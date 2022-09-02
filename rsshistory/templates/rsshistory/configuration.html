@@ -1,0 +1,26 @@
+{% extends base_generic %}
+
+{% block content %}
+
+<h1>Configuration</h1>
+
+<ul>
+ <li>Directory: {{directory}} Size: {{database_size_bytes}} bytes, {{database_size_kbytes}} kbytes, {{database_size_mbytes}} mbytes</li>
+ <li>Version: {{version}}</li>
+</ul>
+
+<h1>Queues</h1>
+<ul>
+    {% for thread in thread_list %}
+       <li>{{ thread.get_thread_name }}: Queue Size: {{thread.get_queue_size}} Current processing: {{ thread.get_process_item }}</li>
+    {% endfor %}
+</ul>
+
+<h1>Advanced</h1>
+<ul>
+  <li><a href="{% url 'news:importlinks' %}">Import links</a></li>
+  <li><a href="{% url 'news:exportdata' %}">Export data</a></li>
+  <li><a href="{% url 'news:removealllinks' %}">Remove all links</a></li>
+</ul>
+
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends base_generic %}
+
+{% block content %}
+  <span>Filters:</span>
+  <a href="/{{django_app}}/links/" class='simplebutton'>Reset</a>
+
+  <form action="/{{django_app}}/links/" method="GET">
+     {{ category_form }}
+     <input type="submit" value="Submit">
+  </form>
+
+  <hr>
+
+  {% if entries_list %}
+  <ul class="linklist">
+    {% for link in entries_list %}
+      <li>
+          <a href="{{ link.link }}" class="longbutton">
+            <div class="linklistitem">
+                <div class="linklistitemtitle">{{link.date_published}}: {{link.title}} {{link.url}}</div>
+            </div>
+          </a>
+
+          {% if user.is_authenticated %}
+          <a href="{{ link.get_absolute_url }}" class="longbutton">
+            <div class="linklistitem">
+                Configure
+            </div>
+          </a>
+          {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+
+    <div class="pagination">
+        <span class="step-links">
+            {% if page_obj.has_previous %}
+               <a href="?page=1{{filters}}" class='simplebutton'>&laquo; first</a>
+               <a href="?page={{ page_obj.previous_page_number }}{{filters}}" class='simplebutton'>previous</a>
+            {% endif %}
+
+            <span class="current">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+            </span>
+
+            {% if page_obj.has_next %}
+              <a href="?page={{ page_obj.next_page_number }}{{filters}}" class='simplebutton'>next</a>
+              <a href="?page={{ page_obj.paginator.num_pages }}{{filters}}" class='simplebutton'>last &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+
+  {% else %}
+    <p>There are no links.</p>
+  {% endif %}
+{% endblock %}

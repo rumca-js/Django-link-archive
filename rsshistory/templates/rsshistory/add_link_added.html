@@ -1,0 +1,10 @@
+{% extends base_generic %}
+
+{% block content %}
+
+<ul>
+    <li>Link added: <a href="{{ link.get_absolute_url }}">{{link.title}}</a></li>
+    <li><a href="{% url 'news:addlink' %}">Add new link</a></li>
+</ul>
+
+{% endblock %}

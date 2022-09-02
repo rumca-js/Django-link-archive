@@ -1,0 +1,44 @@
+{% extends base_generic %}
+
+{% block content %}
+  <h1>RSS history Index</h1>
+  <p>This is a Rss History index.</p>
+
+  <h2>Content</h2>
+  <ul>
+    <li><strong>Sources:</strong> {{ num_links }}</li>
+    <li><strong>Entries:</strong> {{ num_entries }}</li>
+  </ul>
+
+  <h2>Details</h2>
+  With this server you can:
+  <ul>
+    <li>create a database of news/articles</li>
+    <li>you can decide which links are important to you</li>
+  </ul>
+
+  <h2>Your own</h2>
+  <ul>
+    <li>You can create your own instance: <a href="https://github.com/rumca-js/Django-news-app">GitHub</a></li>
+    <li>You can edit templates, styles</li>
+    <li>You can change icons: <a href="https://icons8.com/icons/">https://icons8.com/icons/</a></li>
+  </ul>
+  
+  <p>
+  Let the refresh button F5 be with you!
+  </p>
+  
+  <p>
+  <img src="/static/images/piesel.jpg" width="30%">
+  </p>
+
+  <p>
+    <div>
+    Version: {{version}}
+    </div>
+    <div>
+    Source: <a href="https://github.com/rumca-js/Django-news-app">GitHub</a>
+    </div>
+  </p>
+
+{% endblock %}
