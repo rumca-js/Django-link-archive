@@ -6,10 +6,11 @@ class CatalogConfig(AppConfig):
 
     def ready(self):
         pass
-        from .prjconfig import Configuration
-        c = Configuration.get_object()
+        #from .prjconfig import Configuration
+        #c = Configuration.get_object()
 
     def __del__(self):
-        from .prjconfig import Configuration
-        c = Configuration.get_object() 
-        c.close()
+        pass
+        #from .prjconfig import Configuration
+        #c = Configuration.get_object() 
+        #c.close()

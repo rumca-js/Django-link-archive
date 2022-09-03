@@ -25,14 +25,15 @@ class RssLinkEntryDataModel(models.Model):
     title = models.TextField(max_length=1000, help_text='title')
     description = models.TextField(max_length=1000, help_text='description')
     link = models.TextField(max_length=1000, help_text='link', unique=True)
-    date_published = models.DateTimeField(default=datetime.now)
+    date_published = models.DateTimeField(default = datetime.now, help_text = "date_published")
+    favourite = models.BooleanField(default = False, help_text = "favourite")
 
     class Meta:
         ordering = ['-date_published', 'url', 'title']
 
     def get_absolute_url(self):
         """Returns the URL to access a particular author instance."""
-        return reverse('rsshistory:link-detail', args=[str(self.id)])
+        return reverse('rsshistory:entry-detail', args=[str(self.id)])
 
 
 class LinkData(object):

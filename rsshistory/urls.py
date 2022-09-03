@@ -16,6 +16,7 @@ urlpatterns = [
 
    path('entries/', views.RssEntriesListView.as_view(), name='entries'),
    path('entry/<int:pk>/', views.RssEntryDetailView.as_view(), name='entry-detail'),
+   path('favourite/<int:pk>/', views.favourite_entry, name='entryfavourite'),
 
    path('export/', views.export_data, name='exportdata'),
    path('configuration/', views.configuration, name='configuration'),

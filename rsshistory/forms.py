@@ -58,7 +58,7 @@ class ImportLinksForm(forms.Form):
     rawlinks = forms.CharField(widget=forms.Textarea(attrs={'name':'rawlinks', 'rows':30, 'cols':100}))
 
 
-class ChoiceForm(forms.Form):
+class SourcesChoiceForm(forms.Form):
     """
     Category choice form
     """
@@ -110,6 +110,9 @@ class EntryChoiceForm(forms.Form):
     def __init__(self, *args, **kwargs):
         # how to unpack dynamic forms
         # https://stackoverflow.com/questions/60393884/how-to-pass-choices-dynamically-into-a-django-form
+        categories = kwargs.pop('categories', ())
+        subcategories = kwargs.pop('subcategories', ())
+        title = kwargs.pop('title', ())
         filters = kwargs.pop('filters', ())
 
         # custom javascript code
@@ -128,12 +131,8 @@ class EntryChoiceForm(forms.Form):
         if 'title' in filters:
             title_init = filters['title']
 
-        categories = []
-        subcategories = []
-        titles = []
-
         super().__init__(*args, **kwargs)
 
         self.fields['category'] = forms.CharField(widget=forms.Select(choices=categories, attrs=attr), initial=category_init)
         self.fields['subcategory'] = forms.CharField(widget=forms.Select(choices=subcategories, attrs=attr), initial=subcategory_init)
-        self.fields['title'] = forms.CharField(widget=forms.Select(choices=titles, attrs=attr), initial=title_init)
+        self.fields['title'] = forms.CharField(widget=forms.Select(choices=title, attrs=attr), initial=title_init)

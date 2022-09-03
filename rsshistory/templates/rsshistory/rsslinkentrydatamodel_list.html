@@ -2,9 +2,9 @@
 
 {% block content %}
   <span>Filters:</span>
-  <a href="/{{django_app}}/links/" class='simplebutton'>Reset</a>
+  <a href="/{{django_app}}/entries/" class='simplebutton'>Reset</a>
 
-  <form action="/{{django_app}}/links/" method="GET">
+  <form action="/{{django_app}}/entries/" method="GET">
      {{ category_form }}
      <input type="submit" value="Submit">
   </form>
@@ -17,15 +17,20 @@
       <li>
           <a href="{{ link.link }}" class="longbutton">
             <div class="linklistitem">
-                <div class="linklistitemtitle">{{link.date_published}}: {{link.title}} {{link.url}}</div>
+                <span class="linklistitemtitle">{{link.title}}</span> {{link.date_published}}  {{link.url}}
             </div>
           </a>
 
           {% if user.is_authenticated %}
-          <a href="{{ link.get_absolute_url }}" class="longbutton">
-            <div class="linklistitem">
-                Configure
-            </div>
+          <a href="{{ link.get_absolute_url }}" class="simplebutton">
+             Configure
+          </a>
+          <a href="/{{django_app}}/favourite/{{link.id}}/" class="simplebutton">
+             {% if link.favourite %}
+               UnFavourite
+             {% else %}
+               Favourite
+             {% endif %}
           </a>
           {% endif %}
       </li>

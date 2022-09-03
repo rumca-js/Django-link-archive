@@ -3,7 +3,7 @@ from pathlib import Path
 from .threads import *
 from .basictypes import *
 
-__version__ = "0.0.1"
+__version__ = "0.0.2"
 
 
 class Configuration(object):
@@ -65,7 +65,7 @@ class Configuration(object):
        file_name = url + ".txt"
        file_name = file_name.replace(":", "").replace("/", "").replace("\\","")
        path = Path(".")
-       rss_path = path / 'rss'
+       rss_path = path / 'tmp_rss_data'
        if not rss_path.exists():
            rss_path.mkdir()
        
