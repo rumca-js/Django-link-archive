@@ -106,14 +106,27 @@ class EntryChoiceForm(forms.Form):
     category = forms.CharField(widget=forms.Select(choices=()))
     subcategory = forms.CharField(widget=forms.Select(choices=()))
     title = forms.CharField(widget=forms.Select(choices=()))
+    favourite = forms.BooleanField(required=False)
 
     def __init__(self, *args, **kwargs):
         # how to unpack dynamic forms
         # https://stackoverflow.com/questions/60393884/how-to-pass-choices-dynamically-into-a-django-form
-        categories = kwargs.pop('categories', ())
-        subcategories = kwargs.pop('subcategories', ())
-        title = kwargs.pop('title', ())
-        filters = kwargs.pop('filters', ())
+        request_get_args = kwargs.pop('request_get_args', ())
+        self.entry_query_set = kwargs.pop('entry_query_set', ())
+        self.sources_query_set = kwargs.pop('sources_query_set', ())
+
+        #categories = kwargs.pop('categories', ())
+        #subcategories = kwargs.pop('subcategories', ())
+        #title = kwargs.pop('title', ())
+        filters = EntryChoiceForm.get_source_filter_args(request_get_args)
+
+        categories = self.get_request_values('category')
+        subcategories = self.get_request_values('subcategory')
+        title = self.get_request_values('title')
+
+        categories = self.to_dict(categories)
+        subcategories = self.to_dict(subcategories)
+        title = self.to_dict(title)
 
         # custom javascript code
         # https://stackoverflow.com/questions/10099710/how-to-manually-create-a-select-field-from-a-modelform-in-django
@@ -136,3 +149,45 @@ class EntryChoiceForm(forms.Form):
         self.fields['category'] = forms.CharField(widget=forms.Select(choices=categories, attrs=attr), initial=category_init)
         self.fields['subcategory'] = forms.CharField(widget=forms.Select(choices=subcategories, attrs=attr), initial=subcategory_init)
         self.fields['title'] = forms.CharField(widget=forms.Select(choices=title, attrs=attr), initial=title_init)
+
+    def get_request_values(self, field):
+        values = set()
+        values.add("Any")
+        for val in self.sources_query_set.values(field):
+            if str(val).strip() != "":
+                values.add(val[field])
+
+        return values
+
+    def to_dict(self, alist):
+        result = []
+        for item in sorted(alist):
+            if item.strip() != "":
+                result.append((item, item))
+        return result
+
+    def get_source_filter_args(get_args):
+        parameter_map = {}
+
+        category = get_args.get("category")
+        if category and category != "Any":
+           parameter_map['category'] = category
+
+        subcategory = get_args.get("subcategory")
+        if subcategory and subcategory != "Any":
+           parameter_map['subcategory'] = subcategory
+
+        title = get_args.get("title")
+        if title and title != "Any":
+           parameter_map['title'] = title
+
+        return parameter_map
+
+    def get_entry_filter_args(get_args):
+        parameter_map = {}
+
+        favourite = get_args.get("favourite")
+        if favourite:
+           parameter_map['favourite'] = True
+
+        return parameter_map

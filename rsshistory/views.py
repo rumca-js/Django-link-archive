@@ -313,23 +313,25 @@ class RssEntriesListView(generic.ListView):
     paginate_by = 1000
 
     def get_queryset(self):
-        parameter_map = self.get_filters()
+        source_parameter_map = EntryChoiceForm.get_source_filter_args(self.request.GET)
+        entry_parameter_map = EntryChoiceForm.get_entry_filter_args(self.request.GET)
 
-        objs = RssLinkDataModel.objects.filter(**parameter_map)
-        if objs.exists():
+        self.entries = []
+        self.sources = RssLinkDataModel.objects.filter(**source_parameter_map)
+
+        if self.sources.exists():
             index = 0
-            for obj in objs:
+            for obj in self.sources:
+                entry_parameter_map["url"] = obj.url
                 if index == 0:
-                    self._tmp = RssLinkEntryDataModel.objects.filter(url = obj.url)
+                    self.entries = RssLinkEntryDataModel.objects.filter(**entry_parameter_map)
                 else:
-                    self._tmp = self._tmp | RssLinkEntryDataModel.objects.filter(url = obj.url)
+                    self.entries = self.entries | RssLinkEntryDataModel.objects.filter(**entry_parameter_map)
                 index += 1
-
-            #self._tmp = RssLinkEntryDataModel.objects.filter(**parameter_map)
         else:
-            self._tmp = RssLinkEntryDataModel.objects.all()
+            self.entries = RssLinkEntryDataModel.objects.filter(**entry_parameter_map)
 
-        return self._tmp
+        return self.entries
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
@@ -337,60 +339,16 @@ class RssEntriesListView(generic.ListView):
         context = init_context(context)
         # Create any data and add it to the context
 
-        categories = self.get_request_values('category')
-        subcategories = self.get_request_values('subcategory')
-        title = self.get_request_values('title')
-
-        categories = self.to_dict(categories)
-        subcategories = self.to_dict(subcategories)
-        title = self.to_dict(title)
-
         category_form = EntryChoiceForm(
-                categories = categories,
-                subcategories = subcategories,
-                title = title,
-                filters = self.get_filters())
+                request_get_args = self.request.GET,
+                entry_query_set = self.entries,
+                sources_query_set = self.sources
+                )
 
         context['category_form'] = category_form
         context['page_title'] = "News link list"
 
         return context
-
-    def get_request_values(self, field):
-        values = set()
-
-        parameter_map = self.get_filters()
-
-        values.add("Any")
-        for val in RssLinkDataModel.objects.filter(**parameter_map).values(field):
-            if str(val).strip() != "":
-                values.add(val[field])
-
-        return values
-
-    def to_dict(self, alist):
-        result = []
-        for item in sorted(alist):
-            if item.strip() != "":
-                result.append((item, item))
-        return result
-
-    def get_filters(self):
-        parameter_map = {}
-
-        category = self.request.GET.get("category")
-        if category and category != "Any":
-           parameter_map['category'] = category
-
-        subcategory = self.request.GET.get("subcategory")
-        if subcategory and subcategory != "Any":
-           parameter_map['subcategory'] = subcategory
-
-        title = self.request.GET.get("title")
-        if title and title != "Any":
-           parameter_map['title'] = title
-
-        return parameter_map
 
 
 class RssEntryDetailView(generic.DetailView):
