@@ -46,9 +46,14 @@ class Configuration(object):
        if not export_path.exists():
            export_path.mkdir()
 
-       file_name = export_path / (export_type + "_entries.txt")
-
+       file_name = export_path / (export_type + "_entries.json")
        file_name.write_text(e_converter.get_text())
+
+       file_name = export_path / (export_type + "_entries.csv")
+       file_name.write_text(e_converter.get_csv_text())
+
+       file_name = export_path / (export_type + "_entries.txt")
+       file_name.write_text(e_converter.get_clean_text())
 
    def get_object():
        if not Configuration.obj:

@@ -5,7 +5,7 @@
   <a href="/{{django_app}}/entries/" class='simplebutton'>Reset</a>
 
   <form action="/{{django_app}}/entries/" method="GET">
-     {{ category_form }}
+     {{ filter_form }}
      <input type="submit" value="Submit">
   </form>
 
@@ -15,9 +15,11 @@
   <ul class="linklist">
     {% for link in entries_list %}
       <li>
-          <a href="{{ link.link }}" class="longbutton"
+          <a href="{{ link.link }}"
              {% if link.favourite %}
-               style="background-color: red"
+                class="longbutton longbuttonselected"
+             {% else %}
+                class="longbutton"
              {% endif %}
                   >
             <div class="linklistitem">

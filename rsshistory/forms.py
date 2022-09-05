@@ -1,5 +1,5 @@
 from django import forms
-from .models import RssLinkDataModel
+from .models import RssLinkDataModel, RssLinkEntryDataModel
 
 # https://docs.djangoproject.com/en/4.1/ref/forms/widgets/
 
@@ -68,12 +68,20 @@ class SourcesChoiceForm(forms.Form):
     title = forms.CharField(widget=forms.Select(choices=()))
 
     def __init__(self, *args, **kwargs):
+        self.args = kwargs.pop('args', ())
+        super().__init__(*args, **kwargs)
+
+    def get_filtered_objects(self):
+        parameter_map = self.get_filter_args()
+        self.filtered_objects = RssLinkDataModel.objects.filter(**parameter_map)
+        return self.filtered_objects
+
+    def create(self):
         # how to unpack dynamic forms
         # https://stackoverflow.com/questions/60393884/how-to-pass-choices-dynamically-into-a-django-form
-        categories = kwargs.pop('categories', ())
-        subcategories = kwargs.pop('subcategories', ())
-        title = kwargs.pop('title', ())
-        filters = kwargs.pop('filters', ())
+        categories = self.get_filtered_objects_values('category')
+        subcategories = self.get_filtered_objects_values('subcategory')
+        title = self.get_filtered_objects_values('title')
 
         # custom javascript code
         # https://stackoverflow.com/questions/10099710/how-to-manually-create-a-select-field-from-a-modelform-in-django
@@ -81,21 +89,56 @@ class SourcesChoiceForm(forms.Form):
 
         # default form value
         # https://stackoverflow.com/questions/604266/django-set-default-form-values
-        category_init = 'Any'
-        if 'category' in filters:
-            category_init = filters['category']
-        subcategory_init = 'Any'
-        if 'subcategory' in filters:
-            subcategory_init = filters['subcategory']
-        title_init = 'Any'
-        if 'title' in filters:
-            title_init = filters['title']
-
-        super().__init__(*args, **kwargs)
+        category_init = self.get_init('category')
+        subcategory_init = self.get_init('subcategory')
+        title_init = self.get_init('title')
 
         self.fields['category'] = forms.CharField(widget=forms.Select(choices=categories, attrs=attr), initial=category_init)
         self.fields['subcategory'] = forms.CharField(widget=forms.Select(choices=subcategories, attrs=attr), initial=subcategory_init)
         self.fields['title'] = forms.CharField(widget=forms.Select(choices=title, attrs=attr), initial=title_init)
+
+    def get_init(self, column):
+        filters = self.get_filter_args()
+        if column in filters:
+            return filters[column]
+        else:
+            return "Any"
+
+    def get_filtered_objects_values(self, field):
+        values = set()
+        values.add("Any")
+
+        for val in self.filtered_objects.values(field):
+            if str(val).strip() != "":
+                values.add(val[field])
+
+        dict_values = self.to_dict(values)
+
+        return dict_values
+
+    def to_dict(self, alist):
+        result = []
+        for item in sorted(alist):
+            if item.strip() != "":
+                result.append((item, item))
+        return result
+
+    def get_filter_args(self):
+        parameter_map = {}
+
+        category = self.args.get("category")
+        if category and category != "Any":
+           parameter_map['category'] = category
+
+        subcategory = self.args.get("subcategory")
+        if subcategory and subcategory != "Any":
+           parameter_map['subcategory'] = subcategory
+
+        title = self.args.get("title")
+        if title and title != "Any":
+           parameter_map['title'] = title
+
+        return parameter_map
 
 
 class EntryChoiceForm(forms.Form):
@@ -109,24 +152,36 @@ class EntryChoiceForm(forms.Form):
     favourite = forms.BooleanField(required=False)
 
     def __init__(self, *args, **kwargs):
+        self.args = kwargs.pop('args', ())
+        super().__init__(*args, **kwargs)
+
+    def get_filtered_objects(self):
+        source_parameter_map = self.get_source_filter_args()
+        entry_parameter_map = self.get_entry_filter_args()
+
+        self.entries = []
+        self.sources = RssLinkDataModel.objects.filter(**source_parameter_map)
+
+        if self.sources.exists():
+            index = 0
+            for obj in self.sources:
+                entry_parameter_map["url"] = obj.url
+                if index == 0:
+                    self.entries = RssLinkEntryDataModel.objects.filter(**entry_parameter_map)
+                else:
+                    self.entries = self.entries | RssLinkEntryDataModel.objects.filter(**entry_parameter_map)
+                index += 1
+        else:
+            self.entries = RssLinkEntryDataModel.objects.filter(**entry_parameter_map)
+
+        return self.entries
+
+    def create(self):
         # how to unpack dynamic forms
         # https://stackoverflow.com/questions/60393884/how-to-pass-choices-dynamically-into-a-django-form
-        request_get_args = kwargs.pop('request_get_args', ())
-        self.entry_query_set = kwargs.pop('entry_query_set', ())
-        self.sources_query_set = kwargs.pop('sources_query_set', ())
-
-        #categories = kwargs.pop('categories', ())
-        #subcategories = kwargs.pop('subcategories', ())
-        #title = kwargs.pop('title', ())
-        filters = EntryChoiceForm.get_source_filter_args(request_get_args)
-
-        categories = self.get_request_values('category')
-        subcategories = self.get_request_values('subcategory')
-        title = self.get_request_values('title')
-
-        categories = self.to_dict(categories)
-        subcategories = self.to_dict(subcategories)
-        title = self.to_dict(title)
+        categories = self.get_filtered_objects_values('category')
+        subcategories = self.get_filtered_objects_values('subcategory')
+        title = self.get_filtered_objects_values('title')
 
         # custom javascript code
         # https://stackoverflow.com/questions/10099710/how-to-manually-create-a-select-field-from-a-modelform-in-django
@@ -134,30 +189,33 @@ class EntryChoiceForm(forms.Form):
 
         # default form value
         # https://stackoverflow.com/questions/604266/django-set-default-form-values
-        category_init = 'Any'
-        if 'category' in filters:
-            category_init = filters['category']
-        subcategory_init = 'Any'
-        if 'subcategory' in filters:
-            subcategory_init = filters['subcategory']
-        title_init = 'Any'
-        if 'title' in filters:
-            title_init = filters['title']
-
-        super().__init__(*args, **kwargs)
+        category_init = self.get_source_init('category')
+        subcategory_init = self.get_source_init('subcategory')
+        title_init = self.get_source_init('title')
 
         self.fields['category'] = forms.CharField(widget=forms.Select(choices=categories, attrs=attr), initial=category_init)
         self.fields['subcategory'] = forms.CharField(widget=forms.Select(choices=subcategories, attrs=attr), initial=subcategory_init)
         self.fields['title'] = forms.CharField(widget=forms.Select(choices=title, attrs=attr), initial=title_init)
+        self.fields['favourite'] = forms.BooleanField(required=False, initial=self.args.get('favourite'))
 
-    def get_request_values(self, field):
+    def get_filtered_objects_values(self, field):
         values = set()
         values.add("Any")
-        for val in self.sources_query_set.values(field):
+
+        for val in self.sources.values(field):
             if str(val).strip() != "":
                 values.add(val[field])
 
-        return values
+        dict_values = self.to_dict(values)
+
+        return dict_values
+
+    def get_source_init(self, column):
+        filters = self.get_source_filter_args()
+        if column in filters:
+            return filters[column]
+        else:
+            return "Any"
 
     def to_dict(self, alist):
         result = []
@@ -166,27 +224,27 @@ class EntryChoiceForm(forms.Form):
                 result.append((item, item))
         return result
 
-    def get_source_filter_args(get_args):
+    def get_source_filter_args(self):
         parameter_map = {}
 
-        category = get_args.get("category")
+        category = self.args.get("category")
         if category and category != "Any":
            parameter_map['category'] = category
 
-        subcategory = get_args.get("subcategory")
+        subcategory = self.args.get("subcategory")
         if subcategory and subcategory != "Any":
            parameter_map['subcategory'] = subcategory
 
-        title = get_args.get("title")
+        title = self.args.get("title")
         if title and title != "Any":
            parameter_map['title'] = title
 
         return parameter_map
 
-    def get_entry_filter_args(get_args):
+    def get_entry_filter_args(self):
         parameter_map = {}
 
-        favourite = get_args.get("favourite")
+        favourite = self.args.get("favourite")
         if favourite:
            parameter_map['favourite'] = True
 

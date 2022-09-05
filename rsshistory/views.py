@@ -53,10 +53,9 @@ class RssLinkListView(generic.ListView):
     paginate_by = 100
 
     def get_queryset(self):
-        parameter_map = self.get_filters()
-        self._tmp = RssLinkDataModel.objects.filter(**parameter_map)
 
-        return self._tmp
+        self.filter_form = SourcesChoiceForm(args = self.request.GET)
+        return self.filter_form.get_filtered_objects()
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
@@ -64,56 +63,12 @@ class RssLinkListView(generic.ListView):
         context = init_context(context)
         # Create any data and add it to the context
 
-        categories = self.get_request_values('category')
-        subcategories = self.get_request_values('subcategory')
-        title = self.get_request_values('title')
+        self.filter_form.create()
 
-        categories = self.to_dict(categories)
-        subcategories = self.to_dict(subcategories)
-        title = self.to_dict(title)
-
-        category_form = SourcesChoiceForm(categories = categories,
-                                   subcategories = subcategories,
-                                   title = title,
-                                   filters = self.get_filters())
-
-        context['category_form'] = category_form
+        context['filter_form'] = self.filter_form
         context['page_title'] = "News link list"
 
         return context
-
-    def get_request_values(self, field):
-        values = set()
-        values.add("Any")
-
-        for val in self._tmp.values(field):
-            if str(val).strip() != "":
-                values.add(val[field])
-        return values
-
-    def to_dict(self, alist):
-        result = []
-        for item in sorted(alist):
-            if item.strip() != "":
-                result.append((item, item))
-        return result
-
-    def get_filters(self):
-        parameter_map = {}
-
-        category = self.request.GET.get("category")
-        if category and category != "Any":
-           parameter_map['category'] = category
-
-        subcategory = self.request.GET.get("subcategory")
-        if subcategory and subcategory != "Any":
-           parameter_map['subcategory'] = subcategory
-
-        title = self.request.GET.get("title")
-        if title and title != "Any":
-           parameter_map['title'] = title
-
-        return parameter_map
 
 
 class RssLinkDetailView(generic.DetailView):
@@ -328,25 +283,8 @@ class RssEntriesListView(generic.ListView):
     paginate_by = 1000
 
     def get_queryset(self):
-        source_parameter_map = EntryChoiceForm.get_source_filter_args(self.request.GET)
-        entry_parameter_map = EntryChoiceForm.get_entry_filter_args(self.request.GET)
-
-        self.entries = []
-        self.sources = RssLinkDataModel.objects.filter(**source_parameter_map)
-
-        if self.sources.exists():
-            index = 0
-            for obj in self.sources:
-                entry_parameter_map["url"] = obj.url
-                if index == 0:
-                    self.entries = RssLinkEntryDataModel.objects.filter(**entry_parameter_map)
-                else:
-                    self.entries = self.entries | RssLinkEntryDataModel.objects.filter(**entry_parameter_map)
-                index += 1
-        else:
-            self.entries = RssLinkEntryDataModel.objects.filter(**entry_parameter_map)
-
-        return self.entries
+        self.filter_form = EntryChoiceForm(args = self.request.GET)
+        return self.filter_form.get_filtered_objects()
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
@@ -354,13 +292,9 @@ class RssEntriesListView(generic.ListView):
         context = init_context(context)
         # Create any data and add it to the context
 
-        category_form = EntryChoiceForm(
-                request_get_args = self.request.GET,
-                entry_query_set = self.entries,
-                sources_query_set = self.sources
-                )
+        self.filter_form.create()
 
-        context['category_form'] = category_form
+        context['filter_form'] = self.filter_form
         context['page_title'] = "News link list"
 
         return context

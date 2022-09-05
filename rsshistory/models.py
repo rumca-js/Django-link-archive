@@ -90,23 +90,27 @@ class EntryConverter(object):
          link_info = row_data.split(delimiter)
 
          self.url = link_info[0]
-         self.title = link_info[1]
-         self.description = link_info[2]
-         self.link = link_info[3]
-         self.date_published = link_info[4]
-         self.favourite = link_info[5]
+         self.link = link_info[1]
+         self.date_published = link_info[2]
+         self.favourite = link_info[3]
+         self.title = link_info[4]
+         self.description = link_info[5]
 
     def get_text(link):
         data = {}
         data['url'] = link.url
-        data['title'] = link.title
-        data['description'] = link.description
         data['link'] = link.link
+        data['title'] = link.title
         data['date_published'] = str(link.date_published)
+        data['description'] = link.description
 
         return data
 
-        #return "{0};{1};{2};{3};{4};{5}".format(link.url, link.title, link.description, link.link, link.date_published, link.favourite)
+    def get_csv_text(link):
+        return "{0};{1};{2};{3};{4};{5}".format(link.url, link.link, link.date_published, link.favourite, link.title, link.description)
+
+    def get_clean_text(link):
+        return "{0}\n{1}\n{2}\n{3}\n{4}\n{5}\n".format(link.url, link.link, link.title, link.date_published, link.favourite, link.description)
 
 
 class EntriesConverter(object):
@@ -129,8 +133,6 @@ class EntriesConverter(object):
         self.entries = entries
 
     def get_text(self):
-        summary_text = ""
-
         output_data = []
         for entry in self.entries:
             entry_data = EntryConverter.get_text(entry)
@@ -138,3 +140,19 @@ class EntriesConverter(object):
             
         import json
         return json.dumps(output_data)
+
+    def get_csv_text(self):
+        output_data = []
+        for entry in self.entries:
+            entry_data = EntryConverter.get_csv_text(entry)
+            output_data.append(entry_data)
+            
+        return "\n".join(output_data)
+
+    def get_clean_text(self):
+        output_data = []
+        for entry in self.entries:
+            entry_data = EntryConverter.get_clean_text(entry)
+            output_data.append(entry_data)
+            
+        return "\n".join(output_data)
