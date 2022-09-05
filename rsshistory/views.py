@@ -4,7 +4,7 @@ from django.views import generic
 from django.db.models.query import QuerySet
 from django.db.models.query import EmptyQuerySet
 
-from .models import RssLinkDataModel, RssLinkEntryDataModel, LinksData, LinkData
+from .models import RssLinkDataModel, RssLinkEntryDataModel, SourcesConverter, EntriesConverter
 from .forms import NewLinkForm, ImportLinksForm, SourcesChoiceForm, EntryChoiceForm
 from .basictypes import *
 from pathlib import Path
@@ -239,17 +239,32 @@ def remove_all_links(request):
 
 
 
-def export_data(request):
+def export_sources(request):
     context = get_context(request)
     context['page_title'] = "Export data"
     summary_text = ""
 
-    links = RssLinkDataModel.objects.all()
-    for link in links:
-        data = LinkData.to_string(link)
-        summary_text += data + "\n"
+    sources = RssLinkDataModel.objects.all()
 
-    context["summary_text"] = summary_text
+    s_converter = SourcesConverter()
+    s_converter.set_sources(sources)
+
+    context["summary_text"] = s_converter.get_text()
+
+    return render(request, app_dir / 'summary_present.html', context)
+
+
+def export_entries(request):
+    context = get_context(request)
+    context['page_title'] = "Export data"
+    summary_text = ""
+
+    entries = RssLinkEntryDataModel.objects.all()
+
+    c = Configuration.get_object()
+    c.export_entries(entries)
+
+    context["summary_text"] = "Exported entries"
 
     return render(request, app_dir / 'summary_present.html', context)
 

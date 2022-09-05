@@ -15,7 +15,11 @@
   <ul class="linklist">
     {% for link in entries_list %}
       <li>
-          <a href="{{ link.link }}" class="longbutton">
+          <a href="{{ link.link }}" class="longbutton"
+             {% if link.favourite %}
+               style="background-color: red"
+             {% endif %}
+                  >
             <div class="linklistitem">
                 <span class="linklistitemtitle">{{link.title}}</span> {{link.date_published}}  {{link.url}}
             </div>

@@ -36,30 +36,105 @@ class RssLinkEntryDataModel(models.Model):
         return reverse('rsshistory:entry-detail', args=[str(self.id)])
 
 
-class LinkData(object):
+class SourceConverter(object):
     def __init__(self, row_data):
+        self.process_string(row_data)
+
+    def process_string(self, row_data):
          delimiter = ";"
          link_info = row_data.split(delimiter)
 
          self.url = link_info[0]
          self.title = link_info[1]
-         self.author = link_info[2]
-         self.category = link_info[4]
-         self.subcategory = link_info[5]
-         self.tag = link_info[6]
-         self.date_created = link_info[7]
+         self.category = link_info[2]
+         self.subcategory = link_info[3]
+         self.date_fetched = link_info[4]
 
-    def to_string(link):
-        return "{0};{1};{2};{3};{4};{5};{6};{7};{8}".format(link.url, link.title, link.author, link.category, link.subcategory, link.tag, link.date_created)
+    def get_text(link):
+        return "{0};{1};{2};{3};{4}".format(link.url, link.title, link.category, link.subcategory, link.date_fetched)
 
 
-class LinksData(object):
-    def __init__(self, data):
+class SourcesConverter(object):
+
+    def __init__(self, data = None):
+        if data:
+            self.process_string(data)
+
+    def process_string(self, data):
         delimiter = "\n"
         links = data.split(delimiter)
         self.links = []
 
         for link_row in links:
              link_row = link_row.replace("\r", "")
-             link = LinkData(link_row)
+             link = SourceConverter(link_row)
              self.links.append(link)
+
+    def set_sources(self, sources):
+        self.sources = sources
+
+    def get_text(self):
+        summary_text = ""
+        for source in self.sources:
+            data = SourceConverter.get_text(source)
+            summary_text += data + "\n"
+        return summary_text
+
+
+class EntryConverter(object):
+    def __init__(self, row_data):
+        self.process_string(row_data)
+
+    def process_string(self, row_data):
+         delimiter = ";"
+         link_info = row_data.split(delimiter)
+
+         self.url = link_info[0]
+         self.title = link_info[1]
+         self.description = link_info[2]
+         self.link = link_info[3]
+         self.date_published = link_info[4]
+         self.favourite = link_info[5]
+
+    def get_text(link):
+        data = {}
+        data['url'] = link.url
+        data['title'] = link.title
+        data['description'] = link.description
+        data['link'] = link.link
+        data['date_published'] = str(link.date_published)
+
+        return data
+
+        #return "{0};{1};{2};{3};{4};{5}".format(link.url, link.title, link.description, link.link, link.date_published, link.favourite)
+
+
+class EntriesConverter(object):
+
+    def __init__(self, data = None):
+        if data:
+            self.process_string(data)
+
+    def process_string(self, data):
+        delimiter = "\n"
+        links = data.split(delimiter)
+        self.links = []
+
+        for link_row in links:
+             link_row = link_row.replace("\r", "")
+             link = EntryConverter(link_row)
+             self.links.append(link)
+
+    def set_entries(self, entries):
+        self.entries = entries
+
+    def get_text(self):
+        summary_text = ""
+
+        output_data = []
+        for entry in self.entries:
+            entry_data = EntryConverter.get_text(entry)
+            output_data.append(entry_data)
+            
+        import json
+        return json.dumps(output_data)

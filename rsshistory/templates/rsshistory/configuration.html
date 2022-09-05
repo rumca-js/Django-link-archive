@@ -18,9 +18,10 @@
 
 <h1>Advanced</h1>
 <ul>
-  <li><a href="{% url 'news:importlinks' %}">Import links</a></li>
-  <li><a href="{% url 'news:exportdata' %}">Export data</a></li>
-  <li><a href="{% url 'news:removealllinks' %}">Remove all links</a></li>
+  <li><a href="{% url 'rsshistory:importlinks' %}">Import links</a></li>
+  <li><a href="{% url 'rsshistory:exportsources' %}">Export sources</a></li>
+  <li><a href="{% url 'rsshistory:exportentries' %}">Export entries</a></li>
+  <li><a href="{% url 'rsshistory:removealllinks' %}">Remove all links</a></li>
 </ul>
 
 {% endblock %}

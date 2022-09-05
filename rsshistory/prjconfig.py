@@ -18,6 +18,38 @@ class Configuration(object):
        self.enable_logging()
        self.create_threads()
 
+   def get_rss_tmp_path(self):
+       path = Path(".")
+       rss_path = path / 'tmp_rss_data'
+       if not rss_path.exists():
+           rss_path.mkdir()
+       return rss_path
+
+   def get_export_path(self):
+       path = Path(".")
+       rss_path = path / 'exports' / 'rsshistory'
+       if not rss_path.exists():
+           rss_path.mkdir()
+       return rss_path
+
+   def export_entries(self, entries, export_type = "default"):
+       from .models import RssLinkDataModel, RssLinkEntryDataModel, SourcesConverter, EntriesConverter
+
+       if len(entries) == 0:
+           return
+
+       e_converter = EntriesConverter()
+       e_converter.set_entries(entries)
+
+       export_path = self.get_export_path() / self.get_date_file_name()
+
+       if not export_path.exists():
+           export_path.mkdir()
+
+       file_name = export_path / (export_type + "_entries.txt")
+
+       file_name.write_text(e_converter.get_text())
+
    def get_object():
        if not Configuration.obj:
            Configuration.obj = Configuration()
@@ -63,11 +95,8 @@ class Configuration(object):
        feed = feedparser.parse(url)
 
        file_name = url + ".txt"
-       file_name = file_name.replace(":", "").replace("/", "").replace("\\","")
-       path = Path(".")
-       rss_path = path / 'tmp_rss_data'
-       if not rss_path.exists():
-           rss_path.mkdir()
+       file_name = self.get_url_clean_name(file_name)
+       rss_path = self.get_rss_tmp_path()
        
        file_path = rss_path / file_name
        file_path.write_text(str(feed))
@@ -131,9 +160,7 @@ class Configuration(object):
                published = ""
                if hasattr(entry, "published"):
 
-                   from dateutil import parser
-                   date = parser.parse(entry.published)
-                   date = date.isoformat()
+                   date = self.get_date_iso(entry.published)
 
                    o = RssLinkEntryDataModel(
                        url = item.url,
@@ -154,6 +181,9 @@ class Configuration(object):
            #else:
            #    print("Entry already exists")
 
+       date_range = self.get_datetime_range_one_day()
+       entries = RssLinkEntryDataModel.objects.filter(url = item.url, date_published__range=date_range)
+       self.export_entries(entries, self.get_url_clean_name(item.url))
 
    def download_rss(self, item):
        self.threads[0].add_to_process_list(item)
@@ -166,3 +196,26 @@ class Configuration(object):
       for source in sources:
           self.download_rss(source)
 
+   def get_datetime_file_name(self):
+       return datetime.datetime.today().strftime('%Y-%m-%d_%H-%M-%S')
+
+   def get_date_file_name(self):
+       return datetime.datetime.today().strftime('%Y-%m-%d')
+
+   def get_url_clean_name(self, file_name):
+       file_name = file_name.replace(":", "").replace("/", "").replace("\\","")
+       return file_name
+
+   def get_date_iso(self, timestamp):
+      from dateutil import parser
+      date = parser.parse(timestamp)
+      date = date.isoformat()
+      return date
+
+   def get_datetime_range_one_day(self):
+      from datetime import date, timedelta
+
+      current_date = date.today()
+      next_day = current_date + timedelta(days = 1) 
+
+      return (current_date, next_day)
