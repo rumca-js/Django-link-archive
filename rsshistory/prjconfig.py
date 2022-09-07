@@ -1,9 +1,11 @@
 from pathlib import Path
+import subprocess
 
 from .threads import *
 from .basictypes import *
+from .models import ConfigurationEntry
 
-__version__ = "0.0.3"
+__version__ = "0.0.4"
 
 
 class Configuration(object):
@@ -20,7 +22,7 @@ class Configuration(object):
 
    def get_rss_tmp_path(self):
        path = Path(".")
-       rss_path = path / 'tmp_rss_data'
+       rss_path = path / 'exports' / 'rsshistory' / 'downloaded_rss'
        if not rss_path.exists():
            rss_path.mkdir()
        return rss_path
@@ -49,8 +51,8 @@ class Configuration(object):
        file_name = export_path / (export_type + "_entries.json")
        file_name.write_text(e_converter.get_text())
 
-       file_name = export_path / (export_type + "_entries.csv")
-       file_name.write_text(e_converter.get_csv_text())
+       #file_name = export_path / (export_type + "_entries.csv")
+       #file_name.write_text(e_converter.get_csv_text())
 
        file_name = export_path / (export_type + "_entries.txt")
        file_name.write_text(e_converter.get_clean_text())
@@ -200,6 +202,16 @@ class Configuration(object):
       sources = RssLinkDataModel.objects.all()
       for source in sources:
           self.download_rss(source)
+
+      ob = ConfigurationEntry.objects.all()
+      if ob.exists():
+         self.push_to_git(ob[0])
+
+   def push_to_git(self, conf):
+       git_path = Path(conf.git_path)
+       if not git_path.exists():
+          git_path.mkdir(parents=True, exist_ok = False)
+          subprocess.run(["git", "clone", conf.git_repo], cwd=git_path)
 
    def get_datetime_file_name(self):
        return datetime.datetime.today().strftime('%Y-%m-%d_%H-%M-%S')

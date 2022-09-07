@@ -36,6 +36,13 @@ class RssLinkEntryDataModel(models.Model):
         return reverse('rsshistory:entry-detail', args=[str(self.id)])
 
 
+class ConfigurationEntry(models.Model):
+    git_path = models.CharField(max_length=2000)
+    git_repo = models.CharField(max_length=2000)
+    git_user = models.CharField(max_length=2000)
+    git_token = models.CharField(max_length=2000)
+
+
 class SourceConverter(object):
     def __init__(self, row_data):
         self.process_string(row_data)

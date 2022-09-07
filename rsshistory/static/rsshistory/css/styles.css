@@ -5,6 +5,9 @@
     padding: 0;
     list-style: none;
 }
+.page-body {
+    background-color:#F9F9F9
+}
 
 .mainbutton {
   color : #373737;
@@ -57,6 +60,10 @@ select {display: block;}
   /* display: block; */
   display: flex;
   /* flex-wrap: wrap; */
+}
+
+.longbuttonselected {
+  background-color: #BFD8FF;
 }
 
 .longbutton:hover {

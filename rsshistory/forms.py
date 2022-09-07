@@ -1,5 +1,5 @@
 from django import forms
-from .models import RssLinkDataModel, RssLinkEntryDataModel
+from .models import RssLinkDataModel, RssLinkEntryDataModel, ConfigurationEntry
 
 # https://docs.djangoproject.com/en/4.1/ref/forms/widgets/
 
@@ -150,6 +150,7 @@ class EntryChoiceForm(forms.Form):
     subcategory = forms.CharField(widget=forms.Select(choices=()))
     title = forms.CharField(widget=forms.Select(choices=()))
     favourite = forms.BooleanField(required=False)
+    search = forms.CharField(label='Search', max_length = 500, required=False)
 
     def __init__(self, *args, **kwargs):
         self.args = kwargs.pop('args', ())
@@ -166,6 +167,12 @@ class EntryChoiceForm(forms.Form):
             index = 0
             for obj in self.sources:
                 entry_parameter_map["url"] = obj.url
+
+                if 'search' in entry_parameter_map:
+                    print("parameters: " + entry_parameter_map['search'])
+                    entry_parameter_map["title__icontains"] = entry_parameter_map['search']
+                    del entry_parameter_map['search']
+
                 if index == 0:
                     self.entries = RssLinkEntryDataModel.objects.filter(**entry_parameter_map)
                 else:
@@ -197,6 +204,7 @@ class EntryChoiceForm(forms.Form):
         self.fields['subcategory'] = forms.CharField(widget=forms.Select(choices=subcategories, attrs=attr), initial=subcategory_init)
         self.fields['title'] = forms.CharField(widget=forms.Select(choices=title, attrs=attr), initial=title_init)
         self.fields['favourite'] = forms.BooleanField(required=False, initial=self.args.get('favourite'))
+        self.fields['search'] = forms.CharField(label='Search', max_length = 500, required=False, initial=self.args.get("search"))
 
     def get_filtered_objects_values(self, field):
         values = set()
@@ -248,4 +256,20 @@ class EntryChoiceForm(forms.Form):
         if favourite:
            parameter_map['favourite'] = True
 
+        search = self.args.get("search")
+        if search:
+           parameter_map['search'] = search
+
         return parameter_map
+
+
+class ConfigForm(forms.ModelForm):
+    """
+    Category choice form
+    """
+    class Meta:
+        model = ConfigurationEntry
+        fields = ['git_path', 'git_repo', 'git_user', 'git_token']
+        widgets = {
+         #'git_token': forms.PasswordInput(),
+        }

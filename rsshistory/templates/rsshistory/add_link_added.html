@@ -3,8 +3,8 @@
 {% block content %}
 
 <ul>
-    <li>Link added: <a href="{{ link.get_absolute_url }}">{{link.title}}</a></li>
-    <li><a href="{% url 'news:addlink' %}">Add new link</a></li>
+    <li>Source added: <a href="{{ link.get_absolute_url }}">{{link.title}}</a></li>
+    <li><a href="{% url 'rsshistory:addlink' %}">Add new source</a></li>
 </ul>
 
 {% endblock %}

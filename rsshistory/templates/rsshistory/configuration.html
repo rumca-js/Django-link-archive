@@ -24,4 +24,12 @@
   <li><a href="{% url 'rsshistory:removealllinks' %}">Remove all links</a></li>
 </ul>
 
+<h1>Config</h1>
+
+  <form action="/{{django_app}}/configuration/" method="POST">
+     {% csrf_token %}
+     {{config_form}}
+     <input type="submit" value="Submit">
+  </form>
+
 {% endblock %}

@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from django.shortcuts import render
 from django.views import generic
 
@@ -5,9 +7,11 @@ from django.db.models.query import QuerySet
 from django.db.models.query import EmptyQuerySet
 
 from .models import RssLinkDataModel, RssLinkEntryDataModel, SourcesConverter, EntriesConverter
-from .forms import NewLinkForm, ImportLinksForm, SourcesChoiceForm, EntryChoiceForm
+from .models import ConfigurationEntry
+
+from .forms import NewLinkForm, ImportLinksForm, SourcesChoiceForm, EntryChoiceForm, ConfigForm
 from .basictypes import *
-from pathlib import Path
+
 from .prjconfig import Configuration
 
 
@@ -21,6 +25,7 @@ def init_context(context):
     context["base_generic"] = str(app_dir / "base_generic.html")
 
     c = Configuration.get_object()
+    context['app_version'] = c.version
 
     return context
 
@@ -41,7 +46,6 @@ def index(request):
 
     context['num_links'] = num_links
     context['num_entries'] = num_entries
-    context['version'] = c.version
 
     # Render the HTML template index.html with the data in the context variable
     return render(request, app_dir / 'index.html', context=context)
@@ -231,10 +235,29 @@ def configuration(request):
     
     c = Configuration.get_object()
     context['directory'] = c.directory
-    context['version'] = c.version
     context['database_size_bytes'] = get_directory_size_bytes(c.directory)
     context['database_size_kbytes'] = get_directory_size_bytes(c.directory)/1024
     context['database_size_mbytes'] = get_directory_size_bytes(c.directory)/1024/1024
+
+    ob = ConfigurationEntry.objects.all()
+    if not ob.exists():
+        rec = ConfigurationEntry(git_path = ".",
+                                 git_repo = "TODO",
+                                 git_user = "TODO",
+                                 git_token = "TODO")
+        rec.save()
+
+    ob = ConfigurationEntry.objects.all()
+
+    if request.method == 'POST':
+        form = ConfigForm(request.POST, instance=ob[0])
+        if form.is_valid():
+            form.save()
+
+        ob = ConfigurationEntry.objects.all()
+        context['config_form'] = ConfigForm(instance = ob[0])
+    else:
+        context['config_form'] = ConfigForm(instance = ob[0])
 
     return render(request, app_dir / 'configuration.html', context)
 
@@ -280,7 +303,7 @@ def edit_link(request, pk):
 class RssEntriesListView(generic.ListView):
     model = RssLinkEntryDataModel
     context_object_name = 'entries_list'
-    paginate_by = 1000
+    paginate_by = 500
 
     def get_queryset(self):
         self.filter_form = EntryChoiceForm(args = self.request.GET)
@@ -328,3 +351,4 @@ def favourite_entry(request, pk):
     context["summary_text"] = summary_text
 
     return render(request, app_dir / 'summary_present.html', context)
+
