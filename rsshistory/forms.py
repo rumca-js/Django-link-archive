@@ -162,18 +162,21 @@ class EntryChoiceForm(forms.Form):
         source_parameter_map = self.get_source_filter_args()
         entry_parameter_map = self.get_entry_filter_args()
 
+        if 'search' in entry_parameter_map:
+            print("parameters: " + entry_parameter_map['search'])
+            entry_parameter_map["title__icontains"] = entry_parameter_map['search']
+            del entry_parameter_map['search']
+
         self.entries = []
         self.sources = RssLinkDataModel.objects.filter(**source_parameter_map)
+
+        if source_parameter_map == {}:
+            return RssLinkEntryDataModel.objects.filter(**entry_parameter_map)
 
         if self.sources.exists():
             index = 0
             for obj in self.sources:
                 entry_parameter_map["url"] = obj.url
-
-                if 'search' in entry_parameter_map:
-                    print("parameters: " + entry_parameter_map['search'])
-                    entry_parameter_map["title__icontains"] = entry_parameter_map['search']
-                    del entry_parameter_map['search']
 
                 if index == 0:
                     self.entries = RssLinkEntryDataModel.objects.filter(**entry_parameter_map)

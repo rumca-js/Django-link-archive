@@ -101,11 +101,11 @@ def add_source(request):
 
         # create a form instance and populate it with data from the request:
         form = SourceForm(request.POST)
-
         
         # check whether it's valid:
         if form.is_valid():
             valid = True
+            form.save()
 
         context['form'] = form
 
@@ -391,6 +391,7 @@ def add_entry(request):
         # check whether it's valid:
         if form.is_valid():
             valid = True
+            form.save()
 
         context['form'] = form
 
@@ -414,11 +415,9 @@ def edit_entry(request, pk):
     context['page_title'] = "Edit entry"
     context['pk'] = pk
 
-    ft = RssLinkEntryDataModel.objects.filter(id=pk)
-    if not ft.exists():
+    ob = RssLinkEntryDataModel.objects.filter(id=pk)
+    if not ob.exists():
        return render(request, app_dir / 'entry_edit_exists.html', context)
-
-    ob = ft[0]
 
     if request.method == 'POST':
         form = EntryForm(request.POST, instance=ob[0])
@@ -427,13 +426,28 @@ def edit_entry(request, pk):
         if form.is_valid():
             form.save()
 
-            context['entry'] = ft[0]
+            context['entry'] = ob[0]
             return render(request, app_dir / 'entry_edit_ok.html', context)
 
         context['summary_text'] = "Could not edit entry"
 
         return render(request, app_dir / 'summary_present', context)
     else:
-        form = EntryForm(init_obj=obj)
+        form = EntryForm(instance=ob[0])
         context['form'] = form
         return render(request, app_dir / 'entry_edit.html', context)
+
+
+def remove_entry(request, pk):
+    context = get_context(request)
+    context['page_title'] = "Remove entry"
+
+    entries = RssLinkEntryDataModel.objects.filter(url = ft[0].url)
+    if entries.exists():
+        entries.delete()
+
+        context["summary_text"] = "Remove ok"
+    else:
+        context["summary_text"] = "No source for ID: " + str(pk)
+
+    return render(request, app_dir / 'summary_present.html', context)
