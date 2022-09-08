@@ -3,12 +3,35 @@ from django.urls import reverse
 from datetime import datetime
 
 
+class PageParser(object):
+    def __init__(self, link_url):
+        self.title = self.process(self.get_page(link_url))
+
+    def process(self, text):
+        title = ""
+
+        titles = []
+        for text in re.findall("<title.*?>(.+?)</title>"):
+            titles.append(text)
+
+        return " ".join(titles)
+
+    def get_page(url):
+        import urllib.request, urllib.error, urllib.parse
+        try:
+            req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+            webContent = urllib.request.urlopen(req).read().decode('UTF-8')
+            return webContent
+        except Exception as e:
+           logging.critical(e, exc_info=True)
+
+
 class RssLinkDataModel(models.Model):
 
-    url = models.TextField(max_length=2000, help_text='url', unique=True)
-    title = models.TextField(max_length=1000, help_text='title')
-    category = models.TextField(max_length=1000, help_text='category')
-    subcategory = models.TextField(max_length=1000, help_text='subcategory')
+    url = models.CharField(max_length=2000, unique=True)
+    title = models.CharField(max_length=1000)
+    category = models.CharField(max_length=1000)
+    subcategory = models.CharField(max_length=1000)
     date_fetched = models.DateTimeField(null = True)
 
     class Meta:
@@ -16,17 +39,17 @@ class RssLinkDataModel(models.Model):
 
     def get_absolute_url(self):
         """Returns the URL to access a particular author instance."""
-        return reverse('rsshistory:link-detail', args=[str(self.id)])
+        return reverse('rsshistory:source-detail', args=[str(self.id)])
 
 
 class RssLinkEntryDataModel(models.Model):
 
-    url = models.TextField(max_length=2000, help_text='url')
-    title = models.TextField(max_length=1000, help_text='title')
-    description = models.TextField(max_length=1000, help_text='description')
-    link = models.TextField(max_length=1000, help_text='link', unique=True)
-    date_published = models.DateTimeField(default = datetime.now, help_text = "date_published")
-    favourite = models.BooleanField(default = False, help_text = "favourite")
+    url = models.CharField(max_length=2000)
+    title = models.CharField(max_length=1000)
+    description = models.CharField(max_length=1000)
+    link = models.CharField(max_length=1000, unique=True)
+    date_published = models.DateTimeField(default = datetime.now)
+    favourite = models.BooleanField(default = False)
 
     class Meta:
         ordering = ['-date_published', 'url', 'title']
@@ -70,12 +93,12 @@ class SourcesConverter(object):
     def process_string(self, data):
         delimiter = "\n"
         links = data.split(delimiter)
-        self.links = []
+        self.sources = []
 
         for link_row in links:
              link_row = link_row.replace("\r", "")
              link = SourceConverter(link_row)
-             self.links.append(link)
+             self.sources.append(link)
 
     def set_sources(self, sources):
         self.sources = sources
@@ -93,15 +116,35 @@ class EntryConverter(object):
         self.process_string(row_data)
 
     def process_string(self, row_data):
-         delimiter = ";"
-         link_info = row_data.split(delimiter)
+        from urllib.parse import urlparse
+        delimiter = ";"
+        link_info = row_data.split(delimiter)
 
-         self.url = link_info[0]
-         self.link = link_info[1]
-         self.date_published = link_info[2]
-         self.favourite = link_info[3]
-         self.title = link_info[4]
-         self.description = link_info[5]
+        self.url = ""
+        self.date_published = datetime.now
+        self.favourite = True
+        self.title = ""
+        self.description = ""
+
+        self.link = link_info[0]
+
+        if len(link_info) > 1:
+            self.url = link_info[1]
+        else:
+            if len(self.link) > 4:
+                self.url = urlparse(self.link).netloc
+
+        if len(link_info) > 2:
+            self.favourite = link_info[2] == "True"
+        if len(link_info) > 3:
+            self.title = link_info[3]
+        else:
+            parser = PageParser(self.link)
+            self.title = parser.title
+        if len(link_info) > 4:
+            self.date_published = link_info[4]
+        if len(link_info) > 5:
+            self.description = link_info[5]
 
     def get_text(link):
         data = {}
@@ -114,7 +157,7 @@ class EntryConverter(object):
         return data
 
     def get_csv_text(link):
-        return "{0};{1};{2};{3};{4};{5}".format(link.url, link.link, link.date_published, link.favourite, link.title, link.description)
+        return "{0};{1};{2};{3};{4};{5}".format(link.link, link.url, link.favourite, link.title, link.date_published, link.description)
 
     def get_clean_text(link):
         return "{0}\n{1}\n{2}\n{3}\n{4}\n{5}\n".format(link.url, link.link, link.title, link.date_published, link.favourite, link.description)
@@ -128,13 +171,13 @@ class EntriesConverter(object):
 
     def process_string(self, data):
         delimiter = "\n"
-        links = data.split(delimiter)
-        self.links = []
+        entries = data.split(delimiter)
+        self.entries = []
 
-        for link_row in links:
-             link_row = link_row.replace("\r", "")
-             link = EntryConverter(link_row)
-             self.links.append(link)
+        for entry_row in entries:
+             entry_row = entry_row.replace("\r", "")
+             entry = EntryConverter(entry_row)
+             self.entries.append(entry)
 
     def set_entries(self, entries):
         self.entries = entries

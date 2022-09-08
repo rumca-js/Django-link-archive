@@ -1,0 +1,10 @@
+{% extends base_generic %}
+
+{% block content %}
+
+<ul>
+    <li>Source added: <a href="{{ source.get_absolute_url }}">{{source.title}}</a></li>
+    <li><a href="{% url 'rsshistory:addsource' %}">Add new source</a></li>
+</ul>
+
+{% endblock %}

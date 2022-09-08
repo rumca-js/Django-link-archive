@@ -9,7 +9,7 @@ from django.db.models.query import EmptyQuerySet
 from .models import RssLinkDataModel, RssLinkEntryDataModel, SourcesConverter, EntriesConverter
 from .models import ConfigurationEntry
 
-from .forms import NewLinkForm, ImportLinksForm, SourcesChoiceForm, EntryChoiceForm, ConfigForm
+from .forms import SourceForm, EntryForm, ImportSourcesForm, ImportEntriesForm, SourcesChoiceForm, EntryChoiceForm, ConfigForm
 from .basictypes import *
 
 from .prjconfig import Configuration
@@ -39,21 +39,21 @@ def index(request):
     c = Configuration.get_object()
 
     # Generate counts of some of the main objects
-    num_links = RssLinkDataModel.objects.all().count()
+    num_sources = RssLinkDataModel.objects.all().count()
     num_entries = RssLinkEntryDataModel.objects.all().count()
 
     context = get_context(request)
 
-    context['num_links'] = num_links
+    context['num_souces'] = num_sources
     context['num_entries'] = num_entries
 
     # Render the HTML template index.html with the data in the context variable
     return render(request, app_dir / 'index.html', context=context)
 
 
-class RssLinkListView(generic.ListView):
+class RssSourceListView(generic.ListView):
     model = RssLinkDataModel
-    context_object_name = 'link_list'
+    context_object_name = 'source_list'
     paginate_by = 100
 
     def get_queryset(self):
@@ -63,24 +63,24 @@ class RssLinkListView(generic.ListView):
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
-        context = super(RssLinkListView, self).get_context_data(**kwargs)
+        context = super(RssSourceListView, self).get_context_data(**kwargs)
         context = init_context(context)
         # Create any data and add it to the context
 
         self.filter_form.create()
 
         context['filter_form'] = self.filter_form
-        context['page_title'] = "News link list"
+        context['page_title'] = "News source list"
 
         return context
 
 
-class RssLinkDetailView(generic.DetailView):
+class RssSourceDetailView(generic.DetailView):
     model = RssLinkDataModel
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
-        context = super(RssLinkDetailView, self).get_context_data(**kwargs)
+        context = super(RssSourceDetailView, self).get_context_data(**kwargs)
         context = init_context(context)
 
         c = Configuration.get_object()
@@ -91,32 +91,26 @@ class RssLinkDetailView(generic.DetailView):
         return context
 
 
-def add_link(request):
+def add_source(request):
     context = get_context(request)
-    context['page_title'] = "Add link"
+    context['page_title'] = "Add source"
 
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         method = "POST"
 
         # create a form instance and populate it with data from the request:
-        form = NewLinkForm(request.POST)
+        form = SourceForm(request.POST)
 
+        
         # check whether it's valid:
         if form.is_valid():
-            model = form.to_model()
+            valid = True
 
-            ft = RssLinkDataModel.objects.filter(url=model.url)
-            if ft.exists():
-                context['form'] = form
-                context['link'] = ft[0]
-                return render(request, app_dir / 'add_link_exists.html', context)
-            else:
-                model.save()
+        context['form'] = form
 
-                context['form'] = form
-                context['link'] = model
-                return render(request, app_dir / 'add_link_added.html', context)
+        return render(request, app_dir / 'source_add.html', context)
+
         #    # process the data in form.cleaned_data as required
         #    # ...
         #    # redirect to a new URL:
@@ -124,54 +118,118 @@ def add_link(request):
 
     # if a GET (or any other method) we'll create a blank form
     else:
-        form = NewLinkForm()
+        form = SourceForm()
         context['form'] = form
 
-    return render(request, app_dir / 'add_link.html', context)
+    return render(request, app_dir / 'source_add.html', context)
 
 
-def import_links(request):
+def edit_source(request, pk):
+    context = get_context(request)
+    context['page_title'] = "Edit source"
+    context['pk'] = pk
+
+    ft = RssLinkDataModel.objects.filter(id=pk)
+    if not ft.exists():
+       return render(request, app_dir / 'source_edit_does_not_exist.html', context)
+
+    ob = ft[0]
+
+    if request.method == 'POST':
+        form = SourceForm(request.POST, instance=ob[0])
+        context['form'] = form
+
+        if form.is_valid():
+            form.save()
+
+            context['source'] = ft[0]
+            return render(request, app_dir / 'source_edit_ok.html', context)
+
+        context['summary_text'] = "Could not edit source"
+
+        return render(request, app_dir / 'summary_present', context)
+    else:
+        form = SourceForm(init_obj=obj)
+        context['form'] = form
+        return render(request, app_dir / 'source_edit.html', context)
+
+
+def import_sources(request):
     summary_text = ""
     context = get_context(request)
-    context['page_title'] = "Import links"
+    context['page_title'] = "Import sources"
 
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         method = "POST"
 
         # create a form instance and populate it with data from the request:
-        form = ImportLinksForm(request.POST)
+        form = ImportSourcesForm(request.POST)
 
         if form.is_valid():
-            rawlinks = form.cleaned_data['rawlinks']
-            links = LinksData(rawlinks)
-            for link in links.links:
+            for source in form.get_sources():
 
-                if RssLinkDataModel.objects.filter(url=link.url).exists():
-                    summary_text += link.title + " " + link.url + " " + " Error: Already present in db\n"
+                if RssLinkDataModel.objects.filter(url=source.url).exists():
+                    summary_text += source.title + " " + source.url + " " + " Error: Already present in db\n"
                 else:
-                    record = RssLinkDataModel(url=link.url,
-                                                title=link.title,
-                                                category=link.category,
-                                                subcategory=link.subcategory)
+                    record = RssLinkDataModel(url=source.url,
+                                                title=source.title,
+                                                category=source.category,
+                                                subcategory=source.subcategory)
                     record.save()
-                    summary_text += link.title + " " + link.url + " " + " OK\n"
+                    summary_text += source.title + " " + source.url + " " + " OK\n"
 
         context["form"] = form
         context['summary_text'] = summary_text
-        return render(request, app_dir / 'import_links_summary.html', context)
+        return render(request, app_dir / 'sources_import_summary.html', context)
 
     # if a GET (or any other method) we'll create a blank form
     else:
-        form = ImportLinksForm()
+        form = ImportSourcesForm()
         context["form"] = form
-        context['page_title'] = "Import links"
-        return render(request, app_dir / 'import_links.html', context)
+        return render(request, app_dir / 'sources_import.html', context)
 
 
-def remove_link(request, pk):
+def import_entries(request):
+    # TODO
+    summary_text = ""
     context = get_context(request)
-    context['page_title'] = "Remove link"
+    context['page_title'] = "Import entries"
+
+    # if this is a POST request we need to process the form data
+    if request.method == 'POST':
+        method = "POST"
+
+        # create a form instance and populate it with data from the request:
+        form = ImportEntriesForm(request.POST)
+
+        if form.is_valid():
+            for source in form.get_entries():
+
+                if RssEntryDataModel.objects.filter(url=entry.url).exists():
+                    summary_text += entry.title + " " + entry.url + " " + " Error: Already present in db\n"
+                else:
+                    record = RssEntryDataModel(url=entry.url,
+                                                title=entry.title,
+                                                category=entry.category,
+                                                subcategory=entry.subcategory)
+                    record.save()
+                    summary_text += entry.title + " " + entry.url + " " + " OK\n"
+
+        context["form"] = form
+        context['summary_text'] = summary_text
+        return render(request, app_dir / 'entries_import_summary.html', context)
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = ImportEntriesForm()
+        context["form"] = form
+        return render(request, app_dir / 'entries_import.html', context)
+
+
+def remove_source(request, pk):
+    context = get_context(request)
+    context['page_title'] = "Remove source"
 
     ft = RssLinkDataModel.objects.filter(id=pk)
     if ft.exists():
@@ -180,21 +238,25 @@ def remove_link(request, pk):
             entries.delete()
 
         ft.delete()
-        return render(request, app_dir / 'remove_link_ok.html', context)
+        context["summary_text"] = "Remove ok"
     else:
-        return render(request, app_dir / 'remove_link_nok.html', context)
+        context["summary_text"] = "No source for ID: " + str(pk)
+
+    return render(request, app_dir / 'summary_present.html', context)
 
 
-def remove_all_links(request):
+def remove_all_sources(request):
     context = get_context(request)
     context['page_title'] = "Remove all links"
 
     ft = RssLinkDataModel.objects.all()
     if ft.exists():
         ft.delete()
-        return render(request, app_dir / 'remove_all_links_ok.html', context)
+        context["summary_text"] = "Removing all sources ok"
     else:
-        return render(request, app_dir / 'remove_all_links_nok.html', context)
+        context["summary_text"] = "No source to remove"
+
+    return render(request, app_dir / 'summary_present.html', context)
 
 
 
@@ -262,44 +324,6 @@ def configuration(request):
     return render(request, app_dir / 'configuration.html', context)
 
 
-def edit_link(request, pk):
-    context = get_context(request)
-    context['page_title'] = "Edit link"
-    context['pk'] = pk
-
-    ft = RssLinkDataModel.objects.filter(id=pk)
-    if not ft.exists():
-       return render(request, app_dir / 'edit_link_does_not_exist.html', context)
-
-    obj = ft[0]
-
-    if request.method == 'POST':
-        form = NewLinkForm(request.POST)
-        context['form'] = form
-
-        if form.is_valid():
-            model = form.to_model()
-
-            ft = RssLinkDataModel.objects.filter(url=model.url)
-            if ft.exists():
-                ft.delete()
-                model.save()
-
-                context['link'] = ft[0]
-                return render(request, app_dir / 'edit_link_ok.html', context)
-            else:
-                model.save()
-                return render(request, app_dir / 'edit_link_does_not_exist.html', context)
-
-        context['summary_text'] = "Could not edit link"
-
-        return render(request, app_dir / 'summary_present', context)
-    else:
-        form = NewLinkForm(init_obj=obj)
-        context['form'] = form
-        return render(request, app_dir / 'edit_link.html', context)
-
-
 class RssEntriesListView(generic.ListView):
     model = RssLinkEntryDataModel
     context_object_name = 'entries_list'
@@ -318,7 +342,7 @@ class RssEntriesListView(generic.ListView):
         self.filter_form.create()
 
         context['filter_form'] = self.filter_form
-        context['page_title'] = "News link list"
+        context['page_title'] = "News entries"
 
         return context
 
@@ -352,3 +376,64 @@ def favourite_entry(request, pk):
 
     return render(request, app_dir / 'summary_present.html', context)
 
+
+def add_entry(request):
+    context = get_context(request)
+    context['page_title'] = "Add entry"
+
+    # if this is a POST request we need to process the form data
+    if request.method == 'POST':
+        method = "POST"
+
+        # create a form instance and populate it with data from the request:
+        form = EntryForm(request.POST)
+
+        # check whether it's valid:
+        if form.is_valid():
+            valid = True
+
+        context['form'] = form
+
+        return render(request, app_dir / 'entry_add.html', context)
+
+        #    # process the data in form.cleaned_data as required
+        #    # ...
+        #    # redirect to a new URL:
+        #    #return HttpResponseRedirect('/thanks/')
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = EntryForm()
+        context['form'] = form
+
+    return render(request, app_dir / 'entry_add.html', context)
+
+
+def edit_entry(request, pk):
+    context = get_context(request)
+    context['page_title'] = "Edit entry"
+    context['pk'] = pk
+
+    ft = RssLinkEntryDataModel.objects.filter(id=pk)
+    if not ft.exists():
+       return render(request, app_dir / 'entry_edit_exists.html', context)
+
+    ob = ft[0]
+
+    if request.method == 'POST':
+        form = EntryForm(request.POST, instance=ob[0])
+        context['form'] = form
+
+        if form.is_valid():
+            form.save()
+
+            context['entry'] = ft[0]
+            return render(request, app_dir / 'entry_edit_ok.html', context)
+
+        context['summary_text'] = "Could not edit entry"
+
+        return render(request, app_dir / 'summary_present', context)
+    else:
+        form = EntryForm(init_obj=obj)
+        context['form'] = form
+        return render(request, app_dir / 'entry_edit.html', context)

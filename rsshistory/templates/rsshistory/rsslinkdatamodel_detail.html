@@ -11,7 +11,7 @@
   </p>
 
   {% if user.is_authenticated %}
-    <a href="/{{django_app}}/editlink/{{ object.id }}">Edit link</a>
-    <a href="/{{django_app}}/removelink/{{ object.id }}">Remove link</a>
+    <a href="/{{django_app}}/editsource/{{ object.id }}">Edit source</a>
+    <a href="/{{django_app}}/removesource/{{ object.id }}">Remove source</a>
   {% endif %}
 {% endblock %}

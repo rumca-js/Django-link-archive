@@ -12,50 +12,52 @@ from .models import RssLinkDataModel, RssLinkEntryDataModel, ConfigurationEntry
 #        fields = ['url', 'category', 'subcategory', 'artist', 'album', 'title', 'date_created']
 
 
-class NewLinkForm(forms.Form):
+class SourceForm(forms.ModelForm):
     """
-    New link form
+    Category choice form
     """
-    url = forms.CharField(label='Url', max_length = 500)
-    category = forms.CharField(label='Category', max_length = 100)
-    subcategory = forms.CharField(label='Subcategory', max_length = 100)
-    title = forms.CharField(label='Title', max_length = 200)
-
     class Meta:
         model = RssLinkDataModel
-
-    def __init__(self, *args, **kwargs):
-        init_obj = kwargs.pop('init_obj', ())
-
-        super().__init__(*args, **kwargs)
-
-        if init_obj != ():
-            self.fields['url'] = forms.CharField(label='Url', max_length = 500, initial=init_obj.url)
-            self.fields['category'] = forms.CharField(label='Category', max_length = 100, initial=init_obj.category)
-            self.fields['subcategory'] = forms.CharField(label='Subcategory', max_length = 100, initial=init_obj.subcategory)
-            self.fields['title'] = forms.CharField(label='Title', max_length = 100, initial=init_obj.title)
-        else:
-            from django.utils.timezone import now
-
-    def to_model(self):
-        url = self.cleaned_data['url']
-        category = self.cleaned_data['category']
-        subcategory = self.cleaned_data['subcategory']
-        title = self.cleaned_data['title']
-
-        record = RssLinkDataModel(url=url,
-                                    title=title,
-                                    category=category,
-                                    subcategory=subcategory)
-
-        return record
+        fields = ['url', 'title', 'category', 'subcategory', 'date_fetched']
+        widgets = {
+         #'git_token': forms.PasswordInput(),
+        }
 
 
-class ImportLinksForm(forms.Form):
+class EntryForm(forms.ModelForm):
+    """
+    Category choice form
+    """
+    class Meta:
+        model = RssLinkEntryDataModel
+        fields = ['url', 'title', 'description', 'link', 'date_published', 'favourite']
+        widgets = {
+         #'git_token': forms.PasswordInput(),
+        }
+
+
+class ImportSourcesForm(forms.Form):
     """
     Import links form
     """
-    rawlinks = forms.CharField(widget=forms.Textarea(attrs={'name':'rawlinks', 'rows':30, 'cols':100}))
+    rawsources = forms.CharField(widget=forms.Textarea(attrs={'name':'rawsources', 'rows':30, 'cols':100}))
+
+    def get_sources(self):
+        rawsources = form.cleaned_data['rawsources']
+        sources = SourcesConverter(rawsources)
+        return sources.sources
+
+
+class ImportEntriesForm(forms.Form):
+    """
+    Import links form
+    """
+    rawentries = forms.CharField(widget=forms.Textarea(attrs={'name':'rawentries', 'rows':30, 'cols':100}))
+
+    def get_entries(self):
+        rawentries = form.cleaned_data['rawentries']
+        entries = EntriesConverter(rawentries)
+        return entries.entries
 
 
 class SourcesChoiceForm(forms.Form):

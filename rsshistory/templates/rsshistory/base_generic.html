@@ -20,7 +20,7 @@
                     <div class="mainbutton">
                         <img src="{% static 'icons/icons8-home-96.png' %}" height=30px />
                         Home</div></a></li>
-            <li><a href="{% url 'rsshistory:links' %}">
+            <li><a href="{% url 'rsshistory:sources' %}">
                     <div class="mainbutton">
                         <img src="{% static 'icons/icons8-link-90.png' %}" height=30px />
                         All sources</div></a></li>
@@ -30,10 +30,14 @@
                         All entries</div></a></li>
             {% if user.is_authenticated %}
             <hr>
-            <li><a href="{% url 'rsshistory:addlink' %}">
+            <li><a href="{% url 'rsshistory:addsource' %}">
                     <div class="mainbutton">
                         <img src="{% static 'icons/icons8-add-link-96.png' %}" height=30px />
                         Add source</div></a></li>
+            <li><a href="{% url 'rsshistory:addentry' %}">
+                    <div class="mainbutton">
+                        <img src="{% static 'icons/icons8-add-link-96.png' %}" height=30px />
+                        Add entry</div></a></li>
             <li><a href="{% url 'rsshistory:configuration' %}">
                     <div class="mainbutton">
                         <img src="{% static 'icons/icons8-configuration-67.png' %}" height=30px />

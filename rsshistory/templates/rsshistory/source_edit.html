@@ -1,7 +1,8 @@
 {% extends base_generic %}
 
 {% block content %}
-<form action="/{{django_app}}/addlink" method="post">
+
+<form action="/{{django_app}}/editsource/{{pk}}/" method="post">
     {% csrf_token %}
     {{ form }}
     <input type="submit" value="Submit">

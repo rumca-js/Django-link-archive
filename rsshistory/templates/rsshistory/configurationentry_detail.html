@@ -2,28 +2,28 @@
 
 {% block content %}
   <span>Filters:</span>
-  <a href="/{{django_app}}/sources/" class='simplebutton'>Reset</a>
+  <a href="/{{django_app}}/links/" class='simplebutton'>Reset</a>
 
-  <form action="/{{django_app}}/sources/" method="GET">
+  <form action="/{{django_app}}/links/" method="GET">
      {{ filte_form }}
      <input type="submit" value="Submit">
   </form>
 
   <hr>
 
-  {% if source_list %}
+  {% if link_list %}
   <ul class="linklist">
-    {% for source in source_list %}
+    {% for link in link_list %}
       <li>
-          <a href="{{ source.url }}" class="longbutton">
+          <a href="{{ link.url }}" class="longbutton">
             <div class="linklistitem">
-              <span class="linklistitemtitle">{{source.title}}</span>
-              <span class="linklistitemdescription">[{{source.category}}, {{source.subcategory}}]</span>
+              <span class="linklistitemtitle">{{link.title}}</span>
+              <span class="linklistitemdescription">[{{link.category}}, {{link.subcategory}}]</span>
             </div>
           </a>
 
           {% if user.is_authenticated %}
-          <a href="{{ source.get_absolute_url }}" class="longbutton">
+          <a href="{{ link.get_absolute_url }}" class="longbutton">
             <div class="linklistitem">
                 Configure
             </div>
@@ -52,6 +52,6 @@
     </div>
 
   {% else %}
-    <p>There are no sources.</p>
+    <p>There are no links.</p>
   {% endif %}
 {% endblock %}
