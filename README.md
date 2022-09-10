@@ -13,3 +13,4 @@ Installation, just as any other Django app.
  - sudo apt install feedparser
  - pip3 install feedparser
  - pip3 install python-dateutil
+ - pip3 install PyGithub
