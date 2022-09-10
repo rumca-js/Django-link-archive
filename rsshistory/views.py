@@ -16,13 +16,13 @@ from .prjconfig import Configuration
 
 
 # https://stackoverflow.com/questions/66630043/django-is-loading-template-from-the-wrong-app
-app_dir = Path("rsshistory")
+app_name = Path("rsshistory")
 
 
 def init_context(context):
     context['page_title'] = "RSS history index"
-    context["django_app"] = str(app_dir)
-    context["base_generic"] = str(app_dir / "base_generic.html")
+    context["django_app"] = str(app_name)
+    context["base_generic"] = str(app_name / "base_generic.html")
 
     c = Configuration.get_object()
     context['app_version'] = c.version
@@ -41,14 +41,16 @@ def index(request):
     # Generate counts of some of the main objects
     num_sources = RssLinkDataModel.objects.all().count()
     num_entries = RssLinkEntryDataModel.objects.all().count()
+    num_favourites = RssLinkEntryDataModel.objects.filter(favourite = True).count()
 
     context = get_context(request)
 
-    context['num_souces'] = num_sources
+    context['num_sources'] = num_sources
     context['num_entries'] = num_entries
+    context['num_favourites'] = num_favourites
 
     # Render the HTML template index.html with the data in the context variable
-    return render(request, app_dir / 'index.html', context=context)
+    return render(request, app_name / 'index.html', context=context)
 
 
 class RssSourceListView(generic.ListView):
@@ -70,7 +72,7 @@ class RssSourceListView(generic.ListView):
         self.filter_form.create()
 
         context['filter_form'] = self.filter_form
-        context['page_title'] = "News source list"
+        context['page_title'] += " - news source list"
 
         return context
 
@@ -86,14 +88,14 @@ class RssSourceDetailView(generic.DetailView):
         c = Configuration.get_object()
         c.download_rss(self.object)
 
-        context['page_title'] = self.object.title
+        context['page_title'] += " - " + self.object.title
 
         return context
 
 
 def add_source(request):
     context = get_context(request)
-    context['page_title'] = "Add source"
+    context['page_title'] += " - add source"
 
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
@@ -109,7 +111,7 @@ def add_source(request):
 
         context['form'] = form
 
-        return render(request, app_dir / 'source_add.html', context)
+        return render(request, app_name / 'source_add.html', context)
 
         #    # process the data in form.cleaned_data as required
         #    # ...
@@ -121,17 +123,17 @@ def add_source(request):
         form = SourceForm()
         context['form'] = form
 
-    return render(request, app_dir / 'source_add.html', context)
+    return render(request, app_name / 'source_add.html', context)
 
 
 def edit_source(request, pk):
     context = get_context(request)
-    context['page_title'] = "Edit source"
+    context['page_title'] += " - edit source"
     context['pk'] = pk
 
     ft = RssLinkDataModel.objects.filter(id=pk)
     if not ft.exists():
-       return render(request, app_dir / 'source_edit_does_not_exist.html', context)
+       return render(request, app_name / 'source_edit_does_not_exist.html', context)
 
     ob = ft[0]
 
@@ -143,21 +145,21 @@ def edit_source(request, pk):
             form.save()
 
             context['source'] = ft[0]
-            return render(request, app_dir / 'source_edit_ok.html', context)
+            return render(request, app_name / 'source_edit_ok.html', context)
 
         context['summary_text'] = "Could not edit source"
 
-        return render(request, app_dir / 'summary_present', context)
+        return render(request, app_name / 'summary_present', context)
     else:
         form = SourceForm(init_obj=obj)
         context['form'] = form
-        return render(request, app_dir / 'source_edit.html', context)
+        return render(request, app_name / 'source_edit.html', context)
 
 
 def import_sources(request):
     summary_text = ""
     context = get_context(request)
-    context['page_title'] = "Import sources"
+    context['page_title'] += " - import sources"
 
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
@@ -178,23 +180,25 @@ def import_sources(request):
                                                 subcategory=source.subcategory)
                     record.save()
                     summary_text += source.title + " " + source.url + " " + " OK\n"
+        else:
+            summary_text = "Form is invalid"
 
         context["form"] = form
         context['summary_text'] = summary_text
-        return render(request, app_dir / 'sources_import_summary.html', context)
+        return render(request, app_name / 'sources_import_summary.html', context)
 
     # if a GET (or any other method) we'll create a blank form
     else:
         form = ImportSourcesForm()
         context["form"] = form
-        return render(request, app_dir / 'sources_import.html', context)
+        return render(request, app_name / 'sources_import.html', context)
 
 
 def import_entries(request):
     # TODO
     summary_text = ""
     context = get_context(request)
-    context['page_title'] = "Import entries"
+    context['page_title'] += " - import entries"
 
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
@@ -204,32 +208,41 @@ def import_entries(request):
         form = ImportEntriesForm(request.POST)
 
         if form.is_valid():
-            for source in form.get_entries():
+            summary_text = "Import entries log\n"
 
-                if RssEntryDataModel.objects.filter(url=entry.url).exists():
+            for entry in form.get_entries():
+
+                if RssLinkEntryDataModel.objects.filter(url=entry.url).exists():
                     summary_text += entry.title + " " + entry.url + " " + " Error: Already present in db\n"
                 else:
-                    record = RssEntryDataModel(url=entry.url,
-                                                title=entry.title,
-                                                category=entry.category,
-                                                subcategory=entry.subcategory)
-                    record.save()
-                    summary_text += entry.title + " " + entry.url + " " + " OK\n"
+                    try:
+                        record = RssLinkEntryDataModel(url=entry.url,
+                                                    title=entry.title,
+                                                    description=entry.description,
+                                                    link=entry.link,
+                                                    date_published=entry.date_published,
+                                                    favourite = entry.favourite)
+                        record.save()
+                        summary_text += entry.title + " " + entry.url + " " + " OK\n"
+                    except Exception as e:
+                        summary_text += entry.title + " " + entry.url + " " + " NOK\n"
+        else:
+            summary_text = "Form is invalid"
 
         context["form"] = form
         context['summary_text'] = summary_text
-        return render(request, app_dir / 'entries_import_summary.html', context)
+        return render(request, app_name / 'entries_import_summary.html', context)
 
     # if a GET (or any other method) we'll create a blank form
     else:
         form = ImportEntriesForm()
         context["form"] = form
-        return render(request, app_dir / 'entries_import.html', context)
+        return render(request, app_name / 'entries_import.html', context)
 
 
 def remove_source(request, pk):
     context = get_context(request)
-    context['page_title'] = "Remove source"
+    context['page_title'] += " - remove source"
 
     ft = RssLinkDataModel.objects.filter(id=pk)
     if ft.exists():
@@ -242,12 +255,12 @@ def remove_source(request, pk):
     else:
         context["summary_text"] = "No source for ID: " + str(pk)
 
-    return render(request, app_dir / 'summary_present.html', context)
+    return render(request, app_name / 'summary_present.html', context)
 
 
 def remove_all_sources(request):
     context = get_context(request)
-    context['page_title'] = "Remove all links"
+    context['page_title'] += " - remove all links"
 
     ft = RssLinkDataModel.objects.all()
     if ft.exists():
@@ -256,13 +269,13 @@ def remove_all_sources(request):
     else:
         context["summary_text"] = "No source to remove"
 
-    return render(request, app_dir / 'summary_present.html', context)
+    return render(request, app_name / 'summary_present.html', context)
 
 
 
 def export_sources(request):
     context = get_context(request)
-    context['page_title'] = "Export data"
+    context['page_title'] += " - export data"
     summary_text = ""
 
     sources = RssLinkDataModel.objects.all()
@@ -272,34 +285,40 @@ def export_sources(request):
 
     context["summary_text"] = s_converter.get_text()
 
-    return render(request, app_dir / 'summary_present.html', context)
+    return render(request, app_name / 'summary_present.html', context)
 
 
 def export_entries(request):
     context = get_context(request)
-    context['page_title'] = "Export data"
+    context['page_title'] += " - export data"
     summary_text = ""
 
-    entries = RssLinkEntryDataModel.objects.all()
+    entries = RssLinkEntryDataModel.objects.filter(favourite = True)
 
     c = Configuration.get_object()
-    c.export_entries(entries)
+    c.export_entries(entries, 'favourite')
 
     context["summary_text"] = "Exported entries"
 
-    return render(request, app_dir / 'summary_present.html', context)
+    return render(request, app_name / 'summary_present.html', context)
 
 
 
 def configuration(request):
     context = get_context(request)
-    context['page_title'] = "Configuration"
+    context['page_title'] += " - Configuration"
     
     c = Configuration.get_object()
     context['directory'] = c.directory
     context['database_size_bytes'] = get_directory_size_bytes(c.directory)
     context['database_size_kbytes'] = get_directory_size_bytes(c.directory)/1024
     context['database_size_mbytes'] = get_directory_size_bytes(c.directory)/1024/1024
+
+    threads = c.get_threads()
+    for thread in threads:
+        items = thread.get_processs_list()
+
+    context['thread_list'] = threads
 
     ob = ConfigurationEntry.objects.all()
     if not ob.exists():
@@ -321,7 +340,7 @@ def configuration(request):
     else:
         context['config_form'] = ConfigForm(instance = ob[0])
 
-    return render(request, app_dir / 'configuration.html', context)
+    return render(request, app_name / 'configuration.html', context)
 
 
 class RssEntriesListView(generic.ListView):
@@ -342,7 +361,7 @@ class RssEntriesListView(generic.ListView):
         self.filter_form.create()
 
         context['filter_form'] = self.filter_form
-        context['page_title'] = "News entries"
+        context['page_title'] += " - entries"
 
         return context
 
@@ -355,14 +374,14 @@ class RssEntryDetailView(generic.DetailView):
         context = super(RssEntryDetailView, self).get_context_data(**kwargs)
         context = init_context(context)
 
-        context['page_title'] = self.object.title
+        context['page_title'] += " - " + self.object.title
 
         return context
 
 
 def favourite_entry(request, pk):
     context = get_context(request)
-    context['page_title'] = "Favourite entry"
+    context['page_title'] += " - favourite entry"
     context['pk'] = pk
 
     ft = RssLinkEntryDataModel.objects.get(id=pk)
@@ -374,12 +393,12 @@ def favourite_entry(request, pk):
 
     context["summary_text"] = summary_text
 
-    return render(request, app_dir / 'summary_present.html', context)
+    return render(request, app_name / 'summary_present.html', context)
 
 
 def add_entry(request):
     context = get_context(request)
-    context['page_title'] = "Add entry"
+    context['page_title'] += " - Add entry"
 
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
@@ -395,7 +414,7 @@ def add_entry(request):
 
         context['form'] = form
 
-        return render(request, app_dir / 'entry_add.html', context)
+        return render(request, app_name / 'entry_add.html', context)
 
         #    # process the data in form.cleaned_data as required
         #    # ...
@@ -407,17 +426,17 @@ def add_entry(request):
         form = EntryForm()
         context['form'] = form
 
-    return render(request, app_dir / 'entry_add.html', context)
+    return render(request, app_name / 'entry_add.html', context)
 
 
 def edit_entry(request, pk):
     context = get_context(request)
-    context['page_title'] = "Edit entry"
+    context['page_title'] += " - edit entry"
     context['pk'] = pk
 
     ob = RssLinkEntryDataModel.objects.filter(id=pk)
     if not ob.exists():
-       return render(request, app_dir / 'entry_edit_exists.html', context)
+       return render(request, app_name / 'entry_edit_exists.html', context)
 
     if request.method == 'POST':
         form = EntryForm(request.POST, instance=ob[0])
@@ -427,20 +446,20 @@ def edit_entry(request, pk):
             form.save()
 
             context['entry'] = ob[0]
-            return render(request, app_dir / 'entry_edit_ok.html', context)
+            return render(request, app_name / 'entry_edit_ok.html', context)
 
         context['summary_text'] = "Could not edit entry"
 
-        return render(request, app_dir / 'summary_present', context)
+        return render(request, app_name / 'summary_present', context)
     else:
         form = EntryForm(instance=ob[0])
         context['form'] = form
-        return render(request, app_dir / 'entry_edit.html', context)
+        return render(request, app_name / 'entry_edit.html', context)
 
 
 def remove_entry(request, pk):
     context = get_context(request)
-    context['page_title'] = "Remove entry"
+    context['page_title'] += " - remove entry"
 
     entries = RssLinkEntryDataModel.objects.filter(url = ft[0].url)
     if entries.exists():
@@ -450,4 +469,4 @@ def remove_entry(request, pk):
     else:
         context["summary_text"] = "No source for ID: " + str(pk)
 
-    return render(request, app_dir / 'summary_present.html', context)
+    return render(request, app_name / 'summary_present.html', context)

@@ -33,6 +33,7 @@ class RssLinkDataModel(models.Model):
     category = models.CharField(max_length=1000)
     subcategory = models.CharField(max_length=1000)
     date_fetched = models.DateTimeField(null = True)
+    dead = models.BooleanField(default = False)
 
     class Meta:
         ordering = ['url', 'title', 'date_fetched']
@@ -120,31 +121,40 @@ class EntryConverter(object):
         delimiter = ";"
         link_info = row_data.split(delimiter)
 
-        self.url = ""
-        self.date_published = datetime.now
-        self.favourite = True
         self.title = ""
+        self.date_published = datetime.now
+        self.url = ""
+        self.favourite = True
         self.description = ""
 
         self.link = link_info[0]
 
         if len(link_info) > 1:
-            self.url = link_info[1]
+            if len(link_info[1].strip()) > 0:
+                self.title = link_info[1]
+        else:
+            parser = PageParser(self.link)
+            self.title = parser.title
+
+        if len(link_info) > 2:
+            if len(link_info[2].strip()) > 0:
+                self.date_published = link_info[2]
+
+        if len(link_info) > 3:
+            if len(link_info[3].strip()) > 0:
+                self.url = link_info[3]
+            else:
+                self.url = urlparse(self.link).netloc
         else:
             if len(self.link) > 4:
                 self.url = urlparse(self.link).netloc
 
-        if len(link_info) > 2:
-            self.favourite = link_info[2] == "True"
-        if len(link_info) > 3:
-            self.title = link_info[3]
-        else:
-            parser = PageParser(self.link)
-            self.title = parser.title
         if len(link_info) > 4:
-            self.date_published = link_info[4]
+            self.favourite = link_info[4] == "True"
+
         if len(link_info) > 5:
-            self.description = link_info[5]
+            if len(link_info[5].strip()) > 0:
+                self.description = link_info[5]
 
     def get_text(link):
         data = {}

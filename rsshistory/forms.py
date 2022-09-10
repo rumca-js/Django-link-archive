@@ -1,5 +1,6 @@
 from django import forms
 from .models import RssLinkDataModel, RssLinkEntryDataModel, ConfigurationEntry
+from .models import SourcesConverter, EntriesConverter
 
 # https://docs.djangoproject.com/en/4.1/ref/forms/widgets/
 
@@ -43,7 +44,7 @@ class ImportSourcesForm(forms.Form):
     rawsources = forms.CharField(widget=forms.Textarea(attrs={'name':'rawsources', 'rows':30, 'cols':100}))
 
     def get_sources(self):
-        rawsources = form.cleaned_data['rawsources']
+        rawsources = self.cleaned_data['rawsources']
         sources = SourcesConverter(rawsources)
         return sources.sources
 
@@ -55,7 +56,7 @@ class ImportEntriesForm(forms.Form):
     rawentries = forms.CharField(widget=forms.Textarea(attrs={'name':'rawentries', 'rows':30, 'cols':100}))
 
     def get_entries(self):
-        rawentries = form.cleaned_data['rawentries']
+        rawentries = self.cleaned_data['rawentries']
         entries = EntriesConverter(rawentries)
         return entries.entries
 

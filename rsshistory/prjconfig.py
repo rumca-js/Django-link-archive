@@ -1,35 +1,35 @@
 from pathlib import Path
-import subprocess
+import time
+import shutil
 
 from .threads import *
 from .basictypes import *
 from .models import ConfigurationEntry
 
-__version__ = "0.0.6"
+__version__ = "0.0.7"
 
 
 class Configuration(object):
    obj = None
 
    def __init__(self):
-       self.directory = Path(".").resolve()
-       self.links_directory = self.directory / "link_files"
+       self.directory = Path(".")
        self.version = __version__
        self.server_log_file = self.directory / "server_log_file.txt"
 
        self.enable_logging()
        self.create_threads()
 
-   def get_rss_tmp_path(self):
-       path = Path(".")
-       rss_path = path / 'exports' / 'rsshistory' / 'downloaded_rss'
-       if not rss_path.exists():
-           rss_path.mkdir()
-       return rss_path
-
    def get_export_path(self):
-       path = Path(".")
-       rss_path = path / 'exports' / 'rsshistory'
+       from .views import app_name
+       return self.directory / 'exports' / app_name
+
+   def get_data_path(self):
+       from .views import app_name
+       return self.directory / 'data' / app_name
+
+   def get_rss_tmp_path(self):
+       rss_path = self.get_export_path() / 'downloaded_rss'
        if not rss_path.exists():
            rss_path.mkdir()
        return rss_path
@@ -81,6 +81,9 @@ class Configuration(object):
        for athread in self.threads:
            athread.set_config(self)
            athread.start()
+
+   def get_threads(self):
+       return self.threads
 
    def close(self):
        for athread in self.threads:
@@ -203,15 +206,14 @@ class Configuration(object):
       for source in sources:
           self.download_rss(source)
 
+      time.sleep(60*5)
+
       ob = ConfigurationEntry.objects.all()
       if ob.exists():
          self.push_to_git(ob[0])
 
    def push_to_git(self, conf):
-       git_path = Path(conf.git_path)
-       if not git_path.exists():
-          git_path.mkdir(parents=True, exist_ok = False)
-          subprocess.run(["git", "clone", conf.git_repo], cwd=git_path)
+       pass
 
    def get_datetime_file_name(self):
        return datetime.datetime.today().strftime('%Y-%m-%d_%H-%M-%S')
