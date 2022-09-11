@@ -7,7 +7,7 @@ from .threads import *
 from .basictypes import *
 from .models import ConfigurationEntry
 
-__version__ = "0.0.7"
+__version__ = "0.0.8"
 
 
 class Configuration(object):
