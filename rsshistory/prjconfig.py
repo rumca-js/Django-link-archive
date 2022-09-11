@@ -1,6 +1,7 @@
 from pathlib import Path
 import time
 import shutil
+from .gitrepo import *
 
 from .threads import *
 from .basictypes import *
@@ -54,8 +55,11 @@ class Configuration(object):
        #file_name = export_path / (export_type + "_entries.csv")
        #file_name.write_text(e_converter.get_csv_text())
 
-       file_name = export_path / (export_type + "_entries.txt")
-       file_name.write_text(e_converter.get_clean_text())
+       #file_name = export_path / (export_type + "_entries.txt")
+       #file_name.write_text(e_converter.get_clean_text())
+
+       file_name = export_path / (export_type + "_entries.md")
+       file_name.write_text(e_converter.get_md_text())
 
    def get_object():
        if not Configuration.obj:
@@ -206,20 +210,37 @@ class Configuration(object):
       for source in sources:
           self.download_rss(source)
 
-      time.sleep(60*5)
+      #time.sleep(60*5)
 
       ob = ConfigurationEntry.objects.all()
       if ob.exists():
          self.push_to_git(ob[0])
 
    def push_to_git(self, conf):
-       pass
+       repo = GitRepo(conf)
+
+       repo.up()
+
+       yesterday = self.get_yesterday()
+       expected_dir = repo.get_local_dir() / self.get_year(yesterday) / self.format_date(yesterday)
+       if expected_dir.is_dir():
+           return
+
+       local_dir = self.get_export_path() / self.format_date(yesterday)
+       shutil.copytree(local_dir, expected_dir)
+
+       repo.add([])
+       repo.commit(self.format_date(yesterday))
+       repo.push()
 
    def get_datetime_file_name(self):
        return datetime.datetime.today().strftime('%Y-%m-%d_%H-%M-%S')
 
    def get_date_file_name(self):
-       return datetime.datetime.today().strftime('%Y-%m-%d')
+       return self.format_date(datetime.datetime.today())
+
+   def format_date(self, date):
+       return date.strftime('%Y-%m-%d')
 
    def get_url_clean_name(self, file_name):
        file_name = file_name.replace(":", "").replace("/", "").replace("\\","")
@@ -231,10 +252,29 @@ class Configuration(object):
       date = date.isoformat()
       return date
 
+   def get_year(self, datetime):
+       return datetime.strftime('%Y')
+
+   def get_yesterday(self):
+      from datetime import date, timedelta
+
+      current_date = date.today()
+      prev_day = current_date - timedelta(days = 1) 
+
+      return prev_day
+
+   def get_tommorow(self):
+      from datetime import date, timedelta
+
+      current_date = date.today()
+      next_day = current_date + timedelta(days = 1)
+
+      return next_day
+
    def get_datetime_range_one_day(self):
       from datetime import date, timedelta
 
       current_date = date.today()
-      next_day = current_date + timedelta(days = 1) 
+      next_day = self.get_tommorow()
 
       return (current_date, next_day)
