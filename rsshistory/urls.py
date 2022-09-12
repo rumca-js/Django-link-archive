@@ -12,7 +12,7 @@ urlpatterns = [
    path('importsources', views.import_sources, name='importsources'),
    path('removesource/<int:pk>/', views.remove_source, name='removesource'),
    path('removeallsources/', views.remove_all_sources, name='removeallsources'),
-   path('editsource/<int:pk>/', views.edit_source, name='editsources'),
+   path('editsource/<int:pk>/', views.edit_source, name='editsource'),
    path('exportsources/', views.export_sources, name='exportsources'),
 
    path('entries/', views.RssEntriesListView.as_view(), name='entries'),

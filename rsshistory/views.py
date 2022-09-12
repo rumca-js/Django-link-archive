@@ -2,6 +2,7 @@ from pathlib import Path
 
 from django.shortcuts import render
 from django.views import generic
+from django.urls import reverse
 
 from django.db.models.query import QuerySet
 from django.db.models.query import EmptyQuerySet
@@ -70,6 +71,8 @@ class RssSourceListView(generic.ListView):
         # Create any data and add it to the context
 
         self.filter_form.create()
+        self.filter_form.method = "GET"
+        self.filter_form.action_url = reverse('rsshistory:sources')
 
         context['filter_form'] = self.filter_form
         context['page_title'] += " - news source list"
@@ -111,7 +114,7 @@ def add_source(request):
 
         context['form'] = form
 
-        return render(request, app_name / 'source_add.html', context)
+        return render(request, app_name / 'form_basic.html', context)
 
         #    # process the data in form.cleaned_data as required
         #    # ...
@@ -121,9 +124,11 @@ def add_source(request):
     # if a GET (or any other method) we'll create a blank form
     else:
         form = SourceForm()
+        form.method = "POST"
+        form.action_url = reverse('rsshistory:addsource')
         context['form'] = form
 
-    return render(request, app_name / 'source_add.html', context)
+    return render(request, app_name / 'form_basic.html', context)
 
 
 def edit_source(request, pk):
@@ -152,8 +157,10 @@ def edit_source(request, pk):
         return render(request, app_name / 'summary_present', context)
     else:
         form = SourceForm(init_obj=obj)
+        form.method = "POST"
+        form.action_url = reverse('rsshistory:editsource', args=[pk])
         context['form'] = form
-        return render(request, app_name / 'source_edit.html', context)
+        return render(request, app_name / 'form_basic.html', context)
 
 
 def import_sources(request):
@@ -190,8 +197,10 @@ def import_sources(request):
     # if a GET (or any other method) we'll create a blank form
     else:
         form = ImportSourcesForm()
+        form.method = "POST"
+        form.action_url = reverse('rsshistory:importsources')
         context["form"] = form
-        return render(request, app_name / 'sources_import.html', context)
+        return render(request, app_name / 'form_basic.html', context)
 
 
 def import_entries(request):
@@ -236,8 +245,10 @@ def import_entries(request):
     # if a GET (or any other method) we'll create a blank form
     else:
         form = ImportEntriesForm()
+        form.method = "POST"
+        form.action_url = reverse('rsshistory:importentries')
         context["form"] = form
-        return render(request, app_name / 'entries_import.html', context)
+        return render(request, app_name / 'form_basic.html', context)
 
 
 def remove_source(request, pk):
@@ -335,10 +346,12 @@ def configuration(request):
         if form.is_valid():
             form.save()
 
-        ob = ConfigurationEntry.objects.all()
-        context['config_form'] = ConfigForm(instance = ob[0])
-    else:
-        context['config_form'] = ConfigForm(instance = ob[0])
+    ob = ConfigurationEntry.objects.all()
+    form = ConfigForm(instance = ob[0])
+    form.method = "POST"
+    form.action_url = reverse('rsshistory:configuration')
+
+    context['config_form'] = form
 
     return render(request, app_name / 'configuration.html', context)
 
@@ -359,6 +372,8 @@ class RssEntriesListView(generic.ListView):
         # Create any data and add it to the context
 
         self.filter_form.create()
+        self.filter_form.method = "GET"
+        self.filter_form.action_url = reverse('rsshistory:entries')
 
         context['filter_form'] = self.filter_form
         context['page_title'] += " - entries"
@@ -414,7 +429,7 @@ def add_entry(request):
 
         context['form'] = form
 
-        return render(request, app_name / 'entry_add.html', context)
+        return render(request, app_name / 'form_basic.html', context)
 
         #    # process the data in form.cleaned_data as required
         #    # ...
@@ -424,9 +439,11 @@ def add_entry(request):
     # if a GET (or any other method) we'll create a blank form
     else:
         form = EntryForm()
+        form.method = "POST"
+        form.action_url = reverse('rsshistory:addentry')
         context['form'] = form
 
-    return render(request, app_name / 'entry_add.html', context)
+    return render(request, app_name / 'form_basic.html', context)
 
 
 def edit_entry(request, pk):
@@ -453,8 +470,10 @@ def edit_entry(request, pk):
         return render(request, app_name / 'summary_present', context)
     else:
         form = EntryForm(instance=ob[0])
+        form.method = "POST"
+        form.action_url = reverse('rsshistory:editentry', args=[pk])
         context['form'] = form
-        return render(request, app_name / 'entry_edit.html', context)
+        return render(request, app_name / 'form_basic.html', context)
 
 
 def remove_entry(request, pk):

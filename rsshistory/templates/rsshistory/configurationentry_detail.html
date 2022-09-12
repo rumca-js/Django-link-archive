@@ -4,8 +4,8 @@
   <span>Filters:</span>
   <a href="/{{django_app}}/links/" class='simplebutton'>Reset</a>
 
-  <form action="/{{django_app}}/links/" method="GET">
-     {{ filte_form }}
+  <form action="{{filter_form.action_url}}" method="{{filter_form.method}}">
+     {{ filter_form }}
      <input type="submit" value="Submit">
   </form>
 

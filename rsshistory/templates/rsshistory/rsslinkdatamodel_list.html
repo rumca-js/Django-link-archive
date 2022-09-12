@@ -2,9 +2,9 @@
 
 {% block content %}
   <span>Filters:</span>
-  <a href="/{{django_app}}/sources/" class='simplebutton'>Reset</a>
+  <a href="{{filter_form.action_url}}" class='simplebutton'>Reset</a>
 
-  <form action="/{{django_app}}/sources/" method="GET">
+  <form action="{{filter_form.action_url}}" method="{{filter_form.method}}">
      {{ filte_form }}
      <input type="submit" value="Submit">
   </form>

@@ -173,7 +173,7 @@ class EntryConverter(object):
         return "{0}\n{1}\n{2}\n{3}\n{4}\n{5}\n".format(link.url, link.link, link.title, link.date_published, link.favourite, link.description)
 
     def get_md_text(link):
-        return "# {0}\n - {1}\n - {2}\n - {3}\n - {4}\n{5}\n".format(link.title, link.link, link.url, link.date_published, link.favourite, link.description)
+        return "# {0}\n - {1}\n - RSS feed: {2}\n - date published: {3}\n - Starred: {4}\n\n{5}\n".format(link.title, link.link, link.url, link.date_published, link.favourite, link.description)
 
 
 class EntriesConverter(object):

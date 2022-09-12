@@ -27,7 +27,7 @@
 
 <h1>Config</h1>
 
-  <form action="/{{django_app}}/configuration/" method="POST">
+<form action="{{config_form.action_url}}" method="{{config_form.method}}">
      {% csrf_token %}
      {{config_form}}
      <input type="submit" value="Submit">
