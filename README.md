@@ -25,3 +25,7 @@ Installation, just as any other Django app.
  - Configuration page allows to define github user / token which allows automatic RSS entries export to repositories
  - You can edit templates, styles
  - You can provide your own RSS feeds
+
+# Examples
+
+My RSS entry export repository: [github.com](https://github.com/rumca-js/RSS-Link-Database)
