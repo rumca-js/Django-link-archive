@@ -100,6 +100,9 @@ def add_source(request):
     context = get_context(request)
     context['page_title'] += " - add source"
 
+    if not request.user.is_authenticated:
+        return render(request, app_name / 'missing_rights.html', context)
+
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         method = "POST"
@@ -136,6 +139,9 @@ def edit_source(request, pk):
     context['page_title'] += " - edit source"
     context['pk'] = pk
 
+    if not request.user.is_authenticated:
+        return render(request, app_name / 'missing_rights.html', context)
+
     ft = RssLinkDataModel.objects.filter(id=pk)
     if not ft.exists():
        return render(request, app_name / 'source_edit_does_not_exist.html', context)
@@ -167,6 +173,9 @@ def import_sources(request):
     summary_text = ""
     context = get_context(request)
     context['page_title'] += " - import sources"
+
+    if not request.user.is_authenticated:
+        return render(request, app_name / 'missing_rights.html', context)
 
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
@@ -208,6 +217,9 @@ def import_entries(request):
     summary_text = ""
     context = get_context(request)
     context['page_title'] += " - import entries"
+
+    if not request.user.is_authenticated:
+        return render(request, app_name / 'missing_rights.html', context)
 
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
@@ -255,6 +267,9 @@ def remove_source(request, pk):
     context = get_context(request)
     context['page_title'] += " - remove source"
 
+    if not request.user.is_authenticated:
+        return render(request, app_name / 'missing_rights.html', context)
+
     ft = RssLinkDataModel.objects.filter(id=pk)
     if ft.exists():
         entries = RssLinkEntryDataModel.objects.filter(url = ft[0].url)
@@ -272,6 +287,9 @@ def remove_source(request, pk):
 def remove_all_sources(request):
     context = get_context(request)
     context['page_title'] += " - remove all links"
+
+    if not request.user.is_authenticated:
+        return render(request, app_name / 'missing_rights.html', context)
 
     ft = RssLinkDataModel.objects.all()
     if ft.exists():
@@ -318,6 +336,9 @@ def export_entries(request):
 def configuration(request):
     context = get_context(request)
     context['page_title'] += " - Configuration"
+
+    if not request.user.is_authenticated:
+        return render(request, app_name / 'missing_rights.html', context)
     
     c = Configuration.get_object()
     context['directory'] = c.directory
@@ -333,10 +354,7 @@ def configuration(request):
 
     ob = ConfigurationEntry.objects.all()
     if not ob.exists():
-        rec = ConfigurationEntry(git_path = ".",
-                                 git_repo = "TODO",
-                                 git_user = "TODO",
-                                 git_token = "TODO")
+        rec = ConfigurationEntry()
         rec.save()
 
     ob = ConfigurationEntry.objects.all()
@@ -399,6 +417,9 @@ def favourite_entry(request, pk):
     context['page_title'] += " - favourite entry"
     context['pk'] = pk
 
+    if not request.user.is_authenticated:
+        return render(request, app_name / 'missing_rights.html', context)
+
     ft = RssLinkEntryDataModel.objects.get(id=pk)
     fav = ft.favourite
     ft.favourite = not ft.favourite
@@ -414,6 +435,9 @@ def favourite_entry(request, pk):
 def add_entry(request):
     context = get_context(request)
     context['page_title'] += " - Add entry"
+
+    if not request.user.is_authenticated:
+        return render(request, app_name / 'missing_rights.html', context)
 
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
@@ -451,6 +475,9 @@ def edit_entry(request, pk):
     context['page_title'] += " - edit entry"
     context['pk'] = pk
 
+    if not request.user.is_authenticated:
+        return render(request, app_name / 'missing_rights.html', context)
+
     ob = RssLinkEntryDataModel.objects.filter(id=pk)
     if not ob.exists():
        return render(request, app_name / 'entry_edit_exists.html', context)
@@ -479,6 +506,9 @@ def edit_entry(request, pk):
 def remove_entry(request, pk):
     context = get_context(request)
     context['page_title'] += " - remove entry"
+
+    if not request.user.is_authenticated:
+        return render(request, app_name / 'missing_rights.html', context)
 
     entries = RssLinkEntryDataModel.objects.filter(url = ft[0].url)
     if entries.exists():

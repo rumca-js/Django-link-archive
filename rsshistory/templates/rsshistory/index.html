@@ -1,4 +1,5 @@
 {% extends base_generic %}
+{% load static %}
 
 {% block content %}
   <h1>RSS history Index</h1>
@@ -33,7 +34,7 @@
   </p>
   
   <p>
-  <img src="/static/images/piesel.jpg" width="30%">
+  <img src="{% static 'catalog/images/piesel.jpg' %}" width="30%">
   </p>
 
 {% endblock %}

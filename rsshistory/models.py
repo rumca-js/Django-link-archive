@@ -61,10 +61,16 @@ class RssLinkEntryDataModel(models.Model):
 
 
 class ConfigurationEntry(models.Model):
-    git_path = models.CharField(max_length=2000)
-    git_repo = models.CharField(max_length=2000)
-    git_user = models.CharField(max_length=2000)
-    git_token = models.CharField(max_length=2000)
+    git_path = models.CharField(default = ".", max_length=2000)
+    git_repo = models.CharField(default = "", max_length=2000)
+    git_user = models.CharField(default = "", max_length=2000)
+    git_token = models.CharField(default = "", max_length=2000)
+
+    def is_git_set(self):
+        if self.git_repo != "" and self.git_user != "" and self.git_token != "":
+            return True
+        else:
+            return False
 
 
 class SourceConverter(object):

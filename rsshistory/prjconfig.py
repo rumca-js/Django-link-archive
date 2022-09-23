@@ -7,7 +7,7 @@ from .threads import *
 from .basictypes import *
 from .models import ConfigurationEntry
 
-__version__ = "0.0.9"
+__version__ = "0.1.0"
 
 
 class Configuration(object):
@@ -213,7 +213,7 @@ class Configuration(object):
       #time.sleep(60*5)
 
       ob = ConfigurationEntry.objects.all()
-      if ob.exists():
+      if ob.exists() and ob[0].is_git_set():
          self.push_to_git(ob[0])
 
    def push_to_git(self, conf):
