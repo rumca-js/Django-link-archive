@@ -31,7 +31,7 @@
           <a href="{{ link.get_absolute_url }}" class="simplebutton">
              Configure
           </a>
-          <a href="/{{django_app}}/favourite/{{link.id}}/" class="simplebutton">
+          <a href="{% url 'rsshistory:entryfavourite' link.id %}" class="simplebutton">
              {% if link.favourite %}
                UnFavourite
              {% else %}

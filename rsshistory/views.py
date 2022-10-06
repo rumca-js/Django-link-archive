@@ -351,6 +351,13 @@ def configuration(request):
         items = thread.get_processs_list()
 
     context['thread_list'] = threads
+    
+    if c.server_log_file.exists():
+        with open(c.server_log_file.resolve(), "r") as fh:
+             context['server_log_data'] = fh.read()
+             
+    context['server_path'] = Path(".").resolve()
+    context['directory'] = Path(".").resolve()
 
     ob = ConfigurationEntry.objects.all()
     if not ob.exists():
@@ -364,7 +371,8 @@ def configuration(request):
         if form.is_valid():
             form.save()
 
-    ob = ConfigurationEntry.objects.all()
+        ob = ConfigurationEntry.objects.all()
+    
     form = ConfigForm(instance = ob[0])
     form.method = "POST"
     form.action_url = reverse('rsshistory:configuration')

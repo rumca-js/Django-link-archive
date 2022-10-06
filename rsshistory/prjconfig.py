@@ -1,13 +1,15 @@
 from pathlib import Path
 import time
 import shutil
+import logging
+
 from .gitrepo import *
 
 from .threads import *
 from .basictypes import *
 from .models import ConfigurationEntry
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 
 class Configuration(object):
@@ -16,7 +18,7 @@ class Configuration(object):
    def __init__(self):
        self.directory = Path(".")
        self.version = __version__
-       self.server_log_file = self.directory / "server_log_file.txt"
+       self.server_log_file = self.directory / "log_server.txt"
 
        self.enable_logging()
        self.create_threads()
@@ -59,7 +61,7 @@ class Configuration(object):
        #file_name.write_text(e_converter.get_clean_text())
 
        file_name = export_path / (export_type + "_entries.md")
-       file_name.write_text(e_converter.get_md_text())
+       file_name.write_bytes(e_converter.get_md_text().encode("utf-8", "ingnore"))
 
    def get_object():
        if not Configuration.obj:
@@ -71,7 +73,7 @@ class Configuration(object):
 
        self.server_log_file.unlink(True)
 
-       logging.basicConfig(level=logging.INFO, filename=self.server_log_file)
+       logging.basicConfig(level=logging.INFO, filename=self.server_log_file, format='[%(asctime)s]%(levelname)s:%(message)s')
 
    def create_threads(self):
        download_rss = ThreadJobCommon("download-rss")
@@ -113,9 +115,9 @@ class Configuration(object):
        rss_path = self.get_rss_tmp_path()
        
        file_path = rss_path / file_name
-       file_path.write_text(str(feed))
+       # file_path.write_text(str(feed))   TODO triggers encoding exception
 
-       print(item.url + " " + item.title)
+       logging.info(item.url + " " + item.title)
 
        #print(feed.feed)
        #print(feed.entries)
@@ -203,7 +205,7 @@ class Configuration(object):
        self.threads[0].add_to_process_list(item)
 
    def t_refresh(self, item):
-      logging.info("Refreshing: ")
+      logging.info("Refreshing")
 
       from .models import RssLinkDataModel
       sources = RssLinkDataModel.objects.all()

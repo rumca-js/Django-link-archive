@@ -17,6 +17,7 @@ class ThreadJobCommon(threading.Thread):
        self._itemless = itemless
 
        self._thread_name = name
+       self.daemon = True
 
    def set_config(self, config):
        self._config = config

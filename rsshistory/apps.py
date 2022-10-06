@@ -1,16 +1,12 @@
 from django.apps import AppConfig
+import logging
 
 
 class CatalogConfig(AppConfig):
     name = 'rsshistory'
 
     def ready(self):
-        pass
-        #from .prjconfig import Configuration
-        #c = Configuration.get_object()
-
-    def __del__(self):
-        pass
-        #from .prjconfig import Configuration
-        #c = Configuration.get_object() 
-        #c.close()
+        print("Ready")
+        from .prjconfig import Configuration
+        c = Configuration.get_object()
+        logging.info("APP ready: rsshistory")

@@ -1,6 +1,7 @@
 from django.db import models
 from django.urls import reverse
 from datetime import datetime
+import logging
 
 
 class PageParser(object):
