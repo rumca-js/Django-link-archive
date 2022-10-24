@@ -46,7 +46,7 @@ class RssLinkDataModel(models.Model):
 
 class RssLinkEntryDataModel(models.Model):
 
-    url = models.CharField(max_length=2000)
+    source = models.CharField(max_length=2000)
     title = models.CharField(max_length=1000)
     description = models.CharField(max_length=1000)
     link = models.CharField(max_length=1000, unique=True)
@@ -54,7 +54,7 @@ class RssLinkEntryDataModel(models.Model):
     favourite = models.BooleanField(default = False)
 
     class Meta:
-        ordering = ['-date_published', 'url', 'title']
+        ordering = ['-date_published', 'source', 'title']
 
     def get_absolute_url(self):
         """Returns the URL to access a particular author instance."""
@@ -120,8 +120,10 @@ class SourcesConverter(object):
 
 
 class EntryConverter(object):
-    def __init__(self, row_data):
-        self.process_string(row_data)
+    def __init__(self, row_data = None):
+        if row_data:
+            self.process_string(row_data)
+        self.with_description = True
 
     def process_string(self, row_data):
         from urllib.parse import urlparse
@@ -130,7 +132,7 @@ class EntryConverter(object):
 
         self.title = ""
         self.date_published = datetime.now
-        self.url = ""
+        self.source = ""
         self.favourite = True
         self.description = ""
 
@@ -149,12 +151,12 @@ class EntryConverter(object):
 
         if len(link_info) > 3:
             if len(link_info[3].strip()) > 0:
-                self.url = link_info[3]
+                self.source = link_info[3]
             else:
-                self.url = urlparse(self.link).netloc
+                self.source = urlparse(self.link).netloc
         else:
             if len(self.link) > 4:
-                self.url = urlparse(self.link).netloc
+                self.source = urlparse(self.link).netloc
 
         if len(link_info) > 4:
             self.favourite = link_info[4] == "True"
@@ -165,27 +167,42 @@ class EntryConverter(object):
 
     def get_text(link):
         data = {}
-        data['url'] = link.url
+        data['source'] = link.source
         data['link'] = link.link
         data['title'] = link.title
         data['date_published'] = str(link.date_published)
         data['description'] = link.description
+        data['favourite'] = link.favourite
 
         return data
 
+    def set_entry(self, entry):
+        self.source = entry.source
+        self.link = entry.link
+        self.title = entry.title
+        self.date_published = entry.date_published
+        self.description = entry.description
+        self.favourite = entry.favourite
+
     def get_csv_text(link):
-        return "{0};{1};{2};{3};{4};{5}".format(link.link, link.url, link.favourite, link.title, link.date_published, link.description)
+        return "{0};{1};{2};{3};{4};{5}".format(link.link, link.source, link.favourite, link.title, link.date_published, link.description)
 
     def get_clean_text(link):
-        return "{0}\n{1}\n{2}\n{3}\n{4}\n{5}\n".format(link.url, link.link, link.title, link.date_published, link.favourite, link.description)
+        return "{0}\n{1}\n{2}\n{3}\n{4}\n{5}\n".format(link.source, link.link, link.title, link.date_published, link.favourite, link.description)
 
-    def get_md_text(link):
-        return "# {0}\n - {1}\n - RSS feed: {2}\n - date published: {3}\n - Starred: {4}\n\n{5}\n".format(link.title, link.link, link.url, link.date_published, link.favourite, link.description)
+    def get_md_text(self):
+        ## there is going to be some sort of header probably. Leave # for the title
+        if self.with_description:
+            return "## {0}\n - [{1}]({1})\n - RSS feed: {2}\n - date published: {3}\n - Starred: {4}\n\n{5}\n".format(self.title, self.link, self.source, self.date_published, self.favourite, self.description)
+        else:
+            return "## {0}\n - [{1}]({1})\n - RSS feed: {2}\n - date published: {3}\n - Starred: {4}\n\n".format(self.title, self.link, self.source, self.date_published, self.favourite)
 
 
 class EntriesConverter(object):
 
     def __init__(self, data = None):
+        self.with_description = True
+
         if data:
             self.process_string(data)
 
@@ -230,7 +247,10 @@ class EntriesConverter(object):
     def get_md_text(self):
         output_data = []
         for entry in self.entries:
-            entry_data = EntryConverter.get_md_text(entry)
+            ec = EntryConverter()
+            ec.with_description = self.with_description
+            ec.set_entry(entry)
+            entry_data = ec.get_md_text()
             output_data.append(entry_data)
             
         return "\n".join(output_data)

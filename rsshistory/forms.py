@@ -19,7 +19,7 @@ class SourceForm(forms.ModelForm):
     """
     class Meta:
         model = RssLinkDataModel
-        fields = ['url', 'title', 'category', 'subcategory', 'date_fetched']
+        fields = ['url', 'title', 'category', 'subcategory']
         widgets = {
          #'git_token': forms.PasswordInput(),
         }
@@ -31,7 +31,7 @@ class EntryForm(forms.ModelForm):
     """
     class Meta:
         model = RssLinkEntryDataModel
-        fields = ['url', 'title', 'description', 'link', 'date_published', 'favourite']
+        fields = ['source', 'title', 'description', 'link', 'date_published', 'favourite']
         widgets = {
          #'git_token': forms.PasswordInput(),
         }
@@ -177,7 +177,7 @@ class EntryChoiceForm(forms.Form):
         if self.sources.exists():
             index = 0
             for obj in self.sources:
-                entry_parameter_map["url"] = obj.url
+                entry_parameter_map["source"] = obj.url
 
                 if index == 0:
                     self.entries = RssLinkEntryDataModel.objects.filter(**entry_parameter_map)

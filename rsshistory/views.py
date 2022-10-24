@@ -25,7 +25,7 @@ def init_context(context):
     context["django_app"] = str(app_name)
     context["base_generic"] = str(app_name / "base_generic.html")
 
-    c = Configuration.get_object()
+    c = Configuration.get_object(str(app_name))
     context['app_version'] = c.version
 
     return context
@@ -37,7 +37,7 @@ def get_context(request = None):
 
 
 def index(request):
-    c = Configuration.get_object()
+    c = Configuration.get_object(str(app_name))
 
     # Generate counts of some of the main objects
     num_sources = RssLinkDataModel.objects.all().count()
@@ -88,7 +88,7 @@ class RssSourceDetailView(generic.DetailView):
         context = super(RssSourceDetailView, self).get_context_data(**kwargs)
         context = init_context(context)
 
-        c = Configuration.get_object()
+        c = Configuration.get_object(str(app_name))
         c.download_rss(self.object)
 
         context['page_title'] += " - " + self.object.title
@@ -149,20 +149,20 @@ def edit_source(request, pk):
     ob = ft[0]
 
     if request.method == 'POST':
-        form = SourceForm(request.POST, instance=ob[0])
+        form = SourceForm(request.POST, instance=ob)
         context['form'] = form
 
         if form.is_valid():
             form.save()
 
-            context['source'] = ft[0]
+            context['source'] = ob
             return render(request, app_name / 'source_edit_ok.html', context)
 
         context['summary_text'] = "Could not edit source"
 
         return render(request, app_name / 'summary_present', context)
     else:
-        form = SourceForm(init_obj=obj)
+        form = SourceForm(instance=ob)
         form.method = "POST"
         form.action_url = reverse('rsshistory:editsource', args=[pk])
         context['form'] = form
@@ -324,7 +324,7 @@ def export_entries(request):
 
     entries = RssLinkEntryDataModel.objects.filter(favourite = True)
 
-    c = Configuration.get_object()
+    c = Configuration.get_object(str(app_name))
     c.export_entries(entries, 'favourite')
 
     context["summary_text"] = "Exported entries"
@@ -340,7 +340,7 @@ def configuration(request):
     if not request.user.is_authenticated:
         return render(request, app_name / 'missing_rights.html', context)
     
-    c = Configuration.get_object()
+    c = Configuration.get_object(str(app_name))
     context['directory'] = c.directory
     context['database_size_bytes'] = get_directory_size_bytes(c.directory)
     context['database_size_kbytes'] = get_directory_size_bytes(c.directory)/1024
