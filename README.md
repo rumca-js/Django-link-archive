@@ -20,12 +20,15 @@ Installation, just as any other Django app.
  - pip3 install python-dateutil
  - pip3 install PyGithub
 
+# Automated export / backup
+
+Provides automated export to github location.
+
+Example: [https://github.com/rumca-js/RSS-Link-Database](https://github.com/rumca-js/RSS-Link-Database)
+
 # Configuration
 
  - Configuration page allows to define github user / token which allows automatic RSS entries export to repositories
  - You can edit templates, styles
  - You can provide your own RSS feeds
 
-# Examples
-
-My RSS entry export repository: [github.com](https://github.com/rumca-js/RSS-Link-Database)
