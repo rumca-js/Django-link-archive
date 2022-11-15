@@ -21,7 +21,7 @@ class Configuration(object):
    def __init__(self, app_name):
        self.app_name = str(app_name)
 
-       self.directory = Path("/home/rumpel/WorkDir/DjangoPage/linklibrary")
+       self.directory = Path(".")
        self.version = __version__
        self.server_log_file = self.directory / "log_{0}.txt".format(app_name)
 
@@ -364,7 +364,12 @@ class Configuration(object):
        return date.strftime('%Y-%m-%d')
 
    def get_url_clean_name(self, file_name):
-       file_name = file_name.replace(":", "").replace("/", "").replace("\\","")
+       file_name = file_name.replace(":", ".")\
+              .replace("/", "")\
+              .replace("\\","")\
+              .replace("?",".")\
+              .replace("=",".")
+
        return file_name
 
    def get_date_iso(self, timestamp):
