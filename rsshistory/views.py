@@ -7,7 +7,7 @@ from django.urls import reverse
 from django.db.models.query import QuerySet
 from django.db.models.query import EmptyQuerySet
 
-from .models import RssLinkDataModel, RssLinkEntryDataModel, SourcesConverter, EntriesConverter
+from .models import RssSourceDataModel, RssSourceEntryDataModel, SourcesConverter, EntriesConverter
 from .models import ConfigurationEntry
 
 from .forms import SourceForm, EntryForm, ImportSourcesForm, ImportEntriesForm, SourcesChoiceForm, EntryChoiceForm, ConfigForm
@@ -40,9 +40,9 @@ def index(request):
     c = Configuration.get_object(str(app_name))
 
     # Generate counts of some of the main objects
-    num_sources = RssLinkDataModel.objects.all().count()
-    num_entries = RssLinkEntryDataModel.objects.all().count()
-    num_favourites = RssLinkEntryDataModel.objects.filter(favourite = True).count()
+    num_sources = RssSourceDataModel.objects.all().count()
+    num_entries = RssSourceEntryDataModel.objects.all().count()
+    num_favourites = RssSourceEntryDataModel.objects.filter(favourite = True).count()
 
     context = get_context(request)
 
@@ -55,7 +55,7 @@ def index(request):
 
 
 class RssSourceListView(generic.ListView):
-    model = RssLinkDataModel
+    model = RssSourceDataModel
     context_object_name = 'source_list'
     paginate_by = 100
 
@@ -81,7 +81,7 @@ class RssSourceListView(generic.ListView):
 
 
 class RssSourceDetailView(generic.DetailView):
-    model = RssLinkDataModel
+    model = RssSourceDataModel
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
@@ -142,7 +142,7 @@ def edit_source(request, pk):
     if not request.user.is_authenticated:
         return render(request, app_name / 'missing_rights.html', context)
 
-    ft = RssLinkDataModel.objects.filter(id=pk)
+    ft = RssSourceDataModel.objects.filter(id=pk)
     if not ft.exists():
        return render(request, app_name / 'source_edit_does_not_exist.html', context)
 
@@ -187,10 +187,10 @@ def import_sources(request):
         if form.is_valid():
             for source in form.get_sources():
 
-                if RssLinkDataModel.objects.filter(url=source.url).exists():
+                if RssSourceDataModel.objects.filter(url=source.url).exists():
                     summary_text += source.title + " " + source.url + " " + " Error: Already present in db\n"
                 else:
-                    record = RssLinkDataModel(url=source.url,
+                    record = RssSourceDataModel(url=source.url,
                                                 title=source.title,
                                                 category=source.category,
                                                 subcategory=source.subcategory)
@@ -233,11 +233,11 @@ def import_entries(request):
 
             for entry in form.get_entries():
 
-                if RssLinkEntryDataModel.objects.filter(url=entry.url).exists():
+                if RssSourceEntryDataModel.objects.filter(url=entry.url).exists():
                     summary_text += entry.title + " " + entry.url + " " + " Error: Already present in db\n"
                 else:
                     try:
-                        record = RssLinkEntryDataModel(url=entry.url,
+                        record = RssSourceEntryDataModel(url=entry.url,
                                                     title=entry.title,
                                                     description=entry.description,
                                                     link=entry.link,
@@ -270,13 +270,16 @@ def remove_source(request, pk):
     if not request.user.is_authenticated:
         return render(request, app_name / 'missing_rights.html', context)
 
-    ft = RssLinkDataModel.objects.filter(id=pk)
+    ft = RssSourceDataModel.objects.filter(id=pk)
     if ft.exists():
-        entries = RssLinkEntryDataModel.objects.filter(url = ft[0].url)
-        if entries.exists():
-            entries.delete()
-
+        source_url = ft[0].url
         ft.delete()
+        
+        # TODO checkbox - or other button to remove corresponding entries
+        #entries = RssSourceEntryDataModel.objects.filter(url = source_url)
+        #if entries.exists():
+        #    entries.delete()
+
         context["summary_text"] = "Remove ok"
     else:
         context["summary_text"] = "No source for ID: " + str(pk)
@@ -291,7 +294,7 @@ def remove_all_sources(request):
     if not request.user.is_authenticated:
         return render(request, app_name / 'missing_rights.html', context)
 
-    ft = RssLinkDataModel.objects.all()
+    ft = RssSourceDataModel.objects.all()
     if ft.exists():
         ft.delete()
         context["summary_text"] = "Removing all sources ok"
@@ -307,7 +310,7 @@ def export_sources(request):
     context['page_title'] += " - export data"
     summary_text = ""
 
-    sources = RssLinkDataModel.objects.all()
+    sources = RssSourceDataModel.objects.all()
 
     s_converter = SourcesConverter()
     s_converter.set_sources(sources)
@@ -322,9 +325,9 @@ def export_entries(request):
     context['page_title'] += " - export data"
     summary_text = ""
 
-    entries = RssLinkEntryDataModel.objects.filter(favourite = True)
+    entries = RssSourceEntryDataModel.objects.filter(favourite = True)
 
-    c = Configuration.get_object(str(app_name))
+    c = configuration.get_object(str(app_name))
     c.export_entries(entries, 'favourite')
 
     context["summary_text"] = "Exported entries"
@@ -383,7 +386,7 @@ def configuration(request):
 
 
 class RssEntriesListView(generic.ListView):
-    model = RssLinkEntryDataModel
+    model = RssSourceEntryDataModel
     context_object_name = 'entries_list'
     paginate_by = 500
 
@@ -401,14 +404,20 @@ class RssEntriesListView(generic.ListView):
         self.filter_form.method = "GET"
         self.filter_form.action_url = reverse('rsshistory:entries')
 
+        c = Configuration.get_object(str(app_name))
+        thread = c.get_threads()[0]
+        queue_size = thread.get_queue_size()
+
         context['filter_form'] = self.filter_form
         context['page_title'] += " - entries"
+        context['rss_are_fetched'] = queue_size > 0
+        context['rss_queue_size'] = queue_size
 
         return context
 
 
 class RssEntryDetailView(generic.DetailView):
-    model = RssLinkEntryDataModel
+    model = RssSourceEntryDataModel
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
@@ -428,7 +437,7 @@ def favourite_entry(request, pk):
     if not request.user.is_authenticated:
         return render(request, app_name / 'missing_rights.html', context)
 
-    ft = RssLinkEntryDataModel.objects.get(id=pk)
+    ft = RssSourceEntryDataModel.objects.get(id=pk)
     fav = ft.favourite
     ft.favourite = not ft.favourite
     ft.save()
@@ -459,6 +468,10 @@ def add_entry(request):
             valid = True
             form.save()
 
+            context['summary_text'] = "Added entry!"
+
+            return render(request, app_name / 'summary_present.html', context)
+
         context['form'] = form
 
         return render(request, app_name / 'form_basic.html', context)
@@ -486,7 +499,7 @@ def edit_entry(request, pk):
     if not request.user.is_authenticated:
         return render(request, app_name / 'missing_rights.html', context)
 
-    ob = RssLinkEntryDataModel.objects.filter(id=pk)
+    ob = RssSourceEntryDataModel.objects.filter(id=pk)
     if not ob.exists():
        return render(request, app_name / 'entry_edit_exists.html', context)
 
@@ -502,7 +515,7 @@ def edit_entry(request, pk):
 
         context['summary_text'] = "Could not edit entry"
 
-        return render(request, app_name / 'summary_present', context)
+        return render(request, app_name / 'summary_present.html', context)
     else:
         form = EntryForm(instance=ob[0])
         form.method = "POST"
@@ -518,9 +531,9 @@ def remove_entry(request, pk):
     if not request.user.is_authenticated:
         return render(request, app_name / 'missing_rights.html', context)
 
-    entries = RssLinkEntryDataModel.objects.filter(url = ft[0].url)
-    if entries.exists():
-        entries.delete()
+    entry = RssSourceEntryDataModel.objects.filter(id=pk)
+    if entry.exists():
+        entry.delete()
 
         context["summary_text"] = "Remove ok"
     else:

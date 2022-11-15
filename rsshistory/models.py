@@ -27,7 +27,7 @@ class PageParser(object):
            logging.critical(e, exc_info=True)
 
 
-class RssLinkDataModel(models.Model):
+class RssSourceDataModel(models.Model):
 
     url = models.CharField(max_length=2000, unique=True)
     title = models.CharField(max_length=1000)
@@ -35,6 +35,7 @@ class RssLinkDataModel(models.Model):
     subcategory = models.CharField(max_length=1000)
     date_fetched = models.DateTimeField(null = True)
     dead = models.BooleanField(default = False)
+    export_to_cms = models.BooleanField(default = True)
 
     class Meta:
         ordering = ['url', 'title', 'date_fetched']
@@ -44,7 +45,7 @@ class RssLinkDataModel(models.Model):
         return reverse('rsshistory:source-detail', args=[str(self.id)])
 
 
-class RssLinkEntryDataModel(models.Model):
+class RssSourceEntryDataModel(models.Model):
 
     source = models.CharField(max_length=2000)
     title = models.CharField(max_length=1000)
@@ -59,6 +60,13 @@ class RssLinkEntryDataModel(models.Model):
     def get_absolute_url(self):
         """Returns the URL to access a particular author instance."""
         return reverse('rsshistory:entry-detail', args=[str(self.id)])
+
+    def get_source_name(self):
+        sources = RssSourceDataModel.objects.filter(url = self.source)
+        if len(sources) > 0:
+            return sources[0].title
+        else:
+            return self.source
 
 
 class ConfigurationEntry(models.Model):

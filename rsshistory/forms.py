@@ -1,5 +1,5 @@
 from django import forms
-from .models import RssLinkDataModel, RssLinkEntryDataModel, ConfigurationEntry
+from .models import RssSourceDataModel, RssSourceEntryDataModel, ConfigurationEntry
 from .models import SourcesConverter, EntriesConverter
 
 # https://docs.djangoproject.com/en/4.1/ref/forms/widgets/
@@ -18,8 +18,8 @@ class SourceForm(forms.ModelForm):
     Category choice form
     """
     class Meta:
-        model = RssLinkDataModel
-        fields = ['url', 'title', 'category', 'subcategory']
+        model = RssSourceDataModel
+        fields = ['url', 'title', 'category', 'subcategory', 'export_to_cms']
         widgets = {
          #'git_token': forms.PasswordInput(),
         }
@@ -30,7 +30,7 @@ class EntryForm(forms.ModelForm):
     Category choice form
     """
     class Meta:
-        model = RssLinkEntryDataModel
+        model = RssSourceEntryDataModel
         fields = ['source', 'title', 'description', 'link', 'date_published', 'favourite']
         widgets = {
          #'git_token': forms.PasswordInput(),
@@ -76,7 +76,7 @@ class SourcesChoiceForm(forms.Form):
 
     def get_filtered_objects(self):
         parameter_map = self.get_filter_args()
-        self.filtered_objects = RssLinkDataModel.objects.filter(**parameter_map)
+        self.filtered_objects = RssSourceDataModel.objects.filter(**parameter_map)
         return self.filtered_objects
 
     def create(self):
@@ -169,10 +169,10 @@ class EntryChoiceForm(forms.Form):
             del entry_parameter_map['search']
 
         self.entries = []
-        self.sources = RssLinkDataModel.objects.filter(**source_parameter_map)
+        self.sources = RssSourceDataModel.objects.filter(**source_parameter_map)
 
         if source_parameter_map == {}:
-            return RssLinkEntryDataModel.objects.filter(**entry_parameter_map)
+            return RssSourceEntryDataModel.objects.filter(**entry_parameter_map)
 
         if self.sources.exists():
             index = 0
@@ -180,12 +180,12 @@ class EntryChoiceForm(forms.Form):
                 entry_parameter_map["source"] = obj.url
 
                 if index == 0:
-                    self.entries = RssLinkEntryDataModel.objects.filter(**entry_parameter_map)
+                    self.entries = RssSourceEntryDataModel.objects.filter(**entry_parameter_map)
                 else:
-                    self.entries = self.entries | RssLinkEntryDataModel.objects.filter(**entry_parameter_map)
+                    self.entries = self.entries | RssSourceEntryDataModel.objects.filter(**entry_parameter_map)
                 index += 1
         else:
-            self.entries = RssLinkEntryDataModel.objects.filter(**entry_parameter_map)
+            self.entries = RssSourceEntryDataModel.objects.filter(**entry_parameter_map)
 
         return self.entries
 
@@ -267,6 +267,16 @@ class EntryChoiceForm(forms.Form):
            parameter_map['search'] = search
 
         return parameter_map
+
+    def get_filter_string(self):
+        filters = self.get_source_filter_args()
+        filters.update(self.get_entry_filter_args())
+
+        filter_string = ""
+        for key in filters:
+            filter_string += "&{0}={1}".format(key, filters[key])
+
+        return filter_string
 
 
 class ConfigForm(forms.ModelForm):

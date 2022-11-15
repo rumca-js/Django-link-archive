@@ -2,6 +2,9 @@ from pathlib import Path
 import time
 import shutil
 import logging
+from datetime import datetime
+from datetime import timedelta
+from pytz import timezone
 
 from .gitrepo import *
 
@@ -9,7 +12,7 @@ from .threads import *
 from .basictypes import *
 from .models import ConfigurationEntry
 
-__version__ = "0.1.2"
+__version__ = "0.1.3"
 
 
 class Configuration(object):
@@ -147,7 +150,6 @@ class Configuration(object):
 
    def t_download_rss(self, item):
        try:
-           from .models import RssLinkEntryDataModel
            import feedparser
            log = logging.getLogger(self.app_name)
 
@@ -155,72 +157,116 @@ class Configuration(object):
 
            file_name = url + ".txt"
            file_name = self.get_url_clean_name(file_name)
-           rss_path = self.get_rss_tmp_path()
 
-           log.info(item.url + " " + item.title)
+           queue_size = self.threads[0].get_queue_size()
 
-           rss_contents = self.get_page(url)
-           
-           if rss_contents:
-               feed = feedparser.parse(rss_contents)
-               file_path = rss_path / file_name
-               file_path.write_bytes(rss_contents)
+           # log.info("Source: {0} {1}; Queue: {2}".format(item.url, item.title, queue_size))
+
+           start_time = datetime.datetime.now(timezone('UTC'))
+
+           if item.date_fetched:
+               time_since_update = start_time - item.date_fetched
+               mins = time_since_update / timedelta(minutes = 1)
+
+               if mins < 10:
+                   # log.info("Source: {0} {1} Skipped; Queue: {2}".format(item.url, item.title, queue_size))
+                   return
+
+           #rss_contents = self.get_page(url)
+           #
+           #if rss_contents:
+           #    feed = feedparser.parse(rss_contents)
+           #    rss_path = self.get_rss_tmp_path()
+           #    file_path = rss_path / file_name
+           #    file_path.write_bytes(rss_contents)
+           #else:
+           feed = feedparser.parse(url)
+
+           if len(feed.entries) == 0:
+               log.error("Source: {0} {1} Has no data; Queue: {2}".format(item.url, item.title, queue_size))
            else:
-               feed = feedparser.parse(url)
+               for entry in feed.entries:
+                   self.process_rss_entry(item, entry)
 
-           for entry in feed.entries:
+           stop_time = datetime.datetime.now(timezone('UTC'))
+           total_time = stop_time - start_time
+           total_time.total_seconds() 
 
-               objs = RssLinkEntryDataModel.objects.filter(link = entry.link)
-
-               if not objs.exists():
-                   if str(entry.title).strip() == "" or entry.title == "undefined":
-                       continue
-
-                   if entry.link.find("TVN24-po-ukrainsku") >= 0:
-                       continue
-
-                   description = ""
-                   if hasattr(entry, "description"):
-                       description = entry.description
-
-                   published = ""
-                   if hasattr(entry, "published"):
-
-                       date = self.get_date_iso(entry.published)
-
-                       o = RssLinkEntryDataModel(
-                           source = item.url,
-                           title = entry.title,
-                           description = description,
-                           link = entry.link,
-                           date_published = date)
-                   else:
-                       log.error("RSS link does not have 'published' keyword {0}".format(item.url))
-
-                       o = RssLinkEntryDataModel(
-                           source = item.url,
-                           title = entry.title,
-                           description = description,
-                           link = entry.link)
-
-                   o.save()
+           item.date_fetched = stop_time
+           item.save()
 
        except Exception as e:
           log = logging.getLogger(self.app_name)
-          log.error("Exception during parsing page contents")
+          queue_size = self.threads[0].get_queue_size()
+          log.error("Source: {0} {1} NOK; Queue: {2}".format(item.url, item.title, queue_size))
           log.critical(e, exc_info=True)
 
+   def process_rss_entry(self, item, entry):
+       try:
+          from .models import RssSourceEntryDataModel
+          objs = RssSourceEntryDataModel.objects.filter(link = entry.link)
+
+          if not objs.exists():
+              if str(entry.title).strip() == "" or entry.title == "undefined":
+                  return False
+
+              if entry.link.find("TVN24-po-ukrainsku") >= 0:
+                  return False
+
+              description = ""
+              if hasattr(entry, "description"):
+                  description = entry.description
+
+              published = ""
+              o = None
+              
+              if hasattr(entry, "published"):
+
+                  date = self.get_date_iso(entry.published)
+
+                  o = RssSourceEntryDataModel(
+                      source = item.url,
+                      title = entry.title,
+                      description = description,
+                      link = entry.link,
+                      date_published = date)
+              else:
+                  log = logging.getLogger(self.app_name)
+                  log.error("RSS link does not have 'published' keyword {0}".format(item.url))
+
+                  o = RssSourceEntryDataModel(
+                      source = item.url,
+                      title = entry.title,
+                      description = description,
+                      link = entry.link)
+
+              if o:
+                  o.save()
+
+              return True
+
+       except Exception as e:
+          log = logging.getLogger(self.app_name)
+          queue_size = self.threads[0].get_queue_size()
+          log.error("Entry: {0} {1} NOK/Queue: {2}".format(item.url, item.title, queue_size))
+          log.critical(e, exc_info=True)
+
+          return False
+
    def write_files_today(self, item):
-       from .models import RssLinkEntryDataModel
+       if not item.export_to_cms:
+           return
+
+       from .models import RssSourceEntryDataModel
 
        date_range = self.get_datetime_range_one_day()
-       entries = RssLinkEntryDataModel.objects.filter(source = item.url, date_published__range=date_range)
+       entries = RssSourceEntryDataModel.objects.filter(source = item.url, date_published__range=date_range)
        self.export_entries(entries, self.get_url_clean_name(item.url))
 
    def write_files_favourite(self):
-       from .models import RssLinkEntryDataModel
+       from .models import RssSourceEntryDataModel
 
-       entries = RssLinkEntryDataModel.objects.filter(favourite = True)
+       entries = RssSourceEntryDataModel.objects.filter(favourite = True)
        self.export_entries(entries, "favourite", "favourite", False)
 
    def download_rss(self, item):
@@ -231,8 +277,8 @@ class Configuration(object):
 
        log.info("Refreshing RSS data")
 
-       from .models import RssLinkDataModel
-       sources = RssLinkDataModel.objects.all()
+       from .models import RssSourceDataModel
+       sources = RssSourceDataModel.objects.all()
        for source in sources:
            self.download_rss(source)
 
@@ -286,15 +332,27 @@ class Configuration(object):
 
        repo.up()
 
+       self.copy_yesterday(repo)
+       self.copy_favourites(repo)
+       
        yesterday = self.get_yesterday()
-       expected_dir = repo.get_local_dir() / self.get_year(yesterday) / self.get_month(yesterday) / self.format_date(yesterday)
-
-       local_dir = self.get_export_path() / self.format_date(yesterday)
-       shutil.copytree(local_dir, expected_dir)
 
        repo.add([])
        repo.commit(self.format_date(yesterday))
        repo.push()
+
+   def copy_yesterday(self, repo):
+       yesterday = self.get_yesterday()
+       local_dir = self.get_export_path() / self.format_date(yesterday)
+       expected_dir = repo.get_local_dir() / self.get_year(yesterday) / self.get_month(yesterday) / self.format_date(yesterday)
+
+       shutil.copytree(local_dir, expected_dir)
+
+   def copy_favourites(self, repo):
+       local_dir = self.get_export_path() / "favourite"
+       expected_dir = repo.get_local_dir()
+
+       shutil.copytree(local_dir, expected_dir, dirs_exist_ok=True)
 
    def get_datetime_file_name(self):
        return datetime.datetime.today().strftime('%Y-%m-%d_%H-%M-%S')
@@ -349,8 +407,11 @@ class Configuration(object):
        import urllib.request, urllib.error, urllib.parse
        try:
            req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-           data = urllib.request.urlopen(req).read()
-           # webContent = data.decode('UTF-8')
+
+           data = None
+           with urllib.request.urlopen(req) as response:
+               data = response.read()
+               # webContent = response.decode('UTF-8')
            return data
        except Exception as e:
           log = logging.getLogger(self.app_name)
