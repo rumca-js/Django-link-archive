@@ -1,0 +1,17 @@
+{% extends base_generic %}
+
+{% block content %}
+  <h1>{{ object.title }}</h1>
+
+  <p>
+      <div><strong>Url:</strong> <a href="{{ object.url }}">{{ object.url }}</a></div>
+      <span><strong>Title:</strong> {{ object.title }}</span>
+      <span><strong>Category:</strong> {{ object.category }}</span>
+      <span><strong>Subcategory:</strong> {{ object.subcategory }}</span>
+  </p>
+
+  {% if user.is_authenticated %}
+    <a href="/{{django_app}}/editsource/{{ object.id }}" class="simplebutton">Edit source</a>
+    <a href="/{{django_app}}/removesource/{{ object.id }}" class="simplebutton">Remove source</a>
+  {% endif %}
+{% endblock %}

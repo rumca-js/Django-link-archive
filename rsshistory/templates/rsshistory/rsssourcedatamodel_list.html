@@ -1,0 +1,58 @@
+{% extends base_generic %}
+
+{% block content %}
+  <span>Filters:</span>
+  <a href="{{filter_form.action_url}}" class='simplebutton'>Reset</a>
+
+  <form action="{{filter_form.action_url}}" method="{{filter_form.method}}">
+     {{ filte_form }}
+     <input type="submit" value="Submit">
+  </form>
+
+  <hr>
+
+  {% if source_list %}
+  <ul class="linklist">
+    {% for source in source_list %}
+      <li>
+          <a href="{{ source.url }}" class="longbutton">
+            <div class="linklistitem">
+              <span class="linklistitemtitle">{{source.title}}</span>
+              <span class="linklistitemdescription">[{{source.category}}, {{source.subcategory}}]</span>
+              Last published: {{source.date_fetched}}
+            </div>
+          </a>
+
+          {% if user.is_authenticated %}
+          <a href="{{ source.get_absolute_url }}" class="longbutton">
+            <div class="linklistitem">
+                Details
+            </div>
+          </a>
+          {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+
+    <div class="pagination">
+        <span class="step-links">
+            {% if page_obj.has_previous %}
+               <a href="?page=1{{filters}}" class='simplebutton'>&laquo; first</a>
+               <a href="?page={{ page_obj.previous_page_number }}{{filters}}" class='simplebutton'>previous</a>
+            {% endif %}
+
+            <span class="current">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+            </span>
+
+            {% if page_obj.has_next %}
+              <a href="?page={{ page_obj.next_page_number }}{{filters}}" class='simplebutton'>next</a>
+              <a href="?page={{ page_obj.paginator.num_pages }}{{filters}}" class='simplebutton'>last &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+
+  {% else %}
+    <p>There are no sources.</p>
+  {% endif %}
+{% endblock %}
