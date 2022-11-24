@@ -31,7 +31,7 @@ class EntryForm(forms.ModelForm):
     """
     class Meta:
         model = RssSourceEntryDataModel
-        fields = ['source', 'title', 'description', 'link', 'date_published', 'favourite']
+        fields = ['source', 'title', 'description', 'link', 'date_published', 'persistent']
         widgets = {
          #'git_token': forms.PasswordInput(),
         }
@@ -152,7 +152,7 @@ class EntryChoiceForm(forms.Form):
     category = forms.CharField(widget=forms.Select(choices=()))
     subcategory = forms.CharField(widget=forms.Select(choices=()))
     title = forms.CharField(widget=forms.Select(choices=()))
-    favourite = forms.BooleanField(required=False)
+    persistent = forms.BooleanField(required=False)
     search = forms.CharField(label='Search', max_length = 500, required=False)
 
     def __init__(self, *args, **kwargs):
@@ -209,7 +209,7 @@ class EntryChoiceForm(forms.Form):
         self.fields['category'] = forms.CharField(widget=forms.Select(choices=categories, attrs=attr), initial=category_init)
         self.fields['subcategory'] = forms.CharField(widget=forms.Select(choices=subcategories, attrs=attr), initial=subcategory_init)
         self.fields['title'] = forms.CharField(widget=forms.Select(choices=title, attrs=attr), initial=title_init)
-        self.fields['favourite'] = forms.BooleanField(required=False, initial=self.args.get('favourite'))
+        self.fields['persistent'] = forms.BooleanField(required=False, initial=self.args.get('persistent'))
         self.fields['search'] = forms.CharField(label='Search', max_length = 500, required=False, initial=self.args.get("search"))
 
     def get_filtered_objects_values(self, field):
@@ -258,9 +258,9 @@ class EntryChoiceForm(forms.Form):
     def get_entry_filter_args(self):
         parameter_map = {}
 
-        favourite = self.args.get("favourite")
-        if favourite:
-           parameter_map['favourite'] = True
+        persistent = self.args.get("persistent")
+        if persistent:
+           parameter_map['persistent'] = True
 
         search = self.args.get("search")
         if search:

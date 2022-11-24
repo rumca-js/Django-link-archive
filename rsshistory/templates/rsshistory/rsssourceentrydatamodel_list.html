@@ -20,14 +20,18 @@
     {% for link in entries_list %}
       <li>
           <a href="{{ link.link }}"
-             {% if link.favourite %}
+             {% if link.persistent %}
                 class="longbutton longbuttonselected"
              {% else %}
                 class="longbutton"
              {% endif %}
                   >
             <div class="linklistitem">
+             {% if link.dead %}
+                <span class="linklistitemtitle">Hidden link</span>
+             {% else %}
                 <span class="linklistitemtitle">{{link.title}}</span> {{link.date_published}}  {{link.get_source_name}}
+             {% endif %}
             </div>
           </a>
 
@@ -35,11 +39,18 @@
           <a href="{{ link.get_absolute_url }}" class="simplebutton">
              Details
           </a>
-          <a href="{% url 'rsshistory:entryfavourite' link.id %}" class="simplebutton">
-             {% if link.favourite %}
-               UnFavourite
+          <a href="{% url 'rsshistory:entrypersistent' link.id %}" class="simplebutton">
+             {% if link.persistent %}
+               Not persistent
              {% else %}
-               Favourite
+               Persistent
+             {% endif %}
+          </a>
+          <a href="{% url 'rsshistory:hideentry' link.id %}" class="simplebutton">
+             {% if link.dead %}
+               UnHide
+             {% else %}
+               Hide
              {% endif %}
           </a>
           {% endif %}
@@ -62,6 +73,8 @@
           <a href="?page={{ page_obj.next_page_number }}{{filter_form.get_filter_string}}" class='simplebutton'>next</a>
           <a href="?page={{ page_obj.paginator.num_pages }}{{filter_form.get_filter_string}}" class='simplebutton'>last &raquo;</a>
         {% endif %}
+
+        <span>Records: {{entries_list | length}} </span>
     </span>
 </div>
 

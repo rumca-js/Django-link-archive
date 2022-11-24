@@ -52,7 +52,8 @@ class RssSourceEntryDataModel(models.Model):
     description = models.CharField(max_length=1000)
     link = models.CharField(max_length=1000, unique=True)
     date_published = models.DateTimeField(default = datetime.now)
-    favourite = models.BooleanField(default = False)
+    persistent = models.BooleanField(default = False)
+    dead = models.BooleanField(default = False) # indicated that is removed, fetching will not re-add it
 
     class Meta:
         ordering = ['-date_published', 'source', 'title']
@@ -141,7 +142,7 @@ class EntryConverter(object):
         self.title = ""
         self.date_published = datetime.now
         self.source = ""
-        self.favourite = True
+        self.persistent = True
         self.description = ""
 
         self.link = link_info[0]
@@ -167,7 +168,7 @@ class EntryConverter(object):
                 self.source = urlparse(self.link).netloc
 
         if len(link_info) > 4:
-            self.favourite = link_info[4] == "True"
+            self.persistent = link_info[4] == "True"
 
         if len(link_info) > 5:
             if len(link_info[5].strip()) > 0:
@@ -180,7 +181,7 @@ class EntryConverter(object):
         data['title'] = link.title
         data['date_published'] = str(link.date_published)
         data['description'] = link.description
-        data['favourite'] = link.favourite
+        data['persistent'] = link.persistent
 
         return data
 
@@ -190,20 +191,20 @@ class EntryConverter(object):
         self.title = entry.title
         self.date_published = entry.date_published
         self.description = entry.description
-        self.favourite = entry.favourite
+        self.persistent = entry.persistent
 
     def get_csv_text(link):
-        return "{0};{1};{2};{3};{4};{5}".format(link.link, link.source, link.favourite, link.title, link.date_published, link.description)
+        return "{0};{1};{2};{3};{4};{5}".format(link.link, link.source, link.persistent, link.title, link.date_published, link.description)
 
     def get_clean_text(link):
-        return "{0}\n{1}\n{2}\n{3}\n{4}\n{5}\n".format(link.source, link.link, link.title, link.date_published, link.favourite, link.description)
+        return "{0}\n{1}\n{2}\n{3}\n{4}\n{5}\n".format(link.source, link.link, link.title, link.date_published, link.persistent, link.description)
 
     def get_md_text(self):
         ## there is going to be some sort of header probably. Leave # for the title
         if self.with_description:
-            return "## {0}\n - [{1}]({1})\n - RSS feed: {2}\n - date published: {3}\n - Starred: {4}\n\n{5}\n".format(self.title, self.link, self.source, self.date_published, self.favourite, self.description)
+            return "## {0}\n - [{1}]({1})\n - RSS feed: {2}\n - date published: {3}\n - Starred: {4}\n\n{5}\n".format(self.title, self.link, self.source, self.date_published, self.persistent, self.description)
         else:
-            return "## {0}\n - [{1}]({1})\n - RSS feed: {2}\n - date published: {3}\n - Starred: {4}\n\n".format(self.title, self.link, self.source, self.date_published, self.favourite)
+            return "## {0}\n - [{1}]({1})\n - RSS feed: {2}\n - date published: {3}\n - Persistent: {4}\n\n".format(self.title, self.link, self.source, self.date_published, self.persistent)
 
 
 class EntriesConverter(object):

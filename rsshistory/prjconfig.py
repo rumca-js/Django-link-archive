@@ -12,7 +12,7 @@ from .threads import *
 from .basictypes import *
 from .models import ConfigurationEntry
 
-__version__ = "0.1.3"
+__version__ = "0.2.0"
 
 
 class Configuration(object):
@@ -143,7 +143,7 @@ class Configuration(object):
          self.t_refresh(item)
 
          log = logging.getLogger(self.app_name)
-         log.info("Writing favourites")
+         log.info("Writing persistent")
          self.write_files_favourite()
       else:
          raise NotImplemented
@@ -266,7 +266,7 @@ class Configuration(object):
    def write_files_favourite(self):
        from .models import RssSourceEntryDataModel
 
-       entries = RssSourceEntryDataModel.objects.filter(favourite = True)
+       entries = RssSourceEntryDataModel.objects.filter(persistent = True)
        self.export_entries(entries, "favourite", "favourite", False)
 
    def download_rss(self, item):

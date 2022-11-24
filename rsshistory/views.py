@@ -42,13 +42,13 @@ def index(request):
     # Generate counts of some of the main objects
     num_sources = RssSourceDataModel.objects.all().count()
     num_entries = RssSourceEntryDataModel.objects.all().count()
-    num_favourites = RssSourceEntryDataModel.objects.filter(favourite = True).count()
+    num_persistent = RssSourceEntryDataModel.objects.filter(persistent = True).count()
 
     context = get_context(request)
 
     context['num_sources'] = num_sources
     context['num_entries'] = num_entries
-    context['num_favourites'] = num_favourites
+    context['num_persistent'] = num_persistent
 
     # Render the HTML template index.html with the data in the context variable
     return render(request, app_name / 'index.html', context=context)
@@ -242,7 +242,7 @@ def import_entries(request):
                                                     description=entry.description,
                                                     link=entry.link,
                                                     date_published=entry.date_published,
-                                                    favourite = entry.favourite)
+                                                    persistent = entry.persistent)
                         record.save()
                         summary_text += entry.title + " " + entry.url + " " + " OK\n"
                     except Exception as e:
@@ -325,10 +325,10 @@ def export_entries(request):
     context['page_title'] += " - export data"
     summary_text = ""
 
-    entries = RssSourceEntryDataModel.objects.filter(favourite = True)
+    entries = RssSourceEntryDataModel.objects.filter(persistent = True)
 
     c = configuration.get_object(str(app_name))
-    c.export_entries(entries, 'favourite')
+    c.export_entries(entries, 'persistent')
 
     context["summary_text"] = "Exported entries"
 
@@ -429,20 +429,20 @@ class RssEntryDetailView(generic.DetailView):
         return context
 
 
-def favourite_entry(request, pk):
+def persistent_entry(request, pk):
     context = get_context(request)
-    context['page_title'] += " - favourite entry"
+    context['page_title'] += " - persistent entry"
     context['pk'] = pk
 
     if not request.user.is_authenticated:
         return render(request, app_name / 'missing_rights.html', context)
 
     ft = RssSourceEntryDataModel.objects.get(id=pk)
-    fav = ft.favourite
-    ft.favourite = not ft.favourite
+    fav = ft.persistent
+    ft.persistent = not ft.persistent
     ft.save()
 
-    summary_text = "Link changed to state: " + str(ft.favourite)
+    summary_text = "Link changed to state: " + str(ft.persistent)
 
     context["summary_text"] = summary_text
 
@@ -538,5 +538,25 @@ def remove_entry(request, pk):
         context["summary_text"] = "Remove ok"
     else:
         context["summary_text"] = "No source for ID: " + str(pk)
+
+    return render(request, app_name / 'summary_present.html', context)
+
+
+def hide_entry(request, pk):
+    context = get_context(request)
+    context['page_title'] += " - hide entry"
+    context['pk'] = pk
+
+    if not request.user.is_authenticated:
+        return render(request, app_name / 'missing_rights.html', context)
+
+    ft = RssSourceEntryDataModel.objects.get(id=pk)
+    fav = ft.dead
+    ft.dead = not ft.dead
+    ft.save()
+
+    summary_text = "Link changed to state: " + str(ft.dead)
+
+    context["summary_text"] = summary_text
 
     return render(request, app_name / 'summary_present.html', context)

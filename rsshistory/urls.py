@@ -20,7 +20,8 @@ urlpatterns = [
    path('addentry', views.add_entry, name='addentry'),
    path('editentry/<int:pk>/', views.edit_entry, name='editentry'),
    path('removeentry/<int:pk>/', views.remove_entry, name='removeentry'),
-   path('favourite/<int:pk>/', views.favourite_entry, name='entryfavourite'),
+   path('hideentry/<int:pk>/', views.hide_entry, name='hideentry'),
+   path('persistent/<int:pk>/', views.persistent_entry, name='entrypersistent'),
    path('importentries', views.import_entries, name='importentries'),
    path('exportentries/', views.export_entries, name='exportentries'),
 
