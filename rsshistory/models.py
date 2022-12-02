@@ -36,13 +36,32 @@ class RssSourceDataModel(models.Model):
     date_fetched = models.DateTimeField(null = True)
     dead = models.BooleanField(default = False)
     export_to_cms = models.BooleanField(default = True)
+    remove_after_days = models.CharField(max_length=10, default='0')
 
     class Meta:
-        ordering = ['url', 'title', 'date_fetched']
+        ordering = ['title', 'url', 'date_fetched']
 
     def get_absolute_url(self):
         """Returns the URL to access a particular author instance."""
         return reverse('rsshistory:source-detail', args=[str(self.id)])
+
+    def get_days_to_remove(self):
+       days = 0
+       try:
+           days = int(self.remove_after_days)
+       except:
+           pass
+
+       return days
+
+    def is_removeable(self):
+       days = self.get_days_to_remove()
+
+       if days > 0:
+           return True
+       else:
+           return False
+
 
 
 class RssSourceEntryDataModel(models.Model):
@@ -174,14 +193,14 @@ class EntryConverter(object):
             if len(link_info[5].strip()) > 0:
                 self.description = link_info[5]
 
-    def get_text(link):
+    def get_text(self):
         data = {}
-        data['source'] = link.source
-        data['link'] = link.link
-        data['title'] = link.title
-        data['date_published'] = str(link.date_published)
-        data['description'] = link.description
-        data['persistent'] = link.persistent
+        data['source'] = self.source
+        data['link'] = self.link
+        data['title'] = self.title
+        data['date_published'] = str(self.date_published)
+        data['description'] = self.description
+        data['persistent'] = self.persistent
 
         return data
 
@@ -193,11 +212,11 @@ class EntryConverter(object):
         self.description = entry.description
         self.persistent = entry.persistent
 
-    def get_csv_text(link):
-        return "{0};{1};{2};{3};{4};{5}".format(link.link, link.source, link.persistent, link.title, link.date_published, link.description)
+    def get_csv_text(self):
+        return "{0};{1};{2};{3};{4};{5}".format(self.link, self.source, self.persistent, self.title, self.date_published, self.description)
 
-    def get_clean_text(link):
-        return "{0}\n{1}\n{2}\n{3}\n{4}\n{5}\n".format(link.source, link.link, link.title, link.date_published, link.persistent, link.description)
+    def get_clean_text(self):
+        return "{0}\n{1}\n{2}\n{3}\n{4}\n{5}\n".format(self.source, self.self, self.title, self.date_published, self.persistent, self.description)
 
     def get_md_text(self):
         ## there is going to be some sort of header probably. Leave # for the title
@@ -205,6 +224,9 @@ class EntryConverter(object):
             return "## {0}\n - [{1}]({1})\n - RSS feed: {2}\n - date published: {3}\n - Starred: {4}\n\n{5}\n".format(self.title, self.link, self.source, self.date_published, self.persistent, self.description)
         else:
             return "## {0}\n - [{1}]({1})\n - RSS feed: {2}\n - date published: {3}\n - Persistent: {4}\n\n".format(self.title, self.link, self.source, self.date_published, self.persistent)
+
+    def get_rss_text(self):
+        return "<item><title>![CDATA[{0}]]</title><description>![CDATA[{1}]]</description><pubDate>{2}</pubDate><link>{3}</link></item><guid isPermaLink=\"false\">{4}</guid>".format(self.title, self.description, self.date_published, self.link, self.link)
 
 
 class EntriesConverter(object):
@@ -260,6 +282,17 @@ class EntriesConverter(object):
             ec.with_description = self.with_description
             ec.set_entry(entry)
             entry_data = ec.get_md_text()
+            output_data.append(entry_data)
+            
+        return "\n".join(output_data)
+
+    def get_rss_text(self):
+        output_data = []
+        for entry in self.entries:
+            ec = EntryConverter()
+            ec.with_description = self.with_description
+            ec.set_entry(entry)
+            entry_data = ec.get_rss_text()
             output_data.append(entry_data)
             
         return "\n".join(output_data)

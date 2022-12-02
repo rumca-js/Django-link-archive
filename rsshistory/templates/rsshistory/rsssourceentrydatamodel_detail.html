@@ -12,7 +12,7 @@
   </p>
 
   <p>
-  {% if user.is_authenticated %}
+  {% if user.is_staff %}
     <a href="/{{django_app}}/editentry/{{ object.id }}" class="simplebutton">Edit entry</a>
     <a href="/{{django_app}}/hideentry/{{ object.id }}" class="simplebutton">Hide entry</a>
     <a href="/{{django_app}}/removeentry/{{ object.id }}" class="simplebutton">Remove entry</a>

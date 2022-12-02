@@ -1,5 +1,8 @@
 
 from django.urls import path
+from django.urls import include
+from django.contrib.auth import views as auth
+from django.views.generic import RedirectView
 from . import views
 
 app_name = str(views.app_name)
@@ -26,4 +29,9 @@ urlpatterns = [
    path('exportentries/', views.export_entries, name='exportentries'),
 
    path('configuration/', views.configuration, name='configuration'),
+
+   path('accounts/', include('django.contrib.auth.urls')),
+   #path('logoutuser/', auth.LogoutView.as_view(), name ='logoutuser'),
+   path('rsshistory/accounts/logout/', RedirectView.as_view(url='rsshistory/')),
+   path('accounts/logout/', RedirectView.as_view(url='rsshistory/')),
 ]

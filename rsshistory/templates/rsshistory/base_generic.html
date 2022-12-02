@@ -29,8 +29,9 @@
                     <div class="mainbutton">
                         <img src="{% static 'rsshistory/icons/icons8-link-90.png' %}" height=30px />
                         All entries</div></a></li>
-            {% if user.is_authenticated %}
+
             <hr>
+            {% if user.is_staff %}
             <li><a href="{% url 'rsshistory:addsource' %}">
                     <div class="mainbutton">
                         <img src="{% static 'rsshistory/icons/icons8-add-link-96.png' %}" height=30px />
@@ -43,18 +44,22 @@
                     <div class="mainbutton">
                         <img src="{% static 'rsshistory/icons/icons8-configuration-67.png' %}" height=30px />
                         Configuration</div></a></li>
-
             <hr>
-            <li><a href="{% url 'admin:logout' %}">
+            {% endif %}
+
+            {% if user.is_authenticated %}
+            <li>User: {{ user.get_username }}</li>
+            <li><a href="{% url 'rsshistory:logout' %}">
                     <div class="mainbutton">
                         <img src="{% static 'rsshistory/icons/icons8-logout-100.png' %}" height=30px />
                         Logout</div></a></li>
-            {% else %}
             <hr>
-            <li><a href="{% url 'admin:login' %}">
+            {% else %}
+            <li><a href="{% url 'rsshistory:login' %}">
                     <div class="mainbutton">
                         <img src="{% static 'rsshistory/icons/icons8-login-100.png' %}" height=30px />
                         Login</div></a></li>
+            <hr>
             {% endif %}
         </ul>
      {% endblock %}

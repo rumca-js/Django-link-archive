@@ -22,7 +22,7 @@
             </div>
           </a>
 
-          {% if user.is_authenticated %}
+          {% if user.is_staff %}
           <a href="{{ link.get_absolute_url }}" class="longbutton">
             <div class="linklistitem">
                 Configure

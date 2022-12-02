@@ -21,7 +21,7 @@ app_name = Path("rsshistory")
 
 
 def init_context(context):
-    context['page_title'] = "RSS history index"
+    context['page_title'] = "RSS archive"
     context["django_app"] = str(app_name)
     context["base_generic"] = str(app_name / "base_generic.html")
 
@@ -100,7 +100,7 @@ def add_source(request):
     context = get_context(request)
     context['page_title'] += " - add source"
 
-    if not request.user.is_authenticated:
+    if not request.user.is_staff:
         return render(request, app_name / 'missing_rights.html', context)
 
     # if this is a POST request we need to process the form data
@@ -139,7 +139,7 @@ def edit_source(request, pk):
     context['page_title'] += " - edit source"
     context['pk'] = pk
 
-    if not request.user.is_authenticated:
+    if not request.user.is_staff:
         return render(request, app_name / 'missing_rights.html', context)
 
     ft = RssSourceDataModel.objects.filter(id=pk)
@@ -174,7 +174,7 @@ def import_sources(request):
     context = get_context(request)
     context['page_title'] += " - import sources"
 
-    if not request.user.is_authenticated:
+    if not request.user.is_staff:
         return render(request, app_name / 'missing_rights.html', context)
 
     # if this is a POST request we need to process the form data
@@ -218,7 +218,7 @@ def import_entries(request):
     context = get_context(request)
     context['page_title'] += " - import entries"
 
-    if not request.user.is_authenticated:
+    if not request.user.is_staff:
         return render(request, app_name / 'missing_rights.html', context)
 
     # if this is a POST request we need to process the form data
@@ -267,7 +267,7 @@ def remove_source(request, pk):
     context = get_context(request)
     context['page_title'] += " - remove source"
 
-    if not request.user.is_authenticated:
+    if not request.user.is_staff:
         return render(request, app_name / 'missing_rights.html', context)
 
     ft = RssSourceDataModel.objects.filter(id=pk)
@@ -291,7 +291,7 @@ def remove_all_sources(request):
     context = get_context(request)
     context['page_title'] += " - remove all links"
 
-    if not request.user.is_authenticated:
+    if not request.user.is_staff:
         return render(request, app_name / 'missing_rights.html', context)
 
     ft = RssSourceDataModel.objects.all()
@@ -340,7 +340,7 @@ def configuration(request):
     context = get_context(request)
     context['page_title'] += " - Configuration"
 
-    if not request.user.is_authenticated:
+    if not request.user.is_staff:
         return render(request, app_name / 'missing_rights.html', context)
     
     c = Configuration.get_object(str(app_name))
@@ -388,7 +388,7 @@ def configuration(request):
 class RssEntriesListView(generic.ListView):
     model = RssSourceEntryDataModel
     context_object_name = 'entries_list'
-    paginate_by = 500
+    paginate_by = 200
 
     def get_queryset(self):
         self.filter_form = EntryChoiceForm(args = self.request.GET)
@@ -434,7 +434,7 @@ def persistent_entry(request, pk):
     context['page_title'] += " - persistent entry"
     context['pk'] = pk
 
-    if not request.user.is_authenticated:
+    if not request.user.is_staff:
         return render(request, app_name / 'missing_rights.html', context)
 
     ft = RssSourceEntryDataModel.objects.get(id=pk)
@@ -453,7 +453,7 @@ def add_entry(request):
     context = get_context(request)
     context['page_title'] += " - Add entry"
 
-    if not request.user.is_authenticated:
+    if not request.user.is_staff:
         return render(request, app_name / 'missing_rights.html', context)
 
     # if this is a POST request we need to process the form data
@@ -463,14 +463,23 @@ def add_entry(request):
         # create a form instance and populate it with data from the request:
         form = EntryForm(request.POST)
 
+        ob = RssSourceEntryDataModel.objects.filter(link=request.POST.get('link'))
+        if ob.exists():
+            context['form'] = form
+            context['entry'] = ob[0]
+
+            return render(request, app_name / 'entry_edit_exists.html', context)
+
         # check whether it's valid:
         if form.is_valid():
             valid = True
             form.save()
 
-            context['summary_text'] = "Added entry!"
+            ob = RssSourceEntryDataModel.objects.filter(link=request.POST.get('link'))
+            context['form'] = form
+            context['entry'] = ob[0]
 
-            return render(request, app_name / 'summary_present.html', context)
+            return render(request, app_name / 'entry_added.html', context)
 
         context['form'] = form
 
@@ -494,14 +503,16 @@ def add_entry(request):
 def edit_entry(request, pk):
     context = get_context(request)
     context['page_title'] += " - edit entry"
+
     context['pk'] = pk
 
-    if not request.user.is_authenticated:
+    if not request.user.is_staff:
         return render(request, app_name / 'missing_rights.html', context)
 
     ob = RssSourceEntryDataModel.objects.filter(id=pk)
     if not ob.exists():
-       return render(request, app_name / 'entry_edit_exists.html', context)
+        context['summary_text'] = "Such entry does not exist"
+        return render(request, app_name / 'summary_present.html', context)
 
     if request.method == 'POST':
         form = EntryForm(request.POST, instance=ob[0])
@@ -528,7 +539,7 @@ def remove_entry(request, pk):
     context = get_context(request)
     context['page_title'] += " - remove entry"
 
-    if not request.user.is_authenticated:
+    if not request.user.is_staff:
         return render(request, app_name / 'missing_rights.html', context)
 
     entry = RssSourceEntryDataModel.objects.filter(id=pk)
@@ -547,7 +558,7 @@ def hide_entry(request, pk):
     context['page_title'] += " - hide entry"
     context['pk'] = pk
 
-    if not request.user.is_authenticated:
+    if not request.user.is_staff:
         return render(request, app_name / 'missing_rights.html', context)
 
     ft = RssSourceEntryDataModel.objects.get(id=pk)

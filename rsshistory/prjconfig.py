@@ -12,7 +12,7 @@ from .threads import *
 from .basictypes import *
 from .models import ConfigurationEntry
 
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 
 
 class Configuration(object):
@@ -104,11 +104,77 @@ class Configuration(object):
        if not export_path.exists():
            export_path.mkdir()
 
+       log = logging.getLogger(self.app_name)
+
        file_name = export_path / (export_type + "_entries.json")
+       #log.info("writing json: " + file_name.as_posix() )
        file_name.write_text(e_converter.get_text())
 
        file_name = export_path / (export_type + "_entries.md")
+       #log.info("writing md: " + file_name.as_posix() )
        file_name.write_bytes(e_converter.get_md_text().encode("utf-8", "ingnore"))
+
+       #log.info("writing done")
+
+   def export_fav_entries(self, entries, export_type = "default", entries_dir = None, with_description = True):
+       from .models import EntriesConverter
+
+       if len(entries) == 0:
+           return
+
+       e_converter = EntriesConverter()
+       e_converter.set_entries(entries)
+       e_converter.with_description = with_description
+
+       if entries_dir is None:
+           entries_dir = self.get_export_path() / self.get_date_file_name()
+       else:
+           entries_dir = self.get_export_path() / entries_dir
+
+       export_path = entries_dir
+
+       if not export_path.exists():
+           export_path.mkdir()
+
+       log = logging.getLogger(self.app_name)
+
+       file_name = export_path / (export_type + "_entries.json")
+       #log.info("writing json: " + file_name.as_posix() )
+       file_name.write_text(e_converter.get_text())
+
+       file_name = export_path / (export_type + "_entries.md")
+       #log.info("writing md: " + file_name.as_posix() )
+       file_name.write_bytes(e_converter.get_md_text().encode("utf-8", "ingnore"))
+
+       file_name = export_path / (export_type + "_entries.rss")
+       #log.info("writing rss: " + file_name.as_posix() )
+       text = e_converter.get_rss_text()
+       text = self.encapsulate_rss(text)
+       file_name.write_bytes(text.encode("utf-8", "ingnore"))
+
+       #log.info("writing done")
+
+   def encapsulate_rss(self, text):
+       text = """
+<?xml version="1.0" encoding="UTF-8" ?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+        xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+        xmlns:webfeeds="http://webfeeds.org/rss/1.0"
+	
+xmlns:georss="http://www.georss.org/georss" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#">
+<channel>
+  <title>RSS history</title>
+  <atom:link href="https://ithardware.pl/feed" rel="self" type="application/rss+xml" />
+  <link>https://renegat0x0.ddns.net/</link>
+  <description>RSS archive</description>
+  <language>pl-PL</language>
+""" + text + """
+</channel></rss>
+"""
+       return text
 
    def create_threads(self):
        download_rss = ThreadJobCommon("download-rss")
@@ -140,12 +206,21 @@ class Configuration(object):
              log.error("Exception during parsing page contents {0}".format(item.source) )
              log.critical(e, exc_info=True)
       elif thread == "refresh-thread":
-         self.t_refresh(item)
+         try:
+             self.t_refresh(item)
 
-         log = logging.getLogger(self.app_name)
-         log.info("Writing persistent")
-         self.write_files_favourite()
+             log = logging.getLogger(self.app_name)
+             log.info("Writing persistent")
+             self.write_files_favourite()
+             log.info("Writing persistent done")
+         except Exception as e:
+            log = logging.getLogger(self.app_name)
+            log.error("Exception during refreshing {0}".format(item.source) )
+            log.critical(e, exc_info=True)
       else:
+         log = logging.getLogger(self.app_name)
+         log.error("Not implemented processing thread {0}".format(thread))
+         log.critical(e, exc_info=True)
          raise NotImplemented
 
    def t_download_rss(self, item):
@@ -267,7 +342,7 @@ class Configuration(object):
        from .models import RssSourceEntryDataModel
 
        entries = RssSourceEntryDataModel.objects.filter(persistent = True)
-       self.export_entries(entries, "favourite", "favourite", False)
+       self.export_fav_entries(entries, "favourite", "favourite", False)
 
    def download_rss(self, item):
        self.threads[0].add_to_process_list(item)
@@ -282,6 +357,8 @@ class Configuration(object):
        for source in sources:
            self.download_rss(source)
 
+       self.clear_old_entries()
+
        try:
            ob = ConfigurationEntry.objects.all()
            if ob.exists() and ob[0].is_git_set():
@@ -295,6 +372,7 @@ class Configuration(object):
                       self.push_to_git(conf)
 
                if day_changed:
+                   self.clear_old_entries()
                    pass
                    # TODO clear description of non-favourite up to 500 chars
                if month_changed:
@@ -305,6 +383,28 @@ class Configuration(object):
           log = logging.getLogger(self.app_name)
           log.error("Exception during refresh")
           log.critical(e, exc_info=True)
+
+   def clear_old_entries(self):
+       log = logging.getLogger(self.app_name)
+       log.info("Removing old RSS data")
+
+       from .models import RssSourceDataModel, RssSourceEntryDataModel
+       #sources = RssSourceDataModel.objects.filter(remove_after_days)
+       sources = RssSourceDataModel.objects.all()
+       for source in sources:
+
+           if not source.is_removeable():
+               continue
+
+           days = source.get_days_to_remove()
+           if days > 0:
+               current_time = datetime.datetime.now(timezone('UTC'))
+               days_before = current_time - timedelta(days = days)
+               
+               entries = RssSourceEntryDataModel.objects.filter(source=source.url, persistent=False, date_published__lt=days_before)
+               if entries.exists():
+                   log.info("Removing old RSS data")
+                   entries.delete()
 
    def is_day_changed(self, local_dir):
        yesterday = self.get_yesterday()

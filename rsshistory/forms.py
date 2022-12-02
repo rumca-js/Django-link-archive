@@ -19,7 +19,7 @@ class SourceForm(forms.ModelForm):
     """
     class Meta:
         model = RssSourceDataModel
-        fields = ['url', 'title', 'category', 'subcategory', 'export_to_cms']
+        fields = ['url', 'title', 'category', 'subcategory', 'export_to_cms', 'remove_after_days']
         widgets = {
          #'git_token': forms.PasswordInput(),
         }

@@ -1,7 +1,8 @@
-<!-- templates/registration/login.html -->
+<!-- templates/registration/login.htmlx -->
 <h2>Log In</h2>
-<form method="post">
+
+<form method="post" action="?next=/{{ request.resolver_match.app_name }}">
   {% csrf_token %}
   {{ form.as_p }}
   <button type="submit">Log In</button>
-</form>
+</form> 
