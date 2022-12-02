@@ -3,8 +3,14 @@
  - Django application to manage rss sources
  - Allows to add/remove rss source
  - Each source adds entries to the database
- - Entry database is searchable
- - Entries can be starred/added to favourites
+
+# Features
+
+ - RSS source can be configured, so that entries are deleted after 'X' days
+ - RSS entries can be exported to a github repository
+ - RSS entry can be marked as 'permament' and will not be deleted
+ - RSS entries can be browsed, searched
+ - each RSS source contains timestamp when it was fetched, it will not be fetched too often
 
 # Screenshots
 
@@ -31,4 +37,3 @@ Example: [https://github.com/rumca-js/RSS-Link-Database](https://github.com/rumc
  - Configuration page allows to define github user / token which allows automatic RSS entries export to repositories
  - You can edit templates, styles
  - You can provide your own RSS feeds
-
