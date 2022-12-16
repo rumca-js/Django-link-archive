@@ -37,3 +37,9 @@ Example: [https://github.com/rumca-js/RSS-Link-Database](https://github.com/rumc
  - Configuration page allows to define github user / token which allows automatic RSS entries export to repositories
  - You can edit templates, styles
  - You can provide your own RSS feeds
+
+# Video
+
+Currently only available in Polish language:
+
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/QHBcLrlgaxY/0.jpg)](https://www.youtube.com/watch?v=QHBcLrlgaxY)
