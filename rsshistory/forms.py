@@ -1,6 +1,6 @@
 from django import forms
-from .models import RssSourceDataModel, RssSourceEntryDataModel, ConfigurationEntry
-from .models import SourcesConverter, EntriesConverter
+from .models import RssSourceDataModel, RssSourceEntryDataModel, ConfigurationEntry, RssEntryTagsDataModel
+from .converters import SourcesConverter, EntriesConverter
 
 # https://docs.djangoproject.com/en/4.1/ref/forms/widgets/
 
@@ -19,7 +19,7 @@ class SourceForm(forms.ModelForm):
     """
     class Meta:
         model = RssSourceDataModel
-        fields = ['url', 'title', 'category', 'subcategory', 'export_to_cms', 'remove_after_days']
+        fields = ['url', 'title', 'category', 'subcategory', 'language', 'export_to_cms', 'remove_after_days']
         widgets = {
          #'git_token': forms.PasswordInput(),
         }
@@ -35,6 +35,40 @@ class EntryForm(forms.ModelForm):
         widgets = {
          #'git_token': forms.PasswordInput(),
         }
+
+
+class TagEntryForm(forms.ModelForm):
+    """
+    Category choice form
+    """
+    class Meta:
+        model = RssEntryTagsDataModel
+        fields = ['link', 'author', 'date', 'tag']
+        widgets = {
+         #'git_token': forms.PasswordInput(),
+        }
+
+    def save_tags(self):
+        link = self.cleaned_data["link"]
+        author = self.cleaned_data["author"]
+        date = self.cleaned_data["date"]
+        tags = self.cleaned_data["tag"]
+
+        objs = RssEntryTagsDataModel.objects.filter(author = author, link = link)
+        if objs.exists():
+            objs.delete()
+
+        tags_set = set()
+        tags = tags.split(RssEntryTagsDataModel.get_delim())
+        for tag in tags:
+            tag = str(tag).strip()
+            tag = tag.lower()
+            if tag != "":
+                tags_set.add(tag)
+
+        for tag in tags_set:
+            model = RssEntryTagsDataModel(link = link, author = author, date = date, tag = tag)
+            model.save()
 
 
 class ImportSourcesForm(forms.Form):
@@ -163,12 +197,13 @@ class EntryChoiceForm(forms.Form):
         source_parameter_map = self.get_source_filter_args()
         entry_parameter_map = self.get_entry_filter_args()
 
+        self.entries = []
+        self.sources = []
+
         if 'search' in entry_parameter_map:
-            print("parameters: " + entry_parameter_map['search'])
             entry_parameter_map["title__icontains"] = entry_parameter_map['search']
             del entry_parameter_map['search']
 
-        self.entries = []
         self.sources = RssSourceDataModel.objects.filter(**source_parameter_map)
 
         if source_parameter_map == {}:
@@ -216,9 +251,10 @@ class EntryChoiceForm(forms.Form):
         values = set()
         values.add("Any")
 
-        for val in self.sources.values(field):
-            if str(val).strip() != "":
-                values.add(val[field])
+        if len(self.sources) > 0:
+            for val in self.sources.values(field):
+                if str(val).strip() != "":
+                    values.add(val[field])
 
         dict_values = self.to_dict(values)
 
@@ -277,6 +313,18 @@ class EntryChoiceForm(forms.Form):
             filter_string += "&{0}={1}".format(key, filters[key])
 
         return filter_string
+
+
+class GoogleChoiceForm(forms.Form):
+    """
+    Category choice form
+    """
+
+    category = forms.CharField(widget=forms.Select(choices=()))
+    subcategory = forms.CharField(widget=forms.Select(choices=()))
+    title = forms.CharField(widget=forms.Select(choices=()))
+    persistent = forms.BooleanField(required=False)
+    search = forms.CharField(label='Search', max_length = 500, required=False)
 
 
 class ConfigForm(forms.ModelForm):

@@ -12,7 +12,8 @@ from .threads import *
 from .basictypes import *
 from .models import ConfigurationEntry
 
-__version__ = "0.2.1"
+
+__version__ = "0.2.2"
 
 
 class Configuration(object):
@@ -84,98 +85,6 @@ class Configuration(object):
            rss_path.mkdir()
        return rss_path
 
-   def export_entries(self, entries, export_type = "default", entries_dir = None, with_description = True):
-       from .models import EntriesConverter
-
-       if len(entries) == 0:
-           return
-
-       e_converter = EntriesConverter()
-       e_converter.set_entries(entries)
-       e_converter.with_description = with_description
-
-       if entries_dir is None:
-           entries_dir = self.get_export_path() / self.get_date_file_name()
-       else:
-           entries_dir = self.get_export_path() / entries_dir
-
-       export_path = entries_dir
-
-       if not export_path.exists():
-           export_path.mkdir()
-
-       log = logging.getLogger(self.app_name)
-
-       file_name = export_path / (export_type + "_entries.json")
-       #log.info("writing json: " + file_name.as_posix() )
-       file_name.write_text(e_converter.get_text())
-
-       file_name = export_path / (export_type + "_entries.md")
-       #log.info("writing md: " + file_name.as_posix() )
-       file_name.write_bytes(e_converter.get_md_text().encode("utf-8", "ingnore"))
-
-       #log.info("writing done")
-
-   def export_fav_entries(self, entries, export_type = "default", entries_dir = None, with_description = True):
-       from .models import EntriesConverter
-
-       if len(entries) == 0:
-           return
-
-       e_converter = EntriesConverter()
-       e_converter.set_entries(entries)
-       e_converter.with_description = with_description
-
-       if entries_dir is None:
-           entries_dir = self.get_export_path() / self.get_date_file_name()
-       else:
-           entries_dir = self.get_export_path() / entries_dir
-
-       export_path = entries_dir
-
-       if not export_path.exists():
-           export_path.mkdir()
-
-       log = logging.getLogger(self.app_name)
-
-       file_name = export_path / (export_type + "_entries.json")
-       #log.info("writing json: " + file_name.as_posix() )
-       file_name.write_text(e_converter.get_text())
-
-       file_name = export_path / (export_type + "_entries.md")
-       #log.info("writing md: " + file_name.as_posix() )
-       file_name.write_bytes(e_converter.get_md_text().encode("utf-8", "ingnore"))
-
-       file_name = export_path / (export_type + "_entries.rss")
-       #log.info("writing rss: " + file_name.as_posix() )
-       text = e_converter.get_rss_text()
-       text = self.encapsulate_rss(text)
-       file_name.write_bytes(text.encode("utf-8", "ingnore"))
-
-       #log.info("writing done")
-
-   def encapsulate_rss(self, text):
-       text = """
-<?xml version="1.0" encoding="UTF-8" ?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/"
-	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
-	xmlns:dc="http://purl.org/dc/elements/1.1/"
-        xmlns:atom="http://www.w3.org/2005/Atom"
-	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
-	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
-        xmlns:webfeeds="http://webfeeds.org/rss/1.0"
-	
-xmlns:georss="http://www.georss.org/georss" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#">
-<channel>
-  <title>RSS history</title>
-  <atom:link href="https://ithardware.pl/feed" rel="self" type="application/rss+xml" />
-  <link>https://renegat0x0.ddns.net/</link>
-  <description>RSS archive</description>
-  <language>pl-PL</language>
-""" + text + """
-</channel></rss>
-"""
-       return text
-
    def create_threads(self):
        download_rss = ThreadJobCommon("download-rss")
        refresh_thread = ThreadJobCommon("refresh-thread", 3600, True) #3600 is 1 hour
@@ -203,7 +112,7 @@ xmlns:georss="http://www.georss.org/georss" xmlns:geo="http://www.w3.org/2003/01
              self.write_files_today(item)
           except Exception as e:
              log = logging.getLogger(self.app_name)
-             log.error("Exception during parsing page contents {0}".format(item.source) )
+             log.error("Exception during parsing page contents {0}".format(item.url) )
              log.critical(e, exc_info=True)
       elif thread == "refresh-thread":
          try:
@@ -212,10 +121,12 @@ xmlns:georss="http://www.georss.org/georss" xmlns:geo="http://www.w3.org/2003/01
              log = logging.getLogger(self.app_name)
              log.info("Writing persistent")
              self.write_files_favourite()
+             self.write_sources()
              log.info("Writing persistent done")
          except Exception as e:
             log = logging.getLogger(self.app_name)
-            log.error("Exception during refreshing {0}".format(item.source) )
+            if item:
+                log.error("Exception during refreshing {0}".format(item.url) )
             log.critical(e, exc_info=True)
       else:
          log = logging.getLogger(self.app_name)
@@ -223,8 +134,24 @@ xmlns:georss="http://www.georss.org/georss" xmlns:geo="http://www.w3.org/2003/01
          log.critical(e, exc_info=True)
          raise NotImplemented
 
+   def check_source_fetch_time(self, source):
+       start_time = datetime.datetime.now(timezone('UTC'))
+
+       if source.date_fetched:
+           time_since_update = start_time - source.date_fetched
+           mins = time_since_update / timedelta(minutes = 1)
+
+           if mins >= 10:
+               # log.info("Source: {0} {1} Skipped; Queue: {2}".format(item.url, item.title, queue_size))
+               return True
+
+       return False
+
    def t_download_rss(self, item):
        try:
+           if self.check_source_fetch_time(item) == False:
+               return
+
            import feedparser
            log = logging.getLogger(self.app_name)
 
@@ -238,14 +165,6 @@ xmlns:georss="http://www.georss.org/georss" xmlns:geo="http://www.w3.org/2003/01
            # log.info("Source: {0} {1}; Queue: {2}".format(item.url, item.title, queue_size))
 
            start_time = datetime.datetime.now(timezone('UTC'))
-
-           if item.date_fetched:
-               time_since_update = start_time - item.date_fetched
-               mins = time_since_update / timedelta(minutes = 1)
-
-               if mins < 10:
-                   # log.info("Source: {0} {1} Skipped; Queue: {2}".format(item.url, item.title, queue_size))
-                   return
 
            #rss_contents = self.get_page(url)
            #
@@ -323,7 +242,7 @@ xmlns:georss="http://www.georss.org/georss" xmlns:geo="http://www.w3.org/2003/01
        except Exception as e:
           log = logging.getLogger(self.app_name)
           queue_size = self.threads[0].get_queue_size()
-          log.error("Entry: {0} {1} NOK/Queue: {2}".format(item.url, item.title, queue_size))
+          log.error("Entry: {0} {1} NOK/Queue: {2}; Entry {3} {4}".format(item.url, item.title, queue_size, entry.link, entry.title))
           log.critical(e, exc_info=True)
 
           return False
@@ -333,19 +252,38 @@ xmlns:georss="http://www.georss.org/georss" xmlns:geo="http://www.w3.org/2003/01
            return
 
        from .models import RssSourceEntryDataModel
+       from .converters import EntriesExporter
 
        date_range = self.get_datetime_range_one_day()
        entries = RssSourceEntryDataModel.objects.filter(source = item.url, date_published__range=date_range)
-       self.export_entries(entries, self.get_url_clean_name(item.url))
+
+       ex = EntriesExporter(self, entries)
+       ex.export_entries(item, self.get_url_clean_name(item.url))
 
    def write_files_favourite(self):
        from .models import RssSourceEntryDataModel
+       from .converters import FavouritesConverter
 
        entries = RssSourceEntryDataModel.objects.filter(persistent = True)
-       self.export_fav_entries(entries, "favourite", "favourite", False)
+       converter = FavouritesConverter(self, entries)
+       converter.export()
 
-   def download_rss(self, item):
+   def write_sources(self):
+       from .models import RssSourceDataModel
+       from .converters import SourcesConverter
+
+       sources = RssSourceDataModel.objects.all()
+       converter = SourcesConverter()
+       converter.set_sources(sources)
+       converter.export(self)
+
+   def download_rss(self, item, force = False):
+       if force == False:
+           if self.check_source_fetch_time(item) == False:
+               return False
+
        self.threads[0].add_to_process_list(item)
+       return True
 
    def t_refresh(self, item):
        log = logging.getLogger(self.app_name)

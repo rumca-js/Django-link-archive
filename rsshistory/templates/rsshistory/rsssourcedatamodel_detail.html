@@ -11,6 +11,7 @@
   </p>
 
   {% if user.is_staff %}
+    <a href="/{{django_app}}/refreshsource/{{ object.id }}" class="simplebutton">Refresh source</a>
     <a href="/{{django_app}}/editsource/{{ object.id }}" class="simplebutton">Edit source</a>
     <a href="/{{django_app}}/removesource/{{ object.id }}" class="simplebutton">Remove source</a>
   {% endif %}

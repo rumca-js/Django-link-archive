@@ -16,6 +16,7 @@ urlpatterns = [
    path('removesource/<int:pk>/', views.remove_source, name='removesource'),
    path('removeallsources/', views.remove_all_sources, name='removeallsources'),
    path('editsource/<int:pk>/', views.edit_source, name='editsource'),
+   path('refreshsource/<int:pk>/', views.refresh_source, name='refreshsource'),
    path('exportsources/', views.export_sources, name='exportsources'),
 
    path('entries/', views.RssEntriesListView.as_view(), name='entries'),
@@ -27,8 +28,11 @@ urlpatterns = [
    path('persistent/<int:pk>/', views.persistent_entry, name='entrypersistent'),
    path('importentries', views.import_entries, name='importentries'),
    path('exportentries/', views.export_entries, name='exportentries'),
+   path('tagentry/<int:pk>/', views.tag_entry, name='tagentry'),
 
    path('configuration/', views.configuration, name='configuration'),
+
+   path('tagsview', views.tags_view, name='tagsview'),
 
    path('accounts/', include('django.contrib.auth.urls')),
    #path('logoutuser/', auth.LogoutView.as_view(), name ='logoutuser'),

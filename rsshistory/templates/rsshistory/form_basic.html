@@ -1,6 +1,11 @@
 {% extends base_generic %}
 
 {% block content %}
+
+<h1>{{form_title}}</h1>
+
+<p>{{form_description}}<p>
+
 <form action="{{form.action_url}}" method="{{form.method}}">
     {% csrf_token %}
     {{ form }}

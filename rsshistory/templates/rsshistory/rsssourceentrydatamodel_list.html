@@ -32,6 +32,10 @@
              {% else %}
                 <span class="linklistitemtitle">{{link.title}}</span> {{link.date_published}}  {{link.get_source_name}}
              {% endif %}
+
+            {% if link.get_tag_string %}
+                , Tags: # {{ link.get_tag_string }}
+            {% endif %}
             </div>
           </a>
 

@@ -37,6 +37,7 @@ class RssSourceDataModel(models.Model):
     dead = models.BooleanField(default = False)
     export_to_cms = models.BooleanField(default = True)
     remove_after_days = models.CharField(max_length=10, default='0')
+    language = models.CharField(max_length=1000, default='en-US')
 
     class Meta:
         ordering = ['title', 'url', 'date_fetched']
@@ -88,6 +89,60 @@ class RssSourceEntryDataModel(models.Model):
         else:
             return self.source
 
+    def get_tag_string(self):
+        return RssEntryTagsDataModel.get_tag_string(self.link)
+
+    def get_author_tag_string(self):
+        return RssEntryTagsDataModel.get_author_tag_string(self.link)
+
+
+class RssEntryTagsDataModel(models.Model):
+    # https://stackoverflow.com/questions/14066531/django-model-with-unique-combination-of-two-fields
+
+    link = models.CharField(max_length=1000)
+    author = models.CharField(max_length=1000)
+    date = models.DateTimeField(default = datetime.now)
+
+    # You can label entry as 'cringe', 'woke', 'propaganda', 'misinformation'
+    # If there are many labels, it will be visible for what it is
+    tag = models.CharField(max_length=1000)
+
+    def get_delim():
+        return ","
+
+    def join_elements(elements):
+        tag_string = ""
+        for element in elements:
+            if tag_string == "":
+                tag_string = element.tag
+            else:
+                tag_string += RssEntryTagsDataModel.get_delim() + element.tag
+
+        return tag_string
+
+    def get_author_tag_string(author, link):
+        current_tags_objs = RssEntryTagsDataModel.objects.filter(link = link, author = author)
+
+        if current_tags_objs.exists():
+            return RssEntryTagsDataModel.join_elements(current_tags_objs)
+
+    def get_tag_string(link):
+        current_tags_objs = RssEntryTagsDataModel.objects.filter(link = link)
+
+        if current_tags_objs.exists():
+            return RssEntryTagsDataModel.join_elements(current_tags_objs)
+
+
+
+class RssEntryCommentsDataModel(models.Model):
+
+    link = models.CharField(max_length=1000, unique=True)
+    comment = models.CharField(max_length=1000)
+    reply_id = models.CharField(max_length=1000) # comment id to which we reply
+    author = models.CharField(max_length=1000)
+    date_published = models.DateTimeField(default = datetime.now)
+    date_edited = models.DateTimeField(null = True)
+
 
 class ConfigurationEntry(models.Model):
     git_path = models.CharField(default = ".", max_length=2000)
@@ -100,199 +155,3 @@ class ConfigurationEntry(models.Model):
             return True
         else:
             return False
-
-
-class SourceConverter(object):
-    def __init__(self, row_data):
-        self.process_string(row_data)
-
-    def process_string(self, row_data):
-         delimiter = ";"
-         link_info = row_data.split(delimiter)
-
-         self.url = link_info[0]
-         self.title = link_info[1]
-         self.category = link_info[2]
-         self.subcategory = link_info[3]
-         self.date_fetched = link_info[4]
-
-    def get_text(link):
-        return "{0};{1};{2};{3};{4}".format(link.url, link.title, link.category, link.subcategory, link.date_fetched)
-
-
-class SourcesConverter(object):
-
-    def __init__(self, data = None):
-        if data:
-            self.process_string(data)
-
-    def process_string(self, data):
-        delimiter = "\n"
-        links = data.split(delimiter)
-        self.sources = []
-
-        for link_row in links:
-             link_row = link_row.replace("\r", "")
-             link = SourceConverter(link_row)
-             self.sources.append(link)
-
-    def set_sources(self, sources):
-        self.sources = sources
-
-    def get_text(self):
-        summary_text = ""
-        for source in self.sources:
-            data = SourceConverter.get_text(source)
-            summary_text += data + "\n"
-        return summary_text
-
-
-class EntryConverter(object):
-    def __init__(self, row_data = None):
-        if row_data:
-            self.process_string(row_data)
-        self.with_description = True
-
-    def process_string(self, row_data):
-        from urllib.parse import urlparse
-        delimiter = ";"
-        link_info = row_data.split(delimiter)
-
-        self.title = ""
-        self.date_published = datetime.now
-        self.source = ""
-        self.persistent = True
-        self.description = ""
-
-        self.link = link_info[0]
-
-        if len(link_info) > 1:
-            if len(link_info[1].strip()) > 0:
-                self.title = link_info[1]
-        else:
-            parser = PageParser(self.link)
-            self.title = parser.title
-
-        if len(link_info) > 2:
-            if len(link_info[2].strip()) > 0:
-                self.date_published = link_info[2]
-
-        if len(link_info) > 3:
-            if len(link_info[3].strip()) > 0:
-                self.source = link_info[3]
-            else:
-                self.source = urlparse(self.link).netloc
-        else:
-            if len(self.link) > 4:
-                self.source = urlparse(self.link).netloc
-
-        if len(link_info) > 4:
-            self.persistent = link_info[4] == "True"
-
-        if len(link_info) > 5:
-            if len(link_info[5].strip()) > 0:
-                self.description = link_info[5]
-
-    def get_text(self):
-        data = {}
-        data['source'] = self.source
-        data['link'] = self.link
-        data['title'] = self.title
-        data['date_published'] = str(self.date_published)
-        data['description'] = self.description
-        data['persistent'] = self.persistent
-
-        return data
-
-    def set_entry(self, entry):
-        self.source = entry.source
-        self.link = entry.link
-        self.title = entry.title
-        self.date_published = entry.date_published
-        self.description = entry.description
-        self.persistent = entry.persistent
-
-    def get_csv_text(self):
-        return "{0};{1};{2};{3};{4};{5}".format(self.link, self.source, self.persistent, self.title, self.date_published, self.description)
-
-    def get_clean_text(self):
-        return "{0}\n{1}\n{2}\n{3}\n{4}\n{5}\n".format(self.source, self.self, self.title, self.date_published, self.persistent, self.description)
-
-    def get_md_text(self):
-        ## there is going to be some sort of header probably. Leave # for the title
-        if self.with_description:
-            return "## {0}\n - [{1}]({1})\n - RSS feed: {2}\n - date published: {3}\n - Starred: {4}\n\n{5}\n".format(self.title, self.link, self.source, self.date_published, self.persistent, self.description)
-        else:
-            return "## {0}\n - [{1}]({1})\n - RSS feed: {2}\n - date published: {3}\n - Persistent: {4}\n\n".format(self.title, self.link, self.source, self.date_published, self.persistent)
-
-    def get_rss_text(self):
-        return "<item><title>![CDATA[{0}]]</title><description>![CDATA[{1}]]</description><pubDate>{2}</pubDate><link>{3}</link></item><guid isPermaLink=\"false\">{4}</guid>".format(self.title, self.description, self.date_published, self.link, self.link)
-
-
-class EntriesConverter(object):
-
-    def __init__(self, data = None):
-        self.with_description = True
-
-        if data:
-            self.process_string(data)
-
-    def process_string(self, data):
-        delimiter = "\n"
-        entries = data.split(delimiter)
-        self.entries = []
-
-        for entry_row in entries:
-             entry_row = entry_row.replace("\r", "")
-             entry = EntryConverter(entry_row)
-             self.entries.append(entry)
-
-    def set_entries(self, entries):
-        self.entries = entries
-
-    def get_text(self):
-        output_data = []
-        for entry in self.entries:
-            entry_data = EntryConverter.get_text(entry)
-            output_data.append(entry_data)
-            
-        import json
-        return json.dumps(output_data)
-
-    def get_csv_text(self):
-        output_data = []
-        for entry in self.entries:
-            entry_data = EntryConverter.get_csv_text(entry)
-            output_data.append(entry_data)
-            
-        return "\n".join(output_data)
-
-    def get_clean_text(self):
-        output_data = []
-        for entry in self.entries:
-            entry_data = EntryConverter.get_clean_text(entry)
-            output_data.append(entry_data)
-            
-        return "\n".join(output_data)
-
-    def get_md_text(self):
-        output_data = []
-        for entry in self.entries:
-            ec = EntryConverter()
-            ec.with_description = self.with_description
-            ec.set_entry(entry)
-            entry_data = ec.get_md_text()
-            output_data.append(entry_data)
-            
-        return "\n".join(output_data)
-
-    def get_rss_text(self):
-        output_data = []
-        for entry in self.entries:
-            ec = EntryConverter()
-            ec.with_description = self.with_description
-            ec.set_entry(entry)
-            entry_data = ec.get_rss_text()
-            output_data.append(entry_data)
-            
-        return "\n".join(output_data)

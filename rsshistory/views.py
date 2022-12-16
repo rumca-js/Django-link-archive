@@ -7,8 +7,9 @@ from django.urls import reverse
 from django.db.models.query import QuerySet
 from django.db.models.query import EmptyQuerySet
 
-from .models import RssSourceDataModel, RssSourceEntryDataModel, SourcesConverter, EntriesConverter
+from .models import RssSourceDataModel, RssSourceEntryDataModel
 from .models import ConfigurationEntry
+from .converters import SourcesConverter, EntriesConverter
 
 from .forms import SourceForm, EntryForm, ImportSourcesForm, ImportEntriesForm, SourcesChoiceForm, EntryChoiceForm, ConfigForm
 from .basictypes import *
@@ -112,12 +113,13 @@ def add_source(request):
         
         # check whether it's valid:
         if form.is_valid():
-            valid = True
             form.save()
 
-        context['form'] = form
-
-        return render(request, app_name / 'form_basic.html', context)
+            context["summary_text"] = "Source added"
+            return render(request, app_name / 'summary_present.html', context)
+        else:
+            context["summary_text"] = "Source not added"
+            return render(request, app_name / 'summary_present.html', context)
 
         #    # process the data in form.cleaned_data as required
         #    # ...
@@ -160,13 +162,35 @@ def edit_source(request, pk):
 
         context['summary_text'] = "Could not edit source"
 
-        return render(request, app_name / 'summary_present', context)
+        return render(request, app_name / 'summary_present.html', context)
     else:
         form = SourceForm(instance=ob)
         form.method = "POST"
         form.action_url = reverse('rsshistory:editsource', args=[pk])
         context['form'] = form
         return render(request, app_name / 'form_basic.html', context)
+
+
+def refresh_source(request, pk):
+    context = get_context(request)
+    context['page_title'] += " - refresh source"
+    context['pk'] = pk
+
+    if not request.user.is_staff:
+        return render(request, app_name / 'missing_rights.html', context)
+
+    ft = RssSourceDataModel.objects.filter(id=pk)
+    if not ft.exists():
+       return render(request, app_name / 'source_edit_does_not_exist.html', context)
+
+    ob = ft[0]
+
+    c = Configuration.get_object(str(app_name))
+    c.download_rss(ob, True)
+
+    context['summary_text'] = "Source added to refresh queue"
+
+    return render(request, app_name / 'summary_present.html', context)
 
 
 def import_sources(request):
@@ -425,6 +449,7 @@ class RssEntryDetailView(generic.DetailView):
         context = init_context(context)
 
         context['page_title'] += " - " + self.object.title
+        context['tag_string'] = self.object.get_tag_string()
 
         return context
 
@@ -472,7 +497,6 @@ def add_entry(request):
 
         # check whether it's valid:
         if form.is_valid():
-            valid = True
             form.save()
 
             ob = RssSourceEntryDataModel.objects.filter(link=request.POST.get('link'))
@@ -481,9 +505,8 @@ def add_entry(request):
 
             return render(request, app_name / 'entry_added.html', context)
 
-        context['form'] = form
-
-        return render(request, app_name / 'form_basic.html', context)
+        context["summary_text"] = "Could not add link"
+        return render(request, app_name / 'summary_present.html', context)
 
         #    # process the data in form.cleaned_data as required
         #    # ...
@@ -561,12 +584,121 @@ def hide_entry(request, pk):
     if not request.user.is_staff:
         return render(request, app_name / 'missing_rights.html', context)
 
-    ft = RssSourceEntryDataModel.objects.get(id=pk)
-    fav = ft.dead
-    ft.dead = not ft.dead
-    ft.save()
+    objs = RssSourceEntryDataModel.objects.filter(id=pk)
+    obj = objs[0]
 
-    summary_text = "Link changed to state: " + str(ft.dead)
+    fav = obj.dead
+    obj.dead = not obj.dead
+    obj.save()
+
+    summary_text = "Link changed to state: " + str(obj.dead)
+
+    context["summary_text"] = summary_text
+
+    return render(request, app_name / 'summary_present.html', context)
+
+
+def tag_entry(request, pk):
+    # TODO read and maybe fix https://docs.djangoproject.com/en/4.1/topics/forms/modelforms/
+    from .forms import TagEntryForm
+    from .models import RssEntryTagsDataModel
+
+    context = get_context(request)
+    context['page_title'] += " - tag entry"
+    context['pk'] = pk
+
+    if not request.user.is_staff:
+        return render(request, app_name / 'missing_rights.html', context)
+
+    objs = RssSourceEntryDataModel.objects.filter(id=pk)
+
+    if not objs.exists():
+        context["summary_text"] = "Sorry, such object does not exist"
+        return render(request, app_name / 'summary_present.html', context)
+
+    obj = objs[0]
+    if not obj.persistent:
+        context["summary_text"] = "Sorry, only persistent objects can be tagged"
+        return render(request, app_name / 'summary_present.html', context)
+
+    # if this is a POST request we need to process the form data
+    if request.method == 'POST':
+        method = "POST"
+
+        # create a form instance and populate it with data from the request:
+        form = TagEntryForm(request.POST)
+        
+        # check whether it's valid:
+        if form.is_valid():
+            form.save_tags()
+
+            context["summary_text"] = "Entry tagged"
+            return render(request, app_name / 'summary_present.html', context)
+        else:
+            context["summary_text"] = "Entry not added"
+            return render(request, app_name / 'summary_present.html', context)
+
+        #    # process the data in form.cleaned_data as required
+        #    # ...
+        #    # redirect to a new URL:
+        #    #return HttpResponseRedirect('/thanks/')
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        author = request.user.username
+        link = obj.link
+        tag_string = RssEntryTagsDataModel.get_author_tag_string(author, link)
+
+        if tag_string:
+            form = TagEntryForm(initial={'link' : link, 'author' : author, 'tag' : tag_string})
+        else:
+            form = TagEntryForm(initial={'link' : link, 'author' : author})
+
+        form.method = "POST"
+        form.pk = pk
+        form.action_url = reverse('rsshistory:tagentry', args=[pk])
+        context['form'] = form
+        context['form_title'] = obj.title
+        context['form_description'] = obj.title
+
+    return render(request, app_name / 'form_basic.html', context)
+
+
+def tags_view(request):
+    from .models import RssEntryTagsDataModel
+    from .forms import GoogleChoiceForm
+
+    context = get_context(request)
+    context['page_title'] += " - tags view"
+
+    summary_text = ""
+
+    # if this is a POST request we need to process the form data
+    if request.method == 'POST':
+        method = "POST"
+
+        # create a form instance and populate it with data from the request:
+        form = GoogleChoiceForm(request.POST)
+
+    form = GoogleChoiceForm()
+    form.method = "POST"
+    #form.action_url = reverse('rsshistory:tagentry', args=[pk])
+    context['form'] = form
+
+    return render(request, app_name / 'form_basic.html', context)
+
+
+    tags = RssEntryTagsDataModel.objects.all()
+    for tag in tags:
+        entries = RssSourceEntryDataModel.objects.filter(link = tag.link)
+        for entry in entries:
+            sources = RssSourceDataModel.objects.filter(url = entry.source)
+
+            tag_string = entry.get_tag_string()
+            if tag_string:
+                summary_text += "{0} - {1} - {2} - {3}\n".format(tag.tag, entry.title, entry.link, tag_string)
+            else:
+                summary_text += "{0} - {1} - {2} - {3}\n".format(tag.tag, entry.title, entry.link, tag_string)
 
     context["summary_text"] = summary_text
 
