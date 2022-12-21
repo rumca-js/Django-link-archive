@@ -8,8 +8,9 @@
       <div><strong>Link:</strong> <a href="{{ object.link }}">{{ object.link }}</a></div>
       <div><strong>Title:</strong> {{ object.title }}</div>
       <div><strong>Publish date:</strong> {{ object.date_published }}</div>
-      <div><strong>Persistent:</strong> {{ object.persistent }}</div>
-      <div><strong>Tags:</strong> {{ tag_string }}</div>
+      <div><strong>Persistent:</strong> {{ object.persistent }},
+           <strong>Language:</strong> {{ object.language }},
+           <strong>Tags:</strong> {{ tag_string }}</div>
   </p>
 
   <p>
@@ -18,11 +19,11 @@
     <a href="/{{django_app}}/tagentry/{{ object.id }}" class="simplebutton">Tag entry</a>
     <a href="/{{django_app}}/hideentry/{{ object.id }}" class="simplebutton">Hide entry</a>
     <a href="/{{django_app}}/removeentry/{{ object.id }}" class="simplebutton">Remove entry</a>
-          <a href="/{{django_app}}/favourite/{{object.id}}/" class="simplebutton">
-             {% if source.favourite %}
-               UnFavourite
+          <a href="/{{django_app}}/persistent/{{object.id}}/" class="simplebutton">
+             {% if source.persistent %}
+               Not persistent
              {% else %}
-               Favourite
+               Persistent
              {% endif %}
           </a>
   {% endif %}

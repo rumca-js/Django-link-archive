@@ -59,7 +59,7 @@ class SourcesConverter(object):
         return summary_text
 
     def get_export_path(self):
-       entries_dir = self._cfg.get_export_path() / "favourite"
+       entries_dir = self._cfg.get_highlights_path()
        export_path = entries_dir
 
        if not export_path.exists():
@@ -83,6 +83,7 @@ class EntryConverter(object):
         if row_data:
             self.process_string(row_data)
         self.with_description = True
+        self.entry = None
 
     def process_string(self, row_data):
         from urllib.parse import urlparse
@@ -101,8 +102,9 @@ class EntryConverter(object):
             if len(link_info[1].strip()) > 0:
                 self.title = link_info[1]
         else:
-            parser = PageParser(self.link)
-            self.title = parser.title
+            from .webtools import Page
+            parser = Page(self.link)
+            self.title = parser.get_title()
 
         if len(link_info) > 2:
             if len(link_info[2].strip()) > 0:
@@ -124,7 +126,7 @@ class EntryConverter(object):
             if len(link_info[5].strip()) > 0:
                 self.description = link_info[5]
 
-    def get_text(self):
+    def get_map(self):
         data = {}
         data['source'] = self.source
         data['link'] = self.link
@@ -132,16 +134,19 @@ class EntryConverter(object):
         data['date_published'] = str(self.date_published)
         data['description'] = self.description
         data['persistent'] = self.persistent
+        data['language'] = self.language
 
         return data
 
     def set_entry(self, entry):
+        self.entry = entry
         self.source = entry.source
         self.link = entry.link
         self.title = entry.title
         self.date_published = entry.date_published
         self.description = entry.description
         self.persistent = entry.persistent
+        self.language = entry.language
 
     def get_csv_text(self):
         return "{0};{1};{2};{3};{4};{5}".format(self.link, self.source, self.persistent, self.title, self.date_published, self.description)
@@ -150,11 +155,25 @@ class EntryConverter(object):
         return "{0}\n{1}\n{2}\n{3}\n{4}\n{5}\n".format(self.source, self.self, self.title, self.date_published, self.persistent, self.description)
 
     def get_md_text(self):
-        ## there is going to be some sort of header probably. Leave # for the title
+        tags = ""
+        if self.entry:
+            if self.entry.language == None:
+                self.entry.update_language()
+
+            tags = self.entry.get_tag_string()
+
+        result_string = ""
+        result_string += "## {0}\n".format(self.title)
+        result_string += " - [{0}]({0})\n".format(self.link)
+        result_string += " - RSS feed: {0}\n".format(self.source)
+        result_string += " - date published: {0}\n".format(self.date_published)
+        if tags != "" and tags != None:
+            result_string += " - tags: {0}\n".format(tags)
+        result_string += "\n"
         if self.with_description:
-            return "## {0}\n - [{1}]({1})\n - RSS feed: {2}\n - date published: {3}\n - Starred: {4}\n\n{5}\n".format(self.title, self.link, self.source, self.date_published, self.persistent, self.description)
-        else:
-            return "## {0}\n - [{1}]({1})\n - RSS feed: {2}\n - date published: {3}\n - Persistent: {4}\n\n".format(self.title, self.link, self.source, self.date_published, self.persistent)
+            result_string += "{0}\n".format(self.description)
+
+        return result_string
 
     def get_rss_text(self):
         return "<item><title>![CDATA[{0}]]</title><description>![CDATA[{1}]]</description><pubDate>{2}</pubDate><link>{3}</link></item><guid isPermaLink=\"false\">{4}</guid>".format(self.title, self.description, self.date_published, self.link, self.link)
@@ -164,7 +183,7 @@ class EntriesConverter(object):
 
     def __init__(self, data = None):
         self.with_description = True
-        self._source = None
+        self._source = {}
 
         if data:
             self.process_string(data)
@@ -183,18 +202,24 @@ class EntriesConverter(object):
         self.entries = entries
 
     def set_source(self, source):
-        self._source = source
+        self._source['source url'] = source.url
+        self._source['source title'] = source.title
+
+    def set_source_url(self, source_url):
+        self._source['source url'] = source_url
+        self._source['source title'] = source_url
 
     def get_json(self):
         output_data = {}
         output_data['entries'] = []
 
-        if self._source:
-            output_data['source url'] = self._source.url
-            output_data['source title'] = self._source.title
+        if 'source url' in self._source:
+            output_data['source url'] = self._source['source url']
+        if 'source title' in self._source:
+            output_data['source title'] = self._source['source title']
 
         for entry in self.entries:
-            entry_data = EntryConverter.get_text(entry)
+            entry_data = EntryConverter.get_map(entry)
             output_data['entries'].append(entry_data)
             
         import json
@@ -245,20 +270,63 @@ class EntriesExporter(object):
         self._entries = entries
         self._cfg = config
 
-    def export_entries(self, source, export_type = "default", entries_dir = None, with_description = True):
+    def export_entries(self, source_url, export_file_name = "default", entries_dir = None, with_description = True):
         if len(self._entries) == 0:
             return
 
         e_converter = EntriesConverter()
-        e_converter.set_source(source)
         e_converter.set_entries(self._entries)
         e_converter.with_description = with_description
 
-        if entries_dir is None:
-            entries_dir = self._cfg.get_export_path() / self._cfg.get_date_file_name()
+        from .models import RssSourceDataModel
+        sources = RssSourceDataModel.objects.filter(url = source_url)
+        if sources.exists():
+            e_converter.set_source(sources[0])
+            source_title = sources[0].title
         else:
-            entries_dir = self._cfg.get_export_path() / entries_dir
+            e_converter.set_source_url(source_url)
+            source_title = source_url
 
+        entries_dir = self._cfg.get_export_path() / entries_dir
+        export_path = entries_dir
+
+        if not export_path.exists():
+            export_path.mkdir(parents = True)
+
+        log = logging.getLogger(self._cfg.app_name)
+
+        file_name = export_path / (export_file_name + "_entries.json")
+        #log.info("writing json: " + file_name.as_posix() )
+        file_name.write_text(e_converter.get_json())
+
+        if sources.exists():
+            source = sources[0]
+            md_text = "# Source {0}, Source URL:{1}, Source language: {2}\n\n".format(source.title,
+                     source.url,
+                     source.language)
+
+            md_text = md_text + e_converter.get_md_text()
+        else:
+            md_text = "# Source URL:{0}, Source language: {1}\n\n".format(source_url,
+                    self._entries[0].language)
+
+            md_text = md_text + e_converter.get_md_text()
+
+        file_name = export_path / (export_file_name + "_entries.md")
+        #log.info("writing md: " + file_name.as_posix() )
+        file_name.write_bytes(md_text.encode("utf-8", "ingnore"))
+
+        #log.info("writing done")
+
+    def export_all_entries(self, with_description = True):
+        if len(self._entries) == 0:
+            return
+
+        e_converter = EntriesConverter()
+        e_converter.set_entries(self._entries)
+        e_converter.with_description = with_description
+
+        entries_dir = self._cfg.get_export_path() / self._cfg.get_date_file_name()
         export_path = entries_dir
 
         if not export_path.exists():
@@ -266,79 +334,14 @@ class EntriesExporter(object):
 
         log = logging.getLogger(self._cfg.app_name)
 
-        file_name = export_path / (export_type + "_entries.json")
+        file_name = export_path / ("all_entries.json")
         #log.info("writing json: " + file_name.as_posix() )
         file_name.write_text(e_converter.get_json())
 
-        md_text = "# Source {0}, Source URL:{1}\n\n".format(source.title, source.url)
-        md_text = md_text + e_converter.get_md_text()
+        md_text = e_converter.get_md_text()
 
-        file_name = export_path / (export_type + "_entries.md")
+        file_name = export_path / ("all_entries.md")
         #log.info("writing md: " + file_name.as_posix() )
         file_name.write_bytes(md_text.encode("utf-8", "ingnore"))
 
         #log.info("writing done")
-
-
-class FavouritesConverter(object):
-
-    def __init__(self, config, entries):
-        self._entries = entries
-        self._cfg = config
-
-    def get_export_path(self):
-       entries_dir = self._cfg.get_export_path() / "favourite"
-       export_path = entries_dir
-
-       if not export_path.exists():
-           export_path.mkdir()
-
-       return export_path
-
-    def encapsulate_rss(self, text):
-       text = """
-<?xml version="1.0" encoding="UTF-8" ?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/"
-	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
-	xmlns:dc="http://purl.org/dc/elements/1.1/"
-        xmlns:atom="http://www.w3.org/2005/Atom"
-	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
-	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
-        xmlns:webfeeds="http://webfeeds.org/rss/1.0"
-	
-xmlns:georss="http://www.georss.org/georss" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#">
-<channel>
-  <title>RSS history</title>
-  <atom:link href="https://ithardware.pl/feed" rel="self" type="application/rss+xml" />
-  <link>https://renegat0x0.ddns.net/</link>
-  <description>RSS archive</description>
-  <language>pl-PL</language>
-""" + text + """
-</channel></rss>
-"""
-       return text
-
-    def export(self):
-
-       if len(self._entries) == 0:
-           return
-
-       export_type = 'favourite'
-       export_path = self.get_export_path()
-
-       e_converter = EntriesConverter()
-       e_converter.set_entries(self._entries)
-       e_converter.with_description = False
-
-       file_name = export_path / (export_type + "_entries.json")
-       #log.info("writing json: " + file_name.as_posix() )
-       file_name.write_text(e_converter.get_json())
-
-       file_name = export_path / (export_type + "_entries.md")
-       #log.info("writing md: " + file_name.as_posix() )
-       file_name.write_bytes(e_converter.get_md_text().encode("utf-8", "ingnore"))
-
-       file_name = export_path / (export_type + "_entries.rss")
-       #log.info("writing rss: " + file_name.as_posix() )
-       text = e_converter.get_rss_text()
-       text = self.encapsulate_rss(text)
-       file_name.write_bytes(text.encode("utf-8", "ingnore"))

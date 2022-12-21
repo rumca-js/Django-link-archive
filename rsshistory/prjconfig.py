@@ -11,9 +11,11 @@ from .gitrepo import *
 from .threads import *
 from .basictypes import *
 from .models import ConfigurationEntry
+from .dateutils import DateUtils
+from .prjgitrepo import *
 
 
-__version__ = "0.2.2"
+__version__ = "0.3.0"
 
 
 class Configuration(object):
@@ -106,10 +108,16 @@ class Configuration(object):
            athread.close()
 
    def t_process_item(self, thread, item):
+      from datetime import date, timedelta
+
       if thread == "download-rss":
           try:
              self.t_download_rss(item)
-             self.write_files_today(item)
+             today = DateUtils.get_iso_today()
+             if not item.export_to_cms:
+                return
+
+             self.write_files_for_source_for_day(item.url, today)
           except Exception as e:
              log = logging.getLogger(self.app_name)
              log.error("Exception during parsing page contents {0}".format(item.url) )
@@ -121,6 +129,7 @@ class Configuration(object):
              log = logging.getLogger(self.app_name)
              log.info("Writing persistent")
              self.write_files_favourite()
+             #self.write_all_files_for_day_joined()
              self.write_sources()
              log.info("Writing persistent done")
          except Exception as e:
@@ -135,7 +144,7 @@ class Configuration(object):
          raise NotImplemented
 
    def check_source_fetch_time(self, source):
-       start_time = datetime.datetime.now(timezone('UTC'))
+       start_time = DateUtils.get_datetime_now_utc()
 
        if source.date_fetched:
            time_since_update = start_time - source.date_fetched
@@ -144,8 +153,9 @@ class Configuration(object):
            if mins >= 10:
                # log.info("Source: {0} {1} Skipped; Queue: {2}".format(item.url, item.title, queue_size))
                return True
+           return False
 
-       return False
+       return True
 
    def t_download_rss(self, item):
        try:
@@ -164,7 +174,7 @@ class Configuration(object):
 
            # log.info("Source: {0} {1}; Queue: {2}".format(item.url, item.title, queue_size))
 
-           start_time = datetime.datetime.now(timezone('UTC'))
+           start_time = DateUtils.get_datetime_now_utc()
 
            #rss_contents = self.get_page(url)
            #
@@ -182,7 +192,7 @@ class Configuration(object):
                for entry in feed.entries:
                    self.process_rss_entry(item, entry)
 
-           stop_time = datetime.datetime.now(timezone('UTC'))
+           stop_time = DateUtils.get_datetime_now_utc()
            total_time = stop_time - start_time
            total_time.total_seconds() 
 
@@ -216,14 +226,15 @@ class Configuration(object):
               
               if hasattr(entry, "published"):
 
-                  date = self.get_date_iso(entry.published)
+                  date = DateUtils.get_iso_datetime(entry.published)
 
                   o = RssSourceEntryDataModel(
                       source = item.url,
                       title = entry.title,
                       description = description,
                       link = entry.link,
-                      date_published = date)
+                      date_published = date,
+                      language = item.language)
               else:
                   log = logging.getLogger(self.app_name)
                   log.error("RSS link does not have 'published' keyword {0}".format(item.url))
@@ -232,7 +243,8 @@ class Configuration(object):
                       source = item.url,
                       title = entry.title,
                       description = description,
-                      link = entry.link)
+                      link = entry.link,
+                      language = item.language)
 
               if o:
                   o.save()
@@ -247,26 +259,43 @@ class Configuration(object):
 
           return False
 
-   def write_files_today(self, item):
-       if not item.export_to_cms:
-           return
-
+   def write_files_for_source_for_day(self, source_url, day_iso):
        from .models import RssSourceEntryDataModel
        from .converters import EntriesExporter
 
-       date_range = self.get_datetime_range_one_day()
-       entries = RssSourceEntryDataModel.objects.filter(source = item.url, date_published__range=date_range)
+       date_range = DateUtils.get_range4day(day_iso)
+       entries = RssSourceEntryDataModel.objects.filter(source = source_url, date_published__range=date_range)
 
        ex = EntriesExporter(self, entries)
-       ex.export_entries(item, self.get_url_clean_name(item.url))
+       path = Path(day_iso)
+       ex.export_entries(source_url, self.get_url_clean_name(source_url), path)
+
+   def write_all_files_for_day_joined_separate(self, day_iso):
+       """ We do not want to provide for each day cumulative view. Users may want to select which 'streams' are selected individually '"""
+       from .models import RssSourceDataModel, RssSourceEntryDataModel
+
+       date_range = DateUtils.get_range4day(day_iso)
+
+       # some entries might not have source in the database - added manually.
+       # first capture entries, then check if has export to CMS.
+       # if entry does not have source, it was added manually and is subject for export
+
+       entries = RssSourceEntryDataModel.objects.filter(date_published__range = date_range)
+       sources_urls = set(entries.values_list('source', flat=True).distinct())
+
+       for source_url in sources_urls:
+           print(source_url)
+           source_objs = RssSourceDataModel.objects.filter(url = source_url)
+           if source_objs.exists() and not source_objs[0].export_to_cms:
+              continue
+
+           self.write_files_for_source_for_day(source_url, day_iso)
 
    def write_files_favourite(self):
-       from .models import RssSourceEntryDataModel
-       from .converters import FavouritesConverter
+       from .exporters.highlightsexporter import HighlightsBigExporter
 
-       entries = RssSourceEntryDataModel.objects.filter(persistent = True)
-       converter = FavouritesConverter(self, entries)
-       converter.export()
+       exporter = HighlightsBigExporter(self)
+       exporter.export()
 
    def write_sources(self):
        from .models import RssSourceDataModel
@@ -285,6 +314,32 @@ class Configuration(object):
        self.threads[0].add_to_process_list(item)
        return True
 
+   def check_if_git_update(self):
+       try:
+           ob = ConfigurationEntry.objects.all()
+           if ob.exists() and ob[0].is_git_set():
+               conf = ob[0]
+               repo = DailyRepo(conf, conf.git_daily_repo)
+
+               yesterday = DateUtils.get_date_yesterday()
+               day_present = repo.is_day_data_present(yesterday)
+               month_changed = DateUtils.is_month_changed()
+
+               if not day_present:
+                   self.write_all_files_for_day_joined_separate(yesterday.isoformat())
+
+                   self.push_to_git(conf)
+
+               if not day_present:
+                   self.clear_old_entries()
+                   pass
+                   # TODO clear description of non-favourite up to 500 chars
+
+       except Exception as e:
+          log = logging.getLogger(self.app_name)
+          log.error("Exception during refresh")
+          log.critical(e, exc_info=True)
+
    def t_refresh(self, item):
        log = logging.getLogger(self.app_name)
 
@@ -297,34 +352,121 @@ class Configuration(object):
 
        self.clear_old_entries()
 
-       try:
-           ob = ConfigurationEntry.objects.all()
-           if ob.exists() and ob[0].is_git_set():
-               conf = ob[0]
-               repo = GitRepo(conf)
+       self.check_if_git_update()
 
-               day_changed = self.is_day_changed(repo.get_local_dir() )
-               month_changed = self.is_month_changed(repo.get_local_dir() )
+       #self.debug_refresh()
 
-               if day_changed:
-                      self.push_to_git(conf)
+   def debug_refresh(self):
+       days = ['2022-09-05',
+               '2022-09-06',
+               '2022-09-07',
+               '2022-09-08',
+               '2022-09-09',
+               '2022-09-10',
+               '2022-09-11',
+               '2022-09-12',
+               '2022-09-13',
+               '2022-09-14',
+               '2022-09-15',
+               '2022-09-16',
+               '2022-09-17',
+               '2022-09-18',
+               '2022-09-19',
+               '2022-09-20',
+               '2022-09-21',
+               '2022-09-22',
+               '2022-09-23',
+               '2022-09-24',
+               '2022-09-25',
+               '2022-09-26',
+               '2022-09-27',
+               '2022-09-28',
+               '2022-09-29',
+               '2022-09-30',
+               '2022-10-01',
+               '2022-10-02',
+               '2022-10-03',
+               '2022-10-04',
+               '2022-10-05',
+               '2022-10-06',
+               '2022-10-07',
+               '2022-10-08',
+               '2022-10-09',
+               '2022-10-10',
+               '2022-10-11',
+               '2022-10-12',
+               '2022-10-13',
+               '2022-10-14',
+               '2022-10-15',
+               '2022-10-16',
+               '2022-10-17',
+               '2022-10-18',
+               '2022-10-19',
+               '2022-10-20',
+               '2022-10-21',
+               '2022-10-22',
+               '2022-10-23',
+               '2022-10-24',
+               '2022-10-25',
+               '2022-10-26',
+               '2022-10-27',
+               '2022-10-28',
+               '2022-10-29',
+               '2022-10-30',
+               '2022-10-31',
+               '2022-11-01',
+               '2022-11-02',
+               '2022-11-03',
+               '2022-11-04',
+               '2022-11-05',
+               '2022-11-06',
+               '2022-11-07',
+               '2022-11-08',
+               '2022-11-09',
+               '2022-11-10',
+               '2022-11-11',
+               '2022-11-12',
+               '2022-11-13',
+               '2022-11-14',
+               '2022-11-15',
+               '2022-11-16',
+               '2022-11-17',
+               '2022-11-18',
+               '2022-11-19',
+               '2022-11-20',
+               '2022-11-21',
+               '2022-11-22',
+               '2022-11-23',
+               '2022-11-24',
+               '2022-11-25',
+               '2022-11-26',
+               '2022-11-27',
+               '2022-11-28',
+               '2022-11-29',
+               '2022-11-30',
+               '2022-12-01',
+               '2022-12-02',
+               '2022-12-03',
+               '2022-12-04',
+               '2022-12-05',
+               '2022-12-06',
+               '2022-12-07',
+               '2022-12-08',
+               '2022-12-09',
+               '2022-12-10',
+               '2022-12-11',
+               '2022-12-12',
+               '2022-12-13',
+               '2022-12-14'
+               ]
 
-               if day_changed:
-                   self.clear_old_entries()
-                   pass
-                   # TODO clear description of non-favourite up to 500 chars
-               if month_changed:
-                   pass
-                   # TODO clear description of non-favourite
-
-       except Exception as e:
-          log = logging.getLogger(self.app_name)
-          log.error("Exception during refresh")
-          log.critical(e, exc_info=True)
+       for day in days:
+           pass
+           self.write_all_files_for_day_joined_separate(day)
 
    def clear_old_entries(self):
        log = logging.getLogger(self.app_name)
-       log.info("Removing old RSS data")
+       log.info("RSS cleanup")
 
        from .models import RssSourceDataModel, RssSourceEntryDataModel
        #sources = RssSourceDataModel.objects.filter(remove_after_days)
@@ -336,70 +478,46 @@ class Configuration(object):
 
            days = source.get_days_to_remove()
            if days > 0:
-               current_time = datetime.datetime.now(timezone('UTC'))
+               current_time = DateUtils.get_datetime_now_utc()
                days_before = current_time - timedelta(days = days)
                
                entries = RssSourceEntryDataModel.objects.filter(source=source.url, persistent=False, date_published__lt=days_before)
                if entries.exists():
-                   log.info("Removing old RSS data")
+                   log.info("Removing old RSS data for {0}".format(source.url))
                    entries.delete()
-
-   def is_day_changed(self, local_dir):
-       yesterday = self.get_yesterday()
-       expected_dir = local_dir / self.get_year(yesterday) / self.get_month(yesterday) / self.format_date(yesterday)
-
-       if expected_dir.is_dir():
-           return False
-
-       return True
-
-   def is_month_changed(self, local_dir):
-       yesterday = self.get_yesterday()
-       expected_dir = local_dir / self.get_year(yesterday) / self.get_month(yesterday)
-
-       if expected_dir.is_dir():
-           return False
-
-       return True
 
    def push_to_git(self, conf):
        log = logging.getLogger(self.app_name)
        log.info("Pushing to RSS link repo")
+       
+       yesterday = DateUtils.get_date_yesterday()
 
-       repo = GitRepo(conf)
+
+       repo = MainRepo(conf, conf.git_repo)
 
        repo.up()
 
-       self.copy_yesterday(repo)
-       self.copy_favourites(repo)
-       
-       yesterday = self.get_yesterday()
+       local_dir = self.get_highlights_path()
+       repo.copy_main_data(local_dir)
 
        repo.add([])
-       repo.commit(self.format_date(yesterday))
+       repo.commit(DateUtils.get_dir4date(yesterday))
        repo.push()
 
-   def copy_yesterday(self, repo):
-       yesterday = self.get_yesterday()
-       local_dir = self.get_export_path() / self.format_date(yesterday)
-       expected_dir = repo.get_local_dir() / self.get_year(yesterday) / self.get_month(yesterday) / self.format_date(yesterday)
 
-       shutil.copytree(local_dir, expected_dir)
+       repo = DailyRepo(conf, conf.git_daily_repo)
 
-   def copy_favourites(self, repo):
-       local_dir = self.get_export_path() / "favourite"
-       expected_dir = repo.get_local_dir()
+       repo.up()
 
-       shutil.copytree(local_dir, expected_dir, dirs_exist_ok=True)
+       local_dir = self.get_export_path() / DateUtils.get_dir4date(yesterday)
+       repo.copy_day_data(local_dir, yesterday)
+       
+       repo.add([])
+       repo.commit(DateUtils.get_dir4date(yesterday))
+       repo.push()
 
-   def get_datetime_file_name(self):
-       return datetime.datetime.today().strftime('%Y-%m-%d_%H-%M-%S')
-
-   def get_date_file_name(self):
-       return self.format_date(datetime.datetime.today())
-
-   def format_date(self, date):
-       return date.strftime('%Y-%m-%d')
+   def get_highlights_path(self):
+       return self.get_export_path() / "highlights"
 
    def get_url_clean_name(self, file_name):
        file_name = file_name.replace(":", ".")\
@@ -409,54 +527,3 @@ class Configuration(object):
               .replace("=",".")
 
        return file_name
-
-   def get_date_iso(self, timestamp):
-      from dateutil import parser
-      date = parser.parse(timestamp)
-      date = date.isoformat()
-      return date
-
-   def get_year(self, datetime):
-       return datetime.strftime('%Y')
-
-   def get_month(self, datetime):
-       return datetime.strftime('%m')
-
-   def get_yesterday(self):
-      from datetime import date, timedelta
-
-      current_date = date.today()
-      prev_day = current_date - timedelta(days = 1) 
-
-      return prev_day
-
-   def get_tommorow(self):
-      from datetime import date, timedelta
-
-      current_date = date.today()
-      next_day = current_date + timedelta(days = 1)
-
-      return next_day
-
-   def get_datetime_range_one_day(self):
-      from datetime import date, timedelta
-
-      current_date = date.today()
-      next_day = self.get_tommorow()
-
-      return (current_date, next_day)
-
-   def get_page(self, url):
-       import urllib.request, urllib.error, urllib.parse
-       try:
-           req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-
-           data = None
-           with urllib.request.urlopen(req) as response:
-               data = response.read()
-               # webContent = response.decode('UTF-8')
-           return data
-       except Exception as e:
-          log = logging.getLogger(self.app_name)
-          log.error("Exception during parsing page contents")
-          log.critical(e, exc_info=True)

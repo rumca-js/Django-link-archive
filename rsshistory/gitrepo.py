@@ -21,8 +21,9 @@ origin.push()
 
 
 class GitRepo(object):
-   def __init__(self, git_data):
+   def __init__(self, git_data, git_repo):
       self.git_data = git_data
+      self.git_repo = git_repo
       #self.git = Github(login_or_token=git_data.git_token, base_url=git_data.git_path)
 
    def up(self):
@@ -53,7 +54,7 @@ class GitRepo(object):
       #origin.push()
 
    def get_repo_name(self):
-      last = Path(self.git_data.git_repo).parts[-1]
+      last = Path(self.git_repo).parts[-1]
       last = Path(last)
       last = last.stem
       return last
@@ -64,7 +65,7 @@ class GitRepo(object):
       return Path(self.git_data.git_path) / last
 
    def clone(self):
-      subprocess.run(['git', 'clone', self.git_data.git_repo], cwd=self.git_data.git_path)
+      subprocess.run(['git', 'clone', self.git_repo], cwd=self.git_data.git_path)
 
    def pull(self):
       subprocess.run(['git', 'pull'], cwd=self.get_local_dir())

@@ -2,7 +2,7 @@
 
 {% block content %}
   <span>Filters:</span>
-  <a href="{{filter_form.action_url}}" class='simplebutton'>Reset</a>
+  <a href="{% url 'rsshistory:searchinitview' %}" class='simplebutton'>Reset</a>
 
   <form action="{{filter_form.action_url}}" method="{{filter_form.method}}">
      {{ filter_form }}
@@ -57,6 +57,8 @@
                Hide
              {% endif %}
           </a>
+          {% else %}
+          <hr>
           {% endif %}
       </li>
     {% endfor %}

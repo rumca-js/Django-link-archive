@@ -52,9 +52,9 @@ class WebLinkParser(object):
 
         return links
 
-    import re
-    import requests
     def parse_a_hrefs(self):
+        import re
+        import requests
         links = set()
 
         page = self.get_page(self.searchplace)

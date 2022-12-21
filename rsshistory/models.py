@@ -4,29 +4,6 @@ from datetime import datetime
 import logging
 
 
-class PageParser(object):
-    def __init__(self, link_url):
-        self.title = self.process(self.get_page(link_url))
-
-    def process(self, text):
-        title = ""
-
-        titles = []
-        for text in re.findall("<title.*?>(.+?)</title>"):
-            titles.append(text)
-
-        return " ".join(titles)
-
-    def get_page(url):
-        import urllib.request, urllib.error, urllib.parse
-        try:
-            req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-            webContent = urllib.request.urlopen(req).read().decode('UTF-8')
-            return webContent
-        except Exception as e:
-           logging.critical(e, exc_info=True)
-
-
 class RssSourceDataModel(models.Model):
 
     url = models.CharField(max_length=2000, unique=True)
@@ -75,6 +52,9 @@ class RssSourceEntryDataModel(models.Model):
     persistent = models.BooleanField(default = False)
     dead = models.BooleanField(default = False) # indicated that is removed, fetching will not re-add it
 
+    # possible values en-US, or pl_PL
+    language = models.CharField(max_length=10, null = True)
+
     class Meta:
         ordering = ['-date_published', 'source', 'title']
 
@@ -94,6 +74,20 @@ class RssSourceEntryDataModel(models.Model):
 
     def get_author_tag_string(self):
         return RssEntryTagsDataModel.get_author_tag_string(self.link)
+
+    def update_language(self):
+        objs = RssSourceDataModel.objects.filter(url = self.source)
+        if objs.exists():
+            self.language = objs[0].language
+            self.save()
+        else:
+            from .webtools import Page
+            page = Page(self.link)
+            if page.is_valid():
+                language = page.get_language()
+                if language != None:
+                    self.language = language
+                    self.save()
 
 
 class RssEntryTagsDataModel(models.Model):
@@ -146,12 +140,19 @@ class RssEntryCommentsDataModel(models.Model):
 
 class ConfigurationEntry(models.Model):
     git_path = models.CharField(default = ".", max_length=2000)
-    git_repo = models.CharField(default = "", max_length=2000)
     git_user = models.CharField(default = "", max_length=2000)
     git_token = models.CharField(default = "", max_length=2000)
+    git_repo = models.CharField(default = "", max_length=2000)
+    git_daily_repo = models.CharField(default = "", max_length=2000)
 
     def is_git_set(self):
         if self.git_repo != "" and self.git_user != "" and self.git_token != "":
+            return True
+        else:
+            return False
+
+    def is_git_daily_set(self):
+        if self.git_daily_repo != "" and self.git_user != "" and self.git_token != "":
             return True
         else:
             return False

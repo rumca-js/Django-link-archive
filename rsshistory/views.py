@@ -448,6 +448,9 @@ class RssEntryDetailView(generic.DetailView):
         context = super(RssEntryDetailView, self).get_context_data(**kwargs)
         context = init_context(context)
 
+        if self.object.language == None:
+            self.object.update_language()
+
         context['page_title'] += " - " + self.object.title
         context['tag_string'] = self.object.get_tag_string()
 
@@ -500,6 +503,9 @@ def add_entry(request):
             form.save()
 
             ob = RssSourceEntryDataModel.objects.filter(link=request.POST.get('link'))
+            if ob.exists() and ob[0].language == None:
+                ob[0].update_language()
+
             context['form'] = form
             context['entry'] = ob[0]
 
@@ -664,42 +670,18 @@ def tag_entry(request, pk):
     return render(request, app_name / 'form_basic.html', context)
 
 
-def tags_view(request):
+def search_init_view(request):
     from .models import RssEntryTagsDataModel
     from .forms import GoogleChoiceForm
 
     context = get_context(request)
-    context['page_title'] += " - tags view"
+    context['page_title'] += " - search view"
 
-    summary_text = ""
+    filter_form = EntryChoiceForm(args = request.GET)
+    filter_form.create()
+    filter_form.method = "GET"
+    filter_form.action_url = reverse('rsshistory:entries')
 
-    # if this is a POST request we need to process the form data
-    if request.method == 'POST':
-        method = "POST"
+    context['form'] = filter_form
 
-        # create a form instance and populate it with data from the request:
-        form = GoogleChoiceForm(request.POST)
-
-    form = GoogleChoiceForm()
-    form.method = "POST"
-    #form.action_url = reverse('rsshistory:tagentry', args=[pk])
-    context['form'] = form
-
-    return render(request, app_name / 'form_basic.html', context)
-
-
-    tags = RssEntryTagsDataModel.objects.all()
-    for tag in tags:
-        entries = RssSourceEntryDataModel.objects.filter(link = tag.link)
-        for entry in entries:
-            sources = RssSourceDataModel.objects.filter(url = entry.source)
-
-            tag_string = entry.get_tag_string()
-            if tag_string:
-                summary_text += "{0} - {1} - {2} - {3}\n".format(tag.tag, entry.title, entry.link, tag_string)
-            else:
-                summary_text += "{0} - {1} - {2} - {3}\n".format(tag.tag, entry.title, entry.link, tag_string)
-
-    context["summary_text"] = summary_text
-
-    return render(request, app_name / 'summary_present.html', context)
+    return render(request, app_name / 'form_search.html', context)

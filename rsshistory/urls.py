@@ -32,7 +32,7 @@ urlpatterns = [
 
    path('configuration/', views.configuration, name='configuration'),
 
-   path('tagsview', views.tags_view, name='tagsview'),
+   path('searchinitview', views.search_init_view, name='searchinitview'),
 
    path('accounts/', include('django.contrib.auth.urls')),
    #path('logoutuser/', auth.LogoutView.as_view(), name ='logoutuser'),

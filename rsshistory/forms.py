@@ -31,10 +31,14 @@ class EntryForm(forms.ModelForm):
     """
     class Meta:
         model = RssSourceEntryDataModel
-        fields = ['source', 'title', 'description', 'link', 'date_published', 'persistent']
+        fields = ['source', 'title', 'description', 'link', 'date_published', 'persistent','language']
         widgets = {
          #'git_token': forms.PasswordInput(),
         }
+
+    def __init__(self, *args, **kwargs):
+        super(EntryForm, self).__init__(*args, **kwargs)
+        self.fields['language'].required = False
 
 
 class TagEntryForm(forms.ModelForm):
@@ -192,19 +196,17 @@ class EntryChoiceForm(forms.Form):
     def __init__(self, *args, **kwargs):
         self.args = kwargs.pop('args', ())
         super().__init__(*args, **kwargs)
+        self.get_sources()
 
     def get_filtered_objects(self):
         source_parameter_map = self.get_source_filter_args()
         entry_parameter_map = self.get_entry_filter_args()
 
         self.entries = []
-        self.sources = []
 
         if 'search' in entry_parameter_map:
             entry_parameter_map["title__icontains"] = entry_parameter_map['search']
             del entry_parameter_map['search']
-
-        self.sources = RssSourceDataModel.objects.filter(**source_parameter_map)
 
         if source_parameter_map == {}:
             return RssSourceEntryDataModel.objects.filter(**entry_parameter_map)
@@ -246,6 +248,10 @@ class EntryChoiceForm(forms.Form):
         self.fields['title'] = forms.CharField(widget=forms.Select(choices=title, attrs=attr), initial=title_init)
         self.fields['persistent'] = forms.BooleanField(required=False, initial=self.args.get('persistent'))
         self.fields['search'] = forms.CharField(label='Search', max_length = 500, required=False, initial=self.args.get("search"))
+
+    def get_sources(self):
+        source_parameter_map = self.get_source_filter_args()
+        self.sources = RssSourceDataModel.objects.filter(**source_parameter_map)
 
     def get_filtered_objects_values(self, field):
         values = set()
@@ -333,7 +339,7 @@ class ConfigForm(forms.ModelForm):
     """
     class Meta:
         model = ConfigurationEntry
-        fields = ['git_path', 'git_repo', 'git_user', 'git_token']
+        fields = ['git_path', 'git_repo', 'git_daily_repo', 'git_user', 'git_token']
         widgets = {
          #'git_token': forms.PasswordInput(),
         }
