@@ -1,0 +1,55 @@
+{% extends base_generic %}
+
+{% block content %}
+
+<h1>{{form_title}}</h1>
+
+<p>{{form_description}}<p>
+
+<form action="{{form.action_url}}" method="{{form.method}}">
+    {% csrf_token %}
+    {{ form }}
+    <input type="submit" value="Submit">
+</form>
+
+  <h2>Topics suggestions</h2>
+  Example search terms:
+  <ul>
+    <li>microsoft, apple, nvidia, samsung, xiaomi, amazon, alphabet, facebook, meta, twitter, neuralink</li>
+    <li>big tech, surveillance, privacy, censorship, conspiracy, cbdc, crypto, bitcoint, social media, whistleblower, banned</li>
+    <li>china, iran, israel, Palestine, russia, government, january 6, blackrock, christian, islam, jewish, satan, immigration, corporatocracy, techno feudalism, wef</li>
+    <li>covid, vaccine, pfizer, moderna, astra, pandemic, pandemic amnesty, fda, cdc, immunity, herd immunity</li>
+    <li>woke, cbdc, lgbt, gender, queer, trans, black lives, blm, white privilege, qanon, great reset, cancel culture, elections, stolen elections, sabotage, terrorist, hate speech, propaganda, corrupt, scandal, pedophile, groom</li>
+    <li>climate change, carbon footprint, co2, esg, flat earth, conspiracy theory</li>
+    <li>zuckerberg, musk, biden, Justin Trudeau, hunter biden, trump, bill gates, ghislaine, epstein, joe rogan, alex jones, tim pool, tim cook, fauci, klaus schwab, george soros, jordan peterson, steven crowder, snowden, orwell, merkel, kanye west, jfk, Kennedy, putin, clinton, obama, jack Dorsey</li>
+
+    <li>Twitter Files, pizzagate, qatargate, cablegate</li>
+    <li>wikileaks, julian assange</li>
+    <li>Kaczyński, morawiecki, obajtek</li>
+  </ul>
+
+  <h2>2021 topics</h2>
+  Example search terms:
+  <ul>
+    <li>january 6</li>
+  </ul>
+
+  <h2>2013 topics</h2>
+  Example search terms:
+  <ul>
+    <li>snowden, nsa, five eyes</li>
+  </ul>
+
+  <h2>2010 topics</h2>
+  Example search terms:
+  <ul>
+    <li>julian assange, wikileaks, cablegate</li>
+  </ul>
+
+  <h2>2001 topics</h2>
+  Example search terms:
+  <ul>
+    <li>osama, 9/11</li>
+  </ul>
+
+{% endblock %}
