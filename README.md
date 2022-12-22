@@ -1,22 +1,34 @@
 # Overview
 
- - Django application to manage rss sources
- - Allows to add/remove rss source
+Some time ago I have started capturing links from RSS sources. Why? I am not sure. I was just enjoying development in Django. I am no expert, but I like to program stuff.
+
+ - Django application to manage RSS sources
+ - Allows to add/remove RSS sources
  - Each source adds entries to the database
 
-# Features
+## Features
 
- - RSS source can be configured, so that entries are deleted after 'X' days
- - RSS entries can be exported to a github repository
- - RSS entry can be marked as 'permament' and will not be deleted
- - RSS entries can be browsed, searched
- - each RSS source contains timestamp when it was fetched, it will not be fetched too often
+ - Web GUI in Django
+ - RSS feed sources management: adding / removing / configuration
+ - RSS links managment: adding / removing / configuration
+ - automatic RSS feed update
+ - automatic git export
+ - automatic cleanup after specified time
+ - making some entries permament (not erasable, highlighted)
+ - support for Django auth staff users
+ - automatic behavior through threads, which I think are not a good solution for Django applications?
 
-# Screenshots
+## Links
+
+ - Django RSS application: [https://github.com/rumca-js/Django-rss-feed](https://github.com/rumca-js/Django-rss-feed)
+ - Git RSS daily repository for the year 2022 [https://github.com/rumca-js/RSS-Link-Database-2022](https://github.com/rumca-js/RSS-Link-Database-2022)
+ - Git RSS links repository for the permament articles [https://github.com/rumca-js/RSS-Link-Database](https://github.com/rumca-js/RSS-Link-Database)
+
+## Screenshots
 
 ![](https://raw.githubusercontent.com/rumca-js/Django-rss-feed/main/screenshots/2022_09_14_entries.PNG)
 
-# Installation
+## Installation
 
 Installation, just as any other Django app.
 
@@ -26,22 +38,30 @@ Installation, just as any other Django app.
  - pip3 install python-dateutil
  - pip3 install PyGithub
 
-# Automated export / backup
+## Daily repository
 
-Provides automated export to github location.
+ - repository for a particular year contains directories for each day
+ - each day contains files for each source
+ - there is markdown and json file for each source
 
-Example: [https://github.com/rumca-js/RSS-Link-Database](https://github.com/rumca-js/RSS-Link-Database)
+## Permament repository
 
-# Configuration
+ - contains articles that I have selected as intresting, or noteworthy, or funny, or whathever
+ - files are split by 'language' and 'year' categories
+ - three file formats: JSON, markdown, rss
+ - markdown file is generated as a form of preview, JSON can be reused, imported
+ - links are highlighted, but that does not necessarily mean something is endorsed. It shows particular intrest in topic. It is indication of importance
 
- - Configuration page allows to define github user / token which allows automatic RSS entries export to repositories
- - You can edit templates, styles
- - You can provide your own RSS feeds
+## Sources
 
-# Goal
+ - provided in sources.json file
+ - provides information about sources, like title, url, langugage
+
+## Goal
 
  - Archive purposes
- - I want to 'store important links'
+ - data analysis - probably it would be possible to verify link rot, etc.
+ - I want to have a place to store important links
  - Google sucks at providing results for various topics (dead internet)
 
 ## Inspirations
@@ -56,7 +76,17 @@ Reasoning in Polish:
 
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/QHBcLrlgaxY/0.jpg)](https://www.youtube.com/watch?v=QHBcLrlgaxY)
 
-# Problems, notes
+## Data analysis
+
+With these data we can perform further analysis:
+
+ - how many of old links are not any longer valid (link rot test)
+ - capture all domains from RSS links (internal, and leading outside?). Analyse which domains are most common
+ - which site generates most entries
+ - we can capture all external links from entries, to capture where these sites lead to (check network effect, etc)
+ - we can verify who reported first on certain topics
+
+## Problems, notes
 
  - Google fails to deliver content of small creators (blogs etc. private pages). Google focuses on corporate hosting. Most common links are towards YouTube, Google maps, Facebook, reddit
  - We cannot replace Google search
@@ -65,3 +95,7 @@ Reasoning in Polish:
  - Is the data relevant, or useful for anyone?
  - Either we would like to record data from 'well established sources' or gather as many links as possible. I think web engines do it? We cannot gather too much data, as it can destroy our potato servers.
  - there are other RSS solutions like 'feedly', but it is an app, not data. You cannot parse it, you do not own the data, you can only do things that feedly allows you to do
+
+# Ending notes
+
+All links belong to us!
