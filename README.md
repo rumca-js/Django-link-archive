@@ -17,6 +17,7 @@ Some time ago I have started capturing links from RSS sources. Why? I am not sur
  - making some entries permament (not erasable, highlighted)
  - support for Django auth staff users
  - automatic behavior through threads, which I think are not a good solution for Django applications?
+ - data are stored locally
 
 ## Links
 
