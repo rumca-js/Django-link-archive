@@ -15,7 +15,7 @@ from .dateutils import DateUtils
 from .prjgitrepo import *
 
 
-__version__ = "0.3.0"
+__version__ = "0.3.1"
 
 
 class Configuration(object):
@@ -77,6 +77,9 @@ class Configuration(object):
 
    def get_export_path(self):
        return self.directory / 'exports' / self.app_name
+
+   def get_import_path(self):
+       return self.directory / 'imports' / self.app_name
 
    def get_data_path(self):
        return self.directory / 'data' / self.app_name
@@ -146,8 +149,9 @@ class Configuration(object):
    def check_source_fetch_time(self, source):
        start_time = DateUtils.get_datetime_now_utc()
 
-       if source.date_fetched:
-           time_since_update = start_time - source.date_fetched
+       date_fetched = source.get_date_fetched()
+       if date_fetched:
+           time_since_update = start_time - date_fetched
            mins = time_since_update / timedelta(minutes = 1)
 
            if mins >= 10:
@@ -194,10 +198,9 @@ class Configuration(object):
 
            stop_time = DateUtils.get_datetime_now_utc()
            total_time = stop_time - start_time
-           total_time.total_seconds() 
+           total_time.total_seconds()
 
-           item.date_fetched = stop_time
-           item.save()
+           item.set_operational_info(stop_time, len(feed.entries), total_time.total_seconds())
 
        except Exception as e:
           log = logging.getLogger(self.app_name)
@@ -205,56 +208,67 @@ class Configuration(object):
           log.error("Source: {0} {1} NOK; Queue: {2}".format(item.url, item.title, queue_size))
           log.critical(e, exc_info=True)
 
-   def process_rss_entry(self, item, entry):
+   def get_feed_entry_map(self, source, feed_entry):
+       output_map = {}
+
+       output_map['link'] = feed_entry.link
+       if source.title.find("CodeProject") >= 0:
+           output_map['link'] = feed_entry.source['href']
+           if output_map['link'].strip() == "":
+               output_map['link'] = feed_entry.link
+
+       output_map['description'] = ""
+       if hasattr(feed_entry, "description"):
+           output_map['description'] = feed_entry.description
+
+       published = ""
+       if hasattr(feed_entry, "published"):
+           output_map['published'] = DateUtils.get_iso_datetime(feed_entry.published)
+       else:
+           output_map['published'] = DateUtils.get_datetime_now_utc()
+
+       output_map['source'] = source.url
+       output_map['title'] = feed_entry.title
+       output_map['language'] = source.language
+       return output_map
+
+   def filter_rss_entry(self, source, feed_entry, props):
+      if props['link'].find("TVN24-po-ukrainsku") >= 0:
+          return True
+
+      return False
+
+   def process_rss_entry(self, source, feed_entry):
        try:
           from .models import RssSourceEntryDataModel
-          objs = RssSourceEntryDataModel.objects.filter(link = entry.link)
+
+          props = self.get_feed_entry_map(source, feed_entry)
+
+          objs = RssSourceEntryDataModel.objects.filter(link = props['link'])
 
           if not objs.exists():
-              if str(entry.title).strip() == "" or entry.title == "undefined":
+              if str(feed_entry.title).strip() == "" or feed_entry.title == "undefined":
                   return False
 
-              if entry.link.find("TVN24-po-ukrainsku") >= 0:
-                  return False
+              if self.filter_rss_entry(source, feed_entry, props):
+                  return
 
-              description = ""
-              if hasattr(entry, "description"):
-                  description = entry.description
+              o = RssSourceEntryDataModel(
+                  source = props['source'],
+                  title = props['title'],
+                  description = props['description'],
+                  link = props['link'],
+                  date_published = props['published'],
+                  language = props['language'])
 
-              published = ""
-              o = None
-              
-              if hasattr(entry, "published"):
-
-                  date = DateUtils.get_iso_datetime(entry.published)
-
-                  o = RssSourceEntryDataModel(
-                      source = item.url,
-                      title = entry.title,
-                      description = description,
-                      link = entry.link,
-                      date_published = date,
-                      language = item.language)
-              else:
-                  log = logging.getLogger(self.app_name)
-                  log.error("RSS link does not have 'published' keyword {0}".format(item.url))
-
-                  o = RssSourceEntryDataModel(
-                      source = item.url,
-                      title = entry.title,
-                      description = description,
-                      link = entry.link,
-                      language = item.language)
-
-              if o:
-                  o.save()
+              o.save()
 
               return True
 
        except Exception as e:
           log = logging.getLogger(self.app_name)
           queue_size = self.threads[0].get_queue_size()
-          log.error("Entry: {0} {1} NOK/Queue: {2}; Entry {3} {4}".format(item.url, item.title, queue_size, entry.link, entry.title))
+          log.error("Entry: {0} {1} NOK/Queue: {2}; Entry {3} {4}".format(source.url, source.title, queue_size, feed_entry.link, feed_entry.title))
           log.critical(e, exc_info=True)
 
           return False
@@ -343,6 +357,8 @@ class Configuration(object):
    def t_refresh(self, item):
        log = logging.getLogger(self.app_name)
 
+       #self.debug_refresh()
+
        log.info("Refreshing RSS data")
 
        from .models import RssSourceDataModel
@@ -354,114 +370,119 @@ class Configuration(object):
 
        self.check_if_git_update()
 
-       #self.debug_refresh()
-
    def debug_refresh(self):
-       days = ['2022-09-05',
-               '2022-09-06',
-               '2022-09-07',
-               '2022-09-08',
-               '2022-09-09',
-               '2022-09-10',
-               '2022-09-11',
-               '2022-09-12',
-               '2022-09-13',
-               '2022-09-14',
-               '2022-09-15',
-               '2022-09-16',
-               '2022-09-17',
-               '2022-09-18',
-               '2022-09-19',
-               '2022-09-20',
-               '2022-09-21',
-               '2022-09-22',
-               '2022-09-23',
-               '2022-09-24',
-               '2022-09-25',
-               '2022-09-26',
-               '2022-09-27',
-               '2022-09-28',
-               '2022-09-29',
-               '2022-09-30',
-               '2022-10-01',
-               '2022-10-02',
-               '2022-10-03',
-               '2022-10-04',
-               '2022-10-05',
-               '2022-10-06',
-               '2022-10-07',
-               '2022-10-08',
-               '2022-10-09',
-               '2022-10-10',
-               '2022-10-11',
-               '2022-10-12',
-               '2022-10-13',
-               '2022-10-14',
-               '2022-10-15',
-               '2022-10-16',
-               '2022-10-17',
-               '2022-10-18',
-               '2022-10-19',
-               '2022-10-20',
-               '2022-10-21',
-               '2022-10-22',
-               '2022-10-23',
-               '2022-10-24',
-               '2022-10-25',
-               '2022-10-26',
-               '2022-10-27',
-               '2022-10-28',
-               '2022-10-29',
-               '2022-10-30',
-               '2022-10-31',
-               '2022-11-01',
-               '2022-11-02',
-               '2022-11-03',
-               '2022-11-04',
-               '2022-11-05',
-               '2022-11-06',
-               '2022-11-07',
-               '2022-11-08',
-               '2022-11-09',
-               '2022-11-10',
-               '2022-11-11',
-               '2022-11-12',
-               '2022-11-13',
-               '2022-11-14',
-               '2022-11-15',
-               '2022-11-16',
-               '2022-11-17',
-               '2022-11-18',
-               '2022-11-19',
-               '2022-11-20',
-               '2022-11-21',
-               '2022-11-22',
-               '2022-11-23',
-               '2022-11-24',
-               '2022-11-25',
-               '2022-11-26',
-               '2022-11-27',
-               '2022-11-28',
-               '2022-11-29',
-               '2022-11-30',
-               '2022-12-01',
-               '2022-12-02',
-               '2022-12-03',
-               '2022-12-04',
-               '2022-12-05',
-               '2022-12-06',
-               '2022-12-07',
-               '2022-12-08',
-               '2022-12-09',
-               '2022-12-10',
-               '2022-12-11',
-               '2022-12-12',
-               '2022-12-13',
-               '2022-12-14'
+       days = [
+               #'2022-09-05',
+               #'2022-09-06',
+               #'2022-09-07',
+               #'2022-09-08',
+               #'2022-09-09',
+               #'2022-09-10',
+               #'2022-09-11',
+               #'2022-09-12',
+               #'2022-09-13',
+               #'2022-09-14',
+               #'2022-09-15',
+               #'2022-09-16',
+               #'2022-09-17',
+               #'2022-09-18',
+               #'2022-09-19',
+               #'2022-09-20',
+               #'2022-09-21',
+               #'2022-09-22',
+               #'2022-09-23',
+               #'2022-09-24',
+               #'2022-09-25',
+               #'2022-09-26',
+               #'2022-09-27',
+               #'2022-09-28',
+               #'2022-09-29',
+               #'2022-09-30',
+               #'2022-10-01',
+               #'2022-10-02',
+               #'2022-10-03',
+               #'2022-10-04',
+               #'2022-10-05',
+               #'2022-10-06',
+               #'2022-10-07',
+               #'2022-10-08',
+               #'2022-10-09',
+               #'2022-10-10',
+               #'2022-10-11',
+               #'2022-10-12',
+               #'2022-10-13',
+               #'2022-10-14',
+               #'2022-10-15',
+               #'2022-10-16',
+               #'2022-10-17',
+               #'2022-10-18',
+               #'2022-10-19',
+               #'2022-10-20',
+               #'2022-10-21',
+               #'2022-10-22',
+               #'2022-10-23',
+               #'2022-10-24',
+               #'2022-10-25',
+               #'2022-10-26',
+               #'2022-10-27',
+               #'2022-10-28',
+               #'2022-10-29',
+               #'2022-10-30',
+               #'2022-10-31',
+               #'2022-11-01',
+               #'2022-11-02',
+               #'2022-11-03',
+               #'2022-11-04',
+               #'2022-11-05',
+               #'2022-11-06',
+               #'2022-11-07',
+               #'2022-11-08',
+               #'2022-11-09',
+               #'2022-11-10',
+               #'2022-11-11',
+               #'2022-11-12',
+               #'2022-11-13',
+               #'2022-11-14',
+               #'2022-11-15',
+               #'2022-11-16',
+               #'2022-11-17',
+               #'2022-11-18',
+               #'2022-11-19',
+               #'2022-11-20',
+               #'2022-11-21',
+               #'2022-11-22',
+               #'2022-11-23',
+               #'2022-11-24',
+               #'2022-11-25',
+               #'2022-11-26',
+               #'2022-11-27',
+               #'2022-11-28',
+               #'2022-11-29',
+               #'2022-11-30',
+               #'2022-12-01',
+               #'2022-12-02',
+               #'2022-12-03',
+               #'2022-12-04',
+               #'2022-12-05',
+               #'2022-12-06',
+               #'2022-12-07',
+               #'2022-12-08',
+               #'2022-12-09',
+               #'2022-12-10',
+               #'2022-12-11',
+               #'2022-12-12',
+               #'2022-12-13',
+               #'2022-12-14',
+               '2022-12-15',
+               '2022-12-16',
+               '2022-12-17',
+               '2022-12-18',
+               '2022-12-19',
+               '2022-12-20'
                ]
 
        for day in days:
-           pass
+           print("Doing for a day: {0}".format(day))
            self.write_all_files_for_day_joined_separate(day)
 
    def clear_old_entries(self):
@@ -511,6 +532,7 @@ class Configuration(object):
 
        local_dir = self.get_export_path() / DateUtils.get_dir4date(yesterday)
        repo.copy_day_data(local_dir, yesterday)
+       repo.copy_file(self.get_highlights_path() / "sources.json")
        
        repo.add([])
        repo.commit(DateUtils.get_dir4date(yesterday))

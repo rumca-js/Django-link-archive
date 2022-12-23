@@ -31,14 +31,50 @@ class EntryForm(forms.ModelForm):
     """
     class Meta:
         model = RssSourceEntryDataModel
-        fields = ['source', 'title', 'description', 'link', 'date_published', 'persistent','language']
+        fields = ['link', 'title', 'description', 'date_published', 'source', 'persistent', 'language', 'user']
         widgets = {
          #'git_token': forms.PasswordInput(),
         }
 
     def __init__(self, *args, **kwargs):
         super(EntryForm, self).__init__(*args, **kwargs)
+        self.fields['source'].required = False
         self.fields['language'].required = False
+        self.fields['persistent'].initial = True
+        self.fields['user'].widget.attrs['readonly'] = True
+
+    def save_form(self):
+        from .webtools import Page
+        source = self.cleaned_data["source"]
+        title = self.cleaned_data["title"]
+        description = self.cleaned_data["description"]
+        link = self.cleaned_data["link"]
+        date_published = self.cleaned_data["date_published"]
+        persistent = self.cleaned_data["persistent"]
+        language = self.cleaned_data["language"]
+        user = self.cleaned_data["user"]
+        
+        if not source:
+            p = Page(link)
+            source = p.get_domain()
+        if not language:
+            p = Page(link)
+            language = p.get_language()
+
+        if not source:
+            return
+
+        entry = RssSourceEntryDataModel(
+                source = source,
+                title = title,
+                description = description,
+                link = link,
+                date_published = date_published,
+                persistent = persistent,
+                language = language,
+                user = user)
+
+        entry.save()
 
 
 class TagEntryForm(forms.ModelForm):
@@ -187,11 +223,14 @@ class EntryChoiceForm(forms.Form):
     Category choice form
     """
 
+    # do not think too much about these settings, these will be overriden by 'create' method
+    search = forms.CharField(label='Search', max_length = 500, required=False)
     category = forms.CharField(widget=forms.Select(choices=()))
     subcategory = forms.CharField(widget=forms.Select(choices=()))
     title = forms.CharField(widget=forms.Select(choices=()))
-    persistent = forms.BooleanField(required=False)
-    search = forms.CharField(label='Search', max_length = 500, required=False)
+    persistent = forms.BooleanField(required=False, initial=True)
+    language = forms.CharField(label='language', max_length = 500, required=False)
+    user = forms.CharField(label='user', max_length = 500, required=False)
 
     def __init__(self, *args, **kwargs):
         self.args = kwargs.pop('args', ())
@@ -203,10 +242,6 @@ class EntryChoiceForm(forms.Form):
         entry_parameter_map = self.get_entry_filter_args()
 
         self.entries = []
-
-        if 'search' in entry_parameter_map:
-            entry_parameter_map["title__icontains"] = entry_parameter_map['search']
-            del entry_parameter_map['search']
 
         if source_parameter_map == {}:
             return RssSourceEntryDataModel.objects.filter(**entry_parameter_map)
@@ -243,11 +278,24 @@ class EntryChoiceForm(forms.Form):
         subcategory_init = self.get_source_init('subcategory')
         title_init = self.get_source_init('title')
 
-        self.fields['category'] = forms.CharField(widget=forms.Select(choices=categories, attrs=attr), initial=category_init)
-        self.fields['subcategory'] = forms.CharField(widget=forms.Select(choices=subcategories, attrs=attr), initial=subcategory_init)
-        self.fields['title'] = forms.CharField(widget=forms.Select(choices=title, attrs=attr), initial=title_init)
-        self.fields['persistent'] = forms.BooleanField(required=False, initial=self.args.get('persistent'))
-        self.fields['search'] = forms.CharField(label='Search', max_length = 500, required=False, initial=self.args.get("search"))
+        init = {}
+        init['search'] = ""
+        init['language'] = ""
+        init['persistent'] = True
+        init['user'] = ""
+        if len(self.args) != 0:
+            init['search'] = self.args.get("search")
+            init['language'] = self.args.get("language")
+            init['persistent'] = self.args.get("persistent")
+            init['user'] = self.args.get("user")
+
+        self.fields['search'] = forms.CharField(label = 'Search', max_length = 500, required=False, initial=init['search'])
+        self.fields['category'] = forms.CharField(label = "RSS source category", widget=forms.Select(choices=categories, attrs=attr), initial=category_init)
+        self.fields['subcategory'] = forms.CharField(label = "RSS source subcategory", widget=forms.Select(choices=subcategories, attrs=attr), initial=subcategory_init)
+        self.fields['title'] = forms.CharField(label = "RSS source title", widget=forms.Select(choices=title, attrs=attr), initial=title_init)
+        self.fields['persistent'] = forms.BooleanField(label = "Search in persistent entries", required=False, initial=init['persistent'])
+        self.fields['language'] = forms.CharField(label = 'Search language', max_length = 500, required=False, initial=init['language'])
+        self.fields['user'] = forms.CharField(label = 'Search user', required=False, initial=init['user'])
 
     def get_sources(self):
         source_parameter_map = self.get_source_filter_args()
@@ -307,6 +355,17 @@ class EntryChoiceForm(forms.Form):
         search = self.args.get("search")
         if search:
            parameter_map['search'] = search
+
+        if 'search' in parameter_map:
+            parameter_map["title__icontains"] = parameter_map['search']
+            del parameter_map['search']
+
+        language = self.args.get("language")
+        if language:
+            parameter_map["language__icontains"] = language
+        user = self.args.get("user")
+        if user:
+            parameter_map["user__icontains"] = user
 
         return parameter_map
 

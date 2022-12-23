@@ -16,11 +16,98 @@
     <li><strong>Persistent:</strong> {{ num_persistent }}</li>
   </ul>
 
-  <h2>Details</h2>
-  With this server you can:
+  <h2>Features</h2>
   <ul>
-    <li>create an archive of news/articles</li>
-    <li>create your own source of information</li>
+  <li>Web GUI in Django</li>
+  <li>RSS feed sources management: adding / removing / configuration</li>
+  <li>RSS links managment: adding / removing / configuration</li>
+  <li>automatic RSS feed update</li>
+  <li>automatic git export</li>
+  <li>automatic cleanup after specified time</li>
+  <li>making some entries permament (not erasable, highlighted)</li>
+  <li>support for Django auth staff users</li>
+  <li>automatic behavior through threads, which I think are not a good solution for Django applications?</li>
+  <li>data are stored locally</li>
+  </ul>
+
+ <h2>Links</h2>
+  <ul>
+      <li>Django RSS application: <a href="https://github.com/rumca-js/Django-rss-feed">https://github.com/rumca-js/Django-rss-feed</a></li>
+      <li>Git RSS daily repository for the year 2022 <a href="https://github.com/rumca-js/RSS-Link-Database-2022">https://github.com/rumca-js/RSS-Link-Database-2022</a></li>
+      <li>Git RSS links repository for the permament articles <a href="https://github.com/rumca-js/RSS-Link-Database">https://github.com/rumca-js/RSS-Link-Database</a></li>
+  </ul>
+
+ <h2>Installation</h2>
+ Installation, just as any other Django app.
+
+ <h2>Dependencies</h2>
+  <ul>
+ <li>sudo apt install feedparser / pip3 install feedparser</li>
+ <li>pip3 install python-dateutil</li>
+ <li>pip3 install PyGithub</li>
+  </ul>
+
+ <h2>Daily repository</h2>
+  <ul>
+ <li>repository for a particular year contains directories for each day</li>
+ <li>each day contains files for each source</li>
+ <li>there is markdown and json file for each source</li>
+  </ul>
+
+ <h2>Permament repository</h2>
+  <ul>
+ <li>contains articles that I have selected as intresting, or noteworthy, or funny, or whathever</li>
+ <li>files are split by 'language' and 'year' categories</li>
+ <li>three file formats: JSON, markdown, rss</li>
+ <li>markdown file is generated as a form of preview, JSON can be reused, imported</li>
+ <li>links are highlighted, but that does not necessarily mean something is endorsed. It shows particular intrest in topic. It is indication of importance</li>
+  </ul>
+
+ <h2>Sources</h2>
+  <ul>
+ <li>provided in sources.json file</li>
+ <li>provides information about sources, like title, url, langugage</li>
+  </ul>
+
+ <h2>Goal</h2>
+  <ul>
+ <li>Archive purposes</li>
+ <li>data analysis - probably it would be possible to verify link rot, etc.</li>
+ <li>I want to have a place to store important links</li>
+ <li>Google sucks at providing results for various topics (dead internet)</li>
+  </ul>
+
+ <h2>Inspirations</h2>
+  <ul>
+ <li>I Tracked Everything I Read on the Internet for a Year [https://www.tdpain.net/blog/a-year-of-reading](https://www.tdpain.net/blog/a-year-of-reading).</li>
+ <li>Automating a Reading List [https://zanshin.net/2022/09/11/automating-a-reading-list/](https://zanshin.net/2022/09/11/automating-a-reading-list/)</li>
+ <li>Google Search Is Dying [https://dkb.io/post/google-search-is-dying](https://dkb.io/post/google-search-is-dying)</li>
+ <li>Luke Smith: Remember to Consoom Next Content on YouTube [https://www.youtube.com/watch?v=nI3GVw2JSEI](https://www.youtube.com/watch?v=nI3GVw2JSEI). As a society we provide news instead of building a data base of important information</li>
+ <li>Bright Insight: YES, They Really Are Deleting the Internet And it’s WAY Worse Than You Think [https://www.youtube.com/watch?v=8O_NvPpbsbw](https://www.youtube.com/watch?v=8O_NvPpbsbw). Data are removed from 'visibility' in Google and other platforms.</li>
+  </ul>
+
+  <h2>Reasoning in Polish</h2>
+<a href="https://www.youtube.com/watch?v=QHBcLrlgaxY"><img src="https://img.youtube.com/vi/QHBcLrlgaxY/0.jpg" /></a>)
+
+ <h2>Data analysis</h2>
+ With these data we can perform further analysis:
+  <ul>
+ <li>how many of old links are not any longer valid (link rot test)</li>
+ <li>capture all domains from RSS links (internal, and leading outside?). Analyse which domains are most common</li>
+ <li>which site generates most entries</li>
+ <li>we can capture all external links from entries, to capture where these sites lead to (check network effect, etc)</li>
+ <li>we can verify who reported first on certain topics</li>
+  </ul>
+
+ <h2>Problems, notes</h2>
+  <ul>
+ <li>Google fails to deliver content of small creators (blogs etc. private pages). Google focuses on corporate hosting. Most common links are towards YouTube, Google maps, Facebook, reddit</li>
+ <li>We cannot replace Google search</li>
+ <li>Google provides only 31 pages of news (in news filter) and around 10 pages for ordinary search. This is a very small number. It is like looking through keyhole at the Internet</li>
+ <li>Link rot is real. My links may be not working after some time</li>
+ <li>Is the data relevant, or useful for anyone?</li>
+ <li>Either we would like to record data from 'well established sources' or gather as many links as possible. I think web engines do it? We cannot gather too much data, as it can destroy our potato servers.</li>
+ <li>there are other RSS solutions like 'feedly', but it is an app, not data. You cannot parse it, you do not own the data, you can only do things that feedly allows you to do</li>
   </ul>
 
   <h2>Your own</h2>
@@ -40,9 +127,13 @@
     <li>allow to be able to offend. this is for grown ups, not for kids</li>
 </ul>
 
+ <h2>Ending notes</h2>
+
   <p>
   Let the refresh button F5 be with you!
   </p>
+
+ All links belong to us!
   
   <p>
   <img src="{% static 'catalog/images/piesel.jpg' %}" width="30%">

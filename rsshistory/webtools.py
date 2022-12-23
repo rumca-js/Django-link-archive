@@ -1,5 +1,6 @@
 import logging
 import urllib.request, urllib.error, urllib.parse
+from urllib.parse import urlparse
 
 
 class Page(object):
@@ -22,10 +23,12 @@ class Page(object):
            logging.critical(e, exc_info=True)
 
     def get_language(self):
-        whlang = self.contents.find("lang")
-        lang = self.extract_html(self.contents, '"', '"', whlang)
+        if self.contents:
+            whlang = self.contents.find("lang")
+            if whlang >= 0:
+                lang = self.extract_html(self.contents, '"', '"', whlang)
 
-        return lang
+                return lang
 
     def extract_html(self, text, tag, closingtag, wh = None):
         if not wh:

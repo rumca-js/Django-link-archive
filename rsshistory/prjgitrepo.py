@@ -1,6 +1,7 @@
+import shutil
+
 from .gitrepo import GitRepo
 from .dateutils import DateUtils
-import shutil
 
 
 class DailyRepo(GitRepo):
@@ -26,6 +27,10 @@ class DailyRepo(GitRepo):
             full_local.mkdir()
 
         shutil.copytree(daily_data_path, full_local, dirs_exist_ok = True)
+
+    def copy_file(self, file_name):
+        local_dir = self.get_local_dir()
+        shutil.copy(file_name, local_dir)
 
 
 class MainRepo(GitRepo):

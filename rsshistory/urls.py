@@ -25,7 +25,8 @@ urlpatterns = [
    path('editentry/<int:pk>/', views.edit_entry, name='editentry'),
    path('removeentry/<int:pk>/', views.remove_entry, name='removeentry'),
    path('hideentry/<int:pk>/', views.hide_entry, name='hideentry'),
-   path('persistent/<int:pk>/', views.persistent_entry, name='entrypersistent'),
+   path('persistent/<int:pk>/', views.make_persistent_entry, name='makeentrypersistent'),
+   path('notpersistent/<int:pk>/', views.make_not_persistent_entry, name='makeentrynotpersistent'),
    path('importentries', views.import_entries, name='importentries'),
    path('exportentries/', views.export_entries, name='exportentries'),
    path('tagentry/<int:pk>/', views.tag_entry, name='tagentry'),
@@ -33,6 +34,7 @@ urlpatterns = [
    path('configuration/', views.configuration, name='configuration'),
 
    path('searchinitview', views.search_init_view, name='searchinitview'),
+   path('importview', views.import_view, name='importview'),
 
    path('accounts/', include('django.contrib.auth.urls')),
    #path('logoutuser/', auth.LogoutView.as_view(), name ='logoutuser'),

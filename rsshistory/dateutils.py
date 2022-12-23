@@ -29,6 +29,10 @@ class DateUtils(object):
     def get_datetime_now_utc():
         return datetime.datetime.now(timezone('UTC'))
 
+    def get_datetime_now_iso():
+        now = datetime.datetime.now(timezone('UTC'))
+        return self.get_iso_datetime(now)
+
     def get_datetime_file_name():
         return datetime.datetime.today().strftime('%Y-%m-%d_%H-%M-%S')
 

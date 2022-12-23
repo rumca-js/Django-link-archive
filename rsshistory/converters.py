@@ -14,22 +14,41 @@ class SourceConverter(object):
          self.title = link_info[1]
          self.category = link_info[2]
          self.subcategory = link_info[3]
-         self.date_fetched = link_info[4]
-         self.dead = link_info[5]
-         self.export_to_cms = link_info[6]
-         self.remove_after_days = link_info[7]
-         self.language = link_info[8]
+         self.dead = link_info[4]
+         self.export_to_cms = link_info[5]
+         self.remove_after_days = link_info[6]
+         self.language = link_info[7]
 
     def get_text(self):
-        return "{0};{1};{2};{3};{4};{5};{6};{7};{8}".format(self.url,
+        return "{0};{1};{2};{3};{4};{5};{6};{7}".format(self.url,
                                                     self.title,
                                                     self.category,
                                                     self.subcategory,
-                                                    self.date_fetched,
                                                     self.dead,
                                                     self.export_to_cms,
                                                     self.remove_after_days,
                                                     self.language)
+
+
+    def get_map(self):
+        output_data = {}
+
+        output_data['url'] = self.url
+        output_data['title'] = self.title
+        output_data['category'] = self.category
+        output_data['subcategory'] = self.subcategory
+        output_data['dead'] = self.dead
+        output_data['export_to_cms'] = self.export_to_cms
+        output_data['remove_after_days'] = self.remove_after_days
+        output_data['language'] = self.language
+
+        return output_data
+
+    def get_json(self):
+        output_data = self.get_map()
+
+        import json
+        return json.dumps(output_data)
 
 
 class SourcesConverter(object):
@@ -58,6 +77,15 @@ class SourcesConverter(object):
             summary_text += data + "\n"
         return summary_text
 
+    def get_json(self):
+        output = []
+        for source in self.sources:
+            data = SourceConverter.get_map(source)
+            output.append(data)
+
+        import json
+        return json.dumps(output)
+
     def get_export_path(self):
        entries_dir = self._cfg.get_highlights_path()
        export_path = entries_dir
@@ -73,9 +101,9 @@ class SourcesConverter(object):
 
         export_path = self.get_export_path()
 
-        file_name = export_path / ("sources.csv")
+        file_name = export_path / ("sources.json")
         #log.info("writing json: " + file_name.as_posix() )
-        file_name.write_text(self.get_text())
+        file_name.write_text(self.get_json())
 
 
 class EntryConverter(object):
@@ -212,13 +240,16 @@ class EntriesConverter(object):
     def get_json(self):
         output_data = {}
         output_data['entries'] = []
+        output_data['source'] = {}
 
         if 'source url' in self._source:
-            output_data['source url'] = self._source['source url']
+            output_data['source']['url'] = self._source['source url']
         if 'source title' in self._source:
-            output_data['source title'] = self._source['source title']
+            output_data['source']['title'] = self._source['source title']
 
         for entry in self.entries:
+            if entry.language == None:
+                entry.update_language()
             entry_data = EntryConverter.get_map(entry)
             output_data['entries'].append(entry_data)
             

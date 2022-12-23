@@ -10,14 +10,17 @@ class RssSourceDataModel(models.Model):
     title = models.CharField(max_length=1000)
     category = models.CharField(max_length=1000)
     subcategory = models.CharField(max_length=1000)
-    date_fetched = models.DateTimeField(null = True)
     dead = models.BooleanField(default = False)
     export_to_cms = models.BooleanField(default = True)
     remove_after_days = models.CharField(max_length=10, default='0')
     language = models.CharField(max_length=1000, default='en-US')
 
     class Meta:
-        ordering = ['title', 'url', 'date_fetched']
+        ordering = ['title', 'url']
+
+    #def __init__(self, *args, **kwargs):
+    #    super().__init__(self, *args, **kwargs)
+    #    self.obj = None
 
     def get_absolute_url(self):
         """Returns the URL to access a particular author instance."""
@@ -40,6 +43,47 @@ class RssSourceDataModel(models.Model):
        else:
            return False
 
+    def get_op_data(self):
+        objs = RssSourceOperationalData.objects.filter(url = self.url)
+        if objs.exists():
+            return objs[0]
+
+    def get_date_fetched(self):
+        obj = self.get_op_data()
+        if obj:
+            return obj.date_fetched
+
+    def get_import_seconds(self):
+        obj = self.get_op_data()
+        if obj:
+            return obj.import_seconds
+
+    def get_number_of_entries(self):
+        obj = self.get_op_data()
+        if obj:
+            return obj.number_of_entries
+
+    def set_operational_info(self, date_fetched, number_of_entries, import_seconds):
+        obj = self.get_op_data()
+        if obj:
+            obj.date_fetched = date_fetched
+            obj.import_seconds = import_seconds
+            obj.number_of_entries = number_of_entries
+            obj.save()
+        else:
+            op = RssSourceOperationalData(url = self.url,
+                    date_fetched = date_fetched,
+                    import_seconds = import_seconds,
+                    number_of_entries = number_of_entries)
+            op.save()
+
+
+class RssSourceOperationalData(models.Model):
+
+    url = models.CharField(max_length=2000, unique=True)
+    date_fetched = models.DateTimeField(null = True)
+    import_seconds = models.IntegerField(null = True)
+    number_of_entries = models.IntegerField(null = True)
 
 
 class RssSourceEntryDataModel(models.Model):
@@ -49,8 +93,12 @@ class RssSourceEntryDataModel(models.Model):
     description = models.CharField(max_length=1000)
     link = models.CharField(max_length=1000, unique=True)
     date_published = models.DateTimeField(default = datetime.now)
+    # this entry cannot be removed
     persistent = models.BooleanField(default = False)
-    dead = models.BooleanField(default = False) # indicated that is removed, fetching will not re-add it
+    # this entry is dead indication
+    dead = models.BooleanField(default = False)
+    # user who added entry
+    user = models.CharField(max_length=1000, null = True)
 
     # possible values en-US, or pl_PL
     language = models.CharField(max_length=10, null = True)

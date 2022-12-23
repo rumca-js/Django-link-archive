@@ -11,6 +11,10 @@
       <span><strong>Language:</strong> {{ object.language }}</span>
   </p>
 
+  <p>
+  read:{{object.get_date_fetched}} Number of entries:{{object.get_number_of_entries}} Import seconds:{{object.get_import_seconds}} 
+  </p>
+
   {% if user.is_staff %}
     <a href="/{{django_app}}/refreshsource/{{ object.id }}" class="simplebutton">Refresh source</a>
     <a href="/{{django_app}}/editsource/{{ object.id }}" class="simplebutton">Edit source</a>

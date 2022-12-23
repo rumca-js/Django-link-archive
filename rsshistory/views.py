@@ -457,7 +457,7 @@ class RssEntryDetailView(generic.DetailView):
         return context
 
 
-def persistent_entry(request, pk):
+def make_persistent_entry(request, pk):
     context = get_context(request)
     context['page_title'] += " - persistent entry"
     context['pk'] = pk
@@ -467,7 +467,29 @@ def persistent_entry(request, pk):
 
     ft = RssSourceEntryDataModel.objects.get(id=pk)
     fav = ft.persistent
-    ft.persistent = not ft.persistent
+    ft.persistent = True
+    ft.user = request.user.username
+    ft.save()
+
+    summary_text = "Link changed to state: " + str(ft.persistent)
+
+    context["summary_text"] = summary_text
+
+    return render(request, app_name / 'summary_present.html', context)
+
+
+def make_not_persistent_entry(request, pk):
+    context = get_context(request)
+    context['page_title'] += " - persistent entry"
+    context['pk'] = pk
+
+    if not request.user.is_staff:
+        return render(request, app_name / 'missing_rights.html', context)
+
+    ft = RssSourceEntryDataModel.objects.get(id=pk)
+    fav = ft.persistent
+    ft.persistent = False
+    ft.user = request.user.username
     ft.save()
 
     summary_text = "Link changed to state: " + str(ft.persistent)
@@ -500,14 +522,13 @@ def add_entry(request):
 
         # check whether it's valid:
         if form.is_valid():
-            form.save()
-
-            ob = RssSourceEntryDataModel.objects.filter(link=request.POST.get('link'))
-            if ob.exists() and ob[0].language == None:
-                ob[0].update_language()
+            form.save_form()
 
             context['form'] = form
-            context['entry'] = ob[0]
+
+            ob = RssSourceEntryDataModel.objects.filter(link=request.POST.get('link'))
+            if ob.exists():
+                context['entry'] = ob[0]
 
             return render(request, app_name / 'entry_added.html', context)
 
@@ -521,7 +542,8 @@ def add_entry(request):
 
     # if a GET (or any other method) we'll create a blank form
     else:
-        form = EntryForm()
+        author = request.user.username
+        form = EntryForm(initial={'user' : author})
         form.method = "POST"
         form.action_url = reverse('rsshistory:addentry')
         context['form'] = form
@@ -685,3 +707,59 @@ def search_init_view(request):
     context['form'] = filter_form
 
     return render(request, app_name / 'form_search.html', context)
+
+def import_view(request):
+    from .exporters.readinglist import ReadingList
+    from .webtools import Page
+
+    context = get_context(request)
+    context['page_title'] += " - import view"
+
+    c = Configuration.get_object(str(app_name))
+    import_path = c.get_import_path() / 'readingList.csv'
+
+    summary_text = "tat ta ta"
+
+    rlist_data = import_path.read_text()
+
+    rlist = ReadingList(import_path)
+
+    for entry in rlist.entries:
+        try:
+            print(entry['title'])
+
+            objs = RssSourceEntryDataModel.objects.filter(link = entry['url'])
+            if objs.exists():
+                print(entry['title'] + ", Skipping")
+                summary_text += entry['title'] + " " + entry['url'] + ": Skipping, already in DB\n"
+                continue
+            else:
+                p = Page(entry['url'])
+                if not p.get_domain():
+                    summary_text += entry['title'] + " " + entry['url'] + ": NOK - could not find domain\n"
+                    continue
+
+                lang = p.get_language()
+                if not lang:
+                    summary_text += entry['title'] + " " + entry['url'] + ": NOK - could not find language\n"
+                    continue
+
+                ent = RssSourceEntryDataModel(
+                        source = p.get_domain(),
+                        title = entry['title'],
+                        description = entry['description'],
+                        link = entry['url'],
+                        date_published = entry['date'],
+                        persistent = True,
+                        dead = False,
+                        user = "Thomas Pain",
+                        language = lang)
+
+                ent.save()
+
+                summary_text += entry['title'] + " " + entry['url'] + ": OK \n"
+        except Exception as e:
+            summary_text += entry['title'] + " " + entry['url'] + ": NOK \n"
+
+    context["summary_text"] = summary_text
+    return render(request, app_name / 'summary_present.html', context)

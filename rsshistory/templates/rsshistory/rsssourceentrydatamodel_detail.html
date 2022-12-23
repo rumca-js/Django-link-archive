@@ -4,10 +4,11 @@
   <h1>{{ object.title }}</h1>
 
   <p>
-      <div><strong>Source:</strong> <a href="{{ object.url }}">{{ object.source }}</a></div>
+      <div><strong>Source:</strong> <a href="{{ object.source }}">{{ object.source }}</a></div>
       <div><strong>Link:</strong> <a href="{{ object.link }}">{{ object.link }}</a></div>
       <div><strong>Title:</strong> {{ object.title }}</div>
       <div><strong>Publish date:</strong> {{ object.date_published }}</div>
+      <div><strong>User:</strong> {{ object.user }}</div>
       <div><strong>Persistent:</strong> {{ object.persistent }},
            <strong>Language:</strong> {{ object.language }},
            <strong>Tags:</strong> {{ tag_string }}</div>
@@ -15,17 +16,18 @@
 
   <p>
   {% if user.is_staff %}
-    <a href="/{{django_app}}/editentry/{{ object.id }}" class="simplebutton">Edit entry</a>
-    <a href="/{{django_app}}/tagentry/{{ object.id }}" class="simplebutton">Tag entry</a>
-    <a href="/{{django_app}}/hideentry/{{ object.id }}" class="simplebutton">Hide entry</a>
-    <a href="/{{django_app}}/removeentry/{{ object.id }}" class="simplebutton">Remove entry</a>
-          <a href="/{{django_app}}/persistent/{{object.id}}/" class="simplebutton">
+    <a href="{% url 'rsshistory:editentry' object.id %}" class="simplebutton">Edit entry</a>
+    <a href="{% url 'rsshistory:tagentry' object.id %}" class="simplebutton">Tag entry</a>
+    <a href="{% url 'rsshistory:hideentry' object.id %}" class="simplebutton">Hide entry</a>
+    <a href="{% url 'rsshistory:removeentry' object.id %}" class="simplebutton">Remove entry</a>
              {% if source.persistent %}
+              <a href="{% url 'rsshistory:makeentrypersistent' object.id %}" class="simplebutton">
                Not persistent
              {% else %}
+              <a href="{% url 'rsshistory:makeentrynotpersistent' object.id %}" class="simplebutton">
                Persistent
+              </a>
              {% endif %}
-          </a>
   {% endif %}
   </p>
 
