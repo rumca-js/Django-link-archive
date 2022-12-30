@@ -7,8 +7,7 @@ from django.urls import reverse
 from django.db.models.query import QuerySet
 from django.db.models.query import EmptyQuerySet
 
-from .models import RssSourceDataModel, RssSourceEntryDataModel
-from .models import ConfigurationEntry
+from .models import RssSourceDataModel, RssSourceEntryDataModel, RssEntryTagsDataModel, ConfigurationEntry
 from .converters import SourcesConverter, EntriesConverter
 
 from .forms import SourceForm, EntryForm, ImportSourcesForm, ImportEntriesForm, SourcesChoiceForm, EntryChoiceForm, ConfigForm
@@ -373,16 +372,14 @@ def configuration(request):
     context['database_size_kbytes'] = get_directory_size_bytes(c.directory)/1024
     context['database_size_mbytes'] = get_directory_size_bytes(c.directory)/1024/1024
 
+    from .models import PersistentInfo
+    context['log_items'] = PersistentInfo.objects.all()
+
     threads = c.get_threads()
     for thread in threads:
         items = thread.get_processs_list()
 
     context['thread_list'] = threads
-    
-    if c.server_log_file.exists():
-        with open(c.server_log_file.resolve(), "r") as fh:
-             context['server_log_data'] = fh.read()
-             
     context['server_path'] = Path(".").resolve()
     context['directory'] = Path(".").resolve()
 
@@ -565,6 +562,10 @@ def edit_entry(request, pk):
         context['summary_text'] = "Such entry does not exist"
         return render(request, app_name / 'summary_present.html', context)
 
+    if ob[0].user is None or ob[0].user == "":
+        ob[0].user = request.user.username
+        ob[0].save()
+
     if request.method == 'POST':
         form = EntryForm(request.POST, instance=ob[0])
         context['form'] = form
@@ -580,6 +581,7 @@ def edit_entry(request, pk):
         return render(request, app_name / 'summary_present.html', context)
     else:
         form = EntryForm(instance=ob[0])
+        #form.fields['user'].initial = request.user.username
         form.method = "POST"
         form.action_url = reverse('rsshistory:editentry', args=[pk])
         context['form'] = form
@@ -718,7 +720,7 @@ def import_view(request):
     c = Configuration.get_object(str(app_name))
     import_path = c.get_import_path() / 'readingList.csv'
 
-    summary_text = "tat ta ta"
+    summary_text = ""
 
     rlist_data = import_path.read_text()
 

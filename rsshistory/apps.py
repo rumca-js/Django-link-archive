@@ -6,7 +6,9 @@ class CatalogConfig(AppConfig):
     name = 'rsshistory'
 
     def ready(self):
-        from .prjconfig import Configuration
-        c = Configuration.get_object(CatalogConfig.name)
-        log = logging.getLogger(CatalogConfig.name)
-        log.info("APP ready: {0}".format(CatalogConfig.name))
+        pass
+        
+        text = "APP ready: {0}".format(CatalogConfig.name)
+        from .models import PersistentInfo
+        PersistentInfo.cleanup()
+        p = PersistentInfo.create(text)

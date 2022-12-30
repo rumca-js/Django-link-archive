@@ -13,9 +13,10 @@ from .basictypes import *
 from .models import ConfigurationEntry
 from .dateutils import DateUtils
 from .prjgitrepo import *
+from .models import PersistentInfo
 
 
-__version__ = "0.3.1"
+__version__ = "0.3.2"
 
 
 class Configuration(object):
@@ -123,18 +124,11 @@ class Configuration(object):
              self.write_files_for_source_for_day(item.url, today)
           except Exception as e:
              log = logging.getLogger(self.app_name)
-             log.error("Exception during parsing page contents {0}".format(item.url) )
+             PersistentInfo.error("Exception during parsing page contents {0}".format(item.url) )
              log.critical(e, exc_info=True)
       elif thread == "refresh-thread":
          try:
              self.t_refresh(item)
-
-             log = logging.getLogger(self.app_name)
-             log.info("Writing persistent")
-             self.write_files_favourite()
-             #self.write_all_files_for_day_joined()
-             self.write_sources()
-             log.info("Writing persistent done")
          except Exception as e:
             log = logging.getLogger(self.app_name)
             if item:
@@ -142,7 +136,7 @@ class Configuration(object):
             log.critical(e, exc_info=True)
       else:
          log = logging.getLogger(self.app_name)
-         log.error("Not implemented processing thread {0}".format(thread))
+         PersistentInfo.error("Not implemented processing thread {0}".format(thread))
          log.critical(e, exc_info=True)
          raise NotImplemented
 
@@ -155,7 +149,6 @@ class Configuration(object):
            mins = time_since_update / timedelta(minutes = 1)
 
            if mins >= 10:
-               # log.info("Source: {0} {1} Skipped; Queue: {2}".format(item.url, item.title, queue_size))
                return True
            return False
 
@@ -191,7 +184,7 @@ class Configuration(object):
            feed = feedparser.parse(url)
 
            if len(feed.entries) == 0:
-               log.error("Source: {0} {1} Has no data; Queue: {2}".format(item.url, item.title, queue_size))
+               PersistentInfo.error("Source: {0} {1} Has no data; Queue: {2}".format(item.url, item.title, queue_size))
            else:
                for entry in feed.entries:
                    self.process_rss_entry(item, entry)
@@ -205,7 +198,7 @@ class Configuration(object):
        except Exception as e:
           log = logging.getLogger(self.app_name)
           queue_size = self.threads[0].get_queue_size()
-          log.error("Source: {0} {1} NOK; Queue: {2}".format(item.url, item.title, queue_size))
+          PersistentInfo.error("Source: {0} {1} NOK; Queue: {2} {3}".format(item.url, item.title, queue_size, str(e)))
           log.critical(e, exc_info=True)
 
    def get_feed_entry_map(self, source, feed_entry):
@@ -259,7 +252,8 @@ class Configuration(object):
                   description = props['description'],
                   link = props['link'],
                   date_published = props['published'],
-                  language = props['language'])
+                  language = props['language'],
+                  source_obj = source)
 
               o.save()
 
@@ -268,7 +262,7 @@ class Configuration(object):
        except Exception as e:
           log = logging.getLogger(self.app_name)
           queue_size = self.threads[0].get_queue_size()
-          log.error("Entry: {0} {1} NOK/Queue: {2}; Entry {3} {4}".format(source.url, source.title, queue_size, feed_entry.link, feed_entry.title))
+          PersistentInfo.error("Entry: {0} {1} NOK/Queue: {2}; Entry {3} {4} {5}".format(source.url, source.title, queue_size, feed_entry.link, feed_entry.title, str(e)))
           log.critical(e, exc_info=True)
 
           return False
@@ -341,6 +335,9 @@ class Configuration(object):
 
                if not day_present:
                    self.write_all_files_for_day_joined_separate(yesterday.isoformat())
+                   self.write_files_favourite()
+                   #self.write_all_files_for_day_joined()
+                   self.write_sources()
 
                    self.push_to_git(conf)
 
@@ -351,7 +348,7 @@ class Configuration(object):
 
        except Exception as e:
           log = logging.getLogger(self.app_name)
-          log.error("Exception during refresh")
+          PersistentInfo.error("Exception during refresh: {0}".format(str(e)))
           log.critical(e, exc_info=True)
 
    def t_refresh(self, item):
@@ -359,7 +356,7 @@ class Configuration(object):
 
        #self.debug_refresh()
 
-       log.info("Refreshing RSS data")
+       PersistentInfo.create("Refreshing RSS data")
 
        from .models import RssSourceDataModel
        sources = RssSourceDataModel.objects.all()
@@ -369,6 +366,19 @@ class Configuration(object):
        self.clear_old_entries()
 
        self.check_if_git_update()
+       #self.fix_tags()
+       
+   def fix_tags(self):
+       PersistentInfo.create("Fixing tags")
+       from .models import RssEntryTagsDataModel, RssSourceEntryDataModel
+       tags = RssEntryTagsDataModel.objects.all()
+       for tag in tags:
+            if tag.link_obj == None:
+                links = RssSourceEntryDataModel.objects.filter(link = tag.link)
+                if links.exists():
+                     tag.link_obj = links[0]
+                     tag.save()
+       PersistentInfo.create("Fixing tags done")
 
    def debug_refresh(self):
        days = [
@@ -487,7 +497,6 @@ class Configuration(object):
 
    def clear_old_entries(self):
        log = logging.getLogger(self.app_name)
-       log.info("RSS cleanup")
 
        from .models import RssSourceDataModel, RssSourceEntryDataModel
        #sources = RssSourceDataModel.objects.filter(remove_after_days)
@@ -504,12 +513,12 @@ class Configuration(object):
                
                entries = RssSourceEntryDataModel.objects.filter(source=source.url, persistent=False, date_published__lt=days_before)
                if entries.exists():
-                   log.info("Removing old RSS data for {0}".format(source.url))
+                   PersistentInfo.create("Removing old RSS data for source: {0} {1}".format(source.url, source.title))
                    entries.delete()
 
    def push_to_git(self, conf):
        log = logging.getLogger(self.app_name)
-       log.info("Pushing to RSS link repo")
+       PersistentInfo.create("Pushing to RSS link repo")
        
        yesterday = DateUtils.get_date_yesterday()
 

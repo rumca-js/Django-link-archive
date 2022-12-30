@@ -106,8 +106,10 @@ class TagEntryForm(forms.ModelForm):
             if tag != "":
                 tags_set.add(tag)
 
+        link_objs = RssSourceEntryDataModel.objects.filter(link = link)
+
         for tag in tags_set:
-            model = RssEntryTagsDataModel(link = link, author = author, date = date, tag = tag)
+            model = RssEntryTagsDataModel(link = link, author = author, date = date, tag = tag, link_obj = link_objs[0])
             model.save()
 
 
@@ -228,9 +230,10 @@ class EntryChoiceForm(forms.Form):
     category = forms.CharField(widget=forms.Select(choices=()))
     subcategory = forms.CharField(widget=forms.Select(choices=()))
     title = forms.CharField(widget=forms.Select(choices=()))
-    persistent = forms.BooleanField(required=False, initial=True)
+    persistent = forms.BooleanField(required=False, initial=False)
     language = forms.CharField(label='language', max_length = 500, required=False)
     user = forms.CharField(label='user', max_length = 500, required=False)
+    tag = forms.CharField(label='tag', max_length = 500, required=False)
 
     def __init__(self, *args, **kwargs):
         self.args = kwargs.pop('args', ())
@@ -239,9 +242,24 @@ class EntryChoiceForm(forms.Form):
 
     def get_filtered_objects(self):
         source_parameter_map = self.get_source_filter_args()
-        entry_parameter_map = self.get_entry_filter_args()
+        entry_parameter_map = self.get_entry_filter_args(False)
 
         self.entries = []
+        
+        # https://stackoverflow.com/questions/16669422/django-join-query-without-foreign-key
+        # Model1.objects.extra(where = ['field in (SELECT field from myapp_model2 WHERE ...)'])
+        """ Model1.objects.raw('''SELECT * from myapp_model1
+                   INNER JOIN myapp_model2
+                   ON myapp_model1.field = myapp_model2.field
+                   AND ...''') """
+                   
+        #if 'tag' in entry_parameter_map:
+        #       # TODO https://django.how/views/select-objects-django/
+        #       tag_map = {'tags__tag__icontains' : entry_parameter_map['tag']}
+        #       #links = RssEntryTagsDataModel.objects.prefetch_related('RssSourceEntryDataModel_set').filter(**tag_map)
+        #       #links = RssSourceEntryDataModel.objects.filter(**tag_map)
+        #       #return links.RssSourceEntryDataModel_set.all()
+        #       return RssSourceEntryDataModel.objects.filter(tags__tag__icontains = 'media')
 
         if source_parameter_map == {}:
             return RssSourceEntryDataModel.objects.filter(**entry_parameter_map)
@@ -281,13 +299,15 @@ class EntryChoiceForm(forms.Form):
         init = {}
         init['search'] = ""
         init['language'] = ""
-        init['persistent'] = True
+        init['persistent'] = False
         init['user'] = ""
+        init['tag'] = ""
         if len(self.args) != 0:
             init['search'] = self.args.get("search")
             init['language'] = self.args.get("language")
             init['persistent'] = self.args.get("persistent")
             init['user'] = self.args.get("user")
+            init['tag'] = self.args.get("tag")
 
         self.fields['search'] = forms.CharField(label = 'Search', max_length = 500, required=False, initial=init['search'])
         self.fields['category'] = forms.CharField(label = "RSS source category", widget=forms.Select(choices=categories, attrs=attr), initial=category_init)
@@ -296,6 +316,7 @@ class EntryChoiceForm(forms.Form):
         self.fields['persistent'] = forms.BooleanField(label = "Search in persistent entries", required=False, initial=init['persistent'])
         self.fields['language'] = forms.CharField(label = 'Search language', max_length = 500, required=False, initial=init['language'])
         self.fields['user'] = forms.CharField(label = 'Search user', required=False, initial=init['user'])
+        self.fields['tag'] = forms.CharField(label = 'Search tags', required=False, initial=init['tag'])
 
     def get_sources(self):
         source_parameter_map = self.get_source_filter_args()
@@ -345,27 +366,39 @@ class EntryChoiceForm(forms.Form):
 
         return parameter_map
 
-    def get_entry_filter_args(self):
+    def get_entry_filter_args(self, pure_data = True):
         parameter_map = {}
 
         persistent = self.args.get("persistent")
         if persistent:
            parameter_map['persistent'] = True
+        #else:
+        #   parameter_map['persistent'] = False
 
         search = self.args.get("search")
-        if search:
-           parameter_map['search'] = search
-
-        if 'search' in parameter_map:
-            parameter_map["title__icontains"] = parameter_map['search']
-            del parameter_map['search']
-
         language = self.args.get("language")
-        if language:
-            parameter_map["language__icontains"] = language
         user = self.args.get("user")
-        if user:
-            parameter_map["user__icontains"] = user
+        tag = self.args.get("tag")
+
+        if pure_data:
+            if search:
+               parameter_map['search'] = search
+            if language:
+               parameter_map['language'] = language
+            if user:
+               parameter_map['user'] = user
+            if tag:
+               parameter_map['tag'] = tag
+
+        else:
+            if search:
+                parameter_map["title__icontains"] = search
+            if language:
+                parameter_map["language__icontains"] = language
+            if user:
+                parameter_map["user__icontains"] = user
+            if tag:
+               parameter_map['tags__tag__icontains'] = tag
 
         return parameter_map
 

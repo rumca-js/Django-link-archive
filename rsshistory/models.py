@@ -4,6 +4,7 @@ from datetime import datetime
 import logging
 
 
+
 class RssSourceDataModel(models.Model):
 
     url = models.CharField(max_length=2000, unique=True)
@@ -102,6 +103,8 @@ class RssSourceEntryDataModel(models.Model):
 
     # possible values en-US, or pl_PL
     language = models.CharField(max_length=10, null = True)
+    
+    source_obj = models.ForeignKey(RssSourceDataModel, on_delete=models.CASCADE, related_name='entries', null=True, blank=True)
 
     class Meta:
         ordering = ['-date_published', 'source', 'title']
@@ -148,6 +151,8 @@ class RssEntryTagsDataModel(models.Model):
     # You can label entry as 'cringe', 'woke', 'propaganda', 'misinformation'
     # If there are many labels, it will be visible for what it is
     tag = models.CharField(max_length=1000)
+    
+    link_obj = models.ForeignKey(RssSourceEntryDataModel, on_delete=models.CASCADE, related_name='tags', null=True, blank=True)
 
     def get_delim():
         return ","
@@ -204,3 +209,25 @@ class ConfigurationEntry(models.Model):
             return True
         else:
             return False
+
+
+from pytz import timezone
+
+class PersistentInfo(models.Model):
+    info = models.CharField(default = "", max_length=2000)
+    level = models.IntegerField(default = 0)
+    date = models.DateTimeField(default = datetime.now)
+    user = models.CharField(max_length=1000, null = True)
+
+    def create(info, level = int(logging.INFO), date = datetime.now(timezone('UTC')), user = None):
+        ob = PersistentInfo(info = info, level = level, date = date, user = user)
+        ob.save()
+
+    def error(info, level = int(logging.ERROR), date = datetime.now(timezone('UTC')), user = None):
+        ob = PersistentInfo(info = info, level = level, date = date, user = user)
+        ob.save()
+
+    def cleanup():
+        obs = PersistentInfo.objects.filter(level = int(logging.INFO))
+        if obs.exists():
+            obs.delete()
