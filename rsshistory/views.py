@@ -163,7 +163,14 @@ def edit_source(request, pk):
 
         return render(request, app_name / 'summary_present.html', context)
     else:
-        form = SourceForm(instance=ob)
+        if not ob.favicon:
+            from .webtools import Page
+            p = Page(ob.url)
+
+            form = SourceForm(instance=ob, initial={'favicon' : p.get_domain() +"/favicon.ico" })
+        else:
+            form = SourceForm(instance=ob)
+
         form.method = "POST"
         form.action_url = reverse('rsshistory:editsource', args=[pk])
         context['form'] = form
@@ -171,6 +178,8 @@ def edit_source(request, pk):
 
 
 def refresh_source(request, pk):
+    from .models import RssSourceOperationalData
+
     context = get_context(request)
     context['page_title'] += " - refresh source"
     context['pk'] = pk
@@ -183,6 +192,15 @@ def refresh_source(request, pk):
        return render(request, app_name / 'source_edit_does_not_exist.html', context)
 
     ob = ft[0]
+
+    operational = RssSourceOperationalData.objects.filter(url = ob.url)
+    if operational.exists():
+        print("saving")
+        op = operational[0]
+        op.date_fetched = None
+        op.save()
+    else:
+        print("not saving")
 
     c = Configuration.get_object(str(app_name))
     c.download_rss(ob, True)
@@ -557,30 +575,32 @@ def edit_entry(request, pk):
     if not request.user.is_staff:
         return render(request, app_name / 'missing_rights.html', context)
 
-    ob = RssSourceEntryDataModel.objects.filter(id=pk)
-    if not ob.exists():
+    obs = RssSourceEntryDataModel.objects.filter(id=pk)
+    if not obs.exists():
         context['summary_text'] = "Such entry does not exist"
         return render(request, app_name / 'summary_present.html', context)
 
-    if ob[0].user is None or ob[0].user == "":
-        ob[0].user = request.user.username
-        ob[0].save()
+    ob = obs[0]
+    if ob.user is None or ob.user == "":
+        ob.user = str(request.user.username)
+        ob.description = "test"
+        ob.save()
 
     if request.method == 'POST':
-        form = EntryForm(request.POST, instance=ob[0])
+        form = EntryForm(request.POST, instance=ob)
         context['form'] = form
 
         if form.is_valid():
             form.save()
 
-            context['entry'] = ob[0]
+            context['entry'] = ob
             return render(request, app_name / 'entry_edit_ok.html', context)
 
         context['summary_text'] = "Could not edit entry"
 
         return render(request, app_name / 'summary_present.html', context)
     else:
-        form = EntryForm(instance=ob[0])
+        form = EntryForm(instance=ob)
         #form.fields['user'].initial = request.user.username
         form.method = "POST"
         form.action_url = reverse('rsshistory:editentry', args=[pk])

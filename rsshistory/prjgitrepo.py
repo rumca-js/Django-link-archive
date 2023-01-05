@@ -24,7 +24,7 @@ class DailyRepo(GitRepo):
         full_local = self.get_local_day_path(day)
 
         if not full_local.exists():
-            full_local.mkdir()
+            full_local.mkdir(parents=True, exist_ok=True)
 
         shutil.copytree(daily_data_path, full_local, dirs_exist_ok = True)
 

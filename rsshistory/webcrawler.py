@@ -2,7 +2,6 @@
 import logging
 
 
-
 import re
 import requests
 class WebLinkParser(object):
@@ -158,24 +157,34 @@ class WebLinkParser(object):
 
 
 
-domain = "http://www.onet.pl"
+# domain = "http://www.onet.pl"
+# 
+# domain = "https://www.louderwithcrowder.com"
+# searchdomain = "https://www.louderwithcrowder.com/posts"
+# 
+# #domain = "https://niezalezna.pl"
+# #searchdomain = "https://niezalezna.pl"
+# 
+# parser = WebLinkParser(domain, searchdomain)
+# parser.exclude_default()
+# parser.limit_to_domain = True
+# #links = parser.parse_full_links()
+# 
+# links_data = parser.parse_links_and_titles()
+# 
+# #text = get_page(domain)
+# #text = requests.get("http://www.onet.pl").text
+# #links = parse_full_links(domain, text)
+# 
+# for link_data in links_data:
+#     print("'{0}' '{1}'".format(link_data[0], link_data[1]))
 
-domain = "https://www.louderwithcrowder.com"
-searchdomain = "https://www.louderwithcrowder.com/posts"
 
-#domain = "https://niezalezna.pl"
-#searchdomain = "https://niezalezna.pl"
+from .webtools import *
 
-parser = WebLinkParser(domain, searchdomain)
-parser.exclude_default()
-parser.limit_to_domain = True
-#links = parser.parse_full_links()
 
-links_data = parser.parse_links_and_titles()
+domain = "https://niezalezna.pl"
+p = Page(domain)
 
-#text = get_page(domain)
-#text = requests.get("http://www.onet.pl").text
-#links = parse_full_links(domain, text)
-
-for link_data in links_data:
-    print("'{0}' '{1}'".format(link_data[0], link_data[1]))
+for link in p.get_links():
+    print(link)

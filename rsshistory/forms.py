@@ -19,10 +19,21 @@ class SourceForm(forms.ModelForm):
     """
     class Meta:
         model = RssSourceDataModel
-        fields = ['url', 'title', 'category', 'subcategory', 'language', 'export_to_cms', 'remove_after_days']
+        fields = ['url', 'title', 'category', 'subcategory', 'language', 'export_to_cms', 'remove_after_days', 'favicon']
         widgets = {
          #'git_token': forms.PasswordInput(),
         }
+
+    def __init__(self, *args, **kwargs):
+        super(SourceForm, self).__init__(*args, **kwargs)
+        self.fields['favicon'].required = False
+
+    #def save_form(self):
+    #    from .webtools import Page
+
+    #    url = self.cleaned_data['url']
+    #    favicon = self.cleaned_data['favicon']
+    #    print("Utl: {0} {1}".format(url, favicon))
 
 
 class EntryForm(forms.ModelForm):
@@ -245,21 +256,6 @@ class EntryChoiceForm(forms.Form):
         entry_parameter_map = self.get_entry_filter_args(False)
 
         self.entries = []
-        
-        # https://stackoverflow.com/questions/16669422/django-join-query-without-foreign-key
-        # Model1.objects.extra(where = ['field in (SELECT field from myapp_model2 WHERE ...)'])
-        """ Model1.objects.raw('''SELECT * from myapp_model1
-                   INNER JOIN myapp_model2
-                   ON myapp_model1.field = myapp_model2.field
-                   AND ...''') """
-                   
-        #if 'tag' in entry_parameter_map:
-        #       # TODO https://django.how/views/select-objects-django/
-        #       tag_map = {'tags__tag__icontains' : entry_parameter_map['tag']}
-        #       #links = RssEntryTagsDataModel.objects.prefetch_related('RssSourceEntryDataModel_set').filter(**tag_map)
-        #       #links = RssSourceEntryDataModel.objects.filter(**tag_map)
-        #       #return links.RssSourceEntryDataModel_set.all()
-        #       return RssSourceEntryDataModel.objects.filter(tags__tag__icontains = 'media')
 
         if source_parameter_map == {}:
             return RssSourceEntryDataModel.objects.filter(**entry_parameter_map)
@@ -405,6 +401,18 @@ class EntryChoiceForm(forms.Form):
     def get_filter_string(self):
         filters = self.get_source_filter_args()
         filters.update(self.get_entry_filter_args())
+
+        if "cagetory" in filters and filters["category"] == "Any":
+            del filters["category"]
+        if "subcagetory" in filters and filters["subcategory"] == "Any":
+            del filters["subcategory"]
+        if "title" in filters and filters["title"] == "Any":
+            del filters["title"]
+
+        for filter_name in filters:
+            filtervalue = filters[filter_name]
+            if filtervalue and str(filtervalue).strip() == "":
+                del filters[filter_name]
 
         filter_string = ""
         for key in filters:

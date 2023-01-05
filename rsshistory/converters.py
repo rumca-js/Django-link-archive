@@ -125,6 +125,7 @@ class EntryConverter(object):
         self.description = ""
 
         self.link = link_info[0]
+        self.user = None
 
         if len(link_info) > 1:
             if len(link_info[1].strip()) > 0:
@@ -163,6 +164,7 @@ class EntryConverter(object):
         data['description'] = self.description
         data['persistent'] = self.persistent
         data['language'] = self.language
+        data['user'] = self.user
 
         return data
 
@@ -175,12 +177,13 @@ class EntryConverter(object):
         self.description = entry.description
         self.persistent = entry.persistent
         self.language = entry.language
+        self.user = entry.user
 
     def get_csv_text(self):
-        return "{0};{1};{2};{3};{4};{5}".format(self.link, self.source, self.persistent, self.title, self.date_published, self.description)
+        return "{0};{1};{2};{3};{4};{5}".format(self.link, self.source, self.persistent, self.title, self.date_published, self.description, self.user)
 
     def get_clean_text(self):
-        return "{0}\n{1}\n{2}\n{3}\n{4}\n{5}\n".format(self.source, self.self, self.title, self.date_published, self.persistent, self.description)
+        return "{0}\n{1}\n{2}\n{3}\n{4}\n{5}\n".format(self.source, self.self, self.title, self.date_published, self.persistent, self.description, self.user)
 
     def get_md_text(self):
         tags = ""
@@ -195,6 +198,7 @@ class EntryConverter(object):
         result_string += " - [{0}]({0})\n".format(self.link)
         result_string += " - RSS feed: {0}\n".format(self.source)
         result_string += " - date published: {0}\n".format(self.date_published)
+        result_string += " - user: {0}\n".format(self.user)
         if tags != "" and tags != None:
             result_string += " - tags: {0}\n".format(tags)
         result_string += "\n"

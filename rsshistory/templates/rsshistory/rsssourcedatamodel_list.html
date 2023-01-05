@@ -17,6 +17,7 @@
       <li>
           <a href="{{ source.url }}" class="longbutton">
             <div class="linklistitem">
+              <img src="{{source.get_favicon}}" width="20">
               <span class="linklistitemtitle">{{source.title}}</span>
               <span class="linklistitemdescription">[{{source.category}}, {{source.subcategory}}]</span>
               read:{{source.get_date_fetched}} Number of entries:{{source.get_number_of_entries}} Import seconds:{{source.get_import_seconds}} 

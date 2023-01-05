@@ -15,6 +15,7 @@ class RssSourceDataModel(models.Model):
     export_to_cms = models.BooleanField(default = True)
     remove_after_days = models.CharField(max_length=10, default='0')
     language = models.CharField(max_length=1000, default='en-US')
+    favicon = models.CharField(max_length=1000, null = True)
 
     class Meta:
         ordering = ['title', 'url']
@@ -78,6 +79,20 @@ class RssSourceDataModel(models.Model):
                     number_of_entries = number_of_entries)
             op.save()
 
+    def get_favicon(self):
+       if self.favicon:
+           return self.favicon
+
+       from .webtools import Page
+       page = Page(self.url)
+       domain = page.get_domain()
+       return domain + "/favicon.ico"
+
+    def get_domain(self):
+       from .webtools import Page
+       page = Page(self.url)
+       return page.get_domain()
+
 
 class RssSourceOperationalData(models.Model):
 
@@ -114,9 +129,8 @@ class RssSourceEntryDataModel(models.Model):
         return reverse('rsshistory:entry-detail', args=[str(self.id)])
 
     def get_source_name(self):
-        sources = RssSourceDataModel.objects.filter(url = self.source)
-        if len(sources) > 0:
-            return sources[0].title
+        if self.source_obj:
+            return self.source_obj.title
         else:
             return self.source
 
@@ -139,6 +153,15 @@ class RssSourceEntryDataModel(models.Model):
                 if language != None:
                     self.language = language
                     self.save()
+
+    def get_favicon(self):
+        if self.source_obj:
+            return self.source_obj.get_favicon()
+
+        from .webtools import Page
+        page = Page(self.link)
+        domain = page.get_domain()
+        return domain + "/favicon.ico"
 
 
 class RssEntryTagsDataModel(models.Model):

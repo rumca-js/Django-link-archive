@@ -7,6 +7,9 @@ class CatalogConfig(AppConfig):
 
     def ready(self):
         pass
+
+        from .prjconfig import Configuration
+        c = Configuration.get_object(str(CatalogConfig.name))
         
         text = "APP ready: {0}".format(CatalogConfig.name)
         from .models import PersistentInfo

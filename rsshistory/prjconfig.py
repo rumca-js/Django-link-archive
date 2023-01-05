@@ -14,6 +14,7 @@ from .models import ConfigurationEntry
 from .dateutils import DateUtils
 from .prjgitrepo import *
 from .models import PersistentInfo
+from .sources.basepluginbuilder import BasePluginBuilder
 
 
 __version__ = "0.3.2"
@@ -85,14 +86,8 @@ class Configuration(object):
    def get_data_path(self):
        return self.directory / 'data' / self.app_name
 
-   def get_rss_tmp_path(self):
-       rss_path = self.get_export_path() / 'downloaded_rss'
-       if not rss_path.exists():
-           rss_path.mkdir()
-       return rss_path
-
    def create_threads(self):
-       download_rss = ThreadJobCommon("download-rss")
+       download_rss = ThreadJobCommon("process-source")
        refresh_thread = ThreadJobCommon("refresh-thread", 3600, True) #3600 is 1 hour
 
        self.threads = [
@@ -114,9 +109,9 @@ class Configuration(object):
    def t_process_item(self, thread, item):
       from datetime import date, timedelta
 
-      if thread == "download-rss":
+      if thread == "process-source":
           try:
-             self.t_download_rss(item)
+             self.t_process_source(item)
              today = DateUtils.get_iso_today()
              if not item.export_to_cms:
                 return
@@ -154,88 +149,117 @@ class Configuration(object):
 
        return True
 
-   def t_download_rss(self, item):
+   def t_process_source(self, source):
        try:
-           if self.check_source_fetch_time(item) == False:
+           print("process source: {0}".format(source.title))
+
+           if self.check_source_fetch_time(source) == False:
+               print("not yet time for source: {0}".format(source.title))
                return
-
-           import feedparser
-           log = logging.getLogger(self.app_name)
-
-           url = item.url
-
-           file_name = url + ".txt"
-           file_name = self.get_url_clean_name(file_name)
-
-           queue_size = self.threads[0].get_queue_size()
-
-           # log.info("Source: {0} {1}; Queue: {2}".format(item.url, item.title, queue_size))
 
            start_time = DateUtils.get_datetime_now_utc()
 
-           #rss_contents = self.get_page(url)
-           #
-           #if rss_contents:
-           #    feed = feedparser.parse(rss_contents)
-           #    rss_path = self.get_rss_tmp_path()
-           #    file_path = rss_path / file_name
-           #    file_path.write_bytes(rss_contents)
-           #else:
-           feed = feedparser.parse(url)
+           plugin = BasePluginBuilder.get(source.get_domain())
+           num_entries = 0
 
-           if len(feed.entries) == 0:
-               PersistentInfo.error("Source: {0} {1} Has no data; Queue: {2}".format(item.url, item.title, queue_size))
+           if plugin.is_rss_source():
+               print("rss source: {0}")
+               num_entries = self.t_process_rss_source(source)
            else:
-               for entry in feed.entries:
-                   self.process_rss_entry(item, entry)
+               print("parser source: {0}")
+               num_entries = self.t_process_parser_source(source)
 
            stop_time = DateUtils.get_datetime_now_utc()
            total_time = stop_time - start_time
            total_time.total_seconds()
 
-           item.set_operational_info(stop_time, len(feed.entries), total_time.total_seconds())
+           if num_entries != 0:
+               source.set_operational_info(stop_time, num_entries, total_time.total_seconds())
 
        except Exception as e:
           log = logging.getLogger(self.app_name)
           queue_size = self.threads[0].get_queue_size()
-          PersistentInfo.error("Source: {0} {1} NOK; Queue: {2} {3}".format(item.url, item.title, queue_size, str(e)))
+          PersistentInfo.error("Source: {0} {1} NOK; Queue: {2} {3}".format(source.url, source.title, queue_size, str(e)))
           log.critical(e, exc_info=True)
 
-   def get_feed_entry_map(self, source, feed_entry):
-       output_map = {}
+   def t_process_rss_source(self, source):
+       try:
+           import feedparser
+           url = source.url
 
-       output_map['link'] = feed_entry.link
-       if source.title.find("CodeProject") >= 0:
-           output_map['link'] = feed_entry.source['href']
-           if output_map['link'].strip() == "":
-               output_map['link'] = feed_entry.link
+           feed = feedparser.parse(url)
 
-       output_map['description'] = ""
-       if hasattr(feed_entry, "description"):
-           output_map['description'] = feed_entry.description
+           num_entries = len(feed.entries)
 
-       published = ""
-       if hasattr(feed_entry, "published"):
-           output_map['published'] = DateUtils.get_iso_datetime(feed_entry.published)
-       else:
-           output_map['published'] = DateUtils.get_datetime_now_utc()
+           if num_entries == 0:
+               PersistentInfo.error("Source: {0} {1} Has no data; Queue: {2}".format(source.url, source.title, queue_size))
+           else:
+               rss_path = self.get_export_path() / "downloaded_rss"
+               rss_path.mkdir(parents = True, exist_ok = True)
 
-       output_map['source'] = source.url
-       output_map['title'] = feed_entry.title
-       output_map['language'] = source.language
-       return output_map
+               file_name = url + ".txt"
+               file_name = self.get_url_clean_name(file_name)
 
-   def filter_rss_entry(self, source, feed_entry, props):
-      if props['link'].find("TVN24-po-ukrainsku") >= 0:
-          return True
+               file_path = rss_path / file_name
+               file_path.write_text(str(feed))
 
-      return False
+               for entry in feed.entries:
+                   self.process_rss_entry(source, entry)
+
+           return num_entries
+       except Exception as e:
+          log = logging.getLogger(self.app_name)
+          queue_size = self.threads[0].get_queue_size()
+          PersistentInfo.error("Source: {0} {1} NOK; Queue: {2} {3}".format(source.url, source.title, queue_size, str(e)))
+          log.critical(e, exc_info=True)
+
+   def t_process_parser_source(self, source):
+       from .webtools import Page
+       from .models import RssSourceEntryDataModel
+       try:
+           plugin = BasePluginBuilder.get(source.get_domain())
+           links = plugin.get_links()
+           num_entries = len(links)
+
+           for link in links:
+               objs = RssSourceEntryDataModel.objects.filter(link = link)
+               if objs.exists():
+                   continue
+
+               p = Page(link)
+               title = p.get_title()
+               if title:
+                   print("{0} {1}".format(link, title))
+
+                   props = plugin.get_link_data(source, link)
+
+                   o = RssSourceEntryDataModel(
+                       source = props['source'],
+                       title = props['title'],
+                       description = props['description'],
+                       link = props['link'],
+                       date_published = props['published'],
+                       language = props['language'],
+                       source_obj = source)
+
+                   o.save()
+               else:
+                   print("Could not read title: {0}".format(link))
+
+           return num_entries
+       except Exception as e:
+          log = logging.getLogger(self.app_name)
+          queue_size = self.threads[0].get_queue_size()
+          PersistentInfo.error("Source: {0} {1} NOK; Queue: {2} {3}".format(source.url, source.title, queue_size, str(e)))
+          log.critical(e, exc_info=True)
 
    def process_rss_entry(self, source, feed_entry):
        try:
           from .models import RssSourceEntryDataModel
 
-          props = self.get_feed_entry_map(source, feed_entry)
+          plugin = BasePluginBuilder.get(source.get_domain())
+
+          props = plugin.get_feed_entry_map(source, feed_entry)
 
           objs = RssSourceEntryDataModel.objects.filter(link = props['link'])
 
@@ -243,8 +267,8 @@ class Configuration(object):
               if str(feed_entry.title).strip() == "" or feed_entry.title == "undefined":
                   return False
 
-              if self.filter_rss_entry(source, feed_entry, props):
-                  return
+              if not plugin.is_link_valid(props['link']):
+                  return False
 
               o = RssSourceEntryDataModel(
                   source = props['source'],

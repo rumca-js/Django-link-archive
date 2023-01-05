@@ -7,7 +7,6 @@
 <p>{{form_description}}<p>
 
 <form action="{{form.action_url}}" method="{{form.method}}">
-    {% csrf_token %}
     {{ form }}
     <input type="submit" value="Submit">
 </form>
