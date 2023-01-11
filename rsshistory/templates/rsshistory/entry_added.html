@@ -4,7 +4,7 @@
 
 <ul>
     <li>Link added: <a href="{{ entry.get_absolute_url }}" class="simplebutton">{{entry.title}}</a></li>
-    <li><a href="{% url 'rsshistory:addentry' %}" class="simplebutton">Add new entry</a></li>
+    <li><a href="{% url 'rsshistory:entry-add' %}" class="simplebutton">Add new entry</a></li>
 </ul>
 
 {% endblock %}

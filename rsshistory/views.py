@@ -709,7 +709,7 @@ def tag_entry(request, pk):
 
         form.method = "POST"
         form.pk = pk
-        form.action_url = reverse('rsshistory:tagentry', args=[pk])
+        form.action_url = reverse('rsshistory:entry-tag', args=[pk])
         context['form'] = form
         context['form_title'] = obj.title
         context['form_description'] = obj.title
