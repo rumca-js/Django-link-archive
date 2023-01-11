@@ -50,23 +50,23 @@
              Details
           </a>
              {% if link.persistent %}
-              <a href="{% url 'rsshistory:makeentrynotpersistent' link.id %}" class="simplebutton">
+              <a href="{% url 'rsshistory:entry-notstar' link.id %}" class="simplebutton">
                Not persistent
               </a>
-              <a href="{% url 'rsshistory:tagentry' link.id %}" class="simplebutton">Tag entry</a>
+              <a href="{% url 'rsshistory:entry-tag' link.id %}" class="simplebutton">Tag entry</a>
              {% else %}
-              <a href="{% url 'rsshistory:makeentrypersistent' link.id %}" class="simplebutton">
+              <a href="{% url 'rsshistory:entry-star' link.id %}" class="simplebutton">
                Persistent
               </a>
              {% endif %}
-          <a href="{% url 'rsshistory:hideentry' link.id %}" class="simplebutton">
+          <a href="{% url 'rsshistory:entry-hide' link.id %}" class="simplebutton">
              {% if link.dead %}
                UnHide
              {% else %}
                Hide
              {% endif %}
           </a>
-             <a href="{% url 'rsshistory:removeentry' link.id %}" class="simplebutton">Remove entry</a>
+             <a href="{% url 'rsshistory:entry-remove' link.id %}" class="simplebutton">Remove entry</a>
           {% else %}
           <hr>
           {% endif %}

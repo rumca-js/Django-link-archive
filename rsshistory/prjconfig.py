@@ -17,7 +17,7 @@ from .models import PersistentInfo
 from .sources.basepluginbuilder import BasePluginBuilder
 
 
-__version__ = "0.3.2"
+__version__ = "0.4.0"
 
 
 class Configuration(object):
@@ -109,6 +109,11 @@ class Configuration(object):
    def t_process_item(self, thread, item):
       from datetime import date, timedelta
 
+      if item:
+          print("thread {0} item {1}".format(thread, item.url))
+      else:
+          print("thread {0}".format(thread))
+
       if thread == "process-source":
           try:
              self.t_process_source(item)
@@ -163,10 +168,8 @@ class Configuration(object):
            num_entries = 0
 
            if plugin.is_rss_source():
-               print("rss source: {0}")
                num_entries = self.t_process_rss_source(source)
            else:
-               print("parser source: {0}")
                num_entries = self.t_process_parser_source(source)
 
            stop_time = DateUtils.get_datetime_now_utc()
@@ -378,8 +381,6 @@ class Configuration(object):
    def t_refresh(self, item):
        log = logging.getLogger(self.app_name)
 
-       #self.debug_refresh()
-
        PersistentInfo.create("Refreshing RSS data")
 
        from .models import RssSourceDataModel
@@ -541,23 +542,14 @@ class Configuration(object):
                    entries.delete()
 
    def push_to_git(self, conf):
+       self.push_daily_repo(conf)
+       self.push_highlights_repo(conf)
+
+   def push_daily_repo(self, conf):
        log = logging.getLogger(self.app_name)
        PersistentInfo.create("Pushing to RSS link repo")
        
        yesterday = DateUtils.get_date_yesterday()
-
-
-       repo = MainRepo(conf, conf.git_repo)
-
-       repo.up()
-
-       local_dir = self.get_highlights_path()
-       repo.copy_main_data(local_dir)
-
-       repo.add([])
-       repo.commit(DateUtils.get_dir4date(yesterday))
-       repo.push()
-
 
        repo = DailyRepo(conf, conf.git_daily_repo)
 
@@ -567,6 +559,23 @@ class Configuration(object):
        repo.copy_day_data(local_dir, yesterday)
        repo.copy_file(self.get_highlights_path() / "sources.json")
        
+       repo.add([])
+       repo.commit(DateUtils.get_dir4date(yesterday))
+       repo.push()
+
+   def push_highlights_repo(self, conf):
+       log = logging.getLogger(self.app_name)
+       PersistentInfo.create("Pushing main repo data")
+       
+       yesterday = DateUtils.get_date_yesterday()
+
+       repo = MainRepo(conf, conf.git_repo)
+
+       repo.up()
+
+       local_dir = self.get_highlights_path()
+       repo.copy_main_data(local_dir)
+
        repo.add([])
        repo.commit(DateUtils.get_dir4date(yesterday))
        repo.push()

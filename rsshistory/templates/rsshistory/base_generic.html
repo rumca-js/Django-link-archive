@@ -32,11 +32,11 @@
 
             <hr>
             {% if user.is_staff %}
-            <li><a href="{% url 'rsshistory:addsource' %}">
+            <li><a href="{% url 'rsshistory:source-add' %}">
                     <div class="mainbutton">
                         <img src="{% static 'rsshistory/icons/icons8-add-link-96.png' %}" height=30px />
                         Add source</div></a></li>
-            <li><a href="{% url 'rsshistory:addentry' %}">
+            <li><a href="{% url 'rsshistory:entry-add' %}">
                     <div class="mainbutton">
                         <img src="{% static 'rsshistory/icons/icons8-add-link-96.png' %}" height=30px />
                         Add entry</div></a></li>

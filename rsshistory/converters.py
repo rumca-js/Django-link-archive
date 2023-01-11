@@ -111,6 +111,7 @@ class EntryConverter(object):
         if row_data:
             self.process_string(row_data)
         self.with_description = True
+        self.with_tags = False
         self.entry = None
 
     def process_string(self, row_data):
@@ -215,6 +216,7 @@ class EntriesConverter(object):
 
     def __init__(self, data = None):
         self.with_description = True
+        self.with_tags = False
         self._source = {}
 
         if data:
@@ -255,6 +257,10 @@ class EntriesConverter(object):
             if entry.language == None:
                 entry.update_language()
             entry_data = EntryConverter.get_map(entry)
+
+            if self.with_tags:
+               entry_data['tags'] = entry.get_tag_map()
+
             output_data['entries'].append(entry_data)
             
         import json
@@ -281,6 +287,7 @@ class EntriesConverter(object):
         for entry in self.entries:
             ec = EntryConverter()
             ec.with_description = self.with_description
+            ec.with_tags = self.with_tags
             ec.set_entry(entry)
             entry_data = ec.get_md_text()
             output_data.append(entry_data)
@@ -292,6 +299,7 @@ class EntriesConverter(object):
         for entry in self.entries:
             ec = EntryConverter()
             ec.with_description = self.with_description
+            ec.with_tags = self.with_tags
             ec.set_entry(entry)
             entry_data = ec.get_rss_text()
             output_data.append(entry_data)

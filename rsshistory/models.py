@@ -137,6 +137,15 @@ class RssSourceEntryDataModel(models.Model):
     def get_tag_string(self):
         return RssEntryTagsDataModel.get_tag_string(self.link)
 
+    def get_tag_map(self):
+        result = []
+        tags = RssEntryTagsDataModel.objects.filter(link = self.link)
+        if tags.exists():
+            for tag in tags:
+                result.append(tag.tag)
+        return result
+            
+
     def get_author_tag_string(self):
         return RssEntryTagsDataModel.get_author_tag_string(self.link)
 
@@ -203,6 +212,16 @@ class RssEntryTagsDataModel(models.Model):
             return RssEntryTagsDataModel.join_elements(current_tags_objs)
 
 
+class RssEntryCommentDataModel(models.Model):
+    # https://stackoverflow.com/questions/14066531/django-model-with-unique-combination-of-two-fields
+
+    link = models.CharField(max_length=1000)
+    author = models.CharField(max_length=1000)
+    date = models.DateTimeField(default = datetime.now)
+    comment = models.CharField(max_length=1000)
+    
+    link_obj = models.ForeignKey(RssSourceEntryDataModel, on_delete=models.CASCADE, related_name='comments', null=True, blank=True)
+
 
 class RssEntryCommentsDataModel(models.Model):
 
@@ -254,3 +273,6 @@ class PersistentInfo(models.Model):
         obs = PersistentInfo.objects.filter(level = int(logging.INFO))
         if obs.exists():
             obs.delete()
+
+    def truncate():
+        PersistentInfo.objects.all().delete()

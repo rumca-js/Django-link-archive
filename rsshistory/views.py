@@ -129,7 +129,7 @@ def add_source(request):
     else:
         form = SourceForm()
         form.method = "POST"
-        form.action_url = reverse('rsshistory:addsource')
+        form.action_url = reverse('rsshistory:source-add')
         context['form'] = form
 
     return render(request, app_name / 'form_basic.html', context)
@@ -172,7 +172,7 @@ def edit_source(request, pk):
             form = SourceForm(instance=ob)
 
         form.method = "POST"
-        form.action_url = reverse('rsshistory:editsource', args=[pk])
+        form.action_url = reverse('rsshistory:source-edit', args=[pk])
         context['form'] = form
         return render(request, app_name / 'form_basic.html', context)
 
@@ -248,7 +248,7 @@ def import_sources(request):
     else:
         form = ImportSourcesForm()
         form.method = "POST"
-        form.action_url = reverse('rsshistory:importsources')
+        form.action_url = reverse('rsshistory:sources-import')
         context["form"] = form
         return render(request, app_name / 'form_basic.html', context)
 
@@ -299,7 +299,7 @@ def import_entries(request):
     else:
         form = ImportEntriesForm()
         form.method = "POST"
-        form.action_url = reverse('rsshistory:importentries')
+        form.action_url = reverse('rsshistory:entries-import')
         context["form"] = form
         return render(request, app_name / 'form_basic.html', context)
 
@@ -502,6 +502,9 @@ def make_not_persistent_entry(request, pk):
         return render(request, app_name / 'missing_rights.html', context)
 
     ft = RssSourceEntryDataModel.objects.get(id=pk)
+
+    ft.tags.delete()
+
     fav = ft.persistent
     ft.persistent = False
     ft.user = request.user.username
@@ -560,7 +563,7 @@ def add_entry(request):
         author = request.user.username
         form = EntryForm(initial={'user' : author})
         form.method = "POST"
-        form.action_url = reverse('rsshistory:addentry')
+        form.action_url = reverse('rsshistory:entry-add')
         context['form'] = form
 
     return render(request, app_name / 'form_basic.html', context)
@@ -603,7 +606,7 @@ def edit_entry(request, pk):
         form = EntryForm(instance=ob)
         #form.fields['user'].initial = request.user.username
         form.method = "POST"
-        form.action_url = reverse('rsshistory:editentry', args=[pk])
+        form.action_url = reverse('rsshistory:entry-edit', args=[pk])
         context['form'] = form
         return render(request, app_name / 'form_basic.html', context)
 
@@ -784,4 +787,160 @@ def import_view(request):
             summary_text += entry['title'] + " " + entry['url'] + ": NOK \n"
 
     context["summary_text"] = summary_text
+    return render(request, app_name / 'summary_present.html', context)
+
+
+def truncate_errors(request):
+    context = get_context(request)
+    context['page_title'] += " - clearing errors"
+
+    if not request.user.is_staff:
+        return render(request, app_name / 'missing_rights.html', context)
+
+    from .models import PersistentInfo
+    PersistentInfo.truncate()
+
+    context["summary_text"] = "Clearing errors done"
+
+    return render(request, app_name / 'summary_present.html', context)
+
+
+
+def show_errors_page(request):
+    def fix_source_entry_links():
+        print("fix_source_entry_links")
+
+        entries_no_object = RssSourceEntryDataModel.objects.filter(source_obj = None)
+        for entry in entries_no_object:
+            source = RssSourceDataModel.objects.filter(url = entry.source)
+            if source.exists():
+                entry.source_obj = source[0]
+                entry.save()
+                #summary_text += "Fixed {0}, added source object\n".format(entry.link)
+                print("Fixed {0}, added source object".format(entry.link))
+        print("fix_source_entry_links done")
+
+    def fix_tags_links():
+        print("fix_tags_links")
+
+        tags = RssEntryTagsDataModel.objects.all()
+        for tag in tags:
+            removed = False
+
+            links = RssSourceEntryDataModel.objects.filter(link = tag.link)
+            for link in links:
+                if not link.persistent:
+                    print("Removed tag")
+                    tag.delete()
+                    removed = True
+                    continue
+
+            if removed:
+                continue
+        print("fix_tags_links done")
+
+    def push_main_repo():
+        ob = ConfigurationEntry.objects.all()
+        if ob.exists():
+            conf = ob[0]
+            c = Configuration.get_object(str(app_name))
+            print("Git pushing")
+            c.push_highlights_repo(conf)
+            print("Git ready")
+
+    context = get_context(request)
+    context['page_title'] += " - data errors"
+
+    if not request.user.is_staff:
+        return render(request, app_name / 'missing_rights.html', context)
+
+    #fix_source_entry_links()
+    #fix_tags_links()
+    # push_main_repo()
+
+    summary_text = "Done"
+
+    # find links without source
+
+    # remove tags, for which we do not have links, or entry is not permament
+
+    # show permament links without tags
+
+    context["summary_text"] = summary_text
+
+    return render(request, app_name / 'summary_present.html', context)
+
+
+def show_tags(request):
+
+    context = get_context(request)
+    context['page_title'] += " - browse tags"
+
+    if not request.user.is_staff:
+        return render(request, app_name / 'missing_rights.html', context)
+
+    # TODO select only this month
+    objects = RssEntryTagsDataModel.objects.all()
+
+    tags = objects.values('tag')
+
+    result = {}
+    for item in tags:
+        tag = item['tag']
+        if tag in result:
+            result[item['tag']] += 1
+        else:
+            result[item['tag']] = 0
+
+    result_list = []
+    for item in result:
+        result_list.append([item, result[item]])
+
+    def map_func(elem):
+        return elem[1]
+
+    result_list = sorted(result_list, key = map_func, reverse=True)
+
+    text = ""
+    for tag in result_list:
+        link = reverse('rsshistory:entries') + "?tag="+tag[0]
+        link_text = str(tag[0]) + " " + str(tag[1])
+        text += "<div><a href=\"{0}\">{1}</a></div>".format(link, link_text)
+
+    context["summary_text"] = text
+
+    return render(request, app_name / 'tags_view.html', context)
+
+
+def comment_add(request):
+    context = get_context(request)
+    context['page_title'] += " - add comment"
+
+    if not request.user.is_authenticated:
+        return render(request, app_name / 'missing_rights.html', context)
+
+    context["summary_text"] = "Adding comment"
+
+    return render(request, app_name / 'summary_present.html', context)
+
+def comment_edit(request):
+    context = get_context(request)
+    context['page_title'] += " - edit comment"
+
+    if not request.user.is_authenticated:
+        return render(request, app_name / 'missing_rights.html', context)
+
+    context["summary_text"] = "Editing comment"
+
+    return render(request, app_name / 'summary_present.html', context)
+
+def comment_remove(request):
+    context = get_context(request)
+    context['page_title'] += " - remove comment"
+
+    if not request.user.is_authenticated:
+        return render(request, app_name / 'missing_rights.html', context)
+
+    context["summary_text"] = "Removing comment"
+
     return render(request, app_name / 'summary_present.html', context)

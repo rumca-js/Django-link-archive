@@ -18,11 +18,13 @@
 
 <h1>Advanced</h1>
 <ul>
-  <li><a href="{% url 'rsshistory:importsources' %}" class="simplebutton">Import sources</a></li>
-  <li><a href="{% url 'rsshistory:importentries' %}" class="simplebutton">Import entries</a></li>
-  <li><a href="{% url 'rsshistory:exportsources' %}" class="simplebutton">Export sources</a></li>
-  <li><a href="{% url 'rsshistory:exportentries' %}" class="simplebutton">Export entries</a></li>
-  <li><a href="{% url 'rsshistory:removeallsources' %}" class="simplebutton">Remove all sources</a></li>
+  <li><a href="{% url 'rsshistory:truncate-errors' %}" class="simplebutton">Truncate errors</a></li>
+  <li><a href="{% url 'rsshistory:sources-import' %}" class="simplebutton">Import sources</a></li>
+  <li><a href="{% url 'rsshistory:entries-import' %}" class="simplebutton">Import entries</a></li>
+  <li><a href="{% url 'rsshistory:sources-export' %}" class="simplebutton">Export sources</a></li>
+  <li><a href="{% url 'rsshistory:entries-export' %}" class="simplebutton">Export entries</a></li>
+  <li><a href="{% url 'rsshistory:sources-remove-all' %}" class="simplebutton">Remove all sources</a></li>
+  <li><a href="{% url 'rsshistory:data-errors' %}" class="simplebutton">Data errors</a></li>
 </ul>
 
 <h1>Config</h1>

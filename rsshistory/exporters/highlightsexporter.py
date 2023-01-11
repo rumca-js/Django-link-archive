@@ -56,6 +56,7 @@ xmlns:georss="http://www.georss.org/georss" xmlns:geo="http://www.w3.org/2003/01
        e_converter = EntriesConverter()
        e_converter.set_entries(self._entries)
        e_converter.with_description = False
+       e_converter.with_tags = True
 
        file_name = export_path / (export_file_name + "_entries.json")
        #log.info("writing json: " + file_name.as_posix() )
@@ -81,7 +82,10 @@ class HighlightsBigExporter(object):
         return 1980
 
     def get_current_year(self):
-        return 2022
+        from ..dateutils import DateUtils
+        today = DateUtils.get_date_today()
+        year = int(DateUtils.get_datetime_year(today))
+        return year
 
     def export(self):
        import datetime
