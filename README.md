@@ -1,28 +1,29 @@
 # Overview
 
-Some time ago I have started capturing links from RSS sources. Why? I am not sure. I was just enjoying development in Django. I am no expert, but I like to program stuff.
-
- - Django application to manage RSS sources
- - Allows to add/remove RSS sources
- - Each source adds entries to the database
+RSS archive.
 
 ## Features
 
  - Web GUI in Django
+ - Can be used in a NAS device
  - RSS feed sources management: adding / removing / configuration
  - RSS links managment: adding / removing / configuration
- - automatic RSS feed update
- - automatic git export
- - automatic cleanup after specified time
- - making some entries permament (not erasable, highlighted)
- - support for Django auth staff users
- - automatic behavior through threads, which I think are not a good solution for Django applications?
- - data are stored locally
+ - Local data, no algorithms, no advertisments
+ - Search ability (Google like)
+ - Ability to add your own 'links', entries
+ - Ability to provide custom plugins, parse HTML pages
+ - Minimal: no distraction, compact layout
+ - automatic / configurable RSS feed update
+ - automatic / configurable git export
+
+Note:
+ - it is best to use on a device with SSD
 
 ## Links
 
  - Django RSS application: [https://github.com/rumca-js/Django-rss-feed](https://github.com/rumca-js/Django-rss-feed)
  - Git RSS daily repository for the year 2022 [https://github.com/rumca-js/RSS-Link-Database-2022](https://github.com/rumca-js/RSS-Link-Database-2022)
+ - Git RSS daily repository for the year 2023 [https://github.com/rumca-js/RSS-Link-Database-2023](https://github.com/rumca-js/RSS-Link-Database-2023)
  - Git RSS links repository for the permament articles [https://github.com/rumca-js/RSS-Link-Database](https://github.com/rumca-js/RSS-Link-Database)
 
 ## Screenshots
