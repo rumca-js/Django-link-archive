@@ -5,30 +5,31 @@ RSS archive.
 ## Features
 
  - Web GUI in Django
+ - Local data, no algorithms, no advertisments
+ - Search ability (Google like), by language, author, tags
+ - Ability to provide custom plugins, parse HTML pages
  - Can be used in a NAS device
  - RSS feed sources management: adding / removing / configuration
  - RSS links managment: adding / removing / configuration
- - Local data, no algorithms, no advertisments
- - Search ability (Google like)
- - Ability to add your own 'links', entries
- - Ability to provide custom plugins, parse HTML pages
- - Minimal: no distraction, compact layout
+ - RSS links managment: bookmark support, tag support
+ - Minimal aestethic: no distraction, compact layout
  - automatic / configurable RSS feed update
  - automatic / configurable git export
 
 Note:
  - it is best to use on a device with SSD
+ - archive might archive pages by web crawler: Import archive sources from previous years?
+https://web.archive.org/web/20170401000000/https://www.computerworld.com/index.rss
+ - tool for fetching data from years
 
 ## Links
 
  - Django RSS application: [https://github.com/rumca-js/Django-rss-feed](https://github.com/rumca-js/Django-rss-feed)
- - Git RSS daily repository for the year 2022 [https://github.com/rumca-js/RSS-Link-Database-2022](https://github.com/rumca-js/RSS-Link-Database-2022)
- - Git RSS daily repository for the year 2023 [https://github.com/rumca-js/RSS-Link-Database-2023](https://github.com/rumca-js/RSS-Link-Database-2023)
- - Git RSS links repository for the permament articles [https://github.com/rumca-js/RSS-Link-Database](https://github.com/rumca-js/RSS-Link-Database)
+ - Git bookmarked articles [https://github.com/rumca-js/RSS-Link-Database](https://github.com/rumca-js/RSS-Link-Database)
 
 ## Screenshots
 
-![](https://raw.githubusercontent.com/rumca-js/Django-rss-feed/main/screenshots/2022_09_14_entries.PNG)
+![](https://raw.githubusercontent.com/rumca-js/Django-rss-feed/main/screenshots/2023_01_13_entries.PNG)
 
 ## Installation
 
