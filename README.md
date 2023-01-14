@@ -17,6 +17,10 @@
  - feedly is not local, does not store your data on your hardware
  - feeder does not provide search ability, nor tagging. Does not display icons for RSS entries, in views
 
+## Screenshots
+
+![](https://raw.githubusercontent.com/rumca-js/Django-rss-feed/main/screenshots/2023_01_13_entries.PNG)
+
 ### Notes
 
  - Web GUI in Django
@@ -27,10 +31,6 @@
  - Django RSS application: [https://github.com/rumca-js/Django-rss-feed](https://github.com/rumca-js/Django-rss-feed)
  - My bookmarked articles [https://github.com/rumca-js/RSS-Link-Database](https://github.com/rumca-js/RSS-Link-Database)
 
-## Screenshots
-
-![](https://raw.githubusercontent.com/rumca-js/Django-rss-feed/main/screenshots/2023_01_13_entries.PNG)
-
 ## Installation
 
 Installation, just as any other Django app.
@@ -39,7 +39,6 @@ Installation, just as any other Django app.
 
  - sudo apt install feedparser / pip3 install feedparser
  - pip3 install python-dateutil
- - pip3 install PyGithub
 
 ## Daily repository
 
