@@ -1,7 +1,3 @@
-# Overview
-
-RSS archive.
-
 ## Features
 
  - Local data, no algorithms, no advertisments
