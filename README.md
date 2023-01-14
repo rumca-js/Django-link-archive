@@ -40,13 +40,7 @@ Installation, just as any other Django app.
  - sudo apt install feedparser / pip3 install feedparser
  - pip3 install python-dateutil
 
-## Daily repository
-
- - repository for a particular year contains directories for each day
- - each day contains files for each source
- - there is markdown and json file for each source
-
-## Permament repository
+## Bookmarks
 
  - contains articles that I have selected as intresting, or noteworthy, or funny, or whathever
  - files are split by 'language' and 'year' categories
