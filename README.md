@@ -4,7 +4,6 @@ RSS archive.
 
 ## Features
 
- - Web GUI in Django
  - Local data, no algorithms, no advertisments
  - Search ability (Google like), by language, author, tags
  - Ability to provide custom plugins, parse HTML pages
@@ -16,16 +15,25 @@ RSS archive.
  - automatic / configurable RSS feed update
  - automatic / configurable git export
 
-Note:
+### Problems with other RSS readers
+ - Nextcloud 'News' plugin however currently does not provide: tag support, search ability
+ - thunderbird does not allow tagging, searching by tags
+ - feedly is not local, does not store your data on your hardware
+ - feeder does not provide search ability, nor tagging. Does not display icons for RSS entries, in views
+
+### Notes
+
+ - Web GUI in Django
  - it is best to use on a device with SSD
- - archive might archive pages by web crawler: Import archive sources from previous years?
-https://web.archive.org/web/20170401000000/https://www.computerworld.com/index.rss
- - tool for fetching data from years
+
+### Ideas
+
+ - Provide a view to import RSS links from internet archive https://web.archive.org/web/20170401000000/https://www.computerworld.com/index.rss
 
 ## Links
 
  - Django RSS application: [https://github.com/rumca-js/Django-rss-feed](https://github.com/rumca-js/Django-rss-feed)
- - Git bookmarked articles [https://github.com/rumca-js/RSS-Link-Database](https://github.com/rumca-js/RSS-Link-Database)
+ - My bookmarked articles [https://github.com/rumca-js/RSS-Link-Database](https://github.com/rumca-js/RSS-Link-Database)
 
 ## Screenshots
 
@@ -72,12 +80,9 @@ Installation, just as any other Django app.
  - I Tracked Everything I Read on the Internet for a Year [https://www.tdpain.net/blog/a-year-of-reading](https://www.tdpain.net/blog/a-year-of-reading).
  - Automating a Reading List [https://zanshin.net/2022/09/11/automating-a-reading-list/](https://zanshin.net/2022/09/11/automating-a-reading-list/)
  - Google Search Is Dying [https://dkb.io/post/google-search-is-dying](https://dkb.io/post/google-search-is-dying)
+ - Luke Smith: Search Engines are Totally Useless Now... [https://www.youtube.com/watch?v=N8P6MTOQlyk](https://www.youtube.com/watch?v=N8P6MTOQlyk)
  - Luke Smith: Remember to Consoom Next Content on YouTube [https://www.youtube.com/watch?v=nI3GVw2JSEI](https://www.youtube.com/watch?v=nI3GVw2JSEI). As a society we provide news instead of building a data base of important information
- - Bright Insight: YES, They Really Are Deleting the Internet And it’s WAY Worse Than You Think [https://www.youtube.com/watch?v=8O_NvPpbsbw](https://www.youtube.com/watch?v=8O_NvPpbsbw). Data are removed from 'visibility' in Google and other platforms.
-
-Reasoning in Polish:
-
-[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/QHBcLrlgaxY/0.jpg)](https://www.youtube.com/watch?v=QHBcLrlgaxY)
+ - Ryan George What Google Search Is Like In 2022 [https://www.youtube.com/watch?v=NT7_SxJ3oSI](https://www.youtube.com/watch?v=NT7_SxJ3oSI)
 
 ## Data analysis
 
