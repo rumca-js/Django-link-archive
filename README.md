@@ -22,10 +22,6 @@
  - Web GUI in Django
  - it is best to use on a device with SSD
 
-### Ideas
-
- - Provide a view to import RSS links from internet archive https://web.archive.org/web/20170401000000/https://www.computerworld.com/index.rss
-
 ## Links
 
  - Django RSS application: [https://github.com/rumca-js/Django-rss-feed](https://github.com/rumca-js/Django-rss-feed)
@@ -92,6 +88,7 @@ With these data we can perform further analysis:
 
 ## Problems, notes
 
+ - Provide a view to import RSS links from internet archive https://web.archive.org/web/20170401000000/https://www.computerworld.com/index.rss
  - Google fails to deliver content of small creators (blogs etc. private pages). Google focuses on corporate hosting. Most common links are towards YouTube, Google maps, Facebook, reddit
  - We cannot replace Google search
  - Google provides only 31 pages of news (in news filter) and around 10 pages for ordinary search. This is a very small number. It is like looking through keyhole at the Internet
