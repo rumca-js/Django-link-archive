@@ -19,8 +19,13 @@
             <div class="linklistitem">
               <img src="{{source.get_favicon}}" width="20">
               <span class="linklistitemtitle">{{source.title}}</span>
-              <span class="linklistitemdescription">[{{source.category}}, {{source.subcategory}}]</span>
-              read:{{source.get_date_fetched}} Number of entries:{{source.get_number_of_entries}} Import seconds:{{source.get_import_seconds}} 
+              <span class="linklistitemdescription">
+                  [{{source.category}}, {{source.subcategory}}]</span>
+                  Export: {{ source.export_to_cms }} 
+                  Remove after days: {{ source.remove_after_days }} 
+                  Fetched:{{source.get_date_fetched}} 
+                  Number of entries:{{source.get_number_of_entries}} 
+                  Import seconds:{{source.get_import_seconds}} 
             </div>
           </a>
 

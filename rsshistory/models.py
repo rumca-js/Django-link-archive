@@ -12,7 +12,7 @@ class RssSourceDataModel(models.Model):
     category = models.CharField(max_length=1000)
     subcategory = models.CharField(max_length=1000)
     dead = models.BooleanField(default = False)
-    export_to_cms = models.BooleanField(default = True)
+    export_to_cms = models.BooleanField(default = False)
     remove_after_days = models.CharField(max_length=10, default='0')
     language = models.CharField(max_length=1000, default='en-US')
     favicon = models.CharField(max_length=1000, null = True)
@@ -36,6 +36,23 @@ class RssSourceDataModel(models.Model):
            pass
 
        return days
+
+    def is_fetch_possible(self):
+       from datetime import timedelta
+       from .dateutils import DateUtils
+
+       start_time = DateUtils.get_datetime_now_utc()
+
+       date_fetched = self.get_date_fetched()
+       if date_fetched:
+           time_since_update = start_time - date_fetched
+           mins = time_since_update / timedelta(minutes = 1)
+
+           if mins >= 10:
+               return True
+           return False
+
+       return True
 
     def is_removeable(self):
        days = self.get_days_to_remove()
@@ -76,7 +93,8 @@ class RssSourceDataModel(models.Model):
             op = RssSourceOperationalData(url = self.url,
                     date_fetched = date_fetched,
                     import_seconds = import_seconds,
-                    number_of_entries = number_of_entries)
+                    number_of_entries = number_of_entries,
+                    source_obj = self)
             op.save()
 
     def get_favicon(self):
@@ -100,6 +118,17 @@ class RssSourceOperationalData(models.Model):
     date_fetched = models.DateTimeField(null = True)
     import_seconds = models.IntegerField(null = True)
     number_of_entries = models.IntegerField(null = True)
+    source_obj = models.ForeignKey(RssSourceDataModel, on_delete=models.CASCADE, related_name='dynami_cdata', null=True, blank=True)
+
+
+class RssSourceImportHistory(models.Model):
+    url = models.CharField(max_length=2000)
+    date = models.DateField()
+    source_obj = models.ForeignKey(RssSourceDataModel, on_delete=models.CASCADE, related_name='history_import', null=True, blank=True)
+
+
+class RssSourceExportHistory(models.Model):
+    date = models.DateField()
 
 
 class RssSourceEntryDataModel(models.Model):
@@ -144,7 +173,6 @@ class RssSourceEntryDataModel(models.Model):
             for tag in tags:
                 result.append(tag.tag)
         return result
-            
 
     def get_author_tag_string(self):
         return RssEntryTagsDataModel.get_author_tag_string(self.link)
@@ -262,6 +290,10 @@ class PersistentInfo(models.Model):
     user = models.CharField(max_length=1000, null = True)
 
     def create(info, level = int(logging.INFO), date = datetime.now(timezone('UTC')), user = None):
+        ob = PersistentInfo(info = info, level = level, date = date, user = user)
+        ob.save()
+
+    def text(info, level = int(logging.INFO), date = datetime.now(timezone('UTC')), user = None):
         ob = PersistentInfo(info = info, level = level, date = date, user = user)
         ob.save()
 

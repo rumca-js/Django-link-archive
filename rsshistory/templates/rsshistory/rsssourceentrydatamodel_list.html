@@ -51,12 +51,12 @@
           </a>
              {% if link.persistent %}
               <a href="{% url 'rsshistory:entry-notstar' link.id %}" class="simplebutton">
-               Not persistent
+               Not bookmarked
               </a>
               <a href="{% url 'rsshistory:entry-tag' link.id %}" class="simplebutton">Tag entry</a>
              {% else %}
               <a href="{% url 'rsshistory:entry-star' link.id %}" class="simplebutton">
-               Persistent
+               Bookmark
               </a>
              {% endif %}
           <a href="{% url 'rsshistory:entry-hide' link.id %}" class="simplebutton">

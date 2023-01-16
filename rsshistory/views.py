@@ -1,4 +1,5 @@
 from pathlib import Path
+from datetime import datetime
 
 from django.shortcuts import render
 from django.views import generic
@@ -503,7 +504,8 @@ def make_not_persistent_entry(request, pk):
 
     ft = RssSourceEntryDataModel.objects.get(id=pk)
 
-    ft.tags.delete()
+    tags = RssEntryTagsDataModel.objects.filter(link = ft.link)
+    tags.delete()
 
     fav = ft.persistent
     ft.persistent = False
@@ -540,7 +542,9 @@ def add_entry(request):
 
         # check whether it's valid:
         if form.is_valid():
-            form.save_form()
+            if not form.save_form():
+                context["summary_text"] = "Could not add link"
+                return render(request, app_name / 'summary_present.html', context)
 
             context['form'] = form
 
@@ -845,7 +849,7 @@ def show_errors_page(request):
             conf = ob[0]
             c = Configuration.get_object(str(app_name))
             print("Git pushing")
-            c.push_highlights_repo(conf)
+            c.push_bookmarks_repo(conf)
             print("Git ready")
 
     context = get_context(request)
@@ -862,9 +866,9 @@ def show_errors_page(request):
 
     # find links without source
 
-    # remove tags, for which we do not have links, or entry is not permament
+    # remove tags, for which we do not have links, or entry is not bookmarked
 
-    # show permament links without tags
+    # show bookmarked links without tags
 
     context["summary_text"] = summary_text
 
@@ -944,3 +948,57 @@ def comment_remove(request):
     context["summary_text"] = "Removing comment"
 
     return render(request, app_name / 'summary_present.html', context)
+
+
+def import_internet_archive(request):
+    from .forms import ImportSourceFromInternetArchiveForm
+
+    context = get_context(request)
+    context['page_title'] += " - Import internet archive"
+
+    if not request.user.is_staff:
+        return render(request, app_name / 'missing_rights.html', context)
+    
+    if request.method == 'POST':
+        form = ImportSourceFromInternetArchiveForm(request.POST)
+        if form.is_valid():
+            from .sources.waybackmachine import WaybackMachine
+
+            source_url = form.cleaned_data['source_url']
+            archive_time = form.cleaned_data['archive_time']
+
+            source_obj = RssSourceDataModel.objects.filter(url = source_url)[0]
+
+            wb = WaybackMachine()
+            url = wb.get_wayback_at_time(source_url, archive_time)
+            if not url:
+               context["summary_text"] = "Cannot read wayback url"
+               return render(request, app_name / 'summary_present.html', context)
+
+            print("Found wayback url: {0}, requesting page contents".format(url))
+
+            from .webtools import Page
+            p = Page(url)
+            cont = p.get_contents()
+
+            print("Obtained page contents {0}, processing RSS".format(url))
+
+            if not cont:
+               context["summary_text"] = "Cannot read wayback page contents"
+               return render(request, app_name / 'summary_present.html', context)
+
+            c = Configuration.get_object(str(app_name))
+
+            from .sources.rsssourceprocessor import RssSourceProcessor
+            proc = RssSourceProcessor(c)
+            proc.allow_adding_with_current_time = False
+            proc.process_rss_source(source_obj, url)
+            print("Internet archive done {0}".format(url))
+    
+    form = ImportSourceFromInternetArchiveForm(initial={'archive_time' : datetime.now})
+    form.method = "POST"
+    #form.action_url = reverse('rsshistory:configuration')
+
+    context['form'] = form
+
+    return render(request, app_name / 'import_internetarchive.html', context)

@@ -35,7 +35,7 @@ class BasePlugin(Page):
         output_map['language'] = source.language
         return output_map
 
-    def get_feed_entry_map(self, source, feed_entry):
+    def get_feed_entry_map(self, source, feed_entry, allow_adding_with_current_time = True):
         from ..dateutils import DateUtils
         output_map = {}
 
@@ -46,7 +46,7 @@ class BasePlugin(Page):
         published = ""
         if hasattr(feed_entry, "published"):
             output_map['published'] = DateUtils.get_iso_datetime(feed_entry.published)
-        else:
+        elif allow_adding_with_current_time:
             output_map['published'] = DateUtils.get_datetime_now_utc()
 
         output_map['source'] = source.url

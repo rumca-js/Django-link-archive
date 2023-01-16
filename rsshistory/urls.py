@@ -17,7 +17,7 @@ urlpatterns = [
    path('source-remove/<int:pk>/', views.remove_source, name='source-remove'),
    path('source-edit/<int:pk>/', views.edit_source, name='source-edit'),
    path('source-refresh/<int:pk>/', views.refresh_source, name='source-refresh'),
-   path('sources-remove-all/', views.remove_all_sources, name='soruces-remove-all'),
+   path('sources-remove-all/', views.remove_all_sources, name='sources-remove-all'),
    path('sources-import', views.import_sources, name='sources-import'),
    path('sources-export/', views.export_sources, name='sources-export'),
 
@@ -42,7 +42,8 @@ urlpatterns = [
    # custom views
    path('configuration/', views.configuration, name='configuration'),
    path('searchinitview', views.search_init_view, name='searchinitview'),
-   path('importview', views.import_view, name='importview'),
+   path('import-view', views.import_view, name='import-view'),
+   path('import-internet-archive', views.import_internet_archive, name='import-internet-archive'),
    path('truncate-errors', views.truncate_errors, name='truncate-errors'),
    path('data-errors', views.show_errors_page, name='data-errors'),
    path('show-tags', views.show_tags, name='show-tags'),

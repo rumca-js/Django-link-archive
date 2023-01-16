@@ -1,4 +1,3 @@
-from github import Github
 from pathlib import Path
 import subprocess
 
@@ -24,7 +23,6 @@ class GitRepo(object):
    def __init__(self, git_data, git_repo):
       self.git_data = git_data
       self.git_repo = git_repo
-      #self.git = Github(login_or_token=git_data.git_token, base_url=git_data.git_path)
 
    def up(self):
       git_path = Path(self.git_data.git_path)

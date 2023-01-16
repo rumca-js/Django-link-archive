@@ -5,14 +5,14 @@
 
   <p>
       <div><strong>Url:</strong> <a href="{{ object.url }}">{{ object.url }}</a></div>
-      <span><strong>Title:</strong> {{ object.title }}</span>
+      <div><strong>Title:</strong> {{ object.title }}</div>
       <span><strong>Category:</strong> {{ object.category }}</span>
-      <span><strong>Subcategory:</strong> {{ object.subcategory }}</span>
-      <span><strong>Language:</strong> {{ object.language }}</span>
-  </p>
-
-  <p>
-  read:{{object.get_date_fetched}} Number of entries:{{object.get_number_of_entries}} Import seconds:{{object.get_import_seconds}} 
+      <span><strong>Subcategory:</strong> {{ object.subcategory }}, </span>
+      <span><strong>Language:</strong> {{ object.language }}, </span>
+      <span><strong>Export to CMS:</strong> {{ object.export_to_cms }}, </span>
+      <span><strong>Remove after days:</strong> {{ object.remove_after_days }}, </span>
+      <span><strong>Favicon:</strong> {{ object.get_favicon }}</span>
+      <div>Fetched:{{object.get_date_fetched}} Number of entries:{{object.get_number_of_entries}} Import seconds:{{object.get_import_seconds}} </div>
   </p>
 
   {% if user.is_staff %}

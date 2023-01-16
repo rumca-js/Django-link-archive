@@ -38,7 +38,7 @@
 <h1>Server log</h1>
 <p>
 {% for log_item in log_items %}
-   <div>{{ log_item.date }} {{ log_item.info }}</div>
+   <div>{{ log_item.date }} {{log_item.level}} {{ log_item.info }}</div>
 {% endfor %}
 </p>
 

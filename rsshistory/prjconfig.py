@@ -2,8 +2,8 @@ from pathlib import Path
 import time
 import shutil
 import logging
-from datetime import datetime
-from datetime import timedelta
+import traceback
+from datetime import timedelta, datetime, date
 from pytz import timezone
 
 from .gitrepo import *
@@ -13,11 +13,11 @@ from .basictypes import *
 from .models import ConfigurationEntry
 from .dateutils import DateUtils
 from .prjgitrepo import *
-from .models import PersistentInfo
+from .models import PersistentInfo, RssSourceExportHistory, RssSourceImportHistory
 from .sources.basepluginbuilder import BasePluginBuilder
 
 
-__version__ = "0.4.0"
+__version__ = "0.4.1"
 
 
 class Configuration(object):
@@ -32,6 +32,7 @@ class Configuration(object):
 
        self.enable_logging()
        self.create_threads()
+       print("Creating configuration item")
 
    def get_object(app_name):
        app_name = str(app_name)
@@ -108,15 +109,22 @@ class Configuration(object):
 
    def t_process_item(self, thread, item):
       from datetime import date, timedelta
+      from .sources.rsssourceprocessor import RssSourceProcessor
 
       if item:
-          print("thread {0} item {1}".format(thread, item.url))
+          PersistentInfo.text("thread {0} item {1}".format(thread, item.url))
       else:
-          print("thread {0}".format(thread))
+          PersistentInfo.text("thread {0}".format(thread))
 
       if thread == "process-source":
           try:
-             self.t_process_source(item)
+             proc = RssSourceProcessor(self)
+             proc.process_source(item)
+
+             if len(RssSourceImportHistory.objects.filter(date = date.today())) == 0:
+                 history = RssSourceImportHistory(url = item.url, date = date.today(), source_obj = item)
+                 history.save()
+
              today = DateUtils.get_iso_today()
              if not item.export_to_cms:
                 return
@@ -124,7 +132,7 @@ class Configuration(object):
              self.write_files_for_source_for_day(item.url, today)
           except Exception as e:
              log = logging.getLogger(self.app_name)
-             PersistentInfo.error("Exception during parsing page contents {0}".format(item.url) )
+             PersistentInfo.error("Exception during parsing page contents {0} {1}".format(item.url, str(e)) )
              log.critical(e, exc_info=True)
       elif thread == "refresh-thread":
          try:
@@ -139,160 +147,6 @@ class Configuration(object):
          PersistentInfo.error("Not implemented processing thread {0}".format(thread))
          log.critical(e, exc_info=True)
          raise NotImplemented
-
-   def check_source_fetch_time(self, source):
-       start_time = DateUtils.get_datetime_now_utc()
-
-       date_fetched = source.get_date_fetched()
-       if date_fetched:
-           time_since_update = start_time - date_fetched
-           mins = time_since_update / timedelta(minutes = 1)
-
-           if mins >= 10:
-               return True
-           return False
-
-       return True
-
-   def t_process_source(self, source):
-       try:
-           print("process source: {0}".format(source.title))
-
-           if self.check_source_fetch_time(source) == False:
-               print("not yet time for source: {0}".format(source.title))
-               return
-
-           start_time = DateUtils.get_datetime_now_utc()
-
-           plugin = BasePluginBuilder.get(source.get_domain())
-           num_entries = 0
-
-           if plugin.is_rss_source():
-               num_entries = self.t_process_rss_source(source)
-           else:
-               num_entries = self.t_process_parser_source(source)
-
-           stop_time = DateUtils.get_datetime_now_utc()
-           total_time = stop_time - start_time
-           total_time.total_seconds()
-
-           if num_entries != 0:
-               source.set_operational_info(stop_time, num_entries, total_time.total_seconds())
-
-       except Exception as e:
-          log = logging.getLogger(self.app_name)
-          queue_size = self.threads[0].get_queue_size()
-          PersistentInfo.error("Source: {0} {1} NOK; Queue: {2} {3}".format(source.url, source.title, queue_size, str(e)))
-          log.critical(e, exc_info=True)
-
-   def t_process_rss_source(self, source):
-       try:
-           import feedparser
-           url = source.url
-
-           feed = feedparser.parse(url)
-
-           num_entries = len(feed.entries)
-
-           if num_entries == 0:
-               PersistentInfo.error("Source: {0} {1} Has no data; Queue: {2}".format(source.url, source.title, queue_size))
-           else:
-               rss_path = self.get_export_path() / "downloaded_rss"
-               rss_path.mkdir(parents = True, exist_ok = True)
-
-               file_name = url + ".txt"
-               file_name = self.get_url_clean_name(file_name)
-
-               file_path = rss_path / file_name
-               file_path.write_text(str(feed))
-
-               for entry in feed.entries:
-                   self.process_rss_entry(source, entry)
-
-           return num_entries
-       except Exception as e:
-          log = logging.getLogger(self.app_name)
-          queue_size = self.threads[0].get_queue_size()
-          PersistentInfo.error("Source: {0} {1} NOK; Queue: {2} {3}".format(source.url, source.title, queue_size, str(e)))
-          log.critical(e, exc_info=True)
-
-   def t_process_parser_source(self, source):
-       from .webtools import Page
-       from .models import RssSourceEntryDataModel
-       try:
-           plugin = BasePluginBuilder.get(source.get_domain())
-           links = plugin.get_links()
-           num_entries = len(links)
-
-           for link in links:
-               objs = RssSourceEntryDataModel.objects.filter(link = link)
-               if objs.exists():
-                   continue
-
-               p = Page(link)
-               title = p.get_title()
-               if title:
-                   print("{0} {1}".format(link, title))
-
-                   props = plugin.get_link_data(source, link)
-
-                   o = RssSourceEntryDataModel(
-                       source = props['source'],
-                       title = props['title'],
-                       description = props['description'],
-                       link = props['link'],
-                       date_published = props['published'],
-                       language = props['language'],
-                       source_obj = source)
-
-                   o.save()
-               else:
-                   print("Could not read title: {0}".format(link))
-
-           return num_entries
-       except Exception as e:
-          log = logging.getLogger(self.app_name)
-          queue_size = self.threads[0].get_queue_size()
-          PersistentInfo.error("Source: {0} {1} NOK; Queue: {2} {3}".format(source.url, source.title, queue_size, str(e)))
-          log.critical(e, exc_info=True)
-
-   def process_rss_entry(self, source, feed_entry):
-       try:
-          from .models import RssSourceEntryDataModel
-
-          plugin = BasePluginBuilder.get(source.get_domain())
-
-          props = plugin.get_feed_entry_map(source, feed_entry)
-
-          objs = RssSourceEntryDataModel.objects.filter(link = props['link'])
-
-          if not objs.exists():
-              if str(feed_entry.title).strip() == "" or feed_entry.title == "undefined":
-                  return False
-
-              if not plugin.is_link_valid(props['link']):
-                  return False
-
-              o = RssSourceEntryDataModel(
-                  source = props['source'],
-                  title = props['title'],
-                  description = props['description'],
-                  link = props['link'],
-                  date_published = props['published'],
-                  language = props['language'],
-                  source_obj = source)
-
-              o.save()
-
-              return True
-
-       except Exception as e:
-          log = logging.getLogger(self.app_name)
-          queue_size = self.threads[0].get_queue_size()
-          PersistentInfo.error("Entry: {0} {1} NOK/Queue: {2}; Entry {3} {4} {5}".format(source.url, source.title, queue_size, feed_entry.link, feed_entry.title, str(e)))
-          log.critical(e, exc_info=True)
-
-          return False
 
    def write_files_for_source_for_day(self, source_url, day_iso):
        from .models import RssSourceEntryDataModel
@@ -319,7 +173,6 @@ class Configuration(object):
        sources_urls = set(entries.values_list('source', flat=True).distinct())
 
        for source_url in sources_urls:
-           print(source_url)
            source_objs = RssSourceDataModel.objects.filter(url = source_url)
            if source_objs.exists() and not source_objs[0].export_to_cms:
               continue
@@ -343,30 +196,40 @@ class Configuration(object):
 
    def download_rss(self, item, force = False):
        if force == False:
-           if self.check_source_fetch_time(item) == False:
+           if item.is_fetch_possible() == False:
                return False
 
+       PersistentInfo.text("Adding item to list: {0} {1}".format(item.url, item.title))
        self.threads[0].add_to_process_list(item)
        return True
 
    def check_if_git_update(self):
        try:
+           yesterday = DateUtils.get_date_yesterday()
+
+           history = RssSourceExportHistory.objects.filter(date = yesterday)
+
            ob = ConfigurationEntry.objects.all()
            if ob.exists() and ob[0].is_git_set():
                conf = ob[0]
                repo = DailyRepo(conf, conf.git_daily_repo)
 
-               yesterday = DateUtils.get_date_yesterday()
                day_present = repo.is_day_data_present(yesterday)
                month_changed = DateUtils.is_month_changed()
 
                if not day_present:
+                   PersistentInfo.create("Day has changed, pushing data to git")
                    self.write_all_files_for_day_joined_separate(yesterday.isoformat())
                    self.write_files_favourite()
                    #self.write_all_files_for_day_joined()
                    self.write_sources()
 
                    self.push_to_git(conf)
+                   PersistentInfo.create("Data successfully pushed to git")
+
+                   if len(RssSourceExportHistory.objects.filter(date = date.today())) == 0:
+                       history = RssSourceExportHistory(date = date.today())
+                       history.save()
 
                if not day_present:
                    self.clear_old_entries()
@@ -375,7 +238,8 @@ class Configuration(object):
 
        except Exception as e:
           log = logging.getLogger(self.app_name)
-          PersistentInfo.error("Exception during refresh: {0}".format(str(e)))
+          error_text = traceback.format_exc()
+          PersistentInfo.error("Exception during refresh: {0} {1}".format(str(e), error_text))
           log.critical(e, exc_info=True)
 
    def t_refresh(self, item):
@@ -391,6 +255,11 @@ class Configuration(object):
        self.clear_old_entries()
 
        self.check_if_git_update()
+
+       #from .sources.waybackmachine import WaybackMachine
+       #wb = WaybackMachine()
+       #wb.get_wayback_at_time("www.google.com", "2022")
+
        #self.fix_tags()
        
    def fix_tags(self):
@@ -543,7 +412,7 @@ class Configuration(object):
 
    def push_to_git(self, conf):
        self.push_daily_repo(conf)
-       self.push_highlights_repo(conf)
+       self.push_bookmarks_repo(conf)
 
    def push_daily_repo(self, conf):
        log = logging.getLogger(self.app_name)
@@ -557,13 +426,13 @@ class Configuration(object):
 
        local_dir = self.get_export_path() / DateUtils.get_dir4date(yesterday)
        repo.copy_day_data(local_dir, yesterday)
-       repo.copy_file(self.get_highlights_path() / "sources.json")
+       repo.copy_file(self.get_bookmarks_path() / "sources.json")
        
        repo.add([])
        repo.commit(DateUtils.get_dir4date(yesterday))
        repo.push()
 
-   def push_highlights_repo(self, conf):
+   def push_bookmarks_repo(self, conf):
        log = logging.getLogger(self.app_name)
        PersistentInfo.create("Pushing main repo data")
        
@@ -573,15 +442,15 @@ class Configuration(object):
 
        repo.up()
 
-       local_dir = self.get_highlights_path()
+       local_dir = self.get_bookmarks_path()
        repo.copy_main_data(local_dir)
 
        repo.add([])
        repo.commit(DateUtils.get_dir4date(yesterday))
        repo.push()
 
-   def get_highlights_path(self):
-       return self.get_export_path() / "highlights"
+   def get_bookmarks_path(self):
+       return self.get_export_path() / "bookmarks"
 
    def get_url_clean_name(self, file_name):
        file_name = file_name.replace(":", ".")\

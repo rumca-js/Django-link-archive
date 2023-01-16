@@ -8,8 +8,8 @@ class CodeProjectPlugin(BasePlugin):
     def get_address(self):
         return "https://www.codeproject.com"
 
-    def get_feed_entry_map(self, source, feed_entry):
-        output_map = BasePlugin.get_feed_entry_map(self, source, feed_entry)
+    def get_feed_entry_map(self, source, feed_entry, allow_adding_with_current_time = True):
+        output_map = BasePlugin.get_feed_entry_map(self, source, feed_entry, allow_adding_with_current_time)
 
         if 'href' in feed_entry.source:
             output_map['link'] = feed_entry.source['href']

@@ -13,11 +13,11 @@ class HighlightsExporter(object):
        entries = RssSourceEntryDataModel.objects.filter(persistent = True)
 
     def get_export_path(self):
-       entries_dir = self._cfg.get_highlights_path()
+       entries_dir = self._cfg.get_bookmarks_path()
        export_path = entries_dir
 
        if not export_path.exists():
-           export_path.mkdir()
+           export_path.mkdir(parents = True, exist_ok = True)
 
        return export_path
 
@@ -43,7 +43,7 @@ xmlns:georss="http://www.georss.org/georss" xmlns:geo="http://www.w3.org/2003/01
 """
        return text
 
-    def export(self, export_file_name = 'highlights', export_dir = "default"):
+    def export(self, export_file_name = 'bookmarks', export_dir = "default"):
        from ..converters import EntriesConverter
 
        if len(self._entries) == 0:
@@ -51,7 +51,7 @@ xmlns:georss="http://www.georss.org/georss" xmlns:geo="http://www.w3.org/2003/01
 
        export_path = self.get_export_path() / export_dir
        if not export_path.exists():
-           export_path.mkdir()
+           export_path.mkdir(parents = True, exist_ok = True)
 
        e_converter = EntriesConverter()
        e_converter.set_entries(self._entries)
@@ -91,8 +91,9 @@ class HighlightsBigExporter(object):
        import datetime
        from ..models import RssSourceEntryDataModel
 
-       entries_dir = self._cfg.get_highlights_path()
-       shutil.rmtree(entries_dir)
+       entries_dir = self._cfg.get_bookmarks_path()
+       if entries_dir.exists():
+           shutil.rmtree(entries_dir)
 
        for year in range(self.get_start_year(), self.get_current_year() + 1):
            start_date = datetime.date(year,1,1)
@@ -102,12 +103,12 @@ class HighlightsBigExporter(object):
 
            entries = RssSourceEntryDataModel.objects.filter(persistent = True, date_published__range=therange)
            converter = HighlightsExporter(self._cfg, entries)
-           converter.export('highlights_ALL', str(year))
+           converter.export('bookmarks_ALL', str(year))
 
            en_entries = RssSourceEntryDataModel.objects.filter(persistent = True, date_published__range=therange, language__icontains = 'en')
            converter = HighlightsExporter(self._cfg, en_entries)
-           converter.export('highlights_EN', str(year))
+           converter.export('bookmarks_EN', str(year))
 
            en_entries = RssSourceEntryDataModel.objects.filter(persistent = True, date_published__range=therange, language__icontains = 'pl')
            converter = HighlightsExporter(self._cfg, en_entries)
-           converter.export('highlights_PL', str(year))
+           converter.export('bookmarks_PL', str(year))

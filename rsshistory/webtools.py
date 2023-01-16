@@ -2,9 +2,13 @@ import logging
 import re
 import urllib.request, urllib.error, urllib.parse
 from urllib.parse import urlparse
+import html
 
 
 class Page(object):
+
+    user_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11'
+
     def __init__(self, url):
         self.url = url
         self.contents = None
@@ -19,7 +23,7 @@ class Page(object):
             return False;
 
     def get_contents(self):
-        hdr = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11',
+        hdr = {'User-Agent': Page.user_agent,
                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
                'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
                'Accept-Encoding': 'none',
@@ -76,9 +80,11 @@ class Page(object):
             return None
 
         wh1 = self.contents.find("<title", 0)
-        wh2 = self.contents.find("</title", wh1+1)
+        wh1a = self.contents.find(">", wh1)
+        wh2 = self.contents.find("</title", wh1a+1)
 
-        title = self.contents[wh1+7: wh2].strip()
+        title = self.contents[wh1a+1: wh2].strip()
+        title = html.unescape(title)
 
         return title
 

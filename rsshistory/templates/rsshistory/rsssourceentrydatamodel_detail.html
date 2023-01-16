@@ -22,11 +22,11 @@
     <a href="{% url 'rsshistory:entry-remove' object.id %}" class="simplebutton">Remove entry</a>
              {% if source.persistent %}
               <a href="{% url 'rsshistory:entry-notstar' object.id %}" class="simplebutton">
-               Not Persistent
+               Not bookmarked
               </a>
              {% else %}
               <a href="{% url 'rsshistory:entry-star' object.id %}" class="simplebutton">
-               Persistent
+               Bookmark
               </a>
              {% endif %}
   {% endif %}

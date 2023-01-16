@@ -51,6 +51,8 @@ class EntryForm(forms.ModelForm):
         super(EntryForm, self).__init__(*args, **kwargs)
         self.fields['source'].required = False
         self.fields['language'].required = False
+        self.fields['description'].required = False
+        self.fields['title'].required = False
         self.fields['persistent'].initial = True
         self.fields['user'].widget.attrs['readonly'] = True
 
@@ -65,15 +67,18 @@ class EntryForm(forms.ModelForm):
         language = self.cleaned_data["language"]
         user = self.cleaned_data["user"]
         
+        p = Page(link)
         if not source:
-            p = Page(link)
             source = p.get_domain()
         if not language:
-            p = Page(link)
             language = p.get_language()
+        if not title:
+            title = p.get_title()
+        if not description:
+            description = p.get_title()
 
-        if not source:
-            return
+        if not title or not source:
+            return False
 
         entry = RssSourceEntryDataModel(
                 source = source,
@@ -86,6 +91,7 @@ class EntryForm(forms.ModelForm):
                 user = user)
 
         entry.save()
+        return True
 
 
 class TagEntryForm(forms.ModelForm):
@@ -443,3 +449,8 @@ class ConfigForm(forms.ModelForm):
         widgets = {
          #'git_token': forms.PasswordInput(),
         }
+
+
+class ImportSourceFromInternetArchiveForm(forms.Form):
+    source_url = forms.CharField(label='Source url', max_length = 500)
+    archive_time = forms.DateTimeField(label = "Archive time")

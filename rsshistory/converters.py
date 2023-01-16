@@ -87,7 +87,7 @@ class SourcesConverter(object):
         return json.dumps(output)
 
     def get_export_path(self):
-       entries_dir = self._cfg.get_highlights_path()
+       entries_dir = self._cfg.get_bookmarks_path()
        export_path = entries_dir
 
        if not export_path.exists():
