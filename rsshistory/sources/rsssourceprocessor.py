@@ -47,29 +47,27 @@ class RssSourceProcessor(object):
            num_entries = self.process_parser_source(source)
        return num_entries
 
-
    def process_rss_source(self, source, url = None):
        try:
            import feedparser
 
            if url == None:
                url = source.url
-
            feed = feedparser.parse(url)
 
            num_entries = len(feed.entries)
 
            if num_entries == 0:
-               PersistentInfo.error("Source: {0} {1} Has no data".format(url, source.title))
+               PersistentInfo.error("Source: {0} {1} Has no data".format(source.url, source.title))
            else:
-               rss_path = self._cfg.get_export_path() / "downloaded_rss"
-               rss_path.mkdir(parents = True, exist_ok = True)
+               #rss_path = self._cfg.get_export_path() / "downloaded_rss"
+               #rss_path.mkdir(parents = True, exist_ok = True)
 
-               file_name = url + ".txt"
-               file_name = self._cfg.get_url_clean_name(file_name)
+               #file_name = url + ".txt"
+               #file_name = self._cfg.get_url_clean_name(file_name)
 
-               file_path = rss_path / file_name
-               file_path.write_text(str(feed))
+               #file_path = rss_path / file_name
+               #file_path.write_text(str(feed))
 
                for entry in feed.entries:
                    self.process_rss_entry(source, entry)
@@ -124,8 +122,9 @@ class RssSourceProcessor(object):
           from ..models import RssSourceEntryDataModel
 
           plugin = BasePluginBuilder.get(source.get_domain())
+          plugin.allow_adding_with_current_time = self.allow_adding_with_current_time
 
-          props = plugin.get_feed_entry_map(source, feed_entry, self.allow_adding_with_current_time)
+          props = plugin.get_feed_entry_map(source, feed_entry)
 
           objs = RssSourceEntryDataModel.objects.filter(link = props['link'])
 
@@ -134,6 +133,9 @@ class RssSourceProcessor(object):
                   return False
 
               if not plugin.is_link_valid(props['link']):
+                  return False
+
+              if 'published' not in props:
                   return False
 
               o = RssSourceEntryDataModel(

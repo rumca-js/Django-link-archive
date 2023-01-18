@@ -10,14 +10,12 @@ from .gitrepo import *
 
 from .threads import *
 from .basictypes import *
-from .models import ConfigurationEntry
 from .dateutils import DateUtils
-from .prjgitrepo import *
 from .models import PersistentInfo, RssSourceExportHistory, RssSourceImportHistory
 from .sources.basepluginbuilder import BasePluginBuilder
 
 
-__version__ = "0.4.1"
+__version__ = "0.4.2"
 
 
 class Configuration(object):
@@ -111,17 +109,12 @@ class Configuration(object):
       from datetime import date, timedelta
       from .sources.rsssourceprocessor import RssSourceProcessor
 
-      if item:
-          PersistentInfo.text("thread {0} item {1}".format(thread, item.url))
-      else:
-          PersistentInfo.text("thread {0}".format(thread))
-
       if thread == "process-source":
           try:
              proc = RssSourceProcessor(self)
              proc.process_source(item)
 
-             if len(RssSourceImportHistory.objects.filter(date = date.today())) == 0:
+             if len(RssSourceImportHistory.objects.filter(url = item.url, date = date.today())) == 0:
                  history = RssSourceImportHistory(url = item.url, date = date.today(), source_obj = item)
                  history.save()
 
@@ -189,7 +182,7 @@ class Configuration(object):
        from .models import RssSourceDataModel
        from .converters import SourcesConverter
 
-       sources = RssSourceDataModel.objects.all()
+       sources = RssSourceDataModel.objects.filter(export_to_cms = True)
        converter = SourcesConverter()
        converter.set_sources(sources)
        converter.export(self)
@@ -199,48 +192,8 @@ class Configuration(object):
            if item.is_fetch_possible() == False:
                return False
 
-       PersistentInfo.text("Adding item to list: {0} {1}".format(item.url, item.title))
        self.threads[0].add_to_process_list(item)
        return True
-
-   def check_if_git_update(self):
-       try:
-           yesterday = DateUtils.get_date_yesterday()
-
-           history = RssSourceExportHistory.objects.filter(date = yesterday)
-
-           ob = ConfigurationEntry.objects.all()
-           if ob.exists() and ob[0].is_git_set():
-               conf = ob[0]
-               repo = DailyRepo(conf, conf.git_daily_repo)
-
-               day_present = repo.is_day_data_present(yesterday)
-               month_changed = DateUtils.is_month_changed()
-
-               if not day_present:
-                   PersistentInfo.create("Day has changed, pushing data to git")
-                   self.write_all_files_for_day_joined_separate(yesterday.isoformat())
-                   self.write_files_favourite()
-                   #self.write_all_files_for_day_joined()
-                   self.write_sources()
-
-                   self.push_to_git(conf)
-                   PersistentInfo.create("Data successfully pushed to git")
-
-                   if len(RssSourceExportHistory.objects.filter(date = date.today())) == 0:
-                       history = RssSourceExportHistory(date = date.today())
-                       history.save()
-
-               if not day_present:
-                   self.clear_old_entries()
-                   pass
-                   # TODO clear description of non-favourite up to 500 chars
-
-       except Exception as e:
-          log = logging.getLogger(self.app_name)
-          error_text = traceback.format_exc()
-          PersistentInfo.error("Exception during refresh: {0} {1}".format(str(e), error_text))
-          log.critical(e, exc_info=True)
 
    def t_refresh(self, item):
        log = logging.getLogger(self.app_name)
@@ -254,14 +207,13 @@ class Configuration(object):
 
        self.clear_old_entries()
 
-       self.check_if_git_update()
+       from .gitupdatemgr import GitUpdateManager
 
-       #from .sources.waybackmachine import WaybackMachine
-       #wb = WaybackMachine()
-       #wb.get_wayback_at_time("www.google.com", "2022")
+       git_mgr = GitUpdateManager(self)
+       git_mgr.check_if_git_update()
 
        #self.fix_tags()
-       
+
    def fix_tags(self):
        PersistentInfo.create("Fixing tags")
        from .models import RssEntryTagsDataModel, RssSourceEntryDataModel
@@ -409,45 +361,6 @@ class Configuration(object):
                if entries.exists():
                    PersistentInfo.create("Removing old RSS data for source: {0} {1}".format(source.url, source.title))
                    entries.delete()
-
-   def push_to_git(self, conf):
-       self.push_daily_repo(conf)
-       self.push_bookmarks_repo(conf)
-
-   def push_daily_repo(self, conf):
-       log = logging.getLogger(self.app_name)
-       PersistentInfo.create("Pushing to RSS link repo")
-       
-       yesterday = DateUtils.get_date_yesterday()
-
-       repo = DailyRepo(conf, conf.git_daily_repo)
-
-       repo.up()
-
-       local_dir = self.get_export_path() / DateUtils.get_dir4date(yesterday)
-       repo.copy_day_data(local_dir, yesterday)
-       repo.copy_file(self.get_bookmarks_path() / "sources.json")
-       
-       repo.add([])
-       repo.commit(DateUtils.get_dir4date(yesterday))
-       repo.push()
-
-   def push_bookmarks_repo(self, conf):
-       log = logging.getLogger(self.app_name)
-       PersistentInfo.create("Pushing main repo data")
-       
-       yesterday = DateUtils.get_date_yesterday()
-
-       repo = MainRepo(conf, conf.git_repo)
-
-       repo.up()
-
-       local_dir = self.get_bookmarks_path()
-       repo.copy_main_data(local_dir)
-
-       repo.add([])
-       repo.commit(DateUtils.get_dir4date(yesterday))
-       repo.push()
 
    def get_bookmarks_path(self):
        return self.get_export_path() / "bookmarks"

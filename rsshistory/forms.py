@@ -453,4 +453,10 @@ class ConfigForm(forms.ModelForm):
 
 class ImportSourceFromInternetArchiveForm(forms.Form):
     source_url = forms.CharField(label='Source url', max_length = 500)
-    archive_time = forms.DateTimeField(label = "Archive time")
+    archive_time = forms.DateField(label = "Archive time")
+
+
+class ImportSourceRangeFromInternetArchiveForm(forms.Form):
+    source_url = forms.CharField(label='Source url', max_length = 500)
+    archive_start = forms.DateField(label = "Start time")
+    archive_stop = forms.DateField(label = "Stop time")

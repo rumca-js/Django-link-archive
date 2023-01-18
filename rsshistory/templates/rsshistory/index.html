@@ -17,120 +17,130 @@
   </ul>
 
   <h2>Features</h2>
+
   <ul>
-  <li>Web GUI in Django</li>
-  <li>RSS feed sources management: adding / removing / configuration</li>
-  <li>RSS links managment: adding / removing / configuration</li>
-  <li>automatic RSS feed update</li>
-  <li>automatic git export</li>
-  <li>automatic cleanup after specified time</li>
-  <li>making some entries bookmarked</li>
-  <li>support for Django auth staff users</li>
-  <li>automatic behavior through threads, which I think are not a good solution for Django applications?</li>
-  <li>data are stored locally</li>
+      <li>Local data, no algorithms, no advertisments
+      <li>Search ability (Google like), by language, author, tags
+      <li>Ability to provide custom plugins, parse HTML pages
+      <li>Can be used in a NAS device
+      <li>RSS feed sources management: adding / removing / configuration
+      <li>RSS links managment: adding / removing / configuration
+      <li>RSS links managment: bookmark support, tag support
+      <li>Minimal aestethic: no distraction, compact layout
+      <li>automatic / configurable RSS feed update
+      <li>automatic / configurable git export
   </ul>
 
- <h2>Links</h2>
+    <h2>Problems with other RSS readers</h2>
+
   <ul>
-      <li>Django RSS application: <a href="https://github.com/rumca-js/Django-rss-feed">https://github.com/rumca-js/Django-rss-feed</a></li>
-      <li>Git RSS links repository for the bookmarked articles <a href="https://github.com/rumca-js/RSS-Link-Database">https://github.com/rumca-js/RSS-Link-Database</a></li>
+      <li>Nextcloud 'News' plugin however currently does not provide: tag support, search ability
+      <li>thunderbird does not allow tagging, searching by tags
+      <li>feedly is not local, does not store your data on your hardware
+      <li>feeder does not provide search ability, nor tagging. Does not display icons for RSS entries, in views
+      <li>newsboat is CLI, and it does not provide exhaustive search capabilities
   </ul>
 
- <h2>Installation</h2>
- Installation, just as any other Django app.
+    <h2>Notes</h2>
 
- <h2>Dependencies</h2>
   <ul>
- <li>sudo apt install feedparser / pip3 install feedparser</li>
- <li>pip3 install python-dateutil</li>
- <li>pip3 install PyGithub</li>
+      <li>Web GUI in Django
+      <li>it is best to use on a device with SSD
   </ul>
 
- <h2>Daily repository</h2>
+    <h2>Installation</h2>
+
   <ul>
- <li>repository for a particular year contains directories for each day</li>
- <li>each day contains files for each source</li>
- <li>there is markdown and json file for each source</li>
+      <li>Installation, just as any other Django app.
   </ul>
 
- <h2>Permament repository</h2>
+    <h2>Dependencies</h2>
+
   <ul>
- <li>contains articles that I have selected as intresting, or noteworthy, or funny, or whathever</li>
- <li>files are split by 'language' and 'year' categories</li>
- <li>three file formats: JSON, markdown, rss</li>
- <li>markdown file is generated as a form of preview, JSON can be reused, imported</li>
- <li>links are bookmarked, but that does not necessarily mean something is endorsed. It shows particular intrest in topic. It is indication of importance</li>
+      <li>sudo apt install feedparser / pip3 install feedparser
+      <li>pip3 install python-dateutil
   </ul>
 
- <h2>Sources</h2>
+    <h2>Suite of projects</h2>
+
   <ul>
- <li>provided in sources.json file</li>
- <li>provides information about sources, like title, url, langugage</li>
+      <li>Captured using Django application: https://github.com/rumca-js/Django-rss-feed
+      <li>daily RSS Git repository for the year 2022 https://github.com/rumca-js/RSS-Link-Database-2022
+      <li>daily RSS Git repository for the year 2023 https://github.com/rumca-js/RSS-Link-Database-2023
+      <li>Bookmarked links https://github.com/rumca-js/RSS-Link-Database
   </ul>
 
- <h2>Goal</h2>
+    <h2>Goal</h2>
+
   <ul>
- <li>Archive purposes</li>
- <li>data analysis - probably it would be possible to verify link rot, etc.</li>
- <li>I want to have a place to store important links</li>
- <li>Google sucks at providing results for various topics (dead internet)</li>
+      <li>I want to 'store important links'
+      <li>Archive purposes
+      <li>Data analysis - possible to verify link rot, etc.
+      <li>Google sucks at providing results for various topics (dead internet)
   </ul>
 
- <h2>Inspirations</h2>
+    <h2>Inspirations</h2>
+
   <ul>
- <li>I Tracked Everything I Read on the Internet for a Year [https://www.tdpain.net/blog/a-year-of-reading](https://www.tdpain.net/blog/a-year-of-reading).</li>
- <li>Automating a Reading List [https://zanshin.net/2022/09/11/automating-a-reading-list/](https://zanshin.net/2022/09/11/automating-a-reading-list/)</li>
- <li>Google Search Is Dying [https://dkb.io/post/google-search-is-dying](https://dkb.io/post/google-search-is-dying)</li>
- <li>Luke Smith: Remember to Consoom Next Content on YouTube [https://www.youtube.com/watch?v=nI3GVw2JSEI](https://www.youtube.com/watch?v=nI3GVw2JSEI). As a society we provide news instead of building a data base of important information</li>
- <li>Bright Insight: YES, They Really Are Deleting the Internet And it’s WAY Worse Than You Think [https://www.youtube.com/watch?v=8O_NvPpbsbw](https://www.youtube.com/watch?v=8O_NvPpbsbw). Data are removed from 'visibility' in Google and other platforms.</li>
+      <li>I Tracked Everything I Read on the Internet for a Year https://www.tdpain.net/blog/a-year-of-reading.
+      <li>Automating a Reading List https://zanshin.net/2022/09/11/automating-a-reading-list/
+      <li>Google Search Is Dying https://dkb.io/post/google-search-is-dying
+      <li>Luke Smith: Search Engines are Totally Useless Now... https://www.youtube.com/watch?v=N8P6MTOQlyk
+      <li>Luke Smith: Remember to Consoom Next Content on YouTube https://www.youtube.com/watch?v=nI3GVw2JSEI. As a society we provide news instead of building a data base of important information
+      <li>Ryan George What Google Search Is Like In 2022 https://www.youtube.com/watch?v=NT7_SxJ3oSI
   </ul>
 
-  <h2>Reasoning in Polish</h2>
-<a href="https://www.youtube.com/watch?v=QHBcLrlgaxY"><img src="https://img.youtube.com/vi/QHBcLrlgaxY/0.jpg" /></a>)
+    <h1>Data</h1>
+    <h2>Bookmarks</h2>
 
- <h2>Data analysis</h2>
- With these data we can perform further analysis:
   <ul>
- <li>how many of old links are not any longer valid (link rot test)</li>
- <li>capture all domains from RSS links (internal, and leading outside?). Analyse which domains are most common</li>
- <li>which site generates most entries</li>
- <li>we can capture all external links from entries, to capture where these sites lead to (check network effect, etc)</li>
- <li>we can verify who reported first on certain topics</li>
+      <li>contains articles that I have selected as intresting, or noteworthy, or funny, or whathever
+      <li>files are split by 'language' and 'year' categories
+      <li>three file formats: JSON, markdown, rss
+      <li>markdown file is generated as a form of preview, JSON can be reused, imported
+      <li>links are highlighted, but that does not necessarily mean something is endorsed. It shows particular intrest in topic. It is indication of importance
   </ul>
 
- <h2>Problems, notes</h2>
+    <h2>Daily Data</h2>
+
   <ul>
- <li>Google fails to deliver content of small creators (blogs etc. private pages). Google focuses on corporate hosting. Most common links are towards YouTube, Google maps, Facebook, reddit</li>
- <li>We cannot replace Google search</li>
- <li>Google provides only 31 pages of news (in news filter) and around 10 pages for ordinary search. This is a very small number. It is like looking through keyhole at the Internet</li>
- <li>Link rot is real. My links may be not working after some time</li>
- <li>Is the data relevant, or useful for anyone?</li>
- <li>Either we would like to record data from 'well established sources' or gather as many links as possible. I think web engines do it? We cannot gather too much data, as it can destroy our potato servers.</li>
- <li>there are other RSS solutions like 'feedly', but it is an app, not data. You cannot parse it, you do not own the data, you can only do things that feedly allows you to do</li>
+      <li>RSS links are captured for each source separately
+      <li>two files formats for each day and source: JSON and markdown
+      <li>markdown file is generated as a form of preview, JSON can be reused, imported
+      <li>links are bookmarked, but that does not necessarily mean something is endorsed. It shows particular intrest in topic. It is indication of importance. Such links are stored 'forever'
   </ul>
 
-  <h2>Your own</h2>
+    <h2>Sources</h2>
+
   <ul>
-    <li>You can create your own instance: <a href="https://github.com/rumca-js/Django-rss-feed">GitHub</a></li>
-    <li>You can edit templates, styles</li>
-    <li>You can change icons: <a href="https://icons8.com/icons/">https://icons8.com/icons/</a></li>
-    <li>You can add your own sources: <a href="https://blog.feedspot.com/tech_news_rss_feeds/">https://blog.feedspot.com/tech_news_rss_feeds/</a></li>
+      <li>provided in sources.json file
+      <li>provides information about sources, like title, url, langugage
   </ul>
 
-<h2>Ground rules</h2>
-  Examples:
+    <h1>Data analysis</h1>
+
+    <h2>With these data we can perform further analysis:</h2>
+
   <ul>
-    <li>Do not allow ads, remain open source</li>
-    <li>no piracy</li>
-    <li>don't be evil, but allow free speech</li>
-    <li>allow to be able to offend. this is for grown ups, not for kids</li>
-</ul>
+      <li>how many of old links are not any longer valid (link rot test)
+      <li>capture all domains from RSS links (internal, and leading outside?). Analyse which domains are most common
+      <li>which site generates most entries
+      <li>we can capture all external links from entries, to capture where these sites lead to (check network effect, etc)
+      <li>we can verify who reported first on certain topics
+  </ul>
 
- <h2>Ending notes</h2>
+    <h2>Problems, notes</h2>
 
-  <p>
-  Let the refresh button F5 be with you!
-  </p>
+  <ul>
+      <li>Internet Archive (archive.org) does not provide snapshots for each and every day for all RSS sources. It is sometimes pretty slow. We would like to be sure that a such snapshot takes place. Therefore we need to export links to daily repo ourselves. Django RSS app also makes requests to archive to make the snapshots
+      <li>Google fails to deliver content of small creators (blogs etc. private pages). Google focuses on corporate hosting. Most common links are towards YouTube, Google maps, Facebook, reddit
+      <li>We cannot replace Google search
+      <li>Google provides only 31 pages of news (in news filter) and around 10 pages for ordinary search. This is a very small number. It is like looking through keyhole at the Internet
+      <li>Link rot is real. My links may be not working after some time
+      <li>Is the data relevant, or useful for anyone?
+      <li>Either we would like to record data from 'well established sources' or gather as many links as possible. I think web engines do it? We cannot gather too much data, as it can destroy our potato servers.
+      <li>there are other RSS solutions like 'feedly', but it is an app, not data. You cannot parse it, you do not own the data, you can only do things that feedly allows you to do
+  </ul>
 
  All links belong to us!
   

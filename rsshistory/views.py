@@ -1,5 +1,5 @@
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, date, timedelta
 
 from django.shortcuts import render
 from django.views import generic
@@ -9,6 +9,7 @@ from django.db.models.query import QuerySet
 from django.db.models.query import EmptyQuerySet
 
 from .models import RssSourceDataModel, RssSourceEntryDataModel, RssEntryTagsDataModel, ConfigurationEntry
+from .models import RssSourceImportHistory, RssSourceExportHistory
 from .converters import SourcesConverter, EntriesConverter
 
 from .forms import SourceForm, EntryForm, ImportSourcesForm, ImportEntriesForm, SourcesChoiceForm, EntryChoiceForm, ConfigForm
@@ -93,6 +94,54 @@ class RssSourceDetailView(generic.DetailView):
         c.download_rss(self.object)
 
         context['page_title'] += " - " + self.object.title
+
+        return context
+
+
+class RssEntriesListView(generic.ListView):
+    model = RssSourceEntryDataModel
+    context_object_name = 'entries_list'
+    paginate_by = 200
+
+    def get_queryset(self):
+        self.filter_form = EntryChoiceForm(args = self.request.GET)
+        return self.filter_form.get_filtered_objects()
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get the context
+        context = super(RssEntriesListView, self).get_context_data(**kwargs)
+        context = init_context(context)
+        # Create any data and add it to the context
+
+        self.filter_form.create()
+        self.filter_form.method = "GET"
+        self.filter_form.action_url = reverse('rsshistory:entries')
+
+        c = Configuration.get_object(str(app_name))
+        thread = c.get_threads()[0]
+        queue_size = thread.get_queue_size()
+
+        context['filter_form'] = self.filter_form
+        context['page_title'] += " - entries"
+        context['rss_are_fetched'] = queue_size > 0
+        context['rss_queue_size'] = queue_size
+
+        return context
+
+
+class RssEntryDetailView(generic.DetailView):
+    model = RssSourceEntryDataModel
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get the context
+        context = super(RssEntryDetailView, self).get_context_data(**kwargs)
+        context = init_context(context)
+
+        if self.object.language == None:
+            self.object.update_language()
+
+        context['page_title'] += " - " + self.object.title
+        context['tag_string'] = self.object.get_tag_string()
 
         return context
 
@@ -346,7 +395,6 @@ def remove_all_sources(request):
     return render(request, app_name / 'summary_present.html', context)
 
 
-
 def export_sources(request):
     context = get_context(request)
     context['page_title'] += " - export data"
@@ -377,7 +425,6 @@ def export_entries(request):
     return render(request, app_name / 'summary_present.html', context)
 
 
-
 def configuration(request):
     context = get_context(request)
     context['page_title'] += " - Configuration"
@@ -385,23 +432,6 @@ def configuration(request):
     if not request.user.is_staff:
         return render(request, app_name / 'missing_rights.html', context)
     
-    c = Configuration.get_object(str(app_name))
-    context['directory'] = c.directory
-    context['database_size_bytes'] = get_directory_size_bytes(c.directory)
-    context['database_size_kbytes'] = get_directory_size_bytes(c.directory)/1024
-    context['database_size_mbytes'] = get_directory_size_bytes(c.directory)/1024/1024
-
-    from .models import PersistentInfo
-    context['log_items'] = PersistentInfo.objects.all()
-
-    threads = c.get_threads()
-    for thread in threads:
-        items = thread.get_processs_list()
-
-    context['thread_list'] = threads
-    context['server_path'] = Path(".").resolve()
-    context['directory'] = Path(".").resolve()
-
     ob = ConfigurationEntry.objects.all()
     if not ob.exists():
         rec = ConfigurationEntry()
@@ -425,52 +455,41 @@ def configuration(request):
     return render(request, app_name / 'configuration.html', context)
 
 
-class RssEntriesListView(generic.ListView):
-    model = RssSourceEntryDataModel
-    context_object_name = 'entries_list'
-    paginate_by = 200
+def system_status(request):
+    context = get_context(request)
+    context['page_title'] += " - Status"
 
-    def get_queryset(self):
-        self.filter_form = EntryChoiceForm(args = self.request.GET)
-        return self.filter_form.get_filtered_objects()
+    if not request.user.is_staff:
+        return render(request, app_name / 'missing_rights.html', context)
+    
+    c = Configuration.get_object(str(app_name))
+    size_b = get_directory_size_bytes(c.directory)
+    size_kb = size_b / 1024
+    size_mb = size_kb / 1024
 
-    def get_context_data(self, **kwargs):
-        # Call the base implementation first to get the context
-        context = super(RssEntriesListView, self).get_context_data(**kwargs)
-        context = init_context(context)
-        # Create any data and add it to the context
+    context['directory'] = c.directory
+    context['database_size_bytes'] = size_b
+    context['database_size_kbytes'] = size_kb
+    context['database_size_mbytes'] = size_mb
 
-        self.filter_form.create()
-        self.filter_form.method = "GET"
-        self.filter_form.action_url = reverse('rsshistory:entries')
+    from .models import PersistentInfo
+    context['log_items'] = PersistentInfo.objects.all()
 
-        c = Configuration.get_object(str(app_name))
-        thread = c.get_threads()[0]
-        queue_size = thread.get_queue_size()
+    threads = c.get_threads()
+    for thread in threads:
+        items = thread.get_processs_list()
 
-        context['filter_form'] = self.filter_form
-        context['page_title'] += " - entries"
-        context['rss_are_fetched'] = queue_size > 0
-        context['rss_queue_size'] = queue_size
+    context['thread_list'] = threads
+    context['server_path'] = Path(".").resolve()
+    context['directory'] = Path(".").resolve()
 
-        return context
+    history = RssSourceImportHistory.objects.all()
+    context['import_history_list'] = history
 
+    history = RssSourceExportHistory.objects.all()
+    context['export_history_list'] = history
 
-class RssEntryDetailView(generic.DetailView):
-    model = RssSourceEntryDataModel
-
-    def get_context_data(self, **kwargs):
-        # Call the base implementation first to get the context
-        context = super(RssEntryDetailView, self).get_context_data(**kwargs)
-        context = init_context(context)
-
-        if self.object.language == None:
-            self.object.update_language()
-
-        context['page_title'] += " - " + self.object.title
-        context['tag_string'] = self.object.get_tag_string()
-
-        return context
+    return render(request, app_name / 'system_status.html', context)
 
 
 def make_persistent_entry(request, pk):
@@ -950,55 +969,124 @@ def comment_remove(request):
     return render(request, app_name / 'summary_present.html', context)
 
 
-def import_internet_archive(request):
-    from .forms import ImportSourceFromInternetArchiveForm
+def import_source_from_ia_impl(source_url, archive_time):
+    print("Reading from time: {0} {1}".format(source_url, archive_time))
+
+    source_obj = RssSourceDataModel.objects.filter(url = source_url)[0]
+
+    if len(RssSourceImportHistory.objects.filter(url = source_obj.url, date = archive_time)) != 0:
+        return False
+
+    from .sources.waybackmachine import WaybackMachine
+
+    wb = WaybackMachine()
+    url = wb.get_wayback_at_time(source_url, archive_time)
+    if not url:
+        print("We do not have entry for that timestamp")
+        return False
+
+    print("Found wayback url: {0}, requesting page contents".format(url))
+
+    #from .webtools import Page
+    #p = Page(url)
+    #cont = p.get_contents()
+    #print(cont)
+    #if not cont:
+    #    return False
+
+    #print("Obtained page contents {0}, processing RSS".format(url))
+
+    c = Configuration.get_object(str(app_name))
+
+    from .sources.rsssourceprocessor import RssSourceProcessor
+
+    proc = RssSourceProcessor(c)
+    proc.allow_adding_with_current_time = False
+    entries = proc.process_rss_source(source_obj, url)
+
+    if entries == 0:
+        return False
+
+    print("Internet archive done {0}".format(url))
+
+    if len(RssSourceImportHistory.objects.filter(url = source_obj.url, date = archive_time)) == 0:
+        history = RssSourceImportHistory(url = source_obj.url, date = archive_time, source_obj = source_obj)
+        history.save()
+
+    return True
+
+
+def import_source_from_ia_range_impl(source_url, archive_start, archive_stop):
+    time = archive_stop
+
+    while time > archive_start:
+        if import_source_from_ia_impl(source_url, time) == False:
+            print("Could not import feed for time: {0} {1}".format(source_url, time))
+        time -= timedelta(days = 1)
+
+
+def import_source_from_ia(request, pk):
+    from .forms import ImportSourceRangeFromInternetArchiveForm
 
     context = get_context(request)
     context['page_title'] += " - Import internet archive"
 
     if not request.user.is_staff:
         return render(request, app_name / 'missing_rights.html', context)
-    
+
     if request.method == 'POST':
-        form = ImportSourceFromInternetArchiveForm(request.POST)
+        form = ImportSourceRangeFromInternetArchiveForm(request.POST)
         if form.is_valid():
-            from .sources.waybackmachine import WaybackMachine
-
             source_url = form.cleaned_data['source_url']
-            archive_time = form.cleaned_data['archive_time']
+            archive_start = form.cleaned_data['archive_start']
+            archive_stop = form.cleaned_data['archive_stop']
 
-            source_obj = RssSourceDataModel.objects.filter(url = source_url)[0]
-
-            wb = WaybackMachine()
-            url = wb.get_wayback_at_time(source_url, archive_time)
-            if not url:
-               context["summary_text"] = "Cannot read wayback url"
-               return render(request, app_name / 'summary_present.html', context)
-
-            print("Found wayback url: {0}, requesting page contents".format(url))
-
-            from .webtools import Page
-            p = Page(url)
-            cont = p.get_contents()
-
-            print("Obtained page contents {0}, processing RSS".format(url))
-
-            if not cont:
-               context["summary_text"] = "Cannot read wayback page contents"
-               return render(request, app_name / 'summary_present.html', context)
-
-            c = Configuration.get_object(str(app_name))
-
-            from .sources.rsssourceprocessor import RssSourceProcessor
-            proc = RssSourceProcessor(c)
-            proc.allow_adding_with_current_time = False
-            proc.process_rss_source(source_obj, url)
-            print("Internet archive done {0}".format(url))
+            if import_source_from_ia_range_impl(source_url, archive_start, archive_stop) == False:
+                context["summary_text"] = "Could not read internet archive"
+                return render(request, app_name / 'summary_present.html', context)
+            else:
+                context["summary_text"] = "Internet archive data read successfully"
+                return render(request, app_name / 'summary_present.html', context)
     
-    form = ImportSourceFromInternetArchiveForm(initial={'archive_time' : datetime.now})
+    source_obj = RssSourceDataModel.objects.get(id = pk)
+    
+    form = ImportSourceRangeFromInternetArchiveForm(initial={"source_url": source_obj.url, 
+             'archive_start' : date.today() - timedelta(days = 1),
+             'archive_stop' : date.today()})
     form.method = "POST"
     #form.action_url = reverse('rsshistory:configuration')
 
     context['form'] = form
 
     return render(request, app_name / 'import_internetarchive.html', context)
+
+
+def untagged_bookmarks(request):
+    context = get_context(request)
+    context['page_title'] += " - Find not tagged entries"
+
+    if not request.user.is_staff:
+        return render(request, app_name / 'missing_rights.html', context)
+
+    links = RssSourceEntryDataModel.objects.filter(tags__tag__isnull = True)
+    context['links'] = links
+
+    return render(request, app_name / 'entries_untagged.html', context)
+
+
+class NotBookmarkedView(generic.ListView):
+    model = RssSourceEntryDataModel
+    context_object_name = 'entries_list'
+    paginate_by = 200
+    template_name = app_name / 'entries_untagged_view.html'
+
+    def get_queryset(self):
+        return RssSourceEntryDataModel.objects.filter(tags__tag__isnull = True, persistent = True)
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get the context
+        context = super(NotBookmarkedView, self).get_context_data(**kwargs)
+        context = init_context(context)
+        # Create any data and add it to the context
+
+        return context

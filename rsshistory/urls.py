@@ -33,6 +33,7 @@ urlpatterns = [
    path('entry-tag/<int:pk>/', views.tag_entry, name='entry-tag'),
    path('entries-import', views.import_entries, name='entries-import'),
    path('entries-export/', views.export_entries, name='entries-export'),
+   path('entries-untagged/', views.NotBookmarkedView.as_view(), name='entries-untagged'),
 
    # comment
    path('comment-add', views.comment_add, name='comment-add'),
@@ -41,9 +42,10 @@ urlpatterns = [
 
    # custom views
    path('configuration/', views.configuration, name='configuration'),
+   path('system-status/', views.system_status, name='system-status'),
    path('searchinitview', views.search_init_view, name='searchinitview'),
    path('import-view', views.import_view, name='import-view'),
-   path('import-internet-archive', views.import_internet_archive, name='import-internet-archive'),
+   path('import-source-ia/<int:pk>/', views.import_source_from_ia, name='import-source-ia'),
    path('truncate-errors', views.truncate_errors, name='truncate-errors'),
    path('data-errors', views.show_errors_page, name='data-errors'),
    path('show-tags', views.show_tags, name='show-tags'),

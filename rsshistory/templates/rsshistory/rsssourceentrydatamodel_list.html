@@ -59,14 +59,15 @@
                Bookmark
               </a>
              {% endif %}
-          <a href="{% url 'rsshistory:entry-hide' link.id %}" class="simplebutton">
+          <!--a href="{% url 'rsshistory:entry-hide' link.id %}" class="simplebutton">
              {% if link.dead %}
                UnHide
              {% else %}
                Hide
              {% endif %}
-          </a>
-             <a href="{% url 'rsshistory:entry-remove' link.id %}" class="simplebutton">Remove entry</a>
+          </a -->
+             <a href="{% url 'rsshistory:entry-tag' link.id %}" class="simplebutton">Tag entry</a>
+             <!--a href="{% url 'rsshistory:entry-remove' link.id %}" class="simplebutton">Remove entry</a-->
           {% else %}
           <hr>
           {% endif %}

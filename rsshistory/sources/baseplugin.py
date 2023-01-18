@@ -4,6 +4,7 @@ from ..webtools import Page
 class BasePlugin(Page):
     def __init__(self):
         super().__init__(self.get_address())
+        self.allow_adding_with_current_time = True
 
     def get_address(self):
         return "https://google.com"
@@ -35,7 +36,7 @@ class BasePlugin(Page):
         output_map['language'] = source.language
         return output_map
 
-    def get_feed_entry_map(self, source, feed_entry, allow_adding_with_current_time = True):
+    def get_feed_entry_map(self, source, feed_entry):
         from ..dateutils import DateUtils
         output_map = {}
 
@@ -46,7 +47,7 @@ class BasePlugin(Page):
         published = ""
         if hasattr(feed_entry, "published"):
             output_map['published'] = DateUtils.get_iso_datetime(feed_entry.published)
-        elif allow_adding_with_current_time:
+        elif self.allow_adding_with_current_time:
             output_map['published'] = DateUtils.get_datetime_now_utc()
 
         output_map['source'] = source.url

@@ -9,6 +9,7 @@ class ThreadJobCommon(threading.Thread):
 
    def __init__(self, name = "ThreadJobCommon", seconds_wait = 1, itemless = False):
        threading.Thread.__init__(self)
+       print("Starting thread: {0}".format(name))
        self._started_server_loop = False
        self._process_list = []
        self._process_item = None
@@ -18,6 +19,9 @@ class ThreadJobCommon(threading.Thread):
 
        self._thread_name = name
        self.daemon = True
+
+   def __del__(self):
+       print("Deleting")
 
    def set_config(self, config):
        self._config = config

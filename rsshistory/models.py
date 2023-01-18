@@ -118,13 +118,13 @@ class RssSourceOperationalData(models.Model):
     date_fetched = models.DateTimeField(null = True)
     import_seconds = models.IntegerField(null = True)
     number_of_entries = models.IntegerField(null = True)
-    source_obj = models.ForeignKey(RssSourceDataModel, on_delete=models.CASCADE, related_name='dynami_cdata', null=True, blank=True)
+    source_obj = models.ForeignKey(RssSourceDataModel, on_delete=models.SET_NULL, related_name='dynami_cdata', null=True, blank=True)
 
 
 class RssSourceImportHistory(models.Model):
     url = models.CharField(max_length=2000)
     date = models.DateField()
-    source_obj = models.ForeignKey(RssSourceDataModel, on_delete=models.CASCADE, related_name='history_import', null=True, blank=True)
+    source_obj = models.ForeignKey(RssSourceDataModel, on_delete=models.SET_NULL, related_name='history_import', null=True, blank=True)
 
 
 class RssSourceExportHistory(models.Model):
@@ -148,7 +148,7 @@ class RssSourceEntryDataModel(models.Model):
     # possible values en-US, or pl_PL
     language = models.CharField(max_length=10, null = True)
     
-    source_obj = models.ForeignKey(RssSourceDataModel, on_delete=models.CASCADE, related_name='entries', null=True, blank=True)
+    source_obj = models.ForeignKey(RssSourceDataModel, on_delete=models.SET_NULL, related_name='entries', null=True, blank=True)
 
     class Meta:
         ordering = ['-date_published', 'source', 'title']
@@ -291,15 +291,34 @@ class PersistentInfo(models.Model):
 
     def create(info, level = int(logging.INFO), date = datetime.now(timezone('UTC')), user = None):
         ob = PersistentInfo(info = info, level = level, date = date, user = user)
-        ob.save()
+
+        index = 0
+        while index < 5:
+            try:
+                ob.save()
+                return
+            except Exception as e:
+                index += 1
 
     def text(info, level = int(logging.INFO), date = datetime.now(timezone('UTC')), user = None):
         ob = PersistentInfo(info = info, level = level, date = date, user = user)
-        ob.save()
+        index = 0
+        while index < 5:
+            try:
+                ob.save()
+                return
+            except Exception as e:
+                index += 1
 
     def error(info, level = int(logging.ERROR), date = datetime.now(timezone('UTC')), user = None):
         ob = PersistentInfo(info = info, level = level, date = date, user = user)
-        ob.save()
+        index = 0
+        while index < 5:
+            try:
+                ob.save()
+                return
+            except Exception as e:
+                index += 1
 
     def cleanup():
         obs = PersistentInfo.objects.filter(level = int(logging.INFO))
