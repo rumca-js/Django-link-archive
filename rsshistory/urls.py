@@ -20,6 +20,7 @@ urlpatterns = [
    path('sources-remove-all/', views.remove_all_sources, name='sources-remove-all'),
    path('sources-import', views.import_sources, name='sources-import'),
    path('sources-export/', views.export_sources, name='sources-export'),
+   path('source-wayback-save/<int:pk>/', views.wayback_save, name='source-wayback-save'),
 
    # entries
    path('entries/', views.RssEntriesListView.as_view(), name='entries'),

@@ -79,7 +79,7 @@ class HighlightsBigExporter(object):
         self._cfg = config
 
     def get_start_year(self):
-        return 1980
+        return 1970
 
     def get_current_year(self):
         from ..dateutils import DateUtils

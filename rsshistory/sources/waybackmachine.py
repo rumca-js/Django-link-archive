@@ -1,17 +1,42 @@
 import waybackpy
+import time
+from datetime import datetime, date, timedelta
+
 from waybackpy import WaybackMachineCDXServerAPI, WaybackMachineSaveAPI
+
 from ..models import PersistentInfo
 
 
 class WaybackMachine(object):
 
     def __init__(self):
-        pass
+        self.url = None
+
+    def capture_limits(self, url):
+        if self.url != url:
+            self.url = url
+
+            from ..webtools import Page
+            user_agent = Page.user_agent
+
+            cdx_api = WaybackMachineCDXServerAPI(url, user_agent)
+
+            oldest = cdx_api.oldest()
+            newest = cdx_api.newest()
+
+            self.oldest = oldest.datetime_timestamp
+            self.newest = newest.datetime_timestamp
 
     def get_wayback_at_time(self, url, time):
-        from ..webtools import Page
+        # self.capture_limits(url)
 
+        if self.url:
+            if self.oldest.date() > time or self.newest.date() < time:
+                return
+
+        from ..webtools import Page
         user_agent = Page.user_agent
+        #print("Time: {0} {1} {2} {3}".format(time.year, time.month, time.day, url))
 
         cdx_api = WaybackMachineCDXServerAPI(url, user_agent)
         handle = cdx_api.near(year=time.year, month=time.month, day=time.day, hour=12)
@@ -27,16 +52,29 @@ class WaybackMachine(object):
         archive_timestamp = str(handle.timestamp)
         time_text = time.strftime("%Y%m%d")
 
-
         if not archive_timestamp.startswith(time_text):
-            print(archive_timestamp)
-            print(time_text)
+            #print(archive_timestamp)
+            #print(time_text)
             return
 
         return_url = "https://web.archive.org/web/" + handle.timestamp + "id_/"+handle.original
         return return_url
 
-    def save(self, url):
+    def get_archive_urls(self, url, start_time, stop_time):
+        from ..models import RssSourceImportHistory
+
+        time = stop_time
+        while time >= start_time:
+            #print("Time: {0}".format(time))
+            if len(RssSourceImportHistory.objects.filter(url = url, date = time)) != 0:
+                time -= timedelta(days = 1)
+                continue
+
+            wayback_url = self.get_wayback_at_time(url, time)
+            yield (time, wayback_url)
+            time -= timedelta(days = 1)
+
+    def save_impl(self, url):
         from ..webtools import Page
 
         user_agent = Page.user_agent
@@ -49,3 +87,12 @@ class WaybackMachine(object):
         except Exception as e:
             print("WaybackMachine: save url: {0} {1}".format(url, str(e)))
             PersistentInfo.error("WaybackMachine: save url: {0} {1}".format(url, str(e)))
+            time.sleep(5 * 3600) # wait 5 minute
+
+    def save(self, url):
+        ret = self.save_impl(url)
+        if ret == None:
+            return self.save_impl(url)
+        else:
+            return ret
+

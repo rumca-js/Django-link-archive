@@ -483,7 +483,7 @@ def system_status(request):
     context['server_path'] = Path(".").resolve()
     context['directory'] = Path(".").resolve()
 
-    history = RssSourceImportHistory.objects.all()
+    history = RssSourceImportHistory.objects.all().order_by('id')[:100]
     context['import_history_list'] = history
 
     history = RssSourceExportHistory.objects.all()

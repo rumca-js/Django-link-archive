@@ -15,7 +15,7 @@ from .models import PersistentInfo, RssSourceExportHistory, RssSourceImportHisto
 from .sources.basepluginbuilder import BasePluginBuilder
 
 
-__version__ = "0.4.2"
+__version__ = "0.4.3"
 
 
 class Configuration(object):
@@ -88,10 +88,12 @@ class Configuration(object):
    def create_threads(self):
        download_rss = ThreadJobCommon("process-source")
        refresh_thread = ThreadJobCommon("refresh-thread", 3600, True) #3600 is 1 hour
+       wayback = ThreadJobCommon("wayback")
 
        self.threads = [
                download_rss,
-               refresh_thread
+               refresh_thread,
+               wayback
                ]
 
        for athread in self.threads:
@@ -135,6 +137,10 @@ class Configuration(object):
             if item:
                 log.error("Exception during refreshing {0}".format(item.url) )
             log.critical(e, exc_info=True)
+      elif thread == "wayback":
+         from .sources.waybackmachine import WaybackMachine
+         wb = WaybackMachine()
+         wb.save(item.url)
       else:
          log = logging.getLogger(self.app_name)
          PersistentInfo.error("Not implemented processing thread {0}".format(thread))
@@ -195,6 +201,11 @@ class Configuration(object):
        self.threads[0].add_to_process_list(item)
        return True
 
+   def wayback_save(self, source):
+       PersistentInfo.create("Wayback save on source {0}".format(source.url))
+       self.threads[2].add_to_process_list(source)
+       return True
+
    def t_refresh(self, item):
        log = logging.getLogger(self.app_name)
 
@@ -225,121 +236,6 @@ class Configuration(object):
                      tag.link_obj = links[0]
                      tag.save()
        PersistentInfo.create("Fixing tags done")
-
-   def debug_refresh(self):
-       days = [
-               #'2022-09-05',
-               #'2022-09-06',
-               #'2022-09-07',
-               #'2022-09-08',
-               #'2022-09-09',
-               #'2022-09-10',
-               #'2022-09-11',
-               #'2022-09-12',
-               #'2022-09-13',
-               #'2022-09-14',
-               #'2022-09-15',
-               #'2022-09-16',
-               #'2022-09-17',
-               #'2022-09-18',
-               #'2022-09-19',
-               #'2022-09-20',
-               #'2022-09-21',
-               #'2022-09-22',
-               #'2022-09-23',
-               #'2022-09-24',
-               #'2022-09-25',
-               #'2022-09-26',
-               #'2022-09-27',
-               #'2022-09-28',
-               #'2022-09-29',
-               #'2022-09-30',
-               #'2022-10-01',
-               #'2022-10-02',
-               #'2022-10-03',
-               #'2022-10-04',
-               #'2022-10-05',
-               #'2022-10-06',
-               #'2022-10-07',
-               #'2022-10-08',
-               #'2022-10-09',
-               #'2022-10-10',
-               #'2022-10-11',
-               #'2022-10-12',
-               #'2022-10-13',
-               #'2022-10-14',
-               #'2022-10-15',
-               #'2022-10-16',
-               #'2022-10-17',
-               #'2022-10-18',
-               #'2022-10-19',
-               #'2022-10-20',
-               #'2022-10-21',
-               #'2022-10-22',
-               #'2022-10-23',
-               #'2022-10-24',
-               #'2022-10-25',
-               #'2022-10-26',
-               #'2022-10-27',
-               #'2022-10-28',
-               #'2022-10-29',
-               #'2022-10-30',
-               #'2022-10-31',
-               #'2022-11-01',
-               #'2022-11-02',
-               #'2022-11-03',
-               #'2022-11-04',
-               #'2022-11-05',
-               #'2022-11-06',
-               #'2022-11-07',
-               #'2022-11-08',
-               #'2022-11-09',
-               #'2022-11-10',
-               #'2022-11-11',
-               #'2022-11-12',
-               #'2022-11-13',
-               #'2022-11-14',
-               #'2022-11-15',
-               #'2022-11-16',
-               #'2022-11-17',
-               #'2022-11-18',
-               #'2022-11-19',
-               #'2022-11-20',
-               #'2022-11-21',
-               #'2022-11-22',
-               #'2022-11-23',
-               #'2022-11-24',
-               #'2022-11-25',
-               #'2022-11-26',
-               #'2022-11-27',
-               #'2022-11-28',
-               #'2022-11-29',
-               #'2022-11-30',
-               #'2022-12-01',
-               #'2022-12-02',
-               #'2022-12-03',
-               #'2022-12-04',
-               #'2022-12-05',
-               #'2022-12-06',
-               #'2022-12-07',
-               #'2022-12-08',
-               #'2022-12-09',
-               #'2022-12-10',
-               #'2022-12-11',
-               #'2022-12-12',
-               #'2022-12-13',
-               #'2022-12-14',
-               '2022-12-15',
-               '2022-12-16',
-               '2022-12-17',
-               '2022-12-18',
-               '2022-12-19',
-               '2022-12-20'
-               ]
-
-       for day in days:
-           print("Doing for a day: {0}".format(day))
-           self.write_all_files_for_day_joined_separate(day)
 
    def clear_old_entries(self):
        log = logging.getLogger(self.app_name)
