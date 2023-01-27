@@ -4,17 +4,6 @@
   <h1>{{ object.title }}</h1>
 
   <p>
-      <div><strong>Source:</strong> <a href="{{ object.source }}">{{ object.source }}</a></div>
-      <div><strong>Link:</strong> <a href="{{ object.link }}">{{ object.link }}</a></div>
-      <div><strong>Title:</strong> {{ object.title }}</div>
-      <div><strong>Publish date:</strong> {{ object.date_published }}</div>
-      <div><strong>User:</strong> {{ object.user }}</div>
-      <div><strong>Persistent:</strong> {{ object.persistent }},
-           <strong>Language:</strong> {{ object.language }},
-           <strong>Tags:</strong> {{ tag_string }}</div>
-  </p>
-
-  <p>
    {% if object.source_obj %}
     <a href="{% url 'rsshistory:source-detail' object.source_obj.id %}" class="simplebutton">RSS Source</a>
    {% endif %}
@@ -37,9 +26,14 @@
   </p>
 
   <p>
-  {% if user.is_authenticated %}
-    <a href="{% url 'rsshistory:comment-add' %}" class="simplebutton">Add comment</a>
-  {% endif %}
+      <div><strong>Source:</strong> <a href="{{ object.source }}">{{ object.source }}</a></div>
+      <div><strong>Link:</strong> <a href="{{ object.link }}">{{ object.link }}</a></div>
+      <div><strong>Title:</strong> {{ object.title }}</div>
+      <div><strong>Publish date:</strong> {{ object.date_published }}</div>
+      <div><strong>User:</strong> {{ object.user }}</div>
+      <div><strong>Persistent:</strong> {{ object.persistent }},
+           <strong>Language:</strong> {{ object.language }},
+           <strong>Tags:</strong> {{ tag_string }}</div>
   </p>
 
   <p>
@@ -47,6 +41,25 @@
   </p>
       <div>{{ object.description | safe }}</div>
       <div style="clear:both"></div>
+  </p>
+
+  <h2>Comments</h2>
+  <p>
+  {% for comment in object.comments.all %}
+      <div>{{comment.comment}}</div>
+      <div>{{comment.date_published}} {{comment.author}}
+          {% if comment.author == user.get_username %}
+            <a href="{% url 'rsshistory:entry-comment-edit' comment.id %}" class="simplebutton">Edit</a>
+            <a href="{% url 'rsshistory:entry-comment-remove' comment.id %}" class="simplebutton">Remove</a>
+          {% endif %}
+      </div>
+  {% endfor %}
+  </p>
+
+  <p>
+  {% if user.is_authenticated %}
+    <a href="{% url 'rsshistory:entry-comment-add' object.id %}" class="simplebutton">Add comment</a>
+  {% endif %}
   </p>
 
 {% endblock %}

@@ -27,7 +27,7 @@ class WaybackMachine(object):
             self.oldest = oldest.datetime_timestamp
             self.newest = newest.datetime_timestamp
 
-    def get_wayback_at_time(self, url, time):
+    def get_archive_url(self, url, time):
         # self.capture_limits(url)
 
         if self.url:
@@ -53,8 +53,8 @@ class WaybackMachine(object):
         time_text = time.strftime("%Y%m%d")
 
         if not archive_timestamp.startswith(time_text):
-            #print(archive_timestamp)
-            #print(time_text)
+            print(archive_timestamp)
+            print(time_text)
             return
 
         return_url = "https://web.archive.org/web/" + handle.timestamp + "id_/"+handle.original
@@ -70,7 +70,7 @@ class WaybackMachine(object):
                 time -= timedelta(days = 1)
                 continue
 
-            wayback_url = self.get_wayback_at_time(url, time)
+            wayback_url = self.get_archive_url(url, time)
             yield (time, wayback_url)
             time -= timedelta(days = 1)
 

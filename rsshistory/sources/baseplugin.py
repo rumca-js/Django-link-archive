@@ -5,6 +5,7 @@ class BasePlugin(Page):
     def __init__(self):
         super().__init__(self.get_address())
         self.allow_adding_with_current_time = True
+        self.default_entry_timestamp = None
 
     def get_address(self):
         return "https://google.com"
@@ -49,6 +50,8 @@ class BasePlugin(Page):
             output_map['published'] = DateUtils.get_iso_datetime(feed_entry.published)
         elif self.allow_adding_with_current_time:
             output_map['published'] = DateUtils.get_datetime_now_utc()
+        elif self.default_entry_timestamp:
+            output_map['published'] = self.default_entry_timestamp
 
         output_map['source'] = source.url
         output_map['title'] = feed_entry.title

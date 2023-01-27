@@ -10,6 +10,7 @@ class RssSourceProcessor(object):
    def __init__(self, config):
        self._cfg = config
        self.allow_adding_with_current_time = True
+       self.default_entry_timestamp = None
 
    def process_source(self, source):
        from ..dateutils import DateUtils
@@ -56,6 +57,9 @@ class RssSourceProcessor(object):
            feed = feedparser.parse(url)
 
            num_entries = len(feed.entries)
+           num_processed_entries = 0
+
+           print("Found rss source entry")
 
            if num_entries == 0:
                PersistentInfo.error("Source: {0} {1} Has no data".format(source.url, source.title))
@@ -70,9 +74,12 @@ class RssSourceProcessor(object):
                #file_path.write_text(str(feed))
 
                for entry in feed.entries:
-                   self.process_rss_entry(source, entry)
+                   if self.process_rss_entry(source, entry):
+                       num_processed_entries += 1
 
-           return num_entries
+           print("Number of processed entries: {0}".format(num_processed_entries))
+
+           return num_processed_entries
        except Exception as e:
           log = logging.getLogger(self._cfg.app_name)
           PersistentInfo.error("Source: {0} {1} NOK; {2}".format(source.url, source.title, str(e)))
@@ -94,8 +101,6 @@ class RssSourceProcessor(object):
                p = Page(link)
                title = p.get_title()
                if title:
-                   print("{0} {1}".format(link, title))
-
                    props = plugin.get_link_data(source, link)
 
                    o = RssSourceEntryDataModel(
@@ -110,6 +115,7 @@ class RssSourceProcessor(object):
                    o.save()
                else:
                    print("Could not read title: {0}".format(link))
+                   PersistentInfo.error("Could not read title: {0}".format(link))
 
            return num_entries
        except Exception as e:
@@ -123,6 +129,8 @@ class RssSourceProcessor(object):
 
           plugin = BasePluginBuilder.get(source.get_domain())
           plugin.allow_adding_with_current_time = self.allow_adding_with_current_time
+          if self.default_entry_timestamp:
+              plugin.default_entry_timestamp = self.default_entry_timestamp
 
           props = plugin.get_feed_entry_map(source, feed_entry)
 
@@ -148,13 +156,14 @@ class RssSourceProcessor(object):
                   source_obj = source)
               try:
                   o.save()
+                  return True
               except Exception as e:
                   print(str(e))
+                  return False
 
-              return True
+          return True
 
        except Exception as e:
-          print(str(e))
           PersistentInfo.error("Entry: {0} {1} NOK Entry {2} {3} {4}".format(source.url, source.title, feed_entry.link, feed_entry.title, str(e)))
 
           return False

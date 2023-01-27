@@ -16,6 +16,7 @@ class RssSourceDataModel(models.Model):
     remove_after_days = models.CharField(max_length=10, default='0')
     language = models.CharField(max_length=1000, default='en-US')
     favicon = models.CharField(max_length=1000, null = True)
+    on_hold = models.BooleanField(default = False)
 
     class Meta:
         ordering = ['title', 'url']
@@ -40,6 +41,9 @@ class RssSourceDataModel(models.Model):
     def is_fetch_possible(self):
        from datetime import timedelta
        from .dateutils import DateUtils
+
+       if self.on_hold:
+           return False
 
        start_time = DateUtils.get_datetime_now_utc()
 
@@ -241,24 +245,15 @@ class RssEntryTagsDataModel(models.Model):
 
 
 class RssEntryCommentDataModel(models.Model):
-    # https://stackoverflow.com/questions/14066531/django-model-with-unique-combination-of-two-fields
 
-    link = models.CharField(max_length=1000)
     author = models.CharField(max_length=1000)
-    date = models.DateTimeField(default = datetime.now)
-    comment = models.CharField(max_length=1000)
-    
-    link_obj = models.ForeignKey(RssSourceEntryDataModel, on_delete=models.CASCADE, related_name='comments', null=True, blank=True)
-
-
-class RssEntryCommentsDataModel(models.Model):
-
-    link = models.CharField(max_length=1000, unique=True)
-    comment = models.CharField(max_length=1000)
-    reply_id = models.CharField(max_length=1000) # comment id to which we reply
-    author = models.CharField(max_length=1000)
+    comment = models.TextField(max_length=1000)
     date_published = models.DateTimeField(default = datetime.now)
     date_edited = models.DateTimeField(null = True)
+    reply_id = models.IntegerField(null=True)
+    link = models.CharField(max_length=1000)
+    
+    link_obj = models.ForeignKey(RssSourceEntryDataModel, on_delete=models.CASCADE, related_name='comments', null=True, blank=True)
 
 
 class ConfigurationEntry(models.Model):

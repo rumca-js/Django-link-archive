@@ -313,7 +313,7 @@ class EntriesExporter(object):
         self._entries = entries
         self._cfg = config
 
-    def export_entries(self, source_url, export_file_name = "default", entries_dir = None, with_description = True):
+    def export_entries(self, source_url, export_file_name = "default", export_path = None, with_description = True):
         if len(self._entries) == 0:
             return
 
@@ -329,9 +329,6 @@ class EntriesExporter(object):
         else:
             e_converter.set_source_url(source_url)
             source_title = source_url
-
-        entries_dir = self._cfg.get_export_path() / entries_dir
-        export_path = entries_dir
 
         if not export_path.exists():
             export_path.mkdir(parents = True)

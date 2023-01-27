@@ -140,7 +140,7 @@ class Configuration(object):
       elif thread == "wayback":
          from .sources.waybackmachine import WaybackMachine
          wb = WaybackMachine()
-         wb.save(item.url)
+         wb.save(item)
       else:
          log = logging.getLogger(self.app_name)
          PersistentInfo.error("Not implemented processing thread {0}".format(thread))
@@ -154,9 +154,15 @@ class Configuration(object):
        date_range = DateUtils.get_range4day(day_iso)
        entries = RssSourceEntryDataModel.objects.filter(source = source_url, date_published__range=date_range)
 
+       clean_url = self.get_url_clean_name(source_url)
+
        ex = EntriesExporter(self, entries)
-       path = Path(day_iso)
-       ex.export_entries(source_url, self.get_url_clean_name(source_url), path)
+       ex.export_entries(source_url, clean_url, self.get_export_path_daily(day_iso))
+
+   def get_export_path_daily(self, day_iso):
+       day_path = Path(day_iso)
+       entries_dir = self.get_export_path() / day_iso
+       return entries_dir
 
    def write_all_files_for_day_joined_separate(self, day_iso):
        """ We do not want to provide for each day cumulative view. Users may want to select which 'streams' are selected individually '"""
@@ -201,9 +207,9 @@ class Configuration(object):
        self.threads[0].add_to_process_list(item)
        return True
 
-   def wayback_save(self, source):
-       PersistentInfo.create("Wayback save on source {0}".format(source.url))
-       self.threads[2].add_to_process_list(source)
+   def wayback_save(self, url):
+       PersistentInfo.create("Wayback save on URL:{0}".format(url))
+       self.threads[2].add_to_process_list(url)
        return True
 
    def t_refresh(self, item):
@@ -215,8 +221,6 @@ class Configuration(object):
        sources = RssSourceDataModel.objects.all()
        for source in sources:
            self.download_rss(source)
-
-       self.clear_old_entries()
 
        from .gitupdatemgr import GitUpdateManager
 
@@ -236,27 +240,6 @@ class Configuration(object):
                      tag.link_obj = links[0]
                      tag.save()
        PersistentInfo.create("Fixing tags done")
-
-   def clear_old_entries(self):
-       log = logging.getLogger(self.app_name)
-
-       from .models import RssSourceDataModel, RssSourceEntryDataModel
-       #sources = RssSourceDataModel.objects.filter(remove_after_days)
-       sources = RssSourceDataModel.objects.all()
-       for source in sources:
-
-           if not source.is_removeable():
-               continue
-
-           days = source.get_days_to_remove()
-           if days > 0:
-               current_time = DateUtils.get_datetime_now_utc()
-               days_before = current_time - timedelta(days = days)
-               
-               entries = RssSourceEntryDataModel.objects.filter(source=source.url, persistent=False, date_published__lt=days_before)
-               if entries.exists():
-                   PersistentInfo.create("Removing old RSS data for source: {0} {1}".format(source.url, source.title))
-                   entries.delete()
 
    def get_bookmarks_path(self):
        return self.get_export_path() / "bookmarks"

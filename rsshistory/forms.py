@@ -1,5 +1,5 @@
 from django import forms
-from .models import RssSourceDataModel, RssSourceEntryDataModel, ConfigurationEntry, RssEntryTagsDataModel
+from .models import RssSourceDataModel, RssSourceEntryDataModel, ConfigurationEntry, RssEntryTagsDataModel, RssEntryCommentDataModel
 from .converters import SourcesConverter, EntriesConverter
 
 # https://docs.djangoproject.com/en/4.1/ref/forms/widgets/
@@ -19,7 +19,7 @@ class SourceForm(forms.ModelForm):
     """
     class Meta:
         model = RssSourceDataModel
-        fields = ['url', 'title', 'category', 'subcategory', 'language', 'export_to_cms', 'remove_after_days', 'favicon']
+        fields = ['url', 'title', 'category', 'subcategory', 'language', 'export_to_cms', 'remove_after_days', 'favicon', 'on_hold']
         widgets = {
          #'git_token': forms.PasswordInput(),
         }
@@ -460,3 +460,35 @@ class ImportSourceRangeFromInternetArchiveForm(forms.Form):
     source_url = forms.CharField(label='Source url', max_length = 500)
     archive_start = forms.DateField(label = "Start time")
     archive_stop = forms.DateField(label = "Stop time")
+
+
+from .models import RssEntryCommentDataModel
+
+class CommentEntryForm(forms.ModelForm):
+    """
+    Category choice form
+    """
+    class Meta:
+        model = RssEntryCommentDataModel
+        fields = ['comment', 'link', 'date_published', 'author']
+
+    def __init__(self, *args, **kwargs):
+        super(CommentEntryForm, self).__init__(*args, **kwargs)
+        self.fields['link'].widget.attrs['readonly'] = True
+        self.fields['author'].widget.attrs['readonly'] = True
+
+    def save_comment(self):
+        comment = self.cleaned_data['comment']
+        link_url = self.cleaned_data['link']
+        date_published = self.cleaned_data['date_published']
+        author = self.cleaned_data['author']
+
+        entry = RssSourceEntryDataModel.objects.get(link = link_url)
+
+        o = RssEntryCommentDataModel(
+                comment = comment,
+                link = link_url,
+                author = author,
+                date_published = date_published,
+                link_obj = entry)
+        o.save()

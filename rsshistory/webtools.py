@@ -22,6 +22,12 @@ class Page(object):
         else:
             return False;
 
+    def try_decode(self, thebytes):
+        try:
+            return thebytes.decode('UTF-8', errors='replace')
+        except Exception as e:
+            pass
+
     def get_contents(self):
         hdr = {'User-Agent': Page.user_agent,
                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -34,9 +40,11 @@ class Page(object):
             req = urllib.request.Request(self.url, headers=hdr)
             handle = urllib.request.urlopen(req)
             thebytes = handle.read()
-            return thebytes.decode('UTF-8')
+            return self.try_decode(thebytes)
+
         except Exception as e:
-           logging.critical(e, exc_info=True)
+           from .models import PersistentInfo
+           PersistentInfo.error("Page: Error while reading page {0}".format(str(e)))
 
     def get_language(self):
         if not self.contents:
@@ -48,6 +56,8 @@ class Page(object):
         whlang = self.contents.find("lang")
         if whlang >= 0:
             lang = self.extract_html(self.contents, '"', '"', whlang)
+            if not lang:
+                return "en-US"
 
             if lang.find("en") == -1 and lang.find("pl") == -1:
                 return 'en-US'

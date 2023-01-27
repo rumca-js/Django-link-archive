@@ -12,7 +12,7 @@ from .models import RssSourceDataModel, RssSourceEntryDataModel, RssEntryTagsDat
 from .models import RssSourceImportHistory, RssSourceExportHistory
 from .converters import SourcesConverter, EntriesConverter
 
-from .forms import SourceForm, EntryForm, ImportSourcesForm, ImportEntriesForm, SourcesChoiceForm, EntryChoiceForm, ConfigForm
+from .forms import SourceForm, EntryForm, ImportSourcesForm, ImportEntriesForm, SourcesChoiceForm, EntryChoiceForm, ConfigForm, CommentEntryForm
 from .basictypes import *
 
 from .prjconfig import Configuration
@@ -89,9 +89,6 @@ class RssSourceDetailView(generic.DetailView):
         # Call the base implementation first to get the context
         context = super(RssSourceDetailView, self).get_context_data(**kwargs)
         context = init_context(context)
-
-        c = Configuration.get_object(str(app_name))
-        c.download_rss(self.object)
 
         context['page_title'] += " - " + self.object.title
 
@@ -483,7 +480,7 @@ def system_status(request):
     context['server_path'] = Path(".").resolve()
     context['directory'] = Path(".").resolve()
 
-    history = RssSourceImportHistory.objects.all().order_by('id')[:100]
+    history = RssSourceImportHistory.objects.all().order_by('date')[:100]
     context['import_history_list'] = history
 
     history = RssSourceExportHistory.objects.all()
@@ -500,13 +497,19 @@ def make_persistent_entry(request, pk):
     if not request.user.is_staff:
         return render(request, app_name / 'missing_rights.html', context)
 
-    ft = RssSourceEntryDataModel.objects.get(id=pk)
-    fav = ft.persistent
-    ft.persistent = True
-    ft.user = request.user.username
-    ft.save()
+    entry = RssSourceEntryDataModel.objects.get(id=pk)
 
-    summary_text = "Link changed to state: " + str(ft.persistent)
+    prev_state = entry.persistent
+
+    entry.persistent = True
+    entry.user = request.user.username
+    entry.save()
+
+    if prev_state != True:
+       c = Configuration.get_object(str(app_name))
+       c.wayback_save(entry.link)
+
+    summary_text = "Link changed to state: " + str(entry.persistent)
 
     context["summary_text"] = summary_text
 
@@ -567,9 +570,14 @@ def add_entry(request):
 
             context['form'] = form
 
-            ob = RssSourceEntryDataModel.objects.filter(link=request.POST.get('link'))
+            link = request.POST.get('link')
+
+            ob = RssSourceEntryDataModel.objects.filter(link = link)
             if ob.exists():
                 context['entry'] = ob[0]
+
+            c = Configuration.get_object(str(app_name))
+            c.wayback_save(link)
 
             return render(request, app_name / 'entry_added.html', context)
 
@@ -871,6 +879,19 @@ def show_errors_page(request):
             c.push_bookmarks_repo(conf)
             print("Git ready")
 
+    def show_entries_incorrect_language():
+        print("fix_source_entry_links")
+        from django.db.models import Q
+        criterion1 = Q(language__contains="pl")
+        criterion2 = Q(language__contains="en")
+        criterion3 = Q(language__isnull = True)
+
+        entries_no_object = RssSourceEntryDataModel.objects.filter(~criterion1 & ~criterion2 & ~criterion3, persistent = True)
+        print("fix_source_entry_links done")
+
+        if entries_no_object.exists():
+            return entries_no_object
+
     context = get_context(request)
     context['page_title'] += " - data errors"
 
@@ -882,6 +903,7 @@ def show_errors_page(request):
     # push_main_repo()
 
     summary_text = "Done"
+    context['links_with_errors'] = show_entries_incorrect_language()
 
     # find links without source
 
@@ -891,7 +913,7 @@ def show_errors_page(request):
 
     context["summary_text"] = summary_text
 
-    return render(request, app_name / 'summary_present.html', context)
+    return render(request, app_name / 'show_link_errors.html', context)
 
 
 def show_tags(request):
@@ -913,7 +935,7 @@ def show_tags(request):
         if tag in result:
             result[item['tag']] += 1
         else:
-            result[item['tag']] = 0
+            result[item['tag']] = 1
 
     result_list = []
     for item in result:
@@ -935,66 +957,14 @@ def show_tags(request):
     return render(request, app_name / 'tags_view.html', context)
 
 
-def comment_add(request):
-    context = get_context(request)
-    context['page_title'] += " - add comment"
-
-    if not request.user.is_authenticated:
-        return render(request, app_name / 'missing_rights.html', context)
-
-    context["summary_text"] = "Adding comment"
-
-    return render(request, app_name / 'summary_present.html', context)
-
-def comment_edit(request):
-    context = get_context(request)
-    context['page_title'] += " - edit comment"
-
-    if not request.user.is_authenticated:
-        return render(request, app_name / 'missing_rights.html', context)
-
-    context["summary_text"] = "Editing comment"
-
-    return render(request, app_name / 'summary_present.html', context)
-
-def comment_remove(request):
-    context = get_context(request)
-    context['page_title'] += " - remove comment"
-
-    if not request.user.is_authenticated:
-        return render(request, app_name / 'missing_rights.html', context)
-
-    context["summary_text"] = "Removing comment"
-
-    return render(request, app_name / 'summary_present.html', context)
-
-
-def import_source_from_ia_impl(source_url, archive_time):
+def import_source_from_ia_impl(wb, source_url, source_archive_url, archive_time):
     print("Reading from time: {0} {1}".format(source_url, archive_time))
 
     source_obj = RssSourceDataModel.objects.filter(url = source_url)[0]
 
     if len(RssSourceImportHistory.objects.filter(url = source_obj.url, date = archive_time)) != 0:
+        print("Import timestamp exists")
         return False
-
-    from .sources.waybackmachine import WaybackMachine
-
-    wb = WaybackMachine()
-    url = wb.get_wayback_at_time(source_url, archive_time)
-    if not url:
-        print("We do not have entry for that timestamp")
-        return False
-
-    print("Found wayback url: {0}, requesting page contents".format(url))
-
-    #from .webtools import Page
-    #p = Page(url)
-    #cont = p.get_contents()
-    #print(cont)
-    #if not cont:
-    #    return False
-
-    #print("Obtained page contents {0}, processing RSS".format(url))
 
     c = Configuration.get_object(str(app_name))
 
@@ -1002,12 +972,14 @@ def import_source_from_ia_impl(source_url, archive_time):
 
     proc = RssSourceProcessor(c)
     proc.allow_adding_with_current_time = False
-    entries = proc.process_rss_source(source_obj, url)
+    proc.default_entry_timestamp = archive_time
+    entries = proc.process_rss_source(source_obj, source_archive_url)
 
     if entries == 0:
+        print("No entry read")
         return False
 
-    print("Internet archive done {0}".format(url))
+    print("Internet archive done {0}".format(source_url))
 
     if len(RssSourceImportHistory.objects.filter(url = source_obj.url, date = archive_time)) == 0:
         history = RssSourceImportHistory(url = source_obj.url, date = archive_time, source_obj = source_obj)
@@ -1016,13 +988,33 @@ def import_source_from_ia_impl(source_url, archive_time):
     return True
 
 
-def import_source_from_ia_range_impl(source_url, archive_start, archive_stop):
-    time = archive_stop
+def get_time_stamps(url, start_time, stop_time):
 
-    while time > archive_start:
-        if import_source_from_ia_impl(source_url, time) == False:
-            print("Could not import feed for time: {0} {1}".format(source_url, time))
-        time -= timedelta(days = 1)
+   time = stop_time
+   while time >= start_time:
+       if len(RssSourceImportHistory.objects.filter(url = url, date = time)) != 0:
+           time -= timedelta(days = 1)
+           print("Skipping already imported timestamp {0} {1}".format(url, time))
+           continue
+
+       yield time
+       time -= timedelta(days = 1)
+
+
+def import_source_from_ia_range_impl(source_url, archive_start, archive_stop):
+    from .sources.waybackmachine import WaybackMachine
+    wb = WaybackMachine()
+
+    for timestamp in get_time_stamps(source_url, archive_start, archive_stop):
+        archive_url = wb.get_archive_url(source_url, timestamp)
+        if not archive_url:
+            print("Could not find archive link for timestamp {0} {1}".format(source_url, timestamp))
+            continue
+
+        print("Processing {0} {1} {2}".format(timestamp, source_url, archive_url))
+
+        if import_source_from_ia_impl(wb, source_url, archive_url, timestamp) == False:
+            print("Could not import feed for time: {0} {1} {2}".format(source_url, archive_url, timestamp))
 
 
 def import_source_from_ia(request, pk):
@@ -1090,3 +1082,129 @@ class NotBookmarkedView(generic.ListView):
         # Create any data and add it to the context
 
         return context
+
+
+def wayback_save(request, pk):
+    context = get_context(request)
+    context['page_title'] += " - Waybacksave"
+
+    if not request.user.is_staff:
+        return render(request, app_name / 'missing_rights.html', context)
+
+    source = RssSourceDataModel.objects.get(id=pk)
+    c = Configuration.get_object(str(app_name))
+    c.wayback_save(source.url)
+
+    context["summary_text"] = "Added to waybacksave"
+
+    return render(request, app_name / 'summary_present.html', context)
+
+
+from .models import RssEntryCommentDataModel
+
+def entry_add_comment(request, link_id):
+    context = get_context(request)
+    context['page_title'] += " - Add comment"
+
+    if not request.user.is_authenticated:
+        return render(request, app_name / 'missing_rights.html', context)
+
+    print("Link id" + str(link_id))
+    link = RssSourceEntryDataModel.objects.get(id = link_id)
+
+    # if this is a POST request we need to process the form data
+    if request.method == 'POST':
+        method = "POST"
+
+        # create a form instance and populate it with data from the request:
+        form = CommentEntryForm(request.POST)
+        if form.is_valid():
+            RssEntryCommentDataModel.objects.all().delete()
+
+            form.save_comment()
+
+        context["summary_text"] = "Added a new comment"
+
+        return render(request, app_name / 'summary_present.html', context)
+
+    else:
+        author = request.user.username
+        form = CommentEntryForm(initial={'author' : author, 'link' : link.link})
+
+    form.method = "POST"
+    form.pk = link_id
+    form.action_url = reverse('rsshistory:entry-comment-add', args=[link_id])
+
+    context['form'] = form
+    context['form_title'] = link.title
+    context['form_description'] = link.title
+
+    return render(request, app_name / 'form_basic.html', context)
+
+
+def entry_comment_edit(request, pk):
+    context = get_context(request)
+    context['page_title'] += " - edit comment"
+
+    if not request.user.is_authenticated:
+        return render(request, app_name / 'missing_rights.html', context)
+
+    comment_obj = RssEntryCommentDataModel.objects.get(id = pk)
+    link = comment_obj.link_obj
+
+    author = request.user.username
+
+    if author != comment_obj.author:
+        context["summary_text"] = "You are not the author!"
+        return render(request, app_name / 'summary_present.html', context)
+
+    if request.method == 'POST':
+        form = CommentEntryForm(request.POST)
+
+        if form.is_valid():
+            comment_obj.comment = form.cleaned_data['comment']
+            comment_obj.save()
+
+            context["summary_text"] = "Comment edited"
+
+            return render(request, app_name / 'summary_present.html', context)
+        else:
+            context["summary_text"] = "Form is not valid"
+
+            return render(request, app_name / 'summary_present.html', context)
+    else:
+        form = CommentEntryForm(instance = comment_obj)
+        form.method = "POST"
+        form.pk = pk
+        form.action_url = reverse('rsshistory:entry-comment-edit', args=[pk])
+
+        context['form'] = form
+        context['form_title'] = link.title
+        context['form_description'] = link.title
+
+        return render(request, app_name / 'form_basic.html', context)
+
+
+def entry_comment_remove(request, pk):
+    context = get_context(request)
+    context['page_title'] += " - remove comment"
+
+    if not request.user.is_authenticated:
+        return render(request, app_name / 'missing_rights.html', context)
+
+    comment_obj = RssEntryCommentDataModel.objects.get(id = pk)
+    link = comment_obj.link_obj
+
+    author = request.user.username
+
+    if author != comment_obj.author:
+        context["summary_text"] = "You are not the author!"
+        return render(request, app_name / 'summary_present.html', context)
+
+    comment_obj.delete()
+
+    context["summary_text"] = "Removed comment"
+
+    return render(request, app_name / 'summary_present.html', context)
+
+

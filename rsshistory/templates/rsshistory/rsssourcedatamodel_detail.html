@@ -16,10 +16,16 @@
   </p>
 
   {% if user.is_staff %}
-    <a href="{% url 'rsshistory:source-refresh' object.id %}" class="simplebutton">Refresh source</a>
-    <a href="{% url 'rsshistory:source-wayback-save' object.id %}" class="simplebutton">Archive.org save</a>
+    <p>
     <a href="{% url 'rsshistory:source-edit' object.id %}" class="simplebutton">Edit source</a>
+    <a href="{% url 'rsshistory:source-refresh' object.id %}" class="simplebutton">Refresh source</a>
+    </p>
+    <p>
+    <a href="{% url 'rsshistory:source-wayback-save' object.id %}" class="simplebutton">Archive.org save</a>
+    <a href="{% url 'rsshistory:import-source-ia' object.id %}" class="simplebutton">Import Archive.org</a>
+    </p>
+    <p>
     <a href="{% url 'rsshistory:source-remove' object.id %}" class="simplebutton">Remove source</a>
-    <a href="{% url 'rsshistory:import-source-ia' object.id %}" class="simplebutton">Import time range from Internet archive</a>
+    </p>
   {% endif %}
 {% endblock %}

@@ -25,6 +25,7 @@
 
 input {display: block;} 
 select {display: block;} 
+textarea {display: block;}
 
 .simplebutton {
   /* background-color: #000000; */

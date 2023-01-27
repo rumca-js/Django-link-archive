@@ -37,9 +37,9 @@ urlpatterns = [
    path('entries-untagged/', views.NotBookmarkedView.as_view(), name='entries-untagged'),
 
    # comment
-   path('comment-add', views.comment_add, name='comment-add'),
-   path('comment-edit/<int:pk>/', views.comment_edit, name='comment-edit'),
-   path('comment-remove/<int:pk>/', views.comment_remove, name='comment-remove'),
+   path('entry-comment-add/<int:link_id>', views.entry_add_comment, name='entry-comment-add'),
+   path('entry-comment-edit/<int:pk>/', views.entry_comment_edit, name='entry-comment-edit'),
+   path('entry-comment-remove/<int:pk>/', views.entry_comment_remove, name='entry-comment-remove'),
 
    # custom views
    path('configuration/', views.configuration, name='configuration'),
