@@ -10,7 +10,7 @@ from django.db.models.query import EmptyQuerySet
 
 from .models import RssSourceDataModel, RssSourceEntryDataModel, RssEntryTagsDataModel, ConfigurationEntry
 from .models import RssSourceImportHistory, RssSourceExportHistory
-from .converters import SourcesConverter, EntriesConverter
+from .serializers.converters import ModelCollectionConverter, CsvConverter
 
 from .forms import SourceForm, EntryForm, ImportSourcesForm, ImportEntriesForm, SourcesChoiceForm, EntryChoiceForm, ConfigForm, CommentEntryForm
 from .basictypes import *
@@ -399,10 +399,14 @@ def export_sources(request):
 
     sources = RssSourceDataModel.objects.all()
 
-    s_converter = SourcesConverter()
-    s_converter.set_sources(sources)
+    cc = ModelCollectionConverter(sources)
+    items = cc.get_map()
 
-    context["summary_text"] = s_converter.get_text()
+    converter = CsvConverter(items)
+    converter.set_export_columns(['url', 'title', 'category', 'subcategory', 'dead', 'export_to_cms', 'remove_after_days', 'language', 'favicon', 'on_hold'])
+    text = converter.export()
+
+    context["summary_text"] = converter.export()
 
     return render(request, app_name / 'summary_present.html', context)
 
@@ -460,6 +464,7 @@ def system_status(request):
         return render(request, app_name / 'missing_rights.html', context)
     
     c = Configuration.get_object(str(app_name))
+    #c.write_bookmarks()
     size_b = get_directory_size_bytes(c.directory)
     size_kb = size_b / 1024
     size_mb = size_kb / 1024
@@ -765,7 +770,7 @@ def search_init_view(request):
     return render(request, app_name / 'form_search.html', context)
 
 def import_view(request):
-    from .exporters.readinglist import ReadingList
+    from .serializers.readinglist import ReadingList
     from .webtools import Page
 
     context = get_context(request)
@@ -1119,11 +1124,12 @@ def entry_add_comment(request, link_id):
         # create a form instance and populate it with data from the request:
         form = CommentEntryForm(request.POST)
         if form.is_valid():
-            RssEntryCommentDataModel.objects.all().delete()
-
             form.save_comment()
 
-        context["summary_text"] = "Added a new comment"
+            context["summary_text"] = "Added a new comment"
+            return render(request, app_name / 'summary_present.html', context)
+
+        context["summary_text"] = "Could not add a comment"
 
         return render(request, app_name / 'summary_present.html', context)
 

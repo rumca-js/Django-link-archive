@@ -1,0 +1,19 @@
+{% extends base_generic %}
+
+{% block content %}
+
+<pre>
+{{ summary_text }}
+</pre>
+
+
+<h2>Link with errors</h2>
+
+{% for link in links_with_errors %}
+   <div>
+    <a href="{{link.get_absolute_url}}">{{link.title}} {{link.language}}</a>
+    <!--a href="{{link.link}}">{{link.title}} {{link.language}}</a-->
+    </div>
+{% endfor %}
+
+{% endblock %}

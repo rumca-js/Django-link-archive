@@ -30,11 +30,8 @@
           </a>
 
           {% if user.is_staff %}
-          <a href="{{ source.get_absolute_url }}" class="longbutton">
-            <div class="linklistitem">
-                Details
-            </div>
-          </a>
+            <a href="{{ source.get_absolute_url }}" class="simplebutton">Details</a>
+            <a href="{% url 'rsshistory:source-refresh' source.id %}" class="simplebutton">Refresh</a>
           {% endif %}
       </li>
     {% endfor %}

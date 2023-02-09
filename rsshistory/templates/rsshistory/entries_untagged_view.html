@@ -66,6 +66,7 @@
                Hide
              {% endif %}
           </a -->
+             <a href="{% url 'rsshistory:entry-tag' link.id %}" class="simplebutton">Tag entry</a>
              <!--a href="{% url 'rsshistory:entry-remove' link.id %}" class="simplebutton">Remove entry</a-->
           {% else %}
           <hr>

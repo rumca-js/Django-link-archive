@@ -115,6 +115,25 @@ class RssSourceDataModel(models.Model):
        page = Page(self.url)
        return page.get_domain()
 
+    def get_map(self):
+        output_data = {}
+
+        output_data['url'] = self.url
+        output_data['title'] = self.title
+        output_data['category'] = self.category
+        output_data['subcategory'] = self.subcategory
+        output_data['dead'] = self.dead
+        output_data['export_to_cms'] = self.export_to_cms
+        output_data['remove_after_days'] = self.remove_after_days
+        output_data['language'] = self.language
+        output_data['favicon'] = self.favicon
+        output_data['on_hold'] = self.on_hold
+
+        return output_data
+
+    def get_map_full(self):
+        return self.get_map()
+
 
 class RssSourceOperationalData(models.Model):
 
@@ -171,12 +190,17 @@ class RssSourceEntryDataModel(models.Model):
         return RssEntryTagsDataModel.get_tag_string(self.link)
 
     def get_tag_map(self):
+        # TODO should it be done by for tag in self.tags: tag.get_map()?
         result = []
         tags = RssEntryTagsDataModel.objects.filter(link = self.link)
         if tags.exists():
             for tag in tags:
                 result.append(tag.tag)
         return result
+
+    def get_comment_map(self):
+        # TODO
+        return []
 
     def get_author_tag_string(self):
         return RssEntryTagsDataModel.get_author_tag_string(self.link)
@@ -203,6 +227,32 @@ class RssSourceEntryDataModel(models.Model):
         page = Page(self.link)
         domain = page.get_domain()
         return domain + "/favicon.ico"
+
+    def get_map(self):
+        data = {}
+        data['source'] = self.source
+        data['link'] = self.link
+        data['title'] = self.title
+        data['date_published'] = str(self.date_published)
+        data['description'] = self.description
+        data['persistent'] = self.persistent
+        data['language'] = self.language
+        data['user'] = self.user
+
+        return data
+
+    def get_map_full(self):
+        themap = self.get_map()
+
+        tags = self.get_tag_map()
+        if len(tags) > 0:
+            themap['tags'] = tags
+
+        comments = self.get_comment_map()
+        if len(comments) > 0:
+            themap['comments'] = comments
+
+        return themap
 
 
 class RssEntryTagsDataModel(models.Model):
@@ -247,7 +297,7 @@ class RssEntryTagsDataModel(models.Model):
 class RssEntryCommentDataModel(models.Model):
 
     author = models.CharField(max_length=1000)
-    comment = models.TextField(max_length=1000)
+    comment = models.TextField(max_length=3000)
     date_published = models.DateTimeField(default = datetime.now)
     date_edited = models.DateTimeField(null = True)
     reply_id = models.IntegerField(null=True)

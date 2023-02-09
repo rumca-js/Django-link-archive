@@ -1,6 +1,5 @@
 from django import forms
 from .models import RssSourceDataModel, RssSourceEntryDataModel, ConfigurationEntry, RssEntryTagsDataModel, RssEntryCommentDataModel
-from .converters import SourcesConverter, EntriesConverter
 
 # https://docs.djangoproject.com/en/4.1/ref/forms/widgets/
 
@@ -137,9 +136,11 @@ class ImportSourcesForm(forms.Form):
     rawsources = forms.CharField(widget=forms.Textarea(attrs={'name':'rawsources', 'rows':30, 'cols':100}))
 
     def get_sources(self):
+        from .serializers.converters import CsvConverter
         rawsources = self.cleaned_data['rawsources']
-        sources = SourcesConverter(rawsources)
-        return sources.sources
+
+        converter = CsvConverter()
+        return converter.from_text(rawsources)
 
 
 class ImportEntriesForm(forms.Form):
@@ -149,9 +150,11 @@ class ImportEntriesForm(forms.Form):
     rawentries = forms.CharField(widget=forms.Textarea(attrs={'name':'rawentries', 'rows':30, 'cols':100}))
 
     def get_entries(self):
+        from .serializers.converters import CsvConverter
         rawentries = self.cleaned_data['rawentries']
-        entries = EntriesConverter(rawentries)
-        return entries.entries
+
+        converter = CsvConverter()
+        return converter.from_text(rawsources)
 
 
 class SourcesChoiceForm(forms.Form):
