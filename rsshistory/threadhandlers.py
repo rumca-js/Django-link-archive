@@ -58,7 +58,7 @@ class RefreshThreadHandler(object):
 
         from .gitupdatemgr import GitUpdateManager
 
-        git_mgr = GitUpdateManager(self)
+        git_mgr = GitUpdateManager(self._cfg)
         git_mgr.check_if_git_update()
 
 

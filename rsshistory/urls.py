@@ -33,7 +33,6 @@ urlpatterns = [
    path('entry-notstar/<int:pk>/', views.make_not_persistent_entry, name='entry-notstar'),
    path('entry-tag/<int:pk>/', views.tag_entry, name='entry-tag'),
    path('entries-import', views.import_entries, name='entries-import'),
-   path('entries-export/', views.export_entries, name='entries-export'),
    path('entries-untagged/', views.NotBookmarkedView.as_view(), name='entries-untagged'),
 
    # comment
@@ -50,6 +49,7 @@ urlpatterns = [
    path('truncate-errors', views.truncate_errors, name='truncate-errors'),
    path('data-errors', views.show_errors_page, name='data-errors'),
    path('show-tags', views.show_tags, name='show-tags'),
+   path('write-bookmarks', views.write_bookmarks, name='write-bookmarks'),
 
    # login
    path('accounts/', include('django.contrib.auth.urls')),

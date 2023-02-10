@@ -1,7 +1,7 @@
 
 import logging
 
-from .converters import ModelCollectionConverter, JsonConverter, MarkDownConverter, RssConverter
+from .converters import ModelCollectionConverter, JsonConverter, MarkDownConverter
 
 class EntriesExporter(object):
 
@@ -22,6 +22,9 @@ class EntriesExporter(object):
     def export_entries(self, source_url, export_file_name = "default", export_path = None, with_description = True):
         if len(self._entries) == 0:
             return
+
+        if not export_path.exists():
+            export_path.mkdir()
 
         cc = ModelCollectionConverter(self._entries)
         items = cc.get_map_full()

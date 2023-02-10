@@ -29,6 +29,8 @@ class GitUpdateManager(object):
 
            PersistentInfo.create("Day has changed, pushing data to git")
 
+           from .datawriter import DataWriter
+           writer = DataWriter(self._cfg)
            writer.write_daily_data(yesterday.isoformat())
            writer.write_bookmarks()
            writer.write_sources()

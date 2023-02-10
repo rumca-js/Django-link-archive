@@ -95,7 +95,14 @@ class Configuration(object):
    def get_sources_json_path(self):
        return self.get_bookmarks_path("sources.json")
 
-   def get_export_path_daily(self, day_iso):
+   def get_sources_file_name(self):
+       return "sources.json"
+
+   def get_daily_data_path(self, day_iso = None):
+       if day_iso == None:
+           from ..dateutils import DateUtils
+           day_iso = DateUtils.get_date_today().isoformat()
+
        day_path = Path(day_iso)
        entries_dir = self.get_export_path(day_iso)
        return entries_dir

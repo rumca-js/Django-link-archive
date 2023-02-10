@@ -38,27 +38,6 @@ class BookmarksExporter(object):
        if not export_path.exists():
            export_path.mkdir(parents = True, exist_ok = True)
 
-       """
-       e_converter = EntriesConverter()
-       e_converter.set_entries(self._entries)
-       e_converter.with_description = False
-       e_converter.with_tags = True
-
-       file_name = export_path / (export_file_name + "_entries.json")
-       #log.info("writing json: " + file_name.as_posix() )
-       file_name.write_text(e_converter.get_json())
-
-       file_name = export_path / (export_file_name + "_entries.md")
-       #log.info("writing md: " + file_name.as_posix() )
-       file_name.write_bytes(e_converter.get_md_text().encode("utf-8", "ingnore"))
-
-       file_name = export_path / (export_file_name + "_entries.rss")
-       #log.info("writing rss: " + file_name.as_posix() )
-       text = e_converter.get_rss_text()
-       text = self.encapsulate_rss(text)
-       file_name.write_bytes(text.encode("utf-8", "ingnore"))
-       """
-
        from .converters import ModelCollectionConverter, JsonConverter, MarkDownConverter, RssConverter
 
        cc = ModelCollectionConverter(self._entries)
@@ -80,9 +59,17 @@ class BookmarksExporter(object):
        rss_text = rss_conv.export()
 
        file_name = export_path / (export_file_name + "_entries.rss")
-       file_name.write_text(rss_text)
+       file_name.write_text(self.use_rss_wrapper(rss_text))
 
-    def get_rss_template(self, text, language = "en-US"):
+    def use_rss_wrapper(self, text, language = "en-US", link = "https://renegat0x0.ddns.net"):
+        template = self.get_rss_template()
+
+        map_data = {'channel_title' : "RSS archive", 'channel_description': "Link archive",
+                    'channel_language' : language, 'channel_link' : link,
+                    'channel_feed_url': link, 'channel_text' : text}
+        return self.use_template(template, map_data)
+
+    def get_rss_template(self):
        text = """
 <?xml version="1.0" encoding="UTF-8" ?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/"
 	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
@@ -94,15 +81,25 @@ class BookmarksExporter(object):
 	
 xmlns:georss="http://www.georss.org/georss" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#">
 <channel>
-  <title>RSS history</title>
-  <atom:link href="https://renegat0x0.ddns.net/feed" rel="self" type="application/rss+xml" />
-  <link>https://renegat0x0.ddns.net/</link>
-  <description>RSS archive</description>
-  <language>$language</language>
-$text
+  <title>$channel_title</title>
+  <atom:link href="$channel_feed_url" rel="self" type="application/rss+xml" />
+  <link>$channel_link/</link>
+  <description>$channel_description</description>
+  <language>$channel_language</language>
+$channel_text
 </channel></rss>
 """
        return text
+
+    def use_template(self, template_text, map_data):
+        from string import Template
+        try:
+            t = Template(template_text)
+            return t.safe_substitute(map_data)
+        except Exception as e:
+            error_text = traceback.format_exc()
+            PersistentInfo.error("Template exception {0} {1} {2} {3}".format(template_text, str(map_data), str(e), error_text))
+        return ""
 
 
 class BookmarksBigExporter(object):

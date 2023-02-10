@@ -17,7 +17,7 @@ class SourceEntriesDataWriter(object):
         clean_url = self._cfg.get_url_clean_name(self.source_url)
 
         ex = EntriesExporter(self._cfg, entries)
-        ex.export_entries(self.source_url, clean_url, self._cfg.get_export_path_daily(day_iso))
+        ex.export_entries(self.source_url, clean_url, self._cfg.get_daily_data_path(day_iso))
 
 
 class SourcesEntriesDataWriter(object):
@@ -51,7 +51,7 @@ class DataWriter(object):
     def __init__(self, config):
         self._cfg = config
 
-    def write_dayily_data(self, day_iso):
+    def write_daily_data(self, day_iso):
         writer = SourcesEntriesDataWriter(self._cfg)
         writer.write_for_day(day_iso)
 
@@ -75,11 +75,14 @@ class DataWriter(object):
         converter.set_export_columns(['url', 'title', 'category', 'subcategory', 'dead', 'export_to_cms', 'remove_after_days', 'language', 'favicon', 'on_hold'])
         text = converter.export()
 
-        file_name = self._cfg.get_sources_json_path()
+        file_name = self._cfg.get_bookmarks_path() / self._cfg.get_sources_file_name()
+        file_name.write_text(text)
+
+        file_name = self._cfg.get_daily_data_path() / self._cfg.get_sources_file_name()
         file_name.write_text(text)
 
     def clear_daily_data(self, day_iso):
         import shutil
-        daily_path = self._cfg.get_export_path_daily(day_iso)
+        daily_path = self._cfg.get_daily_data_path(day_iso)
         shutil.rmtree(daily_path)
 

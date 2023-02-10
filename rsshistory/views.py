@@ -397,31 +397,13 @@ def export_sources(request):
     context['page_title'] += " - export data"
     summary_text = ""
 
-    sources = RssSourceDataModel.objects.all()
+    c = Configuration.get_object(str(app_name))
 
-    cc = ModelCollectionConverter(sources)
-    items = cc.get_map()
-
-    converter = CsvConverter(items)
-    converter.set_export_columns(['url', 'title', 'category', 'subcategory', 'dead', 'export_to_cms', 'remove_after_days', 'language', 'favicon', 'on_hold'])
-    text = converter.export()
+    from .datawriter import DataWriter
+    writer = DataWriter(c)
+    writer.write_sources()
 
     context["summary_text"] = converter.export()
-
-    return render(request, app_name / 'summary_present.html', context)
-
-
-def export_entries(request):
-    context = get_context(request)
-    context['page_title'] += " - export data"
-    summary_text = ""
-
-    entries = RssSourceEntryDataModel.objects.filter(persistent = True)
-
-    c = configuration.get_object(str(app_name))
-    c.export_entries(entries, 'persistent')
-
-    context["summary_text"] = "Exported entries"
 
     return render(request, app_name / 'summary_present.html', context)
 
@@ -492,6 +474,24 @@ def system_status(request):
     context['export_history_list'] = history
 
     return render(request, app_name / 'system_status.html', context)
+
+
+def write_bookmarks(request):
+    context = get_context(request)
+    context['page_title'] += " - Writer bookmarks"
+
+    if not request.user.is_staff:
+        return render(request, app_name / 'missing_rights.html', context)
+
+    from .datawriter import DataWriter
+    
+    c = Configuration.get_object(str(app_name))
+    writer = DataWriter(c)
+    writer.write_bookmarks()
+
+    context["summary_text"] = "Wrote OK"
+
+    return render(request, app_name / 'summary_present.html', context)
 
 
 def make_persistent_entry(request, pk):
@@ -841,7 +841,6 @@ def truncate_errors(request):
     return render(request, app_name / 'summary_present.html', context)
 
 
-
 def show_errors_page(request):
     def fix_source_entry_links():
         print("fix_source_entry_links")
@@ -897,6 +896,17 @@ def show_errors_page(request):
         if entries_no_object.exists():
             return entries_no_object
 
+    def afera_fozz():
+        from django.db.models import Q
+        criterion1 = Q(title__contains="FOZZ")
+        entries_afera = RssSourceEntryDataModel.objects.filter(criterion1)
+        text = "Number of entries: {0}, first language {1}".format(len(entries_afera), entries_afera[0].language)
+
+        for entry in entries_afera:
+            text += "<br> {0} {1}\n".format(entry.title, entry.language)
+
+        return text
+
     context = get_context(request)
     context['page_title'] += " - data errors"
 
@@ -916,7 +926,7 @@ def show_errors_page(request):
 
     # show bookmarked links without tags
 
-    context["summary_text"] = summary_text
+    context["summary_text"] = afera_fozz()
 
     return render(request, app_name / 'show_link_errors.html', context)
 
