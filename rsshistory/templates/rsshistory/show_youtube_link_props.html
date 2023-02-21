@@ -1,0 +1,20 @@
+{% extends base_generic %}
+
+{% block content %}
+
+<h2>YouTube Link properties</h2>
+
+{% for props in youtube_props %}    
+  {{ props.0 }} {{ props.1}} </br>
+  <hr/>
+{% endfor %}
+
+<h2>Return dislike properties</h2>
+
+{% for props in return_dislike_props %}    
+  {{ props.0 }} {{ props.1}} </br>
+  <hr/>
+{% endfor %}
+
+
+{% endblock %}
