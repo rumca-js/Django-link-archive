@@ -75,6 +75,9 @@ class DataWriter(object):
         converter.set_export_columns(['url', 'title', 'category', 'subcategory', 'dead', 'export_to_cms', 'remove_after_days', 'language', 'favicon', 'on_hold'])
         text = converter.export()
 
+        self._cfg.get_bookmarks_path().mkdir(parents=True, exist_ok = True)
+        self._cfg.get_daily_data_path().mkdir(parents=True, exist_ok = True)
+
         file_name = self._cfg.get_bookmarks_path() / self._cfg.get_sources_file_name()
         file_name.write_text(text)
 

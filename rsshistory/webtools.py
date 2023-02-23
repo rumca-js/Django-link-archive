@@ -43,8 +43,9 @@ class Page(object):
             return self.try_decode(thebytes)
 
         except Exception as e:
+           error_text = traceback.format_exc()
            from .models import PersistentInfo
-           PersistentInfo.error("Page: Error while reading page {0}".format(str(e)))
+           PersistentInfo.error("Page: Error while reading page {0} {1}".format(str(e), error_text))
 
     def get_language(self):
         if not self.contents:

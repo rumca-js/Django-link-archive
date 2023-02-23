@@ -29,10 +29,11 @@
 
             <div class="linklistitem">
                <img src="{{link.get_favicon}}" width="20"/>
+
                {% if link.dead %}
-                  <span class="linklistitemtitle">Hidden link</span>
+                  <span class="linklistitemtitle">Hidden link
                {% else %}
-                  <span class="linklistitemtitle">{{link.title}}</span> {{link.date_published}}  {{link.get_source_name}}
+                  <span class="linklistitemtitle">{{link.title}} {{link.date_published}}  {{link.get_source_name}}
                {% endif %}
 
                {% if link.get_tag_string %}
@@ -41,7 +42,7 @@
                {% if link.user %}
                   , User: {{link.user}}
                {% endif %}
-
+               </span>
             </div>
           </a>
 

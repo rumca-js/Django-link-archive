@@ -2,6 +2,7 @@ from django.db import models
 from django.urls import reverse
 from datetime import datetime
 import logging
+from pytz import timezone
 
 
 
@@ -254,6 +255,16 @@ class RssSourceEntryDataModel(models.Model):
 
         return themap
 
+    def get_handler_text(self):
+        if self.has_handler():
+            from .linkhandlers.youtubelinkhandler import YouTubeLinkHandler
+            handler = YouTubeLinkHandler(self.link)
+            return handler.get_frame()
+
+    def has_handler(self):
+        if self.link.find("youtube") >= 0:
+            return True
+
 
 class RssEntryTagsDataModel(models.Model):
     # https://stackoverflow.com/questions/14066531/django-model-with-unique-combination-of-two-fields
@@ -325,8 +336,6 @@ class ConfigurationEntry(models.Model):
         else:
             return False
 
-
-from pytz import timezone
 
 class PersistentInfo(models.Model):
     info = models.CharField(default = "", max_length=2000)

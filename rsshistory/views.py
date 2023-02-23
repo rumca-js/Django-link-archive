@@ -140,6 +140,11 @@ class RssEntryDetailView(generic.DetailView):
         context['page_title'] += " - " + self.object.title
         context['tag_string'] = self.object.get_tag_string()
 
+        from .sources.waybackmachine import WaybackMachine
+        from .dateutils import DateUtils
+        m = WaybackMachine()
+        context['archive_org_date'] = m.get_formatted_date(DateUtils.get_date_today())
+
         return context
 
 
@@ -250,7 +255,7 @@ def refresh_source(request, pk):
         print("not saving")
 
     c = Configuration.get_object(str(app_name))
-    c.download_rss(ob, True)
+    c.thread_mgr.download_rss(ob, True)
 
     context['summary_text'] = "Source added to refresh queue"
 
@@ -582,7 +587,7 @@ def add_entry(request):
                 context['entry'] = ob[0]
 
             c = Configuration.get_object(str(app_name))
-            c.wayback_save(link)
+            c.thread_mgr.wayback_save(link)
 
             return render(request, app_name / 'entry_added.html', context)
 
@@ -1224,3 +1229,58 @@ def entry_comment_remove(request, pk):
     return render(request, app_name / 'summary_present.html', context)
 
 
+def show_youtube_link_props(request):
+    context = get_context(request)
+    context['page_title'] += " - show youtube link properties"
+
+    from .forms import YouTubeLinkSimpleForm
+
+    youtube_link = "https:"
+    if not request.method == 'POST':
+        form = YouTubeLinkSimpleForm(initial={'youtube_link' : youtube_link})
+        form.method = "POST"
+        form.action_url = reverse('rsshistory:show-youtube-link-props')
+        context['form'] = form
+
+        return render(request, app_name / 'form_basic.html', context)
+
+    else:
+        form = YouTubeLinkSimpleForm(request.POST)
+        if not form.is_valid():
+
+            context["summary_text"] = "Form is invalid"
+
+            return render(request, app_name / 'summary_present.html', context)
+        else:
+            from .linkhandlers.youtubelinkhandler import YouTubeLinkHandler
+
+            youtube_link = form.cleaned_data['youtube_link']
+
+            handler = YouTubeLinkHandler(youtube_link)
+            handler.download_details()
+
+            yt_json = handler.yt_ob.get_json()
+            rd_json = handler.rd_ob.get_json()
+
+            yt_props = str(yt_json)
+            rd_props = str(rd_json)
+
+            yt_props = [('webpage_url', yt_json['webpage_url'])]
+            yt_props.append( ('title', yt_json['title']) )
+            yt_props.append( ('uploader_url', yt_json['uploader_url']) )
+            yt_props.append( ('channel_url', yt_json['channel_url']) )
+
+            for yt_prop in yt_json:
+                yt_props.append( (yt_prop, str(yt_json[yt_prop])) )
+
+            rd_props = []
+            for rd_prop in rd_json:
+                rd_props.append( (rd_prop, str(rd_json[rd_prop])) )
+
+            context["youtube_props"] = yt_props
+            context["return_dislike_props"] = rd_props
+
+            context["yt_props"] = yt_props
+            context["rd_props"] = rd_props
+
+            return render(request, app_name / 'show_youtube_link_props.html', context)

@@ -10,7 +10,9 @@
 
   {% if user.is_staff %}
     <a href="{% url 'rsshistory:entry-edit' object.id %}" class="simplebutton">Edit entry</a>
+    {% if object.persistent %}
     <a href="{% url 'rsshistory:entry-tag' object.id %}" class="simplebutton">Tag entry</a>
+    {% endif %}
     <a href="{% url 'rsshistory:entry-hide' object.id %}" class="simplebutton">Hide entry</a>
     <a href="{% url 'rsshistory:entry-remove' object.id %}" class="simplebutton">Remove entry</a>
              {% if source.persistent %}
@@ -23,6 +25,10 @@
               </a>
              {% endif %}
   {% endif %}
+  </p>
+
+  <p>
+    <a href="https://web.archive.org/web/{{archive_org_date}}000000*/{{object.link}}" class="simplebutton">View on archive.org</a>
   </p>
 
   <p>
@@ -63,5 +69,12 @@
     <a href="{% url 'rsshistory:entry-comment-add' object.id %}" class="simplebutton">Add comment</a>
   {% endif %}
   </p>
+
+  {% if object.has_handler %}
+    <div class="youtube_player_container">
+    {{object.get_handler_text | safe}}
+    </div>
+  {% endif %}
+
 
 {% endblock %}

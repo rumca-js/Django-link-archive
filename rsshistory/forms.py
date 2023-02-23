@@ -495,3 +495,10 @@ class CommentEntryForm(forms.ModelForm):
                 date_published = date_published,
                 link_obj = entry)
         o.save()
+
+
+class YouTubeLinkSimpleForm(forms.Form):
+    """
+    Import links form
+    """
+    youtube_link = forms.CharField(label='YouTube Link URL', max_length = 500)

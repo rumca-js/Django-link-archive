@@ -27,6 +27,9 @@ class WaybackMachine(object):
             self.oldest = oldest.datetime_timestamp
             self.newest = newest.datetime_timestamp
 
+    def get_formatted_date(self, time):
+        return time.strftime("%Y%m%d")
+
     def get_archive_url(self, url, time):
         # self.capture_limits(url)
 
@@ -50,7 +53,7 @@ class WaybackMachine(object):
         #print(handle.mimetype)
 
         archive_timestamp = str(handle.timestamp)
-        time_text = time.strftime("%Y%m%d")
+        time_text = self.get_formatted_date(time)
 
         if not archive_timestamp.startswith(time_text):
             print(archive_timestamp)

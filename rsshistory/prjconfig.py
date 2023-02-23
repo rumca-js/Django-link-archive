@@ -6,13 +6,12 @@ from pytz import timezone
 
 from .gitrepo import *
 
-from .threads import *
 from .basictypes import *
 from .dateutils import DateUtils
 from .models import PersistentInfo, RssSourceImportHistory
 
 
-__version__ = "0.5.0"
+__version__ = "0.5.2"
 
 
 class Configuration(object):
@@ -100,7 +99,7 @@ class Configuration(object):
 
    def get_daily_data_path(self, day_iso = None):
        if day_iso == None:
-           from ..dateutils import DateUtils
+           from .dateutils import DateUtils
            day_iso = DateUtils.get_date_today().isoformat()
 
        day_path = Path(day_iso)
@@ -108,42 +107,14 @@ class Configuration(object):
        return entries_dir
 
    def create_threads(self):
-       download_rss = ThreadJobCommon("process-source")
-       refresh_thread = ThreadJobCommon("refresh-thread", 3600, True) #3600 is 1 hour
-       wayback = ThreadJobCommon("wayback")
        from .threadhandlers import HandlerManager
-
-       thread_mgr = HandlerManager(self)
-
-       self.threads = [
-               download_rss,
-               refresh_thread,
-               wayback
-               ]
-
-       for athread in self.threads:
-           athread.set_config(thread_mgr)
-           athread.start()
+       self.thread_mgr = HandlerManager(self)
 
    def get_threads(self):
-       return self.threads
+       return self.thread_mgr.threads
 
    def close(self):
-       for athread in self.threads:
-           athread.close()
-
-   def download_rss(self, item, force = False):
-       if force == False:
-           if item.is_fetch_possible() == False:
-               return False
-
-       self.threads[0].add_to_process_list(item)
-       return True
-
-   def wayback_save(self, url):
-       PersistentInfo.create("Wayback save on URL:{0}".format(url))
-       self.threads[2].add_to_process_list(url)
-       return True
+       self.thread_mgr.close()
 
    def get_url_clean_name(self, file_name):
        file_name = file_name.replace(":", ".")\

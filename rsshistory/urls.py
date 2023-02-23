@@ -49,6 +49,7 @@ urlpatterns = [
    path('truncate-errors', views.truncate_errors, name='truncate-errors'),
    path('data-errors', views.show_errors_page, name='data-errors'),
    path('show-tags', views.show_tags, name='show-tags'),
+   path('show-yt-props', views.show_youtube_link_props, name='show-youtube-link-props'),
    path('write-bookmarks', views.write_bookmarks, name='write-bookmarks'),
 
    # login

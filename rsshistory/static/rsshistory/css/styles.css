@@ -11,24 +11,42 @@
 
 .mainbutton {
   color : #373737;
-  padding: 5px 12px;
+  padding: 3px 12px;
   text-decoration: none;
-  border-bottom: 1px solid blue;
   display: inline-block;
+  /* border-bottom: 1px solid blue; */
+  background-color: #e9e9e9;
+  border-radius: 10px;
+  margin: 1px;
 }
 .mainbutton:hover {
-  background-color: #f7f7f7;
+  background-color: #e0e0e0;
   color: blue;
 }
 
 /* Content */
 
-input {display: block;} 
+input {
+box-shadow: none;
+  display: block;
+  color: black;
+  /* padding: 3px 15px; */
+  text-align: left;
+  text-decoration: none;
+  /* text-decoration: underline; */
+  /* border: 1px solid #373737; */
+  /* border-bottom: 1px solid blue; */
+  background-color: #e9e9e9;
+  border-radius: 10px;
+}
 select {display: block;} 
 textarea {display: block;}
 
+.simplebuttoninline {
+display: contents;
+}
+
 .simplebutton {
-  /* background-color: #000000; */
   color: black;
   padding: 3px 15px;
   text-align: center;
@@ -36,11 +54,13 @@ textarea {display: block;}
   /* text-decoration: underline; */
   display: inline-block;
   /* border: 1px solid #373737; */
-  border-bottom: 1px solid blue;
+  /* border-bottom: 1px solid blue; */
+  background-color: #e9e9e9;
+  border-radius: 10px;
 }
 
 .simplebutton:hover {
-  background-color: #f7f7f7;
+  background-color: #e0e0e0;
   color: blue;
 }
 
@@ -88,13 +108,13 @@ textarea {display: block;}
 
 /* video box, youtube player */
 
-.container {
+.youtube_player_container {
   position: relative;
   width: 80%;
   padding-bottom: 46.25%;
   /* background-color: yellow; */
 }
-.video {
+.youtube_player_frame {
   position: absolute;
   top: 0;
   left: 0;
