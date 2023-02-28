@@ -1,0 +1,22 @@
+{% extends base_generic %}
+
+{% block content %}
+
+<h2>Link incorrect youtube</h2>
+
+{% for link in links_incorrect_youtube %}
+   <div>
+       <a href="{{link.get_absolute_url}}">{{link.title}} {{link.language}}</a> {{link.link}} {{link.source}}
+    </div>
+{% endfor %}
+
+<h2>Link incorrect language</h2>
+
+{% for link in links_incorrect_language %}
+   <div>
+    <a href="{{link.get_absolute_url}}">{{link.title}} {{link.language}}</a>
+    <!--a href="{{link.link}}">{{link.title}} {{link.language}}</a-->
+    </div>
+{% endfor %}
+
+{% endblock %}
