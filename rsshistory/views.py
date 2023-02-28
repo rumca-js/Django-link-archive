@@ -1,5 +1,6 @@
 from pathlib import Path
 from datetime import datetime, date, timedelta
+import traceback
 
 from django.shortcuts import render
 from django.views import generic
@@ -138,7 +139,6 @@ class RssEntryDetailView(generic.DetailView):
             self.object.update_language()
 
         context['page_title'] += " - " + self.object.title
-        context['tag_string'] = self.object.get_tag_string()
 
         from .sources.waybackmachine import WaybackMachine
         from .dateutils import DateUtils
@@ -517,7 +517,7 @@ def make_persistent_entry(request, pk):
 
     if prev_state != True:
        c = Configuration.get_object(str(app_name))
-       c.wayback_save(entry.link)
+       c.thread_mgr.wayback_save(entry.link)
 
     summary_text = "Link changed to state: " + str(entry.persistent)
 
@@ -846,7 +846,7 @@ def truncate_errors(request):
     return render(request, app_name / 'summary_present.html', context)
 
 
-def show_errors_page(request):
+def data_errors_page(request):
     def fix_source_entry_links():
         print("fix_source_entry_links")
 
@@ -888,29 +888,53 @@ def show_errors_page(request):
             c.push_bookmarks_repo(conf)
             print("Git ready")
 
-    def show_entries_incorrect_language():
-        print("fix_source_entry_links")
+    def incorrect_language():
         from django.db.models import Q
         criterion1 = Q(language__contains="pl")
         criterion2 = Q(language__contains="en")
         criterion3 = Q(language__isnull = True)
 
         entries_no_object = RssSourceEntryDataModel.objects.filter(~criterion1 & ~criterion2 & ~criterion3, persistent = True)
-        print("fix_source_entry_links done")
 
         if entries_no_object.exists():
             return entries_no_object
 
-    def afera_fozz():
+    def incorrect_youtube():
         from django.db.models import Q
-        criterion1 = Q(title__contains="FOZZ")
-        entries_afera = RssSourceEntryDataModel.objects.filter(criterion1)
-        text = "Number of entries: {0}, first language {1}".format(len(entries_afera), entries_afera[0].language)
+        criterion1 = Q(link__contains="m.youtube")
 
-        for entry in entries_afera:
-            text += "<br> {0} {1}\n".format(entry.title, entry.language)
+        # only fix those that have youtube in source. leave other RSS sources
+        criterion2 = Q(link__contains="https://www.youtube.com")
+        criterion3 = Q(source__contains="youtube")
+        criterion4 = Q(source__contains="https://www.youtube.com/feeds")
 
-        return text
+        criterion5 = Q(source__isnull = True)
+
+        entries_no_object = RssSourceEntryDataModel.objects.filter(criterion1)
+        entries_no_object |= RssSourceEntryDataModel.objects.filter(criterion2 & criterion3 & ~criterion4)
+        entries_no_object |= RssSourceEntryDataModel.objects.filter(criterion2 & criterion5)
+
+        if entries_no_object.exists():
+            return entries_no_object
+
+    def fix_incorrect_youtube(entries):
+        from .linkhandlers.youtubelinkhandler import YouTubeLinkHandler
+
+        for entry in entries:
+            print("Fixing: {} {} {}".format(entry.link, entry.title, entry.source))
+            h = YouTubeLinkHandler(entry.link)
+            h.download_details()
+
+            chan_url = h.get_channel_feed_url()
+            link_valid = h.get_link_url()
+            if chan_url:
+                entry.source = chan_url
+                entry.link = link_valid
+                entry.save()
+                print("Fixed: {} {} {}".format(entry.link, entry.title, chan_url))
+            else:
+                print("Not fixed: {}".format(entry.link, entry.title))
+
 
     context = get_context(request)
     context['page_title'] += " - data errors"
@@ -922,8 +946,15 @@ def show_errors_page(request):
     #fix_tags_links()
     # push_main_repo()
 
+    incorrect_youtube_entries = incorrect_youtube()
+    #fix_incorrect_youtube(incorrect_youtube_entries)
+
     summary_text = "Done"
-    context['links_with_errors'] = show_entries_incorrect_language()
+    try:
+        context['links_incorrect_language'] = incorrect_language()
+        context['links_incorrect_youtube'] = incorrect_youtube_entries
+    except Exception as e:
+        traceback.print_exc(file=sys.stdout)
 
     # find links without source
 
@@ -931,9 +962,7 @@ def show_errors_page(request):
 
     # show bookmarked links without tags
 
-    context["summary_text"] = afera_fozz()
-
-    return render(request, app_name / 'show_link_errors.html', context)
+    return render(request, app_name / 'data_errors.html', context)
 
 
 def show_tags(request):
@@ -970,7 +999,7 @@ def show_tags(request):
     for tag in result_list:
         link = reverse('rsshistory:entries') + "?tag="+tag[0]
         link_text = str(tag[0]) + " " + str(tag[1])
-        text += "<div><a href=\"{0}\">{1}</a></div>".format(link, link_text)
+        text += "<div><a href=\"{0}\" class=\"simplebutton\">{1}</a></div>".format(link, link_text)
 
     context["summary_text"] = text
 
@@ -1265,10 +1294,14 @@ def show_youtube_link_props(request):
             yt_props = str(yt_json)
             rd_props = str(rd_json)
 
+            feed_url = handler.yt_ob.get_channel_feed_url()
+
             yt_props = [('webpage_url', yt_json['webpage_url'])]
             yt_props.append( ('title', yt_json['title']) )
             yt_props.append( ('uploader_url', yt_json['uploader_url']) )
             yt_props.append( ('channel_url', yt_json['channel_url']) )
+            yt_props.append( ('channel_feed_url', feed_url) )
+            yt_props.append( ('channel_id', yt_json['channel_id']) )
 
             for yt_prop in yt_json:
                 yt_props.append( (yt_prop, str(yt_json[yt_prop])) )

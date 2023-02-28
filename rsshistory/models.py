@@ -264,6 +264,15 @@ class RssSourceEntryDataModel(models.Model):
     def has_handler(self):
         if self.link.find("youtube") >= 0:
             return True
+ 
+    def get_archive_link(self):
+        from .sources.waybackmachine import WaybackMachine
+        from .dateutils import DateUtils
+        m = WaybackMachine()
+        formatted_date = m.get_formatted_date(DateUtils.get_date_today())
+
+        archive_link = "https://web.archive.org/web/{}000000*/{}".format(formatted_date, self.link)
+        return archive_link
 
 
 class RssEntryTagsDataModel(models.Model):
@@ -381,3 +390,20 @@ class PersistentInfo(models.Model):
 
     def truncate():
         PersistentInfo.objects.all().delete()
+
+
+## YouTube meta cache
+class YouTubeMetaCache(models.Model):
+
+    url = models.CharField(max_length=1000, help_text='url', unique=False)
+    details_json = models.CharField(max_length=1000, help_text='details_json')
+    dead = models.BooleanField(default = False, help_text='dead')
+
+    link_yt_obj = models.ForeignKey(RssSourceEntryDataModel, on_delete=models.SET_NULL, related_name='link_yt', null=True, blank=True)
+
+class YouTubeReturnDislikeMetaCache(models.Model):
+    url = models.CharField(max_length=1000, help_text='url', unique=False)
+    return_dislike_json = models.CharField(max_length=1000, help_text='return_dislike_json')
+    dead = models.BooleanField(default = False, help_text='dead')
+
+    link_rd_obj = models.ForeignKey(RssSourceEntryDataModel, on_delete=models.SET_NULL, related_name='link_rd', null=True, blank=True)

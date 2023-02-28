@@ -11,11 +11,11 @@ from .dateutils import DateUtils
 from .models import PersistentInfo, RssSourceImportHistory
 
 
-__version__ = "0.5.2"
+__version__ = "0.5.3"
 
 
 class Configuration(object):
-   obj = None
+   obj = {}
 
    def __init__(self, app_name):
        self.app_name = str(app_name)
@@ -25,16 +25,16 @@ class Configuration(object):
        self.server_log_file = self.directory / "log_{0}.txt".format(app_name)
 
        self.enable_logging()
-       self.create_threads()
 
        print("Creating configuration item")
 
    def get_object(app_name):
        app_name = str(app_name)
-       if not Configuration.obj:
-           Configuration.obj = {app_name : Configuration(app_name)}
+
        if app_name not in Configuration.obj:
-           Configuration.obj[app_name] = Configuration(app_name)
+           c = Configuration(app_name)
+           c.create_threads()
+           Configuration.obj[app_name] = c
 
        return Configuration.obj[app_name]
 

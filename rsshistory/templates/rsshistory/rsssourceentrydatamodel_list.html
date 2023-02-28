@@ -46,10 +46,10 @@
             </div>
           </a>
 
-          {% if user.is_staff %}
           <a href="{{ link.get_absolute_url }}" class="simplebutton">
              Details
           </a>
+          {% if user.is_staff %}
              {% if link.persistent %}
               <a href="{% url 'rsshistory:entry-notstar' link.id %}" class="simplebutton">
                Not bookmarked
@@ -69,7 +69,9 @@
           </a -->
              <!--a href="{% url 'rsshistory:entry-remove' link.id %}" class="simplebutton">Remove entry</a-->
           {% else %}
-          <hr>
+              <a href="{{ link.get_archive_link }}" class="simplebutton">
+                 view on Archive.org
+              </a>
           {% endif %}
       </li>
     {% endfor %}

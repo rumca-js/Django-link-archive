@@ -77,6 +77,15 @@ class WaybackSaveHandler(object):
         wb.save(item)
 
 
+class YouTubeDetailsHandler(object):
+    def __init__(self, thread_parent):
+        self._cfg = thread_parent._cfg
+        self.thread_parent = thread_parent
+
+    def process(self, item):
+        pass
+
+
 class HandlerManager(object):
 
    def __init__(self, config):
@@ -96,6 +105,9 @@ class HandlerManager(object):
      elif thread == "wayback":
          handler = WaybackSaveHandler(self)
          handler.process(item)
+     elif thread == "youtube-details":
+         handler = YouTubeDetailsHandler(self)
+         handler.process(item)
      else:
         log = logging.getLogger(self._cfg.app_name)
         PersistentInfo.error("Not implemented processing thread {0}".format(thread))
@@ -106,11 +118,13 @@ class HandlerManager(object):
        download_rss = ThreadJobCommon("process-source")
        refresh_thread = ThreadJobCommon("refresh-thread", 3600, True) #3600 is 1 hour
        wayback = ThreadJobCommon("wayback")
+       yt_details = ThreadJobCommon("youtube-details")
 
        self.threads = [
                download_rss,
                refresh_thread,
-               wayback
+               wayback,
+               yt_details
                ]
 
        for athread in self.threads:
@@ -132,4 +146,10 @@ class HandlerManager(object):
    def wayback_save(self, url):
        PersistentInfo.create("Wayback save on URL:{0}".format(url))
        self.threads[2].add_to_process_list(url)
+       return True
+
+
+   def youtube_details(self, url):
+       PersistentInfo.create("Download YouTube details:{0}".format(url))
+       self.threads[3].add_to_process_list(url)
        return True

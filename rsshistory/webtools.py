@@ -3,6 +3,7 @@ import re
 import urllib.request, urllib.error, urllib.parse
 from urllib.parse import urlparse
 import html
+import traceback
 
 
 class Page(object):

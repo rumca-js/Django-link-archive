@@ -7,6 +7,7 @@ class YouTubeLinkHandler(object):
         self.yt_ob = None
         self.rd_text = None
         self.rd_ob = None
+        self.get_details()
 
     def get_video_code(self):
         return YouTubeLinkHandler.input2code(self.url)
@@ -64,6 +65,18 @@ class YouTubeLinkHandler(object):
         if self.rd_ob:
             return self.rd_ob.get_thumbs_down()
 
+    def get_channel_code(self):
+        if self.yt_ob:
+            return self.yt_ob.get_channel_code()
+
+    def get_channel_feed_url(self):
+        if self.yt_ob:
+            return self.yt_ob.get_channel_feed_url()
+
+    def get_link_url(self):
+        if self.yt_ob:
+            return self.yt_ob.get_link_url()
+
     def load_details(self):
         from ..serializers.youtubelinkjson import YouTubeJson
         self.yt_ob = YouTubeJson()
@@ -106,3 +119,39 @@ class YouTubeLinkHandler(object):
       if self.rd_text is None:
           return False
       return True
+
+    def get_cached_details(self):
+        from ..models import YouTubeMetaCache, YouTubeReturnDislikeMetaCache
+
+        # TODO use .get
+        d = YouTubeMetaCache.objects.filter(url=self.url)
+        r = YouTubeReturnDislikeMetaCache.objects.filter(url=self.url)
+
+        if not d.exists() or not r.exists():
+            pass
+        else:
+            if not d[0].dead:
+                self.yt_text = d[0].details_json
+            if not r[0].dead:
+                self.rd_text = r[0].return_dislike_json
+
+            if not self.load_details():
+                logging.error("Could not read json for {0}".format(self.url))
+
+    def has_cached_details(self):
+        from ..models import YouTubeMetaCache, YouTubeReturnDislikeMetaCache
+
+        d = YouTubeMetaCache.objects.filter(url=self.url)
+        r = YouTubeReturnDislikeMetaCache.objects.filter(url=self.url)
+
+        if not d.exists() or not r.exists():
+            return False
+
+        return True
+
+    def get_details(self):
+        if self.has_cached_details():
+            return self.get_cached_details()
+        else:
+            # TODO add details to download
+            pass

@@ -114,6 +114,10 @@ class YouTubeJson(object):
         if len(self._json) > 0:
             return self._json["channel_url"]
 
+    def get_channel_feed_url(self):
+        if len(self._json) > 0:
+            return "https://www.youtube.com/feeds/videos.xml?channel_id={}".format(self.get_channel_code())
+
     def get_view_count(self):
         if len(self._json) > 0:
             #return str(self._json["view_count"])
@@ -135,6 +139,10 @@ class YouTubeJson(object):
     def get_upload_date(self):
         if len(self._json) > 0:
             return self._json["upload_date"]
+
+    def get_link_url(self):
+        if len(self._json) > 0:
+            return "https://www.youtube.com/watch?v={}".format(self._json["id"])
 
     def add_return_dislike_data(self, rdd):
         self._json["t_likes"] = rdd.get_likes()

@@ -17,14 +17,16 @@ class YTDLP(ytdownloader.YouTubeDownloader):
 
     def download_audio(self, file_name):
         ext = Path(file_name).suffix[1:]
-        yt_file_name = self.get_audio_file_name()
 
         # https://askubuntu.com/questions/630134/how-to-specify-a-filename-while-extracting-audio-using-youtube-dl
 
         cmds = ['yt-dlp', '-o', file_name, "-x", "--audio-format", ext, '--prefer-ffmpeg', self._url]
         logging.info("Downloading: " + " ".join(cmds))
 
-        proc = subprocess.run(cmds, stdout=subprocess.PIPE)
+        proc = subprocess.run(cmds, capture_output=True)
+
+        if proc.returncode != 0:
+            return None
 
         out = self.get_output_ignore(proc)
 
@@ -32,12 +34,14 @@ class YTDLP(ytdownloader.YouTubeDownloader):
 
     def download_video(self, file_name):
         ext = self.get_video_ext()
-        yt_file_name = self.get_video_file_name()
 
         #cmds = ['yt-dlp', '-f','bestvideo[ext={0}]+bestaudio'.format(ext), self._url ]
         cmds = ['yt-dlp', '-o', file_name, self._url ]
         logging.info("Downloading: " + " ".join(cmds))
-        proc = subprocess.run(cmds, stdout=subprocess.PIPE)
+        proc = subprocess.run(cmds, capture_output=True)
+
+        if proc.returncode != 0:
+            return None
 
         out = self.get_output_ignore(proc)
 
@@ -45,9 +49,15 @@ class YTDLP(ytdownloader.YouTubeDownloader):
 
     def download_data(self, path = None):
         cmds = ['yt-dlp', '--dump-json', self._url ]
+
         logging.info("Downloading: " + " ".join(cmds) + str(path))
 
-        proc = subprocess.run(cmds, stdout=subprocess.PIPE)
+        proc = subprocess.run(cmds, capture_output=True)
+        if proc.returncode != 0:
+            return None
+
+        print("Process return code: ", proc.returncode)
+
         out = self.get_output_ignore(proc)
         self._json_data = out.strip()
 

@@ -3,33 +3,40 @@
 {% block content %}
   <h1>{{ object.title }}</h1>
 
-  <p>
-   {% if object.source_obj %}
-    <a href="{% url 'rsshistory:source-detail' object.source_obj.id %}" class="simplebutton">RSS Source</a>
-   {% endif %}
-
   {% if user.is_staff %}
+    <p>
     <a href="{% url 'rsshistory:entry-edit' object.id %}" class="simplebutton">Edit entry</a>
     {% if object.persistent %}
-    <a href="{% url 'rsshistory:entry-tag' object.id %}" class="simplebutton">Tag entry</a>
+        <a href="{% url 'rsshistory:entry-tag' object.id %}" class="simplebutton">Tag entry</a>
     {% endif %}
     <a href="{% url 'rsshistory:entry-hide' object.id %}" class="simplebutton">Hide entry</a>
-    <a href="{% url 'rsshistory:entry-remove' object.id %}" class="simplebutton">Remove entry</a>
-             {% if source.persistent %}
-              <a href="{% url 'rsshistory:entry-notstar' object.id %}" class="simplebutton">
-               Not bookmarked
-              </a>
-             {% else %}
-              <a href="{% url 'rsshistory:entry-star' object.id %}" class="simplebutton">
-               Bookmark
-              </a>
-             {% endif %}
+
+    {% if object.persistent %}
+       <a href="{% url 'rsshistory:entry-notstar' object.id %}" class="simplebutton">
+        Not bookmark
+       </a>
+    {% else %}
+       <a href="{% url 'rsshistory:entry-star' object.id %}" class="simplebutton">
+        Bookmark
+       </a>
+    {% endif %}
+    </p>
+
   {% endif %}
-  </p>
+
 
   <p>
-    <a href="https://web.archive.org/web/{{archive_org_date}}000000*/{{object.link}}" class="simplebutton">View on archive.org</a>
+      {% if object.source_obj %}
+       <a href="{% url 'rsshistory:source-detail' object.source_obj.id %}" class="simplebutton">RSS Source</a>
+      {% endif %}
+      <a href="{{object.get_archive_link}}" class="simplebutton">View on archive.org</a>
   </p>
+
+  {% if user.is_staff %}
+    <p>
+      <a href="{% url 'rsshistory:entry-remove' object.id %}" class="simplebutton">Remove entry</a>
+    </p>
+  {% endif %}
 
   <p>
       <div><strong>Source:</strong> <a href="{{ object.source }}">{{ object.source }}</a></div>
@@ -39,7 +46,11 @@
       <div><strong>User:</strong> {{ object.user }}</div>
       <div><strong>Persistent:</strong> {{ object.persistent }},
            <strong>Language:</strong> {{ object.language }},
-           <strong>Tags:</strong> {{ tag_string }}</div>
+           <strong>Tags:</strong>
+           {% for tag in object.get_tag_map %}
+               <a href="{% url 'rsshistory:entries'%}?tag={{tag}}" class="simplebutton">{{tag}}</a>
+           {% endfor %}
+      </div>
   </p>
 
   <p>

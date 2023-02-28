@@ -37,7 +37,7 @@ class GitUpdateManager(object):
 
            self.push_to_git(conf)
 
-           #self.wayback_save()
+           self.wayback_save()
            PersistentInfo.create("Data successfully pushed to git")
 
            new_history = RssSourceExportHistory(date = yesterday)
@@ -97,7 +97,7 @@ class GitUpdateManager(object):
 
        sources = RssSourceDataModel.objects.all()
        for source in sources:
-           self._cfg.wayback_save(source)
+           self._cfg.thread_mgr.wayback_save(source)
        
    def clear_old_entries(self):
        log = logging.getLogger(self._cfg.app_name)
