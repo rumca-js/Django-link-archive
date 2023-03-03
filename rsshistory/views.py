@@ -80,6 +80,10 @@ class RssSourceListView(generic.ListView):
         context['filter_form'] = self.filter_form
         context['page_title'] += " - news source list"
 
+        from django_user_agents.utils import get_user_agent
+        user_agent = get_user_agent(self.request)
+        context["is_mobile"] = user_agent.is_mobile
+
         return context
 
 
@@ -123,6 +127,10 @@ class RssEntriesListView(generic.ListView):
         context['page_title'] += " - entries"
         context['rss_are_fetched'] = queue_size > 0
         context['rss_queue_size'] = queue_size
+
+        from django_user_agents.utils import get_user_agent
+        user_agent = get_user_agent(self.request)
+        context["is_mobile"] = user_agent.is_mobile
 
         return context
 

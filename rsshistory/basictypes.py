@@ -3,10 +3,6 @@ These types represent commonly used elements: link, channel.
 """
 
 import os
-import time
-import logging
-import shutil
-import urllib.request, urllib.error, urllib.parse
 
 
 def get_ascii_text(text):

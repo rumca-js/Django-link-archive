@@ -41,20 +41,31 @@ class BasePlugin(Page):
         from ..dateutils import DateUtils
         output_map = {}
 
-        output_map['description'] = ""
+        #print("feed entry dict: {}".format(feed_entry.__dict__))
+        #print("Feed entry: {}".format(str(feed_entry)))
+
         if hasattr(feed_entry, "description"):
             output_map['description'] = feed_entry.description
+        else:
+            output_map['description'] = ""
 
-        published = ""
+        if hasattr(feed_entry, "media_thumbnail"):
+            output_map['thumbnail'] = feed_entry.media_thumbnail[0]['url']
+        else:
+            output_map['thumbnail'] = None
+
         if hasattr(feed_entry, "published"):
             output_map['published'] = DateUtils.get_iso_datetime(feed_entry.published)
         elif self.allow_adding_with_current_time:
             output_map['published'] = DateUtils.get_datetime_now_utc()
         elif self.default_entry_timestamp:
             output_map['published'] = self.default_entry_timestamp
+        else:
+            output_map['published'] = ""
 
         output_map['source'] = source.url
         output_map['title'] = feed_entry.title
         output_map['language'] = source.language
         output_map['link'] = feed_entry.link
+
         return output_map

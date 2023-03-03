@@ -21,7 +21,6 @@ class YTDLP(ytdownloader.YouTubeDownloader):
         # https://askubuntu.com/questions/630134/how-to-specify-a-filename-while-extracting-audio-using-youtube-dl
 
         cmds = ['yt-dlp', '-o', file_name, "-x", "--audio-format", ext, '--prefer-ffmpeg', self._url]
-        logging.info("Downloading: " + " ".join(cmds))
 
         proc = subprocess.run(cmds, capture_output=True)
 

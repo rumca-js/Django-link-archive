@@ -1,7 +1,7 @@
 {% extends base_generic %}
 
 {% block content %}
-  <h1>{{ object.title }}</h1>
+  <h1><a href="{{ object.link }}">{{ object.title }}</a></h1>
 
   {% if user.is_staff %}
     <p>
@@ -27,7 +27,14 @@
 
   <p>
       {% if object.source_obj %}
-       <a href="{% url 'rsshistory:source-detail' object.source_obj.id %}" class="simplebutton">RSS Source</a>
+       <a href="{% url 'rsshistory:source-detail' object.source_obj.id %}" class="simplebutton">Source: {{object.source_obj.title}}</a>
+      {% else %}
+          {% if object.thumbnail %}
+          <img src="{{object.thumbnail}}" width="20"/>
+          {% else %}
+          <img src="{{object.get_favicon}}" width="20"/>
+          {% endif %}
+       <strong>Source:</strong> <a href="{{ object.source }}">{{ object.source }}</a>
       {% endif %}
       <a href="{{object.get_archive_link}}" class="simplebutton">View on archive.org</a>
   </p>
@@ -39,18 +46,13 @@
   {% endif %}
 
   <p>
-      <div><strong>Source:</strong> <a href="{{ object.source }}">{{ object.source }}</a></div>
-      <div><strong>Link:</strong> <a href="{{ object.link }}">{{ object.link }}</a></div>
-      <div><strong>Title:</strong> {{ object.title }}</div>
       <div><strong>Publish date:</strong> {{ object.date_published }}</div>
       <div><strong>User:</strong> {{ object.user }}</div>
-      <div><strong>Persistent:</strong> {{ object.persistent }},
-           <strong>Language:</strong> {{ object.language }},
-           <strong>Tags:</strong>
-           {% for tag in object.get_tag_map %}
-               <a href="{% url 'rsshistory:entries'%}?tag={{tag}}" class="simplebutton">{{tag}}</a>
-           {% endfor %}
-      </div>
+       <strong>Language:</strong> {{ object.language }},
+       <strong>Tags:</strong>
+       {% for tag in object.get_tag_map %}
+           <a href="{% url 'rsshistory:entries'%}?tag={{tag}}" class="simplebutton">{{tag}}</a>
+       {% endfor %}
   </p>
 
   <p>
@@ -60,6 +62,7 @@
       <div style="clear:both"></div>
   </p>
 
+{% if object.persistent %}
   <hr/>
   <h2>Comments</h2>
   <p>
@@ -80,6 +83,7 @@
     <a href="{% url 'rsshistory:entry-comment-add' object.id %}" class="simplebutton">Add comment</a>
   {% endif %}
   </p>
+{% endif %}
 
   {% if object.has_handler %}
     <div class="youtube_player_container">

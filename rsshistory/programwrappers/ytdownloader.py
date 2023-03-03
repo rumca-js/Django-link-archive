@@ -35,7 +35,6 @@ class YouTubeDownloader(object):
 
     def download_audio(self, file_name):
         ext = Path(file_name).suffix[1:]
-        yt_file_name = self.get_audio_file_name()
 
         # https://askubuntu.com/questions/630134/how-to-specify-a-filename-while-extracting-audio-using-youtube-dl
 
@@ -49,7 +48,6 @@ class YouTubeDownloader(object):
 
     def download_video(self, file_name):
         ext = self.get_video_ext(Path(file_name))
-        yt_file_name = self.get_video_file_name()
 
         #cmds = ['youtube-dl','-o', file_name, '-f','bestvideo[ext={0}]+bestaudio'.format(ext), self._url ]
         cmds = ['youtube-dl','-o', file_name, self._url ]

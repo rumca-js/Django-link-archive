@@ -7,7 +7,11 @@
   <!-- Add additional CSS in static file -->
   {% load static %}
   <!--date is added to stylesheet name, to force it to be reloaded-->
+  {% if is_mobile %}
+  <link rel="stylesheet" href="{% static 'rsshistory/css/styles-mobile.css' %}?{% now "U" %}">
+  {% else %}
   <link rel="stylesheet" href="{% static 'rsshistory/css/styles.css' %}?{% now "U" %}">
+  {% endif %}
   <link rel="stylesheet" href="{% static 'rsshistory/css/bootstrap5.1.3.min.css' %}">
   <link rel="shortcut icon" type="image/png" href="{% static 'rsshistory/icons/rss.gif' %}"/>
 </head>

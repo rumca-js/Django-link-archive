@@ -42,6 +42,11 @@ box-shadow: none;
 select {display: block;} 
 textarea {display: block;}
 
+hr {
+    margin: 0px;
+    padding: 0px;
+}
+
 .simplebuttoninline {
 display: contents;
 }
@@ -72,15 +77,15 @@ display: contents;
 
 .longbutton {
   /* background-color: #000000; */
-  color: black;
   padding: 0px 15px;
   text-align: left;
+  color: black;
   text-decoration: none;
   margin-bottom:3px;
   /* border: 1px solid #373737; */
   /* display: block; */
   display: flex;
-  /* flex-wrap: wrap; */
+  flex-wrap: wrap;
 }
 
 .longbuttonselected {
@@ -93,11 +98,14 @@ display: contents;
 }
 
 .linklistthumbnail {
-    width: 10%;
+    flex: 100%;
 }
 .linklistitemtitle {
-    flex: 50%;
+    flex: 100%;
     font-weight: bold;
+  text-align: left;
+  color: black;
+  text-decoration: none;
 }
 .linklistitemdescription {
     flex: 50%;

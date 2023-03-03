@@ -1,5 +1,3 @@
-import logging
-import re
 import urllib.request, urllib.error, urllib.parse
 from urllib.parse import urlparse
 import html
@@ -7,7 +5,6 @@ import traceback
 
 
 class Page(object):
-
     user_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11'
 
     def __init__(self, url):
@@ -44,9 +41,9 @@ class Page(object):
             return self.try_decode(thebytes)
 
         except Exception as e:
-           error_text = traceback.format_exc()
-           from .models import PersistentInfo
-           PersistentInfo.error("Page: Error while reading page {0} {1}".format(str(e), error_text))
+            error_text = traceback.format_exc()
+            from .models import PersistentInfo
+            PersistentInfo.error("Page: Error while reading page {0} {1}".format(str(e), error_text))
 
     def get_language(self):
         if not self.contents:
@@ -66,7 +63,7 @@ class Page(object):
 
             return lang
 
-    def extract_html(self, text, tag, closingtag, wh = None):
+    def extract_html(self, text, tag, closingtag, wh=None):
         if not wh:
             wh = 0
 
@@ -93,9 +90,9 @@ class Page(object):
 
         wh1 = self.contents.find("<title", 0)
         wh1a = self.contents.find(">", wh1)
-        wh2 = self.contents.find("</title", wh1a+1)
+        wh2 = self.contents.find("</title", wh1a + 1)
 
-        title = self.contents[wh1a+1: wh2].strip()
+        title = self.contents[wh1a + 1: wh2].strip()
         title = html.unescape(title)
 
         return title
@@ -109,8 +106,6 @@ class Page(object):
         return True
 
     def get_links(self):
-        import re
-        import requests
         links = set()
 
         page = self.get_contents()
@@ -120,7 +115,7 @@ class Page(object):
             wh = page.find('<a href="', wh + 1)
 
             if wh > 0:
-                #print(wh)
+                # print(wh)
                 text = self.extract_html(page, '<a href="', '"', wh)
 
                 if text:
