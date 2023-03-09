@@ -22,7 +22,7 @@ Link database, with RSS functionality
 
 ## Screenshots
 
-![](https://raw.githubusercontent.com/rumca-js/Django-rss-feed/main/screenshots/2023_01_13_entries.PNG)
+![](https://raw.githubusercontent.com/rumca-js/Django-rss-feed/main/screenshots/2023_03_09_entries.PNG)
 
 ## Notes
 
