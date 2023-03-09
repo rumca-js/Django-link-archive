@@ -1,3 +1,5 @@
+Link database, with RSS functionality
+
 # Features
 
  - Local data, no algorithms, no advertisments
