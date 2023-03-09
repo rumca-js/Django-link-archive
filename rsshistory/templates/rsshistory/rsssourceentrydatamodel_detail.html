@@ -6,11 +6,7 @@
   {% if user.is_staff %}
     <p>
     <a href="{% url 'rsshistory:entry-edit' object.id %}" class="simplebutton">Edit entry</a>
-    {% if object.persistent %}
-        <a href="{% url 'rsshistory:entry-tag' object.id %}" class="simplebutton">Tag entry</a>
-    {% endif %}
     <a href="{% url 'rsshistory:entry-hide' object.id %}" class="simplebutton">Hide entry</a>
-
     {% if object.persistent %}
        <a href="{% url 'rsshistory:entry-notstar' object.id %}" class="simplebutton">
         Not bookmark
@@ -19,6 +15,9 @@
        <a href="{% url 'rsshistory:entry-star' object.id %}" class="simplebutton">
         Bookmark
        </a>
+    {% endif %}
+    {% if object.persistent %}
+        <a href="{% url 'rsshistory:entry-tag' object.id %}" class="simplebutton">Tag entry</a>
     {% endif %}
     </p>
 

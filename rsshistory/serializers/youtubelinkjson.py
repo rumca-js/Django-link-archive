@@ -80,6 +80,10 @@ class YouTubeJson(object):
         if len(self._json) > 0:
             return self._json["channel"]
 
+    def get_date_published(self):
+        if len(self._json) > 0:
+            return self._json["upload_date"]
+
     def get_channel_url(self):
         if len(self._json) > 0:
             return self._json["channel_url"]

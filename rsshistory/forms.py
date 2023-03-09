@@ -55,29 +55,65 @@ class EntryForm(forms.ModelForm):
         self.fields['persistent'].initial = True
         self.fields['user'].widget.attrs['readonly'] = True
 
-    def save_form(self):
+    def get_information(self, data):
+        return self.cleaned_data
+
+    def update_info(self, data):
         from .webtools import Page
-        source = self.cleaned_data["source"]
-        title = self.cleaned_data["title"]
-        description = self.cleaned_data["description"]
-        link = self.cleaned_data["link"]
-        date_published = self.cleaned_data["date_published"]
-        persistent = self.cleaned_data["persistent"]
-        language = self.cleaned_data["language"]
-        user = self.cleaned_data["user"]
-        
-        p = Page(link)
-        if not source:
-            source = p.get_domain()
-        if not language:
-            language = p.get_language()
-        if not title:
-            title = p.get_title()
-        if not description:
-            description = p.get_title()
+
+        p = Page(data["link"])
+        d = str(p.get_domain_only())
+
+        if d.startswith("www.youtube") or d.startswith("www.m.youtube"):
+           self.update_info_youtube(data)
+
+        return self.update_info_default(data)
+
+    def update_info_youtube(self, data):
+        from .linkhandlers.youtubelinkhandler import YouTubeLinkHandler
+        h = YouTubeLinkHandler(data["link"])
+        h.download_details()
+
+        data["source"] = h.get_channel_feed_url()
+        data["link"] = h.get_link_url()
+        data["title"] = h.get_title()
+        data["description"] = h.get_description()
+        data["date_published"] = h.get_datetime_published()
+        return data
+
+    def update_info_default(self, data):
+        from .webtools import Page
+        p = Page(data["link"])
+        if not data["source"]:
+            data["source"] = p.get_domain()
+        if not data["language"]:
+            data["language"] = p.get_language()
+        if not data["title"]:
+            data["title"] = p.get_title()
+        if not data["description"]:
+            data["description"] = p.get_title()
+        return data
+
+    def save_form(self):
+        data = self.get_information(self.cleaned_data)
+        data = self.update_info(data)
+
+        source = data["source"]
+        title = data["title"]
+        description = data["description"]
+        link = data["link"]
+        date_published = data["date_published"]
+        persistent = data["persistent"]
+        language = data["language"]
+        user = data["user"]
 
         if not title or not source:
             return False
+
+        source_obj = None
+        sources = RssSourceDataModel.objects.filter(url = source)
+        if sources.exists():
+            source_obj = sources[0]
 
         entry = RssSourceEntryDataModel(
                 source = source,
@@ -87,7 +123,8 @@ class EntryForm(forms.ModelForm):
                 date_published = date_published,
                 persistent = persistent,
                 language = language,
-                user = user)
+                user = user,
+                source_obj = source_obj)
 
         entry.save()
         return True

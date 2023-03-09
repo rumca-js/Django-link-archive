@@ -144,6 +144,11 @@ class HandlerManager(object):
        return True
 
    def wayback_save(self, url):
+       from .webtools import Page
+       p = Page(url)
+       if p.is_mainstream():
+           return True
+
        PersistentInfo.create("Wayback save on URL:{0}".format(url))
        self.threads[2].add_to_process_list(url)
        return True

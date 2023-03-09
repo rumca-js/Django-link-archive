@@ -97,7 +97,7 @@ class GitUpdateManager(object):
 
         sources = RssSourceDataModel.objects.all()
         for source in sources:
-            self._cfg.thread_mgr.wayback_save(source)
+            self._cfg.thread_mgr.wayback_save(source.url)
 
     def clear_old_entries(self):
         log = logging.getLogger(self._cfg.app_name)

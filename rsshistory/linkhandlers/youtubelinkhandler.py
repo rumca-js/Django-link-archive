@@ -41,9 +41,27 @@ class YouTubeLinkHandler(object):
     def get_frame(self):
         return "<iframe src=\"{0}\" frameborder=\"0\" allowfullscreen class=\"youtube_player_frame\"></iframe>".format(self.get_embed_link())
 
+    def get_title(self):
+        if self.yt_ob:
+            return self.yt_ob.get_title()
+
     def get_description(self):
         if self.yt_ob:
             return self.yt_ob.get_description()
+
+    def get_date_published(self):
+        if self.yt_ob:
+            return self.yt_ob.get_date_published()
+
+    def get_datetime_published(self):
+        if self.yt_ob:
+            from datetime import date
+            from datetime import datetime
+
+            date_string = self.yt_ob.get_date_published()
+            date = datetime.strptime(date_string, '%Y%m%d')
+            dt = datetime.combine(date, datetime.min.time())
+            return dt
 
     def get_thumbnail(self):
         if self.yt_ob:
