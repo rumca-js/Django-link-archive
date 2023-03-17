@@ -96,13 +96,16 @@ With these data we can perform further analysis:
 
 # Problems, notes
 
- - Internet Archive (archive.org) does not provide snapshots for each and every day for all RSS sources. It is sometimes pretty slow. We would like to be sure that a such snapshot takes place. Therefore we need to export links to daily repo ourselves. Django RSS app also makes requests to archive to make the snapshots
- - Google fails to deliver content of small creators (blogs etc. private pages). Google focuses on corporate hosting. Most common links are towards YouTube, Google maps, Facebook, reddit
- - We cannot replace Google search
+ - Google fails to deliver content of small creators (blogs etc. private pages). Google focuses on corporate hosting, or deliver products that make investors happy. Most common links are towards YouTube, Google maps, Facebook, Reddit
+ - We cannot replace Google search, since I do not have processing power for that. For programming problems I still go to Google, to find specific information
  - Google provides only 31 pages of news (in news filter) and around 10 pages for ordinary search. This is a very small number. It is like looking through keyhole at the Internet
- - Link rot is real. My links may be not working after some time
- - Is the data relevant, or useful for anyone?
- - Either we would like to record data from 'well established sources' or gather as many links as possible. I think web engines do it? We cannot gather too much data, as it can destroy our potato servers.
+ - This link database, with more than 100 of sources provides many useful data. For example after searching for 'covid' in links I have thounsands of results, just as I would expect
+ - Dead Internet is not a problem for me, since I do not capture data from bot farms
+ - Some topics are so popular, that all of the sources write about it, and I am swamped with links about recent crisises
+ - Even though I have 100 sources, I still find useful info from outside of my sources. Some through YouTube, some through Reddit, etc.
+ - Link rot is real. Some of archived links may be not working after some time. This is especially true for msn, and yahoo, which quite fast delete older links from their database
+ - Internet Archive (archive.org) does not provide snapshots for each and every day for all RSS sources. It is sometimes pretty slow. We would like to be sure that a such snapshot takes place. Therefore we need to export links to daily repo ourselves. Django RSS app also makes requests to archive to make the snapshots
+ - It is hard to define which sources are to be added into database. Even though I have more than 100 sources, I check regularly only a handful of them
  - there are other RSS solutions like 'feedly', but it is an app, not data. You cannot parse it, you do not own the data, you can only do things that feedly allows you to do
 
 # Ending notes
