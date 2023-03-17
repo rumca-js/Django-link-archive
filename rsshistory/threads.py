@@ -37,6 +37,8 @@ class ThreadJobCommon(threading.Thread):
                 self._close_event.wait(self._seconds_wait)
 
         self.log_info("Leaving process")
+        from .models import PersistentInfo
+        PersistentInfo.create("Process has crashed")
 
     def handle_process_item(self):
         try:

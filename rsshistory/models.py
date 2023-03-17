@@ -142,6 +142,9 @@ class RssSourceOperationalData(models.Model):
     source_obj = models.ForeignKey(RssSourceDataModel, on_delete=models.SET_NULL, related_name='dynami_cdata',
                                    null=True, blank=True)
 
+    class Meta:
+        ordering = ['date_fetched']
+
 
 class RssSourceImportHistory(models.Model):
     url = models.CharField(max_length=2000)
@@ -149,9 +152,15 @@ class RssSourceImportHistory(models.Model):
     source_obj = models.ForeignKey(RssSourceDataModel, on_delete=models.SET_NULL, related_name='history_import',
                                    null=True, blank=True)
 
+    class Meta:
+        ordering = ['-date']
+
 
 class RssSourceExportHistory(models.Model):
     date = models.DateField()
+
+    class Meta:
+        ordering = ['-date']
 
 
 class RssSourceEntryDataModel(models.Model):
@@ -270,7 +279,7 @@ class RssSourceEntryDataModel(models.Model):
         from .sources.waybackmachine import WaybackMachine
         from .dateutils import DateUtils
         m = WaybackMachine()
-        formatted_date = m.get_formatted_date(DateUtils.get_date_today())
+        formatted_date = m.get_formatted_date(self.date_published.date())
 
         archive_link = "https://web.archive.org/web/{}000000*/{}".format(formatted_date, self.link)
         return archive_link
@@ -354,8 +363,8 @@ class PersistentInfo(models.Model):
     date = models.DateTimeField(default=datetime.now)
     user = models.CharField(max_length=1000, null=True)
 
-    def create(info, level=int(logging.INFO), date=datetime.now(timezone('UTC')), user=None):
-        ob = PersistentInfo(info=info, level=level, date=date, user=user)
+    def create(info, level=int(logging.INFO), user=None):
+        ob = PersistentInfo(info=info, level=level, date=datetime.now(timezone('UTC')), user=user)
 
         index = 0
         while index < 5:
@@ -365,8 +374,8 @@ class PersistentInfo(models.Model):
             except Exception as e:
                 index += 1
 
-    def text(info, level=int(logging.INFO), date=datetime.now(timezone('UTC')), user=None):
-        ob = PersistentInfo(info=info, level=level, date=date, user=user)
+    def text(info, level=int(logging.INFO), user=None):
+        ob = PersistentInfo(info=info, level=level, date=datetime.now(timezone('UTC')), user=user)
         index = 0
         while index < 5:
             try:
@@ -375,8 +384,8 @@ class PersistentInfo(models.Model):
             except Exception as e:
                 index += 1
 
-    def error(info, level=int(logging.ERROR), date=datetime.now(timezone('UTC')), user=None):
-        ob = PersistentInfo(info=info, level=level, date=date, user=user)
+    def error(info, level=int(logging.ERROR), user=None):
+        ob = PersistentInfo(info=info, level=level, date=datetime.now(timezone('UTC')), user=user)
         index = 0
         while index < 5:
             try:

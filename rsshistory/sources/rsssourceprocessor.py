@@ -35,9 +35,7 @@ class RssSourceProcessor(object):
                 source.set_operational_info(stop_time, num_entries, total_time.total_seconds())
 
         except Exception as e:
-            log = logging.getLogger(self._cfg.app_name)
             PersistentInfo.error("Source: {0} {1} NOK; {2}".format(source.url, source.title, str(e)))
-            log.critical(e, exc_info=True)
 
     def process_source_impl(self, source):
         plugin = BasePluginBuilder.get(source.get_domain())
@@ -83,9 +81,7 @@ class RssSourceProcessor(object):
 
             return num_processed_entries
         except Exception as e:
-            log = logging.getLogger(self._cfg.app_name)
             PersistentInfo.error("Source: {0} {1} NOK; {2}".format(source.url, source.title, str(e)))
-            log.critical(e, exc_info=True)
 
     def process_parser_source(self, source):
         from ..webtools import Page

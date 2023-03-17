@@ -6,7 +6,7 @@ from .gitrepo import *
 from .basictypes import *
 
 
-__version__ = "0.6.0"
+__version__ = "0.6.1"
 
 
 class Configuration(object):
@@ -14,6 +14,7 @@ class Configuration(object):
 
     def __init__(self, app_name):
         self.app_name = str(app_name)
+        self.thread_mgr = None
 
         self.directory = Path(".")
         self.version = __version__
@@ -28,7 +29,6 @@ class Configuration(object):
 
         if app_name not in Configuration.obj:
             c = Configuration(app_name)
-            c.create_threads()
             Configuration.obj[app_name] = c
 
         return Configuration.obj[app_name]
@@ -103,11 +103,13 @@ class Configuration(object):
         return entries_dir
 
     def create_threads(self):
-        from .threadhandlers import HandlerManager
-        self.thread_mgr = HandlerManager(self)
+        if self.thread_mgr is None:
+            from .threadhandlers import HandlerManager
+            self.thread_mgr = HandlerManager(self)
 
     def get_threads(self):
-        return self.thread_mgr.threads
+        if self.thread_mgr:
+           return self.thread_mgr.threads
 
     def close(self):
         self.thread_mgr.close()

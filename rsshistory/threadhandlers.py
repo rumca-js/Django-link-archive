@@ -30,10 +30,8 @@ class ProcessSourceHandler(object):
            writer = SourceEntriesDataWriter(self._cfg, item.url)
            writer.write_for_day(today)
         except Exception as e:
-           log = logging.getLogger(self._cfg.app_name)
            error_text = traceback.format_exc()
            PersistentInfo.error("Exception during parsing page contents {0} {1} {2}".format(item.url, str(e), error_text))
-           log.critical(e, exc_info=True)
 
 
 class RefreshThreadHandler(object):
@@ -45,10 +43,8 @@ class RefreshThreadHandler(object):
         try:
             self.t_refresh(item)
         except Exception as e:
-           log = logging.getLogger(self._cfg.app_name)
-           if item:
-               log.error("Exception during refreshing {0}".format(item.url) )
-           log.critical(e, exc_info=True)
+           error_text = traceback.format_exc()
+           PersistentInfo.error("Exception during parsing page contents {0} {1} {2}".format(item.url, str(e), error_text))
 
     def t_refresh(self, item):
         log = logging.getLogger(self._cfg.app_name)
@@ -149,7 +145,6 @@ class HandlerManager(object):
        if p.is_mainstream():
            return True
 
-       PersistentInfo.create("Wayback save on URL:{0}".format(url))
        self.threads[2].add_to_process_list(url)
        return True
 
