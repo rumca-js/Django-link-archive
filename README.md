@@ -2,6 +2,7 @@ Link database, with RSS functionality
 
 # Features
 
+ - Web GUI in Django
  - Local data, no algorithms, no advertisments
  - Search ability (Google like), by language, author, tags
  - Ability to provide custom plugins, parse HTML pages
@@ -14,11 +15,12 @@ Link database, with RSS functionality
  - automatic / configurable git export
 
 ## Problems with other RSS readers
- - Nextcloud 'News' plugin however currently does not provide: tag support, search ability
- - thunderbird does not allow tagging, searching by tags
- - feedly is not local, does not store your data on your hardware
- - feeder does not provide search ability, nor tagging. Does not display icons for RSS entries, in views
- - newsboat is CLI, and it does not provide exhaustive search capabilities
+
+ - Currently Nextcloud 'News' plugin does not provide: tag support, search ability
+ - Thunderbird does not allow tagging, searching links by tags
+ - Feedly is not local, does not store your data on your hardware
+ - Feeder (phone) does not provide search ability, nor tagging. Cannot configure 'view' for my liking
+ - Newsboat is CLI, and it does not provide exhaustive search capabilities
 
 ## Screenshots
 
@@ -26,12 +28,11 @@ Link database, with RSS functionality
 
 ## Notes
 
- - Web GUI in Django
  - it is best to use on a device with SSD
 
 ## Installation
 
-Installation, just as any other Django app.
+Installation, just as any other Django app. Link [https://docs.djangoproject.com/en/4.1/intro/tutorial01/](https://docs.djangoproject.com/en/4.1/intro/tutorial01/).
 
 ## Dependencies
 
