@@ -99,3 +99,22 @@ class WaybackMachine(object):
         else:
             return ret
 
+    def is_saved(self, url):
+        from ..webtools import Page
+
+        p = Page(url)
+        if p.is_youtube():
+            return False
+
+        dom = p.get_domain_only()
+
+        mainstream = ['www.facebook',
+                      'www.rumble',
+                      'wikipedia.org',
+                      'web.archive.org']
+
+        for item in mainstream:
+            if dom.find(item) >= 0:
+              return False
+
+        return True

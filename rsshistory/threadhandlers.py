@@ -68,9 +68,14 @@ class WaybackSaveHandler(object):
         self.thread_parent = thread_parent
 
     def process(self, item):
-        from .sources.waybackmachine import WaybackMachine
-        wb = WaybackMachine()
-        wb.save(item)
+        try:
+            from .sources.waybackmachine import WaybackMachine
+            wb = WaybackMachine()
+            if wb.is_saved(item):
+                wb.save(item)
+        except Exception as e:
+           error_text = traceback.format_exc()
+           PersistentInfo.error("Exception on WaybackSaveHandler {} {}".format(str(e), error_text))
 
 
 class YouTubeDetailsHandler(object):
@@ -80,6 +85,21 @@ class YouTubeDetailsHandler(object):
 
     def process(self, item):
         pass
+
+
+class YearlyGeneration(object):
+    def __init__(self, thread_parent):
+        self._cfg = thread_parent._cfg
+        self.thread_parent = thread_parent
+
+    def process(self, item):
+        days = [
+        '2020-01-01']
+
+        from .datawriter import DataWriter
+        writer = DataWriter(self._cfg)
+        for day in days:
+            writer.write_daily_data(day)
 
 
 class HandlerManager(object):
@@ -104,6 +124,9 @@ class HandlerManager(object):
      elif thread == "youtube-details":
          handler = YouTubeDetailsHandler(self)
          handler.process(item)
+     elif thread == "yearly-generation":
+         handler = YearlyGeneration(self)
+         handler.process(item)
      else:
         log = logging.getLogger(self._cfg.app_name)
         PersistentInfo.error("Not implemented processing thread {0}".format(thread))
@@ -115,12 +138,14 @@ class HandlerManager(object):
        refresh_thread = ThreadJobCommon("refresh-thread", 3600, True) #3600 is 1 hour
        wayback = ThreadJobCommon("wayback")
        yt_details = ThreadJobCommon("youtube-details")
+       yearly = ThreadJobCommon("yearly-generation")
 
        self.threads = [
                download_rss,
                refresh_thread,
                wayback,
-               yt_details
+               yt_details,
+               yearly
                ]
 
        for athread in self.threads:
@@ -140,14 +165,8 @@ class HandlerManager(object):
        return True
 
    def wayback_save(self, url):
-       from .webtools import Page
-       p = Page(url)
-       if p.is_mainstream():
-           return True
-
        self.threads[2].add_to_process_list(url)
        return True
-
 
    def youtube_details(self, url):
        PersistentInfo.create("Download YouTube details:{0}".format(url))

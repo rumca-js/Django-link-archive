@@ -130,14 +130,21 @@ class BookmarksBigExporter(object):
 
            therange = (start_date, stop_date)
 
-           # entries = RssSourceEntryDataModel.objects.filter(persistent = True, date_published__range=therange)
-           # converter = BookmarksExporter(self._cfg, entries)
-           # converter.export('bookmarks_ALL', str(year))
+           all_entries = RssSourceEntryDataModel.objects.filter(persistent = True, date_published__range=therange)
 
-           en_entries = RssSourceEntryDataModel.objects.filter(persistent = True, date_published__range=therange, language__icontains = 'en')
+           en_entries = all_entries.filter(language__icontains = 'en')
+           pl_entries = all_entries.filter(language__icontains = 'pl')
+
            converter = BookmarksExporter(self._cfg, en_entries)
            converter.export('bookmarks_EN', str(year))
 
-           en_entries = RssSourceEntryDataModel.objects.filter(persistent = True, date_published__range=therange, language__icontains = 'pl')
-           converter = BookmarksExporter(self._cfg, en_entries)
+           converter = BookmarksExporter(self._cfg, pl_entries)
            converter.export('bookmarks_PL', str(year))
+
+           #en_entries = RssSourceEntryDataModel.objects.filter(persistent = True, date_published__range=therange, language__icontains = 'en')
+           #converter = BookmarksExporter(self._cfg, en_entries)
+           #converter.export('bookmarks_EN', str(year))
+
+           #en_entries = RssSourceEntryDataModel.objects.filter(persistent = True, date_published__range=therange, language__icontains = 'pl')
+           #converter = BookmarksExporter(self._cfg, en_entries)
+           #converter.export('bookmarks_PL', str(year))

@@ -4,7 +4,7 @@ from django.urls import include
 from django.contrib.auth import views as auth
 from django.views.generic import RedirectView
 from . import views
-from .viewspkg import viewentries, viewsources, viewcustom
+from .viewspkg import viewentries, viewsources, viewcustom, viewtags
 
 app_name = str(views.app_name)
 
@@ -32,10 +32,14 @@ urlpatterns = [
    path('entry-hide/<int:pk>/', viewentries.hide_entry, name='entry-hide'),
    path('entry-star/<int:pk>/', viewentries.make_persistent_entry, name='entry-star'),
    path('entry-notstar/<int:pk>/', viewentries.make_not_persistent_entry, name='entry-notstar'),
-   path('entry-tag/<int:pk>/', viewentries.tag_entry, name='entry-tag'),
    path('entries-import', viewentries.import_entries, name='entries-import'),
    path('entries-untagged/', viewentries.NotBookmarkedView.as_view(), name='entries-untagged'),
    path('searchinitview', viewentries.search_init_view, name='searchinitview'),
+
+   # tags
+   path('entry-tag/<int:pk>/', viewtags.tag_entry, name='entry-tag'),
+   path('tag-remove/<int:pk>/', viewtags.tag_remove, name='tag-remove'),
+   path('show-tags', viewtags.show_tags, name='show-tags'),
 
    # comment
    path('entry-comment-add/<int:link_id>', views.entry_add_comment, name='entry-comment-add'),
@@ -50,7 +54,7 @@ urlpatterns = [
    path('import-source-ia/<int:pk>/', viewcustom.import_source_from_ia, name='import-source-ia'),
    path('truncate-errors', viewcustom.truncate_errors, name='truncate-errors'),
    path('data-errors', viewcustom.data_errors_page, name='data-errors'),
-   path('show-tags', viewcustom.show_tags, name='show-tags'),
+   path('entry-fix-yt-link/<int:pk>/', viewcustom.fix_youtube_link, name='entry-fix-yt-link'),
    path('show-yt-props', viewcustom.show_youtube_link_props, name='show-youtube-link-props'),
    path('write-bookmarks', viewcustom.write_bookmarks, name='write-bookmarks'),
 

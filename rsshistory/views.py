@@ -9,11 +9,11 @@ from django.urls import reverse
 from django.db.models.query import QuerySet
 from django.db.models.query import EmptyQuerySet
 
-from .models import RssSourceDataModel, RssSourceEntryDataModel, RssEntryTagsDataModel, ConfigurationEntry
+from .models import RssSourceDataModel, RssSourceEntryDataModel, ConfigurationEntry
 from .models import RssSourceImportHistory, RssSourceExportHistory
 from .serializers.converters import ModelCollectionConverter, CsvConverter
 
-from .forms import SourceForm, EntryForm, ImportSourcesForm, ImportEntriesForm, SourcesChoiceForm, EntryChoiceForm, ConfigForm, CommentEntryForm
+from .forms import SourceForm, EntryForm, ImportSourcesForm, ImportEntriesForm, SourcesChoiceForm, ConfigForm, CommentEntryForm
 from .basictypes import *
 
 from .prjconfig import Configuration

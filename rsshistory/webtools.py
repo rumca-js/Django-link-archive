@@ -79,11 +79,11 @@ class Page(object):
 
     def get_domain(self):
         items = urlparse(self.url)
-        return items.scheme + "://" + items.netloc
+        return str(items.scheme) + "://" + str(items.netloc)
 
     def get_domain_only(self):
         items = urlparse(self.url)
-        return items.netloc
+        return str(items.netloc)
 
     def get_title(self):
         if not self.contents:
@@ -138,17 +138,27 @@ class Page(object):
         return links
 
     def is_mainstream(self):
-        dom = str(self.get_domain_only())
+        dom = self.get_domain_only()
 
         # wallet gardens which we will not accept
 
-        mainstream = ['www.youtube',
-                      'www.m.youtube',
-                      'www.facebook',
+        mainstream = ['www.facebook',
                       'www.rumble',
                       'wikipedia.org']
 
         for item in mainstream:
-           if item.find(dom) >= 0:
+            if dom.find(item) >= 0:
               return True
+
+        if self.is_youtube():
+            return True
+
+        return False
+
+    def is_youtube(self):
+        dom = self.get_domain_only()
+        if dom.find("youtube.com") >= 0 or \
+           dom.find("youtu.be") >= 0 or \
+           dom.find('www.m.youtube') >= 0:
+               return True
         return False

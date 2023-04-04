@@ -66,9 +66,10 @@ class RssSourceDataModel(models.Model):
             return False
 
     def get_op_data(self):
-        objs = RssSourceOperationalData.objects.filter(url=self.url)
-        if objs.exists():
-            return objs[0]
+        objs = self.dynami_cdata.all()
+        if len(objs) == 0:
+            return None
+        return objs[0]
 
     def get_date_fetched(self):
         obj = self.get_op_data()
@@ -197,28 +198,23 @@ class RssSourceEntryDataModel(models.Model):
             return self.source
 
     def get_tag_string(self):
-        return RssEntryTagsDataModel.get_tag_string(self.link)
+        return RssEntryTagsDataModel.join_elements(self.tags.all()) 
 
     def get_tag_map(self):
         # TODO should it be done by for tag in self.tags: tag.get_map()?
         result = []
-        tags = RssEntryTagsDataModel.objects.filter(link=self.link)
-        if tags.exists():
-            for tag in tags:
-                result.append(tag.tag)
+        tags = self.tags.all()
+        for tag in tags:
+            result.append(tag.tag)
         return result
 
     def get_comment_map(self):
         # TODO
         return []
 
-    def get_author_tag_string(self):
-        return RssEntryTagsDataModel.get_author_tag_string(self.link)
-
     def update_language(self):
-        objs = RssSourceDataModel.objects.filter(url=self.source)
-        if objs.exists():
-            self.language = objs[0].language
+        if self.source_obj:
+            self.language = self.source_obj.language
             self.save()
         else:
             from .webtools import Page
@@ -314,12 +310,6 @@ class RssEntryTagsDataModel(models.Model):
 
     def get_author_tag_string(author, link):
         current_tags_objs = RssEntryTagsDataModel.objects.filter(link=link, author=author)
-
-        if current_tags_objs.exists():
-            return RssEntryTagsDataModel.join_elements(current_tags_objs)
-
-    def get_tag_string(link):
-        current_tags_objs = RssEntryTagsDataModel.objects.filter(link=link)
 
         if current_tags_objs.exists():
             return RssEntryTagsDataModel.join_elements(current_tags_objs)

@@ -3,9 +3,9 @@ from django.views import generic
 from django.urls import reverse
 from django.shortcuts import render
 
-from ..models import RssSourceDataModel, RssSourceEntryDataModel, RssEntryTagsDataModel, ConfigurationEntry
+from ..models import RssSourceDataModel, RssSourceEntryDataModel, ConfigurationEntry
 from ..prjconfig import Configuration
-from ..forms import SourceForm, EntryForm, ImportSourcesForm, ImportEntriesForm, SourcesChoiceForm, EntryChoiceForm, ConfigForm, CommentEntryForm
+from ..forms import SourceForm, EntryForm, ImportSourcesForm, ImportEntriesForm, SourcesChoiceForm, ConfigForm, CommentEntryForm
 
 
 def init_context(context):

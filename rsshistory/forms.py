@@ -62,9 +62,8 @@ class EntryForm(forms.ModelForm):
         from .webtools import Page
 
         p = Page(data["link"])
-        d = str(p.get_domain_only())
 
-        if d.startswith("www.youtube") or d.startswith("www.m.youtube"):
+        if p.is_youtube():
            self.update_info_youtube(data)
 
         return self.update_info_default(data)
@@ -79,6 +78,7 @@ class EntryForm(forms.ModelForm):
         data["title"] = h.get_title()
         data["description"] = h.get_description()
         data["date_published"] = h.get_datetime_published()
+
         return data
 
     def update_info_default(self, data):
@@ -114,6 +114,10 @@ class EntryForm(forms.ModelForm):
         sources = RssSourceDataModel.objects.filter(url = source)
         if sources.exists():
             source_obj = sources[0]
+
+        links = RssSourceEntryDataModel.objects.filter(link = link)
+        if len(links) > 0:
+            return False
 
         entry = RssSourceEntryDataModel(
                 source = source,
@@ -295,35 +299,22 @@ class EntryChoiceForm(forms.Form):
     def __init__(self, *args, **kwargs):
         self.args = kwargs.pop('args', ())
         super().__init__(*args, **kwargs)
-        self.get_sources()
 
     def get_filtered_objects(self):
         source_parameter_map = self.get_source_filter_args()
         entry_parameter_map = self.get_entry_filter_args(False)
 
         self.entries = []
-
-        if source_parameter_map == {}:
-            return RssSourceEntryDataModel.objects.filter(**entry_parameter_map)
-
-        if self.sources.exists():
-            index = 0
-            for obj in self.sources:
-                entry_parameter_map["source"] = obj.url
-
-                if index == 0:
-                    self.entries = RssSourceEntryDataModel.objects.filter(**entry_parameter_map)
-                else:
-                    self.entries = self.entries | RssSourceEntryDataModel.objects.filter(**entry_parameter_map)
-                index += 1
-        else:
-            self.entries = RssSourceEntryDataModel.objects.filter(**entry_parameter_map)
+        self.entries = RssSourceEntryDataModel.objects.filter(**entry_parameter_map)
 
         return self.entries
 
     def create(self):
         # how to unpack dynamic forms
         # https://stackoverflow.com/questions/60393884/how-to-pass-choices-dynamically-into-a-django-form
+
+        self.get_sources()
+
         categories = self.get_filtered_objects_values('category')
         subcategories = self.get_filtered_objects_values('subcategory')
         title = self.get_filtered_objects_values('title')
@@ -355,7 +346,7 @@ class EntryChoiceForm(forms.Form):
         self.fields['category'] = forms.CharField(label = "RSS source category", widget=forms.Select(choices=categories, attrs=attr), initial=category_init)
         self.fields['subcategory'] = forms.CharField(label = "RSS source subcategory", widget=forms.Select(choices=subcategories, attrs=attr), initial=subcategory_init)
         self.fields['title'] = forms.CharField(label = "RSS source title", widget=forms.Select(choices=title, attrs=attr), initial=title_init)
-        self.fields['persistent'] = forms.BooleanField(label = "Search in persistent entries", required=False, initial=init['persistent'])
+        self.fields['persistent'] = forms.BooleanField(label = "Search in bookmarked entries", required=False, initial=init['persistent'])
         self.fields['language'] = forms.CharField(label = 'Search language', max_length = 500, required=False, initial=init['language'])
         self.fields['user'] = forms.CharField(label = 'Search user', required=False, initial=init['user'])
         self.fields['tag'] = forms.CharField(label = 'Search tags', required=False, initial=init['tag'])
@@ -420,7 +411,12 @@ class EntryChoiceForm(forms.Form):
         search = self.args.get("search")
         language = self.args.get("language")
         user = self.args.get("user")
+
         tag = self.args.get("tag")
+
+        category = self.args.get("category")
+        subcategory = self.args.get("subcategory")
+        source_title = self.args.get("title")
 
         if pure_data:
             if search:
@@ -441,6 +437,13 @@ class EntryChoiceForm(forms.Form):
                 parameter_map["user__icontains"] = user
             if tag:
                parameter_map['tags__tag__icontains'] = tag
+            if category and category != "Any":
+               parameter_map['source_obj__category__icontains'] = category
+            if subcategory and subcategory != "Any":
+               parameter_map['source_obj__subcategory__icontains'] = subcategory
+            if source_title and source_title != "Any":
+               parameter_map['source_obj__title__icontains'] = source_title
+
 
         return parameter_map
 

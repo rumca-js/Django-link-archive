@@ -1,4 +1,5 @@
 from pathlib import Path
+import traceback, sys
 
 from django.views import generic
 from django.urls import reverse
@@ -6,7 +7,7 @@ from django.shortcuts import render
 
 from ..models import RssSourceDataModel, RssSourceEntryDataModel, RssEntryTagsDataModel, ConfigurationEntry
 from ..prjconfig import Configuration
-from ..forms import SourceForm, EntryForm, ImportSourcesForm, ImportEntriesForm, SourcesChoiceForm, EntryChoiceForm, ConfigForm, CommentEntryForm
+from ..forms import SourceForm, EntryForm, ImportSourcesForm, ImportEntriesForm, SourcesChoiceForm, ConfigForm, CommentEntryForm
 from ..models import RssSourceImportHistory, RssSourceExportHistory
 
 
@@ -184,9 +185,32 @@ def truncate_errors(request):
     return render(request, get_app() / 'summary_present.html', context)
 
 
+def get_incorrect_youtube_links():
+    from django.db.models import Q
+    criterion1 = Q(link__contains="m.youtube")
+    criterion1a = Q(link__contains="youtu.be")
+
+    # only fix those that have youtube in source. leave other RSS sources
+    criterion2 = Q(link__contains="https://www.youtube.com")
+    criterion3 = Q(source__contains="youtube")
+    criterion4 = Q(source__contains="https://www.youtube.com/feeds")
+
+    criterion5 = Q(source__isnull = True)
+    criterion6 = Q(source_obj__isnull = True)
+
+    entries_no_object = RssSourceEntryDataModel.objects.filter(criterion1 | criterion1a)
+    entries_no_object |= RssSourceEntryDataModel.objects.filter(criterion2 & criterion3 & ~criterion4)
+    entries_no_object |= RssSourceEntryDataModel.objects.filter(criterion2 & criterion5)
+    #entries_no_object |= RssSourceEntryDataModel.objects.filter(criterion2 & ~criterion5 & criterion6)
+
+    if entries_no_object.exists():
+        return entries_no_object
+
+
 def data_errors_page(request):
-    def fix_source_entry_links():
-        print("fix_source_entry_links")
+
+    def fix_reassign_source_to_nullsource_entries():
+        print("fix_reassign_source_to_nullsource_entries")
 
         entries_no_object = RssSourceEntryDataModel.objects.filter(source_obj = None)
         for entry in entries_no_object:
@@ -196,66 +220,9 @@ def data_errors_page(request):
                 entry.save()
                 #summary_text += "Fixed {0}, added source object\n".format(entry.link)
                 print("Fixed {0}, added source object".format(entry.link))
-        print("fix_source_entry_links done")
+        print("fix_reassign_source_to_nullsource_entries done")
 
-    def fix_links():
-        print("fix_tags_links")
-
-        tags = RssEntryTagsDataModel.objects.all()
-        for tag in tags:
-            removed = False
-
-            links = RssSourceEntryDataModel.objects.filter(link = tag.link)
-            for link in links:
-                if not link.persistent:
-                    print("Removed tag")
-                    tag.delete()
-                    removed = True
-                    continue
-
-            if removed:
-                continue
-        print("fix_tags_links done")
-
-    def push_main_repo():
-        ob = ConfigurationEntry.objects.all()
-        if ob.exists():
-            conf = ob[0]
-            c = Configuration.get_object(str(get_app()))
-            print("Git pushing")
-            c.push_bookmarks_repo(conf)
-            print("Git ready")
-
-    def incorrect_language():
-        from django.db.models import Q
-        criterion1 = Q(language__contains="pl")
-        criterion2 = Q(language__contains="en")
-        criterion3 = Q(language__isnull = True)
-
-        entries_no_object = RssSourceEntryDataModel.objects.filter(~criterion1 & ~criterion2 & ~criterion3, persistent = True)
-
-        if entries_no_object.exists():
-            return entries_no_object
-
-    def incorrect_youtube():
-        from django.db.models import Q
-        criterion1 = Q(link__contains="m.youtube")
-
-        # only fix those that have youtube in source. leave other RSS sources
-        criterion2 = Q(link__contains="https://www.youtube.com")
-        criterion3 = Q(source__contains="youtube")
-        criterion4 = Q(source__contains="https://www.youtube.com/feeds")
-
-        criterion5 = Q(source__isnull = True)
-
-        entries_no_object = RssSourceEntryDataModel.objects.filter(criterion1)
-        entries_no_object |= RssSourceEntryDataModel.objects.filter(criterion2 & criterion3 & ~criterion4)
-        entries_no_object |= RssSourceEntryDataModel.objects.filter(criterion2 & criterion5)
-
-        if entries_no_object.exists():
-            return entries_no_object
-
-    def fix_incorrect_youtube(entries):
+    def fix_incorrect_youtube_links_links(entries):
         from ..linkhandlers.youtubelinkhandler import YouTubeLinkHandler
 
         for entry in entries:
@@ -273,6 +240,32 @@ def data_errors_page(request):
             else:
                 print("Not fixed: {}".format(entry.link, entry.title))
 
+    def get_tags_for_missing_links():
+        result = set()
+
+        tags = RssEntryTagsDataModel.objects.all()
+        for tag in tags:
+
+            if tag.link_obj is None:
+                result.add(tag)
+                continue
+
+            if not tag.link_obj.persistent:
+                result.add(tag)
+                break
+
+        return list(result)
+
+    def get_links_with_incorrect_language():
+        from django.db.models import Q
+        criterion1 = Q(language__contains="pl")
+        criterion2 = Q(language__contains="en")
+        criterion3 = Q(language__isnull = True)
+
+        entries_no_object = RssSourceEntryDataModel.objects.filter(~criterion1 & ~criterion2 & ~criterion3, persistent = True)
+
+        if entries_no_object.exists():
+            return entries_no_object
 
     context = get_context(request)
     context['page_title'] += " - data errors"
@@ -280,17 +273,14 @@ def data_errors_page(request):
     if not request.user.is_staff:
         return render(request, get_app() / 'missing_rights.html', context)
 
-    #fix_source_entry_links()
+    #fix_reassign_source_to_nullsource_entries()
     #fix_tags_links()
-    # push_main_repo()
-
-    incorrect_youtube_entries = incorrect_youtube()
-    #fix_incorrect_youtube(incorrect_youtube_entries)
 
     summary_text = "Done"
     try:
-        context['links_incorrect_language'] = incorrect_language()
-        context['links_incorrect_youtube'] = incorrect_youtube_entries
+        context['links_with_incorrect_language'] = get_links_with_incorrect_language()
+        context['incorrect_youtube_links'] = get_incorrect_youtube_links()
+        context['tags_for_missing_links'] = get_tags_for_missing_links()
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
 
@@ -301,6 +291,54 @@ def data_errors_page(request):
     # show bookmarked links without tags
 
     return render(request, get_app() / 'data_errors.html', context)
+
+
+def fix_youtube_link(request, pk):
+    from ..linkhandlers.youtubelinkhandler import YouTubeLinkHandler
+
+    context = get_context(request)
+    context['page_title'] += " - fix youtube links"
+
+    if not request.user.is_staff:
+        return render(request, get_app() / 'missing_rights.html', context)
+
+    entry = RssSourceEntryDataModel.objects.get(id = pk)
+
+    h = YouTubeLinkHandler(entry.link)
+    if not h.download_details():
+        context['summary_text'] = "Cannot obtain details for link {}".format(entry.link)
+        return render(request, get_app() / 'summary_present.html', context)
+
+    chan_url = h.get_channel_feed_url()
+    link_valid = h.get_link_url()
+
+    sources_obj = RssSourceDataModel.objects.filter(url = chan_url)
+    source_obj = None
+    if len(sources_obj) > 0:
+        source_obj = sources_obj[0]
+
+    found_links = RssSourceEntryDataModel.objects.filter(link = link_valid)
+    if len(found_links) > 0:
+        entry.delete()
+        summary_text = "Fixed links"
+    elif entry.link == link_valid and entry.source_obj is not None and entry.source == chan_url:
+        summary_text = "The link is already valid"
+    else:
+        summary_text = "Fixed link {} to {}".format(entry.link, link_valid)
+        print("Fixed link {} to {}".format(entry.link, link_valid))
+        if chan_url:
+            entry.source = chan_url
+            entry.link = link_valid
+            entry.source_obj = source_obj
+            entry.save()
+        else:
+            entry.link = link_valid
+            entry.source_obj = source_obj
+            entry.save()
+
+    context['summary_text'] = summary_text
+
+    return render(request, get_app() / 'summary_present.html', context)
 
 
 def get_time_stamps(url, start_time, stop_time):
@@ -367,44 +405,6 @@ def import_source_from_ia(request, pk):
     return render(request, get_app() / 'import_internetarchive.html', context)
 
 
-def show_tags(request):
-
-    context = get_context(request)
-    context['page_title'] += " - browse tags"
-
-    # TODO select only this month
-    objects = RssEntryTagsDataModel.objects.all()
-
-    tags = objects.values('tag')
-
-    result = {}
-    for item in tags:
-        tag = item['tag']
-        if tag in result:
-            result[item['tag']] += 1
-        else:
-            result[item['tag']] = 1
-
-    result_list = []
-    for item in result:
-        result_list.append([item, result[item]])
-
-    def map_func(elem):
-        return elem[1]
-
-    result_list = sorted(result_list, key = map_func, reverse=True)
-
-    text = ""
-    for tag in result_list:
-        link = reverse('rsshistory:entries') + "?tag="+tag[0]
-        link_text = str(tag[0]) + " " + str(tag[1])
-        text += "<div><a href=\"{0}\" class=\"simplebutton\">{1}</a></div>".format(link, link_text)
-
-    context["summary_text"] = text
-
-    return render(request, get_app() / 'tags_view.html', context)
-
-
 def import_source_from_ia_impl(wb, source_url, source_archive_url, archive_time):
     print("Reading from time: {0} {1}".format(source_url, archive_time))
 
@@ -458,7 +458,7 @@ def show_youtube_link_props(request):
 
             return render(request, get_app() / 'summary_present.html', context)
         else:
-            from .linkhandlers.youtubelinkhandler import YouTubeLinkHandler
+            from ..linkhandlers.youtubelinkhandler import YouTubeLinkHandler
 
             youtube_link = form.cleaned_data['youtube_link']
 
