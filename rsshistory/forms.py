@@ -63,13 +63,15 @@ class EntryForm(forms.ModelForm):
 
         p = Page(data["link"])
 
+        data["thumbnail"] = None
+
         if p.is_youtube():
            self.update_info_youtube(data)
 
         return self.update_info_default(data)
 
     def update_info_youtube(self, data):
-        from .linkhandlers.youtubelinkhandler import YouTubeLinkHandler
+        from .handlers.youtubelinkhandler import YouTubeLinkHandler
         h = YouTubeLinkHandler(data["link"])
         h.download_details()
 
@@ -78,6 +80,7 @@ class EntryForm(forms.ModelForm):
         data["title"] = h.get_title()
         data["description"] = h.get_description()
         data["date_published"] = h.get_datetime_published()
+        data["thumbnail"] = h.get_thumbnail()
 
         return data
 
@@ -106,6 +109,7 @@ class EntryForm(forms.ModelForm):
         persistent = data["persistent"]
         language = data["language"]
         user = data["user"]
+        thumbnail = data["thumbnail"]
 
         if not title or not source:
             return False
@@ -126,6 +130,7 @@ class EntryForm(forms.ModelForm):
                 link = link,
                 date_published = date_published,
                 persistent = persistent,
+                thumbnail = thumbnail,
                 language = language,
                 user = user,
                 source_obj = source_obj)
@@ -168,6 +173,14 @@ class TagEntryForm(forms.ModelForm):
         for tag in tags_set:
             model = RssEntryTagsDataModel(link = link, author = author, date = date, tag = tag, link_obj = link_objs[0])
             model.save()
+
+
+class TagRenameForm(forms.Form):
+    """
+    Category choice form
+    """
+    current_tag = forms.CharField(label='Current tag', max_length = 100)
+    new_tag = forms.CharField(label='New tag', max_length = 100)
 
 
 class ImportSourcesForm(forms.Form):
@@ -429,23 +442,43 @@ class EntryChoiceForm(forms.Form):
                parameter_map['tag'] = tag
 
         else:
+            tag_key, tag = self.get_tag_search()
+
             if search:
                 parameter_map["title__icontains"] = search
             if language:
                 parameter_map["language__icontains"] = language
             if user:
-                parameter_map["user__icontains"] = user
+                parameter_map["user"] = user
             if tag:
-               parameter_map['tags__tag__icontains'] = tag
+               parameter_map[tag_key] = tag
             if category and category != "Any":
-               parameter_map['source_obj__category__icontains'] = category
+               parameter_map['source_obj__category'] = category
             if subcategory and subcategory != "Any":
-               parameter_map['source_obj__subcategory__icontains'] = subcategory
+               parameter_map['source_obj__subcategory'] = subcategory
             if source_title and source_title != "Any":
-               parameter_map['source_obj__title__icontains'] = source_title
-
+               parameter_map['source_obj__title'] = source_title
 
         return parameter_map
+
+    def get_tag_search(self):
+        tag = self.args.get("tag")
+        if tag is None:
+            return None, None
+
+        tag_find_exact, tag = self.get_search_keyword(tag)
+        if tag_find_exact:
+            key = 'tags__tag'
+        else:
+            key = 'tags__tag__icontains'
+        return key, tag
+
+    def get_search_keyword(self, text):
+        exact_find = False
+        if text.find('"') >= 0:
+            text = text[1:-1]
+            exact_find = True
+        return exact_find, text
 
     def get_filter_string(self):
         filters = self.get_source_filter_args()

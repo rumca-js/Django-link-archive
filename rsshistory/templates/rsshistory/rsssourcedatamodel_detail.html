@@ -19,6 +19,10 @@
     <p>
     <a href="{% url 'rsshistory:source-edit' object.id %}" class="simplebutton">Edit source</a>
     <a href="{% url 'rsshistory:source-refresh' object.id %}" class="simplebutton">Refresh source</a>
+    {% if handler.is_youtube %}
+        <a href="{% url 'rsshistory:fix-source-entries-lan' object.id %}" class="simplebutton">Fix language in videos</a>
+        <a href="{% url 'rsshistory:source-import-yt-links' object.id %}" class="simplebutton">Fetch all videos</a>
+    {% endif %}
     </p>
   {% endif %}
     <p>

@@ -55,11 +55,13 @@ class RssSourceDetailView(generic.DetailView):
     model = RssSourceDataModel
 
     def get_context_data(self, **kwargs):
+        from ..handlers.sourcehandler import SourceHandler
         # Call the base implementation first to get the context
         context = super(RssSourceDetailView, self).get_context_data(**kwargs)
         context = init_context(context)
 
         context['page_title'] += " - " + self.object.title
+        context['handler'] = SourceHandler(self.object)
 
         return context
 
@@ -278,7 +280,6 @@ def export_sources(request):
     return render(request, get_app() / 'summary_present.html', context)
 
 
-
 def wayback_save(request, pk):
     context = get_context(request)
     context['page_title'] += " - Waybacksave"
@@ -292,4 +293,45 @@ def wayback_save(request, pk):
 
     context["summary_text"] = "Added to waybacksave"
 
+    return render(request, get_app() / 'summary_present.html', context)
+
+
+def import_youtube_links_for_source(request, pk):
+    from ..programwrappers.ytdlp import YTDLP
+
+    summary_text = ""
+    context = get_context(request)
+    context['page_title'] += " - import sources"
+
+    if not request.user.is_staff:
+        return render(request, get_app() / 'missing_rights.html', context)
+
+    source_obj = RssSourceDataModel.objects.get(id = pk)
+    url = str(source_obj.url)
+    wh = url.find("=")
+
+    if wh == -1:
+        context['summary_text'] = "Could not obtain code from a video"
+        return render(request, get_app() / 'summary_present.html', context)
+
+    code = url[wh + 1 :]
+    channel = 'https://www.youtube.com/channel/{}'.format(code)
+    ytdlp = YTDLP(channel)
+    links = ytdlp.get_channel_video_list()
+
+    data = {"user" : None, "language" : source_obj.language, "persistent" : False}
+
+    for link in links:
+       print("Adding {}".format(link))
+       try:
+           RssSourceEntryDataModel.create_from_youtube(link, data)
+       except Exception as E:
+           try:
+               RssSourceEntryDataModel.create_from_youtube(link, data)
+           except Exception as E:
+               pass
+
+       summary_text += "\n{}".format(link)
+
+    context['summary_text'] = summary_text
     return render(request, get_app() / 'summary_present.html', context)

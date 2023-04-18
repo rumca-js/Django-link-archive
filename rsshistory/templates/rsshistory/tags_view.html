@@ -2,10 +2,13 @@
 
 {% block content %}
 
+<h2>Popular tags</h2>
+
+{{ summary_text | safe }}
+
 <h2>Tags meaning</h2>
 Some tags names might be confusing. Therefore I provide a little bit of help in understanding the idea behind the tag naming convention.
 <ul>
-  <li>Hate speech - this term is often used by a woke mob. Here it is used to target the real hate speech. Everything about hate. Hate against minorities, hate agains majorities in society. Marks also the hate against white straight dudes.</li>
   <li>Technofeudalism - everything about reliance on big tech solutions. Imagine a world in which you have no free will, but you need to listen to your media platform overlords.</li>
   <li>Tech control - everything about government regulating tech</li>
   <li>BigBrother - tags for links that captures the essense of the government</li>
@@ -25,8 +28,12 @@ Some tags names might be confusing. Therefore I provide a little bit of help in 
   <li>Subscription - In today's model everything is a service. It has its downsides. This tag commonly marks this</li>
 </ul>
 
-<h2>Popular tags</h2>
-
-{{ summary_text | safe }}
+<h2>Restore original word meaning</h2>
+ 
+<ul>
+  <li>Hate speech - this term is often used by a woke mob in misleading context. Sometime hate speech is only accepted against majorities. Hate speech is hate speech. Saying that racism is due to white people, is also a hate speech</li>
+  <li>Racism - fixed quotas in companies based on race is also racist. Making interviews for just 'black' people is also racist</li>
+  <li>Sexism - fixed quotas in companies based on sex, or gender is also racist. Making interviews for females, or adding special points to one sex in tests, or results is sexist</li>
+</ul>
 
 {% endblock %}

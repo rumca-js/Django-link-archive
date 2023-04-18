@@ -22,6 +22,7 @@ urlpatterns = [
    path('sources-import', viewsources.import_sources, name='sources-import'),
    path('sources-export/', viewsources.export_sources, name='sources-export'),
    path('source-wayback-save/<int:pk>/', viewsources.wayback_save, name='source-wayback-save'),
+   path('source-import-yt-links/<int:pk>/', viewsources.import_youtube_links_for_source, name='source-import-yt-links'),
 
    # entries
    path('entries/', viewentries.RssEntriesListView.as_view(), name='entries'),
@@ -39,6 +40,7 @@ urlpatterns = [
    # tags
    path('entry-tag/<int:pk>/', viewtags.tag_entry, name='entry-tag'),
    path('tag-remove/<int:pk>/', viewtags.tag_remove, name='tag-remove'),
+   path('tag-rename', viewtags.tag_rename, name='tag-rename'),
    path('show-tags', viewtags.show_tags, name='show-tags'),
 
    # comment
@@ -54,9 +56,11 @@ urlpatterns = [
    path('import-source-ia/<int:pk>/', viewcustom.import_source_from_ia, name='import-source-ia'),
    path('truncate-errors', viewcustom.truncate_errors, name='truncate-errors'),
    path('data-errors', viewcustom.data_errors_page, name='data-errors'),
-   path('entry-fix-yt-link/<int:pk>/', viewcustom.fix_youtube_link, name='entry-fix-yt-link'),
+   path('fix-entry-youtube-details/<int:pk>/', viewcustom.fix_reset_youtube_link_details, name='fix-entry-youtube-details'),
+   path('fix-source-entries-lan/<int:pk>/', viewcustom.fix_source_entries_language, name='fix-source-entries-lan'),
    path('show-yt-props', viewcustom.show_youtube_link_props, name='show-youtube-link-props'),
    path('write-bookmarks', viewcustom.write_bookmarks, name='write-bookmarks'),
+   path('write-yearly-data', viewcustom.write_yearly_data, name='write-yearly-data'),
 
    # login
    path('accounts/', include('django.contrib.auth.urls')),

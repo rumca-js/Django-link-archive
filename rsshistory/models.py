@@ -94,6 +94,10 @@ class RssSourceDataModel(models.Model):
             obj.number_of_entries = number_of_entries
             obj.save()
         else:
+            objs = RssSourceOperationalData.objects.filter(url = self.url, source_obj = None)
+            if len(objs) >= 0:
+                objs.delete()
+
             op = RssSourceOperationalData(url=self.url,
                                           date_fetched=date_fetched,
                                           import_seconds=import_seconds,
@@ -263,7 +267,7 @@ class RssSourceEntryDataModel(models.Model):
 
     def get_handler_text(self):
         if self.has_handler():
-            from .linkhandlers.youtubelinkhandler import YouTubeLinkHandler
+            from .handlers.youtubelinkhandler import YouTubeLinkHandler
             handler = YouTubeLinkHandler(self.link)
             return handler.get_frame()
 
@@ -279,6 +283,56 @@ class RssSourceEntryDataModel(models.Model):
 
         archive_link = "https://web.archive.org/web/{}000000*/{}".format(formatted_date, self.link)
         return archive_link
+
+    def create_from_youtube(url, data):
+        from .handlers.youtubelinkhandler import YouTubeLinkHandler
+
+        objs = RssSourceEntryDataModel.objects.filter(link = url)
+        if len(objs) != 0:
+           return
+
+        h = YouTubeLinkHandler(url)
+        h.download_details()
+
+        data = dict()
+        source = h.get_channel_feed_url()
+        if source is None:
+            return False
+
+        link = h.get_link_url()
+        title = h.get_title()
+        description = h.get_description()
+        date_published = h.get_datetime_published()
+        thumbnail = h.get_thumbnail()
+
+        language = "en-US"
+        if "language" in data:
+            language = data["language"]
+        user = None
+        if "user" in data:
+            user = data["user"]
+        persistent = False
+        if "persistent" in data:
+            persistent = data["persistent"]
+
+        source_obj = None
+        sources = RssSourceDataModel.objects.filter(url = source)
+        if sources.exists():
+            source_obj = sources[0]
+
+        entry = RssSourceEntryDataModel(
+                source = source,
+                title = title,
+                description = description,
+                link = link,
+                date_published = date_published,
+                persistent = persistent,
+                thumbnail = thumbnail,
+                language = language,
+                user = user,
+                source_obj = source_obj)
+        entry.save()
+        return True
 
 
 class RssEntryTagsDataModel(models.Model):
@@ -376,6 +430,18 @@ class PersistentInfo(models.Model):
 
     def error(info, level=int(logging.ERROR), user=None):
         ob = PersistentInfo(info=info, level=level, date=datetime.now(timezone('UTC')), user=user)
+        index = 0
+        while index < 5:
+            try:
+                ob.save()
+                return
+            except Exception as e:
+                index += 1
+
+    def exc(info, level=int(logging.ERROR), exc_data=None, user=None):
+        text = "{}. Exception data:\n{}".format(info, str(exc_data))
+        ob = PersistentInfo(info=text, level=level, date=datetime.now(timezone('UTC')), user=user)
+
         index = 0
         while index < 5:
             try:

@@ -50,9 +50,9 @@ def show_tags(request):
 
     text = ""
     for tag in result_list:
-        link = reverse('rsshistory:entries') + "?tag="+tag[0]
+        link = '{}?tag="{}"'.format(reverse('rsshistory:entries'), tag[0])
         link_text = str(tag[0]) + " " + str(tag[1])
-        text += "<div><a href=\"{0}\" class=\"simplebutton\">{1}</a></div>".format(link, link_text)
+        text += "<div><a href='{0}' class=\"simplebutton\">{1}</a></div>".format(link, link_text)
 
     context["summary_text"] = text
 
@@ -135,5 +135,47 @@ def tag_remove(request, pk):
     entry.delete()
 
     context["summary_text"] = "Remove ok"
+
+    return render(request, get_app() / 'summary_present.html', context)
+
+
+def tag_rename(request):
+    from ..forms import TagRenameForm
+
+    context = get_context(request)
+    context['page_title'] += " - rename tag"
+
+    if not request.user.is_staff:
+        return render(request, get_app() / 'missing_rights.html', context)
+
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = TagRenameForm(request.POST)
+        
+        # check whether it's valid:
+        if form.is_valid():
+            current_tag = form.cleaned_data['current_tag']
+            new_tag = form.cleaned_data['new_tag']
+
+            tags = RssEntryTagsDataModel.objects.filter(tag = current_tag)
+            for tag in tags:
+                tag.tag = new_tag.lower()
+                tag.save()
+
+            summary_text = "Renamed tags"
+            context["summary_text"] = summary_text
+
+        return render(request, get_app() / 'summary_present.html', context)
+    else:
+        form = TagRenameForm()
+
+        form.method = "POST"
+        form.action_url = reverse('rsshistory:tag-rename')
+
+        context['form'] = form
+        context['form_title'] = "Rename tag"
+        context['form_description'] = "Rename tag"
+
+        return render(request, get_app() / 'form_basic.html', context)
 
     return render(request, get_app() / 'summary_present.html', context)

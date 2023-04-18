@@ -1,6 +1,6 @@
 import feedparser
-
 import logging
+import traceback
 
 from ..models import PersistentInfo
 from .basepluginbuilder import BasePluginBuilder
@@ -35,7 +35,8 @@ class RssSourceProcessor(object):
                 source.set_operational_info(stop_time, num_entries, total_time.total_seconds())
 
         except Exception as e:
-            PersistentInfo.error("Source: {0} {1} NOK; {2}".format(source.url, source.title, str(e)))
+            error_text = traceback.format_exc()
+            PersistentInfo.exc("Source:{} {}; Exc:{}\n{}".format(source.url, source.title, str(e), error_text))
 
     def process_source_impl(self, source):
         plugin = BasePluginBuilder.get(source.get_domain())
@@ -62,7 +63,7 @@ class RssSourceProcessor(object):
             print("Found rss source entry")
 
             if num_entries == 0:
-                PersistentInfo.error("Source: {0} {1} Has no data".format(source.url, source.title))
+                PersistentInfo.error("Source:{0} {1}; Source has no data".format(source.url, source.title))
             else:
                 # rss_path = self._cfg.get_export_path() / "downloaded_rss"
                 # rss_path.mkdir(parents = True, exist_ok = True)
@@ -81,7 +82,8 @@ class RssSourceProcessor(object):
 
             return num_processed_entries
         except Exception as e:
-            PersistentInfo.error("Source: {0} {1} NOK; {2}".format(source.url, source.title, str(e)))
+            error_text = traceback.format_exc()
+            PersistentInfo.exc("Source:{} {}; Exc:{}\n{}".format(source.url, source.title, str(e), error_text))
 
     def process_parser_source(self, source):
         from ..webtools import Page
@@ -117,9 +119,8 @@ class RssSourceProcessor(object):
 
             return num_entries
         except Exception as e:
-            log = logging.getLogger(self._cfg.app_name)
-            PersistentInfo.error("Source: {0} {1} NOK; {2}".format(source.url, source.title, str(e)))
-            log.critical(e, exc_info=True)
+            error_text = traceback.format_exc()
+            PersistentInfo.exc("Source:{} {}; Exc:{}\n{}".format(source.url, source.title, str(e), error_text))
 
     def process_rss_entry(self, source, feed_entry):
         try:
@@ -163,8 +164,9 @@ class RssSourceProcessor(object):
             return True
 
         except Exception as e:
+            error_text = traceback.format_exc()
             PersistentInfo.error(
-                "Entry: {0} {1} NOK Entry {2} {3} {4}".format(source.url, source.title, feed_entry.link,
-                                                              feed_entry.title, str(e)))
+                    "Source:{} {}; Entry:{} {}; Exc:{}\n{}".format(source.url, source.title, feed_entry.link,
+                                                              feed_entry.title, str(e), error_text))
 
             return False

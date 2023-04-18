@@ -223,7 +223,7 @@ def data_errors_page(request):
         print("fix_reassign_source_to_nullsource_entries done")
 
     def fix_incorrect_youtube_links_links(entries):
-        from ..linkhandlers.youtubelinkhandler import YouTubeLinkHandler
+        from ..handlers.youtubelinkhandler import YouTubeLinkHandler
 
         for entry in entries:
             print("Fixing: {} {} {}".format(entry.link, entry.title, entry.source))
@@ -293,8 +293,8 @@ def data_errors_page(request):
     return render(request, get_app() / 'data_errors.html', context)
 
 
-def fix_youtube_link(request, pk):
-    from ..linkhandlers.youtubelinkhandler import YouTubeLinkHandler
+def fix_reset_youtube_link_details(request, pk):
+    from ..handlers.youtubelinkhandler import YouTubeLinkHandler
 
     context = get_context(request)
     context['page_title'] += " - fix youtube links"
@@ -335,6 +335,29 @@ def fix_youtube_link(request, pk):
             entry.link = link_valid
             entry.source_obj = source_obj
             entry.save()
+
+    context['summary_text'] = summary_text
+
+    return render(request, get_app() / 'summary_present.html', context)
+
+
+def fix_source_entries_language(request, pk):
+    from ..handlers.youtubelinkhandler import YouTubeLinkHandler
+
+    context = get_context(request)
+    context['page_title'] += " - fix source entries language"
+
+    if not request.user.is_staff:
+        return render(request, get_app() / 'missing_rights.html', context)
+
+    source_obj = RssSourceDataModel.objects.get(id = pk)
+
+    summary_text = ""
+    for entry in source_obj.entries.all():
+        if entry.language != source_obj.language:
+            entry.language = source_obj.language
+            entry.save()
+            summary_text += entry.title + " " + entry.link + "\n"
 
     context['summary_text'] = summary_text
 
@@ -458,7 +481,7 @@ def show_youtube_link_props(request):
 
             return render(request, get_app() / 'summary_present.html', context)
         else:
-            from ..linkhandlers.youtubelinkhandler import YouTubeLinkHandler
+            from ..handlers.youtubelinkhandler import YouTubeLinkHandler
 
             youtube_link = form.cleaned_data['youtube_link']
 
@@ -513,3 +536,17 @@ def write_bookmarks(request):
 
     return render(request, get_app() / 'summary_present.html', context)
 
+
+def write_yearly_data(request):
+    context = get_context(request)
+    context['page_title'] += " - Write yearly data"
+
+    if not request.user.is_staff:
+        return render(request, get_app() / 'missing_rights.html', context)
+
+    c = Configuration.get_object(str(get_app()))
+    c.thread_mgr.write_yearly_data("2021")
+
+    context["summary_text"] = "Started writing yearly data"
+
+    return render(request, get_app() / 'summary_present.html', context)

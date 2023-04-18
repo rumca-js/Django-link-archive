@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 import logging
 import traceback
 
@@ -92,14 +92,25 @@ class YearlyGeneration(object):
         self._cfg = thread_parent._cfg
         self.thread_parent = thread_parent
 
-    def process(self, item):
-        days = [
-        '2020-01-01']
+    def process(self, year):
+        try:
+            start = '2021-01-01'
+            stop = '2022-01-01'
 
-        from .datawriter import DataWriter
-        writer = DataWriter(self._cfg)
-        for day in days:
-            writer.write_daily_data(day)
+            date_start = datetime.strptime(start, '%Y-%m-%d').date()
+            date_stop = datetime.strptime(stop, '%Y-%m-%d').date()
+
+            from .datawriter import DataWriter
+            writer = DataWriter(self._cfg)
+
+            current_date = date_start
+            while current_date < date_stop:
+                print("Time: {}".format(current_date))
+                writer.write_daily_data(current_date.isoformat())
+                current_date += timedelta(days=1)
+        except Exception as e:
+           error_text = traceback.format_exc()
+           PersistentInfo.error("Exception on YearlyGeneration {} {}".format(str(e), error_text))
 
 
 class HandlerManager(object):
@@ -169,6 +180,11 @@ class HandlerManager(object):
        return True
 
    def youtube_details(self, url):
-       PersistentInfo.create("Download YouTube details:{0}".format(url))
+       PersistentInfo.create("Download YouTube details:{}".format(url))
        self.threads[3].add_to_process_list(url)
+       return True
+
+   def write_yearly_data(self, year):
+       PersistentInfo.create("Download for year:{}".format(year))
+       self.threads[4].add_to_process_list(year)
        return True

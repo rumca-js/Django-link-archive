@@ -43,7 +43,7 @@ class Page(object):
         except Exception as e:
             error_text = traceback.format_exc()
             from .models import PersistentInfo
-            PersistentInfo.error("Page: Error while reading page {0} {1}".format(str(e), error_text))
+            PersistentInfo.error("Page: Error while reading page:{};Error:{};{}".format(self.url, str(e), error_text))
 
     def get_language(self):
         if not self.contents:
