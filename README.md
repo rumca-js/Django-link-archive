@@ -104,9 +104,21 @@ With these data we can perform further analysis:
  - Some topics are so popular, that all of the sources write about it, and I am swamped with links about recent crisises
  - Even though I have 100 sources, I still find useful info from outside of my sources. Some through YouTube, some through Reddit, etc.
  - Link rot is real. Some of archived links may be not working after some time. This is especially true for msn, and yahoo, which quite fast delete older links from their database
- - Internet Archive (archive.org) does not provide snapshots for each and every day for all RSS sources. It is sometimes pretty slow. We would like to be sure that a such snapshot takes place. Therefore we need to export links to daily repo ourselves. Django RSS app also makes requests to archive to make the snapshots
  - It is hard to define which sources are to be added into database. Even though I have more than 100 sources, I check regularly only a handful of them
- - there are other RSS solutions like 'feedly', but it is an app, not data. You cannot parse it, you do not own the data, you can only do things that feedly allows you to do
+
+## Analysis of Tools
+
+Archive.org:
+ - Is not reliable. Sometimes it gets painfully slow. It is still better than nothing
+ - Most mainstream media RSS is covered, but the coverage is spotty. Not all days are covered
+ - Internet Archive (archive.org) does not provide snapshots for each and every day for all RSS sources. It is sometimes pretty slow. We would like to be sure that a such snapshot takes place. Therefore we need to export links to daily repo ourselves. Django RSS app also makes requests to archive to make the snapshots
+
+RSS tools:
+ - Some do not provide ability to bookmark entries
+ - Some do not provide ability to add tags entries (useful for searching entries with a particular tag)
+ - Some do not provide ability to search for a particular title, etc. Searching mechanisms are limiting
+ - There is no ability to fetch archived data. I have been using archive.org to import historic RSS data, but not all data are available
+ - Some of RSS tools are not local (feedly), which for me is a problem
 
 # Ending notes
 
