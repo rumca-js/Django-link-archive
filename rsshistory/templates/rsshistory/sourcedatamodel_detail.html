@@ -1,0 +1,40 @@
+{% extends base_generic %}
+
+{% block content %}
+<h1><img src="{{object.get_favicon}}"/> {{ object.title }}</h1>
+
+  <p>
+      <div><strong>Url:</strong> <a href="{{ object.url }}">{{ object.url }}</a></div>
+      <div><strong>Title:</strong> {{ object.title }}</div>
+      <span><strong>Category:</strong> {{ object.category }}</span>
+      <span><strong>Subcategory:</strong> {{ object.subcategory }}, </span>
+      <span><strong>Language:</strong> {{ object.language }}, </span>
+      <span><strong>Export to CMS:</strong> {{ object.export_to_cms }}, </span>
+      <span><strong>Remove after days:</strong> {{ object.remove_after_days }}, </span>
+      <span><strong>Favicon:</strong> {{ object.get_favicon }}</span>
+      <div>Fetched:{{object.get_date_fetched}} Number of entries:{{object.get_number_of_entries}} Import seconds:{{object.get_import_seconds}} </div>
+  </p>
+
+  {% if user.is_staff %}
+    <p>
+    <a href="{% url 'rsshistory:source-edit' object.id %}" class="simplebutton">Edit source</a>
+    <a href="{% url 'rsshistory:source-refresh' object.id %}" class="simplebutton">Refresh source</a>
+    {% if handler.is_youtube %}
+        <a href="{% url 'rsshistory:fix-source-entries-lan' object.id %}" class="simplebutton">Fix language in videos</a>
+        <a href="{% url 'rsshistory:source-import-yt-links' object.id %}" class="simplebutton">Fetch all videos</a>
+    {% endif %}
+    </p>
+  {% endif %}
+    <p>
+    <a href="{% url 'rsshistory:entries' %}?title={{object.title}}" class="simplebutton">Goto Entries</a>
+  {% if user.is_staff %}
+    <a href="{% url 'rsshistory:source-wayback-save' object.id %}" class="simplebutton">Archive.org save</a>
+    <a href="{% url 'rsshistory:import-source-ia' object.id %}" class="simplebutton">Import Archive.org</a>
+  {% endif %}
+    </p>
+  {% if user.is_staff %}
+    <p>
+    <a href="{% url 'rsshistory:source-remove' object.id %}" class="simplebutton">Remove source</a>
+    </p>
+  {% endif %}
+{% endblock %}

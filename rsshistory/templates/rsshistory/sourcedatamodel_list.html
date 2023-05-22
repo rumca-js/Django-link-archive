@@ -1,0 +1,61 @@
+{% extends base_generic %}
+
+{% block content %}
+  <span>Filters:</span>
+  <a href="{{filter_form.action_url}}" class='simplebutton'>Reset</a>
+
+  <form action="{{filter_form.action_url}}" method="{{filter_form.method}}">
+     {{ filter_form }}
+     <input type="submit" value="Submit">
+  </form>
+
+  <hr>
+
+  {% if source_list %}
+  <ul class="linklist">
+    {% for source in source_list %}
+      <li>
+          <a href="{{ source.url }}" class="longbutton">
+            <div class="linklistitem">
+              <img src="{{source.get_favicon}}" width="20">
+              <span class="linklistitemtitle">{{source.title}}</span>
+              <span class="linklistitemdescription">
+                  [{{source.category}}, {{source.subcategory}}]</span>
+                  Export: {{ source.export_to_cms }} 
+                  Remove after days: {{ source.remove_after_days }} 
+                  Fetched:{{source.get_date_fetched}} 
+                  Number of entries:{{source.get_number_of_entries}} 
+                  Import seconds:{{source.get_import_seconds}} 
+            </div>
+          </a>
+
+          <a href="{{ source.get_absolute_url }}" class="simplebutton">Details</a>
+          {% if user.is_staff %}
+            <a href="{% url 'rsshistory:source-refresh' source.id %}" class="simplebutton">Refresh</a>
+          {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+
+    <div class="pagination">
+        <span class="step-links">
+            {% if page_obj.has_previous %}
+               <a href="?page=1{{filters}}" class='simplebutton'>&laquo; first</a>
+               <a href="?page={{ page_obj.previous_page_number }}{{filters}}" class='simplebutton'>previous</a>
+            {% endif %}
+
+            <span class="current">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+            </span>
+
+            {% if page_obj.has_next %}
+              <a href="?page={{ page_obj.next_page_number }}{{filters}}" class='simplebutton'>next</a>
+              <a href="?page={{ page_obj.paginator.num_pages }}{{filters}}" class='simplebutton'>last &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+
+  {% else %}
+    <p>There are no sources.</p>
+  {% endif %}
+{% endblock %}

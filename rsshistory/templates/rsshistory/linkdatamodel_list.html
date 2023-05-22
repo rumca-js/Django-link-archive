@@ -1,0 +1,87 @@
+{% extends base_generic %}
+
+{% block content %}
+  <span>Filters:</span>
+  <a href="{% url 'rsshistory:searchinitview' %}" class='simplebutton'>Reset</a>
+
+  <form action="{{filter_form.action_url}}" method="{{filter_form.method}}">
+     {{ filter_form }}
+     <input type="submit" value="Submit">
+  </form>
+
+  <hr>
+    {% if rss_are_fetched %}
+       <div style="color:red">Sources are fetched. Queue size: {{rss_queue_size}} </div>
+       <hr>
+    {% endif %}
+
+  {% if entries_list %}
+  <ul class="linklist">
+    {% for link in entries_list %}
+      <li>
+          <span
+             {% if link.persistent %}
+                class="longbutton longbuttonselected"
+             {% else %}
+                class="longbutton"
+             {% endif %}
+                  >
+
+            <!--a href="{{ link.link }}" class="linklistthumbnail">
+              {% if link.thumbnail %}
+                <img src="{{link.thumbnail}}" width="200" height="130" />
+              {% endif %}
+            </a-->
+
+            <div class="linklistitem">
+                <a href="{{ link.get_absolute_url }}" class="linklistitemtitle">
+                   <img src="{{link.get_favicon}}" width="30"/>
+
+                   {% if link.dead %}
+                      Hidden link
+                   {% else %}
+                      {{link.title}} {{link.date_published}}  {{link.get_source_name}}
+                   {% endif %}
+                </a>
+               <div class="linklistitemdescription">
+                   {% if link.get_tag_string %}
+                   Tags: 
+                       {% for tag in link.get_tag_map %}
+                           <a href="{% url 'rsshistory:entries'%}?tag={{tag}}" class="simplebutton">{{tag}}</a>
+                       {% endfor %}
+                   {% endif %}
+                   {% if link.persistent %}
+                      User: {{link.user}}
+                   {% endif %}
+
+               </div>
+            </div>
+          </span>
+      </li>
+    {% endfor %}
+  </ul>
+
+<div class="pagination">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+           <a href="?page=1{{filter_form.get_filter_string}}" class='simplebutton'>&laquo; first</a>
+           <a href="?page={{ page_obj.previous_page_number }}{{filter_form.get_filter_string}}" class='simplebutton'>previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+        </span>
+
+        {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}{{filter_form.get_filter_string}}" class='simplebutton'>next</a>
+          <a href="?page={{ page_obj.paginator.num_pages }}{{filter_form.get_filter_string}}" class='simplebutton'>last &raquo;</a>
+        {% endif %}
+
+        <span>Records: {{entries_list | length}} </span>
+    </span>
+</div>
+
+  {% else %}
+    <p>There are no links.</p>
+  {% endif %}
+{% endblock %}
