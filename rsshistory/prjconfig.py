@@ -6,7 +6,7 @@ from .gitrepo import *
 from .basictypes import *
 
 
-__version__ = "0.6.2"
+__version__ = "0.7.0"
 
 
 class Configuration(object):
@@ -15,7 +15,6 @@ class Configuration(object):
     def __init__(self, app_name):
         self.app_name = str(app_name)
         self.thread_mgr = None
-
         self.directory = Path(".")
         self.version = __version__
         self.server_log_file = self.directory / "log_{0}.txt".format(app_name)
@@ -69,6 +68,18 @@ class Configuration(object):
         log.addHandler(ch)
         return log
 
+    def create_threads(self):
+        if self.thread_mgr is None:
+            from .threadhandlers import HandlerManager
+            self.thread_mgr = HandlerManager(self)
+
+    def get_threads(self):
+        if self.thread_mgr:
+           return self.thread_mgr.threads
+
+    def close(self):
+        self.thread_mgr.close()
+
     def get_export_path(self, append=None):
         if append:
             return self.directory / 'exports' / self.app_name / append
@@ -101,18 +112,6 @@ class Configuration(object):
         day_path = Path(day_iso)
         entries_dir = self.get_export_path(day_iso)
         return entries_dir
-
-    def create_threads(self):
-        if self.thread_mgr is None:
-            from .threadhandlers import HandlerManager
-            self.thread_mgr = HandlerManager(self)
-
-    def get_threads(self):
-        if self.thread_mgr:
-           return self.thread_mgr.threads
-
-    def close(self):
-        self.thread_mgr.close()
 
     def get_url_clean_name(self, file_name):
         file_name = file_name.replace(":", ".") \

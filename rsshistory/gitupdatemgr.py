@@ -93,9 +93,9 @@ class GitUpdateManager(object):
         repo.push()
 
     def wayback_save(self):
-        from .models import RssSourceDataModel
+        from .models import SourceDataModel
 
-        sources = RssSourceDataModel.objects.all()
+        sources = SourceDataModel.objects.all()
         for source in sources:
             self._cfg.thread_mgr.wayback_save(source.url)
 
@@ -103,9 +103,9 @@ class GitUpdateManager(object):
         log = logging.getLogger(self._cfg.app_name)
 
         from datetime import timedelta
-        from .models import RssSourceDataModel, RssSourceEntryDataModel
-        # sources = RssSourceDataModel.objects.filter(remove_after_days)
-        sources = RssSourceDataModel.objects.all()
+        from .models import SourceDataModel, LinkDataModel
+        # sources = SourceDataModel.objects.filter(remove_after_days)
+        sources = SourceDataModel.objects.all()
         for source in sources:
 
             if not source.is_removeable():
@@ -116,7 +116,7 @@ class GitUpdateManager(object):
                 current_time = DateUtils.get_datetime_now_utc()
                 days_before = current_time - timedelta(days=days)
 
-                entries = RssSourceEntryDataModel.objects.filter(source=source.url, persistent=False,
+                entries = LinkDataModel.objects.filter(source=source.url, persistent=False,
                                                                  date_published__lt=days_before)
                 if entries.exists():
                     PersistentInfo.create("Removing old RSS data for source: {0} {1}".format(source.url, source.title))

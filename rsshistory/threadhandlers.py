@@ -3,10 +3,11 @@ import logging
 import traceback
 
 from .threads import *
-
 from .sources.rsssourceprocessor import RssSourceProcessor
+from .programwrappers import ytdlp,id3v2
 from .datawriter import *
 from .models import PersistentInfo, RssSourceImportHistory
+from .basictypes import fix_path_for_windows
 
 
 class ProcessSourceHandler(object):
@@ -34,6 +35,50 @@ class ProcessSourceHandler(object):
            PersistentInfo.error("Exception during parsing page contents {0} {1} {2}".format(item.url, str(e), error_text))
 
 
+class DownloadMusicHandler(object):
+    def __init__(self, thread_parent):
+        self._cfg = thread_parent._cfg
+        self.thread_parent = thread_parent
+
+    def process(self, item):
+      log = logging.getLogger(self._cfg.app_name)
+      PersistentInfo.create("Downloading music: " + item.url + " " + item.title)
+      # TODO pass dir?
+
+      file_name = Path(item.artist) / item.album / item.title
+      file_name = str(file_name) + ".mp3"
+      file_name = fix_path_for_windows(file_name)
+
+      yt = ytdlp.YTDLP(item.url)
+      if not yt.download_audio(file_name):
+          PersistentInfo.error("Could not download music: " + item.url + " " + item.title)
+          return
+
+      data = {'artist' : item.artist, 'album' : item.album, 'title' : item.title }
+
+      id3 = id3v2.Id3v2(file_name, data)
+      id3.tag()
+      PersistentInfo.create("Downloading music done: " + item.url + " " + item.title)
+
+
+class DownloadVideoHandler(object):
+    def __init__(self, thread_parent):
+        self._cfg = thread_parent._cfg
+        self.thread_parent = thread_parent
+
+    def process(self, item):
+      log = logging.getLogger(self._cfg.app_name)
+
+      PersistentInfo.create("Downloading video: " + item.url + " " + item.title)
+
+      yt = ytdlp.YTDLP(item.url)
+      if not yt.download_video('file.mp4'):
+          PersistentInfo.error("Could not download video: " + item.url + " " + item.title)
+          return
+
+      PersistentInfo.create("Downloading video done: " + item.url + " " + item.title)
+
+
 class RefreshThreadHandler(object):
     def __init__(self, thread_parent):
         self._cfg = thread_parent._cfg
@@ -47,12 +92,10 @@ class RefreshThreadHandler(object):
            PersistentInfo.error("Exception during parsing page contents {0} {1} {2}".format(item.url, str(e), error_text))
 
     def t_refresh(self, item):
-        log = logging.getLogger(self._cfg.app_name)
-
         PersistentInfo.create("Refreshing RSS data")
 
-        from .models import RssSourceDataModel
-        sources = RssSourceDataModel.objects.all()
+        from .models import SourceDataModel
+        sources = SourceDataModel.objects.all()
         for source in sources:
             self.thread_parent.download_rss(source)
 
@@ -94,23 +137,25 @@ class YearlyGeneration(object):
 
     def process(self, year):
         try:
-            start = '2021-01-01'
-            stop = '2022-01-01'
+            start = '2022-01-01'
+            stop = '2022-12-31'
 
             date_start = datetime.strptime(start, '%Y-%m-%d').date()
             date_stop = datetime.strptime(stop, '%Y-%m-%d').date()
+            if date_stop < date_start:
+                PersistentInfo.error("Yearly generation: Incorrect configuration of dates start:{} stop:{}".format(date_start, date_stop))
 
             from .datawriter import DataWriter
             writer = DataWriter(self._cfg)
 
             current_date = date_start
-            while current_date < date_stop:
-                print("Time: {}".format(current_date))
+            while current_date <= date_stop:
+                print("Generating for time: {}".format(current_date))
                 writer.write_daily_data(current_date.isoformat())
                 current_date += timedelta(days=1)
         except Exception as e:
            error_text = traceback.format_exc()
-           PersistentInfo.error("Exception on YearlyGeneration {} {}".format(str(e), error_text))
+           PersistentInfo.error("Exception: Yearly generation: {} {}".format(str(e), error_text))
 
 
 class HandlerManager(object):
@@ -120,41 +165,46 @@ class HandlerManager(object):
       self.create_threads()
 
    def t_process_item(self, thread, item):
-     from datetime import date, timedelta
-     from .sources.rsssourceprocessor import RssSourceProcessor
-
-     if thread == "process-source":
-         handler = ProcessSourceHandler(self)
-         handler.process(item)
-     elif thread == "refresh-thread":
-         handler = RefreshThreadHandler(self)
-         handler.process(item)
-     elif thread == "wayback":
-         handler = WaybackSaveHandler(self)
-         handler.process(item)
-     elif thread == "youtube-details":
-         handler = YouTubeDetailsHandler(self)
-         handler.process(item)
-     elif thread == "yearly-generation":
-         handler = YearlyGeneration(self)
-         handler.process(item)
-     else:
-        log = logging.getLogger(self._cfg.app_name)
-        PersistentInfo.error("Not implemented processing thread {0}".format(thread))
-        log.critical(e, exc_info=True)
-        raise NotImplemented
+      if thread == "process-source":
+          handler = ProcessSourceHandler(self)
+          handler.process(item)
+      elif thread == "download-music":
+           handler = DownloadMusicHandler(self)
+           handler.process(item)
+      elif thread == "download-video":
+           handler = DownloadVideoHandler(self)
+           handler.process(item)
+      elif thread == "refresh-thread":
+           handler = RefreshThreadHandler(self)
+           handler.process(item)
+      elif thread == "wayback":
+          handler = WaybackSaveHandler(self)
+          handler.process(item)
+      elif thread == "youtube-details":
+          handler = YouTubeDetailsHandler(self)
+          handler.process(item)
+      elif thread == "yearly-generation":
+          handler = YearlyGeneration(self)
+          handler.process(item)
+      else:
+         PersistentInfo.error("Not implemented processing thread {0}".format(thread))
+         raise NotImplemented
 
    def create_threads(self):
-       download_rss = ThreadJobCommon("process-source")
+       process_source = ThreadJobCommon("process-source")
+       download_music = ThreadJobCommon("download-music")
+       download_video = ThreadJobCommon("download-video")
        refresh_thread = ThreadJobCommon("refresh-thread", 3600, True) #3600 is 1 hour
-       wayback = ThreadJobCommon("wayback")
+       wayback_save = ThreadJobCommon("wayback")
        yt_details = ThreadJobCommon("youtube-details")
        yearly = ThreadJobCommon("yearly-generation")
 
        self.threads = [
-               download_rss,
+               process_source,
+               download_music,
+               download_video,
                refresh_thread,
-               wayback,
+               wayback_save,
                yt_details,
                yearly
                ]
@@ -175,16 +225,24 @@ class HandlerManager(object):
        self.threads[0].add_to_process_list(item)
        return True
 
+   def download_music(self, item):
+       self.threads[1].add_to_process_list(item)
+       return True
+
+   def download_video(self, item):
+       self.threads[2].add_to_process_list(item)
+       return True
+
    def wayback_save(self, url):
-       self.threads[2].add_to_process_list(url)
+       self.threads[4].add_to_process_list(url)
        return True
 
    def youtube_details(self, url):
        PersistentInfo.create("Download YouTube details:{}".format(url))
-       self.threads[3].add_to_process_list(url)
+       self.threads[5].add_to_process_list(url)
        return True
 
    def write_yearly_data(self, year):
        PersistentInfo.create("Download for year:{}".format(year))
-       self.threads[4].add_to_process_list(year)
+       self.threads[6].add_to_process_list(year)
        return True

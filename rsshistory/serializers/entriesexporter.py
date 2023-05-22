@@ -38,8 +38,8 @@ class EntriesExporter(object):
         md = MarkDownConverter(items, self.md_template_link)
         md_text = md.export()
 
-        from ..models import RssSourceDataModel
-        sources = RssSourceDataModel.objects.filter(url = source_url)
+        from ..models import SourceDataModel
+        sources = SourceDataModel.objects.filter(url = source_url)
 
         if sources.exists():
             from .converters import MarkDownSourceConverter

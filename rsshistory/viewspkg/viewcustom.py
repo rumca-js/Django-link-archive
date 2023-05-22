@@ -5,7 +5,7 @@ from django.views import generic
 from django.urls import reverse
 from django.shortcuts import render
 
-from ..models import RssSourceDataModel, RssSourceEntryDataModel, RssEntryTagsDataModel, ConfigurationEntry
+from ..models import SourceDataModel, LinkDataModel, LinkTagsDataModel, ConfigurationEntry
 from ..prjconfig import Configuration
 from ..forms import SourceForm, EntryForm, ImportSourcesForm, ImportEntriesForm, SourcesChoiceForm, ConfigForm, CommentEntryForm
 from ..models import RssSourceImportHistory, RssSourceExportHistory
@@ -75,8 +75,8 @@ def system_status(request):
     from ..models import YouTubeMetaCache, YouTubeReturnDislikeMetaCache
     context['YouTubeMetaCache'] = len(YouTubeMetaCache.objects.all())
     context['YouTubeReturnDislikeMetaCache'] = len(YouTubeReturnDislikeMetaCache.objects.all())
-    context['RssSourceDataModel'] = len(RssSourceDataModel.objects.all())
-    context['RssEntryTagsDataModel'] = len(RssEntryTagsDataModel.objects.all())
+    context['SourceDataModel'] = len(SourceDataModel.objects.all())
+    context['LinkTagsDataModel'] = len(LinkTagsDataModel.objects.all())
 
     from ..models import PersistentInfo
     context['log_items'] = PersistentInfo.objects.all()
@@ -103,15 +103,13 @@ def start_threads(request):
     context = get_context(request)
     context['page_title'] += " - Status"
 
-    if not request.user.is_staff:
-        return render(request, get_app() / 'missing_rights.html', context)
-    
     c = Configuration.get_object(str(get_app()))
     c.create_threads()
 
     context["summary_text"] = "Threads started"
 
     return render(request, get_app() / 'summary_present.html', context)
+
 
 def import_view(request):
     from ..serializers.readinglist import ReadingList
@@ -133,7 +131,7 @@ def import_view(request):
         try:
             print(entry['title'])
 
-            objs = RssSourceEntryDataModel.objects.filter(link = entry['url'])
+            objs = LinkDataModel.objects.filter(link = entry['url'])
             if objs.exists():
                 print(entry['title'] + ", Skipping")
                 summary_text += entry['title'] + " " + entry['url'] + ": Skipping, already in DB\n"
@@ -149,7 +147,7 @@ def import_view(request):
                     summary_text += entry['title'] + " " + entry['url'] + ": NOK - could not find language\n"
                     continue
 
-                ent = RssSourceEntryDataModel(
+                ent = LinkDataModel(
                         source = p.get_domain(),
                         title = entry['title'],
                         description = entry['description'],
@@ -198,10 +196,10 @@ def get_incorrect_youtube_links():
     criterion5 = Q(source__isnull = True)
     criterion6 = Q(source_obj__isnull = True)
 
-    entries_no_object = RssSourceEntryDataModel.objects.filter(criterion1 | criterion1a)
-    entries_no_object |= RssSourceEntryDataModel.objects.filter(criterion2 & criterion3 & ~criterion4)
-    entries_no_object |= RssSourceEntryDataModel.objects.filter(criterion2 & criterion5)
-    #entries_no_object |= RssSourceEntryDataModel.objects.filter(criterion2 & ~criterion5 & criterion6)
+    entries_no_object = LinkDataModel.objects.filter(criterion1 | criterion1a)
+    entries_no_object |= LinkDataModel.objects.filter(criterion2 & criterion3 & ~criterion4)
+    entries_no_object |= LinkDataModel.objects.filter(criterion2 & criterion5)
+    #entries_no_object |= LinkDataModel.objects.filter(criterion2 & ~criterion5 & criterion6)
 
     if entries_no_object.exists():
         return entries_no_object
@@ -212,9 +210,9 @@ def data_errors_page(request):
     def fix_reassign_source_to_nullsource_entries():
         print("fix_reassign_source_to_nullsource_entries")
 
-        entries_no_object = RssSourceEntryDataModel.objects.filter(source_obj = None)
+        entries_no_object = LinkDataModel.objects.filter(source_obj = None)
         for entry in entries_no_object:
-            source = RssSourceDataModel.objects.filter(url = entry.source)
+            source = SourceDataModel.objects.filter(url = entry.source)
             if source.exists():
                 entry.source_obj = source[0]
                 entry.save()
@@ -243,10 +241,13 @@ def data_errors_page(request):
     def get_tags_for_missing_links():
         result = set()
 
-        tags = RssEntryTagsDataModel.objects.all()
+        tags = LinkTagsDataModel.objects.all()
         for tag in tags:
-
             if tag.link_obj is None:
+                result.add(tag)
+                continue
+
+            if tag.link_obj.link != tag.link:
                 result.add(tag)
                 continue
 
@@ -262,7 +263,7 @@ def data_errors_page(request):
         criterion2 = Q(language__contains="en")
         criterion3 = Q(language__isnull = True)
 
-        entries_no_object = RssSourceEntryDataModel.objects.filter(~criterion1 & ~criterion2 & ~criterion3, persistent = True)
+        entries_no_object = LinkDataModel.objects.filter(~criterion1 & ~criterion2 & ~criterion3, persistent = True)
 
         if entries_no_object.exists():
             return entries_no_object
@@ -293,7 +294,41 @@ def data_errors_page(request):
     return render(request, get_app() / 'data_errors.html', context)
 
 
-def fix_reset_youtube_link_details(request, pk):
+def fix_reset_youtube_link_details(link_id):
+    from ..handlers.youtubelinkhandler import YouTubeLinkHandler
+
+    entry = LinkDataModel.objects.get(id = link_id)
+
+    h = YouTubeLinkHandler(entry.link)
+    if not h.download_details():
+        return False
+
+    chan_url = h.get_channel_feed_url()
+    link_valid = h.get_link_url()
+
+    sources_obj = SourceDataModel.objects.filter(url = chan_url)
+    source_obj = None
+    if len(sources_obj) > 0:
+        source_obj = sources_obj[0]
+
+    entry.title = h.get_title()
+    entry.description = h.get_description()
+    entry.date_published = h.get_datetime_published()
+    entry.thumbnail = h.get_thumbnail()
+    entry.link = link_valid
+    entry.source_obj = source_obj
+
+    if chan_url:
+        entry.source = chan_url
+    else:
+        entry.link = link_valid
+
+    entry.save()
+
+    return True
+
+
+def fix_reset_youtube_link_details_page(request, pk):
     from ..handlers.youtubelinkhandler import YouTubeLinkHandler
 
     context = get_context(request)
@@ -302,39 +337,11 @@ def fix_reset_youtube_link_details(request, pk):
     if not request.user.is_staff:
         return render(request, get_app() / 'missing_rights.html', context)
 
-    entry = RssSourceEntryDataModel.objects.get(id = pk)
-
-    h = YouTubeLinkHandler(entry.link)
-    if not h.download_details():
-        context['summary_text'] = "Cannot obtain details for link {}".format(entry.link)
-        return render(request, get_app() / 'summary_present.html', context)
-
-    chan_url = h.get_channel_feed_url()
-    link_valid = h.get_link_url()
-
-    sources_obj = RssSourceDataModel.objects.filter(url = chan_url)
-    source_obj = None
-    if len(sources_obj) > 0:
-        source_obj = sources_obj[0]
-
-    found_links = RssSourceEntryDataModel.objects.filter(link = link_valid)
-    if len(found_links) > 0:
-        entry.delete()
-        summary_text = "Fixed links"
-    elif entry.link == link_valid and entry.source_obj is not None and entry.source == chan_url:
-        summary_text = "The link is already valid"
+    summary_text = ""
+    if fix_reset_youtube_link_details(pk):
+        summary_text += "Fixed {}".format(pk)
     else:
-        summary_text = "Fixed link {} to {}".format(entry.link, link_valid)
-        print("Fixed link {} to {}".format(entry.link, link_valid))
-        if chan_url:
-            entry.source = chan_url
-            entry.link = link_valid
-            entry.source_obj = source_obj
-            entry.save()
-        else:
-            entry.link = link_valid
-            entry.source_obj = source_obj
-            entry.save()
+        summary_text += "Not fixed {}".format(pk)
 
     context['summary_text'] = summary_text
 
@@ -350,7 +357,7 @@ def fix_source_entries_language(request, pk):
     if not request.user.is_staff:
         return render(request, get_app() / 'missing_rights.html', context)
 
-    source_obj = RssSourceDataModel.objects.get(id = pk)
+    source_obj = SourceDataModel.objects.get(id = pk)
 
     summary_text = ""
     for entry in source_obj.entries.all():
@@ -358,6 +365,28 @@ def fix_source_entries_language(request, pk):
             entry.language = source_obj.language
             entry.save()
             summary_text += entry.title + " " + entry.link + "\n"
+
+    context['summary_text'] = summary_text
+
+    return render(request, get_app() / 'summary_present.html', context)
+
+
+def fix_entry_tags(request, entrypk):
+
+    context = get_context(request)
+    context['page_title'] += " - fix entry tags"
+
+    if not request.user.is_staff:
+        return render(request, get_app() / 'missing_rights.html', context)
+
+    entry = LinkDataModel.objects.get(id = entrypk)
+    tags = entry.tags.all()
+
+    summary_text = ""
+    for tag in tags:
+        tag.link = tag.link_obj.link
+        tag.save()
+        summary_text += "Fixed: {}".format(tag.id)
 
     context['summary_text'] = summary_text
 
@@ -415,7 +444,7 @@ def import_source_from_ia(request, pk):
                 context["summary_text"] = "Internet archive data read successfully"
                 return render(request, get_app() / 'summary_present.html', context)
     
-    source_obj = RssSourceDataModel.objects.get(id = pk)
+    source_obj = SourceDataModel.objects.get(id = pk)
     
     form = ImportSourceRangeFromInternetArchiveForm(initial={"source_url": source_obj.url, 
              'archive_start' : date.today() - timedelta(days = 1),
@@ -431,7 +460,7 @@ def import_source_from_ia(request, pk):
 def import_source_from_ia_impl(wb, source_url, source_archive_url, archive_time):
     print("Reading from time: {0} {1}".format(source_url, archive_time))
 
-    source_obj = RssSourceDataModel.objects.filter(url = source_url)[0]
+    source_obj = SourceDataModel.objects.filter(url = source_url)[0]
 
     if len(RssSourceImportHistory.objects.filter(url = source_obj.url, date = archive_time)) != 0:
         print("Import timestamp exists")
@@ -537,7 +566,7 @@ def write_bookmarks(request):
     return render(request, get_app() / 'summary_present.html', context)
 
 
-def write_yearly_data(request):
+def write_yearly_data(request, year):
     context = get_context(request)
     context['page_title'] += " - Write yearly data"
 
@@ -545,8 +574,60 @@ def write_yearly_data(request):
         return render(request, get_app() / 'missing_rights.html', context)
 
     c = Configuration.get_object(str(get_app()))
-    c.thread_mgr.write_yearly_data("2021")
+    c.thread_mgr.write_yearly_data(year)
 
     context["summary_text"] = "Started writing yearly data"
+
+    return render(request, get_app() / 'summary_present.html', context)
+
+
+def write_topic(request, topic):
+    context = get_context(request)
+    context['page_title'] += " - tags writer"
+
+    if not request.user.is_staff:
+        return render(request, get_app() / 'missing_rights.html', context)
+
+    from ..serializers.bookmarksexporter import BookmarksTopicExporter
+
+    c = Configuration.get_object(str(get_app()))
+    exporter = BookmarksTopicExporter(c)
+    exporter.export(topic)
+
+    context["summary_text"] = "Wrote OK"
+
+    return render(request, get_app() / 'summary_present.html', context)
+
+
+def test_page(request):
+    context = get_context(request)
+    context['page_title'] += " - test page"
+
+    if not request.user.is_staff:
+        return render(request, get_app() / 'missing_rights.html', context)
+
+    summary_text = ""
+
+    context["summary_text"] = summary_text
+
+    return render(request, get_app() / 'summary_present.html', context)
+
+
+def fix_bookmarked_yt(request):
+    context = get_context(request)
+    context['page_title'] += " - fix all"
+
+    if not request.user.is_staff:
+        return render(request, get_app() / 'missing_rights.html', context)
+
+    summary = ""
+    links = LinkDataModel.objects.filter(persistent = True)
+    for link in links:
+        if fix_reset_youtube_link_details(link.id):
+            summary += "Fixed: {} {}\n".format(link.link, link.title)
+        else:
+            summary += "Not Fixed: {} {}\n".format(link.link, link.title)
+
+    context["summary_text"] = summary
 
     return render(request, get_app() / 'summary_present.html', context)

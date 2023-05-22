@@ -3,7 +3,7 @@ from django.views import generic
 from django.urls import reverse
 from django.shortcuts import render
 
-from ..models import RssSourceDataModel, RssSourceEntryDataModel, ConfigurationEntry
+from ..models import SourceDataModel, LinkDataModel, ConfigurationEntry
 from ..prjconfig import Configuration
 from ..forms import SourceForm, EntryForm, ImportSourcesForm, ImportEntriesForm, SourcesChoiceForm, ConfigForm, CommentEntryForm
 
@@ -22,7 +22,7 @@ def get_app():
 
 
 class RssSourceListView(generic.ListView):
-    model = RssSourceDataModel
+    model = SourceDataModel
     context_object_name = 'source_list'
     paginate_by = 100
 
@@ -52,16 +52,16 @@ class RssSourceListView(generic.ListView):
 
 
 class RssSourceDetailView(generic.DetailView):
-    model = RssSourceDataModel
+    model = SourceDataModel
 
     def get_context_data(self, **kwargs):
-        from ..handlers.sourcehandler import SourceHandler
+        from ..handlers.sourcecontroller import SourceController
         # Call the base implementation first to get the context
         context = super(RssSourceDetailView, self).get_context_data(**kwargs)
         context = init_context(context)
 
         context['page_title'] += " - " + self.object.title
-        context['handler'] = SourceHandler(self.object)
+        context['handler'] = SourceController(self.object)
 
         return context
 
@@ -113,7 +113,7 @@ def edit_source(request, pk):
     if not request.user.is_staff:
         return render(request, get_app() / 'missing_rights.html', context)
 
-    ft = RssSourceDataModel.objects.filter(id=pk)
+    ft = SourceDataModel.objects.filter(id=pk)
     if not ft.exists():
        return render(request, get_app() / 'source_edit_does_not_exist.html', context)
 
@@ -148,7 +148,7 @@ def edit_source(request, pk):
 
 
 def refresh_source(request, pk):
-    from ..models import RssSourceOperationalData
+    from ..models import SourceOperationalData
 
     context = get_context(request)
     context['page_title'] += " - refresh source"
@@ -157,26 +157,26 @@ def refresh_source(request, pk):
     if not request.user.is_staff:
         return render(request, get_app() / 'missing_rights.html', context)
 
-    ft = RssSourceDataModel.objects.filter(id=pk)
+    ft = SourceDataModel.objects.filter(id=pk)
     if not ft.exists():
        return render(request, get_app() / 'source_edit_does_not_exist.html', context)
 
     ob = ft[0]
 
-    operational = RssSourceOperationalData.objects.filter(url = ob.url)
+    operational = SourceOperationalData.objects.filter(url = ob.url)
     if operational.exists():
-        print("saving")
         op = operational[0]
         op.date_fetched = None
         op.save()
-    else:
-        print("not saving")
 
     c = Configuration.get_object(str(get_app()))
+    if not c.thread_mgr:
+        context['summary_text'] = "Source added, but could not add to queue - missing threads"
+        return render(request, get_app() / 'summary_present.html', context)
+
     c.thread_mgr.download_rss(ob, True)
 
     context['summary_text'] = "Source added to refresh queue"
-
     return render(request, get_app() / 'summary_present.html', context)
 
 
@@ -198,10 +198,10 @@ def import_sources(request):
         if form.is_valid():
             for source in form.get_sources():
 
-                if RssSourceDataModel.objects.filter(url=source.url).exists():
+                if SourceDataModel.objects.filter(url=source.url).exists():
                     summary_text += source.title + " " + source.url + " " + " Error: Already present in db\n"
                 else:
-                    record = RssSourceDataModel(url=source.url,
+                    record = SourceDataModel(url=source.url,
                                                 title=source.title,
                                                 category=source.category,
                                                 subcategory=source.subcategory)
@@ -230,13 +230,13 @@ def remove_source(request, pk):
     if not request.user.is_staff:
         return render(request, get_app() / 'missing_rights.html', context)
 
-    ft = RssSourceDataModel.objects.filter(id=pk)
+    ft = SourceDataModel.objects.filter(id=pk)
     if ft.exists():
         source_url = ft[0].url
         ft.delete()
         
         # TODO checkbox - or other button to remove corresponding entries
-        #entries = RssSourceEntryDataModel.objects.filter(url = source_url)
+        #entries = LinkDataModel.objects.filter(url = source_url)
         #if entries.exists():
         #    entries.delete()
 
@@ -254,7 +254,7 @@ def remove_all_sources(request):
     if not request.user.is_staff:
         return render(request, get_app() / 'missing_rights.html', context)
 
-    ft = RssSourceDataModel.objects.all()
+    ft = SourceDataModel.objects.all()
     if ft.exists():
         ft.delete()
         context["summary_text"] = "Removing all sources ok"
@@ -287,7 +287,7 @@ def wayback_save(request, pk):
     if not request.user.is_staff:
         return render(request, get_app() / 'missing_rights.html', context)
 
-    source = RssSourceDataModel.objects.get(id=pk)
+    source = SourceDataModel.objects.get(id=pk)
     c = Configuration.get_object(str(get_app()))
     c.wayback_save(source.url)
 
@@ -306,7 +306,7 @@ def import_youtube_links_for_source(request, pk):
     if not request.user.is_staff:
         return render(request, get_app() / 'missing_rights.html', context)
 
-    source_obj = RssSourceDataModel.objects.get(id = pk)
+    source_obj = SourceDataModel.objects.get(id = pk)
     url = str(source_obj.url)
     wh = url.find("=")
 
@@ -324,10 +324,10 @@ def import_youtube_links_for_source(request, pk):
     for link in links:
        print("Adding {}".format(link))
        try:
-           RssSourceEntryDataModel.create_from_youtube(link, data)
+           LinkDataModel.create_from_youtube(link, data)
        except Exception as E:
            try:
-               RssSourceEntryDataModel.create_from_youtube(link, data)
+               LinkDataModel.create_from_youtube(link, data)
            except Exception as E:
                pass
 

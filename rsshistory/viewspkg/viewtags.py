@@ -2,8 +2,8 @@ from django.views import generic
 from django.urls import reverse
 from django.shortcuts import render
 
-from ..models import RssSourceDataModel, RssSourceEntryDataModel, ConfigurationEntry
-from ..models import RssEntryTagsDataModel
+from ..models import SourceDataModel, LinkDataModel, ConfigurationEntry
+from ..models import LinkTagsDataModel
 from ..prjconfig import Configuration
 from ..forms import SourceForm, EntryForm, ImportSourcesForm, ImportEntriesForm, SourcesChoiceForm, ConfigForm, CommentEntryForm
 
@@ -27,7 +27,7 @@ def show_tags(request):
     context['page_title'] += " - browse tags"
 
     # TODO select only this month
-    objects = RssEntryTagsDataModel.objects.all()
+    objects = LinkTagsDataModel.objects.all()
 
     tags = objects.values('tag')
 
@@ -52,7 +52,7 @@ def show_tags(request):
     for tag in result_list:
         link = '{}?tag="{}"'.format(reverse('rsshistory:entries'), tag[0])
         link_text = str(tag[0]) + " " + str(tag[1])
-        text += "<div><a href='{0}' class=\"simplebutton\">{1}</a></div>".format(link, link_text)
+        text += "<span><a href='{0}' class=\"simplebutton\" style=\"margin: 5px\">{1}</a></span> ".format(link, link_text)
 
     context["summary_text"] = text
 
@@ -70,7 +70,7 @@ def tag_entry(request, pk):
     if not request.user.is_staff:
         return render(request, get_app() / 'missing_rights.html', context)
 
-    objs = RssSourceEntryDataModel.objects.filter(id=pk)
+    objs = LinkDataModel.objects.filter(id=pk)
 
     if not objs.exists():
         context["summary_text"] = "Sorry, such object does not exist"
@@ -107,7 +107,7 @@ def tag_entry(request, pk):
     else:
         author = request.user.username
         link = obj.link
-        tag_string = RssEntryTagsDataModel.get_author_tag_string(author, link)
+        tag_string = LinkTagsDataModel.get_author_tag_string(author, link)
 
         if tag_string:
             form = TagEntryForm(initial={'link' : link, 'author' : author, 'tag' : tag_string})
@@ -131,10 +131,46 @@ def tag_remove(request, pk):
     if not request.user.is_staff:
         return render(request, get_app() / 'missing_rights.html', context)
 
-    entry = RssEntryTagsDataModel.objects.get(id=pk)
+    entry = LinkTagsDataModel.objects.get(id=pk)
     entry.delete()
 
     context["summary_text"] = "Remove ok"
+
+    return render(request, get_app() / 'summary_present.html', context)
+
+
+def tags_entry_remove(request, entrypk):
+    context = get_context(request)
+    context['page_title'] += " - remove tag"
+
+    if not request.user.is_staff:
+        return render(request, get_app() / 'missing_rights.html', context)
+
+    entry = LinkDataModel.objects.get(id=entrypk)
+    tags = entry.tags.all()
+    for tag in tags:
+        tag.delete()
+
+    context["summary_text"] = "Remove ok"
+
+    return render(request, get_app() / 'summary_present.html', context)
+
+
+def tags_entry_show(request, entrypk):
+    context = get_context(request)
+    context['page_title'] += " - remove tag"
+
+    if not request.user.is_staff:
+        return render(request, get_app() / 'missing_rights.html', context)
+
+    summary = ""
+
+    entry = LinkDataModel.objects.get(id=entrypk)
+    tags = entry.tags.all()
+    for tag in tags:
+        summary += "Link:{} tag:{} author:{}\n".format(tag.link, tag.tag, tag.author)
+
+    context["summary_text"] = summary
 
     return render(request, get_app() / 'summary_present.html', context)
 
@@ -157,7 +193,7 @@ def tag_rename(request):
             current_tag = form.cleaned_data['current_tag']
             new_tag = form.cleaned_data['new_tag']
 
-            tags = RssEntryTagsDataModel.objects.filter(tag = current_tag)
+            tags = LinkTagsDataModel.objects.filter(tag = current_tag)
             for tag in tags:
                 tag.tag = new_tag.lower()
                 tag.save()

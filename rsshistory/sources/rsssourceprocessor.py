@@ -87,14 +87,14 @@ class RssSourceProcessor(object):
 
     def process_parser_source(self, source):
         from ..webtools import Page
-        from ..models import RssSourceEntryDataModel
+        from ..models import LinkDataModel
         try:
             plugin = BasePluginBuilder.get(source.get_domain())
             links = plugin.get_links()
             num_entries = len(links)
 
             for link in links:
-                objs = RssSourceEntryDataModel.objects.filter(link=link)
+                objs = LinkDataModel.objects.filter(link=link)
                 if objs.exists():
                     continue
 
@@ -103,7 +103,7 @@ class RssSourceProcessor(object):
                 if title:
                     props = plugin.get_link_data(source, link)
 
-                    o = RssSourceEntryDataModel(
+                    o = LinkDataModel(
                         source=props['source'],
                         title=props['title'],
                         description=props['description'],
@@ -124,7 +124,7 @@ class RssSourceProcessor(object):
 
     def process_rss_entry(self, source, feed_entry):
         try:
-            from ..models import RssSourceEntryDataModel
+            from ..models import LinkDataModel
 
             plugin = BasePluginBuilder.get(source.get_domain())
             plugin.allow_adding_with_current_time = self.allow_adding_with_current_time
@@ -133,7 +133,7 @@ class RssSourceProcessor(object):
 
             props = plugin.get_feed_entry_map(source, feed_entry)
 
-            objs = RssSourceEntryDataModel.objects.filter(link=props['link'])
+            objs = LinkDataModel.objects.filter(link=props['link'])
 
             if not objs.exists():
                 if str(feed_entry.title).strip() == "" or feed_entry.title == "undefined":
@@ -145,7 +145,7 @@ class RssSourceProcessor(object):
                 if 'published' not in props:
                     return False
 
-                o = RssSourceEntryDataModel(
+                o = LinkDataModel(
                     source=props['source'],
                     title=props['title'],
                     description=props['description'],

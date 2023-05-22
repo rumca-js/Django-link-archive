@@ -10,7 +10,7 @@ We should store links in a coherent manner.
    <li>
        {{link.title}}
        <a href="{% url 'rsshistory:entry-detail' link.id %}">Details</a>
-       <a href="{% url 'rsshistory:entry-fix-yt-link' link.id %}">Fix link</a>
+       <a href="{% url 'rsshistory:fix-entry-youtube-details' link.id %}">Fix link</a>
        <a href="{% url 'rsshistory:entry-remove' link.id %}">Remove entry</a>
     </li>
 {% endfor %}
@@ -25,12 +25,15 @@ We should store links in a coherent manner.
     </div>
 {% endfor %}
 
-<h2>Tags for missing links</h2>
+<h2>Tags errors</h2>
 
+<ul>
 {% for tag in tags_for_missing_links %}
-   <div>
-       <a href="{% url 'rsshistory:tag-remove' tag.id %}">{{tag.link}} {{tag.author}} {{tag.date}}</a>
-    </div>
+    <li>{{tag.tag}} {{tag.link}} {{tag.author}} {{tag.date}}
+       <a href="{% url 'rsshistory:fix-entry-tags' tag.link_obj.id %}">Fix</a>
+       <a href="{% url 'rsshistory:tag-remove' tag.id %}">Remove</a>
+    </li>
 {% endfor %}
+</ul>
 
 {% endblock %}

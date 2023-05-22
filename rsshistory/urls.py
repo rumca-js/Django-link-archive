@@ -4,7 +4,7 @@ from django.urls import include
 from django.contrib.auth import views as auth
 from django.views.generic import RedirectView
 from . import views
-from .viewspkg import viewentries, viewsources, viewcustom, viewtags
+from .viewspkg import viewentries, viewsources, viewcustom, viewtags, viewcomments
 
 app_name = str(views.app_name)
 
@@ -40,13 +40,15 @@ urlpatterns = [
    # tags
    path('entry-tag/<int:pk>/', viewtags.tag_entry, name='entry-tag'),
    path('tag-remove/<int:pk>/', viewtags.tag_remove, name='tag-remove'),
+   path('tags-entry-remove/<int:entrypk>/', viewtags.tags_entry_remove, name='tags-entry-remove'),
+   path('tags-entry-show/<int:entrypk>/', viewtags.tags_entry_show, name='tags-entry-show'),
    path('tag-rename', viewtags.tag_rename, name='tag-rename'),
    path('show-tags', viewtags.show_tags, name='show-tags'),
 
    # comment
-   path('entry-comment-add/<int:link_id>', views.entry_add_comment, name='entry-comment-add'),
-   path('entry-comment-edit/<int:pk>/', views.entry_comment_edit, name='entry-comment-edit'),
-   path('entry-comment-remove/<int:pk>/', views.entry_comment_remove, name='entry-comment-remove'),
+   path('entry-comment-add/<int:link_id>', viewcomments.entry_add_comment, name='entry-comment-add'),
+   path('entry-comment-edit/<int:pk>/', viewcomments.entry_comment_edit, name='entry-comment-edit'),
+   path('entry-comment-remove/<int:pk>/', viewcomments.entry_comment_remove, name='entry-comment-remove'),
 
    # custom views
    path('configuration/', viewcustom.configuration, name='configuration'),
@@ -56,15 +58,17 @@ urlpatterns = [
    path('import-source-ia/<int:pk>/', viewcustom.import_source_from_ia, name='import-source-ia'),
    path('truncate-errors', viewcustom.truncate_errors, name='truncate-errors'),
    path('data-errors', viewcustom.data_errors_page, name='data-errors'),
-   path('fix-entry-youtube-details/<int:pk>/', viewcustom.fix_reset_youtube_link_details, name='fix-entry-youtube-details'),
+   path('fix-entry-youtube-details/<int:pk>/', viewcustom.fix_reset_youtube_link_details_page, name='fix-entry-youtube-details'),
+   path('fix-entry-tags/<int:entrypk>/', viewcustom.fix_entry_tags, name='fix-entry-tags'),
    path('fix-source-entries-lan/<int:pk>/', viewcustom.fix_source_entries_language, name='fix-source-entries-lan'),
    path('show-yt-props', viewcustom.show_youtube_link_props, name='show-youtube-link-props'),
    path('write-bookmarks', viewcustom.write_bookmarks, name='write-bookmarks'),
-   path('write-yearly-data', viewcustom.write_yearly_data, name='write-yearly-data'),
+   path('write-yearly-data/<str:year>', viewcustom.write_yearly_data, name='write-yearly-data'),
+   path('write-topic/<str:topic>', viewcustom.write_topic, name='write-topic'),
+   path('test-page', viewcustom.test_page, name='test-page'),
 
    # login
    path('accounts/', include('django.contrib.auth.urls')),
-   #path('logoutuser/', auth.LogoutView.as_view(), name ='logoutuser'),
    path('rsshistory/accounts/logout/', RedirectView.as_view(url='rsshistory/')),
    path('accounts/logout/', RedirectView.as_view(url='rsshistory/')),
 ]

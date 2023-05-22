@@ -1,23 +1,14 @@
 from django import forms
-from .models import RssSourceDataModel, RssSourceEntryDataModel, ConfigurationEntry, RssEntryTagsDataModel, RssEntryCommentDataModel
+from .models import SourceDataModel, LinkDataModel, ConfigurationEntry, LinkTagsDataModel, LinkCommentDataModel
 
 # https://docs.djangoproject.com/en/4.1/ref/forms/widgets/
-
-#class NewLinkForm(forms.Form):
-#    """
-#    New link form
-#    """
-#    class Meta:
-#        model = LinkDataModel
-#        fields = ['url', 'category', 'subcategory', 'artist', 'album', 'title', 'date_created']
-
 
 class SourceForm(forms.ModelForm):
     """
     Category choice form
     """
     class Meta:
-        model = RssSourceDataModel
+        model = SourceDataModel
         fields = ['url', 'title', 'category', 'subcategory', 'language', 'export_to_cms', 'remove_after_days', 'favicon', 'on_hold']
         widgets = {
          #'git_token': forms.PasswordInput(),
@@ -27,20 +18,13 @@ class SourceForm(forms.ModelForm):
         super(SourceForm, self).__init__(*args, **kwargs)
         self.fields['favicon'].required = False
 
-    #def save_form(self):
-    #    from .webtools import Page
-
-    #    url = self.cleaned_data['url']
-    #    favicon = self.cleaned_data['favicon']
-    #    print("Utl: {0} {1}".format(url, favicon))
-
 
 class EntryForm(forms.ModelForm):
     """
     Category choice form
     """
     class Meta:
-        model = RssSourceEntryDataModel
+        model = LinkDataModel
         fields = ['link', 'title', 'description', 'date_published', 'source', 'persistent', 'language', 'user']
         widgets = {
          #'git_token': forms.PasswordInput(),
@@ -115,15 +99,15 @@ class EntryForm(forms.ModelForm):
             return False
 
         source_obj = None
-        sources = RssSourceDataModel.objects.filter(url = source)
+        sources = SourceDataModel.objects.filter(url = source)
         if sources.exists():
             source_obj = sources[0]
 
-        links = RssSourceEntryDataModel.objects.filter(link = link)
+        links = LinkDataModel.objects.filter(link = link)
         if len(links) > 0:
             return False
 
-        entry = RssSourceEntryDataModel(
+        entry = LinkDataModel(
                 source = source,
                 title = title,
                 description = description,
@@ -144,7 +128,7 @@ class TagEntryForm(forms.ModelForm):
     Category choice form
     """
     class Meta:
-        model = RssEntryTagsDataModel
+        model = LinkTagsDataModel
         fields = ['link', 'author', 'date', 'tag']
         widgets = {
          #'git_token': forms.PasswordInput(),
@@ -156,22 +140,22 @@ class TagEntryForm(forms.ModelForm):
         date = self.cleaned_data["date"]
         tags = self.cleaned_data["tag"]
 
-        objs = RssEntryTagsDataModel.objects.filter(author = author, link = link)
+        objs = LinkTagsDataModel.objects.filter(author = author, link = link)
         if objs.exists():
             objs.delete()
 
         tags_set = set()
-        tags = tags.split(RssEntryTagsDataModel.get_delim())
+        tags = tags.split(LinkTagsDataModel.get_delim())
         for tag in tags:
             tag = str(tag).strip()
             tag = tag.lower()
             if tag != "":
                 tags_set.add(tag)
 
-        link_objs = RssSourceEntryDataModel.objects.filter(link = link)
+        link_objs = LinkDataModel.objects.filter(link = link)
 
         for tag in tags_set:
-            model = RssEntryTagsDataModel(link = link, author = author, date = date, tag = tag, link_obj = link_objs[0])
+            model = LinkTagsDataModel(link = link, author = author, date = date, tag = tag, link_obj = link_objs[0])
             model.save()
 
 
@@ -226,7 +210,7 @@ class SourcesChoiceForm(forms.Form):
 
     def get_filtered_objects(self):
         parameter_map = self.get_filter_args()
-        self.filtered_objects = RssSourceDataModel.objects.filter(**parameter_map)
+        self.filtered_objects = SourceDataModel.objects.filter(**parameter_map)
         return self.filtered_objects
 
     def create(self):
@@ -318,7 +302,7 @@ class EntryChoiceForm(forms.Form):
         entry_parameter_map = self.get_entry_filter_args(False)
 
         self.entries = []
-        self.entries = RssSourceEntryDataModel.objects.filter(**entry_parameter_map)
+        self.entries = LinkDataModel.objects.filter(**entry_parameter_map)
 
         return self.entries
 
@@ -366,7 +350,7 @@ class EntryChoiceForm(forms.Form):
 
     def get_sources(self):
         source_parameter_map = self.get_source_filter_args()
-        self.sources = RssSourceDataModel.objects.filter(**source_parameter_map)
+        self.sources = SourceDataModel.objects.filter(**source_parameter_map)
 
     def get_filtered_objects_values(self, field):
         values = set()
@@ -538,14 +522,12 @@ class ImportSourceRangeFromInternetArchiveForm(forms.Form):
     archive_stop = forms.DateField(label = "Stop time")
 
 
-from .models import RssEntryCommentDataModel
-
 class CommentEntryForm(forms.ModelForm):
     """
     Category choice form
     """
     class Meta:
-        model = RssEntryCommentDataModel
+        model = LinkCommentDataModel
         fields = ['comment', 'link', 'date_published', 'author']
 
     def __init__(self, *args, **kwargs):
@@ -559,9 +541,9 @@ class CommentEntryForm(forms.ModelForm):
         date_published = self.cleaned_data['date_published']
         author = self.cleaned_data['author']
 
-        entry = RssSourceEntryDataModel.objects.get(link = link_url)
+        entry = LinkDataModel.objects.get(link = link_url)
 
-        o = RssEntryCommentDataModel(
+        o = LinkCommentDataModel(
                 comment = comment,
                 link = link_url,
                 author = author,

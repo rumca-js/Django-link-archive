@@ -20,19 +20,18 @@ class YouTubeLinkHandler(object):
         return 'https://www.youtube.com/watch?v={0}'.format(code)
 
     def input2code(url):
-        wh = url.find("=")
-        if wh == -1:
-            wh = url.find("youtu.be")
-            if wh == -1:
-                video_code = url
-            else:
-                video_code = url[wh+9:]
+        wh = url.find("youtu.be")
+        if wh >= 0:
+            video_code = url[wh+9:]
         else:
-            wh2 = url.find("&")
-            if wh2 != -1:
-                video_code = url[wh+1:wh2]
-            else:
-                video_code = url[wh+1:]
+            wh = url.find("?")
+            if wh >= 0:
+                url = url[wh + 1 :]
+                split_items = url.split("&")
+                for split_item in split_items:
+                    wh = split_item.find("v=")
+                    if wh == 0:
+                        video_code = split_item[wh + 2:]
         return video_code
 
     def get_embed_link(self):
@@ -90,6 +89,10 @@ class YouTubeLinkHandler(object):
     def get_channel_feed_url(self):
         if self.yt_ob:
             return self.yt_ob.get_channel_feed_url()
+
+    def get_channel_name(self):
+        if self.yt_ob:
+            return self.yt_ob.get_channel_name()
 
     def get_link_url(self):
         if self.yt_ob:

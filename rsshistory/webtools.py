@@ -119,7 +119,6 @@ class Page(object):
             wh = page.find('<a href="', wh + 1)
 
             if wh > 0:
-                # print(wh)
                 text = self.extract_html(page, '<a href="', '"', wh)
 
                 if text:

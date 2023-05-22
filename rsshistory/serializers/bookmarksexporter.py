@@ -17,8 +17,8 @@ class BookmarksExporter(object):
         self.md_template_bookmarked += " - tags: $tags\n"
 
     def get_entries(self):
-       from ..models import RssSourceEntryDataModel
-       entries = RssSourceEntryDataModel.objects.filter(persistent = True)
+       from ..models import LinkDataModel
+       entries = LinkDataModel.objects.filter(persistent = True)
 
     def get_export_path(self):
        entries_dir = self._cfg.get_bookmarks_path()
@@ -118,7 +118,7 @@ class BookmarksBigExporter(object):
 
     def export(self):
        import datetime
-       from ..models import RssSourceEntryDataModel
+       from ..models import LinkDataModel
 
        entries_dir = self._cfg.get_bookmarks_path()
        if entries_dir.exists():
@@ -130,7 +130,7 @@ class BookmarksBigExporter(object):
 
            therange = (start_date, stop_date)
 
-           all_entries = RssSourceEntryDataModel.objects.filter(persistent = True, date_published__range=therange)
+           all_entries = LinkDataModel.objects.filter(persistent = True, date_published__range=therange)
 
            en_entries = all_entries.filter(language__icontains = 'en')
            pl_entries = all_entries.filter(language__icontains = 'pl')
@@ -141,10 +141,32 @@ class BookmarksBigExporter(object):
            converter = BookmarksExporter(self._cfg, pl_entries)
            converter.export('bookmarks_PL', str(year))
 
-           #en_entries = RssSourceEntryDataModel.objects.filter(persistent = True, date_published__range=therange, language__icontains = 'en')
+           #en_entries = LinkDataModel.objects.filter(persistent = True, date_published__range=therange, language__icontains = 'en')
            #converter = BookmarksExporter(self._cfg, en_entries)
            #converter.export('bookmarks_EN', str(year))
 
-           #en_entries = RssSourceEntryDataModel.objects.filter(persistent = True, date_published__range=therange, language__icontains = 'pl')
+           #en_entries = LinkDataModel.objects.filter(persistent = True, date_published__range=therange, language__icontains = 'pl')
            #converter = BookmarksExporter(self._cfg, en_entries)
            #converter.export('bookmarks_PL', str(year))
+
+
+class BookmarksTopicExporter(object):
+
+    def __init__(self, config):
+        self._cfg = config
+
+    def export(self, topic):
+       import datetime
+       from ..models import LinkDataModel, RssEntryTagsDataModel
+
+       tag_objs = RssEntryTagsDataModel.objects.filter(tag = topic)
+       entries = set()
+       for tag_obj in tag_objs:
+           if tag_obj.link_obj is not None:
+               entries.add(tag_obj.link_obj)
+
+       entries = list(entries)
+       entries = sorted(entries, key = lambda x: x.date_published)
+
+       converter = BookmarksExporter(self._cfg, entries)
+       converter.export("topic_{}".format(topic), "topics")

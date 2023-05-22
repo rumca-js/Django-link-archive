@@ -8,11 +8,11 @@ class SourceEntriesDataWriter(object):
         self.source_url = source_url
 
     def write_for_day(self, day_iso):
-        from .models import RssSourceEntryDataModel
+        from .models import LinkDataModel
         from .serializers.entriesexporter import EntriesExporter
 
         date_range = DateUtils.get_range4day(day_iso)
-        entries = RssSourceEntryDataModel.objects.filter(source = self.source_url, date_published__range=date_range)
+        entries = LinkDataModel.objects.filter(source = self.source_url, date_published__range=date_range)
 
         clean_url = self._cfg.get_url_clean_name(self.source_url)
 
@@ -27,7 +27,7 @@ class SourcesEntriesDataWriter(object):
 
     def write_for_day(self, day_iso):
         """ We do not want to provide for each day cumulative view. Users may want to select which 'streams' are selected individually '"""
-        from .models import RssSourceDataModel, RssSourceEntryDataModel
+        from .models import SourceDataModel, LinkDataModel
 
         date_range = DateUtils.get_range4day(day_iso)
 
@@ -35,11 +35,11 @@ class SourcesEntriesDataWriter(object):
         # first capture entries, then check if has export to CMS.
         # if entry does not have source, it was added manually and is subject for export
 
-        entries = RssSourceEntryDataModel.objects.filter(date_published__range = date_range)
+        entries = LinkDataModel.objects.filter(date_published__range = date_range)
         sources_urls = set(entries.values_list('source', flat=True).distinct())
 
         for source_url in sources_urls:
-            source_objs = RssSourceDataModel.objects.filter(url = source_url)
+            source_objs = SourceDataModel.objects.filter(url = source_url)
             if source_objs.exists() and not source_objs[0].export_to_cms:
                continue
 
@@ -62,9 +62,9 @@ class DataWriter(object):
         exporter.export()
 
     def write_sources(self):
-        from .models import RssSourceDataModel
+        from .models import SourceDataModel
 
-        sources = RssSourceDataModel.objects.filter(export_to_cms = True)
+        sources = SourceDataModel.objects.filter(export_to_cms = True)
 
         from .serializers.converters import ModelCollectionConverter, JsonConverter
 

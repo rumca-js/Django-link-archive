@@ -5,7 +5,7 @@ import logging
 from pytz import timezone
 
 
-class RssSourceDataModel(models.Model):
+class SourceDataModel(models.Model):
     url = models.CharField(max_length=2000, unique=True)
     title = models.CharField(max_length=1000)
     category = models.CharField(max_length=1000)
@@ -18,11 +18,7 @@ class RssSourceDataModel(models.Model):
     on_hold = models.BooleanField(default=False)
 
     class Meta:
-        ordering = ['title', 'url']
-
-    # def __init__(self, *args, **kwargs):
-    #    super().__init__(self, *args, **kwargs)
-    #    self.obj = None
+        ordering = ['title']
 
     def get_absolute_url(self):
         """Returns the URL to access a particular author instance."""
@@ -66,7 +62,7 @@ class RssSourceDataModel(models.Model):
             return False
 
     def get_op_data(self):
-        objs = self.dynami_cdata.all()
+        objs = self.dynamic_data.all()
         if len(objs) == 0:
             return None
         return objs[0]
@@ -94,11 +90,11 @@ class RssSourceDataModel(models.Model):
             obj.number_of_entries = number_of_entries
             obj.save()
         else:
-            objs = RssSourceOperationalData.objects.filter(url = self.url, source_obj = None)
+            objs = SourceOperationalData.objects.filter(url = self.url, source_obj = None)
             if len(objs) >= 0:
                 objs.delete()
 
-            op = RssSourceOperationalData(url=self.url,
+            op = SourceOperationalData(url=self.url,
                                           date_fetched=date_fetched,
                                           import_seconds=import_seconds,
                                           number_of_entries=number_of_entries,
@@ -139,12 +135,12 @@ class RssSourceDataModel(models.Model):
         return self.get_map()
 
 
-class RssSourceOperationalData(models.Model):
+class SourceOperationalData(models.Model):
     url = models.CharField(max_length=2000, unique=True)
     date_fetched = models.DateTimeField(null=True)
     import_seconds = models.IntegerField(null=True)
     number_of_entries = models.IntegerField(null=True)
-    source_obj = models.ForeignKey(RssSourceDataModel, on_delete=models.SET_NULL, related_name='dynami_cdata',
+    source_obj = models.ForeignKey(SourceDataModel, on_delete=models.SET_NULL, related_name='dynamic_data',
                                    null=True, blank=True)
 
     class Meta:
@@ -154,7 +150,7 @@ class RssSourceOperationalData(models.Model):
 class RssSourceImportHistory(models.Model):
     url = models.CharField(max_length=2000)
     date = models.DateField()
-    source_obj = models.ForeignKey(RssSourceDataModel, on_delete=models.SET_NULL, related_name='history_import',
+    source_obj = models.ForeignKey(SourceDataModel, on_delete=models.SET_NULL, related_name='history_import',
                                    null=True, blank=True)
 
     class Meta:
@@ -168,7 +164,7 @@ class RssSourceExportHistory(models.Model):
         ordering = ['-date']
 
 
-class RssSourceEntryDataModel(models.Model):
+class LinkDataModel(models.Model):
     source = models.CharField(max_length=2000)
     title = models.CharField(max_length=1000)
     description = models.CharField(max_length=1000)
@@ -185,7 +181,7 @@ class RssSourceEntryDataModel(models.Model):
     language = models.CharField(max_length=10, null=True)
     thumbnail = models.CharField(max_length=1000, null=True)
 
-    source_obj = models.ForeignKey(RssSourceDataModel, on_delete=models.SET_NULL, related_name='entries', null=True,
+    source_obj = models.ForeignKey(SourceDataModel, on_delete=models.SET_NULL, related_name='link_source', null=True,
                                    blank=True)
 
     class Meta:
@@ -202,7 +198,7 @@ class RssSourceEntryDataModel(models.Model):
             return self.source
 
     def get_tag_string(self):
-        return RssEntryTagsDataModel.join_elements(self.tags.all()) 
+        return LinkTagsDataModel.join_elements(self.tags.all()) 
 
     def get_tag_map(self):
         # TODO should it be done by for tag in self.tags: tag.get_map()?
@@ -265,16 +261,6 @@ class RssSourceEntryDataModel(models.Model):
 
         return themap
 
-    def get_handler_text(self):
-        if self.has_handler():
-            from .handlers.youtubelinkhandler import YouTubeLinkHandler
-            handler = YouTubeLinkHandler(self.link)
-            return handler.get_frame()
-
-    def has_handler(self):
-        if self.link.find("youtube") >= 0:
-            return True
-
     def get_archive_link(self):
         from .sources.waybackmachine import WaybackMachine
         from .dateutils import DateUtils
@@ -287,7 +273,7 @@ class RssSourceEntryDataModel(models.Model):
     def create_from_youtube(url, data):
         from .handlers.youtubelinkhandler import YouTubeLinkHandler
 
-        objs = RssSourceEntryDataModel.objects.filter(link = url)
+        objs = LinkDataModel.objects.filter(link = url)
         if len(objs) != 0:
            return
 
@@ -316,11 +302,11 @@ class RssSourceEntryDataModel(models.Model):
             persistent = data["persistent"]
 
         source_obj = None
-        sources = RssSourceDataModel.objects.filter(url = source)
+        sources = SourceDataModel.objects.filter(url = source)
         if sources.exists():
             source_obj = sources[0]
 
-        entry = RssSourceEntryDataModel(
+        entry = LinkDataModel(
                 source = source,
                 title = title,
                 description = description,
@@ -335,7 +321,7 @@ class RssSourceEntryDataModel(models.Model):
         return True
 
 
-class RssEntryTagsDataModel(models.Model):
+class LinkTagsDataModel(models.Model):
     # https://stackoverflow.com/questions/14066531/django-model-with-unique-combination-of-two-fields
 
     link = models.CharField(max_length=1000)
@@ -346,7 +332,7 @@ class RssEntryTagsDataModel(models.Model):
     # If there are many labels, it will be visible for what it is
     tag = models.CharField(max_length=1000)
 
-    link_obj = models.ForeignKey(RssSourceEntryDataModel, on_delete=models.CASCADE, related_name='tags', null=True,
+    link_obj = models.ForeignKey(LinkDataModel, on_delete=models.CASCADE, related_name='tags', null=True,
                                  blank=True)
 
     def get_delim():
@@ -358,18 +344,18 @@ class RssEntryTagsDataModel(models.Model):
             if tag_string == "":
                 tag_string = element.tag
             else:
-                tag_string += RssEntryTagsDataModel.get_delim() + element.tag
+                tag_string += LinkTagsDataModel.get_delim() + element.tag
 
         return tag_string
 
     def get_author_tag_string(author, link):
-        current_tags_objs = RssEntryTagsDataModel.objects.filter(link=link, author=author)
+        current_tags_objs = LinkTagsDataModel.objects.filter(link=link, author=author)
 
         if current_tags_objs.exists():
-            return RssEntryTagsDataModel.join_elements(current_tags_objs)
+            return LinkTagsDataModel.join_elements(current_tags_objs)
 
 
-class RssEntryCommentDataModel(models.Model):
+class LinkCommentDataModel(models.Model):
     author = models.CharField(max_length=1000)
     comment = models.TextField(max_length=3000)
     date_published = models.DateTimeField(default=datetime.now)
@@ -377,7 +363,7 @@ class RssEntryCommentDataModel(models.Model):
     reply_id = models.IntegerField(null=True)
     link = models.CharField(max_length=1000)
 
-    link_obj = models.ForeignKey(RssSourceEntryDataModel, on_delete=models.CASCADE, related_name='comments', null=True,
+    link_obj = models.ForeignKey(LinkDataModel, on_delete=models.CASCADE, related_name='comments', null=True,
                                  blank=True)
 
 
@@ -461,13 +447,12 @@ class PersistentInfo(models.Model):
 
 """ YouTube meta cache """
 
-
 class YouTubeMetaCache(models.Model):
     url = models.CharField(max_length=1000, help_text='url', unique=False)
     details_json = models.CharField(max_length=1000, help_text='details_json')
     dead = models.BooleanField(default=False, help_text='dead')
 
-    link_yt_obj = models.ForeignKey(RssSourceEntryDataModel, on_delete=models.SET_NULL, related_name='link_yt',
+    link_yt_obj = models.ForeignKey(LinkDataModel, on_delete=models.SET_NULL, related_name='link_yt',
                                     null=True, blank=True)
 
 
@@ -476,5 +461,5 @@ class YouTubeReturnDislikeMetaCache(models.Model):
     return_dislike_json = models.CharField(max_length=1000, help_text='return_dislike_json')
     dead = models.BooleanField(default=False, help_text='dead')
 
-    link_rd_obj = models.ForeignKey(RssSourceEntryDataModel, on_delete=models.SET_NULL, related_name='link_rd',
+    link_rd_obj = models.ForeignKey(LinkDataModel, on_delete=models.SET_NULL, related_name='link_rd',
                                     null=True, blank=True)

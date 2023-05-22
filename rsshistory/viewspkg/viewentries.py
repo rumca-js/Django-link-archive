@@ -3,7 +3,7 @@ from django.views import generic
 from django.urls import reverse
 from django.shortcuts import render
 
-from ..models import RssSourceDataModel, RssSourceEntryDataModel, RssEntryTagsDataModel, ConfigurationEntry
+from ..models import SourceDataModel, LinkDataModel, LinkTagsDataModel, ConfigurationEntry
 from ..prjconfig import Configuration
 from ..forms import SourceForm, EntryForm, ImportSourcesForm, ImportEntriesForm, SourcesChoiceForm, EntryChoiceForm, ConfigForm, CommentEntryForm
 
@@ -22,7 +22,7 @@ def get_app():
 
 
 class RssEntriesListView(generic.ListView):
-    model = RssSourceEntryDataModel
+    model = LinkDataModel
     context_object_name = 'entries_list'
     paginate_by = 200
 
@@ -60,9 +60,11 @@ class RssEntriesListView(generic.ListView):
 
 
 class RssEntryDetailView(generic.DetailView):
-    model = RssSourceEntryDataModel
+    model = LinkDataModel
 
     def get_context_data(self, **kwargs):
+        from ..handlers.linkcontrollerbuilder import LinkControllerBuilder
+
         # Call the base implementation first to get the context
         context = super(RssEntryDetailView, self).get_context_data(**kwargs)
         context = init_context(context)
@@ -71,6 +73,7 @@ class RssEntryDetailView(generic.DetailView):
             self.object.update_language()
 
         context['page_title'] += " - " + self.object.title
+        context['object_controller'] = LinkControllerBuilder.get_controller(self.object)
 
         from ..sources.waybackmachine import WaybackMachine
         from ..dateutils import DateUtils
@@ -94,7 +97,7 @@ def add_entry(request):
         # create a form instance and populate it with data from the request:
         form = EntryForm(request.POST)
 
-        ob = RssSourceEntryDataModel.objects.filter(link=request.POST.get('link'))
+        ob = LinkDataModel.objects.filter(link=request.POST.get('link'))
         if ob.exists():
             context['form'] = form
             context['entry'] = ob[0]
@@ -111,11 +114,14 @@ def add_entry(request):
 
             link = request.POST.get('link')
 
-            ob = RssSourceEntryDataModel.objects.filter(link = link)
+            ob = LinkDataModel.objects.filter(link = link)
             if ob.exists():
                 context['entry'] = ob[0]
 
             c = Configuration.get_object(str(get_app()))
+            if not c.thread_mgr:
+                context['summary_text'] = "Source added, but could not add to queue - missing threads"
+                return render(request, get_app() / 'summary_present.html', context)
             c.thread_mgr.wayback_save(link)
 
             return render(request, get_app() / 'entry_added.html', context)
@@ -148,7 +154,7 @@ def edit_entry(request, pk):
     if not request.user.is_staff:
         return render(request, get_app() / 'missing_rights.html', context)
 
-    obs = RssSourceEntryDataModel.objects.filter(id=pk)
+    obs = LinkDataModel.objects.filter(id=pk)
     if not obs.exists():
         context['summary_text'] = "Such entry does not exist"
         return render(request, get_app() / 'summary_present.html', context)
@@ -156,7 +162,6 @@ def edit_entry(request, pk):
     ob = obs[0]
     if ob.user is None or ob.user == "":
         ob.user = str(request.user.username)
-        ob.description = "test"
         ob.save()
 
     if request.method == 'POST':
@@ -188,7 +193,7 @@ def remove_entry(request, pk):
     if not request.user.is_staff:
         return render(request, get_app() / 'missing_rights.html', context)
 
-    entry = RssSourceEntryDataModel.objects.filter(id=pk)
+    entry = LinkDataModel.objects.filter(id=pk)
     if entry.exists():
         entry.delete()
 
@@ -207,7 +212,7 @@ def hide_entry(request, pk):
     if not request.user.is_staff:
         return render(request, get_app() / 'missing_rights.html', context)
 
-    objs = RssSourceEntryDataModel.objects.filter(id=pk)
+    objs = LinkDataModel.objects.filter(id=pk)
     obj = objs[0]
 
     fav = obj.dead
@@ -244,7 +249,7 @@ def make_persistent_entry(request, pk):
     if not request.user.is_staff:
         return render(request, get_app() / 'missing_rights.html', context)
 
-    entry = RssSourceEntryDataModel.objects.get(id=pk)
+    entry = LinkDataModel.objects.get(id=pk)
 
     prev_state = entry.persistent
 
@@ -254,6 +259,9 @@ def make_persistent_entry(request, pk):
 
     if prev_state != True:
        c = Configuration.get_object(str(get_app()))
+       if not c.thread_mgr:
+           context['summary_text'] = "Source added, but could not add to queue - missing threads"
+           return render(request, get_app() / 'summary_present.html', context)
        c.thread_mgr.wayback_save(entry.link)
 
     summary_text = "Link changed to state: " + str(entry.persistent)
@@ -271,9 +279,9 @@ def make_not_persistent_entry(request, pk):
     if not request.user.is_staff:
         return render(request, get_app() / 'missing_rights.html', context)
 
-    ft = RssSourceEntryDataModel.objects.get(id=pk)
+    ft = LinkDataModel.objects.get(id=pk)
 
-    tags = RssEntryTagsDataModel.objects.filter(link = ft.link)
+    tags = LinkTagsDataModel.objects.filter(link = ft.link)
     tags.delete()
 
     fav = ft.persistent
@@ -309,11 +317,11 @@ def import_entries(request):
 
             for entry in form.get_entries():
 
-                if RssSourceEntryDataModel.objects.filter(url=entry.url).exists():
+                if LinkDataModel.objects.filter(url=entry.url).exists():
                     summary_text += entry.title + " " + entry.url + " " + " Error: Already present in db\n"
                 else:
                     try:
-                        record = RssSourceEntryDataModel(url=entry.url,
+                        record = LinkDataModel(url=entry.url,
                                                     title=entry.title,
                                                     description=entry.description,
                                                     link=entry.link,
@@ -340,13 +348,13 @@ def import_entries(request):
 
 
 class NotBookmarkedView(generic.ListView):
-    model = RssSourceEntryDataModel
+    model = LinkDataModel
     context_object_name = 'entries_list'
     paginate_by = 200
     template_name = get_app() / 'entries_untagged_view.html'
 
     def get_queryset(self):
-        return RssSourceEntryDataModel.objects.filter(tags__tag__isnull = True, persistent = True)
+        return LinkDataModel.objects.filter(tags__tag__isnull = True, persistent = True)
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
