@@ -138,6 +138,12 @@ RSS tools:
  - There is no ability to fetch archived data. I have been using archive.org to import historic RSS data, but not all data are available
  - Some of RSS tools are not local (feedly), which for me is a problem
 
+## Legal
+
+ - I do not endorse any link every link in the database. I may some links be important because of how bad the content is. I use irony often, therefore beware!
+ - Everyone has a right to be forgotten. If any link should be removed from a database please contact me
+ - I do not obtain any form of monetary recompensation from link, or data about it. The data link information were already provided by RSS sources. The RSS source is responsible for what they provide free of charge
+
 # Ending notes
 
 All links belong to us!
