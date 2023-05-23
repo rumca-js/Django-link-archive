@@ -1,18 +1,19 @@
-Link database, with RSS functionality
+Link database, with RSS functionality. Similar to Reddit, but completly open source, on your local machine.
 
 # Features
 
- - Web GUI in Django
  - Local data, no algorithms, no advertisments
- - Search ability (Google like), by language, author, tags
- - Ability to provide custom plugins, parse HTML pages
- - Can be used in a NAS device
- - RSS feed sources management: adding / removing / configuration
- - RSS links managment: adding / removing / configuration
- - RSS links managment: bookmark support, tag support
+ - Web GUI, accessible from anywhere (LAN, public, however it is configured)
+ - Search ability (Google-like), by language, author, tags
+ - Ability to extend, to provide custom plugins, parse HTML pages
+ - RSS feed support (RSS sources)
+ - Sources management: adding, removing, configuration
+ - Link managment: manual adding, removing, configuration, bookmark support, tag support, admin user comments
  - Minimal aestethic: no distraction, compact layout
- - automatic / configurable RSS feed update
- - automatic / configurable git export
+ - Configurable: lists, timeouts
+ - Automatic git export, RSS source import
+ - Minimal installation, integrator may choose however to use production environment, with a good Database engine. Just as it is supported by Django. I am using SQLite without any problems.
+ - Support for web archive. Link rot mitigation
 
 ## Problems with other RSS readers
 
@@ -21,6 +22,8 @@ Link database, with RSS functionality
  - Feedly is not local, does not store your data on your hardware
  - Feeder (phone) does not provide search ability, nor tagging. Cannot configure 'view' for my liking
  - Newsboat is CLI, and it does not provide exhaustive search capabilities
+ - Most do not allow to introduce my own links
+ - Fail to provide consistent search ability
 
 ## Screenshots
 
@@ -50,10 +53,15 @@ Installation, just as any other Django app. Link [https://docs.djangoproject.com
 
 ## Goal
 
- - I want to 'store important links'
- - Archive purposes
+ - Archive. I want to 'store important links'
  - Data analysis - possible to verify link rot, etc.
  - Google sucks at providing results for various topics (dead internet)
+
+Development:
+
+ - KISS. Project should be of small footprint
+ - It should be small, easy to setup
+ - I did not focus on supporting multiple users, it is designed currently on small scale projects
 
 ## Inspirations
 
@@ -66,11 +74,15 @@ Installation, just as any other Django app. Link [https://docs.djangoproject.com
 
 # Data
 
+Program is able to store bookmarked links, and links for each day.
+
+Each day has it's own directory. Therefore it is easy to regenerate data for a particular day, without disturbing other data.
+
 ## Bookmarks
 
+ - three file formats: JSON, markdown, rss
  - contains articles that I have selected as intresting, or noteworthy, or funny, or whathever
  - files are split by 'language' and 'year' categories
- - three file formats: JSON, markdown, rss
  - markdown file is generated as a form of preview, JSON can be reused, imported
  - links are highlighted, but that does not necessarily mean something is endorsed. It shows particular intrest in topic. It is indication of importance
  
@@ -107,6 +119,10 @@ With these data we can perform further analysis:
  - Even though I have 100 sources, I still find useful info from outside of my sources. Some through YouTube, some through Reddit, etc.
  - Link rot is real. Some of archived links may be not working after some time. This is especially true for msn, and yahoo, which quite fast delete older links from their database
  - It is hard to define which sources are to be added into database. Even though I have more than 100 sources, I check regularly only a handful of them
+
+I could not decide if my link database should be public or not. Therefore I created two environments:
+ - public, with all important information
+ - private, with links that are not relevant for the public
 
 ## Analysis of Tools
 
