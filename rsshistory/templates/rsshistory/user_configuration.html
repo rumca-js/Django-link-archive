@@ -1,0 +1,13 @@
+{% extends base_generic %}
+
+{% block content %}
+
+<h1>User configuration</h1>
+
+<form action="{{config_form.action_url}}" method="{{config_form.method}}">
+     {% csrf_token %}
+     {{config_form}}
+     <input type="submit" value="Submit">
+</form>
+
+{% endblock %}
