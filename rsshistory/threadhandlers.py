@@ -178,23 +178,30 @@ class HandlerManager(object):
            handler = RefreshThreadHandler(self)
            handler.process(item)
       elif thread == "wayback":
-          handler = WaybackSaveHandler(self)
-          handler.process(item)
+           handler = WaybackSaveHandler(self)
+           handler.process(item)
       elif thread == "youtube-details":
-          handler = YouTubeDetailsHandler(self)
-          handler.process(item)
+           handler = YouTubeDetailsHandler(self)
+           handler.process(item)
       elif thread == "yearly-generation":
-          handler = YearlyGeneration(self)
-          handler.process(item)
+           handler = YearlyGeneration(self)
+           handler.process(item)
       else:
-         PersistentInfo.error("Not implemented processing thread {0}".format(thread))
-         raise NotImplemented
+          PersistentInfo.error("Not implemented processing thread {0}".format(thread))
+          raise NotImplemented
 
    def create_threads(self):
+       refresh_seconds = 3600
+
+       from .models import ConfigurationEntry
+       confs = ConfigurationEntry.objects.all()
+       if len(confs) > 0:
+           refresh_seconds = confs[0].sources_refresh_period
+
        process_source = ThreadJobCommon("process-source")
        download_music = ThreadJobCommon("download-music")
        download_video = ThreadJobCommon("download-video")
-       refresh_thread = ThreadJobCommon("refresh-thread", 3600, True) #3600 is 1 hour
+       refresh_thread = ThreadJobCommon("refresh-thread", refresh_seconds, True)
        wayback_save = ThreadJobCommon("wayback")
        yt_details = ThreadJobCommon("youtube-details")
        yearly = ThreadJobCommon("yearly-generation")

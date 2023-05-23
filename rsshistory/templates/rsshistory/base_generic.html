@@ -56,7 +56,9 @@
             {% endif %}
 
             {% if user.is_authenticated %}
-            <li>User: {{ user.get_username }}</li>
+            <li><a href="{% url 'rsshistory:user-config' %}">
+                    <div class="mainbutton">
+                        User: {{ user.get_username }}</div></a></li>
             <li><a href="{% url 'rsshistory:logout' %}">
                     <div class="mainbutton">
                         <img src="{% static 'rsshistory/icons/icons8-logout-100.png' %}" height=30px />

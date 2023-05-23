@@ -5,10 +5,11 @@ from django.views import generic
 from django.urls import reverse
 from django.shortcuts import render
 
-from ..models import SourceDataModel, LinkDataModel, LinkTagsDataModel, ConfigurationEntry
 from ..prjconfig import Configuration
-from ..forms import SourceForm, EntryForm, ImportSourcesForm, ImportEntriesForm, SourcesChoiceForm, ConfigForm, CommentEntryForm
+from ..models import SourceDataModel, LinkDataModel, LinkTagsDataModel, ConfigurationEntry, UserConfig
 from ..models import RssSourceImportHistory, RssSourceExportHistory
+from ..forms import SourceForm, EntryForm, ImportSourcesForm, ImportEntriesForm, SourcesChoiceForm, CommentEntryForm
+from ..forms import ConfigForm, UserConfigForm
 
 
 def init_context(context):
@@ -39,13 +40,21 @@ def configuration(request):
     ob = ConfigurationEntry.objects.all()
 
     if request.method == 'POST':
-        form = ConfigForm(request.POST, instance=ob[0])
+        obs = ConfigurationEntry.objects.all()
+        if len(obs) > 0:
+            form = ConfigForm(request.POST, instance=obs[0])
+        else:
+            form = ConfigForm(request.POST)
         if form.is_valid():
             form.save()
 
-        ob = ConfigurationEntry.objects.all()
+    obs = ConfigurationEntry.objects.all()
     
-    form = ConfigForm(instance = ob[0])
+    if len(obs) > 0:
+        form = ConfigForm(instance = obs[0])
+    else:
+        form = ConfigForm()
+
     form.method = "POST"
     form.action_url = reverse('rsshistory:configuration')
 
@@ -628,6 +637,59 @@ def fix_bookmarked_yt(request):
         else:
             summary += "Not Fixed: {} {}\n".format(link.link, link.title)
 
+    context["summary_text"] = summary
+
+    return render(request, get_app() / 'summary_present.html', context)
+
+
+def user_config(request):
+    context = get_context(request)
+    context['page_title'] += " - User configuration"
+
+    if not request.user.is_authenticated:
+        return render(request, get_app() / 'missing_rights.html', context)
+
+    user_name = request.user.get_username()
+    
+    ob = UserConfig.objects.filter(user = user_name)
+    if not ob.exists():
+        rec = UserConfig(user = user_name)
+        rec.save()
+
+    ob = UserConfig.objects.filter(user = user_name)
+
+    if request.method == 'POST':
+        form = UserConfigForm(request.POST, instance=ob[0])
+        if form.is_valid():
+            form.save()
+
+        ob = UserConfig.objects.filter(user = user_name)
+    
+    form = UserConfigForm(request.POST, instance=ob[0])
+    form.method = "POST"
+    form.action_url = reverse('rsshistory:user-config')
+
+    context['config_form'] = form
+
+    return render(request, get_app() / 'user_configuration.html', context)
+
+
+def clear_youtube_cache(request):
+    context = get_context(request)
+    context['page_title'] += " - clear youtube cache"
+
+    if not request.user.is_staff:
+        return render(request, get_app() / 'missing_rights.html', context)
+
+    from ..models import YouTubeMetaCache, YouTubeReturnDislikeMetaCache
+
+    meta = YouTubeMetaCache.objects.all()
+    meta.delete()
+
+    dislike = YouTubeReturnDislikeMetaCache.objects.all()
+    dislike.delete()
+
+    summary = "Deleted all cache"
     context["summary_text"] = summary
 
     return render(request, get_app() / 'summary_present.html', context)

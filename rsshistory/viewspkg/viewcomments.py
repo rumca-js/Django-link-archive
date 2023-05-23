@@ -7,6 +7,7 @@ from django.shortcuts import render
 
 from ..models import SourceDataModel, LinkDataModel, LinkTagsDataModel, ConfigurationEntry, LinkCommentDataModel
 from ..prjconfig import Configuration
+from ..forms import CommentEntryForm
 
 
 def init_context(context):
@@ -27,7 +28,7 @@ def entry_add_comment(request, link_id):
     context['page_title'] += " - Add comment"
 
     if not request.user.is_authenticated:
-        return render(request, app_name / 'missing_rights.html', context)
+        return render(request, get_app() / 'missing_rights.html', context)
 
     print("Link id" + str(link_id))
     link = LinkDataModel.objects.get(id = link_id)
@@ -42,11 +43,11 @@ def entry_add_comment(request, link_id):
             form.save_comment()
 
             context["summary_text"] = "Added a new comment"
-            return render(request, app_name / 'summary_present.html', context)
+            return render(request, get_app() / 'summary_present.html', context)
 
         context["summary_text"] = "Could not add a comment"
 
-        return render(request, app_name / 'summary_present.html', context)
+        return render(request, get_app() / 'summary_present.html', context)
 
     else:
         author = request.user.username
@@ -60,7 +61,7 @@ def entry_add_comment(request, link_id):
     context['form_title'] = link.title
     context['form_description'] = link.title
 
-    return render(request, app_name / 'form_basic.html', context)
+    return render(request, get_app() / 'form_basic.html', context)
 
 
 def entry_comment_edit(request, pk):
@@ -68,7 +69,7 @@ def entry_comment_edit(request, pk):
     context['page_title'] += " - edit comment"
 
     if not request.user.is_authenticated:
-        return render(request, app_name / 'missing_rights.html', context)
+        return render(request, get_app() / 'missing_rights.html', context)
 
     comment_obj = RssEntryCommentDataModel.objects.get(id = pk)
     link = comment_obj.link_obj
@@ -77,7 +78,7 @@ def entry_comment_edit(request, pk):
 
     if author != comment_obj.author:
         context["summary_text"] = "You are not the author!"
-        return render(request, app_name / 'summary_present.html', context)
+        return render(request, get_app() / 'summary_present.html', context)
 
     if request.method == 'POST':
         form = CommentEntryForm(request.POST)
@@ -88,11 +89,11 @@ def entry_comment_edit(request, pk):
 
             context["summary_text"] = "Comment edited"
 
-            return render(request, app_name / 'summary_present.html', context)
+            return render(request, get_app() / 'summary_present.html', context)
         else:
             context["summary_text"] = "Form is not valid"
 
-            return render(request, app_name / 'summary_present.html', context)
+            return render(request, get_app() / 'summary_present.html', context)
     else:
         form = CommentEntryForm(instance = comment_obj)
         form.method = "POST"
@@ -103,7 +104,7 @@ def entry_comment_edit(request, pk):
         context['form_title'] = link.title
         context['form_description'] = link.title
 
-        return render(request, app_name / 'form_basic.html', context)
+        return render(request, get_app() / 'form_basic.html', context)
 
 
 def entry_comment_remove(request, pk):
@@ -111,7 +112,7 @@ def entry_comment_remove(request, pk):
     context['page_title'] += " - remove comment"
 
     if not request.user.is_authenticated:
-        return render(request, app_name / 'missing_rights.html', context)
+        return render(request, get_app() / 'missing_rights.html', context)
 
     comment_obj = RssEntryCommentDataModel.objects.get(id = pk)
     link = comment_obj.link_obj
@@ -120,11 +121,11 @@ def entry_comment_remove(request, pk):
 
     if author != comment_obj.author:
         context["summary_text"] = "You are not the author!"
-        return render(request, app_name / 'summary_present.html', context)
+        return render(request, get_app() / 'summary_present.html', context)
 
     comment_obj.delete()
 
     context["summary_text"] = "Removed comment"
 
-    return render(request, app_name / 'summary_present.html', context)
+    return render(request, get_app() / 'summary_present.html', context)
 

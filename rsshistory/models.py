@@ -373,6 +373,7 @@ class ConfigurationEntry(models.Model):
     git_token = models.CharField(default="", max_length=2000)
     git_repo = models.CharField(default="", max_length=2000)
     git_daily_repo = models.CharField(default="", max_length=2000)
+    sources_refresh_period = models.IntegerField(default=3600)
 
     def is_git_set(self):
         if self.git_repo != "" and self.git_user != "" and self.git_token != "":
@@ -385,6 +386,14 @@ class ConfigurationEntry(models.Model):
             return True
         else:
             return False
+
+
+class UserConfig(models.Model):
+    user = models.CharField(max_length=500, unique=True)
+    theme = models.CharField(max_length=500, null=True)
+    # display type: compact, preview
+    display_type = models.CharField(max_length=500, null=True)
+    links_per_page = models.IntegerField(default=100)
 
 
 class PersistentInfo(models.Model):

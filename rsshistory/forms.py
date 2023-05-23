@@ -1,5 +1,6 @@
 from django import forms
-from .models import SourceDataModel, LinkDataModel, ConfigurationEntry, LinkTagsDataModel, LinkCommentDataModel
+from .models import SourceDataModel, LinkDataModel, LinkTagsDataModel, LinkCommentDataModel
+from .models import ConfigurationEntry, UserConfig
 
 # https://docs.djangoproject.com/en/4.1/ref/forms/widgets/
 
@@ -505,7 +506,26 @@ class ConfigForm(forms.ModelForm):
     """
     class Meta:
         model = ConfigurationEntry
-        fields = ['git_path', 'git_repo', 'git_daily_repo', 'git_user', 'git_token']
+        fields = ['sources_refresh_period', 'git_path', 'git_repo', 'git_daily_repo', 'git_user', 'git_token']
+        widgets = {
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(ConfigForm, self).__init__(*args, **kwargs)
+        self.fields['git_path'].required = False
+        self.fields['git_repo'].required = False
+        self.fields['git_daily_repo'].required = False
+        self.fields['git_user'].required = False
+        self.fields['git_token'].required = False
+
+
+class UserConfigForm(forms.ModelForm):
+    """
+    Category choice form
+    """
+    class Meta:
+        model = UserConfig
+        fields = ['theme', 'display_type', 'links_per_page']
         widgets = {
          #'git_token': forms.PasswordInput(),
         }

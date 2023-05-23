@@ -66,6 +66,7 @@ urlpatterns = [
    path('write-yearly-data/<str:year>', viewcustom.write_yearly_data, name='write-yearly-data'),
    path('write-topic/<str:topic>', viewcustom.write_topic, name='write-topic'),
    path('test-page', viewcustom.test_page, name='test-page'),
+   path('user-config', viewcustom.user_config, name='user-config'),
 
    # login
    path('accounts/', include('django.contrib.auth.urls')),
