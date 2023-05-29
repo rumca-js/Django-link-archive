@@ -41,7 +41,8 @@ Installation, just as any other Django app. Link [https://docs.djangoproject.com
 
 ## Dependencies
 
- - sudo apt install feedparser / pip3 install feedparser
+ - yt-dlp [https://github.com/yt-dlp/yt-dlp](https://github.com/yt-dlp/yt-dlp)
+ - pip3 install feedparser
  - pip3 install python-dateutil
 
 ## Suite of projects
