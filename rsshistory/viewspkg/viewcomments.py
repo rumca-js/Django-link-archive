@@ -10,9 +10,9 @@ from ..prjconfig import Configuration
 from ..forms import CommentEntryForm
 
 
-def init_context(context):
+def init_context(request, context):
     from ..views import init_context
-    return init_context(context)
+    return init_context(request, context)
 
 def get_context(request):
     from ..views import get_context

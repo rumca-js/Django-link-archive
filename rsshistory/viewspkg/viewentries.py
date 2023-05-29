@@ -8,9 +8,9 @@ from ..prjconfig import Configuration
 from ..forms import SourceForm, EntryForm, ImportSourcesForm, ImportEntriesForm, SourcesChoiceForm, EntryChoiceForm, ConfigForm, CommentEntryForm
 
 
-def init_context(context):
+def init_context(request, context):
     from ..views import init_context
-    return init_context(context)
+    return init_context(request, context)
 
 def get_context(request):
     from ..views import get_context
@@ -33,7 +33,7 @@ class RssEntriesListView(generic.ListView):
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
         context = super(RssEntriesListView, self).get_context_data(**kwargs)
-        context = init_context(context)
+        context = init_context(self.request, context)
         # Create any data and add it to the context
 
         self.filter_form.create()
@@ -67,7 +67,7 @@ class RssEntryDetailView(generic.DetailView):
 
         # Call the base implementation first to get the context
         context = super(RssEntryDetailView, self).get_context_data(**kwargs)
-        context = init_context(context)
+        context = init_context(self.request, context)
 
         if self.object.language == None:
             self.object.update_language()
@@ -97,22 +97,24 @@ def add_entry(request):
         # create a form instance and populate it with data from the request:
         form = EntryForm(request.POST)
 
-        ob = LinkDataModel.objects.filter(link=request.POST.get('link'))
-        if ob.exists():
-            context['form'] = form
-            context['entry'] = ob[0]
-
-            return render(request, get_app() / 'entry_edit_exists.html', context)
-
         # check whether it's valid:
         if form.is_valid():
-            if not form.save_form():
-                context["summary_text"] = "Could not add link"
+            data = form.get_full_information()
+
+            ob = LinkDataModel.objects.filter(link=data['link'])
+            if ob.exists():
+                context['form'] = form
+                context['entry'] = ob[0]
+
+                return render(request, get_app() / 'entry_edit_exists.html', context)
+
+            if not form.save_form(data):
+                context["summary_text"] = "Could not save link"
                 return render(request, get_app() / 'summary_present.html', context)
 
             context['form'] = form
 
-            link = request.POST.get('link')
+            link = data['link']
 
             ob = LinkDataModel.objects.filter(link = link)
             if ob.exists():
@@ -121,12 +123,12 @@ def add_entry(request):
             c = Configuration.get_object(str(get_app()))
             if not c.thread_mgr:
                 context['summary_text'] = "Source added, but could not add to queue - missing threads"
-                return render(request, get_app() / 'summary_present.html', context)
+                return render(request, get_app() / 'entry_added.html', context)
             c.thread_mgr.wayback_save(link)
 
             return render(request, get_app() / 'entry_added.html', context)
 
-        context["summary_text"] = "Could not add link"
+        context["summary_text"] = "Form is invalid"
         return render(request, get_app() / 'summary_present.html', context)
 
         #    # process the data in form.cleaned_data as required
@@ -141,6 +143,25 @@ def add_entry(request):
         form.method = "POST"
         form.action_url = reverse('rsshistory:entry-add')
         context['form'] = form
+
+        context['form_title'] = "Add new entry"
+
+        form_text = "<pre>"
+        form_text += "Required fields:\n"
+        form_text += " - Link [required]\n"
+        form_text += "\n"
+        form_text += "For YouTube links:\n"
+        form_text += " - Title, description, Date published, source, language is set automatically\n"
+        form_text += " - manual setting of language overrides the default (en-US)\n"
+        form_text += "\n"
+        form_text += "For standard links:\n"
+        form_text += " - Title, description, source, language is set automatically, if not specified\n"
+        form_text += " - Always specify date published [required]\n"
+        form_text += " - Better specify language\n"
+        form_text += " - In case of errors, specify title, and description\n"
+        form_text += "</pre>"
+
+        context['form_description_post'] = form_text
 
     return render(request, get_app() / 'form_basic.html', context)
 

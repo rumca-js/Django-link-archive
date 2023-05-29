@@ -33,6 +33,7 @@ class EntryForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(EntryForm, self).__init__(*args, **kwargs)
+        self.fields['link'].required = True
         self.fields['source'].required = False
         self.fields['language'].required = False
         self.fields['description'].required = False
@@ -40,8 +41,12 @@ class EntryForm(forms.ModelForm):
         self.fields['persistent'].initial = True
         self.fields['user'].widget.attrs['readonly'] = True
 
-    def get_information(self, data):
+    def get_information(self):
         return self.cleaned_data
+
+    def get_full_information(self):
+        data = self.get_information()
+        return self.update_info(data)
 
     def update_info(self, data):
         from .webtools import Page
@@ -82,10 +87,7 @@ class EntryForm(forms.ModelForm):
             data["description"] = p.get_title()
         return data
 
-    def save_form(self):
-        data = self.get_information(self.cleaned_data)
-        data = self.update_info(data)
-
+    def save_form(self, data):
         source = data["source"]
         title = data["title"]
         description = data["description"]
@@ -525,9 +527,8 @@ class UserConfigForm(forms.ModelForm):
     """
     class Meta:
         model = UserConfig
-        fields = ['theme', 'display_type', 'links_per_page']
+        fields = ['theme', 'display_type', 'links_per_page', 'show_icons']
         widgets = {
-         #'git_token': forms.PasswordInput(),
         }
 
 

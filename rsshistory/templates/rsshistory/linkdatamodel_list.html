@@ -35,7 +35,9 @@
 
             <div class="linklistitem">
                 <a href="{{ link.get_absolute_url }}" class="linklistitemtitle">
+                   {% if user_config.show_icons %}
                    <img src="{{link.get_favicon}}" width="30"/>
+                   {% endif %}
 
                    {% if link.dead %}
                       Hidden link

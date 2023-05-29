@@ -175,11 +175,11 @@ class LinkDataModel(models.Model):
     # this entry is dead indication
     dead = models.BooleanField(default=False)
     # user who added entry
-    user = models.CharField(max_length=1000, null=True)
+    user = models.CharField(max_length=1000, null=True, default=None)
 
     # possible values en-US, or pl_PL
-    language = models.CharField(max_length=10, null=True)
-    thumbnail = models.CharField(max_length=1000, null=True)
+    language = models.CharField(max_length=10, null=True, default=None)
+    thumbnail = models.CharField(max_length=1000, null=True, default=None)
 
     source_obj = models.ForeignKey(SourceDataModel, on_delete=models.SET_NULL, related_name='link_source', null=True,
                                    blank=True)
@@ -393,6 +393,7 @@ class UserConfig(models.Model):
     theme = models.CharField(max_length=500, null=True)
     # display type: compact, preview
     display_type = models.CharField(max_length=500, null=True)
+    show_icons = models.BooleanField(default=True, null=True)
     links_per_page = models.IntegerField(default=100)
 
 

@@ -2,7 +2,7 @@
 
 class YouTubeLinkHandler(object):
     def __init__(self, url = None):
-        self.url = url
+        self.url = YouTubeLinkHandler.input2url(url)
         self.yt_text = None
         self.yt_ob = None
         self.rd_text = None

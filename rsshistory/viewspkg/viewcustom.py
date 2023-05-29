@@ -12,9 +12,9 @@ from ..forms import SourceForm, EntryForm, ImportSourcesForm, ImportEntriesForm,
 from ..forms import ConfigForm, UserConfigForm
 
 
-def init_context(context):
+def init_context(request, context):
     from ..views import init_context
-    return init_context(context)
+    return init_context(request, context)
 
 def get_context(request):
     from ..views import get_context
@@ -86,6 +86,8 @@ def system_status(request):
     context['YouTubeReturnDislikeMetaCache'] = len(YouTubeReturnDislikeMetaCache.objects.all())
     context['SourceDataModel'] = len(SourceDataModel.objects.all())
     context['LinkTagsDataModel'] = len(LinkTagsDataModel.objects.all())
+    context['ConfigurationEntry'] = len(ConfigurationEntry.objects.all())
+    context['UserConfig'] = len(UserConfig.objects.all())
 
     from ..models import PersistentInfo
     context['log_items'] = PersistentInfo.objects.all()
@@ -651,21 +653,25 @@ def user_config(request):
 
     user_name = request.user.get_username()
     
-    ob = UserConfig.objects.filter(user = user_name)
-    if not ob.exists():
+    obs = UserConfig.objects.filter(user = user_name)
+    if not obs.exists():
         rec = UserConfig(user = user_name)
         rec.save()
 
-    ob = UserConfig.objects.filter(user = user_name)
+    obs = UserConfig.objects.filter(user = user_name)
 
     if request.method == 'POST':
-        form = UserConfigForm(request.POST, instance=ob[0])
+        form = UserConfigForm(request.POST, instance=obs[0])
         if form.is_valid():
             form.save()
+        else:
+            context["summary_text"] = "user information is not valid, cannot save"
+            return render(request, get_app() / 'summary_present.html', context)
 
-        ob = UserConfig.objects.filter(user = user_name)
-    
-    form = UserConfigForm(request.POST, instance=ob[0])
+        obs = UserConfig.objects.filter(user = user_name)
+    else:
+        form = UserConfigForm(instance=obs[0])
+
     form.method = "POST"
     form.action_url = reverse('rsshistory:user-config')
 

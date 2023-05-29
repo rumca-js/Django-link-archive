@@ -6,7 +6,7 @@ from .threads import *
 from .sources.rsssourceprocessor import RssSourceProcessor
 from .programwrappers import ytdlp,id3v2
 from .datawriter import *
-from .models import PersistentInfo, RssSourceImportHistory
+from .models import PersistentInfo, ConfigurationEntry, RssSourceImportHistory
 from .basictypes import fix_path_for_windows
 
 
@@ -24,12 +24,13 @@ class ProcessSourceHandler(object):
                history = RssSourceImportHistory(url = item.url, date = date.today(), source_obj = item)
                history.save()
 
-           today = DateUtils.get_iso_today()
-           if not item.export_to_cms:
-              return
+           if ConfigurationEntry.objects.all()[0].is_git_set():
+               today = DateUtils.get_iso_today()
+               if not item.export_to_cms:
+                  return
 
-           writer = SourceEntriesDataWriter(self._cfg, item.url)
-           writer.write_for_day(today)
+               writer = SourceEntriesDataWriter(self._cfg, item.url)
+               writer.write_for_day(today)
         except Exception as e:
            error_text = traceback.format_exc()
            PersistentInfo.error("Exception during parsing page contents {0} {1} {2}".format(item.url, str(e), error_text))
@@ -99,10 +100,11 @@ class RefreshThreadHandler(object):
         for source in sources:
             self.thread_parent.download_rss(source)
 
-        from .gitupdatemgr import GitUpdateManager
+        if ConfigurationEntry.objects.all()[0].is_git_set():
+            from .gitupdatemgr import GitUpdateManager
 
-        git_mgr = GitUpdateManager(self._cfg)
-        git_mgr.check_if_git_update()
+            git_mgr = GitUpdateManager(self._cfg)
+            git_mgr.check_if_git_update()
 
 
 class WaybackSaveHandler(object):

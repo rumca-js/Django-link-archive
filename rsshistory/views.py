@@ -1,6 +1,4 @@
 from pathlib import Path
-from datetime import datetime, date, timedelta
-import traceback
 
 from django.shortcuts import render
 from django.views import generic
@@ -9,11 +7,10 @@ from django.urls import reverse
 from django.db.models.query import QuerySet
 from django.db.models.query import EmptyQuerySet
 
-from .models import SourceDataModel, LinkDataModel, ConfigurationEntry
+from .models import SourceDataModel, LinkDataModel, ConfigurationEntry, UserConfig
 from .models import RssSourceImportHistory, RssSourceExportHistory
 from .serializers.converters import ModelCollectionConverter, CsvConverter
-
-from .forms import SourceForm, EntryForm, ImportSourcesForm, ImportEntriesForm, SourcesChoiceForm, ConfigForm, CommentEntryForm
+from .forms import SourceForm, EntryForm, ConfigForm, CommentEntryForm, ImportSourcesForm, ImportEntriesForm, SourcesChoiceForm
 from .basictypes import *
 
 from .prjconfig import Configuration
@@ -23,8 +20,8 @@ from .prjconfig import Configuration
 app_name = Path("rsshistory")
 
 
-def init_context(context):
-    context['page_title'] = "RSS archive"
+def init_context(request, context):
+    context['page_title'] = "Link Archive"
     context["django_app"] = str(app_name)
     context["base_generic"] = str(app_name / "base_generic.html")
     context["icon_size"] = "30px"
@@ -32,11 +29,17 @@ def init_context(context):
     c = Configuration.get_object(str(app_name))
     context['app_version'] = c.version
 
+    users = UserConfig.objects.filter(user = request.user.get_username())
+    if len(users) > 0:
+       context['user_config'] = users[0]
+    else:
+       context['user_config'] = UserConfig()
+
     return context
 
 def get_context(request = None):
     context = {}
-    context = init_context(context)
+    context = init_context(request, context)
     return context
 
 

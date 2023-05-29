@@ -8,9 +8,9 @@ from ..prjconfig import Configuration
 from ..forms import SourceForm, EntryForm, ImportSourcesForm, ImportEntriesForm, SourcesChoiceForm, ConfigForm, CommentEntryForm
 
 
-def init_context(context):
+def init_context(request, context):
     from ..views import init_context
-    return init_context(context)
+    return init_context(request, context)
 
 def get_context(request):
     from ..views import get_context
@@ -34,7 +34,7 @@ class RssSourceListView(generic.ListView):
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
         context = super(RssSourceListView, self).get_context_data(**kwargs)
-        context = init_context(context)
+        context = init_context(self.request, context)
         # Create any data and add it to the context
 
         self.filter_form.create()
@@ -58,7 +58,7 @@ class RssSourceDetailView(generic.DetailView):
         from ..handlers.sourcecontroller import SourceController
         # Call the base implementation first to get the context
         context = super(RssSourceDetailView, self).get_context_data(**kwargs)
-        context = init_context(context)
+        context = init_context(self.request, context)
 
         context['page_title'] += " - " + self.object.title
         context['handler'] = SourceController(self.object)
@@ -101,6 +101,15 @@ def add_source(request):
         form.method = "POST"
         form.action_url = reverse('rsshistory:source-add')
         context['form'] = form
+
+        context['form_title'] = "Add new source"
+
+        form_text = "<pre>"
+        form_text += " - Specify all fields, if possible\n"
+        form_text += " - if favicon is not specified, it is set to domain/favicon.ico\n"
+        form_text += "</pre>"
+
+        context['form_description_post'] = form_text
 
     return render(request, get_app() / 'form_basic.html', context)
 
