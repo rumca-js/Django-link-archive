@@ -29,6 +29,8 @@ Link database, with RSS functionality. Similar to Reddit, but completly open sou
 
 ![](https://raw.githubusercontent.com/rumca-js/Django-rss-feed/main/screenshots/2023_03_09_entries.PNG)
 
+View screenshots: [https://github.com/rumca-js/Django-rss-feed/tree/main/screenshots](https://github.com/rumca-js/Django-rss-feed/tree/main/screenshots).
+
 ## Notes
 
  - it is best to use on a device with SSD
