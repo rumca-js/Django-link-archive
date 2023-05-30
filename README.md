@@ -25,6 +25,14 @@ Link database, with RSS functionality. Similar to Reddit, but completly open sou
  - Most do not allow to introduce my own links
  - Fail to provide consistent search ability
 
+## Possible use cases
+
+ - YouTube alternative, or filter. You can specify what kind of links, or channels you contain, or support. YouTube will display sometimes 'video unavailable' text
+ - RSS client with multiple features
+ - Important links, for work
+ - Important links, for hobby purposes
+ - Bookmarking interesting songs, song database, etc.
+
 ## Screenshots
 
 ![](https://raw.githubusercontent.com/rumca-js/Django-rss-feed/main/screenshots/2023_03_09_entries.PNG)
