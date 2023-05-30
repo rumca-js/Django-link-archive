@@ -93,12 +93,12 @@ display: contents;
 }
 
 .longbutton:hover {
-  background-color: #f7f7f7;
+  background-color: #f4f4f4;
   color: blue;
 }
 
 .linklistthumbnail {
-    flex: 100%;
+    width: 10%;
 }
 .linklistitemtitle {
     flex: 100%;

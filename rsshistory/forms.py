@@ -4,6 +4,68 @@ from .models import ConfigurationEntry, UserConfig
 
 # https://docs.djangoproject.com/en/4.1/ref/forms/widgets/
 
+
+
+class GoogleChoiceForm(forms.Form):
+    """
+    Category choice form
+    """
+
+    category = forms.CharField(widget=forms.Select(choices=()))
+    subcategory = forms.CharField(widget=forms.Select(choices=()))
+    title = forms.CharField(widget=forms.Select(choices=()))
+    persistent = forms.BooleanField(required=False)
+    search = forms.CharField(label='Search', max_length = 500, required=False)
+
+
+class ConfigForm(forms.ModelForm):
+    """
+    Category choice form
+    """
+    class Meta:
+        model = ConfigurationEntry
+        fields = ['sources_refresh_period', 'git_path', 'git_repo', 'git_daily_repo', 'git_user', 'git_token']
+        widgets = {
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(ConfigForm, self).__init__(*args, **kwargs)
+        self.fields['git_path'].required = False
+        self.fields['git_repo'].required = False
+        self.fields['git_daily_repo'].required = False
+        self.fields['git_user'].required = False
+        self.fields['git_token'].required = False
+
+
+class UserConfigForm(forms.ModelForm):
+    """
+    Category choice form
+    """
+    class Meta:
+        model = UserConfig
+        fields = ['show_icons', 'thumbnails_as_icons', 'small_icons', 'theme', 'display_type', 'links_per_page']
+        #widgets = {
+        #}
+
+
+class ImportSourceFromInternetArchiveForm(forms.Form):
+    source_url = forms.CharField(label='Source url', max_length = 500)
+    archive_time = forms.DateField(label = "Archive time")
+
+
+class ImportSourceRangeFromInternetArchiveForm(forms.Form):
+    source_url = forms.CharField(label='Source url', max_length = 500)
+    archive_start = forms.DateField(label = "Start time")
+    archive_stop = forms.DateField(label = "Stop time")
+
+
+class YouTubeLinkSimpleForm(forms.Form):
+    """
+    Import links form
+    """
+    youtube_link = forms.CharField(label='YouTube Link URL', max_length = 500)
+
+
 class SourceForm(forms.ModelForm):
     """
     Category choice form
@@ -20,6 +82,79 @@ class SourceForm(forms.ModelForm):
         self.fields['favicon'].required = False
 
 
+class TagEntryForm(forms.ModelForm):
+    """
+    Category choice form
+    """
+    class Meta:
+        model = LinkTagsDataModel
+        fields = ['link', 'author', 'date', 'tag']
+        widgets = {
+         #'git_token': forms.PasswordInput(),
+        }
+
+    def save_tags(self):
+        link = self.cleaned_data["link"]
+        author = self.cleaned_data["author"]
+        date = self.cleaned_data["date"]
+        tags = self.cleaned_data["tag"]
+
+        objs = LinkTagsDataModel.objects.filter(author = author, link = link)
+        if objs.exists():
+            objs.delete()
+
+        tags_set = set()
+        tags = tags.split(LinkTagsDataModel.get_delim())
+        for tag in tags:
+            tag = str(tag).strip()
+            tag = tag.lower()
+            if tag != "":
+                tags_set.add(tag)
+
+        link_objs = LinkDataModel.objects.filter(link = link)
+
+        for tag in tags_set:
+            model = LinkTagsDataModel(link = link, author = author, date = date, tag = tag, link_obj = link_objs[0])
+            model.save()
+
+
+class TagRenameForm(forms.Form):
+    """
+    Category choice form
+    """
+    current_tag = forms.CharField(label='Current tag', max_length = 100)
+    new_tag = forms.CharField(label='New tag', max_length = 100)
+
+
+class ImportSourcesForm(forms.Form):
+    """
+    Import links form
+    """
+    rawsources = forms.CharField(widget=forms.Textarea(attrs={'name':'rawsources', 'rows':30, 'cols':100}))
+
+    def get_sources(self):
+        from .serializers.converters import CsvConverter
+        rawsources = self.cleaned_data['rawsources']
+
+        converter = CsvConverter()
+        return converter.from_text(rawsources)
+
+
+class ImportEntriesForm(forms.Form):
+    """
+    Import links form
+    """
+    rawentries = forms.CharField(widget=forms.Textarea(attrs={'name':'rawentries', 'rows':30, 'cols':100}))
+
+    def get_entries(self):
+        from .serializers.converters import CsvConverter
+        rawentries = self.cleaned_data['rawentries']
+
+        converter = CsvConverter()
+        return converter.from_text(rawsources)
+
+
+
 class EntryForm(forms.ModelForm):
     """
     Category choice form
@@ -27,9 +162,9 @@ class EntryForm(forms.ModelForm):
     class Meta:
         model = LinkDataModel
         fields = ['link', 'title', 'description', 'date_published', 'source', 'persistent', 'language', 'user']
-        widgets = {
-         #'git_token': forms.PasswordInput(),
-        }
+        #widgets = {
+        # #'git_token': forms.PasswordInput(),
+        #}
 
     def __init__(self, *args, **kwargs):
         super(EntryForm, self).__init__(*args, **kwargs)
@@ -124,78 +259,6 @@ class EntryForm(forms.ModelForm):
 
         entry.save()
         return True
-
-
-class TagEntryForm(forms.ModelForm):
-    """
-    Category choice form
-    """
-    class Meta:
-        model = LinkTagsDataModel
-        fields = ['link', 'author', 'date', 'tag']
-        widgets = {
-         #'git_token': forms.PasswordInput(),
-        }
-
-    def save_tags(self):
-        link = self.cleaned_data["link"]
-        author = self.cleaned_data["author"]
-        date = self.cleaned_data["date"]
-        tags = self.cleaned_data["tag"]
-
-        objs = LinkTagsDataModel.objects.filter(author = author, link = link)
-        if objs.exists():
-            objs.delete()
-
-        tags_set = set()
-        tags = tags.split(LinkTagsDataModel.get_delim())
-        for tag in tags:
-            tag = str(tag).strip()
-            tag = tag.lower()
-            if tag != "":
-                tags_set.add(tag)
-
-        link_objs = LinkDataModel.objects.filter(link = link)
-
-        for tag in tags_set:
-            model = LinkTagsDataModel(link = link, author = author, date = date, tag = tag, link_obj = link_objs[0])
-            model.save()
-
-
-class TagRenameForm(forms.Form):
-    """
-    Category choice form
-    """
-    current_tag = forms.CharField(label='Current tag', max_length = 100)
-    new_tag = forms.CharField(label='New tag', max_length = 100)
-
-
-class ImportSourcesForm(forms.Form):
-    """
-    Import links form
-    """
-    rawsources = forms.CharField(widget=forms.Textarea(attrs={'name':'rawsources', 'rows':30, 'cols':100}))
-
-    def get_sources(self):
-        from .serializers.converters import CsvConverter
-        rawsources = self.cleaned_data['rawsources']
-
-        converter = CsvConverter()
-        return converter.from_text(rawsources)
-
-
-class ImportEntriesForm(forms.Form):
-    """
-    Import links form
-    """
-    rawentries = forms.CharField(widget=forms.Textarea(attrs={'name':'rawentries', 'rows':30, 'cols':100}))
-
-    def get_entries(self):
-        from .serializers.converters import CsvConverter
-        rawentries = self.cleaned_data['rawentries']
-
-        converter = CsvConverter()
-        return converter.from_text(rawsources)
 
 
 class SourcesChoiceForm(forms.Form):
@@ -490,59 +553,6 @@ class EntryChoiceForm(forms.Form):
         return filter_string
 
 
-class GoogleChoiceForm(forms.Form):
-    """
-    Category choice form
-    """
-
-    category = forms.CharField(widget=forms.Select(choices=()))
-    subcategory = forms.CharField(widget=forms.Select(choices=()))
-    title = forms.CharField(widget=forms.Select(choices=()))
-    persistent = forms.BooleanField(required=False)
-    search = forms.CharField(label='Search', max_length = 500, required=False)
-
-
-class ConfigForm(forms.ModelForm):
-    """
-    Category choice form
-    """
-    class Meta:
-        model = ConfigurationEntry
-        fields = ['sources_refresh_period', 'git_path', 'git_repo', 'git_daily_repo', 'git_user', 'git_token']
-        widgets = {
-        }
-
-    def __init__(self, *args, **kwargs):
-        super(ConfigForm, self).__init__(*args, **kwargs)
-        self.fields['git_path'].required = False
-        self.fields['git_repo'].required = False
-        self.fields['git_daily_repo'].required = False
-        self.fields['git_user'].required = False
-        self.fields['git_token'].required = False
-
-
-class UserConfigForm(forms.ModelForm):
-    """
-    Category choice form
-    """
-    class Meta:
-        model = UserConfig
-        fields = ['theme', 'display_type', 'links_per_page', 'show_icons']
-        widgets = {
-        }
-
-
-class ImportSourceFromInternetArchiveForm(forms.Form):
-    source_url = forms.CharField(label='Source url', max_length = 500)
-    archive_time = forms.DateField(label = "Archive time")
-
-
-class ImportSourceRangeFromInternetArchiveForm(forms.Form):
-    source_url = forms.CharField(label='Source url', max_length = 500)
-    archive_start = forms.DateField(label = "Start time")
-    archive_stop = forms.DateField(label = "Stop time")
-
-
 class CommentEntryForm(forms.ModelForm):
     """
     Category choice form
@@ -571,10 +581,3 @@ class CommentEntryForm(forms.ModelForm):
                 date_published = date_published,
                 link_obj = entry)
         o.save()
-
-
-class YouTubeLinkSimpleForm(forms.Form):
-    """
-    Import links form
-    """
-    youtube_link = forms.CharField(label='YouTube Link URL', max_length = 500)

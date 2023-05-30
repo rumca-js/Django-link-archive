@@ -19,46 +19,88 @@
   <ul class="linklist">
     {% for link in entries_list %}
       <li>
-          <span
-             {% if link.persistent %}
-                class="longbutton longbuttonselected"
-             {% else %}
-                class="longbutton"
-             {% endif %}
-                  >
+          {% if user_config.display_type == "standard" or user_config.display_type == "" %}
+              <a href="{{ link.get_absolute_url }}"
+                 {% if link.persistent %}
+                    class="longbutton longbuttonselected"
+                 {% else %}
+                    class="longbutton"
+                 {% endif %}
+                >
 
-            <!--a href="{{ link.link }}" class="linklistthumbnail">
-              {% if link.thumbnail %}
-                <img src="{{link.thumbnail}}" width="200" height="130" />
-              {% endif %}
-            </a-->
+                  {% if user_config.show_icons %}
+                    <img src=
+                      {% if user_config.thumbnails_as_icons %}
+                          "{{link.get_thumbnail}}"
+                      {% else %}
+                          "{{link.get_favicon}}"
+                      {% endif %}
 
-            <div class="linklistitem">
-                <a href="{{ link.get_absolute_url }}" class="linklistitemtitle">
-                   {% if user_config.show_icons %}
-                   <img src="{{link.get_favicon}}" width="30"/>
-                   {% endif %}
+                      {% if user_config.small_icons %}
+                         width="30"/>
+                      {% else %}
+                         class="linklistthumbnail"/>
+                      {% endif %}
+                  {% endif %}
 
-                   {% if link.dead %}
-                      Hidden link
-                   {% else %}
-                      {{link.title}} {{link.date_published}}  {{link.get_source_name}}
-                   {% endif %}
-                </a>
-               <div class="linklistitemdescription">
-                   {% if link.get_tag_string %}
-                   Tags: 
-                       {% for tag in link.get_tag_map %}
-                           <a href="{% url 'rsshistory:entries'%}?tag={{tag}}" class="simplebutton">{{tag}}</a>
-                       {% endfor %}
-                   {% endif %}
-                   {% if link.persistent %}
-                      User: {{link.user}}
-                   {% endif %}
+                <div class="linklistitem">
+                    <div class="linklistitemtitle">
+                      {% if link.dead %}
+                         Hidden link
+                      {% else %}
+                         {{link.title}} {{link.date_published}}  {{link.get_source_name}}
+                      {% endif %}
 
+                       {% if link.get_tag_string %}
+                       Tags: 
+                           {% for tag in link.get_tag_map %}
+                               #{{tag}},
+                           {% endfor %}
+                       {% endif %}
+                       {% if link.persistent %}
+                          User: {{link.user}}
+                       {% endif %}
+                    </div>
+                    <div class="linklistitemdescription">
+                    </div>
+                </div>
+              </a>
+          {% elif user_config.display_type == "taggable" %}
+             <span
+                {% if link.persistent %}
+                   class="longbutton longbuttonselected"
+                {% else %}
+                   class="longbutton"
+                {% endif %}
+                     >
+
+               <div class="linklistitem">
+                   <a href="{{ link.get_absolute_url }}" class="linklistitemtitle">
+                      {% if user_config.show_icons %}
+                      <img src="{{link.get_favicon}}" width="30"/>
+                      {% endif %}
+
+                      {% if link.dead %}
+                         Hidden link
+                      {% else %}
+                         {{link.title}} {{link.date_published}}  {{link.get_source_name}}
+                      {% endif %}
+                   </a>
+                  <div class="linklistitemdescription">
+                      {% if link.get_tag_string %}
+                      Tags: 
+                          {% for tag in link.get_tag_map %}
+                              <a href="{% url 'rsshistory:entries'%}?tag={{tag}}" class="simplebutton">{{tag}}</a>
+                          {% endfor %}
+                      {% endif %}
+                      {% if link.persistent %}
+                         User: {{link.user}}
+                      {% endif %}
+
+                  </div>
                </div>
-            </div>
-          </span>
+             </span>
+          {% endif %}
       </li>
     {% endfor %}
   </ul>

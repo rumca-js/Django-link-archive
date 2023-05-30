@@ -1,6 +1,7 @@
 from datetime import date, datetime, timedelta
 import logging
 import traceback
+from pathlib import Path
 
 from .threads import *
 from .sources.rsssourceprocessor import RssSourceProcessor
@@ -43,23 +44,23 @@ class DownloadMusicHandler(object):
 
     def process(self, item):
       log = logging.getLogger(self._cfg.app_name)
-      PersistentInfo.create("Downloading music: " + item.url + " " + item.title)
+      PersistentInfo.create("Downloading music: " + item.link + " " + item.title)
       # TODO pass dir?
 
-      file_name = Path(item.artist) / item.album / item.title
+      file_name = Path(str(item.artist)) / str(item.album) / item.title
       file_name = str(file_name) + ".mp3"
       file_name = fix_path_for_windows(file_name)
 
-      yt = ytdlp.YTDLP(item.url)
+      yt = ytdlp.YTDLP(item.link)
       if not yt.download_audio(file_name):
-          PersistentInfo.error("Could not download music: " + item.url + " " + item.title)
+          PersistentInfo.error("Could not download music: " + item.link + " " + item.title)
           return
 
       data = {'artist' : item.artist, 'album' : item.album, 'title' : item.title }
 
       id3 = id3v2.Id3v2(file_name, data)
       id3.tag()
-      PersistentInfo.create("Downloading music done: " + item.url + " " + item.title)
+      PersistentInfo.create("Downloading music done: " + item.link + " " + item.title)
 
 
 class DownloadVideoHandler(object):
@@ -70,14 +71,14 @@ class DownloadVideoHandler(object):
     def process(self, item):
       log = logging.getLogger(self._cfg.app_name)
 
-      PersistentInfo.create("Downloading video: " + item.url + " " + item.title)
+      PersistentInfo.create("Downloading video: " + item.link + " " + item.title)
 
-      yt = ytdlp.YTDLP(item.url)
+      yt = ytdlp.YTDLP(item.link)
       if not yt.download_video('file.mp4'):
-          PersistentInfo.error("Could not download video: " + item.url + " " + item.title)
+          PersistentInfo.error("Could not download video: " + item.link + " " + item.title)
           return
 
-      PersistentInfo.create("Downloading video done: " + item.url + " " + item.title)
+      PersistentInfo.create("Downloading video done: " + item.link + " " + item.title)
 
 
 class RefreshThreadHandler(object):

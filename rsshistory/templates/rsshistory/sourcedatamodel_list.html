@@ -1,8 +1,20 @@
 {% extends base_generic %}
+{% load static %}
 
 {% block content %}
-  <span>Filters:</span>
+
+  <a href="{% url 'rsshistory:source-add' %}" class="mainbutton">
+        <img src="{% static 'rsshistory/icons/icons8-channel-add-96.png' %}" height=30px />
+        Add source</a>
+  <a href="{% url 'rsshistory:entry-add' %}" class="mainbutton">
+        <img src="{% static 'rsshistory/icons/icons8-add-link-96.png' %}" height=30px />
+        Add entry</a>
+
+  <hr>
+
+  <div>Filters:
   <a href="{{filter_form.action_url}}" class='simplebutton'>Reset</a>
+  </div>
 
   <form action="{{filter_form.action_url}}" method="{{filter_form.method}}">
      {{ filter_form }}
@@ -17,7 +29,9 @@
       <li>
           <a href="{{ source.url }}" class="longbutton">
             <div class="linklistitem">
-              <img src="{{source.get_favicon}}" width="20">
+              {% if user_config.show_icons %}
+                <img src="{{source.get_favicon}}" width="20">
+              {% endif %}
               <span class="linklistitemtitle">{{source.title}}</span>
               <span class="linklistitemdescription">
                   [{{source.category}}, {{source.subcategory}}]</span>

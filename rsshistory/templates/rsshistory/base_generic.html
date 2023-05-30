@@ -25,40 +25,28 @@
                     <div class="mainbutton">
                         <img src="{% static 'rsshistory/icons/icons8-home-96.png' %}" height=30px />
                         Home</div></a></li>
-            <li><a href="{% url 'rsshistory:sources' %}">
-                    <div class="mainbutton">
-                        <img src="{% static 'rsshistory/icons/icons8-link-90.png' %}" height=30px />
-                        All sources</div></a></li>
             <li><a href="{% url 'rsshistory:searchinitview' %}">
                     <div class="mainbutton">
                         <img src="{% static 'rsshistory/icons/icons8-link-90.png' %}" height=30px />
                         Search</div></a></li>
+            <li><a href="{% url 'rsshistory:sources' %}">
+                    <div class="mainbutton">
+                        <img src="{% static 'rsshistory/icons/icons8-link-90.png' %}" height=30px />
+                        Sources</div></a></li>
 
             <hr>
             {% if user.is_staff %}
-            <li><a href="{% url 'rsshistory:source-add' %}">
-                    <div class="mainbutton">
-                        <img src="{% static 'rsshistory/icons/icons8-channel-add-96.png' %}" height=30px />
-                        Add source</div></a></li>
-            <li><a href="{% url 'rsshistory:entry-add' %}">
-                    <div class="mainbutton">
-                        <img src="{% static 'rsshistory/icons/icons8-add-link-96.png' %}" height=30px />
-                        Add entry</div></a></li>
-            <li><a href="{% url 'rsshistory:configuration' %}">
+
+            <li><a href="{% url 'rsshistory:admin-page' %}">
                     <div class="mainbutton">
                         <img src="{% static 'rsshistory/icons/icons8-configuration-67.png' %}" height=30px />
-                        Configuration</div></a></li>
-            <li><a href="{% url 'rsshistory:system-status' %}">
-                    <div class="mainbutton">
-                        <img src="{% static 'rsshistory/icons/icons8-configuration-67.png' %}" height=30px />
-                        Status</div></a></li>
-            <hr>
+                        Admin</div></a></li>
             {% endif %}
 
             {% if user.is_authenticated %}
             <li><a href="{% url 'rsshistory:user-config' %}">
                     <div class="mainbutton">
-                        User: {{ user.get_username }}</div></a></li>
+                        <img src="{% static 'rsshistory/icons/icons8-configuration-67.png' %}" height=30px />User: {{ user.get_username }}</div></a></li>
             <li><a href="{% url 'rsshistory:logout' %}">
                     <div class="mainbutton">
                         <img src="{% static 'rsshistory/icons/icons8-logout-100.png' %}" height=30px />

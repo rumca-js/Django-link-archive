@@ -51,7 +51,8 @@ urlpatterns = [
    path('entry-comment-remove/<int:pk>/', viewcomments.entry_comment_remove, name='entry-comment-remove'),
 
    # custom views
-   path('configuration/', viewcustom.configuration, name='configuration'),
+   path('configuration/', viewcustom.configuration_page, name='configuration'),
+   path('admin-page/', viewcustom.admin_page, name='admin-page'),
    path('system-status/', viewcustom.system_status, name='system-status'),
    path('start-background-threads/', viewcustom.start_threads, name='start-background-threads'),
    path('import-view', viewcustom.import_view, name='import-view'),
@@ -67,6 +68,8 @@ urlpatterns = [
    path('write-topic/<str:topic>', viewcustom.write_topic, name='write-topic'),
    path('test-page', viewcustom.test_page, name='test-page'),
    path('user-config', viewcustom.user_config, name='user-config'),
+   path('entry-download-music/<int:pk>/', viewcustom.download_music, name='entry-download-music'),
+   path('entry-download-video/<int:pk>/', viewcustom.download_video, name='entry-download-video'),
 
    # login
    path('accounts/', include('django.contrib.auth.urls')),

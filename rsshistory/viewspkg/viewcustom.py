@@ -25,9 +25,19 @@ def get_app():
     return app_name
 
 
-def configuration(request):
+def admin_page(request):
     context = get_context(request)
-    context['page_title'] += " - Configuration"
+    context['page_title'] += " - Admin page"
+
+    if not request.user.is_staff:
+        return render(request, get_app() / 'missing_rights.html', context)
+    
+    return render(request, get_app() / 'admin_page.html', context)
+
+
+def configuration_page(request):
+    context = get_context(request)
+    context['page_title'] += " - Configuration page"
 
     if not request.user.is_staff:
         return render(request, get_app() / 'missing_rights.html', context)
@@ -699,3 +709,40 @@ def clear_youtube_cache(request):
     context["summary_text"] = summary
 
     return render(request, get_app() / 'summary_present.html', context)
+
+def download_music(request, pk):
+    context = get_context(request)
+    context['page_title'] += " - Download music"
+
+    if not request.user.is_staff:
+        return render(request, app_name / 'missing_rights.html', context)
+
+    ft = VideoLinkDataModel.objects.filter(id=pk)
+    if ft.exists():
+        context["summary_text"] = "Added to download queue"
+    else:
+        context["summary_text"] = "Failed to add to download queue"
+
+    c = Configuration.get_object(str(app_name))
+    c.download_music(ft[0])
+
+    return render(request, app_name / 'summary_present.html', context)
+
+
+def download_video(request, pk):
+    context = get_context(request)
+    context['page_title'] += " - Download video"
+
+    if not request.user.is_staff:
+        return render(request, app_name / 'missing_rights.html', context)
+
+    ft = VideoLinkDataModel.objects.filter(id=pk)
+    if ft.exists():
+        context["summary_text"] = "Added to download queue"
+    else:
+        context["summary_text"] = "Failed to add to download queue"
+
+    c = Configuration.get_object(str(app_name))
+    c.download_video(ft[0])
+
+    return render(request, app_name / 'summary_present.html', context)

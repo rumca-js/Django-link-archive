@@ -1,12 +1,11 @@
 from pathlib import Path
 import logging
 
-from .gitrepo import *
-
+from .programwrappers import ytdlp,id3v2
 from .basictypes import *
 
 
-__version__ = "0.7.0"
+__version__ = "0.8.0"
 
 
 class Configuration(object):
@@ -20,8 +19,6 @@ class Configuration(object):
         self.server_log_file = self.directory / "log_{0}.txt".format(app_name)
 
         self.enable_logging()
-
-        print("Creating configuration item")
 
     def get_object(app_name):
         app_name = str(app_name)

@@ -380,7 +380,7 @@ class NotBookmarkedView(generic.ListView):
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
         context = super(NotBookmarkedView, self).get_context_data(**kwargs)
-        context = init_context(context)
+        context = init_context(self.request, context)
         # Create any data and add it to the context
 
         return context

@@ -166,8 +166,8 @@ class RssSourceExportHistory(models.Model):
 
 class LinkDataModel(models.Model):
     source = models.CharField(max_length=2000)
-    title = models.CharField(max_length=1000)
-    description = models.CharField(max_length=1000)
+    title = models.CharField(max_length=1000, null=True)
+    description = models.CharField(max_length=1000, null=True)
     link = models.CharField(max_length=1000, unique=True)
     date_published = models.DateTimeField(default=datetime.now)
     # this entry cannot be removed
@@ -233,6 +233,12 @@ class LinkDataModel(models.Model):
         page = Page(self.link)
         domain = page.get_domain()
         return domain + "/favicon.ico"
+
+    def get_thumbnail(self):
+        if self.thumbnail:
+            return self.thumbnail
+
+        return self.get_favicon()
 
     def get_map(self):
         data = {}
@@ -390,10 +396,13 @@ class ConfigurationEntry(models.Model):
 
 class UserConfig(models.Model):
     user = models.CharField(max_length=500, unique=True)
+    # theme: light, dark
     theme = models.CharField(max_length=500, null=True)
-    # display type: compact, preview
+    # display type: standard, compact, preview
     display_type = models.CharField(max_length=500, null=True)
-    show_icons = models.BooleanField(default=True, null=True)
+    show_icons = models.BooleanField(default=True)
+    thumbnails_as_icons = models.BooleanField(default=True)
+    small_icons = models.BooleanField(default=True)
     links_per_page = models.IntegerField(default=100)
 
 

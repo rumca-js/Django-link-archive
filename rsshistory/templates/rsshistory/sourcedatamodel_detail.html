@@ -1,7 +1,12 @@
 {% extends base_generic %}
 
 {% block content %}
-<h1><img src="{{object.get_favicon}}"/> {{ object.title }}</h1>
+<h1>
+    {% if user_config.show_icons %}
+    <img src="{{object.get_favicon}}"/>
+    {% endif %}
+    {{ object.title }}
+</h1>
 
   <p>
       <div><strong>Url:</strong> <a href="{{ object.url }}">{{ object.url }}</a></div>
