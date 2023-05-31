@@ -395,11 +395,22 @@ class ConfigurationEntry(models.Model):
 
 
 class UserConfig(models.Model):
+    THEME_TYPE_CHOICES = (
+        ('light', 'light'),
+        ('dark', 'dark'),
+    )
+
+    DISPLAY_TYPE_CHOICES = (
+        ('std', 'standard'),
+        ('tags', 'clickable-tags'),
+        ('twolines', 'line-and-buttons'),
+    )
+
     user = models.CharField(max_length=500, unique=True)
     # theme: light, dark
-    theme = models.CharField(max_length=500, null=True)
+    theme = models.CharField(max_length=500, null=True, default="light", choices = THEME_TYPE_CHOICES)
     # display type: standard, compact, preview
-    display_type = models.CharField(max_length=500, null=True)
+    display_type = models.CharField(max_length=500, null=True, default="standard", choices = DISPLAY_TYPE_CHOICES)
     show_icons = models.BooleanField(default=True)
     thumbnails_as_icons = models.BooleanField(default=True)
     small_icons = models.BooleanField(default=True)

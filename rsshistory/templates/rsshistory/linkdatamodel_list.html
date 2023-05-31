@@ -65,7 +65,7 @@
                     </div>
                 </div>
               </a>
-          {% elif user_config.display_type == "taggable" %}
+          {% elif user_config.display_type == "clickable-tags" %}
              <span
                 {% if link.persistent %}
                    class="longbutton longbuttonselected"
@@ -100,6 +100,51 @@
                   </div>
                </div>
              </span>
+          {% elif user_config.display_type == "line-and-buttons" %}
+              <a href="{{ link.link }}"
+                 {% if link.persistent %}
+                    class="longbutton longbuttonselected"
+                 {% else %}
+                    class="longbutton"
+                 {% endif %}
+                      >
+
+                <div class="linklistitem">
+                   <img src="{{link.get_favicon}}" width="20"/>
+                   {% if link.dead %}
+                      <span class="linklistitemtitle">Hidden link</span>
+                   {% else %}
+                      <span class="linklistitemtitle">{{link.title}}</span> {{link.date_published}}  {{link.get_source_name}}
+                   {% endif %}
+
+                   {% if link.get_tag_string %}
+                       , Tags: # {{ link.get_tag_string }}
+                   {% endif %}
+                   {% if link.user %}
+                      , User: {{link.user}}
+                   {% endif %}
+
+                </div>
+              </a>
+
+              {% if user.is_staff %}
+              <a href="{{ link.get_absolute_url }}" class="simplebutton">
+                 Details
+              </a>
+                 {% if link.persistent %}
+                  <a href="{% url 'rsshistory:entry-notstar' link.id %}" class="simplebutton">
+                   Not bookmarked
+                  </a>
+                  <a href="{% url 'rsshistory:entry-tag' link.id %}" class="simplebutton">Tag entry</a>
+                 {% else %}
+                  <a href="{% url 'rsshistory:entry-star' link.id %}" class="simplebutton">
+                   Bookmark
+                  </a>
+                 {% endif %}
+                 <!--a href="{% url 'rsshistory:entry-remove' link.id %}" class="simplebutton">Remove entry</a-->
+              {% else %}
+              <hr>
+              {% endif %}
           {% endif %}
       </li>
     {% endfor %}

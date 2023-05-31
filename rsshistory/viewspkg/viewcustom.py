@@ -8,7 +8,6 @@ from django.shortcuts import render
 from ..prjconfig import Configuration
 from ..models import SourceDataModel, LinkDataModel, LinkTagsDataModel, ConfigurationEntry, UserConfig
 from ..models import RssSourceImportHistory, RssSourceExportHistory
-from ..forms import SourceForm, EntryForm, ImportSourcesForm, ImportEntriesForm, SourcesChoiceForm, CommentEntryForm
 from ..forms import ConfigForm, UserConfigForm
 
 

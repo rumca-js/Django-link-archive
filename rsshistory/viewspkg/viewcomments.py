@@ -71,7 +71,7 @@ def entry_comment_edit(request, pk):
     if not request.user.is_authenticated:
         return render(request, get_app() / 'missing_rights.html', context)
 
-    comment_obj = RssEntryCommentDataModel.objects.get(id = pk)
+    comment_obj = LinkCommentDataModel.objects.get(id = pk)
     link = comment_obj.link_obj
 
     author = request.user.username
@@ -114,7 +114,7 @@ def entry_comment_remove(request, pk):
     if not request.user.is_authenticated:
         return render(request, get_app() / 'missing_rights.html', context)
 
-    comment_obj = RssEntryCommentDataModel.objects.get(id = pk)
+    comment_obj = LinkCommentDataModel.objects.get(id = pk)
     link = comment_obj.link_obj
 
     author = request.user.username

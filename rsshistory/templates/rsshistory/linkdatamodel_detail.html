@@ -21,6 +21,10 @@
     {% if object.persistent %}
         <a href="{% url 'rsshistory:entry-tag' object.id %}" class="simplebutton">Tag entry</a>
     {% endif %}
+
+    {% for button in object_controller.get_menu_buttons %}
+      <a href="{{button.action}}" class="simplebutton">{{button.name}}</a>
+    {% endfor %}
   </p>
   {% endif %}
 
@@ -28,11 +32,15 @@
       {% if object.source_obj %}
        <a href="{% url 'rsshistory:source-detail' object.source_obj.id %}" class="simplebutton">Source: {{object.source_obj.title}}</a>
       {% else %}
-          {% if object.thumbnail %}
-          <img src="{{object.thumbnail}}" width="20"/>
-          {% else %}
-          <img src="{{object.get_favicon}}" width="20"/>
-          {% endif %}
+                  {% if user_config.show_icons %}
+                    <img src=
+                      {% if user_config.thumbnails_as_icons %}
+                          "{{link.get_thumbnail}}"
+                      {% else %}
+                          "{{link.get_favicon}}"
+                      {% endif %}
+                      width="30"/>
+                  {% endif %}
        <strong>Source:</strong> <a href="{{ object.source }}">{{ object.source }}</a>
       {% endif %}
       <a href="{{object.get_archive_link}}" class="simplebutton">View on archive.org</a>
@@ -56,11 +64,7 @@
       <span><strong>Category:</strong> {{ object.category }}</span>
       <span><strong>Subcategory:</strong> {{ object.subcategory }}</span>
       <span><strong>Language:</strong> {{ object.language }}</span>
-      <span><strong>Dead:</strong> {{ videodead }}</span>
-      <div><strong>View Count:</strong>{{videoviewcount}}
-          <strong>Thumbs Up:</strong>{{videothumbsup}}
-          <strong>Thumbs Down:</strong>{{videothumbsdown}}
-          <strong>UploadDate:</strong>{{videouploaddate}}</div>
+      <span><strong>Dead:</strong> {{ object.dead }}</span>
       <div><strong>Tags:</strong>
        {% for tag in object.get_tag_map %}
            <a href="{% url 'rsshistory:entries'%}?tag={{tag}}" class="simplebutton">{{tag}}</a>

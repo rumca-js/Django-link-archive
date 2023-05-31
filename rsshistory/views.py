@@ -8,7 +8,7 @@ from django.db.models.query import QuerySet
 from django.db.models.query import EmptyQuerySet
 
 from .models import SourceDataModel, LinkDataModel, ConfigurationEntry, UserConfig
-from .forms import SourceForm, EntryForm, ConfigForm, EntryChoiceForm, ImportEntriesForm
+from .forms import ConfigForm
 from .basictypes import *
 from .prjconfig import Configuration
 

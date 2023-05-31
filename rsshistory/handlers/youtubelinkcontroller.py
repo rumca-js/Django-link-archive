@@ -1,13 +1,18 @@
-from .youtubelinkhandler import YouTubeLinkHandler
+from django.urls import reverse
 
-class YouTubeLinkController(YouTubeLinkHandler):
+from .youtubelinkhandler import YouTubeLinkHandler
+from .genericlinkcontroller import GenericLinkController, LinkButton
+
+class YouTubeLinkController(YouTubeLinkHandler, GenericLinkController):
 
     def __init__(self, entry):
         super().__init__(entry.link)
         self.entry = entry
 
     def get_menu_buttons(self):
-        return []
+        return [LinkButton("Download music", reverse('rsshistory:entry-download-music', args=[self.entry.id])),
+                LinkButton("Download video", reverse('rsshistory:entry-download-video', args=[self.entry.id])),
+                LinkButton("Fix YouTube properties", reverse('rsshistory:entry-fix-youtube-details', args=[self.entry.id])),]
 
     def get_frame_html(self):
         frame = self.get_frame()

@@ -5,7 +5,7 @@ from django.shortcuts import render
 from ..models import SourceDataModel, LinkDataModel, ConfigurationEntry
 from ..models import LinkTagsDataModel
 from ..prjconfig import Configuration
-from ..forms import SourceForm, EntryForm, ImportSourcesForm, ImportEntriesForm, SourcesChoiceForm, ConfigForm, CommentEntryForm
+from ..forms import ConfigForm
 
 
 def init_context(request, context):

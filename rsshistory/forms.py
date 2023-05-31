@@ -6,18 +6,6 @@ from .models import ConfigurationEntry, UserConfig
 
 
 
-class GoogleChoiceForm(forms.Form):
-    """
-    Category choice form
-    """
-
-    category = forms.CharField(widget=forms.Select(choices=()))
-    subcategory = forms.CharField(widget=forms.Select(choices=()))
-    title = forms.CharField(widget=forms.Select(choices=()))
-    persistent = forms.BooleanField(required=False)
-    search = forms.CharField(label='Search', max_length = 500, required=False)
-
-
 class ConfigForm(forms.ModelForm):
     """
     Category choice form
@@ -43,7 +31,8 @@ class UserConfigForm(forms.ModelForm):
     """
     class Meta:
         model = UserConfig
-        fields = ['show_icons', 'thumbnails_as_icons', 'small_icons', 'theme', 'display_type', 'links_per_page']
+        fields = ['show_icons', 'thumbnails_as_icons', 'small_icons', 'display_type']
+        #fields = ['show_icons', 'thumbnails_as_icons', 'small_icons', 'display_type', 'theme', 'links_per_page']
         #widgets = {
         #}
 
@@ -152,7 +141,6 @@ class ImportEntriesForm(forms.Form):
 
         converter = CsvConverter()
         return converter.from_text(rawsources)
-
 
 
 class EntryForm(forms.ModelForm):
@@ -567,17 +555,10 @@ class CommentEntryForm(forms.ModelForm):
         self.fields['author'].widget.attrs['readonly'] = True
 
     def save_comment(self):
-        comment = self.cleaned_data['comment']
         link_url = self.cleaned_data['link']
-        date_published = self.cleaned_data['date_published']
-        author = self.cleaned_data['author']
 
         entry = LinkDataModel.objects.get(link = link_url)
 
-        o = LinkCommentDataModel(
-                comment = comment,
-                link = link_url,
-                author = author,
-                date_published = date_published,
-                link_obj = entry)
-        o.save()
+        comment = self.save(commit=False)
+        comment.link_obj = entry
+        comment.save()

@@ -5,7 +5,7 @@ from django.shortcuts import render
 
 from ..models import SourceDataModel, LinkDataModel, LinkTagsDataModel, ConfigurationEntry
 from ..prjconfig import Configuration
-from ..forms import SourceForm, EntryForm, ImportSourcesForm, ImportEntriesForm, SourcesChoiceForm, EntryChoiceForm, ConfigForm, CommentEntryForm
+from ..forms import EntryForm, ImportEntriesForm, EntryChoiceForm, ConfigForm
 
 
 def init_context(request, context):
@@ -36,9 +36,7 @@ class RssEntriesListView(generic.ListView):
         context = init_context(self.request, context)
         # Create any data and add it to the context
 
-        self.filter_form.create()
-        self.filter_form.method = "GET"
-        self.filter_form.action_url = reverse('rsshistory:entries')
+        context['page_title'] += " - entries"
 
         app_name = get_app()
         c = Configuration.get_object(str(app_name))
@@ -49,8 +47,11 @@ class RssEntriesListView(generic.ListView):
            context['rss_are_fetched'] = queue_size > 0
            context['rss_queue_size'] = queue_size
 
+        self.filter_form.create()
+        self.filter_form.method = "GET"
+        self.filter_form.action_url = reverse('rsshistory:entries')
+
         context['filter_form'] = self.filter_form
-        context['page_title'] += " - entries"
 
         from django_user_agents.utils import get_user_agent
         user_agent = get_user_agent(self.request)
@@ -250,8 +251,6 @@ def hide_entry(request, pk):
 
 
 def search_init_view(request):
-    from ..forms import GoogleChoiceForm
-
     context = get_context(request)
     context['page_title'] += " - search view"
 
@@ -374,9 +373,10 @@ class NotBookmarkedView(generic.ListView):
     model = LinkDataModel
     context_object_name = 'entries_list'
     paginate_by = 200
-    template_name = get_app() / 'entries_untagged_view.html'
+    template_name = get_app() / 'linkdatamodel_list.html'
 
     def get_queryset(self):
+        self.filter_form = EntryChoiceForm(args = self.request.GET)
         return LinkDataModel.objects.filter(tags__tag__isnull = True, persistent = True)
 
     def get_context_data(self, **kwargs):
@@ -385,5 +385,26 @@ class NotBookmarkedView(generic.ListView):
         context = init_context(self.request, context)
         # Create any data and add it to the context
 
-        return context
+        # TODO move from entries view
+        context['page_title'] += " - entries"
 
+        app_name = get_app()
+        c = Configuration.get_object(str(app_name))
+        threads = c.get_threads()
+        if threads:
+           thread = c.get_threads()[0]
+           queue_size = thread.get_queue_size()
+           context['rss_are_fetched'] = queue_size > 0
+           context['rss_queue_size'] = queue_size
+
+        self.filter_form.create()
+        self.filter_form.method = "GET"
+        self.filter_form.action_url = reverse('rsshistory:entries-untagged')
+
+        context['filter_form'] = self.filter_form
+
+        from django_user_agents.utils import get_user_agent
+        user_agent = get_user_agent(self.request)
+        context["is_mobile"] = user_agent.is_mobile
+
+        return context
