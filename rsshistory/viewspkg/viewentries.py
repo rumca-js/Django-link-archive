@@ -79,6 +79,10 @@ class RssEntryDetailView(generic.DetailView):
         from ..dateutils import DateUtils
         m = WaybackMachine()
         context['archive_org_date'] = m.get_formatted_date(DateUtils.get_date_today())
+        
+        from django_user_agents.utils import get_user_agent
+        user_agent = get_user_agent(self.request)
+        context["is_mobile"] = user_agent.is_mobile
 
         return context
 
@@ -101,7 +105,7 @@ def add_entry(request):
         if form.is_valid():
             data = form.get_full_information()
 
-            ob = LinkDataModel.objects.filter(link=data['link'])
+            ob = LinkDataModel.objects.filter(link = data['link'])
             if ob.exists():
                 context['form'] = form
                 context['entry'] = ob[0]
@@ -114,9 +118,7 @@ def add_entry(request):
 
             context['form'] = form
 
-            link = data['link']
-
-            ob = LinkDataModel.objects.filter(link = link)
+            ob = LinkDataModel.objects.filter(link = data['link'])
             if ob.exists():
                 context['entry'] = ob[0]
 
@@ -124,7 +126,7 @@ def add_entry(request):
             if not c.thread_mgr:
                 context['summary_text'] = "Source added, but could not add to queue - missing threads"
                 return render(request, get_app() / 'entry_added.html', context)
-            c.thread_mgr.wayback_save(link)
+            c.thread_mgr.wayback_save(data['link'])
 
             return render(request, get_app() / 'entry_added.html', context)
 

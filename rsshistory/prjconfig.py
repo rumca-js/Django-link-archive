@@ -5,7 +5,7 @@ from .programwrappers import ytdlp,id3v2
 from .basictypes import *
 
 
-__version__ = "0.8.0"
+__version__ = "0.8.1"
 
 
 class Configuration(object):
