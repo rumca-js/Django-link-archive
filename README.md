@@ -15,23 +15,23 @@ Link database, with RSS functionality. Similar to Reddit, but completly open sou
  - Minimal installation, integrator may choose however to use production environment, with a good Database engine. Just as it is supported by Django. I am using SQLite without any problems.
  - Support for web archive. Link rot mitigation
 
-## Problems with other RSS readers
+## Problems with other RSS readers, or apps
 
  - Currently Nextcloud 'News' plugin does not provide: tag support, search ability
  - Thunderbird does not allow tagging, searching links by tags
  - Feedly is not local, does not store your data on your hardware
  - Feeder (phone) does not provide search ability, nor tagging. Cannot configure 'view' for my liking
  - Newsboat is CLI, and it does not provide exhaustive search capabilities
- - Most do not allow to introduce my own links
- - Fail to provide consistent search ability
+ - Most do not allow to input links manually
+ - Most fail to provide consistent search ability
+ - Reddit is a nice project, but does not add RSS links automatically, requires a lot of resources to run. This project does not necessarily aim to provide social media experience
 
 ## Possible use cases
 
- - YouTube alternative, or filter. You can specify what kind of links, or channels you contain, or support. YouTube will display sometimes 'video unavailable' text
+ - YouTube link database
+ - Database of important links, for work, for school
  - RSS client with multiple features
- - Important links, for work
- - Important links, for hobby purposes
- - Bookmarking interesting songs, song database, etc.
+ - Reddit/diggit replacement
 
 ## Screenshots
 
