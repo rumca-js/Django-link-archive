@@ -29,20 +29,22 @@
   {% endif %}
 
   <p>
+      {% if user_config.show_icons %}
+        <!--img src=
+          {% if user_config.thumbnails_as_icons %}
+              "{{link.get_thumbnail}}"
+          {% else %}
+              "{{link.get_favicon}}"
+          {% endif %}
+          width="30"/-->
+      {% endif %}
+
       {% if object.source_obj %}
        <a href="{% url 'rsshistory:source-detail' object.source_obj.id %}" class="simplebutton">Source: {{object.source_obj.title}}</a>
       {% else %}
-                  {% if user_config.show_icons %}
-                    <img src=
-                      {% if user_config.thumbnails_as_icons %}
-                          "{{link.get_thumbnail}}"
-                      {% else %}
-                          "{{link.get_favicon}}"
-                      {% endif %}
-                      width="30"/>
-                  {% endif %}
-       <strong>Source:</strong> <a href="{{ object.source }}">{{ object.source }}</a>
+       <a href="{{ object.source }}" class="simplebutton">Source Link</a>
       {% endif %}
+
       <a href="{{object.get_archive_link}}" class="simplebutton">View on archive.org</a>
   </p>
 

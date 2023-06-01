@@ -19,7 +19,7 @@
   <ul class="linklist">
     {% for link in entries_list %}
       <li>
-          {% if user_config.display_type == "standard" or user_config.display_type == "" %}
+          {% if user_config.display_type == "std" or user_config.display_type == "" %}
               <a href="{{ link.get_absolute_url }}"
                  {% if link.persistent %}
                     class="longbutton longbuttonselected"
