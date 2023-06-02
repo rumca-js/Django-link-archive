@@ -24,13 +24,13 @@ Link database, with RSS functionality. Similar to Reddit, but completly open sou
  - Newsboat is CLI, and it does not provide exhaustive search capabilities
  - Most do not allow to input links manually
  - Most fail to provide consistent search ability
- - Reddit is a nice project, but does not add RSS links automatically, requires a lot of resources to run. This project does not necessarily aim to provide social media experience
+ - Reddit is a nice project, but does not add RSS links automatically, requires a lot of resources to run. Reddit aim is to provide social media experience, while this project aims to grant the ability to create database of links
 
 ## Possible use cases
 
  - YouTube link database
  - Database of important links, for work, for school
- - RSS client with multiple features
+ - RSS client
  - Reddit/diggit replacement
 
 ## Screenshots
