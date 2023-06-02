@@ -1,5 +1,7 @@
 
 from ..webtools import Page
+from dateutil import parser
+
 
 class BasePlugin(Page):
     def __init__(self):
@@ -55,17 +57,24 @@ class BasePlugin(Page):
             output_map['thumbnail'] = None
 
         if hasattr(feed_entry, "published"):
-            output_map['published'] = DateUtils.get_iso_datetime(feed_entry.published)
+            dt = parser.parse(feed_entry.published)
+            output_map['published'] = dt
         elif self.allow_adding_with_current_time:
             output_map['published'] = DateUtils.get_datetime_now_utc()
         elif self.default_entry_timestamp:
             output_map['published'] = self.default_entry_timestamp
         else:
-            output_map['published'] = ""
+            output_map['published'] = DateUtils.get_datetime_now_utc()
 
         output_map['source'] = source.url
         output_map['title'] = feed_entry.title
         output_map['language'] = source.language
         output_map['link'] = feed_entry.link
+
+        if output_map['published']:
+            output_map['published'] = DateUtils.to_utc_date(output_map['published'])
+
+            if output_map['published'] > DateUtils.get_datetime_now_utc():
+                output_map['published'] = DateUtils.get_datetime_now_utc()
 
         return output_map

@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.shortcuts import render
 
 from ..prjconfig import Configuration
-from ..models import SourceDataModel, LinkDataModel, LinkTagsDataModel, ConfigurationEntry, UserConfig
+from ..models import SourceDataModel, LinkDataModel, LinkTagsDataModel, ConfigurationEntry, UserConfig, BackgroundJob
 from ..models import RssSourceImportHistory, RssSourceExportHistory
 from ..forms import ConfigForm, UserConfigForm
 
@@ -97,6 +97,7 @@ def system_status(request):
     context['LinkTagsDataModel'] = len(LinkTagsDataModel.objects.all())
     context['ConfigurationEntry'] = len(ConfigurationEntry.objects.all())
     context['UserConfig'] = len(UserConfig.objects.all())
+    context['BackgroundJob'] = len(BackgroundJob.objects.all())
 
     from ..models import PersistentInfo
     context['log_items'] = PersistentInfo.objects.all()
@@ -197,6 +198,9 @@ def truncate_errors(request):
 
     from ..models import PersistentInfo
     PersistentInfo.truncate()
+
+    from ..models import BackgroundJob
+    BackgroundJob.truncate()
 
     context["summary_text"] = "Clearing errors done"
 
@@ -747,3 +751,17 @@ def download_video(request, pk):
         c.thread_mgr.download_video(ft[0])
 
     return render(request, get_app() / 'summary_present.html', context)
+
+
+class BackgroundJobsView(generic.ListView):
+    model = BackgroundJob
+    context_object_name = 'jobs_list'
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get the context
+        context = super(BackgroundJobsView, self).get_context_data(**kwargs)
+        context = init_context(self.request, context)
+
+        context['BackgroundJob'] = len(BackgroundJob.objects.all())
+
+        return context

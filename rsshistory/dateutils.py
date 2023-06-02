@@ -1,6 +1,7 @@
 import datetime
 from datetime import date, timedelta
 from pytz import timezone
+import django.utils
 
 
 class DateUtils(object):
@@ -10,6 +11,11 @@ class DateUtils(object):
 
     def get_iso_today():
         return date.today().isoformat()
+
+    def to_utc_date(input_date):
+       if input_date.tzinfo is None:
+           input_date = input_date.replace(tzinfo=timezone('UTC'))
+       return input_date
 
     def get_date_yesterday():
        current_date = date.today()
@@ -27,10 +33,10 @@ class DateUtils(object):
        return next_day
 
     def get_datetime_now_utc():
-        return datetime.datetime.now(timezone('UTC'))
+        return django.utils.timezone.now()
 
     def get_datetime_now_iso():
-        now = datetime.datetime.now(timezone('UTC'))
+        now = django.utils.timezone.now()
         return self.get_iso_datetime(now)
 
     def get_datetime_file_name():

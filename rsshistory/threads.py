@@ -6,7 +6,7 @@ import sys
 
 class ThreadJobCommon(threading.Thread):
 
-    def __init__(self, name="ThreadJobCommon", seconds_wait=1, itemless=False):
+    def __init__(self, name="ThreadJobCommon", seconds_wait=10, itemless=False):
         threading.Thread.__init__(self)
         print("Starting thread: {0}".format(name))
         self._started_server_loop = False
@@ -40,6 +40,12 @@ class ThreadJobCommon(threading.Thread):
         from .models import PersistentInfo
         PersistentInfo.create("Process has crashed")
 
+    def get_process_item(self):
+        if len(self._process_list) == 0:
+            return None
+
+        return self._process_list.pop(0)
+
     def handle_process_item(self):
         try:
             if self._itemless:
@@ -48,10 +54,9 @@ class ThreadJobCommon(threading.Thread):
             logging.critical(E, exc_info=True)
             traceback.print_exc(file=sys.stdout)
 
-        if len(self._process_list) == 0:
+        item = self.get_process_item()
+        if item is None:
             return False
-
-        item = self._process_list.pop(0)
 
         try:
             self._process_item = item

@@ -35,7 +35,8 @@ class YTDLP(ytdownloader.YouTubeDownloader):
         ext = self.get_video_ext()
 
         #cmds = ['yt-dlp', '-f','bestvideo[ext={0}]+bestaudio'.format(ext), self._url ]
-        cmds = ['yt-dlp', '-o', file_name, self._url ]
+        cmds = ['yt-dlp','-f','bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4', self._url]
+        #cmds = ['yt-dlp', '-o', file_name, self._url ]
         logging.info("Downloading: " + " ".join(cmds))
         proc = subprocess.run(cmds, capture_output=True)
 

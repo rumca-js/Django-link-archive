@@ -493,3 +493,31 @@ class YouTubeReturnDislikeMetaCache(models.Model):
 
     link_rd_obj = models.ForeignKey(LinkDataModel, on_delete=models.SET_NULL, related_name='link_rd',
                                     null=True, blank=True)
+
+
+class BackgroundJob(models.Model):
+    JOB_CHOICES = (
+        ('process-source', 'process-source'),        # for RSS sources it checks if there are new data
+        ('link-add', 'link-add'),                    # adds link using default properties
+        ('link-details', 'link-details'),            # fetches link additional information
+        ('link-refresh', 'link-refresh'),            # refreshes link, refetches its data
+        ('link-save', 'link-save'),                  # if save functionality is enabled
+        ('download-music', 'download-music'),        # 
+        ('download-video', 'download-video'),        # 
+        ('write-yearly-data', 'write-yearly-data'),  # writes yearly data
+        ('write-topic-data', 'write-topic-data'),    # writes yearly data
+        ('push-to-repo', 'push-to-repo'),            # writes yearly data
+        )
+
+    # job - add link, process source, download music, download video, wayback save
+    job = models.CharField(max_length=1000, null=False, choices = JOB_CHOICES)
+    # task name
+    task = models.CharField(max_length=1000, null=True)
+    subject = models.CharField(max_length=1000, null=False)
+    # task args "subject,arg1,arg2,..."
+    # for add link, the first argument is the link URL
+    # for download music, the first argument is the link URL
+    args = models.CharField(max_length=1000, null=True)
+
+    def truncate():
+        BackgroundJob.objects.all().delete()

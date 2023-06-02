@@ -52,6 +52,7 @@ urlpatterns = [
 
    # custom views
    path('configuration/', viewcustom.configuration_page, name='configuration'),
+   path('backgroundjobs/', viewcustom.BackgroundJobsView.as_view(), name='backgroundjobs'),
    path('admin-page/', viewcustom.admin_page, name='admin-page'),
    path('system-status/', viewcustom.system_status, name='system-status'),
    path('start-background-threads/', viewcustom.start_threads, name='start-background-threads'),

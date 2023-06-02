@@ -13,9 +13,10 @@
  <li>Return dislike cache: {{YouTubeReturnDislikeMetaCache}}</li>
  <li>ConfigurationEntry: {{ConfigurationEntry}}</li>
  <li>UserConfig: {{UserConfig}}</li>
+ <li>BackgroundJob: {{BackgroundJob}}</li>
 </ul>
 
-<h1>Queues</h1>
+<h1>Tasks</h1>
 <ul>
     {% for thread in thread_list %}
        <li>{{ thread.get_thread_name }}: Queue Size: {{thread.get_queue_size}} Current processing: {{ thread.get_process_item }}</li>
@@ -26,6 +27,7 @@
 <h1>Advanced</h1>
 <ul>
   <li><a href="{% url 'rsshistory:truncate-errors' %}" class="simplebutton">Truncate errors</a></li>
+  <li><a href="{% url 'rsshistory:backgroundjobs' %}" class="simplebutton">View Background Jobs</a></li>
 </ul>
 
 <h1>Server log</h1>

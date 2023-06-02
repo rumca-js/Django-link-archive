@@ -3,7 +3,7 @@ from django.views import generic
 from django.urls import reverse
 from django.shortcuts import render
 
-from ..models import SourceDataModel, LinkDataModel, LinkTagsDataModel, ConfigurationEntry
+from ..models import SourceDataModel, LinkDataModel, LinkTagsDataModel, ConfigurationEntry, BackgroundJob
 from ..prjconfig import Configuration
 from ..forms import EntryForm, ImportEntriesForm, EntryChoiceForm, ConfigForm
 
@@ -43,7 +43,7 @@ class RssEntriesListView(generic.ListView):
         threads = c.get_threads()
         if threads:
            thread = c.get_threads()[0]
-           queue_size = thread.get_queue_size()
+           queue_size = len(BackgroundJob.objects.filter(job='process-source'))
            context['rss_are_fetched'] = queue_size > 0
            context['rss_queue_size'] = queue_size
 

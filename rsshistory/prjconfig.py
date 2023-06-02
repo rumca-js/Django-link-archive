@@ -5,7 +5,7 @@ from .programwrappers import ytdlp,id3v2
 from .basictypes import *
 
 
-__version__ = "0.8.2"
+__version__ = "0.9.0"
 
 
 class Configuration(object):
@@ -16,7 +16,6 @@ class Configuration(object):
         self.thread_mgr = None
         self.directory = Path(".")
         self.version = __version__
-        self.server_log_file = self.directory / "log_{0}.txt".format(app_name)
 
         self.enable_logging()
 
