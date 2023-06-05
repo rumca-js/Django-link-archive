@@ -35,9 +35,9 @@ Link database, with RSS functionality. Similar to Reddit, but completly open sou
 
 ## Screenshots
 
-![](https://raw.githubusercontent.com/rumca-js/Django-rss-feed/main/screenshots/2023_03_09_entries.PNG)
+![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/2023_03_09_entries.PNG)
 
-View screenshots: [https://github.com/rumca-js/Django-rss-feed/tree/main/screenshots](https://github.com/rumca-js/Django-rss-feed/tree/main/screenshots).
+View screenshots: [https://github.com/rumca-js/Django-link-archive/tree/main/screenshots](https://github.com/rumca-js/Django-link-archive/tree/main/screenshots).
 
 ## Notes
 
@@ -55,7 +55,7 @@ Installation, just as any other Django app. Link [https://docs.djangoproject.com
 
 ## Suite of projects
 
- - Captured using Django application: [https://github.com/rumca-js/Django-rss-feed](https://github.com/rumca-js/Django-rss-feed)
+ - Captured using Django application: [https://github.com/rumca-js/Django-link-archive](https://github.com/rumca-js/Django-link-archive)
  - Bookmarked links [https://github.com/rumca-js/RSS-Link-Database](https://github.com/rumca-js/RSS-Link-Database)
  - daily RSS Git repository for the year 2023 [https://github.com/rumca-js/RSS-Link-Database-2023](https://github.com/rumca-js/RSS-Link-Database-2023)
  - daily RSS Git repository for the year 2022 [https://github.com/rumca-js/RSS-Link-Database-2022](https://github.com/rumca-js/RSS-Link-Database-2022)
