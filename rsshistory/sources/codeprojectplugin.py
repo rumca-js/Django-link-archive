@@ -2,8 +2,8 @@ from .baseplugin import BasePlugin
 
 
 class CodeProjectPlugin(BasePlugin):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, source):
+        super().__init__(source)
         self.allow_adding_with_current_time = True
 
     def get_address(self):

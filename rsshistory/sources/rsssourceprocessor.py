@@ -8,8 +8,8 @@ from .basepluginbuilder import BasePluginBuilder
 
 class RssSourceProcessor(object):
 
-    def __init__(self, config):
-        self._cfg = config
+    def __init__(self):
+        #self._cfg = config
         self.allow_adding_with_current_time = True
         self.default_entry_timestamp = None
 
@@ -17,10 +17,10 @@ class RssSourceProcessor(object):
         from ..dateutils import DateUtils
 
         try:
-            print("process source: {0}".format(source.title))
+            print("process source:{} type:{}".format(source.title, source.source_type))
 
             if not source.is_fetch_possible():
-                print("Not time for source: {0}".format(source.title))
+                print("Not time for source: {}".format(source.title))
                 return
 
             start_time = DateUtils.get_datetime_now_utc()
@@ -39,13 +39,15 @@ class RssSourceProcessor(object):
             PersistentInfo.exc("Source:{} {}; Exc:{}\n{}".format(source.url, source.title, str(e), error_text))
 
     def process_source_impl(self, source):
-        plugin = BasePluginBuilder.get(source.get_domain())
+        from ..models import SourceDataModel
         num_entries = 0
 
-        if plugin.is_rss_source():
+        if source.source_type == SourceDataModel.SOURCE_TYPE_RSS:
             num_entries = self.process_rss_source(source)
-        else:
+        elif source.source_type == SourceDataModel.SOURCE_TYPE_PARSE:
             num_entries = self.process_parser_source(source)
+        else:
+            raise NotImplemented("Not implemented source type")
         return num_entries
 
     def process_rss_source(self, source, url=None):
@@ -85,15 +87,21 @@ class RssSourceProcessor(object):
             error_text = traceback.format_exc()
             PersistentInfo.exc("Source:{} {}; Exc:{}\n{}".format(source.url, source.title, str(e), error_text))
 
-    def process_parser_source(self, source):
+    def process_parser_source(self, source, contents = None):
         from ..webtools import Page
         from ..models import LinkDataModel
         try:
-            plugin = BasePluginBuilder.get(source.get_domain())
+            plugin = BasePluginBuilder.get(source)
+            if contents:
+                plugin.contents = contents
+
             links = plugin.get_links()
             num_entries = len(links)
 
             for link in links:
+                if not plugin.is_link_valid(link):
+                    continue
+
                 objs = LinkDataModel.objects.filter(link=link)
                 if objs.exists():
                     continue
@@ -126,7 +134,7 @@ class RssSourceProcessor(object):
         try:
             from ..models import LinkDataModel
 
-            plugin = BasePluginBuilder.get(source.get_domain())
+            plugin = BasePluginBuilder.get(source)
             plugin.allow_adding_with_current_time = self.allow_adding_with_current_time
             if self.default_entry_timestamp:
                 plugin.default_entry_timestamp = self.default_entry_timestamp

@@ -20,7 +20,6 @@ urlpatterns = [
    path('source-refresh/<int:pk>/', viewsources.refresh_source, name='source-refresh'),
    path('sources-remove-all/', viewsources.remove_all_sources, name='sources-remove-all'),
    path('sources-import', viewsources.import_sources, name='sources-import'),
-   path('sources-export/', viewsources.export_sources, name='sources-export'),
    path('source-archive/<int:pk>/', viewsources.wayback_save, name='source-archive'),
    path('source-import-yt-links/<int:pk>/', viewsources.import_youtube_links_for_source, name='source-import-yt-links'),
 
@@ -55,11 +54,15 @@ urlpatterns = [
    path('entry-comment-remove/<int:pk>/', viewcomments.entry_comment_remove, name='entry-comment-remove'),
 
    # custom views
-   path('configuration/', viewcustom.configuration_page, name='configuration'),
-   path('backgroundjobs/', viewcustom.BackgroundJobsView.as_view(), name='backgroundjobs'),
    path('admin-page/', viewcustom.admin_page, name='admin-page'),
+   path('user-config', viewcustom.user_config, name='user-config'),
+   path('configuration/', viewcustom.configuration_page, name='configuration'),
    path('system-status/', viewcustom.system_status, name='system-status'),
    path('start-background-threads/', viewcustom.start_threads, name='start-background-threads'),
+   path('backgroundjobs/', viewcustom.BackgroundJobsView.as_view(), name='backgroundjobs'),
+   path('write-bookmarks', viewcustom.write_bookmarks, name='write-bookmarks'),
+   path('write-daily-data-form', viewcustom.write_daily_data_form, name='write-daily-data-form'),
+   path('write-tag-form', viewcustom.write_tag_form, name='write-tag-form'),
    path('import-view', viewcustom.import_view, name='import-view'),
    path('import-source-ia/<int:pk>/', viewcustom.import_source_from_ia, name='import-source-ia'),
    path('truncate-errors', viewcustom.truncate_errors, name='truncate-errors'),
@@ -68,15 +71,9 @@ urlpatterns = [
    path('fix-entry-tags/<int:entrypk>/', viewcustom.fix_entry_tags, name='fix-entry-tags'),
    path('fix-source-entries-lan/<int:pk>/', viewcustom.fix_source_entries_language, name='fix-source-entries-lan'),
    path('show-yt-props', viewcustom.show_youtube_link_props, name='show-youtube-link-props'),
-   path('write-bookmarks', viewcustom.write_bookmarks, name='write-bookmarks'),
-   path('write-yearly-data/<str:year>', viewcustom.write_yearly_data, name='write-yearly-data'),
-   path('write-topic/<str:topic>', viewcustom.write_topic, name='write-topic'),
    path('test-page', viewcustom.test_page, name='test-page'),
    path('fix-bookmarked-yt', viewcustom.fix_bookmarked_yt, name='fix-bookmarked-yt'),
    path('clear-yt-cache', viewcustom.clear_youtube_cache, name='clear-yt-cache'),
-   path('user-config', viewcustom.user_config, name='user-config'),
-   path('entry-download-music/<int:pk>/', viewcustom.download_music, name='entry-download-music'),
-   path('entry-download-video/<int:pk>/', viewcustom.download_video, name='entry-download-video'),
 
    # login
    path('accounts/', include('django.contrib.auth.urls')),

@@ -2,14 +2,16 @@ import urllib.request, urllib.error, urllib.parse
 from urllib.parse import urlparse
 import html
 import traceback
+import requests
+import re
 
 
 class Page(object):
     user_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11'
 
-    def __init__(self, url):
+    def __init__(self, url, contents = None):
         self.url = url
-        self.contents = None
+        self.contents = contents
 
     def is_valid(self):
         if not self.contents:
@@ -27,6 +29,9 @@ class Page(object):
             pass
 
     def get_contents(self):
+        if self.contents:
+            return self.contents
+
         hdr = {'User-Agent': Page.user_agent,
                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
                'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
@@ -35,10 +40,14 @@ class Page(object):
                'Connection': 'keep-alive'}
 
         try:
-            req = urllib.request.Request(self.url, headers=hdr)
-            handle = urllib.request.urlopen(req)
-            thebytes = handle.read()
-            return self.try_decode(thebytes)
+            r = requests.get(self.url, headers=hdr)
+            return r.text
+            #req = urllib.request.Request(self.url, headers=hdr)
+            #handle = urllib.request.urlopen(req)
+            #thebytes = handle.read()
+            #if self.url.find("spotify") >= 0:
+            #    print(thebytes)
+            #return self.try_decode(thebytes)
 
         except Exception as e:
             error_text = traceback.format_exc()
@@ -110,9 +119,21 @@ class Page(object):
         return True
 
     def get_links(self):
+        return self.get_links_re()
+
+    def get_links_re(self):
+        cont = str(self.get_contents())
+        print(cont)
+        allt = re.findall("(https?://[a-zA-Z0-9./]+)", cont)
+        print(allt)
+        return set(allt)
+
+    def get_links_a(self):
         links = set()
 
         page = self.get_contents()
+        if not page:
+            return links
 
         wh = 1
         while wh:

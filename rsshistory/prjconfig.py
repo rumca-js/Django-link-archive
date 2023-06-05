@@ -3,8 +3,18 @@ import logging
 
 from .programwrappers import ytdlp,id3v2
 from .basictypes import *
+from .models import ConfigurationEntry
 
 
+""" version is split into three digits:
+ - release
+ - model version
+ - patch
+
+ if there is a small incremental change bump up the patch number
+ if a change requires the model to be changed, then second digit is updated, patch is set to 0
+ if something should be released to public, then release version changes
+"""
 __version__ = "0.10.0"
 
 
@@ -77,13 +87,15 @@ class Configuration(object):
         self.thread_mgr.close()
 
     def get_export_path(self, append=None):
+        directory = Path(ConfigurationEntry.get().data_export_path)
         if append:
-            return self.directory / 'exports' / self.app_name / append
+            return directory / self.app_name / append
         else:
-            return self.directory / 'exports' / self.app_name
+            return directory / self.app_name
 
     def get_import_path(self):
-        return self.directory / 'imports' / self.app_name
+        directory = Path(ConfigurationEntry.get().data_import_path)
+        return self.directory / self.app_name
 
     def get_data_path(self):
         return self.directory / 'data' / self.app_name

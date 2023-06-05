@@ -2,8 +2,8 @@ from .baseplugin import BasePlugin
 
 
 class TVN24Plugin(BasePlugin):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, source):
+        super().__init__(source)
 
     def get_address(self):
         return "https://tvn24.pl"

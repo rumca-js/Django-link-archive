@@ -4,21 +4,14 @@ from dateutil import parser
 
 
 class BasePlugin(Page):
-    def __init__(self):
+    def __init__(self, source):
+        self.source = source
         super().__init__(self.get_address())
         self.allow_adding_with_current_time = True
         self.default_entry_timestamp = None
 
     def get_address(self):
-        return "https://google.com"
-
-    def get_processing_type(self):
-        return "RSS"
-
-    def is_rss_source(self):
-        if self.get_processing_type() == "RSS":
-            return True
-        return False
+        return self.source.get_domain()
 
     def is_link_valid(self, address):
         return True

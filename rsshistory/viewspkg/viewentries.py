@@ -38,14 +38,9 @@ class RssEntriesListView(generic.ListView):
 
         context['page_title'] += " - entries"
 
-        app_name = get_app()
-        c = Configuration.get_object(str(app_name))
-        threads = c.get_threads()
-        if threads:
-           thread = c.get_threads()[0]
-           queue_size = len(BackgroundJob.objects.filter(job='process-source'))
-           context['rss_are_fetched'] = queue_size > 0
-           context['rss_queue_size'] = queue_size
+        queue_size = BackgroundJob.get_number_of_jobs(BackgroundJob.JOB_PROCESS_SOURCE)
+        context['rss_are_fetched'] = queue_size > 0
+        context['rss_queue_size'] = queue_size
 
         self.filter_form.create()
         self.filter_form.method = "GET"
@@ -73,7 +68,7 @@ class RssEntryDetailView(generic.DetailView):
         if self.object.language == None:
             self.object.update_language()
 
-        context['page_title'] += " - " + self.object.title
+        context['page_title'] = self.object.title
         context['object_controller'] = LinkControllerBuilder.get_controller(self.object)
 
         from ..sources.waybackmachine import WaybackMachine
@@ -129,7 +124,7 @@ def add_entry(request):
                 return render(request, get_app() / 'entry_added.html', context)
 
             if ConfigurationEntry.get().link_archive:
-                BackgroundJob.objects.create(job="link-archive", task=None, subject=data['link'], args="")
+                BackgroundJob.link_archive(data['link'])
 
             return render(request, get_app() / 'entry_added.html', context)
 
@@ -422,7 +417,7 @@ def download_entry(request, pk):
 
     link = LinkDataModel.objects.get(id=pk)
 
-    BackgroundJob.objects.create(job='link-download', task=None, subject=link.link, args="")
+    BackgroundJob.link_download(subject=link.link)
     summary_text = "Added to queue"
 
     context["summary_text"] = summary_text
@@ -439,7 +434,7 @@ def wayback_save(request, pk):
 
     if ConfigurationEntry.get().link_archive:
         link = LinkDataModel.objects.get(id=pk)
-        BackgroundJob.objects.create(job="link-archive", task=None, subject=link.link, args="")
+        BackgroundJob.link_archive(subject=link.link)
 
         context["summary_text"] = "Added to waybacksave"
     else:

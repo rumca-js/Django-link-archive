@@ -1,7 +1,9 @@
-from datetime import date, datetime, timedelta
 import logging
 import traceback
+from datetime import date, datetime, timedelta
 from pathlib import Path
+
+from django.db.models import Q
 
 from .threads import *
 from .sources.rsssourceprocessor import RssSourceProcessor
@@ -10,6 +12,7 @@ from .datawriter import *
 from .models import LinkDataModel, SourceDataModel, PersistentInfo, ConfigurationEntry, BackgroundJob
 from .models import RssSourceImportHistory, RssSourceExportHistory
 from .basictypes import fix_path_for_windows
+from .views import app_name
 
 
 class ProcessSourceHandler(ThreadJobCommon):
@@ -21,7 +24,7 @@ class ProcessSourceHandler(ThreadJobCommon):
         self.parent = parent
 
     def get_process_item(self):
-        objs = BackgroundJob.objects.filter(job="process-source")
+        objs = BackgroundJob.objects.filter(job=BackgroundJob.JOB_PROCESS_SOURCE)
         if len(objs) == 0:
             return None
 
@@ -61,10 +64,9 @@ class DownloadLinkHandler(ThreadJobCommon):
         self.parent = parent
 
     def get_process_item(self):
-        from django.db.models import Q
-        criterion1 = Q(job="download-music")
-        criterion2 = Q(job="download-video")
-        criterion3 = Q(job="link-download")
+        criterion1 = Q(job=BackgroundJob.JOB_LINK_DOWNLOAD)
+        criterion2 = Q(job=BackgroundJob.JOB_LINK_DOWNLOAD_MUSIC)
+        criterion3 = Q(job=BackgroundJob.JOB_LINK_DOWNLOAD_VIDEO)
 
         objs = BackgroundJob.objects.filter(criterion1 | criterion2 | criterion3)
         if len(objs) == 0:
@@ -75,11 +77,11 @@ class DownloadLinkHandler(ThreadJobCommon):
 
     def process_item(self, item=None):
         try:
-            if item.job == "download-music":
+            if item.job == BackgroundJob.JOB_LINK_DOWNLOAD_MUSIC:
                 self.process_music_item(item)
-            elif item.job == "download-video":
+            elif item.job == BackgroundJob.JOB_LINK_DOWNLOAD_VIDEO:
                 self.process_video_item(item)
-            elif item.job == "link-download":
+            elif item.job == BackgroundJob.JOB_LINK_DOWNLOAD:
                 self.process_link_item(item)
             else:
                 raise NotImplemented("Not supported process error")
@@ -153,21 +155,17 @@ class RefreshThreadHandler(ThreadJobCommon):
         from .models import SourceDataModel
         sources = SourceDataModel.objects.all()
         for source in sources:
-           if source.is_fetch_possible() == False:
-               continue
-
-           if len(BackgroundJob.objects.filter(job="process-source", subject=source.url)) == 0: 
-               BackgroundJob.objects.create(job="process-source", task=None, subject=source.url, args="")
+            BackgroundJob.download_rss(source)
 
         if ConfigurationEntry.get().is_git_set():
             if RssSourceExportHistory.is_update_required():
-               BackgroundJob.objects.create(job="push-to-repo", task=None, subject="", args="")
+               BackgroundJob.objects.create(job=BackgroundJob.JOB_PUSH_TO_REPO, task=None, subject="", args="")
 
                if ConfigurationEntry.get().source_archive:
                    from .models import SourceDataModel
                    sources = SourceDataModel.objects.all()
                    for source in sources:
-                       BackgroundJob.objects.create(job="link-archive", task=None, subject=source.url, args="")
+                       BackgroundJob.objects.create(job=BackgroundJob.JOB_LINK_ARCHIVE, task=None, subject=source.url, args="")
 
 
 class LinkArchiveHandler(ThreadJobCommon):
@@ -178,7 +176,7 @@ class LinkArchiveHandler(ThreadJobCommon):
         self.parent = parent
 
     def get_process_item(self):
-        objs = BackgroundJob.objects.filter(job="link-archive")
+        objs = BackgroundJob.objects.filter(job=BackgroundJob.JOB_LINK_ARCHIVE)
         if len(objs) == 0:
             return None
 
@@ -195,7 +193,7 @@ class LinkArchiveHandler(ThreadJobCommon):
             if wb.is_saved(item):
                 wb.save(item)
 
-            objs = BackgroundJob.objects.filter(job="link-archive", subject = item)
+            objs = BackgroundJob.objects.filter(job=BackgroundJob.JOB_LINK_ARCHIVE, subject = item)
             objs.delete()
         except Exception as e:
            error_text = traceback.format_exc()
@@ -210,41 +208,70 @@ class WriteThreadHandler(ThreadJobCommon):
         self.parent = parent
 
     def get_process_item(self):
-        objs = BackgroundJob.objects.filter(job="write-yearly-data")
+
+        criterion1 = Q(job=BackgroundJob.JOB_WRITE_DAILY_DATA)
+        criterion2 = Q(job=BackgroundJob.JOB_WRITE_TOPIC_DATA)
+        criterion3 = Q(job=BackgroundJob.JOB_WRITE_BOOKMARKS)
+
+        objs = BackgroundJob.objects.filter(criterion1 | criterion2 | criterion3)
         if len(objs) == 0:
             return None
+
         obj = objs[0]
         return obj
 
-    def process_item(self, obj=None):
+    def process_item(self, item=None):
+        try:
+            if item.job == BackgroundJob.JOB_WRITE_DAILY_DATA:
+                self.write_daily_data(item)
+            elif item.job == BackgroundJob.JOB_WRITE_TOPIC_DATA:
+                self.write_topic_data(item)
+            elif item.job == BackgroundJob.JOB_WRITE_BOOKMARKS:
+                self.write_bookmarks(item)
+            else:
+                raise NotImplemented("Not supported process error")
+
+            item.delete()
+        except Exception as e:
+           error_text = traceback.format_exc()
+           PersistentInfo.error("Exception on LinkArchiveHandler {} {}".format(str(e), error_text))
+
+    def write_daily_data(self, obj=None):
         try:
             from .datawriter import DataWriter
             writer = DataWriter(self._config)
 
             date_input = datetime.strptime(obj.subject, '%Y-%m-%d').date()
 
-            print("Generating for time: {}".format(date_input))
             writer.write_daily_data(date_input.isoformat())
         except Exception as e:
            error_text = traceback.format_exc()
            PersistentInfo.error("Exception: Yearly generation: {} {}".format(str(e), error_text))
 
-    def write_multiple_items(self, start='2022-01-01', stop = '2022-12-31'):
+    def write_topic_data(self, obj=None):
         try:
-            date_start = datetime.strptime(start, '%Y-%m-%d').date()
-            date_stop = datetime.strptime(stop, '%Y-%m-%d').date()
-            if date_stop < date_start:
-                PersistentInfo.error("Yearly generation: Incorrect configuration of dates start:{} stop:{}".format(date_start, date_stop))
+            from ..serializers.bookmarksexporter import BookmarksTopicExporter
 
-            current_date = date_start
-            while current_date <= date_stop:
-                print("Generating for time: {}".format(current_date))
-                str_date = current_date.isoformat()
+            topic = obj.subject
 
-                BackgroundJob.objects.create(job='write-yearly-data', task=None, subject=str_date, args="")
+            c = Configuration.get_object(str(app_name))
+            exporter = BookmarksTopicExporter(c)
+            exporter.export(topic)
         except Exception as e:
            error_text = traceback.format_exc()
-           PersistentInfo.error("Exception: Yearly generation: {} {}".format(str(e), error_text))
+           PersistentInfo.error("Exception: Writing topic data: {} {}".format(str(e), error_text))
+
+    def write_bookmarks(self, obj=None):
+        try:
+            from .prjconfig import Configuration
+            from .datawriter import DataWriter
+            
+            c = Configuration.get_object(str(app_name))
+            writer = DataWriter(c)
+            writer.write_bookmarks()
+        except Exception as e:
+           error_text = traceback.format_exc()
+           PersistentInfo.error("Exception: Writing bookmarks: {} {}".format(str(e), error_text))
 
 
 class RepoThreadHandler(ThreadJobCommon):
@@ -255,7 +282,7 @@ class RepoThreadHandler(ThreadJobCommon):
         self.parent = parent
 
     def get_process_item(self):
-        objs = BackgroundJob.objects.filter(job="push-to-repo")
+        objs = BackgroundJob.objects.filter(job=BackgroundJob.JOB_PUSH_TO_REPO)
         if len(objs) == 0:
             return None
         obj = objs[0]
@@ -286,7 +313,7 @@ class HandlerManager(object):
    def create_threads(self):
        refresh_seconds = 1800
 
-       BackgroundJob.truncate()
+       BackgroundJob.truncate_invalid_jobs()
 
        conf = ConfigurationEntry.get()
        refresh_seconds = conf.sources_refresh_period
@@ -317,30 +344,22 @@ class HandlerManager(object):
        for athread in self.threads:
            athread.close()
 
-   def download_rss(self, item, force = False):
-       if force == False:
-           if item.is_fetch_possible() == False:
-               return False
-
-       bj = BackgroundJob.objects.create(job="process-source", task=None, subject=item.url, args="")
-       return True
-
    def download_music(self, item):
-       bj = BackgroundJob.objects.create(job="download-music", task=None, subject=item.link, args="")
+       bj = BackgroundJob.objects.create(job=BackgroundJob.JOB_LINK_DOWNLOAD_MUSIC, task=None, subject=item.link, args="")
        return True
 
    def download_video(self, item):
-       bj = BackgroundJob.objects.create(job="download-video", task=None, subject=item.link, args="")
+       bj = BackgroundJob.objects.create(job=BackgroundJob.JOB_LINK_DOWNLOAD_VIDEO, task=None, subject=item.link, args="")
        return True
 
    def wayback_save(self, url):
-       bj = BackgroundJob.objects.create(job="link-archive", task=None, subject=url, args="")
+       bj = BackgroundJob.objects.create(job=BackgroundJob.JOB_LINK_ARCHIVE, task=None, subject=url, args="")
        return True
 
    def youtube_details(self, url):
-       bj = BackgroundJob.objects.create(job="link-details", task=None, subject=url, args="")
+       bj = BackgroundJob.objects.create(job=BackgroundJob.JOB_LINK_DETAILS, task=None, subject=url, args="")
        return True
 
-   def write_yearly_data(self, year):
-       bj = BackgroundJob.objects.create(job="write-yearly-data", task=None, subject=year, args="")
+   def write_daily_data(self, input_date):
+       bj = BackgroundJob.objects.create(job=BackgroundJob.JOB_WRITE_DAILY_DATA, task=None, subject=input_date, args="")
        return True

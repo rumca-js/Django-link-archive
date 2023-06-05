@@ -3,14 +3,11 @@ import re
 
 
 class InstalkiPlugin(BasePlugin):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, source):
+        super().__init__(source)
 
     def get_address(self):
         return "https://www.instalki.pl"
-
-    def get_processing_type(self):
-        return "parsing"
 
     def is_link_valid(self, address):
         if not self.is_link_valid_domain(address):

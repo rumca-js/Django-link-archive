@@ -12,7 +12,7 @@ class ConfigForm(forms.ModelForm):
     """
     class Meta:
         model = ConfigurationEntry
-        fields = ['link_archive', 'source_archive', 'sources_refresh_period', 'git_path', 'git_repo', 'git_daily_repo', 'git_user', 'git_token']
+        fields = ['data_export_path','data_import_path', 'link_archive', 'source_archive', 'sources_refresh_period', 'git_path', 'git_repo', 'git_daily_repo', 'git_user', 'git_token']
         widgets = {
         }
 
@@ -48,6 +48,15 @@ class ImportSourceRangeFromInternetArchiveForm(forms.Form):
     archive_stop = forms.DateField(label = "Stop time")
 
 
+class ExportDailyDataForm(forms.Form):
+    time_start = forms.DateField(label = "Start time")
+    time_stop = forms.DateField(label = "Stop time")
+
+
+class ExportTopicForm(forms.Form):
+    tag = forms.CharField(label='Tag', max_length = 500)
+
+
 class YouTubeLinkSimpleForm(forms.Form):
     """
     Import links form
@@ -61,7 +70,7 @@ class SourceForm(forms.ModelForm):
     """
     class Meta:
         model = SourceDataModel
-        fields = ['url', 'title', 'category', 'subcategory', 'language', 'fetch_period', 'export_to_cms', 'remove_after_days', 'favicon', 'on_hold']
+        fields = ['url', 'title', 'source_type', 'category', 'subcategory', 'language', 'fetch_period', 'export_to_cms', 'remove_after_days', 'favicon', 'on_hold']
         widgets = {
          #'git_token': forms.PasswordInput(),
         }

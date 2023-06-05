@@ -33,8 +33,11 @@
     <p>
     <a href="{% url 'rsshistory:entries' %}?title={{object.title}}" class="simplebutton">Goto Entries</a>
   {% if user.is_staff %}
-    <a href="{% url 'rsshistory:source-wayback-save' object.id %}" class="simplebutton">Archive.org save</a>
+    {% if config.source_archive %}
+      <a href="{% url 'rsshistory:source-archive' object.id %}" class="simplebutton">Archive.org save</a>
+    {% endif %}
     <a href="{% url 'rsshistory:import-source-ia' object.id %}" class="simplebutton">Import Archive.org</a>
+    <a href="{% url 'rsshistory:source-process-text' object.id %}" class="simplebutton">Source process text</a>
   {% endif %}
     </p>
   {% if user.is_staff %}

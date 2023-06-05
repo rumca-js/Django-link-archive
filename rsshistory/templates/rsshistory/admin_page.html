@@ -13,12 +13,11 @@
 
 <h1>Import / export</h1>
 <ul>
+  <li><a href="{% url 'rsshistory:write-bookmarks' %}" class="simplebutton">Write bookmarks</a></li>
+  <li><a href="{% url 'rsshistory:write-daily-data-form' %}" class="simplebutton">Write daily data</a></li>
+  <li><a href="{% url 'rsshistory:write-tag-form' %}" class="simplebutton">Write topic data</a></li>
   <li><a href="{% url 'rsshistory:sources-import' %}" class="simplebutton">Import sources</a></li>
-  <li><a href="{% url 'rsshistory:sources-export' %}" class="simplebutton">Export sources</a></li>
   <li><a href="{% url 'rsshistory:entries-import' %}" class="simplebutton">Import entries</a></li>
-  <li><a href="{% url 'rsshistory:write-bookmarks' %}" class="simplebutton">Export bookmarks</a></li>
-  <li><a href="{% url 'rsshistory:write-yearly-data' '2021' %}" class="simplebutton">Write yearly data</a></li>
-  <li><a href="{% url 'rsshistory:write-topic' 'covid' %}" class="simplebutton">Write 'covid' topic data</a></li>
 </ul>
 
 <h1>Debug</h1>

@@ -1,5 +1,6 @@
 from pathlib import Path
 import traceback, sys
+from datetime import timedelta
 
 from django.views import generic
 from django.urls import reverse
@@ -569,48 +570,73 @@ def write_bookmarks(request):
     if not request.user.is_staff:
         return render(request, get_app() / 'missing_rights.html', context)
 
-    from ..datawriter import DataWriter
-    
-    c = Configuration.get_object(str(get_app()))
-    writer = DataWriter(c)
-    writer.write_bookmarks()
+    BackgroundJob.write_bookmarks()
 
     context["summary_text"] = "Wrote OK"
 
     return render(request, get_app() / 'summary_present.html', context)
 
 
-def write_yearly_data(request, year):
+def write_daily_data_form(request):
+    from ..forms import ExportDailyDataForm
+
     context = get_context(request)
-    context['page_title'] += " - Write yearly data"
+    context['page_title'] += " - Write daily data"
 
     if not request.user.is_staff:
         return render(request, get_app() / 'missing_rights.html', context)
 
-    c = Configuration.get_object(str(get_app()))
-    c.thread_mgr.write_yearly_data(year)
+    if request.method == 'POST':
+        form = ExportDailyDataForm(request.POST)
+        if form.is_valid():
+            time_start = form.cleaned_data['time_start']
+            time_stop = form.cleaned_data['time_stop']
 
-    context["summary_text"] = "Started writing yearly data"
+            if BackgroundJob.write_daily_data(time_start, time_stop):
+                context["summary_text"] = "Added daily write job. Start:{} Stop:{}".format(time_start, time_stop)
+            else:
+                context["summary_text"] = "Form is invalid. Start:{} Stop:{}".format(time_start, time_stop)
+            return render(request, get_app() / 'summary_present.html', context)
 
-    return render(request, get_app() / 'summary_present.html', context)
+    from ..dateutils import DateUtils
+    date = DateUtils.get_date_today()
+    
+    form = ExportDailyDataForm(initial={
+             'time_start' : date.today() - timedelta(days = 1),
+             'time_stop' : date.today()})
+    form.method = "POST"
+
+    context['form'] = form
+
+    return render(request, get_app() / 'form_basic.html', context)
 
 
-def write_topic(request, topic):
+def write_tag_form(request):
     context = get_context(request)
     context['page_title'] += " - tags writer"
 
     if not request.user.is_staff:
         return render(request, get_app() / 'missing_rights.html', context)
 
-    from ..serializers.bookmarksexporter import BookmarksTopicExporter
+    from ..forms import ExportTopicForm
 
-    c = Configuration.get_object(str(get_app()))
-    exporter = BookmarksTopicExporter(c)
-    exporter.export(topic)
+    if request.method == 'POST':
+        form = ExportTopicForm(request.POST)
+        if form.is_valid():
+            tag = form.cleaned_data['tag']
 
-    context["summary_text"] = "Wrote OK"
+            if BackgroundJob.write_tag_data(tag):
+                context["summary_text"] = "Added daily write job. Tag:{}".format(tag)
+            else:
+                context["summary_text"] = "Form is invalid. Tag:{}".format(tag)
+            return render(request, get_app() / 'summary_present.html', context)
 
-    return render(request, get_app() / 'summary_present.html', context)
+    form = ExportTopicForm()
+    form.method = "POST"
+
+    context['form'] = form
+
+    return render(request, get_app() / 'form_basic.html', context)
 
 
 def test_page(request):
