@@ -3,7 +3,7 @@ from django.views import generic
 from django.urls import reverse
 from django.shortcuts import render
 
-from ..models import SourceDataModel, LinkDataModel, LinkTagsDataModel, ConfigurationEntry, BackgroundJob
+from ..models import SourceDataModel, LinkDataModel, LinkTagsDataModel, BackgroundJob, ConfigurationEntry
 from ..prjconfig import Configuration
 from ..forms import EntryForm, ImportEntriesForm, EntryChoiceForm, ConfigForm
 
@@ -127,7 +127,9 @@ def add_entry(request):
             if not c.thread_mgr:
                 context['summary_text'] = "Source added, but could not add to queue - missing threads"
                 return render(request, get_app() / 'entry_added.html', context)
-            c.thread_mgr.wayback_save(data['link'])
+
+            if ConfigurationEntry.get().link_archive:
+                BackgroundJob.objects.create(job="link-archive", task=None, subject=data['link'], args="")
 
             return render(request, get_app() / 'entry_added.html', context)
 
@@ -408,3 +410,39 @@ class NotBookmarkedView(generic.ListView):
         context["is_mobile"] = user_agent.is_mobile
 
         return context
+
+
+def download_entry(request, pk):
+    context = get_context(request)
+    context['page_title'] += " - download entry"
+    context['pk'] = pk
+
+    if not request.user.is_staff:
+        return render(request, get_app() / 'missing_rights.html', context)
+
+    link = LinkDataModel.objects.get(id=pk)
+
+    BackgroundJob.objects.create(job='link-download', task=None, subject=link.link, args="")
+    summary_text = "Added to queue"
+
+    context["summary_text"] = summary_text
+
+    return render(request, get_app() / 'summary_present.html', context)
+
+
+def wayback_save(request, pk):
+    context = get_context(request)
+    context['page_title'] += " - Waybacksave"
+
+    if not request.user.is_staff:
+        return render(request, get_app() / 'missing_rights.html', context)
+
+    if ConfigurationEntry.get().link_archive:
+        link = LinkDataModel.objects.get(id=pk)
+        BackgroundJob.objects.create(job="link-archive", task=None, subject=link.link, args="")
+
+        context["summary_text"] = "Added to waybacksave"
+    else:
+        context["summary_text"] = "Waybacksave is disabled for links"
+
+    return render(request, get_app() / 'summary_present.html', context)

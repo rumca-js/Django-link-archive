@@ -5,7 +5,7 @@ from django.views import generic
 from django.urls import reverse
 from django.shortcuts import render
 
-from ..models import SourceDataModel, LinkDataModel, LinkTagsDataModel, ConfigurationEntry, LinkCommentDataModel
+from ..models import SourceDataModel, LinkDataModel, LinkTagsDataModel, LinkCommentDataModel
 from ..prjconfig import Configuration
 from ..forms import CommentEntryForm
 

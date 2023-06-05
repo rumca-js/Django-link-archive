@@ -2,7 +2,7 @@ from django.views import generic
 from django.urls import reverse
 from django.shortcuts import render
 
-from ..models import SourceDataModel, LinkDataModel, ConfigurationEntry
+from ..models import SourceDataModel, LinkDataModel
 from ..models import LinkTagsDataModel
 from ..prjconfig import Configuration
 from ..forms import ConfigForm

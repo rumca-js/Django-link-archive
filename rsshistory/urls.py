@@ -21,7 +21,7 @@ urlpatterns = [
    path('sources-remove-all/', viewsources.remove_all_sources, name='sources-remove-all'),
    path('sources-import', viewsources.import_sources, name='sources-import'),
    path('sources-export/', viewsources.export_sources, name='sources-export'),
-   path('source-wayback-save/<int:pk>/', viewsources.wayback_save, name='source-wayback-save'),
+   path('source-archive/<int:pk>/', viewsources.wayback_save, name='source-archive'),
    path('source-import-yt-links/<int:pk>/', viewsources.import_youtube_links_for_source, name='source-import-yt-links'),
 
    # entries
@@ -36,6 +36,10 @@ urlpatterns = [
    path('entries-import', viewentries.import_entries, name='entries-import'),
    path('entries-untagged/', viewentries.NotBookmarkedView.as_view(), name='entries-untagged'),
    path('searchinitview', viewentries.search_init_view, name='searchinitview'),
+   path('entry-download-music/<int:pk>/', viewcustom.download_music, name='entry-download-music'),
+   path('entry-download-video/<int:pk>/', viewcustom.download_video, name='entry-download-video'),
+   path('entry-download/<int:pk>/', viewentries.download_entry, name='entry-download'),
+   path('entry-archive/<int:pk>/', viewentries.wayback_save, name='entry-archive'),
 
    # tags
    path('entry-tag/<int:pk>/', viewtags.tag_entry, name='entry-tag'),

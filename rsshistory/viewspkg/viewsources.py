@@ -3,7 +3,7 @@ from django.views import generic
 from django.urls import reverse
 from django.shortcuts import render
 
-from ..models import SourceDataModel, LinkDataModel, ConfigurationEntry
+from ..models import SourceDataModel, LinkDataModel
 from ..prjconfig import Configuration
 from ..forms import SourceForm, ImportSourcesForm, SourcesChoiceForm, ConfigForm
 
@@ -296,11 +296,13 @@ def wayback_save(request, pk):
     if not request.user.is_staff:
         return render(request, get_app() / 'missing_rights.html', context)
 
-    source = SourceDataModel.objects.get(id=pk)
-    c = Configuration.get_object(str(get_app()))
-    c.wayback_save(source.url)
+    if ConfigurationEntry.get().source_archive:
+        source = SourceDataModel.objects.get(id=pk)
+        BackgroundJob.objects.create(job="link-archive", task=None, subject=source.url, args="")
 
-    context["summary_text"] = "Added to waybacksave"
+        context["summary_text"] = "Added to waybacksave"
+    else:
+        context["summary_text"] = "Waybacksave is disabled for sources"
 
     return render(request, get_app() / 'summary_present.html', context)
 

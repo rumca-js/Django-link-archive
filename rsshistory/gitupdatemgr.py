@@ -2,8 +2,7 @@ import logging
 import traceback
 
 from .dateutils import DateUtils
-from .models import PersistentInfo, RssSourceExportHistory
-from .models import ConfigurationEntry
+from .models import PersistentInfo, RssSourceExportHistory, ConfigurationEntry
 from .prjgitrepo import *
 
 
@@ -12,22 +11,15 @@ class GitUpdateManager(object):
     def __init__(self, config):
         self._cfg = config
 
-    def check_if_git_update(self):
+    def write_and_push_to_git(self):
         try:
-            ob = ConfigurationEntry.objects.all()
-            if not ob.exists() or not ob[0].is_git_set():
+            if not RssSourceExportHistory.is_update_required():
                 return
 
+            conf = ConfigurationEntry.get()
             yesterday = DateUtils.get_date_yesterday()
 
-            history = RssSourceExportHistory.objects.filter(date=yesterday)
-
-            if len(history) != 0:
-                return
-
-            conf = ob[0]
-
-            PersistentInfo.create("Day has changed, pushing data to git")
+            PersistentInfo.create("Pushing data to git")
 
             from .datawriter import DataWriter
             writer = DataWriter(self._cfg)
@@ -37,8 +29,7 @@ class GitUpdateManager(object):
 
             self.push_to_git(conf)
 
-            self.wayback_save()
-            PersistentInfo.create("Data successfully pushed to git")
+            PersistentInfo.create("Pushing data to git: Done")
 
             new_history = RssSourceExportHistory(date=yesterday)
             new_history.save()
@@ -91,13 +82,6 @@ class GitUpdateManager(object):
         repo.add([])
         repo.commit(DateUtils.get_dir4date(yesterday))
         repo.push()
-
-    def wayback_save(self):
-        from .models import SourceDataModel
-
-        sources = SourceDataModel.objects.all()
-        for source in sources:
-            self._cfg.thread_mgr.wayback_save(source.url)
 
     def clear_old_entries(self):
         log = logging.getLogger(self._cfg.app_name)

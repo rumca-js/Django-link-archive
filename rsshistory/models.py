@@ -1,7 +1,10 @@
+import traceback
+import logging
+from datetime import datetime
+
 from django.db import models
 from django.urls import reverse
-from datetime import datetime
-import logging
+
 from pytz import timezone
 
 
@@ -16,6 +19,7 @@ class SourceDataModel(models.Model):
     language = models.CharField(max_length=1000, default='en-US')
     favicon = models.CharField(max_length=1000, null=True)
     on_hold = models.BooleanField(default=False)
+    fetch_period = models.IntegerField(default=3600)
 
     class Meta:
         ordering = ['title']
@@ -45,9 +49,11 @@ class SourceDataModel(models.Model):
         date_fetched = self.get_date_fetched()
         if date_fetched:
             time_since_update = start_time - date_fetched
-            mins = time_since_update / timedelta(minutes=1)
+            #mins = time_since_update / timedelta(minutes=1)
+            secs = time_since_update / timedelta(seconds=1)
 
-            if mins >= 10:
+            #if mins >= 30:
+            if secs >= self.fetch_period:
                 return True
             return False
 
@@ -156,12 +162,37 @@ class RssSourceImportHistory(models.Model):
     class Meta:
         ordering = ['-date']
 
+    def get_safe():
+        return RssSourceImportHistory.objects.all()[:100]
+
 
 class RssSourceExportHistory(models.Model):
     date = models.DateField()
 
     class Meta:
         ordering = ['-date']
+
+    def is_update_required():
+        from .dateutils import DateUtils
+        try:
+            ob = ConfigurationEntry.get()
+            if not ob.is_git_set():
+                return
+
+            yesterday = DateUtils.get_date_yesterday()
+
+            history = RssSourceExportHistory.objects.filter(date=yesterday)
+
+            if len(history) != 0:
+                return False
+            return True
+
+        except Exception as e:
+            error_text = traceback.format_exc()
+            PersistentInfo.error("Exception for update: {0} {1}".format(str(e), error_text))
+
+    def get_safe():
+        return RssSourceExportHistory.objects.all()[:100]
 
 
 class LinkDataModel(models.Model):
@@ -174,6 +205,8 @@ class LinkDataModel(models.Model):
     persistent = models.BooleanField(default=False)
     # this entry is dead indication
     dead = models.BooleanField(default=False)
+    artist = models.CharField(max_length=1000, null=True, default=None)
+    album = models.CharField(max_length=1000, null=True, default=None)
     # user who added entry
     user = models.CharField(max_length=1000, null=True, default=None)
 
@@ -296,6 +329,7 @@ class LinkDataModel(models.Model):
         description = h.get_description()
         date_published = h.get_datetime_published()
         thumbnail = h.get_thumbnail()
+        artist = h.get_channel_name()
 
         language = "en-US"
         if "language" in data:
@@ -320,6 +354,7 @@ class LinkDataModel(models.Model):
                 date_published = date_published,
                 persistent = persistent,
                 thumbnail = thumbnail,
+                artist = artist,
                 language = language,
                 user = user,
                 source_obj = source_obj)
@@ -374,24 +409,33 @@ class LinkCommentDataModel(models.Model):
 
 
 class ConfigurationEntry(models.Model):
-    git_path = models.CharField(default=".", max_length=2000)
-    git_user = models.CharField(default="", max_length=2000)
-    git_token = models.CharField(default="", max_length=2000)
-    git_repo = models.CharField(default="", max_length=2000)
-    git_daily_repo = models.CharField(default="", max_length=2000)
+    git_path = models.CharField(default=".", max_length=2000, null=True)
+    git_user = models.CharField(default="", max_length=2000, null=True)
+    git_token = models.CharField(default="", max_length=2000, null=True)
+    git_repo = models.CharField(default="", max_length=2000, null=True)
+    git_daily_repo = models.CharField(default="", max_length=2000, null=True)
     sources_refresh_period = models.IntegerField(default=3600)
+    link_archive = models.BooleanField(default=True)
+    source_archive = models.BooleanField(default=True)
+
+    def get():
+        confs = ConfigurationEntry.objects.all()
+        if len(confs) == 0:
+            return ConfigurationEntry.objects.create()
+        else:
+            return confs[0]
 
     def is_git_set(self):
-        if self.git_repo != "" and self.git_user != "" and self.git_token != "":
-            return True
-        else:
+        if self.git_repo == "" or self.git_user == "" and self.git_token == "" or self.git_repo == None or self.git_user == None or self.git_token == None:
             return False
+        else:
+            return True
 
     def is_git_daily_set(self):
-        if self.git_daily_repo != "" and self.git_user != "" and self.git_token != "":
-            return True
-        else:
+        if self.git_daily_repo == "" or self.git_user == "" or self.git_token == "" or self.git_daily_repo == None or self.git_user == None or self.git_token == None:
             return False
+        else:
+            return True
 
 
 class UserConfig(models.Model):
@@ -415,6 +459,13 @@ class UserConfig(models.Model):
     thumbnails_as_icons = models.BooleanField(default=True)
     small_icons = models.BooleanField(default=True)
     links_per_page = models.IntegerField(default=100)
+
+    def get():
+        confs = UserConfig.objects.all()
+        if len(confs) == 0:
+            return UserConfig()
+        else:
+            return confs[0]
 
 
 class PersistentInfo(models.Model):
@@ -474,6 +525,9 @@ class PersistentInfo(models.Model):
     def truncate():
         PersistentInfo.objects.all().delete()
 
+    def get_safe():
+        return PersistentInfo.objects.all()[0:100]
+
 
 """ YouTube meta cache """
 
@@ -501,7 +555,8 @@ class BackgroundJob(models.Model):
         ('link-add', 'link-add'),                    # adds link using default properties
         ('link-details', 'link-details'),            # fetches link additional information
         ('link-refresh', 'link-refresh'),            # refreshes link, refetches its data
-        ('link-save', 'link-save'),                  # if save functionality is enabled
+        ('link-archive', 'link-archive'),            # link is archived using thirdparty pages (archive.org)
+        ('link-download', 'link-download'),          # link is downloaded using wget
         ('download-music', 'download-music'),        # 
         ('download-video', 'download-video'),        # 
         ('write-yearly-data', 'write-yearly-data'),  # writes yearly data

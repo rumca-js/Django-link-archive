@@ -41,28 +41,18 @@ def configuration_page(request):
     if not request.user.is_staff:
         return render(request, get_app() / 'missing_rights.html', context)
     
-    ob = ConfigurationEntry.objects.all()
-    if not ob.exists():
-        rec = ConfigurationEntry()
-        rec.save()
-
-    ob = ConfigurationEntry.objects.all()
+    ob = ConfigurationEntry.get()
 
     if request.method == 'POST':
-        obs = ConfigurationEntry.objects.all()
-        if len(obs) > 0:
-            form = ConfigForm(request.POST, instance=obs[0])
-        else:
-            form = ConfigForm(request.POST)
+        form = ConfigForm(request.POST, instance=ob)
         if form.is_valid():
             form.save()
+        else:
+            context["summary_text"] = "Form is invalid"
+            return render(request, get_app() / 'summary_present.html', context)
 
-    obs = ConfigurationEntry.objects.all()
-    
-    if len(obs) > 0:
-        form = ConfigForm(instance = obs[0])
-    else:
-        form = ConfigForm()
+    ob = ConfigurationEntry.get()
+    form = ConfigForm(instance = ob)
 
     form.method = "POST"
     form.action_url = reverse('rsshistory:configuration')
@@ -89,7 +79,7 @@ def system_status(request):
     #context['database_size_bytes'] = size_b
     #context['database_size_kbytes'] = size_kb
     #context['database_size_mbytes'] = size_mb
-
+    
     from ..models import YouTubeMetaCache, YouTubeReturnDislikeMetaCache
     context['YouTubeMetaCache'] = len(YouTubeMetaCache.objects.all())
     context['YouTubeReturnDislikeMetaCache'] = len(YouTubeReturnDislikeMetaCache.objects.all())
@@ -98,9 +88,9 @@ def system_status(request):
     context['ConfigurationEntry'] = len(ConfigurationEntry.objects.all())
     context['UserConfig'] = len(UserConfig.objects.all())
     context['BackgroundJob'] = len(BackgroundJob.objects.all())
-
+    
     from ..models import PersistentInfo
-    context['log_items'] = PersistentInfo.objects.all()
+    context['log_items'] = PersistentInfo.get_safe()
 
     threads = c.get_threads()
     if threads:
@@ -111,10 +101,10 @@ def system_status(request):
     context['server_path'] = Path(".").resolve()
     context['directory'] = Path(".").resolve()
 
-    history = RssSourceImportHistory.objects.all()[:100]
+    history = RssSourceImportHistory.get_safe()
     context['import_history_list'] = history
 
-    history = RssSourceExportHistory.objects.all()[:100]
+    history = RssSourceExportHistory.get_safe()
     context['export_history_list'] = history
 
     return render(request, get_app() / 'system_status.html', context)

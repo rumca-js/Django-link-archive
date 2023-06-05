@@ -8,7 +8,7 @@ from .sources.rsssourceprocessor import RssSourceProcessor
 from .programwrappers import ytdlp,id3v2
 from .datawriter import *
 from .models import LinkDataModel, SourceDataModel, PersistentInfo, ConfigurationEntry, BackgroundJob
-from .models import RssSourceImportHistory
+from .models import RssSourceImportHistory, RssSourceExportHistory
 from .basictypes import fix_path_for_windows
 
 
@@ -42,17 +42,17 @@ class ProcessSourceHandler(ThreadJobCommon):
                history = RssSourceImportHistory(url = item.url, date = date.today(), source_obj = item)
                history.save()
 
-           if ConfigurationEntry.objects.all()[0].is_git_set():
-               today = DateUtils.get_iso_today()
-               if item.export_to_cms:
-                   writer = SourceEntriesDataWriter(self._config, item.url)
-                   writer.write_for_day(today)
+           #if ConfigurationEntry.get().is_git_set():
+           #    today = DateUtils.get_iso_today()
+           #    if item.export_to_cms:
+           #        writer = SourceEntriesDataWriter(self._config, item.url)
+           #        writer.write_for_day(today)
         except Exception as e:
            error_text = traceback.format_exc()
            PersistentInfo.error("Exception during parsing page contents {0} {1} {2}".format(item.url, str(e), error_text))
 
 
-class DownloadMusicHandler(ThreadJobCommon):
+class DownloadLinkHandler(ThreadJobCommon):
 
     def __init__(self, name="DownloadMusicHandler", seconds_wait=10, itemless=False):
         ThreadJobCommon.__init__(self, name, seconds_wait, itemless)
@@ -61,20 +61,37 @@ class DownloadMusicHandler(ThreadJobCommon):
         self.parent = parent
 
     def get_process_item(self):
-        objs = BackgroundJob.objects.filter(job="download-music")
+        from django.db.models import Q
+        criterion1 = Q(job="download-music")
+        criterion2 = Q(job="download-video")
+        criterion3 = Q(job="link-download")
+
+        objs = BackgroundJob.objects.filter(criterion1 | criterion2 | criterion3)
         if len(objs) == 0:
             return None
 
         obj = objs[0]
-        items = LinkDataModel.objects.filter(link = obj.subject)
-        obj.delete()
-
-        if len(items) != 0:
-            item = items[0]
-            return item
+        return obj
 
     def process_item(self, item=None):
-      log = logging.getLogger(self._config.app_name)
+        try:
+            if item.job == "download-music":
+                self.process_music_item(item)
+            elif item.job == "download-video":
+                self.process_video_item(item)
+            elif item.job == "link-download":
+                self.process_link_item(item)
+            else:
+                raise NotImplemented("Not supported process error")
+
+            item.delete()
+        except Exception as e:
+           error_text = traceback.format_exc()
+           PersistentInfo.error("Exception on LinkArchiveHandler {} {}".format(str(e), error_text))
+
+    def process_music_item(self, obj=None):
+      item = LinkDataModel.objects.filter(link = obj.subject)[0]
+
       PersistentInfo.create("Downloading music: " + item.link + " " + item.title)
       # TODO pass dir?
 
@@ -93,33 +110,8 @@ class DownloadMusicHandler(ThreadJobCommon):
       id3.tag()
       PersistentInfo.create("Downloading music done: " + item.link + " " + item.title)
 
-      objs = BackgroundJob.objects.filter(job="download-music", subject = item.link)
-      objs.delete()
-
-
-class DownloadVideoHandler(ThreadJobCommon):
-
-    def __init__(self, name="DownloadVideoHandler", seconds_wait=10, itemless=False):
-        ThreadJobCommon.__init__(self, name, seconds_wait, itemless)
-
-    def set_parent(self, parent):
-        self.parent = parent
-
-    def get_process_item(self):
-        objs = BackgroundJob.objects.filter(job="download-video")
-        if len(objs) == 0:
-            return None
-
-        obj = objs[0]
-        items = LinkDataModel.objects.filter(link = obj.subject)
-        obj.delete()
-
-        if len(items) != 0:
-            item = items[0]
-            return item
-
-    def process_item(self, item=None):
-      log = logging.getLogger(self._config.app_name)
+    def process_video_item(self, obj=None):
+      item = LinkDataModel.objects.filter(link = obj.subject)[0]
 
       PersistentInfo.create("Downloading video: " + item.link + " " + item.title)
 
@@ -130,8 +122,11 @@ class DownloadVideoHandler(ThreadJobCommon):
 
       PersistentInfo.create("Downloading video done: " + item.link + " " + item.title)
 
-      objs = BackgroundJob.objects.filter(job="download-video", subject = item.link)
-      objs.delete()
+    def process_link_item(self, obj=None):
+      item = LinkDataModel.objects.filter(link = obj.subject)[0]
+      from .webtools import Page
+      p = Page(item.link)
+      p.download_all()
 
 
 class RefreshThreadHandler(ThreadJobCommon):
@@ -150,7 +145,7 @@ class RefreshThreadHandler(ThreadJobCommon):
             self.t_refresh(item)
         except Exception as e:
            error_text = traceback.format_exc()
-           PersistentInfo.error("Exception during parsing page contents {0} {1} {2}".format(item.url, str(e), error_text))
+           PersistentInfo.error("Exception during parsing page contents {0} {1} {2}".format(item, str(e), error_text))
 
     def t_refresh(self, item):
         PersistentInfo.create("Refreshing RSS data")
@@ -158,24 +153,32 @@ class RefreshThreadHandler(ThreadJobCommon):
         from .models import SourceDataModel
         sources = SourceDataModel.objects.all()
         for source in sources:
-            self.parent.download_rss(source)
+           if source.is_fetch_possible() == False:
+               continue
 
-        if ConfigurationEntry.objects.all()[0].is_git_set():
-            from .gitupdatemgr import GitUpdateManager
+           if len(BackgroundJob.objects.filter(job="process-source", subject=source.url)) == 0: 
+               BackgroundJob.objects.create(job="process-source", task=None, subject=source.url, args="")
 
-            git_mgr = GitUpdateManager(self._config)
-            git_mgr.check_if_git_update()
+        if ConfigurationEntry.get().is_git_set():
+            if RssSourceExportHistory.is_update_required():
+               BackgroundJob.objects.create(job="push-to-repo", task=None, subject="", args="")
+
+               if ConfigurationEntry.get().source_archive:
+                   from .models import SourceDataModel
+                   sources = SourceDataModel.objects.all()
+                   for source in sources:
+                       BackgroundJob.objects.create(job="link-archive", task=None, subject=source.url, args="")
 
 
-class WaybackSaveHandler(ThreadJobCommon):
-    def __init__(self, name="WaybackSaveHandler", seconds_wait=10, itemless=False):
+class LinkArchiveHandler(ThreadJobCommon):
+    def __init__(self, name="LinkArchiveHandler", seconds_wait=10, itemless=False):
         ThreadJobCommon.__init__(self, name, seconds_wait, itemless)
 
     def set_parent(self, parent):
         self.parent = parent
 
     def get_process_item(self):
-        objs = BackgroundJob.objects.filter(job="link-save")
+        objs = BackgroundJob.objects.filter(job="link-archive")
         if len(objs) == 0:
             return None
 
@@ -192,39 +195,15 @@ class WaybackSaveHandler(ThreadJobCommon):
             if wb.is_saved(item):
                 wb.save(item)
 
-            objs = BackgroundJob.objects.filter(job="link-save", subject = item)
+            objs = BackgroundJob.objects.filter(job="link-archive", subject = item)
             objs.delete()
         except Exception as e:
            error_text = traceback.format_exc()
-           PersistentInfo.error("Exception on WaybackSaveHandler {} {}".format(str(e), error_text))
+           PersistentInfo.error("Exception on LinkArchiveHandler {} {}".format(str(e), error_text))
 
 
-class YouTubeDetailsHandler(ThreadJobCommon):
-    def __init__(self, name="YouTubeDetailsHandler", seconds_wait=10, itemless=False):
-        ThreadJobCommon.__init__(self, name, seconds_wait, itemless)
-
-    def set_parent(self, parent):
-        self.parent = parent
-
-    def get_process_item(self):
-        objs = BackgroundJob.objects.filter(job="link-refresh")
-        if len(objs) == 0:
-            return None
-
-        obj = objs[0]
-        items = LinkDataModel.objects.filter(link = obj.subject)
-        obj.delete()
-
-        if len(items) != 0:
-            item = items[0]
-            return item
-
-    def process_item(self, item=None):
-        pass
-
-
-class YearlyGeneration(ThreadJobCommon):
-    def __init__(self, name="YearlyGeneration", seconds_wait=10, itemless=False):
+class WriteThreadHandler(ThreadJobCommon):
+    def __init__(self, name="WriteThreadHandler", seconds_wait=10, itemless=False):
         ThreadJobCommon.__init__(self, name, seconds_wait, itemless)
 
     def set_parent(self, parent):
@@ -237,27 +216,65 @@ class YearlyGeneration(ThreadJobCommon):
         obj = objs[0]
         return obj
 
-    def process_item(self, year=None):
+    def process_item(self, obj=None):
         try:
-            start = '2022-01-01'
-            stop = '2022-12-31'
+            from .datawriter import DataWriter
+            writer = DataWriter(self._config)
 
+            date_input = datetime.strptime(obj.subject, '%Y-%m-%d').date()
+
+            print("Generating for time: {}".format(date_input))
+            writer.write_daily_data(date_input.isoformat())
+        except Exception as e:
+           error_text = traceback.format_exc()
+           PersistentInfo.error("Exception: Yearly generation: {} {}".format(str(e), error_text))
+
+    def write_multiple_items(self, start='2022-01-01', stop = '2022-12-31'):
+        try:
             date_start = datetime.strptime(start, '%Y-%m-%d').date()
             date_stop = datetime.strptime(stop, '%Y-%m-%d').date()
             if date_stop < date_start:
                 PersistentInfo.error("Yearly generation: Incorrect configuration of dates start:{} stop:{}".format(date_start, date_stop))
 
-            from .datawriter import DataWriter
-            writer = DataWriter(self._config)
-
             current_date = date_start
             while current_date <= date_stop:
                 print("Generating for time: {}".format(current_date))
-                writer.write_daily_data(current_date.isoformat())
-                current_date += timedelta(days=1)
+                str_date = current_date.isoformat()
+
+                BackgroundJob.objects.create(job='write-yearly-data', task=None, subject=str_date, args="")
         except Exception as e:
            error_text = traceback.format_exc()
            PersistentInfo.error("Exception: Yearly generation: {} {}".format(str(e), error_text))
+
+
+class RepoThreadHandler(ThreadJobCommon):
+    def __init__(self, name="RepoThreadHandler", seconds_wait=10, itemless=False):
+        ThreadJobCommon.__init__(self, name, seconds_wait, itemless)
+
+    def set_parent(self, parent):
+        self.parent = parent
+
+    def get_process_item(self):
+        objs = BackgroundJob.objects.filter(job="push-to-repo")
+        if len(objs) == 0:
+            return None
+        obj = objs[0]
+        return obj
+
+    def process_item(self, obj=None):
+        if obj == None:
+            return	
+        try:
+            if ConfigurationEntry.get().is_git_set():
+                from .gitupdatemgr import GitUpdateManager
+
+                git_mgr = GitUpdateManager(self._config)
+                git_mgr.write_and_push_to_git()
+                
+            obj.delete()
+        except Exception as e:
+           error_text = traceback.format_exc()
+           PersistentInfo.error("Exception: {} {}".format(str(e), error_text))
 
 
 class HandlerManager(object):
@@ -267,31 +284,28 @@ class HandlerManager(object):
       self.create_threads()
 
    def create_threads(self):
-       refresh_seconds = 3600
+       refresh_seconds = 1800
 
        BackgroundJob.truncate()
 
-       from .models import ConfigurationEntry
-       confs = ConfigurationEntry.objects.all()
-       if len(confs) > 0:
-           refresh_seconds = confs[0].sources_refresh_period
+       conf = ConfigurationEntry.get()
+       refresh_seconds = conf.sources_refresh_period
 
        process_source = ProcessSourceHandler("process-source")
-       download_music = DownloadMusicHandler("download-music")
-       download_video = DownloadVideoHandler("download-video")
+       download_thread = DownloadLinkHandler("download")
        refresh_thread = RefreshThreadHandler("refresh-thread", refresh_seconds, True)
-       wayback_save = WaybackSaveHandler("link-save")
-       yt_details = YouTubeDetailsHandler("link-refresh")
-       yearly = YearlyGeneration("write-yearly-data")
+       # sometimes it takes long to archive links
+       link_archive = LinkArchiveHandler("link-archive")
+       write_thread = WriteThreadHandler("write-thread")
+       repo_thread = RepoThreadHandler("repo-thread")
 
        self.threads = [
                process_source,
-               download_music,
-               download_video,
+               download_thread,
                refresh_thread,
-               wayback_save,
-               yt_details,
-               yearly
+               link_archive,
+               write_thread,
+               repo_thread
                ]
 
        for athread in self.threads:
@@ -320,7 +334,7 @@ class HandlerManager(object):
        return True
 
    def wayback_save(self, url):
-       bj = BackgroundJob.objects.create(job="link-save", task=None, subject=url, args="")
+       bj = BackgroundJob.objects.create(job="link-archive", task=None, subject=url, args="")
        return True
 
    def youtube_details(self, url):
@@ -328,5 +342,5 @@ class HandlerManager(object):
        return True
 
    def write_yearly_data(self, year):
-       bj = BackgroundJob.objects.create(job="write-yearly-data", task=None, subject=url, args="")
+       bj = BackgroundJob.objects.create(job="write-yearly-data", task=None, subject=year, args="")
        return True

@@ -26,11 +26,8 @@ def init_context(request, context):
     c = Configuration.get_object(str(app_name))
     context['app_version'] = c.version
 
-    users = UserConfig.objects.filter(user = request.user.get_username())
-    if len(users) > 0:
-       context['user_config'] = users[0]
-    else:
-       context['user_config'] = UserConfig()
+    context['user_config'] = UserConfig.get()
+    context['config'] = ConfigurationEntry.get()
 
     return context
 

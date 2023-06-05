@@ -12,7 +12,7 @@ class ConfigForm(forms.ModelForm):
     """
     class Meta:
         model = ConfigurationEntry
-        fields = ['sources_refresh_period', 'git_path', 'git_repo', 'git_daily_repo', 'git_user', 'git_token']
+        fields = ['link_archive', 'source_archive', 'sources_refresh_period', 'git_path', 'git_repo', 'git_daily_repo', 'git_user', 'git_token']
         widgets = {
         }
 
@@ -61,7 +61,7 @@ class SourceForm(forms.ModelForm):
     """
     class Meta:
         model = SourceDataModel
-        fields = ['url', 'title', 'category', 'subcategory', 'language', 'export_to_cms', 'remove_after_days', 'favicon', 'on_hold']
+        fields = ['url', 'title', 'category', 'subcategory', 'language', 'fetch_period', 'export_to_cms', 'remove_after_days', 'favicon', 'on_hold']
         widgets = {
          #'git_token': forms.PasswordInput(),
         }
@@ -149,7 +149,7 @@ class EntryForm(forms.ModelForm):
     """
     class Meta:
         model = LinkDataModel
-        fields = ['link', 'title', 'description', 'date_published', 'source', 'persistent', 'language', 'user']
+        fields = ['link', 'title', 'description', 'date_published', 'source', 'persistent', 'language', 'user','artist','album']
         #widgets = {
         # #'git_token': forms.PasswordInput(),
         #}
@@ -161,6 +161,8 @@ class EntryForm(forms.ModelForm):
         self.fields['language'].required = False
         self.fields['description'].required = False
         self.fields['title'].required = False
+        self.fields['artist'].required = False
+        self.fields['album'].required = False
         self.fields['persistent'].initial = True
         self.fields['user'].widget.attrs['readonly'] = True
 

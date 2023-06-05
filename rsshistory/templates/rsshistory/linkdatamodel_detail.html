@@ -22,6 +22,8 @@
         <a href="{% url 'rsshistory:entry-tag' object.id %}" class="simplebutton">Tag entry</a>
     {% endif %}
 
+       <a href="{% url 'rsshistory:entry-download' object.id %}" class="simplebutton">Download page</a>
+
     {% for button in object_controller.get_menu_buttons %}
       <a href="{{button.action}}" class="simplebutton">{{button.name}}</a>
     {% endfor %}
@@ -45,6 +47,9 @@
        <a href="{{ object.source }}" class="simplebutton">Source Link</a>
       {% endif %}
 
+      {% if config.link_save %}
+        <a href="{% url 'rsshistory:entry-archive' object.id %}" class="simplebutton">archive.org save</a>
+      {% endif %}
       <a href="{{object.get_archive_link}}" class="simplebutton">View on archive.org</a>
   </p>
 

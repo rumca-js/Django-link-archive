@@ -161,3 +161,8 @@ class Page(object):
            dom.find('www.m.youtube') >= 0:
                return True
         return False
+
+    def download_all(self):
+        from .programwrappers.wget import Wget
+        wget = Wget(self.url)
+        wget.download_all()
