@@ -38,7 +38,7 @@ class ProcessSourceHandler(ThreadJobCommon):
 
     def process_item(self, item=None):
         try:
-           proc = RssSourceProcessor(self._config)
+           proc = RssSourceProcessor()
            proc.process_source(item)
 
            if len(RssSourceImportHistory.objects.filter(url = item.url, date = date.today())) == 0:
