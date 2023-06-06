@@ -16,6 +16,11 @@ Allows to search links.
 
 Displays entry details.
 
+provides ability to:
+ - edit, bookmark, tag, remove, hide link
+ - download music, video, or update link data if it is YouTube link
+ - view stored snaptshots in archive.org webpage, and make a new snapshot
+
 ![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/entry_details.PNG)
 
 # Tags
@@ -33,6 +38,9 @@ Displays available sources.
 # Soure details
 
 Displays source details.
+
+Provides ability to:
+ - view stored snaptshots in archive.org webpage, and make a new snapshot
 
 ![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/source_details.PNG)
 
@@ -58,15 +66,24 @@ Currently supported sources:
 
 ## Configuration page
 
-Provides program configuration
+Provides program configuration.
+
+Configuration options:
+ - export path provides where exported data are located
+ - sources refresh period - how often sources are checked for new links. Each source has its own refresh period.
+ - git options allow to provide automated export
 
 ![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/configuration_page.PNG)
 
 ## Server status
 
-Provides server status. The administrator is required to start threads for the program to operate correctly. Without it the sources will not be checked for the new data.
+Provides server status, information about threads, logged information, import and export logs.
 
-![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/configuration_page.PNG)
+Note: The administrator is required to start threads through link (automated), or through button "Start threads". This was implemented for scenario where django internal server operates privately, and Apache django setup uses database as readonly preview for public.
+
+Server opertion is split between threads and background jobs. Background jobs is a table of 'jobs' that should be handled. Each task can process multiple types of jobs. For example 'write' task can write bookmarks, daily data, download music, download videos, etc.
+
+![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/server_status.PNG)
 
 ## User configuration
 
