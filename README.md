@@ -35,7 +35,7 @@ Link database, with RSS functionality. Similar to Reddit, but completly open sou
 
 ## UI
 
-UI is described in a separate readme: [https://github.com/rumca-js/Django-link-archive/blob/main/README_ui.md](https://github.com/rumca-js/Django-link-archive/blob/main/README_ui.md).
+UI, with snapshots, is described in a separate readme: [https://github.com/rumca-js/Django-link-archive/blob/main/README_ui.md](https://github.com/rumca-js/Django-link-archive/blob/main/README_ui.md).
 
 ## Notes
 
