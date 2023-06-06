@@ -33,11 +33,9 @@ Link database, with RSS functionality. Similar to Reddit, but completly open sou
  - RSS client
  - Reddit/diggit replacement
 
-## Screenshots
+## UI
 
-![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/2023_03_09_entries.PNG)
-
-View screenshots: [https://github.com/rumca-js/Django-link-archive/tree/main/screenshots](https://github.com/rumca-js/Django-link-archive/tree/main/screenshots).
+UI is described in a separate readme: [https://github.com/rumca-js/Django-link-archive/blob/main/README_ui.md](https://github.com/rumca-js/Django-link-archive/blob/main/README_ui.md).
 
 ## Notes
 

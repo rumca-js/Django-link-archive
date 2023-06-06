@@ -40,7 +40,7 @@ Displays source details.
 
 ## New entry form
 
-Allows to add new entry, link.
+Allows to add new entry, link. When adding youtube link all fields are set automatically.
 
 ![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/entry_new.PNG)
 
@@ -48,20 +48,28 @@ Allows to add new entry, link.
 
 Allows to add new source.
 
+Currently supported sources:
+ - RSS
+ - parse mechanism that fetches all links from source URL through web scraping
+
 ![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/search_form.PNG)
 
 # Admin
 
 ## Configuration page
 
+Provides program configuration
+
 ![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/configuration_page.PNG)
 
 ## Server status
+
+Provides server status. The administrator is required to start threads for the program to operate correctly. Without it the sources will not be checked for the new data.
 
 ![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/configuration_page.PNG)
 
 ## User configuration
 
-Provides user configuration.
+Provides user configuration. Each user can configure their view to be shown differently.
 
 ![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/user_configuration_page.PNG)
