@@ -1,13 +1,20 @@
 
 # Myths and legends
 
-I wanted to disarm some of most common myths and legends concerning search algorithms.
+I wanted to disarm some of the most common myths and legends concerning the search algorithms.
 
-## Myth #1 "You only use first entry in google search"
+## Myth #1 "You only use the first entry in the google search"
 
-It may be mostly true. Recently I wanted to find interesting trailers in YouTube. I wrote "trailer" in youtube phone app. In response I received some videos I have already watched, advertisments, some tech trailers. Some trailers have popped up several times from different channels.
+It may be mostly true. Recently I wanted to find interesting trailers in YouTube. I wrote "trailer" in the youtube phone app.
 
-In django link archive I can add sources I am interested in. For 'trailer' example, I can limit results to 'KinoCheck' source, where I can see all trailers from their history.
+In response I found:
+ - some videos that I have already watched, which were not trailer related,
+ - advertisments
+ - some tech trailers, not movie trailers
+ - some shorts vidoes
+ - some trailers popped up several times, from several different channels, bloating the result
+
+In my app I can add sources I am interested in. For 'trailer' example, I can limit results to 'KinoCheck' source, where I can see all trailers from their history.
 
 ## Myth #2 You do not need several pages of results in google search
 
