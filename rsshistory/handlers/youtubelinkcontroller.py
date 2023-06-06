@@ -12,7 +12,7 @@ class YouTubeLinkController(YouTubeLinkHandler, GenericLinkController):
     def get_menu_buttons(self):
         return [LinkButton("Download music", reverse('rsshistory:entry-download-music', args=[self.entry.id])),
                 LinkButton("Download video", reverse('rsshistory:entry-download-video', args=[self.entry.id])),
-                LinkButton("Fix YouTube properties", reverse('rsshistory:entry-fix-youtube-details', args=[self.entry.id])),]
+                LinkButton("Update link data", reverse('rsshistory:entry-fix-youtube-details', args=[self.entry.id])),]
 
     def get_frame_html(self):
         frame = self.get_frame()

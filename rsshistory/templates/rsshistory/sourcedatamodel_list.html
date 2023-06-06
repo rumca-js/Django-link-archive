@@ -39,13 +39,13 @@
                   Remove after days: {{ source.remove_after_days }} 
                   Fetched:{{source.get_date_fetched}} 
                   Number of entries:{{source.get_number_of_entries}} 
-                  Import seconds:{{source.get_import_seconds}} 
+                  Import seconds:{{source.get_import_seconds}}
             </div>
           </a>
 
           <a href="{{ source.get_absolute_url }}" class="simplebutton">Details</a>
           {% if user.is_staff %}
-            <a href="{% url 'rsshistory:source-refresh' source.id %}" class="simplebutton">Refresh</a>
+            <a href="{% url 'rsshistory:source-refresh' source.id %}" class="simplebutton">Update</a>
           {% endif %}
       </li>
     {% endfor %}

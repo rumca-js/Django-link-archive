@@ -12,8 +12,8 @@ from youtubedlmgr.programwrappers import ytdownloader
 
 class YTDLP(ytdownloader.YouTubeDownloader):
 
-    def __init__(self, url = None):
-        super().__init__(url)
+    def __init__(self, url = None, path=None):
+        super().__init__(url, path)
 
     def download_audio(self, file_name):
         ext = Path(file_name).suffix[1:]
@@ -22,7 +22,7 @@ class YTDLP(ytdownloader.YouTubeDownloader):
 
         cmds = ['yt-dlp', '-o', file_name, "-x", "--audio-format", ext, '--prefer-ffmpeg', self._url]
 
-        proc = subprocess.run(cmds, capture_output=True)
+        proc = subprocess.run(cmds, cwd=self._path, capture_output=True)
 
         if proc.returncode != 0:
             return None
@@ -38,7 +38,7 @@ class YTDLP(ytdownloader.YouTubeDownloader):
         cmds = ['yt-dlp','-f','bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4', self._url]
         #cmds = ['yt-dlp', '-o', file_name, self._url ]
         logging.info("Downloading: " + " ".join(cmds))
-        proc = subprocess.run(cmds, capture_output=True)
+        proc = subprocess.run(cmds, cwd=self._path, capture_output=True)
 
         if proc.returncode != 0:
             return None

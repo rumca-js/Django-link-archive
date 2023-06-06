@@ -47,10 +47,12 @@
        <a href="{{ object.source }}" class="simplebutton">Source Link</a>
       {% endif %}
 
-      {% if config.link_save %}
-        <a href="{% url 'rsshistory:entry-archive' object.id %}" class="simplebutton">archive.org save</a>
-      {% endif %}
       <a href="{{object.get_archive_link}}" class="simplebutton">View on archive.org</a>
+      {% if user.is_staff %}
+          {% if config.link_archive %}
+            <a href="{% url 'rsshistory:entry-archive' object.id %}" class="simplebutton">archive.org save</a>
+          {% endif %}
+      {% endif %}
   </p>
 
   {% if user.is_staff %}

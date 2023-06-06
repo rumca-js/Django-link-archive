@@ -3,11 +3,10 @@ import re
 
 
 class SpotifyPlugin(BasePlugin):
+    PLUGIN_NAME = "SpotifyPlugin"
+
     def __init__(self, source):
         super().__init__(source)
-
-    def get_address(self):
-        return "https://open.spotify.com"
 
     def is_link_valid(self, address):
         if not self.is_link_valid_domain(address):

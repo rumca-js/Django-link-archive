@@ -30,8 +30,9 @@ from pathlib import Path
 
 class YouTubeDownloader(object):
 
-    def __init__(self, url):
+    def __init__(self, url, path = None):
         self._url = url
+        self._path = path
 
     def download_audio(self, file_name):
         ext = Path(file_name).suffix[1:]
@@ -40,7 +41,7 @@ class YouTubeDownloader(object):
 
         cmds = ['youtube-dl', '-o', file_name, "-x", "--audio-format", ext, '--prefer-ffmpeg', self._url]
         logging.info("Downloading: " + " ".join(cmds))
-        proc = subprocess.run(cmds, stdout=subprocess.PIPE)
+        proc = subprocess.run(cmds, cwd=self._path, stdout=subprocess.PIPE)
 
         out = self.get_output_ignore(proc)
 
@@ -52,7 +53,7 @@ class YouTubeDownloader(object):
         #cmds = ['youtube-dl','-o', file_name, '-f','bestvideo[ext={0}]+bestaudio'.format(ext), self._url ]
         cmds = ['youtube-dl','-o', file_name, self._url ]
         logging.info("Downloading: " + " ".join(cmds))
-        proc = subprocess.run(cmds, stdout=subprocess.PIPE)
+        proc = subprocess.run(cmds, cwd=self._path, stdout=subprocess.PIPE)
 
         out = self.get_output_ignore(proc)
 

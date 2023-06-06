@@ -9,12 +9,22 @@ from pytz import timezone
 
 
 class SourceDataModel(models.Model):
-    SOURCE_TYPE_RSS = "source-type-rss"
-    SOURCE_TYPE_PARSE = "source-type-parse"
+    SOURCE_TYPE_RSS = "BaseRssPlugin"
+    SOURCE_TYPE_PARSE = "BaseParsePlugin"
+    SOURCE_TYPE_CODEPROJECT = "CodeProjectPlugin"
+    SOURCE_TYPE_INSTALKI = "InstalkiPlugin"
+    SOURCE_TYPE_NIEZALEZNA = "NiezaleznaPlugin"
+    SOURCE_TYPE_TVN24 = "TVN24Plugin"
+    SOURCE_TYPE_SPOTIFY = "SpotifyPlugin"
 
     SOURCE_TYPES = (
         (SOURCE_TYPE_RSS, SOURCE_TYPE_RSS),            # 
         (SOURCE_TYPE_PARSE, SOURCE_TYPE_PARSE),        # 
+        (SOURCE_TYPE_CODEPROJECT, SOURCE_TYPE_CODEPROJECT),        # 
+        (SOURCE_TYPE_INSTALKI, SOURCE_TYPE_INSTALKI),        # 
+        (SOURCE_TYPE_NIEZALEZNA, SOURCE_TYPE_NIEZALEZNA),        # 
+        (SOURCE_TYPE_TVN24, SOURCE_TYPE_TVN24),        # 
+        (SOURCE_TYPE_SPOTIFY, SOURCE_TYPE_SPOTIFY),        # 
         )
 
     url = models.CharField(max_length=2000, unique=True)

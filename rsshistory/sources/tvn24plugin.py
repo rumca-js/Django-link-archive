@@ -1,12 +1,11 @@
-from .baseplugin import BasePlugin
+from .baserssplugin import BaseRssPlugin
 
 
-class TVN24Plugin(BasePlugin):
+class TVN24Plugin(BaseRssPlugin):
+    PLUGIN_NAME = "TVN24Plugin"
+
     def __init__(self, source):
         super().__init__(source)
-
-    def get_address(self):
-        return "https://tvn24.pl"
 
     def is_link_valid(self, address):
         if address.find("TVN24-po-ukrainsku") >= 0:

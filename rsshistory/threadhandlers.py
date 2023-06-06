@@ -5,14 +5,13 @@ from pathlib import Path
 
 from django.db.models import Q
 
-from .threads import *
-from .sources.rsssourceprocessor import RssSourceProcessor
-from .programwrappers import ytdlp,id3v2
-from .datawriter import *
+from .views import app_name
 from .models import LinkDataModel, SourceDataModel, PersistentInfo, ConfigurationEntry, BackgroundJob
 from .models import RssSourceImportHistory, RssSourceExportHistory
+from .threads import *
+from .sources.basepluginbuilder import BasePluginBuilder
 from .basictypes import fix_path_for_windows
-from .views import app_name
+from .programwrappers import ytdlp,id3v2
 
 
 class ProcessSourceHandler(ThreadJobCommon):
@@ -29,30 +28,24 @@ class ProcessSourceHandler(ThreadJobCommon):
             return None
 
         obj = objs[0]
-        items = SourceDataModel.objects.filter(url = obj.subject)
+        sources = SourceDataModel.objects.filter(url = obj.subject)
         obj.delete()
 
-        if len(items) != 0:
-            item = items[0]
-        return item
+        if len(sources) != 0:
+            source = sources[0]
+            return source
 
-    def process_item(self, item=None):
+    def process_item(self, source=None):
         try:
-           proc = RssSourceProcessor()
-           proc.process_source(item)
+           plugin = BasePluginBuilder.get(source)
+           plugin.check_for_data()
 
-           if len(RssSourceImportHistory.objects.filter(url = item.url, date = date.today())) == 0:
-               history = RssSourceImportHistory(url = item.url, date = date.today(), source_obj = item)
+           if len(RssSourceImportHistory.objects.filter(url = source.url, date = date.today())) == 0:
+               history = RssSourceImportHistory(url = source.url, date = date.today(), source_obj = source)
                history.save()
-
-           #if ConfigurationEntry.get().is_git_set():
-           #    today = DateUtils.get_iso_today()
-           #    if item.export_to_cms:
-           #        writer = SourceEntriesDataWriter(self._config, item.url)
-           #        writer.write_for_day(today)
         except Exception as e:
            error_text = traceback.format_exc()
-           PersistentInfo.error("Exception during parsing page contents {0} {1} {2}".format(item.url, str(e), error_text))
+           PersistentInfo.error("Exception during parsing page contents {0} {1} {2}".format(source.url, str(e), error_text))
 
 
 class DownloadLinkHandler(ThreadJobCommon):
@@ -86,10 +79,11 @@ class DownloadLinkHandler(ThreadJobCommon):
             else:
                 raise NotImplemented("Not supported process error")
 
-            item.delete()
         except Exception as e:
            error_text = traceback.format_exc()
            PersistentInfo.error("Exception on LinkArchiveHandler {} {}".format(str(e), error_text))
+
+        item.delete()
 
     def process_music_item(self, obj=None):
       item = LinkDataModel.objects.filter(link = obj.subject)[0]

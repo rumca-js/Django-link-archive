@@ -1,7 +1,6 @@
 from pathlib import Path
 import logging
 
-from .programwrappers import ytdlp,id3v2
 from .basictypes import *
 from .models import ConfigurationEntry
 
@@ -15,7 +14,7 @@ from .models import ConfigurationEntry
  if a change requires the model to be changed, then second digit is updated, patch is set to 0
  if something should be released to public, then release version changes
 """
-__version__ = "0.10.0"
+__version__ = "0.10.1"
 
 
 class Configuration(object):

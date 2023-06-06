@@ -1,6 +1,7 @@
 
 from .baseplugin import BasePlugin
 from .baseparseplugin import BaseParsePlugin
+from .baserssplugin import BaseRssPlugin
 from .codeprojectplugin import CodeProjectPlugin
 from .instalkiplugin import InstalkiPlugin
 from .niezaleznaplugin import NiezaleznaPlugin
@@ -21,12 +22,12 @@ class BasePluginBuilder(object):
 
         for plugin_def in BasePluginBuilder.plugins:
             plugin = plugin_def(source)
-            if source.get_domain() == plugin.get_address():
+            if source.source_type == plugin.PLUGIN_NAME:
                 return plugin
 
         if source.source_type == SourceDataModel.SOURCE_TYPE_RSS:
-            return BasePlugin(source)
+            return BaseRssPlugin(source)
         elif source.source_type == SourceDataModel.SOURCE_TYPE_PARSE:
             return BaseParsePlugin(source)
         else:
-            raise NotImplemented("Unsupported source type: {}".format(source.source_type))
+            raise NotImplementedError("Source: {}: Unsupported source type: {}".format(source.title, source.source_type))

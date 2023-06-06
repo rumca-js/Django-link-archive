@@ -1,6 +1,8 @@
+import traceback
 
+from ..models import PersistentInfo,LinkDataModel
 from ..webtools import Page
-from dateutil import parser
+from ..dateutils import DateUtils
 
 
 class BasePlugin(Page):
@@ -16,58 +18,68 @@ class BasePlugin(Page):
     def is_link_valid(self, address):
         return True
 
-    def get_link_data(self, source, link):
+    def get_link_props(self):
+        return {}
+
+    def check_for_data(self):
         from ..dateutils import DateUtils
-        output_map = {}
 
-        link_ob = Page(link)
+        try:
+            source = self.source
 
-        title = link_ob.get_title()
+            print("process source:{} type:{}".format(source.title, source.source_type))
 
-        output_map['link'] = link
-        output_map['title'] = title
-        output_map['description'] = title
-        output_map['source'] = source.url
-        output_map['published'] = DateUtils.get_datetime_now_utc()
-        output_map['language'] = source.language
-        return output_map
+            if not source.is_fetch_possible():
+                print("It is not the right time for source: {}".format(source.title))
+                return
 
-    def get_feed_entry_map(self, source, feed_entry):
-        from ..dateutils import DateUtils
-        output_map = {}
+            start_time = DateUtils.get_datetime_now_utc()
 
-        #print("feed entry dict: {}".format(feed_entry.__dict__))
-        #print("Feed entry: {}".format(str(feed_entry)))
+            num_entries = self.check_for_data_impl(source)
 
-        if hasattr(feed_entry, "description"):
-            output_map['description'] = feed_entry.description
-        else:
-            output_map['description'] = ""
+            stop_time = DateUtils.get_datetime_now_utc()
+            total_time = stop_time - start_time
+            total_time.total_seconds()
 
-        if hasattr(feed_entry, "media_thumbnail"):
-            output_map['thumbnail'] = feed_entry.media_thumbnail[0]['url']
-        else:
-            output_map['thumbnail'] = None
+            if num_entries != 0:
+                source.set_operational_info(stop_time, num_entries, total_time.total_seconds())
 
-        if hasattr(feed_entry, "published"):
-            dt = parser.parse(feed_entry.published)
-            output_map['published'] = dt
-        elif self.allow_adding_with_current_time:
-            output_map['published'] = DateUtils.get_datetime_now_utc()
-        elif self.default_entry_timestamp:
-            output_map['published'] = self.default_entry_timestamp
-        else:
-            output_map['published'] = DateUtils.get_datetime_now_utc()
+        except Exception as e:
+            error_text = traceback.format_exc()
+            PersistentInfo.exc("Source:{} {}; Exc:{}\n{}".format(source.url, source.title, str(e), error_text))
 
-        output_map['source'] = source.url
-        output_map['title'] = feed_entry.title
-        output_map['language'] = source.language
-        output_map['link'] = feed_entry.link
+    def check_for_data_impl(self, source):
+        try:
+            source = self.source
 
-        if output_map['published']:
-            output_map['published'] = DateUtils.to_utc_date(output_map['published'])
+            links_data = self.get_link_props()
+            num_entries = len(links_data)
 
-            if output_map['published'] > DateUtils.get_datetime_now_utc():
-                output_map['published'] = DateUtils.get_datetime_now_utc()
+            for link_data in links_data:
+                print("Adding link {}".format(link_data['link']))
+                objs = LinkDataModel.objects.filter(link=link_data['link'])
+                if objs.exists():
+                    # TODO maybe update with new data?
+                    continue
 
-        return output_map
+                o = LinkDataModel(
+                    source=link_data['source'],
+                    title=link_data['title'],
+                    description=link_data['description'],
+                    link=link_data['link'],
+                    date_published=link_data['published'],
+                    language=link_data['language'],
+                    thumbnail=link_data['thumbnail'],
+                    source_obj=source)
+
+                try:
+                    o.save()
+                    print("Added link {}".format(link_data['link']))
+                except Exception as e:
+                    o.save()
+
+            return num_entries
+
+        except Exception as e:
+            error_text = traceback.format_exc()
+            PersistentInfo.exc("Source:{} {}; Exc:{}\n{}".format(source.url, source.title, str(e), error_text))
