@@ -60,7 +60,7 @@ Currently supported sources:
  - RSS
  - parse mechanism that fetches all links from source URL through web scraping
 
-![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/search_form.PNG)
+![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/source_new.PNG)
 
 # Admin
 
