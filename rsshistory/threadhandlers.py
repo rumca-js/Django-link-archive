@@ -60,8 +60,9 @@ class DownloadLinkHandler(ThreadJobCommon):
         criterion1 = Q(job=BackgroundJob.JOB_LINK_DOWNLOAD)
         criterion2 = Q(job=BackgroundJob.JOB_LINK_DOWNLOAD_MUSIC)
         criterion3 = Q(job=BackgroundJob.JOB_LINK_DOWNLOAD_VIDEO)
+        criterion4 = Q(job=BackgroundJob.JOB_LINK_ADD)
 
-        objs = BackgroundJob.objects.filter(criterion1 | criterion2 | criterion3)
+        objs = BackgroundJob.objects.filter(criterion1 | criterion2 | criterion3 | criterion4)
         if len(objs) == 0:
             return None
 
@@ -76,6 +77,8 @@ class DownloadLinkHandler(ThreadJobCommon):
                 self.process_video_item(item)
             elif item.job == BackgroundJob.JOB_LINK_DOWNLOAD:
                 self.process_link_item(item)
+            elif item.job == BackgroundJob.JOB_LINK_ADD:
+                self.process_link_add(item)
             else:
                 raise NotImplemented("Not supported process error")
 
@@ -84,6 +87,22 @@ class DownloadLinkHandler(ThreadJobCommon):
            PersistentInfo.error("Exception on LinkArchiveHandler {} {}".format(str(e), error_text))
 
         item.delete()
+
+    def process_link_add(self, obj=None):
+       link = obj.subject
+       source_id = obj.args
+       source_obj = SourceDataModel.objects.get(id = int(source_id))
+       data = {"user" : None, "language" : source_obj.language, "persistent" : False}
+
+       print("Adding {} for {}".format(link, source_obj.title))
+       try:
+           LinkDataModel.create_from_youtube(link, data)
+       except Exception as e:
+           try:
+               LinkDataModel.create_from_youtube(link, data)
+           except Exception as e:
+               error_text = traceback.format_exc()
+               PersistentInfo.error("Exception on adding link {} {}".format(str(e), error_text))
 
     def process_music_item(self, obj=None):
       item = LinkDataModel.objects.filter(link = obj.subject)[0]
@@ -153,13 +172,13 @@ class RefreshThreadHandler(ThreadJobCommon):
 
         if ConfigurationEntry.get().is_git_set():
             if RssSourceExportHistory.is_update_required():
-               BackgroundJob.objects.create(job=BackgroundJob.JOB_PUSH_TO_REPO, task=None, subject="", args="")
+               BackgroundJob.push_to_repo()
 
                if ConfigurationEntry.get().source_archive:
                    from .models import SourceDataModel
                    sources = SourceDataModel.objects.all()
                    for source in sources:
-                       BackgroundJob.objects.create(job=BackgroundJob.JOB_LINK_ARCHIVE, task=None, subject=source.url, args="")
+                       BackgroundJob.link_archive(source.url)
 
 
 class LinkArchiveHandler(ThreadJobCommon):
@@ -339,21 +358,21 @@ class HandlerManager(object):
            athread.close()
 
    def download_music(self, item):
-       bj = BackgroundJob.objects.create(job=BackgroundJob.JOB_LINK_DOWNLOAD_MUSIC, task=None, subject=item.link, args="")
+       bj = BackgroundJob.download_music(item.link)
        return True
 
    def download_video(self, item):
-       bj = BackgroundJob.objects.create(job=BackgroundJob.JOB_LINK_DOWNLOAD_VIDEO, task=None, subject=item.link, args="")
+       bj = BackgroundJob.download_video(item.link)
        return True
 
    def wayback_save(self, url):
-       bj = BackgroundJob.objects.create(job=BackgroundJob.JOB_LINK_ARCHIVE, task=None, subject=url, args="")
+       bj = BackgroundJob.link_archive(url)
        return True
 
    def youtube_details(self, url):
-       bj = BackgroundJob.objects.create(job=BackgroundJob.JOB_LINK_DETAILS, task=None, subject=url, args="")
+       bj = BackgroundJob.youtube_details(url)
        return True
 
    def write_daily_data(self, input_date):
-       bj = BackgroundJob.objects.create(job=BackgroundJob.JOB_WRITE_DAILY_DATA, task=None, subject=input_date, args="")
+       bj = BackgroundJob.write_daily_data(input_date)
        return True

@@ -325,6 +325,7 @@ def import_youtube_links_for_source(request, pk):
         return render(request, get_app() / 'missing_rights.html', context)
 
     source_obj = SourceDataModel.objects.get(id = pk)
+    
     url = str(source_obj.url)
     wh = url.find("=")
 
@@ -335,12 +336,18 @@ def import_youtube_links_for_source(request, pk):
     code = url[wh + 1 :]
     channel = 'https://www.youtube.com/channel/{}'.format(code)
     ytdlp = YTDLP(channel)
+    print("Searching for links for source {} channel {}".format(source_obj.title, channel))
     links = ytdlp.get_channel_video_list()
 
     data = {"user" : None, "language" : source_obj.language, "persistent" : False}
 
+    print("Found source links: {}".format(len(links)))
+
     for link in links:
-       print("Adding {}".format(link))
+       print("Adding job {}".format(link))
+       BackgroundJob.link_add(link, source_obj)
+
+       """
        try:
            LinkDataModel.create_from_youtube(link, data)
        except Exception as E:
@@ -350,6 +357,7 @@ def import_youtube_links_for_source(request, pk):
                pass
 
        summary_text += "\n{}".format(link)
-
-    context['summary_text'] = summary_text
+       """
+    
+    context['summary_text'] = ""
     return render(request, get_app() / 'summary_present.html', context)

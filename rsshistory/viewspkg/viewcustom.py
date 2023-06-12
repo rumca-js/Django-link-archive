@@ -190,8 +190,8 @@ def truncate_errors(request):
     from ..models import PersistentInfo
     PersistentInfo.truncate()
 
-    from ..models import BackgroundJob
-    BackgroundJob.truncate()
+    #from ..models import BackgroundJob
+    #BackgroundJob.truncate()
 
     context["summary_text"] = "Clearing errors done"
 
@@ -592,7 +592,7 @@ def write_daily_data_form(request):
             time_start = form.cleaned_data['time_start']
             time_stop = form.cleaned_data['time_stop']
 
-            if BackgroundJob.write_daily_data(time_start, time_stop):
+            if BackgroundJob.write_daily_data_range(time_start, time_stop):
                 context["summary_text"] = "Added daily write job. Start:{} Stop:{}".format(time_start, time_stop)
             else:
                 context["summary_text"] = "Form is invalid. Start:{} Stop:{}".format(time_start, time_stop)

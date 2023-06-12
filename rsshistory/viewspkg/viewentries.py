@@ -27,7 +27,9 @@ class RssEntriesListView(generic.ListView):
     paginate_by = 200
 
     def get_queryset(self):
-        self.filter_form = EntryChoiceForm(args = self.request.GET)
+        self.filter_form = EntryChoiceForm(self.request.GET, args=self.request.GET)
+        if self.filter_form.is_valid():
+            print("valid")
         return self.filter_form.get_filtered_objects()
 
     def get_context_data(self, **kwargs):
@@ -41,6 +43,9 @@ class RssEntriesListView(generic.ListView):
         queue_size = BackgroundJob.get_number_of_jobs(BackgroundJob.JOB_PROCESS_SOURCE)
         context['rss_are_fetched'] = queue_size > 0
         context['rss_queue_size'] = queue_size
+
+        if self.filter_form.is_valid():
+            print("valid")
 
         self.filter_form.create()
         self.filter_form.method = "GET"
@@ -373,7 +378,9 @@ class NotBookmarkedView(generic.ListView):
     template_name = get_app() / 'linkdatamodel_list.html'
 
     def get_queryset(self):
-        self.filter_form = EntryChoiceForm(args = self.request.GET)
+        self.filter_form = EntryChoiceForm(self.request.GET, args=self.request.GET)
+        if self.filter_form.is_valid():
+            print("valid")
         return LinkDataModel.objects.filter(tags__tag__isnull = True, persistent = True)
 
     def get_context_data(self, **kwargs):
@@ -382,17 +389,14 @@ class NotBookmarkedView(generic.ListView):
         context = init_context(self.request, context)
         # Create any data and add it to the context
 
-        # TODO move from entries view
-        context['page_title'] += " - entries"
+        context['page_title'] += " - not bookmarked"
 
-        app_name = get_app()
-        c = Configuration.get_object(str(app_name))
-        threads = c.get_threads()
-        if threads:
-           thread = c.get_threads()[0]
-           queue_size = thread.get_queue_size()
-           context['rss_are_fetched'] = queue_size > 0
-           context['rss_queue_size'] = queue_size
+        queue_size = BackgroundJob.get_number_of_jobs(BackgroundJob.JOB_PROCESS_SOURCE)
+        context['rss_are_fetched'] = queue_size > 0
+        context['rss_queue_size'] = queue_size
+
+        if self.filter_form.is_valid():
+            print("valid")
 
         self.filter_form.create()
         self.filter_form.method = "GET"

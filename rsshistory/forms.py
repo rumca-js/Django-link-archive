@@ -1,4 +1,6 @@
+from datetime import datetime,timedelta
 from django import forms
+
 from .models import SourceDataModel, LinkDataModel, LinkTagsDataModel, LinkCommentDataModel
 from .models import ConfigurationEntry, UserConfig
 
@@ -265,9 +267,9 @@ class SourcesChoiceForm(forms.Form):
     Category choice form
     """
 
-    category = forms.CharField(widget=forms.Select(choices=()))
-    subcategory = forms.CharField(widget=forms.Select(choices=()))
-    title = forms.CharField(widget=forms.Select(choices=()))
+    category = forms.CharField(widget=forms.Select(choices=()), required=False)
+    subcategory = forms.CharField(widget=forms.Select(choices=()), required=False)
+    title = forms.CharField(widget=forms.Select(choices=()), required=False)
 
     def __init__(self, *args, **kwargs):
         self.args = kwargs.pop('args', ())
@@ -295,16 +297,18 @@ class SourcesChoiceForm(forms.Form):
         subcategory_init = self.get_init('subcategory')
         title_init = self.get_init('title')
 
-        self.fields['category'] = forms.CharField(widget=forms.Select(choices=categories, attrs=attr), initial=category_init)
-        self.fields['subcategory'] = forms.CharField(widget=forms.Select(choices=subcategories, attrs=attr), initial=subcategory_init)
-        self.fields['title'] = forms.CharField(widget=forms.Select(choices=title, attrs=attr), initial=title_init)
+        self.fields['category'].widget=forms.Select(choices=categories, attrs=attr)
+        self.fields['category'].initial=category_init
+        self.fields['subcategory'].widget=forms.Select(choices=subcategories, attrs=attr)
+        self.fields['subcategory'].initial=subcategory_init
+        self.fields['title'].initial=title_init
 
     def get_init(self, column):
         filters = self.get_filter_args()
         if column in filters:
             return filters[column]
         else:
-            return "Any"
+            return ""
 
     def get_filtered_objects_values(self, field):
         values = set()
@@ -322,7 +326,10 @@ class SourcesChoiceForm(forms.Form):
         result = []
         for item in sorted(alist):
             if item.strip() != "":
-                result.append((item, item))
+                if item == "Any":
+                    result.append(("", item))
+                else:
+                    result.append((item, item))
         return result
 
     def get_filter_args(self):
@@ -350,20 +357,22 @@ class EntryChoiceForm(forms.Form):
 
     # do not think too much about these settings, these will be overriden by 'create' method
     search = forms.CharField(label='Search', max_length = 500, required=False)
-    category = forms.CharField(widget=forms.Select(choices=()))
-    subcategory = forms.CharField(widget=forms.Select(choices=()))
-    title = forms.CharField(widget=forms.Select(choices=()))
+    category = forms.CharField(widget=forms.Select(choices=()), required=False)
+    subcategory = forms.CharField(widget=forms.Select(choices=()), required=False)
+    source_title = forms.CharField(widget=forms.Select(choices=()), required=False)
     persistent = forms.BooleanField(required=False, initial=False)
     language = forms.CharField(label='language', max_length = 500, required=False)
     user = forms.CharField(label='user', max_length = 500, required=False)
     tag = forms.CharField(label='tag', max_length = 500, required=False)
+    date_to = forms.DateField(required=False, initial=datetime.now() + timedelta(days=1))
+    date_from = forms.DateField(required=False, initial=datetime.now() - timedelta(days=30))
 
     def __init__(self, *args, **kwargs):
         self.args = kwargs.pop('args', ())
         super().__init__(*args, **kwargs)
 
     def get_filtered_objects(self):
-        source_parameter_map = self.get_source_filter_args()
+        source_parameter_map = self.get_source_filter_args(False)
         entry_parameter_map = self.get_entry_filter_args(False)
 
         self.entries = []
@@ -392,29 +401,31 @@ class EntryChoiceForm(forms.Form):
         title_init = self.get_source_init('title')
 
         init = {}
-        init['search'] = ""
         init['language'] = ""
         init['persistent'] = False
         init['user'] = ""
         init['tag'] = ""
         if len(self.args) != 0:
-            init['search'] = self.args.get("search")
             init['language'] = self.args.get("language")
             init['persistent'] = self.args.get("persistent")
             init['user'] = self.args.get("user")
             init['tag'] = self.args.get("tag")
 
-        self.fields['search'] = forms.CharField(label = 'Search', max_length = 500, required=False, initial=init['search'])
-        self.fields['category'] = forms.CharField(label = "RSS source category", widget=forms.Select(choices=categories, attrs=attr), initial=category_init)
-        self.fields['subcategory'] = forms.CharField(label = "RSS source subcategory", widget=forms.Select(choices=subcategories, attrs=attr), initial=subcategory_init)
-        self.fields['title'] = forms.CharField(label = "RSS source title", widget=forms.Select(choices=title, attrs=attr), initial=title_init)
-        self.fields['persistent'] = forms.BooleanField(label = "Search in bookmarked entries", required=False, initial=init['persistent'])
-        self.fields['language'] = forms.CharField(label = 'Search language', max_length = 500, required=False, initial=init['language'])
-        self.fields['user'] = forms.CharField(label = 'Search user', required=False, initial=init['user'])
-        self.fields['tag'] = forms.CharField(label = 'Search tags', required=False, initial=init['tag'])
+        self.fields['category'].widget=forms.Select(choices=categories, attrs=attr)
+        self.fields['category'].initial=category_init
+        self.fields['subcategory'].widget=forms.Select(choices=subcategories, attrs=attr)
+        self.fields['subcategory'].initial=subcategory_init
+        self.fields['source_title'].widget=forms.Select(choices=title, attrs=attr)
+        self.fields['source_title'].initial=title_init
+        self.fields['persistent'].initial=init['persistent']
+        self.fields['language'].initial=init['language']
+        self.fields['user'].initial=init['user']
+        self.fields['tag'].initial=init['tag']
+        self.fields['date_to'].initial = datetime.now() + timedelta(days=1)
+        self.fields['date_from'].initial = datetime.now() - timedelta(days=30)
 
     def get_sources(self):
-        source_parameter_map = self.get_source_filter_args()
+        source_parameter_map = self.get_source_filter_args(False)
         self.sources = SourceDataModel.objects.filter(**source_parameter_map)
 
     def get_filtered_objects_values(self, field):
@@ -431,20 +442,23 @@ class EntryChoiceForm(forms.Form):
         return dict_values
 
     def get_source_init(self, column):
-        filters = self.get_source_filter_args()
+        filters = self.get_source_filter_args(False)
         if column in filters:
             return filters[column]
         else:
-            return "Any"
+            return ""
 
     def to_dict(self, alist):
         result = []
         for item in sorted(alist):
             if item.strip() != "":
-                result.append((item, item))
+                if item == "Any":
+                    result.append(("", item))
+                else:
+                    result.append((item, item))
         return result
 
-    def get_source_filter_args(self):
+    def get_source_filter_args(self, pure_data = True):
         parameter_map = {}
 
         category = self.args.get("category")
@@ -455,9 +469,14 @@ class EntryChoiceForm(forms.Form):
         if subcategory and subcategory != "Any":
            parameter_map['subcategory'] = subcategory
 
-        title = self.args.get("title")
-        if title and title != "Any":
-           parameter_map['title'] = title
+        if pure_data:
+            title = self.args.get("source_title")
+            if title and title != "Any":
+               parameter_map['source_title'] = title
+        else:
+            title = self.args.get("source_title")
+            if title and title != "Any":
+               parameter_map['title'] = title
 
         return parameter_map
 
@@ -465,10 +484,6 @@ class EntryChoiceForm(forms.Form):
         parameter_map = {}
 
         persistent = self.args.get("persistent")
-        if persistent:
-           parameter_map['persistent'] = True
-        #else:
-        #   parameter_map['persistent'] = False
 
         search = self.args.get("search")
         language = self.args.get("language")
@@ -478,21 +493,16 @@ class EntryChoiceForm(forms.Form):
 
         category = self.args.get("category")
         subcategory = self.args.get("subcategory")
-        source_title = self.args.get("title")
+        source_title = self.args.get("source_title")
 
         if pure_data:
-            if search:
-               parameter_map['search'] = search
-            if language:
-               parameter_map['language'] = language
-            if user:
-               parameter_map['user'] = user
-            if tag:
-               parameter_map['tag'] = tag
-
+            return self.cleaned_data
         else:
             tag_key, tag = self.get_tag_search()
+            parameter_map["date_published__range"] = [self.cleaned_data["date_from"], self.cleaned_data["date_to"]]
 
+            if persistent:
+               parameter_map['persistent'] = persistent
             if search:
                 parameter_map["title__icontains"] = search
             if language:
@@ -530,15 +540,19 @@ class EntryChoiceForm(forms.Form):
         return exact_find, text
 
     def get_filter_string(self):
-        filters = self.get_source_filter_args()
-        filters.update(self.get_entry_filter_args())
+        infilters = self.get_source_filter_args()
+        infilters.update(self.get_entry_filter_args())
+        filters = {}
+        for key in infilters:
+            if infilters[key] is not None and infilters[key] != "" and infilters[key] != "Any":
+               filters[key] = infilters[key]
 
         if "cagetory" in filters and filters["category"] == "Any":
             del filters["category"]
         if "subcagetory" in filters and filters["subcategory"] == "Any":
             del filters["subcategory"]
-        if "title" in filters and filters["title"] == "Any":
-            del filters["title"]
+        if "source_title" in filters and filters["source_title"] == "Any":
+            del filters["source_title"]
 
         for filter_name in filters:
             filtervalue = filters[filter_name]
