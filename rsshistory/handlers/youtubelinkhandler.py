@@ -17,10 +17,12 @@ class YouTubeLinkHandler(object):
         return YouTubeLinkHandler.code2url(code)
 
     def code2url(code):
-        return 'https://www.youtube.com/watch?v={0}'.format(code)
+        if code:
+           return 'https://www.youtube.com/watch?v={0}'.format(code)
 
     def input2code(url):
         wh = url.find("youtu.be")
+        video_code = None
         if wh >= 0:
             video_code = url[wh+9:]
         else:

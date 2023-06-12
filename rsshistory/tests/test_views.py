@@ -66,8 +66,44 @@ class ViewsTest(TestCase):
 
         self.assertEqual(resp.status_code, 200)
 
+    def test_admin(self):
+        url = reverse("rsshistory:admin-page")
+        resp = self.client.get(url)
+
+        self.assertEqual(resp.status_code, 200)
+
+    def test_user_config(self):
+        url = reverse("rsshistory:user-config")
+        resp = self.client.get(url)
+
+        self.assertEqual(resp.status_code, 200)
+
+    def test_system_status(self):
+        url = reverse("rsshistory:system-status")
+        resp = self.client.get(url)
+
+        self.assertEqual(resp.status_code, 200)
+
+    def test_backgroundjobs(self):
+        url = reverse("rsshistory:backgroundjobs")
+        resp = self.client.get(url)
+
+        self.assertEqual(resp.status_code, 200)
+
+    def test_configuration(self):
+        url = reverse("rsshistory:configuration")
+        resp = self.client.get(url)
+
+        self.assertEqual(resp.status_code, 200)
+
     def test_show_tags(self):
         url = reverse("rsshistory:show-tags")
+        resp = self.client.get(url)
+
+        self.assertEqual(resp.status_code, 200)
+
+    def test_tag_rename(self):
+        url = reverse("rsshistory:tag-rename")
         resp = self.client.get(url)
 
         self.assertEqual(resp.status_code, 200)

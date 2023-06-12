@@ -78,8 +78,6 @@ class BaseRssPlugin(BasePlugin):
                     return None
 
                 return props
-            else:
-                print("Link already exists: {}".format(props['link']))
 
         except Exception as e:
             error_text = traceback.format_exc()
@@ -107,8 +105,15 @@ class BaseRssPlugin(BasePlugin):
             output_map['thumbnail'] = None
 
         if hasattr(feed_entry, "published"):
-            dt = parser.parse(feed_entry.published)
-            output_map['published'] = dt
+            try:
+                dt = parser.parse(feed_entry.published)
+                output_map['published'] = dt
+            except Exception as e:
+                PersistentInfo.error(
+                        "Rss parser datetime invalid feed datetime:{}; Exc:{} {}\n{}".format(feed_entry.published,
+                                                              str(e), error_text))
+                output_map['published'] = DateUtils.get_datetime_now_utc()
+
         elif self.allow_adding_with_current_time:
             output_map['published'] = DateUtils.get_datetime_now_utc()
         elif self.default_entry_timestamp:

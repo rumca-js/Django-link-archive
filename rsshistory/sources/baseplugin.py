@@ -56,7 +56,7 @@ class BasePlugin(Page):
             num_entries = len(links_data)
 
             for link_data in links_data:
-                print("Adding link {}".format(link_data['link']))
+                #print("Adding link {}".format(link_data['link']))
                 objs = LinkDataModel.objects.filter(link=link_data['link'])
                 if objs.exists():
                     # TODO maybe update with new data?
@@ -74,7 +74,7 @@ class BasePlugin(Page):
 
                 try:
                     o.save()
-                    print("Added link {}".format(link_data['link']))
+                    #print("Added link {}".format(link_data['link']))
                 except Exception as e:
                     o.save()
 

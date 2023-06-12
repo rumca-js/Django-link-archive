@@ -4,13 +4,13 @@ import os
 import logging
 from pathlib import Path
 
-from youtubedlmgr.programwrappers import ytdownloader
+from .ytdownloader import YouTubeDownloader
 
 
 # yt-dlp
 # https://github.com/yt-dlp/yt-dlp
 
-class YTDLP(ytdownloader.YouTubeDownloader):
+class YTDLP(YouTubeDownloader):
 
     def __init__(self, url = None, path=None):
         super().__init__(url, path)
@@ -32,7 +32,7 @@ class YTDLP(ytdownloader.YouTubeDownloader):
         return proc
 
     def download_video(self, file_name):
-        ext = self.get_video_ext()
+        #ext = self.get_video_ext()
 
         #cmds = ['yt-dlp', '-f','bestvideo[ext={0}]+bestaudio'.format(ext), self._url ]
         cmds = ['yt-dlp','-f','bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4', self._url]
@@ -48,9 +48,9 @@ class YTDLP(ytdownloader.YouTubeDownloader):
         return proc
 
     def download_data(self, path = None):
-        cmds = ['yt-dlp', '--dump-json', self._url ]
+        cmds = ['yt-dlp', '--dump-json', str(self._url)]
 
-        logging.info("Downloading: " + " ".join(cmds) + str(path))
+        print("Downloading: " + " ".join(cmds) + " " + str(path))
 
         proc = subprocess.run(cmds, capture_output=True)
         if proc.returncode != 0:

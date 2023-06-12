@@ -27,7 +27,7 @@
   <ul class="linklist">
     {% for source in source_list %}
       <li>
-          <a href="{{ source.url }}" class="longbutton">
+          <a href="{{ source.get_absolute_url }}" class="longbutton">
             <div class="linklistitem">
               {% if user_config.show_icons %}
                 <img src="{{source.get_favicon}}" width="20">
@@ -42,11 +42,6 @@
                   Import seconds:{{source.get_import_seconds}}
             </div>
           </a>
-
-          <a href="{{ source.get_absolute_url }}" class="simplebutton">Details</a>
-          {% if user.is_staff %}
-            <a href="{% url 'rsshistory:source-refresh' source.id %}" class="simplebutton">Update</a>
-          {% endif %}
       </li>
     {% endfor %}
   </ul>
