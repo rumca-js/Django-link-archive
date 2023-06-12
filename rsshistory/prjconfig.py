@@ -85,16 +85,19 @@ class Configuration(object):
     def close(self):
         self.thread_mgr.close()
 
-    def get_export_path(self, append=None):
+    def get_export_path(self, append=False):
         directory = Path(ConfigurationEntry.get().data_export_path)
         if append:
             return directory / self.app_name / append
         else:
             return directory / self.app_name
 
-    def get_import_path(self):
+    def get_import_path(self, append=False):
         directory = Path(ConfigurationEntry.get().data_import_path)
-        return self.directory / self.app_name
+        if append:
+            return directory / self.app_name / append
+        else:
+            return directory / self.app_name
 
     def get_data_path(self):
         return self.directory / 'data' / self.app_name

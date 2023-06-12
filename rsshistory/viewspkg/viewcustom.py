@@ -123,7 +123,7 @@ def start_threads(request):
     return render(request, get_app() / 'summary_present.html', context)
 
 
-def import_view(request):
+def import_reading_list_view(request):
     from ..serializers.readinglist import ReadingList
     from ..webtools import Page
 
@@ -168,7 +168,8 @@ def import_view(request):
                         persistent = True,
                         dead = False,
                         user = "Thomas Pain",
-                        language = lang)
+                        language = lang,
+                        thumbnail = entry['image'])
 
                 ent.save()
 

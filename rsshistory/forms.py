@@ -375,6 +375,8 @@ class EntryChoiceForm(forms.Form):
         source_parameter_map = self.get_source_filter_args(False)
         entry_parameter_map = self.get_entry_filter_args(False)
 
+        print("Entry parameter map: {}".format(str(entry_parameter_map)))
+
         self.entries = []
         self.entries = LinkDataModel.objects.filter(**entry_parameter_map)
 
@@ -407,7 +409,8 @@ class EntryChoiceForm(forms.Form):
         init['tag'] = ""
         if len(self.args) != 0:
             init['language'] = self.args.get("language")
-            init['persistent'] = self.args.get("persistent")
+            if 'persistent' in self.cleaned_data:
+                init['persistent'] = True
             init['user'] = self.args.get("user")
             init['tag'] = self.args.get("tag")
 
@@ -484,6 +487,8 @@ class EntryChoiceForm(forms.Form):
         parameter_map = {}
 
         persistent = self.args.get("persistent")
+        if persistent:
+            persistent = True
 
         search = self.args.get("search")
         language = self.args.get("language")
