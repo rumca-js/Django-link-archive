@@ -320,7 +320,7 @@ class LinkDataModel(models.Model):
         return themap
 
     def get_archive_link(self):
-        from .sources.waybackmachine import WaybackMachine
+        from .services.waybackmachine import WaybackMachine
         from .dateutils import DateUtils
         m = WaybackMachine()
         formatted_date = m.get_formatted_date(self.date_published.date())
@@ -329,7 +329,7 @@ class LinkDataModel(models.Model):
         return archive_link
 
     def create_from_youtube(url, data):
-        from .handlers.youtubelinkhandler import YouTubeLinkHandler
+        from .pluginentries.youtubelinkhandler import YouTubeLinkHandler
 
         objs = LinkDataModel.objects.filter(link = url)
         if len(objs) != 0:

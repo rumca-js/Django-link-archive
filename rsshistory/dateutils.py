@@ -48,6 +48,11 @@ class DateUtils(object):
     def get_dir4date(date):
         return date.strftime('%Y-%m-%d')
 
+    def get_date_tuple(date):
+        return [date.strftime('%Y'),
+                date.strftime('%m'),
+                date.strftime('%d')]
+
     def get_iso_datetime(timestamp):
        from dateutil import parser
        date = parser.parse(timestamp)

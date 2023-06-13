@@ -58,7 +58,7 @@ class GitUpdateManager(object):
 
         repo.up()
 
-        local_dir = self._cfg.get_export_path() / DateUtils.get_dir4date(yesterday)
+        local_dir = self._cfg.get_daily_data_path(yesterday.isoformat())
         repo.copy_day_data(local_dir, yesterday)
         repo.copy_file(self._cfg.get_bookmarks_path() / "sources.json")
 

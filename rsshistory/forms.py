@@ -197,7 +197,7 @@ class EntryForm(forms.ModelForm):
         return self.update_info_default(data)
 
     def update_info_youtube(self, data):
-        from .handlers.youtubelinkhandler import YouTubeLinkHandler
+        from .pluginentries.youtubelinkhandler import YouTubeLinkHandler
         h = YouTubeLinkHandler(data["link"])
         h.download_details()
 
@@ -370,6 +370,8 @@ class EntryChoiceForm(forms.Form):
     def __init__(self, *args, **kwargs):
         self.args = kwargs.pop('args', ())
         super().__init__(*args, **kwargs)
+        self.fields['date_to'].initial = datetime.now() + timedelta(days=1)
+        self.fields['date_from'].initial = datetime.now() - timedelta(days=30)
 
     def get_filtered_objects(self):
         source_parameter_map = self.get_source_filter_args(False)
@@ -501,11 +503,15 @@ class EntryChoiceForm(forms.Form):
         source_title = self.args.get("source_title")
 
         if pure_data:
-            return self.cleaned_data
+            data = self.cleaned_data
+            if 'persistent' in data and not data['persistent']:
+                del data['persistent']
+            return data
         else:
             tag_key, tag = self.get_tag_search()
-            parameter_map["date_published__range"] = [self.cleaned_data["date_from"], self.cleaned_data["date_to"]]
 
+            if self.cleaned_data["date_from"] and self.cleaned_data["date_to"]:
+                parameter_map["date_published__range"] = [self.cleaned_data["date_from"], self.cleaned_data["date_to"]]
             if persistent:
                parameter_map['persistent'] = persistent
             if search:

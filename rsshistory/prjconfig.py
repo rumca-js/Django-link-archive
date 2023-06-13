@@ -1,3 +1,4 @@
+from datetime import datetime
 from pathlib import Path
 import logging
 
@@ -115,12 +116,16 @@ class Configuration(object):
         return "sources.json"
 
     def get_daily_data_path(self, day_iso=None):
+        from .dateutils import DateUtils
+
         if day_iso == None:
-            from .dateutils import DateUtils
             day_iso = DateUtils.get_date_today().isoformat()
 
-        day_path = Path(day_iso)
-        entries_dir = self.get_export_path(day_iso)
+        in_date = datetime.fromisoformat(day_iso)
+        in_tuple = DateUtils.get_date_tuple(in_date)
+
+        day_path = Path(in_tuple[0]) / in_tuple[1] / Path(day_iso)
+        entries_dir = self.get_export_path(day_path)
         return entries_dir
 
     def get_url_clean_name(self, file_name):

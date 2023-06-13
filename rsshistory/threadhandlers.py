@@ -9,7 +9,7 @@ from .views import app_name
 from .models import LinkDataModel, SourceDataModel, PersistentInfo, ConfigurationEntry, BackgroundJob
 from .models import RssSourceImportHistory, RssSourceExportHistory
 from .threads import *
-from .sources.basepluginbuilder import BasePluginBuilder
+from .pluginsources.basepluginbuilder import BasePluginBuilder
 from .basictypes import fix_path_for_windows
 from .programwrappers import ytdlp,id3v2
 
@@ -201,7 +201,7 @@ class LinkArchiveHandler(ThreadJobCommon):
 
     def process_item(self, item=None):
         try:
-            from .sources.waybackmachine import WaybackMachine
+            from .services.waybackmachine import WaybackMachine
             wb = WaybackMachine()
             if wb.is_saved(item):
                 wb.save(item)

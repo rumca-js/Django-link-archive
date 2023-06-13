@@ -237,7 +237,7 @@ def data_errors_page(request):
         print("fix_reassign_source_to_nullsource_entries done")
 
     def fix_incorrect_youtube_links_links(entries):
-        from ..handlers.youtubelinkhandler import YouTubeLinkHandler
+        from ..pluginentries.youtubelinkhandler import YouTubeLinkHandler
 
         for entry in entries:
             print("Fixing: {} {} {}".format(entry.link, entry.title, entry.source))
@@ -311,7 +311,7 @@ def data_errors_page(request):
 
 
 def fix_reset_youtube_link_details(link_id):
-    from ..handlers.youtubelinkhandler import YouTubeLinkHandler
+    from ..pluginentries.youtubelinkhandler import YouTubeLinkHandler
 
     entry = LinkDataModel.objects.get(id = link_id)
 
@@ -345,7 +345,7 @@ def fix_reset_youtube_link_details(link_id):
 
 
 def fix_reset_youtube_link_details_page(request, pk):
-    from ..handlers.youtubelinkhandler import YouTubeLinkHandler
+    from ..pluginentries.youtubelinkhandler import YouTubeLinkHandler
 
     context = get_context(request)
     context['page_title'] += " - fix youtube links"
@@ -365,7 +365,7 @@ def fix_reset_youtube_link_details_page(request, pk):
 
 
 def fix_source_entries_language(request, pk):
-    from ..handlers.youtubelinkhandler import YouTubeLinkHandler
+    from ..pluginentries.youtubelinkhandler import YouTubeLinkHandler
 
     context = get_context(request)
     context['page_title'] += " - fix source entries language"
@@ -422,7 +422,7 @@ def get_time_stamps(url, start_time, stop_time):
        time -= timedelta(days = 1)
 
 def import_source_from_ia_range_impl(source_url, archive_start, archive_stop):
-    from ..sources.waybackmachine import WaybackMachine
+    from ..services.waybackmachine import WaybackMachine
     wb = WaybackMachine()
 
     for timestamp in get_time_stamps(source_url, archive_start, archive_stop):
@@ -484,7 +484,7 @@ def import_source_from_ia_impl(wb, source_url, source_archive_url, archive_time)
 
     c = Configuration.get_object(str(get_app()))
 
-    from ..sources.rsssourceprocessor import RssSourceProcessor
+    from ..pluginsources.rsssourceprocessor import RssSourceProcessor
 
     proc = RssSourceProcessor(c)
     proc.allow_adding_with_current_time = False
@@ -526,7 +526,7 @@ def show_youtube_link_props(request):
 
             return render(request, get_app() / 'summary_present.html', context)
         else:
-            from ..handlers.youtubelinkhandler import YouTubeLinkHandler
+            from ..pluginentries.youtubelinkhandler import YouTubeLinkHandler
 
             youtube_link = form.cleaned_data['youtube_link']
 

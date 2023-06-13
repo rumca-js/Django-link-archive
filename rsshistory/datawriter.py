@@ -52,10 +52,16 @@ class DataWriter(object):
         self._cfg = config
 
     def write_daily_data(self, day_iso):
+        self._cfg.get_bookmarks_path().mkdir(parents=True, exist_ok = True)
+        self._cfg.get_daily_data_path(day_iso).mkdir(parents=True, exist_ok = True)
+
         writer = SourcesEntriesDataWriter(self._cfg)
         writer.write_for_day(day_iso)
 
     def write_bookmarks(self):
+        self._cfg.get_bookmarks_path().mkdir(parents=True, exist_ok = True)
+        self._cfg.get_daily_data_path().mkdir(parents=True, exist_ok = True)
+
         from .serializers.bookmarksexporter import BookmarksBigExporter
 
         exporter = BookmarksBigExporter(self._cfg)

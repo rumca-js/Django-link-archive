@@ -64,7 +64,7 @@ class RssEntryDetailView(generic.DetailView):
     model = LinkDataModel
 
     def get_context_data(self, **kwargs):
-        from ..handlers.linkcontrollerbuilder import LinkControllerBuilder
+        from ..pluginentries.linkcontrollerbuilder import LinkControllerBuilder
 
         # Call the base implementation first to get the context
         context = super(RssEntryDetailView, self).get_context_data(**kwargs)
@@ -74,9 +74,9 @@ class RssEntryDetailView(generic.DetailView):
             self.object.update_language()
 
         context['page_title'] = self.object.title
-        context['object_controller'] = LinkControllerBuilder.get_controller(self.object)
+        context['object_controller'] = LinkControllerBuilder.get(self.object)
 
-        from ..sources.waybackmachine import WaybackMachine
+        from ..services.waybackmachine import WaybackMachine
         from ..dateutils import DateUtils
         m = WaybackMachine()
         context['archive_org_date'] = m.get_formatted_date(DateUtils.get_date_today())
@@ -103,16 +103,18 @@ def add_entry(request):
         form = EntryForm(request.POST)
 
         # check whether it's valid:
-        if form.is_valid():
-            data = form.get_full_information()
+        valid = form.is_valid()
+        link = request.POST.get("link", "")
 
-            ob = LinkDataModel.objects.filter(link = data['link'])
-            if ob.exists():
-                context['form'] = form
-                context['entry'] = ob[0]
+        ob = LinkDataModel.objects.filter(link = link)
+        if ob.exists():
+            context['form'] = form
+            context['entry'] = ob[0]
 
-                return render(request, get_app() / 'entry_edit_exists.html', context)
+            return render(request, get_app() / 'entry_edit_exists.html', context)
 
+        data = form.get_full_information()
+        if valid:
             if not form.save_form(data):
                 context["summary_text"] = "Could not save link"
                 return render(request, get_app() / 'summary_present.html', context)
