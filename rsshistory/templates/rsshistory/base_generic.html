@@ -19,48 +19,42 @@
   <div class="container-fluid">
     <div class="row">
       <div class="col-sm-2">
-      {% block sidebar %}
-        <ul class="sidebar-nav">
-            <li><a href="{% url 'rsshistory:index' %}">
-                    <div class="mainbutton">
-                        <img src="{% static 'rsshistory/icons/icons8-home-96.png' %}" height=30px />
-                        Home</div></a></li>
-            <li><a href="{% url 'rsshistory:searchinitview' %}">
-                    <div class="mainbutton">
-                        <img src="{% static 'rsshistory/icons/icons8-link-90.png' %}" height=30px />
-                        Search</div></a></li>
-            <li><a href="{% url 'rsshistory:sources' %}">
-                    <div class="mainbutton">
-                        <img src="{% static 'rsshistory/icons/icons8-link-90.png' %}" height=30px />
-                        Sources</div></a></li>
+          <div class="sidebar-nav">
+          {% block sidebar %}
+                <a href="{% url 'rsshistory:index' %}" class="mainbutton">
+                            <img src="{% static 'rsshistory/icons/icons8-home-96.png' %}" height=30px />
+                            Home</a>
+                <a href="{% url 'rsshistory:searchinitview' %}" class="mainbutton">
+                            <img src="{% static 'rsshistory/icons/icons8-link-90.png' %}" height=30px />
+                            Search</a>
+                <a href="{% url 'rsshistory:sources' %}" class="mainbutton">
+                            <img src="{% static 'rsshistory/icons/icons8-link-90.png' %}" height=30px />
+                            Sources</a>
 
-            <hr>
-            {% if user.is_staff %}
+                <hr>
+                {% if user.is_staff %}
 
-            <li><a href="{% url 'rsshistory:admin-page' %}">
-                    <div class="mainbutton">
-                        <img src="{% static 'rsshistory/icons/icons8-configuration-67.png' %}" height=30px />
-                        Admin</div></a></li>
-            {% endif %}
+                <a href="{% url 'rsshistory:admin-page' %}" class="mainbutton">
+                            <img src="{% static 'rsshistory/icons/icons8-configuration-67.png' %}" height=30px />
+                            Admin</a>
+                {% endif %}
 
-            {% if user.is_authenticated %}
-            <li><a href="{% url 'rsshistory:user-config' %}">
-                    <div class="mainbutton">
-                        <img src="{% static 'rsshistory/icons/icons8-configuration-67.png' %}" height=30px />User: {{ user.get_username }}</div></a></li>
-            <li><a href="{% url 'rsshistory:logout' %}">
-                    <div class="mainbutton">
-                        <img src="{% static 'rsshistory/icons/icons8-logout-100.png' %}" height=30px />
-                        Logout</div></a></li>
-            <hr>
-            {% else %}
-            <li><a href="{% url 'rsshistory:login' %}">
-                    <div class="mainbutton">
-                        <img src="{% static 'rsshistory/icons/icons8-login-100.png' %}" height=30px />
-                        Login</div></a></li>
-            <hr>
-            {% endif %}
-        </ul>
-     {% endblock %}
+                {% if user.is_authenticated %}
+                <a href="{% url 'rsshistory:user-config' %}" class="mainbutton">
+                            <img src="{% static 'rsshistory/icons/icons8-configuration-67.png' %}" height=30px />User: {{ user.get_username }}
+                            </a>
+                <a href="{% url 'rsshistory:logout' %}" class="mainbutton">
+                            <img src="{% static 'rsshistory/icons/icons8-logout-100.png' %}" height=30px />
+                            Logout</a>
+                <hr>
+                {% else %}
+                <a href="{% url 'rsshistory:login' %}"  class="mainbutton">
+                            <img src="{% static 'rsshistory/icons/icons8-login-100.png' %}" height=30px />
+                            Login</a>
+                <hr>
+                {% endif %}
+         {% endblock %}
+          </div>
       </div>
       <div class="col-sm-10 page-body">{% block content %}{% endblock %}
           <p>

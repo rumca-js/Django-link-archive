@@ -59,7 +59,7 @@ class BaseParsePlugin(BasePlugin):
                 if objs.exists():
                     continue
 
-                return self.get_link_data(self.source, link_str)
+                props.append(self.get_link_data(self.source, link_str))
 
             return props
         except Exception as e:

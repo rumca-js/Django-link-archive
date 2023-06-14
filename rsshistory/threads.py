@@ -50,34 +50,22 @@ class ThreadJobCommon(threading.Thread):
         try:
             if self._itemless:
                 self.process_item()
-        except Exception as E:
-            logging.critical(E, exc_info=True)
-            traceback.print_exc(file=sys.stdout)
 
-        item = self.get_process_item()
-        if item is None:
-            return False
+            item = self.get_process_item()
+            if item is None:
+                return False
 
-        try:
             self._process_item = item
             self.process_item(item)
             self._process_item = None
-        except Exception as E:
-            logging.critical(E, exc_info=True)
-            traceback.print_exc(file=sys.stdout)
 
-        try:
             self.finished_item(item)
+
+            if len(self._process_list) == 0:
+                self.finished_all()
         except Exception as E:
             logging.critical(E, exc_info=True)
             traceback.print_exc(file=sys.stdout)
-
-        if len(self._process_list) == 0:
-            try:
-                self.finished_all()
-            except Exception as E:
-                logging.critical(E, exc_info=True)
-                traceback.print_exc(file=sys.stdout)
 
         return True
 

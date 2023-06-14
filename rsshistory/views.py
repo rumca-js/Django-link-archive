@@ -29,6 +29,10 @@ def init_context(request, context):
     context['user_config'] = UserConfig.get()
     context['config'] = ConfigurationEntry.get()
 
+    from django_user_agents.utils import get_user_agent
+    user_agent = get_user_agent(request)
+    context["is_mobile"] = user_agent.is_mobile
+
     return context
 
 def get_context(request = None):

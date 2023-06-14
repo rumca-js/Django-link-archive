@@ -38,7 +38,6 @@
       <a href="{% url 'rsshistory:source-archive' object.id %}" class="simplebutton">Archive.org save</a>
     {% endif %}
     <a href="{% url 'rsshistory:import-source-ia' object.id %}" class="simplebutton">Import Archive.org</a>
-    <!--a href="{% url 'rsshistory:source-process-text' object.id %}" class="simplebutton">Source process text</a-->
   {% endif %}
     </p>
   {% if user.is_staff %}

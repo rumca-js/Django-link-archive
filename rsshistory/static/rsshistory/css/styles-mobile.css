@@ -30,7 +30,6 @@ input {
 box-shadow: none;
   display: block;
   color: black;
-  /* padding: 3px 15px; */
   text-align: left;
   text-decoration: none;
   /* text-decoration: underline; */
@@ -51,12 +50,10 @@ display: contents;
   padding: 3px 15px;
   text-align: center;
   text-decoration: none;
-  /* text-decoration: underline; */
-  display: inline-block;
-  /* border: 1px solid #373737; */
-  /* border-bottom: 1px solid blue; */
   background-color: #e9e9e9;
   border-radius: 10px;
+  box-shadow: 1px 1px grey;
+  display: inline-block;
 }
 
 .simplebutton:hover {

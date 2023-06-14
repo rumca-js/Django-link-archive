@@ -4,6 +4,8 @@
     margin-top: 20px;
     padding: 0;
     list-style: none;
+    display: flex;
+    flex-direction: column;
 }
 .page-body {
     background-color:#F9F9F9
@@ -57,6 +59,7 @@ display: contents;
   border-radius: 10px;
   box-shadow: 1px 1px grey;
   display: inline-block;
+  margin: 1px;
 }
 
 .simplebutton:hover {

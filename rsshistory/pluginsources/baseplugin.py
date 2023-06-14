@@ -19,7 +19,7 @@ class BasePlugin(Page):
         return True
 
     def get_link_props(self):
-        return {}
+        return []
 
     def check_for_data(self):
         from ..dateutils import DateUtils
@@ -56,6 +56,9 @@ class BasePlugin(Page):
             num_entries = len(links_data)
 
             for link_data in links_data:
+                if not link_data:
+                    continue
+
                 #print("Adding link {}".format(link_data['link']))
                 objs = LinkDataModel.objects.filter(link=link_data['link'])
                 if objs.exists():
