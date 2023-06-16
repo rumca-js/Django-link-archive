@@ -55,7 +55,7 @@ def entry_add_comment(request, link_id):
 
     form.method = "POST"
     form.pk = link_id
-    form.action_url = reverse('rsshistory:entry-comment-add', args=[link_id])
+    form.action_url = reverse('{}:entry-comment-add'.format(get_app()), args=[link_id])
 
     context['form'] = form
     context['form_title'] = link.title
@@ -98,7 +98,7 @@ def entry_comment_edit(request, pk):
         form = CommentEntryForm(instance = comment_obj)
         form.method = "POST"
         form.pk = pk
-        form.action_url = reverse('rsshistory:entry-comment-edit', args=[pk])
+        form.action_url = reverse('{}:entry-comment-edit'.format(get_app()), args=[pk])
 
         context['form'] = form
         context['form_title'] = link.title

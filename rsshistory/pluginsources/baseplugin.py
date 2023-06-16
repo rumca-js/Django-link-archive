@@ -41,8 +41,7 @@ class BasePlugin(Page):
             total_time = stop_time - start_time
             total_time.total_seconds()
 
-            if num_entries != 0:
-                source.set_operational_info(stop_time, num_entries, total_time.total_seconds())
+            source.set_operational_info(stop_time, num_entries, total_time.total_seconds())
 
         except Exception as e:
             error_text = traceback.format_exc()

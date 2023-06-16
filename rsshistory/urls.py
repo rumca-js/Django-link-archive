@@ -46,7 +46,8 @@ urlpatterns = [
    path('tags-entry-remove/<int:entrypk>/', viewtags.tags_entry_remove, name='tags-entry-remove'),
    path('tags-entry-show/<int:entrypk>/', viewtags.tags_entry_show, name='tags-entry-show'),
    path('tag-rename', viewtags.tag_rename, name='tag-rename'),
-   path('show-tags', viewtags.show_tags, name='show-tags'),
+   path('tags-show-all', viewtags.AllTags.as_view(), name='tags-show-all'),
+   path('tags-show-recent', viewtags.RecentTags.as_view(), name='tags-show-recent'),
 
    # comment
    path('entry-comment-add/<int:link_id>', viewcomments.entry_add_comment, name='entry-comment-add'),

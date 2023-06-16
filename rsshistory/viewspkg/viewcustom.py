@@ -56,7 +56,7 @@ def configuration_page(request):
     form = ConfigForm(instance = ob)
 
     form.method = "POST"
-    form.action_url = reverse('rsshistory:configuration')
+    form.action_url = reverse('{}:configuration'.format(get_app()))
 
     context['config_form'] = form
 
@@ -466,7 +466,7 @@ def import_source_from_ia(request, pk):
              'archive_start' : date.today() - timedelta(days = 1),
              'archive_stop' : date.today()})
     form.method = "POST"
-    #form.action_url = reverse('rsshistory:configuration')
+    #form.action_url = reverse('{}:configuration'.format(get_app()))
 
     context['form'] = form
 
@@ -513,7 +513,7 @@ def show_youtube_link_props(request):
     if not request.method == 'POST':
         form = YouTubeLinkSimpleForm(initial={'youtube_link' : youtube_link})
         form.method = "POST"
-        form.action_url = reverse('rsshistory:show-youtube-link-props')
+        form.action_url = reverse('{}:show-youtube-link-props'.format(get_app()))
         context['form'] = form
 
         return render(request, get_app() / 'form_basic.html', context)
@@ -703,7 +703,7 @@ def user_config(request):
         form = UserConfigForm(instance=obs[0])
 
     form.method = "POST"
-    form.action_url = reverse('rsshistory:user-config')
+    form.action_url = reverse('{}:user-config'.format(get_app()))
 
     context['config_form'] = form
 

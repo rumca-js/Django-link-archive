@@ -49,13 +49,9 @@ class RssEntriesListView(generic.ListView):
 
         self.filter_form.create()
         self.filter_form.method = "GET"
-        self.filter_form.action_url = reverse('rsshistory:entries')
+        self.filter_form.action_url = reverse('{}:entries'.format(get_app()))
 
         context['filter_form'] = self.filter_form
-
-        from django_user_agents.utils import get_user_agent
-        user_agent = get_user_agent(self.request)
-        context["is_mobile"] = user_agent.is_mobile
 
         return context
 
@@ -143,7 +139,7 @@ def add_entry(request):
         author = request.user.username
         form = EntryForm(initial={'user' : author})
         form.method = "POST"
-        form.action_url = reverse('rsshistory:entry-add')
+        form.action_url = reverse('{}:entry-add'.format(get_app()))
         context['form'] = form
 
         context['form_title'] = "Add new entry"
@@ -204,7 +200,7 @@ def edit_entry(request, pk):
         form = EntryForm(instance=ob)
         #form.fields['user'].initial = request.user.username
         form.method = "POST"
-        form.action_url = reverse('rsshistory:entry-edit', args=[pk])
+        form.action_url = reverse('{}:entry-edit'.format(get_app()), args=[pk])
         context['form'] = form
         return render(request, get_app() / 'form_basic.html', context)
 
@@ -256,7 +252,7 @@ def search_init_view(request):
     filter_form = EntryChoiceForm(args = request.GET)
     filter_form.create()
     filter_form.method = "GET"
-    filter_form.action_url = reverse('rsshistory:entries')
+    filter_form.action_url = reverse('{}:entries'.format(get_app()))
 
     context['form'] = filter_form
 
@@ -360,7 +356,7 @@ def import_entries(request):
     else:
         form = ImportEntriesForm()
         form.method = "POST"
-        form.action_url = reverse('rsshistory:entries-import')
+        form.action_url = reverse('{}:entries-import'.format(get_app()))
         context["form"] = form
         return render(request, get_app() / 'form_basic.html', context)
 
@@ -394,7 +390,7 @@ class NotBookmarkedView(generic.ListView):
 
         self.filter_form.create()
         self.filter_form.method = "GET"
-        self.filter_form.action_url = reverse('rsshistory:entries-untagged')
+        self.filter_form.action_url = reverse('{}:entries-untagged'.format(get_app()))
 
         context['filter_form'] = self.filter_form
 

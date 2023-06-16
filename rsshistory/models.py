@@ -186,7 +186,7 @@ class RssSourceImportHistory(models.Model):
 
 
 class RssSourceExportHistory(models.Model):
-    date = models.DateField()
+    date = models.DateField(unique=True, null=False)
 
     class Meta:
         ordering = ['-date']
@@ -397,6 +397,9 @@ class LinkTagsDataModel(models.Model):
 
     link_obj = models.ForeignKey(LinkDataModel, on_delete=models.CASCADE, related_name='tags', null=True,
                                  blank=True)
+
+    class Meta:
+        ordering = ['-date']
 
     def get_delim():
         return ","

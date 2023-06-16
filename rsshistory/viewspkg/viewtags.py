@@ -2,6 +2,8 @@ from django.views import generic
 from django.urls import reverse
 from django.shortcuts import render
 
+from datetime import datetime, timedelta
+
 from ..models import SourceDataModel, LinkDataModel
 from ..models import LinkTagsDataModel
 from ..prjconfig import Configuration
@@ -21,42 +23,72 @@ def get_app():
     return app_name
 
 
-def show_tags(request):
+class AllTags(generic.ListView):
+    model = LinkTagsDataModel
+    context_object_name = 'tags_list'
+    paginate_by = 9200
 
-    context = get_context(request)
-    context['page_title'] += " - browse tags"
+    def get_tags_objects(self):
+        return LinkTagsDataModel.objects.all()
 
-    # TODO select only this month
-    objects = LinkTagsDataModel.objects.all()
+    def get_queryset(self):
+        objects = self.get_tags_objects()
 
-    tags = objects.values('tag')
+        tags = objects.values('tag')
 
-    result = {}
-    for item in tags:
-        tag = item['tag']
-        if tag in result:
-            result[item['tag']] += 1
-        else:
-            result[item['tag']] = 1
+        result = {}
+        for item in tags:
+            tag = item['tag']
+            if tag in result:
+                result[item['tag']] += 1
+            else:
+                result[item['tag']] = 1
 
-    result_list = []
-    for item in result:
-        result_list.append([item, result[item]])
+        self.result_list = []
+        for item in result:
+            self.result_list.append([item, result[item]])
 
-    def map_func(elem):
-        return elem[1]
+        self.result_list = sorted(self.result_list, key=lambda x: (x[1], x[0]), reverse=True)
 
-    result_list = sorted(result_list, key = map_func, reverse=True)
+        return objects
 
-    text = ""
-    for tag in result_list:
-        link = '{}?tag="{}"'.format(reverse('rsshistory:entries'), tag[0])
-        link_text = str(tag[0]) + " " + str(tag[1])
-        text += "<span><a href='{0}' class=\"simplebutton\" style=\"margin: 5px\">{1}</a></span> ".format(link, link_text)
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get the context
+        context = super(AllTags, self).get_context_data(**kwargs)
+        context = init_context(self.request, context)
+        # Create any data and add it to the context
 
-    context["summary_text"] = text
+        context['page_title'] += " - all tags"
+        context['tag_objects'] = self.result_list
+        context['tags_title'] = "All tags"
 
-    return render(request, get_app() / 'tags_view.html', context)
+        return context
+
+
+class RecentTags(AllTags):
+    model = LinkTagsDataModel
+    context_object_name = 'tags_list'
+    paginate_by = 9200
+
+    def get_time_range(self):
+        start = datetime.now() - timedelta(days=30)
+        stop = datetime.now() + timedelta(days=1)
+        return [start, stop]
+
+    def get_tags_objects(self):
+        return LinkTagsDataModel.objects.filter(date__range = self.get_time_range())
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get the context
+        context = super(RecentTags, self).get_context_data(**kwargs)
+        time_range = self.get_time_range()
+        context['tags_title'] = "Recent tags: {} {}".format(time_range[0].date(), time_range[1].date())
+
+        return context
+
+        #link = '{}?tag="{}"'.format(reverse('{}:entries'.format(get_app())), tag[0])
+        #link_text = str(tag[0]) + " " + str(tag[1])
+        #text += "<span><a href='{0}' class=\"simplebutton\" style=\"margin: 5px\">{1}</a></span> ".format(link, link_text)
 
 
 def tag_entry(request, pk):
@@ -116,7 +148,7 @@ def tag_entry(request, pk):
 
         form.method = "POST"
         form.pk = pk
-        form.action_url = reverse('rsshistory:entry-tag', args=[pk])
+        form.action_url = reverse('{}:entry-tag'.format(get_app()), args=[pk])
         context['form'] = form
         context['form_title'] = obj.title
         context['form_description'] = obj.title
@@ -206,7 +238,7 @@ def tag_rename(request):
         form = TagRenameForm()
 
         form.method = "POST"
-        form.action_url = reverse('rsshistory:tag-rename')
+        form.action_url = reverse('{}:tag-rename'.format(get_app()))
 
         context['form'] = form
         context['form_title'] = "Rename tag"

@@ -39,14 +39,10 @@ class RssSourceListView(generic.ListView):
 
         self.filter_form.create()
         self.filter_form.method = "GET"
-        self.filter_form.action_url = reverse('rsshistory:sources')
+        self.filter_form.action_url = reverse('{}:sources'.format(get_app()))
 
         context['filter_form'] = self.filter_form
         context['page_title'] += " - news source list"
-
-        from django_user_agents.utils import get_user_agent
-        user_agent = get_user_agent(self.request)
-        context["is_mobile"] = user_agent.is_mobile
 
         return context
 
@@ -99,7 +95,7 @@ def add_source(request):
     else:
         form = SourceForm()
         form.method = "POST"
-        form.action_url = reverse('rsshistory:source-add')
+        form.action_url = reverse('{}:source-add'.format(get_app()))
         context['form'] = form
 
         context['form_title'] = "Add new source"
@@ -151,7 +147,7 @@ def edit_source(request, pk):
             form = SourceForm(instance=ob)
 
         form.method = "POST"
-        form.action_url = reverse('rsshistory:source-edit', args=[pk])
+        form.action_url = reverse('{}:source-edit'.format(get_app()), args=[pk])
         context['form'] = form
         return render(request, get_app() / 'form_basic.html', context)
 
@@ -222,7 +218,7 @@ def import_sources(request):
     else:
         form = ImportSourcesForm()
         form.method = "POST"
-        form.action_url = reverse('rsshistory:sources-import')
+        form.action_url = reverse('{}:sources-import'.format(get_app()))
         context["form"] = form
         return render(request, get_app() / 'form_basic.html', context)
 

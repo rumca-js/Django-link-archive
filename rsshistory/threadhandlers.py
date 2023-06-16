@@ -299,7 +299,7 @@ class RefreshThreadHandler(ThreadJobCommon):
 
     def __init__(self, name="RefreshThreadHandler"):
         itemless = True
-        seconds_wait = 10
+        seconds_wait = 900
         ThreadJobCommon.__init__(self, name, seconds_wait, itemless)
 
     def get_process_item(self):
@@ -347,24 +347,24 @@ class HandlerManager(object):
 
        refresh_thread = RefreshThreadHandler("refresh-thread")
 
-       # do no add anythiing to push to repo thread. It cannot be blocked by other things
-       handlers = [PushToRepoJobHandler()]
-       repo_thread = MultiJobHandler("push-to-repo-thread", handlers)
-
        # proessing new RSS sources is priority, should be at the first place
-       handlers = [ProcessSourceJobHandler(), LinkAddJobHandler(), 
-                   LinkDownloadJobHandler(), LinkMusicDownloadJobHandler(),
-                   LinkVideoDownloadJobHandler()]
-       short_jobs = MultiJobHandler("short-jobs-thread", handlers)
-       
-       handlers = [LinkArchiveJobHandler(), WriteDailyDataJobHandler(), WriteBookmarksJobHandler(), WriteTopicJobHandler()]
-       long_jobs = MultiJobHandler("long-jobs-thread", handlers)
+       handlers = [
+               PushToRepoJobHandler(),
+               ProcessSourceJobHandler(),
+               LinkAddJobHandler(), 
+               LinkDownloadJobHandler(),
+               LinkMusicDownloadJobHandler(),
+               LinkVideoDownloadJobHandler(),
+               LinkArchiveJobHandler(),
+               WriteDailyDataJobHandler(),
+               WriteBookmarksJobHandler(), 
+               WriteTopicJobHandler(),
+                   ]
+       jobs_thread = MultiJobHandler("jobs-thread", handlers)
 
        self.threads = [
                refresh_thread,
-               repo_thread,
-               short_jobs,
-               long_jobs,
+               jobs_thread,
                ]
 
        for athread in self.threads:
