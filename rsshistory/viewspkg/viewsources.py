@@ -178,11 +178,6 @@ def refresh_source(request, pk):
         op.date_fetched = None
         op.save()
 
-    c = Configuration.get_object(str(get_app()))
-    if not c.thread_mgr:
-        context['summary_text'] = "Source added, but could not add to queue - missing threads"
-        return render(request, get_app() / 'summary_present.html', context)
-
     BackgroundJob.download_rss(ob, True)
 
     context['summary_text'] = "Source added to refresh queue"

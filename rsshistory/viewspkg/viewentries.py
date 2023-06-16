@@ -125,11 +125,6 @@ def add_entry(request):
             if ob.exists():
                 context['entry'] = ob[0]
 
-            c = Configuration.get_object(str(get_app()))
-            if not c.thread_mgr:
-                context['summary_text'] = "Source added, but could not add to queue - missing threads"
-                return render(request, get_app() / 'entry_added.html', context)
-
             if ConfigurationEntry.get().link_archive:
                 BackgroundJob.link_archive(data['link'])
 
@@ -267,6 +262,7 @@ def search_init_view(request):
 
     return render(request, get_app() / 'form_search.html', context)
 
+
 def make_persistent_entry(request, pk):
     context = get_context(request)
     context['page_title'] += " - persistent entry"
@@ -284,11 +280,7 @@ def make_persistent_entry(request, pk):
     entry.save()
 
     if prev_state != True:
-       c = Configuration.get_object(str(get_app()))
-       if not c.thread_mgr:
-           context['summary_text'] = "Source added, but could not add to queue - missing threads"
-           return render(request, get_app() / 'summary_present.html', context)
-       c.thread_mgr.wayback_save(entry.link)
+        BackgroundJob.link_archive(entry.link)
 
     summary_text = "Link changed to state: " + str(entry.persistent)
 

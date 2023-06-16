@@ -743,9 +743,7 @@ def download_music(request, pk):
     else:
         context["summary_text"] = "Failed to add to download queue"
 
-    c = Configuration.get_object(str(get_app()))
-    if c.thread_mgr:
-        c.thread_mgr.download_music(ft[0])
+    BackgroundJob.download_music(ft[0])
 
     return render(request, get_app() / 'summary_present.html', context)
 
@@ -763,9 +761,7 @@ def download_video(request, pk):
     else:
         context["summary_text"] = "Failed to add to download queue"
 
-    c = Configuration.get_object(str(get_app()))
-    if c.thread_mgr:
-        c.thread_mgr.download_video(ft[0])
+    BackgroundJob.download_video(ft[0])
 
     return render(request, get_app() / 'summary_present.html', context)
 
@@ -782,3 +778,33 @@ class BackgroundJobsView(generic.ListView):
         context['BackgroundJob'] = len(BackgroundJob.objects.all())
 
         return context
+
+
+def backgroundjob_remove(request, pk):
+    context = get_context(request)
+    context['page_title'] += " - Background job remove"
+
+    if not request.user.is_staff:
+        return render(request, get_app() / 'missing_rights.html', context)
+
+    bg = BackgroundJob.objects.get(id=pk)
+    bg.delete()
+
+    context["summary_text"] = "Background job has been removed"
+
+    return render(request, get_app() / 'summary_present.html', context)
+
+
+def backgroundjobs_remove(request, job_type):
+    context = get_context(request)
+    context['page_title'] += " - Background jobs remove"
+
+    if not request.user.is_staff:
+        return render(request, get_app() / 'missing_rights.html', context)
+
+    jobs = BackgroundJob.objects.filter(job=job_type)
+    jobs.delete()
+
+    context["summary_text"] = "Background jobs has been removed"
+
+    return render(request, get_app() / 'summary_present.html', context)

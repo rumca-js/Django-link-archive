@@ -27,10 +27,12 @@
                 <a href="{% url 'rsshistory:searchinitview' %}" class="mainbutton">
                             <img src="{% static 'rsshistory/icons/icons8-link-90.png' %}" height=30px />
                             Search</a>
+                <a href="{% url 'rsshistory:show-tags' %}" class="mainbutton">
+                            <img src="{% static 'rsshistory/icons/icons8-link-90.png' %}" height=30px />
+                            Tags</a>
                 <a href="{% url 'rsshistory:sources' %}" class="mainbutton">
                             <img src="{% static 'rsshistory/icons/icons8-link-90.png' %}" height=30px />
                             Sources</a>
-
                 <hr>
                 {% if user.is_staff %}
 

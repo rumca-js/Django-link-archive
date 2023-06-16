@@ -102,10 +102,6 @@ class YouTubeJson(object):
             if "chapters" in self._json:
                 return self._json["chapters"]
 
-    def get_artist(self):
-        if len(self._json) > 0:
-            return self._json["artist"]
-
     def get_channel_name(self):
         if len(self._json) > 0:
             return self._json["channel"]

@@ -7,7 +7,11 @@
   {% if jobs_list %}
     <ul>
     {% for job in jobs_list %}
-    <li>{{job.job}} {{job.task}} {{job.subject}} {{job.args}} </li>
+    <li>
+        {{job.job}} {{job.task}} {{job.subject}} {{job.args}} 
+        <a href="{% url 'rsshistory:backgroundjob-remove' job.id %}" class="simplebutton">Remove</a>
+        <a href="{% url 'rsshistory:backgroundjobs-remove' job.job %}" class="simplebutton">Remove all in type</a>
+    </li>
     {% endfor %}
     </ul>
   {% endif %}

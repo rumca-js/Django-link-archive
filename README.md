@@ -1,37 +1,39 @@
-Link database, with RSS functionality. Similar to Reddit, but completly open source, on your local machine.
+Link database, with RSS functionality. Similar to Reddit, but completely open source, on your local machine.
 
 # Features
 
- - Local data, no algorithms, no advertisments
+ - Local data, no algorithms, no advertisements
  - Web GUI, accessible from anywhere (LAN, public, however it is configured)
  - Search ability (Google-like), by language, author, tags
  - Ability to extend, to provide custom plugins, parse HTML pages
  - RSS feed support (RSS sources)
  - Sources management: adding, removing, configuration
- - Link managment: manual adding, removing, configuration, bookmark support, tag support, admin user comments
- - Minimal aestethic: no distraction, compact layout
+ - Link management: manual adding, removing, configuration, bookmark support, tag support, admin user comments
+ - Minimal aesthetic: no distraction, compact layout
  - Configurable: lists, timeouts
  - Automatic git export, RSS source import
  - Minimal installation, integrator may choose however to use production environment, with a good Database engine. Just as it is supported by Django. I am using SQLite without any problems.
- - Support for web archive. Link rot mitigation
+ - Support for web archive
 
 ## Problems with other RSS readers, or apps
 
- - Currently Nextcloud 'News' plugin does not provide: tag support, search ability
- - Thunderbird does not allow tagging, searching links by tags
+ - Most RSS clients do not allow manual link input
  - Feedly is not local, does not store your data on your hardware
- - Feeder (phone) does not provide search ability, nor tagging. Cannot configure 'view' for my liking
- - Newsboat is CLI, and it does not provide exhaustive search capabilities
- - Most do not allow to input links manually
- - Most fail to provide consistent search ability
- - Reddit is a nice project, but does not add RSS links automatically, requires a lot of resources to run. Reddit aim is to provide social media experience, while this project aims to grant the ability to create database of links
+ - Most programs fail to provide consistent and exhaustive search ability (NextCloud "News" application, Thunderbird, Feeder Android app, Newsboat Linux app)
+ - Most programs do not provide ability to add tag to a link (Thunderbird, Android Feeder app)
+ - Scale: Lemmy software is replacement for Reddit, but requires a lot of resources to operate. This project aims to provide "single user" experience
+ - Goal: Reddit, Lemmy aim is to provide social media experience, this project aims to grant the ability to create database of links
+ - Extensions: In Django project it is relatively easy to add new view
+ - License: Reddit is a nice project, but it is not entirely open source
+ - Interface: Most of the programs are clients (Thunderbird, Feeder, Newsboat), where it is needed to create app that works as a server, so that it can be managed from all devices in LAN, or in public space, if it is configured to operate in that mode
 
 ## Possible use cases
 
- - YouTube link database
- - Database of important links, for work, for school
+ - YouTube link database, link aggregator
+ - Database of important links: for work, for school
  - RSS client
- - Reddit/diggit replacement
+ - Reddit/lemmy/diggit replacement
+ - Data analysis - analyze link rot, how many a page is cited by other sources
 
 ## UI
 
@@ -49,7 +51,10 @@ Installation, just as any other Django app. Link [https://docs.djangoproject.com
 
  - pip3 install feedparser
  - pip3 install python-dateutil
- - yt-dlp [https://github.com/yt-dlp/yt-dlp](https://github.com/yt-dlp/yt-dlp)
+ - pip3 install django-user-agents
+ - yt-dlp [https://github.com/yt-dlp/yt-dlp](https://github.com/yt-dlp/yt-dlp), to obtain youtube information
+ - wget, optional
+ - id3v2, optional
 
 ## Suite of projects
 
@@ -60,17 +65,10 @@ Installation, just as any other Django app. Link [https://docs.djangoproject.com
  - daily RSS Git repository for the year 2021 [https://github.com/rumca-js/RSS-Link-Database-2021](https://github.com/rumca-js/RSS-Link-Database-2021)
  - daily RSS Git repository for the year 2020 [https://github.com/rumca-js/RSS-Link-Database-2020](https://github.com/rumca-js/RSS-Link-Database-2020)
 
-## Goal
+## Development
 
- - Archive. I want to 'store important links'
- - Data analysis - possible to verify link rot, etc.
- - Google sucks at providing results for various topics (dead internet)
-
-Development:
-
- - KISS. Project should be of small footprint
- - It should be small, easy to setup
- - I did not focus on supporting multiple users, it is designed currently on small scale projects
+ - installation should be simple and easy
+ - KISS. Project should be of small footprint. For a single user it should be able to operate for one user on a raspberry PI
 
 ## Inspirations
 
@@ -83,29 +81,28 @@ Development:
 
 # Data
 
-Program is able to store bookmarked links, and links for each day.
+Program maintains two repositories: one for bookmarked links, and daily repository.
 
-Each day has it's own directory. Therefore it is easy to regenerate data for a particular day, without disturbing other data.
+Each day bookmarks and daily repositories are updated with new data. Daily repository is updated when day finishes, then the complete daily data are pushed into the repository.
 
 ## Bookmarks
 
- - three file formats: JSON, markdown, rss
- - contains articles that I have selected as intresting, or noteworthy, or funny, or whathever
+ - three file formats: JSON, markdown, RSS
+ - contains articles that I have selected as interesting, or noteworthy, or funny, or whatever
  - files are split by 'language' and 'year' categories
  - markdown file is generated as a form of preview, JSON can be reused, imported
- - links are highlighted, but that does not necessarily mean something is endorsed. It shows particular intrest in topic. It is indication of importance
+ - links are bookmarked, but that does not necessarily mean something is endorsed. It shows particular interest in topic. It is indication of importance
  
 ## Daily Data
 
  - RSS links are captured for each source separately
  - two files formats for each day and source: JSON and markdown
  - markdown file is generated as a form of preview, JSON can be reused, imported
- - links are bookmarked, but that does not necessarily mean something is endorsed. It shows particular intrest in topic. It is indication of importance. Such links are stored 'forever'
 
 ## Sources
 
  - provided in sources.json file
- - provides information about sources, like title, url, langugage
+ - provides information about sources, like: title, url, langugage
 
 ## Data analysis
 
@@ -122,30 +119,26 @@ With these data we can perform further analysis:
  - Google fails to deliver content of small creators (blogs etc. private pages). Google focuses on corporate hosting, or deliver products that make investors happy. Most common links are towards YouTube, Google maps, Facebook, Reddit
  - We cannot replace Google search, since I do not have processing power for that. For programming problems I still go to Google, to find specific information
  - Google provides only 31 pages of news (in news filter) and around 10 pages for ordinary search. This is a very small number. It is like looking through keyhole at the Internet
- - This link database, with more than 100 of sources provides many useful data. For example after searching for 'covid' in links I have thounsands of results, just as I would expect
+ - This link database, with more than 100 of sources provides many useful data. For example after searching for 'covid' in links I have thousands of results, just as I would expect
  - Dead Internet is not a problem for me, since I do not capture data from bot farms
- - Some topics are so popular, that all of the sources write about it, and I am swamped with links about recent crisises
+ - Some topics are so popular, that all of the sources write about it, and I am swamped with links about recent crisis
  - Even though I have 100 sources, I still find useful info from outside of my sources. Some through YouTube, some through Reddit, etc.
- - Link rot is real. Some of archived links may be not working after some time. This is especially true for msn, and yahoo, which quite fast delete older links from their database
+ - Link rot is real. Some of archived links may be not working after some time. This is especially true for MSN, and yahoo, which quite fast delete older links from their database
  - It is hard to define which sources are to be added into database. Even though I have more than 100 sources, I check regularly only a handful of them
 
 I could not decide if my link database should be public or not. Therefore I created two environments:
  - public, with all important information
  - private, with links that are not relevant for the public
 
-## Analysis of Tools
+## Analysis of tools and services
 
 Archive.org:
  - Is not reliable. Sometimes it gets painfully slow. It is still better than nothing
  - Most mainstream media RSS is covered, but the coverage is spotty. Not all days are covered
  - Internet Archive (archive.org) does not provide snapshots for each and every day for all RSS sources. It is sometimes pretty slow. We would like to be sure that a such snapshot takes place. Therefore we need to export links to daily repo ourselves. Django RSS app also makes requests to archive to make the snapshots
 
-RSS tools:
- - Some do not provide ability to bookmark entries
- - Some do not provide ability to add tags entries (useful for searching entries with a particular tag)
- - Some do not provide ability to search for a particular title, etc. Searching mechanisms are limiting
- - There is no ability to fetch archived data. I have been using archive.org to import historic RSS data, but not all data are available
- - Some of RSS tools are not local (feedly), which for me is a problem
+archive.ph:
+ - does not support link + date URL interface
 
 ## Legal
 
