@@ -2,7 +2,7 @@ import traceback
 import re
 
 from .baseplugin import BasePlugin
-from ..models import PersistentInfo
+from ..models import PersistentInfo, LinkDataModel
 
 
 class BaseParsePlugin(BasePlugin):
@@ -26,7 +26,9 @@ class BaseParsePlugin(BasePlugin):
         return False
 
     def get_link_data(self, source, link):
+        from ..webtools import Page
         from ..dateutils import DateUtils
+
         output_map = {}
 
         link_ob = Page(link)

@@ -1,8 +1,8 @@
-from .baseplugin import BasePlugin
+from .baseparseplugin import BaseParsePlugin
 import re
 
 
-class InstalkiPlugin(BasePlugin):
+class InstalkiPlugin(BaseParsePlugin):
     PLUGIN_NAME = "InstalkiPlugin"
 
     def __init__(self, source):
@@ -10,7 +10,7 @@ class InstalkiPlugin(BasePlugin):
 
     def is_link_valid(self, address):
         if not self.is_link_valid_domain(address):
-            return False;
+            return False
 
         search_pattern = self.get_domain() + "/aktualno"
 

@@ -1,8 +1,8 @@
 import re
-from .baseplugin import BasePlugin
+from .baseparseplugin import BaseParsePlugin
 
 
-class NiezaleznaPlugin(BasePlugin):
+class NiezaleznaPlugin(BaseParsePlugin):
     PLUGIN_NAME = "NiezaleznaPlugin"
 
     def __init__(self, source):

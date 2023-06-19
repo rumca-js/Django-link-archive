@@ -11,10 +11,6 @@
     <input type="submit" value="Submit">
 </form>
 
-  {% if user.is_staff %}
-  <p>
-  <a href="{% url 'rsshistory:entries-untagged' %}" class="simplebutton">Untagged bookmarks</a>
-  </p>
-  {%endif%}
+
 
 {% endblock %}

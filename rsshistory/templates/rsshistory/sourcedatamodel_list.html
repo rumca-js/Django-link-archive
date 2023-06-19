@@ -4,10 +4,10 @@
 {% block content %}
 
   <a href="{% url 'rsshistory:source-add' %}" class="mainbutton">
-        <img src="{% static 'rsshistory/icons/icons8-channel-add-96.png' %}" height=30px />
+      <img src="{% static 'rsshistory/icons/icons8-channel-add-96.png' %}" height="{{icon_size}}" />
         Add source</a>
   <a href="{% url 'rsshistory:entry-add' %}" class="mainbutton">
-        <img src="{% static 'rsshistory/icons/icons8-add-link-96.png' %}" height=30px />
+        <img src="{% static 'rsshistory/icons/icons8-add-link-96.png' %}" height="{{icon_size}}" />
         Add entry</a>
 
   <hr>

@@ -20,7 +20,8 @@ def init_context(request, context):
     context['page_title'] = "Link Archive"
     context["django_app"] = str(app_name)
     context["base_generic"] = str(app_name / "base_generic.html")
-    context["icon_size"] = "30px"
+    context["icon_size"] = "20px"
+    context["email"] = "renegat@renegat0x0.ddns.net"
 
     c = Configuration.get_object(str(app_name))
     context['app_version'] = c.version

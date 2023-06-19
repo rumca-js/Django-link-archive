@@ -14,6 +14,15 @@ To start server
 make run
 ```
 
+## User
+
+Create super user, as usual in Django [https://www.geeksforgeeks.org/how-to-create-superuser-in-django/](https://www.geeksforgeeks.org/how-to-create-superuser-in-django/)
+```
+python manage.py createsuperuser
+```
+
+Create also other users, as required by your setup, environment.
+
 ## Notes
 
  - it is best to use on a device with SSD

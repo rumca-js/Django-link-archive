@@ -117,9 +117,7 @@ class Page(object):
 
     def get_links_re(self):
         cont = str(self.get_contents())
-        print(cont)
-        allt = re.findall("(https?://[a-zA-Z0-9./]+)", cont)
-        print(allt)
+        allt = re.findall("(https?://[a-zA-Z0-9./\-_]+)", cont)
         return set(allt)
 
     def get_links_a(self):

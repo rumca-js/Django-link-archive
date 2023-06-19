@@ -29,8 +29,7 @@ class RssEntriesListView(generic.ListView):
 
     def get_queryset(self):
         self.filter_form = EntryChoiceForm(self.request.GET, args=self.request.GET)
-        if self.filter_form.is_valid():
-            print("valid")
+        self.filter_form.is_valid()
         return self.filter_form.get_filtered_objects()
 
     def get_context_data(self, **kwargs):
@@ -45,8 +44,7 @@ class RssEntriesListView(generic.ListView):
         context['rss_are_fetched'] = queue_size > 0
         context['rss_queue_size'] = queue_size
 
-        if self.filter_form.is_valid():
-            print("valid")
+        self.filter_form.is_valid()
 
         self.filter_form.create()
         self.filter_form.method = "GET"
