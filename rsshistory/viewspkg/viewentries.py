@@ -52,6 +52,10 @@ class RssEntriesListView(generic.ListView):
         self.filter_form.action_url = reverse('{}:entries'.format(get_app()))
 
         context['filter_form'] = self.filter_form
+        if "search" in self.request.GET:
+            context['search_term'] = self.request.GET["search"]
+        elif "tag" in self.request.GET:
+            context['search_term'] = self.request.GET["tag"]
 
         return context
 

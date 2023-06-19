@@ -32,7 +32,7 @@
     </p>
   {% endif %}
     <p>
-    <a href="{% url 'rsshistory:entries' %}?title={{object.title}}" class="simplebutton">Goto Entries</a>
+    <a href="{% url 'rsshistory:entries' %}?source_title={{object.title}}" class="simplebutton">Goto Entries</a>
   {% if user.is_staff %}
     {% if config.source_archive %}
       <a href="{% url 'rsshistory:source-archive' object.id %}" class="simplebutton">Archive.org save</a>

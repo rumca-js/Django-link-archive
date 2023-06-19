@@ -43,11 +43,11 @@
 
                 {% if user.is_authenticated %}
                 <a href="{% url 'rsshistory:user-config' %}" class="mainbutton">
-                            <img src="{% static 'rsshistory/icons/icons8-configuration-67.png' %}" height=30px />User: {{ user.get_username }}
+                            <img src="{% static 'rsshistory/icons/icons8-configuration-67.png' %}" height=30px />User config
                             </a>
                 <a href="{% url 'rsshistory:logout' %}" class="mainbutton">
-                            <img src="{% static 'rsshistory/icons/icons8-logout-100.png' %}" height=30px />
-                            Logout</a>
+                            <img src="{% static 'rsshistory/icons/account.png' %}" height=30px />
+                            Logout [{{ user.get_username }}]</a>
                 <hr>
                 {% else %}
                 <a href="{% url 'rsshistory:login' %}"  class="mainbutton">
