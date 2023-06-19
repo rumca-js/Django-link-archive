@@ -16,9 +16,11 @@ def init_context(request, context):
     from ..views import init_context
     return init_context(request, context)
 
+
 def get_context(request):
     from ..views import get_context
     return get_context(request)
+
 
 def get_app():
     from ..views import app_name
@@ -31,7 +33,7 @@ def admin_page(request):
 
     if not request.user.is_staff:
         return render(request, get_app() / 'missing_rights.html', context)
-    
+
     return render(request, get_app() / 'admin_page.html', context)
 
 
@@ -41,7 +43,7 @@ def configuration_page(request):
 
     if not request.user.is_staff:
         return render(request, get_app() / 'missing_rights.html', context)
-    
+
     ob = ConfigurationEntry.get()
 
     if request.method == 'POST':
@@ -53,7 +55,7 @@ def configuration_page(request):
             return render(request, get_app() / 'summary_present.html', context)
 
     ob = ConfigurationEntry.get()
-    form = ConfigForm(instance = ob)
+    form = ConfigForm(instance=ob)
 
     form.method = "POST"
     form.action_url = reverse('{}:configuration'.format(get_app()))
@@ -69,18 +71,18 @@ def system_status(request):
 
     if not request.user.is_staff:
         return render(request, get_app() / 'missing_rights.html', context)
-    
+
     c = Configuration.get_object(str(get_app()))
 
-    #size_b = get_directory_size_bytes(c.directory)
-    #size_kb = size_b / 1024
-    #size_mb = size_kb / 1024
+    # size_b = get_directory_size_bytes(c.directory)
+    # size_kb = size_b / 1024
+    # size_mb = size_kb / 1024
 
     context['directory'] = c.directory
-    #context['database_size_bytes'] = size_b
-    #context['database_size_kbytes'] = size_kb
-    #context['database_size_mbytes'] = size_mb
-    
+    # context['database_size_bytes'] = size_b
+    # context['database_size_kbytes'] = size_kb
+    # context['database_size_mbytes'] = size_mb
+
     from ..models import YouTubeMetaCache, YouTubeReturnDislikeMetaCache
     context['YouTubeMetaCache'] = len(YouTubeMetaCache.objects.all())
     context['YouTubeReturnDislikeMetaCache'] = len(YouTubeReturnDislikeMetaCache.objects.all())
@@ -89,7 +91,7 @@ def system_status(request):
     context['ConfigurationEntry'] = len(ConfigurationEntry.objects.all())
     context['UserConfig'] = len(UserConfig.objects.all())
     context['BackgroundJob'] = len(BackgroundJob.objects.all())
-    
+
     from ..models import PersistentInfo
     context['log_items'] = PersistentInfo.get_safe()
 
@@ -143,7 +145,7 @@ def import_reading_list_view(request):
         try:
             print(entry['title'])
 
-            objs = LinkDataModel.objects.filter(link = entry['url'])
+            objs = LinkDataModel.objects.filter(link=entry['url'])
             if objs.exists():
                 print(entry['title'] + ", Skipping")
                 summary_text += entry['title'] + " " + entry['url'] + ": Skipping, already in DB\n"
@@ -160,16 +162,16 @@ def import_reading_list_view(request):
                     continue
 
                 ent = LinkDataModel(
-                        source = p.get_domain(),
-                        title = entry['title'],
-                        description = entry['description'],
-                        link = entry['url'],
-                        date_published = entry['date'],
-                        persistent = True,
-                        dead = False,
-                        user = "Thomas Pain",
-                        language = lang,
-                        thumbnail = entry['image'])
+                    source=p.get_domain(),
+                    title=entry['title'],
+                    description=entry['description'],
+                    link=entry['url'],
+                    date_published=entry['date'],
+                    persistent=True,
+                    dead=False,
+                    user="Thomas Pain",
+                    language=lang,
+                    thumbnail=entry['image'])
 
                 ent.save()
 
@@ -191,8 +193,8 @@ def truncate_errors(request):
     from ..models import PersistentInfo
     PersistentInfo.truncate()
 
-    #from ..models import BackgroundJob
-    #BackgroundJob.truncate()
+    # from ..models import BackgroundJob
+    # BackgroundJob.truncate()
 
     context["summary_text"] = "Clearing errors done"
 
@@ -209,30 +211,29 @@ def get_incorrect_youtube_links():
     criterion3 = Q(source__contains="youtube")
     criterion4 = Q(source__contains="https://www.youtube.com/feeds")
 
-    criterion5 = Q(source__isnull = True)
-    criterion6 = Q(source_obj__isnull = True)
+    criterion5 = Q(source__isnull=True)
+    criterion6 = Q(source_obj__isnull=True)
 
     entries_no_object = LinkDataModel.objects.filter(criterion1 | criterion1a)
     entries_no_object |= LinkDataModel.objects.filter(criterion2 & criterion3 & ~criterion4)
     entries_no_object |= LinkDataModel.objects.filter(criterion2 & criterion5)
-    #entries_no_object |= LinkDataModel.objects.filter(criterion2 & ~criterion5 & criterion6)
+    # entries_no_object |= LinkDataModel.objects.filter(criterion2 & ~criterion5 & criterion6)
 
     if entries_no_object.exists():
         return entries_no_object
 
 
 def data_errors_page(request):
-
     def fix_reassign_source_to_nullsource_entries():
         print("fix_reassign_source_to_nullsource_entries")
 
-        entries_no_object = LinkDataModel.objects.filter(source_obj = None)
+        entries_no_object = LinkDataModel.objects.filter(source_obj=None)
         for entry in entries_no_object:
-            source = SourceDataModel.objects.filter(url = entry.source)
+            source = SourceDataModel.objects.filter(url=entry.source)
             if source.exists():
                 entry.source_obj = source[0]
                 entry.save()
-                #summary_text += "Fixed {0}, added source object\n".format(entry.link)
+                # summary_text += "Fixed {0}, added source object\n".format(entry.link)
                 print("Fixed {0}, added source object".format(entry.link))
         print("fix_reassign_source_to_nullsource_entries done")
 
@@ -277,9 +278,9 @@ def data_errors_page(request):
         from django.db.models import Q
         criterion1 = Q(language__contains="pl")
         criterion2 = Q(language__contains="en")
-        criterion3 = Q(language__isnull = True)
+        criterion3 = Q(language__isnull=True)
 
-        entries_no_object = LinkDataModel.objects.filter(~criterion1 & ~criterion2 & ~criterion3, persistent = True)
+        entries_no_object = LinkDataModel.objects.filter(~criterion1 & ~criterion2 & ~criterion3, persistent=True)
 
         if entries_no_object.exists():
             return entries_no_object
@@ -290,8 +291,8 @@ def data_errors_page(request):
     if not request.user.is_staff:
         return render(request, get_app() / 'missing_rights.html', context)
 
-    #fix_reassign_source_to_nullsource_entries()
-    #fix_tags_links()
+    # fix_reassign_source_to_nullsource_entries()
+    # fix_tags_links()
 
     summary_text = "Done"
     try:
@@ -313,7 +314,7 @@ def data_errors_page(request):
 def fix_reset_youtube_link_details(link_id):
     from ..pluginentries.youtubelinkhandler import YouTubeLinkHandler
 
-    entry = LinkDataModel.objects.get(id = link_id)
+    entry = LinkDataModel.objects.get(id=link_id)
 
     h = YouTubeLinkHandler(entry.link)
     if not h.download_details():
@@ -322,7 +323,7 @@ def fix_reset_youtube_link_details(link_id):
     chan_url = h.get_channel_feed_url()
     link_valid = h.get_link_url()
 
-    sources_obj = SourceDataModel.objects.filter(url = chan_url)
+    sources_obj = SourceDataModel.objects.filter(url=chan_url)
     source_obj = None
     if len(sources_obj) > 0:
         source_obj = sources_obj[0]
@@ -373,7 +374,7 @@ def fix_source_entries_language(request, pk):
     if not request.user.is_staff:
         return render(request, get_app() / 'missing_rights.html', context)
 
-    source_obj = SourceDataModel.objects.get(id = pk)
+    source_obj = SourceDataModel.objects.get(id=pk)
 
     summary_text = ""
     for entry in source_obj.entries.all():
@@ -388,14 +389,13 @@ def fix_source_entries_language(request, pk):
 
 
 def fix_entry_tags(request, entrypk):
-
     context = get_context(request)
     context['page_title'] += " - fix entry tags"
 
     if not request.user.is_staff:
         return render(request, get_app() / 'missing_rights.html', context)
 
-    entry = LinkDataModel.objects.get(id = entrypk)
+    entry = LinkDataModel.objects.get(id=entrypk)
     tags = entry.tags.all()
 
     summary_text = ""
@@ -410,16 +410,16 @@ def fix_entry_tags(request, entrypk):
 
 
 def get_time_stamps(url, start_time, stop_time):
+    time = stop_time
+    while time >= start_time:
+        if len(RssSourceImportHistory.objects.filter(url=url, date=time)) != 0:
+            time -= timedelta(days=1)
+            print("Skipping already imported timestamp {0} {1}".format(url, time))
+            continue
 
-   time = stop_time
-   while time >= start_time:
-       if len(RssSourceImportHistory.objects.filter(url = url, date = time)) != 0:
-           time -= timedelta(days = 1)
-           print("Skipping already imported timestamp {0} {1}".format(url, time))
-           continue
+        yield time
+        time -= timedelta(days=1)
 
-       yield time
-       time -= timedelta(days = 1)
 
 def import_source_from_ia_range_impl(source_url, archive_start, archive_stop):
     from ..services.waybackmachine import WaybackMachine
@@ -459,14 +459,14 @@ def import_source_from_ia(request, pk):
             else:
                 context["summary_text"] = "Internet archive data read successfully"
                 return render(request, get_app() / 'summary_present.html', context)
-    
-    source_obj = SourceDataModel.objects.get(id = pk)
-    
-    form = ImportSourceRangeFromInternetArchiveForm(initial={"source_url": source_obj.url, 
-             'archive_start' : date.today() - timedelta(days = 1),
-             'archive_stop' : date.today()})
+
+    source_obj = SourceDataModel.objects.get(id=pk)
+
+    form = ImportSourceRangeFromInternetArchiveForm(initial={"source_url": source_obj.url,
+                                                             'archive_start': date.today() - timedelta(days=1),
+                                                             'archive_stop': date.today()})
     form.method = "POST"
-    #form.action_url = reverse('{}:configuration'.format(get_app()))
+    # form.action_url = reverse('{}:configuration'.format(get_app()))
 
     context['form'] = form
 
@@ -476,9 +476,9 @@ def import_source_from_ia(request, pk):
 def import_source_from_ia_impl(wb, source_url, source_archive_url, archive_time):
     print("Reading from time: {0} {1}".format(source_url, archive_time))
 
-    source_obj = SourceDataModel.objects.filter(url = source_url)[0]
+    source_obj = SourceDataModel.objects.filter(url=source_url)[0]
 
-    if len(RssSourceImportHistory.objects.filter(url = source_obj.url, date = archive_time)) != 0:
+    if len(RssSourceImportHistory.objects.filter(url=source_obj.url, date=archive_time)) != 0:
         print("Import timestamp exists")
         return False
 
@@ -497,11 +497,12 @@ def import_source_from_ia_impl(wb, source_url, source_archive_url, archive_time)
 
     print("Internet archive done {0}".format(source_url))
 
-    if len(RssSourceImportHistory.objects.filter(url = source_obj.url, date = archive_time)) == 0:
-        history = RssSourceImportHistory(url = source_obj.url, date = archive_time, source_obj = source_obj)
+    if len(RssSourceImportHistory.objects.filter(url=source_obj.url, date=archive_time)) == 0:
+        history = RssSourceImportHistory(url=source_obj.url, date=archive_time, source_obj=source_obj)
         history.save()
 
     return True
+
 
 def show_youtube_link_props(request):
     context = get_context(request)
@@ -511,7 +512,7 @@ def show_youtube_link_props(request):
 
     youtube_link = "https:"
     if not request.method == 'POST':
-        form = YouTubeLinkSimpleForm(initial={'youtube_link' : youtube_link})
+        form = YouTubeLinkSimpleForm(initial={'youtube_link': youtube_link})
         form.method = "POST"
         form.action_url = reverse('{}:show-youtube-link-props'.format(get_app()))
         context['form'] = form
@@ -542,18 +543,18 @@ def show_youtube_link_props(request):
             feed_url = handler.yt_ob.get_channel_feed_url()
 
             yt_props = [('webpage_url', yt_json['webpage_url'])]
-            yt_props.append( ('title', yt_json['title']) )
-            yt_props.append( ('uploader_url', yt_json['uploader_url']) )
-            yt_props.append( ('channel_url', yt_json['channel_url']) )
-            yt_props.append( ('channel_feed_url', feed_url) )
-            yt_props.append( ('channel_id', yt_json['channel_id']) )
+            yt_props.append(('title', yt_json['title']))
+            yt_props.append(('uploader_url', yt_json['uploader_url']))
+            yt_props.append(('channel_url', yt_json['channel_url']))
+            yt_props.append(('channel_feed_url', feed_url))
+            yt_props.append(('channel_id', yt_json['channel_id']))
 
             for yt_prop in yt_json:
-                yt_props.append( (yt_prop, str(yt_json[yt_prop])) )
+                yt_props.append((yt_prop, str(yt_json[yt_prop])))
 
             rd_props = []
             for rd_prop in rd_json:
-                rd_props.append( (rd_prop, str(rd_json[rd_prop])) )
+                rd_props.append((rd_prop, str(rd_json[rd_prop])))
 
             context["youtube_props"] = yt_props
             context["return_dislike_props"] = rd_props
@@ -601,10 +602,10 @@ def write_daily_data_form(request):
 
     from ..dateutils import DateUtils
     date = DateUtils.get_date_today()
-    
+
     form = ExportDailyDataForm(initial={
-             'time_start' : date.today() - timedelta(days = 1),
-             'time_stop' : date.today()})
+        'time_start': date.today() - timedelta(days=1),
+        'time_stop': date.today()})
     form.method = "POST"
 
     context['form'] = form
@@ -662,7 +663,7 @@ def fix_bookmarked_yt(request):
         return render(request, get_app() / 'missing_rights.html', context)
 
     summary = ""
-    links = LinkDataModel.objects.filter(persistent = True)
+    links = LinkDataModel.objects.filter(persistent=True)
     for link in links:
         if fix_reset_youtube_link_details(link.id):
             summary += "Fixed: {} {}\n".format(link.link, link.title)
@@ -682,13 +683,13 @@ def user_config(request):
         return render(request, get_app() / 'missing_rights.html', context)
 
     user_name = request.user.get_username()
-    
-    obs = UserConfig.objects.filter(user = user_name)
+
+    obs = UserConfig.objects.filter(user=user_name)
     if not obs.exists():
-        rec = UserConfig(user = user_name)
+        rec = UserConfig(user=user_name)
         rec.save()
 
-    obs = UserConfig.objects.filter(user = user_name)
+    obs = UserConfig.objects.filter(user=user_name)
 
     if request.method == 'POST':
         form = UserConfigForm(request.POST, instance=obs[0])
@@ -698,7 +699,7 @@ def user_config(request):
             context["summary_text"] = "user information is not valid, cannot save"
             return render(request, get_app() / 'summary_present.html', context)
 
-        obs = UserConfig.objects.filter(user = user_name)
+        obs = UserConfig.objects.filter(user=user_name)
     else:
         form = UserConfigForm(instance=obs[0])
 
@@ -729,6 +730,7 @@ def clear_youtube_cache(request):
     context["summary_text"] = summary
 
     return render(request, get_app() / 'summary_present.html', context)
+
 
 def download_music(request, pk):
     context = get_context(request)

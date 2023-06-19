@@ -64,8 +64,8 @@ class BaseRssPlugin(BasePlugin):
             if not objs.exists():
                 if str(feed_entry.title).strip() == "" or feed_entry.title == "undefined":
                     PersistentInfo.error(
-                            "Source:{} {}; Entry:{} {} no title".format(source.url, source.title, feed_entry.link,
-                                                                      feed_entry.title))
+                        "Source:{} {}; Entry:{} {} no title".format(source.url, source.title, feed_entry.link,
+                                                                    feed_entry.title))
                     return None
 
                 if not self.is_link_valid(props['link']):
@@ -73,8 +73,9 @@ class BaseRssPlugin(BasePlugin):
 
                 if 'published' not in props:
                     PersistentInfo.error(
-                            "Source:{} {}; Entry:{} {} missing published field".format(source.url, source.title, feed_entry.link,
-                                                                      feed_entry.title))
+                        "Source:{} {}; Entry:{} {} missing published field".format(source.url, source.title,
+                                                                                   feed_entry.link,
+                                                                                   feed_entry.title))
                     return None
 
                 return props
@@ -82,8 +83,8 @@ class BaseRssPlugin(BasePlugin):
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.error(
-                    "Source:{} {}; Entry:{} {}; Exc:{}\n{}".format(source.url, source.title, feed_entry.link,
-                                                              feed_entry.title, str(e), error_text))
+                "Source:{} {}; Entry:{} {}; Exc:{}\n{}".format(source.url, source.title, feed_entry.link,
+                                                               feed_entry.title, str(e), error_text))
 
             return False
 
@@ -91,8 +92,8 @@ class BaseRssPlugin(BasePlugin):
         from ..dateutils import DateUtils
         output_map = {}
 
-        #print("feed entry dict: {}".format(feed_entry.__dict__))
-        #print("Feed entry: {}".format(str(feed_entry)))
+        # print("feed entry dict: {}".format(feed_entry.__dict__))
+        # print("Feed entry: {}".format(str(feed_entry)))
 
         if hasattr(feed_entry, "description"):
             output_map['description'] = feed_entry.description
@@ -110,8 +111,8 @@ class BaseRssPlugin(BasePlugin):
                 output_map['published'] = dt
             except Exception as e:
                 PersistentInfo.error(
-                        "Rss parser datetime invalid feed datetime:{}; Exc:{} {}\n{}".format(feed_entry.published,
-                                                              str(e), error_text))
+                    "Rss parser datetime invalid feed datetime:{}; Exc:{} {}\n{}".format(feed_entry.published,
+                                                                                         str(e), error_text))
                 output_map['published'] = DateUtils.get_datetime_now_utc()
 
         elif self.allow_adding_with_current_time:

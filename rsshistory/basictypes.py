@@ -6,23 +6,23 @@ import os
 
 
 def get_ascii_text(text):
-  thebytes = text.encode('ascii', 'ignore')
-  return thebytes.decode()
+    thebytes = text.encode('ascii', 'ignore')
+    return thebytes.decode()
 
 
 def fix_path_for_windows(file_path):
     chars = [
-            #"/",
-            ">",
-            "<",
-            ":",
-            #"\\",
-            "|",
-            "?",
-            "*",
-            '"',
-            "'",
-            ]
+        # "/",
+        ">",
+        "<",
+        ":",
+        # "\\",
+        "|",
+        "?",
+        "*",
+        '"',
+        "'",
+    ]
 
     for item in chars:
         file_path = file_path.replace(item, "")
@@ -33,7 +33,7 @@ def fix_path_for_windows(file_path):
     return file_path
 
 
-def get_directory_size_bytes(start_path = '.'):
+def get_directory_size_bytes(start_path='.'):
     total_size = 0
     for dirpath, dirnames, filenames in os.walk(start_path):
         for f in filenames:

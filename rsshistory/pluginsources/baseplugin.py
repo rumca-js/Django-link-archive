@@ -1,6 +1,6 @@
 import traceback
 
-from ..models import PersistentInfo,LinkDataModel
+from ..models import PersistentInfo, LinkDataModel
 from ..webtools import Page
 from ..dateutils import DateUtils
 
@@ -58,7 +58,7 @@ class BasePlugin(Page):
                 if not link_data:
                     continue
 
-                #print("Adding link {}".format(link_data['link']))
+                # print("Adding link {}".format(link_data['link']))
                 objs = LinkDataModel.objects.filter(link=link_data['link'])
                 if objs.exists():
                     # TODO maybe update with new data?
@@ -76,7 +76,7 @@ class BasePlugin(Page):
 
                 try:
                     o.save()
-                    #print("Added link {}".format(link_data['link']))
+                    # print("Added link {}".format(link_data['link']))
                 except Exception as e:
                     o.save()
 

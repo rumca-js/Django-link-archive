@@ -17,60 +17,62 @@ class BookmarksExporter(object):
         self.md_template_bookmarked += " - tags: $tags\n"
 
     def get_entries(self):
-       from ..models import LinkDataModel
-       entries = LinkDataModel.objects.filter(persistent = True)
+        from ..models import LinkDataModel
+        entries = LinkDataModel.objects.filter(persistent=True)
 
     def get_export_path(self):
-       entries_dir = self._cfg.get_bookmarks_path()
-       export_path = entries_dir
+        entries_dir = self._cfg.get_bookmarks_path()
+        export_path = entries_dir
 
-       if not export_path.exists():
-           export_path.mkdir(parents = True, exist_ok = True)
+        if not export_path.exists():
+            export_path.mkdir(parents=True, exist_ok=True)
 
-       return export_path
+        return export_path
 
-    def export(self, export_file_name = 'bookmarks', export_dir = "default"):
+    def export(self, export_file_name='bookmarks', export_dir="default"):
 
-       if len(self._entries) == 0:
-           return
+        if len(self._entries) == 0:
+            return
 
-       export_path = self.get_export_path() / export_dir
-       if not export_path.exists():
-           export_path.mkdir(parents = True, exist_ok = True)
+        export_path = self.get_export_path() / export_dir
+        if not export_path.exists():
+            export_path.mkdir(parents=True, exist_ok=True)
 
-       from .converters import ModelCollectionConverter, JsonConverter, MarkDownConverter, RssConverter
+        from .converters import ModelCollectionConverter, JsonConverter, MarkDownConverter, RssConverter
 
-       cc = ModelCollectionConverter(self._entries)
-       items = cc.get_map_full()
+        cc = ModelCollectionConverter(self._entries)
+        items = cc.get_map_full()
 
-       js_converter = JsonConverter(items)
-       js_converter.set_export_columns(['source', 'title', 'description','link','date_published', 'persistent', 'dead', 'user', 'language', 'tags', 'comments'])
+        js_converter = JsonConverter(items)
+        js_converter.set_export_columns(
+            ['source', 'title', 'description', 'link', 'date_published', 'persistent', 'dead', 'user', 'language',
+             'tags', 'comments'])
 
-       file_name = export_path / (export_file_name + "_entries.json")
-       file_name.write_text(js_converter.export())
+        file_name = export_path / (export_file_name + "_entries.json")
+        file_name.write_text(js_converter.export())
 
-       md = MarkDownConverter(items, self.md_template_bookmarked)
-       md_text = md.export()
+        md = MarkDownConverter(items, self.md_template_bookmarked)
+        md_text = md.export()
 
-       file_name = export_path / (export_file_name + "_entries.md")
-       file_name.write_text(md_text)
+        file_name = export_path / (export_file_name + "_entries.md")
+        file_name.write_text(md_text)
 
-       rss_conv = RssConverter(items)
-       rss_text = rss_conv.export()
+        rss_conv = RssConverter(items)
+        rss_text = rss_conv.export()
 
-       file_name = export_path / (export_file_name + "_entries.rss")
-       file_name.write_text(self.use_rss_wrapper(rss_text))
+        file_name = export_path / (export_file_name + "_entries.rss")
+        file_name.write_text(self.use_rss_wrapper(rss_text))
 
-    def use_rss_wrapper(self, text, language = "en-US", link = "https://renegat0x0.ddns.net"):
+    def use_rss_wrapper(self, text, language="en-US", link="https://renegat0x0.ddns.net"):
         template = self.get_rss_template()
 
-        map_data = {'channel_title' : "RSS archive", 'channel_description': "Link archive",
-                    'channel_language' : language, 'channel_link' : link,
-                    'channel_feed_url': link, 'channel_text' : text}
+        map_data = {'channel_title': "RSS archive", 'channel_description': "Link archive",
+                    'channel_language': language, 'channel_link': link,
+                    'channel_feed_url': link, 'channel_text': text}
         return self.use_template(template, map_data)
 
     def get_rss_template(self):
-       text = """
+        text = """
 <?xml version="1.0" encoding="UTF-8" ?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/"
 	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
 	xmlns:dc="http://purl.org/dc/elements/1.1/"
@@ -89,7 +91,7 @@ xmlns:georss="http://www.georss.org/georss" xmlns:geo="http://www.w3.org/2003/01
 $channel_text
 </channel></rss>
 """
-       return text
+        return text
 
     def use_template(self, template_text, map_data):
         from string import Template
@@ -98,7 +100,8 @@ $channel_text
             return t.safe_substitute(map_data)
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.error("Template exception {0} {1} {2} {3}".format(template_text, str(map_data), str(e), error_text))
+            PersistentInfo.error(
+                "Template exception {0} {1} {2} {3}".format(template_text, str(map_data), str(e), error_text))
         return ""
 
 
@@ -117,37 +120,37 @@ class BookmarksBigExporter(object):
         return year
 
     def export(self):
-       import datetime
-       from ..models import LinkDataModel
+        import datetime
+        from ..models import LinkDataModel
 
-       entries_dir = self._cfg.get_bookmarks_path()
-       if entries_dir.exists():
-           shutil.rmtree(entries_dir)
+        entries_dir = self._cfg.get_bookmarks_path()
+        if entries_dir.exists():
+            shutil.rmtree(entries_dir)
 
-       for year in range(self.get_start_year(), self.get_current_year() + 1):
-           start_date = datetime.date(year,1,1)
-           stop_date = datetime.date(year+1,1,1)
+        for year in range(self.get_start_year(), self.get_current_year() + 1):
+            start_date = datetime.date(year, 1, 1)
+            stop_date = datetime.date(year + 1, 1, 1)
 
-           therange = (start_date, stop_date)
+            therange = (start_date, stop_date)
 
-           all_entries = LinkDataModel.objects.filter(persistent = True, date_published__range=therange)
+            all_entries = LinkDataModel.objects.filter(persistent=True, date_published__range=therange)
 
-           en_entries = all_entries.filter(language__icontains = 'en')
-           pl_entries = all_entries.filter(language__icontains = 'pl')
+            en_entries = all_entries.filter(language__icontains='en')
+            pl_entries = all_entries.filter(language__icontains='pl')
 
-           converter = BookmarksExporter(self._cfg, en_entries)
-           converter.export('bookmarks_EN', str(year))
+            converter = BookmarksExporter(self._cfg, en_entries)
+            converter.export('bookmarks_EN', str(year))
 
-           converter = BookmarksExporter(self._cfg, pl_entries)
-           converter.export('bookmarks_PL', str(year))
+            converter = BookmarksExporter(self._cfg, pl_entries)
+            converter.export('bookmarks_PL', str(year))
 
-           #en_entries = LinkDataModel.objects.filter(persistent = True, date_published__range=therange, language__icontains = 'en')
-           #converter = BookmarksExporter(self._cfg, en_entries)
-           #converter.export('bookmarks_EN', str(year))
+            # en_entries = LinkDataModel.objects.filter(persistent = True, date_published__range=therange, language__icontains = 'en')
+            # converter = BookmarksExporter(self._cfg, en_entries)
+            # converter.export('bookmarks_EN', str(year))
 
-           #en_entries = LinkDataModel.objects.filter(persistent = True, date_published__range=therange, language__icontains = 'pl')
-           #converter = BookmarksExporter(self._cfg, en_entries)
-           #converter.export('bookmarks_PL', str(year))
+            # en_entries = LinkDataModel.objects.filter(persistent = True, date_published__range=therange, language__icontains = 'pl')
+            # converter = BookmarksExporter(self._cfg, en_entries)
+            # converter.export('bookmarks_PL', str(year))
 
 
 class BookmarksTopicExporter(object):
@@ -156,17 +159,17 @@ class BookmarksTopicExporter(object):
         self._cfg = config
 
     def export(self, topic):
-       import datetime
-       from ..models import LinkDataModel, RssEntryTagsDataModel
+        import datetime
+        from ..models import LinkDataModel, RssEntryTagsDataModel
 
-       tag_objs = RssEntryTagsDataModel.objects.filter(tag = topic)
-       entries = set()
-       for tag_obj in tag_objs:
-           if tag_obj.link_obj is not None:
-               entries.add(tag_obj.link_obj)
+        tag_objs = RssEntryTagsDataModel.objects.filter(tag=topic)
+        entries = set()
+        for tag_obj in tag_objs:
+            if tag_obj.link_obj is not None:
+                entries.add(tag_obj.link_obj)
 
-       entries = list(entries)
-       entries = sorted(entries, key = lambda x: x.date_published)
+        entries = list(entries)
+        entries = sorted(entries, key=lambda x: x.date_published)
 
-       converter = BookmarksExporter(self._cfg, entries)
-       converter.export("topic_{}".format(topic), "topics")
+        converter = BookmarksExporter(self._cfg, entries)
+        converter.export("topic_{}".format(topic), "topics")

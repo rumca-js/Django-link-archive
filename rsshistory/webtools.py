@@ -9,7 +9,7 @@ import re
 class Page(object):
     user_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11'
 
-    def __init__(self, url, contents = None):
+    def __init__(self, url, contents=None):
         self.url = url
         self.contents = contents
 
@@ -42,12 +42,6 @@ class Page(object):
         try:
             r = requests.get(self.url, headers=hdr)
             return r.text
-            #req = urllib.request.Request(self.url, headers=hdr)
-            #handle = urllib.request.urlopen(req)
-            #thebytes = handle.read()
-            #if self.url.find("spotify") >= 0:
-            #    print(thebytes)
-            #return self.try_decode(thebytes)
 
         except Exception as e:
             error_text = traceback.format_exc()
@@ -168,7 +162,7 @@ class Page(object):
 
         for item in mainstream:
             if dom.find(item) >= 0:
-              return True
+                return True
 
         if self.is_youtube():
             return True
@@ -178,9 +172,9 @@ class Page(object):
     def is_youtube(self):
         dom = self.get_domain_only()
         if dom.find("youtube.com") >= 0 or \
-           dom.find("youtu.be") >= 0 or \
-           dom.find('www.m.youtube') >= 0:
-               return True
+                dom.find("youtu.be") >= 0 or \
+                dom.find('www.m.youtube') >= 0:
+            return True
         return False
 
     def download_all(self):

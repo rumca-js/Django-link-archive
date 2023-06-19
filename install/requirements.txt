@@ -1,0 +1,8 @@
+django
+feedparser
+requests
+django-user-agents
+yt-dlp
+python-dateutil
+waybackpy
+pytz

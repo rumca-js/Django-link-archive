@@ -13,24 +13,24 @@ class DateUtils(object):
         return date.today().isoformat()
 
     def to_utc_date(input_date):
-       if input_date.tzinfo is None:
-           input_date = input_date.replace(tzinfo=timezone('UTC'))
-       return input_date
+        if input_date.tzinfo is None:
+            input_date = input_date.replace(tzinfo=timezone('UTC'))
+        return input_date
 
     def get_date_yesterday():
-       current_date = date.today()
-       prev_day = current_date - timedelta(days = 1) 
+        current_date = date.today()
+        prev_day = current_date - timedelta(days=1)
 
-       return prev_day
+        return prev_day
 
     def get_date_today():
-       return date.today()
+        return date.today()
 
     def get_date_tommorow():
-       current_date = date.today()
-       next_day = current_date + timedelta(days = 1)
+        current_date = date.today()
+        next_day = current_date + timedelta(days=1)
 
-       return next_day
+        return next_day
 
     def get_datetime_now_utc():
         return django.utils.timezone.now()
@@ -54,10 +54,10 @@ class DateUtils(object):
                 date.strftime('%d')]
 
     def get_iso_datetime(timestamp):
-       from dateutil import parser
-       date = parser.parse(timestamp)
-       date = date.isoformat()
-       return date
+        from dateutil import parser
+        date = parser.parse(timestamp)
+        date = date.isoformat()
+        return date
 
     def get_datetime_year(datetime):
         return datetime.strftime('%Y')
@@ -66,17 +66,17 @@ class DateUtils(object):
         return datetime.strftime('%m')
 
     def get_range4day(date_iso):
-       from datetime import date, timedelta
-       current_date = date.fromisoformat(date_iso)
-       next_day = current_date + timedelta(days = 1)
+        from datetime import date, timedelta
+        current_date = date.fromisoformat(date_iso)
+        next_day = current_date + timedelta(days=1)
 
-       return (current_date, next_day)
+        return (current_date, next_day)
 
     def get_range_today():
-       from datetime import date, timedelta
+        from datetime import date, timedelta
 
-       current_date = date.today()
-       return DateUtils.get_range4day(current_date.isoformat() )
+        current_date = date.today()
+        return DateUtils.get_range4day(current_date.isoformat())
 
     def is_month_changed():
         yesterday = DateUtils.get_date_yesterday()

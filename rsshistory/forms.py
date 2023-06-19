@@ -1,20 +1,22 @@
-from datetime import datetime,timedelta
+from datetime import datetime, timedelta
 from django import forms
 
 from .models import SourceDataModel, LinkDataModel, LinkTagsDataModel, LinkCommentDataModel
 from .models import ConfigurationEntry, UserConfig
 
-# https://docs.djangoproject.com/en/4.1/ref/forms/widgets/
 
+# https://docs.djangoproject.com/en/4.1/ref/forms/widgets/
 
 
 class ConfigForm(forms.ModelForm):
     """
     Category choice form
     """
+
     class Meta:
         model = ConfigurationEntry
-        fields = ['data_export_path','data_import_path', 'link_archive', 'source_archive', 'sources_refresh_period', 'git_path', 'git_repo', 'git_daily_repo', 'git_user', 'git_token']
+        fields = ['data_export_path', 'data_import_path', 'link_archive', 'source_archive', 'sources_refresh_period',
+                  'git_path', 'git_repo', 'git_daily_repo', 'git_user', 'git_token']
         widgets = {
         }
 
@@ -31,50 +33,53 @@ class UserConfigForm(forms.ModelForm):
     """
     Category choice form
     """
+
     class Meta:
         model = UserConfig
         fields = ['show_icons', 'thumbnails_as_icons', 'small_icons', 'display_type']
-        #fields = ['show_icons', 'thumbnails_as_icons', 'small_icons', 'display_type', 'theme', 'links_per_page']
-        #widgets = {
-        #}
+        # fields = ['show_icons', 'thumbnails_as_icons', 'small_icons', 'display_type', 'theme', 'links_per_page']
+        # widgets = {
+        # }
 
 
 class ImportSourceFromInternetArchiveForm(forms.Form):
-    source_url = forms.CharField(label='Source url', max_length = 500)
-    archive_time = forms.DateField(label = "Archive time")
+    source_url = forms.CharField(label='Source url', max_length=500)
+    archive_time = forms.DateField(label="Archive time")
 
 
 class ImportSourceRangeFromInternetArchiveForm(forms.Form):
-    source_url = forms.CharField(label='Source url', max_length = 500)
-    archive_start = forms.DateField(label = "Start time")
-    archive_stop = forms.DateField(label = "Stop time")
+    source_url = forms.CharField(label='Source url', max_length=500)
+    archive_start = forms.DateField(label="Start time")
+    archive_stop = forms.DateField(label="Stop time")
 
 
 class ExportDailyDataForm(forms.Form):
-    time_start = forms.DateField(label = "Start time")
-    time_stop = forms.DateField(label = "Stop time")
+    time_start = forms.DateField(label="Start time")
+    time_stop = forms.DateField(label="Stop time")
 
 
 class ExportTopicForm(forms.Form):
-    tag = forms.CharField(label='Tag', max_length = 500)
+    tag = forms.CharField(label='Tag', max_length=500)
 
 
 class YouTubeLinkSimpleForm(forms.Form):
     """
     Import links form
     """
-    youtube_link = forms.CharField(label='YouTube Link URL', max_length = 500)
+    youtube_link = forms.CharField(label='YouTube Link URL', max_length=500)
 
 
 class SourceForm(forms.ModelForm):
     """
     Category choice form
     """
+
     class Meta:
         model = SourceDataModel
-        fields = ['url', 'title', 'source_type', 'category', 'subcategory', 'language', 'fetch_period', 'export_to_cms', 'remove_after_days', 'favicon', 'on_hold']
+        fields = ['url', 'title', 'source_type', 'category', 'subcategory', 'language', 'fetch_period', 'export_to_cms',
+                  'remove_after_days', 'favicon', 'on_hold']
         widgets = {
-         #'git_token': forms.PasswordInput(),
+            # 'git_token': forms.PasswordInput(),
         }
 
     def __init__(self, *args, **kwargs):
@@ -86,11 +91,12 @@ class TagEntryForm(forms.ModelForm):
     """
     Category choice form
     """
+
     class Meta:
         model = LinkTagsDataModel
         fields = ['link', 'author', 'date', 'tag']
         widgets = {
-         #'git_token': forms.PasswordInput(),
+            # 'git_token': forms.PasswordInput(),
         }
 
     def save_tags(self):
@@ -99,7 +105,7 @@ class TagEntryForm(forms.ModelForm):
         date = self.cleaned_data["date"]
         tags = self.cleaned_data["tag"]
 
-        objs = LinkTagsDataModel.objects.filter(author = author, link = link)
+        objs = LinkTagsDataModel.objects.filter(author=author, link=link)
         if objs.exists():
             objs.delete()
 
@@ -111,10 +117,10 @@ class TagEntryForm(forms.ModelForm):
             if tag != "":
                 tags_set.add(tag)
 
-        link_objs = LinkDataModel.objects.filter(link = link)
+        link_objs = LinkDataModel.objects.filter(link=link)
 
         for tag in tags_set:
-            model = LinkTagsDataModel(link = link, author = author, date = date, tag = tag, link_obj = link_objs[0])
+            model = LinkTagsDataModel(link=link, author=author, date=date, tag=tag, link_obj=link_objs[0])
             model.save()
 
 
@@ -122,15 +128,15 @@ class TagRenameForm(forms.Form):
     """
     Category choice form
     """
-    current_tag = forms.CharField(label='Current tag', max_length = 100)
-    new_tag = forms.CharField(label='New tag', max_length = 100)
+    current_tag = forms.CharField(label='Current tag', max_length=100)
+    new_tag = forms.CharField(label='New tag', max_length=100)
 
 
 class ImportSourcesForm(forms.Form):
     """
     Import links form
     """
-    rawsources = forms.CharField(widget=forms.Textarea(attrs={'name':'rawsources', 'rows':30, 'cols':100}))
+    rawsources = forms.CharField(widget=forms.Textarea(attrs={'name': 'rawsources', 'rows': 30, 'cols': 100}))
 
     def get_sources(self):
         from .serializers.converters import CsvConverter
@@ -144,7 +150,7 @@ class ImportEntriesForm(forms.Form):
     """
     Import links form
     """
-    rawentries = forms.CharField(widget=forms.Textarea(attrs={'name':'rawentries', 'rows':30, 'cols':100}))
+    rawentries = forms.CharField(widget=forms.Textarea(attrs={'name': 'rawentries', 'rows': 30, 'cols': 100}))
 
     def get_entries(self):
         from .serializers.converters import CsvConverter
@@ -158,12 +164,14 @@ class EntryForm(forms.ModelForm):
     """
     Category choice form
     """
+
     class Meta:
         model = LinkDataModel
-        fields = ['link', 'title', 'description', 'date_published', 'source', 'persistent', 'language', 'user','artist','album']
-        #widgets = {
+        fields = ['link', 'title', 'description', 'date_published', 'source', 'persistent', 'language', 'user',
+                  'artist', 'album']
+        # widgets = {
         # #'git_token': forms.PasswordInput(),
-        #}
+        # }
 
     def __init__(self, *args, **kwargs):
         super(EntryForm, self).__init__(*args, **kwargs)
@@ -192,7 +200,7 @@ class EntryForm(forms.ModelForm):
         data["thumbnail"] = None
 
         if p.is_youtube():
-           self.update_info_youtube(data)
+            self.update_info_youtube(data)
 
         return self.update_info_default(data)
 
@@ -238,25 +246,25 @@ class EntryForm(forms.ModelForm):
             return False
 
         source_obj = None
-        sources = SourceDataModel.objects.filter(url = source)
+        sources = SourceDataModel.objects.filter(url=source)
         if sources.exists():
             source_obj = sources[0]
 
-        links = LinkDataModel.objects.filter(link = link)
+        links = LinkDataModel.objects.filter(link=link)
         if len(links) > 0:
             return False
 
         entry = LinkDataModel(
-                source = source,
-                title = title,
-                description = description,
-                link = link,
-                date_published = date_published,
-                persistent = persistent,
-                thumbnail = thumbnail,
-                language = language,
-                user = user,
-                source_obj = source_obj)
+            source=source,
+            title=title,
+            description=description,
+            link=link,
+            date_published=date_published,
+            persistent=persistent,
+            thumbnail=thumbnail,
+            language=language,
+            user=user,
+            source_obj=source_obj)
 
         entry.save()
         return True
@@ -289,7 +297,7 @@ class SourcesChoiceForm(forms.Form):
 
         # custom javascript code
         # https://stackoverflow.com/questions/10099710/how-to-manually-create-a-select-field-from-a-modelform-in-django
-        attr = {"onchange" : "this.form.submit()"}
+        attr = {"onchange": "this.form.submit()"}
 
         # default form value
         # https://stackoverflow.com/questions/604266/django-set-default-form-values
@@ -297,11 +305,11 @@ class SourcesChoiceForm(forms.Form):
         subcategory_init = self.get_init('subcategory')
         title_init = self.get_init('title')
 
-        self.fields['category'].widget=forms.Select(choices=categories, attrs=attr)
-        self.fields['category'].initial=category_init
-        self.fields['subcategory'].widget=forms.Select(choices=subcategories, attrs=attr)
-        self.fields['subcategory'].initial=subcategory_init
-        self.fields['title'].initial=title_init
+        self.fields['category'].widget = forms.Select(choices=categories, attrs=attr)
+        self.fields['category'].initial = category_init
+        self.fields['subcategory'].widget = forms.Select(choices=subcategories, attrs=attr)
+        self.fields['subcategory'].initial = subcategory_init
+        self.fields['title'].initial = title_init
 
     def get_init(self, column):
         filters = self.get_filter_args()
@@ -337,15 +345,15 @@ class SourcesChoiceForm(forms.Form):
 
         category = self.args.get("category")
         if category and category != "Any":
-           parameter_map['category'] = category
+            parameter_map['category'] = category
 
         subcategory = self.args.get("subcategory")
         if subcategory and subcategory != "Any":
-           parameter_map['subcategory'] = subcategory
+            parameter_map['subcategory'] = subcategory
 
         title = self.args.get("title")
         if title and title != "Any":
-           parameter_map['title'] = title
+            parameter_map['title'] = title
 
         return parameter_map
 
@@ -356,14 +364,14 @@ class EntryChoiceForm(forms.Form):
     """
 
     # do not think too much about these settings, these will be overriden by 'create' method
-    search = forms.CharField(label='Search', max_length = 500, required=False)
+    search = forms.CharField(label='Search', max_length=500, required=False)
     category = forms.CharField(widget=forms.Select(choices=()), required=False)
     subcategory = forms.CharField(widget=forms.Select(choices=()), required=False)
     source_title = forms.CharField(widget=forms.Select(choices=()), required=False)
     persistent = forms.BooleanField(required=False, initial=False)
-    language = forms.CharField(label='language', max_length = 500, required=False)
-    user = forms.CharField(label='user', max_length = 500, required=False)
-    tag = forms.CharField(label='tag', max_length = 500, required=False)
+    language = forms.CharField(label='language', max_length=500, required=False)
+    user = forms.CharField(label='user', max_length=500, required=False)
+    tag = forms.CharField(label='tag', max_length=500, required=False)
     date_to = forms.DateField(required=False, initial=datetime.now() + timedelta(days=1))
     date_from = forms.DateField(required=False, initial=datetime.now() - timedelta(days=30))
 
@@ -396,7 +404,7 @@ class EntryChoiceForm(forms.Form):
 
         # custom javascript code
         # https://stackoverflow.com/questions/10099710/how-to-manually-create-a-select-field-from-a-modelform-in-django
-        attr = {"onchange" : "this.form.submit()"}
+        attr = {"onchange": "this.form.submit()"}
 
         # default form value
         # https://stackoverflow.com/questions/604266/django-set-default-form-values
@@ -416,18 +424,20 @@ class EntryChoiceForm(forms.Form):
             init['user'] = self.args.get("user")
             init['tag'] = self.args.get("tag")
 
-        self.fields['category'].widget=forms.Select(choices=categories, attrs=attr)
-        self.fields['category'].initial=category_init
-        self.fields['subcategory'].widget=forms.Select(choices=subcategories, attrs=attr)
-        self.fields['subcategory'].initial=subcategory_init
-        self.fields['source_title'].widget=forms.Select(choices=title, attrs=attr)
-        self.fields['source_title'].initial=title_init
-        self.fields['persistent'].initial=init['persistent']
-        self.fields['language'].initial=init['language']
-        self.fields['user'].initial=init['user']
-        self.fields['tag'].initial=init['tag']
+        self.fields['category'].widget = forms.Select(choices=categories, attrs=attr)
+        self.fields['category'].initial = category_init
+        self.fields['subcategory'].widget = forms.Select(choices=subcategories, attrs=attr)
+        self.fields['subcategory'].initial = subcategory_init
+        self.fields['source_title'].widget = forms.Select(choices=title, attrs=attr)
+        self.fields['source_title'].initial = title_init
+        self.fields['persistent'].initial = init['persistent']
+        self.fields['language'].initial = init['language']
+        self.fields['user'].initial = init['user']
+        self.fields['tag'].initial = init['tag']
         self.fields['date_to'].initial = datetime.now() + timedelta(days=1)
         self.fields['date_from'].initial = datetime.now() - timedelta(days=30)
+
+        # self.fields['language'].widget.attrs.update({"style" : "display:none"})
 
     def get_sources(self):
         source_parameter_map = self.get_source_filter_args(False)
@@ -463,29 +473,29 @@ class EntryChoiceForm(forms.Form):
                     result.append((item, item))
         return result
 
-    def get_source_filter_args(self, pure_data = True):
+    def get_source_filter_args(self, pure_data=True):
         parameter_map = {}
 
         category = self.args.get("category")
         if category and category != "Any":
-           parameter_map['category'] = category
+            parameter_map['category'] = category
 
         subcategory = self.args.get("subcategory")
         if subcategory and subcategory != "Any":
-           parameter_map['subcategory'] = subcategory
+            parameter_map['subcategory'] = subcategory
 
         if pure_data:
             title = self.args.get("source_title")
             if title and title != "Any":
-               parameter_map['source_title'] = title
+                parameter_map['source_title'] = title
         else:
             title = self.args.get("source_title")
             if title and title != "Any":
-               parameter_map['title'] = title
+                parameter_map['title'] = title
 
         return parameter_map
 
-    def get_entry_filter_args(self, pure_data = True):
+    def get_entry_filter_args(self, pure_data=True):
         parameter_map = {}
 
         persistent = self.args.get("persistent")
@@ -513,7 +523,7 @@ class EntryChoiceForm(forms.Form):
             if self.cleaned_data["date_from"] and self.cleaned_data["date_to"]:
                 parameter_map["date_published__range"] = [self.cleaned_data["date_from"], self.cleaned_data["date_to"]]
             if persistent:
-               parameter_map['persistent'] = persistent
+                parameter_map['persistent'] = persistent
             if search:
                 parameter_map["title__icontains"] = search
             if language:
@@ -521,13 +531,13 @@ class EntryChoiceForm(forms.Form):
             if user:
                 parameter_map["user"] = user
             if tag:
-               parameter_map[tag_key] = tag
+                parameter_map[tag_key] = tag
             if category and category != "Any":
-               parameter_map['source_obj__category'] = category
+                parameter_map['source_obj__category'] = category
             if subcategory and subcategory != "Any":
-               parameter_map['source_obj__subcategory'] = subcategory
+                parameter_map['source_obj__subcategory'] = subcategory
             if source_title and source_title != "Any":
-               parameter_map['source_obj__title'] = source_title
+                parameter_map['source_obj__title'] = source_title
 
         return parameter_map
 
@@ -556,7 +566,7 @@ class EntryChoiceForm(forms.Form):
         filters = {}
         for key in infilters:
             if infilters[key] is not None and infilters[key] != "" and infilters[key] != "Any":
-               filters[key] = infilters[key]
+                filters[key] = infilters[key]
 
         if "cagetory" in filters and filters["category"] == "Any":
             del filters["category"]
@@ -581,6 +591,7 @@ class CommentEntryForm(forms.ModelForm):
     """
     Category choice form
     """
+
     class Meta:
         model = LinkCommentDataModel
         fields = ['comment', 'link', 'date_published', 'author']
@@ -593,7 +604,7 @@ class CommentEntryForm(forms.ModelForm):
     def save_comment(self):
         link_url = self.cleaned_data['link']
 
-        entry = LinkDataModel.objects.get(link = link_url)
+        entry = LinkDataModel.objects.get(link=link_url)
 
         comment = self.save(commit=False)
         comment.link_obj = entry

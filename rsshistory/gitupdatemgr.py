@@ -101,7 +101,7 @@ class GitUpdateManager(object):
                 days_before = current_time - timedelta(days=days)
 
                 entries = LinkDataModel.objects.filter(source=source.url, persistent=False,
-                                                                 date_published__lt=days_before)
+                                                       date_published__lt=days_before)
                 if entries.exists():
                     PersistentInfo.create("Removing old RSS data for source: {0} {1}".format(source.url, source.title))
                     entries.delete()

@@ -1,7 +1,5 @@
-
-
 class YouTubeLinkHandler(object):
-    def __init__(self, url = None):
+    def __init__(self, url=None):
         self.url = YouTubeLinkHandler.input2url(url)
         self.yt_text = None
         self.yt_ob = None
@@ -18,17 +16,17 @@ class YouTubeLinkHandler(object):
 
     def code2url(code):
         if code:
-           return 'https://www.youtube.com/watch?v={0}'.format(code)
+            return 'https://www.youtube.com/watch?v={0}'.format(code)
 
     def input2code(url):
         wh = url.find("youtu.be")
         video_code = None
         if wh >= 0:
-            video_code = url[wh+9:]
+            video_code = url[wh + 9:]
         else:
             wh = url.find("?")
             if wh >= 0:
-                url = url[wh + 1 :]
+                url = url[wh + 1:]
                 split_items = url.split("&")
                 for split_item in split_items:
                     wh = split_item.find("v=")
@@ -37,10 +35,11 @@ class YouTubeLinkHandler(object):
         return video_code
 
     def get_embed_link(self):
-        return "https://www.youtube.com/embed/{0}".format(self.get_video_code() )
+        return "https://www.youtube.com/embed/{0}".format(self.get_video_code())
 
     def get_frame(self):
-        return "<iframe src=\"{0}\" frameborder=\"0\" allowfullscreen class=\"youtube_player_frame\"></iframe>".format(self.get_embed_link())
+        return "<iframe src=\"{0}\" frameborder=\"0\" allowfullscreen class=\"youtube_player_frame\"></iframe>".format(
+            self.get_embed_link())
 
     def get_title(self):
         if self.yt_ob:
@@ -105,13 +104,13 @@ class YouTubeLinkHandler(object):
         self.yt_ob = YouTubeJson()
 
         if self.yt_text and not self.yt_ob.loads(self.yt_text):
-            #logging.error("Could not read json for {0}, removing details data".format(self.url))
+            # logging.error("Could not read json for {0}, removing details data".format(self.url))
             return False
 
         from ..serializers.returnyoutubedislikeapijson import YouTubeThumbsDown
         self.rd_ob = YouTubeThumbsDown()
         if self.rd_text and not self.rd_ob.loads(self.rd_text):
-            #logging.error("Could not read json for {0}, removing returndislike api data".format(self.url))
+            # logging.error("Could not read json for {0}, removing returndislike api data".format(self.url))
             return False
 
         return True
@@ -126,22 +125,22 @@ class YouTubeLinkHandler(object):
             return self.load_details()
 
     def download_details_yt(self):
-      from ..programwrappers import ytdlp
+        from ..programwrappers import ytdlp
 
-      yt = ytdlp.YTDLP(self.url)
-      self.yt_text = yt.download_data()
-      if self.yt_text is None:
-          return False
-      return True
+        yt = ytdlp.YTDLP(self.url)
+        self.yt_text = yt.download_data()
+        if self.yt_text is None:
+            return False
+        return True
 
     def download_details_rd(self):
-      from ..serializers.returnyoutubedislikeapijson import YouTubeThumbsDown
+        from ..serializers.returnyoutubedislikeapijson import YouTubeThumbsDown
 
-      ytr = YouTubeThumbsDown(self)
-      self.rd_text = ytr.download_data()
-      if self.rd_text is None:
-          return False
-      return True
+        ytr = YouTubeThumbsDown(self)
+        self.rd_text = ytr.download_data()
+        if self.rd_text is None:
+            return False
+        return True
 
     def get_cached_details(self):
         from ..models import YouTubeMetaCache, YouTubeReturnDislikeMetaCache

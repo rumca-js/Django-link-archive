@@ -17,4 +17,3 @@ class NiezaleznaPlugin(BasePlugin):
         if re.search(search_pattern, address):
             return True
         return False
-

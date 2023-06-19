@@ -14,9 +14,11 @@ def init_context(request, context):
     from ..views import init_context
     return init_context(request, context)
 
+
 def get_context(request):
     from ..views import get_context
     return get_context(request)
+
 
 def get_app():
     from ..views import app_name
@@ -31,7 +33,7 @@ def entry_add_comment(request, link_id):
         return render(request, get_app() / 'missing_rights.html', context)
 
     print("Link id" + str(link_id))
-    link = LinkDataModel.objects.get(id = link_id)
+    link = LinkDataModel.objects.get(id=link_id)
 
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
@@ -51,7 +53,7 @@ def entry_add_comment(request, link_id):
 
     else:
         author = request.user.username
-        form = CommentEntryForm(initial={'author' : author, 'link' : link.link})
+        form = CommentEntryForm(initial={'author': author, 'link': link.link})
 
     form.method = "POST"
     form.pk = link_id
@@ -71,7 +73,7 @@ def entry_comment_edit(request, pk):
     if not request.user.is_authenticated:
         return render(request, get_app() / 'missing_rights.html', context)
 
-    comment_obj = LinkCommentDataModel.objects.get(id = pk)
+    comment_obj = LinkCommentDataModel.objects.get(id=pk)
     link = comment_obj.link_obj
 
     author = request.user.username
@@ -95,7 +97,7 @@ def entry_comment_edit(request, pk):
 
             return render(request, get_app() / 'summary_present.html', context)
     else:
-        form = CommentEntryForm(instance = comment_obj)
+        form = CommentEntryForm(instance=comment_obj)
         form.method = "POST"
         form.pk = pk
         form.action_url = reverse('{}:entry-comment-edit'.format(get_app()), args=[pk])
@@ -114,7 +116,7 @@ def entry_comment_remove(request, pk):
     if not request.user.is_authenticated:
         return render(request, get_app() / 'missing_rights.html', context)
 
-    comment_obj = LinkCommentDataModel.objects.get(id = pk)
+    comment_obj = LinkCommentDataModel.objects.get(id=pk)
     link = comment_obj.link_obj
 
     author = request.user.username
@@ -128,4 +130,3 @@ def entry_comment_remove(request, pk):
     context["summary_text"] = "Removed comment"
 
     return render(request, get_app() / 'summary_present.html', context)
-

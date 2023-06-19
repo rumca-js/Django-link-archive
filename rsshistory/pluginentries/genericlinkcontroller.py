@@ -1,4 +1,3 @@
-
 class LinkButton(object):
 
     def __init__(self, name, action):

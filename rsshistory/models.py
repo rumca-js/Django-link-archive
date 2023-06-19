@@ -18,14 +18,14 @@ class SourceDataModel(models.Model):
     SOURCE_TYPE_SPOTIFY = "SpotifyPlugin"
 
     SOURCE_TYPES = (
-        (SOURCE_TYPE_RSS, SOURCE_TYPE_RSS),            # 
-        (SOURCE_TYPE_PARSE, SOURCE_TYPE_PARSE),        # 
-        (SOURCE_TYPE_CODEPROJECT, SOURCE_TYPE_CODEPROJECT),        # 
-        (SOURCE_TYPE_INSTALKI, SOURCE_TYPE_INSTALKI),        # 
-        (SOURCE_TYPE_NIEZALEZNA, SOURCE_TYPE_NIEZALEZNA),        # 
-        (SOURCE_TYPE_TVN24, SOURCE_TYPE_TVN24),        # 
-        (SOURCE_TYPE_SPOTIFY, SOURCE_TYPE_SPOTIFY),        # 
-        )
+        (SOURCE_TYPE_RSS, SOURCE_TYPE_RSS),  #
+        (SOURCE_TYPE_PARSE, SOURCE_TYPE_PARSE),  #
+        (SOURCE_TYPE_CODEPROJECT, SOURCE_TYPE_CODEPROJECT),  #
+        (SOURCE_TYPE_INSTALKI, SOURCE_TYPE_INSTALKI),  #
+        (SOURCE_TYPE_NIEZALEZNA, SOURCE_TYPE_NIEZALEZNA),  #
+        (SOURCE_TYPE_TVN24, SOURCE_TYPE_TVN24),  #
+        (SOURCE_TYPE_SPOTIFY, SOURCE_TYPE_SPOTIFY),  #
+    )
 
     url = models.CharField(max_length=2000, unique=True)
     title = models.CharField(max_length=1000)
@@ -38,7 +38,7 @@ class SourceDataModel(models.Model):
     favicon = models.CharField(max_length=1000, null=True)
     on_hold = models.BooleanField(default=False)
     fetch_period = models.IntegerField(default=3600)
-    source_type = models.CharField(max_length=1000, null=False, choices = SOURCE_TYPES, default=SOURCE_TYPE_RSS)
+    source_type = models.CharField(max_length=1000, null=False, choices=SOURCE_TYPES, default=SOURCE_TYPE_RSS)
 
     class Meta:
         ordering = ['title']
@@ -68,10 +68,10 @@ class SourceDataModel(models.Model):
         date_fetched = self.get_date_fetched()
         if date_fetched:
             time_since_update = start_time - date_fetched
-            #mins = time_since_update / timedelta(minutes=1)
+            # mins = time_since_update / timedelta(minutes=1)
             secs = time_since_update / timedelta(seconds=1)
 
-            #if mins >= 30:
+            # if mins >= 30:
             if secs >= self.fetch_period:
                 return True
             return False
@@ -115,15 +115,15 @@ class SourceDataModel(models.Model):
             obj.number_of_entries = number_of_entries
             obj.save()
         else:
-            objs = SourceOperationalData.objects.filter(url = self.url, source_obj = None)
+            objs = SourceOperationalData.objects.filter(url=self.url, source_obj=None)
             if len(objs) >= 0:
                 objs.delete()
 
             op = SourceOperationalData(url=self.url,
-                                          date_fetched=date_fetched,
-                                          import_seconds=import_seconds,
-                                          number_of_entries=number_of_entries,
-                                          source_obj=self)
+                                       date_fetched=date_fetched,
+                                       import_seconds=import_seconds,
+                                       number_of_entries=number_of_entries,
+                                       source_obj=self)
             op.save()
 
     def get_favicon(self):
@@ -250,7 +250,7 @@ class LinkDataModel(models.Model):
             return self.source
 
     def get_tag_string(self):
-        return LinkTagsDataModel.join_elements(self.tags.all()) 
+        return LinkTagsDataModel.join_elements(self.tags.all())
 
     def get_tag_map(self):
         # TODO should it be done by for tag in self.tags: tag.get_map()?
@@ -322,18 +322,18 @@ class LinkDataModel(models.Model):
     def get_archive_link(self):
         from .services.waybackmachine import WaybackMachine
         from .dateutils import DateUtils
+
         m = WaybackMachine()
         formatted_date = m.get_formatted_date(self.date_published.date())
-
-        archive_link = "https://web.archive.org/web/{}000000*/{}".format(formatted_date, self.link)
+        archive_link = m.get_archive_url_for_date(formatted_date, self.link)
         return archive_link
 
     def create_from_youtube(url, data):
         from .pluginentries.youtubelinkhandler import YouTubeLinkHandler
 
-        objs = LinkDataModel.objects.filter(link = url)
+        objs = LinkDataModel.objects.filter(link=url)
         if len(objs) != 0:
-           return False
+            return False
 
         h = YouTubeLinkHandler(url)
         if not h.download_details():
@@ -364,22 +364,22 @@ class LinkDataModel(models.Model):
             persistent = data["persistent"]
 
         source_obj = None
-        sources = SourceDataModel.objects.filter(url = source)
+        sources = SourceDataModel.objects.filter(url=source)
         if sources.exists():
             source_obj = sources[0]
 
         entry = LinkDataModel(
-                source = source,
-                title = title,
-                description = description,
-                link = link,
-                date_published = date_published,
-                persistent = persistent,
-                thumbnail = thumbnail,
-                artist = artist,
-                language = language,
-                user = user,
-                source_obj = source_obj)
+            source=source,
+            title=title,
+            description=description,
+            link=link,
+            date_published=date_published,
+            persistent=persistent,
+            thumbnail=thumbnail,
+            artist=artist,
+            language=language,
+            user=user,
+            source_obj=source_obj)
         entry.save()
         return True
 
@@ -482,9 +482,9 @@ class UserConfig(models.Model):
 
     user = models.CharField(max_length=500, unique=True)
     # theme: light, dark
-    theme = models.CharField(max_length=500, null=True, default="light", choices = THEME_TYPE_CHOICES)
+    theme = models.CharField(max_length=500, null=True, default="light", choices=THEME_TYPE_CHOICES)
     # display type: standard, compact, preview
-    display_type = models.CharField(max_length=500, null=True, default="standard", choices = DISPLAY_TYPE_CHOICES)
+    display_type = models.CharField(max_length=500, null=True, default="standard", choices=DISPLAY_TYPE_CHOICES)
     show_icons = models.BooleanField(default=True)
     thumbnails_as_icons = models.BooleanField(default=True)
     small_icons = models.BooleanField(default=True)
@@ -564,6 +564,7 @@ class PersistentInfo(models.Model):
 
 """ YouTube meta cache """
 
+
 class YouTubeMetaCache(models.Model):
     url = models.CharField(max_length=1000, help_text='url', unique=False)
     details_json = models.CharField(max_length=1000, help_text='details_json')
@@ -597,22 +598,22 @@ class BackgroundJob(models.Model):
     JOB_PUSH_TO_REPO = "push-to-repo"
 
     JOB_CHOICES = (
-        (JOB_PROCESS_SOURCE, JOB_PROCESS_SOURCE),        # for RSS sources it checks if there are new data
-        (JOB_LINK_ADD, JOB_LINK_ADD),                    # adds link using default properties, may contain link map properties in the map
-        (JOB_LINK_DETAILS, JOB_LINK_DETAILS),            # fetches link additional information
-        (JOB_LINK_REFRESH, JOB_LINK_REFRESH),            # refreshes link, refetches its data
-        (JOB_LINK_ARCHIVE, JOB_LINK_ARCHIVE),            # link is archived using thirdparty pages (archive.org)
-        (JOB_LINK_DOWNLOAD, JOB_LINK_DOWNLOAD),          # link is downloaded using wget
-        (JOB_LINK_DOWNLOAD_MUSIC, JOB_LINK_DOWNLOAD_MUSIC),        # 
-        (JOB_LINK_DOWNLOAD_VIDEO, JOB_LINK_DOWNLOAD_VIDEO),        # 
-        (JOB_WRITE_DAILY_DATA, JOB_WRITE_DAILY_DATA),    # writes daily data
-        (JOB_WRITE_TOPIC_DATA, JOB_WRITE_TOPIC_DATA),    # writes topic data
-        (JOB_WRITE_BOOKMARKS, JOB_WRITE_BOOKMARKS),      # writes bookmarks
-        (JOB_PUSH_TO_REPO, JOB_PUSH_TO_REPO),            # pushes to repo
-        )
+        (JOB_PROCESS_SOURCE, JOB_PROCESS_SOURCE),  # for RSS sources it checks if there are new data
+        (JOB_LINK_ADD, JOB_LINK_ADD),  # adds link using default properties, may contain link map properties in the map
+        (JOB_LINK_DETAILS, JOB_LINK_DETAILS),  # fetches link additional information
+        (JOB_LINK_REFRESH, JOB_LINK_REFRESH),  # refreshes link, refetches its data
+        (JOB_LINK_ARCHIVE, JOB_LINK_ARCHIVE),  # link is archived using thirdparty pages (archive.org)
+        (JOB_LINK_DOWNLOAD, JOB_LINK_DOWNLOAD),  # link is downloaded using wget
+        (JOB_LINK_DOWNLOAD_MUSIC, JOB_LINK_DOWNLOAD_MUSIC),  #
+        (JOB_LINK_DOWNLOAD_VIDEO, JOB_LINK_DOWNLOAD_VIDEO),  #
+        (JOB_WRITE_DAILY_DATA, JOB_WRITE_DAILY_DATA),  # writes daily data
+        (JOB_WRITE_TOPIC_DATA, JOB_WRITE_TOPIC_DATA),  # writes topic data
+        (JOB_WRITE_BOOKMARKS, JOB_WRITE_BOOKMARKS),  # writes bookmarks
+        (JOB_PUSH_TO_REPO, JOB_PUSH_TO_REPO),  # pushes to repo
+    )
 
     # job - add link, process source, download music, download video, wayback save
-    job = models.CharField(max_length=1000, null=False, choices = JOB_CHOICES)
+    job = models.CharField(max_length=1000, null=False, choices=JOB_CHOICES)
     # task name
     task = models.CharField(max_length=1000, null=True)
     subject = models.CharField(max_length=1000, null=False)
@@ -642,86 +643,92 @@ class BackgroundJob(models.Model):
     def get_number_of_jobs(job_type):
         return len(BackgroundJob.objects.filter(job=job_type))
 
-    def download_rss(source, force = False):
+    def download_rss(source, force=False):
         if force == False:
             if source.is_fetch_possible() == False:
                 return False
 
-        if len(BackgroundJob.objects.filter(job=BackgroundJob.JOB_PROCESS_SOURCE, subject=source.url)) == 0: 
+        if len(BackgroundJob.objects.filter(job=BackgroundJob.JOB_PROCESS_SOURCE, subject=source.url)) == 0:
             BackgroundJob.objects.create(job=BackgroundJob.JOB_PROCESS_SOURCE, task=None, subject=source.url, args="")
 
         return True
 
     def download_music(item):
-       bj = BackgroundJob.objects.create(job=BackgroundJob.JOB_LINK_DOWNLOAD_MUSIC, task=None, subject=item.link, args="")
-       return True
+        bj = BackgroundJob.objects.create(job=BackgroundJob.JOB_LINK_DOWNLOAD_MUSIC, task=None, subject=item.link,
+                                          args="")
+        return True
 
     def download_video(item):
-       bj = BackgroundJob.objects.create(job=BackgroundJob.JOB_LINK_DOWNLOAD_VIDEO, task=None, subject=item.link, args="")
-       return True
+        bj = BackgroundJob.objects.create(job=BackgroundJob.JOB_LINK_DOWNLOAD_VIDEO, task=None, subject=item.link,
+                                          args="")
+        return True
 
     def youtube_details(url):
-       bj = BackgroundJob.objects.create(job=BackgroundJob.JOB_LINK_DETAILS, task=None, subject=url, args="")
-       return True
+        bj = BackgroundJob.objects.create(job=BackgroundJob.JOB_LINK_DETAILS, task=None, subject=url, args="")
+        return True
 
     def link_add(url, source):
-       existing = LinkDataModel.objects.filter(link = url)
-       if len(existing) > 0:
-          return False
-       
-       if len(BackgroundJob.objects.filter(job=BackgroundJob.JOB_LINK_ADD, subject=url)) == 0: 
+        existing = LinkDataModel.objects.filter(link=url)
+        if len(existing) > 0:
+            return False
+
+        if len(BackgroundJob.objects.filter(job=BackgroundJob.JOB_LINK_ADD, subject=url)) == 0:
             BackgroundJob.objects.create(job=BackgroundJob.JOB_LINK_ADD, task=None, subject=url, args=str(source.id))
 
     def write_daily_data_range(date_start=date.today(), date_stop=date.today()):
         from datetime import timedelta
         try:
             if date_stop < date_start:
-                PersistentInfo.error("Yearly generation: Incorrect configuration of dates start:{} stop:{}".format(date_start, date_stop))
+                PersistentInfo.error(
+                    "Yearly generation: Incorrect configuration of dates start:{} stop:{}".format(date_start,
+                                                                                                  date_stop))
                 return False
 
             sent = False
             current_date = date_start
             while current_date <= date_stop:
                 str_date = current_date.isoformat()
-                current_date += timedelta(days = 1) 
+                current_date += timedelta(days=1)
 
-                BackgroundJob.objects.create(job=BackgroundJob.JOB_WRITE_DAILY_DATA, task=None, subject=str_date, args="")
+                BackgroundJob.objects.create(job=BackgroundJob.JOB_WRITE_DAILY_DATA, task=None, subject=str_date,
+                                             args="")
                 sent = True
 
             return sent
         except Exception as e:
-           error_text = traceback.format_exc()
-           PersistentInfo.error("Exception: Daily data: {} {}".format(str(e), error_text))
+            error_text = traceback.format_exc()
+            PersistentInfo.error("Exception: Daily data: {} {}".format(str(e), error_text))
 
     def write_daily_data(input_date):
-       bj = BackgroundJob.objects.create(job=BackgroundJob.JOB_WRITE_DAILY_DATA, task=None, subject=input_date, args="")
-       return True
+        bj = BackgroundJob.objects.create(job=BackgroundJob.JOB_WRITE_DAILY_DATA, task=None, subject=input_date,
+                                          args="")
+        return True
 
-    def write_daily_data_str(start='2022-01-01', stop = '2022-12-31'):
+    def write_daily_data_str(start='2022-01-01', stop='2022-12-31'):
         try:
             date_start = datetime.strptime(start, '%Y-%m-%d').date()
             date_stop = datetime.strptime(stop, '%Y-%m-%d').date()
 
             BackgroundJob.write_daily_data_range(date_start, date_stop)
         except Exception as e:
-           error_text = traceback.format_exc()
-           PersistentInfo.error("Exception: Daily data: {} {}".format(str(e), error_text))
+            error_text = traceback.format_exc()
+            PersistentInfo.error("Exception: Daily data: {} {}".format(str(e), error_text))
 
     def write_tag_data(tag):
         try:
             BackgroundJob.objects.create(job=BackgroundJob.JOB_WRITE_TOPIC_DATA, task=None, subject=tag, args="")
             return True
         except Exception as e:
-           error_text = traceback.format_exc()
-           PersistentInfo.error("Exception: Tag data: {} {}".format(str(e), error_text))
+            error_text = traceback.format_exc()
+            PersistentInfo.error("Exception: Tag data: {} {}".format(str(e), error_text))
 
     def write_bookmarks():
         try:
             BackgroundJob.objects.create(job=BackgroundJob.JOB_WRITE_BOOKMARKS, task=None, subject="", args="")
             return True
         except Exception as e:
-           error_text = traceback.format_exc()
-           PersistentInfo.error("Exception: Write bookmarks: {} {}".format(str(e), error_text))
+            error_text = traceback.format_exc()
+            PersistentInfo.error("Exception: Write bookmarks: {} {}".format(str(e), error_text))
 
     def link_archive(link_url):
         try:
@@ -730,30 +737,30 @@ class BackgroundJob(models.Model):
                 BackgroundJob.objects.create(job=BackgroundJob.JOB_LINK_ARCHIVE, task=None, subject=link_url, args="")
                 return True
             else:
-                for key,obj in enumerate(archive_items):
+                for key, obj in enumerate(archive_items):
                     if key > 100:
-                       obj.delete()
+                        obj.delete()
         except Exception as e:
-           error_text = traceback.format_exc()
-           PersistentInfo.error("Exception: Link archive: {} {}".format(str(e), error_text))
+            error_text = traceback.format_exc()
+            PersistentInfo.error("Exception: Link archive: {} {}".format(str(e), error_text))
 
     def link_download(link_url):
         try:
             BackgroundJob.objects.create(job=BackgroundJob.JOB_LINK_DOWNLOAD, task=None, subject=link_url, args="")
             return True
         except Exception as e:
-           error_text = traceback.format_exc()
-           PersistentInfo.error("Exception: Link download: {} {}".format(str(e), error_text))
-           
+            error_text = traceback.format_exc()
+            PersistentInfo.error("Exception: Link download: {} {}".format(str(e), error_text))
+
     def push_to_repo():
         try:
             items = BackgroundJob.objects.filter(job=BackgroundJob.JOB_PUSH_TO_REPO, subject="")
-            if len(items) == 0: 
-               BackgroundJob.objects.create(job=BackgroundJob.JOB_PUSH_TO_REPO, task=None, subject="", args="")
-               return True
+            if len(items) == 0:
+                BackgroundJob.objects.create(job=BackgroundJob.JOB_PUSH_TO_REPO, task=None, subject="", args="")
+                return True
             elif len(items) > 1:
-               for item in items:
-                   item.delete()
+                for item in items:
+                    item.delete()
         except Exception as e:
-           error_text = traceback.format_exc()
-           PersistentInfo.error("Exception: Link download: {} {}".format(str(e), error_text))
+            error_text = traceback.format_exc()
+            PersistentInfo.error("Exception: Link download: {} {}".format(str(e), error_text))

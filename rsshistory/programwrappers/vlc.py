@@ -1,4 +1,3 @@
-
 import subprocess
 import os
 
@@ -8,7 +7,7 @@ class Vlc(object):
         self.name = name
 
     def run(self):
-        data = subprocess.run(['vlc',self.name, 'vlc://quit'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        data = subprocess.run(['vlc', self.name, 'vlc://quit'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     @staticmethod
     def validate():
@@ -18,5 +17,3 @@ class Vlc(object):
             return False
         return True
 
-
-############################################################

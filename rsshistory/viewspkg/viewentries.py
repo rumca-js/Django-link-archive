@@ -1,4 +1,3 @@
-
 from django.views import generic
 from django.urls import reverse
 from django.shortcuts import render
@@ -12,9 +11,11 @@ def init_context(request, context):
     from ..views import init_context
     return init_context(request, context)
 
+
 def get_context(request):
     from ..views import get_context
     return get_context(request)
+
 
 def get_app():
     from ..views import app_name
@@ -80,7 +81,7 @@ class RssEntryDetailView(generic.DetailView):
         from ..dateutils import DateUtils
         m = WaybackMachine()
         context['archive_org_date'] = m.get_formatted_date(DateUtils.get_date_today())
-        
+
         from django_user_agents.utils import get_user_agent
         user_agent = get_user_agent(self.request)
         context["is_mobile"] = user_agent.is_mobile
@@ -106,7 +107,7 @@ def add_entry(request):
         valid = form.is_valid()
         link = request.POST.get("link", "")
 
-        ob = LinkDataModel.objects.filter(link = link)
+        ob = LinkDataModel.objects.filter(link=link)
         if ob.exists():
             context['form'] = form
             context['entry'] = ob[0]
@@ -121,7 +122,7 @@ def add_entry(request):
 
             context['form'] = form
 
-            ob = LinkDataModel.objects.filter(link = data['link'])
+            ob = LinkDataModel.objects.filter(link=data['link'])
             if ob.exists():
                 context['entry'] = ob[0]
 
@@ -141,7 +142,7 @@ def add_entry(request):
     # if a GET (or any other method) we'll create a blank form
     else:
         author = request.user.username
-        form = EntryForm(initial={'user' : author})
+        form = EntryForm(initial={'user': author})
         form.method = "POST"
         form.action_url = reverse('{}:entry-add'.format(get_app()))
         context['form'] = form
@@ -202,7 +203,7 @@ def edit_entry(request, pk):
         return render(request, get_app() / 'summary_present.html', context)
     else:
         form = EntryForm(instance=ob)
-        #form.fields['user'].initial = request.user.username
+        # form.fields['user'].initial = request.user.username
         form.method = "POST"
         form.action_url = reverse('{}:entry-edit'.format(get_app()), args=[pk])
         context['form'] = form
@@ -253,7 +254,7 @@ def search_init_view(request):
     context = get_context(request)
     context['page_title'] += " - search view"
 
-    filter_form = EntryChoiceForm(args = request.GET)
+    filter_form = EntryChoiceForm(args=request.GET)
     filter_form.create()
     filter_form.method = "GET"
     filter_form.action_url = reverse('{}:entries'.format(get_app()))
@@ -299,7 +300,7 @@ def make_not_persistent_entry(request, pk):
 
     ft = LinkDataModel.objects.get(id=pk)
 
-    tags = LinkTagsDataModel.objects.filter(link = ft.link)
+    tags = LinkTagsDataModel.objects.filter(link=ft.link)
     tags.delete()
 
     fav = ft.persistent
@@ -340,11 +341,11 @@ def import_entries(request):
                 else:
                     try:
                         record = LinkDataModel(url=entry.url,
-                                                    title=entry.title,
-                                                    description=entry.description,
-                                                    link=entry.link,
-                                                    date_published=entry.date_published,
-                                                    persistent = entry.persistent)
+                                               title=entry.title,
+                                               description=entry.description,
+                                               link=entry.link,
+                                               date_published=entry.date_published,
+                                               persistent=entry.persistent)
                         record.save()
                         summary_text += entry.title + " " + entry.url + " " + " OK\n"
                     except Exception as e:
@@ -375,7 +376,7 @@ class NotBookmarkedView(generic.ListView):
         self.filter_form = EntryChoiceForm(self.request.GET, args=self.request.GET)
         if self.filter_form.is_valid():
             print("valid")
-        return LinkDataModel.objects.filter(tags__tag__isnull = True, persistent = True)
+        return LinkDataModel.objects.filter(tags__tag__isnull=True, persistent=True)
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context

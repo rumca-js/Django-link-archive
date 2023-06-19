@@ -5,8 +5,9 @@ import sys
 https://www.tdpain.net/blog/a-year-of-reading
 """
 
+
 class ReadingList(object):
-    def __init__(self, filename = None):
+    def __init__(self, filename=None):
         self.entries = []
         self.filename = filename
         self.read_file()

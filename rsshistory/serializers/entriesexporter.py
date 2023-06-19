@@ -1,7 +1,7 @@
-
 import logging
 
 from .converters import ModelCollectionConverter, JsonConverter, MarkDownConverter
+
 
 class EntriesExporter(object):
 
@@ -19,7 +19,7 @@ class EntriesExporter(object):
 
         self.source_template = "# Source:$title, URL:$url, language:$language"
 
-    def export_entries(self, source_url, export_file_name = "default", export_path = None, with_description = True):
+    def export_entries(self, source_url, export_file_name="default", export_path=None, with_description=True):
         if len(self._entries) == 0:
             return
 
@@ -30,7 +30,9 @@ class EntriesExporter(object):
         items = cc.get_map_full()
 
         js_converter = JsonConverter(items)
-        js_converter.set_export_columns(['source', 'title', 'description','link','date_published', 'persistent', 'dead', 'user', 'language', 'tags', 'comments'])
+        js_converter.set_export_columns(
+            ['source', 'title', 'description', 'link', 'date_published', 'persistent', 'dead', 'user', 'language',
+             'tags', 'comments'])
 
         file_name = export_path / (export_file_name + "_entries.json")
         file_name.write_text(js_converter.export())
@@ -39,7 +41,7 @@ class EntriesExporter(object):
         md_text = md.export()
 
         from ..models import SourceDataModel
-        sources = SourceDataModel.objects.filter(url = source_url)
+        sources = SourceDataModel.objects.filter(url=source_url)
 
         if sources.exists():
             from .converters import MarkDownSourceConverter
@@ -50,7 +52,7 @@ class EntriesExporter(object):
         file_name = export_path / (export_file_name + "_entries.md")
         file_name.write_text(md_text)
 
-    def export_all_entries(self, with_description = True):
+    def export_all_entries(self, with_description=True):
         if len(self._entries) == 0:
             return
 
@@ -64,7 +66,9 @@ class EntriesExporter(object):
         items = cc.get_map_full()
 
         js_converter = JsonConverter(items)
-        js_converter.set_export_columns(['source', 'title', 'description','link','date_published', 'persistent', 'dead', 'user', 'language', 'tags', 'comments'])
+        js_converter.set_export_columns(
+            ['source', 'title', 'description', 'link', 'date_published', 'persistent', 'dead', 'user', 'language',
+             'tags', 'comments'])
 
         file_name = export_path / ("all_entries.json")
         file_name.write_text(js_converter.export())

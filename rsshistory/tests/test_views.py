@@ -6,7 +6,7 @@ from django.urls import reverse
 class ViewsTest(TestCase):
 
     def test_index(self):
-    #    w = self.create_whatever()
+        #    w = self.create_whatever()
         url = reverse("rsshistory:index")
         resp = self.client.get(url)
 
@@ -96,8 +96,14 @@ class ViewsTest(TestCase):
 
         self.assertEqual(resp.status_code, 200)
 
-    def test_show_tags(self):
-        url = reverse("rsshistory:show-tags")
+    def test_tags_show_all(self):
+        url = reverse("rsshistory:tags-show-all")
+        resp = self.client.get(url)
+
+        self.assertEqual(resp.status_code, 200)
+
+    def test_tags_show_recent(self):
+        url = reverse("rsshistory:tags-show-recent")
         resp = self.client.get(url)
 
         self.assertEqual(resp.status_code, 200)

@@ -1,4 +1,3 @@
-
 import logging
 import traceback
 from ..models import PersistentInfo
@@ -75,15 +74,16 @@ class JsonConverter(ItemConverterFabric):
         item_data = self.get_filtered_columns()
 
         import json
-        return json.dumps(item_data) 
+        return json.dumps(item_data)
 
     def from_text(self, text):
         import json
-        return json.loads(text) 
+        return json.loads(text)
 
 
 import csv
 from io import StringIO
+
 
 class CsvConverter(ItemConverterFabric):
 
@@ -97,7 +97,7 @@ class CsvConverter(ItemConverterFabric):
 
         fieldnames = self.get_export_columns()
         with StringIO() as fh:
-            writer = csv.DictWriter(fh, fieldnames=fieldnames, dialect = 'semi')
+            writer = csv.DictWriter(fh, fieldnames=fieldnames, dialect='semi')
 
             writer.writeheader()
 
@@ -110,7 +110,7 @@ class CsvConverter(ItemConverterFabric):
     def from_text(self, text):
         items = []
         with StringIO(text) as fh:
-            reader = csv.DictReader(fh, dialect = 'semi')
+            reader = csv.DictReader(fh, dialect='semi')
             for row in reader:
                 items.append(row)
 
@@ -118,6 +118,7 @@ class CsvConverter(ItemConverterFabric):
 
 
 from string import Template
+
 
 class MarkDownConverter(ItemConverterFabric):
 
@@ -141,13 +142,14 @@ class MarkDownConverter(ItemConverterFabric):
             return t.safe_substitute(map_data)
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.error("Template exception {0} {1} {2} {3}".format(self.item_template, str(map_data), str(e), error_text))
+            PersistentInfo.error(
+                "Template exception {0} {1} {2} {3}".format(self.item_template, str(map_data), str(e), error_text))
         return ""
 
 
 class RssConverter(MarkDownConverter):
 
-    def __init__(self, items, item_template = None):
+    def __init__(self, items, item_template=None):
         if item_template == None:
             super().__init__(items, self.get_template())
         else:
@@ -172,5 +174,6 @@ class MarkDownSourceConverter(object):
             return t.safe_substitute(map_data)
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.error("Template exception {0} {1} {2} {3}".format(self.item_template, str(map_data), str(e), error_text))
+            PersistentInfo.error(
+                "Template exception {0} {1} {2} {3}".format(self.item_template, str(map_data), str(e), error_text))
         return ""

@@ -14,9 +14,11 @@ def init_context(request, context):
     from ..views import init_context
     return init_context(request, context)
 
+
 def get_context(request):
     from ..views import get_context
     return get_context(request)
+
 
 def get_app():
     from ..views import app_name
@@ -76,7 +78,7 @@ class RecentTags(AllTags):
         return [start, stop]
 
     def get_tags_objects(self):
-        return LinkTagsDataModel.objects.filter(date__range = self.get_time_range())
+        return LinkTagsDataModel.objects.filter(date__range=self.get_time_range())
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
@@ -86,9 +88,9 @@ class RecentTags(AllTags):
 
         return context
 
-        #link = '{}?tag="{}"'.format(reverse('{}:entries'.format(get_app())), tag[0])
-        #link_text = str(tag[0]) + " " + str(tag[1])
-        #text += "<span><a href='{0}' class=\"simplebutton\" style=\"margin: 5px\">{1}</a></span> ".format(link, link_text)
+        # link = '{}?tag="{}"'.format(reverse('{}:entries'.format(get_app())), tag[0])
+        # link_text = str(tag[0]) + " " + str(tag[1])
+        # text += "<span><a href='{0}' class=\"simplebutton\" style=\"margin: 5px\">{1}</a></span> ".format(link, link_text)
 
 
 def tag_entry(request, pk):
@@ -119,7 +121,7 @@ def tag_entry(request, pk):
 
         # create a form instance and populate it with data from the request:
         form = TagEntryForm(request.POST)
-        
+
         # check whether it's valid:
         if form.is_valid():
             form.save_tags()
@@ -142,9 +144,9 @@ def tag_entry(request, pk):
         tag_string = LinkTagsDataModel.get_author_tag_string(author, link)
 
         if tag_string:
-            form = TagEntryForm(initial={'link' : link, 'author' : author, 'tag' : tag_string})
+            form = TagEntryForm(initial={'link': link, 'author': author, 'tag': tag_string})
         else:
-            form = TagEntryForm(initial={'link' : link, 'author' : author})
+            form = TagEntryForm(initial={'link': link, 'author': author})
 
         form.method = "POST"
         form.pk = pk
@@ -219,13 +221,13 @@ def tag_rename(request):
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
         form = TagRenameForm(request.POST)
-        
+
         # check whether it's valid:
         if form.is_valid():
             current_tag = form.cleaned_data['current_tag']
             new_tag = form.cleaned_data['new_tag']
 
-            tags = LinkTagsDataModel.objects.filter(tag = current_tag)
+            tags = LinkTagsDataModel.objects.filter(tag=current_tag)
             for tag in tags:
                 tag.tag = new_tag.lower()
                 tag.save()

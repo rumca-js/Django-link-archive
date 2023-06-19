@@ -5,7 +5,7 @@ import logging
 
 class YouTubeJson(object):
 
-    def __init__(self, url = None):
+    def __init__(self, url=None):
         self._json = {}
         self.url = url
 
@@ -25,14 +25,14 @@ class YouTubeJson(object):
         except Exception as e:
             logging.critical(e, exc_info=True)
 
-    def write(self, file_name, force = True):
+    def write(self, file_name, force=True):
         file_dir = os.path.split(file_name)[0]
 
         if not os.path.isdir(file_dir):
             os.makedirs(file_dir)
 
         with open(file_name, "w", encoding='utf-8') as fh:
-            fh.write(self.get_json_data() )
+            fh.write(self.get_json_data())
 
     def read(self, file_name):
         if not os.path.isfile(file_name):
@@ -120,12 +120,12 @@ class YouTubeJson(object):
 
     def get_view_count(self):
         if len(self._json) > 0:
-            #return str(self._json["view_count"])
+            # return str(self._json["view_count"])
             return self._json["t_view_count"]
 
     def get_thumbs_up(self):
         if len(self._json) > 0:
-            #return str(self._json["like_count"])
+            # return str(self._json["like_count"])
             return self._json["t_likes"]
 
     def get_thumbs_down(self):

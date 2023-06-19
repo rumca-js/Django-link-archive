@@ -39,18 +39,12 @@ class WaybackMachine(object):
 
         from ..webtools import Page
         user_agent = Page.user_agent
-        #print("Time: {0} {1} {2} {3}".format(time.year, time.month, time.day, url))
+        # print("Time: {0} {1} {2} {3}".format(time.year, time.month, time.day, url))
 
         cdx_api = WaybackMachineCDXServerAPI(url, user_agent)
         handle = cdx_api.near(year=time.year, month=time.month, day=time.day, hour=12)
 
-        #print(handle)
-        #print(handle.archive_url)
-        #print(handle.original)
-        #print(handle.urlkey)
-        #print(handle.datetime_timestamp)
-        #print(handle.statuscode)
-        #print(handle.mimetype)
+        # self.debug_handle
 
         archive_timestamp = str(handle.timestamp)
         time_text = self.get_formatted_date(time)
@@ -60,22 +54,31 @@ class WaybackMachine(object):
             print(time_text)
             return
 
-        return_url = "https://web.archive.org/web/" + handle.timestamp + "id_/"+handle.original
+        return_url = self.get_archive_url_with_overlay(handle.timestamp, handle.original)
         return return_url
+
+    def get_archive_url_with_overlay(self, formatted_timestamp, url):
+        return "https://web.archive.org/web/{}id_/{}".format(formatted_timestamp, url)
+
+    def get_archive_url_for_timestamp(self, formatted_timestamp, url):
+        return "https://web.archive.org/web/{}*/{}".format(formatted_timestamp, url)
+
+    def get_archive_url_for_date(self, formatted_date, url):
+        return "https://web.archive.org/web/{}000000*/{}".format(formatted_date, url)
 
     def get_archive_urls(self, url, start_time, stop_time):
         from ..models import RssSourceImportHistory
 
         time = stop_time
         while time >= start_time:
-            #print("Time: {0}".format(time))
-            if len(RssSourceImportHistory.objects.filter(url = url, date = time)) != 0:
-                time -= timedelta(days = 1)
+            # print("Time: {0}".format(time))
+            if len(RssSourceImportHistory.objects.filter(url=url, date=time)) != 0:
+                time -= timedelta(days=1)
                 continue
 
             wayback_url = self.get_archive_url(url, time)
             yield (time, wayback_url)
-            time -= timedelta(days = 1)
+            time -= timedelta(days=1)
 
     def save_impl(self, url):
         from ..webtools import Page
@@ -90,7 +93,7 @@ class WaybackMachine(object):
         except Exception as e:
             print("WaybackMachine: save url: {0} {1}".format(url, str(e)))
             PersistentInfo.error("WaybackMachine: save url: {0} {1}".format(url, str(e)))
-            time.sleep(5 * 3600) # wait 5 minute
+            time.sleep(5 * 3600)  # wait 5 minute
 
     def save(self, url):
         ret = self.save_impl(url)
@@ -115,6 +118,15 @@ class WaybackMachine(object):
 
         for item in mainstream:
             if dom.find(item) >= 0:
-              return False
+                return False
 
         return True
+
+    def debug_handle(self, handle):
+        print(handle)
+        print(handle.archive_url)
+        print(handle.original)
+        print(handle.urlkey)
+        print(handle.datetime_timestamp)
+        print(handle.statuscode)
+        print(handle.mimetype)

@@ -12,7 +12,6 @@ from .forms import ConfigForm
 from .basictypes import *
 from .prjconfig import Configuration
 
-
 # https://stackoverflow.com/questions/66630043/django-is-loading-template-from-the-wrong-app
 app_name = Path("rsshistory")
 
@@ -35,7 +34,8 @@ def init_context(request, context):
 
     return context
 
-def get_context(request = None):
+
+def get_context(request=None):
     context = {}
     context = init_context(request, context)
     return context
@@ -45,7 +45,7 @@ def index(request):
     # Generate counts of some of the main objects
     num_sources = SourceDataModel.objects.all().count()
     num_entries = LinkDataModel.objects.all().count()
-    num_persistent = LinkDataModel.objects.filter(persistent = True).count()
+    num_persistent = LinkDataModel.objects.filter(persistent=True).count()
 
     context = get_context(request)
 
@@ -64,8 +64,7 @@ def untagged_bookmarks(request):
     if not request.user.is_staff:
         return render(request, app_name / 'missing_rights.html', context)
 
-    links = LinkDataModel.objects.filter(tags__tag__isnull = True)
+    links = LinkDataModel.objects.filter(tags__tag__isnull=True)
     context['links'] = links
 
     return render(request, app_name / 'entries_untagged.html', context)
-

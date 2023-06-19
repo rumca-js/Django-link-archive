@@ -37,24 +37,11 @@ Link database, with RSS functionality. Similar to Reddit, but completely open so
 
 ## UI
 
-UI, with snapshots, is described in a separate readme: [https://github.com/rumca-js/Django-link-archive/blob/main/README_ui.md](https://github.com/rumca-js/Django-link-archive/blob/main/README_ui.md).
-
-## Notes
-
- - it is best to use on a device with SSD
+UI, with snapshots, is described by a separate README: [https://github.com/rumca-js/Django-link-archive/blob/main/README_ui.md](https://github.com/rumca-js/Django-link-archive/blob/main/README_ui.md).
 
 ## Installation
 
-Installation, just as any other Django app. Link [https://docs.djangoproject.com/en/4.1/intro/tutorial01/](https://docs.djangoproject.com/en/4.1/intro/tutorial01/).
-
-## Dependencies
-
- - pip3 install feedparser
- - pip3 install python-dateutil
- - pip3 install django-user-agents
- - yt-dlp [https://github.com/yt-dlp/yt-dlp](https://github.com/yt-dlp/yt-dlp), to obtain youtube information
- - wget, optional
- - id3v2, optional
+Installation is described by a separate README: [https://github.com/rumca-js/Django-link-archive/blob/main/install/README_install.md](https://github.com/rumca-js/Django-link-archive/blob/main/install/README_install.md).
 
 ## Suite of projects
 
@@ -64,6 +51,11 @@ Installation, just as any other Django app. Link [https://docs.djangoproject.com
  - daily RSS Git repository for the year 2022 [https://github.com/rumca-js/RSS-Link-Database-2022](https://github.com/rumca-js/RSS-Link-Database-2022)
  - daily RSS Git repository for the year 2021 [https://github.com/rumca-js/RSS-Link-Database-2021](https://github.com/rumca-js/RSS-Link-Database-2021)
  - daily RSS Git repository for the year 2020 [https://github.com/rumca-js/RSS-Link-Database-2020](https://github.com/rumca-js/RSS-Link-Database-2020)
+
+## Demo
+
+Demo on development env (may, or may not be running actually):
+ - [https://renegat0x0.ddns.net/apps/rsshistory/](https://renegat0x0.ddns.net/apps/rsshistory/)
 
 ## Development
 

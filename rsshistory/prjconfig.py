@@ -5,7 +5,6 @@ import logging
 from .basictypes import *
 from .models import ConfigurationEntry
 
-
 """ version is split into three digits:
  - release
  - model version
@@ -15,7 +14,7 @@ from .models import ConfigurationEntry
  if a change requires the model to be changed, then second digit is updated, patch is set to 0
  if something should be released to public, then release version changes
 """
-__version__ = "0.10.5"
+__version__ = "0.10.2"
 
 
 class Configuration(object):
@@ -81,7 +80,7 @@ class Configuration(object):
 
     def get_threads(self):
         if self.thread_mgr:
-           return self.thread_mgr.threads
+            return self.thread_mgr.threads
 
     def close(self):
         self.thread_mgr.close()

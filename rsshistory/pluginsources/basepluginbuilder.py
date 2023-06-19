@@ -1,4 +1,3 @@
-
 from .baseplugin import BasePlugin
 from .baseparseplugin import BaseParsePlugin
 from .baserssplugin import BaseRssPlugin
@@ -8,8 +7,8 @@ from .niezaleznaplugin import NiezaleznaPlugin
 from .tvn24plugin import TVN24Plugin
 from .spotifyplugin import SpotifyPlugin
 
-class BasePluginBuilder(object):
 
+class BasePluginBuilder(object):
     plugins = [CodeProjectPlugin,
                InstalkiPlugin,
                NiezaleznaPlugin,
@@ -30,4 +29,5 @@ class BasePluginBuilder(object):
         elif source.source_type == SourceDataModel.SOURCE_TYPE_PARSE:
             return BaseParsePlugin(source)
         else:
-            raise NotImplementedError("Source: {}: Unsupported source type: {}".format(source.title, source.source_type))
+            raise NotImplementedError(
+                "Source: {}: Unsupported source type: {}".format(source.title, source.source_type))

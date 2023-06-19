@@ -1,4 +1,3 @@
-
 from django.views import generic
 from django.urls import reverse
 from django.shortcuts import render
@@ -12,9 +11,11 @@ def init_context(request, context):
     from ..views import init_context
     return init_context(request, context)
 
+
 def get_context(request):
     from ..views import get_context
     return get_context(request)
+
 
 def get_app():
     from ..views import app_name
@@ -27,8 +28,7 @@ class RssSourceListView(generic.ListView):
     paginate_by = 100
 
     def get_queryset(self):
-
-        self.filter_form = SourcesChoiceForm(args = self.request.GET)
+        self.filter_form = SourcesChoiceForm(args=self.request.GET)
         return self.filter_form.get_filtered_objects()
 
     def get_context_data(self, **kwargs):
@@ -75,7 +75,7 @@ def add_source(request):
 
         # create a form instance and populate it with data from the request:
         form = SourceForm(request.POST)
-        
+
         # check whether it's valid:
         if form.is_valid():
             form.save()
@@ -120,7 +120,7 @@ def edit_source(request, pk):
 
     ft = SourceDataModel.objects.filter(id=pk)
     if not ft.exists():
-       return render(request, get_app() / 'source_edit_does_not_exist.html', context)
+        return render(request, get_app() / 'source_edit_does_not_exist.html', context)
 
     ob = ft[0]
 
@@ -142,7 +142,7 @@ def edit_source(request, pk):
             from ..webtools import Page
             p = Page(ob.url)
 
-            form = SourceForm(instance=ob, initial={'favicon' : p.get_domain() +"/favicon.ico" })
+            form = SourceForm(instance=ob, initial={'favicon': p.get_domain() + "/favicon.ico"})
         else:
             form = SourceForm(instance=ob)
 
@@ -164,11 +164,11 @@ def refresh_source(request, pk):
 
     ft = SourceDataModel.objects.filter(id=pk)
     if not ft.exists():
-       return render(request, get_app() / 'source_edit_does_not_exist.html', context)
+        return render(request, get_app() / 'source_edit_does_not_exist.html', context)
 
     ob = ft[0]
 
-    operational = SourceOperationalData.objects.filter(url = ob.url)
+    operational = SourceOperationalData.objects.filter(url=ob.url)
     if operational.exists():
         op = operational[0]
         op.date_fetched = None
@@ -202,9 +202,9 @@ def import_sources(request):
                     summary_text += source.title + " " + source.url + " " + " Error: Already present in db\n"
                 else:
                     record = SourceDataModel(url=source.url,
-                                                title=source.title,
-                                                category=source.category,
-                                                subcategory=source.subcategory)
+                                             title=source.title,
+                                             category=source.category,
+                                             subcategory=source.subcategory)
                     record.save()
                     summary_text += source.title + " " + source.url + " " + " OK\n"
         else:
@@ -234,10 +234,10 @@ def remove_source(request, pk):
     if ft.exists():
         source_url = ft[0].url
         ft.delete()
-        
+
         # TODO checkbox - or other button to remove corresponding entries
-        #entries = LinkDataModel.objects.filter(url = source_url)
-        #if entries.exists():
+        # entries = LinkDataModel.objects.filter(url = source_url)
+        # if entries.exists():
         #    entries.delete()
 
         context["summary_text"] = "Remove ok"
@@ -295,7 +295,7 @@ def process_source_text(request, pk):
 
     from ..pluginsources.rsssourceprocessor import RssSourceProcessor
 
-    source = SourceDataModel.objects.get(id = pk)
+    source = SourceDataModel.objects.get(id=pk)
 
     proc = RssSourceProcessor()
     proc.process_parser_source(source, text)
@@ -315,8 +315,8 @@ def import_youtube_links_for_source(request, pk):
     if not request.user.is_staff:
         return render(request, get_app() / 'missing_rights.html', context)
 
-    source_obj = SourceDataModel.objects.get(id = pk)
-    
+    source_obj = SourceDataModel.objects.get(id=pk)
+
     url = str(source_obj.url)
     wh = url.find("=")
 
@@ -324,31 +324,31 @@ def import_youtube_links_for_source(request, pk):
         context['summary_text'] = "Could not obtain code from a video"
         return render(request, get_app() / 'summary_present.html', context)
 
-    code = url[wh + 1 :]
+    code = url[wh + 1:]
     channel = 'https://www.youtube.com/channel/{}'.format(code)
     ytdlp = YTDLP(channel)
     print("Searching for links for source {} channel {}".format(source_obj.title, channel))
     links = ytdlp.get_channel_video_list()
 
-    data = {"user" : None, "language" : source_obj.language, "persistent" : False}
+    data = {"user": None, "language": source_obj.language, "persistent": False}
 
     print("Found source links: {}".format(len(links)))
 
     for link in links:
-       print("Adding job {}".format(link))
-       BackgroundJob.link_add(link, source_obj)
+        print("Adding job {}".format(link))
+        BackgroundJob.link_add(link, source_obj)
 
-       """
-       try:
-           LinkDataModel.create_from_youtube(link, data)
-       except Exception as E:
-           try:
-               LinkDataModel.create_from_youtube(link, data)
-           except Exception as E:
-               pass
+        """
+        try:
+            LinkDataModel.create_from_youtube(link, data)
+        except Exception as E:
+            try:
+                LinkDataModel.create_from_youtube(link, data)
+            except Exception as E:
+                pass
+ 
+        summary_text += "\n{}".format(link)
+        """
 
-       summary_text += "\n{}".format(link)
-       """
-    
     context['summary_text'] = ""
     return render(request, get_app() / 'summary_present.html', context)
