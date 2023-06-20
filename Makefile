@@ -1,4 +1,4 @@
-.PHONY: run install test install-optional
+.PHONY: run install test install-optional refresh
 
 statics:
 	poetry run python -m manage collectstatic
@@ -26,3 +26,6 @@ migrations-check:
 
 test: migrations-check
 	@poetry run python manage.py test rsshistory
+
+refresh:
+	poetry export -f requirements.txt --output install/requirements.txt
