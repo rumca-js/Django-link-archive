@@ -16,8 +16,10 @@ install:
 	@echo " - modify INSTALLED_APPS, add rsshistory.apps.RssHistoryConfig"
 
 install-optional:
-	# I cannot write installation commands for each Linux distro. I assume you are using debian-derivative
-	sudo apt -y install wget, id3v2
+	# Assumptions:
+	# - I cannot write installation commands for each Linux distro. I assume you are using debian-derivative
+	# - assume you are using sudo. solve it later https://github.com/rumca-js/Django-link-archive/issues/10
+	apt -y install wget, id3v2
 
 migrations-check:
 	python -m manage makemigrations --check --dry-run
