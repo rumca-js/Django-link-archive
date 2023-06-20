@@ -1,13 +1,13 @@
 .PHONY: run install test install-optional
 
 statics:
-	python -m manage collectstatic
+	poetry run python -m manage collectstatic
 
 run:
-	python -m manage runserver 0.0.0.0:8000
+	poetry run python -m manage runserver 0.0.0.0:8000
 
 install:
-	python -m pip install -r install/requirements.txt
+	poetry install
 	@django-admin startproject linklibrary
 	@echo "Please configure your django application linklibrary (settings.py)"
 	@echo " - modify INSTALLED_APPS, add django_user_agents, according to https://pypi.org/project/django-user-agents/"
@@ -18,11 +18,11 @@ install:
 install-optional:
 	# Assumptions:
 	# - I cannot write installation commands for each Linux distro. I assume you are using debian-derivative
-	# - assume you are using sudo. solve it later https://github.com/rumca-js/Django-link-archive/issues/10
+	# - assume you are using sudo for this command. solve it later https://github.com/rumca-js/Django-link-archive/issues/10
 	apt -y install wget, id3v2
 
 migrations-check:
-	python -m manage makemigrations --check --dry-run
+	poetry run python -m manage makemigrations --check --dry-run
 
 test: migrations-check
-	@python manage.py test rsshistory
+	@poetry run python manage.py test rsshistory

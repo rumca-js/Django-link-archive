@@ -4,7 +4,7 @@ Use repository main level makefile to install and run development server.
 
 Makefile: [https://github.com/rumca-js/Django-link-archive/blob/main/Makefile](https://github.com/rumca-js/Django-link-archive/blob/main/Makefile).
 
-To install python dependencies & wget & id3v2 using apt
+To install python dependencies
 ```
 make install
 ```
