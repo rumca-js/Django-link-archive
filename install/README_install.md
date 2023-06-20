@@ -18,7 +18,7 @@ make run
 
 Create super user, as usual in Django [https://www.geeksforgeeks.org/how-to-create-superuser-in-django/](https://www.geeksforgeeks.org/how-to-create-superuser-in-django/)
 ```
-python manage.py createsuperuser
+poetry run python manage.py createsuperuser
 ```
 
 Create also other users, as required by your setup, environment.
