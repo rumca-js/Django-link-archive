@@ -41,7 +41,7 @@ UI, with snapshots, is described by a separate README: [https://github.com/rumca
 
 ## Installation
 
-Installation is described by a separate README: [https://github.com/rumca-js/Django-link-archive/blob/main/install/README_install.md](https://github.com/rumca-js/Django-link-archive/blob/main/install/README_install.md).
+Installation is described by a separate README: [https://github.com/rumca-js/Django-link-archive/blob/main/README_install.md](https://github.com/rumca-js/Django-link-archive/blob/main/README_install.md).
 
 ## Suite of projects
 
