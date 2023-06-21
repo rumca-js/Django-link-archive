@@ -5,7 +5,6 @@ import sys
 
 
 class ThreadJobCommon(threading.Thread):
-
     def __init__(self, name="ThreadJobCommon", seconds_wait=10, itemless=False):
         threading.Thread.__init__(self)
         print("Starting thread: {0}".format(name))
@@ -38,6 +37,7 @@ class ThreadJobCommon(threading.Thread):
 
         self.log_info("Leaving process")
         from .models import PersistentInfo
+
         PersistentInfo.create("Process has crashed")
 
     def get_process_item(self):

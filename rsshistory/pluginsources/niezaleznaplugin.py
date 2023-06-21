@@ -10,7 +10,7 @@ class NiezaleznaPlugin(BaseParsePlugin):
 
     def is_link_valid(self, address):
         if not self.is_link_valid_domain(address):
-            return False;
+            return False
 
         search_pattern = self.get_domain() + "/[0-9]+[-]"
 

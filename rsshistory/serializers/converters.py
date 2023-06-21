@@ -4,7 +4,6 @@ from ..models import PersistentInfo
 
 
 class ModelCollectionConverter(object):
-
     def __init__(self, items):
         self.items = items
 
@@ -24,7 +23,6 @@ class ModelCollectionConverter(object):
 
 
 class ItemConverterFabric(object):
-
     def __init__(self, items):
         self.export_columns_all = True
         self.export_columns = []
@@ -66,7 +64,6 @@ class ItemConverterFabric(object):
 
 
 class JsonConverter(ItemConverterFabric):
-
     def __init__(self, items):
         super().__init__(items)
 
@@ -74,10 +71,12 @@ class JsonConverter(ItemConverterFabric):
         item_data = self.get_filtered_columns()
 
         import json
+
         return json.dumps(item_data)
 
     def from_text(self, text):
         import json
+
         return json.loads(text)
 
 
@@ -86,10 +85,9 @@ from io import StringIO
 
 
 class CsvConverter(ItemConverterFabric):
-
     def __init__(self, items):
         super().__init__(items)
-        csv.register_dialect('semi', delimiter=';', quoting=csv.QUOTE_NONE)
+        csv.register_dialect("semi", delimiter=";", quoting=csv.QUOTE_NONE)
 
     def export(self):
         # TODO
@@ -97,7 +95,7 @@ class CsvConverter(ItemConverterFabric):
 
         fieldnames = self.get_export_columns()
         with StringIO() as fh:
-            writer = csv.DictWriter(fh, fieldnames=fieldnames, dialect='semi')
+            writer = csv.DictWriter(fh, fieldnames=fieldnames, dialect="semi")
 
             writer.writeheader()
 
@@ -110,7 +108,7 @@ class CsvConverter(ItemConverterFabric):
     def from_text(self, text):
         items = []
         with StringIO(text) as fh:
-            reader = csv.DictReader(fh, dialect='semi')
+            reader = csv.DictReader(fh, dialect="semi")
             for row in reader:
                 items.append(row)
 
@@ -121,7 +119,6 @@ from string import Template
 
 
 class MarkDownConverter(ItemConverterFabric):
-
     def __init__(self, items, item_template):
         super().__init__(items)
         self.item_template = item_template
@@ -143,12 +140,14 @@ class MarkDownConverter(ItemConverterFabric):
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.error(
-                "Template exception {0} {1} {2} {3}".format(self.item_template, str(map_data), str(e), error_text))
+                "Template exception {0} {1} {2} {3}".format(
+                    self.item_template, str(map_data), str(e), error_text
+                )
+            )
         return ""
 
 
 class RssConverter(MarkDownConverter):
-
     def __init__(self, items, item_template=None):
         if item_template == None:
             super().__init__(items, self.get_template())
@@ -156,7 +155,7 @@ class RssConverter(MarkDownConverter):
             super().__init__(items, item_template)
 
     def get_template(self):
-        return "<item><title>![CDATA[$title]]</title><description>![CDATA[$description]]</description><pubDate>$date_published</pubDate><link>$link</link></item><guid isPermaLink=\"false\">$link</guid>"
+        return '<item><title>![CDATA[$title]]</title><description>![CDATA[$description]]</description><pubDate>$date_published</pubDate><link>$link</link></item><guid isPermaLink="false">$link</guid>'
 
 
 class MarkDownSourceConverter(object):
@@ -175,5 +174,8 @@ class MarkDownSourceConverter(object):
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.error(
-                "Template exception {0} {1} {2} {3}".format(self.item_template, str(map_data), str(e), error_text))
+                "Template exception {0} {1} {2} {3}".format(
+                    self.item_template, str(map_data), str(e), error_text
+                )
+            )
         return ""

@@ -3,7 +3,7 @@ import logging
 
 
 class RssHistoryConfig(AppConfig):
-    name = 'rsshistory'
+    name = "rsshistory"
 
     def ready(self):
         pass

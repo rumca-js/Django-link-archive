@@ -13,13 +13,13 @@ class ReadingList(object):
         self.read_file()
 
     def read_file(self):
-        with open(self.filename, newline='') as f:
+        with open(self.filename, newline="") as f:
             reader = csv.DictReader(f)
             try:
                 for row in reader:
                     self.handle_row(row)
             except csv.Error as e:
-                sys.exit('file {}, line {}: {}'.format(filename, reader.line_num, e))
+                sys.exit("file {}, line {}: {}".format(filename, reader.line_num, e))
 
     def handle_row(self, row):
         self.entries.append(row)

@@ -3,7 +3,6 @@ import json
 
 
 class YouTubeThumbsDown(object):
-
     def __init__(self, link=None):
         self._link = link
 
@@ -12,6 +11,7 @@ class YouTubeThumbsDown(object):
 
     def read_code_data(code):
         from ..webtools import Page
+
         url = "https://returnyoutubedislikeapi.com/votes?videoId=" + code
 
         page = Page(url)
@@ -30,13 +30,13 @@ class YouTubeThumbsDown(object):
         return self._json
 
     def get_thumbs_up(self):
-        return self._json['likes']
+        return self._json["likes"]
 
     def get_thumbs_down(self):
-        return self._json['dislikes']
+        return self._json["dislikes"]
 
     def get_view_count(self):
-        return self._json['viewCount']
+        return self._json["viewCount"]
 
     def get_rating(self):
-        return self._json['rating']
+        return self._json["rating"]

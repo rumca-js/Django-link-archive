@@ -8,7 +8,6 @@ from ..models import PersistentInfo
 
 
 class WaybackMachine(object):
-
     def __init__(self):
         self.url = None
 
@@ -17,6 +16,7 @@ class WaybackMachine(object):
             self.url = url
 
             from ..webtools import Page
+
             user_agent = Page.user_agent
 
             cdx_api = WaybackMachineCDXServerAPI(url, user_agent)
@@ -38,6 +38,7 @@ class WaybackMachine(object):
                 return
 
         from ..webtools import Page
+
         user_agent = Page.user_agent
         # print("Time: {0} {1} {2} {3}".format(time.year, time.month, time.day, url))
 
@@ -54,7 +55,9 @@ class WaybackMachine(object):
             print(time_text)
             return
 
-        return_url = self.get_archive_url_with_overlay(handle.timestamp, handle.original)
+        return_url = self.get_archive_url_with_overlay(
+            handle.timestamp, handle.original
+        )
         return return_url
 
     def get_archive_url_with_overlay(self, formatted_timestamp, url):
@@ -92,7 +95,9 @@ class WaybackMachine(object):
             return val
         except Exception as e:
             print("WaybackMachine: save url: {0} {1}".format(url, str(e)))
-            PersistentInfo.error("WaybackMachine: save url: {0} {1}".format(url, str(e)))
+            PersistentInfo.error(
+                "WaybackMachine: save url: {0} {1}".format(url, str(e))
+            )
             time.sleep(5 * 3600)  # wait 5 minute
 
     def save(self, url):
@@ -111,10 +116,7 @@ class WaybackMachine(object):
 
         dom = p.get_domain_only()
 
-        mainstream = ['www.facebook',
-                      'www.rumble',
-                      'wikipedia.org',
-                      'web.archive.org']
+        mainstream = ["www.facebook", "www.rumble", "wikipedia.org", "web.archive.org"]
 
         for item in mainstream:
             if dom.find(item) >= 0:

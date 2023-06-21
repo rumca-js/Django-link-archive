@@ -6,7 +6,13 @@ from pathlib import Path
 from django.db.models import Q
 
 from .views import app_name
-from .models import LinkDataModel, SourceDataModel, PersistentInfo, ConfigurationEntry, BackgroundJob
+from .models import (
+    LinkDataModel,
+    SourceDataModel,
+    PersistentInfo,
+    ConfigurationEntry,
+    BackgroundJob,
+)
 from .models import RssSourceImportHistory, RssSourceExportHistory
 from .threads import *
 from .pluginsources.basepluginbuilder import BasePluginBuilder
@@ -23,7 +29,6 @@ class BaseJobHandler(object):
 
 
 class ProcessSourceJobHandler(BaseJobHandler):
-
     def __init__(self):
         pass
 
@@ -41,13 +46,25 @@ class ProcessSourceJobHandler(BaseJobHandler):
             plugin = BasePluginBuilder.get(source)
             plugin.check_for_data()
 
-            if len(RssSourceImportHistory.objects.filter(url=source.url, date=date.today())) == 0:
-                history = RssSourceImportHistory(url=source.url, date=date.today(), source_obj=source)
+            if (
+                len(
+                    RssSourceImportHistory.objects.filter(
+                        url=source.url, date=date.today()
+                    )
+                )
+                == 0
+            ):
+                history = RssSourceImportHistory(
+                    url=source.url, date=date.today(), source_obj=source
+                )
                 history.save()
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.error(
-                "Exception during parsing page contents {0} {1} {2}".format(source.url, str(e), error_text))
+                "Exception during parsing page contents {0} {1} {2}".format(
+                    source.url, str(e), error_text
+                )
+            )
 
 
 class LinkDownloadJobHandler(BaseJobHandler):
@@ -61,11 +78,16 @@ class LinkDownloadJobHandler(BaseJobHandler):
         try:
             item = LinkDataModel.objects.filter(link=obj.subject)[0]
             from .webtools import Page
+
             p = Page(item.link)
             p.download_all()
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.error("Exception downloading web page {0} {1} {2}".format(obj.subject, str(e), error_text))
+            PersistentInfo.error(
+                "Exception downloading web page {0} {1} {2}".format(
+                    obj.subject, str(e), error_text
+                )
+            )
 
 
 class LinkMusicDownloadJobHandler(BaseJobHandler):
@@ -88,17 +110,25 @@ class LinkMusicDownloadJobHandler(BaseJobHandler):
 
             yt = ytdlp.YTDLP(item.link)
             if not yt.download_audio(file_name):
-                PersistentInfo.error("Could not download music: " + item.link + " " + item.title)
+                PersistentInfo.error(
+                    "Could not download music: " + item.link + " " + item.title
+                )
                 return
 
-            data = {'artist': item.artist, 'album': item.album, 'title': item.title}
+            data = {"artist": item.artist, "album": item.album, "title": item.title}
 
             id3 = id3v2.Id3v2(file_name, data)
             id3.tag()
-            PersistentInfo.create("Downloading music done: " + item.link + " " + item.title)
+            PersistentInfo.create(
+                "Downloading music done: " + item.link + " " + item.title
+            )
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.error("Exception downloading music {0} {1} {2}".format(obj.subject, str(e), error_text))
+            PersistentInfo.error(
+                "Exception downloading music {0} {1} {2}".format(
+                    obj.subject, str(e), error_text
+                )
+            )
 
 
 class LinkVideoDownloadJobHandler(BaseJobHandler):
@@ -115,14 +145,22 @@ class LinkVideoDownloadJobHandler(BaseJobHandler):
             PersistentInfo.create("Downloading video: " + item.link + " " + item.title)
 
             yt = ytdlp.YTDLP(item.link)
-            if not yt.download_video('file.mp4'):
-                PersistentInfo.error("Could not download video: " + item.link + " " + item.title)
+            if not yt.download_video("file.mp4"):
+                PersistentInfo.error(
+                    "Could not download video: " + item.link + " " + item.title
+                )
                 return
 
-            PersistentInfo.create("Downloading video done: " + item.link + " " + item.title)
+            PersistentInfo.create(
+                "Downloading video done: " + item.link + " " + item.title
+            )
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.error("Exception downloading video {0} {1} {2}".format(obj.subject, str(e), error_text))
+            PersistentInfo.error(
+                "Exception downloading video {0} {1} {2}".format(
+                    obj.subject, str(e), error_text
+                )
+            )
 
 
 class LinkAddJobHandler(BaseJobHandler):
@@ -147,10 +185,16 @@ class LinkAddJobHandler(BaseJobHandler):
                     LinkDataModel.create_from_youtube(link, data)
                 except Exception as e:
                     error_text = traceback.format_exc()
-                    PersistentInfo.error("Exception on adding link {} {}".format(str(e), error_text))
+                    PersistentInfo.error(
+                        "Exception on adding link {} {}".format(str(e), error_text)
+                    )
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.error("Exception downloading video {0} {1} {2}".format(obj.subject, str(e), error_text))
+            PersistentInfo.error(
+                "Exception downloading video {0} {1} {2}".format(
+                    obj.subject, str(e), error_text
+                )
+            )
 
 
 class LinkArchiveJobHandler(BaseJobHandler):
@@ -165,12 +209,15 @@ class LinkArchiveJobHandler(BaseJobHandler):
             item = obj.subject
 
             from .services.waybackmachine import WaybackMachine
+
             wb = WaybackMachine()
             if wb.is_saved(item):
                 wb.save(item)
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.error("Exception on LinkArchiveHandler {} {}".format(str(e), error_text))
+            PersistentInfo.error(
+                "Exception on LinkArchiveHandler {} {}".format(str(e), error_text)
+            )
 
 
 class WriteDailyDataJobHandler(BaseJobHandler):
@@ -183,14 +230,17 @@ class WriteDailyDataJobHandler(BaseJobHandler):
     def process(self, obj=None):
         try:
             from .datawriter import DataWriter
+
             writer = DataWriter(self._config)
 
-            date_input = datetime.strptime(obj.subject, '%Y-%m-%d').date()
+            date_input = datetime.strptime(obj.subject, "%Y-%m-%d").date()
 
             writer.write_daily_data(date_input.isoformat())
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.error("Exception: Yearly generation: {} {}".format(str(e), error_text))
+            PersistentInfo.error(
+                "Exception: Yearly generation: {} {}".format(str(e), error_text)
+            )
 
 
 class WriteBookmarksJobHandler(BaseJobHandler):
@@ -210,7 +260,9 @@ class WriteBookmarksJobHandler(BaseJobHandler):
             writer.write_bookmarks()
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.error("Exception: Writing bookmarks: {} {}".format(str(e), error_text))
+            PersistentInfo.error(
+                "Exception: Writing bookmarks: {} {}".format(str(e), error_text)
+            )
 
 
 class WriteTopicJobHandler(BaseJobHandler):
@@ -231,7 +283,9 @@ class WriteTopicJobHandler(BaseJobHandler):
             exporter.export(topic)
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.error("Exception: Writing topic data: {} {}".format(str(e), error_text))
+            PersistentInfo.error(
+                "Exception: Writing topic data: {} {}".format(str(e), error_text)
+            )
 
 
 class PushToRepoJobHandler(BaseJobHandler):
@@ -254,7 +308,6 @@ class PushToRepoJobHandler(BaseJobHandler):
 
 
 class MultiJobHandler(ThreadJobCommon):
-
     def __init__(self, name="MultiJobHandler", handlers=[]):
         seconds_wait = 10
         itemless = False
@@ -290,14 +343,15 @@ class MultiJobHandler(ThreadJobCommon):
 
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.error("Exception on LinkArchiveHandler {} {}".format(str(e), error_text))
+            PersistentInfo.error(
+                "Exception on LinkArchiveHandler {} {}".format(str(e), error_text)
+            )
 
         if item:
             item.delete()
 
 
 class RefreshThreadHandler(ThreadJobCommon):
-
     def __init__(self, name="RefreshThreadHandler"):
         itemless = True
         seconds_wait = 900
@@ -311,12 +365,17 @@ class RefreshThreadHandler(ThreadJobCommon):
             self.t_refresh(item)
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.error("Exception during parsing page contents {0} {1} {2}".format(item, str(e), error_text))
+            PersistentInfo.error(
+                "Exception during parsing page contents {0} {1} {2}".format(
+                    item, str(e), error_text
+                )
+            )
 
     def t_refresh(self, item):
         PersistentInfo.create("Refreshing RSS data")
 
         from .models import SourceDataModel
+
         sources = SourceDataModel.objects.all()
         for source in sources:
             BackgroundJob.download_rss(source)
@@ -327,13 +386,13 @@ class RefreshThreadHandler(ThreadJobCommon):
 
                 if ConfigurationEntry.get().source_archive:
                     from .models import SourceDataModel
+
                     sources = SourceDataModel.objects.all()
                     for source in sources:
                         BackgroundJob.link_archive(source.url)
 
 
 class HandlerManager(object):
-
     def __init__(self, config):
         self._cfg = config
         self.create_threads()

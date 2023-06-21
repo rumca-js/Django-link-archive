@@ -41,11 +41,17 @@ class BasePlugin(Page):
             total_time = stop_time - start_time
             total_time.total_seconds()
 
-            source.set_operational_info(stop_time, num_entries, total_time.total_seconds())
+            source.set_operational_info(
+                stop_time, num_entries, total_time.total_seconds()
+            )
 
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.exc("Source:{} {}; Exc:{}\n{}".format(source.url, source.title, str(e), error_text))
+            PersistentInfo.exc(
+                "Source:{} {}; Exc:{}\n{}".format(
+                    source.url, source.title, str(e), error_text
+                )
+            )
 
     def check_for_data_impl(self, source):
         try:
@@ -59,20 +65,21 @@ class BasePlugin(Page):
                     continue
 
                 # print("Adding link {}".format(link_data['link']))
-                objs = LinkDataModel.objects.filter(link=link_data['link'])
+                objs = LinkDataModel.objects.filter(link=link_data["link"])
                 if objs.exists():
                     # TODO maybe update with new data?
                     continue
 
                 o = LinkDataModel(
-                    source=link_data['source'],
-                    title=link_data['title'],
-                    description=link_data['description'],
-                    link=link_data['link'],
-                    date_published=link_data['published'],
-                    language=link_data['language'],
-                    thumbnail=link_data['thumbnail'],
-                    source_obj=source)
+                    source=link_data["source"],
+                    title=link_data["title"],
+                    description=link_data["description"],
+                    link=link_data["link"],
+                    date_published=link_data["published"],
+                    language=link_data["language"],
+                    thumbnail=link_data["thumbnail"],
+                    source_obj=source,
+                )
 
                 try:
                     o.save()
@@ -84,4 +91,8 @@ class BasePlugin(Page):
 
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.exc("Source:{} {}; Exc:{}\n{}".format(source.url, source.title, str(e), error_text))
+            PersistentInfo.exc(
+                "Source:{} {}; Exc:{}\n{}".format(
+                    source.url, source.title, str(e), error_text
+                )
+            )

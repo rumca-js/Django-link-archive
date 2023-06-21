@@ -19,19 +19,27 @@ class GitRepo(object):
             self.pull()
 
     def add(self, files):
-        subprocess.run(['git', 'add', '-A'], cwd=self.get_local_dir())
+        subprocess.run(["git", "add", "-A"], cwd=self.get_local_dir())
         # self.git.index.add(files)
 
     def commit(self, commit_message):
-        subprocess.run(['git', 'commit', '-m', commit_message], cwd=self.get_local_dir())
+        subprocess.run(
+            ["git", "commit", "-m", commit_message], cwd=self.get_local_dir()
+        )
         # self.git.index.commit(commit_message)
 
     def push(self):
         token = self.git_data.git_token
         user = self.git_data.git_user
         repo = self.get_repo_name()
-        subprocess.run(['git', 'push', 'https://{0}@github.com/{1}/{2}.git'.format(token, user, repo)],
-                       cwd=self.get_local_dir())
+        subprocess.run(
+            [
+                "git",
+                "push",
+                "https://{0}@github.com/{1}/{2}.git".format(token, user, repo),
+            ],
+            cwd=self.get_local_dir(),
+        )
         # origin = self.git.remote('origin')
         # origin.push()
 
@@ -47,7 +55,7 @@ class GitRepo(object):
         return Path(self.git_data.git_path) / last
 
     def clone(self):
-        subprocess.run(['git', 'clone', self.git_repo], cwd=self.git_data.git_path)
+        subprocess.run(["git", "clone", self.git_repo], cwd=self.git_data.git_path)
 
     def pull(self):
-        subprocess.run(['git', 'pull'], cwd=self.get_local_dir())
+        subprocess.run(["git", "pull"], cwd=self.get_local_dir())

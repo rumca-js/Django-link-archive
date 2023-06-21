@@ -4,7 +4,6 @@ from django.urls import reverse
 
 
 class ViewsTest(TestCase):
-
     def test_index(self):
         #    w = self.create_whatever()
         url = reverse("rsshistory:index")

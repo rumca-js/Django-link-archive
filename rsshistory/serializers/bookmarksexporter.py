@@ -4,7 +4,6 @@ from ..models import PersistentInfo
 
 
 class BookmarksExporter(object):
-
     def __init__(self, config, entries):
         self._entries = entries
         self._cfg = config
@@ -18,6 +17,7 @@ class BookmarksExporter(object):
 
     def get_entries(self):
         from ..models import LinkDataModel
+
         entries = LinkDataModel.objects.filter(persistent=True)
 
     def get_export_path(self):
@@ -29,8 +29,7 @@ class BookmarksExporter(object):
 
         return export_path
 
-    def export(self, export_file_name='bookmarks', export_dir="default"):
-
+    def export(self, export_file_name="bookmarks", export_dir="default"):
         if len(self._entries) == 0:
             return
 
@@ -38,15 +37,32 @@ class BookmarksExporter(object):
         if not export_path.exists():
             export_path.mkdir(parents=True, exist_ok=True)
 
-        from .converters import ModelCollectionConverter, JsonConverter, MarkDownConverter, RssConverter
+        from .converters import (
+            ModelCollectionConverter,
+            JsonConverter,
+            MarkDownConverter,
+            RssConverter,
+        )
 
         cc = ModelCollectionConverter(self._entries)
         items = cc.get_map_full()
 
         js_converter = JsonConverter(items)
         js_converter.set_export_columns(
-            ['source', 'title', 'description', 'link', 'date_published', 'persistent', 'dead', 'user', 'language',
-             'tags', 'comments'])
+            [
+                "source",
+                "title",
+                "description",
+                "link",
+                "date_published",
+                "persistent",
+                "dead",
+                "user",
+                "language",
+                "tags",
+                "comments",
+            ]
+        )
 
         file_name = export_path / (export_file_name + "_entries.json")
         file_name.write_text(js_converter.export())
@@ -63,12 +79,19 @@ class BookmarksExporter(object):
         file_name = export_path / (export_file_name + "_entries.rss")
         file_name.write_text(self.use_rss_wrapper(rss_text))
 
-    def use_rss_wrapper(self, text, language="en-US", link="https://renegat0x0.ddns.net"):
+    def use_rss_wrapper(
+        self, text, language="en-US", link="https://renegat0x0.ddns.net"
+    ):
         template = self.get_rss_template()
 
-        map_data = {'channel_title': "RSS archive", 'channel_description': "Link archive",
-                    'channel_language': language, 'channel_link': link,
-                    'channel_feed_url': link, 'channel_text': text}
+        map_data = {
+            "channel_title": "RSS archive",
+            "channel_description": "Link archive",
+            "channel_language": language,
+            "channel_link": link,
+            "channel_feed_url": link,
+            "channel_text": text,
+        }
         return self.use_template(template, map_data)
 
     def get_rss_template(self):
@@ -95,18 +118,21 @@ $channel_text
 
     def use_template(self, template_text, map_data):
         from string import Template
+
         try:
             t = Template(template_text)
             return t.safe_substitute(map_data)
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.error(
-                "Template exception {0} {1} {2} {3}".format(template_text, str(map_data), str(e), error_text))
+                "Template exception {0} {1} {2} {3}".format(
+                    template_text, str(map_data), str(e), error_text
+                )
+            )
         return ""
 
 
 class BookmarksBigExporter(object):
-
     def __init__(self, config):
         self._cfg = config
 
@@ -115,6 +141,7 @@ class BookmarksBigExporter(object):
 
     def get_current_year(self):
         from ..dateutils import DateUtils
+
         today = DateUtils.get_date_today()
         year = int(DateUtils.get_datetime_year(today))
         return year
@@ -133,16 +160,18 @@ class BookmarksBigExporter(object):
 
             therange = (start_date, stop_date)
 
-            all_entries = LinkDataModel.objects.filter(persistent=True, date_published__range=therange)
+            all_entries = LinkDataModel.objects.filter(
+                persistent=True, date_published__range=therange
+            )
 
-            en_entries = all_entries.filter(language__icontains='en')
-            pl_entries = all_entries.filter(language__icontains='pl')
+            en_entries = all_entries.filter(language__icontains="en")
+            pl_entries = all_entries.filter(language__icontains="pl")
 
             converter = BookmarksExporter(self._cfg, en_entries)
-            converter.export('bookmarks_EN', str(year))
+            converter.export("bookmarks_EN", str(year))
 
             converter = BookmarksExporter(self._cfg, pl_entries)
-            converter.export('bookmarks_PL', str(year))
+            converter.export("bookmarks_PL", str(year))
 
             # en_entries = LinkDataModel.objects.filter(persistent = True, date_published__range=therange, language__icontains = 'en')
             # converter = BookmarksExporter(self._cfg, en_entries)
@@ -154,7 +183,6 @@ class BookmarksBigExporter(object):
 
 
 class BookmarksTopicExporter(object):
-
     def __init__(self, config):
         self._cfg = config
 

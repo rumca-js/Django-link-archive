@@ -16,30 +16,31 @@ class YouTubeLinkHandler(object):
 
     def code2url(code):
         if code:
-            return 'https://www.youtube.com/watch?v={0}'.format(code)
+            return "https://www.youtube.com/watch?v={0}".format(code)
 
     def input2code(url):
         wh = url.find("youtu.be")
         video_code = None
         if wh >= 0:
-            video_code = url[wh + 9:]
+            video_code = url[wh + 9 :]
         else:
             wh = url.find("?")
             if wh >= 0:
-                url = url[wh + 1:]
+                url = url[wh + 1 :]
                 split_items = url.split("&")
                 for split_item in split_items:
                     wh = split_item.find("v=")
                     if wh == 0:
-                        video_code = split_item[wh + 2:]
+                        video_code = split_item[wh + 2 :]
         return video_code
 
     def get_embed_link(self):
         return "https://www.youtube.com/embed/{0}".format(self.get_video_code())
 
     def get_frame(self):
-        return "<iframe src=\"{0}\" frameborder=\"0\" allowfullscreen class=\"youtube_player_frame\"></iframe>".format(
-            self.get_embed_link())
+        return '<iframe src="{0}" frameborder="0" allowfullscreen class="youtube_player_frame"></iframe>'.format(
+            self.get_embed_link()
+        )
 
     def get_title(self):
         if self.yt_ob:
@@ -59,7 +60,7 @@ class YouTubeLinkHandler(object):
             from datetime import datetime
 
             date_string = self.yt_ob.get_date_published()
-            date = datetime.strptime(date_string, '%Y%m%d')
+            date = datetime.strptime(date_string, "%Y%m%d")
             dt = datetime.combine(date, datetime.min.time())
             return dt
 
@@ -101,6 +102,7 @@ class YouTubeLinkHandler(object):
 
     def load_details(self):
         from ..serializers.youtubelinkjson import YouTubeJson
+
         self.yt_ob = YouTubeJson()
 
         if self.yt_text and not self.yt_ob.loads(self.yt_text):
@@ -108,6 +110,7 @@ class YouTubeLinkHandler(object):
             return False
 
         from ..serializers.returnyoutubedislikeapijson import YouTubeThumbsDown
+
         self.rd_ob = YouTubeThumbsDown()
         if self.rd_text and not self.rd_ob.loads(self.rd_text):
             # logging.error("Could not read json for {0}, removing returndislike api data".format(self.url))

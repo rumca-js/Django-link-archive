@@ -7,7 +7,7 @@ import re
 
 
 class Page(object):
-    user_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11'
+    user_agent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11"
 
     def __init__(self, url, contents=None):
         self.url = url
@@ -20,11 +20,11 @@ class Page(object):
         if self.contents:
             return True
         else:
-            return False;
+            return False
 
     def try_decode(self, thebytes):
         try:
-            return thebytes.decode('UTF-8', errors='replace')
+            return thebytes.decode("UTF-8", errors="replace")
         except Exception as e:
             pass
 
@@ -32,12 +32,14 @@ class Page(object):
         if self.contents:
             return self.contents
 
-        hdr = {'User-Agent': Page.user_agent,
-               'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-               'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
-               'Accept-Encoding': 'none',
-               'Accept-Language': 'en-US,en;q=0.8',
-               'Connection': 'keep-alive'}
+        hdr = {
+            "User-Agent": Page.user_agent,
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Charset": "ISO-8859-1,utf-8;q=0.7,*;q=0.3",
+            "Accept-Encoding": "none",
+            "Accept-Language": "en-US,en;q=0.8",
+            "Connection": "keep-alive",
+        }
 
         try:
             r = requests.get(self.url, headers=hdr)
@@ -46,14 +48,19 @@ class Page(object):
         except Exception as e:
             error_text = traceback.format_exc()
             from .models import PersistentInfo
-            PersistentInfo.error("Page: Error while reading page:{};Error:{};{}".format(self.url, str(e), error_text))
+
+            PersistentInfo.error(
+                "Page: Error while reading page:{};Error:{};{}".format(
+                    self.url, str(e), error_text
+                )
+            )
 
     def get_language(self):
         if not self.contents:
             self.contents = self.get_contents()
 
         if not self.contents:
-            return 'en-US'
+            return "en-US"
 
         whlang = self.contents.find("lang")
         if whlang >= 0:
@@ -62,7 +69,7 @@ class Page(object):
                 return "en-US"
 
             if lang.find("en") == -1 and lang.find("pl") == -1:
-                return 'en-US'
+                return "en-US"
 
             return lang
 
@@ -76,7 +83,7 @@ class Page(object):
             wh2 = text.find(closingtag, len(tag) + wh + 1)
 
             if wh2 > 0:
-                title = text[wh + len(tag):wh2]
+                title = text[wh + len(tag) : wh2]
                 if title.strip() != "":
                     return title
 
@@ -99,7 +106,7 @@ class Page(object):
         wh1a = self.contents.find(">", wh1)
         wh2 = self.contents.find("</title", wh1a + 1)
 
-        title = self.contents[wh1a + 1: wh2].strip()
+        title = self.contents[wh1a + 1 : wh2].strip()
         title = html.unescape(title)
 
         return title
@@ -154,9 +161,7 @@ class Page(object):
 
         # wallet gardens which we will not accept
 
-        mainstream = ['www.facebook',
-                      'www.rumble',
-                      'wikipedia.org']
+        mainstream = ["www.facebook", "www.rumble", "wikipedia.org"]
 
         for item in mainstream:
             if dom.find(item) >= 0:
@@ -169,13 +174,16 @@ class Page(object):
 
     def is_youtube(self):
         dom = self.get_domain_only()
-        if dom.find("youtube.com") >= 0 or \
-                dom.find("youtu.be") >= 0 or \
-                dom.find('www.m.youtube') >= 0:
+        if (
+            dom.find("youtube.com") >= 0
+            or dom.find("youtu.be") >= 0
+            or dom.find("www.m.youtube") >= 0
+        ):
             return True
         return False
 
     def download_all(self):
         from .programwrappers.wget import Wget
+
         wget = Wget(self.url)
         wget.download_all()

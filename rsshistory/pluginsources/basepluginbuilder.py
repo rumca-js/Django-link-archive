@@ -9,12 +9,13 @@ from .spotifyplugin import SpotifyPlugin
 
 
 class BasePluginBuilder(object):
-    plugins = [CodeProjectPlugin,
-               InstalkiPlugin,
-               NiezaleznaPlugin,
-               TVN24Plugin,
-               SpotifyPlugin,
-               ]
+    plugins = [
+        CodeProjectPlugin,
+        InstalkiPlugin,
+        NiezaleznaPlugin,
+        TVN24Plugin,
+        SpotifyPlugin,
+    ]
 
     def get(source):
         from ..models import SourceDataModel
@@ -30,4 +31,7 @@ class BasePluginBuilder(object):
             return BaseParsePlugin(source)
         else:
             raise NotImplementedError(
-                "Source: {}: Unsupported source type: {}".format(source.title, source.source_type))
+                "Source: {}: Unsupported source type: {}".format(
+                    source.title, source.source_type
+                )
+            )

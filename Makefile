@@ -1,4 +1,7 @@
-.PHONY: run install test install-optional refresh
+.PHONY: run install test install-optional refresh reformat
+
+# Assumptions:
+#  - python poetry is in your path
 
 statics:
 	poetry run python -m manage collectstatic
@@ -29,3 +32,8 @@ test: migrations-check
 
 refresh:
 	poetry export -f requirements.txt --output requirements.txt
+
+reformat:
+	# Assumptions:
+	#  - python black is in your path
+	black rsshistory

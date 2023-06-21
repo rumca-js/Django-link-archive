@@ -30,7 +30,11 @@ class BaseRssPlugin(BasePlugin):
             print("Found rss source entry, feed size:{}".format(num_entries))
 
             if num_entries == 0:
-                PersistentInfo.error("Source:{0} {1}; Source has no data".format(source.url, source.title))
+                PersistentInfo.error(
+                    "Source:{0} {1}; Source has no data".format(
+                        source.url, source.title
+                    )
+                )
             else:
                 # rss_path = self._cfg.get_export_path() / "downloaded_rss"
                 # rss_path.mkdir(parents = True, exist_ok = True)
@@ -51,7 +55,11 @@ class BaseRssPlugin(BasePlugin):
             return props
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.exc("Source:{} {}; Exc:{}\n{}".format(source.url, source.title, str(e), error_text))
+            PersistentInfo.exc(
+                "Source:{} {}; Exc:{}\n{}".format(
+                    source.url, source.title, str(e), error_text
+                )
+            )
 
     def process_rss_entry(self, source, feed_entry):
         try:
@@ -59,23 +67,29 @@ class BaseRssPlugin(BasePlugin):
 
             props = self.get_feed_entry_map(source, feed_entry)
 
-            objs = LinkDataModel.objects.filter(link=props['link'])
+            objs = LinkDataModel.objects.filter(link=props["link"])
 
             if not objs.exists():
-                if str(feed_entry.title).strip() == "" or feed_entry.title == "undefined":
+                if (
+                    str(feed_entry.title).strip() == ""
+                    or feed_entry.title == "undefined"
+                ):
                     PersistentInfo.error(
-                        "Source:{} {}; Entry:{} {} no title".format(source.url, source.title, feed_entry.link,
-                                                                    feed_entry.title))
+                        "Source:{} {}; Entry:{} {} no title".format(
+                            source.url, source.title, feed_entry.link, feed_entry.title
+                        )
+                    )
                     return None
 
-                if not self.is_link_valid(props['link']):
+                if not self.is_link_valid(props["link"]):
                     return None
 
-                if 'published' not in props:
+                if "published" not in props:
                     PersistentInfo.error(
-                        "Source:{} {}; Entry:{} {} missing published field".format(source.url, source.title,
-                                                                                   feed_entry.link,
-                                                                                   feed_entry.title))
+                        "Source:{} {}; Entry:{} {} missing published field".format(
+                            source.url, source.title, feed_entry.link, feed_entry.title
+                        )
+                    )
                     return None
 
                 return props
@@ -83,54 +97,64 @@ class BaseRssPlugin(BasePlugin):
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.error(
-                "Source:{} {}; Entry:{} {}; Exc:{}\n{}".format(source.url, source.title, feed_entry.link,
-                                                               feed_entry.title, str(e), error_text))
+                "Source:{} {}; Entry:{} {}; Exc:{}\n{}".format(
+                    source.url,
+                    source.title,
+                    feed_entry.link,
+                    feed_entry.title,
+                    str(e),
+                    error_text,
+                )
+            )
 
             return False
 
     def get_feed_entry_map(self, source, feed_entry):
         from ..dateutils import DateUtils
+
         output_map = {}
 
         # print("feed entry dict: {}".format(feed_entry.__dict__))
         # print("Feed entry: {}".format(str(feed_entry)))
 
         if hasattr(feed_entry, "description"):
-            output_map['description'] = feed_entry.description
+            output_map["description"] = feed_entry.description
         else:
-            output_map['description'] = ""
+            output_map["description"] = ""
 
         if hasattr(feed_entry, "media_thumbnail"):
-            output_map['thumbnail'] = feed_entry.media_thumbnail[0]['url']
+            output_map["thumbnail"] = feed_entry.media_thumbnail[0]["url"]
         else:
-            output_map['thumbnail'] = None
+            output_map["thumbnail"] = None
 
         if hasattr(feed_entry, "published"):
             try:
                 dt = parser.parse(feed_entry.published)
-                output_map['published'] = dt
+                output_map["published"] = dt
             except Exception as e:
                 PersistentInfo.error(
-                    "Rss parser datetime invalid feed datetime:{}; Exc:{} {}\n{}".format(feed_entry.published,
-                                                                                         str(e), error_text))
-                output_map['published'] = DateUtils.get_datetime_now_utc()
+                    "Rss parser datetime invalid feed datetime:{}; Exc:{} {}\n{}".format(
+                        feed_entry.published, str(e), error_text
+                    )
+                )
+                output_map["published"] = DateUtils.get_datetime_now_utc()
 
         elif self.allow_adding_with_current_time:
-            output_map['published'] = DateUtils.get_datetime_now_utc()
+            output_map["published"] = DateUtils.get_datetime_now_utc()
         elif self.default_entry_timestamp:
-            output_map['published'] = self.default_entry_timestamp
+            output_map["published"] = self.default_entry_timestamp
         else:
-            output_map['published'] = DateUtils.get_datetime_now_utc()
+            output_map["published"] = DateUtils.get_datetime_now_utc()
 
-        output_map['source'] = source.url
-        output_map['title'] = feed_entry.title
-        output_map['language'] = source.language
-        output_map['link'] = feed_entry.link
+        output_map["source"] = source.url
+        output_map["title"] = feed_entry.title
+        output_map["language"] = source.language
+        output_map["link"] = feed_entry.link
 
-        if output_map['published']:
-            output_map['published'] = DateUtils.to_utc_date(output_map['published'])
+        if output_map["published"]:
+            output_map["published"] = DateUtils.to_utc_date(output_map["published"])
 
-            if output_map['published'] > DateUtils.get_datetime_now_utc():
-                output_map['published'] = DateUtils.get_datetime_now_utc()
+            if output_map["published"] > DateUtils.get_datetime_now_utc():
+                output_map["published"] = DateUtils.get_datetime_now_utc()
 
         return output_map

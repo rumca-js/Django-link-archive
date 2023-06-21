@@ -33,19 +33,21 @@ class SourceDataModel(models.Model):
     subcategory = models.CharField(max_length=1000)
     dead = models.BooleanField(default=False)
     export_to_cms = models.BooleanField(default=False)
-    remove_after_days = models.CharField(max_length=10, default='0')
-    language = models.CharField(max_length=1000, default='en-US')
+    remove_after_days = models.CharField(max_length=10, default="0")
+    language = models.CharField(max_length=1000, default="en-US")
     favicon = models.CharField(max_length=1000, null=True)
     on_hold = models.BooleanField(default=False)
     fetch_period = models.IntegerField(default=3600)
-    source_type = models.CharField(max_length=1000, null=False, choices=SOURCE_TYPES, default=SOURCE_TYPE_RSS)
+    source_type = models.CharField(
+        max_length=1000, null=False, choices=SOURCE_TYPES, default=SOURCE_TYPE_RSS
+    )
 
     class Meta:
-        ordering = ['title']
+        ordering = ["title"]
 
     def get_absolute_url(self):
         """Returns the URL to access a particular author instance."""
-        return reverse('rsshistory:source-detail', args=[str(self.id)])
+        return reverse("rsshistory:source-detail", args=[str(self.id)])
 
     def get_days_to_remove(self):
         days = 0
@@ -119,11 +121,13 @@ class SourceDataModel(models.Model):
             if len(objs) >= 0:
                 objs.delete()
 
-            op = SourceOperationalData(url=self.url,
-                                       date_fetched=date_fetched,
-                                       import_seconds=import_seconds,
-                                       number_of_entries=number_of_entries,
-                                       source_obj=self)
+            op = SourceOperationalData(
+                url=self.url,
+                date_fetched=date_fetched,
+                import_seconds=import_seconds,
+                number_of_entries=number_of_entries,
+                source_obj=self,
+            )
             op.save()
 
     def get_favicon(self):
@@ -131,28 +135,30 @@ class SourceDataModel(models.Model):
             return self.favicon
 
         from .webtools import Page
+
         page = Page(self.url)
         domain = page.get_domain()
         return domain + "/favicon.ico"
 
     def get_domain(self):
         from .webtools import Page
+
         page = Page(self.url)
         return page.get_domain()
 
     def get_map(self):
         output_data = {}
 
-        output_data['url'] = self.url
-        output_data['title'] = self.title
-        output_data['category'] = self.category
-        output_data['subcategory'] = self.subcategory
-        output_data['dead'] = self.dead
-        output_data['export_to_cms'] = self.export_to_cms
-        output_data['remove_after_days'] = self.remove_after_days
-        output_data['language'] = self.language
-        output_data['favicon'] = self.favicon
-        output_data['on_hold'] = self.on_hold
+        output_data["url"] = self.url
+        output_data["title"] = self.title
+        output_data["category"] = self.category
+        output_data["subcategory"] = self.subcategory
+        output_data["dead"] = self.dead
+        output_data["export_to_cms"] = self.export_to_cms
+        output_data["remove_after_days"] = self.remove_after_days
+        output_data["language"] = self.language
+        output_data["favicon"] = self.favicon
+        output_data["on_hold"] = self.on_hold
 
         return output_data
 
@@ -165,21 +171,31 @@ class SourceOperationalData(models.Model):
     date_fetched = models.DateTimeField(null=True)
     import_seconds = models.IntegerField(null=True)
     number_of_entries = models.IntegerField(null=True)
-    source_obj = models.ForeignKey(SourceDataModel, on_delete=models.SET_NULL, related_name='dynamic_data',
-                                   null=True, blank=True)
+    source_obj = models.ForeignKey(
+        SourceDataModel,
+        on_delete=models.SET_NULL,
+        related_name="dynamic_data",
+        null=True,
+        blank=True,
+    )
 
     class Meta:
-        ordering = ['date_fetched']
+        ordering = ["date_fetched"]
 
 
 class RssSourceImportHistory(models.Model):
     url = models.CharField(max_length=2000)
     date = models.DateField()
-    source_obj = models.ForeignKey(SourceDataModel, on_delete=models.SET_NULL, related_name='history_import',
-                                   null=True, blank=True)
+    source_obj = models.ForeignKey(
+        SourceDataModel,
+        on_delete=models.SET_NULL,
+        related_name="history_import",
+        null=True,
+        blank=True,
+    )
 
     class Meta:
-        ordering = ['-date']
+        ordering = ["-date"]
 
     def get_safe():
         return RssSourceImportHistory.objects.all()[:100]
@@ -189,10 +205,11 @@ class RssSourceExportHistory(models.Model):
     date = models.DateField(unique=True, null=False)
 
     class Meta:
-        ordering = ['-date']
+        ordering = ["-date"]
 
     def is_update_required():
         from .dateutils import DateUtils
+
         try:
             ob = ConfigurationEntry.get()
             if not ob.is_git_set():
@@ -208,7 +225,9 @@ class RssSourceExportHistory(models.Model):
 
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.error("Exception for update: {0} {1}".format(str(e), error_text))
+            PersistentInfo.error(
+                "Exception for update: {0} {1}".format(str(e), error_text)
+            )
 
     def get_safe():
         return RssSourceExportHistory.objects.all()[:100]
@@ -233,15 +252,20 @@ class LinkDataModel(models.Model):
     language = models.CharField(max_length=10, null=True, default=None)
     thumbnail = models.CharField(max_length=1000, null=True, default=None)
 
-    source_obj = models.ForeignKey(SourceDataModel, on_delete=models.SET_NULL, related_name='link_source', null=True,
-                                   blank=True)
+    source_obj = models.ForeignKey(
+        SourceDataModel,
+        on_delete=models.SET_NULL,
+        related_name="link_source",
+        null=True,
+        blank=True,
+    )
 
     class Meta:
-        ordering = ['-date_published', 'source', 'title']
+        ordering = ["-date_published", "source", "title"]
 
     def get_absolute_url(self):
         """Returns the URL to access a particular author instance."""
-        return reverse('rsshistory:entry-detail', args=[str(self.id)])
+        return reverse("rsshistory:entry-detail", args=[str(self.id)])
 
     def get_source_name(self):
         if self.source_obj:
@@ -270,6 +294,7 @@ class LinkDataModel(models.Model):
             self.save()
         else:
             from .webtools import Page
+
             page = Page(self.link)
             if page.is_valid():
                 language = page.get_language()
@@ -282,6 +307,7 @@ class LinkDataModel(models.Model):
             return self.source_obj.get_favicon()
 
         from .webtools import Page
+
         page = Page(self.link)
         domain = page.get_domain()
         return domain + "/favicon.ico"
@@ -294,15 +320,15 @@ class LinkDataModel(models.Model):
 
     def get_map(self):
         data = {}
-        data['source'] = self.source
-        data['link'] = self.link
-        data['title'] = self.title
-        data['date_published'] = str(self.date_published)
-        data['description'] = self.description
-        data['persistent'] = self.persistent
-        data['language'] = self.language
-        data['thumbnail'] = self.thumbnail
-        data['user'] = self.user
+        data["source"] = self.source
+        data["link"] = self.link
+        data["title"] = self.title
+        data["date_published"] = str(self.date_published)
+        data["description"] = self.description
+        data["persistent"] = self.persistent
+        data["language"] = self.language
+        data["thumbnail"] = self.thumbnail
+        data["user"] = self.user
 
         return data
 
@@ -311,11 +337,11 @@ class LinkDataModel(models.Model):
 
         tags = self.get_tag_map()
         if len(tags) > 0:
-            themap['tags'] = tags
+            themap["tags"] = tags
 
         comments = self.get_comment_map()
         if len(comments) > 0:
-            themap['comments'] = comments
+            themap["comments"] = comments
 
         return themap
 
@@ -379,7 +405,8 @@ class LinkDataModel(models.Model):
             artist=artist,
             language=language,
             user=user,
-            source_obj=source_obj)
+            source_obj=source_obj,
+        )
         entry.save()
         return True
 
@@ -395,11 +422,16 @@ class LinkTagsDataModel(models.Model):
     # If there are many labels, it will be visible for what it is
     tag = models.CharField(max_length=1000)
 
-    link_obj = models.ForeignKey(LinkDataModel, on_delete=models.CASCADE, related_name='tags', null=True,
-                                 blank=True)
+    link_obj = models.ForeignKey(
+        LinkDataModel,
+        on_delete=models.CASCADE,
+        related_name="tags",
+        null=True,
+        blank=True,
+    )
 
     class Meta:
-        ordering = ['-date']
+        ordering = ["-date"]
 
     def get_delim():
         return ","
@@ -429,13 +461,22 @@ class LinkCommentDataModel(models.Model):
     reply_id = models.IntegerField(null=True)
     link = models.CharField(max_length=1000)
 
-    link_obj = models.ForeignKey(LinkDataModel, on_delete=models.CASCADE, related_name='comments', null=True,
-                                 blank=True)
+    link_obj = models.ForeignKey(
+        LinkDataModel,
+        on_delete=models.CASCADE,
+        related_name="comments",
+        null=True,
+        blank=True,
+    )
 
 
 class ConfigurationEntry(models.Model):
-    data_import_path = models.CharField(default="./data/imports", max_length=2000, null=True)
-    data_export_path = models.CharField(default="./data/exports", max_length=2000, null=True)
+    data_import_path = models.CharField(
+        default="./data/imports", max_length=2000, null=True
+    )
+    data_export_path = models.CharField(
+        default="./data/exports", max_length=2000, null=True
+    )
     git_path = models.CharField(default="./data/git", max_length=2000, null=True)
     git_user = models.CharField(default="", max_length=2000, null=True)
     git_token = models.CharField(default="", max_length=2000, null=True)
@@ -453,13 +494,27 @@ class ConfigurationEntry(models.Model):
             return confs[0]
 
     def is_git_set(self):
-        if self.git_repo == "" or self.git_user == "" and self.git_token == "" or self.git_repo == None or self.git_user == None or self.git_token == None:
+        if (
+            self.git_repo == ""
+            or self.git_user == ""
+            and self.git_token == ""
+            or self.git_repo == None
+            or self.git_user == None
+            or self.git_token == None
+        ):
             return False
         else:
             return True
 
     def is_git_daily_set(self):
-        if self.git_daily_repo == "" or self.git_user == "" or self.git_token == "" or self.git_daily_repo == None or self.git_user == None or self.git_token == None:
+        if (
+            self.git_daily_repo == ""
+            or self.git_user == ""
+            or self.git_token == ""
+            or self.git_daily_repo == None
+            or self.git_user == None
+            or self.git_token == None
+        ):
             return False
         else:
             return True
@@ -470,21 +525,25 @@ class ConfigurationEntry(models.Model):
 
 class UserConfig(models.Model):
     THEME_TYPE_CHOICES = (
-        ('light', 'light'),
-        ('dark', 'dark'),
+        ("light", "light"),
+        ("dark", "dark"),
     )
 
     DISPLAY_TYPE_CHOICES = (
-        ('std', 'standard'),
-        ('tags', 'clickable-tags'),
-        ('twolines', 'line-and-buttons'),
+        ("std", "standard"),
+        ("tags", "clickable-tags"),
+        ("twolines", "line-and-buttons"),
     )
 
     user = models.CharField(max_length=500, unique=True)
     # theme: light, dark
-    theme = models.CharField(max_length=500, null=True, default="light", choices=THEME_TYPE_CHOICES)
+    theme = models.CharField(
+        max_length=500, null=True, default="light", choices=THEME_TYPE_CHOICES
+    )
     # display type: standard, compact, preview
-    display_type = models.CharField(max_length=500, null=True, default="standard", choices=DISPLAY_TYPE_CHOICES)
+    display_type = models.CharField(
+        max_length=500, null=True, default="standard", choices=DISPLAY_TYPE_CHOICES
+    )
     show_icons = models.BooleanField(default=True)
     thumbnails_as_icons = models.BooleanField(default=True)
     small_icons = models.BooleanField(default=True)
@@ -505,10 +564,12 @@ class PersistentInfo(models.Model):
     user = models.CharField(max_length=1000, null=True)
 
     class Meta:
-        ordering = ['-date', 'level']
+        ordering = ["-date", "level"]
 
     def create(info, level=int(logging.INFO), user=None):
-        ob = PersistentInfo(info=info, level=level, date=datetime.now(timezone('UTC')), user=user)
+        ob = PersistentInfo(
+            info=info, level=level, date=datetime.now(timezone("UTC")), user=user
+        )
 
         index = 0
         while index < 5:
@@ -519,7 +580,9 @@ class PersistentInfo(models.Model):
                 index += 1
 
     def text(info, level=int(logging.INFO), user=None):
-        ob = PersistentInfo(info=info, level=level, date=datetime.now(timezone('UTC')), user=user)
+        ob = PersistentInfo(
+            info=info, level=level, date=datetime.now(timezone("UTC")), user=user
+        )
         index = 0
         while index < 5:
             try:
@@ -529,7 +592,9 @@ class PersistentInfo(models.Model):
                 index += 1
 
     def error(info, level=int(logging.ERROR), user=None):
-        ob = PersistentInfo(info=info, level=level, date=datetime.now(timezone('UTC')), user=user)
+        ob = PersistentInfo(
+            info=info, level=level, date=datetime.now(timezone("UTC")), user=user
+        )
         index = 0
         while index < 5:
             try:
@@ -540,7 +605,9 @@ class PersistentInfo(models.Model):
 
     def exc(info, level=int(logging.ERROR), exc_data=None, user=None):
         text = "{}. Exception data:\n{}".format(info, str(exc_data))
-        ob = PersistentInfo(info=text, level=level, date=datetime.now(timezone('UTC')), user=user)
+        ob = PersistentInfo(
+            info=text, level=level, date=datetime.now(timezone("UTC")), user=user
+        )
 
         index = 0
         while index < 5:
@@ -566,21 +633,33 @@ class PersistentInfo(models.Model):
 
 
 class YouTubeMetaCache(models.Model):
-    url = models.CharField(max_length=1000, help_text='url', unique=False)
-    details_json = models.CharField(max_length=1000, help_text='details_json')
-    dead = models.BooleanField(default=False, help_text='dead')
+    url = models.CharField(max_length=1000, help_text="url", unique=False)
+    details_json = models.CharField(max_length=1000, help_text="details_json")
+    dead = models.BooleanField(default=False, help_text="dead")
 
-    link_yt_obj = models.ForeignKey(LinkDataModel, on_delete=models.SET_NULL, related_name='link_yt',
-                                    null=True, blank=True)
+    link_yt_obj = models.ForeignKey(
+        LinkDataModel,
+        on_delete=models.SET_NULL,
+        related_name="link_yt",
+        null=True,
+        blank=True,
+    )
 
 
 class YouTubeReturnDislikeMetaCache(models.Model):
-    url = models.CharField(max_length=1000, help_text='url', unique=False)
-    return_dislike_json = models.CharField(max_length=1000, help_text='return_dislike_json')
-    dead = models.BooleanField(default=False, help_text='dead')
+    url = models.CharField(max_length=1000, help_text="url", unique=False)
+    return_dislike_json = models.CharField(
+        max_length=1000, help_text="return_dislike_json"
+    )
+    dead = models.BooleanField(default=False, help_text="dead")
 
-    link_rd_obj = models.ForeignKey(LinkDataModel, on_delete=models.SET_NULL, related_name='link_rd',
-                                    null=True, blank=True)
+    link_rd_obj = models.ForeignKey(
+        LinkDataModel,
+        on_delete=models.SET_NULL,
+        related_name="link_rd",
+        null=True,
+        blank=True,
+    )
 
 
 class BackgroundJob(models.Model):
@@ -598,11 +677,20 @@ class BackgroundJob(models.Model):
     JOB_PUSH_TO_REPO = "push-to-repo"
 
     JOB_CHOICES = (
-        (JOB_PROCESS_SOURCE, JOB_PROCESS_SOURCE),  # for RSS sources it checks if there are new data
-        (JOB_LINK_ADD, JOB_LINK_ADD),  # adds link using default properties, may contain link map properties in the map
+        (
+            JOB_PROCESS_SOURCE,
+            JOB_PROCESS_SOURCE,
+        ),  # for RSS sources it checks if there are new data
+        (
+            JOB_LINK_ADD,
+            JOB_LINK_ADD,
+        ),  # adds link using default properties, may contain link map properties in the map
         (JOB_LINK_DETAILS, JOB_LINK_DETAILS),  # fetches link additional information
         (JOB_LINK_REFRESH, JOB_LINK_REFRESH),  # refreshes link, refetches its data
-        (JOB_LINK_ARCHIVE, JOB_LINK_ARCHIVE),  # link is archived using thirdparty pages (archive.org)
+        (
+            JOB_LINK_ARCHIVE,
+            JOB_LINK_ARCHIVE,
+        ),  # link is archived using thirdparty pages (archive.org)
         (JOB_LINK_DOWNLOAD, JOB_LINK_DOWNLOAD),  # link is downloaded using wget
         (JOB_LINK_DOWNLOAD_MUSIC, JOB_LINK_DOWNLOAD_MUSIC),  #
         (JOB_LINK_DOWNLOAD_VIDEO, JOB_LINK_DOWNLOAD_VIDEO),  #
@@ -623,7 +711,7 @@ class BackgroundJob(models.Model):
     args = models.CharField(max_length=1000, null=True)
 
     class Meta:
-        ordering = ['job', 'pk', 'subject']
+        ordering = ["job", "pk", "subject"]
 
     def truncate():
         BackgroundJob.objects.all().delete()
@@ -648,23 +736,45 @@ class BackgroundJob(models.Model):
             if source.is_fetch_possible() == False:
                 return False
 
-        if len(BackgroundJob.objects.filter(job=BackgroundJob.JOB_PROCESS_SOURCE, subject=source.url)) == 0:
-            BackgroundJob.objects.create(job=BackgroundJob.JOB_PROCESS_SOURCE, task=None, subject=source.url, args="")
+        if (
+            len(
+                BackgroundJob.objects.filter(
+                    job=BackgroundJob.JOB_PROCESS_SOURCE, subject=source.url
+                )
+            )
+            == 0
+        ):
+            BackgroundJob.objects.create(
+                job=BackgroundJob.JOB_PROCESS_SOURCE,
+                task=None,
+                subject=source.url,
+                args="",
+            )
 
         return True
 
     def download_music(item):
-        bj = BackgroundJob.objects.create(job=BackgroundJob.JOB_LINK_DOWNLOAD_MUSIC, task=None, subject=item.link,
-                                          args="")
+        bj = BackgroundJob.objects.create(
+            job=BackgroundJob.JOB_LINK_DOWNLOAD_MUSIC,
+            task=None,
+            subject=item.link,
+            args="",
+        )
         return True
 
     def download_video(item):
-        bj = BackgroundJob.objects.create(job=BackgroundJob.JOB_LINK_DOWNLOAD_VIDEO, task=None, subject=item.link,
-                                          args="")
+        bj = BackgroundJob.objects.create(
+            job=BackgroundJob.JOB_LINK_DOWNLOAD_VIDEO,
+            task=None,
+            subject=item.link,
+            args="",
+        )
         return True
 
     def youtube_details(url):
-        bj = BackgroundJob.objects.create(job=BackgroundJob.JOB_LINK_DETAILS, task=None, subject=url, args="")
+        bj = BackgroundJob.objects.create(
+            job=BackgroundJob.JOB_LINK_DETAILS, task=None, subject=url, args=""
+        )
         return True
 
     def link_add(url, source):
@@ -672,16 +782,31 @@ class BackgroundJob(models.Model):
         if len(existing) > 0:
             return False
 
-        if len(BackgroundJob.objects.filter(job=BackgroundJob.JOB_LINK_ADD, subject=url)) == 0:
-            BackgroundJob.objects.create(job=BackgroundJob.JOB_LINK_ADD, task=None, subject=url, args=str(source.id))
+        if (
+            len(
+                BackgroundJob.objects.filter(
+                    job=BackgroundJob.JOB_LINK_ADD, subject=url
+                )
+            )
+            == 0
+        ):
+            BackgroundJob.objects.create(
+                job=BackgroundJob.JOB_LINK_ADD,
+                task=None,
+                subject=url,
+                args=str(source.id),
+            )
 
     def write_daily_data_range(date_start=date.today(), date_stop=date.today()):
         from datetime import timedelta
+
         try:
             if date_stop < date_start:
                 PersistentInfo.error(
-                    "Yearly generation: Incorrect configuration of dates start:{} stop:{}".format(date_start,
-                                                                                                  date_stop))
+                    "Yearly generation: Incorrect configuration of dates start:{} stop:{}".format(
+                        date_start, date_stop
+                    )
+                )
                 return False
 
             sent = False
@@ -690,51 +815,78 @@ class BackgroundJob(models.Model):
                 str_date = current_date.isoformat()
                 current_date += timedelta(days=1)
 
-                BackgroundJob.objects.create(job=BackgroundJob.JOB_WRITE_DAILY_DATA, task=None, subject=str_date,
-                                             args="")
+                BackgroundJob.objects.create(
+                    job=BackgroundJob.JOB_WRITE_DAILY_DATA,
+                    task=None,
+                    subject=str_date,
+                    args="",
+                )
                 sent = True
 
             return sent
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.error("Exception: Daily data: {} {}".format(str(e), error_text))
+            PersistentInfo.error(
+                "Exception: Daily data: {} {}".format(str(e), error_text)
+            )
 
     def write_daily_data(input_date):
-        bj = BackgroundJob.objects.create(job=BackgroundJob.JOB_WRITE_DAILY_DATA, task=None, subject=input_date,
-                                          args="")
+        bj = BackgroundJob.objects.create(
+            job=BackgroundJob.JOB_WRITE_DAILY_DATA,
+            task=None,
+            subject=input_date,
+            args="",
+        )
         return True
 
-    def write_daily_data_str(start='2022-01-01', stop='2022-12-31'):
+    def write_daily_data_str(start="2022-01-01", stop="2022-12-31"):
         try:
-            date_start = datetime.strptime(start, '%Y-%m-%d').date()
-            date_stop = datetime.strptime(stop, '%Y-%m-%d').date()
+            date_start = datetime.strptime(start, "%Y-%m-%d").date()
+            date_stop = datetime.strptime(stop, "%Y-%m-%d").date()
 
             BackgroundJob.write_daily_data_range(date_start, date_stop)
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.error("Exception: Daily data: {} {}".format(str(e), error_text))
+            PersistentInfo.error(
+                "Exception: Daily data: {} {}".format(str(e), error_text)
+            )
 
     def write_tag_data(tag):
         try:
-            BackgroundJob.objects.create(job=BackgroundJob.JOB_WRITE_TOPIC_DATA, task=None, subject=tag, args="")
+            BackgroundJob.objects.create(
+                job=BackgroundJob.JOB_WRITE_TOPIC_DATA, task=None, subject=tag, args=""
+            )
             return True
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.error("Exception: Tag data: {} {}".format(str(e), error_text))
+            PersistentInfo.error(
+                "Exception: Tag data: {} {}".format(str(e), error_text)
+            )
 
     def write_bookmarks():
         try:
-            BackgroundJob.objects.create(job=BackgroundJob.JOB_WRITE_BOOKMARKS, task=None, subject="", args="")
+            BackgroundJob.objects.create(
+                job=BackgroundJob.JOB_WRITE_BOOKMARKS, task=None, subject="", args=""
+            )
             return True
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.error("Exception: Write bookmarks: {} {}".format(str(e), error_text))
+            PersistentInfo.error(
+                "Exception: Write bookmarks: {} {}".format(str(e), error_text)
+            )
 
     def link_archive(link_url):
         try:
-            archive_items = BackgroundJob.objects.filter(job=BackgroundJob.JOB_LINK_ARCHIVE)
+            archive_items = BackgroundJob.objects.filter(
+                job=BackgroundJob.JOB_LINK_ARCHIVE
+            )
             if len(archive_items) < 100:
-                BackgroundJob.objects.create(job=BackgroundJob.JOB_LINK_ARCHIVE, task=None, subject=link_url, args="")
+                BackgroundJob.objects.create(
+                    job=BackgroundJob.JOB_LINK_ARCHIVE,
+                    task=None,
+                    subject=link_url,
+                    args="",
+                )
                 return True
             else:
                 for key, obj in enumerate(archive_items):
@@ -742,25 +894,40 @@ class BackgroundJob(models.Model):
                         obj.delete()
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.error("Exception: Link archive: {} {}".format(str(e), error_text))
+            PersistentInfo.error(
+                "Exception: Link archive: {} {}".format(str(e), error_text)
+            )
 
     def link_download(link_url):
         try:
-            BackgroundJob.objects.create(job=BackgroundJob.JOB_LINK_DOWNLOAD, task=None, subject=link_url, args="")
+            BackgroundJob.objects.create(
+                job=BackgroundJob.JOB_LINK_DOWNLOAD,
+                task=None,
+                subject=link_url,
+                args="",
+            )
             return True
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.error("Exception: Link download: {} {}".format(str(e), error_text))
+            PersistentInfo.error(
+                "Exception: Link download: {} {}".format(str(e), error_text)
+            )
 
     def push_to_repo():
         try:
-            items = BackgroundJob.objects.filter(job=BackgroundJob.JOB_PUSH_TO_REPO, subject="")
+            items = BackgroundJob.objects.filter(
+                job=BackgroundJob.JOB_PUSH_TO_REPO, subject=""
+            )
             if len(items) == 0:
-                BackgroundJob.objects.create(job=BackgroundJob.JOB_PUSH_TO_REPO, task=None, subject="", args="")
+                BackgroundJob.objects.create(
+                    job=BackgroundJob.JOB_PUSH_TO_REPO, task=None, subject="", args=""
+                )
                 return True
             elif len(items) > 1:
                 for item in items:
                     item.delete()
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.error("Exception: Link download: {} {}".format(str(e), error_text))
+            PersistentInfo.error(
+                "Exception: Link download: {} {}".format(str(e), error_text)
+            )

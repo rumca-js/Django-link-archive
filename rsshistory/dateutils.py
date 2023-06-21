@@ -5,7 +5,6 @@ import django.utils
 
 
 class DateUtils(object):
-
     def __init__(self):
         pass
 
@@ -14,7 +13,7 @@ class DateUtils(object):
 
     def to_utc_date(input_date):
         if input_date.tzinfo is None:
-            input_date = input_date.replace(tzinfo=timezone('UTC'))
+            input_date = input_date.replace(tzinfo=timezone("UTC"))
         return input_date
 
     def get_date_yesterday():
@@ -40,33 +39,33 @@ class DateUtils(object):
         return self.get_iso_datetime(now)
 
     def get_datetime_file_name():
-        return datetime.datetime.today().strftime('%Y-%m-%d_%H-%M-%S')
+        return datetime.datetime.today().strftime("%Y-%m-%d_%H-%M-%S")
 
     def get_date_file_name():
         return DateUtils.format_date(datetime.datetime.today())
 
     def get_dir4date(date):
-        return date.strftime('%Y-%m-%d')
+        return date.strftime("%Y-%m-%d")
 
     def get_date_tuple(date):
-        return [date.strftime('%Y'),
-                date.strftime('%m'),
-                date.strftime('%d')]
+        return [date.strftime("%Y"), date.strftime("%m"), date.strftime("%d")]
 
     def get_iso_datetime(timestamp):
         from dateutil import parser
+
         date = parser.parse(timestamp)
         date = date.isoformat()
         return date
 
     def get_datetime_year(datetime):
-        return datetime.strftime('%Y')
+        return datetime.strftime("%Y")
 
     def get_datetime_month(datetime):
-        return datetime.strftime('%m')
+        return datetime.strftime("%m")
 
     def get_range4day(date_iso):
         from datetime import date, timedelta
+
         current_date = date.fromisoformat(date_iso)
         next_day = current_date + timedelta(days=1)
 

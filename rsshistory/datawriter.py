@@ -2,7 +2,6 @@ from .dateutils import DateUtils
 
 
 class SourceEntriesDataWriter(object):
-
     def __init__(self, config, source_url):
         self._cfg = config
         self.source_url = source_url
@@ -12,21 +11,24 @@ class SourceEntriesDataWriter(object):
         from .serializers.entriesexporter import EntriesExporter
 
         date_range = DateUtils.get_range4day(day_iso)
-        entries = LinkDataModel.objects.filter(source=self.source_url, date_published__range=date_range)
+        entries = LinkDataModel.objects.filter(
+            source=self.source_url, date_published__range=date_range
+        )
 
         clean_url = self._cfg.get_url_clean_name(self.source_url)
 
         ex = EntriesExporter(self._cfg, entries)
-        ex.export_entries(self.source_url, clean_url, self._cfg.get_daily_data_path(day_iso))
+        ex.export_entries(
+            self.source_url, clean_url, self._cfg.get_daily_data_path(day_iso)
+        )
 
 
 class SourcesEntriesDataWriter(object):
-
     def __init__(self, config):
         self._cfg = config
 
     def write_for_day(self, day_iso):
-        """ We do not want to provide for each day cumulative view. Users may want to select which 'streams' are selected individually '"""
+        """We do not want to provide for each day cumulative view. Users may want to select which 'streams' are selected individually '"""
         from .models import SourceDataModel, LinkDataModel
 
         date_range = DateUtils.get_range4day(day_iso)
@@ -36,7 +38,7 @@ class SourcesEntriesDataWriter(object):
         # if entry does not have source, it was added manually and is subject for export
 
         entries = LinkDataModel.objects.filter(date_published__range=date_range)
-        sources_urls = set(entries.values_list('source', flat=True).distinct())
+        sources_urls = set(entries.values_list("source", flat=True).distinct())
 
         for source_url in sources_urls:
             source_objs = SourceDataModel.objects.filter(url=source_url)
@@ -79,8 +81,19 @@ class DataWriter(object):
 
         converter = JsonConverter(items)
         converter.set_export_columns(
-            ['url', 'title', 'category', 'subcategory', 'dead', 'export_to_cms', 'remove_after_days', 'language',
-             'favicon', 'on_hold'])
+            [
+                "url",
+                "title",
+                "category",
+                "subcategory",
+                "dead",
+                "export_to_cms",
+                "remove_after_days",
+                "language",
+                "favicon",
+                "on_hold",
+            ]
+        )
         text = converter.export()
 
         self._cfg.get_bookmarks_path().mkdir(parents=True, exist_ok=True)
@@ -94,5 +107,6 @@ class DataWriter(object):
 
     def clear_daily_data(self, day_iso):
         import shutil
+
         daily_path = self._cfg.get_daily_data_path(day_iso)
         shutil.rmtree(daily_path)

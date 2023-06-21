@@ -4,7 +4,6 @@ from .converters import ModelCollectionConverter, JsonConverter, MarkDownConvert
 
 
 class EntriesExporter(object):
-
     def __init__(self, config, entries):
         self._entries = entries
         self._cfg = config
@@ -19,7 +18,13 @@ class EntriesExporter(object):
 
         self.source_template = "# Source:$title, URL:$url, language:$language"
 
-    def export_entries(self, source_url, export_file_name="default", export_path=None, with_description=True):
+    def export_entries(
+        self,
+        source_url,
+        export_file_name="default",
+        export_path=None,
+        with_description=True,
+    ):
         if len(self._entries) == 0:
             return
 
@@ -31,8 +36,20 @@ class EntriesExporter(object):
 
         js_converter = JsonConverter(items)
         js_converter.set_export_columns(
-            ['source', 'title', 'description', 'link', 'date_published', 'persistent', 'dead', 'user', 'language',
-             'tags', 'comments'])
+            [
+                "source",
+                "title",
+                "description",
+                "link",
+                "date_published",
+                "persistent",
+                "dead",
+                "user",
+                "language",
+                "tags",
+                "comments",
+            ]
+        )
 
         file_name = export_path / (export_file_name + "_entries.json")
         file_name.write_text(js_converter.export())
@@ -41,10 +58,12 @@ class EntriesExporter(object):
         md_text = md.export()
 
         from ..models import SourceDataModel
+
         sources = SourceDataModel.objects.filter(url=source_url)
 
         if sources.exists():
             from .converters import MarkDownSourceConverter
+
             msc = MarkDownSourceConverter(sources[0], self.source_template)
             msc_text = msc.export()
             md_text = msc_text + "\n\n" + md_text
@@ -67,8 +86,20 @@ class EntriesExporter(object):
 
         js_converter = JsonConverter(items)
         js_converter.set_export_columns(
-            ['source', 'title', 'description', 'link', 'date_published', 'persistent', 'dead', 'user', 'language',
-             'tags', 'comments'])
+            [
+                "source",
+                "title",
+                "description",
+                "link",
+                "date_published",
+                "persistent",
+                "dead",
+                "user",
+                "language",
+                "tags",
+                "comments",
+            ]
+        )
 
         file_name = export_path / ("all_entries.json")
         file_name.write_text(js_converter.export())

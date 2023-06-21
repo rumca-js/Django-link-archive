@@ -46,15 +46,20 @@ class Configuration(object):
         self.server_log_file.unlink(True)
         self.global_log_file.unlink(True)
 
-        logging.basicConfig(level=logging.INFO, filename=self.global_log_file,
-                            format='[%(asctime)s %(name)s]%(levelname)s:%(message)s')
+        logging.basicConfig(
+            level=logging.INFO,
+            filename=self.global_log_file,
+            format="[%(asctime)s %(name)s]%(levelname)s:%(message)s",
+        )
 
         # create logger for prd_ci
         log = logging.getLogger(self.app_name)
         log.setLevel(level=logging.INFO)
 
         # create formatter and add it to the handlers
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        formatter = logging.Formatter(
+            "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+        )
 
         if create_file:
             # create file handler for logger.
@@ -76,6 +81,7 @@ class Configuration(object):
     def create_threads(self):
         if self.thread_mgr is None:
             from .threadhandlers import HandlerManager
+
             self.thread_mgr = HandlerManager(self)
 
     def get_threads(self):
@@ -100,7 +106,7 @@ class Configuration(object):
             return directory / self.app_name
 
     def get_data_path(self):
-        return self.directory / 'data' / self.app_name
+        return self.directory / "data" / self.app_name
 
     def get_bookmarks_path(self, append=None):
         if append:
@@ -128,10 +134,12 @@ class Configuration(object):
         return entries_dir
 
     def get_url_clean_name(self, file_name):
-        file_name = file_name.replace(":", ".") \
-            .replace("/", "") \
-            .replace("\\", "") \
-            .replace("?", ".") \
+        file_name = (
+            file_name.replace(":", ".")
+            .replace("/", "")
+            .replace("\\", "")
+            .replace("?", ".")
             .replace("=", ".")
+        )
 
         return file_name

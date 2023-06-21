@@ -5,7 +5,6 @@ from .dateutils import DateUtils
 
 
 class DailyRepo(GitRepo):
-
     def __init__(self, git_data, git_repo):
         super().__init__(git_data, git_repo)
 
@@ -18,8 +17,12 @@ class DailyRepo(GitRepo):
         return False
 
     def get_local_day_path(self, day):
-        return self.get_local_dir() / DateUtils.get_datetime_year(day) / DateUtils.get_datetime_month(
-            day) / DateUtils.get_dir4date(day)
+        return (
+            self.get_local_dir()
+            / DateUtils.get_datetime_year(day)
+            / DateUtils.get_datetime_month(day)
+            / DateUtils.get_dir4date(day)
+        )
 
     def copy_day_data(self, daily_data_path, day):
         full_local = self.get_local_day_path(day)
@@ -35,7 +38,6 @@ class DailyRepo(GitRepo):
 
 
 class MainRepo(GitRepo):
-
     def __init__(self, git_data, git_repo):
         super().__init__(git_data, git_repo)
 

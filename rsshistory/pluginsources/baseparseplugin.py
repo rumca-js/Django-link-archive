@@ -16,7 +16,7 @@ class BaseParsePlugin(BasePlugin):
 
     def is_link_valid(self, address):
         if not self.is_link_valid_domain(address):
-            return False;
+            return False
 
         if address.endswith(".html") or address.endswith(".htm"):
             search_pattern = self.source.get_domain()
@@ -37,13 +37,13 @@ class BaseParsePlugin(BasePlugin):
         if not title:
             return output_map
 
-        output_map['link'] = link
-        output_map['title'] = title
-        output_map['description'] = title
-        output_map['source'] = source.url
-        output_map['published'] = DateUtils.get_datetime_now_utc()
-        output_map['language'] = source.language
-        output_map['thumbnail'] = None
+        output_map["link"] = link
+        output_map["title"] = title
+        output_map["description"] = title
+        output_map["source"] = source.url
+        output_map["published"] = DateUtils.get_datetime_now_utc()
+        output_map["language"] = source.language
+        output_map["thumbnail"] = None
         return output_map
 
     def get_link_props(self):
@@ -66,4 +66,8 @@ class BaseParsePlugin(BasePlugin):
             return props
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.exc("Source:{} {}; Exc:{}\n{}".format(source.url, source.title, str(e), error_text))
+            PersistentInfo.exc(
+                "Source:{} {}; Exc:{}\n{}".format(
+                    source.url, source.title, str(e), error_text
+                )
+            )

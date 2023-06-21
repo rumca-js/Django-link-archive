@@ -7,7 +7,6 @@ from .prjgitrepo import *
 
 
 class GitUpdateManager(object):
-
     def __init__(self, config):
         self._cfg = config
 
@@ -22,6 +21,7 @@ class GitUpdateManager(object):
             PersistentInfo.create("Pushing data to git")
 
             from .datawriter import DataWriter
+
             writer = DataWriter(self._cfg)
             writer.write_daily_data(yesterday.isoformat())
             writer.write_bookmarks()
@@ -41,7 +41,9 @@ class GitUpdateManager(object):
         except Exception as e:
             log = logging.getLogger(self._cfg.app_name)
             error_text = traceback.format_exc()
-            PersistentInfo.error("Exception during refresh: {0} {1}".format(str(e), error_text))
+            PersistentInfo.error(
+                "Exception during refresh: {0} {1}".format(str(e), error_text)
+            )
             log.critical(e, exc_info=True)
 
     def push_to_git(self, conf):
@@ -88,10 +90,10 @@ class GitUpdateManager(object):
 
         from datetime import timedelta
         from .models import SourceDataModel, LinkDataModel
+
         # sources = SourceDataModel.objects.filter(remove_after_days)
         sources = SourceDataModel.objects.all()
         for source in sources:
-
             if not source.is_removeable():
                 continue
 
@@ -100,8 +102,13 @@ class GitUpdateManager(object):
                 current_time = DateUtils.get_datetime_now_utc()
                 days_before = current_time - timedelta(days=days)
 
-                entries = LinkDataModel.objects.filter(source=source.url, persistent=False,
-                                                       date_published__lt=days_before)
+                entries = LinkDataModel.objects.filter(
+                    source=source.url, persistent=False, date_published__lt=days_before
+                )
                 if entries.exists():
-                    PersistentInfo.create("Removing old RSS data for source: {0} {1}".format(source.url, source.title))
+                    PersistentInfo.create(
+                        "Removing old RSS data for source: {0} {1}".format(
+                            source.url, source.title
+                        )
+                    )
                     entries.delete()

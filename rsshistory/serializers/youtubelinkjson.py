@@ -4,7 +4,6 @@ import logging
 
 
 class YouTubeJson(object):
-
     def __init__(self, url=None):
         self._json = {}
         self.url = url
@@ -31,14 +30,14 @@ class YouTubeJson(object):
         if not os.path.isdir(file_dir):
             os.makedirs(file_dir)
 
-        with open(file_name, "w", encoding='utf-8') as fh:
+        with open(file_name, "w", encoding="utf-8") as fh:
             fh.write(self.get_json_data())
 
     def read(self, file_name):
         if not os.path.isfile(file_name):
             return None
 
-        with open(file_name, "r", encoding='utf-8') as fh:
+        with open(file_name, "r", encoding="utf-8") as fh:
             data = fh.read()
             self.loads(data)
 
@@ -116,7 +115,9 @@ class YouTubeJson(object):
 
     def get_channel_feed_url(self):
         if len(self._json) > 0:
-            return "https://www.youtube.com/feeds/videos.xml?channel_id={}".format(self.get_channel_code())
+            return "https://www.youtube.com/feeds/videos.xml?channel_id={}".format(
+                self.get_channel_code()
+            )
 
     def get_view_count(self):
         if len(self._json) > 0:

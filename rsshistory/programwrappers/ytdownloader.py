@@ -27,7 +27,6 @@ from pathlib import Path
 
 
 class YouTubeDownloader(object):
-
     def __init__(self, url, path=None):
         self._url = url
         self._path = path
@@ -37,7 +36,16 @@ class YouTubeDownloader(object):
 
         # https://askubuntu.com/questions/630134/how-to-specify-a-filename-while-extracting-audio-using-youtube-dl
 
-        cmds = ['youtube-dl', '-o', file_name, "-x", "--audio-format", ext, '--prefer-ffmpeg', self._url]
+        cmds = [
+            "youtube-dl",
+            "-o",
+            file_name,
+            "-x",
+            "--audio-format",
+            ext,
+            "--prefer-ffmpeg",
+            self._url,
+        ]
         logging.info("Downloading: " + " ".join(cmds))
         proc = subprocess.run(cmds, cwd=self._path, stdout=subprocess.PIPE)
 
@@ -49,7 +57,7 @@ class YouTubeDownloader(object):
         # ext = self.get_video_ext(Path(file_name))
 
         # cmds = ['youtube-dl','-o', file_name, '-f','bestvideo[ext={0}]+bestaudio'.format(ext), self._url ]
-        cmds = ['youtube-dl', '-o', file_name, self._url]
+        cmds = ["youtube-dl", "-o", file_name, self._url]
         logging.info("Downloading: " + " ".join(cmds))
         proc = subprocess.run(cmds, cwd=self._path, stdout=subprocess.PIPE)
 
@@ -71,7 +79,9 @@ class YouTubeDownloader(object):
         return data
 
     def _get_json_data(self):
-        proc = subprocess.run(['youtube-dl', '--dump-json', self._url], stdout=subprocess.PIPE)
+        proc = subprocess.run(
+            ["youtube-dl", "--dump-json", self._url], stdout=subprocess.PIPE
+        )
         out = self.get_output_ignore(proc)
         self._json_data = out.strip()
         return self._json_data
@@ -122,16 +132,18 @@ class YouTubeDownloader(object):
         else:
             wh2 = link.find("&")
             if wh2 != -1:
-                self._video_code = link[wh + 1:wh2]
+                self._video_code = link[wh + 1 : wh2]
             else:
-                self._video_code = link[wh + 1:]
+                self._video_code = link[wh + 1 :]
 
         return self._video_code
 
     @staticmethod
     def validate():
         try:
-            proc = subprocess.run(['youtube-dl'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            proc = subprocess.run(
+                ["youtube-dl"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+            )
         except:
             return False
         return True
