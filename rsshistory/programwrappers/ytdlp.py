@@ -6,11 +6,13 @@ from pathlib import Path
 from .ytdownloader import YouTubeDownloader
 
 
-# yt-dlp
-# https://github.com/yt-dlp/yt-dlp
-
-
 class YTDLP(YouTubeDownloader):
+
+    """
+    yt-dlp Wrapper class
+    https://github.com/yt-dlp/yt-dlp
+    """
+
     def __init__(self, url=None, path=None):
         super().__init__(url, path)
 

@@ -13,7 +13,7 @@ from .models import (
     ConfigurationEntry,
     BackgroundJob,
 )
-from .models import RssSourceImportHistory, RssSourceExportHistory
+from .models import RssSourceExportHistory
 from .threads import *
 from .pluginsources.basepluginbuilder import BasePluginBuilder
 from .basictypes import fix_path_for_windows
@@ -46,18 +46,6 @@ class ProcessSourceJobHandler(BaseJobHandler):
             plugin = BasePluginBuilder.get(source)
             plugin.check_for_data()
 
-            if (
-                len(
-                    RssSourceImportHistory.objects.filter(
-                        url=source.url, date=date.today()
-                    )
-                )
-                == 0
-            ):
-                history = RssSourceImportHistory(
-                    url=source.url, date=date.today(), source_obj=source
-                )
-                history.save()
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.error(

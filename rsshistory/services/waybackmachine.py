@@ -70,15 +70,9 @@ class WaybackMachine(object):
         return "https://web.archive.org/web/{}000000*/{}".format(formatted_date, url)
 
     def get_archive_urls(self, url, start_time, stop_time):
-        from ..models import RssSourceImportHistory
-
         time = stop_time
         while time >= start_time:
             # print("Time: {0}".format(time))
-            if len(RssSourceImportHistory.objects.filter(url=url, date=time)) != 0:
-                time -= timedelta(days=1)
-                continue
-
             wayback_url = self.get_archive_url(url, time)
             yield (time, wayback_url)
             time -= timedelta(days=1)

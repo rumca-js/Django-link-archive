@@ -15,7 +15,7 @@ from ..models import (
     UserConfig,
     BackgroundJob,
 )
-from ..models import RssSourceImportHistory, RssSourceExportHistory
+from ..models import RssSourceExportHistory
 from ..forms import ConfigForm, UserConfigForm
 
 
@@ -117,9 +117,6 @@ def system_status(request):
 
     context["server_path"] = Path(".").resolve()
     context["directory"] = Path(".").resolve()
-
-    history = RssSourceImportHistory.get_safe()
-    context["import_history_list"] = history
 
     history = RssSourceExportHistory.get_safe()
     context["export_history_list"] = history
@@ -446,11 +443,6 @@ def fix_entry_tags(request, entrypk):
 def get_time_stamps(url, start_time, stop_time):
     time = stop_time
     while time >= start_time:
-        if len(RssSourceImportHistory.objects.filter(url=url, date=time)) != 0:
-            time -= timedelta(days=1)
-            print("Skipping already imported timestamp {0} {1}".format(url, time))
-            continue
-
         yield time
         time -= timedelta(days=1)
 
@@ -530,15 +522,6 @@ def import_source_from_ia_impl(wb, source_url, source_archive_url, archive_time)
 
     source_obj = SourceDataModel.objects.filter(url=source_url)[0]
 
-    if (
-        len(
-            RssSourceImportHistory.objects.filter(url=source_obj.url, date=archive_time)
-        )
-        != 0
-    ):
-        print("Import timestamp exists")
-        return False
-
     c = Configuration.get_object(str(get_app()))
 
     from ..pluginsources.rsssourceprocessor import RssSourceProcessor
@@ -553,17 +536,6 @@ def import_source_from_ia_impl(wb, source_url, source_archive_url, archive_time)
         return False
 
     print("Internet archive done {0}".format(source_url))
-
-    if (
-        len(
-            RssSourceImportHistory.objects.filter(url=source_obj.url, date=archive_time)
-        )
-        == 0
-    ):
-        history = RssSourceImportHistory(
-            url=source_obj.url, date=archive_time, source_obj=source_obj
-        )
-        history.save()
 
     return True
 

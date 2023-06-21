@@ -4,29 +4,14 @@ import logging
 from pathlib import Path
 
 
-## Program definitions
-
-
-# We do not use python youtube interface. It will not work with windows executable.
-
-# youtube-dl.exe --write-description --write-info-json --write-annotations --write-sub --write-thumbnail https://www.youtube.com/watch?v=NlovbLiuGLM&t=433s
-
-# youtube-dl.exe --get-title https://www.youtube.com/watch?v=NlovbLiuGLM
-# youtube-dl.exe --get-description https://www.youtube.com/watch?v=NlovbLiuGLM
-# youtube-dl.exe --get-filename https://www.youtube.com/watch?v=NlovbLiuGLM
-# youtube-dl.exe --dump-json https://www.youtube.com/watch?v=NlovbLiuGLM
-# youtube-dl.exe --get-thumbnail https://www.youtube.com/watch?v=NlovbLiuGLM
-
-# youtube-dl.exe --get-title --get-filename --get-description https://www.youtube.com/watch?v=NlovbLiuGLM
-
-# youtube-dl --print-json https://www.youtube.com/playlist?list=<playlist_id> > example.json
-# youtube-dl --dump-json https://www.youtube.com/playlist?list=<playlist_id> > example.json
-
-# https://stackoverflow.com/questions/18054500/how-to-use-youtube-dl-from-a-python-program
-# https://github.com/ytdl-org/youtube-dl/blob/master/README.md#embedding-youtube-dl
-
-
 class YouTubeDownloader(object):
+
+    """
+    We do not use python youtube interface. It will not work with windows executable.
+    https://stackoverflow.com/questions/18054500/how-to-use-youtube-dl-from-a-python-program
+    https://github.com/ytdl-org/youtube-dl/blob/master/README.md#embedding-youtube-dl
+    """
+
     def __init__(self, url, path=None):
         self._url = url
         self._path = path

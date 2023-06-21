@@ -183,24 +183,6 @@ class SourceOperationalData(models.Model):
         ordering = ["date_fetched"]
 
 
-class RssSourceImportHistory(models.Model):
-    url = models.CharField(max_length=2000)
-    date = models.DateField()
-    source_obj = models.ForeignKey(
-        SourceDataModel,
-        on_delete=models.SET_NULL,
-        related_name="history_import",
-        null=True,
-        blank=True,
-    )
-
-    class Meta:
-        ordering = ["-date"]
-
-    def get_safe():
-        return RssSourceImportHistory.objects.all()[:100]
-
-
 class RssSourceExportHistory(models.Model):
     date = models.DateField(unique=True, null=False)
 
