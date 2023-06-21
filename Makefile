@@ -28,4 +28,4 @@ test: migrations-check
 	@poetry run python manage.py test rsshistory
 
 refresh:
-	poetry export -f requirements.txt --output install/requirements.txt
+	poetry export -f requirements.txt --output requirements.txt
