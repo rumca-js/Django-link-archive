@@ -5,7 +5,7 @@ Use repository main level makefile to install and run development server.
 Prerequisites:
  - python poetry
 
-# Automated installation
+## Automated installation
 
 Makefile: [https://github.com/rumca-js/Django-link-archive/blob/main/Makefile](https://github.com/rumca-js/Django-link-archive/blob/main/Makefile).
 
@@ -19,8 +19,20 @@ To start server
 make run
 ```
 
-Manual installation:
- - Read contents of the makefile, and perform the actions described by it
+## Manual installation
+
+Read contents of the makefile, and perform the actions described by it
+
+## Other dependencies
+
+To be able to perform various operations additional programs are needed:
+ - wget - to download pages
+ - id3v2 - to tag downloaded songs
+
+To install them perform the following rule with sudo priviliges
+```
+make install-optional
+```
 
 ## User
 
