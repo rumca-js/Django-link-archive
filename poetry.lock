@@ -466,6 +466,20 @@ files = [
 six = ">=1.5"
 
 [[package]]
+name = "python-memcached"
+version = "1.59"
+description = "Pure python memcached client"
+optional = false
+python-versions = "*"
+files = [
+    {file = "python-memcached-1.59.tar.gz", hash = "sha256:a2e28637be13ee0bf1a8b6843e7490f9456fd3f2a4cb60471733c7b5d5557e4f"},
+    {file = "python_memcached-1.59-py2.py3-none-any.whl", hash = "sha256:4dac64916871bd3550263323fc2ce18e1e439080a2d5670c594cf3118d99b594"},
+]
+
+[package.dependencies]
+six = ">=1.4.0"
+
+[[package]]
 name = "pytz"
 version = "2021.3"
 description = "World timezone definitions, modern and historical"
@@ -676,13 +690,13 @@ files = [
 
 [[package]]
 name = "yt-dlp"
-version = "2023.3.4"
+version = "2023.6.21"
 description = "A youtube-dl fork with additional features and patches"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "yt-dlp-2023.3.4.tar.gz", hash = "sha256:265d5da97a76c15d7d9a4088a67b78acd5dcf6f8cfd8257c52f581ff996ff515"},
-    {file = "yt_dlp-2023.3.4-py2.py3-none-any.whl", hash = "sha256:40ca421407ce07c8fd700854fd978d58526ec6fff3468caa34ff1c7333b8dc34"},
+    {file = "yt-dlp-2023.6.21.tar.gz", hash = "sha256:56c35d1ad3ecfb828c3b89ffe07b235b354eddd82e1a31ddc3d16eb8c3e71e8e"},
+    {file = "yt_dlp-2023.6.21-py2.py3-none-any.whl", hash = "sha256:e4117b1ee07878c7dade2a64e6102fb7840fa1e3f19365cca42ce291754f35cf"},
 ]
 
 [package.dependencies]
@@ -695,5 +709,5 @@ websockets = "*"
 
 [metadata]
 lock-version = "2.0"
-python-versions = "^3.9"
-content-hash = "b68f848f6eb9906bb676385635b65fb2a7c61b66994986fb391596c462a90b6c"
+python-versions = "^3.8"
+content-hash = "5c5803c84d4eb127c02f5bc6ce4b87d2a8b9dec49b4fd4f4fc03044e8b12f068"
