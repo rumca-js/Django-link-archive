@@ -8,12 +8,15 @@ APP_NAME = rsshistory
 #  - python poetry is in your path
 
 install:
-	# keyring problem export PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring
 	poetry install
 	@$(CP) $(PROJECT_NAME)/settings_template.py $(PROJECT_NAME)/settings.py
+	@echo "*******************************************************************"
 	@echo "Please configure your django application linklibrary in settings.py"
-	@echo "Please define SECRET_KEY settings.py"
-	@echo "To create databases use createdb rule"
+	@echo "Please:"
+	@echo " - define SECRET_KEY settings.py"
+	@echo " - use createdb rule to create tables"
+	@echo " - add required hosts to ALLOWED_HOSTS"
+	@echo "*******************************************************************"
 
 createdb:
 	poetry run python manage.py migrate --run-syncdb 
