@@ -155,6 +155,8 @@ class BookmarksBigExporter(object):
             shutil.rmtree(entries_dir)
 
         for year in range(self.get_start_year(), self.get_current_year() + 1):
+            print("Writing bookmarks for a year {}".format(year))
+
             start_date = datetime.date(year, 1, 1)
             stop_date = datetime.date(year + 1, 1, 1)
 
@@ -172,14 +174,6 @@ class BookmarksBigExporter(object):
 
             converter = BookmarksExporter(self._cfg, pl_entries)
             converter.export("bookmarks_PL", str(year))
-
-            # en_entries = LinkDataModel.objects.filter(persistent = True, date_published__range=therange, language__icontains = 'en')
-            # converter = BookmarksExporter(self._cfg, en_entries)
-            # converter.export('bookmarks_EN', str(year))
-
-            # en_entries = LinkDataModel.objects.filter(persistent = True, date_published__range=therange, language__icontains = 'pl')
-            # converter = BookmarksExporter(self._cfg, en_entries)
-            # converter.export('bookmarks_PL', str(year))
 
 
 class BookmarksTopicExporter(object):

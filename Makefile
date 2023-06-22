@@ -1,4 +1,4 @@
-.PHONY: run install test install-optional reformat createdb static migrate superuser fixkeyring
+.PHONY: run install test install-optional reformat createdb static migrate superuser
 
 MV = mv
 PROJECT_NAME = linklibrary

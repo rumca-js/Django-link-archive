@@ -1,4 +1,4 @@
-from .baserssplugin import BaseRssPlugin
+from .sourcerssplugin import BaseRssPlugin
 
 
 class CodeProjectPlugin(BaseRssPlugin):

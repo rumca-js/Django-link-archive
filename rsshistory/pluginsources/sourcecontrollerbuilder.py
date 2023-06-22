@@ -1,14 +1,13 @@
-from .baseplugin import BasePlugin
-from .baseparseplugin import BaseParsePlugin
-from .baserssplugin import BaseRssPlugin
-from .codeprojectplugin import CodeProjectPlugin
-from .instalkiplugin import InstalkiPlugin
-from .niezaleznaplugin import NiezaleznaPlugin
-from .tvn24plugin import TVN24Plugin
-from .spotifyplugin import SpotifyPlugin
+from .sourceparseplugin import BaseParsePlugin
+from .sourcerssplugin import BaseRssPlugin
+from .sourcecodeprojectplugin import CodeProjectPlugin
+from .sourceinstalkiplugin import InstalkiPlugin
+from .sourceniezaleznaplugin import NiezaleznaPlugin
+from .sourcetvn24plugin import TVN24Plugin
+from .sourcespotifyplugin import SpotifyPlugin
 
 
-class BasePluginBuilder(object):
+class SourceControllerBuilder(object):
     plugins = [
         CodeProjectPlugin,
         InstalkiPlugin,
@@ -20,7 +19,7 @@ class BasePluginBuilder(object):
     def get(source):
         from ..models import SourceDataModel
 
-        for plugin_def in BasePluginBuilder.plugins:
+        for plugin_def in SourceControllerBuilder.plugins:
             plugin = plugin_def(source)
             if source.source_type == plugin.PLUGIN_NAME:
                 return plugin

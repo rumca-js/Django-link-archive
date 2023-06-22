@@ -11,10 +11,12 @@
      <input type="submit" value="Submit">
   </form>
 
-  <a href="https://en.wikipedia.org/w/index.php?search={{search_term}}" class="simplebutton">Ask wikipedia</a>
-  <a href="https://www.quora.com/search?q={{search_term}}" class="simplebutton">Ask Quora</a>
-  <a href="https://stackoverflow.com/search?q={{search_term}}" class="simplebutton">Ask Stack Overflow</a>
-  <a href="https://www.wolframalpha.com/input?i={{search_term}}" class="simplebutton">Ask wolfram alpha</a>
+  {% if search_term %}
+     <a href="https://en.wikipedia.org/w/index.php?search={{search_term}}" class="simplebutton">Ask wikipedia</a>
+     <a href="https://www.quora.com/search?q={{search_term}}" class="simplebutton">Ask Quora</a>
+     <a href="https://stackoverflow.com/search?q={{search_term}}" class="simplebutton">Ask Stack Overflow</a>
+     <a href="https://www.wolframalpha.com/input?i={{search_term}}" class="simplebutton">Ask wolfram alpha</a>
+  {% endif %}
 
   <hr>
     {% if rss_are_fetched %}

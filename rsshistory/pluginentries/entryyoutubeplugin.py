@@ -1,10 +1,10 @@
 from django.urls import reverse
 
 from .youtubelinkhandler import YouTubeLinkHandler
-from .genericlinkcontroller import GenericLinkController, LinkButton
+from .entrygenericplugin import EntryGenericPlugin, LinkButton
 
 
-class YouTubeLinkController(YouTubeLinkHandler, GenericLinkController):
+class EntryYouTubePlugin(YouTubeLinkHandler, EntryGenericPlugin):
     def __init__(self, entry):
         super().__init__(entry.link)
         self.entry = entry

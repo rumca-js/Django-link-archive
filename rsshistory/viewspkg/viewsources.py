@@ -54,14 +54,14 @@ class RssSourceDetailView(generic.DetailView):
     model = SourceDataModel
 
     def get_context_data(self, **kwargs):
-        from ..pluginsources.basepluginbuilder import BasePluginBuilder
+        from ..pluginsources.sourcecontrollerbuilder import SourceControllerBuilder
 
         # Call the base implementation first to get the context
         context = super(RssSourceDetailView, self).get_context_data(**kwargs)
         context = init_context(self.request, context)
 
         context["page_title"] = self.object.title
-        context["handler"] = BasePluginBuilder.get(self.object)
+        context["handler"] = SourceControllerBuilder.get(self.object)
 
         return context
 

@@ -4,7 +4,7 @@ class LinkButton(object):
         self.action = action
 
 
-class GenericLinkController(object):
+class EntryGenericPlugin(object):
     def __init__(self, entry):
         self.entry = entry
 

@@ -1,4 +1,4 @@
-from .baseparseplugin import BaseParsePlugin
+from .sourceparseplugin import BaseParsePlugin
 import re
 
 

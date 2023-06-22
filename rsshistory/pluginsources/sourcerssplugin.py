@@ -1,11 +1,11 @@
 import traceback
 from dateutil import parser
 
-from .baseplugin import BasePlugin
+from .sourcegenericplugin import SourceGenericPlugin
 from ..models import PersistentInfo
 
 
-class BaseRssPlugin(BasePlugin):
+class BaseRssPlugin(SourceGenericPlugin):
     PLUGIN_NAME = "BaseRssPlugin"
 
     def __init__(self, source):

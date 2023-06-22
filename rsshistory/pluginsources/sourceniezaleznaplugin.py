@@ -1,9 +1,9 @@
-from .baseplugin import BasePlugin
 import re
+from .sourceparseplugin import BaseParsePlugin
 
 
-class SpotifyPlugin(BasePlugin):
-    PLUGIN_NAME = "SpotifyPlugin"
+class NiezaleznaPlugin(BaseParsePlugin):
+    PLUGIN_NAME = "NiezaleznaPlugin"
 
     def __init__(self, source):
         super().__init__(source)
@@ -12,7 +12,7 @@ class SpotifyPlugin(BasePlugin):
         if not self.is_link_valid_domain(address):
             return False
 
-        search_pattern = self.get_domain() + "/episode"
+        search_pattern = self.get_domain() + "/[0-9]+[-]"
 
         if re.search(search_pattern, address):
             return True

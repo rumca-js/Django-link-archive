@@ -15,7 +15,7 @@ from .models import (
 )
 from .models import RssSourceExportHistory
 from .threads import *
-from .pluginsources.basepluginbuilder import BasePluginBuilder
+from .pluginsources.sourcecontrollerbuilder import SourceControllerBuilder
 from .basictypes import fix_path_for_windows
 from .programwrappers import ytdlp, id3v2
 
@@ -43,7 +43,7 @@ class ProcessSourceJobHandler(BaseJobHandler):
 
             source = sources[0]
 
-            plugin = BasePluginBuilder.get(source)
+            plugin = SourceControllerBuilder.get(source)
             plugin.check_for_data()
 
         except Exception as e:
@@ -219,6 +219,11 @@ class WriteDailyDataJobHandler(BaseJobHandler):
         try:
             from .datawriter import DataWriter
 
+            # some changes could be done externally. Through apache.
+            from django.core.cache import cache
+
+            cache.clear()
+
             writer = DataWriter(self._config)
 
             date_input = datetime.strptime(obj.subject, "%Y-%m-%d").date()
@@ -243,6 +248,11 @@ class WriteBookmarksJobHandler(BaseJobHandler):
             from .prjconfig import Configuration
             from .datawriter import DataWriter
 
+            # some changes could be done externally. Through apache.
+            from django.core.cache import cache
+
+            cache.clear()
+
             c = Configuration.get_object(str(app_name))
             writer = DataWriter(c)
             writer.write_bookmarks()
@@ -263,6 +273,11 @@ class WriteTopicJobHandler(BaseJobHandler):
     def process(self, obj=None):
         try:
             from ..serializers.bookmarksexporter import BookmarksTopicExporter
+
+            # some changes could be done externally. Through apache.
+            from django.core.cache import cache
+
+            cache.clear()
 
             topic = obj.subject
 

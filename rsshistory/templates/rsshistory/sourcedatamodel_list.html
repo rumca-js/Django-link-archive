@@ -12,8 +12,10 @@
 
   <hr>
 
-  <div>Filters:
-  <a href="{{filter_form.action_url}}" class='simplebutton'>Reset</a>
+  <div>
+  <a href="{% url 'rsshistory:searchinitview' %}" class='simplebutton'>
+      <img src="{% static 'rsshistory/icons/icons8-start-100.png' %}" height="{{icon_size}}" />
+      Reset filters</a>
   </div>
 
   <form action="{{filter_form.action_url}}" method="{{filter_form.method}}">

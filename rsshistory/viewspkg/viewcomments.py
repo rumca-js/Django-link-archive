@@ -69,7 +69,9 @@ def entry_add_comment(request, link_id):
 
     context["form"] = form
     context["form_title"] = link.title
-    context["form_description"] = link.title
+    context[
+        "form_description_post"
+    ] = """Please think twice about what you are going to say. Is it written in vengance? Is it something you truly believe? Have you done research in that matter? This is important. You will be able to post only 1 comment per day"""
 
     return render(request, get_app() / "form_basic.html", context)
 

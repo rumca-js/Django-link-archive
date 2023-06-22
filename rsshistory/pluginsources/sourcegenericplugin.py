@@ -5,7 +5,7 @@ from ..webtools import Page
 from ..dateutils import DateUtils
 
 
-class BasePlugin(Page):
+class SourceGenericPlugin(Page):
     def __init__(self, source):
         self.source = source
         super().__init__(self.get_address())

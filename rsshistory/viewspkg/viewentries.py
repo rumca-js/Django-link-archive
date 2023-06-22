@@ -72,7 +72,7 @@ class RssEntryDetailView(generic.DetailView):
     model = LinkDataModel
 
     def get_context_data(self, **kwargs):
-        from ..pluginentries.linkcontrollerbuilder import LinkControllerBuilder
+        from ..pluginentries.entrycontrollerbuilder import EntryControllerBuilder
 
         # Call the base implementation first to get the context
         context = super(RssEntryDetailView, self).get_context_data(**kwargs)
@@ -82,7 +82,7 @@ class RssEntryDetailView(generic.DetailView):
             self.object.update_language()
 
         context["page_title"] = self.object.title
-        context["object_controller"] = LinkControllerBuilder.get(self.object)
+        context["object_controller"] = EntryControllerBuilder.get(self.object)
 
         from ..services.waybackmachine import WaybackMachine
         from ..dateutils import DateUtils

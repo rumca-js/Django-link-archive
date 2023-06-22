@@ -1,11 +1,11 @@
 import traceback
 import re
 
-from .baseplugin import BasePlugin
+from .sourcegenericplugin import SourceGenericPlugin
 from ..models import PersistentInfo, LinkDataModel
 
 
-class BaseParsePlugin(BasePlugin):
+class BaseParsePlugin(SourceGenericPlugin):
     PLUGIN_NAME = "BaseParsePlugin"
 
     def __init__(self, source):

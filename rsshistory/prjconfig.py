@@ -3,9 +3,10 @@ from pathlib import Path
 import logging
 
 from .basictypes import *
-from .models import ConfigurationEntry
+from .models import ConfigurationEntry, UserConfig
 
-""" version is split into three digits:
+"""
+version is split into three digits:
  - release
  - model version
  - patch
@@ -14,7 +15,10 @@ from .models import ConfigurationEntry
  if a change requires the model to be changed, then second digit is updated, patch is set to 0
  if something should be released to public, then release version changes
 """
-__version__ = "0.10.2"
+__version__ = "0.10.5"
+
+
+from pathlib import Path
 
 
 class Configuration(object):
@@ -27,6 +31,34 @@ class Configuration(object):
         self.version = __version__
 
         self.enable_logging()
+
+    def get_context(self):
+        return {
+            "page_title": "Personal Link Database",
+            "app_name": str(self.app_name),
+            "admin_email": "renegat@renegat0x0.ddns.net",
+            "admin_user": "renegat0x0",
+            "app_version": self.version,
+            "user_config": UserConfig.get(),
+            "config": ConfigurationEntry.get(),
+            "icon_size": "20px",
+            "base_generic": str(Path(self.app_name) / "base_generic.html"),
+            "base_footer": """
+          <p>
+            <div>
+            Version: {}
+            </div>
+            <div>
+                Source: <a href="https://github.com/rumca-js/Django-link-archive">https://github.com/rumca-js/Django-link-archive</a>
+            </div>
+            <div>
+                Bookmarked articles <a href="https://github.com/rumca-js/RSS-Link-Database">https://github.com/rumca-js/RSS-Link-Database</a>
+            </div>
+          </p>
+          """.format(
+                self.version
+            ),
+        }
 
     def get_object(app_name):
         app_name = str(app_name)
