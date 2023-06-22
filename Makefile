@@ -1,6 +1,6 @@
 .PHONY: run install test install-optional reformat createdb static migrate superuser
 
-MV = mv
+CP = cp
 PROJECT_NAME = linklibrary
 APP_NAME = rsshistory
 
@@ -8,9 +8,9 @@ APP_NAME = rsshistory
 #  - python poetry is in your path
 
 install:
+	# keyring problem export PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring
 	poetry install
-	# @django-admin startproject $(PROJECT_NAME)
-	@$(MV) $(PROJECT_NAME)/settings_template.py $(PROJECT_NAME)/settings.py
+	@$(CP) $(PROJECT_NAME)/settings_template.py $(PROJECT_NAME)/settings.py
 	@echo "Please configure your django application linklibrary in settings.py"
 	@echo "Please define SECRET_KEY settings.py"
 	@echo "To create databases use createdb rule"
@@ -49,5 +49,3 @@ reformat:
 
 superuser:
 	poetry run python manage.py createsuperuser
-
-# keyring problem export PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring
