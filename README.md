@@ -59,7 +59,7 @@ Demo on development env (may, or may not be running actually):
 
 ## Development
 
-Installation is described by a separate README: [https://github.com/rumca-js/Django-link-archive/blob/main/README_development.md](https://github.com/rumca-js/Django-link-archive/blob/main/README_developmen.md).
+Installation is described by a separate README: [https://github.com/rumca-js/Django-link-archive/blob/main/README_development.md](https://github.com/rumca-js/Django-link-archive/blob/main/README_development.md).
 
 ## Inspirations
 
