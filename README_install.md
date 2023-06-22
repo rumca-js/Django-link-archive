@@ -9,14 +9,13 @@ Prerequisites:
 
 Makefile: [https://github.com/rumca-js/Django-link-archive/blob/main/Makefile](https://github.com/rumca-js/Django-link-archive/blob/main/Makefile).
 
-To install python dependencies
+Rules:
 ```
-make install
-```
-
-To start server
-```
-make run
+$ make install - installs dependencies, creates settings.py
+$ make createdb - creates database tables
+$ make run - starts server
+$ make test - performs tests
+$ make superuser - creates super user
 ```
 
 ## Manual installation
@@ -37,9 +36,8 @@ make install-optional
 ## User
 
 Create super user, as usual in Django [https://www.geeksforgeeks.org/how-to-create-superuser-in-django/](https://www.geeksforgeeks.org/how-to-create-superuser-in-django/)
-```
-poetry run python manage.py createsuperuser
-```
+
+Use rule.
 
 Create also other users, as required by your setup, environment.
 

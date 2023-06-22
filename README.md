@@ -1,4 +1,4 @@
-Link database, with RSS functionality. Similar to Reddit, but completely open source, on your local machine.
+Personal link database, with RSS functionality. Similar to Reddit, but completely open source, on your local machine.
 
 # Features
 
@@ -59,8 +59,7 @@ Demo on development env (may, or may not be running actually):
 
 ## Development
 
- - installation should be simple and easy
- - KISS. Project should be of small footprint. For a single user it should be able to operate for one user on a raspberry PI
+Installation is described by a separate README: [https://github.com/rumca-js/Django-link-archive/blob/main/README_development.md](https://github.com/rumca-js/Django-link-archive/blob/main/README_developmen.md).
 
 ## Inspirations
 

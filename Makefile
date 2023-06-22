@@ -1,22 +1,22 @@
-.PHONY: run install test install-optional refresh reformat
+.PHONY: run install test install-optional reformat createdb static migrate superuser fixkeyring
+
+MV = mv
+PROJECT_NAME = linklibrary
+APP_NAME = rsshistory
 
 # Assumptions:
 #  - python poetry is in your path
 
-statics:
-	poetry run python -m manage collectstatic
-
-run:
-	poetry run python manage.py runserver 0.0.0.0:8000
-
 install:
 	poetry install
-	@django-admin startproject linklibrary
-	@echo "Please configure your django application linklibrary (settings.py)"
-	@echo " - modify INSTALLED_APPS, add django_user_agents, according to https://pypi.org/project/django-user-agents/"
-	@echo " - modify CACHES, to include django user agent MemcachedCache"
-	@echo " - modify MIDDLEWARE_CLASSES, add django_user_agents.middleware.UserAgentMiddleware"
-	@echo " - modify INSTALLED_APPS, add rsshistory.apps.RssHistoryConfig"
+	# @django-admin startproject $(PROJECT_NAME)
+	@$(MV) $(PROJECT_NAME)/settings_template.py $(PROJECT_NAME)/settings.py
+	@echo "Please configure your django application linklibrary in settings.py"
+	@echo "Please define SECRET_KEY settings.py"
+	@echo "To create databases use createdb rule"
+
+createdb:
+	poetry run python manage.py migrate --run-syncdb 
 
 install-optional:
 	# Assumptions:
@@ -24,16 +24,30 @@ install-optional:
 	# - assume you are using sudo for this command. solve it later https://github.com/rumca-js/Django-link-archive/issues/10
 	apt -y install wget, id3v2
 
+run:
+	bash -c "sleep 10; wget -q -S http://127.0.0.1:8080/rsshistory/start-background-threads" &
+	poetry run python manage.py runserver 0.0.0.0:8080
+
 migrations-check:
 	poetry run python -m manage makemigrations --check --dry-run
 
-test: migrations-check
-	@poetry run python manage.py test rsshistory
+static:
+	poetry run python -m manage collectstatic
 
-refresh:
-	poetry export -f requirements.txt --output requirements.txt
+migrate:
+	poetry run python manage.py makemigrations
+	poetry run python manage.py migrate
+
+test: migrations-check
+	@poetry run python manage.py test $(APP_NAME)
 
 reformat:
 	# Assumptions:
 	#  - python black is in your path
-	black rsshistory
+	# Black should use gitignore files to ignore refactoring
+	black $(APP_NAME)
+
+superuser:
+	poetry run python manage.py createsuperuser
+
+# keyring problem export PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring
