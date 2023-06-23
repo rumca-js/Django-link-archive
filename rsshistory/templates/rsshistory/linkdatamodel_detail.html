@@ -22,7 +22,7 @@
         <a href="{% url 'rsshistory:entry-tag' object.id %}" class="simplebutton">Tag entry</a>
     {% endif %}
 
-       <a href="{% url 'rsshistory:entry-download' object.id %}" class="simplebutton">Download page</a>
+       <a href="{% url 'rsshistory:entry-download' object.id %}" class="simplebutton" title="Downloads the page to configuraton export location">Download page</a>
 
     {% for button in object_controller.get_menu_buttons %}
       <a href="{{button.action}}" class="simplebutton">{{button.name}}</a>
