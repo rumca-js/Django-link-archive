@@ -1,11 +1,11 @@
 import logging
 import traceback
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 from pathlib import Path
 
 from django.db.models import Q
 
-from .views import app_name
+from .apps import LinkDatabase
 from .models import (
     LinkDataModel,
     SourceDataModel,
@@ -253,7 +253,7 @@ class WriteBookmarksJobHandler(BaseJobHandler):
 
             cache.clear()
 
-            c = Configuration.get_object(str(app_name))
+            c = Configuration.get_object()
             writer = DataWriter(c)
             writer.write_bookmarks()
         except Exception as e:
@@ -281,7 +281,7 @@ class WriteTopicJobHandler(BaseJobHandler):
 
             topic = obj.subject
 
-            c = Configuration.get_object(str(app_name))
+            c = Configuration.get_object()
             exporter = BookmarksTopicExporter(c)
             exporter.export(topic)
         except Exception as e:

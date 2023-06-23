@@ -11,24 +11,7 @@ from ..models import (
 )
 from ..prjconfig import Configuration
 from ..forms import EntryForm, ImportEntriesForm, EntryChoiceForm, ConfigForm
-
-
-def init_context(request, context):
-    from ..views import init_context
-
-    return init_context(request, context)
-
-
-def get_context(request):
-    from ..views import get_context
-
-    return get_context(request)
-
-
-def get_app():
-    from ..views import app_name
-
-    return app_name
+from ..views import ContextData
 
 
 class RssEntriesListView(generic.ListView):
@@ -44,7 +27,7 @@ class RssEntriesListView(generic.ListView):
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
         context = super(RssEntriesListView, self).get_context_data(**kwargs)
-        context = init_context(self.request, context)
+        context = ContextData.init_context(self.request, context)
         # Create any data and add it to the context
 
         context["page_title"] += " - entries"
@@ -57,7 +40,7 @@ class RssEntriesListView(generic.ListView):
 
         self.filter_form.create()
         self.filter_form.method = "GET"
-        self.filter_form.action_url = reverse("{}:entries".format(get_app()))
+        self.filter_form.action_url = reverse("{}:entries".format(ContextData.app_name))
 
         context["filter_form"] = self.filter_form
         if "search" in self.request.GET:
@@ -76,7 +59,7 @@ class RssEntryDetailView(generic.DetailView):
 
         # Call the base implementation first to get the context
         context = super(RssEntryDetailView, self).get_context_data(**kwargs)
-        context = init_context(self.request, context)
+        context = ContextData.init_context(self.request, context)
 
         if self.object.language == None:
             self.object.update_language()
@@ -90,20 +73,15 @@ class RssEntryDetailView(generic.DetailView):
         m = WaybackMachine()
         context["archive_org_date"] = m.get_formatted_date(DateUtils.get_date_today())
 
-        from django_user_agents.utils import get_user_agent
-
-        user_agent = get_user_agent(self.request)
-        context["is_mobile"] = user_agent.is_mobile
-
         return context
 
 
 def add_entry(request):
-    context = get_context(request)
+    context = ContextData.get_context(request)
     context["page_title"] += " - Add entry"
 
     if not request.user.is_staff:
-        return render(request, get_app() / "missing_rights.html", context)
+        return ContextData.render(request, "missing_rights.html", context)
 
     # if this is a POST request we need to process the form data
     if request.method == "POST":
@@ -121,13 +99,13 @@ def add_entry(request):
             context["form"] = form
             context["entry"] = ob[0]
 
-            return render(request, get_app() / "entry_edit_exists.html", context)
+            return ContextData.render(request, "entry_edit_exists.html", context)
 
         data = form.get_full_information()
         if valid:
             if not form.save_form(data):
                 context["summary_text"] = "Could not save link"
-                return render(request, get_app() / "summary_present.html", context)
+                return ContextData.render(request, "summary_present.html", context)
 
             context["form"] = form
 
@@ -138,10 +116,10 @@ def add_entry(request):
             if ConfigurationEntry.get().link_archive:
                 BackgroundJob.link_archive(data["link"])
 
-            return render(request, get_app() / "entry_added.html", context)
+            return ContextData.render(request, "entry_added.html", context)
 
         context["summary_text"] = "Form is invalid"
-        return render(request, get_app() / "summary_present.html", context)
+        return ContextData.render(request, "summary_present.html", context)
 
         #    # process the data in form.cleaned_data as required
         #    # ...
@@ -153,7 +131,7 @@ def add_entry(request):
         author = request.user.username
         form = EntryForm(initial={"user": author})
         form.method = "POST"
-        form.action_url = reverse("{}:entry-add".format(get_app()))
+        form.action_url = reverse("{}:entry-add".format(ContextData.app_name))
         context["form"] = form
 
         context["form_title"] = "Add new entry"
@@ -175,22 +153,22 @@ def add_entry(request):
 
         context["form_description_post"] = form_text
 
-    return render(request, get_app() / "form_basic.html", context)
+    return ContextData.render(request, "form_basic.html", context)
 
 
 def edit_entry(request, pk):
-    context = get_context(request)
+    context = ContextData.get_context(request)
     context["page_title"] += " - edit entry"
 
     context["pk"] = pk
 
     if not request.user.is_staff:
-        return render(request, get_app() / "missing_rights.html", context)
+        return ContextData.render(request, "missing_rights.html", context)
 
     obs = LinkDataModel.objects.filter(id=pk)
     if not obs.exists():
         context["summary_text"] = "Such entry does not exist"
-        return render(request, get_app() / "summary_present.html", context)
+        return ContextData.render(request, "summary_present.html", context)
 
     ob = obs[0]
     if ob.user is None or ob.user == "":
@@ -205,26 +183,28 @@ def edit_entry(request, pk):
             form.save()
 
             context["entry"] = ob
-            return render(request, get_app() / "entry_edit_ok.html", context)
+            return ContextData.render(request, "entry_edit_ok.html", context)
 
         context["summary_text"] = "Could not edit entry"
 
-        return render(request, get_app() / "summary_present.html", context)
+        return ContextData.render(request, "summary_present.html", context)
     else:
         form = EntryForm(instance=ob)
         # form.fields['user'].initial = request.user.username
         form.method = "POST"
-        form.action_url = reverse("{}:entry-edit".format(get_app()), args=[pk])
+        form.action_url = reverse(
+            "{}:entry-edit".format(ContextData.app_name), args=[pk]
+        )
         context["form"] = form
-        return render(request, get_app() / "form_basic.html", context)
+        return ContextData.render(request, "form_basic.html", context)
 
 
 def remove_entry(request, pk):
-    context = get_context(request)
+    context = ContextData.get_context(request)
     context["page_title"] += " - remove entry"
 
     if not request.user.is_staff:
-        return render(request, get_app() / "missing_rights.html", context)
+        return ContextData.render(request, "missing_rights.html", context)
 
     entry = LinkDataModel.objects.filter(id=pk)
     if entry.exists():
@@ -234,16 +214,16 @@ def remove_entry(request, pk):
     else:
         context["summary_text"] = "No source for ID: " + str(pk)
 
-    return render(request, get_app() / "summary_present.html", context)
+    return ContextData.render(request, "summary_present.html", context)
 
 
 def hide_entry(request, pk):
-    context = get_context(request)
+    context = ContextData.get_context(request)
     context["page_title"] += " - hide entry"
     context["pk"] = pk
 
     if not request.user.is_staff:
-        return render(request, get_app() / "missing_rights.html", context)
+        return ContextData.render(request, "missing_rights.html", context)
 
     objs = LinkDataModel.objects.filter(id=pk)
     obj = objs[0]
@@ -256,30 +236,30 @@ def hide_entry(request, pk):
 
     context["summary_text"] = summary_text
 
-    return render(request, get_app() / "summary_present.html", context)
+    return ContextData.render(request, "summary_present.html", context)
 
 
 def search_init_view(request):
-    context = get_context(request)
+    context = ContextData.get_context(request)
     context["page_title"] += " - search view"
 
     filter_form = EntryChoiceForm(args=request.GET)
     filter_form.create()
     filter_form.method = "GET"
-    filter_form.action_url = reverse("{}:entries".format(get_app()))
+    filter_form.action_url = reverse("{}:entries".format(ContextData.app_name))
 
     context["form"] = filter_form
 
-    return render(request, get_app() / "form_search.html", context)
+    return ContextData.render(request, "form_search.html", context)
 
 
 def make_persistent_entry(request, pk):
-    context = get_context(request)
+    context = ContextData.get_context(request)
     context["page_title"] += " - persistent entry"
     context["pk"] = pk
 
     if not request.user.is_staff:
-        return render(request, get_app() / "missing_rights.html", context)
+        return ContextData.render(request, "missing_rights.html", context)
 
     entry = LinkDataModel.objects.get(id=pk)
 
@@ -296,16 +276,16 @@ def make_persistent_entry(request, pk):
 
     context["summary_text"] = summary_text
 
-    return render(request, get_app() / "summary_present.html", context)
+    return ContextData.render(request, "summary_present.html", context)
 
 
 def make_not_persistent_entry(request, pk):
-    context = get_context(request)
+    context = ContextData.get_context(request)
     context["page_title"] += " - persistent entry"
     context["pk"] = pk
 
     if not request.user.is_staff:
-        return render(request, get_app() / "missing_rights.html", context)
+        return ContextData.render(request, "missing_rights.html", context)
 
     ft = LinkDataModel.objects.get(id=pk)
 
@@ -321,17 +301,17 @@ def make_not_persistent_entry(request, pk):
 
     context["summary_text"] = summary_text
 
-    return render(request, get_app() / "summary_present.html", context)
+    return ContextData.render(request, "summary_present.html", context)
 
 
 def import_entries(request):
     # TODO
     summary_text = ""
-    context = get_context(request)
+    context = ContextData.get_context(request)
     context["page_title"] += " - import entries"
 
     if not request.user.is_staff:
-        return render(request, get_app() / "missing_rights.html", context)
+        return ContextData.render(request, "missing_rights.html", context)
 
     # if this is a POST request we need to process the form data
     if request.method == "POST":
@@ -371,22 +351,22 @@ def import_entries(request):
 
         context["form"] = form
         context["summary_text"] = summary_text
-        return render(request, get_app() / "entries_import_summary.html", context)
+        return ContextData.render(request, "entries_import_summary.html", context)
 
     # if a GET (or any other method) we'll create a blank form
     else:
         form = ImportEntriesForm()
         form.method = "POST"
-        form.action_url = reverse("{}:entries-import".format(get_app()))
+        form.action_url = reverse("{}:entries-import".format(ContextData.app_name))
         context["form"] = form
-        return render(request, get_app() / "form_basic.html", context)
+        return ContextData.render(request, "form_basic.html", context)
 
 
 class NotBookmarkedView(generic.ListView):
     model = LinkDataModel
     context_object_name = "entries_list"
     paginate_by = 200
-    template_name = get_app() / "linkdatamodel_list.html"
+    template_name = ContextData.get_full_template("linkdatamodel_list.html")
 
     def get_queryset(self):
         self.filter_form = EntryChoiceForm(self.request.GET, args=self.request.GET)
@@ -397,7 +377,7 @@ class NotBookmarkedView(generic.ListView):
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
         context = super(NotBookmarkedView, self).get_context_data(**kwargs)
-        context = init_context(self.request, context)
+        context = ContextData.init_context(self.request, context)
         # Create any data and add it to the context
 
         context["page_title"] += " - not bookmarked"
@@ -407,29 +387,26 @@ class NotBookmarkedView(generic.ListView):
         context["rss_queue_size"] = queue_size
 
         if self.filter_form.is_valid():
-            print("valid")
+            pass
 
         self.filter_form.create()
         self.filter_form.method = "GET"
-        self.filter_form.action_url = reverse("{}:entries-untagged".format(get_app()))
+        self.filter_form.action_url = reverse(
+            "{}:entries-untagged".format(ContextData.app_name)
+        )
 
         context["filter_form"] = self.filter_form
-
-        from django_user_agents.utils import get_user_agent
-
-        user_agent = get_user_agent(self.request)
-        context["is_mobile"] = user_agent.is_mobile
 
         return context
 
 
 def download_entry(request, pk):
-    context = get_context(request)
+    context = ContextData.get_context(request)
     context["page_title"] += " - download entry"
     context["pk"] = pk
 
     if not request.user.is_staff:
-        return render(request, get_app() / "missing_rights.html", context)
+        return ContextData.render(request, "missing_rights.html", context)
 
     link = LinkDataModel.objects.get(id=pk)
 
@@ -438,15 +415,15 @@ def download_entry(request, pk):
 
     context["summary_text"] = summary_text
 
-    return render(request, get_app() / "summary_present.html", context)
+    return ContextData.render(request, "summary_present.html", context)
 
 
 def wayback_save(request, pk):
-    context = get_context(request)
+    context = ContextData.get_context(request)
     context["page_title"] += " - Waybacksave"
 
     if not request.user.is_staff:
-        return render(request, get_app() / "missing_rights.html", context)
+        return ContextData.render(request, "missing_rights.html", context)
 
     if ConfigurationEntry.get().link_archive:
         link = LinkDataModel.objects.get(id=pk)
@@ -456,4 +433,4 @@ def wayback_save(request, pk):
     else:
         context["summary_text"] = "Waybacksave is disabled for links"
 
-    return render(request, get_app() / "summary_present.html", context)
+    return ContextData.render(request, "summary_present.html", context)

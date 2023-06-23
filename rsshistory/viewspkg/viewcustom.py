@@ -17,42 +17,25 @@ from ..models import (
 )
 from ..models import RssSourceExportHistory
 from ..forms import ConfigForm, UserConfigForm
-
-
-def init_context(request, context):
-    from ..views import init_context
-
-    return init_context(request, context)
-
-
-def get_context(request):
-    from ..views import get_context
-
-    return get_context(request)
-
-
-def get_app():
-    from ..views import app_name
-
-    return app_name
+from ..views import ContextData
 
 
 def admin_page(request):
-    context = get_context(request)
+    context = ContextData.get_context(request)
     context["page_title"] += " - Admin page"
 
     if not request.user.is_staff:
-        return render(request, get_app() / "missing_rights.html", context)
+        return ContextData.render(request, "missing_rights.html", context)
 
-    return render(request, get_app() / "admin_page.html", context)
+    return ContextData.render(request, "admin_page.html", context)
 
 
 def configuration_page(request):
-    context = get_context(request)
+    context = ContextData.get_context(request)
     context["page_title"] += " - Configuration page"
 
     if not request.user.is_staff:
-        return render(request, get_app() / "missing_rights.html", context)
+        return ContextData.render(request, "missing_rights.html", context)
 
     ob = ConfigurationEntry.get()
 
@@ -62,36 +45,28 @@ def configuration_page(request):
             form.save()
         else:
             context["summary_text"] = "Form is invalid"
-            return render(request, get_app() / "summary_present.html", context)
+            return ContextData.render(request, "summary_present.html", context)
 
     ob = ConfigurationEntry.get()
     form = ConfigForm(instance=ob)
 
     form.method = "POST"
-    form.action_url = reverse("{}:configuration".format(get_app()))
+    form.action_url = reverse("{}:configuration".format(ConfigForm.app_name))
 
     context["config_form"] = form
 
-    return render(request, get_app() / "configuration.html", context)
+    return ContextData.render(request, "configuration.html", context)
 
 
 def system_status(request):
-    context = get_context(request)
+    context = ContextData.get_context(request)
     context["page_title"] += " - Status"
 
     if not request.user.is_staff:
-        return render(request, get_app() / "missing_rights.html", context)
+        return ContextData.render(request, "missing_rights.html", context)
 
-    c = Configuration.get_object(str(get_app()))
-
-    # size_b = get_directory_size_bytes(c.directory)
-    # size_kb = size_b / 1024
-    # size_mb = size_kb / 1024
-
+    c = Configuration.get_object()
     context["directory"] = c.directory
-    # context['database_size_bytes'] = size_b
-    # context['database_size_kbytes'] = size_kb
-    # context['database_size_mbytes'] = size_mb
 
     from ..models import YouTubeMetaCache, YouTubeReturnDislikeMetaCache
 
@@ -121,29 +96,29 @@ def system_status(request):
     history = RssSourceExportHistory.get_safe()
     context["export_history_list"] = history
 
-    return render(request, get_app() / "system_status.html", context)
+    return ContextData.render(request, "system_status.html", context)
 
 
 def start_threads(request):
-    context = get_context(request)
+    context = ContextData.get_context(request)
     context["page_title"] += " - Status"
 
-    c = Configuration.get_object(str(get_app()))
+    c = Configuration.get_object()
     c.create_threads()
 
     context["summary_text"] = "Threads started"
 
-    return render(request, get_app() / "summary_present.html", context)
+    return ContextData.render(request, "summary_present.html", context)
 
 
 def import_reading_list_view(request):
     from ..serializers.readinglist import ReadingList
     from ..webtools import Page
 
-    context = get_context(request)
+    context = ContextData.get_context(request)
     context["page_title"] += " - import view"
 
-    c = Configuration.get_object(str(get_app()))
+    c = Configuration.get_object()
     import_path = c.get_import_path() / "readingList.csv"
 
     summary_text = ""
@@ -204,15 +179,15 @@ def import_reading_list_view(request):
             summary_text += entry["title"] + " " + entry["url"] + ": NOK \n"
 
     context["summary_text"] = summary_text
-    return render(request, get_app() / "summary_present.html", context)
+    return ContextData.render(request, "summary_present.html", context)
 
 
 def truncate_errors(request):
-    context = get_context(request)
+    context = ContextData.get_context(request)
     context["page_title"] += " - clearing errors"
 
     if not request.user.is_staff:
-        return render(request, get_app() / "missing_rights.html", context)
+        return ContextData.render(request, "missing_rights.html", context)
 
     from ..models import PersistentInfo
 
@@ -223,7 +198,7 @@ def truncate_errors(request):
 
     context["summary_text"] = "Clearing errors done"
 
-    return render(request, get_app() / "summary_present.html", context)
+    return ContextData.render(request, "summary_present.html", context)
 
 
 def get_incorrect_youtube_links():
@@ -316,11 +291,11 @@ def data_errors_page(request):
         if entries_no_object.exists():
             return entries_no_object
 
-    context = get_context(request)
+    context = ContextData.get_context(request)
     context["page_title"] += " - data errors"
 
     if not request.user.is_staff:
-        return render(request, get_app() / "missing_rights.html", context)
+        return ContextData.render(request, "missing_rights.html", context)
 
     # fix_reassign_source_to_nullsource_entries()
     # fix_tags_links()
@@ -339,7 +314,7 @@ def data_errors_page(request):
 
     # show bookmarked links without tags
 
-    return render(request, get_app() / "data_errors.html", context)
+    return ContextData.render(request, "data_errors.html", context)
 
 
 def fix_reset_youtube_link_details(link_id):
@@ -379,11 +354,11 @@ def fix_reset_youtube_link_details(link_id):
 def fix_reset_youtube_link_details_page(request, pk):
     from ..pluginentries.youtubelinkhandler import YouTubeLinkHandler
 
-    context = get_context(request)
+    context = ContextData.get_context(request)
     context["page_title"] += " - fix youtube links"
 
     if not request.user.is_staff:
-        return render(request, get_app() / "missing_rights.html", context)
+        return ContextData.render(request, "missing_rights.html", context)
 
     summary_text = ""
     if fix_reset_youtube_link_details(pk):
@@ -393,38 +368,15 @@ def fix_reset_youtube_link_details_page(request, pk):
 
     context["summary_text"] = summary_text
 
-    return render(request, get_app() / "summary_present.html", context)
-
-
-def fix_source_entries_language(request, pk):
-    from ..pluginentries.youtubelinkhandler import YouTubeLinkHandler
-
-    context = get_context(request)
-    context["page_title"] += " - fix source entries language"
-
-    if not request.user.is_staff:
-        return render(request, get_app() / "missing_rights.html", context)
-
-    source_obj = SourceDataModel.objects.get(id=pk)
-
-    summary_text = ""
-    for entry in source_obj.entries.all():
-        if entry.language != source_obj.language:
-            entry.language = source_obj.language
-            entry.save()
-            summary_text += entry.title + " " + entry.link + "\n"
-
-    context["summary_text"] = summary_text
-
-    return render(request, get_app() / "summary_present.html", context)
+    return ContextData.render(request, "summary_present.html", context)
 
 
 def fix_entry_tags(request, entrypk):
-    context = get_context(request)
+    context = ContextData.get_context(request)
     context["page_title"] += " - fix entry tags"
 
     if not request.user.is_staff:
-        return render(request, get_app() / "missing_rights.html", context)
+        return ContextData.render(request, "missing_rights.html", context)
 
     entry = LinkDataModel.objects.get(id=entrypk)
     tags = entry.tags.all()
@@ -437,7 +389,7 @@ def fix_entry_tags(request, entrypk):
 
     context["summary_text"] = summary_text
 
-    return render(request, get_app() / "summary_present.html", context)
+    return ContextData.render(request, "summary_present.html", context)
 
 
 def get_time_stamps(url, start_time, stop_time):
@@ -475,11 +427,11 @@ def import_source_from_ia_range_impl(source_url, archive_start, archive_stop):
 def import_source_from_ia(request, pk):
     from ..forms import ImportSourceRangeFromInternetArchiveForm
 
-    context = get_context(request)
+    context = ContextData.get_context(request)
     context["page_title"] += " - Import internet archive"
 
     if not request.user.is_staff:
-        return render(request, get_app() / "missing_rights.html", context)
+        return ContextData.render(request, "missing_rights.html", context)
 
     if request.method == "POST":
         form = ImportSourceRangeFromInternetArchiveForm(request.POST)
@@ -495,10 +447,10 @@ def import_source_from_ia(request, pk):
                 == False
             ):
                 context["summary_text"] = "Could not read internet archive"
-                return render(request, get_app() / "summary_present.html", context)
+                return ContextData.render(request, "summary_present.html", context)
             else:
                 context["summary_text"] = "Internet archive data read successfully"
-                return render(request, get_app() / "summary_present.html", context)
+                return ContextData.render(request, "summary_present.html", context)
 
     source_obj = SourceDataModel.objects.get(id=pk)
 
@@ -510,11 +462,11 @@ def import_source_from_ia(request, pk):
         }
     )
     form.method = "POST"
-    # form.action_url = reverse('{}:configuration'.format(get_app()))
+    # form.action_url = reverse('{}:configuration'.format(ConfigForm.app_name))
 
     context["form"] = form
 
-    return render(request, get_app() / "import_internetarchive.html", context)
+    return ContextData.render(request, "import_internetarchive.html", context)
 
 
 def import_source_from_ia_impl(wb, source_url, source_archive_url, archive_time):
@@ -522,7 +474,7 @@ def import_source_from_ia_impl(wb, source_url, source_archive_url, archive_time)
 
     source_obj = SourceDataModel.objects.filter(url=source_url)[0]
 
-    c = Configuration.get_object(str(get_app()))
+    c = Configuration.get_object()
 
     from ..pluginsources.rsssourceprocessor import RssSourceProcessor
 
@@ -541,7 +493,7 @@ def import_source_from_ia_impl(wb, source_url, source_archive_url, archive_time)
 
 
 def show_youtube_link_props(request):
-    context = get_context(request)
+    context = ContextData.get_context(request)
     context["page_title"] += " - show youtube link properties"
 
     from ..forms import YouTubeLinkSimpleForm
@@ -550,17 +502,19 @@ def show_youtube_link_props(request):
     if not request.method == "POST":
         form = YouTubeLinkSimpleForm(initial={"youtube_link": youtube_link})
         form.method = "POST"
-        form.action_url = reverse("{}:show-youtube-link-props".format(get_app()))
+        form.action_url = reverse(
+            "{}:show-youtube-link-props".format(ContextData.app_name)
+        )
         context["form"] = form
 
-        return render(request, get_app() / "form_basic.html", context)
+        return ContextData.render(request, "form_basic.html", context)
 
     else:
         form = YouTubeLinkSimpleForm(request.POST)
         if not form.is_valid():
             context["summary_text"] = "Form is invalid"
 
-            return render(request, get_app() / "summary_present.html", context)
+            return ContextData.render(request, "summary_present.html", context)
         else:
             from ..pluginentries.youtubelinkhandler import YouTubeLinkHandler
 
@@ -597,31 +551,31 @@ def show_youtube_link_props(request):
             context["yt_props"] = yt_props
             context["rd_props"] = rd_props
 
-            return render(request, get_app() / "show_youtube_link_props.html", context)
+            return ContextData.render(request, "show_youtube_link_props.html", context)
 
 
 def write_bookmarks(request):
-    context = get_context(request)
+    context = ContextData.get_context(request)
     context["page_title"] += " - Writer bookmarks"
 
     if not request.user.is_staff:
-        return render(request, get_app() / "missing_rights.html", context)
+        return ContextData.render(request, "missing_rights.html", context)
 
     BackgroundJob.write_bookmarks()
 
     context["summary_text"] = "Wrote OK"
 
-    return render(request, get_app() / "summary_present.html", context)
+    return ContextData.render(request, "summary_present.html", context)
 
 
 def write_daily_data_form(request):
     from ..forms import ExportDailyDataForm
 
-    context = get_context(request)
+    context = ContextData.get_context(request)
     context["page_title"] += " - Write daily data"
 
     if not request.user.is_staff:
-        return render(request, get_app() / "missing_rights.html", context)
+        return ContextData.render(request, "missing_rights.html", context)
 
     if request.method == "POST":
         form = ExportDailyDataForm(request.POST)
@@ -639,7 +593,7 @@ def write_daily_data_form(request):
                 context["summary_text"] = "Form is invalid. Start:{} Stop:{}".format(
                     time_start, time_stop
                 )
-            return render(request, get_app() / "summary_present.html", context)
+            return ContextData.render(request, "summary_present.html", context)
 
     from ..dateutils import DateUtils
 
@@ -655,15 +609,15 @@ def write_daily_data_form(request):
 
     context["form"] = form
 
-    return render(request, get_app() / "form_basic.html", context)
+    return ContextData.render(request, "form_basic.html", context)
 
 
 def write_tag_form(request):
-    context = get_context(request)
+    context = ContextData.get_context(request)
     context["page_title"] += " - tags writer"
 
     if not request.user.is_staff:
-        return render(request, get_app() / "missing_rights.html", context)
+        return ContextData.render(request, "missing_rights.html", context)
 
     from ..forms import ExportTopicForm
 
@@ -676,36 +630,36 @@ def write_tag_form(request):
                 context["summary_text"] = "Added daily write job. Tag:{}".format(tag)
             else:
                 context["summary_text"] = "Form is invalid. Tag:{}".format(tag)
-            return render(request, get_app() / "summary_present.html", context)
+            return ContextData.render(request, "summary_present.html", context)
 
     form = ExportTopicForm()
     form.method = "POST"
 
     context["form"] = form
 
-    return render(request, get_app() / "form_basic.html", context)
+    return ContextData.render(request, "form_basic.html", context)
 
 
 def test_page(request):
-    context = get_context(request)
+    context = ContextData.get_context(request)
     context["page_title"] += " - test page"
 
     if not request.user.is_staff:
-        return render(request, get_app() / "missing_rights.html", context)
+        return ContextData.render(request, "missing_rights.html", context)
 
     summary_text = ""
 
     context["summary_text"] = summary_text
 
-    return render(request, get_app() / "summary_present.html", context)
+    return ContextData.render(request, "summary_present.html", context)
 
 
 def fix_bookmarked_yt(request):
-    context = get_context(request)
+    context = ContextData.get_context(request)
     context["page_title"] += " - fix all"
 
     if not request.user.is_staff:
-        return render(request, get_app() / "missing_rights.html", context)
+        return ContextData.render(request, "missing_rights.html", context)
 
     summary = ""
     links = LinkDataModel.objects.filter(persistent=True)
@@ -717,15 +671,15 @@ def fix_bookmarked_yt(request):
 
     context["summary_text"] = summary
 
-    return render(request, get_app() / "summary_present.html", context)
+    return ContextData.render(request, "summary_present.html", context)
 
 
 def user_config(request):
-    context = get_context(request)
+    context = ContextData.get_context(request)
     context["page_title"] += " - User configuration"
 
     if not request.user.is_authenticated:
-        return render(request, get_app() / "missing_rights.html", context)
+        return ContextData.render(request, "missing_rights.html", context)
 
     user_name = request.user.get_username()
 
@@ -742,26 +696,26 @@ def user_config(request):
             form.save()
         else:
             context["summary_text"] = "user information is not valid, cannot save"
-            return render(request, get_app() / "summary_present.html", context)
+            return ContextData.render(request, "summary_present.html", context)
 
         obs = UserConfig.objects.filter(user=user_name)
     else:
         form = UserConfigForm(instance=obs[0])
 
     form.method = "POST"
-    form.action_url = reverse("{}:user-config".format(get_app()))
+    form.action_url = reverse("{}:user-config".format(ConfigForm.app_name))
 
     context["config_form"] = form
 
-    return render(request, get_app() / "user_configuration.html", context)
+    return ContextData.render(request, "user_configuration.html", context)
 
 
 def clear_youtube_cache(request):
-    context = get_context(request)
+    context = ContextData.get_context(request)
     context["page_title"] += " - clear youtube cache"
 
     if not request.user.is_staff:
-        return render(request, get_app() / "missing_rights.html", context)
+        return ContextData.render(request, "missing_rights.html", context)
 
     from ..models import YouTubeMetaCache, YouTubeReturnDislikeMetaCache
 
@@ -774,15 +728,15 @@ def clear_youtube_cache(request):
     summary = "Deleted all cache"
     context["summary_text"] = summary
 
-    return render(request, get_app() / "summary_present.html", context)
+    return ContextData.render(request, "summary_present.html", context)
 
 
 def download_music(request, pk):
-    context = get_context(request)
+    context = ContextData.get_context(request)
     context["page_title"] += " - Download music"
 
     if not request.user.is_staff:
-        return render(request, get_app() / "missing_rights.html", context)
+        return ContextData.render(request, "missing_rights.html", context)
 
     ft = LinkDataModel.objects.filter(id=pk)
     if ft.exists():
@@ -792,15 +746,15 @@ def download_music(request, pk):
 
     BackgroundJob.download_music(ft[0])
 
-    return render(request, get_app() / "summary_present.html", context)
+    return ContextData.render(request, "summary_present.html", context)
 
 
 def download_video(request, pk):
-    context = get_context(request)
+    context = ContextData.get_context(request)
     context["page_title"] += " - Download video"
 
     if not request.user.is_staff:
-        return render(request, get_app() / "missing_rights.html", context)
+        return ContextData.render(request, "missing_rights.html", context)
 
     ft = LinkDataModel.objects.filter(id=pk)
     if ft.exists():
@@ -810,7 +764,7 @@ def download_video(request, pk):
 
     BackgroundJob.download_video(ft[0])
 
-    return render(request, get_app() / "summary_present.html", context)
+    return ContextData.render(request, "summary_present.html", context)
 
 
 class BackgroundJobsView(generic.ListView):
@@ -820,7 +774,7 @@ class BackgroundJobsView(generic.ListView):
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
         context = super(BackgroundJobsView, self).get_context_data(**kwargs)
-        context = init_context(self.request, context)
+        context = ContextData.init_context(self.request, context)
 
         context["BackgroundJob"] = len(BackgroundJob.objects.all())
 
@@ -828,30 +782,30 @@ class BackgroundJobsView(generic.ListView):
 
 
 def backgroundjob_remove(request, pk):
-    context = get_context(request)
+    context = ContextData.get_context(request)
     context["page_title"] += " - Background job remove"
 
     if not request.user.is_staff:
-        return render(request, get_app() / "missing_rights.html", context)
+        return ContextData.render(request, "missing_rights.html", context)
 
     bg = BackgroundJob.objects.get(id=pk)
     bg.delete()
 
     context["summary_text"] = "Background job has been removed"
 
-    return render(request, get_app() / "summary_present.html", context)
+    return ContextData.render(request, "summary_present.html", context)
 
 
 def backgroundjobs_remove(request, job_type):
-    context = get_context(request)
+    context = ContextData.get_context(request)
     context["page_title"] += " - Background jobs remove"
 
     if not request.user.is_staff:
-        return render(request, get_app() / "missing_rights.html", context)
+        return ContextData.render(request, "missing_rights.html", context)
 
     jobs = BackgroundJob.objects.filter(job=job_type)
     jobs.delete()
 
     context["summary_text"] = "Background jobs has been removed"
 
-    return render(request, get_app() / "summary_present.html", context)
+    return ContextData.render(request, "summary_present.html", context)

@@ -1,8 +1,7 @@
 from django.apps import AppConfig
-import logging
 
 
-class RssHistoryConfig(AppConfig):
+class LinkDatabase(AppConfig):
     name = "rsshistory"
     verbose_name = "Personal link database"
 

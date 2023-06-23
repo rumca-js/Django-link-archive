@@ -1,4 +1,4 @@
-.PHONY: run install test install-optional reformat createdb static migrate superuser
+.PHONY: run install test install-optional reformat createdb static migrate superuser oncommit
 
 CP = cp
 PROJECT_NAME = linklibrary
@@ -48,7 +48,9 @@ reformat:
 	# Assumptions:
 	#  - python black is in your path
 	# Black should use gitignore files to ignore refactoring
-	black $(APP_NAME)
+	poetry run black $(APP_NAME)
+
+oncommit: reformat test
 
 superuser:
 	poetry run python manage.py createsuperuser

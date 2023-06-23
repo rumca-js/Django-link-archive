@@ -18,6 +18,8 @@ waybackpy = "^3.0.6"
 pytz = "^2021.1"
 pymemcache = "^4.0.0"
 celery = "^5.3.1"
+django-celery-results = "^2.5.1"
+sqlalchemy = "^2.0.16"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.3.0"

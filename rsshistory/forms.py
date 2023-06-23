@@ -432,10 +432,14 @@ class EntryChoiceForm(forms.Form):
     )
 
     def __init__(self, *args, **kwargs):
+        from .dateutils import DateUtils
+
         self.args = kwargs.pop("args", ())
         super().__init__(*args, **kwargs)
-        self.fields["date_to"].initial = datetime.now() + timedelta(days=1)
-        self.fields["date_from"].initial = datetime.now() - timedelta(days=30)
+
+        date_range = DateUtils.get_days_range(30)
+        self.fields["date_to"].initial = date_range[1]
+        self.fields["date_from"].initial = date_range[0]
 
     def get_filtered_objects(self):
         source_parameter_map = self.get_source_filter_args(False)
@@ -492,8 +496,12 @@ class EntryChoiceForm(forms.Form):
         self.fields["language"].initial = init["language"]
         self.fields["user"].initial = init["user"]
         self.fields["tag"].initial = init["tag"]
-        self.fields["date_to"].initial = datetime.now() + timedelta(days=1)
-        self.fields["date_from"].initial = datetime.now() - timedelta(days=30)
+
+        from .dateutils import DateUtils
+
+        days_range = DateUtils.get_days_range(30)
+        self.fields["date_to"].initial = days_range[1]
+        self.fields["date_from"].initial = days_range[0]
 
         # self.fields['language'].widget.attrs.update({"style" : "display:none"})
 

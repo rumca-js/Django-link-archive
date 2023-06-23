@@ -2,6 +2,7 @@ from django.urls import reverse
 
 from .youtubelinkhandler import YouTubeLinkHandler
 from .entrygenericplugin import EntryGenericPlugin, LinkButton
+from ..apps import LinkDatabase
 
 
 class EntryYouTubePlugin(YouTubeLinkHandler, EntryGenericPlugin):
@@ -13,15 +14,24 @@ class EntryYouTubePlugin(YouTubeLinkHandler, EntryGenericPlugin):
         return [
             LinkButton(
                 "Download music",
-                reverse("rsshistory:entry-download-music", args=[self.entry.id]),
+                reverse(
+                    "{}:entry-download-music".format(LinkDatabase.name),
+                    args=[self.entry.id],
+                ),
             ),
             LinkButton(
                 "Download video",
-                reverse("rsshistory:entry-download-video", args=[self.entry.id]),
+                reverse(
+                    "{}:entry-download-video".format(LinkDatabase.name),
+                    args=[self.entry.id],
+                ),
             ),
             LinkButton(
                 "Update link data",
-                reverse("rsshistory:entry-fix-youtube-details", args=[self.entry.id]),
+                reverse(
+                    "{}:entry-fix-youtube-details".format(LinkDatabase.name),
+                    args=[self.entry.id],
+                ),
             ),
         ]
 

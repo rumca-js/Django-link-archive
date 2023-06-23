@@ -4,6 +4,7 @@ import logging
 
 from .basictypes import *
 from .models import ConfigurationEntry, UserConfig
+from .apps import LinkDatabase
 
 """
 version is split into three digits:
@@ -24,7 +25,7 @@ from pathlib import Path
 class Configuration(object):
     obj = {}
 
-    def __init__(self, app_name):
+    def __init__(self, app_name=LinkDatabase.name):
         self.app_name = str(app_name)
         self.thread_mgr = None
         self.directory = Path(".")
@@ -60,7 +61,11 @@ class Configuration(object):
             ),
         }
 
-    def get_object(app_name):
+    def get_object(app_name=None):
+        if app_name is None:
+            from .apps import LinkDatabase
+
+            app_name = LinkDatabase.name
         app_name = str(app_name)
 
         if app_name not in Configuration.obj:

@@ -7,6 +7,8 @@ from django.urls import reverse
 
 from pytz import timezone
 
+from .apps import LinkDatabase
+
 
 class SourceDataModel(models.Model):
     SOURCE_TYPE_RSS = "BaseRssPlugin"
@@ -17,15 +19,17 @@ class SourceDataModel(models.Model):
     SOURCE_TYPE_TVN24 = "TVN24Plugin"
     SOURCE_TYPE_SPOTIFY = "SpotifyPlugin"
 
+# fmt: off
     SOURCE_TYPES = (
-        (SOURCE_TYPE_RSS, SOURCE_TYPE_RSS),  #
-        (SOURCE_TYPE_PARSE, SOURCE_TYPE_PARSE),  #
-        (SOURCE_TYPE_CODEPROJECT, SOURCE_TYPE_CODEPROJECT),  #
-        (SOURCE_TYPE_INSTALKI, SOURCE_TYPE_INSTALKI),  #
-        (SOURCE_TYPE_NIEZALEZNA, SOURCE_TYPE_NIEZALEZNA),  #
-        (SOURCE_TYPE_TVN24, SOURCE_TYPE_TVN24),  #
-        (SOURCE_TYPE_SPOTIFY, SOURCE_TYPE_SPOTIFY),  #
+        (SOURCE_TYPE_RSS, SOURCE_TYPE_RSS),                     #
+        (SOURCE_TYPE_PARSE, SOURCE_TYPE_PARSE),                 #
+        (SOURCE_TYPE_CODEPROJECT, SOURCE_TYPE_CODEPROJECT),     #
+        (SOURCE_TYPE_INSTALKI, SOURCE_TYPE_INSTALKI),           #
+        (SOURCE_TYPE_NIEZALEZNA, SOURCE_TYPE_NIEZALEZNA),       #
+        (SOURCE_TYPE_TVN24, SOURCE_TYPE_TVN24),                 #
+        (SOURCE_TYPE_SPOTIFY, SOURCE_TYPE_SPOTIFY),             #
     )
+# fmt: on
 
     url = models.CharField(max_length=2000, unique=True)
     title = models.CharField(max_length=1000)
@@ -47,7 +51,9 @@ class SourceDataModel(models.Model):
 
     def get_absolute_url(self):
         """Returns the URL to access a particular author instance."""
-        return reverse("rsshistory:source-detail", args=[str(self.id)])
+        return reverse(
+            "{}:source-detail".format(LinkDatabase.name), args=[str(self.id)]
+        )
 
     def get_days_to_remove(self):
         days = 0
@@ -247,7 +253,7 @@ class LinkDataModel(models.Model):
 
     def get_absolute_url(self):
         """Returns the URL to access a particular author instance."""
-        return reverse("rsshistory:entry-detail", args=[str(self.id)])
+        return reverse("{}:entry-detail".format(LinkDatabase.name), args=[str(self.id)])
 
     def get_source_name(self):
         if self.source_obj:
@@ -399,9 +405,6 @@ class LinkTagsDataModel(models.Model):
     link = models.CharField(max_length=1000)
     author = models.CharField(max_length=1000)
     date = models.DateTimeField(default=datetime.now)
-
-    # You can label entry as 'cringe', 'woke', 'propaganda', 'misinformation'
-    # If there are many labels, it will be visible for what it is
     tag = models.CharField(max_length=1000)
 
     link_obj = models.ForeignKey(
@@ -549,6 +552,8 @@ class PersistentInfo(models.Model):
         ordering = ["-date", "level"]
 
     def create(info, level=int(logging.INFO), user=None):
+        PersistentInfo.remove_old_ones()
+
         ob = PersistentInfo(
             info=info, level=level, date=datetime.now(timezone("UTC")), user=user
         )
@@ -562,6 +567,8 @@ class PersistentInfo(models.Model):
                 index += 1
 
     def text(info, level=int(logging.INFO), user=None):
+        PersistentInfo.remove_old_ones()
+
         ob = PersistentInfo(
             info=info, level=level, date=datetime.now(timezone("UTC")), user=user
         )
@@ -574,6 +581,8 @@ class PersistentInfo(models.Model):
                 index += 1
 
     def error(info, level=int(logging.ERROR), user=None):
+        PersistentInfo.remove_old_ones()
+
         ob = PersistentInfo(
             info=info, level=level, date=datetime.now(timezone("UTC")), user=user
         )
@@ -586,6 +595,8 @@ class PersistentInfo(models.Model):
                 index += 1
 
     def exc(info, level=int(logging.ERROR), exc_data=None, user=None):
+        PersistentInfo.remove_old_ones()
+
         text = "{}. Exception data:\n{}".format(info, str(exc_data))
         ob = PersistentInfo(
             info=text, level=level, date=datetime.now(timezone("UTC")), user=user
@@ -600,6 +611,8 @@ class PersistentInfo(models.Model):
                 index += 1
 
     def cleanup():
+        PersistentInfo.remove_old_ones()
+
         obs = PersistentInfo.objects.filter(level=int(logging.INFO))
         if obs.exists():
             obs.delete()
@@ -609,6 +622,12 @@ class PersistentInfo(models.Model):
 
     def get_safe():
         return PersistentInfo.objects.all()[0:100]
+
+    def remove_old_ones():
+        from .dateutils import DateUtils
+        date_range = DateUtils.get_days_range(30)
+        objs = PersistentInfo.objects.filter(date__lt = date_range[0])
+        objs.delete()
 
 
 """ YouTube meta cache """
@@ -658,29 +677,22 @@ class BackgroundJob(models.Model):
     JOB_WRITE_BOOKMARKS = "write-bookmarks"
     JOB_PUSH_TO_REPO = "push-to-repo"
 
+# fmt: off
     JOB_CHOICES = (
-        (
-            JOB_PROCESS_SOURCE,
-            JOB_PROCESS_SOURCE,
-        ),  # for RSS sources it checks if there are new data
-        (
-            JOB_LINK_ADD,
-            JOB_LINK_ADD,
-        ),  # adds link using default properties, may contain link map properties in the map
-        (JOB_LINK_DETAILS, JOB_LINK_DETAILS),  # fetches link additional information
-        (JOB_LINK_REFRESH, JOB_LINK_REFRESH),  # refreshes link, refetches its data
-        (
-            JOB_LINK_ARCHIVE,
-            JOB_LINK_ARCHIVE,
-        ),  # link is archived using thirdparty pages (archive.org)
-        (JOB_LINK_DOWNLOAD, JOB_LINK_DOWNLOAD),  # link is downloaded using wget
-        (JOB_LINK_DOWNLOAD_MUSIC, JOB_LINK_DOWNLOAD_MUSIC),  #
-        (JOB_LINK_DOWNLOAD_VIDEO, JOB_LINK_DOWNLOAD_VIDEO),  #
-        (JOB_WRITE_DAILY_DATA, JOB_WRITE_DAILY_DATA),  # writes daily data
-        (JOB_WRITE_TOPIC_DATA, JOB_WRITE_TOPIC_DATA),  # writes topic data
-        (JOB_WRITE_BOOKMARKS, JOB_WRITE_BOOKMARKS),  # writes bookmarks
-        (JOB_PUSH_TO_REPO, JOB_PUSH_TO_REPO),  # pushes to repo
+        (JOB_PROCESS_SOURCE, JOB_PROCESS_SOURCE,),              # for RSS sources it checks if there are new data
+        (JOB_LINK_ADD, JOB_LINK_ADD,),                          # adds link using default properties, may contain link map properties in the map
+        (JOB_LINK_DETAILS, JOB_LINK_DETAILS),                   # fetches link additional information
+        (JOB_LINK_REFRESH, JOB_LINK_REFRESH),                   # refreshes link, refetches its data
+        (JOB_LINK_ARCHIVE, JOB_LINK_ARCHIVE,),                  # link is archived using thirdparty pages (archive.org)
+        (JOB_LINK_DOWNLOAD, JOB_LINK_DOWNLOAD),                 # link is downloaded using wget
+        (JOB_LINK_DOWNLOAD_MUSIC, JOB_LINK_DOWNLOAD_MUSIC),     #
+        (JOB_LINK_DOWNLOAD_VIDEO, JOB_LINK_DOWNLOAD_VIDEO),     #
+        (JOB_WRITE_DAILY_DATA, JOB_WRITE_DAILY_DATA),           # writes daily data
+        (JOB_WRITE_TOPIC_DATA, JOB_WRITE_TOPIC_DATA),           # writes topic data
+        (JOB_WRITE_BOOKMARKS, JOB_WRITE_BOOKMARKS),             # writes bookmarks
+        (JOB_PUSH_TO_REPO, JOB_PUSH_TO_REPO),                   # pushes to repo
     )
+# fmt: on
 
     # job - add link, process source, download music, download video, wayback save
     job = models.CharField(max_length=1000, null=False, choices=JOB_CHOICES)

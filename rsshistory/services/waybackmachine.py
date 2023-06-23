@@ -83,7 +83,7 @@ class WaybackMachine(object):
         user_agent = Page.user_agent
 
         save_api = WaybackMachineSaveAPI(url, user_agent)
-        print("Saved url {0}".format(url))
+        print("Save url {0}".format(url))
         try:
             val = save_api.save()
             return val

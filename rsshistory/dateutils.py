@@ -1,5 +1,4 @@
-import datetime
-from datetime import date, timedelta
+from datetime import datetime, date, timedelta
 from pytz import timezone
 import django.utils
 
@@ -39,10 +38,10 @@ class DateUtils(object):
         return self.get_iso_datetime(now)
 
     def get_datetime_file_name():
-        return datetime.datetime.today().strftime("%Y-%m-%d_%H-%M-%S")
+        return datetime.today().strftime("%Y-%m-%d_%H-%M-%S")
 
     def get_date_file_name():
-        return DateUtils.format_date(datetime.datetime.today())
+        return DateUtils.format_date(datetime.today())
 
     def get_dir4date(date):
         return date.strftime("%Y-%m-%d")
@@ -64,16 +63,12 @@ class DateUtils(object):
         return datetime.strftime("%m")
 
     def get_range4day(date_iso):
-        from datetime import date, timedelta
-
         current_date = date.fromisoformat(date_iso)
         next_day = current_date + timedelta(days=1)
 
         return (current_date, next_day)
 
     def get_range_today():
-        from datetime import date, timedelta
-
         current_date = date.today()
         return DateUtils.get_range4day(current_date.isoformat())
 
@@ -88,3 +83,8 @@ class DateUtils(object):
             return True
 
         return False
+
+    def get_days_range(number_of_days=30):
+        date_stop = datetime.now() + timedelta(days=1)
+        date_start = datetime.now() - timedelta(days=number_of_days)
+        return [date_start, date_stop]

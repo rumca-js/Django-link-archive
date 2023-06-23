@@ -3,9 +3,12 @@ from django.urls import include
 from django.contrib.auth import views as auth
 from django.views.generic import RedirectView
 from . import views
+from .apps import LinkDatabase
 from .viewspkg import viewentries, viewsources, viewcustom, viewtags, viewcomments
 
-app_name = str(views.app_name)
+# register app namespace
+# TODO https://stackoverflow.com/questions/30494000/django-url-namespaces-the-template-has-to-know-its-namespace
+app_name = str(LinkDatabase.name)
 
 # fmt: off
 urlpatterns = [
@@ -17,11 +20,12 @@ urlpatterns = [
     path("source-remove/<int:pk>/", viewsources.remove_source, name="source-remove"),
     path("source-edit/<int:pk>/", viewsources.edit_source, name="source-edit"),
     path("source-refresh/<int:pk>/", viewsources.refresh_source, name="source-refresh"),
-    path("sources-remove-all/", viewsources.remove_all_sources, name="sources-remove-all"),
-    path("sources-import", viewsources.import_sources, name="sources-import"),
     path("source-archive/<int:pk>/", viewsources.wayback_save, name="source-archive"),
     path("source-import-yt-links/<int:pk>/", viewsources.import_youtube_links_for_source, name="source-import-yt-links"),
     path("source-process-text/<int:pk>/", viewsources.process_source_text, name="source-process-text"),
+    path("sources-remove-all/", viewsources.remove_all_sources, name="sources-remove-all"),
+    path("sources-import", viewsources.import_sources, name="sources-import"),
+    path("source-fix-entries/<int:source_pk>/", viewsources.source_fix_entries, name="source-fix-entries",),
     # entries
     path("entries/", viewentries.RssEntriesListView.as_view(), name="entries"),
     path("entry/<int:pk>/", viewentries.RssEntryDetailView.as_view(), name="entry-detail"),
@@ -31,13 +35,13 @@ urlpatterns = [
     path("entry-hide/<int:pk>/", viewentries.hide_entry, name="entry-hide"),
     path("entry-star/<int:pk>/", viewentries.make_persistent_entry, name="entry-star"),
     path("entry-notstar/<int:pk>/", viewentries.make_not_persistent_entry, name="entry-notstar"),
-    path("entries-import", viewentries.import_entries, name="entries-import"),
-    path("entries-untagged/", viewentries.NotBookmarkedView.as_view(), name="entries-untagged"),
-    path("searchinitview", viewentries.search_init_view, name="searchinitview"),
     path("entry-download-music/<int:pk>/", viewcustom.download_music, name="entry-download-music",),
     path("entry-download-video/<int:pk>/", viewcustom.download_video, name="entry-download-video",),
     path("entry-download/<int:pk>/", viewentries.download_entry, name="entry-download"),
     path("entry-archive/<int:pk>/", viewentries.wayback_save, name="entry-archive"),
+    path("entries-import", viewentries.import_entries, name="entries-import"),
+    path("entries-untagged/", viewentries.NotBookmarkedView.as_view(), name="entries-untagged"),
+    path("searchinitview", viewentries.search_init_view, name="searchinitview"),
     # tags
     path("entry-tag/<int:pk>/", viewtags.tag_entry, name="entry-tag"),
     path("tag-remove/<int:pk>/", viewtags.tag_remove, name="tag-remove"),
@@ -63,12 +67,12 @@ urlpatterns = [
     path("write-daily-data-form", viewcustom.write_daily_data_form, name="write-daily-data-form",),
     path("write-tag-form", viewcustom.write_tag_form, name="write-tag-form"),
     path("import-reading-list", viewcustom.import_reading_list_view, name="import-reading-list",),
+    # debug forms
     path("import-source-ia/<int:pk>/", viewcustom.import_source_from_ia, name="import-source-ia",),
     path("truncate-errors", viewcustom.truncate_errors, name="truncate-errors"),
     path("data-errors", viewcustom.data_errors_page, name="data-errors"),
     path("entry-fix-youtube-details/<int:pk>/", viewcustom.fix_reset_youtube_link_details_page, name="entry-fix-youtube-details",),
     path("fix-entry-tags/<int:entrypk>/", viewcustom.fix_entry_tags, name="fix-entry-tags",),
-    path("fix-source-entries-lan/<int:pk>/", viewcustom.fix_source_entries_language, name="fix-source-entries-lan",),
     path("show-yt-props", viewcustom.show_youtube_link_props, name="show-youtube-link-props",),
     path("test-page", viewcustom.test_page, name="test-page"),
     path("fix-bookmarked-yt", viewcustom.fix_bookmarked_yt, name="fix-bookmarked-yt"),
