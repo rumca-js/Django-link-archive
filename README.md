@@ -105,21 +105,9 @@ With these data we can perform further analysis:
  - we can capture all external links from entries, to capture where these sites lead to (check network effect, etc)
  - we can verify who reported first on certain topics
 
-# Problems, notes
+# Problems with algorithms
 
- - Google fails to deliver content of small creators (blogs etc. private pages). Google focuses on corporate hosting, or deliver products that make investors happy. Most common links are towards YouTube, Google maps, Facebook, Reddit
- - We cannot replace Google search, since I do not have processing power for that. For programming problems I still go to Google, to find specific information
- - Google provides only 31 pages of news (in news filter) and around 10 pages for ordinary search. This is a very small number. It is like looking through keyhole at the Internet
- - This link database, with more than 100 of sources provides many useful data. For example after searching for 'covid' in links I have thousands of results, just as I would expect
- - Dead Internet is not a problem for me, since I do not capture data from bot farms
- - Some topics are so popular, that all of the sources write about it, and I am swamped with links about recent crisis
- - Even though I have 100 sources, I still find useful info from outside of my sources. Some through YouTube, some through Reddit, etc.
- - Link rot is real. Some of archived links may be not working after some time. This is especially true for MSN, and yahoo, which quite fast delete older links from their database
- - It is hard to define which sources are to be added into database. Even though I have more than 100 sources, I check regularly only a handful of them
-
-I could not decide if my link database should be public or not. Therefore I created two environments:
- - public, with all important information
- - private, with links that are not relevant for the public
+README about search issues: [https://github.com/rumca-js/Django-link-archive/blob/main/README_development.md](https://github.com/rumca-js/Django-link-archive/blob/main/README_development.md).
 
 ## Analysis of tools and services
 

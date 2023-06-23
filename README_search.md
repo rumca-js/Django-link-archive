@@ -30,6 +30,16 @@ If Google, maybe because of some sort of bug, makes search awfully worse for res
 
 YouTube does not allow the user to specify links in comments, possibly to protect the user from spammers. That means we cannot use links any longer, because some of users are abusing this system. Rather than correctly filter out spammers, posting links has been prohibited.
 
+## Other problems
+
+ - Google fails in connecting small creators with audience. Therefore people flock to reddit
+ - Most of Google results go towards Amazon, Facebook, YouTube, Reddit etc. etc.
+ - a Small company cannot compete with Google at search. Single user cannot host their own engine
+ - Google provides only 31 pages of news (in news filter) and around 10 pages for ordinary search. This is a very small number. It is like looking through keyhole at the Internet
+ - In self hosting you can be swamped with data, which you will not be able to filter
+ - Link rot is real, it is hard to keep up, with what is maintained
+ - How to filter sources at self hosting? Which RSS sources are important, and which are not?
+
 ## Searching for trailers
 
 I have found some scenarios in which I was able to receive better results for trailers
