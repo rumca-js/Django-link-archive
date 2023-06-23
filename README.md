@@ -107,7 +107,7 @@ With these data we can perform further analysis:
 
 # Problems with algorithms
 
-README about search issues: [https://github.com/rumca-js/Django-link-archive/blob/main/README_development.md](https://github.com/rumca-js/Django-link-archive/blob/main/README_development.md).
+README about search issues: [https://github.com/rumca-js/Django-link-archive/blob/main/README_search.md](https://github.com/rumca-js/Django-link-archive/blob/main/README_search.md).
 
 ## Analysis of tools and services
 
