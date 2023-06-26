@@ -15,9 +15,8 @@
  <li>BackgroundJob: {{BackgroundJob}}</li>
 </ul>
 
-<h1>Tasks</h1>
+<h1>Jobs</h1>
 <ul>
-  <li><a href="{% url 'rsshistory:start-background-threads' %}" class="simplebutton">Start threads</a></li>
   <li><a href="{% url 'rsshistory:backgroundjobs' %}" class="simplebutton">View Background Jobs</a></li>
     {% for thread in thread_list %}
        <li>{{ thread.get_thread_name }}: Current processing: {{ thread.get_process_item }}</li>
