@@ -85,7 +85,17 @@ class SourceGenericPlugin(Page):
                     o.save()
                     # print("Added link {}".format(link_data['link']))
                 except Exception as e:
-                    o.save()
+                    error_text = traceback.format_exc()
+                    PersistentInfo.exc(
+                        "Could not add entry: Source:{} {}; Entry:{} {}; Exc:{}\n{}".format(
+                            source.url,
+                            source.title,
+                            link_data["link"],
+                            link_data["title"],
+                            str(e),
+                            error_text,
+                        )
+                    )
 
             return num_entries
 
