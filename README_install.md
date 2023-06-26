@@ -17,7 +17,7 @@ Python poetry
 ```
  $ make install
  Configure settings.py
- Configure rsshistory.prjconfig.py
+ Configure rsshistory/prjconfig.py
  $ make createtables
  $ make createsuperuser
  $ sudo make installsysdeps
