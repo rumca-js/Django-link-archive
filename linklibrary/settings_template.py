@@ -25,7 +25,15 @@ SECRET_KEY = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1']
+ALLOWED_HOSTS = ["127.0.0.1"]
+
+CELERY_BROKER_URL = 'amqp://guest:guest@localhost'
+
+#: Only add pickle to this list if your broker is secured
+#: from unwanted access (see userguide/security.html)
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_RESULT_BACKEND = 'db+sqlite:///results.sqlite'
+CELERY_TASK_SERIALIZER = 'json'
 
 
 # Application definition
@@ -37,11 +45,18 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
     'django.contrib.sites',
+
+    # Manual edit start
     #'django_user_agents',
-    'rsshistory.apps.RssHistoryConfig',
+    'django_celery_results',
+    'rsshistory.apps.LinkDatabase',
+    'catalog.apps.LinkDatabase',
+    'news.apps.NewsConfig',
+
+    # Manual edit stop
 ]
+SITE_ID = 1
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -80,8 +95,9 @@ WSGI_APPLICATION = 'linklibrary.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        # fix for windows
+        # manual edit start - for windows
         'NAME': str(os.path.join(BASE_DIR, "db.sqlite3"))
+        # manual edit stop - for windows
     }
 }
 
@@ -120,7 +136,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = '/django/'
+STATIC_URL = 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
