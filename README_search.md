@@ -59,6 +59,7 @@ The problem rises, when
  - an elite, maybe moderators twist idea of what is accepted and not accepted on platform
  - contents is politically censored, motivated, or platforms starts spreading political propaganda
 
+I have some questions about that model:
  - Will people be able to find out that the 'truth' visible on a platform is twisted? Are social platforms smart enough to be able to hide proof of any misdoings?
  - Will people be shadowbanned for inconvenient opinions?
 
