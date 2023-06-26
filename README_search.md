@@ -8,7 +8,7 @@ If I write "Apple", "Microsoft", "Samsung", "Elon Musk", "Bill Gates", "Love", o
 
 I would like results from CNN, from Fox news, from left, from right, from extremists, from liberals.
 
-There seems to be no filter, no option in Google Search to go beyond the several pages of results.
+There seems to be no filter, no option in Google Search to go beyond the several pages of results (31 pages for 'News' filter). It is a very small number. It is like looking through keyhole at the Internet
 
 ## Myth #2 Google, YouTube, TikTok algorithms provide what is best for you
 
@@ -20,25 +20,57 @@ Most of algorithms, like YouTubes's, are based on engagment, on what keeps you h
 
 ## But Google algorithm is the best!
 
-Nothing in this world is permament. What about monopoly? When a company reaches a state where there is no competition, then it often stagnates, and does not evolve.
+The algorithm could have been the best 10 years ago, but is it the best righ now?
 
-Google is the unbeated search engine. It can lower lower quality of the services, and noone will be able to switch to alternatives.
+For example Google, after reaching state of monopoly, could lower it's quality. Will people be able to find out about that?
 
-If Google, maybe because of some sort of bug, makes search awfully worse for results for pages 2,3, and later, who will find the bug? Will anybody care?
+If Google decreased quality of found entries after the first page. Will anybody be able to find out about that?
+
+Nothing in this world is permament. What about monopoly? When a company reaches a state where there is no competition, then it often stagnates, and does not evolve, or worse, it could lowever quality of their service?
+
+## Conflict of interests
+
+Platforms have investors, and users. It must cater to both: investors and users. Some of interests are mutually exclusive. Are platforms more motivated to cater for big corporations, or to the users?
+
+Can platforms walk between those lines successfully?
+
+## Small creators discovery
+
+Google search algorithms are not that great to see new creators online.
+
+TikTok is able to show new users data very easily. YouTube also shows viedos from new creators. What about Google search? Does not show new blogs?
+
+Most of Google results go towards Amazon, Facebook, YouTube, Reddit etc. etc. That is where the investors maney's at.
+
+## Recommendations are based on a social score
+
+Sure, we criticise China social credit score, but we already live in such system. Many of the platforms keep information about users, like 'karma'. Essentially it is a social score, and that is not a bad thing.
+
+In a place with multiple users you need to decide which users are bad actors, which are trolls, and which are just normal users. Moderation needs to happen.
+
+The problem rises, when
+ - an elite, maybe moderators twist idea of what is accepted and not accepted on platform
+ - contents is politically censored, motivated, or platforms starts spreading political propaganda
+
+ - Will people be able to find out that the 'truth' visible on a platform is twisted? Are social platforms smart enough to be able to hide proof of any misdoings?
+ - Will people be shadowbanned for inconvenient opinions?
 
 ## YouTube comments
 
 YouTube does not allow the user to specify links in comments, possibly to protect the user from spammers. That means we cannot use links any longer, because some of users are abusing this system. Rather than correctly filter out spammers, posting links has been prohibited.
 
-## Other problems
+## Platform guidelines
 
- - Google fails in connecting small creators with audience. Therefore people flock to reddit
- - Most of Google results go towards Amazon, Facebook, YouTube, Reddit etc. etc.
- - a Small company cannot compete with Google at search. Single user cannot host their own engine
- - Google provides only 31 pages of news (in news filter) and around 10 pages for ordinary search. This is a very small number. It is like looking through keyhole at the Internet
- - In self hosting you can be swamped with data, which you will not be able to filter
- - Link rot is real, it is hard to keep up, with what is maintained
- - How to filter sources at self hosting? Which RSS sources are important, and which are not?
+For social media platform to operate it needs some guidelines, but:
+ - the guidelines need to be vague enough, to give moderators leeway to moderate anybody (for example moderator can ban somebody because of 'hate speech' argument. However often it is not written what exactly hate speech is)
+ - the guidelines need to apply to everybody. It is like to have a big family, and you want to make everybody happy. It won't happen. Therefore you need to cater for most of them, and ignore some of other people
+ - because guidelines decide what is 'acceptable' and 'not acceptable' it establishes verbose, or not verbose set of rules. It establishes some sort of morality, and things it considers 'virtues'. It also needs some sort of "Goldstein" personality. Something for the people to understand what is bad, what not to follow. These virtues might be imaginary, not scientific. Social platforms are big enough just to force their opinions
+
+This may lead to:
+ - suppression of controvertial views
+ - boring Internet experience
+
+Who controls social media, if their guidelines are moral and correctly implemented?
 
 ## Searching for trailers
 
@@ -49,24 +81,6 @@ When I search for "Trailer" youtube:
 At my setup I can filter by a source type and subtype. At my setup I have category "YouTube" and subcategory "Movies", and "Games".
  - suggests using it's own criteria. At this engine I can browse by date, to see which trailers are 'new' and which are not
  - some trailers are suggested several times at youtube, from various channels. At my setup I have only several youtube channels, which does not spam with same trailers
-
-## Social media
-
-If a social media platform decides to create a space for everybody, then it needs to have some sort of guidelines, but:
- - the guidelines need to be vague enough, to give moderators leeway to moderate anybody
- - the guidelines need to apply to everybody. It is like to have a big family, and you want to make everybody happy. It won't happen. Therefore you need to cater for most of them, and ignore some of other people
- - to be able to deflect any form of criticism there needs to be some sort of virtues established, and people need to be shamed, for not worshiping those virtues. These virtues might be imaginary, not scientific, might be totally pollitically motivated. It does not matter. People may recognize sincerity though. Therefore nearly all social media experience will result in hypocrisy
- - investors of social media are big corporations, therefore social media platform must appear as 'well behaving' for investors. Therefore any form of controversy is not allowed. All views must allign with views of investors, for the monetization of creators to happen
-
-## Social platform recommendation is based on a social score
-
-Sure we criticise China social credit score, but we are not aware we already have such system operating in our place. YouTube, or Google already decides what can be said, and what cannot be.
-
-However that may lead to:
- - suppression of controvertial views
- - boring Internet experience
-
-The moderation however needs to happen, as Internet is full of extremists, trolls, sociopaths.
 
 # Other analysis of search and algorithms
 
@@ -80,3 +94,11 @@ The moderation however needs to happen, as Internet is full of extremists, troll
  - [Luke Smith: Remember to Consoom Next Content on YouTube](https://www.youtube.com/watch?v=nI3GVw2JSEI)
  - [Thoughty2: The Internet Has Died](https://www.youtube.com/watch?v=kL8rHf_idt0)
  - [Enrico Tartarotti: Why Google Search Has Become So Bad](https://www.youtube.com/watch?v=48AOOynnmqU)
+
+## Self hosting
+
+ - a Small company cannot compete with Google at search. Single user cannot host their own engine
+ - In self hosting you can be swamped with data, which you will not be able to filter
+ - Link rot is real, it is hard to keep up, with what is maintained
+ - How to filter sources at self hosting? Which RSS sources are important, and which are not?
+

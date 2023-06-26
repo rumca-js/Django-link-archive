@@ -5,6 +5,12 @@ Use repository main level makefile to install and run development server.
 Prerequisites:
  - python poetry
 
+Technology stack:
+ - django, celery, rabbitmq-server
+
+Notes:
+ - it is best to use on a device with SSD
+
 ## Automated installation
 
 Makefile: [https://github.com/rumca-js/Django-link-archive/blob/main/Makefile](https://github.com/rumca-js/Django-link-archive/blob/main/Makefile).
@@ -12,42 +18,43 @@ Makefile: [https://github.com/rumca-js/Django-link-archive/blob/main/Makefile](h
 Rules:
 ```
 $ make install - installs dependencies, creates settings.py
-$ make createdb - creates database tables
-$ make run - starts server
+$ make createtables - creates database tables
+$ make createsuperuser - creates super user for the system
+$ make installsysdeps - install system dependencies, like rabbitmq-server
+$ make run - starts django server and celery
 $ make test - performs tests
-$ make superuser - creates super user
+$ make oncommit - cleans code, runs tests, things needed before making a commit
 ```
 
 ## Manual installation
 
 Read contents of the makefile, and perform the actions described by it
 
-## Other dependencies
+## System dependencies
+
+Makefile assumes you are running debian, or debian compliant OS. To be able to run it on a different system you have to update Makefile accordingly.
+
+This program installs and configures rabbitmq-server in rule make installsysdeps.
+If you require redis, or other setup please modify mmakefile accordingly.
 
 To be able to perform various operations additional programs are needed:
  - wget - to download pages
  - id3v2 - to tag downloaded songs
 
-To install them perform the following rule with sudo priviliges
-```
-make install-optional
-```
+These programs are installed by make installsysdeps rule.
 
 ## User
 
-Create super user, as usual in Django [https://www.geeksforgeeks.org/how-to-create-superuser-in-django/](https://www.geeksforgeeks.org/how-to-create-superuser-in-django/)
+This program allows to configure super user using a rule.
 
-Use rule.
-
-Create also other users, as required by your setup, environment.
-
-## Notes
-
- - it is best to use on a device with SSD
+You can create super user manually, as usual in Django [https://www.geeksforgeeks.org/how-to-create-superuser-in-django/](https://www.geeksforgeeks.org/how-to-create-superuser-in-django/)
 
 ## Using Apache
 
 Django apps can be deployed for Apache: [https://thecodelearners.com/deploy-django-web-application-to-apache-server-step-by-step-guide/](https://thecodelearners.com/deploy-django-web-application-to-apache-server-step-by-step-guide/).
+
+Notes:
+ - You can point apache to use env set up by the poetry
 
 ## Demo
 
