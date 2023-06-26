@@ -51,7 +51,6 @@ INSTALLED_APPS = [
     #'django_user_agents',
     'django_celery_results',
     'rsshistory.apps.LinkDatabase',
-    'catalog.apps.LinkDatabase',
     'news.apps.NewsConfig',
 
     # Manual edit stop
