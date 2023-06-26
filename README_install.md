@@ -1,9 +1,6 @@
-# Installation
+# Installation overview
 
-Use repository main level makefile to install and run development server.
-
-Prerequisites:
- - python poetry
+Use repository main level Makefile to install and run development server.
 
 Technology stack:
  - django, celery, rabbitmq-server
@@ -11,11 +8,28 @@ Technology stack:
 Notes:
  - it is best to use on a device with SSD
 
-## Automated installation
+# Prerequisites
+
+Python poetry
+
+# Installation steps
+
+```
+ $ make install
+ Configure settings.py
+ Configure rsshistory.prjconfig.py
+ $ make createtables
+ $ make createsuperuser
+ $ sudo make installsysdeps
+ Configure django users
+ $ make run
+```
+
+## Makefile
 
 Makefile: [https://github.com/rumca-js/Django-link-archive/blob/main/Makefile](https://github.com/rumca-js/Django-link-archive/blob/main/Makefile).
 
-Rules:
+list of rules:
 ```
 $ make install - installs dependencies, creates settings.py
 $ make createtables - creates database tables
