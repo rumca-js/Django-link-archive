@@ -18,6 +18,7 @@ from ..models import (
 from ..models import RssSourceExportHistory
 from ..forms import ConfigForm, UserConfigForm
 from ..views import ContextData
+from ..controllers import BackgroundJobController
 
 
 def admin_page(request):
@@ -84,12 +85,6 @@ def system_status(request):
 
     context["log_items"] = PersistentInfo.get_safe()
 
-    threads = c.get_threads()
-    if threads:
-        for thread in threads:
-            items = thread.get_processs_list()
-            context["thread_list"] = threads
-
     context["server_path"] = Path(".").resolve()
     context["directory"] = Path(".").resolve()
 
@@ -97,18 +92,6 @@ def system_status(request):
     context["export_history_list"] = history
 
     return ContextData.render(request, "system_status.html", context)
-
-
-def start_threads(request):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - Status"
-
-    c = Configuration.get_object()
-    c.create_threads()
-
-    context["summary_text"] = "Threads started"
-
-    return ContextData.render(request, "summary_present.html", context)
 
 
 def import_reading_list_view(request):
@@ -192,9 +175,6 @@ def truncate_errors(request):
     from ..models import PersistentInfo
 
     PersistentInfo.truncate()
-
-    # from ..models import BackgroundJob
-    # BackgroundJob.truncate()
 
     context["summary_text"] = "Clearing errors done"
 
@@ -561,7 +541,7 @@ def write_bookmarks(request):
     if not request.user.is_staff:
         return ContextData.render(request, "missing_rights.html", context)
 
-    BackgroundJob.write_bookmarks()
+    BackgroundJobController.write_bookmarks()
 
     context["summary_text"] = "Wrote OK"
 
@@ -583,7 +563,7 @@ def write_daily_data_form(request):
             time_start = form.cleaned_data["time_start"]
             time_stop = form.cleaned_data["time_stop"]
 
-            if BackgroundJob.write_daily_data_range(time_start, time_stop):
+            if BackgroundJobController.write_daily_data_range(time_start, time_stop):
                 context[
                     "summary_text"
                 ] = "Added daily write job. Start:{} Stop:{}".format(
@@ -626,7 +606,7 @@ def write_tag_form(request):
         if form.is_valid():
             tag = form.cleaned_data["tag"]
 
-            if BackgroundJob.write_tag_data(tag):
+            if BackgroundJobController.write_tag_data(tag):
                 context["summary_text"] = "Added daily write job. Tag:{}".format(tag)
             else:
                 context["summary_text"] = "Form is invalid. Tag:{}".format(tag)
@@ -703,7 +683,7 @@ def user_config(request):
         form = UserConfigForm(instance=obs[0])
 
     form.method = "POST"
-    form.action_url = reverse("{}:user-config".format(ConfigForm.app_name))
+    form.action_url = reverse("{}:user-config".format(ContextData.app_name))
 
     context["config_form"] = form
 
@@ -744,7 +724,7 @@ def download_music(request, pk):
     else:
         context["summary_text"] = "Failed to add to download queue"
 
-    BackgroundJob.download_music(ft[0])
+    BackgroundJobController.download_music(ft[0])
 
     return ContextData.render(request, "summary_present.html", context)
 
@@ -762,7 +742,7 @@ def download_video(request, pk):
     else:
         context["summary_text"] = "Failed to add to download queue"
 
-    BackgroundJob.download_video(ft[0])
+    BackgroundJobController.download_video(ft[0])
 
     return ContextData.render(request, "summary_present.html", context)
 

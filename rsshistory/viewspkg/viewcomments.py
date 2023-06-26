@@ -26,7 +26,9 @@ def entry_add_comment(request, link_id):
 
     user_name = request.user.get_username()
     if not LinkCommentDataController.can_user_add_comment(user_name):
-        context["summary_text"] = "User cannot add more comments. Limit to 1 comment per day"
+        context[
+            "summary_text"
+        ] = "User cannot add more comments. Limit to 1 comment per day"
         return ContextData.render(request, "summary_present.html", context)
 
     print("Link id" + str(link_id))

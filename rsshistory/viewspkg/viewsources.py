@@ -6,6 +6,7 @@ from ..models import SourceDataModel, LinkDataModel, BackgroundJob
 from ..prjconfig import Configuration
 from ..forms import SourceForm, ImportSourcesForm, SourcesChoiceForm, ConfigForm
 from ..views import ContextData
+from ..controllers import BackgroundJobController
 
 
 class RssSourceListView(generic.ListView):
@@ -166,7 +167,7 @@ def refresh_source(request, pk):
         op.date_fetched = None
         op.save()
 
-    BackgroundJob.download_rss(ob, True)
+    BackgroundJobController.download_rss(ob, True)
 
     context["summary_text"] = "Source added to refresh queue"
     return ContextData.render(request, "summary_present.html", context)
@@ -272,7 +273,7 @@ def wayback_save(request, pk):
 
     if ConfigurationEntry.get().source_archive:
         source = SourceDataModel.objects.get(id=pk)
-        BackgroundJob.link_archive(subject=source.url)
+        BackgroundJobController.link_archive(subject=source.url)
 
         context["summary_text"] = "Added to waybacksave"
     else:
@@ -336,7 +337,7 @@ def import_youtube_links_for_source(request, pk):
 
     for link in links:
         print("Adding job {}".format(link))
-        BackgroundJob.link_add(link, source_obj)
+        BackgroundJobController.link_add(link, source_obj)
 
     context["summary_text"] = ""
     return ContextData.render(request, "summary_present.html", context)
@@ -353,7 +354,7 @@ def source_fix_entries(request, source_pk):
 
     source_obj = SourceDataModel.objects.get(id=source_pk)
 
-    entries = LinkDataModel.objects.filter(source = source_obj.url)
+    entries = LinkDataModel.objects.filter(source=source_obj.url)
 
     summary_text = "Fixed following items:"
 

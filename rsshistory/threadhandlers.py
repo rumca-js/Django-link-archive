@@ -1,3 +1,6 @@
+"""
+@brief This file provides handlers for 'jobs'.
+"""
 import logging
 import traceback
 from datetime import date, datetime
@@ -14,13 +17,17 @@ from .models import (
     BackgroundJob,
 )
 from .models import RssSourceExportHistory
-from .threads import *
 from .pluginsources.sourcecontrollerbuilder import SourceControllerBuilder
 from .basictypes import fix_path_for_windows
 from .programwrappers import ytdlp, id3v2
+from .controllers import BackgroundJobController
 
 
 class BaseJobHandler(object):
+    """!
+    Base handler
+    """
+
     def get_job_filter(self):
         return Q(job=self.get_job())
 
@@ -29,6 +36,10 @@ class BaseJobHandler(object):
 
 
 class ProcessSourceJobHandler(BaseJobHandler):
+    """!
+    Processes source, checks if contains new entries
+    """
+
     def __init__(self):
         pass
 
@@ -56,6 +67,10 @@ class ProcessSourceJobHandler(BaseJobHandler):
 
 
 class LinkDownloadJobHandler(BaseJobHandler):
+    """!
+    downloads entry
+    """
+
     def __init__(self):
         pass
 
@@ -79,6 +94,10 @@ class LinkDownloadJobHandler(BaseJobHandler):
 
 
 class LinkMusicDownloadJobHandler(BaseJobHandler):
+    """!
+    downloads entry music
+    """
+
     def __init__(self):
         pass
 
@@ -120,6 +139,10 @@ class LinkMusicDownloadJobHandler(BaseJobHandler):
 
 
 class LinkVideoDownloadJobHandler(BaseJobHandler):
+    """!
+    downloads entry video
+    """
+
     def __init__(self):
         pass
 
@@ -152,6 +175,10 @@ class LinkVideoDownloadJobHandler(BaseJobHandler):
 
 
 class LinkAddJobHandler(BaseJobHandler):
+    """!
+    Adds entry to database
+    """
+
     def __init__(self):
         pass
 
@@ -186,6 +213,10 @@ class LinkAddJobHandler(BaseJobHandler):
 
 
 class LinkArchiveJobHandler(BaseJobHandler):
+    """!
+    Archives entry to database
+    """
+
     def __init__(self):
         pass
 
@@ -209,6 +240,10 @@ class LinkArchiveJobHandler(BaseJobHandler):
 
 
 class WriteDailyDataJobHandler(BaseJobHandler):
+    """!
+    Writes daily data to disk
+    """
+
     def __init__(self):
         pass
 
@@ -237,6 +272,10 @@ class WriteDailyDataJobHandler(BaseJobHandler):
 
 
 class WriteBookmarksJobHandler(BaseJobHandler):
+    """!
+    Writes bookmarks data to disk
+    """
+
     def __init__(self):
         pass
 
@@ -264,6 +303,10 @@ class WriteBookmarksJobHandler(BaseJobHandler):
 
 
 class WriteTopicJobHandler(BaseJobHandler):
+    """!
+    Writes topic data to disk
+    """
+
     def __init__(self):
         pass
 
@@ -292,6 +335,10 @@ class WriteTopicJobHandler(BaseJobHandler):
 
 
 class PushToRepoJobHandler(BaseJobHandler):
+    """!
+    Pushes data to repo
+    """
+
     def __init__(self):
         pass
 
@@ -310,108 +357,45 @@ class PushToRepoJobHandler(BaseJobHandler):
             PersistentInfo.error("Exception: {} {}".format(str(e), error_text))
 
 
-class MultiJobHandler(ThreadJobCommon):
-    def __init__(self, name="MultiJobHandler", handlers=[]):
-        seconds_wait = 10
-        itemless = False
-        self.handlers = handlers
-        ThreadJobCommon.__init__(self, name, seconds_wait, itemless)
+class RefreshThreadHandler(object):
+    """!
+    refreshes sources, synchronously
+    """
 
-    def set_config(self, config):
-        self._cfg = config
-        for key, handler in enumerate(self.handlers):
-            handler.set_config(self._cfg)
-
-    def get_process_item(self):
-        afilter = None
-        for key, handler in enumerate(self.handlers):
-            afilter = handler.get_job_filter()
-
-            objs = BackgroundJob.objects.filter(afilter)
-            if len(objs) != 0:
-                obj = objs[0]
-                return obj
-
-    def process_item(self, item=None):
-        try:
-            processed = False
-            for key, handler in enumerate(self.handlers):
-                if item.job == handler.get_job():
-                    handler.process(item)
-                    processed = True
-                    break
-
-            if not processed:
-                raise NotImplemented("Not supported process error")
-
-        except Exception as e:
-            error_text = traceback.format_exc()
-            PersistentInfo.error(
-                "Exception on LinkArchiveHandler {} {}".format(str(e), error_text)
-            )
-
-        if item:
-            item.delete()
-
-
-class RefreshThreadHandler(ThreadJobCommon):
     def __init__(self, name="RefreshThreadHandler"):
-        itemless = True
-        seconds_wait = 900
-        ThreadJobCommon.__init__(self, name, seconds_wait, itemless)
-
-    def get_process_item(self):
         pass
 
-    def process_item(self, item=None):
-        try:
-            self.t_refresh(item)
-        except Exception as e:
-            error_text = traceback.format_exc()
-            PersistentInfo.error(
-                "Exception during parsing page contents {0} {1} {2}".format(
-                    item, str(e), error_text
-                )
-            )
-
-    def t_refresh(self, item):
+    def refresh(self, item=None):
         PersistentInfo.create("Refreshing RSS data")
 
         from .models import SourceDataModel
 
         sources = SourceDataModel.objects.all()
         for source in sources:
-            BackgroundJob.download_rss(source)
+            BackgroundJobController.download_rss(source)
 
         if ConfigurationEntry.get().is_git_set():
             if RssSourceExportHistory.is_update_required():
-                BackgroundJob.push_to_repo()
+                BackgroundJobController.push_to_repo()
 
                 if ConfigurationEntry.get().source_archive:
                     from .models import SourceDataModel
 
                     sources = SourceDataModel.objects.all()
                     for source in sources:
-                        BackgroundJob.link_archive(source.url)
+                        BackgroundJobController.link_archive(source.url)
 
 
 class HandlerManager(object):
-    def __init__(self, config):
-        self._cfg = config
-        self.create_threads()
+    """!
+    Threading manager
+    """
 
-    def create_threads(self):
-        refresh_seconds = 1800
+    def __init__(self):
+        pass
 
-        BackgroundJob.truncate_invalid_jobs()
-
-        conf = ConfigurationEntry.get()
-        refresh_seconds = conf.sources_refresh_period
-
-        refresh_thread = RefreshThreadHandler("refresh-thread")
-
-        # proessing new RSS sources is priority, should be at the first place
-        handlers = [
+    def get_handlers(self):
+        return [
             PushToRepoJobHandler(),
             ProcessSourceJobHandler(),
             LinkAddJobHandler(),
@@ -423,17 +407,32 @@ class HandlerManager(object):
             WriteBookmarksJobHandler(),
             WriteTopicJobHandler(),
         ]
-        jobs_thread = MultiJobHandler("jobs-thread", handlers)
 
-        self.threads = [
-            refresh_thread,
-            jobs_thread,
-        ]
+    def get_handler_and_object(self):
+        afilter = None
+        for key, handler in enumerate(self.get_handlers()):
+            afilter = handler.get_job_filter()
 
-        for athread in self.threads:
-            athread.set_config(self._cfg)
-            athread.start()
+            objs = BackgroundJob.objects.filter(afilter)
+            if len(objs) != 0:
+                obj = objs[0]
+                return [obj, handler]
+        return []
 
-    def close(self):
-        for athread in self.threads:
-            athread.close()
+    def process_all(self):
+        from .prjconfig import Configuration
+
+        config = Configuration.get_object()
+
+        while True:
+            items = self.get_handler_and_object()
+            if len(items) == 0:
+                break
+            else:
+                obj = items[0]
+                handler = items[1]
+
+                handler.set_config(config)
+
+                handler.process(obj)
+                obj.delete()

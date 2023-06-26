@@ -12,6 +12,7 @@ from ..models import (
 from ..prjconfig import Configuration
 from ..forms import EntryForm, ImportEntriesForm, EntryChoiceForm, ConfigForm
 from ..views import ContextData
+from ..controllers import BackgroundJobController
 
 
 class RssEntriesListView(generic.ListView):
@@ -32,7 +33,9 @@ class RssEntriesListView(generic.ListView):
 
         context["page_title"] += " - entries"
 
-        queue_size = BackgroundJob.get_number_of_jobs(BackgroundJob.JOB_PROCESS_SOURCE)
+        queue_size = BackgroundJobController.get_number_of_jobs(
+            BackgroundJob.JOB_PROCESS_SOURCE
+        )
         context["rss_are_fetched"] = queue_size > 0
         context["rss_queue_size"] = queue_size
 
@@ -114,7 +117,7 @@ def add_entry(request):
                 context["entry"] = ob[0]
 
             if ConfigurationEntry.get().link_archive:
-                BackgroundJob.link_archive(data["link"])
+                BackgroundJobController.link_archive(data["link"])
 
             return ContextData.render(request, "entry_added.html", context)
 
@@ -270,7 +273,7 @@ def make_persistent_entry(request, pk):
     entry.save()
 
     if prev_state != True:
-        BackgroundJob.link_archive(entry.link)
+        BackgroundJobController.link_archive(entry.link)
 
     summary_text = "Link changed to state: " + str(entry.persistent)
 
@@ -382,7 +385,9 @@ class NotBookmarkedView(generic.ListView):
 
         context["page_title"] += " - not bookmarked"
 
-        queue_size = BackgroundJob.get_number_of_jobs(BackgroundJob.JOB_PROCESS_SOURCE)
+        queue_size = BackgroundJobController.get_number_of_jobs(
+            BackgroundJob.JOB_PROCESS_SOURCE
+        )
         context["rss_are_fetched"] = queue_size > 0
         context["rss_queue_size"] = queue_size
 
@@ -410,7 +415,7 @@ def download_entry(request, pk):
 
     link = LinkDataModel.objects.get(id=pk)
 
-    BackgroundJob.link_download(subject=link.link)
+    BackgroundJobController.link_download(subject=link.link)
     summary_text = "Added to queue"
 
     context["summary_text"] = summary_text
@@ -427,7 +432,7 @@ def wayback_save(request, pk):
 
     if ConfigurationEntry.get().link_archive:
         link = LinkDataModel.objects.get(id=pk)
-        BackgroundJob.link_archive(subject=link.link)
+        BackgroundJobController.link_archive(subject=link.link)
 
         context["summary_text"] = "Added to waybacksave"
     else:

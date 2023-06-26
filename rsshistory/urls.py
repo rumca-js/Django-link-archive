@@ -2,6 +2,8 @@ from django.urls import path
 from django.urls import include
 from django.contrib.auth import views as auth
 from django.views.generic import RedirectView
+from django.views.generic.base import TemplateView
+
 from . import views
 from .apps import LinkDatabase
 from .viewspkg import viewentries, viewsources, viewcustom, viewtags, viewcomments
@@ -55,11 +57,11 @@ urlpatterns = [
     path("entry-comment-edit/<int:pk>/", viewcomments.entry_comment_edit, name="entry-comment-edit",),
     path("entry-comment-remove/<int:pk>/", viewcomments.entry_comment_remove, name="entry-comment-remove",),
     # custom views
+    path("robots.txt", TemplateView.as_view(template_name="robots.txt", content_type="text/plain")),
     path("admin-page/", viewcustom.admin_page, name="admin-page"),
     path("user-config", viewcustom.user_config, name="user-config"),
     path("configuration/", viewcustom.configuration_page, name="configuration"),
     path("system-status/", viewcustom.system_status, name="system-status"),
-    path("start-background-threads/", viewcustom.start_threads, name="start-background-threads",),
     path("backgroundjobs/", viewcustom.BackgroundJobsView.as_view(), name="backgroundjobs",),
     path("backgroundjob-remove/<int:pk>/", viewcustom.backgroundjob_remove, name="backgroundjob-remove",),
     path("backgroundjobs-remove/<str:job_type>/", viewcustom.backgroundjobs_remove, name="backgroundjobs-remove",),
