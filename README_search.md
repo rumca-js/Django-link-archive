@@ -2,6 +2,13 @@
 
 Google Search Is Dying [https://dkb.io/post/google-search-is-dying](https://dkb.io/post/google-search-is-dying)
 
+## Other inspirations
+
+ - I Tracked Everything I Read on the Internet for a Year [https://www.tdpain.net/blog/a-year-of-reading](https://www.tdpain.net/blog/a-year-of-reading).
+ - Automating a Reading List [https://zanshin.net/2022/09/11/automating-a-reading-list/](https://zanshin.net/2022/09/11/automating-a-reading-list/)
+ - Luke Smith: Search Engines are Totally Useless Now... [https://www.youtube.com/watch?v=N8P6MTOQlyk](https://www.youtube.com/watch?v=N8P6MTOQlyk)
+ - Luke Smith: Remember to Consoom Next Content on YouTube [https://www.youtube.com/watch?v=nI3GVw2JSEI](https://www.youtube.com/watch?v=nI3GVw2JSEI). As a society we provide news instead of building a data base of important information
+
 ## Myth #1 "You only use the first entry in the google search"
 
 If I write "Apple", "Microsoft", "Samsung", "Elon Musk", "Bill Gates", "Love", or 'War', or 'Abortion' I would expect thousands upon thausands of results.
@@ -90,10 +97,9 @@ At my setup I can filter by a source type and subtype. At my setup I have catego
  - [Why Google is so unbearable (and how to fix it) | MR IXNS](https://ixns.github.io//lifehacks/computers/internet/2022/05/17/avoid-google-bloatware.html)
  - [The Hated One: Google vs DuckDuckGo](https://www.youtube.com/watch?v=SrsCEbi5N7Y)
  - [Google Manipulates Search Results to Hide Sensitive Subjects: Report](https://www.businessinsider.com/google-manipulates-search-results-report-2019-11?IR=T)
- - [Luke Smith: Search Engines are Totally Useless Now...](https://www.youtube.com/watch?v=N8P6MTOQlyk)
- - [Luke Smith: Remember to Consoom Next Content on YouTube](https://www.youtube.com/watch?v=nI3GVw2JSEI)
  - [Thoughty2: The Internet Has Died](https://www.youtube.com/watch?v=kL8rHf_idt0)
  - [Enrico Tartarotti: Why Google Search Has Become So Bad](https://www.youtube.com/watch?v=48AOOynnmqU)
+ - Ryan George What Google Search Is Like In 2022 [https://www.youtube.com/watch?v=NT7_SxJ3oSI](https://www.youtube.com/watch?v=NT7_SxJ3oSI)
 
 ## Self hosting
 
