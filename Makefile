@@ -1,4 +1,6 @@
-.PHONY: run install test install-optional reformat createdb static migrate superuser oncommit
+.PHONY: install createtables createsuperuser installsysdeps configuresysdeps
+.PHONY: celery
+.PHONY: run reformat static migrate oncommit test 
 
 CP = cp
 PROJECT_NAME = linklibrary
@@ -14,28 +16,41 @@ install:
 	@echo "Please configure your django application linklibrary in settings.py"
 	@echo "Please:"
 	@echo " - define SECRET_KEY settings.py"
-	@echo " - use createdb rule to create tables"
+	@echo " - use createtables rule to create tables"
 	@echo " - add required hosts to ALLOWED_HOSTS"
 	@echo "*******************************************************************"
 
-createdb:
-	poetry run python manage.py migrate --run-syncdb 
+createtables:
+	poetry run python manage.py migrate --run-syncdb
+	poetry run python manage.py migrate django_celery_results
 
-install-optional:
-	# Assumptions:
-	# - I cannot write installation commands for each Linux distro. I assume you are using debian-derivative
-	# - assume you are using sudo for this command. solve it later https://github.com/rumca-js/Django-link-archive/issues/10
-	apt -y install wget, id3v2
+createsuperuser:
+	poetry run python manage.py createsuperuser
+
+# Assumptions:
+# - I cannot write installation commands for each Linux distro. I assume you are using debian-derivative
+# - assume you are using sudo for this command. solve it later https://github.com/rumca-js/Django-link-archive/issues/10
+# http://pont.ist/rabbit-mq/
+installsysdeps:
+	apt -y install rabbitmq-server, wget, id3v2
+	systemctl enable rabbitmq-server
+	systemctl start rabbitmq-server
 
 run:
-	bash -c "sleep 10; wget -q -S http://127.0.0.1:8080/rsshistory/start-background-threads" &
+	poetry run celery -A linklibrary worker -l INFO -B &
 	poetry run python manage.py runserver 0.0.0.0:8080
 
-migrations-check:
-	poetry run python -m manage makemigrations --check --dry-run
+# Assumptions:
+#  - python black is in your path
+# Black should use gitignore files to ignore refactoring
+reformat:
+	poetry run black $(APP_NAME)
 
 static:
 	poetry run python -m manage collectstatic
+
+migrations-check:
+	poetry run python -m manage makemigrations --check --dry-run
 
 migrate:
 	poetry run python manage.py makemigrations
@@ -44,13 +59,5 @@ migrate:
 test: migrations-check
 	@poetry run python manage.py test $(APP_NAME)
 
-reformat:
-	# Assumptions:
-	#  - python black is in your path
-	# Black should use gitignore files to ignore refactoring
-	poetry run black $(APP_NAME)
-
 oncommit: reformat test
 
-superuser:
-	poetry run python manage.py createsuperuser
