@@ -2,7 +2,7 @@
 
 Use repository main level Makefile to install and run development server.
 
-Technology stack:
+This project uses the following technologies:
  - django
  - celery - for tasks
  - rabbitmq-server
