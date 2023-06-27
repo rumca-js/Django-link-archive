@@ -1,10 +1,12 @@
-.PHONY: install createtables createsuperuser installsysdeps configuresysdeps
-.PHONY: celery
-.PHONY: run reformat static migrate oncommit test 
+.PHONY: install install-minimal
+.PHONY: createtables createtables-minimal createtables-celery createsuperuser installsysdeps configuresysdeps
+.PHONY: run run-celery runserver run-minimal
+.PHONY: reformat static migrate oncommit test 
 
 CP = cp
 PROJECT_NAME = linklibrary
 APP_NAME = rsshistory
+PORT=8080
 
 # Assumptions:
 #  - python poetry is in your path
@@ -20,8 +22,23 @@ install:
 	@echo " - add required hosts to ALLOWED_HOSTS"
 	@echo "*******************************************************************"
 
-createtables:
+install-minimal:
+	poetry install
+	@$(CP) $(PROJECT_NAME)/settings_template_minimal.py $(PROJECT_NAME)/settings.py
+	@echo "*******************************************************************"
+	@echo "Please configure your django application linklibrary in settings.py"
+	@echo "Please:"
+	@echo " - define SECRET_KEY settings.py"
+	@echo " - use createtables rule to create tables"
+	@echo " - add required hosts to ALLOWED_HOSTS"
+	@echo "*******************************************************************"
+
+createtables: createtables-minimal createtables-celery
+
+createtables-minimal:
 	poetry run python manage.py migrate --run-syncdb
+
+createtables-celery:
 	poetry run python manage.py migrate django_celery_results
 
 createsuperuser:
@@ -38,9 +55,15 @@ installsysdeps:
 	systemctl enable memcached.service
 	systemctl start memcached.service
 
-run:
+run: run-celery runserver
+
+run-minimal: runserver
+
+run-celery:
 	poetry run celery -A linklibrary worker -l INFO -B &
-	poetry run python manage.py runserver 0.0.0.0:8080
+
+runserver:
+	poetry run python manage.py runserver 0.0.0.0:$(PORT)
 
 # Assumptions:
 #  - python black is in your path
