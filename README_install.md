@@ -29,9 +29,11 @@ This is minimal setup, without backend, without tasks.
  $ make run-minimal
 ```
 
+For basic setup this should be enough, and should be working.
+
 # Installation steps (full setup)
 
-After performing these steps you should be ready to go. It installs all necessary dependencies, and starts servers.
+For a full setup, with backend and tasks a more robust setup needs to be created:
 
 ```
  $ make install
@@ -44,7 +46,7 @@ After performing these steps you should be ready to go. It installs all necessar
  $ make run
 ```
 
-Below are more details.
+Parts of it are described below.
 
 ## settings.py
 
