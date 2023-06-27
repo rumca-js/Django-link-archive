@@ -15,7 +15,7 @@ Notes:
 
 Python poetry [https://python-poetry.org/docs/](https://python-poetry.org/docs/).
 
-# Installation steps (minimal setup)
+# Basic setup, no backend
 
 This is minimal setup, without backend, without tasks.
 
@@ -31,7 +31,7 @@ This is minimal setup, without backend, without tasks.
 
 For basic setup this should be enough, and should be working.
 
-# Installation steps (full setup)
+# Full setup, with backend
 
 For a full setup, with backend and tasks a more robust setup needs to be created:
 
