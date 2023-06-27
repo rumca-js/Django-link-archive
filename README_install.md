@@ -3,7 +3,10 @@
 Use repository main level Makefile to install and run development server.
 
 Technology stack:
- - django, celery, rabbitmq-server
+ - django
+ - celery
+ - rabbitmq-server
+ - memcached (without it memory locking does not work)
 
 Notes:
  - it is best to use on a device with SSD
@@ -13,6 +16,8 @@ Notes:
 Python poetry
 
 # Installation steps
+
+After performing these steps you should be ready to go:
 
 ```
  $ make install
@@ -24,6 +29,16 @@ Python poetry
  Configure django users
  $ make run
 ```
+
+Below are more details.
+
+## settings.py
+
+During install step user is informed that settings.py file should be updated:
+ - SECRET_KEY needs to be defined
+ - ALLOWED_HOSTS needs to be configured
+ - tables need to be created
+ - users need to be defined
 
 ## Makefile
 
@@ -54,6 +69,8 @@ If you require redis, or other setup please modify mmakefile accordingly.
 To be able to perform various operations additional programs are needed:
  - wget - to download pages
  - id3v2 - to tag downloaded songs
+
+Memcached is required for the memory locking to work.
 
 These programs are installed by make installsysdeps rule.
 

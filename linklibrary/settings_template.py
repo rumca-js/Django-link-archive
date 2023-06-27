@@ -34,6 +34,8 @@ CELERY_BROKER_URL = 'amqp://guest:guest@localhost'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_RESULT_BACKEND = 'db+sqlite:///results.sqlite'
 CELERY_TASK_SERIALIZER = 'json'
+CELERY_CACHE_BACKEND = 'django-cache'
+CELERY_RESULT_BACKEND = 'django-db'
 
 
 # Application definition
@@ -51,8 +53,6 @@ INSTALLED_APPS = [
     #'django_user_agents',
     'django_celery_results',
     'rsshistory.apps.LinkDatabase',
-
-    # Manual edit stop
 ]
 SITE_ID = 1
 
@@ -140,3 +140,10 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.memcached.PyMemcacheCache",
+        "LOCATION": "127.0.0.1:11211",
+    }
+}

@@ -36,6 +36,9 @@ def memcache_lock(lock_id, oid):
 
     @see
     https://docs.celeryq.dev/en/stable/tutorials/task-cookbook.html#cookbook-task-serial
+    
+    Note: This requires memcached to be configured in djanog
+    https://stackoverflow.com/questions/53950548/flask-celery-task-locking
     """
     timeout_at = time.monotonic() + LOCK_EXPIRE - 3
     # cache.add fails if the key already exists
@@ -53,7 +56,7 @@ def memcache_lock(lock_id, oid):
             cache.delete(lock_id)
 
 
-@app.on_after_finalize.connect
+@app.on_after_configure.connect
 def setup_periodic_tasks(sender, **kwargs):
     # in seconds
     sender.add_periodic_task(900.0, rsshistory_main_checker_task.s('hello'), name='RSS History Checker task')
@@ -66,16 +69,15 @@ def rsshistory_main_checker_task(self, arg):
     with memcache_lock(lock_id, self.app.oid) as acquired:
         logger.info('Lock on:%s acquired:%s', self.name, acquired)
         if acquired:
-            from rsshistory.tasks import subs_checker_task
-            subs_checker_task(arg)
+            from rsshistory.tasks import subs_checker_task as rsshistory_subs_checker_task
+            rsshistory_subs_checker_task(arg)
 
 
 @app.task(bind=True)
 def rsshistory_main_processing_task(self, arg):
-
     lock_id = '{0}-lock'.format(self.name)
     with memcache_lock(lock_id, self.app.oid) as acquired:
         logger.info('Lock on:%s acquired:%s', self.name, acquired)
         if acquired:
-            from rsshistory.tasks import subs_processing_task
-            subs_processing_task(arg)
+            from rsshistory.tasks import subs_processing_task as rsshistory_subs_processing_task
+            rsshistory_subs_processing_task(arg)
