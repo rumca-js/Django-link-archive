@@ -74,3 +74,7 @@ Notes:
 
 Demo on developement env (may, or may not be running actually):
  - [https://renegat0x0.ddns.net/apps/rsshistory/](https://renegat0x0.ddns.net/apps/rsshistory/)
+
+# Monitoring
+
+ - Celery - [https://docs.celeryq.dev/en/stable/userguide/monitoring.html](https://docs.celeryq.dev/en/stable/userguide/monitoring.html)

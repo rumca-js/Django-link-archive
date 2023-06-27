@@ -32,9 +32,11 @@ createsuperuser:
 # - assume you are using sudo for this command. solve it later https://github.com/rumca-js/Django-link-archive/issues/10
 # http://pont.ist/rabbit-mq/
 installsysdeps:
-	apt -y install rabbitmq-server, wget, id3v2
+	apt -y install rabbitmq-server, memcached, wget, id3v2
 	systemctl enable rabbitmq-server
 	systemctl start rabbitmq-server
+	systemctl enable memcached.service
+	systemctl start memcached.service
 
 run:
 	poetry run celery -A linklibrary worker -l INFO -B &
