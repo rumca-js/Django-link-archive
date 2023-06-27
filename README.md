@@ -43,6 +43,12 @@ UI, with snapshots, is described by a separate README: [https://github.com/rumca
 
 Installation is described by a separate README: [https://github.com/rumca-js/Django-link-archive/blob/main/README_install.md](https://github.com/rumca-js/Django-link-archive/blob/main/README_install.md).
 
+To configure you need to add sources. There are at least two types:
+ - standard RSS source
+ - parsed source. For this source page contents is downloaded, and links from it are extracted from that page and added to the database
+
+How to find RSS link? There is a 'tutorial' for that: [https://zapier.com/blog/how-to-find-rss-feed-url/](https://zapier.com/blog/how-to-find-rss-feed-url/)
+
 ## Suite of projects
 
  - Captured using Django application: [https://github.com/rumca-js/Django-link-archive](https://github.com/rumca-js/Django-link-archive)
@@ -65,7 +71,7 @@ README about search issues: [https://github.com/rumca-js/Django-link-archive/blo
 
 Development is described by a separate README: [https://github.com/rumca-js/Django-link-archive/blob/main/README_development.md](https://github.com/rumca-js/Django-link-archive/blob/main/README_development.md).
 
-# Data
+# Import, export data
 
 Program maintains two repositories: one for bookmarked links, and daily repository.
 
