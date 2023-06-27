@@ -25,4 +25,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', RedirectView.as_view(url='rsshistory/')),
     path('rsshistory/', include('rsshistory.urls')),
+    path('robots.txt', RedirectView.as_view(url='rsshistory/robots.txt')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
