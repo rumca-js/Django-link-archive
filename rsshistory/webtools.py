@@ -123,9 +123,26 @@ class Page(object):
         return self.get_links_re()
 
     def get_links_re(self):
+        links = set()
+
         cont = str(self.get_contents())
+
         allt = re.findall("(https?://[a-zA-Z0-9./\-_]+)", cont)
-        return set(allt)
+        links.update(set(allt))
+
+        allt2 = re.findall('href="([a-zA-Z0-9./\-_]+)', cont)
+        for item in allt2:
+            if item.find("http") == 0:
+                links.add(item)
+            else:
+                url = self.url
+                if not url.endswith("/"):
+                    url = url + "/"
+                if item.startswith("/"):
+                    item = item[1:]
+                links.add(url + item)
+
+        return links
 
     def get_links_a(self):
         links = set()
