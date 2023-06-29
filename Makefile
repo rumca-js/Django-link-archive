@@ -1,12 +1,14 @@
 .PHONY: install install-minimal
 .PHONY: createtables createtables-minimal createtables-celery createsuperuser installsysdeps configuresysdeps
 .PHONY: run run-celery runserver run-minimal
-.PHONY: reformat static migrate oncommit test 
+.PHONY: update oncommit test create-companion-app static migrate reformat
 
 CP = cp
 PROJECT_NAME = linklibrary
-APP_NAME = rsshistory
 PORT=8080
+APP_NAME = rsshistory
+# Edit companion app if necessary
+COMPANION_APP = catalog
 
 # Assumptions:
 #  - python poetry is in your path
@@ -81,8 +83,20 @@ migrate:
 	poetry run python manage.py makemigrations
 	poetry run python manage.py migrate
 
+update: migrate static
+
 test: migrations-check
 	@poetry run python manage.py test $(APP_NAME)
 
 oncommit: reformat test
 
+create-companion-app:
+	rm -rf ./$(COMPANION_APP)
+	mkdir $(COMPANION_APP)
+	cp -r $(APP_NAME)/* ./$(COMPANION_APP)/*
+	grep -rl $(APP_NAME) ./$(COMPANION_APP) | xargs sed -i 's/$(APP_NAME)/$(COMPANION_APP)/g'
+	@echo "*******************************************************************"
+	@echo "Please configure your django application linklibrary in settings.py"
+	@echo "Please:"
+	@echo " - register app in INSTALLED_APPS, add '$(COMPANION_APP).apps.LinkDatabase',
+	@echo "*******************************************************************"
