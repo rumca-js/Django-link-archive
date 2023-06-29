@@ -48,6 +48,13 @@ For a full setup, with backend and tasks a more robust setup needs to be created
 
 Parts of it are described below.
 
+# Update
+
+After updating source code, to correctly update existing environment please:
+```
+ $ make update
+```
+
 ## settings.py
 
 During install step user is informed that settings.py file should be updated:
