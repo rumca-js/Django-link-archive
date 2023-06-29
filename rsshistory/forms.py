@@ -56,11 +56,6 @@ class UserConfigForm(forms.ModelForm):
         # }
 
 
-class ImportSourceFromInternetArchiveForm(forms.Form):
-    source_url = forms.CharField(label="Source url", max_length=500)
-    archive_time = forms.DateField(label="Archive time")
-
-
 class ImportSourceRangeFromInternetArchiveForm(forms.Form):
     source_url = forms.CharField(label="Source url", max_length=500)
     archive_start = forms.DateField(label="Start time")
@@ -104,9 +99,7 @@ class SourceForm(forms.ModelForm):
             "favicon",
             "on_hold",
         ]
-        widgets = {
-            # 'git_token': forms.PasswordInput(),
-        }
+        widgets = {}
 
     def __init__(self, *args, **kwargs):
         super(SourceForm, self).__init__(*args, **kwargs)
@@ -121,9 +114,7 @@ class TagEntryForm(forms.ModelForm):
     class Meta:
         model = LinkTagsDataModel
         fields = ["link", "author", "date", "tag"]
-        widgets = {
-            # 'git_token': forms.PasswordInput(),
-        }
+        widgets = {}
 
     def save_tags(self):
         link = self.cleaned_data["link"]
@@ -161,42 +152,6 @@ class TagRenameForm(forms.Form):
     new_tag = forms.CharField(label="New tag", max_length=100)
 
 
-class ImportSourcesForm(forms.Form):
-    """
-    Import links form
-    """
-
-    rawsources = forms.CharField(
-        widget=forms.Textarea(attrs={"name": "rawsources", "rows": 30, "cols": 100})
-    )
-
-    def get_sources(self):
-        from .serializers.converters import CsvConverter
-
-        rawsources = self.cleaned_data["rawsources"]
-
-        converter = CsvConverter()
-        return converter.from_text(rawsources)
-
-
-class ImportEntriesForm(forms.Form):
-    """
-    Import links form
-    """
-
-    rawentries = forms.CharField(
-        widget=forms.Textarea(attrs={"name": "rawentries", "rows": 30, "cols": 100})
-    )
-
-    def get_entries(self):
-        from .serializers.converters import CsvConverter
-
-        rawentries = self.cleaned_data["rawentries"]
-
-        converter = CsvConverter()
-        return converter.from_text(rawsources)
-
-
 class EntryForm(forms.ModelForm):
     """
     Category choice form
@@ -216,9 +171,6 @@ class EntryForm(forms.ModelForm):
             "artist",
             "album",
         ]
-        # widgets = {
-        # #'git_token': forms.PasswordInput(),
-        # }
 
     def __init__(self, *args, **kwargs):
         super(EntryForm, self).__init__(*args, **kwargs)

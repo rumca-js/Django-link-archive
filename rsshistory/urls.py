@@ -26,7 +26,6 @@ urlpatterns = [
     path("source-import-yt-links/<int:pk>/", viewsources.import_youtube_links_for_source, name="source-import-yt-links"),
     path("source-process-text/<int:pk>/", viewsources.process_source_text, name="source-process-text"),
     path("sources-remove-all/", viewsources.remove_all_sources, name="sources-remove-all"),
-    path("sources-import", viewsources.import_sources, name="sources-import"),
     path("source-fix-entries/<int:source_pk>/", viewsources.source_fix_entries, name="source-fix-entries",),
     # entries
     path("entries/", viewentries.RssEntriesListView.as_view(), name="entries"),
@@ -41,7 +40,6 @@ urlpatterns = [
     path("entry-download-video/<int:pk>/", viewcustom.download_video, name="entry-download-video",),
     path("entry-download/<int:pk>/", viewentries.download_entry, name="entry-download"),
     path("entry-archive/<int:pk>/", viewentries.wayback_save, name="entry-archive"),
-    path("entries-import", viewentries.import_entries, name="entries-import"),
     path("entries-untagged/", viewentries.NotBookmarkedView.as_view(), name="entries-untagged"),
     path("searchinitview", viewentries.search_init_view, name="searchinitview"),
     # tags
@@ -68,6 +66,9 @@ urlpatterns = [
     path("write-bookmarks", viewcustom.write_bookmarks, name="write-bookmarks"),
     path("write-daily-data-form", viewcustom.write_daily_data_form, name="write-daily-data-form",),
     path("write-tag-form", viewcustom.write_tag_form, name="write-tag-form"),
+    path("import-bookmarks", viewcustom.import_bookmarks, name="import-bookmarks"),
+    path("import-daily-data", viewcustom.import_daily_data, name="import-daily-data"),
+    path("import-sources", viewcustom.import_sources, name="import-sources"),
     path("import-reading-list", viewcustom.import_reading_list_view, name="import-reading-list",),
     # debug forms
     path("import-source-ia/<int:pk>/", viewcustom.import_source_from_ia, name="import-source-ia",),

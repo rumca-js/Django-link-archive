@@ -16,7 +16,6 @@
   padding: 3px 12px;
   text-decoration: none;
   display: inline-block;
-  /* border-bottom: 1px solid blue; */
   background-color: #e9e9e9;
   border-radius: 10px;
   margin: 1px;
@@ -26,9 +25,15 @@
   color: blue;
 }
 
+.mainbutton-icon {
+    width:20px;
+}
+.content-icon {
+    width:20px;
+}
+
 /* Content */
 
-/* maybe inputs should use simplebutton scheme? */
 input {
   color: black;
   text-align: center;
@@ -79,13 +84,32 @@ display: contents;
   color: blue;
 }
 
-.linklist {
+/* List containers */
+
+.container_std {
     margin-top: 20px;
     padding: 0;
     list-style: none;
 }
+.container_clicable-tags {
+    margin-top: 20px;
+    padding: 0;
+    list-style: none;
+}
+.container_line-and-buttons {
+    margin-top: 20px;
+    padding: 0;
+    list-style: none;
+}
+.container_youtube-thumbnails {
+    margin-top: 20px;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+}
 
-.longbutton {
+.element_std {
   padding: 0px 15px;
   text-align: left;
   color: black;
@@ -94,15 +118,65 @@ display: contents;
   display: flex;
   flex-wrap: wrap;
 }
-
-.longbuttonselected {
-  background-color: #BFD8FF;
-}
-
-.longbutton:hover {
+.element_std:hover {
   background-color: #f4f4f4;
   color: blue;
 }
+.element_std_selected {
+  background-color: #BFD8FF;
+}
+.element_tags {
+  padding: 0px 15px;
+  text-align: left;
+  color: black;
+  text-decoration: none;
+  margin-bottom:3px;
+  display: flex;
+  flex-wrap: wrap;
+}
+.element_tags:hover {
+  background-color: #f4f4f4;
+  color: blue;
+}
+.element_tags_selected {
+  background-color: #BFD8FF;
+}
+.element_twolines {
+  padding: 0px 15px;
+  text-align: left;
+  color: black;
+  text-decoration: none;
+  margin-bottom:3px;
+  display: flex;
+  flex-wrap: wrap;
+}
+.element_twolines:hover {
+  background-color: #f4f4f4;
+  color: blue;
+}
+.element_twolines {
+  background-color: #BFD8FF;
+}
+
+.element_youtube-thumbnails {
+    text-overflow: ellipsis; 
+    max-width: 20%; 
+    min-width: 20%; 
+    width: auto; 
+    white-space: nowrap; 
+    overflow: hidden; 
+  color: black;
+  text-decoration: none;
+  margin: 5px;
+}
+.element_youtube-thumbnails:hover {
+  background-color: #f4f4f4;
+  color: blue;
+}
+.element_youtube-thumbnails_selected {
+  background-color: #BFD8FF;
+}
+
 
 .linklistthumbnail {
     width: 10%;
@@ -115,7 +189,7 @@ display: contents;
   text-decoration: none;
 }
 .linklistitemdescription {
-    flex: 50%;
+    /* flex: 50%; */
     padding-left:10px;
     margin-left:10px;
     font-style:italic;
@@ -127,7 +201,6 @@ display: contents;
   position: relative;
   width: 80%;
   padding-bottom: 46.25%;
-  /* background-color: yellow; */
 }
 .youtube_player_frame {
   position: absolute;

@@ -4,7 +4,7 @@ from django.shortcuts import render
 
 from ..models import SourceDataModel, LinkDataModel, BackgroundJob
 from ..prjconfig import Configuration
-from ..forms import SourceForm, ImportSourcesForm, SourcesChoiceForm, ConfigForm
+from ..forms import SourceForm, SourcesChoiceForm, ConfigForm
 from ..views import ContextData
 from ..controllers import BackgroundJobController
 
@@ -57,14 +57,11 @@ def add_source(request):
     if not request.user.is_staff:
         return ContextData.render(request, "missing_rights.html", context)
 
-    # if this is a POST request we need to process the form data
     if request.method == "POST":
         method = "POST"
 
-        # create a form instance and populate it with data from the request:
         form = SourceForm(request.POST)
 
-        # check whether it's valid:
         if form.is_valid():
             form.save()
 
@@ -74,12 +71,6 @@ def add_source(request):
             context["summary_text"] = "Source not added"
             return ContextData.render(request, "summary_present.html", context)
 
-        #    # process the data in form.cleaned_data as required
-        #    # ...
-        #    # redirect to a new URL:
-        #    #return HttpResponseRedirect('/thanks/')
-
-    # if a GET (or any other method) we'll create a blank form
     else:
         form = SourceForm()
         form.method = "POST"
@@ -173,56 +164,6 @@ def refresh_source(request, pk):
     return ContextData.render(request, "summary_present.html", context)
 
 
-def import_sources(request):
-    summary_text = ""
-    context = ContextData.get_context(request)
-    context["page_title"] += " - import sources"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
-
-    # if this is a POST request we need to process the form data
-    if request.method == "POST":
-        method = "POST"
-
-        # create a form instance and populate it with data from the request:
-        form = ImportSourcesForm(request.POST)
-
-        if form.is_valid():
-            for source in form.get_sources():
-                if SourceDataModel.objects.filter(url=source.url).exists():
-                    summary_text += (
-                        source.title
-                        + " "
-                        + source.url
-                        + " "
-                        + " Error: Already present in db\n"
-                    )
-                else:
-                    record = SourceDataModel(
-                        url=source.url,
-                        title=source.title,
-                        category=source.category,
-                        subcategory=source.subcategory,
-                    )
-                    record.save()
-                    summary_text += source.title + " " + source.url + " " + " OK\n"
-        else:
-            summary_text = "Form is invalid"
-
-        context["form"] = form
-        context["summary_text"] = summary_text
-        return ContextData.render(request, "sources_import_summary.html", context)
-
-    # if a GET (or any other method) we'll create a blank form
-    else:
-        form = ImportSourcesForm()
-        form.method = "POST"
-        form.action_url = reverse("{}:sources-import".format(ContextData.app_name))
-        context["form"] = form
-        return ContextData.render(request, "form_basic.html", context)
-
-
 def remove_source(request, pk):
     context = ContextData.get_context(request)
     context["page_title"] += " - remove source"
@@ -234,11 +175,6 @@ def remove_source(request, pk):
     if ft.exists():
         source_url = ft[0].url
         ft.delete()
-
-        # TODO checkbox - or other button to remove corresponding entries
-        # entries = LinkDataModel.objects.filter(url = source_url)
-        # if entries.exists():
-        #    entries.delete()
 
         context["summary_text"] = "Remove ok"
     else:

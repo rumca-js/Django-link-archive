@@ -43,10 +43,8 @@ class AllTags(generic.ListView):
         return objects
 
     def get_context_data(self, **kwargs):
-        # Call the base implementation first to get the context
         context = super(AllTags, self).get_context_data(**kwargs)
         context = ContextData.init_context(self.request, context)
-        # Create any data and add it to the context
 
         context["page_title"] += " - all tags"
         context["tag_objects"] = self.result_list
@@ -78,10 +76,6 @@ class RecentTags(AllTags):
 
         return context
 
-        # link = '{}?tag="{}"'.format(reverse('{}:entries'.format(ContextData.app_name)), tag[0])
-        # link_text = str(tag[0]) + " " + str(tag[1])
-        # text += "<span><a href='{0}' class=\"simplebutton\" style=\"margin: 5px\">{1}</a></span> ".format(link, link_text)
-
 
 def tag_entry(request, pk):
     # TODO read and maybe fix https://docs.djangoproject.com/en/4.1/topics/forms/modelforms/
@@ -105,14 +99,11 @@ def tag_entry(request, pk):
         context["summary_text"] = "Sorry, only persistent objects can be tagged"
         return ContextData.render(request, "summary_present.html", context)
 
-    # if this is a POST request we need to process the form data
     if request.method == "POST":
         method = "POST"
 
-        # create a form instance and populate it with data from the request:
         form = TagEntryForm(request.POST)
 
-        # check whether it's valid:
         if form.is_valid():
             form.save_tags()
 
@@ -122,12 +113,6 @@ def tag_entry(request, pk):
             context["summary_text"] = "Entry not added"
             return ContextData.render(request, "summary_present.html", context)
 
-        #    # process the data in form.cleaned_data as required
-        #    # ...
-        #    # redirect to a new URL:
-        #    #return HttpResponseRedirect('/thanks/')
-
-    # if a GET (or any other method) we'll create a blank form
     else:
         author = request.user.username
         link = obj.link
@@ -213,10 +198,8 @@ def tag_rename(request):
         return ContextData.render(request, "missing_rights.html", context)
 
     if request.method == "POST":
-        # create a form instance and populate it with data from the request:
         form = TagRenameForm(request.POST)
 
-        # check whether it's valid:
         if form.is_valid():
             current_tag = form.cleaned_data["current_tag"]
             new_tag = form.cleaned_data["new_tag"]

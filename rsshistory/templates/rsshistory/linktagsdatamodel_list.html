@@ -6,7 +6,7 @@
 
 {% for tag in tag_objects %}
     <span>
-        <a href='{% url 'rsshistory:entries'%}?tag={{tag.0}}' class="simplebutton" style="margin: 5px">
+        <a href='{% url 'rsshistory:entries'%}?tag="{{tag.0}}"' class="simplebutton" style="margin: 5px">
             {{tag.0}} {{tag.1}}</a>
     </span>
 {% endfor %}
@@ -20,6 +20,5 @@
   <li><a href="{% url 'rsshistory:entries-untagged' %}" class="simplebutton">Untagged bookmarks</a></li>
 {% endif %}
 </ul>
-
 
 {% endblock %} 

@@ -16,7 +16,7 @@ version is split into three digits:
  if a change requires the model to be changed, then second digit is updated, patch is set to 0
  if something should be released to public, then release version changes
 """
-__version__ = "0.10.6"
+__version__ = "0.10.7"
 
 
 from pathlib import Path
@@ -39,9 +39,7 @@ class Configuration(object):
             "admin_email": "renegat@renegat0x0.ddns.net",
             "admin_user": "renegat0x0",
             "app_version": self.version,
-            "user_config": UserConfig.get(),
             "config": ConfigurationEntry.get(),
-            "icon_size": "20px",
             "base_generic": str(Path(self.app_name) / "base_generic.html"),
             "base_footer": """
           <p>

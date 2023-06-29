@@ -3,7 +3,7 @@
 
 {% block content %}
   <a href="{% url 'rsshistory:searchinitview' %}" class='simplebutton'>
-      <img src="{% static 'rsshistory/icons/icons8-start-100.png' %}" height="{{icon_size}}" />
+      <img src="{% static 'rsshistory/icons/icons8-start-100.png' %}" class="content-icon" />
       Reset filters</a>
 
   <form action="{{filter_form.action_url}}" method="{{filter_form.method}}">
@@ -25,15 +25,103 @@
     {% endif %}
 
   {% if entries_list %}
-  <ul class="linklist">
+  <div class="linklist container_{{user_config.display_type}}">
     {% for link in entries_list %}
-      <li>
-          {% if user_config.display_type == "std" or user_config.display_type == "" %}
-              <a href="{{ link.get_absolute_url }}"
+          {% if user_config.display_type == "clickable-tags" %}
+             <span
                  {% if link.persistent %}
-                    class="longbutton longbuttonselected"
+                 title="{{link.get_title}} {{link.get_long_description}}"
+                    class="element_{{user_config.display_type}} element_{{user_config.display_type}}_selected"
                  {% else %}
-                    class="longbutton"
+                    class="element_{{user_config.display_type}}"
+                 {% endif %}
+                     >
+
+               <div class="linklistitem">
+                   <a href="{{ link.get_absolute_url }}" class="linklistitemtitle">
+                      {% if user_config.show_icons %}
+                      <img src="{{link.get_favicon}}" class="content-icon"/>
+                      {% endif %}
+
+                      {{link.get_title}} {{link.get_long_description}}
+                   </a>
+                  <div class="linklistitemdescription">
+                      {% if link.get_tag_string %}
+                      Tags: 
+                          {% for tag in link.get_tag_map %}
+                              <a href="{% url 'entries'%}?tag={{tag}}" class="simplebutton">{{tag}}</a>
+                          {% endfor %}
+                      {% endif %}
+                      {% if link.persistent %}
+                         User: {{link.user}}
+                      {% endif %}
+
+                  </div>
+               </div>
+             </span>
+          {% elif user_config.display_type == "line-and-buttons" %}
+              <a href="{{ link.get_absolute_url }}"
+                 title="{{link.get_title}} {{link.get_long_description}}"
+                 {% if link.persistent %}
+                    class="element_{{user_config.display_type}} element_{{user_config.display_type}}_selected"
+                 {% else %}
+                    class="element_{{user_config.display_type}}"
+                 {% endif %}
+                      >
+
+                <div class="linklistitem">
+                   <img src="{{link.get_favicon}}" class="content-icon"/>
+                  <span class="linklistitemtitle">{{link.get_title}}</span> {{link.get_full_description}}
+                </div>
+              </a>
+
+              {% if user.is_staff %}
+                 <a href="{{ link.get_absolute_url }}" class="simplebutton">
+                    Details
+                 </a>
+                 {% if link.persistent %}
+                  <a href="{% url 'entry-notstar' link.id %}" class="simplebutton">
+                   Not bookmarked
+                  </a>
+                  <a href="{% url 'entry-tag' link.id %}" class="simplebutton">Tag entry</a>
+                 {% else %}
+                  <a href="{% url 'entry-star' link.id %}" class="simplebutton">
+                   Bookmark
+                  </a>
+                 {% endif %}
+              {% else %}
+                  <hr>
+              {% endif %}
+          {% elif user_config.display_type == "youtube-thumbnails" %}
+              <a href="{{ link.get_absolute_url }}"
+                 title="{{link.get_title}} {{link.get_long_description}}"
+                 {% if link.persistent %}
+                    class="element_{{user_config.display_type}} element_{{user_config.display_type}}_selected"
+                 {% else %}
+                    class="element_{{user_config.display_type}}"
+                 {% endif %}
+                      >
+                      {% if user_config.show_icons %}
+                        <img src=
+                          {% if user_config.thumbnails_as_icons %}
+                              "{{link.get_thumbnail}}"
+                          {% else %}
+                              "{{link.get_favicon}}"
+                          {% endif %}
+                             width="100%"/>
+                      {% endif %}
+                       <div>{{link.get_title}}</div>
+                       <div>{{link.get_long_description}}</div>
+                      </a>
+
+              <!-- mainly std, and otther -->
+          {% else %}
+              <a href="{{ link.get_absolute_url }}"
+                 title="{{link.get_title}} {{link.get_long_description}}"
+                 {% if link.persistent %}
+                    class="element_{{user_config.display_type}} element_{{user_config.display_type}}_selected"
+                 {% else %}
+                    class="element_{{user_config.display_type}}"
                  {% endif %}
                 >
 
@@ -46,118 +134,24 @@
                       {% endif %}
 
                       {% if user_config.small_icons %}
-                         width="{{icon_size}}"/>
+                         class="content-icon"/>
                       {% else %}
                          class="linklistthumbnail"/>
                       {% endif %}
                   {% endif %}
 
                 <div class="linklistitem">
-                    <div class="linklistitemtitle">
-                      {% if link.dead %}
-                         Hidden link
-                      {% else %}
-                         {{link.title}} {{link.date_published}}  {{link.get_source_name}}
-                      {% endif %}
-
-                       {% if link.get_tag_string %}
-                       Tags: 
-                           {% for tag in link.get_tag_map %}
-                               #{{tag}},
-                           {% endfor %}
-                       {% endif %}
-                       {% if link.persistent %}
-                          User: {{link.user}}
-                       {% endif %}
-                    </div>
-                    <div class="linklistitemdescription">
-                    </div>
+                    <span class="linklistitemtitle">
+                         {{link.get_title}}
+                    </span>
+                    <span class="linklistitemdescription">
+                         {{link.get_full_description}}
+                    </span>
                 </div>
               </a>
-          {% elif user_config.display_type == "clickable-tags" %}
-             <span
-                {% if link.persistent %}
-                   class="longbutton longbuttonselected"
-                {% else %}
-                   class="longbutton"
-                {% endif %}
-                     >
-
-               <div class="linklistitem">
-                   <a href="{{ link.get_absolute_url }}" class="linklistitemtitle">
-                      {% if user_config.show_icons %}
-                      <img src="{{link.get_favicon}}" width="{{icon_size}}"/>
-                      {% endif %}
-
-                      {% if link.dead %}
-                         Hidden link
-                      {% else %}
-                         {{link.title}} {{link.date_published}}  {{link.get_source_name}}
-                      {% endif %}
-                   </a>
-                  <div class="linklistitemdescription">
-                      {% if link.get_tag_string %}
-                      Tags: 
-                          {% for tag in link.get_tag_map %}
-                              <a href="{% url 'rsshistory:entries'%}?tag={{tag}}" class="simplebutton">{{tag}}</a>
-                          {% endfor %}
-                      {% endif %}
-                      {% if link.persistent %}
-                         User: {{link.user}}
-                      {% endif %}
-
-                  </div>
-               </div>
-             </span>
-          {% elif user_config.display_type == "line-and-buttons" %}
-              <a href="{{ link.link }}"
-                 {% if link.persistent %}
-                    class="longbutton longbuttonselected"
-                 {% else %}
-                    class="longbutton"
-                 {% endif %}
-                      >
-
-                <div class="linklistitem">
-                   <img src="{{link.get_favicon}}" width="20"/>
-                   {% if link.dead %}
-                      <span class="linklistitemtitle">Hidden link</span>
-                   {% else %}
-                      <span class="linklistitemtitle">{{link.title}}</span> {{link.date_published}}  {{link.get_source_name}}
-                   {% endif %}
-
-                   {% if link.get_tag_string %}
-                       , Tags: # {{ link.get_tag_string }}
-                   {% endif %}
-                   {% if link.user %}
-                      , User: {{link.user}}
-                   {% endif %}
-
-                </div>
-              </a>
-
-              {% if user.is_staff %}
-              <a href="{{ link.get_absolute_url }}" class="simplebutton">
-                 Details
-              </a>
-                 {% if link.persistent %}
-                  <a href="{% url 'rsshistory:entry-notstar' link.id %}" class="simplebutton">
-                   Not bookmarked
-                  </a>
-                  <a href="{% url 'rsshistory:entry-tag' link.id %}" class="simplebutton">Tag entry</a>
-                 {% else %}
-                  <a href="{% url 'rsshistory:entry-star' link.id %}" class="simplebutton">
-                   Bookmark
-                  </a>
-                 {% endif %}
-                 <!--a href="{% url 'rsshistory:entry-remove' link.id %}" class="simplebutton">Remove entry</a-->
-              {% else %}
-              <hr>
-              {% endif %}
           {% endif %}
-      </li>
     {% endfor %}
-  </ul>
+  </div>
 
 <div class="pagination">
     <span class="step-links">

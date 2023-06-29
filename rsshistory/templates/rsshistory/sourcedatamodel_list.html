@@ -4,17 +4,17 @@
 {% block content %}
 
   <a href="{% url 'rsshistory:source-add' %}" class="mainbutton">
-      <img src="{% static 'rsshistory/icons/icons8-channel-add-96.png' %}" height="{{icon_size}}" />
+      <img src="{% static 'rsshistory/icons/icons8-channel-add-96.png' %}" class="content-icon" />
         Add source</a>
   <a href="{% url 'rsshistory:entry-add' %}" class="mainbutton">
-        <img src="{% static 'rsshistory/icons/icons8-add-link-96.png' %}" height="{{icon_size}}" />
+        <img src="{% static 'rsshistory/icons/icons8-add-link-96.png' %}" class="content-icon" />
         Add entry</a>
 
   <hr>
 
   <div>
   <a href="{% url 'rsshistory:sources' %}" class='simplebutton'>
-      <img src="{% static 'rsshistory/icons/icons8-start-100.png' %}" height="{{icon_size}}" />
+      <img src="{% static 'rsshistory/icons/icons8-start-100.png' %}" class="content-icon" />
       Reset filters</a>
   </div>
 
@@ -26,44 +26,41 @@
   <hr>
 
   {% if source_list %}
-  <ul class="linklist">
-    {% for source in source_list %}
-      <li>
-          <a href="{{ source.get_absolute_url }}" class="longbutton">
-            <div class="linklistitem">
-              {% if user_config.show_icons %}
-                <img src="{{source.get_favicon}}" width="20">
-              {% endif %}
-              <span class="linklistitemtitle">{{source.title}}</span>
-              <span class="linklistitemdescription">
-                  [{{source.category}}, {{source.subcategory}}]</span>
-                  Export: {{ source.export_to_cms }} 
-                  Fetched:{{source.get_date_fetched}} 
-                  Number of entries:{{source.get_number_of_entries}} 
-                  Import seconds:{{source.get_import_seconds}}
-            </div>
-          </a>
-      </li>
-    {% endfor %}
-  </ul>
+     <div class="linklist container_{{user_config.display_type}}">
+       {% for source in source_list %}
+         <a href="{{ source.get_absolute_url }}"
+           class="element_{{user_config.display_type}}"
+           title="{{source.title}} {{source.get_full_description}}"
+         >
+           <div class="linklistitem">
+             {% if user_config.show_icons %}
+               <img src="{{source.get_favicon}}" width="20">
+             {% endif %}
+             <span class="linklistitemtitle">{{source.title}}</span>
+             <span class="linklistitemdescription">
+                 {{source.get_full_description}}</span>
+           </div>
+         </a>
+       {% endfor %}
+     </div>
 
-    <div class="pagination">
-        <span class="step-links">
-            {% if page_obj.has_previous %}
-               <a href="?page=1{{filters}}" class='simplebutton'>&laquo; first</a>
-               <a href="?page={{ page_obj.previous_page_number }}{{filters}}" class='simplebutton'>previous</a>
-            {% endif %}
+     <div class="pagination">
+         <span class="step-links">
+             {% if page_obj.has_previous %}
+                <a href="?page=1{{filters}}" class='simplebutton'>&laquo; first</a>
+                <a href="?page={{ page_obj.previous_page_number }}{{filters}}" class='simplebutton'>previous</a>
+             {% endif %}
 
-            <span class="current">
-                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
-            </span>
+             <span class="current">
+                 Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+             </span>
 
-            {% if page_obj.has_next %}
-              <a href="?page={{ page_obj.next_page_number }}{{filters}}" class='simplebutton'>next</a>
-              <a href="?page={{ page_obj.paginator.num_pages }}{{filters}}" class='simplebutton'>last &raquo;</a>
-            {% endif %}
-        </span>
-    </div>
+             {% if page_obj.has_next %}
+               <a href="?page={{ page_obj.next_page_number }}{{filters}}" class='simplebutton'>next</a>
+               <a href="?page={{ page_obj.paginator.num_pages }}{{filters}}" class='simplebutton'>last &raquo;</a>
+             {% endif %}
+         </span>
+     </div>
 
   {% else %}
     <p>There are no sources.</p>

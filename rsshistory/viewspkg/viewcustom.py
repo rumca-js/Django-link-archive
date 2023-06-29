@@ -193,14 +193,12 @@ def get_incorrect_youtube_links():
     criterion4 = Q(source__contains="https://www.youtube.com/feeds")
 
     criterion5 = Q(source__isnull=True)
-    criterion6 = Q(source_obj__isnull=True)
 
     entries_no_object = LinkDataModel.objects.filter(criterion1 | criterion1a)
     entries_no_object |= LinkDataModel.objects.filter(
         criterion2 & criterion3 & ~criterion4
     )
     entries_no_object |= LinkDataModel.objects.filter(criterion2 & criterion5)
-    # entries_no_object |= LinkDataModel.objects.filter(criterion2 & ~criterion5 & criterion6)
 
     if entries_no_object.exists():
         return entries_no_object
@@ -216,7 +214,6 @@ def data_errors_page(request):
             if source.exists():
                 entry.source_obj = source[0]
                 entry.save()
-                # summary_text += "Fixed {0}, added source object\n".format(entry.link)
                 print("Fixed {0}, added source object".format(entry.link))
         print("fix_reassign_source_to_nullsource_entries done")
 
@@ -442,7 +439,6 @@ def import_source_from_ia(request, pk):
         }
     )
     form.method = "POST"
-    # form.action_url = reverse('{}:configuration'.format(ConfigForm.app_name))
 
     context["form"] = form
 
@@ -543,7 +539,35 @@ def write_bookmarks(request):
 
     BackgroundJobController.write_bookmarks()
 
-    context["summary_text"] = "Wrote OK"
+    context["summary_text"] = "Wrote job started"
+
+    return ContextData.render(request, "summary_present.html", context)
+
+
+def import_bookmarks(request):
+    context = ContextData.get_context(request)
+    context["page_title"] += " - Import bookmarks"
+
+    if not request.user.is_staff:
+        return ContextData.render(request, "missing_rights.html", context)
+
+    BackgroundJobController.import_bookmarks()
+
+    context["summary_text"] = "Import job started"
+
+    return ContextData.render(request, "summary_present.html", context)
+
+
+def import_sources(request):
+    context = ContextData.get_context(request)
+    context["page_title"] += " - Import sources"
+
+    if not request.user.is_staff:
+        return ContextData.render(request, "missing_rights.html", context)
+
+    BackgroundJobController.import_sources()
+
+    context["summary_text"] = "Import job started"
 
     return ContextData.render(request, "summary_present.html", context)
 
@@ -590,6 +614,20 @@ def write_daily_data_form(request):
     context["form"] = form
 
     return ContextData.render(request, "form_basic.html", context)
+
+
+def import_daily_data(request):
+    context = ContextData.get_context(request)
+    context["page_title"] += " - Import daily data"
+
+    if not request.user.is_staff:
+        return ContextData.render(request, "missing_rights.html", context)
+
+    BackgroundJobController.import_daily_data()
+
+    context["summary_text"] = "Import job started"
+
+    return ContextData.render(request, "summary_present.html", context)
 
 
 def write_tag_form(request):

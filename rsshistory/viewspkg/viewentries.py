@@ -10,7 +10,7 @@ from ..models import (
     ConfigurationEntry,
 )
 from ..prjconfig import Configuration
-from ..forms import EntryForm, ImportEntriesForm, EntryChoiceForm, ConfigForm
+from ..forms import EntryForm, EntryChoiceForm, ConfigForm
 from ..views import ContextData
 from ..controllers import BackgroundJobController
 
@@ -124,15 +124,13 @@ def add_entry(request):
         context["summary_text"] = "Form is invalid"
         return ContextData.render(request, "summary_present.html", context)
 
-        #    # process the data in form.cleaned_data as required
-        #    # ...
-        #    # redirect to a new URL:
-        #    #return HttpResponseRedirect('/thanks/')
-
-    # if a GET (or any other method) we'll create a blank form
     else:
         author = request.user.username
-        form = EntryForm(initial={"user": author})
+        initial = {"user": author}
+        if "link" in request.GET:
+            initial['link'] = request.GET['link']
+
+        form = EntryForm(initial=initial)
         form.method = "POST"
         form.action_url = reverse("{}:entry-add".format(ContextData.app_name))
         context["form"] = form
@@ -193,7 +191,6 @@ def edit_entry(request, pk):
         return ContextData.render(request, "summary_present.html", context)
     else:
         form = EntryForm(instance=ob)
-        # form.fields['user'].initial = request.user.username
         form.method = "POST"
         form.action_url = reverse(
             "{}:entry-edit".format(ContextData.app_name), args=[pk]
@@ -305,64 +302,6 @@ def make_not_persistent_entry(request, pk):
     context["summary_text"] = summary_text
 
     return ContextData.render(request, "summary_present.html", context)
-
-
-def import_entries(request):
-    # TODO
-    summary_text = ""
-    context = ContextData.get_context(request)
-    context["page_title"] += " - import entries"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
-
-    # if this is a POST request we need to process the form data
-    if request.method == "POST":
-        method = "POST"
-
-        # create a form instance and populate it with data from the request:
-        form = ImportEntriesForm(request.POST)
-
-        if form.is_valid():
-            summary_text = "Import entries log\n"
-
-            for entry in form.get_entries():
-                if LinkDataModel.objects.filter(url=entry.url).exists():
-                    summary_text += (
-                        entry.title
-                        + " "
-                        + entry.url
-                        + " "
-                        + " Error: Already present in db\n"
-                    )
-                else:
-                    try:
-                        record = LinkDataModel(
-                            url=entry.url,
-                            title=entry.title,
-                            description=entry.description,
-                            link=entry.link,
-                            date_published=entry.date_published,
-                            persistent=entry.persistent,
-                        )
-                        record.save()
-                        summary_text += entry.title + " " + entry.url + " " + " OK\n"
-                    except Exception as e:
-                        summary_text += entry.title + " " + entry.url + " " + " NOK\n"
-        else:
-            summary_text = "Form is invalid"
-
-        context["form"] = form
-        context["summary_text"] = summary_text
-        return ContextData.render(request, "entries_import_summary.html", context)
-
-    # if a GET (or any other method) we'll create a blank form
-    else:
-        form = ImportEntriesForm()
-        form.method = "POST"
-        form.action_url = reverse("{}:entries-import".format(ContextData.app_name))
-        context["form"] = form
-        return ContextData.render(request, "form_basic.html", context)
 
 
 class NotBookmarkedView(generic.ListView):

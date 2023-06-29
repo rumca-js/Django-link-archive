@@ -24,6 +24,13 @@
   color: blue;
 }
 
+.mainbutton-icon {
+    width=20px;
+}
+.content-icon {
+    width=20px;
+}
+
 /* Content */
 
 input {
@@ -71,10 +78,44 @@ display: contents;
   color: blue;
 }
 
-.linklist {
+.container_std {
     margin-top: 20px;
     padding: 0;
     list-style: none;
+}
+.container_clicable-tags {
+    margin-top: 20px;
+    padding: 0;
+    list-style: none;
+}
+.container_line-and-buttons {
+    margin-top: 20px;
+    padding: 0;
+    list-style: none;
+}
+.container_youtube-thumbnails {
+    margin-top: 20px;
+    padding: 0;
+    list-style: none;
+}
+
+.element_std {
+  padding: 0px 15px;
+  text-align: left;
+  color: black;
+  text-decoration: none;
+  margin-bottom:3px;
+  display: flex;
+  flex-wrap: wrap;
+}
+.element_youtube-thumbnails {
+  padding: 0px 15px;
+  text-align: left;
+  color: black;
+  text-decoration: none;
+  margin-bottom:3px;
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .longbutton {

@@ -271,6 +271,56 @@ class WriteDailyDataJobHandler(BaseJobHandler):
             )
 
 
+class ImportDailyDataJobHandler(BaseJobHandler):
+    """!
+    Writes daily data to disk
+    """
+
+    def __init__(self):
+        pass
+
+    def get_job(self):
+        return BackgroundJob.JOB_IMPORT_DAILY_DATA
+
+    def process(self, obj=None):
+        pass
+
+
+class ImportBookmarksJobHandler(BaseJobHandler):
+    """!
+    Writes daily data to disk
+    """
+
+    def __init__(self):
+        pass
+
+    def get_job(self):
+        return BackgroundJob.JOB_IMPORT_BOOKMARKS
+
+    def process(self, obj=None):
+        pass
+
+
+class ImportSourcesJobHandler(BaseJobHandler):
+    """!
+    Writes daily data to disk
+    """
+
+    def __init__(self):
+        pass
+
+    def get_job(self):
+        return BackgroundJob.JOB_IMPORT_SOURCES
+
+    def process(self, obj=None):
+        c = Configuration.get_object()
+        import_path = c.get_import_path() / "sources.json"
+
+        # read json
+
+        # create sources
+
+
 class WriteBookmarksJobHandler(BaseJobHandler):
     """!
     Writes bookmarks data to disk
@@ -406,6 +456,9 @@ class HandlerManager(object):
             WriteDailyDataJobHandler(),
             WriteBookmarksJobHandler(),
             WriteTopicJobHandler(),
+            ImportSourcesJobHandler(),
+            ImportBookmarksJobHandler(),
+            ImportDailyDataJobHandler(),
         ]
 
     def get_handler_and_object(self):
