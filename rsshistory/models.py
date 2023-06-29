@@ -64,6 +64,16 @@ class SourceDataModel(models.Model):
 
         return days
 
+    def get_long_description(self):
+        return "{} {}".format(self.category, self.subcategory)
+
+    def get_full_description(self):
+        return "{} Export:{} Fetched:{} Number of entries:{} Import seconds:{}".format(self.get_long_description(),
+            self.export_to_cms,
+            self.get_date_fetched(),
+            self.get_number_of_entries(),
+            self.get_import_seconds())
+
     def is_fetch_possible(self):
         from datetime import timedelta
         from .dateutils import DateUtils
@@ -260,6 +270,31 @@ class LinkDataModel(models.Model):
             return self.source_obj.title
         else:
             return self.source
+
+    def get_link_dead_text(self):
+        return "______"
+
+    def get_title(self):
+        if self.dead:
+            return self.get_link_dead_text()
+        return self.title
+
+    def get_long_description(self):
+        if self.dead:
+            return self.get_link_dead_text()
+        return "{} {}".format(self.date_published, self.get_source_name())
+
+    def get_full_description(self):
+        if self.dead:
+            return self.get_link_dead_text()
+        string = "{} {}".format(self.date_published, self.get_source_name())
+        tags = self.get_tag_string()
+        if tags:
+            string += " Tags:{}".format(tags)
+        if self.user:
+            string += " User:{}".format(self.user)
+
+        return string
 
     def get_tag_string(self):
         return LinkTagsDataModel.join_elements(self.tags.all())
@@ -518,6 +553,7 @@ class UserConfig(models.Model):
         ("std", "standard"),
         ("tags", "clickable-tags"),
         ("twolines", "line-and-buttons"),
+        ("youtube-thumbnails", "youtube-thumbnails"),
     )
 
     user = models.CharField(max_length=500, unique=True)
@@ -534,12 +570,20 @@ class UserConfig(models.Model):
     small_icons = models.BooleanField(default=True)
     links_per_page = models.IntegerField(default=100)
 
-    def get():
+    def get(user_name = None):
+        """
+        This is used if no request is specified. Use configured by admin setup.
+        """
+        if user_name:
+            confs = UserConfig.objects.filter(user = user_name)
+            if len(confs) != 0:
+                return confs[0]
+
         confs = UserConfig.objects.all()
-        if len(confs) == 0:
-            return UserConfig()
-        else:
+        if len(confs) != 0:
             return confs[0]
+
+        return UserConfig()
 
 
 class PersistentInfo(models.Model):
@@ -676,6 +720,9 @@ class BackgroundJob(models.Model):
     JOB_WRITE_DAILY_DATA = "write-daily-data"
     JOB_WRITE_TOPIC_DATA = "write-topic-data"
     JOB_WRITE_BOOKMARKS = "write-bookmarks"
+    JOB_IMPORT_DAILY_DATA = "import-daily-data"
+    JOB_IMPORT_BOOKMARKS = "import-bookmarks"
+    JOB_IMPORT_SOURCES = "import-sources"
     JOB_PUSH_TO_REPO = "push-to-repo"
 
     # fmt: off
@@ -688,10 +735,13 @@ class BackgroundJob(models.Model):
         (JOB_LINK_DOWNLOAD, JOB_LINK_DOWNLOAD),                 # link is downloaded using wget
         (JOB_LINK_DOWNLOAD_MUSIC, JOB_LINK_DOWNLOAD_MUSIC),     #
         (JOB_LINK_DOWNLOAD_VIDEO, JOB_LINK_DOWNLOAD_VIDEO),     #
-        (JOB_WRITE_DAILY_DATA, JOB_WRITE_DAILY_DATA),           # writes daily data
-        (JOB_WRITE_TOPIC_DATA, JOB_WRITE_TOPIC_DATA),           # writes topic data
-        (JOB_WRITE_BOOKMARKS, JOB_WRITE_BOOKMARKS),             # writes bookmarks
-        (JOB_PUSH_TO_REPO, JOB_PUSH_TO_REPO),                   # pushes to repo
+        (JOB_WRITE_DAILY_DATA, JOB_WRITE_DAILY_DATA),
+        (JOB_WRITE_TOPIC_DATA, JOB_WRITE_TOPIC_DATA),
+        (JOB_WRITE_BOOKMARKS, JOB_WRITE_BOOKMARKS),
+        (JOB_IMPORT_DAILY_DATA, JOB_IMPORT_DAILY_DATA),
+        (JOB_IMPORT_BOOKMARKS, JOB_IMPORT_BOOKMARKS),
+        (JOB_IMPORT_SOURCES, JOB_IMPORT_SOURCES),
+        (JOB_PUSH_TO_REPO, JOB_PUSH_TO_REPO),
     )
     # fmt: on
 
