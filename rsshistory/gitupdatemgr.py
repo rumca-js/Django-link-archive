@@ -91,7 +91,6 @@ class GitUpdateManager(object):
         from datetime import timedelta
         from .models import SourceDataModel, LinkDataModel
 
-        # sources = SourceDataModel.objects.filter(remove_after_days)
         sources = SourceDataModel.objects.all()
         for source in sources:
             if not source.is_removeable():

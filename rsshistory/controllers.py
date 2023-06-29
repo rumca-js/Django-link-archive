@@ -193,6 +193,33 @@ class BackgroundJobController(object):
                 "Exception: Write bookmarks: {} {}".format(str(e), error_text)
             )
 
+    def import_daily_data():
+        bj = BackgroundJob.objects.create(
+            job=BackgroundJob.JOB_IMPORT_DAILY_DATA,
+            task=None,
+            subject="",
+            args="",
+        )
+        return True
+
+    def import_bookmarks():
+        bj = BackgroundJob.objects.create(
+            job=BackgroundJob.JOB_IMPORT_BOOKMARKS,
+            task=None,
+            subject="",
+            args="",
+        )
+        return True
+
+    def import_sources():
+        bj = BackgroundJob.objects.create(
+            job=BackgroundJob.JOB_IMPORT_SOURCES,
+            task=None,
+            subject="",
+            args="",
+        )
+        return True
+
     def link_archive(link_url):
         try:
             archive_items = BackgroundJob.objects.filter(
