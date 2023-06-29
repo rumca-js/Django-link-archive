@@ -4,7 +4,7 @@ from django.shortcuts import render
 from django.views import generic
 from django.urls import reverse
 
-from .models import SourceDataModel, LinkDataModel
+from .models import SourceDataModel, LinkDataModel, UserConfig
 from .basictypes import *
 from .prjconfig import Configuration
 from .apps import LinkDatabase
@@ -20,6 +20,9 @@ class ContextData(object):
     def init_context(request, context):
         c = Configuration.get_object()
         context.update(c.get_context())
+
+        user_name = request.user.get_username()
+        context["user_config"] = UserConfig.get(user_name)
 
         from django_user_agents.utils import get_user_agent
 

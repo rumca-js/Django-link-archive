@@ -20,13 +20,11 @@ class GitRepo(object):
 
     def add(self, files):
         subprocess.run(["git", "add", "-A"], cwd=self.get_local_dir())
-        # self.git.index.add(files)
 
     def commit(self, commit_message):
         subprocess.run(
             ["git", "commit", "-m", commit_message], cwd=self.get_local_dir()
         )
-        # self.git.index.commit(commit_message)
 
     def push(self):
         token = self.git_data.git_token
@@ -40,8 +38,6 @@ class GitRepo(object):
             ],
             cwd=self.get_local_dir(),
         )
-        # origin = self.git.remote('origin')
-        # origin.push()
 
     def get_repo_name(self):
         last = Path(self.git_repo).parts[-1]

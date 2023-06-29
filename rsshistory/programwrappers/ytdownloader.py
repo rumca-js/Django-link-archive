@@ -16,8 +16,14 @@ class YouTubeDownloader(object):
         self._url = url
         self._path = path
 
+    def get_video_ext(self):
+        return "mp4"
+
+    def get_music_ext(self):
+        return "mp3"
+
     def download_audio(self, file_name):
-        # ext = Path(file_name).suffix[1:]
+        ext = self.get_music_ext()
 
         # https://askubuntu.com/questions/630134/how-to-specify-a-filename-while-extracting-audio-using-youtube-dl
 
@@ -39,7 +45,7 @@ class YouTubeDownloader(object):
         return proc
 
     def download_video(self, file_name):
-        # ext = self.get_video_ext(Path(file_name))
+        ext = self.get_video_ext()
 
         # cmds = ['youtube-dl','-o', file_name, '-f','bestvideo[ext={0}]+bestaudio'.format(ext), self._url ]
         cmds = ["youtube-dl", "-o", file_name, self._url]
@@ -81,7 +87,6 @@ class YouTubeDownloader(object):
             logging.error("Could not obtain returndislikeapi")
             return None
 
-        # TODO - we should only call YouTubeJson to obtain data
         thumbs = returndislikejson.YouTubeThumbsDown(thumbs_data)
 
         js.add_thumbs_data(thumbs)

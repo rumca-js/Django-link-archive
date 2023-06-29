@@ -31,8 +31,6 @@ class WaybackMachine(object):
         return time.strftime("%Y%m%d")
 
     def get_archive_url(self, url, time):
-        # self.capture_limits(url)
-
         if self.url:
             if self.oldest.date() > time or self.newest.date() < time:
                 return
@@ -40,12 +38,9 @@ class WaybackMachine(object):
         from ..webtools import Page
 
         user_agent = Page.user_agent
-        # print("Time: {0} {1} {2} {3}".format(time.year, time.month, time.day, url))
 
         cdx_api = WaybackMachineCDXServerAPI(url, user_agent)
         handle = cdx_api.near(year=time.year, month=time.month, day=time.day, hour=12)
-
-        # self.debug_handle
 
         archive_timestamp = str(handle.timestamp)
         time_text = self.get_formatted_date(time)
@@ -72,7 +67,6 @@ class WaybackMachine(object):
     def get_archive_urls(self, url, start_time, stop_time):
         time = stop_time
         while time >= start_time:
-            # print("Time: {0}".format(time))
             wayback_url = self.get_archive_url(url, time)
             yield (time, wayback_url)
             time -= timedelta(days=1)
