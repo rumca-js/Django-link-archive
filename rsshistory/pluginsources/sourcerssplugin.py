@@ -22,7 +22,6 @@ class BaseRssPlugin(SourceGenericPlugin):
 
             url = source.url
             feed = feedparser.parse(url)
-            # print("Feed parse: {}".format(str(feed)))
 
             num_entries = len(feed.entries)
             num_processed_entries = 0
@@ -36,15 +35,6 @@ class BaseRssPlugin(SourceGenericPlugin):
                     )
                 )
             else:
-                # rss_path = self._cfg.get_export_path() / "downloaded_rss"
-                # rss_path.mkdir(parents = True, exist_ok = True)
-
-                # file_name = url + ".txt"
-                # file_name = self._cfg.get_url_clean_name(file_name)
-
-                # file_path = rss_path / file_name
-                # file_path.write_text(str(feed))
-
                 for feed_entry in feed.entries:
                     entry_props = self.process_rss_entry(source, feed_entry)
                     if entry_props is not None:
@@ -113,9 +103,6 @@ class BaseRssPlugin(SourceGenericPlugin):
         from ..dateutils import DateUtils
 
         output_map = {}
-
-        # print("feed entry dict: {}".format(feed_entry.__dict__))
-        # print("Feed entry: {}".format(str(feed_entry)))
 
         if hasattr(feed_entry, "description"):
             output_map["description"] = feed_entry.description

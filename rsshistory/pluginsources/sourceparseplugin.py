@@ -15,10 +15,19 @@ class BaseParsePlugin(SourceGenericPlugin):
         return self.source.get_domain()
 
     def is_link_valid(self, address):
+        print("Address:{} link:{}".format(self.source.url, address))
+
         if not self.is_link_valid_domain(address):
             return False
 
-        if address.endswith(".html") or address.endswith(".htm"):
+        if not address.startswith(self.source.url):
+            return
+
+        if (
+            address.endswith(".html")
+            or address.endswith(".htm")
+            or address.endswith("/")
+        ):
             search_pattern = self.source.get_domain()
 
             if re.search(search_pattern, address):

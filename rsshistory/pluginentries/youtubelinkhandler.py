@@ -106,14 +106,12 @@ class YouTubeLinkHandler(object):
         self.yt_ob = YouTubeJson()
 
         if self.yt_text and not self.yt_ob.loads(self.yt_text):
-            # logging.error("Could not read json for {0}, removing details data".format(self.url))
             return False
 
         from ..serializers.returnyoutubedislikeapijson import YouTubeThumbsDown
 
         self.rd_ob = YouTubeThumbsDown()
         if self.rd_text and not self.rd_ob.loads(self.rd_text):
-            # logging.error("Could not read json for {0}, removing returndislike api data".format(self.url))
             return False
 
         return True
@@ -177,6 +175,3 @@ class YouTubeLinkHandler(object):
     def get_details(self):
         if self.has_cached_details():
             return self.get_cached_details()
-        else:
-            # TODO add details to download
-            pass
