@@ -44,6 +44,14 @@ Provides ability to:
 
 ![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/source_details.PNG)
 
+# Lists are configurable
+
+Display as lines with buttons
+![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/entries_list_buttons.PNG)
+
+Display as youtube
+![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/entries_list_youtube.PNG)
+
 # Forms
 
 ## New entry form
