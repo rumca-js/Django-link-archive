@@ -41,6 +41,7 @@ Displays source details.
 
 Provides ability to:
  - view stored snaptshots in archive.org webpage, and make a new snapshot
+ - download all youtube video links from a defined channel
 
 ![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/source_details.PNG)
 
