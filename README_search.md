@@ -109,3 +109,10 @@ At my setup I can filter by a source type and subtype. At my setup I have catego
  - Link rot is real, it is hard to keep up, with what is maintained
  - How to filter sources at self hosting? Which RSS sources are important, and which are not?
 
+# Data analysis
+
+Propositions for data analysis. There are many things we can do with so much data.
+
+ - Verify link rot, by checking how many pages are still present
+ - Capture small creators, which are quoted quite often (filter mainstream media first)
+ - Iterate over links, and check which links are quoted often, maintain network identification. Propose a 'karma' for a link, check which links are most influential
