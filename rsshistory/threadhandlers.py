@@ -34,6 +34,14 @@ class BaseJobHandler(object):
     def set_config(self, config):
         self._config = config
 
+    def get_files_with_extension(self, input_path, extension):
+        result = []
+        for root, dirs, files in os.walk(path):
+            for afile in files:
+                if afile.endswith(extension):
+                    result.append(os.path.join(root, afile))
+        return result
+
 
 class ProcessSourceJobHandler(BaseJobHandler):
     """!
@@ -283,7 +291,37 @@ class ImportDailyDataJobHandler(BaseJobHandler):
         return BackgroundJob.JOB_IMPORT_DAILY_DATA
 
     def process(self, obj=None):
-        pass
+        c = Configuration.get_object()
+
+        import_path = c.get_import_path()
+
+        valid_dirs = []
+        dirs = os.listdir(import_path)
+        for adir in dirs:
+            if adir != 'bookmarks':
+                valid_dirs.append(import_path / adir)
+
+        for avalid_dir in valid_dirs:
+            files = self.get_files_with_extension(avalid_dir, 'json')
+            for afile in files:
+                self.import_one_file(afile)
+
+    def import_one_file(self, afile):
+        import json
+
+        with open(import_file) as json_file:
+            data = json.load(json_file)
+
+            for json_entry in data:
+                export_names = LinkDataModel.get_export_names()
+
+                create_args = {}
+                for export_name in export_names:
+                    create_args[export_name] = json_source[export_name]
+
+                LinkDataModel.objects.create(create_args)
+
+                # TODO import tags also
 
 
 class ImportBookmarksJobHandler(BaseJobHandler):
@@ -298,7 +336,29 @@ class ImportBookmarksJobHandler(BaseJobHandler):
         return BackgroundJob.JOB_IMPORT_BOOKMARKS
 
     def process(self, obj=None):
-        pass
+        c = Configuration.get_object()
+        import_path = c.get_import_path() / "bookmarks"
+
+        files = self.get_files_with_extension(import_path, 'json')
+        for afile in files:
+            self.import_one_file(afile)
+
+    def import_one_file(self, afile):
+        import json
+
+        with open(import_file) as json_file:
+            data = json.load(json_file)
+
+            for json_entry in data:
+                export_names = LinkDataModel.get_export_names()
+
+                create_args = {}
+                for export_name in export_names:
+                    create_args[export_name] = json_source[export_name]
+
+                LinkDataModel.objects.create(create_args)
+
+                # TODO import tags also
 
 
 class ImportSourcesJobHandler(BaseJobHandler):
@@ -313,12 +373,22 @@ class ImportSourcesJobHandler(BaseJobHandler):
         return BackgroundJob.JOB_IMPORT_SOURCES
 
     def process(self, obj=None):
+        import json
+
         c = Configuration.get_object()
-        import_path = c.get_import_path() / "sources.json"
+        import_file = c.get_import_path() / "sources.json"
 
-        # read json
+        with open(import_file) as json_file:
+            data = json.load(json_file)
 
-        # create sources
+            for json_source in data:
+                export_names = SourceDataModel.get_export_names()
+
+                create_args = {}
+                for export_name in export_names:
+                    create_args[export_name] = json_source[export_name]
+
+                SourceDataModel.objects.create(create_args)
 
 
 class WriteBookmarksJobHandler(BaseJobHandler):

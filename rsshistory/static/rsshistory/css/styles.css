@@ -29,7 +29,7 @@
     width:20px;
 }
 .content-icon {
-    width:20px;
+    width:3%;
 }
 
 /* Content */
@@ -86,12 +86,14 @@ display: contents;
 
 /* List containers */
 
-.container_std {
+.container_standard {
     margin-top: 20px;
     padding: 0;
     list-style: none;
+    display: flex;
+    flex-direction: column;
 }
-.container_clicable-tags {
+.container_clickable-tags {
     margin-top: 20px;
     padding: 0;
     list-style: none;
@@ -109,65 +111,59 @@ display: contents;
     flex-wrap: wrap;
 }
 
-.element_std {
+.element_standard {
   padding: 0px 15px;
   text-align: left;
   color: black;
   text-decoration: none;
   margin-bottom:3px;
-  display: flex;
-  flex-wrap: wrap;
 }
-.element_std:hover {
+.element_standard:hover {
   background-color: #f4f4f4;
   color: blue;
 }
-.element_std_selected {
+.element_standard_selected {
   background-color: #BFD8FF;
 }
-.element_tags {
+.element_clickable-tags {
   padding: 0px 15px;
   text-align: left;
   color: black;
   text-decoration: none;
   margin-bottom:3px;
-  display: flex;
-  flex-wrap: wrap;
 }
-.element_tags:hover {
+.element_clickable-tags:hover {
   background-color: #f4f4f4;
   color: blue;
 }
-.element_tags_selected {
+.element_clickable-tags_selected {
   background-color: #BFD8FF;
 }
-.element_twolines {
+.element_line-and-buttons {
   padding: 0px 15px;
   text-align: left;
   color: black;
   text-decoration: none;
   margin-bottom:3px;
-  display: flex;
-  flex-wrap: wrap;
 }
-.element_twolines:hover {
+.element_line-and-buttons:hover {
   background-color: #f4f4f4;
   color: blue;
 }
-.element_twolines {
+.element_line-and-buttons_selected {
   background-color: #BFD8FF;
 }
 
 .element_youtube-thumbnails {
-    text-overflow: ellipsis; 
-    max-width: 20%; 
-    min-width: 20%; 
-    width: auto; 
-    white-space: nowrap; 
-    overflow: hidden; 
+  text-overflow: ellipsis; 
+  max-width: 18%; 
+  min-width: 18%; 
+  width: auto; 
   color: black;
   text-decoration: none;
   margin: 5px;
+  display:flex;
+  flex-direction:column;
 }
 .element_youtube-thumbnails:hover {
   background-color: #f4f4f4;
@@ -182,17 +178,17 @@ display: contents;
     width: 10%;
 }
 .linklistitemtitle {
-    flex: 100%;
-    font-weight: bold;
+  font-weight: bold;
   text-align: left;
-  color: black;
   text-decoration: none;
+  color:black;
 }
+.linklistitemtitle:hover {
+  color:blue;
+}
+
 .linklistitemdescription {
-    /* flex: 50%; */
-    padding-left:10px;
-    margin-left:10px;
-    font-style:italic;
+   font-style:italic;
 }
 
 /* video box, youtube player */
@@ -201,6 +197,7 @@ display: contents;
   position: relative;
   width: 80%;
   padding-bottom: 46.25%;
+  /* background-color: yellow; */
 }
 .youtube_player_frame {
   position: absolute;

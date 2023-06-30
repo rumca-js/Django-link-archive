@@ -1,3 +1,10 @@
+"""
+TODO introduce proxy models
+
+https://www.benlopatin.com/using-django-proxy-models/
+https://www.geeksforgeeks.org/creating-multiple-user-types-and-using-proxy-models-in-python-django/
+"""
+
 import traceback
 import logging
 from datetime import datetime, date
@@ -162,19 +169,29 @@ class SourceDataModel(models.Model):
         page = Page(self.url)
         return page.get_domain()
 
+    def get_export_names():
+        return [
+                "url",
+                "title",
+                "category",
+                "subcategory",
+                "dead",
+                "export_to_cms",
+                "remove_after_days",
+                "language",
+                "favicon",
+                "on_hold",
+                "fetch_period",
+                "source_type",
+                ]
+
     def get_map(self):
         output_data = {}
 
-        output_data["url"] = self.url
-        output_data["title"] = self.title
-        output_data["category"] = self.category
-        output_data["subcategory"] = self.subcategory
-        output_data["dead"] = self.dead
-        output_data["export_to_cms"] = self.export_to_cms
-        output_data["remove_after_days"] = self.remove_after_days
-        output_data["language"] = self.language
-        output_data["favicon"] = self.favicon
-        output_data["on_hold"] = self.on_hold
+        export_names = SourceDataModel.get_export_names()
+        for export_name in export_names:
+            val = getattr(self, export_name)
+            output_data[export_name] = val
 
         return output_data
 
@@ -341,19 +358,32 @@ class LinkDataModel(models.Model):
 
         return self.get_favicon()
 
-    def get_map(self):
-        data = {}
-        data["source"] = self.source
-        data["link"] = self.link
-        data["title"] = self.title
-        data["date_published"] = str(self.date_published)
-        data["description"] = self.description
-        data["persistent"] = self.persistent
-        data["language"] = self.language
-        data["thumbnail"] = self.thumbnail
-        data["user"] = self.user
+    def get_export_names():
+        return ["source",
+        "title",
+        "description",
+        "link",
+        "date_published",
+        "persistent",
+        "dead",
+        "artist",
+        "album",
+        "user",
+        "language",
+        "thumbnail",
+        ]
 
-        return data
+    def get_map(self):
+        output_data = {}
+
+        export_names = LinkDataModel.get_export_names()
+        for export_name in export_names:
+            val = getattr(self, export_name)
+            if export_name.find("date_") >= 0:
+                val = val.isoformat()
+            output_data[export_name] = val
+
+        return output_data
 
     def get_map_full(self):
         themap = self.get_map()
@@ -550,9 +580,9 @@ class UserConfig(models.Model):
     )
 
     DISPLAY_TYPE_CHOICES = (
-        ("std", "standard"),
-        ("tags", "clickable-tags"),
-        ("twolines", "line-and-buttons"),
+        ("standard", "standard"),
+        ("clickable-tags", "clickable-tags"),
+        ("line-and-buttons", "line-and-buttons"),
         ("youtube-thumbnails", "youtube-thumbnails"),
     )
 

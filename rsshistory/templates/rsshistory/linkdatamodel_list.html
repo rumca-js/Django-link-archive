@@ -28,7 +28,7 @@
   <div class="linklist container_{{user_config.display_type}}">
     {% for link in entries_list %}
           {% if user_config.display_type == "clickable-tags" %}
-             <span
+             <div
                  {% if link.persistent %}
                  title="{{link.get_title}} {{link.get_long_description}}"
                     class="element_{{user_config.display_type}} element_{{user_config.display_type}}_selected"
@@ -39,17 +39,30 @@
 
                <div class="linklistitem">
                    <a href="{{ link.get_absolute_url }}" class="linklistitemtitle">
-                      {% if user_config.show_icons %}
-                      <img src="{{link.get_favicon}}" class="content-icon"/>
-                      {% endif %}
+                      <div>
+                          {% if user_config.show_icons %}
+                            <img src=
+                              {% if user_config.thumbnails_as_icons %}
+                                  "{{link.get_thumbnail}}"
+                              {% else %}
+                                  "{{link.get_favicon}}"
+                              {% endif %}
+                              {% if user_config.small_icons %}
+                                 class="content-icon"
+                              {% else %}
+                                 class="linklistthumbnail"
+                              {% endif %}
+                                 />
+                          {% endif %}
 
-                      {{link.get_title}} {{link.get_long_description}}
+                          {{link.get_title}} {{link.get_long_description}}
+                      </div>
                    </a>
                   <div class="linklistitemdescription">
                       {% if link.get_tag_string %}
                       Tags: 
                           {% for tag in link.get_tag_map %}
-                              <a href="{% url 'entries'%}?tag={{tag}}" class="simplebutton">{{tag}}</a>
+                              <a href='{% url 'rsshistory:entries'%}?tag="{{tag}}"' class="simplebutton">{{tag}}</a>
                           {% endfor %}
                       {% endif %}
                       {% if link.persistent %}
@@ -58,40 +71,58 @@
 
                   </div>
                </div>
-             </span>
+             </div>
           {% elif user_config.display_type == "line-and-buttons" %}
-              <a href="{{ link.get_absolute_url }}"
-                 title="{{link.get_title}} {{link.get_long_description}}"
-                 {% if link.persistent %}
-                    class="element_{{user_config.display_type}} element_{{user_config.display_type}}_selected"
-                 {% else %}
-                    class="element_{{user_config.display_type}}"
-                 {% endif %}
-                      >
+             <div
+                     title="{{link.get_title}} {{link.get_long_description}}"
+                     {% if link.persistent %}
+                        class="element_{{user_config.display_type}} element_{{user_config.display_type}}_selected"
+                     {% else %}
+                        class="element_{{user_config.display_type}}"
+                     {% endif %}
+                 >
+                  <a href="{{ link.link }}" >
+                      <div>
 
-                <div class="linklistitem">
-                   <img src="{{link.get_favicon}}" class="content-icon"/>
-                  <span class="linklistitemtitle">{{link.get_title}}</span> {{link.get_full_description}}
-                </div>
-              </a>
+                          {% if user_config.show_icons %}
+                            <img src=
+                              {% if user_config.thumbnails_as_icons %}
+                                  "{{link.get_thumbnail}}"
+                              {% else %}
+                                  "{{link.get_favicon}}"
+                              {% endif %}
+                              {% if user_config.small_icons %}
+                                 class="content-icon"
+                              {% else %}
+                                 class="linklistthumbnail"
+                              {% endif %}
+                                 />
+                          {% endif %}
+                      <span class="linklistitemtitle">{{link.get_title}}</span>
+                      <span class="linklistitemdescription">{{link.get_full_description}}</span>
+                      </div>
+                  </a>
 
               {% if user.is_staff %}
-                 <a href="{{ link.get_absolute_url }}" class="simplebutton">
-                    Details
-                 </a>
-                 {% if link.persistent %}
-                  <a href="{% url 'entry-notstar' link.id %}" class="simplebutton">
-                   Not bookmarked
-                  </a>
-                  <a href="{% url 'entry-tag' link.id %}" class="simplebutton">Tag entry</a>
-                 {% else %}
-                  <a href="{% url 'entry-star' link.id %}" class="simplebutton">
-                   Bookmark
-                  </a>
-                 {% endif %}
+                  <div>
+                     <a href="{{ link.get_absolute_url }}" class="simplebutton">
+                        Details
+                     </a>
+                     {% if link.persistent %}
+                      <a href="{% url 'rsshistory:entry-notstar' link.id %}" class="simplebutton">
+                       Not bookmarked
+                      </a>
+                      <a href="{% url 'rsshistory:entry-tag' link.id %}" class="simplebutton">Tag entry</a>
+                     {% else %}
+                      <a href="{% url 'rsshistory:entry-star' link.id %}" class="simplebutton">
+                       Bookmark
+                      </a>
+                     {% endif %}
+                  </div>
               {% else %}
                   <hr>
               {% endif %}
+             </div>
           {% elif user_config.display_type == "youtube-thumbnails" %}
               <a href="{{ link.get_absolute_url }}"
                  title="{{link.get_title}} {{link.get_long_description}}"
@@ -110,8 +141,8 @@
                           {% endif %}
                              width="100%"/>
                       {% endif %}
-                       <div>{{link.get_title}}</div>
-                       <div>{{link.get_long_description}}</div>
+                       <span class="linklistitemtitle">{{link.get_title}}</span>
+                       <span class="linklistitemdescription">{{link.get_long_description}}</span>
                       </a>
 
               <!-- mainly std, and otther -->
@@ -134,20 +165,19 @@
                       {% endif %}
 
                       {% if user_config.small_icons %}
-                         class="content-icon"/>
+                         class="content-icon"
                       {% else %}
-                         class="linklistthumbnail"/>
+                         class="linklistthumbnail"
                       {% endif %}
+                     />
                   {% endif %}
 
-                <div class="linklistitem">
-                    <span class="linklistitemtitle">
-                         {{link.get_title}}
-                    </span>
-                    <span class="linklistitemdescription">
-                         {{link.get_full_description}}
-                    </span>
-                </div>
+                  <span class="linklistitemtitle">
+                       {{link.get_title}}
+                  </span>
+                  <span class="linklistitemdescription">
+                       {{link.get_full_description}}
+                  </span>
               </a>
           {% endif %}
     {% endfor %}
