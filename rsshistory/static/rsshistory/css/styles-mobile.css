@@ -116,6 +116,10 @@ display: contents;
   text-decoration: none;
   margin-bottom:3px;
 }
+.element_standard a {
+  color: black;
+  text-decoration: none;
+}
 .element_standard:hover {
   background-color: #f4f4f4;
   color: blue;
@@ -132,6 +136,10 @@ display: contents;
   display: flex;
   flex-wrap: wrap;
 }
+.element_clickable-tags a {
+  color: black;
+  text-decoration: none;
+}
 .element_clickable-tags:hover {
   background-color: #f4f4f4;
   color: blue;
@@ -147,6 +155,10 @@ display: contents;
   margin-bottom:3px;
   display: flex;
   flex-wrap: wrap;
+}
+.element_line-and-buttons a {
+  color: black;
+  text-decoration: none;
 }
 .element_line-and-buttons:hover {
   background-color: #f4f4f4;
@@ -166,6 +178,10 @@ display: contents;
   display:flex;
   flex-direction:column;
 }
+.element_youtube-thumbnails a {
+  color: black;
+  text-decoration: none;
+}
 .element_youtube-thumbnails:hover {
   background-color: #f4f4f4;
   color: blue;
@@ -182,10 +198,6 @@ display: contents;
   font-weight: bold;
   text-align: left;
   text-decoration: none;
-  color:black;
-}
-.linklistitemtitle:hover {
-  color:blue;
 }
 
 .linklistitemdescription {

@@ -52,7 +52,7 @@ def configuration_page(request):
     form = ConfigForm(instance=ob)
 
     form.method = "POST"
-    form.action_url = reverse("{}:configuration".format(ConfigForm.app_name))
+    form.action_url = reverse("{}:configuration".format(ContextData.app_name))
 
     context["config_form"] = form
 
