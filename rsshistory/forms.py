@@ -67,6 +67,20 @@ class ExportDailyDataForm(forms.Form):
     time_stop = forms.DateField(label="Stop time")
 
 
+class LinkInputForm(forms.Form):
+    link = forms.CharField(label="Link", max_length=500)
+
+    def get_information(self):
+        return self.cleaned_data
+
+
+class SourceInputForm(forms.Form):
+    url = forms.CharField(label="Source URL", max_length=500)
+
+    def get_information(self):
+        return self.cleaned_data
+
+
 class ExportTopicForm(forms.Form):
     tag = forms.CharField(label="Tag", max_length=500)
 
@@ -77,6 +91,83 @@ class YouTubeLinkSimpleForm(forms.Form):
     """
 
     youtube_link = forms.CharField(label="YouTube Link URL", max_length=500)
+
+
+class EntryForm(forms.ModelForm):
+    """
+    Category choice form
+    """
+
+    class Meta:
+        model = LinkDataModel
+        fields = [
+            "link",
+            "title",
+            "description",
+            "date_published",
+            "source",
+            "persistent",
+            "language",
+            "user",
+            "artist",
+            "album",
+            "thumbnail",
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super(EntryForm, self).__init__(*args, **kwargs)
+        self.fields["link"].required = True
+        self.fields["source"].required = False
+        self.fields["language"].required = False
+        self.fields["description"].required = False
+        self.fields["title"].required = False
+        self.fields["artist"].required = False
+        self.fields["album"].required = False
+        self.fields["persistent"].initial = True
+        self.fields["user"].widget.attrs["readonly"] = True
+        self.fields["thumbnail"].required = False
+
+    def get_information(self):
+        return self.cleaned_data
+
+    def save_form(self, data):
+        source = data["source"]
+        title = data["title"]
+        description = data["description"]
+        link = data["link"]
+        date_published = data["date_published"]
+        persistent = data["persistent"]
+        language = data["language"]
+        user = data["user"]
+        thumbnail = data["thumbnail"]
+
+        if not title or not source:
+            return False
+
+        source_obj = None
+        sources = SourceDataModel.objects.filter(url=source)
+        if sources.exists():
+            source_obj = sources[0]
+
+        links = LinkDataModel.objects.filter(link=link)
+        if len(links) > 0:
+            return False
+
+        entry = LinkDataModel(
+            source=source,
+            title=title,
+            description=description,
+            link=link,
+            date_published=date_published,
+            persistent=persistent,
+            thumbnail=thumbnail,
+            language=language,
+            user=user,
+            source_obj=source_obj,
+        )
+
+        entry.save()
+        return True
 
 
 class SourceForm(forms.ModelForm):
@@ -151,125 +242,6 @@ class TagRenameForm(forms.Form):
     current_tag = forms.CharField(label="Current tag", max_length=100)
     new_tag = forms.CharField(label="New tag", max_length=100)
 
-
-class EntryForm(forms.ModelForm):
-    """
-    Category choice form
-    """
-
-    class Meta:
-        model = LinkDataModel
-        fields = [
-            "link",
-            "title",
-            "description",
-            "date_published",
-            "source",
-            "persistent",
-            "language",
-            "user",
-            "artist",
-            "album",
-        ]
-
-    def __init__(self, *args, **kwargs):
-        super(EntryForm, self).__init__(*args, **kwargs)
-        self.fields["link"].required = True
-        self.fields["source"].required = False
-        self.fields["language"].required = False
-        self.fields["description"].required = False
-        self.fields["title"].required = False
-        self.fields["artist"].required = False
-        self.fields["album"].required = False
-        self.fields["persistent"].initial = True
-        self.fields["user"].widget.attrs["readonly"] = True
-
-    def get_information(self):
-        return self.cleaned_data
-
-    def get_full_information(self):
-        data = self.get_information()
-        return self.update_info(data)
-
-    def update_info(self, data):
-        from .webtools import Page
-
-        p = Page(data["link"])
-
-        data["thumbnail"] = None
-
-        if p.is_youtube():
-            self.update_info_youtube(data)
-
-        return self.update_info_default(data)
-
-    def update_info_youtube(self, data):
-        from .pluginentries.youtubelinkhandler import YouTubeLinkHandler
-
-        h = YouTubeLinkHandler(data["link"])
-        h.download_details()
-
-        data["source"] = h.get_channel_feed_url()
-        data["link"] = h.get_link_url()
-        data["title"] = h.get_title()
-        data["description"] = h.get_description()
-        data["date_published"] = h.get_datetime_published()
-        data["thumbnail"] = h.get_thumbnail()
-
-        return data
-
-    def update_info_default(self, data):
-        from .webtools import Page
-
-        p = Page(data["link"])
-        if not data["source"]:
-            data["source"] = p.get_domain()
-        if not data["language"]:
-            data["language"] = p.get_language()
-        if not data["title"]:
-            data["title"] = p.get_title()
-        if not data["description"]:
-            data["description"] = p.get_title()
-        return data
-
-    def save_form(self, data):
-        source = data["source"]
-        title = data["title"]
-        description = data["description"]
-        link = data["link"]
-        date_published = data["date_published"]
-        persistent = data["persistent"]
-        language = data["language"]
-        user = data["user"]
-        thumbnail = data["thumbnail"]
-
-        if not title or not source:
-            return False
-
-        source_obj = None
-        sources = SourceDataModel.objects.filter(url=source)
-        if sources.exists():
-            source_obj = sources[0]
-
-        links = LinkDataModel.objects.filter(link=link)
-        if len(links) > 0:
-            return False
-
-        entry = LinkDataModel(
-            source=source,
-            title=title,
-            description=description,
-            link=link,
-            date_published=date_published,
-            persistent=persistent,
-            thumbnail=thumbnail,
-            language=language,
-            user=user,
-            source_obj=source_obj,
-        )
-
-        entry.save()
-        return True
 
 
 class SourcesChoiceForm(forms.Form):

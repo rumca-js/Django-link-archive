@@ -80,6 +80,8 @@ class RssEntryDetailView(generic.DetailView):
 
 
 def add_entry(request):
+    from ..controllers import LinkDataController
+
     context = ContextData.get_context(request)
     context["page_title"] += " - Add entry"
 
@@ -104,7 +106,7 @@ def add_entry(request):
 
             return ContextData.render(request, "entry_edit_exists.html", context)
 
-        data = form.get_full_information()
+        data = LinkDataController.get_full_information(form.get_information())
         if valid:
             if not form.save_form(data):
                 context["summary_text"] = "Could not save link"
@@ -155,6 +157,45 @@ def add_entry(request):
         context["form_description_post"] = form_text
 
     return ContextData.render(request, "form_basic.html", context)
+
+
+def add_simple_entry(request):
+    from ..forms import ExportDailyDataForm, LinkInputForm
+    from ..controllers import LinkDataController
+
+    context = ContextData.get_context(request)
+    context["page_title"] += " - Add simple entry"
+
+    if not request.user.is_staff:
+        return ContextData.render(request, "missing_rights.html", context)
+
+    if request.method == "POST":
+        form = LinkInputForm(request.POST)
+        if form.is_valid():
+            link = form.cleaned_data['link']
+
+            ob = LinkDataModel.objects.filter(url=url)
+            if ob.exists():
+                context["form"] = form
+                context["entry"] = ob[0]
+
+                return ContextData.render(request, "entry_edit_exists.html", context)
+
+            data = LinkDataController.get_full_information({'link': link})
+
+            form = EntryForm(initial = data)
+            form.method = "POST"
+            form.action_url = reverse("{}:entry-add".format(ContextData.app_name))
+            context['form'] = form
+            
+            return ContextData.render(request, "form_basic.html", context)
+    else:
+        form = LinkInputForm()
+        form.method = "POST"
+
+        context["form"] = form
+
+        return ContextData.render(request, "form_basic.html", context)
 
 
 def edit_entry(request, pk):

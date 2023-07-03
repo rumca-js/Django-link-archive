@@ -2,7 +2,99 @@ from datetime import datetime, date, timedelta
 
 from django.db.models import Q
 
+from .models import SourceDataModel
 from .models import LinkCommentDataModel, BackgroundJob
+from .webtools import Page
+
+
+class SourceDataController(object):
+    def __init__(self, source=None):
+        pass
+
+    def get_full_information(data):
+        p = Page(data['url'])
+        # TODO if passed url is youtube video, obtain information, obtain channel feed url
+
+        wh1 = p.get_contents().find("<rss version=")
+        wh2 = p.get_contents().find("<feed")
+        if wh1 >= 0 or wh2 >= 0:
+             return SourceDataController.get_info_from_rss(data['url'])
+        else:
+             return SourceDataController.get_info_from_page(data['url'], p)
+
+    def get_info_from_rss(url):
+        import feedparser
+        feed = feedparser.parse(url)
+        data = {}
+        data["url"] = url
+        data["source_type"] = SourceDataModel.SOURCE_TYPE_RSS
+        if 'title' in feed.feed:
+            data["title"] = feed.feed.title
+        if 'subtitle' in feed.feed:
+            data["description"] = feed.feed.subtitle
+        if 'language' in feed.feed:
+            data["language"] = feed.feed.language
+        if 'image' in feed.feed:
+            data["favicon"] = feed.feed.image
+        return data
+
+    def get_info_from_page(url, p):
+        data = {}
+        data["url"] = url
+        data["source_type"] = SourceDataModel.SOURCE_TYPE_PARSE
+        data["language"] = p.get_language()
+        data["title"] = p.get_title()
+        data["description"] = p.get_title()
+        return data
+
+
+class LinkDataController(object):
+    def __init__(self, link=None):
+        pass
+
+    def get_full_information(data):
+        return LinkDataController.update_info(data)
+
+    def update_info(data):
+        from .webtools import Page
+
+        p = Page(data["link"])
+
+        data["thumbnail"] = None
+
+        if p.is_youtube():
+            LinkDataController.update_info_youtube(data)
+
+        return LinkDataController.update_info_default(data)
+
+    def update_info_youtube(data):
+        from .pluginentries.youtubelinkhandler import YouTubeLinkHandler
+
+        h = YouTubeLinkHandler(data["link"])
+        h.download_details()
+
+        data["source"] = h.get_channel_feed_url()
+        data["link"] = h.get_link_url()
+        data["title"] = h.get_title()
+        data["description"] = h.get_description()
+        data["date_published"] = h.get_datetime_published()
+        data["thumbnail"] = h.get_thumbnail()
+
+        return data
+
+    def update_info_default(data):
+        from .webtools import Page
+
+        p = Page(data["link"])
+        if "source" not in data or not data["source"]:
+            data["source"] = p.get_domain()
+        if "language" not in data or not data["language"]:
+            data["language"] = p.get_language()
+        if "title" not in data or not data["title"]:
+            data["title"] = p.get_title()
+        if "description" not in data or not data["description"]:
+            data["description"] = p.get_title()
+        return data
 
 
 class LinkCommentDataController(object):

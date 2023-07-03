@@ -3,10 +3,10 @@
 
 {% block content %}
 
-  <a href="{% url 'rsshistory:source-add' %}" class="mainbutton">
+  <a href="{% url 'rsshistory:source-add-simple' %}" class="mainbutton">
       <img src="{% static 'rsshistory/icons/icons8-channel-add-96.png' %}" class="content-icon" />
         Add source</a>
-  <a href="{% url 'rsshistory:entry-add' %}" class="mainbutton">
+  <a href="{% url 'rsshistory:entry-add-simple' %}" class="mainbutton">
         <img src="{% static 'rsshistory/icons/icons8-add-link-96.png' %}" class="content-icon" />
         Add entry</a>
 
@@ -34,7 +34,7 @@
          >
            <div class="linklistitem">
              {% if user_config.show_icons %}
-               <img src="{{source.get_favicon}}" width="20">
+               <img src="{{source.get_favicon}}" class="content-icon"/>
              {% endif %}
              <span class="linklistitemtitle">{{source.title}}</span>
              <span class="linklistitemdescription">

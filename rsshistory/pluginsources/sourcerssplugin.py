@@ -121,7 +121,7 @@ class BaseRssPlugin(SourceGenericPlugin):
             except Exception as e:
                 PersistentInfo.error(
                     "Rss parser datetime invalid feed datetime:{}; Exc:{} {}\n{}".format(
-                        feed_entry.published, str(e), error_text
+                        feed_entry.published, str(e), ""
                     )
                 )
                 output_map["published"] = DateUtils.get_datetime_now_utc()

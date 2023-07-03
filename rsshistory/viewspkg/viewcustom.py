@@ -81,6 +81,9 @@ def system_status(request):
     context["UserConfig"] = len(UserConfig.objects.all())
     context["BackgroundJob"] = len(BackgroundJob.objects.all())
 
+    from ..dateutils import DateUtils
+    context["Current_DateTime"] = DateUtils.get_datetime_now_utc()
+
     from ..models import PersistentInfo
 
     context["log_items"] = PersistentInfo.get_safe()

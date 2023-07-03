@@ -89,6 +89,44 @@ def add_source(request):
     return ContextData.render(request, "form_basic.html", context)
 
 
+def add_source_simple(request):
+    from ..forms import SourceInputForm
+    from ..controllers import SourceDataController
+
+    context = ContextData.get_context(request)
+    context["page_title"] += " - add source"
+
+    if not request.user.is_staff:
+        return ContextData.render(request, "missing_rights.html", context)
+
+    if request.method == "POST":
+        form = SourceInputForm(request.POST)
+        if form.is_valid():
+            url = form.cleaned_data['url']
+
+            ob = SourceDataModel.objects.filter(url=url)
+            if ob.exists():
+                context["form"] = form
+                context["source"] = ob[0]
+
+                return ContextData.render(request, "source_edit_exists.html", context)
+
+            data = SourceDataController.get_full_information({'url': url})
+
+            form = SourceForm(initial = data)
+            form.method = "POST"
+            form.action_url = reverse("{}:source-add".format(ContextData.app_name))
+            context['form'] = form
+
+    else:
+        form = SourceInputForm()
+        form.method = "POST"
+
+        context["form"] = form
+
+    return ContextData.render(request, "form_basic.html", context)
+
+
 def edit_source(request, pk):
     context = ContextData.get_context(request)
     context["page_title"] += " - edit source"
