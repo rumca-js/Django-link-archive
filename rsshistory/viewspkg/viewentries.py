@@ -174,7 +174,7 @@ def add_simple_entry(request):
         if form.is_valid():
             link = form.cleaned_data['link']
 
-            ob = LinkDataModel.objects.filter(url=url)
+            ob = LinkDataModel.objects.filter(link=link)
             if ob.exists():
                 context["form"] = form
                 context["entry"] = ob[0]
@@ -182,6 +182,7 @@ def add_simple_entry(request):
                 return ContextData.render(request, "entry_edit_exists.html", context)
 
             data = LinkDataController.get_full_information({'link': link})
+            data['user'] = request.user.username
 
             form = EntryForm(initial = data)
             form.method = "POST"
