@@ -4,6 +4,7 @@ from .sourcecodeprojectplugin import CodeProjectPlugin
 from .sourceniezaleznaplugin import NiezaleznaPlugin
 from .sourcetvn24plugin import TVN24Plugin
 from .sourcespotifyplugin import SpotifyPlugin
+from .sourcegenerousparserplugin import SourceGenerousParserPlugin
 
 
 class SourceControllerBuilder(object):
@@ -12,6 +13,7 @@ class SourceControllerBuilder(object):
         NiezaleznaPlugin,
         TVN24Plugin,
         SpotifyPlugin,
+        SourceGenerousParserPlugin
     ]
 
     def get(source):

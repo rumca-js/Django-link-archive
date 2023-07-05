@@ -20,6 +20,7 @@ from .apps import LinkDatabase
 class SourceDataModel(models.Model):
     SOURCE_TYPE_RSS = "BaseRssPlugin"
     SOURCE_TYPE_PARSE = "BaseParsePlugin"
+    SOURCE_TYPE_GENEROUS_PARSE = "SourceGenerousParserPlugin"
     SOURCE_TYPE_CODEPROJECT = "CodeProjectPlugin"
     SOURCE_TYPE_INSTALKI = "InstalkiPlugin"
     SOURCE_TYPE_NIEZALEZNA = "NiezaleznaPlugin"
@@ -30,6 +31,7 @@ class SourceDataModel(models.Model):
     SOURCE_TYPES = (
         (SOURCE_TYPE_RSS, SOURCE_TYPE_RSS),                     #
         (SOURCE_TYPE_PARSE, SOURCE_TYPE_PARSE),                 #
+        (SOURCE_TYPE_GENEROUS_PARSE, SOURCE_TYPE_GENEROUS_PARSE),                 #
         (SOURCE_TYPE_CODEPROJECT, SOURCE_TYPE_CODEPROJECT),     #
         (SOURCE_TYPE_INSTALKI, SOURCE_TYPE_INSTALKI),           #
         (SOURCE_TYPE_NIEZALEZNA, SOURCE_TYPE_NIEZALEZNA),       #

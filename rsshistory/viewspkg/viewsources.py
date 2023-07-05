@@ -221,6 +221,28 @@ def remove_source(request, pk):
     return ContextData.render(request, "summary_present.html", context)
 
 
+def source_remove_entries(request, pk):
+    context = ContextData.get_context(request)
+    context["page_title"] += " - remove source entries"
+
+    if not request.user.is_staff:
+        return ContextData.render(request, "missing_rights.html", context)
+
+    ft = SourceDataModel.objects.filter(id=pk)
+    if ft.exists():
+        entries = LinkDataModel.objects.filter(source = ft[0].url)
+        if entries.exists():
+            entries.delete()
+            context["summary_text"] = "Remove ok"
+            context['summary_text'] = str(entries)
+        else:
+            context["summary_text"] = "No entries to remove"
+    else:
+        context["summary_text"] = "No source for ID: " + str(pk)
+
+    return ContextData.render(request, "summary_present.html", context)
+
+
 def remove_all_sources(request):
     context = ContextData.get_context(request)
     context["page_title"] += " - remove all links"

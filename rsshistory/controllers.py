@@ -2,7 +2,7 @@ from datetime import datetime, date, timedelta
 
 from django.db.models import Q
 
-from .models import SourceDataModel
+from .models import LinkDataModel, SourceDataModel
 from .models import LinkCommentDataModel, BackgroundJob
 from .webtools import Page
 

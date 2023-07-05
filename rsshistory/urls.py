@@ -21,6 +21,7 @@ urlpatterns = [
     path("source-add", viewsources.add_source, name="source-add"),
     path("source-add-simple", viewsources.add_source_simple, name="source-add-simple"),
     path("source-remove/<int:pk>/", viewsources.remove_source, name="source-remove"),
+    path("source-remove-entries/<int:pk>/", viewsources.source_remove_entries, name="source-remove-entries"),
     path("source-edit/<int:pk>/", viewsources.edit_source, name="source-edit"),
     path("source-refresh/<int:pk>/", viewsources.refresh_source, name="source-refresh"),
     path("source-archive/<int:pk>/", viewsources.wayback_save, name="source-archive"),
