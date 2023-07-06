@@ -86,7 +86,7 @@ migrate:
 update: migrate static
 
 test: migrations-check
-	@poetry run python manage.py test $(APP_NAME)
+	@poetry run python manage.py test $(APP_NAME) -v 2
 
 oncommit: reformat test
 
