@@ -2,21 +2,21 @@ from django.views import generic
 from django.urls import reverse
 from django.shortcuts import render
 
-from ..models import SourceDataModel, LinkDataModel, BackgroundJob
+from ..models import BackgroundJob
 from ..prjconfig import Configuration
-from ..forms import SourceForm, SourcesChoiceForm, ConfigForm
+from ..forms import SourceForm, SourcesChoiceForm, ConfigForm, SourceChoiceArgsExtractor
 from ..views import ContextData
-from ..controllers import BackgroundJobController
+from ..controllers import SourceDataController, LinkDataController, BackgroundJobController
 
 
 class RssSourceListView(generic.ListView):
-    model = SourceDataModel
+    model = SourceDataController
     context_object_name = "source_list"
     paginate_by = 100
 
     def get_queryset(self):
-        self.filter_form = SourcesChoiceForm(args=self.request.GET)
-        return self.filter_form.get_filtered_objects()
+        self.extractor = SourceChoiceArgsExtractor(self.request.GET)
+        return self.extractor.get_filtered_objects()
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
@@ -24,7 +24,8 @@ class RssSourceListView(generic.ListView):
         context = ContextData.init_context(self.request, context)
         # Create any data and add it to the context
 
-        self.filter_form.create()
+        self.filter_form = SourcesChoiceForm(args=self.request.GET)
+        self.filter_form.create(self.extractor.filtered_objects)
         self.filter_form.method = "GET"
         self.filter_form.action_url = reverse("{}:sources".format(ContextData.app_name))
 
@@ -35,7 +36,7 @@ class RssSourceListView(generic.ListView):
 
 
 class RssSourceDetailView(generic.DetailView):
-    model = SourceDataModel
+    model = SourceDataController
 
     def get_context_data(self, **kwargs):
         from ..pluginsources.sourcecontrollerbuilder import SourceControllerBuilder
@@ -45,7 +46,10 @@ class RssSourceDetailView(generic.DetailView):
         context = ContextData.init_context(self.request, context)
 
         context["page_title"] = self.object.title
-        context["handler"] = SourceControllerBuilder.get(self.object)
+        try:
+            context["handler"] = SourceControllerBuilder.get(self.object)
+        except:
+            pass
 
         return context
 
@@ -104,7 +108,7 @@ def add_source_simple(request):
         if form.is_valid():
             url = form.cleaned_data['url']
 
-            ob = SourceDataModel.objects.filter(url=url)
+            ob = SourceDataController.objects.filter(url=url)
             if ob.exists():
                 context["form"] = form
                 context["source"] = ob[0]
@@ -135,7 +139,7 @@ def edit_source(request, pk):
     if not request.user.is_staff:
         return ContextData.render(request, "missing_rights.html", context)
 
-    ft = SourceDataModel.objects.filter(id=pk)
+    ft = SourceDataController.objects.filter(id=pk)
     if not ft.exists():
         return ContextData.render(request, "source_edit_does_not_exist.html", context)
 
@@ -184,7 +188,7 @@ def refresh_source(request, pk):
     if not request.user.is_staff:
         return ContextData.render(request, "missing_rights.html", context)
 
-    ft = SourceDataModel.objects.filter(id=pk)
+    ft = SourceDataController.objects.filter(id=pk)
     if not ft.exists():
         return ContextData.render(request, "source_edit_does_not_exist.html", context)
 
@@ -209,7 +213,7 @@ def remove_source(request, pk):
     if not request.user.is_staff:
         return ContextData.render(request, "missing_rights.html", context)
 
-    ft = SourceDataModel.objects.filter(id=pk)
+    ft = SourceDataController.objects.filter(id=pk)
     if ft.exists():
         source_url = ft[0].url
         ft.delete()
@@ -228,9 +232,9 @@ def source_remove_entries(request, pk):
     if not request.user.is_staff:
         return ContextData.render(request, "missing_rights.html", context)
 
-    ft = SourceDataModel.objects.filter(id=pk)
+    ft = SourceDataController.objects.filter(id=pk)
     if ft.exists():
-        entries = LinkDataModel.objects.filter(source = ft[0].url)
+        entries = LinkDataController.objects.filter(source = ft[0].url)
         if entries.exists():
             entries.delete()
             context["summary_text"] = "Remove ok"
@@ -250,7 +254,7 @@ def remove_all_sources(request):
     if not request.user.is_staff:
         return ContextData.render(request, "missing_rights.html", context)
 
-    ft = SourceDataModel.objects.all()
+    ft = SourceDataController.objects.all()
     if ft.exists():
         ft.delete()
         context["summary_text"] = "Removing all sources ok"
@@ -268,7 +272,7 @@ def wayback_save(request, pk):
         return ContextData.render(request, "missing_rights.html", context)
 
     if ConfigurationEntry.get().source_archive:
-        source = SourceDataModel.objects.get(id=pk)
+        source = SourceDataController.objects.get(id=pk)
         BackgroundJobController.link_archive(subject=source.url)
 
         context["summary_text"] = "Added to waybacksave"
@@ -290,7 +294,7 @@ def process_source_text(request, pk):
 
     from ..pluginsources.rsssourceprocessor import RssSourceProcessor
 
-    source = SourceDataModel.objects.get(id=pk)
+    source = SourceDataController.objects.get(id=pk)
 
     proc = RssSourceProcessor()
     proc.process_parser_source(source, text)
@@ -310,7 +314,7 @@ def import_youtube_links_for_source(request, pk):
     if not request.user.is_staff:
         return ContextData.render(request, "missing_rights.html", context)
 
-    source_obj = SourceDataModel.objects.get(id=pk)
+    source_obj = SourceDataController.objects.get(id=pk)
 
     url = str(source_obj.url)
     wh = url.find("=")
@@ -348,9 +352,9 @@ def source_fix_entries(request, source_pk):
     if not request.user.is_staff:
         return ContextData.render(request, "missing_rights.html", context)
 
-    source_obj = SourceDataModel.objects.get(id=source_pk)
+    source_obj = SourceDataController.objects.get(id=source_pk)
 
-    entries = LinkDataModel.objects.filter(source=source_obj.url)
+    entries = LinkDataController.objects.filter(source=source_obj.url)
 
     summary_text = "Fixed following items:"
 

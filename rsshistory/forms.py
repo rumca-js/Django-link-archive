@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from django import forms
 
 from .models import (
@@ -7,6 +7,7 @@ from .models import (
     LinkTagsDataModel,
     LinkCommentDataModel,
 )
+from .controllers import SourceDataController, LinkDataController
 from .models import ConfigurationEntry, UserConfig
 
 
@@ -93,13 +94,126 @@ class YouTubeLinkSimpleForm(forms.Form):
     youtube_link = forms.CharField(label="YouTube Link URL", max_length=500)
 
 
+class OmniSearchForm(forms.Form):
+    """
+    Import links form
+    """
+
+    search = forms.CharField(label="Search for", max_length=500)
+
+
+class Conditions(object):
+    def __init__(self, data):
+        self.data = data
+
+    def is_data(self):
+        return len(self.data) > 0
+
+    def is_operator(self):
+        return self.data[0] in ('(', ')', '=', '!', '<', '>', '=', '&', '|', '^')
+
+    def get_operator(self):
+        return self.data
+
+    def is_condition(self):
+        return not self.is_operator()
+
+    def add(self, newchar):
+        self.data += str(newchar)
+
+    def ready(self):
+        self.data = self.data.strip()
+
+    def str(self):
+        return self.data
+
+    def __str__(self):
+        return self.data
+
+
+from django.db.models import Q
+class OmniSearchProcessor(object):
+    def __init__(self, data):
+        self.data = data
+        self.conditions = []
+
+    def is_operator(self, char):
+        return char in ('(', ')', '=', '!', '<', '>','&', '|', '^')
+
+    def is_condition(self, char):
+        return not self.is_operator(char)
+
+    def parse_conditions(self):
+        conditions = []
+        bracket_count = 0
+        current_condition = Conditions("")
+
+        for char in self.data:
+            if char == '(':
+                bracket_count += 1
+            elif char == ')':
+                bracket_count -= 1
+
+            if current_condition.is_data():
+                if self.is_operator(char) and current_condition.is_operator():
+                    current_condition.add(char)
+                elif self.is_condition(char) and current_condition.is_condition():
+                    current_condition.add(char)
+                else:
+                    current_condition.ready()
+                    conditions.append(current_condition)
+                    current_condition = Conditions(char)
+            else:
+                current_condition.add(char)
+
+        if current_condition.is_data():
+            current_condition.ready()
+            conditions.append(current_condition)
+
+        return conditions
+
+    def get_eval_query(self, celem):
+        c0 = celem[0].data
+        c1 = celem[1].data
+        c2 = celem[2].data
+
+        if c1 == "==":
+            return {c0 + "__exact" : c2}
+        if c1 == "=":
+            return {c0 + "__contains" : c2}
+        else:
+            return {c0 : c2}
+
+    def filter_queryset(self, queryset):
+        conditions = self.parse_conditions()
+
+        combined_q_object = None
+
+        for key in range(int((len(conditions)+1)/4)):
+            if key == 0:
+                condition_text = self.get_eval_query(conditions[key*4: key*4+3])
+                if combined_q_object is None:
+                    combined_q_object = Q(**condition_text)
+            else:
+                condition = conditions[key*4]
+                if condition.get_operator() == "&":
+                    condition_text = self.get_eval_query(conditions[key*4: key*4+3])
+                    combined_q_object &= Q(**condition_text)
+                if condition.get_operator() == "|":
+                    condition_text = self.get_eval_query(conditions[key*4: key*4+3])
+                    combined_q_object |= Q(**condition_text)
+
+        filtered_queryset = queryset.filter(combined_q_object)
+        return filtered_queryset
+
+
 class EntryForm(forms.ModelForm):
     """
     Category choice form
     """
 
     class Meta:
-        model = LinkDataModel
+        model = LinkDataController
         fields = [
             "link",
             "title",
@@ -145,15 +259,15 @@ class EntryForm(forms.ModelForm):
             return False
 
         source_obj = None
-        sources = SourceDataModel.objects.filter(url=source)
+        sources = SourceDataController.objects.filter(url=source)
         if sources.exists():
             source_obj = sources[0]
 
-        links = LinkDataModel.objects.filter(link=link)
+        links = LinkDataController.objects.filter(link=link)
         if len(links) > 0:
             return False
 
-        entry = LinkDataModel(
+        entry = LinkDataController(
             source=source,
             title=title,
             description=description,
@@ -176,7 +290,7 @@ class SourceForm(forms.ModelForm):
     """
 
     class Meta:
-        model = SourceDataModel
+        model = SourceDataController
         fields = [
             "url",
             "title",
@@ -225,7 +339,7 @@ class TagEntryForm(forms.ModelForm):
             if tag != "":
                 tags_set.add(tag)
 
-        link_objs = LinkDataModel.objects.filter(link=link)
+        link_objs = LinkDataController.objects.filter(link=link)
 
         for tag in tags_set:
             model = LinkTagsDataModel(
@@ -257,12 +371,9 @@ class SourcesChoiceForm(forms.Form):
         self.args = kwargs.pop("args", ())
         super().__init__(*args, **kwargs)
 
-    def get_filtered_objects(self):
-        parameter_map = self.get_filter_args()
-        self.filtered_objects = SourceDataModel.objects.filter(**parameter_map)
-        return self.filtered_objects
+    def create(self, filtered_objects):
+        self.filtered_objects = filtered_objects
 
-    def create(self):
         # how to unpack dynamic forms
         # https://stackoverflow.com/questions/60393884/how-to-pass-choices-dynamically-into-a-django-form
         categories = self.get_filtered_objects_values("category")
@@ -273,26 +384,13 @@ class SourcesChoiceForm(forms.Form):
         # https://stackoverflow.com/questions/10099710/how-to-manually-create-a-select-field-from-a-modelform-in-django
         attr = {"onchange": "this.form.submit()"}
 
-        # default form value
-        # https://stackoverflow.com/questions/604266/django-set-default-form-values
-        category_init = self.get_init("category")
-        subcategory_init = self.get_init("subcategory")
-        title_init = self.get_init("title")
-
         self.fields["category"].widget = forms.Select(choices=categories, attrs=attr)
-        self.fields["category"].initial = category_init
         self.fields["subcategory"].widget = forms.Select(
             choices=subcategories, attrs=attr
         )
-        self.fields["subcategory"].initial = subcategory_init
-        self.fields["title"].initial = title_init
-
-    def get_init(self, column):
-        filters = self.get_filter_args()
-        if column in filters:
-            return filters[column]
-        else:
-            return ""
+        self.fields["title"].widget = forms.Select(
+            choices=title, attrs=attr
+        )
 
     def get_filtered_objects_values(self, field):
         values = set()
@@ -316,6 +414,20 @@ class SourcesChoiceForm(forms.Form):
                     result.append((item, item))
         return result
 
+
+class SourceChoiceArgsExtractor(object):
+    def __init__(self, args):
+        self.args = args
+
+    def get_filtered_objects(self, input_query = None):
+        parameter_map = self.get_filter_args()
+
+        if input_query is None:
+            self.filtered_objects = SourceDataController.objects.filter(**parameter_map)
+        else:
+            self.filtered_objects = SourceDataController.objects.filter(Q(**parameter_map) & input_query)
+        return self.filtered_objects
+
     def get_filter_args(self):
         parameter_map = {}
 
@@ -334,53 +446,23 @@ class SourcesChoiceForm(forms.Form):
         return parameter_map
 
 
-class EntryChoiceForm(forms.Form):
-    """
-    Category choice form
-    """
+def my_date_to():
+    from .dateutils import DateUtils
+    return DateUtils.get_days_range()[1]
+def my_date_from():
+    from .dateutils import DateUtils
+    return DateUtils.get_days_range()[0]
 
-    # do not think too much about these settings, these will be overriden by 'create' method
-    search = forms.CharField(label="Search", max_length=500, required=False)
+
+class BasicEntryChoiceForm(forms.Form):
     category = forms.CharField(widget=forms.Select(choices=()), required=False)
     subcategory = forms.CharField(widget=forms.Select(choices=()), required=False)
     source_title = forms.CharField(widget=forms.Select(choices=()), required=False)
-    persistent = forms.BooleanField(required=False, initial=False)
-    language = forms.CharField(label="language", max_length=500, required=False)
-    user = forms.CharField(label="user", max_length=500, required=False)
-    tag = forms.CharField(label="tag", max_length=500, required=False)
-    date_to = forms.DateField(
-        required=False, initial=datetime.now() + timedelta(days=1)
-    )
-    date_from = forms.DateField(
-        required=False, initial=datetime.now() - timedelta(days=30)
-    )
 
-    def __init__(self, *args, **kwargs):
-        from .dateutils import DateUtils
-
-        self.args = kwargs.pop("args", ())
-        super().__init__(*args, **kwargs)
-
-        date_range = DateUtils.get_days_range(30)
-        self.fields["date_to"].initial = date_range[1]
-        self.fields["date_from"].initial = date_range[0]
-
-    def get_filtered_objects(self):
-        source_parameter_map = self.get_source_filter_args(False)
-        entry_parameter_map = self.get_entry_filter_args(False)
-
-        print("Entry parameter map: {}".format(str(entry_parameter_map)))
-
-        self.entries = []
-        self.entries = LinkDataModel.objects.filter(**entry_parameter_map)
-
-        return self.entries
-
-    def create(self):
+    def create(self, sources):
         # how to unpack dynamic forms
         # https://stackoverflow.com/questions/60393884/how-to-pass-choices-dynamically-into-a-django-form
-
-        self.get_sources()
+        self.sources = sources
 
         categories = self.get_filtered_objects_values("category")
         subcategories = self.get_filtered_objects_values("subcategory")
@@ -390,48 +472,11 @@ class EntryChoiceForm(forms.Form):
         # https://stackoverflow.com/questions/10099710/how-to-manually-create-a-select-field-from-a-modelform-in-django
         attr = {"onchange": "this.form.submit()"}
 
-        # default form value
-        # https://stackoverflow.com/questions/604266/django-set-default-form-values
-        category_init = self.get_source_init("category")
-        subcategory_init = self.get_source_init("subcategory")
-        title_init = self.get_source_init("title")
-
-        init = {}
-        init["language"] = ""
-        init["persistent"] = False
-        init["user"] = ""
-        init["tag"] = ""
-        if len(self.args) != 0:
-            init["language"] = self.args.get("language")
-            if "persistent" in self.cleaned_data:
-                init["persistent"] = True
-            init["user"] = self.args.get("user")
-            init["tag"] = self.args.get("tag")
-
         self.fields["category"].widget = forms.Select(choices=categories, attrs=attr)
-        self.fields["category"].initial = category_init
         self.fields["subcategory"].widget = forms.Select(
             choices=subcategories, attrs=attr
         )
-        self.fields["subcategory"].initial = subcategory_init
         self.fields["source_title"].widget = forms.Select(choices=title, attrs=attr)
-        self.fields["source_title"].initial = title_init
-        self.fields["persistent"].initial = init["persistent"]
-        self.fields["language"].initial = init["language"]
-        self.fields["user"].initial = init["user"]
-        self.fields["tag"].initial = init["tag"]
-
-        from .dateutils import DateUtils
-
-        days_range = DateUtils.get_days_range(30)
-        self.fields["date_to"].initial = days_range[1]
-        self.fields["date_from"].initial = days_range[0]
-
-        # self.fields['language'].widget.attrs.update({"style" : "display:none"})
-
-    def get_sources(self):
-        source_parameter_map = self.get_source_filter_args(False)
-        self.sources = SourceDataModel.objects.filter(**source_parameter_map)
 
     def get_filtered_objects_values(self, field):
         values = set()
@@ -446,13 +491,6 @@ class EntryChoiceForm(forms.Form):
 
         return dict_values
 
-    def get_source_init(self, column):
-        filters = self.get_source_filter_args(False)
-        if column in filters:
-            return filters[column]
-        else:
-            return ""
-
     def to_dict(self, alist):
         result = []
         for item in sorted(alist):
@@ -462,6 +500,71 @@ class EntryChoiceForm(forms.Form):
                 else:
                     result.append((item, item))
         return result
+
+
+class EntryBookmarksChoiceForm(BasicEntryChoiceForm):
+    """
+    Category choice form
+    """
+
+    # do not think too much about these settings, these will be overriden by 'create' method
+    search = forms.CharField(label="Search", max_length=500, required=False)
+    language = forms.CharField(label="language", max_length=500, required=False)
+    user = forms.CharField(label="user", max_length=500, required=False)
+    tag = forms.CharField(label="tag", max_length=500, required=False)
+    date_to = forms.DateField(
+        required=False, initial = my_date_to
+    )
+    date_from = forms.DateField(
+        required=False, initial = my_date_from
+    )
+
+
+class EntryChoiceForm(BasicEntryChoiceForm):
+    """
+    Category choice form
+    """
+
+    # do not think too much about these settings, these will be overriden by 'create' method
+    search = forms.CharField(label="Search", max_length=500, required=False)
+    persistent = forms.BooleanField(required=False, initial=False)
+    language = forms.CharField(label="language", max_length=500, required=False)
+    user = forms.CharField(label="user", max_length=500, required=False)
+    tag = forms.CharField(label="tag", max_length=500, required=False)
+    date_to = forms.DateField(
+        required=False, initial = my_date_to
+    )
+    date_from = forms.DateField(
+        required=False, initial = my_date_from
+    )
+
+
+class EntryChoiceArgsExtractor(object):
+    def __init__(self, args):
+        self.args = args
+        self.time_constrained = True
+
+    def get_sources(self):
+        #source_parameter_map = self.get_source_filter_args(False)
+        #self.sources = SourceDataController.objects.filter(**source_parameter_map)
+        self.sources = SourceDataController.objects.all()
+
+    def set_time_constrained(self, constrained):
+        self.time_constrained = constrained
+
+    def get_filtered_objects(self, input_query = None):
+        source_parameter_map = self.get_source_filter_args(False)
+        entry_parameter_map = self.get_entry_filter_args(False)
+
+        print("Entry parameter map: {}".format(str(entry_parameter_map)))
+
+        
+        if input_query == None:
+            self.entries = LinkDataController.objects.filter(**entry_parameter_map)
+        else:
+            self.entries = LinkDataController.objects.filter(Q(**entry_parameter_map) & input_query)
+
+        return self.entries
 
     def get_source_filter_args(self, pure_data=True):
         parameter_map = {}
@@ -485,56 +588,91 @@ class EntryChoiceForm(forms.Form):
 
         return parameter_map
 
+    def get_default_range(self):
+        from .dateutils import DateUtils
+        return DateUtils.get_days_range()
+
+    def copy_if_is_set(self, dst, src, element):
+        if element in src and src[element] != "":
+            dst[element] = src[element]
+
+    def copy_if_is_set_and_translate(self, dst, src, element):
+        if element in src and src[element] != "":
+            if element == "search":
+                dst["title__icontains"] = src[element]
+            elif element == "language":
+                dst["language__icontains"] = src[element]
+            elif element == "category":
+                dst["source_obj__category"] = src[element]
+            elif element == "subcategory":
+                dst["source_obj__subcategory"] = src[element]
+            elif element == "source_title":
+                dst["source_obj__title"] = src[element]
+            elif element == "persistent":
+                if src[element] == "on":
+                    dst["persistent"] = True
+                else:
+                    dst["persistent"] = False
+            elif element == "tag":
+                if src[element].startswith('"'):
+                    dst["tags__tag"] = src[element][1:-1]
+                else:
+                    dst["tags__tag__icontains"] = src[element]
+            elif element == 'date_from':
+                if 'date_to' in src and src['date_to'] != "":
+                    dst["date_published__range"] = [
+                        src["date_from"],
+                        src["date_to"],
+                    ]
+            elif element == 'date_to':
+                pass
+            else:
+                dst[element] = src[element]
+
     def get_entry_filter_args(self, pure_data=True):
         parameter_map = {}
 
-        persistent = self.args.get("persistent")
-        if persistent:
-            persistent = True
-
-        search = self.args.get("search")
-        language = self.args.get("language")
-        user = self.args.get("user")
-
-        tag = self.args.get("tag")
-
-        category = self.args.get("category")
-        subcategory = self.args.get("subcategory")
-        source_title = self.args.get("source_title")
-
         if pure_data:
-            data = self.cleaned_data
-            if "persistent" in data and not data["persistent"]:
-                del data["persistent"]
-            return data
-        else:
-            tag_key, tag = self.get_tag_search()
+            self.copy_if_is_set(parameter_map, self.args, 'search')
+            self.copy_if_is_set(parameter_map, self.args, 'language')
+            self.copy_if_is_set(parameter_map, self.args, 'user')
+            self.copy_if_is_set(parameter_map, self.args, 'tag')
+            self.copy_if_is_set(parameter_map, self.args, 'category')
+            self.copy_if_is_set(parameter_map, self.args, 'subcategory')
+            self.copy_if_is_set(parameter_map, self.args, 'source_title')
+            self.copy_if_is_set(parameter_map, self.args, 'persistent')
+            self.copy_if_is_set(parameter_map, self.args, 'date_from')
+            self.copy_if_is_set(parameter_map, self.args, 'date_to')
 
-            if self.cleaned_data["date_from"] and self.cleaned_data["date_to"]:
-                parameter_map["date_published__range"] = [
-                    self.cleaned_data["date_from"],
-                    self.cleaned_data["date_to"],
-                ]
-            if persistent:
-                parameter_map["persistent"] = persistent
-            if search:
-                parameter_map["title__icontains"] = search
-            if language:
-                parameter_map["language__icontains"] = language
-            if user:
-                parameter_map["user"] = user
-            if tag:
-                parameter_map[tag_key] = tag
-            if category and category != "Any":
-                parameter_map["source_obj__category"] = category
-            if subcategory and subcategory != "Any":
-                parameter_map["source_obj__subcategory"] = subcategory
-            if source_title and source_title != "Any":
-                parameter_map["source_obj__title"] = source_title
+            if self.time_constrained:
+                date_range = self.get_default_range()
+                if 'date_from' not in parameter_map:
+                    parameter_map['date_from'] = date_range[0]
+                if 'date_to' not in parameter_map:
+                    parameter_map['date_to'] = date_range[1]
+
+            return parameter_map
+        else:
+            self.copy_if_is_set_and_translate(parameter_map, self.args, 'search')
+            self.copy_if_is_set_and_translate(parameter_map, self.args, 'language')
+            self.copy_if_is_set_and_translate(parameter_map, self.args, 'user')
+            self.copy_if_is_set_and_translate(parameter_map, self.args, 'tag')
+            self.copy_if_is_set_and_translate(parameter_map, self.args, 'category')
+            self.copy_if_is_set_and_translate(parameter_map, self.args, 'subcategory')
+            self.copy_if_is_set_and_translate(parameter_map, self.args, 'source_title')
+            self.copy_if_is_set_and_translate(parameter_map, self.args, 'persistent')
+            self.copy_if_is_set_and_translate(parameter_map, self.args, 'date_from')
+            self.copy_if_is_set_and_translate(parameter_map, self.args, 'date_to')
+
+            if self.time_constrained:
+                if 'date_published__range' not in parameter_map:
+                    date_range = self.get_default_range()
+                    parameter_map["date_published__range"] = [date_range[0], date_range[1]]
 
         return parameter_map
 
     def get_tag_search(self):
+        # TODO remove
         tag = self.args.get("tag")
         if tag is None:
             return None, None
@@ -556,31 +694,12 @@ class EntryChoiceForm(forms.Form):
     def get_filter_string(self):
         infilters = self.get_source_filter_args()
         infilters.update(self.get_entry_filter_args())
-        filters = {}
-        for key in infilters:
-            if (
-                infilters[key] is not None
-                and infilters[key] != ""
-                and infilters[key] != "Any"
-            ):
-                filters[key] = infilters[key]
-
-        if "cagetory" in filters and filters["category"] == "Any":
-            del filters["category"]
-        if "subcagetory" in filters and filters["subcategory"] == "Any":
-            del filters["subcategory"]
-        if "source_title" in filters and filters["source_title"] == "Any":
-            del filters["source_title"]
-
-        for filter_name in filters:
-            filtervalue = filters[filter_name]
-            if filtervalue and str(filtervalue).strip() == "":
-                del filters[filter_name]
 
         filter_string = ""
-        for key in filters:
-            filter_string += "&{0}={1}".format(key, filters[key])
+        for key in infilters:
+            filter_string += "&{0}={1}".format(key, infilters[key])
 
+        # TODO try urlencode
         return filter_string
 
 
@@ -601,7 +720,7 @@ class CommentEntryForm(forms.ModelForm):
     def save_comment(self):
         link_url = self.cleaned_data["link"]
 
-        entry = LinkDataModel.objects.get(link=link_url)
+        entry = LinkDataController.objects.get(link=link_url)
 
         comment = self.save(commit=False)
         comment.link_obj = entry

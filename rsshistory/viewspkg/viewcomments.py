@@ -6,15 +6,13 @@ from django.urls import reverse
 from django.shortcuts import render
 
 from ..models import (
-    SourceDataModel,
-    LinkDataModel,
     LinkTagsDataModel,
     LinkCommentDataModel,
 )
 from ..prjconfig import Configuration
 from ..forms import CommentEntryForm
 from ..views import ContextData
-from ..controllers import LinkCommentDataController
+from ..controllers import LinkCommentDataController, LinkDataController
 
 
 def entry_add_comment(request, link_id):
@@ -32,7 +30,7 @@ def entry_add_comment(request, link_id):
         return ContextData.render(request, "summary_present.html", context)
 
     print("Link id" + str(link_id))
-    link = LinkDataModel.objects.get(id=link_id)
+    link = LinkDataController.objects.get(id=link_id)
 
     # if this is a POST request we need to process the form data
     if request.method == "POST":

@@ -6,14 +6,13 @@
 
 {% for tag in tag_objects %}
     <span>
-        <a href='{% url 'rsshistory:entries'%}?tag="{{tag.0}}"' class="simplebutton" style="margin: 5px">
+        <a href='{% url 'rsshistory:entries-bookmarked'%}?tag="{{tag.0}}"' class="simplebutton" style="margin: 5px">
             {{tag.0}} {{tag.1}}</a>
     </span>
 {% endfor %}
 
 <h2>Tag management</h2>
 <ul>
-  <li><a href="{% url 'rsshistory:tags-show-recent' %}" class="simplebutton">Recent tags</a></li>
   <li><a href="{% url 'rsshistory:tags-show-all' %}" class="simplebutton">All tags</a></li>
 {% if user.is_staff %}
   <li><a href="{% url 'rsshistory:tag-rename' %}" class="simplebutton">Rename tag</a></li>

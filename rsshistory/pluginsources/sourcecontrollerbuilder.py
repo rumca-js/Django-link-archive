@@ -1,7 +1,7 @@
 from .sourceparseplugin import BaseParsePlugin
 from .sourcerssplugin import BaseRssPlugin
 from .sourcecodeprojectplugin import CodeProjectPlugin
-from .sourceniezaleznaplugin import NiezaleznaPlugin
+from .sourceparseditigsplugin import SourceParseDigitsPlugin
 from .sourcetvn24plugin import TVN24Plugin
 from .sourcespotifyplugin import SpotifyPlugin
 from .sourcegenerousparserplugin import SourceGenerousParserPlugin
@@ -10,7 +10,7 @@ from .sourcegenerousparserplugin import SourceGenerousParserPlugin
 class SourceControllerBuilder(object):
     plugins = [
         CodeProjectPlugin,
-        NiezaleznaPlugin,
+        SourceParseDigitsPlugin,
         TVN24Plugin,
         SpotifyPlugin,
         SourceGenerousParserPlugin

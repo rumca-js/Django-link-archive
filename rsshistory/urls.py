@@ -30,8 +30,11 @@ urlpatterns = [
     path("sources-remove-all/", viewsources.remove_all_sources, name="sources-remove-all"),
     path("source-fix-entries/<int:source_pk>/", viewsources.source_fix_entries, name="source-fix-entries",),
     # entries
-    path("entries/", viewentries.RssEntriesListView.as_view(), name="entries"),
-    path("entry/<int:pk>/", viewentries.RssEntryDetailView.as_view(), name="entry-detail"),
+    path("entries/", viewentries.EntriesSearchListView.as_view(), name="entries"),
+    path("entries-recent/", viewentries.EntriesRecentListView.as_view(), name="entries-recent"),
+    path("entries-untagged/", viewentries.EntriesNotTaggedView.as_view(), name="entries-untagged"),
+    path("entries-bookmarked/", viewentries.EntriesBookmarkedView.as_view(), name="entries-bookmarked"),
+    path("entry/<int:pk>/", viewentries.EntryDetailView.as_view(), name="entry-detail"),
     path("entry-add", viewentries.add_entry, name="entry-add"),
     path("entry-add-simple", viewentries.add_simple_entry, name="entry-add-simple"),
     path("entry-edit/<int:pk>/", viewentries.edit_entry, name="entry-edit"),
@@ -43,7 +46,6 @@ urlpatterns = [
     path("entry-download-video/<int:pk>/", viewcustom.download_video, name="entry-download-video",),
     path("entry-download/<int:pk>/", viewentries.download_entry, name="entry-download"),
     path("entry-archive/<int:pk>/", viewentries.wayback_save, name="entry-archive"),
-    path("entries-untagged/", viewentries.NotBookmarkedView.as_view(), name="entries-untagged"),
     path("searchinitview", viewentries.search_init_view, name="searchinitview"),
     # tags
     path("entry-tag/<int:pk>/", viewtags.tag_entry, name="entry-tag"),
@@ -81,6 +83,7 @@ urlpatterns = [
     path("fix-entry-tags/<int:entrypk>/", viewcustom.fix_entry_tags, name="fix-entry-tags",),
     path("show-yt-props", viewcustom.show_youtube_link_props, name="show-youtube-link-props",),
     path("test-page", viewcustom.test_page, name="test-page"),
+    path("test-form-page", viewcustom.test_form_page, name="test-form-page"),
     path("fix-bookmarked-yt", viewcustom.fix_bookmarked_yt, name="fix-bookmarked-yt"),
     path("clear-yt-cache", viewcustom.clear_youtube_cache, name="clear-yt-cache"),
     # login

@@ -1,8 +1,4 @@
 """
-TODO introduce proxy models
-
-https://www.benlopatin.com/using-django-proxy-models/
-https://www.geeksforgeeks.org/creating-multiple-user-types-and-using-proxy-models-in-python-django/
 """
 
 import traceback
@@ -23,7 +19,7 @@ class SourceDataModel(models.Model):
     SOURCE_TYPE_GENEROUS_PARSE = "SourceGenerousParserPlugin"
     SOURCE_TYPE_CODEPROJECT = "CodeProjectPlugin"
     SOURCE_TYPE_INSTALKI = "InstalkiPlugin"
-    SOURCE_TYPE_NIEZALEZNA = "NiezaleznaPlugin"
+    SOURCE_TYPE_DIGITS_START = "SourceParseDigitsPlugin"
     SOURCE_TYPE_TVN24 = "TVN24Plugin"
     SOURCE_TYPE_SPOTIFY = "SpotifyPlugin"
 
@@ -34,7 +30,7 @@ class SourceDataModel(models.Model):
         (SOURCE_TYPE_GENEROUS_PARSE, SOURCE_TYPE_GENEROUS_PARSE),                 #
         (SOURCE_TYPE_CODEPROJECT, SOURCE_TYPE_CODEPROJECT),     #
         (SOURCE_TYPE_INSTALKI, SOURCE_TYPE_INSTALKI),           #
-        (SOURCE_TYPE_NIEZALEZNA, SOURCE_TYPE_NIEZALEZNA),       #
+        (SOURCE_TYPE_DIGITS_START, SOURCE_TYPE_DIGITS_START),       #
         (SOURCE_TYPE_TVN24, SOURCE_TYPE_TVN24),                 #
         (SOURCE_TYPE_SPOTIFY, SOURCE_TYPE_SPOTIFY),             #
     )
@@ -57,148 +53,6 @@ class SourceDataModel(models.Model):
 
     class Meta:
         ordering = ["title"]
-
-    def get_absolute_url(self):
-        """Returns the URL to access a particular author instance."""
-        return reverse(
-            "{}:source-detail".format(LinkDatabase.name), args=[str(self.id)]
-        )
-
-    def get_days_to_remove(self):
-        days = 0
-        try:
-            days = int(self.remove_after_days)
-        except:
-            pass
-
-        return days
-
-    def get_long_description(self):
-        return "{} {}".format(self.category, self.subcategory)
-
-    def get_full_description(self):
-        return "{} Export:{} Fetched:{} Number of entries:{} Import seconds:{}".format(self.get_long_description(),
-            self.export_to_cms,
-            self.get_date_fetched(),
-            self.get_number_of_entries(),
-            self.get_import_seconds())
-
-    def is_fetch_possible(self):
-        from datetime import timedelta
-        from .dateutils import DateUtils
-
-        if self.on_hold:
-            return False
-
-        start_time = DateUtils.get_datetime_now_utc()
-
-        date_fetched = self.get_date_fetched()
-        if date_fetched:
-            time_since_update = start_time - date_fetched
-            # mins = time_since_update / timedelta(minutes=1)
-            secs = time_since_update / timedelta(seconds=1)
-
-            # if mins >= 30:
-            if secs >= self.fetch_period:
-                return True
-            return False
-
-        return True
-
-    def is_removeable(self):
-        days = self.get_days_to_remove()
-
-        if days > 0:
-            return True
-        else:
-            return False
-
-    def get_op_data(self):
-        objs = self.dynamic_data.all()
-        if len(objs) == 0:
-            return None
-        return objs[0]
-
-    def get_date_fetched(self):
-        obj = self.get_op_data()
-        if obj:
-            return obj.date_fetched
-
-    def get_import_seconds(self):
-        obj = self.get_op_data()
-        if obj:
-            return obj.import_seconds
-
-    def get_number_of_entries(self):
-        obj = self.get_op_data()
-        if obj:
-            return obj.number_of_entries
-
-    def set_operational_info(self, date_fetched, number_of_entries, import_seconds):
-        obj = self.get_op_data()
-        if obj:
-            obj.date_fetched = date_fetched
-            obj.import_seconds = import_seconds
-            obj.number_of_entries = number_of_entries
-            obj.save()
-        else:
-            objs = SourceOperationalData.objects.filter(url=self.url, source_obj=None)
-            if len(objs) >= 0:
-                objs.delete()
-
-            op = SourceOperationalData(
-                url=self.url,
-                date_fetched=date_fetched,
-                import_seconds=import_seconds,
-                number_of_entries=number_of_entries,
-                source_obj=self,
-            )
-            op.save()
-
-    def get_favicon(self):
-        if self.favicon:
-            return self.favicon
-
-        from .webtools import Page
-
-        page = Page(self.url)
-        domain = page.get_domain()
-        return domain + "/favicon.ico"
-
-    def get_domain(self):
-        from .webtools import Page
-
-        page = Page(self.url)
-        return page.get_domain()
-
-    def get_export_names():
-        return [
-                "url",
-                "title",
-                "category",
-                "subcategory",
-                "dead",
-                "export_to_cms",
-                "remove_after_days",
-                "language",
-                "favicon",
-                "on_hold",
-                "fetch_period",
-                "source_type",
-                ]
-
-    def get_map(self):
-        output_data = {}
-
-        export_names = SourceDataModel.get_export_names()
-        for export_name in export_names:
-            val = getattr(self, export_name)
-            output_data[export_name] = val
-
-        return output_data
-
-    def get_map_full(self):
-        return self.get_map()
 
 
 class SourceOperationalData(models.Model):
@@ -280,191 +134,6 @@ class LinkDataModel(models.Model):
     class Meta:
         ordering = ["-date_published", "source", "title"]
 
-    def get_absolute_url(self):
-        """Returns the URL to access a particular author instance."""
-        return reverse("{}:entry-detail".format(LinkDatabase.name), args=[str(self.id)])
-
-    def get_source_name(self):
-        if self.source_obj:
-            return self.source_obj.title
-        else:
-            return self.source
-
-    def get_link_dead_text(self):
-        return "______"
-
-    def get_title(self):
-        if self.dead:
-            return self.get_link_dead_text()
-        return self.title
-
-    def get_long_description(self):
-        if self.dead:
-            return self.get_link_dead_text()
-        return "{} {}".format(self.date_published, self.get_source_name())
-
-    def get_full_description(self):
-        if self.dead:
-            return self.get_link_dead_text()
-        string = "{} {}".format(self.date_published, self.get_source_name())
-        tags = self.get_tag_string()
-        if tags:
-            string += " Tags:{}".format(tags)
-        if self.user:
-            string += " User:{}".format(self.user)
-
-        return string
-
-    def get_tag_string(self):
-        return LinkTagsDataModel.join_elements(self.tags.all())
-
-    def get_tag_map(self):
-        # TODO should it be done by for tag in self.tags: tag.get_map()?
-        result = []
-        tags = self.tags.all()
-        for tag in tags:
-            result.append(tag.tag)
-        return result
-
-    def get_comment_map(self):
-        # TODO
-        return []
-
-    def update_language(self):
-        if self.source_obj:
-            self.language = self.source_obj.language
-            self.save()
-        else:
-            from .webtools import Page
-
-            page = Page(self.link)
-            if page.is_valid():
-                language = page.get_language()
-                if language != None:
-                    self.language = language
-                    self.save()
-
-    def get_favicon(self):
-        if self.source_obj:
-            return self.source_obj.get_favicon()
-
-        from .webtools import Page
-
-        page = Page(self.link)
-        domain = page.get_domain()
-        return domain + "/favicon.ico"
-
-    def get_thumbnail(self):
-        if self.thumbnail:
-            return self.thumbnail
-
-        return self.get_favicon()
-
-    def get_export_names():
-        return ["source",
-        "title",
-        "description",
-        "link",
-        "date_published",
-        "persistent",
-        "dead",
-        "artist",
-        "album",
-        "user",
-        "language",
-        "thumbnail",
-        ]
-
-    def get_map(self):
-        output_data = {}
-
-        export_names = LinkDataModel.get_export_names()
-        for export_name in export_names:
-            val = getattr(self, export_name)
-            if export_name.find("date_") >= 0:
-                val = val.isoformat()
-            output_data[export_name] = val
-
-        return output_data
-
-    def get_map_full(self):
-        themap = self.get_map()
-
-        tags = self.get_tag_map()
-        if len(tags) > 0:
-            themap["tags"] = tags
-
-        comments = self.get_comment_map()
-        if len(comments) > 0:
-            themap["comments"] = comments
-
-        return themap
-
-    def get_archive_link(self):
-        from .services.waybackmachine import WaybackMachine
-        from .dateutils import DateUtils
-
-        m = WaybackMachine()
-        formatted_date = m.get_formatted_date(self.date_published.date())
-        archive_link = m.get_archive_url_for_date(formatted_date, self.link)
-        return archive_link
-
-    def create_from_youtube(url, data):
-        from .pluginentries.youtubelinkhandler import YouTubeLinkHandler
-
-        objs = LinkDataModel.objects.filter(link=url)
-        if len(objs) != 0:
-            return False
-
-        h = YouTubeLinkHandler(url)
-        if not h.download_details():
-            PersistentInfo.error("Could not obtain details for link:{}".format(url))
-            return False
-
-        data = dict()
-        source = h.get_channel_feed_url()
-        if source is None:
-            PersistentInfo.error("Could not obtain channel feed url:{}".format(url))
-            return False
-
-        link = h.get_link_url()
-        title = h.get_title()
-        description = h.get_description()
-        date_published = h.get_datetime_published()
-        thumbnail = h.get_thumbnail()
-        artist = h.get_channel_name()
-
-        language = "en-US"
-        if "language" in data:
-            language = data["language"]
-        user = None
-        if "user" in data:
-            user = data["user"]
-        persistent = False
-        if "persistent" in data:
-            persistent = data["persistent"]
-
-        source_obj = None
-        sources = SourceDataModel.objects.filter(url=source)
-        if sources.exists():
-            source_obj = sources[0]
-
-        entry = LinkDataModel(
-            source=source,
-            title=title,
-            description=description,
-            link=link,
-            date_published=date_published,
-            persistent=persistent,
-            thumbnail=thumbnail,
-            artist=artist,
-            language=language,
-            user=user,
-            source_obj=source_obj,
-        )
-        entry.save()
-        return True
-
 
 class LinkTagsDataModel(models.Model):
     # https://stackoverflow.com/questions/14066531/django-model-with-unique-combination-of-two-fields
@@ -503,6 +172,19 @@ class LinkTagsDataModel(models.Model):
 
         if current_tags_objs.exists():
             return LinkTagsDataModel.join_elements(current_tags_objs)
+
+
+class LinkVoteDataModel(models.Model):
+    author = models.CharField(max_length=1000)
+    vote = models.IntegerField(null=True)
+
+    link_obj = models.ForeignKey(
+        LinkDataModel,
+        on_delete=models.CASCADE,
+        related_name="votes",
+        null=True,
+        blank=True,
+    )
 
 
 class LinkCommentDataModel(models.Model):

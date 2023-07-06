@@ -84,7 +84,12 @@ class DateUtils(object):
 
         return False
 
-    def get_days_range(number_of_days=30):
+    def get_days_range(number_of_days=10):
+        date_stop = date.today() + timedelta(days=1)
+        date_start = date.today() - timedelta(days=number_of_days)
+        return [date_start, date_stop]
+
+    def get_datetime_range(number_of_days=10):
         date_stop = datetime.now() + timedelta(days=1)
         date_start = datetime.now() - timedelta(days=number_of_days)
         return [date_start, date_stop]

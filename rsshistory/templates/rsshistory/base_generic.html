@@ -24,10 +24,16 @@
                 <a href="{% url 'rsshistory:index' %}" class="mainbutton">
                     <img src="{% static 'rsshistory/icons/icons8-home-96.png' %}" class="mainbutton-icon" />
                             Home</a>
+                <a href="{% url 'rsshistory:entries-recent' %}" class="mainbutton">
+                            <img src="{% static 'rsshistory/icons/icons8-new-100.png' %}" class="mainbutton-icon" />
+                            What's new</a>
+                <a href="{% url 'rsshistory:entries-bookmarked' %}" class="mainbutton">
+                            <img src="{% static 'rsshistory/icons/icons8-bookmarks-100.png' %}" class="mainbutton-icon" />
+                            Bookmarks</a>
                 <a href="{% url 'rsshistory:searchinitview' %}" class="mainbutton">
                             <img src="{% static 'rsshistory/icons/icons8-search-100.png' %}" class="mainbutton-icon" />
                             Search</a>
-                <a href="{% url 'rsshistory:tags-show-recent' %}" class="mainbutton">
+                <a href="{% url 'rsshistory:tags-show-all' %}" class="mainbutton">
                     <img src="{% static 'rsshistory/icons/icons8-tags-100.png' %}" class="mainbutton-icon" />
                             Tags</a>
                 <a href="{% url 'rsshistory:sources' %}" class="mainbutton">

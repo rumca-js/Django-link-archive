@@ -1,33 +1,33 @@
 from django.views import generic
 from django.urls import reverse
 from django.shortcuts import render
+from django.db.models import Q
 
 from ..models import (
-    SourceDataModel,
-    LinkDataModel,
     LinkTagsDataModel,
     BackgroundJob,
     ConfigurationEntry,
 )
 from ..prjconfig import Configuration
-from ..forms import EntryForm, EntryChoiceForm, ConfigForm
+from ..forms import EntryForm, EntryChoiceForm, ConfigForm, BasicEntryChoiceForm, EntryBookmarksChoiceForm
+from ..forms import EntryChoiceArgsExtractor
 from ..views import ContextData
-from ..controllers import BackgroundJobController
+from ..controllers import LinkDataController, SourceDataController, BackgroundJobController
 
 
-class RssEntriesListView(generic.ListView):
-    model = LinkDataModel
+class EntriesSearchListView(generic.ListView):
+    model = LinkDataController
     context_object_name = "entries_list"
-    paginate_by = 200
+    paginate_by = 100
 
     def get_queryset(self):
-        self.filter_form = EntryChoiceForm(self.request.GET, args=self.request.GET)
-        self.filter_form.is_valid()
-        return self.filter_form.get_filtered_objects()
+        self.extractor = EntryChoiceArgsExtractor(self.request.GET)
+        self.extractor.get_sources()
+        return self.extractor.get_filtered_objects()
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
-        context = super(RssEntriesListView, self).get_context_data(**kwargs)
+        context = super(EntriesSearchListView, self).get_context_data(**kwargs)
         context = ContextData.init_context(self.request, context)
         # Create any data and add it to the context
 
@@ -39,11 +39,61 @@ class RssEntriesListView(generic.ListView):
         context["rss_are_fetched"] = queue_size > 0
         context["rss_queue_size"] = queue_size
 
+        adict = self.extractor.get_entry_filter_args()
+
+        self.filter_form = EntryChoiceForm(adict)
+        self.filter_form.create(self.extractor.sources)
         self.filter_form.is_valid()
 
-        self.filter_form.create()
         self.filter_form.method = "GET"
         self.filter_form.action_url = reverse("{}:entries".format(ContextData.app_name))
+
+        context["args_extractor"] = self.extractor
+        context["reset_link"] = reverse("{}:searchinitview".format(ContextData.app_name))
+
+        context["filter_form"] = self.filter_form
+        if "search" in self.request.GET:
+            context["search_term"] = self.request.GET["search"]
+        elif "tag" in self.request.GET:
+            context["search_term"] = self.request.GET["tag"]
+
+        return context
+
+class EntriesRecentListView(generic.ListView):
+    model = LinkDataController
+    context_object_name = "entries_list"
+    paginate_by = 100
+
+    def get_queryset(self):
+        self.extractor = EntryChoiceArgsExtractor(self.request.GET)
+        self.extractor.get_sources()
+        return self.extractor.get_filtered_objects()
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get the context
+        context = super(EntriesRecentListView, self).get_context_data(**kwargs)
+        context = ContextData.init_context(self.request, context)
+        # Create any data and add it to the context
+
+        context["page_title"] += " - entries"
+
+        queue_size = BackgroundJobController.get_number_of_jobs(
+            BackgroundJob.JOB_PROCESS_SOURCE
+        )
+        context["rss_are_fetched"] = queue_size > 0
+        context["rss_queue_size"] = queue_size
+
+        adict = self.extractor.get_entry_filter_args()
+
+        self.filter_form = BasicEntryChoiceForm(adict)
+        self.filter_form.create(self.extractor.sources)
+
+        self.filter_form.is_valid()
+        self.filter_form.method = "GET"
+        self.filter_form.action_url = reverse("{}:entries-recent".format(ContextData.app_name))
+
+        context["args_extractor"] = self.extractor
+        context["reset_link"] = reverse("{}:entries-recent".format(ContextData.app_name))
 
         context["filter_form"] = self.filter_form
         if "search" in self.request.GET:
@@ -54,14 +104,103 @@ class RssEntriesListView(generic.ListView):
         return context
 
 
-class RssEntryDetailView(generic.DetailView):
-    model = LinkDataModel
+class EntriesNotTaggedView(generic.ListView):
+    # TODO inherit from entries view?
+    model = LinkDataController
+    context_object_name = "entries_list"
+    paginate_by = 100
+    template_name = ContextData.get_full_template("linkdatacontroller_list.html")
+
+    def get_queryset(self):
+        self.extractor = EntryChoiceArgsExtractor(self.request.GET)
+        self.extractor.get_sources()
+        return self.extractor.get_filtered_objects(Q(tags__tag__isnull=True, persistent=True))
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get the context
+        context = super(EntriesNotTaggedView, self).get_context_data(**kwargs)
+        context = ContextData.init_context(self.request, context)
+        # Create any data and add it to the context
+
+        context["page_title"] += " - not bookmarked"
+
+        queue_size = BackgroundJobController.get_number_of_jobs(
+            BackgroundJob.JOB_PROCESS_SOURCE
+        )
+        context["rss_are_fetched"] = queue_size > 0
+        context["rss_queue_size"] = queue_size
+
+        adict = self.extractor.get_entry_filter_args()
+
+        self.filter_form = EntryChoiceForm(adict)
+        self.filter_form.create(self.extractor.sources)
+
+        self.filter_form.is_valid()
+        self.filter_form.method = "GET"
+        self.filter_form.action_url = reverse(
+            "{}:entries-untagged".format(ContextData.app_name)
+        )
+
+        context["args_extractor"] = self.extractor
+        context["reset_link"] = reverse("{}:entries-untagged".format(ContextData.app_name))
+        context["filter_form"] = self.filter_form
+
+        return context
+
+
+class EntriesBookmarkedView(generic.ListView):
+    # TODO inherit from entries view?
+    model = LinkDataController
+    context_object_name = "entries_list"
+    paginate_by = 100
+    template_name = ContextData.get_full_template("linkdatacontroller_list.html")
+
+    def get_queryset(self):
+        self.extractor = EntryChoiceArgsExtractor(self.request.GET)
+        self.extractor.set_time_constrained(False)
+        self.extractor.get_sources()
+        return self.extractor.get_filtered_objects(Q(persistent=True))
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get the context
+        context = super(EntriesBookmarkedView, self).get_context_data(**kwargs)
+        context = ContextData.init_context(self.request, context)
+        # Create any data and add it to the context
+
+        context["page_title"] += " - not bookmarked"
+
+        queue_size = BackgroundJobController.get_number_of_jobs(
+            BackgroundJob.JOB_PROCESS_SOURCE
+        )
+        context["rss_are_fetched"] = queue_size > 0
+        context["rss_queue_size"] = queue_size
+
+        adict = self.extractor.get_entry_filter_args()
+
+        self.filter_form = EntryBookmarksChoiceForm(adict)
+        self.filter_form.create(self.extractor.sources)
+
+        self.filter_form.is_valid()
+        self.filter_form.method = "GET"
+        self.filter_form.action_url = reverse(
+            "{}:entries-bookmarked".format(ContextData.app_name)
+        )
+
+        context["args_extractor"] = self.extractor
+        context["reset_link"] = reverse("{}:entries-untagged".format(ContextData.app_name))
+        context["filter_form"] = self.filter_form
+
+        return context
+
+
+class EntryDetailView(generic.DetailView):
+    model = LinkDataController
 
     def get_context_data(self, **kwargs):
         from ..pluginentries.entrycontrollerbuilder import EntryControllerBuilder
 
         # Call the base implementation first to get the context
-        context = super(RssEntryDetailView, self).get_context_data(**kwargs)
+        context = super(EntryDetailView, self).get_context_data(**kwargs)
         context = ContextData.init_context(self.request, context)
 
         if self.object.language == None:
@@ -99,7 +238,7 @@ def add_entry(request):
         valid = form.is_valid()
         link = request.POST.get("link", "")
 
-        ob = LinkDataModel.objects.filter(link=link)
+        ob = LinkDataController.objects.filter(link=link)
         if ob.exists():
             context["form"] = form
             context["entry"] = ob[0]
@@ -114,7 +253,7 @@ def add_entry(request):
 
             context["form"] = form
 
-            ob = LinkDataModel.objects.filter(link=data["link"])
+            ob = LinkDataController.objects.filter(link=data["link"])
             if ob.exists():
                 context["entry"] = ob[0]
 
@@ -174,7 +313,7 @@ def add_simple_entry(request):
         if form.is_valid():
             link = form.cleaned_data['link']
 
-            ob = LinkDataModel.objects.filter(link=link)
+            ob = LinkDataController.objects.filter(link=link)
             if ob.exists():
                 context["form"] = form
                 context["entry"] = ob[0]
@@ -208,7 +347,7 @@ def edit_entry(request, pk):
     if not request.user.is_staff:
         return ContextData.render(request, "missing_rights.html", context)
 
-    obs = LinkDataModel.objects.filter(id=pk)
+    obs = LinkDataController.objects.filter(id=pk)
     if not obs.exists():
         context["summary_text"] = "Such entry does not exist"
         return ContextData.render(request, "summary_present.html", context)
@@ -248,7 +387,7 @@ def remove_entry(request, pk):
     if not request.user.is_staff:
         return ContextData.render(request, "missing_rights.html", context)
 
-    entry = LinkDataModel.objects.filter(id=pk)
+    entry = LinkDataController.objects.filter(id=pk)
     if entry.exists():
         entry.delete()
 
@@ -267,7 +406,7 @@ def hide_entry(request, pk):
     if not request.user.is_staff:
         return ContextData.render(request, "missing_rights.html", context)
 
-    objs = LinkDataModel.objects.filter(id=pk)
+    objs = LinkDataController.objects.filter(id=pk)
     obj = objs[0]
 
     fav = obj.dead
@@ -285,8 +424,8 @@ def search_init_view(request):
     context = ContextData.get_context(request)
     context["page_title"] += " - search view"
 
-    filter_form = EntryChoiceForm(args=request.GET)
-    filter_form.create()
+    filter_form = EntryChoiceForm()
+    filter_form.create(SourceDataController.objects.all())
     filter_form.method = "GET"
     filter_form.action_url = reverse("{}:entries".format(ContextData.app_name))
 
@@ -303,7 +442,7 @@ def make_persistent_entry(request, pk):
     if not request.user.is_staff:
         return ContextData.render(request, "missing_rights.html", context)
 
-    entry = LinkDataModel.objects.get(id=pk)
+    entry = LinkDataController.objects.get(id=pk)
 
     prev_state = entry.persistent
 
@@ -329,7 +468,7 @@ def make_not_persistent_entry(request, pk):
     if not request.user.is_staff:
         return ContextData.render(request, "missing_rights.html", context)
 
-    ft = LinkDataModel.objects.get(id=pk)
+    ft = LinkDataController.objects.get(id=pk)
 
     tags = LinkTagsDataModel.objects.filter(link=ft.link)
     tags.delete()
@@ -346,44 +485,6 @@ def make_not_persistent_entry(request, pk):
     return ContextData.render(request, "summary_present.html", context)
 
 
-class NotBookmarkedView(generic.ListView):
-    model = LinkDataModel
-    context_object_name = "entries_list"
-    paginate_by = 200
-    template_name = ContextData.get_full_template("linkdatamodel_list.html")
-
-    def get_queryset(self):
-        self.filter_form = EntryChoiceForm(self.request.GET, args=self.request.GET)
-        if self.filter_form.is_valid():
-            print("valid")
-        return LinkDataModel.objects.filter(tags__tag__isnull=True, persistent=True)
-
-    def get_context_data(self, **kwargs):
-        # Call the base implementation first to get the context
-        context = super(NotBookmarkedView, self).get_context_data(**kwargs)
-        context = ContextData.init_context(self.request, context)
-        # Create any data and add it to the context
-
-        context["page_title"] += " - not bookmarked"
-
-        queue_size = BackgroundJobController.get_number_of_jobs(
-            BackgroundJob.JOB_PROCESS_SOURCE
-        )
-        context["rss_are_fetched"] = queue_size > 0
-        context["rss_queue_size"] = queue_size
-
-        if self.filter_form.is_valid():
-            pass
-
-        self.filter_form.create()
-        self.filter_form.method = "GET"
-        self.filter_form.action_url = reverse(
-            "{}:entries-untagged".format(ContextData.app_name)
-        )
-
-        context["filter_form"] = self.filter_form
-
-        return context
 
 
 def download_entry(request, pk):
@@ -394,7 +495,7 @@ def download_entry(request, pk):
     if not request.user.is_staff:
         return ContextData.render(request, "missing_rights.html", context)
 
-    link = LinkDataModel.objects.get(id=pk)
+    link = LinkDataController.objects.get(id=pk)
 
     BackgroundJobController.link_download(subject=link.link)
     summary_text = "Added to queue"
@@ -412,7 +513,7 @@ def wayback_save(request, pk):
         return ContextData.render(request, "missing_rights.html", context)
 
     if ConfigurationEntry.get().link_archive:
-        link = LinkDataModel.objects.get(id=pk)
+        link = LinkDataController.objects.get(id=pk)
         BackgroundJobController.link_archive(subject=link.link)
 
         context["summary_text"] = "Added to waybacksave"

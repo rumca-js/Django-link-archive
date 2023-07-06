@@ -26,9 +26,13 @@
 }
 
 .mainbutton-icon {
-    width:20px;
+    width:8%;
 }
 .content-icon {
+    width:3%;
+    float: left;
+}
+.content-thumbnail {
     width:3%;
     float: left;
 }

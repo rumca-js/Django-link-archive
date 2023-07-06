@@ -16,9 +16,9 @@ class BookmarksExporter(object):
         self.md_template_bookmarked += " - tags: $tags\n"
 
     def get_entries(self):
-        from ..models import LinkDataModel
+        from ..controllers import LinkDataController
 
-        entries = LinkDataModel.objects.filter(persistent=True)
+        entries = LinkDataController.objects.filter(persistent=True)
 
     def get_export_path(self):
         entries_dir = self._cfg.get_bookmarks_path()
@@ -148,7 +148,7 @@ class BookmarksBigExporter(object):
 
     def export(self):
         import datetime
-        from ..models import LinkDataModel
+        from ..controllers import LinkDataController
 
         entries_dir = self._cfg.get_bookmarks_path()
         if entries_dir.exists():
@@ -162,7 +162,7 @@ class BookmarksBigExporter(object):
 
             therange = (start_date, stop_date)
 
-            all_entries = LinkDataModel.objects.filter(
+            all_entries = LinkDataController.objects.filter(
                 persistent=True, date_published__range=therange
             )
 
@@ -182,7 +182,8 @@ class BookmarksTopicExporter(object):
 
     def export(self, topic):
         import datetime
-        from ..models import LinkDataModel, RssEntryTagsDataModel
+        from ..models import RssEntryTagsDataModel
+        from ..controllers import LinkDataController
 
         tag_objs = RssEntryTagsDataModel.objects.filter(tag=topic)
         entries = set()

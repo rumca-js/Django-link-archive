@@ -18,31 +18,11 @@ class BaseRssPlugin(SourceGenericPlugin):
             import feedparser
 
             source = self.source
-            props = []
 
             url = source.url
             feed = feedparser.parse(url)
+            return self.process_rss_feed(self.source, feed)
 
-            num_entries = len(feed.entries)
-            num_processed_entries = 0
-
-            print("Found rss source entry, feed size:{}".format(num_entries))
-
-            if num_entries == 0:
-                PersistentInfo.error(
-                    "Source:{0} {1}; Source has no data".format(
-                        source.url, source.title
-                    )
-                )
-            else:
-                for feed_entry in feed.entries:
-                    entry_props = self.process_rss_entry(source, feed_entry)
-                    if entry_props is not None:
-                        props.append(entry_props)
-
-            print("Number of new entries: {0}".format(len(props)))
-
-            return props
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.exc(
@@ -50,6 +30,30 @@ class BaseRssPlugin(SourceGenericPlugin):
                     source.url, source.title, str(e), error_text
                 )
             )
+
+    def process_rss_feed(self, source, feed):
+        props = []
+
+        source = self.source
+        num_entries = len(feed.entries)
+
+        print("Found rss source entry, feed size:{}".format(num_entries))
+
+        if num_entries == 0:
+            PersistentInfo.error(
+                "Source:{0} {1}; Source has no data".format(
+                    source.url, source.title
+                )
+            )
+        else:
+            for feed_entry in feed.entries:
+                entry_props = self.process_rss_entry(source, feed_entry)
+                if entry_props is not None:
+                    props.append(entry_props)
+
+        print("Number of new entries: {0}".format(len(props)))
+
+        return props
 
     def process_rss_entry(self, source, feed_entry):
         try:

@@ -24,10 +24,14 @@
 }
 
 .mainbutton-icon {
-    width:20px;
+    width:13%;
 }
 .content-icon {
-    width:15%;
+    width:11%;
+    float: left;
+}
+.content-thumbnail {
+    width:11%;
     float: left;
 }
 

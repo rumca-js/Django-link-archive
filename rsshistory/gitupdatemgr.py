@@ -89,9 +89,9 @@ class GitUpdateManager(object):
         log = logging.getLogger(self._cfg.app_name)
 
         from datetime import timedelta
-        from .models import SourceDataModel, LinkDataModel
+        from .controllers import SourceDataController, LinkDataController
 
-        sources = SourceDataModel.objects.all()
+        sources = SourceDataController.objects.all()
         for source in sources:
             if not source.is_removeable():
                 continue
@@ -101,7 +101,7 @@ class GitUpdateManager(object):
                 current_time = DateUtils.get_datetime_now_utc()
                 days_before = current_time - timedelta(days=days)
 
-                entries = LinkDataModel.objects.filter(
+                entries = LinkDataController.objects.filter(
                     source=source.url, persistent=False, date_published__lt=days_before
                 )
                 if entries.exists():

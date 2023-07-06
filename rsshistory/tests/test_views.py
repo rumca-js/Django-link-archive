@@ -77,12 +77,6 @@ class ViewsTest(TestCase):
 
         self.assertEqual(resp.status_code, 200)
 
-    def test_source_import(self):
-        url = reverse("{}:sources-import".format(LinkDatabase.name))
-        resp = self.client.get(url)
-
-        self.assertEqual(resp.status_code, 200)
-
     """
     Entries
     """
@@ -161,12 +155,6 @@ class ViewsTest(TestCase):
 
     def test_entry_archive(self):
         url = reverse("{}:entry-archive".format(LinkDatabase.name), args=[0])
-        resp = self.client.get(url)
-
-        self.assertEqual(resp.status_code, 200)
-
-    def test_entries_import(self):
-        url = reverse("{}:entries-import".format(LinkDatabase.name))
         resp = self.client.get(url)
 
         self.assertEqual(resp.status_code, 200)
@@ -308,3 +296,27 @@ class ViewsTest(TestCase):
         resp = self.client.get(url)
 
         self.assertEqual(resp.status_code, 200)
+
+    def test_import_bookmarks(self):
+        url = reverse("{}:import-bookmarks".format(LinkDatabase.name))
+        resp = self.client.get(url)
+
+        self.assertEqual(resp.status_code, 200)
+
+    def test_import_daily_data(self):
+        url = reverse("{}:import-daily-data".format(LinkDatabase.name))
+        resp = self.client.get(url)
+
+        self.assertEqual(resp.status_code, 200)
+
+    def test_import_sources(self):
+        url = reverse("{}:import-sources".format(LinkDatabase.name))
+        resp = self.client.get(url)
+
+        self.assertEqual(resp.status_code, 200)
+
+    #def test_import_reading_list(self):
+    #    url = reverse("{}:import-reading-list".format(LinkDatabase.name))
+    #    resp = self.client.get(url)
+
+    #    self.assertEqual(resp.status_code, 200)

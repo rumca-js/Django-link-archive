@@ -10,8 +10,6 @@ from django.db.models import Q
 
 from .apps import LinkDatabase
 from .models import (
-    LinkDataModel,
-    SourceDataModel,
     PersistentInfo,
     ConfigurationEntry,
     BackgroundJob,
@@ -20,7 +18,7 @@ from .models import RssSourceExportHistory
 from .pluginsources.sourcecontrollerbuilder import SourceControllerBuilder
 from .basictypes import fix_path_for_windows
 from .programwrappers import ytdlp, id3v2
-from .controllers import BackgroundJobController
+from .controllers import BackgroundJobController, LinkDataController, SourceDataController
 
 
 class BaseJobHandler(object):
@@ -56,7 +54,7 @@ class ProcessSourceJobHandler(BaseJobHandler):
 
     def process(self, obj=None):
         try:
-            sources = SourceDataModel.objects.filter(url=obj.subject)
+            sources = SourceDataController.objects.filter(url=obj.subject)
             if len(sources) == 0:
                 return
 
@@ -87,7 +85,7 @@ class LinkDownloadJobHandler(BaseJobHandler):
 
     def process(self, obj=None):
         try:
-            item = LinkDataModel.objects.filter(link=obj.subject)[0]
+            item = LinkDataController.objects.filter(link=obj.subject)[0]
             from .webtools import Page
 
             p = Page(item.link)
@@ -114,7 +112,7 @@ class LinkMusicDownloadJobHandler(BaseJobHandler):
 
     def process(self, obj=None):
         try:
-            item = LinkDataModel.objects.filter(link=obj.subject)[0]
+            item = LinkDataController.objects.filter(link=obj.subject)[0]
 
             PersistentInfo.create("Downloading music: " + item.link + " " + item.title)
             # TODO pass dir?
@@ -159,7 +157,7 @@ class LinkVideoDownloadJobHandler(BaseJobHandler):
 
     def process(self, obj=None):
         try:
-            item = LinkDataModel.objects.filter(link=obj.subject)[0]
+            item = LinkDataController.objects.filter(link=obj.subject)[0]
 
             PersistentInfo.create("Downloading video: " + item.link + " " + item.title)
 
@@ -197,15 +195,15 @@ class LinkAddJobHandler(BaseJobHandler):
         try:
             link = obj.subject
             source_id = obj.args
-            source_obj = SourceDataModel.objects.get(id=int(source_id))
+            source_obj = SourceDataController.objects.get(id=int(source_id))
             data = {"user": None, "language": source_obj.language, "persistent": False}
 
             print("Adding {} for {}".format(link, source_obj.title))
             try:
-                LinkDataModel.create_from_youtube(link, data)
+                LinkDataController.create_from_youtube(link, data)
             except Exception as e:
                 try:
-                    LinkDataModel.create_from_youtube(link, data)
+                    LinkDataController.create_from_youtube(link, data)
                 except Exception as e:
                     error_text = traceback.format_exc()
                     PersistentInfo.error(
@@ -313,13 +311,13 @@ class ImportDailyDataJobHandler(BaseJobHandler):
             data = json.load(json_file)
 
             for json_entry in data:
-                export_names = LinkDataModel.get_export_names()
+                export_names = LinkDataController.get_export_names()
 
                 create_args = {}
                 for export_name in export_names:
                     create_args[export_name] = json_source[export_name]
 
-                LinkDataModel.objects.create(create_args)
+                LinkDataController.objects.create(create_args)
 
                 # TODO import tags also
 
@@ -350,13 +348,13 @@ class ImportBookmarksJobHandler(BaseJobHandler):
             data = json.load(json_file)
 
             for json_entry in data:
-                export_names = LinkDataModel.get_export_names()
+                export_names = LinkDataController.get_export_names()
 
                 create_args = {}
                 for export_name in export_names:
                     create_args[export_name] = json_source[export_name]
 
-                LinkDataModel.objects.create(create_args)
+                LinkDataController.objects.create(create_args)
 
                 # TODO import tags also
 
@@ -382,13 +380,13 @@ class ImportSourcesJobHandler(BaseJobHandler):
             data = json.load(json_file)
 
             for json_source in data:
-                export_names = SourceDataModel.get_export_names()
+                export_names = SourceDataController.get_export_names()
 
                 create_args = {}
                 for export_name in export_names:
                     create_args[export_name] = json_source[export_name]
 
-                SourceDataModel.objects.create(create_args)
+                SourceDataController.objects.create(create_args)
 
 
 class WriteBookmarksJobHandler(BaseJobHandler):
@@ -488,9 +486,9 @@ class RefreshThreadHandler(object):
     def refresh(self, item=None):
         PersistentInfo.create("Refreshing RSS data")
 
-        from .models import SourceDataModel
+        from .controllers import SourceDataController
 
-        sources = SourceDataModel.objects.all()
+        sources = SourceDataController.objects.all()
         for source in sources:
             BackgroundJobController.download_rss(source)
 
@@ -499,9 +497,8 @@ class RefreshThreadHandler(object):
                 BackgroundJobController.push_to_repo()
 
                 if ConfigurationEntry.get().source_archive:
-                    from .models import SourceDataModel
 
-                    sources = SourceDataModel.objects.all()
+                    sources = SourceDataController.objects.all()
                     for source in sources:
                         BackgroundJobController.link_archive(source.url)
 

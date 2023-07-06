@@ -8,8 +8,6 @@ from django.shortcuts import render
 
 from ..prjconfig import Configuration
 from ..models import (
-    SourceDataModel,
-    LinkDataModel,
     LinkTagsDataModel,
     ConfigurationEntry,
     UserConfig,
@@ -18,7 +16,7 @@ from ..models import (
 from ..models import RssSourceExportHistory
 from ..forms import ConfigForm, UserConfigForm
 from ..views import ContextData
-from ..controllers import BackgroundJobController
+from ..controllers import BackgroundJobController, SourceDataController, LinkDataController
 
 
 def admin_page(request):
@@ -75,7 +73,7 @@ def system_status(request):
     context["YouTubeReturnDislikeMetaCache"] = len(
         YouTubeReturnDislikeMetaCache.objects.all()
     )
-    context["SourceDataModel"] = len(SourceDataModel.objects.all())
+    context["SourceDataModel"] = len(SourceDataController.objects.all())
     context["LinkTagsDataModel"] = len(LinkTagsDataModel.objects.all())
     context["ConfigurationEntry"] = len(ConfigurationEntry.objects.all())
     context["UserConfig"] = len(UserConfig.objects.all())
@@ -117,7 +115,7 @@ def import_reading_list_view(request):
         try:
             print(entry["title"])
 
-            objs = LinkDataModel.objects.filter(link=entry["url"])
+            objs = LinkDataController.objects.filter(link=entry["url"])
             if objs.exists():
                 print(entry["title"] + ", Skipping")
                 summary_text += (
@@ -145,7 +143,7 @@ def import_reading_list_view(request):
                     )
                     continue
 
-                ent = LinkDataModel(
+                ent = LinkDataController(
                     source=p.get_domain(),
                     title=entry["title"],
                     description=entry["description"],
@@ -197,11 +195,11 @@ def get_incorrect_youtube_links():
 
     criterion5 = Q(source__isnull=True)
 
-    entries_no_object = LinkDataModel.objects.filter(criterion1 | criterion1a)
-    entries_no_object |= LinkDataModel.objects.filter(
+    entries_no_object = LinkDataController.objects.filter(criterion1 | criterion1a)
+    entries_no_object |= LinkDataController.objects.filter(
         criterion2 & criterion3 & ~criterion4
     )
-    entries_no_object |= LinkDataModel.objects.filter(criterion2 & criterion5)
+    entries_no_object |= LinkDataController.objects.filter(criterion2 & criterion5)
 
     if entries_no_object.exists():
         return entries_no_object
@@ -211,9 +209,9 @@ def data_errors_page(request):
     def fix_reassign_source_to_nullsource_entries():
         print("fix_reassign_source_to_nullsource_entries")
 
-        entries_no_object = LinkDataModel.objects.filter(source_obj=None)
+        entries_no_object = LinkDataController.objects.filter(source_obj=None)
         for entry in entries_no_object:
-            source = SourceDataModel.objects.filter(url=entry.source)
+            source = SourceDataController.objects.filter(url=entry.source)
             if source.exists():
                 entry.source_obj = source[0]
                 entry.save()
@@ -264,7 +262,7 @@ def data_errors_page(request):
         criterion2 = Q(language__contains="en")
         criterion3 = Q(language__isnull=True)
 
-        entries_no_object = LinkDataModel.objects.filter(
+        entries_no_object = LinkDataController.objects.filter(
             ~criterion1 & ~criterion2 & ~criterion3, persistent=True
         )
 
@@ -300,7 +298,7 @@ def data_errors_page(request):
 def fix_reset_youtube_link_details(link_id):
     from ..pluginentries.youtubelinkhandler import YouTubeLinkHandler
 
-    entry = LinkDataModel.objects.get(id=link_id)
+    entry = LinkDataController.objects.get(id=link_id)
 
     h = YouTubeLinkHandler(entry.link)
     if not h.download_details():
@@ -309,7 +307,7 @@ def fix_reset_youtube_link_details(link_id):
     chan_url = h.get_channel_feed_url()
     link_valid = h.get_link_url()
 
-    sources_obj = SourceDataModel.objects.filter(url=chan_url)
+    sources_obj = SourceDataController.objects.filter(url=chan_url)
     source_obj = None
     if len(sources_obj) > 0:
         source_obj = sources_obj[0]
@@ -358,7 +356,7 @@ def fix_entry_tags(request, entrypk):
     if not request.user.is_staff:
         return ContextData.render(request, "missing_rights.html", context)
 
-    entry = LinkDataModel.objects.get(id=entrypk)
+    entry = LinkDataController.objects.get(id=entrypk)
     tags = entry.tags.all()
 
     summary_text = ""
@@ -432,7 +430,7 @@ def import_source_from_ia(request, pk):
                 context["summary_text"] = "Internet archive data read successfully"
                 return ContextData.render(request, "summary_present.html", context)
 
-    source_obj = SourceDataModel.objects.get(id=pk)
+    source_obj = SourceDataController.objects.get(id=pk)
 
     form = ImportSourceRangeFromInternetArchiveForm(
         initial={
@@ -451,7 +449,7 @@ def import_source_from_ia(request, pk):
 def import_source_from_ia_impl(wb, source_url, source_archive_url, archive_time):
     print("Reading from time: {0} {1}".format(source_url, archive_time))
 
-    source_obj = SourceDataModel.objects.filter(url=source_url)[0]
+    source_obj = SourceDataController.objects.filter(url=source_url)[0]
 
     c = Configuration.get_object()
 
@@ -670,9 +668,28 @@ def test_page(request):
 
     summary_text = ""
 
+    items = LinkDataController.objects.filter(source = "https://pluralistic.net/feed")
+    items.delete()
+
     context["summary_text"] = summary_text
 
     return ContextData.render(request, "summary_present.html", context)
+
+def test_form_page(request):
+    from ..forms import OmniSearchForm
+
+    context = ContextData.get_context(request)
+    context["page_title"] += " - test form page"
+
+    if not request.user.is_staff:
+        return ContextData.render(request, "missing_rights.html", context)
+
+    summary_text = ""
+
+    form = OmniSearchForm(request.GET)
+    context["form"] = form
+
+    return ContextData.render(request, "form_basic.html", context)
 
 
 def fix_bookmarked_yt(request):
@@ -683,7 +700,7 @@ def fix_bookmarked_yt(request):
         return ContextData.render(request, "missing_rights.html", context)
 
     summary = ""
-    links = LinkDataModel.objects.filter(persistent=True)
+    links = LinkDataController.objects.filter(persistent=True)
     for link in links:
         if fix_reset_youtube_link_details(link.id):
             summary += "Fixed: {} {}\n".format(link.link, link.title)
@@ -759,7 +776,7 @@ def download_music(request, pk):
     if not request.user.is_staff:
         return ContextData.render(request, "missing_rights.html", context)
 
-    ft = LinkDataModel.objects.filter(id=pk)
+    ft = LinkDataController.objects.filter(id=pk)
     if ft.exists():
         context["summary_text"] = "Added to download queue"
     else:
@@ -777,7 +794,7 @@ def download_video(request, pk):
     if not request.user.is_staff:
         return ContextData.render(request, "missing_rights.html", context)
 
-    ft = LinkDataModel.objects.filter(id=pk)
+    ft = LinkDataController.objects.filter(id=pk)
     if ft.exists():
         context["summary_text"] = "Added to download queue"
     else:

@@ -4,11 +4,11 @@ from django.shortcuts import render
 
 from datetime import datetime, timedelta
 
-from ..models import SourceDataModel, LinkDataModel
 from ..models import LinkTagsDataModel
 from ..prjconfig import Configuration
 from ..forms import ConfigForm
 from ..views import ContextData
+from ..controllers import LinkDataController
 
 
 class AllTags(generic.ListView):
@@ -71,7 +71,7 @@ class RecentTags(AllTags):
         context = super(RecentTags, self).get_context_data(**kwargs)
         time_range = self.get_time_range()
         context["tags_title"] = "Recent tags: {} {}".format(
-            time_range[0].date(), time_range[1].date()
+            time_range[0], time_range[1]
         )
 
         return context
@@ -88,7 +88,7 @@ def tag_entry(request, pk):
     if not request.user.is_staff:
         return ContextData.render(request, "missing_rights.html", context)
 
-    objs = LinkDataModel.objects.filter(id=pk)
+    objs = LinkDataController.objects.filter(id=pk)
 
     if not objs.exists():
         context["summary_text"] = "Sorry, such object does not exist"
@@ -159,7 +159,7 @@ def tags_entry_remove(request, entrypk):
     if not request.user.is_staff:
         return ContextData.render(request, "missing_rights.html", context)
 
-    entry = LinkDataModel.objects.get(id=entrypk)
+    entry = LinkDataController.objects.get(id=entrypk)
     tags = entry.tags.all()
     for tag in tags:
         tag.delete()
@@ -178,7 +178,7 @@ def tags_entry_show(request, entrypk):
 
     summary = ""
 
-    entry = LinkDataModel.objects.get(id=entrypk)
+    entry = LinkDataController.objects.get(id=entrypk)
     tags = entry.tags.all()
     for tag in tags:
         summary += "Link:{} tag:{} author:{}\n".format(tag.link, tag.tag, tag.author)
@@ -204,7 +204,7 @@ def tag_rename(request):
             current_tag = form.cleaned_data["current_tag"]
             new_tag = form.cleaned_data["new_tag"]
 
-            tags = LinkTagsDataModel.objects.filter(tag=current_tag)
+            tags = LinkTagsDataController.objects.filter(tag=current_tag)
             for tag in tags:
                 tag.tag = new_tag.lower()
                 tag.save()

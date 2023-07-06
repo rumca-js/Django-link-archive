@@ -17,6 +17,7 @@ class SourceGenerousParserPlugin(BaseParsePlugin):
             or address.endswith(".htm")
             or address.endswith("/")
         ):
+            print(address)
             return True
         else:
             return False

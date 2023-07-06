@@ -57,9 +57,9 @@ class EntriesExporter(object):
         md = MarkDownConverter(items, self.md_template_link)
         md_text = md.export()
 
-        from ..models import SourceDataModel
+        from ..controllers import SourceDataController
 
-        sources = SourceDataModel.objects.filter(url=source_url)
+        sources = SourceDataController.objects.filter(url=source_url)
 
         if sources.exists():
             from .converters import MarkDownSourceConverter
