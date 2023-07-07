@@ -14,6 +14,7 @@ Personal link database, with RSS functionality. Similar to Reddit, but completel
  - Automatic git export, RSS source import
  - Minimal installation, integrator may choose however to use production environment, with a good Database engine. Just as it is supported by Django. I am using SQLite without any problems.
  - Support for web archive
+ - Since it is a Django page, you can show it to your friends (if you like)
 
 ## Problems with other RSS readers, or apps
 
@@ -34,6 +35,7 @@ Personal link database, with RSS functionality. Similar to Reddit, but completel
  - RSS client
  - Reddit/lemmy/diggit replacement
  - Data analysis - analyze link rot, how many a page is cited by other sources
+ - YouTube filter. Manage your own subscriptions, videos, without thirdparty interference
 
 ## UI
 

@@ -21,6 +21,7 @@
       <div class="col-sm-2">
           <div class="sidebar-nav">
           {% block sidebar %}
+             <div class="mainbutton-container">
                 <a href="{% url 'rsshistory:index' %}" class="mainbutton">
                     <img src="{% static 'rsshistory/icons/icons8-home-96.png' %}" class="mainbutton-icon" />
                             Home</a>
@@ -39,7 +40,9 @@
                 <a href="{% url 'rsshistory:sources' %}" class="mainbutton">
                             <img src="{% static 'rsshistory/icons/icons8-broadcast-100.png' %}" class="mainbutton-icon" />
                             Sources</a>
-                <hr>
+	     </div>
+             <hr>
+             <div class="mainbutton-container">
                 {% if user.is_staff %}
 
                 <a href="{% url 'rsshistory:admin-page' %}" class="mainbutton">
@@ -57,7 +60,8 @@
                       <img src="{% static 'rsshistory/icons/icons8-login-100.png' %}" class="mainbutton-icon" />
                               Login</a>
                 {% endif %}
-                <hr>
+	     </div>
+             <hr>
          {% endblock %}
           </div>
       </div>

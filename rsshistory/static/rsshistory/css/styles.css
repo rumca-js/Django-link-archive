@@ -11,6 +11,13 @@
     background-color:#F9F9F9
 }
 
+.mainbutton-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  flex-direction: column;
+}
+
 .mainbutton {
   color : #373737;
   padding: 3px 12px;
@@ -26,14 +33,18 @@
 }
 
 .mainbutton-icon {
-    width:8%;
+    width:20px;
 }
 .content-icon {
-    width:3%;
+    width:20px;
     float: left;
 }
 .content-thumbnail {
-    width:3%;
+    width:60px;
+    float: left;
+}
+.content-big-thumbnail {
+    width:150px;
     float: left;
 }
 

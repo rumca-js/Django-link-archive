@@ -9,14 +9,19 @@
     background-color:#F9F9F9
 }
 
+.mainbutton-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+}
+
 .mainbutton {
   color : #373737;
-  padding: 3px 12px;
+  padding: 1% 2%;
   text-decoration: none;
-  display: inline-block;
   background-color: #e9e9e9;
   border-radius: 10px;
-  margin: 1px;
+  margin : 1px;
 }
 .mainbutton:hover {
   background-color: #e0e0e0;
@@ -24,14 +29,18 @@
 }
 
 .mainbutton-icon {
-    width:13%;
+  width:30px;
 }
 .content-icon {
-    width:11%;
-    float: left;
+  width:30px;
+  float: left;
 }
 .content-thumbnail {
-    width:11%;
+  width:11%;
+  float: left;
+}
+.content-big-thumbnail {
+    width:20%;
     float: left;
 }
 
@@ -62,12 +71,12 @@ select {display: block;}
 textarea {display: block;}
 
 hr {
-    margin: 0px;
-    padding: 0px;
+  margin: 0px;
+  padding: 0px;
 }
 
 .simplebuttoninline {
-display: contents;
+  display: contents;
 }
 
 .simplebutton {
@@ -90,28 +99,28 @@ display: contents;
 /* List containers */
 
 .container_standard {
-    margin-top: 20px;
-    padding: 0;
-    list-style: none;
-    display: flex;
-    flex-direction: column;
+  margin-top: 20px;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
 }
 .container_clickable-tags {
-    margin-top: 20px;
-    padding: 0;
-    list-style: none;
+  margin-top: 20px;
+  padding: 0;
+  list-style: none;
 }
 .container_line-and-buttons {
-    margin-top: 20px;
-    padding: 0;
-    list-style: none;
+  margin-top: 20px;
+  padding: 0;
+  list-style: none;
 }
 .container_youtube-thumbnails {
-    margin-top: 20px;
-    padding: 0;
-    list-style: none;
-    display: flex;
-    flex-wrap: wrap;
+  margin-top: 20px;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .element_standard {
@@ -197,7 +206,7 @@ display: contents;
 
 
 .linklistthumbnail {
-    width: 100%;
+  width: 100%;
 }
 .linklistitemtitle {
   font-weight: bold;
