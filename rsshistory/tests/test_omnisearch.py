@@ -37,13 +37,21 @@ class OmniSearchTest(TestCase):
 
         self.assertEqual(len(conditions), 9)
 
-    def test_get_eval(self):
-        processor = OmniSearchProcessor("title == test & tag == something")
+    def test_get_eval_contains(self):
+        processor = OmniSearchProcessor("title = test & tag = something")
         conditions = processor.parse_conditions()
 
         eval_text = processor.get_eval_query(conditions[0:3])
 
         self.assertEqual(eval_text, {"title__contains": "test"})
+
+    def test_get_eval_exact(self):
+        processor = OmniSearchProcessor("title == test & tag == something")
+        conditions = processor.parse_conditions()
+
+        eval_text = processor.get_eval_query(conditions[0:3])
+
+        self.assertEqual(eval_text, {"title__exact": "test"})
 
     def test_filter_query_set(self):
         LinkDataModel.objects.create(link="https://test.com")

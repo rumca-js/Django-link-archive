@@ -82,6 +82,11 @@ Program maintains two repositories: one for bookmarked links, and daily reposito
 
 Each day bookmarks and daily repositories are updated with new data. Daily repository is updated when day finishes, then the complete daily data are pushed into the repository.
 
+Link properties:
+ - persistent - set if it is bookmarked
+ - tag - set by the users, through forms
+ - vote - set by the users, through forms. Decides how important the link is. Admin can arbitrarily define how long the range is
+
 ## Bookmarks
 
  - three file formats: JSON, markdown, RSS

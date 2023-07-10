@@ -13,11 +13,16 @@ It should be able to operate on SBC, like raspberry PI.
 
 # Conventions
 
- - Everything that relates to link should start with "Entry"
- - Everything that relates to source should start with "Source"
- - New services are handled by 'services' directory
- - Handling of new sites might require changes in pluginsources, and pluginentries (the first handles source, the second one a entry, link)
+ - everything that relates to link should start with "Entry"
+ - everything that relates to source should start with "Source"
+ - new services are handled by 'services' directory (like handling GIT, webarchive, etc.)
+ - handling of new sites might require changes in pluginsources, and pluginentries (the first handles source, the second one a entry, link)
+
+# Design
+
+ - all links are stored in LinkDataModel. Links older than the configured period are moved to archive table.
 
 ## Notes
 
+ - do not change exported names of link data model. We do not want to be forced to regenerate all links again. We can add new fields though
  - do not fetch all objects from any table. Do not use Model.objects.all(). One exception: to obtain length of table

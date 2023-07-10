@@ -87,6 +87,24 @@ class ViewsTest(TestCase):
 
         self.assertEqual(resp.status_code, 200)
 
+    def test_entries_recent(self):
+        url = reverse("{}:entries-recent".format(LinkDatabase.name))
+        resp = self.client.get(url)
+
+        self.assertEqual(resp.status_code, 200)
+
+    def test_entries_untagged(self):
+        url = reverse("{}:entries-untagged".format(LinkDatabase.name))
+        resp = self.client.get(url)
+
+        self.assertEqual(resp.status_code, 200)
+
+    def test_entries_bookmarked(self):
+        url = reverse("{}:entries-bookmarked".format(LinkDatabase.name))
+        resp = self.client.get(url)
+
+        self.assertEqual(resp.status_code, 200)
+
     def test_entry(self):
         url = reverse("{}:entry-detail".format(LinkDatabase.name), args=[0])
         resp = self.client.get(url)
@@ -165,8 +183,20 @@ class ViewsTest(TestCase):
 
         self.assertEqual(resp.status_code, 200)
 
-    def test_entries_search(self):
-        url = reverse("{}:searchinitview".format(LinkDatabase.name))
+    def test_entries_search_init(self):
+        url = reverse("{}:entries-search-init".format(LinkDatabase.name))
+        resp = self.client.get(url)
+
+        self.assertEqual(resp.status_code, 200)
+
+    def test_entries_bookmarked_init(self):
+        url = reverse("{}:entries-bookmarked-init".format(LinkDatabase.name))
+        resp = self.client.get(url)
+
+        self.assertEqual(resp.status_code, 200)
+
+    def test_entries_recent_init(self):
+        url = reverse("{}:entries-recent-init".format(LinkDatabase.name))
         resp = self.client.get(url)
 
         self.assertEqual(resp.status_code, 200)

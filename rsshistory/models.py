@@ -46,7 +46,7 @@ class SourceDataModel(models.Model):
     language = models.CharField(max_length=1000, default="en-US")
     favicon = models.CharField(max_length=1000, null=True)
     on_hold = models.BooleanField(default=False)
-    fetch_period = models.IntegerField(default=3600)
+    fetch_period = models.IntegerField(default=900)
     source_type = models.CharField(
         max_length=1000, null=False, choices=SOURCE_TYPES, default=SOURCE_TYPE_RSS
     )
@@ -104,7 +104,7 @@ class RssSourceExportHistory(models.Model):
         return RssSourceExportHistory.objects.all()[:100]
 
 
-class LinkDataModel(models.Model):
+class BaseLinkDataModel(models.Model):
     source = models.CharField(max_length=2000)
     title = models.CharField(max_length=1000, null=True)
     description = models.TextField(max_length=1000, null=True)
@@ -123,6 +123,12 @@ class LinkDataModel(models.Model):
     language = models.CharField(max_length=10, null=True, default=None)
     thumbnail = models.CharField(max_length=1000, null=True, default=None)
 
+    class Meta:
+        abstract = True
+        ordering = ["-date_published", "source", "title"]
+
+
+class LinkDataModel(BaseLinkDataModel):
     source_obj = models.ForeignKey(
         SourceDataModel,
         on_delete=models.SET_NULL,
@@ -131,29 +137,8 @@ class LinkDataModel(models.Model):
         blank=True,
     )
 
-    class Meta:
-        ordering = ["-date_published", "source", "title"]
 
-
-class ArchiveLinkDataModel(models.Model):
-    source = models.CharField(max_length=2000)
-    title = models.CharField(max_length=1000, null=True)
-    description = models.TextField(max_length=1000, null=True)
-    link = models.CharField(max_length=1000, unique=True)
-    date_published = models.DateTimeField(default=datetime.now)
-    # this entry cannot be removed
-    persistent = models.BooleanField(default=False)
-    # this entry is dead indication
-    dead = models.BooleanField(default=False)
-    artist = models.CharField(max_length=1000, null=True, default=None)
-    album = models.CharField(max_length=1000, null=True, default=None)
-    # user who added entry
-    user = models.CharField(max_length=1000, null=True, default=None)
-
-    # possible values en-US, or pl_PL
-    language = models.CharField(max_length=10, null=True, default=None)
-    thumbnail = models.CharField(max_length=1000, null=True, default=None)
-
+class ArchiveLinkDataModel(BaseLinkDataModel):
     source_obj = models.ForeignKey(
         SourceDataModel,
         on_delete=models.SET_NULL,
@@ -161,9 +146,6 @@ class ArchiveLinkDataModel(models.Model):
         null=True,
         blank=True,
     )
-
-    class Meta:
-        ordering = ["-date_published", "source", "title"]
 
 
 class LinkTagsDataModel(models.Model):

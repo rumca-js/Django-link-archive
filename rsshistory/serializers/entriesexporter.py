@@ -37,9 +37,7 @@ class EntriesExporter(object):
         items = cc.get_map_full()
 
         js_converter = JsonConverter(items)
-        js_converter.set_export_columns(
-            LinkDataController.get_all_export_names()
-        )
+        js_converter.set_export_columns(LinkDataController.get_all_export_names())
 
         file_name = export_path / (export_file_name + "_entries.json")
         file_name.write_text(js_converter.export())
@@ -75,9 +73,7 @@ class EntriesExporter(object):
         items = cc.get_map_full()
 
         js_converter = JsonConverter(items)
-        js_converter.set_export_columns(
-            LinkDataController.get_all_export_names()
-        )
+        js_converter.set_export_columns(LinkDataController.get_all_export_names())
 
         file_name = export_path / ("all_entries.json")
         file_name.write_text(js_converter.export())
