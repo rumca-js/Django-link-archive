@@ -59,7 +59,7 @@ def memcache_lock(lock_id, oid):
 @app.on_after_configure.connect
 def setup_periodic_tasks(sender, **kwargs):
     # in seconds
-    sender.add_periodic_task(900.0, rsshistory_main_checker_task.s('hello'), name='RSS History Checker task')
+    sender.add_periodic_task(300.0, rsshistory_main_checker_task.s('hello'), name='RSS History Checker task')
     sender.add_periodic_task(60.0, rsshistory_main_processing_task.s('hello'), name='RSS History Processing task')
 
 
