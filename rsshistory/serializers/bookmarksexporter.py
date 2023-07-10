@@ -37,6 +37,7 @@ class BookmarksExporter(object):
         if not export_path.exists():
             export_path.mkdir(parents=True, exist_ok=True)
 
+        from ..controllers import LinkDataController
         from .converters import (
             ModelCollectionConverter,
             JsonConverter,
@@ -49,19 +50,7 @@ class BookmarksExporter(object):
 
         js_converter = JsonConverter(items)
         js_converter.set_export_columns(
-            [
-                "source",
-                "title",
-                "description",
-                "link",
-                "date_published",
-                "persistent",
-                "dead",
-                "user",
-                "language",
-                "tags",
-                "comments",
-            ]
+                LinkDataController.get_all_export_names()
         )
 
         file_name = export_path / (export_file_name + "_entries.json")

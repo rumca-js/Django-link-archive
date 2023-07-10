@@ -23,7 +23,7 @@ def entry_add_comment(request, link_id):
         return ContextData.render(request, "missing_rights.html", context)
 
     user_name = request.user.get_username()
-    if not LinkCommentDataController.can_user_add_comment(user_name):
+    if not LinkCommentDataController.can_user_add_comment(link_id, user_name):
         context[
             "summary_text"
         ] = "User cannot add more comments. Limit to 1 comment per day"
@@ -50,7 +50,7 @@ def entry_add_comment(request, link_id):
 
     else:
         author = request.user.username
-        form = CommentEntryForm(initial={"author": author, "link": link.link})
+        form = CommentEntryForm(initial={"author": author, "link_id": link.id})
 
     form.method = "POST"
     form.pk = link_id

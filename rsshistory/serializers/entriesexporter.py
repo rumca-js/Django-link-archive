@@ -25,6 +25,8 @@ class EntriesExporter(object):
         export_path=None,
         with_description=True,
     ):
+        from ..controllers import SourceDataController, LinkDataController
+
         if len(self._entries) == 0:
             return
 
@@ -36,19 +38,7 @@ class EntriesExporter(object):
 
         js_converter = JsonConverter(items)
         js_converter.set_export_columns(
-            [
-                "source",
-                "title",
-                "description",
-                "link",
-                "date_published",
-                "persistent",
-                "dead",
-                "user",
-                "language",
-                "tags",
-                "comments",
-            ]
+            LinkDataController.get_all_export_names()
         )
 
         file_name = export_path / (export_file_name + "_entries.json")
@@ -56,8 +46,6 @@ class EntriesExporter(object):
 
         md = MarkDownConverter(items, self.md_template_link)
         md_text = md.export()
-
-        from ..controllers import SourceDataController
 
         sources = SourceDataController.objects.filter(url=source_url)
 
@@ -72,6 +60,8 @@ class EntriesExporter(object):
         file_name.write_text(md_text)
 
     def export_all_entries(self, with_description=True):
+        from ..controllers import LinkDataController
+
         if len(self._entries) == 0:
             return
 
@@ -86,19 +76,7 @@ class EntriesExporter(object):
 
         js_converter = JsonConverter(items)
         js_converter.set_export_columns(
-            [
-                "source",
-                "title",
-                "description",
-                "link",
-                "date_published",
-                "persistent",
-                "dead",
-                "user",
-                "language",
-                "tags",
-                "comments",
-            ]
+            LinkDataController.get_all_export_names()
         )
 
         file_name = export_path / ("all_entries.json")

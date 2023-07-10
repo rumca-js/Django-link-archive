@@ -13,7 +13,7 @@ class SourceControllerBuilder(object):
         SourceParseDigitsPlugin,
         TVN24Plugin,
         SpotifyPlugin,
-        SourceGenerousParserPlugin
+        SourceGenerousParserPlugin,
     ]
 
     def get(source):

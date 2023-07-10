@@ -172,7 +172,10 @@
                   {% endif %}
 
                   <span class="linklistitemtitle">
-                       {{link.get_title}}
+                     {% if link.get_vote > 0 %}
+                      [{{link.get_vote}}] 
+                     {% endif %}
+		     {{link.get_title}}
                   </span>
                   <span class="linklistitemdescription">
                        {{link.get_full_description}}

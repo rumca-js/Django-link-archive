@@ -86,7 +86,7 @@ class WaybackMachine(object):
             PersistentInfo.error(
                 "WaybackMachine: save url: {0} {1}".format(url, str(e))
             )
-            time.sleep(5 * 3600)  # wait 5 minute
+            time.sleep(5 * 60)  # wait 5 minute
 
     def save(self, url):
         ret = self.save_impl(url)

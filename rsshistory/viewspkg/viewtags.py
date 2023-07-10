@@ -226,3 +226,61 @@ def tag_rename(request):
         return ContextData.render(request, "form_basic.html", context)
 
     return ContextData.render(request, "summary_present.html", context)
+
+
+def entry_vote(request, pk):
+    # TODO read and maybe fix https://docs.djangoproject.com/en/4.1/topics/forms/modelforms/
+    from ..forms import LinkVoteForm
+
+    context = ContextData.get_context(request)
+    context["page_title"] += " - vote entry"
+    context["pk"] = pk
+
+    if not request.user.is_staff:
+        return ContextData.render(request, "missing_rights.html", context)
+
+    objs = LinkDataController.objects.filter(id=pk)
+
+    if not objs.exists():
+        context["summary_text"] = "Sorry, such object does not exist"
+        return ContextData.render(request, "summary_present.html", context)
+
+    obj = objs[0]
+    if not obj.persistent:
+        context["summary_text"] = "Sorry, only persistent objects can be tagged"
+        return ContextData.render(request, "summary_present.html", context)
+
+    if request.method == "POST":
+        method = "POST"
+
+        form = LinkVoteForm(request.POST)
+
+        if form.is_valid():
+            form.save_vote()
+
+            context["summary_text"] = "Entry voted"
+            return ContextData.render(request, "summary_present.html", context)
+        else:
+            context["summary_text"] = "Entry not voted"
+            return ContextData.render(request, "summary_present.html", context)
+
+    else:
+        author = request.user.username
+
+        vote = 0
+        votes = obj.votes.filter(author=author)
+        if len(votes) > 0:
+            vote = votes[0].vote
+
+        form = LinkVoteForm(initial={"link_id": obj.id, "author": author, "vote": vote})
+
+        form.method = "POST"
+        form.pk = pk
+        form.action_url = reverse(
+            "{}:entry-vote".format(ContextData.app_name), args=[pk]
+        )
+        context["form"] = form
+        context["form_title"] = obj.title
+        context["form_description"] = obj.title
+
+    return ContextData.render(request, "form_basic.html", context)

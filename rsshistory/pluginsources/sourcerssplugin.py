@@ -41,9 +41,7 @@ class BaseRssPlugin(SourceGenericPlugin):
 
         if num_entries == 0:
             PersistentInfo.error(
-                "Source:{0} {1}; Source has no data".format(
-                    source.url, source.title
-                )
+                "Source:{0} {1}; Source has no data".format(source.url, source.title)
             )
         else:
             for feed_entry in feed.entries:

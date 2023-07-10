@@ -1,18 +1,18 @@
 from datetime import datetime, date, timedelta
+import traceback
 
 from django.db import models
 from django.urls import reverse
 from django.db.models import Q
 
-from .models import LinkDataModel, SourceDataModel
-from .models import LinkCommentDataModel, BackgroundJob, LinkTagsDataModel
+from .models import LinkDataModel, SourceDataModel, ArchiveLinkDataModel, BackgroundJob, PersistentInfo
+from .models import LinkCommentDataModel, LinkTagsDataModel, LinkVoteDataModel
 from .webtools import Page
 
 from .apps import LinkDatabase
 
 
 class SourceDataController(SourceDataModel):
-
     class Meta:
         proxy = True
 
@@ -35,11 +35,13 @@ class SourceDataController(SourceDataModel):
         return "{} {}".format(self.category, self.subcategory)
 
     def get_full_description(self):
-        return "{} Export:{} Fetched:{} Number of entries:{} Import seconds:{}".format(self.get_long_description(),
+        return "{} Export:{} Fetched:{} Number of entries:{} Import seconds:{}".format(
+            self.get_long_description(),
             self.export_to_cms,
             self.get_date_fetched(),
             self.get_number_of_entries(),
-            self.get_import_seconds())
+            self.get_import_seconds(),
+        )
 
     def is_fetch_possible(self):
         from datetime import timedelta
@@ -131,19 +133,19 @@ class SourceDataController(SourceDataModel):
 
     def get_export_names():
         return [
-                "url",
-                "title",
-                "category",
-                "subcategory",
-                "dead",
-                "export_to_cms",
-                "remove_after_days",
-                "language",
-                "favicon",
-                "on_hold",
-                "fetch_period",
-                "source_type",
-                ]
+            "url",
+            "title",
+            "category",
+            "subcategory",
+            "dead",
+            "export_to_cms",
+            "remove_after_days",
+            "language",
+            "favicon",
+            "on_hold",
+            "fetch_period",
+            "source_type",
+        ]
 
     def get_map(self):
         output_data = {}
@@ -159,29 +161,30 @@ class SourceDataController(SourceDataModel):
         return self.get_map()
 
     def get_full_information(data):
-        p = Page(data['url'])
+        p = Page(data["url"])
         # TODO if passed url is youtube video, obtain information, obtain channel feed url
 
         wh1 = p.get_contents().find("<rss version=")
         wh2 = p.get_contents().find("<feed")
         if wh1 >= 0 or wh2 >= 0:
-             return SourceDataController.get_info_from_rss(data['url'])
+            return SourceDataController.get_info_from_rss(data["url"])
         else:
-             return SourceDataController.get_info_from_page(data['url'], p)
+            return SourceDataController.get_info_from_page(data["url"], p)
 
     def get_info_from_rss(url):
         import feedparser
+
         feed = feedparser.parse(url)
         data = {}
         data["url"] = url
         data["source_type"] = SourceDataModel.SOURCE_TYPE_RSS
-        if 'title' in feed.feed:
+        if "title" in feed.feed:
             data["title"] = feed.feed.title
-        if 'subtitle' in feed.feed:
+        if "subtitle" in feed.feed:
             data["description"] = feed.feed.subtitle
-        if 'language' in feed.feed:
+        if "language" in feed.feed:
             data["language"] = feed.feed.language
-        if 'image' in feed.feed:
+        if "image" in feed.feed:
             data["favicon"] = feed.feed.image
         return data
 
@@ -195,15 +198,13 @@ class SourceDataController(SourceDataModel):
         return data
 
 
-
 class LinkDataController(LinkDataModel):
-
     class Meta:
         proxy = True
 
     def get_source_obj(self):
         if self.source_obj:
-            return SourceDataController.objects.get(id = self.source_obj.id)
+            return SourceDataController.objects.get(id=self.source_obj.id)
         else:
             return None
 
@@ -245,6 +246,20 @@ class LinkDataController(LinkDataModel):
     def get_tag_string(self):
         return LinkTagsDataModel.join_elements(self.tags.all())
 
+    def get_vote(self):
+        votes = self.votes.all()
+        if len(votes) == 0:
+            return 0
+
+        sum_num = None
+        for vote in votes:
+            if sum_num == None:
+                sum_num = vote.vote
+            else:
+                sum_num += vote.vote
+
+        return sum_num / len(votes)
+
     def get_tag_map(self):
         # TODO should it be done by for tag in self.tags: tag.get_map()?
         result = []
@@ -253,7 +268,7 @@ class LinkDataController(LinkDataModel):
             result.append(tag.tag)
         return result
 
-    def get_comment_map(self):
+    def get_comment_vec(self):
         # TODO
         return []
 
@@ -288,18 +303,38 @@ class LinkDataController(LinkDataModel):
         return self.get_favicon()
 
     def get_export_names():
-        return ["source",
-        "title",
-        "description",
-        "link",
-        "date_published",
-        "persistent",
-        "dead",
-        "artist",
-        "album",
-        "user",
-        "language",
-        "thumbnail",
+        return [
+            "source",
+            "title",
+            "description",
+            "link",
+            "date_published",
+            "persistent",
+            "dead",
+            "artist",
+            "album",
+            "user",
+            "language",
+            "thumbnail",
+        ]
+
+    def get_all_export_names():
+        return [
+            "source",
+            "title",
+            "description",
+            "link",
+            "date_published",
+            "persistent",
+            "dead",
+            "artist",
+            "album",
+            "user",
+            "language",
+            "thumbnail",
+            "tags",
+            "comments",
+            "vote"
         ]
 
     def get_map(self):
@@ -321,7 +356,11 @@ class LinkDataController(LinkDataModel):
         if len(tags) > 0:
             themap["tags"] = tags
 
-        comments = self.get_comment_map()
+        vote = self.get_vote()
+        if vote > 0:
+            themap["vote"] = tags
+
+        comments = self.get_comment_vec()
         if len(comments) > 0:
             themap["comments"] = comments
 
@@ -437,23 +476,70 @@ class LinkDataController(LinkDataModel):
             data["description"] = p.get_title()
         return data
 
+    def make_not_persistent(self, username):
+        tags = LinkTagsDataModel.objects.filter(link_obj=self)
+        tags.delete()
+
+        votes = LinkVoteDataModel.objects.filter(link_obj=self)
+        votes.delete()
+
+        self.persistent = False
+        self.user = username
+        self.save()
+
+    def move_to_archive(self):
+        objs = ArchiveLinkDataModel.objects.filter(link=self.link)
+        if len(objs) == 0:
+            themap = self.get_map()
+            themap["source_obj"] = self.get_source_obj()
+            try:
+                ArchiveLinkDataModel.objects.create(**themap)
+                self.delete()
+            except Exception as e:
+                error_text = traceback.format_exc()
+        else:
+            try:
+                self.delete()
+            except Exception as e:
+                error_text = traceback.format_exc()
+
+    def move_all_to_archive():
+        from .dateutils import DateUtils
+
+        current_time = DateUtils.get_datetime_now_utc()
+        days_before = current_time - timedelta(days=100)
+
+        entries = LinkDataController.objects.filter(
+            persistent=False, date_published__lt=days_before
+        )
+
+        for entry in entries:
+            if entry.get_source_obj() is None:
+                entry.move_to_archive()
+            elif entry.get_source_obj().get_days_to_remove() == 0:
+                entry.move_to_archive()
+
+
 
 class LinkCommentDataController(LinkCommentDataModel):
     class Meta:
         proxy = True
 
-    def can_user_add_comment(user_name):
+    def can_user_add_comment(link_id, user_name):
         now = datetime.now()
         time_start = now - timedelta(days=1)
         time_stop = now
 
-        criterion0 = Q(author=user_name)
+        link = LinkDataModel.objects.get(id=link_id)
+
+        criterion0 = Q(author=user_name, link_obj=link)
         criterion1 = Q(date_published__range=[time_start, time_stop])
         criterion2 = Q(date_edited__range=[time_start, time_stop])
 
         comments = LinkCommentDataModel.objects.filter(
             criterion0 & (criterion1 | criterion2)
         )
+
         if len(comments) > 0:
             return False
 

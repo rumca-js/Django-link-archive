@@ -18,7 +18,11 @@ from .models import RssSourceExportHistory
 from .pluginsources.sourcecontrollerbuilder import SourceControllerBuilder
 from .basictypes import fix_path_for_windows
 from .programwrappers import ytdlp, id3v2
-from .controllers import BackgroundJobController, LinkDataController, SourceDataController
+from .controllers import (
+    BackgroundJobController,
+    LinkDataController,
+    SourceDataController,
+)
 
 
 class BaseJobHandler(object):
@@ -296,11 +300,11 @@ class ImportDailyDataJobHandler(BaseJobHandler):
         valid_dirs = []
         dirs = os.listdir(import_path)
         for adir in dirs:
-            if adir != 'bookmarks':
+            if adir != "bookmarks":
                 valid_dirs.append(import_path / adir)
 
         for avalid_dir in valid_dirs:
-            files = self.get_files_with_extension(avalid_dir, 'json')
+            files = self.get_files_with_extension(avalid_dir, "json")
             for afile in files:
                 self.import_one_file(afile)
 
@@ -337,7 +341,7 @@ class ImportBookmarksJobHandler(BaseJobHandler):
         c = Configuration.get_object()
         import_path = c.get_import_path() / "bookmarks"
 
-        files = self.get_files_with_extension(import_path, 'json')
+        files = self.get_files_with_extension(import_path, "json")
         for afile in files:
             self.import_one_file(afile)
 
@@ -497,7 +501,6 @@ class RefreshThreadHandler(object):
                 BackgroundJobController.push_to_repo()
 
                 if ConfigurationEntry.get().source_archive:
-
                     sources = SourceDataController.objects.all()
                     for source in sources:
                         BackgroundJobController.link_archive(source.url)

@@ -1,8 +1,10 @@
 import logging
 import traceback
+from datetime import timedelta
 
 from .dateutils import DateUtils
 from .models import PersistentInfo, RssSourceExportHistory, ConfigurationEntry
+from .controllers import SourceDataController, LinkDataController
 from .prjgitrepo import *
 
 
@@ -34,7 +36,9 @@ class GitUpdateManager(object):
             new_history = RssSourceExportHistory(date=yesterday)
             new_history.save()
 
+            # TODO move this code to thread handler
             self.clear_old_entries()
+            self.push_old_links_to_archive()
 
             writer.clear_daily_data(yesterday.isoformat())
 
@@ -88,8 +92,6 @@ class GitUpdateManager(object):
     def clear_old_entries(self):
         log = logging.getLogger(self._cfg.app_name)
 
-        from datetime import timedelta
-        from .controllers import SourceDataController, LinkDataController
 
         sources = SourceDataController.objects.all()
         for source in sources:
@@ -111,3 +113,6 @@ class GitUpdateManager(object):
                         )
                     )
                     entries.delete()
+
+    def push_old_links_to_archive(self):
+        LinkDataController.move_all_to_archive()

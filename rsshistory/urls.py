@@ -34,6 +34,9 @@ urlpatterns = [
     path("entries-recent/", viewentries.EntriesRecentListView.as_view(), name="entries-recent"),
     path("entries-untagged/", viewentries.EntriesNotTaggedView.as_view(), name="entries-untagged"),
     path("entries-bookmarked/", viewentries.EntriesBookmarkedView.as_view(), name="entries-bookmarked"),
+    path("entries-search-init", viewentries.entries_search_init, name="entries-search-init"),
+    path("entries-bookmarked-init", viewentries.entries_bookmarked_init, name="entries-bookmarked-init"),
+    path("entries-recent-init", viewentries.entries_recent_init, name="entries-recent-init"),
     path("entry/<int:pk>/", viewentries.EntryDetailView.as_view(), name="entry-detail"),
     path("entry-add", viewentries.add_entry, name="entry-add"),
     path("entry-add-simple", viewentries.add_simple_entry, name="entry-add-simple"),
@@ -46,7 +49,6 @@ urlpatterns = [
     path("entry-download-video/<int:pk>/", viewcustom.download_video, name="entry-download-video",),
     path("entry-download/<int:pk>/", viewentries.download_entry, name="entry-download"),
     path("entry-archive/<int:pk>/", viewentries.wayback_save, name="entry-archive"),
-    path("searchinitview", viewentries.search_init_view, name="searchinitview"),
     # tags
     path("entry-tag/<int:pk>/", viewtags.tag_entry, name="entry-tag"),
     path("tag-remove/<int:pk>/", viewtags.tag_remove, name="tag-remove"),
@@ -59,6 +61,8 @@ urlpatterns = [
     path("entry-comment-add/<int:link_id>", viewcomments.entry_add_comment, name="entry-comment-add",),
     path("entry-comment-edit/<int:pk>/", viewcomments.entry_comment_edit, name="entry-comment-edit",),
     path("entry-comment-remove/<int:pk>/", viewcomments.entry_comment_remove, name="entry-comment-remove",),
+    # vote
+    path("entry-vote/<int:pk>/", viewtags.entry_vote, name="entry-vote"),
     # custom views
     path("robots.txt", TemplateView.as_view(template_name="robots.txt", content_type="text/plain")),
     path("admin-page/", viewcustom.admin_page, name="admin-page"),

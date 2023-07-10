@@ -6,7 +6,11 @@ from ..models import BackgroundJob
 from ..prjconfig import Configuration
 from ..forms import SourceForm, SourcesChoiceForm, ConfigForm, SourceChoiceArgsExtractor
 from ..views import ContextData
-from ..controllers import SourceDataController, LinkDataController, BackgroundJobController
+from ..controllers import (
+    SourceDataController,
+    LinkDataController,
+    BackgroundJobController,
+)
 
 
 class RssSourceListView(generic.ListView):
@@ -106,7 +110,7 @@ def add_source_simple(request):
     if request.method == "POST":
         form = SourceInputForm(request.POST)
         if form.is_valid():
-            url = form.cleaned_data['url']
+            url = form.cleaned_data["url"]
 
             ob = SourceDataController.objects.filter(url=url)
             if ob.exists():
@@ -115,12 +119,12 @@ def add_source_simple(request):
 
                 return ContextData.render(request, "source_edit_exists.html", context)
 
-            data = SourceDataController.get_full_information({'url': url})
+            data = SourceDataController.get_full_information({"url": url})
 
-            form = SourceForm(initial = data)
+            form = SourceForm(initial=data)
             form.method = "POST"
             form.action_url = reverse("{}:source-add".format(ContextData.app_name))
-            context['form'] = form
+            context["form"] = form
 
     else:
         form = SourceInputForm()
@@ -234,11 +238,11 @@ def source_remove_entries(request, pk):
 
     ft = SourceDataController.objects.filter(id=pk)
     if ft.exists():
-        entries = LinkDataController.objects.filter(source = ft[0].url)
+        entries = LinkDataController.objects.filter(source=ft[0].url)
         if entries.exists():
             entries.delete()
             context["summary_text"] = "Remove ok"
-            context['summary_text'] = str(entries)
+            context["summary_text"] = str(entries)
         else:
             context["summary_text"] = "No entries to remove"
     else:

@@ -1,4 +1,3 @@
-
 from django.test import TestCase
 from django.utils import timezone
 from django.urls import reverse
@@ -9,7 +8,6 @@ from ..models import LinkDataModel
 
 class OmniSearchTest(TestCase):
     def test_parse_conditions(self):
-
         processor = OmniSearchProcessor("title == test & tag == something")
         conditions = processor.parse_conditions()
 
@@ -24,7 +22,6 @@ class OmniSearchTest(TestCase):
         self.assertEqual(len(conditions), 7)
 
     def test_parse_conditions_with_brackets(self):
-
         processor = OmniSearchProcessor("(title == test & tag == something)")
         conditions = processor.parse_conditions()
 
@@ -41,7 +38,6 @@ class OmniSearchTest(TestCase):
         self.assertEqual(len(conditions), 9)
 
     def test_get_eval(self):
-
         processor = OmniSearchProcessor("title == test & tag == something")
         conditions = processor.parse_conditions()
 
@@ -50,9 +46,9 @@ class OmniSearchTest(TestCase):
         self.assertEqual(eval_text, {"title__contains": "test"})
 
     def test_filter_query_set(self):
-        LinkDataModel.objects.create(link = "https://test.com")
+        LinkDataModel.objects.create(link="https://test.com")
 
-        processor = OmniSearchProcessor('link == https://test.com')
+        processor = OmniSearchProcessor("link == https://test.com")
 
         qs = LinkDataModel.objects.all()
         print("Query set length: {}".format(len(qs)))
@@ -61,4 +57,3 @@ class OmniSearchTest(TestCase):
         print("Query set length: {}".format(len(qs)))
 
         self.assertEqual(len(qs), 1)
-

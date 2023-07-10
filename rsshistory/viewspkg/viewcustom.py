@@ -16,7 +16,11 @@ from ..models import (
 from ..models import RssSourceExportHistory
 from ..forms import ConfigForm, UserConfigForm
 from ..views import ContextData
-from ..controllers import BackgroundJobController, SourceDataController, LinkDataController
+from ..controllers import (
+    BackgroundJobController,
+    SourceDataController,
+    LinkDataController,
+)
 
 
 def admin_page(request):
@@ -80,6 +84,7 @@ def system_status(request):
     context["BackgroundJob"] = len(BackgroundJob.objects.all())
 
     from ..dateutils import DateUtils
+
     context["Current_DateTime"] = DateUtils.get_datetime_now_utc()
 
     from ..models import PersistentInfo
@@ -668,12 +673,15 @@ def test_page(request):
 
     summary_text = ""
 
-    items = LinkDataController.objects.filter(source = "https://pluralistic.net/feed")
-    items.delete()
+    LinkDataController.move_all_to_archive()
+
+    #items = LinkDataController.objects.filter(source="https://pluralistic.net/feed")
+    #items.delete()
 
     context["summary_text"] = summary_text
 
     return ContextData.render(request, "summary_present.html", context)
+
 
 def test_form_page(request):
     from ..forms import OmniSearchForm

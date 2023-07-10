@@ -19,7 +19,8 @@
        </a>
     {% endif %}
     {% if object.persistent %}
-        <a href="{% url 'rsshistory:entry-tag' object.id %}" class="simplebutton">Tag entry</a>
+        <a href="{% url 'rsshistory:entry-tag' object.id %}" class="simplebutton">Tag</a>
+        <a href="{% url 'rsshistory:entry-vote' object.id %}" class="simplebutton">Vote</a>
     {% endif %}
 
        <a href="{% url 'rsshistory:entry-download' object.id %}" class="simplebutton" title="Downloads the page to configuraton export location">Download page</a>
@@ -67,6 +68,8 @@
       <div>
            <strong>Publish date:</strong> {{ object.date_published }}
            <strong>User:</strong> {{ object.user }}
+           <strong>Vote:</strong>
+{{object.get_vote}} 
       </div>
       <span><strong>Artist:</strong> {{ object.artist }}</span>
       <span><strong>Album:</strong> {{ object.album }}</span>

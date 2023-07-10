@@ -4,7 +4,7 @@ from django.shortcuts import render
 from django.views import generic
 from django.urls import reverse
 
-from .models import SourceDataModel, LinkDataModel, UserConfig
+from .models import SourceDataModel, LinkDataModel, ArchiveLinkDataModel, UserConfig
 from .basictypes import *
 from .prjconfig import Configuration
 from .apps import LinkDatabase
@@ -47,12 +47,14 @@ def index(request):
     # Generate counts of some of the main objects
     num_sources = SourceDataModel.objects.all().count()
     num_entries = LinkDataModel.objects.all().count()
+    num_archived = ArchiveLinkDataModel.objects.all().count()
     num_persistent = LinkDataModel.objects.filter(persistent=True).count()
 
     context = ContextData.get_context(request)
 
     context["num_sources"] = num_sources
     context["num_entries"] = num_entries
+    context["num_archived"] = num_archived
     context["num_persistent"] = num_persistent
 
     # Render the HTML template index.html with the data in the context variable

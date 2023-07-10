@@ -107,7 +107,7 @@ class RssSourceExportHistory(models.Model):
 class LinkDataModel(models.Model):
     source = models.CharField(max_length=2000)
     title = models.CharField(max_length=1000, null=True)
-    description = models.CharField(max_length=1000, null=True)
+    description = models.TextField(max_length=1000, null=True)
     link = models.CharField(max_length=1000, unique=True)
     date_published = models.DateTimeField(default=datetime.now)
     # this entry cannot be removed
@@ -127,6 +127,37 @@ class LinkDataModel(models.Model):
         SourceDataModel,
         on_delete=models.SET_NULL,
         related_name="link_source",
+        null=True,
+        blank=True,
+    )
+
+    class Meta:
+        ordering = ["-date_published", "source", "title"]
+
+
+class ArchiveLinkDataModel(models.Model):
+    source = models.CharField(max_length=2000)
+    title = models.CharField(max_length=1000, null=True)
+    description = models.TextField(max_length=1000, null=True)
+    link = models.CharField(max_length=1000, unique=True)
+    date_published = models.DateTimeField(default=datetime.now)
+    # this entry cannot be removed
+    persistent = models.BooleanField(default=False)
+    # this entry is dead indication
+    dead = models.BooleanField(default=False)
+    artist = models.CharField(max_length=1000, null=True, default=None)
+    album = models.CharField(max_length=1000, null=True, default=None)
+    # user who added entry
+    user = models.CharField(max_length=1000, null=True, default=None)
+
+    # possible values en-US, or pl_PL
+    language = models.CharField(max_length=10, null=True, default=None)
+    thumbnail = models.CharField(max_length=1000, null=True, default=None)
+
+    source_obj = models.ForeignKey(
+        SourceDataModel,
+        on_delete=models.SET_NULL,
+        related_name="archive_source",
         null=True,
         blank=True,
     )
@@ -176,7 +207,7 @@ class LinkTagsDataModel(models.Model):
 
 class LinkVoteDataModel(models.Model):
     author = models.CharField(max_length=1000)
-    vote = models.IntegerField(null=True)
+    vote = models.IntegerField(default=0)
 
     link_obj = models.ForeignKey(
         LinkDataModel,
@@ -193,7 +224,6 @@ class LinkCommentDataModel(models.Model):
     date_published = models.DateTimeField(default=datetime.now)
     date_edited = models.DateTimeField(null=True)
     reply_id = models.IntegerField(null=True)
-    link = models.CharField(max_length=1000)
 
     link_obj = models.ForeignKey(
         LinkDataModel,
@@ -227,6 +257,7 @@ class ConfigurationEntry(models.Model):
         else:
             return confs[0]
 
+    # TODO remove this function. refactor to two functions
     def is_git_set(self):
         if (
             self.git_repo == ""
@@ -284,12 +315,12 @@ class UserConfig(models.Model):
     small_icons = models.BooleanField(default=True)
     links_per_page = models.IntegerField(default=100)
 
-    def get(user_name = None):
+    def get(user_name=None):
         """
         This is used if no request is specified. Use configured by admin setup.
         """
         if user_name:
-            confs = UserConfig.objects.filter(user = user_name)
+            confs = UserConfig.objects.filter(user=user_name)
             if len(confs) != 0:
                 return confs[0]
 

@@ -9,10 +9,20 @@ from ..models import (
     ConfigurationEntry,
 )
 from ..prjconfig import Configuration
-from ..forms import EntryForm, EntryChoiceForm, ConfigForm, BasicEntryChoiceForm, EntryBookmarksChoiceForm
+from ..forms import (
+    EntryForm,
+    EntryChoiceForm,
+    ConfigForm,
+    BasicEntryChoiceForm,
+    EntryBookmarksChoiceForm,
+)
 from ..forms import EntryChoiceArgsExtractor
 from ..views import ContextData
-from ..controllers import LinkDataController, SourceDataController, BackgroundJobController
+from ..controllers import (
+    LinkDataController,
+    SourceDataController,
+    BackgroundJobController,
+)
 
 
 class EntriesSearchListView(generic.ListView):
@@ -49,7 +59,9 @@ class EntriesSearchListView(generic.ListView):
         self.filter_form.action_url = reverse("{}:entries".format(ContextData.app_name))
 
         context["args_extractor"] = self.extractor
-        context["reset_link"] = reverse("{}:searchinitview".format(ContextData.app_name))
+        context["reset_link"] = reverse(
+            "{}:entries-search-init".format(ContextData.app_name)
+        )
 
         context["filter_form"] = self.filter_form
         if "search" in self.request.GET:
@@ -58,6 +70,7 @@ class EntriesSearchListView(generic.ListView):
             context["search_term"] = self.request.GET["tag"]
 
         return context
+
 
 class EntriesRecentListView(generic.ListView):
     model = LinkDataController
@@ -90,10 +103,14 @@ class EntriesRecentListView(generic.ListView):
 
         self.filter_form.is_valid()
         self.filter_form.method = "GET"
-        self.filter_form.action_url = reverse("{}:entries-recent".format(ContextData.app_name))
+        self.filter_form.action_url = reverse(
+            "{}:entries-recent".format(ContextData.app_name)
+        )
 
         context["args_extractor"] = self.extractor
-        context["reset_link"] = reverse("{}:entries-recent".format(ContextData.app_name))
+        context["reset_link"] = reverse(
+            "{}:entries-recent-init".format(ContextData.app_name)
+        )
 
         context["filter_form"] = self.filter_form
         if "search" in self.request.GET:
@@ -114,7 +131,9 @@ class EntriesNotTaggedView(generic.ListView):
     def get_queryset(self):
         self.extractor = EntryChoiceArgsExtractor(self.request.GET)
         self.extractor.get_sources()
-        return self.extractor.get_filtered_objects(Q(tags__tag__isnull=True, persistent=True))
+        return self.extractor.get_filtered_objects(
+            Q(tags__tag__isnull=True, persistent=True)
+        )
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
@@ -142,7 +161,9 @@ class EntriesNotTaggedView(generic.ListView):
         )
 
         context["args_extractor"] = self.extractor
-        context["reset_link"] = reverse("{}:entries-untagged".format(ContextData.app_name))
+        context["reset_link"] = reverse(
+            "{}:entries-untagged".format(ContextData.app_name)
+        )
         context["filter_form"] = self.filter_form
 
         return context
@@ -187,7 +208,9 @@ class EntriesBookmarkedView(generic.ListView):
         )
 
         context["args_extractor"] = self.extractor
-        context["reset_link"] = reverse("{}:entries-untagged".format(ContextData.app_name))
+        context["reset_link"] = reverse(
+            "{}:entries-bookmarked-init".format(ContextData.app_name)
+        )
         context["filter_form"] = self.filter_form
 
         return context
@@ -269,7 +292,7 @@ def add_entry(request):
         author = request.user.username
         initial = {"user": author}
         if "link" in request.GET:
-            initial['link'] = request.GET['link']
+            initial["link"] = request.GET["link"]
 
         form = EntryForm(initial=initial)
         form.method = "POST"
@@ -311,7 +334,7 @@ def add_simple_entry(request):
     if request.method == "POST":
         form = LinkInputForm(request.POST)
         if form.is_valid():
-            link = form.cleaned_data['link']
+            link = form.cleaned_data["link"]
 
             ob = LinkDataController.objects.filter(link=link)
             if ob.exists():
@@ -320,14 +343,14 @@ def add_simple_entry(request):
 
                 return ContextData.render(request, "entry_edit_exists.html", context)
 
-            data = LinkDataController.get_full_information({'link': link})
-            data['user'] = request.user.username
+            data = LinkDataController.get_full_information({"link": link})
+            data["user"] = request.user.username
 
-            form = EntryForm(initial = data)
+            form = EntryForm(initial=data)
             form.method = "POST"
             form.action_url = reverse("{}:entry-add".format(ContextData.app_name))
-            context['form'] = form
-            
+            context["form"] = form
+
             return ContextData.render(request, "form_basic.html", context)
     else:
         form = LinkInputForm()
@@ -420,14 +443,44 @@ def hide_entry(request, pk):
     return ContextData.render(request, "summary_present.html", context)
 
 
-def search_init_view(request):
+def entries_search_init(request):
     context = ContextData.get_context(request)
-    context["page_title"] += " - search view"
+    context["page_title"] += " - search filter"
 
     filter_form = EntryChoiceForm()
     filter_form.create(SourceDataController.objects.all())
     filter_form.method = "GET"
     filter_form.action_url = reverse("{}:entries".format(ContextData.app_name))
+
+    context["form"] = filter_form
+
+    return ContextData.render(request, "form_search.html", context)
+
+
+def entries_bookmarked_init(request):
+    context = ContextData.get_context(request)
+    context["page_title"] += " - bookmarked filter"
+
+    filter_form = EntryBookmarksChoiceForm()
+    filter_form.create(SourceDataController.objects.all())
+    filter_form.method = "GET"
+    filter_form.action_url = reverse(
+        "{}:entries-bookmarked".format(ContextData.app_name)
+    )
+
+    context["form"] = filter_form
+
+    return ContextData.render(request, "form_search.html", context)
+
+
+def entries_recent_init(request):
+    context = ContextData.get_context(request)
+    context["page_title"] += " - recent filter"
+
+    filter_form = BasicEntryChoiceForm()
+    filter_form.create(SourceDataController.objects.all())
+    filter_form.method = "GET"
+    filter_form.action_url = reverse("{}:entries-recent".format(ContextData.app_name))
 
     context["form"] = filter_form
 
@@ -469,22 +522,13 @@ def make_not_persistent_entry(request, pk):
         return ContextData.render(request, "missing_rights.html", context)
 
     ft = LinkDataController.objects.get(id=pk)
-
-    tags = LinkTagsDataModel.objects.filter(link=ft.link)
-    tags.delete()
-
-    fav = ft.persistent
-    ft.persistent = False
-    ft.user = request.user.username
-    ft.save()
+    ft.make_not_persistent(request.user.username)
 
     summary_text = "Link changed to state: " + str(ft.persistent)
 
     context["summary_text"] = summary_text
 
     return ContextData.render(request, "summary_present.html", context)
-
-
 
 
 def download_entry(request, pk):
