@@ -19,7 +19,10 @@ Personal link database, with RSS functionality. Similar to Reddit, but completel
 ## Problems with other RSS readers, or apps
 
  - Most RSS clients do not allow manual link input
- - Feedly is not local, does not store your data on your hardware
+ - Some programs are not programs from users perspective, but a service:
+     * Feedly
+     * Pockets
+     * Readwise Reader
  - Most programs fail to provide consistent and exhaustive search ability (NextCloud "News" application, Thunderbird, Feeder Android app, Newsboat Linux app)
  - Most programs do not provide ability to add tag to a link (Thunderbird, Android Feeder app)
  - Scale: Lemmy software is replacement for Reddit, but requires a lot of resources to operate. This project aims to provide "single user" experience
