@@ -6,23 +6,16 @@
       <img src="{% static 'rsshistory/icons/icons8-start-100.png' %}" class="content-icon" />
       Reset filters</a>
 
+    {% if rss_are_fetched %}
+      <span style="color:red">Sources are fetched. Queue size: {{rss_queue_size}} </span>
+    {% endif %}
+
   <form action="{{filter_form.action_url}}" method="{{filter_form.method}}">
      {{ filter_form }}
      <input type="submit" value="Submit">
   </form>
 
-  {% if search_term %}
-     <a href="https://en.wikipedia.org/w/index.php?search={{search_term}}" class="simplebutton">Ask wikipedia</a>
-     <a href="https://www.quora.com/search?q={{search_term}}" class="simplebutton">Ask Quora</a>
-     <a href="https://stackoverflow.com/search?q={{search_term}}" class="simplebutton">Ask Stack Overflow</a>
-     <a href="https://www.wolframalpha.com/input?i={{search_term}}" class="simplebutton">Ask wolfram alpha</a>
-  {% endif %}
-
   <hr>
-    {% if rss_are_fetched %}
-       <div style="color:red">Sources are fetched. Queue size: {{rss_queue_size}} </div>
-       <hr>
-    {% endif %}
 
   {% if entries_list %}
   <div class="linklist container_{{user_config.display_type}}">
@@ -208,4 +201,15 @@
   {% else %}
     <p>There are no links.</p>
   {% endif %}
+
+  {% if search_term %}
+     <a href="https://en.wikipedia.org/w/index.php?search={{search_term}}" class="simplebutton">Ask wikipedia</a>
+     <a href="https://www.wolframalpha.com/input?i={{search_term}}" class="simplebutton">Ask wolfram alpha</a>
+     <a href="https://chat.openai.com/" class="simplebutton">ChatGPT</a>
+     <a href="https://www.quora.com/search?q={{search_term}}" class="simplebutton">Ask Quora</a>
+     <a href="https://stackoverflow.com/search?q={{search_term}}" class="simplebutton">Ask Stack Overflow</a>
+     <a href="https://www.youtube.com/results?search_query={{search_term}}" class="simplebutton">YouTube</a>
+     <a href="https://open.spotify.com/search/{{search_term}}" class="simplebutton">Spotify</a>
+  {% endif %}
+
 {% endblock %}

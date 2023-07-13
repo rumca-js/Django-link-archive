@@ -3,6 +3,7 @@ import re
 
 from .sourcegenericplugin import SourceGenericPlugin
 from ..models import PersistentInfo, LinkDataModel
+from ..controllers import LinkDataController
 
 
 class BaseParsePlugin(SourceGenericPlugin):
@@ -66,7 +67,7 @@ class BaseParsePlugin(SourceGenericPlugin):
                 if not self.is_link_valid(link_str):
                     continue
 
-                objs = LinkDataModel.objects.filter(link=link_str)
+                objs = LinkDataController.objects.filter(link = link_str)
                 if objs.exists():
                     continue
 

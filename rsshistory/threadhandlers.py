@@ -474,6 +474,9 @@ class PushToRepoJobHandler(BaseJobHandler):
 
                 git_mgr = GitUpdateManager(self._config)
                 git_mgr.write_and_push_to_git()
+
+                git_mgr.clear_old_entries()
+                git_mgr.push_old_links_to_archive()
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.error("Exception: {} {}".format(str(e), error_text))

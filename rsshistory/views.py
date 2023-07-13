@@ -15,7 +15,7 @@ class ContextData(object):
     app_name = Path(LinkDatabase.name)
 
     def get_full_template(template):
-        return ContextData.app_name / "linkdatamodel_list.html"
+        return ContextData.app_name / template
 
     def init_context(request, context):
         c = Configuration.get_object()

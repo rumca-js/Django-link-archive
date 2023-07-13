@@ -7,22 +7,24 @@ from ..models import (
     LinkTagsDataModel,
     BackgroundJob,
     ConfigurationEntry,
+    ArchiveLinkDataModel,
 )
-from ..prjconfig import Configuration
+from ..controllers import (
+    LinkDataController,
+    SourceDataController,
+    BackgroundJobController,
+)
 from ..forms import (
     EntryForm,
     EntryChoiceForm,
     ConfigForm,
     BasicEntryChoiceForm,
     EntryBookmarksChoiceForm,
+    OmniSearchForm
 )
 from ..forms import EntryChoiceArgsExtractor
 from ..views import ContextData
-from ..controllers import (
-    LinkDataController,
-    SourceDataController,
-    BackgroundJobController,
-)
+from ..prjconfig import Configuration
 
 
 class EntriesSearchListView(generic.ListView):
@@ -33,7 +35,20 @@ class EntriesSearchListView(generic.ListView):
     def get_queryset(self):
         self.extractor = EntryChoiceArgsExtractor(self.request.GET)
         self.extractor.get_sources()
+        self.extractor.set_time_constrained(False)
         return self.extractor.get_filtered_objects()
+
+    def get_reset_link(self):
+        return reverse("{}:entries-search-init".format(ContextData.app_name))
+
+    def get_form_action_link(self):
+        return reverse("{}:entries".format(ContextData.app_name))
+
+    def get_form(self, adict):
+        return EntryChoiceForm(adict)
+
+    def get_title(self):
+        return " - entries"
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
@@ -41,7 +56,7 @@ class EntriesSearchListView(generic.ListView):
         context = ContextData.init_context(self.request, context)
         # Create any data and add it to the context
 
-        context["page_title"] += " - entries"
+        context["page_title"] += self.get_title()
 
         queue_size = BackgroundJobController.get_number_of_jobs(
             BackgroundJob.JOB_PROCESS_SOURCE
@@ -51,28 +66,26 @@ class EntriesSearchListView(generic.ListView):
 
         adict = self.extractor.get_entry_filter_args()
 
-        self.filter_form = EntryChoiceForm(adict)
+        self.filter_form = self.get_form(adict)
         self.filter_form.create(self.extractor.sources)
         self.filter_form.is_valid()
 
         self.filter_form.method = "GET"
-        self.filter_form.action_url = reverse("{}:entries".format(ContextData.app_name))
+        self.filter_form.action_url = self.get_form_action_link()
 
         context["args_extractor"] = self.extractor
-        context["reset_link"] = reverse(
-            "{}:entries-search-init".format(ContextData.app_name)
-        )
+        context["reset_link"] = self.get_reset_link()
 
         context["filter_form"] = self.filter_form
-        if "search" in self.request.GET:
-            context["search_term"] = self.request.GET["search"]
+        if "title" in self.request.GET:
+            context["search_term"] = self.request.GET["title"]
         elif "tag" in self.request.GET:
             context["search_term"] = self.request.GET["tag"]
 
         return context
 
 
-class EntriesRecentListView(generic.ListView):
+class EntriesRecentListView(EntriesSearchListView):
     model = LinkDataController
     context_object_name = "entries_list"
     paginate_by = 100
@@ -80,101 +93,52 @@ class EntriesRecentListView(generic.ListView):
     def get_queryset(self):
         self.extractor = EntryChoiceArgsExtractor(self.request.GET)
         self.extractor.get_sources()
+        #self.extractor.set_time_constrained(False)
         return self.extractor.get_filtered_objects()
 
-    def get_context_data(self, **kwargs):
-        # Call the base implementation first to get the context
-        context = super(EntriesRecentListView, self).get_context_data(**kwargs)
-        context = ContextData.init_context(self.request, context)
-        # Create any data and add it to the context
+    def get_reset_link(self):
+        return reverse("{}:entries-recent-init".format(ContextData.app_name))
 
-        context["page_title"] += " - entries"
+    def get_form_action_link(self):
+        return reverse("{}:entries-recent".format(ContextData.app_name))
 
-        queue_size = BackgroundJobController.get_number_of_jobs(
-            BackgroundJob.JOB_PROCESS_SOURCE
-        )
-        context["rss_are_fetched"] = queue_size > 0
-        context["rss_queue_size"] = queue_size
+    def get_form(self, adict):
+        return BasicEntryChoiceForm(adict)
 
-        adict = self.extractor.get_entry_filter_args()
-
-        self.filter_form = BasicEntryChoiceForm(adict)
-        self.filter_form.create(self.extractor.sources)
-
-        self.filter_form.is_valid()
-        self.filter_form.method = "GET"
-        self.filter_form.action_url = reverse(
-            "{}:entries-recent".format(ContextData.app_name)
-        )
-
-        context["args_extractor"] = self.extractor
-        context["reset_link"] = reverse(
-            "{}:entries-recent-init".format(ContextData.app_name)
-        )
-
-        context["filter_form"] = self.filter_form
-        if "search" in self.request.GET:
-            context["search_term"] = self.request.GET["search"]
-        elif "tag" in self.request.GET:
-            context["search_term"] = self.request.GET["tag"]
-
-        return context
+    def get_title(self):
+        return " - entries"
 
 
-class EntriesNotTaggedView(generic.ListView):
-    # TODO inherit from entries view?
+class EntriesNotTaggedView(EntriesSearchListView):
     model = LinkDataController
     context_object_name = "entries_list"
     paginate_by = 100
-    template_name = ContextData.get_full_template("linkdatacontroller_list.html")
 
     def get_queryset(self):
         self.extractor = EntryChoiceArgsExtractor(self.request.GET)
+        self.extractor.set_time_constrained(False)
         self.extractor.get_sources()
         return self.extractor.get_filtered_objects(
             Q(tags__tag__isnull=True, persistent=True)
         )
 
-    def get_context_data(self, **kwargs):
-        # Call the base implementation first to get the context
-        context = super(EntriesNotTaggedView, self).get_context_data(**kwargs)
-        context = ContextData.init_context(self.request, context)
-        # Create any data and add it to the context
+    def get_reset_link(self):
+        return reverse("{}:entries-untagged".format(ContextData.app_name))
 
-        context["page_title"] += " - not bookmarked"
+    def get_form_action_link(self):
+        return reverse("{}:entries-recent".format(ContextData.app_name))
 
-        queue_size = BackgroundJobController.get_number_of_jobs(
-            BackgroundJob.JOB_PROCESS_SOURCE
-        )
-        context["rss_are_fetched"] = queue_size > 0
-        context["rss_queue_size"] = queue_size
+    def get_form(self, adict):
+        return EntryChoiceForm(adict)
 
-        adict = self.extractor.get_entry_filter_args()
-
-        self.filter_form = EntryChoiceForm(adict)
-        self.filter_form.create(self.extractor.sources)
-
-        self.filter_form.is_valid()
-        self.filter_form.method = "GET"
-        self.filter_form.action_url = reverse(
-            "{}:entries-untagged".format(ContextData.app_name)
-        )
-
-        context["args_extractor"] = self.extractor
-        context["reset_link"] = reverse(
-            "{}:entries-untagged".format(ContextData.app_name)
-        )
-        context["filter_form"] = self.filter_form
-
-        return context
+    def get_title(self):
+        return " - not tagged"
 
 
-class EntriesBookmarkedView(generic.ListView):
-    # TODO inherit from entries view?
+class EntriesBookmarkedListView(EntriesSearchListView):
     model = LinkDataController
     context_object_name = "entries_list"
     paginate_by = 100
-    template_name = ContextData.get_full_template("linkdatacontroller_list.html")
 
     def get_queryset(self):
         self.extractor = EntryChoiceArgsExtractor(self.request.GET)
@@ -182,13 +146,77 @@ class EntriesBookmarkedView(generic.ListView):
         self.extractor.get_sources()
         return self.extractor.get_filtered_objects(Q(persistent=True))
 
+    def get_reset_link(self):
+        return reverse("{}:entries-bookmarked-init".format(ContextData.app_name))
+
+    def get_form_action_link(self):
+        return reverse("{}:entries-bookmarked".format(ContextData.app_name))
+
+    def get_form(self, adict):
+        return EntryBookmarksChoiceForm(adict)
+
+    def get_title(self):
+        return " - bookmarked"
+
+
+class EntriesArchiveListView(EntriesSearchListView):
+    model = LinkDataController
+    context_object_name = "entries_list"
+    paginate_by = 100
+    template_name = str(ContextData.get_full_template("linkdatacontroller_list.html"))
+
+    def get_queryset(self):
+        self.extractor = EntryChoiceArgsExtractor(self.request.GET)
+        self.extractor.get_sources()
+        self.extractor.set_archive_source(True)
+        return self.extractor.get_filtered_objects()
+
+    def get_reset_link(self):
+        return reverse("{}:entries-archived-init".format(ContextData.app_name))
+
+    def get_form_action_link(self):
+        return reverse("{}:entries-archived".format(ContextData.app_name))
+
+    def get_form(self, adict):
+        return EntryChoiceForm(adict)
+
+    def get_title(self):
+        return " - archived"
+
+
+class EntriesOmniListView(generic.ListView):
+    model = LinkDataController
+    context_object_name = "entries_list"
+    paginate_by = 100
+
+    def get_queryset(self):
+        processor = None
+        if 'search' in self.request.GET:
+            from ..forms import OmniSearchProcessor
+            processor = OmniSearchProcessor(self.request.GET['search'])
+            return processor.filter_queryset(LinkDataController.objects.all())
+        else:
+            return LinkDataController.objects.all()
+
+    def get_reset_link(self):
+        return reverse("{}:entries-omni-search".format(ContextData.app_name))
+
+    def get_form_action_link(self):
+        return reverse("{}:entries-omni-search".format(ContextData.app_name))
+
+    def get_form(self):
+        return OmniSearchForm(self.request.GET)
+
+    def get_title(self):
+        return " - entries"
+
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
-        context = super(EntriesBookmarkedView, self).get_context_data(**kwargs)
+        context = super(EntriesOmniListView, self).get_context_data(**kwargs)
         context = ContextData.init_context(self.request, context)
         # Create any data and add it to the context
 
-        context["page_title"] += " - not bookmarked"
+        context["page_title"] += self.get_title()
 
         queue_size = BackgroundJobController.get_number_of_jobs(
             BackgroundJob.JOB_PROCESS_SOURCE
@@ -196,22 +224,21 @@ class EntriesBookmarkedView(generic.ListView):
         context["rss_are_fetched"] = queue_size > 0
         context["rss_queue_size"] = queue_size
 
-        adict = self.extractor.get_entry_filter_args()
-
-        self.filter_form = EntryBookmarksChoiceForm(adict)
-        self.filter_form.create(self.extractor.sources)
-
+        self.filter_form = self.get_form()
         self.filter_form.is_valid()
-        self.filter_form.method = "GET"
-        self.filter_form.action_url = reverse(
-            "{}:entries-bookmarked".format(ContextData.app_name)
-        )
 
-        context["args_extractor"] = self.extractor
-        context["reset_link"] = reverse(
-            "{}:entries-bookmarked-init".format(ContextData.app_name)
-        )
+        self.filter_form.method = "GET"
+        self.filter_form.action_url = self.get_form_action_link()
+
+        context["reset_link"] = self.get_reset_link()
+
         context["filter_form"] = self.filter_form
+        if "title" in self.request.GET:
+            context["search_term"] = self.request.GET["title"]
+        elif "tag" in self.request.GET:
+            context["search_term"] = self.request.GET["tag"]
+        elif "search" in self.request.GET:
+            context["search_term"] = self.request.GET["search"]
 
         return context
 
@@ -453,6 +480,32 @@ def entries_search_init(request):
     filter_form.action_url = reverse("{}:entries".format(ContextData.app_name))
 
     context["form"] = filter_form
+
+    return ContextData.render(request, "form_search.html", context)
+
+
+def entries_omni_search_init(request):
+
+    context = ContextData.get_context(request)
+    context["page_title"] += " - search filter"
+
+    filter_form = OmniSearchForm()
+    filter_form.method = "GET"
+    filter_form.action_url = reverse("{}:entries-omni-search".format(ContextData.app_name))
+
+    context["form"] = filter_form
+    context["form_description_post"] = """
+    Examples:
+    <ul>
+     <li>"title = china" - searches anything with China in title</li>
+     <li>"tags__tag = tag" - searches links with tag</li>
+     <li>"persistent = 1" - all persistent link</li>
+     <li>"title = china & persistent = 1" - all persistent link, with china in title</li>
+     </ul>
+    """
+
+    if "search" in self.request.GET:
+        context["search_term"] = self.request.GET["search"]
 
     return ContextData.render(request, "form_search.html", context)
 

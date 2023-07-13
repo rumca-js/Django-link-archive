@@ -55,11 +55,11 @@ class BaseRssPlugin(SourceGenericPlugin):
 
     def process_rss_entry(self, source, feed_entry):
         try:
-            from ..models import LinkDataModel
+            from ..controllers import LinkDataController
 
             props = self.get_feed_entry_map(source, feed_entry)
 
-            objs = LinkDataModel.objects.filter(link=props["link"])
+            objs = LinkDataController.objects.filter(link=props["link"])
 
             if not objs.exists():
                 if (

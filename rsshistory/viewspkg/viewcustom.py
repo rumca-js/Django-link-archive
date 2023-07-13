@@ -675,8 +675,8 @@ def test_page(request):
 
     LinkDataController.move_all_to_archive()
 
-    #items = LinkDataController.objects.filter(source="https://pluralistic.net/feed")
-    #items.delete()
+    # items = LinkDataController.objects.filter(source="https://pluralistic.net/feed")
+    # items.delete()
 
     context["summary_text"] = summary_text
 

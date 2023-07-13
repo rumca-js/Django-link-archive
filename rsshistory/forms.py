@@ -100,6 +100,10 @@ class OmniSearchForm(forms.Form):
 
     search = forms.CharField(label="Search for", max_length=500)
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["search"].widget.attrs.update(size="100")
+
 
 class Conditions(object):
     def __init__(self, data):
@@ -196,7 +200,7 @@ class OmniSearchProcessor(object):
                 if combined_q_object is None:
                     combined_q_object = Q(**condition_text)
             else:
-                condition = conditions[key * 4]
+                condition = conditions[key * 4 - 1]
                 if condition.get_operator() == "&":
                     condition_text = self.get_eval_query(
                         conditions[key * 4 : key * 4 + 3]
@@ -209,6 +213,7 @@ class OmniSearchProcessor(object):
                     combined_q_object |= Q(**condition_text)
 
         filtered_queryset = queryset.filter(combined_q_object)
+        print("Omni query:{}".format(filtered_queryset.query))
         return filtered_queryset
 
 
@@ -516,13 +521,9 @@ class EntryBookmarksChoiceForm(BasicEntryChoiceForm):
     """
 
     # do not think too much about these settings, these will be overriden by 'create' method
-    search = forms.CharField(label="Search", max_length=500, required=False)
-    language = forms.CharField(label="language", max_length=500, required=False)
-    user = forms.CharField(label="user", max_length=500, required=False)
+    title = forms.CharField(label="title", max_length=1000, required=False)
     tag = forms.CharField(label="tag", max_length=500, required=False)
     vote = forms.IntegerField(label="vote", required=False)
-    date_to = forms.DateField(required=False, initial=my_date_to)
-    date_from = forms.DateField(required=False, initial=my_date_from)
 
 
 class EntryChoiceForm(BasicEntryChoiceForm):
@@ -531,12 +532,14 @@ class EntryChoiceForm(BasicEntryChoiceForm):
     """
 
     # do not think too much about these settings, these will be overriden by 'create' method
-    search = forms.CharField(label="Search", max_length=500, required=False)
+    title = forms.CharField(label="title", max_length=1000, required=False)
     persistent = forms.BooleanField(required=False, initial=False)
-    language = forms.CharField(label="language", max_length=500, required=False)
+    language = forms.CharField(label="language", max_length=10, required=False)
     user = forms.CharField(label="user", max_length=500, required=False)
     tag = forms.CharField(label="tag", max_length=500, required=False)
     vote = forms.IntegerField(label="vote", required=False)
+    artist = forms.CharField(label="artist", max_length=1000, required=False)
+    album = forms.CharField(label="album", max_length=1000, required=False)
     date_to = forms.DateField(required=False, initial=my_date_to)
     date_from = forms.DateField(required=False, initial=my_date_from)
 
@@ -545,14 +548,16 @@ class EntryChoiceArgsExtractor(object):
     def __init__(self, args):
         self.args = args
         self.time_constrained = True
+        self.archive_source = False
 
     def get_sources(self):
-        # source_parameter_map = self.get_source_filter_args(False)
-        # self.sources = SourceDataController.objects.filter(**source_parameter_map)
         self.sources = SourceDataController.objects.all()
 
     def set_time_constrained(self, constrained):
         self.time_constrained = constrained
+
+    def set_archive_source(self, source):
+        self.archive_source = source
 
     def get_filtered_objects(self, input_query=None):
         source_parameter_map = self.get_source_filter_args(False)
@@ -561,11 +566,21 @@ class EntryChoiceArgsExtractor(object):
         print("Entry parameter map: {}".format(str(entry_parameter_map)))
 
         if input_query == None:
-            self.entries = LinkDataController.objects.filter(**entry_parameter_map)
+            if not self.archive_source:
+                self.entries = LinkDataController.objects.filter(**entry_parameter_map)
+            if self.archive_source:
+                from .models import ArchiveLinkDataModel
+                self.entries = ArchiveLinkDataModel.objects.filter(**entry_parameter_map)
         else:
-            self.entries = LinkDataController.objects.filter(
-                Q(**entry_parameter_map) & input_query
-            )
+            if not self.archive_source:
+                self.entries = LinkDataController.objects.filter(
+                    Q(**entry_parameter_map) & input_query
+                )
+            if self.archive_source:
+                from .models import ArchiveLinkDataModel
+                self.entries = ArchiveLinkDataModel.objects.filter(
+                    Q(**entry_parameter_map) & input_query
+                    )
 
         return self.entries
 
@@ -602,7 +617,7 @@ class EntryChoiceArgsExtractor(object):
 
     def copy_if_is_set_and_translate(self, dst, src, element):
         if element in src and src[element] != "":
-            if element == "search":
+            if element == "title":
                 dst["title__icontains"] = src[element]
             elif element == "language":
                 dst["language__icontains"] = src[element]
@@ -632,6 +647,10 @@ class EntryChoiceArgsExtractor(object):
                     ]
             elif element == "date_to":
                 pass
+            elif element == "artist":
+                dst["artist__icontains"] = src[element]
+            elif element == "album":
+                dst["album__icontains"] = src[element]
             else:
                 dst[element] = src[element]
 
@@ -639,7 +658,7 @@ class EntryChoiceArgsExtractor(object):
         parameter_map = {}
 
         if pure_data:
-            self.copy_if_is_set(parameter_map, self.args, "search")
+            self.copy_if_is_set(parameter_map, self.args, "title")
             self.copy_if_is_set(parameter_map, self.args, "language")
             self.copy_if_is_set(parameter_map, self.args, "user")
             self.copy_if_is_set(parameter_map, self.args, "tag")
@@ -648,6 +667,8 @@ class EntryChoiceArgsExtractor(object):
             self.copy_if_is_set(parameter_map, self.args, "subcategory")
             self.copy_if_is_set(parameter_map, self.args, "source_title")
             self.copy_if_is_set(parameter_map, self.args, "persistent")
+            self.copy_if_is_set(parameter_map, self.args, "artist")
+            self.copy_if_is_set(parameter_map, self.args, "album")
             self.copy_if_is_set(parameter_map, self.args, "date_from")
             self.copy_if_is_set(parameter_map, self.args, "date_to")
 
@@ -660,7 +681,7 @@ class EntryChoiceArgsExtractor(object):
 
             return parameter_map
         else:
-            self.copy_if_is_set_and_translate(parameter_map, self.args, "search")
+            self.copy_if_is_set_and_translate(parameter_map, self.args, "title")
             self.copy_if_is_set_and_translate(parameter_map, self.args, "language")
             self.copy_if_is_set_and_translate(parameter_map, self.args, "user")
             self.copy_if_is_set_and_translate(parameter_map, self.args, "tag")
@@ -669,6 +690,8 @@ class EntryChoiceArgsExtractor(object):
             self.copy_if_is_set_and_translate(parameter_map, self.args, "subcategory")
             self.copy_if_is_set_and_translate(parameter_map, self.args, "source_title")
             self.copy_if_is_set_and_translate(parameter_map, self.args, "persistent")
+            self.copy_if_is_set_and_translate(parameter_map, self.args, "artist")
+            self.copy_if_is_set_and_translate(parameter_map, self.args, "album")
             self.copy_if_is_set_and_translate(parameter_map, self.args, "date_from")
             self.copy_if_is_set_and_translate(parameter_map, self.args, "date_to")
 

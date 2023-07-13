@@ -10,6 +10,9 @@
 
   <p>
       <div><strong>Url:</strong> <a href="{{ object.url }}">{{ object.url }}</a></div>
+    {% if handler.is_youtube %}
+      <div><strong>Channel:</strong> <a href="{{ object.get_channel_page_url }}">{{ object.get_channel_page_url }}</a></div>
+    {% endif %}
       <div><strong>Title:</strong> {{ object.title }}</div>
       <span><strong>Category:</strong> {{ object.category }}</span>
       <span><strong>Subcategory:</strong> {{ object.subcategory }}, </span>

@@ -36,10 +36,6 @@ class GitUpdateManager(object):
             new_history = RssSourceExportHistory(date=yesterday)
             new_history.save()
 
-            # TODO move this code to thread handler
-            self.clear_old_entries()
-            self.push_old_links_to_archive()
-
             writer.clear_daily_data(yesterday.isoformat())
 
         except Exception as e:
@@ -91,7 +87,6 @@ class GitUpdateManager(object):
 
     def clear_old_entries(self):
         log = logging.getLogger(self._cfg.app_name)
-
 
         sources = SourceDataController.objects.all()
         for source in sources:

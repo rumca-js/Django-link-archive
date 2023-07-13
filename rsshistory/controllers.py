@@ -5,7 +5,14 @@ from django.db import models
 from django.urls import reverse
 from django.db.models import Q
 
-from .models import LinkDataModel, SourceDataModel, ArchiveLinkDataModel, BackgroundJob, PersistentInfo
+from .models import (
+    LinkDataModel,
+    SourceDataModel,
+    ArchiveLinkDataModel,
+    BackgroundJob,
+    PersistentInfo,
+    SourceOperationalData,
+)
 from .models import LinkCommentDataModel, LinkTagsDataModel, LinkVoteDataModel
 from .webtools import Page
 
@@ -197,6 +204,11 @@ class SourceDataController(SourceDataModel):
         data["description"] = p.get_title()
         return data
 
+    def get_channel_page_url(self):
+        from .pluginsources.youtubesourcehandler import YouTubeSourceHandler
+        return YouTubeSourceHandler.input2url(self.url)
+
+
 
 class LinkDataController(LinkDataModel):
     class Meta:
@@ -207,6 +219,26 @@ class LinkDataController(LinkDataModel):
             return SourceDataController.objects.get(id=self.source_obj.id)
         else:
             return None
+
+    def get_link_object(link, date = None):
+        if date is None:
+            obj = LinkDataModel.objects.filter(link = link)
+            if len(obj) > 0:
+                return obj[0]
+            obj = ArchiveLinkDataModel.objects.filter(link = link)
+            if len(obj) > 0:
+                return obj[0]
+
+        current_time = DateUtils.get_datetime_now_utc()
+        date_before = current_time - date
+        if date_before.days > self.get_archive_days_limit():
+            obj = ArchiveLinkDataModel.objects.filter(link = link)
+            if len(obj) > 0:
+                return obj[0]
+        else:
+            obj = LinkDataModel.objects.filter(link = link)
+            if len(obj) > 0:
+                return obj[0]
 
     def get_absolute_url(self):
         """Returns the URL to access a particular author instance."""
@@ -230,6 +262,9 @@ class LinkDataController(LinkDataModel):
         if self.dead:
             return self.get_link_dead_text()
         return "{} {}".format(self.date_published, self.get_source_name())
+
+    def has_tags(self):
+        return len(self.tags.all()) > 0
 
     def get_full_description(self):
         if self.dead:
@@ -334,7 +369,7 @@ class LinkDataController(LinkDataModel):
             "thumbnail",
             "tags",
             "comments",
-            "vote"
+            "vote",
         ]
 
     def get_map(self):
@@ -503,11 +538,14 @@ class LinkDataController(LinkDataModel):
             except Exception as e:
                 error_text = traceback.format_exc()
 
+    def get_archive_days_limit(self):
+        return 100
+
     def move_all_to_archive():
         from .dateutils import DateUtils
 
         current_time = DateUtils.get_datetime_now_utc()
-        days_before = current_time - timedelta(days=100)
+        days_before = current_time - timedelta(days=self.get_archive_days_limit() )
 
         entries = LinkDataController.objects.filter(
             persistent=False, date_published__lt=days_before
@@ -518,7 +556,6 @@ class LinkDataController(LinkDataModel):
                 entry.move_to_archive()
             elif entry.get_source_obj().get_days_to_remove() == 0:
                 entry.move_to_archive()
-
 
 
 class LinkCommentDataController(LinkCommentDataModel):
