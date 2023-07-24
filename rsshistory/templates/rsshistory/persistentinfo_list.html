@@ -1,0 +1,20 @@
+{% extends base_generic %}
+
+{% block content %}
+  <ul>
+     <li><a href="{% url 'rsshistory:truncate-errors' %}" class="simplebutton">Truncate errors</a></li>
+  </ul>
+
+  {% if info_list %}
+    <table>
+      <tr>
+         <th width="200">Date</th><th width="100">Level</th><th>Text</th>
+      </tr>
+      {% for info in info_list %}
+      <tr>
+         <td>{{info.date}}</td><td>{{info.level}}</td><td>{{info.info}}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  {% endif %}
+{% endblock %}

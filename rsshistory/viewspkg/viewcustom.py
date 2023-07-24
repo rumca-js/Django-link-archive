@@ -12,8 +12,9 @@ from ..models import (
     ConfigurationEntry,
     UserConfig,
     BackgroundJob,
+    PersistentInfo
 )
-from ..models import RssSourceExportHistory
+from ..models import RssSourceExportHistory, Domains
 from ..forms import ConfigForm, UserConfigForm
 from ..views import ContextData
 from ..controllers import (
@@ -86,8 +87,6 @@ def system_status(request):
     from ..dateutils import DateUtils
 
     context["Current_DateTime"] = DateUtils.get_datetime_now_utc()
-
-    from ..models import PersistentInfo
 
     context["log_items"] = PersistentInfo.get_safe()
 
@@ -177,8 +176,6 @@ def truncate_errors(request):
 
     if not request.user.is_staff:
         return ContextData.render(request, "missing_rights.html", context)
-
-    from ..models import PersistentInfo
 
     PersistentInfo.truncate()
 
@@ -673,7 +670,7 @@ def test_page(request):
 
     summary_text = ""
 
-    LinkDataController.move_all_to_archive()
+    # LinkDataController.move_all_to_archive()
 
     # items = LinkDataController.objects.filter(source="https://pluralistic.net/feed")
     # items.delete()
@@ -853,5 +850,63 @@ def backgroundjobs_remove(request, job_type):
     jobs.delete()
 
     context["summary_text"] = "Background jobs has been removed"
+
+    return ContextData.render(request, "summary_present.html", context)
+
+
+class PersistentInfoView(generic.ListView):
+    model = PersistentInfo
+    context_object_name = "info_list"
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get the context
+        context = super(PersistentInfoView, self).get_context_data(**kwargs)
+        context = ContextData.init_context(self.request, context)
+
+        return context
+
+
+class DomainsListView(generic.ListView):
+    model = Domains
+    context_object_name = "domain_list"
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get the context
+        context = super(DomainsListView, self).get_context_data(**kwargs)
+        context = ContextData.init_context(self.request, context)
+
+        if "type" in self.request.GET:
+            context["type"] = self.request.GET["type"]
+        else:
+            context["type"] = "normal"
+
+        return context
+
+
+def domain_remove(request, pk):
+    context = ContextData.get_context(request)
+    context["page_title"] += " - Domain remove"
+
+    if not request.user.is_staff:
+        return ContextData.render(request, "missing_rights.html", context)
+
+    domain = Domains.objects.get(id=pk)
+    domain.delete()
+
+    context["summary_text"] = "Domain was removed"
+
+    return ContextData.render(request, "summary_present.html", context)
+
+
+def check_if_move_to_archive(request):
+    context = ContextData.get_context(request)
+    context["page_title"] += " - Move to archive"
+
+    if not request.user.is_staff:
+        return ContextData.render(request, "missing_rights.html", context)
+
+    LinkDataController.move_all_to_archive()
+
+    context["summary_text"] = "Moved links to archive"
 
     return ContextData.render(request, "summary_present.html", context)

@@ -1,0 +1,21 @@
+{% extends base_generic %}
+
+{% block content %}
+
+<h3>Domains</h3>
+  {% if domain_list %}
+    <ul>
+      {% for domain in domain_list %}
+          {% if type == "normal" %}
+            <li><a href="https://{{domain.domain}}">{{domain.domain}}</a>, Updated:{{domain.date_last}}, First seen:{{domain.date_created}}
+                <a href="{% url 'rsshistory:domain-remove' domain.id %}" class="simplebutton">Remove</a>
+            </li>
+          {% elif type == "clear" %}
+          <div>- {{domain.domain}}, Updated:{{domain.date_last}}, First seen:{{domain.date_created}}</div>
+          {% endif %}
+      {% endfor %}
+    </ul>
+  {% else %}
+    No domains yet
+  {% endif %}
+{% endblock %}

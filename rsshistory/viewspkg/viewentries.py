@@ -11,6 +11,7 @@ from ..models import (
 )
 from ..controllers import (
     LinkDataController,
+    ArchiveLinkDataController,
     SourceDataController,
     BackgroundJobController,
 )
@@ -20,7 +21,7 @@ from ..forms import (
     ConfigForm,
     BasicEntryChoiceForm,
     EntryBookmarksChoiceForm,
-    OmniSearchForm
+    OmniSearchForm,
 )
 from ..forms import EntryChoiceArgsExtractor
 from ..views import ContextData
@@ -31,6 +32,7 @@ class EntriesSearchListView(generic.ListView):
     model = LinkDataController
     context_object_name = "entries_list"
     paginate_by = 100
+    template_name = str(ContextData.get_full_template("linkdatacontroller_list.html"))
 
     def get_queryset(self):
         self.extractor = EntryChoiceArgsExtractor(self.request.GET)
@@ -93,7 +95,7 @@ class EntriesRecentListView(EntriesSearchListView):
     def get_queryset(self):
         self.extractor = EntryChoiceArgsExtractor(self.request.GET)
         self.extractor.get_sources()
-        #self.extractor.set_time_constrained(False)
+        # self.extractor.set_time_constrained(False)
         return self.extractor.get_filtered_objects()
 
     def get_reset_link(self):
@@ -191,9 +193,10 @@ class EntriesOmniListView(generic.ListView):
 
     def get_queryset(self):
         processor = None
-        if 'search' in self.request.GET:
+        if "search" in self.request.GET:
             from ..forms import OmniSearchProcessor
-            processor = OmniSearchProcessor(self.request.GET['search'])
+
+            processor = OmniSearchProcessor(self.request.GET["search"])
             return processor.filter_queryset(LinkDataController.objects.all())
         else:
             return LinkDataController.objects.all()
@@ -251,6 +254,33 @@ class EntryDetailView(generic.DetailView):
 
         # Call the base implementation first to get the context
         context = super(EntryDetailView, self).get_context_data(**kwargs)
+        context = ContextData.init_context(self.request, context)
+
+        if self.object.language == None:
+            self.object.update_language()
+
+        context["page_title"] = self.object.title
+        context["object_controller"] = EntryControllerBuilder.get(self.object)
+
+        from ..services.waybackmachine import WaybackMachine
+        from ..dateutils import DateUtils
+
+        m = WaybackMachine()
+        context["archive_org_date"] = m.get_formatted_date(DateUtils.get_date_today())
+
+        return context
+
+
+class EntryArchivedDetailView(generic.DetailView):
+    model = ArchiveLinkDataController
+
+    template_name = str(ContextData.get_full_template("linkdatacontroller_detail.html"))
+
+    def get_context_data(self, **kwargs):
+        from ..pluginentries.entrycontrollerbuilder import EntryControllerBuilder
+
+        # Call the base implementation first to get the context
+        context = super(EntryArchivedDetailView, self).get_context_data(**kwargs)
         context = ContextData.init_context(self.request, context)
 
         if self.object.language == None:
@@ -485,16 +515,19 @@ def entries_search_init(request):
 
 
 def entries_omni_search_init(request):
-
     context = ContextData.get_context(request)
     context["page_title"] += " - search filter"
 
     filter_form = OmniSearchForm()
     filter_form.method = "GET"
-    filter_form.action_url = reverse("{}:entries-omni-search".format(ContextData.app_name))
+    filter_form.action_url = reverse(
+        "{}:entries-omni-search".format(ContextData.app_name)
+    )
 
     context["form"] = filter_form
-    context["form_description_post"] = """
+    context[
+        "form_description_post"
+    ] = """
     Examples:
     <ul>
      <li>"title = china" - searches anything with China in title</li>
@@ -504,7 +537,7 @@ def entries_omni_search_init(request):
      </ul>
     """
 
-    if "search" in self.request.GET:
+    if "search" in request.GET:
         context["search_term"] = self.request.GET["search"]
 
     return ContextData.render(request, "form_search.html", context)
@@ -540,6 +573,20 @@ def entries_recent_init(request):
     return ContextData.render(request, "form_search.html", context)
 
 
+def entries_archived_init(request):
+    context = ContextData.get_context(request)
+    context["page_title"] += " - init filter"
+
+    filter_form = EntryChoiceForm()
+    filter_form.create(SourceDataController.objects.all())
+    filter_form.method = "GET"
+    filter_form.action_url = reverse("{}:entries-archived".format(ContextData.app_name))
+
+    context["form"] = filter_form
+
+    return ContextData.render(request, "form_search.html", context)
+
+
 def make_persistent_entry(request, pk):
     context = ContextData.get_context(request)
     context["page_title"] += " - persistent entry"
@@ -550,13 +597,7 @@ def make_persistent_entry(request, pk):
 
     entry = LinkDataController.objects.get(id=pk)
 
-    prev_state = entry.persistent
-
-    entry.persistent = True
-    entry.user = request.user.username
-    entry.save()
-
-    if prev_state != True:
+    if LinkDataHyperController.make_persistent(request, entry):
         BackgroundJobController.link_archive(entry.link)
 
     summary_text = "Link changed to state: " + str(entry.persistent)
@@ -574,10 +615,10 @@ def make_not_persistent_entry(request, pk):
     if not request.user.is_staff:
         return ContextData.render(request, "missing_rights.html", context)
 
-    ft = LinkDataController.objects.get(id=pk)
-    ft.make_not_persistent(request.user.username)
+    entry = LinkDataController.objects.get(id=pk)
+    LinkDataHyperController.make_not_persistent(request, entry)
 
-    summary_text = "Link changed to state: " + str(ft.persistent)
+    summary_text = "Link changed to state: " + str(entry.persistent)
 
     context["summary_text"] = summary_text
 

@@ -27,6 +27,7 @@
 <h1>Server log</h1>
 <p>
 <ul>
+  <li><a href="{% url 'rsshistory:persistentinfos' %}" class="simplebutton">View all persistent infos</a></li>
   <li><a href="{% url 'rsshistory:truncate-errors' %}" class="simplebutton">Truncate errors</a></li>
 </ul>
 {% for log_item in log_items %}

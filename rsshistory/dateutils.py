@@ -15,6 +15,12 @@ class DateUtils(object):
             input_date = input_date.replace(tzinfo=timezone("UTC"))
         return input_date
 
+    def get_day_diff(time_input):
+        current_time = DateUtils.get_datetime_now_utc()
+        time_diff = current_time - entry.date_published
+        days_diff = time_diff.days
+        return days_diff
+
     def get_date_yesterday():
         current_date = date.today()
         prev_day = current_date - timedelta(days=1)

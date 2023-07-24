@@ -3,6 +3,7 @@ import traceback
 from ..models import PersistentInfo, LinkDataModel
 from ..webtools import Page
 from ..dateutils import DateUtils
+from ..controllers import LinkDataHyperController
 
 
 class SourceGenericPlugin(Page):
@@ -64,47 +65,7 @@ class SourceGenericPlugin(Page):
                 if not link_data:
                     continue
 
-                objs = LinkDataModel.objects.filter(link=link_data["link"])
-                if objs.exists():
-                    o = objs[0]
-                    method = "update"
-
-                    o.source = link_data["source"]
-                    o.title = link_data["title"]
-                    o.description = link_data["description"]
-                    o.link = link_data["link"]
-                    o.date_published = link_data["published"]
-                    o.language = link_data["language"]
-                    o.thumbnail = link_data["thumbnail"]
-                    o.source_obj = source
-                else:
-                    o = LinkDataModel(
-                        source=link_data["source"],
-                        title=link_data["title"],
-                        description=link_data["description"],
-                        link=link_data["link"],
-                        date_published=link_data["published"],
-                        language=link_data["language"],
-                        thumbnail=link_data["thumbnail"],
-                        source_obj=source,
-                    )
-                    method = "add"
-
-                try:
-                    o.save()
-                except Exception as e:
-                    error_text = traceback.format_exc()
-                    PersistentInfo.exc(
-                        "Could not {} entry: Source:{} {}; Entry:{} {}; Exc:{}\n{}".format(
-                            method,
-                            source.url,
-                            source.title,
-                            link_data["link"],
-                            link_data["title"],
-                            str(e),
-                            error_text,
-                        )
-                    )
+                LinkDataHyperController.add_new_link(link_data, source)
 
             return num_entries
 

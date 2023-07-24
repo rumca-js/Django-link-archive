@@ -17,26 +17,16 @@ class GitUpdateManager(object):
             if not RssSourceExportHistory.is_update_required():
                 return
 
-            conf = ConfigurationEntry.get()
-            yesterday = DateUtils.get_date_yesterday()
-
             PersistentInfo.create("Pushing data to git")
 
-            from .datawriter import DataWriter
-
-            writer = DataWriter(self._cfg)
-            writer.write_daily_data(yesterday.isoformat())
-            writer.write_bookmarks()
-            writer.write_sources()
-
-            self.push_to_git(conf)
+            self.write_and_push_bookmarks()
+            self.write_and_push_daily_data()
 
             PersistentInfo.create("Pushing data to git: Done")
 
+            yesterday = DateUtils.get_date_yesterday()
             new_history = RssSourceExportHistory(date=yesterday)
             new_history.save()
-
-            writer.clear_daily_data(yesterday.isoformat())
 
         except Exception as e:
             log = logging.getLogger(self._cfg.app_name)
@@ -46,9 +36,30 @@ class GitUpdateManager(object):
             )
             log.critical(e, exc_info=True)
 
-    def push_to_git(self, conf):
-        self.push_daily_repo(conf)
+    def write_and_push_bookmarks(self):
+        from .datawriter import DataWriter
+
+        conf = ConfigurationEntry.get()
+
+        writer = DataWriter(self._cfg)
+        writer.write_bookmarks()
+        writer.write_sources()
+
         self.push_bookmarks_repo(conf)
+
+    def write_and_push_daily_data(self):
+        from .datawriter import DataWriter
+
+        conf = ConfigurationEntry.get()
+        yesterday = DateUtils.get_date_yesterday()
+
+        writer = DataWriter(self._cfg)
+        writer.write_daily_data(yesterday.isoformat())
+        writer.write_sources()
+
+        self.push_daily_repo(conf)
+
+        writer.clear_daily_data(yesterday.isoformat())
 
     def push_daily_repo(self, conf):
         log = logging.getLogger(self._cfg.app_name)

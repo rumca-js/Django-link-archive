@@ -204,7 +204,7 @@ def tag_rename(request):
             current_tag = form.cleaned_data["current_tag"]
             new_tag = form.cleaned_data["new_tag"]
 
-            tags = LinkTagsDataController.objects.filter(tag=current_tag)
+            tags = LinkTagsDataModel.objects.filter(tag=current_tag)
             for tag in tags:
                 tag.tag = new_tag.lower()
                 tag.save()

@@ -67,7 +67,7 @@ class BaseParsePlugin(SourceGenericPlugin):
                 if not self.is_link_valid(link_str):
                     continue
 
-                objs = LinkDataController.objects.filter(link = link_str)
+                objs = LinkDataController.objects.filter(link=link_str)
                 if objs.exists():
                     continue
 

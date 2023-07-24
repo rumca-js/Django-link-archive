@@ -8,6 +8,8 @@
   <li><a href="{% url 'rsshistory:configuration' %}" class="simplebutton">Configuration</a></li>
   <li><a href="{% url 'rsshistory:show-youtube-link-props' %}" class="simplebutton">Show YouTube properties</a></li>
   <li><a href="{% url 'rsshistory:entries-omni-search-init' %}" class="simplebutton">Omni search</a></li>
+  <li><a href="{% url 'rsshistory:entries-archived-init' %}" class="simplebutton" title="Search archived entries">Search archived entries</a></li>
+  <li><a href="{% url 'rsshistory:check-move-archive' %}" class="simplebutton" title="Moves old entries to archive">Move old entries to archive</a></li>
 </ul>
 
 <h1>Import / export</h1>
@@ -37,6 +39,7 @@
   <li><a href="https://www.quora.com/" class="simplebutton">Quora</a></li>
   <li><a href="https://stackoverflow.com" class="simplebutton">Stack overflow</a></li>
   <li><a href="https://www.reddit.com/" class="simplebutton">Reddit</a></li>
+  <li><a href="https://hn.algolia.com/?dateRange=all&page=0&prefix=true&query=tim%20cook&sort=byPopularity&type=story" class="simplebutton">Hacker News search</a></li>
 
   <li><a href="https://mastodon.social/explore" class="simplebutton">Mastodon</a></li>
   <li><a href="https://join-lemmy.org/instances" class="simplebutton">Lemmy</a></li>

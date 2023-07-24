@@ -469,7 +469,7 @@ class PushToRepoJobHandler(BaseJobHandler):
 
     def process(self, obj=None):
         try:
-            if ConfigurationEntry.get().is_git_set():
+            if ConfigurationEntry.get().is_bookmark_repo_set():
                 from .gitupdatemgr import GitUpdateManager
 
                 git_mgr = GitUpdateManager(self._config)
@@ -499,7 +499,9 @@ class RefreshThreadHandler(object):
         for source in sources:
             BackgroundJobController.download_rss(source)
 
-        if ConfigurationEntry.get().is_git_set():
+        conf = ConfigurationEntry.get()
+
+        if conf.is_bookmark_repo_set() or conf.is_daily_repo_set():
             if RssSourceExportHistory.is_update_required():
                 BackgroundJobController.push_to_repo()
 

@@ -80,20 +80,7 @@ class DataWriter(object):
         items = cc.get_map()
 
         converter = JsonConverter(items)
-        converter.set_export_columns(
-            [
-                "url",
-                "title",
-                "category",
-                "subcategory",
-                "dead",
-                "export_to_cms",
-                "remove_after_days",
-                "language",
-                "favicon",
-                "on_hold",
-            ]
-        )
+        converter.set_export_columns(SourceDataController.get_export_names())
         text = converter.export()
 
         self._cfg.get_bookmarks_path().mkdir(parents=True, exist_ok=True)

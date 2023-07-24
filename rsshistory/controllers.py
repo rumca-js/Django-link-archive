@@ -5,15 +5,21 @@ from django.db import models
 from django.urls import reverse
 from django.db.models import Q
 
-from .models import (
+from .models.linkmodels import (
+    BaseLinkDataModel,
+    BaseLinkDataController,
     LinkDataModel,
-    SourceDataModel,
     ArchiveLinkDataModel,
+)
+from .models.appmodels import (
     BackgroundJob,
     PersistentInfo,
+)
+from .models.sourcemodels import (
+    SourceDataModel,
     SourceOperationalData,
 )
-from .models import LinkCommentDataModel, LinkTagsDataModel, LinkVoteDataModel
+from .models import LinkCommentDataModel, LinkTagsDataModel, LinkVoteDataModel, Domains
 from .webtools import Page
 
 from .apps import LinkDatabase
@@ -140,6 +146,7 @@ class SourceDataController(SourceDataModel):
 
     def get_export_names():
         return [
+            "id",
             "url",
             "title",
             "category",
@@ -206,8 +213,8 @@ class SourceDataController(SourceDataModel):
 
     def get_channel_page_url(self):
         from .pluginsources.youtubesourcehandler import YouTubeSourceHandler
-        return YouTubeSourceHandler.input2url(self.url)
 
+        return YouTubeSourceHandler.input2url(self.url)
 
 
 class LinkDataController(LinkDataModel):
@@ -220,332 +227,11 @@ class LinkDataController(LinkDataModel):
         else:
             return None
 
-    def get_link_object(link, date = None):
-        if date is None:
-            obj = LinkDataModel.objects.filter(link = link)
-            if len(obj) > 0:
-                return obj[0]
-            obj = ArchiveLinkDataModel.objects.filter(link = link)
-            if len(obj) > 0:
-                return obj[0]
-
-        current_time = DateUtils.get_datetime_now_utc()
-        date_before = current_time - date
-        if date_before.days > self.get_archive_days_limit():
-            obj = ArchiveLinkDataModel.objects.filter(link = link)
-            if len(obj) > 0:
-                return obj[0]
-        else:
-            obj = LinkDataModel.objects.filter(link = link)
-            if len(obj) > 0:
-                return obj[0]
-
-    def get_absolute_url(self):
-        """Returns the URL to access a particular author instance."""
-        return reverse("{}:entry-detail".format(LinkDatabase.name), args=[str(self.id)])
-
-    def get_source_name(self):
-        if self.get_source_obj():
-            return self.get_source_obj().title
-        else:
-            return self.source
-
-    def get_link_dead_text(self):
-        return "______"
-
-    def get_title(self):
-        if self.dead:
-            return self.get_link_dead_text()
-        return self.title
-
-    def get_long_description(self):
-        if self.dead:
-            return self.get_link_dead_text()
-        return "{} {}".format(self.date_published, self.get_source_name())
-
-    def has_tags(self):
-        return len(self.tags.all()) > 0
-
-    def get_full_description(self):
-        if self.dead:
-            return self.get_link_dead_text()
-        string = "{} {}".format(self.date_published, self.get_source_name())
-        tags = self.get_tag_string()
-        if tags:
-            string += " Tags:{}".format(tags)
-        if self.user:
-            string += " User:{}".format(self.user)
-
-        return string
-
-    def get_tag_string(self):
-        return LinkTagsDataModel.join_elements(self.tags.all())
-
-    def get_vote(self):
-        votes = self.votes.all()
-        if len(votes) == 0:
-            return 0
-
-        sum_num = None
-        for vote in votes:
-            if sum_num == None:
-                sum_num = vote.vote
-            else:
-                sum_num += vote.vote
-
-        return sum_num / len(votes)
-
-    def get_tag_map(self):
-        # TODO should it be done by for tag in self.tags: tag.get_map()?
-        result = []
-        tags = self.tags.all()
-        for tag in tags:
-            result.append(tag.tag)
-        return result
-
-    def get_comment_vec(self):
-        # TODO
-        return []
-
-    def update_language(self):
-        if self.get_source_obj():
-            self.language = self.get_source_obj().language
-            self.save()
-        else:
-            from .webtools import Page
-
-            page = Page(self.link)
-            if page.is_valid():
-                language = page.get_language()
-                if language != None:
-                    self.language = language
-                    self.save()
-
-    def get_favicon(self):
-        if self.get_source_obj():
-            return self.get_source_obj().get_favicon()
-
-        from .webtools import Page
-
-        page = Page(self.link)
-        domain = page.get_domain()
-        return domain + "/favicon.ico"
-
-    def get_thumbnail(self):
-        if self.thumbnail:
-            return self.thumbnail
-
-        return self.get_favicon()
-
-    def get_export_names():
-        return [
-            "source",
-            "title",
-            "description",
-            "link",
-            "date_published",
-            "persistent",
-            "dead",
-            "artist",
-            "album",
-            "user",
-            "language",
-            "thumbnail",
-        ]
-
-    def get_all_export_names():
-        return [
-            "source",
-            "title",
-            "description",
-            "link",
-            "date_published",
-            "persistent",
-            "dead",
-            "artist",
-            "album",
-            "user",
-            "language",
-            "thumbnail",
-            "tags",
-            "comments",
-            "vote",
-        ]
-
-    def get_map(self):
-        output_data = {}
-
-        export_names = LinkDataController.get_export_names()
-        for export_name in export_names:
-            val = getattr(self, export_name)
-            if export_name.find("date_") >= 0:
-                val = val.isoformat()
-            output_data[export_name] = val
-
-        return output_data
-
-    def get_map_full(self):
-        themap = self.get_map()
-
-        tags = self.get_tag_map()
-        if len(tags) > 0:
-            themap["tags"] = tags
-
-        vote = self.get_vote()
-        if vote > 0:
-            themap["vote"] = tags
-
-        comments = self.get_comment_vec()
-        if len(comments) > 0:
-            themap["comments"] = comments
-
-        return themap
-
-    def get_archive_link(self):
-        from .services.waybackmachine import WaybackMachine
-        from .dateutils import DateUtils
-
-        m = WaybackMachine()
-        formatted_date = m.get_formatted_date(self.date_published.date())
-        archive_link = m.get_archive_url_for_date(formatted_date, self.link)
-        return archive_link
-
-    def create_from_youtube(url, data):
-        from .pluginentries.youtubelinkhandler import YouTubeLinkHandler
-
-        objs = LinkDataModel.objects.filter(link=url)
-        if len(objs) != 0:
-            return False
-
-        h = YouTubeLinkHandler(url)
-        if not h.download_details():
-            PersistentInfo.error("Could not obtain details for link:{}".format(url))
-            return False
-
-        data = dict()
-        source = h.get_channel_feed_url()
-        if source is None:
-            PersistentInfo.error("Could not obtain channel feed url:{}".format(url))
-            return False
-
-        link = h.get_link_url()
-        title = h.get_title()
-        description = h.get_description()
-        date_published = h.get_datetime_published()
-        thumbnail = h.get_thumbnail()
-        artist = h.get_channel_name()
-
-        language = "en-US"
-        if "language" in data:
-            language = data["language"]
-        user = None
-        if "user" in data:
-            user = data["user"]
-        persistent = False
-        if "persistent" in data:
-            persistent = data["persistent"]
-
-        source_obj = None
-        sources = SourceDataModel.objects.filter(url=source)
-        if sources.exists():
-            source_obj = sources[0]
-
-        entry = LinkDataModel(
-            source=source,
-            title=title,
-            description=description,
-            link=link,
-            date_published=date_published,
-            persistent=persistent,
-            thumbnail=thumbnail,
-            artist=artist,
-            language=language,
-            user=user,
-            source_obj=source_obj,
-        )
-        entry.save()
-        return True
-
-    def get_full_information(data):
-        return LinkDataController.update_info(data)
-
-    def update_info(data):
-        from .webtools import Page
-
-        p = Page(data["link"])
-
-        data["thumbnail"] = None
-
-        if p.is_youtube():
-            LinkDataController.update_info_youtube(data)
-
-        return LinkDataController.update_info_default(data)
-
-    def update_info_youtube(data):
-        from .pluginentries.youtubelinkhandler import YouTubeLinkHandler
-
-        h = YouTubeLinkHandler(data["link"])
-        h.download_details()
-
-        data["source"] = h.get_channel_feed_url()
-        data["link"] = h.get_link_url()
-        data["title"] = h.get_title()
-        # TODO limit comes from LinkDataModel, do not hardcode
-        data["description"] = h.get_description()[:999]
-        data["date_published"] = h.get_datetime_published()
-        data["thumbnail"] = h.get_thumbnail()
-
-        return data
-
-    def update_info_default(data):
-        from .webtools import Page
-
-        p = Page(data["link"])
-        if "source" not in data or not data["source"]:
-            data["source"] = p.get_domain()
-        if "language" not in data or not data["language"]:
-            data["language"] = p.get_language()
-        if "title" not in data or not data["title"]:
-            data["title"] = p.get_title()
-        if "description" not in data or not data["description"]:
-            data["description"] = p.get_title()
-        return data
-
-    def make_not_persistent(self, username):
-        tags = LinkTagsDataModel.objects.filter(link_obj=self)
-        tags.delete()
-
-        votes = LinkVoteDataModel.objects.filter(link_obj=self)
-        votes.delete()
-
-        self.persistent = False
-        self.user = username
-        self.save()
-
-    def move_to_archive(self):
-        objs = ArchiveLinkDataModel.objects.filter(link=self.link)
-        if len(objs) == 0:
-            themap = self.get_map()
-            themap["source_obj"] = self.get_source_obj()
-            try:
-                ArchiveLinkDataModel.objects.create(**themap)
-                self.delete()
-            except Exception as e:
-                error_text = traceback.format_exc()
-        else:
-            try:
-                self.delete()
-            except Exception as e:
-                error_text = traceback.format_exc()
-
-    def get_archive_days_limit(self):
-        return 100
-
     def move_all_to_archive():
         from .dateutils import DateUtils
 
         current_time = DateUtils.get_datetime_now_utc()
-        days_before = current_time - timedelta(days=self.get_archive_days_limit() )
+        days_before = current_time - timedelta(days=BaseLinkDataController.get_archive_days_limit())
 
         entries = LinkDataController.objects.filter(
             persistent=False, date_published__lt=days_before
@@ -556,6 +242,140 @@ class LinkDataController(LinkDataModel):
                 entry.move_to_archive()
             elif entry.get_source_obj().get_days_to_remove() == 0:
                 entry.move_to_archive()
+
+
+class ArchiveLinkDataController(ArchiveLinkDataModel):
+    class Meta:
+        proxy = True
+
+    def get_source_obj(self):
+        if self.source_obj:
+            return SourceDataController.objects.get(id=self.source_obj.id)
+        else:
+            return None
+
+
+class LinkDataHyperController(object):
+
+    def add_new_link(link_data, source = None):
+        objs = LinkDataModel.objects.filter(link=link_data["link"])
+        if objs.exists():
+            o = objs[0]
+
+            o.source = link_data["source"]
+            o.title = link_data["title"]
+            o.description = link_data["description"]
+            o.link = link_data["link"]
+            o.date_published = link_data["published"]
+            o.language = link_data["language"]
+            o.thumbnail = link_data["thumbnail"]
+            o.source_obj = source
+        else:
+            o = LinkDataModel(
+                source=link_data["source"],
+                title=link_data["title"],
+                description=link_data["description"],
+                link=link_data["link"],
+                date_published=link_data["published"],
+                language=link_data["language"],
+                thumbnail=link_data["thumbnail"],
+                source_obj=source,
+            )
+        try:
+           o.save()
+
+           p = Page(link_data["source"])
+           domain = p.get_domain_only()
+           Domains.add(domain)
+
+           p = Page(link_data["link"])
+           domain = p.get_domain_only()
+           Domains.add(domain)
+
+           return True
+        except Exception as e:
+           error_text = traceback.format_exc()
+           PersistentInfo.exc(
+                        "Could not {} entry: Source:{} {}; Entry:{} {}; Exc:{}\n{}".format(
+                            method,
+                            source.url,
+                            source.title,
+                            link_data["link"],
+                            link_data["title"],
+                            str(e),
+                            error_text,
+                        )
+           )
+        return False
+
+    def get_link_object(link, date=None):
+        if date is None:
+            obj = LinkDataController.objects.filter(link=link)
+            if len(obj) > 0:
+                return obj[0]
+            obj = ArchiveLinkDataController.objects.filter(link=link)
+            if len(obj) > 0:
+                return obj[0]
+
+        current_time = DateUtils.get_datetime_now_utc()
+        date_before = current_time - date
+        if date_before.days > self.get_archive_days_limit():
+            obj = ArchiveLinkDataController.objects.filter(link=link)
+            if len(obj) > 0:
+                return obj[0]
+        else:
+            obj = LinkDataController.objects.filter(link=link)
+            if len(obj) > 0:
+                return obj[0]
+
+    def make_persistent(self, request, entry):
+        if entry.is_archive():
+            LinkDataHyperController.move_from_archive(entry)
+
+        entry.make_persistent(request.user.username)
+        return True
+
+    def make_not_persistent(self, request, entry):
+        entry.make_not_persistent(request.user.username)
+
+        days_diff = DateUtils.get_day_diff(entry.date_published)
+
+        if days_diff > BaseLinkDataController.get_archive_days_limit():
+            LinkDataHyperController.move_to_archive(entry)
+
+        return True
+
+    def move_to_archive(entry):
+        objs = ArchiveLinkDataModel.objects.filter(link=entry.link)
+        if len(objs) == 0:
+            themap = entry.get_map()
+            themap["source_obj"] = entry.get_source_obj()
+            try:
+                ArchiveLinkDataModel.objects.create(**themap)
+                entry.delete()
+            except Exception as e:
+                error_text = traceback.format_exc()
+        else:
+            try:
+                entry.delete()
+            except Exception as e:
+                error_text = traceback.format_exc()
+
+    def move_from_archive(entry):
+        objs = LinkDataModel.objects.filter(link=entry.link)
+        if len(objs) == 0:
+            themap = entry.get_map()
+            themap["source_obj"] = entry.get_source_obj()
+            try:
+                LinkDataModel.objects.create(**themap)
+                entry.delete()
+            except Exception as e:
+                error_text = traceback.format_exc()
+        else:
+            try:
+                entry.delete()
+            except Exception as e:
+                error_text = traceback.format_exc()
 
 
 class LinkCommentDataController(LinkCommentDataModel):

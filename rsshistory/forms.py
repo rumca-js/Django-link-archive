@@ -542,13 +542,17 @@ class EntryChoiceForm(BasicEntryChoiceForm):
     album = forms.CharField(label="album", max_length=1000, required=False)
     date_to = forms.DateField(required=False, initial=my_date_to)
     date_from = forms.DateField(required=False, initial=my_date_from)
+    archive = forms.BooleanField(required=False, initial=False)
 
 
 class EntryChoiceArgsExtractor(object):
     def __init__(self, args):
         self.args = args
         self.time_constrained = True
-        self.archive_source = False
+        if "archive" in self.args and self.args["archive"] == "on":
+            self.archive_source = True
+        else:
+            self.archive_source = False
 
     def get_sources(self):
         self.sources = SourceDataController.objects.all()
@@ -569,8 +573,11 @@ class EntryChoiceArgsExtractor(object):
             if not self.archive_source:
                 self.entries = LinkDataController.objects.filter(**entry_parameter_map)
             if self.archive_source:
-                from .models import ArchiveLinkDataModel
-                self.entries = ArchiveLinkDataModel.objects.filter(**entry_parameter_map)
+                from .controllers import ArchiveLinkDataController
+
+                self.entries = ArchiveLinkDataController.objects.filter(
+                    **entry_parameter_map
+                )
         else:
             if not self.archive_source:
                 self.entries = LinkDataController.objects.filter(
@@ -578,9 +585,10 @@ class EntryChoiceArgsExtractor(object):
                 )
             if self.archive_source:
                 from .models import ArchiveLinkDataModel
+
                 self.entries = ArchiveLinkDataModel.objects.filter(
                     Q(**entry_parameter_map) & input_query
-                    )
+                )
 
         return self.entries
 
@@ -671,6 +679,7 @@ class EntryChoiceArgsExtractor(object):
             self.copy_if_is_set(parameter_map, self.args, "album")
             self.copy_if_is_set(parameter_map, self.args, "date_from")
             self.copy_if_is_set(parameter_map, self.args, "date_to")
+            self.copy_if_is_set(parameter_map, self.args, "archive")
 
             if self.time_constrained:
                 date_range = self.get_default_range()

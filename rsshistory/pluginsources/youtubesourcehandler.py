@@ -1,4 +1,3 @@
-
 class YouTubeSourceHandler(object):
     def __init__(self, url=None):
         if url:
@@ -29,9 +28,9 @@ class YouTubeSourceHandler(object):
 
     def input2code_channel(url):
         wh = url.rfind("/")
-        return url[wh+1:]
+        return url[wh + 1 :]
 
     def input2code_feeds(url):
         wh = url.find("=")
         if wh >= 0:
-            return url[wh+1:]
+            return url[wh + 1 :]
