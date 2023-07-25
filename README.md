@@ -37,7 +37,7 @@ Personal link database, with RSS functionality. Similar to Reddit, but completel
  - Database of important links: for work, for school
  - RSS client
  - Reddit/lemmy/diggit replacement
- - Data analysis - analyze link rot, how many a page is cited by other sources. For example [https://github.com/rumca-js/Django-link-archive/blob/main/analysis_domains.md](https://github.com/rumca-js/Django-link-archive/blob/main/analysis_domains.md)
+ - Data analysis - analyze link rot, how many a page is cited by other sources. For example [https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/analysis_domains.md](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/analysis_domains.md)
  - YouTube filter. Manage your own subscriptions, videos, without thirdparty interference
 
 ## UI
