@@ -234,3 +234,14 @@ hr {
   height: 100%;
   border: 0;
 }
+
+/* Configuration pages */
+.management-box {
+    /* color: grey;*/
+  margin: 5px;
+  padding: 5px;
+  background-color: #f4f4f4;
+  /* border: solid 1px;
+  border-color: grey; */
+  /* box-shadow: 1px 1px grey; */
+}

@@ -2,55 +2,75 @@
 
 {% block content %}
 
-<h1>Managment links</h1>
-<ul>
-  <li><a href="{% url 'rsshistory:system-status' %}" class="simplebutton">Status</a></li>
-  <li><a href="{% url 'rsshistory:configuration' %}" class="simplebutton">Configuration</a></li>
-  <li><a href="{% url 'rsshistory:show-youtube-link-props' %}" class="simplebutton">Show YouTube properties</a></li>
-  <li><a href="{% url 'rsshistory:entries-omni-search-init' %}" class="simplebutton">Omni search</a></li>
-  <li><a href="{% url 'rsshistory:entries-archived-init' %}" class="simplebutton" title="Search archived entries">Search archived entries</a></li>
-  <li><a href="{% url 'rsshistory:check-move-archive' %}" class="simplebutton" title="Moves old entries to archive">Move old entries to archive</a></li>
-</ul>
+<div style="display: flex">
+    <div class="management-box">
+        <h1>Managment links</h1>
+        <ul>
+            <li><a href="{% url 'rsshistory:system-status' %}" class="simplebutton">Status</a></li>
+            <li><a href="{% url 'rsshistory:configuration' %}" class="simplebutton">Configuration</a></li>
+            <li><a href="{% url 'rsshistory:show-youtube-link-props' %}" class="simplebutton">Show YouTube video properties</a></li>
+        </ul>
+    </div>
 
-<h1>Import / export</h1>
-<ul>
-  <li><a href="{% url 'rsshistory:write-bookmarks' %}" class="simplebutton">Write bookmarks</a></li>
-  <li><a href="{% url 'rsshistory:write-daily-data-form' %}" class="simplebutton">Write daily data</a></li>
-  <li><a href="{% url 'rsshistory:write-tag-form' %}" class="simplebutton">Write topic data</a></li>
-  <li><a href="{% url 'rsshistory:import-sources' %}" class="simplebutton">Import sources</a></li>
-  <li><a href="{% url 'rsshistory:import-bookmarks' %}" class="simplebutton">Import bookmarks</a></li>
-  <li><a href="{% url 'rsshistory:import-daily-data' %}" class="simplebutton">Import daily data</a></li>
-  <li><a href="{% url 'rsshistory:import-reading-list' %}" class="simplebutton">Import reading list</a></li>
-</ul>
+    <div class="management-box">
+        <h1>Import / export</h1>
+        <ul>
+            <li><a href="{% url 'rsshistory:write-bookmarks' %}" class="simplebutton">Write bookmarks</a></li>
+            <li><a href="{% url 'rsshistory:write-daily-data-form' %}" class="simplebutton">Write daily data</a></li>
+            <li><a href="{% url 'rsshistory:write-tag-form' %}" class="simplebutton">Write topic data</a></li>
+            <li><a href="{% url 'rsshistory:import-sources' %}" class="simplebutton">Import sources</a></li>
+            <li><a href="{% url 'rsshistory:import-bookmarks' %}" class="simplebutton">Import bookmarks</a></li>
+            <li><a href="{% url 'rsshistory:import-daily-data' %}" class="simplebutton">Import daily data</a></li>
+            <li><a href="{% url 'rsshistory:import-reading-list' %}" class="simplebutton">Import reading list</a></li>
+            <li><a href="{% url 'rsshistory:push-daily-data-form' %}" class="simplebutton">Push daily data to repo</a></li>
+        </ul>
+    </div>
 
-<h1>Debug</h1>
-<ul>
-  <li><a href="{% url 'rsshistory:tags-entry-show' '664761' %}" class="simplebutton">Show entry tags</a></li>
-  <li><a href="{% url 'rsshistory:test-page' %}" class="simplebutton">Test page</a></li>
-  <li><a href="{% url 'rsshistory:test-form-page' %}" class="simplebutton">Test form page</a></li>
-  <li><a href="{% url 'rsshistory:data-errors' %}" class="simplebutton">Data errors</a></li>
-</ul>
+    <div class="management-box">
+        <h1>Advanced</h1>
+        <ul>
+            <li><a href="{% url 'rsshistory:entries-archived-init' %}" class="simplebutton" title="Search archived entries">Search archived entries</a></li>
+            <li><a href="{% url 'rsshistory:entries-omni-search-init' %}" class="simplebutton">Omni search</a></li>
+            <li><a href="{% url 'rsshistory:check-move-archive' %}" class="simplebutton" title="Moves old entries to archive">Move old entries to archive</a></li>
+            <li><a href="{% url 'rsshistory:data-errors' %}" class="simplebutton">Show data errors</a></li>
+            <li><a href="{% url 'rsshistory:sources-manual-refresh' %}" class="simplebutton">Update all sources manually</a></li>
+        </ul>
+    </div>
+</div>
 
-<h1>Sources</h1>
-<ul>
-  <li><a href="https://www.wolframalpha.com/" class="simplebutton">Wolfram</a></li>
-  <li><a href="https://en.wikipedia.org/w/index.php" class="simplebutton">Wikipedia</a></li>
-  <li><a href="https://chat.openai.com/" class="simplebutton">ChatGPT</a></li>
-  <li><a href="https://www.quora.com/" class="simplebutton">Quora</a></li>
-  <li><a href="https://stackoverflow.com" class="simplebutton">Stack overflow</a></li>
-  <li><a href="https://www.reddit.com/" class="simplebutton">Reddit</a></li>
-  <li><a href="https://hn.algolia.com/?dateRange=all&page=0&prefix=true&query=tim%20cook&sort=byPopularity&type=story" class="simplebutton">Hacker News search</a></li>
+<div class="management-box">
+    <h1>Sources</h1>
+    <ul>
+        <li><a href="https://en.wikipedia.org/w/index.php" class="simplebutton">Wikipedia</a></li>
+        <li><a href="https://news.ycombinator.com/" class="simplebutton">Hacker News</a></li>
+        <li><a href="https://hn.algolia.com/?dateRange=all&page=0&prefix=true&query=tim%20cook&sort=byPopularity&type=story" class="simplebutton">Hacker News search</a></li>
+        <li><a href="https://www.wolframalpha.com/" class="simplebutton">Wolfram</a></li>
+        <li><a href="https://chat.openai.com/" class="simplebutton">ChatGPT</a></li>
+        <li><a href="https://www.quora.com/" class="simplebutton">Quora</a></li>
+        <li><a href="https://stackoverflow.com" class="simplebutton">Stack overflow</a></li>
+        <li><a href="https://www.reddit.com/" class="simplebutton">Reddit</a></li>
 
-  <li><a href="https://mastodon.social/explore" class="simplebutton">Mastodon</a></li>
-  <li><a href="https://join-lemmy.org/instances" class="simplebutton">Lemmy</a></li>
+        <li><a href="https://mastodon.social/explore" class="simplebutton">Mastodon</a></li>
+        <li><a href="https://join-lemmy.org/instances" class="simplebutton">Lemmy</a></li>
 
-  <li><a href="https://www.youtube.com/" class="simplebutton">YouTube</a></li>
-  <li><a href="https://odysee.com/" class="simplebutton">Odysee</a></li>
-  <li><a href="https://rumble.com/" class="simplebutton">Rumble</a></li>
-  <li><a href="https://www.spotify.com/" class="simplebutton">Spotify</a></li>
+        <li><a href="https://www.youtube.com/" class="simplebutton">YouTube</a></li>
+        <li><a href="https://odysee.com/" class="simplebutton">Odysee</a></li>
+        <li><a href="https://rumble.com/" class="simplebutton">Rumble</a></li>
+        <li><a href="https://www.spotify.com/" class="simplebutton">Spotify</a></li>
 
-  <li><a href="https://pluralistic.net/" class="simplebutton">Pluralistic</a></li>
-  <li><a href="https://applecensorship.com/news" class="simplebutton">Apple Censorship</a></li>
-</ul>
+        <li><a href="https://pluralistic.net/" class="simplebutton">Pluralistic</a></li>
+        <li><a href="https://applecensorship.com/news" class="simplebutton">Apple Censorship</a></li>
+    </ul>
+</div>
+
+<div class="management-box">
+    <h1>Debug</h1>
+    <ul>
+        <li><a href="{% url 'rsshistory:tags-entry-show' '664761' %}" class="simplebutton">Show entry tags</a></li>
+        <li><a href="{% url 'rsshistory:test-page' %}" class="simplebutton">Test page</a></li>
+        <li><a href="{% url 'rsshistory:test-form-page' %}" class="simplebutton">Test form page</a></li>
+    </ul>
+</div>
+
 
 {% endblock %}

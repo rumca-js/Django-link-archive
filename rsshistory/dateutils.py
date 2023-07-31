@@ -46,9 +46,6 @@ class DateUtils(object):
     def get_datetime_file_name():
         return datetime.today().strftime("%Y-%m-%d_%H-%M-%S")
 
-    def get_date_file_name():
-        return DateUtils.format_date(datetime.today())
-
     def get_dir4date(date):
         return date.strftime("%Y-%m-%d")
 

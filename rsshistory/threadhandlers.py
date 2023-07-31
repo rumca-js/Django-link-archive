@@ -469,7 +469,10 @@ class PushToRepoJobHandler(BaseJobHandler):
 
     def process(self, obj=None):
         try:
-            if ConfigurationEntry.get().is_bookmark_repo_set():
+            if (
+                ConfigurationEntry.get().is_bookmark_repo_set()
+                and ConfigurationEntry.get().is_daily_repo_set()
+            ):
                 from .gitupdatemgr import GitUpdateManager
 
                 git_mgr = GitUpdateManager(self._config)
@@ -477,6 +480,31 @@ class PushToRepoJobHandler(BaseJobHandler):
 
                 git_mgr.clear_old_entries()
                 git_mgr.push_old_links_to_archive()
+        except Exception as e:
+            error_text = traceback.format_exc()
+            PersistentInfo.error("Exception: {} {}".format(str(e), error_text))
+
+
+class PushDailyDataToRepoJobHandler(BaseJobHandler):
+    """!
+    Pushes data to repo
+    """
+
+    def __init__(self):
+        pass
+
+    def get_job(self):
+        return BackgroundJob.JOB_PUSH_DAILY_DATA_TO_REPO
+
+    def process(self, obj=None):
+        try:
+            if ConfigurationEntry.get().is_daily_repo_set():
+                from .gitupdatemgr import GitUpdateManager
+
+                date_input = obj.subject
+
+                git_mgr = GitUpdateManager(self._config)
+                git_mgr.write_and_push_daily_data(date_input)
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.error("Exception: {} {}".format(str(e), error_text))
@@ -522,6 +550,7 @@ class HandlerManager(object):
     def get_handlers(self):
         return [
             PushToRepoJobHandler(),
+            PushDailyDataToRepoJobHandler(),
             ProcessSourceJobHandler(),
             LinkAddJobHandler(),
             LinkDownloadJobHandler(),

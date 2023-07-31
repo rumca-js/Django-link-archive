@@ -231,7 +231,9 @@ class LinkDataController(LinkDataModel):
         from .dateutils import DateUtils
 
         current_time = DateUtils.get_datetime_now_utc()
-        days_before = current_time - timedelta(days=BaseLinkDataController.get_archive_days_limit())
+        days_before = current_time - timedelta(
+            days=BaseLinkDataController.get_archive_days_limit()
+        )
 
         entries = LinkDataController.objects.filter(
             persistent=False, date_published__lt=days_before
@@ -256,8 +258,7 @@ class ArchiveLinkDataController(ArchiveLinkDataModel):
 
 
 class LinkDataHyperController(object):
-
-    def add_new_link(link_data, source = None):
+    def add_new_link(link_data, source=None):
         objs = LinkDataModel.objects.filter(link=link_data["link"])
         if objs.exists():
             o = objs[0]
@@ -282,30 +283,30 @@ class LinkDataHyperController(object):
                 source_obj=source,
             )
         try:
-           o.save()
+            o.save()
 
-           p = Page(link_data["source"])
-           domain = p.get_domain_only()
-           Domains.add(domain)
+            p = Page(link_data["source"])
+            domain = p.get_domain_only()
+            Domains.add(domain)
 
-           p = Page(link_data["link"])
-           domain = p.get_domain_only()
-           Domains.add(domain)
+            p = Page(link_data["link"])
+            domain = p.get_domain_only()
+            Domains.add(domain)
 
-           return True
+            return True
         except Exception as e:
-           error_text = traceback.format_exc()
-           PersistentInfo.exc(
-                        "Could not {} entry: Source:{} {}; Entry:{} {}; Exc:{}\n{}".format(
-                            method,
-                            source.url,
-                            source.title,
-                            link_data["link"],
-                            link_data["title"],
-                            str(e),
-                            error_text,
-                        )
-           )
+            error_text = traceback.format_exc()
+            PersistentInfo.exc(
+                "Could not {} entry: Source:{} {}; Entry:{} {}; Exc:{}\n{}".format(
+                    method,
+                    source.url,
+                    source.title,
+                    link_data["link"],
+                    link_data["title"],
+                    str(e),
+                    error_text,
+                )
+            )
         return False
 
     def get_link_object(link, date=None):
@@ -538,7 +539,7 @@ class BackgroundJobController(BackgroundJob):
             date_start = datetime.strptime(start, "%Y-%m-%d").date()
             date_stop = datetime.strptime(stop, "%Y-%m-%d").date()
 
-            BackgroundJob.write_daily_data_range(date_start, date_stop)
+            BackgroundJobController.write_daily_data_range(date_start, date_stop)
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.error(
@@ -634,14 +635,39 @@ class BackgroundJobController(BackgroundJob):
                 "Exception: Link download: {} {}".format(str(e), error_text)
             )
 
-    def push_to_repo():
+    def push_to_repo(input_date=""):
         try:
             items = BackgroundJob.objects.filter(
                 job=BackgroundJob.JOB_PUSH_TO_REPO, subject=""
             )
             if len(items) == 0:
                 BackgroundJob.objects.create(
-                    job=BackgroundJob.JOB_PUSH_TO_REPO, task=None, subject="", args=""
+                    job=BackgroundJob.JOB_PUSH_TO_REPO,
+                    task=None,
+                    subject=input_date,
+                    args="",
+                )
+                return True
+            elif len(items) > 1:
+                for item in items:
+                    item.delete()
+        except Exception as e:
+            error_text = traceback.format_exc()
+            PersistentInfo.error(
+                "Exception: Link download: {} {}".format(str(e), error_text)
+            )
+
+    def push_daily_data_to_repo(input_date=""):
+        try:
+            items = BackgroundJob.objects.filter(
+                job=BackgroundJob.JOB_PUSH_DAILY_DATA_TO_REPO, subject=""
+            )
+            if len(items) == 0:
+                BackgroundJob.objects.create(
+                    job=BackgroundJob.JOB_PUSH_DAILY_DATA_TO_REPO,
+                    task=None,
+                    subject=input_date,
+                    args="",
                 )
                 return True
             elif len(items) > 1:

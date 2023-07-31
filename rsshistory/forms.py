@@ -13,6 +13,20 @@ from .controllers import SourceDataController, LinkDataController
 # https://docs.djangoproject.com/en/4.1/ref/forms/widgets/
 
 
+def my_date_to():
+    from .dateutils import DateUtils
+
+    return DateUtils.get_days_range()[1]
+
+
+def my_date_from():
+    from .dateutils import DateUtils
+
+    return DateUtils.get_days_range()[0]
+
+
+
+
 class ConfigForm(forms.ModelForm):
     """
     Category choice form
@@ -65,6 +79,10 @@ class ImportSourceRangeFromInternetArchiveForm(forms.Form):
 class ExportDailyDataForm(forms.Form):
     time_start = forms.DateField(label="Start time")
     time_stop = forms.DateField(label="Stop time")
+
+
+class PushDailyDataForm(forms.Form):
+    input_date = forms.DateField(label="Input date", initial=my_date_from)
 
 
 class LinkInputForm(forms.Form):
@@ -453,18 +471,6 @@ class SourceChoiceArgsExtractor(object):
             parameter_map["title"] = title
 
         return parameter_map
-
-
-def my_date_to():
-    from .dateutils import DateUtils
-
-    return DateUtils.get_days_range()[1]
-
-
-def my_date_from():
-    from .dateutils import DateUtils
-
-    return DateUtils.get_days_range()[0]
 
 
 class BasicEntryChoiceForm(forms.Form):

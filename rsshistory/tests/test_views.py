@@ -1,8 +1,11 @@
+from datetime import datetime
+
 from django.test import TestCase
 from django.utils import timezone
 from django.urls import reverse
 
 from ..apps import LinkDatabase
+from ..controllers import SourceDataController, LinkDataController
 
 
 class ViewsTest(TestCase):
@@ -76,6 +79,13 @@ class ViewsTest(TestCase):
         resp = self.client.get(url)
 
         self.assertEqual(resp.status_code, 200)
+
+    def test_sources_refresh_all(self):
+        url = reverse("{}:sources-manual-refresh".format(LinkDatabase.name))
+        resp = self.client.get(url)
+
+        self.assertEqual(resp.status_code, 200)
+
 
     """
     Entries
@@ -345,8 +355,64 @@ class ViewsTest(TestCase):
 
         self.assertEqual(resp.status_code, 200)
 
+    def test_check_move_archive(self):
+        url = reverse("{}:check-move-archive".format(LinkDatabase.name))
+        resp = self.client.get(url)
+
+        self.assertEqual(resp.status_code, 200)
+
+    def test_push_daily_data_form(self):
+        url = reverse("{}:push-daily-data-form".format(LinkDatabase.name))
+        resp = self.client.get(url)
+
+        self.assertEqual(resp.status_code, 200)
+
+    def test_domains(self):
+        url = reverse("{}:domains".format(LinkDatabase.name))
+        resp = self.client.get(url)
+
+        self.assertEqual(resp.status_code, 200)
+
     # def test_import_reading_list(self):
     #    url = reverse("{}:import-reading-list".format(LinkDatabase.name))
     #    resp = self.client.get(url)
 
     #    self.assertEqual(resp.status_code, 200)
+
+
+
+class EnhancedViewTest(ViewsTest):
+    def setUp(self):
+        source_youtube = SourceDataController.objects.create(
+            url="https://youtube.com",
+            title="YouTube",
+            category="No",
+            subcategory="No",
+            export_to_cms=True,
+        )
+        LinkDataController.objects.create(
+            source="https://youtube.com",
+            link="https://youtube.com?v=persistent",
+            title="The first link",
+            source_obj=source_youtube,
+            persistent=True,
+            date_published=datetime.strptime("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
+            language="en",
+        )
+        LinkDataController.objects.create(
+            source="https://youtube.com",
+            link="https://youtube.com?v=nonpersistent",
+            title="The second link",
+            source_obj=source_youtube,
+            persistent=False,
+            date_published=datetime.strptime("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
+            language="en",
+        )
+
+        SourceDataController.objects.create(
+            url="https://linkedin.com",
+            title="LinkedIn",
+            category="No",
+            subcategory="No",
+            export_to_cms=False,
+        )

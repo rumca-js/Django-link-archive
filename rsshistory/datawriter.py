@@ -53,23 +53,7 @@ class DataWriter(object):
     def __init__(self, config):
         self._cfg = config
 
-    def write_daily_data(self, day_iso):
-        self._cfg.get_bookmarks_path().mkdir(parents=True, exist_ok=True)
-        self._cfg.get_daily_data_path(day_iso).mkdir(parents=True, exist_ok=True)
-
-        writer = SourcesEntriesDataWriter(self._cfg)
-        writer.write_for_day(day_iso)
-
-    def write_bookmarks(self):
-        self._cfg.get_bookmarks_path().mkdir(parents=True, exist_ok=True)
-        self._cfg.get_daily_data_path().mkdir(parents=True, exist_ok=True)
-
-        from .serializers.bookmarksexporter import BookmarksBigExporter
-
-        exporter = BookmarksBigExporter(self._cfg)
-        exporter.export()
-
-    def write_sources(self):
+    def get_sources_json(self):
         from .controllers import SourceDataController
 
         sources = SourceDataController.objects.filter(export_to_cms=True)
@@ -83,13 +67,29 @@ class DataWriter(object):
         converter.set_export_columns(SourceDataController.get_export_names())
         text = converter.export()
 
-        self._cfg.get_bookmarks_path().mkdir(parents=True, exist_ok=True)
-        self._cfg.get_daily_data_path().mkdir(parents=True, exist_ok=True)
+        return text
 
-        file_name = self._cfg.get_bookmarks_path() / self._cfg.get_sources_file_name()
+    def write_daily_data(self, day_iso):
+        daily_path = self._cfg.get_daily_data_path(day_iso)
+        daily_path.mkdir(parents=True, exist_ok=True)
+
+        writer = SourcesEntriesDataWriter(self._cfg)
+        writer.write_for_day(day_iso)
+
+        text = self.get_sources_json()
+        file_name = daily_path / self._cfg.get_sources_file_name()
         file_name.write_text(text)
 
-        file_name = self._cfg.get_daily_data_path() / self._cfg.get_sources_file_name()
+    def write_bookmarks(self):
+        self._cfg.get_bookmarks_path().mkdir(parents=True, exist_ok=True)
+
+        from .serializers.bookmarksexporter import BookmarksBigExporter
+
+        exporter = BookmarksBigExporter(self._cfg)
+        exporter.export()
+
+        text = self.get_sources_json()
+        file_name = self._cfg.get_bookmarks_path() / self._cfg.get_sources_file_name()
         file_name.write_text(text)
 
     def clear_daily_data(self, day_iso):

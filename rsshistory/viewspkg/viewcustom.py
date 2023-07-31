@@ -12,7 +12,7 @@ from ..models import (
     ConfigurationEntry,
     UserConfig,
     BackgroundJob,
-    PersistentInfo
+    PersistentInfo,
 )
 from ..models import RssSourceExportHistory, Domains
 from ..forms import ConfigForm, UserConfigForm
@@ -654,6 +654,36 @@ def write_tag_form(request):
             return ContextData.render(request, "summary_present.html", context)
 
     form = ExportTopicForm()
+    form.method = "POST"
+
+    context["form"] = form
+
+    return ContextData.render(request, "form_basic.html", context)
+
+
+def push_daily_data_form(request):
+    context = ContextData.get_context(request)
+    context["page_title"] += " - tags writer"
+
+    if not request.user.is_staff:
+        return ContextData.render(request, "missing_rights.html", context)
+
+    from ..forms import PushDailyDataForm
+
+    if request.method == "POST":
+        form = PushDailyDataForm(request.POST)
+        if form.is_valid():
+            input_date = form.cleaned_data["input_date"]
+
+            if BackgroundJobController.push_daily_data_to_repo(input_date.isoformat()):
+                context["summary_text"] = "Added daily data push job. Tag:{}".format(
+                    input_date.isoformat()
+                )
+            else:
+                context["summary_text"] = "Form is invalid. Tag:{}".format(tag)
+            return ContextData.render(request, "summary_present.html", context)
+
+    form = PushDailyDataForm()
     form.method = "POST"
 
     context["form"] = form

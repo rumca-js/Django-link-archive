@@ -50,6 +50,9 @@
 
 /* Content */
 
+table {
+    display: flex;
+}
 input {
   color: black;
   text-align: center;
@@ -57,7 +60,7 @@ input {
   background-color: #e9e9e9;
   border-radius: 10px;
   box-shadow: 1px 1px grey;
-  display: block;
+  /*display: block;*/
 }
 input[type=submit] {
   color: black;
@@ -67,12 +70,16 @@ input[type=submit] {
   background-color: #e9e9e9;
   border-radius: 10px;
   box-shadow: 1px 1px grey;
-  display: inline-block;
+  /* display: block;*/
   margin: 1px;
   border: 0px;
 }
-select {display: block;} 
+/*select {display: block;} */
 textarea {display: block;}
+
+tr {
+    /* display:inline-table*/
+}
 
 hr {
     margin: 0px;
@@ -234,4 +241,15 @@ display: contents;
   width: 100%;
   height: 100%;
   border: 0;
+}
+
+/* Configuration pages */
+.management-box {
+    /* color: grey;*/
+  margin: 5px;
+  padding: 5px;
+  background-color: #f4f4f4;
+  /* border: solid 1px;
+  border-color: grey; */
+  /* box-shadow: 1px 1px grey; */
 }

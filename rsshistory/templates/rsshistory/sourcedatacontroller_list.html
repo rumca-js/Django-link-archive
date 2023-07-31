@@ -19,8 +19,14 @@
   </div>
 
   <form action="{{filter_form.action_url}}" method="{{filter_form.method}}">
-     {{ filter_form }}
-     <input type="submit" value="Submit">
+      <table>
+          {{ filter_form }}
+          <tr>
+              <td>
+                  <input type="submit" value="Submit">
+              </td>
+          </tr>
+      </table>
   </form>
 
   <hr>

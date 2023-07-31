@@ -210,6 +210,25 @@ def refresh_source(request, pk):
     return ContextData.render(request, "summary_present.html", context)
 
 
+def sources_manual_refresh(request):
+    from ..pluginsources.sourcecontrollerbuilder import SourceControllerBuilder
+
+    context = ContextData.get_context(request)
+    context["page_title"] += " - refresh source"
+
+    if not request.user.is_staff:
+        return ContextData.render(request, "missing_rights.html", context)
+
+    objs = SourceDataController.objects.all()
+
+    for ob in objs:
+        plugin = SourceControllerBuilder.get(source)
+        plugin.check_for_data()
+
+    context["summary_text"] = "Refreshed all sources"
+    return ContextData.render(request, "summary_present.html", context)
+
+
 def remove_source(request, pk):
     context = ContextData.get_context(request)
     context["page_title"] += " - remove source"

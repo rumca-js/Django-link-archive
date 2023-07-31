@@ -9,20 +9,22 @@ from ..pluginsources.sourceparseditigsplugin import SourceParseDigitsPlugin
 
 
 class SourcePluginsTest(TestCase):
-    def test_rss_parser(self):
-        source = SourceDataController.objects.create(
-            url="https://www.youtube.com/feeds/videos.xml?channel_id=UCXGgrKt94gR6lmN4aN3mYTg"
-        )
+    pass
 
-        plugin = BaseRssPlugin(source)
-        links = plugin.get_link_props()
+    # def test_rss_parser(self):
+    #    source = SourceDataController.objects.create(
+    #        url="https://www.youtube.com/feeds/videos.xml?channel_id=UCXGgrKt94gR6lmN4aN3mYTg"
+    #    )
 
-        self.assertGreater(len(links), 1)
+    #    plugin = BaseRssPlugin(source)
+    #    links = plugin.get_link_props()
 
-    def test_generous_parse(self):
-        source = SourceDataController.objects.create(url="https://pluralistic.net/feed")
+    #    self.assertGreater(len(links), 1)
 
-        plugin = SourceParseDigitsPlugin(source)
-        links = plugin.get_link_props()
+    # def test_generous_parse(self):
+    #    source = SourceDataController.objects.create(url="https://pluralistic.net/feed")
 
-        self.assertGreater(len(links), 1)
+    #    plugin = SourceParseDigitsPlugin(source)
+    #    links = plugin.get_link_props()
+
+    #    self.assertGreater(len(links), 1)

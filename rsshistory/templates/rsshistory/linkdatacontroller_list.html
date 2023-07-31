@@ -11,8 +11,14 @@
     {% endif %}
 
   <form action="{{filter_form.action_url}}" method="{{filter_form.method}}">
+     <table>
      {{ filter_form }}
-     <input type="submit" value="Submit">
+     <tr>
+         <td>
+             <input type="submit" value="Submit">
+         </td>
+     </tr>
+     </table>
   </form>
 
   <hr>

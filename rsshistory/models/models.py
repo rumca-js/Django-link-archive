@@ -123,14 +123,16 @@ class Domains(models.Model):
     def add(domain_text):
         if domain_text.find("/") >= 0:
             from ..webtools import Page
+
             p = Page(domain_text)
             domain_text = p.get_domain_only()
 
-        objs = Domains.objects.filter(domain = domain_text)
+        objs = Domains.objects.filter(domain=domain_text)
         if len(objs) == 0:
-            Domains.objects.create(domain = domain_text)
+            Domains.objects.create(domain=domain_text)
         else:
             from ..dateutils import DateUtils
+
             obj = objs[0]
             obj.date_last = DateUtils.get_datetime_now_utc()
             obj.save()

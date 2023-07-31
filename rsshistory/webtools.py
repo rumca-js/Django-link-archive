@@ -60,18 +60,23 @@ class Page(object):
             self.contents = self.get_contents()
 
         if not self.contents:
-            return "en-US"
+            return "en"
 
         whlang = self.contents.find("lang")
         if whlang >= 0:
             lang = self.extract_html(self.contents, '"', '"', whlang)
             if not lang:
-                return "en-US"
+                return "en"
 
-            if lang.find("en") == -1 and lang.find("pl") == -1:
-                return "en-US"
+            if len(lang) > 5:
+                return "en"
+
+            if lang.find("<") >= 0:
+                return "en"
 
             return lang
+        else:
+            return "en"
 
     def extract_html(self, text, tag, closingtag, wh=None):
         if not wh:
@@ -103,8 +108,14 @@ class Page(object):
             return None
 
         wh1 = self.contents.find("<title", 0)
+        if wh1 == -1:
+            wh1 = self.contents.find("<TITLE", 0)
+
+        if wh1 == -1:
+            return None
+
         wh1a = self.contents.find(">", wh1)
-        wh2 = self.contents.find("</title", wh1a + 1)
+        wh2 = self.contents.find("</", wh1a + 1)
 
         title = self.contents[wh1a + 1 : wh2].strip()
         title = html.unescape(title)
@@ -178,7 +189,15 @@ class Page(object):
 
         # wallet gardens which we will not accept
 
-        mainstream = ["www.facebook", "www.rumble", "wikipedia.org"]
+        mainstream = [
+            "www.facebook",
+            "www.rumble",
+            "wikipedia.org",
+            "twitter.com",
+            "www.reddit.com",
+            "stackoverflow.com",
+            "www.quora.com",
+        ]
 
         for item in mainstream:
             if dom.find(item) >= 0:

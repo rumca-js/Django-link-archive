@@ -41,9 +41,13 @@ class BaseLinkDataController(BaseLinkDataModel):
         """Returns the URL to access a particular author instance."""
 
         if self.is_archive_entry():
-            return reverse("{}:entry-archived".format(LinkDatabase.name), args=[str(self.id)])
+            return reverse(
+                "{}:entry-archived".format(LinkDatabase.name), args=[str(self.id)]
+            )
         else:
-            return reverse("{}:entry-detail".format(LinkDatabase.name), args=[str(self.id)])
+            return reverse(
+                "{}:entry-detail".format(LinkDatabase.name), args=[str(self.id)]
+            )
 
     def get_source_name(self):
         if self.get_source_obj():
@@ -88,6 +92,7 @@ class BaseLinkDataController(BaseLinkDataModel):
     def get_tag_string(self):
         try:
             from .models import LinkTagsDataModel
+
             return LinkTagsDataModel.join_elements(self.tags.all())
         except Exception as e:
             return ""

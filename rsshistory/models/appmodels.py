@@ -209,6 +209,7 @@ class BackgroundJob(models.Model):
     JOB_IMPORT_BOOKMARKS = "import-bookmarks"
     JOB_IMPORT_SOURCES = "import-sources"
     JOB_PUSH_TO_REPO = "push-to-repo"
+    JOB_PUSH_DAILY_DATA_TO_REPO = "push-daily-data-to-repo"
 
     # fmt: off
     JOB_CHOICES = (
@@ -227,6 +228,7 @@ class BackgroundJob(models.Model):
         (JOB_IMPORT_BOOKMARKS, JOB_IMPORT_BOOKMARKS),
         (JOB_IMPORT_SOURCES, JOB_IMPORT_SOURCES),
         (JOB_PUSH_TO_REPO, JOB_PUSH_TO_REPO),
+        (JOB_PUSH_DAILY_DATA_TO_REPO, JOB_PUSH_DAILY_DATA_TO_REPO),
     )
     # fmt: on
 

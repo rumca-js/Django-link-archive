@@ -9,8 +9,14 @@
 {{form_description_pre| safe}}
 
 <form action="{{form.action_url}}" method="{{form.method}}">
+    <table>
     {{ form }}
-    <input type="submit" value="Submit">
+    <tr>
+        <td>
+        <input type="submit" value="Submit">
+        </td>
+    </tr>
+    </table>
 </form>
 
 {{form_description_post| safe}}
