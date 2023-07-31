@@ -899,12 +899,15 @@ class PersistentInfoView(generic.ListView):
 class DomainsListView(generic.ListView):
     model = Domains
     context_object_name = "domain_list"
+    paginate_by = 100
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
         context = super(DomainsListView, self).get_context_data(**kwargs)
         context = ContextData.init_context(self.request, context)
 
+        # TODO https://stackoverflow.com/questions/57487336/change-value-for-paginate-by-on-the-fly
+        # if type is not normal, no pagination
         if "type" in self.request.GET:
             context["type"] = self.request.GET["type"]
         else:
