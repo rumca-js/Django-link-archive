@@ -282,6 +282,8 @@ class EntryForm(forms.ModelForm):
         language = data["language"]
         user = data["user"]
         thumbnail = data["thumbnail"]
+        artist = data["artist"]
+        album = data["album"]
 
         if not title or not source:
             return False
@@ -305,6 +307,8 @@ class EntryForm(forms.ModelForm):
             thumbnail=thumbnail,
             language=language,
             user=user,
+            artist=artist,
+            album=album,
             source_obj=source_obj,
         )
 
