@@ -40,6 +40,15 @@ Personal link database, with RSS functionality. Similar to Reddit, but completel
  - Data analysis - analyze link rot, how many a page is cited by other sources. For example [https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/analysis_domains.md](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/analysis_domains.md)
  - YouTube filter. Manage your own subscriptions, videos, without thirdparty interference
 
+## Suite of projects
+
+ - Captured using Django application, program: [https://github.com/rumca-js/Django-link-archive](https://github.com/rumca-js/Django-link-archive)
+ - Bookmarked links [https://github.com/rumca-js/RSS-Link-Database](https://github.com/rumca-js/RSS-Link-Database)
+ - daily RSS Git repository for the year 2023 [https://github.com/rumca-js/RSS-Link-Database-2023](https://github.com/rumca-js/RSS-Link-Database-2023)
+ - daily RSS Git repository for the year 2022 [https://github.com/rumca-js/RSS-Link-Database-2022](https://github.com/rumca-js/RSS-Link-Database-2022)
+ - daily RSS Git repository for the year 2021 [https://github.com/rumca-js/RSS-Link-Database-2021](https://github.com/rumca-js/RSS-Link-Database-2021)
+ - daily RSS Git repository for the year 2020 [https://github.com/rumca-js/RSS-Link-Database-2020](https://github.com/rumca-js/RSS-Link-Database-2020)
+
 ## UI
 
 UI, with snapshots, is described by a separate README: [https://github.com/rumca-js/Django-link-archive/blob/main/README_ui.md](https://github.com/rumca-js/Django-link-archive/blob/main/README_ui.md).
@@ -54,15 +63,6 @@ To configure you need to add sources. There are at least two types:
 
 How to find RSS link? There is a 'tutorial' for that: [https://zapier.com/blog/how-to-find-rss-feed-url/](https://zapier.com/blog/how-to-find-rss-feed-url/)
 
-## Suite of projects
-
- - Captured using Django application: [https://github.com/rumca-js/Django-link-archive](https://github.com/rumca-js/Django-link-archive)
- - Bookmarked links [https://github.com/rumca-js/RSS-Link-Database](https://github.com/rumca-js/RSS-Link-Database)
- - daily RSS Git repository for the year 2023 [https://github.com/rumca-js/RSS-Link-Database-2023](https://github.com/rumca-js/RSS-Link-Database-2023)
- - daily RSS Git repository for the year 2022 [https://github.com/rumca-js/RSS-Link-Database-2022](https://github.com/rumca-js/RSS-Link-Database-2022)
- - daily RSS Git repository for the year 2021 [https://github.com/rumca-js/RSS-Link-Database-2021](https://github.com/rumca-js/RSS-Link-Database-2021)
- - daily RSS Git repository for the year 2020 [https://github.com/rumca-js/RSS-Link-Database-2020](https://github.com/rumca-js/RSS-Link-Database-2020)
-
 ## Demo
 
 Demo on development env (may, or may not be running actually):
@@ -72,11 +72,9 @@ Demo on development env (may, or may not be running actually):
 
 README about search issues: [https://github.com/rumca-js/Django-link-archive/blob/main/README_search.md](https://github.com/rumca-js/Django-link-archive/blob/main/README_search.md).
 
-## Development
-
-Development is described by a separate README: [https://github.com/rumca-js/Django-link-archive/blob/main/README_development.md](https://github.com/rumca-js/Django-link-archive/blob/main/README_development.md).
-
 # Import, export data
+
+## Automatic git export
 
 Program maintains two repositories: one for bookmarked links, and daily repository.
 
@@ -88,7 +86,7 @@ Link properties:
  - vote - set by the users, through forms. Decides how important the link is. Admin can arbitrarily define how long the range is
  - age - set by the users. Minimal age that is required to view this link
 
-## Bookmarks
+### Bookmarks
 
  - three file formats: JSON, markdown, RSS
  - contains articles that I have selected as interesting, or noteworthy, or funny, or whatever
@@ -96,18 +94,38 @@ Link properties:
  - markdown file is generated as a form of preview, JSON can be reused, imported
  - links are bookmarked, but that does not necessarily mean something is endorsed. It shows particular interest in topic. It is indication of importance
  
-## Daily Data
+### Daily Data
 
  - RSS links are captured for each source separately
  - two files formats for each day and source: JSON and markdown
  - markdown file is generated as a form of preview, JSON can be reused, imported
 
-## Sources
+### Sources
 
  - provided in sources.json file
  - provides information about sources, like: title, url, langugage
 
-## Data analysis
+## Import from another instance
+
+Scenario to import sources from a other instance:
+ - find sources in the other instance. It should be at "Sources" menu button, by default
+ - select which sources you would like to export, you can select a filter
+ - click 'Show as json', it should produce a nice JSON output
+ - copy link URL of that instance, of that JSON output
+ - navigate to your instance
+ - select 'Admin' page
+ - select 'Import from URL', and paste URL
+
+Scenario to import links from a other instance:
+ - find links in the other instance. It should be at "Search" menu button, by default
+ - select which links you would like to export, you can select a filter, like a date, tag. etc.
+ - click 'Show as json', it should produce a nice JSON output
+ - copy link URL of that instance, of that JSON output
+ - navigate to your instance
+ - select 'Admin' page
+ - select 'Import from URL', and paste URL
+
+# Data analysis
 
 With these data we can perform further analysis:
 
@@ -116,8 +134,9 @@ With these data we can perform further analysis:
  - which site generates most entries
  - we can capture all external links from entries, to capture where these sites lead to (check network effect, etc)
  - we can verify who reported first on certain topics
+ - we can find all domains that are used by this instance. For example [https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/analysis_domains.md](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/analysis_domains.md)
 
-## Analysis of tools and services
+# Analysis of tools and services
 
 Archive.org:
  - Is not reliable. Sometimes it gets painfully slow. It is still better than nothing
@@ -127,17 +146,14 @@ Archive.org:
 archive.ph:
  - does not support link + date URL interface
 
-## Legal
-
- - I do not endorse any link every link in the database. I may some links be important because of how bad the content is. I use irony often, therefore beware!
- - Everyone has a right to be forgotten. If any link should be removed from a database please contact me
- - I do not obtain any form of monetary recompensation from link, or data about it. The data link information were already provided by RSS sources. The RSS source is responsible for what they provide free of charge
-
 # User management
 
 This was created for the single player experience only, but... there is support for more Users.
 
-This is unfinished, but I want to create rules, roadmap for the end game.
+What works?
+ - nearly everything for single player experience
+
+Roadmap for the end game.
 
  - at first only administrator can add new users. For running instance contact administrator
  - you do not create passwords, they are generated for you, with a proper complexity. Please write them down
@@ -155,6 +171,16 @@ What causes karma change:
  - adding vote for a link
  - upvotes, or downvotes on comments
  - bans of other users you invited
+
+# Development
+
+Development is described by a separate README: [https://github.com/rumca-js/Django-link-archive/blob/main/README_development.md](https://github.com/rumca-js/Django-link-archive/blob/main/README_development.md).
+
+# Legal
+
+ - I do not endorse any link every link in the database. I may some links be important because of how bad the content is. I use irony often, therefore beware!
+ - Everyone has a right to be forgotten. If any link should be removed from a database please contact me
+ - I do not obtain any form of monetary recompensation from link, or data about it. The data link information were already provided by RSS sources. The RSS source is responsible for what they provide free of charge
 
 # Ending notes
 
