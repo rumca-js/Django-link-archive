@@ -1,6 +1,4 @@
-# Installation overview
-
-Use repository main level Makefile to install and run development server.
+# overview
 
 This project uses the following technologies:
  - django
