@@ -92,7 +92,7 @@ Each day bookmarks and daily repositories are updated with new data. Daily repos
  - provided in sources.json file
  - provides information about sources, like: title, url, langugage
 
-## Import from another instance
+## Import from another Django-link-archive instance
 
 Scenario to import sources from a other instance:
  - find sources in the other instance. It should be at "Sources" menu button, by default
