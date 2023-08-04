@@ -4,9 +4,17 @@ Use repository main level Makefile to install and run development server.
 
 This project uses the following technologies:
  - django
- - celery - for tasks
+ - celery
  - rabbitmq-server
  - memcached - without it memory locking does not work
+
+Steps:
+ - [Prerequisites](https://github.com/rumca-js/Django-link-archive/blob/main/README_install.md#prerequisites)
+ - [Basic installation](https://github.com/rumca-js/Django-link-archive/blob/main/README_install.md#basic-intallation)
+ - [Full installation](https://github.com/rumca-js/Django-link-archive/blob/main/README_install.md#full-intallation)
+ - [Configure](https://github.com/rumca-js/Django-link-archive/blob/main/README_install.md#configure)
+ - [Run](https://github.com/rumca-js/Django-link-archive/blob/main/README_install.md#run)
+ - [Advanced](https://github.com/rumca-js/Django-link-archive/blob/main/README_install.md#advanced)
 
 Notes:
  - it is best to use on a device with SSD
@@ -15,45 +23,38 @@ Notes:
 
 Python poetry [https://python-poetry.org/docs/](https://python-poetry.org/docs/).
 
-# Basic setup, no backend
+# Basic installation
 
 This is minimal setup, without backend, without tasks.
 
 ```
  $ make install-minimal
- Configure settings.py
- Configure rsshistory/prjconfig.py
+  - Configure file settings.py
+  - Configure file rsshistory/prjconfig.py
  $ make createtables-minimal
  $ make createsuperuser
- Configure django users
- $ make run-minimal
+  - Configure django users
 ```
 
 For basic setup this should be enough, and should be working.
 
-# Full setup, with backend
+# Full installation
 
 For a full setup, with backend and tasks a more robust setup needs to be created:
 
 ```
  $ make install
- Configure settings.py
- Configure rsshistory/prjconfig.py
+  - Configure file settings.py
+  - Configure file rsshistory/prjconfig.py
  $ make createtables
  $ make createsuperuser
  $ sudo make installsysdeps
- Configure django users
- $ make run
+  - Configure django users
 ```
 
 Parts of it are described below.
 
-# Update
-
-After updating source code, to correctly update existing environment please:
-```
- $ make update
-```
+# Configure
 
 ## settings.py
 
@@ -62,6 +63,38 @@ During install step user is informed that settings.py file should be updated:
  - ALLOWED_HOSTS needs to be configured
  - tables need to be created
  - users need to be defined
+
+## User management
+
+This program allows to configure super user using a rule.
+
+You can create super user manually, as usual in Django [https://www.geeksforgeeks.org/how-to-create-superuser-in-django/](https://www.geeksforgeeks.org/how-to-create-superuser-in-django/)
+
+## RSS
+
+To enable RSS functionality, you have to provide RSS sources by the page UI.
+
+## Run
+
+For minimal setup
+
+```
+ $ make run-minimal
+```
+
+For full setup
+```
+ $ make run
+```
+
+# Advanced
+
+## Update
+
+After updating source code, to correctly update existing environment please:
+```
+ $ make update
+```
 
 ## Makefile
 
@@ -96,12 +129,6 @@ To be able to perform various operations additional programs are needed:
 Memcached is required for the memory locking to work.
 
 These programs are installed by make installsysdeps rule.
-
-## User
-
-This program allows to configure super user using a rule.
-
-You can create super user manually, as usual in Django [https://www.geeksforgeeks.org/how-to-create-superuser-in-django/](https://www.geeksforgeeks.org/how-to-create-superuser-in-django/)
 
 ## Using Apache
 
