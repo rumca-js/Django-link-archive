@@ -132,6 +132,27 @@ archive.ph:
  - Everyone has a right to be forgotten. If any link should be removed from a database please contact me
  - I do not obtain any form of monetary recompensation from link, or data about it. The data link information were already provided by RSS sources. The RSS source is responsible for what they provide free of charge
 
+# User management
+
+This was created for the single player experience only, but... there is support for more Users.
+
+This is unfinished, but I want to create rules, roadmap for the end game.
+
+ - at first only administrator can add new users. For running instance contact administrator
+ - you do not create passwords, they are generated for you, with a proper complexity. Please write them down
+ - contact other users, other users can also add new users, if karma allows it
+
+Karma effect on the user:
+ - if your karma goes below 0 your account is banned
+ - after certain threshold you can submit comments
+ - after certain threshold you can upvote and downvote comments
+ - after certain threshold you create users (1 per day)
+
+What causes karma change:
+ - admin, or moderators
+ - upvotes, or downvotes on comments
+ - bans of other users you invited
+
 # Ending notes
 
 All links belong to us!
