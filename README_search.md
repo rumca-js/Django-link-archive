@@ -67,6 +67,12 @@ I have some questions about that model:
 
 YouTube does not allow the user to specify links in comments, possibly to protect the user from spammers. That means we cannot use links any longer, because some of users are abusing this system. Rather than correctly filter out spammers, posting links has been prohibited.
 
+## YouTube subscriptions
+
+Is very limited. Cannot be used effectively if a source with many videos per day. You will be swampted by a such subscription.
+
+You cannot filter out certain channels from subscriptions.
+
 ## Platform guidelines
 
 For social media platform to operate it needs some guidelines, but:
