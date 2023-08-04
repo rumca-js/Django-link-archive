@@ -476,6 +476,16 @@ class SourceChoiceArgsExtractor(object):
 
         return parameter_map
 
+    def get_filter_string(self):
+        infilters = self.get_filter_args()
+
+        filter_string = ""
+        for key in infilters:
+            filter_string += "&{0}={1}".format(key, infilters[key])
+
+        # TODO try urlencode
+        return filter_string
+
 
 class BasicEntryChoiceForm(forms.Form):
     category = forms.CharField(widget=forms.Select(choices=()), required=False)

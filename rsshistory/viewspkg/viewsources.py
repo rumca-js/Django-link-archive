@@ -35,6 +35,8 @@ class RssSourceListView(generic.ListView):
         self.filter_form.method = "GET"
         self.filter_form.action_url = reverse("{}:sources".format(ContextData.app_name))
 
+        context["args_extractor"] = self.extractor
+
         context["filter_form"] = self.filter_form
         context["page_title"] += " - news source list"
 
