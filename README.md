@@ -80,12 +80,6 @@ Program maintains two repositories: one for bookmarked links, and daily reposito
 
 Each day bookmarks and daily repositories are updated with new data. Daily repository is updated when day finishes, then the complete daily data are pushed into the repository.
 
-Link properties:
- - persistent - set if it is bookmarked
- - tag - set by the users, through forms
- - vote - set by the users, through forms. Decides how important the link is. Admin can arbitrarily define how long the range is
- - age - set by the users. Minimal age that is required to view this link
-
 ### Bookmarks
 
  - three file formats: JSON, markdown, RSS
@@ -125,27 +119,6 @@ Scenario to import links from a other instance:
  - select 'Admin' page
  - select 'Import from URL', and paste URL
 
-# Data analysis
-
-With these data we can perform further analysis:
-
- - how many of old links are not any longer valid (link rot test)
- - capture all domains from RSS links (internal, and leading outside?). Analyse which domains are most common
- - which site generates most entries
- - we can capture all external links from entries, to capture where these sites lead to (check network effect, etc)
- - we can verify who reported first on certain topics
- - we can find all domains that are used by this instance. For example [https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/analysis_domains.md](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/analysis_domains.md)
-
-# Analysis of tools and services
-
-Archive.org:
- - Is not reliable. Sometimes it gets painfully slow. It is still better than nothing
- - Most mainstream media RSS is covered, but the coverage is spotty. Not all days are covered
- - Internet Archive (archive.org) does not provide snapshots for each and every day for all RSS sources. It is sometimes pretty slow. We would like to be sure that a such snapshot takes place. Therefore we need to export links to daily repo ourselves. Django RSS app also makes requests to archive to make the snapshots
-
-archive.ph:
- - does not support link + date URL interface
-
 # User management
 
 This was created for the single player experience only, but... there is support for more Users.
@@ -175,6 +148,27 @@ What causes karma change:
 # Development
 
 Development is described by a separate README: [https://github.com/rumca-js/Django-link-archive/blob/main/README_development.md](https://github.com/rumca-js/Django-link-archive/blob/main/README_development.md).
+
+# Data analysis
+
+With these data we can perform further analysis:
+
+ - how many of old links are not any longer valid (link rot test)
+ - capture all domains from RSS links (internal, and leading outside?). Analyse which domains are most common
+ - which site generates most entries
+ - we can capture all external links from entries, to capture where these sites lead to (check network effect, etc)
+ - we can verify who reported first on certain topics
+ - we can find all domains that are used by this instance. For example [https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/analysis_domains.md](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/analysis_domains.md)
+
+# Analysis of tools and services
+
+Archive.org:
+ - Is not reliable. Sometimes it gets painfully slow. It is still better than nothing
+ - Most mainstream media RSS is covered, but the coverage is spotty. Not all days are covered
+ - Internet Archive (archive.org) does not provide snapshots for each and every day for all RSS sources. It is sometimes pretty slow. We would like to be sure that a such snapshot takes place. Therefore we need to export links to daily repo ourselves. Django RSS app also makes requests to archive to make the snapshots
+
+archive.ph:
+ - does not support link + date URL interface
 
 # Legal
 
