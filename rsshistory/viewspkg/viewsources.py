@@ -1,11 +1,13 @@
 from django.views import generic
 from django.urls import reverse
 from django.shortcuts import render
+from django.http import JsonResponse
 
 from ..models import BackgroundJob
 from ..prjconfig import Configuration
 from ..forms import SourceForm, SourcesChoiceForm, ConfigForm, SourceChoiceArgsExtractor
 from ..views import ContextData
+
 from ..controllers import (
     SourceDataController,
     LinkDataController,
@@ -394,3 +396,19 @@ def source_fix_entries(request, source_pk):
     context["summary_text"] = summary_text
 
     return ContextData.render(request, "summary_present.html", context)
+
+
+def sources_json(request):
+
+    # Data
+    extractor = SourceChoiceArgsExtractor(request.GET)
+    sources = extractor.get_filtered_objects()
+
+    json_obj = {'sources' : []}
+
+    for source in sources:
+        source_map = source.get_map_full()
+        json_obj['sources'].append(source_map)
+
+    # JsonResponse
+    return JsonResponse(json_obj)

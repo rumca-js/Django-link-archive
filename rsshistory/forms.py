@@ -587,7 +587,7 @@ class EntryChoiceArgsExtractor(object):
 
                 self.entries = ArchiveLinkDataController.objects.filter(
                     **entry_parameter_map
-                )
+                    )[:self.get_hard_query_limit()]
         else:
             if not self.archive_source:
                 self.entries = LinkDataController.objects.filter(
@@ -598,9 +598,12 @@ class EntryChoiceArgsExtractor(object):
 
                 self.entries = ArchiveLinkDataModel.objects.filter(
                     Q(**entry_parameter_map) & input_query
-                )
+                    )[:self.get_hard_query_limit()]
 
         return self.entries
+
+    def get_hard_query_limit(self):
+        10000
 
     def get_source_filter_args(self, pure_data=True):
         parameter_map = {}

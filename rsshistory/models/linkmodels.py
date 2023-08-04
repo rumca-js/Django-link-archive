@@ -304,18 +304,24 @@ class BaseLinkDataController(BaseLinkDataModel):
         return BaseLinkDataController.update_info_default(data)
 
     def update_info_youtube(data):
+        # TODO there should be some generic handlers
         from ..pluginentries.youtubelinkhandler import YouTubeLinkHandler
 
         h = YouTubeLinkHandler(data["link"])
         h.download_details()
 
-        data["source"] = h.get_channel_feed_url()
-        data["link"] = h.get_link_url()
-        data["title"] = h.get_title()
+        if "source" not in data or data["source"].strip() == "":
+            data["source"] = h.get_channel_feed_url()
+        if "link" not in data or data["link"].strip() == "":
+            data["link"] = h.get_link_url()
+        if "title" not in data or data["title"].strip() == "":
+            data["title"] = h.get_title()
         # TODO limit comes from LinkDataModel, do not hardcode
-        data["description"] = h.get_description()[:999]
+        if "description" not in data or data["description"].strip() == "":
+            data["description"] = h.get_description()[:900]
         data["date_published"] = h.get_datetime_published()
-        data["thumbnail"] = h.get_thumbnail()
+        if "thumbnail" not in data or data["thumbnail"] is None or data["thumbnail"].strip() == "":
+            data["thumbnail"] = h.get_thumbnail()
 
         return data
 

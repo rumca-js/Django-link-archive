@@ -267,7 +267,7 @@ class LinkDataHyperController(object):
             o.title = link_data["title"]
             o.description = link_data["description"]
             o.link = link_data["link"]
-            o.date_published = link_data["published"]
+            # o.date_published = link_data["published"]
             o.language = link_data["language"]
             o.thumbnail = link_data["thumbnail"]
             o.source_obj = source

@@ -2,12 +2,14 @@ from django.views import generic
 from django.urls import reverse
 from django.shortcuts import render
 from django.db.models import Q
+from django.http import JsonResponse
 
 from ..models import (
     LinkTagsDataModel,
     BackgroundJob,
     ConfigurationEntry,
     ArchiveLinkDataModel,
+    Domains,
 )
 from ..controllers import (
     LinkDataController,
@@ -325,8 +327,8 @@ def add_entry(request):
 
             return ContextData.render(request, "entry_edit_exists.html", context)
 
-        data = LinkDataController.get_full_information(form.get_information())
         if valid:
+            data = form.get_information()
             if not form.save_form(data):
                 context["summary_text"] = "Could not save link"
                 return ContextData.render(request, "summary_present.html", context)
@@ -336,6 +338,8 @@ def add_entry(request):
             ob = LinkDataController.objects.filter(link=data["link"])
             if ob.exists():
                 context["entry"] = ob[0]
+
+            Domains.add(data["link"])
 
             if ConfigurationEntry.get().link_archive:
                 BackgroundJobController.link_archive(data["link"])
@@ -659,3 +663,21 @@ def wayback_save(request, pk):
         context["summary_text"] = "Waybacksave is disabled for links"
 
     return ContextData.render(request, "summary_present.html", context)
+
+
+def entries_json(request):
+
+    # Data
+    extractor = EntryChoiceArgsExtractor(request.GET)
+    extractor.get_sources()
+    extractor.set_time_constrained(False)
+    links = extractor.get_filtered_objects()
+
+    json_obj = {'links' : []}
+
+    for link in links:
+        link_map = link.get_map_full()
+        json_obj['links'].append(link_map)
+
+    # JsonResponse
+    return JsonResponse(json_obj)
