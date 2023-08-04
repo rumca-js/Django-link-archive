@@ -1,3 +1,7 @@
+from urllib.parse import urlparse
+from urllib.parse import parse_qs
+
+
 class YouTubeLinkHandler(object):
     def __init__(self, url=None):
         self.url = YouTubeLinkHandler.input2url(url)
@@ -22,17 +26,24 @@ class YouTubeLinkHandler(object):
         wh = url.find("youtu.be")
         video_code = None
         if wh >= 0:
-            video_code = url[wh + 9 :]
+            return YouTubeLinkHandler.input2code_youtu_be(url)
         else:
-            wh = url.find("?")
-            if wh >= 0:
-                url = url[wh + 1 :]
-                split_items = url.split("&")
-                for split_item in split_items:
-                    wh = split_item.find("v=")
-                    if wh == 0:
-                        video_code = split_item[wh + 2 :]
+            return YouTubeLinkHandler.input2code_standard(url)
+
+    def input2code_youtu_be(url):
+        wh = url.find("youtu.be")
+
+        wh_question = url.find("?", wh)
+        if wh_question >= 0:
+            video_code = url[wh + 9 : wh_question]
+        else:
+            video_code = url[wh + 9 :]
+
         return video_code
+
+    def input2code_standard(url):
+        parsed_elements = urlparse(url)
+        return parse_qs(parsed_elements.query)["v"][0]
 
     def get_embed_link(self):
         return "https://www.youtube.com/embed/{0}".format(self.get_video_code())
