@@ -56,11 +56,13 @@ UI, with snapshots, is described by a separate README: [https://github.com/rumca
 
 Installation is described by a separate README: [https://github.com/rumca-js/Django-link-archive/blob/main/README_install.md](https://github.com/rumca-js/Django-link-archive/blob/main/README_install.md).
 
-To configure you need to add sources. There are at least two types:
+For RSS functionality you have to provide "source". There are two types of sources:
  - standard RSS source
  - parsed source. For this source page contents is downloaded, and links from it are extracted from that page and added to the database
 
 How to find RSS link? There is a 'tutorial' for that: [https://zapier.com/blog/how-to-find-rss-feed-url/](https://zapier.com/blog/how-to-find-rss-feed-url/)
+
+Links also can be provided manually.
 
 ## Demo
 
