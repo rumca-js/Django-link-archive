@@ -86,6 +86,7 @@ Link properties:
  - persistent - set if it is bookmarked
  - tag - set by the users, through forms
  - vote - set by the users, through forms. Decides how important the link is. Admin can arbitrarily define how long the range is
+ - age - set by the users. Minimal age that is required to view this link
 
 ## Bookmarks
 
