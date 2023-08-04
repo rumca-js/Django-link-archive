@@ -13,7 +13,7 @@ Personal link database, with RSS functionality. Similar to Reddit, but completel
  - Configurable: lists, timeouts
  - Automatic git export, RSS source import
  - Minimal installation, integrator may choose however to use production environment, with a good Database engine. Just as it is supported by Django. I am using SQLite without any problems.
- - Support for web archive
+ - Support for web archive: archive.org
  - Since it is a Django page, you can show it to your friends (if you like)
 
 ## Problems with other RSS readers, or apps
