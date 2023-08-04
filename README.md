@@ -151,6 +151,7 @@ Karma effect on the user:
 
 What causes karma change:
  - admin, or moderators
+ - adding vote for a link
  - upvotes, or downvotes on comments
  - bans of other users you invited
 
