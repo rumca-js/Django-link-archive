@@ -33,12 +33,11 @@ Personal link database, with RSS functionality. Similar to Reddit, but completel
 
 ## Possible use cases
 
- - YouTube link database, link aggregator
- - Database of important links: for work, for school
+ - YouTube filter. You add only your own subscriptions. You can categorize, filter entries from your sources
+ - link aggregator. Similar to Lemmy, Reddit
+ - Database of important links: for work, or for school
  - RSS client
- - Reddit/lemmy/diggit replacement
- - Data analysis - analyze link rot, how many a page is cited by other sources. For example [https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/analysis_domains.md](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/analysis_domains.md)
- - YouTube filter. Manage your own subscriptions, videos, without thirdparty interference
+ - Data analysis - analyze link rot, how many a page is cited by other sources, analyze link domains. For example [https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/analysis_domains.md](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/analysis_domains.md)
 
 ## Suite of projects
 
