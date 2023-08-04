@@ -144,6 +144,7 @@ This is unfinished, but I want to create rules, roadmap for the end game.
 
 Karma effect on the user:
  - if your karma goes below 0 your account is banned
+ - after certain threshold you can submit new links
  - after certain threshold you can submit comments
  - after certain threshold you can upvote and downvote comments
  - after certain threshold you create users (1 per day)
