@@ -1,6 +1,7 @@
 # List of domains, most from the Hacker News
 
  - 0110.be, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - 032c.com, Updated:July 27, 2023, 10:16 p.m., First seen:July 27, 2023, 10:16 p.m.
  - 0day.work, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - 0pointer.net, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:49 p.m.
  - 0ut3r.space, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
@@ -23,6 +24,7 @@
  - 19thnews.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - 1f604.blogspot.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - 1paragraph.app, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
+ - 1sub.dev, Updated:July 26, 2023, 12:41 p.m., First seen:July 26, 2023, 12:41 p.m.
  - 2012.osmz.ru, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - 2022.stateofjs.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - 2023.fossy.us, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -59,8 +61,9 @@
  - 9fans.github.io, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - 9front.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - 9p.io, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - 9to5google.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
- - 9to5mac.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - 9to5google.com, Updated:July 26, 2023, 1:51 a.m., First seen:July 24, 2023, 1:48 p.m.
+ - 9to5linux.com, Updated:Aug. 3, 2023, 4:47 p.m., First seen:July 26, 2023, 6:36 a.m.
+ - 9to5mac.com, Updated:July 28, 2023, 6:52 p.m., First seen:July 24, 2023, 1:48 p.m.
  - BigBalli.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - Flexport.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - Outstatic.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
@@ -72,22 +75,25 @@
  - aaka.sh, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - aaplinvestors.net, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - aapt.scitation.org, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
+ - aaronhertzmann.com, Updated:Aug. 2, 2023, 12:57 p.m., First seen:Aug. 1, 2023, 12:06 a.m.
  - aaronlou.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - aaronson.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - aaronzlewis.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - aasnova.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - aatishb.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - abby.how, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - abc.xyz, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:49 p.m.
+ - abc.xyz, Updated:July 25, 2023, 8:27 p.m., First seen:July 24, 2023, 1:49 p.m.
  - abc7.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - abc7chicago.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - abc7news.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
- - abcnews.go.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - abcnews.go.com, Updated:Aug. 4, 2023, 12:36 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - abcnews.go.comhttps:, Updated:Aug. 3, 2023, 7:16 p.m., First seen:Aug. 3, 2023, 7:16 p.m.
  - abe-winter.github.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - abelprize.no, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - aberant.tumblr.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - abhvio.us, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - abnercoimbre.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - about.codecov.io, Updated:Aug. 2, 2023, 4:12 p.m., First seen:Aug. 2, 2023, 4:12 p.m.
  - about.fb.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:46 p.m.
  - about.gitlab.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - about.google, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -103,7 +109,7 @@
  - abstractexpr.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - abuqader.substack.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - academia.stackexchange.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:46 p.m.
- - academic.oup.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - academic.oup.com, Updated:July 27, 2023, 2:41 p.m., First seen:July 24, 2023, 1:48 p.m.
  - academictorrents.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - academy.cs.cmu.edu, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - acceldataio.medium.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
@@ -177,7 +183,7 @@
  - ai.google, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - ai.googleblog.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - ai.honu.io, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - ai.meta.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - ai.meta.com, Updated:Aug. 2, 2023, 4:12 p.m., First seen:July 24, 2023, 1:48 p.m.
  - ai.stanford.edu, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - ai.v-gar.de, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - ai4comm.media.mit.edu, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -189,7 +195,7 @@
  - aimagazine.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - aip.scitation.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - aiquiz.ronsor.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - airbyte.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - airbyte.com, Updated:Aug. 3, 2023, 9:27 p.m., First seen:July 24, 2023, 1:48 p.m.
  - airdisputes.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - airfactsjournal.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - airgraver.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -232,8 +238,9 @@
  - alexxcons.github.io, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - alexyorke.github.io, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - algorithmica.org, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
+ - algorithmicbotany.org, Updated:July 24, 2023, 10:42 p.m., First seen:July 24, 2023, 10:42 p.m.
  - alhassy.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - alicegg.tech, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - alicegg.tech, Updated:July 25, 2023, 4:07 p.m., First seen:July 24, 2023, 2:46 p.m.
  - alistair.blog, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - alistapart.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - aljazaribook.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -245,6 +252,7 @@
  - allquiet.app, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - allsoftwaresucks.blogspot.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - almalinux.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - almirvuk.com, Updated:July 27, 2023, 4:52 a.m., First seen:July 27, 2023, 4:52 a.m.
  - alok.github.io, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - aloneonahill.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - alpaca-ai-custom4.ngrok.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -286,6 +294,7 @@
  - andgein.ru, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - andrea.corbellini.name, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - andreabergia.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - andrealeopardi.com, Updated:July 25, 2023, 4:07 a.m., First seen:July 25, 2023, 4:07 a.m.
  - andreaskambanis.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - andregarzia.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - andreisurugiu.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -299,7 +308,7 @@
  - andrewpillar.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - andreyor.st, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - andreyorst.gitlab.io, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - android-developers.googleblog.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - android-developers.googleblog.com, Updated:Aug. 3, 2023, 4:07 a.m., First seen:July 24, 2023, 1:48 p.m.
  - androidblog.a.pinggy.io, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - andromedacluster.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - andy-bell.co.uk, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -325,6 +334,7 @@
  - annpettifor.substack.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - anonchatgpt.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - anotherangrywoman.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - answers.netlify.com, Updated:July 26, 2023, 8:21 a.m., First seen:July 26, 2023, 8:21 a.m.
  - anthonyhobday.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - antigonejournal.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - antirez.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -350,28 +360,29 @@
  - apisix.apache.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - apitman.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - aplcart.info, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
- - apnews.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - apnews.com, Updated:July 31, 2023, 8:55 p.m., First seen:July 24, 2023, 1:48 p.m.
  - apolloinrealtime.org, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - app.airframes.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - app.engage.gettyimages.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - app.hedgeye.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - app.humanornot.ai, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - app.jellylade.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
+ - app.markwhen.com, Updated:July 31, 2023, 8:55 p.m., First seen:July 31, 2023, 8:55 p.m.
  - app.movinglake.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - app.pickcode.io, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - app.pressnt.net, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - app.scribbler.so, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - app.uptrace.dev, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - app.wordbots.io, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - appleinsider.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - appleinsider.com, Updated:Aug. 2, 2023, 4:17 a.m., First seen:July 24, 2023, 1:48 p.m.
  - applerankings.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - applewatchrunner.substack.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - appleworld.today, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - applied-langua.ge, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - appliku.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - appliku.com, Updated:July 26, 2023, 12:41 p.m., First seen:July 24, 2023, 1:48 p.m.
  - apply.workable.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:46 p.m.
  - applyonline.hdfcbank.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - apps.apple.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - apps.apple.com, Updated:July 26, 2023, 3:56 p.m., First seen:July 24, 2023, 1:48 p.m.
  - apps.dtic.mil, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - apps.web.maine.gov, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - apps.weber.edu, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -381,13 +392,15 @@
  - apuchitnis.substack.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - aqicn.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - aquila.usm.edu, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - arachnoid.com, Updated:July 26, 2023, 6:11 a.m., First seen:July 26, 2023, 6:11 a.m.
  - arantius.github.io, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - aras-p.info, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - arbesman.substack.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - arcadeblogger.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - arc.net, Updated:July 25, 2023, 4:07 p.m., First seen:July 25, 2023, 4:07 p.m.
+ - arcadeblogger.com, Updated:July 28, 2023, 12:22 p.m., First seen:July 24, 2023, 2:47 p.m.
  - arcan-fe.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - archeyes.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - archive.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - archive.org, Updated:Aug. 4, 2023, 1:47 a.m., First seen:July 24, 2023, 1:48 p.m.
  - archive.vn, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - archives.design, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - archlinux.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -407,13 +420,14 @@
  - arineonshark.itch.io, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - armink.github.io, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - armorpaint.org, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
+ - armyoe.files.wordpress.com, Updated:July 29, 2023, 7:17 p.m., First seen:July 29, 2023, 7:17 p.m.
  - armypubs.army.mil, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - arnaud-carre.github.io, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - arogozhnikov.github.io, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - around.uoregon.edu, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - arrow.apache.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - arslan.io, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - arstechnica.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - arstechnica.com, Updated:Aug. 4, 2023, 11:32 a.m., First seen:July 24, 2023, 1:48 p.m.
  - artasillumination.files.wordpress.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - artem.krylysov.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - artemis.sh, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
@@ -424,9 +438,9 @@
  - artsandculture.google.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:49 p.m.
  - artsy.github.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - arun.is, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - arxiv.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - arxiv.org, Updated:Aug. 4, 2023, 1:47 a.m., First seen:July 24, 2023, 1:48 p.m.
  - arxivgen.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - asahilinux.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - asahilinux.org, Updated:Aug. 2, 2023, 4:12 p.m., First seen:July 24, 2023, 1:48 p.m.
  - asawicki.info, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - ascii.textfiles.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
  - asciimath.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -438,6 +452,7 @@
  - asianews.network, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - asianometry.substack.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - askjerry.substack.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
+ - askxammy.com, Updated:July 27, 2023, 4:52 a.m., First seen:July 27, 2023, 4:52 a.m.
  - askyourpdf.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - asm-editor.specy.app, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - asnewman.github.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -449,7 +464,7 @@
  - assistedeverything.substack.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - asteriskmag.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - astral.sh, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
- - astralcodexten.substack.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - astralcodexten.substack.com, Updated:July 25, 2023, 5:12 p.m., First seen:July 24, 2023, 1:48 p.m.
  - astrid.tech, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - astro.build, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - astrobites.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -467,15 +482,17 @@
  - attentionviz.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - au.finance.yahoo.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - audialab.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - audioboom.com, Updated:Aug. 4, 2023, 12:46 a.m., First seen:July 25, 2023, 12:56 a.m.
  - auerstack.substack.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - aurelien2022.substack.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - aus.social, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - auspicious-domain-086.notion.site, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - austingil.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:47 p.m.
- - austinhenley.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - austinhenley.com, Updated:Aug. 4, 2023, 12:11 a.m., First seen:July 24, 2023, 1:48 p.m.
  - austinkleon.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - austinpoor.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - austinvernon.site, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - austral-lang.org, Updated:July 27, 2023, 8:06 p.m., First seen:July 27, 2023, 8:06 p.m.
  - authjs.dev, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - authors.apple.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - authzed.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -501,7 +518,7 @@
  - awfulannouncing.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - awk.dev, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - aws-icons.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - aws.amazon.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - aws.amazon.com, Updated:Aug. 4, 2023, 3:57 a.m., First seen:July 24, 2023, 1:48 p.m.
  - axbom.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - axelp.io, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - axleos.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -516,6 +533,7 @@
  - bad.computer, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - badar.tech, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - badgers.space, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - badsoftwareadvice.substack.com, Updated:July 26, 2023, 8:17 p.m., First seen:July 26, 2023, 8:17 p.m.
  - badssl.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - bae.st, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - baekdal.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -531,6 +549,7 @@
  - barnabas.me, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - barrgroup.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - bartendinglicensehelp.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
+ - bartwullems.blogspot.com, Updated:Aug. 2, 2023, 1:02 a.m., First seen:Aug. 2, 2023, 1:02 a.m.
  - bas.codes, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - baseballgames.dreamhosters.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - basehost.eu, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -575,7 +594,7 @@
  - benchkram.de, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - beneinstein.medium.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - bengoertzel.substack.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - benhoyt.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - benhoyt.com, Updated:July 29, 2023, 9:27 p.m., First seen:July 24, 2023, 1:48 p.m.
  - benjamincongdon.me, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - benjaminrosshoffman.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - benjcal.space, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -604,6 +623,7 @@
  - beta.elevenlabs.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - beta.sayhello.so, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - beta.w3.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - betanews.com, Updated:Aug. 3, 2023, 4:07 a.m., First seen:July 31, 2023, 8:53 p.m.
  - betonit.substack.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - betterexplained.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - bettermarkets.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -621,7 +641,7 @@
  - biffweb.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - bigcapital.ly, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - bigdanzblog.wordpress.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - bigthink.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - bigthink.com, Updated:Aug. 2, 2023, 4:12 p.m., First seen:July 24, 2023, 1:48 p.m.
  - bigwav.app, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - bikebiz.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - bikerglen.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -644,10 +664,10 @@
  - bitcannon.net, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - bitecode.substack.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 1:49 p.m.
  - bitesizebio.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - bitfieldconsulting.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - bitfieldconsulting.com, Updated:July 27, 2023, 10:22 a.m., First seen:July 24, 2023, 1:48 p.m.
  - bitmath.blogspot.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - bitmaybewise.substack.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - bitmovin.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - bitmovin.com, Updated:Aug. 2, 2023, 7:32 a.m., First seen:July 24, 2023, 1:48 p.m.
  - bits-chips.nl, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - bitsavers.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - bitsavers.trailing-edge.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -661,7 +681,7 @@
  - bjlkeng.github.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - bjornpagen.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - bjornwestergard.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - bjsm.bmj.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - bjsm.bmj.com, Updated:July 26, 2023, 9:22 p.m., First seen:July 24, 2023, 1:48 p.m.
  - bkamins.github.io, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - bkhome.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - blackcentraleurope.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
@@ -680,8 +700,9 @@
  - blocks.githubnext.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - blocksandfiles.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - blocksuite.affine.pro, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - blockworks.co, Updated:July 28, 2023, 3:37 p.m., First seen:July 28, 2023, 3:37 p.m.
  - blocr.github.io, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - blog.1password.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - blog.1password.com, Updated:July 26, 2023, 6:06 p.m., First seen:July 24, 2023, 1:48 p.m.
  - blog.aadilali.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - blog.aaronkharris.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - blog.aawadia.dev, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -699,7 +720,7 @@
  - blog.andyglassman.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - blog.andygol.co.ua, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - blog.angular.io, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
- - blog.apnic.net, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - blog.apnic.net, Updated:July 31, 2023, 9:56 p.m., First seen:July 24, 2023, 1:48 p.m.
  - blog.appsignal.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - blog.aqnichol.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - blog.archive.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -735,8 +756,8 @@
  - blog.chaselambda.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - blog.checkpoint.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - blog.chiselstrike.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - blog.chromium.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:49 p.m.
- - blog.cloudflare.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - blog.chromium.org, Updated:Aug. 4, 2023, 9:22 a.m., First seen:July 24, 2023, 1:49 p.m.
+ - blog.cloudflare.com, Updated:July 26, 2023, 8:17 p.m., First seen:July 24, 2023, 1:48 p.m.
  - blog.cloudnativefolks.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - blog.clubhouse.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - blog.codeanywhere.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -812,7 +833,7 @@
  - blog.gitguardian.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - blog.glowforge.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - blog.glyph.im, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:45 p.m.
- - blog.google, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - blog.google, Updated:Aug. 4, 2023, 5:02 a.m., First seen:July 24, 2023, 1:48 p.m.
  - blog.gopenai.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - blog.hansenpartnership.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - blog.hellolanding.tech, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -839,7 +860,7 @@
  - blog.josefsson.org, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 1:49 p.m.
  - blog.jquery.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - blog.jse.li, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - blog.jupyter.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - blog.jupyter.org, Updated:July 27, 2023, 3:52 a.m., First seen:July 24, 2023, 1:48 p.m.
  - blog.kagi.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - blog.karliner.net, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - blog.kchung.co, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -848,6 +869,7 @@
  - blog.koehntopp.info, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - blog.kowalczyk.info, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - blog.kraken.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - blog.kroy.io, Updated:July 28, 2023, 9:07 a.m., First seen:July 28, 2023, 9:07 a.m.
  - blog.langchain.dev, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 1:49 p.m.
  - blog.langworth.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - blog.lastmileai.dev, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
@@ -864,7 +886,7 @@
  - blog.m5e.de, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - blog.mand3l.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - blog.mangoteque.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
- - blog.marcua.net, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - blog.marcua.net, Updated:July 27, 2023, 4:57 a.m., First seen:July 24, 2023, 1:48 p.m.
  - blog.massdriver.cloud, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - blog.mastermind.dev, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - blog.mastodon.world, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -916,11 +938,11 @@
  - blog.patreon.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - blog.paulbohm.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - blog.payara.fish, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - blog.persistent.info, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
+ - blog.persistent.info, Updated:Aug. 2, 2023, 10:42 p.m., First seen:July 24, 2023, 2:45 p.m.
  - blog.peterzhu.ca, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - blog.phnx.im, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - blog.phor.net, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - blog.phronemophobic.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - blog.phronemophobic.com, Updated:July 25, 2023, 10:37 p.m., First seen:July 24, 2023, 1:48 p.m.
  - blog.phylum.io, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:49 p.m.
  - blog.physics-astronomy.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - blog.pingsafe.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
@@ -950,7 +972,9 @@
  - blog.regehr.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - blog.replit.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - blog.revolutionanalytics.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - blog.rfox.eu, Updated:July 29, 2023, 1:51 p.m., First seen:July 29, 2023, 1:51 p.m.
  - blog.robertelder.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - blog.roblox.com, Updated:July 28, 2023, 5:47 p.m., First seen:July 28, 2023, 5:47 p.m.
  - blog.rongarret.info, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:45 p.m.
  - blog.rust-lang.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - blog.ryujinx.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -971,7 +995,9 @@
  - blog.silentsignal.eu, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - blog.simutrans.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - blog.singleton.io, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
+ - blog.skypilot.co, Updated:Aug. 2, 2023, 7:27 p.m., First seen:Aug. 2, 2023, 7:27 p.m.
  - blog.southparkcommons.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:49 p.m.
+ - blog.spatial.chat, Updated:July 25, 2023, 4:07 p.m., First seen:July 25, 2023, 4:07 p.m.
  - blog.sqlitecloud.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
  - blog.standardnotes.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - blog.stmcyber.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -983,6 +1009,7 @@
  - blog.testdouble.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - blog.thc.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - blog.thea.codes, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:45 p.m.
+ - blog.theabhishek.dev, Updated:July 28, 2023, 8:02 a.m., First seen:July 28, 2023, 8:02 a.m.
  - blog.theapricot.io, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - blog.thefrenchghosty.me, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - blog.thelifeofkenneth.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -996,14 +1023,14 @@
  - blog.tjll.net, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - blog.tomayac.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - blog.torproject.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - blog.trailofbits.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - blog.trailofbits.com, Updated:July 29, 2023, 11:07 a.m., First seen:July 24, 2023, 2:46 p.m.
  - blog.treblle.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - blog.trunk.io, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:49 p.m.
  - blog.tsr-podcast.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - blog.turquoise.health, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - blog.turso.tech, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - blog.twitch.tv, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - blog.twitter.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:45 p.m.
+ - blog.twitter.com, Updated:Aug. 3, 2023, 5:12 a.m., First seen:July 24, 2023, 2:45 p.m.
  - blog.usmanity.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - blog.val.town, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:48 p.m.
  - blog.valentin.sh, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -1031,6 +1058,7 @@
  - blog.xa0.de, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - blog.xpnsec.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - blog.yenniejun.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - blog.yoav.ws, Updated:July 25, 2023, 6:19 a.m., First seen:July 25, 2023, 6:19 a.m.
  - blog.yoshuawuyts.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - blog.yossarian.net, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - blog.youmu.moe, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -1044,16 +1072,16 @@
  - blogless.datenbrei.de, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - blogs.apache.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - blogs.bing.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - blogs.bl.uk, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - blogs.bl.uk, Updated:Aug. 4, 2023, 9:22 a.m., First seen:July 24, 2023, 1:48 p.m.
  - blogs.bmj.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - blogs.chapman.edu, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - blogs.cisco.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - blogs.embarcadero.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
- - blogs.gnome.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
+ - blogs.gnome.org, Updated:July 26, 2023, 6:06 p.m., First seen:July 24, 2023, 2:48 p.m.
  - blogs.harvard.edu, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - blogs.intellique.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - blogs.ischool.berkeley.edu, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - blogs.loc.gov, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - blogs.loc.gov, Updated:Aug. 1, 2023, 12:06 a.m., First seen:July 24, 2023, 2:46 p.m.
  - blogs.lse.ac.uk, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - blogs.microsoft.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - blogs.nasa.gov, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -1063,7 +1091,9 @@
  - blogs.perl.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - blogs.scientificamerican.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:47 p.m.
  - blogs.uoregon.edu, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - blogs.windows.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - blogs.windows.com, Updated:July 25, 2023, 4:06 a.m., First seen:July 24, 2023, 1:48 p.m.
+ - bloodknife.com, Updated:Aug. 4, 2023, 7:12 a.m., First seen:Aug. 4, 2023, 7:12 a.m.
+ - bloomberg.github.io, Updated:July 27, 2023, 5:56 p.m., First seen:July 27, 2023, 5:56 p.m.
  - blubsblog.bearblog.dev, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - bluelander.bearblog.dev, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - blueshirt.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -1078,10 +1108,11 @@
  - boards.greenhouse.io, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - boards.straightdope.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - bob-cd.github.io, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - bobcopeland.com, Updated:Aug. 3, 2023, 1:53 p.m., First seen:Aug. 3, 2023, 1:53 p.m.
  - bodhi.fedoraproject.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - bogota.gov.co, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - boilingsteam.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:45 p.m.
- - boingboing.net, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:45 p.m.
+ - boingboing.net, Updated:Aug. 2, 2023, 6:22 p.m., First seen:July 24, 2023, 2:45 p.m.
  - bolinlang.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - boltcss.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - bombich.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -1127,15 +1158,16 @@
  - brandur.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - brassicgamer.blogspot.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - bratgpt.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - brave.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - brave.com, Updated:Aug. 3, 2023, 6:12 p.m., First seen:July 24, 2023, 1:48 p.m.
  - bravenewgeek.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - breached.vc, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - breachmedia.ca, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - breakingthe3ma.app, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - brendenhyde.com, Updated:July 25, 2023, 12:52 a.m., First seen:July 25, 2023, 12:52 a.m.
  - bret.dk, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - brettongoods.substack.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - brettscott.substack.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - brev.dev, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - brev.dev, Updated:July 24, 2023, 8:32 p.m., First seen:July 24, 2023, 2:47 p.m.
  - brew.sh, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - brianb.freeshell.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - briancallahan.net, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -1146,6 +1178,7 @@
  - brickexperimentchannel.wordpress.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - brickit.app, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - bricks.stackexchange.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - briefcase.readthedocs.io, Updated:Aug. 3, 2023, 12:47 p.m., First seen:Aug. 3, 2023, 12:47 p.m.
  - briefs.video, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - briefsky.app, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - britishcoast.wordpress.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -1170,7 +1203,7 @@
  - buf.build, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - bugfix-66.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - bugmenot.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - bugs.chromium.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - bugs.chromium.org, Updated:July 24, 2023, 3:06 p.m., First seen:July 24, 2023, 1:48 p.m.
  - bugs.debian.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - bugs.launchpad.net, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - bugs.openjdk.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -1193,11 +1226,11 @@
  - bundlestore.airballoon.app, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - bunny.net, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - burialsandbeyond.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:49 p.m.
- - businessinsider.com.pl, Updated:July 24, 2023, 2:01 p.m., First seen:July 24, 2023, 2:01 p.m.
+ - businessinsider.com.pl, Updated:Aug. 4, 2023, 12:37 p.m., First seen:July 24, 2023, 2:01 p.m.
  - busy-beavers.tigyog.app, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - busybox.net, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - but-her-flies.bearblog.dev, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - buttondown.email, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - buttondown.email, Updated:July 29, 2023, 7:17 p.m., First seen:July 24, 2023, 1:48 p.m.
  - buttonmash.substack.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - butwhatfor.beehiiv.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - buu342.me, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -1242,6 +1275,7 @@
  - canyouactually.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - capeprivacy.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - capillaries.io, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - capnproto.org, Updated:July 28, 2023, 4:42 p.m., First seen:July 28, 2023, 4:42 p.m.
  - caps.wiki, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - carboncredits.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - carbonswitch.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -1262,6 +1296,7 @@
  - carta.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - caseyaccidental.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - caseyhandmer.wordpress.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - caseymuratori.com, Updated:Aug. 1, 2023, 3:21 a.m., First seen:Aug. 1, 2023, 3:21 a.m.
  - caseysoftware.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - casparwre.de, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - cassandradispatch.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -1275,6 +1310,7 @@
  - catgirl.ai, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - catgpt.wvd.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - catonmat.net, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - catskull.net, Updated:Aug. 4, 2023, 12:16 a.m., First seen:Aug. 2, 2023, 4:17 a.m.
  - catvalente.substack.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - caymannewsservice.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - cbsaustin.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -1283,7 +1319,9 @@
  - cddo.blog.gov.uk, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - cdent.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - cdixon.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - cdm.link, Updated:July 25, 2023, 6:19 a.m., First seen:July 25, 2023, 6:19 a.m.
  - cdn.cloudflare.steamstatic.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
+ - cdn.feedcontrol.net, Updated:Aug. 4, 2023, 12:51 a.m., First seen:July 25, 2023, 12:57 a.m.
  - cdn.openai.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - cdn.winget.microsoft.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - cdoyle.me, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -1321,6 +1359,7 @@
  - changelog.complete.org, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - channel101.fandom.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - chaos.social, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:49 p.m.
+ - chargebackstop.com, Updated:Aug. 2, 2023, 4:12 p.m., First seen:Aug. 2, 2023, 4:12 p.m.
  - charleseisenstein.substack.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - charliebecker.substack.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - charlieharrington.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -1337,6 +1376,7 @@
  - chatterhead.bearblog.dev, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - chaudhry.notion.site, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - chcollins.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - cheapskatesguide.org, Updated:July 26, 2023, 4:01 a.m., First seen:July 26, 2023, 4:01 a.m.
  - checkmyads.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - checksum.sh, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - chelseatroy.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:49 p.m.
@@ -1345,6 +1385,7 @@
  - chess24.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - chicago.suntimes.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - chicagoreader.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - chie.app, Updated:July 28, 2023, 5:47 p.m., First seen:July 28, 2023, 5:47 p.m.
  - china-journal.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - chinacarhistory.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - chinese.stackexchange.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -1363,16 +1404,18 @@
  - christianheilmann.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:49 p.m.
  - chriswarrick.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - chrisx.xyz, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
- - chrome.google.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - chrome.google.com, Updated:Aug. 1, 2023, 4:26 a.m., First seen:July 24, 2023, 1:48 p.m.
  - chromestatus.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - chromium-review.googlesource.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:47 p.m.
  - chromium.googlesource.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - chronologyclock.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - chrultrabook.github.io, Updated:Aug. 3, 2023, 7:17 p.m., First seen:Aug. 3, 2023, 7:17 p.m.
  - cichocinski.dev, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - ciechanow.ski, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - cims.nyu.edu, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - cinematography.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - cintra.substack.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - cioinfluence.com, Updated:July 28, 2023, 4:42 p.m., First seen:July 28, 2023, 4:42 p.m.
  - circleci.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - circleid.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:49 p.m.
  - circuitverse.org, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
@@ -1415,6 +1458,7 @@
  - cloud.ergo.services, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - cloud.google.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - cloudappreciationsociety.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - cloudblogs.microsoft.com, Updated:Aug. 4, 2023, 5:02 a.m., First seen:Aug. 4, 2023, 5:02 a.m.
  - cloudflare-ipfs.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - cloudinary.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - cloudisland.nz, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -1423,7 +1467,7 @@
  - clubhopr.app, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - cmart.blog, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - cme.h-its.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - cmte.ieee.org, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
+ - cmte.ieee.org, Updated:July 25, 2023, 12:52 p.m., First seen:July 24, 2023, 2:45 p.m.
  - cnevpost.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - cobalt.dev, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - cocktailpeanut.github.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -1461,6 +1505,7 @@
  - codingcompetitions.withgoogle.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - codingkaiser.blog, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - codingnest.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - cofense.com, Updated:Aug. 3, 2023, 9:32 a.m., First seen:Aug. 3, 2023, 9:32 a.m.
  - cogdogblog.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - cognitiverevolution.substack.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - cohost.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -1518,6 +1563,7 @@
  - companiesmarketcap.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - compass.onlinelibrary.wiley.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - compellingsciencefiction.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
+ - computationalaudiology.com, Updated:July 29, 2023, 1:22 a.m., First seen:July 29, 2023, 1:22 a.m.
  - compute.toys, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - computer.rip, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - computeradsfromthepast.substack.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:49 p.m.
@@ -1527,6 +1573,7 @@
  - con.racket-lang.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - conal.net, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - conduition.io, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - confidentialcomputing.io, Updated:Aug. 1, 2023, 3:17 p.m., First seen:Aug. 1, 2023, 3:17 p.m.
  - confusedbit.dev, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - conic.finance, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - connortumbleson.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
@@ -1551,6 +1598,7 @@
  - cookieplmonster.github.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - cooklang.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - coolaj86.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - cophone.io, Updated:July 28, 2023, 3:37 p.m., First seen:July 28, 2023, 3:37 p.m.
  - copy.sh, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - copyrightlately.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - cor3ntin.github.io, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -1600,7 +1648,7 @@
  - crates.io, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - crawshaw.io, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - crdt.tech, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
- - createsend.com, Updated:July 24, 2023, 2:07 p.m., First seen:July 24, 2023, 2:07 p.m.
+ - createsend.com, Updated:Aug. 3, 2023, 2:02 p.m., First seen:July 24, 2023, 2:07 p.m.
  - creativegood.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - creatomate.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - creatoreconomy.so, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -1637,12 +1685,14 @@
  - csdb.dk, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - cseweb.ucsd.edu, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - css-comments.vercel.app, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - css-irl.info, Updated:Aug. 1, 2023, 4:26 a.m., First seen:Aug. 1, 2023, 4:26 a.m.
  - css-tricks.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:49 p.m.
  - csspro.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - csswizardry.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - csvbase.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - ctan.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - cthiriet.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
+ - ctif.org, Updated:July 26, 2023, 3:56 p.m., First seen:July 26, 2023, 3:56 p.m.
  - cturt.github.io, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - cube0x0.github.io, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - cubxity.dev, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -1678,14 +1728,14 @@
  - da.lacounty.gov, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - dabeaz-course.github.io, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - dadagrams.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - daedtech.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - daedtech.com, Updated:Aug. 3, 2023, 4:07 a.m., First seen:July 24, 2023, 2:47 p.m.
  - dafluffypotato.itch.io, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - dagger.io, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - dagster.io, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:46 p.m.
  - daily.jstor.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - dailynous.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - dailyreckoning.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - dailysceptic.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:01 p.m.
+ - dailysceptic.org, Updated:Aug. 4, 2023, 12:37 p.m., First seen:July 24, 2023, 2:01 p.m.
  - dakotavadams.substack.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - dallasinnovates.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - dan.bulwinkle.net, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -1719,7 +1769,7 @@
  - databasearchitects.blogspot.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - databasediagram.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - databorg.ai, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - datacolada.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - datacolada.org, Updated:Aug. 3, 2023, 5:12 a.m., First seen:July 24, 2023, 1:48 p.m.
  - datademythed.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - datafinnovation.medium.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - datagubbe.se, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
@@ -1731,13 +1781,13 @@
  - datascientyst.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - datasette.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - dataswamp.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - datatracker.ietf.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - datatracker.ietf.org, Updated:July 25, 2023, 5:12 p.m., First seen:July 24, 2023, 1:48 p.m.
  - dateforce.app, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - dave.zfxinc.net, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - davedelong.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - davekarpf.substack.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - davekilian.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - daverupert.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
+ - daverupert.com, Updated:Aug. 2, 2023, 10:42 p.m., First seen:July 24, 2023, 1:49 p.m.
  - davestewart.co.uk, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - david-delassus.medium.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - david-gilbertson.medium.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -1774,7 +1824,7 @@
  - deadreckonings.files.wordpress.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - dearproducer.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - dearrow.ajay.app, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - death.andgravity.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - death.andgravity.com, Updated:Aug. 1, 2023, 1:07 p.m., First seen:July 24, 2023, 1:48 p.m.
  - deathbyai.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - deavid.wordpress.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - debian-handbook.info, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
@@ -1788,7 +1838,7 @@
  - decodebytes.substack.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - decoded.legal, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - decomposition.al, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
- - decrypt.co, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - decrypt.co, Updated:July 25, 2023, 4:07 p.m., First seen:July 24, 2023, 1:48 p.m.
  - deep-ivy-ltd.breezy.hr, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:48 p.m.
  - deepimagination.cc, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - deepmind.github.io, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -1800,7 +1850,7 @@
  - defacto2.net, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - defcon.social, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - defector.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
- - defensescoop.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - defensescoop.com, Updated:July 27, 2023, 7:07 a.m., First seen:July 24, 2023, 1:48 p.m.
  - defn.io, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:46 p.m.
  - degenerateconic.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - degreeswhat.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -1839,17 +1889,18 @@
  - dev.blog.documentfoundation.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - dev.epicgames.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - dev.l1x.be, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - dev.to, Updated:July 28, 2023, 4:42 a.m., First seen:July 28, 2023, 4:42 a.m.
  - dev.yorhel.nl, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - devbase.fyi, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - devblogs.microsoft.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - devclass.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - devblogs.microsoft.com, Updated:Aug. 4, 2023, 5:02 a.m., First seen:July 24, 2023, 1:48 p.m.
+ - devclass.com, Updated:July 27, 2023, 2:47 a.m., First seen:July 24, 2023, 1:48 p.m.
  - devcycle.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - devdojo.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - developer.apple.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - developer.chrome.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - developer.apple.com, Updated:July 28, 2023, 12:22 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - developer.chrome.com, Updated:Aug. 1, 2023, 4:26 a.m., First seen:July 24, 2023, 1:48 p.m.
  - developer.grammarly.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - developer.ibm.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - developer.mozilla.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - developer.mozilla.org, Updated:Aug. 1, 2023, 4:26 a.m., First seen:July 24, 2023, 1:48 p.m.
  - developer.nvidia.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - developer.okta.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - developer.twitter.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -1858,7 +1909,7 @@
  - developerpitstop.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - developers.facebook.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:47 p.m.
  - developers.googleblog.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - developers.redhat.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - developers.redhat.com, Updated:July 28, 2023, 11:17 a.m., First seen:July 24, 2023, 1:48 p.m.
  - developers.slashdot.org, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - developers.yubico.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - deviationgame.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
@@ -1916,8 +1967,8 @@
  - discuit.net, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - discuss.haiku-os.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:49 p.m.
  - discuss.ocaml.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - discuss.python.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - discuss.systems, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - discuss.python.org, Updated:July 29, 2023, 5:41 a.m., First seen:July 24, 2023, 1:48 p.m.
+ - discuss.systems, Updated:July 27, 2023, 4:57 a.m., First seen:July 24, 2023, 2:46 p.m.
  - discussions.apple.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - disinformationchronicle.substack.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - diskprices.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
@@ -1939,7 +1990,7 @@
  - djpardis.medium.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - djsegal.github.io, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - dkb.blog, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:49 p.m.
- - dl.acm.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - dl.acm.org, Updated:July 25, 2023, 11:47 a.m., First seen:July 24, 2023, 1:48 p.m.
  - dm.hn, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - dm13450.github.io, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - dmitry-kan.medium.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -1951,7 +2002,7 @@
  - doc.lagout.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - docconverter.app, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - dockets.justia.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - dockyard.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - dockyard.com, Updated:July 26, 2023, 6:06 p.m., First seen:July 24, 2023, 2:46 p.m.
  - docs.authlib.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - docs.aws.amazon.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - docs.brew.sh, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -1959,13 +2010,13 @@
  - docs.cozodb.org, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - docs.datomic.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - docs.docker.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - docs.fcc.gov, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
+ - docs.fcc.gov, Updated:Aug. 2, 2023, 8:32 p.m., First seen:July 24, 2023, 2:48 p.m.
  - docs.flux.ai, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - docs.freebsd.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - docs.github.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - docs.gitlab.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - docs.godotengine.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - docs.google.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - docs.google.com, Updated:July 27, 2023, 9:17 a.m., First seen:July 24, 2023, 1:48 p.m.
  - docs.hylang.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - docs.kanaries.net, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
  - docs.keydb.dev, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -1979,9 +2030,10 @@
  - docs.racket-lang.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - docs.ruby-lang.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - docs.stepci.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - docs.sweep.dev, Updated:July 31, 2023, 9:56 p.m., First seen:July 31, 2023, 9:56 p.m.
  - docs.taichi-lang.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - docs.tigrisdata.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - doctorow.medium.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:49 p.m.
+ - doctorow.medium.com, Updated:July 25, 2023, 5:12 p.m., First seen:July 24, 2023, 1:49 p.m.
  - documentationlab.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - dodcio.defense.gov, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - dogapi.dog, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -2053,6 +2105,7 @@
  - dt.plumbing, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - dtinth.github.io, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - dtrace.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - duarteocarmo.com, Updated:Aug. 1, 2023, 6:32 p.m., First seen:Aug. 1, 2023, 6:32 p.m.
  - dub.sh, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - duckdb.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - duffel.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -2069,8 +2122,10 @@
  - dusted.codes, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - dusted.dk, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - dustin-godevais.medium.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - dustingetz.electricfiddle.net, Updated:July 24, 2023, 9:37 p.m., First seen:July 24, 2023, 9:37 p.m.
  - dustri.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - dvassallo.medium.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
+ - dwdraju.medium.com, Updated:July 26, 2023, 11:32 p.m., First seen:July 26, 2023, 11:32 p.m.
  - dx.tips, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - dylibso.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - dynomight.net, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -2078,20 +2133,21 @@
  - dys2p.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - e-discoveryteam.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - e2e.ti.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - e360.yale.edu, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - e360.yale.edu, Updated:Aug. 3, 2023, 10:32 p.m., First seen:July 24, 2023, 1:48 p.m.
  - eandt.theiet.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:46 p.m.
  - earthbound.report, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - earthly.dev, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:46 p.m.
  - earthobservatory.nasa.gov, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - earthquake.usgs.gov, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - east-fruit.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
+ - easydns.com, Updated:July 26, 2023, 6:06 p.m., First seen:July 26, 2023, 6:06 p.m.
  - easylang.online, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:46 p.m.
  - eaton-works.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - eatrightindia.gov.in, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - ec.europa.eu, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - echoesofsomewhere.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - echoserver.dev, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - eclecticlight.co, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - eclecticlight.co, Updated:Aug. 3, 2023, 6:17 a.m., First seen:July 24, 2023, 1:48 p.m.
  - eclipse-foundation.blog, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - eco.kde.org, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - econofact.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -2113,6 +2169,7 @@
  - edoput.it, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - edoras.sdsu.edu, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - edri.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - edsource.org, Updated:July 28, 2023, 4:42 p.m., First seen:July 28, 2023, 4:42 p.m.
  - educatedguesswork.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - educationandstatistics.blogspot.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - edw.is, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -2134,14 +2191,15 @@
  - ei.cs.vt.edu, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - eig.org, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - eigenrobot.substack.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - eighty-twenty.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - eighty-twenty.org, Updated:July 31, 2023, 8:55 p.m., First seen:July 24, 2023, 2:46 p.m.
  - eitherway.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - eklitzke.org, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:48 p.m.
  - el-tramo.be, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - elaine-cao-93.medium.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - elastic.github.io, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - elc.github.io, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - electrek.co, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - electrek.co, Updated:Aug. 3, 2023, 5:08 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - electricenergyonline.com, Updated:July 24, 2023, 9:37 p.m., First seen:July 24, 2023, 9:37 p.m.
  - electricliterature.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - electroagenda.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - electronics.stackexchange.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -2190,7 +2248,7 @@
  - en.qantara.de, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - en.vietnamplus.vn, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - en.wikibooks.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:49 p.m.
- - en.wikipedia.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - en.wikipedia.org, Updated:Aug. 2, 2023, 2:02 p.m., First seen:July 24, 2023, 1:48 p.m.
  - en.wikisource.org, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - en.wikiversity.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - en.wiktionary.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -2217,23 +2275,26 @@
  - english.news.cn, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - english.stackexchange.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 1:48 p.m.
  - english.tau.ac.il, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:49 p.m.
- - enhance.dev, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
+ - enhance.dev, Updated:July 27, 2023, 1:37 p.m., First seen:July 24, 2023, 2:48 p.m.
  - enigma.hoerenberg.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - enterprise.dji.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - entomologytoday.org, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - entrackr.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - environmentamerica.org, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
+ - envoy-playground.apoxy.dev, Updated:July 28, 2023, 2:37 a.m., First seen:July 28, 2023, 2:37 a.m.
  - enzian.systems, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - eodg.atm.ox.ac.uk, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - eol.org, Updated:Aug. 2, 2023, 9:41 a.m., First seen:Aug. 2, 2023, 9:41 a.m.
  - eos.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - epage.github.io, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - epic-kitchens.github.io, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - epicandmonicisnotiso.blogspot.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:45 p.m.
  - epochai.org, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
- - epoznan.pl, Updated:July 24, 2023, 2:01 p.m., First seen:July 24, 2023, 2:01 p.m.
+ - epoznan.pl, Updated:Aug. 4, 2023, 12:37 p.m., First seen:July 24, 2023, 2:01 p.m.
  - eprint.iacr.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
  - epsilon537.github.io, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - equals.app, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - ergodicityeconomics.com, Updated:Aug. 3, 2023, 12:52 a.m., First seen:Aug. 3, 2023, 12:52 a.m.
  - ergodox-ez.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - ergomake.dev, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:45 p.m.
  - erich-friedman.github.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -2241,6 +2302,7 @@
  - ericlippert.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - ericmitchell.ai, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - ericsink.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - ericswpark.com, Updated:July 27, 2023, 12:37 a.m., First seen:July 27, 2023, 12:37 a.m.
  - ericwbailey.website, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - erik.itland.no, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - erikbern.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -2250,30 +2312,35 @@
  - erikjohannes.no, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - erikmcclure.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - eriktorenberg.substack.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - erikvandeven.medium.com, Updated:July 24, 2023, 8:32 p.m., First seen:July 24, 2023, 8:32 p.m.
  - eriugenareview.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - erlangforums.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - ersei.net, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:48 p.m.
  - erthalion.info, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - eruda.liriliri.io, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - erynwells.me, Updated:Aug. 3, 2023, 9:32 a.m., First seen:Aug. 3, 2023, 9:32 a.m.
  - esawebb.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:49 p.m.
  - escape.tech, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - escapebigtech.info, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - espp.fyi, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - estebank.github.io, Updated:Aug. 1, 2023, 6:32 p.m., First seen:Aug. 1, 2023, 6:32 p.m.
  - estesrockets.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
+ - esthercrawford.medium.com, Updated:July 27, 2023, 7:01 p.m., First seen:July 27, 2023, 7:01 p.m.
  - estonianworld.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - ethanschoonover.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - etherscan.io, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:47 p.m.
  - ethics.acm.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - ethw.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - ethz.ch, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
- - etiennefd.substack.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
+ - etiennefd.substack.com, Updated:Aug. 4, 2023, 8:17 a.m., First seen:July 24, 2023, 2:48 p.m.
  - etleap.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - etodd.io, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - eugeneyan.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - eugeneyan.com, Updated:Aug. 2, 2023, 3:12 a.m., First seen:July 24, 2023, 1:48 p.m.
  - eukaryotewritesblog.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:45 p.m.
  - eulawenforcement.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - eupnea-linux.github.io, Updated:July 27, 2023, 6:02 a.m., First seen:July 27, 2023, 6:02 a.m.
  - europeanreviewofbooks.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:49 p.m.
- - eurosport.tvn24.pl, Updated:July 24, 2023, 2:07 p.m., First seen:July 24, 2023, 2:07 p.m.
+ - eurosport.tvn24.pl, Updated:Aug. 4, 2023, 10:37 a.m., First seen:July 24, 2023, 2:07 p.m.
  - ev-edition.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - evadb.readthedocs.io, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - evanhahn.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -2288,6 +2355,7 @@
  - every-door.app, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - every.to, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - everydayastronaut.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - everything.intellectronica.net, Updated:July 26, 2023, 8:21 a.m., First seen:July 26, 2023, 8:21 a.m.
  - evhaste.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - evidence.dev, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - evolutionary.arweave.dev, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -2301,6 +2369,7 @@
  - expmag.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - exponentially.substack.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - export.arxiv.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - exptv.org, Updated:Aug. 3, 2023, 12:52 a.m., First seen:Aug. 3, 2023, 12:52 a.m.
  - extism.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:49 p.m.
  - eycndy.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - eyeondesign.aiga.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
@@ -2311,7 +2380,7 @@
  - f4pga.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - faa.gov, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - fab.cba.mit.edu, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - fabiensanglard.net, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - fabiensanglard.net, Updated:July 27, 2023, 9:11 p.m., First seen:July 24, 2023, 1:48 p.m.
  - fablestudio.github.io, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - facebook.github.io, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - factorio.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -2324,6 +2393,7 @@
  - fairinternetreport.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - fakemoneynews.substack.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - fakenous.substack.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
+ - fakty.tvn24.pl, Updated:Aug. 4, 2023, 12:52 a.m., First seen:July 24, 2023, 6:27 p.m.
  - falconllm.tii.ae, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - fallows.substack.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:49 p.m.
  - famichiki.jp, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -2338,7 +2408,7 @@
  - fastapi.tiangolo.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - fastcompanyme.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - fasterplease.substack.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - fasterthanli.me, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - fasterthanli.me, Updated:July 25, 2023, 6:17 p.m., First seen:July 24, 2023, 2:46 p.m.
  - fastflowchart.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - fastmail.fm, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - fastmailstatus.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -2357,17 +2427,18 @@
  - fedguy.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - fedi.tips, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - fediscience.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - fedoramagazine.org, Updated:Aug. 2, 2023, 6:22 p.m., First seen:Aug. 2, 2023, 6:22 p.m.
  - fedscoop.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - feedbase.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - feeds.a.dj.com, Updated:July 24, 2023, 2:07 p.m., First seen:July 24, 2023, 2:07 p.m.
- - feeds.abcnews.com, Updated:July 24, 2023, 2:01 p.m., First seen:July 24, 2023, 2:01 p.m.
- - feeds.arstechnica.com, Updated:July 24, 2023, 2:01 p.m., First seen:July 24, 2023, 2:01 p.m.
- - feeds.bbci.co.uk, Updated:July 24, 2023, 2:01 p.m., First seen:July 24, 2023, 2:01 p.m.
- - feeds.feedburner.com, Updated:July 24, 2023, 1:16 p.m., First seen:July 24, 2023, 1:16 p.m.
- - feeds.nbcnews.com, Updated:July 24, 2023, 2:06 p.m., First seen:July 24, 2023, 2:06 p.m.
- - feeds.npr.org, Updated:July 24, 2023, 2:06 p.m., First seen:July 24, 2023, 2:06 p.m.
- - feeds.skynews.com, Updated:July 24, 2023, 2:07 p.m., First seen:July 24, 2023, 2:07 p.m.
- - feeds.washingtonpost.com, Updated:July 24, 2023, 2:07 p.m., First seen:July 24, 2023, 2:07 p.m.
+ - feeds.a.dj.com, Updated:Aug. 4, 2023, 11:42 a.m., First seen:July 24, 2023, 2:07 p.m.
+ - feeds.abcnews.com, Updated:Aug. 4, 2023, 12:36 p.m., First seen:July 24, 2023, 2:01 p.m.
+ - feeds.arstechnica.com, Updated:Aug. 4, 2023, 11:32 a.m., First seen:July 24, 2023, 2:01 p.m.
+ - feeds.bbci.co.uk, Updated:Aug. 4, 2023, 12:37 p.m., First seen:July 24, 2023, 2:01 p.m.
+ - feeds.feedburner.com, Updated:Aug. 4, 2023, 12:52 p.m., First seen:July 24, 2023, 1:16 p.m.
+ - feeds.nbcnews.com, Updated:Aug. 4, 2023, 12:47 p.m., First seen:July 24, 2023, 2:06 p.m.
+ - feeds.npr.org, Updated:Aug. 4, 2023, 11:42 a.m., First seen:July 24, 2023, 2:06 p.m.
+ - feeds.skynews.com, Updated:Aug. 4, 2023, 12:47 p.m., First seen:July 24, 2023, 2:07 p.m.
+ - feeds.washingtonpost.com, Updated:Aug. 4, 2023, 12:48 p.m., First seen:July 24, 2023, 2:07 p.m.
  - feld.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - feldspaten.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - felipec.wordpress.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
@@ -2387,16 +2458,18 @@
  - fiberplane.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - fibery.io, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - figsinwinter.substack.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - file770.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - filamentphp.com, Updated:Aug. 1, 2023, 11:57 p.m., First seen:Aug. 1, 2023, 11:57 p.m.
+ - file770.com, Updated:Aug. 3, 2023, 11:37 p.m., First seen:July 24, 2023, 2:46 p.m.
  - filippo.io, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:45 p.m.
  - filmcolossus.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - filmulator.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - filtermag.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - fimfetch.net, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - finance.yahoo.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - finance.yahoo.com, Updated:Aug. 1, 2023, 4:22 p.m., First seen:July 24, 2023, 1:48 p.m.
  - financialpost.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - financialstatement.zip, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - finbold.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
+ - find-and-update.company-information.service.gov.uk, Updated:Aug. 3, 2023, 6:12 p.m., First seen:Aug. 3, 2023, 6:12 p.m.
  - findenergy.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - fingerprint.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 1:48 p.m.
  - finmasters.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -2410,6 +2483,8 @@
  - fkks.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - flak.tedunangst.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - flappybirdle.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - flashbak.com, Updated:July 25, 2023, 1:57 p.m., First seen:July 25, 2023, 1:57 p.m.
+ - flashmuseum.org, Updated:July 28, 2023, 4:42 p.m., First seen:July 28, 2023, 4:42 p.m.
  - flatfootfox.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - flattened.net, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - flavoracle.tumblr.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
@@ -2449,17 +2524,18 @@
  - fontsinuse.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - fontsplugin.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - food.game, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - foodnotbombs.net, Updated:July 27, 2023, 3:52 a.m., First seen:July 27, 2023, 3:52 a.m.
  - foon.uk, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - foone.tumblr.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - forecast.weather.gov, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - forgejo.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - forgeperf.org, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - forms.gle, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - forsal.pl, Updated:July 24, 2023, 2:01 p.m., First seen:July 24, 2023, 2:01 p.m.
+ - forsal.pl, Updated:Aug. 4, 2023, 12:37 p.m., First seen:July 24, 2023, 2:01 p.m.
  - forta.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - forthebadge.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - fortran-lang.discourse.group, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 1:48 p.m.
- - fortune.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - fortune.com, Updated:Aug. 2, 2023, 10:47 a.m., First seen:July 24, 2023, 1:48 p.m.
  - forum.cktn.de, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - forum.devtalk.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - forum.dlang.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -2493,6 +2569,7 @@
  - foundation.gnome.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - foundation.mozilla.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
  - foundingfuel.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
+ - fractalvise.com, Updated:July 27, 2023, 8:12 a.m., First seen:July 27, 2023, 8:12 a.m.
  - framablog.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:47 p.m.
  - frame.work, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - franciscomt.medium.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -2520,6 +2597,7 @@
  - fsfe.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:49 p.m.
  - ftx.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - fuckregex.dev, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
+ - fuckthatshit.co.za, Updated:July 26, 2023, 5:01 p.m., First seen:July 26, 2023, 5:01 p.m.
  - fuel.edby.coffee, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - fullcontrol.xyz, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - fullfact.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -2542,8 +2620,9 @@
  - futurepinball.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - futurework.org.au, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - futurice.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - futurism.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - futurism.com, Updated:July 26, 2023, 7:16 a.m., First seen:July 24, 2023, 1:48 p.m.
  - fuzzypixelz.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:49 p.m.
+ - fwsgonzo.medium.com, Updated:July 29, 2023, 8:56 a.m., First seen:July 29, 2023, 8:56 a.m.
  - fwupd.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - fy.blackhats.net.au, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - fylm.ai, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
@@ -2594,6 +2673,7 @@
  - gebir.ge, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - geekstravelinjapan.wordpress.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - gekkio.fi, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - genai.stackexchange.com, Updated:Aug. 1, 2023, 2:16 a.m., First seen:Aug. 1, 2023, 2:16 a.m.
  - genders.wtf, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - generalist.academy, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - generalrobots.substack.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -2645,8 +2725,8 @@
  - git.minix3.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - gitea-open-letter.coding.social, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - github-business-card.vercel.app, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - github.blog, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - github.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - github.blog, Updated:Aug. 4, 2023, 5:02 a.m., First seen:July 24, 2023, 1:48 p.m.
+ - github.com, Updated:Aug. 3, 2023, 10:32 p.m., First seen:July 24, 2023, 1:48 p.m.
  - githubcopilotinvestigation.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - githubcopilotlitigation.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - githubnext.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -2659,7 +2739,7 @@
  - gitless.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - giuliomagnifico.blog, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - giza.mused.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - gizmodo.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:49 p.m.
+ - gizmodo.com, Updated:Aug. 4, 2023, 12:42 a.m., First seen:July 24, 2023, 1:49 p.m.
  - glaubercosta-11125.medium.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - glaze.cs.uchicago.edu, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - glean.io, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -2676,6 +2756,7 @@
  - go-fed.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - go.dev, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - go.googlesource.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - go.tvn24.pl, Updated:Aug. 4, 2023, 12:52 a.m., First seen:July 25, 2023, 12:57 a.m.
  - goauthentik.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - godbolt.org, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - godotengine.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -2714,14 +2795,16 @@
  - gptminus1.vercel.app, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - gptzero.me, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - gpuopen.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:47 p.m.
- - gpus.llm-utils.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - gpus.llm-utils.org, Updated:Aug. 1, 2023, 5:32 a.m., First seen:July 24, 2023, 1:48 p.m.
  - gpux.ai, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - grabbyaliens.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - grack.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - gradientdefense.com, Updated:Aug. 1, 2023, 2:16 a.m., First seen:Aug. 1, 2023, 2:16 a.m.
  - gradientflow.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - grady.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - grafana.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:46 p.m.
  - grafbase.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - grammar.intrinsiclabs.ai, Updated:Aug. 2, 2023, 10:42 p.m., First seen:Aug. 2, 2023, 10:42 p.m.
  - grandjurytarget.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - granta.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:46 p.m.
  - grantisom.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -2729,6 +2812,7 @@
  - grantshandy.github.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - grantwahl.substack.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - graphite.dev, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - graphite.rs, Updated:July 28, 2023, 2:37 a.m., First seen:July 28, 2023, 2:37 a.m.
  - graphitemaster.github.io, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - grapplinglane.substack.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - gravitymoth.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -2766,13 +2850,16 @@
  - guessthe.game, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - guides.loc.gov, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - guix.gnu.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - guochengqian.github.io, Updated:Aug. 3, 2023, 10:32 p.m., First seen:Aug. 3, 2023, 10:32 p.m.
  - gurwinder.substack.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - gustedt.gitlabpages.inria.fr, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - gustedt.wordpress.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - gut-cli.dev, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
+ - gutenberg.org, Updated:July 27, 2023, 4:51 p.m., First seen:July 27, 2023, 4:51 p.m.
  - guthib.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - guytevet.github.io, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - guzey.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - gvisor.dev, Updated:July 28, 2023, 12:26 a.m., First seen:July 28, 2023, 12:26 a.m.
  - gvolpe.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - gwern.net, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
  - gyroflow.xyz, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -2799,7 +2886,7 @@
  - hackerstations.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:46 p.m.
  - hackertosh.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - hackmd.io, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - hacks.mozilla.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - hacks.mozilla.org, Updated:July 29, 2023, 11:07 a.m., First seen:July 24, 2023, 1:48 p.m.
  - hacktoberfest.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - haddadi.github.io, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - haggardhawksblog.blogspot.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
@@ -2826,10 +2913,11 @@
  - hardwary.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - hardwear.io, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - harelba.github.io, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - harpers.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:49 p.m.
+ - harpers.org, Updated:Aug. 2, 2023, 5:17 p.m., First seen:July 24, 2023, 1:49 p.m.
  - harrison.totty.dev, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - harthur.wordpress.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - hartmannreport.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - harvard.simplesyllabus.com, Updated:Aug. 2, 2023, 2:07 a.m., First seen:Aug. 2, 2023, 2:07 a.m.
  - hasen.substack.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - hashrust.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - haskell.foundation, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
@@ -2841,8 +2929,9 @@
  - haynes.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - haystack.deepset.ai, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - haystack.it, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - haz.ee, Updated:July 24, 2023, 9:37 p.m., First seen:July 24, 2023, 9:37 p.m.
  - hazlitt.net, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - hazyresearch.stanford.edu, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 1:49 p.m.
+ - hazyresearch.stanford.edu, Updated:July 27, 2023, 12:32 p.m., First seen:July 24, 2023, 1:49 p.m.
  - hbr.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - hci.stanford.edu, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - hcibib.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -2897,7 +2986,7 @@
  - hnbadges.netlify.app, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - hnpdf.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - hnresumetojobs.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - hnrss.org, Updated:July 24, 2023, 2:01 p.m., First seen:July 24, 2023, 2:01 p.m.
+ - hnrss.org, Updated:Aug. 4, 2023, 12:37 p.m., First seen:July 24, 2023, 2:01 p.m.
  - hocus.dev, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - hoho.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - hohoho.click, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -2908,7 +2997,7 @@
  - home.cern, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - home.omg.lol, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - home.sandiego.edu, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - home.treasury.gov, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - home.treasury.gov, Updated:Aug. 2, 2023, 9:37 p.m., First seen:July 24, 2023, 2:46 p.m.
  - homesignalblog.wordpress.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - hookrace.net, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - hoop.dev, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -2916,6 +3005,7 @@
  - hothardware.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - house.dwell.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - how.complexsystems.fail, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
+ - howardism.org, Updated:Aug. 1, 2023, 7:37 p.m., First seen:Aug. 1, 2023, 7:37 p.m.
  - howchoo.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - hp-15c.homepage.t-online.de, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - hpcalcs.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -2925,7 +3015,7 @@
  - htmlwithsuperpowers.netlify.app, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - htmx.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - http.rip, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
- - httptoolkit.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - httptoolkit.com, Updated:July 25, 2023, 3:02 p.m., First seen:July 24, 2023, 1:48 p.m.
  - httptoolkit.tech, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - httpwg.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - hu.ma.ne, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -2953,6 +3043,7 @@
  - huyenchip.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
  - hvac-learning.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - hwfo.substack.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - hydra-so.notion.site, Updated:Aug. 3, 2023, 6:12 p.m., First seen:Aug. 3, 2023, 6:12 p.m.
  - hydras.io, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - hydrogen-central.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - hynek.me, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -2960,6 +3051,7 @@
  - hypebeast.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - hypermedia.systems, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - hyperpaper.me, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - hypersphere.blog, Updated:July 31, 2023, 8:55 p.m., First seen:July 31, 2023, 8:55 p.m.
  - hyperswitch.io, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - hyperview.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - hypirion.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -2979,11 +3071,13 @@
  - iamkate.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - iamkroot.github.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - iamnotarobot.substack.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - iamvishnu.com, Updated:Aug. 1, 2023, 10:52 p.m., First seen:Aug. 1, 2023, 10:52 p.m.
  - ian.sh, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - ianbicking.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - iangmcdowell.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - ianleslie.substack.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - ianthehenry.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:45 p.m.
+ - iapp.org, Updated:Aug. 2, 2023, 5:17 p.m., First seen:Aug. 2, 2023, 5:17 p.m.
  - iapps.courts.state.ny.us, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:49 p.m.
  - ibex.tech, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - ibiyemiabiodun.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -2993,6 +3087,7 @@
  - icfp23.sigplan.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - ichi.do, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - icing.space, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - icml.cc, Updated:July 27, 2023, 10:16 p.m., First seen:July 27, 2023, 10:16 p.m.
  - iconbuddy.app, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - idea-instructions.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - idea.popcount.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
@@ -3003,7 +3098,7 @@
  - idiallo.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - idiotlamborghini.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - idlewords.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
- - ieeexplore.ieee.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - ieeexplore.ieee.org, Updated:July 27, 2023, 8:12 a.m., First seen:July 24, 2023, 1:48 p.m.
  - ieefa.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - if50.substack.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - ifcomp.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -3055,7 +3150,7 @@
  - inflection.ai, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - info.computerhistory.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - infoproc.blogspot.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - infosec.exchange, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - infosec.exchange, Updated:July 25, 2023, 5:12 a.m., First seen:July 24, 2023, 2:46 p.m.
  - infosec.rodeo, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - infovores.substack.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - infracost.io, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -3069,8 +3164,9 @@
  - innersourcecommons.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - innocenceproject.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - innotechtoday.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - innovationnation.blog, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - innovationnation.blog, Updated:July 29, 2023, 4:01 p.m., First seen:July 24, 2023, 1:48 p.m.
  - inorris.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - inria.hal.science, Updated:July 26, 2023, 11:32 p.m., First seen:July 26, 2023, 11:32 p.m.
  - inside.java, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - insideadviser.com.au, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - insideclimatenews.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -3097,8 +3193,9 @@
  - internet-in-a-box.org, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - internetfreedom.in, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - interop.seemann.io, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
+ - interpeer.io, Updated:July 26, 2023, 1:46 p.m., First seen:July 26, 2023, 1:46 p.m.
  - interpreterbook.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - interrupt.memfault.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - interrupt.memfault.com, Updated:July 27, 2023, 3:46 p.m., First seen:July 24, 2023, 1:48 p.m.
  - interruptlabs.ca, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - interviewing.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
  - introductory.medium.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -3117,6 +3214,7 @@
  - invisible-characters.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - invisiblepeople.tv, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - invisv.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
+ - invoicedragon.com, Updated:July 25, 2023, 12:52 p.m., First seen:July 25, 2023, 12:52 p.m.
  - io.google, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - ioactive.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - ioc.exchange, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:49 p.m.
@@ -3158,7 +3256,7 @@
  - isthisarabic.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - isthisit.nz, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - istwitterdownyet.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - ithardware.pl, Updated:July 24, 2023, 2:01 p.m., First seen:July 24, 2023, 2:01 p.m.
+ - ithardware.pl, Updated:Aug. 4, 2023, 12:37 p.m., First seen:July 24, 2023, 2:01 p.m.
  - itigic.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - itservices.wp.st-andrews.ac.uk, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - itsfoss.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
@@ -3199,9 +3297,9 @@
  - jakob.space, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - jakobgreenfeld.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - jalammar.github.io, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:47 p.m.
- - jalopnik.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - jalopnik.com, Updated:Aug. 1, 2023, 7:37 p.m., First seen:July 24, 2023, 1:48 p.m.
  - jam.dev, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:46 p.m.
- - jamanetwork.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - jamanetwork.com, Updated:July 27, 2023, 7:07 a.m., First seen:July 24, 2023, 1:48 p.m.
  - james.darpinian.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:47 p.m.
  - jamesclear.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:46 p.m.
  - jamesturk.github.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -3216,6 +3314,7 @@
  - japannews.yomiuri.co.jp, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:45 p.m.
  - japantoday.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - jaredforsyth.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - jarv.is, Updated:Aug. 2, 2023, 3:07 p.m., First seen:Aug. 2, 2023, 3:07 p.m.
  - jasmcole.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - jasoneckert.github.io, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:45 p.m.
  - jasonfeifer.beehiiv.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -3275,7 +3374,7 @@
  - jjain.substack.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - jjar.huji.ac.il, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - jjpryor.substack.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
- - jlericson.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - jlericson.com, Updated:July 27, 2023, 9:17 a.m., First seen:July 24, 2023, 1:48 p.m.
  - jlongster.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - jmap.io, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - jmcdonnell.substack.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -3288,7 +3387,7 @@
  - jobmarketanalytics.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - jobs.ashbyhq.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - jobs.flightcontrol.dev, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - jobs.lever.co, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - jobs.lever.co, Updated:Aug. 4, 2023, 12:37 p.m., First seen:July 24, 2023, 1:48 p.m.
  - jobsort.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - joeblu.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - joel.tools, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -3322,7 +3421,7 @@
  - jointhefediverse.net, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - jojozhuang.github.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - joker-lang.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - jonathanhaidt.substack.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - jonathanhaidt.substack.com, Updated:July 28, 2023, 6:52 p.m., First seen:July 24, 2023, 1:48 p.m.
  - jonathanturley.org, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - jonatron.github.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - jonpauluritis.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -3344,6 +3443,7 @@
  - joukovsky.substack.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - joumxyzptlk.de, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - journal.paoloamoroso.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - journals.aom.org, Updated:Aug. 2, 2023, 11:51 a.m., First seen:Aug. 2, 2023, 11:51 a.m.
  - journals.aps.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - journals.lww.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 1:48 p.m.
  - journals.plos.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -3381,7 +3481,7 @@
  - justquickmath.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - justsimply.dev, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - justune.eu, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - jvns.ca, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - jvns.ca, Updated:July 28, 2023, 5:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - jyn.dev, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - jzhao.xyz, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - k3tan.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -3420,7 +3520,7 @@
  - kellyjonbrazil.github.io, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - kelu124.gitbooks.io, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - kennedn.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - kenschutte.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - kenschutte.com, Updated:July 29, 2023, 5:07 p.m., First seen:July 24, 2023, 1:48 p.m.
  - kentcdodds.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - kentindell.github.io, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - kentnerburn.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -3446,7 +3546,7 @@
  - kickstage.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - kidger.site, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - kids.frontiersin.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - kidswholovemath.substack.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - kidswholovemath.substack.com, Updated:July 29, 2023, 7:17 p.m., First seen:July 24, 2023, 1:48 p.m.
  - kilianvalkhof.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - kimmo.blog, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - kimono-koans.github.io, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
@@ -3477,13 +3577,15 @@
  - kohlschuetter.github.io, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - kolektiva.social, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - komonews.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - konkret24.tvn24.pl, Updated:Aug. 4, 2023, 11:42 a.m., First seen:July 24, 2023, 3:12 p.m.
  - konstaui.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - koodihommia.blogspot.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - koptional.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - koreajoongangdaily.joins.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - koshka.love, Updated:July 29, 2023, 11:42 a.m., First seen:July 29, 2023, 11:42 a.m.
  - kotaku.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - kottke.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - krebsonsecurity.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - krebsonsecurity.com, Updated:Aug. 3, 2023, 12:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - krickelkrackel.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - kristall.random-projects.net, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - kristiandupont.medium.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
@@ -3502,6 +3604,8 @@
  - kurtextrem.de, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - kurtisknodel.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - kuzudb.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - kvm-forum.qemu.org, Updated:July 27, 2023, 6:02 a.m., First seen:July 27, 2023, 6:02 a.m.
+ - kxgong.github.io, Updated:July 24, 2023, 6:22 p.m., First seen:July 24, 2023, 6:22 p.m.
  - kylehalladay.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - kylehovey.github.io, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - kylemayes.github.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -3540,7 +3644,8 @@
  - lareviewofbooks.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - larryjordan.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - lars.ingebrigtsen.no, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - lastmileai.dev, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - last9.io, Updated:July 29, 2023, 6:46 a.m., First seen:July 29, 2023, 6:46 a.m.
+ - lastmileai.dev, Updated:July 26, 2023, 5:01 p.m., First seen:July 24, 2023, 1:48 p.m.
  - laststandonzombieisland.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - lastweekin.ai, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - lateblt.tripod.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -3612,6 +3717,7 @@
  - lettuce.wtf, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - levelup-edu.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - levelup.gitconnected.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:49 p.m.
+ - levizwannah.github.io, Updated:July 25, 2023, 4:06 a.m., First seen:July 25, 2023, 4:06 a.m.
  - lexfridman.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - lexi-lambda.github.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - lflank.wordpress.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -3634,7 +3740,7 @@
  - libs.suckless.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - lichess.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:45 p.m.
  - lifearchitect.ai, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
- - lifehacker.com, Updated:July 24, 2023, 2:06 p.m., First seen:July 24, 2023, 2:06 p.m.
+ - lifehacker.com, Updated:Aug. 4, 2023, 12:42 p.m., First seen:July 24, 2023, 2:06 p.m.
  - lifemichael.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - lifeofaudrey.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - lighthouse.mq.edu.au, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -3697,6 +3803,7 @@
  - lkml.iu.edu, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - lkml.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:46 p.m.
  - llava-vl.github.io, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
+ - llm-attacks.org, Updated:July 29, 2023, 8:22 p.m., First seen:July 29, 2023, 8:22 p.m.
  - llm-utils.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - llmconstellation.olafblitz.repl.co, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - llsoftsec.github.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -3705,15 +3812,17 @@
  - lmsys.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - lmy.medium.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - lobi.to, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - lobste.rs, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
+ - lobste.rs, Updated:July 26, 2023, 6:11 a.m., First seen:July 24, 2023, 2:48 p.m.
  - localbitcoins.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - localfirstweb.dev, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - localrf.github.io, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - localtoday.news, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - locationtbd.home.blog, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - lock.cmpxchg8b.com, Updated:July 24, 2023, 3:06 p.m., First seen:July 24, 2023, 3:06 p.m.
  - lockval.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - locusmag.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - loeber.substack.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - log.schemescape.com, Updated:July 27, 2023, 12:37 a.m., First seen:July 27, 2023, 12:37 a.m.
  - logankilpatrick.medium.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - logicboard.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - logicsheet.co, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
@@ -3722,8 +3831,8 @@
  - logseq.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - lolbas-project.github.io, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - londonist.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - longform.asmartbear.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:45 p.m.
- - longnow.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - longform.asmartbear.com, Updated:Aug. 2, 2023, 3:07 p.m., First seen:July 24, 2023, 2:45 p.m.
+ - longnow.org, Updated:July 27, 2023, 6:02 a.m., First seen:July 24, 2023, 2:46 p.m.
  - longreads.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:49 p.m.
  - lookify.io, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - looria.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
@@ -3733,21 +3842,24 @@
  - loro-dev.notion.site, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - lost-at-sql.therobinlord.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - lost-pixel.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - louderwithcrowder.com, Updated:July 24, 2023, 2:06 p.m., First seen:July 24, 2023, 2:06 p.m.
+ - louderwithcrowder.com, Updated:Aug. 3, 2023, 8:26 p.m., First seen:July 24, 2023, 2:06 p.m.
  - louison.substack.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:49 p.m.
  - louwrentius.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 1:49 p.m.
  - loveofallwisdom.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - lowendbox.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - lowendmac.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
+ - lpython.org, Updated:July 29, 2023, 4:36 a.m., First seen:July 29, 2023, 4:36 a.m.
  - lrios.bearblog.dev, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - lsc.cornell.edu, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - lspace.swyx.io, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:46 p.m.
  - lsww.de, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - luajit.io:80, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - lucacardelli.name, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - lucas-mcgregor.medium.com, Updated:July 27, 2023, 9:11 p.m., First seen:July 27, 2023, 9:11 p.m.
  - lucaserb.substack.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - lucasfcosta.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:49 p.m.
  - lucaskostka.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - lucaspauker.com, Updated:July 27, 2023, 9:11 p.m., First seen:July 27, 2023, 9:11 p.m.
  - luciditysystems.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - lucumr.pocoo.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:46 p.m.
  - ludic.mataroa.blog, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -3760,6 +3872,7 @@
  - lukasrosenstock.net, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - lukeplant.me.uk, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:46 p.m.
  - lukesalamone.github.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - lukesmith.xyz, Updated:Aug. 4, 2023, 12:51 a.m., First seen:July 25, 2023, 12:56 a.m.
  - luna-demo.vercel.app, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - lunatic.solutions, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - lunette.app, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
@@ -3772,7 +3885,7 @@
  - lux-magazine.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 1:49 p.m.
  - lux.camera, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - lweb.cfa.harvard.edu, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - lwn.net, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - lwn.net, Updated:July 29, 2023, 12:17 a.m., First seen:July 24, 2023, 1:48 p.m.
  - lwss.github.io, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - lxe.co, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - lycheeorg.github.io, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
@@ -3780,6 +3893,7 @@
  - lyme-online.co.uk, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - lyonsden.net, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - m.post.naver.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
+ - m0agx.eu, Updated:July 26, 2023, 10:31 a.m., First seen:July 26, 2023, 10:31 a.m.
  - m680x0.github.io, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - m6n.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - ma.nu, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -3788,6 +3902,7 @@
  - mabez.dev, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
  - mac-cursors.netlify.app, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - machinelearning.apple.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - machinelearningmastery.com, Updated:July 28, 2023, 4:42 a.m., First seen:July 28, 2023, 4:42 a.m.
  - maciej.codes, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
  - macleans.ca, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - macos9.app, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -3808,6 +3923,7 @@
  - magazine.sebastianraschka.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:48 p.m.
  - magcius.github.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - maggieappleton.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:49 p.m.
+ - magicloops.dev, Updated:Aug. 1, 2023, 9:47 p.m., First seen:Aug. 1, 2023, 9:47 p.m.
  - magit.vc, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
  - magoo.medium.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - magratheametals.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -3817,17 +3933,18 @@
  - maikklein.github.io, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - mail.kde.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - mail.openjdk.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - mail.tarsnap.com, Updated:July 27, 2023, 6:02 a.m., First seen:July 27, 2023, 6:02 a.m.
  - mailbox.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:49 p.m.
  - mailchimp.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - mailcoach.app, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - mailman.nanog.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - main.oxfordamerican.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - mainichi.jp, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - mainichi.jp, Updated:July 29, 2023, 9:27 p.m., First seen:July 24, 2023, 1:48 p.m.
  - mainisusuallyafunction.blogspot.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - mainmatter.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - major-grooves.medium.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:46 p.m.
  - make-a-video3d.github.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - make.wordpress.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - make.wordpress.org, Updated:July 26, 2023, 10:27 p.m., First seen:July 24, 2023, 2:47 p.m.
  - makeavideo.studio, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - makerfaire.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - makesourcenotcode.github.io, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -3838,6 +3955,7 @@
  - mamot.fr, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - man.netbsd.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - man7.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
+ - managore.itch.io, Updated:July 28, 2023, 10:07 p.m., First seen:July 28, 2023, 10:07 p.m.
  - manara.breezy.hr, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - mango.pdf.zone, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - manifold.markets, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -3852,6 +3970,7 @@
  - manyonepercents.substack.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - manytricks.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - maori.geek.nz, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
+ - map.henryn.xyz, Updated:July 24, 2023, 3:06 p.m., First seen:July 24, 2023, 3:06 p.m.
  - map.name, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - maplant.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - mapoftheuniverse.net, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -3859,7 +3978,7 @@
  - mar1d.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - maraoz.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - marble.onl, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
- - marc.info, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - marc.info, Updated:July 25, 2023, 12:52 a.m., First seen:July 24, 2023, 1:48 p.m.
  - marci.gunyho.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - marciok.substack.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - marckhoury.github.io, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -3909,7 +4028,8 @@
  - mastodon.matrix.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - mastodon.nl, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - mastodon.online, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
- - mastodon.social, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - mastodon.sdf.org, Updated:July 25, 2023, 9:36 a.m., First seen:July 25, 2023, 9:36 a.m.
+ - mastodon.social, Updated:Aug. 3, 2023, 8:27 a.m., First seen:July 24, 2023, 1:48 p.m.
  - mastodon.world, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - matan-h.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - matduggan.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -3927,13 +4047,13 @@
  - mathoverflow.net, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - mathshistory.st-andrews.ac.uk, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - mathstodon.xyz, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:45 p.m.
- - matklad.github.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - matklad.github.io, Updated:Aug. 1, 2023, 7:42 a.m., First seen:July 24, 2023, 1:48 p.m.
  - matomo.org, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - matplotlib.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:46 p.m.
  - matradomski.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - matrix.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:47 p.m.
  - mats3.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - matt-rickard.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - matt-rickard.com, Updated:Aug. 3, 2023, 1:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - matt-schellhas.medium.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - matt.blwt.io, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - matt.might.net, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -3974,7 +4094,9 @@
  - mazzzystar.github.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
  - mbernste.github.io, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - mbork.pl, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - mcfunley.com, Updated:July 25, 2023, 10:37 p.m., First seen:July 25, 2023, 10:37 p.m.
  - mcgst.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - mcilloni.ovh, Updated:July 25, 2023, 8:27 p.m., First seen:July 25, 2023, 8:27 p.m.
  - mckayla.blog, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - mcmansionhell.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - mcoliver.substack.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -3992,9 +4114,9 @@
  - media.ford.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
  - media.mbusa.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - mediabiasfactcheck.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - medicalxpress.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - medicalxpress.com, Updated:July 28, 2023, 3:42 a.m., First seen:July 24, 2023, 1:48 p.m.
  - medispank.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - medium.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - medium.com, Updated:Aug. 3, 2023, 4:07 a.m., First seen:July 24, 2023, 1:48 p.m.
  - medium.ikuznetsov.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - medusajs.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - meduza.io, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -4021,6 +4143,7 @@
  - merveilles.town, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - merylldindin.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - mesonbuild.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - messwithdns.net, Updated:July 29, 2023, 12:17 a.m., First seen:July 29, 2023, 12:17 a.m.
  - meta.ath0.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - meta.miraheze.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - meta.stackexchange.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -4050,6 +4173,7 @@
  - michael.stapelberg.ch, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - michaelbach.de, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - michaelnielsen.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - michaelnotebook.com, Updated:July 31, 2023, 8:55 p.m., First seen:July 31, 2023, 8:55 p.m.
  - michaelweinberg.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - michal.sapka.me, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - mickeydelp.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -4079,7 +4203,7 @@
  - milwaukeemaven.blogspot.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - mim.stupi.net, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - mimosa.so, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - minborgsjavapot.blogspot.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - minborgsjavapot.blogspot.com, Updated:Aug. 3, 2023, 10:32 p.m., First seen:July 24, 2023, 2:47 p.m.
  - minbrowser.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - mind-vis.github.io, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - mindpop.blankenship.io, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
@@ -4115,16 +4239,18 @@
  - mitxonline.mit.edu, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - mixed-news.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - mjg59.dreamwidth.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - mjtsai.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - mjtsai.com, Updated:July 25, 2023, 1:57 p.m., First seen:July 24, 2023, 1:48 p.m.
  - mkaic.substack.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - mkbaio.substack.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - mklinux.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
+ - mkweb.bcgsc.ca, Updated:Aug. 2, 2023, 11:47 p.m., First seen:Aug. 2, 2023, 11:47 p.m.
  - mlajtos.mu, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - mlb.watchbotapp.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - mlc.ai, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - mle-online.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - mlochbaum.github.io, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - mmapped.blog, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - mmazzarolo.com, Updated:Aug. 1, 2023, 4:22 p.m., First seen:Aug. 1, 2023, 4:22 p.m.
  - mmcthrow-musings.blogspot.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - mmhaskell.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - mode80.github.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -4142,6 +4268,7 @@
  - monadical.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - monadmonkey.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - mondaynote.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
+ - monetal.app, Updated:July 28, 2023, 3:37 p.m., First seen:July 28, 2023, 3:37 p.m.
  - money.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - moneywise.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - monroelab.net, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -4174,7 +4301,7 @@
  - movetodon.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - movies.stackexchange.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - movingthelimit.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - moxie.foxnews.com, Updated:July 24, 2023, 2:01 p.m., First seen:July 24, 2023, 2:01 p.m.
+ - moxie.foxnews.com, Updated:Aug. 4, 2023, 12:37 p.m., First seen:July 24, 2023, 2:01 p.m.
  - moyix.blogspot.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - mozillalifeboat.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - mpimet.mpg.de, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
@@ -4186,6 +4313,7 @@
  - mrfireside.medium.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - mrjamesbell.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - mronline.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - mrs-t.medium.com, Updated:Aug. 1, 2023, 9:47 p.m., First seen:Aug. 1, 2023, 9:47 p.m.
  - mrscraper.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
  - mrsk.dev, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - mrsteinberg.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -4206,6 +4334,7 @@
  - mullvad.net, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - mult.dev, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - muratbuffalo.blogspot.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:45 p.m.
+ - muratordom.pl, Updated:Aug. 4, 2023, 12:47 p.m., First seen:July 24, 2023, 5:21 p.m.
  - murdoch.is, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - murf.ai, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - muscar.eu, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -4224,6 +4353,7 @@
  - mwi.usma.edu, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - mwl.io, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - mxgrn.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - my90stv.com, Updated:July 28, 2023, 3:37 p.m., First seen:July 28, 2023, 3:37 p.m.
  - mycroft.ai, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - myme.no, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - mymood.today, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -4279,14 +4409,14 @@
  - nedbatchelder.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - neelc.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - neeva.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
- - neil-clarke.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - neil-clarke.com, Updated:Aug. 2, 2023, 8:32 p.m., First seen:July 24, 2023, 1:48 p.m.
  - neil.computer, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - neilmadden.blog, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - nelua.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - nenadmarkus.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - neocha.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - neocities.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - neon.tech, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - neon.tech, Updated:Aug. 3, 2023, 7:17 p.m., First seen:July 24, 2023, 1:48 p.m.
  - neontomo.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - neoteric.eu, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - nerdist.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:45 p.m.
@@ -4302,11 +4432,12 @@
  - networkx.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - neugierig.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - neuml.github.io, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - neurosciencenews.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:45 p.m.
+ - neurosciencenews.com, Updated:Aug. 3, 2023, 1:53 p.m., First seen:July 24, 2023, 2:45 p.m.
+ - neuters.de, Updated:July 25, 2023, 4:07 p.m., First seen:July 25, 2023, 4:07 p.m.
  - neutralino.js.org, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - new.chess24.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - new.pythonforengineers.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:49 p.m.
- - newatlas.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - newatlas.com, Updated:July 31, 2023, 11:03 p.m., First seen:July 24, 2023, 1:48 p.m.
  - newcriterion.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - newhumanist.org.uk, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - newjerseymonitor.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -4339,10 +4470,12 @@
  - news.griffith.edu.au, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - news.harvard.edu, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:49 p.m.
  - news.illinois.edu, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - news.itsfoss.com, Updated:Aug. 3, 2023, 11:47 a.m., First seen:July 25, 2023, 9:37 a.m.
+ - news.ku.dk, Updated:July 31, 2023, 8:55 p.m., First seen:July 31, 2023, 8:55 p.m.
  - news.lettersofnote.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - news.livebook.dev, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:45 p.m.
  - news.microsoft.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - news.mit.edu, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - news.mit.edu, Updated:Aug. 1, 2023, 2:16 a.m., First seen:July 24, 2023, 1:48 p.m.
  - news.ncsu.edu, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - news.nd.edu, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - news.northeastern.edu, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
@@ -4354,7 +4487,7 @@
  - news.perlfoundation.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - news.rice.edu, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - news.shopify.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
- - news.sky.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:07 p.m.
+ - news.sky.com, Updated:Aug. 4, 2023, 12:47 p.m., First seen:July 24, 2023, 2:07 p.m.
  - news.social-protocols.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - news.stanford.edu, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - news.stv.tv, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
@@ -4371,12 +4504,13 @@
  - news.weill.cornell.edu, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - news.yahoo.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - news.yale.edu, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - news.ycombinator.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - news.ycombinator.com, Updated:Aug. 4, 2023, 10:27 a.m., First seen:July 24, 2023, 1:48 p.m.
  - newsboat.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - newscenter.lbl.gov, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - newsingermany.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - newsletter.butwhatfor.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - newsletter.danhon.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - newsletter.devmoh.co, Updated:July 31, 2023, 8:55 p.m., First seen:July 31, 2023, 8:55 p.m.
  - newsletter.mollywhite.net, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - newsletter.pessimistsarchive.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
  - newsletter.pragmaticengineer.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -4387,7 +4521,9 @@
  - newsnotfound.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - newsreleases.sandia.gov, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - newsrnd.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - newsroom.collegeboard.org, Updated:Aug. 4, 2023, 3:57 a.m., First seen:Aug. 4, 2023, 3:57 a.m.
  - newsroom.haas.berkeley.edu, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - newsroom.ibm.com, Updated:Aug. 3, 2023, 1:53 p.m., First seen:Aug. 3, 2023, 1:53 p.m.
  - newsroom.spotify.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - newsroom.squarespace.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - newsroom.statefarm.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -4426,12 +4562,13 @@
  - nicolodavis.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - niconiconi.neocities.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:47 p.m.
  - nida.nih.gov, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
+ - niebezpiecznik.pl, Updated:Aug. 4, 2023, 12:51 a.m., First seen:July 25, 2023, 12:57 a.m.
  - niespodd.github.io, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
- - niezalezna.pl, Updated:July 24, 2023, 2:06 p.m., First seen:July 24, 2023, 2:06 p.m.
+ - niezalezna.pl, Updated:Aug. 3, 2023, 7:26 p.m., First seen:July 24, 2023, 2:06 p.m.
  - nigeltao.github.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - nightingaledvs.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - nilsbakker.nl, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - nim-lang.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - nim-lang.org, Updated:Aug. 1, 2023, 3:17 p.m., First seen:July 24, 2023, 1:48 p.m.
  - nipponrama.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - nira.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - nis2directive.eu, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -4498,13 +4635,14 @@
  - notmuchmail.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - notmyplate.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - notospypixels.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
+ - notrelated.xyz, Updated:Aug. 4, 2023, 12:51 a.m., First seen:July 25, 2023, 12:56 a.m.
  - novalis.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - novamostra.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - novehiclesinthepark.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - novel.sh, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - novum.substack.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:47 p.m.
  - now.northropgrumman.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - noyb.eu, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - noyb.eu, Updated:July 29, 2023, 11:42 a.m., First seen:July 24, 2023, 1:48 p.m.
  - nrc.github.io, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - nsidc.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - nskyc.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -4516,7 +4654,7 @@
  - nuclearprinceton.princeton.edu, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - nudges.fyi, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - nuitka.net, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - nullprogram.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - nullprogram.com, Updated:Aug. 1, 2023, 10:52 p.m., First seen:July 24, 2023, 1:48 p.m.
  - nullpt.rs, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - numba.pydata.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - nurse.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -4534,7 +4672,7 @@
  - nyansatan.github.io, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - nyheritage.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - nymag.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - nypost.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - nypost.com, Updated:July 28, 2023, 1:27 p.m., First seen:July 24, 2023, 1:48 p.m.
  - nysmusic.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - nyx.gallery, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - nyxt.atlas.engineer, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -4548,7 +4686,7 @@
  - obliviousinvestor.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - oblivus.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - obscuritory.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - observablehq.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - observablehq.com, Updated:July 25, 2023, 12:52 a.m., First seen:July 24, 2023, 1:48 p.m.
  - observant-hoodie-597.notion.site, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - obsidian.md, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:47 p.m.
  - obyford.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -4575,7 +4713,7 @@
  - okbjgm.weebly.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - okso.app, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - olark.hire.trakstar.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - old.reddit.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - old.reddit.com, Updated:Aug. 2, 2023, 7:27 p.m., First seen:July 24, 2023, 1:48 p.m.
  - old.sage.moe, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - oldblog.antirez.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - oldbytes.space, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -4585,7 +4723,7 @@
  - oli.me.uk, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - oliveremberton.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - oll.libertyfund.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - ollama.ai, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - ollama.ai, Updated:Aug. 2, 2023, 6:22 p.m., First seen:July 24, 2023, 1:48 p.m.
  - olvy.co, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - om.co, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:46 p.m.
  - omajoshi.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -4607,10 +4745,12 @@
  - onevariable.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - onezero.medium.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - onfirstup.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - online.wsj.com, Updated:Aug. 4, 2023, 3:02 a.m., First seen:Aug. 4, 2023, 3:02 a.m.
  - onlinebooks.library.upenn.edu, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - onlinelibrary.wiley.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - onlinelibrary.wiley.com, Updated:Aug. 3, 2023, 5:12 a.m., First seen:July 24, 2023, 1:48 p.m.
  - onlineornot.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - onluminousgrounds.wordpress.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - onnxruntime.ai, Updated:July 25, 2023, 4:07 p.m., First seen:July 25, 2023, 4:07 p.m.
  - onsclom.bearblog.dev, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - onthepublicrecord.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - ooh.directory, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -4627,7 +4767,7 @@
  - openfolder.sh, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - opengoal.dev, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - openheartproject.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - openjdk.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - openjdk.org, Updated:July 26, 2023, 7:12 p.m., First seen:July 24, 2023, 1:48 p.m.
  - openjfx.io, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - openletter.mousetail.nl, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - openlsr.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -4637,7 +4777,7 @@
  - openpm.ai, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - openprocessing.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - openrct2.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - openreview.net, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
+ - openreview.net, Updated:July 24, 2023, 7:27 p.m., First seen:July 24, 2023, 2:45 p.m.
  - openship.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - opensource.googleblog.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - opensource.nc3.lu, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
@@ -4678,19 +4818,23 @@
  - ottertune.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:49 p.m.
  - ounapuu.ee, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:49 p.m.
  - ouroboros.rocks, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - ourworldindata.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:45 p.m.
+ - ourworldindata.org, Updated:July 25, 2023, 1:57 a.m., First seen:July 24, 2023, 2:45 p.m.
+ - ourworldofpixels.com, Updated:July 25, 2023, 7:22 p.m., First seen:July 25, 2023, 7:22 p.m.
  - outdoorstatus.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - outerproduct.net, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - outfunnel.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
+ - outhorseyouremail.com, Updated:July 28, 2023, 4:42 a.m., First seen:July 28, 2023, 4:42 a.m.
+ - outland.art, Updated:July 25, 2023, 11:42 p.m., First seen:July 25, 2023, 11:42 p.m.
  - oven.rippling-ats.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - overemployee.blog, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - overexact.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - overkill.wtf, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - overreacted.io, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - overturemaps.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - overturemaps.org, Updated:July 26, 2023, 5:01 p.m., First seen:July 24, 2023, 2:47 p.m.
  - owasp.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - owen.cafe, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - oxfordamerican.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - oxfordpoliticalreview.com, Updated:July 26, 2023, 7:12 p.m., First seen:July 26, 2023, 7:12 p.m.
  - oxide.computer, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - p-org.github.io, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - p.migdal.pl, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -4716,11 +4860,13 @@
  - pandoc.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - papa.bretmulvey.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - paper-chan.moe, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
+ - paper.mmm.dev, Updated:July 27, 2023, 6:02 a.m., First seen:July 27, 2023, 6:02 a.m.
  - paperless.blog, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - paperlist.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - papers.ssrn.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - papersplease.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - par.nsf.gov, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
+ - paraxial.io, Updated:July 24, 2023, 7:27 p.m., First seen:July 24, 2023, 7:27 p.m.
  - paredit.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - parentheticallyspeaking.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - paroj.github.io, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -4742,7 +4888,7 @@
  - patterns.app, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:47 p.m.
  - paul.kinlan.me, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - pauley.me, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - paulgraham.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - paulgraham.com, Updated:July 28, 2023, 2:32 p.m., First seen:July 24, 2023, 1:48 p.m.
  - paulkingsnorth.substack.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:48 p.m.
  - paullukas.substack.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - paulosman.me, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
@@ -4757,7 +4903,7 @@
  - payne.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - paysync.ca, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - pb.co.za, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - pboyd.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - pboyd.io, Updated:July 25, 2023, 5:12 p.m., First seen:July 24, 2023, 1:48 p.m.
  - pbrown.me, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - pbs.cs.berkeley.edu, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - pcsx2.net, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -4766,6 +4912,7 @@
  - pdfux.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - pdodds.w3.uvm.edu, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - pdos.csail.mit.edu, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - pdx.su, Updated:Aug. 2, 2023, 7:27 p.m., First seen:Aug. 2, 2023, 7:27 p.m.
  - pedestrianobservations.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - peel.fm, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - pelotoncal.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -4790,17 +4937,19 @@
  - peopleofcolorintech.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - peppe.rs, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - peps.python.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - percisely.xyz, Updated:July 24, 2023, 8:32 p.m., First seen:July 24, 2023, 8:32 p.m.
  - perell.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:45 p.m.
  - perezmeyer.com.ar, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - perfectionkills.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - perfectpacman.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - perfectunion.us, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:45 p.m.
  - perldoc.perl.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - permission.site, Updated:Aug. 1, 2023, 11:57 p.m., First seen:Aug. 1, 2023, 11:57 p.m.
  - personal.garrettfuller.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - personal.utdallas.edu, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - perspective.finos.org, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - petals.ml, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - petapixel.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - petapixel.com, Updated:July 28, 2023, 10:12 a.m., First seen:July 24, 2023, 1:48 p.m.
  - peter.czanik.hu, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - peter.eisentraut.org, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 1:48 p.m.
  - peter.sh, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -4822,6 +4971,8 @@
  - phasellm.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - phauer.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - phenaki.video, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
+ - philaverse.substack.com, Updated:July 27, 2023, 3:52 a.m., First seen:July 27, 2023, 3:52 a.m.
+ - philbooth.me, Updated:July 29, 2023, 6:12 p.m., First seen:July 29, 2023, 6:12 p.m.
  - philipjoubert.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - philippschmitt.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - phillyflightlist.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -4838,7 +4989,7 @@
  - phoenixonrails.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - photomatt.tumblr.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:47 p.m.
  - phryneas.de, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - phys.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - phys.org, Updated:Aug. 4, 2023, 11:32 a.m., First seen:July 24, 2023, 1:48 p.m.
  - physics.aps.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:46 p.m.
  - physics.nyu.edu, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - physics.stackexchange.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -4846,6 +4997,7 @@
  - physicstoday.scitation.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - physlab.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - pickard.cc, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - picolisp-explored.com, Updated:Aug. 4, 2023, 7:12 a.m., First seen:Aug. 4, 2023, 7:12 a.m.
  - picovoice.ai, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - pierre-couy.dev, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - pierre.equoy.fr, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
@@ -4865,7 +5017,7 @@
  - piotrjaworski.medium.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - pip.pypa.io, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - pirateweather.net, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - pirg.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - pirg.org, Updated:July 25, 2023, 5:12 a.m., First seen:July 24, 2023, 2:47 p.m.
  - pitchfork.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - pittsburgh.legalexaminer.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - pix2pixzero.github.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -4874,6 +5026,7 @@
  - pixelparmesan.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - pixian.ai, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - pixletters.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - pkg-size.dev, Updated:July 25, 2023, 4:06 a.m., First seen:July 25, 2023, 4:06 a.m.
  - pkolaczk.github.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
  - placesjournal.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:46 p.m.
  - plaid.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -4889,6 +5042,7 @@
  - plasma-mobile.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - platform.leolabs.space, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - platform.openai.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - platform.uno, Updated:July 27, 2023, 4:52 a.m., First seen:July 27, 2023, 4:52 a.m.
  - plato.stanford.edu, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - platoeducation.ai, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - play-cs.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -4910,7 +5064,7 @@
  - ploomber.io, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - ploum.net, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - plug-world.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - pluralistic.net, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - pluralistic.net, Updated:Aug. 3, 2023, 6:22 p.m., First seen:July 24, 2023, 1:48 p.m.
  - plus.maths.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - plusdocs.notion.site, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - pm.stackexchange.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
@@ -4973,10 +5127,10 @@
  - practiceinterview.co, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - pradyunsg.me, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - praeclarum.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - prashanth.world, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - prashanth.world, Updated:Aug. 4, 2023, 12:07 a.m., First seen:July 24, 2023, 1:48 p.m.
  - prashants.in, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - pratik.is, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - praveshkoirala.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - praveshkoirala.com, Updated:Aug. 2, 2023, 4:12 p.m., First seen:July 24, 2023, 2:47 p.m.
  - precedent.vercel.app, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - precursorapp.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - predictabledesigns.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -5025,6 +5179,7 @@
  - projectf.io, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - projectfluent.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - projectgoobii.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - projectionlab.com, Updated:July 24, 2023, 5:16 p.m., First seen:July 24, 2023, 5:16 p.m.
  - projectobs.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - projects.blender.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - projects.csail.mit.edu, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
@@ -5059,11 +5214,11 @@
  - public.tableau.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - publication.design.systems, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - publiccode.eu, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
- - publicdomainreview.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - publicdomainreview.org, Updated:July 26, 2023, 11:36 a.m., First seen:July 24, 2023, 1:48 p.m.
  - publichealth.verily.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - publicinfrastructure.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:45 p.m.
  - publishing.aip.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - pubmed.ncbi.nlm.nih.gov, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - pubmed.ncbi.nlm.nih.gov, Updated:July 29, 2023, 5:41 a.m., First seen:July 24, 2023, 1:48 p.m.
  - pubs.acs.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - pubs.er.usgs.gov, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - pubs.geoscienceworld.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -5099,6 +5254,7 @@
  - pythoninsider.blogspot.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - pythonislove.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - pythontest.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - pythonwheels.com, Updated:Aug. 3, 2023, 11:42 a.m., First seen:Aug. 3, 2023, 11:42 a.m.
  - pytorch.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:49 p.m.
  - q3k.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - qchenevier.github.io, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -5114,7 +5270,7 @@
  - quaran.to, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - queendomblog.wordpress.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - questdb.io, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - queue.acm.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - queue.acm.org, Updated:July 25, 2023, 10:37 p.m., First seen:July 24, 2023, 1:48 p.m.
  - quick-lint-js.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - quickwit.io, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - quii.dev, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -5130,7 +5286,7 @@
  - r2c.dev, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - r744.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - ra.co, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - rachelbythebay.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - rachelbythebay.com, Updated:Aug. 2, 2023, 2:07 a.m., First seen:July 24, 2023, 1:48 p.m.
  - rachsmith.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - racketscript.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - radicalscholarship.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -5166,9 +5322,10 @@
  - rawtext.club, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - ray.run, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - raymii.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
- - raypatrick.xyz, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - raypatrick.xyz, Updated:Aug. 4, 2023, 12:07 a.m., First seen:July 24, 2023, 1:48 p.m.
  - razib.substack.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - rbates.dev, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - rcpmag.com, Updated:Aug. 3, 2023, 4:07 a.m., First seen:Aug. 3, 2023, 4:07 a.m.
  - rcwz.pl, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - rdtr01.xl.digital, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - react-lm.github.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -5184,17 +5341,18 @@
  - readonlymemory.vg, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - readwise.io, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - reaganray.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
+ - realaboutinstagram.netlify.app, Updated:July 25, 2023, 8:27 p.m., First seen:July 25, 2023, 8:27 p.m.
  - reality.mentat.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - realizeengineering.blog, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - reanimate.github.io, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - reason.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - reason.com, Updated:July 27, 2023, 4:51 p.m., First seen:July 24, 2023, 1:48 p.m.
  - reasonabledeviations.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - reasonablypolymorphic.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - reasoning-machines.s3-website.ca-central-1.amazonaws.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - reasonstobecheerful.world, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:48 p.m.
  - rebble.io, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - rebeccaskinner.net, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - reclaimthenet.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:49 p.m.
+ - reclaimthenet.org, Updated:Aug. 4, 2023, 1:56 a.m., First seen:July 24, 2023, 1:49 p.m.
  - redbean.systems, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - redcanary.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - reddark.netlify.app, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -5233,7 +5391,7 @@
  - renewables-map.robinhawkes.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - rentry.co, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:47 p.m.
  - replicad.xyz, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - replicate.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - replicate.com, Updated:July 25, 2023, 7:22 p.m., First seen:July 24, 2023, 1:48 p.m.
  - replit.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - report.opensustain.tech, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - repository.law.umich.edu, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -5243,6 +5401,7 @@
  - reroom.ai, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - research.aimultiple.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - research.american.edu, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - research.atspotify.com, Updated:July 29, 2023, 4:01 p.m., First seen:July 29, 2023, 4:01 p.m.
  - research.checkpoint.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - research.cornell.edu, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - research.exoticsilicon.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:45 p.m.
@@ -5255,7 +5414,7 @@
  - research.wmz.ninja, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - researchintegrityjournal.biomedcentral.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - resend.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - resobscura.substack.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - resobscura.substack.com, Updated:Aug. 3, 2023, 7:17 p.m., First seen:July 24, 2023, 1:48 p.m.
  - resources.altium.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - resources.fabric.inc, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - resources.mpi-inf.mpg.de, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -5273,8 +5432,8 @@
  - retrocoding.net, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - retrocogs.mega65.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - retrocomputermuseum.co.uk, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - retrocomputing.stackexchange.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
- - retrododo.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - retrocomputing.stackexchange.com, Updated:July 26, 2023, 2:51 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - retrododo.com, Updated:July 24, 2023, 3:06 p.m., First seen:July 24, 2023, 1:48 p.m.
  - retrorepairsandrefurbs.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - return.life, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - returns.readthedocs.io, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
@@ -5338,7 +5497,7 @@
  - ronakganatra.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - ronin-rb.dev, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - rooms.xyz, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - rootsofprogress.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:49 p.m.
+ - rootsofprogress.org, Updated:July 28, 2023, 11:12 p.m., First seen:July 24, 2023, 1:49 p.m.
  - rosacarbo.notion.site, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - rosecompiler.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - rosenzweig.io, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -5357,7 +5516,9 @@
  - rsapkf.org, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - rsc.vet, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - rss-bridge.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - rss.nytimes.com, Updated:July 24, 2023, 2:06 p.m., First seen:July 24, 2023, 2:06 p.m.
+ - rss.cnn.com, Updated:Aug. 4, 2023, 12:41 a.m., First seen:July 25, 2023, 12:51 a.m.
+ - rss.nytimes.com, Updated:Aug. 4, 2023, 12:47 p.m., First seen:July 24, 2023, 2:06 p.m.
+ - rss.politico.com, Updated:Aug. 4, 2023, 9:32 a.m., First seen:July 25, 2023, 6:18 p.m.
  - rssdsaisection.substack.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - rtnf.my.id, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - rtpg.co, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -5373,6 +5534,7 @@
  - rupertmckay.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - ruralhospitals.chqpr.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - ruscur.au, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
+ - rust-analyzer.github.io, Updated:July 25, 2023, 8:31 a.m., First seen:July 25, 2023, 8:31 a.m.
  - rust-gcc.github.io, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - rust-hosted-langs.github.io, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - rust-lang.github.io, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -5387,6 +5549,7 @@
  - ryancor.medium.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - ryanmulligan.dev, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - ryanshannon.substack.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
+ - ryantravitz.com, Updated:July 27, 2023, 2:47 a.m., First seen:July 27, 2023, 2:47 a.m.
  - rybicki.io, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - s.wsj.net, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - s21.q4cdn.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
@@ -5438,7 +5601,7 @@
  - sbp-brims.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - scale.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - scalibq.wordpress.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - scanalyst.fourmilab.ch, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - scanalyst.fourmilab.ch, Updated:July 27, 2023, 3:46 p.m., First seen:July 24, 2023, 1:48 p.m.
  - scandinavianmind.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - scastiel.dev, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - schluss.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -5455,6 +5618,7 @@
  - sci-hub.ru, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - sci-hub.se, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - sci-hubtw.hkvisa.net, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - science.ku.dk, Updated:July 25, 2023, 3:02 p.m., First seen:July 25, 2023, 3:02 p.m.
  - science.sciencemag.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - science.uq.edu.au, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - sciencebasedlife.wordpress.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -5468,7 +5632,7 @@
  - sciprogramming.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - scitechdaily.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:49 p.m.
  - sciter.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - scopeblog.stanford.edu, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - scopeblog.stanford.edu, Updated:July 28, 2023, 5:47 p.m., First seen:July 24, 2023, 2:46 p.m.
  - scopeviews.co.uk, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - scotrail.datasette.io, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - scott.mn, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
@@ -5488,8 +5652,11 @@
  - scrippsnews.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - scripting.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - scrollprize.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:45 p.m.
+ - scsfg.io, Updated:July 26, 2023, 5:01 p.m., First seen:July 26, 2023, 5:01 p.m.
  - sdf.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - sdkgames.itch.io, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
+ - sdtimes.com, Updated:Aug. 1, 2023, 4:26 a.m., First seen:Aug. 1, 2023, 4:26 a.m.
+ - sdxl.replicate.dev, Updated:July 28, 2023, 4:42 p.m., First seen:July 28, 2023, 4:42 p.m.
  - se.cs.uni-tuebingen.de, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - seanbarry.dev, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - search.feep.dev, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -5498,6 +5665,7 @@
  - searchengineland.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - searchtodon.social, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - searq.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - seas.harvard.edu, Updated:July 27, 2023, 4:51 p.m., First seen:July 27, 2023, 4:51 p.m.
  - seb.deleuze.fr, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - sebastian.bearblog.dev, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - sebastian.itch.io, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -5520,15 +5688,17 @@
  - security.apple.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - security.googleblog.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - security.stackexchange.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 1:48 p.m.
- - securityaffairs.com, Updated:July 24, 2023, 2:07 p.m., First seen:July 24, 2023, 1:49 p.m.
+ - securityaffairs.com, Updated:Aug. 4, 2023, 10:37 a.m., First seen:July 24, 2023, 1:49 p.m.
  - securitylabs.datadoghq.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - securityonline.info, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - seekingalpha.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:46 p.m.
  - segment-anything.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
+ - sekurak.pl, Updated:Aug. 2, 2023, 6:32 p.m., First seen:July 31, 2023, 8:58 p.m.
  - seldo.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - selecta.ciaran.co.za, Updated:July 28, 2023, 4:42 p.m., First seen:July 28, 2023, 4:42 p.m.
  - selfie.cs.uni-salzburg.at, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - semaphoreci.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - semiengineering.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - semiengineering.com, Updated:July 28, 2023, 5:52 a.m., First seen:July 24, 2023, 1:48 p.m.
  - semiwiki.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - sendfly.io, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - seneca.dylancastillo.co, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -5548,9 +5718,9 @@
  - sesquiotic.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - set-inform.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - setharielgreen.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - sethmlarson.dev, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - sethmlarson.dev, Updated:Aug. 3, 2023, 1:53 p.m., First seen:July 24, 2023, 2:46 p.m.
  - sethops1.net, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - seths.blog, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:49 p.m.
+ - seths.blog, Updated:Aug. 4, 2023, 8:46 a.m., First seen:July 24, 2023, 1:49 p.m.
  - setiathome.berkeley.edu, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - setosa.io, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - seumasjeltzz.github.io, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -5561,6 +5731,7 @@
  - sfstandard.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - sfy.ru, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - sfyimby.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - sgp.fas.org, Updated:Aug. 3, 2023, 7:17 p.m., First seen:Aug. 3, 2023, 7:17 p.m.
  - sgs.princeton.edu, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - sgx.fail, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - sh.diva-portal.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -5608,7 +5779,7 @@
  - sideprojects.fazier.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - sidsite.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - sievedata.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
- - sifted.eu, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - sifted.eu, Updated:Aug. 3, 2023, 4:07 a.m., First seen:July 24, 2023, 1:48 p.m.
  - sigmodrecord.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - sigmoidprime.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - signal.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -5682,7 +5853,7 @@
  - slesinsky.org, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - slickgpt.vercel.app, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - slightknack.dev, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - slimemoldtimemold.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - slimemoldtimemold.com, Updated:July 24, 2023, 6:22 p.m., First seen:July 24, 2023, 2:47 p.m.
  - slimvoice.co, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - slint-ui.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - slint.dev, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -5722,6 +5893,7 @@
  - social.treehouse.systems, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - social.wildeboer.net, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - socialhub.activitypub.rocks, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - socket.dev, Updated:July 25, 2023, 6:17 p.m., First seen:July 25, 2023, 6:17 p.m.
  - socketsite.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:46 p.m.
  - sockpuppet.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - socviz.co, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -5760,6 +5932,7 @@
  - sourcery-ai.medium.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - sourcery.ai, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - sourceware.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - southseattleemerald.com, Updated:July 29, 2023, 3:31 a.m., First seen:July 29, 2023, 3:31 a.m.
  - sp23.datastructur.es, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - spacedimp.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - spaceflighthistory.blogspot.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
@@ -5767,6 +5940,7 @@
  - spacepolicyonline.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - spaceref.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - spacetraders.io, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
+ - spaceweatherarchive.com, Updated:July 28, 2023, 11:12 p.m., First seen:July 28, 2023, 11:12 p.m.
  - spack.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - spannr.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - sparkmailapp.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
@@ -5774,15 +5948,17 @@
  - speakerdeck.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - specbranch.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:46 p.m.
  - spectatorworld.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - spectrum.ieee.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - spectrumlocalnews.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
+ - spectrum.ieee.org, Updated:July 27, 2023, 10:16 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - spectrumlocalnews.com, Updated:Aug. 2, 2023, 12:57 p.m., First seen:July 24, 2023, 2:48 p.m.
  - speechresearch.github.io, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - spelpappan.se, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - sph.umd.edu, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - sphericalbullshit.wordpress.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - sphericalcowconsulting.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - spin.atomicobject.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - spiffy.tech, Updated:July 29, 2023, 9:27 p.m., First seen:July 29, 2023, 9:27 p.m.
+ - spin.atomicobject.com, Updated:July 25, 2023, 4:06 a.m., First seen:July 24, 2023, 1:48 p.m.
  - spindas.dreamwidth.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - spiral.imperial.ac.uk, Updated:July 25, 2023, 6:17 p.m., First seen:July 25, 2023, 6:17 p.m.
  - sponsor.ajay.app, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - spookylukey.github.io, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - sporks.space, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -5792,6 +5968,7 @@
  - spritesmods.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:49 p.m.
  - spyballoonsim.hornetsnestguild.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - sqlfordevs.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - sqlite-utils.datasette.io, Updated:July 29, 2023, 7:51 a.m., First seen:July 29, 2023, 7:51 a.m.
  - sqlite.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - sqlpkg.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - sqrtminusone.xyz, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
@@ -5808,13 +5985,13 @@
  - sscspace.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - ssir.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - ssteinberg.xyz, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
- - stability.ai, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - stability.ai, Updated:July 26, 2023, 7:12 p.m., First seen:July 24, 2023, 1:48 p.m.
  - stable-diffusion-art.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - stablediffusionlitigation.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - staceyoniot.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:45 p.m.
  - stack.convex.dev, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:48 p.m.
  - stackdiary.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - stackoverflow.blog, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - stackoverflow.blog, Updated:July 27, 2023, 1:37 p.m., First seen:July 24, 2023, 1:48 p.m.
  - stackoverflow.co, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - stackoverflow.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - stackoverflow.gg, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -5827,7 +6004,7 @@
  - staging.rickconsole.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - stallman.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - stallmansupport.org, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
- - staltz.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - staltz.com, Updated:Aug. 4, 2023, 12:06 a.m., First seen:July 24, 2023, 1:48 p.m.
  - stamen.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - stan.bar, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - stancarey.wordpress.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -5841,7 +6018,7 @@
  - startupdreams.substack.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - startuppirate.substack.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - startupwin.kelsus.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - statecraft.beehiiv.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - statecraft.beehiiv.com, Updated:Aug. 3, 2023, 5:08 p.m., First seen:July 24, 2023, 1:48 p.m.
  - static.roland.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - static.sched.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - static1.squarespace.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -5857,6 +6034,8 @@
  - status.mycloud.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - status.openai.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
  - status.python.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - status.ring.com, Updated:July 28, 2023, 11:12 p.m., First seen:July 28, 2023, 11:12 p.m.
+ - status.slack.com, Updated:July 27, 2023, 10:22 a.m., First seen:July 27, 2023, 10:22 a.m.
  - status.twilio.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - staysaasy.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - stderr.nl, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
@@ -5890,7 +6069,7 @@
  - stevepolito.design, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - steveridout.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - stgraber.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - stitcher.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - stitcher.io, Updated:Aug. 3, 2023, 1:53 p.m., First seen:July 24, 2023, 2:46 p.m.
  - stkbailey.substack.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - stockfishchess.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - stonks.news, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -5916,11 +6095,13 @@
  - streaming.media.ccc.de, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - streamnative.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - streetpass.social, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - streets.mn, Updated:July 29, 2023, 8:22 p.m., First seen:July 29, 2023, 8:22 p.m.
  - stretch15.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - strictlypositive.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - stripe.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - strlen.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - structpad.app, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - sts-news.medium.com, Updated:July 27, 2023, 4:51 p.m., First seen:July 27, 2023, 4:51 p.m.
  - stuartritchie.substack.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:47 p.m.
  - studentaid.gov, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - students.tools, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
@@ -5947,10 +6128,11 @@
  - summate.it, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - summer-afternoon.vlucendo.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - summerofcode.withgoogle.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - sunghoyahng.substack.com, Updated:July 26, 2023, 3:56 p.m., First seen:July 26, 2023, 3:56 p.m.
  - sunny.gg, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - sunroof.withgoogle.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - suor.github.io, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
- - supabase.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - supabase.com, Updated:Aug. 3, 2023, 12:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - supademo.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - superbowl.substack.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:46 p.m.
  - superfastpython.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -5968,8 +6150,10 @@
  - support.okta.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - support.stripe.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - support.thehelm.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
+ - support.twilio.com, Updated:Aug. 3, 2023, 5:12 a.m., First seen:Aug. 3, 2023, 5:12 a.m.
  - support.upwork.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - surfingcomplexity.blog, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - suricrasia.online, Updated:Aug. 1, 2023, 5:27 p.m., First seen:Aug. 1, 2023, 5:27 p.m.
  - surma.dev, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - susam.net, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - svbhallofshame.wordpress.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -6009,6 +6193,7 @@
  - system76.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - systemsapproach.substack.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
  - szhu.github.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - szklokontaktowe.tvn24.pl, Updated:Aug. 4, 2023, 12:52 a.m., First seen:July 25, 2023, 12:57 a.m.
  - szopa.medium.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - t.me, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - t.mkws.sh, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
@@ -6047,12 +6232,13 @@
  - taskandpurpose.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - tasktxt.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - tasshin.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - tatsu-lab.github.io, Updated:July 27, 2023, 4:51 p.m., First seen:July 27, 2023, 4:51 p.m.
  - tauri.app, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - tavianator.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 1:49 p.m.
  - taws.ch, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - taxheaven3000.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - taxproper.notion.site, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - taylor.town, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - taylor.town, Updated:Aug. 3, 2023, 11:42 a.m., First seen:July 24, 2023, 1:48 p.m.
  - tc39.es, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - tcc.lovebyte.party, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - tchncs.de, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -6074,7 +6260,7 @@
  - tech.target.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - techaint.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - techcommunity.microsoft.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - techcrunch.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - techcrunch.com, Updated:Aug. 3, 2023, 7:17 p.m., First seen:July 24, 2023, 1:48 p.m.
  - techdows.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - techfreedom.org, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - techfundingnews.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -6092,12 +6278,13 @@
  - techpolicy.press, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:45 p.m.
  - techrights.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - techtinkering.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - techxplore.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - techxplore.com, Updated:Aug. 4, 2023, 5:02 a.m., First seen:July 24, 2023, 1:48 p.m.
  - techzonics.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - tedd.it, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - tedgioia.substack.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - tedium.co, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - tedpiotrowski.svbtle.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - tedunderwood.com, Updated:Aug. 1, 2023, 7:42 a.m., First seen:Aug. 1, 2023, 7:42 a.m.
  - teenage.engineering, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - teivah.medium.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - telefunc.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
@@ -6122,7 +6309,7 @@
  - testing.googleblog.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - tevfik.xyz, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - text-to-diagram.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - text.npr.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - text.npr.org, Updated:Aug. 3, 2023, 6:12 p.m., First seen:July 24, 2023, 1:48 p.m.
  - textbrowser.github.io, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - textfiles.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - textshader.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -6136,7 +6323,7 @@
  - the-algorithms.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - the-analog-thing.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - the-dam.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - the-decoder.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
+ - the-decoder.com, Updated:July 24, 2023, 5:16 p.m., First seen:July 24, 2023, 1:49 p.m.
  - the-federation.info, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - the-guild.dev, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - the-yorkshireman.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
@@ -6172,7 +6359,7 @@
  - thecyberexpress.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - thedailywtf.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - thedav.is, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
- - thedebrief.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - thedebrief.org, Updated:July 28, 2023, 3:37 p.m., First seen:July 24, 2023, 2:46 p.m.
  - thedeepdive.ca, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - thedisruptors.beehiiv.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - thedividendlist.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -6190,9 +6377,9 @@
  - thegauntlet.substack.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - thegradient.pub, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - thegrayzone.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - thehackernews.com, Updated:July 24, 2023, 1:16 p.m., First seen:July 24, 2023, 1:16 p.m.
+ - thehackernews.com, Updated:Aug. 4, 2023, 12:52 p.m., First seen:July 24, 2023, 1:16 p.m.
  - thehftguy.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - thehill.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - thehill.com, Updated:Aug. 4, 2023, 12:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - thehistoryofhowweplay.wordpress.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - thehistoryoftheweb.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - thehtml.review, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -6200,7 +6387,7 @@
  - thehustle.co, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - theiflife.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - theins.ru, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - theintercept.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - theintercept.com, Updated:Aug. 3, 2023, 3:08 p.m., First seen:July 24, 2023, 1:48 p.m.
  - thelampmagazine.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - thelawdogfiles.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - thelead.uk, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -6217,18 +6404,19 @@
  - themarkup.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:46 p.m.
  - themeasureofaplan.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - themer.dev, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - themessenger.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - themessenger.com, Updated:July 25, 2023, 3:02 a.m., First seen:July 24, 2023, 1:48 p.m.
  - themillions.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - themonadreader.files.wordpress.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - themythicalengineer.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - thenewstack.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
  - thenextrecession.wordpress.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - thenextweb.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
+ - thenextweb.com, Updated:July 26, 2023, 5:01 a.m., First seen:July 24, 2023, 2:48 p.m.
  - thenumb.at, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - thenybble.de, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - theodyssey.dev, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - theor.xyz, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - thepalindrome.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - thepath.unaids.org, Updated:July 28, 2023, 3:37 p.m., First seen:July 28, 2023, 3:37 p.m.
  - thephd.dev, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - thephilbert.io, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - thepointmag.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -6246,6 +6434,7 @@
  - therectangle.substack.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - therevealer.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - thescottyjam.github.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - thesephist.com, Updated:July 25, 2023, 6:17 p.m., First seen:July 25, 2023, 6:17 p.m.
  - thesequence.substack.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 1:48 p.m.
  - thesifter.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - thesloth.me, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -6260,8 +6449,9 @@
  - thetypingoftheregex.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - theundeniablestreetview.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - thevaluable.dev, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:47 p.m.
- - thewalrus.ca, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - thewalrus.ca, Updated:July 26, 2023, 9:22 p.m., First seen:July 24, 2023, 1:48 p.m.
  - thewebivore.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - thewhyaxis.substack.com, Updated:Aug. 2, 2023, 8:32 p.m., First seen:Aug. 2, 2023, 8:32 p.m.
  - thewire.in, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - thezvi.wordpress.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - think.ing.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -6279,6 +6469,8 @@
  - thomasburette.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - thomashawk.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - thomask.sdf.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - thomasp.vivaldi.net, Updated:July 29, 2023, 1:51 p.m., First seen:July 29, 2023, 1:51 p.m.
+ - thomaspark.co, Updated:July 25, 2023, 5:12 a.m., First seen:July 25, 2023, 5:12 a.m.
  - thomasprosser.substack.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - thonny.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - thoriumsim.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -6296,7 +6488,7 @@
  - tidyfirst.substack.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:49 p.m.
  - tiempoheadlines.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - tigameshelf.net, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - tigerbeetle.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - tigerbeetle.com, Updated:July 26, 2023, 1:46 p.m., First seen:July 24, 2023, 1:48 p.m.
  - tigereye.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - tigyog.app, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - til.simonwillison.net, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -6307,8 +6499,8 @@
  - tim.blog, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - tim.mcnamara.nz, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - timbaumann.info, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - timdettmers.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - time.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - timdettmers.com, Updated:July 26, 2023, 9:26 a.m., First seen:July 24, 2023, 2:46 p.m.
+ - time.com, Updated:Aug. 4, 2023, 12:52 p.m., First seen:July 24, 2023, 1:48 p.m.
  - time.is, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - timeretain.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - timesofindia.indiatimes.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -6339,14 +6531,16 @@
  - tlpnetwork.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
  - tmsearch.uspto.gov, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - tnsr.org, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
- - toastytech.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - toastermuseum.com, Updated:Aug. 4, 2023, 7:12 a.m., First seen:Aug. 4, 2023, 7:12 a.m.
+ - toastytech.com, Updated:Aug. 1, 2023, 9:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - tobiasahlin.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - today.duke.edu, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 1:49 p.m.
  - today.ku.edu, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - today.tamu.edu, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - today.uconn.edu, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - today.uconn.edu, Updated:July 28, 2023, 4:42 p.m., First seen:July 24, 2023, 2:46 p.m.
  - today.ucsd.edu, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - todobot.ai, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - together.ai, Updated:July 29, 2023, 5:41 a.m., First seen:July 29, 2023, 5:41 a.m.
  - toji.dev, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - tom7.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - tomasp.net, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
@@ -6370,7 +6564,7 @@
  - topagree.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - topology.mitpress.mit.edu, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - topos.site, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - torrentfreak.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - torrentfreak.com, Updated:July 28, 2023, 2:32 p.m., First seen:July 24, 2023, 1:48 p.m.
  - tortel.li, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - torturechambersmalltalk.substack.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - tosche.net, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -6382,9 +6576,10 @@
  - towardsdatascience.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:47 p.m.
  - tracingwoodgrains.substack.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - tracy.posthaven.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - tracydurnell.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - tracydurnell.com, Updated:Aug. 3, 2023, 5:27 a.m., First seen:July 24, 2023, 1:48 p.m.
  - trailruncapital.substack.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - training.kalzumeus.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - transcripts.volts.wtf, Updated:July 28, 2023, 4:42 p.m., First seen:July 28, 2023, 4:42 p.m.
  - transformer-circuits.pub, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - transformyour.city, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - transitivebullsh.it, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
@@ -6417,8 +6612,10 @@
  - trunkbaseddevelopment.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - truthout.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - try.scroll.pub, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - tryblackbird.com, Updated:July 27, 2023, 12:32 p.m., First seen:July 27, 2023, 12:32 p.m.
  - trygalaxy.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - tschatzl.github.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - tsdr.uspto.gov, Updated:July 24, 2023, 11:47 p.m., First seen:July 24, 2023, 11:47 p.m.
  - tsk.bearblog.dev, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - tsoding.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - tsplp.research.uconn.edu, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -6429,7 +6626,7 @@
  - tushar.lol, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - tutanota.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - tuxphones.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - tvn24.pl, Updated:July 24, 2023, 2:07 p.m., First seen:July 24, 2023, 2:07 p.m.
+ - tvn24.pl, Updated:Aug. 4, 2023, 12:47 p.m., First seen:July 24, 2023, 2:07 p.m.
  - tvpworld.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:47 p.m.
  - tvtropes.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:49 p.m.
  - twdev.blog, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
@@ -6440,10 +6637,11 @@
  - twiddlingbits.net, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - twinspark.js.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - twistedphysics.typepad.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - twistedsifter.com, Updated:July 27, 2023, 1:37 p.m., First seen:July 27, 2023, 1:37 p.m.
  - twitchard.github.io, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - twitodon.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - twitter-thread.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - twitter.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - twitter.com, Updated:Aug. 4, 2023, 11:32 a.m., First seen:July 24, 2023, 1:48 p.m.
  - twitter.github.io, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - twitterisgoinggreat.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - two-wrongs.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -6454,12 +6652,13 @@
  - txti.es, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - tycho.sytes.net, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - tyhopp.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
- - tylercipriani.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - tylercipriani.com, Updated:Aug. 1, 2023, 5:32 a.m., First seen:July 24, 2023, 1:48 p.m.
  - tylerglaiel.substack.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - tylerneylon.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - tynan.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - type-level-typescript.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - type-signature.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - type.method.ac, Updated:July 27, 2023, 11:27 a.m., First seen:July 27, 2023, 11:27 a.m.
  - typeapi.org, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - typeclasses.substack.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - typefully.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:49 p.m.
@@ -6488,7 +6687,7 @@
  - unchartedterritories.tomaspueyo.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - unclutter.it, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - undark.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - undeadly.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - undeadly.org, Updated:July 24, 2023, 11:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - undeleted.ronsor.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - underorion.se, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - underpassapp.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -6505,7 +6704,7 @@
  - unitednuclear.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - univalence.me, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - unix.foo, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - unix.stackexchange.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - unix.stackexchange.com, Updated:July 27, 2023, 4:51 p.m., First seen:July 24, 2023, 2:47 p.m.
  - unix50.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - unlighthouse.dev, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - unnecessaryinventions.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -6519,6 +6718,7 @@
  - unsupervision.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - untappedcities.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:46 p.m.
  - untimelyunicorn.gumroad.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
+ - unum-cloud.github.io, Updated:Aug. 1, 2023, 1:11 a.m., First seen:Aug. 1, 2023, 1:11 a.m.
  - unusualwhales.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - unzip.dev, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - up.codes, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -6549,20 +6749,21 @@
  - users.ece.utexas.edu, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - users.ics.aalto.fi, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - uses.tech, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - uspto.report, Updated:Aug. 2, 2023, 9:41 a.m., First seen:Aug. 2, 2023, 9:41 a.m.
  - usrtk.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - uss-la-ca135.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - utcc.utoronto.ca, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - utcc.utoronto.ca, Updated:Aug. 1, 2023, 7:42 a.m., First seen:July 24, 2023, 1:48 p.m.
  - utkusen.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - uu.diva-portal.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - uxdesign.cc, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - v20.ohayo.computer, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - v2ex.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - v5.chriskrycho.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - v5.chriskrycho.com, Updated:Aug. 2, 2023, 3:07 p.m., First seen:July 24, 2023, 2:47 p.m.
  - vad.solutions, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - vadimdemedes.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - vadimkravcenko.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - vadosware.io, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
- - val.packett.cool, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - val.packett.cool, Updated:July 27, 2023, 12:37 a.m., First seen:July 24, 2023, 2:46 p.m.
  - valberg.dk, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - valle-demo.github.io, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - valspals.substack.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
@@ -6577,6 +6778,7 @@
  - vaonis.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - variety.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - varun.ca, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - varun.ch, Updated:Aug. 1, 2023, 12:06 a.m., First seen:Aug. 1, 2023, 12:06 a.m.
  - varunshenoy.substack.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - vaughntan.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - vcai.mpi-inf.mpg.de, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -6585,7 +6787,7 @@
  - vegconomist.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - veloren.net, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - vento.so, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - venturebeat.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - venturebeat.com, Updated:July 29, 2023, 7:51 a.m., First seen:July 24, 2023, 1:48 p.m.
  - ventureinsecurity.net, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - verasight.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - vercel.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -6604,6 +6806,7 @@
  - vicuna.lmsys.org, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - videocardz.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - videovillage.co, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - vienna.earth, Updated:Aug. 2, 2023, 3:07 p.m., First seen:Aug. 2, 2023, 3:07 p.m.
  - vietnam.postsen.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - viewfromthewing.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:46 p.m.
  - viewsourcecode.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -6634,7 +6837,8 @@
  - visionbasic.net, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - visual-fonts.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - visualpde.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
- - vitalik.ca, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - visualstudiomagazine.com, Updated:Aug. 4, 2023, 5:02 a.m., First seen:Aug. 4, 2023, 5:02 a.m.
+ - vitalik.ca, Updated:July 24, 2023, 4:11 p.m., First seen:July 24, 2023, 2:46 p.m.
  - vitalik.eth.limo, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - vite-plugin-ssr.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - vitejs.dev, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -6661,6 +6865,7 @@
  - vpnoverview.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - vrfd.info, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - vrite.io, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - vscode.dev, Updated:July 25, 2023, 12:52 a.m., First seen:July 25, 2023, 12:52 a.m.
  - vstinner.github.io, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - vt.social, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - vtda.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -6703,6 +6908,7 @@
  - wearenotsaved.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - weathermachine.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - web.archive.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - web.cs.ucdavis.edu, Updated:July 28, 2023, 2:37 a.m., First seen:July 28, 2023, 2:37 a.m.
  - web.cs.umass.edu, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - web.cse.ohio-state.edu, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - web.dev, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -6719,6 +6925,7 @@
  - web3isgoinggreat.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:45 p.m.
  - webamp.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - webapp.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - webarena.dev, Updated:July 28, 2023, 3:42 a.m., First seen:July 28, 2023, 3:42 a.m.
  - webaudio.prototyping.bbc.co.uk, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - webbtelescope.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:45 p.m.
  - webbu.app, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
@@ -6733,6 +6940,7 @@
  - weblog.rogueamoeba.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:45 p.m.
  - webmonetization.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - webplatform.news, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
+ - webrecorder.net, Updated:Aug. 1, 2023, 5:27 p.m., First seen:Aug. 1, 2023, 5:27 p.m.
  - webrtchacks.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - webstudio.is, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - webzine.nixos.cafe, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -6753,6 +6961,7 @@
  - whatcanidofor.archlinux.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - whatcolorisit.sumbioun.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - whatdoesthiscodedo.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - whatever.scalzi.com, Updated:Aug. 1, 2023, 6:37 a.m., First seen:Aug. 1, 2023, 6:37 a.m.
  - whatheco.de, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - whatisthequestion.wordpress.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - wheelreinventor.substack.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -6769,7 +6978,7 @@
  - whyevolutionistrue.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:46 p.m.
  - whyisthisinteresting.substack.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - whynothugo.nl, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:46 p.m.
- - wiadomosci.gazeta.pl, Updated:July 24, 2023, 2:07 p.m., First seen:July 24, 2023, 2:07 p.m.
+ - wiadomosci.gazeta.pl, Updated:Aug. 4, 2023, 12:48 p.m., First seen:July 24, 2023, 2:07 p.m.
  - wiby.me, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - wickedengine.net, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - wickr.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -6777,7 +6986,7 @@
  - widgetsandshit.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - wifinigel.blogspot.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - wifiovercoax.mcleodnet.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
- - wiki.alopex.li, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:49 p.m.
+ - wiki.alopex.li, Updated:Aug. 3, 2023, 4:02 p.m., First seen:July 24, 2023, 1:49 p.m.
  - wiki.blender.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - wiki.c2.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - wiki.debian.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -6800,6 +7009,7 @@
  - willbrownsberger.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - williamcolgan.net, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - williamyaoh.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - willthompson.name, Updated:July 25, 2023, 12:52 p.m., First seen:July 25, 2023, 12:52 p.m.
  - win-vector.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - windows95tips.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - windowsreport.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
@@ -6832,7 +7042,7 @@
  - workerbox.net, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - workout.lol, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - workplace.stackexchange.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - worksinprogress.co, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - worksinprogress.co, Updated:Aug. 2, 2023, 6:22 p.m., First seen:July 24, 2023, 1:48 p.m.
  - worksinprogress.substack.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - workspace.google.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - workspaceupdates.googleblog.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:49 p.m.
@@ -6899,7 +7109,8 @@
  - www.aaronkharris.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.aaronsw.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.aarp.org, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
- - www.abc.net.au, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.abc.net.au, Updated:July 25, 2023, 12:52 a.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.abc15.com, Updated:Aug. 2, 2023, 10:42 p.m., First seen:Aug. 2, 2023, 10:42 p.m.
  - www.abelard.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.ableton.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.abortretry.fail, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -6916,6 +7127,7 @@
  - www.actionnewsjax.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.adama-platform.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.adamtal.me, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
+ - www.adaptframework.solutions, Updated:Aug. 2, 2023, 12:57 p.m., First seen:Aug. 2, 2023, 12:57 p.m.
  - www.adelaide.edu.au, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.adept.ai, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.adhdevidence.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
@@ -6946,7 +7158,7 @@
  - www.airdeets.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.airdomainintelligence.mil, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.airforcetimes.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:49 p.m.
- - www.airgradient.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.airgradient.com, Updated:July 29, 2023, 7:17 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.airlive.net, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.airplane.dev, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.airsafe.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -6968,16 +7180,16 @@
  - www.alexcharlton.co, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.alexcrompton.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.alexhyett.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
- - www.alexmolas.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.alexmolas.com, Updated:July 29, 2023, 11:07 a.m., First seen:July 24, 2023, 1:48 p.m.
  - www.alexmurrell.co.uk, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - www.algolia.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.aliciakennedy.news, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.alignmentforum.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - www.aljazeera.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:49 p.m.
+ - www.aljazeera.com, Updated:Aug. 4, 2023, 12:36 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.allaboutcircuits.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.allencheng.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.allianceofdemocracies.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - www.allthingsdistributed.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.allthingsdistributed.com, Updated:July 27, 2023, 9:11 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.alma.sh, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.alphagalileo.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.alpharail.co.nz, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -6986,7 +7198,7 @@
  - www.amazingcto.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:45 p.m.
  - www.amazon.co.uk, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.amazon.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:49 p.m.
- - www.amazon.science, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - www.amazon.science, Updated:July 24, 2023, 10:42 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.amazonforum.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.amazonredshiftresearchproject.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.ambient.run, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -7013,7 +7225,7 @@
  - www.andrewheiss.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.andrewjvpowell.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.andrewnile.co.uk, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - www.androidauthority.com, Updated:July 24, 2023, 2:01 p.m., First seen:July 24, 2023, 2:01 p.m.
+ - www.androidauthority.com, Updated:Aug. 4, 2023, 11:32 a.m., First seen:July 24, 2023, 2:01 p.m.
  - www.androidpolice.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.andycleff.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.aneventapart.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -7032,7 +7244,7 @@
  - www.apalrd.net, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.apnic.net, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.apollographql.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - www.apple.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.apple.com, Updated:Aug. 3, 2023, 10:32 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.applemust.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.appsmith.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.apricitas.io, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
@@ -7063,7 +7275,7 @@
  - www.asahi.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.asanai.net, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.asbestos.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - www.ashbyhq.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.ashbyhq.com, Updated:July 27, 2023, 5:56 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.asiamarkets.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.asiaone.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.asiasentinel.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -7072,16 +7284,17 @@
  - www.asktog.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.askvg.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.asml.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - www.assemblyai.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:49 p.m.
+ - www.assemblyai.com, Updated:July 27, 2023, 11:21 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.assemblymag.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.assemblyscript.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.astrobin.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.astronautix.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.asus.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.aswf.io, Updated:Aug. 2, 2023, 6:22 p.m., First seen:Aug. 2, 2023, 6:22 p.m.
  - www.ataricompendium.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.atg.wa.gov, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.atlanticcouncil.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - www.atlasobscura.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.atlasobscura.com, Updated:July 28, 2023, 1:27 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.atlassian.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.atmosera.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - www.atomic14.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -7118,9 +7331,9 @@
  - www.baesystems.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.bakersfield.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.bakertilly.de, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - www.baldurbjarnason.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:49 p.m.
+ - www.baldurbjarnason.com, Updated:July 31, 2023, 8:55 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.bandcampunited.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - www.bankier.pl, Updated:July 24, 2023, 2:01 p.m., First seen:July 24, 2023, 2:01 p.m.
+ - www.bankier.pl, Updated:Aug. 4, 2023, 12:37 p.m., First seen:July 24, 2023, 2:01 p.m.
  - www.bankofcanada.ca, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.bankofengland.co.uk, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.bard.edu, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -7135,13 +7348,16 @@
  - www.bay12forums.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.bay12games.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.bazhenov.me, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - www.bbc.co.uk, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - www.bbc.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.bbc.co.uk, Updated:Aug. 4, 2023, 12:37 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.bbc.com, Updated:Aug. 4, 2023, 11:32 a.m., First seen:July 24, 2023, 1:48 p.m.
  - www.bbcelite.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.bcorporation.net, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.bea.gov, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.beatandraise.com, Updated:Aug. 2, 2023, 6:27 a.m., First seen:Aug. 2, 2023, 6:27 a.m.
  - www.beautifulpublicdata.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:45 p.m.
+ - www.beavernotes.com, Updated:Aug. 4, 2023, 11:32 a.m., First seen:Aug. 4, 2023, 11:32 a.m.
  - www.bedelstein.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
+ - www.belfastlive.co.uk, Updated:July 29, 2023, 7:51 a.m., First seen:July 29, 2023, 7:51 a.m.
  - www.bell-labs.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.ben-evans.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.bengreenberg.dev, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
@@ -7171,6 +7387,7 @@
  - www.billboard.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.binarymoon.co.uk, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.bioinformaticszen.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - www.biometricupdate.com, Updated:Aug. 4, 2023, 4:16 a.m., First seen:July 28, 2023, 2:14 p.m.
  - www.bionity.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.biorxiv.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.birdandmoon.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -7195,12 +7412,12 @@
  - www.blackrock.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.blackswanstreet.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.bleedingheartland.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - www.bleepingcomputer.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.bleepingcomputer.com, Updated:Aug. 4, 2023, 12:37 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.blender.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.blendnow.com:443, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.blockbench.net, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.blogto.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - www.bloomberg.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.bloomberg.com, Updated:Aug. 1, 2023, 9:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.bls.gov, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.blueorigin.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.bmj.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -7217,6 +7434,7 @@
  - www.bostonglobe.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.bostonplans.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.bostonreview.net, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:45 p.m.
+ - www.bps.org.uk, Updated:Aug. 1, 2023, 7:37 p.m., First seen:Aug. 1, 2023, 7:37 p.m.
  - www.bradshawfoundation.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.braeunig.us, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.brandingmag.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
@@ -7250,7 +7468,7 @@
  - www.bulwer-lytton.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.bundesverfassungsgericht.de, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.bunniestudios.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:46 p.m.
- - www.businessinsider.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.businessinsider.com, Updated:Aug. 2, 2023, 10:47 a.m., First seen:July 24, 2023, 1:48 p.m.
  - www.businessinsider.in, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.businessinsurance.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.businesspost.ie, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -7276,10 +7494,10 @@
  - www.calligrapher.ai, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.calmdownben.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.calnewport.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - www.caltech.edu, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.caltech.edu, Updated:July 27, 2023, 7:01 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.calvertjournal.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.cam.ac.uk, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - www.cambridge.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.cambridge.org, Updated:July 28, 2023, 9:07 a.m., First seen:July 24, 2023, 1:48 p.m.
  - www.cambridgeindependent.co.uk, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.cambus.net, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.campus-fm.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -7341,7 +7559,7 @@
  - www.chick-fil-a.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.chimehq.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.chinatalk.media, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - www.chip.pl, Updated:July 24, 2023, 2:01 p.m., First seen:July 24, 2023, 2:01 p.m.
+ - www.chip.pl, Updated:Aug. 4, 2023, 11:32 a.m., First seen:July 24, 2023, 2:01 p.m.
  - www.chocolate-doom.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.choosingtherapy.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.chrisfinke.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -7369,6 +7587,7 @@
  - www.claudiokuenzler.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.clear.rice.edu, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.clevelandfed.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.click2houston.com, Updated:July 26, 2023, 1:46 p.m., First seen:July 26, 2023, 1:46 p.m.
  - www.cliki.net, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.climateprediction.net, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.clockworkmicro.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -7380,17 +7599,18 @@
  - www.clubofrome.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.clues.life, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.cluetrain.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - www.cmu.edu, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.cmu.edu, Updated:July 29, 2023, 6:12 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.cmyr.net, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - www.cnbc.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - www.cnet.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:49 p.m.
+ - www.cnbc.com, Updated:Aug. 4, 2023, 12:37 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.cnet.com, Updated:Aug. 4, 2023, 12:37 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.cnil.fr, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - www.cnn.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.cnn.com, Updated:Aug. 4, 2023, 12:41 a.m., First seen:July 24, 2023, 1:48 p.m.
  - www.cnx-software.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.co2meter.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.cockroachlabs.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.codastory.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.codeium.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - www.codeproject.com, Updated:Aug. 4, 2023, 5:02 a.m., First seen:July 25, 2023, 4:06 a.m.
  - www.codepuzzle.io, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.coderelay.io, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.codeweavers.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -7406,6 +7626,7 @@
  - www.coloradopolitics.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.comicsbeat.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.comicsmaker.ai, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
+ - www.comigo.ai, Updated:Aug. 3, 2023, 8:22 p.m., First seen:Aug. 3, 2023, 8:22 p.m.
  - www.commandlinefu.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.commentary.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.commerce.senate.gov, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
@@ -7425,7 +7646,7 @@
  - www.computer.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.computerenhance.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.computerhistory.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - www.computerworld.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - www.computerworld.com, Updated:Aug. 4, 2023, 10:27 a.m., First seen:July 24, 2023, 2:47 p.m.
  - www.computinghistory.org.uk, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.concordia.ca, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.concordmonitor.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -7453,6 +7674,7 @@
  - www.cosfone.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.cosmos.esa.int, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - www.countbayesie.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - www.counterpointresearch.com, Updated:July 28, 2023, 9:02 p.m., First seen:July 28, 2023, 9:02 p.m.
  - www.countle.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.courier.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.couriermail.com.au, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -7464,6 +7686,7 @@
  - www.covid-datascience.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.cpard.xyz, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - www.cpc.ncep.noaa.gov, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.cpomagazine.com, Updated:Aug. 3, 2023, 3:02 a.m., First seen:Aug. 3, 2023, 3:02 a.m.
  - www.cppstories.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.cpsc.gov, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.cpushack.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -7490,6 +7713,7 @@
  - www.cs.princeton.edu, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.cs.rochester.edu, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.cs.toronto.edu, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - www.cs.tufts.edu, Updated:Aug. 3, 2023, 4:02 p.m., First seen:Aug. 3, 2023, 4:02 p.m.
  - www.cs.umd.edu, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.cs.utexas.edu, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.cs.virginia.edu, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:49 p.m.
@@ -7527,15 +7751,16 @@
  - www.daily.place, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.dailycal.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.dailydot.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 1:49 p.m.
- - www.dailymail.co.uk, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.dailymail.co.uk, Updated:Aug. 4, 2023, 12:37 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.dailyscandinavian.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - www.dailywire.com, Updated:July 24, 2023, 2:01 p.m., First seen:July 24, 2023, 2:01 p.m.
+ - www.dailywire.com, Updated:Aug. 4, 2023, 3:57 a.m., First seen:July 24, 2023, 2:01 p.m.
  - www.dal.ca, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.dallasnews.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - www.damninteresting.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:49 p.m.
+ - www.damninteresting.com, Updated:July 24, 2023, 6:22 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.dancowell.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.darkreading.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:45 p.m.
  - www.darpa.mil, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.darrylbayliss.net, Updated:Aug. 3, 2023, 4:07 a.m., First seen:Aug. 3, 2023, 4:07 a.m.
  - www.databreaches.net, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.databricks.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.datacenterdynamics.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
@@ -7561,7 +7786,7 @@
  - www.debian.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.deccanherald.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.decipad.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - www.decisionproblem.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - www.decisionproblem.com, Updated:Aug. 2, 2023, 5:17 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.deepakg.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.deepfence.io, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.deeplearning.ai, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -7580,13 +7805,13 @@
  - www.desiderata.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.design-reuse.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.designboom.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - www.desmog.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - www.destroyallsoftware.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:45 p.m.
+ - www.desmog.com, Updated:July 24, 2023, 5:16 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - www.destroyallsoftware.com, Updated:Aug. 3, 2023, 12:47 p.m., First seen:July 24, 2023, 2:45 p.m.
  - www.detroitnews.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:45 p.m.
  - www.deusinmachina.net, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.deutschland.de, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.developing.dev, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - www.devever.net, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.devever.net, Updated:Aug. 4, 2023, 12:07 a.m., First seen:July 24, 2023, 1:48 p.m.
  - www.devex.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.dewanahmed.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.dexerto.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
@@ -7600,15 +7825,18 @@
  - www.diffchecker.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.dig.security, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.digibarn.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
+ - www.digikey.com, Updated:July 24, 2023, 3:06 p.m., First seen:July 24, 2023, 3:06 p.m.
  - www.digital-science.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.digitalcameraworld.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - www.digitalmars.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.digitalocean.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.digitaltrends.com, Updated:Aug. 2, 2023, 9:36 p.m., First seen:July 25, 2023, 12:47 p.m.
  - www.dignitymemorial.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.dimeadozen.ai, Updated:Aug. 2, 2023, 10:42 p.m., First seen:Aug. 2, 2023, 10:42 p.m.
  - www.dimensional.me, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.directedplay.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.disconnect.blog, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - www.discoursemagazine.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
+ - www.discoursemagazine.com, Updated:July 28, 2023, 3:37 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.discovermagazine.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.discovery.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.dispatch.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -7660,7 +7888,7 @@
  - www.duckdns.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.duplicati.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.dutchamsterdam.nl, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
- - www.dw.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.dw.com, Updated:July 29, 2023, 1:51 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.dyalog.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.dylanpaulus.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - www.e-resident.gov.ee, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -7672,9 +7900,10 @@
  - www.easypost.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.eater.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.ebi.ac.uk, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - www.ecb.torontomu.ca, Updated:July 31, 2023, 8:55 p.m., First seen:July 31, 2023, 8:55 p.m.
  - www.ecommercebytes.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.econlib.org, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
- - www.economist.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.economist.com, Updated:Aug. 2, 2023, 7:27 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.econtribute.de, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.ecstaticintegration.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.ecu.edu.au, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -7685,7 +7914,7 @@
  - www.edn.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.eecs.harvard.edu, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.eetimes.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
- - www.eff.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.eff.org, Updated:July 28, 2023, 10:07 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.efinancialcareers.co.uk, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.efinancialcareers.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.egison.org, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
@@ -7710,10 +7939,11 @@
  - www.emeraldlake.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - www.emergentmind.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - www.emergetools.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.emilkirkegaard.com, Updated:July 28, 2023, 5:52 a.m., First seen:July 28, 2023, 5:52 a.m.
  - www.encrypted.at, Updated:July 24, 2023, 2:01 p.m., First seen:July 24, 2023, 2:01 p.m.
  - www.energy.gov, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.energymonitor.ai, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
- - www.engadget.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.engadget.com, Updated:Aug. 4, 2023, 12:37 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.engine-sim.parts, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.engine.study, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.engineeringbookclub.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -7748,14 +7978,14 @@
  - www.ethswarm.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.eumetsat.int, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.euractiv.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
- - www.eurekalert.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.eurekalert.org, Updated:Aug. 2, 2023, 10:42 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.eurogamer.net, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.euronews.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.european-lisp-symposium.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.evalapply.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.evangelosscifi.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.evanjones.ca, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - www.evanmiller.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - www.evanmiller.org, Updated:July 24, 2023, 6:22 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.eventhubs.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.everydaydrinking.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.evuniverse.io, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -7774,6 +8004,7 @@
  - www.fabiocrameri.ch, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.fabricatedknowledge.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.facebook.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.facebookuserprivacysettlement.com, Updated:July 29, 2023, 10:02 a.m., First seen:July 29, 2023, 10:02 a.m.
  - www.factoriesinspace.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.factorio.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.failory.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -7792,10 +8023,10 @@
  - www.fbi.gov, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.fcc.gov, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.fda.gov, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
- - www.fdic.gov, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.fdic.gov, Updated:July 29, 2023, 12:17 a.m., First seen:July 24, 2023, 1:48 p.m.
  - www.fearofoblivion.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.federalregister.gov, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
- - www.federalreserve.gov, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.federalreserve.gov, Updated:July 26, 2023, 10:27 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.federalreservehistory.org, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.felicis.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.fermyon.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -7815,11 +8046,12 @@
  - www.filestash.app, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.filfre.net, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.filson.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - www.finleycms.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
+ - www.finleycms.com, Updated:July 28, 2023, 12:22 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.fireeye.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.firemon.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.firstpost.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.fisheries.noaa.gov, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
+ - www.fitchratings.com, Updated:Aug. 2, 2023, 1:02 a.m., First seen:Aug. 2, 2023, 1:02 a.m.
  - www.fitzsim.org, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.fivehundredwordsaday.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.fixscript.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -7846,7 +8078,7 @@
  - www.folklore.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.foodnavigator.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.foonathan.net, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - www.forbes.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.forbes.com, Updated:Aug. 4, 2023, 12:37 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.foreignaffairs.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.forensicmag.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.forrestthewoods.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -7867,7 +8099,7 @@
  - www.fox7austin.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.fox9.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.foxbusiness.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
- - www.foxnews.com, Updated:July 24, 2023, 2:01 p.m., First seen:July 24, 2023, 2:01 p.m.
+ - www.foxnews.com, Updated:Aug. 4, 2023, 12:37 p.m., First seen:July 24, 2023, 2:01 p.m.
  - www.foxprohistory.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.foxy.io, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.fpcomplete.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
@@ -7892,8 +8124,8 @@
  - www.frontiersin.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.froresystems.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.fry-ai.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - www.fsf.org, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:48 p.m.
- - www.ft.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.fsf.org, Updated:July 28, 2023, 5:47 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.ft.com, Updated:Aug. 4, 2023, 11:32 a.m., First seen:July 24, 2023, 1:48 p.m.
  - www.ftadviser.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.ftc.gov, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.full-stop.net, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -7908,7 +8140,7 @@
  - www.fxhash.xyz, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.galaxus.ch, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.gamedeveloper.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:45 p.m.
- - www.gamespot.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.gamespot.com, Updated:Aug. 4, 2023, 12:37 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.gamesradar.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.gamingalexandria.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.gamingdeputy.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -7949,6 +8181,7 @@
  - www.ghsa.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.gibney.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.gimp.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - www.gingerbill.org, Updated:July 28, 2023, 5:52 a.m., First seen:July 28, 2023, 5:52 a.m.
  - www.giskard.ai, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.gitclear.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.githubstatus.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -7964,7 +8197,7 @@
  - www.globalsign.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.globsec.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.gnu-pascal.de, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
- - www.gnu.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.gnu.org, Updated:Aug. 3, 2023, 5:08 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.goatcounter.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.golang.dk, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.goodgoodgood.co, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
@@ -8010,7 +8243,7 @@
  - www.growveg.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.grucloud.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.grumpygamer.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - www.gsb.stanford.edu, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - www.gsb.stanford.edu, Updated:July 24, 2023, 3:06 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.gu.se, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.guinnessworldrecords.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.guitarworld.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -8019,8 +8252,11 @@
  - www.haaretz.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.hacker-jobs.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.hackerfactor.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - www.hackerone.com, Updated:Aug. 2, 2023, 8:32 p.m., First seen:Aug. 2, 2023, 8:32 p.m.
  - www.hackerrank.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - www.hackersdictionary.com, Updated:July 29, 2023, 1:51 p.m., First seen:July 29, 2023, 1:51 p.m.
  - www.hackingwithswift.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.hackread.com, Updated:Aug. 4, 2023, 12:37 p.m., First seen:July 24, 2023, 7:27 p.m.
  - www.hackster.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.hagerty.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.haggadot.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -8054,6 +8290,7 @@
  - www.helmholtz-berlin.de, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.help.senate.gov, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.henleyglobal.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - www.henrikkarlsson.xyz, Updated:July 26, 2023, 9:22 p.m., First seen:July 26, 2023, 9:22 p.m.
  - www.heraldtribune.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.heritagedaily.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.hermansilver.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
@@ -8088,6 +8325,7 @@
  - www.homedepot.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.homerow.app, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - www.homescope.io, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
+ - www.honest-broker.com, Updated:July 29, 2023, 1:22 a.m., First seen:July 29, 2023, 1:22 a.m.
  - www.honeycomb.io, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.hoover.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.hopkinsmedicine.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -8111,7 +8349,7 @@
  - www.humprog.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.hybridlogic.co.uk, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.hydro-international.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - www.hydrogeninsight.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - www.hydrogeninsight.com, Updated:Aug. 3, 2023, 8:22 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.hypchain.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.hyperganic.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.hyperion-entertainment.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -8138,7 +8376,7 @@
  - www.iea.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.ietf.org, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.ifixit.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:45 p.m.
- - www.iflscience.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:45 p.m.
+ - www.iflscience.com, Updated:July 29, 2023, 5:07 p.m., First seen:July 24, 2023, 2:45 p.m.
  - www.igalia.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.ign.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.ignorance.ai, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
@@ -8163,11 +8401,12 @@
  - www.indiewire.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.industryweek.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.ineteconomics.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - www.inferse.com, Updated:Aug. 1, 2023, 9:47 p.m., First seen:Aug. 1, 2023, 9:47 p.m.
  - www.infiltration.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.influxdata.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - www.infoq.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.infoq.com, Updated:Aug. 3, 2023, 4:07 a.m., First seen:July 24, 2023, 1:48 p.m.
  - www.informs.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - www.infoworld.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.infoworld.com, Updated:Aug. 2, 2023, 4:17 a.m., First seen:July 24, 2023, 1:48 p.m.
  - www.ingo-blechschmidt.eu, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.inivis.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.inkandswitch.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -8180,13 +8419,13 @@
  - www.insider.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.insideradio.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:45 p.m.
  - www.instagram.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - www.instalki.pl, Updated:July 24, 2023, 2:02 p.m., First seen:July 24, 2023, 2:02 p.m.
+ - www.instalki.pl, Updated:Aug. 3, 2023, 3:02 p.m., First seen:July 24, 2023, 2:02 p.m.
  - www.institutionalinvestor.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.instructables.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.insurancejournal.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.intc.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.intechopen.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - www.intel.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.intel.com, Updated:July 24, 2023, 8:32 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.intellimail.xyz, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.interactions.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.interconnects.ai, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -8198,7 +8437,7 @@
  - www.investors.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.ioi.dk, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.iranintl.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - www.irishtimes.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.irishtimes.com, Updated:July 26, 2023, 6:06 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.iro.umontreal.ca, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.irs.gov, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.irunfar.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
@@ -8208,6 +8447,7 @@
  - www.isi.edu, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.iso.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.israel21c.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - www.itprotoday.com, Updated:July 28, 2023, 4:42 a.m., First seen:July 28, 2023, 4:42 a.m.
  - www.itv.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.iventoy.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.iwf.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -8225,7 +8465,7 @@
  - www.jamez.it, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.janestreet.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.janromme.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - www.japantimes.co.jp, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
+ - www.japantimes.co.jp, Updated:July 27, 2023, 4:57 a.m., First seen:July 24, 2023, 2:48 p.m.
  - www.jasoncolavito.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.jasondavies.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.jasonshen.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
@@ -8235,14 +8475,14 @@
  - www.jclinepi.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.jdawiseman.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.jdsupra.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
- - www.jeffgeerling.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.jeffgeerling.com, Updated:July 27, 2023, 2:41 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.jeffnobbs.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - www.jefftk.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.jefftk.com, Updated:Aug. 4, 2023, 12:46 a.m., First seen:July 24, 2023, 1:48 p.m.
  - www.jeremiak.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.jeremyong.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.jernesto.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.jeromeleroy.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - www.jetbrains.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.jetbrains.com, Updated:July 26, 2023, 1:46 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.jetnet.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.jetpack.io, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.jetpens.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
@@ -8268,6 +8508,7 @@
  - www.jonstokes.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.joseferben.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.joshwcomeau.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.journaldemontreal.com, Updated:Aug. 3, 2023, 7:17 p.m., First seen:Aug. 3, 2023, 7:17 p.m.
  - www.journals.uchicago.edu, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.jpl.nasa.gov, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.jpost.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -8278,7 +8519,7 @@
  - www.junglekeepers.org, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.jurnalanas.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.just-food.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
- - www.justice.gov, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:45 p.m.
+ - www.justice.gov, Updated:July 26, 2023, 12:46 a.m., First seen:July 24, 2023, 2:45 p.m.
  - www.justingarrison.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.justus.pw, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.justworktogether.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
@@ -8296,6 +8537,7 @@
  - www.katevassgalerie.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - www.katsnyderux.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.kbb.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - www.kc8apf.net, Updated:July 27, 2023, 9:11 p.m., First seen:July 27, 2023, 9:11 p.m.
  - www.kcrw.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.kennylog-in.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.kent.edu, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
@@ -8344,7 +8586,7 @@
  - www.lastweekinaws.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.lastwordonnothing.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.latent.space, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 1:48 p.m.
- - www.latimes.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.latimes.com, Updated:July 28, 2023, 7:57 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.lattepanda.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.law.kuleuven.be, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.law360.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -8365,13 +8607,14 @@
  - www.lei.chat, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.leidenmedievalistsblog.nl, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.lelanthran.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - www.lemonde.fr, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.lemonde.fr, Updated:Aug. 4, 2023, 12:42 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.lenfestinstitute.org, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.lennysnewsletter.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.leoweekly.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.lesbonscomptes.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.leshenko.net, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.lesswrong.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.leteyski.com, Updated:July 27, 2023, 5:56 p.m., First seen:July 27, 2023, 5:56 p.m.
  - www.levels.fyi, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.levernews.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.lexx.gr, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -8381,6 +8624,7 @@
  - www.lifespan.io, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:45 p.m.
  - www.liftaircraft.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.lightbend.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
+ - www.lighton.ai, Updated:Aug. 1, 2023, 8:42 p.m., First seen:Aug. 1, 2023, 8:42 p.m.
  - www.lilysthings.org, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.linaro.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.lineleap.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -8395,6 +8639,7 @@
  - www.linuxfromscratch.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.linuxjournal.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.linuxliteos.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.linuxtoday.com, Updated:Aug. 4, 2023, 2:26 a.m., First seen:July 24, 2023, 6:16 p.m.
  - www.linuxuprising.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.linyangchen.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.lioness.co, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
@@ -8409,10 +8654,12 @@
  - www.lobbyfacts.eu, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.loc.gov, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.local10.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.localcan.com, Updated:Aug. 1, 2023, 1:07 p.m., First seen:Aug. 1, 2023, 1:07 p.m.
  - www.lockedinspace.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.lofiatc.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.logicloop.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.logicmatters.net, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - www.logikalsolutions.com, Updated:Aug. 3, 2023, 8:27 a.m., First seen:Aug. 3, 2023, 8:27 a.m.
  - www.loldrivers.io, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - www.londonreconnections.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.lonelyworld.info, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -8425,10 +8672,10 @@
  - www.lostretrotapes.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.lotareader.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.loudersound.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - www.louderwithcrowder.com, Updated:July 24, 2023, 2:06 p.m., First seen:July 24, 2023, 2:06 p.m.
+ - www.louderwithcrowder.com, Updated:Aug. 3, 2023, 8:26 p.m., First seen:July 24, 2023, 2:06 p.m.
  - www.loukidelis.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.lovedbefore.london, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - www.lowtechmagazine.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:45 p.m.
+ - www.lowtechmagazine.com, Updated:July 29, 2023, 12:17 a.m., First seen:July 24, 2023, 2:45 p.m.
  - www.lowyat.net, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.lpalmieri.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.lrb.co.uk, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -8453,6 +8700,7 @@
  - www.macworld.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.maddyness.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.madinamerica.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.madisontrust.com, Updated:Aug. 3, 2023, 6:12 p.m., First seen:Aug. 3, 2023, 6:12 p.m.
  - www.madsci.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.maersk.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.magiclasso.co, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -8467,7 +8715,9 @@
  - www.manton.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.manufacturingdive.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.marginalia.nu, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.marijuanamoment.net, Updated:Aug. 1, 2023, 6:32 p.m., First seen:Aug. 1, 2023, 6:32 p.m.
  - www.marineinsight.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - www.marines.mil, Updated:July 29, 2023, 7:51 a.m., First seen:July 29, 2023, 7:51 a.m.
  - www.marketplace.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.marketplacepulse.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.marketscreener.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -8479,6 +8729,7 @@
  - www.martinfowler.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.masswerk.at, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.masteringemacs.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.mastermariners.org.au, Updated:July 25, 2023, 6:19 a.m., First seen:July 25, 2023, 6:19 a.m.
  - www.matecdev.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.math.cmu.edu, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.math.columbia.edu, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -8486,6 +8737,7 @@
  - www.math.uni-bielefeld.de, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.math.utah.edu, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.math.uwaterloo.ca, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.mathematica-journal.com, Updated:July 25, 2023, 10:37 p.m., First seen:July 25, 2023, 10:37 p.m.
  - www.maths.ed.ac.uk, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.matrixcalculus.org, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - www.mattb.nz, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -8516,7 +8768,7 @@
  - www.mercurynews.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.mermaidchart.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.mersenneforum.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - www.meta.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
+ - www.meta.com, Updated:Aug. 2, 2023, 10:42 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.metaculus.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.metalevel.at, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.metallicss.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -8525,6 +8777,7 @@
  - www.meter.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.mevis-research.de, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.mewho.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - www.meziantou.net, Updated:Aug. 1, 2023, 4:26 a.m., First seen:Aug. 1, 2023, 4:26 a.m.
  - www.mha-net.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.micahlerner.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.micahwalter.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -8536,6 +8789,7 @@
  - www.michaelsamsel.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.michalpaszkiewicz.co.uk, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.mickmel.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - www.microbiologyresearch.org, Updated:July 28, 2023, 10:07 p.m., First seen:July 28, 2023, 10:07 p.m.
  - www.microsoft.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.middleeasteye.net, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.midjourney.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -8573,6 +8827,7 @@
  - www.modular.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.mollywhite.net, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.moma.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - www.money.pl, Updated:Aug. 4, 2023, 12:47 p.m., First seen:July 24, 2023, 4:16 p.m.
  - www.moneycontrol.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.monicahq.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.monkeon.co.uk, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -8592,6 +8847,7 @@
  - www.mrdbourke.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.mriedel.ece.umn.edu, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.msn.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.msnbc.com, Updated:Aug. 1, 2023, 7:42 p.m., First seen:July 27, 2023, 8:07 p.m.
  - www.mt-propeller.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.mtb.xyz, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.mtpr.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -8620,7 +8876,9 @@
  - www.nasa.gov, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.nasdaq.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.nassiben.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.natecation.com, Updated:Aug. 3, 2023, 3:02 a.m., First seen:Aug. 3, 2023, 3:02 a.m.
  - www.nateranda.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
+ - www.natesilver.net, Updated:July 25, 2023, 5:12 p.m., First seen:July 25, 2023, 5:12 p.m.
  - www.nationalgeographic.co.uk, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.nationalgeographic.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.nationalparkstraveler.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -8630,14 +8888,15 @@
  - www.nato.int, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - www.naturalis.nl, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.naturallanguageplaylist.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - www.nature.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.nature.com, Updated:Aug. 3, 2023, 1:53 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.nature.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.naval-technology.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.navalgazing.net, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.navytimes.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
+ - www.nbc.ca, Updated:Aug. 1, 2023, 8:42 p.m., First seen:Aug. 1, 2023, 8:42 p.m.
  - www.nbcbayarea.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.nbclosangeles.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - www.nbcnews.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.nbcnews.com, Updated:Aug. 4, 2023, 12:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.nbcnewyork.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.nbcphiladelphia.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.nber.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -8649,11 +8908,12 @@
  - www.ncsc.gov.uk, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.ndss-symposium.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.ndsu.edu, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - www.neelc.org, Updated:July 27, 2023, 6:02 a.m., First seen:July 27, 2023, 6:02 a.m.
  - www.nejm.org, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - www.neogaf.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.neom.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.neovimconf.live, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - www.neowin.net, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.neowin.net, Updated:July 27, 2023, 4:52 a.m., First seen:July 24, 2023, 1:48 p.m.
  - www.nerc.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.nerdwallet.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.nethack.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -8663,7 +8923,7 @@
  - www.netmeister.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.netnewsledger.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.netwatchglobal.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - www.networkworld.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.networkworld.com, Updated:Aug. 3, 2023, 10:31 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.neucards.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.neuralframes.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.neuroengine.ai, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -8675,6 +8935,7 @@
  - www.news.com.au, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.news.ucsb.edu, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.news.uliege.be, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
+ - www.news.uzh.ch, Updated:Aug. 2, 2023, 5:17 p.m., First seen:Aug. 2, 2023, 5:17 p.m.
  - www.news24.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.newscientist.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.newscript.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
@@ -8682,9 +8943,9 @@
  - www.newsmusicsearcharchive.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.newsnationnow.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.newstatesman.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
- - www.newsweek.com, Updated:July 24, 2023, 2:06 p.m., First seen:July 24, 2023, 2:06 p.m.
+ - www.newsweek.com, Updated:Aug. 4, 2023, 12:47 p.m., First seen:July 24, 2023, 2:06 p.m.
  - www.newtraderu.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - www.newyorker.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.newyorker.com, Updated:July 28, 2023, 9:02 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.nextcomputers.org, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.nextgov.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.nextplatform.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:49 p.m.
@@ -8728,6 +8989,7 @@
  - www.northstarmonthly.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.nostr.how, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.nostr.net, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - www.notboring.co, Updated:Aug. 3, 2023, 7:17 p.m., First seen:Aug. 3, 2023, 7:17 p.m.
  - www.notebookcheck.net, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.notechmagazine.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.notion.so, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -8736,8 +8998,9 @@
  - www.nplusonemag.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.npmjs.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.npopov.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - www.npr.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.npr.org, Updated:Aug. 4, 2023, 11:42 a.m., First seen:July 24, 2023, 1:48 p.m.
  - www.nray.dev, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.nrc.gov, Updated:July 27, 2023, 4:51 p.m., First seen:July 27, 2023, 4:51 p.m.
  - www.nrc.nl, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.nrel.gov, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.nrk.no, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -8747,14 +9010,14 @@
  - www.ntsb.gov:443, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.ntv.co.ug, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.nukeni.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - www.nullpt.rs, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - www.nullpt.rs, Updated:Aug. 1, 2023, 9:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.nunodonato.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.nushell.sh, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.nvidia.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.nxtaltfoods.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.nybooks.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.nydailynews.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - www.nytimes.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.nytimes.com, Updated:Aug. 4, 2023, 12:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.nyu.edu, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.nyuengelberg.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.nzz.ch, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -8783,6 +9046,7 @@
  - www.onsclom.net, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - www.onvoard.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.onxmaps.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - www.opb.org, Updated:Aug. 3, 2023, 6:17 a.m., First seen:Aug. 3, 2023, 6:17 a.m.
  - www.open-fire.dev, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.open-resume.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.open-std.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -8790,7 +9054,7 @@
  - www.openbible.info, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.openbsd.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.openbsdhandbook.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - www.openculture.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.openculture.com, Updated:July 26, 2023, 9:26 a.m., First seen:July 24, 2023, 1:48 p.m.
  - www.opendnd.games, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.openfaas.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.openhv.net, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -8800,12 +9064,13 @@
  - www.openrailwaymap.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.openrobotics.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.opensecrets.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - www.opensignal.com, Updated:July 27, 2023, 8:06 p.m., First seen:July 27, 2023, 8:06 p.m.
  - www.openssh.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.openssl.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.openstenoproject.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.openttd.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.openvim.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - www.openwall.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - www.openwall.com, Updated:Aug. 4, 2023, 10:27 a.m., First seen:July 24, 2023, 2:47 p.m.
  - www.optica.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.optoutproject.net, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.optus.com.au, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
@@ -8815,11 +9080,12 @@
  - www.orchardandvine.net, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.ordently.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.oregonlive.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - www.oreilly.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
+ - www.oreilly.com, Updated:July 28, 2023, 4:42 a.m., First seen:July 24, 2023, 2:45 p.m.
  - www.organclearinghouse.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.orioledata.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.ornl.gov, Updated:Aug. 3, 2023, 8:22 p.m., First seen:Aug. 3, 2023, 8:22 p.m.
  - www.orwellfoundation.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - www.os2museum.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.os2museum.com, Updated:July 29, 2023, 3:31 a.m., First seen:July 24, 2023, 1:48 p.m.
  - www.osfc.io, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.osintme.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.ourchatstory.co, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -8827,6 +9093,7 @@
  - www.outsideonline.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.outtherecolorado.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.overcomingbias.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.overshootday.org, Updated:Aug. 2, 2023, 3:07 p.m., First seen:Aug. 2, 2023, 3:07 p.m.
  - www.ovhcloud.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.owlbynight.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.owlfolio.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -8837,7 +9104,7 @@
  - www.paddleyourownkanoo.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:45 p.m.
  - www.pageonepower.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.pagesonpages.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - www.pagetable.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.pagetable.com, Updated:July 26, 2023, 12:41 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.palladiummag.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.paloaltoonline.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.panda.sys.t.u-tokyo.ac.jp, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
@@ -8863,10 +9130,10 @@
  - www.pbs.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.pcengines.ch, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.pcg-random.org, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
- - www.pcgamer.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.pcgamer.com, Updated:Aug. 4, 2023, 12:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.pcjs.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - www.pcmag.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:45 p.m.
- - www.pcworld.com, Updated:July 24, 2023, 2:06 p.m., First seen:July 24, 2023, 2:06 p.m.
+ - www.pcmag.com, Updated:July 28, 2023, 4:42 a.m., First seen:July 24, 2023, 2:45 p.m.
+ - www.pcworld.com, Updated:Aug. 4, 2023, 11:42 a.m., First seen:July 24, 2023, 2:06 p.m.
  - www.pdfa.org, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - www.pdos.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.pearson.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -8876,7 +9143,7 @@
  - www.pepysdiary.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.percona.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.perfai.ai, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - www.perfectrec.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.perfectrec.com, Updated:July 28, 2023, 4:42 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.permit.io, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.persuasion.community, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.perthirtysix.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -8896,7 +9163,7 @@
  - www.phoenixframework.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.phonearena.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.phonescoop.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - www.phoronix.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.phoronix.com, Updated:July 24, 2023, 9:37 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.photopea.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.photoprism.app, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.photoroo.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -8927,6 +9194,7 @@
  - www.plugsocketmuseum.nl, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.plural.sh, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.plusdocs.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - www.pmail.com, Updated:Aug. 3, 2023, 5:08 p.m., First seen:Aug. 3, 2023, 5:08 p.m.
  - www.pnas.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.pocnetwork.net, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.poder360.com.br, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
@@ -8934,19 +9202,21 @@
  - www.pointsdevue.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.poised.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.poker.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - www.politico.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.pola.rs, Updated:Aug. 3, 2023, 4:02 p.m., First seen:Aug. 3, 2023, 4:02 p.m.
+ - www.politico.com, Updated:Aug. 4, 2023, 9:32 a.m., First seen:July 24, 2023, 1:48 p.m.
  - www.politico.eu, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - www.polsatnews.pl, Updated:July 24, 2023, 2:06 p.m., First seen:July 24, 2023, 2:06 p.m.
+ - www.polsatnews.pl, Updated:Aug. 4, 2023, 10:37 a.m., First seen:July 24, 2023, 2:06 p.m.
  - www.polygon.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.polymathrobotics.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.polytechnique-insights.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.pomerium.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - www.popsci.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.popsci.com, Updated:July 28, 2023, 4:42 a.m., First seen:July 24, 2023, 1:48 p.m.
  - www.popularmechanics.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.positive.news, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.postconsumerbrands.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.postgresql.fastware.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.postgresql.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.postman.com, Updated:July 31, 2023, 8:53 p.m., First seen:July 31, 2023, 8:53 p.m.
  - www.potaroo.net, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.power-eng.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.poweredbygpt.co, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -8959,6 +9229,7 @@
  - www.presscheck.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.prettyclean.cc, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.prettygoodhouse.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - www.prettypolly.app, Updated:Aug. 2, 2023, 8:32 p.m., First seen:Aug. 2, 2023, 8:32 p.m.
  - www.prevention.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - www.primevideotech.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.princeton.edu, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
@@ -9058,7 +9329,7 @@
  - www.recurrentauto.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.red-lang.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.redbrick.me, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - www.reddit.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.reddit.com, Updated:Aug. 4, 2023, 12:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.redditstatus.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.redfin.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.redhat.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:49 p.m.
@@ -9075,7 +9346,7 @@
  - www.reneweuropegroup.eu, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.reproof.app, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.rerun.io, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:46 p.m.
- - www.researchgate.net, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.researchgate.net, Updated:Aug. 1, 2023, 5:32 a.m., First seen:July 24, 2023, 1:48 p.m.
  - www.researchhub.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.researchprofessionalnews.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.residentcontrarian.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
@@ -9087,7 +9358,7 @@
  - www.retroprinter.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.retroreversing.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.retrotechnology.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - www.reuters.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.reuters.com, Updated:Aug. 4, 2023, 12:51 a.m., First seen:July 24, 2023, 1:48 p.m.
  - www.reversinglabs.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.reviewgeek.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.reviewjournal.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -9115,7 +9386,7 @@
  - www.ripleys.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.risingwave-labs.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.risk.net, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - www.rnz.co.nz, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - www.rnz.co.nz, Updated:July 25, 2023, 4:07 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.roadandtrack.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.roads.org.uk, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.roastd.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -9126,6 +9397,7 @@
  - www.robinwieruch.de, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.robkalmeijer.nl, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.robkhenderson.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.robodaily.com, Updated:July 31, 2023, 8:53 p.m., First seen:July 31, 2023, 8:53 p.m.
  - www.rochester.edu, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.rockefeller.edu, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.rockpapershotgun.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -9191,7 +9463,7 @@
  - www.schmidtfutures.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.schneier.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.sci.news, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - www.science.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.science.org, Updated:Aug. 3, 2023, 10:38 a.m., First seen:July 24, 2023, 1:48 p.m.
  - www.sciencealert.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.scienceandnonduality.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.sciencedaily.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -9202,7 +9474,7 @@
  - www.sciencemediacentre.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.sciencenews.org, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.scientific-computing.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - www.scientificamerican.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.scientificamerican.com, Updated:July 29, 2023, 8:22 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.scimex.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:45 p.m.
  - www.scintilla.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.scmagazine.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -9222,23 +9494,27 @@
  - www.scylladb.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.sdcard.org, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.sdxcentral.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - www.searchenginejournal.com, Updated:Aug. 4, 2023, 5:02 a.m., First seen:Aug. 4, 2023, 5:02 a.m.
  - www.searchthedeck.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - www.seattleinprogress.com, Updated:July 25, 2023, 11:42 p.m., First seen:July 25, 2023, 11:42 p.m.
  - www.seattletimes.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.sec.gov, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.secjuice.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.secureblink.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.securitymagazine.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - www.securityweek.com, Updated:July 24, 2023, 2:07 p.m., First seen:July 24, 2023, 2:07 p.m.
+ - www.securityweek.com, Updated:Aug. 4, 2023, 12:47 p.m., First seen:July 24, 2023, 2:07 p.m.
  - www.secwale.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.segger.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.seinfeldscripts.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - www.semafor.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.semafor.com, Updated:July 24, 2023, 4:11 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.semantic-mediawiki.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.sematic.dev, Updated:July 26, 2023, 5:01 p.m., First seen:July 26, 2023, 5:01 p.m.
  - www.semianalysis.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.senate.gov, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.sensibledefaults.io, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.sequoiacap.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:45 p.m.
  - www.serialreader.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - www.seriouseats.com, Updated:Aug. 1, 2023, 7:37 p.m., First seen:Aug. 1, 2023, 7:37 p.m.
  - www.serioustrouble.show, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.servethehome.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.setphaserstostun.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -9248,7 +9524,7 @@
  - www.sexdrugsandsuicide.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.sfchronicle.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.sfexaminer.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
- - www.sfgate.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.sfgate.com, Updated:Aug. 3, 2023, 5:12 a.m., First seen:July 24, 2023, 1:48 p.m.
  - www.shadertoy.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.shadowboxtraining.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.shanleykane.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
@@ -9287,13 +9563,13 @@
  - www.slidebook.io, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.slideshare.net, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.sligocki.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - www.slowboring.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - www.slowboring.com, Updated:July 29, 2023, 4:01 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.slynyrd.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.smartcitiesdive.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.smashingmagazine.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.smbc-comics.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.smh.com.au, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
- - www.smithsonianmag.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.smithsonianmag.com, Updated:Aug. 2, 2023, 7:32 a.m., First seen:July 24, 2023, 1:48 p.m.
  - www.snackstack.net, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - www.sniffnet.net, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.snopes.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -9314,7 +9590,7 @@
  - www.soundonsound.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.sozu.io, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - www.space-travel.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - www.space.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.space.com, Updated:Aug. 2, 2023, 4:17 a.m., First seen:July 24, 2023, 1:48 p.m.
  - www.spacedaily.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.spacerogue.net, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.spaceweather.gov, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
@@ -9323,14 +9599,15 @@
  - www.spakhm.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.sparringmind.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.spectator.co.uk, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - www.spicyweb.dev, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - www.speedcurve.com, Updated:July 25, 2023, 4:06 a.m., First seen:July 25, 2023, 4:06 a.m.
+ - www.spicyweb.dev, Updated:July 31, 2023, 8:55 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.spiegel.de, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.spiked-online.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.splunk.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.spoon-tamago.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:45 p.m.
  - www.spytalk.co, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.sqlalchemy.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - www.sqlite.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.sqlite.org, Updated:July 27, 2023, 4:51 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.squadmobility.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.sri.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.ssa.gov, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -9372,7 +9649,7 @@
  - www.streamlinehq.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.stride3d.net, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.stripes.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - www.strongtowns.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.strongtowns.org, Updated:July 29, 2023, 5:07 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.stroustrup.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.struct.ai, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.stuff.co.nz, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -9393,7 +9670,8 @@
  - www.surgehq.ai, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.suse.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.svgbackgrounds.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - www.svix.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:45 p.m.
+ - www.svix.com, Updated:July 27, 2023, 9:11 p.m., First seen:July 24, 2023, 2:45 p.m.
+ - www.swan.io, Updated:July 27, 2023, 4:52 a.m., First seen:July 27, 2023, 4:52 a.m.
  - www.sweethome3d.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.swift.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.swiftcentre.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -9439,23 +9717,24 @@
  - www.teamsmart.ai, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - www.tecgraf.puc-rio.br, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.tech-insider.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - www.techdirt.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.techdirt.com, Updated:Aug. 4, 2023, 12:32 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.techemails.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.technobugg.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.technology.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.technologynetworks.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.technologyreview.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.techpowerup.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:46 p.m.
- - www.techradar.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.techradar.com, Updated:Aug. 4, 2023, 12:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.techrepublic.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - www.techspot.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.techspot.com, Updated:Aug. 2, 2023, 4:17 a.m., First seen:July 24, 2023, 1:48 p.m.
  - www.techtarget.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.techtello.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.ted.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.teenvogue.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.telecomtv.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - www.telegraph.co.uk, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.telegraph.co.uk, Updated:Aug. 4, 2023, 12:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.telematica.so, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
+ - www.telerik.com, Updated:Aug. 3, 2023, 4:07 a.m., First seen:July 27, 2023, 4:52 a.m.
  - www.tellerreport.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.templetonprize.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.terrastruct.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -9463,7 +9742,7 @@
  - www.teslarati.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.tesorio.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.texasmonthly.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - www.texastribune.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.texastribune.org, Updated:July 25, 2023, 8:27 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.textualize.io, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.tfeb.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.thalesgroup.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -9477,7 +9756,7 @@
  - www.thearticle.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.theartnewspaper.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:45 p.m.
  - www.theassemblync.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - www.theatlantic.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.theatlantic.com, Updated:Aug. 1, 2023, 6:32 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.theautopian.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.thebaltimorebanner.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.thebeliever.net, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -9487,6 +9766,7 @@
  - www.thecarconnection.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.thecgo.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.thecity.nyc, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
+ - www.thecollector.com, Updated:Aug. 1, 2023, 3:21 a.m., First seen:Aug. 1, 2023, 3:21 a.m.
  - www.thecollegefix.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.thecompanion.app, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.thecrimson.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -9497,14 +9777,16 @@
  - www.thediff.co, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:45 p.m.
  - www.thedrive.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.theedgesingapore.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - www.thefenlandblackoakproject.co.uk, Updated:July 28, 2023, 9:02 p.m., First seen:July 28, 2023, 9:02 p.m.
  - www.thefinalhop.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.thefire.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.thefitzwilliam.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:48 p.m.
- - www.thefp.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:49 p.m.
+ - www.thefp.com, Updated:July 27, 2023, 12:37 a.m., First seen:July 24, 2023, 1:49 p.m.
  - www.thefreshloaf.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.thegamer.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - www.theglobeandmail.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - www.theguardian.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.theguardian.com, Updated:Aug. 4, 2023, 12:47 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.thegwpf.org, Updated:July 28, 2023, 4:47 a.m., First seen:July 28, 2023, 4:47 a.m.
  - www.thehindu.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:45 p.m.
  - www.thehindubusinessline.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.thehistoryblog.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -9519,7 +9801,7 @@
  - www.themuse.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.thenation.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.thenationalnews.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - www.thenewatlantis.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.thenewatlantis.com, Updated:Aug. 1, 2023, 10:57 a.m., First seen:July 24, 2023, 1:48 p.m.
  - www.thenewhumanitarian.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.thennt.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.theoremoftheday.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -9530,12 +9812,13 @@
  - www.theprivacywhisperer.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.theprompt.io, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.thepsmiths.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - www.theregister.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.theregister.com, Updated:Aug. 3, 2023, 7:17 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.therobotreport.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.thesocialradars.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.thespec.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.thespl.it, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.thesr71blackbird.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
+ - www.thestackcanary.com, Updated:July 25, 2023, 9:36 a.m., First seen:July 25, 2023, 9:36 a.m.
  - www.thestar.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.thestreet.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.thesun.co.uk, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
@@ -9546,7 +9829,7 @@
  - www.thetrainingdata.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.theturnsignalblog.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.theurbanist.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - www.theverge.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.theverge.com, Updated:Aug. 4, 2023, 12:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.thewealthadvisor.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.theworldsworstwebsiteever.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.thingiverse.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -9578,7 +9861,7 @@
  - www.timescale.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.timeshighereducation.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.timesnownews.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:46 p.m.
- - www.timesofisrael.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.timesofisrael.com, Updated:July 29, 2023, 9:27 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.timesunion.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.timothyrice.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.timr.co, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
@@ -9587,8 +9870,9 @@
  - www.tinybird.co, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.tinyux.app, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.tipp10.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - www.tlo.com, Updated:July 26, 2023, 9:22 p.m., First seen:July 26, 2023, 9:22 p.m.
  - www.tno.nl, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - www.today.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:06 p.m.
+ - www.today.com, Updated:July 27, 2023, 2:42 p.m., First seen:July 24, 2023, 2:06 p.m.
  - www.todayifoundout.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.together.xyz, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.tokyoweekender.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
@@ -9604,6 +9888,7 @@
  - www.topspeed.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.totaljs.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.totaltypescript.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.toureiffel.paris, Updated:Aug. 4, 2023, 12:37 p.m., First seen:Aug. 4, 2023, 12:37 p.m.
  - www.townandcountrymag.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.tpr.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.tradientblog.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
@@ -9614,7 +9899,7 @@
  - www.treehugger.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.treetalk.co.uk, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.tremendous.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - www.tremor.so, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.tremor.so, Updated:July 28, 2023, 10:07 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.trendmicro.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.treycausey.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - www.tri-cityherald.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -9687,7 +9972,7 @@
  - www.usegalileo.ai, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.usehaystack.io, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.usemotion.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
- - www.usenix.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.usenix.org, Updated:Aug. 1, 2023, 11:57 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.user.tu-berlin.de, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.useragents.me, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.usgs.gov, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -9696,7 +9981,7 @@
  - www.utilitydive.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:45 p.m.
  - www.utoronto.ca, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.utu.fi, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
- - www.uvm.edu, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.uvm.edu, Updated:July 31, 2023, 8:55 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.uyuni-project.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.v01.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.val-lang.dev, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -9713,7 +9998,7 @@
  - www.veterinarydaily.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - www.viam.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.vibilagare.se, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:48 p.m.
- - www.vice.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.vice.com, Updated:Aug. 1, 2023, 4:26 a.m., First seen:July 24, 2023, 1:48 p.m.
  - www.vimninja.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.vimonlineeditor.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.vinography.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
@@ -9734,18 +10019,18 @@
  - www.voguebusiness.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.voitureblog.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.volta.foundation, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - www.vox.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.vox.com, Updated:July 28, 2023, 3:42 a.m., First seen:July 24, 2023, 1:48 p.m.
  - www.voys.co.za, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.vqronline.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - www.vulture.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:49 p.m.
+ - www.vulture.com, Updated:July 31, 2023, 8:55 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.w3.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.w3schools.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.waituntil8th.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.warp.dev, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.warren.senate.gov, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.washington.edu, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 1:48 p.m.
- - www.washingtonexaminer.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:45 p.m.
- - www.washingtonpost.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.washingtonexaminer.com, Updated:Aug. 4, 2023, 9:33 a.m., First seen:July 24, 2023, 2:45 p.m.
+ - www.washingtonpost.com, Updated:Aug. 4, 2023, 12:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.washingtontimes.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.watermarkremover.io, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.watermelontools.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -9778,15 +10063,16 @@
  - www.willett.io, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.willmcgugan.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.windmill.dev, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - www.windowscentral.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.windowscentral.com, Updated:Aug. 4, 2023, 5:02 a.m., First seen:July 24, 2023, 1:48 p.m.
  - www.windytan.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.winehq.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.winglang.io, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.wingolog.org, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.winston.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.wired.co.uk, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - www.wired.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.wired.com, Updated:Aug. 4, 2023, 11:43 a.m., First seen:July 24, 2023, 1:48 p.m.
  - www.wireheading.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.wirtualnemedia.pl, Updated:Aug. 4, 2023, 9:33 a.m., First seen:July 24, 2023, 4:17 p.m.
  - www.wisdomination.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.withcoherence.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.withdiode.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:47 p.m.
@@ -9800,7 +10086,7 @@
  - www.womp.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.woodtv.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.work-bites.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
- - www.workatastartup.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:47 p.m.
+ - www.workatastartup.com, Updated:July 24, 2023, 5:16 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.workingsoftware.dev, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.worklife.news, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.worksinprogress.news, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -9808,7 +10094,7 @@
  - www.worldofreel.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.worldometers.info, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.wptv.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
- - www.wsj.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.wsj.com, Updated:Aug. 4, 2023, 11:42 a.m., First seen:July 24, 2023, 1:48 p.m.
  - www.wtamu.edu, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.wusa9.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.wxyz.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
@@ -9829,7 +10115,7 @@
  - www.yahoo.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.yaml.de, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.yannickoswald.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - www.ycombinator.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.ycombinator.com, Updated:Aug. 3, 2023, 6:12 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.yeovilhistory.info, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.yet-another-blog.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - www.yieldcode.blog, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -9837,14 +10123,14 @@
  - www.ynetnews.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.yobowargames.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - www.you-tldr.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
- - www.youtube.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:16 p.m.
+ - www.youtube.com, Updated:Aug. 4, 2023, 1:12 p.m., First seen:July 24, 2023, 1:16 p.m.
  - www.yubico.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.yugabyte.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.yulingyao.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.yyzkevin.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - www.zachleat.com, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - www.zannzen.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
- - www.zdnet.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - www.zdnet.com, Updated:Aug. 4, 2023, 8:28 a.m., First seen:July 24, 2023, 1:48 p.m.
  - www.zdziarski.com, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - www.zeileis.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www.zeit.de, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
@@ -9866,14 +10152,17 @@
  - www2.seas.gwu.edu, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - www3.nhk.or.jp, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 1:48 p.m.
  - wyclif.substack.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:46 p.m.
- - wykop.pl, Updated:July 24, 2023, 2:16 p.m., First seen:July 24, 2023, 1:16 p.m.
+ - wydarzenia.interia.pl, Updated:Aug. 4, 2023, 12:48 p.m., First seen:July 26, 2023, 7:18 a.m.
+ - wykop.pl, Updated:Aug. 4, 2023, 1:12 p.m., First seen:July 24, 2023, 1:16 p.m.
  - wyoleg.gov, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - x.company, Updated:July 24, 2023, 5:16 p.m., First seen:July 24, 2023, 5:16 p.m.
  - x.st, Updated:July 24, 2023, 1:49 p.m., First seen:July 24, 2023, 1:49 p.m.
  - x0axz.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - x11cp.org, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - x64.sh, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - xai.sh, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - xakcop.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
+ - xamlbrewer.wordpress.com, Updated:July 27, 2023, 4:52 a.m., First seen:July 27, 2023, 4:52 a.m.
  - xata.io, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - xav.io, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - xavd.id, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
@@ -9955,6 +10244,7 @@
  - zapatopi.net, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - zapier.com, Updated:July 24, 2023, 2:46 p.m., First seen:July 24, 2023, 2:46 p.m.
  - zarasophos.net, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - zdrowietvn.pl, Updated:Aug. 4, 2023, 12:52 a.m., First seen:July 25, 2023, 12:57 a.m.
  - zealdocs.org, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - zed.dev, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 1:48 p.m.
  - zeihan.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
@@ -9971,7 +10261,7 @@
  - zhengdongwang.com, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
  - zicklag.github.io, Updated:July 24, 2023, 2:45 p.m., First seen:July 24, 2023, 2:45 p.m.
  - zig.news, Updated:July 24, 2023, 2:47 p.m., First seen:July 24, 2023, 2:47 p.m.
- - ziglang.org, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 1:48 p.m.
+ - ziglang.org, Updated:Aug. 4, 2023, 6:07 a.m., First seen:July 24, 2023, 1:48 p.m.
  - zilliz.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
  - zincsearch.com, Updated:July 24, 2023, 2:48 p.m., First seen:July 24, 2023, 2:48 p.m.
  - zintaglio.com, Updated:July 24, 2023, 1:48 p.m., First seen:July 24, 2023, 1:48 p.m.
