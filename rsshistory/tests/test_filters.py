@@ -82,6 +82,8 @@ class FiltersTest(TestCase):
                 "vote" : "none",
                 "source_title" : "none",
                 "persistent" : "none",
+                "category" : "none",
+                "subcategory" : "none",
                 "artist" : "none",
                 "album" : "none",
                 "date_from" : "none",
@@ -101,6 +103,8 @@ class FiltersTest(TestCase):
         self.assertTrue( "vote" in filter_args)
         self.assertTrue( "source_title" in filter_args)
         self.assertTrue( "persistent" in filter_args)
+        self.assertTrue( "category" in filter_args)
+        self.assertTrue( "subcategory" in filter_args)
         self.assertTrue( "artist" in filter_args)
         self.assertTrue( "album" in filter_args)
         self.assertTrue( "date_from" in filter_args)
@@ -138,6 +142,8 @@ class FiltersTest(TestCase):
         self.assertTrue( "tags__tag__icontains" in filter_args)
         self.assertTrue( "votes__vote__gt" in filter_args)
         self.assertTrue( "source_obj__title" in filter_args)
+        self.assertTrue( "source_obj__category" in filter_args)
+        self.assertTrue( "source_obj__subcategory" in filter_args)
         self.assertTrue( "persistent" in filter_args)
         self.assertTrue( "artist__icontains" in filter_args)
         self.assertTrue( "album__icontains" in filter_args)
