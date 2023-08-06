@@ -162,7 +162,7 @@ class Domains(models.Model):
                                subdomain=domain_data.subdomain,
                                suffix=domain_data.suffix)
 
-    def update_domain_obj(domain_only_text):
+    def update_domain_obj(obj):
         from ..dateutils import DateUtils
 
         obj.date_last = DateUtils.get_datetime_now_utc()

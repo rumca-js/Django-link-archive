@@ -76,7 +76,7 @@ def add_source(request):
         form = SourceForm(request.POST)
 
         if form.is_valid():
-            form.save()
+            SourceDataController.add(form.cleaned_data)
 
             context["summary_text"] = "Source added"
             return ContextData.render(request, "summary_present.html", context)

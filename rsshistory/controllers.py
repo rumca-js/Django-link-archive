@@ -29,9 +29,11 @@ class SourceDataController(SourceDataModel):
     class Meta:
         proxy = True
 
-    def add(source_data):
+    def add(source_data_map):
         # TODO add domain when adding new source
-        pass
+        SourceDataModel.objects.create(**source_data_map)
+
+        Domains.add(source_data_map["url"])
 
     def get_absolute_url(self):
         """Returns the URL to access a particular author instance."""
