@@ -114,28 +114,80 @@ class LinkCommentDataModel(models.Model):
 
 class Domains(models.Model):
     domain = models.CharField(max_length=1000)
+    main = models.CharField(max_length=200, null=True)
+    subdomain = models.CharField(max_length=200, null=True)
+    suffix = models.CharField(max_length=20, null=True)
+
     date_created = models.DateTimeField(default=datetime.now)
     date_last = models.DateTimeField(default=datetime.now)
 
     class Meta:
-        ordering = ["domain"]
+        ordering = ["suffix", "main", "domain"]
+        #ordering = ["domain"]
 
-    def add(domain_text):
-        if domain_text.find("/") >= 0:
+    def add(url):
+        """
+        Public API
+        """
+
+        domain_text = Domains.get_domain_url(url)
+
+        Domains.create_or_update_domain(domain_text)
+
+    def get_domain_url(input_url):
+        if input_url.find("/") >= 0:
             from ..webtools import Page
 
-            p = Page(domain_text)
+            p = Page(input_url)
             domain_text = p.get_domain_only()
-
-        objs = Domains.objects.filter(domain=domain_text)
-        if len(objs) == 0:
-            Domains.objects.create(domain=domain_text)
+            return domain_text
         else:
-            from ..dateutils import DateUtils
+            return input_url
 
-            obj = objs[0]
-            obj.date_last = DateUtils.get_datetime_now_utc()
-            obj.save()
+    def create_or_update_domain(domain_only_text):
+        objs = Domains.objects.filter(domain=domain_only_text)
+        if len(objs) == 0:
+            Domains.create_domain_object(domain_only_text)
+        else:
+            Domains.update_domain_obj(objs[0])
+
+    def create_domain_object(domain_only_text):
+        import tldextract
+
+        extract = tldextract.TLDExtract()
+        domain_data = extract(domain_only_text)
+
+        Domains.objects.create(domain=domain_only_text,
+                               main=domain_data.domain,
+                               subdomain=domain_data.subdomain,
+                               suffix=domain_data.suffix)
+
+    def update_domain_obj(domain_only_text):
+        from ..dateutils import DateUtils
+
+        obj.date_last = DateUtils.get_datetime_now_utc()
+        obj.save()
+
+    def fix_domain_obj(self):
+        import tldextract
+        from ..dateutils import DateUtils
+
+        extract = tldextract.TLDExtract()
+        domain_data = extract(self.domain)
+
+        print(domain_data)
+
+        self.main=domain_data.domain
+        self.subdomain=domain_data.subdomain
+        self.suffix=domain_data.suffix
+
+        self.date_last = DateUtils.get_datetime_now_utc()
+        self.save()
+
+    def fix_domain_objs():
+        objs = Domains.objects.all()
+        for obj in objs:
+            obj.fix_domain_obj()
 
 
 """ YouTube meta cache """

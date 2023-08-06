@@ -931,6 +931,20 @@ def domain_remove(request, pk):
     return ContextData.render(request, "summary_present.html", context)
 
 
+def domains_fix(request):
+    context = ContextData.get_context(request)
+    context["page_title"] += " - Domain fix"
+
+    if not request.user.is_staff:
+        return ContextData.render(request, "missing_rights.html", context)
+
+    Domains.fix_domain_objs()
+
+    context["summary_text"] = "Domains were fixed"
+
+    return ContextData.render(request, "summary_present.html", context)
+
+
 def check_if_move_to_archive(request):
     context = ContextData.get_context(request)
     context["page_title"] += " - Move to archive"
