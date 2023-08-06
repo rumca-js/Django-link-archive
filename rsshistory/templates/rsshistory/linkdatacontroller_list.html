@@ -187,8 +187,8 @@
 <div class="pagination">
     <span class="step-links">
         {% if page_obj.has_previous %}
-           <a href="?page=1{{args_extractor.get_filter_string}}" class='simplebutton'>&laquo; first</a>
-           <a href="?page={{ page_obj.previous_page_number }}{{args_extractor.get_filter_string}}" class='simplebutton'>previous</a>
+           <a href="?page=1{{query_filter.get_filter_string}}" class='simplebutton'>&laquo; first</a>
+           <a href="?page={{ page_obj.previous_page_number }}{{query_filter.get_filter_string}}" class='simplebutton'>previous</a>
         {% endif %}
 
         <span class="current">
@@ -196,8 +196,8 @@
         </span>
 
         {% if page_obj.has_next %}
-          <a href="?page={{ page_obj.next_page_number }}{{args_extractor.get_filter_string}}" class='simplebutton'>next</a>
-          <a href="?page={{ page_obj.paginator.num_pages }}{{args_extractor.get_filter_string}}" class='simplebutton'>last &raquo;</a>
+          <a href="?page={{ page_obj.next_page_number }}{{query_filter.get_filter_string}}" class='simplebutton'>next</a>
+          <a href="?page={{ page_obj.paginator.num_pages }}{{query_filter.get_filter_string}}" class='simplebutton'>last &raquo;</a>
         {% endif %}
 
         <span>Records: {{entries_list | length}} </span>

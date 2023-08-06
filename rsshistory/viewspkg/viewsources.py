@@ -5,7 +5,8 @@ from django.http import JsonResponse
 
 from ..models import BackgroundJob
 from ..prjconfig import Configuration
-from ..forms import SourceForm, SourcesChoiceForm, ConfigForm, SourceChoiceArgsExtractor
+from ..forms import SourceForm, SourcesChoiceForm, ConfigForm
+from ..queryfilters import SourceFilter
 from ..views import ContextData
 
 from ..controllers import (
@@ -21,8 +22,8 @@ class RssSourceListView(generic.ListView):
     paginate_by = 100
 
     def get_queryset(self):
-        self.extractor = SourceChoiceArgsExtractor(self.request.GET)
-        return self.extractor.get_filtered_objects()
+        self.query_filter = SourceFilter(self.request.GET)
+        return self.query_filter.get_filtered_objects()
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
@@ -31,11 +32,11 @@ class RssSourceListView(generic.ListView):
         # Create any data and add it to the context
 
         self.filter_form = SourcesChoiceForm(args=self.request.GET)
-        self.filter_form.create(self.extractor.filtered_objects)
+        self.filter_form.create(self.query_filter.filtered_objects)
         self.filter_form.method = "GET"
         self.filter_form.action_url = reverse("{}:sources".format(ContextData.app_name))
 
-        context["args_extractor"] = self.extractor
+        context["query_filter"] = self.query_filter
 
         context["filter_form"] = self.filter_form
         context["page_title"] += " - news source list"
@@ -403,8 +404,8 @@ def source_fix_entries(request, source_pk):
 def sources_json(request):
 
     # Data
-    extractor = SourceChoiceArgsExtractor(request.GET)
-    sources = extractor.get_filtered_objects()
+    query_filter = SourceFilter(request.GET)
+    sources = query_filter.get_filtered_objects()
 
     json_obj = {'sources' : []}
 

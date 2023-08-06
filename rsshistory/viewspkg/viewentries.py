@@ -25,7 +25,7 @@ from ..forms import (
     EntryBookmarksChoiceForm,
     OmniSearchForm,
 )
-from ..forms import EntryChoiceArgsExtractor
+from ..queryfilters import EntryFilter
 from ..views import ContextData
 from ..prjconfig import Configuration
 
@@ -37,10 +37,10 @@ class EntriesSearchListView(generic.ListView):
     template_name = str(ContextData.get_full_template("linkdatacontroller_list.html"))
 
     def get_queryset(self):
-        self.extractor = EntryChoiceArgsExtractor(self.request.GET)
-        self.extractor.get_sources()
-        self.extractor.set_time_constrained(False)
-        return self.extractor.get_filtered_objects()
+        self.query_filter = EntryFilter(self.request.GET)
+        self.query_filter.get_sources()
+        self.query_filter.set_time_constrained(False)
+        return self.query_filter.get_filtered_objects()
 
     def get_reset_link(self):
         return reverse("{}:entries-search-init".format(ContextData.app_name))
@@ -68,16 +68,16 @@ class EntriesSearchListView(generic.ListView):
         context["rss_are_fetched"] = queue_size > 0
         context["rss_queue_size"] = queue_size
 
-        adict = self.extractor.get_entry_filter_args()
+        adict = self.query_filter.get_entry_filter_args()
 
         self.filter_form = self.get_form(adict)
-        self.filter_form.create(self.extractor.sources)
+        self.filter_form.create(self.query_filter.sources)
         self.filter_form.is_valid()
 
         self.filter_form.method = "GET"
         self.filter_form.action_url = self.get_form_action_link()
 
-        context["args_extractor"] = self.extractor
+        context["query_filter"] = self.query_filter
         context["reset_link"] = self.get_reset_link()
 
         context["filter_form"] = self.filter_form
@@ -95,10 +95,10 @@ class EntriesRecentListView(EntriesSearchListView):
     paginate_by = 100
 
     def get_queryset(self):
-        self.extractor = EntryChoiceArgsExtractor(self.request.GET)
-        self.extractor.get_sources()
-        # self.extractor.set_time_constrained(False)
-        return self.extractor.get_filtered_objects()
+        self.query_filter = EntryFilter(self.request.GET)
+        self.query_filter.get_sources()
+        # self.query_filter.set_time_constrained(False)
+        return self.query_filter.get_filtered_objects()
 
     def get_reset_link(self):
         return reverse("{}:entries-recent-init".format(ContextData.app_name))
@@ -119,10 +119,10 @@ class EntriesNotTaggedView(EntriesSearchListView):
     paginate_by = 100
 
     def get_queryset(self):
-        self.extractor = EntryChoiceArgsExtractor(self.request.GET)
-        self.extractor.set_time_constrained(False)
-        self.extractor.get_sources()
-        return self.extractor.get_filtered_objects(
+        self.query_filter = EntryFilter(self.request.GET)
+        self.query_filter.set_time_constrained(False)
+        self.query_filter.get_sources()
+        return self.query_filter.get_filtered_objects(
             Q(tags__tag__isnull=True, persistent=True)
         )
 
@@ -145,10 +145,10 @@ class EntriesBookmarkedListView(EntriesSearchListView):
     paginate_by = 100
 
     def get_queryset(self):
-        self.extractor = EntryChoiceArgsExtractor(self.request.GET)
-        self.extractor.set_time_constrained(False)
-        self.extractor.get_sources()
-        return self.extractor.get_filtered_objects(Q(persistent=True))
+        self.query_filter = EntryFilter(self.request.GET)
+        self.query_filter.set_time_constrained(False)
+        self.query_filter.get_sources()
+        return self.query_filter.get_filtered_objects(Q(persistent=True))
 
     def get_reset_link(self):
         return reverse("{}:entries-bookmarked-init".format(ContextData.app_name))
@@ -170,10 +170,10 @@ class EntriesArchiveListView(EntriesSearchListView):
     template_name = str(ContextData.get_full_template("linkdatacontroller_list.html"))
 
     def get_queryset(self):
-        self.extractor = EntryChoiceArgsExtractor(self.request.GET)
-        self.extractor.get_sources()
-        self.extractor.set_archive_source(True)
-        return self.extractor.get_filtered_objects()
+        self.query_filter = EntryFilter(self.request.GET)
+        self.query_filter.get_sources()
+        self.query_filter.set_archive_source(True)
+        return self.query_filter.get_filtered_objects()
 
     def get_reset_link(self):
         return reverse("{}:entries-archived-init".format(ContextData.app_name))
@@ -668,10 +668,10 @@ def wayback_save(request, pk):
 def entries_json(request):
 
     # Data
-    extractor = EntryChoiceArgsExtractor(request.GET)
-    extractor.get_sources()
-    extractor.set_time_constrained(False)
-    links = extractor.get_filtered_objects()
+    query_filter = EntryFilter(request.GET)
+    query_filter.get_sources()
+    query_filter.set_time_constrained(False)
+    links = query_filter.get_filtered_objects()
 
     json_obj = {'links' : []}
 
