@@ -6,7 +6,7 @@ from django.urls import reverse
 
 from .models import SourceDataModel, LinkDataModel, ArchiveLinkDataModel, UserConfig
 from .basictypes import *
-from .prjconfig import Configuration
+from .configuration import Configuration
 from .apps import LinkDatabase
 
 

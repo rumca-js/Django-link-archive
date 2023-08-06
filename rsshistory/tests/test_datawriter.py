@@ -8,7 +8,7 @@ from django.urls import reverse
 
 from ..models import ConfigurationEntry, PersistentInfo
 from ..controllers import SourceDataController, LinkDataController
-from ..prjconfig import Configuration
+from ..configuration import Configuration
 from ..datawriter import DataWriter
 
 

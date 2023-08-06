@@ -44,6 +44,7 @@ urlpatterns = [
     path("entries-bookmarked-init", viewentries.entries_bookmarked_init, name="entries-bookmarked-init"),
     path("entries-recent-init", viewentries.entries_recent_init, name="entries-recent-init"),
     path("entries-omni-search", viewentries.EntriesOmniListView.as_view(), name="entries-omni-search"),
+    path("entries-remove-all", viewentries.entries_remove_all, name="entries-remove-all"),
     path("entry/<int:pk>/", viewentries.EntryDetailView.as_view(), name="entry-detail"),
     path("entry-archived/<int:pk>/", viewentries.EntryArchivedDetailView.as_view(), name="entry-archived"),
     path("entry-add", viewentries.add_entry, name="entry-add"),
@@ -71,20 +72,18 @@ urlpatterns = [
     path("entry-comment-remove/<int:pk>/", viewcomments.entry_comment_remove, name="entry-comment-remove",),
     # vote
     path("entry-vote/<int:pk>/", viewtags.entry_vote, name="entry-vote"),
-    # custom views
+    # admin views
     path("robots.txt", TemplateView.as_view(template_name="robots.txt", content_type="text/plain")),
     path("admin-page/", viewcustom.admin_page, name="admin-page"),
     path("user-config", viewcustom.user_config, name="user-config"),
     path("configuration/", viewcustom.configuration_page, name="configuration"),
     path("system-status/", viewcustom.system_status, name="system-status"),
     path("about/", viewcustom.about, name="about"),
+    # background jobs
     path("backgroundjobs/", viewcustom.BackgroundJobsView.as_view(), name="backgroundjobs",),
-    path("persistentinfos/", viewcustom.PersistentInfoView.as_view(), name="persistentinfos",),
+    path("backgroundjobs-perform-all/", viewcustom.backgroundjobs_perform_all, name="backgroundjobs-perform-all",),
     path("backgroundjob-remove/<int:pk>/", viewcustom.backgroundjob_remove, name="backgroundjob-remove",),
     path("backgroundjobs-remove/<str:job_type>/", viewcustom.backgroundjobs_remove, name="backgroundjobs-remove",),
-    path("domains/", viewcustom.DomainsListView.as_view(), name="domains",),
-    path("domain-remove/<int:pk>/", viewcustom.domain_remove, name="domain-remove",),
-    path("domains-fix/", viewcustom.domains_fix, name="domain-fix",),
     path("write-bookmarks", viewcustom.write_bookmarks, name="write-bookmarks"),
     path("write-daily-data-form", viewcustom.write_daily_data_form, name="write-daily-data-form",),
     path("write-tag-form", viewcustom.write_tag_form, name="write-tag-form"),
@@ -94,6 +93,12 @@ urlpatterns = [
     path("import-sources", viewcustom.import_sources, name="import-sources"),
     path("import-reading-list", viewcustom.import_reading_list_view, name="import-reading-list",),
     path("check-move-archive", viewcustom.check_if_move_to_archive, name="check-move-archive",),
+    # persistant infos
+    path("persistentinfos/", viewcustom.PersistentInfoView.as_view(), name="persistentinfos",),
+    # domains
+    path("domains/", viewcustom.DomainsListView.as_view(), name="domains",),
+    path("domain-remove/<int:pk>/", viewcustom.domain_remove, name="domain-remove",),
+    path("domains-fix/", viewcustom.domains_fix, name="domain-fix",),
     # debug forms
     path("import-source-ia/<int:pk>/", viewcustom.import_source_from_ia, name="import-source-ia",),
     path("truncate-errors", viewcustom.truncate_errors, name="truncate-errors"),

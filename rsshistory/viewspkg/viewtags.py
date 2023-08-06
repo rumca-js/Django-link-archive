@@ -5,7 +5,7 @@ from django.shortcuts import render
 from datetime import datetime, timedelta
 
 from ..models import LinkTagsDataModel
-from ..prjconfig import Configuration
+from ..configuration import Configuration
 from ..forms import ConfigForm
 from ..views import ContextData
 from ..controllers import LinkDataController

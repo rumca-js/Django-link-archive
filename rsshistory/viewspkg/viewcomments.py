@@ -9,7 +9,7 @@ from ..models import (
     LinkTagsDataModel,
     LinkCommentDataModel,
 )
-from ..prjconfig import Configuration
+from ..configuration import Configuration
 from ..forms import CommentEntryForm
 from ..views import ContextData
 from ..controllers import LinkCommentDataController, LinkDataController

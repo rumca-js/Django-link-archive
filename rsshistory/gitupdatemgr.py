@@ -24,10 +24,6 @@ class GitUpdateManager(object):
 
             PersistentInfo.create("Pushing data to git: Done")
 
-            yesterday = DateUtils.get_date_yesterday()
-            new_history = RssSourceExportHistory(date=yesterday)
-            new_history.save()
-
         except Exception as e:
             log = logging.getLogger(self._cfg.app_name)
             error_text = traceback.format_exc()
@@ -94,30 +90,3 @@ class GitUpdateManager(object):
         repo.add([])
         repo.commit(DateUtils.get_dir4date(yesterday))
         repo.push()
-
-    def clear_old_entries(self):
-        log = logging.getLogger(self._cfg.app_name)
-
-        sources = SourceDataController.objects.all()
-        for source in sources:
-            if not source.is_removeable():
-                continue
-
-            days = source.get_days_to_remove()
-            if days > 0:
-                current_time = DateUtils.get_datetime_now_utc()
-                days_before = current_time - timedelta(days=days)
-
-                entries = LinkDataController.objects.filter(
-                    source=source.url, persistent=False, date_published__lt=days_before
-                )
-                if entries.exists():
-                    PersistentInfo.create(
-                        "Removing old RSS data for source: {0} {1}".format(
-                            source.url, source.title
-                        )
-                    )
-                    entries.delete()
-
-    def push_old_links_to_archive(self):
-        LinkDataController.move_all_to_archive()

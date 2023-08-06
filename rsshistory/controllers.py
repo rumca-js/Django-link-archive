@@ -233,7 +233,7 @@ class LinkDataController(LinkDataModel):
         else:
             return None
 
-    def move_all_to_archive():
+    def move_old_links_to_archive():
         from .dateutils import DateUtils
 
         current_time = DateUtils.get_datetime_now_utc()
@@ -250,6 +250,28 @@ class LinkDataController(LinkDataModel):
                 entry.move_to_archive()
             elif entry.get_source_obj().get_days_to_remove() == 0:
                 entry.move_to_archive()
+
+    def clear_old_entries():
+        sources = SourceDataController.objects.all()
+        for source in sources:
+            if not source.is_removeable():
+                continue
+
+            days = source.get_days_to_remove()
+            if days > 0:
+                current_time = DateUtils.get_datetime_now_utc()
+                days_before = current_time - timedelta(days=days)
+
+                entries = LinkDataController.objects.filter(
+                    source=source.url, persistent=False, date_published__lt=days_before
+                )
+                if entries.exists():
+                    PersistentInfo.create(
+                        "Removing old RSS data for source: {0} {1}".format(
+                            source.url, source.title
+                        )
+                    )
+                    entries.delete()
 
 
 class ArchiveLinkDataController(ArchiveLinkDataModel):

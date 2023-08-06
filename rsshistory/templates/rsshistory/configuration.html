@@ -5,9 +5,15 @@
 <h1>Config</h1>
 
 <form action="{{config_form.action_url}}" method="{{config_form.method}}">
-     {% csrf_token %}
-     {{config_form}}
-     <input type="submit" value="Submit">
+    <table>
+        {% csrf_token %}
+        {{config_form}}
+        <tr>
+            <td>
+                <input type="submit" value="Submit">
+            </td>
+        </tr>
+    </table>
 </form>
 
 {% endblock %}

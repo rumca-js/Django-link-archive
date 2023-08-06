@@ -5,40 +5,43 @@
 <h1>Info</h1>
 
 <ul>
- <li>Version: {{app_version}}</li>
- <li>Current time: {{Current_DateTime}}</li>
- <li>Sources: {{SourceDataModel}}</li>
- <li>Entries: {{LinkDataModel}}</li>
- <li>Tags length: {{LinkTagsDataModel}}</li>
- <li>Configurations: {{ConfigurationEntry}}</li>
- <li>UserConfig: {{UserConfig}}</li>
- <li>BackgroundJob: {{BackgroundJob}}</li>
+    <li>Version: {{app_version}}</li>
+    <li>Current time: {{Current_DateTime}}</li>
+    <li>Sources: {{SourceDataModel}}</li>
+    <li>Entries: {{LinkDataModel}}</li>
+    <li>Tags length: {{LinkTagsDataModel}}</li>
+    <li>Configurations: {{ConfigurationEntry}}</li>
+    <li>UserConfig: {{UserConfig}}</li>
+    <li>BackgroundJob: {{BackgroundJob}}</li>
 </ul>
 
 <h1>Jobs</h1>
 <ul>
-  <li><a href="{% url 'rsshistory:backgroundjobs' %}" class="simplebutton">View Background Jobs</a></li>
+    <a href="{% url 'rsshistory:backgroundjobs' %}" class="simplebutton">View Background Jobs</a>
+    <a href="{% url 'rsshistory:backgroundjobs-perform-all' %}" class="simplebutton">Process all background jobs</a>
+
     {% for thread in thread_list %}
-       <li>{{ thread.get_thread_name }}: Current processing: {{ thread.get_process_item }}</li>
+    <li>{{ thread.get_thread_name }}: Current processing: {{ thread.get_process_item }}</li>
     {% endfor %}
 </ul>
 
 <h1>Server log</h1>
 <p>
-<ul>
-  <li><a href="{% url 'rsshistory:persistentinfos' %}" class="simplebutton">View all persistent infos</a></li>
-  <li><a href="{% url 'rsshistory:truncate-errors' %}" class="simplebutton">Truncate errors</a></li>
-</ul>
-{% for log_item in log_items %}
-   <div>{{ log_item.date }} {{log_item.level}} {{ log_item.info }}</div>
-{% endfor %}
+    <ul>
+        <a href="{% url 'rsshistory:persistentinfos' %}" class="simplebutton">View all persistent infos</a>
+        <a href="{% url 'rsshistory:truncate-errors' %}" class="simplebutton">Truncate errors</a>
+    </ul>
+    
+    {% for log_item in log_items %}
+    <div>{{ log_item.date }} {{log_item.level}} {{ log_item.info }}</div>
+    {% endfor %}
 </p>
 
 <h1>Export history</h1>
 <p>
-{% for ihist in export_history_list %}
-    <div>{{ihist.date}}</div>
-{% endfor %}
+     {% for ihist in export_history_list %}
+     <div>{{ihist.date}}</div>
+     {% endfor %}
 </p>
 
 {% endblock %}

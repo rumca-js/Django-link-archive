@@ -4,7 +4,7 @@ from django.shortcuts import render
 from django.http import JsonResponse
 
 from ..models import BackgroundJob
-from ..prjconfig import Configuration
+from ..configuration import Configuration
 from ..forms import SourceForm, SourcesChoiceForm, ConfigForm
 from ..queryfilters import SourceFilter
 from ..views import ContextData

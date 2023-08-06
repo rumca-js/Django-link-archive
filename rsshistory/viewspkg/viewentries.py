@@ -27,7 +27,7 @@ from ..forms import (
 )
 from ..queryfilters import EntryFilter
 from ..views import ContextData
-from ..prjconfig import Configuration
+from ..configuration import Configuration
 
 
 class EntriesSearchListView(generic.ListView):
@@ -72,6 +72,7 @@ class EntriesSearchListView(generic.ListView):
 
         self.filter_form = self.get_form(adict)
         self.filter_form.create(self.query_filter.sources)
+
         self.filter_form.is_valid()
 
         self.filter_form.method = "GET"
@@ -681,3 +682,17 @@ def entries_json(request):
 
     # JsonResponse
     return JsonResponse(json_obj)
+
+
+def entries_remove_all(request):
+    context = ContextData.get_context(request)
+    context["page_title"] += " - Remove all entries"
+
+    if not request.user.is_staff:
+        return ContextData.render(request, "missing_rights.html", context)
+
+    LinkDataController.objects.all().delete()
+
+    context["summary_text"] = "Removed all entries"
+
+    return ContextData.render(request, "summary_present.html", context)

@@ -23,6 +23,7 @@ from .controllers import (
     LinkDataController,
     SourceDataController,
 )
+from .configuration import Configuration
 
 
 class BaseJobHandler(object):
@@ -390,7 +391,7 @@ class ImportSourcesJobHandler(BaseJobHandler):
                 for export_name in export_names:
                     create_args[export_name] = json_source[export_name]
 
-                SourceDataController.objects.create(create_args)
+                SourceDataController.objects.create(**create_args)
 
 
 class WriteBookmarksJobHandler(BaseJobHandler):
@@ -406,7 +407,7 @@ class WriteBookmarksJobHandler(BaseJobHandler):
 
     def process(self, obj=None):
         try:
-            from .prjconfig import Configuration
+            from .configuration import Configuration
             from .datawriter import DataWriter
 
             # some changes could be done externally. Through apache.
@@ -478,8 +479,9 @@ class PushToRepoJobHandler(BaseJobHandler):
                 git_mgr = GitUpdateManager(self._config)
                 git_mgr.write_and_push_to_git()
 
-                git_mgr.clear_old_entries()
-                git_mgr.push_old_links_to_archive()
+                yesterday = DateUtils.get_date_yesterday()
+                new_history = RssSourceExportHistory(date=yesterday)
+                new_history.save()
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.error("Exception: {} {}".format(str(e), error_text))
@@ -529,14 +531,17 @@ class RefreshThreadHandler(object):
 
         conf = ConfigurationEntry.get()
 
-        if conf.is_bookmark_repo_set() or conf.is_daily_repo_set():
-            if RssSourceExportHistory.is_update_required():
+        if RssSourceExportHistory.is_update_required():
+            if conf.is_bookmark_repo_set() or conf.is_daily_repo_set():
                 BackgroundJobController.push_to_repo()
 
                 if ConfigurationEntry.get().source_archive:
                     sources = SourceDataController.objects.all()
                     for source in sources:
                         BackgroundJobController.link_archive(source.url)
+
+            LinkDataController.clear_old_entries()
+            LinkDataController.move_old_links_to_archive()
 
 
 class HandlerManager(object):
@@ -577,7 +582,7 @@ class HandlerManager(object):
         return []
 
     def process_all(self):
-        from .prjconfig import Configuration
+        from .configuration import Configuration
 
         config = Configuration.get_object()
 

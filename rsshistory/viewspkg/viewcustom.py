@@ -6,7 +6,7 @@ from django.views import generic
 from django.urls import reverse
 from django.shortcuts import render
 
-from ..prjconfig import Configuration
+from ..configuration import Configuration
 from ..models import (
     LinkTagsDataModel,
     ConfigurationEntry,
@@ -704,7 +704,12 @@ def test_page(request):
 
     summary_text = ""
 
-    # LinkDataController.move_all_to_archive()
+    from ..threadhandlers import ImportSourcesJobHandler
+
+    handler = ImportSourcesJobHandler()
+    handler.process()
+
+    # LinkDataController.move_old_links_to_archive()
 
     # items = LinkDataController.objects.filter(source="https://pluralistic.net/feed")
     # items.delete()
@@ -869,6 +874,25 @@ def backgroundjob_remove(request, pk):
     bg.delete()
 
     context["summary_text"] = "Background job has been removed"
+
+    return ContextData.render(request, "summary_present.html", context)
+
+
+def backgroundjobs_perform_all(request):
+    context = ContextData.get_context(request)
+    context["page_title"] += " - Background perform all"
+
+    if not request.user.is_staff:
+        return ContextData.render(request, "missing_rights.html", context)
+
+    from ..threadhandlers import HandlerManager, RefreshThreadHandler
+    refresh_handler = RefreshThreadHandler()
+    refresh_handler.refresh()
+
+    mgr = HandlerManager()
+    mgr.process_all()
+
+    context["summary_text"] = "Background jobs have been processed"
 
     return ContextData.render(request, "summary_present.html", context)
 
