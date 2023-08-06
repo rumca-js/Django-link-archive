@@ -74,11 +74,8 @@ def system_status(request):
 
     from ..models import YouTubeMetaCache, YouTubeReturnDislikeMetaCache
 
-    context["YouTubeMetaCache"] = len(YouTubeMetaCache.objects.all())
-    context["YouTubeReturnDislikeMetaCache"] = len(
-        YouTubeReturnDislikeMetaCache.objects.all()
-    )
     context["SourceDataModel"] = len(SourceDataController.objects.all())
+    context["LinkDataModel"] = len(LinkDataController.objects.all())
     context["LinkTagsDataModel"] = len(LinkTagsDataModel.objects.all())
     context["ConfigurationEntry"] = len(ConfigurationEntry.objects.all())
     context["UserConfig"] = len(UserConfig.objects.all())
@@ -97,6 +94,13 @@ def system_status(request):
     context["export_history_list"] = history
 
     return ContextData.render(request, "system_status.html", context)
+
+
+def about(request):
+    context = ContextData.get_context(request)
+    context["page_title"] += " - About"
+
+    return ContextData.render(request, "about.html", context)
 
 
 def import_reading_list_view(request):

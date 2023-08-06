@@ -77,6 +77,7 @@ urlpatterns = [
     path("user-config", viewcustom.user_config, name="user-config"),
     path("configuration/", viewcustom.configuration_page, name="configuration"),
     path("system-status/", viewcustom.system_status, name="system-status"),
+    path("about/", viewcustom.about, name="about"),
     path("backgroundjobs/", viewcustom.BackgroundJobsView.as_view(), name="backgroundjobs",),
     path("persistentinfos/", viewcustom.PersistentInfoView.as_view(), name="persistentinfos",),
     path("backgroundjob-remove/<int:pk>/", viewcustom.backgroundjob_remove, name="backgroundjob-remove",),
