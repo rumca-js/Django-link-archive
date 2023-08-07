@@ -671,6 +671,7 @@ def entries_json(request):
     # Data
     query_filter = EntryFilter(request.GET)
     query_filter.get_sources()
+    query_filter.use_page_limit = True
     query_filter.set_time_constrained(False)
     links = query_filter.get_filtered_objects()
 

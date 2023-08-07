@@ -6,6 +6,7 @@ from .controllers import SourceDataController, LinkDataController, ArchiveLinkDa
 class SourceFilter(object):
     def __init__(self, args):
         self.args = args
+        self.use_page_limit = False
 
     def get_filtered_objects(self, input_query=None):
         parameter_map = self.get_filter_args()
@@ -16,6 +17,12 @@ class SourceFilter(object):
             self.filtered_objects = SourceDataController.objects.filter(
                 Q(**parameter_map) & input_query
             )
+
+        if self.use_page_limit:
+            limit_range = self.get_limit()
+            if limit_range:
+                self.filtered_objects = self.filtered_objects[limit_range[0]: limit_range[1]]
+
         return self.filtered_objects
 
     def get_filter_args(self, translate=False):
@@ -35,6 +42,21 @@ class SourceFilter(object):
 
         return parameter_map
 
+    def get_limit(self):
+        if 'page' in self.args:
+            page = int(self.args['page'])
+        else:
+            page = 1
+
+        from .viewspkg.viewsources import RssSourceListView
+        paginate_by = int(RssSourceListView.paginate_by)
+        # for page 1, paginate_by 100  we have range 0..99
+        # for page 2, paginate_by 100  we have range 100..199
+
+        start = (page-1)*paginate_by
+
+        return [start, start + paginate_by]
+
     def get_filter_string(self):
         infilters = self.get_filter_args()
 
@@ -50,10 +72,26 @@ class EntryFilter(object):
     def __init__(self, args):
         self.args = args
         self.time_constrained = True
+        self.use_page_limit = False
         if "archive" in self.args and self.args["archive"] == "on":
             self.archive_source = True
         else:
             self.archive_source = False
+
+    def get_limit(self):
+        if 'page' in self.args:
+            page = int(self.args['page'])
+        else:
+            page = 1
+
+        from .viewspkg.viewentries import EntriesSearchListView
+        paginate_by = int(EntriesSearchListView.paginate_by)
+        # for page 1, paginate_by 100  we have range 0..99
+        # for page 2, paginate_by 100  we have range 100..199
+
+        start = (page-1)*paginate_by
+
+        return [start, start + paginate_by]
 
     def get_sources(self):
         self.sources = SourceDataController.objects.all()
@@ -76,7 +114,7 @@ class EntryFilter(object):
             if self.archive_source:
                 self.entries = ArchiveLinkDataController.objects.filter(
                     **entry_parameter_map
-                    )[:self.get_hard_query_limit()]
+                    )
         else:
             if not self.archive_source:
                 self.entries = LinkDataController.objects.filter(
@@ -85,7 +123,12 @@ class EntryFilter(object):
             if self.archive_source:
                 self.entries = ArchiveLinkDataController.objects.filter(
                     Q(**entry_parameter_map) & input_query
-                    )[:self.get_hard_query_limit()]
+                    )
+
+        if self.use_page_limit:
+            limit_range = self.get_limit()
+            if limit_range:
+                self.entries = self.entries[limit_range[0]: limit_range[1]]
 
         return self.entries
 

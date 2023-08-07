@@ -9,20 +9,22 @@ from ..apps import LinkDatabase
 
 
 class ConfigurationEntry(models.Model):
+    sources_refresh_period = models.IntegerField(default=3600)
+    link_archive = models.BooleanField(default=True)
+    source_archive = models.BooleanField(default=True)
+
     data_import_path = models.CharField(
         default="./data/imports", max_length=2000, null=True
     )
     data_export_path = models.CharField(
         default="./data/exports", max_length=2000, null=True
     )
+
     git_path = models.CharField(default="./data/git", max_length=2000, null=True)
     git_user = models.CharField(default="", max_length=2000, null=True)
     git_token = models.CharField(default="", max_length=2000, null=True)
     git_repo = models.CharField(default="", max_length=2000, null=True)
     git_daily_repo = models.CharField(default="", max_length=2000, null=True)
-    sources_refresh_period = models.IntegerField(default=3600)
-    link_archive = models.BooleanField(default=True)
-    source_archive = models.BooleanField(default=True)
 
     def get():
         confs = ConfigurationEntry.objects.all()

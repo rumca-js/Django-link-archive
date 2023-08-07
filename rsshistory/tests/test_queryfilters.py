@@ -173,3 +173,36 @@ class FiltersTest(TestCase):
 
         self.assertTrue( "unsupported" not in filter_args)
 
+    def test_source_filter_limit(self):
+        args = {'title' : 'link', "category" : "none", "subcategory" : "none", "notsupported" : "none", "page" : "1"}
+
+        thefilter = SourceFilter(args)
+        limit = thefilter.get_limit()
+
+        self.assertEqual(limit[0], 0)
+        self.assertEqual(limit[1], 100)
+
+        args = {'title' : 'link', "category" : "none", "subcategory" : "none", "notsupported" : "none", "page" : "2"}
+
+        thefilter = SourceFilter(args)
+        limit = thefilter.get_limit()
+
+        self.assertEqual(limit[0], 100)
+        self.assertEqual(limit[1], 200)
+
+    def test_entry_filter_limit(self):
+        args = {'title' : 'link', "category" : "none", "subcategory" : "none", "notsupported" : "none", "page" : "1"}
+
+        thefilter = EntryFilter(args)
+        limit = thefilter.get_limit()
+
+        self.assertEqual(limit[0], 0)
+        self.assertEqual(limit[1], 100)
+
+        args = {'title' : 'link', "category" : "none", "subcategory" : "none", "notsupported" : "none", "page" : "2"}
+
+        thefilter = EntryFilter(args)
+        limit = thefilter.get_limit()
+
+        self.assertEqual(limit[0], 100)
+        self.assertEqual(limit[1], 200)

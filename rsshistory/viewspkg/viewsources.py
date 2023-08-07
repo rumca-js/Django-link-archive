@@ -405,6 +405,7 @@ def sources_json(request):
 
     # Data
     query_filter = SourceFilter(request.GET)
+    query_filter.use_page_limit = True
     sources = query_filter.get_filtered_objects()
 
     json_obj = {'sources' : []}
