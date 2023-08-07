@@ -340,7 +340,8 @@ def add_entry(request):
             if ob.exists():
                 context["entry"] = ob[0]
 
-            Domains.add(data["link"])
+            if ConfigurationEntry.get().store_domain_info:
+                Domains.add(data["link"])
 
             if ConfigurationEntry.get().link_archive:
                 BackgroundJobController.link_archive(data["link"])

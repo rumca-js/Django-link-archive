@@ -11,15 +11,17 @@ from .models.linkmodels import (
     LinkDataModel,
     ArchiveLinkDataModel,
 )
-from .models.appmodels import (
+from .models import (
     BackgroundJob,
     PersistentInfo,
-)
-from .models.sourcemodels import (
+    ConfigurationEntry,
     SourceDataModel,
     SourceOperationalData,
-)
-from .models import LinkCommentDataModel, LinkTagsDataModel, LinkVoteDataModel, Domains
+    LinkCommentDataModel,
+    LinkTagsDataModel,
+    LinkVoteDataModel,
+    Domains,
+    )
 from .webtools import Page
 
 from .apps import LinkDatabase
@@ -32,8 +34,9 @@ class SourceDataController(SourceDataModel):
     def add(source_data_map):
         # TODO add domain when adding new source
         SourceDataModel.objects.create(**source_data_map)
-
-        Domains.add(source_data_map["url"])
+        
+        if ConfigurationEntry.get().store_domain_info:
+            Domains.add(source_data_map["url"])
 
     def get_absolute_url(self):
         """Returns the URL to access a particular author instance."""

@@ -17,8 +17,8 @@
 
 <h1>Jobs</h1>
 <ul>
-    <a href="{% url 'rsshistory:backgroundjobs' %}" class="simplebutton">View Background Jobs</a>
-    <a href="{% url 'rsshistory:backgroundjobs-perform-all' %}" class="simplebutton">Process all background jobs</a>
+    <a href="{% url 'rsshistory:backgroundjobs' %}" title="View background jobs" class="simplebutton">View Background Jobs</a>
+    <a href="{% url 'rsshistory:backgroundjobs-perform-all' %}" title="Refresh and process all" class="simplebutton">Refresh and process all</a>
 
     {% for thread in thread_list %}
     <li>{{ thread.get_thread_name }}: Current processing: {{ thread.get_process_item }}</li>
@@ -28,8 +28,8 @@
 <h1>Server log</h1>
 <p>
     <ul>
-        <a href="{% url 'rsshistory:persistentinfos' %}" class="simplebutton">View all persistent infos</a>
-        <a href="{% url 'rsshistory:truncate-errors' %}" class="simplebutton">Truncate errors</a>
+        <a href="{% url 'rsshistory:persistentinfos' %}" title="View all persistent infos" class="simplebutton">View all persistent infos</a>
+        <a href="{% url 'rsshistory:truncate-errors' %}" title="Truncate errors" class="simplebutton">Truncate errors</a>
     </ul>
     
     {% for log_item in log_items %}

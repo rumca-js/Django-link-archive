@@ -33,11 +33,12 @@ class ConfigForm(forms.ModelForm):
     class Meta:
         model = ConfigurationEntry
         fields = [
-            "data_export_path",
-            "data_import_path",
+            "sources_refresh_period",
             "link_archive",
             "source_archive",
-            "sources_refresh_period",
+            "store_domain_info",
+            "data_export_path",
+            "data_import_path",
             "git_path",
             "git_repo",
             "git_daily_repo",
