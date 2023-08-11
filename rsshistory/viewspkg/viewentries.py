@@ -667,6 +667,22 @@ def wayback_save(request, pk):
     return ContextData.render(request, "summary_present.html", context)
 
 
+def entry_json(request, pk):
+
+    links = LinkDataController.objects.filter(id=pk)
+
+    if len(links) == 0:
+        context["summary_text"] = "No such link in the database {}".format(pk)
+        return ContextData.render(request, "summary_present.html", context)
+
+    link = links[0]
+
+    link_map = link.get_map_full()
+
+    # JsonResponse
+    return JsonResponse(link_map)
+
+
 def entries_json(request):
 
     # Data

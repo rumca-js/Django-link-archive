@@ -48,5 +48,8 @@
     <a href="{% url 'rsshistory:source-remove' object.id %}" class="simplebutton">Remove source</a>
     <a href="{% url 'rsshistory:source-remove-entries' object.id %}" class="simplebutton">Remove entries</a>
     </p>
+    <p>
+    <a href="{% url 'rsshistory:source-json' object.id %}" class="simplebutton">Show JSON</a>
+    </p>
   {% endif %}
 {% endblock %}

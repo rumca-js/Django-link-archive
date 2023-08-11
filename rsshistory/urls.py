@@ -18,6 +18,7 @@ urlpatterns = [
     # sources
     path("sources/", viewsources.RssSourceListView.as_view(), name="sources"),
     path("source/<int:pk>/", viewsources.RssSourceDetailView.as_view(), name="source-detail"),
+    path("source-json/<int:pk>", viewsources.source_json, name="source-json"),
     path("sources-json/", viewsources.sources_json, name="sources-json"),
     path("source-add", viewsources.add_source, name="source-add"),
     path("source-add-simple", viewsources.add_source_simple, name="source-add-simple"),
@@ -46,6 +47,7 @@ urlpatterns = [
     path("entries-omni-search", viewentries.EntriesOmniListView.as_view(), name="entries-omni-search"),
     path("entries-remove-all", viewentries.entries_remove_all, name="entries-remove-all"),
     path("entry/<int:pk>/", viewentries.EntryDetailView.as_view(), name="entry-detail"),
+    path("entry-json/<int:pk>/", viewentries.entry_json, name="entry-json"),
     path("entry-archived/<int:pk>/", viewentries.EntryArchivedDetailView.as_view(), name="entry-archived"),
     path("entry-add", viewentries.add_entry, name="entry-add"),
     path("entry-add-simple", viewentries.add_simple_entry, name="entry-add-simple"),

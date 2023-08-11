@@ -422,3 +422,19 @@ class EnhancedViewTest(ViewsTest):
             subcategory="No",
             export_to_cms=False,
         )
+
+    def test_source_json(self):
+        sources = SourceDataController.objects.filter(url__icontains = "https://youtube")
+
+        url = reverse("{}:source-json".format(LinkDatabase.name), args=[sources[0].id])
+        resp = self.client.get(url)
+
+        self.assertEqual(resp.status_code, 200)
+
+    def test_entry_json(self):
+        entries = LinkDataController.objects.filter(link__icontains = "https://youtube")
+
+        url = reverse("{}:entry-json".format(LinkDatabase.name), args=[entries[0].id])
+        resp = self.client.get(url)
+
+        self.assertEqual(resp.status_code, 200)

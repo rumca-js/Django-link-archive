@@ -109,6 +109,11 @@
     <a href="{% url 'rsshistory:entry-comment-add' object.id %}" class="simplebutton">Add comment</a>
   {% endif %}
   </p>
+
 {% endif %}
+
+  <p>
+    <a href="{% url 'rsshistory:entry-json' object.id %}" class="simplebutton">Show JSON</a>
+  </p>
 
 {% endblock %}

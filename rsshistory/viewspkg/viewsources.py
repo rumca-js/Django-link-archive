@@ -401,6 +401,22 @@ def source_fix_entries(request, source_pk):
     return ContextData.render(request, "summary_present.html", context)
 
 
+def source_json(request, pk):
+
+    sources = SourceDataController.objects.filter(id=pk)
+
+    if len(sources) == 0:
+        context["summary_text"] = "No such source in the database {}".format(pk)
+        return ContextData.render(request, "summary_present.html", context)
+
+    source = sources[0]
+
+    source_map = source.get_map_full()
+
+    # JsonResponse
+    return JsonResponse(source_map)
+
+
 def sources_json(request):
 
     # Data
