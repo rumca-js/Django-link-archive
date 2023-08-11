@@ -677,7 +677,7 @@ def entry_json(request, pk):
 
     link = links[0]
 
-    link_map = link.get_map_full()
+    link_map = {"link" : link.get_map_full()}
 
     # JsonResponse
     return JsonResponse(link_map)

@@ -411,7 +411,7 @@ def source_json(request, pk):
 
     source = sources[0]
 
-    source_map = source.get_map_full()
+    source_map = {"source" : source.get_map_full()}
 
     # JsonResponse
     return JsonResponse(source_map)

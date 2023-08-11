@@ -208,7 +208,7 @@
     <p>There are no links.</p>
   {% endif %}
 
-     <a href="{% url 'rsshistory:entries-json' %}?{{ request.GET.urlencode }}" class='simplebutton'>Show as json</a>
+     <a href="{% url 'rsshistory:entries-json' %}?{{ request.GET.urlencode }}" class='simplebutton'>Show JSON</a>
 
   {% if search_term %}
      <a href="https://en.wikipedia.org/w/index.php?search={{search_term}}" class="simplebutton">Ask wikipedia</a>

@@ -94,6 +94,7 @@ urlpatterns = [
     path("import-daily-data", viewcustom.import_daily_data, name="import-daily-data"),
     path("import-sources", viewcustom.import_sources, name="import-sources"),
     path("import-reading-list", viewcustom.import_reading_list_view, name="import-reading-list",),
+    path("import-from-instance", viewcustom.import_from_instance, name="import-from-instance",),
     path("check-move-archive", viewcustom.check_if_move_to_archive, name="check-move-archive",),
     # persistant infos
     path("persistentinfos/", viewcustom.PersistentInfoView.as_view(), name="persistentinfos",),

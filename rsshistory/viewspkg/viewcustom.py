@@ -174,6 +174,40 @@ def import_reading_list_view(request):
     return ContextData.render(request, "summary_present.html", context)
 
 
+def import_from_instance(request):
+    from ..forms import LinkInputForm
+
+    context = ContextData.get_context(request)
+    context["page_title"] += " - Import from instance"
+
+    if not request.user.is_staff:
+        return ContextData.render(request, "missing_rights.html", context)
+
+    if request.method == "POST":
+        form = LinkInputForm(request.POST)
+        if form.is_valid():
+            link = form.cleaned_data["link"]
+
+            from ..serializers.instanceimporter import InstanceImporter
+            ie = InstanceImporter(link)
+            ie.import_all()
+
+            context["summary_text"] = "Imported"
+            return ContextData.render(request, "summary_present.html", context)
+        
+        else:
+            context["summary_text"] = "Form is invalid"
+            return ContextData.render(request, "summary_present.html", context)
+
+    else:
+        form = LinkInputForm()
+        form.method = "POST"
+
+        context["form"] = form
+
+    return ContextData.render(request, "form_basic.html", context)
+
+
 def truncate_errors(request):
     context = ContextData.get_context(request)
     context["page_title"] += " - clearing errors"
