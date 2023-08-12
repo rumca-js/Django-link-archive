@@ -203,6 +203,8 @@ def import_from_instance(request):
         form = LinkInputForm()
         form.method = "POST"
 
+        context["form_title"] = "Instance URL import"
+        context["form_description_pre"] = "Provide URL to another instance od Django-link-archive, the link of JSON data."
         context["form"] = form
 
     return ContextData.render(request, "form_basic.html", context)
