@@ -677,10 +677,12 @@ def entry_json(request, pk):
 
     link = links[0]
 
-    link_map = {"link" : link.get_map_full()}
+    from ..serializers.instanceimporter import InstanceExporter
+    exporter = InstanceExporter()
+    json_obj = exporter.export_link(link)
 
     # JsonResponse
-    return JsonResponse(link_map)
+    return JsonResponse(json_obj)
 
 
 def entries_json(request):
@@ -692,11 +694,9 @@ def entries_json(request):
     query_filter.set_time_constrained(False)
     links = query_filter.get_filtered_objects()
 
-    json_obj = {'links' : []}
-
-    for link in links:
-        link_map = link.get_map_full()
-        json_obj['links'].append(link_map)
+    from ..serializers.instanceimporter import InstanceExporter
+    exporter = InstanceExporter()
+    json_obj = exporter.export_links(links)
 
     # JsonResponse
     return JsonResponse(json_obj)

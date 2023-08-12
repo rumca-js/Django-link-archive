@@ -411,10 +411,12 @@ def source_json(request, pk):
 
     source = sources[0]
 
-    source_map = {"source" : source.get_map_full()}
+    from ..serializers.instanceimporter import InstanceExporter
+    exporter = InstanceExporter()
+    json_obj = exporter.export_source(source)
 
     # JsonResponse
-    return JsonResponse(source_map)
+    return JsonResponse(json_obj)
 
 
 def sources_json(request):
@@ -424,11 +426,9 @@ def sources_json(request):
     query_filter.use_page_limit = True
     sources = query_filter.get_filtered_objects()
 
-    json_obj = {'sources' : []}
-
-    for source in sources:
-        source_map = source.get_map_full()
-        json_obj['sources'].append(source_map)
+    from ..serializers.instanceimporter import InstanceExporter
+    exporter = InstanceExporter()
+    json_obj = exporter.export_sources(sources)
 
     # JsonResponse
     return JsonResponse(json_obj)

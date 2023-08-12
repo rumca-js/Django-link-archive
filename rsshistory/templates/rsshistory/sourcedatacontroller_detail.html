@@ -19,7 +19,7 @@
       <span><strong>Language:</strong> {{ object.language }}, </span>
       <span><strong>Export to CMS:</strong> {{ object.export_to_cms }}, </span>
       <span><strong>Remove after days:</strong> {{ object.remove_after_days }}, </span>
-      <span><strong>Favicon:</strong> {{ object.get_favicon }}</span>
+      <span><strong>Favicon:</strong><a href="{{ object.get_favicon }}" title="{{ object.get_favicon }}">Favicon URL</a>, </span>
       <span><strong>Source type:</strong> {{ object.source_type }}</span>
       <div>Fetched:{{object.get_date_fetched}} Number of entries:{{object.get_number_of_entries}} Import seconds:{{object.get_import_seconds}} </div>
   </p>

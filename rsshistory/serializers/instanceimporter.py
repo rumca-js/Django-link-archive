@@ -3,6 +3,37 @@ import json
 from ..controllers import LinkDataController, SourceDataController
 
 
+class InstanceExporter(object):
+    def __init__(self):
+        pass
+
+    def export_link(self, link):
+        link_map = {"link" : link.get_map_full()}
+        return link_map
+
+    def export_links(self, links):
+        json_obj = {'links' : []}
+
+        for link in links:
+            link_map = link.get_map_full()
+            json_obj['links'].append(link_map)
+
+        return json_obj
+
+    def export_source(self, source):
+        source_map = {"source" : source.get_map_full()}
+        return source_map
+
+    def export_sources(self, sources):
+        json_obj = {'sources' : []}
+
+        for source in sources:
+            source_map = source.get_map_full()
+            json_obj['sources'].append(source_map)
+
+        return json_obj
+
+
 class InstanceImporter(object):
     def __init__(self, url):
         self.url = url
