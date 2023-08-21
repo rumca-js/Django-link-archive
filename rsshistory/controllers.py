@@ -409,6 +409,11 @@ class LinkDataHyperController(object):
             except Exception as e:
                 error_text = traceback.format_exc()
 
+    def read_domains_from_bookmarks():
+        objs = LinkDataModel.objects.filter(persistent=True)
+        for obj in objs:
+            Domains.add(obj.link)
+
 
 class LinkCommentDataController(LinkCommentDataModel):
     class Meta:

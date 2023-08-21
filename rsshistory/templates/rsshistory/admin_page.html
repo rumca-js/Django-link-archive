@@ -1,16 +1,22 @@
 {% extends base_generic %}
-
 {% block content %}
+
+<a href="javascript:history.back()" class="simplebutton">Go Back</a>
 
     <div>
         <h1>Managment links</h1>
         <a href="{% url 'rsshistory:system-status' %}" title="Displays status" class="simplebutton">Status</a>
         <a href="{% url 'rsshistory:configuration' %}" title="Instance configuration" class="simplebutton">Configuration</a>
+        <a href="{% url 'rsshistory:domains' %}" class="simplebutton" title="Domains">Domains</a>
+        <a href="{% url 'rsshistory:backgroundjobs' %}" title="View background jobs" class="simplebutton">Background Jobs</a>
+        <a href="{% url 'rsshistory:logs' %}" title="View all logs" class="simplebutton">Logs</a>
         <a href="{% url 'rsshistory:show-youtube-link-props' %}" title="Shows YouTube properties" class="simplebutton">Show YouTube video properties</a>
+        <a href="/admin" title="User administration" class="simplebutton">User admin</a>
     </div>
 
     <div>
         <h1>Import / export</h1>
+        <a href="{% url 'rsshistory:data-exports' %}" title="Configured Data Exports" class="simplebutton">Configured Data Exports</a>
         <a href="{% url 'rsshistory:import-from-instance' %}" title="Import from another link archive instance" class="simplebutton">Import from instance</a>
         <a href="{% url 'rsshistory:write-bookmarks' %}" class="simplebutton">Write bookmarks</a>
         <a href="{% url 'rsshistory:write-daily-data-form' %}" class="simplebutton">Write daily data</a>
@@ -24,7 +30,6 @@
 
     <div>
         <h1>Advanced</h1>
-        <a href="{% url 'rsshistory:domains' %}" class="simplebutton" title="Known domains">Known domains</a>
         <a href="{% url 'rsshistory:entries-archived-init' %}" class="simplebutton" title="Search archived entries">Search archived entries</a>
         <a href="{% url 'rsshistory:entries-omni-search-init' %}" class="simplebutton">Omni search</a>
         <a href="{% url 'rsshistory:data-errors' %}" class="simplebutton">Show data errors</a>

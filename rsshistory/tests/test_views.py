@@ -10,7 +10,6 @@ from ..controllers import SourceDataController, LinkDataController
 
 class ViewsTest(TestCase):
     def test_index(self):
-        #    w = self.create_whatever()
         url = reverse("{}:index".format(LinkDatabase.name))
         resp = self.client.get(url)
 
@@ -379,10 +378,12 @@ class ViewsTest(TestCase):
 
         self.assertEqual(resp.status_code, 200)
 
+    # Note: do not test import, as it starts importing
+    #
     # def test_import_reading_list(self):
     #    url = reverse("{}:import-reading-list".format(LinkDatabase.name))
     #    resp = self.client.get(url)
-
+    #
     #    self.assertEqual(resp.status_code, 200)
 
 

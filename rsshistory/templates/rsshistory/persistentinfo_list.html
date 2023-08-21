@@ -1,9 +1,14 @@
 {% extends base_generic %}
-
 {% block content %}
-  <ul>
-     <li><a href="{% url 'rsshistory:truncate-errors' %}" class="simplebutton">Truncate errors</a></li>
-  </ul>
+
+<div class="contentbuttonmenu">
+    <a href="javascript:history.back()" class="simplebutton">Go Back</a>
+    <a href="{% url 'rsshistory:truncate-log' %}" title="Truncate" class="simplebutton">Truncate</a>
+    <a href="{% url 'rsshistory:truncate-log-all' %}" title="Truncate all logs" class="simplebutton">Truncate all</a>
+    <a href="{% url 'rsshistory:truncate-log-errors' %}" title="Truncate errors" class="simplebutton">Truncate errors</a>
+</div>
+
+<h1>Persistant info list</h1>
 
   {% if info_list %}
     <table>

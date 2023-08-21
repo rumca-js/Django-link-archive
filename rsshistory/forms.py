@@ -6,7 +6,7 @@ from .models import (
     LinkCommentDataModel,
     LinkVoteDataModel,
 )
-from .models import ConfigurationEntry, UserConfig
+from .models import ConfigurationEntry, UserConfig, DataExport
 from .controllers import SourceDataController, LinkDataController
 
 
@@ -45,7 +45,6 @@ class ConfigForm(forms.ModelForm):
             "git_user",
             "git_token",
         ]
-        widgets = {}
 
     def __init__(self, *args, **kwargs):
         super(ConfigForm, self).__init__(*args, **kwargs)
@@ -54,6 +53,24 @@ class ConfigForm(forms.ModelForm):
         self.fields["git_daily_repo"].required = False
         self.fields["git_user"].required = False
         self.fields["git_token"].required = False
+
+
+class DataExportForm(forms.ModelForm):
+    """
+    Category choice form
+    """
+
+    class Meta:
+        model = DataExport
+        fields = [
+            "enabled",
+            "export_type",
+            "export_data",
+            "local_path",
+            "remote_path",
+            "user",
+            "password",
+        ]
 
 
 class UserConfigForm(forms.ModelForm):
@@ -100,6 +117,7 @@ class SourceInputForm(forms.Form):
 
 class ExportTopicForm(forms.Form):
     tag = forms.CharField(label="Tag", max_length=500)
+    store_domain_info = forms.BooleanField()
 
 
 class YouTubeLinkSimpleForm(forms.Form):

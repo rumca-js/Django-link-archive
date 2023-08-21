@@ -1,22 +1,21 @@
 {% extends base_generic %}
 {% load static %}
-
 {% block content %}
 
-  <a href="{% url 'rsshistory:source-add-simple' %}" class="mainbutton">
-      <img src="{% static 'rsshistory/icons/icons8-channel-add-96.png' %}" class="content-icon" />
+<div class="contentbuttonmenu">
+    <a href="javascript:history.back()" class="simplebutton">Go Back</a>
+
+    <a href="{% url 'rsshistory:source-add-simple' %}" class="simplebutton">
+        <img src="{% static 'rsshistory/icons/icons8-channel-add-96.png' %}" class="content-icon" />
         Add source</a>
-  <a href="{% url 'rsshistory:entry-add-simple' %}" class="mainbutton">
+    <a href="{% url 'rsshistory:entry-add-simple' %}" class="simplebutton">
         <img src="{% static 'rsshistory/icons/icons8-add-link-96.png' %}" class="content-icon" />
         Add entry</a>
 
-  <hr>
-
-  <div>
-  <a href="{% url 'rsshistory:sources' %}" class='simplebutton'>
-      <img src="{% static 'rsshistory/icons/icons8-start-100.png' %}" class="content-icon" />
-      Reset filters</a>
-  </div>
+    <a href="{% url 'rsshistory:sources' %}" class='simplebutton'>
+        <img src="{% static 'rsshistory/icons/icons8-start-100.png' %}" class="content-icon" />
+        Reset filters</a>
+</div>
 
   <form action="{{filter_form.action_url}}" method="{{filter_form.method}}">
       <table>

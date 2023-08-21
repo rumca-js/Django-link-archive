@@ -137,6 +137,10 @@ class Page(object):
         links = set()
 
         cont = str(self.get_contents())
+        url = self.url
+        if url.find("?") >= 0:
+            wh = url.find("?")
+            url = url[:wh]
 
         allt = re.findall("(https?://[a-zA-Z0-9./\-_]+)", cont)
         links.update(set(allt))
@@ -144,14 +148,19 @@ class Page(object):
         allt2 = re.findall('href="([a-zA-Z0-9./\-_]+)', cont)
         for item in allt2:
             if item.find("http") == 0:
-                links.add(item)
+                ready_url = item
             else:
-                url = self.url
-                if not url.endswith("/"):
-                    url = url + "/"
-                if item.startswith("/"):
-                    item = item[1:]
-                links.add(url + item)
+                if item.startswith("//"):
+                    ready_url = self.get_domain() + "/" + item[2:]
+                else:
+                    if not url.endswith("/"):
+                        url = url + "/"
+                    if item.startswith("/"):
+                        item = item[1:]
+
+                    ready_url = url + item
+
+            links.add(ready_url)
 
         return links
 

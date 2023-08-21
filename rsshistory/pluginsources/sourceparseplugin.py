@@ -1,5 +1,6 @@
 import traceback
 import re
+import os
 
 from .sourcegenericplugin import SourceGenericPlugin
 from ..models import PersistentInfo, LinkDataModel
@@ -24,10 +25,12 @@ class BaseParsePlugin(SourceGenericPlugin):
         if not address.startswith(self.source.url):
             return
 
+        split = os.path.splitext(address)
+
         if (
-            address.endswith(".html")
-            or address.endswith(".htm")
-            or address.endswith("/")
+            split[1] == ".html"
+            or split[1] == ".htm"
+            or split[1] == ""
         ):
             search_pattern = self.source.get_domain()
 

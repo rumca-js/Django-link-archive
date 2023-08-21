@@ -1,10 +1,14 @@
 {% extends base_generic %}
 {% load static %}
-
 {% block content %}
+
+<div class="contentbuttonmenu">
+    <a href="javascript:history.back()" class="simplebutton">Go Back</a>
+
     <a href="{{reset_link}}" class='simplebutton'>
       <img src="{% static 'rsshistory/icons/icons8-start-100.png' %}" class="content-icon" />
       Reset filters</a>
+</div>
 
     {% if rss_are_fetched %}
       <span style="color:red">Sources are fetched. Queue size: {{rss_queue_size}} </span>

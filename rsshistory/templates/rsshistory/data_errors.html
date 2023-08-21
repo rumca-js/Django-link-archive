@@ -1,8 +1,7 @@
 {% extends base_generic %}
-
 {% block content %}
 
-<h2>Incorrect youtube links</h2>
+<h1>Incorrect youtube links</h1>
 We should store links in a coherent manner.
 
 <ul>
@@ -16,7 +15,7 @@ We should store links in a coherent manner.
 {% endfor %}
 </ul>
 
-<h2>Link incorrect language</h2>
+<h1>Link incorrect language</h1>
 
 {% for link in links_with_incorrect_language %}
    <div>
@@ -25,7 +24,7 @@ We should store links in a coherent manner.
     </div>
 {% endfor %}
 
-<h2>Tags errors</h2>
+<h1>Tags errors</h1>
 
 <ul>
 {% for tag in tags_for_missing_links %}

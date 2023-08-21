@@ -90,6 +90,7 @@ class UserConfig(models.Model):
     thumbnails_as_icons = models.BooleanField(default=True)
     small_icons = models.BooleanField(default=True)
     links_per_page = models.IntegerField(default=100)
+    karma = models.IntegerField(default=0)
 
     def get(user_name=None):
         """

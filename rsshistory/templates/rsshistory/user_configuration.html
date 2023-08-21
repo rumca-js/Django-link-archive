@@ -1,9 +1,18 @@
 {% extends base_generic %}
 {% load static %}
-
 {% block content %}
 
+<div class="contentbuttonmenu">
+    <a href="javascript:history.back()" class="simplebutton">Go Back</a>
+
+    <a href="{% url 'rsshistory:logout' %}" class="simplebutton">
+                <img src="{% static 'rsshistory/icons/icons8-logout-100.png' %}" class="content-icon" />
+                Logout</a>
+</div>
+
 <h1>User configuration: [{{ user.get_username }}]</h1>
+
+<div>Karma: {{user_object.karma}}</div>
 
 <form action="{{config_form.action_url}}" method="{{config_form.method}}" style="margin:10px">
     <table>
@@ -16,11 +25,5 @@
         </tr>
     </table>
 </form>
-
-<hr>
-
-<a href="{% url 'rsshistory:logout' %}" class="mainbutton">
-            <img src="{% static 'rsshistory/icons/icons8-logout-100.png' %}" class="content-icon" />
-            Logout</a>
 
 {% endblock %}

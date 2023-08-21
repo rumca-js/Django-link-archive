@@ -474,10 +474,10 @@ class PushToRepoJobHandler(BaseJobHandler):
                 ConfigurationEntry.get().is_bookmark_repo_set()
                 and ConfigurationEntry.get().is_daily_repo_set()
             ):
-                from .gitupdatemgr import GitUpdateManager
+                from .updatemgr import UpdateManager
 
-                git_mgr = GitUpdateManager(self._config)
-                git_mgr.write_and_push_to_git()
+                update_mgr = UpdateManager(self._config)
+                update_mgr.write_and_push_to_git()
 
                 yesterday = DateUtils.get_date_yesterday()
                 new_history = RssSourceExportHistory(date=yesterday)
@@ -501,12 +501,12 @@ class PushDailyDataToRepoJobHandler(BaseJobHandler):
     def process(self, obj=None):
         try:
             if ConfigurationEntry.get().is_daily_repo_set():
-                from .gitupdatemgr import GitUpdateManager
+                from .updatemgr import UpdateManager
 
                 date_input = obj.subject
 
-                git_mgr = GitUpdateManager(self._config)
-                git_mgr.write_and_push_daily_data(date_input)
+                update_mgr = UpdateManager(self._config)
+                update_mgr.write_and_push_daily_data(date_input)
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.error("Exception: {} {}".format(str(e), error_text))

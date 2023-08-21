@@ -1,6 +1,10 @@
 {% extends base_generic %}
-
 {% block content %}
+
+<div class="contentbuttonmenu">
+    <a href="javascript:history.back()" class="simplebutton">Go Back</a>
+</div>
+
 <h1>
     {% if user_config.show_icons %}
     <img src="{{object.get_favicon}}"/>

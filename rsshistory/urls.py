@@ -6,7 +6,7 @@ from django.views.generic.base import TemplateView
 
 from . import views
 from .apps import LinkDatabase
-from .viewspkg import viewentries, viewsources, viewcustom, viewtags, viewcomments
+from .viewspkg import viewentries, viewsources, viewcustom, viewtags, viewcomments, viewadmin, viewexport, viewdomains
 
 # register app namespace
 # TODO https://stackoverflow.com/questions/30494000/django-url-namespaces-the-template-has-to-know-its-namespace
@@ -76,35 +76,44 @@ urlpatterns = [
     path("entry-vote/<int:pk>/", viewtags.entry_vote, name="entry-vote"),
     # admin views
     path("robots.txt", TemplateView.as_view(template_name="robots.txt", content_type="text/plain")),
-    path("admin-page/", viewcustom.admin_page, name="admin-page"),
-    path("user-config", viewcustom.user_config, name="user-config"),
-    path("configuration/", viewcustom.configuration_page, name="configuration"),
-    path("system-status/", viewcustom.system_status, name="system-status"),
-    path("about/", viewcustom.about, name="about"),
+    path("admin-page/", viewadmin.admin_page, name="admin-page"),
+    path("user-config", viewadmin.user_config, name="user-config"),
+    path("configuration/", viewadmin.configuration_page, name="configuration"),
+    path("system-status/", viewadmin.system_status, name="system-status"),
+    path("about/", viewadmin.about, name="about"),
     # background jobs
-    path("backgroundjobs/", viewcustom.BackgroundJobsView.as_view(), name="backgroundjobs",),
-    path("backgroundjobs-perform-all/", viewcustom.backgroundjobs_perform_all, name="backgroundjobs-perform-all",),
-    path("backgroundjob-remove/<int:pk>/", viewcustom.backgroundjob_remove, name="backgroundjob-remove",),
-    path("backgroundjobs-remove/<str:job_type>/", viewcustom.backgroundjobs_remove, name="backgroundjobs-remove",),
-    path("write-bookmarks", viewcustom.write_bookmarks, name="write-bookmarks"),
-    path("write-daily-data-form", viewcustom.write_daily_data_form, name="write-daily-data-form",),
-    path("write-tag-form", viewcustom.write_tag_form, name="write-tag-form"),
-    path("push-daily-data-form", viewcustom.push_daily_data_form, name="push-daily-data-form"),
-    path("import-bookmarks", viewcustom.import_bookmarks, name="import-bookmarks"),
-    path("import-daily-data", viewcustom.import_daily_data, name="import-daily-data"),
-    path("import-sources", viewcustom.import_sources, name="import-sources"),
-    path("import-reading-list", viewcustom.import_reading_list_view, name="import-reading-list",),
-    path("import-from-instance", viewcustom.import_from_instance, name="import-from-instance",),
-    path("check-move-archive", viewcustom.check_if_move_to_archive, name="check-move-archive",),
+    path("backgroundjobs/", viewadmin.BackgroundJobsView.as_view(), name="backgroundjobs",),
+    path("backgroundjobs-perform-all/", viewadmin.backgroundjobs_perform_all, name="backgroundjobs-perform-all",),
+    path("backgroundjob-remove/<int:pk>/", viewadmin.backgroundjob_remove, name="backgroundjob-remove",),
+    path("backgroundjobs-remove/<str:job_type>/", viewadmin.backgroundjobs_remove, name="backgroundjobs-remove",),
     # persistant infos
-    path("persistentinfos/", viewcustom.PersistentInfoView.as_view(), name="persistentinfos",),
+    path("logs/", viewadmin.PersistentInfoView.as_view(), name="logs",),
+    path("truncate-log", viewadmin.truncate_log, name="truncate-log"),
+    path("truncate-log-errors", viewadmin.truncate_log_errors, name="truncate-log-errors"),
+    path("truncate-log-all", viewadmin.truncate_log_all, name="truncate-log-all"),
+    # import / export
+    path("data-export-add", viewexport.data_export_add, name="data-export-add"),
+    path("data-export-edit/<int:pk>/", viewexport.data_export_edit, name="data-export-edit"),
+    path("data-export-remove/<int:pk>/", viewexport.data_export_remove, name="data-export-remove"),
+    path("data-exports/", viewexport.DataExportListView.as_view(), name="data-exports",),
+    path("data-export/<int:pk>/", viewexport.DataExportDetailsView.as_view(), name="data-export",),
+    path("write-bookmarks", viewexport.write_bookmarks, name="write-bookmarks"),
+    path("write-daily-data-form", viewexport.write_daily_data_form, name="write-daily-data-form",),
+    path("write-tag-form", viewexport.write_tag_form, name="write-tag-form"),
+    path("push-daily-data-form", viewexport.push_daily_data_form, name="push-daily-data-form"),
+    path("import-bookmarks", viewexport.import_bookmarks, name="import-bookmarks"),
+    path("import-daily-data", viewexport.import_daily_data, name="import-daily-data"),
+    path("import-sources", viewexport.import_sources, name="import-sources"),
+    path("import-reading-list", viewexport.import_reading_list_view, name="import-reading-list",),
+    path("import-from-instance", viewexport.import_from_instance, name="import-from-instance",),
+    path("import-source-ia/<int:pk>/", viewexport.import_source_from_ia, name="import-source-ia",),
     # domains
-    path("domains/", viewcustom.DomainsListView.as_view(), name="domains",),
-    path("domain-remove/<int:pk>/", viewcustom.domain_remove, name="domain-remove",),
-    path("domains-fix/", viewcustom.domains_fix, name="domain-fix",),
-    # debug forms
-    path("import-source-ia/<int:pk>/", viewcustom.import_source_from_ia, name="import-source-ia",),
-    path("truncate-errors", viewcustom.truncate_errors, name="truncate-errors"),
+    path("domains/", viewdomains.DomainsListView.as_view(), name="domains",),
+    path("domain-remove/<int:pk>/", viewdomains.domain_remove, name="domain-remove",),
+    path("domains-fix/", viewdomains.domains_fix, name="domain-fix",),
+    path("domains-read-bookmarks/", viewdomains.domains_read_bookmarks, name="domains-read-bookmarks",),
+    # other, debug forms
+    path("check-move-archive", viewcustom.check_if_move_to_archive, name="check-move-archive",),
     path("data-errors", viewcustom.data_errors_page, name="data-errors"),
     path("entry-fix-youtube-details/<int:pk>/", viewcustom.fix_reset_youtube_link_details_page, name="entry-fix-youtube-details",),
     path("fix-entry-tags/<int:entrypk>/", viewcustom.fix_entry_tags, name="fix-entry-tags",),
@@ -112,7 +121,6 @@ urlpatterns = [
     path("test-page", viewcustom.test_page, name="test-page"),
     path("test-form-page", viewcustom.test_form_page, name="test-form-page"),
     path("fix-bookmarked-yt", viewcustom.fix_bookmarked_yt, name="fix-bookmarked-yt"),
-    path("clear-yt-cache", viewcustom.clear_youtube_cache, name="clear-yt-cache"),
     # login
     path("accounts/", include("django.contrib.auth.urls")),
     path("rsshistory/accounts/logout/", RedirectView.as_view(url="rsshistory/")),

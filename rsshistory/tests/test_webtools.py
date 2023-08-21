@@ -27,6 +27,35 @@ webpage_title_upper = """<html>
 </html>
 """
 
+webpage_links = """<html>
+ <TITLE>This is a upper case title</TITLE>
+ <a custom-peroperty="custom-property-value" href="http://otherpage1.net" class="class">
+   <picture></picture>
+   </a>
+ <a custom-peroperty="custom-property-value" href="https://otherpage2.net" class="class">
+   <picture></picture>
+   </a>
+ <a custom-peroperty="custom-property-value" href="/test/test1" class="contentLink  hero--img -first">
+   <picture></picture>
+   </a>
+ <a custom-peroperty="custom-property-value" href="/test/test2.html" class="class">
+   <picture></picture>
+   </a>
+ <a custom-peroperty="custom-property-value" href="/test/test3.htm" class="class">
+   <picture></picture>
+   </a>
+ <a custom-peroperty="custom-property-value" href="/test/test4.js" class="class">
+   <picture></picture>
+   </a>
+ <a custom-peroperty="custom-property-value" href="/test/test5/" class="class">
+   <picture></picture>
+   </a>
+ <a custom-peroperty="custom-property-value" href="//test6/" class="class">
+   <picture></picture>
+   </a>
+</html>
+"""
+
 
 class PageTest(TestCase):
     def test_get_domain(self):
@@ -100,3 +129,18 @@ class PageTest(TestCase):
 
         p = Page("http://wikipedia.org/test", webpage_title_upper)
         self.assertTrue(p.is_mainstream())
+
+    def test_get_links(self):
+        p = Page("http://mytestpage.com/?argument=value", webpage_links)
+
+        links = p.get_links()
+
+        self.assertTrue("http://otherpage1.net" in links)
+        self.assertTrue("https://otherpage2.net" in links)
+
+        self.assertTrue("http://mytestpage.com/test/test1" in links)
+        self.assertTrue("http://mytestpage.com/test/test2.html" in links)
+        self.assertTrue("http://mytestpage.com/test/test3.htm" in links)
+        self.assertTrue("http://mytestpage.com/test/test4.js" in links)
+        self.assertTrue("http://mytestpage.com/test/test5/" in links)
+        self.assertTrue("http://mytestpage.com/test6/" in links)

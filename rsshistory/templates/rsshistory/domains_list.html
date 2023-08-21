@@ -1,8 +1,12 @@
 {% extends base_generic %}
-
 {% block content %}
 
-<h3>Domains</h3>
+<div class="contentbuttonmenu">
+    <a href="javascript:history.back()" class="simplebutton">Go Back</a>
+    <a href="{% url 'rsshistory:domains-read-bookmarks' %}" class="simplebutton">Read from bookmarks</a>
+</div>
+
+<h1>Domains</h1>
   {% if domain_list %}
     <ul>
       {% for domain in domain_list %}

@@ -31,6 +31,9 @@
 .mainbutton-icon {
   width:30px;
 }
+
+/* Content */
+
 .content-icon {
   width:30px;
   float: left;
@@ -43,8 +46,6 @@
     width:20%;
     float: left;
 }
-
-/* Content */
 
 input {
   box-shadow: none;
@@ -94,6 +95,10 @@ hr {
 .simplebutton:hover {
   background-color: #e0e0e0;
   color: blue;
+}
+
+.contentbuttonmenu {
+    display: block;
 }
 
 /* List containers */

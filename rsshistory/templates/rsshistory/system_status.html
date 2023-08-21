@@ -1,6 +1,9 @@
 {% extends base_generic %}
-
 {% block content %}
+
+<div class="contentbuttonmenu">
+    <a href="javascript:history.back()" class="simplebutton">Go Back</a>
+</div>
 
 <h1>Info</h1>
 
@@ -12,30 +15,24 @@
     <li>Tags length: {{LinkTagsDataModel}}</li>
     <li>Configurations: {{ConfigurationEntry}}</li>
     <li>UserConfig: {{UserConfig}}</li>
-    <li>BackgroundJob: {{BackgroundJob}}</li>
+
+    <li>BackgroundJob: {{BackgroundJob}}
+        <a href="{% url 'rsshistory:backgroundjobs' %}" title="View background jobs" class="simplebutton">View</a>
+        <a href="{% url 'rsshistory:backgroundjobs-perform-all' %}" title="Refresh and process all" class="simplebutton">Refresh and process all</a>
+    </li>
+
+    <li>Server log length: {{ServerLogLength}} Server log errors: {{ServerLogErrorsLength}}
+        <a href="{% url 'rsshistory:logs' %}" title="View all logs" class="simplebutton">View</a>
+        <a href="{% url 'rsshistory:truncate-log' %}" title="Truncate" class="simplebutton">Truncate</a>
+        <a href="{% url 'rsshistory:truncate-log-errors' %}" title="Truncate errors" class="simplebutton">Truncate errors</a>
+        <a href="{% url 'rsshistory:truncate-log-all' %}" title="Truncate all logs" class="simplebutton">Truncate all</a>
+    </li>
+
+    <li>Domains: {{DomainsLength}}
+        <a href="{% url 'rsshistory:domains' %}" title="Domains" class="simplebutton">View</a>
+        </li>
 </ul>
 
-<h1>Jobs</h1>
-<ul>
-    <a href="{% url 'rsshistory:backgroundjobs' %}" title="View background jobs" class="simplebutton">View Background Jobs</a>
-    <a href="{% url 'rsshistory:backgroundjobs-perform-all' %}" title="Refresh and process all" class="simplebutton">Refresh and process all</a>
-
-    {% for thread in thread_list %}
-    <li>{{ thread.get_thread_name }}: Current processing: {{ thread.get_process_item }}</li>
-    {% endfor %}
-</ul>
-
-<h1>Server log</h1>
-<p>
-    <ul>
-        <a href="{% url 'rsshistory:persistentinfos' %}" title="View all persistent infos" class="simplebutton">View all persistent infos</a>
-        <a href="{% url 'rsshistory:truncate-errors' %}" title="Truncate errors" class="simplebutton">Truncate errors</a>
-    </ul>
-    
-    {% for log_item in log_items %}
-    <div>{{ log_item.date }} {{log_item.level}} {{ log_item.info }}</div>
-    {% endfor %}
-</p>
 
 <h1>Export history</h1>
 <p>

@@ -1,8 +1,11 @@
 {% extends base_generic %}
-
 {% block content %}
 
-<h2>{{tags_title}}</h2>
+<div class="contentbuttonmenu">
+    <a href="javascript:history.back()" class="simplebutton">Go Back</a>
+</div>
+
+<h1>{{tags_title}}</h1>
 
 {% for tag in tag_objects %}
     <span>
@@ -12,12 +15,10 @@
 {% endfor %}
 
 <h2>Tag management</h2>
-<ul>
-  <li><a href="{% url 'rsshistory:tags-show-all' %}" class="simplebutton">All tags</a></li>
+  <a href="{% url 'rsshistory:tags-show-recent' %}" class="simplebutton">Recent tags</a>
 {% if user.is_staff %}
-  <li><a href="{% url 'rsshistory:tag-rename' %}" class="simplebutton">Rename tag</a></li>
-  <li><a href="{% url 'rsshistory:entries-untagged' %}" class="simplebutton">Untagged bookmarks</a></li>
+  <a href="{% url 'rsshistory:tag-rename' %}" class="simplebutton">Rename tag</a>
+  <a href="{% url 'rsshistory:entries-untagged' %}" class="simplebutton">Untagged bookmarks</a>
 {% endif %}
-</ul>
 
 {% endblock %} 

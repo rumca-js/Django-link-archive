@@ -190,34 +190,32 @@ class Domains(models.Model):
             obj.fix_domain_obj()
 
 
-""" YouTube meta cache """
+class DataExport(models.Model):
 
+    EXPORT_TYPE_GIT = "export-type-git"
+    EXPORT_TYPE_LOC = "export-type-loc"
 
-class YouTubeMetaCache(models.Model):
-    url = models.CharField(max_length=1000, help_text="url", unique=False)
-    details_json = models.CharField(max_length=1000, help_text="details_json")
-    dead = models.BooleanField(default=False, help_text="dead")
-
-    link_yt_obj = models.ForeignKey(
-        LinkDataModel,
-        on_delete=models.SET_NULL,
-        related_name="link_yt",
-        null=True,
-        blank=True,
+    # fmt: off
+    EXPORT_TYPE_CHOICES = (
+        (EXPORT_TYPE_LOC, EXPORT_TYPE_LOC,),
+        (EXPORT_TYPE_GIT, EXPORT_TYPE_GIT,),
     )
+    # fmt: on
 
+    EXPORT_DAILY_DATA = "export-dtype-daily-data"
+    EXPORT_BOOKMARKS = "export-dtype-bookmarks"
 
-class YouTubeReturnDislikeMetaCache(models.Model):
-    url = models.CharField(max_length=1000, help_text="url", unique=False)
-    return_dislike_json = models.CharField(
-        max_length=1000, help_text="return_dislike_json"
+    # fmt: off
+    EXPORT_DATA_CHOICES = (
+        (EXPORT_DAILY_DATA, EXPORT_DAILY_DATA,),
+        (EXPORT_BOOKMARKS, EXPORT_BOOKMARKS,),
     )
-    dead = models.BooleanField(default=False, help_text="dead")
+    # fmt: on
 
-    link_rd_obj = models.ForeignKey(
-        LinkDataModel,
-        on_delete=models.SET_NULL,
-        related_name="link_rd",
-        null=True,
-        blank=True,
-    )
+    enabled = models.BooleanField(default=True)
+    export_type = models.CharField(max_length=1000, choices=EXPORT_TYPE_CHOICES)
+    export_data = models.CharField(max_length=1000, choices=EXPORT_DATA_CHOICES)
+    local_path = models.CharField(max_length=1000)
+    remote_path = models.CharField(max_length=1000)
+    user = models.CharField(default="", max_length=2000, null=True)
+    password = models.CharField(default="", max_length=2000, null=True)

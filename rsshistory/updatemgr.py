@@ -1,14 +1,13 @@
-import logging
 import traceback
 from datetime import timedelta
 
 from .dateutils import DateUtils
 from .models import PersistentInfo, RssSourceExportHistory, ConfigurationEntry
 from .controllers import SourceDataController, LinkDataController
-from .prjgitrepo import *
+from .repotypes import *
 
 
-class GitUpdateManager(object):
+class UpdateManager(object):
     def __init__(self, config):
         self._cfg = config
 
@@ -25,12 +24,10 @@ class GitUpdateManager(object):
             PersistentInfo.create("Pushing data to git: Done")
 
         except Exception as e:
-            log = logging.getLogger(self._cfg.app_name)
             error_text = traceback.format_exc()
             PersistentInfo.error(
                 "Exception during refresh: {0} {1}".format(str(e), error_text)
             )
-            log.critical(e, exc_info=True)
 
     def write_and_push_bookmarks(self):
         from .datawriter import DataWriter
@@ -59,7 +56,6 @@ class GitUpdateManager(object):
         writer.clear_daily_data(write_date.isoformat())
 
     def push_daily_repo(self, conf, input_date):
-        log = logging.getLogger(self._cfg.app_name)
         PersistentInfo.create("Pushing to RSS link repo")
 
         repo = DailyRepo(conf, conf.git_daily_repo)
@@ -75,7 +71,6 @@ class GitUpdateManager(object):
         repo.push()
 
     def push_bookmarks_repo(self, conf):
-        log = logging.getLogger(self._cfg.app_name)
         PersistentInfo.create("Pushing main repo data")
 
         yesterday = DateUtils.get_date_yesterday()

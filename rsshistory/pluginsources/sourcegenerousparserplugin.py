@@ -1,4 +1,6 @@
+import os
 import re
+
 from .sourceparseplugin import BaseParsePlugin
 
 
@@ -12,10 +14,12 @@ class SourceGenerousParserPlugin(BaseParsePlugin):
         if not self.is_link_valid_domain(address):
             return False
 
+        split = os.path.splitext(address)
+
         if (
-            address.endswith(".html")
-            or address.endswith(".htm")
-            or address.endswith("/")
+            split[1] == ".html"
+            or split[1] == ".htm"
+            or split[1] == ""
         ):
             print(address)
             return True

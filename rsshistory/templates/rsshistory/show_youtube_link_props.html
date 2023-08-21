@@ -1,20 +1,38 @@
 {% extends base_generic %}
-
 {% block content %}
 
-<h2>YouTube Link properties</h2>
+<div class="contentbuttonmenu">
+    <a href="javascript:history.back()" class="simplebutton">Go Back</a>
+</div>
+
+<h1>YouTube Link properties</h1>
 
 {% for props in youtube_props %}    
-  {{ props.0 }} {{ props.1}} </br>
-  <hr/>
+<div style="display: flex; flex-wrap: wrap">
+    <div style="margin-right: 5px">{{ props.0 }}:</div>
+    <div style="margin-right: 5px">{{ props.1}}</div>
+    <div style="margin-right: 5px"><a href="{{props.1}}">Link</a></div>
+</div>
 {% endfor %}
 
 <h2>Return dislike properties</h2>
 
 {% for props in return_dislike_props %}    
-  {{ props.0 }} {{ props.1}} </br>
-  <hr/>
+<div style="display: flex; flex-wrap: wrap">
+    <div style="margin-right: 5px">{{ props.0 }}</div>
+    <div style="margin-right: 5px">{{ props.1 }}</div>
+</div>
 {% endfor %}
 
+<!--h2>All YouTube properties</h2>
+
+{% for props in all_youtube_props %}    
+<div style="display: flex; flex-wrap: wrap">
+    <div style="margin-right: 5px">{{ props.0 }}:</div>
+    <div style="margin-right: 5px">{{ props.1}}</div>
+    <div style="margin-right: 5px"><a href="{{props.1}}">Link</a></div>
+</div>
+{% endfor %}
+<h2-->
 
 {% endblock %}

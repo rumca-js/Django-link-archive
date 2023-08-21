@@ -1,0 +1,25 @@
+{% extends base_generic %}
+{% block content %}
+
+<div class="contentbuttonmenu">
+    <a href="javascript:history.back()" class="simplebutton">Go Back</a>
+</div>
+
+<h1>Data Export</h1>
+
+<p>
+<div>ID: {{object.id}}</div>
+<div>Enabled: {{object.enabled}}</div>
+<div>Export type: {{object.export_type}}</div>
+<div>Export data: {{object.export_data}}</div>
+<div>Local path: {{object.local_path}}</div>
+<div>Remote path: {{object.remote_path}}</div>
+<div>User: {{object.user}}</div>
+<div>Password: {{object.password}}</div>
+</p>
+
+<a href="{% url 'rsshistory:data-export-edit' object.id %}" class="simplebutton">
+    Edit
+</a>
+
+{% endblock %}

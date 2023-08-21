@@ -6,7 +6,6 @@ from .models import (
     LinkTagsDataModel,
     LinkVoteDataModel,
     LinkCommentDataModel,
-    YouTubeMetaCache,
-    YouTubeReturnDislikeMetaCache,
     Domains,
+    DataExport
 )

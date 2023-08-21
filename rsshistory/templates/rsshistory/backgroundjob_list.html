@@ -1,8 +1,12 @@
 {% extends base_generic %}
-
 {% block content %}
 
- <h2>BackgroundJob: {{BackgroundJob}}</h2>
+<div class="contentbuttonmenu">
+    <a href="javascript:history.back()" class="simplebutton">Go Back</a>
+    <a href="{% url 'rsshistory:backgroundjobs-perform-all' %}" title="Refresh and process all" class="simplebutton">Refresh and process all</a>
+</div>
+
+ <h1>Jobs [{{BackgroundJob}}]</h1>
 
   {% if jobs_list %}
     <ul>
@@ -14,5 +18,7 @@
     </li>
     {% endfor %}
     </ul>
+    {% else %}
+      Currently no jobs
   {% endif %}
 {% endblock %}
