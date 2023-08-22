@@ -23,9 +23,9 @@
 
     <li>Server log length: {{ServerLogLength}} Server log errors: {{ServerLogErrorsLength}}
         <a href="{% url 'rsshistory:logs' %}" title="View all logs" class="simplebutton">View</a>
-        <a href="{% url 'rsshistory:truncate-log' %}" title="Truncate" class="simplebutton">Truncate</a>
-        <a href="{% url 'rsshistory:truncate-log-errors' %}" title="Truncate errors" class="simplebutton">Truncate errors</a>
-        <a href="{% url 'rsshistory:truncate-log-all' %}" title="Truncate all logs" class="simplebutton">Truncate all</a>
+        <a href="{% url 'rsshistory:truncate-log' %}" title="Remove info" class="simplebutton">Remove info</a>
+        <a href="{% url 'rsshistory:truncate-log-errors' %}" title="Remove errors" class="simplebutton">Remove errors</a>
+        <a href="{% url 'rsshistory:truncate-log-all' %}" title="Remove all logs" class="simplebutton">Remove all</a>
     </li>
 
     <li>Domains: {{DomainsLength}}

@@ -176,6 +176,20 @@ def backgroundjob_remove(request, pk):
     return ContextData.render(request, "summary_present.html", context)
 
 
+def backgroundjobs_remove_all(request):
+    context = ContextData.get_context(request)
+    context["page_title"] += " - Remove all background jobs"
+
+    if not request.user.is_staff:
+        return ContextData.render(request, "missing_rights.html", context)
+
+    bg = BackgroundJob.objects.all()
+    bg.delete()
+
+    context["summary_text"] = "Background jobs were removed"
+    return ContextData.render(request, "summary_present.html", context)
+
+
 def backgroundjobs_perform_all(request):
     context = ContextData.get_context(request)
     context["page_title"] += " - Background perform all"

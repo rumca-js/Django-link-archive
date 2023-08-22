@@ -44,6 +44,21 @@ def domain_remove(request, pk):
     return ContextData.render(request, "summary_present.html", context)
 
 
+def domains_remove_all(request):
+    context = ContextData.get_context(request)
+    context["page_title"] += " - Domains remove"
+
+    if not request.user.is_staff:
+        return ContextData.render(request, "missing_rights.html", context)
+
+    domains = Domains.objects.all()
+    domains.delete()
+
+    context["summary_text"] = "Domains were removed"
+
+    return ContextData.render(request, "summary_present.html", context)
+
+
 def domains_fix(request):
     context = ContextData.get_context(request)
     context["page_title"] += " - Domain fix"

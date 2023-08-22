@@ -5,16 +5,18 @@
 <div class="contentbuttonmenu">
     <a href="javascript:history.back()" class="simplebutton">Go Back</a>
 
+    <a href="{% url 'rsshistory:sources' %}" class='simplebutton'>
+        <img src="{% static 'rsshistory/icons/icons8-start-100.png' %}" class="content-icon" />
+        Reset filters</a>
+
+    {% if user.is_staff %}
     <a href="{% url 'rsshistory:source-add-simple' %}" class="simplebutton">
         <img src="{% static 'rsshistory/icons/icons8-channel-add-96.png' %}" class="content-icon" />
         Add source</a>
     <a href="{% url 'rsshistory:entry-add-simple' %}" class="simplebutton">
         <img src="{% static 'rsshistory/icons/icons8-add-link-96.png' %}" class="content-icon" />
         Add entry</a>
-
-    <a href="{% url 'rsshistory:sources' %}" class='simplebutton'>
-        <img src="{% static 'rsshistory/icons/icons8-start-100.png' %}" class="content-icon" />
-        Reset filters</a>
+    {% endif %}
 </div>
 
   <form action="{{filter_form.action_url}}" method="{{filter_form.method}}">

@@ -3,7 +3,10 @@
 
 <div class="contentbuttonmenu">
     <a href="javascript:history.back()" class="simplebutton">Go Back</a>
-    <a href="{% url 'rsshistory:domains-read-bookmarks' %}" class="simplebutton">Read from bookmarks</a>
+    {% if user.is_staff %}
+    <a href="{% url 'rsshistory:domains-read-bookmarks' %}" title="Reads domains from bookmarks" class="simplebutton">Read from bookmarks</a>
+    <a href="{% url 'rsshistory:domains-remove-all' %}" title="Removes all domains" class="simplebutton">Remove all</a>
+    {% endif %}
 </div>
 
 <h1>Domains</h1>

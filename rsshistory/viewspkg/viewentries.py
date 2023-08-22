@@ -714,3 +714,17 @@ def entries_remove_all(request):
     context["summary_text"] = "Removed all entries"
 
     return ContextData.render(request, "summary_present.html", context)
+
+
+def entries_remove_nonbookmarked(request):
+    context = ContextData.get_context(request)
+    context["page_title"] += " - Remove nonbookmarked entries"
+
+    if not request.user.is_staff:
+        return ContextData.render(request, "missing_rights.html", context)
+
+    LinkDataController.objects.filter(persistent = False).delete()
+
+    context["summary_text"] = "Removed all non bookmarked entries"
+
+    return ContextData.render(request, "summary_present.html", context)

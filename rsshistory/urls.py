@@ -46,6 +46,7 @@ urlpatterns = [
     path("entries-recent-init", viewentries.entries_recent_init, name="entries-recent-init"),
     path("entries-omni-search", viewentries.EntriesOmniListView.as_view(), name="entries-omni-search"),
     path("entries-remove-all", viewentries.entries_remove_all, name="entries-remove-all"),
+    path("entries-remove-nonbookmarked", viewentries.entries_remove_nonbookmarked, name="entries-remove-nonbookmarked"),
     path("entry/<int:pk>/", viewentries.EntryDetailView.as_view(), name="entry-detail"),
     path("entry-json/<int:pk>/", viewentries.entry_json, name="entry-json"),
     path("entry-archived/<int:pk>/", viewentries.EntryArchivedDetailView.as_view(), name="entry-archived"),
@@ -86,6 +87,7 @@ urlpatterns = [
     path("backgroundjobs-perform-all/", viewadmin.backgroundjobs_perform_all, name="backgroundjobs-perform-all",),
     path("backgroundjob-remove/<int:pk>/", viewadmin.backgroundjob_remove, name="backgroundjob-remove",),
     path("backgroundjobs-remove/<str:job_type>/", viewadmin.backgroundjobs_remove, name="backgroundjobs-remove",),
+    path("backgroundjobs-remove-all/", viewadmin.backgroundjobs_remove_all, name="backgroundjobs-remove-all",),
     # persistant infos
     path("logs/", viewadmin.PersistentInfoView.as_view(), name="logs",),
     path("truncate-log", viewadmin.truncate_log, name="truncate-log"),
@@ -110,6 +112,7 @@ urlpatterns = [
     # domains
     path("domains/", viewdomains.DomainsListView.as_view(), name="domains",),
     path("domain-remove/<int:pk>/", viewdomains.domain_remove, name="domain-remove",),
+    path("domains-remove-all/", viewdomains.domains_remove_all, name="domains-remove-all",),
     path("domains-fix/", viewdomains.domains_fix, name="domain-fix",),
     path("domains-read-bookmarks/", viewdomains.domains_read_bookmarks, name="domains-read-bookmarks",),
     # other, debug forms

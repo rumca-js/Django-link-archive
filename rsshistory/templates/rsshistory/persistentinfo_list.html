@@ -3,23 +3,22 @@
 
 <div class="contentbuttonmenu">
     <a href="javascript:history.back()" class="simplebutton">Go Back</a>
-    <a href="{% url 'rsshistory:truncate-log' %}" title="Truncate" class="simplebutton">Truncate</a>
-    <a href="{% url 'rsshistory:truncate-log-all' %}" title="Truncate all logs" class="simplebutton">Truncate all</a>
-    <a href="{% url 'rsshistory:truncate-log-errors' %}" title="Truncate errors" class="simplebutton">Truncate errors</a>
+    <a href="{% url 'rsshistory:truncate-log' %}" title="Removes infos" class="simplebutton">Remove infos</a>
+    <a href="{% url 'rsshistory:truncate-log-errors' %}" title="Removes errors" class="simplebutton">Remove errors</a>
+    <a href="{% url 'rsshistory:truncate-log-all' %}" title="Removes all logs" class="simplebutton">Remove all</a>
 </div>
 
 <h1>Persistant info list</h1>
 
   {% if info_list %}
-    <table>
-      <tr>
-         <th width="200">Date</th><th width="100">Level</th><th>Text</th>
-      </tr>
       {% for info in info_list %}
-      <tr>
-         <td>{{info.date}}</td><td>{{info.level}}</td><td>{{info.info}}</td>
-      </tr>
+      <div style="display:flex; flex-wrap: wrap; margin-bottom: 2%">
+         <div>Date: {{info.date}}</div>
+         <div>Level: {{info.level}}</div>
+         <div>{{info.info}}</div>
+      </div>
       {% endfor %}
-    </table>
+  {% else %}
+     No logs
   {% endif %}
 {% endblock %}
