@@ -289,49 +289,6 @@ class EntryForm(forms.ModelForm):
     def get_information(self):
         return self.cleaned_data
 
-    def save_form(self, data):
-        source = data["source"]
-        title = data["title"]
-        description = data["description"]
-        link = data["link"]
-        date_published = data["date_published"]
-        persistent = data["persistent"]
-        language = data["language"]
-        user = data["user"]
-        thumbnail = data["thumbnail"]
-        artist = data["artist"]
-        album = data["album"]
-
-        if not title or not source:
-            return False
-
-        source_obj = None
-        sources = SourceDataController.objects.filter(url=source)
-        if sources.exists():
-            source_obj = sources[0]
-
-        links = LinkDataController.objects.filter(link=link)
-        if len(links) > 0:
-            return False
-
-        entry = LinkDataController(
-            source=source,
-            title=title,
-            description=description,
-            link=link,
-            date_published=date_published,
-            persistent=persistent,
-            thumbnail=thumbnail,
-            language=language,
-            user=user,
-            artist=artist,
-            album=album,
-            source_obj=source_obj,
-        )
-
-        entry.save()
-        return True
-
 
 class SourceForm(forms.ModelForm):
     """

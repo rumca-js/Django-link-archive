@@ -76,7 +76,7 @@ class BaseRssPlugin(SourceGenericPlugin):
                 if not self.is_link_valid(props["link"]):
                     return None
 
-                if "published" not in props:
+                if "date_published" not in props:
                     PersistentInfo.error(
                         "Source:{} {}; Entry:{} {} missing published field".format(
                             source.url, source.title, feed_entry.link, feed_entry.title
@@ -116,34 +116,34 @@ class BaseRssPlugin(SourceGenericPlugin):
         else:
             output_map["thumbnail"] = None
 
-        if hasattr(feed_entry, "published"):
+        if hasattr(feed_entry, "date_published"):
             try:
                 dt = parser.parse(feed_entry.published)
-                output_map["published"] = dt
+                output_map["date_published"] = dt
             except Exception as e:
                 PersistentInfo.error(
                     "Rss parser datetime invalid feed datetime:{}; Exc:{} {}\n{}".format(
                         feed_entry.published, str(e), ""
                     )
                 )
-                output_map["published"] = DateUtils.get_datetime_now_utc()
+                output_map["date_published"] = DateUtils.get_datetime_now_utc()
 
         elif self.allow_adding_with_current_time:
-            output_map["published"] = DateUtils.get_datetime_now_utc()
+            output_map["date_published"] = DateUtils.get_datetime_now_utc()
         elif self.default_entry_timestamp:
-            output_map["published"] = self.default_entry_timestamp
+            output_map["date_published"] = self.default_entry_timestamp
         else:
-            output_map["published"] = DateUtils.get_datetime_now_utc()
+            output_map["date_published"] = DateUtils.get_datetime_now_utc()
 
         output_map["source"] = source.url
         output_map["title"] = feed_entry.title
         output_map["language"] = source.language
         output_map["link"] = feed_entry.link
 
-        if output_map["published"]:
-            output_map["published"] = DateUtils.to_utc_date(output_map["published"])
+        if output_map["date_published"]:
+            output_map["date_published"] = DateUtils.to_utc_date(output_map["date_published"])
 
-            if output_map["published"] > DateUtils.get_datetime_now_utc():
-                output_map["published"] = DateUtils.get_datetime_now_utc()
+            if output_map["date_published"] > DateUtils.get_datetime_now_utc():
+                output_map["date_published"] = DateUtils.get_datetime_now_utc()
 
         return output_map

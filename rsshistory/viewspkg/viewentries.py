@@ -330,7 +330,7 @@ def add_entry(request):
 
         if valid:
             data = form.get_information()
-            if not form.save_form(data):
+            if not LinkDataHyperController.add_new_link(data):
                 context["summary_text"] = "Could not save link"
                 return ContextData.render(request, "summary_present.html", context)
 

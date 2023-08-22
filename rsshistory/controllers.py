@@ -289,30 +289,20 @@ class ArchiveLinkDataController(ArchiveLinkDataModel):
 
 
 class LinkDataHyperController(object):
-    def add_new_link(link_data, source=None):
-        objs = LinkDataModel.objects.filter(link=link_data["link"])
-        if objs.exists():
-            o = objs[0]
 
-            o.source = link_data["source"]
-            o.title = link_data["title"]
-            o.description = link_data["description"]
-            o.link = link_data["link"]
-            # o.date_published = link_data["published"]
-            o.language = link_data["language"]
-            o.thumbnail = link_data["thumbnail"]
-            o.source_obj = source
-        else:
-            o = LinkDataModel(
-                source=link_data["source"],
-                title=link_data["title"],
-                description=link_data["description"],
-                link=link_data["link"],
-                date_published=link_data["published"],
-                language=link_data["language"],
-                thumbnail=link_data["thumbnail"],
-                source_obj=source,
-            )
+    def add_new_link(link_data):
+ 
+        if "source_obj" not in link_data:
+            source_obj = None
+            sources = SourceDataController.objects.filter(url=link_data["source"])
+            if sources.exists():
+                source_obj = sources[0]
+
+            link_data["source_obj"] = source_obj
+
+        objs = LinkDataModel.objects.filter(link=link_data["link"])
+        if not objs.exists():
+            o = LinkDataModel(**link_data)
         try:
             o.save()
 

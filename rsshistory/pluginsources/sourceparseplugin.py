@@ -54,7 +54,7 @@ class BaseParsePlugin(SourceGenericPlugin):
         output_map["title"] = title
         output_map["description"] = title
         output_map["source"] = source.url
-        output_map["published"] = DateUtils.get_datetime_now_utc()
+        output_map["date_published"] = DateUtils.get_datetime_now_utc()
         output_map["language"] = source.language
         output_map["thumbnail"] = None
         return output_map
