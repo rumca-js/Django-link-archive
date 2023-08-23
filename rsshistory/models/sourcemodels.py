@@ -59,3 +59,29 @@ class SourceOperationalData(models.Model):
 
     class Meta:
         ordering = ["date_fetched"]
+
+
+class SourceCategories(models.Model):
+    category = models.CharField(max_length=1000, unique=True)
+
+    class Meta:
+        ordering = ["category"]
+
+    def add(category):
+        if category and category != "":
+            objs = SourceCategories.objects.filter(category = category)
+            if len(objs) == 0:
+                SourceCategories.objects.create(category = category)
+
+
+class SourceSubCategories(models.Model):
+    subcategory = models.CharField(max_length=1000, unique=True)
+
+    class Meta:
+        ordering = ["subcategory"]
+
+    def add(subcategory):
+        if subcategory and subcategory != "":
+            objs = SourceSubCategories.objects.filter(subcategory = subcategory)
+            if len(objs) == 0:
+                SourceSubCategories.objects.create(subcategory = subcategory)

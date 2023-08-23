@@ -50,7 +50,7 @@ webpage_links = """<html>
  <a custom-peroperty="custom-property-value" href="/test/test5/" class="class">
    <picture></picture>
    </a>
- <a custom-peroperty="custom-property-value" href="//test6/" class="class">
+ <a custom-peroperty="custom-property-value" href="//test6.domain.com/" class="class">
    <picture></picture>
    </a>
 </html>
@@ -143,4 +143,4 @@ class PageTest(TestCase):
         self.assertTrue("http://mytestpage.com/test/test3.htm" in links)
         self.assertTrue("http://mytestpage.com/test/test4.js" in links)
         self.assertTrue("http://mytestpage.com/test/test5/" in links)
-        self.assertTrue("http://mytestpage.com/test6/" in links)
+        self.assertTrue("https://test6.domain.com/" in links)

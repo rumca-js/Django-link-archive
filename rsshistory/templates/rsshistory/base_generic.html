@@ -40,6 +40,11 @@
                 <a href="{% url 'rsshistory:sources' %}" class="mainbutton" title="Sources">
                             <img src="{% static 'rsshistory/icons/icons8-broadcast-100.png' %}" class="mainbutton-icon" />
                             Sources</a>
+                {% if config.store_domain_info %}
+                <a href="{% url 'rsshistory:domains' %}" class="mainbutton" title="Domains">
+                            <img src="{% static 'rsshistory/icons/icons8-broadcast-100.png' %}" class="mainbutton-icon" />
+                            Domains</a>
+                {% endif %}
 	     </div>
              <hr>
              <div class="mainbutton-container">

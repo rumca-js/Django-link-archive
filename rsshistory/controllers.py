@@ -54,7 +54,7 @@ class SourceDataController(SourceDataModel):
         return days
 
     def get_long_description(self):
-        return "{} {}".format(self.category, self.subcategory)
+        return "Category:{} Subcategory:{} Export:{} On Hold:{} Type:{}".format(self.category, self.subcategory, self.export_to_cms, self.on_hold, self.source_type)
 
     def get_full_description(self):
         return "{} Export:{} Fetched:{} Number of entries:{} Import seconds:{}".format(

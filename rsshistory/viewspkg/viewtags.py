@@ -1,6 +1,7 @@
 from django.views import generic
 from django.urls import reverse
 from django.shortcuts import render
+from django.http import HttpResponseForbidden, HttpResponseRedirect
 
 from datetime import datetime, timedelta
 
@@ -107,8 +108,9 @@ def tag_entry(request, pk):
         if form.is_valid():
             form.save_tags()
 
-            context["summary_text"] = "Entry tagged"
-            return ContextData.render(request, "summary_present.html", context)
+            return HttpResponseRedirect(
+                    reverse("{}:entry-detail".format(ContextData.app_name), kwargs={"pk": obj.pk})
+            )
         else:
             context["summary_text"] = "Entry not added"
             return ContextData.render(request, "summary_present.html", context)
@@ -258,8 +260,9 @@ def entry_vote(request, pk):
         if form.is_valid():
             form.save_vote()
 
-            context["summary_text"] = "Entry voted"
-            return ContextData.render(request, "summary_present.html", context)
+            return HttpResponseRedirect(
+                    reverse("{}:entry-detail".format(ContextData.app_name), kwargs={"pk": obj.pk})
+            )
         else:
             context["summary_text"] = "Entry not voted"
             return ContextData.render(request, "summary_present.html", context)

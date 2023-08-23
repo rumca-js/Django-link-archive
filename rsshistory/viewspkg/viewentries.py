@@ -607,11 +607,9 @@ def make_persistent_entry(request, pk):
     if LinkDataHyperController.make_persistent(request, entry):
         BackgroundJobController.link_archive(entry.link)
 
-    summary_text = "Link changed to state: " + str(entry.persistent)
-
-    context["summary_text"] = summary_text
-
-    return ContextData.render(request, "summary_present.html", context)
+    return HttpResponseRedirect(
+            reverse("{}:entry-detail".format(ContextData.app_name), kwargs={"pk": entry.pk})
+    )
 
 
 def make_not_persistent_entry(request, pk):
@@ -625,11 +623,9 @@ def make_not_persistent_entry(request, pk):
     entry = LinkDataController.objects.get(id=pk)
     LinkDataHyperController.make_not_persistent(request, entry)
 
-    summary_text = "Link changed to state: " + str(entry.persistent)
-
-    context["summary_text"] = summary_text
-
-    return ContextData.render(request, "summary_present.html", context)
+    return HttpResponseRedirect(
+            reverse("{}:entry-detail".format(ContextData.app_name), kwargs={"pk": entry.pk})
+    )
 
 
 def download_entry(request, pk):

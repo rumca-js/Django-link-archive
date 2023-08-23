@@ -9,13 +9,28 @@
     {% endif %}
 </div>
 
+  <form action="{{filter_form.action_url}}" method="{{filter_form.method}}">
+     <table>
+     {{ filter_form }}
+     <tr>
+         <td>
+             <input type="submit" value="Submit">
+         </td>
+     </tr>
+     </table>
+  </form>
+
+  <hr>
+
 <h1>Domains</h1>
   {% if domain_list %}
     <ul>
       {% for domain in domain_list %}
           {% if type == "normal" %}
-            <li><a href="https://{{domain.domain}}">{{domain.domain}}</a>, Updated:{{domain.date_last}}, First seen:{{domain.date_created}}
-                <a href="{% url 'rsshistory:domain-remove' domain.id %}" class="simplebutton">Remove</a>
+            <li>
+                <a href="{% url 'rsshistory:domain-detail' domain.id %}" class="simplebutton">View</a>
+
+                <a href="https://{{domain.domain}}">{{domain.domain}}</a>, Updated:{{domain.date_last}}, First seen:{{domain.date_created}}
             </li>
           {% elif type == "clear" %}
           <div>- {{domain.domain}} Updated:{{domain.date_last}}, First seen:{{domain.date_created}}</div>

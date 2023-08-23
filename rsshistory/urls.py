@@ -120,9 +120,11 @@ urlpatterns = [
     path("import-source-ia/<int:pk>/", viewexport.import_source_from_ia, name="import-source-ia",),
     # domains
     path("domains/", viewdomains.DomainsListView.as_view(), name="domains",),
+    path("domain/<int:pk>/", viewdomains.DomainsDetailView.as_view(), name="domain-detail",),
     path("domain-remove/<int:pk>/", viewdomains.domain_remove, name="domain-remove",),
     path("domains-remove-all/", viewdomains.domains_remove_all, name="domains-remove-all",),
-    path("domains-fix/", viewdomains.domains_fix, name="domain-fix",),
+    path("domains-fix/", viewdomains.domains_fix, name="domains-fix",),
+    path("domain-fix/<int:pk>/", viewdomains.domain_fix, name="domain-fix",),
     path("domains-read-bookmarks/", viewdomains.domains_read_bookmarks, name="domains-read-bookmarks",),
     # other, debug forms
     path("check-move-archive", viewcustom.check_if_move_to_archive, name="check-move-archive",),

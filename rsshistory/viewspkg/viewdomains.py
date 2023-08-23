@@ -7,12 +7,18 @@ from ..controllers import (
     LinkDataController,
     LinkDataHyperController,
 )
+from ..forms import DomainsChoiceForm
+from ..queryfilters import DomainFilter
 
 
 class DomainsListView(generic.ListView):
     model = Domains
     context_object_name = "domain_list"
     paginate_by = 100
+
+    def get_queryset(self):
+        self.query_filter = DomainFilter(self.request.GET)
+        return self.query_filter.get_filtered_objects()
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
@@ -25,6 +31,35 @@ class DomainsListView(generic.ListView):
             context["type"] = self.request.GET["type"]
         else:
             context["type"] = "normal"
+
+        self.filter_form = self.get_form()
+        self.filter_form.method = "GET"
+        self.filter_form.action_url = self.get_form_action_link()
+
+        context["filter_form"] = self.filter_form
+        context["query_filter"] = self.query_filter
+
+        return context
+
+    def get_form(self):
+        return DomainsChoiceForm(self.request.GET)
+
+    def get_form_action_link(self):
+        return reverse("{}:domains".format(ContextData.app_name))
+
+
+class DomainsDetailView(generic.DetailView):
+    model = Domains
+    context_object_name = "domain_detail"
+
+    def get_context_data(self, **kwargs):
+        from ..pluginsources.sourcecontrollerbuilder import SourceControllerBuilder
+
+        # Call the base implementation first to get the context
+        context = super(DomainsDetailView, self).get_context_data(**kwargs)
+        context = ContextData.init_context(self.request, context)
+
+        context["page_title"] = "domain detail view"
 
         return context
 
@@ -51,10 +86,24 @@ def domains_remove_all(request):
     if not request.user.is_staff:
         return ContextData.render(request, "missing_rights.html", context)
 
-    domains = Domains.objects.all()
-    domains.delete()
+    Domains.remove_all()
 
     context["summary_text"] = "Domains were removed"
+
+    return ContextData.render(request, "summary_present.html", context)
+
+
+def domain_fix(request, pk):
+    context = ContextData.get_context(request)
+    context["page_title"] += " - Domain fix"
+
+    if not request.user.is_staff:
+        return ContextData.render(request, "missing_rights.html", context)
+
+    domain = Domains.objects.filter(id = pk)
+    domain[0].fix()
+
+    context["summary_text"] = "Domains were fixed"
 
     return ContextData.render(request, "summary_present.html", context)
 
@@ -66,11 +115,12 @@ def domains_fix(request):
     if not request.user.is_staff:
         return ContextData.render(request, "missing_rights.html", context)
 
-    Domains.fix_domain_objs()
+    Domains.fix_all()
 
     context["summary_text"] = "Domains were fixed"
 
     return ContextData.render(request, "summary_present.html", context)
+
 
 
 def domains_read_bookmarks(request):

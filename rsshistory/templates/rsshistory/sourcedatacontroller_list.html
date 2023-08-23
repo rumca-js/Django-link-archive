@@ -37,7 +37,7 @@
        {% for source in source_list %}
          <a href="{{ source.get_absolute_url }}"
            class="element_{{user_config.display_type}}"
-           title="{{source.title}} {{source.get_full_description}}"
+           title="{{source.title}} {{source.get_long_description}}"
          >
            <div class="linklistitem">
              {% if user_config.show_icons %}
@@ -45,7 +45,7 @@
              {% endif %}
              <span class="linklistitemtitle">{{source.title}}</span>
              <span class="linklistitemdescription">
-                 {{source.get_full_description}}</span>
+                 {{source.get_long_description}}</span>
            </div>
          </a>
        {% endfor %}

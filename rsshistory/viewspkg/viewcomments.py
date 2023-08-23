@@ -4,6 +4,7 @@ import traceback, sys
 from django.views import generic
 from django.urls import reverse
 from django.shortcuts import render
+from django.http import HttpResponseForbidden, HttpResponseRedirect
 
 from ..models import (
     LinkTagsDataModel,
@@ -41,8 +42,9 @@ def entry_add_comment(request, link_id):
         if form.is_valid():
             form.save_comment()
 
-            context["summary_text"] = "Added a new comment"
-            return ContextData.render(request, "summary_present.html", context)
+            return HttpResponseRedirect(
+                    reverse("{}:entry-detail".format(ContextData.app_name), kwargs={"pk": link.pk})
+            )
 
         context["summary_text"] = "Could not add a comment"
 

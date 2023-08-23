@@ -5,11 +5,45 @@ from .controllers import (
     LinkDataController,
     ArchiveLinkDataController,
 )
+from .models import Domains
 
 
-class SourceFilter(object):
+class BaseQueryFilter(object):
     def __init__(self, args):
         self.args = args
+
+    def get_filter_string(self):
+        infilters = self.args
+
+        filter_string = ""
+        for key in infilters:
+            if key != "page" and infilters[key] != "":
+                filter_string += "&{0}={1}".format(key, infilters[key])
+
+        # TODO try urlencode
+        return filter_string
+
+    def get_model_pagination(self):
+        return 100
+
+    def get_limit(self):
+        if "page" in self.args:
+            page = int(self.args["page"])
+        else:
+            page = 1
+
+        paginate_by = self.get_model_pagination()
+        # for page 1, paginate_by 100  we have range 0..99
+        # for page 2, paginate_by 100  we have range 100..199
+
+        start = (page - 1) * paginate_by
+
+        return [start, start + paginate_by]
+
+
+class SourceFilter(BaseQueryFilter):
+    def __init__(self, args):
+        super().__init__(args)
         self.use_page_limit = False
 
     def get_filtered_objects(self, input_query=None):
@@ -48,36 +82,14 @@ class SourceFilter(object):
 
         return parameter_map
 
-    def get_limit(self):
-        if "page" in self.args:
-            page = int(self.args["page"])
-        else:
-            page = 1
-
+    def get_model_pagination(self):
         from .viewspkg.viewsources import RssSourceListView
-
-        paginate_by = int(RssSourceListView.paginate_by)
-        # for page 1, paginate_by 100  we have range 0..99
-        # for page 2, paginate_by 100  we have range 100..199
-
-        start = (page - 1) * paginate_by
-
-        return [start, start + paginate_by]
-
-    def get_filter_string(self):
-        infilters = self.get_filter_args()
-
-        filter_string = ""
-        for key in infilters:
-            filter_string += "&{0}={1}".format(key, infilters[key])
-
-        # TODO try urlencode
-        return filter_string
+        return int(RssSourceListView.paginate_by)
 
 
-class EntryFilter(object):
+class EntryFilter(BaseQueryFilter):
     def __init__(self, args):
-        self.args = args
+        super().__init__(args)
         self.time_constrained = True
         self.use_page_limit = False
         if "archive" in self.args and self.args["archive"] == "on":
@@ -85,21 +97,10 @@ class EntryFilter(object):
         else:
             self.archive_source = False
 
-    def get_limit(self):
-        if "page" in self.args:
-            page = int(self.args["page"])
-        else:
-            page = 1
+    def get_model_pagination(self):
 
         from .viewspkg.viewentries import EntriesSearchListView
-
-        paginate_by = int(EntriesSearchListView.paginate_by)
-        # for page 1, paginate_by 100  we have range 0..99
-        # for page 2, paginate_by 100  we have range 100..199
-
-        start = (page - 1) * paginate_by
-
-        return [start, start + paginate_by]
+        return int(EntriesSearchListView.paginate_by)
 
     def get_sources(self):
         self.sources = SourceDataController.objects.all()
@@ -287,13 +288,48 @@ class EntryFilter(object):
             exact_find = True
         return exact_find, text
 
-    def get_filter_string(self):
-        infilters = self.get_source_filter_args()
-        infilters.update(self.get_entry_filter_args())
 
-        filter_string = ""
-        for key in infilters:
-            filter_string += "&{0}={1}".format(key, infilters[key])
+class DomainFilter(BaseQueryFilter):
+    def __init__(self, args):
+        super().__init__(args)
+        self.use_page_limit = False
 
-        # TODO try urlencode
-        return filter_string
+    def get_filtered_objects(self, input_query=None):
+        parameter_map = self.get_filter_args()
+
+        if input_query is None:
+            self.filtered_objects = Domains.objects.filter(**parameter_map)
+        else:
+            self.filtered_objects = Domains.objects.filter(
+                Q(**parameter_map) & input_query
+            )
+
+        if self.use_page_limit:
+            limit_range = self.get_limit()
+            if limit_range:
+                self.filtered_objects = self.filtered_objects[
+                    limit_range[0] : limit_range[1]
+                ]
+
+        return self.filtered_objects
+
+    def get_filter_args(self, translate=False):
+        parameter_map = {}
+
+        suffix = self.args.get("suffix")
+        if suffix and suffix != "":
+            parameter_map["suffix"] = suffix
+
+        tld = self.args.get("tld")
+        if tld and tld != "":
+            parameter_map["tld"] = tld
+
+        main = self.args.get("main")
+        if main and main != "":
+            parameter_map["main"] = main
+
+        domain = self.args.get("domain")
+        if domain and domain != "":
+            parameter_map["domain__icontains"] = domain
+
+        return parameter_map

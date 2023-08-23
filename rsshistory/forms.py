@@ -363,6 +363,66 @@ class TagRenameForm(forms.Form):
     new_tag = forms.CharField(label="New tag", max_length=100)
 
 
+class DomainsChoiceForm(forms.Form):
+    """
+    Category choice form
+    """
+
+    domain = forms.CharField(label="Domain", max_length=500, required=False)
+    suffix = forms.CharField(widget=forms.Select(choices=()), required=False)
+    tld = forms.CharField(widget=forms.Select(choices=()), required=False)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # custom javascript code
+        # https://stackoverflow.com/questions/10099710/how-to-manually-create-a-select-field-from-a-modelform-in-django
+        attr = {"onchange": "this.form.submit()"}
+
+        self.fields["suffix"].widget = forms.Select(choices=self.get_suffix_choices(), attrs=attr)
+        self.fields["tld"].widget = forms.Select(choices=self.get_tld_choices(), attrs=attr)
+
+    def get_suffix_choices(self):
+        from .models import DomainsSuffixes
+
+        result = []
+        result.append(["", ""])
+
+        suffs = DomainsSuffixes.objects.all()
+        for suff in suffs:
+            if suff and suff != "":
+                result.append([suff.suffix, suff.suffix])
+
+        return result
+
+    def get_tld_choices(self):
+        from .models import DomainsTlds
+
+        result = []
+        result.append(["", ""])
+
+        tlds = DomainsTlds.objects.all()
+        for tld in tlds:
+            if tld and tld != "":
+                result.append([tld.tld, tld.tld])
+
+        return result
+
+    def get_main_choices(self):
+        from .models import DomainsMains
+
+        result = []
+        result.append(["", ""])
+
+        mains = DomainsMains.objects.all()
+        for main in mains and main != "":
+            result.append([main.main, main.main])
+
+        result = sorted(result)
+
+        return result
+
+
 class SourcesChoiceForm(forms.Form):
     """
     Category choice form
@@ -370,7 +430,6 @@ class SourcesChoiceForm(forms.Form):
 
     category = forms.CharField(widget=forms.Select(choices=()), required=False)
     subcategory = forms.CharField(widget=forms.Select(choices=()), required=False)
-    title = forms.CharField(widget=forms.Select(choices=()), required=False)
 
     def __init__(self, *args, **kwargs):
         self.args = kwargs.pop("args", ())
@@ -381,9 +440,8 @@ class SourcesChoiceForm(forms.Form):
 
         # how to unpack dynamic forms
         # https://stackoverflow.com/questions/60393884/how-to-pass-choices-dynamically-into-a-django-form
-        categories = self.get_filtered_objects_values("category")
-        subcategories = self.get_filtered_objects_values("subcategory")
-        title = self.get_filtered_objects_values("title")
+        categories = self.get_categories()
+        subcategories = self.get_subcategories()
 
         # custom javascript code
         # https://stackoverflow.com/questions/10099710/how-to-manually-create-a-select-field-from-a-modelform-in-django
@@ -393,28 +451,29 @@ class SourcesChoiceForm(forms.Form):
         self.fields["subcategory"].widget = forms.Select(
             choices=subcategories, attrs=attr
         )
-        self.fields["title"].widget = forms.Select(choices=title, attrs=attr)
 
-    def get_filtered_objects_values(self, field):
-        values = set()
-        values.add("Any")
+    def get_categories(self):
+        from .models import SourceCategories
 
-        for val in self.filtered_objects.values(field):
-            if str(val).strip() != "":
-                values.add(val[field])
-
-        dict_values = self.to_dict(values)
-
-        return dict_values
-
-    def to_dict(self, alist):
         result = []
-        for item in sorted(alist):
-            if item.strip() != "":
-                if item == "Any":
-                    result.append(("", item))
-                else:
-                    result.append((item, item))
+        result.append(["", ""])
+
+        for category in SourceCategories.objects.all():
+            if category and category != "":
+                result.append([category.category, category.category])
+
+        return result
+
+    def get_subcategories(self):
+        from .models import SourceSubCategories
+
+        result = []
+        result.append(["", ""])
+
+        for subcategory in SourceSubCategories.objects.all():
+            if subcategory and subcategory != "":
+                result.append([subcategory.subcategory, subcategory.subcategory])
+
         return result
 
 
@@ -428,8 +487,8 @@ class BasicEntryChoiceForm(forms.Form):
         # https://stackoverflow.com/questions/60393884/how-to-pass-choices-dynamically-into-a-django-form
         self.sources = sources
 
-        categories = self.get_filtered_objects_values("category")
-        subcategories = self.get_filtered_objects_values("subcategory")
+        categories = self.get_categories()
+        subcategories = self.get_subcategories()
         title = self.get_filtered_objects_values("title")
 
         # custom javascript code
@@ -441,6 +500,30 @@ class BasicEntryChoiceForm(forms.Form):
             choices=subcategories, attrs=attr
         )
         self.fields["source_title"].widget = forms.Select(choices=title, attrs=attr)
+
+    def get_categories(self):
+        from .models import SourceCategories
+
+        result = []
+        result.append(["", ""])
+
+        for category in SourceCategories.objects.all():
+            if category and category != "":
+                result.append([category.category, category.category])
+
+        return result
+
+    def get_subcategories(self):
+        from .models import SourceSubCategories
+
+        result = []
+        result.append(["", ""])
+
+        for subcategory in SourceSubCategories.objects.all():
+            if subcategory and subcategory != "":
+                result.append([subcategory.subcategory, subcategory.subcategory])
+
+        return result
 
     def get_filtered_objects_values(self, field):
         values = set()

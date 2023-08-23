@@ -3,9 +3,11 @@
 
 <div class="contentbuttonmenu">
     <a href="javascript:history.back()" class="simplebutton">Go Back</a>
+    {% if user.is_staff %}
     <a href="{% url 'rsshistory:entries-remove-nonbookmarked' %}" title="Remove nonbookmarked entries" class="simplebutton">Remove non bookmarked entries</a>
     <a href="{% url 'rsshistory:entries-remove-all' %}" title="Remove nonbookmarked entries" class="simplebutton">Remove all entries</a>
     <a href="{% url 'rsshistory:sources-remove-all' %}" title="Removes all sources" class="simplebutton">Remove all sources</a>
+    {% endif %}
 </div>
 
 <h1>Config</h1>

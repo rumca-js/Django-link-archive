@@ -3,9 +3,12 @@
 
 <div class="contentbuttonmenu">
     <a href="javascript:history.back()" class="simplebutton">Go Back</a>
+
+    {% if user.is_staff %}
     <a href="{% url 'rsshistory:truncate-log' %}" title="Removes infos" class="simplebutton">Remove infos</a>
     <a href="{% url 'rsshistory:truncate-log-errors' %}" title="Removes errors" class="simplebutton">Remove errors</a>
     <a href="{% url 'rsshistory:truncate-log-all' %}" title="Removes all logs" class="simplebutton">Remove all</a>
+    {% endif %}
 </div>
 
 <h1>Persistant info list</h1>

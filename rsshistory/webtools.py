@@ -130,6 +130,11 @@ class Page(object):
             return False
         return True
 
+    def is_rss_available(self):
+        if self.get_contents().find("application/rss+xml") >= 0:
+            return True
+        return False
+
     def get_links(self):
         return self.get_links_re()
 
@@ -151,7 +156,7 @@ class Page(object):
                 ready_url = item
             else:
                 if item.startswith("//"):
-                    ready_url = self.get_domain() + "/" + item[2:]
+                    ready_url = "https:" + item
                 else:
                     if not url.endswith("/"):
                         url = url + "/"
@@ -161,35 +166,6 @@ class Page(object):
                     ready_url = url + item
 
             links.add(ready_url)
-
-        return links
-
-    def get_links_a(self):
-        links = set()
-
-        page = self.get_contents()
-        if not page:
-            return links
-
-        wh = 1
-        while wh:
-            wh = page.find('<a href="', wh + 1)
-
-            if wh > 0:
-                text = self.extract_html(page, '<a href="', '"', wh)
-
-                if text:
-                    text = text.strip()
-                    if text.startswith("/"):
-                        text = self.url + text
-
-                    if not self.is_link_valid(text):
-                        continue
-
-                    if text != "" and len(text) > 1:
-                        links.add(text)
-            else:
-                break
 
         return links
 
