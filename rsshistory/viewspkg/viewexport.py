@@ -399,9 +399,9 @@ def data_export_add(request):
     form.method = "POST"
     form.action_url = reverse("{}:data-export-add".format(ContextData.app_name))
 
-    context["config_form"] = form
+    context["form"] = form
 
-    return ContextData.render(request, "configuration.html", context)
+    return ContextData.render(request, "form_basic.html", context)
 
 
 def data_export_edit(request, pk):
