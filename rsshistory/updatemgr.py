@@ -44,9 +44,10 @@ class UpdateManager(object):
 
         conf = ConfigurationEntry.get()
 
-        write_date = datetime.strptime(input_date, "%Y-%m-%d").date()
         if input_date == "":
             write_date = DateUtils.get_date_yesterday()
+        else:
+            write_date = datetime.strptime(input_date, "%Y-%m-%d").date()
 
         writer = DataWriter(self._cfg)
         writer.write_daily_data(write_date.isoformat())
