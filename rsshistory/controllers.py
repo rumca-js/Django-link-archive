@@ -350,15 +350,16 @@ class LinkDataHyperController(object):
             if len(obj) > 0:
                 return obj[0]
 
-    def make_persistent(self, request, entry):
-        if entry.is_archive():
+    def make_persistent(request, entry):
+        if entry.is_archive_entry():
             LinkDataHyperController.move_from_archive(entry)
 
         entry.make_persistent(request.user.username)
         return True
 
-    def make_not_persistent(self, request, entry):
+    def make_not_persistent(request, entry):
         entry.make_not_persistent(request.user.username)
+        from .dateutils import DateUtils
 
         days_diff = DateUtils.get_day_diff(entry.date_published)
 

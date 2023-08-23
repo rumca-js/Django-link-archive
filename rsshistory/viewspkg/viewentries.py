@@ -13,6 +13,7 @@ from ..models import (
 )
 from ..controllers import (
     LinkDataController,
+    LinkDataHyperController,
     ArchiveLinkDataController,
     SourceDataController,
     BackgroundJobController,

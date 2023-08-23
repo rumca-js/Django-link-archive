@@ -17,7 +17,7 @@ class DateUtils(object):
 
     def get_day_diff(time_input):
         current_time = DateUtils.get_datetime_now_utc()
-        time_diff = current_time - entry.date_published
+        time_diff = current_time - time_input
         days_diff = time_diff.days
         return days_diff
 
@@ -45,6 +45,9 @@ class DateUtils(object):
 
     def get_datetime_file_name():
         return datetime.today().strftime("%Y-%m-%d_%H-%M-%S")
+
+    def get_date_file_name():
+        return DateUtils.format_date(datetime.today())
 
     def get_dir4date(date):
         return date.strftime("%Y-%m-%d")

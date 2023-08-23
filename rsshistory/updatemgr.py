@@ -1,5 +1,5 @@
 import traceback
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 from .dateutils import DateUtils
 from .models import PersistentInfo, RssSourceExportHistory, ConfigurationEntry
@@ -55,7 +55,7 @@ class UpdateManager(object):
 
         writer.clear_daily_data(write_date.isoformat())
 
-    def push_daily_repo(self, conf, input_date):
+    def push_daily_repo(self, conf, write_date):
         PersistentInfo.create("Pushing to RSS link repo")
 
         repo = DailyRepo(conf, conf.git_daily_repo)

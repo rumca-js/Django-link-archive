@@ -65,7 +65,7 @@ class SourceGenericPlugin(Page):
                 if not link_data:
                     continue
 
-                LinkDataHyperController.add_new_link(link_data, source)
+                LinkDataHyperController.add_new_link(link_data)
 
             return num_entries
 

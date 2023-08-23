@@ -24,6 +24,7 @@ from .controllers import (
     SourceDataController,
 )
 from .configuration import Configuration
+from .dateutils import DateUtils
 
 
 class BaseJobHandler(object):

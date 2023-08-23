@@ -72,7 +72,7 @@ def system_status(request):
     context["directory"] = c.directory
 
     context["SourceDataModel"] = len(SourceDataController.objects.all())
-    context["LinkDataModel"] = len(LinkDataController.objects.all())
+    # Takes too long context["LinkDataModel"] = len(LinkDataController.objects.all())
     context["LinkTagsDataModel"] = len(LinkTagsDataModel.objects.all())
     context["ConfigurationEntry"] = len(ConfigurationEntry.objects.all())
     context["UserConfig"] = len(UserConfig.objects.all())
@@ -83,14 +83,14 @@ def system_status(request):
     context["Current_DateTime"] = DateUtils.get_datetime_now_utc()
 
     context["ServerLogLength"] = len(PersistentInfo.objects.all())
-    context["ServerLogErrorsLength"] = len(PersistentInfo.objects.filter(level = logging.ERROR))
+    # Takes too long context["ServerLogErrorsLength"] = len(PersistentInfo.objects.filter(level = logging.ERROR))
     context["DomainsLength"] = len(Domains.objects.all())
 
     context["server_path"] = Path(".").resolve()
     context["directory"] = Path(".").resolve()
 
-    history = RssSourceExportHistory.get_safe()
-    context["export_history_list"] = history
+    # Takes too long history = RssSourceExportHistory.get_safe()
+    # Takes too long context["export_history_list"] = history
 
     return ContextData.render(request, "system_status.html", context)
 
