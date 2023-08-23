@@ -85,7 +85,6 @@ class ViewsTest(TestCase):
 
         self.assertEqual(resp.status_code, 200)
 
-
     """
     Entries
     """
@@ -387,7 +386,6 @@ class ViewsTest(TestCase):
     #    self.assertEqual(resp.status_code, 200)
 
 
-
 class EnhancedViewTest(ViewsTest):
     def setUp(self):
         source_youtube = SourceDataController.objects.create(
@@ -425,7 +423,7 @@ class EnhancedViewTest(ViewsTest):
         )
 
     def test_source_json(self):
-        sources = SourceDataController.objects.filter(url__icontains = "https://youtube")
+        sources = SourceDataController.objects.filter(url__icontains="https://youtube")
 
         url = reverse("{}:source-json".format(LinkDatabase.name), args=[sources[0].id])
         resp = self.client.get(url)
@@ -433,7 +431,7 @@ class EnhancedViewTest(ViewsTest):
         self.assertEqual(resp.status_code, 200)
 
     def test_entry_json(self):
-        entries = LinkDataController.objects.filter(link__icontains = "https://youtube")
+        entries = LinkDataController.objects.filter(link__icontains="https://youtube")
 
         url = reverse("{}:entry-json".format(LinkDatabase.name), args=[entries[0].id])
         resp = self.client.get(url)

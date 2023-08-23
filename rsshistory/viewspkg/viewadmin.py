@@ -146,8 +146,6 @@ def user_config(request):
     return ContextData.render(request, "user_configuration.html", context)
 
 
-
-
 class BackgroundJobsView(generic.ListView):
     model = BackgroundJob
     context_object_name = "jobs_list"
@@ -198,6 +196,7 @@ def backgroundjobs_perform_all(request):
         return ContextData.render(request, "missing_rights.html", context)
 
     from ..threadhandlers import HandlerManager, RefreshThreadHandler
+
     refresh_handler = RefreshThreadHandler()
     refresh_handler.refresh()
 
@@ -257,7 +256,7 @@ def truncate_log(request):
     if not request.user.is_staff:
         return ContextData.render(request, "missing_rights.html", context)
 
-    PersistentInfo.objects.filter(level__lt = 40).truncate()
+    PersistentInfo.objects.filter(level__lt=40).truncate()
 
     context["summary_text"] = "Clearing errors done"
 

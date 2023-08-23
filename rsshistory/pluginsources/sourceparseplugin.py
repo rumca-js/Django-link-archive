@@ -27,11 +27,7 @@ class BaseParsePlugin(SourceGenericPlugin):
 
         split = os.path.splitext(address)
 
-        if (
-            split[1] == ".html"
-            or split[1] == ".htm"
-            or split[1] == ""
-        ):
+        if split[1] == ".html" or split[1] == ".htm" or split[1] == "":
             search_pattern = self.source.get_domain()
 
             if re.search(search_pattern, address):

@@ -6,7 +6,16 @@ from django.views.generic.base import TemplateView
 
 from . import views
 from .apps import LinkDatabase
-from .viewspkg import viewentries, viewsources, viewcustom, viewtags, viewcomments, viewadmin, viewexport, viewdomains
+from .viewspkg import (
+    viewentries,
+    viewsources,
+    viewcustom,
+    viewtags,
+    viewcomments,
+    viewadmin,
+    viewexport,
+    viewdomains,
+)
 
 # register app namespace
 # TODO https://stackoverflow.com/questions/30494000/django-url-namespaces-the-template-has-to-know-its-namespace

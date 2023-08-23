@@ -7,5 +7,5 @@ from .models import (
     LinkVoteDataModel,
     LinkCommentDataModel,
     Domains,
-    DataExport
+    DataExport,
 )

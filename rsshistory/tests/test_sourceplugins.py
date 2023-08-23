@@ -10,7 +10,6 @@ from ..pluginsources.sourceparseditigsplugin import SourceParseDigitsPlugin
 
 
 class SourceParsePluginTest(TestCase):
-
     def setUp(self):
         self.source_youtube = SourceDataController.objects.create(
             url="https://youtube.com",
@@ -52,7 +51,6 @@ class SourceParsePluginTest(TestCase):
 
 
 class SourceGenerousParsePluginTest(TestCase):
-
     def setUp(self):
         self.source_youtube = SourceDataController.objects.create(
             url="https://youtube.com",
@@ -91,4 +89,3 @@ class SourceGenerousParsePluginTest(TestCase):
     def test_is_link_valid_css(self):
         parse = SourceGenerousParserPlugin(self.source_youtube)
         self.assertFalse(parse.is_link_valid("https://youtube.com/location/inside.css"))
-

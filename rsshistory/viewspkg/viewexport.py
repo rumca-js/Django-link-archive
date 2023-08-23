@@ -99,12 +99,13 @@ def import_from_instance(request):
             link = form.cleaned_data["link"]
 
             from ..serializers.instanceimporter import InstanceImporter
+
             ie = InstanceImporter(link)
             ie.import_all()
 
             context["summary_text"] = "Imported"
             return ContextData.render(request, "summary_present.html", context)
-        
+
         else:
             context["summary_text"] = "Form is invalid"
             return ContextData.render(request, "summary_present.html", context)
@@ -114,7 +115,9 @@ def import_from_instance(request):
         form.method = "POST"
 
         context["form_title"] = "Instance URL import"
-        context["form_description_pre"] = "Provide URL to another instance od Django-link-archive, the link of JSON data."
+        context[
+            "form_description_pre"
+        ] = "Provide URL to another instance od Django-link-archive, the link of JSON data."
         context["form"] = form
 
     return ContextData.render(request, "form_basic.html", context)
@@ -408,22 +411,24 @@ def data_export_edit(request, pk):
     if not request.user.is_staff:
         return ContextData.render(request, "missing_rights.html", context)
 
-    objs = DataExport.objects.filter(id = pk)
+    objs = DataExport.objects.filter(id=pk)
     if len(objs) == 0:
         context["summary_text"] = "No such object"
         return ContextData.render(request, "summary_present.html", context)
 
     if request.method == "POST":
-        form = DataExportForm(request.POST, instance = objs[0])
+        form = DataExportForm(request.POST, instance=objs[0])
         if form.is_valid():
             form.save()
         else:
             context["summary_text"] = "Form is invalid"
             return ContextData.render(request, "summary_present.html", context)
 
-    form = DataExportForm(instance = objs[0])
+    form = DataExportForm(instance=objs[0])
     form.method = "POST"
-    form.action_url = reverse("{}:data-export-edit".format(ContextData.app_name), args = [pk])
+    form.action_url = reverse(
+        "{}:data-export-edit".format(ContextData.app_name), args=[pk]
+    )
 
     context["config_form"] = form
 
@@ -437,7 +442,7 @@ def data_export_remove(request, pk):
     if not request.user.is_staff:
         return ContextData.render(request, "missing_rights.html", context)
 
-    objs = DataExport.objects.filter(id = pk)
+    objs = DataExport.objects.filter(id=pk)
     if len(objs) == 0:
         context["summary_text"] = "No such object"
         return ContextData.render(request, "summary_present.html", context)

@@ -21,7 +21,7 @@ from .models import (
     LinkTagsDataModel,
     LinkVoteDataModel,
     Domains,
-    )
+)
 from .webtools import Page
 
 from .apps import LinkDatabase
@@ -34,7 +34,7 @@ class SourceDataController(SourceDataModel):
     def add(source_data_map):
         # TODO add domain when adding new source
         SourceDataModel.objects.create(**source_data_map)
-        
+
         if ConfigurationEntry.get().store_domain_info:
             Domains.add(source_data_map["url"])
 
@@ -289,9 +289,7 @@ class ArchiveLinkDataController(ArchiveLinkDataModel):
 
 
 class LinkDataHyperController(object):
-
     def add_new_link(link_data):
- 
         if "source_obj" not in link_data:
             source_obj = None
             sources = SourceDataController.objects.filter(url=link_data["source"])

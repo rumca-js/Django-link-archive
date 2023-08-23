@@ -669,7 +669,6 @@ def wayback_save(request, pk):
 
 
 def entry_json(request, pk):
-
     links = LinkDataController.objects.filter(id=pk)
 
     if len(links) == 0:
@@ -679,6 +678,7 @@ def entry_json(request, pk):
     link = links[0]
 
     from ..serializers.instanceimporter import InstanceExporter
+
     exporter = InstanceExporter()
     json_obj = exporter.export_link(link)
 
@@ -687,7 +687,6 @@ def entry_json(request, pk):
 
 
 def entries_json(request):
-
     # Data
     query_filter = EntryFilter(request.GET)
     query_filter.get_sources()
@@ -696,6 +695,7 @@ def entries_json(request):
     links = query_filter.get_filtered_objects()
 
     from ..serializers.instanceimporter import InstanceExporter
+
     exporter = InstanceExporter()
     json_obj = exporter.export_links(links)
 
@@ -724,7 +724,7 @@ def entries_remove_nonbookmarked(request):
     if not request.user.is_staff:
         return ContextData.render(request, "missing_rights.html", context)
 
-    LinkDataController.objects.filter(persistent = False).delete()
+    LinkDataController.objects.filter(persistent=False).delete()
 
     context["summary_text"] = "Removed all non bookmarked entries"
 

@@ -123,7 +123,6 @@ class Domains(models.Model):
 
     class Meta:
         ordering = ["suffix", "main", "domain"]
-        #ordering = ["domain"]
 
     def add(url):
         """
@@ -157,10 +156,12 @@ class Domains(models.Model):
         extract = tldextract.TLDExtract()
         domain_data = extract(domain_only_text)
 
-        Domains.objects.create(domain=domain_only_text,
-                               main=domain_data.domain,
-                               subdomain=domain_data.subdomain,
-                               suffix=domain_data.suffix)
+        Domains.objects.create(
+            domain=domain_only_text,
+            main=domain_data.domain,
+            subdomain=domain_data.subdomain,
+            suffix=domain_data.suffix,
+        )
 
     def update_domain_obj(obj):
         from ..dateutils import DateUtils
@@ -177,9 +178,9 @@ class Domains(models.Model):
 
         print(domain_data)
 
-        self.main=domain_data.domain
-        self.subdomain=domain_data.subdomain
-        self.suffix=domain_data.suffix
+        self.main = domain_data.domain
+        self.subdomain = domain_data.subdomain
+        self.suffix = domain_data.suffix
 
         self.date_last = DateUtils.get_datetime_now_utc()
         self.save()
@@ -191,7 +192,6 @@ class Domains(models.Model):
 
 
 class DataExport(models.Model):
-
     EXPORT_TYPE_GIT = "export-type-git"
     EXPORT_TYPE_LOC = "export-type-loc"
 

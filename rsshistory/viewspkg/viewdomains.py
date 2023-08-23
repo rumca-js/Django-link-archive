@@ -85,5 +85,3 @@ def domains_read_bookmarks(request):
     context["summary_text"] = "Domains were read from bookmarks"
 
     return ContextData.render(request, "summary_present.html", context)
-
-

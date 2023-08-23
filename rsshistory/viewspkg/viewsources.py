@@ -402,7 +402,6 @@ def source_fix_entries(request, source_pk):
 
 
 def source_json(request, pk):
-
     sources = SourceDataController.objects.filter(id=pk)
 
     if len(sources) == 0:
@@ -412,6 +411,7 @@ def source_json(request, pk):
     source = sources[0]
 
     from ..serializers.instanceimporter import InstanceExporter
+
     exporter = InstanceExporter()
     json_obj = exporter.export_source(source)
 
@@ -420,13 +420,13 @@ def source_json(request, pk):
 
 
 def sources_json(request):
-
     # Data
     query_filter = SourceFilter(request.GET)
     query_filter.use_page_limit = True
     sources = query_filter.get_filtered_objects()
 
     from ..serializers.instanceimporter import InstanceExporter
+
     exporter = InstanceExporter()
     json_obj = exporter.export_sources(sources)
 

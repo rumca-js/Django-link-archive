@@ -1,4 +1,3 @@
-
 from pathlib import Path
 import shutil
 from datetime import datetime
@@ -17,7 +16,7 @@ class DomainTest(TestCase):
     def test_domain_add(self):
         Domains.add("waiterrant.blogspot.com")
 
-        objs = Domains.objects.filter(domain__icontains = "waiterrant")
+        objs = Domains.objects.filter(domain__icontains="waiterrant")
 
         self.assertEqual(len(objs), 1)
 
@@ -27,4 +26,3 @@ class DomainTest(TestCase):
         self.assertEqual(obj.main, "blogspot")
         self.assertEqual(obj.subdomain, "waiterrant")
         self.assertEqual(obj.suffix, "com")
-

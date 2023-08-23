@@ -253,7 +253,9 @@ def show_youtube_link_props(request):
             youtube_props.append(("channel", yt_json["channel"]))
             youtube_props.append(("channel_url", yt_json["channel_url"]))
             youtube_props.append(("channel_feed_url", feed_url))
-            youtube_props.append(("channel_follower_count", yt_json["channel_follower_count"]))
+            youtube_props.append(
+                ("channel_follower_count", yt_json["channel_follower_count"])
+            )
             youtube_props.append(("view_count", yt_json["view_count"]))
             youtube_props.append(("like_count", yt_json["like_count"]))
             youtube_props.append(("language", yt_json["language"]))

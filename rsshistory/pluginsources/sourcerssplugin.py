@@ -141,7 +141,9 @@ class BaseRssPlugin(SourceGenericPlugin):
         output_map["link"] = feed_entry.link
 
         if output_map["date_published"]:
-            output_map["date_published"] = DateUtils.to_utc_date(output_map["date_published"])
+            output_map["date_published"] = DateUtils.to_utc_date(
+                output_map["date_published"]
+            )
 
             if output_map["date_published"] > DateUtils.get_datetime_now_utc():
                 output_map["date_published"] = DateUtils.get_datetime_now_utc()
