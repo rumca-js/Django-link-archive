@@ -69,6 +69,16 @@ class DataWriter(object):
 
         return text
 
+    def get_domains_json(self, domains=None):
+        from .models import Domains
+
+        if domains is None:
+            domains = Domains.objects.all()
+
+        from .serializers.domainexporter import DomainJsonExporter
+        exp = DomainJsonExporter()
+        return exp.get_text(domains)
+
     def write_daily_data(self, day_iso):
         daily_path = self._cfg.get_daily_data_path(day_iso)
         daily_path.mkdir(parents=True, exist_ok=True)
@@ -77,7 +87,11 @@ class DataWriter(object):
         writer.write_for_day(day_iso)
 
         text = self.get_sources_json()
-        file_name = daily_path / self._cfg.get_sources_file_name()
+        file_name = self._cfg.get_export_path() / self._cfg.get_sources_file_name()
+        file_name.write_text(text)
+
+        text = self.get_domains_json()
+        file_name = self._cfg.get_export_path() / self._cfg.get_domains_file_name()
         file_name.write_text(text)
 
     def write_bookmarks(self):

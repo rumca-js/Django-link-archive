@@ -1,0 +1,101 @@
+{% extends base_generic %}
+{% block content %}
+
+<div class="contentbuttonmenu">
+    <a href="javascript:history.back()" class="simplebutton">Go Back</a>
+</div>
+
+<h1>{{form_title}}</h1>
+
+<p>{{form_description}}<p>
+
+{{form_description_pre| safe}}
+
+<form action="{{form.action_url}}" method="{{form.method}}">
+    <table>
+    {{ form }}
+    <tr>
+        <td>
+        <input type="submit" value="Submit">
+        </td>
+    </tr>
+    </table>
+</form>
+
+Examples:
+<ul>
+    <li>"title = china" - searches anything with China in title</li>
+    <li>"tags__tag = tag" - searches links with tag</li>
+    <li>"persistent = 1" - all persistent link</li>
+    <li>"title = china & persistent = 1" - all persistent link, with china in title</li>
+</ul>
+
+Available fields:
+<ul>
+    <li>"title"</li>
+    <li>"description"</li>
+    <li>"link"</li>
+    <li>"source"</li>
+    <li>"persistent"</li>
+    <li>"dead"</li>
+    <li>"artist"</li>
+    <li>"album"</li>
+    <li>"user"</li>
+    <li>"language"</li>
+    <li>"thumbnail"</li>
+</ul>
+
+Available foreign fields:
+<ul>
+    <li>"tags__tag"</li>
+    <li>"votes__vote"</li>
+    <li>"source_obj__category"</li>
+    <li>"source_obj__subcategory"</li>
+</ul>
+
+Available comparison operators:
+<ul>
+    <li>"==", "=", ">", "<", ">=", "<=", "is null"</li>
+</ul>
+
+Available condition operators
+<ul>
+    <li>"&", "|"</li>
+</ul>
+
+System accepts brackets.
+
+<hr/>
+
+<div>
+  <h2>Other places</h2>
+
+  <h3>Important</h3>
+  <a href="https://en.wikipedia.org/w/index.php" class="simplebutton">Wikipedia</a>
+  <a href="https://news.ycombinator.com/" class="simplebutton">Hacker News</a>
+
+  <h3>Mainstream</h3>
+  <a href="https://www.quora.com/" class="simplebutton">Quora</a>
+  <a href="https://stackoverflow.com" class="simplebutton">Stack overflow</a>
+  <a href="https://www.reddit.com/" class="simplebutton">Reddit</a>
+  <a href="https://medium.com/" class="simplebutton">Medium</a>
+  <a href="https://substack.com/" class="simplebutton">Substack</a>
+
+  <h3>Search engines</h3>
+  <a href="https://www.duckduckgo.com/" class="simplebutton">DuckDuckGo</a>
+  <a href="https://hn.algolia.com/?dateRange=all&page=0&prefix=true&query=tim%20cook&sort=byPopularity&type=story" class="simplebutton">Hacker News search</a>
+  <a href="https://www.wolframalpha.com/" class="simplebutton">Wolfram</a>
+  <a href="https://chat.openai.com/" class="simplebutton">ChatGPT</a>
+  <a href="https://kagi.com/" class="simplebutton">Kagi search</a>
+
+  <h3>Social</h3>
+  <a href="https://mastodon.social/explore" class="simplebutton">Mastodon</a>
+  <a href="https://join-lemmy.org/instances" class="simplebutton">Lemmy</a>
+
+  <a href="https://www.youtube.com/" class="simplebutton">YouTube</a>
+  <a href="https://odysee.com/" class="simplebutton">Odysee</a>
+  <a href="https://rumble.com/" class="simplebutton">Rumble</a>
+  <a href="https://www.spotify.com/" class="simplebutton">Spotify</a>
+</div>
+
+{% endblock %}

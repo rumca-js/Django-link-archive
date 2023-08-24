@@ -62,11 +62,13 @@ class SourceParsePluginTest(TestCase):
         link = LinkDataHyperController.add_new_link(link_data)
 
         objs = LinkDataModel.objects.filter(link=link_name)
+        self.assertEqual(len(objs), 1)
         obj = objs[0]
 
         LinkDataHyperController.make_persistent(RequestObject(), obj)
 
         objs = LinkDataModel.objects.filter(link=link_name)
+        self.assertEqual(len(objs), 1)
         obj = objs[0]
 
         self.assertTrue(obj.persistent == True)
@@ -74,6 +76,7 @@ class SourceParsePluginTest(TestCase):
         LinkDataHyperController.make_not_persistent(RequestObject(), obj)
 
         objs = LinkDataModel.objects.filter(link=link_name)
+        self.assertEqual(len(objs), 1)
         obj = objs[0]
 
         self.assertTrue(obj.persistent == False)

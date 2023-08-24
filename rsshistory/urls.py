@@ -126,6 +126,8 @@ urlpatterns = [
     path("domains-fix/", viewdomains.domains_fix, name="domains-fix",),
     path("domain-fix/<int:pk>/", viewdomains.domain_fix, name="domain-fix",),
     path("domains-read-bookmarks/", viewdomains.domains_read_bookmarks, name="domains-read-bookmarks",),
+    path("domain-json/<int:pk>/", viewdomains.domain_json, name="domain-json",),
+    path("domains-json/", viewdomains.domains_json, name="domains-json"),
     # other, debug forms
     path("check-move-archive", viewcustom.check_if_move_to_archive, name="check-move-archive",),
     path("data-errors", viewcustom.data_errors_page, name="data-errors"),

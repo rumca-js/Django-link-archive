@@ -1,5 +1,6 @@
 from django.views import generic
 from django.urls import reverse
+from django.http import JsonResponse
 
 from ..models import Domains
 from ..views import ContextData
@@ -13,7 +14,7 @@ from ..queryfilters import DomainFilter
 
 class DomainsListView(generic.ListView):
     model = Domains
-    context_object_name = "domain_list"
+    context_object_name = "content_list"
     paginate_by = 100
 
     def get_queryset(self):
@@ -135,3 +136,33 @@ def domains_read_bookmarks(request):
     context["summary_text"] = "Domains were read from bookmarks"
 
     return ContextData.render(request, "summary_present.html", context)
+
+
+def domain_json(request, pk):
+    domains = Domains.objects.filter(id=pk)
+
+    if len(domains) == 0:
+        context["summary_text"] = "No such domain in the database {}".format(pk)
+        return ContextData.render(request, "summary_present.html", context)
+
+    domain = domains[0]
+
+    # JsonResponse
+    return JsonResponse(domain.get_map() )
+
+
+def domains_json(request):
+    from ..queryfilters import DomainFilter
+    domains = Domains.objects.all()
+
+    # Data
+    query_filter = DomainFilter(request.GET)
+    query_filter.use_page_limit = True
+    domains = query_filter.get_filtered_objects()
+
+    from ..serializers.domainexporter import DomainJsonExporter
+
+    exp = DomainJsonExporter()
+
+    # JsonResponse
+    return JsonResponse(exp.get_json(domains))

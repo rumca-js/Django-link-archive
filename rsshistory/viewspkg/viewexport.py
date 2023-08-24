@@ -454,7 +454,7 @@ def data_export_remove(request, pk):
 
 class DataExportListView(generic.ListView):
     model = DataExport
-    context_object_name = "objects"
+    context_object_name = "content_list"
     paginate_by = 100
 
     def get_context_data(self, **kwargs):

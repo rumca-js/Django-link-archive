@@ -32,9 +32,9 @@
 
   <hr>
 
-  {% if source_list %}
+  {% if content_list %}
      <div class="linklist container_{{user_config.display_type}}">
-       {% for source in source_list %}
+       {% for source in content_list %}
          <a href="{{ source.get_absolute_url }}"
            class="element_{{user_config.display_type}}"
            title="{{source.title}} {{source.get_long_description}}"
@@ -51,23 +51,7 @@
        {% endfor %}
      </div>
 
-     <div class="pagination">
-         <span class="step-links">
-             {% if page_obj.has_previous %}
-                <a href="?page=1{{query_filter.get_filter_string}}" class='simplebutton'>&laquo; first</a>
-                <a href="?page={{ page_obj.previous_page_number }}{{query_filter.get_filter_string}}" class='simplebutton'>previous</a>
-             {% endif %}
-
-             <span class="current">
-                 Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
-             </span>
-
-             {% if page_obj.has_next %}
-               <a href="?page={{ page_obj.next_page_number }}{{query_filter.get_filter_string}}" class='simplebutton'>next</a>
-               <a href="?page={{ page_obj.paginator.num_pages }}{{query_filter.get_filter_string}}" class='simplebutton'>last &raquo;</a>
-             {% endif %}
-         </span>
-     </div>
+    {% include "rsshistory/pagination.html" %}
 
      <a href="{% url 'rsshistory:sources-json' %}?{{ request.GET.urlencode }}" class='simplebutton'>Show JSON</a>
 

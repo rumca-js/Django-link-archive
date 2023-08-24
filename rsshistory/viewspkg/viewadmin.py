@@ -148,7 +148,7 @@ def user_config(request):
 
 class BackgroundJobsView(generic.ListView):
     model = BackgroundJob
-    context_object_name = "jobs_list"
+    context_object_name = "content_list"
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
@@ -225,7 +225,7 @@ def backgroundjobs_remove(request, job_type):
 
 class PersistentInfoView(generic.ListView):
     model = PersistentInfo
-    context_object_name = "info_list"
+    context_object_name = "content_list"
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context

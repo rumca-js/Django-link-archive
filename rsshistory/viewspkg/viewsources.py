@@ -18,7 +18,7 @@ from ..controllers import (
 
 class RssSourceListView(generic.ListView):
     model = SourceDataController
-    context_object_name = "source_list"
+    context_object_name = "content_list"
     paginate_by = 100
 
     def get_queryset(self):

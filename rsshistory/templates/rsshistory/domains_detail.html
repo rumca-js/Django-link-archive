@@ -23,4 +23,6 @@
 <div>Date last: {{object.date_last}}</div>
 </p>
 
+<a href="{% url 'rsshistory:domain-json' object.id %}" class="simplebutton">Show JSON</a>
+
 {% endblock %}

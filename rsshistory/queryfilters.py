@@ -9,8 +9,9 @@ from .models import Domains
 
 
 class BaseQueryFilter(object):
-    def __init__(self, args):
+    def __init__(self, args, page_limit = False):
         self.args = args
+        self.use_page_limit = page_limit
 
     def get_filter_string(self):
         infilters = self.args
@@ -40,30 +41,28 @@ class BaseQueryFilter(object):
 
         return [start, start + paginate_by]
 
-
-class SourceFilter(BaseQueryFilter):
-    def __init__(self, args):
-        super().__init__(args)
-        self.use_page_limit = False
-
-    def get_filtered_objects(self, input_query=None):
-        parameter_map = self.get_filter_args()
-
-        if input_query is None:
-            self.filtered_objects = SourceDataController.objects.filter(**parameter_map)
-        else:
-            self.filtered_objects = SourceDataController.objects.filter(
-                Q(**parameter_map) & input_query
-            )
+    def get_filtered_objects(self):
+        filtered_objects = self.get_filtered_objects_internal()
 
         if self.use_page_limit:
             limit_range = self.get_limit()
             if limit_range:
-                self.filtered_objects = self.filtered_objects[
+                filtered_objects = filtered_objects[
                     limit_range[0] : limit_range[1]
                 ]
 
+        self.filtered_objects = filtered_objects
+
         return self.filtered_objects
+
+
+class SourceFilter(BaseQueryFilter):
+    def __init__(self, args):
+        super().__init__(args)
+
+    def get_filtered_objects_internal(self):
+        parameter_map = self.get_filter_args()
+        return SourceDataController.objects.filter(**parameter_map)
 
     def get_filter_args(self, translate=False):
         parameter_map = {}
@@ -91,11 +90,12 @@ class EntryFilter(BaseQueryFilter):
     def __init__(self, args):
         super().__init__(args)
         self.time_constrained = True
-        self.use_page_limit = False
         if "archive" in self.args and self.args["archive"] == "on":
             self.archive_source = True
         else:
             self.archive_source = False
+
+        self.additional_condition = None
 
     def get_model_pagination(self):
 
@@ -111,13 +111,16 @@ class EntryFilter(BaseQueryFilter):
     def set_archive_source(self, source):
         self.archive_source = source
 
-    def get_filtered_objects(self, input_query=None):
+    def set_additional_condition(self, condition):
+        self.additional_condition = condition
+
+    def get_filtered_objects_internal(self):
         source_parameter_map = self.get_source_filter_args(True)
         entry_parameter_map = self.get_entry_filter_args(True)
 
         print("Entry parameter map: {}".format(str(entry_parameter_map)))
 
-        if input_query == None:
+        if self.additional_condition == None:
             if not self.archive_source:
                 self.entries = LinkDataController.objects.filter(**entry_parameter_map)
             if self.archive_source:
@@ -127,17 +130,12 @@ class EntryFilter(BaseQueryFilter):
         else:
             if not self.archive_source:
                 self.entries = LinkDataController.objects.filter(
-                    Q(**entry_parameter_map) & input_query
+                    Q(**entry_parameter_map) & self.additional_condition
                 )
             if self.archive_source:
                 self.entries = ArchiveLinkDataController.objects.filter(
-                    Q(**entry_parameter_map) & input_query
+                    Q(**entry_parameter_map) & self.additional_condition
                 )
-
-        if self.use_page_limit:
-            limit_range = self.get_limit()
-            if limit_range:
-                self.entries = self.entries[limit_range[0] : limit_range[1]]
 
         return self.entries
 
@@ -292,25 +290,10 @@ class EntryFilter(BaseQueryFilter):
 class DomainFilter(BaseQueryFilter):
     def __init__(self, args):
         super().__init__(args)
-        self.use_page_limit = False
 
-    def get_filtered_objects(self, input_query=None):
+    def get_filtered_objects_internal(self):
         parameter_map = self.get_filter_args()
-
-        if input_query is None:
-            self.filtered_objects = Domains.objects.filter(**parameter_map)
-        else:
-            self.filtered_objects = Domains.objects.filter(
-                Q(**parameter_map) & input_query
-            )
-
-        if self.use_page_limit:
-            limit_range = self.get_limit()
-            if limit_range:
-                self.filtered_objects = self.filtered_objects[
-                    limit_range[0] : limit_range[1]
-                ]
-
+        self.filtered_objects = Domains.objects.filter(**parameter_map)
         return self.filtered_objects
 
     def get_filter_args(self, translate=False):
@@ -333,3 +316,183 @@ class DomainFilter(BaseQueryFilter):
             parameter_map["domain__icontains"] = domain
 
         return parameter_map
+
+
+class StringSymbolEquation(object):
+    def __init__(self, data):
+        self.data = data
+        self.current_symbol = ord("A") - 1
+
+    def is_operator(self, char):
+        return char in ("(", ")", "&", "|", "~", "^", "!")
+
+    def is_whitespace(self, char):
+        return char in (" ", "\t")
+
+    def process(self):
+        result_string = ""
+        inside_text = False
+        self.conditions = {}
+        self.current_condition = ""
+
+        for char in self.data:
+            if self.is_operator(char):
+                inside_text = False
+                result_string += char
+
+                self.add_condition()
+
+            elif inside_text:
+                self.current_condition += char
+            else:
+                self.current_condition += char
+
+                if not self.is_whitespace(char):
+                    inside_text = True
+                    result_string += self.get_next_symbol()
+
+        self.add_condition()
+
+        return result_string, self.conditions
+
+    def add_condition(self):
+        self.current_condition = self.current_condition.strip()
+        if self.current_condition != "":
+            self.conditions[self.get_current_symbol()] = self.current_condition
+            self.current_condition = ""
+
+    def get_current_symbol(self):
+        return chr(self.current_symbol)
+
+    def get_next_symbol(self):
+        self.current_symbol += 1
+        return chr(self.current_symbol)
+
+
+from sympy import sympify
+import sympy
+class OmniSymbolProcessor(object):
+
+    def __init__(self, data, symbol_evaluator):
+        self.symbol_evaluator = symbol_evaluator
+
+        eq = StringSymbolEquation(data)
+        self.eq_string, self.conditions = eq.process()
+        copy = self.eq_string
+
+        self.expr = sympify(self.eq_string)
+        self.known_results = {}
+
+    def process(self):
+        return self.process_internal(self.expr)
+
+    def process_internal(self, expr):
+        for arg in expr.args:
+            self.process_internal(arg)
+
+        if expr.func == sympy.core.symbol.Symbol:
+            symbol = str(expr)
+
+            return self.evaluate_symbol(symbol)
+        else:
+            function = str(expr.func)
+            operation_symbol = str(expr)
+            print("Operation: {}".format(function))
+
+            return self.make_operation(operation_symbol, function, expr.args)
+
+        #print(f'arg {expr}')
+        #print(f'arg.func: {expr.func}')
+        #print(f'arg.args: {expr.args}')
+
+    def evaluate_symbol(self, symbol):
+        condition_text = self.conditions[symbol]
+        print("Evaluation condition {} {}".format(symbol, condition_text))
+
+        self.known_results[symbol] = self.symbol_evaluator.evaluate_symbol(condition_text)
+
+        return self.known_results[symbol]
+
+    def make_operation(self, operation_symbol, function, args):
+
+        args0 = str(args[0])
+        args1 = str(args[1])
+
+        print("Evaluation function: full:{} function:{} args:{} {}".format(operation_symbol, function, args0, args1))
+
+        args0 = self.known_results[args0]
+        args1 = self.known_results[args1]
+
+        if function == "And":
+            self.known_results[operation_symbol] = args0 & args1
+            return self.known_results[operation_symbol]
+        elif function == "Or":
+            self.known_results[operation_symbol] = args0 | args1
+            return self.known_results[operation_symbol]
+        else:
+            raise NotImplementedError("Not implemented function: {}".format(function))
+
+
+class OmniSymbolEvaluator(object):
+    def evaluate_symbol(self, symbol):
+        condition_data = self.split_symbol(symbol)
+        condition_data = self.translate_condition(condition_data)
+
+        print("Symbol evaluator condition data:{}".format(condition_data))
+        return Q(**condition_data)
+
+    def get_operators(self):
+        return ("==", "=", "!=", "<=", ">=", "<", ">")
+
+    def split_symbol(self, symbol):
+        for op in self.get_operators():
+            sp = symbol.split(op)
+            if len(sp) > 1:
+                return [sp[0].strip(), op, sp[1].strip()]
+
+        wh = symbol.find("is null")
+        if wh >= 0:
+            return [symbol[wh:].strip(), "is null"]
+
+    def translate_condition(self, condition_data):
+        """
+        https://docs.djangoproject.com/en/4.2/ref/models/querysets/#field-lookups
+        """
+
+        if condition_data[1] == "==":
+            return {condition_data[0]+"__iexact": condition_data[2]}
+        elif condition_data[1] == "=":
+            return {condition_data[0]+"__icontains": condition_data[2]}
+        elif condition_data[1] == ">":
+            return {condition_data[0]+"__gt": condition_data[2]}
+        elif condition_data[1] == "<":
+            return {condition_data[0]+"__lt": condition_data[2]}
+        elif condition_data[1] == ">=":
+            return {condition_data[0]+"__gte": condition_data[2]}
+        elif condition_data[1] == "<=":
+            return {condition_data[0]+"__lte": condition_data[2]}
+        elif condition_data[1] == "is null":
+            return {condition_data[0]+"__isnull": True}
+
+
+class OmniSearchProcessor(BaseQueryFilter):
+    def __init__(self, args):
+        super().__init__(args)
+
+        self.data = self.args["search"]
+        self.query_set = None
+
+    def set_query_set(self, query_set):
+        self.query_set = query_set
+
+    def get_filtered_objects_internal(self):
+        if self.query_set is None:
+            return []
+
+        proc = OmniSymbolProcessor(self.data, OmniSymbolEvaluator())
+        combined_q_object = proc.process()
+
+        filtered_queryset = self.query_set.filter(combined_q_object)
+        print("Omni query:{}".format(filtered_queryset.query))
+        return filtered_queryset
+

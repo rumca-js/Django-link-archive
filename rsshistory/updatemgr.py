@@ -65,7 +65,8 @@ class UpdateManager(object):
 
         local_dir = self._cfg.get_daily_data_path(write_date.isoformat())
         repo.copy_day_data(local_dir, write_date)
-        repo.copy_file(self._cfg.get_bookmarks_path() / "sources.json")
+        repo.copy_file(self._cfg.get_export_path() / self._cfg.get_sources_file_name())
+        repo.copy_file(self._cfg.get_export_path() / self._cfg.get_domains_file_name())
 
         repo.add([])
         repo.commit(DateUtils.get_dir4date(write_date))

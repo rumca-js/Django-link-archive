@@ -1,0 +1,20 @@
+<a href="{{ link.get_absolute_url }}"
+   title="{{link.get_title}} {{link.get_long_description}}"
+   {% if link.persistent %}
+   class="element_{{user_config.display_type}} element_{{user_config.display_type}}_selected"
+   {% else %}
+   class="element_{{user_config.display_type}}"
+   {% endif %}
+   >
+   {% if user_config.show_icons %}
+   <img src=
+        {% if user_config.thumbnails_as_icons %}
+        "{{link.get_thumbnail}}"
+        {% else %}
+        "{{link.get_favicon}}"
+        {% endif %}
+        width="100%"/>
+   {% endif %}
+   <span class="linklistitemtitle">{{link.get_title}}</span>
+   <span class="linklistitemdescription">{{link.get_long_description}}</span>
+</a>

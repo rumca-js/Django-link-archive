@@ -27,192 +27,28 @@
 
   <hr>
 
-  {% if entries_list %}
+  {% if content_list %}
   <div class="linklist container_{{user_config.display_type}}">
-    {% for link in entries_list %}
+    {% for link in content_list %}
           {% if user_config.display_type == "clickable-tags" %}
-             <div
-                 {% if link.persistent %}
-                 title="{{link.get_title}} {{link.get_long_description}}"
-                    class="element_{{user_config.display_type}} element_{{user_config.display_type}}_selected"
-                 {% else %}
-                    class="element_{{user_config.display_type}}"
-                 {% endif %}
-                     >
-
-               <div class="linklistitem">
-                   <a href="{{ link.get_absolute_url }}" class="linklistitemtitle">
-                      <div>
-                          {% if user_config.show_icons %}
-                            <img src=
-                              {% if user_config.thumbnails_as_icons %}
-                                  "{{link.get_thumbnail}}"
-                              {% else %}
-                                  "{{link.get_favicon}}"
-                              {% endif %}
-                              {% if user_config.small_icons %}
-                                 class="content-thumbnail"
-                              {% else %}
-                                 class="content-big-thumbnail"
-                              {% endif %}
-                                 />
-                          {% endif %}
-
-                          {{link.get_title}} {{link.get_long_description}}
-                      </div>
-                   </a>
-                  <div class="linklistitemdescription">
-                      {% if link.get_tag_string %}
-                      Tags: 
-                          {% for tag in link.get_tag_map %}
-                              <a href='{% url 'rsshistory:entries'%}?tag="{{tag}}"' class="simplebutton">{{tag}}</a>
-                          {% endfor %}
-                      {% endif %}
-                      {% if link.persistent %}
-                         User: {{link.user}}
-                      {% endif %}
-
-                  </div>
-               </div>
-             </div>
+              {% include "rsshistory/linkdatacontroller_list__clickable_tags.html" %}
           {% elif user_config.display_type == "line-and-buttons" %}
-             <div
-                     title="{{link.get_title}} {{link.get_long_description}}"
-                     {% if link.persistent %}
-                        class="element_{{user_config.display_type}} element_{{user_config.display_type}}_selected"
-                     {% else %}
-                        class="element_{{user_config.display_type}}"
-                     {% endif %}
-                 >
-                  <a href="{{ link.link }}" >
-                      <div>
-                          {% if user_config.show_icons %}
-                            <img src=
-                              {% if user_config.thumbnails_as_icons %}
-                                  "{{link.get_thumbnail}}"
-                              {% else %}
-                                  "{{link.get_favicon}}"
-                              {% endif %}
-                              {% if user_config.small_icons %}
-                                 class="content-thumbnail"
-                              {% else %}
-                                 class="content-big-thumbnail"
-                              {% endif %}
-                                 />
-                          {% endif %}
-                      <span class="linklistitemtitle">{{link.get_title}}</span>
-                      <span class="linklistitemdescription">{{link.get_full_description}}</span>
-                      </div>
-                  </a>
-
-              {% if user.is_staff %}
-                  <div>
-                     <a href="{{ link.get_absolute_url }}" class="simplebutton">
-                        Details
-                     </a>
-                     {% if link.persistent %}
-                      <a href="{% url 'rsshistory:entry-notstar' link.id %}" class="simplebutton">
-                       Not bookmarked
-                      </a>
-                      <a href="{% url 'rsshistory:entry-tag' link.id %}" class="simplebutton">Tag entry</a>
-                     {% else %}
-                      <a href="{% url 'rsshistory:entry-star' link.id %}" class="simplebutton">
-                       Bookmark
-                      </a>
-                     {% endif %}
-                  </div>
-              {% else %}
-                  <hr>
-              {% endif %}
-             </div>
+              {% include "rsshistory/linkdatacontroller_list__line_and_buttons.html" %}
           {% elif user_config.display_type == "youtube-thumbnails" %}
-              <a href="{{ link.get_absolute_url }}"
-                 title="{{link.get_title}} {{link.get_long_description}}"
-                 {% if link.persistent %}
-                    class="element_{{user_config.display_type}} element_{{user_config.display_type}}_selected"
-                 {% else %}
-                    class="element_{{user_config.display_type}}"
-                 {% endif %}
-                      >
-                      {% if user_config.show_icons %}
-                        <img src=
-                          {% if user_config.thumbnails_as_icons %}
-                              "{{link.get_thumbnail}}"
-                          {% else %}
-                              "{{link.get_favicon}}"
-                          {% endif %}
-                             width="100%"/>
-                      {% endif %}
-                       <span class="linklistitemtitle">{{link.get_title}}</span>
-                       <span class="linklistitemdescription">{{link.get_long_description}}</span>
-                      </a>
-
-              <!-- mainly std, and otther -->
+              {% include "rsshistory/linkdatacontroller_list__youtube_thumbnails.html" %}
           {% else %}
-              <a href="{{ link.get_absolute_url }}"
-                 title="{{link.get_title}} {{link.get_long_description}}"
-                 {% if link.persistent %}
-                    class="element_{{user_config.display_type}} element_{{user_config.display_type}}_selected"
-                 {% else %}
-                    class="element_{{user_config.display_type}}"
-                 {% endif %}
-                >
-
-                  {% if user_config.show_icons %}
-                    <img src=
-                      {% if user_config.thumbnails_as_icons %}
-                          "{{link.get_thumbnail}}"
-                      {% else %}
-                          "{{link.get_favicon}}"
-                      {% endif %}
-
-                      {% if user_config.small_icons %}
-                         class="content-thumbnail"
-                      {% else %}
-                         class="content-big-thumbnail"
-                      {% endif %}
-                     />
-                  {% endif %}
-
-                  <span class="linklistitemtitle">
-                     {% if link.get_vote > 0 %}
-                      [{{link.get_vote}}] 
-                     {% endif %}
-		     {{link.get_title}}
-                  </span>
-                  <span class="linklistitemdescription">
-                       {{link.get_full_description}}
-                  </span>
-              </a>
+              {% include "rsshistory/linkdatacontroller_list__standard.html" %}
           {% endif %}
     {% endfor %}
   </div>
 
-<div class="pagination">
-    <span class="step-links">
-        {% if page_obj.has_previous %}
-           <a href="?page=1{{query_filter.get_filter_string}}" class='simplebutton'>&laquo; first</a>
-           <a href="?page={{ page_obj.previous_page_number }}{{query_filter.get_filter_string}}" class='simplebutton'>previous</a>
-        {% endif %}
-
-        <span class="current">
-            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
-        </span>
-
-        {% if page_obj.has_next %}
-          <a href="?page={{ page_obj.next_page_number }}{{query_filter.get_filter_string}}" class='simplebutton'>next</a>
-          <a href="?page={{ page_obj.paginator.num_pages }}{{query_filter.get_filter_string}}" class='simplebutton'>last &raquo;</a>
-        {% endif %}
-
-        <span>Records: {{entries_list | length}} </span>
-    </span>
-</div>
+{% include "rsshistory/pagination.html" %}
 
   {% else %}
     <p>There are no links.</p>
   {% endif %}
 
-     <a href="{% url 'rsshistory:entries-json' %}?{{ request.GET.urlencode }}" class='simplebutton'>Show JSON</a>
+  <a href="{% url 'rsshistory:entries-json' %}?query_type={{query_type}}&{{ request.GET.urlencode }}" class='simplebutton'>Show JSON</a>
 
   {% if search_term %}
      <a href="https://en.wikipedia.org/w/index.php?search={{search_term}}" class="simplebutton">Ask wikipedia</a>

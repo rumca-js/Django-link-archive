@@ -11,9 +11,9 @@
 
  <h1>Jobs [{{BackgroundJob}}]</h1>
 
-  {% if jobs_list %}
+  {% if content_list %}
     <ul>
-    {% for job in jobs_list %}
+    {% for job in content_list %}
     <li>
         {{job.job}} {{job.task}} {{job.subject}} {{job.args}} 
         <a href="{% url 'rsshistory:backgroundjob-remove' job.id %}" class="simplebutton">Remove</a>

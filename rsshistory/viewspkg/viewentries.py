@@ -34,27 +34,19 @@ from ..configuration import Configuration
 
 class EntriesSearchListView(generic.ListView):
     model = LinkDataController
-    context_object_name = "entries_list"
+    context_object_name = "content_list"
     paginate_by = 100
     template_name = str(ContextData.get_full_template("linkdatacontroller_list.html"))
 
+    def get_filter(self):
+        query_filter = EntryFilter(self.request.GET)
+        query_filter.get_sources()
+        query_filter.set_time_constrained(False)
+        return query_filter
+
     def get_queryset(self):
-        self.query_filter = EntryFilter(self.request.GET)
-        self.query_filter.get_sources()
-        self.query_filter.set_time_constrained(False)
+        self.query_filter = self.get_filter()
         return self.query_filter.get_filtered_objects()
-
-    def get_reset_link(self):
-        return reverse("{}:entries-search-init".format(ContextData.app_name))
-
-    def get_form_action_link(self):
-        return reverse("{}:entries".format(ContextData.app_name))
-
-    def get_form(self, adict):
-        return EntryChoiceForm(adict)
-
-    def get_title(self):
-        return " - entries"
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
@@ -70,177 +62,13 @@ class EntriesSearchListView(generic.ListView):
         context["rss_are_fetched"] = queue_size > 0
         context["rss_queue_size"] = queue_size
 
-        adict = self.query_filter.get_entry_filter_args()
-
-        self.filter_form = self.get_form(adict)
-        self.filter_form.create(self.query_filter.sources)
-
-        self.filter_form.is_valid()
-
-        self.filter_form.method = "GET"
-        self.filter_form.action_url = self.get_form_action_link()
-
         context["query_filter"] = self.query_filter
         context["reset_link"] = self.get_reset_link()
-
-        context["filter_form"] = self.filter_form
-        if "title" in self.request.GET:
-            context["search_term"] = self.request.GET["title"]
-        elif "tag" in self.request.GET:
-            context["search_term"] = self.request.GET["tag"]
-
-        return context
-
-
-class EntriesRecentListView(EntriesSearchListView):
-    model = LinkDataController
-    context_object_name = "entries_list"
-    paginate_by = 100
-
-    def get_queryset(self):
-        self.query_filter = EntryFilter(self.request.GET)
-        self.query_filter.get_sources()
-        # self.query_filter.set_time_constrained(False)
-        return self.query_filter.get_filtered_objects()
-
-    def get_reset_link(self):
-        return reverse("{}:entries-recent-init".format(ContextData.app_name))
-
-    def get_form_action_link(self):
-        return reverse("{}:entries-recent".format(ContextData.app_name))
-
-    def get_form(self, adict):
-        return BasicEntryChoiceForm(adict)
-
-    def get_title(self):
-        return " - entries"
-
-
-class EntriesNotTaggedView(EntriesSearchListView):
-    model = LinkDataController
-    context_object_name = "entries_list"
-    paginate_by = 100
-
-    def get_queryset(self):
-        self.query_filter = EntryFilter(self.request.GET)
-        self.query_filter.set_time_constrained(False)
-        self.query_filter.get_sources()
-        return self.query_filter.get_filtered_objects(
-            Q(tags__tag__isnull=True, persistent=True)
-        )
-
-    def get_reset_link(self):
-        return reverse("{}:entries-untagged".format(ContextData.app_name))
-
-    def get_form_action_link(self):
-        return reverse("{}:entries-recent".format(ContextData.app_name))
-
-    def get_form(self, adict):
-        return EntryChoiceForm(adict)
-
-    def get_title(self):
-        return " - not tagged"
-
-
-class EntriesBookmarkedListView(EntriesSearchListView):
-    model = LinkDataController
-    context_object_name = "entries_list"
-    paginate_by = 100
-
-    def get_queryset(self):
-        self.query_filter = EntryFilter(self.request.GET)
-        self.query_filter.set_time_constrained(False)
-        self.query_filter.get_sources()
-        return self.query_filter.get_filtered_objects(Q(persistent=True))
-
-    def get_reset_link(self):
-        return reverse("{}:entries-bookmarked-init".format(ContextData.app_name))
-
-    def get_form_action_link(self):
-        return reverse("{}:entries-bookmarked".format(ContextData.app_name))
-
-    def get_form(self, adict):
-        return EntryBookmarksChoiceForm(adict)
-
-    def get_title(self):
-        return " - bookmarked"
-
-
-class EntriesArchiveListView(EntriesSearchListView):
-    model = LinkDataController
-    context_object_name = "entries_list"
-    paginate_by = 100
-    template_name = str(ContextData.get_full_template("linkdatacontroller_list.html"))
-
-    def get_queryset(self):
-        self.query_filter = EntryFilter(self.request.GET)
-        self.query_filter.get_sources()
-        self.query_filter.set_archive_source(True)
-        return self.query_filter.get_filtered_objects()
-
-    def get_reset_link(self):
-        return reverse("{}:entries-archived-init".format(ContextData.app_name))
-
-    def get_form_action_link(self):
-        return reverse("{}:entries-archived".format(ContextData.app_name))
-
-    def get_form(self, adict):
-        return EntryChoiceForm(adict)
-
-    def get_title(self):
-        return " - archived"
-
-
-class EntriesOmniListView(generic.ListView):
-    model = LinkDataController
-    context_object_name = "entries_list"
-    paginate_by = 100
-
-    def get_queryset(self):
-        processor = None
-        if "search" in self.request.GET:
-            from ..forms import OmniSearchProcessor
-
-            processor = OmniSearchProcessor(self.request.GET["search"])
-            return processor.filter_queryset(LinkDataController.objects.all())
-        else:
-            return LinkDataController.objects.all()
-
-    def get_reset_link(self):
-        return reverse("{}:entries-omni-search".format(ContextData.app_name))
-
-    def get_form_action_link(self):
-        return reverse("{}:entries-omni-search".format(ContextData.app_name))
-
-    def get_form(self):
-        return OmniSearchForm(self.request.GET)
-
-    def get_title(self):
-        return " - entries"
-
-    def get_context_data(self, **kwargs):
-        # Call the base implementation first to get the context
-        context = super(EntriesOmniListView, self).get_context_data(**kwargs)
-        context = ContextData.init_context(self.request, context)
-        # Create any data and add it to the context
-
-        context["page_title"] += self.get_title()
-
-        queue_size = BackgroundJobController.get_number_of_jobs(
-            BackgroundJob.JOB_PROCESS_SOURCE
-        )
-        context["rss_are_fetched"] = queue_size > 0
-        context["rss_queue_size"] = queue_size
+        context["query_type"] = self.get_query_type()
 
         self.filter_form = self.get_form()
-        self.filter_form.is_valid()
-
-        self.filter_form.method = "GET"
-        self.filter_form.action_url = self.get_form_action_link()
-
-        context["reset_link"] = self.get_reset_link()
-
         context["filter_form"] = self.filter_form
+
         if "title" in self.request.GET:
             context["search_term"] = self.request.GET["title"]
         elif "tag" in self.request.GET:
@@ -249,6 +77,174 @@ class EntriesOmniListView(generic.ListView):
             context["search_term"] = self.request.GET["search"]
 
         return context
+
+    def get_reset_link(self):
+        return reverse("{}:entries-search-init".format(ContextData.app_name))
+
+    def get_form_action_link(self):
+        return reverse("{}:entries".format(ContextData.app_name))
+
+    def get_form_instance(self):
+        return EntryChoiceForm(self.request.GET)
+
+    def get_form(self):
+        filter_form = self.get_form_instance()
+        filter_form.create(self.query_filter.sources)
+
+        filter_form.method = "GET"
+        filter_form.action_url = self.get_form_action_link()
+
+        return filter_form
+
+    def get_title(self):
+        return " - entries"
+
+    def get_query_type(self):
+        return "standard"
+
+
+class EntriesRecentListView(EntriesSearchListView):
+    model = LinkDataController
+    context_object_name = "content_list"
+    paginate_by = 100
+
+    def get_filter(self):
+        query_filter = EntryFilter(self.request.GET)
+        query_filter.get_sources()
+        return query_filter
+
+    def get_reset_link(self):
+        return reverse("{}:entries-recent-init".format(ContextData.app_name))
+
+    def get_form_action_link(self):
+        return reverse("{}:entries-recent".format(ContextData.app_name))
+
+    def get_form_instance(self):
+        return BasicEntryChoiceForm(self.request.GET)
+
+    def get_title(self):
+        return " - entries"
+
+    def get_query_type(self):
+        return "recent"
+
+
+class EntriesNotTaggedView(EntriesSearchListView):
+    model = LinkDataController
+    context_object_name = "content_list"
+    paginate_by = 100
+
+    def get_filter(self):
+        query_filter = EntryFilter(self.request.GET)
+        query_filter.set_time_constrained(False)
+        query_filter.get_sources()
+        query_filter.set_additional_condition(Q(tags__tag__isnull=True, persistent=True))
+        return query_filter
+
+    def get_reset_link(self):
+        return reverse("{}:entries-untagged".format(ContextData.app_name))
+
+    def get_form_action_link(self):
+        return reverse("{}:entries-recent".format(ContextData.app_name))
+
+    def get_form_instance(self):
+        return EntryChoiceForm(self.request.GET)
+
+    def get_title(self):
+        return " - not tagged"
+
+    def get_query_type(self):
+        return "not-tagged"
+
+
+class EntriesBookmarkedListView(EntriesSearchListView):
+    model = LinkDataController
+    context_object_name = "content_list"
+    paginate_by = 100
+
+    def get_filter(self):
+        query_filter = EntryFilter(self.request.GET)
+        query_filter.set_time_constrained(False)
+        query_filter.get_sources()
+        query_filter.set_additional_condition(Q(persistent=True))
+        return query_filter
+
+    def get_reset_link(self):
+        return reverse("{}:entries-bookmarked-init".format(ContextData.app_name))
+
+    def get_form_action_link(self):
+        return reverse("{}:entries-bookmarked".format(ContextData.app_name))
+
+    def get_form_instance(self):
+        return EntryBookmarksChoiceForm(self.request.GET)
+
+    def get_title(self):
+        return " - bookmarked"
+
+    def get_query_type(self):
+        return "bookmarked"
+
+
+class EntriesArchiveListView(EntriesSearchListView):
+    model = LinkDataController
+    context_object_name = "content_list"
+    paginate_by = 100
+    template_name = str(ContextData.get_full_template("linkdatacontroller_list.html"))
+
+    def get_filter(self):
+        query_filter = EntryFilter(self.request.GET)
+        query_filter.get_sources()
+        query_filter.set_archive_source(True)
+        return query_filter
+
+    def get_reset_link(self):
+        return reverse("{}:entries-archived-init".format(ContextData.app_name))
+
+    def get_form_action_link(self):
+        return reverse("{}:entries-archived".format(ContextData.app_name))
+
+    def get_form_instance(self):
+        return EntryChoiceForm(self.request.GET)
+
+    def get_title(self):
+        return " - archived"
+
+    def get_query_type(self):
+        return "archived"
+
+
+class EntriesOmniListView(EntriesSearchListView):
+    model = LinkDataController
+    context_object_name = "content_list"
+    paginate_by = 100
+
+    def get_filter(self):
+        from ..queryfilters import OmniSearchProcessor
+        query_filter = OmniSearchProcessor(self.request.GET)
+        query_filter.set_query_set(LinkDataController.objects.all())
+        return query_filter
+
+    def get_reset_link(self):
+        return reverse("{}:entries-omni-search-init".format(ContextData.app_name))
+
+    def get_form_action_link(self):
+        return reverse("{}:entries-omni-search".format(ContextData.app_name))
+
+    def get_form_instance(self):
+        return OmniSearchForm(self.request.GET)
+
+    def get_form(self):
+        filter_form = self.get_form_instance()
+        filter_form.method = "GET"
+        filter_form.action_url = self.get_form_action_link()
+
+        return filter_form
+
+    def get_title(self):
+        return " - entries"
+
+    def get_query_type(self):
+        return "omni"
 
 
 class EntryDetailView(generic.DetailView):
@@ -533,22 +529,11 @@ def entries_omni_search_init(request):
     )
 
     context["form"] = filter_form
-    context[
-        "form_description_post"
-    ] = """
-    Examples:
-    <ul>
-     <li>"title = china" - searches anything with China in title</li>
-     <li>"tags__tag = tag" - searches links with tag</li>
-     <li>"persistent = 1" - all persistent link</li>
-     <li>"title = china & persistent = 1" - all persistent link, with china in title</li>
-     </ul>
-    """
 
     if "search" in request.GET:
         context["search_term"] = self.request.GET["search"]
 
-    return ContextData.render(request, "form_search.html", context)
+    return ContextData.render(request, "form_search_omni.html", context)
 
 
 def entries_bookmarked_init(request):
@@ -684,11 +669,36 @@ def entry_json(request, pk):
 
 
 def entries_json(request):
-    # Data
-    query_filter = EntryFilter(request.GET)
-    query_filter.get_sources()
-    query_filter.use_page_limit = True
-    query_filter.set_time_constrained(False)
+
+    found_view = False
+
+    if "query_type" in request.GET:
+        query_type = request.GET["query_type"]
+
+        check_views = [
+                EntriesSearchListView,
+                EntriesRecentListView,
+                EntriesBookmarkedListView,
+                EntriesNotTaggedView,
+                EntriesArchiveListView,
+                EntriesOmniListView,
+                ]
+
+        for view_class in check_views:
+            view = view_class()
+            view.request = request
+            if query_type == view.get_query_type():
+                query_filter = view.get_filter()
+                query_filter.use_page_limit = True
+                found_view = True
+                break
+
+    if not found_view:
+        view = check_views[0]()
+        view.request = request
+        query_filter = view.get_filter()
+        query_filter.use_page_limit = True
+
     links = query_filter.get_filtered_objects()
 
     from ..serializers.instanceimporter import InstanceExporter

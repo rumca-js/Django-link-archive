@@ -289,6 +289,7 @@ class ArchiveLinkDataController(ArchiveLinkDataModel):
 
 
 class LinkDataHyperController(object):
+
     def add_new_link(link_data):
         if "source_obj" not in link_data:
             source_obj = None
@@ -301,6 +302,7 @@ class LinkDataHyperController(object):
         objs = LinkDataModel.objects.filter(link=link_data["link"])
         if not objs.exists():
             o = LinkDataModel(**link_data)
+            o.save()
             # if link exists - do not change data
         try:
             p = Page(link_data["source"])

@@ -134,6 +134,17 @@ class Domains(models.Model):
         mains = DomainsMains.objects.all()
         mains.delete()
 
+    def get_map(self):
+        result = {"domain" : self.domain,
+                  "main" : self.main,
+                  "subdomain" : self.subdomain,
+                  "suffix" : self.suffix,
+                  "tld" : self.tld,
+                  "date_created" : self.date_created.isoformat(),
+                  "date_last" : self.date_last.isoformat(),
+                  }
+        return result
+
 
 class DomainsSuffixes(models.Model):
     suffix = models.CharField(max_length=20, null=True, unique=True)

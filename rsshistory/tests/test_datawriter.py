@@ -6,7 +6,7 @@ from django.test import TestCase
 from django.utils import timezone
 from django.urls import reverse
 
-from ..models import ConfigurationEntry, PersistentInfo
+from ..models import ConfigurationEntry, PersistentInfo, Domains
 from ..controllers import SourceDataController, LinkDataController
 from ..configuration import Configuration
 from ..datawriter import DataWriter
@@ -15,8 +15,7 @@ from ..datawriter import DataWriter
 class DataWriterTest(TestCase):
     def setUp(self):
         self.test_export_path = Path("./test_data/exports")
-        if self.test_export_path.exists():
-            self.remove_all_files()
+        self.remove_all_files()
 
         source_youtube = SourceDataController.objects.create(
             url="https://youtube.com",
@@ -52,12 +51,15 @@ class DataWriterTest(TestCase):
             export_to_cms=False,
         )
 
+        Domains.add("https://youtube.com?v=nonpersistent")
+
     def tearDown(self):
         self.remove_all_files()
 
     def remove_all_files(self):
-        shutil.rmtree(self.test_export_path.as_posix())
-        shutil.rmtree(self.test_export_path.parent.as_posix())
+        if self.test_export_path.exists():
+            shutil.rmtree(self.test_export_path.as_posix())
+            shutil.rmtree(self.test_export_path.parent.as_posix())
 
     def test_write_bookmarks(self):
         entry = ConfigurationEntry.get()
@@ -119,3 +121,15 @@ class DataWriterTest(TestCase):
         json_obj = json.loads(json_file.read_text())
 
         self.assertEqual(len(json_obj), 2)
+
+    def test_domain_json(self):
+        entry = ConfigurationEntry.get()
+        entry.data_export_path = self.test_export_path
+        entry.save()
+
+        conf = Configuration.get_object()
+
+        writer = DataWriter(conf)
+        json = writer.get_domains_json()
+        # json as text
+        self.assertEqual(len(json), 208)

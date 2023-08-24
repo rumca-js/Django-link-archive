@@ -2,66 +2,92 @@ from django.test import TestCase
 from django.utils import timezone
 from django.urls import reverse
 
-from ..forms import OmniSearchProcessor
+from ..queryfilters import OmniSearchProcessor, StringSymbolEquation, OmniSymbolProcessor
 from ..models import LinkDataModel
 
 
+class SymbolEvaluator(object):
+    def evaluate_symbol(self, symbol):
+        if symbol == "title == test":
+            return 5
+        elif symbol == "tag == something":
+            return 1
+        else:
+            return 0
+
+
 class OmniSearchTest(TestCase):
-    def test_parse_conditions(self):
-        processor = OmniSearchProcessor("title == test & tag == something")
-        conditions = processor.parse_conditions()
-
-        self.assertEqual(conditions[0].data, "title")
-        self.assertEqual(conditions[1].data, "==")
-        self.assertEqual(conditions[2].data, "test")
-        self.assertEqual(conditions[3].data, "&")
-        self.assertEqual(conditions[4].data, "tag")
-        self.assertEqual(conditions[5].data, "==")
-        self.assertEqual(conditions[6].data, "something")
-
-        self.assertEqual(len(conditions), 7)
-
-    def test_parse_conditions_with_brackets(self):
-        processor = OmniSearchProcessor("(title == test & tag == something)")
-        conditions = processor.parse_conditions()
-
-        self.assertEqual(conditions[0].data, "(")
-        self.assertEqual(conditions[1].data, "title")
-        self.assertEqual(conditions[2].data, "==")
-        self.assertEqual(conditions[3].data, "test")
-        self.assertEqual(conditions[4].data, "&")
-        self.assertEqual(conditions[5].data, "tag")
-        self.assertEqual(conditions[6].data, "==")
-        self.assertEqual(conditions[7].data, "something")
-        self.assertEqual(conditions[8].data, ")")
-
-        self.assertEqual(len(conditions), 9)
-
-    def test_get_eval_contains(self):
-        processor = OmniSearchProcessor("title = test & tag = something")
-        conditions = processor.parse_conditions()
-
-        eval_text = processor.get_eval_query(conditions[0:3])
-
-        self.assertEqual(eval_text, {"title__contains": "test"})
-
-    def test_get_eval_exact(self):
-        processor = OmniSearchProcessor("title == test & tag == something")
-        conditions = processor.parse_conditions()
-
-        eval_text = processor.get_eval_query(conditions[0:3])
-
-        self.assertEqual(eval_text, {"title__exact": "test"})
-
     def test_filter_query_set(self):
         LinkDataModel.objects.create(link="https://test.com")
 
-        processor = OmniSearchProcessor("link == https://test.com")
+        args = {"search" : "link == https://test.com"}
+        processor = OmniSearchProcessor(args)
 
         qs = LinkDataModel.objects.all()
         print("Query set length: {}".format(len(qs)))
 
-        qs = processor.filter_queryset(qs)
+        processor.set_query_set(qs)
+
+        qs = processor.get_filtered_objects()
         print("Query set length: {}".format(len(qs)))
 
         self.assertEqual(len(qs), 1)
+
+    def test_symbol_equation_1(self):
+        text = "(title == test & description == none) | title == covid"
+
+        tok = StringSymbolEquation(text)
+        string, conditions = tok.process()
+
+        self.assertEqual(string, "(A&B)|C")
+        self.assertEqual(conditions["A"], "title == test")
+        self.assertEqual(conditions["B"], "description == none")
+        self.assertEqual(conditions["C"], "title == covid")
+
+    def test_symbol_equation_2(self):
+        text = "(title == test & description == none) | !(title == covid)"
+
+        tok = StringSymbolEquation(text)
+        string, conditions = tok.process()
+
+        self.assertEqual(string, "(A&B)|!(C)")
+        self.assertEqual(conditions["A"], "title == test")
+        self.assertEqual(conditions["B"], "description == none")
+        self.assertEqual(conditions["C"], "title == covid")
+
+    def test_symbol_equation_3(self):
+        text = "title == test & tag == something"
+
+        tok = StringSymbolEquation(text)
+        string, conditions = tok.process()
+
+        self.assertEqual(string, "A&B")
+        self.assertEqual(conditions["A"], "title == test")
+        self.assertEqual(conditions["B"], "tag == something")
+
+    def test_omni_search_next_and(self):
+        args = "title == test & tag == something"
+
+        tok = OmniSymbolProcessor(args, SymbolEvaluator())
+        self.assertEqual(tok.eq_string, "A&B")
+
+        value = tok.process()
+
+        self.assertEqual(tok.conditions["A"], "title == test")
+        self.assertEqual(tok.conditions["B"], "tag == something")
+
+        # 1 & 5 == 1
+        self.assertEqual(value, 1)
+
+    def test_omni_search_next_or(self):
+        args = "title == test | tag == something"
+
+        tok = OmniSymbolProcessor(args, SymbolEvaluator())
+        value = tok.process()
+
+        self.assertEqual(tok.eq_string, "A|B")
+        self.assertEqual(tok.conditions["A"], "title == test")
+        self.assertEqual(tok.conditions["B"], "tag == something")
+
+        # 1 | 5 == 1
+        self.assertEqual(value, 5)

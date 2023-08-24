@@ -14,7 +14,7 @@ from ..controllers import LinkDataController
 
 class AllTags(generic.ListView):
     model = LinkTagsDataModel
-    context_object_name = "tags_list"
+    context_object_name = "content_list"
     paginate_by = 9200
 
     def get_tags_objects(self):

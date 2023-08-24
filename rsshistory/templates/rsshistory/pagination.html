@@ -1,0 +1,25 @@
+<div class="pagination">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+        <a href="?page=1{{query_filter.get_filter_string}}" class='simplebutton'>|&lt;</a>
+        <a href="?page={{ page_obj.previous_page_number }}{{query_filter.get_filter_string}}" class='simplebutton'>&lt;</a>
+        {% else %}
+        <span>|&lt;</span>
+        <span>&lt;</span>
+        {% endif %}
+
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{{query_filter.get_filter_string}}" class='simplebutton'>&gt;</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}{{query_filter.get_filter_string}}" class='simplebutton'>&gt;|</a>
+        {% else %}
+        <span>&gt;</span>
+        <span>&gt;|</span>
+        {% endif %}
+
+        <span class="current">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+        </span>
+
+        <!--span>Records: {{content_list | length}} </span-->
+    </span>
+</div>

@@ -16,7 +16,7 @@ version is split into three digits:
  if a change requires the model to be changed, then second digit is updated, patch is set to 0
  if something should be released to public, then release version changes
 """
-__version__ = "0.15.0"
+__version__ = "0.15.1"
 
 
 from pathlib import Path
@@ -102,6 +102,9 @@ class Configuration(object):
 
     def get_sources_file_name(self):
         return "sources.json"
+
+    def get_domains_file_name(self):
+        return "domains.json"
 
     def get_daily_data_path(self, day_iso=None):
         from .dateutils import DateUtils
