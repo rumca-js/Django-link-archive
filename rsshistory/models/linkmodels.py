@@ -235,7 +235,7 @@ class BaseLinkDataController(BaseLinkDataModel):
     def create_from_youtube(url, data):
         from ..pluginentries.youtubelinkhandler import YouTubeLinkHandler
 
-        objs = BaseLinkDataController.objects.filter(link=url)
+        objs = BaseLinkDataModel.objects.filter(link=url)
         if len(objs) != 0:
             return False
 

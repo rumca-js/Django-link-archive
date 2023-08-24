@@ -301,9 +301,8 @@ class LinkDataHyperController(object):
         objs = LinkDataModel.objects.filter(link=link_data["link"])
         if not objs.exists():
             o = LinkDataModel(**link_data)
+            # if link exists - do not change data
         try:
-            o.save()
-
             p = Page(link_data["source"])
             domain = p.get_domain_only()
             Domains.add(domain)
