@@ -57,15 +57,15 @@ def remove_path(path):
 
 class Snapshot(object):
 
-    def __init__(self, path):
+    def __init__(self):
         self.files_data = []
-        self.path = path
 
-        if self.path.exists():
-            self.make_snapshot()
+    def add(self, path):
+        if path.exists():
+            self.make_snapshot(path)
 
-    def make_snapshot(self):
-        files = get_source_files(self.path)
+    def make_snapshot(self, path):
+        files = get_source_files(path)
         for afile in files:
             bytes = afile.read_bytes()
 
@@ -82,7 +82,9 @@ class Snapshot(object):
 
 def process_files(source_app, destination_app):
 
-    snapshot = Snapshot(Path(destination_app) / "migrations")
+    snapshot = Snapshot()
+    snapshot.add(Path(destination_app) / "migrations")
+    snapshot.add(Path(destination_app) / "static" / destination_app / "icons" )
 
     remove_path(destination_app)
 

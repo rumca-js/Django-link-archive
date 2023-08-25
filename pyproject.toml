@@ -21,6 +21,7 @@ celery = "^5.3.1"
 django-celery-results = "^2.5.1"
 sqlalchemy = "^2.0.16"
 tldextract = "^3.4.4"
+sympy = "^1.12"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.3.0"

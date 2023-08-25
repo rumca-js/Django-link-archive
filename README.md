@@ -4,16 +4,16 @@ Personal link database, with RSS functionality. Similar to Reddit, but completel
 
  - Local data, no algorithms, no advertisements
  - Web GUI, accessible from anywhere (LAN, public, however it is configured)
- - Search ability (Google-like), by language, author, tags
- - Ability to extend, to provide custom plugins, parse HTML pages
- - RSS feed support (RSS sources)
+ - Minimal installation, integrator may choose however to use production environment, with a good Database engine. Just as it is supported by Django. I am using SQLite without any problems.
  - Sources management: adding, removing, configuration
  - Link management: manual adding, removing, configuration, bookmark support, tag support, admin user comments
+ - RSS feed support
+ - Search ability (Google-like), by language, author, tags
  - Minimal aesthetic: no distraction, compact layout
- - Configurable: lists, timeouts
  - Automatic git export, RSS source import
- - Minimal installation, integrator may choose however to use production environment, with a good Database engine. Just as it is supported by Django. I am using SQLite without any problems.
  - Support for web archive: archive.org
+ - Ability to extend, to provide custom plugins, parse HTML pages
+ - Configurable: lists, timeouts
  - Since it is a Django page, you can show it to your friends (if you like)
 
 ## Problems with other RSS readers, or apps
@@ -66,6 +66,10 @@ Demo on development env (may, or may not be running actually):
 README about search issues: [https://github.com/rumca-js/Django-link-archive/blob/main/README_search.md](https://github.com/rumca-js/Django-link-archive/blob/main/README_search.md).
 
 # Import, export data
+
+## View data
+
+Most of views contain "Show JSON" button that provides the view data as JSON. This can be used by scripts, for import, export.
 
 ## Automatic git export
 

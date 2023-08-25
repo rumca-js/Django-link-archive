@@ -1,6 +1,6 @@
 .PHONY: install install-minimal
 .PHONY: createtables createtables-minimal createtables-celery createsuperuser installsysdeps configuresysdeps
-.PHONY: run run-celery runserver run-minimal
+.PHONY: run run-celery run-server run-minimal
 .PHONY: update oncommit test create-companion-app static migrate reformat
 .PHONY: clear-celery
 
@@ -58,14 +58,14 @@ installsysdeps:
 	systemctl enable memcached.service
 	systemctl start memcached.service
 
-run: run-celery runserver
+run: run-celery run-server
 
-run-minimal: runserver
+run-minimal: run-server
 
 run-celery:
 	poetry run celery -A linklibrary worker -l INFO -B &
 
-runserver:
+run-server:
 	poetry run python manage.py runserver 0.0.0.0:$(PORT)
 
 # Assumptions:
