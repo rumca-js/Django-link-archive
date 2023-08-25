@@ -15,6 +15,7 @@ Personal link database, with RSS functionality. Similar to Reddit, but completel
  - Ability to extend, to provide custom plugins, parse HTML pages
  - Configurable: lists, timeouts
  - Since it is a Django page, you can show it to your friends (if you like)
+ - You can have all your links at one place. You do not have to navigate several platforms, you go from your own instance outside.
 
 ## Problems with other RSS readers, or apps
 
