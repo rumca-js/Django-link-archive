@@ -26,3 +26,15 @@ It should be able to operate on SBC, like raspberry PI.
 
  - do not change exported names of link data model. We do not want to be forced to regenerate all links again. We can add new fields though
  - do not fetch all objects from any table. Do not use Model.objects.all(). One exception: to obtain length of table
+
+# Omni search
+
+Uses sympy.
+
+Processing:
+ - read input condition from input to symbol equation that can be digested by sympy 
+      * (link_field = search_value) into (A) condition
+      * (link_field = search_value) & (link_field2 = search_value2) into (A) & (B) condition
+ - traverse with sympy equation
+ - translate each condition (A, B ...) into Django Q objects
+ - use Q object to select from link database
