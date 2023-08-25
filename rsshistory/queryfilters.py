@@ -436,10 +436,14 @@ class OmniSymbolProcessor(object):
 class OmniSymbolEvaluator(object):
     def evaluate_symbol(self, symbol):
         condition_data = self.split_symbol(symbol)
-        condition_data = self.translate_condition(condition_data)
+        if condition_data:
+            condition_data = self.translate_condition(condition_data)
 
-        print("Symbol evaluator condition data:{}".format(condition_data))
-        return Q(**condition_data)
+            print("Symbol evaluator condition data:{}".format(condition_data))
+            return Q(**condition_data)
+        else:
+            return Q(title__icontains = symbol)
+            #return Q(title__icontains = symbol) | Q(tags__tag__icontains = symbol) | Q(description__icontains = symbol)
 
     def get_operators(self):
         return ("==", "=", "!=", "<=", ">=", "<", ">")
@@ -452,7 +456,7 @@ class OmniSymbolEvaluator(object):
 
         wh = symbol.find("is null")
         if wh >= 0:
-            return [symbol[wh:].strip(), "is null"]
+            return [symbol[:wh].strip(), "is null"]
 
     def translate_condition(self, condition_data):
         """
