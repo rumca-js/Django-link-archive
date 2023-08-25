@@ -312,8 +312,7 @@ class BaseLinkDataController(BaseLinkDataModel):
 
         if "source" not in data or data["source"].strip() == "":
             data["source"] = h.get_channel_feed_url()
-        if "link" not in data or data["link"].strip() == "":
-            data["link"] = h.get_link_url()
+        data["link"] = h.get_link_url()
         if "title" not in data or data["title"].strip() == "":
             data["title"] = h.get_title()
         # TODO limit comes from LinkDataModel, do not hardcode
@@ -322,6 +321,8 @@ class BaseLinkDataController(BaseLinkDataModel):
         data["date_published"] = h.get_datetime_published()
         if "thumbnail" not in data or data["thumbnail"] is None or data["thumbnail"].strip() == "":
             data["thumbnail"] = h.get_thumbnail()
+        data["artist"] = h.get_channel_name()
+        data["album"] = h.get_channel_name()
 
         return data
 
@@ -337,6 +338,12 @@ class BaseLinkDataController(BaseLinkDataModel):
             data["title"] = p.get_title()
         if "description" not in data or not data["description"]:
             data["description"] = p.get_title()
+
+        sources = SourceDataModel.objects.filter(url = data["source"])
+        if len(sources) > 0:
+            data["artist"] = sources[0].title
+            data["album"] = sources[0].title
+
         return data
 
     def make_persistent(self, username):

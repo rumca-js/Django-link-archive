@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 
 from ..models import LinkTagsDataModel
 from ..configuration import Configuration
-from ..forms import ConfigForm
+from ..forms import ConfigForm, TagForm, TagEntryForm, TagRenameForm
 from ..views import ContextData
 from ..controllers import LinkDataController
 
@@ -80,7 +80,6 @@ class RecentTags(AllTags):
 
 def tag_entry(request, pk):
     # TODO read and maybe fix https://docs.djangoproject.com/en/4.1/topics/forms/modelforms/
-    from ..forms import TagEntryForm
 
     context = ContextData.get_context(request)
     context["page_title"] += " - tag entry"
@@ -154,6 +153,59 @@ def tag_remove(request, pk):
     return ContextData.render(request, "summary_present.html", context)
 
 
+def tag_remove_form(request):
+    context = ContextData.get_context(request)
+    context["page_title"] += " - remove tag form"
+
+    if not request.user.is_staff:
+        return ContextData.render(request, "missing_rights.html", context)
+
+
+    if request.method == "POST":
+        form = TagForm(request.POST)
+
+        if form.is_valid():
+            tag_name = form.cleaned_data["tag"]
+
+            tags = LinkTagsDataModel.objects.filter(tag=tag_name)
+            tags.delete()
+
+            summary_text = "Removed tags"
+            context["summary_text"] = summary_text
+
+        return ContextData.render(request, "summary_present.html", context)
+    else:
+        form = TagForm()
+
+        form.method = "POST"
+        form.action_url = reverse("{}:tag-remove-form".format(ContextData.app_name))
+
+        context["form"] = form
+        context["form_title"] = "Remove tag"
+        context["form_description"] = "Remove tag"
+
+        return ContextData.render(request, "form_basic.html", context)
+
+    return ContextData.render(request, "summary_present.html", context)
+
+
+def tag_remove_str(request, tag_name):
+    context = ContextData.get_context(request)
+    context["page_title"] += " - remove tag"
+
+    if not request.user.is_staff:
+        return ContextData.render(request, "missing_rights.html", context)
+
+    entries = LinkTagsDataModel.objects.filter(tag=tag_name)
+    entries.delete()
+
+    return HttpResponseRedirect(
+            reverse("{}:tags-show-all".format(ContextData.app_name))
+    )
+
+    return ContextData.render(request, "summary_present.html", context)
+
+
 def tags_entry_remove(request, entrypk):
     context = ContextData.get_context(request)
     context["page_title"] += " - remove tag"
@@ -191,8 +243,6 @@ def tags_entry_show(request, entrypk):
 
 
 def tag_rename(request):
-    from ..forms import TagRenameForm
-
     context = ContextData.get_context(request)
     context["page_title"] += " - rename tag"
 

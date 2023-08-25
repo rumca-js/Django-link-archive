@@ -139,6 +139,8 @@ class BaseRssPlugin(SourceGenericPlugin):
         output_map["title"] = feed_entry.title
         output_map["language"] = source.language
         output_map["link"] = feed_entry.link
+        output_map["artist"] = source.title
+        output_map["album"] = source.title
 
         if output_map["date_published"]:
             output_map["date_published"] = DateUtils.to_utc_date(

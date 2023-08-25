@@ -120,6 +120,14 @@ class ExportTopicForm(forms.Form):
     store_domain_info = forms.BooleanField()
 
 
+class TagForm(forms.Form):
+    """
+    Import links form
+    """
+
+    tag = forms.CharField(label="Tag name", max_length=500)
+
+
 class YouTubeLinkSimpleForm(forms.Form):
     """
     Import links form

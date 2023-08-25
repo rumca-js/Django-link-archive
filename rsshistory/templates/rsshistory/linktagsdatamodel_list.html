@@ -3,11 +3,12 @@
 
 <div class="contentbuttonmenu">
     <a href="javascript:history.back()" class="simplebutton">Go Back</a>
-  <a href="{% url 'rsshistory:tags-show-recent' %}" class="simplebutton">Recent tags</a>
-{% if user.is_staff %}
-  <a href="{% url 'rsshistory:tag-rename' %}" class="simplebutton">Rename tag</a>
-  <a href="{% url 'rsshistory:entries-untagged' %}" class="simplebutton">Untagged bookmarks</a>
-{% endif %}
+    <a href="{% url 'rsshistory:tags-show-recent' %}" class="simplebutton">Recent tags</a>
+    <a href="{% url 'rsshistory:entries-untagged' %}" class="simplebutton">Untagged bookmarks</a>
+    {% if user.is_staff %}
+    <a href="{% url 'rsshistory:tag-rename' %}" class="simplebutton">Rename tag</a>
+    <a href="{% url 'rsshistory:tag-remove-form' %}" class="simplebutton">Tag remove</a>
+    {% endif %}
 </div>
 
 <h1>{{tags_title}}</h1>

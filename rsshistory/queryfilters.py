@@ -442,8 +442,8 @@ class OmniSymbolEvaluator(object):
             print("Symbol evaluator condition data:{}".format(condition_data))
             return Q(**condition_data)
         else:
-            return Q(title__icontains = symbol)
-            #return Q(title__icontains = symbol) | Q(tags__tag__icontains = symbol) | Q(description__icontains = symbol)
+            #return Q(title__icontains = symbol)
+            return Q(title__icontains = symbol) | Q(tags__tag__icontains = symbol) | Q(description__icontains = symbol)
 
     def get_operators(self):
         return ("==", "=", "!=", "<=", ">=", "<", ">")
@@ -496,7 +496,7 @@ class OmniSearchProcessor(BaseQueryFilter):
         proc = OmniSymbolProcessor(self.data, OmniSymbolEvaluator())
         combined_q_object = proc.process()
 
-        filtered_queryset = self.query_set.filter(combined_q_object)
+        filtered_queryset = self.query_set.filter(combined_q_object).distinct()
         print("Omni query:{}".format(filtered_queryset.query))
         return filtered_queryset
 

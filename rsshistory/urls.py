@@ -73,6 +73,8 @@ urlpatterns = [
     # tags
     path("entry-tag/<int:pk>/", viewtags.tag_entry, name="entry-tag"),
     path("tag-remove/<int:pk>/", viewtags.tag_remove, name="tag-remove"),
+    path("tag-remove-str/<str:tag>/", viewtags.tag_remove_str, name="tag-remove-str"),
+    path("tag-remove-form/", viewtags.tag_remove_form, name="tag-remove-form"),
     path("tags-entry-remove/<int:entrypk>/", viewtags.tags_entry_remove, name="tags-entry-remove",),
     path("tags-entry-show/<int:entrypk>/", viewtags.tags_entry_show, name="tags-entry-show",),
     path("tag-rename", viewtags.tag_rename, name="tag-rename"),

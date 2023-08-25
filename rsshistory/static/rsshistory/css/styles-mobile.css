@@ -10,37 +10,37 @@
 }
 
 .mainbutton-container {
-  display: flex;
-  flex-wrap: wrap;
-  align-content: flex-start;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
 }
 
 .mainbutton {
-  color : #373737;
-  padding: 1% 2%;
-  text-decoration: none;
-  background-color: #e9e9e9;
-  border-radius: 10px;
-  margin : 1px;
+    color : #373737;
+    padding: 1% 2%;
+    text-decoration: none;
+    background-color: #e9e9e9;
+    border-radius: 10px;
+    margin : 1px;
 }
 .mainbutton:hover {
-  background-color: #e0e0e0;
-  color: blue;
+    background-color: #e0e0e0;
+    color: blue;
 }
 
 .mainbutton-icon {
-  width:30px;
+    width:30px;
 }
 
 /* Content */
 
 .content-icon {
-  width:30px;
-  float: left;
+    width:30px;
+    float: left;
 }
 .content-thumbnail {
-  width:11%;
-  float: left;
+    width:11%;
+    float: left;
 }
 .content-big-thumbnail {
     width:20%;
@@ -48,53 +48,63 @@
 }
 
 input {
-  box-shadow: none;
-  display: block;
-  color: black;
-  text-align: left;
-  text-decoration: none;
-  background-color: #e9e9e9;
-  border-radius: 10px;
+    box-shadow: none;
+    display: block;
+    color: black;
+    text-align: left;
+    text-decoration: none;
+    background-color: #e9e9e9;
+    border-radius: 10px;
 }
 input[type=submit] {
-  color: black;
-  padding: 3px 15px;
-  text-align: center;
-  text-decoration: none;
-  background-color: #e9e9e9;
-  border-radius: 10px;
-  box-shadow: 1px 1px grey;
-  display: inline-block;
-  margin: 1px;
-  border: 0px;
+    color: black;
+    padding: 3px 15px;
+    text-align: center;
+    text-decoration: none;
+    background-color: #e9e9e9;
+    border-radius: 10px;
+    box-shadow: 1px 1px grey;
+    display: inline-block;
+    margin: 1px;
+    border: 0px;
 }
+
 select {display: block;} 
 textarea {display: block;}
 
 hr {
-  margin: 0px;
-  padding: 0px;
+    margin: 0px;
+    padding: 0px;
 }
 
 .simplebuttoninline {
-  display: contents;
+    display: contents;
 }
 
 .simplebutton {
-  color: black;
-  padding: 3px 15px;
-  text-align: center;
-  text-decoration: none;
-  background-color: #e9e9e9;
-  border-radius: 10px;
-  box-shadow: 1px 1px grey;
-  display: inline-block;
-  margin: 1px;
+    color: black;
+    padding: 3px 15px;
+    text-align: center;
+    text-decoration: none;
+    background-color: #e9e9e9;
+    border-radius: 10px;
+    box-shadow: 1px 1px grey;
+    display: inline-block;
+    margin: 1px;
 }
 
 .simplebutton:hover {
-  background-color: #e0e0e0;
-  color: blue;
+    background-color: #e0e0e0;
+    color: blue;
+}
+
+.simplebuttondisabled {
+    color: grey;
+    box-shadow: 0px 0px grey;
+}
+.simplebuttondisabled:hover {
+    background-color: #e9e9e9;
+    color: grey;
 }
 
 .contentbuttonmenu {
@@ -104,149 +114,149 @@ hr {
 /* List containers */
 
 .container_standard {
-  margin-top: 20px;
-  padding: 0;
-  list-style: none;
-  display: flex;
-  flex-direction: column;
+    margin-top: 20px;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
 }
 .container_clickable-tags {
-  margin-top: 20px;
-  padding: 0;
-  list-style: none;
+    margin-top: 20px;
+    padding: 0;
+    list-style: none;
 }
 .container_line-and-buttons {
-  margin-top: 20px;
-  padding: 0;
-  list-style: none;
+    margin-top: 20px;
+    padding: 0;
+    list-style: none;
 }
 .container_youtube-thumbnails {
-  margin-top: 20px;
-  padding: 0;
-  list-style: none;
-  display: flex;
-  flex-wrap: wrap;
+    margin-top: 20px;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
 }
 
 .element_standard {
-  padding: 0px 15px;
-  text-align: left;
-  color: black;
-  text-decoration: none;
-  margin-bottom:3px;
+    padding: 0px 15px;
+    text-align: left;
+    color: black;
+    text-decoration: none;
+    margin-bottom:3px;
 }
 .element_standard a {
-  color: black;
-  text-decoration: none;
+    color: black;
+    text-decoration: none;
 }
 .element_standard:hover {
-  background-color: #f4f4f4;
-  color: blue;
+    background-color: #f4f4f4;
+    color: blue;
 }
 .element_standard_selected {
-  background-color: #BFD8FF;
+    background-color: #BFD8FF;
 }
 .element_clickable-tags {
-  padding: 0px 15px;
-  text-align: left;
-  color: black;
-  text-decoration: none;
-  margin-bottom:3px;
-  display: flex;
-  flex-wrap: wrap;
+    padding: 0px 15px;
+    text-align: left;
+    color: black;
+    text-decoration: none;
+    margin-bottom:3px;
+    display: flex;
+    flex-wrap: wrap;
 }
 .element_clickable-tags a {
-  color: black;
-  text-decoration: none;
+    color: black;
+    text-decoration: none;
 }
 .element_clickable-tags:hover {
-  background-color: #f4f4f4;
-  color: blue;
+    background-color: #f4f4f4;
+    color: blue;
 }
 .element_clickable-tags_selected {
-  background-color: #BFD8FF;
+    background-color: #BFD8FF;
 }
 .element_line-and-buttons {
-  padding: 0px 15px;
-  text-align: left;
-  color: black;
-  text-decoration: none;
-  margin-bottom:3px;
-  display: flex;
-  flex-wrap: wrap;
+    padding: 0px 15px;
+    text-align: left;
+    color: black;
+    text-decoration: none;
+    margin-bottom:3px;
+    display: flex;
+    flex-wrap: wrap;
 }
 .element_line-and-buttons a {
-  color: black;
-  text-decoration: none;
+    color: black;
+    text-decoration: none;
 }
 .element_line-and-buttons:hover {
-  background-color: #f4f4f4;
-  color: blue;
+    background-color: #f4f4f4;
+    color: blue;
 }
 .element_line-and-buttons_selected {
-  background-color: #BFD8FF;
+    background-color: #BFD8FF;
 }
 
 .element_youtube-thumbnails {
-  text-overflow: ellipsis; 
-  max-width: 100%; 
-  min-width: 100%;
-  color: black;
-  text-decoration: none;
-  margin: 5px;
-  display:flex;
-  flex-direction:column;
+    text-overflow: ellipsis; 
+    max-width: 100%; 
+    min-width: 100%;
+    color: black;
+    text-decoration: none;
+    margin: 5px;
+    display:flex;
+    flex-direction:column;
 }
 .element_youtube-thumbnails a {
-  color: black;
-  text-decoration: none;
+    color: black;
+    text-decoration: none;
 }
 .element_youtube-thumbnails:hover {
-  background-color: #f4f4f4;
-  color: blue;
+    background-color: #f4f4f4;
+    color: blue;
 }
 .element_youtube-thumbnails_selected {
-  background-color: #BFD8FF;
+    background-color: #BFD8FF;
 }
 
 
 .linklistthumbnail {
-  width: 100%;
+    width: 100%;
 }
 .linklistitemtitle {
-  font-weight: bold;
-  text-align: left;
-  text-decoration: none;
+    font-weight: bold;
+    text-align: left;
+    text-decoration: none;
 }
 
 .linklistitemdescription {
-   font-style:italic;
+    font-style:italic;
 }
 
 /* video box, youtube player */
 
 .youtube_player_container {
-  position: relative;
-  width: 100%;
-  padding-bottom: 46.25%;
-  /* background-color: yellow; */
+    position: relative;
+    width: 100%;
+    padding-bottom: 46.25%;
+    /* background-color: yellow; */
 }
 .youtube_player_frame {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  border: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
 }
 
 /* Configuration pages */
 .management-box {
     /* color: grey;*/
-  margin: 5px;
-  padding: 5px;
-  background-color: #f4f4f4;
-  /* border: solid 1px;
-  border-color: grey; */
-  /* box-shadow: 1px 1px grey; */
+    margin: 5px;
+    padding: 5px;
+    background-color: #f4f4f4;
+    /* border: solid 1px;
+    border-color: grey; */
+    /* box-shadow: 1px 1px grey; */
 }
