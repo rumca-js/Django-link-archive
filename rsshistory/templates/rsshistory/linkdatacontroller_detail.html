@@ -9,7 +9,7 @@
   {% if user.is_staff %}
     <p>
        <a href="{% url 'rsshistory:entry-edit' object.id %}" class="simplebutton">Edit entry</a>
-    {% if object.persistent %}
+    {% if object.bookmarked %}
        <a href="{% url 'rsshistory:entry-notstar' object.id %}" class="simplebutton">
         Not bookmark
        </a>
@@ -18,7 +18,7 @@
         Bookmark
        </a>
     {% endif %}
-    {% if object.persistent %}
+    {% if object.bookmarked %}
         <a href="{% url 'rsshistory:entry-tag' object.id %}" class="simplebutton">Tag</a>
         <a href="{% url 'rsshistory:entry-vote' object.id %}" class="simplebutton">Vote</a>
     {% endif %}
@@ -88,7 +88,7 @@
   {{object_controller.get_description_html | safe | linebreaks }}
   <div style="clear:both"></div>
 
-{% if object.persistent %}
+{% if object.bookmarked %}
   <hr/>
   <h2>Comments</h2>
   <p>

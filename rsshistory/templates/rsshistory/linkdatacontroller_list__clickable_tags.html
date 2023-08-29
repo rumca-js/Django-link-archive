@@ -1,5 +1,5 @@
 <div
-        {% if link.persistent %}
+        {% if link.bookmarked %}
         title="{{link.get_title}} {{link.get_long_description}}"
         class="element_{{user_config.display_type}} element_{{user_config.display_type}}_selected"
         {% else %}
@@ -35,7 +35,7 @@
                 <a href='{% url 'rsshistory:entries'%}?tag="{{tag}}"' class="simplebutton">{{tag}}</a>
                 {% endfor %}
                 {% endif %}
-                {% if link.persistent %}
+                {% if link.bookmarked %}
                 User: {{link.user}}
                 {% endif %}
 
