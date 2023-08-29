@@ -18,7 +18,7 @@ class BookmarksExporter(object):
     def get_entries(self):
         from ..controllers import LinkDataController
 
-        entries = LinkDataController.objects.filter(persistent=True)
+        entries = LinkDataController.objects.filter(bookmarked=True)
 
     def get_export_path(self):
         entries_dir = self._cfg.get_bookmarks_path()
@@ -150,7 +150,7 @@ class BookmarksBigExporter(object):
             therange = (start_date, stop_date)
 
             all_entries = LinkDataController.objects.filter(
-                persistent=True, date_published__range=therange
+                bookmarked=True, date_published__range=therange
             )
 
             en_entries = all_entries.filter(language__icontains="en")

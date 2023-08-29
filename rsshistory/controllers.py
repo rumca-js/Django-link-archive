@@ -243,7 +243,7 @@ class LinkDataController(LinkDataModel):
         )
 
         entries = LinkDataController.objects.filter(
-            persistent=False, date_published__lt=days_before
+            bookmarked=False, date_published__lt=days_before
         )
 
         for entry in entries:
@@ -264,7 +264,7 @@ class LinkDataController(LinkDataModel):
                 days_before = current_time - timedelta(days=days)
 
                 entries = LinkDataController.objects.filter(
-                    source=source.url, persistent=False, date_published__lt=days_before
+                    source=source.url, bookmarked=False, date_published__lt=days_before
                 )
                 if entries.exists():
                     PersistentInfo.create(
@@ -347,15 +347,15 @@ class LinkDataHyperController(object):
             if len(obj) > 0:
                 return obj[0]
 
-    def make_persistent(request, entry):
+    def make_bookmarked(request, entry):
         if entry.is_archive_entry():
             LinkDataHyperController.move_from_archive(entry)
 
-        entry.make_persistent(request.user.username)
+        entry.make_bookmarked(request.user.username)
         return True
 
-    def make_not_persistent(request, entry):
-        entry.make_not_persistent(request.user.username)
+    def make_not_bookmarked(request, entry):
+        entry.make_not_bookmarked(request.user.username)
         from .dateutils import DateUtils
 
         days_diff = DateUtils.get_day_diff(entry.date_published)
@@ -398,7 +398,7 @@ class LinkDataHyperController(object):
                 error_text = traceback.format_exc()
 
     def read_domains_from_bookmarks():
-        objs = LinkDataModel.objects.filter(persistent=True)
+        objs = LinkDataModel.objects.filter(bookmarked=True)
         for obj in objs:
             Domains.add(obj.link)
 

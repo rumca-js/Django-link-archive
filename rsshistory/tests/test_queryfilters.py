@@ -21,19 +21,19 @@ class FiltersTest(TestCase):
         )
         LinkDataController.objects.create(
             source="https://youtube.com",
-            link="https://youtube.com?v=persistent",
+            link="https://youtube.com?v=bookmarked",
             title="The first link",
             source_obj=source_youtube,
-            persistent=True,
+            bookmarked=True,
             date_published=datetime.strptime("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
         )
         LinkDataController.objects.create(
             source="https://youtube.com",
-            link="https://youtube.com?v=nonpersistent",
+            link="https://youtube.com?v=nonbookmarked",
             title="The second link",
             source_obj=source_youtube,
-            persistent=False,
+            bookmarked=False,
             date_published=datetime.strptime("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
         )
@@ -90,7 +90,7 @@ class FiltersTest(TestCase):
             "tag": "none",
             "vote": "none",
             "source_title": "none",
-            "persistent": "none",
+            "bookmarked": "none",
             "category": "none",
             "subcategory": "none",
             "artist": "none",
@@ -111,7 +111,7 @@ class FiltersTest(TestCase):
         self.assertTrue("tag" in filter_args)
         self.assertTrue("vote" in filter_args)
         self.assertTrue("source_title" in filter_args)
-        self.assertTrue("persistent" in filter_args)
+        self.assertTrue("bookmarked" in filter_args)
         self.assertTrue("category" in filter_args)
         self.assertTrue("subcategory" in filter_args)
         self.assertTrue("artist" in filter_args)
@@ -132,7 +132,7 @@ class FiltersTest(TestCase):
             "category": "none",
             "subcategory": "none",
             "source_title": "none",
-            "persistent": "none",
+            "bookmarked": "none",
             "artist": "none",
             "album": "none",
             "date_from": "none",
@@ -153,7 +153,7 @@ class FiltersTest(TestCase):
         self.assertTrue("source_obj__title" in filter_args)
         self.assertTrue("source_obj__category" in filter_args)
         self.assertTrue("source_obj__subcategory" in filter_args)
-        self.assertTrue("persistent" in filter_args)
+        self.assertTrue("bookmarked" in filter_args)
         self.assertTrue("artist__icontains" in filter_args)
         self.assertTrue("album__icontains" in filter_args)
         self.assertTrue("date_published__range" in filter_args)

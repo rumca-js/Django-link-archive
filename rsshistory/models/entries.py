@@ -15,7 +15,7 @@ class BaseLinkDataModel(models.Model):
     link = models.CharField(max_length=1000, unique=True)
     date_published = models.DateTimeField(default=datetime.now)
     # this entry cannot be removed
-    persistent = models.BooleanField(default=False)
+    bookmarked = models.BooleanField(default=False)
     # this entry is dead indication
     dead = models.BooleanField(default=False)
     artist = models.CharField(max_length=1000, null=True, default=None)
@@ -166,7 +166,7 @@ class BaseLinkDataController(BaseLinkDataModel):
             "description",
             "link",
             "date_published",
-            "persistent",
+            "bookmarked",
             "dead",
             "artist",
             "album",
@@ -182,7 +182,7 @@ class BaseLinkDataController(BaseLinkDataModel):
             "description",
             "link",
             "date_published",
-            "persistent",
+            "bookmarked",
             "dead",
             "artist",
             "album",
@@ -263,9 +263,9 @@ class BaseLinkDataController(BaseLinkDataModel):
         user = None
         if "user" in data:
             user = data["user"]
-        persistent = False
-        if "persistent" in data:
-            persistent = data["persistent"]
+        bookmarked = False
+        if "bookmarked" in data:
+            bookmarked = data["bookmarked"]
 
         source_obj = None
         sources = SourceDataModel.objects.filter(url=source)
@@ -278,7 +278,7 @@ class BaseLinkDataController(BaseLinkDataModel):
             description=description,
             link=link,
             date_published=date_published,
-            persistent=persistent,
+            bookmarked=bookmarked,
             thumbnail=thumbnail,
             artist=artist,
             language=language,
@@ -346,12 +346,12 @@ class BaseLinkDataController(BaseLinkDataModel):
 
         return data
 
-    def make_persistent(self, username):
-        self.persistent = True
+    def make_bookmarked(self, username):
+        self.bookmarked = True
         self.user = username
         self.save()
 
-    def make_not_persistent(self, username):
+    def make_not_bookmarked(self, username):
         from ..models import LinkTagsDataModel, LinkVoteDataModel
 
         tags = LinkTagsDataModel.objects.filter(link_obj=self)
@@ -360,7 +360,7 @@ class BaseLinkDataController(BaseLinkDataModel):
         votes = LinkVoteDataModel.objects.filter(link_obj=self)
         votes.delete()
 
-        self.persistent = False
+        self.bookmarked = False
         self.user = username
         self.save()
 

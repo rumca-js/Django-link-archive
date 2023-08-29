@@ -26,19 +26,19 @@ class DataWriterTest(TestCase):
         )
         LinkDataController.objects.create(
             source="https://youtube.com",
-            link="https://youtube.com?v=persistent",
+            link="https://youtube.com?v=bookmarked",
             title="The first link",
             source_obj=source_youtube,
-            persistent=True,
+            bookmarked=True,
             date_published=datetime.strptime("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
         )
         LinkDataController.objects.create(
             source="https://youtube.com",
-            link="https://youtube.com?v=nonpersistent",
+            link="https://youtube.com?v=nonbookmarked",
             title="The second link",
             source_obj=source_youtube,
-            persistent=False,
+            bookmarked=False,
             date_published=datetime.strptime("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
         )
@@ -51,7 +51,7 @@ class DataWriterTest(TestCase):
             export_to_cms=False,
         )
 
-        Domains.add("https://youtube.com?v=nonpersistent")
+        Domains.add("https://youtube.com?v=nonbookmarked")
 
     def tearDown(self):
         self.remove_all_files()
@@ -73,7 +73,7 @@ class DataWriterTest(TestCase):
         writer = DataWriter(conf)
         writer.write_bookmarks()
 
-        links = LinkDataController.objects.filter(persistent=True)
+        links = LinkDataController.objects.filter(bookmarked=True)
         self.assertEqual(len(links), 1)
 
         json_file = conf.get_bookmarks_path("2023") / "bookmarks_EN_entries.json"

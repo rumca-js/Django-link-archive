@@ -202,7 +202,7 @@ class LinkAddJobHandler(BaseJobHandler):
             link = obj.subject
             source_id = obj.args
             source_obj = SourceDataController.objects.get(id=int(source_id))
-            data = {"user": None, "language": source_obj.language, "persistent": False}
+            data = {"user": None, "language": source_obj.language, "bookmarked": False}
 
             print("Adding {} for {}".format(link, source_obj.title))
             try:

@@ -193,11 +193,11 @@ class EntryFilter(BaseQueryFilter):
                 dst["source_obj__title"] = src[element]
             elif element == "user":
                 dst["user__icontains"] = src[element]
-            elif element == "persistent":
+            elif element == "bookmarked":
                 if src[element] == "on":
-                    dst["persistent"] = True
+                    dst["bookmarked"] = True
                 else:
-                    dst["persistent"] = False
+                    dst["bookmarked"] = False
             elif element == "tag":
                 if src[element].startswith('"'):
                     dst["tags__tag"] = src[element][1:-1]
@@ -230,7 +230,7 @@ class EntryFilter(BaseQueryFilter):
             self.copy_if_is_set(parameter_map, self.args, "tag")
             self.copy_if_is_set(parameter_map, self.args, "vote")
             self.copy_if_is_set(parameter_map, self.args, "source_title")
-            self.copy_if_is_set(parameter_map, self.args, "persistent")
+            self.copy_if_is_set(parameter_map, self.args, "bookmarked")
             self.copy_if_is_set(parameter_map, self.args, "category")
             self.copy_if_is_set(parameter_map, self.args, "subcategory")
             self.copy_if_is_set(parameter_map, self.args, "artist")
@@ -254,7 +254,7 @@ class EntryFilter(BaseQueryFilter):
             self.copy_if_is_set_and_translate(parameter_map, self.args, "tag")
             self.copy_if_is_set_and_translate(parameter_map, self.args, "vote")
             self.copy_if_is_set_and_translate(parameter_map, self.args, "source_title")
-            self.copy_if_is_set_and_translate(parameter_map, self.args, "persistent")
+            self.copy_if_is_set_and_translate(parameter_map, self.args, "bookmarked")
             self.copy_if_is_set_and_translate(parameter_map, self.args, "category")
             self.copy_if_is_set_and_translate(parameter_map, self.args, "subcategory")
             self.copy_if_is_set_and_translate(parameter_map, self.args, "artist")

@@ -138,7 +138,7 @@ class EntriesNotTaggedView(EntriesSearchListView):
         query_filter = EntryFilter(self.request.GET)
         query_filter.set_time_constrained(False)
         query_filter.get_sources()
-        query_filter.set_additional_condition(Q(tags__tag__isnull=True, persistent=True))
+        query_filter.set_additional_condition(Q(tags__tag__isnull=True, bookmarked=True))
         return query_filter
 
     def get_reset_link(self):
@@ -166,7 +166,7 @@ class EntriesBookmarkedListView(EntriesSearchListView):
         query_filter = EntryFilter(self.request.GET)
         query_filter.set_time_constrained(False)
         query_filter.get_sources()
-        query_filter.set_additional_condition(Q(persistent=True))
+        query_filter.set_additional_condition(Q(bookmarked=True))
         return query_filter
 
     def get_reset_link(self):
@@ -580,9 +580,9 @@ def entries_archived_init(request):
     return ContextData.render(request, "form_search.html", context)
 
 
-def make_persistent_entry(request, pk):
+def make_bookmarked_entry(request, pk):
     context = ContextData.get_context(request)
-    context["page_title"] += " - persistent entry"
+    context["page_title"] += " - bookmarked entry"
     context["pk"] = pk
 
     if not request.user.is_staff:
@@ -590,7 +590,7 @@ def make_persistent_entry(request, pk):
 
     entry = LinkDataController.objects.get(id=pk)
 
-    if LinkDataHyperController.make_persistent(request, entry):
+    if LinkDataHyperController.make_bookmarked(request, entry):
         BackgroundJobController.link_archive(entry.link)
 
     return HttpResponseRedirect(
@@ -598,16 +598,16 @@ def make_persistent_entry(request, pk):
     )
 
 
-def make_not_persistent_entry(request, pk):
+def make_not_bookmarked_entry(request, pk):
     context = ContextData.get_context(request)
-    context["page_title"] += " - persistent entry"
+    context["page_title"] += " - bookmarked entry"
     context["pk"] = pk
 
     if not request.user.is_staff:
         return ContextData.render(request, "missing_rights.html", context)
 
     entry = LinkDataController.objects.get(id=pk)
-    LinkDataHyperController.make_not_persistent(request, entry)
+    LinkDataHyperController.make_not_bookmarked(request, entry)
 
     return HttpResponseRedirect(
             reverse("{}:entry-detail".format(ContextData.app_name), kwargs={"pk": entry.pk})
@@ -731,7 +731,7 @@ def entries_remove_nonbookmarked(request):
     if not request.user.is_staff:
         return ContextData.render(request, "missing_rights.html", context)
 
-    LinkDataController.objects.filter(persistent=False).delete()
+    LinkDataController.objects.filter(bookmarked=False).delete()
 
     context["summary_text"] = "Removed all non bookmarked entries"
 

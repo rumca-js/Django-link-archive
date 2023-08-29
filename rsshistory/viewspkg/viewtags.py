@@ -95,8 +95,8 @@ def tag_entry(request, pk):
         return ContextData.render(request, "summary_present.html", context)
 
     obj = objs[0]
-    if not obj.persistent:
-        context["summary_text"] = "Sorry, only persistent objects can be tagged"
+    if not obj.bookmarked:
+        context["summary_text"] = "Sorry, only bookmarked objects can be tagged"
         return ContextData.render(request, "summary_present.html", context)
 
     if request.method == "POST":
@@ -298,8 +298,8 @@ def entry_vote(request, pk):
         return ContextData.render(request, "summary_present.html", context)
 
     obj = objs[0]
-    if not obj.persistent:
-        context["summary_text"] = "Sorry, only persistent objects can be tagged"
+    if not obj.bookmarked:
+        context["summary_text"] = "Sorry, only bookmarked objects can be tagged"
         return ContextData.render(request, "summary_present.html", context)
 
     if request.method == "POST":

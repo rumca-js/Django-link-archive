@@ -359,7 +359,7 @@ def import_youtube_links_for_source(request, pk):
     )
     links = ytdlp.get_channel_video_list()
 
-    data = {"user": None, "language": source_obj.language, "persistent": False}
+    data = {"user": None, "language": source_obj.language, "bookmarked": False}
 
     print("Found source links: {}".format(len(links)))
 

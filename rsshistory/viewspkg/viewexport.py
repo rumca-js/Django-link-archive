@@ -67,7 +67,7 @@ def import_reading_list_view(request):
                     description=entry["description"],
                     link=entry["url"],
                     date_published=entry["date"],
-                    persistent=True,
+                    bookmarked=True,
                     dead=False,
                     user="Thomas Pain",
                     language=lang,

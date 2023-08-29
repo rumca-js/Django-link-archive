@@ -48,14 +48,14 @@ def index(request):
     num_sources = SourceDataModel.objects.all().count()
     num_entries = LinkDataModel.objects.all().count()
     num_archived = ArchiveLinkDataModel.objects.all().count()
-    num_persistent = LinkDataModel.objects.filter(persistent=True).count()
+    num_bookmarked = LinkDataModel.objects.filter(bookmarked=True).count()
 
     context = ContextData.get_context(request)
 
     context["num_sources"] = num_sources
     context["num_entries"] = num_entries
     context["num_archived"] = num_archived
-    context["num_persistent"] = num_persistent
+    context["num_bookmarked"] = num_bookmarked
 
     # Render the HTML template index.html with the data in the context variable
     return ContextData.render(request, "index.html", context=context)

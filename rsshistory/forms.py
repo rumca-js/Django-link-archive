@@ -161,7 +161,7 @@ class EntryForm(forms.ModelForm):
             "description",
             "date_published",
             "source",
-            "persistent",
+            "bookmarked",
             "language",
             "user",
             "artist",
@@ -178,7 +178,7 @@ class EntryForm(forms.ModelForm):
         self.fields["title"].required = False
         self.fields["artist"].required = False
         self.fields["album"].required = False
-        self.fields["persistent"].initial = True
+        self.fields["bookmarked"].initial = True
         self.fields["user"].widget.attrs["readonly"] = True
         self.fields["thumbnail"].required = False
 
@@ -463,7 +463,7 @@ class EntryChoiceForm(BasicEntryChoiceForm):
 
     # do not think too much about these settings, these will be overriden by 'create' method
     title = forms.CharField(label="title", max_length=1000, required=False)
-    persistent = forms.BooleanField(required=False, initial=False)
+    bookmarked = forms.BooleanField(required=False, initial=False)
     language = forms.CharField(label="language", max_length=10, required=False)
     user = forms.CharField(label="user", max_length=500, required=False)
     tag = forms.CharField(label="tag", max_length=500, required=False)

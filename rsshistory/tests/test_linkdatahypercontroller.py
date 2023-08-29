@@ -46,7 +46,7 @@ class SourceParsePluginTest(TestCase):
 
         self.assertTrue(len(objs) == 1)
 
-    def test_make_persistent(self):
+    def test_make_bookmarked(self):
         link_name = "https://youtube.com/v=12345"
 
         link_data = {
@@ -65,18 +65,18 @@ class SourceParsePluginTest(TestCase):
         self.assertEqual(len(objs), 1)
         obj = objs[0]
 
-        LinkDataHyperController.make_persistent(RequestObject(), obj)
+        LinkDataHyperController.make_bookmarked(RequestObject(), obj)
 
         objs = LinkDataModel.objects.filter(link=link_name)
         self.assertEqual(len(objs), 1)
         obj = objs[0]
 
-        self.assertTrue(obj.persistent == True)
+        self.assertTrue(obj.bookmarked == True)
 
-        LinkDataHyperController.make_not_persistent(RequestObject(), obj)
+        LinkDataHyperController.make_not_bookmarked(RequestObject(), obj)
 
         objs = LinkDataModel.objects.filter(link=link_name)
         self.assertEqual(len(objs), 1)
         obj = objs[0]
 
-        self.assertTrue(obj.persistent == False)
+        self.assertTrue(obj.bookmarked == False)

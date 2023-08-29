@@ -85,7 +85,7 @@ def data_errors_page(request):
                 result.add(tag)
                 continue
 
-            if not tag.link_obj.persistent:
+            if not tag.link_obj.bookmarked:
                 result.add(tag)
                 break
 
@@ -99,7 +99,7 @@ def data_errors_page(request):
         criterion3 = Q(language__isnull=True)
 
         entries_no_object = LinkDataController.objects.filter(
-            ~criterion1 & ~criterion2 & ~criterion3, persistent=True
+            ~criterion1 & ~criterion2 & ~criterion3, bookmarked=True
         )
 
         if entries_no_object.exists():
@@ -326,7 +326,7 @@ def fix_bookmarked_yt(request):
         return ContextData.render(request, "missing_rights.html", context)
 
     summary = ""
-    links = LinkDataController.objects.filter(persistent=True)
+    links = LinkDataController.objects.filter(bookmarked=True)
     for link in links:
         if fix_reset_youtube_link_details(link.id):
             summary += "Fixed: {} {}\n".format(link.link, link.title)
