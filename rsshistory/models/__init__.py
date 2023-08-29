@@ -2,7 +2,7 @@ from .admin import ConfigurationEntry, UserConfig, PersistentInfo, BackgroundJob
 from .entries import LinkDataModel, ArchiveLinkDataModel, BaseLinkDataModel, BaseLinkDataController
 from .sources import SourceDataModel, SourceOperationalData, SourceCategories, SourceSubCategories
 from .export import (
-    RssSourceExportHistory,
+    SourceExportHistory,
     DataExport,
 )
 from .tags import (
