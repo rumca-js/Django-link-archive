@@ -15,13 +15,13 @@ class ConfigurationEntry(models.Model):
     store_domain_info = models.BooleanField(default=True)
 
     data_import_path = models.CharField(
-        default="../data/imports", max_length=2000, null=True
+        default="../data/{}/imports".format(LinkDatabase.name), max_length=2000, null=True
     )
     data_export_path = models.CharField(
-        default="../data/exports", max_length=2000, null=True
+        default="../data/{}/exports".format(LinkDatabase.name), max_length=2000, null=True
     )
 
-    git_path = models.CharField(default="../data/git", max_length=2000, null=True)
+    git_path = models.CharField(default="../data/{}/git".format(LinkDatabase.name), max_length=2000, null=True)
     git_user = models.CharField(default="", max_length=2000, null=True)
     git_token = models.CharField(default="", max_length=2000, null=True)
     git_repo = models.CharField(default="", max_length=2000, null=True)
