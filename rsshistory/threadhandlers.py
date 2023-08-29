@@ -14,7 +14,7 @@ from .models import (
     ConfigurationEntry,
     BackgroundJob,
 )
-from .models import RssSourceExportHistory
+from .models import SourceExportHistory
 from .pluginsources.sourcecontrollerbuilder import SourceControllerBuilder
 from .basictypes import fix_path_for_windows
 from .programwrappers import ytdlp, id3v2
@@ -481,7 +481,7 @@ class PushToRepoJobHandler(BaseJobHandler):
                 update_mgr.write_and_push_to_git()
 
                 yesterday = DateUtils.get_date_yesterday()
-                new_history = RssSourceExportHistory(date=yesterday)
+                new_history = SourceExportHistory(date=yesterday)
                 new_history.save()
         except Exception as e:
             error_text = traceback.format_exc()
@@ -532,7 +532,7 @@ class RefreshThreadHandler(object):
 
         conf = ConfigurationEntry.get()
 
-        if RssSourceExportHistory.is_update_required():
+        if SourceExportHistory.is_update_required():
             if conf.is_bookmark_repo_set() or conf.is_daily_repo_set():
                 BackgroundJobController.push_to_repo()
 

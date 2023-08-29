@@ -1,7 +1,7 @@
 from django.db import models
 
 
-class RssSourceExportHistory(models.Model):
+class SourceExportHistory(models.Model):
     date = models.DateField(unique=True, null=False)
 
     class Meta:
@@ -17,7 +17,7 @@ class RssSourceExportHistory(models.Model):
 
             yesterday = DateUtils.get_date_yesterday()
 
-            history = RssSourceExportHistory.objects.filter(date=yesterday)
+            history = SourceExportHistory.objects.filter(date=yesterday)
 
             if len(history) != 0:
                 return False
@@ -30,7 +30,7 @@ class RssSourceExportHistory(models.Model):
             )
 
     def get_safe():
-        return RssSourceExportHistory.objects.all()[:100]
+        return SourceExportHistory.objects.all()[:100]
 
 
 class DataExport(models.Model):

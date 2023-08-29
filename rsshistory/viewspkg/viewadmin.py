@@ -10,7 +10,7 @@ from ..models import (
     UserConfig,
     BackgroundJob,
     PersistentInfo,
-    RssSourceExportHistory,
+    SourceExportHistory,
     Domains,
 )
 from ..configuration import Configuration

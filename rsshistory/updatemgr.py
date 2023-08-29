@@ -2,7 +2,7 @@ import traceback
 from datetime import timedelta, datetime
 
 from .dateutils import DateUtils
-from .models import PersistentInfo, RssSourceExportHistory, ConfigurationEntry
+from .models import PersistentInfo, SourceExportHistory, ConfigurationEntry
 from .controllers import SourceDataController, LinkDataController
 from .repotypes import *
 
@@ -13,7 +13,7 @@ class UpdateManager(object):
 
     def write_and_push_to_git(self, input_date=""):
         try:
-            if not RssSourceExportHistory.is_update_required():
+            if not SourceExportHistory.is_update_required():
                 return
 
             PersistentInfo.create("Pushing data to git")
