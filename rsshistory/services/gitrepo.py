@@ -55,3 +55,8 @@ class GitRepo(object):
 
     def pull(self):
         subprocess.run(["git", "pull"], cwd=self.get_local_dir())
+
+    def copy_tree(self, input_path):
+        expected_dir = self.get_local_dir()
+
+        shutil.copytree(input_path, expected_dir, dirs_exist_ok=True)

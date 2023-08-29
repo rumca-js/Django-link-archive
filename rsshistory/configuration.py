@@ -97,6 +97,12 @@ class Configuration(object):
         else:
             return self.get_export_path("bookmarks")
 
+    def get_daily_data_path(self, append=None):
+        if append:
+            return self.get_export_path("daily_data") / append
+        else:
+            return self.get_export_path("daily_data")
+
     def get_sources_json_path(self):
         return self.get_bookmarks_path("sources.json")
 
@@ -106,7 +112,7 @@ class Configuration(object):
     def get_domains_file_name(self):
         return "domains.json"
 
-    def get_daily_data_path(self, day_iso=None):
+    def get_daily_data_day_path(self, day_iso=None):
         from .dateutils import DateUtils
 
         if day_iso == None:
@@ -116,7 +122,7 @@ class Configuration(object):
         in_tuple = DateUtils.get_date_tuple(in_date)
 
         day_path = Path(in_tuple[0]) / in_tuple[1] / Path(day_iso)
-        entries_dir = self.get_export_path(day_path)
+        entries_dir = self.get_daily_data_path(day_path)
         return entries_dir
 
     def get_url_clean_name(self, file_name):

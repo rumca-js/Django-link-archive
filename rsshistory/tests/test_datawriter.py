@@ -62,6 +62,8 @@ class DataWriterTest(TestCase):
             shutil.rmtree(self.test_export_path.parent.as_posix())
 
     def test_write_bookmarks(self):
+        import json
+
         entry = ConfigurationEntry.get()
         entry.data_export_path = self.test_export_path
         entry.save()
@@ -77,13 +79,16 @@ class DataWriterTest(TestCase):
         json_file = conf.get_bookmarks_path("2023") / "bookmarks_EN_entries.json"
         self.assertEqual(json_file.exists(), True)
 
-        import json
-
         json_obj = json.loads(json_file.read_text())
 
         self.assertEqual(len(json_obj), 1)
 
+        json_file = conf.get_bookmarks_path() / "sources.json"
+        self.assertEqual(json_file.exists(), True)
+
     def test_write_source_export_to_cms(self):
+        import json
+
         entry = ConfigurationEntry.get()
         entry.data_export_path = self.test_export_path
         entry.save()
@@ -96,13 +101,13 @@ class DataWriterTest(TestCase):
         json_file = conf.get_sources_json_path()
         self.assertEqual(json_file.exists(), True)
 
-        import json
-
         json_obj = json.loads(json_file.read_text())
 
         self.assertEqual(len(json_obj), 1)
 
     def test_write_daily_data(self):
+        import json
+
         entry = ConfigurationEntry.get()
         entry.data_export_path = self.test_export_path
         entry.save()
@@ -113,14 +118,18 @@ class DataWriterTest(TestCase):
         writer.write_daily_data("2023-03-03")
 
         json_file = (
-            conf.get_daily_data_path("2023-03-03") / "https.youtube.com_entries.json"
+            conf.get_daily_data_day_path("2023-03-03") / "https.youtube.com_entries.json"
         )
-
-        import json
 
         json_obj = json.loads(json_file.read_text())
 
         self.assertEqual(len(json_obj), 2)
+
+        json_file = conf.get_daily_data_path() / "sources.json"
+        self.assertEqual(json_file.exists(), True)
+
+        json_file = conf.get_daily_data_path() / "domains.json"
+        self.assertEqual(json_file.exists(), True)
 
     def test_domain_json(self):
         entry = ConfigurationEntry.get()

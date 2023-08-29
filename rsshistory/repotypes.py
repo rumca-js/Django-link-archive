@@ -40,9 +40,3 @@ class DailyRepo(GitRepo):
 class MainRepo(GitRepo):
     def __init__(self, git_data, git_repo):
         super().__init__(git_data, git_repo)
-
-    def copy_main_data(self, main_path):
-        local_dir = main_path
-        expected_dir = self.get_local_dir()
-
-        shutil.copytree(local_dir, expected_dir, dirs_exist_ok=True)

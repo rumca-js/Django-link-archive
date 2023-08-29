@@ -6,7 +6,7 @@ class SourceEntriesDataWriter(object):
         self._cfg = config
         self.source_url = source_url
 
-    def write_for_day(self, day_iso):
+    def write_for_day(self, input_path, day_iso):
         from .controllers import LinkDataController
         from .serializers.entriesexporter import EntriesExporter
 
@@ -19,7 +19,7 @@ class SourceEntriesDataWriter(object):
 
         ex = EntriesExporter(self._cfg, entries)
         ex.export_entries(
-            self.source_url, clean_url, self._cfg.get_daily_data_path(day_iso)
+            self.source_url, clean_url, input_path
         )
 
 
@@ -27,7 +27,7 @@ class SourcesEntriesDataWriter(object):
     def __init__(self, config):
         self._cfg = config
 
-    def write_for_day(self, day_iso):
+    def write_for_day(self, input_path, day_iso):
         """We do not want to provide for each day cumulative view. Users may want to select which 'streams' are selected individually '"""
         from .controllers import SourceDataController, LinkDataController
 
@@ -46,7 +46,7 @@ class SourcesEntriesDataWriter(object):
                 continue
 
             writer = SourceEntriesDataWriter(self._cfg, source_url)
-            writer.write_for_day(day_iso)
+            writer.write_for_day(input_path, day_iso)
 
 
 class DataWriter(object):
@@ -80,18 +80,18 @@ class DataWriter(object):
         return exp.get_text(domains)
 
     def write_daily_data(self, day_iso):
-        daily_path = self._cfg.get_daily_data_path(day_iso)
+        daily_path = self._cfg.get_daily_data_day_path(day_iso)
         daily_path.mkdir(parents=True, exist_ok=True)
 
         writer = SourcesEntriesDataWriter(self._cfg)
-        writer.write_for_day(day_iso)
+        writer.write_for_day(daily_path, day_iso)
 
         text = self.get_sources_json()
-        file_name = self._cfg.get_export_path() / self._cfg.get_sources_file_name()
+        file_name = self._cfg.get_daily_data_path() / self._cfg.get_sources_file_name()
         file_name.write_text(text)
 
         text = self.get_domains_json()
-        file_name = self._cfg.get_export_path() / self._cfg.get_domains_file_name()
+        file_name = self._cfg.get_daily_data_path() / self._cfg.get_domains_file_name()
         file_name.write_text(text)
 
     def write_bookmarks(self):
