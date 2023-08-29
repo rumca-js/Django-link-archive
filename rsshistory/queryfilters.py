@@ -7,6 +7,12 @@ from .controllers import (
 )
 from .models import Domains
 
+try:
+    from sympy import sympify
+    import sympy
+except Exception as E:
+    pass
+
 
 class BaseQueryFilter(object):
     def __init__(self, args, page_limit = False):
@@ -369,8 +375,6 @@ class StringSymbolEquation(object):
         return chr(self.current_symbol)
 
 
-from sympy import sympify
-import sympy
 class OmniSymbolProcessor(object):
 
     def __init__(self, data, symbol_evaluator):

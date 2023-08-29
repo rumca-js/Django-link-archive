@@ -5,13 +5,11 @@ from django.db import models
 from django.urls import reverse
 from django.db.models import Q
 
-from .models.linkmodels import (
+from .models import (
     BaseLinkDataModel,
     BaseLinkDataController,
     LinkDataModel,
     ArchiveLinkDataModel,
-)
-from .models import (
     BackgroundJob,
     PersistentInfo,
     ConfigurationEntry,

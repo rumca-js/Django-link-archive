@@ -4,8 +4,8 @@ from django.db import models
 from django.urls import reverse
 
 from ..apps import LinkDatabase
-from .sourcemodels import SourceDataModel
-from .appmodels import PersistentInfo
+from .sources import SourceDataModel
+from .admin import PersistentInfo
 
 
 class BaseLinkDataModel(models.Model):
