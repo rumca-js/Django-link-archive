@@ -59,29 +59,33 @@ class UpdateManager(object):
     def push_daily_repo(self, conf, write_date):
         PersistentInfo.create("Pushing to RSS link repo")
 
-        repo = DailyRepo(conf, conf.git_daily_repo)
+        all_export_data = DataExport.objects.filter(export_data = DataExport.EXPORT_DAILY_DATA)
+        for export_data in all_export_data:
+            repo = DailyRepo(export_data, export_data.remote_path)
 
-        repo.up()
+            repo.up()
 
-        local_dir = self._cfg.get_daily_data_path()
-        repo.copy_tree(local_dir)
+            local_dir = self._cfg.get_daily_data_path()
+            repo.copy_tree(local_dir)
 
-        repo.add([])
-        repo.commit(DateUtils.get_dir4date(write_date))
-        repo.push()
+            repo.add([])
+            repo.commit(DateUtils.get_dir4date(write_date))
+            repo.push()
 
     def push_bookmarks_repo(self, conf):
         PersistentInfo.create("Pushing main repo data")
 
-        yesterday = DateUtils.get_date_yesterday()
+        all_export_data = DataExport.objects.filter(export_data = DataExport.EXPORT_BOOKMARKS)
+        for export_data in all_export_data:
+            yesterday = DateUtils.get_date_yesterday()
 
-        repo = MainRepo(conf, conf.git_repo)
+            repo = BookmarkRepo(export_data, export_data.remote_path)
 
-        repo.up()
+            repo.up()
 
-        local_dir = self._cfg.get_bookmarks_path()
-        repo.copy_tree(local_dir)
+            local_dir = self._cfg.get_bookmarks_path()
+            repo.copy_tree(local_dir)
 
-        repo.add([])
-        repo.commit(DateUtils.get_dir4date(yesterday))
-        repo.push()
+            repo.add([])
+            repo.commit(DateUtils.get_dir4date(yesterday))
+            repo.push()

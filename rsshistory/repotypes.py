@@ -37,6 +37,6 @@ class DailyRepo(GitRepo):
         shutil.copy(file_name, local_dir)
 
 
-class MainRepo(GitRepo):
+class BookmarkRepo(GitRepo):
     def __init__(self, git_data, git_repo):
         super().__init__(git_data, git_repo)

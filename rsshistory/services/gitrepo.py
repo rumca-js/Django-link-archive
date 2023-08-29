@@ -8,7 +8,7 @@ class GitRepo(object):
         self.git_repo = git_repo
 
     def up(self):
-        git_path = Path(self.git_data.git_path)
+        git_path = Path(self.git_data.local_path)
         local = self.get_local_dir()
 
         if not local.is_dir():
@@ -27,8 +27,8 @@ class GitRepo(object):
         )
 
     def push(self):
-        token = self.git_data.git_token
-        user = self.git_data.git_user
+        token = self.git_data.password
+        user = self.git_data.user
         repo = self.get_repo_name()
         subprocess.run(
             [
@@ -48,10 +48,10 @@ class GitRepo(object):
     def get_local_dir(self):
         last = self.get_repo_name()
 
-        return Path(self.git_data.git_path) / last
+        return Path(self.git_data.local_path) / last
 
     def clone(self):
-        subprocess.run(["git", "clone", self.git_repo], cwd=self.git_data.git_path)
+        subprocess.run(["git", "clone", self.git_repo], cwd=self.git_data.local_path)
 
     def pull(self):
         subprocess.run(["git", "pull"], cwd=self.get_local_dir())
