@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.utils import timezone
 from django.urls import reverse
 
-from ..queryfilters import OmniSearchProcessor, StringSymbolEquation, OmniSymbolProcessor
+from ..queryfilters import OmniSearchFilter, StringSymbolEquation, OmniSymbolProcessor
 from ..models import LinkDataModel
 
 
@@ -21,7 +21,7 @@ class OmniSearchTest(TestCase):
         LinkDataModel.objects.create(link="https://test.com")
 
         args = {"search" : "link == https://test.com"}
-        processor = OmniSearchProcessor(args)
+        processor = OmniSearchFilter(args)
 
         qs = LinkDataModel.objects.all()
         print("Query set length: {}".format(len(qs)))

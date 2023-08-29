@@ -219,8 +219,8 @@ class EntriesOmniListView(EntriesSearchListView):
     paginate_by = 100
 
     def get_filter(self):
-        from ..queryfilters import OmniSearchProcessor
-        query_filter = OmniSearchProcessor(self.request.GET)
+        from ..queryfilters import OmniSearchFilter
+        query_filter = OmniSearchFilter(self.request.GET)
         query_filter.set_query_set(LinkDataController.objects.all())
         return query_filter
 

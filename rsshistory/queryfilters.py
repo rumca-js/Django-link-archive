@@ -483,7 +483,7 @@ class OmniSymbolEvaluator(object):
             return {condition_data[0]+"__isnull": True}
 
 
-class OmniSearchProcessor(BaseQueryFilter):
+class OmniSearchFilter(BaseQueryFilter):
     def __init__(self, args):
         super().__init__(args)
 
