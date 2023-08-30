@@ -59,8 +59,9 @@ def memcache_lock(lock_id, oid):
 @app.on_after_configure.connect
 def setup_periodic_tasks(sender, **kwargs):
     # in seconds
-    sender.add_periodic_task(300.0, rsshistory_main_checker_task.s('hello'), name='RSS History Checker task')
-    sender.add_periodic_task(60.0, rsshistory_main_processing_task.s('hello'), name='RSS History Processing task')
+    sender.add_periodic_task(300.0, rsshistory_main_checker_task.s('hello'), name='rsshistory Checker task')
+    sender.add_periodic_task(60.0, rsshistory_main_process_all_jobs_task.s('hello'), name='rsshistory Processing task')
+
 
 
 @app.task(bind=True)
@@ -74,10 +75,10 @@ def rsshistory_main_checker_task(self, arg):
 
 
 @app.task(bind=True)
-def rsshistory_main_processing_task(self, arg):
+def rsshistory_main_process_all_jobs_task(self, arg):
     lock_id = '{0}-lock'.format(self.name)
     with memcache_lock(lock_id, self.app.oid) as acquired:
         logger.info('Lock on:%s acquired:%s', self.name, acquired)
         if acquired:
-            from rsshistory.tasks import subs_processing_task as rsshistory_subs_processing_task
-            rsshistory_subs_processing_task(arg)
+            from rsshistory.tasks import process_all_jobs_task as rsshistory_process_all_jobs_task
+            rsshistory_process_all_jobs_task(arg)
