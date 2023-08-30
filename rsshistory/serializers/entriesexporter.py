@@ -27,7 +27,7 @@ class EntriesExporter(object):
     ):
         from ..controllers import SourceDataController, LinkDataController
 
-        if len(self._entries) == 0:
+        if self._entries.count() == 0:
             return
 
         if not export_path.exists():
@@ -60,7 +60,7 @@ class EntriesExporter(object):
     def export_all_entries(self, with_description=True):
         from ..controllers import LinkDataController
 
-        if len(self._entries) == 0:
+        if self._entries.count() == 0:
             return
 
         entries_dir = self._cfg.get_export_path() / self._cfg.get_date_file_name()

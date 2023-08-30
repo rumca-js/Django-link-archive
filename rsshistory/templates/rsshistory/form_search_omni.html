@@ -29,7 +29,7 @@ Examples:
     <li>"title = china" - searches anything with China in title</li>
     <li>"tags__tag = tag" - searches links with tag</li>
     <li>"bookmarked = 1" - all bookmarked link</li>
-    <li>"title = china & bookmarked = 1" - all bookmarked link, with china in title</li>
+    <li>"(title = china | title = japan) & bookmarked = 1" - all bookmarked link, with china, or japan in title</li>
 </ul>
 
 Available fields:
@@ -39,10 +39,7 @@ Available fields:
 
 Available foreign fields:
 <ul>
-    <li>"tags__tag"</li>
-    <li>"votes__vote"</li>
-    <li>"source_obj__category"</li>
-    <li>"source_obj__subcategory"</li>
+    <li>"tags__tag", "votes__vote", "source_obj__title", "source_obj__category", "source_obj__subcategory"</li>
 </ul>
 
 Available comparison operators:

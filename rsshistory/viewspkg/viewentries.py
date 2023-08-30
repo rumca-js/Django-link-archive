@@ -9,7 +9,6 @@ from ..models import (
     LinkTagsDataModel,
     BackgroundJob,
     ConfigurationEntry,
-    ArchiveLinkDataModel,
     Domains,
 )
 from ..controllers import (
@@ -64,6 +63,8 @@ class EntriesSearchListView(generic.ListView):
 
         context["query_filter"] = self.query_filter
         context["reset_link"] = self.get_reset_link()
+        context["more_results_link"] = self.get_more_results_link()
+        context["has_more_results"] = self.has_more_results()
         context["query_type"] = self.get_query_type()
 
         self.filter_form = self.get_form()
@@ -80,6 +81,16 @@ class EntriesSearchListView(generic.ListView):
 
     def get_reset_link(self):
         return reverse("{}:entries-search-init".format(ContextData.app_name))
+
+    def has_more_results(self):
+        return True
+
+    def get_more_results_link(self):
+        return (
+            reverse("{}:entries-omni-search".format(ContextData.app_name))
+            + "?"
+            + self.query_filter.get_filter_string()
+        )
 
     def get_form_action_link(self):
         return reverse("{}:entries".format(ContextData.app_name))
@@ -138,8 +149,13 @@ class EntriesNotTaggedView(EntriesSearchListView):
         query_filter = EntryFilter(self.request.GET)
         query_filter.set_time_constrained(False)
         query_filter.get_sources()
-        query_filter.set_additional_condition(Q(tags__tag__isnull=True, bookmarked=True))
+        query_filter.set_additional_condition(
+            Q(tags__tag__isnull=True, bookmarked=True)
+        )
         return query_filter
+
+    def has_more_results(self):
+        return False
 
     def get_reset_link(self):
         return reverse("{}:entries-untagged".format(ContextData.app_name))
@@ -169,6 +185,9 @@ class EntriesBookmarkedListView(EntriesSearchListView):
         query_filter.set_additional_condition(Q(bookmarked=True))
         return query_filter
 
+    def has_more_results(self):
+        return False
+
     def get_reset_link(self):
         return reverse("{}:entries-bookmarked-init".format(ContextData.app_name))
 
@@ -197,6 +216,9 @@ class EntriesArchiveListView(EntriesSearchListView):
         query_filter.set_archive_source(True)
         return query_filter
 
+    def has_more_results(self):
+        return False
+
     def get_reset_link(self):
         return reverse("{}:entries-archived-init".format(ContextData.app_name))
 
@@ -219,9 +241,13 @@ class EntriesOmniListView(EntriesSearchListView):
     paginate_by = 100
 
     def get_filter(self):
-        from ..queryfilters import OmniSearchFilter
-        query_filter = OmniSearchFilter(self.request.GET)
-        query_filter.set_query_set(LinkDataController.objects.all())
+        from ..queryfilters import OmniSearchProcessor
+
+        query_filter = OmniSearchProcessor(self.request.GET)
+        if not query_filter.use_archive_source:
+            query_filter.set_query_set(LinkDataController.objects.all())
+        else:
+            query_filter.set_query_set(ArchiveLinkDataController.objects.all())
         return query_filter
 
     def get_reset_link(self):
@@ -229,6 +255,23 @@ class EntriesOmniListView(EntriesSearchListView):
 
     def get_form_action_link(self):
         return reverse("{}:entries-omni-search".format(ContextData.app_name))
+
+    def has_more_results(self):
+        if "archive" in self.request.GET:
+            return False
+        else:
+            return True
+
+    def get_more_results_link(self):
+        if "search" in self.request.GET:
+            return reverse(
+                "{}:entries-omni-search".format(ContextData.app_name)
+            ) + "?archive=on&search={}".format(self.request.GET["search"])
+        else:
+            return (
+                reverse("{}:entries-omni-search".format(ContextData.app_name))
+                + "?archive=on"
+            )
 
     def get_form_instance(self):
         return OmniSearchForm(self.request.GET)
@@ -593,9 +636,7 @@ def make_bookmarked_entry(request, pk):
     if LinkDataHyperController.make_bookmarked(request, entry):
         BackgroundJobController.link_archive(entry.link)
 
-    return HttpResponseRedirect(
-            reverse("{}:entry-detail".format(ContextData.app_name), kwargs={"pk": entry.pk})
-    )
+    return HttpResponseRedirect(entry.get_absolute_url())
 
 
 def make_not_bookmarked_entry(request, pk):
@@ -609,9 +650,7 @@ def make_not_bookmarked_entry(request, pk):
     entry = LinkDataController.objects.get(id=pk)
     LinkDataHyperController.make_not_bookmarked(request, entry)
 
-    return HttpResponseRedirect(
-            reverse("{}:entry-detail".format(ContextData.app_name), kwargs={"pk": entry.pk})
-    )
+    return HttpResponseRedirect(entry.get_absolute_url())
 
 
 def download_entry(request, pk):
@@ -653,7 +692,7 @@ def wayback_save(request, pk):
 def entry_json(request, pk):
     links = LinkDataController.objects.filter(id=pk)
 
-    if len(links) == 0:
+    if links.count() == 0:
         context["summary_text"] = "No such link in the database {}".format(pk)
         return ContextData.render(request, "summary_present.html", context)
 
@@ -669,20 +708,19 @@ def entry_json(request, pk):
 
 
 def entries_json(request):
-
     found_view = False
 
     if "query_type" in request.GET:
         query_type = request.GET["query_type"]
 
         check_views = [
-                EntriesSearchListView,
-                EntriesRecentListView,
-                EntriesBookmarkedListView,
-                EntriesNotTaggedView,
-                EntriesArchiveListView,
-                EntriesOmniListView,
-                ]
+            EntriesSearchListView,
+            EntriesRecentListView,
+            EntriesBookmarkedListView,
+            EntriesNotTaggedView,
+            EntriesArchiveListView,
+            EntriesOmniListView,
+        ]
 
         for view_class in check_views:
             view = view_class()
@@ -734,5 +772,118 @@ def entries_remove_nonbookmarked(request):
     LinkDataController.objects.filter(bookmarked=False).delete()
 
     context["summary_text"] = "Removed all non bookmarked entries"
+
+    return ContextData.render(request, "summary_present.html", context)
+
+
+def archive_make_bookmarked_entry(request, pk):
+    context = ContextData.get_context(request)
+    context["page_title"] += " - bookmark entry"
+    context["pk"] = pk
+
+    if not request.user.is_staff:
+        return ContextData.render(request, "missing_rights.html", context)
+
+    entry = ArchiveLinkDataController.objects.get(id=pk)
+
+    if LinkDataHyperController.make_bookmarked(request, entry):
+        BackgroundJobController.link_archive(entry.link)
+
+    return HttpResponseRedirect(entry.get_absolute_url())
+
+
+def archive_make_not_bookmarked_entry(request, pk):
+    context = ContextData.get_context(request)
+    context["page_title"] += " - bookmark entry"
+    context["pk"] = pk
+
+    if not request.user.is_staff:
+        return ContextData.render(request, "missing_rights.html", context)
+
+    entry = LinkDataController.objects.get(id=pk)
+    LinkDataHyperController.make_not_bookmarked(request, entry)
+
+    return HttpResponseRedirect(entry.get_absolute_url())
+
+
+def archive_edit_entry(request, pk):
+    # TODO refactor with edit entry. we do not want copy paste programming
+    context = ContextData.get_context(request)
+    context["page_title"] += " - edit entry"
+
+    context["pk"] = pk
+
+    if not request.user.is_staff:
+        return ContextData.render(request, "missing_rights.html", context)
+
+    obs = ArchiveLinkDataController.objects.filter(id=pk)
+    if not obs.exists():
+        context["summary_text"] = "Such entry does not exist"
+        return ContextData.render(request, "summary_present.html", context)
+
+    ob = obs[0]
+    if ob.user is None or ob.user == "":
+        ob.user = str(request.user.username)
+        ob.save()
+
+    if request.method == "POST":
+        form = EntryArchiveForm(request.POST, instance=ob)
+        context["form"] = form
+
+        if form.is_valid():
+            form.save()
+
+            context["entry"] = ob
+            return ContextData.render(request, "entry_edit_ok.html", context)
+
+        context["summary_text"] = "Could not edit entry"
+
+        return ContextData.render(request, "summary_present.html", context)
+    else:
+        form = EntryArchiveForm(instance=ob)
+        form.method = "POST"
+        form.action_url = reverse(
+            "{}:entry-archive-edit".format(ContextData.app_name), args=[pk]
+        )
+        context["form"] = form
+        return ContextData.render(request, "form_basic.html", context)
+
+
+def archive_remove_entry(request, pk):
+    context = ContextData.get_context(request)
+    context["page_title"] += " - remove entry"
+
+    if not request.user.is_staff:
+        return ContextData.render(request, "missing_rights.html", context)
+
+    entry = ArchiveLinkDataController.objects.filter(id=pk)
+    if entry.exists():
+        entry.delete()
+
+        context["summary_text"] = "Remove ok"
+    else:
+        context["summary_text"] = "No source for ID: " + str(pk)
+
+    return ContextData.render(request, "summary_present.html", context)
+
+
+def archive_hide_entry(request, pk):
+    context = ContextData.get_context(request)
+    context["page_title"] += " - hide entry"
+    context["pk"] = pk
+
+    if not request.user.is_staff:
+        return ContextData.render(request, "missing_rights.html", context)
+
+    objs = ArchiveLinkDataController.objects.filter(id=pk)
+    obj = objs[0]
+
+    fav = obj.dead
+    obj.dead = not obj.dead
+    obj.save()
+
+    summary_text = "Link changed to state: " + str(obj.dead)
+
+    context["summary_text"] = summary_text
 
     return ContextData.render(request, "summary_present.html", context)

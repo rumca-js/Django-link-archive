@@ -3,6 +3,9 @@
 
 <div class="contentbuttonmenu">
     <a href="javascript:history.back()" class="simplebutton">Go Back</a>
+    <a href="{% url 'rsshistory:data-export-edit' object.id %}" class="simplebutton">
+        Edit
+    </a>
 </div>
 
 <h1>Data Export</h1>
@@ -14,12 +17,6 @@
 <div>Export data: {{object.export_data}}</div>
 <div>Local path: {{object.local_path}}</div>
 <div>Remote path: {{object.remote_path}}</div>
-<div>User: {{object.user}}</div>
-<div>Password: {{object.password}}</div>
 </p>
-
-<a href="{% url 'rsshistory:data-export-edit' object.id %}" class="simplebutton">
-    Edit
-</a>
 
 {% endblock %}

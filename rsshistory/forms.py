@@ -7,7 +7,11 @@ from .models import (
     LinkVoteDataModel,
 )
 from .models import ConfigurationEntry, UserConfig, DataExport
-from .controllers import SourceDataController, LinkDataController
+from .controllers import (
+    SourceDataController,
+    LinkDataController,
+    ArchiveLinkDataController,
+)
 
 
 # https://docs.djangoproject.com/en/4.1/ref/forms/widgets/
@@ -39,20 +43,10 @@ class ConfigForm(forms.ModelForm):
             "store_domain_info",
             "data_export_path",
             "data_import_path",
-            "git_path",
-            "git_repo",
-            "git_daily_repo",
-            "git_user",
-            "git_token",
         ]
 
     def __init__(self, *args, **kwargs):
         super(ConfigForm, self).__init__(*args, **kwargs)
-        self.fields["git_path"].required = False
-        self.fields["git_repo"].required = False
-        self.fields["git_daily_repo"].required = False
-        self.fields["git_user"].required = False
-        self.fields["git_token"].required = False
 
 
 class DataExportForm(forms.ModelForm):
@@ -186,6 +180,28 @@ class EntryForm(forms.ModelForm):
         return self.cleaned_data
 
 
+class EntryArchiveForm(forms.ModelForm):
+    """
+    Category choice form
+    """
+
+    class Meta:
+        model = ArchiveLinkDataController
+        fields = [
+            "link",
+            "title",
+            "description",
+            "date_published",
+            "source",
+            "bookmarked",
+            "language",
+            "user",
+            "artist",
+            "album",
+            "thumbnail",
+        ]
+
+
 class SourceForm(forms.ModelForm):
     """
     Category choice form
@@ -275,8 +291,12 @@ class DomainsChoiceForm(forms.Form):
         # https://stackoverflow.com/questions/10099710/how-to-manually-create-a-select-field-from-a-modelform-in-django
         attr = {"onchange": "this.form.submit()"}
 
-        self.fields["suffix"].widget = forms.Select(choices=self.get_suffix_choices(), attrs=attr)
-        self.fields["tld"].widget = forms.Select(choices=self.get_tld_choices(), attrs=attr)
+        self.fields["suffix"].widget = forms.Select(
+            choices=self.get_suffix_choices(), attrs=attr
+        )
+        self.fields["tld"].widget = forms.Select(
+            choices=self.get_tld_choices(), attrs=attr
+        )
 
     def get_suffix_choices(self):
         from .models import DomainsSuffixes
@@ -328,7 +348,6 @@ class SourcesChoiceForm(forms.Form):
     subcategory = forms.CharField(widget=forms.Select(choices=()), required=False)
 
     def __init__(self, *args, **kwargs):
-        self.args = kwargs.pop("args", ())
         super().__init__(*args, **kwargs)
 
     def create(self, filtered_objects):
@@ -355,8 +374,7 @@ class SourcesChoiceForm(forms.Form):
         result.append(["", ""])
 
         for category in SourceCategories.objects.all():
-            if category and category != "":
-                result.append([category.category, category.category])
+            result.append([category.category, category.category])
 
         return result
 
@@ -367,8 +385,7 @@ class SourcesChoiceForm(forms.Form):
         result.append(["", ""])
 
         for subcategory in SourceSubCategories.objects.all():
-            if subcategory and subcategory != "":
-                result.append([subcategory.subcategory, subcategory.subcategory])
+            result.append([subcategory.subcategory, subcategory.subcategory])
 
         return result
 
@@ -423,12 +440,11 @@ class BasicEntryChoiceForm(forms.Form):
 
     def get_filtered_objects_values(self, field):
         values = set()
-        values.add("Any")
+        values.add("")
 
-        if len(self.sources) > 0:
+        if self.sources.count() > 0:
             for val in self.sources.values(field):
-                if str(val).strip() != "":
-                    values.add(val[field])
+                values.add(val[field])
 
         dict_values = self.to_dict(values)
 
@@ -437,11 +453,7 @@ class BasicEntryChoiceForm(forms.Form):
     def to_dict(self, alist):
         result = []
         for item in sorted(alist):
-            if item.strip() != "":
-                if item == "Any":
-                    result.append(("", item))
-                else:
-                    result.append((item, item))
+            result.append((item, item))
         return result
 
 

@@ -2,7 +2,7 @@ import traceback
 from datetime import timedelta, datetime
 
 from .dateutils import DateUtils
-from .models import PersistentInfo, SourceExportHistory, ConfigurationEntry
+from .models import PersistentInfo, SourceExportHistory, ConfigurationEntry, DataExport
 from .controllers import SourceDataController, LinkDataController
 from .repotypes import *
 
@@ -57,9 +57,11 @@ class UpdateManager(object):
         writer.clear_daily_data(write_date.isoformat())
 
     def push_daily_repo(self, conf, write_date):
-        PersistentInfo.create("Pushing to RSS link repo")
+        PersistentInfo.create("Pushing to daily data repo")
 
-        all_export_data = DataExport.objects.filter(export_data = DataExport.EXPORT_DAILY_DATA)
+        all_export_data = DataExport.objects.filter(
+            export_data=DataExport.EXPORT_DAILY_DATA
+        )
         for export_data in all_export_data:
             if export_data.export_type == DataExport.EXPORT_TYPE_GIT:
                 repo = DailyRepo(export_data, export_data.remote_path)
@@ -73,10 +75,14 @@ class UpdateManager(object):
                 repo.commit(DateUtils.get_dir4date(write_date))
                 repo.push()
 
-    def push_bookmarks_repo(self, conf):
-        PersistentInfo.create("Pushing main repo data")
+        PersistentInfo.create("Pushing to daily data repo done")
 
-        all_export_data = DataExport.objects.filter(export_data = DataExport.EXPORT_BOOKMARKS)
+    def push_bookmarks_repo(self, conf):
+        PersistentInfo.create("Pushing bookmarks repo")
+
+        all_export_data = DataExport.objects.filter(
+            export_data=DataExport.EXPORT_BOOKMARKS
+        )
         for export_data in all_export_data:
             if export_data.export_type == DataExport.EXPORT_TYPE_GIT:
                 yesterday = DateUtils.get_date_yesterday()
@@ -91,3 +97,5 @@ class UpdateManager(object):
                 repo.add([])
                 repo.commit(DateUtils.get_dir4date(yesterday))
                 repo.push()
+
+        PersistentInfo.create("Pushing to bookmarks repo done")

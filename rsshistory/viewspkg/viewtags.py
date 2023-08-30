@@ -108,7 +108,10 @@ def tag_entry(request, pk):
             form.save_tags()
 
             return HttpResponseRedirect(
-                    reverse("{}:entry-detail".format(ContextData.app_name), kwargs={"pk": obj.pk})
+                reverse(
+                    "{}:entry-detail".format(ContextData.app_name),
+                    kwargs={"pk": obj.pk},
+                )
             )
         else:
             context["summary_text"] = "Entry not added"
@@ -160,7 +163,6 @@ def tag_remove_form(request):
     if not request.user.is_staff:
         return ContextData.render(request, "missing_rights.html", context)
 
-
     if request.method == "POST":
         form = TagForm(request.POST)
 
@@ -200,7 +202,7 @@ def tag_remove_str(request, tag_name):
     entries.delete()
 
     return HttpResponseRedirect(
-            reverse("{}:tags-show-all".format(ContextData.app_name))
+        reverse("{}:tags-show-all".format(ContextData.app_name))
     )
 
     return ContextData.render(request, "summary_present.html", context)
@@ -311,7 +313,10 @@ def entry_vote(request, pk):
             form.save_vote()
 
             return HttpResponseRedirect(
-                    reverse("{}:entry-detail".format(ContextData.app_name), kwargs={"pk": obj.pk})
+                reverse(
+                    "{}:entry-detail".format(ContextData.app_name),
+                    kwargs={"pk": obj.pk},
+                )
             )
         else:
             context["summary_text"] = "Entry not voted"
@@ -322,7 +327,7 @@ def entry_vote(request, pk):
 
         vote = 0
         votes = obj.votes.filter(author=author)
-        if len(votes) > 0:
+        if votes.count() > 0:
             vote = votes[0].vote
 
         form = LinkVoteForm(initial={"link_id": obj.id, "author": author, "vote": vote})

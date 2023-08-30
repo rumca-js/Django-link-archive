@@ -13,7 +13,6 @@ from .entries import LinkDataModel
 from .admin import PersistentInfo, ConfigurationEntry
 
 
-
 class LinkTagsDataModel(models.Model):
     # https://stackoverflow.com/questions/14066531/django-model-with-unique-combination-of-two-fields
 

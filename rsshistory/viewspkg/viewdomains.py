@@ -101,7 +101,7 @@ def domain_fix(request, pk):
     if not request.user.is_staff:
         return ContextData.render(request, "missing_rights.html", context)
 
-    domain = Domains.objects.filter(id = pk)
+    domain = Domains.objects.filter(id=pk)
     domain[0].fix()
 
     context["summary_text"] = "Domains were fixed"
@@ -123,7 +123,6 @@ def domains_fix(request):
     return ContextData.render(request, "summary_present.html", context)
 
 
-
 def domains_read_bookmarks(request):
     context = ContextData.get_context(request)
     context["page_title"] += " - Domain read bookmarks"
@@ -141,18 +140,19 @@ def domains_read_bookmarks(request):
 def domain_json(request, pk):
     domains = Domains.objects.filter(id=pk)
 
-    if len(domains) == 0:
+    if domains.count() == 0:
         context["summary_text"] = "No such domain in the database {}".format(pk)
         return ContextData.render(request, "summary_present.html", context)
 
     domain = domains[0]
 
     # JsonResponse
-    return JsonResponse(domain.get_map() )
+    return JsonResponse(domain.get_map())
 
 
 def domains_json(request):
     from ..queryfilters import DomainFilter
+
     domains = Domains.objects.all()
 
     # Data

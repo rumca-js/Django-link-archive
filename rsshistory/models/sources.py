@@ -69,9 +69,9 @@ class SourceCategories(models.Model):
 
     def add(category):
         if category and category != "":
-            objs = SourceCategories.objects.filter(category = category)
-            if len(objs) == 0:
-                SourceCategories.objects.create(category = category)
+            objs = SourceCategories.objects.filter(category=category)
+            if objs.count() == 0:
+                SourceCategories.objects.create(category=category)
 
 
 class SourceSubCategories(models.Model):
@@ -82,6 +82,6 @@ class SourceSubCategories(models.Model):
 
     def add(subcategory):
         if subcategory and subcategory != "":
-            objs = SourceSubCategories.objects.filter(subcategory = subcategory)
-            if len(objs) == 0:
-                SourceSubCategories.objects.create(subcategory = subcategory)
+            objs = SourceSubCategories.objects.filter(subcategory=subcategory)
+            if objs.count() == 0:
+                SourceSubCategories.objects.create(subcategory=subcategory)

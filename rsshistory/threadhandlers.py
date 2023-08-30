@@ -61,7 +61,7 @@ class ProcessSourceJobHandler(BaseJobHandler):
     def process(self, obj=None):
         try:
             sources = SourceDataController.objects.filter(url=obj.subject)
-            if len(sources) == 0:
+            if sources.count() == 0:
                 return
 
             source = sources[0]
@@ -515,7 +515,8 @@ class PushDailyDataToRepoJobHandler(BaseJobHandler):
 
 class RefreshThreadHandler(object):
     """!
-    refreshes sources, synchronously
+    refreshes sources, synchronously.
+    This handler only adds background jobs, nothing more
     """
 
     def __init__(self, name="RefreshThreadHandler"):
@@ -541,6 +542,7 @@ class RefreshThreadHandler(object):
                     for source in sources:
                         BackgroundJobController.link_archive(source.url)
 
+            ## TODO move this to a background job
             LinkDataController.clear_old_entries()
             LinkDataController.move_old_links_to_archive()
 
@@ -577,7 +579,7 @@ class HandlerManager(object):
             afilter = handler.get_job_filter()
 
             objs = BackgroundJob.objects.filter(afilter)
-            if len(objs) != 0:
+            if objs.count() != 0:
                 obj = objs[0]
                 return [obj, handler]
         return []

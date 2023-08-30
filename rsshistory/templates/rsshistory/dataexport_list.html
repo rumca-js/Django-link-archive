@@ -13,9 +13,9 @@
     {% for object in content_list %}
     <li>
         Enabled:{{ object.enabled }},
+        Remote path:{{ object.remote_path }}
         Export type:{{ object.export_type }},
         Export data:{{ object.export_data }},
-        Remote path:{{ object.remote_path }}
         <a href="{% url 'rsshistory:data-export' object.id %}" class="simplebutton">
             Details
         </a>

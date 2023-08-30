@@ -12,6 +12,7 @@
     <li>Current time: {{Current_DateTime}}</li>
     <li>Sources: {{SourceDataModel}}</li>
     <li>Entries: {{LinkDataModel}}</li>
+    <li>ArchiveEntries: {{ArchiveLinkDataModel}}</li>
     <li>Tags length: {{LinkTagsDataModel}}</li>
     <li>Configurations: {{ConfigurationEntry}}</li>
     <li>UserConfig: {{UserConfig}}</li>
@@ -21,7 +22,7 @@
         <a href="{% url 'rsshistory:backgroundjobs-perform-all' %}" title="Refresh and process all" class="simplebutton">Refresh and process all</a>
     </li>
 
-    <li>Server log length: {{ServerLogLength}} Server log errors: {{ServerLogErrorsLength}}
+    <li>Server log length: {{ServerLogLength}} 
         <a href="{% url 'rsshistory:logs' %}" title="View all logs" class="simplebutton">View</a>
         <a href="{% url 'rsshistory:truncate-log' %}" title="Remove info" class="simplebutton">Remove info</a>
         <a href="{% url 'rsshistory:truncate-log-errors' %}" title="Remove errors" class="simplebutton">Remove errors</a>

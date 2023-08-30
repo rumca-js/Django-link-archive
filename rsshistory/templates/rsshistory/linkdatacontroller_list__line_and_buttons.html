@@ -33,7 +33,7 @@
                 Details
             </a>
             {% if link.bookmarked %}
-            <a href="{% url 'rsshistory:entry-notstar' link.id %}" class="simplebutton">
+            <a href="{% url 'rsshistory:entry-notbookmark' link.id %}" class="simplebutton">
                 Not bookmarked
             </a>
             <a href="{% url 'rsshistory:entry-tag' link.id %}" class="simplebutton">Tag entry</a>

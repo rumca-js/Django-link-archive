@@ -154,7 +154,7 @@ class BackgroundJobControllerTest(TestCase):
             job=BackgroundJob.JOB_WRITE_DAILY_DATA
         )
 
-        self.assertEqual(len(objects), 3)
+        self.assertEqual(objects.count(), 3)
 
         self.assertEqual(objects[0].subject, "2022-03-02")
         self.assertEqual(objects[1].subject, "2022-03-03")

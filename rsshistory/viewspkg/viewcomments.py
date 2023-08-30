@@ -43,7 +43,10 @@ def entry_add_comment(request, link_id):
             form.save_comment()
 
             return HttpResponseRedirect(
-                    reverse("{}:entry-detail".format(ContextData.app_name), kwargs={"pk": link.pk})
+                reverse(
+                    "{}:entry-detail".format(ContextData.app_name),
+                    kwargs={"pk": link.pk},
+                )
             )
 
         context["summary_text"] = "Could not add a comment"

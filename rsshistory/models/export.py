@@ -1,4 +1,7 @@
+import traceback
 from django.db import models
+
+from .admin import PersistentInfo, ConfigurationEntry
 
 
 class SourceExportHistory(models.Model):
@@ -19,7 +22,7 @@ class SourceExportHistory(models.Model):
 
             history = SourceExportHistory.objects.filter(date=yesterday)
 
-            if len(history) != 0:
+            if history.count() != 0:
                 return False
             return True
 
@@ -30,7 +33,7 @@ class SourceExportHistory(models.Model):
             )
 
     def get_safe():
-        return SourceExportHistory.objects.all()[:100]
+        return SourceExportHistory.objects.all()[:7]
 
 
 class DataExport(models.Model):

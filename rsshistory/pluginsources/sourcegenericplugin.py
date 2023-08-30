@@ -1,6 +1,6 @@
 import traceback
 
-from ..models import PersistentInfo, LinkDataModel
+from ..models import PersistentInfo
 from ..webtools import Page
 from ..dateutils import DateUtils
 from ..controllers import LinkDataHyperController

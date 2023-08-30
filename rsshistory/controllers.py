@@ -52,7 +52,13 @@ class SourceDataController(SourceDataModel):
         return days
 
     def get_long_description(self):
-        return "Category:{} Subcategory:{} Export:{} On Hold:{} Type:{}".format(self.category, self.subcategory, self.export_to_cms, self.on_hold, self.source_type)
+        return "Category:{} Subcategory:{} Export:{} On Hold:{} Type:{}".format(
+            self.category,
+            self.subcategory,
+            self.export_to_cms,
+            self.on_hold,
+            self.source_type,
+        )
 
     def get_full_description(self):
         return "{} Export:{} Fetched:{} Number of entries:{} Import seconds:{}".format(
@@ -95,7 +101,7 @@ class SourceDataController(SourceDataModel):
 
     def get_op_data(self):
         objs = self.dynamic_data.all()
-        if len(objs) == 0:
+        if objs.count() == 0:
             return None
         return objs[0]
 
@@ -123,7 +129,7 @@ class SourceDataController(SourceDataModel):
             obj.save()
         else:
             objs = SourceOperationalData.objects.filter(url=self.url, source_obj=None)
-            if len(objs) >= 0:
+            if objs.count() >= 0:
                 objs.delete()
 
             op = SourceOperationalData(
@@ -234,6 +240,35 @@ class LinkDataController(LinkDataModel):
         else:
             return None
 
+    def get_absolute_url(self):
+        """Returns the URL to access a particular author instance."""
+        return reverse("{}:entry-detail".format(LinkDatabase.name), args=[str(self.id)])
+
+    def get_edit_url(self):
+        """Returns the URL to access a particular author instance."""
+
+        return reverse("{}:entry-edit".format(LinkDatabase.name), args=[str(self.id)])
+
+    def get_bookmark_set_url(self):
+        """Returns the URL to access a particular author instance."""
+        return reverse(
+            "{}:entry-bookmark".format(LinkDatabase.name), args=[str(self.id)]
+        )
+
+    def get_bookmark_unset_url(self):
+        """Returns the URL to access a particular author instance."""
+        return reverse(
+            "{}:entry-notbookmark".format(LinkDatabase.name), args=[str(self.id)]
+        )
+
+    def get_hide_url(self):
+        """Returns the URL to access a particular author instance."""
+        return reverse("{}:entry-hide".format(LinkDatabase.name), args=[str(self.id)])
+
+    def get_remove_url(self):
+        """Returns the URL to access a particular author instance."""
+        return reverse("{}:entry-remove".format(LinkDatabase.name), args=[str(self.id)])
+
     def move_old_links_to_archive():
         from .dateutils import DateUtils
 
@@ -253,6 +288,8 @@ class LinkDataController(LinkDataModel):
                 entry.move_to_archive()
 
     def clear_old_entries():
+        from .dateutils import DateUtils
+
         sources = SourceDataController.objects.all()
         for source in sources:
             if not source.is_removeable():
@@ -285,9 +322,47 @@ class ArchiveLinkDataController(ArchiveLinkDataModel):
         else:
             return None
 
+    def get_absolute_url(self):
+        """Returns the URL to access a particular author instance."""
+
+        return reverse(
+            "{}:entry-archived".format(LinkDatabase.name), args=[str(self.id)]
+        )
+
+    def get_edit_url(self):
+        """Returns the URL to access a particular author instance."""
+
+        return reverse(
+            "{}:entry-archive-edit".format(LinkDatabase.name), args=[str(self.id)]
+        )
+
+    def get_bookmark_set_url(self):
+        """Returns the URL to access a particular author instance."""
+        return reverse(
+            "{}:entry-archive-bookmark".format(LinkDatabase.name), args=[str(self.id)]
+        )
+
+    def get_bookmark_unset_url(self):
+        """Returns the URL to access a particular author instance."""
+        return reverse(
+            "{}:entry-archive-notbookmark".format(LinkDatabase.name),
+            args=[str(self.id)],
+        )
+
+    def get_hide_url(self):
+        """Returns the URL to access a particular author instance."""
+        return reverse(
+            "{}:entry-archive-hide".format(LinkDatabase.name), args=[str(self.id)]
+        )
+
+    def get_remove_url(self):
+        """Returns the URL to access a particular author instance."""
+        return reverse(
+            "{}:entry-archive-remove".format(LinkDatabase.name), args=[str(self.id)]
+        )
+
 
 class LinkDataHyperController(object):
-
     def add_new_link(link_data):
         if "source_obj" not in link_data:
             source_obj = None
@@ -330,21 +405,21 @@ class LinkDataHyperController(object):
     def get_link_object(link, date=None):
         if date is None:
             obj = LinkDataController.objects.filter(link=link)
-            if len(obj) > 0:
+            if obj.count() > 0:
                 return obj[0]
             obj = ArchiveLinkDataController.objects.filter(link=link)
-            if len(obj) > 0:
+            if obj.count() > 0:
                 return obj[0]
 
         current_time = DateUtils.get_datetime_now_utc()
         date_before = current_time - date
         if date_before.days > self.get_archive_days_limit():
             obj = ArchiveLinkDataController.objects.filter(link=link)
-            if len(obj) > 0:
+            if obj.count() > 0:
                 return obj[0]
         else:
             obj = LinkDataController.objects.filter(link=link)
-            if len(obj) > 0:
+            if obj.count() > 0:
                 return obj[0]
 
     def make_bookmarked(request, entry):
@@ -367,7 +442,7 @@ class LinkDataHyperController(object):
 
     def move_to_archive(entry):
         objs = ArchiveLinkDataModel.objects.filter(link=entry.link)
-        if len(objs) == 0:
+        if objs.count() == 0:
             themap = entry.get_map()
             themap["source_obj"] = entry.get_source_obj()
             try:
@@ -383,7 +458,7 @@ class LinkDataHyperController(object):
 
     def move_from_archive(entry):
         objs = LinkDataModel.objects.filter(link=entry.link)
-        if len(objs) == 0:
+        if objs.count() == 0:
             themap = entry.get_map()
             themap["source_obj"] = entry.get_source_obj()
             try:
@@ -422,7 +497,7 @@ class LinkCommentDataController(LinkCommentDataModel):
             criterion0 & (criterion1 | criterion2)
         )
 
-        if len(comments) > 0:
+        if comments.count() > 0:
             return False
 
         return True
@@ -448,7 +523,7 @@ class BackgroundJobController(BackgroundJob):
                 job.delete()
 
     def get_number_of_jobs(job_type):
-        return len(BackgroundJob.objects.filter(job=job_type))
+        return BackgroundJob.objects.filter(job=job_type).count()
 
     def download_rss(source, force=False):
         if force == False:
@@ -456,11 +531,9 @@ class BackgroundJobController(BackgroundJob):
                 return False
 
         if (
-            len(
-                BackgroundJob.objects.filter(
-                    job=BackgroundJob.JOB_PROCESS_SOURCE, subject=source.url
-                )
-            )
+            BackgroundJob.objects.filter(
+                job=BackgroundJob.JOB_PROCESS_SOURCE, subject=source.url
+            ).count()
             == 0
         ):
             BackgroundJob.objects.create(
@@ -498,15 +571,13 @@ class BackgroundJobController(BackgroundJob):
 
     def link_add(url, source):
         existing = LinkDataModel.objects.filter(link=url)
-        if len(existing) > 0:
+        if existing.count() > 0:
             return False
 
         if (
-            len(
-                BackgroundJob.objects.filter(
-                    job=BackgroundJob.JOB_LINK_ADD, subject=url
-                )
-            )
+            BackgroundJob.objects.filter(
+                job=BackgroundJob.JOB_LINK_ADD, subject=url
+            ).count()
             == 0
         ):
             BackgroundJob.objects.create(
@@ -626,7 +697,7 @@ class BackgroundJobController(BackgroundJob):
             archive_items = BackgroundJob.objects.filter(
                 job=BackgroundJob.JOB_LINK_ARCHIVE
             )
-            if len(archive_items) < 100:
+            if archive_items.count() < 100:
                 BackgroundJob.objects.create(
                     job=BackgroundJob.JOB_LINK_ARCHIVE,
                     task=None,
@@ -664,7 +735,7 @@ class BackgroundJobController(BackgroundJob):
             items = BackgroundJob.objects.filter(
                 job=BackgroundJob.JOB_PUSH_TO_REPO, subject=""
             )
-            if len(items) == 0:
+            if items.count() == 0:
                 BackgroundJob.objects.create(
                     job=BackgroundJob.JOB_PUSH_TO_REPO,
                     task=None,
@@ -672,7 +743,7 @@ class BackgroundJobController(BackgroundJob):
                     args="",
                 )
                 return True
-            elif len(items) > 1:
+            elif items.count() > 1:
                 for item in items:
                     item.delete()
         except Exception as e:
@@ -686,7 +757,7 @@ class BackgroundJobController(BackgroundJob):
             items = BackgroundJob.objects.filter(
                 job=BackgroundJob.JOB_PUSH_DAILY_DATA_TO_REPO, subject=""
             )
-            if len(items) == 0:
+            if items.count() == 0:
                 BackgroundJob.objects.create(
                     job=BackgroundJob.JOB_PUSH_DAILY_DATA_TO_REPO,
                     task=None,
@@ -694,7 +765,7 @@ class BackgroundJobController(BackgroundJob):
                     args="",
                 )
                 return True
-            elif len(items) > 1:
+            elif items.count() > 1:
                 for item in items:
                     item.delete()
         except Exception as e:

@@ -2,6 +2,7 @@ from datetime import timedelta
 
 from django.views import generic
 from django.urls import reverse
+from django.http import HttpResponseForbidden, HttpResponseRedirect
 
 from ..models import DataExport
 from ..controllers import (
@@ -412,7 +413,7 @@ def data_export_edit(request, pk):
         return ContextData.render(request, "missing_rights.html", context)
 
     objs = DataExport.objects.filter(id=pk)
-    if len(objs) == 0:
+    if objs.count() == 0:
         context["summary_text"] = "No such object"
         return ContextData.render(request, "summary_present.html", context)
 
@@ -443,7 +444,7 @@ def data_export_remove(request, pk):
         return ContextData.render(request, "missing_rights.html", context)
 
     objs = DataExport.objects.filter(id=pk)
-    if len(objs) == 0:
+    if objs.count() == 0:
         context["summary_text"] = "No such object"
         return ContextData.render(request, "summary_present.html", context)
     else:

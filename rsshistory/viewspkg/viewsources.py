@@ -31,7 +31,7 @@ class RssSourceListView(generic.ListView):
         context = ContextData.init_context(self.request, context)
         # Create any data and add it to the context
 
-        self.filter_form = SourcesChoiceForm(args=self.request.GET)
+        self.filter_form = SourcesChoiceForm(self.request.GET)
         self.filter_form.create(self.query_filter.filtered_objects)
         self.filter_form.method = "GET"
         self.filter_form.action_url = reverse("{}:sources".format(ContextData.app_name))
@@ -404,7 +404,7 @@ def source_fix_entries(request, source_pk):
 def source_json(request, pk):
     sources = SourceDataController.objects.filter(id=pk)
 
-    if len(sources) == 0:
+    if sources.count() == 0:
         context["summary_text"] = "No such source in the database {}".format(pk)
         return ContextData.render(request, "summary_present.html", context)
 

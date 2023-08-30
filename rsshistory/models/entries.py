@@ -105,7 +105,7 @@ class BaseLinkDataController(BaseLinkDataModel):
             return 0
 
         votes = self.votes.all()
-        if len(votes) == 0:
+        if votes.count() == 0:
             return 0
 
         sum_num = None
@@ -236,7 +236,7 @@ class BaseLinkDataController(BaseLinkDataModel):
         from ..pluginentries.youtubelinkhandler import YouTubeLinkHandler
 
         objs = BaseLinkDataModel.objects.filter(link=url)
-        if len(objs) != 0:
+        if objs.count() != 0:
             return False
 
         h = YouTubeLinkHandler(url)
@@ -319,7 +319,11 @@ class BaseLinkDataController(BaseLinkDataModel):
         if "description" not in data or data["description"].strip() == "":
             data["description"] = h.get_description()[:900]
         data["date_published"] = h.get_datetime_published()
-        if "thumbnail" not in data or data["thumbnail"] is None or data["thumbnail"].strip() == "":
+        if (
+            "thumbnail" not in data
+            or data["thumbnail"] is None
+            or data["thumbnail"].strip() == ""
+        ):
             data["thumbnail"] = h.get_thumbnail()
         data["artist"] = h.get_channel_name()
         data["album"] = h.get_channel_name()
@@ -339,8 +343,8 @@ class BaseLinkDataController(BaseLinkDataModel):
         if "description" not in data or not data["description"]:
             data["description"] = p.get_title()
 
-        sources = SourceDataModel.objects.filter(url = data["source"])
-        if len(sources) > 0:
+        sources = SourceDataModel.objects.filter(url=data["source"])
+        if sources.count() > 0:
             data["artist"] = sources[0].title
             data["album"] = sources[0].title
 
@@ -366,7 +370,7 @@ class BaseLinkDataController(BaseLinkDataModel):
 
     def move_to_archive(self):
         objs = ArchiveLinkDataModel.objects.filter(link=self.link)
-        if len(objs) == 0:
+        if objs.count() == 0:
             themap = self.get_map()
             themap["source_obj"] = self.get_source_obj()
             try:
@@ -385,6 +389,9 @@ class BaseLinkDataController(BaseLinkDataModel):
 
     def is_archive_entry(self):
         return False
+
+    def get_description_length():
+        return 1000
 
 
 class LinkDataModel(BaseLinkDataController):

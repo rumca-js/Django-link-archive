@@ -41,7 +41,7 @@ class Domains(models.Model):
 
     def create_or_update_domain(domain_only_text):
         objs = Domains.objects.filter(domain=domain_only_text)
-        if len(objs) == 0:
+        if objs.count() == 0:
             Domains.create_domain_object(domain_only_text)
         else:
             Domains.update_domain_obj(objs[0])
@@ -86,7 +86,12 @@ class Domains(models.Model):
         import tldextract
         from ..dateutils import DateUtils
 
-        if self.suffix is not None and self.tld is not None and self.suffix != "" and self.tld != "":
+        if (
+            self.suffix is not None
+            and self.tld is not None
+            and self.suffix != ""
+            and self.tld != ""
+        ):
             print("Skipping {} {} {}".format(self.domain, self.suffix, self.tld))
             return False
 
@@ -106,7 +111,11 @@ class Domains(models.Model):
             changed = True
 
         if changed:
-            print("domain:{} subdomain:{} suffix:{} tld:{}".format(self.main, self.subdomain, self.suffix, self.tld))
+            print(
+                "domain:{} subdomain:{} suffix:{} tld:{}".format(
+                    self.main, self.subdomain, self.suffix, self.tld
+                )
+            )
 
             self.date_last = DateUtils.get_datetime_now_utc()
             self.save()
@@ -135,14 +144,15 @@ class Domains(models.Model):
         mains.delete()
 
     def get_map(self):
-        result = {"domain" : self.domain,
-                  "main" : self.main,
-                  "subdomain" : self.subdomain,
-                  "suffix" : self.suffix,
-                  "tld" : self.tld,
-                  "date_created" : self.date_created.isoformat(),
-                  "date_last" : self.date_last.isoformat(),
-                  }
+        result = {
+            "domain": self.domain,
+            "main": self.main,
+            "subdomain": self.subdomain,
+            "suffix": self.suffix,
+            "tld": self.tld,
+            "date_created": self.date_created.isoformat(),
+            "date_last": self.date_last.isoformat(),
+        }
         return result
 
 
@@ -150,24 +160,24 @@ class DomainsSuffixes(models.Model):
     suffix = models.CharField(max_length=20, null=True, unique=True)
 
     def add(suffix):
-        suffixes = DomainsSuffixes.objects.filter(suffix = suffix)
-        if len(suffixes) == 0:
-            DomainsSuffixes.objects.create(suffix = suffix)
+        suffixes = DomainsSuffixes.objects.filter(suffix=suffix)
+        if suffixes.count() == 0:
+            DomainsSuffixes.objects.create(suffix=suffix)
+
 
 class DomainsTlds(models.Model):
     tld = models.CharField(max_length=20, null=True, unique=True)
 
     def add(tld):
-        tlds = DomainsTlds.objects.filter(tld = tld)
-        if len(tlds) == 0:
-            DomainsTlds.objects.create(tld = tld)
+        tlds = DomainsTlds.objects.filter(tld=tld)
+        if tlds.count() == 0:
+            DomainsTlds.objects.create(tld=tld)
 
 
 class DomainsMains(models.Model):
     main = models.CharField(max_length=20, null=True, unique=True)
 
     def add(main):
-        mains = DomainsMains.objects.filter(main = main)
-        if len(mains) == 0:
-            DomainsMains.objects.create(main = main)
-
+        mains = DomainsMains.objects.filter(main=main)
+        if mains.count() == 0:
+            DomainsMains.objects.create(main=main)

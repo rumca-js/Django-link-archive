@@ -4,6 +4,7 @@
 <div class="contentbuttonmenu">
     <a href="javascript:history.back()" class="simplebutton">Go Back</a>
     {% if user.is_staff %}
+    <a href="{% url 'rsshistory:backgroundjobs-check-new' %}" title="Checks if it is time for a new job" class="simplebutton">Check</a>
     <a href="{% url 'rsshistory:backgroundjobs-perform-all' %}" title="Refresh and process all" class="simplebutton">Refresh and process all</a>
     <a href="{% url 'rsshistory:backgroundjobs-remove-all' %}" title="Removes all background jobs" class="simplebutton">Remove all</a>
     {% endif %}

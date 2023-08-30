@@ -42,6 +42,10 @@
     {% endfor %}
   </div>
 
+  {% if not page_obj.has_next and has_more_results %}
+  <a href="{{ more_results_link }}" class="simplebutton">More results</a>
+  {% endif %}
+
 {% include "rsshistory/pagination.html" %}
 
   {% else %}

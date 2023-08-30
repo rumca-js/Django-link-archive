@@ -3,7 +3,7 @@ import re
 import os
 
 from .sourcegenericplugin import SourceGenericPlugin
-from ..models import PersistentInfo, LinkDataModel
+from ..models import PersistentInfo
 from ..controllers import LinkDataController
 
 

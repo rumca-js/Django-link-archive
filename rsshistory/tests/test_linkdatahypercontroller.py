@@ -44,7 +44,7 @@ class SourceParsePluginTest(TestCase):
 
         objs = LinkDataModel.objects.filter(link=link_name)
 
-        self.assertTrue(len(objs) == 1)
+        self.assertTrue(objs.count() == 1)
 
     def test_make_bookmarked(self):
         link_name = "https://youtube.com/v=12345"
@@ -62,13 +62,13 @@ class SourceParsePluginTest(TestCase):
         link = LinkDataHyperController.add_new_link(link_data)
 
         objs = LinkDataModel.objects.filter(link=link_name)
-        self.assertEqual(len(objs), 1)
+        self.assertEqual(objs.count(), 1)
         obj = objs[0]
 
         LinkDataHyperController.make_bookmarked(RequestObject(), obj)
 
         objs = LinkDataModel.objects.filter(link=link_name)
-        self.assertEqual(len(objs), 1)
+        self.assertEqual(objs.count(), 1)
         obj = objs[0]
 
         self.assertTrue(obj.bookmarked == True)
@@ -76,7 +76,7 @@ class SourceParsePluginTest(TestCase):
         LinkDataHyperController.make_not_bookmarked(RequestObject(), obj)
 
         objs = LinkDataModel.objects.filter(link=link_name)
-        self.assertEqual(len(objs), 1)
+        self.assertEqual(objs.count(), 1)
         obj = objs[0]
 
         self.assertTrue(obj.bookmarked == False)

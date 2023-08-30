@@ -30,7 +30,7 @@ class BookmarksExporter(object):
         return export_path
 
     def export(self, export_file_name="bookmarks", export_dir="default"):
-        if len(self._entries) == 0:
+        if self._entries.count() == 0:
             return
 
         export_path = self.get_export_path() / export_dir

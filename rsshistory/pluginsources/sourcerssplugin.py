@@ -2,7 +2,7 @@ import traceback
 from dateutil import parser
 
 from .sourcegenericplugin import SourceGenericPlugin
-from ..models import PersistentInfo
+from ..models import PersistentInfo, BaseLinkDataController
 
 
 class BaseRssPlugin(SourceGenericPlugin):
@@ -37,7 +37,7 @@ class BaseRssPlugin(SourceGenericPlugin):
         source = self.source
         num_entries = len(feed.entries)
 
-        print("Found rss source entry, feed size:{}".format(num_entries))
+        # print("Found rss source entry, feed size:{}".format(num_entries))
 
         if num_entries == 0:
             PersistentInfo.error(
@@ -49,7 +49,7 @@ class BaseRssPlugin(SourceGenericPlugin):
                 if entry_props is not None:
                     props.append(entry_props)
 
-        print("Number of new entries: {0}".format(len(props)))
+        # print("Number of new entries: {0}".format(len(props)))
 
         return props
 
@@ -62,10 +62,7 @@ class BaseRssPlugin(SourceGenericPlugin):
             objs = LinkDataController.objects.filter(link=props["link"])
 
             if not objs.exists():
-                if (
-                    str(feed_entry.title).strip() == ""
-                    or feed_entry.title == "undefined"
-                ):
+                if "title" not in props:
                     PersistentInfo.error(
                         "Source:{} {}; Entry:{} {} no title".format(
                             source.url, source.title, feed_entry.link, feed_entry.title
@@ -107,7 +104,9 @@ class BaseRssPlugin(SourceGenericPlugin):
         output_map = {}
 
         if hasattr(feed_entry, "description"):
-            output_map["description"] = feed_entry.description
+            output_map["description"] = feed_entry.description[
+                : BaseLinkDataController.get_description_length() - 2
+            ]
         else:
             output_map["description"] = ""
 
@@ -141,6 +140,9 @@ class BaseRssPlugin(SourceGenericPlugin):
         output_map["link"] = feed_entry.link
         output_map["artist"] = source.title
         output_map["album"] = source.title
+
+        if str(feed_entry.title).strip() == "" or feed_entry.title == "undefined":
+            output_map["title"] = output_map["link"]
 
         if output_map["date_published"]:
             output_map["date_published"] = DateUtils.to_utc_date(

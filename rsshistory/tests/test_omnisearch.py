@@ -20,18 +20,18 @@ class OmniSearchTest(TestCase):
     def test_filter_query_set(self):
         LinkDataModel.objects.create(link="https://test.com")
 
-        args = {"search" : "link == https://test.com"}
+        args = {"search": "link == https://test.com"}
         processor = OmniSearchFilter(args)
 
         qs = LinkDataModel.objects.all()
-        print("Query set length: {}".format(len(qs)))
+        print("Query set length: {}".format(qs.count()))
 
         processor.set_query_set(qs)
 
         qs = processor.get_filtered_objects()
-        print("Query set length: {}".format(len(qs)))
+        print("Query set length: {}".format(qs.count()))
 
-        self.assertEqual(len(qs), 1)
+        self.assertEqual(qs.count(), 1)
 
     def test_symbol_equation_1(self):
         text = "(title == test & description == none) | title == covid"

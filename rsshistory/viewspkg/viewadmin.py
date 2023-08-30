@@ -3,6 +3,7 @@ import logging
 
 from django.views import generic
 from django.urls import reverse
+from django.http import HttpResponseForbidden, HttpResponseRedirect
 
 from ..models import (
     LinkTagsDataModel,
@@ -19,6 +20,7 @@ from ..controllers import (
     BackgroundJobController,
     SourceDataController,
     LinkDataController,
+    ArchiveLinkDataController,
 )
 from ..views import ContextData
 
@@ -71,26 +73,26 @@ def system_status(request):
     c = Configuration.get_object()
     context["directory"] = c.directory
 
-    context["SourceDataModel"] = len(SourceDataController.objects.all())
-    # Takes too long context["LinkDataModel"] = len(LinkDataController.objects.all())
-    context["LinkTagsDataModel"] = len(LinkTagsDataModel.objects.all())
-    context["ConfigurationEntry"] = len(ConfigurationEntry.objects.all())
-    context["UserConfig"] = len(UserConfig.objects.all())
-    context["BackgroundJob"] = len(BackgroundJob.objects.all())
+    context["SourceDataModel"] = SourceDataController.objects.count()
+    context["LinkDataModel"] = LinkDataController.objects.count()
+    context["ArchiveLinkDataModel"] = ArchiveLinkDataController.objects.count()
+    context["LinkTagsDataModel"] = LinkTagsDataModel.objects.count()
+    context["ConfigurationEntry"] = ConfigurationEntry.objects.count()
+    context["UserConfig"] = UserConfig.objects.count()
+    context["BackgroundJob"] = BackgroundJob.objects.count()
 
     from ..dateutils import DateUtils
 
     context["Current_DateTime"] = DateUtils.get_datetime_now_utc()
 
-    context["ServerLogLength"] = len(PersistentInfo.objects.all())
-    # Takes too long context["ServerLogErrorsLength"] = len(PersistentInfo.objects.filter(level = logging.ERROR))
-    context["DomainsLength"] = len(Domains.objects.all())
+    context["ServerLogLength"] = PersistentInfo.objects.count()
+    context["DomainsLength"] = Domains.objects.count()
 
     context["server_path"] = Path(".").resolve()
     context["directory"] = Path(".").resolve()
 
-    # Takes too long history = RssSourceExportHistory.get_safe()
-    # Takes too long context["export_history_list"] = history
+    history = SourceExportHistory.get_safe()
+    context["export_history_list"] = history
 
     return ContextData.render(request, "system_status.html", context)
 
@@ -118,7 +120,7 @@ def user_config(request):
 
     obs = UserConfig.objects.filter(user=user_name)
 
-    if len(obs) > 0:
+    if obs.count() > 0:
         for key, value in enumerate(obs):
             if key != 0:
                 value.truncate()
@@ -155,7 +157,7 @@ class BackgroundJobsView(generic.ListView):
         context = super(BackgroundJobsView, self).get_context_data(**kwargs)
         context = ContextData.init_context(self.request, context)
 
-        context["BackgroundJob"] = len(BackgroundJob.objects.all())
+        context["BackgroundJob"] = BackgroundJob.objects.count()
 
         return context
 
@@ -186,6 +188,23 @@ def backgroundjobs_remove_all(request):
 
     context["summary_text"] = "Background jobs were removed"
     return ContextData.render(request, "summary_present.html", context)
+
+
+def backgroundjobs_check_new(request):
+    context = ContextData.get_context(request)
+    context["page_title"] += " - Background check if new"
+
+    if not request.user.is_staff:
+        return ContextData.render(request, "missing_rights.html", context)
+
+    from ..threadhandlers import RefreshThreadHandler
+
+    refresh_handler = RefreshThreadHandler()
+    refresh_handler.refresh()
+
+    return HttpResponseRedirect(
+        reverse("{}:backgroundjobs".format(ContextData.app_name))
+    )
 
 
 def backgroundjobs_perform_all(request):

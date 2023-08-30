@@ -18,7 +18,7 @@ def subs_checker_task(arg):
     logger.info("Refreshing sources done")
 
 
-def subs_processing_task(arg):
+def process_all_jobs_task(arg):
     """!
     Processes jobs
     """

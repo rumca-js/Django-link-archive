@@ -8,13 +8,13 @@
 
   {% if user.is_staff %}
     <p>
-       <a href="{% url 'rsshistory:entry-edit' object.id %}" class="simplebutton">Edit entry</a>
+        <a href="{{object.get_edit_url}}" class="simplebutton">Edit entry</a>
     {% if object.bookmarked %}
-       <a href="{% url 'rsshistory:entry-notstar' object.id %}" class="simplebutton">
+       <a href="{{object.get_bookmark_unset_url}}" class="simplebutton">
         Not bookmark
        </a>
     {% else %}
-       <a href="{% url 'rsshistory:entry-star' object.id %}" class="simplebutton">
+       <a href="{{object.get_bookmark_set_url}}" class="simplebutton">
         Bookmark
        </a>
     {% endif %}

@@ -18,7 +18,7 @@ class DomainTest(TestCase):
 
         objs = Domains.objects.filter(domain__icontains="waiterrant")
 
-        self.assertEqual(len(objs), 1)
+        self.assertEqual(objs.count(), 1)
 
         obj = objs[0]
 

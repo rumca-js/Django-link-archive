@@ -18,9 +18,7 @@ class SourceEntriesDataWriter(object):
         clean_url = self._cfg.get_url_clean_name(self.source_url)
 
         ex = EntriesExporter(self._cfg, entries)
-        ex.export_entries(
-            self.source_url, clean_url, input_path
-        )
+        ex.export_entries(self.source_url, clean_url, input_path)
 
 
 class SourcesEntriesDataWriter(object):
@@ -76,6 +74,7 @@ class DataWriter(object):
             domains = Domains.objects.all()
 
         from .serializers.domainexporter import DomainJsonExporter
+
         exp = DomainJsonExporter()
         return exp.get_text(domains)
 
@@ -109,5 +108,5 @@ class DataWriter(object):
     def clear_daily_data(self, day_iso):
         import shutil
 
-        daily_path = self._cfg.get_daily_data_path(day_iso)
+        daily_path = self._cfg.get_daily_data_path()
         shutil.rmtree(daily_path)

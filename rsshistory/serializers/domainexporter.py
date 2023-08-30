@@ -1,5 +1,6 @@
 import json
 
+
 class DomainJsonExporter(object):
     def __init__(self):
         pass
@@ -10,7 +11,7 @@ class DomainJsonExporter(object):
             json_data.append(domain.get_map())
 
         # JsonResponse
-        return {"domains" : json_data}
+        return {"domains": json_data}
 
     def get_text(self, domains):
         json_data = self.get_json(domains)

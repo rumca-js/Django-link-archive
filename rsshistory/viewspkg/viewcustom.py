@@ -9,6 +9,7 @@ from django.shortcuts import render
 from ..configuration import Configuration
 from ..models import (
     LinkTagsDataModel,
+    BaseLinkDataController,
 )
 from ..views import ContextData
 from ..controllers import (
@@ -145,11 +146,13 @@ def fix_reset_youtube_link_details(link_id):
 
     sources_obj = SourceDataController.objects.filter(url=chan_url)
     source_obj = None
-    if len(sources_obj) > 0:
+    if sources_obj.count() > 0:
         source_obj = sources_obj[0]
 
     entry.title = h.get_title()
-    entry.description = h.get_description()
+    entry.description = h.get_description()[
+        : BaseLinkDataController.get_description_length() - 2
+    ]
     entry.date_published = h.get_datetime_published()
     entry.thumbnail = h.get_thumbnail()
     entry.link = link_valid
@@ -286,10 +289,17 @@ def test_page(request):
 
     summary_text = ""
 
-    from ..threadhandlers import ImportSourcesJobHandler
+    #from datetime import datetime
+    #from ..models import SourceExportHistory
 
-    handler = ImportSourcesJobHandler()
-    handler.process()
+    #input_date = datetime.strptime("29/08/2023", "%d/%m/%Y")
+    #exps = SourceExportHistory.objects.filter(date=input_date)
+    #exps.delete()
+
+    # from ..threadhandlers import ImportSourcesJobHandler
+
+    # handler = ImportSourcesJobHandler()
+    # handler.process()
 
     # LinkDataController.move_old_links_to_archive()
 

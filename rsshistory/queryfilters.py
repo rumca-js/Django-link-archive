@@ -15,9 +15,14 @@ except Exception as E:
 
 
 class BaseQueryFilter(object):
-    def __init__(self, args, page_limit = False):
+    def __init__(self, args, page_limit=False):
         self.args = args
         self.use_page_limit = page_limit
+
+        if "archive" in self.args and self.args["archive"] == "on":
+            self.use_archive_source = True
+        else:
+            self.use_archive_source = False
 
     def get_filter_string(self):
         infilters = self.args
@@ -53,9 +58,7 @@ class BaseQueryFilter(object):
         if self.use_page_limit:
             limit_range = self.get_limit()
             if limit_range:
-                filtered_objects = filtered_objects[
-                    limit_range[0] : limit_range[1]
-                ]
+                filtered_objects = filtered_objects[limit_range[0] : limit_range[1]]
 
         self.filtered_objects = filtered_objects
 
@@ -74,21 +77,22 @@ class SourceFilter(BaseQueryFilter):
         parameter_map = {}
 
         category = self.args.get("category")
-        if category and category != "Any":
+        if category and category != "":
             parameter_map["category"] = category
 
         subcategory = self.args.get("subcategory")
-        if subcategory and subcategory != "Any":
+        if subcategory and subcategory != "":
             parameter_map["subcategory"] = subcategory
 
         title = self.args.get("title")
-        if title and title != "Any":
+        if title and title != "":
             parameter_map["title"] = title
 
         return parameter_map
 
     def get_model_pagination(self):
         from .viewspkg.viewsources import RssSourceListView
+
         return int(RssSourceListView.paginate_by)
 
 
@@ -96,16 +100,12 @@ class EntryFilter(BaseQueryFilter):
     def __init__(self, args):
         super().__init__(args)
         self.time_constrained = True
-        if "archive" in self.args and self.args["archive"] == "on":
-            self.archive_source = True
-        else:
-            self.archive_source = False
 
         self.additional_condition = None
 
     def get_model_pagination(self):
-
         from .viewspkg.viewentries import EntriesSearchListView
+
         return int(EntriesSearchListView.paginate_by)
 
     def get_sources(self):
@@ -115,7 +115,7 @@ class EntryFilter(BaseQueryFilter):
         self.time_constrained = constrained
 
     def set_archive_source(self, source):
-        self.archive_source = source
+        self.use_archive_source = source
 
     def set_additional_condition(self, condition):
         self.additional_condition = condition
@@ -126,22 +126,14 @@ class EntryFilter(BaseQueryFilter):
 
         print("Entry parameter map: {}".format(str(entry_parameter_map)))
 
-        if self.additional_condition == None:
-            if not self.archive_source:
-                self.entries = LinkDataController.objects.filter(**entry_parameter_map)
-            if self.archive_source:
-                self.entries = ArchiveLinkDataController.objects.filter(
-                    **entry_parameter_map
-                )
+        q = Q(**entry_parameter_map)
+        if self.additional_condition != None:
+            q = q & self.additional_condition
+
+        if not self.use_archive_source:
+            self.entries = LinkDataController.objects.filter(q)
         else:
-            if not self.archive_source:
-                self.entries = LinkDataController.objects.filter(
-                    Q(**entry_parameter_map) & self.additional_condition
-                )
-            if self.archive_source:
-                self.entries = ArchiveLinkDataController.objects.filter(
-                    Q(**entry_parameter_map) & self.additional_condition
-                )
+            self.entries = ArchiveLinkDataController.objects.filter(q)
 
         return self.entries
 
@@ -152,20 +144,20 @@ class EntryFilter(BaseQueryFilter):
         parameter_map = {}
 
         category = self.args.get("category")
-        if category and category != "Any":
+        if category and category != "":
             parameter_map["category"] = category
 
         subcategory = self.args.get("subcategory")
-        if subcategory and subcategory != "Any":
+        if subcategory and subcategory != "":
             parameter_map["subcategory"] = subcategory
 
         if not translate:
             title = self.args.get("source_title")
-            if title and title != "Any":
+            if title and title != "":
                 parameter_map["source_title"] = title
         else:
             title = self.args.get("source_title")
-            if title and title != "Any":
+            if title and title != "":
                 parameter_map["title"] = title
 
         return parameter_map
@@ -376,7 +368,6 @@ class StringSymbolEquation(object):
 
 
 class OmniSymbolProcessor(object):
-
     def __init__(self, data, symbol_evaluator):
         self.symbol_evaluator = symbol_evaluator
 
@@ -405,24 +396,29 @@ class OmniSymbolProcessor(object):
 
             return self.make_operation(operation_symbol, function, expr.args)
 
-        #print(f'arg {expr}')
-        #print(f'arg.func: {expr.func}')
-        #print(f'arg.args: {expr.args}')
+        # print(f'arg {expr}')
+        # print(f'arg.func: {expr.func}')
+        # print(f'arg.args: {expr.args}')
 
     def evaluate_symbol(self, symbol):
         condition_text = self.conditions[symbol]
         print("Evaluation condition {} {}".format(symbol, condition_text))
 
-        self.known_results[symbol] = self.symbol_evaluator.evaluate_symbol(condition_text)
+        self.known_results[symbol] = self.symbol_evaluator.evaluate_symbol(
+            condition_text
+        )
 
         return self.known_results[symbol]
 
     def make_operation(self, operation_symbol, function, args):
-
         args0 = str(args[0])
         args1 = str(args[1])
 
-        print("Evaluation function: full:{} function:{} args:{} {}".format(operation_symbol, function, args0, args1))
+        print(
+            "Evaluation function: full:{} function:{} args:{} {}".format(
+                operation_symbol, function, args0, args1
+            )
+        )
 
         args0 = self.known_results[args0]
         args1 = self.known_results[args1]
@@ -438,16 +434,31 @@ class OmniSymbolProcessor(object):
 
 
 class OmniSymbolEvaluator(object):
+    def __init__(self, use_archive_source):
+        self.use_archive_source = use_archive_source
+
     def evaluate_symbol(self, symbol):
         condition_data = self.split_symbol(symbol)
         if condition_data:
-            condition_data = self.translate_condition(condition_data)
+            if self.is_link_symbol(condition_data):
+                condition_data = self.translate_condition(condition_data)
 
-            print("Symbol evaluator condition data:{}".format(condition_data))
-            return Q(**condition_data)
+                print("Symbol evaluator condition data:{}".format(condition_data))
+                return Q(**condition_data)
+            else:
+                if condition_data[0] == "archive" and condition_data[2] == "1":
+                    self.use_archive_source = True
         else:
-            #return Q(title__icontains = symbol)
-            return Q(title__icontains = symbol) | Q(tags__tag__icontains = symbol) | Q(description__icontains = symbol)
+            # return Q(title__icontains = symbol)
+            if not self.use_archive_source:
+                return (
+                    Q(title__icontains=symbol)
+                    | Q(tags__tag__icontains=symbol)
+                    | Q(description__icontains=symbol)
+                )
+            else:
+                # archive table does not have tags
+                return Q(title__icontains=symbol) | Q(description__icontains=symbol)
 
     def get_operators(self):
         return ("==", "=", "!=", "<=", ">=", "<", ">")
@@ -462,32 +473,42 @@ class OmniSymbolEvaluator(object):
         if wh >= 0:
             return [symbol[:wh].strip(), "is null"]
 
+    def is_link_symbol(self, condition):
+        return condition[0] != "archive"
+
     def translate_condition(self, condition_data):
         """
         https://docs.djangoproject.com/en/4.2/ref/models/querysets/#field-lookups
         """
 
         if condition_data[1] == "==":
-            return {condition_data[0]+"__iexact": condition_data[2]}
+            return {condition_data[0] + "__iexact": condition_data[2]}
         elif condition_data[1] == "=":
-            return {condition_data[0]+"__icontains": condition_data[2]}
+            return {condition_data[0] + "__icontains": condition_data[2]}
         elif condition_data[1] == ">":
-            return {condition_data[0]+"__gt": condition_data[2]}
+            return {condition_data[0] + "__gt": condition_data[2]}
         elif condition_data[1] == "<":
-            return {condition_data[0]+"__lt": condition_data[2]}
+            return {condition_data[0] + "__lt": condition_data[2]}
         elif condition_data[1] == ">=":
-            return {condition_data[0]+"__gte": condition_data[2]}
+            return {condition_data[0] + "__gte": condition_data[2]}
         elif condition_data[1] == "<=":
-            return {condition_data[0]+"__lte": condition_data[2]}
+            return {condition_data[0] + "__lte": condition_data[2]}
         elif condition_data[1] == "is null":
-            return {condition_data[0]+"__isnull": True}
+            return {condition_data[0] + "__isnull": True}
+
+    def is_archive_source(self):
+        return False
 
 
 class OmniSearchFilter(BaseQueryFilter):
     def __init__(self, args):
         super().__init__(args)
 
-        self.data = self.args["search"]
+        if "search" in self.args:
+            self.data = self.args["search"]
+        else:
+            self.data = ""
+
         self.query_set = None
 
     def set_query_set(self, query_set):
@@ -497,10 +518,14 @@ class OmniSearchFilter(BaseQueryFilter):
         if self.query_set is None:
             return []
 
-        proc = OmniSymbolProcessor(self.data, OmniSymbolEvaluator())
-        combined_q_object = proc.process()
+        symbol_evaluator = OmniSymbolEvaluator(self.use_archive_source)
 
-        filtered_queryset = self.query_set.filter(combined_q_object).distinct()
-        print("Omni query:{}".format(filtered_queryset.query))
-        return filtered_queryset
+        if self.data:
+            proc = OmniSymbolProcessor(self.data, symbol_evaluator)
+            combined_q_object = proc.process()
 
+            filtered_queryset = self.query_set.filter(combined_q_object).distinct()
+            print("Omni query:{}".format(filtered_queryset.query))
+            return filtered_queryset
+        else:
+            return self.query_set
