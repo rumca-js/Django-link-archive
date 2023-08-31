@@ -228,16 +228,16 @@ class BackgroundJobControllerTest(TestCase):
             1,
         )
 
-    def test_link_archive(self):
+    def test_link_save(self):
         self.assertEqual(
-            BackgroundJobController.get_number_of_jobs(BackgroundJob.JOB_LINK_ARCHIVE),
+            BackgroundJobController.get_number_of_jobs(BackgroundJob.JOB_LINK_SAVE),
             0,
         )
 
-        BackgroundJobController.link_archive("http://youtube.com?v=676767")
+        BackgroundJobController.link_save("http://youtube.com?v=676767")
 
         self.assertEqual(
-            BackgroundJobController.get_number_of_jobs(BackgroundJob.JOB_LINK_ARCHIVE),
+            BackgroundJobController.get_number_of_jobs(BackgroundJob.JOB_LINK_SAVE),
             1,
         )
 

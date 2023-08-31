@@ -8,6 +8,7 @@ import re
 
 class Page(object):
     user_agent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11"
+    # user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/116.0" # from browser
 
     def __init__(self, url, contents=None):
         self.url = url
@@ -42,7 +43,7 @@ class Page(object):
         }
 
         try:
-            r = requests.get(self.url, headers=hdr)
+            r = requests.get(self.url, headers=hdr, timeout=5)
             return r.text
 
         except Exception as e:
@@ -121,6 +122,41 @@ class Page(object):
         title = html.unescape(title)
 
         return title
+
+    def get_description(self):
+        if not self.contents:
+            self.contents = self.get_contents()
+
+        if not self.contents:
+            return None
+
+        wh1 = self.contents.find('<meta')
+        if wh1 == -1:
+            return None
+
+        wh1 = self.contents.find('name="description"')
+        if wh1 == -1:
+            return None
+
+        wh1 = self.contents.find("content", wh1 + 1)
+        if wh1 == -1:
+            return None
+
+        wh1 = self.contents.find('"', wh1 + 1)
+        if wh1 == -1:
+            return None
+
+        wh2 = self.contents.find('"', wh1 + 1)
+        if wh2 == -1:
+            return None
+
+        description = self.contents[wh1 + 1 : wh2].strip()
+        description = html.unescape(description)
+
+        if len(description) > 500:
+            return None
+
+        return description
 
     def is_link_valid(self, address):
         return self.is_link_valid_domain(address)

@@ -299,9 +299,9 @@ def wayback_save(request, pk):
     if not request.user.is_staff:
         return ContextData.render(request, "missing_rights.html", context)
 
-    if ConfigurationEntry.get().source_archive:
+    if ConfigurationEntry.get().source_save:
         source = SourceDataController.objects.get(id=pk)
-        BackgroundJobController.link_archive(subject=source.url)
+        BackgroundJobController.link_save(subject=source.url)
 
         context["summary_text"] = "Added to waybacksave"
     else:

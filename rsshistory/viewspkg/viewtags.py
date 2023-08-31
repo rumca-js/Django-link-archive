@@ -5,8 +5,7 @@ from django.http import HttpResponseForbidden, HttpResponseRedirect
 
 from datetime import datetime, timedelta
 
-from ..models import LinkTagsDataModel
-from ..configuration import Configuration
+from ..models import LinkTagsDataModel, ConfigurationEntry
 from ..forms import ConfigForm, TagForm, TagEntryForm, TagRenameForm
 from ..views import ContextData
 from ..controllers import LinkDataController
@@ -319,7 +318,8 @@ def entry_vote(request, pk):
                 )
             )
         else:
-            context["summary_text"] = "Entry not voted"
+            config = ConfigurationEntry.get()
+            context["summary_text"] = "Entry not voted. Vote min, max = [{}, {}]".format(config.vote_min, config.vote_max)
             return ContextData.render(request, "summary_present.html", context)
 
     else:

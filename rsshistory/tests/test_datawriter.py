@@ -74,7 +74,7 @@ class DataWriterTest(TestCase):
         writer.write_bookmarks()
 
         links = LinkDataController.objects.filter(bookmarked=True)
-        self.assertEqual((inks.count(), 1)
+        self.assertEqual(links.count(), 1)
 
         json_file = conf.get_bookmarks_path("2023") / "bookmarks_EN_entries.json"
         self.assertEqual(json_file.exists(), True)
@@ -141,4 +141,4 @@ class DataWriterTest(TestCase):
         writer = DataWriter(conf)
         json = writer.get_domains_json()
         # json as text
-        self.assertEqual(len(json), 208)
+        self.assertEqual(len(json), 15)

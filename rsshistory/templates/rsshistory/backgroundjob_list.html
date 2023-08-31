@@ -4,8 +4,9 @@
 <div class="contentbuttonmenu">
     <a href="javascript:history.back()" class="simplebutton">Go Back</a>
     {% if user.is_staff %}
+    <a href="{% url 'rsshistory:backgroundjob-add' %}" title="Add a new job" class="simplebutton">New</a>
     <a href="{% url 'rsshistory:backgroundjobs-check-new' %}" title="Checks if it is time for a new job" class="simplebutton">Check</a>
-    <a href="{% url 'rsshistory:backgroundjobs-perform-all' %}" title="Refresh and process all" class="simplebutton">Refresh and process all</a>
+    <a href="{% url 'rsshistory:backgroundjobs-perform-all' %}" title="Process all" class="simplebutton">Process all</a>
     <a href="{% url 'rsshistory:backgroundjobs-remove-all' %}" title="Removes all background jobs" class="simplebutton">Remove all</a>
     {% endif %}
 </div>
@@ -13,15 +14,19 @@
  <h1>Jobs [{{BackgroundJob}}]</h1>
 
   {% if content_list %}
-    <ul>
-    {% for job in content_list %}
-    <li>
-        {{job.job}} {{job.task}} {{job.subject}} {{job.args}} 
-        <a href="{% url 'rsshistory:backgroundjob-remove' job.id %}" class="simplebutton">Remove</a>
-        <a href="{% url 'rsshistory:backgroundjobs-remove' job.job %}" class="simplebutton">Remove all in type</a>
-    </li>
+     <div class="linklist container_{{user_config.display_type}}">
+      {% for job in content_list %}
+        <div 
+           class="element_{{user_config.display_type}}"
+           title="{{job.job}} {{job.task}} {{job.subject}} {{job.args}}"
+           >
+         - {{job.job}} {{job.task}} {{job.subject}} {{job.args}} 
+            <a href="{% url 'rsshistory:backgroundjob-remove' job.id %}" class="simplebutton">Remove</a>
+            <a href="{% url 'rsshistory:backgroundjobs-remove' job.job %}" class="simplebutton">Remove all in type</a>
+        </div>
+
     {% endfor %}
-    </ul>
+    </div>
     {% else %}
       Currently no jobs
   {% endif %}

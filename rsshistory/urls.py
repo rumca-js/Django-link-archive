@@ -35,7 +35,7 @@ urlpatterns = [
     path("source-remove-entries/<int:pk>/", viewsources.source_remove_entries, name="source-remove-entries"),
     path("source-edit/<int:pk>/", viewsources.edit_source, name="source-edit"),
     path("source-refresh/<int:pk>/", viewsources.refresh_source, name="source-refresh"),
-    path("source-archive/<int:pk>/", viewsources.wayback_save, name="source-archive"),
+    path("source-save/<int:pk>/", viewsources.wayback_save, name="source-save"),
     path("source-import-yt-links/<int:pk>/", viewsources.import_youtube_links_for_source, name="source-import-yt-links"),
     path("source-process-text/<int:pk>/", viewsources.process_source_text, name="source-process-text"),
     path("source-fix-entries/<int:source_pk>/", viewsources.source_fix_entries, name="source-fix-entries",),
@@ -74,7 +74,7 @@ urlpatterns = [
     path("entry-archive-notbookmark/<int:pk>/", viewentries.archive_make_not_bookmarked_entry, name="entry-archive-notbookmark"),
     path("entry-archive-hide/<int:pk>/", viewentries.archive_hide_entry, name="entry-archive-hide"),
     path("entry-archive-remove/<int:pk>/", viewentries.archive_remove_entry, name="entry-archive-remove"),
-    path("entry-archive/<int:pk>/", viewentries.wayback_save, name="entry-archive"),
+    path("entry-save/<int:pk>/", viewentries.wayback_save, name="entry-save"),
     # tags
     path("entry-tag/<int:pk>/", viewtags.tag_entry, name="entry-tag"),
     path("tag-remove/<int:pk>/", viewtags.tag_remove, name="tag-remove"),
@@ -100,6 +100,7 @@ urlpatterns = [
     path("about/", viewadmin.about, name="about"),
     # background jobs
     path("backgroundjobs/", viewadmin.BackgroundJobsView.as_view(), name="backgroundjobs",),
+    path("backgroundjob-add", viewadmin.backgroundjob_add, name="backgroundjob-add",),
     path("backgroundjobs-check-new/", viewadmin.backgroundjobs_check_new, name="backgroundjobs-check-new",),
     path("backgroundjobs-perform-all/", viewadmin.backgroundjobs_perform_all, name="backgroundjobs-perform-all",),
     path("backgroundjob-remove/<int:pk>/", viewadmin.backgroundjob_remove, name="backgroundjob-remove",),

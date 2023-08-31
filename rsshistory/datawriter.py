@@ -71,7 +71,7 @@ class DataWriter(object):
         from .models import Domains
 
         if domains is None:
-            domains = Domains.objects.all()
+            domains = Domains.objects.filter(dead=False)
 
         from .serializers.domainexporter import DomainJsonExporter
 

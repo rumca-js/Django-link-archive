@@ -55,8 +55,8 @@ class ViewsTest(TestCase):
 
         self.assertEqual(resp.status_code, 200)
 
-    def test_source_archive(self):
-        url = reverse("{}:source-archive".format(LinkDatabase.name), args=[0])
+    def test_source_save(self):
+        url = reverse("{}:source-save".format(LinkDatabase.name), args=[0])
         resp = self.client.get(url)
 
         self.assertEqual(resp.status_code, 200)
@@ -143,20 +143,14 @@ class ViewsTest(TestCase):
 
         self.assertEqual(resp.status_code, 200)
 
-    def test_entry_star(self):
-        url = reverse("{}:entry-star".format(LinkDatabase.name), args=[0])
+    def test_entry_bookmark(self):
+        url = reverse("{}:entry-bookmark".format(LinkDatabase.name), args=[0])
         resp = self.client.get(url)
 
         self.assertEqual(resp.status_code, 200)
 
-    def test_entry_nostar(self):
-        url = reverse("{}:entry-nostar".format(LinkDatabase.name), args=[0])
-        resp = self.client.get(url)
-
-        self.assertEqual(resp.status_code, 200)
-
-    def test_entry_nostar(self):
-        url = reverse("{}:entry-notstar".format(LinkDatabase.name), args=[0])
+    def test_entry_nobookmark(self):
+        url = reverse("{}:entry-notbookmark".format(LinkDatabase.name), args=[0])
         resp = self.client.get(url)
 
         self.assertEqual(resp.status_code, 200)
@@ -179,8 +173,8 @@ class ViewsTest(TestCase):
 
         self.assertEqual(resp.status_code, 200)
 
-    def test_entry_archive(self):
-        url = reverse("{}:entry-archive".format(LinkDatabase.name), args=[0])
+    def test_entry_save(self):
+        url = reverse("{}:entry-save".format(LinkDatabase.name), args=[0])
         resp = self.client.get(url)
 
         self.assertEqual(resp.status_code, 200)

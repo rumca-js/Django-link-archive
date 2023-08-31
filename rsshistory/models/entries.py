@@ -175,6 +175,15 @@ class BaseLinkDataController(BaseLinkDataModel):
             "thumbnail",
         ]
 
+    def get_query_names():
+        names = BaseLinkDataController.get_export_names()
+        names.append("source_obj__title")
+        names.append("source_obj__category")
+        names.append("source_obj__subcategory")
+        names.append("tags__tag")
+        names.append("votes__vote")
+        return names
+
     def get_all_export_names():
         return [
             "source",

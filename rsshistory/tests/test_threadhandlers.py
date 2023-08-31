@@ -105,16 +105,16 @@ class BackgroundJobControllerTest(TestCase):
             handler.get_job(), BackgroundJobController.JOB_LINK_DOWNLOAD_VIDEO
         )
 
-    def test_link_archive_handler(self):
+    def test_link_save_handler(self):
         bg_obj = BackgroundJobController.objects.create(
-            job=BackgroundJobController.JOB_LINK_ARCHIVE
+            job=BackgroundJobController.JOB_LINK_SAVE
         )
 
         mgr = HandlerManager()
         handler_obj, handler = mgr.get_handler_and_object()
 
         self.assertEqual(bg_obj, handler_obj)
-        self.assertEqual(handler.get_job(), BackgroundJobController.JOB_LINK_ARCHIVE)
+        self.assertEqual(handler.get_job(), BackgroundJobController.JOB_LINK_SAVE)
 
     def test_write_daily_data(self):
         bg_obj = BackgroundJobController.objects.create(

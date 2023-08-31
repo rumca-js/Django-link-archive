@@ -7,6 +7,7 @@ from django.shortcuts import render
 from django.http import HttpResponseForbidden, HttpResponseRedirect
 
 from ..models import (
+    ConfigurationEntry,
     LinkTagsDataModel,
     LinkCommentDataModel,
 )
@@ -25,9 +26,8 @@ def entry_add_comment(request, link_id):
 
     user_name = request.user.get_username()
     if not LinkCommentDataController.can_user_add_comment(link_id, user_name):
-        context[
-            "summary_text"
-        ] = "User cannot add more comments. Limit to 1 comment per day"
+        conf = ConfigurationEntry.get()
+        context["summary_text"] = "User cannot add more comments. Limit to {} comment per day".format(config.number_of_comments_per_day)
         return ContextData.render(request, "summary_present.html", context)
 
     print("Link id" + str(link_id))
@@ -40,7 +40,7 @@ def entry_add_comment(request, link_id):
         # create a form instance and populate it with data from the request:
         form = CommentEntryForm(request.POST)
         if form.is_valid():
-            form.save_comment()
+            LinkCommentDataController.save_comment(form.cleaned_data)
 
             return HttpResponseRedirect(
                 reverse(

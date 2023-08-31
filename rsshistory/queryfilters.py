@@ -434,31 +434,32 @@ class OmniSymbolProcessor(object):
 
 
 class OmniSymbolEvaluator(object):
-    def __init__(self, use_archive_source):
-        self.use_archive_source = use_archive_source
+    def __init__(self):
+        self.fields = []
+        self.default_search_symbols = []
+        self.translatable_names = []
 
     def evaluate_symbol(self, symbol):
         condition_data = self.split_symbol(symbol)
         if condition_data:
-            if self.is_link_symbol(condition_data):
+            if self.is_translatable(condition_data):
                 condition_data = self.translate_condition(condition_data)
 
                 print("Symbol evaluator condition data:{}".format(condition_data))
                 return Q(**condition_data)
             else:
-                if condition_data[0] == "archive" and condition_data[2] == "1":
-                    self.use_archive_source = True
+                self.fields[condition_data[0]] = condition_data[2]
         else:
-            # return Q(title__icontains = symbol)
-            if not self.use_archive_source:
-                return (
-                    Q(title__icontains=symbol)
-                    | Q(tags__tag__icontains=symbol)
-                    | Q(description__icontains=symbol)
-                )
-            else:
-                # archive table does not have tags
-                return Q(title__icontains=symbol) | Q(description__icontains=symbol)
+            result = None
+            for item in self.default_search_symbols:
+                input_map = {item : symbol}
+
+                if result is None:
+                    result = Q(**input_map)
+                else:
+                    result |= Q(**input_map)
+
+            return result
 
     def get_operators(self):
         return ("==", "=", "!=", "<=", ">=", "<", ">")
@@ -471,10 +472,10 @@ class OmniSymbolEvaluator(object):
 
         wh = symbol.find("is null")
         if wh >= 0:
-            return [symbol[:wh].strip(), "is null"]
+            return [symbol[:wh].strip(), "is null", ""]
 
-    def is_link_symbol(self, condition):
-        return condition[0] != "archive"
+    def is_translatable(self, condition):
+        return condition[0] in self.translatable_names
 
     def translate_condition(self, condition_data):
         """
@@ -499,6 +500,12 @@ class OmniSymbolEvaluator(object):
     def is_archive_source(self):
         return False
 
+    def set_default_search_symbols(self, symbols):
+        self.default_search_symbols = symbols
+
+    def set_translatable(self, names):
+        self.translatable_names = names
+
 
 class OmniSearchFilter(BaseQueryFilter):
     def __init__(self, args):
@@ -510,21 +517,60 @@ class OmniSearchFilter(BaseQueryFilter):
             self.data = ""
 
         self.query_set = None
+        self.default_search_symbols = []
+        self.translatable_names = []
+        self.combined_query = None
+
+        self.symbol_evaluator = OmniSymbolEvaluator()
 
     def set_query_set(self, query_set):
         self.query_set = query_set
+
+    def set_default_search_symbols(self, symbols):
+        self.default_search_symbols = symbols
+
+    def set_translatable(self, names):
+        self.translatable_names = names
+
+    def get_fields(self):
+        return self.symbol_evaluator.fields
+
+    def calculate_combined_query(self):
+        uses_operator = False
+        for symbol in self.symbol_evaluator.get_operators():
+            if self.data.find(symbol) >= 0:
+                uses_operator = True
+                break
+
+        if uses_operator:
+            self.combined_query = self.get_combined_query_using_processor()
+        else:
+            self.combined_query = self.get_combined_query_simple()
+
+    def get_combined_query_simple(self):
+        result = {}
+        for item in self.default_search_symbols:
+            result[item] = self.data
+
+        return Q(**result)
+
+    def get_combined_query_using_processor(self):
+        self.symbol_evaluator.set_default_search_symbols(self.default_search_symbols)
+        self.symbol_evaluator.set_translatable(self.translatable_names)
+
+        if self.data:
+            proc = OmniSymbolProcessor(self.data, self.symbol_evaluator)
+            combined_q_object = proc.process()
+            return combined_q_object
 
     def get_filtered_objects_internal(self):
         if self.query_set is None:
             return []
 
-        symbol_evaluator = OmniSymbolEvaluator(self.use_archive_source)
+        if self.data is not None and self.data != "":
+            self.calculate_combined_query()
 
-        if self.data:
-            proc = OmniSymbolProcessor(self.data, symbol_evaluator)
-            combined_q_object = proc.process()
-
-            filtered_queryset = self.query_set.filter(combined_q_object).distinct()
+            filtered_queryset = self.query_set.filter(self.combined_query ).distinct()
             print("Omni query:{}".format(filtered_queryset.query))
             return filtered_queryset
         else:

@@ -497,10 +497,22 @@ class LinkCommentDataController(LinkCommentDataModel):
             criterion0 & (criterion1 | criterion2)
         )
 
-        if comments.count() > 0:
+        conf = ConfigurationEntry.get()
+
+        if comments.count() > conf.number_of_comments_per_day:
             return False
 
         return True
+
+    def save_comment(data):
+        entry = LinkDataController.objects.get(id=data["link_id"])
+
+        LinkCommentDataModel.objects.create(
+            author=data["author"],
+            comment=data["comment"],
+            date_published=data["date_published"],
+            link_obj=entry,
+        )
 
 
 class BackgroundJobController(BackgroundJob):
@@ -692,14 +704,14 @@ class BackgroundJobController(BackgroundJob):
         )
         return True
 
-    def link_archive(link_url):
+    def link_save(link_url):
         try:
             archive_items = BackgroundJob.objects.filter(
-                job=BackgroundJob.JOB_LINK_ARCHIVE
+                job=BackgroundJob.JOB_LINK_SAVE
             )
             if archive_items.count() < 100:
                 BackgroundJob.objects.create(
-                    job=BackgroundJob.JOB_LINK_ARCHIVE,
+                    job=BackgroundJob.JOB_LINK_SAVE,
                     task=None,
                     subject=link_url,
                     args="",
@@ -743,9 +755,6 @@ class BackgroundJobController(BackgroundJob):
                     args="",
                 )
                 return True
-            elif items.count() > 1:
-                for item in items:
-                    item.delete()
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.error(
@@ -765,9 +774,25 @@ class BackgroundJobController(BackgroundJob):
                     args="",
                 )
                 return True
-            elif items.count() > 1:
-                for item in items:
-                    item.delete()
+        except Exception as e:
+            error_text = traceback.format_exc()
+            PersistentInfo.error(
+                "Exception: Link download: {} {}".format(str(e), error_text)
+            )
+
+    def make_cleanup():
+        try:
+            items = BackgroundJob.objects.filter(
+                job=BackgroundJob.JOB_CLEANUP, subject=""
+            )
+            if items.count() == 0:
+                BackgroundJob.objects.create(
+                    job=BackgroundJob.JOB_CLEANUP,
+                    task=None,
+                    subject="",
+                    args="",
+                )
+                return True
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.error(

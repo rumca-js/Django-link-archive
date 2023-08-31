@@ -10,9 +10,12 @@ from ..apps import LinkDatabase
 
 class ConfigurationEntry(models.Model):
     sources_refresh_period = models.IntegerField(default=3600)
-    link_archive = models.BooleanField(default=True)
-    source_archive = models.BooleanField(default=True)
+    link_save = models.BooleanField(default=True)
+    source_save = models.BooleanField(default=True)
     store_domain_info = models.BooleanField(default=True)
+    vote_min = models.IntegerField(default=-100)
+    vote_max = models.IntegerField(default=100)
+    number_of_comments_per_day = models.IntegerField(default=1)
 
     data_import_path = models.CharField(
         default="../data/{}/imports".format(LinkDatabase.name),
@@ -33,30 +36,24 @@ class ConfigurationEntry(models.Model):
             return confs[0]
 
     def is_bookmark_repo_set(self):
-        if (
-            self.git_repo == ""
-            or self.git_user == ""
-            and self.git_token == ""
-            or self.git_repo == None
-            or self.git_user == None
-            or self.git_token == None
-        ):
-            return False
-        else:
+        from .export import DataExport
+
+        exps = DataExport.objects.filter(export_data = DataExport.EXPORT_BOOKMARKS)
+
+        if exps.count() > 0:
             return True
+        else:
+            return False
 
     def is_daily_repo_set(self):
-        if (
-            self.git_daily_repo == ""
-            or self.git_user == ""
-            or self.git_token == ""
-            or self.git_daily_repo == None
-            or self.git_user == None
-            or self.git_token == None
-        ):
-            return False
-        else:
+        from .export import DataExport
+
+        exps = DataExport.objects.filter(export_data = DataExport.EXPORT_DAILY_DATA)
+
+        if exps.count() > 0:
             return True
+        else:
+            return False
 
     def get_data_export_path(self):
         return self.data_export_path
@@ -196,7 +193,7 @@ class BackgroundJob(models.Model):
     JOB_LINK_ADD = "link-add"
     JOB_LINK_DETAILS = "link-details"
     JOB_LINK_REFRESH = "link-refresh"
-    JOB_LINK_ARCHIVE = "link-archive"
+    JOB_LINK_SAVE = "link-save"
     JOB_LINK_DOWNLOAD = "link-download"
     JOB_LINK_DOWNLOAD_MUSIC = "download-music"
     JOB_LINK_DOWNLOAD_VIDEO = "download-video"
@@ -208,6 +205,7 @@ class BackgroundJob(models.Model):
     JOB_IMPORT_SOURCES = "import-sources"
     JOB_PUSH_TO_REPO = "push-to-repo"
     JOB_PUSH_DAILY_DATA_TO_REPO = "push-daily-data-to-repo"
+    JOB_CLEANUP = "cleanup"
 
     # fmt: off
     JOB_CHOICES = (
@@ -215,7 +213,7 @@ class BackgroundJob(models.Model):
         (JOB_LINK_ADD, JOB_LINK_ADD,),                          # adds link using default properties, may contain link map properties in the map
         (JOB_LINK_DETAILS, JOB_LINK_DETAILS),                   # fetches link additional information
         (JOB_LINK_REFRESH, JOB_LINK_REFRESH),                   # refreshes link, refetches its data
-        (JOB_LINK_ARCHIVE, JOB_LINK_ARCHIVE,),                  # link is archived using thirdparty pages (archive.org)
+        (JOB_LINK_SAVE, JOB_LINK_SAVE,),                        # link is saved using thirdparty pages (archive.org)
         (JOB_LINK_DOWNLOAD, JOB_LINK_DOWNLOAD),                 # link is downloaded using wget
         (JOB_LINK_DOWNLOAD_MUSIC, JOB_LINK_DOWNLOAD_MUSIC),     #
         (JOB_LINK_DOWNLOAD_VIDEO, JOB_LINK_DOWNLOAD_VIDEO),     #
@@ -227,6 +225,7 @@ class BackgroundJob(models.Model):
         (JOB_IMPORT_SOURCES, JOB_IMPORT_SOURCES),
         (JOB_PUSH_TO_REPO, JOB_PUSH_TO_REPO),
         (JOB_PUSH_DAILY_DATA_TO_REPO, JOB_PUSH_DAILY_DATA_TO_REPO),
+        (JOB_CLEANUP, JOB_CLEANUP),
     )
     # fmt: on
 

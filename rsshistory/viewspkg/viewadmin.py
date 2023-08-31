@@ -15,7 +15,7 @@ from ..models import (
     Domains,
 )
 from ..configuration import Configuration
-from ..forms import ConfigForm, UserConfigForm
+from ..forms import ConfigForm, UserConfigForm, BackgroundJobForm
 from ..controllers import (
     BackgroundJobController,
     SourceDataController,
@@ -162,6 +162,35 @@ class BackgroundJobsView(generic.ListView):
         return context
 
 
+def backgroundjob_add(request):
+    context = ContextData.get_context(request)
+    context["page_title"] += " - Add a new background job"
+
+    if not request.user.is_staff:
+        return ContextData.render(request, "missing_rights.html", context)
+
+    if request.method == "POST":
+        form = BackgroundJobForm(request.POST)
+        if form.is_valid():
+            BackgroundJob.objects.create(**form.cleaned_data)
+
+            return HttpResponseRedirect(
+                reverse("{}:backgroundjobs".format(ContextData.app_name))
+            )
+        else:
+            context["summary_text"] = "Form is invalid"
+            return ContextData.render(request, "summary_present.html", context)
+
+    form = BackgroundJobForm()
+
+    form.method = "POST"
+    form.action_url = reverse("{}:backgroundjob-add".format(ContextData.app_name))
+
+    context["form"] = form
+
+    return ContextData.render(request, "form_basic.html", context)
+
+
 def backgroundjob_remove(request, pk):
     context = ContextData.get_context(request)
     context["page_title"] += " - Background job remove"
@@ -215,9 +244,6 @@ def backgroundjobs_perform_all(request):
         return ContextData.render(request, "missing_rights.html", context)
 
     from ..threadhandlers import HandlerManager, RefreshThreadHandler
-
-    refresh_handler = RefreshThreadHandler()
-    refresh_handler.refresh()
 
     mgr = HandlerManager()
     mgr.process_all()

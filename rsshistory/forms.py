@@ -2,6 +2,7 @@ from datetime import datetime, timedelta, date
 from django import forms
 
 from .models import (
+    BackgroundJob,
     LinkTagsDataModel,
     LinkCommentDataModel,
     LinkVoteDataModel,
@@ -38,11 +39,14 @@ class ConfigForm(forms.ModelForm):
         model = ConfigurationEntry
         fields = [
             "sources_refresh_period",
-            "link_archive",
-            "source_archive",
+            "link_save",
+            "source_save",
             "store_domain_info",
             "data_export_path",
             "data_import_path",
+            "vote_min",
+            "vote_max",
+            "number_of_comments_per_day",
         ]
 
     def __init__(self, *args, **kwargs):
@@ -275,6 +279,13 @@ class TagRenameForm(forms.Form):
     new_tag = forms.CharField(label="New tag", max_length=100)
 
 
+class BackgroundJobForm(forms.Form):
+    job = forms.CharField(widget=forms.Select(choices=BackgroundJob.JOB_CHOICES), required=True)
+    task = forms.CharField(label="task", required=False)
+    subject = forms.CharField(label="subject", required=False)
+    args = forms.CharField(label="args", required=False)
+
+
 class DomainsChoiceForm(forms.Form):
     """
     Category choice form
@@ -502,16 +513,9 @@ class CommentEntryForm(forms.Form):
         super(CommentEntryForm, self).__init__(*args, **kwargs)
         self.fields["author"].readonly = True
 
-    def save_comment(self):
-        entry = LinkDataController.objects.get(id=self.cleaned_data["link_id"])
 
-        LinkCommentDataModel.objects.create(
-            author=self.cleaned_data["author"],
-            comment=self.cleaned_data["comment"],
-            date_published=self.cleaned_data["date_published"],
-            link_obj=entry,
-        )
-
+from django.db.models import IntegerField, Model
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 class LinkVoteForm(forms.Form):
     """
@@ -525,6 +529,13 @@ class LinkVoteForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(LinkVoteForm, self).__init__(*args, **kwargs)
         self.fields["author"].readonly = True
+
+        config = ConfigurationEntry.get()
+
+        self.fields["vote"].validators = [
+            MaxValueValidator(config.vote_max),
+            MinValueValidator(config.vote_min)
+        ]
 
     def save_vote(self):
         entry = LinkDataController.objects.get(id=self.cleaned_data["link_id"])

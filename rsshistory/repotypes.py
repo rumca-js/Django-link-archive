@@ -5,8 +5,8 @@ from .dateutils import DateUtils
 
 
 class DailyRepo(GitRepo):
-    def __init__(self, git_data, git_repo):
-        super().__init__(git_data, git_repo)
+    def __init__(self, git_data):
+        super().__init__(git_data)
 
     def is_day_data_present(self, day):
         expected_dir = self.get_local_day_path(day)
@@ -38,5 +38,5 @@ class DailyRepo(GitRepo):
 
 
 class BookmarkRepo(GitRepo):
-    def __init__(self, git_data, git_repo):
-        super().__init__(git_data, git_repo)
+    def __init__(self, git_data):
+        super().__init__(git_data)

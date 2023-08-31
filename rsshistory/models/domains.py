@@ -6,11 +6,15 @@ from django.urls import reverse
 
 
 class Domains(models.Model):
+    protocol = models.CharField(max_length=100, default="https")         # http or https, or ssl
     domain = models.CharField(max_length=1000)
     main = models.CharField(max_length=200, null=True)
     subdomain = models.CharField(max_length=200, null=True)
     suffix = models.CharField(max_length=20, null=True)
     tld = models.CharField(max_length=20, null=True)
+    title = models.CharField(max_length=500, null=True)
+    description = models.CharField(max_length=1000, null=True)
+    dead = models.BooleanField(default=False)
 
     date_created = models.DateTimeField(default=datetime.now)
     date_last = models.DateTimeField(default=datetime.now)
@@ -68,6 +72,7 @@ class Domains(models.Model):
         DomainsSuffixes.add(ob.suffix)
         DomainsTlds.add(ob.tld)
         DomainsMains.add(ob.main)
+        ob.request_title()
 
     def get_domain_ext(self, domain_only_text):
         tld = os.path.splitext(domain_only_text)[1][1:]
@@ -91,6 +96,8 @@ class Domains(models.Model):
             and self.tld is not None
             and self.suffix != ""
             and self.tld != ""
+            and self.title is not None
+            and self.dead == False
         ):
             print("Skipping {} {} {}".format(self.domain, self.suffix, self.tld))
             return False
@@ -110,10 +117,13 @@ class Domains(models.Model):
             self.tld = self.get_domain_ext(self.domain)
             changed = True
 
+        if self.request_title():
+            changed = True
+
         if changed:
             print(
-                "domain:{} subdomain:{} suffix:{} tld:{}".format(
-                    self.main, self.subdomain, self.suffix, self.tld
+                    "domain:{} subdomain:{} suffix:{} tld:{} title:{}".format(
+                    self.main, self.subdomain, self.suffix, self.tld, self.title
                 )
             )
 
@@ -123,11 +133,52 @@ class Domains(models.Model):
             Domains.update_complementary_data(self)
 
         else:
-            print("Nothing has changed")
+            print("domain:{} Nothing has changed".format(self.domain))
+
+    def request_title(self, force=False):
+        if self.title is not None and self.dead == False and not force:
+            return False
+
+        changed = False
+        print("{} Trying with {}".format(self.domain, self.protocol))
+
+        from ..webtools import Page
+        p = Page(self.protocol + "://" + self.domain)
+        self.title = p.get_title()
+        self.description = p.get_description()
+        self.protocol = "https"
+        if self.title is not None:
+            changed = True
+            self.dead = False
+
+        if self.title is None:
+            print("{} Trying with http".format(self.domain))
+
+            p = Page("http://"+self.domain)
+            self.title = p.get_title()
+            self.description = p.get_description()
+
+            if self.title is not None:
+                self.protocol = "http"
+                self.dead = False
+                changed = True
+            else:
+                self.dead = True
+                changed = True
+
+        if self.title is not None and self.title.find("Access Denied") >= 0:
+            self.dead = True
+            changed = True
+
+        if changed:
+            self.save()
+
+        return changed
 
     def fix_all():
-        objs = Domains.objects.all()
+        objs = Domains.objects.filter(dead = False)
         for obj in objs:
+            print("Fixing:{}".format(obj.domain))
             obj.fix()
 
     def remove_all():
@@ -150,6 +201,8 @@ class Domains(models.Model):
             "subdomain": self.subdomain,
             "suffix": self.suffix,
             "tld": self.tld,
+            "title": self.title,
+            "dead": self.dead,
             "date_created": self.date_created.isoformat(),
             "date_last": self.date_last.isoformat(),
         }

@@ -6,6 +6,7 @@ from django.http import JsonResponse
 from django.http import HttpResponseForbidden, HttpResponseRedirect
 
 from ..models import (
+    BaseLinkDataController,
     LinkTagsDataModel,
     BackgroundJob,
     ConfigurationEntry,
@@ -241,13 +242,29 @@ class EntriesOmniListView(EntriesSearchListView):
     paginate_by = 100
 
     def get_filter(self):
-        from ..queryfilters import OmniSearchProcessor
+        from ..queryfilters import OmniSearchFilter
 
-        query_filter = OmniSearchProcessor(self.request.GET)
-        if not query_filter.use_archive_source:
-            query_filter.set_query_set(LinkDataController.objects.all())
-        else:
+        query_filter = OmniSearchFilter(self.request.GET)
+
+        translate = BaseLinkDataController.get_query_names()
+
+        query_filter.set_translatable(translate)
+        query_filter.set_default_search_symbols([
+            "title__icontains",
+            "description__icontains",
+            #"tags__tag__icontains",
+            ])
+
+        query_filter.calculate_combined_query()
+
+        fields = query_filter.get_fields()
+
+        if ("archive" in self.request.GET and self.request.GET["archive"] == 1) or \
+            ("archive" in fields and fields["archive"] == "1"):
             query_filter.set_query_set(ArchiveLinkDataController.objects.all())
+        else:
+            query_filter.set_query_set(LinkDataController.objects.all())
+
         return query_filter
 
     def get_reset_link(self):
@@ -384,8 +401,8 @@ def add_entry(request):
             if ConfigurationEntry.get().store_domain_info:
                 Domains.add(data["link"])
 
-            if ConfigurationEntry.get().link_archive:
-                BackgroundJobController.link_archive(data["link"])
+            if ConfigurationEntry.get().link_save:
+                BackgroundJobController.link_save(data["link"])
 
             return ContextData.render(request, "entry_added.html", context)
 
@@ -634,7 +651,7 @@ def make_bookmarked_entry(request, pk):
     entry = LinkDataController.objects.get(id=pk)
 
     if LinkDataHyperController.make_bookmarked(request, entry):
-        BackgroundJobController.link_archive(entry.link)
+        BackgroundJobController.link_save(entry.link)
 
     return HttpResponseRedirect(entry.get_absolute_url())
 
@@ -678,9 +695,9 @@ def wayback_save(request, pk):
     if not request.user.is_staff:
         return ContextData.render(request, "missing_rights.html", context)
 
-    if ConfigurationEntry.get().link_archive:
+    if ConfigurationEntry.get().link_save:
         link = LinkDataController.objects.get(id=pk)
-        BackgroundJobController.link_archive(subject=link.link)
+        BackgroundJobController.link_save(subject=link.link)
 
         context["summary_text"] = "Added to waybacksave"
     else:
@@ -787,7 +804,7 @@ def archive_make_bookmarked_entry(request, pk):
     entry = ArchiveLinkDataController.objects.get(id=pk)
 
     if LinkDataHyperController.make_bookmarked(request, entry):
-        BackgroundJobController.link_archive(entry.link)
+        BackgroundJobController.link_save(entry.link)
 
     return HttpResponseRedirect(entry.get_absolute_url())
 

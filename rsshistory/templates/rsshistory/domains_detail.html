@@ -12,16 +12,39 @@
 
 <h1>Data Export</h1>
 
-<p>
-<div>ID: {{object.id}}</div>
-<div>Domain: {{object.domain}}</div>
-<div>Main: {{object.main}}</div>
-<div>Subdomain: {{object.subdomain}}</div>
-<div>Suffix: {{object.suffix}}</div>
-<div>TLD: {{object.tld}}</div>
-<div>Date created: {{object.date_created}}</div>
-<div>Date last: {{object.date_last}}</div>
-</p>
+{% if object.dead %}
+This domain is marked as dead!
+{% endif %}
+
+<table>
+    <tr>
+        <td>Link</td><td><a href="{{object.protocol}}://{{object.domain}}">{{object.domain}}</a></td>
+    </tr>
+    <tr>
+        <td>Title</td><td>{{object.title}}</td>
+    </tr>
+    <tr>
+        <td>Description</td><td>{{object.description}}</td>
+    </tr>
+    <tr>
+        <td>Main</td><td>{{object.main}}</td>
+    </tr>
+    <tr>
+        <td>Subdomain</td><td>{{object.subdomain}}</td>
+    </tr>
+    <tr>
+        <td>Suffix</td><td>{{object.suffix}}</td>
+    </tr>
+    <tr>
+        <td>TLD</td><td>{{object.tld}}</td>
+    </tr>
+    <tr>
+        <td>Date created</td><td>{{object.date_created}}</td>
+    </tr>
+    <tr>
+        <td>Date last</td><td>{{object.date_last}}</td>
+    </tr>
+</table>
 
 <a href="{% url 'rsshistory:domain-json' object.id %}" class="simplebutton">Show JSON</a>
 

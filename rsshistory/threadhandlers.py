@@ -224,7 +224,7 @@ class LinkAddJobHandler(BaseJobHandler):
             )
 
 
-class LinkArchiveJobHandler(BaseJobHandler):
+class LinkSaveJobHandler(BaseJobHandler):
     """!
     Archives entry to database
     """
@@ -233,7 +233,7 @@ class LinkArchiveJobHandler(BaseJobHandler):
         pass
 
     def get_job(self):
-        return BackgroundJob.JOB_LINK_ARCHIVE
+        return BackgroundJob.JOB_LINK_SAVE
 
     def process(self, obj=None):
         try:
@@ -513,6 +513,26 @@ class PushDailyDataToRepoJobHandler(BaseJobHandler):
             PersistentInfo.error("Exception: {} {}".format(str(e), error_text))
 
 
+class CleanupJobHandler(BaseJobHandler):
+    """!
+    Pushes data to repo
+    """
+
+    def __init__(self):
+        pass
+
+    def get_job(self):
+        return BackgroundJob.JOB_CLEANUP
+
+    def process(self, obj=None):
+        try:
+            LinkDataController.clear_old_entries()
+            LinkDataController.move_old_links_to_archive()
+        except Exception as e:
+            error_text = traceback.format_exc()
+            PersistentInfo.error("Exception: {} {}".format(str(e), error_text))
+
+
 class RefreshThreadHandler(object):
     """!
     refreshes sources, synchronously.
@@ -537,14 +557,12 @@ class RefreshThreadHandler(object):
             if conf.is_bookmark_repo_set() or conf.is_daily_repo_set():
                 BackgroundJobController.push_to_repo()
 
-                if ConfigurationEntry.get().source_archive:
+                if ConfigurationEntry.get().source_save:
                     sources = SourceDataController.objects.all()
                     for source in sources:
-                        BackgroundJobController.link_archive(source.url)
+                        BackgroundJobController.link_save(source.url)
 
-            ## TODO move this to a background job
-            LinkDataController.clear_old_entries()
-            LinkDataController.move_old_links_to_archive()
+            BackgroundJobController.make_cleanup()
 
 
 class HandlerManager(object):
@@ -564,13 +582,14 @@ class HandlerManager(object):
             LinkDownloadJobHandler(),
             LinkMusicDownloadJobHandler(),
             LinkVideoDownloadJobHandler(),
-            LinkArchiveJobHandler(),
+            LinkSaveJobHandler(),
             WriteDailyDataJobHandler(),
             WriteBookmarksJobHandler(),
             WriteTopicJobHandler(),
             ImportSourcesJobHandler(),
             ImportBookmarksJobHandler(),
             ImportDailyDataJobHandler(),
+            CleanupJobHandler(),
         ]
 
     def get_handler_and_object(self):
