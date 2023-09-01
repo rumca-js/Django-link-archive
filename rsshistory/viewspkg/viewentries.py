@@ -46,7 +46,7 @@ class EntriesSearchListView(generic.ListView):
 
     def get_queryset(self):
         self.query_filter = self.get_filter()
-        return self.query_filter.get_filtered_objects()
+        return self.get_filtered_objects()
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
@@ -79,6 +79,9 @@ class EntriesSearchListView(generic.ListView):
             context["search_term"] = self.request.GET["search"]
 
         return context
+
+    def get_filtered_objects(self):
+        return self.query_filter.get_filtered_objects()
 
     def get_reset_link(self):
         return reverse("{}:entries-search-init".format(ContextData.app_name))
@@ -247,8 +250,8 @@ class EntriesOmniListView(EntriesSearchListView):
         query_filter = OmniSearchFilter(self.request.GET)
 
         translate = BaseLinkDataController.get_query_names()
-
         query_filter.set_translatable(translate)
+
         query_filter.set_default_search_symbols([
             "title__icontains",
             "description__icontains",
@@ -257,15 +260,18 @@ class EntriesOmniListView(EntriesSearchListView):
 
         query_filter.calculate_combined_query()
 
-        fields = query_filter.get_fields()
+        return query_filter
+
+    def get_filtered_objects(self):
+        fields = self.query_filter.get_fields()
 
         if ("archive" in self.request.GET and self.request.GET["archive"] == 1) or \
             ("archive" in fields and fields["archive"] == "1"):
-            query_filter.set_query_set(ArchiveLinkDataController.objects.all())
+            self.query_filter.set_query_set(ArchiveLinkDataController.objects.all())
         else:
-            query_filter.set_query_set(LinkDataController.objects.all())
+            self.query_filter.set_query_set(LinkDataController.objects.all())
 
-        return query_filter
+        return self.query_filter.get_filtered_objects()
 
     def get_reset_link(self):
         return reverse("{}:entries-omni-search-init".format(ContextData.app_name))

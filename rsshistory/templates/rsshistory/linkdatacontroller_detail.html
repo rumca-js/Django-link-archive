@@ -43,10 +43,11 @@
       {% endif %}
 
       {% if object.source_obj %}
-       <a href="{% url 'rsshistory:source-detail' object.source_obj.id %}" class="simplebutton">Source: {{object.source_obj.title}}</a>
+      <a href="{% url 'rsshistory:source-detail' object.source_obj.id %}" class="simplebutton" title="Source: {{object.source_obj.title}}">Source</a>
       {% else %}
-       <a href="{{ object.source }}" class="simplebutton">Source Link</a>
+      <a href="{{ object.source }}" class="simplebutton" title="{{ object.source }}">Source</a>
       {% endif %}
+      <a href="{% url 'rsshistory:domain-by-name' %}?domain_name={{object.get_domain_only}}" class="simplebutton" title="{{object.get_domain_only}}">Domain</a>
 
       <a href="{{object.get_archive_link}}" class="simplebutton">View on archive.org</a>
       {% if user.is_staff %}
@@ -64,7 +65,8 @@
   {% endif %}
 
   <p>
-      <div><strong>Url:</strong> <a href="{{ object.link }}">{{ object.link }}</a></div>
+      <div><strong>Url:</strong> <a href="{{ object.link }}">{{ object.link }}</a>, 
+      </div>
       <div>
            <strong>Publish date:</strong> {{ object.date_published }}
            <strong>User:</strong> {{ object.user }}

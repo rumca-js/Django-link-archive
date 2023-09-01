@@ -17,6 +17,7 @@ from ..controllers import (
     SourceDataController,
     LinkDataController,
 )
+from ..dateutils import DateUtils
 
 
 def get_incorrect_youtube_links():
@@ -288,6 +289,14 @@ def test_page(request):
         return ContextData.render(request, "missing_rights.html", context)
 
     summary_text = ""
+
+    date_range = DateUtils.get_range4day("2023-08-31")
+    links = LinkDataController.objects.filter(date_published__range = date_range, link__icontains = "youtube.com/watch?v")
+
+    for link in links:
+        print("Fixing:{} {} {}".format(link.title, link.link, link.date_published))
+        fix_reset_youtube_link_details(link.id)
+
 
     #from datetime import datetime
     #from ..models import SourceExportHistory

@@ -291,7 +291,7 @@ class DomainsChoiceForm(forms.Form):
     Category choice form
     """
 
-    domain = forms.CharField(label="Domain", max_length=500, required=False)
+    search = forms.CharField(label="Search", max_length=500, required=False)
     suffix = forms.CharField(widget=forms.Select(choices=()), required=False)
     tld = forms.CharField(widget=forms.Select(choices=()), required=False)
 
@@ -355,6 +355,7 @@ class SourcesChoiceForm(forms.Form):
     Category choice form
     """
 
+    search = forms.CharField(label="Search", max_length=500, required=False)
     category = forms.CharField(widget=forms.Select(choices=()), required=False)
     subcategory = forms.CharField(widget=forms.Select(choices=()), required=False)
 

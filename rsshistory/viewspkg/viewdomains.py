@@ -1,6 +1,7 @@
 from django.views import generic
 from django.urls import reverse
 from django.http import JsonResponse
+from django.http import HttpResponseForbidden, HttpResponseRedirect
 
 from ..models import Domains
 from ..views import ContextData
@@ -8,7 +9,7 @@ from ..controllers import (
     LinkDataController,
     LinkDataHyperController,
 )
-from ..forms import DomainsChoiceForm
+from ..forms import DomainsChoiceForm, LinkInputForm
 from ..queryfilters import DomainFilter
 
 
@@ -63,6 +64,76 @@ class DomainsDetailView(generic.DetailView):
         context["page_title"] = "domain detail view"
 
         return context
+
+
+class DomainsByNameDetailView(generic.DetailView):
+    model = Domains
+    context_object_name = "domain_detail"
+
+    def get_object(self):
+        domain_name = self.request.GET["domain_name"]
+        objs = Domains.objects.filter(domain = domain_name)
+        if objs.count() > 0:
+            return objs[0]
+
+    def get_context_data(self, **kwargs):
+        from ..pluginsources.sourcecontrollerbuilder import SourceControllerBuilder
+
+        # Call the base implementation first to get the context
+        context = super(DomainsByNameDetailView, self).get_context_data(**kwargs)
+        context = ContextData.init_context(self.request, context)
+
+        context["page_title"] = "domain detail view"
+
+        return context
+
+
+def domain_by_name(request, domain_name):
+    context = ContextData.get_context(request)
+    context["page_title"] += " - Domain preview"
+
+    if not request.user.is_staff:
+        return ContextData.render(request, "missing_rights.html", context)
+
+    domain = Domains.objects.filter(domain = domain_name)
+
+    context["summary_text"] = "Domain was removed"
+
+    return ContextData.render(request, "summary_present.html", context)
+
+
+def domain_add(request):
+    context = ContextData.get_context(request)
+    context["page_title"] += " - add domain"
+
+    if not request.user.is_staff:
+        return ContextData.render(request, "missing_rights.html", context)
+
+    if request.method == "POST":
+        form = LinkInputForm(request.POST)
+        if form.is_valid():
+            link = form.cleaned_data["link"]
+
+            domain = Domains.add(link)
+
+            return HttpResponseRedirect(
+                reverse(
+                    "{}:domain-detail".format(ContextData.app_name),
+                    kwargs={"pk": domain.id},
+                )
+            )
+        else:
+            context["summary_text"] = "Form is invalid"
+            return ContextData.render(request, "summary_present.html", context)
+
+    else:
+        form = LinkInputForm()
+        form.method = "POST"
+
+        context["form_title"] = "Add new domain"
+        context["form"] = form
+
+    return ContextData.render(request, "form_basic.html", context)
 
 
 def domain_remove(request, pk):

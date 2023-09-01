@@ -70,10 +70,32 @@ class SourceFilter(BaseQueryFilter):
         super().__init__(args)
 
     def get_filtered_objects_internal(self):
-        parameter_map = self.get_filter_args()
-        return SourceDataController.objects.filter(**parameter_map)
+        conditions = self.get_conditions()
+        print(conditions)
 
-    def get_filter_args(self, translate=False):
+        return SourceDataController.objects.filter(conditions)
+
+    def get_conditions(self):
+        return self.get_arg_conditions_query() & self.get_omni_conditions()
+
+    def get_omni_conditions(self):
+        query_filter = OmniSearchFilter(self.args)
+
+        translate = SourceDataController.get_query_names()
+        query_filter.set_translatable(translate)
+
+        query_filter.set_default_search_symbols([
+            "title__icontains",
+            ])
+
+        query_filter.calculate_combined_query()
+        return query_filter.combined_query
+
+    def get_arg_conditions_query(self):
+        args = self.get_arg_conditions()
+        return Q(**args)
+
+    def get_arg_conditions(self, translate=False):
         parameter_map = {}
 
         category = self.args.get("category")
@@ -290,11 +312,36 @@ class DomainFilter(BaseQueryFilter):
         super().__init__(args)
 
     def get_filtered_objects_internal(self):
-        parameter_map = self.get_filter_args()
-        self.filtered_objects = Domains.objects.filter(**parameter_map)
+        conditions = self.get_conditions()
+        print(conditions)
+
+        self.filtered_objects = Domains.objects.filter(conditions)
+
         return self.filtered_objects
 
-    def get_filter_args(self, translate=False):
+    def get_conditions(self):
+        return self.get_arg_conditions_query() & self.get_omni_conditions()
+
+    def get_omni_conditions(self):
+        query_filter = OmniSearchFilter(self.args)
+
+        translate = Domains.get_query_names()
+        query_filter.set_translatable(translate)
+
+        query_filter.set_default_search_symbols([
+            "domain__icontains",
+            "title__icontains",
+            "description__icontains",
+            ])
+
+        query_filter.calculate_combined_query()
+        return query_filter.combined_query
+
+    def get_arg_conditions_query(self):
+        args = self.get_arg_conditions()
+        return Q(**args)
+
+    def get_arg_conditions(self, translate=False):
         parameter_map = {}
 
         suffix = self.args.get("suffix")
@@ -450,6 +497,9 @@ class OmniSymbolEvaluator(object):
             else:
                 self.fields[condition_data[0]] = condition_data[2]
         else:
+            if not symbol or symbol == "":
+                return
+
             result = None
             for item in self.default_search_symbols:
                 input_map = {item : symbol}
@@ -548,11 +598,21 @@ class OmniSearchFilter(BaseQueryFilter):
             self.combined_query = self.get_combined_query_simple()
 
     def get_combined_query_simple(self):
-        result = {}
-        for item in self.default_search_symbols:
-            result[item] = self.data
+        symbol = self.data
 
-        return Q(**result)
+        if not symbol or symbol == "":
+            return Q()
+
+        result = None
+        for item in self.default_search_symbols:
+            input_map = {item : symbol}
+
+            if result is None:
+                result = Q(**input_map)
+            else:
+                result |= Q(**input_map)
+
+        return result
 
     def get_combined_query_using_processor(self):
         self.symbol_evaluator.set_default_search_symbols(self.default_search_symbols)
@@ -571,6 +631,7 @@ class OmniSearchFilter(BaseQueryFilter):
             self.calculate_combined_query()
 
             filtered_queryset = self.query_set.filter(self.combined_query ).distinct()
+            print("Omni query:{}".format(filtered_queryset))
             print("Omni query:{}".format(filtered_queryset.query))
             return filtered_queryset
         else:

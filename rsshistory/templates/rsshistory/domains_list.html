@@ -4,6 +4,7 @@
 <div class="contentbuttonmenu">
     <a href="javascript:history.back()" class="simplebutton">Go Back</a>
     {% if user.is_staff %}
+    <a href="{% url 'rsshistory:domain-add' %}" title="Add new domain" class="simplebutton">Add</a>
     <a href="{% url 'rsshistory:domains-read-bookmarks' %}" title="Reads domains from bookmarks" class="simplebutton">Read from bookmarks</a>
     <a href="{% url 'rsshistory:domains-remove-all' %}" title="Removes all domains" class="simplebutton">Remove all</a>
     {% endif %}
@@ -31,19 +32,28 @@
                class="element_{{user_config.display_type}}"
                title="{{domain.domain}}"
              >
-             - 
-             {% if domain.dead %}
-             <b>[DEAD]</b>
-             {% endif %}
+             - <span class="linklistitemtitle">
+                 {% if domain.dead %}
+                 [DEAD]
+                 {% endif %}
+                 {{domain.domain}}
+             </span>
 
-             {{domain.domain}}
-
-             {% if domain.title %}
+             <span class="linklistitemdescription">
+                 {% if domain.title %}
                  {{domain.title}}
-             {% endif %}
+                 {% endif %}
+             </span>
              </a>
           {% elif type == "clear" %}
-          <div>- {{domain.domain}} Updated:{{domain.date_last}}, First seen:{{domain.date_created}}</div>
+          <div>
+              -
+             {% if domain.dead %}
+             [DEAD]
+             {% endif %}
+              {{domain.domain}}
+              {{domain.title}}
+          </div>
           {% endif %}
       {% endfor %}
     </div>

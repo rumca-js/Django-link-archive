@@ -5,14 +5,20 @@ import traceback
 import requests
 import re
 
+from bs4 import BeautifulSoup
+
 
 class Page(object):
-    user_agent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11"
+    # use headers from https://www.supermonitoring.com/blog/check-browser-http-headers/
+    user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/116.0"
+
+    # user_agent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11"
     # user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/116.0" # from browser
 
     def __init__(self, url, contents=None):
         self.url = url
         self.contents = contents
+        self.status_code = None
 
     def is_valid(self):
         if not self.contents:
@@ -29,6 +35,17 @@ class Page(object):
         except Exception as e:
             pass
 
+    def is_status_ok(self):
+        if self.status_code is None:
+            return False
+
+        print("Status code:{}".format(self.status_code))
+        if self.status_code == 403:
+            # Many pages return 403, but they are correct
+            return True
+
+        return self.status_code >= 200 and self.status_code < 300
+
     def get_contents(self):
         if self.contents:
             return self.contents
@@ -44,6 +61,7 @@ class Page(object):
 
         try:
             r = requests.get(self.url, headers=hdr, timeout=5)
+            self.status_code = r.status_code
             return r.text
 
         except Exception as e:
@@ -63,21 +81,11 @@ class Page(object):
         if not self.contents:
             return "en"
 
-        whlang = self.contents.find("lang")
-        if whlang >= 0:
-            lang = self.extract_html(self.contents, '"', '"', whlang)
-            if not lang:
-                return "en"
-
-            if len(lang) > 5:
-                return "en"
-
-            if lang.find("<") >= 0:
-                return "en"
-
-            return lang
-        else:
-            return "en"
+        soup = BeautifulSoup(self.contents, 'html.parser')
+        html = soup.find("html")
+        if html and html.has_attr("lang"):
+            print("returning: {}".format(html["lang"]))
+            return html["lang"]
 
     def extract_html(self, text, tag, closingtag, wh=None):
         if not wh:
@@ -108,20 +116,19 @@ class Page(object):
         if not self.contents:
             return None
 
-        wh1 = self.contents.find("<title", 0)
-        if wh1 == -1:
-            wh1 = self.contents.find("<TITLE", 0)
+        soup = BeautifulSoup(self.contents, 'html.parser')
+        title = soup.find('title')
+        if title:
+            title = title.string
+            return title
 
-        if wh1 == -1:
-            return None
+        title = soup.find("meta", property="og:title")
+        if title and title.has_attr("content"):
+            title = title["content"]
 
-        wh1a = self.contents.find(">", wh1)
-        wh2 = self.contents.find("</", wh1a + 1)
+            return title
 
-        title = self.contents[wh1a + 1 : wh2].strip()
-        title = html.unescape(title)
-
-        return title
+        #title = html.unescape(title)
 
     def get_description(self):
         if not self.contents:
@@ -130,33 +137,32 @@ class Page(object):
         if not self.contents:
             return None
 
-        wh1 = self.contents.find('<meta')
-        if wh1 == -1:
-            return None
+        soup = BeautifulSoup(self.contents, "html.parser")
+        description = soup.find("meta", attrs={'name' : "description"})
+        if description and description.has_attr("content"):
+            description = description["content"]
+            return description
 
-        wh1 = self.contents.find('name="description"')
-        if wh1 == -1:
-            return None
+        description = soup.find("meta", property="og:description")
+        if description and description.has_attr("content"):
+            description = description["content"]
 
-        wh1 = self.contents.find("content", wh1 + 1)
-        if wh1 == -1:
-            return None
+            return description
 
-        wh1 = self.contents.find('"', wh1 + 1)
+        wh1 = self.contents.find('<meta name="description"')
         if wh1 == -1:
-            return None
+            return
 
-        wh2 = self.contents.find('"', wh1 + 1)
+        wh1 = self.contents.find('description',wh1 + 24 +1)
+        if wh1 == -1:
+            return
+        wh1 = self.contents.find('"',wh1+1)
+        if wh1 == -1:
+            return
+        wh2 = self.contents.find('"',wh1+1)
         if wh2 == -1:
-            return None
-
-        description = self.contents[wh1 + 1 : wh2].strip()
-        description = html.unescape(description)
-
-        if len(description) > 500:
-            return None
-
-        return description
+            return
+        return self.contents[wh1+1: wh2]
 
     def is_link_valid(self, address):
         return self.is_link_valid_domain(address)

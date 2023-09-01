@@ -153,6 +153,12 @@ class BaseLinkDataController(BaseLinkDataModel):
         domain = page.get_domain()
         return domain + "/favicon.ico"
 
+    def get_domain_only(self):
+        from ..webtools import Page
+
+        page = Page(self.link)
+        return page.get_domain_only()
+
     def get_thumbnail(self):
         if self.thumbnail:
             return self.thumbnail

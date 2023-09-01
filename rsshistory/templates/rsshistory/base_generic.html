@@ -4,6 +4,10 @@
     {% block title %}<title>{{ page_title }}</title>{% endblock %}
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="{{app_description}}"/>
+  <meta property="og:title" content="{{app_title}}"/>
+  <meta property="og:description" content="{{app_description}}"/>
+
   <!-- Add additional CSS in static file -->
   {% load static %}
   <!--date is added to stylesheet name, to force it to be reloaded-->

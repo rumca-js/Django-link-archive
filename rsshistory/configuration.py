@@ -16,7 +16,7 @@ version is split into three digits:
  if a change requires the model to be changed, then second digit is updated, patch is set to 0
  if something should be released to public, then release version changes
 """
-__version__ = "0.18.1"
+__version__ = "0.19.0"
 
 
 from pathlib import Path
@@ -36,6 +36,8 @@ class Configuration(object):
         return {
             "page_title": "[{}]".format(self.app_name),
             "app_name": str(self.app_name),
+            "app_title": "Personal Link Database",
+            "app_description": "Personal Link Database. May work as link aggregator, may link as YouTube subscription filter.",
             "admin_email": "renegat@renegat0x0.ddns.net",
             "admin_user": "renegat0x0",
             "app_version": self.version,

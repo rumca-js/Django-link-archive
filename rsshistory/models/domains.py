@@ -14,6 +14,8 @@ class Domains(models.Model):
     tld = models.CharField(max_length=20, null=True)
     title = models.CharField(max_length=500, null=True)
     description = models.CharField(max_length=1000, null=True)
+    language = models.CharField(max_length=1000, default="en-US")
+    status_code = models.IntegerField(default=200)
     dead = models.BooleanField(default=False)
 
     date_created = models.DateTimeField(default=datetime.now)
@@ -31,7 +33,7 @@ class Domains(models.Model):
             url = url[:wh]
 
         domain_text = Domains.get_domain_url(url)
-        Domains.create_or_update_domain(domain_text)
+        return Domains.create_or_update_domain(domain_text)
 
     def get_domain_url(input_url):
         if input_url.find("/") >= 0:
@@ -46,9 +48,10 @@ class Domains(models.Model):
     def create_or_update_domain(domain_only_text):
         objs = Domains.objects.filter(domain=domain_only_text)
         if objs.count() == 0:
-            Domains.create_domain_object(domain_only_text)
+            return Domains.create_domain_object(domain_only_text)
         else:
             Domains.update_domain_obj(objs[0])
+            return objs[0]
 
     def create_domain_object(domain_only_text):
         import tldextract
@@ -68,11 +71,18 @@ class Domains(models.Model):
 
         Domains.update_complementary_data(ob)
 
+        return ob
+
     def update_complementary_data(ob):
         DomainsSuffixes.add(ob.suffix)
         DomainsTlds.add(ob.tld)
         DomainsMains.add(ob.main)
+
         ob.fix_title()
+
+        from ..dateutils import DateUtils
+        ob.date_last = DateUtils.get_datetime_now_utc()
+        ob.save()
 
     def get_domain_ext(self, domain_only_text):
         tld = os.path.splitext(domain_only_text)[1][1:]
@@ -84,8 +94,10 @@ class Domains(models.Model):
     def update_domain_obj(obj):
         from ..dateutils import DateUtils
 
-        obj.date_last = DateUtils.get_datetime_now_utc()
-        obj.save()
+        days = DateUtils.get_day_diff(obj.date_last)
+        # TODO make this configurable
+        if days > 7:
+            self.update_complementary_data()
 
     def fix(self):
         self.fix_domain()
@@ -127,7 +139,6 @@ class Domains(models.Model):
                 )
             )
 
-            self.date_last = DateUtils.get_datetime_now_utc()
             self.save()
 
             Domains.update_complementary_data(self)
@@ -136,47 +147,63 @@ class Domains(models.Model):
             print("domain:{} Nothing has changed".format(self.domain))
 
     def fix_title(self, force=False):
-        if self.title is not None and self.description is not None and self.dead == False and not force:
-            print("Domain: not fixing title/description {} {} {}".format(self.domain, self.suffix, self.tld))
-            return False
+        #if self.title is not None and self.description is not None and self.dead == False and not force:
+        #    print("Domain: not fixing title/description {} {} {}".format(self.domain, self.suffix, self.tld))
+        #    return False
+        print("Fixing title {}".format(self.domain))
 
         changed = False
 
         from ..webtools import Page
         p = Page(self.protocol + "://" + self.domain)
-        self.title = p.get_title()
-        self.description = p.get_description()
-        self.protocol = "https"
-        if self.title is not None:
-            changed = True
-            self.dead = False
 
-        if self.title is None:
+        new_title = p.get_title()
+        new_description = p.get_description()
+        new_language = p.get_language()
+        protocol = self.protocol
+
+        if new_title is None:
             print("{} Trying with http".format(self.domain))
+            protocol = "http"
+            p = Page(protocol + "://"+self.domain)
+            new_title = p.get_title()
+            new_description = p.get_description()
+            new_language = p.get_language()
 
-            p = Page("http://"+self.domain)
-            self.title = p.get_title()
-            self.description = p.get_description()
+        print("Page status:{}".format(p.is_status_ok()))
 
-            if self.title is not None:
-                self.protocol = "http"
-                self.dead = False
-                changed = True
-            else:
-                self.dead = True
-                changed = True
+        self.status_code = p.status_code
 
-        if self.title is not None and self.title.find("Access Denied") >= 0:
+        if p.is_status_ok() == False:
             self.dead = True
+            self.save()
+            return
+        if self.dead and p.is_status_ok():
+            self.dead = False
+            changed = True
+
+        print("New title:{}".format(new_title))
+        print("New description:{}".format(new_description))
+
+        if new_title is not None:
+            self.title = new_title
+            changed = True
+        if new_description is not None:
+            self.description = new_description
+            changed = True
+        if new_language is not None:
+            self.language = new_language
+            changed = True
+        if new_title is not None and new_description is None:
+            self.description = None
             changed = True
 
         if changed:
+            self.protocol = protocol
             self.save()
 
-        return changed
-
     def fix_all():
-        objs = Domains.objects.filter(dead = False)
+        objs = Domains.objects.filter(dead = True) #, description__isnull = True)
         for obj in objs:
             print("Fixing:{}".format(obj.domain))
             obj.fix()
@@ -196,16 +223,34 @@ class Domains(models.Model):
 
     def get_map(self):
         result = {
+            "protocol": self.protocol,
             "domain": self.domain,
             "main": self.main,
             "subdomain": self.subdomain,
             "suffix": self.suffix,
             "tld": self.tld,
             "title": self.title,
+            "description": self.description,
             "dead": self.dead,
             "date_created": self.date_created.isoformat(),
             "date_last": self.date_last.isoformat(),
         }
+        return result
+
+    def get_query_names():
+        result = [
+            "protocol",
+            "domain",
+            "main",
+            "subdomain",
+            "suffix",
+            "tld",
+            "title",
+            "description",
+            "dead",
+            "date_created",
+            "date_last",
+        ]
         return result
 
 

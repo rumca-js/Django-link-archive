@@ -157,7 +157,30 @@ class SourceDataController(SourceDataModel):
         page = Page(self.url)
         return page.get_domain()
 
+    def get_domain_only(self):
+        from .webtools import Page
+
+        page = Page(self.url)
+        return page.get_domain_only()
+
     def get_export_names():
+        return [
+            "id",
+            "url",
+            "title",
+            "category",
+            "subcategory",
+            "dead",
+            "export_to_cms",
+            "remove_after_days",
+            "language",
+            "favicon",
+            "on_hold",
+            "fetch_period",
+            "source_type",
+        ]
+
+    def get_query_names():
         return [
             "id",
             "url",
