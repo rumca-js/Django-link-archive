@@ -38,7 +38,13 @@ Personal link database, with RSS functionality. Similar to Reddit, but completel
  - Link aggregator. Similar to Lemmy, Reddit
  - Database of important links: for work, or for school
  - RSS client
- - Data analysis - analyze link rot, how many a page is cited by other sources, analyze link domains. For example [https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/analysis_domains.md](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/analysis_domains.md)
+ - Data analysis - analyze link rot, how many a page is cited by other sources, analyze link domains.
+
+For example
+ - github pages that have rotten [https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/analysis/github_notrot.md](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/analysis/github_notrot.md)
+ - github pages that not have rotten [https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/analysis/github_notrot.md](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/analysis/github_notrot.md)
+ - substack pages that have rotten [https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/analysis/substack_notrot.md](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/analysis/substack_notrot.md)
+ - substack pages that not have rotten [https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/analysis/substack_notrot.md](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/analysis/substack_notrot.md)
 
 ## Suite of projects
 

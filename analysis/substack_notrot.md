@@ -1,0 +1,374 @@
+
+
+- 1517.substack.com 1517 Fund | Zak Slayback | Substack
+- aaronsiri.substack.com Injecting Freedom | Aaron Siri | Substack
+- abouttolearn.substack.com About to Learn | Substack
+- abuqader.substack.com brainwork | abu | Substack
+- acecreamu.substack.com Oleksii Sidorov | Substack
+- adamsinger.substack.com Hot Takes | Adam Singer | Substack
+- adamtooze.substack.com Chartbook | Adam Tooze | Substack
+- adetokunbo.substack.com Adetokunbo Sees | Adetokunbo Abiola | Substack
+- aella.substack.com Knowingless | Aella | Substack
+- ageling.substack.com Ageling on Agile | Willem-Jan Ageling | Substack
+- aheze.substack.com Andrew's Substack | Andrew Zheng | Substack
+- aiguide.substack.com AI: A Guide for Thinking Humans | Melanie Mitchell | Substack
+- aisnakeoil.substack.com AI Snake Oil | Sayash Kapoor | Substack
+- albertcory50.substack.com Life Since the Baby Boom | Albert Cory | Substack
+- alexberenson.substack.com Unreported Truths | Alex Berenson | Substack
+- alexewerlof.substack.com Alex Ewerlöf Notes | Substack
+- alexw.substack.com Rational in the Fullness of Time | Alexandr Wang | Substack
+- alexwasburne.substack.com A Biologist's Guide to Life | Alex Washburne | Substack
+- alexwrites.substack.com Alex Writes | Alex Wilhelm | Substack
+- amistrongeryet.substack.com Am I Stronger Yet? | Steve | Substack
+- ammarmian.substack.com Ammar Mian | Substack
+- anarchosolarpunk.substack.com Sunshine and Seedlings: A Newsletter by HydroponicTrash | Anarcho Solarpunk | Substack
+- andrewhuth.substack.com Andrew's Substack | Andrew Huth | Substack
+- anhtho.substack.com Anh-Tho’s Newsletter | Anh-Tho Chuong | Substack
+- animationobsessive.substack.com Animation Obsessive | Animation Obsessive Staff | Substack
+- annamancini.substack.com Anna’s Archival Musings | Anna Mancini | Substack
+- annehelen.substack.com Culture Study | Anne Helen Petersen | Substack
+- annpettifor.substack.com System Change | Ann Pettifor | Substack
+- antonhowes.substack.com Age of Invention, by Anton Howes | Substack
+- antoniomelonio.substack.com Beneath the Pavement | Antonio Melonio | Substack
+- anu.substack.com Working Theories | Anu Atluru | Substack
+- applewatchrunner.substack.com Runner’s Newsletter | Substack
+- apuchitnis.substack.com Mindful Musings | Apurva Chitnis | Substack
+- arbesman.substack.com Cabinet of Wonders | Samuel Arbesman | Substack
+- arcove.substack.com Transmissions from the floor | Drew Schorno | Substack
+- arnoldkling.substack.com In My Tribe | Arnold Kling | Substack
+- asianometry.substack.com The Asianometry Newsletter | Jon Y | Substack
+- assistedeverything.substack.com Assisted Everything | Marco Witzmann | Substack
+- astralcodexten.substack.com Astral Codex Ten | Scott Alexander | Substack
+- athelaseng.substack.com Athelas Engineering | Aakash Adesara | Substack
+- auerstack.substack.com Auerstack | David B. Auerbach | Substack
+- aurelien2022.substack.com Trying to Understand the World | Aurelien | Substack
+- ava.substack.com bookbear express | Ava | Substack
+- awesomekling.substack.com Andreas Kling | Substack
+- badsoftwareadvice.substack.com Bad Software Advice | David Tate | Substack
+- basta.substack.com Basta’s Notes | Matt Basta | Substack
+- behavioralvalueinvestor.substack.com Behavioral Value Investor | Gary Mishuris, CFA | Substack
+- bengoertzel.substack.com Eurykosmotron | Ben Goertzel | Substack
+- betonit.substack.com Bet On It | Bryan Caplan | Substack
+- biblioracle.substack.com The Biblioracle Recommends | John Warner | Substack
+- bitecode.substack.com Bite code! | Substack
+- bitmaybewise.substack.com Bit Maybe Wise | Hercules Merscher | Substack
+- block21m.substack.com Block21M | Substack
+- boringappsec.substack.com Boring AppSec | Sandesh Mysore Anand | Substack
+- brainpizza.substack.com Brain Pizza by Shane O'Mara | Substack
+- brettongoods.substack.com Bretton Goods | Pradyumna Prasad | Substack
+- brettscott.substack.com Altered States of Monetary Consciousness | Brett Scott | Substack
+- buildinpublichub.substack.com Build In Public Newsletter | KP | Substack
+- buttonmash.substack.com button mash | Alanna Okun | Substack
+- bytesdataaction.substack.com Bytes, Data, Action! | Blake Burch | Substack
+- bzogrammer.substack.com Bzogramming | Charles Rosenbauer | Substack
+- careercutler.substack.com High Growth Engineer | Jordan Cutler | Substack
+- catvalente.substack.com Welcome to Garbagetown | Catherynne M. Valente | Substack
+- cell.substack.com Codon | Niko McCarty | Substack
+- centuryofbio.substack.com The Century of Biology | Elliot Hershberg | Substack
+- chamathreads.substack.com Chamath Palihapitiya | Substack
+- charleseisenstein.substack.com Charles Eisenstein | Substack
+- charliebecker.substack.com Castles in the Sky | Charlie Becker | Substack
+- cintra.substack.com Cintra Wilson Feels Your Pain | Substack
+- classicalwisdom.substack.com Classical Wisdom | Substack
+- climateer.substack.com Climateer | Steve | Substack
+- cloudnativeengineer.substack.com Cloud Native Engineer | Giuseppe Santoro | Substack
+- codeconfessions.substack.com Confessions of a Code Addict | Abhinav Upadhyay | Substack
+- codesolo.substack.com Code Solo | Yanis | Substack
+- cognitiverevolution.substack.com The Cognitive Revolution | Substack
+- coldhealing.substack.com coldhealing | Substack
+- colinharman.substack.com Retrieve and Generate | Colin Harman | Substack
+- colinmeloy.substack.com Colin Meloy's Machine Shop | Substack
+- computeradsfromthepast.substack.com Computer Ads from the Past | John Paul Wohlscheid | Substack
+- console.substack.com Console by CodeSee.io | Ana Mogul | Substack
+- constructionphysics.substack.com Construction Physics | Brian Potter | Substack
+- countercraft.substack.com Counter Craft | Lincoln Michel | Substack
+- cpwalker.substack.com Chris’s Substack | Chris Walker | Substack
+- cremieux.substack.com Cremieux Recueil | Substack
+- cryptostackers.substack.com 0xStacker's Newsletter | Sistine Research | Substack
+- curiositysink.substack.com Curiosity Sink__ | John Raptis | Substack
+- cybersect.substack.com Cybersect | Robert Graham | Substack
+- cyrilgrislain.substack.com Cyril G. | Cyril Grislain | Substack
+- dakotavadams.substack.com Deprogram | Dakota V Adams | Substack
+- danieljeffries.substack.com Future History | Daniel Jeffries | Substack
+- danlawton.substack.com Dan Lawton | Substack
+- darkfutura.substack.com DARK FUTURA | Simplicius The Thinker | Substack
+- darrellowens.substack.com The Discourse Lounge | Darrell Owens | Substack
+- davekarpf.substack.com The Future, Now and Then | Dave Karpf | Substack
+- davidlat.substack.com Original Jurisdiction | David Lat | Substack
+- davidrozado.substack.com Rozado’s Visual Analytics | David Rozado | Substack
+- davidsj.substack.com davidj.substack | David Jayatillake | Substack
+- davidzweig.substack.com Silent Lunch, The David Zweig Newsletter | Substack
+- decodebytes.substack.com decodebytes | Luke Hinds | Substack
+- deepsub.substack.com Autonomy | Deepak Subburam | Substack
+- depression2022.substack.com The Great Reset Diary 2022- | Yun-Fang Juan | Substack
+- derw.substack.com Derw | Substack
+- dirtybubblemedia.substack.com Dirty Bubble Media | Substack
+- disinformationchronicle.substack.com The DisInformation Chronicle | Paul D. Thacker | Substack
+- dissentient.substack.com Dissentient | Substack
+- dossier.substack.com The Dossier | Jordan Schachtel | Substack
+- drericding.substack.com Dr. Eric Ding’s Journal | Eric Feigl-Ding | Substack
+- drpippa.substack.com Dr. Pippa's Pen & Podcast | Dr Pippa | Substack
+- drsamanthaboardman.substack.com The Dose | Dr. Samantha Boardman | Substack
+- dynomight.substack.com DYNOMIGHT INTERNET NEWSLETTER | Substack
+- edconway.substack.com Material World | Ed Conway | Substack
+- ednevsky.substack.com Alexander Nevedovsky | ednevsky | Substack
+- edwardslavsquat.substack.com Edward Slavsquat | Substack
+- edwardsnowden.substack.com Continuing Ed — with Edward Snowden | Substack
+- eigenrobot.substack.com eigenrobot,s Blog | Substack
+- embedded.substack.com Embedded | Nick Catucci | Substack
+- empathynovel.substack.com Empathy: The Remnant Pieces | Andrew Johnston | Substack
+- erikdestefanis.substack.com Erik de Stefanis | Substack
+- erikexamines.substack.com Erik Examines | Erik Engheim | Substack
+- erikexplores.substack.com Erik Explores | Erik Engheim | Substack
+- eriktorenberg.substack.com Erik Torenberg | Substack
+- etiennefd.substack.com Atlas of Wonders and Monsters | Étienne Fortier-Dubois | Substack
+- experimentalhistory.substack.com Experimental History | Adam Mastroianni | Substack
+- exponentially.substack.com Exponentially | Jamie | Substack
+- ez.substack.com Ed Zitron's Where's Your Ed At | Substack
+- fakemoneynews.substack.com Fake Money News | Substack
+- fakenous.substack.com Fake Noûs | Michael Huemer | Substack
+- fallows.substack.com Breaking the News | James Fallows | Substack
+- fasterplease.substack.com Faster, Please! | James Pethokoukis | Substack
+- fatsoftwareengineer.substack.com The Fat Software Engineer | Substack
+- fchollet.substack.com Sparks in the Wind | François Chollet | Substack
+- figsinwinter.substack.com Figs in Winter: Stoicism and beyond | Massimo Pigliucci | Substack
+- fromthedesk.substack.com From the Desk | Miles Farnsworth | Substack
+- furiouslyrotatingshapes.substack.com Furiously Rotating Shapes | furiousRotator | Substack
+- garymarcus.substack.com Marcus on AI | Gary Marcus | Substack
+- generalrobots.substack.com General Robots | Benjie Holson | Substack
+- ghiculescu.substack.com Alex Ghiculescu's Newsletter | Substack
+- girdley.substack.com Michael Girdley's Newsletter | Substack
+- goodreason.substack.com Good Reason | Andre Cooper | Substack
+- gouldasks.substack.com Gould Asks | Substack
+- grantwahl.substack.com Fútbol with Grant Wahl | Substack
+- grapplinglane.substack.com Grappling Lane | tibi | Substack
+- gurwinder.substack.com The Prism | Gurwinder | Substack
+- hagakure.substack.com The Hagakure | Paulo André | Substack
+- haleynahman.substack.com Maybe Baby | Haley Nahman | Substack
+- hannahritchie.substack.com Sustainability by numbers | Hannah Ritchie | Substack
+- happychasing.substack.com Happy Chasing | Petter Haga | Substack
+- hardpivot.substack.com Hard Pivot | jeff tang | Substack
+- hasen.substack.com Hasen Judi | Substack
+- hermitian.substack.com John’s Substack | Substack
+- humanprogramming.substack.com Human Programming | Daniel Sosebee | Substack
+- hwfo.substack.com Handwaving Freakoutery | Substack
+- hxstem.substack.com Heterodox STEM | Dorian Abbot | Substack
+- iamnotarobot.substack.com I Am Not a Robot | Diego Basch | Substack
+- ianleslie.substack.com The Ruffian | Ian Leslie | Substack
+- idealgas.substack.com The Ideal Gas Newsletter | Substack
+- if50.substack.com 50 Years of Text Games | Aaron A. Reed | Substack
+- ihavemanythoughts.substack.com I have thoughts | Thomas Poinsot | Substack
+- infovores.substack.com Infovores Newsletter | Substack
+- interconnect.substack.com Interconnected | Kevin Xu | Substack
+- interhumanagreement.substack.com inter human agreement | linked zero sync | Substack
+- intuitiveai.substack.com Intuitive AI | Will Seltzer | Substack
+- investing1012dot0.substack.com Investing 101 | Kyle Harrison | Substack
+- ironicsans.substack.com Ironic Sans | David Friedman | Substack
+- ivanklimchuk.substack.com Ivan's Indie Journey | Ivan Klimchuk | Substack
+- jackdevanney.substack.com Gordian Knot News | Jack Devanney | Substack
+- jackiebavaro.substack.com Cracking the PM Newsletter | Jackie Bavaro | Substack
+- jacobbartlett.substack.com Jacob’s Tech Tavern | Jacob Bartlett | Substack
+- jacobbuckman.substack.com As Clay Awakens | Jacob Buckman | Substack
+- javani.substack.com Politics, News, Novels and More | MJ Javani | Substack
+- jbconsulting.substack.com These Are Systems | Jacob Bayless | Substack
+- jeanhsu.substack.com Tech and Tea | Jean Hsu | Substack
+- jeffreycarter.substack.com Points And Figures | Jeffrey Carter | Substack
+- jeromeaparis.substack.com Jérôme à Paris | Substack
+- jessesingal.substack.com Singal-Minded | Jesse Singal | Substack
+- jessicadefino.substack.com The Unpublishable | Jessica DeFino | Substack
+- jjain.substack.com Jinay's Substack | Jinay Jain | Substack
+- jjpryor.substack.com Pryor Thoughts | JJ Pryor | Substack
+- jmcdonnell.substack.com Causal Deference | John McDonnell | Substack
+- joemorrison.substack.com A Closer Look with Joe Morrison | Substack
+- joeposnanski.substack.com JoeBlogs | Joe Posnanski | Substack
+- jonathanhaidt.substack.com After Babel | Jon Haidt | Substack
+- joukovsky.substack.com quite useless | a. natasha joukovsky | Substack
+- joylere.substack.com Finding Joy | Joy Lere, Psy.D. | Substack
+- jprahman.substack.com Delayed Branch | Jason Rahman | Substack
+- justinehsmith.substack.com Justin Smith-Ruiu’s Hinternet | Substack
+- kanekoa.substack.com Kanekoa News | Substack
+- karawynn.substack.com Nine Lives | Karawynn Long | Substack
+- kareem.substack.com Kareem Abdul-Jabbar | Substack
+- kidswholovemath.substack.com Kids Who Love Math | Sebastian Gutierrez | Substack
+- knollslaw.substack.com Knoll’s Law | Knoll's Law | Substack
+- knopp.substack.com System Failure | Nathan Knopp | Substack
+- lauradodsworth.substack.com Laura Dodsworth | Substack
+- lcamtuf.substack.com lcamtuf’s thing | Substack
+- lenright.substack.com A Particular Weird | Lyle Enright | Substack
+- liahaberman.substack.com ICYMI by Lia Haberman | Substack
+- liorn.substack.com I Have No Idea What I'm Doing | Lior Neu-ner | Substack
+- littlebitofeverything.substack.com Tech, investment and a little bit of everything. | John | Substack
+- livepaola.substack.com Paola Writes | Paola Bonomo | Substack
+- loeber.substack.com Loeber on Substack | John Loeber | Substack
+- louison.substack.com Louison’s newsletter | Louison Dumont | Substack
+- lucaserb.substack.com Lucas’s Substack | Lucas Erb | Substack
+- luisthiamnye.substack.com Luis | Luis Thiam-Nye | Substack
+- lunduke.substack.com The Lunduke Journal of Technology | Bryan Lunduke | Substack
+- madattheinternet.substack.com Mad at the Internet | Joshua Moon | Substack
+- madeincosmos.substack.com Grandmotherly Wisdom | Made in Cosmos ✨ | Substack
+- maestroai.substack.com Maestro's Musings | Justin Cranshaw | Substack
+- magrawala.substack.com Maneesh’s Substack | Maneesh Agrawala | Substack
+- manyonepercents.substack.com Many One Percents | Tuấn Mon | Substack
+- marciok.substack.com Marcio Klepacz | Substack
+- marionteniade.substack.com Teniade Topics | Marion Teniade | Substack
+- markmcneilly.substack.com Mimir's Well | Mark McNeilly | Substack
+- martinshkreli.substack.com Martin’s Newsletter | Martin Shkreli | Substack
+- mattfrisbie.substack.com !important | Matt Frisbie | Substack
+- matthewgrohman.substack.com Matthew’s Substack | Matthew Grohman | Substack
+- matthewtejo.substack.com Matthew’s Writing | Matthew Tejo | Substack
+- mattstoller.substack.com BIG by Matt Stoller | Substack
+- maximumeffort.substack.com Maximum Effort, Minimum Reward | Dylan Black | Substack
+- maxread.substack.com Read Max | Max Read | Substack
+- mcoliver.substack.com Mindful Ruminations | Michael Oliver | Substack
+- meghanboilard.substack.com Off-Topic | Meghan Boilard | Substack
+- meltedcheeseonwhitefish.substack.com The Melt by Jason Diamond | Substack
+- methexis.substack.com Methexis | Kevin Fischer | Substack
+- mkaic.substack.com Cosmic Column | Kai Christensen | Substack
+- mkbaio.substack.com Wrong ideas strongly held | mkBaio | Substack
+- molecularspec.substack.com Molecular Spectacular | Adomas Malaiska | Substack
+- mosquitocapital.substack.com Mosquito Chronicles | Mosquito Capital | Substack
+- mostlypython.substack.com Mostly Python | Eric Matthes | Substack
+- mukdde.substack.com muk’s Newsletter | Substack
+- mulebritannia.substack.com Mule Britannia! | Chris Smith | Substack
+- nabeelqu.substack.com Nabeel S. Qureshi | Substack
+- nabilalouani.substack.com Anti-Suckers | Nabil Alouani | Substack
+- natesilver.substack.com Silver Bulletin | Nate Silver | Substack
+- nayafia.substack.com Monomythical | Nadia | Substack
+- nerology.substack.com Nerology | Nero Vanbiervliet | Substack
+- noahnorman.substack.com Augmented Realist | Noah Norman | Substack
+- noahpinion.substack.com Noahpinion | Noah Smith | Substack
+- nongaap.substack.com Nongaap Investing | Mike | Substack
+- nonzero.substack.com Nonzero Newsletter | Robert Wright | Substack
+- notado.substack.com The Notado Newsletter | Substack
+- novum.substack.com Novum Newsletter | Anton Cebalo | Substack
+- nvnt.substack.com Navaneeth’s Newsletter | Navaneeth pk | Substack
+- oalexanderdk.substack.com OSINT & Analysis by Oliver Alexander | Substack
+- omnibudsman.substack.com Omnibudsman | Dunstan Ramsay | Substack
+- on.substack.com On Substack | Substack Writers | Substack
+- oneusefulthing.substack.com One Useful Thing | Ethan Mollick | Substack
+- oscargws.substack.com Head Noise | Oscar Watson-Smith | Substack
+- owlpal.substack.com The Trick Revealed | Jabari | Substack
+- passingtime.substack.com Passing Time | Michael Bateman | Substack
+- paulkingsnorth.substack.com The Abbey of Misrule | Paul Kingsnorth | Substack
+- paullukas.substack.com Uni Watch | Paul Lukas | Substack
+- peabee.substack.com Pea Bee | pb | Substack
+- pgpt.substack.com PG's Substack | Substack
+- philaverse.substack.com The PhilaVerse | Phil Siarri | Substack
+- philo.substack.com MD&A | Philo | Substack
+- philosophybear.substack.com Philosophy bear | Substack
+- philosophyinhell.substack.com Unverified Revelations | Substack
+- philsiarri.substack.com The PhilaVerse | Phil Siarri | Substack
+- photonlines.substack.com Photon-Lines Substack | Nick M | Substack
+- planetwavesfm.substack.com Planet Waves FM - Chiron Return | Eric F Coppolino | Substack
+- pmarca.substack.com Marc Andreessen Substack | Substack
+- polymathicbeing.substack.com Polymathic Being | Michael Woudenberg | Substack
+- popehat.substack.com The Popehat Report | Ken White | Substack
+- prigoose.substack.com offscript | Priya | Substack
+- progalpha.substack.com Programmer's Alpha | Jack Berendt | Substack
+- public.substack.com Public | Michael Shellenberger | Substack
+- puzzledpenguin.substack.com Popcorn Penguin Posts | PopcornPenguin | Substack
+- radleybalko.substack.com The Watch | Radley Balko | Substack
+- rakkhi.substack.com Cyber rants | Rakkhi Joy | Substack
+- ramapascala.substack.com A Blog For The Anthropocene | Rama Pascala | Substack
+- randomminds.substack.com Random Minds by Katherine Brodsky | Substack
+- ravisparikh.substack.com Ravi Parikh’s Newsletter | Substack
+- ravitejakanta.substack.com Lazy Afternoons | Ravi Teja Kanta | Substack
+- razib.substack.com Razib Khan's Unsupervised Learning | Substack
+- read2050.substack.com 2050 | Peter Havers | Substack
+- resobscura.substack.com Res Obscura | Benjamin Breen | Substack
+- riskybiznews.substack.com Risky Business News | Patrick Gray | Substack
+- robertbryce.substack.com Robert Bryce | Substack
+- robkhenderson.substack.com Rob Henderson's Newsletter | Substack
+- robotic.substack.com Interconnects | Nathan Lambert | Substack
+- rogerpielkejr.substack.com The Honest Broker | Roger Pielke Jr. | Substack
+- rssdsaisection.substack.com RSS DS+AI Section Newsletter | Substack
+- ryanshannon.substack.com Entry Level Investing | Ryan Shannon | Substack
+- samkriss.substack.com Numb at the Lodge | Sam Kriss | Substack
+- sarharibhakti.substack.com Scatter Brain | Sar Haribhakti | Substack
+- sashachapin.substack.com Sasha's 'Newsletter' | Sasha Chapin | Substack
+- scottbelsky.substack.com Implications, by Scott Belsky | Substack
+- scribepod.substack.com scribepod | Yacine | Substack
+- sensiblemed.substack.com Sensible Medicine | Substack
+- seymourhersh.substack.com Seymour Hersh | Substack
+- shatterzone.substack.com Shatter Zone | The Only Robert Evans | Substack
+- shimmeringvoid.substack.com the shimmering void | Ben Follington | Substack
+- shrimalmadhur.substack.com Madhur’s Writings | Madhur Shrimal | Substack
+- simonsarris.substack.com The Map is Mostly Water | Simon Sarris | Substack
+- simplicityissota.substack.com Simplicity is SOTA | Richard Demsyn-Jones | Substack
+- skunkledger.substack.com Skunk Ledger | BLAP | Substack
+- skventures.substack.com Irregular Ideas with Paul Kedrosky & Eric Norlin of SKV | SK Ventures | Substack
+- skybrian.substack.com Skybrian’s Blog | Substack
+- soaringtwenties.substack.com Soaring Twenties | Thomas J Bevan | Substack
+- somereverie.substack.com Reverie by Daniel Cawrey | Substack
+- sotonye.substack.com NeoNarrative | Sotonye | Substack
+- startupdreams.substack.com Innovation Nation | George Patterson Sibble | Substack
+- startuppirate.substack.com Startup Pirate by Alex Alexakis | Substack
+- stkbailey.substack.com Data People Etc. | Stephen Bailey | Substack
+- stuartritchie.substack.com Science Fictions | Stuart Ritchie | Substack
+- subconscious.substack.com Subconscious | Gordon Brander | Substack
+- substack.com Substack - A new economic engine for culture
+- sudoapps.substack.com Sudo Apps | Samir Khoja | Substack
+- sunghoyahng.substack.com Sungho Yahng | Substack
+- superbowl.substack.com Superb Owl | Max Goodbird | Substack
+- superself.substack.com Super Self | Lewis Kallow | Substack
+- synthedia.substack.com Synthedia | Bret Kinsella | Substack
+- syntopikon.substack.com Syntopikon | Substack
+- systemsapproach.substack.com Systems Approach | Bruce Davie | Substack
+- technicallychallenged.substack.com The Technically Challenged Newsletter | Jesse | Substack
+- technofog.substack.com The Reactionary | Techno Fog | Substack
+- tedgioia.substack.com The Honest Broker | Ted Gioia | Substack
+- tedhope.substack.com Hope For Film | Ted Hope | Substack
+- textualvariations.substack.com Textual Variations | Mikhail Skoptsov | Substack
+- theaireport.substack.com The AI Report | Substack
+- theap.substack.com The AP (Alex Pareene) Newsletter | Substack
+- thebuilderjr.substack.com JR’s Newsletter | Substack
+- thechipletter.substack.com The Chip Letter | Babbage | Substack
+- theclimatebrink.substack.com The Climate Brink | Andrew Dessler | Substack
+- thecolumn.substack.com The Column | Adam Johnson | Substack
+- theconvivialsociety.substack.com The Convivial Society | L. M. Sacasas | Substack
+- theeggandtherock.substack.com The Egg And The Rock | Julian Gough | Substack
+- theexitgame.substack.com The Exit Game | Mujavid Bukhari | Substack
+- thegauntlet.substack.com The Gauntlet | Julia Doubleday | Substack
+- thehandbasket.substack.com The Handbasket | Marisa Kabas | Substack
+- themacrocompass.substack.com The Macro Compass | Alfonso Peccatiello (Alf) | Substack
+- therationalist.substack.com The Rationalist | Petra | Substack
+- therectangle.substack.com The Rectangle | Callum Booth | Substack
+- thesequence.substack.com TheSequence | Jesus Rodriguez | Substack
+- thewhyaxis.substack.com The Why Axis | Christopher Ingraham | Substack
+- thisisunpacked.substack.com Unpacked | Viggy Balagopalakrishnan | Substack
+- thomasprosser.substack.com The Path Not Taken | Thomas Prosser | Substack
+- tidyfirst.substack.com Software Design: Tidy First? | Kent Beck | Substack
+- tinyempires.substack.com Tiny Empires | JT | Substack
+- tldraw.substack.com tldraw | Steve Ruiz | Substack
+- tomknighton.substack.com Tilting At Windmills | Tom Knighton | Substack
+- torturechambersmalltalk.substack.com Torture Chamber Small Talk | Loudt Darrow | Substack
+- tracingwoodgrains.substack.com Tracing Woodgrains | TracingWoodgrains | Substack
+- trailruncapital.substack.com Life on the Trail | Allison Barr Allen | Substack
+- treeofwoe.substack.com Contemplations on the Tree of Woe | Substack
+- trevorklee.substack.com Trevor Klee’s Newsletter | Substack
+- tylerglaiel.substack.com Tyler’s Substack | Tyler Glaiel | Substack
+- typeclasses.substack.com Type Classes | Chris Martin | Substack
+- unfashionable.substack.com Unfashionable | Sven Schnieders | Substack
+- valspals.substack.com Val's Pals | Valerie | Substack
+- varunshenoy.substack.com Public Experiments | Varun | Substack
+- vigneshwarar.substack.com Vigneshwarar’s Newsletter | Substack
+- voidpapers.substack.com Void Papers | Tobi | Substack
+- volted.substack.com Volted: Electrify your Life | Jeff Eiden | Substack
+- walkingtheworld.substack.com Chris Arnade Walks the World | Substack
+- waseem.substack.com Startup Real Talk | Waseem Daher | Substack
+- weeklyphp.substack.com Weekly PHP | Víctor Falcón 🤟 | Substack
+- weirdmedievalguys.substack.com weird medieval guys | Substack
+- wheelreinventor.substack.com Wheel’s Substack | Wheel Reinventor | Substack
+- whyisthisinteresting.substack.com Why is this interesting? | Noah Brier | Substack
+- wittgenfine.substack.com Wittgenfine’s Word | Substack
+- woodfromeden.substack.com Wood From Eden | Anders L | Substack
+- worksinprogress.substack.com The Works in Progress Newsletter | Substack
+- worldish.substack.com Worldish | Substack
+- wyclif.substack.com Wyclif's Dust | Substack
+- yehudacohen.substack.com Fun With The Cloud | Yehuda Cohen | Substack
+- ymeskhout.substack.com Yassine Meskhout | Substack
+- yonom.substack.com Simon's Blog | Simon Farshid | Substack
+- yourlocalepidemiologist.substack.com Your Local Epidemiologist | Katelyn Jetelina | Substack
+- zacharydcarter.substack.com In The Long Run | Zachary D. Carter | Substack
+- zetter.substack.com Zero Day | Kim Zetter | Substack
+- zionlights.substack.com Zion Lights | Substack

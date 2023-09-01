@@ -1,8 +1,8 @@
-# Notes on contemporary search engines, algorithms
+# Why this happened
 
 Google Search Is Dying [https://dkb.io/post/google-search-is-dying](https://dkb.io/post/google-search-is-dying)
 
-## Other inspirations
+## inspirations
 
  - I Tracked Everything I Read on the Internet for a Year [https://www.tdpain.net/blog/a-year-of-reading](https://www.tdpain.net/blog/a-year-of-reading).
  - Automating a Reading List [https://zanshin.net/2022/09/11/automating-a-reading-list/](https://zanshin.net/2022/09/11/automating-a-reading-list/)
@@ -63,6 +63,12 @@ I have some questions about that model:
  - Will people be able to find out that the 'truth' visible on a platform is twisted? Are social platforms smart enough to be able to hide proof of any misdoings?
  - Will people be shadowbanned for inconvenient opinions?
 
+## Google is for SEO not for discovery
+
+You cannot effectively "Find new content" on Google. You may be searching for something particular, it will find you that.
+
+For example: you cannot find new blogs, creators by Google.
+
 ## YouTube comments
 
 YouTube does not allow the user to specify links in comments, possibly to protect the user from spammers. That means we cannot use links any longer, because some of users are abusing this system. Rather than correctly filter out spammers, posting links has been prohibited.
@@ -95,6 +101,10 @@ When I search for "Trailer" youtube:
 At my setup I can filter by a source type and subtype. At my setup I have category "YouTube" and subcategory "Movies", and "Games".
  - suggests using it's own criteria. At this engine I can browse by date, to see which trailers are 'new' and which are not
  - some trailers are suggested several times at youtube, from various channels. At my setup I have only several youtube channels, which does not spam with same trailers
+
+## Domains
+
+When browsing the internet much of stuff is hosted somewhere. Today I found multiple things hosted on github. A thought occurred: this is not hosted by individuals, therefore it is 'a property' by github, and 'is managed' by github.
 
 # Other analysis of search and algorithms
 
