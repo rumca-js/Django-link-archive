@@ -40,12 +40,6 @@ Personal link database, with RSS functionality. Similar to Reddit, but completel
  - RSS client
  - Data analysis - analyze link rot, how many a page is cited by other sources, analyze link domains.
 
-For example
- - github pages that have rotten [https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/analysis/github_rot.md](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/analysis/github_rot.md)
- - github pages that not have rotten [https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/analysis/github_notrot.md](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/analysis/github_notrot.md)
- - substack pages that have rotten [https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/analysis/substack_rot.md](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/analysis/substack_rot.md)
- - substack pages that not have rotten [https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/analysis/substack_notrot.md](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/analysis/substack_notrot.md)
-
 ## Suite of projects
 
  - Captured using Django application, program: [https://github.com/rumca-js/Django-link-archive](https://github.com/rumca-js/Django-link-archive)
@@ -162,7 +156,13 @@ With these data we can perform further analysis:
  - which site generates most entries
  - we can capture all external links from entries, to capture where these sites lead to (check network effect, etc)
  - we can verify who reported first on certain topics
- - we can find all domains that are used by this instance. For example [https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/analysis_domains.md](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/analysis_domains.md)
+
+For example:
+ - github pages that have rotten [https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/analysis/github_rot.md](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/analysis/github_rot.md)
+ - github pages that not have rotten [https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/analysis/github_notrot.md](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/analysis/github_notrot.md)
+ - substack pages that have rotten [https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/analysis/substack_rot.md](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/analysis/substack_rot.md)
+ - substack pages that not have rotten [https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/analysis/substack_notrot.md](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/analysis/substack_notrot.md)
+
 
 # Analysis of tools and services
 
