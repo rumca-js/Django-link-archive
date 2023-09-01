@@ -115,7 +115,7 @@ class BaseRssPlugin(SourceGenericPlugin):
         else:
             output_map["thumbnail"] = None
 
-        if hasattr(feed_entry, "date_published"):
+        if hasattr(feed_entry, "published"):
             try:
                 dt = parser.parse(feed_entry.published)
                 output_map["date_published"] = dt

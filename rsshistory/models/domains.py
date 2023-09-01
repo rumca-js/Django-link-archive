@@ -72,7 +72,7 @@ class Domains(models.Model):
         DomainsSuffixes.add(ob.suffix)
         DomainsTlds.add(ob.tld)
         DomainsMains.add(ob.main)
-        ob.request_title()
+        ob.fix_title()
 
     def get_domain_ext(self, domain_only_text):
         tld = os.path.splitext(domain_only_text)[1][1:]
@@ -88,6 +88,10 @@ class Domains(models.Model):
         obj.save()
 
     def fix(self):
+        self.fix_domain()
+        self.fix_title()
+
+    def fix_domain(self):
         import tldextract
         from ..dateutils import DateUtils
 
@@ -96,10 +100,9 @@ class Domains(models.Model):
             and self.tld is not None
             and self.suffix != ""
             and self.tld != ""
-            and self.title is not None
             and self.dead == False
         ):
-            print("Skipping {} {} {}".format(self.domain, self.suffix, self.tld))
+            print("Domain: not fixing domain {} {} {}".format(self.domain, self.suffix, self.tld))
             return False
 
         changed = False
@@ -117,9 +120,6 @@ class Domains(models.Model):
             self.tld = self.get_domain_ext(self.domain)
             changed = True
 
-        if self.request_title():
-            changed = True
-
         if changed:
             print(
                     "domain:{} subdomain:{} suffix:{} tld:{} title:{}".format(
@@ -135,12 +135,12 @@ class Domains(models.Model):
         else:
             print("domain:{} Nothing has changed".format(self.domain))
 
-    def request_title(self, force=False):
-        if self.title is not None and self.dead == False and not force:
+    def fix_title(self, force=False):
+        if self.title is not None and self.description is not None and self.dead == False and not force:
+            print("Domain: not fixing title/description {} {} {}".format(self.domain, self.suffix, self.tld))
             return False
 
         changed = False
-        print("{} Trying with {}".format(self.domain, self.protocol))
 
         from ..webtools import Page
         p = Page(self.protocol + "://" + self.domain)
