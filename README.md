@@ -66,6 +66,11 @@ Demo on development env (may, or may not be running actually):
 
 README about search issues: [https://github.com/rumca-js/Django-link-archive/blob/main/README_search.md](https://github.com/rumca-js/Django-link-archive/blob/main/README_search.md).
 
+# Data analysis
+
+Analysis ideas and results are present in a separate README:
+ [https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/analysis/readme.md](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/analysis/readme.md)
+
 # Import, export data
 
 ## View data
@@ -146,11 +151,6 @@ What causes karma change:
 # Development
 
 Development is described by a separate README: [https://github.com/rumca-js/Django-link-archive/blob/main/README_development.md](https://github.com/rumca-js/Django-link-archive/blob/main/README_development.md).
-
-# Data analysis
-
-Analysis ideas and results are present in a separate README:
- [https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/analysis/readme.md](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/analysis/readme.md)
 
 # Analysis of tools and services
 
