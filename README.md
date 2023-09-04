@@ -49,27 +49,13 @@ Personal link database, with RSS functionality. Similar to Reddit, but completel
  - daily RSS Git repository for the year 2021 [https://github.com/rumca-js/RSS-Link-Database-2021](https://github.com/rumca-js/RSS-Link-Database-2021)
  - daily RSS Git repository for the year 2020 [https://github.com/rumca-js/RSS-Link-Database-2020](https://github.com/rumca-js/RSS-Link-Database-2020)
 
-## UI
+## Links
 
-UI, with snapshots: [https://github.com/rumca-js/Django-link-archive/blob/main/README_ui.md](https://github.com/rumca-js/Django-link-archive/blob/main/README_ui.md).
-
-## Installation
-
-Installation, and configuration: [https://github.com/rumca-js/Django-link-archive/blob/main/README_install.md](https://github.com/rumca-js/Django-link-archive/blob/main/README_install.md).
-
-## Demo
-
-Demo on development env (may, or may not be running actually):
- - [https://renegat0x0.ddns.net/apps/rsshistory/](https://renegat0x0.ddns.net/apps/rsshistory/)
-
-# Inspiration, notes about search algorithms
-
-Search issues: [https://github.com/rumca-js/Django-link-archive/blob/main/README_search.md](https://github.com/rumca-js/Django-link-archive/blob/main/README_search.md).
-
-# Data analysis
-
-Data analysis:
- [https://github.com/rumca-js/Django-link-archive/blob/main/analysis/readme.md](https://github.com/rumca-js/Django-link-archive/blob/main/analysis/readme.md)
+ - UI, with snapshots: [https://github.com/rumca-js/Django-link-archive/blob/main/README_ui.md](https://github.com/rumca-js/Django-link-archive/blob/main/README_ui.md).
+ - Installation, and configuration: [https://github.com/rumca-js/Django-link-archive/blob/main/README_install.md](https://github.com/rumca-js/Django-link-archive/blob/main/README_install.md).
+ - Demo on development env (may, or may not be running actually): [https://renegat0x0.ddns.net/apps/rsshistory/](https://renegat0x0.ddns.net/apps/rsshistory/)
+ - Inspiration, notes about search algorithms [https://github.com/rumca-js/Django-link-archive/blob/main/README_search.md](https://github.com/rumca-js/Django-link-archive/blob/main/README_search.md).
+ - Data analysis: [https://github.com/rumca-js/Django-link-archive/blob/main/analysis/readme.md](https://github.com/rumca-js/Django-link-archive/blob/main/analysis/readme.md)
 
 # Import, export data
 
