@@ -51,11 +51,11 @@ Personal link database, with RSS functionality. Similar to Reddit, but completel
 
 ## UI
 
-UI, with snapshots, is described by a separate README: [https://github.com/rumca-js/Django-link-archive/blob/main/README_ui.md](https://github.com/rumca-js/Django-link-archive/blob/main/README_ui.md).
+UI, with snapshots: [https://github.com/rumca-js/Django-link-archive/blob/main/README_ui.md](https://github.com/rumca-js/Django-link-archive/blob/main/README_ui.md).
 
 ## Installation
 
-Installation, and configuration is described by a separate README: [https://github.com/rumca-js/Django-link-archive/blob/main/README_install.md](https://github.com/rumca-js/Django-link-archive/blob/main/README_install.md).
+Installation, and configuration: [https://github.com/rumca-js/Django-link-archive/blob/main/README_install.md](https://github.com/rumca-js/Django-link-archive/blob/main/README_install.md).
 
 ## Demo
 
@@ -64,11 +64,11 @@ Demo on development env (may, or may not be running actually):
 
 # Inspiration, notes about search algorithms
 
-README about search issues: [https://github.com/rumca-js/Django-link-archive/blob/main/README_search.md](https://github.com/rumca-js/Django-link-archive/blob/main/README_search.md).
+Search issues: [https://github.com/rumca-js/Django-link-archive/blob/main/README_search.md](https://github.com/rumca-js/Django-link-archive/blob/main/README_search.md).
 
 # Data analysis
 
-Analysis ideas and results are present in a separate README:
+Data analysis:
  [https://github.com/rumca-js/Django-link-archive/blob/main/analysis/readme.md](https://github.com/rumca-js/Django-link-archive/blob/main/analysis/readme.md)
 
 # Import, export data
