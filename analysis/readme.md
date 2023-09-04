@@ -1,5 +1,8 @@
-
 # Analysis results
+
+Analysis is performed on my personal link archive instance.
+
+Most of links is provided by Hacker news, and Code project. Most of RSS sources provide data for the RSS source domain. HN and CodeProject provide links outside of their domains.
 
  - list of found blogs: [https://github.com/rumca-js/Django-link-archive/blob/main/analysis/blogs.md](https://github.com/rumca-js/Django-link-archive/blob/main/analysis/blogs.md).
  - github pages that have rotten [https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/analysis/github_rot.md](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/analysis/github_rot.md)
