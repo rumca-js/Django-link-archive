@@ -69,7 +69,7 @@ README about search issues: [https://github.com/rumca-js/Django-link-archive/blo
 # Data analysis
 
 Analysis ideas and results are present in a separate README:
- [https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/analysis/readme.md](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/analysis/readme.md)
+ [https://github.com/rumca-js/Django-link-archive/blob/main/analysis/readme.md](https://github.com/rumca-js/Django-link-archive/blob/main/analysis/readme.md)
 
 # Import, export data
 
