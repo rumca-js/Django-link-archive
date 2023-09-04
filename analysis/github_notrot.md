@@ -1,6 +1,8 @@
 
 # All github domains that have not rotten (2023.09.01)
 
+search equation = "domain = github.io & dead = 0"
+
 - 152334H.github.io 152334H
 - 3d-diffusion.github.io Novel View Synthesis with Diffusion Models
 - 9fans.github.io None

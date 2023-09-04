@@ -1,4 +1,5 @@
 
+search equation = "domain = substack.com & dead = 0"
 
 - 1517.substack.com 1517 Fund | Zak Slayback | Substack
 - aaronsiri.substack.com Injecting Freedom | Aaron Siri | Substack

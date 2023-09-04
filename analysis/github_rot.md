@@ -1,6 +1,8 @@
 
 # All github domains that have rotten (2023.09.01)
 
+search equation = "domain = github.io & dead = 1"
+
 - [DEAD] alula.github.io Site not found · GitHub Pages
 - [DEAD] amandasaurus.github.io Site not found · GitHub Pages
 - [DEAD] andersoncardoso.github.io Site not found · GitHub Pages
