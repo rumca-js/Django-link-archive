@@ -3,995 +3,995 @@
 
 search equation = "(title = blog | description = blog) & dead = 0"
 
-- blog.abacus.ai The Abacus.AI Blog
-- blog.eleuther.ai EleutherAI Blog
-- blog.fixie.ai Fixie.ai Blog
-- simpleblog.ai Create a Simple Blog in seconds, Post From Google Docs, Office 365.
-- www.softwine.ai Stay curious about wine tech | softwine
-- decomposition.al decomposition ∘ al
-- chie.app Chie
-- holyswift.app Holy Swift
-- blog.railway.app Railway Blog
-- boot-and-shoe.vercel.app Boot & Shoe Blog
-- www.encrypted.at en|crypted.at – Private tech and tutorial blog
-- blog.haschek.at Futurelopment
-- blog.sigma-star.at Company Blog - sigma star gmbh
-- ruscur.au ruscur's blog
-- engineering.kablamo.com.au Kablamo Engineering Blog | Kablamo Engineering Blog
-- fy.blackhats.net.au Firstyear's blog-a-log
-- there.oughta.be There oughta be…
-- ma.ttias.be Mattias Geniar
-- adamnash.blog Psychohistory | The personal blog of Adam Nash
-- alistair.blog alistair smith • blog
-- appventuretime.blog Appventure Time
-- bb-i.blog Kontrowersyjny blog – O polityce i historii trochę inaczej
-- cmart.blog cmart's blog
-- www.ctrl.blog Ctrl blog by Daniel Aleksandersen
-- dkb.blog DKB Blog | Dmitri Brereton | Substack
-- github.blog The GitHub Blog - Updates, ideas, and inspiration from GitHub to help developers build and design software.
-- handwritten.blog handwritten.blog
-- locationtbd.home.blog To Be Determined – by Carson Lansdowne
-- hypersphere.blog Hypersphere
-- kimmo.blog Web-focused software development - kimmo.blog
-- latlong.blog Lat × Long
-- mmapped.blog mmap(blog)
-- nicheless.blog Nicheless | Think. Write away.
-- pixelfed.blog Pixelfed Blog
-- raku-advent.blog Raku Advent Calendar – Raku is a multi-paradigm language where there's more than one way to do it
-- rez0.blog home · rez0
-- scottaaronson.blog Shtetl-Optimized
-- seths.blog Seth's Blog
-- newsletter.smarter.blog Smarter.Blog Newsletter | Mahesh | Substack
-- stackoverflow.blog The Stack Overflow Blog - Stack Overflow
-- www.sudarkoff.blog George Sudarkoff's Blog | Substack
-- thetechtrailblazer.blog The Tech Trailblazer – A Sane Software Engineering blog
-- tim.blog The Blog of Author Tim Ferriss - Tim Ferriss's 4-Hour Workweek and Lifestyle Design Blog. Tim is an author of 5 #1 NYT/WSJ bestsellers, investor (FB, Uber, Twitter, 50+ more), and host of The Tim Ferriss Show podcast (400M+ downloads)
-- twdev.blog twdev.blog
-- hypatia.ca hypatia dot ca – Leigh Honeywell's Blog
-- blog.jonlu.ca JonLucaâs Blog | JonLucaâs Blog - A blog about tech, programming, and finance
-- blog.peterzhu.ca Peter Zhu
-- pvk.ca Paul Khuong: some Lisp
-- schroer.ca Dominick Schroer's Blog
-- backend.cafe Backend Cafe
-- blog.arduino.cc Arduino Blog
-- pickard.cc chris pickard's weblog
-- postimg.cc Postimages — free image hosting / image upload
-- blog.frankel.ch A Java geek
-- blog.reds.ch REDS blog – REDS Institute, HEIG-VD
-- blog.spatial.chat SpatialChat Blog | Online space for virtual events, offices, parties
-- blog.massdriver.cloud Massdriver Blog
-- secret.club secret club | We Break Software
-- blog.charliemeyer.co Charlie Meyer's Blog
-- blog.coscreen.co The Pair Programming Blog (Page 1)
-- notepin.co Notepin - Extremely simple blogging platform
-- blog.skypilot.co SkyPilot Blog
-- www.timr.co Tim Ruffles' blog
-- travelhungry.co Travel Hungry: Great Tastes From Stuttgart & Beyond
-- blog.thea.codes Blog - Stargirl (Thea) Flowers
-- 1299651405.com Conor Bergin's Blog
-- blog.1password.com Blog | 1Password
-- dev.37signals.com 37signals Dev — How we do, what we do
-- Outstatic.com Outstatic - A Static Site CMS for Next.js
-- aaronhertzmann.com Aaron Hertzmann’s blog | Aaron Hertzmann’s blog
-- abstractexpr.com Abstract Expression – Software Development Blog
-- blog.adacore.com The AdaCore Blog
-- blog.adamchalmers.com A Less Mad March
-- blog.adobe.com Welcome to the Adobe Blog
-- www.afrugaldoctor.com A Frugal Doctor
-- tech.ahrefs.com Ahrefs
-- aigarius.com Aigarius Blog
-- blog.airsequel.com Blog | Airsequel
-- www.aiweirdness.com AI Weirdness
-- www.akshaykhot.com Akshay's Blog
-- alexcabal.com Alex Cabal
-- www.alexcrompton.com Alex Crompton
-- www.alexmolas.com Alex Molas
-- alexsidorenko.com Home | Alex Sidorenko
-- almirvuk.com Almir Vuk | Blog & Website
-- andreizgirvaci.com Blog | Andrei Zgîrvaci
-- andrewpillar.com Andrew Pillar's Blog
-- www.anildash.com Anil Dash
-- oldblog.antirez.com antirez weblog
-- antoinevastel.com Antoine Vastel Blog
-- blog.appsignal.com The latest on everything AppSignal | AppSignal Blog
-- blog.aquasec.com Cloud native applications security
-- arcadeblogger.com The Arcade Blogger
-- ashvardanian.com Ash's Blog
-- research.atspotify.com Spotify Research - Spotify’s official research blog : Spotify Research
-- austinhenley.com Austin Z. Henley
-- www.autoblog.com Autoblog is part of the Yahoo family of brands
-- blog.azirevpn.com AzireVPN Blog
-- www.bartoszsypytkowski.com Bartosz Sypytkowski
-- blog.bassemdy.com Ramblings of a self-taught software engineer
-- batsov.com (think)
-- bbarrows.com Brad Barrows' Blog
-- belaycpp.com Belay the C++ – A blog talking about (usually bad) practices in C++
-- bennuttall.com Ben Nuttall - Software engineer
-- bertrandmeyer.com Bertrand Meyer's technology+ blog Bertrand Meyer's technology+ blog - Software engineering, programming methodology, languages, verification, general technology, publication culture, and more
-- bikerglen.com Photons, Electrons, and Dirt | A blog by Glen Akins
-- billprin.com Bill Prin - Software engineer and entrepeneur
-- billwadge.com Bill Wadge's Blog | Just another WordPress.com site
-- blogs.bing.com Bing Blogs | Home
-- blog.bioware.com BioWare Blog – A look at story-based gaming
-- www.bitestring.com Posts - Bitestring's Blog
-- blog.bitfinex.com The Bitfinex Blog
-- blog.bitmex.com Homepage | BitMEX Blog
-- blog.bitnami.com Bitnami Blog
-- agileotter.blogspot.com Agile Otter Blog
-- airlied.blogspot.com Dave Airlie Linux Graphics blog
-- avodonosov.blogspot.com blog
-- googleblog.blogspot.com The Keyword | Google Product and Technology News and Stories
-- nikmav.blogspot.com nmav's Blog
-- ptspts.blogspot.com pts.blog
-- richg42.blogspot.com Richard Geldreich's Blog
-- steamtraen.blogspot.com Nick Brown's blog
-- steve-yegge.blogspot.com Stevey's Blog Rants
-- writingball.blogspot.com The Typewriter Revolution blog
-- www.blogto.com blogTO
-- blogs.bmj.com BMJ Blogs BMJ Blogs - Insights and opinion on the latest news and research
-- www.boatblurb.com Boating News & Information | BoatBlurb Blog & Newsletter
-- borncity.com BornCity – BÃ¼cher, Blogs und Computer Know-How
-- www.brightball.com Brightball
-- www.bunniestudios.com bunnie's blog
-- bytecellar.com Byte Cellar - The Vintage Computing Weblog
-- cabel.com cabel.com – A blog from Cabel Sasser
-- calnewport.com Author of Deep Work, Study Hacks Blog - Cal Newport
-- www.calnewport.com Author of Deep Work, Study Hacks Blog - Cal Newport
-- canolcer.com Can's blog
-- canvatechblog.com Canva Engineering Blog
-- blog.cedriccharly.com Cedric Charly's Blog
-- ceronman.com Manuel Cerón – A blog mostly about programming languages
-- blog.checkpoint.com Check Point Blog - Cyber Security News, Research & Trends
-- chidiwilliams.com Chidi Williams
-- blog.chiselstrike.com Redirecting to https://blog.turso.tech/
-- chreke.com chreke's blog
-- chriskiehl.com Home - Blogomatano
-- chriswarrick.com Blog | Chris Warrick
-- circleid.com CircleID - Breaking Internet News, Opinions and Blogs
-- blogs.cisco.com Cisco Blogs
-- clagnut.com Clagnut by Richard Rutter
-- www.claudiokuenzler.com yet another tech-blog - made in Switzerland
-- clementneo.com Clement Neo - Blog
-- blog.cloudflare.com The Cloudflare Blog
-- blog.clubhouse.com Clubhouse Blog
-- codahale.com Coda Hale writes things. | codahale.com
-- code-held.com Blog | Backendhance
-- blog.codeanywhere.com Blog · Codeanywhere
-- blog.codesolvent.com Codesolvent Blog
-- www.codex99.com Codex 99
-- blog.codinghorror.com Coding Horror
-- cogdogblog.com CogDogBlog – Alan Levine barks about and plays with stuff here
-- www.computerweekly.com Computer Weekly | Information Technology (IT) News, UK IT Jobs, Industry News
-- connortumbleson.com Connor Tumbleson
-- copyrightlately.com Copyright Lately | Creative Law For Curious People
-- corporalfrisk.com Corporal Frisk – Finnish blogger in reserve, defence and national security.
-- www.coryzue.com Cory Zue | Full-Stack Developer, Maker of Products, and Solopreneur
-- www.countbayesie.com Count Bayesie - A Probability Blog
-- crankyflier.com Cranky Flier – An Airline Industry Blog
-- crocidb.com CrociDBlog - A blog about programming, gamedev, hacking projects, creative code, photography and my thoughts. Written by Bruno Croci.
-- www.crosswordunclued.com Crossword Unclued
-- daedtech.com Stories about Software
-- danlebrero.com Daniel Lebrero Berna Blog
-- www.dannydutch.com Quite Interesting - DannyDutch
-- dariusforoux.com Darius Foroux | Weekly ideas to become smarter and wealthier
-- james.darpinian.com James Darpinian's blog | James Darpinian
-- securitylabs.datadoghq.com Home | Datadog Security Labs
-- datalars.com datalars
-- davekilian.com Dave Kilian's Blog
-- daverupert.com The Homepage of Dave Rupert | daverupert.com
-- tech.davis-hansson.com Jacob Davis-Hansson
-- debugagent.com Java, Debugging, DevOps & Open Source
-- www.deepakg.com Deepak Gulati's blog
-- denvergazette.com Denver News, Sports & Business | Denver Gazette, N
-- developmentfriendly.com Development Friendly – Coding and web development advice for all.
-- www.dewanahmed.com Dewan's Blog
-- blog.discord.com Discord Blog
-- disrel.com Frog Guy Rants | Blog
-- blog.dopt.com Blog — Dopt
-- technology.doximity.com Doximity Technology Blog
-- blog.doyensec.com Doyensec's Blog
-- www.dquach.com Dan Quach Blog
-- drewdevault.com Drew DeVault's blog
-- blog.dropbox.com Work in Progress | Dropbox Blog
-- duarteocarmo.com Duarte O.Carmo
-- blog.duolingo.com Duolingo Blog | Writing about the best way to learn a language
-- tech.ebayinc.com Tech Blog - eBay Inc.
-- www.edn.com EDN - Voice of the Engineer
-- www.eigenbahn.com Home | Eigenbahn blog
-- blog.eikondevice.com Eikon Blog
-- blog.eladgil.com Elad Blog | Substack
-- www.electronicdesign.com Home | Electronic Design
-- blogs.embarcadero.com Embarcadero RAD Studio, Delphi, & C++Builder Blogs
-- emiruz.com Emir's blog
-- www.erichgrunewald.com Erich Grunewald's Blog
-- ericlippert.com Fabulous adventures in coding | Eric Lippert's blog
-- ericsink.com Selected Blog Posts
-- eukaryotewritesblog.com Eukaryote Writes Blog | Risk, research, and life as a membrane-bound organism
-- www.europereloaded.com The Liberty Beacon | Bringing Alternative Media Sources Together™
-- evhaste.com Haste Makes Waste – Sincerity is a required field.
-- explained-from-first-principles.com Explained from First Principles
-- explorationsofstyle.com Explorations of Style | A Blog about Academic Writing
-- www.expunctis.com Blog entries | Lineae ex punctis
-- blog.ezyang.com ezyang’s blog
-- blog.fahhem.com Fahhem's Blog – An intermittent post of thoughts
-- engineering.fb.com Engineering at Meta - Engineering at Meta Blog
-- www.fearofoblivion.com Fear of Oblivion
-- florentcrivello.com Flo Crivello
-- www.fluentcpp.com Fluent C++ - Jonathan Boccara's blog
-- blog.fluxninja.com Blog | FluxNinja Aperture
-- www.forrestthewoods.com ForrestTheWoods - Home
-- blog.forret.com blog.forret.com · Peter Forret
-- www.fortressofdoors.com Fortress of Doors
-- www.fosspatents.com FOSS Patents
-- fromdevtodev.com OneBite.Dev - Coding blog in a bite size
-- www.gatesnotes.com Home | Bill Gates
-- gavinhoward.com Gavin D. Howard
-- www.geekmetaverse.com Geek Metaverse News – AI, Crypto, Metaverse, NFT, Tech, Web3, Gaming and Reviews
-- blog.get-merit.com The Merit Blog
-- blog.getbootstrap.com Bootstrap Blog · Official blog for the Bootstrap framework.
-- blog.getclearspace.com clearspace blog
-- blog.gingerbeardman.com ⌘I  Get Info
-- girliemac.com GirlieMac! Blog
-- blog.gitea.com Blog | Gitea Blog
-- blog.gitguardian.com GitGuardian Blog
-- blog.glowforge.com The Glowforge Blog -
-- ai.googleblog.com Google Research Blog
-- android-developers.googleblog.com Android Developers Blog
-- developers.googleblog.com Google for Developers Blog - News about Web, Mobile, AI and Cloud
-- opensource.googleblog.com Google Open Source Blog
-- security.googleblog.com Google Online Security Blog
-- testing.googleblog.com Google Testing Blog
-- grantisom.com Grant Isom
-- www.greyblake.com Posts | Serhii Potapov (greyblake)
-- www.hanselman.com Scott Hanselman - Coder, Blogger, Teacher, Speaker, Author
-- hashrust.com HashRust - experience the joy of Rust
-- healeycodes.com Blog — Andrew Healey
-- heathermeeker.com Copyleft Currents – A blog about open source software licensing
-- hedgehoglibrarian.com Hedgehog Librarian – Tales of a Prickly, Nocturnal Infodiva
-- henrikwarne.com Henrik Warne's blog | Thoughts on programming…
-- hotair.com HotAir – Politics, Culture, Media, Breaking News from a conservative viewpoint
-- blog.hubspot.com HubSpot Blog | Marketing, Sales, Agency, and Customer Success Content
-- hypirion.com hyPiRion
-- blog.iconfactory.com The Breakroom • A blog for the Iconfactory
-- idiallo.com Programming from the human perspective By Ibrahim Diallo
-- idiotlamborghini.com IdiotLamborghini
-- www.idontplaydarts.com Application Security
-- blog.imaginationtech.com Imagination Blog
-- timesofindia.indiatimes.com News - Latest News, Breaking News, Bollywood, Sports, Business and Political News | Times of India
-- blog.ioces.com The Blog of Matt
-- ipde.com IP/DE | A Blog About Intellectual Property Litigation and the District of Delaware
-- www.irwincollier.com Irwin Collier's Blog, Economics in the Rear-view Mirror
-- blog.isquaredsoftware.com Mark's Dev Blog
-- jakearchibald.com Blog - JakeArchibald.com
-- jakecoppinger.com Jake Coppinger
-- blog.janestreet.com Jane Street Tech Blog
-- jarvispowered.com Derek Jarvis' Blog
-- jaykmody.com Jay Mody
-- www.jeremiak.com 👋🏻 - Jeremia on the internet
-- www.jeremymorgan.com Jeremy's Programming Blog
-- www.jeremyong.com Jeremy's Blog
-- www.jernesto.com Juan Ernesto Blog
-- jesseduffield.com Pursuit Of Laziness – A blog by Jesse Duffield
-- blog.jetbrains.com JetBrains Blog: The Drive to Develop
-- blog.jim-nielsen.com Jim Nielsen’s Blog
-- jimclair.com Jim Clair – Blog
-- jlongster.com James Long - blog & knowledge graph
-- www.joannejacobs.com Joanne Jacobs on Education and Parenting
-- www.joelonsoftware.com Joel on Software
-- johnathannader.com Johnathan Nader
-- johnnyreilly.com johnnyreilly | johnnyreilly
-- johnnysswlab.com Welcome to Johnny's Software Lab! - Johnny's Software Lab
-- blog.johnqian.com John Qian's blog
-- www.joseferben.com Josef Erben's Blog
-- www.joshcsimmons.com The Blog of Dr. Josh C. Simmons
-- blog.jquery.com Official jQuery Blog | New Wave Javascript
-- k3tan.com A personal blog | k3tan.com
-- kabirgoel.com Kabir Goel
-- blog.kagi.com Kagi Blog
-- karimjedda.com Karim Jedda - Personal blog
-- blog.kellybrazil.com Home - Brazil's Blog
-- kinduff.com Casa | Alejandro AR (kinduff)
-- blog.kraken.com Kraken Blog
-- kumazen.com KumaZen - KumaZen
-- laravel-news.com Laravel News
-- blog.lastpass.com The LastPass Blog - The Last Password You'll Ever Need
-- blog.ldodds.com Lost Boy – The blog of @ldodds
-- leonidasv.com leonidasv.com
-- www.lesswrong.com LessWrong
-- www.leteyski.com Leteyski's blog
-- letmypeoplecode.com LetMyPeopleCode.com – A blog about software, schmaltz, and monkey-patches for the soul
-- www.linuxuprising.com Linux Uprising Blog
-- blog.littlepolygon.com Little Polygon Game Dev Blog
-- retro-futurism.livejournal.com Ретрофутуризм. Retrofuturism — LiveJournal
-- blog.logrocket.com LogRocket Blog - Resources to Help Product Teams Ship Amazing Digital Experiences
-- lopespm.com Byte Tank - Pedro Lopes Blog
-- www.lpalmieri.com Luca Palmieri
-- lucaskostka.com Random thoughts from Lucas Kostka
-- lucaspauker.com Lucas' Blog
-- luciditysystems.com Lucidity
-- macwright.com macwright.com
-- markessien.com Mark Essien | Home
-- tech.marksblogg.com Tech Blog
-- markuta.com Markuta
-- www.math3ma.com Math3ma
-- maxleiter.com Max Leiter
-- blog.medium.com The Medium Blog
-- datafinnovation.medium.com DataFinnovation - ChainArgos - 4AC – Medium
-- doctorow.medium.com Cory Doctorow – Medium
-- jeff-kaye.medium.com Jeffrey Kaye – Medium
-- kjhealey.medium.com Kieran Healey – Medium
-- netflixtechblog.medium.com Netflix Technology Blog – Medium
-- blog.meilisearch.com Meilisearch Blog
-- underthehood.meltwater.com under the hood - Meltwater Engineering Blog
-- interrupt.memfault.com Interrupt | A community and blog for embedded software makers
-- blog.metaobject.com metablog
-- micahflee.com Micah Lee's blog
-- blog.fabric.microsoft.com Blog usługi Microsoft Fabric
-- blogs.microsoft.com The Official Microsoft Blog
-- cloudblogs.microsoft.com Home - Cloud Perspectives Blog
-- devblogs.microsoft.com DevBlogs - Microsoft Developer Blogs
-- blog.mikeswanson.com Mike Swanson's Blog
-- blog.mikrotik.com MikroTik blog
-- minimaxir.com Max Woolf's Blog
-- www.mishalaskin.com About
-- mmazzarolo.com Matteo Mazzarolo
-- modernescpp.com MC++ BLOG – Der Blog für Modernes C++ von Rainer Grimm
-- moretothat.com More To That
-- www.mrdbourke.com Daniel Bourke
-- mxgrn.com Blog · Max Gorin
-- blog.myscale.com Post | MyScale | Blog
-- www.nakedcapitalism.com naked capitalism: Finance, economics, politics, power
-- research.nccgroup.com NCC Group Research Blog | Making the world safer and more secure
-- nedbatchelder.com Ned Batchelder
-- blog.neeto.com neeto blog | Neeraj Singh | Substack
-- blog.nestybox.com Nestybox Blog Site | Articles about running Docker, Kubernetes, and more inside containers, easily and securely.
-- netflixtechblog.com Netflix TechBlog
-- www.networkworld.com Welcome to Network World.com
-- blog.newsblur.com The NewsBlur Blog | A new sound of an old instrument
-- nickjanetakis.com From Development to Production — Nick Janetakis
-- nickolinger.com Nick Olinger's blog | Software Engineer
-- nicolodavis.com nicolodavis.com
-- www.nihamkin.com Artium Nihamkin's Blog
-- www.nileshonly.com Blog by Nilesh
-- blog.nindalf.com Krishna Sundarram
-- nipponrama.com Nipponrama - Blog about Japan and Japanese pop culture
-- www.noahlebovic.com NL
-- www.noamlerner.com Noam Lerner's Blog
-- blog.nobugware.com Fabrice Aneche
-- florian.noeding.com Florian Noeding's blog · Florian Noeding's blog
-- norasandler.com Nora Sandler
-- www.npopov.com nikic's Blog
-- blog.nuclearsecrecy.com Restricted Data: The Nuclear Secrecy Blog
-- blogs.nvidia.com NVIDIA Blog
-- blog.oddbit.com blog.oddbit.com
-- blog.opencagedata.com OpenCage blog - what's new at OpenCage
-- blog.oppedahl.com Ant-like Persistence - Carl Oppedahl's blog
-- blogs.oracle.com Oracle Blogs
-- orangejuiceliberationfront.com Orange Juice Liberation Front | Uliâs blog on programming, game development, pop culture and other boring things.
-- oschvr.com oschvr.com
-- blog.otterstack.com Danny's Blog
-- blog.oup.com OUPblog | Oxford University Press’s Academic Insights for the World
-- www.overcomingbias.com Overcoming Bias | Robin Hanson | Substack
-- palmerluckey.com The Blog of Palmer Luckey – The #1 Palmer Luckey Blog on the Internet
-- blog.patreon.com Patreon Blog
-- paulstamatiou.com Technology, Design and Photography — PaulStamatiou.com
-- www.peterullrich.com Peter Ullrich - Elixir Developer and Bicycle Activist
-- phauer.com Philipp Hauer's Blog - Engineering Management, Java Ecosystem, Kotlin, Sociology of Software Development
-- blog.phronemophobic.com Phronemophobic's Blog
-- blog.physics-astronomy.com Blog By Physics-Astronomy
-- picolisp-explored.com PicoLisp Blog
-- pilabor.com Tech-Tutorials, Howtos and buying advice
-- piotrduperas.com Blog by Piotr Duperas
-- blog.pocketcasts.com Pocket Casts Blog
-- pointersgonewild.com Pointers Gone Wild | A blog about programming, technology and society.
-- blog.postman.com All Things API: News, Tutorials & More | Postman Blog
-- www.primevideotech.com Prime Video Tech | The tech blog about innovation at Prime Video
-- www.programmerhat.com Programmer Hat | Programmer Hat Blog
-- www.progressandpurpose.com Progress and Purpose
-- blog.prusa3d.com Original Prusa 3D Printers - Company Blog
-- blog.pushbullet.com Pushbullet Blog
-- pxlnv.com Pixel Envy
-- blog.qualys.com Qualys Security Blog | Expert network security guidance and news
-- blog.quarkslab.com Quarkslab's blog
-- blog.quinefoundation.com QUINE Foundation Blog
-- www.quippd.com Asif Youssuff
-- blog.rachelbinx.com rachel binx ⤇ blog
-- rauljordan.com rauljordan::blog
-- reaganray.com Reagan Ray
-- blog.redplanetlabs.com Blog
-- blog.replit.com Replit - Blog
-- studio.ribbonfarm.com Ribbonfarm Studio | Venkatesh Rao | Substack
-- www.righto.com Ken Shirriff's blog
-- www.robinlinacre.com Robin Linacre's blog: Post list
-- blog.roblox.com Roblox Blog - All the latest news direct from Roblox employees.
-- blog.roboflow.com Roboflow Blog
-- weblog.rogueamoeba.com Rogue Amoeba - Under the Microscope
-- www.roughtype.com ROUGH TYPE | Nicholas Carr's blog
-- rssfeedasap.com RSS Feed Extractor - Get an RSS feed of almost anything
-- blog.saeloun.com Ruby on Rails Consulting Company based in Boston | Saeloun Blog | Page 1 | Saeloun Blog
-- sahbichaieb.com Home | Sahbi Chaieb
-- blog.sakugabooru.com Sakuga Blog – The Art of Japanese Animation
-- www.sandiegocriminallawyersblog.com San Diego Criminal Lawyers Blog — Published by San Diego, California Criminal Attorneys — Law Offices of David M. Boertje
-- blogs.scientificamerican.com Scientific American Blog Network - Scientific American Blog Network
-- blog.scottlogic.com Scott Logic Blog
-- www.scottsantens.com Scott Santens' Universal Basic Income Guide
-- secretartofscience.com Secret Art of Science
-- securelist.com Securelist | Kaspersky’s threat research and reports
-- symantec-enterprise-blogs.security.com Symantec Enterprise Blogs
-- shaunoconnell.com ShaunOConnell.com – GP | Commissioner | Coach & Mentor | Blogger
-- siboehm.com siboehm
-- sigmoidprime.com sigmoid prime
-- signalprocessingjobs.com HardwareTeams.com - The #1 job board and blog for electrical and computer engineers. | HardwareTeams.com
-- blog.simutrans.com The Simutrans Blog
-- sirupsen.com Simon Eskildsen - Sirupsen
-- slimemoldtimemold.com SLIME MOLD TIME MOLD – Mad Science Blogging
-- softwaredoug.com Doug Turnbull's Blog
-- www.softwaremaxims.com Musings about software | The Blog of Thomas Depierre, Elixir and DevOps consultant.
-- www.somebits.com Nelson's Weblog
-- spreadprivacy.com Spread Privacy
-- blog.standardnotes.com Decrypted | Standard Notes
-- startafuckingblog.com Start a Fucking Blog
-- steipete.com steipete's blog
-- www.stephendiehl.com Home
-- osblog.stephenmarz.com Stephen Marz: Blog
-- stephenn.com Stephen's Tech Blog
-- steven-giesel.com Steven Giesel
-- blog.stmcyber.com STM Cyber Blog - R&D Team
-- www.stylewarning.com stylewarning's screed
-- aheze.substack.com Andrew's Substack | Andrew Zheng | Substack
-- davekarpf.substack.com The Future, Now and Then | Dave Karpf | Substack
-- eigenrobot.substack.com eigenrobot,s Blog | Substack
-- ihavemanythoughts.substack.com I have thoughts | Thomas Poinsot | Substack
-- joeposnanski.substack.com JoeBlogs | Joe Posnanski | Substack
-- molecularspec.substack.com Molecular Spectacular | Adomas Malaiska | Substack
-- mukdde.substack.com muk’s Newsletter | Substack
-- philosophybear.substack.com Philosophy bear | Substack
-- ramapascala.substack.com A Blog For The Anthropocene | Rama Pascala | Substack
-- skunkledger.substack.com Skunk Ledger | BLAP | Substack
-- skybrian.substack.com Skybrian’s Blog | Substack
-- substack.com Substack - A new economic engine for culture
-- theap.substack.com The AP (Alex Pareene) Newsletter | Substack
-- thebuilderjr.substack.com JR’s Newsletter | Substack
-- yonom.substack.com Simon's Blog | Simon Farshid | Substack
-- www.svgbackgrounds.com Customize and apply backgrounds fast | SVG Backgrounds
-- blog.syncpup.com Syncpup.com Blog - Sync' up! ... without getting drained
-- blog.system76.com System76 Blog
-- tech.target.com Target Tech Blog
-- tasshin.com Tasshin
-- tderflinger.com Thomas Derflinger Blog
-- techdows.com Techdows - Latest Technology News
-- www.technoblogy.com Technoblogy
-- blog.tempus-ex.com Tempus Ex Blog
-- misc-stuff.terraaeon.com The Miscellaneous Stuff Blog
-- blog.testdouble.com Test Double | Blog | Articles and Screencasts
-- ascii.textfiles.com ASCII by Jason Scott
-- theaudioowl.com Blog - The Audio Owl
-- www.thecarconnection.com New Cars, Car Reviews, Car Shows, Car Photos - The Car Connection
-- www.thecustomdroid.com TheCustomDroid - Android Tutorials, Tips and Tricks
-- www.thegingerviking.com Marc Crouch - The Ginger Viking
-- www.thehistoryblog.com The History Blog
-- www.theinsaneapp.com Insane - TheInsaneApp.com
-- themythicalengineer.com The Mythical Engineer | Blog about Software Engineering
-- theprivacydad.com Welcome to The Privacy Dad's Blog!
-- www.theturnsignalblog.com The Turn Signal
-- blog.thevinter.com About
-- registerspill.thorstenball.com Register Spill | Thorsten Ball | Substack
-- blog.tigrisdata.com Tigris Blog | Tigris
-- blog.timescale.com Timescale Blog
-- www.timesofisrael.com The Times of Israel | News from Israel, the Middle East and the Jewish World
-- blog.tomayac.com Blogccasion
-- tomerfiliba.com Blog Posts
-- tomtunguz.com Tomasz Tunguz by @ttunguz
-- tech.townsourced.com Townsourced Tech Blog
-- blog.trailofbits.com Trail of Bits Blog
-- blog.treblle.com Treblle Blog | API Mission Control | Tech Blog
-- tritonstation.com Triton Station – A Blog About the Science and Sociology of Cosmology and Dark Matter
-- trstringer.com Thomas Stringer
-- gentlier.tumblr.com Side Blog on Tumblr
-- iquantny.tumblr.com I Quant NY
-- blog.twitter.com Blog
-- dilbertblog.typepad.com The Dilbert Blog
-- www.ufarooqi.com Umar Farooqi
-- blog.usmanity.com Notes from the Burrow
-- vanitynotes.com Vanity Notes - A blog about programming and socialism
-- vickiboykis.com Tech Blog | ★❤✰ Vicki Boykis ★❤✰
-- www.vinography.com Vinography : A Wine Blog
-- vivqu.com Vivian Qu
-- www.voitureblog.com   Voiture Blog: It's all about cars
-- lauren.vortex.com Lauren Weinstein's Blog
-- blog.waymo.com Waypoint - The official Waymo blog
-- blog.whatsapp.com WhatsApp Blog
-- whimsysoul.com Whimsy Soul - Find your everyday magic
-- whyevolutionistrue.com Why Evolution Is True – Why Evolution is True is a blog written by Jerry Coyne, centered on evolution and biology but also dealing with diverse topics like politics, culture, and cats.
-- will-keleher.com posts
-- notes.willhackett.com Will Hackett
-- wimpysworld.com Wimpy's World
-- win-vector.com Win Vector LLC – Data science advising, consulting, and training
-- blogs.windows.com Home | Windows Blog
-- www.windytan.com absorptions
-- artasillumination.files.wordpress.com Art as Illumination | An art blog from Jacob Rowan Studios
-- beatpatrol.wordpress.com The Beat Patrol | Music and Beat literature-related blogsite
-- bigdanzblog.wordpress.com Big Dan the Blogging Man
-- brickexperimentchannel.wordpress.com Brick Experiment Channel
-- byorgey.wordpress.com blog :: Brent -> [String]
-- caseyhandmer.wordpress.com Casey Handmer's blog – Space, Travel, Technology, 3D Printing, Energy, Writing
-- deavid.wordpress.com DeavidSedice's blog – Thoughts about programming
-- dustingmixon.wordpress.com Short, Fat Matrices – a research blog by Dustin G. Mixon
-- fgiesen.wordpress.com The ryg blog | When I grow up I'll be an inventor.
-- gaodawei.wordpress.com 高大伟 David Cowhig's Translation Blog
-- gravityandlevity.wordpress.com Gravity and Levity | A blog about the big ideas in physics, plus a few other things
-- gustedt.wordpress.com Jens Gustedt's Blog
-- matthewfelgate.wordpress.com Matthew Felgate – My thoughts, electronics and adventures
-- microcorelabs.wordpress.com MicroCore Labs – Ted Fried's Project Blog
-- naveenarun.wordpress.com Naveen Arun's Blog
-- ntdotdev.wordpress.com NTDEV
-- queendomblog.wordpress.com Queendom Blog | Insight at your fingertips – www.queendom.com
-- randomascii.wordpress.com Random ASCII – tech blog of Bruce Dawson | Forecast for randomascii: programming, tech topics, with a chance of unicycling
-- scalibq.wordpress.com Scali's OpenBlog™ | Programming, graphics, hardware, maths, and that sort of thing
-- shaneosullivan.wordpress.com SOS – Shane O'Sullivan's technical blog… really ties the room together
-- stancarey.wordpress.com Sentence first | An Irishman's blog about the English language.
-- svbhallofshame.wordpress.com WordPress.com — Get a Free Blog Here
-- terraformindustries.wordpress.com Terraform Industries Blog – gigascale atmospheric hydrocarbon synthesis
-- thenextrecession.wordpress.com Michael Roberts Blog – blogging from a marxist economist
-- uselessdevblog.wordpress.com The Useless Dev blog – A useless blog from, and for, useless developers
-- vermaden.wordpress.com 𝚟𝚎𝚛𝚖𝚊𝚍𝚎𝚗 | Another ${RANDOM} sysadmin sharing his experiences of work at IT industry.
-- wordpress.com WordPress.com: Build a Site, Sell Your Stuff, Start a Blog & More
-- worldofmatthew.com WorldofMatthew
-- blog.xpnsec.com XPN InfoSec Blog
-- www.yannickoswald.com VC Europe I Yannick Oswald I Blog I European VC Musings
-- www.yet-another-blog.com Yet Another Blog
-- yishenggong.com Yisheng's blog – software engineering, poetry and short stories
-- blog.yoshuawuyts.com Yoshua Wuyts — Blog
-- blog.zaccohn.com Zachary Cohn – Zachary Cohn's Blog
-- www.zeptonaut.com zeptonaut
-- zserge.com zserge's blog
-- blog.zulip.com The Zulip Blog
-- www.zxch3n.com Zxch3n's Blog | Zxch3n
-- events.ccc.de CCC Event Blog
-- blog.datawrapper.de Datawrapper Blog
-- blogless.datenbrei.de Blogless â Writing Articles online without a Blog
-- blog.felixge.de Felix Geisendörfer
-- gorillasun.de Gorilla Sun
-- www.joachim-breitner.de Blog – Joachim Breitner's Homepage
-- blog.michael.kuron-germany.de Michael Kuron's Blog
-- blog.m5e.de M5E's Blog
-- blog.mnus.de minus' blog
-- scilogs.spektrum.de Tagebücher der Wissenschaft » SciLogs - Wissenschaftsblogs
-- www.amolas.dev My Blog – My WordPress Blog
-- avestura.dev Avestura's Blog
-- blog.axo.dev axo blog - Not every developer wants to be a web developer: Hello oranda!
-- blubsblog.bearblog.dev Blub's Blog
-- chatterhead.bearblog.dev Chatterhead Says
-- deijin.bearblog.dev ❀°。Deijin's Blog
-- herman.bearblog.dev ᕕ( ᐛ )ᕗ Herman's blog
-- klint.bearblog.dev Thoughtless Acts
-- nicky.bearblog.dev Nicky's Blog
-- onsclom.bearblog.dev 📚 Austin Merrick’s Blog
-- biriukov.dev 🏠 | Viacheslav Biriukov
-- blog.bithole.dev Adrian's Blog
-- blog.boleary.dev Brendan O'Leary
-- blog.boot.dev Boot.dev Blog
-- ecostack.dev Ecostack — a developer blog
-- fusectore.dev fusectore.dev | My blog on programming.
-- hamel.dev Hamel’s Blog
-- jmmv.dev Julio Merino (jmmv.dev)
-- jmorrice.dev John Morrice
-- kizu.dev Articles & Experiments by Roman Komarov
-- kodimensional.dev chshersh aka Dmitrii Kovanikov
-- kuenzi.dev The Twenty Percent
-- blog.langchain.dev LangChain
-- blog.lastmileai.dev lastmile ai — blog
-- news.livebook.dev Livebook.dev - The Livebook Blog
-- lunnova.dev lunnova.dev
-- blog.meadsteve.dev MeadSteve's Dev Blog – MeadSteve's Dev Blog
-- blog.mikemwanje.dev Mike Mwanje's Blog
-- blog.neko.dev Blog@neko.dev - blog.neko.dev
-- blog.orhun.dev Orhun's Blog
-- rbates.dev Ryan's Dev Blog
-- rmkit.dev rmkit
-- www.ruxu.dev Blog | Roger Oriol
-- scastiel.dev Sebastien Castiel · Developer, writer, indie hacker · 📍 Montreal, QC
-- blog.theabhishek.dev Verma Notes
-- wagslane.dev Lane's Blog
-- walid.dev Walid Ziouche
-- blog.warrant.dev Warrant Blog | Warrant Blog
-- blog.washi.dev Washi
-- julian.digital julian.digital
-- ooh.directory ooh.directory: a place to find good blogs that interest you
-- lakesare.brick.do Evgenia Karunus
-- noidea.dog No Idea Blog
-- blogs.chapman.edu Chapman Blogs | Chapman University
-- blogs.harvard.edu Weblogs at Harvard
-- corpgov.law.harvard.edu The Harvard Law School Forum on Corporate Governance | The leading online blog in the fields of corporate governance and financial regulation.
-- scopeblog.stanford.edu Scope | Stanford Medicine's blog - Scope
-- blogs.uoregon.edu University of Oregon – Educational blogs from our community
-- blog.seas.upenn.edu Penn Engineering Blog - Posts from the School of Engineering and Applied Science
-- ano.ee Esileht - Ants Nomm
-- ounapuu.ee ./techtipsy â Herman's blog
-- dri.es On digital experiences, Open Source, Open Web, Drupal, and our digital future | Dries Buytaert
-- cs-syd.eu CS SYD
-- theloop.ecpr.eu ECPR's Political Science Blog - The Loop
-- blog.europython.eu EuroPython Blog
-- www.reactivesystems.eu On Programming, Software Architecture, and Sociotechnical Systems
-- blog.rfox.eu Bystroushaak's blog
-- blog.silentsignal.eu Silent Signal Techblog
-- trojanczyk.eu Blog about business, startups, technology and digital transformation | Adam Trojanczyk
-- bergie.iki.fi Blog - Henri Bergius
-- blog.liw.fi blog.liw.fi
-- blog.payara.fish Blog | Payara
-- anicetnougaret.fr Anicet Nougaret's portfolio & blog.
-- www.lemonde.fr Le Monde.fr - Actualités et Infos en France et dans le monde
-- adriano.fyi Adriano Caloiaro's personal blog
-- brr.fyi brr
-- www.nan.fyi Not a Number
-- blog.google The Keyword | Google Product and Technology News and Stories
-- blogs.loc.gov Library of Congress Blogs | Blogs from the Library of Congress
-- blogs.nasa.gov NASA Blogs
-- www.lexx.gr Blog 🎤 Lexxman
-- blog.deckc.hair nandalism blog
-- blog.turquoise.health Turquoise Health Blog
-- dm.hn Hacker News Blogroll
-- sheep.horse Sheep.Horse - The Blog of Andrew Stephens
-- shinobi.bt.ht Shinobi Website | A text-based, RSS focused blogging "system"
-- git.ht GitHoot: blogging as simple as creating a GitHub gist
-- peter.czanik.hu Random thoughts of Peter 'CzP' Czanik
-- drb.ie Homepage - Essays, Blog Posts & Book Reviews - Dublin Review of Books
-- blog.glyph.im Deciphering Glyph :: index
-- notes.ghed.in Notes
-- www.downtoearth.org.in Down To Earth | Latest news, opinion, analysis on environment & science issues | India, South Asia
-- resources.fabric.inc fabric Blog | E-Commerce Blog About Scaling Commerce
-- blog.owulveryck.info Unladen swallow - Olivier Wulveryck
-- palant.info Almost Secure
-- petrovs.info Blago's blog
-- withinboredom.info Somewhere Within Boredom – A Site About Stuff
-- blog.ajour.io Simple Automation
-- blog.alexellis.io Alex Ellis' Blog
-- americanexpress.io American Express Technology
-- blog.angular.io Angular Blog
-- blog.appcensus.io The AppCensus Blog
-- axelp.io Axel’s Blog | Technical blog discussing reverse engineering, detections engineering, exploit development, capability development, and other cybersecurity topics.
-- blog.benton.io Andrew Benton's Blog
-- www.beren.io Beren's Blog - Thoughts on AI, Neuroscience, and other things that interest me.
-- blog.bigpicture.io The BigPicture.io Blog
-- bitbashing.io Bit Bashing
-- conduition.io Conduition
-- crawshaw.io crawshaw blog
-- www.eidel.io Home | Oliver Eidel
-- blog.elementary.io elementary Blog
-- blog.elevenlabs.io ElevenLabs | Blog
-- blog.everstrike.io Everstrike Blog
-- blog.exaloop.io Home | Exaloop blog
-- blog.ferretdb.io FerretDB Blog | FerretDB Blog
-- blog.getdaft.io Daft Blog | Sammy Sidhu | Substack
-- blog.gitea.io Blog | Gitea Blog
-- adam-mcdaniel-blog.github.io Adam | Blog
-- ahgamut.github.io Blog Needs a Name
-- alexanderameye.github.io Technical blog by Alexander Ameye.
-- alexandruburlacu.github.io Alex's occasional blog posts
-- alexxcons.github.io Alexxcon's Software Development Blog
-- alok.github.io Every Man a Debtor
-- ambiso.github.io ambiso's blog
-- arogozhnikov.github.io Brilliantly wrong (blog by Alex Rogozhnikov)
-- bkamins.github.io Blog by Bogumił Kamiński | Comments on things I find usable or interesting
-- claytonwramsey.github.io clayt | Clayton Ramsey’s blog. I’m a PhD student who likes to write about software. Copyright © 2023 Clayton Ramsey. All rights reserved.
-- cookieplmonster.github.io Silent’s Blog | A blog and portfolio of Silent
-- davidlaprade.github.io David Laprade | Blog
-- doridori.github.io SystemDotRun – Dorian Cussen's Super Blog
-- dragon863.github.io Dragon863 - Home
-- drtomasaragon.github.io Dr. Tomás Aragón - Population Health Blog
-- floooh.github.io The Brain Dump
-- frycos.github.io Frycos Security Diary | Blogging mainly
-- gavinray97.github.io Gavin Ray Blog
-- greydanus.github.io Natural Intelligence
-- hirrolot.github.io Hirrolot's Blog
-- iamkroot.github.io Krut's Blog
-- ixns.github.io MR IXNS | A simple blog where I dive into curious topics.
-- jackevansevo.github.io Jack's Blog
-- jasoneckert.github.io Jason Eckert's Website and Blog
-- johanwind.github.io The Good Minima | A blog about implicit biases in deep learning.
-- johnazariah.github.io John Azariah’s Blog | Ruminations of a partially-applied functional programmer…
-- josefbacik.github.io Josef Bacik’s Blog | Musings about current development work.
-- joshumax.github.io Josh Talk
-- kaleidawave.github.io Ben's Engineering Blog
-- karpathy.github.io Andrej Karpathy blog
-- kentindell.github.io Home | Dr. Ken Tindell
-- kevinzakka.github.io Kevin Zakka's Blog
-- kimono-koans.github.io kimono koans' blog!
-- kobzol.github.io Kobzol’s blog | Blog about programming stuff.
-- ktkaufman03.github.io Kai Kaufman's tech blog
-- leejo.github.io Blog Archive
-- lexi-lambda.github.io Alexis King’s Blog
-- litchipi.github.io Index | Blog of Litchi Pi
-- ludovicianul.github.io m's blog · We're all different. This is the only thing we have in common.
-- lukesalamone.github.io Luke Salamone's Blog
-- lwss.github.io LWSS Blog – Basement Dweller
-- matklad.github.io matklad
-- mcraiha.github.io Main Page | mcraiha.github.io
-- mnpn.github.io Mnpn
-- n-eq.github.io n-eq · Nabil Elqatib's blog
-- note89.github.io All posts | Note's on software
-- philpearl.github.io Phil Pearl's Blog
-- pkolaczk.github.io Home | Piotr Kołaczkowski
-- poignardazur.github.io PoignardAzur · Developer blog of Olivier Faure
-- pr0g.github.io Tom Hulton-Harrop | A programming blog
-- pvigier.github.io Blog | pvigier’s blog
-- raphlinus.github.io Raph Levien’s blog | Blog of Raph Levien.
-- rustylife.github.io Rustam Kovhaev's blog
-- shwestrick.github.io Work Hard, Span Easy | Parallelizing things is easy, but making them fast is hard. A blog about parallel algorithms, data structures, programming languages, and anything else that comes to mind. Written by Sam Westrick.
-- sohl-dickstein.github.io Jascha’s blog | This blog is intended to be a place to share ideas and results that are too weird, incomplete, or off-topic to turn into an academic paper, but that I think may be important. Let me know what you think! Contact links to the left.
-- stdnoerr.github.io stdnoerr's blog
-- taeric.github.io Josh Berry's Blog
-- trofi.github.io trofi's blog: /
-- twitchard.github.io Home - Richard Marmorstein
-- vstinner.github.io Victor Stinner blog 3
-- wsdookadr.github.io Blog
-- yanmaani.github.io yanmaani's blog
-- grady.io All posts | Grady Simon
-- blog.gruntwork.io Gruntwork
-- blog.interviewing.io Blog | interviewing.io
-- blog.jez.io Jake Zimmerman – Jake Zimmerman
-- blog.kroy.io blog.kroy.io – computers, tech, and whatever other random stuff crosses my mind.
-- blog.lfe.io LFE Blog - LFE Tutorials, News, & Updates
-- luajit.io Jinhua Blog
-- blog.meain.io meain/blog
-- blog.michaeldresser.io Michael Dresser’s blog
-- blogit.michelin.io Michelin IT Engineering Blog
-- blog.min.io MinIO Blog
-- blog.mithrilsecurity.io Mithril Security Blog
-- opensourcesecurity.io Open Source Security
-- blog.openziti.io OpenZiti Tech Blog
-- overreacted.io Overreacted — A blog by Dan Abramov
-- blog.packagecloud.io Page Packagecloud Blog
-- pboyd.io pboyd.io
-- blog.phylum.io Phylum | Research Blog
-- blog.readyset.io ReadySet Blog
-- blog.sentry.io Home | Product Blog • Sentry
-- stitcher.io Blog - stitcher.io
-- blog.streamlit.io Blog on Building & Sharing Data Apps | Streamlit Blog
-- blog.theapricot.io Apricot Blog
-- thephilbert.io Philip Herrons Personal Blog – Compilers and stuff
-- blog.trunk.io Trunk | Trunk Blog
-- vrite.io Vrite ï¼ headless CMS for technical content
-- blog.whimslab.io Yiming Cao – Medium
-- blog.wildcat.io WildCat's Blog
-- yager.io Home :: Will Yager
-- blog.znote.io Home | Znote blog
-- who.ldelossa.is | a.programming.blog
-- blog.timing.is timing blog
-- linus.schreibt.jetzt Linus's blog - Home
-- blog.jse.li Jesse Li
-- sadh.life Tushar's Blog
-- tushar.lol Tushar's Blog
-- www.adamtal.me Adam Tal's Blog
-- blainehansen.me Blaine Hansen
-- danq.me Dan Q â Personal blog of Dan Q: hacker, magician, geocacher, gamerâ¦
-- doumer.me Doumer's Blog - Learn, Build, Share and Innovate.
-- ernestas.me Interface
-- fhur.me About
-- jfhr.me jfhr's blog
-- laplab.me About | Nikita Lapkov
-- lemire.me Daniel Lemire's blog – Daniel Lemire is a computer science professor at the Data Science Laboratory of the Université du Québec (TÉLUQ) in Montreal. His research is focused on software performance and data engineering. He is a techno-optimist and a free-speech advocate.
-- blog.matthieud.me Matthieu's blog
-- muhammadraza.me Muhammad | Personal Blog where I write about things I learn or discover.
-- btm.qva.mybluehost.me a blog by biggiemac42
-- petevilter.me Pete's Blog
-- blog.pkh.me ubitux/blog
-- ruky.me Rukshan's Blog - Personal Blog of Rukshan
-- blog.ryotak.me RyotaK's Blog - 技術的な話とか
-- michal.sapka.me [MichaÅ Sapka's website]
-- blog.shalvah.me Shalvah's Blog
-- leonid.shevtsov.me The homepage of Leonid Shevtsov - systems architect, software enthusiast and philosopher. Opinions, tips and case studies
-- blog.thefrenchghosty.me TheFrenchGhosty's Blog
-- thesloth.me The Sloth Blog
-- tonsky.me Blog @ tonsky.me
-- tyrrrz.me Oleksii Holub
-- vgel.me Theia Vogel's website & blog
-- xnacly.me xnacly - blog
-- shkspr.mobi Terence Eden’s Blog
-- memo.mx Memo Garcia
-- blog.waleedkhan.name Steno & PL
-- acko.net Hackery, Math & Design — Acko.net
-- alexwlchan.net alexwlchan
-- www.andreinc.net andreinc
-- andrewlock.net Andrew Lock | .NET Escapades
-- www.apalrd.net apalrd's adventures
-- blog.apnic.net APNIC Blog | Regional Internet Registry for the Asia Pacific
-- blog.backslasher.net BackSlasher
-- blog.burntsushi.net Andrew Gallant's Blog - Andrew Gallant's Blog
-- www.cambus.net Frederic Cambus | Cambus.net
-- www.cdahmedeh.net cdahmedeh (Ahmed El-Hajjar)
-- chriscoyier.net Chris Coyier - Web craftsman, blogger, author, speaker.
-- climatecasino.net Watching the World Go Bye – Eliot Jacobson's Collapse of Everything Blog
-- www.colino.net Bienvenue – colin@colino.net
-- conorbroderick.net All posts | Conor's Blog -
-- www.cryptologie.net Cryptologie
-- blog.darksky.net Dark Sky Blog
-- darrenburns.net Darren Burns - Blog
-- desdemonadespair.net Desdemona Despair – Blogging the End of the World™
-- www.deusinmachina.net Deus In Machina | Diego Crespo | Substack
-- duncanlock.net Duncan Locks personal site · duncan­lock­.net
-- www.foonathan.net foonathan::​blog()
-- news.gandi.net Gandi.net news
-- taras.glek.net Taras' Blog on AI, Perf, Hacks
-- hookrace.net HookRace Blog
-- blog.information-superhighway.net blog dot information dash superhighway dot net
-- blog.jakubholy.net Holy on Dev
-- jaycarlson.net Blog - Jay Carlson
-- blog.karliner.net Mike's Blog — Technologist at Large
-- www.kooslooijesteijn.net Blog | Koos Looijesteijn
-- blog.lidskialf.net adq – Andrew de Quincey's miscellaneous tech projects
-- www.logicmatters.net - Logic Matters
-- lukasrosenstock.net Lukas Rosenstock's Blog
-- lyonsden.net Home - Lyonsden Blog
-- blog.marcua.net N=1 (marcua’s blog) | I’m the Co-Founder and CTO of B12, where we’re building a better future of creative and analytical work. Before that, I was Director of Data at Locu, a startup that was acquired by GoDaddy. I went to grad school at MIT’s CSAIL. One time in Jerusalem I ate a whole tub of hummus on my own. I don’t regret that day.
-- www.meziantou.net Meziantou's blog
-- mfiano.net Posts
-- tech.michaelaltfield.net Michael Altfield's Tech Blog - Technology, Science, and the pursuit of Enlightenment
-- mijailovic.net Nemanja Mijailovic's Blog
-- naich.net Naich's crappy blog – It's not very good but there is lots of swearing
-- blog.nearlyfreespeech.net NearlyFreeSpeech.NET Blog
-- nliu.net my php/cobol blog
-- www.noulakaz.net Noulakaz
-- blog.phor.net William Entriken Blog — Analysis of all – William Entriken Blog
-- blog.searchmysite.net Blog for searchmysite.net
-- www.sevarg.net Syonyk's Project Blog
-- simonwillison.net Simon Willison’s Weblog
-- www.systemreboot.net systemreboot – blog
-- blog.thunderbird.net The Thunderbird Blog -
-- blog.tjll.net Tyblog | Home
-- twiddlingbits.net twiddling∧bits
-- blog.varunramesh.net Varun Ramesh's Blog
-- vitonsky.net Blog about computers
-- thomasp.vivaldi.net Thomas Pike’s other blog | Tales from a system administrator
-- microblog.vladh.net vladh's microblog
-- blog.vslira.net vslira's blog
-- jan.wildeboer.net Jan Wildeboer's Blog
-- blog.williammanley.net Will's blog
-- bear.willmeyers.net willmeyers' bear blog
-- blog.yossarian.net ENOSUCHBLOG
-- yotam.net Yotam's blog
-- pavel.network Pavel's blog about underlying Internet technologies
-- blog.brixit.nl BrixIT Blog
-- www.leidenmedievalistsblog.nl Leiden Medievalists Blog
-- blog.nlnetlabs.nl The NLnet Labs Blog
-- stderr.nl (...) — /Blog
-- patricia.no Home | Patricia Aas - Programmer
-- isthisit.nz is this it?
-- blog.entropy.observer Ian's blog | entropy.observer
-- blog.flipperzero.one Flipper Blog
-- plei.one plei.one - Blog
-- blog.sunfishcode.online sunfishcode's blog · A blog by sunfishcode
-- memooo.ooo Memo Garcia
-- www.alignmentforum.org AI Alignment Forum
-- annas-blog.org Anna’s Blog
-- blogs.apache.org Blogs Archive | This is an archive of the Roller blogs that were previously hosted on blogs.apache.org
-- news.apache.org The Apache Software Foundation Blog - The Apache Software Foundation Blog
-- blog.archive.org Internet Archive Blogs | A blog from the team at archive.org
-- blog.asciinema.org asciinema blog · asciinema blog
-- code.blender.org Developer Blog - code.blender.org
-- brianmckenna.org BAM Weblog
-- blog.cachix.org Cachix Blog
-- cdixon.org cdixon | home
-- blog.cerowrt.org CeroWrt notebook: On fixing the internet since 2011 - http://blog.cerowrt.org/
-- blog.chromium.org Chromium Blog
-- blog.cr0.org cr0 blog
-- blog.darlinghq.org Darling Development Blog
-- bits.debian.org Bits from Debian - Blog from the Debian Project
-- www.deepstateblog.org Welcome to the Deep State Blog
-- blog.demofox.org The blog at the bottom of the sea « Programming, Graphics, Gamedev, Exotic Computation, Audio Synthesis
-- blog.documentfoundation.org The Document Foundation Blog - The home of LibreOffice
-- dev.blog.documentfoundation.org LibreOffice Development Blog - Blog for the LibreOffice Developers Community; Tutorials, tips and tricks for working with the LibreOffice code
-- peter.eisentraut.org Peter Eisentraut | Peter Eisentraut’s blog
-- blog.ericgoldman.org Technology & Marketing Law Blog -
-- framablog.org Framablog – La route est longue mais la voie est libre…
-- www.frontiersin.org Frontiers | Publisher of peer-reviewed articles in open access journals
-- blogs.gnome.org GNOME Blogs – A blogging community for GNOME contributors
-- havenweb.org Haven: Host your own private blog
-- blog.humphd.org Bread & Circuits
-- www.isc.org ISC - ISC
-- blog.jgc.org John Graham-Cumming's blog
-- blog.joinmastodon.org Mastodon Blog
-- blog.josefsson.org Simon Josefsson's blog
-- blog.jupyter.org Jupyter Blog
-- origami.kosmulski.org Origami by MichaÅ Kosmulski
-- lambda-the-ultimate.org Lambda the Ultimate | Programming Languages Weblog
-- blog.metabrainz.org MetaBrainz Blog – MetaBrainz Foundation community blog
-- blog.mozilla.org Home - The Mozilla Blog
-- hacks.mozilla.org Home - Mozilla Hacks - the Web developer blog
-- niconiconi.neocities.org niconiconi's blog
-- blog.netbsd.org NetBSD Blog
-- www.openrightsgroup.org Home | Open Rights Group
-- blog.openstreetmap.org OpenStreetMap Blog | Supporting the OpenStreetMap project
-- blog.pamelafox.org pamela fox's blog
-- blogs.perl.org blogs.perl.org â blogging the onion
-- lucumr.pocoo.org Blog | Armin Ronacher's Thoughts and Writings
-- praeclarum.org praeclarum
-- blog.pypi.org The Python Package Index
-- pubs.rsc.org RSC Publishing Home – Chemical Science Journals, Books and Databases
-- blog.rust-lang.org The Rust Programming Language Blog
-- blog.ryujinx.org Ryujinx - Blog
-- www.setphaserstostun.org Just another blog
-- snarfed.org snarfed.org | Ryan Barrett's blog
-- stallmansupport.org Introduction | Stallman Support
-- fredblog.stlouisfed.org FRED Blog | Interesting graphs from the FRED library
-- usa.streetsblog.org Homepage — Streetsblog USA
-- blog.tensorflow.org The TensorFlow Blog
-- blog.torproject.org Tor Blog | The Tor Project
-- blog.ucsusa.org The Equation - Union of Concerned Scientists
-- viruta.org Federico's Blog
-- blog.webpagetest.org WebPageTest Blog
-- blog.weechat.org WeeChat dev news
-- blog.wireshark.org Sniff free or die | The official Wireshark blog
-- writefreely.org WriteFreely
-- middle-earth.xenite.org Middle-earth & J.R.R. Tolkien Blog – by Michael Martinez
-- mcilloni.ovh mcilloni's blog · A simple blog for rather complicated topics
-- www.androidowy.pl Androidowy - najciekawszy polski blog. Windows AI, Android
-- antyweb.pl Antyweb - blog technologiczny
-- independenttrader.pl Niezależny Portal Finansowy - Independent Trader.pl
-- mensfeld.pl Closer to Code - Blog about coding in various languages, security, and my other IT adventures.
-- www.midline.pl Blog Internet. Czas działać!
-- p.migdal.pl Homepage - Piotr Migdał
-- www.salon24.pl Salon24 - Blogi, wiadomości, opinie i komentarze
-- spidersweb.pl Spider’s Web
-- www.wprost.pl WPROST.pl - Polska i świat, historia, polityka, biznes, kultura
-- moritz.pm Moritz' Blog
-- docs.microblog.pub microblog.pub - A self-hosted, single-user, ActivityPub powered microblog.
-- mariusbancila.ro Marius Bancila's Blog
-- nullpt.rs nullpt.rs • blog
-- www.nullpt.rs nullpt.rs • blog
-- hugotunius.se Blog - Hugo Tunius
-- blog.webp.se WebP Cloud Services Blog
-- kofi.sexy Kofi Gumbs
-- artemis.sh Artemis Everfree
-- bower.sh erock's blog
-- d-s.sh [MichaÅ Sapka's website]
-- blog.gibson.sh ./gibson.sh --blog
-- x64.sh R3zk0n
-- austinvernon.site Austin Vernon - Austin Vernon's Blog
-- blog.djha.skin Skin's Blog
-- blog.syncinc.so The Sequin Blog
-- pdx.su Jeff Sandberg's Blog
-- dropbox.tech Dropbox Tech Blog - Dropbox
-- blog.ipfs.tech Home | IPFS Blog & News
-- dispatch.techlore.tech Techlore Dispatch | Henry Fisher | Substack
-- threedots.tech Learn Building Modern Go applications - Three Dots Labs blog
-- blog.turso.tech Turso blog
-- blog.winny.tech Winny's Blog
-- blog.dave.tf blog.dave.tf
-- blog.cr.yp.to cr.yp.to: blog
-- blog.val.town Val Town Blog
-- blog.lon.tv Lon Seidman & Lon.TV Blog - Tech & Commentary from Lon Seidman of Lon.TV
-- blog.twitch.tv Twitch Blog
-- blogs.lse.ac.uk LSE Blogs | Expert analysis & debate from LSE
-- blog.practicalethics.ox.ac.uk Practical Ethics
-- itservices.wp.st-andrews.ac.uk IT Services blog – Latest news, advice and information from the IT Services team
-- blog.benjojo.co.uk Benjojo's Blog
-- blog.davetcode.co.uk David Tyler's Blog - Technical writing mostly focused on emulating old systems.
-- www.examinerlive.co.uk YorkshireLive - Yorkshire News, Sport, Events & more
-- www.hybridlogic.co.uk HybridLogic
-- mukulrathi.co.uk Mukul's Personal Website
-- www.tomanthony.co.uk Tom Anthony - SEO, Web Development and Research
-- oli.me.uk Oliver Caldwell's blog
-- www.wilfred.me.uk Wilfred Hughes::Blog
-- blog.scienceandindustrymuseum.org.uk Science and Industry Museum blog -
-- blogs.bl.uk British Library Blog
-- cyberhost.uk CyberHost - Tech Blogs and Tutorials
-- darrenparkinson.uk Darren Parkinson - Darren Parkinson
-- blog.roastidio.us Roastidio.us Blog
-- blog.zoom.us The latest insights on how the world connects | Zoom Blog
-- incisive.vc Incisive Ventures – Your partner for growth
-- blog.mastodon.world Mastodon.world Blog
-- blog.yoav.ws Yoav's blog thing
-- ellie.wtf Ellie's Blog
-- cedwards.xyz Connor's Blog
-- blog.dataparty.xyz blog.dataparty
-- engineeringblogs.xyz Engineering Blogs
-- gazoche.xyz Gazoche's blog
-- www.henrikkarlsson.xyz Escaping Flatland | Henrik Karlsson | Substack
-- stephan.lachnit.xyz Stephan Lachnit | Blog
-- lukesmith.xyz Luke's Webpage
-- blog.sulami.xyz Welcome - sulami's blog
-- blog.youtube YouTube Blog — Official Blog for Latest YouTube News & Insights
-- fuckthatshit.co.za FUCK THAT SHIT FUCK THAT SHIT - A blog about ideas, things and 💩
-- blog.freeradical.zone Free Radical Blog
-- mango.pdf.zone the mango zone
+- https://blog.abacus.ai The Abacus.AI Blog
+- https://blog.eleuther.ai EleutherAI Blog
+- https://blog.fixie.ai Fixie.ai Blog
+- https://simpleblog.ai Create a Simple Blog in seconds, Post From Google Docs, Office 365.
+- https://www.softwine.ai Stay curious about wine tech | softwine
+- https://decomposition.al decomposition ∘ al
+- https://chie.app Chie
+- https://holyswift.app Holy Swift
+- https://blog.railway.app Railway Blog
+- https://boot-and-shoe.vercel.app Boot & Shoe Blog
+- https://www.encrypted.at en|crypted.at – Private tech and tutorial blog
+- https://blog.haschek.at Futurelopment
+- https://blog.sigma-star.at Company Blog - sigma star gmbh
+- https://ruscur.au ruscur's blog
+- https://engineering.kablamo.com.au Kablamo Engineering Blog | Kablamo Engineering Blog
+- https://fy.blackhats.net.au Firstyear's blog-a-log
+- https://there.oughta.be There oughta be…
+- https://ma.ttias.be Mattias Geniar
+- https://adamnash.blog Psychohistory | The personal blog of Adam Nash
+- https://alistair.blog alistair smith • blog
+- https://appventuretime.blog Appventure Time
+- https://bb-i.blog Kontrowersyjny blog – O polityce i historii trochę inaczej
+- https://cmart.blog cmart's blog
+- https://www.ctrl.blog Ctrl blog by Daniel Aleksandersen
+- https://dkb.blog DKB Blog | Dmitri Brereton | Substack
+- https://github.blog The GitHub Blog - Updates, ideas, and inspiration from GitHub to help developers build and design software.
+- https://handwritten.blog handwritten.blog
+- https://locationtbd.home.blog To Be Determined – by Carson Lansdowne
+- https://hypersphere.blog Hypersphere
+- https://kimmo.blog Web-focused software development - kimmo.blog
+- https://latlong.blog Lat × Long
+- https://mmapped.blog mmap(blog)
+- https://nicheless.blog Nicheless | Think. Write away.
+- https://pixelfed.blog Pixelfed Blog
+- https://raku-advent.blog Raku Advent Calendar – Raku is a multi-paradigm language where there's more than one way to do it
+- https://rez0.blog home · rez0
+- https://scottaaronson.blog Shtetl-Optimized
+- https://seths.blog Seth's Blog
+- https://newsletter.smarter.blog Smarter.Blog Newsletter | Mahesh | Substack
+- https://stackoverflow.blog The Stack Overflow Blog - Stack Overflow
+- https://www.sudarkoff.blog George Sudarkoff's Blog | Substack
+- https://thetechtrailblazer.blog The Tech Trailblazer – A Sane Software Engineering blog
+- https://tim.blog The Blog of Author Tim Ferriss - Tim Ferriss's 4-Hour Workweek and Lifestyle Design Blog. Tim is an author of 5 #1 NYT/WSJ bestsellers, investor (FB, Uber, Twitter, 50+ more), and host of The Tim Ferriss Show podcast (400M+ downloads)
+- https://twdev.blog twdev.blog
+- https://hypatia.ca hypatia dot ca – Leigh Honeywell's Blog
+- https://blog.jonlu.ca JonLucaâs Blog | JonLucaâs Blog - A blog about tech, programming, and finance
+- https://blog.peterzhu.ca Peter Zhu
+- https://pvk.ca Paul Khuong: some Lisp
+- https://schroer.ca Dominick Schroer's Blog
+- https://backend.cafe Backend Cafe
+- https://blog.arduino.cc Arduino Blog
+- https://pickard.cc chris pickard's weblog
+- https://postimg.cc Postimages — free image hosting / image upload
+- https://blog.frankel.ch A Java geek
+- https://blog.reds.ch REDS blog – REDS Institute, HEIG-VD
+- https://blog.spatial.chat SpatialChat Blog | Online space for virtual events, offices, parties
+- https://blog.massdriver.cloud Massdriver Blog
+- https://secret.club secret club | We Break Software
+- https://blog.charliemeyer.co Charlie Meyer's Blog
+- https://blog.coscreen.co The Pair Programming Blog (Page 1)
+- https://notepin.co Notepin - Extremely simple blogging platform
+- https://blog.skypilot.co SkyPilot Blog
+- https://www.timr.co Tim Ruffles' blog
+- https://travelhungry.co Travel Hungry: Great Tastes From Stuttgart & Beyond
+- https://blog.thea.codes Blog - Stargirl (Thea) Flowers
+- https://1299651405.com Conor Bergin's Blog
+- https://blog.1password.com Blog | 1Password
+- https://dev.37signals.com 37signals Dev — How we do, what we do
+- https://Outstatic.com Outstatic - A Static Site CMS for Next.js
+- https://aaronhertzmann.com Aaron Hertzmann’s blog | Aaron Hertzmann’s blog
+- https://abstractexpr.com Abstract Expression – Software Development Blog
+- https://blog.adacore.com The AdaCore Blog
+- https://blog.adamchalmers.com A Less Mad March
+- https://blog.adobe.com Welcome to the Adobe Blog
+- https://www.afrugaldoctor.com A Frugal Doctor
+- https://tech.ahrefs.com Ahrefs
+- https://aigarius.com Aigarius Blog
+- https://blog.airsequel.com Blog | Airsequel
+- https://www.aiweirdness.com AI Weirdness
+- https://www.akshaykhot.com Akshay's Blog
+- https://alexcabal.com Alex Cabal
+- https://www.alexcrompton.com Alex Crompton
+- https://www.alexmolas.com Alex Molas
+- https://alexsidorenko.com Home | Alex Sidorenko
+- https://almirvuk.com Almir Vuk | Blog & Website
+- https://andreizgirvaci.com Blog | Andrei Zgîrvaci
+- https://andrewpillar.com Andrew Pillar's Blog
+- https://www.anildash.com Anil Dash
+- https://oldblog.antirez.com antirez weblog
+- https://antoinevastel.com Antoine Vastel Blog
+- https://blog.appsignal.com The latest on everything AppSignal | AppSignal Blog
+- https://blog.aquasec.com Cloud native applications security
+- https://arcadeblogger.com The Arcade Blogger
+- https://ashvardanian.com Ash's Blog
+- https://research.atspotify.com Spotify Research - Spotify’s official research blog : Spotify Research
+- https://austinhenley.com Austin Z. Henley
+- https://www.autoblog.com Autoblog is part of the Yahoo family of brands
+- https://blog.azirevpn.com AzireVPN Blog
+- https://www.bartoszsypytkowski.com Bartosz Sypytkowski
+- https://blog.bassemdy.com Ramblings of a self-taught software engineer
+- https://batsov.com (think)
+- https://bbarrows.com Brad Barrows' Blog
+- https://belaycpp.com Belay the C++ – A blog talking about (usually bad) practices in C++
+- https://bennuttall.com Ben Nuttall - Software engineer
+- https://bertrandmeyer.com Bertrand Meyer's technology+ blog Bertrand Meyer's technology+ blog - Software engineering, programming methodology, languages, verification, general technology, publication culture, and more
+- https://bikerglen.com Photons, Electrons, and Dirt | A blog by Glen Akins
+- https://billprin.com Bill Prin - Software engineer and entrepeneur
+- https://billwadge.com Bill Wadge's Blog | Just another WordPress.com site
+- https://blogs.bing.com Bing Blogs | Home
+- https://blog.bioware.com BioWare Blog – A look at story-based gaming
+- https://www.bitestring.com Posts - Bitestring's Blog
+- https://blog.bitfinex.com The Bitfinex Blog
+- https://blog.bitmex.com Homepage | BitMEX Blog
+- https://blog.bitnami.com Bitnami Blog
+- https://agileotter.blogspot.com Agile Otter Blog
+- https://airlied.blogspot.com Dave Airlie Linux Graphics blog
+- https://avodonosov.blogspot.com blog
+- https://googleblog.blogspot.com The Keyword | Google Product and Technology News and Stories
+- https://nikmav.blogspot.com nmav's Blog
+- https://ptspts.blogspot.com pts.blog
+- https://richg42.blogspot.com Richard Geldreich's Blog
+- https://steamtraen.blogspot.com Nick Brown's blog
+- https://steve-yegge.blogspot.com Stevey's Blog Rants
+- https://writingball.blogspot.com The Typewriter Revolution blog
+- https://www.blogto.com blogTO
+- https://blogs.bmj.com BMJ Blogs BMJ Blogs - Insights and opinion on the latest news and research
+- https://www.boatblurb.com Boating News & Information | BoatBlurb Blog & Newsletter
+- https://borncity.com BornCity – BÃ¼cher, Blogs und Computer Know-How
+- https://www.brightball.com Brightball
+- https://www.bunniestudios.com bunnie's blog
+- https://bytecellar.com Byte Cellar - The Vintage Computing Weblog
+- https://cabel.com cabel.com – A blog from Cabel Sasser
+- https://calnewport.com Author of Deep Work, Study Hacks Blog - Cal Newport
+- https://www.calnewport.com Author of Deep Work, Study Hacks Blog - Cal Newport
+- https://canolcer.com Can's blog
+- https://canvatechblog.com Canva Engineering Blog
+- https://blog.cedriccharly.com Cedric Charly's Blog
+- https://ceronman.com Manuel Cerón – A blog mostly about programming languages
+- https://blog.checkpoint.com Check Point Blog - Cyber Security News, Research & Trends
+- https://chidiwilliams.com Chidi Williams
+- https://blog.chiselstrike.com Redirecting to https://blog.turso.tech/
+- https://chreke.com chreke's blog
+- https://chriskiehl.com Home - Blogomatano
+- https://chriswarrick.com Blog | Chris Warrick
+- https://circleid.com CircleID - Breaking Internet News, Opinions and Blogs
+- https://blogs.cisco.com Cisco Blogs
+- https://clagnut.com Clagnut by Richard Rutter
+- https://www.claudiokuenzler.com yet another tech-blog - made in Switzerland
+- https://clementneo.com Clement Neo - Blog
+- https://blog.cloudflare.com The Cloudflare Blog
+- https://blog.clubhouse.com Clubhouse Blog
+- https://codahale.com Coda Hale writes things. | codahale.com
+- https://code-held.com Blog | Backendhance
+- https://blog.codeanywhere.com Blog · Codeanywhere
+- https://blog.codesolvent.com Codesolvent Blog
+- https://www.codex99.com Codex 99
+- https://blog.codinghorror.com Coding Horror
+- https://cogdogblog.com CogDogBlog – Alan Levine barks about and plays with stuff here
+- https://www.computerweekly.com Computer Weekly | Information Technology (IT) News, UK IT Jobs, Industry News
+- https://connortumbleson.com Connor Tumbleson
+- https://copyrightlately.com Copyright Lately | Creative Law For Curious People
+- https://corporalfrisk.com Corporal Frisk – Finnish blogger in reserve, defence and national security.
+- https://www.coryzue.com Cory Zue | Full-Stack Developer, Maker of Products, and Solopreneur
+- https://www.countbayesie.com Count Bayesie - A Probability Blog
+- https://crankyflier.com Cranky Flier – An Airline Industry Blog
+- https://crocidb.com CrociDBlog - A blog about programming, gamedev, hacking projects, creative code, photography and my thoughts. Written by Bruno Croci.
+- https://www.crosswordunclued.com Crossword Unclued
+- https://daedtech.com Stories about Software
+- https://danlebrero.com Daniel Lebrero Berna Blog
+- https://www.dannydutch.com Quite Interesting - DannyDutch
+- https://dariusforoux.com Darius Foroux | Weekly ideas to become smarter and wealthier
+- https://james.darpinian.com James Darpinian's blog | James Darpinian
+- https://securitylabs.datadoghq.com Home | Datadog Security Labs
+- https://datalars.com datalars
+- https://davekilian.com Dave Kilian's Blog
+- https://daverupert.com The Homepage of Dave Rupert | daverupert.com
+- https://tech.davis-hansson.com Jacob Davis-Hansson
+- https://debugagent.com Java, Debugging, DevOps & Open Source
+- https://www.deepakg.com Deepak Gulati's blog
+- https://denvergazette.com Denver News, Sports & Business | Denver Gazette, N
+- https://developmentfriendly.com Development Friendly – Coding and web development advice for all.
+- https://www.dewanahmed.com Dewan's Blog
+- https://blog.discord.com Discord Blog
+- https://disrel.com Frog Guy Rants | Blog
+- https://blog.dopt.com Blog — Dopt
+- https://technology.doximity.com Doximity Technology Blog
+- https://blog.doyensec.com Doyensec's Blog
+- https://www.dquach.com Dan Quach Blog
+- https://drewdevault.com Drew DeVault's blog
+- https://blog.dropbox.com Work in Progress | Dropbox Blog
+- https://duarteocarmo.com Duarte O.Carmo
+- https://blog.duolingo.com Duolingo Blog | Writing about the best way to learn a language
+- https://tech.ebayinc.com Tech Blog - eBay Inc.
+- https://www.edn.com EDN - Voice of the Engineer
+- https://www.eigenbahn.com Home | Eigenbahn blog
+- https://blog.eikondevice.com Eikon Blog
+- https://blog.eladgil.com Elad Blog | Substack
+- https://www.electronicdesign.com Home | Electronic Design
+- https://blogs.embarcadero.com Embarcadero RAD Studio, Delphi, & C++Builder Blogs
+- https://emiruz.com Emir's blog
+- https://www.erichgrunewald.com Erich Grunewald's Blog
+- https://ericlippert.com Fabulous adventures in coding | Eric Lippert's blog
+- https://ericsink.com Selected Blog Posts
+- https://eukaryotewritesblog.com Eukaryote Writes Blog | Risk, research, and life as a membrane-bound organism
+- https://www.europereloaded.com The Liberty Beacon | Bringing Alternative Media Sources Together™
+- https://evhaste.com Haste Makes Waste – Sincerity is a required field.
+- https://explained-from-first-principles.com Explained from First Principles
+- https://explorationsofstyle.com Explorations of Style | A Blog about Academic Writing
+- https://www.expunctis.com Blog entries | Lineae ex punctis
+- https://blog.ezyang.com ezyang’s blog
+- https://blog.fahhem.com Fahhem's Blog – An intermittent post of thoughts
+- https://engineering.fb.com Engineering at Meta - Engineering at Meta Blog
+- https://www.fearofoblivion.com Fear of Oblivion
+- https://florentcrivello.com Flo Crivello
+- https://www.fluentcpp.com Fluent C++ - Jonathan Boccara's blog
+- https://blog.fluxninja.com Blog | FluxNinja Aperture
+- https://www.forrestthewoods.com ForrestTheWoods - Home
+- https://blog.forret.com blog.forret.com · Peter Forret
+- https://www.fortressofdoors.com Fortress of Doors
+- https://www.fosspatents.com FOSS Patents
+- https://fromdevtodev.com OneBite.Dev - Coding blog in a bite size
+- https://www.gatesnotes.com Home | Bill Gates
+- https://gavinhoward.com Gavin D. Howard
+- https://www.geekmetaverse.com Geek Metaverse News – AI, Crypto, Metaverse, NFT, Tech, Web3, Gaming and Reviews
+- https://blog.get-merit.com The Merit Blog
+- https://blog.getbootstrap.com Bootstrap Blog · Official blog for the Bootstrap framework.
+- https://blog.getclearspace.com clearspace blog
+- https://blog.gingerbeardman.com ⌘I  Get Info
+- https://girliemac.com GirlieMac! Blog
+- https://blog.gitea.com Blog | Gitea Blog
+- https://blog.gitguardian.com GitGuardian Blog
+- https://blog.glowforge.com The Glowforge Blog -
+- https://ai.googleblog.com Google Research Blog
+- https://android-developers.googleblog.com Android Developers Blog
+- https://developers.googleblog.com Google for Developers Blog - News about Web, Mobile, AI and Cloud
+- https://opensource.googleblog.com Google Open Source Blog
+- https://security.googleblog.com Google Online Security Blog
+- https://testing.googleblog.com Google Testing Blog
+- https://grantisom.com Grant Isom
+- https://www.greyblake.com Posts | Serhii Potapov (greyblake)
+- https://www.hanselman.com Scott Hanselman - Coder, Blogger, Teacher, Speaker, Author
+- https://hashrust.com HashRust - experience the joy of Rust
+- https://healeycodes.com Blog — Andrew Healey
+- https://heathermeeker.com Copyleft Currents – A blog about open source software licensing
+- https://hedgehoglibrarian.com Hedgehog Librarian – Tales of a Prickly, Nocturnal Infodiva
+- https://henrikwarne.com Henrik Warne's blog | Thoughts on programming…
+- https://hotair.com HotAir – Politics, Culture, Media, Breaking News from a conservative viewpoint
+- https://blog.hubspot.com HubSpot Blog | Marketing, Sales, Agency, and Customer Success Content
+- https://hypirion.com hyPiRion
+- https://blog.iconfactory.com The Breakroom • A blog for the Iconfactory
+- https://idiallo.com Programming from the human perspective By Ibrahim Diallo
+- https://idiotlamborghini.com IdiotLamborghini
+- https://www.idontplaydarts.com Application Security
+- https://blog.imaginationtech.com Imagination Blog
+- https://timesofindia.indiatimes.com News - Latest News, Breaking News, Bollywood, Sports, Business and Political News | Times of India
+- https://blog.ioces.com The Blog of Matt
+- https://ipde.com IP/DE | A Blog About Intellectual Property Litigation and the District of Delaware
+- https://www.irwincollier.com Irwin Collier's Blog, Economics in the Rear-view Mirror
+- https://blog.isquaredsoftware.com Mark's Dev Blog
+- https://jakearchibald.com Blog - JakeArchibald.com
+- https://jakecoppinger.com Jake Coppinger
+- https://blog.janestreet.com Jane Street Tech Blog
+- https://jarvispowered.com Derek Jarvis' Blog
+- https://jaykmody.com Jay Mody
+- https://www.jeremiak.com 👋🏻 - Jeremia on the internet
+- https://www.jeremymorgan.com Jeremy's Programming Blog
+- https://www.jeremyong.com Jeremy's Blog
+- https://www.jernesto.com Juan Ernesto Blog
+- https://jesseduffield.com Pursuit Of Laziness – A blog by Jesse Duffield
+- https://blog.jetbrains.com JetBrains Blog: The Drive to Develop
+- https://blog.jim-nielsen.com Jim Nielsen’s Blog
+- https://jimclair.com Jim Clair – Blog
+- https://jlongster.com James Long - blog & knowledge graph
+- https://www.joannejacobs.com Joanne Jacobs on Education and Parenting
+- https://www.joelonsoftware.com Joel on Software
+- https://johnathannader.com Johnathan Nader
+- https://johnnyreilly.com johnnyreilly | johnnyreilly
+- https://johnnysswlab.com Welcome to Johnny's Software Lab! - Johnny's Software Lab
+- https://blog.johnqian.com John Qian's blog
+- https://www.joseferben.com Josef Erben's Blog
+- https://www.joshcsimmons.com The Blog of Dr. Josh C. Simmons
+- https://blog.jquery.com Official jQuery Blog | New Wave Javascript
+- https://k3tan.com A personal blog | k3tan.com
+- https://kabirgoel.com Kabir Goel
+- https://blog.kagi.com Kagi Blog
+- https://karimjedda.com Karim Jedda - Personal blog
+- https://blog.kellybrazil.com Home - Brazil's Blog
+- https://kinduff.com Casa | Alejandro AR (kinduff)
+- https://blog.kraken.com Kraken Blog
+- https://kumazen.com KumaZen - KumaZen
+- https://laravel-news.com Laravel News
+- https://blog.lastpass.com The LastPass Blog - The Last Password You'll Ever Need
+- https://blog.ldodds.com Lost Boy – The blog of @ldodds
+- https://leonidasv.com leonidasv.com
+- https://www.lesswrong.com LessWrong
+- https://www.leteyski.com Leteyski's blog
+- https://letmypeoplecode.com LetMyPeopleCode.com – A blog about software, schmaltz, and monkey-patches for the soul
+- https://www.linuxuprising.com Linux Uprising Blog
+- https://blog.littlepolygon.com Little Polygon Game Dev Blog
+- https://retro-futurism.livejournal.com Ретрофутуризм. Retrofuturism — LiveJournal
+- https://blog.logrocket.com LogRocket Blog - Resources to Help Product Teams Ship Amazing Digital Experiences
+- https://lopespm.com Byte Tank - Pedro Lopes Blog
+- https://www.lpalmieri.com Luca Palmieri
+- https://lucaskostka.com Random thoughts from Lucas Kostka
+- https://lucaspauker.com Lucas' Blog
+- https://luciditysystems.com Lucidity
+- https://macwright.com macwright.com
+- https://markessien.com Mark Essien | Home
+- https://tech.marksblogg.com Tech Blog
+- https://markuta.com Markuta
+- https://www.math3ma.com Math3ma
+- https://maxleiter.com Max Leiter
+- https://blog.medium.com The Medium Blog
+- https://datafinnovation.medium.com DataFinnovation - ChainArgos - 4AC – Medium
+- https://doctorow.medium.com Cory Doctorow – Medium
+- https://jeff-kaye.medium.com Jeffrey Kaye – Medium
+- https://kjhealey.medium.com Kieran Healey – Medium
+- https://netflixtechblog.medium.com Netflix Technology Blog – Medium
+- https://blog.meilisearch.com Meilisearch Blog
+- https://underthehood.meltwater.com under the hood - Meltwater Engineering Blog
+- https://interrupt.memfault.com Interrupt | A community and blog for embedded software makers
+- https://blog.metaobject.com metablog
+- https://micahflee.com Micah Lee's blog
+- https://blog.fabric.microsoft.com Blog usługi Microsoft Fabric
+- https://blogs.microsoft.com The Official Microsoft Blog
+- https://cloudblogs.microsoft.com Home - Cloud Perspectives Blog
+- https://devblogs.microsoft.com DevBlogs - Microsoft Developer Blogs
+- https://blog.mikeswanson.com Mike Swanson's Blog
+- https://blog.mikrotik.com MikroTik blog
+- https://minimaxir.com Max Woolf's Blog
+- https://www.mishalaskin.com About
+- https://mmazzarolo.com Matteo Mazzarolo
+- https://modernescpp.com MC++ BLOG – Der Blog für Modernes C++ von Rainer Grimm
+- https://moretothat.com More To That
+- https://www.mrdbourke.com Daniel Bourke
+- https://mxgrn.com Blog · Max Gorin
+- https://blog.myscale.com Post | MyScale | Blog
+- https://www.nakedcapitalism.com naked capitalism: Finance, economics, politics, power
+- https://research.nccgroup.com NCC Group Research Blog | Making the world safer and more secure
+- https://nedbatchelder.com Ned Batchelder
+- https://blog.neeto.com neeto blog | Neeraj Singh | Substack
+- https://blog.nestybox.com Nestybox Blog Site | Articles about running Docker, Kubernetes, and more inside containers, easily and securely.
+- https://netflixtechblog.com Netflix TechBlog
+- https://www.networkworld.com Welcome to Network World.com
+- https://blog.newsblur.com The NewsBlur Blog | A new sound of an old instrument
+- https://nickjanetakis.com From Development to Production — Nick Janetakis
+- https://nickolinger.com Nick Olinger's blog | Software Engineer
+- https://nicolodavis.com nicolodavis.com
+- https://www.nihamkin.com Artium Nihamkin's Blog
+- https://www.nileshonly.com Blog by Nilesh
+- https://blog.nindalf.com Krishna Sundarram
+- https://nipponrama.com Nipponrama - Blog about Japan and Japanese pop culture
+- https://www.noahlebovic.com NL
+- https://www.noamlerner.com Noam Lerner's Blog
+- https://blog.nobugware.com Fabrice Aneche
+- https://florian.noeding.com Florian Noeding's blog · Florian Noeding's blog
+- https://norasandler.com Nora Sandler
+- https://www.npopov.com nikic's Blog
+- https://blog.nuclearsecrecy.com Restricted Data: The Nuclear Secrecy Blog
+- https://blogs.nvidia.com NVIDIA Blog
+- https://blog.oddbit.com blog.oddbit.com
+- https://blog.opencagedata.com OpenCage blog - what's new at OpenCage
+- https://blog.oppedahl.com Ant-like Persistence - Carl Oppedahl's blog
+- https://blogs.oracle.com Oracle Blogs
+- https://orangejuiceliberationfront.com Orange Juice Liberation Front | Uliâs blog on programming, game development, pop culture and other boring things.
+- https://oschvr.com oschvr.com
+- https://blog.otterstack.com Danny's Blog
+- https://blog.oup.com OUPblog | Oxford University Press’s Academic Insights for the World
+- https://www.overcomingbias.com Overcoming Bias | Robin Hanson | Substack
+- https://palmerluckey.com The Blog of Palmer Luckey – The #1 Palmer Luckey Blog on the Internet
+- https://blog.patreon.com Patreon Blog
+- https://paulstamatiou.com Technology, Design and Photography — PaulStamatiou.com
+- https://www.peterullrich.com Peter Ullrich - Elixir Developer and Bicycle Activist
+- https://phauer.com Philipp Hauer's Blog - Engineering Management, Java Ecosystem, Kotlin, Sociology of Software Development
+- https://blog.phronemophobic.com Phronemophobic's Blog
+- https://blog.physics-astronomy.com Blog By Physics-Astronomy
+- https://picolisp-explored.com PicoLisp Blog
+- https://pilabor.com Tech-Tutorials, Howtos and buying advice
+- https://piotrduperas.com Blog by Piotr Duperas
+- https://blog.pocketcasts.com Pocket Casts Blog
+- https://pointersgonewild.com Pointers Gone Wild | A blog about programming, technology and society.
+- https://blog.postman.com All Things API: News, Tutorials & More | Postman Blog
+- https://www.primevideotech.com Prime Video Tech | The tech blog about innovation at Prime Video
+- https://www.programmerhat.com Programmer Hat | Programmer Hat Blog
+- https://www.progressandpurpose.com Progress and Purpose
+- https://blog.prusa3d.com Original Prusa 3D Printers - Company Blog
+- https://blog.pushbullet.com Pushbullet Blog
+- https://pxlnv.com Pixel Envy
+- https://blog.qualys.com Qualys Security Blog | Expert network security guidance and news
+- https://blog.quarkslab.com Quarkslab's blog
+- https://blog.quinefoundation.com QUINE Foundation Blog
+- https://www.quippd.com Asif Youssuff
+- https://blog.rachelbinx.com rachel binx ⤇ blog
+- https://rauljordan.com rauljordan::blog
+- https://reaganray.com Reagan Ray
+- https://blog.redplanetlabs.com Blog
+- https://blog.replit.com Replit - Blog
+- https://studio.ribbonfarm.com Ribbonfarm Studio | Venkatesh Rao | Substack
+- https://www.righto.com Ken Shirriff's blog
+- https://www.robinlinacre.com Robin Linacre's blog: Post list
+- https://blog.roblox.com Roblox Blog - All the latest news direct from Roblox employees.
+- https://blog.roboflow.com Roboflow Blog
+- https://weblog.rogueamoeba.com Rogue Amoeba - Under the Microscope
+- https://www.roughtype.com ROUGH TYPE | Nicholas Carr's blog
+- https://rssfeedasap.com RSS Feed Extractor - Get an RSS feed of almost anything
+- https://blog.saeloun.com Ruby on Rails Consulting Company based in Boston | Saeloun Blog | Page 1 | Saeloun Blog
+- https://sahbichaieb.com Home | Sahbi Chaieb
+- https://blog.sakugabooru.com Sakuga Blog – The Art of Japanese Animation
+- https://www.sandiegocriminallawyersblog.com San Diego Criminal Lawyers Blog — Published by San Diego, California Criminal Attorneys — Law Offices of David M. Boertje
+- https://blogs.scientificamerican.com Scientific American Blog Network - Scientific American Blog Network
+- https://blog.scottlogic.com Scott Logic Blog
+- https://www.scottsantens.com Scott Santens' Universal Basic Income Guide
+- https://secretartofscience.com Secret Art of Science
+- https://securelist.com Securelist | Kaspersky’s threat research and reports
+- https://symantec-enterprise-blogs.security.com Symantec Enterprise Blogs
+- https://shaunoconnell.com ShaunOConnell.com – GP | Commissioner | Coach & Mentor | Blogger
+- https://siboehm.com siboehm
+- https://sigmoidprime.com sigmoid prime
+- https://signalprocessingjobs.com HardwareTeams.com - The #1 job board and blog for electrical and computer engineers. | HardwareTeams.com
+- https://blog.simutrans.com The Simutrans Blog
+- https://sirupsen.com Simon Eskildsen - Sirupsen
+- https://slimemoldtimemold.com SLIME MOLD TIME MOLD – Mad Science Blogging
+- https://softwaredoug.com Doug Turnbull's Blog
+- https://www.softwaremaxims.com Musings about software | The Blog of Thomas Depierre, Elixir and DevOps consultant.
+- https://www.somebits.com Nelson's Weblog
+- https://spreadprivacy.com Spread Privacy
+- https://blog.standardnotes.com Decrypted | Standard Notes
+- https://startafuckingblog.com Start a Fucking Blog
+- https://steipete.com steipete's blog
+- https://www.stephendiehl.com Home
+- https://osblog.stephenmarz.com Stephen Marz: Blog
+- https://stephenn.com Stephen's Tech Blog
+- https://steven-giesel.com Steven Giesel
+- https://blog.stmcyber.com STM Cyber Blog - R&D Team
+- https://www.stylewarning.com stylewarning's screed
+- https://aheze.substack.com Andrew's Substack | Andrew Zheng | Substack
+- https://davekarpf.substack.com The Future, Now and Then | Dave Karpf | Substack
+- https://eigenrobot.substack.com eigenrobot,s Blog | Substack
+- https://ihavemanythoughts.substack.com I have thoughts | Thomas Poinsot | Substack
+- https://joeposnanski.substack.com JoeBlogs | Joe Posnanski | Substack
+- https://molecularspec.substack.com Molecular Spectacular | Adomas Malaiska | Substack
+- https://mukdde.substack.com muk’s Newsletter | Substack
+- https://philosophybear.substack.com Philosophy bear | Substack
+- https://ramapascala.substack.com A Blog For The Anthropocene | Rama Pascala | Substack
+- https://skunkledger.substack.com Skunk Ledger | BLAP | Substack
+- https://skybrian.substack.com Skybrian’s Blog | Substack
+- https://substack.com Substack - A new economic engine for culture
+- https://theap.substack.com The AP (Alex Pareene) Newsletter | Substack
+- https://thebuilderjr.substack.com JR’s Newsletter | Substack
+- https://yonom.substack.com Simon's Blog | Simon Farshid | Substack
+- https://www.svgbackgrounds.com Customize and apply backgrounds fast | SVG Backgrounds
+- https://blog.syncpup.com Syncpup.com Blog - Sync' up! ... without getting drained
+- https://blog.system76.com System76 Blog
+- https://tech.target.com Target Tech Blog
+- https://tasshin.com Tasshin
+- https://tderflinger.com Thomas Derflinger Blog
+- https://techdows.com Techdows - Latest Technology News
+- https://www.technoblogy.com Technoblogy
+- https://blog.tempus-ex.com Tempus Ex Blog
+- https://misc-stuff.terraaeon.com The Miscellaneous Stuff Blog
+- https://blog.testdouble.com Test Double | Blog | Articles and Screencasts
+- https://ascii.textfiles.com ASCII by Jason Scott
+- https://theaudioowl.com Blog - The Audio Owl
+- https://www.thecarconnection.com New Cars, Car Reviews, Car Shows, Car Photos - The Car Connection
+- https://www.thecustomdroid.com TheCustomDroid - Android Tutorials, Tips and Tricks
+- https://www.thegingerviking.com Marc Crouch - The Ginger Viking
+- https://www.thehistoryblog.com The History Blog
+- https://www.theinsaneapp.com Insane - TheInsaneApp.com
+- https://themythicalengineer.com The Mythical Engineer | Blog about Software Engineering
+- https://theprivacydad.com Welcome to The Privacy Dad's Blog!
+- https://www.theturnsignalblog.com The Turn Signal
+- https://blog.thevinter.com About
+- https://registerspill.thorstenball.com Register Spill | Thorsten Ball | Substack
+- https://blog.tigrisdata.com Tigris Blog | Tigris
+- https://blog.timescale.com Timescale Blog
+- https://www.timesofisrael.com The Times of Israel | News from Israel, the Middle East and the Jewish World
+- https://blog.tomayac.com Blogccasion
+- https://tomerfiliba.com Blog Posts
+- https://tomtunguz.com Tomasz Tunguz by @ttunguz
+- https://tech.townsourced.com Townsourced Tech Blog
+- https://blog.trailofbits.com Trail of Bits Blog
+- https://blog.treblle.com Treblle Blog | API Mission Control | Tech Blog
+- https://tritonstation.com Triton Station – A Blog About the Science and Sociology of Cosmology and Dark Matter
+- https://trstringer.com Thomas Stringer
+- https://gentlier.tumblr.com Side Blog on Tumblr
+- https://iquantny.tumblr.com I Quant NY
+- https://blog.twitter.com Blog
+- https://dilbertblog.typepad.com The Dilbert Blog
+- https://www.ufarooqi.com Umar Farooqi
+- https://blog.usmanity.com Notes from the Burrow
+- https://vanitynotes.com Vanity Notes - A blog about programming and socialism
+- https://vickiboykis.com Tech Blog | ★❤✰ Vicki Boykis ★❤✰
+- https://www.vinography.com Vinography : A Wine Blog
+- https://vivqu.com Vivian Qu
+- https://www.voitureblog.com   Voiture Blog: It's all about cars
+- https://lauren.vortex.com Lauren Weinstein's Blog
+- https://blog.waymo.com Waypoint - The official Waymo blog
+- https://blog.whatsapp.com WhatsApp Blog
+- https://whimsysoul.com Whimsy Soul - Find your everyday magic
+- https://whyevolutionistrue.com Why Evolution Is True – Why Evolution is True is a blog written by Jerry Coyne, centered on evolution and biology but also dealing with diverse topics like politics, culture, and cats.
+- https://will-keleher.com posts
+- https://notes.willhackett.com Will Hackett
+- https://wimpysworld.com Wimpy's World
+- https://win-vector.com Win Vector LLC – Data science advising, consulting, and training
+- https://blogs.windows.com Home | Windows Blog
+- https://www.windytan.com absorptions
+- https://artasillumination.files.wordpress.com Art as Illumination | An art blog from Jacob Rowan Studios
+- https://beatpatrol.wordpress.com The Beat Patrol | Music and Beat literature-related blogsite
+- https://bigdanzblog.wordpress.com Big Dan the Blogging Man
+- https://brickexperimentchannel.wordpress.com Brick Experiment Channel
+- https://byorgey.wordpress.com blog :: Brent -> [String]
+- https://caseyhandmer.wordpress.com Casey Handmer's blog – Space, Travel, Technology, 3D Printing, Energy, Writing
+- https://deavid.wordpress.com DeavidSedice's blog – Thoughts about programming
+- https://dustingmixon.wordpress.com Short, Fat Matrices – a research blog by Dustin G. Mixon
+- https://fgiesen.wordpress.com The ryg blog | When I grow up I'll be an inventor.
+- https://gaodawei.wordpress.com 高大伟 David Cowhig's Translation Blog
+- https://gravityandlevity.wordpress.com Gravity and Levity | A blog about the big ideas in physics, plus a few other things
+- https://gustedt.wordpress.com Jens Gustedt's Blog
+- https://matthewfelgate.wordpress.com Matthew Felgate – My thoughts, electronics and adventures
+- https://microcorelabs.wordpress.com MicroCore Labs – Ted Fried's Project Blog
+- https://naveenarun.wordpress.com Naveen Arun's Blog
+- https://ntdotdev.wordpress.com NTDEV
+- https://queendomblog.wordpress.com Queendom Blog | Insight at your fingertips – www.queendom.com
+- https://randomascii.wordpress.com Random ASCII – tech blog of Bruce Dawson | Forecast for randomascii: programming, tech topics, with a chance of unicycling
+- https://scalibq.wordpress.com Scali's OpenBlog™ | Programming, graphics, hardware, maths, and that sort of thing
+- https://shaneosullivan.wordpress.com SOS – Shane O'Sullivan's technical blog… really ties the room together
+- https://stancarey.wordpress.com Sentence first | An Irishman's blog about the English language.
+- https://svbhallofshame.wordpress.com WordPress.com — Get a Free Blog Here
+- https://terraformindustries.wordpress.com Terraform Industries Blog – gigascale atmospheric hydrocarbon synthesis
+- https://thenextrecession.wordpress.com Michael Roberts Blog – blogging from a marxist economist
+- https://uselessdevblog.wordpress.com The Useless Dev blog – A useless blog from, and for, useless developers
+- https://vermaden.wordpress.com 𝚟𝚎𝚛𝚖𝚊𝚍𝚎𝚗 | Another ${RANDOM} sysadmin sharing his experiences of work at IT industry.
+- https://wordpress.com WordPress.com: Build a Site, Sell Your Stuff, Start a Blog & More
+- https://worldofmatthew.com WorldofMatthew
+- https://blog.xpnsec.com XPN InfoSec Blog
+- https://www.yannickoswald.com VC Europe I Yannick Oswald I Blog I European VC Musings
+- https://www.yet-another-blog.com Yet Another Blog
+- https://yishenggong.com Yisheng's blog – software engineering, poetry and short stories
+- https://blog.yoshuawuyts.com Yoshua Wuyts — Blog
+- https://blog.zaccohn.com Zachary Cohn – Zachary Cohn's Blog
+- https://www.zeptonaut.com zeptonaut
+- https://zserge.com zserge's blog
+- https://blog.zulip.com The Zulip Blog
+- https://www.zxch3n.com Zxch3n's Blog | Zxch3n
+- https://events.ccc.de CCC Event Blog
+- https://blog.datawrapper.de Datawrapper Blog
+- https://blogless.datenbrei.de Blogless â Writing Articles online without a Blog
+- https://blog.felixge.de Felix Geisendörfer
+- https://gorillasun.de Gorilla Sun
+- https://www.joachim-breitner.de Blog – Joachim Breitner's Homepage
+- https://blog.michael.kuron-germany.de Michael Kuron's Blog
+- https://blog.m5e.de M5E's Blog
+- https://blog.mnus.de minus' blog
+- https://scilogs.spektrum.de Tagebücher der Wissenschaft » SciLogs - Wissenschaftsblogs
+- https://www.amolas.dev My Blog – My WordPress Blog
+- https://avestura.dev Avestura's Blog
+- https://blog.axo.dev axo blog - Not every developer wants to be a web developer: Hello oranda!
+- https://blubsblog.bearblog.dev Blub's Blog
+- https://chatterhead.bearblog.dev Chatterhead Says
+- https://deijin.bearblog.dev ❀°。Deijin's Blog
+- https://herman.bearblog.dev ᕕ( ᐛ )ᕗ Herman's blog
+- https://klint.bearblog.dev Thoughtless Acts
+- https://nicky.bearblog.dev Nicky's Blog
+- https://onsclom.bearblog.dev 📚 Austin Merrick’s Blog
+- https://biriukov.dev 🏠 | Viacheslav Biriukov
+- https://blog.bithole.dev Adrian's Blog
+- https://blog.boleary.dev Brendan O'Leary
+- https://blog.boot.dev Boot.dev Blog
+- https://ecostack.dev Ecostack — a developer blog
+- https://fusectore.dev fusectore.dev | My blog on programming.
+- https://hamel.dev Hamel’s Blog
+- https://jmmv.dev Julio Merino (jmmv.dev)
+- https://jmorrice.dev John Morrice
+- https://kizu.dev Articles & Experiments by Roman Komarov
+- https://kodimensional.dev chshersh aka Dmitrii Kovanikov
+- https://kuenzi.dev The Twenty Percent
+- https://blog.langchain.dev LangChain
+- https://blog.lastmileai.dev lastmile ai — blog
+- https://news.livebook.dev Livebook.dev - The Livebook Blog
+- https://lunnova.dev lunnova.dev
+- https://blog.meadsteve.dev MeadSteve's Dev Blog – MeadSteve's Dev Blog
+- https://blog.mikemwanje.dev Mike Mwanje's Blog
+- https://blog.neko.dev Blog@neko.dev - blog.neko.dev
+- https://blog.orhun.dev Orhun's Blog
+- https://rbates.dev Ryan's Dev Blog
+- https://rmkit.dev rmkit
+- https://www.ruxu.dev Blog | Roger Oriol
+- https://scastiel.dev Sebastien Castiel · Developer, writer, indie hacker · 📍 Montreal, QC
+- https://blog.theabhishek.dev Verma Notes
+- https://wagslane.dev Lane's Blog
+- https://walid.dev Walid Ziouche
+- https://blog.warrant.dev Warrant Blog | Warrant Blog
+- https://blog.washi.dev Washi
+- https://julian.digital julian.digital
+- https://ooh.directory ooh.directory: a place to find good blogs that interest you
+- https://lakesare.brick.do Evgenia Karunus
+- https://noidea.dog No Idea Blog
+- https://blogs.chapman.edu Chapman Blogs | Chapman University
+- https://blogs.harvard.edu Weblogs at Harvard
+- https://corpgov.law.harvard.edu The Harvard Law School Forum on Corporate Governance | The leading online blog in the fields of corporate governance and financial regulation.
+- https://scopeblog.stanford.edu Scope | Stanford Medicine's blog - Scope
+- https://blogs.uoregon.edu University of Oregon – Educational blogs from our community
+- https://blog.seas.upenn.edu Penn Engineering Blog - Posts from the School of Engineering and Applied Science
+- https://ano.ee Esileht - Ants Nomm
+- https://ounapuu.ee ./techtipsy â Herman's blog
+- https://dri.es On digital experiences, Open Source, Open Web, Drupal, and our digital future | Dries Buytaert
+- https://cs-syd.eu CS SYD
+- https://theloop.ecpr.eu ECPR's Political Science Blog - The Loop
+- https://blog.europython.eu EuroPython Blog
+- https://www.reactivesystems.eu On Programming, Software Architecture, and Sociotechnical Systems
+- https://blog.rfox.eu Bystroushaak's blog
+- https://blog.silentsignal.eu Silent Signal Techblog
+- https://trojanczyk.eu Blog about business, startups, technology and digital transformation | Adam Trojanczyk
+- https://bergie.iki.fi Blog - Henri Bergius
+- https://blog.liw.fi blog.liw.fi
+- https://blog.payara.fish Blog | Payara
+- https://anicetnougaret.fr Anicet Nougaret's portfolio & blog.
+- https://www.lemonde.fr Le Monde.fr - Actualités et Infos en France et dans le monde
+- https://adriano.fyi Adriano Caloiaro's personal blog
+- https://brr.fyi brr
+- https://www.nan.fyi Not a Number
+- https://blog.google The Keyword | Google Product and Technology News and Stories
+- https://blogs.loc.gov Library of Congress Blogs | Blogs from the Library of Congress
+- https://blogs.nasa.gov NASA Blogs
+- https://www.lexx.gr Blog 🎤 Lexxman
+- https://blog.deckc.hair nandalism blog
+- https://blog.turquoise.health Turquoise Health Blog
+- https://dm.hn Hacker News Blogroll
+- https://sheep.horse Sheep.Horse - The Blog of Andrew Stephens
+- https://shinobi.bt.ht Shinobi Website | A text-based, RSS focused blogging "system"
+- https://git.ht GitHoot: blogging as simple as creating a GitHub gist
+- https://peter.czanik.hu Random thoughts of Peter 'CzP' Czanik
+- https://drb.ie Homepage - Essays, Blog Posts & Book Reviews - Dublin Review of Books
+- https://blog.glyph.im Deciphering Glyph :: index
+- https://notes.ghed.in Notes
+- https://www.downtoearth.org.in Down To Earth | Latest news, opinion, analysis on environment & science issues | India, South Asia
+- https://resources.fabric.inc fabric Blog | E-Commerce Blog About Scaling Commerce
+- https://blog.owulveryck.info Unladen swallow - Olivier Wulveryck
+- https://palant.info Almost Secure
+- https://petrovs.info Blago's blog
+- https://withinboredom.info Somewhere Within Boredom – A Site About Stuff
+- https://blog.ajour.io Simple Automation
+- https://blog.alexellis.io Alex Ellis' Blog
+- https://americanexpress.io American Express Technology
+- https://blog.angular.io Angular Blog
+- https://blog.appcensus.io The AppCensus Blog
+- https://axelp.io Axel’s Blog | Technical blog discussing reverse engineering, detections engineering, exploit development, capability development, and other cybersecurity topics.
+- https://blog.benton.io Andrew Benton's Blog
+- https://www.beren.io Beren's Blog - Thoughts on AI, Neuroscience, and other things that interest me.
+- https://blog.bigpicture.io The BigPicture.io Blog
+- https://bitbashing.io Bit Bashing
+- https://conduition.io Conduition
+- https://crawshaw.io crawshaw blog
+- https://www.eidel.io Home | Oliver Eidel
+- https://blog.elementary.io elementary Blog
+- https://blog.elevenlabs.io ElevenLabs | Blog
+- https://blog.everstrike.io Everstrike Blog
+- https://blog.exaloop.io Home | Exaloop blog
+- https://blog.ferretdb.io FerretDB Blog | FerretDB Blog
+- https://blog.getdaft.io Daft Blog | Sammy Sidhu | Substack
+- https://blog.gitea.io Blog | Gitea Blog
+- https://adam-mcdaniel-blog.github.io Adam | Blog
+- https://ahgamut.github.io Blog Needs a Name
+- https://alexanderameye.github.io Technical blog by Alexander Ameye.
+- https://alexandruburlacu.github.io Alex's occasional blog posts
+- https://alexxcons.github.io Alexxcon's Software Development Blog
+- https://alok.github.io Every Man a Debtor
+- https://ambiso.github.io ambiso's blog
+- https://arogozhnikov.github.io Brilliantly wrong (blog by Alex Rogozhnikov)
+- https://bkamins.github.io Blog by Bogumił Kamiński | Comments on things I find usable or interesting
+- https://claytonwramsey.github.io clayt | Clayton Ramsey’s blog. I’m a PhD student who likes to write about software. Copyright © 2023 Clayton Ramsey. All rights reserved.
+- https://cookieplmonster.github.io Silent’s Blog | A blog and portfolio of Silent
+- https://davidlaprade.github.io David Laprade | Blog
+- https://doridori.github.io SystemDotRun – Dorian Cussen's Super Blog
+- https://dragon863.github.io Dragon863 - Home
+- https://drtomasaragon.github.io Dr. Tomás Aragón - Population Health Blog
+- https://floooh.github.io The Brain Dump
+- https://frycos.github.io Frycos Security Diary | Blogging mainly
+- https://gavinray97.github.io Gavin Ray Blog
+- https://greydanus.github.io Natural Intelligence
+- https://hirrolot.github.io Hirrolot's Blog
+- https://iamkroot.github.io Krut's Blog
+- https://ixns.github.io MR IXNS | A simple blog where I dive into curious topics.
+- https://jackevansevo.github.io Jack's Blog
+- https://jasoneckert.github.io Jason Eckert's Website and Blog
+- https://johanwind.github.io The Good Minima | A blog about implicit biases in deep learning.
+- https://johnazariah.github.io John Azariah’s Blog | Ruminations of a partially-applied functional programmer…
+- https://josefbacik.github.io Josef Bacik’s Blog | Musings about current development work.
+- https://joshumax.github.io Josh Talk
+- https://kaleidawave.github.io Ben's Engineering Blog
+- https://karpathy.github.io Andrej Karpathy blog
+- https://kentindell.github.io Home | Dr. Ken Tindell
+- https://kevinzakka.github.io Kevin Zakka's Blog
+- https://kimono-koans.github.io kimono koans' blog!
+- https://kobzol.github.io Kobzol’s blog | Blog about programming stuff.
+- https://ktkaufman03.github.io Kai Kaufman's tech blog
+- https://leejo.github.io Blog Archive
+- https://lexi-lambda.github.io Alexis King’s Blog
+- https://litchipi.github.io Index | Blog of Litchi Pi
+- https://ludovicianul.github.io m's blog · We're all different. This is the only thing we have in common.
+- https://lukesalamone.github.io Luke Salamone's Blog
+- https://lwss.github.io LWSS Blog – Basement Dweller
+- https://matklad.github.io matklad
+- https://mcraiha.github.io Main Page | mcraiha.github.io
+- https://mnpn.github.io Mnpn
+- https://n-eq.github.io n-eq · Nabil Elqatib's blog
+- https://note89.github.io All posts | Note's on software
+- https://philpearl.github.io Phil Pearl's Blog
+- https://pkolaczk.github.io Home | Piotr Kołaczkowski
+- https://poignardazur.github.io PoignardAzur · Developer blog of Olivier Faure
+- https://pr0g.github.io Tom Hulton-Harrop | A programming blog
+- https://pvigier.github.io Blog | pvigier’s blog
+- https://raphlinus.github.io Raph Levien’s blog | Blog of Raph Levien.
+- https://rustylife.github.io Rustam Kovhaev's blog
+- https://shwestrick.github.io Work Hard, Span Easy | Parallelizing things is easy, but making them fast is hard. A blog about parallel algorithms, data structures, programming languages, and anything else that comes to mind. Written by Sam Westrick.
+- https://sohl-dickstein.github.io Jascha’s blog | This blog is intended to be a place to share ideas and results that are too weird, incomplete, or off-topic to turn into an academic paper, but that I think may be important. Let me know what you think! Contact links to the left.
+- https://stdnoerr.github.io stdnoerr's blog
+- https://taeric.github.io Josh Berry's Blog
+- https://trofi.github.io trofi's blog: /
+- https://twitchard.github.io Home - Richard Marmorstein
+- https://vstinner.github.io Victor Stinner blog 3
+- https://wsdookadr.github.io Blog
+- https://yanmaani.github.io yanmaani's blog
+- https://grady.io All posts | Grady Simon
+- https://blog.gruntwork.io Gruntwork
+- https://blog.interviewing.io Blog | interviewing.io
+- https://blog.jez.io Jake Zimmerman – Jake Zimmerman
+- https://blog.kroy.io blog.kroy.io – computers, tech, and whatever other random stuff crosses my mind.
+- https://blog.lfe.io LFE Blog - LFE Tutorials, News, & Updates
+- https://luajit.io Jinhua Blog
+- https://blog.meain.io meain/blog
+- https://blog.michaeldresser.io Michael Dresser’s blog
+- https://blogit.michelin.io Michelin IT Engineering Blog
+- https://blog.min.io MinIO Blog
+- https://blog.mithrilsecurity.io Mithril Security Blog
+- https://opensourcesecurity.io Open Source Security
+- https://blog.openziti.io OpenZiti Tech Blog
+- https://overreacted.io Overreacted — A blog by Dan Abramov
+- https://blog.packagecloud.io Page Packagecloud Blog
+- https://pboyd.io pboyd.io
+- https://blog.phylum.io Phylum | Research Blog
+- https://blog.readyset.io ReadySet Blog
+- https://blog.sentry.io Home | Product Blog • Sentry
+- https://stitcher.io Blog - stitcher.io
+- https://blog.streamlit.io Blog on Building & Sharing Data Apps | Streamlit Blog
+- https://blog.theapricot.io Apricot Blog
+- https://thephilbert.io Philip Herrons Personal Blog – Compilers and stuff
+- https://blog.trunk.io Trunk | Trunk Blog
+- https://vrite.io Vrite ï¼ headless CMS for technical content
+- https://blog.whimslab.io Yiming Cao – Medium
+- https://blog.wildcat.io WildCat's Blog
+- https://yager.io Home :: Will Yager
+- https://blog.znote.io Home | Znote blog
+- https://who.ldelossa.is | a.programming.blog
+- https://blog.timing.is timing blog
+- https://linus.schreibt.jetzt Linus's blog - Home
+- https://blog.jse.li Jesse Li
+- https://sadh.life Tushar's Blog
+- https://tushar.lol Tushar's Blog
+- https://www.adamtal.me Adam Tal's Blog
+- https://blainehansen.me Blaine Hansen
+- https://danq.me Dan Q â Personal blog of Dan Q: hacker, magician, geocacher, gamerâ¦
+- https://doumer.me Doumer's Blog - Learn, Build, Share and Innovate.
+- https://ernestas.me Interface
+- https://fhur.me About
+- https://jfhr.me jfhr's blog
+- https://laplab.me About | Nikita Lapkov
+- https://lemire.me Daniel Lemire's blog – Daniel Lemire is a computer science professor at the Data Science Laboratory of the Université du Québec (TÉLUQ) in Montreal. His research is focused on software performance and data engineering. He is a techno-optimist and a free-speech advocate.
+- https://blog.matthieud.me Matthieu's blog
+- https://muhammadraza.me Muhammad | Personal Blog where I write about things I learn or discover.
+- https://btm.qva.mybluehost.me a blog by biggiemac42
+- https://petevilter.me Pete's Blog
+- https://blog.pkh.me ubitux/blog
+- https://ruky.me Rukshan's Blog - Personal Blog of Rukshan
+- https://blog.ryotak.me RyotaK's Blog - 技術的な話とか
+- https://michal.sapka.me [MichaÅ Sapka's website]
+- https://blog.shalvah.me Shalvah's Blog
+- https://leonid.shevtsov.me The homepage of Leonid Shevtsov - systems architect, software enthusiast and philosopher. Opinions, tips and case studies
+- https://blog.thefrenchghosty.me TheFrenchGhosty's Blog
+- https://thesloth.me The Sloth Blog
+- https://tonsky.me Blog @ tonsky.me
+- https://tyrrrz.me Oleksii Holub
+- https://vgel.me Theia Vogel's website & blog
+- https://xnacly.me xnacly - blog
+- https://shkspr.mobi Terence Eden’s Blog
+- https://memo.mx Memo Garcia
+- https://blog.waleedkhan.name Steno & PL
+- https://acko.net Hackery, Math & Design — Acko.net
+- https://alexwlchan.net alexwlchan
+- https://www.andreinc.net andreinc
+- https://andrewlock.net Andrew Lock | .NET Escapades
+- https://www.apalrd.net apalrd's adventures
+- https://blog.apnic.net APNIC Blog | Regional Internet Registry for the Asia Pacific
+- https://blog.backslasher.net BackSlasher
+- https://blog.burntsushi.net Andrew Gallant's Blog - Andrew Gallant's Blog
+- https://www.cambus.net Frederic Cambus | Cambus.net
+- https://www.cdahmedeh.net cdahmedeh (Ahmed El-Hajjar)
+- https://chriscoyier.net Chris Coyier - Web craftsman, blogger, author, speaker.
+- https://climatecasino.net Watching the World Go Bye – Eliot Jacobson's Collapse of Everything Blog
+- https://www.colino.net Bienvenue – colin@colino.net
+- https://conorbroderick.net All posts | Conor's Blog -
+- https://www.cryptologie.net Cryptologie
+- https://blog.darksky.net Dark Sky Blog
+- https://darrenburns.net Darren Burns - Blog
+- https://desdemonadespair.net Desdemona Despair – Blogging the End of the World™
+- https://www.deusinmachina.net Deus In Machina | Diego Crespo | Substack
+- https://duncanlock.net Duncan Locks personal site · duncan­lock­.net
+- https://www.foonathan.net foonathan::​blog()
+- https://news.gandi.net Gandi.net news
+- https://taras.glek.net Taras' Blog on AI, Perf, Hacks
+- https://hookrace.net HookRace Blog
+- https://blog.information-superhighway.net blog dot information dash superhighway dot net
+- https://blog.jakubholy.net Holy on Dev
+- https://jaycarlson.net Blog - Jay Carlson
+- https://blog.karliner.net Mike's Blog — Technologist at Large
+- https://www.kooslooijesteijn.net Blog | Koos Looijesteijn
+- https://blog.lidskialf.net adq – Andrew de Quincey's miscellaneous tech projects
+- https://www.logicmatters.net - Logic Matters
+- https://lukasrosenstock.net Lukas Rosenstock's Blog
+- https://lyonsden.net Home - Lyonsden Blog
+- https://blog.marcua.net N=1 (marcua’s blog) | I’m the Co-Founder and CTO of B12, where we’re building a better future of creative and analytical work. Before that, I was Director of Data at Locu, a startup that was acquired by GoDaddy. I went to grad school at MIT’s CSAIL. One time in Jerusalem I ate a whole tub of hummus on my own. I don’t regret that day.
+- https://www.meziantou.net Meziantou's blog
+- https://mfiano.net Posts
+- https://tech.michaelaltfield.net Michael Altfield's Tech Blog - Technology, Science, and the pursuit of Enlightenment
+- https://mijailovic.net Nemanja Mijailovic's Blog
+- https://naich.net Naich's crappy blog – It's not very good but there is lots of swearing
+- https://blog.nearlyfreespeech.net NearlyFreeSpeech.NET Blog
+- https://nliu.net my php/cobol blog
+- https://www.noulakaz.net Noulakaz
+- https://blog.phor.net William Entriken Blog — Analysis of all – William Entriken Blog
+- https://blog.searchmysite.net Blog for searchmysite.net
+- https://www.sevarg.net Syonyk's Project Blog
+- https://simonwillison.net Simon Willison’s Weblog
+- https://www.systemreboot.net systemreboot – blog
+- https://blog.thunderbird.net The Thunderbird Blog -
+- https://blog.tjll.net Tyblog | Home
+- https://twiddlingbits.net twiddling∧bits
+- https://blog.varunramesh.net Varun Ramesh's Blog
+- https://vitonsky.net Blog about computers
+- https://thomasp.vivaldi.net Thomas Pike’s other blog | Tales from a system administrator
+- https://microblog.vladh.net vladh's microblog
+- https://blog.vslira.net vslira's blog
+- https://jan.wildeboer.net Jan Wildeboer's Blog
+- https://blog.williammanley.net Will's blog
+- https://bear.willmeyers.net willmeyers' bear blog
+- https://blog.yossarian.net ENOSUCHBLOG
+- https://yotam.net Yotam's blog
+- https://pavel.network Pavel's blog about underlying Internet technologies
+- https://blog.brixit.nl BrixIT Blog
+- https://www.leidenmedievalistsblog.nl Leiden Medievalists Blog
+- https://blog.nlnetlabs.nl The NLnet Labs Blog
+- https://stderr.nl (...) — /Blog
+- https://patricia.no Home | Patricia Aas - Programmer
+- https://isthisit.nz is this it?
+- https://blog.entropy.observer Ian's blog | entropy.observer
+- https://blog.flipperzero.one Flipper Blog
+- https://plei.one plei.one - Blog
+- https://blog.sunfishcode.online sunfishcode's blog · A blog by sunfishcode
+- https://memooo.ooo Memo Garcia
+- https://www.alignmentforum.org AI Alignment Forum
+- https://annas-blog.org Anna’s Blog
+- https://blogs.apache.org Blogs Archive | This is an archive of the Roller blogs that were previously hosted on blogs.apache.org
+- https://news.apache.org The Apache Software Foundation Blog - The Apache Software Foundation Blog
+- https://blog.archive.org Internet Archive Blogs | A blog from the team at archive.org
+- https://blog.asciinema.org asciinema blog · asciinema blog
+- https://code.blender.org Developer Blog - code.blender.org
+- https://brianmckenna.org BAM Weblog
+- https://blog.cachix.org Cachix Blog
+- https://cdixon.org cdixon | home
+- https://blog.cerowrt.org CeroWrt notebook: On fixing the internet since 2011 - http://blog.cerowrt.org/
+- https://blog.chromium.org Chromium Blog
+- https://blog.cr0.org cr0 blog
+- https://blog.darlinghq.org Darling Development Blog
+- https://bits.debian.org Bits from Debian - Blog from the Debian Project
+- https://www.deepstateblog.org Welcome to the Deep State Blog
+- https://blog.demofox.org The blog at the bottom of the sea « Programming, Graphics, Gamedev, Exotic Computation, Audio Synthesis
+- https://blog.documentfoundation.org The Document Foundation Blog - The home of LibreOffice
+- https://dev.blog.documentfoundation.org LibreOffice Development Blog - Blog for the LibreOffice Developers Community; Tutorials, tips and tricks for working with the LibreOffice code
+- https://peter.eisentraut.org Peter Eisentraut | Peter Eisentraut’s blog
+- https://blog.ericgoldman.org Technology & Marketing Law Blog -
+- https://framablog.org Framablog – La route est longue mais la voie est libre…
+- https://www.frontiersin.org Frontiers | Publisher of peer-reviewed articles in open access journals
+- https://blogs.gnome.org GNOME Blogs – A blogging community for GNOME contributors
+- https://havenweb.org Haven: Host your own private blog
+- https://blog.humphd.org Bread & Circuits
+- https://www.isc.org ISC - ISC
+- https://blog.jgc.org John Graham-Cumming's blog
+- https://blog.joinmastodon.org Mastodon Blog
+- https://blog.josefsson.org Simon Josefsson's blog
+- https://blog.jupyter.org Jupyter Blog
+- https://origami.kosmulski.org Origami by MichaÅ Kosmulski
+- https://lambda-the-ultimate.org Lambda the Ultimate | Programming Languages Weblog
+- https://blog.metabrainz.org MetaBrainz Blog – MetaBrainz Foundation community blog
+- https://blog.mozilla.org Home - The Mozilla Blog
+- https://hacks.mozilla.org Home - Mozilla Hacks - the Web developer blog
+- https://niconiconi.neocities.org niconiconi's blog
+- https://blog.netbsd.org NetBSD Blog
+- https://www.openrightsgroup.org Home | Open Rights Group
+- https://blog.openstreetmap.org OpenStreetMap Blog | Supporting the OpenStreetMap project
+- https://blog.pamelafox.org pamela fox's blog
+- https://blogs.perl.org blogs.perl.org â blogging the onion
+- https://lucumr.pocoo.org Blog | Armin Ronacher's Thoughts and Writings
+- https://praeclarum.org praeclarum
+- https://blog.pypi.org The Python Package Index
+- https://pubs.rsc.org RSC Publishing Home – Chemical Science Journals, Books and Databases
+- https://blog.rust-lang.org The Rust Programming Language Blog
+- https://blog.ryujinx.org Ryujinx - Blog
+- https://www.setphaserstostun.org Just another blog
+- https://snarfed.org snarfed.org | Ryan Barrett's blog
+- https://stallmansupport.org Introduction | Stallman Support
+- https://fredblog.stlouisfed.org FRED Blog | Interesting graphs from the FRED library
+- https://usa.streetsblog.org Homepage — Streetsblog USA
+- https://blog.tensorflow.org The TensorFlow Blog
+- https://blog.torproject.org Tor Blog | The Tor Project
+- https://blog.ucsusa.org The Equation - Union of Concerned Scientists
+- https://viruta.org Federico's Blog
+- https://blog.webpagetest.org WebPageTest Blog
+- https://blog.weechat.org WeeChat dev news
+- https://blog.wireshark.org Sniff free or die | The official Wireshark blog
+- https://writefreely.org WriteFreely
+- https://middle-earth.xenite.org Middle-earth & J.R.R. Tolkien Blog – by Michael Martinez
+- https://mcilloni.ovh mcilloni's blog · A simple blog for rather complicated topics
+- https://www.androidowy.pl Androidowy - najciekawszy polski blog. Windows AI, Android
+- https://antyweb.pl Antyweb - blog technologiczny
+- https://independenttrader.pl Niezależny Portal Finansowy - Independent Trader.pl
+- https://mensfeld.pl Closer to Code - Blog about coding in various languages, security, and my other IT adventures.
+- https://www.midline.pl Blog Internet. Czas działać!
+- https://p.migdal.pl Homepage - Piotr Migdał
+- https://www.salon24.pl Salon24 - Blogi, wiadomości, opinie i komentarze
+- https://spidersweb.pl Spider’s Web
+- https://www.wprost.pl WPROST.pl - Polska i świat, historia, polityka, biznes, kultura
+- https://moritz.pm Moritz' Blog
+- https://docs.microblog.pub microblog.pub - A self-hosted, single-user, ActivityPub powered microblog.
+- https://mariusbancila.ro Marius Bancila's Blog
+- https://nullpt.rs nullpt.rs • blog
+- https://www.nullpt.rs nullpt.rs • blog
+- https://hugotunius.se Blog - Hugo Tunius
+- https://blog.webp.se WebP Cloud Services Blog
+- https://kofi.sexy Kofi Gumbs
+- https://artemis.sh Artemis Everfree
+- https://bower.sh erock's blog
+- https://d-s.sh [MichaÅ Sapka's website]
+- https://blog.gibson.sh ./gibson.sh --blog
+- https://x64.sh R3zk0n
+- https://austinvernon.site Austin Vernon - Austin Vernon's Blog
+- https://blog.djha.skin Skin's Blog
+- https://blog.syncinc.so The Sequin Blog
+- https://pdx.su Jeff Sandberg's Blog
+- https://dropbox.tech Dropbox Tech Blog - Dropbox
+- https://blog.ipfs.tech Home | IPFS Blog & News
+- https://dispatch.techlore.tech Techlore Dispatch | Henry Fisher | Substack
+- https://threedots.tech Learn Building Modern Go applications - Three Dots Labs blog
+- https://blog.turso.tech Turso blog
+- https://blog.winny.tech Winny's Blog
+- https://blog.dave.tf blog.dave.tf
+- https://blog.cr.yp.to cr.yp.to: blog
+- https://blog.val.town Val Town Blog
+- https://blog.lon.tv Lon Seidman & Lon.TV Blog - Tech & Commentary from Lon Seidman of Lon.TV
+- https://blog.twitch.tv Twitch Blog
+- https://blogs.lse.ac.uk LSE Blogs | Expert analysis & debate from LSE
+- https://blog.practicalethics.ox.ac.uk Practical Ethics
+- https://itservices.wp.st-andrews.ac.uk IT Services blog – Latest news, advice and information from the IT Services team
+- https://blog.benjojo.co.uk Benjojo's Blog
+- https://blog.davetcode.co.uk David Tyler's Blog - Technical writing mostly focused on emulating old systems.
+- https://www.examinerlive.co.uk YorkshireLive - Yorkshire News, Sport, Events & more
+- https://www.hybridlogic.co.uk HybridLogic
+- https://mukulrathi.co.uk Mukul's Personal Website
+- https://www.tomanthony.co.uk Tom Anthony - SEO, Web Development and Research
+- https://oli.me.uk Oliver Caldwell's blog
+- https://www.wilfred.me.uk Wilfred Hughes::Blog
+- https://blog.scienceandindustrymuseum.org.uk Science and Industry Museum blog -
+- https://blogs.bl.uk British Library Blog
+- https://cyberhost.uk CyberHost - Tech Blogs and Tutorials
+- https://darrenparkinson.uk Darren Parkinson - Darren Parkinson
+- https://blog.roastidio.us Roastidio.us Blog
+- https://blog.zoom.us The latest insights on how the world connects | Zoom Blog
+- https://incisive.vc Incisive Ventures – Your partner for growth
+- https://blog.mastodon.world Mastodon.world Blog
+- https://blog.yoav.ws Yoav's blog thing
+- https://ellie.wtf Ellie's Blog
+- https://cedwards.xyz Connor's Blog
+- https://blog.dataparty.xyz blog.dataparty
+- https://engineeringblogs.xyz Engineering Blogs
+- https://gazoche.xyz Gazoche's blog
+- https://www.henrikkarlsson.xyz Escaping Flatland | Henrik Karlsson | Substack
+- https://stephan.lachnit.xyz Stephan Lachnit | Blog
+- https://lukesmith.xyz Luke's Webpage
+- https://blog.sulami.xyz Welcome - sulami's blog
+- https://blog.youtube YouTube Blog — Official Blog for Latest YouTube News & Insights
+- https://fuckthatshit.co.za FUCK THAT SHIT FUCK THAT SHIT - A blog about ideas, things and 💩
+- https://blog.freeradical.zone Free Radical Blog
+- https://mango.pdf.zone the mango zone
