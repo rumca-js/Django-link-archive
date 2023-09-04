@@ -53,7 +53,7 @@ class BaseQueryFilter(object):
         return [start, start + paginate_by]
 
     def get_filtered_objects(self):
-        filtered_objects = self.get_filtered_objects_internal()
+        filtered_objects = self.get_filtered_objects_internal().distinct()
 
         if self.use_page_limit:
             limit_range = self.get_limit()
@@ -458,8 +458,15 @@ class OmniSymbolProcessor(object):
         return self.known_results[symbol]
 
     def make_operation(self, operation_symbol, function, args):
+        
         args0 = str(args[0])
-        args1 = str(args[1])
+        args0 = self.known_results[args0]
+
+        if len(args) > 1:
+            args1 = str(args[1])
+            args1 = self.known_results[args1]
+        else:
+            args1 = None
 
         print(
             "Evaluation function: full:{} function:{} args:{} {}".format(
@@ -467,14 +474,14 @@ class OmniSymbolProcessor(object):
             )
         )
 
-        args0 = self.known_results[args0]
-        args1 = self.known_results[args1]
-
         if function == "And":
             self.known_results[operation_symbol] = args0 & args1
             return self.known_results[operation_symbol]
         elif function == "Or":
             self.known_results[operation_symbol] = args0 | args1
+            return self.known_results[operation_symbol]
+        elif function == "Not":
+            self.known_results[operation_symbol] = ~args0
             return self.known_results[operation_symbol]
         else:
             raise NotImplementedError("Not implemented function: {}".format(function))
@@ -512,7 +519,7 @@ class OmniSymbolEvaluator(object):
             return result
 
     def get_operators(self):
-        return ("==", "=", "!=", "<=", ">=", "<", ">")
+        return ("==", "=", "~", "<=", ">=", "<", ">")
 
     def split_symbol(self, symbol):
         for op in self.get_operators():

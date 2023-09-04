@@ -5,7 +5,7 @@
     <a href="javascript:history.back()" class="simplebutton">Go Back</a>
 
     {% if user.is_staff %}
-    <a href="{% url 'rsshistory:domain-fix' object.id %}" class="simplebutton">Fix</a>
+    <a href="{% url 'rsshistory:domain-update-data' object.id %}" class="simplebutton">Update</a>
     <a href="{% url 'rsshistory:domain-remove' object.id %}" class="simplebutton">Remove</a>
     {% endif %}
 </div>

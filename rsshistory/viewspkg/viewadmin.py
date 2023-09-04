@@ -22,25 +22,20 @@ from ..controllers import (
     LinkDataController,
     ArchiveLinkDataController,
 )
-from ..views import ContextData
+from ..views import ContextData, ViewPage
 
 
 def admin_page(request):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - Admin page"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
-
-    return ContextData.render(request, "admin_page.html", context)
+    p = ViewPage(request)
+    p.set_title("Admin")
+    p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    return p.render("admin_page.html")
 
 
 def configuration_page(request):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - Configuration page"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Configuration")
+    p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
 
     ob = ConfigurationEntry.get()
 
@@ -49,8 +44,8 @@ def configuration_page(request):
         if form.is_valid():
             form.save()
         else:
-            context["summary_text"] = "Form is invalid"
-            return ContextData.render(request, "summary_present.html", context)
+            p.set_variable("summary_text", "Form is invalid")
+            return p.render("summary_present.html")
 
     ob = ConfigurationEntry.get()
     form = ConfigForm(instance=ob)
@@ -58,94 +53,75 @@ def configuration_page(request):
     form.method = "POST"
     form.action_url = reverse("{}:configuration".format(ContextData.app_name))
 
-    context["config_form"] = form
+    p.set_variable("config_form", form)
 
-    return ContextData.render(request, "configuration.html", context)
+    return p.render("configuration.html")
 
 
 def system_status(request):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - Status"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Status")
+    p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
 
     c = Configuration.get_object()
-    context["directory"] = c.directory
+    p.context["directory"] = c.directory
 
-    context["SourceDataModel"] = SourceDataController.objects.count()
-    context["LinkDataModel"] = LinkDataController.objects.count()
-    context["ArchiveLinkDataModel"] = ArchiveLinkDataController.objects.count()
-    context["LinkTagsDataModel"] = LinkTagsDataModel.objects.count()
-    context["ConfigurationEntry"] = ConfigurationEntry.objects.count()
-    context["UserConfig"] = UserConfig.objects.count()
-    context["BackgroundJob"] = BackgroundJob.objects.count()
+    p.context["SourceDataModel"] = SourceDataController.objects.count()
+    p.context["LinkDataModel"] = LinkDataController.objects.count()
+    p.context["ArchiveLinkDataModel"] = ArchiveLinkDataController.objects.count()
+    p.context["LinkTagsDataModel"] = LinkTagsDataModel.objects.count()
+    p.context["ConfigurationEntry"] = ConfigurationEntry.objects.count()
+    p.context["UserConfig"] = UserConfig.objects.count()
+    p.context["BackgroundJob"] = BackgroundJob.objects.count()
 
     from ..dateutils import DateUtils
 
-    context["Current_DateTime"] = DateUtils.get_datetime_now_utc()
+    p.context["Current_DateTime"] = DateUtils.get_datetime_now_utc()
 
-    context["ServerLogLength"] = PersistentInfo.objects.count()
-    context["DomainsLength"] = Domains.objects.count()
+    p.context["ServerLogLength"] = PersistentInfo.objects.count()
+    p.context["DomainsLength"] = Domains.objects.count()
 
-    context["server_path"] = Path(".").resolve()
-    context["directory"] = Path(".").resolve()
+    p.context["server_path"] = Path(".").resolve()
+    p.context["directory"] = Path(".").resolve()
 
     history = SourceExportHistory.get_safe()
-    context["export_history_list"] = history
+    p.context["export_history_list"] = history
 
-    return ContextData.render(request, "system_status.html", context)
+    return p.render("system_status.html")
 
 
 def about(request):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - About"
-
-    return ContextData.render(request, "about.html", context)
+    p = ViewPage(request)
+    p.set_title("About")
+    return p.render("about.html")
 
 
 def user_config(request):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - User configuration"
-
-    if not request.user.is_authenticated:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("User configuration")
+    p.set_access(ConfigurationEntry.ACCESS_TYPE_LOGGED)
 
     user_name = request.user.get_username()
 
-    obs = UserConfig.objects.filter(user=user_name)
-    if not obs.exists():
-        rec = UserConfig(user=user_name)
-        rec.save()
-
-    obs = UserConfig.objects.filter(user=user_name)
-
-    if obs.count() > 0:
-        for key, value in enumerate(obs):
-            if key != 0:
-                value.truncate()
-
-    ob = obs[0]
+    user_obj = UserConfig.get_or_create(user_name)
 
     if request.method == "POST":
-        form = UserConfigForm(request.POST, instance=ob)
+        form = UserConfigForm(request.POST, instance=user_obj)
         if form.is_valid():
             form.save()
         else:
-            context["summary_text"] = "user information is not valid, cannot save"
-            return ContextData.render(request, "summary_present.html", context)
-
-        obs = UserConfig.objects.filter(user=user_name)
+            p.context["summary_text"] = "user information is not valid, cannot save"
+            return p.render("summary_present.html")
     else:
-        form = UserConfigForm(instance=ob)
+        form = UserConfigForm(instance=user_obj)
 
     form.method = "POST"
     form.action_url = reverse("{}:user-config".format(ContextData.app_name))
 
-    context["config_form"] = form
-    context["user_object"] = ob
+    p.context["config_form"] = form
+    p.context["user_object"] = user_obj
 
-    return ContextData.render(request, "user_configuration.html", context)
+    return p.render("user_configuration.html")
 
 
 class BackgroundJobsView(generic.ListView):

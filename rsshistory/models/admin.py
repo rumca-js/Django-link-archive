@@ -9,6 +9,21 @@ from ..apps import LinkDatabase
 
 
 class ConfigurationEntry(models.Model):
+
+    ACCESS_TYPE_ALL = "access-type-all"
+    ACCESS_TYPE_LOGGED = "access-type-logged"
+    ACCESS_TYPE_OWNER = "access-type-owner"
+    ACCESS_TYPE_STAFF = "access-type-staff"
+
+    # fmt: off
+    ACCESS_TYPES = (
+        (ACCESS_TYPE_ALL, ACCESS_TYPE_ALL),                     #
+        (ACCESS_TYPE_LOGGED, ACCESS_TYPE_LOGGED),               #
+        (ACCESS_TYPE_STAFF, ACCESS_TYPE_STAFF),               #
+        (ACCESS_TYPE_OWNER, ACCESS_TYPE_OWNER),                 #
+    )
+    # fmt: on
+
     sources_refresh_period = models.IntegerField(default=3600)
     link_save = models.BooleanField(default=True)
     source_save = models.BooleanField(default=True)
@@ -16,6 +31,10 @@ class ConfigurationEntry(models.Model):
     vote_min = models.IntegerField(default=-100)
     vote_max = models.IntegerField(default=100)
     number_of_comments_per_day = models.IntegerField(default=1)
+    user_agent = models.CharField(default="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/116.0", max_length=1000)
+    access_type = models.CharField(
+        max_length=1000, null=False, choices=ACCESS_TYPES, default=ACCESS_TYPE_ALL
+    )
 
     data_import_path = models.CharField(
         default="../data/{}/imports".format(LinkDatabase.name),
@@ -97,6 +116,17 @@ class UserConfig(models.Model):
                 return confs[0]
 
         return UserConfig()
+
+    def get_or_create(user_name):
+        """
+        This is used if no request is specified. Use configured by admin setup.
+        """
+        users = UserConfig.objects.filter(user=user_name)
+        if not users.exists():
+            user = UserConfig(user=user_name)
+            user.save()
+            return user
+        return users[0]
 
 
 class PersistentInfo(models.Model):

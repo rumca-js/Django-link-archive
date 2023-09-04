@@ -39,14 +39,16 @@ class ConfigForm(forms.ModelForm):
         model = ConfigurationEntry
         fields = [
             "sources_refresh_period",
+            "user_agent",
             "link_save",
             "source_save",
             "store_domain_info",
-            "data_export_path",
-            "data_import_path",
             "vote_min",
             "vote_max",
             "number_of_comments_per_day",
+            "data_export_path",
+            "data_import_path",
+            "access_type",
         ]
 
     def __init__(self, *args, **kwargs):

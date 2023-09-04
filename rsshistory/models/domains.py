@@ -3,6 +3,7 @@ from datetime import datetime, date
 
 from django.db import models
 from django.urls import reverse
+import django.utils
 
 
 class Domains(models.Model):
@@ -18,8 +19,8 @@ class Domains(models.Model):
     status_code = models.IntegerField(default=200)
     dead = models.BooleanField(default=False)
 
-    date_created = models.DateTimeField(default=datetime.now)
-    date_last = models.DateTimeField(default=datetime.now)
+    date_created = models.DateTimeField(default=django.utils.timezone.now)
+    date_last = models.DateTimeField(default=django.utils.timezone.now)
 
     class Meta:
         ordering = ["tld", "suffix", "main", "domain"]
@@ -48,12 +49,12 @@ class Domains(models.Model):
     def create_or_update_domain(domain_only_text):
         objs = Domains.objects.filter(domain=domain_only_text)
         if objs.count() == 0:
-            return Domains.create_domain_object(domain_only_text)
+            return Domains.create_object(domain_only_text)
         else:
-            Domains.update_domain_obj(objs[0])
+            Domains.update_object(objs[0])
             return objs[0]
 
-    def create_domain_object(domain_only_text):
+    def create_object(domain_only_text):
         import tldextract
 
         extract = tldextract.TLDExtract()
@@ -69,20 +70,23 @@ class Domains(models.Model):
             tld=tld,
         )
 
-        Domains.update_complementary_data(ob)
+        Domains.update_complementary_data(ob, True)
 
         return ob
 
-    def update_complementary_data(ob):
-        DomainsSuffixes.add(ob.suffix)
-        DomainsTlds.add(ob.tld)
-        DomainsMains.add(ob.main)
+    def update_object(self, force = False):
+        if self.is_domain_set() == False:
+            self.update_domain()
 
-        ob.fix_title()
+        self.update_complementary_data(force)
 
-        from ..dateutils import DateUtils
-        ob.date_last = DateUtils.get_datetime_now_utc()
-        ob.save()
+    def update_complementary_data(self, force = False):
+        DomainsSuffixes.add(self.suffix)
+        DomainsTlds.add(self.tld)
+        DomainsMains.add(self.main)
+
+        if self.is_update_time() or force or self.is_page_info_set() == False:
+            self.update_page_info()
 
     def get_domain_ext(self, domain_only_text):
         tld = os.path.splitext(domain_only_text)[1][1:]
@@ -91,31 +95,22 @@ class Domains(models.Model):
             tld = tld[:wh]
         return tld
 
-    def update_domain_obj(obj):
+    def is_domain_set(self):
+        return self.suffix is not None and self.tld is not None and self.suffix != "" and self.tld != ""
+
+    def is_page_info_set(self):
+        return self.title is not None and self.description is not None and self.language is not None
+
+    def is_update_time(self):
         from ..dateutils import DateUtils
 
-        days = DateUtils.get_day_diff(obj.date_last)
+        days = DateUtils.get_day_diff(self.date_last)
         # TODO make this configurable
-        if days > 7:
-            self.update_complementary_data()
+        return days > 7
 
-    def fix(self):
-        self.fix_domain()
-        self.fix_title()
-
-    def fix_domain(self):
+    def update_domain(self):
         import tldextract
         from ..dateutils import DateUtils
-
-        if (
-            self.suffix is not None
-            and self.tld is not None
-            and self.suffix != ""
-            and self.tld != ""
-            and self.dead == False
-        ):
-            print("Domain: not fixing domain {} {} {}".format(self.domain, self.suffix, self.tld))
-            return False
 
         changed = False
 
@@ -146,7 +141,7 @@ class Domains(models.Model):
         else:
             print("domain:{} Nothing has changed".format(self.domain))
 
-    def fix_title(self, force=False):
+    def update_page_info(self):
         #if self.title is not None and self.description is not None and self.dead == False and not force:
         #    print("Domain: not fixing title/description {} {} {}".format(self.domain, self.suffix, self.tld))
         #    return False
@@ -176,6 +171,10 @@ class Domains(models.Model):
 
         if p.is_status_ok() == False:
             self.dead = True
+
+            from ..dateutils import DateUtils
+            self.date_last = DateUtils.get_datetime_now_utc()
+
             self.save()
             return
         if self.dead and p.is_status_ok():
@@ -199,14 +198,19 @@ class Domains(models.Model):
             changed = True
 
         if changed:
+            from ..dateutils import DateUtils
+            self.date_last = DateUtils.get_datetime_now_utc()
+
             self.protocol = protocol
             self.save()
 
-    def fix_all():
-        objs = Domains.objects.filter(dead = True) #, description__isnull = True)
-        for obj in objs:
-            print("Fixing:{}".format(obj.domain))
-            obj.fix()
+    def update_all(domains = None):
+        if domains is None:
+            domains = Domains.objects.filter(dead = True) #, description__isnull = True)
+
+        for domain in domains:
+            print("Fixing:{}".format(domain.domain))
+            domain.update_object()
 
     def remove_all():
         domains = Domains.objects.all()
@@ -231,6 +235,8 @@ class Domains(models.Model):
             "tld": self.tld,
             "title": self.title,
             "description": self.description,
+            "language": self.language,
+            "status_code": self.status_code,
             "dead": self.dead,
             "date_created": self.date_created.isoformat(),
             "date_last": self.date_last.isoformat(),
@@ -247,6 +253,8 @@ class Domains(models.Model):
             "tld",
             "title",
             "description",
+            "language",
+            "status_code",
             "dead",
             "date_created",
             "date_last",

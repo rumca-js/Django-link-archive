@@ -4,7 +4,7 @@ from django.shortcuts import render
 from django.views import generic
 from django.urls import reverse
 
-from .models import UserConfig
+from .models import UserConfig, ConfigurationEntry
 from .controllers import (
     SourceDataController,
     LinkDataController,
@@ -48,8 +48,40 @@ class ContextData(object):
         return render(request, ContextData.app_name / template, context)
 
 
-def index(request):
-    context = ContextData.get_context(request)
+class ViewPage(object):
+    def __init__(self, request):
+        self.request = request
+        self.context = ContextData.get_context(request)
+        self.access_type = None
 
-    # Render the HTML template index.html with the data in the context variable
-    return ContextData.render(request, "index.html", context=context)
+    def set_title(self, title):
+        self.context["page_title"] += " - {}".format(title)
+
+    def set_access(self, access_type):
+        self.access_type = access_type
+
+    def set_variable(self, variable_name, variable_value):
+        self.context[variable_name] = variable_value
+
+    def render(self, template):
+        if self.access_type:
+            if self.access_type == ConfigurationEntry.ACCESS_TYPE_OWNER and not self.request.user.is_superuser:
+                return ContextData.render(self.request, "missing_rights.html", self.context)
+            if self.access_type == ConfigurationEntry.ACCESS_TYPE_STAFF and not self.request.user.is_staff:
+                return ContextData.render(self.request, "missing_rights.html", self.context)
+            if self.access_type == ConfigurationEntry.ACCESS_TYPE_LOGGED and not self.request.user.is_authenticated:
+                return ContextData.render(self.request, "missing_rights.html", self.context)
+
+        config = ConfigurationEntry.get()
+        if config.access_type == ConfigurationEntry.ACCESS_TYPE_OWNER and not self.request.user.is_superuser:
+            return ContextData.render(self.request, "missing_rights.html", self.context)
+        if config.access_type == ConfigurationEntry.ACCESS_TYPE_LOGGED and not self.request.user.is_authenticated:
+            return ContextData.render(self.request, "missing_rights.html", self.context)
+
+        return ContextData.render(self.request, template, self.context)
+
+
+def index(request):
+    p = ViewPage(request)
+    p.set_title("Index")
+    return p.render("index.html")

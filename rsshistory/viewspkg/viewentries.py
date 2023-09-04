@@ -252,11 +252,18 @@ class EntriesOmniListView(EntriesSearchListView):
         translate = BaseLinkDataController.get_query_names()
         query_filter.set_translatable(translate)
 
-        query_filter.set_default_search_symbols([
-            "title__icontains",
-            "description__icontains",
-            #"tags__tag__icontains",
-            ])
+        if ("archive" in self.request.GET and self.request.GET["archive"] == 1):
+            query_filter.set_default_search_symbols([
+                "title__icontains",
+                "description__icontains",
+                #"tags__tag__icontains",
+                ])
+        else:
+            query_filter.set_default_search_symbols([
+                "title__icontains",
+                "description__icontains",
+                "tags__tag__icontains",
+                ])
 
         query_filter.calculate_combined_query()
 

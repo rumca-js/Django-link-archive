@@ -61,7 +61,7 @@ class DomainsDetailView(generic.DetailView):
         context = super(DomainsDetailView, self).get_context_data(**kwargs)
         context = ContextData.init_context(self.request, context)
 
-        context["page_title"] = "domain detail view"
+        context["page_title"] += " {} domain".format(self.object.domain)
 
         return context
 
@@ -72,9 +72,10 @@ class DomainsByNameDetailView(generic.DetailView):
 
     def get_object(self):
         domain_name = self.request.GET["domain_name"]
-        objs = Domains.objects.filter(domain = domain_name)
-        if objs.count() > 0:
-            return objs[0]
+        self.objects = Domains.objects.filter(domain = domain_name)
+        if self.objects.count() > 0:
+            self.object = self.objects[0]
+            return self.object
 
     def get_context_data(self, **kwargs):
         from ..pluginsources.sourcecontrollerbuilder import SourceControllerBuilder
@@ -83,23 +84,9 @@ class DomainsByNameDetailView(generic.DetailView):
         context = super(DomainsByNameDetailView, self).get_context_data(**kwargs)
         context = ContextData.init_context(self.request, context)
 
-        context["page_title"] = "domain detail view"
+        context["page_title"] += " {} domain".format(self.object.domain)
 
         return context
-
-
-def domain_by_name(request, domain_name):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - Domain preview"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
-
-    domain = Domains.objects.filter(domain = domain_name)
-
-    context["summary_text"] = "Domain was removed"
-
-    return ContextData.render(request, "summary_present.html", context)
 
 
 def domain_add(request):
@@ -143,12 +130,16 @@ def domain_remove(request, pk):
     if not request.user.is_staff:
         return ContextData.render(request, "missing_rights.html", context)
 
-    domain = Domains.objects.get(id=pk)
+    domains = Domains.objects.get(id=pk)
+    if domains.count() == 0:
+        context["summary_text"] = "Domain does not exist"
+        return ContextData.render(request, "summary_present.html", context)
+
     domain.delete()
 
-    context["summary_text"] = "Domain was removed"
-
-    return ContextData.render(request, "summary_present.html", context)
+    return HttpResponseRedirect(
+        reverse("{}:domains".format(ContextData.app_name))
+    )
 
 
 def domains_remove_all(request):
@@ -160,22 +151,28 @@ def domains_remove_all(request):
 
     Domains.remove_all()
 
-    context["summary_text"] = "Domains were removed"
+    return HttpResponseRedirect(
+        reverse("{}:domains".format(ContextData.app_name))
+    )
 
-    return ContextData.render(request, "summary_present.html", context)
 
-
-def domain_fix(request, pk):
+def domain_update_data(request, pk):
     context = ContextData.get_context(request)
-    context["page_title"] += " - Domain fix"
+    context["page_title"] += " - Domain update data"
 
     if not request.user.is_staff:
         return ContextData.render(request, "missing_rights.html", context)
 
-    domain = Domains.objects.filter(id=pk)
-    domain[0].fix()
+    domains = Domains.objects.filter(id=pk)
+    domain = domains[0]
+    domain.update_object(force=True)
 
-    context["summary_text"] = "Domains were fixed"
+    return HttpResponseRedirect(
+        reverse(
+            "{}:domain-detail".format(ContextData.app_name),
+            kwargs={"pk": domain.id},
+        )
+    )
 
     return ContextData.render(request, "summary_present.html", context)
 
