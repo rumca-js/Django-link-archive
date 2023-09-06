@@ -16,7 +16,7 @@ version is split into three digits:
  if a change requires the model to be changed, then second digit is updated, patch is set to 0
  if something should be released to public, then release version changes
 """
-__version__ = "0.20.0"
+__version__ = "0.21.0"
 
 
 from pathlib import Path
@@ -43,21 +43,6 @@ class Configuration(object):
             "app_version": self.version,
             "config": ConfigurationEntry.get(),
             "base_generic": str(Path(self.app_name) / "base_generic.html"),
-            "base_footer": """
-          <p>
-            <div>
-            Version: {}
-            </div>
-            <div>
-                Source: <a href="https://github.com/rumca-js/Django-link-archive">https://github.com/rumca-js/Django-link-archive</a>
-            </div>
-            <div>
-                Bookmarked articles <a href="https://github.com/rumca-js/RSS-Link-Database">https://github.com/rumca-js/RSS-Link-Database</a>
-            </div>
-          </p>
-          """.format(
-                self.version
-            ),
         }
 
     def get_object(app_name=None):

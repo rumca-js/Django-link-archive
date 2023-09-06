@@ -6,11 +6,12 @@
 
     {% if user.is_staff %}
     <a href="{% url 'rsshistory:domain-update-data' object.id %}" class="simplebutton">Update</a>
+    <a href="{% url 'rsshistory:domain-edit' object.id %}" class="simplebutton">Edit</a>
     <a href="{% url 'rsshistory:domain-remove' object.id %}" class="simplebutton">Remove</a>
     {% endif %}
 </div>
 
-<h1>Data Export</h1>
+<h1>Domain</h1>
 
 {% if object.dead %}
 This domain is marked as dead!
@@ -37,6 +38,12 @@ This domain is marked as dead!
     </tr>
     <tr>
         <td>TLD</td><td>{{object.tld}}</td>
+    </tr>
+    <tr>
+        <td>Category</td><td>{{object.category}}</td>
+    </tr>
+    <tr>
+        <td>SubCategory</td><td>{{object.subcategory}}</td>
     </tr>
     <tr>
         <td>Language</td><td>{{object.language}}</td>

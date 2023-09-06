@@ -23,7 +23,7 @@ class BaseLinkDataModel(models.Model):
     # user who added entry
     user = models.CharField(max_length=1000, null=True, default=None)
 
-    # possible values en-US, or pl_PL
+    # possible values en, en-US, or pl_PL
     language = models.CharField(max_length=10, null=True, default=None)
     thumbnail = models.CharField(max_length=1000, null=True, default=None)
 
@@ -272,7 +272,7 @@ class BaseLinkDataController(BaseLinkDataModel):
         thumbnail = h.get_thumbnail()
         artist = h.get_channel_name()
 
-        language = "en-US"
+        language = "en"
         if "language" in data:
             language = data["language"]
         user = None
@@ -351,6 +351,10 @@ class BaseLinkDataController(BaseLinkDataModel):
         p = Page(data["link"])
         if "source" not in data or not data["source"]:
             data["source"] = p.get_domain()
+        if "artist" not in data or not data["artist"]:
+            data["artist"] = p.get_domain()
+        if "album" not in data or not data["album"]:
+            data["album"] = p.get_domain()
         if "language" not in data or not data["language"]:
             data["language"] = p.get_language()
         if "title" not in data or not data["title"]:

@@ -5,18 +5,22 @@ from django.db import models
 from django.urls import reverse
 import django.utils
 
+from ..apps import LinkDatabase
+
 
 class Domains(models.Model):
     protocol = models.CharField(max_length=100, default="https")         # http or https, or ssl
-    domain = models.CharField(max_length=1000)
+    domain = models.CharField(max_length=1000, unique=True)
     main = models.CharField(max_length=200, null=True)
     subdomain = models.CharField(max_length=200, null=True)
     suffix = models.CharField(max_length=20, null=True)
     tld = models.CharField(max_length=20, null=True)
     title = models.CharField(max_length=500, null=True)
     description = models.CharField(max_length=1000, null=True)
-    language = models.CharField(max_length=1000, default="en-US")
+    language = models.CharField(max_length=1000, default="en")
     status_code = models.IntegerField(default=200)
+    category = models.CharField(max_length=1000, null=True)
+    subcategory = models.CharField(max_length=1000, null=True)
     dead = models.BooleanField(default=False)
 
     date_created = models.DateTimeField(default=django.utils.timezone.now)
@@ -45,6 +49,11 @@ class Domains(models.Model):
             return domain_text
         else:
             return input_url
+
+    def get_absolute_url(self):
+        return reverse(
+            "{}:domain-detail".format(LinkDatabase.name), args=[str(self.id)]
+        )
 
     def create_or_update_domain(domain_only_text):
         objs = Domains.objects.filter(domain=domain_only_text)
@@ -85,7 +94,7 @@ class Domains(models.Model):
         DomainsTlds.add(self.tld)
         DomainsMains.add(self.main)
 
-        if self.is_update_time() or force or self.is_page_info_set() == False:
+        if self.is_update_time() or force:
             self.update_page_info()
 
     def get_domain_ext(self, domain_only_text):
@@ -106,7 +115,10 @@ class Domains(models.Model):
 
         days = DateUtils.get_day_diff(self.date_last)
         # TODO make this configurable
-        return days > 7
+        return days > self.get_update_days_limit()
+
+    def get_update_days_limit(self):
+        return 7
 
     def update_domain(self):
         import tldextract
@@ -169,7 +181,9 @@ class Domains(models.Model):
 
         self.status_code = p.status_code
 
-        if p.is_status_ok() == False:
+        is_title_invalid = new_title and (new_title.find("Forbidden") >= 0 or new_title.find("Access denied") >= 0)
+
+        if p.is_status_ok() == False or is_title_invalid:
             self.dead = True
 
             from ..dateutils import DateUtils
@@ -206,7 +220,11 @@ class Domains(models.Model):
 
     def update_all(domains = None):
         if domains is None:
-            domains = Domains.objects.filter(dead = True) #, description__isnull = True)
+            from ..dateutils import DateUtils
+            date_before_limit = DateUtils.get_days_before_dt(self.get_update_days_limit())
+
+            domains = Domains.objects.filter(date_last__lt = date_before_limit)
+            #domains = Domains.objects.filter(dead = True) #, description__isnull = True)
 
         for domain in domains:
             print("Fixing:{}".format(domain.domain))
@@ -237,6 +255,8 @@ class Domains(models.Model):
             "description": self.description,
             "language": self.language,
             "status_code": self.status_code,
+            "category": self.category,
+            "subcategory": self.subcategory,
             "dead": self.dead,
             "date_created": self.date_created.isoformat(),
             "date_last": self.date_last.isoformat(),
@@ -255,11 +275,24 @@ class Domains(models.Model):
             "description",
             "language",
             "status_code",
+            "category",
+            "subcategory",
             "dead",
             "date_created",
             "date_last",
         ]
         return result
+
+    def reset_dynamic_data():
+        objs = DomainCategories.objects.all()
+        objs.delete()
+        objs = DomainSubCategories.objects.all()
+        objs.delete()
+
+        domains = Domains.objects.all()
+        for domain in domains:
+            DomainCategories.add(domain.category)
+            DomainSubCategories.add(domain.category, domain.subcategory)
 
 
 class DomainsSuffixes(models.Model):
@@ -287,3 +320,30 @@ class DomainsMains(models.Model):
         mains = DomainsMains.objects.filter(main=main)
         if mains.count() == 0:
             DomainsMains.objects.create(main=main)
+
+
+class DomainCategories(models.Model):
+    category = models.CharField(max_length=1000, unique=True)
+
+    class Meta:
+        ordering = ["category"]
+
+    def add(category):
+        if category and category != "":
+            objs = DomainCategories.objects.filter(category=category)
+            if objs.count() == 0:
+                DomainCategories.objects.create(category=category)
+
+
+class DomainSubCategories(models.Model):
+    category = models.CharField(max_length=1000, default="")
+    subcategory = models.CharField(max_length=1000)
+
+    class Meta:
+        ordering = ["category", "subcategory"]
+
+    def add(category, subcategory):
+        if category and category != "" and subcategory and subcategory != "":
+            objs = DomainSubCategories.objects.filter(category=category, subcategory=subcategory)
+            if objs.count() == 0:
+                DomainSubCategories.objects.create(category=category, subcategory=subcategory)

@@ -519,7 +519,7 @@ class OmniSymbolEvaluator(object):
             return result
 
     def get_operators(self):
-        return ("==", "=", "~", "<=", ">=", "<", ">")
+        return ("==", "=", "~", "<=", ">=", "<", ">", "is null")
 
     def split_symbol(self, symbol):
         for op in self.get_operators():

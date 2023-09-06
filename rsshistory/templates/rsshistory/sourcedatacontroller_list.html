@@ -43,14 +43,24 @@
              {% if user_config.show_icons %}
                <img src="{{source.get_favicon}}" class="content-icon"/>
              {% endif %}
-             <span class="linklistitemtitle">{{source.title}}</span>
+             <span class="linklistitemtitle">
+             {% if source.dead %}
+	     [DEAD]
+             {% endif %}
+             {% if source.on_hold %}
+	     [H]
+             {% endif %}
+		     {{source.title}}
+	     </span>
              <span class="linklistitemdescription">
-                 {{source.get_long_description}}</span>
+                 {{source.get_long_description}}
+	     </span>
            </div>
          </a>
        {% endfor %}
      </div>
 
+     <hr>
     {% include "rsshistory/pagination.html" %}
 
      <a href="{% url 'rsshistory:sources-json' %}?{{ request.GET.urlencode }}" class='simplebutton'>Show JSON</a>

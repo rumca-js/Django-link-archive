@@ -1,0 +1,48 @@
+{% load static %}
+
+<div class="mainbutton-container">
+    <a href="{% url 'rsshistory:index' %}" class="mainbutton">
+        <img src="{% static 'rsshistory/icons/icons8-home-96.png' %}" class="mainbutton-icon" />
+        Home</a>
+    <a href="{% url 'rsshistory:entries-recent' %}" class="mainbutton" title="Shows new entries">
+        <img src="{% static 'rsshistory/icons/icons8-new-100.png' %}" class="mainbutton-icon" />
+        What's new</a>
+    <a href="{% url 'rsshistory:entries-bookmarked' %}" class="mainbutton" title="Shows bookmarked links">
+        <img src="{% static 'rsshistory/icons/icons8-bookmarks-100.png' %}" class="mainbutton-icon" />
+        Bookmarks</a>
+    <a href="{% url 'rsshistory:entries-omni-search-init' %}" class="mainbutton" title="Advanced search">
+        <img src="{% static 'rsshistory/icons/icons8-search-100.png' %}" class="mainbutton-icon" />
+        Search</a>
+    <a href="{% url 'rsshistory:tags-show-all' %}" class="mainbutton" title="Tags">
+        <img src="{% static 'rsshistory/icons/icons8-tags-100.png' %}" class="mainbutton-icon" />
+        Tags</a>
+    <a href="{% url 'rsshistory:sources' %}" class="mainbutton" title="Sources">
+        <img src="{% static 'rsshistory/icons/icons8-broadcast-100.png' %}" class="mainbutton-icon" />
+        Sources</a>
+    {% if config.store_domain_info %}
+    <a href="{% url 'rsshistory:domains' %}" class="mainbutton" title="Domains">
+        <img src="{% static 'rsshistory/icons/icons8-broadcast-100.png' %}" class="mainbutton-icon" />
+        Domains</a>
+    {% endif %}
+</div>
+<hr>
+<div class="mainbutton-container">
+    {% if user.is_staff %}
+
+    <a href="{% url 'rsshistory:admin-page' %}" class="mainbutton" title="Admin">
+        <img src="{% static 'rsshistory/icons/icons8-configuration-67.png' %}" class="mainbutton-icon" />
+        Admin</a>
+    {% endif %}
+
+    {% if user.is_authenticated %}
+    <a href="{% url 'rsshistory:user-config' %}" class="mainbutton" title="User config">
+        <img src="{% static 'rsshistory/icons/account.png' %}" class="mainbutton-icon" />
+        [{{ user.get_username }}]
+    </a>
+    {% else %}
+    <a href="{% url 'rsshistory:login' %}"  class="mainbutton" title="Login">
+        <img src="{% static 'rsshistory/icons/icons8-login-100.png' %}" class="mainbutton-icon" />
+        Login</a>
+    {% endif %}
+</div>
+<hr>

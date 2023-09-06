@@ -2,6 +2,7 @@ from django.views import generic
 from django.urls import reverse
 from django.shortcuts import render
 from django.http import JsonResponse
+from django.http import HttpResponseForbidden, HttpResponseRedirect
 
 from ..models import BackgroundJob
 from ..configuration import Configuration
@@ -76,10 +77,9 @@ def add_source(request):
         form = SourceForm(request.POST)
 
         if form.is_valid():
-            SourceDataController.add(form.cleaned_data)
+            source = SourceDataController.add(form.cleaned_data)
 
-            context["summary_text"] = "Source added"
-            return ContextData.render(request, "summary_present.html", context)
+            return HttpResponseRedirect(source.get_absolute_url())
         else:
             context["summary_text"] = "Source not added"
             return ContextData.render(request, "summary_present.html", context)

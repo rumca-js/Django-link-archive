@@ -13,8 +13,10 @@ from .models import (
     PersistentInfo,
     ConfigurationEntry,
     BackgroundJob,
+    SourceDataModel,
+    Domains,
+    SourceExportHistory
 )
-from .models import SourceExportHistory
 from .pluginsources.sourcecontrollerbuilder import SourceControllerBuilder
 from .basictypes import fix_path_for_windows
 from .programwrappers import ytdlp, id3v2
@@ -528,6 +530,24 @@ class CleanupJobHandler(BaseJobHandler):
         try:
             LinkDataController.clear_old_entries()
             LinkDataController.move_old_links_to_archive()
+            Domains.reset_dynamic_data()
+            SourceDataModel.reset_dynamic_data()
+        except Exception as e:
+            error_text = traceback.format_exc()
+            PersistentInfo.error("Exception: {} {}".format(str(e), error_text))
+
+
+class CheckDomainsJobHandler(BaseJobHandler):
+
+    def __init__(self):
+        pass
+
+    def get_job(self):
+        return BackgroundJob.JOB_CHECK_DOMAINS
+
+    def process(self, obj=None):
+        try:
+            Domains.update_all()
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.error("Exception: {} {}".format(str(e), error_text))
@@ -590,6 +610,7 @@ class HandlerManager(object):
             ImportBookmarksJobHandler(),
             ImportDailyDataJobHandler(),
             CleanupJobHandler(),
+            CheckDomainsJobHandler(),
         ]
 
     def get_handler_and_object(self):

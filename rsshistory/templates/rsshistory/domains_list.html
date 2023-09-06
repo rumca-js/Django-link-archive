@@ -6,7 +6,6 @@
     {% if user.is_staff %}
     <a href="{% url 'rsshistory:domain-add' %}" title="Add new domain" class="simplebutton">Add</a>
     <a href="{% url 'rsshistory:domains-read-bookmarks' %}" title="Reads domains from bookmarks" class="simplebutton">Read from bookmarks</a>
-    <a href="{% url 'rsshistory:domains-remove-all' %}" title="Removes all domains" class="simplebutton">Remove all</a>
     {% endif %}
 </div>
 
@@ -19,6 +18,13 @@
          </td>
      </tr>
      </table>
+
+     <div>
+         categories: {{categories}}
+     </div>
+     <div>
+     subcategories: {{subcategories}}
+     </div>
   </form>
 
   <hr>
@@ -58,7 +64,9 @@
       {% endfor %}
     </div>
 
+    <hr>
     {% include "rsshistory/pagination.html" %}
+
   {% else %}
     No domains yet
   {% endif %}

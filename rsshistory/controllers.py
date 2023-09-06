@@ -31,10 +31,12 @@ class SourceDataController(SourceDataModel):
 
     def add(source_data_map):
         # TODO add domain when adding new source
-        SourceDataModel.objects.create(**source_data_map)
+        source = SourceDataModel.objects.create(**source_data_map)
 
         if ConfigurationEntry.get().store_domain_info:
             Domains.add(source_data_map["url"])
+
+        return source
 
     def get_absolute_url(self):
         """Returns the URL to access a particular author instance."""
@@ -557,70 +559,50 @@ class BackgroundJobController(BackgroundJob):
                 print("Clearing job {}".format(job.job))
                 job.delete()
 
-    def get_number_of_jobs(job_type):
-        return BackgroundJob.objects.filter(job=job_type).count()
+    def get_number_of_jobs(job_name):
+        return BackgroundJob.objects.filter(job=job_name).count()
+
+    def create_single_job(job_name, subject="", args=""):
+        try:
+            items = BackgroundJob.objects.filter(
+                job=job_name, subject=subject
+            )
+            if items.count() == 0:
+                BackgroundJob.objects.create(
+                    job=job_name,
+                    task=None,
+                    subject=subject,
+                    args=args,
+                )
+                return True
+        except Exception as e:
+            error_text = traceback.format_exc()
+            PersistentInfo.error(
+                "Exception: {}: {} {}".format(job_name, str(e), error_text)
+            )
 
     def download_rss(source, force=False):
         if force == False:
             if source.is_fetch_possible() == False:
                 return False
 
-        if (
-            BackgroundJob.objects.filter(
-                job=BackgroundJob.JOB_PROCESS_SOURCE, subject=source.url
-            ).count()
-            == 0
-        ):
-            BackgroundJob.objects.create(
-                job=BackgroundJob.JOB_PROCESS_SOURCE,
-                task=None,
-                subject=source.url,
-                args="",
-            )
-
-        return True
+        return BackgroundJobController.create_single_job(BackgroundJob.JOB_PROCESS_SOURCE, source.url)
 
     def download_music(item):
-        bj = BackgroundJob.objects.create(
-            job=BackgroundJob.JOB_LINK_DOWNLOAD_MUSIC,
-            task=None,
-            subject=item.link,
-            args="",
-        )
-        return True
+        return BackgroundJobController.create_single_job(BackgroundJob.JOB_LINK_DOWNLOAD_MUSIC, item.link)
 
     def download_video(item):
-        bj = BackgroundJob.objects.create(
-            job=BackgroundJob.JOB_LINK_DOWNLOAD_VIDEO,
-            task=None,
-            subject=item.link,
-            args="",
-        )
-        return True
+        return BackgroundJobController.create_single_job(BackgroundJob.JOB_LINK_DOWNLOAD_VIDEO, item.link)
 
     def youtube_details(url):
-        bj = BackgroundJob.objects.create(
-            job=BackgroundJob.JOB_LINK_DETAILS, task=None, subject=url, args=""
-        )
-        return True
+        return BackgroundJobController.create_single_job(BackgroundJob.JOB_LINK_DETAILS, url)
 
     def link_add(url, source):
         existing = LinkDataModel.objects.filter(link=url)
         if existing.count() > 0:
             return False
 
-        if (
-            BackgroundJob.objects.filter(
-                job=BackgroundJob.JOB_LINK_ADD, subject=url
-            ).count()
-            == 0
-        ):
-            BackgroundJob.objects.create(
-                job=BackgroundJob.JOB_LINK_ADD,
-                task=None,
-                subject=url,
-                args=str(source.id),
-            )
+        return BackgroundJobController.create_single_job(BackgroundJob.JOB_LINK_ADD, url, str(source.id))
 
     def write_daily_data_range(date_start=date.today(), date_stop=date.today()):
         from datetime import timedelta
@@ -640,12 +622,7 @@ class BackgroundJobController(BackgroundJob):
                 str_date = current_date.isoformat()
                 current_date += timedelta(days=1)
 
-                BackgroundJob.objects.create(
-                    job=BackgroundJob.JOB_WRITE_DAILY_DATA,
-                    task=None,
-                    subject=str_date,
-                    args="",
-                )
+                BackgroundJobController.write_daily_data(str_date)
                 sent = True
 
             return sent
@@ -656,13 +633,7 @@ class BackgroundJobController(BackgroundJob):
             )
 
     def write_daily_data(input_date):
-        bj = BackgroundJob.objects.create(
-            job=BackgroundJob.JOB_WRITE_DAILY_DATA,
-            task=None,
-            subject=input_date,
-            args="",
-        )
-        return True
+        return BackgroundJobController.create_single_job(BackgroundJob.JOB_WRITE_DAILY_DATA, input_date)
 
     def write_daily_data_str(start="2022-01-01", stop="2022-12-31"):
         try:
@@ -677,55 +648,19 @@ class BackgroundJobController(BackgroundJob):
             )
 
     def write_tag_data(tag):
-        try:
-            BackgroundJob.objects.create(
-                job=BackgroundJob.JOB_WRITE_TOPIC_DATA, task=None, subject=tag, args=""
-            )
-            return True
-        except Exception as e:
-            error_text = traceback.format_exc()
-            PersistentInfo.error(
-                "Exception: Tag data: {} {}".format(str(e), error_text)
-            )
+        return BackgroundJobController.create_single_job(BackgroundJob.JOB_LINK_DOWNLOAD, tag)
 
     def write_bookmarks():
-        try:
-            BackgroundJob.objects.create(
-                job=BackgroundJob.JOB_WRITE_BOOKMARKS, task=None, subject="", args=""
-            )
-            return True
-        except Exception as e:
-            error_text = traceback.format_exc()
-            PersistentInfo.error(
-                "Exception: Write bookmarks: {} {}".format(str(e), error_text)
-            )
+        return BackgroundJobController.create_single_job(BackgroundJob.JOB_WRITE_BOOKMARKS)
 
     def import_daily_data():
-        bj = BackgroundJob.objects.create(
-            job=BackgroundJob.JOB_IMPORT_DAILY_DATA,
-            task=None,
-            subject="",
-            args="",
-        )
-        return True
+        return BackgroundJobController.create_single_job(BackgroundJob.JOB_IMPORT_DAILY_DATA)
 
     def import_bookmarks():
-        bj = BackgroundJob.objects.create(
-            job=BackgroundJob.JOB_IMPORT_BOOKMARKS,
-            task=None,
-            subject="",
-            args="",
-        )
-        return True
+        return BackgroundJobController.create_single_job(BackgroundJob.JOB_IMPORT_BOOKMARKS)
 
     def import_sources():
-        bj = BackgroundJob.objects.create(
-            job=BackgroundJob.JOB_IMPORT_SOURCES,
-            task=None,
-            subject="",
-            args="",
-        )
-        return True
+        return BackgroundJobController.create_single_job(BackgroundJob.JOB_IMPORT_SOURCES)
 
     def link_save(link_url):
         try:
@@ -751,73 +686,17 @@ class BackgroundJobController(BackgroundJob):
             )
 
     def link_download(link_url):
-        try:
-            BackgroundJob.objects.create(
-                job=BackgroundJob.JOB_LINK_DOWNLOAD,
-                task=None,
-                subject=link_url,
-                args="",
-            )
-            return True
-        except Exception as e:
-            error_text = traceback.format_exc()
-            PersistentInfo.error(
-                "Exception: Link download: {} {}".format(str(e), error_text)
-            )
+        return BackgroundJobController.create_single_job(BackgroundJob.JOB_LINK_DOWNLOAD, link_url)
 
     def push_to_repo(input_date=""):
-        try:
-            items = BackgroundJob.objects.filter(
-                job=BackgroundJob.JOB_PUSH_TO_REPO, subject=""
-            )
-            if items.count() == 0:
-                BackgroundJob.objects.create(
-                    job=BackgroundJob.JOB_PUSH_TO_REPO,
-                    task=None,
-                    subject=input_date,
-                    args="",
-                )
-                return True
-        except Exception as e:
-            error_text = traceback.format_exc()
-            PersistentInfo.error(
-                "Exception: Link download: {} {}".format(str(e), error_text)
-            )
+        return BackgroundJobController.create_single_job(BackgroundJob.JOB_PUSH_TO_REPO, input_date)
 
     def push_daily_data_to_repo(input_date=""):
-        try:
-            items = BackgroundJob.objects.filter(
-                job=BackgroundJob.JOB_PUSH_DAILY_DATA_TO_REPO, subject=""
-            )
-            if items.count() == 0:
-                BackgroundJob.objects.create(
-                    job=BackgroundJob.JOB_PUSH_DAILY_DATA_TO_REPO,
-                    task=None,
-                    subject=input_date,
-                    args="",
-                )
-                return True
-        except Exception as e:
-            error_text = traceback.format_exc()
-            PersistentInfo.error(
-                "Exception: Link download: {} {}".format(str(e), error_text)
-            )
+        return BackgroundJobController.create_single_job(BackgroundJob.JOB_PUSH_DAILY_DATA_TO_REPO, input_date)
 
     def make_cleanup():
-        try:
-            items = BackgroundJob.objects.filter(
-                job=BackgroundJob.JOB_CLEANUP, subject=""
-            )
-            if items.count() == 0:
-                BackgroundJob.objects.create(
-                    job=BackgroundJob.JOB_CLEANUP,
-                    task=None,
-                    subject="",
-                    args="",
-                )
-                return True
-        except Exception as e:
-            error_text = traceback.format_exc()
-            PersistentInfo.error(
-                "Exception: Link download: {} {}".format(str(e), error_text)
-            )
+        return BackgroundJobController.create_single_job(BackgroundJob.JOB_CLEANUP)
+
+    def check_domains():
+        return BackgroundJobController.create_single_job(BackgroundJob.JOB_CHECK_DOMAINS)
+

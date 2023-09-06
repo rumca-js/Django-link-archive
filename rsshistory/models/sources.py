@@ -32,7 +32,7 @@ class SourceDataModel(models.Model):
     dead = models.BooleanField(default=False)
     export_to_cms = models.BooleanField(default=False)
     remove_after_days = models.CharField(max_length=10, default="0")
-    language = models.CharField(max_length=1000, default="en-US")
+    language = models.CharField(max_length=1000, default="en")
     favicon = models.CharField(max_length=1000, null=True)
     on_hold = models.BooleanField(default=False)
     fetch_period = models.IntegerField(default=900)
@@ -42,6 +42,17 @@ class SourceDataModel(models.Model):
 
     class Meta:
         ordering = ["title"]
+
+    def reset_dynamic_data():
+        objs = SourceCategories.objects.all()
+        objs.delete()
+        objs = SourceSubCategories.objects.all()
+        objs.delete()
+
+        sources = SourceDataModel.objects.all()
+        for source in sources:
+            SourceCategories.add(source.category)
+            SourceSubCategories.add(source.category, source.subcategory)
 
 
 class SourceOperationalData(models.Model):
@@ -75,13 +86,14 @@ class SourceCategories(models.Model):
 
 
 class SourceSubCategories(models.Model):
-    subcategory = models.CharField(max_length=1000, unique=True)
+    category = models.CharField(max_length=1000, default="")
+    subcategory = models.CharField(max_length=1000)
 
     class Meta:
-        ordering = ["subcategory"]
+        ordering = ["category", "subcategory"]
 
-    def add(subcategory):
-        if subcategory and subcategory != "":
-            objs = SourceSubCategories.objects.filter(subcategory=subcategory)
+    def add(category, subcategory):
+        if category and category != "" and subcategory and subcategory != "":
+            objs = SourceSubCategories.objects.filter(category=category, subcategory=subcategory)
             if objs.count() == 0:
-                SourceSubCategories.objects.create(subcategory=subcategory)
+                SourceSubCategories.objects.create(category=category, subcategory=subcategory)

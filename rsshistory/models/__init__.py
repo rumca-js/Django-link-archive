@@ -25,4 +25,6 @@ from .domains import (
     DomainsSuffixes,
     DomainsTlds,
     DomainsMains,
+    DomainCategories,
+    DomainSubCategories,
 )

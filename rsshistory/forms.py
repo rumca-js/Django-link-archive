@@ -2,6 +2,7 @@ from datetime import datetime, timedelta, date
 from django import forms
 
 from .models import (
+    Domains,
     BackgroundJob,
     LinkTagsDataModel,
     LinkCommentDataModel,
@@ -286,6 +287,34 @@ class BackgroundJobForm(forms.Form):
     task = forms.CharField(label="task", required=False)
     subject = forms.CharField(label="subject", required=False)
     args = forms.CharField(label="args", required=False)
+
+
+class DomainEditForm(forms.ModelForm):
+    """
+    Category choice form
+    """
+
+    class Meta:
+        model = Domains
+        fields = [
+            "category",
+            "subcategory",
+            "domain",
+            "title",
+            "description",
+            "status_code",
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super(DomainEditForm, self).__init__(*args, **kwargs)
+        self.fields["domain"].widget.attrs["readonly"] = True
+
+        self.fields["title"].widget.attrs["readonly"] = True
+        self.fields["description"].widget.attrs["readonly"] = True
+        self.fields["title"].required = False
+        self.fields["description"].required = False
+
+        self.fields["status_code"].widget.attrs["readonly"] = True
 
 
 class DomainsChoiceForm(forms.Form):

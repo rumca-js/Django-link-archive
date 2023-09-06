@@ -3,13 +3,13 @@ from django.urls import reverse
 from django.http import JsonResponse
 from django.http import HttpResponseForbidden, HttpResponseRedirect
 
-from ..models import Domains
-from ..views import ContextData
+from ..models import Domains, DomainCategories, DomainSubCategories, ConfigurationEntry
+from ..views import ContextData, ViewPage
 from ..controllers import (
     LinkDataController,
     LinkDataHyperController,
 )
-from ..forms import DomainsChoiceForm, LinkInputForm
+from ..forms import DomainsChoiceForm, DomainEditForm, LinkInputForm
 from ..queryfilters import DomainFilter
 
 
@@ -40,6 +40,17 @@ class DomainsListView(generic.ListView):
 
         context["filter_form"] = self.filter_form
         context["query_filter"] = self.query_filter
+
+        items = set()
+        for cat in DomainCategories.objects.all():
+            items.add(cat.category)
+        items = sorted(list(items))
+        context["categories"] = ",".join(items)
+        items = set()
+        for cat in DomainSubCategories.objects.all():
+            items.add(cat.subcategory)
+        items = sorted(list(items))
+        context["subcategories"] = ",".join(items)
 
         return context
 
@@ -123,6 +134,46 @@ def domain_add(request):
     return ContextData.render(request, "form_basic.html", context)
 
 
+def domain_edit(request, pk):
+    p = ViewPage(request)
+    p.set_title("Edit domain")
+    p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+
+    domains = Domains.objects.filter(id=pk)
+    if not domains.exists():
+        p.context["summary_text"] = "Could not find such domain"
+        return p.render("summary_present.html")
+
+    domain = domains[0]
+
+    if request.method == "POST":
+        form = DomainEditForm(request.POST, instance=domain)
+        p.context["form"] = form
+
+        if form.is_valid():
+            domain = form.save()
+            category = domain.category
+            subcategory = domain.subcategory
+
+            DomainCategories.add(category)
+            DomainSubCategories.add(category, subcategory)
+            print("Category:{} subcategory:{}".format(category, subcategory))
+
+            return HttpResponseRedirect(domain.get_absolute_url())
+
+        p.context["summary_text"] = "Could not edit domain {}".format(form.cleaned_data)
+        return p.render("summary_present.html")
+    else:
+        form = DomainEditForm(instance=domain)
+
+        form.method = "POST"
+        form.action_url = reverse(
+            "{}:domain-edit".format(ContextData.app_name), args=[pk]
+        )
+        p.context["form"] = form
+        return p.render("form_basic.html")
+
+
 def domain_remove(request, pk):
     context = ContextData.get_context(request)
     context["page_title"] += " - Domain remove"
@@ -130,11 +181,7 @@ def domain_remove(request, pk):
     if not request.user.is_staff:
         return ContextData.render(request, "missing_rights.html", context)
 
-    domains = Domains.objects.get(id=pk)
-    if domains.count() == 0:
-        context["summary_text"] = "Domain does not exist"
-        return ContextData.render(request, "summary_present.html", context)
-
+    domain = Domains.objects.get(id=pk)
     domain.delete()
 
     return HttpResponseRedirect(

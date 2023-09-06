@@ -19,7 +19,6 @@ class ConfigurationEntry(models.Model):
     ACCESS_TYPES = (
         (ACCESS_TYPE_ALL, ACCESS_TYPE_ALL),                     #
         (ACCESS_TYPE_LOGGED, ACCESS_TYPE_LOGGED),               #
-        (ACCESS_TYPE_STAFF, ACCESS_TYPE_STAFF),               #
         (ACCESS_TYPE_OWNER, ACCESS_TYPE_OWNER),                 #
     )
     # fmt: on
@@ -236,6 +235,7 @@ class BackgroundJob(models.Model):
     JOB_PUSH_TO_REPO = "push-to-repo"
     JOB_PUSH_DAILY_DATA_TO_REPO = "push-daily-data-to-repo"
     JOB_CLEANUP = "cleanup"
+    JOB_CHECK_DOMAINS = "check-domains"
 
     # fmt: off
     JOB_CHOICES = (
@@ -256,6 +256,7 @@ class BackgroundJob(models.Model):
         (JOB_PUSH_TO_REPO, JOB_PUSH_TO_REPO),
         (JOB_PUSH_DAILY_DATA_TO_REPO, JOB_PUSH_DAILY_DATA_TO_REPO),
         (JOB_CLEANUP, JOB_CLEANUP),
+        (JOB_CHECK_DOMAINS, JOB_CHECK_DOMAINS),
     )
     # fmt: on
 

@@ -60,10 +60,12 @@ class ViewPage(object):
     def set_access(self, access_type):
         self.access_type = access_type
 
+        return self.check_access()
+
     def set_variable(self, variable_name, variable_value):
         self.context[variable_name] = variable_value
 
-    def render(self, template):
+    def check_access(self):
         if self.access_type:
             if self.access_type == ConfigurationEntry.ACCESS_TYPE_OWNER and not self.request.user.is_superuser:
                 return ContextData.render(self.request, "missing_rights.html", self.context)
@@ -77,6 +79,11 @@ class ViewPage(object):
             return ContextData.render(self.request, "missing_rights.html", self.context)
         if config.access_type == ConfigurationEntry.ACCESS_TYPE_LOGGED and not self.request.user.is_authenticated:
             return ContextData.render(self.request, "missing_rights.html", self.context)
+
+    def render(self, template):
+        result = self.check_access()
+        if result is not None:
+            return result
 
         return ContextData.render(self.request, template, self.context)
 

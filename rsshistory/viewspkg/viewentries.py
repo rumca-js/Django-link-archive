@@ -441,7 +441,7 @@ def add_entry(request):
         form_text += "\n"
         form_text += "For YouTube links:\n"
         form_text += " - Title, description, Date published, source, language is set automatically\n"
-        form_text += " - manual setting of language overrides the default (en-US)\n"
+        form_text += " - manual setting of language overrides the default (en)\n"
         form_text += "\n"
         form_text += "For standard links:\n"
         form_text += " - Title, description, source, language is set automatically, if not specified\n"

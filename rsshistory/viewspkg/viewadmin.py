@@ -28,14 +28,18 @@ from ..views import ContextData, ViewPage
 def admin_page(request):
     p = ViewPage(request)
     p.set_title("Admin")
-    p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
     return p.render("admin_page.html")
 
 
 def configuration_page(request):
     p = ViewPage(request)
     p.set_title("Configuration")
-    p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     ob = ConfigurationEntry.get()
 
@@ -61,7 +65,9 @@ def configuration_page(request):
 def system_status(request):
     p = ViewPage(request)
     p.set_title("Status")
-    p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     c = Configuration.get_object()
     p.context["directory"] = c.directory
@@ -99,7 +105,9 @@ def about(request):
 def user_config(request):
     p = ViewPage(request)
     p.set_title("User configuration")
-    p.set_access(ConfigurationEntry.ACCESS_TYPE_LOGGED)
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_LOGGED)
+    if data is not None:
+        return data
 
     user_name = request.user.get_username()
 
@@ -139,11 +147,11 @@ class BackgroundJobsView(generic.ListView):
 
 
 def backgroundjob_add(request):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - Add a new background job"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Add a new background job")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     if request.method == "POST":
         form = BackgroundJobForm(request.POST)
@@ -158,49 +166,50 @@ def backgroundjob_add(request):
             return ContextData.render(request, "summary_present.html", context)
 
     form = BackgroundJobForm()
-
     form.method = "POST"
     form.action_url = reverse("{}:backgroundjob-add".format(ContextData.app_name))
 
-    context["form"] = form
+    p.context["form"] = form
 
-    return ContextData.render(request, "form_basic.html", context)
+    return p.render("form_basic.html")
 
 
 def backgroundjob_remove(request, pk):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - Background job remove"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Remove a new background job")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     bg = BackgroundJob.objects.get(id=pk)
     bg.delete()
 
-    context["summary_text"] = "Background job has been removed"
-    return ContextData.render(request, "summary_present.html", context)
+    return HttpResponseRedirect(
+        reverse("{}:backgroundjobs".format(ContextData.app_name))
+    )
 
 
 def backgroundjobs_remove_all(request):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - Remove all background jobs"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Remove all background jobs")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     bg = BackgroundJob.objects.all()
     bg.delete()
 
-    context["summary_text"] = "Background jobs were removed"
-    return ContextData.render(request, "summary_present.html", context)
+    return HttpResponseRedirect(
+        reverse("{}:backgroundjobs".format(ContextData.app_name))
+    )
 
 
 def backgroundjobs_check_new(request):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - Background check if new"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Check for new background jobs")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     from ..threadhandlers import RefreshThreadHandler
 
@@ -213,35 +222,35 @@ def backgroundjobs_check_new(request):
 
 
 def backgroundjobs_perform_all(request):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - Background perform all"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Process all background jobs")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     from ..threadhandlers import HandlerManager, RefreshThreadHandler
 
     mgr = HandlerManager()
     mgr.process_all()
 
-    context["summary_text"] = "Background jobs have been processed"
-
-    return ContextData.render(request, "summary_present.html", context)
+    return HttpResponseRedirect(
+        reverse("{}:backgroundjobs".format(ContextData.app_name))
+    )
 
 
 def backgroundjobs_remove(request, job_type):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - Background jobs remove"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Remove background jobs")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     jobs = BackgroundJob.objects.filter(job=job_type)
     jobs.delete()
 
-    context["summary_text"] = "Background jobs has been removed"
-
-    return ContextData.render(request, "summary_present.html", context)
+    return HttpResponseRedirect(
+        reverse("{}:backgroundjobs".format(ContextData.app_name))
+    )
 
 
 class PersistentInfoView(generic.ListView):
@@ -257,42 +266,42 @@ class PersistentInfoView(generic.ListView):
 
 
 def truncate_log_all(request):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - clearing logs"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Clearing all logs")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     PersistentInfo.truncate()
 
-    context["summary_text"] = "Clearing errors done"
-
-    return ContextData.render(request, "summary_present.html", context)
+    return HttpResponseRedirect(
+        reverse("{}:logs".format(ContextData.app_name))
+    )
 
 
 def truncate_log(request):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - clearing logs"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Clearing info logs")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     PersistentInfo.objects.filter(level__lt=40).truncate()
 
-    context["summary_text"] = "Clearing errors done"
-
-    return ContextData.render(request, "summary_present.html", context)
+    return HttpResponseRedirect(
+        reverse("{}:logs".format(ContextData.app_name))
+    )
 
 
 def truncate_log_errors(request):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - clearing log errors"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Clearing error logs")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     PersistentInfo.objects.filter(level=logging.ERROR).truncate()
 
-    context["summary_text"] = "Clearing errors done"
-
-    return ContextData.render(request, "summary_present.html", context)
+    return HttpResponseRedirect(
+        reverse("{}:logs".format(ContextData.app_name))
+    )

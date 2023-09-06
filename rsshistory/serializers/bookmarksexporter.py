@@ -67,7 +67,7 @@ class BookmarksExporter(object):
         file_name.write_text(self.use_rss_wrapper(rss_text))
 
     def use_rss_wrapper(
-        self, text, language="en-US", link="https://renegat0x0.ddns.net"
+        self, text, language="en", link="https://renegat0x0.ddns.net"
     ):
         template = self.get_rss_template()
 

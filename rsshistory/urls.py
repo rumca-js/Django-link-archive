@@ -132,6 +132,7 @@ urlpatterns = [
     path("domain/<int:pk>/", viewdomains.DomainsDetailView.as_view(), name="domain-detail",),
     path("domain-by-name/", viewdomains.DomainsByNameDetailView.as_view(), name="domain-by-name",),
     path("domain-add/", viewdomains.domain_add, name="domain-add",),
+    path("domain-edit/<int:pk>/", viewdomains.domain_edit, name="domain-edit",),
     path("domain-remove/<int:pk>/", viewdomains.domain_remove, name="domain-remove",),
     path("domains-remove-all/", viewdomains.domains_remove_all, name="domains-remove-all",),
     path("domains-fix/", viewdomains.domains_fix, name="domains-fix",),
