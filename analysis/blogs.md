@@ -6,598 +6,598 @@ Sources:
 
 # List
 
-- catgirl.ai gay robot noises
-- jes.al About · Jesal Gadhia
-- dotat.at Tony Finch
-- www.matuzo.at Manuel Matuzovic - Manuel Matuzović
-- www.metalevel.at Home Page of Markus Triska
-- thenumb.at Max Slater
-- ruscur.au ruscur's blog
-- samthor.au Whistlr
-- emily.id.au Emily Trau
-- fy.blackhats.net.au Firstyear's blog-a-log
-- stan.bar Stanislaw Baranski
-- mouha.be Nicky Mouha – Researcher in Cryptography
-- www.stef.be Steffest - web developer
-- ma.ttias.be Mattias Geniar
-- ibob.bg Borislav Stanimirov | iboB
-- adamnash.blog Psychohistory | The personal blog of Adam Nash
-- alistair.blog alistair smith • blog
-- bb-i.blog Kontrowersyjny blog – O polityce i historii trochę inaczej
-- cmart.blog cmart's blog
-- www.ctrl.blog Ctrl blog by Daniel Aleksandersen
-- garry.blog garry.net
-- handwritten.blog handwritten.blog
-- locationtbd.home.blog To Be Determined – by Carson Lansdowne
-- mckayla.blog Kayla
-- mmapped.blog mmap(blog)
-- neilmadden.blog Neil Madden – Thoughts on application security, applied crypto, philosophy and logic
-- paperless.blog Paperless
-- seths.blog Seth's Blog
-- thetechtrailblazer.blog The Tech Trailblazer – A Sane Software Engineering blog
-- tim.blog The Blog of Author Tim Ferriss - Tim Ferriss's 4-Hour Workweek and Lifestyle Design Blog. Tim is an author of 5 #1 NYT/WSJ bestsellers, investor (FB, Uber, Twitter, 50+ more), and host of The Tim Ferriss Show podcast (400M+ downloads)
-- www.yieldcode.blog yield code(); - Dmitry Kudryavtsev
-- alestsurko.by Ales Tsurko | Home
-- 48k.ca George's Home Page
-- alantrick.ca Alan Trick’s Website
-- dgross.ca Daniel P. Gross
-- finbarr.ca Finbarr Timbers
-- froghat.ca froghat.ca
-- gadanidis.ca Tim Gadanidis - Home
-- www.gotw.ca GotW.ca Home Page
-- hypatia.ca hypatia dot ca – Leigh Honeywell's Blog
-- ibraheem.ca Ibraheem Ahmed
-- ivanish.ca Ivan Reese
-- jrhawley.ca James Hawley
-- justinjackson.ca Hi, I'm Justin Jackson
-- jvns.ca Julia Evans
-- kevincox.ca Kevin Cox
-- madrona.ca Madrona Grove
-- www.michaelgeist.ca Michael Geist -
-- mina.naguib.ca Mina Naguib
-- nbailey.ca Noah Bailey
-- blog.peterzhu.ca Peter Zhu
-- pvk.ca Paul Khuong: some Lisp
-- schroer.ca Dominick Schroer's Blog
-- snarky.ca Tall, Snarky Canadian
-- thume.ca Tristan's Site - Tristan Hume
-- varun.ca About | Varun Vachhar
-- vitalik.ca Vitalik Buterin's website
-- owen.cafe Home
-- mako.cc Benjamin Mako Hill
-- pickard.cc chris pickard's weblog
-- vincent.bernat.ch MTU Ninja | Vincent Bernat
-- dugas.ch Dugas.ch
-- www.fabiocrameri.ch Fabio Crameri
-- blog.frankel.ch A Java geek
-- ionathan.ch About · Jonathan Chan
-- michael.stapelberg.ch About - Michael Stapelberg
-- www.alexcharlton.co Alex Charlton Design
-- blog.charliemeyer.co Charlie Meyer's Blog
-- www.izzy.co Izzy Miller
-- josem.co Jose M.
-- blog.kchung.co Kevin Chung
-- rtpg.co Raphael
-- shubhamjain.co Home | Shubham Jain
-- thomaspark.co Thomas Park | On web development, interface design, user research, and all the rest
-- www.timr.co Tim Ruffles' blog
-- aj.codes Posts | Andrew Jorgensen
-- www.aleksandra.codes aleksandra.codes
-- bas.codes Bas codes
-- diego.codes Diego Vicente
-- maciej.codes Maciej codes stuff
-- manny.codes Emmanuel Hayford
-- nora.codes Leonora Tindall | Nora Codes
-- rambo.codes Rambo.codes | Gui Rambo writes about his coding and reverse engineering adventures. | Rambo Codes
-- days.rory.codes Day by Day - Rory Flint
-- solnic.codes solnic.codes
-- blog.thea.codes Blog - Stargirl (Thea) Flowers
-- www.0x58ed.com Lennart Koopmann
-- 1299651405.com Conor Bergin's Blog
-- blog.aadilali.com Aadil Ali
-- www.aaron-powell.com LINQ to Fail
-- blog.aaronkharris.com Aaron's Essays
-- www.aaronkharris.com Aaron Harris
-- aaronlou.com Aaron Lou
-- www.aaronsw.com Aaron Swartz
-- aatishb.com Aatish Bhatia
-- abnercoimbre.com Abner
-- akashhamirwasia.com Akash Hamirwasia
-- alexcabal.com Alex Cabal
-- alexharri.com Alex Harri
-- alexmeub.com Alex Meub
-- www.alexmolas.com Alex Molas
-- www.allencheng.com Home - Allen Cheng
-- www.allendowney.com Allen Downey
-- allisonseboldt.com Allison Seboldt
-- almirvuk.com Almir Vuk | Blog & Website
-- alvyray.com Alvy Ray Smith Homepage
-- www.amygoodchild.com Amy Goodchild
-- www.analogmantra.com Analog Mantra
-- andreabergia.com Andrea Bergia's Website
-- andrealeopardi.com Andrea Leopardi
-- www.andreasfragner.com Andreas Fragner
-- andregarzia.com AndreGarzia.com
-- andreizgirvaci.com Blog | Andrei Zgîrvaci
-- andrewpillar.com Andrew Pillar's Blog
-- www.anildash.com Anil Dash
-- ashvardanian.com Ash's Blog
-- renato.athaydes.com Renato Athaydes
-- austingil.com Hi, I'm Austin Gil. I want to help you build better websites
-- austinhenley.com Austin Z. Henley
-- tumblr.austinkleon.com Austin Kleon
-- www.austinmann.com Travel Photographer - Austin Mann
-- austinpoor.com Austin Poor's Personal Website
-- bbarrows.com Brad Barrows' Blog
-- benjoffe.com Ben Joffe
-- www.benlorantfy.com Ben Lorantfy
-- www.bjmalicoat.com BJ Malicoat
-- blakeashleyjr.com Blake Ashley Jr.
-- blakewatson.com blakewatson.com
-- 1f604.blogspot.com busypoll
-- agileotter.blogspot.com Agile Otter Blog
-- airlied.blogspot.com Dave Airlie Linux Graphics blog
-- allsoftwaresucks.blogspot.com I hate software
-- amitp.blogspot.com Amit's Thoughts
-- avodonosov.blogspot.com blog
-- backreaction.blogspot.com Sabine Hossenfelder: Backreaction
-- bartwullems.blogspot.com The art of simplicity
-- beelineblogger.blogspot.com BeeLine
-- bitbanksoftware.blogspot.com Follow me down the optimization rabbit hole
-- bitmath.blogspot.com Bits, Math and Performance(?)
-- brassicgamer.blogspot.com The Brassic Gamer
-- bsdly.blogspot.com That grumpy BSD guy
-- busibuggy.blogspot.com Busi Buggy
-- c65gs.blogspot.com Making a C64/C65 compatible computer
-- coding-and-computers.blogspot.com Coding And Computers
-- commandcenter.blogspot.com command center
-- cubicspot.blogspot.com Cubic
-- cypherphunk.blogspot.com Cypher Phunk
-- databasearchitects.blogspot.com Database Architects
-- dbmsmusings.blogspot.com DBMS Musings
-- diamondgeezer.blogspot.com diamond geezer
-- educationandstatistics.blogspot.com Education and Statistics
-- egyptianchronicles.blogspot.com Egyptian Chronicles
-- epicandmonicisnotiso.blogspot.com Epic & Monic is not Iso!
-- evidenceanecdotal.blogspot.com Anecdotal Evidence
-- farawaytimes.blogspot.com Far Away Times
-- gbracha.blogspot.com Room 101
-- googleprojectzero.blogspot.com Project Zero
-- haggardhawksblog.blogspot.com HaggardHawks
-- harmanhowtolisten.blogspot.com Harman How to Listen
-- heronsperch.blogspot.com Heron's Perch
-- infoproc.blogspot.com Information Processing
-- jazzprofiles.blogspot.com JazzProfiles
-- johnhcochrane.blogspot.com The Grumpy Economist
-- jpkoning.blogspot.com Moneyness
-- koodihommia.blogspot.com Koodihommia
-- kurotimedesign.blogspot.com Kuro Time Design
-- legasovtapetranslation.blogspot.com The Legasov Tapes
-- maddy06.blogspot.com Maddy's Ramblings
-- mainisusuallyafunction.blogspot.com main is usually a function
-- mikehadlow.blogspot.com Code rant
-- mikelynchcartoons.blogspot.com Mike Lynch Cartoons
-- milwaukeemaven.blogspot.com Milwaukee Maven
-- minborgsjavapot.blogspot.com Minborg's Java Pot
-- mmcthrow-musings.blogspot.com Musings of Michael McThrow
-- moyix.blogspot.com Push the Red Button
-- mssprovenance.blogspot.com Medieval Manuscripts Provenance
-- multixden.blogspot.com The Art is Long
-- muratbuffalo.blogspot.com Metadata
-- nibblestew.blogspot.com Nibble Stew
-- nikmav.blogspot.com nmav's Blog
-- oldvcr.blogspot.com Old Vintage Computing Research
-- programming-puzzler.blogspot.com Thoughts on Programming
-- ptspts.blogspot.com pts.blog
-- pyfound.blogspot.com Python Software Foundation News
-- pythoninsider.blogspot.com Python Insider
-- recursive-public-rants.blogspot.com Public Rants
-- richg42.blogspot.com Richard Geldreich's Blog
-- riowang.blogspot.com Poemas del río Wang
-- schwitzsplinters.blogspot.com The Splintered Mind
-- scienceunicorn.blogspot.com The Science Unicorn
-- smackeyacky.blogspot.com smackeyacky
-- smalldatum.blogspot.com Small Datum
-- spaceflighthistory.blogspot.com No Shortage of Dreams
-- steamtraen.blogspot.com Nick Brown's blog
-- steve-yegge.blogspot.com Stevey's Blog Rants
-- tertulia-moderna.blogspot.com Tertulia Moderna
-- thelittleengineerthatcould.blogspot.com The Little Engineer That Could
-- theprogrammersparadox.blogspot.com The Programmer's Paradox
-- understandingsociety.blogspot.com Understanding Society
-- vintagecomputerstories.blogspot.com Vintage Computer Stories
-- wifinigel.blogspot.com WifiNigel
-- wormwoodiana.blogspot.com Wormwoodiana
-- writingball.blogspot.com The Typewriter Revolution blog
-- wtarreau.blogspot.com Willy Tarreau's stuff
-- www.breck-mckye.com Jimmy Breck-McKye
-- www.brendangregg.com Brendan Gregg's Homepage
-- canolcer.com Can's blog
-- nicholas.carlini.com Nicholas Carlini
-- carloslagoa.com carlos' site
-- blog.cedriccharly.com Cedric Charly's Blog
-- www.charlespetzold.com Charles Petzold
-- charlieharrington.com Charlie Harrington
-- www.chestergrant.com Chester Grant
-- chidiwilliams.com Chidi Williams
-- chollinger.com Christian Hollinger
-- christianjmills.com Christian Mills
-- christianvarga.com Christian Varga
-- chriswarrick.com Blog | Chris Warrick
-- clementneo.com Clement Neo - Blog
-- www.countbayesie.com Count Bayesie - A Probability Blog
-- james.darpinian.com James Darpinian's blog | James Darpinian
-- blog.daveallie.com Dave Allie
-- davekilian.com Dave Kilian's Blog
-- davidbieber.com David Bieber
-- www.dewanahmed.com Dewan's Blog
-- www.dquach.com Dan Quach Blog
-- drewdevault.com Drew DeVault's blog
-- duarteocarmo.com Duarte O.Carmo
-- edjefferson.com Ed Jefferson - Words, code, data
-- blog.ehoneahobed.com Dr. Ehoneah Obed
-- www.erenkrantz.com Justin R. Erenkrantz
-- ericdraken.com Eric Draken - Hard-Problem Solver
-- www.erichgrunewald.com Erich Grunewald's Blog
-- ericswpark.com Eric Park
-- erikbern.com Erik Bernhardsson
-- erikmcclure.com Erik McClure
-- www.eriksvedang.com Erik Svedäng
-- eriugenareview.com Eriugena Review
-- www.ethanheilman.com Ethan Heilman
-- www.ethanrosenthal.com Ethan Rosenthal
-- blog.ezyang.com ezyang’s blog
-- finmoorhouse.com About me - Fin Moorhouse
-- www.gabormelli.com Gabor Melli's Home Page
-- www.geoffreylitt.com Geoffrey Litt
-- www.germanvelasco.com German Velasco
-- giannirosato.com Gianni's Site
-- girliemac.com GirlieMac! Blog
-- guzey.com Alexey Guzey
-- hardiksachan.com Hardik Sachan
-- www.hillelwayne.com Hillel Wayne
-- www.holovaty.com Adrian Holovaty
-- hturan.com Harley Turan
-- blog.ioces.com The Blog of Matt
-- blog.isquaredsoftware.com Mark's Dev Blog
-- janellsihay.com Janell Sihay
-- blog.janestreet.com Jane Street Tech Blog
-- www.janromme.com jan's stuff
-- jaredramsey.com Jared Ramsey
-- jarvispowered.com Derek Jarvis' Blog
-- www.jasonshen.com Jason Shen | Cultivating Resilience
-- www.jasonshulmanstudio.com Jason Shulman
-- jayacunzo.com Jay Acunzo | Author, Speaker, Showrunner
-- jaykmody.com Jay Mody
-- jaylittle.com Jay Little
-- jeffammons.com Jeff Ammons
-- www.jeffgeerling.com Jeff Geerling - Author and Software Developer in St. Louis, MO
-- www.jeffnobbs.com Home | Jeff Nobbs
-- www.jefftk.com Jeff Kaufman
-- jeremymikkola.com Jeremy Mikkola - Home
-- www.jeromeleroy.com Jerome Leroy | Composer
-- www.jordanbpeterson.com Home | Jordan Peterson
-- doctorow.medium.com Cory Doctorow – Medium
-- renegadeotter.com Renegade Otter
-- swizec.com Swizec Teller
-- tracydurnell.com Tracy Durnell
-- deijin.bearblog.dev ❀°。Deijin's Blog
-- herman.bearblog.dev ᕕ( ᐛ )ᕗ Herman's blog
-- nicky.bearblog.dev Nicky's Blog
-- onsclom.bearblog.dev 📚 Austin Merrick’s Blog
-- rogermexico.bearblog.dev Roger González Gutiérrez
-- www.bengreenberg.dev Ben Greenberg | Developer Advocate
-- blog.bithole.dev Adrian's Blog
-- blog.boleary.dev Brendan O'Leary
-- davidisaksson.dev ~/.didev
-- den.dev Den Delimarsky
-- hamel.dev Hamel’s Blog
-- henvic.dev Henrique Vicente
-- imfeld.dev Daniel Imfeld
-- jahed.dev jahed.dev
-- jfreeman.dev John Freeman
-- jimmyislive.dev @jimmyislive
-- jmmv.dev Julio Merino (jmmv.dev)
-- jmorrice.dev John Morrice
-- kg.dev Kash Goudarzi
-- blog.meadsteve.dev MeadSteve's Dev Blog – MeadSteve's Dev Blog
-- blog.mikemwanje.dev Mike Mwanje's Blog
-- blog.neko.dev Blog@neko.dev - blog.neko.dev
-- nicolo.dev Nicolo.dev
-- www.nray.dev Nicholas Ray
-- rasbora.dev Rasbora's Site | rasbora.dev
-- rbates.dev Ryan's Dev Blog
-- www.rida.dev Rida F'kih — Developer & Designer
-- www.ruxu.dev Blog | Roger Oriol
-- ryanmulligan.dev Ryan Mulligan
-- simme.dev Simon Aronsson
-- slama.dev slama.dev
-- slightknack.dev Home — Isaac Clayton
-- thunderseethe.dev thunderseethe's devlog
-- harrison.totty.dev Harrison Totty
-- danieldk.eu Home | Daniël de Kok
-- dev.hexagon.56k.guru Hexagon's Blog
-- bricolage.io None
-- bsubercaseaux.github.io Bernardo Subercaseaux (he/him/his)
-- cmumatt.github.io Matthew C. Davis | Matthew C. Davis at Carnegie Mellon School of Computer Science.
-- joearms.github.io Joe's Blog — a non-linear personal web notebook
-- joseprupi.github.io Josep Rubió Piqué | This is my website.
-- grady.io All posts | Grady Simon
-- lav.io Sam Lavigne
-- leerob.io Lee Robinson
-- luajit.io Jinhua Blog
-- www.eliseomartelli.it Home - Eliseo Martelli
-- mazzo.li Francesco Mazzoli
-- sadh.life Tushar's Blog
-- yadukrishnan.live Scribblings of an introvert
-- justine.lol Justine Tunney's Web Page
-- koshka.love Koshka's Kingdom
-- jakstys.lt Motiejus Jakštys Public Record
-- www.adamtal.me Adam Tal's Blog
-- andrew-quinn.me None
-- andrewkelley.me Andrew Kelley
-- www.aquiles.me About Me - Science, Entrepreneurship | Aquiles Carattino
-- aswinmohan.me Aswin Mohan · aswinmohan.me
-- barnabas.me Barnabas Kendall
-- www.bazhenov.me bazhenov.me
-- benjamincongdon.me Ben Congdon
-- birchtree.me Birchtree
-- blainehansen.me Blaine Hansen
-- borretti.me Fernando Borretti
-- brunocalza.me Bruno Calza
-- bsago.me bsago.me
-- buu342.me Buu342's Land
-- bvisness.me Ben Visness
-- cdoyle.me Colm Doyle · A Developer Relations professional in Dublin, Ireland.
-- chrishannah.me Chris Hannah | Chris Hannah
-- danpalmer.me Dan Palmer
-- doumer.me Doumer's Blog - Learn, Build, Share and Innovate.
-- drshika.me Drshika Asher | Drshika Asher’s Personal Website
-- erynwells.me Eryn Rachel Wells
-- fhur.me About
-- geoffgraham.me Home - Geoff Graham
-- hajo.me Hajo Nils KrabbenhÃ¶ft
-- hescaide.me Holy-Elie Scaide's Notes
-- hynek.me Hynek Schlawack
-- jasony.me Juncheng Yang's website
-- jfhr.me jfhr's blog
-- joshanderson.me Josh Anderson – Information Architect
-- www.jvt.me Jamie Tanna | Software Engineer
-- katafrakt.me Index | katafrakt's garden
-- klafyvel.me Klafyvel's personal page
-- laplab.me About | Nikita Lapkov
-- maskray.me MaskRay
-- blog.matthieud.me Matthieu's blog
-- maxgreenwald.me Max Greenwald
-- blog.millerti.me Matt's Headroom
-- molodtsov.me Yury Molodtsov
-- btm.qva.mybluehost.me a blog by biggiemac42
-- navendu.me Navendu Pottekkat
-- ncase.me It's Nicky Case!
-- omarshehata.me Omar Shehata
-- pauley.me Eric Pauley
-- paulosman.me Paul Osman
-- pbrown.me Paul Brown
-- petevilter.me Pete's Blog
-- philbooth.me Phil Booth
-- pradyunsg.me Pradyun Gedam
-- preslav.me Preslav Rachev
-- prophitt.me Corey Prophitt's Website
-- rauno.me Rauno Freiberg
-- michal.sapka.me [MichaÅ Sapka's website]
-- seiya.me Seiya Nuta
-- serhack.me SerHack – Security Researcher and Writer
-- blog.shalvah.me Shalvah's Blog
-- sharats.me The Sharat's
-- blog.thefrenchghosty.me TheFrenchGhosty's Blog
-- thesloth.me The Sloth Blog
-- tonsky.me Blog @ tonsky.me
-- tyrrrz.me Oleksii Holub
-- univalence.me About
-- lea.verou.me Home • Lea Verou
-- vgel.me Theia Vogel's website & blog
-- vimota.me Victor Mota
-- xnacly.me xnacly - blog
-- scott.mn Scott.mn
-- tck.mn Andy Tockman
-- shkspr.mobi Terence Eden’s Blog
-- cadence.moe cadence's website
-- griffin.moe Griffin Moe - Hello!
-- jameswillia.ms Home | James Williams
-- iam.mt Mohnish Thallavajhula
-- mlajtos.mu mlajtos.mu
-- memo.mx Memo Garcia
-- www.agwa.name Andrew Ayer
-- akkartik.name Kartik Agaram
-- andrea.corbellini.name Andrea Corbellini
-- neil.fraser.name Neil Fraser
-- joeyh.name Joey Hess
-- willthompson.name Will Thompson
-- 0x46.net Filip Borkiewicz
-- alexgaynor.net Alex Gaynor
-- alexwlchan.net alexwlchan
-- blog.aurel32.net AurÃ©lien Jarno
-- billmei.net Bill Mei
-- briancallahan.net Dr. Brian Robert Callahan
-- dan.bulwinkle.net Dan Bulwinkle
-- blog.burntsushi.net Andrew Gallant's Blog - Andrew Gallant's Blog
-- jfm.carcosa.net Jason F. McBrayer
-- blog.carlmjohnson.net The Ethically-Trained Programmer
-- www.cdahmedeh.net cdahmedeh (Ahmed El-Hajjar)
-- www.colinmclear.net Colin McLear
-- conorbroderick.net All posts | Conor's Blog -
-- cpojer.net Christoph Nakazawa
-- cprimozic.net Casey Primozic's Homepage
-- darkcoding.net Graham King
-- darrenburns.net Darren Burns - Blog
-- renegat0x0.ddns.net renegat0x0 site
-- destevez.net Daniel Estévez – Scientific & Technical Amateur Radio — Home of EA4GPZ / M0HXM
-- dottedmag.net Mikhail Gusarov
-- duncanlock.net Duncan Locks personal site · duncan­lock­.net
-- ersei.net Home | Ersei 'n Stuff
-- fabiensanglard.net Fabien Sanglard's Website
-- www.friendlyskies.net Marc Stuff
-- taras.glek.net Taras' Blog on AI, Perf, Hacks
-- www.grammarware.net Dr. Vadim Zaytsev
-- www.gregegan.net Greg Egan’s Home Page
-- hookrace.net HookRace Blog
-- incompleteideas.net Rich Sutton's Home Page
-- javahippie.net Tim ZÃ¶ller
-- jaycarlson.net Blog - Jay Carlson
-- jemarch.net Homepage of Jose E. Marchesi
-- jfloren.net John Floren
-- jmtd.net Jonathan Dowland
-- jpmens.net Jan-Piet Mens
-- jsomers.net James Somers
-- blog.karliner.net Mike's Blog — Technologist at Large
-- www.kooslooijesteijn.net Blog | Koos Looijesteijn
-- krisnova.net Kris Nóva | Kris Nóva
-- kylemcdonald.net Kyle McDonald
-- www.leshenko.net Nikita's Homepage
-- lindastone.net Linda Stone – Writer, speaker, consultant
-- eli.lipsitz.net Eli Lipsitz
-- lukasrosenstock.net Lukas Rosenstock's Blog
-- mattwynne.net Matt Wynne
-- www.meziantou.net Meziantou's blog
-- matt.might.net Matt Might
-- mijailovic.net Nemanja Mijailovic's Blog
-- www.milanvit.net Czech/in/Japan – Milan Vit
-- blog.mollywhite.net Molly White
-- www.mollywhite.net Molly White
-- nick-lane.net Nick Lane Personal Website
-- nliu.net my php/cobol blog
-- oleb.net Ole Begemann
-- orlp.net About Me | orlp.net
-- www.patrickweaver.net Patrick Weaver
-- paulbourke.net Paul Bourke - Personal Pages
-- paulromer.net Paul Romer
-- petereliaskraft.net Peter Kraft
-- peterme.net Welcome to Peter's DevLog
-- pluralistic.net Pluralistic: Daily links from Cory Doctorow – No trackers, no ads. Black type, white background. Privacy policy: we don't collect or retain any data at all ever period.
-- rebeccaskinner.net Rebecca Skinner - Home
-- www.salkosuo.net Sami Salkosuo | Occasionally updated.
-- www.sami-lehtinen.net Sami Lehtinen
-- www.scattered-thoughts.net Jamie Brandon
-- til.simonwillison.net Simon Willison: TIL
-- simson.net Simson Garfinkel
-- digit.so36.net Matthias Monroy
-- www.spronck.net Pieter Spronck
-- stephenramsay.net Stephen Ramsay
-- susam.net Susam Pal
-- www.tdpain.net Hi there! :: Thomas Pain
-- blog.varunramesh.net Varun Ramesh's Blog
-- microblog.vladh.net vladh's microblog
-- blog.vslira.net vslira's blog
-- jan.wildeboer.net Jan Wildeboer's Blog
-- yotam.net Yotam's blog
-- chris.eidhof.nl Chris Eidhof
-- stderr.nl (...) — /Blog
-- sylviavanos.nl Home | Sylvia van Os
-- robins.one Taylor Robinson
-- marble.onl Andrew Marble
-- antonz.org Anton Zhiyanov
-- www.b-list.org James Bennett
-- briansmith.org Brian Smith
-- blog.cr0.org cr0 blog
-- www.heltweg.org Philip Heltweg
-- interconnected.org Matt Webb
-- jacobian.org Jacob Kaplan-Moss
-- jenson.org Scott Jenson – Exploring the world beyond mobile
-- blog.jgc.org John Graham-Cumming's blog
-- johnhorgan.org John Horgan (The Science Writer)
-- blog.josefsson.org Simon Josefsson's blog
-- www.laputan.org Brian Foote
-- man7.org Michael Kerrisk - man7.org
-- www.manton.org Manton Reece
-- mycophobia.org mycophobia's web site
-- www.ncameron.org Nicholas Cameron
-- neelc.org Neel Chauhan
-- www.neelc.org Neel Chauhan
-- novalis.org David "Novalis" Turner
-- tinyclouds.org Ryan Dahl
-- mike.zwobble.org Mike's corner of the web
-- blog.danieljanus.pl Daniel Janus â blog
-- mbork.pl Marcin Borkowski: Strona domowa
-- p.migdal.pl Homepage - Piotr Migdał
-- www.justus.pw Justus Perlwitz
-- mariusbancila.ro Marius Bancila's Blog
-- andgein.ru Заметки Андрея Гейна
-- daniel.haxx.se Daniel Stenberg - daniel.haxx.se
-- hugotunius.se Blog - Hugo Tunius
-- jforberg.se Jforberg
-- www.jonashietala.se Jonas Hietala: Home
-- rigtorp.se Erik Rigtorp
-- aaka.sh Aakash Patel
-- artemis.sh Artemis Everfree
-- bower.sh erock's blog
-- d-s.sh [MichaÅ Sapka's website]
-- blog.gibson.sh ./gibson.sh --blog
-- kau.sh Kaushik Gopal's Site
-- austinvernon.site Austin Vernon - Austin Vernon's Blog
-- kidger.site Patrick Kidger
-- timor.site timor's site
-- ciechanow.ski Bartosz Ciechanowski
-- blog.djha.skin Skin's Blog
-- 18alan.space Alan's Space
-- ariadne.space Ariadne's Space
-- beccaricks.space Becca Ricks
-- benjcal.space Ben Calderon's Web Page
-- icing.space Royal Icing
-- jakob.space Recent Posts â Jakob's Personal Webpage
-- zverok.space zverok's space
-- andreyor.st Andrey Listopadov
-- julien.jorge.st Julien Jorge's Personal Website
-- effect.systems Yihong Zhang
-- alicegg.tech Alice GG
-- astrid.tech Astrid Yu | astrid.tech
-- gabrielsieben.tech Gabriel Sieben
-- sanket.tech Sanket Shanbhag
-- blog.winny.tech Winny's Blog
-- blog.dave.tf blog.dave.tf
-- lobi.to Harley Watson
-- quaran.to nick quaranto
-- blog.val.town Val Town Blog
-- ma.tt Matt Mullenweg | Unlucky in Cards
-- adamkdean.co.uk Adam K Dean
-- www.alexmurrell.co.uk Alex Murrell
-- blog.benjojo.co.uk Benjojo's Blog
-- blog.davetcode.co.uk David Tyler's Blog - Technical writing mostly focused on emulating old systems.
-- incoherency.co.uk James Stanley
-- kevinmahoney.co.uk Kevin Mahoney
-- www.kianryan.co.uk Kian Ryan
-- www.michalpaszkiewicz.co.uk Michal Paszkiewicz
-- mukulrathi.co.uk Mukul's Personal Website
-- www.thecodepainter.co.uk Simon Painter
-- www.tomanthony.co.uk Tom Anthony - SEO, Web Development and Research
-- www.da.vidbuchanan.co.uk [d@vidbuchanan.co.uk ~]$
-- webdevlaw.uk Hi, I'm Heather Burns – — at home in the world.
-- beej.us Beej's Web Page
-- www.neversaw.us Chris Dickinson
-- scottburns.us Project Docs – Scott Allen Burns
-- www.scottkennedy.us Scott Kennedy
-- rmf.vc Bob Frankston Home Page
-- omar.website Omar Rizwan
-- zura.wiki Roger Zurawicki · Roger Zurawicki
-- kadekillary.work kade killary
-- debugging.works Hi, I'm kmille
-- prashanth.world Prashanth Sadasivan – The Chief Questions Officer 💻🍳☕️
-- ellie.wtf Ellie's Blog
-- benkettle.xyz Ben Kettle
-- brycevandegrift.xyz Bryce Vandegrift's Website
-- cedwards.xyz Connor's Blog
-- chrisx.xyz Chris Xiao
-- danpetrov.xyz Hi! | DanPetrov
-- garrit.xyz Garrit Franke
-- gazoche.xyz Gazoche's blog
-- jerrysv.xyz jerrysv.yxz - home
-- stephan.lachnit.xyz Stephan Lachnit | Blog
-- lukesmith.xyz Luke's Webpage
-- www.mtb.xyz Matt Brown
-- nadia.xyz Nadia Asparouhova
-- notrelated.xyz Not Related! A Big-Braned Podcast
-- raypatrick.xyz Ray Patrick
-- ssteinberg.xyz Shlomi Steinberg
-- blog.sulami.xyz Welcome - sulami's blog
-- tlakh.xyz Florian Obser
-- waqas.xyz Waqas Ahmed
-- chan.co.za Channon Perry
+- https://catgirl.ai gay robot noises
+- https://jes.al About · Jesal Gadhia
+- https://dotat.at Tony Finch
+- https://www.matuzo.at Manuel Matuzovic - Manuel Matuzović
+- https://www.metalevel.at Home Page of Markus Triska
+- https://thenumb.at Max Slater
+- https://ruscur.au ruscur's blog
+- https://samthor.au Whistlr
+- https://emily.id.au Emily Trau
+- https://fy.blackhats.net.au Firstyear's blog-a-log
+- https://stan.bar Stanislaw Baranski
+- https://mouha.be Nicky Mouha – Researcher in Cryptography
+- https://www.stef.be Steffest - web developer
+- https://ma.ttias.be Mattias Geniar
+- https://ibob.bg Borislav Stanimirov | iboB
+- https://adamnash.blog Psychohistory | The personal blog of Adam Nash
+- https://alistair.blog alistair smith • blog
+- https://bb-i.blog Kontrowersyjny blog – O polityce i historii trochę inaczej
+- https://cmart.blog cmart's blog
+- https://www.ctrl.blog Ctrl blog by Daniel Aleksandersen
+- https://garry.blog garry.net
+- https://handwritten.blog handwritten.blog
+- https://locationtbd.home.blog To Be Determined – by Carson Lansdowne
+- https://mckayla.blog Kayla
+- https://mmapped.blog mmap(blog)
+- https://neilmadden.blog Neil Madden – Thoughts on application security, applied crypto, philosophy and logic
+- https://paperless.blog Paperless
+- https://seths.blog Seth's Blog
+- https://thetechtrailblazer.blog The Tech Trailblazer – A Sane Software Engineering blog
+- https://tim.blog The Blog of Author Tim Ferriss - Tim Ferriss's 4-Hour Workweek and Lifestyle Design Blog. Tim is an author of 5 #1 NYT/WSJ bestsellers, investor (FB, Uber, Twitter, 50+ more), and host of The Tim Ferriss Show podcast (400M+ downloads)
+- https://www.yieldcode.blog yield code(); - Dmitry Kudryavtsev
+- https://alestsurko.by Ales Tsurko | Home
+- https://48k.ca George's Home Page
+- https://alantrick.ca Alan Trick’s Website
+- https://dgross.ca Daniel P. Gross
+- https://finbarr.ca Finbarr Timbers
+- https://froghat.ca froghat.ca
+- https://gadanidis.ca Tim Gadanidis - Home
+- https://www.gotw.ca GotW.ca Home Page
+- https://hypatia.ca hypatia dot ca – Leigh Honeywell's Blog
+- https://ibraheem.ca Ibraheem Ahmed
+- https://ivanish.ca Ivan Reese
+- https://jrhawley.ca James Hawley
+- https://justinjackson.ca Hi, I'm Justin Jackson
+- https://jvns.ca Julia Evans
+- https://kevincox.ca Kevin Cox
+- https://madrona.ca Madrona Grove
+- https://www.michaelgeist.ca Michael Geist -
+- https://mina.naguib.ca Mina Naguib
+- https://nbailey.ca Noah Bailey
+- https://blog.peterzhu.ca Peter Zhu
+- https://pvk.ca Paul Khuong: some Lisp
+- https://schroer.ca Dominick Schroer's Blog
+- https://snarky.ca Tall, Snarky Canadian
+- https://thume.ca Tristan's Site - Tristan Hume
+- https://varun.ca About | Varun Vachhar
+- https://vitalik.ca Vitalik Buterin's website
+- https://owen.cafe Home
+- https://mako.cc Benjamin Mako Hill
+- https://pickard.cc chris pickard's weblog
+- https://vincent.bernat.ch MTU Ninja | Vincent Bernat
+- https://dugas.ch Dugas.ch
+- https://www.fabiocrameri.ch Fabio Crameri
+- https://blog.frankel.ch A Java geek
+- https://ionathan.ch About · Jonathan Chan
+- https://michael.stapelberg.ch About - Michael Stapelberg
+- https://www.alexcharlton.co Alex Charlton Design
+- https://blog.charliemeyer.co Charlie Meyer's Blog
+- https://www.izzy.co Izzy Miller
+- https://josem.co Jose M.
+- https://blog.kchung.co Kevin Chung
+- https://rtpg.co Raphael
+- https://shubhamjain.co Home | Shubham Jain
+- https://thomaspark.co Thomas Park | On web development, interface design, user research, and all the rest
+- https://www.timr.co Tim Ruffles' blog
+- https://aj.codes Posts | Andrew Jorgensen
+- https://www.aleksandra.codes aleksandra.codes
+- https://bas.codes Bas codes
+- https://diego.codes Diego Vicente
+- https://maciej.codes Maciej codes stuff
+- https://manny.codes Emmanuel Hayford
+- https://nora.codes Leonora Tindall | Nora Codes
+- https://rambo.codes Rambo.codes | Gui Rambo writes about his coding and reverse engineering adventures. | Rambo Codes
+- https://days.rory.codes Day by Day - Rory Flint
+- https://solnic.codes solnic.codes
+- https://blog.thea.codes Blog - Stargirl (Thea) Flowers
+- https://www.0x58ed.com Lennart Koopmann
+- https://1299651405.com Conor Bergin's Blog
+- https://blog.aadilali.com Aadil Ali
+- https://www.aaron-powell.com LINQ to Fail
+- https://blog.aaronkharris.com Aaron's Essays
+- https://www.aaronkharris.com Aaron Harris
+- https://aaronlou.com Aaron Lou
+- https://www.aaronsw.com Aaron Swartz
+- https://aatishb.com Aatish Bhatia
+- https://abnercoimbre.com Abner
+- https://akashhamirwasia.com Akash Hamirwasia
+- https://alexcabal.com Alex Cabal
+- https://alexharri.com Alex Harri
+- https://alexmeub.com Alex Meub
+- https://www.alexmolas.com Alex Molas
+- https://www.allencheng.com Home - Allen Cheng
+- https://www.allendowney.com Allen Downey
+- https://allisonseboldt.com Allison Seboldt
+- https://almirvuk.com Almir Vuk | Blog & Website
+- https://alvyray.com Alvy Ray Smith Homepage
+- https://www.amygoodchild.com Amy Goodchild
+- https://www.analogmantra.com Analog Mantra
+- https://andreabergia.com Andrea Bergia's Website
+- https://andrealeopardi.com Andrea Leopardi
+- https://www.andreasfragner.com Andreas Fragner
+- https://andregarzia.com AndreGarzia.com
+- https://andreizgirvaci.com Blog | Andrei Zgîrvaci
+- https://andrewpillar.com Andrew Pillar's Blog
+- https://www.anildash.com Anil Dash
+- https://ashvardanian.com Ash's Blog
+- https://renato.athaydes.com Renato Athaydes
+- https://austingil.com Hi, I'm Austin Gil. I want to help you build better websites
+- https://austinhenley.com Austin Z. Henley
+- https://tumblr.austinkleon.com Austin Kleon
+- https://www.austinmann.com Travel Photographer - Austin Mann
+- https://austinpoor.com Austin Poor's Personal Website
+- https://bbarrows.com Brad Barrows' Blog
+- https://benjoffe.com Ben Joffe
+- https://www.benlorantfy.com Ben Lorantfy
+- https://www.bjmalicoat.com BJ Malicoat
+- https://blakeashleyjr.com Blake Ashley Jr.
+- https://blakewatson.com blakewatson.com
+- https://1f604.blogspot.com busypoll
+- https://agileotter.blogspot.com Agile Otter Blog
+- https://airlied.blogspot.com Dave Airlie Linux Graphics blog
+- https://allsoftwaresucks.blogspot.com I hate software
+- https://amitp.blogspot.com Amit's Thoughts
+- https://avodonosov.blogspot.com blog
+- https://backreaction.blogspot.com Sabine Hossenfelder: Backreaction
+- https://bartwullems.blogspot.com The art of simplicity
+- https://beelineblogger.blogspot.com BeeLine
+- https://bitbanksoftware.blogspot.com Follow me down the optimization rabbit hole
+- https://bitmath.blogspot.com Bits, Math and Performance(?)
+- https://brassicgamer.blogspot.com The Brassic Gamer
+- https://bsdly.blogspot.com That grumpy BSD guy
+- https://busibuggy.blogspot.com Busi Buggy
+- https://c65gs.blogspot.com Making a C64/C65 compatible computer
+- https://coding-and-computers.blogspot.com Coding And Computers
+- https://commandcenter.blogspot.com command center
+- https://cubicspot.blogspot.com Cubic
+- https://cypherphunk.blogspot.com Cypher Phunk
+- https://databasearchitects.blogspot.com Database Architects
+- https://dbmsmusings.blogspot.com DBMS Musings
+- https://diamondgeezer.blogspot.com diamond geezer
+- https://educationandstatistics.blogspot.com Education and Statistics
+- https://egyptianchronicles.blogspot.com Egyptian Chronicles
+- https://epicandmonicisnotiso.blogspot.com Epic & Monic is not Iso!
+- https://evidenceanecdotal.blogspot.com Anecdotal Evidence
+- https://farawaytimes.blogspot.com Far Away Times
+- https://gbracha.blogspot.com Room 101
+- https://googleprojectzero.blogspot.com Project Zero
+- https://haggardhawksblog.blogspot.com HaggardHawks
+- https://harmanhowtolisten.blogspot.com Harman How to Listen
+- https://heronsperch.blogspot.com Heron's Perch
+- https://infoproc.blogspot.com Information Processing
+- https://jazzprofiles.blogspot.com JazzProfiles
+- https://johnhcochrane.blogspot.com The Grumpy Economist
+- https://jpkoning.blogspot.com Moneyness
+- https://koodihommia.blogspot.com Koodihommia
+- https://kurotimedesign.blogspot.com Kuro Time Design
+- https://legasovtapetranslation.blogspot.com The Legasov Tapes
+- https://maddy06.blogspot.com Maddy's Ramblings
+- https://mainisusuallyafunction.blogspot.com main is usually a function
+- https://mikehadlow.blogspot.com Code rant
+- https://mikelynchcartoons.blogspot.com Mike Lynch Cartoons
+- https://milwaukeemaven.blogspot.com Milwaukee Maven
+- https://minborgsjavapot.blogspot.com Minborg's Java Pot
+- https://mmcthrow-musings.blogspot.com Musings of Michael McThrow
+- https://moyix.blogspot.com Push the Red Button
+- https://mssprovenance.blogspot.com Medieval Manuscripts Provenance
+- https://multixden.blogspot.com The Art is Long
+- https://muratbuffalo.blogspot.com Metadata
+- https://nibblestew.blogspot.com Nibble Stew
+- https://nikmav.blogspot.com nmav's Blog
+- https://oldvcr.blogspot.com Old Vintage Computing Research
+- https://programming-puzzler.blogspot.com Thoughts on Programming
+- https://ptspts.blogspot.com pts.blog
+- https://pyfound.blogspot.com Python Software Foundation News
+- https://pythoninsider.blogspot.com Python Insider
+- https://recursive-public-rants.blogspot.com Public Rants
+- https://richg42.blogspot.com Richard Geldreich's Blog
+- https://riowang.blogspot.com Poemas del río Wang
+- https://schwitzsplinters.blogspot.com The Splintered Mind
+- https://scienceunicorn.blogspot.com The Science Unicorn
+- https://smackeyacky.blogspot.com smackeyacky
+- https://smalldatum.blogspot.com Small Datum
+- https://spaceflighthistory.blogspot.com No Shortage of Dreams
+- https://steamtraen.blogspot.com Nick Brown's blog
+- https://steve-yegge.blogspot.com Stevey's Blog Rants
+- https://tertulia-moderna.blogspot.com Tertulia Moderna
+- https://thelittleengineerthatcould.blogspot.com The Little Engineer That Could
+- https://theprogrammersparadox.blogspot.com The Programmer's Paradox
+- https://understandingsociety.blogspot.com Understanding Society
+- https://vintagecomputerstories.blogspot.com Vintage Computer Stories
+- https://wifinigel.blogspot.com WifiNigel
+- https://wormwoodiana.blogspot.com Wormwoodiana
+- https://writingball.blogspot.com The Typewriter Revolution blog
+- https://wtarreau.blogspot.com Willy Tarreau's stuff
+- https://www.breck-mckye.com Jimmy Breck-McKye
+- https://www.brendangregg.com Brendan Gregg's Homepage
+- https://canolcer.com Can's blog
+- https://nicholas.carlini.com Nicholas Carlini
+- https://carloslagoa.com carlos' site
+- https://blog.cedriccharly.com Cedric Charly's Blog
+- https://www.charlespetzold.com Charles Petzold
+- https://charlieharrington.com Charlie Harrington
+- https://www.chestergrant.com Chester Grant
+- https://chidiwilliams.com Chidi Williams
+- https://chollinger.com Christian Hollinger
+- https://christianjmills.com Christian Mills
+- https://christianvarga.com Christian Varga
+- https://chriswarrick.com Blog | Chris Warrick
+- https://clementneo.com Clement Neo - Blog
+- https://www.countbayesie.com Count Bayesie - A Probability Blog
+- https://james.darpinian.com James Darpinian's blog | James Darpinian
+- https://blog.daveallie.com Dave Allie
+- https://davekilian.com Dave Kilian's Blog
+- https://davidbieber.com David Bieber
+- https://www.dewanahmed.com Dewan's Blog
+- https://www.dquach.com Dan Quach Blog
+- https://drewdevault.com Drew DeVault's blog
+- https://duarteocarmo.com Duarte O.Carmo
+- https://edjefferson.com Ed Jefferson - Words, code, data
+- https://blog.ehoneahobed.com Dr. Ehoneah Obed
+- https://www.erenkrantz.com Justin R. Erenkrantz
+- https://ericdraken.com Eric Draken - Hard-Problem Solver
+- https://www.erichgrunewald.com Erich Grunewald's Blog
+- https://ericswpark.com Eric Park
+- https://erikbern.com Erik Bernhardsson
+- https://erikmcclure.com Erik McClure
+- https://www.eriksvedang.com Erik Svedäng
+- https://eriugenareview.com Eriugena Review
+- https://www.ethanheilman.com Ethan Heilman
+- https://www.ethanrosenthal.com Ethan Rosenthal
+- https://blog.ezyang.com ezyang’s blog
+- https://finmoorhouse.com About me - Fin Moorhouse
+- https://www.gabormelli.com Gabor Melli's Home Page
+- https://www.geoffreylitt.com Geoffrey Litt
+- https://www.germanvelasco.com German Velasco
+- https://giannirosato.com Gianni's Site
+- https://girliemac.com GirlieMac! Blog
+- https://guzey.com Alexey Guzey
+- https://hardiksachan.com Hardik Sachan
+- https://www.hillelwayne.com Hillel Wayne
+- https://www.holovaty.com Adrian Holovaty
+- https://hturan.com Harley Turan
+- https://blog.ioces.com The Blog of Matt
+- https://blog.isquaredsoftware.com Mark's Dev Blog
+- https://janellsihay.com Janell Sihay
+- https://blog.janestreet.com Jane Street Tech Blog
+- https://www.janromme.com jan's stuff
+- https://jaredramsey.com Jared Ramsey
+- https://jarvispowered.com Derek Jarvis' Blog
+- https://www.jasonshen.com Jason Shen | Cultivating Resilience
+- https://www.jasonshulmanstudio.com Jason Shulman
+- https://jayacunzo.com Jay Acunzo | Author, Speaker, Showrunner
+- https://jaykmody.com Jay Mody
+- https://jaylittle.com Jay Little
+- https://jeffammons.com Jeff Ammons
+- https://www.jeffgeerling.com Jeff Geerling - Author and Software Developer in St. Louis, MO
+- https://www.jeffnobbs.com Home | Jeff Nobbs
+- https://www.jefftk.com Jeff Kaufman
+- https://jeremymikkola.com Jeremy Mikkola - Home
+- https://www.jeromeleroy.com Jerome Leroy | Composer
+- https://www.jordanbpeterson.com Home | Jordan Peterson
+- https://doctorow.medium.com Cory Doctorow – Medium
+- https://renegadeotter.com Renegade Otter
+- https://swizec.com Swizec Teller
+- https://tracydurnell.com Tracy Durnell
+- https://deijin.bearblog.dev ❀°。Deijin's Blog
+- https://herman.bearblog.dev ᕕ( ᐛ )ᕗ Herman's blog
+- https://nicky.bearblog.dev Nicky's Blog
+- https://onsclom.bearblog.dev 📚 Austin Merrick’s Blog
+- https://rogermexico.bearblog.dev Roger González Gutiérrez
+- https://www.bengreenberg.dev Ben Greenberg | Developer Advocate
+- https://blog.bithole.dev Adrian's Blog
+- https://blog.boleary.dev Brendan O'Leary
+- https://davidisaksson.dev ~/.didev
+- https://den.dev Den Delimarsky
+- https://hamel.dev Hamel’s Blog
+- https://henvic.dev Henrique Vicente
+- https://imfeld.dev Daniel Imfeld
+- https://jahed.dev jahed.dev
+- https://jfreeman.dev John Freeman
+- https://jimmyislive.dev @jimmyislive
+- https://jmmv.dev Julio Merino (jmmv.dev)
+- https://jmorrice.dev John Morrice
+- https://kg.dev Kash Goudarzi
+- https://blog.meadsteve.dev MeadSteve's Dev Blog – MeadSteve's Dev Blog
+- https://blog.mikemwanje.dev Mike Mwanje's Blog
+- https://blog.neko.dev Blog@neko.dev - blog.neko.dev
+- https://nicolo.dev Nicolo.dev
+- https://www.nray.dev Nicholas Ray
+- https://rasbora.dev Rasbora's Site | rasbora.dev
+- https://rbates.dev Ryan's Dev Blog
+- https://www.rida.dev Rida F'kih — Developer & Designer
+- https://www.ruxu.dev Blog | Roger Oriol
+- https://ryanmulligan.dev Ryan Mulligan
+- https://simme.dev Simon Aronsson
+- https://slama.dev slama.dev
+- https://slightknack.dev Home — Isaac Clayton
+- https://thunderseethe.dev thunderseethe's devlog
+- https://harrison.totty.dev Harrison Totty
+- https://danieldk.eu Home | Daniël de Kok
+- https://dev.hexagon.56k.guru Hexagon's Blog
+- https://bricolage.io None
+- https://bsubercaseaux.github.io Bernardo Subercaseaux (he/him/his)
+- https://cmumatt.github.io Matthew C. Davis | Matthew C. Davis at Carnegie Mellon School of Computer Science.
+- https://joearms.github.io Joe's Blog — a non-linear personal web notebook
+- https://joseprupi.github.io Josep Rubió Piqué | This is my website.
+- https://grady.io All posts | Grady Simon
+- https://lav.io Sam Lavigne
+- https://leerob.io Lee Robinson
+- https://luajit.io Jinhua Blog
+- https://www.eliseomartelli.it Home - Eliseo Martelli
+- https://mazzo.li Francesco Mazzoli
+- https://sadh.life Tushar's Blog
+- https://yadukrishnan.live Scribblings of an introvert
+- https://justine.lol Justine Tunney's Web Page
+- https://koshka.love Koshka's Kingdom
+- https://jakstys.lt Motiejus Jakštys Public Record
+- https://www.adamtal.me Adam Tal's Blog
+- https://andrew-quinn.me None
+- https://andrewkelley.me Andrew Kelley
+- https://www.aquiles.me About Me - Science, Entrepreneurship | Aquiles Carattino
+- https://aswinmohan.me Aswin Mohan · aswinmohan.me
+- https://barnabas.me Barnabas Kendall
+- https://www.bazhenov.me bazhenov.me
+- https://benjamincongdon.me Ben Congdon
+- https://birchtree.me Birchtree
+- https://blainehansen.me Blaine Hansen
+- https://borretti.me Fernando Borretti
+- https://brunocalza.me Bruno Calza
+- https://bsago.me bsago.me
+- https://buu342.me Buu342's Land
+- https://bvisness.me Ben Visness
+- https://cdoyle.me Colm Doyle · A Developer Relations professional in Dublin, Ireland.
+- https://chrishannah.me Chris Hannah | Chris Hannah
+- https://danpalmer.me Dan Palmer
+- https://doumer.me Doumer's Blog - Learn, Build, Share and Innovate.
+- https://drshika.me Drshika Asher | Drshika Asher’s Personal Website
+- https://erynwells.me Eryn Rachel Wells
+- https://fhur.me About
+- https://geoffgraham.me Home - Geoff Graham
+- https://hajo.me Hajo Nils KrabbenhÃ¶ft
+- https://hescaide.me Holy-Elie Scaide's Notes
+- https://hynek.me Hynek Schlawack
+- https://jasony.me Juncheng Yang's website
+- https://jfhr.me jfhr's blog
+- https://joshanderson.me Josh Anderson – Information Architect
+- https://www.jvt.me Jamie Tanna | Software Engineer
+- https://katafrakt.me Index | katafrakt's garden
+- https://klafyvel.me Klafyvel's personal page
+- https://laplab.me About | Nikita Lapkov
+- https://maskray.me MaskRay
+- https://blog.matthieud.me Matthieu's blog
+- https://maxgreenwald.me Max Greenwald
+- https://blog.millerti.me Matt's Headroom
+- https://molodtsov.me Yury Molodtsov
+- https://btm.qva.mybluehost.me a blog by biggiemac42
+- https://navendu.me Navendu Pottekkat
+- https://ncase.me It's Nicky Case!
+- https://omarshehata.me Omar Shehata
+- https://pauley.me Eric Pauley
+- https://paulosman.me Paul Osman
+- https://pbrown.me Paul Brown
+- https://petevilter.me Pete's Blog
+- https://philbooth.me Phil Booth
+- https://pradyunsg.me Pradyun Gedam
+- https://preslav.me Preslav Rachev
+- https://prophitt.me Corey Prophitt's Website
+- https://rauno.me Rauno Freiberg
+- https://michal.sapka.me [MichaÅ Sapka's website]
+- https://seiya.me Seiya Nuta
+- https://serhack.me SerHack – Security Researcher and Writer
+- https://blog.shalvah.me Shalvah's Blog
+- https://sharats.me The Sharat's
+- https://blog.thefrenchghosty.me TheFrenchGhosty's Blog
+- https://thesloth.me The Sloth Blog
+- https://tonsky.me Blog @ tonsky.me
+- https://tyrrrz.me Oleksii Holub
+- https://univalence.me About
+- https://lea.verou.me Home • Lea Verou
+- https://vgel.me Theia Vogel's website & blog
+- https://vimota.me Victor Mota
+- https://xnacly.me xnacly - blog
+- https://scott.mn Scott.mn
+- https://tck.mn Andy Tockman
+- https://shkspr.mobi Terence Eden’s Blog
+- https://cadence.moe cadence's website
+- https://griffin.moe Griffin Moe - Hello!
+- https://jameswillia.ms Home | James Williams
+- https://iam.mt Mohnish Thallavajhula
+- https://mlajtos.mu mlajtos.mu
+- https://memo.mx Memo Garcia
+- https://www.agwa.name Andrew Ayer
+- https://akkartik.name Kartik Agaram
+- https://andrea.corbellini.name Andrea Corbellini
+- https://neil.fraser.name Neil Fraser
+- https://joeyh.name Joey Hess
+- https://willthompson.name Will Thompson
+- https://0x46.net Filip Borkiewicz
+- https://alexgaynor.net Alex Gaynor
+- https://alexwlchan.net alexwlchan
+- https://blog.aurel32.net AurÃ©lien Jarno
+- https://billmei.net Bill Mei
+- https://briancallahan.net Dr. Brian Robert Callahan
+- https://dan.bulwinkle.net Dan Bulwinkle
+- https://blog.burntsushi.net Andrew Gallant's Blog - Andrew Gallant's Blog
+- https://jfm.carcosa.net Jason F. McBrayer
+- https://blog.carlmjohnson.net The Ethically-Trained Programmer
+- https://www.cdahmedeh.net cdahmedeh (Ahmed El-Hajjar)
+- https://www.colinmclear.net Colin McLear
+- https://conorbroderick.net All posts | Conor's Blog -
+- https://cpojer.net Christoph Nakazawa
+- https://cprimozic.net Casey Primozic's Homepage
+- https://darkcoding.net Graham King
+- https://darrenburns.net Darren Burns - Blog
+- https://renegat0x0.ddns.net renegat0x0 site
+- https://destevez.net Daniel Estévez – Scientific & Technical Amateur Radio — Home of EA4GPZ / M0HXM
+- https://dottedmag.net Mikhail Gusarov
+- https://duncanlock.net Duncan Locks personal site · duncan­lock­.net
+- https://ersei.net Home | Ersei 'n Stuff
+- https://fabiensanglard.net Fabien Sanglard's Website
+- https://www.friendlyskies.net Marc Stuff
+- https://taras.glek.net Taras' Blog on AI, Perf, Hacks
+- https://www.grammarware.net Dr. Vadim Zaytsev
+- https://www.gregegan.net Greg Egan’s Home Page
+- https://hookrace.net HookRace Blog
+- https://incompleteideas.net Rich Sutton's Home Page
+- https://javahippie.net Tim ZÃ¶ller
+- https://jaycarlson.net Blog - Jay Carlson
+- https://jemarch.net Homepage of Jose E. Marchesi
+- https://jfloren.net John Floren
+- https://jmtd.net Jonathan Dowland
+- https://jpmens.net Jan-Piet Mens
+- https://jsomers.net James Somers
+- https://blog.karliner.net Mike's Blog — Technologist at Large
+- https://www.kooslooijesteijn.net Blog | Koos Looijesteijn
+- https://krisnova.net Kris Nóva | Kris Nóva
+- https://kylemcdonald.net Kyle McDonald
+- https://www.leshenko.net Nikita's Homepage
+- https://lindastone.net Linda Stone – Writer, speaker, consultant
+- https://eli.lipsitz.net Eli Lipsitz
+- https://lukasrosenstock.net Lukas Rosenstock's Blog
+- https://mattwynne.net Matt Wynne
+- https://www.meziantou.net Meziantou's blog
+- https://matt.might.net Matt Might
+- https://mijailovic.net Nemanja Mijailovic's Blog
+- https://www.milanvit.net Czech/in/Japan – Milan Vit
+- https://blog.mollywhite.net Molly White
+- https://www.mollywhite.net Molly White
+- https://nick-lane.net Nick Lane Personal Website
+- https://nliu.net my php/cobol blog
+- https://oleb.net Ole Begemann
+- https://orlp.net About Me | orlp.net
+- https://www.patrickweaver.net Patrick Weaver
+- https://paulbourke.net Paul Bourke - Personal Pages
+- https://paulromer.net Paul Romer
+- https://petereliaskraft.net Peter Kraft
+- https://peterme.net Welcome to Peter's DevLog
+- https://pluralistic.net Pluralistic: Daily links from Cory Doctorow – No trackers, no ads. Black type, white background. Privacy policy: we don't collect or retain any data at all ever period.
+- https://rebeccaskinner.net Rebecca Skinner - Home
+- https://www.salkosuo.net Sami Salkosuo | Occasionally updated.
+- https://www.sami-lehtinen.net Sami Lehtinen
+- https://www.scattered-thoughts.net Jamie Brandon
+- https://til.simonwillison.net Simon Willison: TIL
+- https://simson.net Simson Garfinkel
+- https://digit.so36.net Matthias Monroy
+- https://www.spronck.net Pieter Spronck
+- https://stephenramsay.net Stephen Ramsay
+- https://susam.net Susam Pal
+- https://www.tdpain.net Hi there! :: Thomas Pain
+- https://blog.varunramesh.net Varun Ramesh's Blog
+- https://microblog.vladh.net vladh's microblog
+- https://blog.vslira.net vslira's blog
+- https://jan.wildeboer.net Jan Wildeboer's Blog
+- https://yotam.net Yotam's blog
+- https://chris.eidhof.nl Chris Eidhof
+- https://stderr.nl (...) — /Blog
+- https://sylviavanos.nl Home | Sylvia van Os
+- https://robins.one Taylor Robinson
+- https://marble.onl Andrew Marble
+- https://antonz.org Anton Zhiyanov
+- https://www.b-list.org James Bennett
+- https://briansmith.org Brian Smith
+- https://blog.cr0.org cr0 blog
+- https://www.heltweg.org Philip Heltweg
+- https://interconnected.org Matt Webb
+- https://jacobian.org Jacob Kaplan-Moss
+- https://jenson.org Scott Jenson – Exploring the world beyond mobile
+- https://blog.jgc.org John Graham-Cumming's blog
+- https://johnhorgan.org John Horgan (The Science Writer)
+- https://blog.josefsson.org Simon Josefsson's blog
+- https://www.laputan.org Brian Foote
+- https://man7.org Michael Kerrisk - man7.org
+- https://www.manton.org Manton Reece
+- https://mycophobia.org mycophobia's web site
+- https://www.ncameron.org Nicholas Cameron
+- https://neelc.org Neel Chauhan
+- https://www.neelc.org Neel Chauhan
+- https://novalis.org David "Novalis" Turner
+- https://tinyclouds.org Ryan Dahl
+- https://mike.zwobble.org Mike's corner of the web
+- https://blog.danieljanus.pl Daniel Janus â blog
+- https://mbork.pl Marcin Borkowski: Strona domowa
+- https://p.migdal.pl Homepage - Piotr Migdał
+- https://www.justus.pw Justus Perlwitz
+- https://mariusbancila.ro Marius Bancila's Blog
+- https://andgein.ru Заметки Андрея Гейна
+- https://daniel.haxx.se Daniel Stenberg - daniel.haxx.se
+- https://hugotunius.se Blog - Hugo Tunius
+- https://jforberg.se Jforberg
+- https://www.jonashietala.se Jonas Hietala: Home
+- https://rigtorp.se Erik Rigtorp
+- https://aaka.sh Aakash Patel
+- https://artemis.sh Artemis Everfree
+- https://bower.sh erock's blog
+- https://d-s.sh [MichaÅ Sapka's website]
+- https://blog.gibson.sh ./gibson.sh --blog
+- https://kau.sh Kaushik Gopal's Site
+- https://austinvernon.site Austin Vernon - Austin Vernon's Blog
+- https://kidger.site Patrick Kidger
+- https://timor.site timor's site
+- https://ciechanow.ski Bartosz Ciechanowski
+- https://blog.djha.skin Skin's Blog
+- https://18alan.space Alan's Space
+- https://ariadne.space Ariadne's Space
+- https://beccaricks.space Becca Ricks
+- https://benjcal.space Ben Calderon's Web Page
+- https://icing.space Royal Icing
+- https://jakob.space Recent Posts â Jakob's Personal Webpage
+- https://zverok.space zverok's space
+- https://andreyor.st Andrey Listopadov
+- https://julien.jorge.st Julien Jorge's Personal Website
+- https://effect.systems Yihong Zhang
+- https://alicegg.tech Alice GG
+- https://astrid.tech Astrid Yu | astrid.tech
+- https://gabrielsieben.tech Gabriel Sieben
+- https://sanket.tech Sanket Shanbhag
+- https://blog.winny.tech Winny's Blog
+- https://blog.dave.tf blog.dave.tf
+- https://lobi.to Harley Watson
+- https://quaran.to nick quaranto
+- https://blog.val.town Val Town Blog
+- https://ma.tt Matt Mullenweg | Unlucky in Cards
+- https://adamkdean.co.uk Adam K Dean
+- https://www.alexmurrell.co.uk Alex Murrell
+- https://blog.benjojo.co.uk Benjojo's Blog
+- https://blog.davetcode.co.uk David Tyler's Blog - Technical writing mostly focused on emulating old systems.
+- https://incoherency.co.uk James Stanley
+- https://kevinmahoney.co.uk Kevin Mahoney
+- https://www.kianryan.co.uk Kian Ryan
+- https://www.michalpaszkiewicz.co.uk Michal Paszkiewicz
+- https://mukulrathi.co.uk Mukul's Personal Website
+- https://www.thecodepainter.co.uk Simon Painter
+- https://www.tomanthony.co.uk Tom Anthony - SEO, Web Development and Research
+- https://www.da.vidbuchanan.co.uk [d@vidbuchanan.co.uk ~]$
+- https://webdevlaw.uk Hi, I'm Heather Burns – — at home in the world.
+- https://beej.us Beej's Web Page
+- https://www.neversaw.us Chris Dickinson
+- https://scottburns.us Project Docs – Scott Allen Burns
+- https://www.scottkennedy.us Scott Kennedy
+- https://rmf.vc Bob Frankston Home Page
+- https://omar.website Omar Rizwan
+- https://zura.wiki Roger Zurawicki · Roger Zurawicki
+- https://kadekillary.work kade killary
+- https://debugging.works Hi, I'm kmille
+- https://prashanth.world Prashanth Sadasivan – The Chief Questions Officer 💻🍳☕️
+- https://ellie.wtf Ellie's Blog
+- https://benkettle.xyz Ben Kettle
+- https://brycevandegrift.xyz Bryce Vandegrift's Website
+- https://cedwards.xyz Connor's Blog
+- https://chrisx.xyz Chris Xiao
+- https://danpetrov.xyz Hi! | DanPetrov
+- https://garrit.xyz Garrit Franke
+- https://gazoche.xyz Gazoche's blog
+- https://jerrysv.xyz jerrysv.yxz - home
+- https://stephan.lachnit.xyz Stephan Lachnit | Blog
+- https://lukesmith.xyz Luke's Webpage
+- https://www.mtb.xyz Matt Brown
+- https://nadia.xyz Nadia Asparouhova
+- https://notrelated.xyz Not Related! A Big-Braned Podcast
+- https://raypatrick.xyz Ray Patrick
+- https://ssteinberg.xyz Shlomi Steinberg
+- https://blog.sulami.xyz Welcome - sulami's blog
+- https://tlakh.xyz Florian Obser
+- https://waqas.xyz Waqas Ahmed
+- https://chan.co.za Channon Perry
