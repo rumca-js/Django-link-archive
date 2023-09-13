@@ -10,7 +10,7 @@ from ..controllers import (
     SourceDataController,
     LinkDataController,
 )
-from ..views import ContextData
+from ..views import ContextData, ViewPage
 from ..forms import DataExportForm
 
 
@@ -18,8 +18,11 @@ def import_reading_list_view(request):
     from ..serializers.readinglist import ReadingList
     from ..webtools import Page
 
-    context = ContextData.get_context(request)
-    context["page_title"] += " - import view"
+    page = ViewPage(request)
+    page.set_title("Import view")
+    data = page.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     c = Configuration.get_object()
     import_path = c.get_import_path() / "readingList.csv"
@@ -81,18 +84,18 @@ def import_reading_list_view(request):
         except Exception as e:
             summary_text += entry["title"] + " " + entry["url"] + ": NOK \n"
 
-    context["summary_text"] = summary_text
-    return ContextData.render(request, "summary_present.html", context)
+    page.context["summary_text"] = summary_text
+    return page.render("summary_present.html")
 
 
 def import_from_instance(request):
     from ..forms import LinkInputForm
 
-    context = ContextData.get_context(request)
-    context["page_title"] += " - Import from instance"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Import from another instance")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     if request.method == "POST":
         form = LinkInputForm(request.POST)
@@ -104,24 +107,24 @@ def import_from_instance(request):
             ie = InstanceImporter(link)
             ie.import_all()
 
-            context["summary_text"] = "Imported"
-            return ContextData.render(request, "summary_present.html", context)
+            p.context["summary_text"] = "Imported"
+            return p.render("summary_present.html")
 
         else:
-            context["summary_text"] = "Form is invalid"
-            return ContextData.render(request, "summary_present.html", context)
+            p.context["summary_text"] = "Form is invalid"
+            return p.render("summary_present.html")
 
     else:
         form = LinkInputForm()
         form.method = "POST"
 
-        context["form_title"] = "Instance URL import"
-        context[
+        p.context["form_title"] = "Instance URL import"
+        p.context[
             "form_description_pre"
         ] = "Provide URL to another instance od Django-link-archive, the link of JSON data."
-        context["form"] = form
+        p.context["form"] = form
 
-    return ContextData.render(request, "form_basic.html", context)
+    return p.render("form_basic.html")
 
 
 def get_time_stamps(url, start_time, stop_time):
@@ -159,11 +162,11 @@ def import_source_from_ia_range_impl(source_url, archive_start, archive_stop):
 def import_source_from_ia(request, pk):
     from ..forms import ImportSourceRangeFromInternetArchiveForm
 
-    context = ContextData.get_context(request)
-    context["page_title"] += " - Import internet archive"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Import from internet archive")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     if request.method == "POST":
         form = ImportSourceRangeFromInternetArchiveForm(request.POST)
@@ -178,10 +181,10 @@ def import_source_from_ia(request, pk):
                 )
                 == False
             ):
-                context["summary_text"] = "Could not read internet archive"
+                p.context["summary_text"] = "Could not read internet archive"
                 return ContextData.render(request, "summary_present.html", context)
             else:
-                context["summary_text"] = "Internet archive data read successfully"
+                p.context["summary_text"] = "Internet archive data read successfully"
                 return ContextData.render(request, "summary_present.html", context)
 
     source_obj = SourceDataController.objects.get(id=pk)
@@ -195,9 +198,9 @@ def import_source_from_ia(request, pk):
     )
     form.method = "POST"
 
-    context["form"] = form
+    p.context["form"] = form
 
-    return ContextData.render(request, "import_internetarchive.html", context)
+    return p.render("import_internetarchive.html")
 
 
 def import_source_from_ia_impl(wb, source_url, source_archive_url, archive_time):
@@ -224,55 +227,55 @@ def import_source_from_ia_impl(wb, source_url, source_archive_url, archive_time)
 
 
 def write_bookmarks(request):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - Writer bookmarks"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Write bookmarks")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     BackgroundJobController.write_bookmarks()
 
-    context["summary_text"] = "Wrote job started"
+    p.context["summary_text"] = "Wrote job started"
 
-    return ContextData.render(request, "summary_present.html", context)
+    return p.render("summary_present.html")
 
 
 def import_bookmarks(request):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - Import bookmarks"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Import bookmarks")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     BackgroundJobController.import_bookmarks()
 
-    context["summary_text"] = "Import job started"
+    p.context["summary_text"] = "Import job started"
 
-    return ContextData.render(request, "summary_present.html", context)
+    return p.render("summary_present.html")
 
 
 def import_sources(request):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - Import sources"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Import sources")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     BackgroundJobController.import_sources()
 
-    context["summary_text"] = "Import job started"
+    p.context["summary_text"] = "Import job started"
 
-    return ContextData.render(request, "summary_present.html", context)
+    return p.render("summary_present.html")
 
 
 def write_daily_data_form(request):
     from ..forms import ExportDailyDataForm
 
-    context = ContextData.get_context(request)
-    context["page_title"] += " - Write daily data"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Write daily data")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     if request.method == "POST":
         form = ExportDailyDataForm(request.POST)
@@ -281,16 +284,16 @@ def write_daily_data_form(request):
             time_stop = form.cleaned_data["time_stop"]
 
             if BackgroundJobController.write_daily_data_range(time_start, time_stop):
-                context[
+                p.context[
                     "summary_text"
                 ] = "Added daily write job. Start:{} Stop:{}".format(
                     time_start, time_stop
                 )
             else:
-                context["summary_text"] = "Form is invalid. Start:{} Stop:{}".format(
+                p.context["summary_text"] = "Form is invalid. Start:{} Stop:{}".format(
                     time_start, time_stop
                 )
-            return ContextData.render(request, "summary_present.html", context)
+            return p.render("summary_present.html")
 
     from ..dateutils import DateUtils
 
@@ -304,31 +307,31 @@ def write_daily_data_form(request):
     )
     form.method = "POST"
 
-    context["form"] = form
+    p.context["form"] = form
 
-    return ContextData.render(request, "form_basic.html", context)
+    return p.render("form_basic.html")
 
 
 def import_daily_data(request):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - Import daily data"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Import daily data")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     BackgroundJobController.import_daily_data()
 
-    context["summary_text"] = "Import job started"
+    p.context["summary_text"] = "Import job started"
 
-    return ContextData.render(request, "summary_present.html", context)
+    return p.render("summary_present.html")
 
 
 def write_tag_form(request):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - tags writer"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Write tags")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     from ..forms import ExportTopicForm
 
@@ -338,25 +341,25 @@ def write_tag_form(request):
             tag = form.cleaned_data["tag"]
 
             if BackgroundJobController.write_tag_data(tag):
-                context["summary_text"] = "Added daily write job. Tag:{}".format(tag)
+                p.context["summary_text"] = "Added daily write job. Tag:{}".format(tag)
             else:
-                context["summary_text"] = "Form is invalid. Tag:{}".format(tag)
-            return ContextData.render(request, "summary_present.html", context)
+                p.context["summary_text"] = "Form is invalid. Tag:{}".format(tag)
+            return p.render("summary_present.html")
 
     form = ExportTopicForm()
     form.method = "POST"
 
-    context["form"] = form
+    p.context["form"] = form
 
-    return ContextData.render(request, "form_basic.html", context)
+    return p.render("form_basic.html")
 
 
 def push_daily_data_form(request):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - tags writer"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Push daily data")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     from ..forms import PushDailyDataForm
 
@@ -366,64 +369,64 @@ def push_daily_data_form(request):
             input_date = form.cleaned_data["input_date"]
 
             if BackgroundJobController.push_daily_data_to_repo(input_date.isoformat()):
-                context["summary_text"] = "Added daily data push job. Tag:{}".format(
+                p.context["summary_text"] = "Added daily data push job. Tag:{}".format(
                     input_date.isoformat()
                 )
             else:
-                context["summary_text"] = "Form is invalid. Tag:{}".format(tag)
+                p.context["summary_text"] = "Form is invalid. Tag:{}".format(tag)
             return ContextData.render(request, "summary_present.html", context)
 
     form = PushDailyDataForm()
     form.method = "POST"
 
-    context["form"] = form
+    p.context["form"] = form
 
-    return ContextData.render(request, "form_basic.html", context)
+    return p.render("form_basic.html")
 
 
 def data_export_add(request):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - Data export add page"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Add data export")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     if request.method == "POST":
         form = DataExportForm(request.POST)
         if form.is_valid():
             form.save()
         else:
-            context["summary_text"] = "Form is invalid"
-            return ContextData.render(request, "summary_present.html", context)
+            p.context["summary_text"] = "Form is invalid"
+            return p.render("summary_present.html")
 
     form = DataExportForm()
     form.method = "POST"
     form.action_url = reverse("{}:data-export-add".format(ContextData.app_name))
 
-    context["form"] = form
+    p.context["form"] = form
 
-    return ContextData.render(request, "form_basic.html", context)
+    return p.render("form_basic.html")
 
 
 def data_export_edit(request, pk):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - Data export edit page"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Edit data export")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     objs = DataExport.objects.filter(id=pk)
     if objs.count() == 0:
-        context["summary_text"] = "No such object"
-        return ContextData.render(request, "summary_present.html", context)
+        p.context["summary_text"] = "No such object"
+        return p.render("summary_present.html")
 
     if request.method == "POST":
         form = DataExportForm(request.POST, instance=objs[0])
         if form.is_valid():
             form.save()
         else:
-            context["summary_text"] = "Form is invalid"
-            return ContextData.render(request, "summary_present.html", context)
+            p.context["summary_text"] = "Form is invalid"
+            return p.render("summary_present.html")
 
     form = DataExportForm(instance=objs[0])
     form.method = "POST"
@@ -431,32 +434,39 @@ def data_export_edit(request, pk):
         "{}:data-export-edit".format(ContextData.app_name), args=[pk]
     )
 
-    context["config_form"] = form
+    p.context["config_form"] = form
 
-    return ContextData.render(request, "configuration.html", context)
+    return p.render("configuration.html")
 
 
 def data_export_remove(request, pk):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - Data export remove page"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Remove data export")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     objs = DataExport.objects.filter(id=pk)
     if objs.count() == 0:
-        context["summary_text"] = "No such object"
-        return ContextData.render(request, "summary_present.html", context)
+        p.context["summary_text"] = "No such object"
+        return p.render("summary_present.html")
     else:
         objs.delete()
-        context["summary_text"] = "Removed object"
-        return ContextData.render(request, "summary_present.html", context)
+        p.context["summary_text"] = "Removed object"
+        return p.render("summary_present.html")
 
 
 class DataExportListView(generic.ListView):
     model = DataExport
     context_object_name = "content_list"
     paginate_by = 100
+
+    def get(self, *args, **kwargs):
+        p = ViewPage(self.request)
+        data = p.check_access()
+        if data:
+            return redirect('{}:missing-rights'.format(ContextData.app_name))
+        return super(DataExportListView, self).get(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context

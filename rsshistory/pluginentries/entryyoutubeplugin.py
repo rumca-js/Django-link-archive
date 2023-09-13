@@ -36,14 +36,32 @@ class EntryYouTubePlugin(YouTubeLinkHandler, EntryGenericPlugin):
         ]
 
     def get_frame_html(self):
-        frame = self.get_frame()
 
-        return """
-    <div class="youtube_player_container">
-       {}
-    </div>""".format(
-            frame
-        )
+        frame_text = """
+        <div class="youtube_player_container">
+           {}
+        </div>"""
+
+        if self.entry.age and self.entry.age >= 18:
+            frame_text = """
+            <div>
+                <img src="{}" class="content-thumbnail"/>
+            </div>"""
+
+            frame_text = frame_text.format(self.entry.get_thumbnail())
+
+            return frame_text
+        else:
+            frame_text = """
+            <div class="youtube_player_container">
+               {}
+            </div>"""
+
+            frame_inner = self.get_frame()
+
+            frame_text = frame_text.format(frame_inner)
+
+            return frame_text
 
     def get_description_html(self):
         frame = self.get_frame()

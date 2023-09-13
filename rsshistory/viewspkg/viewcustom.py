@@ -11,7 +11,7 @@ from ..models import (
     LinkTagsDataModel,
     BaseLinkDataController,
 )
-from ..views import ContextData
+from ..views import ContextData, ViewPage
 from ..controllers import (
     BackgroundJobController,
     SourceDataController,
@@ -190,11 +190,11 @@ def fix_reset_youtube_link_details_page(request, pk):
 
 
 def fix_entry_tags(request, entrypk):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - fix entry tags"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Fix entry tags")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     entry = LinkDataController.objects.get(id=entrypk)
     tags = entry.tags.all()
@@ -205,14 +205,17 @@ def fix_entry_tags(request, entrypk):
         tag.save()
         summary_text += "Fixed: {}".format(tag.id)
 
-    context["summary_text"] = summary_text
+    p.context["summary_text"] = summary_text
 
-    return ContextData.render(request, "summary_present.html", context)
+    return p.render("summary_present.html")
 
 
 def show_youtube_link_props(request):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - show youtube link properties"
+    p = ViewPage(request)
+    p.set_title("Show YouTube link properties")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     from ..forms import YouTubeLinkSimpleForm
 
@@ -223,16 +226,16 @@ def show_youtube_link_props(request):
         form.action_url = reverse(
             "{}:show-youtube-link-props".format(ContextData.app_name)
         )
-        context["form"] = form
+        p.context["form"] = form
 
-        return ContextData.render(request, "form_basic.html", context)
+        return p.render("form_basic.html")
 
     else:
         form = YouTubeLinkSimpleForm(request.POST)
         if not form.is_valid():
-            context["summary_text"] = "Form is invalid"
+            p.context["summary_text"] = "Form is invalid"
 
-            return ContextData.render(request, "summary_present.html", context)
+            return p.render("summary_present.html")
         else:
             from ..pluginentries.youtubelinkhandler import YouTubeLinkHandler
 
@@ -274,19 +277,19 @@ def show_youtube_link_props(request):
             for rd_prop in rd_json:
                 rd_props.append((rd_prop, str(rd_json[rd_prop])))
 
-            context["youtube_props"] = youtube_props
-            context["return_dislike_props"] = rd_props
-            context["all_youtube_props"] = all_youtube_props
+            p.context["youtube_props"] = youtube_props
+            p.context["return_dislike_props"] = rd_props
+            p.context["all_youtube_props"] = all_youtube_props
 
-            return ContextData.render(request, "show_youtube_link_props.html", context)
+            return p.render("show_youtube_link_props.html")
 
 
 def test_page(request):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - test page"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Test page")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     summary_text = ""
 
@@ -315,34 +318,34 @@ def test_page(request):
     # items = LinkDataController.objects.filter(source="https://pluralistic.net/feed")
     # items.delete()
 
-    context["summary_text"] = summary_text
+    p.context["summary_text"] = summary_text
 
-    return ContextData.render(request, "summary_present.html", context)
+    return p.render("summary_present.html")
 
 
 def test_form_page(request):
     from ..forms import OmniSearchForm
 
-    context = ContextData.get_context(request)
-    context["page_title"] += " - test form page"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Test form page")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     summary_text = ""
 
     form = OmniSearchForm(request.GET)
-    context["form"] = form
+    p.context["form"] = form
 
-    return ContextData.render(request, "form_basic.html", context)
+    return p.render("form_basic.html")
 
 
 def fix_bookmarked_yt(request):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - fix all"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Fix bookmarked entries")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     summary = ""
     links = LinkDataController.objects.filter(bookmarked=True)
@@ -352,56 +355,56 @@ def fix_bookmarked_yt(request):
         else:
             summary += "Not Fixed: {} {}\n".format(link.link, link.title)
 
-    context["summary_text"] = summary
+    p.context["summary_text"] = summary
 
-    return ContextData.render(request, "summary_present.html", context)
+    return p.render("summary_present.html")
 
 
 def download_music(request, pk):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - Download music"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Download music")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     ft = LinkDataController.objects.filter(id=pk)
     if ft.exists():
-        context["summary_text"] = "Added to download queue"
+        p.context["summary_text"] = "Added to download queue"
     else:
-        context["summary_text"] = "Failed to add to download queue"
+        p.context["summary_text"] = "Failed to add to download queue"
 
     BackgroundJobController.download_music(ft[0])
 
-    return ContextData.render(request, "summary_present.html", context)
+    return p.render("summary_present.html")
 
 
 def download_video(request, pk):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - Download video"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Download video")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     ft = LinkDataController.objects.filter(id=pk)
     if ft.exists():
-        context["summary_text"] = "Added to download queue"
+        p.context["summary_text"] = "Added to download queue"
     else:
-        context["summary_text"] = "Failed to add to download queue"
+        p.context["summary_text"] = "Failed to add to download queue"
 
     BackgroundJobController.download_video(ft[0])
 
-    return ContextData.render(request, "summary_present.html", context)
+    return p.render("summary_present.html")
 
 
 def check_if_move_to_archive(request):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - Move to archive"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Move to archive")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     LinkDataController.move_all_to_archive()
 
-    context["summary_text"] = "Moved links to archive"
+    p.context["summary_text"] = "Moved links to archive"
 
-    return ContextData.render(request, "summary_present.html", context)
+    return p.render("summary_present.html")

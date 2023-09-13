@@ -124,7 +124,7 @@ class BookmarksBigExporter(object):
         self._cfg = config
 
     def get_start_year(self):
-        return 1970
+        return 1900
 
     def get_current_year(self):
         from ..dateutils import DateUtils

@@ -2,6 +2,7 @@ from datetime import datetime, date, timedelta
 
 from django.db import models
 from django.urls import reverse
+from django.templatetags.static import static
 
 from ..apps import LinkDatabase
 from .sources import SourceDataModel
@@ -11,21 +12,22 @@ from .admin import PersistentInfo
 class BaseLinkDataModel(models.Model):
     source = models.CharField(max_length=2000)
     title = models.CharField(max_length=1000, null=True)
-    description = models.TextField(max_length=1000, null=True)
+    description = models.TextField(max_length=1000, null=True, blank=True)
     link = models.CharField(max_length=1000, unique=True)
     date_published = models.DateTimeField(default=datetime.now)
     # this entry cannot be removed
     bookmarked = models.BooleanField(default=False)
+    age = models.IntegerField(blank=True, null=True)
     # this entry is dead indication
-    dead = models.BooleanField(default=False)
-    artist = models.CharField(max_length=1000, null=True, default=None)
-    album = models.CharField(max_length=1000, null=True, default=None)
+    dead = models.BooleanField(blank=True, null=True)
+    artist = models.CharField(max_length=1000, null=True, blank=True)
+    album = models.CharField(max_length=1000, null=True, blank=True)
     # user who added entry
-    user = models.CharField(max_length=1000, null=True, default=None)
+    user = models.CharField(max_length=1000, null=True, blank=True)
 
     # possible values en, en-US, or pl_PL
-    language = models.CharField(max_length=10, null=True, default=None)
-    thumbnail = models.CharField(max_length=1000, null=True, default=None)
+    language = models.CharField(max_length=10, null=True, blank=True)
+    thumbnail = models.CharField(max_length=1000, null=True, blank=True)
 
     class Meta:
         abstract = True
@@ -160,6 +162,9 @@ class BaseLinkDataController(BaseLinkDataModel):
         return page.get_domain_only()
 
     def get_thumbnail(self):
+        if self.age and self.age >= 18:
+            return static("{0}/images/sign-304093_640.png".format(LinkDatabase.name))
+
         if self.thumbnail:
             return self.thumbnail
 
@@ -402,9 +407,6 @@ class BaseLinkDataController(BaseLinkDataModel):
                 self.delete()
             except Exception as e:
                 error_text = traceback.format_exc()
-
-    def get_archive_days_limit():
-        return 100
 
     def is_archive_entry(self):
         return False

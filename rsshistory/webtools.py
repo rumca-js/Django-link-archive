@@ -119,18 +119,20 @@ class Page(object):
         if not self.contents:
             return None
 
+        title = None
+
         soup = BeautifulSoup(self.contents, 'html.parser')
-        title = soup.find('title')
+        title_find = soup.find('title')
+        if title_find:
+            title = title_find.string
+
+        title_find = soup.find("meta", property="og:title")
+        if title_find and title_find.has_attr("content"):
+            title = title_find["content"]
+
         if title:
-            title = title.string
+            title = title.strip()
             return title
-
-        title = soup.find("meta", property="og:title")
-        if title and title.has_attr("content"):
-            title = title["content"]
-
-            return title
-
         #title = html.unescape(title)
 
     def get_description(self):
@@ -140,32 +142,37 @@ class Page(object):
         if not self.contents:
             return None
 
+        description = None
+
         soup = BeautifulSoup(self.contents, "html.parser")
-        description = soup.find("meta", attrs={'name' : "description"})
-        if description and description.has_attr("content"):
-            description = description["content"]
-            return description
+        description_find = soup.find("meta", attrs={'name' : "description"})
+        if description_find and description_fidn.has_attr("content"):
+            description = description_find["content"]
 
-        description = soup.find("meta", property="og:description")
-        if description and description.has_attr("content"):
-            description = description["content"]
+        description_find = soup.find("meta", property="og:description")
+        if description_find and description_find.has_attr("content"):
+            description = description_find["content"]
 
-            return description
+        if description is None:
+            wh1 = self.contents.find('<meta name="description"')
+            if wh1 == -1:
+                return
 
-        wh1 = self.contents.find('<meta name="description"')
-        if wh1 == -1:
-            return
+            wh1 = self.contents.find('description',wh1 + 24 +1)
+            if wh1 == -1:
+                return
+            wh1 = self.contents.find('"',wh1+1)
+            if wh1 == -1:
+                return
+            wh2 = self.contents.find('"',wh1+1)
+            if wh2 == -1:
+                return
+            description = self.contents[wh1+1: wh2]
 
-        wh1 = self.contents.find('description',wh1 + 24 +1)
-        if wh1 == -1:
-            return
-        wh1 = self.contents.find('"',wh1+1)
-        if wh1 == -1:
-            return
-        wh2 = self.contents.find('"',wh1+1)
-        if wh2 == -1:
-            return
-        return self.contents[wh1+1: wh2]
+        if description:
+            description = description.strip()
+
+        return description
 
     def is_link_valid(self, address):
         return self.is_link_valid_domain(address)

@@ -1,6 +1,6 @@
 from django.views import generic
 from django.urls import reverse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.db.models import Q
 from django.http import JsonResponse
 from django.http import HttpResponseForbidden, HttpResponseRedirect
@@ -28,7 +28,7 @@ from ..forms import (
     OmniSearchForm,
 )
 from ..queryfilters import EntryFilter
-from ..views import ContextData
+from ..views import ContextData, ViewPage
 from ..configuration import Configuration
 
 
@@ -37,6 +37,13 @@ class EntriesSearchListView(generic.ListView):
     context_object_name = "content_list"
     paginate_by = 100
     template_name = str(ContextData.get_full_template("linkdatacontroller_list.html"))
+
+    def get(self, *args, **kwargs):
+        p = ViewPage(self.request)
+        data = p.check_access()
+        if data:
+            return redirect('{}:missing-rights'.format(ContextData.app_name))
+        return super(EntriesSearchListView, self).get(*args, **kwargs)
 
     def get_filter(self):
         query_filter = EntryFilter(self.request.GET)
@@ -255,12 +262,16 @@ class EntriesOmniListView(EntriesSearchListView):
         if ("archive" in self.request.GET and self.request.GET["archive"] == 1):
             query_filter.set_default_search_symbols([
                 "title__icontains",
+                "artist__icontains",
+                "album__icontains",
                 "description__icontains",
                 #"tags__tag__icontains",
                 ])
         else:
             query_filter.set_default_search_symbols([
                 "title__icontains",
+                "artist__icontains",
+                "album__icontains",
                 "description__icontains",
                 "tags__tag__icontains",
                 ])
@@ -514,6 +525,11 @@ def edit_entry(request, pk):
         ob.user = str(request.user.username)
         ob.save()
 
+    limit = BaseLinkDataController.get_description_length() - 2
+    if len(ob.description) >= limit:
+        ob.description = ob.description[:limit]
+        ob.save()
+
     if request.method == "POST":
         form = EntryForm(request.POST, instance=ob)
         context["form"] = form
@@ -521,11 +537,9 @@ def edit_entry(request, pk):
         if form.is_valid():
             form.save()
 
-            context["entry"] = ob
-            return ContextData.render(request, "entry_edit_ok.html", context)
+            return HttpResponseRedirect(ob.get_absolute_url())
 
         context["summary_text"] = "Could not edit entry"
-
         return ContextData.render(request, "summary_present.html", context)
     else:
         form = EntryForm(instance=ob)

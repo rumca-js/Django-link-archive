@@ -102,6 +102,13 @@ def about(request):
     return p.render("about.html")
 
 
+def missing_rights(request):
+    p = ViewPage(request)
+    p.set_title("Missing rights")
+    p.context["summary_text"] = "user information is not valid, cannot save"
+    return p.render("summary_present.html")
+
+
 def user_config(request):
     p = ViewPage(request)
     p.set_title("User configuration")
@@ -135,6 +142,13 @@ def user_config(request):
 class BackgroundJobsView(generic.ListView):
     model = BackgroundJob
     context_object_name = "content_list"
+
+    def get(self, *args, **kwargs):
+        p = ViewPage(self.request)
+        data = p.check_access()
+        if data:
+            return redirect('{}:missing-rights'.format(ContextData.app_name))
+        return super(BackgroundJobsView, self).get(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
@@ -256,6 +270,13 @@ def backgroundjobs_remove(request, job_type):
 class PersistentInfoView(generic.ListView):
     model = PersistentInfo
     context_object_name = "content_list"
+
+    def get(self, *args, **kwargs):
+        p = ViewPage(self.request)
+        data = p.check_access()
+        if data:
+            return redirect('{}:missing-rights'.format(ContextData.app_name))
+        return super(PersistentInfoView, self).get(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context

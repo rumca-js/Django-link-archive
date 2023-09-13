@@ -58,11 +58,12 @@
   {% if search_term %}
      <a href="https://en.wikipedia.org/w/index.php?search={{search_term}}" class="simplebutton">Ask wikipedia</a>
      <a href="https://www.wolframalpha.com/input?i={{search_term}}" class="simplebutton">Ask wolfram alpha</a>
-     <a href="https://chat.openai.com/" class="simplebutton">ChatGPT</a>
+     <a href="https://www.reddit.com/search/?q={{search_term}}" class="simplebutton">Ask Reddit</a>
      <a href="https://www.quora.com/search?q={{search_term}}" class="simplebutton">Ask Quora</a>
      <a href="https://stackoverflow.com/search?q={{search_term}}" class="simplebutton">Ask Stack Overflow</a>
      <a href="https://www.youtube.com/results?search_query={{search_term}}" class="simplebutton">YouTube</a>
      <a href="https://open.spotify.com/search/{{search_term}}" class="simplebutton">Spotify</a>
+     <a href="https://chat.openai.com/" class="simplebutton">ChatGPT</a>
   {% endif %}
 
 {% endblock %}

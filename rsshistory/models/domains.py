@@ -294,6 +294,15 @@ class Domains(models.Model):
             DomainCategories.add(domain.category)
             DomainSubCategories.add(domain.category, domain.subcategory)
 
+    def get_description_safe(self):
+        if self.description:
+            if len(self.description) > 100:
+                return self.description[:100] + "..."
+            else:
+                return self.description
+        else:
+            return ""
+
 
 class DomainsSuffixes(models.Model):
     suffix = models.CharField(max_length=20, null=True, unique=True)

@@ -35,6 +35,9 @@ class ConfigurationEntry(models.Model):
         max_length=1000, null=False, choices=ACCESS_TYPES, default=ACCESS_TYPE_ALL
     )
 
+    days_to_move_to_archive = models.IntegerField(default=100)
+    days_to_remove_links = models.IntegerField(default=0)
+
     data_import_path = models.CharField(
         default="../data/{}/imports".format(LinkDatabase.name),
         max_length=2000,

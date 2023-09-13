@@ -46,9 +46,16 @@
              </span>
 
              <span class="linklistitemdescription">
+                 {% if domain.category %}
+                 [{{domain.category}}]
+                 {% endif %}
+                 {% if domain.subcategory %}
+                 [{{domain.subcategory}}]
+                 {% endif %}
                  {% if domain.title %}
                  {{domain.title}}
                  {% endif %}
+                 | {{domain.get_description_safe}}
              </span>
              </a>
           {% elif type == "clear" %}

@@ -98,6 +98,7 @@ urlpatterns = [
     path("configuration/", viewadmin.configuration_page, name="configuration"),
     path("system-status/", viewadmin.system_status, name="system-status"),
     path("about/", viewadmin.about, name="about"),
+    path("missing-rights/", viewadmin.missing_rights, name="missing-rights"),
     # background jobs
     path("backgroundjobs/", viewadmin.BackgroundJobsView.as_view(), name="backgroundjobs",),
     path("backgroundjob-add", viewadmin.backgroundjob_add, name="backgroundjob-add",),

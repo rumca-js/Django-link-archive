@@ -1,6 +1,6 @@
 from django.views import generic
 from django.urls import reverse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.http import HttpResponseForbidden, HttpResponseRedirect
 
@@ -8,7 +8,7 @@ from ..models import BackgroundJob
 from ..configuration import Configuration
 from ..forms import SourceForm, SourcesChoiceForm, ConfigForm
 from ..queryfilters import SourceFilter
-from ..views import ContextData
+from ..views import ContextData, ViewPage
 
 from ..controllers import (
     SourceDataController,
@@ -21,6 +21,13 @@ class RssSourceListView(generic.ListView):
     model = SourceDataController
     context_object_name = "content_list"
     paginate_by = 100
+
+    def get(self, *args, **kwargs):
+        p = ViewPage(self.request)
+        data = p.check_access()
+        if data:
+            return redirect('{}:missing-rights'.format(ContextData.app_name))
+        return super(RssSourceListView, self).get(*args, **kwargs)
 
     def get_queryset(self):
         self.query_filter = SourceFilter(self.request.GET)
@@ -65,11 +72,11 @@ class RssSourceDetailView(generic.DetailView):
 
 
 def add_source(request):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - add source"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Add source")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     if request.method == "POST":
         method = "POST"
@@ -81,36 +88,36 @@ def add_source(request):
 
             return HttpResponseRedirect(source.get_absolute_url())
         else:
-            context["summary_text"] = "Source not added"
-            return ContextData.render(request, "summary_present.html", context)
+            p.context["summary_text"] = "Source not added"
+            return p.render("summary_present.html")
 
     else:
         form = SourceForm()
         form.method = "POST"
         form.action_url = reverse("{}:source-add".format(ContextData.app_name))
-        context["form"] = form
 
-        context["form_title"] = "Add new source"
+        p.context["form"] = form
+        p.context["form_title"] = "Add new source"
 
         form_text = "<pre>"
         form_text += " - Specify all fields, if possible\n"
         form_text += " - if favicon is not specified, it is set to domain/favicon.ico\n"
         form_text += "</pre>"
 
-        context["form_description_post"] = form_text
+        p.context["form_description_post"] = form_text
 
-    return ContextData.render(request, "form_basic.html", context)
+    return p.render("form_basic.html")
 
 
 def add_source_simple(request):
     from ..forms import SourceInputForm
     from ..controllers import SourceDataController
 
-    context = ContextData.get_context(request)
-    context["page_title"] += " - add source"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Add source")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     if request.method == "POST":
         form = SourceInputForm(request.POST)
@@ -119,54 +126,54 @@ def add_source_simple(request):
 
             ob = SourceDataController.objects.filter(url=url)
             if ob.exists():
-                context["form"] = form
-                context["source"] = ob[0]
+                p.context["form"] = form
+                p.context["source"] = ob[0]
 
-                return ContextData.render(request, "source_edit_exists.html", context)
+                return p.render("source_edit_exists.html")
 
             data = SourceDataController.get_full_information({"url": url})
 
             form = SourceForm(initial=data)
             form.method = "POST"
             form.action_url = reverse("{}:source-add".format(ContextData.app_name))
-            context["form"] = form
 
+            p.context["form"] = form
     else:
         form = SourceInputForm()
         form.method = "POST"
 
-        context["form"] = form
+        p.context["form"] = form
 
-    return ContextData.render(request, "form_basic.html", context)
+    return p.render("form_basic.html")
 
 
 def edit_source(request, pk):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - edit source"
-    context["pk"] = pk
+    p = ViewPage(request)
+    p.set_title("Edit source")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p.context["pk"] = pk
 
     ft = SourceDataController.objects.filter(id=pk)
     if not ft.exists():
-        return ContextData.render(request, "source_edit_does_not_exist.html", context)
+        return p.render("source_edit_does_not_exist.html")
 
     ob = ft[0]
 
     if request.method == "POST":
         form = SourceForm(request.POST, instance=ob)
-        context["form"] = form
+        p.context["form"] = form
 
         if form.is_valid():
             form.save()
 
-            context["source"] = ob
-            return ContextData.render(request, "source_edit_ok.html", context)
+            return HttpResponseRedirect(ob.get_absolute_url())
 
-        context["summary_text"] = "Could not edit source"
+        p.context["summary_text"] = "Could not edit source"
 
-        return ContextData.render(request, "summary_present.html", context)
+        return p.render("summary_present.html")
     else:
         if not ob.favicon:
             from ..webtools import Page
@@ -183,23 +190,24 @@ def edit_source(request, pk):
         form.action_url = reverse(
             "{}:source-edit".format(ContextData.app_name), args=[pk]
         )
-        context["form"] = form
-        return ContextData.render(request, "form_basic.html", context)
+        p.context["form"] = form
+        return p.render("form_basic.html")
 
 
 def refresh_source(request, pk):
     from ..models import SourceOperationalData
 
-    context = ContextData.get_context(request)
-    context["page_title"] += " - refresh source"
-    context["pk"] = pk
+    p = ViewPage(request)
+    p.set_title("Refresh source")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p.context["pk"] = pk
 
     ft = SourceDataController.objects.filter(id=pk)
     if not ft.exists():
-        return ContextData.render(request, "source_edit_does_not_exist.html", context)
+        return p.render("source_edit_does_not_exist.html")
 
     ob = ft[0]
 
@@ -211,18 +219,17 @@ def refresh_source(request, pk):
 
     BackgroundJobController.download_rss(ob, True)
 
-    context["summary_text"] = "Source added to refresh queue"
-    return ContextData.render(request, "summary_present.html", context)
+    return HttpResponseRedirect(ob.get_absolute_url())
 
 
 def sources_manual_refresh(request):
     from ..pluginsources.sourcecontrollerbuilder import SourceControllerBuilder
 
-    context = ContextData.get_context(request)
-    context["page_title"] += " - refresh source"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Refresh sources")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     objs = SourceDataController.objects.all()
 
@@ -230,92 +237,104 @@ def sources_manual_refresh(request):
         plugin = SourceControllerBuilder.get(source)
         plugin.check_for_data()
 
-    context["summary_text"] = "Refreshed all sources"
-    return ContextData.render(request, "summary_present.html", context)
+    return HttpResponseRedirect(
+        reverse("{}:sources".format(ContextData.app_name))
+    )
 
 
 def remove_source(request, pk):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - remove source"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Remove source")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     ft = SourceDataController.objects.filter(id=pk)
     if ft.exists():
         source_url = ft[0].url
         ft.delete()
 
-        context["summary_text"] = "Remove ok"
+        return HttpResponseRedirect(
+            reverse("{}:sources".format(ContextData.app_name))
+        )
     else:
-        context["summary_text"] = "No source for ID: " + str(pk)
+        p.context["summary_text"] = "No source for ID: " + str(pk)
 
-    return ContextData.render(request, "summary_present.html", context)
+    return p.render("summary_present.html")
 
 
 def source_remove_entries(request, pk):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - remove source entries"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Remove source entries")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     ft = SourceDataController.objects.filter(id=pk)
     if ft.exists():
         entries = LinkDataController.objects.filter(source=ft[0].url)
         if entries.exists():
             entries.delete()
-            context["summary_text"] = "Remove ok"
-            context["summary_text"] = str(entries)
-        else:
-            context["summary_text"] = "No entries to remove"
-    else:
-        context["summary_text"] = "No source for ID: " + str(pk)
 
-    return ContextData.render(request, "summary_present.html", context)
+            return HttpResponseRedirect(
+                    reverse("{}:source-detail".format(ContextData.app_name), 
+                        kwargs={"pk": pk},
+                        ))
+        else:
+            p.context["summary_text"] = "No entries to remove"
+    else:
+        p.context["summary_text"] = "No source for ID: " + str(pk)
+
+    return p.render("summary_present.html")
 
 
 def remove_all_sources(request):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - remove all links"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Remove all sources")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     ft = SourceDataController.objects.all()
     if ft.exists():
         ft.delete()
-        context["summary_text"] = "Removing all sources ok"
-    else:
-        context["summary_text"] = "No source to remove"
 
-    return ContextData.render(request, "summary_present.html", context)
+        return HttpResponseRedirect(
+            reverse("{}:sources".format(ContextData.app_name))
+        )
+    else:
+        p.context["summary_text"] = "No source to remove"
+
+    return p.render("summary_present.html")
 
 
 def wayback_save(request, pk):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - Waybacksave"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Wayback save")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     if ConfigurationEntry.get().source_save:
         source = SourceDataController.objects.get(id=pk)
         BackgroundJobController.link_save(subject=source.url)
 
-        context["summary_text"] = "Added to waybacksave"
+        return HttpResponseRedirect(
+                reverse("{}:source-detail".format(ContextData.app_name), 
+                    kwargs={"pk": pk},
+                    ))
     else:
-        context["summary_text"] = "Waybacksave is disabled for sources"
+        p.context["summary_text"] = "Waybacksave is disabled for sources"
 
-    return ContextData.render(request, "summary_present.html", context)
+    return p.render("summary_present.html")
 
 
 def process_source_text(request, pk):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - process"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Process source")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     text = """
     """
@@ -327,20 +346,22 @@ def process_source_text(request, pk):
     proc = RssSourceProcessor()
     proc.process_parser_source(source, text)
 
-    context["summary_text"] = "Added to waybacksave"
-
-    return ContextData.render(request, "summary_present.html", context)
+    return HttpResponseRedirect(
+            reverse("{}:source-detail".format(ContextData.app_name), 
+                kwargs={"pk": pk},
+                ))
 
 
 def import_youtube_links_for_source(request, pk):
     from ..programwrappers.ytdlp import YTDLP
 
-    summary_text = ""
-    context = ContextData.get_context(request)
-    context["page_title"] += " - import sources"
+    p = ViewPage(request)
+    p.set_title("Import YouTube links for source")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    summary_text = ""
 
     source_obj = SourceDataController.objects.get(id=pk)
 
@@ -348,8 +369,8 @@ def import_youtube_links_for_source(request, pk):
     wh = url.find("=")
 
     if wh == -1:
-        context["summary_text"] = "Could not obtain code from a video"
-        return ContextData.render(request, "summary_present.html", context)
+        p.context["summary_text"] = "Could not obtain code from a video"
+        return p.render("summary_present.html")
 
     code = url[wh + 1 :]
     channel = "https://www.youtube.com/channel/{}".format(code)
@@ -367,18 +388,18 @@ def import_youtube_links_for_source(request, pk):
         print("Adding job {}".format(link))
         BackgroundJobController.link_add(link, source_obj)
 
-    context["summary_text"] = ""
-    return ContextData.render(request, "summary_present.html", context)
+    p.context["summary_text"] = ""
+    return p.render("summary_present.html")
 
 
 def source_fix_entries(request, source_pk):
     from ..pluginentries.youtubelinkhandler import YouTubeLinkHandler
 
-    context = ContextData.get_context(request)
-    context["page_title"] += " - Update entries for source"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Fix source entries")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     source_obj = SourceDataController.objects.get(id=source_pk)
 
@@ -396,9 +417,9 @@ def source_fix_entries(request, source_pk):
             entry.save()
             summary_text += "Fixed {} {}\n".format(entry.title, entry.link)
 
-    context["summary_text"] = summary_text
+    p.context["summary_text"] = summary_text
 
-    return ContextData.render(request, "summary_present.html", context)
+    return p.render("summary_present.html")
 
 
 def source_json(request, pk):

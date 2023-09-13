@@ -50,6 +50,8 @@ class ConfigForm(forms.ModelForm):
             "data_export_path",
             "data_import_path",
             "access_type",
+            "days_to_move_to_archive",
+            "days_to_remove_links",
         ]
 
     def __init__(self, *args, **kwargs):
@@ -167,6 +169,7 @@ class EntryForm(forms.ModelForm):
             "user",
             "artist",
             "album",
+            "age",
             "thumbnail",
         ]
 
@@ -181,6 +184,7 @@ class EntryForm(forms.ModelForm):
         self.fields["album"].required = False
         self.fields["bookmarked"].initial = True
         self.fields["user"].widget.attrs["readonly"] = True
+        self.fields["age"].required = False
         self.fields["thumbnail"].required = False
 
     def get_information(self):
@@ -205,6 +209,7 @@ class EntryArchiveForm(forms.ModelForm):
             "user",
             "artist",
             "album",
+            "age",
             "thumbnail",
         ]
 
@@ -325,6 +330,7 @@ class DomainsChoiceForm(forms.Form):
     search = forms.CharField(label="Search", max_length=500, required=False)
     suffix = forms.CharField(widget=forms.Select(choices=()), required=False)
     tld = forms.CharField(widget=forms.Select(choices=()), required=False)
+    sort = forms.CharField(widget=forms.Select(choices=()), required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -339,46 +345,61 @@ class DomainsChoiceForm(forms.Form):
         self.fields["tld"].widget = forms.Select(
             choices=self.get_tld_choices(), attrs=attr
         )
+        self.fields["sort"].widget = forms.Select(
+            choices=self.get_sort_choices(), attrs=attr
+        )
+
+    def to_choices(self, names):
+        names = sorted(names)
+        result = []
+
+        for name in names:
+            result.append([name, name])
+
+        return result
 
     def get_suffix_choices(self):
         from .models import DomainsSuffixes
 
         result = []
-        result.append(["", ""])
+        result.append("")
 
         suffs = DomainsSuffixes.objects.all()
         for suff in suffs:
             if suff and suff != "":
-                result.append([suff.suffix, suff.suffix])
+                result.append(suff.suffix)
 
-        return result
+        return self.to_choices(result)
 
     def get_tld_choices(self):
         from .models import DomainsTlds
 
         result = []
-        result.append(["", ""])
+        result.append("")
 
         tlds = DomainsTlds.objects.all()
         for tld in tlds:
             if tld and tld != "":
-                result.append([tld.tld, tld.tld])
+                result.append(tld.tld)
 
-        return result
+        return self.to_choices(result)
 
     def get_main_choices(self):
         from .models import DomainsMains
 
         result = []
-        result.append(["", ""])
+        result.append("")
 
         mains = DomainsMains.objects.all()
         for main in mains and main != "":
-            result.append([main.main, main.main])
+            result.append(main.main)
 
-        result = sorted(result)
+        return self.to_choices(result)
 
-        return result
+    def get_sort_choices(self):
+        names = Domains.get_query_names()
+        names.append("")
+        return self.to_choices(names)
 
 
 class SourcesChoiceForm(forms.Form):

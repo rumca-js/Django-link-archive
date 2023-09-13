@@ -1,5 +1,6 @@
 from django.views import generic
 from django.urls import reverse
+from django.shortcuts import redirect
 from django.http import JsonResponse
 from django.http import HttpResponseForbidden, HttpResponseRedirect
 
@@ -18,9 +19,27 @@ class DomainsListView(generic.ListView):
     context_object_name = "content_list"
     paginate_by = 100
 
+    def get(self, *args, **kwargs):
+        p = ViewPage(self.request)
+        data = p.check_access()
+        if data:
+            return redirect('{}:missing-rights'.format(ContextData.app_name))
+        return super(DomainsListView, self).get(*args, **kwargs)
+
     def get_queryset(self):
+        self.sort = "normal"
+        if "sort" in self.request.GET:
+            sort = self.request.GET["sort"]
+            if sort.strip() != "":
+                self.sort = sort
+
         self.query_filter = DomainFilter(self.request.GET)
-        return self.query_filter.get_filtered_objects()
+
+        objects = self.query_filter.get_filtered_objects()
+
+        if self.sort != "normal":
+            return objects.order_by("-"+self.sort)
+        return objects
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
@@ -33,6 +52,8 @@ class DomainsListView(generic.ListView):
             context["type"] = self.request.GET["type"]
         else:
             context["type"] = "normal"
+
+        context["sort"] = self.sort
 
         self.filter_form = self.get_form()
         self.filter_form.method = "GET"
@@ -101,11 +122,11 @@ class DomainsByNameDetailView(generic.DetailView):
 
 
 def domain_add(request):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - add domain"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Add domain")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     if request.method == "POST":
         form = LinkInputForm(request.POST)
@@ -121,23 +142,25 @@ def domain_add(request):
                 )
             )
         else:
-            context["summary_text"] = "Form is invalid"
-            return ContextData.render(request, "summary_present.html", context)
+            p.context["summary_text"] = "Form is invalid"
+            return p.render("summary_present.html")
 
     else:
         form = LinkInputForm()
         form.method = "POST"
 
-        context["form_title"] = "Add new domain"
-        context["form"] = form
+        p.context["form_title"] = "Add new domain"
+        p.context["form"] = form
 
-    return ContextData.render(request, "form_basic.html", context)
+    return p.render("form_basic.html")
 
 
 def domain_edit(request, pk):
     p = ViewPage(request)
     p.set_title("Edit domain")
-    p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     domains = Domains.objects.filter(id=pk)
     if not domains.exists():
@@ -175,11 +198,11 @@ def domain_edit(request, pk):
 
 
 def domain_remove(request, pk):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - Domain remove"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Remove domain")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     domain = Domains.objects.get(id=pk)
     domain.delete()
@@ -190,8 +213,11 @@ def domain_remove(request, pk):
 
 
 def domains_remove_all(request):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - Domains remove"
+    p = ViewPage(request)
+    p.set_title("Remove all domains")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     if not request.user.is_staff:
         return ContextData.render(request, "missing_rights.html", context)
@@ -204,11 +230,11 @@ def domains_remove_all(request):
 
 
 def domain_update_data(request, pk):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - Domain update data"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Update domain data")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     domains = Domains.objects.filter(id=pk)
     domain = domains[0]
@@ -225,31 +251,31 @@ def domain_update_data(request, pk):
 
 
 def domains_fix(request):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - Domain fix"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Fix domains")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     Domains.fix_all()
 
-    context["summary_text"] = "Domains were fixed"
-
-    return ContextData.render(request, "summary_present.html", context)
+    return HttpResponseRedirect(
+        reverse("{}:domains".format(ContextData.app_name))
+    )
 
 
 def domains_read_bookmarks(request):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - Domain read bookmarks"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Read domains from bookmarks")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     LinkDataHyperController.read_domains_from_bookmarks()
 
-    context["summary_text"] = "Domains were read from bookmarks"
-
-    return ContextData.render(request, "summary_present.html", context)
+    return HttpResponseRedirect(
+        reverse("{}:domains".format(ContextData.app_name))
+    )
 
 
 def domain_json(request, pk):

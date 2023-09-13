@@ -297,9 +297,11 @@ class LinkDataController(LinkDataModel):
     def move_old_links_to_archive():
         from .dateutils import DateUtils
 
+        conf = ConfigurationEntry.get()
+
         current_time = DateUtils.get_datetime_now_utc()
         days_before = current_time - timedelta(
-            days=BaseLinkDataController.get_archive_days_limit()
+            days=conf.days_to_move_to_archive
         )
 
         entries = LinkDataController.objects.filter(
@@ -428,6 +430,8 @@ class LinkDataHyperController(object):
         return False
 
     def get_link_object(link, date=None):
+        conf = ConfigurationEntry.get()
+
         if date is None:
             obj = LinkDataController.objects.filter(link=link)
             if obj.count() > 0:
@@ -438,7 +442,7 @@ class LinkDataHyperController(object):
 
         current_time = DateUtils.get_datetime_now_utc()
         date_before = current_time - date
-        if date_before.days > self.get_archive_days_limit():
+        if date_before.days > conf.days_to_move_to_archive:
             obj = ArchiveLinkDataController.objects.filter(link=link)
             if obj.count() > 0:
                 return obj[0]

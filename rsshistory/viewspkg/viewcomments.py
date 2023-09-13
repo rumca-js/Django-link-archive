@@ -13,24 +13,23 @@ from ..models import (
 )
 from ..configuration import Configuration
 from ..forms import CommentEntryForm
-from ..views import ContextData
+from ..views import ContextData, ViewPage
 from ..controllers import LinkCommentDataController, LinkDataController
 
 
 def entry_add_comment(request, link_id):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - Add comment"
-
-    if not request.user.is_authenticated:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Add comment")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_LOGGED)
+    if data is not None:
+        return data
 
     user_name = request.user.get_username()
     if not LinkCommentDataController.can_user_add_comment(link_id, user_name):
         conf = ConfigurationEntry.get()
-        context["summary_text"] = "User cannot add more comments. Limit to {} comment per day".format(config.number_of_comments_per_day)
-        return ContextData.render(request, "summary_present.html", context)
+        p.context["summary_text"] = "User cannot add more comments. Limit to {} comment per day".format(config.number_of_comments_per_day)
+        return p.render("summary_present.html")
 
-    print("Link id" + str(link_id))
     link = LinkDataController.objects.get(id=link_id)
 
     # if this is a POST request we need to process the form data
@@ -49,9 +48,8 @@ def entry_add_comment(request, link_id):
                 )
             )
 
-        context["summary_text"] = "Could not add a comment"
-
-        return ContextData.render(request, "summary_present.html", context)
+        p.context["summary_text"] = "Could not add a comment"
+        return p.render("summary_present.html")
 
     else:
         author = request.user.username
@@ -63,21 +61,21 @@ def entry_add_comment(request, link_id):
         "{}:entry-comment-add".format(ContextData.app_name), args=[link_id]
     )
 
-    context["form"] = form
-    context["form_title"] = link.title
-    context[
+    p.context["form"] = form
+    p.context["form_title"] = link.title
+    p.context[
         "form_description_post"
     ] = """Please think twice about what you are going to say. Is it written in vengance? Is it something you truly believe? Have you done research in that matter? This is important. You will be able to post only 1 comment per day"""
 
-    return ContextData.render(request, "form_basic.html", context)
+    return p.render("form_basic.html")
 
 
 def entry_comment_edit(request, pk):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - edit comment"
-
-    if not request.user.is_authenticated:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Edit comment")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_LOGGED)
+    if data is not None:
+        return data
 
     comment_obj = LinkCommentDataModel.objects.get(id=pk)
     link = comment_obj.link_obj
@@ -85,8 +83,8 @@ def entry_comment_edit(request, pk):
     author = request.user.username
 
     if author != comment_obj.author:
-        context["summary_text"] = "You are not the author!"
-        return ContextData.render(request, "summary_present.html", context)
+        p.context["summary_text"] = "You are not the author!"
+        return p.render("summary_present.html")
 
     if request.method == "POST":
         form = CommentEntryForm(request.POST)
@@ -95,13 +93,13 @@ def entry_comment_edit(request, pk):
             comment_obj.comment = form.cleaned_data["comment"]
             comment_obj.save()
 
-            context["summary_text"] = "Comment edited"
+            p.context["summary_text"] = "Comment edited"
 
-            return ContextData.render(request, "summary_present.html", context)
+            return p.render("summary_present.html")
         else:
-            context["summary_text"] = "Form is not valid"
+            p.context["summary_text"] = "Form is not valid"
 
-            return ContextData.render(request, "summary_present.html", context)
+            return p.render("summary_present.html")
     else:
         form = CommentEntryForm(instance=comment_obj)
         form.method = "POST"
@@ -110,19 +108,19 @@ def entry_comment_edit(request, pk):
             "{}:entry-comment-edit".format(ContextData.app_name), args=[pk]
         )
 
-        context["form"] = form
-        context["form_title"] = link.title
-        context["form_description"] = link.title
+        p.context["form"] = form
+        p.context["form_title"] = link.title
+        p.context["form_description"] = link.title
 
-        return ContextData.render(request, "form_basic.html", context)
+        return p.render("form_basic.html")
 
 
 def entry_comment_remove(request, pk):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - remove comment"
-
-    if not request.user.is_authenticated:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Remove comment")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_LOGGED)
+    if data is not None:
+        return data
 
     comment_obj = LinkCommentDataModel.objects.get(id=pk)
     link = comment_obj.link_obj
@@ -130,11 +128,11 @@ def entry_comment_remove(request, pk):
     author = request.user.username
 
     if author != comment_obj.author:
-        context["summary_text"] = "You are not the author!"
-        return ContextData.render(request, "summary_present.html", context)
+        p.context["summary_text"] = "You are not the author!"
+        return p.render("summary_present.html")
 
     comment_obj.delete()
 
-    context["summary_text"] = "Removed comment"
+    p.context["summary_text"] = "Removed comment"
 
-    return ContextData.render(request, "summary_present.html", context)
+    return p.render("summary_present.html")

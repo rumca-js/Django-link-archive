@@ -1,13 +1,13 @@
 from django.views import generic
 from django.urls import reverse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponseForbidden, HttpResponseRedirect
 
 from datetime import datetime, timedelta
 
 from ..models import LinkTagsDataModel, ConfigurationEntry
 from ..forms import ConfigForm, TagForm, TagEntryForm, TagRenameForm
-from ..views import ContextData
+from ..views import ContextData, ViewPage
 from ..controllers import LinkDataController
 
 
@@ -15,6 +15,13 @@ class AllTags(generic.ListView):
     model = LinkTagsDataModel
     context_object_name = "content_list"
     paginate_by = 9200
+
+    def get(self, *args, **kwargs):
+        p = ViewPage(self.request)
+        data = p.check_access()
+        if data:
+            return redirect('{}:missing-rights'.format(ContextData.app_name))
+        return super(AllTags, self).get(*args, **kwargs)
 
     def get_tags_objects(self):
         return LinkTagsDataModel.objects.all()
@@ -78,25 +85,27 @@ class RecentTags(AllTags):
 
 
 def tag_entry(request, pk):
+    p = ViewPage(request)
+    p.set_title("Tag entry")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
     # TODO read and maybe fix https://docs.djangoproject.com/en/4.1/topics/forms/modelforms/
 
-    context = ContextData.get_context(request)
-    context["page_title"] += " - tag entry"
-    context["pk"] = pk
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p.context["page_title"] += " - tag entry"
+    p.context["pk"] = pk
 
     objs = LinkDataController.objects.filter(id=pk)
 
     if not objs.exists():
-        context["summary_text"] = "Sorry, such object does not exist"
-        return ContextData.render(request, "summary_present.html", context)
+        p.context["summary_text"] = "Sorry, such object does not exist"
+        return p.render("summary_present.html")
 
     obj = objs[0]
     if not obj.bookmarked:
-        context["summary_text"] = "Sorry, only bookmarked objects can be tagged"
-        return ContextData.render(request, "summary_present.html", context)
+        p.context["summary_text"] = "Sorry, only bookmarked objects can be tagged"
+        return p.render("summary_present.html")
 
     if request.method == "POST":
         method = "POST"
@@ -113,8 +122,8 @@ def tag_entry(request, pk):
                 )
             )
         else:
-            context["summary_text"] = "Entry not added"
-            return ContextData.render(request, "summary_present.html", context)
+            p.context["summary_text"] = "Entry not added"
+            return p.render("summary_present.html")
 
     else:
         author = request.user.username
@@ -133,34 +142,34 @@ def tag_entry(request, pk):
         form.action_url = reverse(
             "{}:entry-tag".format(ContextData.app_name), args=[pk]
         )
-        context["form"] = form
-        context["form_title"] = obj.title
-        context["form_description"] = obj.title
+        p.context["form"] = form
+        p.context["form_title"] = obj.title
+        p.context["form_description"] = obj.title
 
-    return ContextData.render(request, "form_basic.html", context)
+    return p.render("form_basic.html")
 
 
 def tag_remove(request, pk):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - remove tag"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Remove a tag")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     entry = LinkTagsDataModel.objects.get(id=pk)
     entry.delete()
 
-    context["summary_text"] = "Remove ok"
-
-    return ContextData.render(request, "summary_present.html", context)
+    return HttpResponseRedirect(
+        reverse("{}:tag-show-all".format(ContextData.app_name))
+    )
 
 
 def tag_remove_form(request):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - remove tag form"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Remove tag form")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     if request.method == "POST":
         form = TagForm(request.POST)
@@ -171,9 +180,11 @@ def tag_remove_form(request):
             tags = LinkTagsDataModel.objects.filter(tag=tag_name)
             tags.delete()
 
-            summary_text = "Removed tags"
-            context["summary_text"] = summary_text
+            return HttpResponseRedirect(
+                reverse("{}:tag-show-all".format(ContextData.app_name))
+            )
 
+        p.context["summary_text"] = "Invalid form"
         return ContextData.render(request, "summary_present.html", context)
     else:
         form = TagForm()
@@ -181,21 +192,21 @@ def tag_remove_form(request):
         form.method = "POST"
         form.action_url = reverse("{}:tag-remove-form".format(ContextData.app_name))
 
-        context["form"] = form
-        context["form_title"] = "Remove tag"
-        context["form_description"] = "Remove tag"
+        p.context["form"] = form
+        p.context["form_title"] = "Remove tag"
+        p.context["form_description"] = "Remove tag"
 
-        return ContextData.render(request, "form_basic.html", context)
+        return p.render("form_basic.html")
 
-    return ContextData.render(request, "summary_present.html", context)
+    return p.render("summary_present.html")
 
 
 def tag_remove_str(request, tag_name):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - remove tag"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Remove tag")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     entries = LinkTagsDataModel.objects.filter(tag=tag_name)
     entries.delete()
@@ -204,32 +215,30 @@ def tag_remove_str(request, tag_name):
         reverse("{}:tags-show-all".format(ContextData.app_name))
     )
 
-    return ContextData.render(request, "summary_present.html", context)
-
 
 def tags_entry_remove(request, entrypk):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - remove tag"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Remove tag")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     entry = LinkDataController.objects.get(id=entrypk)
     tags = entry.tags.all()
     for tag in tags:
         tag.delete()
 
-    context["summary_text"] = "Remove ok"
-
-    return ContextData.render(request, "summary_present.html", context)
+    return HttpResponseRedirect(
+        reverse("{}:tags-show-all".format(ContextData.app_name))
+    )
 
 
 def tags_entry_show(request, entrypk):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - remove tag"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Show tag entry")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     summary = ""
 
@@ -238,17 +247,17 @@ def tags_entry_show(request, entrypk):
     for tag in tags:
         summary += "Link:{} tag:{} author:{}\n".format(tag.link, tag.tag, tag.author)
 
-    context["summary_text"] = summary
+    p.context["summary_text"] = summary
 
-    return ContextData.render(request, "summary_present.html", context)
+    return p.render("summary_present.html")
 
 
 def tag_rename(request):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - rename tag"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Rename a tag")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     if request.method == "POST":
         form = TagRenameForm(request.POST)
@@ -262,9 +271,11 @@ def tag_rename(request):
                 tag.tag = new_tag.lower()
                 tag.save()
 
-            summary_text = "Renamed tags"
-            context["summary_text"] = summary_text
+            return HttpResponseRedirect(
+                reverse("{}:tags-show-all".format(ContextData.app_name))
+            )
 
+        p.context["summary_text"] = "Invalid form"
         return ContextData.render(request, "summary_present.html", context)
     else:
         form = TagRenameForm()
@@ -272,36 +283,37 @@ def tag_rename(request):
         form.method = "POST"
         form.action_url = reverse("{}:tag-rename".format(ContextData.app_name))
 
-        context["form"] = form
-        context["form_title"] = "Rename tag"
-        context["form_description"] = "Rename tag"
+        p.context["form"] = form
+        p.context["form_title"] = "Rename tag"
+        p.context["form_description"] = "Rename tag"
 
-        return ContextData.render(request, "form_basic.html", context)
+        return p.render("form_basic.html")
 
-    return ContextData.render(request, "summary_present.html", context)
+    return p.render("summary_present.html")
 
 
 def entry_vote(request, pk):
     # TODO read and maybe fix https://docs.djangoproject.com/en/4.1/topics/forms/modelforms/
     from ..forms import LinkVoteForm
 
-    context = ContextData.get_context(request)
-    context["page_title"] += " - vote entry"
-    context["pk"] = pk
+    p = ViewPage(request)
+    p.set_title("Vote for entry")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p.context["pk"] = pk
 
     objs = LinkDataController.objects.filter(id=pk)
 
     if not objs.exists():
-        context["summary_text"] = "Sorry, such object does not exist"
-        return ContextData.render(request, "summary_present.html", context)
+        p.context["summary_text"] = "Sorry, such object does not exist"
+        return p.render("summary_present.html")
 
     obj = objs[0]
     if not obj.bookmarked:
-        context["summary_text"] = "Sorry, only bookmarked objects can be tagged"
-        return ContextData.render(request, "summary_present.html", context)
+        p.context["summary_text"] = "Sorry, only bookmarked objects can be tagged"
+        return p.render("summary_present.html")
 
     if request.method == "POST":
         method = "POST"
@@ -319,8 +331,8 @@ def entry_vote(request, pk):
             )
         else:
             config = ConfigurationEntry.get()
-            context["summary_text"] = "Entry not voted. Vote min, max = [{}, {}]".format(config.vote_min, config.vote_max)
-            return ContextData.render(request, "summary_present.html", context)
+            p.context["summary_text"] = "Entry not voted. Vote min, max = [{}, {}]".format(config.vote_min, config.vote_max)
+            return p.render("summary_present.html")
 
     else:
         author = request.user.username
@@ -337,8 +349,9 @@ def entry_vote(request, pk):
         form.action_url = reverse(
             "{}:entry-vote".format(ContextData.app_name), args=[pk]
         )
-        context["form"] = form
-        context["form_title"] = obj.title
-        context["form_description"] = obj.title
 
-    return ContextData.render(request, "form_basic.html", context)
+        p.context["form"] = form
+        p.context["form_title"] = obj.title
+        p.context["form_description"] = obj.title
+
+    return p.render("form_basic.html")

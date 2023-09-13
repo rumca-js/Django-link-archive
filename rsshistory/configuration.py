@@ -16,7 +16,7 @@ version is split into three digits:
  if a change requires the model to be changed, then second digit is updated, patch is set to 0
  if something should be released to public, then release version changes
 """
-__version__ = "0.21.0"
+__version__ = "0.22.0"
 
 
 from pathlib import Path
@@ -43,6 +43,7 @@ class Configuration(object):
             "app_version": self.version,
             "config": ConfigurationEntry.get(),
             "base_generic": str(Path(self.app_name) / "base_generic.html"),
+            "c": self,
         }
 
     def get_object(app_name=None):
@@ -57,6 +58,17 @@ class Configuration(object):
             Configuration.obj[app_name] = c
 
         return Configuration.obj[app_name]
+
+    def get_workspaces(self):
+        result = []
+        items_in_dir = os.listdir(self.directory)
+        for item in items_in_dir:
+            full_path_item = item + "/apps.py"
+            if os.path.isfile(full_path_item):
+                if item != "private":
+                    result.append(item)
+
+        return result
 
     def enable_logging(self, create_file=True):
         pass
