@@ -12,6 +12,8 @@ from ..models import BackgroundJob, PersistentInfo
 
 class BackgroundJobControllerTest(TestCase):
     def setUp(self):
+        BackgroundJobController.objects.all().delete()
+
         ob = SourceDataController.objects.create(
             url="https://youtube.com", title="YouTube", category="No", subcategory="No"
         )
@@ -24,6 +26,9 @@ class BackgroundJobControllerTest(TestCase):
         # pers = PersistentInfo.objects.all()
         # self.assertEqual(pers[0].info, "")
         # self.assertEqual(len(pers), 0)
+
+    def tearDown(self):
+        BackgroundJobController.objects.all().delete()
 
     def test_number_of_jobs(self):
         self.assertEqual(

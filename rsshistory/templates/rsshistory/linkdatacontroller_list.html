@@ -19,7 +19,7 @@
      {{ filter_form }}
      <tr>
          <td>
-             <input type="submit" value="Submit">
+             <input type="submit" value="Search">
          </td>
      </tr>
      </table>
@@ -30,6 +30,7 @@
   {% if content_list %}
   <div class="linklist container_{{user_config.display_type}}">
     {% for link in content_list %}
+    {% if type == "normal" %}
           {% if user_config.display_type == "clickable-tags" %}
               {% include "rsshistory/linkdatacontroller_list__clickable_tags.html" %}
           {% elif user_config.display_type == "line-and-buttons" %}
@@ -39,6 +40,9 @@
           {% else %}
               {% include "rsshistory/linkdatacontroller_list__standard.html" %}
           {% endif %}
+    {% elif type == "clear" %}
+              {% include "rsshistory/linkdatacontroller_list__clean_list.html" %}
+    {% endif %}
     {% endfor %}
   </div>
 
@@ -54,6 +58,8 @@
   {% endif %}
 
   <a href="{% url 'rsshistory:entries-json' %}?query_type={{query_type}}&{{ request.GET.urlencode }}" class='simplebutton'>Show JSON</a>
+  <a href="{% url 'rsshistory:entries' %}?query_type={{query_type}}&{{ args }}&type=clear" class='simplebutton'>Show Clear</a>
+  <a href="{% url 'rsshistory:entries' %}?query_type={{query_type}}&{{ args }}&type=normal" class='simplebutton'>Show Normal</a>
 
   {% if search_term %}
      <a href="https://en.wikipedia.org/w/index.php?search={{search_term}}" class="simplebutton">Ask wikipedia</a>

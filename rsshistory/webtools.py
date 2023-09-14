@@ -20,6 +20,7 @@ class Page(object):
         self.status_code = None
 
         from .models import ConfigurationEntry
+
         config = ConfigurationEntry.get()
         self.user_agent = config.user_agent
 
@@ -84,11 +85,13 @@ class Page(object):
         if not self.contents:
             return "en"
 
-        soup = BeautifulSoup(self.contents, 'html.parser')
+        soup = BeautifulSoup(self.contents, "html.parser")
         html = soup.find("html")
         if html and html.has_attr("lang"):
             print("returning: {}".format(html["lang"]))
             return html["lang"]
+
+        return "en"
 
     def extract_html(self, text, tag, closingtag, wh=None):
         if not wh:
@@ -121,8 +124,8 @@ class Page(object):
 
         title = None
 
-        soup = BeautifulSoup(self.contents, 'html.parser')
-        title_find = soup.find('title')
+        soup = BeautifulSoup(self.contents, "html.parser")
+        title_find = soup.find("title")
         if title_find:
             title = title_find.string
 
@@ -133,7 +136,7 @@ class Page(object):
         if title:
             title = title.strip()
             return title
-        #title = html.unescape(title)
+        # title = html.unescape(title)
 
     def get_description(self):
         if not self.contents:
@@ -145,8 +148,8 @@ class Page(object):
         description = None
 
         soup = BeautifulSoup(self.contents, "html.parser")
-        description_find = soup.find("meta", attrs={'name' : "description"})
-        if description_find and description_fidn.has_attr("content"):
+        description_find = soup.find("meta", attrs={"name": "description"})
+        if description_find and description_find.has_attr("content"):
             description = description_find["content"]
 
         description_find = soup.find("meta", property="og:description")
@@ -158,16 +161,16 @@ class Page(object):
             if wh1 == -1:
                 return
 
-            wh1 = self.contents.find('description',wh1 + 24 +1)
+            wh1 = self.contents.find("description", wh1 + 24 + 1)
             if wh1 == -1:
                 return
-            wh1 = self.contents.find('"',wh1+1)
+            wh1 = self.contents.find('"', wh1 + 1)
             if wh1 == -1:
                 return
-            wh2 = self.contents.find('"',wh1+1)
+            wh2 = self.contents.find('"', wh1 + 1)
             if wh2 == -1:
                 return
-            description = self.contents[wh1+1: wh2]
+            description = self.contents[wh1 + 1 : wh2]
 
         if description:
             description = description.strip()

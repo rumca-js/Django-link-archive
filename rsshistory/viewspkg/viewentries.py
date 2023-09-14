@@ -5,9 +5,9 @@ from django.db.models import Q
 from django.http import JsonResponse
 from django.http import HttpResponseForbidden, HttpResponseRedirect
 
+from ..apps import LinkDatabase
 from ..models import (
     BaseLinkDataController,
-    LinkTagsDataModel,
     BackgroundJob,
     ConfigurationEntry,
     Domains,
@@ -28,21 +28,20 @@ from ..forms import (
     OmniSearchForm,
 )
 from ..queryfilters import EntryFilter
-from ..views import ContextData, ViewPage
-from ..configuration import Configuration
+from ..views import ViewPage
 
 
 class EntriesSearchListView(generic.ListView):
     model = LinkDataController
     context_object_name = "content_list"
     paginate_by = 100
-    template_name = str(ContextData.get_full_template("linkdatacontroller_list.html"))
+    template_name = str(ViewPage.get_full_template("linkdatacontroller_list.html"))
 
     def get(self, *args, **kwargs):
         p = ViewPage(self.request)
         data = p.check_access()
         if data:
-            return redirect('{}:missing-rights'.format(ContextData.app_name))
+            return redirect("{}:missing-rights".format(LinkDatabase.name))
         return super(EntriesSearchListView, self).get(*args, **kwargs)
 
     def get_filter(self):
@@ -58,8 +57,9 @@ class EntriesSearchListView(generic.ListView):
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
         context = super(EntriesSearchListView, self).get_context_data(**kwargs)
-        context = ContextData.init_context(self.request, context)
+        context = ViewPage.init_context(self.request, context)
         # Create any data and add it to the context
+        self.init_display_type(context)
 
         context["page_title"] += self.get_title()
 
@@ -91,20 +91,20 @@ class EntriesSearchListView(generic.ListView):
         return self.query_filter.get_filtered_objects()
 
     def get_reset_link(self):
-        return reverse("{}:entries-search-init".format(ContextData.app_name))
+        return reverse("{}:entries-search-init".format(LinkDatabase.name))
 
     def has_more_results(self):
         return True
 
     def get_more_results_link(self):
         return (
-            reverse("{}:entries-omni-search".format(ContextData.app_name))
+            reverse("{}:entries-omni-search".format(LinkDatabase.name))
             + "?"
             + self.query_filter.get_filter_string()
         )
 
     def get_form_action_link(self):
-        return reverse("{}:entries".format(ContextData.app_name))
+        return reverse("{}:entries".format(LinkDatabase.name))
 
     def get_form_instance(self):
         return EntryChoiceForm(self.request.GET)
@@ -124,6 +124,22 @@ class EntriesSearchListView(generic.ListView):
     def get_query_type(self):
         return "standard"
 
+    def init_display_type(self, context):
+        # TODO https://stackoverflow.com/questions/57487336/change-value-for-paginate-by-on-the-fly
+        # if type is not normal, no pagination
+        if "type" in self.request.GET:
+            context["type"] = self.request.GET["type"]
+        else:
+            context["type"] = "normal"
+        context["args"] = self.get_args()
+
+    def get_args(self):
+        thelist = ""
+        for arg in self.request.GET:
+            if arg != "type":
+                thelist += "&{}={}".format(arg,self.request.GET[arg])
+        return thelist
+
 
 class EntriesRecentListView(EntriesSearchListView):
     model = LinkDataController
@@ -136,10 +152,10 @@ class EntriesRecentListView(EntriesSearchListView):
         return query_filter
 
     def get_reset_link(self):
-        return reverse("{}:entries-recent-init".format(ContextData.app_name))
+        return reverse("{}:entries-recent-init".format(LinkDatabase.name))
 
     def get_form_action_link(self):
-        return reverse("{}:entries-recent".format(ContextData.app_name))
+        return reverse("{}:entries-recent".format(LinkDatabase.name))
 
     def get_form_instance(self):
         return BasicEntryChoiceForm(self.request.GET)
@@ -169,10 +185,10 @@ class EntriesNotTaggedView(EntriesSearchListView):
         return False
 
     def get_reset_link(self):
-        return reverse("{}:entries-untagged".format(ContextData.app_name))
+        return reverse("{}:entries-untagged".format(LinkDatabase.name))
 
     def get_form_action_link(self):
-        return reverse("{}:entries-recent".format(ContextData.app_name))
+        return reverse("{}:entries-recent".format(LinkDatabase.name))
 
     def get_form_instance(self):
         return EntryChoiceForm(self.request.GET)
@@ -200,10 +216,10 @@ class EntriesBookmarkedListView(EntriesSearchListView):
         return False
 
     def get_reset_link(self):
-        return reverse("{}:entries-bookmarked-init".format(ContextData.app_name))
+        return reverse("{}:entries-bookmarked-init".format(LinkDatabase.name))
 
     def get_form_action_link(self):
-        return reverse("{}:entries-bookmarked".format(ContextData.app_name))
+        return reverse("{}:entries-bookmarked".format(LinkDatabase.name))
 
     def get_form_instance(self):
         return EntryBookmarksChoiceForm(self.request.GET)
@@ -219,7 +235,7 @@ class EntriesArchiveListView(EntriesSearchListView):
     model = LinkDataController
     context_object_name = "content_list"
     paginate_by = 100
-    template_name = str(ContextData.get_full_template("linkdatacontroller_list.html"))
+    template_name = str(ViewPage.get_full_template("linkdatacontroller_list.html"))
 
     def get_filter(self):
         query_filter = EntryFilter(self.request.GET)
@@ -231,10 +247,10 @@ class EntriesArchiveListView(EntriesSearchListView):
         return False
 
     def get_reset_link(self):
-        return reverse("{}:entries-archived-init".format(ContextData.app_name))
+        return reverse("{}:entries-archived-init".format(LinkDatabase.name))
 
     def get_form_action_link(self):
-        return reverse("{}:entries-archived".format(ContextData.app_name))
+        return reverse("{}:entries-archived".format(LinkDatabase.name))
 
     def get_form_instance(self):
         return EntryChoiceForm(self.request.GET)
@@ -259,22 +275,26 @@ class EntriesOmniListView(EntriesSearchListView):
         translate = BaseLinkDataController.get_query_names()
         query_filter.set_translatable(translate)
 
-        if ("archive" in self.request.GET and self.request.GET["archive"] == 1):
-            query_filter.set_default_search_symbols([
-                "title__icontains",
-                "artist__icontains",
-                "album__icontains",
-                "description__icontains",
-                #"tags__tag__icontains",
-                ])
+        if "archive" in self.request.GET and self.request.GET["archive"] == 1:
+            query_filter.set_default_search_symbols(
+                [
+                    "title__icontains",
+                    "artist__icontains",
+                    "album__icontains",
+                    "description__icontains",
+                    # "tags__tag__icontains",
+                ]
+            )
         else:
-            query_filter.set_default_search_symbols([
-                "title__icontains",
-                "artist__icontains",
-                "album__icontains",
-                "description__icontains",
-                "tags__tag__icontains",
-                ])
+            query_filter.set_default_search_symbols(
+                [
+                    "title__icontains",
+                    "artist__icontains",
+                    "album__icontains",
+                    "description__icontains",
+                    "tags__tag__icontains",
+                ]
+            )
 
         query_filter.calculate_combined_query()
 
@@ -283,8 +303,9 @@ class EntriesOmniListView(EntriesSearchListView):
     def get_filtered_objects(self):
         fields = self.query_filter.get_fields()
 
-        if ("archive" in self.request.GET and self.request.GET["archive"] == 1) or \
-            ("archive" in fields and fields["archive"] == "1"):
+        if ("archive" in self.request.GET and self.request.GET["archive"] == 1) or (
+            "archive" in fields and fields["archive"] == "1"
+        ):
             self.query_filter.set_query_set(ArchiveLinkDataController.objects.all())
         else:
             self.query_filter.set_query_set(LinkDataController.objects.all())
@@ -292,10 +313,10 @@ class EntriesOmniListView(EntriesSearchListView):
         return self.query_filter.get_filtered_objects()
 
     def get_reset_link(self):
-        return reverse("{}:entries-omni-search-init".format(ContextData.app_name))
+        return reverse("{}:entries-omni-search-init".format(LinkDatabase.name))
 
     def get_form_action_link(self):
-        return reverse("{}:entries-omni-search".format(ContextData.app_name))
+        return reverse("{}:entries-omni-search".format(LinkDatabase.name))
 
     def has_more_results(self):
         if "archive" in self.request.GET:
@@ -306,11 +327,11 @@ class EntriesOmniListView(EntriesSearchListView):
     def get_more_results_link(self):
         if "search" in self.request.GET:
             return reverse(
-                "{}:entries-omni-search".format(ContextData.app_name)
+                "{}:entries-omni-search".format(LinkDatabase.name)
             ) + "?archive=on&search={}".format(self.request.GET["search"])
         else:
             return (
-                reverse("{}:entries-omni-search".format(ContextData.app_name))
+                reverse("{}:entries-omni-search".format(LinkDatabase.name))
                 + "?archive=on"
             )
 
@@ -339,7 +360,7 @@ class EntryDetailView(generic.DetailView):
 
         # Call the base implementation first to get the context
         context = super(EntryDetailView, self).get_context_data(**kwargs)
-        context = ContextData.init_context(self.request, context)
+        context = ViewPage.init_context(self.request, context)
 
         if self.object.language == None:
             self.object.update_language()
@@ -359,14 +380,14 @@ class EntryDetailView(generic.DetailView):
 class EntryArchivedDetailView(generic.DetailView):
     model = ArchiveLinkDataController
 
-    template_name = str(ContextData.get_full_template("linkdatacontroller_detail.html"))
+    template_name = str(ViewPage.get_full_template("linkdatacontroller_detail.html"))
 
     def get_context_data(self, **kwargs):
         from ..pluginentries.entrycontrollerbuilder import EntryControllerBuilder
 
         # Call the base implementation first to get the context
         context = super(EntryArchivedDetailView, self).get_context_data(**kwargs)
-        context = ContextData.init_context(self.request, context)
+        context = ViewPage.init_context(self.request, context)
 
         if self.object.language == None:
             self.object.update_language()
@@ -386,11 +407,11 @@ class EntryArchivedDetailView(generic.DetailView):
 def add_entry(request):
     from ..controllers import LinkDataController
 
-    context = ContextData.get_context(request)
-    context["page_title"] += " - Add entry"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Add entry")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     # if this is a POST request we need to process the form data
     if request.method == "POST":
@@ -405,22 +426,22 @@ def add_entry(request):
 
         ob = LinkDataController.objects.filter(link=link)
         if ob.exists():
-            context["form"] = form
-            context["entry"] = ob[0]
+            p.context["form"] = form
+            p.context["entry"] = ob[0]
 
-            return ContextData.render(request, "entry_edit_exists.html", context)
+            return p.render("entry_edit_exists.html")
 
         if valid:
             data = form.get_information()
             if not LinkDataHyperController.add_new_link(data):
-                context["summary_text"] = "Could not save link"
-                return ContextData.render(request, "summary_present.html", context)
+                p.context["summary_text"] = "Could not save link"
+                return p.render("summary_present.html")
 
-            context["form"] = form
+            p.context["form"] = form
 
             ob = LinkDataController.objects.filter(link=data["link"])
             if ob.exists():
-                context["entry"] = ob[0]
+                p.context["entry"] = ob[0]
 
             if ConfigurationEntry.get().store_domain_info:
                 Domains.add(data["link"])
@@ -428,10 +449,10 @@ def add_entry(request):
             if ConfigurationEntry.get().link_save:
                 BackgroundJobController.link_save(data["link"])
 
-            return ContextData.render(request, "entry_added.html", context)
+            return p.render("entry_added.html")
 
-        context["summary_text"] = "Form is invalid"
-        return ContextData.render(request, "summary_present.html", context)
+        p.context["summary_text"] = "Form is invalid"
+        return p.render("summary_present.html")
 
     else:
         author = request.user.username
@@ -441,10 +462,10 @@ def add_entry(request):
 
         form = EntryForm(initial=initial)
         form.method = "POST"
-        form.action_url = reverse("{}:entry-add".format(ContextData.app_name))
-        context["form"] = form
+        form.action_url = reverse("{}:entry-add".format(LinkDatabase.name))
+        p.context["form"] = form
 
-        context["form_title"] = "Add new entry"
+        p.context["form_title"] = "Add new entry"
 
         form_text = "<pre>"
         form_text += "Required fields:\n"
@@ -461,20 +482,20 @@ def add_entry(request):
         form_text += " - In case of errors, specify title, and description\n"
         form_text += "</pre>"
 
-        context["form_description_post"] = form_text
+        p.context["form_description_post"] = form_text
 
-    return ContextData.render(request, "form_basic.html", context)
+    return p.render("form_basic.html")
 
 
 def add_simple_entry(request):
     from ..forms import ExportDailyDataForm, LinkInputForm
     from ..controllers import LinkDataController
 
-    context = ContextData.get_context(request)
-    context["page_title"] += " - Add simple entry"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Add entry")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     if request.method == "POST":
         form = LinkInputForm(request.POST)
@@ -483,42 +504,42 @@ def add_simple_entry(request):
 
             ob = LinkDataController.objects.filter(link=link)
             if ob.exists():
-                context["form"] = form
-                context["entry"] = ob[0]
+                p.context["form"] = form
+                p.context["entry"] = ob[0]
 
-                return ContextData.render(request, "entry_edit_exists.html", context)
+                return p.render("entry_edit_exists.html")
 
             data = LinkDataController.get_full_information({"link": link})
             data["user"] = request.user.username
 
             form = EntryForm(initial=data)
             form.method = "POST"
-            form.action_url = reverse("{}:entry-add".format(ContextData.app_name))
-            context["form"] = form
+            form.action_url = reverse("{}:entry-add".format(LinkDatabase.name))
+            p.context["form"] = form
 
-            return ContextData.render(request, "form_basic.html", context)
+            return p.render("form_basic.html")
     else:
         form = LinkInputForm()
         form.method = "POST"
 
-        context["form"] = form
+        p.context["form"] = form
 
-        return ContextData.render(request, "form_basic.html", context)
+        return p.render("form_basic.html")
 
 
 def edit_entry(request, pk):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - edit entry"
+    p = ViewPage(request)
+    p.set_title("Edit entry")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
-    context["pk"] = pk
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p.context["pk"] = pk
 
     obs = LinkDataController.objects.filter(id=pk)
     if not obs.exists():
-        context["summary_text"] = "Such entry does not exist"
-        return ContextData.render(request, "summary_present.html", context)
+        p.context["summary_text"] = "Such entry does not exist"
+        return p.render("summary_present.html")
 
     ob = obs[0]
     if ob.user is None or ob.user == "":
@@ -532,50 +553,51 @@ def edit_entry(request, pk):
 
     if request.method == "POST":
         form = EntryForm(request.POST, instance=ob)
-        context["form"] = form
+        p.context["form"] = form
 
         if form.is_valid():
             form.save()
 
             return HttpResponseRedirect(ob.get_absolute_url())
 
-        context["summary_text"] = "Could not edit entry"
-        return ContextData.render(request, "summary_present.html", context)
+        p.context["summary_text"] = "Could not edit entry"
+        return render("summary_present.html")
     else:
         form = EntryForm(instance=ob)
         form.method = "POST"
         form.action_url = reverse(
-            "{}:entry-edit".format(ContextData.app_name), args=[pk]
+            "{}:entry-edit".format(LinkDatabase.name), args=[pk]
         )
-        context["form"] = form
-        return ContextData.render(request, "form_basic.html", context)
+        p.context["form"] = form
+        return p.render("form_basic.html")
 
 
 def remove_entry(request, pk):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - remove entry"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Remove entry")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     entry = LinkDataController.objects.filter(id=pk)
     if entry.exists():
         entry.delete()
 
-        context["summary_text"] = "Remove ok"
+        p.context["summary_text"] = "Remove ok"
     else:
-        context["summary_text"] = "No source for ID: " + str(pk)
+        p.context["summary_text"] = "No source for ID: " + str(pk)
 
-    return ContextData.render(request, "summary_present.html", context)
+    return p.render("summary_present.html")
 
 
 def hide_entry(request, pk):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - hide entry"
-    context["pk"] = pk
+    p = ViewPage(request)
+    p.set_title("Hide entry")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p.context["pk"] = pk
 
     objs = LinkDataController.objects.filter(id=pk)
     obj = objs[0]
@@ -586,94 +608,96 @@ def hide_entry(request, pk):
 
     summary_text = "Link changed to state: " + str(obj.dead)
 
-    context["summary_text"] = summary_text
+    p.context["summary_text"] = summary_text
 
-    return ContextData.render(request, "summary_present.html", context)
+    return p.render("summary_present.html")
 
 
 def entries_search_init(request):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - search filter"
+    p = ViewPage(request)
+    p.set_title("Search entries")
 
     filter_form = EntryChoiceForm()
     filter_form.create(SourceDataController.objects.all())
     filter_form.method = "GET"
-    filter_form.action_url = reverse("{}:entries".format(ContextData.app_name))
+    filter_form.action_url = reverse("{}:entries".format(LinkDatabase.name))
 
-    context["form"] = filter_form
+    p.context["form"] = filter_form
 
-    return ContextData.render(request, "form_search.html", context)
+    return p.render("form_search.html")
 
 
 def entries_omni_search_init(request):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - search filter"
+    p = ViewPage(request)
+    p.set_title("Search entries")
 
     filter_form = OmniSearchForm()
     filter_form.method = "GET"
     filter_form.action_url = reverse(
-        "{}:entries-omni-search".format(ContextData.app_name)
+        "{}:entries-omni-search".format(LinkDatabase.name)
     )
 
-    context["form"] = filter_form
+    p.context["form"] = filter_form
 
     if "search" in request.GET:
-        context["search_term"] = self.request.GET["search"]
+        p.context["search_term"] = self.request.GET["search"]
 
-    return ContextData.render(request, "form_search_omni.html", context)
+    return p.render("form_search_omni.html")
 
 
 def entries_bookmarked_init(request):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - bookmarked filter"
+    p = ViewPage(request)
+    p.set_title("Bookmarked entries")
 
     filter_form = EntryBookmarksChoiceForm()
     filter_form.create(SourceDataController.objects.all())
     filter_form.method = "GET"
     filter_form.action_url = reverse(
-        "{}:entries-bookmarked".format(ContextData.app_name)
+        "{}:entries-bookmarked".format(LinkDatabase.name)
     )
 
-    context["form"] = filter_form
+    p.context["form"] = filter_form
 
-    return ContextData.render(request, "form_search.html", context)
+    return p.render("form_search.html")
 
 
 def entries_recent_init(request):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - recent filter"
+    p = ViewPage(request)
+    p.set_title("Search recent entries")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     filter_form = BasicEntryChoiceForm()
     filter_form.create(SourceDataController.objects.all())
     filter_form.method = "GET"
-    filter_form.action_url = reverse("{}:entries-recent".format(ContextData.app_name))
+    filter_form.action_url = reverse("{}:entries-recent".format(LinkDatabase.name))
 
-    context["form"] = filter_form
+    p.context["form"] = filter_form
 
-    return ContextData.render(request, "form_search.html", context)
+    return p.render("form_search.html")
 
 
 def entries_archived_init(request):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - init filter"
+    p = ViewPage(request)
+    p.set_title("Search archive entries")
 
     filter_form = EntryChoiceForm()
     filter_form.create(SourceDataController.objects.all())
     filter_form.method = "GET"
-    filter_form.action_url = reverse("{}:entries-archived".format(ContextData.app_name))
+    filter_form.action_url = reverse("{}:entries-archived".format(LinkDatabase.name))
 
-    context["form"] = filter_form
+    p.context["form"] = filter_form
 
-    return ContextData.render(request, "form_search.html", context)
+    return p.render("form_search.html")
 
 
 def make_bookmarked_entry(request, pk):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - bookmarked entry"
-    context["pk"] = pk
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Bookmark entry")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     entry = LinkDataController.objects.get(id=pk)
 
@@ -684,12 +708,11 @@ def make_bookmarked_entry(request, pk):
 
 
 def make_not_bookmarked_entry(request, pk):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - bookmarked entry"
-    context["pk"] = pk
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Not bookmark entry")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     entry = LinkDataController.objects.get(id=pk)
     LinkDataHyperController.make_not_bookmarked(request, entry)
@@ -698,47 +721,48 @@ def make_not_bookmarked_entry(request, pk):
 
 
 def download_entry(request, pk):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - download entry"
-    context["pk"] = pk
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Download entry")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     link = LinkDataController.objects.get(id=pk)
 
     BackgroundJobController.link_download(subject=link.link)
     summary_text = "Added to queue"
 
-    context["summary_text"] = summary_text
+    p.context["summary_text"] = summary_text
 
-    return ContextData.render(request, "summary_present.html", context)
+    return p.render("summary_present.html")
 
 
 def wayback_save(request, pk):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - Waybacksave"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Save entry")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     if ConfigurationEntry.get().link_save:
         link = LinkDataController.objects.get(id=pk)
         BackgroundJobController.link_save(subject=link.link)
 
-        context["summary_text"] = "Added to waybacksave"
+        p.context["summary_text"] = "Added to waybacksave"
     else:
-        context["summary_text"] = "Waybacksave is disabled for links"
+        p.context["summary_text"] = "Waybacksave is disabled for links"
 
-    return ContextData.render(request, "summary_present.html", context)
+    return p.render("summary_present.html")
 
 
 def entry_json(request, pk):
     links = LinkDataController.objects.filter(id=pk)
 
     if links.count() == 0:
-        context["summary_text"] = "No such link in the database {}".format(pk)
-        return ContextData.render(request, "summary_present.html", context)
+        p = ViewPage(request)
+        p.set_title("Entry JSON")
+        p.context["summary_text"] = "No such link in the database {}".format(pk)
+        return p.render("summary_present.html")
 
     link = links[0]
 
@@ -793,40 +817,39 @@ def entries_json(request):
 
 
 def entries_remove_all(request):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - Remove all entries"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Remove all entries")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     LinkDataController.objects.all().delete()
 
-    context["summary_text"] = "Removed all entries"
+    p.context["summary_text"] = "Removed all entries"
 
-    return ContextData.render(request, "summary_present.html", context)
+    return p.render("summary_present.html")
 
 
 def entries_remove_nonbookmarked(request):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - Remove nonbookmarked entries"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Remove not bookmarked entries")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     LinkDataController.objects.filter(bookmarked=False).delete()
 
-    context["summary_text"] = "Removed all non bookmarked entries"
+    p.context["summary_text"] = "Removed all non bookmarked entries"
 
-    return ContextData.render(request, "summary_present.html", context)
+    return p.render("summary_present.html")
 
 
 def archive_make_bookmarked_entry(request, pk):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - bookmark entry"
-    context["pk"] = pk
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Bookmark entry")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     entry = ArchiveLinkDataController.objects.get(id=pk)
 
@@ -837,12 +860,11 @@ def archive_make_bookmarked_entry(request, pk):
 
 
 def archive_make_not_bookmarked_entry(request, pk):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - bookmark entry"
-    context["pk"] = pk
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Not bookmark entry")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     entry = LinkDataController.objects.get(id=pk)
     LinkDataHyperController.make_not_bookmarked(request, entry)
@@ -852,18 +874,16 @@ def archive_make_not_bookmarked_entry(request, pk):
 
 def archive_edit_entry(request, pk):
     # TODO refactor with edit entry. we do not want copy paste programming
-    context = ContextData.get_context(request)
-    context["page_title"] += " - edit entry"
-
-    context["pk"] = pk
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Edit entry")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     obs = ArchiveLinkDataController.objects.filter(id=pk)
     if not obs.exists():
-        context["summary_text"] = "Such entry does not exist"
-        return ContextData.render(request, "summary_present.html", context)
+        p.context["summary_text"] = "Such entry does not exist"
+        return p.render("summary_present.html")
 
     ob = obs[0]
     if ob.user is None or ob.user == "":
@@ -877,47 +897,46 @@ def archive_edit_entry(request, pk):
         if form.is_valid():
             form.save()
 
-            context["entry"] = ob
-            return ContextData.render(request, "entry_edit_ok.html", context)
+            p.context["entry"] = ob
+            return p.render("entry_edit_ok.html")
 
-        context["summary_text"] = "Could not edit entry"
+        p.context["summary_text"] = "Could not edit entry"
 
-        return ContextData.render(request, "summary_present.html", context)
+        return p.render("summary_present.html")
     else:
         form = EntryArchiveForm(instance=ob)
         form.method = "POST"
         form.action_url = reverse(
-            "{}:entry-archive-edit".format(ContextData.app_name), args=[pk]
+            "{}:entry-archive-edit".format(LinkDatabase.name), args=[pk]
         )
-        context["form"] = form
-        return ContextData.render(request, "form_basic.html", context)
+        p.context["form"] = form
+        return p.render("form_basic.html")
 
 
 def archive_remove_entry(request, pk):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - remove entry"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Remove entry")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     entry = ArchiveLinkDataController.objects.filter(id=pk)
     if entry.exists():
         entry.delete()
 
-        context["summary_text"] = "Remove ok"
+        p.context["summary_text"] = "Remove ok"
     else:
-        context["summary_text"] = "No source for ID: " + str(pk)
+        p.context["summary_text"] = "No source for ID: " + str(pk)
 
-    return ContextData.render(request, "summary_present.html", context)
+    return p.render("summary_present.html")
 
 
 def archive_hide_entry(request, pk):
-    context = ContextData.get_context(request)
-    context["page_title"] += " - hide entry"
-    context["pk"] = pk
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Hide entry")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     objs = ArchiveLinkDataController.objects.filter(id=pk)
     obj = objs[0]
@@ -928,6 +947,6 @@ def archive_hide_entry(request, pk):
 
     summary_text = "Link changed to state: " + str(obj.dead)
 
-    context["summary_text"] = summary_text
+    p.context["summary_text"] = summary_text
 
-    return ContextData.render(request, "summary_present.html", context)
+    return p.render("summary_present.html")

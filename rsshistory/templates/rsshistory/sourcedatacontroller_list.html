@@ -24,7 +24,7 @@
           {{ filter_form }}
           <tr>
               <td>
-                  <input type="submit" value="Submit">
+                  <input type="submit" value="Search">
               </td>
           </tr>
       </table>
@@ -33,37 +33,45 @@
   <hr>
 
   {% if content_list %}
-     <div class="linklist container_{{user_config.display_type}}">
-       {% for source in content_list %}
-         <a href="{{ source.get_absolute_url }}"
-           class="element_{{user_config.display_type}}"
-           title="{{source.title}} {{source.get_long_description}}"
+  <div class="linklist container_{{user_config.display_type}}">
+      {% for source in content_list %}
+      {% if type == "normal" %}
+      <a href="{{ source.get_absolute_url }}"
+         class="element_{{user_config.display_type}}"
+         title="{{source.title}} {{source.get_long_description}}"
          >
-           <div class="linklistitem">
+         <div class="linklistitem">
              {% if user_config.show_icons %}
-               <img src="{{source.get_favicon}}" class="content-icon"/>
+             <img src="{{source.get_favicon}}" class="content-icon"/>
              {% endif %}
              <span class="linklistitemtitle">
-             {% if source.dead %}
-	     [DEAD]
-             {% endif %}
-             {% if source.on_hold %}
-	     [H]
-             {% endif %}
-		     {{source.title}}
-	     </span>
-             <span class="linklistitemdescription">
-                 {{source.get_long_description}}
-	     </span>
-           </div>
-         </a>
-       {% endfor %}
-     </div>
+                 {% if source.dead %}
+                 [DEAD]
+                 {% endif %}
+                 {% if source.on_hold %}
+                 [H]
+                 {% endif %}
+                 {{source.title}}
+             </span>
+          <span class="linklistitemdescription">
+              {{source.get_long_description}}
+          </span>
+         </div>
+      </a>
+      {% elif type == "clear" %}
+      <div>
+      - {{source.url}} {{source.title}}
+      </div>
+      {% endif %}
+      {% endfor %}
+  </div>
 
      <hr>
     {% include "rsshistory/pagination.html" %}
 
      <a href="{% url 'rsshistory:sources-json' %}?{{ request.GET.urlencode }}" class='simplebutton'>Show JSON</a>
+     <a href="{% url 'rsshistory:sources' %}?{{ args }}&type=clear" class='simplebutton'>Clear list</a>
+     <a href="{% url 'rsshistory:sources' %}?{{ args }}&type=normal" class='simplebutton'>Normal list</a>
 
   {% else %}
     <p>There are no sources.</p>

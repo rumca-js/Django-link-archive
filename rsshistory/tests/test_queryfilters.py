@@ -46,7 +46,7 @@ class FiltersTest(TestCase):
             export_to_cms=False,
         )
 
-    def test_source_filters(self):
+    def test_source_arg_conditions(self):
         args = {
             "title": "link",
             "category": "none",
@@ -56,7 +56,7 @@ class FiltersTest(TestCase):
 
         thefilter = SourceFilter(args)
 
-        filter_args = thefilter.get_filter_args()
+        filter_args = thefilter.get_arg_conditions()
 
         self.assertTrue("title" in filter_args)
         self.assertTrue("category" in filter_args)
@@ -64,7 +64,7 @@ class FiltersTest(TestCase):
 
         self.assertTrue("unsupported" not in filter_args)
 
-    def test_source_filters_translate(self):
+    def test_source_arg_conditions_translate(self):
         args = {
             "title": "link",
             "category": "none",
@@ -74,7 +74,7 @@ class FiltersTest(TestCase):
 
         thefilter = SourceFilter(args)
 
-        filter_args = thefilter.get_filter_args(True)
+        filter_args = thefilter.get_arg_conditions(True)
 
         self.assertTrue("title" in filter_args)
         self.assertTrue("category" in filter_args)

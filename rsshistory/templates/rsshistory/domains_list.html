@@ -14,7 +14,7 @@
      {{ filter_form }}
      <tr>
          <td>
-             <input type="submit" value="Submit">
+             <input type="submit" value="Search">
          </td>
      </tr>
      </table>
@@ -64,7 +64,7 @@
              {% if domain.dead %}
              [DEAD]
              {% endif %}
-              {{domain.domain}}
+              {{domain.protocol}}://{{domain.domain}}
               {{domain.title}}
           </div>
           {% endif %}
@@ -79,5 +79,7 @@
   {% endif %}
 
   <a href="{% url 'rsshistory:domains-json' %}?{{ request.GET.urlencode }}" class='simplebutton'>Show JSON</a>
+  <a href="{% url 'rsshistory:domains' %}?{{ args }}&type=clear" class='simplebutton'>Clear list</a>
+  <a href="{% url 'rsshistory:domains' %}?{{ args }}&type=normal" class='simplebutton'>Normal list</a>
 
 {% endblock %}

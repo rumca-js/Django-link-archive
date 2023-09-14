@@ -66,9 +66,8 @@ class BookmarksExporter(object):
         file_name = export_path / (export_file_name + "_entries.rss")
         file_name.write_text(self.use_rss_wrapper(rss_text))
 
-    def use_rss_wrapper(
-        self, text, language="en", link="https://renegat0x0.ddns.net"
-    ):
+    # TODO remove hardcoded link to this site
+    def use_rss_wrapper(self, text, language="en", link="https://renegat0x0.ddns.net"):
         template = self.get_rss_template()
 
         map_data = {

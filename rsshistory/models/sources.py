@@ -94,6 +94,10 @@ class SourceSubCategories(models.Model):
 
     def add(category, subcategory):
         if category and category != "" and subcategory and subcategory != "":
-            objs = SourceSubCategories.objects.filter(category=category, subcategory=subcategory)
+            objs = SourceSubCategories.objects.filter(
+                category=category, subcategory=subcategory
+            )
             if objs.count() == 0:
-                SourceSubCategories.objects.create(category=category, subcategory=subcategory)
+                SourceSubCategories.objects.create(
+                    category=category, subcategory=subcategory
+                )

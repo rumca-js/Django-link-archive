@@ -4,17 +4,16 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.http import HttpResponseForbidden, HttpResponseRedirect
 
-from ..models import BackgroundJob
-from ..configuration import Configuration
-from ..forms import SourceForm, SourcesChoiceForm, ConfigForm
-from ..queryfilters import SourceFilter
-from ..views import ContextData, ViewPage
-
+from ..apps import LinkDatabase
+from ..models import ConfigurationEntry
 from ..controllers import (
     SourceDataController,
     LinkDataController,
     BackgroundJobController,
 )
+from ..forms import SourceForm, SourcesChoiceForm
+from ..queryfilters import SourceFilter
+from ..views import ViewPage
 
 
 class RssSourceListView(generic.ListView):
@@ -26,7 +25,7 @@ class RssSourceListView(generic.ListView):
         p = ViewPage(self.request)
         data = p.check_access()
         if data:
-            return redirect('{}:missing-rights'.format(ContextData.app_name))
+            return redirect("{}:missing-rights".format(LinkDatabase.name))
         return super(RssSourceListView, self).get(*args, **kwargs)
 
     def get_queryset(self):
@@ -36,13 +35,15 @@ class RssSourceListView(generic.ListView):
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
         context = super(RssSourceListView, self).get_context_data(**kwargs)
-        context = ContextData.init_context(self.request, context)
+        context = ViewPage.init_context(self.request, context)
         # Create any data and add it to the context
+
+        self.init_display_type(context)
 
         self.filter_form = SourcesChoiceForm(self.request.GET)
         self.filter_form.create(self.query_filter.filtered_objects)
         self.filter_form.method = "GET"
-        self.filter_form.action_url = reverse("{}:sources".format(ContextData.app_name))
+        self.filter_form.action_url = reverse("{}:sources".format(LinkDatabase.name))
 
         context["query_filter"] = self.query_filter
 
@@ -50,6 +51,23 @@ class RssSourceListView(generic.ListView):
         context["page_title"] += " - news source list"
 
         return context
+
+    def init_display_type(self, context):
+        # TODO https://stackoverflow.com/questions/57487336/change-value-for-paginate-by-on-the-fly
+        # if type is not normal, no pagination
+        if "type" in self.request.GET:
+            context["type"] = self.request.GET["type"]
+        else:
+            context["type"] = "normal"
+        context["args"] = self.get_args()
+
+    def get_args(self):
+        thelist = ""
+        for arg in self.request.GET:
+            if arg != "type":
+                thelist += "&{}={}".format(arg,self.request.GET[arg])
+        return thelist
+
 
 
 class RssSourceDetailView(generic.DetailView):
@@ -60,7 +78,7 @@ class RssSourceDetailView(generic.DetailView):
 
         # Call the base implementation first to get the context
         context = super(RssSourceDetailView, self).get_context_data(**kwargs)
-        context = ContextData.init_context(self.request, context)
+        context = ViewPage.init_context(self.request, context)
 
         context["page_title"] = self.object.title
         try:
@@ -94,7 +112,7 @@ def add_source(request):
     else:
         form = SourceForm()
         form.method = "POST"
-        form.action_url = reverse("{}:source-add".format(ContextData.app_name))
+        form.action_url = reverse("{}:source-add".format(LinkDatabase.name))
 
         p.context["form"] = form
         p.context["form_title"] = "Add new source"
@@ -135,7 +153,7 @@ def add_source_simple(request):
 
             form = SourceForm(initial=data)
             form.method = "POST"
-            form.action_url = reverse("{}:source-add".format(ContextData.app_name))
+            form.action_url = reverse("{}:source-add".format(LinkDatabase.name))
 
             p.context["form"] = form
     else:
@@ -188,7 +206,7 @@ def edit_source(request, pk):
 
         form.method = "POST"
         form.action_url = reverse(
-            "{}:source-edit".format(ContextData.app_name), args=[pk]
+            "{}:source-edit".format(LinkDatabase.name), args=[pk]
         )
         p.context["form"] = form
         return p.render("form_basic.html")
@@ -237,9 +255,7 @@ def sources_manual_refresh(request):
         plugin = SourceControllerBuilder.get(source)
         plugin.check_for_data()
 
-    return HttpResponseRedirect(
-        reverse("{}:sources".format(ContextData.app_name))
-    )
+    return HttpResponseRedirect(reverse("{}:sources".format(LinkDatabase.name)))
 
 
 def remove_source(request, pk):
@@ -254,9 +270,7 @@ def remove_source(request, pk):
         source_url = ft[0].url
         ft.delete()
 
-        return HttpResponseRedirect(
-            reverse("{}:sources".format(ContextData.app_name))
-        )
+        return HttpResponseRedirect(reverse("{}:sources".format(LinkDatabase.name)))
     else:
         p.context["summary_text"] = "No source for ID: " + str(pk)
 
@@ -277,9 +291,11 @@ def source_remove_entries(request, pk):
             entries.delete()
 
             return HttpResponseRedirect(
-                    reverse("{}:source-detail".format(ContextData.app_name), 
-                        kwargs={"pk": pk},
-                        ))
+                reverse(
+                    "{}:source-detail".format(LinkDatabase.name),
+                    kwargs={"pk": pk},
+                )
+            )
         else:
             p.context["summary_text"] = "No entries to remove"
     else:
@@ -299,9 +315,7 @@ def remove_all_sources(request):
     if ft.exists():
         ft.delete()
 
-        return HttpResponseRedirect(
-            reverse("{}:sources".format(ContextData.app_name))
-        )
+        return HttpResponseRedirect(reverse("{}:sources".format(LinkDatabase.name)))
     else:
         p.context["summary_text"] = "No source to remove"
 
@@ -320,9 +334,11 @@ def wayback_save(request, pk):
         BackgroundJobController.link_save(subject=source.url)
 
         return HttpResponseRedirect(
-                reverse("{}:source-detail".format(ContextData.app_name), 
-                    kwargs={"pk": pk},
-                    ))
+            reverse(
+                "{}:source-detail".format(LinkDatabase.name),
+                kwargs={"pk": pk},
+            )
+        )
     else:
         p.context["summary_text"] = "Waybacksave is disabled for sources"
 
@@ -347,9 +363,11 @@ def process_source_text(request, pk):
     proc.process_parser_source(source, text)
 
     return HttpResponseRedirect(
-            reverse("{}:source-detail".format(ContextData.app_name), 
-                kwargs={"pk": pk},
-                ))
+        reverse(
+            "{}:source-detail".format(LinkDatabase.name),
+            kwargs={"pk": pk},
+        )
+    )
 
 
 def import_youtube_links_for_source(request, pk):
@@ -426,8 +444,10 @@ def source_json(request, pk):
     sources = SourceDataController.objects.filter(id=pk)
 
     if sources.count() == 0:
-        context["summary_text"] = "No such source in the database {}".format(pk)
-        return ContextData.render(request, "summary_present.html", context)
+        p = ViewPage(request)
+        p.set_title("Source JSON")
+        p.context["summary_text"] = "No such source in the database {}".format(pk)
+        return p.render("summary_present.html")
 
     source = sources[0]
 

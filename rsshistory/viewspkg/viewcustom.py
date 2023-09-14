@@ -6,17 +6,18 @@ from django.views import generic
 from django.urls import reverse
 from django.shortcuts import render
 
-from ..configuration import Configuration
+from ..apps import LinkDatabase
 from ..models import (
     LinkTagsDataModel,
     BaseLinkDataController,
 )
-from ..views import ContextData, ViewPage
+from ..configuration import ConfigurationEntry
 from ..controllers import (
     BackgroundJobController,
     SourceDataController,
     LinkDataController,
 )
+from ..views import ViewPage
 from ..dateutils import DateUtils
 
 
@@ -107,20 +108,20 @@ def data_errors_page(request):
         if entries_no_object.exists():
             return entries_no_object
 
-    context = ContextData.get_context(request)
-    context["page_title"] += " - data errors"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Data errors")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     # fix_reassign_source_to_nullsource_entries()
     # fix_tags_links()
 
     summary_text = "Done"
     try:
-        context["links_with_incorrect_language"] = get_links_with_incorrect_language()
-        context["incorrect_youtube_links"] = get_incorrect_youtube_links()
-        context["tags_for_missing_links"] = get_tags_for_missing_links()
+        p.context["links_with_incorrect_language"] = get_links_with_incorrect_language()
+        p.context["incorrect_youtube_links"] = get_incorrect_youtube_links()
+        p.context["tags_for_missing_links"] = get_tags_for_missing_links()
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
 
@@ -130,7 +131,7 @@ def data_errors_page(request):
 
     # show bookmarked links without tags
 
-    return ContextData.render(request, "data_errors.html", context)
+    return p.render("data_errors.html")
 
 
 def fix_reset_youtube_link_details(link_id):
@@ -172,11 +173,11 @@ def fix_reset_youtube_link_details(link_id):
 def fix_reset_youtube_link_details_page(request, pk):
     from ..pluginentries.youtubelinkhandler import YouTubeLinkHandler
 
-    context = ContextData.get_context(request)
-    context["page_title"] += " - fix youtube links"
-
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
+    p = ViewPage(request)
+    p.set_title("Fix YouTube links")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     summary_text = ""
     if fix_reset_youtube_link_details(pk):
@@ -184,9 +185,9 @@ def fix_reset_youtube_link_details_page(request, pk):
     else:
         summary_text += "Not fixed {}".format(pk)
 
-    context["summary_text"] = summary_text
+    p.context["summary_text"] = summary_text
 
-    return ContextData.render(request, "summary_present.html", context)
+    return p.render("summary_present.html")
 
 
 def fix_entry_tags(request, entrypk):
@@ -224,7 +225,7 @@ def show_youtube_link_props(request):
         form = YouTubeLinkSimpleForm(initial={"youtube_link": youtube_link})
         form.method = "POST"
         form.action_url = reverse(
-            "{}:show-youtube-link-props".format(ContextData.app_name)
+            "{}:show-youtube-link-props".format(LinkDatabase.name)
         )
         p.context["form"] = form
 
@@ -294,19 +295,20 @@ def test_page(request):
     summary_text = ""
 
     date_range = DateUtils.get_range4day("2023-08-31")
-    links = LinkDataController.objects.filter(date_published__range = date_range, link__icontains = "youtube.com/watch?v")
+    links = LinkDataController.objects.filter(
+        date_published__range=date_range, link__icontains="youtube.com/watch?v"
+    )
 
     for link in links:
         print("Fixing:{} {} {}".format(link.title, link.link, link.date_published))
         fix_reset_youtube_link_details(link.id)
 
+    # from datetime import datetime
+    # from ..models import SourceExportHistory
 
-    #from datetime import datetime
-    #from ..models import SourceExportHistory
-
-    #input_date = datetime.strptime("29/08/2023", "%d/%m/%Y")
-    #exps = SourceExportHistory.objects.filter(date=input_date)
-    #exps.delete()
+    # input_date = datetime.strptime("29/08/2023", "%d/%m/%Y")
+    # exps = SourceExportHistory.objects.filter(date=input_date)
+    # exps.delete()
 
     # from ..threadhandlers import ImportSourcesJobHandler
 

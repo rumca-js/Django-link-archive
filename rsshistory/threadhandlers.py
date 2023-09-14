@@ -15,7 +15,7 @@ from .models import (
     BackgroundJob,
     SourceDataModel,
     Domains,
-    SourceExportHistory
+    SourceExportHistory,
 )
 from .pluginsources.sourcecontrollerbuilder import SourceControllerBuilder
 from .basictypes import fix_path_for_windows
@@ -538,7 +538,6 @@ class CleanupJobHandler(BaseJobHandler):
 
 
 class CheckDomainsJobHandler(BaseJobHandler):
-
     def __init__(self):
         pass
 

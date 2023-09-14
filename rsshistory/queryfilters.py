@@ -84,9 +84,11 @@ class SourceFilter(BaseQueryFilter):
         translate = SourceDataController.get_query_names()
         query_filter.set_translatable(translate)
 
-        query_filter.set_default_search_symbols([
-            "title__icontains",
-            ])
+        query_filter.set_default_search_symbols(
+            [
+                "title__icontains",
+            ]
+        )
 
         query_filter.calculate_combined_query()
         return query_filter.combined_query
@@ -328,11 +330,13 @@ class DomainFilter(BaseQueryFilter):
         translate = Domains.get_query_names()
         query_filter.set_translatable(translate)
 
-        query_filter.set_default_search_symbols([
-            "domain__icontains",
-            "title__icontains",
-            "description__icontains",
-            ])
+        query_filter.set_default_search_symbols(
+            [
+                "domain__icontains",
+                "title__icontains",
+                "description__icontains",
+            ]
+        )
 
         query_filter.calculate_combined_query()
         return query_filter.combined_query
@@ -368,11 +372,17 @@ class StringSymbolEquation(object):
         self.data = data
         self.current_symbol = ord("A") - 1
 
-    def is_operator(self, char):
-        return char in ("(", ")", "&", "|", "~", "^", "!")
+    def get_operators():
+        return ("(", ")", "&", "|", "~", "^", "!")
 
-    def is_whitespace(self, char):
-        return char in (" ", "\t")
+    def get_whitespaces():
+        return (" ", "\t")
+
+    def is_operator(char):
+        return char in StringSymbolEquation.get_operators()
+
+    def is_whitespace(char):
+        return char in StringSymbolEquation.get_whitespaces()
 
     def process(self):
         result_string = ""
@@ -381,7 +391,7 @@ class StringSymbolEquation(object):
         self.current_condition = ""
 
         for char in self.data:
-            if self.is_operator(char):
+            if StringSymbolEquation.is_operator(char):
                 inside_text = False
                 result_string += char
 
@@ -392,7 +402,7 @@ class StringSymbolEquation(object):
             else:
                 self.current_condition += char
 
-                if not self.is_whitespace(char):
+                if not StringSymbolEquation.is_whitespace(char):
                     inside_text = True
                     result_string += self.get_next_symbol()
 
@@ -417,13 +427,14 @@ class StringSymbolEquation(object):
 class OmniSymbolProcessor(object):
     def __init__(self, data, symbol_evaluator):
         self.symbol_evaluator = symbol_evaluator
+        self.known_results = {}
 
+        self.translate_to_symbol_notation(data)
+        self.expr = sympify(self.eq_string)
+
+    def translate_to_symbol_notation(self, data):
         eq = StringSymbolEquation(data)
         self.eq_string, self.conditions = eq.process()
-        copy = self.eq_string
-
-        self.expr = sympify(self.eq_string)
-        self.known_results = {}
 
     def process(self):
         return self.process_internal(self.expr)
@@ -458,7 +469,6 @@ class OmniSymbolProcessor(object):
         return self.known_results[symbol]
 
     def make_operation(self, operation_symbol, function, args):
-        
         args0 = str(args[0])
         args0 = self.known_results[args0]
 
@@ -474,13 +484,13 @@ class OmniSymbolProcessor(object):
             )
         )
 
-        if function == "And":
+        if function == "And": # & sign
             self.known_results[operation_symbol] = args0 & args1
             return self.known_results[operation_symbol]
-        elif function == "Or":
+        elif function == "Or": # | sign
             self.known_results[operation_symbol] = args0 | args1
             return self.known_results[operation_symbol]
-        elif function == "Not":
+        elif function == "Not": # ~ sign
             self.known_results[operation_symbol] = ~args0
             return self.known_results[operation_symbol]
         else:
@@ -489,13 +499,15 @@ class OmniSymbolProcessor(object):
 
 class OmniSymbolEvaluator(object):
     def __init__(self):
-        self.fields = []
+        self.fields = {}
         self.default_search_symbols = []
         self.translatable_names = []
 
     def evaluate_symbol(self, symbol):
         condition_data = self.split_symbol(symbol)
         if condition_data:
+            print("Condition data {}".format(condition_data))
+
             if self.is_translatable(condition_data):
                 condition_data = self.translate_condition(condition_data)
 
@@ -509,7 +521,7 @@ class OmniSymbolEvaluator(object):
 
             result = None
             for item in self.default_search_symbols:
-                input_map = {item : symbol}
+                input_map = {item: symbol}
 
                 if result is None:
                     result = Q(**input_map)
@@ -521,11 +533,28 @@ class OmniSymbolEvaluator(object):
     def get_operators(self):
         return ("==", "=", "~", "<=", ">=", "<", ">", "is null")
 
+    def cleanup_left_operator_part(self, left_part):
+        return left_part.strip()
+
+    def cleanup_right_operator_part(self, right_part):
+        right_part = right_part.strip()
+
+        wh1 = right_part.find('"')
+        wh2 = right_part.find('"', wh1+1)
+
+        if wh1 == 0 and wh2 == len(right_part) - 1:
+            right_part = right_part[1:-1]
+
+        return right_part
+
     def split_symbol(self, symbol):
         for op in self.get_operators():
             sp = symbol.split(op)
             if len(sp) > 1:
-                return [sp[0].strip(), op, sp[1].strip()]
+                left_part = self.cleanup_left_operator_part(sp[0])
+                right_part = self.cleanup_right_operator_part(sp[1])
+
+                return [left_part, op, right_part]
 
         wh = symbol.find("is null")
         if wh >= 0:
@@ -594,7 +623,14 @@ class OmniSearchFilter(BaseQueryFilter):
 
     def calculate_combined_query(self):
         uses_operator = False
+
+        operators = set()
         for symbol in self.symbol_evaluator.get_operators():
+            operators.add(symbol)
+        for symbol in StringSymbolEquation.get_operators():
+            operators.add(symbol)
+
+        for symbol in operators:
             if self.data.find(symbol) >= 0:
                 uses_operator = True
                 break
@@ -612,7 +648,7 @@ class OmniSearchFilter(BaseQueryFilter):
 
         result = None
         for item in self.default_search_symbols:
-            input_map = {item : symbol}
+            input_map = {item: symbol}
 
             if result is None:
                 result = Q(**input_map)
@@ -637,7 +673,7 @@ class OmniSearchFilter(BaseQueryFilter):
         if self.data is not None and self.data != "":
             self.calculate_combined_query()
 
-            filtered_queryset = self.query_set.filter(self.combined_query ).distinct()
+            filtered_queryset = self.query_set.filter(self.combined_query).distinct()
             print("Omni query:{}".format(filtered_queryset))
             print("Omni query:{}".format(filtered_queryset.query))
             return filtered_queryset

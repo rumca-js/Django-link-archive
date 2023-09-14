@@ -9,7 +9,6 @@ from ..apps import LinkDatabase
 
 
 class ConfigurationEntry(models.Model):
-
     ACCESS_TYPE_ALL = "access-type-all"
     ACCESS_TYPE_LOGGED = "access-type-logged"
     ACCESS_TYPE_OWNER = "access-type-owner"
@@ -30,7 +29,10 @@ class ConfigurationEntry(models.Model):
     vote_min = models.IntegerField(default=-100)
     vote_max = models.IntegerField(default=100)
     number_of_comments_per_day = models.IntegerField(default=1)
-    user_agent = models.CharField(default="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/116.0", max_length=1000)
+    user_agent = models.CharField(
+        default="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/116.0",
+        max_length=1000,
+    )
     access_type = models.CharField(
         max_length=1000, null=False, choices=ACCESS_TYPES, default=ACCESS_TYPE_ALL
     )
@@ -59,7 +61,7 @@ class ConfigurationEntry(models.Model):
     def is_bookmark_repo_set(self):
         from .export import DataExport
 
-        exps = DataExport.objects.filter(export_data = DataExport.EXPORT_BOOKMARKS)
+        exps = DataExport.objects.filter(export_data=DataExport.EXPORT_BOOKMARKS)
 
         if exps.count() > 0:
             return True
@@ -69,7 +71,7 @@ class ConfigurationEntry(models.Model):
     def is_daily_repo_set(self):
         from .export import DataExport
 
-        exps = DataExport.objects.filter(export_data = DataExport.EXPORT_DAILY_DATA)
+        exps = DataExport.objects.filter(export_data=DataExport.EXPORT_DAILY_DATA)
 
         if exps.count() > 0:
             return True

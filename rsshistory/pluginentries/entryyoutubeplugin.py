@@ -36,7 +36,6 @@ class EntryYouTubePlugin(YouTubeLinkHandler, EntryGenericPlugin):
         ]
 
     def get_frame_html(self):
-
         frame_text = """
         <div class="youtube_player_container">
            {}

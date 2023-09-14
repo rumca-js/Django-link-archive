@@ -10,14 +10,14 @@ from .repotypes import *
 class RepoFactory(object):
     def get(export_data):
         if export_data.export_type == DataExport.EXPORT_TYPE_GIT:
-           if export_data.export_data == DataExport.EXPORT_DAILY_DATA:
-               return DailyRepo
-           if export_data.export_data == DataExport.EXPORT_BOOKMARKS:
-               return BookmarkRepo
+            if export_data.export_data == DataExport.EXPORT_DAILY_DATA:
+                return DailyRepo
+            if export_data.export_data == DataExport.EXPORT_BOOKMARKS:
+                return BookmarkRepo
 
 
 class UpdateManager(object):
-    def __init__(self, config, repo_builder = None):
+    def __init__(self, config, repo_builder=None):
         self._cfg = config
 
         if repo_builder is None:

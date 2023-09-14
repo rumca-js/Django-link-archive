@@ -5,6 +5,7 @@ from django.views import generic
 from django.urls import reverse
 from django.http import HttpResponseForbidden, HttpResponseRedirect
 
+from ..apps import LinkDatabase
 from ..models import (
     LinkTagsDataModel,
     ConfigurationEntry,
@@ -14,15 +15,14 @@ from ..models import (
     SourceExportHistory,
     Domains,
 )
-from ..configuration import Configuration
-from ..forms import ConfigForm, UserConfigForm, BackgroundJobForm
 from ..controllers import (
-    BackgroundJobController,
     SourceDataController,
     LinkDataController,
     ArchiveLinkDataController,
 )
-from ..views import ContextData, ViewPage
+from ..configuration import Configuration
+from ..forms import ConfigForm, UserConfigForm, BackgroundJobForm
+from ..views import ViewPage
 
 
 def admin_page(request):
@@ -55,7 +55,7 @@ def configuration_page(request):
     form = ConfigForm(instance=ob)
 
     form.method = "POST"
-    form.action_url = reverse("{}:configuration".format(ContextData.app_name))
+    form.action_url = reverse("{}:configuration".format(LinkDatabase.name))
 
     p.set_variable("config_form", form)
 
@@ -131,7 +131,7 @@ def user_config(request):
         form = UserConfigForm(instance=user_obj)
 
     form.method = "POST"
-    form.action_url = reverse("{}:user-config".format(ContextData.app_name))
+    form.action_url = reverse("{}:user-config".format(LinkDatabase.name))
 
     p.context["config_form"] = form
     p.context["user_object"] = user_obj
@@ -147,13 +147,13 @@ class BackgroundJobsView(generic.ListView):
         p = ViewPage(self.request)
         data = p.check_access()
         if data:
-            return redirect('{}:missing-rights'.format(ContextData.app_name))
+            return redirect("{}:missing-rights".format(LinkDatabase.name))
         return super(BackgroundJobsView, self).get(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
         context = super(BackgroundJobsView, self).get_context_data(**kwargs)
-        context = ContextData.init_context(self.request, context)
+        context = ViewPage.init_context(self.request, context)
 
         context["BackgroundJob"] = BackgroundJob.objects.count()
 
@@ -173,15 +173,15 @@ def backgroundjob_add(request):
             BackgroundJob.objects.create(**form.cleaned_data)
 
             return HttpResponseRedirect(
-                reverse("{}:backgroundjobs".format(ContextData.app_name))
+                reverse("{}:backgroundjobs".format(LinkDatabase.name))
             )
         else:
-            context["summary_text"] = "Form is invalid"
-            return ContextData.render(request, "summary_present.html", context)
+            p.context["summary_text"] = "Form is invalid"
+            return p.render("summary_present.html")
 
     form = BackgroundJobForm()
     form.method = "POST"
-    form.action_url = reverse("{}:backgroundjob-add".format(ContextData.app_name))
+    form.action_url = reverse("{}:backgroundjob-add".format(LinkDatabase.name))
 
     p.context["form"] = form
 
@@ -199,7 +199,7 @@ def backgroundjob_remove(request, pk):
     bg.delete()
 
     return HttpResponseRedirect(
-        reverse("{}:backgroundjobs".format(ContextData.app_name))
+        reverse("{}:backgroundjobs".format(LinkDatabase.name))
     )
 
 
@@ -214,7 +214,7 @@ def backgroundjobs_remove_all(request):
     bg.delete()
 
     return HttpResponseRedirect(
-        reverse("{}:backgroundjobs".format(ContextData.app_name))
+        reverse("{}:backgroundjobs".format(LinkDatabase.name))
     )
 
 
@@ -231,7 +231,7 @@ def backgroundjobs_check_new(request):
     refresh_handler.refresh()
 
     return HttpResponseRedirect(
-        reverse("{}:backgroundjobs".format(ContextData.app_name))
+        reverse("{}:backgroundjobs".format(LinkDatabase.name))
     )
 
 
@@ -248,7 +248,7 @@ def backgroundjobs_perform_all(request):
     mgr.process_all()
 
     return HttpResponseRedirect(
-        reverse("{}:backgroundjobs".format(ContextData.app_name))
+        reverse("{}:backgroundjobs".format(LinkDatabase.name))
     )
 
 
@@ -263,7 +263,7 @@ def backgroundjobs_remove(request, job_type):
     jobs.delete()
 
     return HttpResponseRedirect(
-        reverse("{}:backgroundjobs".format(ContextData.app_name))
+        reverse("{}:backgroundjobs".format(LinkDatabase.name))
     )
 
 
@@ -275,13 +275,13 @@ class PersistentInfoView(generic.ListView):
         p = ViewPage(self.request)
         data = p.check_access()
         if data:
-            return redirect('{}:missing-rights'.format(ContextData.app_name))
+            return redirect("{}:missing-rights".format(LinkDatabase.name))
         return super(PersistentInfoView, self).get(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
         context = super(PersistentInfoView, self).get_context_data(**kwargs)
-        context = ContextData.init_context(self.request, context)
+        context = ViewPage.init_context(self.request, context)
 
         return context
 
@@ -295,9 +295,7 @@ def truncate_log_all(request):
 
     PersistentInfo.truncate()
 
-    return HttpResponseRedirect(
-        reverse("{}:logs".format(ContextData.app_name))
-    )
+    return HttpResponseRedirect(reverse("{}:logs".format(LinkDatabase.name)))
 
 
 def truncate_log(request):
@@ -309,9 +307,7 @@ def truncate_log(request):
 
     PersistentInfo.objects.filter(level__lt=40).truncate()
 
-    return HttpResponseRedirect(
-        reverse("{}:logs".format(ContextData.app_name))
-    )
+    return HttpResponseRedirect(reverse("{}:logs".format(LinkDatabase.name)))
 
 
 def truncate_log_errors(request):
@@ -323,6 +319,4 @@ def truncate_log_errors(request):
 
     PersistentInfo.objects.filter(level=logging.ERROR).truncate()
 
-    return HttpResponseRedirect(
-        reverse("{}:logs".format(ContextData.app_name))
-    )
+    return HttpResponseRedirect(reverse("{}:logs".format(LinkDatabase.name)))

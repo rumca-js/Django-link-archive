@@ -288,7 +288,9 @@ class TagRenameForm(forms.Form):
 
 
 class BackgroundJobForm(forms.Form):
-    job = forms.CharField(widget=forms.Select(choices=BackgroundJob.JOB_CHOICES), required=True)
+    job = forms.CharField(
+        widget=forms.Select(choices=BackgroundJob.JOB_CHOICES), required=True
+    )
     task = forms.CharField(label="task", required=False)
     subject = forms.CharField(label="subject", required=False)
     args = forms.CharField(label="args", required=False)
@@ -570,6 +572,7 @@ class CommentEntryForm(forms.Form):
 from django.db.models import IntegerField, Model
 from django.core.validators import MaxValueValidator, MinValueValidator
 
+
 class LinkVoteForm(forms.Form):
     """
     Category choice form
@@ -587,7 +590,7 @@ class LinkVoteForm(forms.Form):
 
         self.fields["vote"].validators = [
             MaxValueValidator(config.vote_max),
-            MinValueValidator(config.vote_min)
+            MinValueValidator(config.vote_min),
         ]
 
     def save_vote(self):

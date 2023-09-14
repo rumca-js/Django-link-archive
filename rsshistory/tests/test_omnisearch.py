@@ -17,6 +17,21 @@ class SymbolEvaluator(object):
 
 
 class OmniSearchTest(TestCase):
+
+    def test_filter_query_set_not_translable(self):
+        LinkDataModel.objects.create(link="https://test.com")
+
+        args = {"search": "link == https://test.com"}
+        processor = OmniSearchFilter(args)
+
+        processor.calculate_combined_query()
+        fields = processor.get_fields()
+
+        # link is not translatable. can be read by fields
+
+        self.assertTrue("link" in fields)
+        self.assertTrue(fields["link"] == "https://test.com")
+
     def test_filter_query_set(self):
         LinkDataModel.objects.create(link="https://test.com")
 
@@ -27,6 +42,24 @@ class OmniSearchTest(TestCase):
         print("Query set length: {}".format(qs.count()))
 
         processor.set_query_set(qs)
+        processor.set_translatable(['link'])
+
+        qs = processor.get_filtered_objects()
+        print("Query set length: {}".format(qs.count()))
+
+        self.assertEqual(qs.count(), 1)
+
+    def test_filter_query_set_with_quotes(self):
+        LinkDataModel.objects.create(link="https://test.com", artist="Sombody Anybody")
+
+        args = {"search": 'artist = "Sombody "'}
+        processor = OmniSearchFilter(args)
+
+        qs = LinkDataModel.objects.all()
+        print("Query set length: {}".format(qs.count()))
+
+        processor.set_query_set(qs)
+        processor.set_translatable(['link', 'artist'])
 
         qs = processor.get_filtered_objects()
         print("Query set length: {}".format(qs.count()))

@@ -8,13 +8,12 @@ from django.http import HttpResponseForbidden, HttpResponseRedirect
 
 from ..models import (
     ConfigurationEntry,
-    LinkTagsDataModel,
     LinkCommentDataModel,
 )
-from ..configuration import Configuration
 from ..forms import CommentEntryForm
-from ..views import ContextData, ViewPage
+from ..views import ViewPage
 from ..controllers import LinkCommentDataController, LinkDataController
+from ..apps import LinkDatabase
 
 
 def entry_add_comment(request, link_id):
@@ -27,7 +26,11 @@ def entry_add_comment(request, link_id):
     user_name = request.user.get_username()
     if not LinkCommentDataController.can_user_add_comment(link_id, user_name):
         conf = ConfigurationEntry.get()
-        p.context["summary_text"] = "User cannot add more comments. Limit to {} comment per day".format(config.number_of_comments_per_day)
+        p.context[
+            "summary_text"
+        ] = "User cannot add more comments. Limit to {} comment per day".format(
+            config.number_of_comments_per_day
+        )
         return p.render("summary_present.html")
 
     link = LinkDataController.objects.get(id=link_id)
@@ -43,7 +46,7 @@ def entry_add_comment(request, link_id):
 
             return HttpResponseRedirect(
                 reverse(
-                    "{}:entry-detail".format(ContextData.app_name),
+                    "{}:entry-detail".format(LinkDatabase.name),
                     kwargs={"pk": link.pk},
                 )
             )
@@ -58,7 +61,7 @@ def entry_add_comment(request, link_id):
     form.method = "POST"
     form.pk = link_id
     form.action_url = reverse(
-        "{}:entry-comment-add".format(ContextData.app_name), args=[link_id]
+        "{}:entry-comment-add".format(LinkDatabase.name), args=[link_id]
     )
 
     p.context["form"] = form
@@ -105,7 +108,7 @@ def entry_comment_edit(request, pk):
         form.method = "POST"
         form.pk = pk
         form.action_url = reverse(
-            "{}:entry-comment-edit".format(ContextData.app_name), args=[pk]
+            "{}:entry-comment-edit".format(LinkDatabase.name), args=[pk]
         )
 
         p.context["form"] = form

@@ -4,13 +4,14 @@ from django.views import generic
 from django.urls import reverse
 from django.http import HttpResponseForbidden, HttpResponseRedirect
 
-from ..models import DataExport
+from ..apps import LinkDatabase
+from ..models import DataExport, ConfigurationEntry
 from ..controllers import (
     BackgroundJobController,
     SourceDataController,
     LinkDataController,
 )
-from ..views import ContextData, ViewPage
+from ..views import ViewPage
 from ..forms import DataExportForm
 
 
@@ -182,10 +183,10 @@ def import_source_from_ia(request, pk):
                 == False
             ):
                 p.context["summary_text"] = "Could not read internet archive"
-                return ContextData.render(request, "summary_present.html", context)
+                return p.render("summary_present.html")
             else:
                 p.context["summary_text"] = "Internet archive data read successfully"
-                return ContextData.render(request, "summary_present.html", context)
+                return p.render("summary_present.html")
 
     source_obj = SourceDataController.objects.get(id=pk)
 
@@ -374,7 +375,7 @@ def push_daily_data_form(request):
                 )
             else:
                 p.context["summary_text"] = "Form is invalid. Tag:{}".format(tag)
-            return ContextData.render(request, "summary_present.html", context)
+            return p.render("summary_present.html")
 
     form = PushDailyDataForm()
     form.method = "POST"
@@ -401,7 +402,7 @@ def data_export_add(request):
 
     form = DataExportForm()
     form.method = "POST"
-    form.action_url = reverse("{}:data-export-add".format(ContextData.app_name))
+    form.action_url = reverse("{}:data-export-add".format(LinkDatabase.name))
 
     p.context["form"] = form
 
@@ -431,7 +432,7 @@ def data_export_edit(request, pk):
     form = DataExportForm(instance=objs[0])
     form.method = "POST"
     form.action_url = reverse(
-        "{}:data-export-edit".format(ContextData.app_name), args=[pk]
+        "{}:data-export-edit".format(LinkDatabase.name), args=[pk]
     )
 
     p.context["config_form"] = form
@@ -465,13 +466,13 @@ class DataExportListView(generic.ListView):
         p = ViewPage(self.request)
         data = p.check_access()
         if data:
-            return redirect('{}:missing-rights'.format(ContextData.app_name))
+            return redirect("{}:missing-rights".format(LinkDatabase.name))
         return super(DataExportListView, self).get(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
         context = super(DataExportListView, self).get_context_data(**kwargs)
-        context = ContextData.init_context(self.request, context)
+        context = ViewPage.init_context(self.request, context)
 
         return context
 
@@ -483,6 +484,6 @@ class DataExportDetailsView(generic.DetailView):
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
         context = super(DataExportDetailsView, self).get_context_data(**kwargs)
-        context = ContextData.init_context(self.request, context)
+        context = ViewPage.init_context(self.request, context)
 
         return context

@@ -300,9 +300,7 @@ class LinkDataController(LinkDataModel):
         conf = ConfigurationEntry.get()
 
         current_time = DateUtils.get_datetime_now_utc()
-        days_before = current_time - timedelta(
-            days=conf.days_to_move_to_archive
-        )
+        days_before = current_time - timedelta(days=conf.days_to_move_to_archive)
 
         entries = LinkDataController.objects.filter(
             bookmarked=False, date_published__lt=days_before
@@ -464,7 +462,9 @@ class LinkDataHyperController(object):
 
         days_diff = DateUtils.get_day_diff(entry.date_published)
 
-        if days_diff > BaseLinkDataController.get_archive_days_limit():
+        conf = ConfigurationEntry.get()
+
+        if days_diff > conf.days_to_move_to_archive:
             LinkDataHyperController.move_to_archive(entry)
 
         return True
@@ -568,9 +568,7 @@ class BackgroundJobController(BackgroundJob):
 
     def create_single_job(job_name, subject="", args=""):
         try:
-            items = BackgroundJob.objects.filter(
-                job=job_name, subject=subject
-            )
+            items = BackgroundJob.objects.filter(job=job_name, subject=subject)
             if items.count() == 0:
                 BackgroundJob.objects.create(
                     job=job_name,
@@ -590,23 +588,33 @@ class BackgroundJobController(BackgroundJob):
             if source.is_fetch_possible() == False:
                 return False
 
-        return BackgroundJobController.create_single_job(BackgroundJob.JOB_PROCESS_SOURCE, source.url)
+        return BackgroundJobController.create_single_job(
+            BackgroundJob.JOB_PROCESS_SOURCE, source.url
+        )
 
     def download_music(item):
-        return BackgroundJobController.create_single_job(BackgroundJob.JOB_LINK_DOWNLOAD_MUSIC, item.link)
+        return BackgroundJobController.create_single_job(
+            BackgroundJob.JOB_LINK_DOWNLOAD_MUSIC, item.link
+        )
 
     def download_video(item):
-        return BackgroundJobController.create_single_job(BackgroundJob.JOB_LINK_DOWNLOAD_VIDEO, item.link)
+        return BackgroundJobController.create_single_job(
+            BackgroundJob.JOB_LINK_DOWNLOAD_VIDEO, item.link
+        )
 
     def youtube_details(url):
-        return BackgroundJobController.create_single_job(BackgroundJob.JOB_LINK_DETAILS, url)
+        return BackgroundJobController.create_single_job(
+            BackgroundJob.JOB_LINK_DETAILS, url
+        )
 
     def link_add(url, source):
         existing = LinkDataModel.objects.filter(link=url)
         if existing.count() > 0:
             return False
 
-        return BackgroundJobController.create_single_job(BackgroundJob.JOB_LINK_ADD, url, str(source.id))
+        return BackgroundJobController.create_single_job(
+            BackgroundJob.JOB_LINK_ADD, url, str(source.id)
+        )
 
     def write_daily_data_range(date_start=date.today(), date_stop=date.today()):
         from datetime import timedelta
@@ -637,7 +645,9 @@ class BackgroundJobController(BackgroundJob):
             )
 
     def write_daily_data(input_date):
-        return BackgroundJobController.create_single_job(BackgroundJob.JOB_WRITE_DAILY_DATA, input_date)
+        return BackgroundJobController.create_single_job(
+            BackgroundJob.JOB_WRITE_DAILY_DATA, input_date
+        )
 
     def write_daily_data_str(start="2022-01-01", stop="2022-12-31"):
         try:
@@ -652,19 +662,29 @@ class BackgroundJobController(BackgroundJob):
             )
 
     def write_tag_data(tag):
-        return BackgroundJobController.create_single_job(BackgroundJob.JOB_LINK_DOWNLOAD, tag)
+        return BackgroundJobController.create_single_job(
+            BackgroundJob.JOB_WRITE_TOPIC_DATA, tag
+        )
 
     def write_bookmarks():
-        return BackgroundJobController.create_single_job(BackgroundJob.JOB_WRITE_BOOKMARKS)
+        return BackgroundJobController.create_single_job(
+            BackgroundJob.JOB_WRITE_BOOKMARKS
+        )
 
     def import_daily_data():
-        return BackgroundJobController.create_single_job(BackgroundJob.JOB_IMPORT_DAILY_DATA)
+        return BackgroundJobController.create_single_job(
+            BackgroundJob.JOB_IMPORT_DAILY_DATA
+        )
 
     def import_bookmarks():
-        return BackgroundJobController.create_single_job(BackgroundJob.JOB_IMPORT_BOOKMARKS)
+        return BackgroundJobController.create_single_job(
+            BackgroundJob.JOB_IMPORT_BOOKMARKS
+        )
 
     def import_sources():
-        return BackgroundJobController.create_single_job(BackgroundJob.JOB_IMPORT_SOURCES)
+        return BackgroundJobController.create_single_job(
+            BackgroundJob.JOB_IMPORT_SOURCES
+        )
 
     def link_save(link_url):
         try:
@@ -690,17 +710,24 @@ class BackgroundJobController(BackgroundJob):
             )
 
     def link_download(link_url):
-        return BackgroundJobController.create_single_job(BackgroundJob.JOB_LINK_DOWNLOAD, link_url)
+        return BackgroundJobController.create_single_job(
+            BackgroundJob.JOB_LINK_DOWNLOAD, link_url
+        )
 
     def push_to_repo(input_date=""):
-        return BackgroundJobController.create_single_job(BackgroundJob.JOB_PUSH_TO_REPO, input_date)
+        return BackgroundJobController.create_single_job(
+            BackgroundJob.JOB_PUSH_TO_REPO, input_date
+        )
 
     def push_daily_data_to_repo(input_date=""):
-        return BackgroundJobController.create_single_job(BackgroundJob.JOB_PUSH_DAILY_DATA_TO_REPO, input_date)
+        return BackgroundJobController.create_single_job(
+            BackgroundJob.JOB_PUSH_DAILY_DATA_TO_REPO, input_date
+        )
 
     def make_cleanup():
         return BackgroundJobController.create_single_job(BackgroundJob.JOB_CLEANUP)
 
     def check_domains():
-        return BackgroundJobController.create_single_job(BackgroundJob.JOB_CHECK_DOMAINS)
-
+        return BackgroundJobController.create_single_job(
+            BackgroundJob.JOB_CHECK_DOMAINS
+        )

@@ -5,10 +5,11 @@ from django.http import HttpResponseForbidden, HttpResponseRedirect
 
 from datetime import datetime, timedelta
 
+from ..apps import LinkDatabase
 from ..models import LinkTagsDataModel, ConfigurationEntry
-from ..forms import ConfigForm, TagForm, TagEntryForm, TagRenameForm
-from ..views import ContextData, ViewPage
 from ..controllers import LinkDataController
+from ..forms import TagForm, TagEntryForm, TagRenameForm
+from ..views import ViewPage
 
 
 class AllTags(generic.ListView):
@@ -20,7 +21,7 @@ class AllTags(generic.ListView):
         p = ViewPage(self.request)
         data = p.check_access()
         if data:
-            return redirect('{}:missing-rights'.format(ContextData.app_name))
+            return redirect("{}:missing-rights".format(LinkDatabase.name))
         return super(AllTags, self).get(*args, **kwargs)
 
     def get_tags_objects(self):
@@ -51,7 +52,7 @@ class AllTags(generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super(AllTags, self).get_context_data(**kwargs)
-        context = ContextData.init_context(self.request, context)
+        context = ViewPage.init_context(self.request, context)
 
         context["page_title"] += " - all tags"
         context["tag_objects"] = self.result_list
@@ -117,7 +118,7 @@ def tag_entry(request, pk):
 
             return HttpResponseRedirect(
                 reverse(
-                    "{}:entry-detail".format(ContextData.app_name),
+                    "{}:entry-detail".format(LinkDatabase.name),
                     kwargs={"pk": obj.pk},
                 )
             )
@@ -140,7 +141,7 @@ def tag_entry(request, pk):
         form.method = "POST"
         form.pk = pk
         form.action_url = reverse(
-            "{}:entry-tag".format(ContextData.app_name), args=[pk]
+            "{}:entry-tag".format(LinkDatabase.name), args=[pk]
         )
         p.context["form"] = form
         p.context["form_title"] = obj.title
@@ -159,9 +160,7 @@ def tag_remove(request, pk):
     entry = LinkTagsDataModel.objects.get(id=pk)
     entry.delete()
 
-    return HttpResponseRedirect(
-        reverse("{}:tag-show-all".format(ContextData.app_name))
-    )
+    return HttpResponseRedirect(reverse("{}:tag-show-all".format(LinkDatabase.name)))
 
 
 def tag_remove_form(request):
@@ -181,16 +180,16 @@ def tag_remove_form(request):
             tags.delete()
 
             return HttpResponseRedirect(
-                reverse("{}:tag-show-all".format(ContextData.app_name))
+                reverse("{}:tag-show-all".format(LinkDatabase.name))
             )
 
         p.context["summary_text"] = "Invalid form"
-        return ContextData.render(request, "summary_present.html", context)
+        return p.render("summary_present.html")
     else:
         form = TagForm()
 
         form.method = "POST"
-        form.action_url = reverse("{}:tag-remove-form".format(ContextData.app_name))
+        form.action_url = reverse("{}:tag-remove-form".format(LinkDatabase.name))
 
         p.context["form"] = form
         p.context["form_title"] = "Remove tag"
@@ -212,7 +211,7 @@ def tag_remove_str(request, tag_name):
     entries.delete()
 
     return HttpResponseRedirect(
-        reverse("{}:tags-show-all".format(ContextData.app_name))
+        reverse("{}:tags-show-all".format(LinkDatabase.name))
     )
 
 
@@ -229,7 +228,7 @@ def tags_entry_remove(request, entrypk):
         tag.delete()
 
     return HttpResponseRedirect(
-        reverse("{}:tags-show-all".format(ContextData.app_name))
+        reverse("{}:tags-show-all".format(LinkDatabase.name))
     )
 
 
@@ -272,16 +271,16 @@ def tag_rename(request):
                 tag.save()
 
             return HttpResponseRedirect(
-                reverse("{}:tags-show-all".format(ContextData.app_name))
+                reverse("{}:tags-show-all".format(LinkDatabase.name))
             )
 
         p.context["summary_text"] = "Invalid form"
-        return ContextData.render(request, "summary_present.html", context)
+        return p.render("summary_present.html")
     else:
         form = TagRenameForm()
 
         form.method = "POST"
-        form.action_url = reverse("{}:tag-rename".format(ContextData.app_name))
+        form.action_url = reverse("{}:tag-rename".format(LinkDatabase.name))
 
         p.context["form"] = form
         p.context["form_title"] = "Rename tag"
@@ -325,13 +324,17 @@ def entry_vote(request, pk):
 
             return HttpResponseRedirect(
                 reverse(
-                    "{}:entry-detail".format(ContextData.app_name),
+                    "{}:entry-detail".format(LinkDatabase.name),
                     kwargs={"pk": obj.pk},
                 )
             )
         else:
             config = ConfigurationEntry.get()
-            p.context["summary_text"] = "Entry not voted. Vote min, max = [{}, {}]".format(config.vote_min, config.vote_max)
+            p.context[
+                "summary_text"
+            ] = "Entry not voted. Vote min, max = [{}, {}]".format(
+                config.vote_min, config.vote_max
+            )
             return p.render("summary_present.html")
 
     else:
@@ -347,7 +350,7 @@ def entry_vote(request, pk):
         form.method = "POST"
         form.pk = pk
         form.action_url = reverse(
-            "{}:entry-vote".format(ContextData.app_name), args=[pk]
+            "{}:entry-vote".format(LinkDatabase.name), args=[pk]
         )
 
         p.context["form"] = form

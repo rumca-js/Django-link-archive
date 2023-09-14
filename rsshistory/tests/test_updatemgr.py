@@ -24,7 +24,7 @@ class BookmarkTestRepo(object):
     def up(self):
         self.is_up = True
 
-    def add(self, files): 
+    def add(self, files):
         self.is_add = True
 
     def commit(self, commit_message):
@@ -46,16 +46,15 @@ class RepoTestFactory(object):
 
     def get(export_data):
         if export_data.export_type == DataExport.EXPORT_TYPE_GIT:
-           if export_data.export_data == DataExport.EXPORT_DAILY_DATA:
-               RepoTestFactory.used_repos.append(RepoTestFactory)
-               return DailyTestRepo
-           if export_data.export_data == DataExport.EXPORT_BOOKMARKS:
-               RepoTestFactory.used_repos.append(RepoTestFactory)
-               return BookmarkTestRepo
+            if export_data.export_data == DataExport.EXPORT_DAILY_DATA:
+                RepoTestFactory.used_repos.append(RepoTestFactory)
+                return DailyTestRepo
+            if export_data.export_data == DataExport.EXPORT_BOOKMARKS:
+                RepoTestFactory.used_repos.append(RepoTestFactory)
+                return BookmarkTestRepo
 
 
 class UpdateManagerTest(TestCase):
-
     def setUp(self):
         source_youtube = SourceDataController.objects.create(
             url="https://youtube.com",
@@ -74,28 +73,28 @@ class UpdateManagerTest(TestCase):
             language="en",
         )
         DataExport.objects.create(
-                enabled = True,
-                export_type = DataExport.EXPORT_TYPE_GIT,
-                export_data = DataExport.EXPORT_DAILY_DATA,
-                local_path = "test",
-                remote_path = "test.git",
-                user = "user",
-                password = "password",
+            enabled=True,
+            export_type=DataExport.EXPORT_TYPE_GIT,
+            export_data=DataExport.EXPORT_DAILY_DATA,
+            local_path="test",
+            remote_path="test.git",
+            user="user",
+            password="password",
         )
         DataExport.objects.create(
-                enabled = True,
-                export_type = DataExport.EXPORT_TYPE_GIT,
-                export_data = DataExport.EXPORT_BOOKMARKS,
-                local_path = "test",
-                remote_path = "test.git",
-                user = "user",
-                password = "password",
+            enabled=True,
+            export_type=DataExport.EXPORT_TYPE_GIT,
+            export_data=DataExport.EXPORT_BOOKMARKS,
+            local_path="test",
+            remote_path="test.git",
+            user="user",
+            password="password",
         )
 
     def test_push_daily_repo(self):
         RepoTestFactory.used_repos = []
 
-        conf = Configuration.get_object() 
+        conf = Configuration.get_object()
         mgr = UpdateManager(conf, RepoTestFactory)
 
         write_date = DateUtils.get_date_yesterday()
@@ -108,7 +107,7 @@ class UpdateManagerTest(TestCase):
     def test_bookmark_repo(self):
         RepoTestFactory.used_repos = []
 
-        conf = Configuration.get_object() 
+        conf = Configuration.get_object()
         mgr = UpdateManager(conf, RepoTestFactory)
 
         mgr.push_bookmarks_repo()

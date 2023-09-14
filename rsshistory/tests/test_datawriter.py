@@ -1,6 +1,7 @@
 from pathlib import Path
 import shutil
 from datetime import datetime
+import json
 
 from django.test import TestCase
 from django.utils import timezone
@@ -61,8 +62,34 @@ class DataWriterTest(TestCase):
             shutil.rmtree(self.test_export_path.as_posix())
             shutil.rmtree(self.test_export_path.parent.as_posix())
 
+    def test_domain_json(self):
+        entry = ConfigurationEntry.get()
+        entry.data_export_path = self.test_export_path
+        entry.save()
+
+        conf = Configuration.get_object()
+
+        writer = DataWriter(conf)
+        json_text = writer.get_domains_json()
+
+        json_obj = json.loads(json_text)
+
+        self.assertEqual(len(json_obj), 1)
+
+    def test_sources_json(self):
+        entry = ConfigurationEntry.get()
+        entry.data_export_path = self.test_export_path
+        entry.save()
+
+        conf = Configuration.get_object()
+
+        writer = DataWriter(conf)
+        json_text = writer.get_sources_json()
+        json_obj = json.loads(json_text)
+
+        self.assertEqual(len(json_obj), 1)
+
     def test_write_bookmarks(self):
-        import json
 
         entry = ConfigurationEntry.get()
         entry.data_export_path = self.test_export_path
@@ -87,8 +114,6 @@ class DataWriterTest(TestCase):
         self.assertEqual(json_file.exists(), True)
 
     def test_write_source_export_to_cms(self):
-        import json
-
         entry = ConfigurationEntry.get()
         entry.data_export_path = self.test_export_path
         entry.save()
@@ -106,8 +131,6 @@ class DataWriterTest(TestCase):
         self.assertEqual(len(json_obj), 1)
 
     def test_write_daily_data(self):
-        import json
-
         entry = ConfigurationEntry.get()
         entry.data_export_path = self.test_export_path
         entry.save()
@@ -118,7 +141,8 @@ class DataWriterTest(TestCase):
         writer.write_daily_data("2023-03-03")
 
         json_file = (
-            conf.get_daily_data_day_path("2023-03-03") / "https.youtube.com_entries.json"
+            conf.get_daily_data_day_path("2023-03-03")
+            / "https.youtube.com_entries.json"
         )
 
         json_obj = json.loads(json_file.read_text())
@@ -130,15 +154,3 @@ class DataWriterTest(TestCase):
 
         json_file = conf.get_daily_data_path() / "domains.json"
         self.assertEqual(json_file.exists(), True)
-
-    def test_domain_json(self):
-        entry = ConfigurationEntry.get()
-        entry.data_export_path = self.test_export_path
-        entry.save()
-
-        conf = Configuration.get_object()
-
-        writer = DataWriter(conf)
-        json = writer.get_domains_json()
-        # json as text
-        self.assertEqual(len(json), 15)

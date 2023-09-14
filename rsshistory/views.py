@@ -5,22 +5,16 @@ from django.views import generic
 from django.urls import reverse
 
 from .models import UserConfig, ConfigurationEntry
-from .controllers import (
-    SourceDataController,
-    LinkDataController,
-    ArchiveLinkDataController,
-)
 from .basictypes import *
 from .configuration import Configuration
 from .apps import LinkDatabase
 
 
-class ContextData(object):
-    # https://stackoverflow.com/questions/66630043/django-is-loading-template-from-the-wrong-app
-    app_name = Path(LinkDatabase.name)
-
-    def get_full_template(template):
-        return ContextData.app_name / template
+class ViewPage(object):
+    def __init__(self, request):
+        self.request = request
+        self.context = ViewPage.get_context(request)
+        self.access_type = None
 
     def init_context(request, context):
         c = Configuration.get_object()
@@ -38,21 +32,8 @@ class ContextData(object):
 
     def get_context(request=None):
         context = {}
-        context = ContextData.init_context(request, context)
+        context = ViewPage.init_context(request, context)
         return context
-
-    def render(request, template, context=None):
-        if context is None:
-            context = self.get_context(request)
-
-        return render(request, ContextData.app_name / template, context)
-
-
-class ViewPage(object):
-    def __init__(self, request):
-        self.request = request
-        self.context = ContextData.get_context(request)
-        self.access_type = None
 
     def set_title(self, title):
         self.context["page_title"] += " - {}".format(title)
@@ -67,25 +48,49 @@ class ViewPage(object):
 
     def check_access(self):
         if self.access_type:
-            if self.access_type == ConfigurationEntry.ACCESS_TYPE_OWNER and not self.request.user.is_superuser:
-                return ContextData.render(self.request, "missing_rights.html", self.context)
-            if self.access_type == ConfigurationEntry.ACCESS_TYPE_STAFF and not self.request.user.is_staff:
-                return ContextData.render(self.request, "missing_rights.html", self.context)
-            if self.access_type == ConfigurationEntry.ACCESS_TYPE_LOGGED and not self.request.user.is_authenticated:
-                return ContextData.render(self.request, "missing_rights.html", self.context)
+            if (
+                self.access_type == ConfigurationEntry.ACCESS_TYPE_OWNER
+                and not self.request.user.is_superuser
+            ):
+                return self.render_implementation("missing_rights.html")
+            if (
+                self.access_type == ConfigurationEntry.ACCESS_TYPE_STAFF
+                and not self.request.user.is_staff
+            ):
+                return self.render_implementation("missing_rights.html")
+            if (
+                self.access_type == ConfigurationEntry.ACCESS_TYPE_LOGGED
+                and not self.request.user.is_authenticated
+            ):
+                return self.render_implementation("missing_rights.html")
 
         config = ConfigurationEntry.get()
-        if config.access_type == ConfigurationEntry.ACCESS_TYPE_OWNER and not self.request.user.is_superuser:
-            return ContextData.render(self.request, "missing_rights.html", self.context)
-        if config.access_type == ConfigurationEntry.ACCESS_TYPE_LOGGED and not self.request.user.is_authenticated:
-            return ContextData.render(self.request, "missing_rights.html", self.context)
+        if (
+            config.access_type == ConfigurationEntry.ACCESS_TYPE_OWNER
+            and not self.request.user.is_superuser
+        ):
+            return self.render_implementation("missing_rights.html")
+        if (
+            config.access_type == ConfigurationEntry.ACCESS_TYPE_LOGGED
+            and not self.request.user.is_authenticated
+        ):
+            return self.render_implementation("missing_rights.html")
+
+    def get_full_template(template):
+        return Path(LinkDatabase.name) / template
+
+    def render_implementation(self, template):
+        if self.context is None:
+            self.context = self.get_context(self.request)
+
+        return render(self.request, Path(LinkDatabase.name) / template, self.context)
 
     def render(self, template):
         result = self.check_access()
         if result is not None:
             return result
 
-        return ContextData.render(self.request, template, self.context)
+        return self.render_implementation(template)
 
 
 def index(request):

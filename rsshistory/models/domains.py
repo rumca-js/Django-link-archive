@@ -9,7 +9,9 @@ from ..apps import LinkDatabase
 
 
 class Domains(models.Model):
-    protocol = models.CharField(max_length=100, default="https")         # http or https, or ssl
+    protocol = models.CharField(
+        max_length=100, default="https"
+    )  # http or https, or ssl
     domain = models.CharField(max_length=1000, unique=True)
     main = models.CharField(max_length=200, null=True)
     subdomain = models.CharField(max_length=200, null=True)
@@ -83,13 +85,13 @@ class Domains(models.Model):
 
         return ob
 
-    def update_object(self, force = False):
+    def update_object(self, force=False):
         if self.is_domain_set() == False:
             self.update_domain()
 
         self.update_complementary_data(force)
 
-    def update_complementary_data(self, force = False):
+    def update_complementary_data(self, force=False):
         DomainsSuffixes.add(self.suffix)
         DomainsTlds.add(self.tld)
         DomainsMains.add(self.main)
@@ -105,10 +107,19 @@ class Domains(models.Model):
         return tld
 
     def is_domain_set(self):
-        return self.suffix is not None and self.tld is not None and self.suffix != "" and self.tld != ""
+        return (
+            self.suffix is not None
+            and self.tld is not None
+            and self.suffix != ""
+            and self.tld != ""
+        )
 
     def is_page_info_set(self):
-        return self.title is not None and self.description is not None and self.language is not None
+        return (
+            self.title is not None
+            and self.description is not None
+            and self.language is not None
+        )
 
     def is_update_time(self):
         from ..dateutils import DateUtils
@@ -141,7 +152,7 @@ class Domains(models.Model):
 
         if changed:
             print(
-                    "domain:{} subdomain:{} suffix:{} tld:{} title:{}".format(
+                "domain:{} subdomain:{} suffix:{} tld:{} title:{}".format(
                     self.main, self.subdomain, self.suffix, self.tld, self.title
                 )
             )
@@ -154,7 +165,7 @@ class Domains(models.Model):
             print("domain:{} Nothing has changed".format(self.domain))
 
     def update_page_info(self):
-        #if self.title is not None and self.description is not None and self.dead == False and not force:
+        # if self.title is not None and self.description is not None and self.dead == False and not force:
         #    print("Domain: not fixing title/description {} {} {}".format(self.domain, self.suffix, self.tld))
         #    return False
         print("Fixing title {}".format(self.domain))
@@ -162,6 +173,7 @@ class Domains(models.Model):
         changed = False
 
         from ..webtools import Page
+
         p = Page(self.protocol + "://" + self.domain)
 
         new_title = p.get_title()
@@ -172,7 +184,7 @@ class Domains(models.Model):
         if new_title is None:
             print("{} Trying with http".format(self.domain))
             protocol = "http"
-            p = Page(protocol + "://"+self.domain)
+            p = Page(protocol + "://" + self.domain)
             new_title = p.get_title()
             new_description = p.get_description()
             new_language = p.get_language()
@@ -181,12 +193,15 @@ class Domains(models.Model):
 
         self.status_code = p.status_code
 
-        is_title_invalid = new_title and (new_title.find("Forbidden") >= 0 or new_title.find("Access denied") >= 0)
+        is_title_invalid = new_title and (
+            new_title.find("Forbidden") >= 0 or new_title.find("Access denied") >= 0
+        )
 
         if p.is_status_ok() == False or is_title_invalid:
             self.dead = True
 
             from ..dateutils import DateUtils
+
             self.date_last = DateUtils.get_datetime_now_utc()
 
             self.save()
@@ -213,18 +228,22 @@ class Domains(models.Model):
 
         if changed:
             from ..dateutils import DateUtils
+
             self.date_last = DateUtils.get_datetime_now_utc()
 
             self.protocol = protocol
             self.save()
 
-    def update_all(domains = None):
+    def update_all(domains=None):
         if domains is None:
             from ..dateutils import DateUtils
-            date_before_limit = DateUtils.get_days_before_dt(self.get_update_days_limit())
 
-            domains = Domains.objects.filter(date_last__lt = date_before_limit)
-            #domains = Domains.objects.filter(dead = True) #, description__isnull = True)
+            date_before_limit = DateUtils.get_days_before_dt(
+                self.get_update_days_limit()
+            )
+
+            domains = Domains.objects.filter(date_last__lt=date_before_limit)
+            # domains = Domains.objects.filter(dead = True) #, description__isnull = True)
 
         for domain in domains:
             print("Fixing:{}".format(domain.domain))
@@ -353,6 +372,10 @@ class DomainSubCategories(models.Model):
 
     def add(category, subcategory):
         if category and category != "" and subcategory and subcategory != "":
-            objs = DomainSubCategories.objects.filter(category=category, subcategory=subcategory)
+            objs = DomainSubCategories.objects.filter(
+                category=category, subcategory=subcategory
+            )
             if objs.count() == 0:
-                DomainSubCategories.objects.create(category=category, subcategory=subcategory)
+                DomainSubCategories.objects.create(
+                    category=category, subcategory=subcategory
+                )

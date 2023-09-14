@@ -4,12 +4,12 @@ from django.shortcuts import redirect
 from django.http import JsonResponse
 from django.http import HttpResponseForbidden, HttpResponseRedirect
 
+from ..apps import LinkDatabase
 from ..models import Domains, DomainCategories, DomainSubCategories, ConfigurationEntry
-from ..views import ContextData, ViewPage
 from ..controllers import (
-    LinkDataController,
     LinkDataHyperController,
 )
+from ..views import ViewPage
 from ..forms import DomainsChoiceForm, DomainEditForm, LinkInputForm
 from ..queryfilters import DomainFilter
 
@@ -23,7 +23,7 @@ class DomainsListView(generic.ListView):
         p = ViewPage(self.request)
         data = p.check_access()
         if data:
-            return redirect('{}:missing-rights'.format(ContextData.app_name))
+            return redirect("{}:missing-rights".format(LinkDatabase.name))
         return super(DomainsListView, self).get(*args, **kwargs)
 
     def get_queryset(self):
@@ -38,20 +38,15 @@ class DomainsListView(generic.ListView):
         objects = self.query_filter.get_filtered_objects()
 
         if self.sort != "normal":
-            return objects.order_by("-"+self.sort)
+            return objects.order_by("-" + self.sort)
         return objects
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
         context = super(DomainsListView, self).get_context_data(**kwargs)
-        context = ContextData.init_context(self.request, context)
+        context = ViewPage.init_context(self.request, context)
 
-        # TODO https://stackoverflow.com/questions/57487336/change-value-for-paginate-by-on-the-fly
-        # if type is not normal, no pagination
-        if "type" in self.request.GET:
-            context["type"] = self.request.GET["type"]
-        else:
-            context["type"] = "normal"
+        self.init_display_type(context)
 
         context["sort"] = self.sort
 
@@ -79,7 +74,24 @@ class DomainsListView(generic.ListView):
         return DomainsChoiceForm(self.request.GET)
 
     def get_form_action_link(self):
-        return reverse("{}:domains".format(ContextData.app_name))
+        return reverse("{}:domains".format(LinkDatabase.name))
+
+    def init_display_type(self, context):
+        # TODO https://stackoverflow.com/questions/57487336/change-value-for-paginate-by-on-the-fly
+        # if type is not normal, no pagination
+        if "type" in self.request.GET:
+            context["type"] = self.request.GET["type"]
+        else:
+            context["type"] = "normal"
+        context["args"] = self.get_args()
+
+    def get_args(self):
+        thelist = ""
+        for arg in self.request.GET:
+            if arg != "type":
+                thelist += "&{}={}".format(arg,self.request.GET[arg])
+        return thelist
+
 
 
 class DomainsDetailView(generic.DetailView):
@@ -91,7 +103,7 @@ class DomainsDetailView(generic.DetailView):
 
         # Call the base implementation first to get the context
         context = super(DomainsDetailView, self).get_context_data(**kwargs)
-        context = ContextData.init_context(self.request, context)
+        context = ViewPage.init_context(self.request, context)
 
         context["page_title"] += " {} domain".format(self.object.domain)
 
@@ -104,7 +116,7 @@ class DomainsByNameDetailView(generic.DetailView):
 
     def get_object(self):
         domain_name = self.request.GET["domain_name"]
-        self.objects = Domains.objects.filter(domain = domain_name)
+        self.objects = Domains.objects.filter(domain=domain_name)
         if self.objects.count() > 0:
             self.object = self.objects[0]
             return self.object
@@ -114,7 +126,7 @@ class DomainsByNameDetailView(generic.DetailView):
 
         # Call the base implementation first to get the context
         context = super(DomainsByNameDetailView, self).get_context_data(**kwargs)
-        context = ContextData.init_context(self.request, context)
+        context = ViewPage.init_context(self.request, context)
 
         context["page_title"] += " {} domain".format(self.object.domain)
 
@@ -137,7 +149,7 @@ def domain_add(request):
 
             return HttpResponseRedirect(
                 reverse(
-                    "{}:domain-detail".format(ContextData.app_name),
+                    "{}:domain-detail".format(LinkDatabase.name),
                     kwargs={"pk": domain.id},
                 )
             )
@@ -191,7 +203,7 @@ def domain_edit(request, pk):
 
         form.method = "POST"
         form.action_url = reverse(
-            "{}:domain-edit".format(ContextData.app_name), args=[pk]
+            "{}:domain-edit".format(LinkDatabase.name), args=[pk]
         )
         p.context["form"] = form
         return p.render("form_basic.html")
@@ -207,9 +219,7 @@ def domain_remove(request, pk):
     domain = Domains.objects.get(id=pk)
     domain.delete()
 
-    return HttpResponseRedirect(
-        reverse("{}:domains".format(ContextData.app_name))
-    )
+    return HttpResponseRedirect(reverse("{}:domains".format(LinkDatabase.name)))
 
 
 def domains_remove_all(request):
@@ -219,14 +229,9 @@ def domains_remove_all(request):
     if data is not None:
         return data
 
-    if not request.user.is_staff:
-        return ContextData.render(request, "missing_rights.html", context)
-
     Domains.remove_all()
 
-    return HttpResponseRedirect(
-        reverse("{}:domains".format(ContextData.app_name))
-    )
+    return HttpResponseRedirect(reverse("{}:domains".format(LinkDatabase.name)))
 
 
 def domain_update_data(request, pk):
@@ -242,12 +247,10 @@ def domain_update_data(request, pk):
 
     return HttpResponseRedirect(
         reverse(
-            "{}:domain-detail".format(ContextData.app_name),
+            "{}:domain-detail".format(LinkDatabase.name),
             kwargs={"pk": domain.id},
         )
     )
-
-    return ContextData.render(request, "summary_present.html", context)
 
 
 def domains_fix(request):
@@ -259,9 +262,7 @@ def domains_fix(request):
 
     Domains.fix_all()
 
-    return HttpResponseRedirect(
-        reverse("{}:domains".format(ContextData.app_name))
-    )
+    return HttpResponseRedirect(reverse("{}:domains".format(LinkDatabase.name)))
 
 
 def domains_read_bookmarks(request):
@@ -273,17 +274,17 @@ def domains_read_bookmarks(request):
 
     LinkDataHyperController.read_domains_from_bookmarks()
 
-    return HttpResponseRedirect(
-        reverse("{}:domains".format(ContextData.app_name))
-    )
+    return HttpResponseRedirect(reverse("{}:domains".format(LinkDatabase.name)))
 
 
 def domain_json(request, pk):
     domains = Domains.objects.filter(id=pk)
 
     if domains.count() == 0:
-        context["summary_text"] = "No such domain in the database {}".format(pk)
-        return ContextData.render(request, "summary_present.html", context)
+        p = ViewPage(request)
+        p.set_title("Domain json")
+        p.context["summary_text"] = "No such domain in the database {}".format(pk)
+        return p.render("summary_present.html")
 
     domain = domains[0]
 
