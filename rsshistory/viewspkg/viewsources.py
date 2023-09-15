@@ -3,6 +3,7 @@ from django.urls import reverse
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.http import HttpResponseForbidden, HttpResponseRedirect
+from django.utils.http import urlencode
 
 from ..apps import LinkDatabase
 from ..models import ConfigurationEntry
@@ -62,12 +63,12 @@ class RssSourceListView(generic.ListView):
         context["args"] = self.get_args()
 
     def get_args(self):
-        thelist = ""
+        arg_data = {}
         for arg in self.request.GET:
             if arg != "type":
-                thelist += "&{}={}".format(arg,self.request.GET[arg])
-        return thelist
+                arg_data[arg] = self.request.GET[arg]
 
+        return "&" + urlencode(arg_data)
 
 
 class RssSourceDetailView(generic.DetailView):

@@ -1,0 +1,32 @@
+<h2>Search syntax</h2>
+Examples:
+<ul>
+    <li>"china" - searches china in title</li>
+    <li>"china | japan" - searches china, or japan in title</li>
+    <li>"title = china" - searches anything with China in title</li>
+    <li>"tags__tag = tag" - searches links with tag</li>
+    <li>"bookmarked = 1" - all bookmarked link</li>
+    <li>"(title = china | title = japan) & bookmarked = 1" - all bookmarked link, with china, or japan in title</li>
+</ul>
+
+Available fields:
+<ul>
+    <li>"title", "description", "link", "source", "bookmarked", "dead", "artist", "album", "user", "language", "thumbnail"</li>
+</ul>
+
+Available foreign fields:
+<ul>
+    <li>"tags__tag", "votes__vote", "source_obj__title", "source_obj__category", "source_obj__subcategory"</li>
+</ul>
+
+Available comparison operators:
+<ul>
+    <li>"==" for exact compare, "=" to find items containing string, ">" for comaparing if greater than, "<" for comaparing if less than, ">=", "<=", "~" for negation, "is null"</li>
+</ul>
+
+Available condition operators
+<ul>
+    <li>"&" - And, "|" - Or, "~" - Not</li>
+</ul>
+
+System accepts brackets.

@@ -1,4 +1,5 @@
 from django.db.models import Q
+from django.utils.http import urlencode
 
 from .controllers import (
     SourceDataController,
@@ -27,13 +28,12 @@ class BaseQueryFilter(object):
     def get_filter_string(self):
         infilters = self.args
 
-        filter_string = ""
+        filter_data = {}
         for key in infilters:
-            if key != "page" and infilters[key] != "":
-                filter_string += "&{0}={1}".format(key, infilters[key])
-
-        # TODO try urlencode
-        return filter_string
+            value = infilters[key]
+            if key != "page" and value != "":
+                filter_data[key] = value
+        return "&" + urlencode(filter_data)
 
     def get_model_pagination(self):
         return 100
@@ -94,7 +94,7 @@ class SourceFilter(BaseQueryFilter):
         return query_filter.combined_query
 
     def get_arg_conditions_query(self):
-        args = self.get_arg_conditions()
+        args = self.get_arg_conditions(True)
         return Q(**args)
 
     def get_arg_conditions(self, translate=False):
@@ -125,12 +125,51 @@ class EntryFilter(BaseQueryFilter):
         super().__init__(args)
         self.time_constrained = True
 
+        self.use_archive_source = False
         self.additional_condition = None
 
     def get_model_pagination(self):
         from .viewspkg.viewentries import EntriesSearchListView
 
         return int(EntriesSearchListView.paginate_by)
+
+    def get_filtered_objects_internal(self):
+        conditions = self.get_conditions()
+        print(conditions)
+
+        if not self.use_archive_source:
+            self.filtered_objects = LinkDataController.objects.filter(conditions)
+        else:
+            self.filtered_objects = ArchiveLinkDataController.objects.filter(conditions)
+
+        return self.filtered_objects
+
+    def get_conditions(self):
+        condition = self.get_arg_conditions_query() & self.get_omni_conditions()
+        if self.additional_condition != None:
+            condition = condition & self.additional_condition
+        return condition
+
+    def get_omni_conditions(self):
+        query_filter = OmniSearchFilter(self.args)
+
+        translate = LinkDataController.get_query_names()
+        query_filter.set_translatable(translate)
+
+        query_filter.set_default_search_symbols(
+            [
+                "title__icontains",
+                "description__icontains",
+                "tags__tag__icontains",
+            ]
+        )
+
+        query_filter.calculate_combined_query()
+        return query_filter.combined_query
+
+    def get_arg_conditions_query(self):
+        args = self.get_arg_conditions(True)
+        return Q(**args)
 
     def get_sources(self):
         self.sources = SourceDataController.objects.all()
@@ -144,99 +183,10 @@ class EntryFilter(BaseQueryFilter):
     def set_additional_condition(self, condition):
         self.additional_condition = condition
 
-    def get_filtered_objects_internal(self):
-        source_parameter_map = self.get_source_filter_args(True)
-        entry_parameter_map = self.get_entry_filter_args(True)
-
-        print("Entry parameter map: {}".format(str(entry_parameter_map)))
-
-        q = Q(**entry_parameter_map)
-        if self.additional_condition != None:
-            q = q & self.additional_condition
-
-        if not self.use_archive_source:
-            self.entries = LinkDataController.objects.filter(q)
-        else:
-            self.entries = ArchiveLinkDataController.objects.filter(q)
-
-        return self.entries
-
     def get_hard_query_limit(self):
         10000
 
-    def get_source_filter_args(self, translate=False):
-        parameter_map = {}
-
-        category = self.args.get("category")
-        if category and category != "":
-            parameter_map["category"] = category
-
-        subcategory = self.args.get("subcategory")
-        if subcategory and subcategory != "":
-            parameter_map["subcategory"] = subcategory
-
-        if not translate:
-            title = self.args.get("source_title")
-            if title and title != "":
-                parameter_map["source_title"] = title
-        else:
-            title = self.args.get("source_title")
-            if title and title != "":
-                parameter_map["title"] = title
-
-        return parameter_map
-
-    def get_default_range(self):
-        from .dateutils import DateUtils
-
-        return DateUtils.get_days_range()
-
-    def copy_if_is_set(self, dst, src, element):
-        if element in src and src[element] != "":
-            dst[element] = src[element]
-
-    def copy_if_is_set_and_translate(self, dst, src, element):
-        if element in src and src[element] != "":
-            if element == "title":
-                dst["title__icontains"] = src[element]
-            elif element == "language":
-                dst["language__icontains"] = src[element]
-            elif element == "category":
-                dst["source_obj__category"] = src[element]
-            elif element == "subcategory":
-                dst["source_obj__subcategory"] = src[element]
-            elif element == "source_title":
-                dst["source_obj__title"] = src[element]
-            elif element == "user":
-                dst["user__icontains"] = src[element]
-            elif element == "bookmarked":
-                if src[element] == "on":
-                    dst["bookmarked"] = True
-                else:
-                    dst["bookmarked"] = False
-            elif element == "tag":
-                if src[element].startswith('"'):
-                    dst["tags__tag"] = src[element][1:-1]
-                else:
-                    dst["tags__tag__icontains"] = src[element]
-            elif element == "vote":
-                dst["votes__vote__gt"] = src[element]
-            elif element == "date_from":
-                if "date_to" in src and src["date_to"] != "":
-                    dst["date_published__range"] = [
-                        src["date_from"],
-                        src["date_to"],
-                    ]
-            elif element == "date_to":
-                pass
-            elif element == "artist":
-                dst["artist__icontains"] = src[element]
-            elif element == "album":
-                dst["album__icontains"] = src[element]
-            else:
-                dst[element] = src[element]
-
-    def get_entry_filter_args(self, translate=False):
+    def get_arg_conditions(self, translate=False):
         parameter_map = {}
 
         if not translate:
@@ -288,25 +238,55 @@ class EntryFilter(BaseQueryFilter):
 
         return parameter_map
 
-    def get_tag_search(self):
-        # TODO remove
-        tag = self.args.get("tag")
-        if tag is None:
-            return None, None
+    def copy_if_is_set_and_translate(self, dst, src, element):
+        if element in src and src[element] != "":
+            if element == "title":
+                dst["title__icontains"] = src[element]
+            elif element == "language":
+                dst["language__icontains"] = src[element]
+            elif element == "category":
+                dst["source_obj__category"] = src[element]
+            elif element == "subcategory":
+                dst["source_obj__subcategory"] = src[element]
+            elif element == "source_title":
+                dst["source_obj__title"] = src[element]
+            elif element == "user":
+                dst["user__icontains"] = src[element]
+            elif element == "bookmarked":
+                if src[element] == "on":
+                    dst["bookmarked"] = True
+                else:
+                    dst["bookmarked"] = False
+            elif element == "tag":
+                if src[element].startswith('"'):
+                    dst["tags__tag"] = src[element][1:-1]
+                else:
+                    dst["tags__tag__icontains"] = src[element]
+            elif element == "vote":
+                dst["votes__vote__gt"] = src[element]
+            elif element == "date_from":
+                if "date_to" in src and src["date_to"] != "":
+                    dst["date_published__range"] = [
+                        src["date_from"],
+                        src["date_to"],
+                    ]
+            elif element == "date_to":
+                pass
+            elif element == "artist":
+                dst["artist__icontains"] = src[element]
+            elif element == "album":
+                dst["album__icontains"] = src[element]
+            else:
+                dst[element] = src[element]
 
-        tag_find_exact, tag = self.get_search_keyword(tag)
-        if tag_find_exact:
-            key = "tags__tag"
-        else:
-            key = "tags__tag__icontains"
-        return key, tag
+    def get_default_range(self):
+        from .dateutils import DateUtils
 
-    def get_search_keyword(self, text):
-        exact_find = False
-        if text.find('"') >= 0:
-            text = text[1:-1]
-            exact_find = True
-        return exact_find, text
+        return DateUtils.get_days_range()
+
+    def copy_if_is_set(self, dst, src, element):
+        if element in src and src[element] != "":
+            dst[element] = src[element]
 
 
 class DomainFilter(BaseQueryFilter):
@@ -342,7 +322,7 @@ class DomainFilter(BaseQueryFilter):
         return query_filter.combined_query
 
     def get_arg_conditions_query(self):
-        args = self.get_arg_conditions()
+        args = self.get_arg_conditions(True)
         return Q(**args)
 
     def get_arg_conditions(self, translate=False):

@@ -460,6 +460,7 @@ class BasicEntryChoiceForm(forms.Form):
     category = forms.CharField(widget=forms.Select(choices=()), required=False)
     subcategory = forms.CharField(widget=forms.Select(choices=()), required=False)
     source_title = forms.CharField(widget=forms.Select(choices=()), required=False)
+    search = forms.CharField(label="search", max_length=1000, required=False)
 
     def create(self, sources):
         # how to unpack dynamic forms
@@ -532,6 +533,10 @@ class EntryBookmarksChoiceForm(BasicEntryChoiceForm):
     title = forms.CharField(label="title", max_length=1000, required=False)
     tag = forms.CharField(label="tag", max_length=500, required=False)
     vote = forms.IntegerField(label="vote", required=False)
+
+
+class EntryRecentChoiceForm(BasicEntryChoiceForm):
+    pass
 
 
 class EntryChoiceForm(BasicEntryChoiceForm):

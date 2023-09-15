@@ -16,69 +16,10 @@
     </table>
 </form>
 
-Examples:
-<ul>
-    <li>"china" - searches china in title</li>
-    <li>"china | japan" - searches china, or japan in title</li>
-    <li>"title = china" - searches anything with China in title</li>
-    <li>"tags__tag = tag" - searches links with tag</li>
-    <li>"bookmarked = 1" - all bookmarked link</li>
-    <li>"(title = china | title = japan) & bookmarked = 1" - all bookmarked link, with china, or japan in title</li>
-</ul>
-
-Available fields:
-<ul>
-    <li>"title", "description", "link", "source", "bookmarked", "dead", "artist", "album", "user", "language", "thumbnail"</li>
-</ul>
-
-Available foreign fields:
-<ul>
-    <li>"tags__tag", "votes__vote", "source_obj__title", "source_obj__category", "source_obj__subcategory"</li>
-</ul>
-
-Available comparison operators:
-<ul>
-    <li>"==" for exact compare, "=" to find items containing string, ">" for comaparing if greater than, "<" for comaparing if less than, ">=", "<=", "~" for negation, "is null"</li>
-</ul>
-
-Available condition operators
-<ul>
-    <li>"&" - And, "|" - Or, "~" - Not</li>
-</ul>
-
-System accepts brackets.
-
+{% include "rsshistory/form_search_places.html" %} 
 <hr/>
 
-<div>
-  <h2>Other places</h2>
-
-  <h3>Important</h3>
-  <a href="https://en.wikipedia.org/w/index.php" class="simplebutton">Wikipedia</a>
-  <a href="https://news.ycombinator.com/" class="simplebutton">Hacker News</a>
-
-  <h3>Mainstream</h3>
-  <a href="https://www.quora.com/" class="simplebutton">Quora</a>
-  <a href="https://stackoverflow.com" class="simplebutton">Stack overflow</a>
-  <a href="https://www.reddit.com/" class="simplebutton">Reddit</a>
-  <a href="https://medium.com/" class="simplebutton">Medium</a>
-  <a href="https://substack.com/" class="simplebutton">Substack</a>
-
-  <h3>Search engines</h3>
-  <a href="https://www.duckduckgo.com/" class="simplebutton">DuckDuckGo</a>
-  <a href="https://hn.algolia.com/?dateRange=all&page=0&prefix=true&query=tim%20cook&sort=byPopularity&type=story" class="simplebutton">Hacker News search</a>
-  <a href="https://www.wolframalpha.com/" class="simplebutton">Wolfram</a>
-  <a href="https://chat.openai.com/" class="simplebutton">ChatGPT</a>
-  <a href="https://kagi.com/" class="simplebutton">Kagi search</a>
-
-  <h3>Social</h3>
-  <a href="https://mastodon.social/explore" class="simplebutton">Mastodon</a>
-  <a href="https://join-lemmy.org/instances" class="simplebutton">Lemmy</a>
-
-  <a href="https://www.youtube.com/" class="simplebutton">YouTube</a>
-  <a href="https://odysee.com/" class="simplebutton">Odysee</a>
-  <a href="https://rumble.com/" class="simplebutton">Rumble</a>
-  <a href="https://www.spotify.com/" class="simplebutton">Spotify</a>
-</div>
+{% include "rsshistory/form_search_syntax.html" %} 
+<hr/>
 
 {% endblock %}

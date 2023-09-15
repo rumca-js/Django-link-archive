@@ -26,7 +26,7 @@ class Domains(models.Model):
     dead = models.BooleanField(default=False)
 
     date_created = models.DateTimeField(default=django.utils.timezone.now)
-    date_last = models.DateTimeField(default=django.utils.timezone.now)
+    date_update_last = models.DateTimeField(default=django.utils.timezone.now)
 
     class Meta:
         ordering = ["tld", "suffix", "main", "domain"]
@@ -124,7 +124,7 @@ class Domains(models.Model):
     def is_update_time(self):
         from ..dateutils import DateUtils
 
-        days = DateUtils.get_day_diff(self.date_last)
+        days = DateUtils.get_day_diff(self.date_update_last)
         # TODO make this configurable
         return days > self.get_update_days_limit()
 
@@ -202,7 +202,7 @@ class Domains(models.Model):
 
             from ..dateutils import DateUtils
 
-            self.date_last = DateUtils.get_datetime_now_utc()
+            self.date_update_last = DateUtils.get_datetime_now_utc()
 
             self.save()
             return
@@ -229,7 +229,7 @@ class Domains(models.Model):
         if changed:
             from ..dateutils import DateUtils
 
-            self.date_last = DateUtils.get_datetime_now_utc()
+            self.date_update_last = DateUtils.get_datetime_now_utc()
 
             self.protocol = protocol
             self.save()
@@ -242,7 +242,7 @@ class Domains(models.Model):
                 self.get_update_days_limit()
             )
 
-            domains = Domains.objects.filter(date_last__lt=date_before_limit)
+            domains = Domains.objects.filter(date_update_last__lt=date_before_limit)
             # domains = Domains.objects.filter(dead = True) #, description__isnull = True)
 
         for domain in domains:
@@ -278,7 +278,7 @@ class Domains(models.Model):
             "subcategory": self.subcategory,
             "dead": self.dead,
             "date_created": self.date_created.isoformat(),
-            "date_last": self.date_last.isoformat(),
+            "date_update_last": self.date_update_last.isoformat(),
         }
         return result
 
@@ -298,7 +298,7 @@ class Domains(models.Model):
             "subcategory",
             "dead",
             "date_created",
-            "date_last",
+            "date_update_last",
         ]
         return result
 

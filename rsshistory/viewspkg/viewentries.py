@@ -4,6 +4,7 @@ from django.shortcuts import render, redirect
 from django.db.models import Q
 from django.http import JsonResponse
 from django.http import HttpResponseForbidden, HttpResponseRedirect
+from django.utils.http import urlencode
 
 from ..apps import LinkDatabase
 from ..models import (
@@ -23,8 +24,8 @@ from ..forms import (
     EntryForm,
     EntryChoiceForm,
     ConfigForm,
-    BasicEntryChoiceForm,
     EntryBookmarksChoiceForm,
+    EntryRecentChoiceForm,
     OmniSearchForm,
 )
 from ..queryfilters import EntryFilter
@@ -134,11 +135,12 @@ class EntriesSearchListView(generic.ListView):
         context["args"] = self.get_args()
 
     def get_args(self):
-        thelist = ""
+        arg_data = {}
         for arg in self.request.GET:
             if arg != "type":
-                thelist += "&{}={}".format(arg,self.request.GET[arg])
-        return thelist
+                arg_data[arg] = self.request.GET[arg]
+
+        return "&" + urlencode(arg_data)
 
 
 class EntriesRecentListView(EntriesSearchListView):
@@ -158,7 +160,7 @@ class EntriesRecentListView(EntriesSearchListView):
         return reverse("{}:entries-recent".format(LinkDatabase.name))
 
     def get_form_instance(self):
-        return BasicEntryChoiceForm(self.request.GET)
+        return EntryRecentChoiceForm(self.request.GET)
 
     def get_title(self):
         return " - entries"
@@ -668,7 +670,7 @@ def entries_recent_init(request):
     if data is not None:
         return data
 
-    filter_form = BasicEntryChoiceForm()
+    filter_form = EntryRecentChoiceForm()
     filter_form.create(SourceDataController.objects.all())
     filter_form.method = "GET"
     filter_form.action_url = reverse("{}:entries-recent".format(LinkDatabase.name))
