@@ -25,6 +25,8 @@ class BaseQueryFilter(object):
         else:
             self.use_archive_source = False
 
+        self.error = False
+
     def get_filter_string(self):
         infilters = self.args
 
@@ -53,7 +55,12 @@ class BaseQueryFilter(object):
         return [start, start + paginate_by]
 
     def get_filtered_objects(self):
-        filtered_objects = self.get_filtered_objects_internal().distinct()
+        filtered_objects = self.get_filtered_objects_internal()
+        if filtered_objects is None:
+            self.error = True
+            return
+
+        filtered_objects = filtered_objects.distinct()
 
         if self.use_page_limit:
             limit_range = self.get_limit()
@@ -64,6 +71,9 @@ class BaseQueryFilter(object):
 
         return self.filtered_objects
 
+    def is_error(self):
+        return self.error
+
 
 class SourceFilter(BaseQueryFilter):
     def __init__(self, args):
@@ -71,12 +81,25 @@ class SourceFilter(BaseQueryFilter):
 
     def get_filtered_objects_internal(self):
         conditions = self.get_conditions()
-        print(conditions)
+        print("Source filter conditions: {}".format(conditions))
 
-        return SourceDataController.objects.filter(conditions)
+        if conditions:
+            return SourceDataController.objects.filter(conditions)
+        else:
+            return SourceDataController.objects.none()
 
     def get_conditions(self):
-        return self.get_arg_conditions_query() & self.get_omni_conditions()
+        q1 = self.get_arg_conditions_query()
+        q2 = self.get_omni_conditions()
+
+        if q1 and q2:
+            return q1 & q2
+        if q1:
+            return q1
+        if q2:
+            return q2
+
+        self.error = True
 
     def get_omni_conditions(self):
         query_filter = OmniSearchFilter(self.args)
@@ -126,7 +149,7 @@ class EntryFilter(BaseQueryFilter):
         self.time_constrained = True
 
         self.use_archive_source = False
-        self.additional_condition = None
+        self.additional_condition = Q()
 
     def get_model_pagination(self):
         from .viewspkg.viewentries import EntriesSearchListView
@@ -137,6 +160,9 @@ class EntryFilter(BaseQueryFilter):
         conditions = self.get_conditions()
         print(conditions)
 
+        if not conditions:
+            return LinkDataController.objects.none()
+
         if not self.use_archive_source:
             self.filtered_objects = LinkDataController.objects.filter(conditions)
         else:
@@ -145,10 +171,18 @@ class EntryFilter(BaseQueryFilter):
         return self.filtered_objects
 
     def get_conditions(self):
-        condition = self.get_arg_conditions_query() & self.get_omni_conditions()
-        if self.additional_condition != None:
-            condition = condition & self.additional_condition
-        return condition
+        q1 = self.get_arg_conditions_query()
+        q2 = self.get_omni_conditions()
+        q3 = self.additional_condition
+
+        if q1 and q2:
+            return q1 & q2 & q3
+        if q1:
+            return q1 & q3
+        if q2:
+            return q2 & q3
+
+        self.error = True
 
     def get_omni_conditions(self):
         query_filter = OmniSearchFilter(self.args)
@@ -616,7 +650,10 @@ class OmniSearchFilter(BaseQueryFilter):
                 break
 
         if uses_operator:
-            self.combined_query = self.get_combined_query_using_processor()
+            try:
+                self.combined_query = self.get_combined_query_using_processor()
+            except Exception as e:
+                self.combined_query = Q()
         else:
             self.combined_query = self.get_combined_query_simple()
 

@@ -30,8 +30,12 @@ class SourceDataController(SourceDataModel):
         proxy = True
 
     def add(source_data_map):
+        sources = SourceDataController.objects.filter(url = source_data_map["url"])
+        if sources.count() > 0:
+            return None
+
         # TODO add domain when adding new source
-        source = SourceDataModel.objects.create(**source_data_map)
+        source = SourceDataController.objects.create(**source_data_map)
 
         if ConfigurationEntry.get().store_domain_info:
             Domains.add(source_data_map["url"])
@@ -212,14 +216,27 @@ class SourceDataController(SourceDataModel):
     def get_map_full(self):
         return self.get_map()
 
+    def is_page_rss(page, data):
+        try:
+            import feedparser
+            feed = feedparser.parse(data["url"])
+            return True
+        except Exception as e:
+            return False
+
+        #wh1 = page.get_contents().find("<rss version=")
+        #wh2 = page.get_contents().find("<feed")
+        #if wh1 >= 0 or wh2 >= 0:
+        #    return True
+
     def get_full_information(data):
         p = Page(data["url"])
         # TODO if passed url is youtube video, obtain information, obtain channel feed url
 
-        wh1 = p.get_contents().find("<rss version=")
-        wh2 = p.get_contents().find("<feed")
-        if wh1 >= 0 or wh2 >= 0:
+        if SourceDataController.is_page_rss(p, data):
             return SourceDataController.get_info_from_rss(data["url"])
+        elif p.get_rss_url():
+            return SourceDataController.get_info_from_rss(p.get_rss_url())
         else:
             return SourceDataController.get_info_from_page(data["url"], p)
 
@@ -237,7 +254,10 @@ class SourceDataController(SourceDataModel):
         if "language" in feed.feed:
             data["language"] = feed.feed.language
         if "image" in feed.feed:
-            data["favicon"] = feed.feed.image
+            if 'href' in feed.feed.image:
+                data["favicon"] = feed.feed.image['href']
+            else:
+                data["favicon"] = feed.feed.image
         return data
 
     def get_info_from_page(url, p):

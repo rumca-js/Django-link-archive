@@ -103,7 +103,7 @@ class FiltersTest(TestCase):
 
         thefilter = EntryFilter(args)
 
-        filter_args = thefilter.get_entry_filter_args()
+        filter_args = thefilter.get_arg_conditions()
 
         self.assertTrue("title" in filter_args)
         self.assertTrue("language" in filter_args)
@@ -143,7 +143,7 @@ class FiltersTest(TestCase):
 
         thefilter = EntryFilter(args)
 
-        filter_args = thefilter.get_entry_filter_args(True)
+        filter_args = thefilter.get_arg_conditions(True)
 
         self.assertTrue("title__icontains" in filter_args)
         self.assertTrue("language__icontains" in filter_args)
@@ -173,7 +173,7 @@ class FiltersTest(TestCase):
 
         thefilter = EntryFilter(args)
 
-        filter_args = thefilter.get_source_filter_args()
+        filter_args = thefilter.get_arg_conditions()
 
         self.assertTrue("category" in filter_args)
         self.assertTrue("subcategory" in filter_args)

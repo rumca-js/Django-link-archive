@@ -99,6 +99,7 @@ urlpatterns = [
     path("system-status/", viewadmin.system_status, name="system-status"),
     path("about/", viewadmin.about, name="about"),
     path("missing-rights/", viewadmin.missing_rights, name="missing-rights"),
+    path("show-info/", viewcustom.show_info, name="show-info"),
     # background jobs
     path("backgroundjobs/", viewadmin.BackgroundJobsView.as_view(), name="backgroundjobs",),
     path("backgroundjob-add", viewadmin.backgroundjob_add, name="backgroundjob-add",),
@@ -147,6 +148,7 @@ urlpatterns = [
     path("entry-fix-youtube-details/<int:pk>/", viewcustom.fix_reset_youtube_link_details_page, name="entry-fix-youtube-details",),
     path("fix-entry-tags/<int:entrypk>/", viewcustom.fix_entry_tags, name="fix-entry-tags",),
     path("show-yt-props", viewcustom.show_youtube_link_props, name="show-youtube-link-props",),
+    path("show-page-props", viewcustom.show_page_props, name="show-page-props",),
     path("test-page", viewcustom.test_page, name="test-page"),
     path("test-form-page", viewcustom.test_form_page, name="test-form-page"),
     path("fix-bookmarked-yt", viewcustom.fix_bookmarked_yt, name="fix-bookmarked-yt"),

@@ -42,7 +42,7 @@ class RssSourceListView(generic.ListView):
         self.init_display_type(context)
 
         self.filter_form = SourcesChoiceForm(self.request.GET)
-        self.filter_form.create(self.query_filter.filtered_objects)
+        self.filter_form.create()
         self.filter_form.method = "GET"
         self.filter_form.action_url = reverse("{}:sources".format(LinkDatabase.name))
 
@@ -104,6 +104,9 @@ def add_source(request):
 
         if form.is_valid():
             source = SourceDataController.add(form.cleaned_data)
+            if not source:
+                p.context["summary_text"] = "Source already exist"
+                return p.render("summary_present.html")
 
             return HttpResponseRedirect(source.get_absolute_url())
         else:
@@ -197,10 +200,10 @@ def edit_source(request, pk):
         if not ob.favicon:
             from ..webtools import Page
 
-            p = Page(ob.url)
+            page = Page(ob.url)
 
             form = SourceForm(
-                instance=ob, initial={"favicon": p.get_domain() + "/favicon.ico"}
+                instance=ob, initial={"favicon": page.get_domain() + "/favicon.ico"}
             )
         else:
             form = SourceForm(instance=ob)

@@ -1,0 +1,18 @@
+{% extends base_generic %}
+{% block content %}
+
+<div class="contentbuttonmenu">
+    <a href="javascript:history.back()" class="simplebutton">Go Back</a>
+</div>
+
+<h1>YouTube Link properties</h1>
+
+{% for property in show_properties %}    
+<div style="display: flex; flex-wrap: wrap">
+    <div style="margin-right: 5px">{{ property.0 }}:</div>
+    <div style="margin-right: 5px">{{ property.1}}</div>
+    <div style="margin-right: 5px"><a href="{{property.1}}">Link</a></div>
+</div>
+{% endfor %}
+
+{% endblock %}

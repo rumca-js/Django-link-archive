@@ -19,6 +19,7 @@ from ..controllers import (
 )
 from ..views import ViewPage
 from ..dateutils import DateUtils
+from ..forms import LinkInputForm
 
 
 def get_incorrect_youtube_links():
@@ -285,6 +286,43 @@ def show_youtube_link_props(request):
             return p.render("show_youtube_link_props.html")
 
 
+def show_page_props(request):
+    p = ViewPage(request)
+    p.set_title("Show page properties")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    from ..webtools import Page
+
+    if not request.method == "POST":
+        form = LinkInputForm()
+        form.method = "POST"
+        form.action_url = reverse(
+            "{}:show-page-props".format(LinkDatabase.name)
+        )
+        p.context["form"] = form
+
+        return p.render("form_basic.html")
+
+    else:
+        form = LinkInputForm(request.POST)
+        if not form.is_valid():
+            p.context["summary_text"] = "Form is invalid"
+
+            return p.render("summary_present.html")
+        else:
+            from ..pluginentries.youtubelinkhandler import YouTubeLinkHandler
+
+            page_link = form.cleaned_data["link"]
+
+            page = Page(page_link)
+
+            p.context["show_properties"] = page.get_properties()
+
+            return p.render("show_properties.html")
+
+
 def test_page(request):
     p = ViewPage(request)
     p.set_title("Test page")
@@ -408,5 +446,16 @@ def check_if_move_to_archive(request):
     LinkDataController.move_all_to_archive()
 
     p.context["summary_text"] = "Moved links to archive"
+
+    return p.render("summary_present.html")
+
+
+def show_info(request):
+    p = ViewPage(request)
+
+    info = "Cannot make query"
+    p.set_title("Info: {}".format(info) )
+
+    p.context["summary_text"] = info
 
     return p.render("summary_present.html")

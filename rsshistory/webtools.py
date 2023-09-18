@@ -148,6 +148,7 @@ class Page(object):
         description = None
 
         soup = BeautifulSoup(self.contents, "html.parser")
+
         description_find = soup.find("meta", attrs={"name": "description"})
         if description_find and description_find.has_attr("content"):
             description = description_find["content"]
@@ -185,10 +186,27 @@ class Page(object):
             return False
         return True
 
-    def is_rss_available(self):
-        if self.get_contents().find("application/rss+xml") >= 0:
-            return True
-        return False
+    def get_rss_url(self):
+        if not self.contents:
+            self.contents = self.get_contents()
+
+        if not self.contents:
+            return None
+
+        soup = BeautifulSoup(self.contents, "html.parser")
+
+        rss_url = None
+
+        rss_find = soup.find("link", attrs={"type": "application/rss+xml"})
+
+        if rss_find and rss_find.has_attr("href"):
+            rss_url = rss_find["href"]
+
+        rss_find = soup.find("link", attrs={"type": "application/rss+xml;charset=UTF-8"})
+        if rss_find and rss_find.has_attr("href"):
+            rss_url = rss_find["href"]
+
+        return rss_url
 
     def get_links(self):
         return self.get_links_re()
@@ -263,3 +281,13 @@ class Page(object):
 
         wget = Wget(self.url)
         wget.download_all()
+
+    def get_properties(self):
+        props = []
+        props.append(("title", self.get_title()))
+        props.append(("description", self.get_description()))
+        props.append(("language", self.get_language()))
+        props.append(("contents", self.get_contents()))
+        props.append(("links", self.get_links()))
+        props.append(("rss_url", self.get_rss_url()))
+        return props
