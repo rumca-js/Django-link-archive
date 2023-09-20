@@ -34,6 +34,10 @@
 
 /* Content */
 
+.error-text {
+    color : red;
+}
+
 .content-icon {
     width:30px;
     float: left;

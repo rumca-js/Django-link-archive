@@ -56,10 +56,6 @@ class BaseQueryFilter(object):
 
     def get_filtered_objects(self):
         filtered_objects = self.get_filtered_objects_internal()
-        if filtered_objects is None:
-            self.error = True
-            return
-
         filtered_objects = filtered_objects.distinct()
 
         if self.use_page_limit:
@@ -83,7 +79,7 @@ class SourceFilter(BaseQueryFilter):
         conditions = self.get_conditions()
         print("Source filter conditions: {}".format(conditions))
 
-        if conditions:
+        if conditions is not None:
             return SourceDataController.objects.filter(conditions)
         else:
             return SourceDataController.objects.none()
@@ -92,14 +88,18 @@ class SourceFilter(BaseQueryFilter):
         q1 = self.get_arg_conditions_query()
         q2 = self.get_omni_conditions()
 
-        if q1 and q2:
-            return q1 & q2
-        if q1:
-            return q1
-        if q2:
-            return q2
+        if q1 is None or q2 is None:
+            self.error = True
 
-        self.error = True
+        if q1 is not None and q2 is not None:
+            print("q1 and q2")
+            return q1 & q2
+        if q1 is not None:
+            print("q1")
+            return q1
+        if q2 is not None:
+            print("q2")
+            return q2
 
     def get_omni_conditions(self):
         query_filter = OmniSearchFilter(self.args)
@@ -160,7 +160,7 @@ class EntryFilter(BaseQueryFilter):
         conditions = self.get_conditions()
         print(conditions)
 
-        if not conditions:
+        if conditions is None:
             return LinkDataController.objects.none()
 
         if not self.use_archive_source:
@@ -175,14 +175,15 @@ class EntryFilter(BaseQueryFilter):
         q2 = self.get_omni_conditions()
         q3 = self.additional_condition
 
-        if q1 and q2:
-            return q1 & q2 & q3
-        if q1:
-            return q1 & q3
-        if q2:
-            return q2 & q3
+        if q1 is None or q2 is None:
+            self.error = True
 
-        self.error = True
+        if q1 is not None and q2 is not None:
+            return q1 & q2 & q3
+        if q1 is not None:
+            return q1 & q3
+        if q2 is not None:
+            return q2 & q3
 
     def get_omni_conditions(self):
         query_filter = OmniSearchFilter(self.args)
@@ -336,7 +337,21 @@ class DomainFilter(BaseQueryFilter):
         return self.filtered_objects
 
     def get_conditions(self):
-        return self.get_arg_conditions_query() & self.get_omni_conditions()
+        q1 = self.get_arg_conditions_query()
+        q2 = self.get_omni_conditions()
+
+        if q1 is None or q2 is None:
+            self.error = True
+
+        if q1 is not None and q2 is not None:
+            print("q1 and q2")
+            return q1 & q2
+        if q1 is not None:
+            print("q1")
+            return q1
+        if q2 is not None:
+            print("q2")
+            return q2
 
     def get_omni_conditions(self):
         query_filter = OmniSearchFilter(self.args)

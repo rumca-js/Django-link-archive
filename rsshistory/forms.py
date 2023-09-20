@@ -455,10 +455,10 @@ class SourcesChoiceForm(forms.Form):
 
 
 class BasicEntryChoiceForm(forms.Form):
+    search = forms.CharField(label="search", max_length=1000, required=False)
     category = forms.CharField(widget=forms.Select(choices=()), required=False)
     subcategory = forms.CharField(widget=forms.Select(choices=()), required=False)
     source_title = forms.CharField(widget=forms.Select(choices=()), required=False)
-    search = forms.CharField(label="search", max_length=1000, required=False)
 
     def create(self, sources):
         # how to unpack dynamic forms

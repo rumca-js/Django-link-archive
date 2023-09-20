@@ -10,10 +10,6 @@
       Reset filters</a>
 </div>
 
-    {% if rss_are_fetched %}
-      <span style="color:red">Sources are fetched. Queue size: {{rss_queue_size}} </span>
-    {% endif %}
-
   <form action="{{filter_form.action_url}}" method="{{filter_form.method}}">
      <table>
      {{ filter_form }}
@@ -24,6 +20,13 @@
      </tr>
      </table>
   </form>
+
+    {% if rss_are_fetched %}
+      <span class="error-text">Sources are fetched. Queue size: {{rss_queue_size}} </span>
+    {% endif %}
+    {% if query_filter.is_error %}
+    <p class="error-text">There errors with your query</p>
+    {% endif %}
 
   <hr>
 
@@ -55,10 +58,6 @@
 
   {% else %}
     <p>There are no links.</p>
-  {% endif %}
-
-  {% if query_filter.is_error %}
-    <p>There errors with your query</p>
   {% endif %}
 
   <div>

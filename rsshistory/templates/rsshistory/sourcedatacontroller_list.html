@@ -30,6 +30,10 @@
       </table>
   </form>
 
+  {% if query_filter.is_error %}
+    <p class="error-text">There errors with your query</p>
+  {% endif %}
+
   <hr>
 
   {% if content_list %}
@@ -75,10 +79,6 @@
 
   {% else %}
     <p>There are no sources.</p>
-  {% endif %}
-
-  {% if query_filter.is_error %}
-    <p>There errors with your query</p>
   {% endif %}
 
 {% endblock %}

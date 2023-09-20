@@ -18,14 +18,10 @@
          </td>
      </tr>
      </table>
-
-     <!--div>
-         categories: {{categories}}
-     </div>
-     <div>
-     subcategories: {{subcategories}}
-     </div-->
   </form>
+  {% if query_filter.is_error %}
+    <p class="error-text">There errors with your query</p>
+  {% endif %}
 
   <hr>
 

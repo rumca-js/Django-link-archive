@@ -38,6 +38,10 @@
 
 /* Content */
 
+.error-text {
+    color : red;
+}
+
 .content-icon {
     width:20px;
     float: left;
