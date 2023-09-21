@@ -16,6 +16,7 @@ COMPANION_APP = catalog
 
 install:
 	poetry install
+	poetry run python -m spacy download en_core_web_sm
 	@$(CP) $(PROJECT_NAME)/settings_template.py $(PROJECT_NAME)/settings.py
 	@echo "*******************************************************************"
 	@echo "Please configure your django application linklibrary in settings.py"

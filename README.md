@@ -38,7 +38,7 @@ Personal link database, with RSS functionality. Similar to Reddit, but completel
  - Link aggregator. Similar to Lemmy, Reddit
  - Database of important links: for work, or for school
  - RSS client
- - Data analysis - analyze link rot, how many a page is cited by other sources, analyze link domains.
+ - Data analysis - analyze link rot, how many a page is cited by other sources, analyze link domains
 
 ## Suite of projects
 
