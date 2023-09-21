@@ -436,3 +436,129 @@ class ArchiveLinkDataModel(BaseLinkDataController):
 
     def is_archive_entry(self):
         return True
+
+
+class KeyWords(models.Model):
+    keyword = models.CharField(max_length=200)
+    date_published = models.DateTimeField(default=datetime.now)
+
+    def count(keyword):
+        keys = KeyWords.objects.filter(keyword = keyword)
+        return keys.count()
+
+    def is_valid(str_token):
+        if str_token.find("<") >= 0 or \
+            str_token.find(">") >= 0 or \
+            str_token.find("=") >= 0 or \
+            str_token.find("/") >= 0 or \
+            str_token.find(";") >= 0 or \
+            str_token.find("\"") >= 0 or \
+            str_token.find("#") >= 0 or \
+            str_token.find("?") >= 0 or \
+            str_token.find("&amp;") >= 0:
+            return False
+
+        if len(str_token) == 1:
+            return False
+
+        return True
+
+    def is_common(str_token):
+       if str_token == "day" or \
+           str_token == "days" or \
+           str_token == "month" or \
+           str_token == "months" or \
+           str_token == "year" or \
+           str_token == "years" or \
+           str_token == "world" or \
+           str_token == "news" or \
+           str_token == "week" or \
+           str_token == "comments" or \
+           str_token == "january" or \
+           str_token == "february" or \
+           str_token == "march" or \
+           str_token == "april" or \
+           str_token == "june" or \
+           str_token == "july" or \
+           str_token == "september" or \
+           str_token == "october" or \
+           str_token == "november" or \
+           str_token == "decmber" or \
+           str_token == "monday" or \
+           str_token == "tuesday" or \
+           str_token == "wednesday" or \
+           str_token == "thursday" or \
+           str_token == "friday" or \
+           str_token == "saturday" or \
+           str_token == "sunday" or \
+           str_token == "cnet" or \
+           str_token == "new":
+           return True
+       return False
+
+    def add_text(text, language):
+        if not language:
+            return
+        if language.find('en') == -1:
+            return
+
+        import spacy
+        nlp = spacy.load("en_core_web_sm")
+        doc = nlp(text)
+
+        # insert one occurance for the text
+        # should limit spamming words
+        important_tokens = set()
+
+        for token in doc:
+            str_token = str(token).lower()
+            if not KeyWords.is_valid(str_token):
+                continue
+            if KeyWords.is_common(str_token):
+                continue
+
+            #print("keyword:{} type:{}".format(str_token, token.pos_))
+
+            if token.pos_ == "NOUN" or token.pos_ == "PROPN":
+                important_tokens.add(str_token)
+
+        for str_token in important_tokens:
+            KeyWords.objects.create(keyword = str_token)
+
+    def clear_old_entries():
+        from ..dateutils import DateUtils
+
+        # entries older than 2 days
+        date_before_limit = DateUtils.get_days_before_dt(2)
+
+        keys = KeyWords.objects.filter(date_published__lt=date_before_limit)
+        keys.delete()
+
+    def get_keyword_data(day_iso = None):
+        # collect how many times keyword exist
+        counter = {}
+
+        if day_iso is None:
+            keys = KeyWords.objects.all()
+        else:
+            date_range = DateUtils.get_range4day(day_iso)
+            keys = KeyWords.objects.filter(date_published__range = date_range)
+
+        for key in keys:
+            if key.keyword in counter:
+                counter[key.keyword] += 1
+            else:
+                counter[key.keyword] = 1
+
+        # transform to list
+        content_list = []
+        for key in counter:
+            value = counter[key]
+            if value > 1:
+                content_list.append([key, value])
+
+        # sort
+        content_list = sorted(
+            content_list, key=lambda x: (x[1], x[0]), reverse=True
+        )
+        return content_list

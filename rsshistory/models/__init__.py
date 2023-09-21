@@ -4,6 +4,7 @@ from .entries import (
     ArchiveLinkDataModel,
     BaseLinkDataModel,
     BaseLinkDataController,
+    KeyWords,
 )
 from .sources import (
     SourceDataModel,

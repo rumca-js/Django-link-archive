@@ -19,6 +19,7 @@ from .models import (
     LinkTagsDataModel,
     LinkVoteDataModel,
     Domains,
+    KeyWords,
 )
 from .webtools import Page
 
@@ -423,22 +424,32 @@ class LinkDataHyperController(object):
             o.save()
             # if link exists - do not change data
         try:
-            p = Page(link_data["source"])
-            domain = p.get_domain_only()
-            Domains.add(domain)
+            if ConfigurationEntry.get().store_domain_info:
+                p = Page(link_data["source"])
+                domain = p.get_domain_only()
+                Domains.add(domain)
 
-            p = Page(link_data["link"])
-            domain = p.get_domain_only()
-            Domains.add(domain)
+                p = Page(link_data["link"])
+                domain = p.get_domain_only()
+                Domains.add(domain)
+
+            if ConfigurationEntry.get().store_keyword_info:
+                # TODO we should make some switch in sources if it should store keywords
+                if link_data['link'].find("www.reddit.com") == -1:
+                    # TODO description contains HTML tags. we do not want funny stuff in keywords
+                    description = LinkDataHyperController.get_clean_description(link_data)
+
+                    # duplicate words are not counted. We joint title and description
+                    # for the words to be counted once only
+                    keyworded_text = link_data["title"] # + " " + str(description)
+                    KeyWords.add_text(keyworded_text, link_data["language"])
 
             return True
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.exc(
-                "Could not {} entry: Source:{} {}; Entry:{} {}; Exc:{}\n{}".format(
-                    method,
-                    source.url,
-                    source.title,
+                "Could not process entry: Source:{}; Entry:{} {}; Exc:{}\n{}".format(
+                    source_obj,
                     link_data["link"],
                     link_data["title"],
                     str(e),
@@ -525,6 +536,17 @@ class LinkDataHyperController(object):
         objs = LinkDataModel.objects.filter(bookmarked=True)
         for obj in objs:
             Domains.add(obj.link)
+
+    def get_clean_description(link_data):
+        import re
+        # as per recommendation from @freylis, compile once only
+        CLEANR = re.compile('<.*?>')
+
+        cleantext = re.sub(CLEANR, '', link_data["description"])
+        return cleantext
+        #from bs4 import BeautifulSoup
+        #cleantext = BeautifulSoup(link_data["description"], "lxml").text
+        #return cleantext
 
 
 class LinkCommentDataController(LinkCommentDataModel):

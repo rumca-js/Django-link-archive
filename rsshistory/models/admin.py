@@ -26,6 +26,7 @@ class ConfigurationEntry(models.Model):
     link_save = models.BooleanField(default=True)
     source_save = models.BooleanField(default=True)
     store_domain_info = models.BooleanField(default=True)
+    store_keyword_info = models.BooleanField(default=True)
     vote_min = models.IntegerField(default=-100)
     vote_max = models.IntegerField(default=100)
     number_of_comments_per_day = models.IntegerField(default=1)

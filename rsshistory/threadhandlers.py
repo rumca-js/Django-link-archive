@@ -16,6 +16,7 @@ from .models import (
     SourceDataModel,
     Domains,
     SourceExportHistory,
+    KeyWords,
 )
 from .pluginsources.sourcecontrollerbuilder import SourceControllerBuilder
 from .basictypes import fix_path_for_windows
@@ -532,6 +533,8 @@ class CleanupJobHandler(BaseJobHandler):
             LinkDataController.move_old_links_to_archive()
             Domains.reset_dynamic_data()
             SourceDataModel.reset_dynamic_data()
+            KeyWords.clear_old_entries()
+
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.error("Exception: {} {}".format(str(e), error_text))

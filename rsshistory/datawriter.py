@@ -67,16 +67,35 @@ class DataWriter(object):
 
         return text
 
-    def get_domains_json(self, domains=None):
+    def get_domains_json(self):
         from .models import Domains
 
-        if domains is None:
-            domains = Domains.objects.all()
+        domains = Domains.objects.all()
 
         from .serializers.domainexporter import DomainJsonExporter
 
         exp = DomainJsonExporter()
         return exp.get_text(domains)
+
+    def get_personal_domains_json(self):
+        from .models import Domains
+
+        domains = Domains.objects.filter(category = "Personal")
+
+        from .serializers.domainexporter import DomainJsonExporter
+
+        exp = DomainJsonExporter()
+        return exp.get_text(domains)
+
+    def get_keywords_json(self, day_iso):
+        from .models import KeyWords
+
+        from .serializers.keywordexporter import KeywordExporter
+
+        keywords = KeyWords.get_keyword_data()
+        if len(keywords) > 0:
+            exp = KeywordExporter()
+            return exp.get_text(keywords)
 
     def write_daily_data(self, day_iso):
         daily_path = self._cfg.get_daily_data_day_path(day_iso)
@@ -92,6 +111,15 @@ class DataWriter(object):
         text = self.get_domains_json()
         file_name = self._cfg.get_daily_data_path() / self._cfg.get_domains_file_name()
         file_name.write_text(text)
+
+        text = self.get_personal_domains_json()
+        file_name = self._cfg.get_daily_data_path() / self._cfg.get_personal_domains_file_name()
+        file_name.write_text(text)
+
+        text = self.get_keywords_json(day_iso)
+        if text:
+            file_name = daily_path / self._cfg.get_keywords_file_name()
+            file_name.write_text(text)
 
     def write_bookmarks(self):
         self._cfg.get_bookmarks_path().mkdir(parents=True, exist_ok=True)

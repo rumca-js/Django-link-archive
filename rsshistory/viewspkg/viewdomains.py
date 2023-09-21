@@ -309,3 +309,13 @@ def domains_json(request):
 
     # JsonResponse
     return JsonResponse(exp.get_json(domains))
+
+
+def domain_category_list(request):
+    p = ViewPage(request)
+    p.set_title("View categories")
+
+    subcategories = DomainSubCategories.objects.all()
+    p.context["content_list"] = subcategories
+
+    return p.render("domain_category_list.html")

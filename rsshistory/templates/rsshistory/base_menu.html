@@ -24,6 +24,11 @@
         <img src="{% static 'rsshistory/icons/icons8-broadcast-100.png' %}" class="mainbutton-icon" />
         Domains</a>
     {% endif %}
+    {% if config.store_keyword_info %}
+    <a href="{% url 'rsshistory:keywords' %}" class="mainbutton" title="Keywords">
+        <img src="{% static 'rsshistory/icons/icons8-broadcast-100.png' %}" class="mainbutton-icon" />
+        Keywords</a>
+    {% endif %}
 </div>
 <hr>
 <div class="mainbutton-container">

@@ -1,0 +1,29 @@
+{% extends base_generic %}
+{% block content %}
+
+<div class="contentbuttonmenu">
+    <a href="javascript:history.back()" class="simplebutton">Go Back</a>
+    {% if user.is_staff %}
+    <a href="{% url 'rsshistory:keywords-remove-all' %}" title="Removes all keywords" class="simplebutton">Remove all</a>
+    {% endif %}
+</div>
+
+<h1>KeyWords</h1>
+<p>
+Keywords list. Keywords older than 2 days are removed. Every link can add keyword only once.
+</p>
+
+  {% if content_list %}
+      {% for keyword in content_list %}
+      <span>
+          <a href="{% url 'rsshistory:entries-omni-search'%}?search={{keyword.0}}" class="simplebutton">{{keyword.0}} {{keyword.1}}</a>
+      </span>
+      {% endfor %}
+
+    <hr>
+
+  {% else %}
+    No keywords yet
+  {% endif %}
+
+{% endblock %}

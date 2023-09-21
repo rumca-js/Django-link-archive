@@ -142,6 +142,10 @@ urlpatterns = [
     path("domains-read-bookmarks/", viewdomains.domains_read_bookmarks, name="domains-read-bookmarks",),
     path("domain-json/<int:pk>/", viewdomains.domain_json, name="domain-json",),
     path("domains-json/", viewdomains.domains_json, name="domains-json"),
+    path("domain-category-list/", viewdomains.domain_category_list, name="domain-category-list"),
+    # keywords
+    path("keywords/", viewentries.keywords, name="keywords",),
+    path("keywords-remove-all/", viewentries.keywords_remove_all, name="keywords-remove-all",),
     # other, debug forms
     path("check-move-archive", viewcustom.check_if_move_to_archive, name="check-move-archive",),
     path("data-errors", viewcustom.data_errors_page, name="data-errors"),

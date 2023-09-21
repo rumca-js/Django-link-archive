@@ -12,6 +12,7 @@ from ..models import (
     BackgroundJob,
     ConfigurationEntry,
     Domains,
+    KeyWords,
 )
 from ..controllers import (
     LinkDataController,
@@ -952,3 +953,53 @@ def archive_hide_entry(request, pk):
     p.context["summary_text"] = summary_text
 
     return p.render("summary_present.html")
+
+
+class KeyWordsListView(generic.ListView):
+    model = KeyWords
+    context_object_name = "content_list"
+    paginate_by = 100
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get the context
+        context = super(KeyWordsListView, self).get_context_data(**kwargs)
+        context = ViewPage.init_context(self.request, context)
+        return context
+
+
+class KeyWordsDetailView(generic.DetailView):
+    model = KeyWords
+    context_object_name = "content_detail"
+
+    def get_context_data(self, **kwargs):
+        from ..pluginsources.sourcecontrollerbuilder import SourceControllerBuilder
+
+        # Call the base implementation first to get the context
+        context = super(KeyWordsDetailView, self).get_context_data(**kwargs)
+        context = ViewPage.init_context(self.request, context)
+
+        return context
+
+
+def keywords(request):
+    p = ViewPage(request)
+    p.set_title("Keywords")
+
+    content_list = KeyWords.get_keyword_data()
+    if len(content_list) >= 0:
+        p.context['content_list'] = content_list
+
+    return p.render("keywords_list.html")
+
+
+def keywords_remove_all(request):
+    p = ViewPage(request)
+    p.set_title("Keywords remove all")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    keys = KeyWords.objects.all()
+    keys.delete()
+
+    return redirect("{}:keywords".format(LinkDatabase.name))

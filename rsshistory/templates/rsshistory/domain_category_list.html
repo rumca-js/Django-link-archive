@@ -1,0 +1,14 @@
+{% extends base_generic %}
+{% block content %}
+
+<div class="contentbuttonmenu">
+<a href="javascript:history.back()" class="simplebutton">Go Back</a>
+</div>
+
+<h1>Domain category list</h1>
+
+{% for item in content_list %}
+<div style="margin-right: 5px">{{item.category}} {{item.subcategory}}</div>
+{% endfor %}
+
+{% endblock %}

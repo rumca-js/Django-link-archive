@@ -5,6 +5,7 @@
     <a href="javascript:history.back()" class="simplebutton">Go Back</a>
     {% if user.is_staff %}
     <a href="{% url 'rsshistory:domain-add' %}" title="Add new domain" class="simplebutton">Add</a>
+    <a href="{% url 'rsshistory:domain-category-list' %}" title="Shows categories" class="simplebutton">View categories</a>
     <a href="{% url 'rsshistory:domains-read-bookmarks' %}" title="Reads domains from bookmarks" class="simplebutton">Read from bookmarks</a>
     {% endif %}
 </div>

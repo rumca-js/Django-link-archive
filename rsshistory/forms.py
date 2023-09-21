@@ -44,6 +44,7 @@ class ConfigForm(forms.ModelForm):
             "link_save",
             "source_save",
             "store_domain_info",
+            "store_keyword_info",
             "vote_min",
             "vote_max",
             "number_of_comments_per_day",
