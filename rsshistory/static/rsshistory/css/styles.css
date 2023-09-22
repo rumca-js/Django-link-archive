@@ -1,4 +1,4 @@
-/* side bar */
+/* Layout */
 
 .sidebar-nav {
     margin-top: 20px;
@@ -7,6 +7,7 @@
     display: flex;
     flex-direction: column;
 }
+
 .page-body {
     background-color:#F9F9F9
 }
@@ -36,7 +37,7 @@
     width:20px;
 }
 
-/* Content */
+/* Basic Content elements */
 
 .error-text {
     color : red;
@@ -53,6 +54,11 @@
 .content-big-thumbnail {
     width:150px;
     float: left;
+}
+
+.float-button {
+    display:inline-block;
+    margin: 2px;
 }
 
 input {
@@ -86,7 +92,7 @@ hr {
 }
 
 .simplebuttoninline {
-display: contents;
+    display: contents;
 }
 
 .simplebutton {
@@ -224,6 +230,7 @@ display: contents;
     background-color: #BFD8FF;
 }
 
+/* end of view elements */
 
 .linklistthumbnail {
     width: 10%;

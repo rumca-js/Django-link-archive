@@ -3,11 +3,6 @@
 
 <div class="contentbuttonmenu">
     <a href="javascript:history.back()" class="simplebutton">Go Back</a>
-    {% if user.is_staff %}
-    <a href="{% url 'rsshistory:entries-remove-nonbookmarked' %}" title="Remove nonbookmarked entries" class="simplebutton">Remove non bookmarked entries</a>
-    <a href="{% url 'rsshistory:entries-remove-all' %}" title="Remove nonbookmarked entries" class="simplebutton">Remove all entries</a>
-    <a href="{% url 'rsshistory:sources-remove-all' %}" title="Removes all sources" class="simplebutton">Remove all sources</a>
-    {% endif %}
 </div>
 
 <h1>Config</h1>
@@ -28,6 +23,7 @@ Notes:
 <ul>
     <li>You can check your user agent in <a href="https://www.supermonitoring.com/blog/check-browser-http-headers/">https://www.supermonitoring.com/blog/check-browser-http-headers/</a></li>
     <li>There are three access types available. "All" allows anybody view contents. "Logged" allows only logged users to view contents. "Owner" means application is private, and only owner can view it's contents.</li>
+    <li>Changing number of days after which links are moved to archive may lead to an issue. If the new number of days is smaller, links are not moved from archive back to the link table at hand.</li>
 </ul>
 
 {% endblock %}

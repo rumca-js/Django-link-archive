@@ -68,10 +68,13 @@ class YouTubeLinkHandler(object):
         if self.yt_ob:
             from datetime import date
             from datetime import datetime
+            from pytz import timezone
 
             date_string = self.yt_ob.get_date_published()
             date = datetime.strptime(date_string, "%Y%m%d")
             dt = datetime.combine(date, datetime.min.time())
+            dt = dt.replace(tzinfo=timezone("UTC"))
+
             return dt
 
     def get_thumbnail(self):

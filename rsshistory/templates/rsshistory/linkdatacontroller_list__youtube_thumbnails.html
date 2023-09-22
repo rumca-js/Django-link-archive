@@ -1,5 +1,5 @@
 <a href="{{ link.get_absolute_url }}"
-   title="{{link.get_title}} {{link.get_long_description}}"
+   title="{{link.title}} {{link.source}}"
    {% if link.bookmarked %}
    class="element_{{user_config.display_type}} element_{{user_config.display_type}}_selected"
    {% else %}
@@ -15,6 +15,6 @@
         {% endif %}
         width="100%"/>
    {% endif %}
-   <span class="linklistitemtitle">{{link.get_title}}</span>
-   <span class="linklistitemdescription">{{link.get_long_description}}</span>
+   <span class="linklistitemtitle">{{link.title| slice:":100"}}</span>
+   <span class="linklistitemdescription">{{link.source_obj.title| slice:":100"}}</span>
 </a>

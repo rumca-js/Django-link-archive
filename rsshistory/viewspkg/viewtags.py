@@ -16,6 +16,7 @@ class AllTags(generic.ListView):
     model = LinkTagsDataModel
     context_object_name = "content_list"
     paginate_by = 9200
+    template_name = str(ViewPage.get_full_template("tags_list.html"))
 
     def get(self, *args, **kwargs):
         p = ViewPage(self.request)
@@ -65,6 +66,7 @@ class RecentTags(AllTags):
     model = LinkTagsDataModel
     context_object_name = "tags_list"
     paginate_by = 9200
+    template_name = str(ViewPage.get_full_template("tags_list.html"))
 
     def get_time_range(self):
         from ..dateutils import DateUtils

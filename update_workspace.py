@@ -80,7 +80,8 @@ class Snapshot(object):
             file_path.write_bytes(file_bytes)
 
 
-def process_files(source_app, destination_app):
+def update_workspace(source_app, destination_app):
+    print("Processing app:{}".format(source_app))
 
     snapshot = Snapshot()
     snapshot.add(Path(destination_app) / "migrations")
@@ -92,17 +93,32 @@ def process_files(source_app, destination_app):
     for source_file in source_files:
         conv = FileConverter(source_file)
         if conv.is_ok():
-            print("Converting {}".format(source_file))
+            # print("Converting {}".format(source_file))
             conv.convert(source_app, destination_app)
 
     snapshot.restore()
 
 
+def get_workspaces(self):
+    result = []
+    items_in_dir = os.listdir(".")
+    for item in items_in_dir:
+        full_path_item = item + "/apps.py"
+        if os.path.isfile(full_path_item):
+            if item != "private":
+                result.append(item)
+
+    return result
+
+
 def main():
     if len(sys.argv) < 2:
-        print("Please provide app to replace")
+        workspaces = get_workspaces()
+        for workspace in workspaces:
+            if workspace != "rsshistory":
+                update_workspace("rsshistory", workspace)
     else:
-        process_files("rsshistory", sys.argv[1])
+        update_workspace("rsshistory", sys.argv[1])
 
 
 main()

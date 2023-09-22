@@ -45,14 +45,15 @@ class ConfigForm(forms.ModelForm):
             "source_save",
             "store_domain_info",
             "store_keyword_info",
-            "vote_min",
-            "vote_max",
-            "number_of_comments_per_day",
             "data_export_path",
             "data_import_path",
             "access_type",
             "days_to_move_to_archive",
             "days_to_remove_links",
+            "whats_new_days",
+            "vote_min",
+            "vote_max",
+            "number_of_comments_per_day",
         ]
 
     def __init__(self, *args, **kwargs):
@@ -146,6 +147,7 @@ class OmniSearchForm(forms.Form):
     """
 
     search = forms.CharField(label="Search for", max_length=500)
+    archive = forms.BooleanField(label="Search archive", required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -333,6 +335,8 @@ class DomainsChoiceForm(forms.Form):
     search = forms.CharField(label="Search", max_length=500, required=False)
     suffix = forms.CharField(widget=forms.Select(choices=()), required=False)
     tld = forms.CharField(widget=forms.Select(choices=()), required=False)
+    category = forms.CharField(widget=forms.Select(choices=()), required=False)
+    subcategory = forms.CharField(widget=forms.Select(choices=()), required=False)
     sort = forms.CharField(widget=forms.Select(choices=()), required=False)
 
     def __init__(self, *args, **kwargs):
@@ -351,6 +355,11 @@ class DomainsChoiceForm(forms.Form):
         self.fields["sort"].widget = forms.Select(
             choices=self.get_sort_choices(), attrs=attr
         )
+
+        categories = self.get_categories()
+        subcategories = self.get_subcategories()
+        self.fields["category"].widget = forms.Select(choices=categories, attrs=attr)
+        self.fields["subcategory"].widget = forms.Select(choices=subcategories, attrs=attr)
 
     def to_choices(self, names):
         names = sorted(names)
@@ -404,6 +413,30 @@ class DomainsChoiceForm(forms.Form):
         names.append("")
         return self.to_choices(names)
 
+    def get_categories(self):
+        from .models import DomainCategories
+
+        result = []
+        result.append(["", ""])
+
+        for category in DomainCategories.objects.all():
+            if category and category != "":
+                result.append([category.category, category.category])
+
+        return result
+
+    def get_subcategories(self):
+        from .models import DomainSubCategories
+
+        result = []
+        result.append(["", ""])
+
+        for subcategory in DomainSubCategories.objects.all():
+            if subcategory and subcategory != "":
+                result.append([subcategory.subcategory, subcategory.subcategory])
+
+        return result
+
 
 class SourcesChoiceForm(forms.Form):
     """
@@ -456,7 +489,7 @@ class SourcesChoiceForm(forms.Form):
 
 
 class BasicEntryChoiceForm(forms.Form):
-    search = forms.CharField(label="search", max_length=1000, required=False)
+    search = forms.CharField(label="Search", max_length=1000, required=False)
     category = forms.CharField(widget=forms.Select(choices=()), required=False)
     subcategory = forms.CharField(widget=forms.Select(choices=()), required=False)
     source_title = forms.CharField(widget=forms.Select(choices=()), required=False)
@@ -464,11 +497,11 @@ class BasicEntryChoiceForm(forms.Form):
     def create(self, sources):
         # how to unpack dynamic forms
         # https://stackoverflow.com/questions/60393884/how-to-pass-choices-dynamically-into-a-django-form
-        self.sources = sources
+        self.sources = SourceDataController.objects.all()
 
-        categories = self.get_categories()
-        subcategories = self.get_subcategories()
-        title = self.get_filtered_objects_values("title")
+        categories = self.get_sources_values("category")
+        subcategories = self.get_sources_values("subcategory")
+        title = self.get_sources_values("title")
 
         # custom javascript code
         # https://stackoverflow.com/questions/10099710/how-to-manually-create-a-select-field-from-a-modelform-in-django
@@ -504,7 +537,7 @@ class BasicEntryChoiceForm(forms.Form):
 
         return result
 
-    def get_filtered_objects_values(self, field):
+    def get_sources_values(self, field):
         values = set()
         values.add("")
 

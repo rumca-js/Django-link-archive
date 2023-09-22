@@ -332,14 +332,22 @@ def test_page(request):
 
     summary_text = ""
 
-    date_range = DateUtils.get_range4day("2023-08-31")
-    links = LinkDataController.objects.filter(
-        date_published__range=date_range, link__icontains="youtube.com/watch?v"
-    )
+    from ..models import KeyWords
+    keys = KeyWords.objects.all()
+    for key in keys:
+        if not KeyWords.is_valid(key.keyword):
+            key.delete()
+        if KeyWords.is_common(key.keyword):
+            key.delete()
 
-    for link in links:
-        print("Fixing:{} {} {}".format(link.title, link.link, link.date_published))
-        fix_reset_youtube_link_details(link.id)
+    #date_range = DateUtils.get_range4day("2023-08-31")
+    #links = LinkDataController.objects.filter(
+    #    date_published__range=date_range, link__icontains="youtube.com/watch?v"
+    #)
+
+    #for link in links:
+    #    print("Fixing:{} {} {}".format(link.title, link.link, link.date_published))
+    #    fix_reset_youtube_link_details(link.id)
 
     # from datetime import datetime
     # from ..models import SourceExportHistory

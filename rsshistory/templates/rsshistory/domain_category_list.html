@@ -3,12 +3,15 @@
 
 <div class="contentbuttonmenu">
 <a href="javascript:history.back()" class="simplebutton">Go Back</a>
+    {% if user.is_staff %}
+    <a href="{% url 'rsshistory:domains-reset-dynamic-data' %}" title="Resets categories and subcategories" class="simplebutton">Reset dynamic dat</a>
+    {% endif %}
 </div>
 
 <h1>Domain category list</h1>
 
 {% for item in content_list %}
-<div style="margin-right: 5px">{{item.category}} {{item.subcategory}}</div>
+<div style="margin-right: 5px">{{item.category}} {{item.subcategory}} <a href="{% url 'rsshistory:domains' %}?search=category+%3D+{{item.category}}+%26+subcategory+%3D+{{item.subcategory}}">Link</a></div>
 {% endfor %}
 
 {% endblock %}

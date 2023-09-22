@@ -96,7 +96,7 @@ class BaseRssPlugin(SourceGenericPlugin):
                 )
             )
 
-            return False
+            return None
 
     def get_feed_entry_map(self, source, feed_entry):
         from ..dateutils import DateUtils
@@ -140,6 +140,7 @@ class BaseRssPlugin(SourceGenericPlugin):
         output_map["link"] = feed_entry.link
         output_map["artist"] = source.title
         output_map["album"] = source.title
+        output_map["bookmarked"] = False
 
         if str(feed_entry.title).strip() == "" or feed_entry.title == "undefined":
             output_map["title"] = output_map["link"]

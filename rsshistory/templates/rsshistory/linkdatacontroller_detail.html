@@ -4,7 +4,12 @@
   {{object_controller.get_frame_html | safe | linebreaks }}
   <div style="clear:both"></div>
 
-  <h1><a href="{{ object.link }}">{{ object.title }}</a></h1>
+  <h1><a href="{{ object.link }}">
+          {% if object.bookmarked %}
+          [{{object.get_vote}}]
+          {% endif %}
+          {{ object.title }}
+      </a></h1>
 
   {% if user.is_staff %}
     <p>

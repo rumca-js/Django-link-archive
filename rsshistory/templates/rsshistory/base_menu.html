@@ -13,20 +13,20 @@
     <a href="{% url 'rsshistory:entries-omni-search-init' %}" class="mainbutton" title="Advanced search">
         <img src="{% static 'rsshistory/icons/icons8-search-100.png' %}" class="mainbutton-icon" />
         Search</a>
-    <a href="{% url 'rsshistory:tags-show-all' %}" class="mainbutton" title="Tags">
-        <img src="{% static 'rsshistory/icons/icons8-tags-100.png' %}" class="mainbutton-icon" />
-        Tags</a>
     <a href="{% url 'rsshistory:sources' %}" class="mainbutton" title="Sources">
         <img src="{% static 'rsshistory/icons/icons8-broadcast-100.png' %}" class="mainbutton-icon" />
         Sources</a>
     {% if config.store_domain_info %}
-    <a href="{% url 'rsshistory:domains' %}" class="mainbutton" title="Domains">
-        <img src="{% static 'rsshistory/icons/icons8-broadcast-100.png' %}" class="mainbutton-icon" />
+    <a href="{% url 'rsshistory:domains' %}" class="mainbutton" title="Captured domains">
+        <img src="{% static 'rsshistory/icons/icons8-www-64.png' %}" class="mainbutton-icon" />
         Domains</a>
     {% endif %}
+    <a href="{% url 'rsshistory:tags-show-all' %}" class="mainbutton" title="Tags">
+        <img src="{% static 'rsshistory/icons/icons8-tags-100.png' %}" class="mainbutton-icon" />
+        Tags</a>
     {% if config.store_keyword_info %}
-    <a href="{% url 'rsshistory:keywords' %}" class="mainbutton" title="Keywords">
-        <img src="{% static 'rsshistory/icons/icons8-broadcast-100.png' %}" class="mainbutton-icon" />
+    <a href="{% url 'rsshistory:keywords' %}" class="mainbutton" title="Shows keywords used by links">
+        <img src="{% static 'rsshistory/icons/icons8-letters-96.png' %}" class="mainbutton-icon" />
         Keywords</a>
     {% endif %}
 </div>

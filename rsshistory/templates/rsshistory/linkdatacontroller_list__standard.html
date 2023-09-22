@@ -1,5 +1,5 @@
-<a href="{{ link.get_absolute_url }}"
-   title="{{link.get_title}} {{link.get_long_description}}"
+<a href="{{ link.get_absolute_url | safe }}"
+   title="{{link.title}} {{link.source}}"
    {% if link.bookmarked %}
    class="element_{{user_config.display_type}} element_{{user_config.display_type}}_selected"
    {% else %}
@@ -24,12 +24,10 @@
    {% endif %}
 
    <span class="linklistitemtitle">
-       {% if link.get_vote > 0 %}
-       [{{link.get_vote}}] 
-       {% endif %}
-       {{link.get_title}}
+       {{link.title | slice:":100"}}
    </span>
     <span class="linklistitemdescription">
-        {{link.get_full_description}}
+        {{link.source_obj.title | slice:":100"}}
+        {{link.date_published}}
     </span>
 </a>

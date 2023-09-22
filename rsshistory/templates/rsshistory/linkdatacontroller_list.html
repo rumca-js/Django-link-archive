@@ -2,6 +2,10 @@
 {% load static %}
 {% block content %}
 
+<div>
+{{ query_filter.time_start }}
+</div>
+
 <div class="contentbuttonmenu">
     <a href="javascript:history.back()" class="simplebutton">Go Back</a>
 
@@ -79,5 +83,9 @@
       <a href="https://chat.openai.com/" class="simplebutton">ChatGPT</a>
   </div>
   {% endif %}
+
+<div>
+{{ query_filter.time_stop }}
+</div>
 
 {% endblock %}

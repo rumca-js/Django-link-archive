@@ -418,11 +418,79 @@ class LinkDataHyperController(object):
 
             link_data["source_obj"] = source_obj
 
-        objs = LinkDataModel.objects.filter(link=link_data["link"])
-        if not objs.exists():
-            o = LinkDataModel(**link_data)
-            o.save()
-            # if link exists - do not change data
+        is_archive = BaseLinkDataController.is_archive_by_date(link_data["date_published"])
+        if not is_archive or link_data["bookmarked"]:
+            objs = LinkDataModel.objects.filter(link=link_data["link"])
+            if not objs.exists():
+                o = LinkDataModel(**link_data)
+                o.save()
+                # if link exists - do not change data
+                LinkDataHyperController.add_new_link_data(link_data)
+                return True
+
+        elif is_archive:
+            objs = ArchiveLinkDataModel.objects.filter(link=link_data["link"])
+            if not objs.exists():
+                o = ArchiveLinkDataModel(**link_data)
+                o.save()
+                return True
+
+        return False
+
+    def is_link(link):
+        objs = LinkDataModel.objects.filter(link=link)
+        if objs.exists():
+            return True
+
+        objs = ArchiveLinkDataModel.objects.filter(link=link)
+        if objs.exists():
+            return True
+
+        return False
+
+    def create_from_youtube(url, data):
+        from .pluginentries.youtubelinkhandler import YouTubeLinkHandler
+
+        objs = LinkDataController.objects.filter(link=url)
+        if objs.count() != 0:
+            return False
+
+        h = YouTubeLinkHandler(url)
+        if not h.download_details():
+            PersistentInfo.error("Could not obtain details for link:{}".format(url))
+            return False
+
+        link_data = {}
+        source = h.get_channel_feed_url()
+        if source is None:
+            PersistentInfo.error("Could not obtain channel feed url:{}".format(url))
+            return False
+
+        link_data["link"] = h.get_link_url()
+        link_data["title"] = h.get_title()
+        link_data["description"] = h.get_description()
+        link_data["date_published"] = h.get_datetime_published()
+        link_data["thumbnail"] = h.get_thumbnail()
+        link_data["artist"] = h.get_channel_name()
+
+        language = "en"
+        if "language" in data:
+            link_data["language"] = data["language"]
+        user = None
+        if "user" in data:
+            link_data["user"] = data["user"]
+        bookmarked = False
+        if "bookmarked" in data:
+            link_data["bookmarked"] = data["bookmarked"]
+
+        source_obj = None
+        sources = SourceDataModel.objects.filter(url=source)
+        if sources.exists():
+            link_data["source_obj"] = sources[0]
+
+        return LinkDataHyperController.add_new_link(link_data)
+
+    def add_new_link_data(link_data):
         try:
             if ConfigurationEntry.get().store_domain_info:
                 p = Page(link_data["source"])
@@ -443,20 +511,16 @@ class LinkDataHyperController(object):
                     # for the words to be counted once only
                     keyworded_text = link_data["title"] # + " " + str(description)
                     KeyWords.add_text(keyworded_text, link_data["language"])
-
-            return True
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.exc(
-                "Could not process entry: Source:{}; Entry:{} {}; Exc:{}\n{}".format(
-                    source_obj,
+                "Could not process entry: Entry:{} {}; Exc:{}\n{}".format(
                     link_data["link"],
                     link_data["title"],
                     str(e),
                     error_text,
                 )
             )
-        return False
 
     def get_link_object(link, date=None):
         conf = ConfigurationEntry.get()
@@ -605,7 +669,9 @@ class BackgroundJobController(BackgroundJob):
                 print("Clearing job {}".format(job.job))
                 job.delete()
 
-    def get_number_of_jobs(job_name):
+    def get_number_of_jobs(job_name = None):
+        if job_name is None:
+            return BackgroundJob.objects.all().count()
         return BackgroundJob.objects.filter(job=job_name).count()
 
     def create_single_job(job_name, subject="", args=""):

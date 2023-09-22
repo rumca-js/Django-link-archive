@@ -40,25 +40,39 @@ class EntriesSearchListView(generic.ListView):
     template_name = str(ViewPage.get_full_template("linkdatacontroller_list.html"))
 
     def get(self, *args, **kwargs):
+        print("get")
+        from datetime import datetime
+        self.time_start = datetime.now()
+
         p = ViewPage(self.request)
         data = p.check_access()
         if data:
             return redirect("{}:missing-rights".format(LinkDatabase.name))
-        return super(EntriesSearchListView, self).get(*args, **kwargs)
+        print("get constructor of list view")
+        view = super(EntriesSearchListView, self).get(*args, **kwargs)
+        print("get done")
+        return view
 
     def get_filter(self):
+        print("get_filter")
         query_filter = EntryFilter(self.request.GET)
         query_filter.get_sources()
-        query_filter.set_time_constrained(False)
-        return query_filter
+        thefilter = query_filter
+        print("get_filter done")
+        return thefilter
 
     def get_queryset(self):
+        print("get_queryset")
         self.query_filter = self.get_filter()
-        return self.get_filtered_objects()
+        objects = self.get_filtered_objects()
+        print("get_queryset done")
+        return objects
 
     def get_context_data(self, **kwargs):
+        print("get_context_data")
         # Call the base implementation first to get the context
         context = super(EntriesSearchListView, self).get_context_data(**kwargs)
+
         context = ViewPage.init_context(self.request, context)
         # Create any data and add it to the context
         self.init_display_type(context)
@@ -66,7 +80,7 @@ class EntriesSearchListView(generic.ListView):
         context["page_title"] += self.get_title()
 
         queue_size = BackgroundJobController.get_number_of_jobs(
-            BackgroundJob.JOB_PROCESS_SOURCE
+            #BackgroundJob.JOB_PROCESS_SOURCE
         )
         context["rss_are_fetched"] = queue_size > 0
         context["rss_queue_size"] = queue_size
@@ -87,9 +101,13 @@ class EntriesSearchListView(generic.ListView):
         elif "search" in self.request.GET:
             context["search_term"] = self.request.GET["search"]
 
+        from datetime import datetime
+        print("get_context_data done. View time delta:{}".format(datetime.now() - self.time_start))
+
         return context
 
     def get_filtered_objects(self):
+        print("get_filtered_objects")
         return self.query_filter.get_filtered_objects()
 
     def get_reset_link(self):
@@ -121,7 +139,7 @@ class EntriesSearchListView(generic.ListView):
         return filter_form
 
     def get_title(self):
-        return " - entries"
+        return " - Links"
 
     def get_query_type(self):
         return "standard"
@@ -143,6 +161,11 @@ class EntriesSearchListView(generic.ListView):
 
         return "&" + urlencode(arg_data)
 
+    def get_default_range(self):
+        from ..dateutils import DateUtils
+        config = ConfigurationEntry.get()
+        return DateUtils.get_days_range(config.whats_new_days)
+
 
 class EntriesRecentListView(EntriesSearchListView):
     model = LinkDataController
@@ -151,6 +174,7 @@ class EntriesRecentListView(EntriesSearchListView):
 
     def get_filter(self):
         query_filter = EntryFilter(self.request.GET)
+        query_filter.set_time_limit(self.get_default_range() )
         query_filter.get_sources()
         return query_filter
 
@@ -161,10 +185,11 @@ class EntriesRecentListView(EntriesSearchListView):
         return reverse("{}:entries-recent".format(LinkDatabase.name))
 
     def get_form_instance(self):
-        return EntryRecentChoiceForm(self.request.GET)
+        form = EntryRecentChoiceForm(self.request.GET)
+        return form
 
     def get_title(self):
-        return " - entries"
+        return " - Recent"
 
     def get_query_type(self):
         return "recent"
@@ -197,7 +222,7 @@ class EntriesNotTaggedView(EntriesSearchListView):
         return EntryChoiceForm(self.request.GET)
 
     def get_title(self):
-        return " - not tagged"
+        return " - UnTagged"
 
     def get_query_type(self):
         return "not-tagged"
@@ -210,7 +235,6 @@ class EntriesBookmarkedListView(EntriesSearchListView):
 
     def get_filter(self):
         query_filter = EntryFilter(self.request.GET)
-        query_filter.set_time_constrained(False)
         query_filter.get_sources()
         query_filter.set_additional_condition(Q(bookmarked=True))
         return query_filter
@@ -228,7 +252,7 @@ class EntriesBookmarkedListView(EntriesSearchListView):
         return EntryBookmarksChoiceForm(self.request.GET)
 
     def get_title(self):
-        return " - bookmarked"
+        return " - Bookmarked"
 
     def get_query_type(self):
         return "bookmarked"
@@ -259,7 +283,7 @@ class EntriesArchiveListView(EntriesSearchListView):
         return EntryChoiceForm(self.request.GET)
 
     def get_title(self):
-        return " - archived"
+        return " - Archived"
 
     def get_query_type(self):
         return "archived"
@@ -278,7 +302,7 @@ class EntriesOmniListView(EntriesSearchListView):
         translate = BaseLinkDataController.get_query_names()
         query_filter.set_translatable(translate)
 
-        if "archive" in self.request.GET and self.request.GET["archive"] == 1:
+        if "archive" in self.request.GET and self.request.GET["archive"] == "on":
             query_filter.set_default_search_symbols(
                 [
                     "title__icontains",
@@ -306,7 +330,7 @@ class EntriesOmniListView(EntriesSearchListView):
     def get_filtered_objects(self):
         fields = self.query_filter.get_fields()
 
-        if ("archive" in self.request.GET and self.request.GET["archive"] == 1) or (
+        if ("archive" in self.request.GET and self.request.GET["archive"] == "on") or (
             "archive" in fields and fields["archive"] == "1"
         ):
             self.query_filter.set_query_set(ArchiveLinkDataController.objects.all())
@@ -349,7 +373,7 @@ class EntriesOmniListView(EntriesSearchListView):
         return filter_form
 
     def get_title(self):
-        return " - entries"
+        return " - Links"
 
     def get_query_type(self):
         return "omni"
@@ -427,12 +451,10 @@ def add_entry(request):
         valid = form.is_valid()
         link = request.POST.get("link", "")
 
-        ob = LinkDataController.objects.filter(link=link)
-        if ob.exists():
-            p.context["form"] = form
-            p.context["entry"] = ob[0]
-
-            return p.render("entry_edit_exists.html")
+        obs = LinkDataController.objects.filter(link=link)
+        if obs.exists():
+            ob = obs[0]
+            return HttpResponseRedirect(ob.get_absolute_url())
 
         if valid:
             data = form.get_information()
@@ -442,9 +464,9 @@ def add_entry(request):
 
             p.context["form"] = form
 
-            ob = LinkDataController.objects.filter(link=data["link"])
-            if ob.exists():
-                p.context["entry"] = ob[0]
+            obs = LinkDataController.objects.filter(link=data["link"])
+            if obs.exists():
+                p.context["entry"] = obs[0]
 
             if ConfigurationEntry.get().store_domain_info:
                 Domains.add(data["link"])
@@ -505,12 +527,10 @@ def add_simple_entry(request):
         if form.is_valid():
             link = form.cleaned_data["link"]
 
-            ob = LinkDataController.objects.filter(link=link)
-            if ob.exists():
-                p.context["form"] = form
-                p.context["entry"] = ob[0]
-
-                return p.render("entry_edit_exists.html")
+            obs = LinkDataController.objects.filter(link=link)
+            if obs.exists():
+                ob = obs[0]
+                return HttpResponseRedirect(ob.get_absolute_url())
 
             data = LinkDataController.get_full_information({"link": link})
             data["user"] = request.user.username
@@ -564,7 +584,7 @@ def edit_entry(request, pk):
             return HttpResponseRedirect(ob.get_absolute_url())
 
         p.context["summary_text"] = "Could not edit entry"
-        return render("summary_present.html")
+        return p.render("summary_present.html")
     else:
         form = EntryForm(instance=ob)
         form.method = "POST"
@@ -899,9 +919,7 @@ def archive_edit_entry(request, pk):
 
         if form.is_valid():
             form.save()
-
-            p.context["entry"] = ob
-            return p.render("entry_edit_ok.html")
+            return HttpResponseRedirect(ob.get_absolute_url())
 
         p.context["summary_text"] = "Could not edit entry"
 
@@ -953,32 +971,6 @@ def archive_hide_entry(request, pk):
     p.context["summary_text"] = summary_text
 
     return p.render("summary_present.html")
-
-
-class KeyWordsListView(generic.ListView):
-    model = KeyWords
-    context_object_name = "content_list"
-    paginate_by = 100
-
-    def get_context_data(self, **kwargs):
-        # Call the base implementation first to get the context
-        context = super(KeyWordsListView, self).get_context_data(**kwargs)
-        context = ViewPage.init_context(self.request, context)
-        return context
-
-
-class KeyWordsDetailView(generic.DetailView):
-    model = KeyWords
-    context_object_name = "content_detail"
-
-    def get_context_data(self, **kwargs):
-        from ..pluginsources.sourcecontrollerbuilder import SourceControllerBuilder
-
-        # Call the base implementation first to get the context
-        context = super(KeyWordsDetailView, self).get_context_data(**kwargs)
-        context = ViewPage.init_context(self.request, context)
-
-        return context
 
 
 def keywords(request):

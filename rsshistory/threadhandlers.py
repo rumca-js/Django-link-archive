@@ -25,6 +25,7 @@ from .controllers import (
     BackgroundJobController,
     LinkDataController,
     SourceDataController,
+    LinkDataHyperController,
 )
 from .configuration import Configuration
 from .dateutils import DateUtils
@@ -208,20 +209,13 @@ class LinkAddJobHandler(BaseJobHandler):
             data = {"user": None, "language": source_obj.language, "bookmarked": False}
 
             print("Adding {} for {}".format(link, source_obj.title))
-            try:
-                LinkDataController.create_from_youtube(link, data)
-            except Exception as e:
-                try:
-                    LinkDataController.create_from_youtube(link, data)
-                except Exception as e:
-                    error_text = traceback.format_exc()
-                    PersistentInfo.error(
-                        "Exception on adding link {} {}".format(str(e), error_text)
-                    )
+            if not LinkDataHyperController.is_link(link):
+                LinkDataHyperController.create_from_youtube(link, data)
+
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.error(
-                "Exception downloading video {0} {1} {2}".format(
+                "Exception when adding YouTube link {0} {1} {2}".format(
                     obj.subject, str(e), error_text
                 )
             )
@@ -589,13 +583,16 @@ class RefreshThreadHandler(object):
 
 class HandlerManager(object):
     """!
-    Threading manager
+    @note Uses handler priority when processing jobs.
     """
 
     def __init__(self):
         pass
 
     def get_handlers(self):
+        """
+        @returns available handlers. Order is important
+        """
         return [
             PushToRepoJobHandler(),
             PushDailyDataToRepoJobHandler(),

@@ -311,7 +311,7 @@ def domains_json(request):
     return JsonResponse(exp.get_json(domains))
 
 
-def domain_category_list(request):
+def domains_category_list(request):
     p = ViewPage(request)
     p.set_title("View categories")
 
@@ -319,3 +319,12 @@ def domain_category_list(request):
     p.context["content_list"] = subcategories
 
     return p.render("domain_category_list.html")
+
+
+def domains_reset_dynamic_data(request):
+    p = ViewPage(request)
+    p.set_title("Reset dynamic data")
+
+    Domains.reset_dynamic_data()
+
+    return redirect("{}:domains".format(LinkDatabase.name))

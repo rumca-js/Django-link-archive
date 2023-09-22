@@ -82,7 +82,8 @@ class BaseLinkDataController(BaseLinkDataModel):
     def get_full_description(self):
         if self.dead:
             return self.get_link_dead_text()
-        string = "{} {}".format(self.date_published, self.get_source_name())
+        string = self.get_long_description()
+
         tags = self.get_tag_string()
         if tags:
             string += " Tags:{}".format(tags)
@@ -100,6 +101,8 @@ class BaseLinkDataController(BaseLinkDataModel):
             return ""
 
     def get_vote(self):
+        if self.bookmarked == False:
+            return 0
         try:
             if not getattr(self, "votes"):
                 return 0
@@ -122,6 +125,10 @@ class BaseLinkDataController(BaseLinkDataModel):
     def get_tag_map(self):
         # TODO should it be done by for tag in self.tags: tag.get_map()?
         result = []
+
+        if self.bookmarked == False:
+            return 0
+
         tags = self.tags.all()
         for tag in tags:
             result.append(tag.tag)
@@ -252,62 +259,6 @@ class BaseLinkDataController(BaseLinkDataModel):
         archive_link = m.get_archive_url_for_date(formatted_date, self.link)
         return archive_link
 
-    def create_from_youtube(url, data):
-        from ..pluginentries.youtubelinkhandler import YouTubeLinkHandler
-
-        objs = BaseLinkDataModel.objects.filter(link=url)
-        if objs.count() != 0:
-            return False
-
-        h = YouTubeLinkHandler(url)
-        if not h.download_details():
-            PersistentInfo.error("Could not obtain details for link:{}".format(url))
-            return False
-
-        data = dict()
-        source = h.get_channel_feed_url()
-        if source is None:
-            PersistentInfo.error("Could not obtain channel feed url:{}".format(url))
-            return False
-
-        link = h.get_link_url()
-        title = h.get_title()
-        description = h.get_description()
-        date_published = h.get_datetime_published()
-        thumbnail = h.get_thumbnail()
-        artist = h.get_channel_name()
-
-        language = "en"
-        if "language" in data:
-            language = data["language"]
-        user = None
-        if "user" in data:
-            user = data["user"]
-        bookmarked = False
-        if "bookmarked" in data:
-            bookmarked = data["bookmarked"]
-
-        source_obj = None
-        sources = SourceDataModel.objects.filter(url=source)
-        if sources.exists():
-            source_obj = sources[0]
-
-        entry = LinkDataModel(
-            source=source,
-            title=title,
-            description=description,
-            link=link,
-            date_published=date_published,
-            bookmarked=bookmarked,
-            thumbnail=thumbnail,
-            artist=artist,
-            language=language,
-            user=user,
-            source_obj=source_obj,
-        )
-        entry.save()
-        return True
-
     def get_full_information(data):
         return BaseLinkDataController.update_info(data)
 
@@ -411,6 +362,18 @@ class BaseLinkDataController(BaseLinkDataModel):
     def is_archive_entry(self):
         return False
 
+    def is_archive_by_date(input_date):
+        from ..dateutils import DateUtils
+        from .admin import ConfigurationEntry
+
+        conf = ConfigurationEntry.get()
+
+        current_time = DateUtils.get_datetime_now_utc()
+        days_before = current_time - timedelta(days=conf.days_to_move_to_archive) 
+        if input_date < days_before:
+            return True
+        return False
+
     def get_description_length():
         return 1000
 
@@ -447,6 +410,7 @@ class KeyWords(models.Model):
         return keys.count()
 
     def is_valid(str_token):
+        # check if non alphanumeric?
         if str_token.find("<") >= 0 or \
             str_token.find(">") >= 0 or \
             str_token.find("=") >= 0 or \
@@ -454,6 +418,7 @@ class KeyWords(models.Model):
             str_token.find(";") >= 0 or \
             str_token.find("\"") >= 0 or \
             str_token.find("#") >= 0 or \
+            str_token.find("+") >= 0 or \
             str_token.find("?") >= 0 or \
             str_token.find("&amp;") >= 0:
             return False
@@ -529,10 +494,17 @@ class KeyWords(models.Model):
         from ..dateutils import DateUtils
 
         # entries older than 2 days
-        date_before_limit = DateUtils.get_days_before_dt(2)
+        # date_before_limit = KeyWords.get_keywords_date_limit()
 
-        keys = KeyWords.objects.filter(date_published__lt=date_before_limit)
+        #keys = KeyWords.objects.filter(date_published__lt=date_before_limit)
+        #keys.delete()
+
+        # Each day capture new keywords
+        keys = KeyWords.objects.all()
         keys.delete()
+
+    def get_keywords_date_limit():
+        return DateUtils.get_days_before_dt(1)
 
     def get_keyword_data(day_iso = None):
         # collect how many times keyword exist
@@ -554,6 +526,8 @@ class KeyWords(models.Model):
         content_list = []
         for key in counter:
             value = counter[key]
+            #content_list.append([key, value])
+
             if value > 1:
                 content_list.append([key, value])
 
@@ -562,3 +536,15 @@ class KeyWords(models.Model):
             content_list, key=lambda x: (x[1], x[0]), reverse=True
         )
         return content_list
+
+    def is_keyword_date_range(input_date):
+        from ..dateutils import DateUtils
+        from .admin import ConfigurationEntry
+
+        conf = ConfigurationEntry.get()
+
+        current_time = DateUtils.get_datetime_now_utc()
+        days_before = current_time - timedelta(days=KeyWords.get_keywords_date_limit()) 
+        if input_date < days_before:
+            return False
+        return True

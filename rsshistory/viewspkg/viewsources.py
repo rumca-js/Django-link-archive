@@ -11,6 +11,7 @@ from ..controllers import (
     SourceDataController,
     LinkDataController,
     BackgroundJobController,
+    LinkDataHyperController,
 )
 from ..forms import SourceForm, SourcesChoiceForm
 from ..queryfilters import SourceFilter
@@ -180,7 +181,8 @@ def edit_source(request, pk):
 
     ft = SourceDataController.objects.filter(id=pk)
     if not ft.exists():
-        return p.render("source_edit_does_not_exist.html")
+        p.context["summary_text"] = "Source does not exist"
+        return p.render("summary_present.html")
 
     ob = ft[0]
 
@@ -194,7 +196,6 @@ def edit_source(request, pk):
             return HttpResponseRedirect(ob.get_absolute_url())
 
         p.context["summary_text"] = "Could not edit source"
-
         return p.render("summary_present.html")
     else:
         if not ob.favicon:
@@ -229,7 +230,8 @@ def refresh_source(request, pk):
 
     ft = SourceDataController.objects.filter(id=pk)
     if not ft.exists():
-        return p.render("source_edit_does_not_exist.html")
+        p.context["summary_text"] = "Source does not exist"
+        return p.render("summary_present.html")
 
     ob = ft[0]
 
@@ -408,7 +410,8 @@ def import_youtube_links_for_source(request, pk):
 
     for link in links:
         print("Adding job {}".format(link))
-        BackgroundJobController.link_add(link, source_obj)
+        if not LinkDataHyperController.is_link(link):
+            BackgroundJobController.link_add(link, source_obj)
 
     p.context["summary_text"] = ""
     return p.render("summary_present.html")

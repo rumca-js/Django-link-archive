@@ -3,14 +3,13 @@
 
 <a href="javascript:history.back()" class="simplebutton">Go Back</a>
 
+{% if user.is_staff %}
     <div>
         <h1>Managment links</h1>
         <a href="{% url 'rsshistory:system-status' %}" title="Displays status" class="simplebutton">Status</a>
         <a href="{% url 'rsshistory:configuration' %}" title="Instance configuration" class="simplebutton">Configuration</a>
-        <a href="{% url 'rsshistory:domains' %}" class="simplebutton" title="Domains">Domains</a>
         <a href="{% url 'rsshistory:backgroundjobs' %}" title="View background jobs" class="simplebutton">Background Jobs</a>
         <a href="{% url 'rsshistory:logs' %}" title="View all logs" class="simplebutton">Logs</a>
-        <a href="{% url 'rsshistory:keywords' %}" title="View keywords" class="simplebutton">Keywords</a>
         <a href="{% url 'rsshistory:show-youtube-link-props' %}" title="Shows YouTube properties" class="simplebutton">Show YouTube video properties</a>
         <a href="{% url 'rsshistory:show-page-props' %}" title="Shows page properties" class="simplebutton">Show page properties</a>
         <a href="/admin" title="User administration" class="simplebutton">User admin</a>
@@ -33,6 +32,10 @@
     <div>
         <h1>Advanced</h1>
 	    <a href="{% url 'rsshistory:domains-remove-all' %}" title="Removes all domains" class="simplebutton">Remove all domains</a>
+        <a href="{% url 'rsshistory:keywords-remove-all' %}" title="Removes all keywords" class="simplebutton">Remove all keywords</a>
+        <a href="{% url 'rsshistory:sources-remove-all' %}" title="Removes all sources" class="simplebutton">Remove all sources</a>
+        <a href="{% url 'rsshistory:entries-remove-all' %}" title="Remove nonbookmarked entries" class="simplebutton">Remove all entries</a>
+        <a href="{% url 'rsshistory:entries-remove-nonbookmarked' %}" title="Remove nonbookmarked entries" class="simplebutton">Remove non bookmarked entries</a>
         <a href="{% url 'rsshistory:data-errors' %}" class="simplebutton">Show data errors</a>
     </div>
 
@@ -42,5 +45,6 @@
         <a href="{% url 'rsshistory:test-page' %}" class="simplebutton">Test page</a>
         <a href="{% url 'rsshistory:test-form-page' %}" class="simplebutton">Test form page</a>
     </div>
+{% endif %}
 
 {% endblock %}

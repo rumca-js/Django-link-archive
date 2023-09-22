@@ -70,6 +70,33 @@ class BaseQueryFilter(object):
     def is_error(self):
         return self.error
 
+    def get_parameter_map_arg(self, keyword):
+        value = self.args.get(keyword)
+        if value and value != "":
+            return value
+
+    def get_parameter_map_args(self):
+        return []
+
+    def get_parameter_map(self):
+        parameter_map = {}
+        for arg in self.get_parameter_map_args():
+            value = self.get_parameter_map_arg(arg)
+            if value:
+                parameter_map[arg] = value
+
+        return parameter_map
+
+    def time_start(self):
+        from datetime import datetime
+        self.time_start = datetime.now()
+        return ""
+
+    def time_stop(self):
+        from datetime import datetime
+        print("Page display time delta:{}".format(datetime.now() - self.time_start))
+        return ""
+
 
 class SourceFilter(BaseQueryFilter):
     def __init__(self, args):
@@ -117,25 +144,11 @@ class SourceFilter(BaseQueryFilter):
         return query_filter.combined_query
 
     def get_arg_conditions_query(self):
-        args = self.get_arg_conditions(True)
+        args = self.get_parameter_map()
         return Q(**args)
 
-    def get_arg_conditions(self, translate=False):
-        parameter_map = {}
-
-        category = self.args.get("category")
-        if category and category != "":
-            parameter_map["category"] = category
-
-        subcategory = self.args.get("subcategory")
-        if subcategory and subcategory != "":
-            parameter_map["subcategory"] = subcategory
-
-        title = self.args.get("title")
-        if title and title != "":
-            parameter_map["title"] = title
-
-        return parameter_map
+    def get_parameter_map_args(self):
+        return ["category", "subcategory", "titlte"]
 
     def get_model_pagination(self):
         from .viewspkg.viewsources import RssSourceListView
@@ -146,7 +159,7 @@ class SourceFilter(BaseQueryFilter):
 class EntryFilter(BaseQueryFilter):
     def __init__(self, args):
         super().__init__(args)
-        self.time_constrained = True
+        self.time_limit = None
 
         self.use_archive_source = False
         self.additional_condition = Q()
@@ -207,10 +220,10 @@ class EntryFilter(BaseQueryFilter):
         return Q(**args)
 
     def get_sources(self):
-        self.sources = SourceDataController.objects.all()
+        self.sources = None
 
-    def set_time_constrained(self, constrained):
-        self.time_constrained = constrained
+    def set_time_limit(self, time_limit):
+        self.time_limit = time_limit
 
     def set_archive_source(self, source):
         self.use_archive_source = source
@@ -240,8 +253,8 @@ class EntryFilter(BaseQueryFilter):
             self.copy_if_is_set(parameter_map, self.args, "date_to")
             self.copy_if_is_set(parameter_map, self.args, "archive")
 
-            if self.time_constrained:
-                date_range = self.get_default_range()
+            if self.time_limit:
+                date_range = self.time_limit
                 if "date_from" not in parameter_map:
                     parameter_map["date_from"] = date_range[0]
                 if "date_to" not in parameter_map:
@@ -263,9 +276,9 @@ class EntryFilter(BaseQueryFilter):
             self.copy_if_is_set_and_translate(parameter_map, self.args, "date_from")
             self.copy_if_is_set_and_translate(parameter_map, self.args, "date_to")
 
-            if self.time_constrained:
+            if self.time_limit:
                 if "date_published__range" not in parameter_map:
-                    date_range = self.get_default_range()
+                    date_range = self.time_limit
                     parameter_map["date_published__range"] = [
                         date_range[0],
                         date_range[1],
@@ -314,11 +327,6 @@ class EntryFilter(BaseQueryFilter):
             else:
                 dst[element] = src[element]
 
-    def get_default_range(self):
-        from .dateutils import DateUtils
-
-        return DateUtils.get_days_range()
-
     def copy_if_is_set(self, dst, src, element):
         if element in src and src[element] != "":
             dst[element] = src[element]
@@ -364,6 +372,8 @@ class DomainFilter(BaseQueryFilter):
                 "domain__icontains",
                 "title__icontains",
                 "description__icontains",
+                "category__icontains",
+                "subcategory__icontains",
             ]
         )
 
@@ -371,29 +381,11 @@ class DomainFilter(BaseQueryFilter):
         return query_filter.combined_query
 
     def get_arg_conditions_query(self):
-        args = self.get_arg_conditions(True)
+        args = self.get_parameter_map()
         return Q(**args)
 
-    def get_arg_conditions(self, translate=False):
-        parameter_map = {}
-
-        suffix = self.args.get("suffix")
-        if suffix and suffix != "":
-            parameter_map["suffix"] = suffix
-
-        tld = self.args.get("tld")
-        if tld and tld != "":
-            parameter_map["tld"] = tld
-
-        main = self.args.get("main")
-        if main and main != "":
-            parameter_map["main"] = main
-
-        domain = self.args.get("domain")
-        if domain and domain != "":
-            parameter_map["domain__icontains"] = domain
-
-        return parameter_map
+    def get_parameter_map_args(self):
+        return ["suffix", "tld", "main", "domain", "category", "subcategory"]
 
 
 class StringSymbolEquation(object):
@@ -705,8 +697,7 @@ class OmniSearchFilter(BaseQueryFilter):
         if self.data is not None and self.data != "":
             self.calculate_combined_query()
 
-            filtered_queryset = self.query_set.filter(self.combined_query).distinct()
-            print("Omni query:{}".format(filtered_queryset))
+            filtered_queryset = self.query_set.filter(self.combined_query)
             print("Omni query:{}".format(filtered_queryset.query))
             return filtered_queryset
         else:
