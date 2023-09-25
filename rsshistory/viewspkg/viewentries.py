@@ -12,7 +12,6 @@ from ..models import (
     BackgroundJob,
     ConfigurationEntry,
     Domains,
-    KeyWords,
 )
 from ..controllers import (
     LinkDataController,
@@ -202,7 +201,6 @@ class EntriesNotTaggedView(EntriesSearchListView):
 
     def get_filter(self):
         query_filter = EntryFilter(self.request.GET)
-        query_filter.set_time_constrained(False)
         query_filter.get_sources()
         query_filter.set_additional_condition(
             Q(tags__tag__isnull=True, bookmarked=True)
@@ -973,25 +971,3 @@ def archive_hide_entry(request, pk):
     return p.render("summary_present.html")
 
 
-def keywords(request):
-    p = ViewPage(request)
-    p.set_title("Keywords")
-
-    content_list = KeyWords.get_keyword_data()
-    if len(content_list) >= 0:
-        p.context['content_list'] = content_list
-
-    return p.render("keywords_list.html")
-
-
-def keywords_remove_all(request):
-    p = ViewPage(request)
-    p.set_title("Keywords remove all")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
-
-    keys = KeyWords.objects.all()
-    keys.delete()
-
-    return redirect("{}:keywords".format(LinkDatabase.name))

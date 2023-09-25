@@ -127,7 +127,7 @@ class BaseLinkDataController(BaseLinkDataModel):
         result = []
 
         if self.bookmarked == False:
-            return 0
+            return result
 
         tags = self.tags.all()
         for tag in tags:
@@ -438,6 +438,7 @@ class KeyWords(models.Model):
            str_token == "world" or \
            str_token == "news" or \
            str_token == "week" or \
+           str_token == "today" or \
            str_token == "comments" or \
            str_token == "january" or \
            str_token == "february" or \
@@ -476,6 +477,8 @@ class KeyWords(models.Model):
         important_tokens = set()
 
         for token in doc:
+            # some words may appear in the beginning of the sentence - 
+            # lets ignore case entirely
             str_token = str(token).lower()
             if not KeyWords.is_valid(str_token):
                 continue
@@ -490,20 +493,45 @@ class KeyWords(models.Model):
         for str_token in important_tokens:
             KeyWords.objects.create(keyword = str_token)
 
-    def clear_old_entries():
+    def add_link_data(link_data):
+        print("Add link data")
+        from .admin import ConfigurationEntry
+
+        if ConfigurationEntry.get().store_keyword_info:
+            if "language" not in link_data:
+                return False
+
+            print("Store keywords")
+            if not KeyWords.is_keyword_date_range(link_data['date_published']):
+                return False
+
+            print("Date is published")
+            # TODO we should make some switch in sources if it should store keywords
+            if link_data['link'].find("www.reddit.com") != -1:
+                return False
+
+            print("reddit")
+            # duplicate words are not counted. We joint title and description
+            # for the words to be counted once only
+            keyworded_text = link_data["title"]
+            KeyWords.add_text(keyworded_text, link_data["language"])
+
+            return True
+
+    def clear():
         from ..dateutils import DateUtils
 
         # entries older than 2 days
-        # date_before_limit = KeyWords.get_keywords_date_limit()
-
-        #keys = KeyWords.objects.filter(date_published__lt=date_before_limit)
-        #keys.delete()
-
-        # Each day capture new keywords
-        keys = KeyWords.objects.all()
+        date_before_limit = KeyWords.get_keywords_date_limit()
+        keys = KeyWords.objects.filter(date_published__lt=date_before_limit)
         keys.delete()
 
+        ## Each day capture new keywords
+        #keys = KeyWords.objects.all()
+        #keys.delete()
+
     def get_keywords_date_limit():
+        from ..dateutils import DateUtils
         return DateUtils.get_days_before_dt(1)
 
     def get_keyword_data(day_iso = None):
@@ -538,13 +566,14 @@ class KeyWords(models.Model):
         return content_list
 
     def is_keyword_date_range(input_date):
+        # TODO we clear every beginning of 
+        # maybe we should clear
         from ..dateutils import DateUtils
         from .admin import ConfigurationEntry
 
         conf = ConfigurationEntry.get()
 
-        current_time = DateUtils.get_datetime_now_utc()
-        days_before = current_time - timedelta(days=KeyWords.get_keywords_date_limit()) 
-        if input_date < days_before:
+        date_limit = KeyWords.get_keywords_date_limit()
+        if input_date < date_limit:
             return False
         return True

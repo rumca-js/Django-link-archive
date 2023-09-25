@@ -1,11 +1,10 @@
-from datetime import datetime
-
 from django.test import TestCase
 from django.utils import timezone
 from django.urls import reverse
 
 from ..apps import LinkDatabase
 from ..controllers import SourceDataController, LinkDataController
+from ..dateutils import DateUtils
 
 
 class ViewsTest(TestCase):
@@ -395,7 +394,7 @@ class EnhancedViewTest(ViewsTest):
             title="The first link",
             source_obj=source_youtube,
             bookmarked=True,
-            date_published=datetime.strptime("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
+            date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
         )
         LinkDataController.objects.create(
@@ -404,7 +403,7 @@ class EnhancedViewTest(ViewsTest):
             title="The second link",
             source_obj=source_youtube,
             bookmarked=False,
-            date_published=datetime.strptime("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
+            date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
         )
 

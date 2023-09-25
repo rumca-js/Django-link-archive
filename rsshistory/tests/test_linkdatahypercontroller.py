@@ -1,10 +1,10 @@
-import datetime
+import django.utils
 
 from django.test import TestCase
 
 from ..controllers import LinkDataHyperController, SourceDataController
-
 from ..models import LinkDataModel
+from ..dateutils import DateUtils
 
 
 class UserObject(object):
@@ -37,7 +37,7 @@ class SourceParsePluginTest(TestCase):
             "description": "description",
             "language": "en",
             "thumbnail": "https://youtube.com/favicon.ico",
-            "date_published": datetime.datetime.now(),
+            "date_published": DateUtils.get_datetime_now_utc(),
         }
 
         link = LinkDataHyperController.add_new_link(link_data)
@@ -56,7 +56,7 @@ class SourceParsePluginTest(TestCase):
             "description": "description",
             "language": "en",
             "thumbnail": "https://youtube.com/favicon.ico",
-            "date_published": datetime.datetime.now(),
+            "date_published": DateUtils.get_datetime_now_utc(),
         }
 
         link = LinkDataHyperController.add_new_link(link_data)

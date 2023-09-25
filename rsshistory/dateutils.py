@@ -94,7 +94,7 @@ class DateUtils(object):
         return date.today() - timedelta(days=number_of_days)
 
     def get_days_before_dt(number_of_days=7):
-        return datetime.now() - timedelta(days=number_of_days)
+        return DateUtils.get_datetime_now_utc() - timedelta(days=number_of_days)
 
     def get_days_range(number_of_days=7):
         date_stop = date.today() + timedelta(days=1)
@@ -102,6 +102,9 @@ class DateUtils(object):
         return [date_start, date_stop]
 
     def get_days_range_dt(number_of_days=7):
-        date_stop = datetime.now() + timedelta(days=1)
-        date_start = datetime.now() - timedelta(days=number_of_days)
+        date_stop = DateUtils.get_datetime_now_utc() + timedelta(days=1)
+        date_start = DateUtils.get_datetime_now_utc() - timedelta(days=number_of_days)
         return [date_start, date_stop]
+
+    def from_string(string_input, string_format):
+        return datetime.strptime(string_input, string_format)

@@ -1,6 +1,5 @@
 from pathlib import Path
 import shutil
-from datetime import datetime
 
 from django.test import TestCase
 from django.utils import timezone
@@ -69,7 +68,7 @@ class UpdateManagerTest(TestCase):
             title="The first link",
             source_obj=source_youtube,
             bookmarked=True,
-            date_published=datetime.strptime("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
+            date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
         )
         DataExport.objects.create(

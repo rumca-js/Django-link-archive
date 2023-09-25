@@ -5,11 +5,13 @@ from datetime import timedelta
 from django.views import generic
 from django.urls import reverse
 from django.shortcuts import render
+from django.http import HttpResponseForbidden, HttpResponseRedirect
 
 from ..apps import LinkDatabase
 from ..models import (
     LinkTagsDataModel,
     BaseLinkDataController,
+    KeyWords,
 )
 from ..configuration import ConfigurationEntry
 from ..controllers import (
@@ -467,3 +469,62 @@ def show_info(request):
     p.context["summary_text"] = info
 
     return p.render("summary_present.html")
+
+
+def keywords(request):
+    p = ViewPage(request)
+    p.set_title("Keywords")
+
+    content_list = KeyWords.get_keyword_data()
+    if len(content_list) >= 0:
+        p.context['content_list'] = content_list
+
+    return p.render("keywords_list.html")
+
+
+def keywords_remove_all(request):
+    p = ViewPage(request)
+    p.set_title("Keywords remove all")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    keys = KeyWords.objects.all()
+    keys.delete()
+
+    return redirect("{}:keywords".format(LinkDatabase.name))
+
+
+def keyword_remove(request):
+    p = ViewPage(request)
+    p.set_title("Remove a keyword")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    from ..forms import KeywordInputForm
+
+    if not request.method == "POST":
+        form = KeywordInputForm()
+        form.method = "POST"
+        form.action_url = reverse(
+            "{}:keyword-remove".format(LinkDatabase.name)
+        )
+        p.context["form"] = form
+
+        return p.render("form_basic.html")
+
+    else:
+        form = KeywordInputForm(request.POST)
+        if not form.is_valid():
+            p.context["summary_text"] = "Form is invalid"
+
+            return p.render("summary_present.html")
+        else:
+            keyword = form.cleaned_data["keyword"]
+            keywords = KeyWords.objects.filter(keyword = keyword)
+            keywords.delete()
+
+            return HttpResponseRedirect(
+                reverse("{}:keywords".format(LinkDatabase.name))
+            )

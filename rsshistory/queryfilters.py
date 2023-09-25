@@ -70,22 +70,22 @@ class BaseQueryFilter(object):
     def is_error(self):
         return self.error
 
-    def get_parameter_map_arg(self, keyword):
+    def get_filter_args_map(self):
+        parameter_map = {}
+        for key in self.get_filter_args_map_keys():
+            value = self.get_filter_args_value(key)
+            if value:
+                parameter_map[key] = value
+
+        return parameter_map
+
+    def get_filter_args_map_keys(self):
+        return []
+
+    def get_filter_args_value(self, keyword):
         value = self.args.get(keyword)
         if value and value != "":
             return value
-
-    def get_parameter_map_args(self):
-        return []
-
-    def get_parameter_map(self):
-        parameter_map = {}
-        for arg in self.get_parameter_map_args():
-            value = self.get_parameter_map_arg(arg)
-            if value:
-                parameter_map[arg] = value
-
-        return parameter_map
 
     def time_start(self):
         from datetime import datetime
@@ -144,11 +144,11 @@ class SourceFilter(BaseQueryFilter):
         return query_filter.combined_query
 
     def get_arg_conditions_query(self):
-        args = self.get_parameter_map()
+        args = self.get_filter_args_map()
         return Q(**args)
 
-    def get_parameter_map_args(self):
-        return ["category", "subcategory", "titlte"]
+    def get_filter_args_map_keys(self):
+        return ["category", "subcategory", "title"]
 
     def get_model_pagination(self):
         from .viewspkg.viewsources import RssSourceListView
@@ -236,6 +236,7 @@ class EntryFilter(BaseQueryFilter):
 
     def get_arg_conditions(self, translate=False):
         parameter_map = {}
+        #TODO change to new API get_filter_args_map
 
         if not translate:
             self.copy_if_is_set(parameter_map, self.args, "title")
@@ -381,10 +382,10 @@ class DomainFilter(BaseQueryFilter):
         return query_filter.combined_query
 
     def get_arg_conditions_query(self):
-        args = self.get_parameter_map()
+        args = self.get_filter_args_map()
         return Q(**args)
 
-    def get_parameter_map_args(self):
+    def get_filter_args_map_keys(self):
         return ["suffix", "tld", "main", "domain", "category", "subcategory"]
 
 

@@ -501,16 +501,7 @@ class LinkDataHyperController(object):
                 domain = p.get_domain_only()
                 Domains.add(domain)
 
-            if ConfigurationEntry.get().store_keyword_info:
-                # TODO we should make some switch in sources if it should store keywords
-                if link_data['link'].find("www.reddit.com") == -1:
-                    # TODO description contains HTML tags. we do not want funny stuff in keywords
-                    description = LinkDataHyperController.get_clean_description(link_data)
-
-                    # duplicate words are not counted. We joint title and description
-                    # for the words to be counted once only
-                    keyworded_text = link_data["title"] # + " " + str(description)
-                    KeyWords.add_text(keyworded_text, link_data["language"])
+                KeyWords.add_link_data(link_data)
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.exc(

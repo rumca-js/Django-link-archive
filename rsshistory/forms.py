@@ -102,6 +102,10 @@ class ExportDailyDataForm(forms.Form):
     time_stop = forms.DateField(label="Stop time")
 
 
+class KeywordInputForm(forms.Form):
+    keyword = forms.DateField(label="Keyword")
+
+
 class PushDailyDataForm(forms.Form):
     input_date = forms.DateField(label="Input date", initial=my_date_from)
 

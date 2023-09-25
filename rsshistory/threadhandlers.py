@@ -527,7 +527,7 @@ class CleanupJobHandler(BaseJobHandler):
             LinkDataController.move_old_links_to_archive()
             Domains.reset_dynamic_data()
             SourceDataModel.reset_dynamic_data()
-            KeyWords.clear_old_entries()
+            KeyWords.clear()
 
         except Exception as e:
             error_text = traceback.format_exc()

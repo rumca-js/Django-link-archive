@@ -1,6 +1,5 @@
 from pathlib import Path
 import shutil
-from datetime import datetime
 
 from django.test import TestCase
 from django.utils import timezone
@@ -8,6 +7,7 @@ from django.urls import reverse
 
 from ..controllers import SourceDataController, LinkDataController
 from ..queryfilters import SourceFilter, EntryFilter
+from ..dateutils import DateUtils
 
 
 class FiltersTest(TestCase):
@@ -25,7 +25,7 @@ class FiltersTest(TestCase):
             title="The first link",
             source_obj=source_youtube,
             bookmarked=True,
-            date_published=datetime.strptime("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
+            date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
         )
         LinkDataController.objects.create(
@@ -34,7 +34,7 @@ class FiltersTest(TestCase):
             title="The second link",
             source_obj=source_youtube,
             bookmarked=False,
-            date_published=datetime.strptime("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
+            date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
         )
 
@@ -56,7 +56,7 @@ class FiltersTest(TestCase):
 
         thefilter = SourceFilter(args)
 
-        filter_args = thefilter.get_arg_conditions()
+        filter_args = thefilter.get_filter_args_map()
 
         self.assertTrue("title" in filter_args)
         self.assertTrue("category" in filter_args)
@@ -74,7 +74,7 @@ class FiltersTest(TestCase):
 
         thefilter = SourceFilter(args)
 
-        filter_args = thefilter.get_arg_conditions(True)
+        filter_args = thefilter.get_filter_args_map()
 
         self.assertTrue("title" in filter_args)
         self.assertTrue("category" in filter_args)

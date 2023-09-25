@@ -145,8 +145,9 @@ urlpatterns = [
     path("domains-reset-dynamic-data/", viewdomains.domains_reset_dynamic_data, name="domains-reset-dynamic-data"),
     path("domains-remove-all/", viewdomains.domains_remove_all, name="domains-remove-all",),
     # keywords
-    path("keywords/", viewentries.keywords, name="keywords",),
-    path("keywords-remove-all/", viewentries.keywords_remove_all, name="keywords-remove-all",),
+    path("keywords/", viewcustom.keywords, name="keywords",),
+    path("keyword-remove", viewcustom.keyword_remove, name="keyword-remove",),
+    path("keywords-remove-all/", viewcustom.keywords_remove_all, name="keywords-remove-all",),
     # other, debug forms
     path("check-move-archive", viewcustom.check_if_move_to_archive, name="check-move-archive",),
     path("data-errors", viewcustom.data_errors_page, name="data-errors"),
