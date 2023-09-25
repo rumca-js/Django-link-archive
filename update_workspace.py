@@ -9,7 +9,6 @@ def get_source_files(path):
     for root, dirs, files in os.walk(str(path), topdown=False):
        for name in files:
            file_name = os.path.join(root, name)
-           print(file_name)
            result_files.append(Path(file_name))
 
     return result_files
@@ -51,7 +50,6 @@ class FileConverter(object):
 def remove_path(path):
     destination_path = Path(path)
     if destination_path.exists():
-        print("Removing old path {}".format(destination_path))
         shutil.rmtree(destination_path)
 
 
@@ -81,7 +79,7 @@ class Snapshot(object):
 
 
 def update_workspace(source_app, destination_app):
-    print("Processing app:{}".format(source_app))
+    print("Processing app:{}".format(destination_app))
 
     snapshot = Snapshot()
     snapshot.add(Path(destination_app) / "migrations")
@@ -93,13 +91,12 @@ def update_workspace(source_app, destination_app):
     for source_file in source_files:
         conv = FileConverter(source_file)
         if conv.is_ok():
-            # print("Converting {}".format(source_file))
             conv.convert(source_app, destination_app)
 
     snapshot.restore()
 
 
-def get_workspaces(self):
+def get_workspaces():
     result = []
     items_in_dir = os.listdir(".")
     for item in items_in_dir:
