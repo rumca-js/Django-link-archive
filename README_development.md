@@ -27,6 +27,7 @@ It should be able to operate on SBC, like raspberry PI.
  - do not change exported names of link data model. We do not want to be forced to regenerate all links again. We can add new fields though
  - do not fetch all objects from any table. Do not use Model.objects.all(). One exception: to obtain length of table
  - do not use len() for checking length of table. Use queryset 'count' API
+ - do not use datetime.now(). Use django timezone datetime, or other native means
  
 # Omni search
 

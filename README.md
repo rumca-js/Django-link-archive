@@ -57,6 +57,12 @@ Personal link database, with RSS functionality. Similar to Reddit, but completel
  - Inspiration, notes about search algorithms [https://github.com/rumca-js/Django-link-archive/blob/main/README_search.md](https://github.com/rumca-js/Django-link-archive/blob/main/README_search.md).
  - Data analysis: [https://github.com/rumca-js/Django-link-archive/blob/main/analysis/readme.md](https://github.com/rumca-js/Django-link-archive/blob/main/analysis/readme.md)
 
+# Features
+
+ - Program can gather all domains from incoming links. These data can be used to get to know more places in the Internet. Google suck at 'discovering new places' in the internet. It is only a search engine after all.
+ - Program can gather keywords from incoming links. It uses only 'title' of link. Unfortunately description cannot be used reliably, as it is often cluttered with advertisments, affiliate links, and other uninteresting data. Counting keywrods can show you which words generate most buzz. With it you can check what is really happening in the world.
+ - Analyze yourself! Check which pages you visit, check which domains, etc.
+
 # Import, export data
 
 ## View data
