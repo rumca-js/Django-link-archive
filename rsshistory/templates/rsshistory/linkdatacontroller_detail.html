@@ -78,8 +78,12 @@
            <strong>Vote:</strong>
 {{object.get_vote}} 
       </div>
-      <span><strong>Artist:</strong> {{ object.artist }}</span>
-      <span><strong>Album:</strong> {{ object.album }}</span>
+      <span><strong>Artist:</strong> 
+               <a href="{% url 'rsshistory:entries-omni-search'%}?search=artist+%3D+{{ object.artist }}" class="simplebutton">{{ object.artist }}</a>
+      </span>
+      <span><strong>Album:</strong>
+               <a href="{% url 'rsshistory:entries-omni-search'%}?search=album+%3D+{{ object.album }}" class="simplebutton">{{ object.album }}</a>
+      </span>
       <span><strong>Language:</strong> {{ object.language }}</span>
       <span><strong>Dead:</strong> {{ object.dead }}</span>
       

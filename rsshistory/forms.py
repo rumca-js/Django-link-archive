@@ -179,6 +179,9 @@ class EntryForm(forms.ModelForm):
             "age",
             "thumbnail",
         ]
+        widgets = {
+            'date_published': forms.widgets.DateTimeInput(attrs={'type': 'datetime-local'})
+        }
 
     def __init__(self, *args, **kwargs):
         super(EntryForm, self).__init__(*args, **kwargs)
@@ -219,6 +222,9 @@ class EntryArchiveForm(forms.ModelForm):
             "age",
             "thumbnail",
         ]
+        widgets = {
+            'date_published': forms.widgets.DateTimeInput(attrs={'type': 'datetime-local'})
+        }
 
 
 class SourceForm(forms.ModelForm):
@@ -256,7 +262,9 @@ class TagEntryForm(forms.ModelForm):
     class Meta:
         model = LinkTagsDataModel
         fields = ["link", "author", "date", "tag"]
-        widgets = {}
+        widgets = {
+            'date': forms.widgets.DateTimeInput(attrs={'type': 'datetime-local'})
+        }
 
     def save_tags(self):
         link = self.cleaned_data["link"]
@@ -601,13 +609,9 @@ class CommentEntryForm(forms.Form):
     """
 
     link_id = forms.IntegerField(required=False, widget=forms.HiddenInput())
-    author = forms.CharField(max_length=1000)
+    author = forms.CharField(max_length=1000, widget=forms.TextInput(attrs={'readonly': 'readonly'}))
     comment = forms.CharField(widget=forms.Textarea)
-    date_published = forms.DateTimeField(initial=datetime.now)
-
-    def __init__(self, *args, **kwargs):
-        super(CommentEntryForm, self).__init__(*args, **kwargs)
-        self.fields["author"].readonly = True
+    date_published = forms.DateTimeField(initial=datetime.now, widget=forms.widgets.DateTimeInput(attrs={'type': 'datetime-local', 'readonly': 'readonly'}))
 
 
 from django.db.models import IntegerField, Model

@@ -63,6 +63,10 @@ class EntryYouTubePlugin(YouTubeLinkHandler, EntryGenericPlugin):
             return frame_text
 
     def get_description_html(self):
-        frame = self.get_frame()
+        import re
 
-        return """{}""".format(self.entry.description)
+        frame = self.get_frame()
+        description = self.entry.description
+        description = self.htmlify(description)
+
+        return """{}""".format(description)

@@ -405,6 +405,9 @@ class KeyWords(models.Model):
     keyword = models.CharField(max_length=200)
     date_published = models.DateTimeField(default=datetime.now)
 
+    class Meta:
+        ordering = ["-date_published"]
+
     def count(keyword):
         keys = KeyWords.objects.filter(keyword = keyword)
         return keys.count()

@@ -269,9 +269,11 @@ def show_youtube_link_props(request):
             )
             youtube_props.append(("view_count", yt_json["view_count"]))
             youtube_props.append(("like_count", yt_json["like_count"]))
-            youtube_props.append(("language", yt_json["language"]))
+            if "language" in yt_json:
+                youtube_props.append(("language", yt_json["language"]))
             youtube_props.append(("upload_date", yt_json["upload_date"]))
-            youtube_props.append(("duration", yt_json["duration_string"]))
+            if "duration_string" in yt_json:
+                youtube_props.append(("duration", yt_json["duration_string"]))
 
             all_youtube_props = []
             for yt_prop in yt_json:
@@ -478,6 +480,13 @@ def keywords(request):
     content_list = KeyWords.get_keyword_data()
     if len(content_list) >= 0:
         p.context['content_list'] = content_list
+
+    objects = KeyWords.objects.all()
+    min_val = objects[0].date_published
+    for aobject in KeyWords.objects.all():
+        if min_val > aobject.date_published:
+            min_val = aobject.date_published
+    p.context['last_date'] = min_val
 
     return p.render("keywords_list.html")
 

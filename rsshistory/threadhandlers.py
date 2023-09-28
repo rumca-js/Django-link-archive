@@ -559,6 +559,8 @@ class RefreshThreadHandler(object):
         pass
 
     def refresh(self, item=None):
+        KeyWords.clear()
+        
         PersistentInfo.create("Refreshing RSS data")
 
         from .controllers import SourceDataController
