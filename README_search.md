@@ -57,18 +57,6 @@ Let's compare that to YouTube. If I search for something I will receive a very l
 
 When I browse for web, all I can do is to find other sources like reddit to find that information. Therefore I have to write as a search "Best blogs", or "Best blogs reddit".
 
-## YouTube comments
-
-Comments are designed for short form discussions. Everything is contained by small boxes, for mobile input. This results in short bursts of emotions, rather than rational discussion.
-
-Secondly YouTube does not allow the user to specify links in comments, possibly to protect the user from spammers. That means we cannot use links any longer, because some of users are abusing this system. Rather than correctly filter out spammers, posting links has been prohibited.
-
-## YouTube subscriptions
-
-YouTube subscription page cannot be used effectively used. Especially if you have more than 30 channels subscribed. The subscription page is easily swampted by videos of the configured channels.
-
-You cannot filter this view at all. What if I want to view only gaming channels? What if I have 'more important' channels which I want to check regularly?
-
 ## Moderation
 
 There always need to be some sort of social media moderation. There are pages designed for devious acts, to spread malware, for espionage, for disinformation.
@@ -93,7 +81,29 @@ This may lead to:
  - suppression of controvertial views
  - boring Internet experience
 
-## Searching for trailers
+## Platform Property rights
+
+When using github you do not own your code. When creating a YouTube channel you do not own your videos.
+
+The company can take down any videos they do not like.
+
+Like it or leave.
+
+YouTube is nearly monopolistic in it's space, so there is no going around it.
+
+## YouTube comments
+
+Comments are designed for short form discussions. Everything is contained by small boxes, for mobile input. This results in short bursts of emotions, rather than rational discussion.
+
+Secondly YouTube does not allow the user to specify links in comments, possibly to protect the user from spammers. That means we cannot use links any longer, because some of users are abusing this system. Rather than correctly filter out spammers, posting links has been prohibited.
+
+## YouTube subscriptions
+
+YouTube subscription page cannot be used effectively used. Especially if you have more than 30 channels subscribed. The subscription page is easily swampted by videos of the configured channels.
+
+You cannot filter this view at all. What if I want to view only gaming channels? What if I have 'more important' channels which I want to check regularly?
+
+## YouTube search filtering
 
 Finding older trailers in YouTube does not work wery well. If I write 'trailers' I am swamped only with new trailers.
 
@@ -101,10 +111,6 @@ When I search for a "trailer" youtube:
  - suggests games, movies, various things. Filtering is limited to expected duration, upload date. I cannot filter game trailers vs movie trailers.
  - there are many ads in search now
  - some trailers are suggested several times at youtube, from various channels. At my setup I have only several youtube channels, which does not spam with same trailers
-
-## Domains
-
-When browsing the internet much of stuff is hosted somewhere. Today I found multiple things hosted on github. A thought occurred: this is not hosted by individuals, therefore it is 'a property' by github, and 'is managed' by github.
 
 # Other analysis of search and algorithms
 
@@ -124,11 +130,3 @@ When browsing the internet much of stuff is hosted somewhere. Today I found mult
  - In self hosting you can be swamped with data, which you will not be able to filter
  - Link rot is real, it is hard to keep up, with what is maintained
  - How to filter sources at self hosting? Which RSS sources are important, and which are not?
-
-# Data analysis
-
-Propositions for data analysis. There are many things we can do with so much data.
-
- - Verify link rot, by checking how many pages are still present
- - Capture small creators, which are quoted quite often (filter mainstream media first)
- - Iterate over links, and check which links are quoted often, maintain network identification. Propose a 'karma' for a link, check which links are most influential
