@@ -13,14 +13,13 @@ Personal link database, with RSS functionality. Similar to Reddit, but completel
 ## Problems with other RSS readers, or apps
 
  - Most RSS clients do not allow manual link input
- - Some programs are not programs from users perspective, but a service: Feedly, Pockets, Readwise Reader. Terms and condition of service can change. This is a product. No strings attached
+ - Some programs are not programs from users perspective, but a service: Feedly, Pockets, Readwise Reader. Their Terms and service can change
  - Most programs fail to provide consistent and exhaustive search ability (NextCloud "News" application, Thunderbird, Feeder Android app, Newsboat Linux app)
  - Most programs do not provide ability to add tag to a link (Thunderbird, Android Feeder app)
  - Scale: Lemmy software is replacement for Reddit, but requires a lot of resources to operate. This project aims to provide "single user" experience
  - Goal: Reddit, Lemmy aim is to provide social media experience, this project aims to grant the ability to create database of links
- - Extensions: In Django project it is relatively easy to add new view
  - License: Reddit is a nice project, but it is not entirely open source
- - Interface: Most of the programs are clients (Thunderbird, Feeder, Newsboat), where it is needed to create app that works as a server, so that it can be managed from all devices in LAN, or in public space, if it is configured to operate in that mode
+ - Interface: Most of the RSS programs are GUI: Thunderbird, Feeder. I wanted a server app, that can be accessed from anywhere
 
 ## Possible use cases
 
@@ -40,24 +39,24 @@ Personal link database, with RSS functionality. Similar to Reddit, but completel
 
 ## Links
 
- - [Screenshots](https://github.com/rumca-js/Django-link-archive/blob/main/README_ui.md).
- - [Installation, configuration](https://github.com/rumca-js/Django-link-archive/blob/main/README_install.md).
+ - [Screenshots](https://github.com/rumca-js/Django-link-archive/blob/main/README_ui.md)
+ - [Installation, configuration](https://github.com/rumca-js/Django-link-archive/blob/main/README_install.md)
  - [Demo app (may, or may not be running actually)](https://renegat0x0.ddns.net/apps/rsshistory/)
- - [Notes about search industry](https://github.com/rumca-js/Django-link-archive/blob/main/README_search.md).
+ - [Notes about search industry](https://github.com/rumca-js/Django-link-archive/blob/main/README_search.md)
  - [Data analysis](https://github.com/rumca-js/Django-link-archive/blob/main/analysis/readme.md)
 
 # How it works?
 
- - You define RSS source in "Sources" page, or you manually add a link in "Sources" page
- - Every day your bookmarks can be exported to a repository, if configured
- - Each link adds domain into 'Domains' pool, if configured
- - Each link adds title of the link into 'KeyWords' pool, if configured
+ - First define a RSS source in "Sources" page, or you manually add a link in "Sources" page
+ - Every day your bookmarks are exported to a repository, if configured
+ - Each new link adds its domain into the 'Domains' pool, if configured
+ - Each new link adds words from its title into the 'KeyWords' pool, if configured
  - You can monitor what kinds of domains were added by the links to you system
  - You can monitor what kind of words generate most buzz
 
-# Import, export data
+# Automatic export
 
-## View data
+## Accessible from views, pages
 
 Most of views contain "Show JSON" button that provides the view data as JSON. This can be used by scripts, for import, export.
 
