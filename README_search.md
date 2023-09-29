@@ -81,7 +81,7 @@ This may lead to:
  - suppression of controvertial views
  - boring Internet experience
 
-## Platform Property rights
+## Content property rights
 
 When using github you do not own your code. When creating a YouTube channel you do not own your videos.
 
