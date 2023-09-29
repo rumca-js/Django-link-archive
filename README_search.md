@@ -13,9 +13,9 @@ Google Search Is Dying [https://dkb.io/post/google-search-is-dying](https://dkb.
 
 If I write "Apple", "Microsoft", "Samsung", "Elon Musk", "Bill Gates", "Love", or 'War', or 'Abortion' I would expect thousands upon thausands of results.
 
-I would like results from CNN, from Fox news, from left, from right, from extremists, from liberals.
+Google provides around 10 to 17 pages, each containing around 10 links each. This gives us 100 to 170 links per search. It is like looking through keyhole at the Internet.
 
-There seems to be no filter, no option in Google Search to go beyond the several pages of results (31 pages for 'News' filter). It is a very small number. It is like looking through keyhole at the Internet
+For other filters like 'news' this number can be changed. The number of results is closer to 31 pages.
 
 ## Myth #2 Google, YouTube, TikTok algorithms provide what is best for you
 
@@ -23,17 +23,21 @@ Corporations monetize your attention. Their goal is to offer you the most distra
 
 Algorithms are set to benefit investors of companies, not the users.
 
-Most of algorithms, like YouTubes's, are based on engagment, on what keeps you hooked. These are not designed to create a well structured database of information. Most do not operate as Wikipedia, but operate as a media outlet. It suggests more 'recent' news, reactions, opinions. It does not propagate scientific news, or data.
+Most of algorithms, like YouTubes's, are based on engagment, on what keeps you hooked. These are not designed to create a well structured database of important information.
+
+Therefore you will not receive important information, but addictive content.
+
+Most do not operate as Wikipedia, but operate as a media outlet. It suggests more 'recent' news, reactions, opinions. It does not propagate scientific news, or data.
 
 ## But Google algorithm is the best!
 
 The Google search algorithm could have been the best 10 years ago, but is it the best righ now?
 
-For example Google, after reaching state of monopoly, could lower it's quality. Will people be able to find out about that?
+Could it change it's algorithm during period of 10 years? Could it downgrade the experience to boost their sales, or clicks to Google provided services?
+
+Will people be able ever to find out about big tech algorithm manipulations?
 
 If Google decreased quality of found entries after the first page. Will anybody be able to find out about that?
-
-Nothing in this world is permament. What about monopoly? When a company reaches a state where there is no competition, then it often stagnates, and does not evolve, or worse, it could lowever quality of their service?
 
 ## Conflict of interests
 
@@ -43,72 +47,59 @@ Are platforms more motivated to cater for big corporations, or to the users? How
 
 Can platforms walk between this line successfully?
 
-Many things are subjected to the ad business model. Everything that is not liked by 'advertisers', or is not 'advertiser' friendly is blocked. This results in an environment not suited for controversial topics.
+Will big tech provide content you need, or content advertisers wish to be sold?
 
-## Google SEO is not for discovery
+## Discovery
 
-Google SEO is more like for who pays better, or designs page to better suit Google intentions.
+Let's say I am interested in blogs. I can search for a blogs, but as a result as I already wrote I will receive around 100 - 200 links. That is a very small number blogs. There are thousands of blogs.
 
+Let's compare that to YouTube. If I search for something I will receive a very long list. As a bonus I have access to reccommended, or similar videos.
 
-YouTube shows 'recommended' videos, TikTok also provide recommended videos. You can find many interesting things which relate to it.
-
-Google search algorithms does not provide such functionality. You cannot find anything intersting, or related to you search.
-
-For example if you searched for blogs, it will not suggest many intersting blogs.
-
-Most of Google results go towards Amazon, Facebook, YouTube, Reddit etc. etc. That is where the investors maney's at.
-
-YouTube and TikTok provide infinite amount of results. You can scroll for a very long time. Google provides you around 10 - 31 pages of results, and that's it.
-
-Google search is not very good for 'discovery'.
-
-You cannot effectively "Find new content" on Google. You may be searching for something particular, it will find you that.
-
-For example: you cannot find new blogs, creators by Google.
+When I browse for web, all I can do is to find other sources like reddit to find that information. Therefore I have to write as a search "Best blogs", or "Best blogs reddit".
 
 ## YouTube comments
 
-YouTube does not allow the user to specify links in comments, possibly to protect the user from spammers. That means we cannot use links any longer, because some of users are abusing this system. Rather than correctly filter out spammers, posting links has been prohibited.
+Comments are designed for short form discussions. Everything is contained by small boxes, for mobile input. This results in short bursts of emotions, rather than rational discussion.
 
-Comments are designed for short form discussions, where everything is contained by small boxes, for mobile input. This results in short bursts of emotions, rather than rational discussion.
+Secondly YouTube does not allow the user to specify links in comments, possibly to protect the user from spammers. That means we cannot use links any longer, because some of users are abusing this system. Rather than correctly filter out spammers, posting links has been prohibited.
 
 ## YouTube subscriptions
 
-Can subscription model be used effectively used? Especially if you have 30 channels subscribed? The subscription page will be easily swampted by many videos of the configured channels.
+YouTube subscription page cannot be used effectively used. Especially if you have more than 30 channels subscribed. The subscription page is easily swampted by videos of the configured channels.
 
-You cannot filter out certain channels from subscriptions view.
+You cannot filter this view at all. What if I want to view only gaming channels? What if I have 'more important' channels which I want to check regularly?
 
 ## Moderation
 
-There always need to be some sort of social media moderation. There are pages designed for malware, or espionage.
+There always need to be some sort of social media moderation. There are pages designed for devious acts, to spread malware, for espionage, for disinformation.
 
 There are also pages designed by small creators who will be blocked because of some arbitrary reasons, or by a mistake.
 
-There is also a possibility of big tech censorship, where some topics will be muted by Google, Apple, and Facebook.
+There is also a possibility of big tech censorship, where some topics will be muted by Google, Apple, and Facebook because are politicised.
 
 Who and why decides what exists on the Internet?
 
+Is 'Oversight board' in a company enough? In society we have three forms of power: legislature, an executive, and a judicary. It seems that for the Internet a company providing platform has all the power in hand. It decides what is information, and makes the action.
+
+Too much power in one hand leads to abuse of power.
+
 ## Platform guidelines
 
-For social media platform to operate it needs some guidelines, but:
- - the guidelines need to be vague enough, to give moderators leeway to moderate anybody (for example moderator can ban somebody because of 'hate speech' argument. However often it is not written what exactly hate speech is)
- - the guidelines need to apply to everybody. It is like to have a big family, and you want to make everybody happy. It won't happen. Therefore you need to cater for most of them, and ignore some of other people
- - because guidelines decide what is 'acceptable' and 'not acceptable' it establishes verbose, or not verbose set of rules. It establishes some sort of morality, and things it considers 'virtues'. It also needs some sort of "Goldstein" personality. Something for the people to understand what is bad, what not to follow. These virtues might be imaginary, not scientific. Social platforms are big enough just to force their opinions
+Social media platforms need guidelines, but:
+ - The guidelines are often vague enough, to give moderators leeway to moderate anybody (for example moderator can ban somebody because of 'hate speech' argument. However often it is not written what exactly hate speech is)
+ - The guidelines use minimal common denominator. It is like to have a big family, and you want to make everybody happy. It won't happen. Therefore you need to cater for most of them, and ignore some of other people
 
 This may lead to:
  - suppression of controvertial views
  - boring Internet experience
 
-Who controls social media, if their guidelines are moral and correctly implemented?
-
 ## Searching for trailers
 
-I have found some scenarios in which I was able to receive better results for trailers
+Finding older trailers in YouTube does not work wery well. If I write 'trailers' I am swamped only with new trailers.
 
-When I search for "Trailer" youtube:
- - suggests games, movies, various things. I can apply some filters, I can select expected duration, upload date. I cannot filter game trailers vs movie trailers.
-At my setup I can filter by a source type and subtype. At my setup I have category "YouTube" and subcategory "Movies", and "Games".
- - suggests using it's own criteria. At this engine I can browse by date, to see which trailers are 'new' and which are not
+When I search for a "trailer" youtube:
+ - suggests games, movies, various things. Filtering is limited to expected duration, upload date. I cannot filter game trailers vs movie trailers.
+ - there are many ads in search now
  - some trailers are suggested several times at youtube, from various channels. At my setup I have only several youtube channels, which does not spam with same trailers
 
 ## Domains
