@@ -75,6 +75,8 @@ Displays all available domains.
 
 # Forms
 
+Most of forms are designed to use Django Model forms.
+
 ## New entry form
 
 There are two stages of adding a new link:
@@ -82,7 +84,11 @@ There are two stages of adding a new link:
  - for the link all data are obtained
  - then in second form you will be asked to make your manual edits
 
+## Simple UI for adding link
+
 ![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/entry_new_simple.PNG)
+
+## Advanced UI for adding link
 
 ![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/entry_new.PNG)
 
