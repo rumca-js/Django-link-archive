@@ -3,27 +3,17 @@ Personal link database, with RSS functionality. Similar to Reddit, but completel
 # Features
 
  - Local data, no algorithms, no advertisements
- - Web GUI, accessible from anywhere (LAN, public, however it is configured)
- - Minimal installation, integrator may choose however to use production environment, with a good Database engine. Just as it is supported by Django. I am using SQLite without any problems.
- - Sources management: adding, removing, configuration
- - Link management: manual adding, removing, configuration, bookmark support, tag support, admin user comments
- - RSS feed support
- - Search ability (Google-like), by language, author, tags
  - Minimal aesthetic: no distraction, compact layout
- - Automatic git export, RSS source import
- - Support for web archive: archive.org
- - Ability to extend, to provide custom plugins, parse HTML pages
- - Configurable: lists, timeouts
- - Since it is a Django page, you can show it to your friends (if you like)
- - You can have all your links at one place. You do not have to navigate several platforms, you go from your own instance outside.
+ - Web GUI, accessible from anywhere: LAN, public, however it is configured
+ - Minimal installation, integrator may choose however to use production environment, with a good Database engine. Just as it is supported by Django. I am using SQLite without any problems.
+ - Google-like Link search ability
+ - RSS feed support
+ - You can gather information about: links, domains, feeds
 
 ## Problems with other RSS readers, or apps
 
  - Most RSS clients do not allow manual link input
- - Some programs are not programs from users perspective, but a service:
-     * Feedly
-     * Pockets
-     * Readwise Reader
+ - Some programs are not programs from users perspective, but a service: Feedly, Pockets, Readwise Reader. Terms and condition of service can change. This is a product. No strings attached
  - Most programs fail to provide consistent and exhaustive search ability (NextCloud "News" application, Thunderbird, Feeder Android app, Newsboat Linux app)
  - Most programs do not provide ability to add tag to a link (Thunderbird, Android Feeder app)
  - Scale: Lemmy software is replacement for Reddit, but requires a lot of resources to operate. This project aims to provide "single user" experience
@@ -42,26 +32,28 @@ Personal link database, with RSS functionality. Similar to Reddit, but completel
 
 ## Suite of projects
 
- - Captured using Django application, program: [https://github.com/rumca-js/Django-link-archive](https://github.com/rumca-js/Django-link-archive)
- - Bookmarked links [https://github.com/rumca-js/RSS-Link-Database](https://github.com/rumca-js/RSS-Link-Database)
- - daily RSS Git repository for the year 2023 [https://github.com/rumca-js/RSS-Link-Database-2023](https://github.com/rumca-js/RSS-Link-Database-2023)
- - daily RSS Git repository for the year 2022 [https://github.com/rumca-js/RSS-Link-Database-2022](https://github.com/rumca-js/RSS-Link-Database-2022)
- - daily RSS Git repository for the year 2021 [https://github.com/rumca-js/RSS-Link-Database-2021](https://github.com/rumca-js/RSS-Link-Database-2021)
- - daily RSS Git repository for the year 2020 [https://github.com/rumca-js/RSS-Link-Database-2020](https://github.com/rumca-js/RSS-Link-Database-2020)
+ - [Bookmarked links](https://github.com/rumca-js/RSS-Link-Database)
+ - [daily RSS Git repository for the year 2023](https://github.com/rumca-js/RSS-Link-Database-2023)
+ - [daily RSS Git repository for the year 2022](https://github.com/rumca-js/RSS-Link-Database-2022)
+ - [daily RSS Git repository for the year 2021](https://github.com/rumca-js/RSS-Link-Database-2021)
+ - [daily RSS Git repository for the year 2020](https://github.com/rumca-js/RSS-Link-Database-2020)
 
 ## Links
 
- - UI, with snapshots: [https://github.com/rumca-js/Django-link-archive/blob/main/README_ui.md](https://github.com/rumca-js/Django-link-archive/blob/main/README_ui.md).
- - Installation, and configuration: [https://github.com/rumca-js/Django-link-archive/blob/main/README_install.md](https://github.com/rumca-js/Django-link-archive/blob/main/README_install.md).
- - Demo on development env (may, or may not be running actually): [https://renegat0x0.ddns.net/apps/rsshistory/](https://renegat0x0.ddns.net/apps/rsshistory/)
- - Inspiration, notes about search algorithms [https://github.com/rumca-js/Django-link-archive/blob/main/README_search.md](https://github.com/rumca-js/Django-link-archive/blob/main/README_search.md).
- - Data analysis: [https://github.com/rumca-js/Django-link-archive/blob/main/analysis/readme.md](https://github.com/rumca-js/Django-link-archive/blob/main/analysis/readme.md)
+ - [Screenshots](https://github.com/rumca-js/Django-link-archive/blob/main/README_ui.md).
+ - [Installation, configuration](https://github.com/rumca-js/Django-link-archive/blob/main/README_install.md).
+ - [Demo app (may, or may not be running actually)](https://renegat0x0.ddns.net/apps/rsshistory/)
+ - [Notes about search industry](https://github.com/rumca-js/Django-link-archive/blob/main/README_search.md).
+ - [Data analysis](https://github.com/rumca-js/Django-link-archive/blob/main/analysis/readme.md)
 
-# Features
+# How it works?
 
- - Program can gather all domains from incoming links. These data can be used to get to know more places in the Internet. Google suck at 'discovering new places' in the internet. It is only a search engine after all.
- - Program can gather keywords from incoming links. It uses only 'title' of link. Unfortunately description cannot be used reliably, as it is often cluttered with advertisments, affiliate links, and other uninteresting data. Counting keywrods can show you which words generate most buzz. With it you can check what is really happening in the world.
- - Analyze yourself! Check which pages you visit, check which domains, etc.
+ - You define RSS source in "Sources" page, or you manually add a link in "Sources" page
+ - Every day your bookmarks can be exported to a repository, if configured
+ - Each link adds domain into 'Domains' pool, if configured
+ - Each link adds title of the link into 'KeyWords' pool, if configured
+ - You can monitor what kinds of domains were added by the links to you system
+ - You can monitor what kind of words generate most buzz
 
 # Import, export data
 

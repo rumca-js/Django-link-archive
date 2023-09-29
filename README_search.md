@@ -27,7 +27,7 @@ Most of algorithms, like YouTubes's, are based on engagment, on what keeps you h
 
 ## But Google algorithm is the best!
 
-The algorithm could have been the best 10 years ago, but is it the best righ now?
+The Google search algorithm could have been the best 10 years ago, but is it the best righ now?
 
 For example Google, after reaching state of monopoly, could lower it's quality. Will people be able to find out about that?
 
@@ -37,33 +37,30 @@ Nothing in this world is permament. What about monopoly? When a company reaches 
 
 ## Conflict of interests
 
-Platforms have investors, and users. It must cater to both: investors and users. Some of interests are mutually exclusive. Are platforms more motivated to cater for big corporations, or to the users?
+Platforms need to serve investors and users. These interests are sometimes mutually exclusive.
 
-Can platforms walk between those lines successfully?
+Are platforms more motivated to cater for big corporations, or to the users? How much can they degrade user experience, until users flee to other services?
 
-## Small creators discovery
+Can platforms walk between this line successfully?
 
-Google search algorithms are not that great to see new creators online.
+Many things are subjected to the ad business model. Everything that is not liked by 'advertisers', or is not 'advertiser' friendly is blocked. This results in an environment not suited for controversial topics.
 
-TikTok is able to show new users data very easily. YouTube also shows viedos from new creators. What about Google search? Does not show new blogs?
+## Google SEO is not for discovery
+
+Google SEO is more like for who pays better, or designs page to better suit Google intentions.
+
+
+YouTube shows 'recommended' videos, TikTok also provide recommended videos. You can find many interesting things which relate to it.
+
+Google search algorithms does not provide such functionality. You cannot find anything intersting, or related to you search.
+
+For example if you searched for blogs, it will not suggest many intersting blogs.
 
 Most of Google results go towards Amazon, Facebook, YouTube, Reddit etc. etc. That is where the investors maney's at.
 
-## Recommendations are based on a social score
+YouTube and TikTok provide infinite amount of results. You can scroll for a very long time. Google provides you around 10 - 31 pages of results, and that's it.
 
-Sure, we criticise China social credit score, but we already live in such system. Many of the platforms keep information about users, like 'karma'. Essentially it is a social score, and that is not a bad thing.
-
-In a place with multiple users you need to decide which users are bad actors, which are trolls, and which are just normal users. Moderation needs to happen.
-
-The problem rises, when
- - an elite, maybe moderators twist idea of what is accepted and not accepted on platform
- - contents is politically censored, motivated, or platforms starts spreading political propaganda
-
-I have some questions about that model:
- - Will people be able to find out that the 'truth' visible on a platform is twisted? Are social platforms smart enough to be able to hide proof of any misdoings?
- - Will people be shadowbanned for inconvenient opinions?
-
-## Google is for SEO not for discovery
+Google search is not very good for 'discovery'.
 
 You cannot effectively "Find new content" on Google. You may be searching for something particular, it will find you that.
 
@@ -73,11 +70,23 @@ For example: you cannot find new blogs, creators by Google.
 
 YouTube does not allow the user to specify links in comments, possibly to protect the user from spammers. That means we cannot use links any longer, because some of users are abusing this system. Rather than correctly filter out spammers, posting links has been prohibited.
 
+Comments are designed for short form discussions, where everything is contained by small boxes, for mobile input. This results in short bursts of emotions, rather than rational discussion.
+
 ## YouTube subscriptions
 
-Is very limited. Cannot be used effectively if a source with many videos per day. You will be swampted by a such subscription.
+Can subscription model be used effectively used? Especially if you have 30 channels subscribed? The subscription page will be easily swampted by many videos of the configured channels.
 
-You cannot filter out certain channels from subscriptions.
+You cannot filter out certain channels from subscriptions view.
+
+## Moderation
+
+There always need to be some sort of social media moderation. There are pages designed for malware, or espionage.
+
+There are also pages designed by small creators who will be blocked because of some arbitrary reasons, or by a mistake.
+
+There is also a possibility of big tech censorship, where some topics will be muted by Google, Apple, and Facebook.
+
+Who and why decides what exists on the Internet?
 
 ## Platform guidelines
 
@@ -116,7 +125,7 @@ When browsing the internet much of stuff is hosted somewhere. Today I found mult
  - [Google Manipulates Search Results to Hide Sensitive Subjects: Report](https://www.businessinsider.com/google-manipulates-search-results-report-2019-11?IR=T)
  - [Thoughty2: The Internet Has Died](https://www.youtube.com/watch?v=kL8rHf_idt0)
  - [Enrico Tartarotti: Why Google Search Has Become So Bad](https://www.youtube.com/watch?v=48AOOynnmqU)
- - Ryan George What Google Search Is Like In 2022 [https://www.youtube.com/watch?v=NT7_SxJ3oSI](https://www.youtube.com/watch?v=NT7_SxJ3oSI)
+ - [Ryan George What Google Search Is Like In 2022](https://www.youtube.com/watch?v=NT7_SxJ3oSI)
 
 ## Self hosting
 

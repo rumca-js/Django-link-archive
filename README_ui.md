@@ -1,35 +1,39 @@
-View all screenshots: [https://github.com/rumca-js/Django-link-archive/tree/main/screenshots](https://github.com/rumca-js/Django-link-archive/tree/main/screenshots).
-
 # Index
 
-Displays total number of entries, sources, and bookmarks.
+Displays index page. Can be customized by a template file
 
 ![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/index.PNG)
+
+# Link lists
+
+Links can be displayed
+ - standard
+ - lists with buttons
+ - similar to YouTube
+
+![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/entries_list_youtube.PNG)
+
+![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/entries_list_standard.PNG)
+
+![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/entries_list_buttons.PNG)
 
 # Search form
 
 Allows to search links.
 
-![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/search_form.PNG)
+![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/search_form_omni.PNG)
+
+There are also variations of it
+
+![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/search_form_whats_new.PNG)
 
 # Entry, link details
 
-Displays entry details.
-
-provides ability to:
- - edit, bookmark, tag, remove, hide link
- - download music, video, or update link data if it is YouTube link
- - view stored snaptshots in archive.org webpage, and make a new snapshot
+Link details view.
 
 ![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/entry_details.PNG)
 
-# Tags
-
-Displays all available tags.
-
-![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/tag_view.PNG)
-
-# Soure list
+# Source list
 
 Displays available sources.
 
@@ -45,25 +49,42 @@ Provides ability to:
 
 ![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/source_details.PNG)
 
-# Lists are configurable
+# Tags
 
-Display as lines with buttons
-![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/entries_list_buttons.PNG)
+Displays all available tags.
 
-Display as youtube
-![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/entries_list_youtube.PNG)
+![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/tag_view.PNG)
+
+# Keywords
+
+Displays all available keywords. The default time span of keywords is 1 day.
+
+![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/keywords.PNG)
+
+# Domains
+
+Displays all available domains.
+
+![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/domains.PNG)
 
 # Forms
 
 ## New entry form
 
-Allows to add new entry, link. When adding youtube link all fields are set automatically.
+There are two stages of adding a new link:
+ - first you specify a link inside of a simple input form
+ - for the link all data are obtained
+ - then in second form you will be asked to make your manual edits
+
+![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/entry_new_simple.PNG)
 
 ![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/entry_new.PNG)
 
 ## New source form
 
 Allows to add new source.
+
+Similarly to entries, first you have to specify a link to feed, then you can make additional changes.
 
 Currently supported sources:
  - RSS
@@ -82,15 +103,11 @@ Configuration options:
  - sources refresh period - how often sources are checked for new links. Each source has its own refresh period.
  - git options allow to provide automated export
 
-![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/configuration_page.PNG)
+![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/configuration_form.PNG)
 
 ## Server status
 
-Provides server status, information about threads, logged information, import and export logs.
-
-Note: The administrator is required to start threads through link (automated), or through button "Start threads". This was implemented for scenario where django internal server operates privately, and Apache django setup uses database as readonly preview for public.
-
-Server opertion is split between threads and background jobs. Background jobs is a table of 'jobs' that should be handled. Each task can process multiple types of jobs. For example 'write' task can write bookmarks, daily data, download music, download videos, etc.
+Provides server status.
 
 ![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/server_status.PNG)
 
@@ -99,3 +116,15 @@ Server opertion is split between threads and background jobs. Background jobs is
 Provides user configuration. Each user can configure their view to be shown differently.
 
 ![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/user_configuration_page.PNG)
+
+## Logs
+
+All events are stored for maintanance.
+
+![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/logs.PNG)
+
+## Background jobs
+
+Background jobs
+
+![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/background_jobs.PNG)
