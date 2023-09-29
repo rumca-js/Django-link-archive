@@ -6,14 +6,20 @@ Displays index page. Can be customized by a template file
 
 # Link lists
 
-Links can be displayed
- - standard
+Available link display types
+ - standard view
  - lists with buttons
  - similar to YouTube
 
+## YouTube list
+
 ![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/entries_list_youtube.PNG)
 
+## Standard list
+
 ![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/entries_list_standard.PNG)
+
+## List with buttons
 
 ![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/entries_list_buttons.PNG)
 
