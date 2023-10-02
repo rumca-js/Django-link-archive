@@ -1,0 +1,307 @@
+/* Layout */
+
+.sidebar-nav {
+    margin-top: 20px;
+    padding: 0;
+    list-style: none;
+}
+
+.body-style {
+    color: black;
+    background-color:#ffffff
+}
+
+.page-body {
+    background-color:#F9F9F9
+}
+
+a:link {
+    color: blue;
+}
+
+a:visited {
+    color: blue;
+}
+
+a:hover {
+    color: blue;
+}
+
+a:active {
+    color: blue;
+}
+
+input {
+	/* background-color: #e9e9e9; */
+    display: block;
+    text-align: left;
+    text-decoration: none;
+    border-radius: 10px;
+    box-shadow: none;
+}
+
+select {display: block;} 
+textarea {display: block;}
+
+hr {
+    margin: 0px;
+    padding: 0px;
+}
+
+.base-button-container a:link, .base-button-container a:visited, .base-button-container a:active {
+}
+
+.base-button-container a:hover {
+}
+
+.linklist a:link, .linklist a:visited, .linklist a:active {
+}
+
+.linklist a:hover {
+}
+
+.highlight_background {
+}
+
+/* Basic Content elements */
+
+.mainbutton-icon {
+    width:30px;
+}
+
+.error-text {
+    color : red;
+}
+
+.content-icon {
+    width:30px;
+    float: left;
+}
+.content-thumbnail {
+    width:11%;
+    float: left;
+}
+.content-big-thumbnail {
+    width:20%;
+    float: left;
+}
+
+.mainbutton-container {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+}
+
+.mainbutton, .mainbutton:link, .mainbutton:visited, .mainbutton:active {
+    color : #373737;
+    background-color: #e9e9e9;
+    padding: 1% 2%;
+    text-decoration: none;
+    border-radius: 10px;
+    margin : 1px;
+}
+
+.mainbutton:hover {
+    color : black;
+    background-color: #e0e0e0;
+}
+
+.simplebutton, .simplebutton:link, .simplebutton:active, .simplebutton:visited  {
+    color : #373737;
+    background-color: #e9e9e9;
+    padding: 3px 15px;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 10px;
+    box-shadow: 1px 1px grey;
+    display: inline-block;
+    margin: 1px;
+    border: 0px;
+}
+
+.simplebutton:hover  {
+    color : black;
+    background-color: #e0e0e0;
+}
+
+.simplebuttondisabled {
+    color: grey;
+    box-shadow: 0px 0px grey;
+}
+.simplebuttondisabled:hover {
+    color: grey;
+    background-color: #e9e9e9;
+}
+
+
+.float-button {
+    display:inline-block;
+    margin: 2px;
+}
+
+.simplebuttoninline {
+    display: contents;
+}
+
+.contentbuttonmenu {
+    display: block;
+}
+
+/* List containers */
+
+.container_standard {
+    margin-top: 20px;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+}
+.container_clickable-tags {
+    margin-top: 20px;
+    padding: 0;
+    list-style: none;
+}
+.container_line-and-buttons {
+    margin-top: 20px;
+    padding: 0;
+    list-style: none;
+}
+.container_youtube-thumbnails {
+    margin-top: 20px;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.element_standard, .element_standard:link, .element_standard:visited {
+    color : black;
+    padding: 0px 15px;
+    text-align: left;
+    text-decoration: none;
+    margin-bottom:3px;
+}
+
+.element_standard:hover, .element_standard:active{
+    color: blue;
+    background-color: #BFD8FF;
+}
+
+.element_standard_selected, .element_standard_selected:link .element_standard_selected:visited, .element_standard_selected:active {
+    color : red;  /* not inherited */
+    background-color: #BFD8FF;
+    text-decoration: none;
+}
+
+.element_standard_selected:hover {
+    color: white;
+    background-color: blue;
+}
+
+.element_clickable-tags, .element_clickable-tags:link, .element_clickable-tags:visited, .element_clickable-tags:active {
+    padding: 0px 15px;
+    text-align: left;
+    text-decoration: none;
+    margin-bottom:3px;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.element_clickable-tags a {
+    text-decoration: none;
+}
+
+.element_clickable-tags:hover {
+    color: blue;
+    background-color: #f4f4f4;
+}
+
+.element_clickable-tags_selected, .element_clickable-tags_selected:link, .element_clickable-tags_selected:active, .element_clickable-tags_selected:visited {
+}
+
+.element_line-and-buttons, .element_line-and-buttons:link, .element_line-and-buttons:active, .element_line-and-buttons:visited {
+    padding: 0px 15px;
+    text-align: left;
+    text-decoration: none;
+    margin-bottom:3px;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.element_line-and-buttons a {
+    text-decoration: none;
+}
+
+.element_line-and-buttons:hover {
+    color: blue;
+    background-color: #f4f4f4;
+}
+
+.element_line-and-buttons_selected, .element_line-and-buttons_selected:link, .element_line-and-buttons_selected:visited, .element_line-and-buttons_selected:active {
+}
+
+.element_youtube-thumbnails, .element_youtube-thumbnails:link, .element_youtube-thumbnails:active: .element_youtube-thumbnails:visited {
+    text-overflow: ellipsis; 
+    max-width: 100%; 
+    min-width: 100%;
+    color: black;
+    text-decoration: none;
+    margin: 5px;
+    display:flex;
+    flex-direction:column;
+}
+
+.element_youtube-thumbnails a {
+    text-decoration: none;
+}
+
+.element_youtube-thumbnails:hover {
+    color: black;
+    background-color: #f4f4f4;
+}
+
+.element_youtube-thumbnails_selected, .element_youtube-thumbnails_selected:link, .element_youtube-thumbnails_selected:active, .element_youtube-thumbnails_selected:visited {
+}
+
+/* end of view elements */
+
+.link-list-thumbnail {
+    width: 100%;
+}
+.link-list-item-title {
+    font-weight: bold;
+    text-align: left;
+    text-decoration: none;
+}
+
+.link-list-item-description {
+    font-style:italic;
+}
+
+/* video box, youtube player */
+
+.youtube_player_container {
+    position: relative;
+    width: 100%;
+    padding-bottom: 46.25%;
+    /* background-color: yellow; */
+}
+.youtube_player_frame {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+
+/* Configuration pages */
+.management-box {
+    /* color: grey;*/
+    margin: 5px;
+    padding: 5px;
+    background-color: #f4f4f4;
+    /* border: solid 1px;
+    border-color: grey; */
+    /* box-shadow: 1px 1px grey; */
+}

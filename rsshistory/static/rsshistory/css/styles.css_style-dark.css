@@ -1,0 +1,320 @@
+/* Layout */
+
+.sidebar-nav {
+    margin-top: 20px;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+}
+
+.body-style {
+    color: white;
+    background-color:#000000
+}
+
+.page-body {
+    background-color:#000000
+}
+
+a:link {
+    color: blue;
+}
+
+a:visited {
+    color: green;
+}
+
+a:hover {
+    color: green;
+}
+
+a:active {
+    color: green;
+}
+
+input {
+    /*TBD replace with button container style color: #e9e9e9;*/
+    /* background-color: #e9e9e9; */
+    display: block;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 10px;
+    box-shadow: 1px 1px grey;
+}
+
+select {
+    display: block;
+}
+
+textarea {
+    display: block;
+}
+
+hr {
+    margin: 0px;
+    padding: 0px;
+}
+
+.base-button-container a:link, .base-button-container a:visited, .base-button-container a:active {
+}
+
+.base-button-container a:hover {
+}
+
+.link-list a{
+}
+
+.link-list a:link, .link-list a:visited, .link-list a:active {
+}
+
+.link-list a:hover {
+}
+
+.highlight_background {
+}
+
+/* Basic Content elements */
+
+.mainbutton-icon {
+    width:20px;
+}
+
+.error-text {
+    color : red;
+}
+
+.content-icon {
+    width:20px;
+    float: left;
+}
+
+.content-thumbnail {
+    width:60px;
+    float: left;
+}
+
+.content-big-thumbnail {
+    width:150px;
+    float: left;
+}
+
+.mainbutton-container {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    flex-direction: column;
+}
+
+.mainbutton, .mainbutton:link, .mainbutton:visited, .mainbutton:active {
+    color : #373737;
+    background-color: #7f7f7f;
+    padding: 3px 12px;
+    text-decoration: none;
+    display: inline-block;
+    border-radius: 10px;
+    margin: 1px;
+}
+
+.mainbutton:hover {
+    color : black;
+    background-color: #95ce8d;
+}
+
+.simplebutton, .simplebutton:link, .simplebutton:active, .simplebutton:visited  {
+    color : #373737;
+    background-color: #7f7f7f;
+    padding: 3px 15px;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 10px;
+    box-shadow: 1px 1px grey;
+    display: inline-block;
+    margin: 1px;
+    border: 0px;
+}
+
+.simplebutton:hover  {
+    color : black;
+    background-color: #95ce8d;
+}
+
+.simplebuttondisabled {
+    color: grey;
+    background-color: #7f7f7f;
+    box-shadow: 0px 0px grey;
+}
+
+.simplebuttondisabled:hover {
+    color: grey;
+    background-color: #e9e9e9;
+}
+
+.float-button {
+    display:inline-block;
+    margin: 2px;
+}
+
+.simplebuttoninline {
+    display: contents;
+}
+
+.contentbuttonmenu {
+    display: block;
+}
+
+/* List containers */
+
+.container_standard {
+    margin-top: 20px;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch
+}
+
+.container_clickable-tags {
+    margin-top: 20px;
+    padding: 0;
+    list-style: none;
+}
+
+.container_line-and-buttons {
+    margin-top: 20px;
+    padding: 0;
+    list-style: none;
+}
+
+.container_youtube-thumbnails {
+    margin-top: 20px;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.element_standard, .element_standard:link, .element_standard:visited {
+    color : #ececec;
+    padding: 0px 15px;
+    text-align: left;
+    text-decoration: none;
+    margin-bottom:3px;
+}
+
+.element_standard:hover, .element_standard:active{
+    color: blue;
+    background-color: #95ce8d;
+}
+
+.element_standard_selected, .element_standard_selected:link .element_standard_selected:visited, .element_standard_selected:active {
+    color : red;  /* not inherited */
+    background-color: #355035;
+    text-decoration: none;
+}
+
+.element_standard_selected:hover {
+    color: white;
+    background-color: green;
+}
+
+.element_clickable-tags, .element_clickable-tags:link, .element_clickable-tags:visited, .element_clickable-tags:active {
+    color : #373737;
+    background-color: #e9e9e9;
+    padding: 0px 15px;
+    text-align: left;
+    text-decoration: none;
+    margin-bottom:3px;
+}
+
+.element_clickable-tags a {
+    text-decoration: none;
+}
+
+.element_clickable-tags:hover {
+    color: blue;
+    background-color: #f4f4f4;
+}
+
+.element_clickable-tags_selected, .element_clickable-tags_selected:link, .element_clickable-tags_selected:active, .element_clickable-tags_selected:visited {
+}
+
+.element_line-and-buttons, .element_line-and-buttons:link, .element_line-and-buttons:active, .element_line-and-buttons:visited {
+    color : #373737;
+    background-color: #e9e9e9;
+    padding: 0px 15px;
+    text-align: left;
+    text-decoration: none;
+    margin-bottom:3px;
+}
+.element_line-and-buttons a {
+    text-decoration: none;
+}
+.element_line-and-buttons a:hover {
+    color: blue;
+    background-color: #f4f4f4;
+}
+
+.element_line-and-buttons_selected, .element_line-and-buttons_selected:link, .element_line-and-buttons_selected:visited, .element_line-and-buttons_selected:active {
+}
+
+.element_youtube-thumbnails, .element_youtube-thumbnails:link, .element_youtube-thumbnails:active: .element_youtube-thumbnails:visited {
+    color : #373737;
+    background-color: #e9e9e9;
+    text-overflow: ellipsis; 
+    max-width: 18%; 
+    min-width: 18%; 
+    width: auto; 
+    text-decoration: none;
+    margin: 5px;
+    display:flex;
+    flex-direction:column;
+}
+.element_youtube-thumbnails a {
+    text-decoration: none;
+}
+.element_youtube-thumbnails:hover {
+    color: black;
+    background-color: #f4f4f4;
+}
+.element_youtube-thumbnails_selected, .element_youtube-thumbnails_selected:link, .element_youtube-thumbnails_selected:active, .element_youtube-thumbnails_selected:visited {
+}
+
+/* end of view elements */
+
+.link-list-thumbnail {
+    width: 10%;
+}
+.link-list-item-title {
+    font-weight: bold;
+    text-align: left;
+    text-decoration: none;
+}
+
+.link-list-item-description {
+    font-style:italic;
+}
+
+/* video box, youtube player */
+
+.youtube_player_container {
+    position: relative;
+    width: 80%;
+    padding-bottom: 46.25%;
+    /* background-color: yellow; */
+}
+.youtube_player_frame {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+
+/* Configuration pages */
+.management-box {
+    margin: 5px;
+    padding: 5px;
+    background-color: #f4f4f4;
+}
