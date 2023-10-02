@@ -4,7 +4,6 @@ from .entries import (
     ArchiveLinkDataModel,
     BaseLinkDataModel,
     BaseLinkDataController,
-    KeyWords,
 )
 from .sources import (
     SourceDataModel,
@@ -28,4 +27,7 @@ from .domains import (
     DomainsMains,
     DomainCategories,
     DomainSubCategories,
+)
+from .keywords import (
+    KeyWords,
 )

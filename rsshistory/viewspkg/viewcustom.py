@@ -334,41 +334,7 @@ def test_page(request):
     if data is not None:
         return data
 
-    summary_text = ""
-
-    from ..models import KeyWords
-    keys = KeyWords.objects.all()
-    for key in keys:
-        if not KeyWords.is_valid(key.keyword):
-            key.delete()
-        if KeyWords.is_common(key.keyword):
-            key.delete()
-
-    #date_range = DateUtils.get_range4day("2023-08-31")
-    #links = LinkDataController.objects.filter(
-    #    date_published__range=date_range, link__icontains="youtube.com/watch?v"
-    #)
-
-    #for link in links:
-    #    print("Fixing:{} {} {}".format(link.title, link.link, link.date_published))
-    #    fix_reset_youtube_link_details(link.id)
-
-    # from datetime import datetime
-    # from ..models import SourceExportHistory
-
-    # input_date = datetime.strptime("29/08/2023", "%d/%m/%Y")
-    # exps = SourceExportHistory.objects.filter(date=input_date)
-    # exps.delete()
-
-    # from ..threadhandlers import ImportSourcesJobHandler
-
-    # handler = ImportSourcesJobHandler()
-    # handler.process()
-
-    # LinkDataController.move_old_links_to_archive()
-
-    # items = LinkDataController.objects.filter(source="https://pluralistic.net/feed")
-    # items.delete()
+    summary_text = "test page"
 
     p.context["summary_text"] = summary_text
 

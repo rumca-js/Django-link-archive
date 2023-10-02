@@ -85,7 +85,7 @@ class UserConfigForm(forms.ModelForm):
 
     class Meta:
         model = UserConfig
-        fields = ["show_icons", "thumbnails_as_icons", "small_icons", "display_type"]
+        fields = ["show_icons", "thumbnails_as_icons", "small_icons", "display_type", "display_style"]
         # fields = ['show_icons', 'thumbnails_as_icons', 'small_icons', 'display_type', 'theme', 'links_per_page']
         # widgets = {
         # }

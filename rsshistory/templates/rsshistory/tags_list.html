@@ -7,7 +7,7 @@
     <a href="{% url 'rsshistory:entries-untagged' %}" class="simplebutton">Untagged bookmarks</a>
     {% if user.is_staff %}
     <a href="{% url 'rsshistory:tag-rename' %}" class="simplebutton">Rename tag</a>
-    <a href="{% url 'rsshistory:tag-remove-form' %}" class="simplebutton">Tag remove</a>
+    <a href="{% url 'rsshistory:tag-remove-form' %}" class="simplebutton">Remove tag</a>
     {% endif %}
 </div>
 

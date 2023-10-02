@@ -29,9 +29,7 @@
         <img src="{% static 'rsshistory/icons/icons8-letters-96.png' %}" class="mainbutton-icon" />
         Keywords</a>
     {% endif %}
-</div>
 <hr>
-<div class="mainbutton-container">
     {% if user.is_staff %}
 
     <a href="{% url 'rsshistory:admin-page' %}" class="mainbutton" title="Admin">

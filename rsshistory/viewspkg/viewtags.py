@@ -162,7 +162,7 @@ def tag_remove(request, pk):
     entry = LinkTagsDataModel.objects.get(id=pk)
     entry.delete()
 
-    return HttpResponseRedirect(reverse("{}:tag-show-all".format(LinkDatabase.name)))
+    return HttpResponseRedirect(reverse("{}:tags-show-all".format(LinkDatabase.name)))
 
 
 def tag_remove_form(request):
@@ -182,7 +182,7 @@ def tag_remove_form(request):
             tags.delete()
 
             return HttpResponseRedirect(
-                reverse("{}:tag-show-all".format(LinkDatabase.name))
+                reverse("{}:tags-show-all".format(LinkDatabase.name))
             )
 
         p.context["summary_text"] = "Invalid form"

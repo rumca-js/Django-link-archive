@@ -8,7 +8,7 @@
 <form action="{{form.action_url}}" method="{{form.method}}">
     {% csrf_token %}
     {{ form }}
-    <input type="submit" value="Submit">
+    <input type="submit" value="Submit" class="simplebutton">
 </form>
 
 {% endblock %}

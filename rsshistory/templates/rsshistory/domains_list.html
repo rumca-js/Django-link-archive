@@ -1,8 +1,12 @@
 {% extends base_generic %}
+{% load static %}
 {% block content %}
 
 <div class="contentbuttonmenu">
     <a href="javascript:history.back()" class="simplebutton">Go Back</a>
+    <a href="{% url 'rsshistory:domains' %}" class='simplebutton'>
+        <img src="{% static 'rsshistory/icons/icons8-start-100.png' %}" class="content-icon" />
+        Reset filters</a>
     {% if user.is_staff %}
     <a href="{% url 'rsshistory:domain-add' %}" title="Add new domain" class="simplebutton">Add</a>
     <a href="{% url 'rsshistory:domains-category-list' %}" title="Shows categories" class="simplebutton">View categories</a>
@@ -15,7 +19,7 @@
      {{ filter_form }}
      <tr>
          <td>
-             <input type="submit" value="Search">
+             <input type="submit" value="Search" class="simplebutton">
          </td>
      </tr>
      </table>

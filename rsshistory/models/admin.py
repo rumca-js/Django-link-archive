@@ -85,22 +85,30 @@ class ConfigurationEntry(models.Model):
 
 
 class UserConfig(models.Model):
-    THEME_TYPE_CHOICES = (
-        ("light", "light"),
-        ("dark", "dark"),
+    DISPLAY_STYLE_LIGHT = "style-light"
+    DISPLAY_STYLE_DARK = "style-dark"
+
+    STYLE_TYPES = (
+        (DISPLAY_STYLE_LIGHT, DISPLAY_STYLE_LIGHT),             #
+        (DISPLAY_STYLE_DARK, DISPLAY_STYLE_DARK),               #
     )
 
+    DISPLAY_TYPE_STANDARD = "standard"
+    DISPLAY_TYPE_CLICKABLE_TAGS = "clickable-tags"
+    DISPLAY_TYPE_LINE_AND_BUTTONS = "line-and-buttons"
+    DISPLAY_TYPE_YOUTUBE_THUMBNAILS = "youtube-thumbnails"
+
     DISPLAY_TYPE_CHOICES = (
-        ("standard", "standard"),
-        ("clickable-tags", "clickable-tags"),
-        ("line-and-buttons", "line-and-buttons"),
-        ("youtube-thumbnails", "youtube-thumbnails"),
+        (DISPLAY_TYPE_STANDARD, DISPLAY_TYPE_STANDARD),
+        (DISPLAY_TYPE_CLICKABLE_TAGS, DISPLAY_TYPE_CLICKABLE_TAGS),
+        (DISPLAY_TYPE_LINE_AND_BUTTONS, DISPLAY_TYPE_LINE_AND_BUTTONS),
+        (DISPLAY_TYPE_YOUTUBE_THUMBNAILS, DISPLAY_TYPE_YOUTUBE_THUMBNAILS),
     )
 
     user = models.CharField(max_length=500, unique=True)
     # theme: light, dark
-    theme = models.CharField(
-        max_length=500, null=True, default="light", choices=THEME_TYPE_CHOICES
+    display_style = models.CharField(
+        max_length=500, null=True, default="style-light", choices=STYLE_TYPES
     )
     # display type: standard, compact, preview
     display_type = models.CharField(

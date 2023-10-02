@@ -52,6 +52,8 @@
       {% else %}
       <a href="{{ object.source }}" class="simplebutton" title="{{ object.source }}">Source</a>
       {% endif %}
+      <a href="{% url 'rsshistory:entries-omni-search'%}?search=artist+%3D+{{ object.artist }}" class="simplebutton">Artist: {{ object.artist }}</a>
+      <a href="{% url 'rsshistory:entries-omni-search'%}?search=album+%3D+{{ object.album }}" class="simplebutton">Album: {{ object.album }}</a>
       <a href="{% url 'rsshistory:domain-by-name' %}?domain_name={{object.get_domain_only}}" class="simplebutton" title="{{object.get_domain_only}}">Domain</a>
 
       <a href="{{object.get_archive_link}}" class="simplebutton">View on archive.org</a>
@@ -78,12 +80,6 @@
            <strong>Vote:</strong>
 {{object.get_vote}} 
       </div>
-      <span><strong>Artist:</strong> 
-               <a href="{% url 'rsshistory:entries-omni-search'%}?search=artist+%3D+{{ object.artist }}" class="simplebutton">{{ object.artist }}</a>
-      </span>
-      <span><strong>Album:</strong>
-               <a href="{% url 'rsshistory:entries-omni-search'%}?search=album+%3D+{{ object.album }}" class="simplebutton">{{ object.album }}</a>
-      </span>
       <span><strong>Language:</strong> {{ object.language }}</span>
       <span><strong>Dead:</strong> {{ object.dead }}</span>
       
