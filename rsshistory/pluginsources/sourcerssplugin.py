@@ -15,49 +15,39 @@ class BaseRssPlugin(SourceGenericPlugin):
 
     def get_link_props(self):
         try:
-            import feedparser
+            from ..webtools import RssPropertyReader
+            reader = RssPropertyReader(self.source.url)
+            all_props = reader.parse_and_process()
 
-            source = self.source
+            if len(all_props) == 0:
+                PersistentInfo.error(
+                    "Source:{0} {1}; Source has no data".format(self.source.url, self.source.title)
+                )
 
-            url = source.url
-            feed = feedparser.parse(url)
-            return self.process_rss_feed(self.source, feed)
+            result = []
+
+            for prop in all_props:
+                prop = self.enhance(prop)
+                if self.is_link_ok_to_add(prop):
+                    result.append(prop)
+            return result
 
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.exc(
-                "Source:{} {}; Exc:{}\n{}".format(
-                    source.url, source.title, str(e), error_text
+                    "BaseRssPlugin:get_link_props: Source:{} {}; Exc:{}\n{}".format(
+                    self.source.url, self.source.title, str(e), error_text
                 )
             )
+            return []
 
-    def process_rss_feed(self, source, feed):
-        props = []
-
-        source = self.source
-        num_entries = len(feed.entries)
-
-        # print("Found rss source entry, feed size:{}".format(num_entries))
-
-        if num_entries == 0:
-            PersistentInfo.error(
-                "Source:{0} {1}; Source has no data".format(source.url, source.title)
-            )
-        else:
-            for feed_entry in feed.entries:
-                entry_props = self.process_rss_entry(source, feed_entry)
-                if entry_props is not None:
-                    props.append(entry_props)
-
-        # print("Number of new entries: {0}".format(len(props)))
-
-        return props
-
-    def process_rss_entry(self, source, feed_entry):
+    def is_link_ok_to_add(self, props):
         try:
             from ..controllers import LinkDataController
 
-            props = self.get_feed_entry_map(source, feed_entry)
+            is_archive = BaseLinkDataController.is_archive_by_date(props["date_published"])
+            if is_archive:
+                return False
 
             objs = LinkDataController.objects.filter(link=props["link"])
 
@@ -68,10 +58,10 @@ class BaseRssPlugin(SourceGenericPlugin):
                             source.url, source.title, feed_entry.link, feed_entry.title
                         )
                     )
-                    return None
+                    return False
 
                 if not self.is_link_valid(props["link"]):
-                    return None
+                    return False
 
                 if "date_published" not in props:
                     PersistentInfo.error(
@@ -79,9 +69,9 @@ class BaseRssPlugin(SourceGenericPlugin):
                             source.url, source.title, feed_entry.link, feed_entry.title
                         )
                     )
-                    return None
+                    return False
 
-                return props
+                return True
 
         except Exception as e:
             error_text = traceback.format_exc()
@@ -98,59 +88,14 @@ class BaseRssPlugin(SourceGenericPlugin):
 
             return None
 
-    def get_feed_entry_map(self, source, feed_entry):
-        from ..dateutils import DateUtils
+    def enhance(self, prop):
+        prop["description"] = prop["description"][
+            : BaseLinkDataController.get_description_length() - 2
+        ]
 
-        output_map = {}
+        prop["source"] = self.source.url
+        prop["language"] = self.source.language
+        prop["artist"] = self.source.title
+        prop["album"] = self.source.title
 
-        if hasattr(feed_entry, "description"):
-            output_map["description"] = feed_entry.description[
-                : BaseLinkDataController.get_description_length() - 2
-            ]
-        else:
-            output_map["description"] = ""
-
-        if hasattr(feed_entry, "media_thumbnail"):
-            output_map["thumbnail"] = feed_entry.media_thumbnail[0]["url"]
-        else:
-            output_map["thumbnail"] = None
-
-        if hasattr(feed_entry, "published"):
-            try:
-                dt = parser.parse(feed_entry.published)
-                output_map["date_published"] = dt
-            except Exception as e:
-                PersistentInfo.error(
-                    "Rss parser datetime invalid feed datetime:{}; Exc:{} {}\n{}".format(
-                        feed_entry.published, str(e), ""
-                    )
-                )
-                output_map["date_published"] = DateUtils.get_datetime_now_utc()
-
-        elif self.allow_adding_with_current_time:
-            output_map["date_published"] = DateUtils.get_datetime_now_utc()
-        elif self.default_entry_timestamp:
-            output_map["date_published"] = self.default_entry_timestamp
-        else:
-            output_map["date_published"] = DateUtils.get_datetime_now_utc()
-
-        output_map["source"] = source.url
-        output_map["title"] = feed_entry.title
-        output_map["language"] = source.language
-        output_map["link"] = feed_entry.link
-        output_map["artist"] = source.title
-        output_map["album"] = source.title
-        output_map["bookmarked"] = False
-
-        if str(feed_entry.title).strip() == "" or feed_entry.title == "undefined":
-            output_map["title"] = output_map["link"]
-
-        if output_map["date_published"]:
-            output_map["date_published"] = DateUtils.to_utc_date(
-                output_map["date_published"]
-            )
-
-            if output_map["date_published"] > DateUtils.get_datetime_now_utc():
-                output_map["date_published"] = DateUtils.get_datetime_now_utc()
-
-        return output_map
+        return prop

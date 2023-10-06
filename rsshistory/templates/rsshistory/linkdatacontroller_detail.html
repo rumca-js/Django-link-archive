@@ -72,17 +72,10 @@
   {% endif %}
 
   <p>
-      <div><strong>Url:</strong> <a href="{{ object.link }}">{{ object.link }}</a>, 
-      </div>
-      <div>
-           <strong>Publish date:</strong> {{ object.date_published }}
-           <strong>User:</strong> {{ object.user }}
-           <strong>Vote:</strong>
-{{object.get_vote}} 
-      </div>
-      <span><strong>Language:</strong> {{ object.language }}</span>
-      <span><strong>Dead:</strong> {{ object.dead }}</span>
-      
+      {% for parameter in object_controller.get_parameters %}
+        <div><strong>{{parameter.name | safe}}:</strong> {{parameter.description | safe}}</div>
+      {% endfor %}
+
       {% if object.has_tags %}
           <div><strong>Tags:</strong>
            {% for tag in object.get_tag_map %}

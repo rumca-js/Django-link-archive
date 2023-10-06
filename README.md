@@ -42,7 +42,9 @@ Personal link database, with RSS functionality. Similar to Reddit, but completel
 
  - [Screenshots](https://github.com/rumca-js/Django-link-archive/blob/main/README_ui.md)
  - [Installation, configuration](https://github.com/rumca-js/Django-link-archive/blob/main/README_install.md)
- - [Demo app (may, or may not be running actually)](https://renegat0x0.ddns.net/apps/rsshistory/)
+ - [Main Demo app (may, or may not be running actually)](https://renegat0x0.ddns.net/apps/rsshistory/)
+ - [YouTube music filter demo app (may, or may not be running actually)](https://renegat0x0.ddns.net/apps/catalog/)
+ - [Various links demo app (may, or may not be running actually)](https://renegat0x0.ddns.net/apps/various/)
  - [Notes about search industry](https://github.com/rumca-js/Django-link-archive/blob/main/README_search.md)
  - [Data analysis](https://github.com/rumca-js/Django-link-archive/blob/main/analysis/readme.md)
 

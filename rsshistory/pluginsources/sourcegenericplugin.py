@@ -4,6 +4,7 @@ from ..models import PersistentInfo
 from ..webtools import Page
 from ..dateutils import DateUtils
 from ..controllers import LinkDataHyperController
+from ..apps import LinkDatabase
 
 
 class SourceGenericPlugin(Page):
@@ -22,16 +23,19 @@ class SourceGenericPlugin(Page):
     def get_link_props(self):
         return []
 
+    def on_added_entry(self, entry):
+        pass
+
     def check_for_data(self):
         from ..dateutils import DateUtils
 
         try:
             source = self.source
 
-            print("process source:{} type:{}".format(source.title, source.source_type))
+            print("[{}]: Process source:{} type:{} time:{}".format(LinkDatabase.name, source.title, source.source_type, source.get_date_fetched()))
 
             if not source.is_fetch_possible():
-                print("It is not the right time for source: {}".format(source.title))
+                print("[{}]: Process source:{}: It is not the right time".format(LinkDatabase.name, source.title))
                 return
 
             start_time = DateUtils.get_datetime_now_utc()
@@ -46,10 +50,12 @@ class SourceGenericPlugin(Page):
                 stop_time, num_entries, total_time.total_seconds()
             )
 
+            print("[{}]: Process source:{} type:{} DONE".format(LinkDatabase.name, source.title, source.source_type))
+
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.exc(
-                "Source:{} {}; Exc:{}\n{}".format(
+                    "[SourceGenericPlugin:check_for_data] Source:{} {}; Exc:{}\n{}".format(
                     source.url, source.title, str(e), error_text
                 )
             )
@@ -65,14 +71,15 @@ class SourceGenericPlugin(Page):
                 if not link_data:
                     continue
 
-                LinkDataHyperController.add_new_link(link_data)
+                entry = LinkDataHyperController.add_new_link(link_data)
+                self.on_added_entry(entry)
 
             return num_entries
 
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.exc(
-                "Source:{} {}; Exc:{}\n{}".format(
+                "SourceGenericPlugin:check_for_data_impl: Source:{} {}; Exc:{}\n{}".format(
                     source.url, source.title, str(e), error_text
                 )
             )

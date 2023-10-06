@@ -39,7 +39,7 @@ class EntriesSearchListView(generic.ListView):
     template_name = str(ViewPage.get_full_template("linkdatacontroller_list.html"))
 
     def get(self, *args, **kwargs):
-        print("get")
+        print("EntriesSearchListView:get")
         from datetime import datetime
         self.time_start = datetime.now()
 
@@ -47,28 +47,28 @@ class EntriesSearchListView(generic.ListView):
         data = p.check_access()
         if data:
             return redirect("{}:missing-rights".format(LinkDatabase.name))
-        print("get constructor of list view")
+        print("EntriesSearchListView:get constructor of list view")
         view = super(EntriesSearchListView, self).get(*args, **kwargs)
-        print("get done")
+        print("EntriesSearchListView:get done")
         return view
 
     def get_filter(self):
-        print("get_filter")
+        print("EntriesSearchListView:get_filter")
         query_filter = EntryFilter(self.request.GET)
         query_filter.get_sources()
         thefilter = query_filter
-        print("get_filter done")
+        print("EntriesSearchListView:get_filter done")
         return thefilter
 
     def get_queryset(self):
-        print("get_queryset")
+        print("EntriesSearchListView:get_queryset")
         self.query_filter = self.get_filter()
         objects = self.get_filtered_objects()
-        print("get_queryset done")
+        print("EntriesSearchListView:get_queryset done")
         return objects
 
     def get_context_data(self, **kwargs):
-        print("get_context_data")
+        print("EntriesSearchListView:get_context_data")
         # Call the base implementation first to get the context
         context = super(EntriesSearchListView, self).get_context_data(**kwargs)
 
@@ -101,12 +101,12 @@ class EntriesSearchListView(generic.ListView):
             context["search_term"] = self.request.GET["search"]
 
         from datetime import datetime
-        print("get_context_data done. View time delta:{}".format(datetime.now() - self.time_start))
+        print("EntriesSearchListView:get_context_data done. View time delta:{}".format(datetime.now() - self.time_start))
 
         return context
 
     def get_filtered_objects(self):
-        print("get_filtered_objects")
+        print("EntriesSearchListView:get_filtered_objects")
         return self.query_filter.get_filtered_objects()
 
     def get_reset_link(self):

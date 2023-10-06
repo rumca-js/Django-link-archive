@@ -315,8 +315,8 @@ def domains_category_list(request):
     p = ViewPage(request)
     p.set_title("View categories")
 
-    subcategories = DomainSubCategories.objects.all()
-    p.context["content_list"] = subcategories
+    categories = DomainCategories.objects.all()
+    p.context["category_list"] = categories
 
     return p.render("domain_category_list.html")
 

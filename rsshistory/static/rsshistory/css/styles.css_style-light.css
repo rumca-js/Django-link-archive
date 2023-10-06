@@ -17,19 +17,7 @@
     background-color:#F9F9F9
 }
 
-a:link {
-    color: blue;
-}
-
-a:visited {
-    color: blue;
-}
-
-a:hover {
-    color: blue;
-}
-
-a:active {
+a, a:link, a:visited, a:hover, a:active {
     color: blue;
 }
 
@@ -62,10 +50,7 @@ hr {
 .base-button-container a:hover {
 }
 
-.link-list a{
-}
-
-.link-list a:link, .link-list a:visited, .link-list a:active {
+.linklist a, .linklist a:link, .linklist a:visited, .linklist a:active {
 }
 
 .link-list a:hover {
@@ -163,6 +148,19 @@ hr {
     display: block;
 }
 
+.link-list-thumbnail {
+    width: 10%;
+}
+.link-list-item-title {
+    font-weight: bold;
+    text-align: left;
+    text-decoration: none;
+}
+
+.link-list-item-description {
+    font-style:italic;
+}
+
 /* List containers */
 
 .container_standard {
@@ -207,9 +205,9 @@ hr {
     background-color: #BFD8FF;
 }
 
-.element_standard_selected, .element_standard_selected:link .element_standard_selected:visited, .element_standard_selected:active {
+.element_standard_selected, .element_standard_selected:link, .element_standard_selected:visited, .element_standard_selected:active {
     color : red;  /* not inherited */
-    background-color: #BFD8FF;
+    /* background-color: #BFD8FF; */
     text-decoration: none;
 }
 
@@ -247,10 +245,12 @@ hr {
     text-decoration: none;
     margin-bottom:3px;
 }
+
 .element_line-and-buttons a {
     text-decoration: none;
 }
-.element_line-and-buttons a:hover {
+
+.element_line-and-buttons:hover {
     color: blue;
     background-color: #f4f4f4;
 }
@@ -258,7 +258,7 @@ hr {
 .element_line-and-buttons_selected, .element_line-and-buttons_selected:link, .element_line-and-buttons_selected:visited, .element_line-and-buttons_selected:active {
 }
 
-.element_youtube-thumbnails, .element_youtube-thumbnails:link, .element_youtube-thumbnails:active: .element_youtube-thumbnails:visited {
+.element_youtube-thumbnails, .element_youtube-thumbnails:link, .element_youtube-thumbnails:active, .element_youtube-thumbnails:visited {
     color : #373737;
     background-color: #e9e9e9;
     text-overflow: ellipsis; 
@@ -270,30 +270,20 @@ hr {
     display:flex;
     flex-direction:column;
 }
+
 .element_youtube-thumbnails a {
     text-decoration: none;
 }
+
 .element_youtube-thumbnails:hover {
     color: black;
     background-color: #f4f4f4;
 }
+
 .element_youtube-thumbnails_selected, .element_youtube-thumbnails_selected:link, .element_youtube-thumbnails_selected:active, .element_youtube-thumbnails_selected:visited {
 }
 
 /* end of view elements */
-
-.link-list-thumbnail {
-    width: 10%;
-}
-.link-list-item-title {
-    font-weight: bold;
-    text-align: left;
-    text-decoration: none;
-}
-
-.link-list-item-description {
-    font-style:italic;
-}
 
 /* video box, youtube player */
 

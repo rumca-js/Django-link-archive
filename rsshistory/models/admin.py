@@ -27,6 +27,8 @@ class ConfigurationEntry(models.Model):
     source_save = models.BooleanField(default=True)
     store_domain_info = models.BooleanField(default=True)
     store_keyword_info = models.BooleanField(default=True)
+    auto_add_sources = models.BooleanField(default=False)
+    auto_sources_enabled = models.BooleanField(default=False)
     vote_min = models.IntegerField(default=-100)
     vote_max = models.IntegerField(default=100)
     number_of_comments_per_day = models.IntegerField(default=1)
@@ -227,9 +229,12 @@ class PersistentInfo(models.Model):
     def remove_old_ones():
         from ..dateutils import DateUtils
 
-        date_range = DateUtils.get_days_range(30)
-        objs = PersistentInfo.objects.filter(date__lt=date_range[0])
-        objs.delete()
+        try:
+            date_range = DateUtils.get_days_range(30)
+            objs = PersistentInfo.objects.filter(date__lt=date_range[0])
+            objs.delete()
+        except Exception as e:
+            pass
 
 
 class BackgroundJob(models.Model):

@@ -15,7 +15,7 @@ from .export import (
     SourceExportHistory,
     DataExport,
 )
-from .tags import (
+from .entriestags import (
     LinkTagsDataModel,
     LinkVoteDataModel,
     LinkCommentDataModel,

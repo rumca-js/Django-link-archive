@@ -305,7 +305,7 @@ def truncate_log(request):
     if data is not None:
         return data
 
-    PersistentInfo.objects.filter(level__lt=40).truncate()
+    PersistentInfo.objects.filter(level__lt=40).delete()
 
     return HttpResponseRedirect(reverse("{}:logs".format(LinkDatabase.name)))
 
@@ -317,6 +317,6 @@ def truncate_log_errors(request):
     if data is not None:
         return data
 
-    PersistentInfo.objects.filter(level=logging.ERROR).truncate()
+    PersistentInfo.objects.filter(level=logging.ERROR).delete()
 
     return HttpResponseRedirect(reverse("{}:logs".format(LinkDatabase.name)))

@@ -155,6 +155,7 @@ def add_source_simple(request):
                 return p.render("source_edit_exists.html")
 
             data = SourceDataController.get_full_information({"url": url})
+            print(data)
 
             form = SourceForm(initial=data)
             form.method = "POST"

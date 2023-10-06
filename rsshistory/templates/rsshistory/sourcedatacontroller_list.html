@@ -17,6 +17,10 @@
         <img src="{% static 'rsshistory/icons/icons8-add-link-96.png' %}" class="content-icon" />
         Add entry</a>
     {% endif %}
+    <a href="{% url 'rsshistory:sources' %}?search=on_hold+%3D+1" class="simplebutton">
+        On Hold</a>
+    <a href="{% url 'rsshistory:sources' %}?search=category+%3D%3D+New" class="simplebutton">
+        New sources</a>
 </div>
 
   <form action="{{filter_form.action_url}}" method="{{filter_form.method}}">

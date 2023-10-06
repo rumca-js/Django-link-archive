@@ -10,8 +10,16 @@
 
 <h1>Domain category list</h1>
 
-{% for item in content_list %}
-<div style="margin-right: 5px">{{item.category}} {{item.subcategory}} <a href="{% url 'rsshistory:domains' %}?search=category+%3D+{{item.category}}+%26+subcategory+%3D+{{item.subcategory}}">Link</a></div>
+{% for category in category_list %}
+<div style="margin-right: 5px">{{category.category}} <a href="{% url 'rsshistory:domains' %}?search=category+%3D+{{category.category}}">Link</a></div>
+
+    <div> --
+    {% for subcategory in category.subcategories.all %}
+        <span style="margin-right: 5px">{{subcategory.subcategory}} <a href="{% url 'rsshistory:domains' %}?search=category+%3D+{{subcategory.category}}+%26+subcategory+%3D+{{subcategory.subcategory}}">Link</a></span>
+    {% endfor %}
+    </div>
+
+    <hr/>
 {% endfor %}
 
 {% endblock %}

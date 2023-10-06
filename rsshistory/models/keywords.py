@@ -3,11 +3,13 @@ from datetime import datetime, date, timedelta
 from django.db import models
 from django.urls import reverse
 from django.templatetags.static import static
+import django.utils
 
 
 class KeyWords(models.Model):
     keyword = models.CharField(max_length=200)
-    date_published = models.DateTimeField(default=datetime.now)
+    language = models.CharField(max_length=10, default="en")
+    date_published = models.DateTimeField(default=django.utils.timezone.now)
 
     class Meta:
         ordering = ["-date_published"]
@@ -69,14 +71,24 @@ class KeyWords(models.Model):
            return True
        return False
 
+    def load_token_program(language):
+        import spacy
+        if language.find("en") >= 0:
+            load_text = "en_core_web_sm"
+        elif language.find("pl") >= 0:
+            load_text = "pl_core_news_sm"
+        else:
+            return
+
+        return spacy.load(load_text)
+
     def add_text(text, language):
         if not language:
             return
         if language.find('en') == -1:
             return
 
-        import spacy
-        nlp = spacy.load("en_core_web_sm")
+        nlp = KeyWords.load_token_program(language)
         doc = nlp(text)
 
         # insert one occurance for the text
@@ -98,26 +110,22 @@ class KeyWords(models.Model):
                 important_tokens.add(str_token)
 
         for str_token in important_tokens:
-            KeyWords.objects.create(keyword = str_token)
+            KeyWords.objects.create(keyword = str_token, language = language)
 
     def add_link_data(link_data):
-        print("Add link data")
         from .admin import ConfigurationEntry
 
         if ConfigurationEntry.get().store_keyword_info:
             if "language" not in link_data:
                 return False
 
-            print("Store keywords")
             if not KeyWords.is_keyword_date_range(link_data['date_published']):
                 return False
 
-            print("Date is published")
             # TODO we should make some switch in sources if it should store keywords
             if link_data['link'].find("www.reddit.com") != -1:
                 return False
 
-            print("reddit")
             # duplicate words are not counted. We joint title and description
             # for the words to be counted once only
             keyworded_text = link_data["title"]

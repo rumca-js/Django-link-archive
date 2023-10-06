@@ -21,7 +21,7 @@ from .models import (
     Domains,
     KeyWords,
 )
-from .webtools import Page
+from .webtools import Page, RssPropertyReader
 
 from .apps import LinkDatabase
 
@@ -217,34 +217,30 @@ class SourceDataController(SourceDataModel):
     def get_map_full(self):
         return self.get_map()
 
-    def is_page_rss(page, data):
-        try:
-            import feedparser
-            feed = feedparser.parse(data["url"])
-            return True
-        except Exception as e:
-            return False
-
-        #wh1 = page.get_contents().find("<rss version=")
-        #wh2 = page.get_contents().find("<feed")
-        #if wh1 >= 0 or wh2 >= 0:
-        #    return True
-
     def get_full_information(data):
         p = Page(data["url"])
         # TODO if passed url is youtube video, obtain information, obtain channel feed url
 
-        if SourceDataController.is_page_rss(p, data):
+        if p.is_rss():
+            print("Page is rss")
             return SourceDataController.get_info_from_rss(data["url"])
+        elif p.is_youtube():
+            from .pluginentries.youtubelinkhandler import YouTubeLinkHandler
+            print("Page is youtube")
+            handler = YouTubeLinkHandler(data["url"])
+            handler.download_details()
+            return SourceDataController.get_info_from_rss(handler.get_channel_feed_url())
         elif p.get_rss_url():
+            print("Page has RSS url")
             return SourceDataController.get_info_from_rss(p.get_rss_url())
         else:
+            print("Obtaining from page")
             return SourceDataController.get_info_from_page(data["url"], p)
 
     def get_info_from_rss(url):
-        import feedparser
+        reader = RssPropertyReader(url)
+        feed = reader.parse()
 
-        feed = feedparser.parse(url)
         data = {}
         data["url"] = url
         data["source_type"] = SourceDataModel.SOURCE_TYPE_RSS
@@ -410,6 +406,8 @@ class ArchiveLinkDataController(ArchiveLinkDataModel):
 
 class LinkDataHyperController(object):
     def add_new_link(link_data):
+        print("LinkDataHyperController:Adding link: {}".format(link_data['link']))
+
         if "source_obj" not in link_data:
             source_obj = None
             sources = SourceDataController.objects.filter(url=link_data["source"])
@@ -426,16 +424,20 @@ class LinkDataHyperController(object):
                 o.save()
                 # if link exists - do not change data
                 LinkDataHyperController.add_new_link_data(link_data)
-                return True
+                return o
+            else:
+                return objs[0]
 
         elif is_archive:
             objs = ArchiveLinkDataModel.objects.filter(link=link_data["link"])
             if not objs.exists():
                 o = ArchiveLinkDataModel(**link_data)
                 o.save()
-                return True
+                return o
+            else:
+                return objs[0]
 
-        return False
+        return None
 
     def is_link(link):
         objs = LinkDataModel.objects.filter(link=link)

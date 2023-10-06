@@ -40,3 +40,13 @@ Processing:
  - traverse with sympy equation
  - translate each condition (A, B ...) into Django Q objects
  - use Q object to select from link database
+
+# Styles
+
+Most of views use 'lists' to display elements.
+
+Each link element style is reflected by a separate style in a CSS file.
+
+What if we do not want to use main style for highlights, but for youtube we would like a slightly different color?
+
+Each style should be independent from other styles.

@@ -54,6 +54,8 @@ class ConfigForm(forms.ModelForm):
             "vote_min",
             "vote_max",
             "number_of_comments_per_day",
+            "auto_add_sources",
+            "auto_sources_enabled",
         ]
 
     def __init__(self, *args, **kwargs):
@@ -180,7 +182,8 @@ class EntryForm(forms.ModelForm):
             "thumbnail",
         ]
         widgets = {
-            'date_published': forms.widgets.DateTimeInput(attrs={'type': 'datetime-local'})
+        # DateTimeInput widget does not work my my Android phone
+        #    'date_published': forms.widgets.DateTimeInput(attrs={'type': 'datetime-local'})
         }
 
     def __init__(self, *args, **kwargs):
@@ -223,7 +226,7 @@ class EntryArchiveForm(forms.ModelForm):
             "thumbnail",
         ]
         widgets = {
-            'date_published': forms.widgets.DateTimeInput(attrs={'type': 'datetime-local'})
+        #    'date_published': forms.widgets.DateTimeInput(attrs={'type': 'datetime-local'})
         }
 
 
@@ -263,7 +266,7 @@ class TagEntryForm(forms.ModelForm):
         model = LinkTagsDataModel
         fields = ["link", "author", "date", "tag"]
         widgets = {
-            'date': forms.widgets.DateTimeInput(attrs={'type': 'datetime-local'})
+        #    'date': forms.widgets.DateTimeInput(attrs={'type': 'datetime-local'})
         }
 
     def save_tags(self):

@@ -6,6 +6,7 @@ from django.urls import reverse
 import django.utils
 
 from ..apps import LinkDatabase
+from ..webtools import Page, RssPropertyReader
 
 
 class Domains(models.Model):
@@ -19,7 +20,7 @@ class Domains(models.Model):
     tld = models.CharField(max_length=20, null=True)
     title = models.CharField(max_length=500, null=True)
     description = models.CharField(max_length=1000, null=True)
-    language = models.CharField(max_length=1000, default="en")
+    language = models.CharField(max_length=10, default="en")
     status_code = models.IntegerField(default=200)
     category = models.CharField(max_length=1000, null=True)
     subcategory = models.CharField(max_length=1000, null=True)
@@ -52,6 +53,12 @@ class Domains(models.Model):
         else:
             return input_url
 
+    def get_domain_full_url(self, protocol = None):
+        if protocol is None:
+            return self.protocol + "://" + self.domain
+        else:
+            return protocol + "://" + self.domain
+
     def get_absolute_url(self):
         return reverse(
             "{}:domain-detail".format(LinkDatabase.name), args=[str(self.id)]
@@ -60,10 +67,14 @@ class Domains(models.Model):
     def create_or_update_domain(domain_only_text):
         objs = Domains.objects.filter(domain=domain_only_text)
         if objs.count() == 0:
-            return Domains.create_object(domain_only_text)
+            obj = Domains.create_object(domain_only_text)
         else:
-            Domains.update_object(objs[0])
-            return objs[0]
+            obj = objs[0]
+            Domains.update_object(obj)
+
+        obj.check_and_create_source()
+
+        return obj
 
     def create_object(domain_only_text):
         import tldextract
@@ -90,6 +101,58 @@ class Domains(models.Model):
             self.update_domain()
 
         self.update_complementary_data(force)
+
+    def check_and_create_source(self):
+        from .admin import ConfigurationEntry
+
+        conf = ConfigurationEntry.get()
+
+        if self.dead:
+            return
+        if not conf.auto_add_sources:
+            return
+
+        from ..webtools import Page
+        from .sources import SourceDataModel
+        
+        if SourceDataModel.objects.filter(url = self.domain).count() > 0:
+            return
+
+        domain_page = Page(self.get_domain_full_url())
+        rss = domain_page.get_rss_url()
+        if rss:
+            if SourceDataModel.objects.filter(url = rss).count() > 0:
+                return
+
+            parser = RssPropertyReader(rss)
+            d = parser.parse()
+
+            if len(d.entries) == 0:
+                return
+
+            props = {}
+            props["url"] = rss
+
+            if "title" in d.feed:
+                props["title"] = d.feed.title
+            props["export_to_cms"] = False
+            if "language" in d.feed:
+                props["language"] = d.feed.language
+            if "image" in d.feed:
+                props["favicon"] = d.feed.image["href"]
+            props["on_hold"] = not conf.auto_sources_enabled
+            props["source_type"] = SourceDataModel.SOURCE_TYPE_RSS
+            props["remove_after_days"] = 2
+            props["category"] = "New"
+            props["subcategory"] = "New"
+
+            if props["url"].endswith("/"):
+                props["url"] = props["url"][:-1]
+
+            if SourceDataModel.objects.filter(url = props["url"]).count() > 0:
+                return
+
+            SourceDataModel.objects.create(**props)
 
     def update_complementary_data(self, force=False):
         DomainsSuffixes.add(self.suffix)
@@ -174,7 +237,7 @@ class Domains(models.Model):
 
         from ..webtools import Page
 
-        p = Page(self.protocol + "://" + self.domain)
+        p = Page(self.get_domain_full_url())
 
         new_title = p.get_title()
         new_description = p.get_description()
@@ -183,8 +246,7 @@ class Domains(models.Model):
 
         if new_title is None:
             print("{} Trying with http".format(self.domain))
-            protocol = "http"
-            p = Page(protocol + "://" + self.domain)
+            p = Page(self.get_domain_full_url("http"))
             new_title = p.get_title()
             new_description = p.get_description()
             new_language = p.get_language()
@@ -367,15 +429,28 @@ class DomainSubCategories(models.Model):
     category = models.CharField(max_length=1000, default="")
     subcategory = models.CharField(max_length=1000)
 
+    category_obj = models.ForeignKey(
+        DomainCategories,
+        on_delete=models.SET_NULL,
+        related_name="subcategories",
+        null=True,
+        blank=True,
+    )
+
     class Meta:
         ordering = ["category", "subcategory"]
 
     def add(category, subcategory):
+        category_obj = None
+        category_objs = DomainCategories.objects.filter(category = category)
+        if category_objs.count() > 0:
+            category_obj = category_objs[0]
+
         if category and category != "" and subcategory and subcategory != "":
             objs = DomainSubCategories.objects.filter(
                 category=category, subcategory=subcategory
             )
             if objs.count() == 0:
                 DomainSubCategories.objects.create(
-                    category=category, subcategory=subcategory
+                    category=category, subcategory=subcategory, category_obj = category_obj
                 )
