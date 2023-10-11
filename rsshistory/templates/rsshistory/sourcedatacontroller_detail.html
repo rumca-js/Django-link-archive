@@ -40,7 +40,7 @@
     </p>
   {% endif %}
     <p>
-    <a href="{% url 'rsshistory:entries-omni-search' %}?search=source_obj__title+%3D+{{object.title}}" class="simplebutton">Goto Entries</a>
+    <a href="{% url 'rsshistory:entries-omni-search' %}?search=source+%3D+{{object.url}}" class="simplebutton">Goto Entries</a>
      <a href="{% url 'rsshistory:domain-by-name' %}?domain_name={{object.get_domain_only}}" class="simplebutton" title="{{object.get_domain_only}}">Domain</a>
   {% if user.is_staff %}
     {% if config.source_archive %}

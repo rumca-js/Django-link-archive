@@ -54,8 +54,8 @@ class BaseRssPlugin(SourceGenericPlugin):
             if not objs.exists():
                 if "title" not in props:
                     PersistentInfo.error(
-                        "Source:{} {}; Entry:{} {} no title".format(
-                            source.url, source.title, feed_entry.link, feed_entry.title
+                        "Link:{}; Title:{} missing published field".format(
+                            props["link"], props["title"],
                         )
                     )
                     return False
@@ -65,22 +65,31 @@ class BaseRssPlugin(SourceGenericPlugin):
 
                 if "date_published" not in props:
                     PersistentInfo.error(
-                        "Source:{} {}; Entry:{} {} missing published field".format(
-                            source.url, source.title, feed_entry.link, feed_entry.title
+                        "Link:{}; Title:{} missing published field".format(
+                            props["link"], props["title"],
                         )
                     )
                     return False
 
+                from ..webtools import Page
+                p = Page(props["link"])
+                if p.is_youtube():
+                    from ..pluginentries.youtubelinkhandler import YouTubeLinkHandler
+                    handler = YouTubeLinkHandler(props["link"])
+                    handler.download_details()
+                    if not handler.is_valid():
+                        return False
+
                 return True
+
+            return False
 
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.error(
-                "Source:{} {}; Entry:{} {}; Exc:{}\n{}".format(
-                    source.url,
-                    source.title,
-                    feed_entry.link,
-                    feed_entry.title,
+                "Link:{}; Title:{}; Exc:{}\n{}".format(
+                    props["link"],
+                    props["title"],
                     str(e),
                     error_text,
                 )

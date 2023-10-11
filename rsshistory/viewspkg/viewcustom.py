@@ -249,10 +249,10 @@ def show_youtube_link_props(request):
             handler.download_details()
 
             yt_json = handler.yt_ob.get_json()
-            rd_json = handler.rd_ob.get_json()
+            # TODO rd_json = handler.rd_ob.get_json()
 
             yt_props = str(yt_json)
-            rd_props = str(rd_json)
+            # TODO rd_props = str(rd_json)
 
             feed_url = handler.yt_ob.get_channel_feed_url()
 
@@ -274,17 +274,18 @@ def show_youtube_link_props(request):
             youtube_props.append(("upload_date", yt_json["upload_date"]))
             if "duration_string" in yt_json:
                 youtube_props.append(("duration", yt_json["duration_string"]))
+            youtube_props.append(("valid", handler.is_valid()))
 
             all_youtube_props = []
             for yt_prop in yt_json:
                 all_youtube_props.append((yt_prop, str(yt_json[yt_prop])))
 
-            rd_props = []
-            for rd_prop in rd_json:
-                rd_props.append((rd_prop, str(rd_json[rd_prop])))
+            #rd_props = []
+            #for rd_prop in rd_json:
+            #    rd_props.append((rd_prop, str(rd_json[rd_prop])))
 
             p.context["youtube_props"] = youtube_props
-            p.context["return_dislike_props"] = rd_props
+            #p.context["return_dislike_props"] = rd_props
             p.context["all_youtube_props"] = all_youtube_props
 
             return p.render("show_youtube_link_props.html")

@@ -38,6 +38,8 @@ class SourceDataController(SourceDataModel):
         # TODO add domain when adding new source
         source = SourceDataController.objects.create(**source_data_map)
 
+        SourceDataController.fix_entries()
+
         if ConfigurationEntry.get().store_domain_info:
             Domains.add(source_data_map["url"])
 
@@ -271,6 +273,12 @@ class SourceDataController(SourceDataModel):
 
         return YouTubeSourceHandler.input2url(self.url)
 
+    def fix_entries():
+        entries = LinkDataModel.objects.filter(source = self.url)
+        for entry in entries:
+            entry.source_obj = self
+            entry.save()
+
 
 class LinkDataController(LinkDataModel):
     class Meta:
@@ -416,28 +424,41 @@ class LinkDataHyperController(object):
 
             link_data["source_obj"] = source_obj
 
+        created = False
+        ob = None
         is_archive = BaseLinkDataController.is_archive_by_date(link_data["date_published"])
+
         if not is_archive or link_data["bookmarked"]:
             objs = LinkDataModel.objects.filter(link=link_data["link"])
-            if not objs.exists():
-                o = LinkDataModel(**link_data)
-                o.save()
-                # if link exists - do not change data
-                LinkDataHyperController.add_new_link_data(link_data)
-                return o
-            else:
+            if objs.exists():
                 return objs[0]
-
         elif is_archive:
             objs = ArchiveLinkDataModel.objects.filter(link=link_data["link"])
-            if not objs.exists():
-                o = ArchiveLinkDataModel(**link_data)
-                o.save()
-                return o
-            else:
+            if objs.exists():
                 return objs[0]
 
-        return None
+        p = Page(link_data["link"])
+        if p.is_youtube():
+            from .pluginentries.youtubelinkhandler import YouTubeLinkHandler
+            handler = YouTubeLinkHandler(link_data["link"])
+            handler.download_details()
+            if not handler.is_valid():
+                return None
+
+        if not is_archive or link_data["bookmarked"]:
+            ob = LinkDataModel(**link_data)
+            ob.save()
+            created = True
+
+            # if link exists - do not change data
+            LinkDataHyperController.add_new_link_data(link_data)
+
+        elif is_archive:
+            ob = ArchiveLinkDataModel(**link_data)
+            ob.save()
+            created = True
+
+        return ob
 
     def is_link(link):
         objs = LinkDataModel.objects.filter(link=link)

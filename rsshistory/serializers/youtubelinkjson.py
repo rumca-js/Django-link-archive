@@ -141,6 +141,14 @@ class YouTubeJson(object):
         if len(self._json) > 0:
             return self._json["upload_date"]
 
+    def is_live(self):
+        if len(self._json) > 0:
+            return self._json["live_status"] == "is_live"
+
+    def was_live(self):
+        if len(self._json) > 0:
+            return self._json["was_live"] == True
+
     def get_link_url(self):
         if len(self._json) > 0:
             return "https://www.youtube.com/watch?v={}".format(self._json["id"])

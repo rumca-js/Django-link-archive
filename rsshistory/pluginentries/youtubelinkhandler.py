@@ -44,12 +44,24 @@ class YouTubeLinkHandler(object):
         parsed_elements = urlparse(url)
         return parse_qs(parsed_elements.query)["v"][0]
 
-    def get_embed_link(self):
+    def get_link_classic(self):
+        return "https://www.youtube.com?v={0}".format(self.get_video_code())
+
+    def get_link_mobile(self):
+        return "https://www.m.youtube.com?v={0}".format(self.get_video_code())
+
+    def get_link_youtu_be(self):
+        return "https://youtu.be/{0}".format(self.get_video_code())
+
+    def get_link_embed(self):
         return "https://www.youtube.com/embed/{0}".format(self.get_video_code())
+
+    def get_link_music(self):
+        return "https://music.youtube.com?v={0}".format(self.get_video_code())
 
     def get_frame(self):
         return '<iframe src="{0}" frameborder="0" allowfullscreen class="youtube_player_frame"></iframe>'.format(
-            self.get_embed_link()
+            self.get_link_embed()
         )
 
     def get_title(self):
@@ -113,6 +125,10 @@ class YouTubeLinkHandler(object):
         if self.yt_ob:
             return self.yt_ob.get_link_url()
 
+    def is_live(self):
+        if self.yt_ob:
+            return self.yt_ob.is_live() or self.yt_ob.was_live()
+
     def load_details(self):
         from ..serializers.youtubelinkjson import YouTubeJson
 
@@ -121,16 +137,16 @@ class YouTubeLinkHandler(object):
         if self.yt_text and not self.yt_ob.loads(self.yt_text):
             return False
 
-        from ..serializers.returnyoutubedislikeapijson import YouTubeThumbsDown
+        #from ..serializers.returnyoutubedislikeapijson import YouTubeThumbsDown
 
-        self.rd_ob = YouTubeThumbsDown()
-        if self.rd_text and not self.rd_ob.loads(self.rd_text):
-            return False
+        #self.rd_ob = YouTubeThumbsDown()
+        #if self.rd_text and not self.rd_ob.loads(self.rd_text):
+        #    return False
 
         return True
 
     def download_details_only(self):
-        if self.download_details_yt() and self.download_details_rd():
+        if self.download_details_yt(): # and self.download_details_rd():
             return True
         return False
 
@@ -154,4 +170,16 @@ class YouTubeLinkHandler(object):
         self.rd_text = ytr.download_data()
         if self.rd_text is None:
             return False
+        return True
+
+    def is_valid(self):
+        from ..webtools import Page
+
+        p = Page(self.url)
+        if not p.is_youtube():
+            return False
+
+        if self.is_live():
+            return False
+
         return True
