@@ -103,10 +103,7 @@ def import_from_instance(request):
         if form.is_valid():
             link = form.cleaned_data["link"]
 
-            from ..serializers.instanceimporter import InstanceImporter
-
-            ie = InstanceImporter(link)
-            ie.import_all()
+            BackgroundJobController.import_from_instance(link)
 
             p.context["summary_text"] = "Imported"
             return p.render("summary_present.html")

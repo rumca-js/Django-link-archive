@@ -48,10 +48,13 @@ hr {
 .base-button-container a:hover {
 }
 
-.linklist a:link, .linklist a:visited, .linklist a:active {
+.link-list a{
 }
 
-.linklist a:hover {
+.link-list a:link, .link-list a:visited, .link-list a:active {
+}
+
+.link-list a:hover {
 }
 
 .highlight_background {
@@ -187,6 +190,14 @@ hr {
     flex-wrap: wrap;
 }
 
+.container_search-engine {
+    margin-top: 20px;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+}
+
 .element_standard, .element_standard:link, .element_standard:visited {
     color : #ececec;
     padding: 0px 15px;
@@ -283,6 +294,14 @@ hr {
 .element_youtube-thumbnails_selected:hover {
     color: black;
     background-color: green;
+}
+
+.element_search-engine, .element_search-engine:link, .element_search-engine:visited {
+    color : #ececec;
+    padding: 0px 15px;
+    text-align: left;
+    text-decoration: none;
+    margin-bottom:3px;
 }
 
 /* end of view elements */

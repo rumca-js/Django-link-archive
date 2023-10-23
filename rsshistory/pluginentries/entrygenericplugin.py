@@ -20,7 +20,11 @@ class EntryGenericPlugin(object):
     def get_parameters(self):
         parameters = []
 
-        parameters.append(EntryParameter("Url", '<a href="{}">{}</a>'.format(self.entry.link, self.entry.link)))
+        parameters.append(
+            EntryParameter(
+                "Url", '<a href="{}">{}</a>'.format(self.entry.link, self.entry.link)
+            )
+        )
 
         parameters.append(EntryParameter("Publish date", self.entry.date_published))
         parameters.append(EntryParameter("Artist", self.entry.artist))
@@ -45,8 +49,8 @@ class EntryGenericPlugin(object):
     def htmlify(self, description):
         import re
 
-        #inside = 0
-        #for index, letter in enumerate(description):
+        # inside = 0
+        # for index, letter in enumerate(description):
         #    if letter == "<":
         #        inside += 1
         #    if letter == ">":

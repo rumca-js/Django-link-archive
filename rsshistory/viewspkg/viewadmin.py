@@ -198,9 +198,7 @@ def backgroundjob_remove(request, pk):
     bg = BackgroundJob.objects.get(id=pk)
     bg.delete()
 
-    return HttpResponseRedirect(
-        reverse("{}:backgroundjobs".format(LinkDatabase.name))
-    )
+    return HttpResponseRedirect(reverse("{}:backgroundjobs".format(LinkDatabase.name)))
 
 
 def backgroundjobs_remove_all(request):
@@ -213,9 +211,7 @@ def backgroundjobs_remove_all(request):
     bg = BackgroundJob.objects.all()
     bg.delete()
 
-    return HttpResponseRedirect(
-        reverse("{}:backgroundjobs".format(LinkDatabase.name))
-    )
+    return HttpResponseRedirect(reverse("{}:backgroundjobs".format(LinkDatabase.name)))
 
 
 def backgroundjobs_check_new(request):
@@ -230,9 +226,7 @@ def backgroundjobs_check_new(request):
     refresh_handler = RefreshThreadHandler()
     refresh_handler.refresh()
 
-    return HttpResponseRedirect(
-        reverse("{}:backgroundjobs".format(LinkDatabase.name))
-    )
+    return HttpResponseRedirect(reverse("{}:backgroundjobs".format(LinkDatabase.name)))
 
 
 def backgroundjobs_perform_all(request):
@@ -247,9 +241,7 @@ def backgroundjobs_perform_all(request):
     mgr = HandlerManager()
     mgr.process_all()
 
-    return HttpResponseRedirect(
-        reverse("{}:backgroundjobs".format(LinkDatabase.name))
-    )
+    return HttpResponseRedirect(reverse("{}:backgroundjobs".format(LinkDatabase.name)))
 
 
 def backgroundjobs_remove(request, job_type):
@@ -262,9 +254,7 @@ def backgroundjobs_remove(request, job_type):
     jobs = BackgroundJob.objects.filter(job=job_type)
     jobs.delete()
 
-    return HttpResponseRedirect(
-        reverse("{}:backgroundjobs".format(LinkDatabase.name))
-    )
+    return HttpResponseRedirect(reverse("{}:backgroundjobs".format(LinkDatabase.name)))
 
 
 class PersistentInfoView(generic.ListView):

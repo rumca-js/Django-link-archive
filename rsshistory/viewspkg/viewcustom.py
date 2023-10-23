@@ -5,6 +5,7 @@ from datetime import timedelta
 from django.views import generic
 from django.urls import reverse
 from django.shortcuts import render
+from django.shortcuts import redirect
 from django.http import HttpResponseForbidden, HttpResponseRedirect
 
 from ..apps import LinkDatabase
@@ -280,12 +281,12 @@ def show_youtube_link_props(request):
             for yt_prop in yt_json:
                 all_youtube_props.append((yt_prop, str(yt_json[yt_prop])))
 
-            #rd_props = []
-            #for rd_prop in rd_json:
+            # rd_props = []
+            # for rd_prop in rd_json:
             #    rd_props.append((rd_prop, str(rd_json[rd_prop])))
 
             p.context["youtube_props"] = youtube_props
-            #p.context["return_dislike_props"] = rd_props
+            # p.context["return_dislike_props"] = rd_props
             p.context["all_youtube_props"] = all_youtube_props
 
             return p.render("show_youtube_link_props.html")
@@ -303,9 +304,7 @@ def show_page_props(request):
     if not request.method == "POST":
         form = LinkInputForm()
         form.method = "POST"
-        form.action_url = reverse(
-            "{}:show-page-props".format(LinkDatabase.name)
-        )
+        form.action_url = reverse("{}:show-page-props".format(LinkDatabase.name))
         p.context["form"] = form
 
         return p.render("form_basic.html")
@@ -433,7 +432,7 @@ def show_info(request):
     p = ViewPage(request)
 
     info = "Cannot make query"
-    p.set_title("Info: {}".format(info) )
+    p.set_title("Info: {}".format(info))
 
     p.context["summary_text"] = info
 
@@ -446,14 +445,15 @@ def keywords(request):
 
     content_list = KeyWords.get_keyword_data()
     if len(content_list) >= 0:
-        p.context['content_list'] = content_list
+        p.context["content_list"] = content_list
 
     objects = KeyWords.objects.all()
-    min_val = objects[0].date_published
-    for aobject in KeyWords.objects.all():
-        if min_val > aobject.date_published:
-            min_val = aobject.date_published
-    p.context['last_date'] = min_val
+    if len(objects) > 0:
+        min_val = objects[0].date_published
+        for aobject in KeyWords.objects.all():
+            if min_val > aobject.date_published:
+                min_val = aobject.date_published
+        p.context["last_date"] = min_val
 
     return p.render("keywords_list.html")
 
@@ -483,9 +483,7 @@ def keyword_remove(request):
     if not request.method == "POST":
         form = KeywordInputForm()
         form.method = "POST"
-        form.action_url = reverse(
-            "{}:keyword-remove".format(LinkDatabase.name)
-        )
+        form.action_url = reverse("{}:keyword-remove".format(LinkDatabase.name))
         p.context["form"] = form
 
         return p.render("form_basic.html")
@@ -498,7 +496,7 @@ def keyword_remove(request):
             return p.render("summary_present.html")
         else:
             keyword = form.cleaned_data["keyword"]
-            keywords = KeyWords.objects.filter(keyword = keyword)
+            keywords = KeyWords.objects.filter(keyword=keyword)
             keywords.delete()
 
             return HttpResponseRedirect(

@@ -152,7 +152,7 @@ def add_source_simple(request):
                 p.context["form"] = form
                 p.context["source"] = ob[0]
 
-                return p.render("source_edit_exists.html")
+                return HttpResponseRedirect(ob[0].get_absolute_url())
 
             data = SourceDataController.get_full_information({"url": url})
             print(data)
@@ -211,9 +211,7 @@ def edit_source(request, pk):
             form = SourceForm(instance=ob)
 
         form.method = "POST"
-        form.action_url = reverse(
-            "{}:source-edit".format(LinkDatabase.name), args=[pk]
-        )
+        form.action_url = reverse("{}:source-edit".format(LinkDatabase.name), args=[pk])
         p.context["form"] = form
         return p.render("form_basic.html")
 

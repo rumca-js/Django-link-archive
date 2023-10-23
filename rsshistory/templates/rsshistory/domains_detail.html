@@ -13,19 +13,13 @@
 
 <h1>Domain</h1>
 
-{% if object.dead %}
+{% if object.link_obj.dead %}
 This domain is marked as dead!
 {% endif %}
 
 <table>
     <tr>
         <td>Link</td><td><a href="{{object.protocol}}://{{object.domain}}">{{object.domain}}</a></td>
-    </tr>
-    <tr>
-        <td>Title</td><td>{{object.title}}</td>
-    </tr>
-    <tr>
-        <td>Description</td><td>{{object.description}}</td>
     </tr>
     <tr>
         <td>Main</td><td>{{object.main}}</td>
@@ -46,10 +40,7 @@ This domain is marked as dead!
         <td>SubCategory</td><td>{{object.subcategory}}</td>
     </tr>
     <tr>
-        <td>Language</td><td>{{object.language}}</td>
-    </tr>
-    <tr>
-        <td>Last status code</td><td>{{object.status_code}}</td>
+        <td>Dead</td><td>{{object.dead}}</td>
     </tr>
     <tr>
         <td>Date created</td><td>{{object.date_created}}</td>
@@ -58,6 +49,58 @@ This domain is marked as dead!
         <td>Date last</td><td>{{object.date_update_last}}</td>
     </tr>
 </table>
+
+<h3><a href="{{object.link_obj.get_absolute_url }}">Link information</a> </h3>
+
+{% if object.link_obj %}
+
+<table>
+    <tr>
+        <td>Title</td><td>{{object.link_obj.title}}</td>
+    </tr>
+    <tr>
+        <td>Description</td><td>{{object.link_obj.description}}</td>
+    </tr>
+    <tr>
+        <td>Language</td><td>{{object.link_obj.language}}</td>
+    </tr>
+    <tr>
+        <td>Charset</td><td>{{object.link_obj.charset}}</td>
+    </tr>
+    <tr>
+        <td>Date published</td><td>{{object.link_obj.date_published}}</td>
+    </tr>
+    <tr>
+        <td>Bookmarked</td><td>{{object.link_obj.bookmarked}}</td>
+    </tr>
+    <tr>
+        <td>Permanent</td><td>{{object.link_obj.permanent}}</td>
+    </tr>
+    <tr>
+        <td>Dead</td><td>{{object.link_obj.dead}}</td>
+    </tr>
+    <tr>
+        <td>Status</td><td>{{object.link_obj.status_code}}</td>
+    </tr>
+    <tr>
+        <td>Artist</td><td>{{object.link_obj.artist}}</td>
+    </tr>
+    <tr>
+        <td>Album</td><td>{{object.link_obj.album}}</td>
+    </tr>
+    <tr>
+        <td>Age</td><td>{{object.link_obj.age}}</td>
+    </tr>
+    <tr>
+        <td>Thumbnail</td><td>{{object.link_obj.thumbnail}}</td>
+    </tr>
+    <tr>
+        <td>Page rating</td><td>{{object.link_obj.page_rating}}</td>
+    </tr>
+</table>
+{% else %}
+ No link data
+{% endif %}
 
 <a href="{% url 'rsshistory:domain-json' object.id %}" class="simplebutton">Show JSON</a>
 

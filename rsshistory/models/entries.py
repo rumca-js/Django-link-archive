@@ -9,25 +9,42 @@ from .sources import SourceDataModel
 from .admin import PersistentInfo
 
 
+
 class BaseLinkDataModel(models.Model):
+    link = models.CharField(max_length=1000, unique=True)
+
+    # URL of source, might be RSS source
     source = models.CharField(max_length=2000)
+
     title = models.CharField(max_length=1000, null=True)
     description = models.TextField(max_length=1000, null=True, blank=True)
-    link = models.CharField(max_length=1000, unique=True)
-    date_published = models.DateTimeField(default=datetime.now)
-    # this entry cannot be removed
-    bookmarked = models.BooleanField(default=False)
+    thumbnail = models.CharField(max_length=1000, null=True, blank=True)
+    language = models.CharField(max_length=10, null=True, blank=True)
     age = models.IntegerField(blank=True, null=True)
-    # this entry is dead indication
+
+    date_published = models.DateTimeField(default=datetime.now)
+    date_update_last = models.DateTimeField(null=True)
+    date_dead_since = models.DateTimeField(null=True)
+
+    # this entry cannot be removed. Serves a purpose. Domain page, source page
+    permanent = models.BooleanField(default=False)
+    bookmarked = models.BooleanField(default=False)
     dead = models.BooleanField(blank=True, null=True)
-    artist = models.CharField(max_length=1000, null=True, blank=True)
-    album = models.CharField(max_length=1000, null=True, blank=True)
+
     # user who added entry
     user = models.CharField(max_length=1000, null=True, blank=True)
 
-    # possible values en, en-US, or pl_PL
-    language = models.CharField(max_length=10, null=True, blank=True)
-    thumbnail = models.CharField(max_length=1000, null=True, blank=True)
+    # We could use a different model, but it may lead to making multiple queries
+    # For each model.
+
+    artist = models.CharField(max_length=1000, null=True, blank=True)
+    album = models.CharField(max_length=1000, null=True, blank=True)
+
+    status_code = models.IntegerField(default=200)
+
+    page_rating_contents = models.IntegerField(default=0)
+    page_rating_votes = models.IntegerField(default=0)
+    page_rating = models.IntegerField(default=0)
 
     class Meta:
         abstract = True
@@ -101,7 +118,7 @@ class BaseLinkDataController(BaseLinkDataModel):
             return ""
 
     def get_vote(self):
-        if self.bookmarked == False:
+        if not self.is_taggable():
             return 0
         try:
             if not getattr(self, "votes"):
@@ -110,23 +127,26 @@ class BaseLinkDataController(BaseLinkDataModel):
             return 0
 
         votes = self.votes.all()
-        if votes.count() == 0:
+        count = votes.count()
+        if count == 0:
             return 0
 
-        sum_num = None
+        sum_num = 0
         for vote in votes:
-            if sum_num == None:
-                sum_num = vote.vote
-            else:
-                sum_num += vote.vote
+            sum_num += vote.vote
 
-        return sum_num / len(votes)
+        return sum_num / count
+
+    def update_calculated_vote(self):
+        self.page_rating_votes = self.get_vote()
+        self.page_rating = self.page_rating_votes + self.page_rating_contents
+        self.save()
 
     def get_tag_map(self):
         # TODO should it be done by for tag in self.tags: tag.get_map()?
         result = []
 
-        if self.bookmarked == False:
+        if not self.is_taggable():
             return result
 
         tags = self.tags.all()
@@ -191,6 +211,7 @@ class BaseLinkDataController(BaseLinkDataModel):
             "user",
             "language",
             "thumbnail",
+            "age",
         ]
 
     def get_query_names():
@@ -327,11 +348,14 @@ class BaseLinkDataController(BaseLinkDataModel):
 
     def make_bookmarked(self, username):
         self.bookmarked = True
+        self.permanent = True
         self.user = username
         self.save()
 
     def make_not_bookmarked(self, username):
         from ..models import LinkTagsDataModel, LinkVoteDataModel
+
+        self.permanent = False
 
         tags = LinkTagsDataModel.objects.filter(link_obj=self)
         tags.delete()
@@ -342,6 +366,9 @@ class BaseLinkDataController(BaseLinkDataModel):
         self.bookmarked = False
         self.user = username
         self.save()
+
+    def is_taggable(self):
+        return self.permanent or self.bookmarked
 
     def move_to_archive(self):
         objs = ArchiveLinkDataModel.objects.filter(link=self.link)
@@ -369,7 +396,7 @@ class BaseLinkDataController(BaseLinkDataModel):
         conf = ConfigurationEntry.get()
 
         current_time = DateUtils.get_datetime_now_utc()
-        days_before = current_time - timedelta(days=conf.days_to_move_to_archive) 
+        days_before = current_time - timedelta(days=conf.days_to_move_to_archive)
         if input_date < days_before:
             return True
         return False

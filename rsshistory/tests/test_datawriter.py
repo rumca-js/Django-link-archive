@@ -15,6 +15,8 @@ from ..dateutils import DateUtils
 
 class DataWriterTest(TestCase):
     def setUp(self):
+        self.disable_web_pages()
+
         self.test_export_path = Path("./test_data/exports")
         self.remove_all_files()
 
@@ -57,6 +59,14 @@ class DataWriterTest(TestCase):
     def tearDown(self):
         self.remove_all_files()
 
+    def disable_web_pages(self):
+        from ..webtools import BasePage, Page
+        BasePage.user_agent = None
+        Page.user_agent = None
+        entry = ConfigurationEntry.get()
+        entry.user_agent = ""
+        entry.save()
+
     def remove_all_files(self):
         if self.test_export_path.exists():
             shutil.rmtree(self.test_export_path.as_posix())
@@ -90,7 +100,6 @@ class DataWriterTest(TestCase):
         self.assertEqual(len(json_obj), 1)
 
     def test_write_bookmarks(self):
-
         entry = ConfigurationEntry.get()
         entry.data_export_path = self.test_export_path
         entry.save()

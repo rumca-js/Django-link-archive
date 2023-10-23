@@ -45,6 +45,8 @@ class ConfigForm(forms.ModelForm):
             "source_save",
             "store_domain_info",
             "store_keyword_info",
+            "auto_add_sources",
+            "auto_sources_enabled",
             "data_export_path",
             "data_import_path",
             "access_type",
@@ -54,8 +56,6 @@ class ConfigForm(forms.ModelForm):
             "vote_min",
             "vote_max",
             "number_of_comments_per_day",
-            "auto_add_sources",
-            "auto_sources_enabled",
         ]
 
     def __init__(self, *args, **kwargs):
@@ -87,7 +87,13 @@ class UserConfigForm(forms.ModelForm):
 
     class Meta:
         model = UserConfig
-        fields = ["show_icons", "thumbnails_as_icons", "small_icons", "display_type", "display_style"]
+        fields = [
+            "show_icons",
+            "thumbnails_as_icons",
+            "small_icons",
+            "display_type",
+            "display_style",
+        ]
         # fields = ['show_icons', 'thumbnails_as_icons', 'small_icons', 'display_type', 'theme', 'links_per_page']
         # widgets = {
         # }
@@ -174,6 +180,8 @@ class EntryForm(forms.ModelForm):
             "date_published",
             "source",
             "bookmarked",
+            "permanent",
+            "dead",
             "language",
             "user",
             "artist",
@@ -182,8 +190,8 @@ class EntryForm(forms.ModelForm):
             "thumbnail",
         ]
         widgets = {
-        # DateTimeInput widget does not work my my Android phone
-        #    'date_published': forms.widgets.DateTimeInput(attrs={'type': 'datetime-local'})
+            # DateTimeInput widget does not work my my Android phone
+            #    'date_published': forms.widgets.DateTimeInput(attrs={'type': 'datetime-local'})
         }
 
     def __init__(self, *args, **kwargs):
@@ -226,7 +234,7 @@ class EntryArchiveForm(forms.ModelForm):
             "thumbnail",
         ]
         widgets = {
-        #    'date_published': forms.widgets.DateTimeInput(attrs={'type': 'datetime-local'})
+            #    'date_published': forms.widgets.DateTimeInput(attrs={'type': 'datetime-local'})
         }
 
 
@@ -266,7 +274,7 @@ class TagEntryForm(forms.ModelForm):
         model = LinkTagsDataModel
         fields = ["link", "author", "date", "tag"]
         widgets = {
-        #    'date': forms.widgets.DateTimeInput(attrs={'type': 'datetime-local'})
+            #    'date': forms.widgets.DateTimeInput(attrs={'type': 'datetime-local'})
         }
 
     def save_tags(self):
@@ -374,7 +382,9 @@ class DomainsChoiceForm(forms.Form):
         categories = self.get_categories()
         subcategories = self.get_subcategories()
         self.fields["category"].widget = forms.Select(choices=categories, attrs=attr)
-        self.fields["subcategory"].widget = forms.Select(choices=subcategories, attrs=attr)
+        self.fields["subcategory"].widget = forms.Select(
+            choices=subcategories, attrs=attr
+        )
 
     def to_choices(self, names):
         names = sorted(names)
@@ -512,7 +522,7 @@ class BasicEntryChoiceForm(forms.Form):
     def create(self, sources):
         # how to unpack dynamic forms
         # https://stackoverflow.com/questions/60393884/how-to-pass-choices-dynamically-into-a-django-form
-        self.sources = SourceDataController.objects.all()
+        self.sources = SourceDataController.objects.filter(on_hold = False)
 
         categories = self.get_sources_values("category")
         subcategories = self.get_sources_values("subcategory")
@@ -534,7 +544,7 @@ class BasicEntryChoiceForm(forms.Form):
         result = []
         result.append(["", ""])
 
-        for category in SourceCategories.objects.all():
+        for category in SourceCategories.objects.filter(on_hold = False):
             if category and category != "":
                 result.append([category.category, category.category])
 
@@ -546,7 +556,7 @@ class BasicEntryChoiceForm(forms.Form):
         result = []
         result.append(["", ""])
 
-        for subcategory in SourceSubCategories.objects.all():
+        for subcategory in SourceSubCategories.objects.filter(on_hold = False):
             if subcategory and subcategory != "":
                 result.append([subcategory.subcategory, subcategory.subcategory])
 
@@ -612,9 +622,16 @@ class CommentEntryForm(forms.Form):
     """
 
     link_id = forms.IntegerField(required=False, widget=forms.HiddenInput())
-    author = forms.CharField(max_length=1000, widget=forms.TextInput(attrs={'readonly': 'readonly'}))
+    author = forms.CharField(
+        max_length=1000, widget=forms.TextInput(attrs={"readonly": "readonly"})
+    )
     comment = forms.CharField(widget=forms.Textarea)
-    date_published = forms.DateTimeField(initial=datetime.now, widget=forms.widgets.DateTimeInput(attrs={'type': 'datetime-local', 'readonly': 'readonly'}))
+    date_published = forms.DateTimeField(
+        initial=datetime.now,
+        widget=forms.widgets.DateTimeInput(
+            attrs={"type": "datetime-local", "readonly": "readonly"}
+        ),
+    )
 
 
 from django.db.models import IntegerField, Model
@@ -640,17 +657,3 @@ class LinkVoteForm(forms.Form):
             MaxValueValidator(config.vote_max),
             MinValueValidator(config.vote_min),
         ]
-
-    def save_vote(self):
-        entry = LinkDataController.objects.get(id=self.cleaned_data["link_id"])
-
-        vote = LinkVoteDataModel.objects.filter(
-            author=self.cleaned_data["author"], link_obj=entry
-        )
-        vote.delete()
-
-        LinkVoteDataModel.objects.create(
-            author=self.cleaned_data["author"],
-            vote=self.cleaned_data["vote"],
-            link_obj=entry,
-        )

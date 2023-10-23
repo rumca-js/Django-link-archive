@@ -155,6 +155,7 @@ hr {
 .link-list-thumbnail {
     width: 10%;
 }
+
 .link-list-item-title {
     font-weight: bold;
     text-align: left;
@@ -194,6 +195,15 @@ hr {
     list-style: none;
     display: flex;
     flex-wrap: wrap;
+}
+
+.container_search-engine {
+    margin-top: 20px;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch
 }
 
 .element_standard, .element_standard:link, .element_standard:visited {
@@ -289,6 +299,14 @@ hr {
 .element_youtube-thumbnails_selected:hover {
     color: black;
     background-color: green;
+}
+
+.element_search-engine, .element_search-engine:link, .element_search-engine:visited {
+    color : #ececec;
+    padding: 0px 15px;
+    text-align: left;
+    text-decoration: none;
+    margin-bottom:3px;
 }
 
 /* end of view elements */

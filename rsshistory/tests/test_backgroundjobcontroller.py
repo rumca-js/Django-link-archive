@@ -8,6 +8,7 @@ from ..controllers import (
     SourceDataController,
 )
 from ..models import BackgroundJob, PersistentInfo
+from ..configuration import Configuration
 
 
 class BackgroundJobControllerTest(TestCase):

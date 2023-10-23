@@ -1,5 +1,6 @@
 import json
 
+from ..models import Domains
 from ..controllers import LinkDataController, SourceDataController
 
 
@@ -49,14 +50,17 @@ class InstanceImporter(object):
         if "links" in json_data:
             self.import_from_links(json_data["links"])
 
-        if "sources" in json_data:
+        elif "sources" in json_data:
             self.import_from_sources(json_data["sources"])
 
-        if "link" in json_data:
+        elif "link" in json_data:
             self.import_from_link(json_data["link"])
 
-        if "source" in json_data:
+        elif "source" in json_data:
             self.import_from_source(json_data["source"])
+
+        elif "domains" in json_data:
+            self.import_from_domains(json_data["domains"])
 
     def import_from_links(self, json_data):
         print("Import from links")
@@ -79,3 +83,11 @@ class InstanceImporter(object):
         print("Import from source")
 
         SourceDataController.objects.create(**json_data)
+
+    def import_from_domains(self, json_data):
+        print("Import from domains")
+
+        # TODO add such check for other import functions
+        for domains_data in json_data:
+            if Domains.objects.filter(domain=domains_data["domain"]).count() == 0:
+                Domains.objects.create(**domains_data)

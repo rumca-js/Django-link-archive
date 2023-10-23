@@ -7,6 +7,7 @@ import django.utils
 
 from ..apps import LinkDatabase
 from ..webtools import Page, RssPropertyReader
+from .entries import LinkDataModel
 
 
 class Domains(models.Model):
@@ -18,19 +19,37 @@ class Domains(models.Model):
     subdomain = models.CharField(max_length=200, null=True)
     suffix = models.CharField(max_length=20, null=True)
     tld = models.CharField(max_length=20, null=True)
-    title = models.CharField(max_length=500, null=True)
-    description = models.CharField(max_length=1000, null=True)
-    language = models.CharField(max_length=10, default="en")
-    status_code = models.IntegerField(default=200)
+    title = models.CharField(max_length=500, null=True)  # to be removed
+    description = models.CharField(max_length=1000, null=True)  # to be removed
+    language = models.CharField(max_length=10, default="en")  # to be removed
+    status_code = models.IntegerField(default=200)  # to be removed
     category = models.CharField(max_length=1000, null=True)
     subcategory = models.CharField(max_length=1000, null=True)
-    dead = models.BooleanField(default=False)
+    dead = models.BooleanField(default=False)  # to be removed
 
     date_created = models.DateTimeField(default=django.utils.timezone.now)
-    date_update_last = models.DateTimeField(default=django.utils.timezone.now)
+    date_update_last = models.DateTimeField(
+        default=django.utils.timezone.now
+    )  # to be removed
+
+    link_obj = models.ForeignKey(
+        LinkDataModel,
+        on_delete=models.SET_NULL,
+        related_name="domains_obj",
+        null=True,
+        blank=True,
+    )
 
     class Meta:
-        ordering = ["tld", "suffix", "main", "domain"]
+        ordering = [
+            "-link_obj__page_rating",
+            "-category",
+            "-subcategory",
+            "tld",
+            "suffix",
+            "main",
+            "domain",
+        ]
 
     def add(url):
         """
@@ -40,20 +59,28 @@ class Domains(models.Model):
         if wh > 8:
             url = url[:wh]
 
+        if url.strip() == "":
+            print("Provided invalid URL, empty")
+            return
+
+        if url.find("http") == -1:
+            url = "https://" + url
+
+        print("Adding url {}".format(url))
         domain_text = Domains.get_domain_url(url)
+        if not domain_text or domain_text == "" or domain_text == "https://":
+            print("Not domain text")
+
         return Domains.create_or_update_domain(domain_text)
 
     def get_domain_url(input_url):
-        if input_url.find("/") >= 0:
-            from ..webtools import Page
+        from ..webtools import Page
 
-            p = Page(input_url)
-            domain_text = p.get_domain_only()
-            return domain_text
-        else:
-            return input_url
+        p = Page(input_url)
+        domain_text = p.get_domain_only()
+        return domain_text
 
-    def get_domain_full_url(self, protocol = None):
+    def get_domain_full_url(self, protocol=None):
         if protocol is None:
             return self.protocol + "://" + self.domain
         else:
@@ -65,36 +92,60 @@ class Domains(models.Model):
         )
 
     def create_or_update_domain(domain_only_text):
+        print("Creating, or updating {}".format(domain_only_text))
         objs = Domains.objects.filter(domain=domain_only_text)
+
         if objs.count() == 0:
-            obj = Domains.create_object(domain_only_text)
+            props = Domains.get_link_properties(domain_only_text)
+            obj = Domains.create_object(domain_only_text, props)
+            if props:
+                obj.add_domain_link(props)
+                obj.check_and_create_source(props)
         else:
             obj = objs[0]
-            Domains.update_object(obj)
-
-        obj.check_and_create_source()
+        #    Domains.update_object(obj)
 
         return obj
 
-    def create_object(domain_only_text):
+    def create_object(domain_only_text, props):
         import tldextract
 
-        extract = tldextract.TLDExtract()
-        domain_data = extract(domain_only_text)
+        if props:
+            extract = tldextract.TLDExtract()
+            domain_data = extract(domain_only_text)
 
-        tld = os.path.splitext(domain_only_text)[1][1:]
+            tld = os.path.splitext(domain_only_text)[1][1:]
 
-        ob = Domains.objects.create(
-            domain=domain_only_text,
-            main=domain_data.domain,
-            subdomain=domain_data.subdomain,
-            suffix=domain_data.suffix,
-            tld=tld,
-        )
+            ob = Domains.objects.create(
+                domain=domain_only_text,
+                main=domain_data.domain,
+                subdomain=domain_data.subdomain,
+                suffix=domain_data.suffix,
+                tld=tld,
+            )
 
-        Domains.update_complementary_data(ob, True)
+            ob.update_complementary_data(True)
+            ob.add_domain_link(props)
+            ob.check_and_create_source(props)
 
-        return ob
+            return ob
+
+    def get_link_properties(link):
+        if link.find("http") == -1:
+            link = "https://"+link
+
+        p = Page(link)
+        if p.get_contents() is None:
+            return
+
+        return p.get_properties_map()
+
+    def get_page_properties(self):
+        # if self.link_obj is not None:
+        #    return
+
+        link = self.get_domain_full_url()
+        return Domains.get_link_properties(link)
 
     def update_object(self, force=False):
         if self.is_domain_set() == False:
@@ -102,65 +153,108 @@ class Domains(models.Model):
 
         self.update_complementary_data(force)
 
-    def check_and_create_source(self):
+        if self.link_obj == None:
+            props = self.get_page_properties()
+            if props:
+                entry = self.add_domain_link(props)
+                if entry:
+                    self.link_obj = entry
+                    self.save()
+                self.check_and_create_source(props)
+            else:
+                self.dead = True
+                self.save()
+
+    def add_domain_link(self, props):
+        from ..controllers import LinkDataHyperController
+
+        entry = LinkDataHyperController.get_link_object(props["link"])
+        if entry:
+            return entry
+
+        link_props = {}
+        link_props["link"] = props["link"]
+        link_props["title"] = props["title"]
+        link_props["description"] = props["description"]
+        link_props["page_rating_contents"] = props["page_rating"]
+
+        entry = LinkDataHyperController.add_new_link(link_props)
+        entry.permanent = True
+        entry.save()
+
+        self.link_obj = entry
+        self.save()
+        return entry
+
+    def check_and_create_source(self, props):
+        from ..webtools import Page
+        from .sources import SourceDataModel
         from .admin import ConfigurationEntry
+        from .admin import PersistentInfo
+
+        rss_url = props["rss_url"]
+        if not rss_url:
+            return
+
+        if rss_url.endswith("/"):
+            rss_url = rss_url[:-1]
+
+        if SourceDataModel.objects.filter(url=rss_url).count() > 0:
+            return
+
+        if self.link_obj and self.link_obj.dead:
+            return
 
         conf = ConfigurationEntry.get()
 
-        if self.dead:
-            return
         if not conf.auto_add_sources:
             return
 
-        from ..webtools import Page
-        from .sources import SourceDataModel
-        
-        if SourceDataModel.objects.filter(url = self.domain).count() > 0:
+        parser = RssPropertyReader(rss_url)
+        d = parser.parse()
+        if d is None:
+            PersistentInfo.error(
+                    "RSS is empty: rss_url:{0}".format(rss_url)
+            )
             return
 
-        domain_page = Page(self.get_domain_full_url())
-        rss = domain_page.get_rss_url()
-        if rss:
-            if SourceDataModel.objects.filter(url = rss).count() > 0:
-                return
+        if len(d.entries) == 0:
+            PersistentInfo.error(
+                    "RSS no entries: rss_url:{0}".format(rss_url)
+            )
+            return
 
-            parser = RssPropertyReader(rss)
-            d = parser.parse()
+        props = {}
+        props["url"] = rss_url
 
-            if len(d.entries) == 0:
-                return
-
-            props = {}
-            props["url"] = rss
-
-            if "title" in d.feed:
-                props["title"] = d.feed.title
-            props["export_to_cms"] = False
-            if "language" in d.feed:
-                props["language"] = d.feed.language
-            if "image" in d.feed:
+        if "title" in d.feed:
+            props["title"] = d.feed.title
+        props["export_to_cms"] = False
+        if "language" in d.feed:
+            props["language"] = d.feed.language
+        if "image" in d.feed:
+            if "href" in d.feed.image:
                 props["favicon"] = d.feed.image["href"]
-            props["on_hold"] = not conf.auto_sources_enabled
-            props["source_type"] = SourceDataModel.SOURCE_TYPE_RSS
-            props["remove_after_days"] = 2
-            props["category"] = "New"
-            props["subcategory"] = "New"
+            else:
+                props["favicon"] = d.feed.image
+        props["on_hold"] = not conf.auto_sources_enabled
+        props["source_type"] = SourceDataModel.SOURCE_TYPE_RSS
+        props["remove_after_days"] = 2
+        props["category"] = "New"
+        props["subcategory"] = "New"
 
-            if props["url"].endswith("/"):
-                props["url"] = props["url"][:-1]
-
-            if SourceDataModel.objects.filter(url = props["url"]).count() > 0:
-                return
-
+        try:
             SourceDataModel.objects.create(**props)
+        except Exception as E:
+            pass
 
     def update_complementary_data(self, force=False):
         DomainsSuffixes.add(self.suffix)
         DomainsTlds.add(self.tld)
         DomainsMains.add(self.main)
 
-        if self.is_update_time() or force:
-            self.update_page_info()
+        #if self.is_update_time() or force:
+        #    self.update_page_info()
 
     def get_domain_ext(self, domain_only_text):
         tld = os.path.splitext(domain_only_text)[1][1:]
@@ -189,9 +283,9 @@ class Domains(models.Model):
 
         days = DateUtils.get_day_diff(self.date_update_last)
         # TODO make this configurable
-        return days > self.get_update_days_limit()
+        return days > Domains.get_update_days_limit()
 
-    def get_update_days_limit(self):
+    def get_update_days_limit():
         return 7
 
     def update_domain(self):
@@ -222,7 +316,7 @@ class Domains(models.Model):
 
             self.save()
 
-            Domains.update_complementary_data(self)
+            self.update_complementary_data()
 
         else:
             print("domain:{} Nothing has changed".format(self.domain))
@@ -231,16 +325,26 @@ class Domains(models.Model):
         # if self.title is not None and self.description is not None and self.dead == False and not force:
         #    print("Domain: not fixing title/description {} {} {}".format(self.domain, self.suffix, self.tld))
         #    return False
+        if self.link_obj is not None:
+            return
+
         print("Fixing title {}".format(self.domain))
 
-        changed = False
-
+        from ..dateutils import DateUtils
         from ..webtools import Page
+
+        date_before_limit = DateUtils.get_days_before_dt(
+            Domains.get_update_days_limit()
+        )
+        if self.date_update_last >= date_before_limit:
+            return
+
+        changed = False
 
         p = Page(self.get_domain_full_url())
 
         new_title = p.get_title()
-        new_description = p.get_description()
+        new_description = p.get_description_safe()[:998]
         new_language = p.get_language()
         protocol = self.protocol
 
@@ -248,7 +352,7 @@ class Domains(models.Model):
             print("{} Trying with http".format(self.domain))
             p = Page(self.get_domain_full_url("http"))
             new_title = p.get_title()
-            new_description = p.get_description()
+            new_description = p.get_description_safe()[:998]
             new_language = p.get_language()
 
         print("Page status:{}".format(p.is_status_ok()))
@@ -261,8 +365,6 @@ class Domains(models.Model):
 
         if p.is_status_ok() == False or is_title_invalid:
             self.dead = True
-
-            from ..dateutils import DateUtils
 
             self.date_update_last = DateUtils.get_datetime_now_utc()
 
@@ -289,8 +391,6 @@ class Domains(models.Model):
             changed = True
 
         if changed:
-            from ..dateutils import DateUtils
-
             self.date_update_last = DateUtils.get_datetime_now_utc()
 
             self.protocol = protocol
@@ -301,15 +401,17 @@ class Domains(models.Model):
             from ..dateutils import DateUtils
 
             date_before_limit = DateUtils.get_days_before_dt(
-                self.get_update_days_limit()
+                Domains.get_update_days_limit()
             )
 
-            domains = Domains.objects.filter(date_update_last__lt=date_before_limit)
+            domains = Domains.objects.filter(date_update_last__lt=date_before_limit, dead = False, link_obj = None)
             # domains = Domains.objects.filter(dead = True) #, description__isnull = True)
 
         for domain in domains:
-            print("Fixing:{}".format(domain.domain))
-            domain.update_object()
+            if not domain.dead:
+                print("Fixing:{}".format(domain.domain))
+                domain.update_object()
+                print("Fixing:{} done".format(domain.domain))
 
     def remove_all():
         domains = Domains.objects.all()
@@ -323,6 +425,16 @@ class Domains(models.Model):
 
         mains = DomainsMains.objects.all()
         mains.delete()
+
+    def remove(self):
+        from ..controllers import LinkDataHyperController
+
+        link = self.get_domain_full_url()
+        entry = LinkDataHyperController.get_link_object(link)
+        if entry:
+            entry.delete()
+
+        self.delete()
 
     def get_map(self):
         result = {
@@ -442,7 +554,7 @@ class DomainSubCategories(models.Model):
 
     def add(category, subcategory):
         category_obj = None
-        category_objs = DomainCategories.objects.filter(category = category)
+        category_objs = DomainCategories.objects.filter(category=category)
         if category_objs.count() > 0:
             category_obj = category_objs[0]
 
@@ -452,5 +564,7 @@ class DomainSubCategories(models.Model):
             )
             if objs.count() == 0:
                 DomainSubCategories.objects.create(
-                    category=category, subcategory=subcategory, category_obj = category_obj
+                    category=category,
+                    subcategory=subcategory,
+                    category_obj=category_obj,
                 )

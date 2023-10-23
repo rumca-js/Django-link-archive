@@ -1,6 +1,6 @@
 <div
         {% if link.bookmarked %}
-        title="{{link.get_title}} {{link.get_long_description}}"
+         title="{{link.get_title}} {{link.link}} {{link.get_long_description}}"
         class="element_{{user_config.display_type}} element_{{user_config.display_type}}_selected"
         {% else %}
         class="element_{{user_config.display_type}}"

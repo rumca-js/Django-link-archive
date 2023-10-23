@@ -25,3 +25,31 @@ class DomainTest(TestCase):
         self.assertEqual(obj.main, "blogspot")
         self.assertEqual(obj.subdomain, "waiterrant")
         self.assertEqual(obj.suffix, "com")
+
+    def test_domain_add_https(self):
+        Domains.add("https://waiterrant.blogspot.com")
+
+        objs = Domains.objects.filter(domain__icontains="waiterrant")
+
+        self.assertEqual(objs.count(), 1)
+
+        obj = objs[0]
+
+        self.assertEqual(obj.domain, "waiterrant.blogspot.com")
+        self.assertEqual(obj.main, "blogspot")
+        self.assertEqual(obj.subdomain, "waiterrant")
+        self.assertEqual(obj.suffix, "com")
+
+    def test_domain_add_full_link(self):
+        Domains.add("https://waiterrant.blogspot.com/nothing-important")
+
+        objs = Domains.objects.filter(domain__icontains="waiterrant")
+
+        self.assertEqual(objs.count(), 1)
+
+        obj = objs[0]
+
+        self.assertEqual(obj.domain, "waiterrant.blogspot.com")
+        self.assertEqual(obj.main, "blogspot")
+        self.assertEqual(obj.subdomain, "waiterrant")
+        self.assertEqual(obj.suffix, "com")

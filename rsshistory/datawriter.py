@@ -80,7 +80,7 @@ class DataWriter(object):
     def get_personal_domains_json(self):
         from .models import Domains
 
-        domains = Domains.objects.filter(category = "Personal")
+        domains = Domains.objects.filter(category="Personal")
 
         from .serializers.domainexporter import DomainJsonExporter
 
@@ -113,7 +113,9 @@ class DataWriter(object):
         file_name.write_text(text)
 
         text = self.get_personal_domains_json()
-        file_name = self._cfg.get_daily_data_path() / self._cfg.get_personal_domains_file_name()
+        file_name = (
+            self._cfg.get_daily_data_path() / self._cfg.get_personal_domains_file_name()
+        )
         file_name.write_text(text)
 
         text = self.get_keywords_json(day_iso)

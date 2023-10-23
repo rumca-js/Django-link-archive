@@ -22,6 +22,9 @@ class YouTubeLinkHandler(object):
             return "https://www.youtube.com/watch?v={0}".format(code)
 
     def input2code(url):
+        if not url:
+            return
+
         wh = url.find("youtu.be")
         video_code = None
         if wh >= 0:
@@ -42,7 +45,11 @@ class YouTubeLinkHandler(object):
 
     def input2code_standard(url):
         parsed_elements = urlparse(url)
-        return parse_qs(parsed_elements.query)["v"][0]
+        elements = parse_qs(parsed_elements.query)
+        if "v" in elements:
+            return elements["v"][0]
+        else:
+            return None
 
     def get_link_classic(self):
         return "https://www.youtube.com?v={0}".format(self.get_video_code())
@@ -137,16 +144,16 @@ class YouTubeLinkHandler(object):
         if self.yt_text and not self.yt_ob.loads(self.yt_text):
             return False
 
-        #from ..serializers.returnyoutubedislikeapijson import YouTubeThumbsDown
+        # from ..serializers.returnyoutubedislikeapijson import YouTubeThumbsDown
 
-        #self.rd_ob = YouTubeThumbsDown()
-        #if self.rd_text and not self.rd_ob.loads(self.rd_text):
+        # self.rd_ob = YouTubeThumbsDown()
+        # if self.rd_text and not self.rd_ob.loads(self.rd_text):
         #    return False
 
         return True
 
     def download_details_only(self):
-        if self.download_details_yt(): # and self.download_details_rd():
+        if self.download_details_yt():  # and self.download_details_rd():
             return True
         return False
 

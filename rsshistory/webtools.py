@@ -15,7 +15,6 @@ from .models import PersistentInfo
 from .apps import LinkDatabase
 
 
-
 class BasePage(object):
     # use headers from https://www.supermonitoring.com/blog/check-browser-http-headers/
     user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/116.0"
@@ -25,12 +24,19 @@ class BasePage(object):
     def __init__(self, url, contents=None):
         self.url = url
         self.contents = contents
-        self.status_code = None
+        if self.contents:
+            self.process_contents()
 
-        from .models import ConfigurationEntry
+        self.status_code = 0
 
-        config = ConfigurationEntry.get()
-        self.user_agent = config.user_agent
+        if self.contents is None:
+            from .models import ConfigurationEntry
+
+            config = ConfigurationEntry.get()
+            self.user_agent = config.user_agent
+
+    def process_contents(self):
+        pass
 
     def is_valid(self):
         if not self.contents:
@@ -48,7 +54,7 @@ class BasePage(object):
             pass
 
     def is_status_ok(self):
-        if self.status_code is None:
+        if self.status_code == 0:
             return False
 
         print("Status code:{}".format(self.status_code))
@@ -62,6 +68,9 @@ class BasePage(object):
         if self.contents:
             return self.contents
 
+        if not self.user_agent or self.user_agent == "":
+            return None
+
         hdr = {
             "User-Agent": self.user_agent,
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
@@ -73,7 +82,7 @@ class BasePage(object):
 
         try:
             print("[{}] Page: Requesting page: {}".format(LinkDatabase.name, self.url))
-            #traceback.print_stack()
+            # traceback.print_stack()
 
             r = requests.get(self.url, headers=hdr, timeout=5)
             self.status_code = r.status_code
@@ -88,9 +97,13 @@ class BasePage(object):
 
             self.contents = r.text
             self.contents_bytes = r.content
+
+            self.process_contents()
+
             return r.text
 
         except Exception as e:
+            print(e)
             error_text = traceback.format_exc()
 
             PersistentInfo.error(
@@ -108,7 +121,7 @@ class BasePage(object):
         items = urlparse(self.url)
         return str(items.netloc)
 
-    def is_html(self, check_contents = False):
+    def is_html(self, check_contents=False):
         if self.is_analytics():
             return False
 
@@ -137,6 +150,7 @@ class BasePage(object):
     def is_rss(self):
         try:
             import feedparser
+
             feed = feedparser.parse(self.get_contents())
             if len(feed.entries) > 0:
                 return True
@@ -169,6 +183,24 @@ class BasePage(object):
         else:
             return url
 
+    def get_url_full(domain, url):
+        ready_url = ""
+        if url.find("http") == 0:
+            ready_url = url
+        else:
+            if url.startswith("//"):
+                ready_url = "https:" + url
+            elif url.startswith("/"):
+                if not domain.endswith("/"):
+                    domain = domain + "/"
+                if url.startswith("/"):
+                    url = url[1:]
+
+                ready_url = domain + url
+            else:
+                ready_url = domain + url
+        return ready_url
+
     def is_analytics(self):
         if self.url.find("g.doubleclick") >= 0:
             return True
@@ -185,6 +217,8 @@ class BasePage(object):
         if self.url.find("googletagservices") >= 0:
             return True
         if self.url.find("cdn.speedcurve.com") >= 0:
+            return True
+        if self.url.find("amazonaws.com") >= 0:
             return True
 
 
@@ -209,6 +243,7 @@ class RssPropertyReader(BasePage):
                 return None
 
             import feedparser
+
             return feedparser.parse(contents)
 
         except Exception as e:
@@ -319,7 +354,7 @@ class ContentLinkParser(BasePage):
     TODO filter also html from non html
     """
 
-    def __init__(self, url, contents = None):
+    def __init__(self, url, contents=None):
         super().__init__(url, contents)
         self.url = self.get_clean_url()
 
@@ -397,6 +432,10 @@ class Page(BasePage):
     def __init__(self, url, contents=None):
         super().__init__(url, contents)
 
+    def process_contents(self):
+        if self.contents:
+            self.soup = BeautifulSoup(self.contents, "html.parser")
+
     def get_language(self):
         if not self.contents:
             self.contents = self.get_contents()
@@ -404,12 +443,41 @@ class Page(BasePage):
         if not self.contents:
             return "en"
 
-        soup = BeautifulSoup(self.contents, "html.parser")
-        html = soup.find("html")
+        html = self.soup.find("html")
         if html and html.has_attr("lang"):
             return html["lang"]
 
         return "en"
+
+    def get_title_meta(self):
+        if not self.contents:
+            self.contents = self.get_contents()
+
+        if not self.contents:
+            return None
+
+        title = None
+
+        title_find = self.soup.find("title")
+        if title_find:
+            title = title_find.string
+
+        return title
+
+    def get_title_og(self):
+        if not self.contents:
+            self.contents = self.get_contents()
+
+        if not self.contents:
+            return None
+
+        title = None
+
+        title_find = self.soup.find("meta", property="og:title")
+        if title_find and title_find.has_attr("content"):
+            title = title_find["content"]
+
+        return title
 
     def get_title(self):
         if not self.contents:
@@ -420,18 +488,21 @@ class Page(BasePage):
 
         title = None
 
-        soup = BeautifulSoup(self.contents, "html.parser")
-        title_find = soup.find("title")
-        if title_find:
-            title = title_find.string
-
-        title_find = soup.find("meta", property="og:title")
-        if title_find and title_find.has_attr("content"):
-            title = title_find["content"]
+        title = self.get_title_og()
+        if not title:
+            title = self.get_title_meta()
 
         if title:
             title = title.strip()
-            return title
+
+            # TODO hardcoded. Some pages provide such a dumb title with redirect
+            if title.find("Just a moment...") >= 0:
+                title = self.url
+
+        if not title or title == "":
+            title = self.url
+
+        return title
         # title = html.unescape(title)
 
     def get_charset(self):
@@ -443,12 +514,40 @@ class Page(BasePage):
 
         charset = None
 
-        soup = BeautifulSoup(self.contents, "html.parser")
-
-        allmeta = soup.findAll("meta")
+        allmeta = self.soup.findAll("meta")
         for meta in allmeta:
             if "charset" in meta.attrs:
                 return meta.attrs["charset"]
+
+    def get_description_meta(self):
+        if not self.contents:
+            self.contents = self.get_contents()
+
+        if not self.contents:
+            return None
+
+        description = None
+
+        description_find = self.soup.find("meta", attrs={"name": "description"})
+        if description_find and description_find.has_attr("content"):
+            description = description_find["content"]
+
+        return description
+
+    def get_description_og(self):
+        if not self.contents:
+            self.contents = self.get_contents()
+
+        if not self.contents:
+            return None
+
+        description = None
+
+        description_find = self.soup.find("meta", property="og:description")
+        if description_find and description_find.has_attr("content"):
+            description = description_find["content"]
+
+        return description
 
     def get_description(self):
         if not self.contents:
@@ -459,36 +558,20 @@ class Page(BasePage):
 
         description = None
 
-        soup = BeautifulSoup(self.contents, "html.parser")
-
-        description_find = soup.find("meta", attrs={"name": "description"})
-        if description_find and description_find.has_attr("content"):
-            description = description_find["content"]
-
-        description_find = soup.find("meta", property="og:description")
-        if description_find and description_find.has_attr("content"):
-            description = description_find["content"]
-
-        if description is None:
-            wh1 = self.contents.find('<meta name="description"')
-            if wh1 == -1:
-                return
-
-            wh1 = self.contents.find("description", wh1 + 24 + 1)
-            if wh1 == -1:
-                return
-            wh1 = self.contents.find('"', wh1 + 1)
-            if wh1 == -1:
-                return
-            wh2 = self.contents.find('"', wh1 + 1)
-            if wh2 == -1:
-                return
-            description = self.contents[wh1 + 1 : wh2]
+        description = self.get_description_og()
+        if not description:
+            description = self.get_description_meta()
 
         if description:
             description = description.strip()
 
         return description
+
+    def get_description_safe(self):
+        desc = self.get_description()
+        if not desc:
+            return ""
+        return desc
 
     def is_link_valid(self, address):
         return self.is_link_valid_domain(address)
@@ -498,36 +581,42 @@ class Page(BasePage):
             return False
         return True
 
-    def get_rss_url(self):
+    def get_rss_url(self, full_check=False):
         if not self.contents:
             self.contents = self.get_contents()
 
         if not self.contents:
             return None
 
-        soup = BeautifulSoup(self.contents, "html.parser")
-
         rss_url = None
 
-        rss_find = soup.find("link", attrs={"type": "application/rss+xml"})
+        rss_find = self.soup.find("link", attrs={"type": "application/rss+xml"})
 
         if rss_find and rss_find.has_attr("href"):
             rss_url = rss_find["href"]
 
-        rss_find = soup.find("link", attrs={"type": "application/rss+xml;charset=UTF-8"})
+        rss_find = self.soup.find(
+            "link", attrs={"type": "application/rss+xml;charset=UTF-8"}
+        )
         if rss_find and rss_find.has_attr("href"):
             rss_url = rss_find["href"]
 
         if rss_url:
-            try:
-                parser = RssPropertyReader(rss_url)
-                feed = parser.parse()
-                if len(feed.entries) > 0:
-                    return rss_url
-            except Exception as e:
-                return None
+            rss_url = BasePage.get_url_full(self.get_domain(), rss_url)
+            # try:
+            #    parser = RssPropertyReader(rss_url)
+            #    feed = parser.parse()
+            #
+            #    print("RSS: {}".format(rss_url))
+            #    print(len(feed.entries))
+            #
+            #    if len(feed.entries) > 0:
+            #        return rss_url
+            # except Exception as e:
+            #    print("Exception {}".format(str(e)))
+            return rss_url
 
-        if not rss_url:
+        if not rss_url and full_check:
             lucky_shot = self.url + "/feed"
             try:
                 parser = RssPropertyReader(lucky_shot)
@@ -535,7 +624,7 @@ class Page(BasePage):
                 if len(feed.entries) > 0:
                     rss_url = lucky_shot
             except Exception as e:
-                return None
+                print("Exception {}".format(str(e)))
 
     def get_links(self):
         p = ContentLinkParser(self.url, self.get_contents())
@@ -553,7 +642,9 @@ class Page(BasePage):
         p = ContentLinkParser(self.url, self.get_contents())
         links = p.get_links()
         links = ContentLinkParser.filter_link_html(links)
-        in_domain = ContentLinkParser.filter_link_in_domain(p.get_links(), self.get_domain())
+        in_domain = ContentLinkParser.filter_link_in_domain(
+            p.get_links(), self.get_domain()
+        )
         return links - in_domain
 
     def is_mainstream(self):
@@ -596,18 +687,81 @@ class Page(BasePage):
         wget = Wget(self.url)
         wget.download_all()
 
+    def get_properties_map(self):
+        props = {}
+
+        props["link"] = self.url
+        props["title"] = self.get_title()
+        props["description"] = self.get_description()
+        props["meta:title"] = self.get_title_meta()
+        props["meta:description"] = self.get_description_meta()
+        props["og:title"] = self.get_title_og()
+        props["og:description"] = self.get_description_og()
+        props["is_html"] = self.is_html()
+        props["charset"] = self.get_charset()
+        props["language"] = self.get_language()
+        props["rss_url"] = self.get_rss_url()
+        props["page_rating"] = self.get_page_rating()
+        props["status_code"] = self.status_code
+        props["links"] = self.get_links()
+        props["links_inner"] = self.get_links_inner()
+        props["links_outer"] = self.get_links_outer()
+        props["contents"] = self.get_contents()
+        return props
+
     def get_properties(self):
         props = []
-        p = ContentLinkParser(self.url, self.get_contents())
 
-        props.append(("title", self.get_title()))
-        props.append(("description", self.get_description()))
-        props.append(("is_html", p.is_html()))
-        props.append(("charset", self.get_charset()))
-        props.append(("language", self.get_language()))
-        props.append(("rss_url", self.get_rss_url()))
-        props.append(("links", self.get_links()))
-        props.append(("links_inner", self.get_links_inner()))
-        props.append(("links_outer", self.get_links_outer()))
-        props.append(("contents", self.get_contents()))
+        map_props = self.get_properties_map()
+        for key in map_props:
+            props.append((key, map_props[key]))
+
         return props
+
+    def get_page_rating(self):
+        rating = 0
+
+        title_meta = self.get_title_meta()
+        title_og = self.get_title_og()
+        description_meta = self.get_description_meta()
+        description_og = self.get_description_og()
+
+        rating += self.get_page_rating_title(title_meta)
+        rating += self.get_page_rating_title(title_og)
+        rating += self.get_page_rating_description(description_meta)
+        rating += self.get_page_rating_description(description_og)
+        rating += self.get_page_rating_status_code(self.status_code)
+
+        return rating
+
+    def get_page_rating_title(self, title):
+        rating = 0
+        if title is not None:
+            if len(title) > 1000:
+                rating += 5
+            elif len(title.split(" ")) < 2:
+                rating += 5
+            elif len(title) < 4:
+                rating += 2
+            else:
+                rating += 10
+
+        return rating
+
+    def get_page_rating_description(self, description):
+        rating = 0
+        if description is not None:
+            rating += 5
+
+        return rating
+
+    def get_page_rating_status_code(self, status_code):
+        rating = 0
+        if status_code == 200:
+            rating += 10
+        elif status_code >= 200 and status_code <= 300:
+            rating += 5
+        elif status_code != 0:
+            rating += 1
+
+        return rating

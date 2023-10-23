@@ -34,12 +34,11 @@ class EntryYouTubePlugin(YouTubeLinkHandler, EntryGenericPlugin):
                 ),
             ),
             EntryButton(
-                "YewTu.be",
-                "https://yewtu.be/watch?v={}".format(self.get_video_code())
+                "YewTu.be", "https://yewtu.be/watch?v={}".format(self.get_video_code())
             ),
             EntryButton(
                 "YouTube Music",
-                "https://music.youtube.com/watch?v={}".format(self.get_video_code())
+                "https://music.youtube.com/watch?v={}".format(self.get_video_code()),
             ),
         ]
 

@@ -21,7 +21,7 @@ from .models import (
     Domains,
     KeyWords,
 )
-from .webtools import Page, RssPropertyReader
+from .webtools import Page, RssPropertyReader, ContentLinkParser
 
 from .apps import LinkDatabase
 
@@ -31,14 +31,14 @@ class SourceDataController(SourceDataModel):
         proxy = True
 
     def add(source_data_map):
-        sources = SourceDataController.objects.filter(url = source_data_map["url"])
+        sources = SourceDataController.objects.filter(url=source_data_map["url"])
         if sources.count() > 0:
             return None
 
         # TODO add domain when adding new source
         source = SourceDataController.objects.create(**source_data_map)
 
-        SourceDataController.fix_entries()
+        SourceDataController.fix_entries(source)
 
         if ConfigurationEntry.get().store_domain_info:
             Domains.add(source_data_map["url"])
@@ -228,10 +228,13 @@ class SourceDataController(SourceDataModel):
             return SourceDataController.get_info_from_rss(data["url"])
         elif p.is_youtube():
             from .pluginentries.youtubelinkhandler import YouTubeLinkHandler
+
             print("Page is youtube")
             handler = YouTubeLinkHandler(data["url"])
             handler.download_details()
-            return SourceDataController.get_info_from_rss(handler.get_channel_feed_url())
+            return SourceDataController.get_info_from_rss(
+                handler.get_channel_feed_url()
+            )
         elif p.get_rss_url():
             print("Page has RSS url")
             return SourceDataController.get_info_from_rss(p.get_rss_url())
@@ -253,8 +256,8 @@ class SourceDataController(SourceDataModel):
         if "language" in feed.feed:
             data["language"] = feed.feed.language
         if "image" in feed.feed:
-            if 'href' in feed.feed.image:
-                data["favicon"] = feed.feed.image['href']
+            if "href" in feed.feed.image:
+                data["favicon"] = feed.feed.image["href"]
             else:
                 data["favicon"] = feed.feed.image
         return data
@@ -266,6 +269,7 @@ class SourceDataController(SourceDataModel):
         data["language"] = p.get_language()
         data["title"] = p.get_title()
         data["description"] = p.get_title()
+        data["page_rating"] = p.get_page_rating()
         return data
 
     def get_channel_page_url(self):
@@ -273,8 +277,8 @@ class SourceDataController(SourceDataModel):
 
         return YouTubeSourceHandler.input2url(self.url)
 
-    def fix_entries():
-        entries = LinkDataModel.objects.filter(source = self.url)
+    def fix_entries(self):
+        entries = LinkDataModel.objects.filter(source=self.url)
         for entry in entries:
             entry.source_obj = self
             entry.save()
@@ -351,7 +355,10 @@ class LinkDataController(LinkDataModel):
                 days_before = current_time - timedelta(days=days)
 
                 entries = LinkDataController.objects.filter(
-                    source=source.url, bookmarked=False, date_published__lt=days_before
+                    source=source.url,
+                    bookmarked=False,
+                    permanent=False,
+                    date_published__lt=days_before,
                 )
                 if entries.exists():
                     PersistentInfo.create(
@@ -414,9 +421,7 @@ class ArchiveLinkDataController(ArchiveLinkDataModel):
 
 class LinkDataHyperController(object):
     def add_new_link(link_data):
-        print("LinkDataHyperController:Adding link: {}".format(link_data['link']))
-
-        if "source_obj" not in link_data:
+        if "source_obj" not in link_data and "source" in link_data:
             source_obj = None
             sources = SourceDataController.objects.filter(url=link_data["source"])
             if sources.exists():
@@ -426,7 +431,12 @@ class LinkDataHyperController(object):
 
         created = False
         ob = None
-        is_archive = BaseLinkDataController.is_archive_by_date(link_data["date_published"])
+        is_archive = False
+
+        if "date_published" in link_data:
+            is_archive = BaseLinkDataController.is_archive_by_date(
+                link_data["date_published"]
+            )
 
         if not is_archive or link_data["bookmarked"]:
             objs = LinkDataModel.objects.filter(link=link_data["link"])
@@ -440,10 +450,12 @@ class LinkDataHyperController(object):
         p = Page(link_data["link"])
         if p.is_youtube():
             from .pluginentries.youtubelinkhandler import YouTubeLinkHandler
+
             handler = YouTubeLinkHandler(link_data["link"])
-            handler.download_details()
-            if not handler.is_valid():
-                return None
+            if handler.get_video_code():
+                handler.download_details()
+                if not handler.is_valid():
+                    return None
 
         if not is_archive or link_data["bookmarked"]:
             ob = LinkDataModel(**link_data)
@@ -457,6 +469,9 @@ class LinkDataHyperController(object):
             ob = ArchiveLinkDataModel(**link_data)
             ob.save()
             created = True
+
+        if created:
+            print("[{}]:Adding link: {}".format(LinkDatabase.name, link_data["link"]))
 
         return ob
 
@@ -516,15 +531,23 @@ class LinkDataHyperController(object):
     def add_new_link_data(link_data):
         try:
             if ConfigurationEntry.get().store_domain_info:
-                p = Page(link_data["source"])
-                domain = p.get_domain_only()
-                Domains.add(domain)
+                if "source" in link_data:
+                    p = Page(link_data["source"])
+                    domain = p.get_domain_only()
+                    Domains.add(domain)
 
                 p = Page(link_data["link"])
                 domain = p.get_domain_only()
                 Domains.add(domain)
 
-                KeyWords.add_link_data(link_data)
+                parser = ContentLinkParser(link_data["link"], link_data["description"])
+                links = parser.get_links()
+                for link in links:
+                    Domains.add(domain)
+
+            if ConfigurationEntry.get().store_keyword_info:
+                if "title" in link_data:
+                    KeyWords.add_link_data(link_data)
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.exc(
@@ -537,6 +560,8 @@ class LinkDataHyperController(object):
             )
 
     def get_link_object(link, date=None):
+        from .dateutils import DateUtils
+
         conf = ConfigurationEntry.get()
 
         if date is None:
@@ -546,6 +571,8 @@ class LinkDataHyperController(object):
             obj = ArchiveLinkDataController.objects.filter(link=link)
             if obj.count() > 0:
                 return obj[0]
+
+            return None
 
         current_time = DateUtils.get_datetime_now_utc()
         date_before = current_time - date
@@ -617,14 +644,15 @@ class LinkDataHyperController(object):
 
     def get_clean_description(link_data):
         import re
-        # as per recommendation from @freylis, compile once only
-        CLEANR = re.compile('<.*?>')
 
-        cleantext = re.sub(CLEANR, '', link_data["description"])
+        # as per recommendation from @freylis, compile once only
+        CLEANR = re.compile("<.*?>")
+
+        cleantext = re.sub(CLEANR, "", link_data["description"])
         return cleantext
-        #from bs4 import BeautifulSoup
-        #cleantext = BeautifulSoup(link_data["description"], "lxml").text
-        #return cleantext
+        # from bs4 import BeautifulSoup
+        # cleantext = BeautifulSoup(link_data["description"], "lxml").text
+        # return cleantext
 
 
 class LinkCommentDataController(LinkCommentDataModel):
@@ -664,6 +692,17 @@ class LinkCommentDataController(LinkCommentDataModel):
         )
 
 
+class DomainsController(Domains):
+    class Meta:
+        proxy = True
+
+    def add(url):
+        domain = Domains.add(url)
+        entry = LinkDataHyperController.add_new_link(domain.get_domain_full_url())
+        domain.link_obj = entry
+        domain.save()
+
+
 class BackgroundJobController(BackgroundJob):
     class Meta:
         proxy = True
@@ -683,7 +722,7 @@ class BackgroundJobController(BackgroundJob):
                 print("Clearing job {}".format(job.job))
                 job.delete()
 
-    def get_number_of_jobs(job_name = None):
+    def get_number_of_jobs(job_name=None):
         if job_name is None:
             return BackgroundJob.objects.all().count()
         return BackgroundJob.objects.filter(job=job_name).count()
@@ -852,4 +891,9 @@ class BackgroundJobController(BackgroundJob):
     def check_domains():
         return BackgroundJobController.create_single_job(
             BackgroundJob.JOB_CHECK_DOMAINS
+        )
+
+    def import_from_instance(link):
+        return BackgroundJobController.create_single_job(
+            BackgroundJob.JOB_IMPORT_INSTANCE, link
         )

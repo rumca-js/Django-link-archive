@@ -6,7 +6,7 @@ from django.http import HttpResponseForbidden, HttpResponseRedirect
 from datetime import datetime, timedelta
 
 from ..apps import LinkDatabase
-from ..models import LinkTagsDataModel, ConfigurationEntry
+from ..models import LinkTagsDataModel, ConfigurationEntry, LinkVoteDataModel
 from ..controllers import LinkDataController
 from ..forms import TagForm, TagEntryForm, TagRenameForm
 from ..views import ViewPage
@@ -106,7 +106,7 @@ def tag_entry(request, pk):
         return p.render("summary_present.html")
 
     obj = objs[0]
-    if not obj.bookmarked:
+    if not obj.is_taggable():
         p.context["summary_text"] = "Sorry, only bookmarked objects can be tagged"
         return p.render("summary_present.html")
 
@@ -142,9 +142,7 @@ def tag_entry(request, pk):
 
         form.method = "POST"
         form.pk = pk
-        form.action_url = reverse(
-            "{}:entry-tag".format(LinkDatabase.name), args=[pk]
-        )
+        form.action_url = reverse("{}:entry-tag".format(LinkDatabase.name), args=[pk])
         p.context["form"] = form
         p.context["form_title"] = obj.title
         p.context["form_description"] = obj.title
@@ -212,9 +210,7 @@ def tag_remove_str(request, tag_name):
     entries = LinkTagsDataModel.objects.filter(tag=tag_name)
     entries.delete()
 
-    return HttpResponseRedirect(
-        reverse("{}:tags-show-all".format(LinkDatabase.name))
-    )
+    return HttpResponseRedirect(reverse("{}:tags-show-all".format(LinkDatabase.name)))
 
 
 def tags_entry_remove(request, entrypk):
@@ -229,9 +225,7 @@ def tags_entry_remove(request, entrypk):
     for tag in tags:
         tag.delete()
 
-    return HttpResponseRedirect(
-        reverse("{}:tags-show-all".format(LinkDatabase.name))
-    )
+    return HttpResponseRedirect(reverse("{}:tags-show-all".format(LinkDatabase.name)))
 
 
 def tags_entry_show(request, entrypk):
@@ -312,7 +306,7 @@ def entry_vote(request, pk):
         return p.render("summary_present.html")
 
     obj = objs[0]
-    if not obj.bookmarked:
+    if not obj.is_taggable():
         p.context["summary_text"] = "Sorry, only bookmarked objects can be tagged"
         return p.render("summary_present.html")
 
@@ -322,7 +316,7 @@ def entry_vote(request, pk):
         form = LinkVoteForm(request.POST)
 
         if form.is_valid():
-            form.save_vote()
+            LinkVoteDataModel.save_vote(form.cleaned_data)
 
             return HttpResponseRedirect(
                 reverse(
@@ -351,9 +345,7 @@ def entry_vote(request, pk):
 
         form.method = "POST"
         form.pk = pk
-        form.action_url = reverse(
-            "{}:entry-vote".format(LinkDatabase.name), args=[pk]
-        )
+        form.action_url = reverse("{}:entry-vote".format(LinkDatabase.name), args=[pk])
 
         p.context["form"] = form
         p.context["form_title"] = obj.title

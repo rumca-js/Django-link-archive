@@ -17,7 +17,7 @@ class BaseParsePlugin(SourceGenericPlugin):
         return self.source.get_domain()
 
     def is_link_valid(self, address):
-        print("Address:{} link:{}".format(self.source.url, address))
+        # print("Address:{} link:{}".format(self.source.url, address))
 
         if not self.is_link_valid_domain(address):
             return False

@@ -50,7 +50,10 @@ hr {
 .base-button-container a:hover {
 }
 
-.linklist a, .linklist a:link, .linklist a:visited, .linklist a:active {
+.link-list a{
+}
+
+.link-list a:link, .link-list a:visited, .link-list a:active {
 }
 
 .link-list a:hover {
@@ -151,6 +154,7 @@ hr {
 .link-list-thumbnail {
     width: 10%;
 }
+
 .link-list-item-title {
     font-weight: bold;
     text-align: left;
@@ -192,6 +196,15 @@ hr {
     flex-wrap: wrap;
 }
 
+.container_search-engine {
+    margin-top: 20px;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch
+}
+
 .element_standard, .element_standard:link, .element_standard:visited {
     color : black;
     padding: 0px 15px;
@@ -206,14 +219,13 @@ hr {
 }
 
 .element_standard_selected, .element_standard_selected:link, .element_standard_selected:visited, .element_standard_selected:active {
-    color : red;  /* not inherited */
-    /* background-color: #BFD8FF; */
+    color : green;  /* not inherited */
     text-decoration: none;
 }
 
 .element_standard_selected:hover {
     color: white;
-    background-color: blue;
+    background-color: green;
 }
 
 .element_clickable-tags, .element_clickable-tags:link, .element_clickable-tags:visited, .element_clickable-tags:active {
@@ -281,6 +293,24 @@ hr {
 }
 
 .element_youtube-thumbnails_selected, .element_youtube-thumbnails_selected:link, .element_youtube-thumbnails_selected:active, .element_youtube-thumbnails_selected:visited {
+}
+
+.element_search-engine, .element_search-engine:link, .element_search-engine:visited {
+    color : black;
+    padding: 0px 15px;
+    text-align: left;
+    text-decoration: none;
+    margin-bottom:3px;
+}
+
+.element_search-engine:hover, .element_search-engine:active{
+    color: blue;
+    background-color: #BFD8FF;
+}
+
+.element_search-engine_selected, .element_search-engine_selected:link, .element_search-engine_selected:visited, .element_search-engine_selected:active {
+    color : green;  /* not inherited */
+    text-decoration: none;
 }
 
 /* end of view elements */

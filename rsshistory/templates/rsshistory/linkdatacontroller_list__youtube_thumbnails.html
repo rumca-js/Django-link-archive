@@ -1,5 +1,5 @@
 <a href="{{ link.get_absolute_url }}"
-   title="{{link.title}} {{link.source}}"
+   title="{{link.title}} {{link.link}} {{link.source}}"
    {% if link.bookmarked %}
    class="element_{{user_config.display_type}} element_{{user_config.display_type}}_selected"
    {% else %}

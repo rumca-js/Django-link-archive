@@ -64,6 +64,29 @@ class LinkVoteDataModel(models.Model):
         blank=True,
     )
 
+    def save_vote(input_data):
+        link_id = input_data["link_id"]
+        author = input_data["author"]
+        vote = input_data["vote"]
+
+        entry = LinkDataModel.objects.get(id=link_id)
+
+        votes = LinkVoteDataModel.objects.filter(
+            author=author, link_obj=entry
+        )
+        votes.delete()
+
+        ob = LinkVoteDataModel.objects.create(
+            author=author,
+            vote=vote,
+            link_obj=entry,
+        )
+
+        # TODO this should be a background task
+        entry.update_calculated_vote()
+
+        return ob
+
 
 class LinkCommentDataModel(models.Model):
     author = models.CharField(max_length=1000)

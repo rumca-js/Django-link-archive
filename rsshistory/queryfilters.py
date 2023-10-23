@@ -89,11 +89,13 @@ class BaseQueryFilter(object):
 
     def time_start(self):
         from datetime import datetime
+
         self.time_start = datetime.now()
         return ""
 
     def time_stop(self):
         from datetime import datetime
+
         print("Page display time delta:{}".format(datetime.now() - self.time_start))
         return ""
 
@@ -207,6 +209,7 @@ class EntryFilter(BaseQueryFilter):
         query_filter.set_default_search_symbols(
             [
                 "title__icontains",
+                "link__icontains",
                 "description__icontains",
                 "tags__tag__icontains",
             ]
@@ -236,7 +239,7 @@ class EntryFilter(BaseQueryFilter):
 
     def get_arg_conditions(self, translate=False):
         parameter_map = {}
-        #TODO change to new API get_filter_args_map
+        # TODO change to new API get_filter_args_map
 
         if not translate:
             self.copy_if_is_set(parameter_map, self.args, "title")
@@ -253,6 +256,7 @@ class EntryFilter(BaseQueryFilter):
             self.copy_if_is_set(parameter_map, self.args, "date_from")
             self.copy_if_is_set(parameter_map, self.args, "date_to")
             self.copy_if_is_set(parameter_map, self.args, "archive")
+            self.copy_if_is_set(parameter_map, self.args, "age")
 
             if self.time_limit:
                 date_range = self.time_limit
@@ -276,6 +280,7 @@ class EntryFilter(BaseQueryFilter):
             self.copy_if_is_set_and_translate(parameter_map, self.args, "album")
             self.copy_if_is_set_and_translate(parameter_map, self.args, "date_from")
             self.copy_if_is_set_and_translate(parameter_map, self.args, "date_to")
+            self.copy_if_is_set_and_translate(parameter_map, self.args, "age")
 
             if self.time_limit:
                 if "date_published__range" not in parameter_map:
@@ -370,11 +375,11 @@ class DomainFilter(BaseQueryFilter):
 
         query_filter.set_default_search_symbols(
             [
-                "domain__icontains",
-                "title__icontains",
-                "description__icontains",
                 "category__icontains",
                 "subcategory__icontains",
+                "link_obj__title__icontains",
+                "domain__icontains",
+                "link_obj__description__icontains",
             ]
         )
 
@@ -506,13 +511,13 @@ class OmniSymbolProcessor(object):
             )
         )
 
-        if function == "And": # & sign
+        if function == "And":  # & sign
             self.known_results[operation_symbol] = args0 & args1
             return self.known_results[operation_symbol]
-        elif function == "Or": # | sign
+        elif function == "Or":  # | sign
             self.known_results[operation_symbol] = args0 | args1
             return self.known_results[operation_symbol]
-        elif function == "Not": # ~ sign
+        elif function == "Not":  # ~ sign
             self.known_results[operation_symbol] = ~args0
             return self.known_results[operation_symbol]
         else:
@@ -562,7 +567,7 @@ class OmniSymbolEvaluator(object):
         right_part = right_part.strip()
 
         wh1 = right_part.find('"')
-        wh2 = right_part.find('"', wh1+1)
+        wh2 = right_part.find('"', wh1 + 1)
 
         if wh1 == 0 and wh2 == len(right_part) - 1:
             right_part = right_part[1:-1]
@@ -645,6 +650,9 @@ class OmniSearchFilter(BaseQueryFilter):
 
     def calculate_combined_query(self):
         uses_operator = False
+        print("Self combined query {}".format(self.combined_query))
+        if self.combined_query is not None:
+            return
 
         operators = set()
         for symbol in self.symbol_evaluator.get_operators():
@@ -659,11 +667,22 @@ class OmniSearchFilter(BaseQueryFilter):
 
         if uses_operator:
             try:
+                print("Using processor")
                 self.combined_query = self.get_combined_query_using_processor()
+                print("Using processor done")
             except Exception as e:
-                self.combined_query = Q()
+                self.error = True
+                pass
         else:
-            self.combined_query = self.get_combined_query_simple()
+            try:
+                self.combined_query = self.get_combined_query_simple()
+            except Exception as e:
+                self.error = True
+                pass
+
+        if self.combined_query is None:
+            self.error = True
+            self.combined_query = Q()
 
     def get_combined_query_simple(self):
         symbol = self.data
@@ -687,6 +706,7 @@ class OmniSearchFilter(BaseQueryFilter):
         self.symbol_evaluator.set_translatable(self.translatable_names)
 
         if self.data:
+            print("Have data")
             proc = OmniSymbolProcessor(self.data, self.symbol_evaluator)
             combined_q_object = proc.process()
             return combined_q_object
@@ -698,6 +718,7 @@ class OmniSearchFilter(BaseQueryFilter):
         if self.data is not None and self.data != "":
             self.calculate_combined_query()
 
+            print("self.combined query: {}".format(self.combined_query))
             filtered_queryset = self.query_set.filter(self.combined_query)
             print("Omni query:{}".format(filtered_queryset.query))
             return filtered_queryset

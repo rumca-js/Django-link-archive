@@ -19,6 +19,7 @@ class RequestObject(object):
 
 class SourceParsePluginTest(TestCase):
     def setUp(self):
+        self.disable_web_pages()
         self.source_youtube = SourceDataController.objects.create(
             url="https://youtube.com",
             title="YouTube",
@@ -26,6 +27,15 @@ class SourceParsePluginTest(TestCase):
             subcategory="No",
             export_to_cms=True,
         )
+
+    def disable_web_pages(self):
+        from ..webtools import BasePage, Page
+        from ..models import ConfigurationEntry
+        BasePage.user_agent = None
+        Page.user_agent = None
+        entry = ConfigurationEntry.get()
+        entry.user_agent = ""
+        entry.save()
 
     def test_add_new_link(self):
         link_name = "https://youtube.com/v=1234"

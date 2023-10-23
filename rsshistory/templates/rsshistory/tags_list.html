@@ -16,7 +16,7 @@
 {% if tag_objects %}
     {% for tag in tag_objects %}
         <span class="float-button">
-            <a href='{% url 'rsshistory:entries-bookmarked'%}?tag="{{tag.0}}"' class="simplebutton">
+            <a href='{% url 'rsshistory:entries-omni-search'%}?search=tags__tag+%3D+"{{tag.0}}"' class="simplebutton">
                 {{tag.0}} {{tag.1}}</a>
         </span>
     {% endfor %}

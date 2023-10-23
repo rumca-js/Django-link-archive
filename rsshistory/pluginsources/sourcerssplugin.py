@@ -16,12 +16,15 @@ class BaseRssPlugin(SourceGenericPlugin):
     def get_link_props(self):
         try:
             from ..webtools import RssPropertyReader
+
             reader = RssPropertyReader(self.source.url)
             all_props = reader.parse_and_process()
 
             if len(all_props) == 0:
                 PersistentInfo.error(
-                    "Source:{0} {1}; Source has no data".format(self.source.url, self.source.title)
+                    "Source:{0} {1}; Source has no data".format(
+                        self.source.url, self.source.title
+                    )
                 )
 
             result = []
@@ -35,7 +38,7 @@ class BaseRssPlugin(SourceGenericPlugin):
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.exc(
-                    "BaseRssPlugin:get_link_props: Source:{} {}; Exc:{}\n{}".format(
+                "BaseRssPlugin:get_link_props: Source:{} {}; Exc:{}\n{}".format(
                     self.source.url, self.source.title, str(e), error_text
                 )
             )
@@ -45,17 +48,21 @@ class BaseRssPlugin(SourceGenericPlugin):
         try:
             from ..controllers import LinkDataController
 
-            is_archive = BaseLinkDataController.is_archive_by_date(props["date_published"])
+            is_archive = BaseLinkDataController.is_archive_by_date(
+                props["date_published"]
+            )
             if is_archive:
                 return False
 
             objs = LinkDataController.objects.filter(link=props["link"])
+            # print("Adding link {} {}".format(props["link"], props["title"]))
 
             if not objs.exists():
                 if "title" not in props:
                     PersistentInfo.error(
                         "Link:{}; Title:{} missing published field".format(
-                            props["link"], props["title"],
+                            props["link"],
+                            props["title"],
                         )
                     )
                     return False
@@ -63,20 +70,33 @@ class BaseRssPlugin(SourceGenericPlugin):
                 if not self.is_link_valid(props["link"]):
                     return False
 
+                # print("Link is valid {}".format(props["link"]))
+
                 if "date_published" not in props:
                     PersistentInfo.error(
                         "Link:{}; Title:{} missing published field".format(
-                            props["link"], props["title"],
+                            props["link"],
+                            props["title"],
                         )
                     )
                     return False
 
+                # print("Link - checking page {}".format(props["link"]))
+
                 from ..webtools import Page
+
                 p = Page(props["link"])
                 if p.is_youtube():
+                    print("Link - it is youtube {}".format(props["link"]))
                     from ..pluginentries.youtubelinkhandler import YouTubeLinkHandler
+
                     handler = YouTubeLinkHandler(props["link"])
                     handler.download_details()
+                    print(
+                        "Link - it is youtube {}, valid:{}".format(
+                            props["link"], handler.is_valid()
+                        )
+                    )
                     if not handler.is_valid():
                         return False
 

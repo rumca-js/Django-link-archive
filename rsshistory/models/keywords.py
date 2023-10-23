@@ -15,21 +15,23 @@ class KeyWords(models.Model):
         ordering = ["-date_published"]
 
     def count(keyword):
-        keys = KeyWords.objects.filter(keyword = keyword)
+        keys = KeyWords.objects.filter(keyword=keyword)
         return keys.count()
 
     def is_valid(str_token):
         # check if non alphanumeric?
-        if str_token.find("<") >= 0 or \
-            str_token.find(">") >= 0 or \
-            str_token.find("=") >= 0 or \
-            str_token.find("/") >= 0 or \
-            str_token.find(";") >= 0 or \
-            str_token.find("\"") >= 0 or \
-            str_token.find("#") >= 0 or \
-            str_token.find("+") >= 0 or \
-            str_token.find("?") >= 0 or \
-            str_token.find("&amp;") >= 0:
+        if (
+            str_token.find("<") >= 0
+            or str_token.find(">") >= 0
+            or str_token.find("=") >= 0
+            or str_token.find("/") >= 0
+            or str_token.find(";") >= 0
+            or str_token.find('"') >= 0
+            or str_token.find("#") >= 0
+            or str_token.find("+") >= 0
+            or str_token.find("?") >= 0
+            or str_token.find("&amp;") >= 0
+        ):
             return False
 
         if len(str_token) == 1:
@@ -38,41 +40,44 @@ class KeyWords(models.Model):
         return True
 
     def is_common(str_token):
-       if str_token == "day" or \
-           str_token == "days" or \
-           str_token == "month" or \
-           str_token == "months" or \
-           str_token == "year" or \
-           str_token == "years" or \
-           str_token == "world" or \
-           str_token == "news" or \
-           str_token == "week" or \
-           str_token == "today" or \
-           str_token == "comments" or \
-           str_token == "january" or \
-           str_token == "february" or \
-           str_token == "march" or \
-           str_token == "april" or \
-           str_token == "june" or \
-           str_token == "july" or \
-           str_token == "september" or \
-           str_token == "october" or \
-           str_token == "november" or \
-           str_token == "decmber" or \
-           str_token == "monday" or \
-           str_token == "tuesday" or \
-           str_token == "wednesday" or \
-           str_token == "thursday" or \
-           str_token == "friday" or \
-           str_token == "saturday" or \
-           str_token == "sunday" or \
-           str_token == "cnet" or \
-           str_token == "new":
-           return True
-       return False
+        if (
+            str_token == "day"
+            or str_token == "days"
+            or str_token == "month"
+            or str_token == "months"
+            or str_token == "year"
+            or str_token == "years"
+            or str_token == "world"
+            or str_token == "news"
+            or str_token == "week"
+            or str_token == "today"
+            or str_token == "comments"
+            or str_token == "january"
+            or str_token == "february"
+            or str_token == "march"
+            or str_token == "april"
+            or str_token == "june"
+            or str_token == "july"
+            or str_token == "september"
+            or str_token == "october"
+            or str_token == "november"
+            or str_token == "decmber"
+            or str_token == "monday"
+            or str_token == "tuesday"
+            or str_token == "wednesday"
+            or str_token == "thursday"
+            or str_token == "friday"
+            or str_token == "saturday"
+            or str_token == "sunday"
+            or str_token == "cnet"
+            or str_token == "new"
+        ):
+            return True
+        return False
 
     def load_token_program(language):
         import spacy
+
         if language.find("en") >= 0:
             load_text = "en_core_web_sm"
         elif language.find("pl") >= 0:
@@ -85,7 +90,7 @@ class KeyWords(models.Model):
     def add_text(text, language):
         if not language:
             return
-        if language.find('en') == -1:
+        if language.find("en") == -1:
             return
 
         nlp = KeyWords.load_token_program(language)
@@ -96,7 +101,7 @@ class KeyWords(models.Model):
         important_tokens = set()
 
         for token in doc:
-            # some words may appear in the beginning of the sentence - 
+            # some words may appear in the beginning of the sentence -
             # lets ignore case entirely
             str_token = str(token).lower()
             if not KeyWords.is_valid(str_token):
@@ -104,13 +109,13 @@ class KeyWords(models.Model):
             if KeyWords.is_common(str_token):
                 continue
 
-            #print("keyword:{} type:{}".format(str_token, token.pos_))
+            # print("keyword:{} type:{}".format(str_token, token.pos_))
 
             if token.pos_ == "NOUN" or token.pos_ == "PROPN":
                 important_tokens.add(str_token)
 
         for str_token in important_tokens:
-            KeyWords.objects.create(keyword = str_token, language = language)
+            KeyWords.objects.create(keyword=str_token, language=language)
 
     def add_link_data(link_data):
         from .admin import ConfigurationEntry
@@ -119,11 +124,11 @@ class KeyWords(models.Model):
             if "language" not in link_data:
                 return False
 
-            if not KeyWords.is_keyword_date_range(link_data['date_published']):
+            if not KeyWords.is_keyword_date_range(link_data["date_published"]):
                 return False
 
             # TODO we should make some switch in sources if it should store keywords
-            if link_data['link'].find("www.reddit.com") != -1:
+            if link_data["link"].find("www.reddit.com") != -1:
                 return False
 
             # duplicate words are not counted. We joint title and description
@@ -142,14 +147,15 @@ class KeyWords(models.Model):
         keys.delete()
 
         ## Each day capture new keywords
-        #keys = KeyWords.objects.all()
-        #keys.delete()
+        # keys = KeyWords.objects.all()
+        # keys.delete()
 
     def get_keywords_date_limit():
         from ..dateutils import DateUtils
+
         return DateUtils.get_days_before_dt(1)
 
-    def get_keyword_data(day_iso = None):
+    def get_keyword_data(day_iso=None):
         # collect how many times keyword exist
         counter = {}
 
@@ -157,7 +163,7 @@ class KeyWords(models.Model):
             keys = KeyWords.objects.all()
         else:
             date_range = DateUtils.get_range4day(day_iso)
-            keys = KeyWords.objects.filter(date_published__range = date_range)
+            keys = KeyWords.objects.filter(date_published__range=date_range)
 
         for key in keys:
             if key.keyword in counter:
@@ -169,19 +175,17 @@ class KeyWords(models.Model):
         content_list = []
         for key in counter:
             value = counter[key]
-            #content_list.append([key, value])
+            # content_list.append([key, value])
 
             if value > 1:
                 content_list.append([key, value])
 
         # sort
-        content_list = sorted(
-            content_list, key=lambda x: (x[1], x[0]), reverse=True
-        )
+        content_list = sorted(content_list, key=lambda x: (x[1], x[0]), reverse=True)
         return content_list
 
     def is_keyword_date_range(input_date):
-        # TODO we clear every beginning of 
+        # TODO we clear every beginning of
         # maybe we should clear
         from ..dateutils import DateUtils
         from .admin import ConfigurationEntry

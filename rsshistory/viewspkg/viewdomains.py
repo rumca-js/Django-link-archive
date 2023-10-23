@@ -147,13 +147,15 @@ def domain_add(request):
             link = form.cleaned_data["link"]
 
             domain = Domains.add(link)
-
-            return HttpResponseRedirect(
+            if domain:
+                return HttpResponseRedirect(
                 reverse(
                     "{}:domain-detail".format(LinkDatabase.name),
                     kwargs={"pk": domain.id},
                 )
-            )
+                )
+            p.context["summary_text"] = "Could not create domain"
+            return p.render("summary_present.html")
         else:
             p.context["summary_text"] = "Form is invalid"
             return p.render("summary_present.html")
@@ -203,9 +205,7 @@ def domain_edit(request, pk):
         form = DomainEditForm(instance=domain)
 
         form.method = "POST"
-        form.action_url = reverse(
-            "{}:domain-edit".format(LinkDatabase.name), args=[pk]
-        )
+        form.action_url = reverse("{}:domain-edit".format(LinkDatabase.name), args=[pk])
         p.context["form"] = form
         return p.render("form_basic.html")
 
@@ -218,7 +218,7 @@ def domain_remove(request, pk):
         return data
 
     domain = Domains.objects.get(id=pk)
-    domain.delete()
+    domain.remove()
 
     return HttpResponseRedirect(reverse("{}:domains".format(LinkDatabase.name)))
 
@@ -261,7 +261,7 @@ def domains_fix(request):
     if data is not None:
         return data
 
-    Domains.fix_all()
+    Domains.update_all()
 
     return HttpResponseRedirect(reverse("{}:domains".format(LinkDatabase.name)))
 
@@ -298,9 +298,14 @@ def domains_json(request):
 
     domains = Domains.objects.all()
 
+    page_limit = "standard"
+    if "page_limit" in request.GET:
+        page_limit = request.GET["page_limit"]
+
     # Data
     query_filter = DomainFilter(request.GET)
-    query_filter.use_page_limit = True
+    if page_limit != "no-limit":
+        query_filter.use_page_limit = True
     domains = query_filter.get_filtered_objects()
 
     from ..serializers.domainexporter import DomainJsonExporter

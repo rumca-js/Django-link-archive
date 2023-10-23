@@ -52,7 +52,7 @@
              {% if user_config.show_icons %}
              <img src="{{source.get_favicon}}" class="content-icon"/>
              {% endif %}
-             <span class="linklistitemtitle">
+             <span class="link-list-item-title">
                  {% if source.dead %}
                  [DEAD]
                  {% endif %}
@@ -61,7 +61,7 @@
                  {% endif %}
                  {{source.title}}
              </span>
-          <span class="linklistitemdescription">
+          <span class="link-list-item-description">
               {{source.get_long_description}}
           </span>
          </div>

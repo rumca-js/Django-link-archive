@@ -15,7 +15,7 @@ class SourceGenericPlugin(Page):
         self.default_entry_timestamp = None
 
     def get_address(self):
-        return self.source.get_domain()
+        return self.source.url
 
     def is_link_valid(self, address):
         return True
@@ -32,10 +32,21 @@ class SourceGenericPlugin(Page):
         try:
             source = self.source
 
-            print("[{}]: Process source:{} type:{} time:{}".format(LinkDatabase.name, source.title, source.source_type, source.get_date_fetched()))
+            print(
+                "[{}]: Process source:{} type:{} time:{}".format(
+                    LinkDatabase.name,
+                    source.title,
+                    source.source_type,
+                    source.get_date_fetched(),
+                )
+            )
 
             if not source.is_fetch_possible():
-                print("[{}]: Process source:{}: It is not the right time".format(LinkDatabase.name, source.title))
+                print(
+                    "[{}]: Process source:{}: It is not the right time".format(
+                        LinkDatabase.name, source.title
+                    )
+                )
                 return
 
             start_time = DateUtils.get_datetime_now_utc()
@@ -50,12 +61,16 @@ class SourceGenericPlugin(Page):
                 stop_time, num_entries, total_time.total_seconds()
             )
 
-            print("[{}]: Process source:{} type:{} DONE".format(LinkDatabase.name, source.title, source.source_type))
+            print(
+                "[{}]: Process source:{} type:{} DONE".format(
+                    LinkDatabase.name, source.title, source.source_type
+                )
+            )
 
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.exc(
-                    "[SourceGenericPlugin:check_for_data] Source:{} {}; Exc:{}\n{}".format(
+                "[SourceGenericPlugin:check_for_data] Source:{} {}; Exc:{}\n{}".format(
                     source.url, source.title, str(e), error_text
                 )
             )

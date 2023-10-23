@@ -49,6 +49,7 @@ class Configuration(object):
     def get_object(app_name=None):
         if app_name is None:
             from .apps import LinkDatabase
+
             app_name = LinkDatabase.name
 
         app_name = str(app_name)

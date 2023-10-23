@@ -392,6 +392,28 @@ class ImportSourcesJobHandler(BaseJobHandler):
                 SourceDataController.objects.create(**create_args)
 
 
+class ImportInstanceJobHandler(BaseJobHandler):
+    """!
+    Imports from instance
+    """
+
+    def __init__(self):
+        pass
+
+    def get_job(self):
+        return BackgroundJob.JOB_IMPORT_INSTANCE
+
+    def process(self, obj=None):
+        import json
+
+        json_url = obj.subject
+
+        from .serializers.instanceimporter import InstanceImporter
+
+        ie = InstanceImporter(json_url)
+        ie.import_all()
+
+
 class WriteBookmarksJobHandler(BaseJobHandler):
     """!
     Writes bookmarks data to disk
@@ -560,7 +582,7 @@ class RefreshThreadHandler(object):
 
     def refresh(self, item=None):
         KeyWords.clear()
-        
+
         PersistentInfo.create("Refreshing RSS data")
 
         from .controllers import SourceDataController
@@ -610,6 +632,7 @@ class HandlerManager(object):
             ImportSourcesJobHandler(),
             ImportBookmarksJobHandler(),
             ImportDailyDataJobHandler(),
+            ImportInstanceJobHandler(),
             CleanupJobHandler(),
             CheckDomainsJobHandler(),
         ]

@@ -41,6 +41,7 @@ class EntriesSearchListView(generic.ListView):
     def get(self, *args, **kwargs):
         print("EntriesSearchListView:get")
         from datetime import datetime
+
         self.time_start = datetime.now()
 
         p = ViewPage(self.request)
@@ -79,7 +80,7 @@ class EntriesSearchListView(generic.ListView):
         context["page_title"] += self.get_title()
 
         queue_size = BackgroundJobController.get_number_of_jobs(
-            #BackgroundJob.JOB_PROCESS_SOURCE
+            # BackgroundJob.JOB_PROCESS_SOURCE
         )
         context["rss_are_fetched"] = queue_size > 0
         context["rss_queue_size"] = queue_size
@@ -101,7 +102,12 @@ class EntriesSearchListView(generic.ListView):
             context["search_term"] = self.request.GET["search"]
 
         from datetime import datetime
-        print("EntriesSearchListView:get_context_data done. View time delta:{}".format(datetime.now() - self.time_start))
+
+        print(
+            "EntriesSearchListView:get_context_data done. View time delta:{}".format(
+                datetime.now() - self.time_start
+            )
+        )
 
         return context
 
@@ -162,6 +168,7 @@ class EntriesSearchListView(generic.ListView):
 
     def get_default_range(self):
         from ..dateutils import DateUtils
+
         config = ConfigurationEntry.get()
         return DateUtils.get_days_range(config.whats_new_days)
 
@@ -173,7 +180,7 @@ class EntriesRecentListView(EntriesSearchListView):
 
     def get_filter(self):
         query_filter = EntryFilter(self.request.GET)
-        query_filter.set_time_limit(self.get_default_range() )
+        query_filter.set_time_limit(self.get_default_range())
         query_filter.get_sources()
         return query_filter
 
@@ -304,6 +311,7 @@ class EntriesOmniListView(EntriesSearchListView):
             query_filter.set_default_search_symbols(
                 [
                     "title__icontains",
+                    "link__icontains",
                     "artist__icontains",
                     "album__icontains",
                     "description__icontains",
@@ -314,6 +322,7 @@ class EntriesOmniListView(EntriesSearchListView):
             query_filter.set_default_search_symbols(
                 [
                     "title__icontains",
+                    "link__icontains",
                     "artist__icontains",
                     "album__icontains",
                     "description__icontains",
@@ -568,7 +577,7 @@ def edit_entry(request, pk):
         ob.save()
 
     limit = BaseLinkDataController.get_description_length() - 2
-    if len(ob.description) >= limit:
+    if ob.description and len(ob.description) >= limit:
         ob.description = ob.description[:limit]
         ob.save()
 
@@ -586,9 +595,7 @@ def edit_entry(request, pk):
     else:
         form = EntryForm(instance=ob)
         form.method = "POST"
-        form.action_url = reverse(
-            "{}:entry-edit".format(LinkDatabase.name), args=[pk]
-        )
+        form.action_url = reverse("{}:entry-edit".format(LinkDatabase.name), args=[pk])
         p.context["form"] = form
         return p.render("form_basic.html")
 
@@ -654,9 +661,7 @@ def entries_omni_search_init(request):
 
     filter_form = OmniSearchForm()
     filter_form.method = "GET"
-    filter_form.action_url = reverse(
-        "{}:entries-omni-search".format(LinkDatabase.name)
-    )
+    filter_form.action_url = reverse("{}:entries-omni-search".format(LinkDatabase.name))
 
     p.context["form"] = filter_form
 
@@ -673,9 +678,7 @@ def entries_bookmarked_init(request):
     filter_form = EntryBookmarksChoiceForm()
     filter_form.create(SourceDataController.objects.all())
     filter_form.method = "GET"
-    filter_form.action_url = reverse(
-        "{}:entries-bookmarked".format(LinkDatabase.name)
-    )
+    filter_form.action_url = reverse("{}:entries-bookmarked".format(LinkDatabase.name))
 
     p.context["form"] = filter_form
 
@@ -737,6 +740,8 @@ def make_not_bookmarked_entry(request, pk):
 
     entry = LinkDataController.objects.get(id=pk)
     LinkDataHyperController.make_not_bookmarked(request, entry)
+
+    entry = LinkDataHyperController.get_link_object(entry.link)
 
     return HttpResponseRedirect(entry.get_absolute_url())
 
@@ -802,6 +807,10 @@ def entries_json(request):
     if "query_type" in request.GET:
         query_type = request.GET["query_type"]
 
+    page_limit = "standard"
+    if "page_limit" in request.GET:
+        page_limit = request.GET["page_limit"]
+
         check_views = [
             EntriesSearchListView,
             EntriesRecentListView,
@@ -816,7 +825,8 @@ def entries_json(request):
             view.request = request
             if query_type == view.get_query_type():
                 query_filter = view.get_filter()
-                query_filter.use_page_limit = True
+                if page_limit != "no-limit":
+                    query_filter.use_page_limit = True
                 found_view = True
                 break
 
@@ -969,5 +979,3 @@ def archive_hide_entry(request, pk):
     p.context["summary_text"] = summary_text
 
     return p.render("summary_present.html")
-
-

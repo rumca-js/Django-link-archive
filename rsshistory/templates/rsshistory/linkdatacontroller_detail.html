@@ -6,7 +6,7 @@
 
   <h1><a href="{{ object.link }}">
           {% if object.bookmarked %}
-          [{{object.get_vote}}]
+          [{{object.page_rating_votes}}]
           {% endif %}
           {{ object.title }}
       </a></h1>
@@ -23,7 +23,7 @@
         Bookmark
        </a>
     {% endif %}
-    {% if object.bookmarked %}
+    {% if object.is_taggable %}
         <a href="{% url 'rsshistory:entry-tag' object.id %}" class="simplebutton">Tag</a>
         <a href="{% url 'rsshistory:entry-vote' object.id %}" class="simplebutton">Vote</a>
     {% endif %}
@@ -75,6 +75,9 @@
       {% for parameter in object_controller.get_parameters %}
         <div><strong>{{parameter.name | safe}}:</strong> {{parameter.description | safe}}</div>
       {% endfor %}
+        <div><strong>Points</strong>{{object.page_rating}}</div>
+        <div><strong>Points contents</strong>{{object.page_rating_contents}}</div>
+        <div><strong>Points votes</strong>{{object.page_rating_votes}}</div>
 
       {% if object.has_tags %}
           <div><strong>Tags:</strong>
@@ -88,7 +91,7 @@
   {{object_controller.get_description_html | safe | linebreaks }}
   <div style="clear:both"></div>
 
-{% if object.bookmarked %}
+{% if object.is_taggable %}
   <hr/>
   <h2>Comments</h2>
   <p>

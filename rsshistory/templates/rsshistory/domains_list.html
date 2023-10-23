@@ -38,30 +38,30 @@
                class="element_{{user_config.display_type}}"
                title="{{domain.domain}}"
              >
-             - <span class="linklistitemtitle">
-                 {% if domain.dead %}
+             - <span class="link-list-item-title">
+                 {% if domain.dead or domain.link_obj.dead %}
                  [DEAD]
                  {% endif %}
                  {{domain.domain}}
              </span>
 
-             <span class="linklistitemdescription">
+             <span class="link-list-item-description">
                  {% if domain.category %}
                  [{{domain.category}}]
                  {% endif %}
                  {% if domain.subcategory %}
                  [{{domain.subcategory}}]
                  {% endif %}
-                 {% if domain.title %}
-                 {{domain.title}}
+                 {% if domain.link_obj.title %}
+                 {{domain.title  | slice:":100"}}
                  {% endif %}
-                 | {{domain.get_description_safe}}
+                 | {{domain.link_obj.description | slice:":200"}}
              </span>
              </a>
           {% elif type == "clear" %}
           <div>
               -
-             {% if domain.dead %}
+             {% if domain.dead or domain.link_obj.dead %}
              [DEAD]
              {% endif %}
               {{domain.protocol}}://{{domain.domain}}
@@ -83,6 +83,8 @@
   <a href="{% url 'rsshistory:domains' %}?{{ args }}&type=normal" class='simplebutton'>Normal list</a>
 
   <h1>Details</h1>
-  Domains are added with each new link
+  Domains are added with each new link.
+
+  <a href="https://en.wikipedia.org/wiki/List_of_Internet_top-level_domains">Domain lists on wikipedia</a>
 
 {% endblock %}

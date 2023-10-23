@@ -17,7 +17,6 @@ class SymbolEvaluator(object):
 
 
 class OmniSearchTest(TestCase):
-
     def test_filter_query_set_not_translable(self):
         LinkDataModel.objects.create(link="https://test.com")
 
@@ -42,7 +41,7 @@ class OmniSearchTest(TestCase):
         print("Query set length: {}".format(qs.count()))
 
         processor.set_query_set(qs)
-        processor.set_translatable(['link'])
+        processor.set_translatable(["link"])
 
         qs = processor.get_filtered_objects()
         print("Query set length: {}".format(qs.count()))
@@ -59,7 +58,7 @@ class OmniSearchTest(TestCase):
         print("Query set length: {}".format(qs.count()))
 
         processor.set_query_set(qs)
-        processor.set_translatable(['link', 'artist'])
+        processor.set_translatable(["link", "artist"])
 
         qs = processor.get_filtered_objects()
         print("Query set length: {}".format(qs.count()))

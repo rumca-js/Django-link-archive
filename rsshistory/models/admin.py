@@ -23,8 +23,8 @@ class ConfigurationEntry(models.Model):
     # fmt: on
 
     sources_refresh_period = models.IntegerField(default=3600)
-    link_save = models.BooleanField(default=True)
-    source_save = models.BooleanField(default=True)
+    link_save = models.BooleanField(default=False)
+    source_save = models.BooleanField(default=False)
     store_domain_info = models.BooleanField(default=True)
     store_keyword_info = models.BooleanField(default=True)
     auto_add_sources = models.BooleanField(default=False)
@@ -91,20 +91,22 @@ class UserConfig(models.Model):
     DISPLAY_STYLE_DARK = "style-dark"
 
     STYLE_TYPES = (
-        (DISPLAY_STYLE_LIGHT, DISPLAY_STYLE_LIGHT),             #
-        (DISPLAY_STYLE_DARK, DISPLAY_STYLE_DARK),               #
+        (DISPLAY_STYLE_LIGHT, DISPLAY_STYLE_LIGHT),  #
+        (DISPLAY_STYLE_DARK, DISPLAY_STYLE_DARK),  #
     )
 
     DISPLAY_TYPE_STANDARD = "standard"
     DISPLAY_TYPE_CLICKABLE_TAGS = "clickable-tags"
     DISPLAY_TYPE_LINE_AND_BUTTONS = "line-and-buttons"
     DISPLAY_TYPE_YOUTUBE_THUMBNAILS = "youtube-thumbnails"
+    DISPLAY_TYPE_SEARCH_ENGINE = "search-engine"
 
     DISPLAY_TYPE_CHOICES = (
         (DISPLAY_TYPE_STANDARD, DISPLAY_TYPE_STANDARD),
         (DISPLAY_TYPE_CLICKABLE_TAGS, DISPLAY_TYPE_CLICKABLE_TAGS),
         (DISPLAY_TYPE_LINE_AND_BUTTONS, DISPLAY_TYPE_LINE_AND_BUTTONS),
         (DISPLAY_TYPE_YOUTUBE_THUMBNAILS, DISPLAY_TYPE_YOUTUBE_THUMBNAILS),
+        (DISPLAY_TYPE_SEARCH_ENGINE, DISPLAY_TYPE_SEARCH_ENGINE),
     )
 
     user = models.CharField(max_length=500, unique=True)
@@ -252,6 +254,7 @@ class BackgroundJob(models.Model):
     JOB_IMPORT_DAILY_DATA = "import-daily-data"
     JOB_IMPORT_BOOKMARKS = "import-bookmarks"
     JOB_IMPORT_SOURCES = "import-sources"
+    JOB_IMPORT_INSTANCE = "import-instance"
     JOB_PUSH_TO_REPO = "push-to-repo"
     JOB_PUSH_DAILY_DATA_TO_REPO = "push-daily-data-to-repo"
     JOB_CLEANUP = "cleanup"
@@ -273,6 +276,7 @@ class BackgroundJob(models.Model):
         (JOB_IMPORT_DAILY_DATA, JOB_IMPORT_DAILY_DATA),
         (JOB_IMPORT_BOOKMARKS, JOB_IMPORT_BOOKMARKS),
         (JOB_IMPORT_SOURCES, JOB_IMPORT_SOURCES),
+        (JOB_IMPORT_INSTANCE, JOB_IMPORT_INSTANCE),
         (JOB_PUSH_TO_REPO, JOB_PUSH_TO_REPO),
         (JOB_PUSH_DAILY_DATA_TO_REPO, JOB_PUSH_DAILY_DATA_TO_REPO),
         (JOB_CLEANUP, JOB_CLEANUP),
