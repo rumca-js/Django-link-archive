@@ -65,15 +65,14 @@ class LinkVoteDataModel(models.Model):
     )
 
     def save_vote(input_data):
+        from ..controllers import BackgroundJobController
         link_id = input_data["link_id"]
         author = input_data["author"]
         vote = input_data["vote"]
 
         entry = LinkDataModel.objects.get(id=link_id)
 
-        votes = LinkVoteDataModel.objects.filter(
-            author=author, link_obj=entry
-        )
+        votes = LinkVoteDataModel.objects.filter(author=author, link_obj=entry)
         votes.delete()
 
         ob = LinkVoteDataModel.objects.create(
@@ -84,6 +83,8 @@ class LinkVoteDataModel(models.Model):
 
         # TODO this should be a background task
         entry.update_calculated_vote()
+
+        BackgroundJobController.update_entry_data(entry.link)
 
         return ob
 

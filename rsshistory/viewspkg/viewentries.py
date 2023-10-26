@@ -27,6 +27,7 @@ from ..forms import (
     EntryBookmarksChoiceForm,
     EntryRecentChoiceForm,
     OmniSearchForm,
+    OmniSearchWithArchiveForm,
 )
 from ..queryfilters import EntryFilter
 from ..views import ViewPage
@@ -62,10 +63,12 @@ class EntriesSearchListView(generic.ListView):
         return thefilter
 
     def get_queryset(self):
+        config = ConfigurationEntry.get()
+
         print("EntriesSearchListView:get_queryset")
         self.query_filter = self.get_filter()
-        objects = self.get_filtered_objects()
-        print("EntriesSearchListView:get_queryset done")
+        objects = self.get_filtered_objects().order_by(config.entries_order_by)
+        print("EntriesSearchListView:get_queryset done {}".format(objects.query))
         return objects
 
     def get_context_data(self, **kwargs):
@@ -370,7 +373,11 @@ class EntriesOmniListView(EntriesSearchListView):
             )
 
     def get_form_instance(self):
-        return OmniSearchForm(self.request.GET)
+        config = ConfigurationEntry.get()
+        if config.days_to_move_to_archive == 0:
+            return OmniSearchForm(self.request.GET)
+        else:
+            return OmniSearchWithArchiveForm(self.request.GET)
 
     def get_form(self):
         filter_form = self.get_form_instance()
@@ -390,20 +397,21 @@ class EntryDetailView(generic.DetailView):
     model = LinkDataController
 
     def get_context_data(self, **kwargs):
+        from ..models import EntryVisits
         from ..pluginentries.entrycontrollerbuilder import EntryControllerBuilder
+        from ..services.waybackmachine import WaybackMachine
+        from ..dateutils import DateUtils
 
         # Call the base implementation first to get the context
         context = super(EntryDetailView, self).get_context_data(**kwargs)
         context = ViewPage.init_context(self.request, context)
 
-        if self.object.language == None:
-            self.object.update_language()
+        EntryVisits.visited(self.object, self.request.user.username)
+        object_controller = EntryControllerBuilder.get(self.object)
+        object_controller.set_user(self.request.user.username)
 
         context["page_title"] = self.object.title
-        context["object_controller"] = EntryControllerBuilder.get(self.object)
-
-        from ..services.waybackmachine import WaybackMachine
-        from ..dateutils import DateUtils
+        context["object_controller"] = object_controller
 
         m = WaybackMachine()
         context["archive_org_date"] = m.get_formatted_date(DateUtils.get_date_today())
@@ -475,7 +483,7 @@ def add_entry(request):
             if obs.exists():
                 p.context["entry"] = obs[0]
 
-            if ConfigurationEntry.get().store_domain_info:
+            if ConfigurationEntry.get().auto_store_domain_info:
                 Domains.add(data["link"])
 
             if ConfigurationEntry.get().link_save:
@@ -726,7 +734,8 @@ def make_bookmarked_entry(request, pk):
     entry = LinkDataController.objects.get(id=pk)
 
     if LinkDataHyperController.make_bookmarked(request, entry):
-        BackgroundJobController.link_save(entry.link)
+        if ConfigurationEntry.get().link_save:
+            BackgroundJobController.link_save(entry.link)
 
     return HttpResponseRedirect(entry.get_absolute_url())
 
@@ -956,6 +965,20 @@ def archive_remove_entry(request, pk):
         p.context["summary_text"] = "Remove ok"
     else:
         p.context["summary_text"] = "No source for ID: " + str(pk)
+
+    return p.render("summary_present.html")
+
+
+def archive_entries_remove_all(request):
+    p = ViewPage(request)
+    p.set_title("Remove all entries")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    ArchiveLinkDataController.objects.all().delete()
+
+    p.context["summary_text"] = "Removed all entries"
 
     return p.render("summary_present.html")
 

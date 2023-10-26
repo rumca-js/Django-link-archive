@@ -4,6 +4,7 @@ from .entries import (
     ArchiveLinkDataModel,
     BaseLinkDataModel,
     BaseLinkDataController,
+    EntryVisits,
 )
 from .sources import (
     SourceDataModel,

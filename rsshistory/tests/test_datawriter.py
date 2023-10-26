@@ -61,6 +61,7 @@ class DataWriterTest(TestCase):
 
     def disable_web_pages(self):
         from ..webtools import BasePage, Page
+
         BasePage.user_agent = None
         Page.user_agent = None
         entry = ConfigurationEntry.get()

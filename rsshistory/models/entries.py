@@ -9,7 +9,6 @@ from .sources import SourceDataModel
 from .admin import PersistentInfo
 
 
-
 class BaseLinkDataModel(models.Model):
     link = models.CharField(max_length=1000, unique=True)
 
@@ -44,6 +43,7 @@ class BaseLinkDataModel(models.Model):
 
     page_rating_contents = models.IntegerField(default=0)
     page_rating_votes = models.IntegerField(default=0)
+    page_rating_visits = models.IntegerField(default=0)
     page_rating = models.IntegerField(default=0)
 
     class Meta:
@@ -137,8 +137,18 @@ class BaseLinkDataController(BaseLinkDataModel):
 
         return sum_num / count
 
+    def get_visits(self):
+        visits = EntryVisits.objects.filter(entry = self.link)
+
+        sum_num = 0
+        for visit in visits:
+            sum_num += visit.visits
+
+        return sum_num / visits.count()
+
     def update_calculated_vote(self):
         self.page_rating_votes = self.get_vote()
+        self.page_rating_visits = self.get_visits()
         self.page_rating = self.page_rating_votes + self.page_rating_contents
         self.save()
 
@@ -394,10 +404,12 @@ class BaseLinkDataController(BaseLinkDataModel):
         from .admin import ConfigurationEntry
 
         conf = ConfigurationEntry.get()
+        if conf.days_to_move_to_archive == 0:
+            return False
 
-        current_time = DateUtils.get_datetime_now_utc()
-        days_before = current_time - timedelta(days=conf.days_to_move_to_archive)
-        if input_date < days_before:
+        date_to_move = DateUtils.get_days_before_dt(conf.days_to_move_to_archive)
+
+        if input_date < date_to_move:
             return True
         return False
 
@@ -426,3 +438,46 @@ class ArchiveLinkDataModel(BaseLinkDataController):
 
     def is_archive_entry(self):
         return True
+
+
+class EntryVisits(models.Model):
+    """
+    Each user vists many places. This table keeps track of it
+    """
+
+    entry = models.CharField(max_length=1000)  # same as link
+    user = models.CharField(max_length=1000, null=True, blank=True)
+    visits = models.IntegerField(blank=True, null=True)
+
+    entry_object = models.ForeignKey(
+        LinkDataModel,
+        on_delete=models.CASCADE,
+        related_name="visits_counter",
+    )
+
+    def visited(entry, user):
+        from .admin import ConfigurationEntry
+        from ..controllers import BackgroundJobController
+
+        config = ConfigurationEntry.get()
+
+        if not config.track_user_actions:
+            return
+
+        if str(user) == "" or user is None:
+            return
+
+        visits = EntryVisits.objects.filter(entry=entry.link, user=user)
+
+        if visits.count() == 0:
+            visit = EntryVisits.objects.create(
+                entry=entry.link, user=user, visits=1, entry_object=entry
+            )
+        else:
+            visit = visits[0]
+            visit.visits += 1
+            visit.save()
+
+        BackgroundJobController.update_entry_data(entry.link)
+
+        return visit

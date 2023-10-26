@@ -13,6 +13,10 @@ class EntryParameter(object):
 class EntryGenericPlugin(object):
     def __init__(self, entry):
         self.entry = entry
+        self.user = None
+
+    def set_user(self, user):
+        self.user = user
 
     def get_menu_buttons(self):
         return []

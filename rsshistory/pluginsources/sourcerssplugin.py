@@ -122,6 +122,9 @@ class BaseRssPlugin(SourceGenericPlugin):
             : BaseLinkDataController.get_description_length() - 2
         ]
 
+        if prop["link"].endswith("/"):
+            prop["link"] = prop["link"][:-1]
+
         prop["source"] = self.source.url
         prop["language"] = self.source.language
         prop["artist"] = self.source.title

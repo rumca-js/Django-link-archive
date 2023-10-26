@@ -25,10 +25,12 @@ class ConfigurationEntry(models.Model):
     sources_refresh_period = models.IntegerField(default=3600)
     link_save = models.BooleanField(default=False)
     source_save = models.BooleanField(default=False)
-    store_domain_info = models.BooleanField(default=True)
-    store_keyword_info = models.BooleanField(default=True)
-    auto_add_sources = models.BooleanField(default=False)
-    auto_sources_enabled = models.BooleanField(default=False)
+    auto_store_entries = models.BooleanField(default=True)
+    auto_store_sources = models.BooleanField(default=False)
+    auto_store_sources_enabled = models.BooleanField(default=False)
+    auto_store_domain_info = models.BooleanField(default=True)
+    auto_store_keyword_info = models.BooleanField(default=True)
+    track_user_actions = models.BooleanField(default=True)
     vote_min = models.IntegerField(default=-100)
     vote_max = models.IntegerField(default=100)
     number_of_comments_per_day = models.IntegerField(default=1)
@@ -53,6 +55,11 @@ class ConfigurationEntry(models.Model):
         default="../data/{}/exports".format(LinkDatabase.name),
         max_length=2000,
         null=True,
+    )
+    # TODO selectable from combo?
+    entries_order_by = models.CharField(
+        default="-date_published",  # TODO support for multiple columns
+        max_length=1000,
     )
 
     def get():
@@ -242,8 +249,7 @@ class PersistentInfo(models.Model):
 class BackgroundJob(models.Model):
     JOB_PROCESS_SOURCE = "process-source"
     JOB_LINK_ADD = "link-add"
-    JOB_LINK_DETAILS = "link-details"
-    JOB_LINK_REFRESH = "link-refresh"
+    JOB_LINK_UPDATE_DATA = "link-update-data"
     JOB_LINK_SAVE = "link-save"
     JOB_LINK_DOWNLOAD = "link-download"
     JOB_LINK_DOWNLOAD_MUSIC = "download-music"
@@ -264,8 +270,7 @@ class BackgroundJob(models.Model):
     JOB_CHOICES = (
         (JOB_PROCESS_SOURCE, JOB_PROCESS_SOURCE,),              # for RSS sources it checks if there are new data
         (JOB_LINK_ADD, JOB_LINK_ADD,),                          # adds link using default properties, may contain link map properties in the map
-        (JOB_LINK_DETAILS, JOB_LINK_DETAILS),                   # fetches link additional information
-        (JOB_LINK_REFRESH, JOB_LINK_REFRESH),                   # refreshes link, refetches its data
+        (JOB_LINK_UPDATE_DATA, JOB_LINK_UPDATE_DATA),           # update data, recalculate
         (JOB_LINK_SAVE, JOB_LINK_SAVE,),                        # link is saved using thirdparty pages (archive.org)
         (JOB_LINK_DOWNLOAD, JOB_LINK_DOWNLOAD),                 # link is downloaded using wget
         (JOB_LINK_DOWNLOAD_MUSIC, JOB_LINK_DOWNLOAD_MUSIC),     #

@@ -3,7 +3,7 @@ import django.utils
 from django.test import TestCase
 
 from ..controllers import LinkDataHyperController, SourceDataController
-from ..models import LinkDataModel
+from ..models import LinkDataModel, Domains, ConfigurationEntry
 from ..dateutils import DateUtils
 
 
@@ -17,6 +17,15 @@ class RequestObject(object):
         self.user = UserObject(user_name)
 
 
+class RequestsObject(object):
+    def __init__(self, url, headers, timeout):
+        self.status_code = 200
+        self.apparent_encoding = "utf-8"
+        self.encoding = "utf-8"
+        self.text = "text"
+        self.content = "text"
+
+
 class SourceParsePluginTest(TestCase):
     def setUp(self):
         self.disable_web_pages()
@@ -28,16 +37,17 @@ class SourceParsePluginTest(TestCase):
             export_to_cms=True,
         )
 
+    def get_contents_function(self, url, headers, timeout):
+        print("Mocked Requesting page: {}".format(url))
+        return RequestsObject(url, headers, timeout)
+
     def disable_web_pages(self):
         from ..webtools import BasePage, Page
-        from ..models import ConfigurationEntry
-        BasePage.user_agent = None
-        Page.user_agent = None
-        entry = ConfigurationEntry.get()
-        entry.user_agent = ""
-        entry.save()
 
-    def test_add_new_link(self):
+        BasePage.get_contents_function = self.get_contents_function
+        Page.get_contents_function = self.get_contents_function
+
+    def test_add_new_link_no_slash(self):
         link_name = "https://youtube.com/v=1234"
 
         link_data = {
@@ -50,10 +60,31 @@ class SourceParsePluginTest(TestCase):
             "date_published": DateUtils.get_datetime_now_utc(),
         }
 
-        link = LinkDataHyperController.add_new_link(link_data)
+        entry = LinkDataHyperController.add_new_link(link_data)
 
         objs = LinkDataModel.objects.filter(link=link_name)
 
+        self.assertTrue(objs.count() == 1)
+
+    def test_add_new_link_with_slash(self):
+        link_name = "https://youtube.com/v=1234/"
+
+        link_data = {
+            "link": link_name,
+            "source": "https://youtube.com",
+            "title": "test",
+            "description": "description",
+            "language": "en",
+            "thumbnail": "https://youtube.com/favicon.ico",
+            "date_published": DateUtils.get_datetime_now_utc(),
+        }
+
+        entry = LinkDataHyperController.add_new_link(link_data)
+
+        objs = LinkDataModel.objects.filter(link="https://youtube.com/v=1234/")
+        self.assertTrue(objs.count() == 0)
+
+        objs = LinkDataModel.objects.filter(link="https://youtube.com/v=1234")
         self.assertTrue(objs.count() == 1)
 
     def test_make_bookmarked(self):
@@ -69,7 +100,7 @@ class SourceParsePluginTest(TestCase):
             "date_published": DateUtils.get_datetime_now_utc(),
         }
 
-        link = LinkDataHyperController.add_new_link(link_data)
+        entry = LinkDataHyperController.add_new_link(link_data)
 
         objs = LinkDataModel.objects.filter(link=link_name)
         self.assertEqual(objs.count(), 1)
@@ -90,3 +121,32 @@ class SourceParsePluginTest(TestCase):
         obj = objs[0]
 
         self.assertTrue(obj.bookmarked == False)
+
+    def test_add_new_link_adds_domain(self):
+        Domains.objects.all().delete()
+        LinkDataModel.objects.all().delete()
+
+        config = ConfigurationEntry.get()
+        config.auto_store_entries = False
+        config.auto_store_domain_info = True
+        config.save()
+
+        link_name = "https://youtube.com/v=1234"
+
+        link_data = {
+            "link": link_name,
+            "source": "https://youtube.com",
+            "title": "test",
+            "description": "description",
+            "language": "en",
+            "thumbnail": "https://youtube.com/favicon.ico",
+            "date_published": DateUtils.get_datetime_now_utc(),
+        }
+
+        entry = LinkDataHyperController.add_new_link(link_data, source_is_auto=True)
+
+        objs = LinkDataModel.objects.filter(link=link_name)
+
+        self.assertEqual(objs.count(), 0)
+
+        self.assertEqual(Domains.objects.all().count(), 1)

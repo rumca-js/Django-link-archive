@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.db.models import Q
 
 from .models import (
+    ConfigurationEntry,
     BaseLinkDataModel,
     BaseLinkDataController,
     LinkDataModel,
@@ -40,7 +41,7 @@ class SourceDataController(SourceDataModel):
 
         SourceDataController.fix_entries(source)
 
-        if ConfigurationEntry.get().store_domain_info:
+        if ConfigurationEntry.get().auto_store_domain_info:
             Domains.add(source_data_map["url"])
 
         return source
@@ -109,10 +110,8 @@ class SourceDataController(SourceDataModel):
             return False
 
     def get_op_data(self):
-        objs = self.dynamic_data.all()
-        if objs.count() == 0:
-            return None
-        return objs[0]
+        if hasattr(self, "dynamic_data"):
+            return self.dynamic_data
 
     def get_date_fetched(self):
         obj = self.get_op_data()
@@ -137,18 +136,27 @@ class SourceDataController(SourceDataModel):
             obj.number_of_entries = number_of_entries
             obj.save()
         else:
-            objs = SourceOperationalData.objects.filter(url=self.url, source_obj=None)
-            if objs.count() >= 0:
-                objs.delete()
+            # previously we could have dangling data without relation
+            op_datas = SourceOperationalData.objects.filter(url=self.url)
 
-            op = SourceOperationalData(
-                url=self.url,
-                date_fetched=date_fetched,
-                import_seconds=import_seconds,
-                number_of_entries=number_of_entries,
-                source_obj=self,
-            )
-            op.save()
+            if op_datas.count() == 0:
+                obj = SourceOperationalData(
+                    url=self.url,
+                    date_fetched=date_fetched,
+                    import_seconds=import_seconds,
+                    number_of_entries=number_of_entries,
+                    source_obj=self,
+                )
+                obj.save()
+            else:
+                obj = op_datas[0]
+                obj.date_fetched = date_fetched
+                obj.import_seconds = import_seconds
+                obj.number_of_entries = number_of_entries
+                obj.save()
+
+            self.dynamic_data = obj
+            self.save()
 
     def get_favicon(self):
         if self.favicon:
@@ -328,11 +336,14 @@ class LinkDataController(LinkDataModel):
 
         conf = ConfigurationEntry.get()
 
+        if conf.days_to_move_to_archive == 0:
+            return
+
         current_time = DateUtils.get_datetime_now_utc()
         days_before = current_time - timedelta(days=conf.days_to_move_to_archive)
 
         entries = LinkDataController.objects.filter(
-            bookmarked=False, date_published__lt=days_before
+            bookmarked=False, permament=False, date_published__lt=days_before
         )
 
         for entry in entries:
@@ -351,8 +362,7 @@ class LinkDataController(LinkDataModel):
 
             days = source.get_days_to_remove()
             if days > 0:
-                current_time = DateUtils.get_datetime_now_utc()
-                days_before = current_time - timedelta(days=days)
+                days_before = DateUtils.get_days_before_dt(days)
 
                 entries = LinkDataController.objects.filter(
                     source=source.url,
@@ -367,6 +377,27 @@ class LinkDataController(LinkDataModel):
                         )
                     )
                     entries.delete()
+
+        config = ConfigurationEntry.get()
+        days = config.days_to_remove_links
+        if days != 0:
+            days_before = DateUtils.get_days_before_dt(days)
+
+            entries = LinkDataController.objects.filter(
+                bookmarked=False,
+                permanent=False,
+                date_published__lt=days_before,
+            )
+            if entries.exists():
+                entries.delete()
+
+            entries = ArchiveLinkDataController.objects.filter(
+                bookmarked=False,
+                permanent=False,
+                date_published__lt=days_before,
+            )
+            if entries.exists():
+                entries.delete()
 
 
 class ArchiveLinkDataController(ArchiveLinkDataModel):
@@ -420,7 +451,70 @@ class ArchiveLinkDataController(ArchiveLinkDataModel):
 
 
 class LinkDataHyperController(object):
-    def add_new_link(link_data):
+    """
+    Archive managment can be tricky. It is long to process entire archive.
+    If there is a possiblity we do not search it, we do not add anything to it.
+    """
+
+    def add_new_link(link_data, source_is_auto=False):
+        obj = None
+
+        if link_data["link"].endswith("/"):
+            link_data["link"] = link_data["link"][:-1]
+
+        if LinkDataHyperController.is_enabled_to_store(link_data, source_is_auto):
+            link_data = LinkDataHyperController.check_and_set_source_object(link_data)
+
+            is_archive = LinkDataHyperController.is_link_data_for_archive(link_data)
+
+            obj = LinkDataHyperController.get_entry_internal(link_data, is_archive)
+
+            if obj:
+                return obj
+
+            if not LinkDataHyperController.is_live_video(link_data):
+                print(
+                    "[{}]:Adding link: {}".format(LinkDatabase.name, link_data["link"])
+                )
+
+                obj = LinkDataHyperController.add_entry_internal(link_data, is_archive)
+
+        LinkDataHyperController.add_addition_link_data(link_data)
+
+        return obj
+
+    def get_entry_internal(link_data, is_archive):
+        if not is_archive:
+            objs = LinkDataModel.objects.filter(link=link_data["link"])
+            if objs.exists():
+                return objs[0]
+        else:
+            objs = ArchiveLinkDataModel.objects.filter(link=link_data["link"])
+            if objs.exists():
+                return objs[0]
+
+    def add_entry_internal(link_data, is_archive):
+        if not is_archive:
+            ob = LinkDataModel.objects.create(**link_data)
+
+        elif is_archive:
+            ob = ArchiveLinkDataModel.objects.create(**link_data)
+
+        return ob
+
+    def is_link_data_for_archive(link_data):
+        if "bookmarked" in link_data and link_data["bookmarked"]:
+            return False
+
+        is_archive = False
+        if "date_published" in link_data:
+            is_archive = BaseLinkDataController.is_archive_by_date(
+                link_data["date_published"]
+            )
+
+        return is_archive
+
+    def check_and_set_source_object(link_data):
         if "source_obj" not in link_data and "source" in link_data:
             source_obj = None
             sources = SourceDataController.objects.filter(url=link_data["source"])
@@ -429,24 +523,15 @@ class LinkDataHyperController(object):
 
             link_data["source_obj"] = source_obj
 
-        created = False
-        ob = None
-        is_archive = False
+        return link_data
 
-        if "date_published" in link_data:
-            is_archive = BaseLinkDataController.is_archive_by_date(
-                link_data["date_published"]
-            )
+    def is_enabled_to_store(link_data, source_is_auto):
+        config = ConfigurationEntry.get()
+        if source_is_auto and not config.auto_store_entries:
+            return False
+        return True
 
-        if not is_archive or link_data["bookmarked"]:
-            objs = LinkDataModel.objects.filter(link=link_data["link"])
-            if objs.exists():
-                return objs[0]
-        elif is_archive:
-            objs = ArchiveLinkDataModel.objects.filter(link=link_data["link"])
-            if objs.exists():
-                return objs[0]
-
+    def is_live_video(link_data):
         p = Page(link_data["link"])
         if p.is_youtube():
             from .pluginentries.youtubelinkhandler import YouTubeLinkHandler
@@ -455,25 +540,9 @@ class LinkDataHyperController(object):
             if handler.get_video_code():
                 handler.download_details()
                 if not handler.is_valid():
-                    return None
+                    return True
 
-        if not is_archive or link_data["bookmarked"]:
-            ob = LinkDataModel(**link_data)
-            ob.save()
-            created = True
-
-            # if link exists - do not change data
-            LinkDataHyperController.add_new_link_data(link_data)
-
-        elif is_archive:
-            ob = ArchiveLinkDataModel(**link_data)
-            ob.save()
-            created = True
-
-        if created:
-            print("[{}]:Adding link: {}".format(LinkDatabase.name, link_data["link"]))
-
-        return ob
+        return False
 
     def is_link(link):
         objs = LinkDataModel.objects.filter(link=link)
@@ -528,9 +597,10 @@ class LinkDataHyperController(object):
 
         return LinkDataHyperController.add_new_link(link_data)
 
-    def add_new_link_data(link_data):
+    def add_addition_link_data(link_data):
         try:
-            if ConfigurationEntry.get().store_domain_info:
+            config = ConfigurationEntry.get()
+            if config.auto_store_domain_info:
                 if "source" in link_data:
                     p = Page(link_data["source"])
                     domain = p.get_domain_only()
@@ -545,7 +615,7 @@ class LinkDataHyperController(object):
                 for link in links:
                     Domains.add(domain)
 
-            if ConfigurationEntry.get().store_keyword_info:
+            if config.auto_store_keyword_info:
                 if "title" in link_data:
                     KeyWords.add_link_data(link_data)
         except Exception as e:
@@ -558,6 +628,7 @@ class LinkDataHyperController(object):
                     error_text,
                 )
             )
+            print(error_text)
 
     def get_link_object(link, date=None):
         from .dateutils import DateUtils
@@ -574,9 +645,9 @@ class LinkDataHyperController(object):
 
             return None
 
-        current_time = DateUtils.get_datetime_now_utc()
-        date_before = current_time - date
-        if date_before.days > conf.days_to_move_to_archive:
+        is_archive = BaseLinkDataController.is_archive_by_date(date)
+
+        if is_archive:
             obj = ArchiveLinkDataController.objects.filter(link=link)
             if obj.count() > 0:
                 return obj[0]
@@ -698,9 +769,6 @@ class DomainsController(Domains):
 
     def add(url):
         domain = Domains.add(url)
-        entry = LinkDataHyperController.add_new_link(domain.get_domain_full_url())
-        domain.link_obj = entry
-        domain.save()
 
 
 class BackgroundJobController(BackgroundJob):
@@ -763,9 +831,9 @@ class BackgroundJobController(BackgroundJob):
             BackgroundJob.JOB_LINK_DOWNLOAD_VIDEO, item.link
         )
 
-    def youtube_details(url):
+    def update_entry_data(url):
         return BackgroundJobController.create_single_job(
-            BackgroundJob.JOB_LINK_DETAILS, url
+            BackgroundJob.JOB_LINK_UPDATE_DATA, url
         )
 
     def link_add(url, source):

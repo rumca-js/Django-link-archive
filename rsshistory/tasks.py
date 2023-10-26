@@ -1,5 +1,6 @@
 from celery import shared_task
 from celery.utils.log import get_task_logger
+import traceback
 
 from linklibrary.celery import app, logger
 
@@ -10,10 +11,14 @@ def subs_checker_task(arg):
     """
     logger.info("Refreshing sources")
 
-    from .threadhandlers import RefreshThreadHandler
+    try:
+        from .threadhandlers import RefreshThreadHandler
 
-    handler = RefreshThreadHandler()
-    handler.refresh()
+        handler = RefreshThreadHandler()
+        handler.refresh()
+    except Exception as E:
+        error_text = traceback.format_exc()
+        print("Exception in checker task: {} {}".format(str(E), error_text))
 
     logger.info("Refreshing sources done")
 
@@ -24,9 +29,13 @@ def process_all_jobs_task(arg):
     """
     logger.info("Processing source")
 
-    from .threadhandlers import HandlerManager
+    try:
+        from .threadhandlers import HandlerManager
 
-    mgr = HandlerManager()
-    mgr.process_all()
+        mgr = HandlerManager()
+        mgr.process_all()
+
+    except Exception as E:
+        print("Exception in processing task: {} {}".format(str(E), error_text))
 
     logger.info("Processing done")

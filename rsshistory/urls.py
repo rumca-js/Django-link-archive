@@ -74,6 +74,7 @@ urlpatterns = [
     path("entry-archive-notbookmark/<int:pk>/", viewentries.archive_make_not_bookmarked_entry, name="entry-archive-notbookmark"),
     path("entry-archive-hide/<int:pk>/", viewentries.archive_hide_entry, name="entry-archive-hide"),
     path("entry-archive-remove/<int:pk>/", viewentries.archive_remove_entry, name="entry-archive-remove"),
+    path("entries-archive-remove-all", viewentries.archive_entries_remove_all, name="entries-archive-remove-all"),
     path("entry-save/<int:pk>/", viewentries.wayback_save, name="entry-save"),
     # tags
     path("entry-tag/<int:pk>/", viewtags.tag_entry, name="entry-tag"),

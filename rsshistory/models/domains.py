@@ -32,10 +32,10 @@ class Domains(models.Model):
         default=django.utils.timezone.now
     )  # to be removed
 
-    link_obj = models.ForeignKey(
+    link_obj = models.OneToOneField(
         LinkDataModel,
         on_delete=models.SET_NULL,
-        related_name="domains_obj",
+        related_name="domain_obj",
         null=True,
         blank=True,
     )
@@ -66,7 +66,6 @@ class Domains(models.Model):
         if url.find("http") == -1:
             url = "https://" + url
 
-        print("Adding url {}".format(url))
         domain_text = Domains.get_domain_url(url)
         if not domain_text or domain_text == "" or domain_text == "https://":
             print("Not domain text")
@@ -92,7 +91,7 @@ class Domains(models.Model):
         )
 
     def create_or_update_domain(domain_only_text):
-        print("Creating, or updating {}".format(domain_only_text))
+        print("Creating, or updating domain {}".format(domain_only_text))
         objs = Domains.objects.filter(domain=domain_only_text)
 
         if objs.count() == 0:
@@ -132,7 +131,7 @@ class Domains(models.Model):
 
     def get_link_properties(link):
         if link.find("http") == -1:
-            link = "https://"+link
+            link = "https://" + link
 
         p = Page(link)
         if p.get_contents() is None:
@@ -156,10 +155,7 @@ class Domains(models.Model):
         if self.link_obj == None:
             props = self.get_page_properties()
             if props:
-                entry = self.add_domain_link(props)
-                if entry:
-                    self.link_obj = entry
-                    self.save()
+                self.add_domain_link(props)
                 self.check_and_create_source(props)
             else:
                 self.dead = True
@@ -170,6 +166,9 @@ class Domains(models.Model):
 
         entry = LinkDataHyperController.get_link_object(props["link"])
         if entry:
+            if self.link_obj == None:
+                self.link_obj = entry
+                self.save()
             return entry
 
         link_props = {}
@@ -177,6 +176,8 @@ class Domains(models.Model):
         link_props["title"] = props["title"]
         link_props["description"] = props["description"]
         link_props["page_rating_contents"] = props["page_rating"]
+        link_props["page_rating"] = props["page_rating"]
+        link_props["language"] = props["language"]
 
         entry = LinkDataHyperController.add_new_link(link_props)
         entry.permanent = True
@@ -184,6 +185,7 @@ class Domains(models.Model):
 
         self.link_obj = entry
         self.save()
+
         return entry
 
     def check_and_create_source(self, props):
@@ -207,21 +209,17 @@ class Domains(models.Model):
 
         conf = ConfigurationEntry.get()
 
-        if not conf.auto_add_sources:
+        if not conf.auto_store_sources:
             return
 
         parser = RssPropertyReader(rss_url)
         d = parser.parse()
         if d is None:
-            PersistentInfo.error(
-                    "RSS is empty: rss_url:{0}".format(rss_url)
-            )
+            PersistentInfo.error("RSS is empty: rss_url:{0}".format(rss_url))
             return
 
         if len(d.entries) == 0:
-            PersistentInfo.error(
-                    "RSS no entries: rss_url:{0}".format(rss_url)
-            )
+            PersistentInfo.error("RSS no entries: rss_url:{0}".format(rss_url))
             return
 
         props = {}
@@ -237,7 +235,7 @@ class Domains(models.Model):
                 props["favicon"] = d.feed.image["href"]
             else:
                 props["favicon"] = d.feed.image
-        props["on_hold"] = not conf.auto_sources_enabled
+        props["on_hold"] = not conf.auto_store_sources_enabled
         props["source_type"] = SourceDataModel.SOURCE_TYPE_RSS
         props["remove_after_days"] = 2
         props["category"] = "New"
@@ -253,7 +251,7 @@ class Domains(models.Model):
         DomainsTlds.add(self.tld)
         DomainsMains.add(self.main)
 
-        #if self.is_update_time() or force:
+        # if self.is_update_time() or force:
         #    self.update_page_info()
 
     def get_domain_ext(self, domain_only_text):
@@ -404,13 +402,18 @@ class Domains(models.Model):
                 Domains.get_update_days_limit()
             )
 
-            domains = Domains.objects.filter(date_update_last__lt=date_before_limit, dead = False, link_obj = None)
+            domains = Domains.objects.filter(
+                date_update_last__lt=date_before_limit, dead=False, link_obj=None
+            )
             # domains = Domains.objects.filter(dead = True) #, description__isnull = True)
 
         for domain in domains:
             if not domain.dead:
                 print("Fixing:{}".format(domain.domain))
-                domain.update_object()
+                try:
+                    domain.update_object()
+                except Exception as e:
+                    print(str(e))
                 print("Fixing:{} done".format(domain.domain))
 
     def remove_all():

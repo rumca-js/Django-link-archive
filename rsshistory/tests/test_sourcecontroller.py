@@ -13,6 +13,7 @@ class SourceControllerTest(TestCase):
     def disable_web_pages(self):
         from ..webtools import BasePage, Page
         from ..models import ConfigurationEntry
+
         BasePage.user_agent = None
         Page.user_agent = None
         entry = ConfigurationEntry.get()

@@ -82,6 +82,31 @@ class ProcessSourceJobHandler(BaseJobHandler):
             )
 
 
+class EntryUpdateData(BaseJobHandler):
+    """!
+    downloads entry
+    """
+
+    def __init__(self):
+        pass
+
+    def get_job(self):
+        return BackgroundJob.JOB_LINK_UPDATE_DATA
+
+    def process(self, obj=None):
+        try:
+            entry = LinkDataController.objects.filter(link=obj.subject)[0]
+            entry.update_calculated_vote()
+
+        except Exception as e:
+            error_text = traceback.format_exc()
+            PersistentInfo.error(
+                "Exception when updating link data {0} {1} {2}".format(
+                    obj.subject, str(e), error_text
+                )
+            )
+
+
 class LinkDownloadJobHandler(BaseJobHandler):
     """!
     downloads entry
@@ -499,9 +524,7 @@ class PushToRepoJobHandler(BaseJobHandler):
                 update_mgr = UpdateManager(self._config)
                 update_mgr.write_and_push_to_git()
 
-                yesterday = DateUtils.get_date_yesterday()
-                new_history = SourceExportHistory(date=yesterday)
-                new_history.save()
+                SourceExportHistory.confirm()
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.error("Exception: {} {}".format(str(e), error_text))
@@ -581,6 +604,7 @@ class RefreshThreadHandler(object):
         pass
 
     def refresh(self, item=None):
+        # This has to be done before exporting
         KeyWords.clear()
 
         PersistentInfo.create("Refreshing RSS data")
@@ -601,8 +625,12 @@ class RefreshThreadHandler(object):
                     sources = SourceDataController.objects.all()
                     for source in sources:
                         BackgroundJobController.link_save(source.url)
+            else:
+                SourceExportHistory.confirm()
 
             BackgroundJobController.make_cleanup()
+
+        PersistentInfo.create("Refreshing RSS data - done")
 
 
 class HandlerManager(object):
@@ -635,6 +663,7 @@ class HandlerManager(object):
             ImportInstanceJobHandler(),
             CleanupJobHandler(),
             CheckDomainsJobHandler(),
+            EntryUpdateData(),
         ]
 
     def get_handler_and_object(self):

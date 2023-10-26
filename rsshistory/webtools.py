@@ -20,6 +20,7 @@ class BasePage(object):
     user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/116.0"
     # user_agent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11"
     # user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/116.0" # from browser
+    get_contents_function = None
 
     def __init__(self, url, contents=None):
         self.url = url
@@ -28,6 +29,9 @@ class BasePage(object):
             self.process_contents()
 
         self.status_code = 0
+
+        if BasePage.get_contents_function is None:
+            self.get_contents_function = self.get_contents_internal
 
         if self.contents is None:
             from .models import ConfigurationEntry
@@ -64,6 +68,10 @@ class BasePage(object):
 
         return self.status_code >= 200 and self.status_code < 300
 
+    def get_contents_internal(self, url, headers, timeout):
+        print("[{}] Page: Requesting page: {}".format(LinkDatabase.name, url))
+        return requests.get(url, headers=headers, timeout=5)
+
     def get_contents(self):
         if self.contents:
             return self.contents
@@ -81,10 +89,9 @@ class BasePage(object):
         }
 
         try:
-            print("[{}] Page: Requesting page: {}".format(LinkDatabase.name, self.url))
             # traceback.print_stack()
 
-            r = requests.get(self.url, headers=hdr, timeout=5)
+            r = self.get_contents_function(self.url, headers=hdr, timeout=5)
             self.status_code = r.status_code
 
             """
@@ -235,7 +242,6 @@ class RssPropertyReader(BasePage):
         self.default_entry_timestamp = None
 
     def parse(self):
-        print("RssPropertyReader:parse")
         try:
             contents = self.get_contents()
 
@@ -256,7 +262,6 @@ class RssPropertyReader(BasePage):
             )
 
     def parse_and_process(self):
-        print("RssPropertyReader:parse")
         result = []
         try:
             feed = self.parse()
@@ -272,7 +277,6 @@ class RssPropertyReader(BasePage):
                 )
             )
             traceback.print_stack()
-        print("RssPropertyReader:parse done")
         return result
 
     def process_feed(self, feed):
@@ -464,20 +468,20 @@ class Page(BasePage):
 
         return title
 
-    def get_title_og(self):
+    def get_og_field(self, name):
         if not self.contents:
             self.contents = self.get_contents()
 
         if not self.contents:
             return None
 
-        title = None
+        field = None
 
-        title_find = self.soup.find("meta", property="og:title")
-        if title_find and title_find.has_attr("content"):
-            title = title_find["content"]
+        field_find = self.soup.find("meta", property="og:{}".format(field))
+        if field_find and field_find.has_attr("content"):
+            field = field_find["content"]
 
-        return title
+        return field
 
     def get_title(self):
         if not self.contents:
@@ -488,7 +492,7 @@ class Page(BasePage):
 
         title = None
 
-        title = self.get_title_og()
+        title = self.get_og_field("title")
         if not title:
             title = self.get_title_meta()
 
@@ -534,21 +538,6 @@ class Page(BasePage):
 
         return description
 
-    def get_description_og(self):
-        if not self.contents:
-            self.contents = self.get_contents()
-
-        if not self.contents:
-            return None
-
-        description = None
-
-        description_find = self.soup.find("meta", property="og:description")
-        if description_find and description_find.has_attr("content"):
-            description = description_find["content"]
-
-        return description
-
     def get_description(self):
         if not self.contents:
             self.contents = self.get_contents()
@@ -558,7 +547,7 @@ class Page(BasePage):
 
         description = None
 
-        description = self.get_description_og()
+        description = self.get_og_field("description")
         if not description:
             description = self.get_description_meta()
 
@@ -695,8 +684,9 @@ class Page(BasePage):
         props["description"] = self.get_description()
         props["meta:title"] = self.get_title_meta()
         props["meta:description"] = self.get_description_meta()
-        props["og:title"] = self.get_title_og()
-        props["og:description"] = self.get_description_og()
+        props["og:title"] = self.get_og_field("title")
+        props["og:description"] = self.get_og_field("description")
+        props["og:image"] = self.get_og_field("image")
         props["is_html"] = self.is_html()
         props["charset"] = self.get_charset()
         props["language"] = self.get_language()
@@ -722,15 +712,19 @@ class Page(BasePage):
         rating = 0
 
         title_meta = self.get_title_meta()
-        title_og = self.get_title_og()
+        title_og = self.get_og_field("title")
         description_meta = self.get_description_meta()
-        description_og = self.get_description_og()
+        description_og = self.get_og_field("description")
+        image_og = self.get_og_field("image")
 
         rating += self.get_page_rating_title(title_meta)
         rating += self.get_page_rating_title(title_og)
         rating += self.get_page_rating_description(description_meta)
         rating += self.get_page_rating_description(description_og)
         rating += self.get_page_rating_status_code(self.status_code)
+
+        if image_og:
+            rating += 5
 
         return rating
 

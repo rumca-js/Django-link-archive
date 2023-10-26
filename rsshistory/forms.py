@@ -43,13 +43,16 @@ class ConfigForm(forms.ModelForm):
             "user_agent",
             "link_save",
             "source_save",
-            "store_domain_info",
-            "store_keyword_info",
-            "auto_add_sources",
-            "auto_sources_enabled",
+            "auto_store_entries",
+            "auto_store_sources",
+            "auto_store_sources_enabled",
+            "auto_store_domain_info",
+            "auto_store_keyword_info",
+            "track_user_actions",
             "data_export_path",
             "data_import_path",
             "access_type",
+            "entries_order_by",
             "days_to_move_to_archive",
             "days_to_remove_links",
             "whats_new_days",
@@ -159,11 +162,18 @@ class OmniSearchForm(forms.Form):
     """
 
     search = forms.CharField(label="Search for", max_length=500)
-    archive = forms.BooleanField(label="Search archive", required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["search"].widget.attrs.update(size="100")
+
+
+class OmniSearchWithArchiveForm(OmniSearchForm):
+    """
+    Import links form
+    """
+
+    archive = forms.BooleanField(label="Search archive", required=False)
 
 
 class EntryForm(forms.ModelForm):
@@ -333,21 +343,12 @@ class DomainEditForm(forms.ModelForm):
             "category",
             "subcategory",
             "domain",
-            "title",
-            "description",
-            "status_code",
+            "dead",
         ]
 
     def __init__(self, *args, **kwargs):
         super(DomainEditForm, self).__init__(*args, **kwargs)
         self.fields["domain"].widget.attrs["readonly"] = True
-
-        self.fields["title"].widget.attrs["readonly"] = True
-        self.fields["description"].widget.attrs["readonly"] = True
-        self.fields["title"].required = False
-        self.fields["description"].required = False
-
-        self.fields["status_code"].widget.attrs["readonly"] = True
 
 
 class DomainsChoiceForm(forms.Form):
@@ -522,7 +523,7 @@ class BasicEntryChoiceForm(forms.Form):
     def create(self, sources):
         # how to unpack dynamic forms
         # https://stackoverflow.com/questions/60393884/how-to-pass-choices-dynamically-into-a-django-form
-        self.sources = SourceDataController.objects.filter(on_hold = False)
+        self.sources = SourceDataController.objects.filter(on_hold=False)
 
         categories = self.get_sources_values("category")
         subcategories = self.get_sources_values("subcategory")
@@ -544,7 +545,7 @@ class BasicEntryChoiceForm(forms.Form):
         result = []
         result.append(["", ""])
 
-        for category in SourceCategories.objects.filter(on_hold = False):
+        for category in SourceCategories.objects.filter(on_hold=False):
             if category and category != "":
                 result.append([category.category, category.category])
 
@@ -556,7 +557,7 @@ class BasicEntryChoiceForm(forms.Form):
         result = []
         result.append(["", ""])
 
-        for subcategory in SourceSubCategories.objects.filter(on_hold = False):
+        for subcategory in SourceSubCategories.objects.filter(on_hold=False):
             if subcategory and subcategory != "":
                 result.append([subcategory.subcategory, subcategory.subcategory])
 

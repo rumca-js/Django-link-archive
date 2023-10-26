@@ -120,7 +120,7 @@ class KeyWords(models.Model):
     def add_link_data(link_data):
         from .admin import ConfigurationEntry
 
-        if ConfigurationEntry.get().store_keyword_info:
+        if ConfigurationEntry.get().auto_store_keyword_info:
             if "language" not in link_data:
                 return False
 

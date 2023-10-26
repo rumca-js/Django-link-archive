@@ -7,8 +7,14 @@ from ..controllers import (
     LinkDataController,
     SourceDataController,
 )
-from ..models import BackgroundJob, PersistentInfo
-from ..threadhandlers import HandlerManager
+from ..models import (
+    BackgroundJob,
+    PersistentInfo,
+    ConfigurationEntry,
+    DataExport,
+    SourceExportHistory,
+)
+from ..threadhandlers import HandlerManager, RefreshThreadHandler
 
 
 class BackgroundJobControllerTest(TestCase):
@@ -188,4 +194,100 @@ class BackgroundJobControllerTest(TestCase):
         self.assertEqual(bg_obj, handler_obj)
         self.assertEqual(
             handler.get_job(), BackgroundJobController.JOB_IMPORT_DAILY_DATA
+        )
+
+
+class RefreshThreadHandlerTest(TestCase):
+    def disable_web_pages(self):
+        from ..webtools import BasePage, Page
+
+        BasePage.user_agent = None
+        Page.user_agent = None
+        entry = ConfigurationEntry.get()
+        entry.user_agent = ""
+        entry.save()
+
+    def setUp(self):
+        SourceDataController.objects.create(
+            url="https://youtube.com",
+            title="YouTube",
+            category="No",
+            subcategory="No",
+            export_to_cms=True,
+        )
+
+        BackgroundJobController.objects.all().delete()
+        SourceExportHistory.objects.all().delete()
+
+        self.disable_web_pages()
+        entry = ConfigurationEntry.get()
+
+    def create_exports(self):
+        DataExport.objects.create(
+            enabled=True,
+            export_type=DataExport.EXPORT_TYPE_GIT,
+            export_data=DataExport.EXPORT_DAILY_DATA,
+            local_path="test",
+            remote_path="test.git",
+            user="user",
+            password="password",
+        )
+
+        DataExport.objects.create(
+            enabled=True,
+            export_type=DataExport.EXPORT_TYPE_GIT,
+            export_data=DataExport.EXPORT_BOOKMARKS,
+            local_path="test",
+            remote_path="test.git",
+            user="user",
+            password="password",
+        )
+
+    def test_process_no_exports(self):
+        DataExport.objects.all().delete()
+
+        handler = RefreshThreadHandler()
+        handler.refresh()
+
+        self.assertEqual(
+            BackgroundJobController.objects.filter(
+                job=BackgroundJobController.JOB_PROCESS_SOURCE
+            ).count(),
+            1,
+        )
+
+        self.assertEqual(
+            BackgroundJobController.objects.filter(
+                job=BackgroundJobController.JOB_CLEANUP
+            ).count(),
+            1,
+        )
+
+        self.assertEqual(SourceExportHistory.objects.all().count(), 1)
+
+    def test_process_with_exports(self):
+        self.create_exports()
+
+        handler = RefreshThreadHandler()
+        handler.refresh()
+
+        self.assertEqual(
+            BackgroundJobController.objects.filter(
+                job=BackgroundJobController.JOB_PROCESS_SOURCE
+            ).count(),
+            1,
+        )
+
+        self.assertEqual(
+            BackgroundJobController.objects.filter(
+                job=BackgroundJobController.JOB_PUSH_TO_REPO
+            ).count(),
+            1,
+        )
+
+        self.assertEqual(
+            BackgroundJobController.objects.filter(
+                job=BackgroundJobController.JOB_CLEANUP
+            ).count(),
+            1,
         )

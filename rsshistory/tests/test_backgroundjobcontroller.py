@@ -33,19 +33,19 @@ class BackgroundJobControllerTest(TestCase):
 
     def test_number_of_jobs(self):
         self.assertEqual(
-            BackgroundJobController.get_number_of_jobs(BackgroundJob.JOB_LINK_DETAILS),
+            BackgroundJobController.get_number_of_jobs(BackgroundJob.JOB_LINK_UPDATE_DATA),
             0,
         )
 
         bj = BackgroundJob.objects.create(
-            job=BackgroundJob.JOB_LINK_DETAILS,
+            job=BackgroundJob.JOB_LINK_UPDATE_DATA,
             task=None,
             subject="https://youtube.com?v=1234",
             args="",
         )
 
         self.assertEqual(
-            BackgroundJobController.get_number_of_jobs(BackgroundJob.JOB_LINK_DETAILS),
+            BackgroundJobController.get_number_of_jobs(BackgroundJob.JOB_LINK_UPDATE_DATA),
             1,
         )
 
@@ -115,19 +115,6 @@ class BackgroundJobControllerTest(TestCase):
             BackgroundJobController.get_number_of_jobs(
                 BackgroundJob.JOB_LINK_DOWNLOAD_VIDEO
             ),
-            1,
-        )
-
-    def test_youtube_details(self):
-        self.assertEqual(
-            BackgroundJobController.get_number_of_jobs(BackgroundJob.JOB_LINK_DETAILS),
-            0,
-        )
-
-        x = BackgroundJobController.youtube_details("https://youtube.com?v=1234")
-
-        self.assertEqual(
-            BackgroundJobController.get_number_of_jobs(BackgroundJob.JOB_LINK_DETAILS),
             1,
         )
 

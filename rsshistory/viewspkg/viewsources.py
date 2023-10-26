@@ -227,16 +227,15 @@ def refresh_source(request, pk):
 
     p.context["pk"] = pk
 
-    ft = SourceDataController.objects.filter(id=pk)
-    if not ft.exists():
+    sources = SourceDataController.objects.filter(id=pk)
+    if not sources.exists():
         p.context["summary_text"] = "Source does not exist"
         return p.render("summary_present.html")
 
-    ob = ft[0]
+    source = sources[0]
 
-    operational = SourceOperationalData.objects.filter(url=ob.url)
-    if operational.exists():
-        op = operational[0]
+    if source.dynamic_data is not None:
+        op = source.dynamic_data
         op.date_fetched = None
         op.save()
 

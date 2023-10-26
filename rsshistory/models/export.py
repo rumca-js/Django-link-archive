@@ -14,10 +14,6 @@ class SourceExportHistory(models.Model):
         from ..dateutils import DateUtils
 
         try:
-            ob = ConfigurationEntry.get()
-            if not ob.is_bookmark_repo_set() and not ob.is_daily_repo_set():
-                return
-
             yesterday = DateUtils.get_date_yesterday()
 
             history = SourceExportHistory.objects.filter(date=yesterday)
@@ -34,6 +30,16 @@ class SourceExportHistory(models.Model):
 
     def get_safe():
         return SourceExportHistory.objects.all()[:7]
+
+    def confirm(input_date=None):
+        from ..dateutils import DateUtils
+
+        process_date = DateUtils.get_date_yesterday()
+        if input_date is not None:
+            process_date = input_date
+
+        if SourceExportHistory.objects.filter(date=process_date).count() == 0:
+            SourceExportHistory.objects.create(date=process_date)
 
 
 class DataExport(models.Model):

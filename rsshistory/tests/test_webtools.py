@@ -94,7 +94,7 @@ class PageTest(TestCase):
         # default language
         p = Page("http://test.com/my-site-test", webpage_no_title)
 
-        #when page has no title, URL is chosen for the title
+        # when page has no title, URL is chosen for the title
         self.assertEqual(p.get_title(), "http://test.com/my-site-test")
 
     def test_title_lowercase(self):

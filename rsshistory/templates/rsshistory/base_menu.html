@@ -16,7 +16,7 @@
     <a href="{% url 'rsshistory:sources' %}" class="mainbutton" title="Sources">
         <img src="{% static 'rsshistory/icons/icons8-broadcast-100.png' %}" class="mainbutton-icon" />
         Sources</a>
-    {% if config.store_domain_info %}
+    {% if config.auto_store_domain_info %}
     <a href="{% url 'rsshistory:domains' %}" class="mainbutton" title="Captured domains">
         <img src="{% static 'rsshistory/icons/icons8-www-64.png' %}" class="mainbutton-icon" />
         Domains</a>
@@ -24,7 +24,7 @@
     <a href="{% url 'rsshistory:tags-show-all' %}" class="mainbutton" title="Tags">
         <img src="{% static 'rsshistory/icons/icons8-tags-100.png' %}" class="mainbutton-icon" />
         Tags</a>
-    {% if config.store_keyword_info %}
+    {% if config.auto_store_keyword_info %}
     <a href="{% url 'rsshistory:keywords' %}" class="mainbutton" title="Shows keywords used by links">
         <img src="{% static 'rsshistory/icons/icons8-letters-96.png' %}" class="mainbutton-icon" />
         Keywords</a>
