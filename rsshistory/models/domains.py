@@ -19,10 +19,6 @@ class Domains(models.Model):
     subdomain = models.CharField(max_length=200, null=True)
     suffix = models.CharField(max_length=20, null=True)
     tld = models.CharField(max_length=20, null=True)
-    title = models.CharField(max_length=500, null=True)  # to be removed
-    description = models.CharField(max_length=1000, null=True)  # to be removed
-    language = models.CharField(max_length=10, default="en")  # to be removed
-    status_code = models.IntegerField(default=200)  # to be removed
     category = models.CharField(max_length=1000, null=True)
     subcategory = models.CharField(max_length=1000, null=True)
     dead = models.BooleanField(default=False)  # to be removed

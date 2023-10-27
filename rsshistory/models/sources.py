@@ -2,16 +2,6 @@ from django.db import models
 from django.urls import reverse
 
 
-class SourceOperationalData(models.Model):
-    url = models.CharField(max_length=2000, unique=True)
-    date_fetched = models.DateTimeField(null=True)
-    import_seconds = models.IntegerField(null=True)
-    number_of_entries = models.IntegerField(null=True)
-
-    class Meta:
-        ordering = ["date_fetched"]
-
-
 class SourceDataModel(models.Model):
     SOURCE_TYPE_RSS = "BaseRssPlugin"
     SOURCE_TYPE_PARSE = "BaseParsePlugin"
@@ -64,10 +54,20 @@ class SourceDataModel(models.Model):
             SourceCategories.add(source.category)
             SourceSubCategories.add(source.category, source.subcategory)
 
-    dynamic_data = models.OneToOneField(
-        SourceOperationalData,
-        on_delete=models.SET_NULL,
-        related_name="source_obj",
+
+class SourceOperationalData(models.Model):
+    url = models.CharField(max_length=2000, unique=True)
+    date_fetched = models.DateTimeField(null=True)
+    import_seconds = models.IntegerField(null=True)
+    number_of_entries = models.IntegerField(null=True)
+
+    class Meta:
+        ordering = ["date_fetched"]
+
+    source_obj = models.OneToOneField(
+        SourceDataModel,
+        on_delete=models.CASCADE,
+        related_name="dynamic_data",
         null=True,
         blank=True,
     )

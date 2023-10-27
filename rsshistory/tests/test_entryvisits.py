@@ -28,12 +28,12 @@ class EntryVisitsTest(TestCase):
 
         visits = EntryVisits.objects.filter(entry="https://youtube.com?v=12345")
         self.assertEqual(visits.count(), 1)
-        self.assertEqual(visits[0].visit, 1)
+        self.assertEqual(visits[0].visits, 1)
         self.assertEqual(visits[0].user, "test_username")
 
         EntryVisits.visited(entries[0], "test_username")
 
         visits = EntryVisits.objects.filter(entry="https://youtube.com?v=12345")
         self.assertEqual(visits.count(), 1)
-        self.assertEqual(visits[0].visit, 2)
+        self.assertEqual(visits[0].visits, 2)
         self.assertEqual(visits[0].user, "test_username")

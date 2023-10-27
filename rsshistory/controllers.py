@@ -153,10 +153,10 @@ class SourceDataController(SourceDataModel):
                 obj.date_fetched = date_fetched
                 obj.import_seconds = import_seconds
                 obj.number_of_entries = number_of_entries
+                obj.source_obj = self
                 obj.save()
 
-            self.dynamic_data = obj
-            self.save()
+        return obj
 
     def get_favicon(self):
         if self.favicon:
@@ -494,11 +494,17 @@ class LinkDataHyperController(object):
                 return objs[0]
 
     def add_entry_internal(link_data, is_archive):
+        from .dateutils import DateUtils
+
+        new_link_data = dict(link_data)
+        if "date_published" not in new_link_data:
+            new_link_data["date_published"] = DateUtils.get_datetime_now_utc()
+
         if not is_archive:
-            ob = LinkDataModel.objects.create(**link_data)
+            ob = LinkDataModel.objects.create(**new_link_data)
 
         elif is_archive:
-            ob = ArchiveLinkDataModel.objects.create(**link_data)
+            ob = ArchiveLinkDataModel.objects.create(**new_link_data)
 
         return ob
 

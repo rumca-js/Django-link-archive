@@ -477,7 +477,7 @@ class Page(BasePage):
 
         field = None
 
-        field_find = self.soup.find("meta", property="og:{}".format(field))
+        field_find = self.soup.find("meta", property="og:{}".format(name))
         if field_find and field_find.has_attr("content"):
             field = field_find["content"]
 

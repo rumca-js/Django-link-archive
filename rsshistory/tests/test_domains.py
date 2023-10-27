@@ -8,23 +8,28 @@ from django.urls import reverse
 from ..models import Domains, ConfigurationEntry
 
 
+class RequestsObject(object):
+    def __init__(self, url, headers, timeout):
+        self.status_code = 200
+        self.apparent_encoding = "utf-8"
+        self.encoding = "utf-8"
+        self.text = "text"
+        self.content = "text"
+
+
 class DomainTest(TestCase):
     def setUp(self):
         self.disable_web_pages()
 
-    def get_contents_function(self):
-        return "test function data"
+    def get_contents_function(self, url, headers, timeout):
+        print("Mocked Requesting page: {}".format(url))
+        return RequestsObject(url, headers, timeout)
 
     def disable_web_pages(self):
         from ..webtools import BasePage, Page
 
-        BasePage.user_agent = None
         BasePage.get_contents_function = self.get_contents_function
-
-        Page.user_agent = None
-        entry = ConfigurationEntry.get()
-        entry.user_agent = ""
-        entry.save()
+        Page.get_contents_function = self.get_contents_function
 
     def test_domain_add(self):
         Domains.add("waiterrant.blogspot.com")
