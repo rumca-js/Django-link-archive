@@ -10,7 +10,7 @@ from django.urls import reverse
 
 from ..apps import LinkDatabase
 from .entries import LinkDataModel
-from .admin import PersistentInfo, ConfigurationEntry
+from .admin import PersistentInfo
 
 
 class LinkTagsDataModel(models.Model):
@@ -18,7 +18,7 @@ class LinkTagsDataModel(models.Model):
 
     link = models.CharField(max_length=1000)
     author = models.CharField(max_length=1000)
-    date = models.DateTimeField(default=datetime.now)
+    date = models.DateTimeField(auto_now_add=True)
     tag = models.CharField(max_length=1000)
 
     link_obj = models.ForeignKey(
@@ -50,6 +50,31 @@ class LinkTagsDataModel(models.Model):
 
         if current_tags_objs.exists():
             return LinkTagsDataModel.join_elements(current_tags_objs)
+
+    def save_tags(data):
+        link = data["link"]
+        author = data["author"]
+        date = data["date"]
+        tags = data["tag"]
+
+        objs = LinkTagsDataModel.objects.filter(author=author, link=link)
+        if objs.exists():
+            objs.delete()
+
+        tags_set = set()
+        tags = tags.split(LinkTagsDataModel.get_delim())
+        for tag in tags:
+            tag = str(tag).strip()
+            tag = tag.lower()
+            if tag != "":
+                tags_set.add(tag)
+
+        link_objs = LinkDataModel.objects.filter(link=link)
+
+        for tag in tags_set:
+            LinkTagsDataModel.objects.create(
+                link=link, author=author, date=date, tag=tag, link_obj=link_objs[0]
+            )
 
 
 class LinkVoteDataModel(models.Model):
@@ -92,7 +117,7 @@ class LinkVoteDataModel(models.Model):
 class LinkCommentDataModel(models.Model):
     author = models.CharField(max_length=1000)
     comment = models.TextField(max_length=3000)
-    date_published = models.DateTimeField(default=datetime.now)
+    date_published = models.DateTimeField(auto_now_add=True)
     date_edited = models.DateTimeField(null=True)
     reply_id = models.IntegerField(null=True)
 

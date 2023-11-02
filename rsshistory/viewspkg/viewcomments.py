@@ -7,8 +7,8 @@ from django.shortcuts import render
 from django.http import HttpResponseForbidden, HttpResponseRedirect
 
 from ..models import (
-    ConfigurationEntry,
     LinkCommentDataModel,
+    ConfigurationEntry,
 )
 from ..forms import CommentEntryForm
 from ..views import ViewPage
@@ -25,7 +25,6 @@ def entry_add_comment(request, link_id):
 
     user_name = request.user.get_username()
     if not LinkCommentDataController.can_user_add_comment(link_id, user_name):
-        conf = ConfigurationEntry.get()
         p.context[
             "summary_text"
         ] = "User cannot add more comments. Limit to {} comment per day".format(

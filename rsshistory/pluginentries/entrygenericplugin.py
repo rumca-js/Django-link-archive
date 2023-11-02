@@ -24,12 +24,6 @@ class EntryGenericPlugin(object):
     def get_parameters(self):
         parameters = []
 
-        parameters.append(
-            EntryParameter(
-                "Url", '<a href="{}">{}</a>'.format(self.entry.link, self.entry.link)
-            )
-        )
-
         parameters.append(EntryParameter("Publish date", self.entry.date_published))
         parameters.append(EntryParameter("Artist", self.entry.artist))
         parameters.append(EntryParameter("Album", self.entry.album))

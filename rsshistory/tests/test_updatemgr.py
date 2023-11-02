@@ -62,6 +62,7 @@ class UpdateManagerTest(TestCase):
             subcategory="No",
             export_to_cms=True,
         )
+
         LinkDataController.objects.create(
             source="https://youtube.com",
             link="https://youtube.com?v=bookmarked",
@@ -71,6 +72,17 @@ class UpdateManagerTest(TestCase):
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
         )
+
+        LinkDataController.objects.create(
+            source="https://youtube.com",
+            link="https://youtube.com?v=permanent",
+            title="The first link",
+            source_obj=source_youtube,
+            permanent=True,
+            date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
+            language="en",
+        )
+
         DataExport.objects.create(
             enabled=True,
             export_type=DataExport.EXPORT_TYPE_GIT,
@@ -79,6 +91,10 @@ class UpdateManagerTest(TestCase):
             remote_path="test.git",
             user="user",
             password="password",
+            export_entries = True,
+            export_entries_bookmarks = True,
+            export_entries_permanents = True,
+            export_sources = True,
         )
         DataExport.objects.create(
             enabled=True,
@@ -88,6 +104,10 @@ class UpdateManagerTest(TestCase):
             remote_path="test.git",
             user="user",
             password="password",
+            export_entries = True,
+            export_entries_bookmarks = True,
+            export_entries_permanents = True,
+            export_sources = True,
         )
 
     def test_push_daily_repo(self):
@@ -98,7 +118,9 @@ class UpdateManagerTest(TestCase):
 
         write_date = DateUtils.get_date_yesterday()
 
-        mgr.push_daily_repo(write_date)
+        export_config = DataExport.objects.filter(export_data=DataExport.EXPORT_DAILY_DATA)[0]
+
+        mgr.push_daily_repo(export_config, write_date)
         self.assertTrue(True)
 
         self.assertEqual(len(RepoTestFactory.used_repos), 1)
@@ -109,7 +131,9 @@ class UpdateManagerTest(TestCase):
         conf = Configuration.get_object()
         mgr = UpdateManager(conf, RepoTestFactory)
 
-        mgr.push_bookmarks_repo()
+        export_config = DataExport.objects.filter(export_data=DataExport.EXPORT_BOOKMARKS)[0]
+
+        mgr.push_bookmarks_repo(export_config)
         self.assertTrue(True)
 
         self.assertEqual(len(RepoTestFactory.used_repos), 1)

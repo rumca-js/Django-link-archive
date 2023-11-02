@@ -15,20 +15,6 @@ class BookmarksExporter(object):
         self.md_template_bookmarked += " - user: $user\n"
         self.md_template_bookmarked += " - tags: $tags\n"
 
-    def get_entries(self):
-        from ..controllers import LinkDataController
-
-        entries = LinkDataController.objects.filter(bookmarked=True)
-
-    def get_export_path(self):
-        entries_dir = self._cfg.get_bookmarks_path()
-        export_path = entries_dir
-
-        if not export_path.exists():
-            export_path.mkdir(parents=True, exist_ok=True)
-
-        return export_path
-
     def export(self, export_file_name="bookmarks", export_dir="default"):
         if self._entries.count() == 0:
             return
@@ -65,6 +51,20 @@ class BookmarksExporter(object):
 
         file_name = export_path / (export_file_name + "_entries.rss")
         file_name.write_text(self.use_rss_wrapper(rss_text))
+
+    def get_entries(self):
+        from ..controllers import LinkDataController
+
+        entries = LinkDataController.objects.filter(bookmarked=True)
+
+    def get_export_path(self):
+        entries_dir = self._cfg.get_bookmarks_path()
+        export_path = entries_dir
+
+        if not export_path.exists():
+            export_path.mkdir(parents=True, exist_ok=True)
+
+        return export_path
 
     # TODO remove hardcoded link to this site
     def use_rss_wrapper(self, text, language="en", link="https://renegat0x0.ddns.net"):

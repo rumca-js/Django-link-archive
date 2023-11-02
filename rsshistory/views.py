@@ -8,6 +8,7 @@ from .models import UserConfig, ConfigurationEntry
 from .basictypes import *
 from .configuration import Configuration
 from .apps import LinkDatabase
+from .configuration import Configuration
 
 
 class ViewPage(object):
@@ -64,7 +65,7 @@ class ViewPage(object):
             ):
                 return self.render_implementation("missing_rights.html")
 
-        config = ConfigurationEntry.get()
+        config = Configuration.get_object().config_entry
         if (
             config.access_type == ConfigurationEntry.ACCESS_TYPE_OWNER
             and not self.request.user.is_superuser

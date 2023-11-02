@@ -9,6 +9,7 @@ from .models import (
     LinkVoteDataModel,
 )
 from .models import ConfigurationEntry, UserConfig, DataExport
+from .configuration import Configuration
 from .controllers import (
     SourceDataController,
     LinkDataController,
@@ -80,6 +81,10 @@ class DataExportForm(forms.ModelForm):
             "remote_path",
             "user",
             "password",
+            "export_entries",
+            "export_entries_bookmarks",
+            "export_entries_permanents",
+            "export_sources",
         ]
 
 
@@ -282,36 +287,10 @@ class TagEntryForm(forms.ModelForm):
 
     class Meta:
         model = LinkTagsDataModel
-        fields = ["link", "author", "date", "tag"]
+        fields = ["link", "author", "tag"]
         widgets = {
             #    'date': forms.widgets.DateTimeInput(attrs={'type': 'datetime-local'})
         }
-
-    def save_tags(self):
-        link = self.cleaned_data["link"]
-        author = self.cleaned_data["author"]
-        date = self.cleaned_data["date"]
-        tags = self.cleaned_data["tag"]
-
-        objs = LinkTagsDataModel.objects.filter(author=author, link=link)
-        if objs.exists():
-            objs.delete()
-
-        tags_set = set()
-        tags = tags.split(LinkTagsDataModel.get_delim())
-        for tag in tags:
-            tag = str(tag).strip()
-            tag = tag.lower()
-            if tag != "":
-                tags_set.add(tag)
-
-        link_objs = LinkDataController.objects.filter(link=link)
-
-        for tag in tags_set:
-            model = LinkTagsDataModel(
-                link=link, author=author, date=date, tag=tag, link_obj=link_objs[0]
-            )
-            model.save()
 
 
 class TagRenameForm(forms.Form):
@@ -652,7 +631,7 @@ class LinkVoteForm(forms.Form):
         super(LinkVoteForm, self).__init__(*args, **kwargs)
         self.fields["author"].readonly = True
 
-        config = ConfigurationEntry.get()
+        config = Configuration.get_object().config_entry
 
         self.fields["vote"].validators = [
             MaxValueValidator(config.vote_max),

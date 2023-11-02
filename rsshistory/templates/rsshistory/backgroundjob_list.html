@@ -1,11 +1,19 @@
 {% extends base_generic %}
+{% load static %}
 {% block content %}
 
 <div class="contentbuttonmenu">
-    <a href="javascript:history.back()" class="simplebutton">Go Back</a>
+    <a href="javascript:history.back()" class="simplebutton">
+        <img src="{% static 'rsshistory/icons/icons8-back-100.png' %}" class="content-icon" />
+    </a>
+
     {% if user.is_staff %}
-    <a href="{% url 'rsshistory:backgroundjob-add' %}" title="Add a new job" class="simplebutton">New</a>
-    <a href="{% url 'rsshistory:backgroundjobs-check-new' %}" title="Checks if it is time for a new job" class="simplebutton">Check</a>
+    <a href="{% url 'rsshistory:backgroundjob-add' %}" title="Add a new job" class="simplebutton" title="Add background job">
+       <img src="{% static 'rsshistory/icons/icons8-plus-100.png' %}" class="content-icon" />
+    </a>
+    <a href="{% url 'rsshistory:backgroundjobs-check-new' %}" title="Checks if it is time for a new job" class="simplebutton">
+       <img src="{% static 'rsshistory/icons/icons8-update-100.png' %}" class="content-icon" />
+    </a>
     <a href="{% url 'rsshistory:backgroundjobs-perform-all' %}" title="Process all" class="simplebutton">Process all</a>
     <a href="{% url 'rsshistory:backgroundjobs-remove-all' %}" title="Removes all background jobs" class="simplebutton">Remove all</a>
     {% endif %}
@@ -21,7 +29,9 @@
            title="{{job.job}} {{job.task}} {{job.subject}} {{job.args}}"
            >
          - {{job.job}} {{job.task}} {{job.subject}} {{job.args}} 
-            <a href="{% url 'rsshistory:backgroundjob-remove' job.id %}" class="simplebutton">Remove</a>
+            <a href="{% url 'rsshistory:backgroundjob-remove' job.id %}" class="simplebutton" title="Remove job">
+               <img src="{% static 'rsshistory/icons/icons8-trash-100.png' %}" class="content-icon" />
+            </a>
             <a href="{% url 'rsshistory:backgroundjobs-remove' job.job %}" class="simplebutton">Remove all in type</a>
         </div>
 

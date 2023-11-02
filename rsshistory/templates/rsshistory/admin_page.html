@@ -1,7 +1,12 @@
 {% extends base_generic %}
+{% load static %}
 {% block content %}
 
-<a href="javascript:history.back()" class="simplebutton">Go Back</a>
+<div class="contentbuttonmenu">
+    <a href="javascript:history.back()" class="simplebutton">
+        <img src="{% static 'rsshistory/icons/icons8-back-100.png' %}" class="content-icon" />
+    </a>
+</div>
 
 {% if user.is_staff %}
     <div>

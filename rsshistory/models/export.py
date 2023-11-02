@@ -1,7 +1,7 @@
 import traceback
 from django.db import models
 
-from .admin import PersistentInfo, ConfigurationEntry
+from .admin import PersistentInfo
 
 
 class SourceExportHistory(models.Model):
@@ -70,3 +70,9 @@ class DataExport(models.Model):
     remote_path = models.CharField(max_length=1000)
     user = models.CharField(default="", max_length=2000, null=True)
     password = models.CharField(default="", max_length=2000, null=True)
+
+    # maybe we should make another table, for each EXPORT
+    export_entries = models.BooleanField(default=True)
+    export_entries_bookmarks = models.BooleanField(default=False)
+    export_entries_permanents = models.BooleanField(default=False)
+    export_sources = models.BooleanField(default=False)

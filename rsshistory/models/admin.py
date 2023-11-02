@@ -63,6 +63,9 @@ class ConfigurationEntry(models.Model):
     )
 
     def get():
+        """
+        Most probably should not be used directly. Should be cached in application
+        """
         confs = ConfigurationEntry.objects.all()
         if confs.count() == 0:
             return ConfigurationEntry.objects.create()
@@ -263,6 +266,7 @@ class BackgroundJob(models.Model):
     JOB_IMPORT_INSTANCE = "import-instance"
     JOB_PUSH_TO_REPO = "push-to-repo"
     JOB_PUSH_DAILY_DATA_TO_REPO = "push-daily-data-to-repo"
+    JOB_PUSH_BOOKMARKS_TO_REPO = "push-bookmarks-to-repo"
     JOB_CLEANUP = "cleanup"
     JOB_CHECK_DOMAINS = "check-domains"
 
@@ -284,6 +288,7 @@ class BackgroundJob(models.Model):
         (JOB_IMPORT_INSTANCE, JOB_IMPORT_INSTANCE),
         (JOB_PUSH_TO_REPO, JOB_PUSH_TO_REPO),
         (JOB_PUSH_DAILY_DATA_TO_REPO, JOB_PUSH_DAILY_DATA_TO_REPO),
+        (JOB_PUSH_BOOKMARKS_TO_REPO, JOB_PUSH_BOOKMARKS_TO_REPO),
         (JOB_CLEANUP, JOB_CLEANUP),
         (JOB_CHECK_DOMAINS, JOB_CHECK_DOMAINS),
     )

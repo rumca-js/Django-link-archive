@@ -9,7 +9,7 @@ import django.utils
 class KeyWords(models.Model):
     keyword = models.CharField(max_length=200)
     language = models.CharField(max_length=10, default="en")
-    date_published = models.DateTimeField(default=django.utils.timezone.now)
+    date_published = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ["-date_published"]
@@ -118,9 +118,9 @@ class KeyWords(models.Model):
             KeyWords.objects.create(keyword=str_token, language=language)
 
     def add_link_data(link_data):
-        from .admin import ConfigurationEntry
+        from ..configuration import Configuration
 
-        if ConfigurationEntry.get().auto_store_keyword_info:
+        if Configuration.get_object().config_entry.auto_store_keyword_info:
             if "language" not in link_data:
                 return False
 
@@ -191,9 +191,9 @@ class KeyWords(models.Model):
         # TODO we clear every beginning of
         # maybe we should clear
         from ..dateutils import DateUtils
-        from .admin import ConfigurationEntry
+        from ..configuration import Configuration
 
-        conf = ConfigurationEntry.get()
+        conf = Configuration.get_object().config_entry
 
         date_limit = KeyWords.get_keywords_date_limit()
         if input_date < date_limit:

@@ -1,5 +1,7 @@
 import urllib.request, urllib.error, urllib.parse
 from urllib.parse import urlparse
+import urllib.robotparser
+
 import html
 import traceback
 import requests
@@ -18,8 +20,6 @@ from .apps import LinkDatabase
 class BasePage(object):
     # use headers from https://www.supermonitoring.com/blog/check-browser-http-headers/
     user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/116.0"
-    # user_agent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11"
-    # user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/116.0" # from browser
     get_contents_function = None
 
     def __init__(self, url, contents=None):
@@ -34,10 +34,10 @@ class BasePage(object):
             self.get_contents_function = self.get_contents_internal
 
         if self.contents is None:
-            from .models import ConfigurationEntry
+            from .configuration import Configuration
 
-            config = ConfigurationEntry.get()
-            self.user_agent = config.user_agent
+            config = Configuration.get_object()
+            self.user_agent = config.config_entry.user_agent
 
     def process_contents(self):
         pass
@@ -56,6 +56,16 @@ class BasePage(object):
             return thebytes.decode("UTF-8", errors="replace")
         except Exception as e:
             pass
+
+    def get_robots_txt(self):
+        """
+        https://developers.google.com/search/docs/crawling-indexing/robots/intro
+        """
+        self.rp = urllib.robotparser.RobotFileParser()
+        domain = self.get_domain()
+        self.rp.set_url("{}/robots.txt".format(domain))
+
+        return self.rp
 
     def is_status_ok(self):
         if self.status_code == 0:

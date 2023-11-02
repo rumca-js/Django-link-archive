@@ -1,19 +1,23 @@
 {% extends base_generic %}
+{% load static %}
 {% block content %}
 
   {{object_controller.get_frame_html | safe | linebreaks }}
   <div style="clear:both"></div>
 
-  <h1><a href="{{ object.link }}">
+  <h1><a href="{{ object.link }}" title="{{ object.link }}">
           {% if object.bookmarked %}
           [{{object.page_rating_votes}}]
           {% endif %}
           {{ object.title }}
       </a></h1>
+      <div><strong>Url</strong>{{object.link}}</div>
 
   {% if user.is_staff %}
     <p>
-        <a href="{{object.get_edit_url}}" class="simplebutton">Edit entry</a>
+        <a href="{{object.get_edit_url}}" class="simplebutton" title="Edit entry">
+            <img src="{% static 'rsshistory/icons/icons8-edit-100.png' %}" class="content-icon" />
+        </a>
     {% if object.bookmarked %}
        <a href="{{object.get_bookmark_unset_url}}" class="simplebutton">
         Not bookmark
@@ -24,7 +28,6 @@
        </a>
     {% endif %}
     {% if object.is_taggable %}
-        <a href="{% url 'rsshistory:entry-tag' object.id %}" class="simplebutton">Tag</a>
         <a href="{% url 'rsshistory:entry-vote' object.id %}" class="simplebutton">Vote</a>
     {% endif %}
 
@@ -66,27 +69,34 @@
 
   {% if user.is_staff %}
     <p>
+      <a href="{% url 'rsshistory:entry-remove' object.id %}" class="simplebutton">
+          <img src="{% static 'rsshistory/icons/icons8-trash-100.png' %}" class="content-icon" title="Remove entry" />
+      </a>
       <a href="{% url 'rsshistory:entry-hide' object.id %}" class="simplebutton">Hide entry</a>
-      <a href="{% url 'rsshistory:entry-remove' object.id %}" class="simplebutton">Remove entry</a>
     </p>
   {% endif %}
 
   <p>
       {% for parameter in object_controller.get_parameters %}
-        <div><strong>{{parameter.name | safe}}:</strong> {{parameter.description | safe}}</div>
+        <span><strong>{{parameter.name | safe}}:</strong> {{parameter.description | safe}}</span>
       {% endfor %}
-        <div><strong>Points</strong>{{object.page_rating}}</div>
-        <div><strong>Points contents</strong>{{object.page_rating_contents}}</div>
-        <div><strong>Points votes</strong>{{object.page_rating_votes}}</div>
-        <div><strong>User visits</strong>{{object.page_rating_visits}}</div>
+        <span><strong>Points</strong>{{object.page_rating}}</span>
+        <span><strong>Points contents</strong>{{object.page_rating_contents}}</span>
+        <span><strong>Points votes</strong>{{object.page_rating_votes}}</span>
+        <span><strong>User visits</strong>{{object.page_rating_visits}}</span>
 
-      {% if object.has_tags %}
-          <div><strong>Tags:</strong>
-           {% for tag in object.get_tag_map %}
-               <a href="{% url 'rsshistory:entries-omni-search'%}?search=tags__tag+%3D+{{tag}}" class="simplebutton">{{tag}}</a>
-           {% endfor %}
-          </div>
-      {% endif %}
+        {% if object.is_taggable %}
+        <div><strong>Tags:</strong>
+            <a href="{% url 'rsshistory:entry-tag' object.id %}" class="simplebutton">
+               <img src="{% static 'rsshistory/icons/icons8-edit-100.png' %}" class="content-icon" />
+            </a>
+            {% endif %}
+            {% if object.has_tags %}
+            {% for tag in object.get_tag_map %}
+            <a href="{% url 'rsshistory:entries-omni-search'%}?search=tags__tag+%3D+{{tag}}" class="simplebutton">{{tag}}</a>
+            {% endfor %}
+        </div>
+        {% endif %}
   </p>
 
   {{object_controller.get_description_html | safe | linebreaks }}
@@ -100,8 +110,12 @@
       <div>{{comment.comment | linebreaks}}</div>
       <div>{{comment.date_published}} {{comment.author}}
           {% if comment.author == user.get_username %}
-            <a href="{% url 'rsshistory:entry-comment-edit' comment.id %}" class="simplebutton">Edit</a>
-            <a href="{% url 'rsshistory:entry-comment-remove' comment.id %}" class="simplebutton">Remove</a>
+            <a href="{% url 'rsshistory:entry-comment-edit' comment.id %}" class="simplebutton" title="Edit comment">
+               <img src="{% static 'rsshistory/icons/icons8-edit-100.png' %}" class="content-icon" />
+            </a>
+            <a href="{% url 'rsshistory:entry-comment-remove' comment.id %}" class="simplebutton" title="Remove comment">
+               <img src="{% static 'rsshistory/icons/icons8-trash-100.png' %}" class="content-icon" />
+            </a>
           {% endif %}
       </div>
       <hr/>

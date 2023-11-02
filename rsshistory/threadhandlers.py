@@ -11,7 +11,6 @@ from django.db.models import Q
 from .apps import LinkDatabase
 from .models import (
     PersistentInfo,
-    ConfigurationEntry,
     BackgroundJob,
     SourceDataModel,
     Domains,
@@ -452,7 +451,6 @@ class WriteBookmarksJobHandler(BaseJobHandler):
 
     def process(self, obj=None):
         try:
-            from .configuration import Configuration
             from .datawriter import DataWriter
 
             # some changes could be done externally. Through apache.
@@ -515,16 +513,46 @@ class PushToRepoJobHandler(BaseJobHandler):
 
     def process(self, obj=None):
         try:
+            from .configuration import Configuration
+            c = Configuration.get_object()
             if (
-                ConfigurationEntry.get().is_bookmark_repo_set()
-                and ConfigurationEntry.get().is_daily_repo_set()
+                c.config_entry.is_bookmark_repo_set()
+                or c.config_entry.is_daily_repo_set()
             ):
                 from .updatemgr import UpdateManager
 
                 update_mgr = UpdateManager(self._config)
-                update_mgr.write_and_push_to_git()
+                if c.config_entry.is_bookmark_repo_set():
+                    update_mgr.write_and_push_bookmarks()
+                if c.config_entry.is_daily_repo_set():
+                    update_mgr.write_and_push_daily_data()
 
                 SourceExportHistory.confirm()
+        except Exception as e:
+            error_text = traceback.format_exc()
+            PersistentInfo.error("Exception: {} {}".format(str(e), error_text))
+
+
+class PushBookmarksToRepoJobHandler(BaseJobHandler):
+    """!
+    Pushes data to repo
+    """
+
+    def __init__(self):
+        pass
+
+    def get_job(self):
+        return BackgroundJob.JOB_PUSH_BOOKMARKS_TO_REPO
+
+    def process(self, obj=None):
+        try:
+            config = Configuration.get_object()
+
+            if config.config_entry.is_bookmark_repo_set():
+                from .updatemgr import UpdateManager
+
+                update_mgr = UpdateManager(self._config)
+                update_mgr.write_and_push_bookmarks()
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.error("Exception: {} {}".format(str(e), error_text))
@@ -543,7 +571,9 @@ class PushDailyDataToRepoJobHandler(BaseJobHandler):
 
     def process(self, obj=None):
         try:
-            if ConfigurationEntry.get().is_daily_repo_set():
+            config = Configuration.get_object()
+
+            if config.config_entry.is_daily_repo_set():
                 from .updatemgr import UpdateManager
 
                 date_input = obj.subject
@@ -615,13 +645,14 @@ class RefreshThreadHandler(object):
         for source in sources:
             BackgroundJobController.download_rss(source)
 
-        conf = ConfigurationEntry.get()
+        c = Configuration.get_object()
+        conf = c.config_entry
 
         if SourceExportHistory.is_update_required():
             if conf.is_bookmark_repo_set() or conf.is_daily_repo_set():
                 BackgroundJobController.push_to_repo()
 
-                if ConfigurationEntry.get().source_save:
+                if conf.source_save:
                     sources = SourceDataController.objects.all()
                     for source in sources:
                         BackgroundJobController.link_save(source.url)
@@ -648,6 +679,7 @@ class HandlerManager(object):
         return [
             PushToRepoJobHandler(),
             PushDailyDataToRepoJobHandler(),
+            PushBookmarksToRepoJobHandler(),
             ProcessSourceJobHandler(),
             LinkAddJobHandler(),
             LinkDownloadJobHandler(),
@@ -678,7 +710,7 @@ class HandlerManager(object):
         return []
 
     def process_all(self):
-        from .configuration import Configuration
+        PersistentInfo.create("Processing messages")
 
         config = Configuration.get_object()
 
@@ -694,3 +726,4 @@ class HandlerManager(object):
 
                 handler.process(obj)
                 obj.delete()
+        PersistentInfo.create("Processing messages done")

@@ -31,6 +31,7 @@ from ..forms import (
 )
 from ..queryfilters import EntryFilter
 from ..views import ViewPage
+from ..configuration import Configuration
 
 
 class EntriesSearchListView(generic.ListView):
@@ -63,7 +64,7 @@ class EntriesSearchListView(generic.ListView):
         return thefilter
 
     def get_queryset(self):
-        config = ConfigurationEntry.get()
+        config = Configuration.get_object().config_entry
 
         print("EntriesSearchListView:get_queryset")
         self.query_filter = self.get_filter()
@@ -172,7 +173,7 @@ class EntriesSearchListView(generic.ListView):
     def get_default_range(self):
         from ..dateutils import DateUtils
 
-        config = ConfigurationEntry.get()
+        config = Configuration.get_object().config_entry
         return DateUtils.get_days_range(config.whats_new_days)
 
 
@@ -373,7 +374,7 @@ class EntriesOmniListView(EntriesSearchListView):
             )
 
     def get_form_instance(self):
-        config = ConfigurationEntry.get()
+        config = Configuration.get_object().config_entry
         if config.days_to_move_to_archive == 0:
             return OmniSearchForm(self.request.GET)
         else:
@@ -483,10 +484,12 @@ def add_entry(request):
             if obs.exists():
                 p.context["entry"] = obs[0]
 
-            if ConfigurationEntry.get().auto_store_domain_info:
+            config = Configuration.get_object().config_entry
+
+            if config.auto_store_domain_info:
                 Domains.add(data["link"])
 
-            if ConfigurationEntry.get().link_save:
+            if config.link_save:
                 BackgroundJobController.link_save(data["link"])
 
             return p.render("entry_added.html")
@@ -734,7 +737,7 @@ def make_bookmarked_entry(request, pk):
     entry = LinkDataController.objects.get(id=pk)
 
     if LinkDataHyperController.make_bookmarked(request, entry):
-        if ConfigurationEntry.get().link_save:
+        if Configuration.get_object().config_entry.link_save:
             BackgroundJobController.link_save(entry.link)
 
     return HttpResponseRedirect(entry.get_absolute_url())
@@ -779,7 +782,7 @@ def wayback_save(request, pk):
     if data is not None:
         return data
 
-    if ConfigurationEntry.get().link_save:
+    if Configuration.get_object().config_entry.link_save:
         link = LinkDataController.objects.get(id=pk)
         BackgroundJobController.link_save(subject=link.link)
 

@@ -32,6 +32,8 @@ class SourceDataController(SourceDataModel):
         proxy = True
 
     def add(source_data_map):
+        from .configuration import Configuration
+
         sources = SourceDataController.objects.filter(url=source_data_map["url"])
         if sources.count() > 0:
             return None
@@ -41,7 +43,7 @@ class SourceDataController(SourceDataModel):
 
         SourceDataController.fix_entries(source)
 
-        if ConfigurationEntry.get().auto_store_domain_info:
+        if Configuration.get_object().config_entry.auto_store_domain_info:
             Domains.add(source_data_map["url"])
 
         return source
@@ -86,15 +88,14 @@ class SourceDataController(SourceDataModel):
         if self.on_hold:
             return False
 
-        start_time = DateUtils.get_datetime_now_utc()
-
+        now = DateUtils.get_datetime_now_utc()
         date_fetched = self.get_date_fetched()
+
         if date_fetched:
-            time_since_update = start_time - date_fetched
+            time_since_update = now - date_fetched
             # mins = time_since_update / timedelta(minutes=1)
             secs = time_since_update / timedelta(seconds=1)
 
-            # if mins >= 30:
             if secs >= self.fetch_period:
                 return True
             return False
@@ -333,8 +334,9 @@ class LinkDataController(LinkDataModel):
 
     def move_old_links_to_archive():
         from .dateutils import DateUtils
+        from .configuration import Configuration
 
-        conf = ConfigurationEntry.get()
+        conf = Configuration.get_object().config_entry
 
         if conf.days_to_move_to_archive == 0:
             return
@@ -343,7 +345,7 @@ class LinkDataController(LinkDataModel):
         days_before = current_time - timedelta(days=conf.days_to_move_to_archive)
 
         entries = LinkDataController.objects.filter(
-            bookmarked=False, permament=False, date_published__lt=days_before
+            bookmarked=False, permanent=False, date_published__lt=days_before
         )
 
         for entry in entries:
@@ -354,6 +356,7 @@ class LinkDataController(LinkDataModel):
 
     def clear_old_entries():
         from .dateutils import DateUtils
+        from .configuration import Configuration
 
         sources = SourceDataController.objects.all()
         for source in sources:
@@ -378,7 +381,7 @@ class LinkDataController(LinkDataModel):
                     )
                     entries.delete()
 
-        config = ConfigurationEntry.get()
+        config = Configuration.get_object().config_entry
         days = config.days_to_remove_links
         if days != 0:
             days_before = DateUtils.get_days_before_dt(days)
@@ -532,7 +535,9 @@ class LinkDataHyperController(object):
         return link_data
 
     def is_enabled_to_store(link_data, source_is_auto):
-        config = ConfigurationEntry.get()
+        from .configuration import Configuration
+        config = Configuration.get_object().config_entry
+
         if source_is_auto and not config.auto_store_entries:
             return False
         return True
@@ -604,8 +609,10 @@ class LinkDataHyperController(object):
         return LinkDataHyperController.add_new_link(link_data)
 
     def add_addition_link_data(link_data):
+        from .configuration import Configuration
+
         try:
-            config = ConfigurationEntry.get()
+            config = Configuration.get_object().config_entry
             if config.auto_store_domain_info:
                 if "source" in link_data:
                     p = Page(link_data["source"])
@@ -618,7 +625,12 @@ class LinkDataHyperController(object):
 
                 parser = ContentLinkParser(link_data["link"], link_data["description"])
                 links = parser.get_links()
+                domains = set()
                 for link in links:
+                    link_page = Page(link)
+                    domains.add(link_page.get_domain())
+
+                for domain in domains:
                     Domains.add(domain)
 
             if config.auto_store_keyword_info:
@@ -638,8 +650,9 @@ class LinkDataHyperController(object):
 
     def get_link_object(link, date=None):
         from .dateutils import DateUtils
+        from .configuration import Configuration
 
-        conf = ConfigurationEntry.get()
+        conf = Configuration.get_object().config_entry
 
         if date is None:
             obj = LinkDataController.objects.filter(link=link)
@@ -672,10 +685,11 @@ class LinkDataHyperController(object):
     def make_not_bookmarked(request, entry):
         entry.make_not_bookmarked(request.user.username)
         from .dateutils import DateUtils
+        from .configuration import Configuration
 
         days_diff = DateUtils.get_day_diff(entry.date_published)
 
-        conf = ConfigurationEntry.get()
+        conf = Configuration.get_object().config_entry
 
         if days_diff > conf.days_to_move_to_archive:
             LinkDataHyperController.move_to_archive(entry)
@@ -737,6 +751,8 @@ class LinkCommentDataController(LinkCommentDataModel):
         proxy = True
 
     def can_user_add_comment(link_id, user_name):
+        from .configuration import Configuration
+
         now = datetime.now()
         time_start = now - timedelta(days=1)
         time_stop = now
@@ -751,7 +767,7 @@ class LinkCommentDataController(LinkCommentDataModel):
             criterion0 & (criterion1 | criterion2)
         )
 
-        conf = ConfigurationEntry.get()
+        conf = Configuration.get_object().config_entry
 
         if comments.count() > conf.number_of_comments_per_day:
             return False

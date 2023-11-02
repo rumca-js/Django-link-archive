@@ -6,7 +6,7 @@ from django.test import TestCase
 from django.utils import timezone
 from django.urls import reverse
 
-from ..models import ConfigurationEntry, PersistentInfo, Domains
+from ..models import ConfigurationEntry, PersistentInfo, Domains, DataExport
 from ..controllers import SourceDataController, LinkDataController
 from ..configuration import Configuration
 from ..datawriter import DataWriter
@@ -45,6 +45,15 @@ class DataWriterTest(TestCase):
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
         )
+        LinkDataController.objects.create(
+            source="https://youtube.com",
+            link="https://youtube.com?v=permanent",
+            title="The first link",
+            source_obj=source_youtube,
+            permanent=True,
+            date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
+            language="en",
+        )
 
         SourceDataController.objects.create(
             url="https://linkedin.com",
@@ -55,6 +64,28 @@ class DataWriterTest(TestCase):
         )
 
         Domains.add("https://youtube.com?v=nonbookmarked")
+
+        self.export_config = DataExport.objects.create(
+                export_type = DataExport.EXPORT_TYPE_GIT,
+                export_data = DataExport.EXPORT_BOOKMARKS,
+                local_path = ".",
+                remote_path = ".",
+                export_entries = True,
+                export_entries_bookmarks = True,
+                export_entries_permanents = True,
+                export_sources = True,
+        )
+
+        DataExport.objects.create(
+                export_type = DataExport.EXPORT_TYPE_GIT,
+                export_data = DataExport.EXPORT_DAILY_DATA,
+                local_path = ".",
+                remote_path = ".",
+                export_entries = True,
+                export_entries_bookmarks = True,
+                export_entries_permanents = True,
+                export_sources = True,
+        )
 
     def tearDown(self):
         self.remove_all_files()
@@ -80,7 +111,7 @@ class DataWriterTest(TestCase):
 
         conf = Configuration.get_object()
 
-        writer = DataWriter(conf)
+        writer = DataWriter(conf, self.export_config)
         json_text = writer.get_domains_json()
 
         json_obj = json.loads(json_text)
@@ -94,7 +125,7 @@ class DataWriterTest(TestCase):
 
         conf = Configuration.get_object()
 
-        writer = DataWriter(conf)
+        writer = DataWriter(conf, self.export_config)
         json_text = writer.get_sources_json()
         json_obj = json.loads(json_text)
 
@@ -107,7 +138,7 @@ class DataWriterTest(TestCase):
 
         conf = Configuration.get_object()
 
-        writer = DataWriter(conf)
+        writer = DataWriter(conf, self.export_config)
         writer.write_bookmarks()
 
         links = LinkDataController.objects.filter(bookmarked=True)
@@ -130,7 +161,7 @@ class DataWriterTest(TestCase):
 
         conf = Configuration.get_object()
 
-        writer = DataWriter(conf)
+        writer = DataWriter(conf, self.export_config)
         writer.write_bookmarks()
 
         json_file = conf.get_sources_json_path()
@@ -147,7 +178,7 @@ class DataWriterTest(TestCase):
 
         conf = Configuration.get_object()
 
-        writer = DataWriter(conf)
+        writer = DataWriter(conf, self.export_config)
         writer.write_daily_data("2023-03-03")
 
         json_file = (
@@ -157,10 +188,7 @@ class DataWriterTest(TestCase):
 
         json_obj = json.loads(json_file.read_text())
 
-        self.assertEqual(len(json_obj), 2)
+        self.assertEqual(len(json_obj), 3)
 
         json_file = conf.get_daily_data_path() / "sources.json"
-        self.assertEqual(json_file.exists(), True)
-
-        json_file = conf.get_daily_data_path() / "domains.json"
         self.assertEqual(json_file.exists(), True)

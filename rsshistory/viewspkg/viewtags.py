@@ -116,7 +116,7 @@ def tag_entry(request, pk):
         form = TagEntryForm(request.POST)
 
         if form.is_valid():
-            form.save_tags()
+            LinkTagsDataModel.save_tags(form.cleaned_data)
 
             return HttpResponseRedirect(
                 reverse(
@@ -325,7 +325,7 @@ def entry_vote(request, pk):
                 )
             )
         else:
-            config = ConfigurationEntry.get()
+            config = Configuration.get_object().config_entry
             p.context[
                 "summary_text"
             ] = "Entry not voted. Vote min, max = [{}, {}]".format(

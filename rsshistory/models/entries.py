@@ -3,6 +3,7 @@ from datetime import datetime, date, timedelta
 from django.db import models
 from django.urls import reverse
 from django.templatetags.static import static
+from django.utils import timezone
 
 from ..apps import LinkDatabase
 from .sources import SourceDataModel
@@ -21,8 +22,8 @@ class BaseLinkDataModel(models.Model):
     language = models.CharField(max_length=10, null=True, blank=True)
     age = models.IntegerField(blank=True, null=True)
 
-    date_published = models.DateTimeField(default=datetime.now)
-    date_update_last = models.DateTimeField(null=True)
+    date_published = models.DateTimeField(default=timezone.now)
+    date_update_last = models.DateTimeField(auto_now=True, null=True)
     date_dead_since = models.DateTimeField(null=True)
 
     # this entry cannot be removed. Serves a purpose. Domain page, source page
@@ -35,6 +36,14 @@ class BaseLinkDataModel(models.Model):
 
     # We could use a different model, but it may lead to making multiple queries
     # For each model.
+
+    # Archive was introduced to have two tables:
+    #  - link model (fast)
+    #  - archive (slow)
+
+    # If we have moved artist & album to one big table, then it would go against this
+    # solution.
+    # We do not want to have archive tables for everything.
 
     artist = models.CharField(max_length=1000, null=True, blank=True)
     album = models.CharField(max_length=1000, null=True, blank=True)
@@ -222,6 +231,10 @@ class BaseLinkDataController(BaseLinkDataModel):
             "language",
             "thumbnail",
             "age",
+            "page_rating_contents",
+            "page_rating_votes",
+            "page_rating_visits",
+            "page_rating",
         ]
 
     def get_query_names():
@@ -247,6 +260,11 @@ class BaseLinkDataController(BaseLinkDataModel):
             "user",
             "language",
             "thumbnail",
+            "age",
+            "page_rating_contents",
+            "page_rating_votes",
+            "page_rating_visits",
+            "page_rating",
             "tags",
             "comments",
             "vote",
@@ -401,9 +419,9 @@ class BaseLinkDataController(BaseLinkDataModel):
 
     def is_archive_by_date(input_date):
         from ..dateutils import DateUtils
-        from .admin import ConfigurationEntry
+        from ..configuration import Configuration
 
-        conf = ConfigurationEntry.get()
+        conf = Configuration.get_object().config_entry
         if conf.days_to_move_to_archive == 0:
             return False
 
@@ -456,10 +474,10 @@ class EntryVisits(models.Model):
     )
 
     def visited(entry, user):
-        from .admin import ConfigurationEntry
+        from ..configuration import Configuration
         from ..controllers import BackgroundJobController
 
-        config = ConfigurationEntry.get()
+        config = Configuration.get_object().config_entry
 
         if not config.track_user_actions:
             return

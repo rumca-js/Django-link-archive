@@ -1,8 +1,12 @@
 {% extends base_generic %}
+{% load static %}
 {% block content %}
 
 <div class="contentbuttonmenu">
-    <a href="javascript:history.back()" class="simplebutton">Go Back</a>
+    <a href="javascript:history.back()" class="simplebutton">
+        <img src="{% static 'rsshistory/icons/icons8-back-100.png' %}" class="content-icon" />
+    </a>
+
     <a href="{% url 'rsshistory:tags-show-recent' %}" class="simplebutton">Recent tags</a>
     <a href="{% url 'rsshistory:entries-untagged' %}" class="simplebutton">Untagged bookmarks</a>
     {% if user.is_staff %}
@@ -16,7 +20,7 @@
 {% if tag_objects %}
     {% for tag in tag_objects %}
         <span class="float-button">
-            <a href='{% url 'rsshistory:entries-omni-search'%}?search=tags__tag+%3D+"{{tag.0}}"' class="simplebutton">
+            <a href='{% url 'rsshistory:entries-omni-search'%}?search=tags__tag+%3D%3D+"{{tag.0}}"' class="simplebutton">
                 {{tag.0}} {{tag.1}}</a>
         </span>
     {% endfor %}

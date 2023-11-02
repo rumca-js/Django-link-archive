@@ -1,8 +1,11 @@
 {% extends base_generic %}
+{% load static %}
 {% block content %}
 
 <div class="contentbuttonmenu">
-    <a href="javascript:history.back()" class="simplebutton">Go Back</a>
+    <a href="javascript:history.back()" class="simplebutton">
+        <img src="{% static 'rsshistory/icons/icons8-back-100.png' %}" class="content-icon" />
+    </a>
 </div>
 
 <h1>
@@ -31,8 +34,12 @@
 
   {% if user.is_staff %}
     <p>
-    <a href="{% url 'rsshistory:source-edit' object.id %}" class="simplebutton">Edit source</a>
-    <a href="{% url 'rsshistory:source-refresh' object.id %}" class="simplebutton" title="Checks if source has new data">Update</a>
+    <a href="{% url 'rsshistory:source-edit' object.id %}" class="simplebutton" title="Edit source">
+        <img src="{% static 'rsshistory/icons/icons8-edit-100.png' %}" class="content-icon" />
+    </a>
+    <a href="{% url 'rsshistory:source-refresh' object.id %}" class="simplebutton" title="Checks if the source has new data">
+        <img src="{% static 'rsshistory/icons/icons8-update-100.png' %}" class="content-icon" />
+    </a>
     <a href="{% url 'rsshistory:source-fix-entries' object.id %}" class="simplebutton" title="Fixes entries for source, objects relationships, langauge">Fix entries</a>
     {% if handler.is_youtube %}
         <a href="{% url 'rsshistory:source-import-yt-links' object.id %}" class="simplebutton">Fetch all videos</a>
@@ -51,7 +58,9 @@
     </p>
   {% if user.is_staff %}
     <p>
-    <a href="{% url 'rsshistory:source-remove' object.id %}" class="simplebutton">Remove source</a>
+    <a href="{% url 'rsshistory:source-remove' object.id %}" class="simplebutton" title="Remove source">
+        <img src="{% static 'rsshistory/icons/icons8-trash-100.png' %}" class="content-icon" />
+    </a>
     <a href="{% url 'rsshistory:source-remove-entries' object.id %}" class="simplebutton">Remove entries</a>
     </p>
     <p>

@@ -36,6 +36,7 @@ def process_all_jobs_task(arg):
         mgr.process_all()
 
     except Exception as E:
+        error_text = traceback.format_exc()
         print("Exception in processing task: {} {}".format(str(E), error_text))
 
     logger.info("Processing done")

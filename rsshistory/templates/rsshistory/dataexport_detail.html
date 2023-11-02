@@ -1,10 +1,18 @@
 {% extends base_generic %}
+{% load static %}
 {% block content %}
 
 <div class="contentbuttonmenu">
-    <a href="javascript:history.back()" class="simplebutton">Go Back</a>
-    <a href="{% url 'rsshistory:data-export-edit' object.id %}" class="simplebutton">Edit</a>
-    <a href="{% url 'rsshistory:data-export-remove' object.id %}" class="simplebutton">Remove</a>
+    <a href="javascript:history.back()" class="simplebutton">
+        <img src="{% static 'rsshistory/icons/icons8-back-100.png' %}" class="content-icon" />
+    </a>
+
+    <a href="{% url 'rsshistory:data-export-edit' object.id %}" class="simplebutton">
+       <img src="{% static 'rsshistory/icons/icons8-edit-100.png' %}" class="content-icon" />
+    </a>
+    <a href="{% url 'rsshistory:data-export-remove' object.id %}" class="simplebutton">
+       <img src="{% static 'rsshistory/icons/icons8-trash-100.png' %}" class="content-icon" />
+    </a>
 </div>
 
 <h1>Data Export</h1>

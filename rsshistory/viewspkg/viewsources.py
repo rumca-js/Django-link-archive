@@ -16,6 +16,7 @@ from ..controllers import (
 from ..forms import SourceForm, SourcesChoiceForm
 from ..queryfilters import SourceFilter
 from ..views import ViewPage
+from ..configuration import Configuration
 
 
 class RssSourceListView(generic.ListView):
@@ -239,9 +240,9 @@ def refresh_source(request, pk):
         op.date_fetched = None
         op.save()
 
-    BackgroundJobController.download_rss(ob, True)
+    BackgroundJobController.download_rss(source, True)
 
-    return HttpResponseRedirect(ob.get_absolute_url())
+    return HttpResponseRedirect(source.get_absolute_url())
 
 
 def sources_manual_refresh(request):
@@ -333,7 +334,7 @@ def wayback_save(request, pk):
     if data is not None:
         return data
 
-    if ConfigurationEntry.get().source_save:
+    if Configuration.get_object().config_entry.source_save:
         source = SourceDataController.objects.get(id=pk)
         BackgroundJobController.link_save(subject=source.url)
 

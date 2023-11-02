@@ -1,10 +1,13 @@
 {% extends base_generic %}
+{% load static %}
 {% block content %}
 
 <div class="contentbuttonmenu">
     <a href="javascript:history.back()" class="simplebutton">Go Back</a>
 
-    <a href="{% url 'rsshistory:data-export-add' %}" title="Add new data export" class="simplebutton">Add</a>
+    <a href="{% url 'rsshistory:data-export-add' %}" title="Add new data export" class="simplebutton">
+        <img src="{% static 'rsshistory/icons/icons8-plus-100.png' %}" class="content-icon" />
+    </a>
 </div>
 
 <h1>Exports</h1>

@@ -336,6 +336,36 @@ def test_page(request):
 
     summary_text = "test page"
 
+    from ..models import Domains, LinkTagsDataModel
+    domains = Domains.objects.all()
+    for domain in domains:
+        if domain.link_obj:
+            if domain.category == "Personal":
+                tags = LinkTagsDataModel.objects.filter(link = domain.link_obj.link, tag = "personal")
+                if tags.count() == 0:
+                    LinkTagsDataModel.objects.create(link = domain.link_obj.link, tag = "personal", author="rumpel", link_obj = domain.link_obj)
+                else:
+                    tag = tags[0]
+                    tag.link_obj = domain.link_obj
+                    tag.save()
+            #if domain.subcategory == "Substack":
+            #    tags = LinkTagsDataModel.objects.filter(link = domain.link_obj.link, tag = "substack")
+            #    if tags.count() == 0:
+            #        LinkTagsDataModel.objects.create(link = domain.link_obj.link, tag = "substack", author="rumpel", link_obj = domain.link_obj)
+            #    else:
+            #        tag = tags[0]
+            #        tag.link_obj = domain.link_obj
+            #        tag.save()
+            #if domain.subcategory == "Mastodon":
+            #    tags = LinkTagsDataModel.objects.filter(link = domain.link_obj.link, tag = "mastodon")
+            #    if tags.count() == 0:
+            #        LinkTagsDataModel.objects.create(link = domain.link_obj.link, tag = "mastodon", author="rumpel", link_obj = domain.link_obj)
+            #    else:
+            #        tag = tags[0]
+            #        tag.link_obj = domain.link_obj
+            #        tag.save()
+
+
     p.context["summary_text"] = summary_text
 
     return p.render("summary_present.html")

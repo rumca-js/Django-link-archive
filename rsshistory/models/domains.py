@@ -23,9 +23,9 @@ class Domains(models.Model):
     subcategory = models.CharField(max_length=1000, null=True)
     dead = models.BooleanField(default=False)  # to be removed
 
-    date_created = models.DateTimeField(default=django.utils.timezone.now)
+    date_created = models.DateTimeField(auto_now_add=True)
     date_update_last = models.DateTimeField(
-        default=django.utils.timezone.now
+        auto_now=True
     )  # to be removed
 
     link_obj = models.OneToOneField(
@@ -63,7 +63,7 @@ class Domains(models.Model):
             url = "https://" + url
 
         domain_text = Domains.get_domain_url(url)
-        if not domain_text or domain_text == "" or domain_text == "https://":
+        if not domain_text or domain_text == "" or domain_text == "https://" or domain_text == "http://":
             print("Not domain text")
 
         return Domains.create_or_update_domain(domain_text)
@@ -125,13 +125,20 @@ class Domains(models.Model):
 
             return ob
 
-    def get_link_properties(link):
-        if link.find("http") == -1:
-            link = "https://" + link
+    def get_link_properties(domain_only):
+        http_position = domain_only.find("http")
+        if http_position == 0:
+            domain_only = domain_only[http_position+7:]
+
+        link = "https://" + domain_only
 
         p = Page(link)
         if p.get_contents() is None:
-            return
+            link = "http://" + domain_only
+            p = Page(link)
+            if p.get_contents() is None:
+                return
+            return p.get_properties_map()
 
         return p.get_properties_map()
 
@@ -139,7 +146,7 @@ class Domains(models.Model):
         # if self.link_obj is not None:
         #    return
 
-        link = self.get_domain_full_url()
+        link = Domains.get_domain_url(self.get_domain_full_url())
         return Domains.get_link_properties(link)
 
     def update_object(self, force=False):
@@ -165,6 +172,8 @@ class Domains(models.Model):
             if self.link_obj == None:
                 self.link_obj = entry
                 self.save()
+                entry.permanent = True
+                entry.save()
             return entry
 
         link_props = {}
@@ -187,7 +196,7 @@ class Domains(models.Model):
     def check_and_create_source(self, props):
         from ..webtools import Page
         from .sources import SourceDataModel
-        from .admin import ConfigurationEntry
+        from ..configuration import Configuration
         from .admin import PersistentInfo
 
         rss_url = props["rss_url"]
@@ -203,7 +212,7 @@ class Domains(models.Model):
         if self.link_obj and self.link_obj.dead:
             return
 
-        conf = ConfigurationEntry.get()
+        conf = Configuration.get_object().config_entry
 
         if not conf.auto_store_sources:
             return
@@ -404,13 +413,12 @@ class Domains(models.Model):
             # domains = Domains.objects.filter(dead = True) #, description__isnull = True)
 
         for domain in domains:
-            if not domain.dead:
-                print("Fixing:{}".format(domain.domain))
-                try:
-                    domain.update_object()
-                except Exception as e:
-                    print(str(e))
-                print("Fixing:{} done".format(domain.domain))
+            print("Fixing:{}".format(domain.domain))
+            try:
+                domain.update_object()
+            except Exception as e:
+                print(str(e))
+            print("Fixing:{} done".format(domain.domain))
 
     def remove_all():
         domains = Domains.objects.all()

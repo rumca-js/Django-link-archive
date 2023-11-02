@@ -16,7 +16,7 @@ version is split into three digits:
  if a change requires the model to be changed, then second digit is updated, patch is set to 0
  if something should be released to public, then release version changes
 """
-__version__ = "0.28.0"
+__version__ = "0.29.0"
 
 
 from pathlib import Path
@@ -29,22 +29,28 @@ class Configuration(object):
         self.app_name = str(app_name)
         self.directory = Path(".")
         self.version = __version__
-
         self.enable_logging()
 
+        self.context = {}
+        self.config_entry = ConfigurationEntry.get() 
+        self.get_context()
+
     def get_context(self):
-        return {
-            "page_title": "[{}]".format(self.app_name),
-            "app_name": str(self.app_name),
-            "app_title": "Personal Link Database",
-            "app_description": "Personal Link Database. May work as link aggregator, may link as YouTube subscription filter.",
-            "admin_email": "renegat@renegat0x0.ddns.net",
-            "admin_user": "renegat0x0",
-            "app_version": self.version,
-            "config": ConfigurationEntry.get(),
-            "base_generic": str(Path(self.app_name) / "base_generic.html"),
-            "c": self,
-        }
+        if len(self.context) == 0:
+            self.context = {
+                "page_title": "[{}]".format(self.app_name),
+                "app_name": str(self.app_name),
+                "app_title": "Personal Link Database",
+                "app_description": "Personal Link Database. May work as link aggregator, may link as YouTube subscription filter.",
+                "admin_email": "renegat@renegat0x0.ddns.net",
+                "admin_user": "renegat0x0",
+                "app_version": self.version,
+                "config": self.config_entry,
+                "base_generic": str(Path(self.app_name) / "base_generic.html"),
+                "c": self,
+            }
+        else:
+            return self.context
 
     def get_object(app_name=None):
         if app_name is None:

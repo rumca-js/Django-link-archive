@@ -71,7 +71,7 @@ hr {
 
 .content-icon {
     width:30px;
-    float: left;
+    /* float: left; */
 }
 
 .content-thumbnail {
