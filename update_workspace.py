@@ -102,8 +102,7 @@ def get_workspaces():
     for item in items_in_dir:
         full_path_item = item + "/apps.py"
         if os.path.isfile(full_path_item):
-            if item != "private":
-                result.append(item)
+             result.append(item)
 
     return result
 

@@ -28,6 +28,8 @@ It should be able to operate on SBC, like raspberry PI.
  - do not fetch all objects from any table. Do not use Model.objects.all(). One exception: to obtain length of table
  - do not use len() for checking length of table. Use queryset 'count' API
  - do not use datetime.now(). Use django timezone datetime, or other native means
+ - do not iterate over object using .all() [Use batch approach](https://djangosnippets.org/snippets/1170/)
+ - if SQLlite is used, then try to cache data. Requesting many things from database might lead to database locking. Therefore passing objects as arguments may not necessarily be the best idea
  
 # Omni search
 
