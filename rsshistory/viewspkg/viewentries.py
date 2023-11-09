@@ -306,6 +306,13 @@ class EntriesOmniListView(EntriesSearchListView):
     def get_filter(self):
         from ..queryfilters import OmniSearchFilter
 
+        from ..models import UserSearchHistory
+
+        username = self.request.user.username
+
+        if self.request.user.is_authenticated and "search" in self.args:
+            UserSearchHistory.add(username, self.args["search"])
+
         query_filter = OmniSearchFilter(self.request.GET)
 
         translate = BaseLinkDataController.get_query_names()

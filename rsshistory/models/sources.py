@@ -60,6 +60,7 @@ class SourceOperationalData(models.Model):
     date_fetched = models.DateTimeField(null=True)
     import_seconds = models.IntegerField(null=True)
     number_of_entries = models.IntegerField(null=True)
+    page_hash = models.BinaryField(max_length = 30)
 
     class Meta:
         ordering = ["date_fetched"]

@@ -5,8 +5,8 @@ import re
 class SpotifyPlugin(BaseParsePlugin):
     PLUGIN_NAME = "SpotifyPlugin"
 
-    def __init__(self, source):
-        super().__init__(source)
+    def __init__(self, source_id):
+        super().__init__(source_id)
 
     def is_link_valid(self, address):
         if not self.is_link_valid_domain(address):

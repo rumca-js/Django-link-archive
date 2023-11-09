@@ -54,7 +54,6 @@ class LinkTagsDataModel(models.Model):
     def save_tags(data):
         link = data["link"]
         author = data["author"]
-        date = data["date"]
         tags = data["tag"]
 
         objs = LinkTagsDataModel.objects.filter(author=author, link=link)
@@ -73,7 +72,7 @@ class LinkTagsDataModel(models.Model):
 
         for tag in tags_set:
             LinkTagsDataModel.objects.create(
-                link=link, author=author, date=date, tag=tag, link_obj=link_objs[0]
+                link=link, author=author, tag=tag, link_obj=link_objs[0]
             )
 
 
@@ -91,6 +90,7 @@ class LinkVoteDataModel(models.Model):
 
     def save_vote(input_data):
         from ..controllers import BackgroundJobController
+
         link_id = input_data["link_id"]
         author = input_data["author"]
         vote = input_data["vote"]

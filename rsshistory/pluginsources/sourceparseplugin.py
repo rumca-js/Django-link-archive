@@ -10,25 +10,27 @@ from ..controllers import LinkDataController
 class BaseParsePlugin(SourceGenericPlugin):
     PLUGIN_NAME = "BaseParsePlugin"
 
-    def __init__(self, source):
-        super().__init__(source)
+    def __init__(self, source_id):
+        super().__init__(source_id)
 
     def get_address(self):
-        return self.source.get_domain()
+        return self.get_source().get_domain()
 
     def is_link_valid(self, address):
         # print("Address:{} link:{}".format(self.source.url, address))
 
+        source = self.get_source()
+
         if not self.is_link_valid_domain(address):
             return False
 
-        if not address.startswith(self.source.url):
+        if not address.startswith(source.url):
             return
 
         split = os.path.splitext(address)
 
         if split[1] == ".html" or split[1] == ".htm" or split[1] == "":
-            search_pattern = self.source.get_domain()
+            search_pattern = source.get_domain()
 
             if re.search(search_pattern, address):
                 return True
@@ -70,13 +72,13 @@ class BaseParsePlugin(SourceGenericPlugin):
                 if objs.exists():
                     continue
 
-                props.append(self.get_link_data(self.source, link_str))
+                props.append(self.get_link_data(self.get_source(), link_str))
 
             return props
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.exc(
-                "Source:{} {}; Exc:{}\n{}".format(
-                    source.url, source.title, str(e), error_text
+                "Source:{}; Exc:{}\n{}".format(
+                    self.source_id, str(e), error_text
                 )
             )

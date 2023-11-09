@@ -146,12 +146,12 @@ def domain_add(request):
         if form.is_valid():
             link = form.cleaned_data["link"]
 
-            domain = Domains.add(link)
-            if domain:
+            domain_id = Domains.add(link)
+            if domain_id:
                 return HttpResponseRedirect(
                     reverse(
                         "{}:domain-detail".format(LinkDatabase.name),
-                        kwargs={"pk": domain.id},
+                        kwargs={"pk": domain_id},
                     )
                 )
             p.context["summary_text"] = "Could not create domain"

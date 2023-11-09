@@ -15,24 +15,27 @@ class PermanentEntriesExporter(object):
 
     def export(self, export_file_name="permanents", export_dir="default"):
         # TODO rewrite this to use batch jobs. You cannot iterate over whole database
-        all_entries = LinkDataController.objects.filter(
-            permanent=True
-        ).order_by("domain_obj__tld", "domain_obj__suffix", "domain_obj__main", "domain_obj__domain")
+        all_entries = LinkDataController.objects.filter(permanent=True).order_by(
+            "domain_obj__tld",
+            "domain_obj__suffix",
+            "domain_obj__main",
+            "domain_obj__domain",
+        )
 
         entries_no = self.get_number_of_entries_for_page()
         pages_float = all_entries.count() / entries_no
         pages = int(pages_float)
         if pages_float > pages:
             pages += 1
-        
+
         for page in range(pages):
             start_slice = page * entries_no
-            end_slice = ((page+1) * entries_no)-1
-            entries = all_entries[start_slice: end_slice]
+            end_slice = ((page + 1) * entries_no) - 1
+            entries = all_entries[start_slice:end_slice]
             self.export_inner(entries, "permanent", self.get_page_dir(page))
 
     def get_page_dir(self, page):
-        return Path("permement") / "{page:05d}".format(page=page)
+        return Path("permanent") / "{page:05d}".format(page=page)
 
     def export_inner(self, entries, export_file_name="permanent", export_dir="default"):
         if entries.count() == 0:

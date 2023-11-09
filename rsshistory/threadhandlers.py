@@ -63,13 +63,7 @@ class ProcessSourceJobHandler(BaseJobHandler):
 
     def process(self, obj=None):
         try:
-            sources = SourceDataController.objects.filter(url=obj.subject)
-            if sources.count() == 0:
-                return
-
-            source = sources[0]
-
-            plugin = SourceControllerBuilder.get(source)
+            plugin = SourceControllerBuilder.get(obj.subject)
             plugin.check_for_data()
 
         except Exception as e:
@@ -514,6 +508,7 @@ class PushToRepoJobHandler(BaseJobHandler):
     def process(self, obj=None):
         try:
             from .configuration import Configuration
+
             c = Configuration.get_object()
             if (
                 c.config_entry.is_bookmark_repo_set()

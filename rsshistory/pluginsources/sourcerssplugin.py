@@ -8,8 +8,8 @@ from ..models import PersistentInfo, BaseLinkDataController
 class BaseRssPlugin(SourceGenericPlugin):
     PLUGIN_NAME = "BaseRssPlugin"
 
-    def __init__(self, source):
-        super().__init__(source)
+    def __init__(self, source_id):
+        super().__init__(source_id)
         self.allow_adding_with_current_time = True
         self.default_entry_timestamp = None
 
@@ -17,13 +17,13 @@ class BaseRssPlugin(SourceGenericPlugin):
         try:
             from ..webtools import RssPropertyReader
 
-            reader = RssPropertyReader(self.source.url)
+            reader = RssPropertyReader(self.get_address(), self.get_contents() )
             all_props = reader.parse_and_process()
 
             if len(all_props) == 0:
                 PersistentInfo.error(
-                    "Source:{0} {1}; Source has no data".format(
-                        self.source.url, self.source.title
+                    "Source:{0}; Source has no data".format(
+                        self.source_id
                     )
                 )
 
@@ -38,8 +38,8 @@ class BaseRssPlugin(SourceGenericPlugin):
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.exc(
-                "BaseRssPlugin:get_link_props: Source:{} {}; Exc:{}\n{}".format(
-                    self.source.url, self.source.title, str(e), error_text
+                "BaseRssPlugin:get_link_props: Source:{}; Exc:{}\n{}".format(
+                    self.source_id, str(e), error_text
                 )
             )
             return []
@@ -125,9 +125,11 @@ class BaseRssPlugin(SourceGenericPlugin):
         if prop["link"].endswith("/"):
             prop["link"] = prop["link"][:-1]
 
-        prop["source"] = self.source.url
-        prop["language"] = self.source.language
-        prop["artist"] = self.source.title
-        prop["album"] = self.source.title
+        source = self.get_source()
+
+        prop["source"] = source.url
+        prop["language"] = source.language
+        prop["artist"] = source.title
+        prop["album"] = source.title
 
         return prop

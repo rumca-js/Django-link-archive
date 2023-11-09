@@ -11,7 +11,7 @@
           {% endif %}
           {{ object.title }}
       </a></h1>
-      <div><strong>Url</strong>{{object.link}}</div>
+      <div>{{object.link}}</div>
 
   {% if user.is_staff %}
     <p>
@@ -19,22 +19,29 @@
             <img src="{% static 'rsshistory/icons/icons8-edit-100.png' %}" class="content-icon" />
         </a>
     {% if object.bookmarked %}
-       <a href="{{object.get_bookmark_unset_url}}" class="simplebutton">
-        Not bookmark
+       <a href="{{object.get_bookmark_unset_url}}" class="simplebutton" title="Remove bookmark">
+          <img src="{% static 'rsshistory/icons/icons8-not-bookmark-100.png' %}" class="content-icon" />
        </a>
     {% else %}
-       <a href="{{object.get_bookmark_set_url}}" class="simplebutton">
-        Bookmark
+       <a href="{{object.get_bookmark_set_url}}" class="simplebutton" title="Bookmark it">
+          <img src="{% static 'rsshistory/icons/icons8-bookmark-100.png' %}" class="content-icon" />
        </a>
     {% endif %}
     {% if object.is_taggable %}
         <a href="{% url 'rsshistory:entry-vote' object.id %}" class="simplebutton">Vote</a>
     {% endif %}
 
-       <a href="{% url 'rsshistory:entry-download' object.id %}" class="simplebutton" title="Downloads the page to configuraton export location">Download page</a>
+    <a href="{% url 'rsshistory:entry-download' object.id %}" class="simplebutton" title="Downloads the page to configuraton export location">
+        <img src="{% static 'rsshistory/icons/icons8-download-96.png' %}" class="content-icon" />
+        page</a>
 
     {% for button in object_controller.get_menu_buttons %}
-      <a href="{{button.action}}" class="simplebutton">{{button.name}}</a>
+            <a href="{{button.action}}" class="simplebutton">
+                {% if button.image %}
+                <img src="{{button.image}}" class="content-icon" />
+                {% endif %}
+                {{button.name}}
+            </a>
     {% endfor %}
   </p>
   {% endif %}
@@ -55,8 +62,8 @@
       {% else %}
       <a href="{{ object.source }}" class="simplebutton" title="{{ object.source }}">Source</a>
       {% endif %}
-      <a href="{% url 'rsshistory:entries-omni-search'%}?search=artist+%3D+{{ object.artist }}" class="simplebutton">Artist: {{ object.artist }}</a>
-      <a href="{% url 'rsshistory:entries-omni-search'%}?search=album+%3D+{{ object.album }}" class="simplebutton">Album: {{ object.album }}</a>
+      <a href="{% url 'rsshistory:entries-omni-search'%}?search=artist+%3D+{{ object.artist }}" class="simplebutton">{{ object.artist }}</a>
+      <a href="{% url 'rsshistory:entries-omni-search'%}?search=album+%3D+{{ object.album }}" class="simplebutton">{{ object.album }}</a>
       <a href="{% url 'rsshistory:domain-by-name' %}?domain_name={{object.get_domain_only}}" class="simplebutton" title="{{object.get_domain_only}}">Domain</a>
 
       <a href="{{object.get_archive_link}}" class="simplebutton">View on archive.org</a>
@@ -72,31 +79,33 @@
       <a href="{% url 'rsshistory:entry-remove' object.id %}" class="simplebutton">
           <img src="{% static 'rsshistory/icons/icons8-trash-100.png' %}" class="content-icon" title="Remove entry" />
       </a>
-      <a href="{% url 'rsshistory:entry-hide' object.id %}" class="simplebutton">Hide entry</a>
+      <a href="{% url 'rsshistory:entry-hide' object.id %}" class="simplebutton">Hide</a>
     </p>
   {% endif %}
 
   <p>
-      {% for parameter in object_controller.get_parameters %}
-        <span><strong>{{parameter.name | safe}}:</strong> {{parameter.description | safe}}</span>
-      {% endfor %}
-        <span><strong>Points</strong>{{object.page_rating}}</span>
-        <span><strong>Points contents</strong>{{object.page_rating_contents}}</span>
-        <span><strong>Points votes</strong>{{object.page_rating_votes}}</span>
-        <span><strong>User visits</strong>{{object.page_rating_visits}}</span>
+      {% if object.is_taggable %}
+      <div><strong>Tags:</strong>
+          <a href="{% url 'rsshistory:entry-tag' object.id %}" class="simplebutton">
+              <img src="{% static 'rsshistory/icons/icons8-edit-100.png' %}" class="content-icon" />
+          </a>
+          {% endif %}
+          {% if object.has_tags %}
+          {% for tag in object.get_tag_map %}
+          <a href="{% url 'rsshistory:entries-omni-search'%}?search=tags__tag+%3D+{{tag}}" class="simplebutton">{{tag}}</a>
+          {% endfor %}
+      </div>
+      {% endif %}
+  </p>
 
-        {% if object.is_taggable %}
-        <div><strong>Tags:</strong>
-            <a href="{% url 'rsshistory:entry-tag' object.id %}" class="simplebutton">
-               <img src="{% static 'rsshistory/icons/icons8-edit-100.png' %}" class="content-icon" />
-            </a>
-            {% endif %}
-            {% if object.has_tags %}
-            {% for tag in object.get_tag_map %}
-            <a href="{% url 'rsshistory:entries-omni-search'%}?search=tags__tag+%3D+{{tag}}" class="simplebutton">{{tag}}</a>
-            {% endfor %}
-        </div>
-        {% endif %}
+  <p>
+      {% for parameter in object_controller.get_parameters %}
+      <span><strong>{{parameter.name | safe}}:</strong> {{parameter.description | safe}}</span>
+      {% endfor %}
+      <span><strong>Points</strong>{{object.page_rating}}</span>
+      <span><strong>Points contents</strong>{{object.page_rating_contents}}</span>
+      <span><strong>Points votes</strong>{{object.page_rating_votes}}</span>
+      <span><strong>User visits</strong>{{object.page_rating_visits}}</span>
   </p>
 
   {{object_controller.get_description_html | safe | linebreaks }}

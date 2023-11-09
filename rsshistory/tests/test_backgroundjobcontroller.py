@@ -33,7 +33,9 @@ class BackgroundJobControllerTest(TestCase):
 
     def test_number_of_jobs(self):
         self.assertEqual(
-            BackgroundJobController.get_number_of_jobs(BackgroundJob.JOB_LINK_UPDATE_DATA),
+            BackgroundJobController.get_number_of_jobs(
+                BackgroundJob.JOB_LINK_UPDATE_DATA
+            ),
             0,
         )
 
@@ -45,7 +47,9 @@ class BackgroundJobControllerTest(TestCase):
         )
 
         self.assertEqual(
-            BackgroundJobController.get_number_of_jobs(BackgroundJob.JOB_LINK_UPDATE_DATA),
+            BackgroundJobController.get_number_of_jobs(
+                BackgroundJob.JOB_LINK_UPDATE_DATA
+            ),
             1,
         )
 

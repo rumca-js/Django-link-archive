@@ -237,35 +237,36 @@ class EntryFilter(BaseQueryFilter):
     def get_hard_query_limit(self):
         10000
 
+    def get_filter_args_map_keys(self):
+        return [
+            "title",
+            "description",
+            "thumbnail",
+            "language",
+            "age",
+            "date_from",
+            "date_to",
+            "permanent",
+            "bookmarked",
+            "dead",
+            "user",
+            "tag",
+            "artist",
+            "album",
+            "vote",
+            # not related to entry/link
+            "source_title",
+            "category",
+            "subcategory",
+            "archive",
+        ]
+
     def get_arg_conditions(self, translate=False):
         parameter_map = {}
         # TODO change to new API get_filter_args_map
 
         if not translate:
-            self.copy_if_is_set(parameter_map, self.args, "title")
-            self.copy_if_is_set(parameter_map, self.args, "language")
-            self.copy_if_is_set(parameter_map, self.args, "user")
-            self.copy_if_is_set(parameter_map, self.args, "tag")
-            self.copy_if_is_set(parameter_map, self.args, "vote")
-            self.copy_if_is_set(parameter_map, self.args, "source_title")
-            self.copy_if_is_set(parameter_map, self.args, "bookmarked")
-            self.copy_if_is_set(parameter_map, self.args, "category")
-            self.copy_if_is_set(parameter_map, self.args, "subcategory")
-            self.copy_if_is_set(parameter_map, self.args, "artist")
-            self.copy_if_is_set(parameter_map, self.args, "album")
-            self.copy_if_is_set(parameter_map, self.args, "date_from")
-            self.copy_if_is_set(parameter_map, self.args, "date_to")
-            self.copy_if_is_set(parameter_map, self.args, "archive")
-            self.copy_if_is_set(parameter_map, self.args, "age")
-
-            if self.time_limit:
-                date_range = self.time_limit
-                if "date_from" not in parameter_map:
-                    parameter_map["date_from"] = date_range[0]
-                if "date_to" not in parameter_map:
-                    parameter_map["date_to"] = date_range[1]
-
-            return parameter_map
+            return self.get_filter_args_map()
         else:
             self.copy_if_is_set_and_translate(parameter_map, self.args, "title")
             self.copy_if_is_set_and_translate(parameter_map, self.args, "language")
@@ -273,6 +274,7 @@ class EntryFilter(BaseQueryFilter):
             self.copy_if_is_set_and_translate(parameter_map, self.args, "tag")
             self.copy_if_is_set_and_translate(parameter_map, self.args, "vote")
             self.copy_if_is_set_and_translate(parameter_map, self.args, "source_title")
+            self.copy_if_is_set_and_translate(parameter_map, self.args, "permanent")
             self.copy_if_is_set_and_translate(parameter_map, self.args, "bookmarked")
             self.copy_if_is_set_and_translate(parameter_map, self.args, "category")
             self.copy_if_is_set_and_translate(parameter_map, self.args, "subcategory")
@@ -293,19 +295,14 @@ class EntryFilter(BaseQueryFilter):
         return parameter_map
 
     def copy_if_is_set_and_translate(self, dst, src, element):
+        mapping = self.get_arg_title_translation()
+
         if element in src and src[element] != "":
-            if element == "title":
-                dst["title__icontains"] = src[element]
-            elif element == "language":
-                dst["language__icontains"] = src[element]
-            elif element == "category":
-                dst["source_obj__category"] = src[element]
-            elif element == "subcategory":
-                dst["source_obj__subcategory"] = src[element]
-            elif element == "source_title":
-                dst["source_obj__title"] = src[element]
-            elif element == "user":
-                dst["user__icontains"] = src[element]
+            if element in mapping:
+                # simple translate
+                dst[mapping[element]] = src[element]
+
+            # special processing
             elif element == "bookmarked":
                 if src[element] == "on":
                     dst["bookmarked"] = True
@@ -324,18 +321,21 @@ class EntryFilter(BaseQueryFilter):
                         src["date_from"],
                         src["date_to"],
                     ]
-            elif element == "date_to":
-                pass
-            elif element == "artist":
-                dst["artist__icontains"] = src[element]
-            elif element == "album":
-                dst["album__icontains"] = src[element]
             else:
                 dst[element] = src[element]
 
-    def copy_if_is_set(self, dst, src, element):
-        if element in src and src[element] != "":
-            dst[element] = src[element]
+    def get_arg_title_translation(self):
+        return {
+            "title": "title__icontains",
+            "language": "language__icontains",
+            "category": "source_obj__category",
+            "subcategory": "source_obj__subcategory",
+            "source_title": "source_obj__title",
+            "user": "user__icontains",
+            "vote": "votes__vote__gt",
+            "artist": "artist__icontains",
+            "album": "album__icontains",
+        }
 
 
 class DomainFilter(BaseQueryFilter):

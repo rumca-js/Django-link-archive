@@ -66,25 +66,25 @@ class DataWriterTest(TestCase):
         Domains.add("https://youtube.com?v=nonbookmarked")
 
         self.export_config = DataExport.objects.create(
-                export_type = DataExport.EXPORT_TYPE_GIT,
-                export_data = DataExport.EXPORT_BOOKMARKS,
-                local_path = ".",
-                remote_path = ".",
-                export_entries = True,
-                export_entries_bookmarks = True,
-                export_entries_permanents = True,
-                export_sources = True,
+            export_type=DataExport.EXPORT_TYPE_GIT,
+            export_data=DataExport.EXPORT_BOOKMARKS,
+            local_path=".",
+            remote_path=".",
+            export_entries=True,
+            export_entries_bookmarks=True,
+            export_entries_permanents=True,
+            export_sources=True,
         )
 
         DataExport.objects.create(
-                export_type = DataExport.EXPORT_TYPE_GIT,
-                export_data = DataExport.EXPORT_DAILY_DATA,
-                local_path = ".",
-                remote_path = ".",
-                export_entries = True,
-                export_entries_bookmarks = True,
-                export_entries_permanents = True,
-                export_sources = True,
+            export_type=DataExport.EXPORT_TYPE_GIT,
+            export_data=DataExport.EXPORT_DAILY_DATA,
+            local_path=".",
+            remote_path=".",
+            export_entries=True,
+            export_entries_bookmarks=True,
+            export_entries_permanents=True,
+            export_sources=True,
         )
 
     def tearDown(self):

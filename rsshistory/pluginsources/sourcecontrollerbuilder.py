@@ -16,21 +16,32 @@ class SourceControllerBuilder(object):
         SourceGenerousParserPlugin,
     ]
 
-    def get(source):
+    def get(source_url):
         from ..models import SourceDataModel
 
+        sources = SourceDataModel.objects.filter(url = source_url)
+        if len(sources) == 0:
+            raise NotImplementedError(
+                "Source URL: {}: No such source".format(
+                    source_url
+                )
+            )
+
+        source = sources[0]
+        # database operations should be short lived. we do not pass source object.
+            
         for plugin_def in SourceControllerBuilder.plugins:
-            plugin = plugin_def(source)
+            plugin = plugin_def(source.id)
             if source.source_type == plugin.PLUGIN_NAME:
                 return plugin
 
         if source.source_type == SourceDataModel.SOURCE_TYPE_RSS:
-            return BaseRssPlugin(source)
+            return BaseRssPlugin(source.id)
         elif source.source_type == SourceDataModel.SOURCE_TYPE_PARSE:
-            return BaseParsePlugin(source)
+            return BaseParsePlugin(source.id)
         else:
             raise NotImplementedError(
-                "Source: {}: Unsupported source type: {}".format(
+                "Source:{}: Unsupported source type:{}".format(
                     source.title, source.source_type
                 )
             )

@@ -63,18 +63,20 @@ class DataWriter(object):
 
         if self.export_cfg.export_sources:
             text = self.get_sources_json()
-            file_name = self._cfg.get_daily_data_path() / self._cfg.get_sources_file_name()
+            file_name = (
+                self._cfg.get_daily_data_path() / self._cfg.get_sources_file_name()
+            )
             file_name.write_text(text)
 
-        #text = self.get_domains_json()
-        #file_name = self._cfg.get_daily_data_path() / self._cfg.get_domains_file_name()
-        #file_name.write_text(text)
+        # text = self.get_domains_json()
+        # file_name = self._cfg.get_daily_data_path() / self._cfg.get_domains_file_name()
+        # file_name.write_text(text)
 
-        #text = self.get_personal_domains_json()
-        #file_name = (
+        # text = self.get_personal_domains_json()
+        # file_name = (
         #    self._cfg.get_daily_data_path() / self._cfg.get_personal_domains_file_name()
-        #)
-        #file_name.write_text(text)
+        # )
+        # file_name.write_text(text)
 
         text = self.get_keywords_json(day_iso)
         if text:
@@ -99,7 +101,9 @@ class DataWriter(object):
 
         if self.export_cfg.export_sources:
             text = self.get_sources_json()
-            file_name = self._cfg.get_bookmarks_path() / self._cfg.get_sources_file_name()
+            file_name = (
+                self._cfg.get_bookmarks_path() / self._cfg.get_sources_file_name()
+            )
             file_name.write_text(text)
 
     def get_sources_json(self):

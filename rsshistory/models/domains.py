@@ -24,9 +24,7 @@ class Domains(models.Model):
     dead = models.BooleanField(default=False)  # to be removed
 
     date_created = models.DateTimeField(auto_now_add=True)
-    date_update_last = models.DateTimeField(
-        auto_now=True
-    )  # to be removed
+    date_update_last = models.DateTimeField(auto_now=True)  # to be removed
 
     link_obj = models.OneToOneField(
         LinkDataModel,
@@ -63,7 +61,12 @@ class Domains(models.Model):
             url = "https://" + url
 
         domain_text = Domains.get_domain_url(url)
-        if not domain_text or domain_text == "" or domain_text == "https://" or domain_text == "http://":
+        if (
+            not domain_text
+            or domain_text == ""
+            or domain_text == "https://"
+            or domain_text == "http://"
+        ):
             print("Not domain text")
 
         return Domains.create_or_update_domain(domain_text)
@@ -93,14 +96,12 @@ class Domains(models.Model):
         if objs.count() == 0:
             props = Domains.get_link_properties(domain_only_text)
             obj = Domains.create_object(domain_only_text, props)
-            if props:
-                obj.add_domain_link(props)
-                obj.check_and_create_source(props)
         else:
             obj = objs[0]
         #    Domains.update_object(obj)
 
-        return obj
+        if obj:
+            return obj.id
 
     def create_object(domain_only_text, props):
         import tldextract
@@ -128,7 +129,7 @@ class Domains(models.Model):
     def get_link_properties(domain_only):
         http_position = domain_only.find("http")
         if http_position == 0:
-            domain_only = domain_only[http_position+7:]
+            domain_only = domain_only[http_position + 7 :]
 
         link = "https://" + domain_only
 

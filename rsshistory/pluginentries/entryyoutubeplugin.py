@@ -1,4 +1,5 @@
 from django.urls import reverse
+from django.templatetags.static import static
 
 from .youtubelinkhandler import YouTubeLinkHandler
 from .entrygenericplugin import EntryGenericPlugin, EntryButton, EntryParameter
@@ -13,18 +14,20 @@ class EntryYouTubePlugin(YouTubeLinkHandler, EntryGenericPlugin):
     def get_menu_buttons(self):
         return [
             EntryButton(
-                "Download music",
+                "music",
                 reverse(
                     "{}:entry-download-music".format(LinkDatabase.name),
                     args=[self.entry.id],
                 ),
+                static("{}/icons/icons8-download-96.png".format(LinkDatabase.name))
             ),
             EntryButton(
-                "Download video",
+                "video",
                 reverse(
                     "{}:entry-download-video".format(LinkDatabase.name),
                     args=[self.entry.id],
                 ),
+                static("{}/icons/icons8-download-96.png".format(LinkDatabase.name))
             ),
             EntryButton(
                 "Update link data",

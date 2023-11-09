@@ -32,3 +32,9 @@ from .domains import (
 from .keywords import (
     KeyWords,
 )
+from .searchhistory import (
+    UserSearchHistory,
+    EntryHitUserSearchHistory,
+    EntryHitSearchHistory,
+    EntryRelatedHistory,
+)

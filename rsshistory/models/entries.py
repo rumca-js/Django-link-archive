@@ -147,7 +147,7 @@ class BaseLinkDataController(BaseLinkDataModel):
         return sum_num / count
 
     def get_visits(self):
-        visits = EntryVisits.objects.filter(entry = self.link)
+        visits = EntryVisits.objects.filter(entry=self.link)
 
         sum_num = 0
         for visit in visits:
@@ -223,6 +223,7 @@ class BaseLinkDataController(BaseLinkDataModel):
             "description",
             "link",
             "date_published",
+            "permanent",
             "bookmarked",
             "dead",
             "artist",
@@ -253,6 +254,7 @@ class BaseLinkDataController(BaseLinkDataModel):
             "description",
             "link",
             "date_published",
+            "permanent",
             "bookmarked",
             "dead",
             "artist",
@@ -288,14 +290,20 @@ class BaseLinkDataController(BaseLinkDataModel):
         tags = self.get_tag_map()
         if len(tags) > 0:
             themap["tags"] = tags
+        else:
+            themap["tags"] = []
 
         vote = self.get_vote()
         if vote > 0:
-            themap["vote"] = tags
+            themap["vote"] = vote
+        else:
+            themap["vote"] = 0
 
         comments = self.get_comment_vec()
         if len(comments) > 0:
             themap["comments"] = comments
+        else:
+            themap["comments"] = []
 
         return themap
 
@@ -329,6 +337,8 @@ class BaseLinkDataController(BaseLinkDataModel):
 
         h = YouTubeLinkHandler(data["link"])
         h.download_details()
+        if h.get_video_code() is None:
+            return data
 
         if "source" not in data or data["source"].strip() == "":
             data["source"] = h.get_channel_feed_url()

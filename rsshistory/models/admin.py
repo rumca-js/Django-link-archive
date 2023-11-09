@@ -242,7 +242,7 @@ class PersistentInfo(models.Model):
         from ..dateutils import DateUtils
 
         try:
-            date_range = DateUtils.get_days_range(30)
+            date_range = DateUtils.get_days_range(5)
             objs = PersistentInfo.objects.filter(date__lt=date_range[0])
             objs.delete()
         except Exception as e:

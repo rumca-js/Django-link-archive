@@ -1,7 +1,8 @@
 class EntryButton(object):
-    def __init__(self, name, action):
+    def __init__(self, name, action, image = None):
         self.name = name
         self.action = action
+        self.image = image
 
 
 class EntryParameter(object):
@@ -25,8 +26,6 @@ class EntryGenericPlugin(object):
         parameters = []
 
         parameters.append(EntryParameter("Publish date", self.entry.date_published))
-        parameters.append(EntryParameter("Artist", self.entry.artist))
-        parameters.append(EntryParameter("Album", self.entry.album))
         if self.entry.user:
             parameters.append(EntryParameter("User", self.entry.user))
         parameters.append(EntryParameter("Vote", self.entry.get_vote()))

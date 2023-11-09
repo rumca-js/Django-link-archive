@@ -91,10 +91,10 @@ class UpdateManagerTest(TestCase):
             remote_path="test.git",
             user="user",
             password="password",
-            export_entries = True,
-            export_entries_bookmarks = True,
-            export_entries_permanents = True,
-            export_sources = True,
+            export_entries=True,
+            export_entries_bookmarks=True,
+            export_entries_permanents=True,
+            export_sources=True,
         )
         DataExport.objects.create(
             enabled=True,
@@ -104,10 +104,10 @@ class UpdateManagerTest(TestCase):
             remote_path="test.git",
             user="user",
             password="password",
-            export_entries = True,
-            export_entries_bookmarks = True,
-            export_entries_permanents = True,
-            export_sources = True,
+            export_entries=True,
+            export_entries_bookmarks=True,
+            export_entries_permanents=True,
+            export_sources=True,
         )
 
     def test_push_daily_repo(self):
@@ -118,7 +118,9 @@ class UpdateManagerTest(TestCase):
 
         write_date = DateUtils.get_date_yesterday()
 
-        export_config = DataExport.objects.filter(export_data=DataExport.EXPORT_DAILY_DATA)[0]
+        export_config = DataExport.objects.filter(
+            export_data=DataExport.EXPORT_DAILY_DATA
+        )[0]
 
         mgr.push_daily_repo(export_config, write_date)
         self.assertTrue(True)
@@ -131,7 +133,9 @@ class UpdateManagerTest(TestCase):
         conf = Configuration.get_object()
         mgr = UpdateManager(conf, RepoTestFactory)
 
-        export_config = DataExport.objects.filter(export_data=DataExport.EXPORT_BOOKMARKS)[0]
+        export_config = DataExport.objects.filter(
+            export_data=DataExport.EXPORT_BOOKMARKS
+        )[0]
 
         mgr.push_bookmarks_repo(export_config)
         self.assertTrue(True)

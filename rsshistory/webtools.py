@@ -24,6 +24,14 @@ class BasePage(object):
 
     def __init__(self, url, contents=None):
         self.url = url
+
+        if self.url.find("https") >= 0:
+            self.protocol = "https"
+        elif self.url.find("http") >= 0:
+            self.protocol = "http"
+        else:
+            self.protocol = "https"
+
         self.contents = contents
         if self.contents:
             self.process_contents()
@@ -132,7 +140,7 @@ class BasePage(object):
 
     def get_domain(self):
         items = urlparse(self.url)
-        return str(items.scheme) + "://" + str(items.netloc)
+        return self.protocol + "://" + str(items.netloc)
 
     def get_domain_only(self):
         items = urlparse(self.url)
@@ -246,8 +254,8 @@ class RssPropertyReader(BasePage):
     which allows to define timeouts.
     """
 
-    def __init__(self, url):
-        super().__init__(url)
+    def __init__(self, url, contents = None):
+        super().__init__(url, contents)
         self.allow_adding_with_current_time = True
         self.default_entry_timestamp = None
 
@@ -645,6 +653,12 @@ class Page(BasePage):
             p.get_links(), self.get_domain()
         )
         return links - in_domain
+
+    def get_domain_page(self):
+        if self.url == self.get_domain():
+            return self
+
+        return Page(self.get_domain())
 
     def is_mainstream(self):
         dom = self.get_domain_only()
