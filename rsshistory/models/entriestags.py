@@ -75,6 +75,14 @@ class LinkTagsDataModel(models.Model):
                 link=link, author=author, tag=tag, link_obj=link_objs[0]
             )
 
+    def set_tag(entry, tag_name, author=""):
+        objs = LinkTagsDataModel.objects.filter(link=entry.link, author=author, tag=tag_name)
+
+        if objs.count() == 0:
+            LinkTagsDataModel.objects.create(
+                link=entry.link, author=author, tag=tag_name, link_obj=entry
+            )
+
 
 class LinkVoteDataModel(models.Model):
     author = models.CharField(max_length=1000)

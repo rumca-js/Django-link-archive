@@ -14,20 +14,32 @@ class EntryYouTubePlugin(YouTubeLinkHandler, EntryGenericPlugin):
     def get_menu_buttons(self):
         return [
             EntryButton(
-                "music",
+                "Music",
                 reverse(
                     "{}:entry-download-music".format(LinkDatabase.name),
                     args=[self.entry.id],
                 ),
-                static("{}/icons/icons8-download-96.png".format(LinkDatabase.name))
+                static("{}/icons/icons8-download-96.png".format(LinkDatabase.name)),
             ),
             EntryButton(
-                "video",
+                "Video",
                 reverse(
                     "{}:entry-download-video".format(LinkDatabase.name),
                     args=[self.entry.id],
                 ),
-                static("{}/icons/icons8-download-96.png".format(LinkDatabase.name))
+                static("{}/icons/icons8-download-96.png".format(LinkDatabase.name)),
+            ),
+            EntryButton(
+                "Invidious",
+                "https://yewtu.be/watch?v={}".format(self.get_video_code()),
+                "https://invidious.io/favicon-32x32.png",
+            ),
+            EntryButton(
+                "YouTube Music",
+                "https://music.youtube.com/watch?v={}".format(self.get_video_code()),
+                static(
+                    "{}/icons/icons8-youtube-music-96.png".format(LinkDatabase.name)
+                ),
             ),
             EntryButton(
                 "Update link data",
@@ -35,13 +47,6 @@ class EntryYouTubePlugin(YouTubeLinkHandler, EntryGenericPlugin):
                     "{}:entry-fix-youtube-details".format(LinkDatabase.name),
                     args=[self.entry.id],
                 ),
-            ),
-            EntryButton(
-                "YewTu.be", "https://yewtu.be/watch?v={}".format(self.get_video_code())
-            ),
-            EntryButton(
-                "YouTube Music",
-                "https://music.youtube.com/watch?v={}".format(self.get_video_code()),
             ),
         ]
 

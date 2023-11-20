@@ -24,8 +24,10 @@ class SourceGenericPlugin(Page):
                 return
 
             start_time = DateUtils.get_datetime_now_utc()
+            num_entries = 0
 
-            num_entries = self.check_for_data_impl()
+            if self.is_page_hash_ok():
+                num_entries = self.check_for_data_impl()
 
             stop_time = DateUtils.get_datetime_now_utc()
             total_time = stop_time - start_time
@@ -69,6 +71,15 @@ class SourceGenericPlugin(Page):
                 )
             )
 
+    def is_page_hash_ok(self):
+        source = self.get_source()
+        self.hash = self.get_hash()
+
+        if self.hash and source.get_page_hash() == self.hash:
+            return False
+
+        return True
+
     def is_fetch_possible(self):
         source = self.get_source()
 
@@ -89,12 +100,6 @@ class SourceGenericPlugin(Page):
             )
             return False
 
-        self.hash = self.get_hash()
-
-        if self.hash and source.get_page_hash() == self.hash:
-            print("Page hash has not changed")
-            return False
-
         return True
 
     def get_hash(self):
@@ -103,16 +108,17 @@ class SourceGenericPlugin(Page):
 
         text = self.get_contents()
         if text:
-            self.hash = hashlib.md5(text.encode("utf-8")).digest()
+            try:
+                self.hash = hashlib.md5(text.encode("utf-8")).digest()
+            except Exception as E:
+                print("Exception {}".format(E))
 
         return self.hash
 
     def set_operational_info(self, stop_time, num_entries, total_seconds, hash_value):
         source = self.get_source()
 
-        source.set_operational_info(
-            stop_time, num_entries, total_seconds, hash_value
-        )
+        source.set_operational_info(stop_time, num_entries, total_seconds, hash_value)
 
         print(
             "[{}]: Process source:{} type:{} DONE".format(
@@ -121,7 +127,7 @@ class SourceGenericPlugin(Page):
         )
 
     def get_source(self):
-        sources = SourceDataController.objects.filter(id = self.source_id)
+        sources = SourceDataController.objects.filter(id=self.source_id)
         if len(sources) > 0:
             return sources[0]
 
@@ -136,5 +142,7 @@ class SourceGenericPlugin(Page):
         return []
 
     def on_added_entry(self, entry):
+        """
+        TO be implemented
+        """
         pass
-

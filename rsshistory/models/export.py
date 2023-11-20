@@ -53,20 +53,22 @@ class DataExport(models.Model):
     )
     # fmt: on
 
-    EXPORT_DAILY_DATA = "export-dtype-daily-data"
-    EXPORT_BOOKMARKS = "export-dtype-bookmarks"
+    EXPORT_DAILY_DATA = "export-dtype-daily-data"       # for each day a file is expected
+    EXPORT_YEAR_DATA = "export-dtype-year-data"         # for each year a file is expected
+    EXPORT_NOTIME_DATA = "export-dtype-notime-data"     # not a time related export. Will use other means for file, directory names
 
     # fmt: off
     EXPORT_DATA_CHOICES = (
         (EXPORT_DAILY_DATA, EXPORT_DAILY_DATA,),
-        (EXPORT_BOOKMARKS, EXPORT_BOOKMARKS,),
+        (EXPORT_YEAR_DATA, EXPORT_YEAR_DATA,),
+        (EXPORT_NOTIME_DATA, EXPORT_NOTIME_DATA,),
     )
     # fmt: on
 
     enabled = models.BooleanField(default=True)
     export_type = models.CharField(max_length=1000, choices=EXPORT_TYPE_CHOICES)
     export_data = models.CharField(max_length=1000, choices=EXPORT_DATA_CHOICES)
-    local_path = models.CharField(max_length=1000)
+    local_path = models.CharField(max_length=1000)  # relative?
     remote_path = models.CharField(max_length=1000)
     user = models.CharField(default="", max_length=2000, null=True)
     password = models.CharField(default="", max_length=2000, null=True)
@@ -76,3 +78,33 @@ class DataExport(models.Model):
     export_entries_bookmarks = models.BooleanField(default=False)
     export_entries_permanents = models.BooleanField(default=False)
     export_sources = models.BooleanField(default=False)
+
+    def is_daily_data_set():
+        exps = DataExport.objects.filter(
+            export_data=DataExport.EXPORT_DAILY_DATA, enabled=True
+        )
+
+        if exps.count() > 0:
+            return True
+        else:
+            return False
+
+    def is_year_data_set():
+        exps = DataExport.objects.filter(
+            export_data=DataExport.EXPORT_YEAR_DATA, enabled=True
+        )
+
+        if exps.count() > 0:
+            return True
+        else:
+            return False
+
+    def is_notime_data_set():
+        exps = DataExport.objects.filter(
+            export_data=DataExport.EXPORT_NOTIME_DATA, enabled=True
+        )
+
+        if exps.count() > 0:
+            return True
+        else:
+            return False

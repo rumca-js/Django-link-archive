@@ -9,7 +9,7 @@ from django.urls import reverse
 from ..models import ConfigurationEntry, PersistentInfo, Domains, DataExport
 from ..controllers import SourceDataController, LinkDataController
 from ..configuration import Configuration
-from ..datawriter import DataWriter
+from ..datawriter import DataWriter, DataWriterConfiguration
 from ..dateutils import DateUtils
 
 
@@ -65,9 +65,9 @@ class DataWriterTest(TestCase):
 
         Domains.add("https://youtube.com?v=nonbookmarked")
 
-        self.export_config = DataExport.objects.create(
+        self.export_daily = DataExport.objects.create(
             export_type=DataExport.EXPORT_TYPE_GIT,
-            export_data=DataExport.EXPORT_BOOKMARKS,
+            export_data=DataExport.EXPORT_DAILY_DATA,
             local_path=".",
             remote_path=".",
             export_entries=True,
@@ -76,9 +76,20 @@ class DataWriterTest(TestCase):
             export_sources=True,
         )
 
-        DataExport.objects.create(
+        self.export_year = DataExport.objects.create(
             export_type=DataExport.EXPORT_TYPE_GIT,
-            export_data=DataExport.EXPORT_DAILY_DATA,
+            export_data=DataExport.EXPORT_YEAR_DATA,
+            local_path=".",
+            remote_path=".",
+            export_entries=True,
+            export_entries_bookmarks=True,
+            export_entries_permanents=True,
+            export_sources=True,
+        )
+
+        self.export_notime = DataExport.objects.create(
+            export_type=DataExport.EXPORT_TYPE_GIT,
+            export_data=DataExport.EXPORT_NOTIME_DATA,
             local_path=".",
             remote_path=".",
             export_entries=True,
@@ -111,7 +122,9 @@ class DataWriterTest(TestCase):
 
         conf = Configuration.get_object()
 
-        writer = DataWriter(conf, self.export_config)
+        dw_conf = DataWriterConfiguration(conf, self.export_daily, "daily_data")
+        writer = DataWriter.get(dw_conf)
+
         json_text = writer.get_domains_json()
 
         json_obj = json.loads(json_text)
@@ -125,51 +138,88 @@ class DataWriterTest(TestCase):
 
         conf = Configuration.get_object()
 
-        writer = DataWriter(conf, self.export_config)
+        dw_conf = DataWriterConfiguration(conf, self.export_daily, "daily_data")
+        writer = DataWriter.get(dw_conf)
+
         json_text = writer.get_sources_json()
         json_obj = json.loads(json_text)
 
         self.assertEqual(len(json_obj), 1)
 
-    def test_write_bookmarks(self):
+    def test_write_year(self):
         entry = ConfigurationEntry.get()
         entry.data_export_path = self.test_export_path
         entry.save()
 
         conf = Configuration.get_object()
 
-        writer = DataWriter(conf, self.export_config)
-        writer.write_bookmarks()
+        dw_conf = DataWriterConfiguration(conf, self.export_year, "year")
+        writer = DataWriter.get(dw_conf)
+        writer.write()
 
         links = LinkDataController.objects.filter(bookmarked=True)
         self.assertEqual(links.count(), 1)
 
-        json_file = conf.get_bookmarks_path("2023") / "bookmarks_EN_entries.json"
+        json_file = (
+            conf.get_export_path()
+            / self.export_year.local_path
+            / "year"
+            / "2023"
+            / "bookmarks_EN_entries.json"
+        )
+        print("Test JSON path")
+        print(str(json_file))
         self.assertEqual(json_file.exists(), True)
 
         json_obj = json.loads(json_file.read_text())
 
         self.assertEqual(len(json_obj), 1)
 
-        json_file = conf.get_bookmarks_path() / "sources.json"
+        json_file = (
+            conf.get_export_path()
+            / self.export_year.local_path
+            / "year"
+            / "sources.json"
+        )
         self.assertEqual(json_file.exists(), True)
 
-    def test_write_source_export_to_cms(self):
+    def test_write_notime(self):
         entry = ConfigurationEntry.get()
         entry.data_export_path = self.test_export_path
         entry.save()
 
         conf = Configuration.get_object()
 
-        writer = DataWriter(conf, self.export_config)
-        writer.write_bookmarks()
+        dw_conf = DataWriterConfiguration(conf, self.export_notime, "notime")
+        writer = DataWriter.get(dw_conf)
+        writer.write()
 
-        json_file = conf.get_sources_json_path()
+        links = LinkDataController.objects.filter(bookmarked=True)
+        self.assertEqual(links.count(), 1)
+
+        permanent_path = (
+            conf.get_export_path()
+            / self.export_year.local_path
+            / "notime"
+            / "permanent"
+            / "00000"
+        )
+        self.assertEqual(permanent_path.exists(), True)
+
+        # json_file = conf.get_export_path() / self.export_year.local_path / "notime" / "permanent" / "bookmarks_EN_entries.json"
+        # self.assertEqual(json_file.exists(), True)
+
+        # json_obj = json.loads(json_file.read_text())
+
+        # self.assertEqual(len(json_obj), 1)
+
+        json_file = (
+            conf.get_export_path()
+            / self.export_year.local_path
+            / "notime"
+            / "sources.json"
+        )
         self.assertEqual(json_file.exists(), True)
-
-        json_obj = json.loads(json_file.read_text())
-
-        self.assertEqual(len(json_obj), 1)
 
     def test_write_daily_data(self):
         entry = ConfigurationEntry.get()
@@ -178,11 +228,19 @@ class DataWriterTest(TestCase):
 
         conf = Configuration.get_object()
 
-        writer = DataWriter(conf, self.export_config)
-        writer.write_daily_data("2023-03-03")
+        dw_conf = DataWriterConfiguration(
+            conf, self.export_daily, "daily_data", "2023-03-03"
+        )
+        writer = DataWriter.get(dw_conf)
+        writer.write()
 
         json_file = (
-            conf.get_daily_data_day_path("2023-03-03")
+            conf.get_export_path()
+            / self.export_year.local_path
+            / "daily_data"
+            / "2023"
+            / "03"
+            / "2023-03-03"
             / "https.youtube.com_entries.json"
         )
 
@@ -190,5 +248,10 @@ class DataWriterTest(TestCase):
 
         self.assertEqual(len(json_obj), 3)
 
-        json_file = conf.get_daily_data_path() / "sources.json"
+        json_file = (
+            conf.get_export_path()
+            / self.export_year.local_path
+            / "daily_data"
+            / "sources.json"
+        )
         self.assertEqual(json_file.exists(), True)

@@ -19,9 +19,8 @@ class BookmarksExporter(object):
         if self._entries.count() == 0:
             return
 
-        export_path = self.get_export_path() / export_dir
-        if not export_path.exists():
-            export_path.mkdir(parents=True, exist_ok=True)
+        if not export_dir.exists():
+            export_dir.mkdir(parents=True, exist_ok=True)
 
         from ..controllers import LinkDataController
         from .converters import (
@@ -37,34 +36,25 @@ class BookmarksExporter(object):
         js_converter = JsonConverter(items)
         js_converter.set_export_columns(LinkDataController.get_all_export_names())
 
-        file_name = export_path / (export_file_name + "_entries.json")
+        file_name = export_dir / (export_file_name + "_entries.json")
         file_name.write_text(js_converter.export())
 
         md = MarkDownConverter(items, self.md_template_bookmarked)
         md_text = md.export()
 
-        file_name = export_path / (export_file_name + "_entries.md")
+        file_name = export_dir / (export_file_name + "_entries.md")
         file_name.write_text(md_text)
 
         rss_conv = RssConverter(items)
         rss_text = rss_conv.export()
 
-        file_name = export_path / (export_file_name + "_entries.rss")
+        file_name = export_dir / (export_file_name + "_entries.rss")
         file_name.write_text(self.use_rss_wrapper(rss_text))
 
     def get_entries(self):
         from ..controllers import LinkDataController
 
         entries = LinkDataController.objects.filter(bookmarked=True)
-
-    def get_export_path(self):
-        entries_dir = self._cfg.get_bookmarks_path()
-        export_path = entries_dir
-
-        if not export_path.exists():
-            export_path.mkdir(parents=True, exist_ok=True)
-
-        return export_path
 
     # TODO remove hardcoded link to this site
     def use_rss_wrapper(self, text, language="en", link="https://renegat0x0.ddns.net"):
@@ -132,11 +122,12 @@ class BookmarksBigExporter(object):
         year = int(DateUtils.get_datetime_year(today))
         return year
 
-    def export(self):
+    def export(self, directory):
         import datetime
         from ..controllers import LinkDataController
 
-        entries_dir = self._cfg.get_bookmarks_path()
+        entries_dir = directory
+
         if entries_dir.exists():
             shutil.rmtree(entries_dir)
 
@@ -156,17 +147,17 @@ class BookmarksBigExporter(object):
             pl_entries = all_entries.filter(language__icontains="pl")
 
             converter = BookmarksExporter(self._cfg, en_entries)
-            converter.export("bookmarks_EN", str(year))
+            converter.export("bookmarks_EN", entries_dir / str(year))
 
             converter = BookmarksExporter(self._cfg, pl_entries)
-            converter.export("bookmarks_PL", str(year))
+            converter.export("bookmarks_PL", entries_dir / str(year))
 
 
 class BookmarksTopicExporter(object):
     def __init__(self, config):
         self._cfg = config
 
-    def export(self, topic):
+    def export(self, topic, directory):
         import datetime
         from ..models import RssEntryTagsDataModel
         from ..controllers import LinkDataController
@@ -181,4 +172,4 @@ class BookmarksTopicExporter(object):
         entries = sorted(entries, key=lambda x: x.date_published)
 
         converter = BookmarksExporter(self._cfg, entries)
-        converter.export("topic_{}".format(topic), "topics")
+        converter.export("topic_{}".format(topic), directory, "topics")

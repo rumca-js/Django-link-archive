@@ -33,7 +33,7 @@
 
     <a href="{% url 'rsshistory:entry-download' object.id %}" class="simplebutton" title="Downloads the page to configuraton export location">
         <img src="{% static 'rsshistory/icons/icons8-download-96.png' %}" class="content-icon" />
-        page</a>
+        Page</a>
 
     {% for button in object_controller.get_menu_buttons %}
             <a href="{{button.action}}" class="simplebutton">
@@ -66,7 +66,9 @@
       <a href="{% url 'rsshistory:entries-omni-search'%}?search=album+%3D+{{ object.album }}" class="simplebutton">{{ object.album }}</a>
       <a href="{% url 'rsshistory:domain-by-name' %}?domain_name={{object.get_domain_only}}" class="simplebutton" title="{{object.get_domain_only}}">Domain</a>
 
-      <a href="{{object.get_archive_link}}" class="simplebutton">View on archive.org</a>
+      <a href="{{object.get_archive_link}}" class="simplebutton">
+          <img src="https://archive.org/offshoot_assets/favicon.ico" class="content-icon" title="Remove entry" />
+          Archive.org</a>
       {% if user.is_staff %}
           {% if config.link_archive %}
             <a href="{% url 'rsshistory:entry-archive' object.id %}" class="simplebutton">archive.org save</a>

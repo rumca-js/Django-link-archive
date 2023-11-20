@@ -88,7 +88,7 @@ class BasePage(object):
 
     def get_contents_internal(self, url, headers, timeout):
         print("[{}] Page: Requesting page: {}".format(LinkDatabase.name, url))
-        return requests.get(url, headers=headers, timeout=5)
+        return requests.get(url, headers=headers, timeout=timeout)
 
     def get_contents(self):
         if self.contents:
@@ -109,7 +109,7 @@ class BasePage(object):
         try:
             # traceback.print_stack()
 
-            r = self.get_contents_function(self.url, headers=hdr, timeout=5)
+            r = self.get_contents_function(self.url, headers=hdr, timeout=10)
             self.status_code = r.status_code
 
             """
@@ -128,7 +128,6 @@ class BasePage(object):
             return r.text
 
         except Exception as e:
-            print(e)
             error_text = traceback.format_exc()
 
             PersistentInfo.error(
@@ -136,10 +135,11 @@ class BasePage(object):
                     self.url, str(e), error_text
                 )
             )
-            traceback.print_stack()
 
     def get_domain(self):
         items = urlparse(self.url)
+        if items.netloc is None or str(items.netloc) == "":
+            return self.url
         return self.protocol + "://" + str(items.netloc)
 
     def get_domain_only(self):
@@ -191,7 +191,7 @@ class BasePage(object):
 
     def get_page_ext(self):
         if self.is_domain_level_url():
-            return None
+            return ""
         else:
             url = self.get_clean_url()
             sp = url.split(".")
@@ -199,6 +199,8 @@ class BasePage(object):
                 ext = sp[-1]
                 if len(ext) < 5:
                     return ext
+
+        return ""
 
     def get_clean_url(self):
         url = self.url
@@ -254,7 +256,7 @@ class RssPropertyReader(BasePage):
     which allows to define timeouts.
     """
 
-    def __init__(self, url, contents = None):
+    def __init__(self, url, contents=None):
         super().__init__(url, contents)
         self.allow_adding_with_current_time = True
         self.default_entry_timestamp = None
@@ -411,6 +413,9 @@ class ContentLinkParser(BasePage):
                 if item.startswith("//"):
                     ready_url = "https:" + item
                 else:
+                    if item.startswith("/"):
+                        url = self.get_domain()
+
                     if not url.endswith("/"):
                         url = url + "/"
                     if item.startswith("/"):
@@ -449,6 +454,32 @@ class ContentLinkParser(BasePage):
 
         return result
 
+    def filter_link_out_domain(links, domain):
+        result = set()
+
+        for link in links:
+            if link.find(domain) < 0:
+                result.add(link)
+
+        return result
+
+    def filter_link_out_url(links, url):
+        result = set()
+
+        for link in links:
+            if link.find(url) < 0:
+                result.add(link)
+
+        return result
+
+    def filter_domains(links):
+        result = set()
+        for link in links:
+            p = BasePage(link)
+            result.add(p.get_domain())
+
+        return result
+
 
 class Page(BasePage):
     def __init__(self, url, contents=None):
@@ -463,13 +494,13 @@ class Page(BasePage):
             self.contents = self.get_contents()
 
         if not self.contents:
-            return "en"
+            return ""
 
         html = self.soup.find("html")
         if html and html.has_attr("lang"):
             return html["lang"]
 
-        return "en"
+        return ""
 
     def get_title_meta(self):
         if not self.contents:
@@ -654,6 +685,12 @@ class Page(BasePage):
         )
         return links - in_domain
 
+    def get_domains(self):
+        p = ContentLinkParser(self.url, self.get_contents())
+        links = p.get_links()
+        links = ContentLinkParser.filter_domains(links)
+        return links
+
     def get_domain_page(self):
         if self.url == self.get_domain():
             return self
@@ -740,12 +777,14 @@ class Page(BasePage):
         description_meta = self.get_description_meta()
         description_og = self.get_og_field("description")
         image_og = self.get_og_field("image")
+        language = self.get_language()
 
         rating += self.get_page_rating_title(title_meta)
         rating += self.get_page_rating_title(title_og)
         rating += self.get_page_rating_description(description_meta)
         rating += self.get_page_rating_description(description_og)
         rating += self.get_page_rating_status_code(self.status_code)
+        rating += self.get_page_rating_language(language)
 
         if image_og:
             rating += 5
@@ -773,6 +812,15 @@ class Page(BasePage):
 
         return rating
 
+    def get_page_rating_language(self, language):
+        rating = 0
+        if language is not None:
+            rating += 5
+        if language.find("en") >= 0:
+            rating += 1
+
+        return rating
+
     def get_page_rating_status_code(self, status_code):
         rating = 0
         if status_code == 200:
@@ -783,3 +831,16 @@ class Page(BasePage):
             rating += 1
 
         return rating
+
+    def is_valid(self):
+        if BasePage.is_valid(self) == False:
+            return False
+
+        title = self.get_title()
+        is_title_invalid = title and (
+                title.find("Forbidden") >= 0 or title.find("Access denied") >= 0
+                )
+
+        if self.is_status_ok() == False or is_title_invalid:
+            return False
+        return True

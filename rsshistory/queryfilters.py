@@ -672,13 +672,11 @@ class OmniSearchFilter(BaseQueryFilter):
                 print("Using processor done")
             except Exception as e:
                 self.error = True
-                pass
         else:
             try:
                 self.combined_query = self.get_combined_query_simple()
             except Exception as e:
                 self.error = True
-                pass
 
         if self.combined_query is None:
             self.error = True

@@ -1,5 +1,5 @@
 class EntryButton(object):
-    def __init__(self, name, action, image = None):
+    def __init__(self, name, action, image=None):
         self.name = name
         self.action = action
         self.image = image
@@ -59,3 +59,5 @@ class EntryGenericPlugin(object):
         #            description = description.replace(link, '<a href="{}">{}</a>'.format(link, link))
 
         return description
+
+

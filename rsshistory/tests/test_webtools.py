@@ -83,7 +83,7 @@ class PageTest(TestCase):
     def test_default_language(self):
         # default language
         p = Page("http://test.com/my-site-test", webpage_no_lang)
-        self.assertEqual(p.get_language(), "en")
+        self.assertEqual(p.get_language(), "")
 
     def test_language_it(self):
         # default language
@@ -169,3 +169,49 @@ class PageTest(TestCase):
         self.assertTrue("http://mytestpage.com/test/test4.js" not in links)
         self.assertTrue("http://mytestpage.com/test/test5/" in links)
         self.assertTrue("https://test6.domain.com/" in links)
+
+    def test_get_links_nodomain(self):
+        p = Page("http://mytestpage.com/nodomain/", webpage_links)
+
+        links = p.get_links()
+
+        self.assertTrue("http://otherpage1.net" in links)
+        self.assertTrue("https://otherpage2.net" in links)
+
+        self.assertTrue("http://mytestpage.com/test/test1" in links)
+        self.assertTrue("http://mytestpage.com/test/test2.html" in links)
+        self.assertTrue("http://mytestpage.com/test/test3.htm" in links)
+        # java script is not accepted by default
+        self.assertTrue("http://mytestpage.com/test/test4.js" not in links)
+        self.assertTrue("http://mytestpage.com/test/test5/" in links)
+        self.assertTrue("https://test6.domain.com/" in links)
+
+    def test_get_page_ext_html(self):
+        p = Page("http://mytestpage.com/page.html", webpage_links)
+        ext = p.get_page_ext()
+
+        self.assertTrue(ext == "html")
+
+    def test_get_page_ext_htm(self):
+        p = Page("http://mytestpage.com/page.htm", webpage_links)
+        ext = p.get_page_ext()
+
+        self.assertTrue(ext == "htm")
+
+    def test_get_page_ext_js(self):
+        p = Page("http://mytestpage.com/page.js", webpage_links)
+        ext = p.get_page_ext()
+
+        self.assertTrue(ext == "js")
+
+    def test_get_page_ext_no_ext(self):
+        p = Page("http://mytestpage.com", webpage_links)
+        ext = p.get_page_ext()
+
+        self.assertTrue(ext == "")
+
+    def test_get_page_ext_html_args(self):
+        p = Page("http://mytestpage.com/page.html?args=some", webpage_links)
+        ext = p.get_page_ext()
+
+        self.assertTrue(ext == "html")

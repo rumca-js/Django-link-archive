@@ -13,7 +13,7 @@ class PermanentEntriesExporter(object):
         self.md_template_bookmarked += " - user: $user\n"
         self.md_template_bookmarked += " - tags: $tags\n"
 
-    def export(self, export_file_name="permanents", export_dir="default"):
+    def export(self, export_file_name="permanents", export_path="default"):
         # TODO rewrite this to use batch jobs. You cannot iterate over whole database
         all_entries = LinkDataController.objects.filter(permanent=True).order_by(
             "domain_obj__tld",
@@ -32,18 +32,20 @@ class PermanentEntriesExporter(object):
             start_slice = page * entries_no
             end_slice = ((page + 1) * entries_no) - 1
             entries = all_entries[start_slice:end_slice]
-            self.export_inner(entries, "permanent", self.get_page_dir(page))
+            self.export_inner(
+                entries, "permanent", self.get_page_dir(export_path, page)
+            )
 
-    def get_page_dir(self, page):
-        return Path("permanent") / "{page:05d}".format(page=page)
+    def get_page_dir(self, export_path, page):
+        return export_path / Path("permanent") / "{page:05d}".format(page=page)
 
-    def export_inner(self, entries, export_file_name="permanent", export_dir="default"):
+    def export_inner(
+        self, entries, export_file_name="permanent", export_path="default"
+    ):
         if entries.count() == 0:
             return
 
-        export_path = self.get_export_path() / export_dir
-        if not export_path.exists():
-            export_path.mkdir(parents=True, exist_ok=True)
+        export_path.mkdir(parents=True, exist_ok=True)
 
         from ..controllers import LinkDataController
         from .converters import (
@@ -67,14 +69,6 @@ class PermanentEntriesExporter(object):
 
         file_name = export_path / (export_file_name + "_entries.md")
         file_name.write_text(md_text)
-
-    def get_export_path(self):
-        entries_dir = self._cfg.get_bookmarks_path()
-        export_path = entries_dir
-
-        if not export_path.exists():
-            export_path.mkdir(parents=True, exist_ok=True)
-        return export_path
 
     def get_number_of_entries_for_page(self):
         return 1000

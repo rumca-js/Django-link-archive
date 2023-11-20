@@ -1,19 +1,87 @@
 import traceback
+from pathlib import Path
 from datetime import timedelta, datetime
 
 from .dateutils import DateUtils
 from .models import PersistentInfo, SourceExportHistory, DataExport
 from .controllers import SourceDataController, LinkDataController
 from .repotypes import *
+from .datawriter import DataWriter, DataWriterConfiguration
 
 
 class RepoFactory(object):
     def get(export_data):
         if export_data.export_type == DataExport.EXPORT_TYPE_GIT:
-            if export_data.export_data == DataExport.EXPORT_DAILY_DATA:
-                return DailyRepo
-            if export_data.export_data == DataExport.EXPORT_BOOKMARKS:
-                return BookmarkRepo
+            return DefaultRepo
+
+        # TODO add support for more repo types. SMB?
+
+
+class UpdateExportManager(object):
+    def __init__(self, config, repo_builder, export_data, directory=None, date=None):
+        self._cfg = config
+        self.export_data = export_data
+        self.directory = directory
+        self.date = date
+        self.repo_builder = repo_builder
+
+    def process(self):
+        self.write()
+        self.push()
+        self.clear()
+
+    def write(self):
+        if self.date:
+            config = DataWriterConfiguration(
+                self._cfg, self.export_data, self.directory, self.date.isoformat()
+            )
+        else:
+            config = DataWriterConfiguration(
+                self._cfg, self.export_data, self.directory
+            )
+
+        writer = DataWriter.get(config)
+        writer.write()
+
+    def get_directory(self):
+        return Path(self.export_data.local_path) / self.directory
+
+    def push(self):
+        export_data = self.export_data
+
+        if self.export_data.export_data == DataExport.EXPORT_DAILY_DATA:
+            message = DateUtils.get_dir4date(self.date)
+            self.push_implementation(export_data, message)
+        else:
+            # TODO maybe use today
+            yesterday = DateUtils.get_date_yesterday()
+            message = DateUtils.get_dir4date(yesterday)
+            self.push_implementation(export_data, message)
+
+    def clear(self):
+        dir = self.get_directory()
+        if dir.exists():
+            import shutil
+
+            shutil.rmtree(dir)
+
+    def push_implementation(self, export_data, commit_message):
+        PersistentInfo.create("Pushing repo")
+
+        if export_data.export_type == DataExport.EXPORT_TYPE_GIT:
+            repo_class = self.repo_builder.get(export_data)
+            repo = repo_class(export_data)
+
+            repo.up()
+
+            local_dir = self._cfg.get_export_path(self.get_directory())
+            repo.copy_tree(local_dir)
+
+            repo.add([])
+            repo.commit(commit_message)
+            repo.push()
+
+        PersistentInfo.create("Pushing repo done")
 
 
 class UpdateManager(object):
@@ -32,7 +100,8 @@ class UpdateManager(object):
 
             PersistentInfo.create("Pushing data to git")
 
-            self.write_and_push_bookmarks()
+            self.write_and_push_notime_data()
+            self.write_and_push_year_data()
             self.write_and_push_daily_data(input_date)
 
             PersistentInfo.create("Pushing data to git: Done")
@@ -43,73 +112,38 @@ class UpdateManager(object):
                 "Exception during refresh: {0} {1}".format(str(e), error_text)
             )
 
-    def write_and_push_bookmarks(self):
-        from .datawriter import DataWriter
-
-        all_export_data = DataExport.objects.filter(
-            export_data=DataExport.EXPORT_BOOKMARKS
-        )
-
-        for export_data in all_export_data:
-            writer = DataWriter(self._cfg, export_data)
-            writer.write_bookmarks()
-
-            self.push_bookmarks_repo(export_data)
-
     def write_and_push_daily_data(self, input_date=""):
-        from .datawriter import DataWriter
-
         if input_date == "":
             write_date = DateUtils.get_date_yesterday()
         else:
             write_date = datetime.strptime(input_date, "%Y-%m-%d").date()
 
         all_export_data = DataExport.objects.filter(
-            export_data=DataExport.EXPORT_DAILY_DATA
+            export_data=DataExport.EXPORT_DAILY_DATA, enabled=True
         )
 
         for export_data in all_export_data:
-            writer = DataWriter(self._cfg, export_data)
-            writer.write_daily_data(write_date.isoformat())
+            mgr = UpdateExportManager(
+                self._cfg, self.repo_builder, export_data, "daily_data", write_date
+            )
+            mgr.process()
 
-            self.push_daily_repo(export_data, write_date)
+    def write_and_push_year_data(self):
+        all_export_data = DataExport.objects.filter(
+            export_data=DataExport.EXPORT_YEAR_DATA, enabled=True
+        )
 
-            writer.clear_daily_data(write_date.isoformat())
+        for export_data in all_export_data:
+            mgr = UpdateExportManager(self._cfg, self.repo_builder, export_data, "year")
+            mgr.process()
 
-    def push_daily_repo(self, export_data, write_date):
-        PersistentInfo.create("Pushing to daily data repo")
+    def write_and_push_notime_data(self):
+        all_export_data = DataExport.objects.filter(
+            export_data=DataExport.EXPORT_NOTIME_DATA, enabled=True
+        )
 
-        if export_data.export_type == DataExport.EXPORT_TYPE_GIT:
-            repo_class = self.repo_builder.get(export_data)
-            repo = repo_class(export_data)
-
-            repo.up()
-
-            local_dir = self._cfg.get_daily_data_path()
-            repo.copy_tree(local_dir)
-
-            repo.add([])
-            repo.commit(DateUtils.get_dir4date(write_date))
-            repo.push()
-
-        PersistentInfo.create("Pushing to daily data repo done")
-
-    def push_bookmarks_repo(self, export_data):
-        PersistentInfo.create("Pushing bookmarks repo")
-
-        if export_data.export_type == DataExport.EXPORT_TYPE_GIT:
-            yesterday = DateUtils.get_date_yesterday()
-
-            repo_class = self.repo_builder.get(export_data)
-            repo = repo_class(export_data)
-
-            repo.up()
-
-            local_dir = self._cfg.get_bookmarks_path()
-            repo.copy_tree(local_dir)
-
-            repo.add([])
-            repo.commit(DateUtils.get_dir4date(yesterday))
-            repo.push()
-
-        PersistentInfo.create("Pushing to bookmarks repo done")
+        for export_data in all_export_data:
+            mgr = UpdateExportManager(
+                self._cfg, self.repo_builder, export_data, "notime"
+            )
+            mgr.process()

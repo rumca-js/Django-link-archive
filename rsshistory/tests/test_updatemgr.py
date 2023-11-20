@@ -12,7 +12,7 @@ from ..configuration import Configuration
 from ..dateutils import DateUtils
 
 
-class BookmarkTestRepo(object):
+class BaseRepo(object):
     def __init__(self, git_data):
         self.is_up = False
         self.is_add = False
@@ -36,21 +36,12 @@ class BookmarkTestRepo(object):
         self.is_copy_tree = True
 
 
-class DailyTestRepo(BookmarkTestRepo):
-    pass
-
-
 class RepoTestFactory(object):
     used_repos = []
 
     def get(export_data):
-        if export_data.export_type == DataExport.EXPORT_TYPE_GIT:
-            if export_data.export_data == DataExport.EXPORT_DAILY_DATA:
-                RepoTestFactory.used_repos.append(RepoTestFactory)
-                return DailyTestRepo
-            if export_data.export_data == DataExport.EXPORT_BOOKMARKS:
-                RepoTestFactory.used_repos.append(RepoTestFactory)
-                return BookmarkTestRepo
+        RepoTestFactory.used_repos.append(BaseRepo)
+        return BaseRepo
 
 
 class UpdateManagerTest(TestCase):
@@ -99,7 +90,20 @@ class UpdateManagerTest(TestCase):
         DataExport.objects.create(
             enabled=True,
             export_type=DataExport.EXPORT_TYPE_GIT,
-            export_data=DataExport.EXPORT_BOOKMARKS,
+            export_data=DataExport.EXPORT_YEAR_DATA,
+            local_path="test",
+            remote_path="test.git",
+            user="user",
+            password="password",
+            export_entries=True,
+            export_entries_bookmarks=True,
+            export_entries_permanents=True,
+            export_sources=True,
+        )
+        DataExport.objects.create(
+            enabled=True,
+            export_type=DataExport.EXPORT_TYPE_GIT,
+            export_data=DataExport.EXPORT_NOTIME_DATA,
             local_path="test",
             remote_path="test.git",
             user="user",
@@ -111,33 +115,48 @@ class UpdateManagerTest(TestCase):
         )
 
     def test_push_daily_repo(self):
-        RepoTestFactory.used_repos = []
+       RepoTestFactory.used_repos = []
 
-        conf = Configuration.get_object()
-        mgr = UpdateManager(conf, RepoTestFactory)
+       conf = Configuration.get_object()
+       mgr = UpdateManager(conf, RepoTestFactory)
 
-        write_date = DateUtils.get_date_yesterday()
+       write_date = DateUtils.get_date_yesterday()
 
-        export_config = DataExport.objects.filter(
-            export_data=DataExport.EXPORT_DAILY_DATA
-        )[0]
+       export_config = DataExport.objects.filter(
+           export_data=DataExport.EXPORT_DAILY_DATA
+       )[0]
 
-        mgr.push_daily_repo(export_config, write_date)
-        self.assertTrue(True)
+       mgr.push_daily_repo(export_config, write_date)
+       self.assertTrue(True)
 
-        self.assertEqual(len(RepoTestFactory.used_repos), 1)
+       self.assertEqual(len(RepoTestFactory.used_repos), 1)
 
-    def test_bookmark_repo(self):
-        RepoTestFactory.used_repos = []
+    def test_year_repo(self):
+       RepoTestFactory.used_repos = []
 
-        conf = Configuration.get_object()
-        mgr = UpdateManager(conf, RepoTestFactory)
+       conf = Configuration.get_object()
+       mgr = UpdateManager(conf, RepoTestFactory)
 
-        export_config = DataExport.objects.filter(
-            export_data=DataExport.EXPORT_BOOKMARKS
-        )[0]
+       export_config = DataExport.objects.filter(
+           export_data=DataExport.EXPORT_YEAR_DATA
+       )[0]
 
-        mgr.push_bookmarks_repo(export_config)
-        self.assertTrue(True)
+       mgr.push_default_repo(export_config)
+       self.assertTrue(True)
 
-        self.assertEqual(len(RepoTestFactory.used_repos), 1)
+       self.assertEqual(len(RepoTestFactory.used_repos), 1)
+
+    def test_notime_repo(self):
+       RepoTestFactory.used_repos = []
+
+       conf = Configuration.get_object()
+       mgr = UpdateManager(conf, RepoTestFactory)
+
+       export_config = DataExport.objects.filter(
+           export_data=DataExport.EXPORT_NOTIME
+       )[0]
+
+       mgr.push_default_repo(export_config)
+       self.assertTrue(True)
+
+       self.assertEqual(len(RepoTestFactory.used_repos), 1)

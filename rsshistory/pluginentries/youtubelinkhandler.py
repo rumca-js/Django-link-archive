@@ -135,6 +135,7 @@ class YouTubeLinkHandler(object):
     def is_live(self):
         if self.yt_ob:
             return self.yt_ob.is_live() or self.yt_ob.was_live()
+        return True
 
     def load_details(self):
         from ..serializers.youtubelinkjson import YouTubeJson

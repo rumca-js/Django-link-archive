@@ -5,8 +5,6 @@ from ..controllers import LinkDataController, SourceDataController
 
 
 class InstanceExporter(object):
-    def __init__(self):
-        pass
 
     def export_link(self, link):
         link_map = {"link": link.get_map_full()}

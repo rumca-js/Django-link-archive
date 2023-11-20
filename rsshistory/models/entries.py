@@ -29,7 +29,7 @@ class BaseLinkDataModel(models.Model):
     # this entry cannot be removed. Serves a purpose. Domain page, source page
     permanent = models.BooleanField(default=False)
     bookmarked = models.BooleanField(default=False)
-    dead = models.BooleanField(blank=True, null=True)
+    dead = models.BooleanField(default = False)
 
     # user who added entry
     user = models.CharField(max_length=1000, null=True, blank=True)
@@ -315,74 +315,6 @@ class BaseLinkDataController(BaseLinkDataModel):
         formatted_date = m.get_formatted_date(self.date_published.date())
         archive_link = m.get_archive_url_for_date(formatted_date, self.link)
         return archive_link
-
-    def get_full_information(data):
-        return BaseLinkDataController.update_info(data)
-
-    def update_info(data):
-        from ..webtools import Page
-
-        p = Page(data["link"])
-
-        data["thumbnail"] = None
-
-        if p.is_youtube():
-            BaseLinkDataController.update_info_youtube(data)
-
-        return BaseLinkDataController.update_info_default(data)
-
-    def update_info_youtube(data):
-        # TODO there should be some generic handlers
-        from ..pluginentries.youtubelinkhandler import YouTubeLinkHandler
-
-        h = YouTubeLinkHandler(data["link"])
-        h.download_details()
-        if h.get_video_code() is None:
-            return data
-
-        if "source" not in data or data["source"].strip() == "":
-            data["source"] = h.get_channel_feed_url()
-        data["link"] = h.get_link_url()
-        if "title" not in data or data["title"].strip() == "":
-            data["title"] = h.get_title()
-        # TODO limit comes from LinkDataModel, do not hardcode
-        if "description" not in data or data["description"].strip() == "":
-            data["description"] = h.get_description()[:900]
-        data["date_published"] = h.get_datetime_published()
-        if (
-            "thumbnail" not in data
-            or data["thumbnail"] is None
-            or data["thumbnail"].strip() == ""
-        ):
-            data["thumbnail"] = h.get_thumbnail()
-        data["artist"] = h.get_channel_name()
-        data["album"] = h.get_channel_name()
-
-        return data
-
-    def update_info_default(data):
-        from ..webtools import Page
-
-        p = Page(data["link"])
-        if "source" not in data or not data["source"]:
-            data["source"] = p.get_domain()
-        if "artist" not in data or not data["artist"]:
-            data["artist"] = p.get_domain()
-        if "album" not in data or not data["album"]:
-            data["album"] = p.get_domain()
-        if "language" not in data or not data["language"]:
-            data["language"] = p.get_language()
-        if "title" not in data or not data["title"]:
-            data["title"] = p.get_title()
-        if "description" not in data or not data["description"]:
-            data["description"] = p.get_title()
-
-        sources = SourceDataModel.objects.filter(url=data["source"])
-        if sources.count() > 0:
-            data["artist"] = sources[0].title
-            data["album"] = sources[0].title
-
-        return data
 
     def make_bookmarked(self, username):
         self.bookmarked = True

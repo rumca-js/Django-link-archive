@@ -5,6 +5,7 @@ import os
 from .sourcegenericplugin import SourceGenericPlugin
 from ..models import PersistentInfo
 from ..controllers import LinkDataController
+from ..webtools import Page
 
 
 class BaseParsePlugin(SourceGenericPlugin):
@@ -13,31 +14,26 @@ class BaseParsePlugin(SourceGenericPlugin):
     def __init__(self, source_id):
         super().__init__(source_id)
 
-    def get_address(self):
-        return self.get_source().get_domain()
+    #def get_address(self):
+    #    return self.get_source().get_domain()
 
     def is_link_valid(self, address):
-        # print("Address:{} link:{}".format(self.source.url, address))
-
         source = self.get_source()
 
         if not self.is_link_valid_domain(address):
             return False
 
         if not address.startswith(source.url):
-            return
+            return False
 
-        split = os.path.splitext(address)
+        p = Page(address)
+        ext = p.get_page_ext()
 
-        if split[1] == ".html" or split[1] == ".htm" or split[1] == "":
-            search_pattern = source.get_domain()
-
-            if re.search(search_pattern, address):
-                return True
+        if ext == "html" or ext == "htm" or ext == "":
+            return True
         return False
 
     def get_link_data(self, source, link):
-        from ..webtools import Page
         from ..dateutils import DateUtils
 
         output_map = {}
@@ -78,7 +74,5 @@ class BaseParsePlugin(SourceGenericPlugin):
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.exc(
-                "Source:{}; Exc:{}\n{}".format(
-                    self.source_id, str(e), error_text
-                )
+                "Source:{}; Exc:{}\n{}".format(self.source_id, str(e), error_text)
             )

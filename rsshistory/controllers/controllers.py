@@ -57,8 +57,8 @@ class SourceDataController(SourceDataModel):
         days = 0
         try:
             days = int(self.remove_after_days)
-        except:
-            pass
+        except Exception as E:
+            PersistentInfo.error("Exception {}".format(str(E)))
 
         return days
 
@@ -132,7 +132,9 @@ class SourceDataController(SourceDataModel):
         if obj:
             return obj.number_of_entries
 
-    def set_operational_info(self, date_fetched, number_of_entries, import_seconds, hash_value):
+    def set_operational_info(
+        self, date_fetched, number_of_entries, import_seconds, hash_value
+    ):
         obj = self.get_op_data()
         if obj:
             obj.date_fetched = date_fetched
@@ -150,7 +152,7 @@ class SourceDataController(SourceDataModel):
                     date_fetched=date_fetched,
                     import_seconds=import_seconds,
                     number_of_entries=number_of_entries,
-                    page_hash = hash_value,
+                    page_hash=hash_value,
                     source_obj=self,
                 )
                 obj.save()
@@ -169,21 +171,15 @@ class SourceDataController(SourceDataModel):
         if self.favicon:
             return self.favicon
 
-        from ..webtools import Page
-
         page = Page(self.url)
         domain = page.get_domain()
         return domain + "/favicon.ico"
 
     def get_domain(self):
-        from ..webtools import Page
-
         page = Page(self.url)
         return page.get_domain()
 
     def get_domain_only(self):
-        from ..webtools import Page
-
         page = Page(self.url)
         return page.get_domain_only()
 
@@ -278,9 +274,11 @@ class SourceDataController(SourceDataModel):
         return data
 
     def get_info_from_page(url, p):
+        from ..pluginsources.sourceparseplugin import BaseParsePlugin
+
         data = {}
         data["url"] = url
-        data["source_type"] = SourceDataModel.SOURCE_TYPE_PARSE
+        data["source_type"] = BaseParsePlugin.PLUGIN_NAME
         data["language"] = p.get_language()
         data["title"] = p.get_title()
         data["description"] = p.get_title()
@@ -297,6 +295,106 @@ class SourceDataController(SourceDataModel):
         for entry in entries:
             entry.source_obj = self
             entry.save()
+
+
+class EntryPageDataReader(object):
+    def __init__(self, data):
+        self.data = data
+        self.p = Page(self.data["link"])
+
+    def get_full_information(self):
+        p = self.p
+
+        if self.data["link"].endswith("/"):
+            self.data["link"] = self.data["link"][:-1]
+
+        conf = Configuration.get_object().config_entry
+        if conf.auto_store_domain_info and p.get_domain() == self.data["link"]:
+            self.data["permanent"] = True
+
+        if p.is_html():
+            self.data["page_rating_contents"] = p.get_page_rating()
+
+        self.data["thumbnail"] = None
+
+        if p.is_youtube():
+            self.update_info_youtube()
+        if p.is_html():
+            self.update_info_html()
+        if p.is_rss():
+            self.update_info_rss()
+
+        self.update_info_default()
+        return self.data
+
+    def update_info_youtube(self):
+        # TODO there should be some generic handlers
+        from ..pluginentries.youtubelinkhandler import YouTubeLinkHandler
+
+        h = YouTubeLinkHandler(self.data["link"])
+        h.download_details()
+        if h.get_video_code() is None:
+            return self.data
+
+        if "source" not in self.data or self.data["source"].strip() == "":
+            self.data["source"] = h.get_channel_feed_url()
+        self.data["link"] = h.get_link_url()
+        if "title" not in self.data or self.data["title"].strip() == "":
+            self.data["title"] = h.get_title()
+        # TODO limit comes from LinkDataModel, do not hardcode
+        if "description" not in self.data or self.data["description"].strip() == "":
+            self.data["description"] = h.get_description()[:900]
+        self.data["date_published"] = h.get_datetime_published()
+        if (
+            "thumbnail" not in self.data
+            or self.data["thumbnail"] is None
+            or self.data["thumbnail"].strip() == ""
+        ):
+            self.data["thumbnail"] = h.get_thumbnail()
+        self.data["artist"] = h.get_channel_name()
+        self.data["album"] = h.get_channel_name()
+
+        return self.data
+
+    def update_info_html(self):
+        p = self.p
+
+        if "language" not in self.data or not self.data["language"]:
+            self.data["language"] = p.get_language()
+        if "title" not in self.data or not self.data["title"]:
+            self.data["title"] = p.get_title()
+        if "description" not in self.data or not self.data["description"]:
+            self.data["description"] = p.get_title()
+
+        return self.data
+
+    def update_info_rss(self):
+        r = RssPropertyReader(self.p.get_contents())
+        # TODO add title and description handling
+        return self.data
+
+    def update_info_default(self):
+        p = self.p
+
+        if "source" not in self.data or not self.data["source"]:
+            self.data["source"] = p.get_domain()
+        if "artist" not in self.data or not self.data["artist"]:
+            self.data["artist"] = p.get_domain()
+        if "album" not in self.data or not self.data["album"]:
+            self.data["album"] = p.get_domain()
+        if "language" not in self.data or not self.data["language"]:
+            self.data["language"] = ""
+        if "title" not in self.data or not self.data["title"]:
+            self.data["title"] = p.get_domain()
+        if "description" not in self.data or not self.data["description"]:
+            self.data["description"] = p.get_domain()
+
+        sources = SourceDataModel.objects.filter(url=self.data["source"])
+        if sources.count() > 0:
+            self.data["artist"] = sources[0].title
+            self.data["album"] = sources[0].title
+
+        return self.data
 
 
 class LinkDataController(LinkDataModel):
@@ -358,6 +456,10 @@ class LinkDataController(LinkDataModel):
                 entry.move_to_archive()
             elif entry.get_source_obj().get_days_to_remove() == 0:
                 entry.move_to_archive()
+
+    def get_full_information(data):
+        reader = EntryPageDataReader(data)
+        return reader.get_full_information()
 
     def clear_old_entries():
         from ..dateutils import DateUtils
@@ -634,24 +736,30 @@ class LinkDataHyperController(object):
         try:
             config = Configuration.get_object().config_entry
             if config.auto_store_domain_info:
+                domains = set()
+                
                 if "source" in link_data:
+                    print("Adding 0 domain for: {}".format(link_data["source"]))
                     p = Page(link_data["source"])
                     domain = p.get_domain_only()
-                    Domains.add(domain)
+                    domains.add(domain)
 
                 p = Page(link_data["link"])
                 domain = p.get_domain_only()
-                Domains.add(domain)
+                print("Adding 1 domain for: {}".format(domain))
+                domains.add(domain)
 
                 parser = ContentLinkParser(link_data["link"], link_data["description"])
-                links = parser.get_links()
-                domains = set()
-                for link in links:
-                    link_page = Page(link)
-                    domains.add(link_page.get_domain())
+                description_links = parser.get_links()
 
+                for link in description_links:
+                    print("Adding 2 domain for: {}".format(link))
+                    ppp = Page(link)
+                    domains.add(ppp.get_domain())
+                    
                 for domain in domains:
-                    Domains.add(domain)
+                    if domain != None and domains != "":
+                         Domains.add(domain)
 
             if config.auto_store_keyword_info:
                 if "title" in link_data:
@@ -987,6 +1095,16 @@ class BackgroundJobController(BackgroundJob):
     def push_daily_data_to_repo(input_date=""):
         return BackgroundJobController.create_single_job(
             BackgroundJob.JOB_PUSH_DAILY_DATA_TO_REPO, input_date
+        )
+
+    def push_year_data_to_repo(input_date=""):
+        return BackgroundJobController.create_single_job(
+            BackgroundJob.JOB_PUSH_YEAR_DATA_TO_REPO, input_date
+        )
+
+    def push_notime_data_to_repo(input_date=""):
+        return BackgroundJobController.create_single_job(
+            BackgroundJob.JOB_PUSH_NOTIME_DATA_TO_REPO, input_date
         )
 
     def make_cleanup():

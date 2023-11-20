@@ -98,7 +98,6 @@ class Domains(models.Model):
             obj = Domains.create_object(domain_only_text, props)
         else:
             obj = objs[0]
-        #    Domains.update_object(obj)
 
         if obj:
             return obj.id
@@ -107,6 +106,8 @@ class Domains(models.Model):
         import tldextract
 
         if props:
+            entry = Domains.add_domain_entry(props)
+
             extract = tldextract.TLDExtract()
             domain_data = extract(domain_only_text)
 
@@ -118,10 +119,10 @@ class Domains(models.Model):
                 subdomain=domain_data.subdomain,
                 suffix=domain_data.suffix,
                 tld=tld,
+                link_obj=entry
             )
 
             ob.update_complementary_data(True)
-            ob.add_domain_link(props)
             ob.check_and_create_source(props)
 
             return ob
@@ -159,23 +160,13 @@ class Domains(models.Model):
         if self.link_obj == None:
             props = self.get_page_properties()
             if props:
-                self.add_domain_link(props)
                 self.check_and_create_source(props)
             else:
                 self.dead = True
                 self.save()
 
-    def add_domain_link(self, props):
+    def add_domain_entry(props):
         from ..controllers import LinkDataHyperController
-
-        entry = LinkDataHyperController.get_link_object(props["link"])
-        if entry:
-            if self.link_obj == None:
-                self.link_obj = entry
-                self.save()
-                entry.permanent = True
-                entry.save()
-            return entry
 
         link_props = {}
         link_props["link"] = props["link"]
@@ -186,12 +177,6 @@ class Domains(models.Model):
         link_props["language"] = props["language"]
 
         entry = LinkDataHyperController.add_new_link(link_props)
-        entry.permanent = True
-        entry.save()
-
-        self.link_obj = entry
-        self.save()
-
         return entry
 
     def check_and_create_source(self, props):
@@ -250,7 +235,8 @@ class Domains(models.Model):
         try:
             SourceDataModel.objects.create(**props)
         except Exception as E:
-            pass
+            from .admin import PersistentInfo
+            PersistentInfo.error("Exception {}".format(str(E)))
 
     def update_complementary_data(self, force=False):
         DomainsSuffixes.add(self.suffix)
@@ -363,11 +349,7 @@ class Domains(models.Model):
 
         self.status_code = p.status_code
 
-        is_title_invalid = new_title and (
-            new_title.find("Forbidden") >= 0 or new_title.find("Access denied") >= 0
-        )
-
-        if p.is_status_ok() == False or is_title_invalid:
+        if p.is_valid() == False:
             self.dead = True
 
             self.date_update_last = DateUtils.get_datetime_now_utc()

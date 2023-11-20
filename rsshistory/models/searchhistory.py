@@ -17,7 +17,7 @@ class UserSearchHistory(models.Model):
     date = models.DateTimeField(auto_now_add=True)
 
     def add(user, search_query):
-        UserSearchHistory.objects.create(search_query = search_query, user=user)
+        UserSearchHistory.objects.create(search_query=search_query, user=user)
 
 
 class EntryHitUserSearchHistory(models.Model):
@@ -31,7 +31,9 @@ class EntryHitUserSearchHistory(models.Model):
     user = models.CharField(max_length=1000)
 
     def add(user, search_query, link):
-        UserSearchHistory.objects.create(search_query = search_query, user=user, link=link)
+        UserSearchHistory.objects.create(
+            search_query=search_query, user=user, link=link
+        )
 
 
 class EntryHitSearchHistory(models.Model):

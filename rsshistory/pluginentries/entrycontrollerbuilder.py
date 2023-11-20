@@ -4,10 +4,14 @@ class EntryControllerBuilder(object):
 
         p = Page(entry.link)
         if p.is_youtube():
-            from .entryyoutubeplugin import EntryYouTubePlugin
+            from ..pluginentries.youtubelinkhandler import YouTubeLinkHandler
 
-            return EntryYouTubePlugin(entry)
-        else:
-            from .entrygenericplugin import EntryGenericPlugin
+            handler = YouTubeLinkHandler(entry.link)
+            if handler.get_video_code():
+                from .entryyoutubeplugin import EntryYouTubePlugin
 
-            return EntryGenericPlugin(entry)
+                return EntryYouTubePlugin(entry)
+
+        from .entrygenericplugin import EntryGenericPlugin
+
+        return EntryGenericPlugin(entry)

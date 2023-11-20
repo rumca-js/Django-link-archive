@@ -10,9 +10,6 @@
         <img src="{% static 'rsshistory/icons/icons8-start-100.png' %}" class="content-icon" />
         Reset filters</a>
     {% if user.is_staff %}
-    <a href="{% url 'rsshistory:domain-add' %}" title="Add new domain" class="simplebutton">
-        <img src="{% static 'rsshistory/icons/icons8-plus-100.png' %}" class="content-icon" />
-    </a>
     <a href="{% url 'rsshistory:domains-category-list' %}" title="Shows categories" class="simplebutton">View categories</a>
     <a href="{% url 'rsshistory:domains' %}?search=category+is+null&sort=date_update_last" title="Domains without category" class="simplebutton">Domains without category</a>
     {% endif %}

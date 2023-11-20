@@ -203,6 +203,7 @@ class EntryForm(forms.ModelForm):
             "album",
             "age",
             "thumbnail",
+            "page_rating_contents",
         ]
         widgets = {
             # DateTimeInput widget does not work my my Android phone

@@ -16,7 +16,7 @@ version is split into three digits:
  if a change requires the model to be changed, then second digit is updated, patch is set to 0
  if something should be released to public, then release version changes
 """
-__version__ = "0.30.0"
+__version__ = "0.31.0"
 
 
 from pathlib import Path
@@ -98,21 +98,6 @@ class Configuration(object):
     def get_data_path(self):
         return self.directory / "data" / self.app_name
 
-    def get_bookmarks_path(self, append=None):
-        if append:
-            return self.get_export_path("bookmarks") / append
-        else:
-            return self.get_export_path("bookmarks")
-
-    def get_daily_data_path(self, append=None):
-        if append:
-            return self.get_export_path("daily_data") / append
-        else:
-            return self.get_export_path("daily_data")
-
-    def get_sources_json_path(self):
-        return self.get_bookmarks_path("sources.json")
-
     def get_sources_file_name(self):
         return "sources.json"
 
@@ -135,8 +120,7 @@ class Configuration(object):
         in_tuple = DateUtils.get_date_tuple(in_date)
 
         day_path = Path(in_tuple[0]) / in_tuple[1] / Path(day_iso)
-        entries_dir = self.get_daily_data_path(day_path)
-        return entries_dir
+        return day_path
 
     def get_url_clean_name(self, file_name):
         file_name = (

@@ -17,14 +17,12 @@ class BaseRssPlugin(SourceGenericPlugin):
         try:
             from ..webtools import RssPropertyReader
 
-            reader = RssPropertyReader(self.get_address(), self.get_contents() )
+            reader = RssPropertyReader(self.get_address(), self.get_contents())
             all_props = reader.parse_and_process()
 
             if len(all_props) == 0:
                 PersistentInfo.error(
-                    "Source:{0}; Source has no data".format(
-                        self.source_id
-                    )
+                    "Source:{0}; Source has no data".format(self.source_id)
                 )
 
             result = []
@@ -55,7 +53,6 @@ class BaseRssPlugin(SourceGenericPlugin):
                 return False
 
             objs = LinkDataController.objects.filter(link=props["link"])
-            # print("Adding link {} {}".format(props["link"], props["title"]))
 
             if not objs.exists():
                 if "title" not in props:
@@ -70,8 +67,6 @@ class BaseRssPlugin(SourceGenericPlugin):
                 if not self.is_link_valid(props["link"]):
                     return False
 
-                # print("Link is valid {}".format(props["link"]))
-
                 if "date_published" not in props:
                     PersistentInfo.error(
                         "Link:{}; Title:{} missing published field".format(
@@ -80,8 +75,6 @@ class BaseRssPlugin(SourceGenericPlugin):
                         )
                     )
                     return False
-
-                # print("Link - checking page {}".format(props["link"]))
 
                 from ..webtools import Page
 

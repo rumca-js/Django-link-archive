@@ -4,26 +4,6 @@ from django.urls import reverse
 
 class SourceDataModel(models.Model):
     SOURCE_TYPE_RSS = "BaseRssPlugin"
-    SOURCE_TYPE_PARSE = "BaseParsePlugin"
-    SOURCE_TYPE_GENEROUS_PARSE = "SourceGenerousParserPlugin"
-    SOURCE_TYPE_CODEPROJECT = "CodeProjectPlugin"
-    SOURCE_TYPE_INSTALKI = "InstalkiPlugin"
-    SOURCE_TYPE_DIGITS_START = "SourceParseDigitsPlugin"
-    SOURCE_TYPE_TVN24 = "TVN24Plugin"
-    SOURCE_TYPE_SPOTIFY = "SpotifyPlugin"
-
-    # fmt: off
-    SOURCE_TYPES = (
-        (SOURCE_TYPE_RSS, SOURCE_TYPE_RSS),                     #
-        (SOURCE_TYPE_PARSE, SOURCE_TYPE_PARSE),                 #
-        (SOURCE_TYPE_GENEROUS_PARSE, SOURCE_TYPE_GENEROUS_PARSE),                 #
-        (SOURCE_TYPE_CODEPROJECT, SOURCE_TYPE_CODEPROJECT),     #
-        (SOURCE_TYPE_INSTALKI, SOURCE_TYPE_INSTALKI),           #
-        (SOURCE_TYPE_DIGITS_START, SOURCE_TYPE_DIGITS_START),       #
-        (SOURCE_TYPE_TVN24, SOURCE_TYPE_TVN24),                 #
-        (SOURCE_TYPE_SPOTIFY, SOURCE_TYPE_SPOTIFY),             #
-    )
-    # fmt: on
 
     url = models.CharField(max_length=2000, unique=True)
     title = models.CharField(max_length=1000)
@@ -37,7 +17,7 @@ class SourceDataModel(models.Model):
     on_hold = models.BooleanField(default=False)
     fetch_period = models.IntegerField(default=900)
     source_type = models.CharField(
-        max_length=1000, null=False, choices=SOURCE_TYPES, default=SOURCE_TYPE_RSS
+        max_length=1000, null=False, default=SOURCE_TYPE_RSS
     )
 
     class Meta:
@@ -60,7 +40,7 @@ class SourceOperationalData(models.Model):
     date_fetched = models.DateTimeField(null=True)
     import_seconds = models.IntegerField(null=True)
     number_of_entries = models.IntegerField(null=True)
-    page_hash = models.BinaryField(max_length = 30)
+    page_hash = models.BinaryField(max_length=30)
 
     class Meta:
         ordering = ["date_fetched"]

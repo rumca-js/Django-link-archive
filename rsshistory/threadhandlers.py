@@ -2,6 +2,7 @@
 @brief This file provides handlers for 'jobs'.
 """
 import logging
+import time
 import traceback
 from datetime import date, datetime
 from pathlib import Path
@@ -16,6 +17,7 @@ from .models import (
     Domains,
     SourceExportHistory,
     KeyWords,
+    DataExport,
 )
 from .pluginsources.sourcecontrollerbuilder import SourceControllerBuilder
 from .basictypes import fix_path_for_windows
@@ -55,9 +57,6 @@ class ProcessSourceJobHandler(BaseJobHandler):
     Processes source, checks if contains new entries
     """
 
-    def __init__(self):
-        pass
-
     def get_job(self):
         return BackgroundJob.JOB_PROCESS_SOURCE
 
@@ -80,17 +79,21 @@ class EntryUpdateData(BaseJobHandler):
     downloads entry
     """
 
-    def __init__(self):
-        pass
-
     def get_job(self):
         return BackgroundJob.JOB_LINK_UPDATE_DATA
 
     def process(self, obj=None):
         try:
-            entry = LinkDataController.objects.filter(link=obj.subject)[0]
-            entry.update_calculated_vote()
-
+            entries = LinkDataController.objects.filter(link=obj.subject)
+            if len(entries) > 0:
+                entry = entries[0]
+                entry.update_calculated_vote()
+            else:
+                PersistentInfo.error(
+                    "Incorrect background job {0}".format(
+                        obj.subject,
+                    )
+                )
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.error(
@@ -104,9 +107,6 @@ class LinkDownloadJobHandler(BaseJobHandler):
     """!
     downloads entry
     """
-
-    def __init__(self):
-        pass
 
     def get_job(self):
         return BackgroundJob.JOB_LINK_DOWNLOAD
@@ -131,9 +131,6 @@ class LinkMusicDownloadJobHandler(BaseJobHandler):
     """!
     downloads entry music
     """
-
-    def __init__(self):
-        pass
 
     def get_job(self):
         return BackgroundJob.JOB_LINK_DOWNLOAD_MUSIC
@@ -177,9 +174,6 @@ class LinkVideoDownloadJobHandler(BaseJobHandler):
     downloads entry video
     """
 
-    def __init__(self):
-        pass
-
     def get_job(self):
         return BackgroundJob.JOB_LINK_DOWNLOAD_VIDEO
 
@@ -213,9 +207,6 @@ class LinkAddJobHandler(BaseJobHandler):
     Adds entry to database
     """
 
-    def __init__(self):
-        pass
-
     def get_job(self):
         return BackgroundJob.JOB_LINK_ADD
 
@@ -244,9 +235,6 @@ class LinkSaveJobHandler(BaseJobHandler):
     Archives entry to database
     """
 
-    def __init__(self):
-        pass
-
     def get_job(self):
         return BackgroundJob.JOB_LINK_SAVE
 
@@ -270,9 +258,6 @@ class WriteDailyDataJobHandler(BaseJobHandler):
     """!
     Writes daily data to disk
     """
-
-    def __init__(self):
-        pass
 
     def get_job(self):
         return BackgroundJob.JOB_WRITE_DAILY_DATA
@@ -302,9 +287,6 @@ class ImportDailyDataJobHandler(BaseJobHandler):
     """!
     Writes daily data to disk
     """
-
-    def __init__(self):
-        pass
 
     def get_job(self):
         return BackgroundJob.JOB_IMPORT_DAILY_DATA
@@ -348,9 +330,6 @@ class ImportBookmarksJobHandler(BaseJobHandler):
     Writes daily data to disk
     """
 
-    def __init__(self):
-        pass
-
     def get_job(self):
         return BackgroundJob.JOB_IMPORT_BOOKMARKS
 
@@ -385,9 +364,6 @@ class ImportSourcesJobHandler(BaseJobHandler):
     Writes daily data to disk
     """
 
-    def __init__(self):
-        pass
-
     def get_job(self):
         return BackgroundJob.JOB_IMPORT_SOURCES
 
@@ -415,9 +391,6 @@ class ImportInstanceJobHandler(BaseJobHandler):
     Imports from instance
     """
 
-    def __init__(self):
-        pass
-
     def get_job(self):
         return BackgroundJob.JOB_IMPORT_INSTANCE
 
@@ -436,9 +409,6 @@ class WriteBookmarksJobHandler(BaseJobHandler):
     """!
     Writes bookmarks data to disk
     """
-
-    def __init__(self):
-        pass
 
     def get_job(self):
         return BackgroundJob.JOB_WRITE_BOOKMARKS
@@ -466,9 +436,6 @@ class WriteTopicJobHandler(BaseJobHandler):
     """!
     Writes topic data to disk
     """
-
-    def __init__(self):
-        pass
 
     def get_job(self):
         return BackgroundJob.JOB_WRITE_TOPIC_DATA
@@ -499,28 +466,25 @@ class PushToRepoJobHandler(BaseJobHandler):
     Pushes data to repo
     """
 
-    def __init__(self):
-        pass
-
     def get_job(self):
         return BackgroundJob.JOB_PUSH_TO_REPO
 
     def process(self, obj=None):
         try:
-            from .configuration import Configuration
-
-            c = Configuration.get_object()
             if (
-                c.config_entry.is_bookmark_repo_set()
-                or c.config_entry.is_daily_repo_set()
+                DataExport.is_daily_data_set()
+                or DataExport.is_year_data_set()
+                or DataExport.is_notime_data_set()
             ):
                 from .updatemgr import UpdateManager
 
                 update_mgr = UpdateManager(self._config)
-                if c.config_entry.is_bookmark_repo_set():
-                    update_mgr.write_and_push_bookmarks()
-                if c.config_entry.is_daily_repo_set():
+                if DataExport.is_year_data_set():
+                    update_mgr.write_and_push_year_data()
+                if DataExport.is_daily_data_set():
                     update_mgr.write_and_push_daily_data()
+                if DataExport.is_notime_data_set():
+                    update_mgr.write_and_push_notime_data()
 
                 SourceExportHistory.confirm()
         except Exception as e:
@@ -528,26 +492,42 @@ class PushToRepoJobHandler(BaseJobHandler):
             PersistentInfo.error("Exception: {} {}".format(str(e), error_text))
 
 
-class PushBookmarksToRepoJobHandler(BaseJobHandler):
+class PushYearDataToRepoJobHandler(BaseJobHandler):
     """!
     Pushes data to repo
     """
 
-    def __init__(self):
-        pass
-
     def get_job(self):
-        return BackgroundJob.JOB_PUSH_BOOKMARKS_TO_REPO
+        return BackgroundJob.JOB_PUSH_YEAR_DATA_TO_REPO
 
     def process(self, obj=None):
+        # TODO read year from string
         try:
-            config = Configuration.get_object()
-
-            if config.config_entry.is_bookmark_repo_set():
+            if DataExport.is_year_data_set():
                 from .updatemgr import UpdateManager
 
                 update_mgr = UpdateManager(self._config)
-                update_mgr.write_and_push_bookmarks()
+                update_mgr.write_and_push_year_data()
+        except Exception as e:
+            error_text = traceback.format_exc()
+            PersistentInfo.error("Exception: {} {}".format(str(e), error_text))
+
+
+class PushNoTimeDataToRepoJobHandler(BaseJobHandler):
+    """!
+    Pushes data to repo
+    """
+
+    def get_job(self):
+        return BackgroundJob.JOB_PUSH_NOTIME_DATA_TO_REPO
+
+    def process(self, obj=None):
+        try:
+            if DataExport.is_notime_data_set():
+                from .updatemgr import UpdateManager
+
+                update_mgr = UpdateManager(self._config)
+                update_mgr.write_and_push_notime_data()
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.error("Exception: {} {}".format(str(e), error_text))
@@ -558,17 +538,13 @@ class PushDailyDataToRepoJobHandler(BaseJobHandler):
     Pushes data to repo
     """
 
-    def __init__(self):
-        pass
-
     def get_job(self):
         return BackgroundJob.JOB_PUSH_DAILY_DATA_TO_REPO
 
     def process(self, obj=None):
+        # TODO read date from string
         try:
-            config = Configuration.get_object()
-
-            if config.config_entry.is_daily_repo_set():
+            if DataExport.is_daily_data_set():
                 from .updatemgr import UpdateManager
 
                 date_input = obj.subject
@@ -584,9 +560,6 @@ class CleanupJobHandler(BaseJobHandler):
     """!
     Pushes data to repo
     """
-
-    def __init__(self):
-        pass
 
     def get_job(self):
         return BackgroundJob.JOB_CLEANUP
@@ -605,8 +578,6 @@ class CleanupJobHandler(BaseJobHandler):
 
 
 class CheckDomainsJobHandler(BaseJobHandler):
-    def __init__(self):
-        pass
 
     def get_job(self):
         return BackgroundJob.JOB_CHECK_DOMAINS
@@ -625,9 +596,6 @@ class RefreshThreadHandler(object):
     This handler only adds background jobs, nothing more
     """
 
-    def __init__(self, name="RefreshThreadHandler"):
-        pass
-
     def refresh(self, item=None):
         # This has to be done before exporting
         KeyWords.clear()
@@ -636,36 +604,47 @@ class RefreshThreadHandler(object):
 
         from .controllers import SourceDataController
 
-        sources = SourceDataController.objects.all()
+        self.check_sources()
+
+        if SourceExportHistory.is_update_required():
+            self.do_update()
+            SourceExportHistory.confirm()
+
+        PersistentInfo.create("Refreshing RSS data - done")
+
+    def check_sources(self):
+        from .controllers import SourceDataController
+
+        sources = SourceDataController.objects.filter(on_hold = False)
         for source in sources:
-            BackgroundJobController.download_rss(source)
+            if source.is_fetch_possible():
+                BackgroundJobController.download_rss(source)
+
+    def do_update(self):
+        if DataExport.is_daily_data_set():
+            BackgroundJobController.push_daily_data_to_repo()
+
+        if DataExport.is_year_data_set():
+            BackgroundJobController.push_year_data_to_repo()
+
+        if DataExport.is_notime_data_set():
+            BackgroundJobController.push_notime_data_to_repo()
 
         c = Configuration.get_object()
         conf = c.config_entry
+        
+        if conf.source_save:
+            sources = SourceDataController.objects.filter(on_hold = False)
+            for source in sources:
+                BackgroundJobController.link_save(source.url)
 
-        if SourceExportHistory.is_update_required():
-            if conf.is_bookmark_repo_set() or conf.is_daily_repo_set():
-                BackgroundJobController.push_to_repo()
-
-                if conf.source_save:
-                    sources = SourceDataController.objects.all()
-                    for source in sources:
-                        BackgroundJobController.link_save(source.url)
-            else:
-                SourceExportHistory.confirm()
-
-            BackgroundJobController.make_cleanup()
-
-        PersistentInfo.create("Refreshing RSS data - done")
+        BackgroundJobController.make_cleanup()
 
 
 class HandlerManager(object):
     """!
     @note Uses handler priority when processing jobs.
     """
-
-    def __init__(self):
-        pass
 
     def get_handlers(self):
         """
@@ -674,7 +653,8 @@ class HandlerManager(object):
         return [
             PushToRepoJobHandler(),
             PushDailyDataToRepoJobHandler(),
-            PushBookmarksToRepoJobHandler(),
+            PushYearDataToRepoJobHandler(),
+            PushNoTimeDataToRepoJobHandler(),
             ProcessSourceJobHandler(),
             LinkAddJobHandler(),
             LinkDownloadJobHandler(),
@@ -708,6 +688,7 @@ class HandlerManager(object):
         PersistentInfo.create("Processing messages")
 
         config = Configuration.get_object()
+        start_processing_time = time.time()
 
         while True:
             items = self.get_handler_and_object()
@@ -721,4 +702,9 @@ class HandlerManager(object):
 
                 handler.process(obj)
                 obj.delete()
+
+                # if 10 minutes passed
+                if time.time() - start_processing_time >= 60 * 10:
+                    break
+
         PersistentInfo.create("Processing messages done")

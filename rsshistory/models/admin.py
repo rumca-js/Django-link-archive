@@ -72,26 +72,6 @@ class ConfigurationEntry(models.Model):
         else:
             return confs[0]
 
-    def is_bookmark_repo_set(self):
-        from .export import DataExport
-
-        exps = DataExport.objects.filter(export_data=DataExport.EXPORT_BOOKMARKS)
-
-        if exps.count() > 0:
-            return True
-        else:
-            return False
-
-    def is_daily_repo_set(self):
-        from .export import DataExport
-
-        exps = DataExport.objects.filter(export_data=DataExport.EXPORT_DAILY_DATA)
-
-        if exps.count() > 0:
-            return True
-        else:
-            return False
-
     def get_data_export_path(self):
         return self.data_export_path
 
@@ -246,7 +226,7 @@ class PersistentInfo(models.Model):
             objs = PersistentInfo.objects.filter(date__lt=date_range[0])
             objs.delete()
         except Exception as e:
-            pass
+            print("Exception {}".format(e))
 
 
 class BackgroundJob(models.Model):
@@ -266,7 +246,8 @@ class BackgroundJob(models.Model):
     JOB_IMPORT_INSTANCE = "import-instance"
     JOB_PUSH_TO_REPO = "push-to-repo"
     JOB_PUSH_DAILY_DATA_TO_REPO = "push-daily-data-to-repo"
-    JOB_PUSH_BOOKMARKS_TO_REPO = "push-bookmarks-to-repo"
+    JOB_PUSH_YEAR_DATA_TO_REPO = "push-year-data-to-repo"
+    JOB_PUSH_NOTIME_DATA_TO_REPO = "push-notime-data-to-repo"
     JOB_CLEANUP = "cleanup"
     JOB_CHECK_DOMAINS = "check-domains"
 
@@ -288,7 +269,8 @@ class BackgroundJob(models.Model):
         (JOB_IMPORT_INSTANCE, JOB_IMPORT_INSTANCE),
         (JOB_PUSH_TO_REPO, JOB_PUSH_TO_REPO),
         (JOB_PUSH_DAILY_DATA_TO_REPO, JOB_PUSH_DAILY_DATA_TO_REPO),
-        (JOB_PUSH_BOOKMARKS_TO_REPO, JOB_PUSH_BOOKMARKS_TO_REPO),
+        (JOB_PUSH_YEAR_DATA_TO_REPO, JOB_PUSH_YEAR_DATA_TO_REPO),
+        (JOB_PUSH_NOTIME_DATA_TO_REPO, JOB_PUSH_NOTIME_DATA_TO_REPO),
         (JOB_CLEANUP, JOB_CLEANUP),
         (JOB_CHECK_DOMAINS, JOB_CHECK_DOMAINS),
     )

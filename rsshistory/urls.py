@@ -134,7 +134,6 @@ urlpatterns = [
     path("domains/", viewdomains.DomainsListView.as_view(), name="domains",),
     path("domain/<int:pk>/", viewdomains.DomainsDetailView.as_view(), name="domain-detail",),
     path("domain-by-name/", viewdomains.DomainsByNameDetailView.as_view(), name="domain-by-name",),
-    path("domain-add/", viewdomains.domain_add, name="domain-add",),
     path("domain-edit/<int:pk>/", viewdomains.domain_edit, name="domain-edit",),
     path("domain-update-data/<int:pk>/", viewdomains.domain_update_data, name="domain-update-data",),
     path("domain-json/<int:pk>/", viewdomains.domain_json, name="domain-json",),

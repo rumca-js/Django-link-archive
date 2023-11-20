@@ -236,7 +236,17 @@ class RefreshThreadHandlerTest(TestCase):
         DataExport.objects.create(
             enabled=True,
             export_type=DataExport.EXPORT_TYPE_GIT,
-            export_data=DataExport.EXPORT_BOOKMARKS,
+            export_data=DataExport.EXPORT_YEAR_DATA,
+            local_path="test",
+            remote_path="test.git",
+            user="user",
+            password="password",
+        )
+
+        DataExport.objects.create(
+            enabled=True,
+            export_type=DataExport.EXPORT_TYPE_GIT,
+            export_data=DataExport.EXPORT_NOTIME_DATA,
             local_path="test",
             remote_path="test.git",
             user="user",
