@@ -2,7 +2,6 @@ import json
 
 
 class DomainJsonExporter(object):
-
     def get_json(self, domains):
         json_data = []
         for domain in domains:

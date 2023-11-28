@@ -16,9 +16,7 @@ class SourceDataModel(models.Model):
     favicon = models.CharField(max_length=1000, null=True)
     on_hold = models.BooleanField(default=False)
     fetch_period = models.IntegerField(default=900)
-    source_type = models.CharField(
-        max_length=1000, null=False, default=SOURCE_TYPE_RSS
-    )
+    source_type = models.CharField(max_length=1000, null=False, default=SOURCE_TYPE_RSS)
 
     class Meta:
         ordering = ["title"]

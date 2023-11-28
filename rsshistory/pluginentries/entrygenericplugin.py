@@ -59,5 +59,3 @@ class EntryGenericPlugin(object):
         #            description = description.replace(link, '<a href="{}">{}</a>'.format(link, link))
 
         return description
-
-

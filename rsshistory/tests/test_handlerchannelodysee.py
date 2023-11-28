@@ -6,7 +6,6 @@ from ..pluginentries.handlerchannelodysee import OdyseeSourceHandler
 
 
 class OdyseeSourceHandlerTest(TestCase):
-
     def test_source_input2code_channel(self):
         self.assertEqual(
             OdyseeSourceHandler("https://odysee.com/@samtime:1").get_channel_code(),
@@ -15,7 +14,9 @@ class OdyseeSourceHandlerTest(TestCase):
 
     def test_source_input2code_feed(self):
         self.assertEqual(
-            OdyseeSourceHandler("https://odysee.com/$/rss/@samtime:1").get_channel_code(),
+            OdyseeSourceHandler(
+                "https://odysee.com/$/rss/@samtime:1"
+            ).get_channel_code(),
             "@samtime:1",
         )
 

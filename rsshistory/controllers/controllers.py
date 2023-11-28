@@ -289,12 +289,14 @@ class SourceDataController(SourceDataModel):
 
     def get_channel_page_url(self):
         from ..pluginentries.handlerchannel import ChannelHandler
+
         handler = ChannelHandler.get(self.url)
 
         return handler.get_channel_url()
 
     def is_channel_page_url(self):
         from ..pluginentries.handlerchannel import ChannelHandler
+
         return ChannelHandler.get_supported(self.url)
 
     def fix_entries(self):
@@ -744,21 +746,35 @@ class LinkDataHyperController(object):
             config = Configuration.get_object().config_entry
             if config.auto_store_domain_info:
                 domains = set()
-                
+
                 if "source" in link_data:
                     print("Adding 0 domain for: {}".format(link_data["source"]))
                     p = BasePage(link_data["source"])
                     domain = p.get_domain()
-                    if domain == None or domain == "" or domain == "http://" or domain == "https://":
-                        LinkDataHyperController.store_error_info(domain, "Invalid source domain")
+                    if (
+                        domain == None
+                        or domain == ""
+                        or domain == "http://"
+                        or domain == "https://"
+                    ):
+                        LinkDataHyperController.store_error_info(
+                            domain, "Invalid source domain"
+                        )
                     domains.add(domain)
 
                 p = BasePage(link_data["link"])
                 domain = p.get_domain()
                 print("Adding 1 domain for: {}".format(domain))
                 domains.add(domain)
-                if domain == None or domain == "" or domain == "http://" or domain == "https://":
-                    LinkDataHyperController.store_error_info(domain, "Invalid link domain")
+                if (
+                    domain == None
+                    or domain == ""
+                    or domain == "http://"
+                    or domain == "https://"
+                ):
+                    LinkDataHyperController.store_error_info(
+                        domain, "Invalid link domain"
+                    )
 
                 parser = ContentLinkParser(link_data["link"], link_data["description"])
                 description_links = parser.get_links()
@@ -767,15 +783,27 @@ class LinkDataHyperController(object):
                     print("Adding 2 domain for: {}".format(link))
                     ppp = BasePage(link)
                     domain = ppp.get_domain()
-                    if domain == None or domain == "" or domain == "http://" or domain == "https://":
-                        text = "Invalid description line link:{} domain:{} description:{}".format(link, domain, link_data["description"])
+                    if (
+                        domain == None
+                        or domain == ""
+                        or domain == "http://"
+                        or domain == "https://"
+                    ):
+                        text = "Invalid description line link:{} domain:{} description:{}".format(
+                            link, domain, link_data["description"]
+                        )
                         LinkDataHyperController.store_error_info(domain, text)
                     else:
                         domains.add(domain)
-                    
+
                 for domain in domains:
-                    if domain != None and domain != "" and domain != "http://" and domain != "https://":
-                         Domains.add(domain)
+                    if (
+                        domain != None
+                        and domain != ""
+                        and domain != "http://"
+                        and domain != "https://"
+                    ):
+                        Domains.add(domain)
 
             if config.auto_store_keyword_info:
                 if "title" in link_data:
@@ -798,11 +826,7 @@ class LinkDataHyperController(object):
         for line in lines:
             line_text += line
 
-        PersistentInfo.error(
-            "Domain{};{};Lines:{}".format(
-                url, info, line_text
-            )
-        )
+        PersistentInfo.error("Domain{};{};Lines:{}".format(url, info, line_text))
 
     def get_link_object(link, date=None):
         from ..dateutils import DateUtils
@@ -941,6 +965,7 @@ class DomainsController(Domains):
     """
     TODO copy methods from model
     """
+
     class Meta:
         proxy = True
 
@@ -1147,4 +1172,3 @@ class BackgroundJobController(BackgroundJob):
         return BackgroundJobController.create_single_job(
             BackgroundJob.JOB_IMPORT_INSTANCE, link
         )
-

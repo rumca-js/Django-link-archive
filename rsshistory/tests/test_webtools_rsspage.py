@@ -45,7 +45,6 @@ webpage_rss = """
 
 
 class RssPageTest(TestCase):
-
     def test_rss_title(self):
         # default language
         reader = RssPage("http://test.com/my-site-test", webpage_rss)
@@ -68,7 +67,10 @@ class RssPageTest(TestCase):
         # default language
         reader = RssPage("http://test.com/my-site-test", webpage_rss)
         reader.parse()
-        self.assertEqual(reader.get_thumbnail(), "https://thumbnails.lbry.com/UCd6vEDS3SOhWbXZrxbrf_bw")
+        self.assertEqual(
+            reader.get_thumbnail(),
+            "https://thumbnails.lbry.com/UCd6vEDS3SOhWbXZrxbrf_bw",
+        )
 
     def test_rss_author(self):
         # default language

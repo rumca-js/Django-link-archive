@@ -4,7 +4,6 @@ import django.utils
 
 
 class DateUtils(object):
-
     def get_iso_today():
         return date.today().isoformat()
 

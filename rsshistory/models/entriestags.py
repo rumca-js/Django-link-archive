@@ -76,7 +76,9 @@ class LinkTagsDataModel(models.Model):
             )
 
     def set_tag(entry, tag_name, author=""):
-        objs = LinkTagsDataModel.objects.filter(link=entry.link, author=author, tag=tag_name)
+        objs = LinkTagsDataModel.objects.filter(
+            link=entry.link, author=author, tag=tag_name
+        )
 
         if objs.count() == 0:
             LinkTagsDataModel.objects.create(

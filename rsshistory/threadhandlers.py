@@ -578,7 +578,6 @@ class CleanupJobHandler(BaseJobHandler):
 
 
 class CheckDomainsJobHandler(BaseJobHandler):
-
     def get_job(self):
         return BackgroundJob.JOB_CHECK_DOMAINS
 
@@ -615,7 +614,7 @@ class RefreshThreadHandler(object):
     def check_sources(self):
         from .controllers import SourceDataController
 
-        sources = SourceDataController.objects.filter(on_hold = False)
+        sources = SourceDataController.objects.filter(on_hold=False)
         for source in sources:
             if source.is_fetch_possible():
                 BackgroundJobController.download_rss(source)
@@ -632,9 +631,9 @@ class RefreshThreadHandler(object):
 
         c = Configuration.get_object()
         conf = c.config_entry
-        
+
         if conf.source_save:
-            sources = SourceDataController.objects.filter(on_hold = False)
+            sources = SourceDataController.objects.filter(on_hold=False)
             for source in sources:
                 BackgroundJobController.link_save(source.url)
 

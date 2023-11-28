@@ -14,7 +14,9 @@ class EntryOdyseePlugin(OdyseeVideoHandler, EntryGenericPlugin):
     def get_frame(self):
         return """
         <iframe style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%;" width="100%" height="100%" src="{}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen">
-        """.format(self.get_link_embed())
+        """.format(
+            self.get_link_embed()
+        )
 
     def get_parameters(self):
         old_params = super().get_parameters()

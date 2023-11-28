@@ -100,7 +100,7 @@ class BasePage(object):
 
         if not self.user_agent or self.user_agent == "":
             return None
-        
+
         if self.url == "http://" or self.url == "https://" or self.url == None:
             lines = traceback.format_stack()
             line_text = ""
@@ -108,9 +108,7 @@ class BasePage(object):
                 line_text += line
 
             PersistentInfo.error(
-                "Page: Url is invalid{};Lines:{}".format(
-                    self.url, line_text
-                )
+                "Page: Url is invalid{};Lines:{}".format(self.url, line_text)
             )
 
             return None
@@ -304,7 +302,6 @@ class RssPage(BasePage):
             )
 
     def parse_and_process(self):
-
         result = []
         try:
             if self.feed is None:
@@ -908,8 +905,8 @@ class HtmlPage(BasePage):
 
         title = self.get_title()
         is_title_invalid = title and (
-                title.find("Forbidden") >= 0 or title.find("Access denied") >= 0
-                )
+            title.find("Forbidden") >= 0 or title.find("Access denied") >= 0
+        )
 
         if self.is_status_ok() == False or is_title_invalid:
             return False

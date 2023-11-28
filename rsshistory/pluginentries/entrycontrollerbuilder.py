@@ -14,6 +14,7 @@ class EntryControllerBuilder(object):
 
         if entry.link.find("odysee") >= 0:
             from .entryodyseeplugin import EntryOdyseePlugin
+
             return EntryOdyseePlugin(entry)
 
         from .entrygenericplugin import EntryGenericPlugin

@@ -29,7 +29,7 @@ class BaseLinkDataModel(models.Model):
     # this entry cannot be removed. Serves a purpose. Domain page, source page
     permanent = models.BooleanField(default=False)
     bookmarked = models.BooleanField(default=False)
-    dead = models.BooleanField(default = False)
+    dead = models.BooleanField(default=False)
 
     # user who added entry
     user = models.CharField(max_length=1000, null=True, blank=True)

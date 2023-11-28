@@ -93,10 +93,10 @@ class KeyWords(models.Model):
     def add_text(text, language):
         if not language:
             return
-            
+
         if language == "":
             language = "en"
-        
+
         if language.find("en") == -1:
             return
 

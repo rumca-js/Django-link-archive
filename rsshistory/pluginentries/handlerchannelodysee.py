@@ -1,6 +1,5 @@
-
 class OdyseeSourceHandler(object):
-    def __init__(self, url = None):
+    def __init__(self, url=None):
         if url:
             self.code = self.input2code(url)
 

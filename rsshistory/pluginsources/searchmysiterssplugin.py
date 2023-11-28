@@ -10,6 +10,7 @@ class SearchMySiteRSSPlugin(BaseRssPlugin):
     """
     Created for https://searmysite.net/
     """
+
     PLUGIN_NAME = "SearchMySiteRSSPlugin"
 
     def __init__(self, source_id):

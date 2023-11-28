@@ -53,9 +53,9 @@ class DataExport(models.Model):
     )
     # fmt: on
 
-    EXPORT_DAILY_DATA = "export-dtype-daily-data"       # for each day a file is expected
-    EXPORT_YEAR_DATA = "export-dtype-year-data"         # for each year a file is expected
-    EXPORT_NOTIME_DATA = "export-dtype-notime-data"     # not a time related export. Will use other means for file, directory names
+    EXPORT_DAILY_DATA = "export-dtype-daily-data"  # for each day a file is expected
+    EXPORT_YEAR_DATA = "export-dtype-year-data"  # for each year a file is expected
+    EXPORT_NOTIME_DATA = "export-dtype-notime-data"  # not a time related export. Will use other means for file, directory names
 
     # fmt: off
     EXPORT_DATA_CHOICES = (

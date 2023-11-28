@@ -17,7 +17,6 @@ class SourceControllerBuilder(object):
         BaseParsePlugin,
         SourceGenerousParserPlugin,
         DomainParserPlugin,
-
         # domain specific
         SourceParseDigitsPlugin,
         NowNowNowParserPlugin,

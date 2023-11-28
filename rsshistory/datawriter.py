@@ -75,7 +75,7 @@ class BaseDataWriter(object):
 class DailyDataWriter(BaseDataWriter):
     def __init__(self, data_writer_config):
         super().__init__(data_writer_config)
-        
+
     def get_daily_path(self):
         day_iso = self.date_iso
         daily_path = self.get_directory() / self.config.get_daily_data_day_path(day_iso)

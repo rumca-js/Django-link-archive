@@ -207,7 +207,6 @@ class BackgroundJobControllerTest(TestCase):
 
 
 class RefreshThreadHandlerTest(TestCase):
-
     def setUp(self):
         SourceDataController.objects.create(
             url="https://youtube.com",

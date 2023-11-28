@@ -9,6 +9,7 @@ class NowNowNowParserPlugin(DomainParserPlugin):
     """
     Created for https://nownownow.com/
     """
+
     PLUGIN_NAME = "NowNowNowParserPlugin"
 
     def __init__(self, source_id):
@@ -16,6 +17,7 @@ class NowNowNowParserPlugin(DomainParserPlugin):
 
     def on_added_entry(self, entry):
         from ..configuration import Configuration
+
         c = Configuration.get_object()
 
         LinkTagsDataModel.set_tag(entry, "personal", c.get_context()["admin_user"])

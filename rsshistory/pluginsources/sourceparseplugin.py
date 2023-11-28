@@ -14,7 +14,7 @@ class BaseParsePlugin(SourceGenericPlugin):
     def __init__(self, source_id):
         super().__init__(source_id)
 
-    #def get_address(self):
+    # def get_address(self):
     #    return self.get_source().get_domain()
 
     def is_link_valid(self, address):

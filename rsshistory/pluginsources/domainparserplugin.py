@@ -12,6 +12,7 @@ class DomainParserPlugin(BaseParsePlugin):
     """
     Created for https://nownownow.com/
     """
+
     PLUGIN_NAME = "DomainParserPlugin"
 
     def __init__(self, source_id):

@@ -10,7 +10,6 @@ from ..pluginsources.sourceparseditigsplugin import SourceParseDigitsPlugin
 from ..pluginsources.domainparserplugin import DomainParserPlugin
 
 
-
 class RequestsObject(object):
     def __init__(self, url, headers, timeout):
         self.status_code = 200
@@ -18,6 +17,7 @@ class RequestsObject(object):
         self.encoding = "utf-8"
         self.text = "text"
         self.content = "text"
+
 
 webpage_youtube_contents = """
 <html>
@@ -120,7 +120,6 @@ class SourceGenerousParsePluginTest(TestCase):
         self.assertFalse(parse.is_link_valid("https://youtube.com/location/inside.css"))
 
 
-
 class DomainParsePluginTest(TestCase):
     def setUp(self):
         self.source_youtube = SourceDataController.objects.create(
@@ -154,13 +153,13 @@ class DomainParsePluginTest(TestCase):
         parser = DomainParserPlugin(self.source_youtube.id)
 
         parser.contents = webpage_contents
-        #domains = parser.get_domains()
+        # domains = parser.get_domains()
 
         props = parser.get_link_props()
         print(props)
-        
-        self.assertTrue( self.is_domain(props, "https://test1.com"))
-        self.assertTrue( self.is_domain(props, "https://test2.com"))
+
+        self.assertTrue(self.is_domain(props, "https://test1.com"))
+        self.assertTrue(self.is_domain(props, "https://test2.com"))
 
 
 class BaseParsePluginTest(TestCase):
@@ -195,10 +194,10 @@ class BaseParsePluginTest(TestCase):
         parser = BaseParsePlugin(self.source_youtube.id)
 
         parser.contents = webpage_youtube_contents
-        #domains = parser.get_domains()
+        # domains = parser.get_domains()
 
         props = parser.get_link_props()
         print(props)
-        
-        self.assertTrue( self.is_domain(props, "https://youtube.com/1"))
-        self.assertTrue( self.is_domain(props, "https://youtube.com/2"))
+
+        self.assertTrue(self.is_domain(props, "https://youtube.com/1"))
+        self.assertTrue(self.is_domain(props, "https://youtube.com/2"))

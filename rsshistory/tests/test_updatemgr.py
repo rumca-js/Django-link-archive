@@ -115,44 +115,44 @@ class UpdateManagerTest(TestCase):
         )
 
     def test_push_daily_repo(self):
-       RepoTestFactory.used_repos = []
+        RepoTestFactory.used_repos = []
 
-       conf = Configuration.get_object()
-       mgr = UpdateManager(conf, RepoTestFactory)
+        conf = Configuration.get_object()
+        mgr = UpdateManager(conf, RepoTestFactory)
 
-       #write_date = DateUtils.get_date_yesterday()
+        # write_date = DateUtils.get_date_yesterday()
 
-       export_config = DataExport.objects.filter(
-           export_data=DataExport.EXPORT_DAILY_DATA
-       )[0]
+        export_config = DataExport.objects.filter(
+            export_data=DataExport.EXPORT_DAILY_DATA
+        )[0]
 
-       mgr.write_and_push_daily_data()
+        mgr.write_and_push_daily_data()
 
-       self.assertEqual(len(RepoTestFactory.used_repos), 1)
+        self.assertEqual(len(RepoTestFactory.used_repos), 1)
 
     def test_year_repo(self):
-       RepoTestFactory.used_repos = []
+        RepoTestFactory.used_repos = []
 
-       conf = Configuration.get_object()
-       mgr = UpdateManager(conf, RepoTestFactory)
+        conf = Configuration.get_object()
+        mgr = UpdateManager(conf, RepoTestFactory)
 
-       export_config = DataExport.objects.filter(
-           export_data=DataExport.EXPORT_YEAR_DATA
-       )[0]
+        export_config = DataExport.objects.filter(
+            export_data=DataExport.EXPORT_YEAR_DATA
+        )[0]
 
-       mgr.write_and_push_year_data()
-       self.assertEqual(len(RepoTestFactory.used_repos), 1)
+        mgr.write_and_push_year_data()
+        self.assertEqual(len(RepoTestFactory.used_repos), 1)
 
     def test_notime_repo(self):
-       RepoTestFactory.used_repos = []
+        RepoTestFactory.used_repos = []
 
-       conf = Configuration.get_object()
-       mgr = UpdateManager(conf, RepoTestFactory)
+        conf = Configuration.get_object()
+        mgr = UpdateManager(conf, RepoTestFactory)
 
-       export_config = DataExport.objects.filter(
-           export_data=DataExport.EXPORT_NOTIME_DATA
-       )[0]
+        export_config = DataExport.objects.filter(
+            export_data=DataExport.EXPORT_NOTIME_DATA
+        )[0]
 
-       mgr.write_and_push_notime_data()
+        mgr.write_and_push_notime_data()
 
-       self.assertEqual(len(RepoTestFactory.used_repos), 1)
+        self.assertEqual(len(RepoTestFactory.used_repos), 1)

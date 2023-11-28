@@ -105,7 +105,7 @@ class KeyWordsTest(TestCase):
         datetime = KeyWords.get_keywords_date_limit() - timedelta(days=1)
 
         item = KeyWords.objects.create(keyword="test")
-        item.date_published=datetime
+        item.date_published = datetime
         item.save()
 
         keys = KeyWords.objects.all()

@@ -69,7 +69,10 @@ class Domains(models.Model):
             or domain_text == "http://"
         ):
             from .admin import PersistentInfo
-            PersistentInfo.create("Not a domain text:{}, url:{}".format(domain_text, url))
+
+            PersistentInfo.create(
+                "Not a domain text:{}, url:{}".format(domain_text, url)
+            )
             return
 
         return Domains.create_or_update_domain(domain_text)
@@ -112,7 +115,10 @@ class Domains(models.Model):
             entry = Domains.add_domain_entry(props)
             if entry is None:
                 from .admin import PersistentInfo
-                PersistentInfo.error("Entry is None, cannot add domain {}".format(domain_only_text))
+
+                PersistentInfo.error(
+                    "Entry is None, cannot add domain {}".format(domain_only_text)
+                )
                 return
 
             extract = tldextract.TLDExtract()
@@ -120,7 +126,7 @@ class Domains(models.Model):
 
             tld = os.path.splitext(domain_only_text)[1][1:]
 
-            old_entries = Domains.objects.filter(link_obj = entry)
+            old_entries = Domains.objects.filter(link_obj=entry)
             if old_entries.count() > 0:
                 ob = old_entries[0]
                 ob.domain = domain_only_text
@@ -137,7 +143,7 @@ class Domains(models.Model):
                     subdomain=domain_data.subdomain,
                     suffix=domain_data.suffix,
                     tld=tld,
-                    link_obj=entry
+                    link_obj=entry,
                 )
 
                 ob.update_complementary_data(True)
@@ -154,7 +160,11 @@ class Domains(models.Model):
             for line in lines:
                 line_text += line
 
-            PersistentInfo.create("Cannot obtain properties, expecting only domain:{}\n{}".format(domain_only, line_text))
+            PersistentInfo.create(
+                "Cannot obtain properties, expecting only domain:{}\n{}".format(
+                    domain_only, line_text
+                )
+            )
             return
 
         link = "https://" + domain_only
@@ -260,6 +270,7 @@ class Domains(models.Model):
             SourceDataModel.objects.create(**props)
         except Exception as E:
             from .admin import PersistentInfo
+
             PersistentInfo.error("Exception {}".format(str(E)))
 
     def update_complementary_data(self, force=False):
