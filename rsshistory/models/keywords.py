@@ -76,16 +76,19 @@ class KeyWords(models.Model):
         return False
 
     def load_token_program(language):
-        import spacy
+        try:
+            import spacy
 
-        if language.find("en") >= 0:
-            load_text = "en_core_web_sm"
-        elif language.find("pl") >= 0:
-            load_text = "pl_core_news_sm"
-        else:
+            if language.find("en") >= 0:
+                load_text = "en_core_web_sm"
+            elif language.find("pl") >= 0:
+                load_text = "pl_core_news_sm"
+            else:
+                return
+
+            return spacy.load(load_text)
+        except Exception as E:
             return
-
-        return spacy.load(load_text)
 
     def add_text(text, language):
         if not language:
@@ -98,6 +101,9 @@ class KeyWords(models.Model):
             return
 
         nlp = KeyWords.load_token_program(language)
+        if not nlp:
+            return
+
         doc = nlp(text)
 
         # insert one occurance for the text

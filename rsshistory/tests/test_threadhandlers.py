@@ -17,6 +17,15 @@ from ..models import (
 from ..threadhandlers import HandlerManager, RefreshThreadHandler
 
 
+class RequestsObject(object):
+    def __init__(self, url, headers, timeout):
+        self.status_code = 200
+        self.apparent_encoding = "utf-8"
+        self.encoding = "utf-8"
+        self.text = "text"
+        self.content = "text"
+
+
 class BackgroundJobControllerTest(TestCase):
     def setUp(self):
         ob = SourceDataController.objects.create(
@@ -198,14 +207,6 @@ class BackgroundJobControllerTest(TestCase):
 
 
 class RefreshThreadHandlerTest(TestCase):
-    def disable_web_pages(self):
-        from ..webtools import BasePage, Page
-
-        BasePage.user_agent = None
-        Page.user_agent = None
-        entry = ConfigurationEntry.get()
-        entry.user_agent = ""
-        entry.save()
 
     def setUp(self):
         SourceDataController.objects.create(
@@ -221,6 +222,16 @@ class RefreshThreadHandlerTest(TestCase):
 
         self.disable_web_pages()
         entry = ConfigurationEntry.get()
+
+    def get_contents_function(self, url, headers, timeout):
+        print("Mocked Requesting page: {}".format(url))
+        return RequestsObject(url, headers, timeout)
+
+    def disable_web_pages(self):
+        from ..webtools import BasePage, HtmlPage
+
+        BasePage.get_contents_function = self.get_contents_function
+        HtmlPage.get_contents_function = self.get_contents_function
 
     def create_exports(self):
         DataExport.objects.create(
@@ -290,7 +301,21 @@ class RefreshThreadHandlerTest(TestCase):
 
         self.assertEqual(
             BackgroundJobController.objects.filter(
-                job=BackgroundJobController.JOB_PUSH_TO_REPO
+                job=BackgroundJobController.JOB_PUSH_DAILY_DATA_TO_REPO
+            ).count(),
+            1,
+        )
+
+        self.assertEqual(
+            BackgroundJobController.objects.filter(
+                job=BackgroundJobController.JOB_PUSH_YEAR_DATA_TO_REPO
+            ).count(),
+            1,
+        )
+
+        self.assertEqual(
+            BackgroundJobController.objects.filter(
+                job=BackgroundJobController.JOB_PUSH_NOTIME_DATA_TO_REPO
             ).count(),
             1,
         )

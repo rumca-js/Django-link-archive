@@ -120,14 +120,13 @@ class UpdateManagerTest(TestCase):
        conf = Configuration.get_object()
        mgr = UpdateManager(conf, RepoTestFactory)
 
-       write_date = DateUtils.get_date_yesterday()
+       #write_date = DateUtils.get_date_yesterday()
 
        export_config = DataExport.objects.filter(
            export_data=DataExport.EXPORT_DAILY_DATA
        )[0]
 
-       mgr.push_daily_repo(export_config, write_date)
-       self.assertTrue(True)
+       mgr.write_and_push_daily_data()
 
        self.assertEqual(len(RepoTestFactory.used_repos), 1)
 
@@ -141,9 +140,7 @@ class UpdateManagerTest(TestCase):
            export_data=DataExport.EXPORT_YEAR_DATA
        )[0]
 
-       mgr.push_default_repo(export_config)
-       self.assertTrue(True)
-
+       mgr.write_and_push_year_data()
        self.assertEqual(len(RepoTestFactory.used_repos), 1)
 
     def test_notime_repo(self):
@@ -153,10 +150,9 @@ class UpdateManagerTest(TestCase):
        mgr = UpdateManager(conf, RepoTestFactory)
 
        export_config = DataExport.objects.filter(
-           export_data=DataExport.EXPORT_NOTIME
+           export_data=DataExport.EXPORT_NOTIME_DATA
        )[0]
 
-       mgr.push_default_repo(export_config)
-       self.assertTrue(True)
+       mgr.write_and_push_notime_data()
 
        self.assertEqual(len(RepoTestFactory.used_repos), 1)

@@ -104,7 +104,9 @@ class KeyWordsTest(TestCase):
     def test_clear_old(self):
         datetime = KeyWords.get_keywords_date_limit() - timedelta(days=1)
 
-        KeyWords.objects.create(keyword="test", date_published=datetime)
+        item = KeyWords.objects.create(keyword="test")
+        item.date_published=datetime
+        item.save()
 
         keys = KeyWords.objects.all()
         self.assertEqual(keys.count(), 1)

@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.utils import timezone
 from django.urls import reverse
 
-from ..webtools import Page
+from ..webtools import HtmlPage
 
 
 webpage_no_lang = """<html>
@@ -69,93 +69,83 @@ webpage_links = """<html>
 """
 
 
-class PageTest(TestCase):
-    def test_get_domain(self):
-        # default language
-        p = Page("http://test.com/my-site-test", webpage_lang_not_default)
-        self.assertEqual(p.get_domain(), "http://test.com")
-
-    def test_get_domain_only(self):
-        # default language
-        p = Page("http://test.com/my-site-test", webpage_lang_not_default)
-        self.assertEqual(p.get_domain_only(), "test.com")
-
+class HtmlPageTest(TestCase):
     def test_default_language(self):
         # default language
-        p = Page("http://test.com/my-site-test", webpage_no_lang)
+        p = HtmlPage("http://test.com/my-site-test", webpage_no_lang)
         self.assertEqual(p.get_language(), "")
 
     def test_language_it(self):
         # default language
-        p = Page("http://test.com/my-site-test", webpage_lang_not_default)
+        p = HtmlPage("http://test.com/my-site-test", webpage_lang_not_default)
         self.assertEqual(p.get_language(), "it")
 
     def test_no_title(self):
         # default language
-        p = Page("http://test.com/my-site-test", webpage_no_title)
+        p = HtmlPage("http://test.com/my-site-test", webpage_no_title)
 
         # when page has no title, URL is chosen for the title
         self.assertEqual(p.get_title(), "http://test.com/my-site-test")
 
     def test_title_lowercase(self):
         # default language
-        p = Page("http://test.com/my-site-test", webpage_title_lower)
+        p = HtmlPage("http://test.com/my-site-test", webpage_title_lower)
         self.assertEqual(p.get_title(), "This is a lower case title")
 
     def test_title_uppercase(self):
         # default language
-        p = Page("http://test.com/my-site-test", webpage_title_upper)
+        p = HtmlPage("http://test.com/my-site-test", webpage_title_upper)
         self.assertEqual(p.get_title(), "This is a upper case title")
 
     def test_title_meta_og(self):
         # default language
-        p = Page("http://test.com/my-site-test", webpage_title_meta_og)
+        p = HtmlPage("http://test.com/my-site-test", webpage_title_meta_og)
         self.assertEqual(p.get_title(), "selected og:title")
 
     def test_description_meta_og(self):
         # default language
-        p = Page("http://test.com/my-site-test", webpage_description_meta_og)
+        p = HtmlPage("http://test.com/my-site-test", webpage_description_meta_og)
         self.assertEqual(p.get_description(), "selected og:description")
 
     def test_is_youtube(self):
         # default language
-        p = Page("http://youtube.com/?v=1234", webpage_title_upper)
+        p = HtmlPage("http://youtube.com/?v=1234", webpage_title_upper)
         self.assertTrue(p.is_youtube())
 
-        p = Page("http://youtu.be/djjdj", webpage_title_upper)
+        p = HtmlPage("http://youtu.be/djjdj", webpage_title_upper)
         self.assertTrue(p.is_youtube())
 
-        p = Page("http://www.m.youtube/?v=1235", webpage_title_upper)
+        p = HtmlPage("http://www.m.youtube/?v=1235", webpage_title_upper)
         self.assertTrue(p.is_youtube())
 
-        p = Page("http://twitter.com/test", webpage_title_upper)
+        p = HtmlPage("http://twitter.com/test", webpage_title_upper)
         self.assertFalse(p.is_youtube())
 
     def test_is_mainstream(self):
         # default language
-        p = Page("http://youtube.com/?v=1234", webpage_title_upper)
+        p = HtmlPage("http://youtube.com/?v=1234", webpage_title_upper)
         self.assertTrue(p.is_mainstream())
 
-        p = Page("http://youtu.be/djjdj", webpage_title_upper)
+        p = HtmlPage("http://youtu.be/djjdj", webpage_title_upper)
         self.assertTrue(p.is_mainstream())
 
-        p = Page("http://www.m.youtube/?v=1235", webpage_title_upper)
+        p = HtmlPage("http://www.m.youtube/?v=1235", webpage_title_upper)
         self.assertTrue(p.is_mainstream())
 
-        p = Page("http://twitter.com/test", webpage_title_upper)
+        p = HtmlPage("http://twitter.com/test", webpage_title_upper)
         self.assertTrue(p.is_mainstream())
 
-        p = Page("http://www.facebook.com/test", webpage_title_upper)
+        p = HtmlPage("http://www.facebook.com/test", webpage_title_upper)
         self.assertTrue(p.is_mainstream())
 
-        p = Page("http://www.rumble.com/test", webpage_title_upper)
+        p = HtmlPage("http://www.rumble.com/test", webpage_title_upper)
         self.assertTrue(p.is_mainstream())
 
-        p = Page("http://wikipedia.org/test", webpage_title_upper)
+        p = HtmlPage("http://wikipedia.org/test", webpage_title_upper)
         self.assertTrue(p.is_mainstream())
 
     def test_get_links(self):
-        p = Page("http://mytestpage.com/?argument=value", webpage_links)
+        p = HtmlPage("http://mytestpage.com/?argument=value", webpage_links)
 
         links = p.get_links()
 
@@ -171,7 +161,7 @@ class PageTest(TestCase):
         self.assertTrue("https://test6.domain.com/" in links)
 
     def test_get_links_nodomain(self):
-        p = Page("http://mytestpage.com/nodomain/", webpage_links)
+        p = HtmlPage("http://mytestpage.com/nodomain/", webpage_links)
 
         links = p.get_links()
 
@@ -185,33 +175,3 @@ class PageTest(TestCase):
         self.assertTrue("http://mytestpage.com/test/test4.js" not in links)
         self.assertTrue("http://mytestpage.com/test/test5/" in links)
         self.assertTrue("https://test6.domain.com/" in links)
-
-    def test_get_page_ext_html(self):
-        p = Page("http://mytestpage.com/page.html", webpage_links)
-        ext = p.get_page_ext()
-
-        self.assertTrue(ext == "html")
-
-    def test_get_page_ext_htm(self):
-        p = Page("http://mytestpage.com/page.htm", webpage_links)
-        ext = p.get_page_ext()
-
-        self.assertTrue(ext == "htm")
-
-    def test_get_page_ext_js(self):
-        p = Page("http://mytestpage.com/page.js", webpage_links)
-        ext = p.get_page_ext()
-
-        self.assertTrue(ext == "js")
-
-    def test_get_page_ext_no_ext(self):
-        p = Page("http://mytestpage.com", webpage_links)
-        ext = p.get_page_ext()
-
-        self.assertTrue(ext == "")
-
-    def test_get_page_ext_html_args(self):
-        p = Page("http://mytestpage.com/page.html?args=some", webpage_links)
-        ext = p.get_page_ext()
-
-        self.assertTrue(ext == "html")

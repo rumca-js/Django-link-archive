@@ -26,10 +26,10 @@ class DomainTest(TestCase):
         return RequestsObject(url, headers, timeout)
 
     def disable_web_pages(self):
-        from ..webtools import BasePage, Page
+        from ..webtools import BasePage, HtmlPage
 
         BasePage.get_contents_function = self.get_contents_function
-        Page.get_contents_function = self.get_contents_function
+        HtmlPage.get_contents_function = self.get_contents_function
 
     def test_domain_add(self):
         Domains.add("waiterrant.blogspot.com")

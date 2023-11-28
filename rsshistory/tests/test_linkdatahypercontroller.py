@@ -42,10 +42,10 @@ class SourceParsePluginTest(TestCase):
         return RequestsObject(url, headers, timeout)
 
     def disable_web_pages(self):
-        from ..webtools import BasePage, Page
+        from ..webtools import BasePage, HtmlPage
 
         BasePage.get_contents_function = self.get_contents_function
-        Page.get_contents_function = self.get_contents_function
+        HtmlPage.get_contents_function = self.get_contents_function
 
     def test_add_new_link_no_slash(self):
         link_name = "https://youtube.com/v=1234"
@@ -147,6 +147,6 @@ class SourceParsePluginTest(TestCase):
 
         objs = LinkDataModel.objects.filter(link=link_name)
 
-        self.assertEqual(objs.count(), 0)
-
+        # for each domain an entry is created
+        self.assertEqual(objs.count(), 1)
         self.assertEqual(Domains.objects.all().count(), 1)
