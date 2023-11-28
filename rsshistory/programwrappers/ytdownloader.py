@@ -64,9 +64,9 @@ class YouTubeDownloader(object):
     def get_thumbs_data(self):
         code = self.process_link(self._url)
         url = "https://returnyoutubedislikeapi.com/votes?videoId=" + code
-        from ..webtools import Page
+        from ..webtools import BasePage
 
-        data = Page(url).get_contents()
+        data = BasePage(url).get_contents()
         return data
 
     def _get_json_data(self):

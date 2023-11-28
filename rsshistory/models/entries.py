@@ -182,9 +182,9 @@ class BaseLinkDataController(BaseLinkDataModel):
             self.language = self.get_source_obj().language
             self.save()
         else:
-            from ..webtools import Page
+            from ..webtools import HtmlPage
 
-            page = Page(self.link)
+            page = HtmlPage(self.link)
             if page.is_valid():
                 language = page.get_language()
                 if language != None:
@@ -195,16 +195,16 @@ class BaseLinkDataController(BaseLinkDataModel):
         if self.get_source_obj():
             return self.get_source_obj().get_favicon()
 
-        from ..webtools import Page
+        from ..webtools import BasePage
 
-        page = Page(self.link)
+        page = BasePage(self.link)
         domain = page.get_domain()
         return domain + "/favicon.ico"
 
     def get_domain_only(self):
-        from ..webtools import Page
+        from ..webtools import BasePage
 
-        page = Page(self.link)
+        page = BasePage(self.link)
         return page.get_domain_only()
 
     def get_thumbnail(self):

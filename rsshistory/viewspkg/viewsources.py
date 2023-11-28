@@ -85,7 +85,7 @@ class RssSourceDetailView(generic.DetailView):
 
         context["page_title"] = self.object.title
         try:
-            context["handler"] = SourceControllerBuilder.get(self.object)
+            context["handler"] = SourceControllerBuilder.get(self.object.url)
         except:
             pass
 
@@ -201,9 +201,9 @@ def edit_source(request, pk):
         return p.render("summary_present.html")
     else:
         if not ob.favicon:
-            from ..webtools import Page
+            from ..webtools import BasePage
 
-            page = Page(ob.url)
+            page = BasePage(ob.url)
 
             form = SourceForm(
                 instance=ob, initial={"favicon": page.get_domain() + "/favicon.ico"}
@@ -235,7 +235,8 @@ def refresh_source(request, pk):
 
     source = sources[0]
 
-    if source.dynamic_data is not None:
+    dynamic_data = source.get_op_data() 
+    if dynamic_data is not None:
         op = source.dynamic_data
         op.date_fetched = None
         op.save()
@@ -417,8 +418,6 @@ def import_youtube_links_for_source(request, pk):
 
 
 def source_fix_entries(request, source_pk):
-    from ..pluginentries.youtubelinkhandler import YouTubeLinkHandler
-
     p = ViewPage(request)
     p.set_title("Fix source entries")
     data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)

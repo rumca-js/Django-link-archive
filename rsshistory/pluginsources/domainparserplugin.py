@@ -2,7 +2,7 @@ import os
 import re
 import traceback
 
-from ..webtools import Page
+from ..webtools import HtmlPage
 from ..models import PersistentInfo
 from ..controllers import LinkDataController
 from .sourceparseplugin import BaseParsePlugin
@@ -25,7 +25,7 @@ class DomainParserPlugin(BaseParsePlugin):
             num_entries = len(domains_vec)
 
             for link_str in domains_vec:
-                p = Page(link_str)
+                p = HtmlPage(link_str)
                 if p.is_valid() == False:
                     continue
 

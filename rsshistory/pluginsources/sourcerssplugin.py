@@ -15,9 +15,9 @@ class BaseRssPlugin(SourceGenericPlugin):
 
     def get_link_props(self):
         try:
-            from ..webtools import RssPropertyReader
+            from ..webtools import RssPage
 
-            reader = RssPropertyReader(self.get_address(), self.get_contents())
+            reader = RssPage(self.get_address(), self.get_contents())
             all_props = reader.parse_and_process()
 
             if len(all_props) == 0:
@@ -76,14 +76,14 @@ class BaseRssPlugin(SourceGenericPlugin):
                     )
                     return False
 
-                from ..webtools import Page
+                from ..webtools import HtmlPage
 
-                p = Page(props["link"])
+                p = HtmlPage(props["link"])
                 if p.is_youtube():
                     print("Link - it is youtube {}".format(props["link"]))
-                    from ..pluginentries.youtubelinkhandler import YouTubeLinkHandler
+                    from ..pluginentries.handlervideoyoutube import YouTubeVideoHandler
 
-                    handler = YouTubeLinkHandler(props["link"])
+                    handler = YouTubeVideoHandler(props["link"])
                     handler.download_details()
                     print(
                         "Link - it is youtube {}, valid:{}".format(

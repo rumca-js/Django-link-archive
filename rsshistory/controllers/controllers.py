@@ -24,7 +24,7 @@ from ..models import (
 )
 
 from ..configuration import Configuration
-from ..webtools import Page, RssPropertyReader, ContentLinkParser
+from ..webtools import BasePage, HtmlPage, RssPage, ContentLinkParser
 from ..apps import LinkDatabase
 
 
@@ -171,16 +171,16 @@ class SourceDataController(SourceDataModel):
         if self.favicon:
             return self.favicon
 
-        page = Page(self.url)
+        page = BasePage(self.url)
         domain = page.get_domain()
         return domain + "/favicon.ico"
 
     def get_domain(self):
-        page = Page(self.url)
+        page = BasePage(self.url)
         return page.get_domain()
 
     def get_domain_only(self):
-        page = Page(self.url)
+        page = BasePage(self.url)
         return page.get_domain_only()
 
     def get_export_names():
@@ -231,22 +231,23 @@ class SourceDataController(SourceDataModel):
         return self.get_map()
 
     def get_full_information(data):
-        p = Page(data["url"])
+        p = BasePage(data["url"])
         # TODO if passed url is youtube video, obtain information, obtain channel feed url
 
         if p.is_rss():
             print("Page is rss")
             return SourceDataController.get_info_from_rss(data["url"])
         elif p.is_youtube():
-            from ..pluginentries.youtubelinkhandler import YouTubeLinkHandler
+            from ..pluginentries.handlervideoyoutube import YouTubeVideoHandler
 
             print("Page is youtube")
-            handler = YouTubeLinkHandler(data["url"])
+            handler = YouTubeVideoHandler(data["url"])
             handler.download_details()
             return SourceDataController.get_info_from_rss(
                 handler.get_channel_feed_url()
             )
         elif p.get_rss_url():
+            p = HtmlPage(data["url"])
             print("Page has RSS url")
             return SourceDataController.get_info_from_rss(p.get_rss_url())
         else:
@@ -254,23 +255,24 @@ class SourceDataController(SourceDataModel):
             return SourceDataController.get_info_from_page(data["url"], p)
 
     def get_info_from_rss(url):
-        reader = RssPropertyReader(url)
+        reader = RssPage(url)
         feed = reader.parse()
 
         data = {}
         data["url"] = url
         data["source_type"] = SourceDataModel.SOURCE_TYPE_RSS
-        if "title" in feed.feed:
-            data["title"] = feed.feed.title
-        if "subtitle" in feed.feed:
-            data["description"] = feed.feed.subtitle
-        if "language" in feed.feed:
-            data["language"] = feed.feed.language
-        if "image" in feed.feed:
-            if "href" in feed.feed.image:
-                data["favicon"] = feed.feed.image["href"]
-            else:
-                data["favicon"] = feed.feed.image
+        title = reader.get_title()
+        if title:
+            data["title"] = title
+        subtitle = reader.get_subtitle()
+        if subtitle:
+            data["description"] = subtitle
+        language = reader.get_language()
+        if language:
+            data["language"] = language
+        thumb = reader.get_thumbnail()
+        if thumb:
+            data["favicon"] = thumb
         return data
 
     def get_info_from_page(url, p):
@@ -286,9 +288,14 @@ class SourceDataController(SourceDataModel):
         return data
 
     def get_channel_page_url(self):
-        from ..pluginsources.youtubesourcehandler import YouTubeSourceHandler
+        from ..pluginentries.handlerchannel import ChannelHandler
+        handler = ChannelHandler.get(self.url)
 
-        return YouTubeSourceHandler.input2url(self.url)
+        return handler.get_channel_url()
+
+    def is_channel_page_url(self):
+        from ..pluginentries.handlerchannel import ChannelHandler
+        return ChannelHandler.get_supported(self.url)
 
     def fix_entries(self):
         entries = LinkDataModel.objects.filter(source=self.url)
@@ -300,7 +307,7 @@ class SourceDataController(SourceDataModel):
 class EntryPageDataReader(object):
     def __init__(self, data):
         self.data = data
-        self.p = Page(self.data["link"])
+        self.p = HtmlPage(self.data["link"])
 
     def get_full_information(self):
         p = self.p
@@ -329,9 +336,9 @@ class EntryPageDataReader(object):
 
     def update_info_youtube(self):
         # TODO there should be some generic handlers
-        from ..pluginentries.youtubelinkhandler import YouTubeLinkHandler
+        from ..pluginentries.handlervideoyoutube import YouTubeVideoHandler
 
-        h = YouTubeLinkHandler(self.data["link"])
+        h = YouTubeVideoHandler(self.data["link"])
         h.download_details()
         if h.get_video_code() is None:
             return self.data
@@ -369,7 +376,7 @@ class EntryPageDataReader(object):
         return self.data
 
     def update_info_rss(self):
-        r = RssPropertyReader(self.p.get_contents())
+        r = RssPage(self.p.get_contents())
         # TODO add title and description handling
         return self.data
 
@@ -601,7 +608,7 @@ class LinkDataHyperController(object):
         return obj
 
     def is_domain_link_data(link_data):
-        p = Page(link_data["link"])
+        p = BasePage(link_data["link"])
         return p.get_domain() == link_data["link"]
 
     def get_entry_internal(link_data, is_archive):
@@ -667,11 +674,11 @@ class LinkDataHyperController(object):
         return True
 
     def is_live_video(link_data):
-        p = Page(link_data["link"])
+        p = HtmlPage(link_data["link"])
         if p.is_youtube():
-            from ..pluginentries.youtubelinkhandler import YouTubeLinkHandler
+            from ..pluginentries.handlervideoyoutube import YouTubeVideoHandler
 
-            handler = YouTubeLinkHandler(link_data["link"])
+            handler = YouTubeVideoHandler(link_data["link"])
             if handler.get_video_code():
                 handler.download_details()
                 if not handler.is_valid():
@@ -691,13 +698,13 @@ class LinkDataHyperController(object):
         return False
 
     def create_from_youtube(url, data):
-        from ..pluginentries.youtubelinkhandler import YouTubeLinkHandler
+        from ..pluginentries.handlervideoyoutube import YouTubeVideoHandler
 
         objs = LinkDataController.objects.filter(link=url)
         if objs.count() != 0:
             return False
 
-        h = YouTubeLinkHandler(url)
+        h = YouTubeVideoHandler(url)
         if not h.download_details():
             PersistentInfo.error("Could not obtain details for link:{}".format(url))
             return False
@@ -740,25 +747,34 @@ class LinkDataHyperController(object):
                 
                 if "source" in link_data:
                     print("Adding 0 domain for: {}".format(link_data["source"]))
-                    p = Page(link_data["source"])
-                    domain = p.get_domain_only()
+                    p = BasePage(link_data["source"])
+                    domain = p.get_domain()
+                    if domain == None or domain == "" or domain == "http://" or domain == "https://":
+                        LinkDataHyperController.store_error_info(domain, "Invalid source domain")
                     domains.add(domain)
 
-                p = Page(link_data["link"])
-                domain = p.get_domain_only()
+                p = BasePage(link_data["link"])
+                domain = p.get_domain()
                 print("Adding 1 domain for: {}".format(domain))
                 domains.add(domain)
+                if domain == None or domain == "" or domain == "http://" or domain == "https://":
+                    LinkDataHyperController.store_error_info(domain, "Invalid link domain")
 
                 parser = ContentLinkParser(link_data["link"], link_data["description"])
                 description_links = parser.get_links()
 
                 for link in description_links:
                     print("Adding 2 domain for: {}".format(link))
-                    ppp = Page(link)
-                    domains.add(ppp.get_domain())
+                    ppp = BasePage(link)
+                    domain = ppp.get_domain()
+                    if domain == None or domain == "" or domain == "http://" or domain == "https://":
+                        text = "Invalid description line link:{} domain:{} description:{}".format(link, domain, link_data["description"])
+                        LinkDataHyperController.store_error_info(domain, text)
+                    else:
+                        domains.add(domain)
                     
                 for domain in domains:
-                    if domain != None and domains != "":
+                    if domain != None and domain != "" and domain != "http://" and domain != "https://":
                          Domains.add(domain)
 
             if config.auto_store_keyword_info:
@@ -775,6 +791,18 @@ class LinkDataHyperController(object):
                 )
             )
             print(error_text)
+
+    def store_error_info(url, info):
+        lines = traceback.format_stack()
+        line_text = ""
+        for line in lines:
+            line_text += line
+
+        PersistentInfo.error(
+            "Domain{};{};Lines:{}".format(
+                url, info, line_text
+            )
+        )
 
     def get_link_object(link, date=None):
         from ..dateutils import DateUtils
@@ -910,11 +938,11 @@ class LinkCommentDataController(LinkCommentDataModel):
 
 
 class DomainsController(Domains):
+    """
+    TODO copy methods from model
+    """
     class Meta:
         proxy = True
-
-    def add(url):
-        domain = Domains.add(url)
 
 
 class BackgroundJobController(BackgroundJob):
@@ -1119,3 +1147,4 @@ class BackgroundJobController(BackgroundJob):
         return BackgroundJobController.create_single_job(
             BackgroundJob.JOB_IMPORT_INSTANCE, link
         )
+

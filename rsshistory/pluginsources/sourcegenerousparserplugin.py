@@ -1,7 +1,7 @@
 import os
 import re
 
-from ..webtools import Page
+from ..webtools import BasePage
 from .sourceparseplugin import BaseParsePlugin
 
 
@@ -15,7 +15,7 @@ class SourceGenerousParserPlugin(BaseParsePlugin):
         if not self.is_link_valid_domain(address):
             return False
 
-        p = Page(address)
+        p = BasePage(address)
         ext = p.get_page_ext()
 
         if ext == "html" or ext == "htm" or ext == "":

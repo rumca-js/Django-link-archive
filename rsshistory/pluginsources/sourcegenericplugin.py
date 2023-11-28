@@ -2,13 +2,13 @@ import traceback
 import hashlib
 
 from ..models import PersistentInfo
-from ..webtools import Page
+from ..webtools import HtmlPage
 from ..dateutils import DateUtils
 from ..controllers import LinkDataHyperController, SourceDataController
 from ..apps import LinkDatabase
 
 
-class SourceGenericPlugin(Page):
+class SourceGenericPlugin(HtmlPage):
     def __init__(self, source_id):
         self.source_id = source_id
         super().__init__(self.get_address())
@@ -84,7 +84,7 @@ class SourceGenericPlugin(Page):
         source = self.get_source()
 
         print(
-            "[{}]: Process source:{} type:{} time:{}".format(
+            "[{}] Process source:{} type:{} time:{}".format(
                 LinkDatabase.name,
                 source.title,
                 source.source_type,
@@ -94,7 +94,7 @@ class SourceGenericPlugin(Page):
 
         if not source.is_fetch_possible():
             print(
-                "[{}]: Process source:{}: It is not the right time".format(
+                "[{}] Process source:{}: It is not the right time".format(
                     LinkDatabase.name, source.title
                 )
             )
@@ -121,7 +121,7 @@ class SourceGenericPlugin(Page):
         source.set_operational_info(stop_time, num_entries, total_seconds, hash_value)
 
         print(
-            "[{}]: Process source:{} type:{} DONE".format(
+            "[{}] Process source:{} type:{} DONE".format(
                 LinkDatabase.name, source.title, source.source_type
             )
         )

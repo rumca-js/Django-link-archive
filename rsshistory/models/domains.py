@@ -4,9 +4,10 @@ from datetime import datetime, date
 from django.db import models
 from django.urls import reverse
 import django.utils
+import traceback
 
 from ..apps import LinkDatabase
-from ..webtools import Page, RssPropertyReader
+from ..webtools import BasePage, HtmlPage, RssPage
 from .entries import LinkDataModel
 
 
@@ -67,14 +68,14 @@ class Domains(models.Model):
             or domain_text == "https://"
             or domain_text == "http://"
         ):
-            print("Not domain text")
+            from .admin import PersistentInfo
+            PersistentInfo.create("Not a domain text:{}, url:{}".format(domain_text, url))
+            return
 
         return Domains.create_or_update_domain(domain_text)
 
     def get_domain_url(input_url):
-        from ..webtools import Page
-
-        p = Page(input_url)
+        p = BasePage(input_url)
         domain_text = p.get_domain_only()
         return domain_text
 
@@ -93,9 +94,11 @@ class Domains(models.Model):
         print("Creating, or updating domain {}".format(domain_only_text))
         objs = Domains.objects.filter(domain=domain_only_text)
 
+        obj = None
         if objs.count() == 0:
             props = Domains.get_link_properties(domain_only_text)
-            obj = Domains.create_object(domain_only_text, props)
+            if props:
+                obj = Domains.create_object(domain_only_text, props)
         else:
             obj = objs[0]
 
@@ -107,37 +110,59 @@ class Domains(models.Model):
 
         if props:
             entry = Domains.add_domain_entry(props)
+            if entry is None:
+                from .admin import PersistentInfo
+                PersistentInfo.error("Entry is None, cannot add domain {}".format(domain_only_text))
+                return
 
             extract = tldextract.TLDExtract()
             domain_data = extract(domain_only_text)
 
             tld = os.path.splitext(domain_only_text)[1][1:]
 
-            ob = Domains.objects.create(
-                domain=domain_only_text,
-                main=domain_data.domain,
-                subdomain=domain_data.subdomain,
-                suffix=domain_data.suffix,
-                tld=tld,
-                link_obj=entry
-            )
+            old_entries = Domains.objects.filter(link_obj = entry)
+            if old_entries.count() > 0:
+                ob = old_entries[0]
+                ob.domain = domain_only_text
+                ob.main = domain_data.domain
+                ob.subdomain = domain_data.subdomain
+                ob.suffix = domain_data.suffix
+                ob.tld = tld
+                ob.save()
 
-            ob.update_complementary_data(True)
-            ob.check_and_create_source(props)
+            else:
+                ob = Domains.objects.create(
+                    domain=domain_only_text,
+                    main=domain_data.domain,
+                    subdomain=domain_data.subdomain,
+                    suffix=domain_data.suffix,
+                    tld=tld,
+                    link_obj=entry
+                )
+
+                ob.update_complementary_data(True)
+                ob.check_and_create_source(props)
 
             return ob
 
     def get_link_properties(domain_only):
-        http_position = domain_only.find("http")
-        if http_position == 0:
-            domain_only = domain_only[http_position + 7 :]
+        if domain_only.find("http") >= 0:
+            from .admin import PersistentInfo
+
+            lines = traceback.format_stack()
+            line_text = ""
+            for line in lines:
+                line_text += line
+
+            PersistentInfo.create("Cannot obtain properties, expecting only domain:{}\n{}".format(domain_only, line_text))
+            return
 
         link = "https://" + domain_only
 
-        p = Page(link)
+        p = HtmlPage(link)
         if p.get_contents() is None:
             link = "http://" + domain_only
-            p = Page(link)
+            p = HtmlPage(link)
             if p.get_contents() is None:
                 return
             return p.get_properties_map()
@@ -180,7 +205,6 @@ class Domains(models.Model):
         return entry
 
     def check_and_create_source(self, props):
-        from ..webtools import Page
         from .sources import SourceDataModel
         from ..configuration import Configuration
         from .admin import PersistentInfo
@@ -203,7 +227,7 @@ class Domains(models.Model):
         if not conf.auto_store_sources:
             return
 
-        parser = RssPropertyReader(rss_url)
+        parser = RssPage(rss_url)
         d = parser.parse()
         if d is None:
             PersistentInfo.error("RSS is empty: rss_url:{0}".format(rss_url))
@@ -216,16 +240,16 @@ class Domains(models.Model):
         props = {}
         props["url"] = rss_url
 
-        if "title" in d.feed:
-            props["title"] = d.feed.title
+        title = parser.get_title()
+        if title:
+            props["title"] = title
         props["export_to_cms"] = False
-        if "language" in d.feed:
-            props["language"] = d.feed.language
-        if "image" in d.feed:
-            if "href" in d.feed.image:
-                props["favicon"] = d.feed.image["href"]
-            else:
-                props["favicon"] = d.feed.image
+        language = parser.get_language()
+        if language:
+            props["language"] = language
+        thumnail = parser.get_thumbnail()
+        if thumnail:
+            props["favicon"] = thumnail
         props["on_hold"] = not conf.auto_store_sources_enabled
         props["source_type"] = SourceDataModel.SOURCE_TYPE_RSS
         props["remove_after_days"] = 2
@@ -321,7 +345,6 @@ class Domains(models.Model):
         print("Fixing title {}".format(self.domain))
 
         from ..dateutils import DateUtils
-        from ..webtools import Page
 
         date_before_limit = DateUtils.get_days_before_dt(
             Domains.get_update_days_limit()
@@ -331,7 +354,7 @@ class Domains(models.Model):
 
         changed = False
 
-        p = Page(self.get_domain_full_url())
+        p = HtmlPage(self.get_domain_full_url())
 
         new_title = p.get_title()
         new_description = p.get_description_safe()[:998]
@@ -340,7 +363,7 @@ class Domains(models.Model):
 
         if new_title is None:
             print("{} Trying with http".format(self.domain))
-            p = Page(self.get_domain_full_url("http"))
+            p = HtmlPage(self.get_domain_full_url("http"))
             new_title = p.get_title()
             new_description = p.get_description_safe()[:998]
             new_language = p.get_language()
@@ -434,10 +457,6 @@ class Domains(models.Model):
             "subdomain": self.subdomain,
             "suffix": self.suffix,
             "tld": self.tld,
-            "title": self.title,
-            "description": self.description,
-            "language": self.language,
-            "status_code": self.status_code,
             "category": self.category,
             "subcategory": self.subcategory,
             "dead": self.dead,
@@ -454,10 +473,6 @@ class Domains(models.Model):
             "subdomain",
             "suffix",
             "tld",
-            "title",
-            "description",
-            "language",
-            "status_code",
             "category",
             "subcategory",
             "dead",

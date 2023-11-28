@@ -11,6 +11,7 @@ def subs_checker_task(arg):
     """
     logger.info("Refreshing sources")
 
+    from .apps import LinkDatabase
     try:
         from .threadhandlers import RefreshThreadHandler
 
@@ -18,7 +19,7 @@ def subs_checker_task(arg):
         handler.refresh()
     except Exception as E:
         error_text = traceback.format_exc()
-        print("Exception in checker task: {} {}".format(str(E), error_text))
+        print("[{}] Exception in checker task: {} {}".format(LinkDatabase.name, str(E), error_text))
 
     logger.info("Refreshing sources done")
 
@@ -29,6 +30,7 @@ def process_all_jobs_task(arg):
     """
     logger.info("Processing source")
 
+    from .apps import LinkDatabase
     try:
         from .threadhandlers import HandlerManager
 
@@ -37,6 +39,6 @@ def process_all_jobs_task(arg):
 
     except Exception as E:
         error_text = traceback.format_exc()
-        print("Exception in processing task: {} {}".format(str(E), error_text))
+        print("[{}] Exception in processing task: {} {}".format(LinkDatabase.name, str(E), error_text))
 
     logger.info("Processing done")

@@ -493,9 +493,6 @@ def add_entry(request):
 
             config = Configuration.get_object().config_entry
 
-            if config.auto_store_domain_info:
-                Domains.add(data["link"])
-
             if config.link_save:
                 BackgroundJobController.link_save(data["link"])
 
@@ -557,6 +554,7 @@ def add_simple_entry(request):
                 ob = obs[0]
                 return HttpResponseRedirect(ob.get_absolute_url())
 
+            print("I am here")
             data = LinkDataController.get_full_information({"link": link})
             data["user"] = request.user.username
 

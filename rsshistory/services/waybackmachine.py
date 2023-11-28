@@ -15,9 +15,9 @@ class WaybackMachine(object):
         if self.url != url:
             self.url = url
 
-            from ..webtools import Page
+            from ..webtools import BasePage
 
-            user_agent = Page.user_agent
+            user_agent = BasePage.user_agent
 
             cdx_api = WaybackMachineCDXServerAPI(url, user_agent)
 
@@ -35,9 +35,9 @@ class WaybackMachine(object):
             if self.oldest.date() > time or self.newest.date() < time:
                 return
 
-        from ..webtools import Page
+        from ..webtools import BasePage
 
-        user_agent = Page.user_agent
+        user_agent = BasePage.user_agent
 
         cdx_api = WaybackMachineCDXServerAPI(url, user_agent)
         handle = cdx_api.near(year=time.year, month=time.month, day=time.day, hour=12)
@@ -72,9 +72,9 @@ class WaybackMachine(object):
             time -= timedelta(days=1)
 
     def save_impl(self, url):
-        from ..webtools import Page
+        from ..webtools import BasePage
 
-        user_agent = Page.user_agent
+        user_agent = BasePage.user_agent
 
         save_api = WaybackMachineSaveAPI(url, user_agent)
         print("Save url {0}".format(url))
@@ -96,9 +96,9 @@ class WaybackMachine(object):
             return ret
 
     def is_saved(self, url):
-        from ..webtools import Page
+        from ..webtools import HtmlPage
 
-        p = Page(url)
+        p = HtmlPage(url)
         if p.is_youtube():
             return False
 

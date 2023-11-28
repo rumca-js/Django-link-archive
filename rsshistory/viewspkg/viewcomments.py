@@ -103,7 +103,9 @@ def entry_comment_edit(request, pk):
 
             return p.render("summary_present.html")
     else:
-        form = CommentEntryForm(instance=comment_obj)
+        data = {"link_id" : link.id, "author" : author, "comment" : comment_obj.comment, "date_published" : comment_obj.date_published}
+        form = CommentEntryForm(initial = data)
+
         form.method = "POST"
         form.pk = pk
         form.action_url = reverse(

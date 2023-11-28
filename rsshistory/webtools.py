@@ -18,6 +18,10 @@ from .apps import LinkDatabase
 
 
 class BasePage(object):
+    """
+    Should not contain any HTML/RSS content processing
+    """
+
     # use headers from https://www.supermonitoring.com/blog/check-browser-http-headers/
     user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/116.0"
     get_contents_function = None
@@ -96,6 +100,20 @@ class BasePage(object):
 
         if not self.user_agent or self.user_agent == "":
             return None
+        
+        if self.url == "http://" or self.url == "https://" or self.url == None:
+            lines = traceback.format_stack()
+            line_text = ""
+            for line in lines:
+                line_text += line
+
+            PersistentInfo.error(
+                "Page: Url is invalid{};Lines:{}".format(
+                    self.url, line_text
+                )
+            )
+
+            return None
 
         hdr = {
             "User-Agent": self.user_agent,
@@ -144,6 +162,8 @@ class BasePage(object):
 
     def get_domain_only(self):
         items = urlparse(self.url)
+        if items.netloc is None or str(items.netloc) == "":
+            return self.url
         return str(items.netloc)
 
     def is_html(self, check_contents=False):
@@ -249,7 +269,7 @@ class BasePage(object):
             return True
 
 
-class RssPropertyReader(BasePage):
+class RssPage(BasePage):
     """
     Handles RSS parsing.
     Do not use feedparser directly enywhere. We use BasicPage
@@ -260,6 +280,7 @@ class RssPropertyReader(BasePage):
         super().__init__(url, contents)
         self.allow_adding_with_current_time = True
         self.default_entry_timestamp = None
+        self.feed = None
 
     def parse(self):
         try:
@@ -270,46 +291,51 @@ class RssPropertyReader(BasePage):
 
             import feedparser
 
-            return feedparser.parse(contents)
+            self.feed = feedparser.parse(contents)
+            return self.feed
 
         except Exception as e:
             error_text = traceback.format_exc()
 
             PersistentInfo.error(
-                "RssPropertyReader: when parsing:{};Error:{};{}".format(
+                "RssPage: when parsing:{};Error:{};{}".format(
                     self.url, str(e), error_text
                 )
             )
 
     def parse_and_process(self):
+
         result = []
         try:
-            feed = self.parse()
-            if feed:
-                result = self.process_feed(feed)
+            if self.feed is None:
+                self.feed = self.parse()
+
+            if self.feed:
+                result = self.process_feed()
 
         except Exception as e:
             error_text = traceback.format_exc()
 
             PersistentInfo.error(
-                "RssPropertyReader: when parsing:{};Error:{};{}".format(
+                "RssPage: when parsing:{};Error:{};{}".format(
                     self.url, str(e), error_text
                 )
             )
             traceback.print_stack()
+            traceback.print_exc()
         return result
 
-    def process_feed(self, feed):
+    def process_feed(self):
         props = []
 
-        for feed_entry in feed.entries:
-            entry_props = self.get_feed_entry_map(feed, feed_entry)
+        for feed_entry in self.feed.entries:
+            entry_props = self.get_feed_entry_map(feed_entry)
             if entry_props is not None:
                 props.append(entry_props)
 
         return props
 
-    def get_feed_entry_map(self, feed, feed_entry):
+    def get_feed_entry_map(self, feed_entry):
         from .dateutils import DateUtils
 
         output_map = {}
@@ -320,15 +346,17 @@ class RssPropertyReader(BasePage):
             output_map["description"] = ""
 
         if hasattr(feed_entry, "media_thumbnail"):
-            output_map["thumbnail"] = feed_entry.media_thumbnail[0]["url"]
-        else:
-            if "image" in feed.feed:
-                if "href" in feed.feed.image:
-                    output_map["thumbnail"] = feed.feed.image.href
+            if len(feed_entry.media_thumbnail) > 0:
+                thumb = feed_entry.media_thumbnail[0]
+                if "url" in thumb:
+                    output_map["thumbnail"] = thumb["url"]
                 else:
-                    output_map["thumbnail"] = feed.feed.image
-            else:
-                output_map["thumbnail"] = None
+                    output_map["thumbnail"] = str(thumb)
+        else:
+            output_map["thumbnail"] = self.get_thumbnail()
+
+        if "thumbnail" not in output_map:
+            output_map["thumbnail"] = None
 
         if hasattr(feed_entry, "published"):
             try:
@@ -351,11 +379,13 @@ class RssPropertyReader(BasePage):
 
         output_map["source"] = self.url
         output_map["title"] = feed_entry.title
-        if "language" in feed.feed:
-            output_map["language"] = feed.feed.language
+        language = self.get_language()
+        if language:
+            output_map["language"] = language
         output_map["link"] = feed_entry.link
-        if "author" in feed:
-            output_map["artist"] = feed.feed.author
+        author = self.get_author()
+        if author:
+            output_map["artist"] = author
         output_map["album"] = ""
         output_map["bookmarked"] = False
 
@@ -371,6 +401,46 @@ class RssPropertyReader(BasePage):
                 output_map["date_published"] = DateUtils.get_datetime_now_utc()
 
         return output_map
+
+    def get_title(self):
+        if self.feed is None:
+            self.parse()
+
+        if "title" in self.feed.feed:
+            return self.feed.feed.title
+
+    def get_subtitle(self):
+        if self.feed is None:
+            self.parse()
+
+        if "subtitle" in self.feed.feed:
+            return self.feed.feed.subtitle
+
+    def get_language(self):
+        if self.feed is None:
+            self.parse()
+
+        if "language" in self.feed.feed:
+            return self.feed.feed.language
+
+    def get_thumbnail(self):
+        if self.feed is None:
+            self.parse()
+
+        if "image" in self.feed.feed:
+            if "href" in self.feed.feed.image:
+                return self.feed.feed.image["href"]
+            elif "url" in self.feed.feed.image:
+                return self.feed.feed.image["url"]
+            else:
+                return self.feed.feed.image
+
+    def get_author(self):
+        if self.feed is None:
+            self.parse()
+
+        if "author" in self.feed:
+            return self.feed.feed.author
 
 
 class ContentLinkParser(BasePage):
@@ -481,7 +551,7 @@ class ContentLinkParser(BasePage):
         return result
 
 
-class Page(BasePage):
+class HtmlPage(BasePage):
     def __init__(self, url, contents=None):
         super().__init__(url, contents)
 
@@ -642,7 +712,7 @@ class Page(BasePage):
         if rss_url:
             rss_url = BasePage.get_url_full(self.get_domain(), rss_url)
             # try:
-            #    parser = RssPropertyReader(rss_url)
+            #    parser = RssPage(rss_url)
             #    feed = parser.parse()
             #
             #    print("RSS: {}".format(rss_url))
@@ -657,7 +727,7 @@ class Page(BasePage):
         if not rss_url and full_check:
             lucky_shot = self.url + "/feed"
             try:
-                parser = RssPropertyReader(lucky_shot)
+                parser = RssPage(lucky_shot)
                 feed = parser.parse()
                 if len(feed.entries) > 0:
                     rss_url = lucky_shot

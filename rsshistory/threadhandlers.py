@@ -114,9 +114,9 @@ class LinkDownloadJobHandler(BaseJobHandler):
     def process(self, obj=None):
         try:
             item = LinkDataController.objects.filter(link=obj.subject)[0]
-            from .webtools import Page
+            from .webtools import HtmlPage
 
-            p = Page(item.link)
+            p = HtmlPage(item.link)
             p.download_all()
         except Exception as e:
             error_text = traceback.format_exc()

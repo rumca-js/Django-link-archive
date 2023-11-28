@@ -1,16 +1,20 @@
 class EntryControllerBuilder(object):
     def get(entry):
-        from ..webtools import Page
+        from ..webtools import HtmlPage
 
-        p = Page(entry.link)
+        p = HtmlPage(entry.link)
         if p.is_youtube():
-            from ..pluginentries.youtubelinkhandler import YouTubeLinkHandler
+            from ..pluginentries.handlervideoyoutube import YouTubeVideoHandler
 
-            handler = YouTubeLinkHandler(entry.link)
+            handler = YouTubeVideoHandler(entry.link)
             if handler.get_video_code():
                 from .entryyoutubeplugin import EntryYouTubePlugin
 
                 return EntryYouTubePlugin(entry)
+
+        if entry.link.find("odysee") >= 0:
+            from .entryodyseeplugin import EntryOdyseePlugin
+            return EntryOdyseePlugin(entry)
 
         from .entrygenericplugin import EntryGenericPlugin
 

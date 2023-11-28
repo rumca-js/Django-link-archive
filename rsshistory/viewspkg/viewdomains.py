@@ -134,42 +134,6 @@ class DomainsByNameDetailView(generic.DetailView):
         return context
 
 
-def domain_add(request):
-    p = ViewPage(request)
-    p.set_title("Add domain")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
-
-    if request.method == "POST":
-        form = LinkInputForm(request.POST)
-        if form.is_valid():
-            link = form.cleaned_data["link"]
-
-            domain_id = Domains.add(link)
-            if domain_id:
-                return HttpResponseRedirect(
-                    reverse(
-                        "{}:domain-detail".format(LinkDatabase.name),
-                        kwargs={"pk": domain_id},
-                    )
-                )
-            p.context["summary_text"] = "Could not create domain"
-            return p.render("summary_present.html")
-        else:
-            p.context["summary_text"] = "Form is invalid"
-            return p.render("summary_present.html")
-
-    else:
-        form = LinkInputForm()
-        form.method = "POST"
-
-        p.context["form_title"] = "Add new domain"
-        p.context["form"] = form
-
-    return p.render("form_basic.html")
-
-
 def domain_edit(request, pk):
     p = ViewPage(request)
     p.set_title("Edit domain")

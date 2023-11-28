@@ -38,9 +38,9 @@ class InstanceImporter(object):
         self.url = url
 
     def import_all(self):
-        from ..webtools import Page
+        from ..webtools import BasePage
 
-        p = Page(self.url)
+        p = BasePage(self.url)
         instance_text = p.get_contents()
 
         json_data = json.loads(instance_text)

@@ -5,7 +5,7 @@ import os
 from .sourcegenericplugin import SourceGenericPlugin
 from ..models import PersistentInfo
 from ..controllers import LinkDataController
-from ..webtools import Page
+from ..webtools import BasePage, HtmlPage
 
 
 class BaseParsePlugin(SourceGenericPlugin):
@@ -26,7 +26,7 @@ class BaseParsePlugin(SourceGenericPlugin):
         if not address.startswith(source.url):
             return False
 
-        p = Page(address)
+        p = BasePage(address)
         ext = p.get_page_ext()
 
         if ext == "html" or ext == "htm" or ext == "":
@@ -38,7 +38,7 @@ class BaseParsePlugin(SourceGenericPlugin):
 
         output_map = {}
 
-        link_ob = Page(link)
+        link_ob = HtmlPage(link)
 
         title = link_ob.get_title()
         if not title:

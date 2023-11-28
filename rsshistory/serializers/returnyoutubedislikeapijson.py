@@ -10,11 +10,11 @@ class YouTubeThumbsDown(object):
         return YouTubeThumbsDown.read_code_data(self._link.get_video_code())
 
     def read_code_data(code):
-        from ..webtools import Page
+        from ..webtools import BasePage
 
         url = "https://returnyoutubedislikeapi.com/votes?videoId=" + code
 
-        page = Page(url)
+        page = BasePage(url)
         data = page.get_contents()
         return data
 

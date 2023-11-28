@@ -17,7 +17,7 @@ from ..forms import DataExportForm
 
 def import_reading_list_view(request):
     from ..serializers.readinglist import ReadingList
-    from ..webtools import Page
+    from ..webtools import BasePage
 
     page = ViewPage(request)
     page.set_title("Import view")
@@ -46,7 +46,7 @@ def import_reading_list_view(request):
                 )
                 continue
             else:
-                p = Page(entry["url"])
+                p = BasePage(entry["url"])
                 if not p.get_domain():
                     summary_text += (
                         entry["title"]
