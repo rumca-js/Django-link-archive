@@ -2,7 +2,6 @@ from datetime import datetime, timedelta, date
 from django import forms
 
 from .models import (
-    Domains,
     BackgroundJob,
     LinkTagsDataModel,
     LinkCommentDataModel,
@@ -14,6 +13,7 @@ from .controllers import (
     SourceDataController,
     LinkDataController,
     ArchiveLinkDataController,
+    DomainsController,
 )
 
 
@@ -318,7 +318,7 @@ class DomainEditForm(forms.ModelForm):
     """
 
     class Meta:
-        model = Domains
+        model = DomainsController
         fields = [
             "category",
             "subcategory",
@@ -415,7 +415,7 @@ class DomainsChoiceForm(forms.Form):
         return self.to_choices(result)
 
     def get_sort_choices(self):
-        names = Domains.get_query_names()
+        names = DomainsController.get_query_names()
         names.append("")
         return self.to_choices(names)
 

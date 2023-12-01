@@ -52,9 +52,9 @@ class BaseDataWriter(object):
         return text
 
     def get_domains_json(self):
-        from .models import Domains
+        from .controllers import DomainsController
 
-        domains = Domains.objects.all()
+        domains = DomainsController.objects.all()
 
         from .serializers.domainexporter import DomainJsonExporter
 

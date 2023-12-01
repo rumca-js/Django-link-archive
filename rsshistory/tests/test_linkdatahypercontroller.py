@@ -2,9 +2,10 @@ import django.utils
 
 from django.test import TestCase
 
-from ..controllers import LinkDataHyperController, SourceDataController
-from ..models import LinkDataModel, Domains, ConfigurationEntry
+from ..controllers import LinkDataHyperController, SourceDataController, DomainsController
+from ..models import LinkDataModel, ConfigurationEntry
 from ..dateutils import DateUtils
+from .utilities import WebPageDisabled
 
 
 class UserObject(object):
@@ -17,16 +18,7 @@ class RequestObject(object):
         self.user = UserObject(user_name)
 
 
-class RequestsObject(object):
-    def __init__(self, url, headers, timeout):
-        self.status_code = 200
-        self.apparent_encoding = "utf-8"
-        self.encoding = "utf-8"
-        self.text = "text"
-        self.content = "text"
-
-
-class SourceParsePluginTest(TestCase):
+class SourceParsePluginTest(WebPageDisabled, TestCase):
     def setUp(self):
         self.disable_web_pages()
         self.source_youtube = SourceDataController.objects.create(
@@ -36,16 +28,6 @@ class SourceParsePluginTest(TestCase):
             subcategory="No",
             export_to_cms=True,
         )
-
-    def get_contents_function(self, url, headers, timeout):
-        print("Mocked Requesting page: {}".format(url))
-        return RequestsObject(url, headers, timeout)
-
-    def disable_web_pages(self):
-        from ..webtools import BasePage, HtmlPage
-
-        BasePage.get_contents_function = self.get_contents_function
-        HtmlPage.get_contents_function = self.get_contents_function
 
     def test_add_new_link_no_slash(self):
         link_name = "https://youtube.com/v=1234"
@@ -123,7 +105,7 @@ class SourceParsePluginTest(TestCase):
         self.assertTrue(obj.bookmarked == False)
 
     def test_add_new_link_adds_domain(self):
-        Domains.objects.all().delete()
+        DomainsController.objects.all().delete()
         LinkDataModel.objects.all().delete()
 
         config = ConfigurationEntry.get()
@@ -149,4 +131,4 @@ class SourceParsePluginTest(TestCase):
 
         # for each domain an entry is created
         self.assertEqual(objs.count(), 1)
-        self.assertEqual(Domains.objects.all().count(), 1)
+        self.assertEqual(DomainsController.objects.all().count(), 1)

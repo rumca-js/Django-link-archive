@@ -6,23 +6,15 @@ from django.test import TestCase
 from django.utils import timezone
 from django.urls import reverse
 
-from ..models import ConfigurationEntry, PersistentInfo, Domains, DataExport
-from ..controllers import SourceDataController, LinkDataController
+from ..models import ConfigurationEntry, PersistentInfo, DataExport
+from ..controllers import SourceDataController, LinkDataController, DomainsController
 from ..configuration import Configuration
 from ..datawriter import DataWriter, DataWriterConfiguration
 from ..dateutils import DateUtils
+from .utilities import WebPageDisabled
 
 
-class RequestsObject(object):
-    def __init__(self, url, headers, timeout):
-        self.status_code = 200
-        self.apparent_encoding = "utf-8"
-        self.encoding = "utf-8"
-        self.text = "text"
-        self.content = "text"
-
-
-class DataWriterTest(TestCase):
+class DataWriterTest(WebPageDisabled, TestCase):
     def setUp(self):
         self.disable_web_pages()
 
@@ -72,7 +64,7 @@ class DataWriterTest(TestCase):
             export_to_cms=False,
         )
 
-        Domains.add("https://youtube.com?v=nonbookmarked")
+        DomainsController.add("https://youtube.com?v=nonbookmarked")
 
         self.export_daily = DataExport.objects.create(
             export_type=DataExport.EXPORT_TYPE_GIT,
@@ -109,16 +101,6 @@ class DataWriterTest(TestCase):
 
     def tearDown(self):
         self.remove_all_files()
-
-    def get_contents_function(self, url, headers, timeout):
-        print("Mocked Requesting page: {}".format(url))
-        return RequestsObject(url, headers, timeout)
-
-    def disable_web_pages(self):
-        from ..webtools import BasePage, HtmlPage
-
-        BasePage.get_contents_function = self.get_contents_function
-        HtmlPage.get_contents_function = self.get_contents_function
 
     def remove_all_files(self):
         if self.test_export_path.exists():

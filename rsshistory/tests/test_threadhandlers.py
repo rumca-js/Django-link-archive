@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.utils import timezone
 from django.urls import reverse
+from datetime import datetime, timedelta
 
 from ..controllers import (
     BackgroundJobController,
@@ -13,20 +14,14 @@ from ..models import (
     ConfigurationEntry,
     DataExport,
     SourceExportHistory,
+    KeyWords,
 )
-from ..threadhandlers import HandlerManager, RefreshThreadHandler
+from ..threadhandlers import HandlerManager, RefreshThreadHandler, CleanupJobHandler
+from .utilities import WebPageDisabled
+from ..dateutils import DateUtils
 
 
-class RequestsObject(object):
-    def __init__(self, url, headers, timeout):
-        self.status_code = 200
-        self.apparent_encoding = "utf-8"
-        self.encoding = "utf-8"
-        self.text = "text"
-        self.content = "text"
-
-
-class BackgroundJobControllerTest(TestCase):
+class BackgroundJobControllerTest(WebPageDisabled, TestCase):
     def setUp(self):
         ob = SourceDataController.objects.create(
             url="https://youtube.com", title="YouTube", category="No", subcategory="No"
@@ -36,6 +31,7 @@ class BackgroundJobControllerTest(TestCase):
             link="https://youtube.com?v=12345",
             source_obj=ob,
         )
+        self.disable_web_pages()
 
     def test_push_to_repo_handler(self):
         bg_obj = BackgroundJobController.objects.create(
@@ -206,7 +202,7 @@ class BackgroundJobControllerTest(TestCase):
         )
 
 
-class RefreshThreadHandlerTest(TestCase):
+class RefreshThreadHandlerTest(WebPageDisabled, TestCase):
     def setUp(self):
         SourceDataController.objects.create(
             url="https://youtube.com",
@@ -220,17 +216,6 @@ class RefreshThreadHandlerTest(TestCase):
         SourceExportHistory.objects.all().delete()
 
         self.disable_web_pages()
-        entry = ConfigurationEntry.get()
-
-    def get_contents_function(self, url, headers, timeout):
-        print("Mocked Requesting page: {}".format(url))
-        return RequestsObject(url, headers, timeout)
-
-    def disable_web_pages(self):
-        from ..webtools import BasePage, HtmlPage
-
-        BasePage.get_contents_function = self.get_contents_function
-        HtmlPage.get_contents_function = self.get_contents_function
 
     def create_exports(self):
         DataExport.objects.create(
@@ -325,3 +310,52 @@ class RefreshThreadHandlerTest(TestCase):
             ).count(),
             1,
         )
+
+class CleanJobHandlerTest(WebPageDisabled, TestCase):
+
+    def setUp(self):
+        source_youtube = SourceDataController.objects.create(
+            url="https://youtube.com",
+            title="YouTube",
+            category="No",
+            subcategory="No",
+            export_to_cms=True,
+        )
+        LinkDataController.objects.create(
+            source="https://youtube.com",
+            link="https://youtube.com?v=bookmarked",
+            title="The first link",
+            source_obj=source_youtube,
+            bookmarked=True,
+            date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
+            language="en",
+        )
+        LinkDataController.objects.create(
+            source="https://youtube.com",
+            link="https://youtube.com?v=nonbookmarked",
+            title="The second link",
+            source_obj=source_youtube,
+            bookmarked=False,
+            date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
+            language="en",
+        )
+        LinkDataController.objects.create(
+            source="https://youtube.com",
+            link="https://youtube.com?v=permanent",
+            title="The first link",
+            source_obj=source_youtube,
+            permanent=True,
+            date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
+            language="en",
+        )
+
+        datetime = KeyWords.get_keywords_date_limit() - timedelta(days=1)
+        keyword = KeyWords.objects.create(keyword="test")
+        keyword.date_published = datetime
+        keyword.save()
+
+    def test_cleanup_job(self):
+        # TODO insert some data
+
+        handler = CleanupJobHandler()
+        handler.process()

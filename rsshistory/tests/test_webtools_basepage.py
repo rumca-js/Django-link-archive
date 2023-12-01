@@ -75,6 +75,11 @@ class BasePageTest(TestCase):
         p = BasePage("http://test.com/my-site-test", webpage_lang_not_default)
         self.assertEqual(p.get_domain(), "http://test.com")
 
+    def test_get_domain_no_http(self):
+        # default language
+        p = BasePage("test.com", webpage_lang_not_default)
+        self.assertEqual(p.get_domain(), "https://test.com")
+
     def test_get_domain_only(self):
         # default language
         p = BasePage("http://test.com/my-site-test", webpage_lang_not_default)

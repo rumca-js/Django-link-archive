@@ -14,7 +14,6 @@ from .models import (
     PersistentInfo,
     BackgroundJob,
     SourceDataModel,
-    Domains,
     SourceExportHistory,
     KeyWords,
     DataExport,
@@ -27,6 +26,7 @@ from .controllers import (
     LinkDataController,
     SourceDataController,
     LinkDataHyperController,
+    DomainsController,
 )
 from .configuration import Configuration
 from .dateutils import DateUtils
@@ -64,12 +64,13 @@ class ProcessSourceJobHandler(BaseJobHandler):
         try:
             plugin = SourceControllerBuilder.get(obj.subject)
             plugin.check_for_data()
+            return True
 
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.error(
                 "Exception during parsing page contents {0} {1} {2}".format(
-                    source.url, str(e), error_text
+                    obj.subject, str(e), error_text
                 )
             )
 
@@ -87,13 +88,15 @@ class EntryUpdateData(BaseJobHandler):
             entries = LinkDataController.objects.filter(link=obj.subject)
             if len(entries) > 0:
                 entry = entries[0]
-                entry.update_calculated_vote()
+                entry.update_link_data()
             else:
                 PersistentInfo.error(
                     "Incorrect background job {0}".format(
                         obj.subject,
                     )
                 )
+
+            return True
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.error(
@@ -118,6 +121,8 @@ class LinkDownloadJobHandler(BaseJobHandler):
 
             p = HtmlPage(item.link)
             p.download_all()
+
+            return True
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.error(
@@ -160,6 +165,8 @@ class LinkMusicDownloadJobHandler(BaseJobHandler):
             PersistentInfo.create(
                 "Downloading music done: " + item.link + " " + item.title
             )
+
+            return True
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.error(
@@ -193,6 +200,8 @@ class LinkVideoDownloadJobHandler(BaseJobHandler):
             PersistentInfo.create(
                 "Downloading video done: " + item.link + " " + item.title
             )
+
+            return True
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.error(
@@ -221,6 +230,8 @@ class LinkAddJobHandler(BaseJobHandler):
             if not LinkDataHyperController.is_link(link):
                 LinkDataHyperController.create_from_youtube(link, data)
 
+            return True
+
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.error(
@@ -247,6 +258,8 @@ class LinkSaveJobHandler(BaseJobHandler):
             wb = WaybackMachine()
             if wb.is_saved(item):
                 wb.save(item)
+
+            return True
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.error(
@@ -276,6 +289,8 @@ class WriteDailyDataJobHandler(BaseJobHandler):
             date_input = datetime.strptime(obj.subject, "%Y-%m-%d").date()
 
             writer.write_daily_data(date_input.isoformat())
+
+            return True
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.error(
@@ -306,6 +321,8 @@ class ImportDailyDataJobHandler(BaseJobHandler):
             files = self.get_files_with_extension(avalid_dir, "json")
             for afile in files:
                 self.import_one_file(afile)
+
+        return True
 
     def import_one_file(self, afile):
         import json
@@ -340,6 +357,8 @@ class ImportBookmarksJobHandler(BaseJobHandler):
         files = self.get_files_with_extension(import_path, "json")
         for afile in files:
             self.import_one_file(afile)
+
+        return True
 
     def import_one_file(self, afile):
         import json
@@ -385,6 +404,8 @@ class ImportSourcesJobHandler(BaseJobHandler):
 
                 SourceDataController.objects.create(**create_args)
 
+        return True
+
 
 class ImportInstanceJobHandler(BaseJobHandler):
     """!
@@ -403,6 +424,8 @@ class ImportInstanceJobHandler(BaseJobHandler):
 
         ie = InstanceImporter(json_url)
         ie.import_all()
+
+        return True
 
 
 class WriteBookmarksJobHandler(BaseJobHandler):
@@ -425,6 +448,8 @@ class WriteBookmarksJobHandler(BaseJobHandler):
             c = Configuration.get_object()
             writer = DataWriter(c)
             writer.write_bookmarks()
+
+            return True
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.error(
@@ -454,6 +479,8 @@ class WriteTopicJobHandler(BaseJobHandler):
             c = Configuration.get_object()
             exporter = BookmarksTopicExporter(c)
             exporter.export(topic)
+
+            return True
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.error(
@@ -508,6 +535,8 @@ class PushYearDataToRepoJobHandler(BaseJobHandler):
 
                 update_mgr = UpdateManager(self._config)
                 update_mgr.write_and_push_year_data()
+
+            return True
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.error("Exception: {} {}".format(str(e), error_text))
@@ -528,6 +557,8 @@ class PushNoTimeDataToRepoJobHandler(BaseJobHandler):
 
                 update_mgr = UpdateManager(self._config)
                 update_mgr.write_and_push_notime_data()
+
+            return True
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.error("Exception: {} {}".format(str(e), error_text))
@@ -551,6 +582,8 @@ class PushDailyDataToRepoJobHandler(BaseJobHandler):
 
                 update_mgr = UpdateManager(self._config)
                 update_mgr.write_and_push_daily_data(date_input)
+
+            return True
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.error("Exception: {} {}".format(str(e), error_text))
@@ -566,11 +599,24 @@ class CleanupJobHandler(BaseJobHandler):
 
     def process(self, obj=None):
         try:
-            LinkDataController.clear_old_entries()
-            LinkDataController.move_old_links_to_archive()
-            Domains.reset_dynamic_data()
-            SourceDataModel.reset_dynamic_data()
-            KeyWords.clear()
+            limit = 0
+            try:
+                if obj is not None:
+                    limit = int(obj.subject)
+            except Exception as E:
+                pass
+
+            LinkDataController.move_old_links_to_archive(limit)
+            LinkDataController.clear_old_entries(limit)
+
+            if limit == 0:
+                PersistentInfo.remove_old_ones()
+                DomainsController.reset_dynamic_data()
+                DomainsController.create_missing_domains()
+                SourceDataModel.reset_dynamic_data()
+                KeyWords.clear()
+
+            return True
 
         except Exception as e:
             error_text = traceback.format_exc()
@@ -583,7 +629,9 @@ class CheckDomainsJobHandler(BaseJobHandler):
 
     def process(self, obj=None):
         try:
-            Domains.update_all()
+            DomainsController.update_all()
+
+            return True
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.error("Exception: {} {}".format(str(e), error_text))
@@ -599,7 +647,7 @@ class RefreshThreadHandler(object):
         # This has to be done before exporting
         KeyWords.clear()
 
-        PersistentInfo.create("Refreshing RSS data")
+        #PersistentInfo.create("Refreshing RSS data")
 
         from .controllers import SourceDataController
 
@@ -609,7 +657,7 @@ class RefreshThreadHandler(object):
             self.do_update()
             SourceExportHistory.confirm()
 
-        PersistentInfo.create("Refreshing RSS data - done")
+        #PersistentInfo.create("Refreshing RSS data - done")
 
     def check_sources(self):
         from .controllers import SourceDataController
@@ -650,26 +698,32 @@ class HandlerManager(object):
         @returns available handlers. Order is important
         """
         return [
+            # fmt: off
             PushToRepoJobHandler(),
+
             PushDailyDataToRepoJobHandler(),
             PushYearDataToRepoJobHandler(),
             PushNoTimeDataToRepoJobHandler(),
+
+            WriteDailyDataJobHandler(),
+            WriteBookmarksJobHandler(),
+            WriteTopicJobHandler(),
+
+            ImportSourcesJobHandler(),
+            ImportBookmarksJobHandler(),
+            ImportDailyDataJobHandler(),
+            ImportInstanceJobHandler(),
+
+            CleanupJobHandler(),
             ProcessSourceJobHandler(),
             LinkAddJobHandler(),
             LinkDownloadJobHandler(),
             LinkMusicDownloadJobHandler(),
             LinkVideoDownloadJobHandler(),
-            LinkSaveJobHandler(),
-            WriteDailyDataJobHandler(),
-            WriteBookmarksJobHandler(),
-            WriteTopicJobHandler(),
-            ImportSourcesJobHandler(),
-            ImportBookmarksJobHandler(),
-            ImportDailyDataJobHandler(),
-            ImportInstanceJobHandler(),
-            CleanupJobHandler(),
-            CheckDomainsJobHandler(),
             EntryUpdateData(),
+            LinkSaveJobHandler(),
+            CheckDomainsJobHandler(),
+            # fmt: on
         ]
 
     def get_handler_and_object(self):
@@ -677,7 +731,7 @@ class HandlerManager(object):
         for key, handler in enumerate(self.get_handlers()):
             afilter = handler.get_job_filter()
 
-            objs = BackgroundJob.objects.filter(afilter)
+            objs = BackgroundJob.objects.filter(afilter).order_by("date_created")
             if objs.count() != 0:
                 obj = objs[0]
                 return [obj, handler]
@@ -699,11 +753,55 @@ class HandlerManager(object):
 
                 handler.set_config(config)
 
-                handler.process(obj)
-                obj.delete()
+                try:
+                    if handler.process(obj):
+                        obj.delete()
+                except Exception as E:
+                    error_text = traceback.format_exc()
+                    PersistentInfo.error(
+                        "Exception during handler processing {0}\n{1}\n{2}".format(
+                            handler.get_job(), str(E), error_text
+                        )
+                    )
 
                 # if 10 minutes passed
-                if time.time() - start_processing_time >= 60 * 10:
+                passed_seconds = time.time() - start_processing_time
+                if passed_seconds >= 60 * 10:
+                    PersistentInfo.create("Task exeeded time:{}".format(passed_seconds))
                     break
 
         PersistentInfo.create("Processing messages done")
+
+    def process_one(self):
+        PersistentInfo.create("Processing message")
+
+        config = Configuration.get_object()
+        start_processing_time = time.time()
+
+        items = self.get_handler_and_object()
+        if len(items) == 0:
+            return False
+
+        obj = items[0]
+        handler = items[1]
+
+        handler.set_config(config)
+
+        try:
+            if handler.process(obj):
+                obj.delete()
+        except Exception as E:
+            error_text = traceback.format_exc()
+            PersistentInfo.error(
+                "Exception during handler processing {0}\n{1}\n{2}".format(
+                    handler.get_job(), str(E), error_text
+                )
+            )
+
+        items = self.get_handler_and_object()
+        if len(items) == 0:
+            return False
+
+        PersistentInfo.create("Processing messages done")
+
+        return True

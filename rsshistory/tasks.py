@@ -41,7 +41,7 @@ def process_all_jobs_task(arg):
         from .threadhandlers import HandlerManager
 
         mgr = HandlerManager()
-        mgr.process_all()
+        return mgr.process_all()
 
     except Exception as E:
         error_text = traceback.format_exc()
@@ -52,3 +52,29 @@ def process_all_jobs_task(arg):
         )
 
     logger.info("Processing done")
+
+
+def process_one_jobs_task(arg):
+    """!
+    Processes jobs
+    """
+    logger.info("Processing source")
+
+    from .apps import LinkDatabase
+
+    try:
+        from .threadhandlers import HandlerManager
+
+        mgr = HandlerManager()
+        return mgr.process_one()
+
+    except Exception as E:
+        error_text = traceback.format_exc()
+        print(
+            "[{}] Exception in processing task: {} {}".format(
+                LinkDatabase.name, str(E), error_text
+            )
+        )
+
+    logger.info("Processing done")
+

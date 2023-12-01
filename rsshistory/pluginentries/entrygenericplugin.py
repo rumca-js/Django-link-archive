@@ -26,8 +26,12 @@ class EntryGenericPlugin(object):
         parameters = []
 
         parameters.append(EntryParameter("Publish date", self.entry.date_published))
-        if self.entry.user:
+
+        if self.entry.user != "":
             parameters.append(EntryParameter("User", self.entry.user))
+        if self.entry.status_code:
+            parameters.append(EntryParameter("Status code", self.entry.status_code))
+
         parameters.append(EntryParameter("Vote", self.entry.get_vote()))
         parameters.append(EntryParameter("Language", self.entry.language))
         if self.entry.dead:

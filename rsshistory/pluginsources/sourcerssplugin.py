@@ -3,6 +3,7 @@ from dateutil import parser
 
 from .sourcegenericplugin import SourceGenericPlugin
 from ..models import PersistentInfo, BaseLinkDataController
+from ..apps import LinkDatabase
 
 
 class BaseRssPlugin(SourceGenericPlugin):
@@ -14,101 +15,23 @@ class BaseRssPlugin(SourceGenericPlugin):
         self.default_entry_timestamp = None
 
     def get_link_props(self):
-        try:
-            from ..webtools import RssPage
+        from ..webtools import RssPage
 
-            reader = RssPage(self.get_address(), self.get_contents())
-            all_props = reader.parse_and_process()
+        reader = RssPage(self.get_address(), self.get_contents())
+        all_props = reader.parse_and_process()
 
-            if len(all_props) == 0:
-                PersistentInfo.error(
-                    "Source:{0}; Source has no data".format(self.source_id)
-                )
+        num_entries = len(all_props)
 
-            result = []
-
-            for prop in all_props:
-                prop = self.enhance(prop)
-                if self.is_link_ok_to_add(prop):
-                    result.append(prop)
-            return result
-
-        except Exception as e:
-            error_text = traceback.format_exc()
-            PersistentInfo.exc(
-                "BaseRssPlugin:get_link_props: Source:{}; Exc:{}\n{}".format(
-                    self.source_id, str(e), error_text
-                )
-            )
-            return []
-
-    def is_link_ok_to_add(self, props):
-        try:
-            from ..controllers import LinkDataController
-
-            is_archive = BaseLinkDataController.is_archive_by_date(
-                props["date_published"]
-            )
-            if is_archive:
-                return False
-
-            objs = LinkDataController.objects.filter(link=props["link"])
-
-            if not objs.exists():
-                if "title" not in props:
-                    PersistentInfo.error(
-                        "Link:{}; Title:{} missing published field".format(
-                            props["link"],
-                            props["title"],
-                        )
-                    )
-                    return False
-
-                if not self.is_link_valid(props["link"]):
-                    return False
-
-                if "date_published" not in props:
-                    PersistentInfo.error(
-                        "Link:{}; Title:{} missing published field".format(
-                            props["link"],
-                            props["title"],
-                        )
-                    )
-                    return False
-
-                from ..webtools import HtmlPage
-
-                p = HtmlPage(props["link"])
-                if p.is_youtube():
-                    print("Link - it is youtube {}".format(props["link"]))
-                    from ..pluginentries.handlervideoyoutube import YouTubeVideoHandler
-
-                    handler = YouTubeVideoHandler(props["link"])
-                    handler.download_details()
-                    print(
-                        "Link - it is youtube {}, valid:{}".format(
-                            props["link"], handler.is_valid()
-                        )
-                    )
-                    if not handler.is_valid():
-                        return False
-
-                return True
-
-            return False
-
-        except Exception as e:
-            error_text = traceback.format_exc()
+        if num_entries == 0:
             PersistentInfo.error(
-                "Link:{}; Title:{}; Exc:{}\n{}".format(
-                    props["link"],
-                    props["title"],
-                    str(e),
-                    error_text,
-                )
+                "Source:{0}; Source has no data".format(self.source_id)
             )
 
-            return None
+        for index, prop in enumerate(all_props):
+            prop = self.enhance(prop)
+            if self.is_link_ok_to_add(prop):
+                print("[{}] Rss plugin link:{} [{}/{}]".format(LinkDatabase.name, prop["link"], index, num_entries))
+                yield prop
 
     def enhance(self, prop):
         prop["description"] = prop["description"][

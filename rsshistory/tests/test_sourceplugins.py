@@ -9,14 +9,7 @@ from ..pluginsources.sourcegenerousparserplugin import SourceGenerousParserPlugi
 from ..pluginsources.sourceparseditigsplugin import SourceParseDigitsPlugin
 from ..pluginsources.domainparserplugin import DomainParserPlugin
 
-
-class RequestsObject(object):
-    def __init__(self, url, headers, timeout):
-        self.status_code = 200
-        self.apparent_encoding = "utf-8"
-        self.encoding = "utf-8"
-        self.text = "text"
-        self.content = "text"
+from .utilities import WebPageDisabled
 
 
 webpage_youtube_contents = """
@@ -38,7 +31,7 @@ webpage_contents = """
 """
 
 
-class SourceParsePluginTest(TestCase):
+class SourceParsePluginTest(WebPageDisabled, TestCase):
     def setUp(self):
         self.source_youtube = SourceDataController.objects.create(
             url="https://youtube.com",
@@ -47,6 +40,7 @@ class SourceParsePluginTest(TestCase):
             subcategory="No",
             export_to_cms=True,
         )
+        self.disable_web_pages()
 
     def test_is_link_valid_html(self):
         parse = BaseParsePlugin(self.source_youtube.id)
@@ -79,7 +73,7 @@ class SourceParsePluginTest(TestCase):
         self.assertFalse(parse.is_link_valid("https://youtube.com/location/inside.css"))
 
 
-class SourceGenerousParsePluginTest(TestCase):
+class SourceGenerousParsePluginTest(WebPageDisabled, TestCase):
     def setUp(self):
         self.source_youtube = SourceDataController.objects.create(
             url="https://youtube.com",
@@ -88,6 +82,7 @@ class SourceGenerousParsePluginTest(TestCase):
             subcategory="No",
             export_to_cms=True,
         )
+        self.disable_web_pages()
 
     def test_is_link_valid_html(self):
         parse = SourceGenerousParserPlugin(self.source_youtube.id)
@@ -120,7 +115,7 @@ class SourceGenerousParsePluginTest(TestCase):
         self.assertFalse(parse.is_link_valid("https://youtube.com/location/inside.css"))
 
 
-class DomainParsePluginTest(TestCase):
+class DomainParsePluginTest(WebPageDisabled, TestCase):
     def setUp(self):
         self.source_youtube = SourceDataController.objects.create(
             url="https://youtube.com",
@@ -132,17 +127,10 @@ class DomainParsePluginTest(TestCase):
 
         self.disable_web_pages()
 
-    def get_contents_function(self, url, headers, timeout):
-        print("Mocked Requesting page: {}".format(url))
-        return RequestsObject(url, headers, timeout)
-
-    def disable_web_pages(self):
-        from ..webtools import BasePage, HtmlPage
-
-        BasePage.get_contents_function = self.get_contents_function
-        HtmlPage.get_contents_function = self.get_contents_function
-
     def is_domain(self, alist, value):
+        if alist is None:
+            return False
+
         for avalue in alist:
             if avalue["link"] == value:
                 return True
@@ -162,7 +150,7 @@ class DomainParsePluginTest(TestCase):
         self.assertTrue(self.is_domain(props, "https://test2.com"))
 
 
-class BaseParsePluginTest(TestCase):
+class BaseParsePluginTest(WebPageDisabled, TestCase):
     def setUp(self):
         self.source_youtube = SourceDataController.objects.create(
             url="https://youtube.com",
@@ -172,16 +160,6 @@ class BaseParsePluginTest(TestCase):
             export_to_cms=True,
         )
         self.disable_web_pages()
-
-    def get_contents_function(self, url, headers, timeout):
-        print("Mocked Requesting page: {}".format(url))
-        return RequestsObject(url, headers, timeout)
-
-    def disable_web_pages(self):
-        from ..webtools import BasePage, HtmlPage
-
-        BasePage.get_contents_function = self.get_contents_function
-        HtmlPage.get_contents_function = self.get_contents_function
 
     def is_domain(self, alist, value):
         for avalue in alist:

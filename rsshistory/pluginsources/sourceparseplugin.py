@@ -1,6 +1,7 @@
 import traceback
 import re
 import os
+import time
 
 from .sourcegenericplugin import SourceGenericPlugin
 from ..models import PersistentInfo
@@ -41,26 +42,32 @@ class BaseParsePlugin(SourceGenericPlugin):
         link_ob = HtmlPage(link)
 
         title = link_ob.get_title()
-        if not title:
-            return output_map
+        description = link_ob.get_description()
+        if description is None:
+            description = title
+
+        language = link_ob.get_language()
+        if not language:
+            language = source.language
 
         output_map["link"] = link
         output_map["title"] = title
-        output_map["description"] = title
+        output_map["description"] = description
         output_map["source"] = source.url
         output_map["date_published"] = DateUtils.get_datetime_now_utc()
-        output_map["language"] = source.language
-        output_map["thumbnail"] = None
+        output_map["language"] = language
+        output_map["thumbnail"] = link_ob.get_image()
+
         return output_map
 
     def get_link_props(self):
         try:
-            props = []
+            start_processing_time = time.time()
 
             links_str_vec = self.get_links()
             num_entries = len(links_str_vec)
 
-            for link_str in links_str_vec:
+            for index, link_str in enumerate(links_str_vec):
                 if not self.is_link_valid(link_str):
                     continue
 
@@ -68,9 +75,16 @@ class BaseParsePlugin(SourceGenericPlugin):
                 if objs.exists():
                     continue
 
-                props.append(self.get_link_data(self.get_source(), link_str))
+                link_props = self.get_link_data(self.get_source(), link_str)
 
-            return props
+                print("[{}] Processing parsing link {}:[{}/{}]".format(LinkDatabase.name, link_str, index, num_entries))
+
+                yield link_props
+
+                # if 10 minutes passed
+                if time.time() - start_processing_time >= 60 * 10:
+                    break
+
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.exc(

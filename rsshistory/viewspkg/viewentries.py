@@ -704,9 +704,6 @@ def entries_bookmarked_init(request):
 def entries_recent_init(request):
     p = ViewPage(request)
     p.set_title("Search recent entries")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
 
     filter_form = EntryRecentChoiceForm()
     filter_form.create(SourceDataController.objects.all())

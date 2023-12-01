@@ -113,6 +113,8 @@ class UpdateManager(object):
             )
 
     def write_and_push_daily_data(self, input_date=""):
+        PersistentInfo.create("Pushing data to git - daily data")
+
         if input_date == "":
             write_date = DateUtils.get_date_yesterday()
         else:
@@ -128,7 +130,11 @@ class UpdateManager(object):
             )
             mgr.process()
 
+        PersistentInfo.create("Pushing data to git - daily data - DONE")
+
     def write_and_push_year_data(self):
+        PersistentInfo.create("Pushing data to git - year data")
+
         all_export_data = DataExport.objects.filter(
             export_data=DataExport.EXPORT_YEAR_DATA, enabled=True
         )
@@ -137,7 +143,11 @@ class UpdateManager(object):
             mgr = UpdateExportManager(self._cfg, self.repo_builder, export_data, "year")
             mgr.process()
 
+        PersistentInfo.create("Pushing data to git - year data - DONE")
+
     def write_and_push_notime_data(self):
+        PersistentInfo.create("Pushing data to git - notime data")
+
         all_export_data = DataExport.objects.filter(
             export_data=DataExport.EXPORT_NOTIME_DATA, enabled=True
         )
@@ -147,3 +157,5 @@ class UpdateManager(object):
                 self._cfg, self.repo_builder, export_data, "notime"
             )
             mgr.process()
+
+        PersistentInfo.create("Pushing data to git - notime data - DONE")

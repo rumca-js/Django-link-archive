@@ -1,16 +1,18 @@
 import os
 import re
 import traceback
+import time
 
 from ..webtools import HtmlPage
 from ..models import PersistentInfo
 from ..controllers import LinkDataController
 from .sourceparseplugin import BaseParsePlugin
+from ..apps import LinkDatabase
 
 
 class DomainParserPlugin(BaseParsePlugin):
     """
-    Created for https://nownownow.com/
+    Finds all domains on site
     """
 
     PLUGIN_NAME = "DomainParserPlugin"
@@ -18,29 +20,37 @@ class DomainParserPlugin(BaseParsePlugin):
     def __init__(self, source_id):
         super().__init__(source_id)
 
+    def is_link_valid(self, link):
+        return True
+
     def get_link_props(self):
-        try:
-            props = []
+        start_processing_time = time.time()
 
-            domains_vec = self.get_domains()
-            num_entries = len(domains_vec)
+        domains_vec = self.get_domains()
+        num_entries = len(domains_vec)
 
-            for link_str in domains_vec:
-                p = HtmlPage(link_str)
-                if p.is_valid() == False:
-                    continue
+        index = 0
+        for link_str in domains_vec:
+                
+            p = HtmlPage(link_str)
+            if p.is_valid() == False:
+                print("[{}] DomainParserPlugin: link is not valid:{}".format(LinkDatabase.name, link_str))
+                continue
 
-                print("Adding domain: {}".format(link_str))
+            objs = LinkDataController.objects.filter(link=link_str)
+            if objs.exists():
+                continue
 
-                objs = LinkDataController.objects.filter(link=link_str)
-                if objs.exists():
-                    continue
+            link_props = self.get_link_data(self.get_source(), link_str)
 
-                props.append(self.get_link_data(self.get_source(), link_str))
+            if self.is_link_ok_to_add(link_props):
+                print("[{}] DomainParserPlugin: adding domain:{} [{}/{}]".format(LinkDatabase.name, link_str, index, num_entries))
+                yield link_props
 
-            return props
-        except Exception as e:
-            error_text = traceback.format_exc()
-            PersistentInfo.exc(
-                "Source:{}; Exc:{}\n{}".format(self.source_id, str(e), error_text)
-            )
+                index += 1
+                if index > 10:
+                    return
+
+            # if 10 minutes passed
+            if time.time() - start_processing_time >= 60 * 10:
+                break

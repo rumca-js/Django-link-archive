@@ -29,6 +29,8 @@ logger = get_task_logger(__name__)
 
 LOCK_EXPIRE = 60 * 60  # Lock expires in 60 minutes
 
+timeouts = {}
+
 @contextmanager
 def memcache_lock(lock_id, oid):
     """! 
@@ -40,20 +42,33 @@ def memcache_lock(lock_id, oid):
     Note: This requires memcached to be configured in djanog
     https://stackoverflow.com/questions/53950548/flask-celery-task-locking
     """
-    timeout_at = time.monotonic() + LOCK_EXPIRE - 3
+    #if lock_id not in timeouts:
+    #    timeouts[lock_id] = time.time()
+
+    #timeout_at = time.monotonic() + LOCK_EXPIRE - 3
     # cache.add fails if the key already exists
-    status = cache.add(lock_id, oid, LOCK_EXPIRE)
+    #status = cache.add(lock_id, oid, LOCK_EXPIRE)
+
+    # https://docs.djangoproject.com/en/4.2/topics/cache/
+    # https://docs.djangoproject.com/en/4.2/ref/settings/
+    # using default timeout, most probably 5 seconds
+    status = cache.add(lock_id, oid)
     try:
+        #if status:
+        #    del timeouts[lock_id]
+
         yield status
     finally:
         # memcache delete is very slow, but we have to use it to take
         # advantage of using add() for atomic locking
-        if time.monotonic() < timeout_at and status:
+        # if time.monotonic() < timeout_at and status:
+        if status:
             # don't release the lock if we exceeded the timeout
             # to lessen the chance of releasing an expired lock
             # owned by someone else
             # also don't release the lock if we didn't acquire it
             cache.delete(lock_id)
+            #del timeouts[lock_id]
 
 
 @app.on_after_configure.connect

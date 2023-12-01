@@ -17,6 +17,8 @@ from .models import PersistentInfo
 from .apps import LinkDatabase
 
 
+
+
 class BasePage(object):
     """
     Should not contain any HTML/RSS content processing
@@ -83,7 +85,7 @@ class BasePage(object):
         if self.status_code == 0:
             return False
 
-        print("Status code:{}".format(self.status_code))
+        #print("Status code:{}".format(self.status_code))
         if self.status_code == 403:
             # Many pages return 403, but they are correct
             return True
@@ -152,17 +154,134 @@ class BasePage(object):
                 )
             )
 
+    def get_full_url(self):
+        if self.url.find("http") == -1:
+            return "https://" + self.url
+        return self.url
+
     def get_domain(self):
+        if self.url.find("http") == -1:
+            self.url = "https://" + self.url
+
         items = urlparse(self.url)
         if items.netloc is None or str(items.netloc) == "":
             return self.url
         return self.protocol + "://" + str(items.netloc)
 
     def get_domain_only(self):
+        if self.url.find("http") == -1:
+            self.url = "https://" + self.url
+
         items = urlparse(self.url)
         if items.netloc is None or str(items.netloc) == "":
             return self.url
         return str(items.netloc)
+
+    def is_domain(self):
+        url = self.get_full_url()
+        if url == self.get_domain():
+            return True
+
+        return False
+
+    def get_page_ext(self):
+        url = self.get_clean_url()
+        if self.url.endswith("/"):
+            return ""
+
+        sp = url.split(".")
+        if len(sp) > 1:
+            ext = sp[-1]
+            if len(ext) < 5:
+                return ext
+
+        return ""
+
+    def get_clean_url(self):
+        url = self.url
+        if url.find("?") >= 0:
+            wh = url.find("?")
+            return url[:wh]
+        else:
+            return url
+
+    def get_url_full(domain, url):
+        ready_url = ""
+        if url.find("http") == 0:
+            ready_url = url
+        else:
+            if url.startswith("//"):
+                ready_url = "https:" + url
+            elif url.startswith("/"):
+                if not domain.endswith("/"):
+                    domain = domain + "/"
+                if url.startswith("/"):
+                    url = url[1:]
+
+                ready_url = domain + url
+            else:
+                ready_url = domain + url
+        return ready_url
+
+
+class DomainAwarePage(BasePage):
+
+    def __init__(self, url, contents=None):
+        super().__init__(url, contents)
+
+    def is_mainstream(self):
+        dom = self.get_domain_only()
+
+        # wallet gardens which we will not accept
+
+        mainstream = [
+            "www.facebook",
+            "www.rumble",
+            "wikipedia.org",
+            "twitter.com",
+            "www.reddit.com",
+            "stackoverflow.com",
+            "www.quora.com",
+        ]
+
+        for item in mainstream:
+            if dom.find(item) >= 0:
+                return True
+
+        if self.is_youtube():
+            return True
+
+        return False
+
+    def is_youtube(self):
+        dom = self.get_domain_only()
+        if (
+            dom.find("youtube.com") >= 0
+            or dom.find("youtu.be") >= 0
+            or dom.find("www.m.youtube") >= 0
+        ):
+            return True
+        return False
+
+    def is_analytics(self):
+        if self.url.find("g.doubleclick") >= 0:
+            return True
+        if self.url.find("doubleverify.com") >= 0:
+            return True
+        if self.url.find("adservice.google.com") >= 0:
+            return True
+        if self.url.find("amazon-adsystem.com") >= 0:
+            return True
+        if self.url.find("googlesyndication") >= 0:
+            return True
+        if self.url.find("google-analytics") >= 0:
+            return True
+        if self.url.find("googletagservices") >= 0:
+            return True
+        if self.url.find("cdn.speedcurve.com") >= 0:
+            return True
+        if self.url.find("amazonaws.com") >= 0:
+            return True
 
     def is_html(self, check_contents=False):
         if self.is_analytics():
@@ -201,73 +320,8 @@ class BasePage(object):
         except Exception as e:
             return False
 
-    def is_domain_level_url(self):
-        if self.url.find("/", 9) >= 0:
-            return False
 
-        return True
-
-    def get_page_ext(self):
-        if self.is_domain_level_url():
-            return ""
-        else:
-            url = self.get_clean_url()
-            sp = url.split(".")
-            if len(sp) > 1:
-                ext = sp[-1]
-                if len(ext) < 5:
-                    return ext
-
-        return ""
-
-    def get_clean_url(self):
-        url = self.url
-        if url.find("?") >= 0:
-            wh = url.find("?")
-            return url[:wh]
-        else:
-            return url
-
-    def get_url_full(domain, url):
-        ready_url = ""
-        if url.find("http") == 0:
-            ready_url = url
-        else:
-            if url.startswith("//"):
-                ready_url = "https:" + url
-            elif url.startswith("/"):
-                if not domain.endswith("/"):
-                    domain = domain + "/"
-                if url.startswith("/"):
-                    url = url[1:]
-
-                ready_url = domain + url
-            else:
-                ready_url = domain + url
-        return ready_url
-
-    def is_analytics(self):
-        if self.url.find("g.doubleclick") >= 0:
-            return True
-        if self.url.find("doubleverify.com") >= 0:
-            return True
-        if self.url.find("adservice.google.com") >= 0:
-            return True
-        if self.url.find("amazon-adsystem.com") >= 0:
-            return True
-        if self.url.find("googlesyndication") >= 0:
-            return True
-        if self.url.find("google-analytics") >= 0:
-            return True
-        if self.url.find("googletagservices") >= 0:
-            return True
-        if self.url.find("cdn.speedcurve.com") >= 0:
-            return True
-        if self.url.find("amazonaws.com") >= 0:
-            return True
-
-
-class RssPage(BasePage):
+class RssPage(DomainAwarePage):
     """
     Handles RSS parsing.
     Do not use feedparser directly enywhere. We use BasicPage
@@ -458,6 +512,19 @@ class ContentLinkParser(BasePage):
         links.update(self.get_links_https())
         links.update(self.get_links_href())
 
+        if None in links:
+            links.remove(None)
+        if "" in links:
+            links.remove("")
+        if "http" in links:
+            links.remove("http")
+        if "https" in links:
+            links.remove("https")
+        if "http://" in links:
+            links.remove("http://")
+        if "https://" in links:
+            links.remove("https://")
+
         return links
 
     def get_links_https(self):
@@ -497,7 +564,7 @@ class ContentLinkParser(BasePage):
     def filter_link_html(links):
         result = set()
         for link in links:
-            p = BasePage(link)
+            p = DomainAwarePage(link)
             if p.is_html():
                 result.add(link)
 
@@ -548,7 +615,7 @@ class ContentLinkParser(BasePage):
         return result
 
 
-class HtmlPage(BasePage):
+class HtmlPage(DomainAwarePage):
     def __init__(self, url, contents=None):
         super().__init__(url, contents)
 
@@ -672,6 +739,15 @@ class HtmlPage(BasePage):
 
         return description
 
+    def get_image(self):
+        if not self.contents:
+            self.contents = self.get_contents()
+
+        if not self.contents:
+            return None
+
+        return self.get_og_field("image")
+
     def get_description_safe(self):
         desc = self.get_description()
         if not desc:
@@ -718,7 +794,7 @@ class HtmlPage(BasePage):
             #    if len(feed.entries) > 0:
             #        return rss_url
             # except Exception as e:
-            #    print("Exception {}".format(str(e)))
+            #    print("WebTools exception {}".format(str(e)))
             return rss_url
 
         if not rss_url and full_check:
@@ -729,7 +805,7 @@ class HtmlPage(BasePage):
                 if len(feed.entries) > 0:
                     rss_url = lucky_shot
             except Exception as e:
-                print("Exception {}".format(str(e)))
+                print("WebTools exception during rss processing {}".format(str(e)))
 
     def get_links(self):
         p = ContentLinkParser(self.url, self.get_contents())
@@ -763,40 +839,6 @@ class HtmlPage(BasePage):
             return self
 
         return Page(self.get_domain())
-
-    def is_mainstream(self):
-        dom = self.get_domain_only()
-
-        # wallet gardens which we will not accept
-
-        mainstream = [
-            "www.facebook",
-            "www.rumble",
-            "wikipedia.org",
-            "twitter.com",
-            "www.reddit.com",
-            "stackoverflow.com",
-            "www.quora.com",
-        ]
-
-        for item in mainstream:
-            if dom.find(item) >= 0:
-                return True
-
-        if self.is_youtube():
-            return True
-
-        return False
-
-    def is_youtube(self):
-        dom = self.get_domain_only()
-        if (
-            dom.find("youtube.com") >= 0
-            or dom.find("youtu.be") >= 0
-            or dom.find("www.m.youtube") >= 0
-        ):
-            return True
-        return False
 
     def download_all(self):
         from .programwrappers.wget import Wget

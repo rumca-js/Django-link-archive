@@ -62,8 +62,6 @@ class YTDLP(YouTubeDownloader):
         if proc.returncode != 0:
             return None
 
-        print("Process return code: ", proc.returncode)
-
         out = self.get_output_ignore(proc)
         self._json_data = out.strip()
 

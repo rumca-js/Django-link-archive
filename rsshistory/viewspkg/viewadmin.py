@@ -156,6 +156,7 @@ class BackgroundJobsView(generic.ListView):
         context = ViewPage.init_context(self.request, context)
 
         context["BackgroundJob"] = BackgroundJob.objects.count()
+        context["page_title"] += " Jobs"
 
         return context
 
@@ -272,6 +273,7 @@ class PersistentInfoView(generic.ListView):
         # Call the base implementation first to get the context
         context = super(PersistentInfoView, self).get_context_data(**kwargs)
         context = ViewPage.init_context(self.request, context)
+        context['page_title'] += " Logs"
 
         return context
 

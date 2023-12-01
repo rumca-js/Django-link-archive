@@ -5,8 +5,8 @@ from .controllers import (
     SourceDataController,
     LinkDataController,
     ArchiveLinkDataController,
+    DomainsController,
 )
-from .models import Domains
 
 try:
     from sympy import sympify
@@ -346,7 +346,7 @@ class DomainFilter(BaseQueryFilter):
         conditions = self.get_conditions()
         print(conditions)
 
-        self.filtered_objects = Domains.objects.filter(conditions)
+        self.filtered_objects = DomainsController.objects.filter(conditions)
 
         return self.filtered_objects
 
@@ -370,7 +370,7 @@ class DomainFilter(BaseQueryFilter):
     def get_omni_conditions(self):
         query_filter = OmniSearchFilter(self.args)
 
-        translate = Domains.get_query_names()
+        translate = DomainsController.get_query_names()
         query_filter.set_translatable(translate)
 
         query_filter.set_default_search_symbols(

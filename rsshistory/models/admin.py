@@ -131,8 +131,7 @@ class UserConfig(models.Model):
         """
         users = UserConfig.objects.filter(user=user_name)
         if not users.exists():
-            user = UserConfig(user=user_name)
-            user.save()
+            user = UserConfig.objects.create(user=user_name)
             return user
         return users[0]
 
@@ -140,70 +139,49 @@ class UserConfig(models.Model):
 class PersistentInfo(models.Model):
     info = models.CharField(default="", max_length=2000)
     level = models.IntegerField(default=0)
-    date = models.DateTimeField(default=datetime.now)
+    date = models.DateTimeField(auto_now_add=True)
     user = models.CharField(max_length=1000, null=True)
 
     class Meta:
         ordering = ["-date", "level"]
 
     def create(info, level=int(logging.INFO), user=None):
-        PersistentInfo.remove_old_ones()
-
-        ob = PersistentInfo(
-            info=info, level=level, date=datetime.now(timezone("UTC")), user=user
-        )
-
-        index = 0
-        while index < 5:
-            try:
-                ob.save()
-                return
-            except Exception as e:
-                index += 1
+        try:
+            PersistentInfo.objects.create(
+                info=info, level=level, date=datetime.now(timezone("UTC")), user=user
+            )
+            return
+        except Exception as e:
+            print("PersistentInfo::create Exception {}".format(e))
 
     def text(info, level=int(logging.INFO), user=None):
-        PersistentInfo.remove_old_ones()
-
-        ob = PersistentInfo(
-            info=info, level=level, date=datetime.now(timezone("UTC")), user=user
-        )
-        index = 0
-        while index < 5:
-            try:
-                ob.save()
-                return
-            except Exception as e:
-                index += 1
+        try:
+            PersistentInfo.objects.create(
+                info=info, level=level, date=datetime.now(timezone("UTC")), user=user
+            )
+            return
+        except Exception as e:
+            print("PersistentInfo::text Exception {}".format(e))
 
     def error(info, level=int(logging.ERROR), user=None):
-        PersistentInfo.remove_old_ones()
-
-        ob = PersistentInfo(
-            info=info, level=level, date=datetime.now(timezone("UTC")), user=user
-        )
-        index = 0
-        while index < 5:
-            try:
-                ob.save()
-                return
-            except Exception as e:
-                index += 1
+        try:
+            PersistentInfo.objects.create(
+                info=info, level=level, date=datetime.now(timezone("UTC")), user=user
+            )
+            return
+        except Exception as e:
+            print("PersistentInfo::error Exception {}".format(e))
 
     def exc(info, level=int(logging.ERROR), exc_data=None, user=None):
-        PersistentInfo.remove_old_ones()
-
         text = "{}. Exception data:\n{}".format(info, str(exc_data))
-        ob = PersistentInfo(
-            info=text, level=level, date=datetime.now(timezone("UTC")), user=user
-        )
 
-        index = 0
-        while index < 5:
-            try:
-                ob.save()
-                return
-            except Exception as e:
-                index += 1
+        try:
+            PersistentInfo.objects.create(
+                info=text, level=level, date=datetime.now(timezone("UTC")), user=user
+            )
+            return
+        except Exception as e:
+            print("PersistentInfo::exc Exception {}".format(e))
 
     def cleanup():
         PersistentInfo.remove_old_ones()
@@ -223,10 +201,16 @@ class PersistentInfo(models.Model):
 
         try:
             date_range = DateUtils.get_days_range(5)
-            objs = PersistentInfo.objects.filter(date__lt=date_range[0])
-            objs.delete()
+            while True:
+                objs = PersistentInfo.objects.filter(date__lt=date_range[0])
+
+                if not objs.exists():
+                    break
+
+                obj = objs[0]
+                obj.delete()
         except Exception as e:
-            print("Exception {}".format(e))
+            print("[{}] Could not remove old persistant infos {}".format(LinkDatabase.name, e))
 
 
 class BackgroundJob(models.Model):
@@ -285,6 +269,7 @@ class BackgroundJob(models.Model):
     # for add link, the first argument is the link URL
     # for download music, the first argument is the link URL
     args = models.CharField(max_length=1000, null=True)
+    date_created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ["job", "pk", "subject"]
+        ordering = ["date_created", "job", "pk", "subject"]

@@ -235,7 +235,7 @@ def refresh_source(request, pk):
 
     source = sources[0]
 
-    dynamic_data = source.get_op_data() 
+    dynamic_data = source.get_op_data()
     if dynamic_data is not None:
         op = source.dynamic_data
         op.date_fetched = None
@@ -257,9 +257,12 @@ def sources_manual_refresh(request):
 
     objs = SourceDataController.objects.all()
 
-    for ob in objs:
-        plugin = SourceControllerBuilder.get(source)
-        plugin.check_for_data()
+    try:
+        for ob in objs:
+            plugin = SourceControllerBuilder.get(source)
+            plugin.check_for_data()
+    except Exception as E:
+        print(str(E))
 
     return HttpResponseRedirect(reverse("{}:sources".format(LinkDatabase.name)))
 

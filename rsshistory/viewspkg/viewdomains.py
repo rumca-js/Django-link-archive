@@ -8,7 +8,9 @@ from django.utils.http import urlencode
 from ..apps import LinkDatabase
 from ..models import Domains, DomainCategories, DomainSubCategories, ConfigurationEntry
 from ..controllers import (
-    LinkDataHyperController,
+    LinkDataHyperController, 
+    LinkDataController,
+    DomainsController,
 )
 from ..views import ViewPage
 from ..forms import DomainsChoiceForm, DomainEditForm, LinkInputForm
@@ -16,7 +18,7 @@ from ..queryfilters import DomainFilter
 
 
 class DomainsListView(generic.ListView):
-    model = Domains
+    model = DomainsController
     context_object_name = "content_list"
     paginate_by = 100
 
@@ -96,7 +98,7 @@ class DomainsListView(generic.ListView):
 
 
 class DomainsDetailView(generic.DetailView):
-    model = Domains
+    model = DomainsController
     context_object_name = "domain_detail"
 
     def get_context_data(self, **kwargs):
@@ -112,15 +114,26 @@ class DomainsDetailView(generic.DetailView):
 
 
 class DomainsByNameDetailView(generic.DetailView):
-    model = Domains
+    model = DomainsController
     context_object_name = "domain_detail"
 
     def get_object(self):
         domain_name = self.request.GET["domain_name"]
-        self.objects = Domains.objects.filter(domain=domain_name)
+        self.objects = DomainsController.objects.filter(domain=domain_name)
         if self.objects.count() > 0:
             self.object = self.objects[0]
             return self.object
+        else:
+            if domain_name.find("http") == -1:
+                domain_name = "https://"+domain_name
+
+            entries = LinkDataController.objects.filter(link = domain_name)
+            if len(entries) > 0:
+                entry = entries[0]
+                if not entry.dead:
+                    id = DomainsController.add(entry.link)
+                    self.object = DomainsController.objects.get(id)
+                    return self.object
 
     def get_context_data(self, **kwargs):
         from ..pluginsources.sourcecontrollerbuilder import SourceControllerBuilder
@@ -141,7 +154,7 @@ def domain_edit(request, pk):
     if data is not None:
         return data
 
-    domains = Domains.objects.filter(id=pk)
+    domains = DomainsController.objects.filter(id=pk)
     if not domains.exists():
         p.context["summary_text"] = "Could not find such domain"
         return p.render("summary_present.html")
@@ -181,7 +194,7 @@ def domain_remove(request, pk):
     if data is not None:
         return data
 
-    domain = Domains.objects.get(id=pk)
+    domain = DomainsController.objects.get(id=pk)
     domain.remove()
 
     return HttpResponseRedirect(reverse("{}:domains".format(LinkDatabase.name)))
@@ -194,7 +207,7 @@ def domains_remove_all(request):
     if data is not None:
         return data
 
-    Domains.remove_all()
+    DomainsController.remove_all()
 
     return HttpResponseRedirect(reverse("{}:domains".format(LinkDatabase.name)))
 
@@ -206,7 +219,7 @@ def domain_update_data(request, pk):
     if data is not None:
         return data
 
-    domains = Domains.objects.filter(id=pk)
+    domains = DomainsController.objects.filter(id=pk)
     domain = domains[0]
     domain.update_object(force=True)
 
@@ -225,7 +238,7 @@ def domains_fix(request):
     if data is not None:
         return data
 
-    Domains.update_all()
+    DomainsController.update_all()
 
     return HttpResponseRedirect(reverse("{}:domains".format(LinkDatabase.name)))
 
@@ -243,7 +256,7 @@ def domains_read_bookmarks(request):
 
 
 def domain_json(request, pk):
-    domains = Domains.objects.filter(id=pk)
+    domains = DomainsController.objects.filter(id=pk)
 
     if domains.count() == 0:
         p = ViewPage(request)
@@ -260,7 +273,7 @@ def domain_json(request, pk):
 def domains_json(request):
     from ..queryfilters import DomainFilter
 
-    domains = Domains.objects.all()
+    domains = DomainsController.objects.all()
 
     page_limit = "standard"
     if "page_limit" in request.GET:
@@ -294,6 +307,6 @@ def domains_reset_dynamic_data(request):
     p = ViewPage(request)
     p.set_title("Reset dynamic data")
 
-    Domains.reset_dynamic_data()
+    DomainsController.reset_dynamic_data()
 
     return redirect("{}:domains".format(LinkDatabase.name))

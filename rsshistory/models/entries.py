@@ -4,6 +4,7 @@ from django.db import models
 from django.urls import reverse
 from django.templatetags.static import static
 from django.utils import timezone
+import traceback
 
 from ..apps import LinkDatabase
 from .sources import SourceDataModel
@@ -154,6 +155,28 @@ class BaseLinkDataController(BaseLinkDataModel):
             sum_num += visit.visits
 
         return sum_num / visits.count()
+
+    def update_link_data(self):
+        p = HtmlPage(self.link)
+
+        if self.page_rating_contents == 0:
+            self.page_rating_contents = p.get_page_rating()
+
+        if self.title == "" or self.title is None:
+            self.title = p.get_title()
+
+        if self.description == "" or self.description is None:
+            self.description = p.get_description()
+
+        if self.thumbnail == "" or self.thumbnail is None:
+            self.thumbnail = p.get_image()
+
+        if self.language == "" or self.language is None:
+            self.language = p.get_language()
+
+        self.status_code = p.status_code
+
+        self.update_calculated_vote()
 
     def update_calculated_vote(self):
         self.page_rating_votes = self.get_vote()
@@ -339,22 +362,6 @@ class BaseLinkDataController(BaseLinkDataModel):
 
     def is_taggable(self):
         return self.permanent or self.bookmarked
-
-    def move_to_archive(self):
-        objs = ArchiveLinkDataModel.objects.filter(link=self.link)
-        if objs.count() == 0:
-            themap = self.get_map()
-            themap["source_obj"] = self.get_source_obj()
-            try:
-                ArchiveLinkDataModel.objects.create(**themap)
-                self.delete()
-            except Exception as e:
-                error_text = traceback.format_exc()
-        else:
-            try:
-                self.delete()
-            except Exception as e:
-                error_text = traceback.format_exc()
 
     def is_archive_entry(self):
         return False
