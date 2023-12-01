@@ -311,8 +311,8 @@ class RefreshThreadHandlerTest(WebPageDisabled, TestCase):
             1,
         )
 
-class CleanJobHandlerTest(WebPageDisabled, TestCase):
 
+class CleanJobHandlerTest(WebPageDisabled, TestCase):
     def setUp(self):
         source_youtube = SourceDataController.objects.create(
             url="https://youtube.com",

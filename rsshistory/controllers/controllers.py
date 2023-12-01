@@ -447,7 +447,7 @@ class LinkDataController(LinkDataModel):
         """Returns the URL to access a particular author instance."""
         return reverse("{}:entry-remove".format(LinkDatabase.name), args=[str(self.id)])
 
-    def move_old_links_to_archive(limit = 0):
+    def move_old_links_to_archive(limit=0):
         """
         from ..dateutils import DateUtils
 
@@ -532,7 +532,7 @@ class LinkDataController(LinkDataModel):
         reader = EntryPageDataReader(data)
         return reader.get_full_information()
 
-    def clear_old_entries(limit = 0):
+    def clear_old_entries(limit=0):
         """
         This function can clear many many links, so we do not perform entries.delete.
         We do it one-by-one.
@@ -670,12 +670,7 @@ class LinkDataController(LinkDataModel):
                     continue
 
                 for entry in entries:
-
-                    print(
-                            "[{}] Removing link:{}".format(
-                            LinkDatabase.name, entry.link
-                        )
-                    )
+                    print("[{}] Removing link:{}".format(LinkDatabase.name, entry.link))
 
                     entry.delete()
                     index += 1
@@ -694,12 +689,7 @@ class LinkDataController(LinkDataModel):
 
             if entries.exists():
                 for entry in entries:
-
-                    print(
-                            "[{}] Removing link:{}".format(
-                            LinkDatabase.name, entry.link
-                        )
-                    )
+                    print("[{}] Removing link:{}".format(LinkDatabase.name, entry.link))
 
                     entry.delete()
                     index += 1
@@ -714,14 +704,8 @@ class LinkDataController(LinkDataModel):
             )
 
             if entries.exists():
-
                 for entry in entries:
-
-                    print(
-                            "[{}] Removing link:{}".format(
-                            LinkDatabase.name, entry.link
-                        )
-                    )
+                    print("[{}] Removing link:{}".format(LinkDatabase.name, entry.link))
 
                     entry.delete()
                     index += 1
@@ -961,7 +945,7 @@ class LinkDataHyperController(object):
 
                 # TODO - add source domain when source is added
 
-                #if "source" in link_data:
+                # if "source" in link_data:
                 #    print("Adding 0 domain for: {}".format(link_data["source"]))
                 #    p = BasePage(link_data["source"])
                 #    domain = p.get_domain()
@@ -1187,18 +1171,26 @@ class DomainsController(Domains):
         if not Configuration.get_object().config_entry.auto_store_domain_info:
             return
 
-        entries = LinkDataController.objects.filter(permanent = True)
+        entries = LinkDataController.objects.filter(permanent=True)
         for entry in entries:
             if not DomainsController.is_domain_object(entry):
                 p = BasePage(entry.link)
                 if p.is_domain():
                     print("Create missing domains entry:{} - domain".format(entry.link))
-                    domains = Domains.objects.filter(domain = p.get_domain())
+                    domains = Domains.objects.filter(domain=p.get_domain())
                     if domains.count() == 0:
-                        print("Create missing domains entry:{} - missing domain".format(entry.link))
+                        print(
+                            "Create missing domains entry:{} - missing domain".format(
+                                entry.link
+                            )
+                        )
                         DomainsController.add(p.get_domain())
                     else:
-                        print("Create missing domains entry:{} - missing domain link".format(entry.link))
+                        print(
+                            "Create missing domains entry:{} - missing domain link".format(
+                                entry.link
+                            )
+                        )
                         domain = domains[0]
                         domain.link_obj = entry.link
 
@@ -1256,7 +1248,11 @@ class DomainsController(Domains):
         )
 
     def create_or_update_domain(domain_only_text):
-        print("[{}] Creating, or updating domain:{}".format(LinkDatabase.name, domain_only_text))
+        print(
+            "[{}] Creating, or updating domain:{}".format(
+                LinkDatabase.name, domain_only_text
+            )
+        )
         objs = Domains.objects.filter(domain=domain_only_text)
 
         obj = None

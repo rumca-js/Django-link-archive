@@ -31,10 +31,13 @@ class DomainParserPlugin(BaseParsePlugin):
 
         index = 0
         for link_str in domains_vec:
-                
             p = HtmlPage(link_str)
             if p.is_valid() == False:
-                print("[{}] DomainParserPlugin: link is not valid:{}".format(LinkDatabase.name, link_str))
+                print(
+                    "[{}] DomainParserPlugin: link is not valid:{}".format(
+                        LinkDatabase.name, link_str
+                    )
+                )
                 continue
 
             objs = LinkDataController.objects.filter(link=link_str)
@@ -44,7 +47,11 @@ class DomainParserPlugin(BaseParsePlugin):
             link_props = self.get_link_data(self.get_source(), link_str)
 
             if self.is_link_ok_to_add(link_props):
-                print("[{}] DomainParserPlugin: adding domain:{} [{}/{}]".format(LinkDatabase.name, link_str, index, num_entries))
+                print(
+                    "[{}] DomainParserPlugin: adding domain:{} [{}/{}]".format(
+                        LinkDatabase.name, link_str, index, num_entries
+                    )
+                )
                 yield link_props
 
                 index += 1

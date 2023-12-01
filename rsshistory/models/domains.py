@@ -65,6 +65,7 @@ class Domains(models.Model):
     def get_update_days_limit():
         return 7
 
+
 class DomainsSuffixes(models.Model):
     suffix = models.CharField(max_length=20, null=True, unique=True)
 

@@ -647,8 +647,6 @@ class RefreshThreadHandler(object):
         # This has to be done before exporting
         KeyWords.clear()
 
-        #PersistentInfo.create("Refreshing RSS data")
-
         from .controllers import SourceDataController
 
         self.check_sources()
@@ -656,8 +654,6 @@ class RefreshThreadHandler(object):
         if SourceExportHistory.is_update_required():
             self.do_update()
             SourceExportHistory.confirm()
-
-        #PersistentInfo.create("Refreshing RSS data - done")
 
     def check_sources(self):
         from .controllers import SourceDataController

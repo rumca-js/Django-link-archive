@@ -2,7 +2,11 @@ import django.utils
 
 from django.test import TestCase
 
-from ..controllers import LinkDataHyperController, SourceDataController, DomainsController
+from ..controllers import (
+    LinkDataHyperController,
+    SourceDataController,
+    DomainsController,
+)
 from ..models import LinkDataModel, ConfigurationEntry
 from ..dateutils import DateUtils
 from .utilities import WebPageDisabled

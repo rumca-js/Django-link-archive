@@ -17,8 +17,6 @@ from .models import PersistentInfo
 from .apps import LinkDatabase
 
 
-
-
 class BasePage(object):
     """
     Should not contain any HTML/RSS content processing
@@ -85,7 +83,6 @@ class BasePage(object):
         if self.status_code == 0:
             return False
 
-        #print("Status code:{}".format(self.status_code))
         if self.status_code == 403:
             # Many pages return 403, but they are correct
             return True
@@ -225,7 +222,6 @@ class BasePage(object):
 
 
 class DomainAwarePage(BasePage):
-
     def __init__(self, url, contents=None):
         super().__init__(url, contents)
 

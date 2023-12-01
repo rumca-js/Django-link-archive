@@ -77,7 +77,11 @@ class BaseParsePlugin(SourceGenericPlugin):
 
                 link_props = self.get_link_data(self.get_source(), link_str)
 
-                print("[{}] Processing parsing link {}:[{}/{}]".format(LinkDatabase.name, link_str, index, num_entries))
+                print(
+                    "[{}] Processing parsing link {}:[{}/{}]".format(
+                        LinkDatabase.name, link_str, index, num_entries
+                    )
+                )
 
                 yield link_props
 

@@ -210,7 +210,11 @@ class PersistentInfo(models.Model):
                 obj = objs[0]
                 obj.delete()
         except Exception as e:
-            print("[{}] Could not remove old persistant infos {}".format(LinkDatabase.name, e))
+            print(
+                "[{}] Could not remove old persistant infos {}".format(
+                    LinkDatabase.name, e
+                )
+            )
 
 
 class BackgroundJob(models.Model):

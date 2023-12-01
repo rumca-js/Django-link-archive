@@ -30,7 +30,11 @@ class BaseRssPlugin(SourceGenericPlugin):
         for index, prop in enumerate(all_props):
             prop = self.enhance(prop)
             if self.is_link_ok_to_add(prop):
-                print("[{}] Rss plugin link:{} [{}/{}]".format(LinkDatabase.name, prop["link"], index, num_entries))
+                print(
+                    "[{}] Rss plugin link:{} [{}/{}]".format(
+                        LinkDatabase.name, prop["link"], index, num_entries
+                    )
+                )
                 yield prop
 
     def enhance(self, prop):

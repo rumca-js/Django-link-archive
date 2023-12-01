@@ -1,5 +1,3 @@
-
-
 class RequestsObject(object):
     def __init__(self, url, headers, timeout):
         self.status_code = 200
@@ -10,7 +8,6 @@ class RequestsObject(object):
 
 
 class WebPageDisabled(object):
-
     def get_contents_function(self, url, headers, timeout):
         print("Mocked Requesting page: {}".format(url))
         return RequestsObject(url, headers, timeout)

@@ -273,7 +273,7 @@ class PersistentInfoView(generic.ListView):
         # Call the base implementation first to get the context
         context = super(PersistentInfoView, self).get_context_data(**kwargs)
         context = ViewPage.init_context(self.request, context)
-        context['page_title'] += " Logs"
+        context["page_title"] += " Logs"
 
         return context
 

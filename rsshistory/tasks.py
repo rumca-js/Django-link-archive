@@ -77,4 +77,3 @@ def process_one_jobs_task(arg):
         )
 
     logger.info("Processing done")
-

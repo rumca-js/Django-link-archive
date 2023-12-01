@@ -8,7 +8,7 @@ from django.utils.http import urlencode
 from ..apps import LinkDatabase
 from ..models import Domains, DomainCategories, DomainSubCategories, ConfigurationEntry
 from ..controllers import (
-    LinkDataHyperController, 
+    LinkDataHyperController,
     LinkDataController,
     DomainsController,
 )
@@ -125,9 +125,9 @@ class DomainsByNameDetailView(generic.DetailView):
             return self.object
         else:
             if domain_name.find("http") == -1:
-                domain_name = "https://"+domain_name
+                domain_name = "https://" + domain_name
 
-            entries = LinkDataController.objects.filter(link = domain_name)
+            entries = LinkDataController.objects.filter(link=domain_name)
             if len(entries) > 0:
                 entry = entries[0]
                 if not entry.dead:

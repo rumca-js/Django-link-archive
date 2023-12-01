@@ -32,15 +32,9 @@ class DomainTest(WebPageDisabled, TestCase):
         self.assertEqual(obj.suffix, "com")
 
         entries = LinkDataController.objects.all()
-        self.assertEqual(
-            entries.count(),
-            1
-            )
+        self.assertEqual(entries.count(), 1)
 
-        self.assertEqual(
-            obj.link_obj,
-            entries[0]
-            )
+        self.assertEqual(obj.link_obj, entries[0])
 
     def test_domain_add_https(self):
         LinkDataController.objects.all().delete()
@@ -60,15 +54,9 @@ class DomainTest(WebPageDisabled, TestCase):
         self.assertEqual(obj.suffix, "com")
 
         entries = LinkDataController.objects.all()
-        self.assertEqual(
-            entries.count(),
-            1
-            )
+        self.assertEqual(entries.count(), 1)
 
-        self.assertEqual(
-            obj.link_obj,
-            entries[0]
-            )
+        self.assertEqual(obj.link_obj, entries[0])
 
     def test_domain_add_full_link(self):
         LinkDataController.objects.all().delete()
@@ -88,12 +76,6 @@ class DomainTest(WebPageDisabled, TestCase):
         self.assertEqual(obj.suffix, "com")
 
         entries = LinkDataController.objects.all()
-        self.assertEqual(
-            entries.count(),
-            1
-            )
+        self.assertEqual(entries.count(), 1)
 
-        self.assertEqual(
-            obj.link_obj,
-            entries[0]
-            )
+        self.assertEqual(obj.link_obj, entries[0])
