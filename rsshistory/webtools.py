@@ -69,15 +69,46 @@ class BasePage(object):
         except Exception as e:
             pass
 
-    def get_robots_txt(self):
+    def get_robots_txt_url(self):
+        return self.get_domain() + "/robots.txt"
+
+    def is_robots_txt(self):
+        robots_file = self.get_robots_txt_url()
+        p = BasePage(robots_file)
+        if p.get_contents() != None:
+            return True
+
+    def get_robots_txt_obj(self):
         """
         https://developers.google.com/search/docs/crawling-indexing/robots/intro
         """
         self.rp = urllib.robotparser.RobotFileParser()
         domain = self.get_domain()
-        self.rp.set_url("{}/robots.txt".format(domain))
+        self.rp.set_url(self.get_robots_txt_url())
 
         return self.rp
+
+    def get_site_maps(self):
+        """
+        https://stackoverflow.com/questions/2978144/pythons-robotparser-ignoring-sitemaps
+        robot parser does not work. We have to do it manually
+        """
+        result = set()
+
+        p = HtmlPage(self.get_robots_txt_url())
+        contents = p.get_contents()
+        if contents:
+            lines = contents.split("\n")
+            for line in lines:
+                line = line.replace("\r","")
+                wh = line.find("Sitemap")
+                if wh >= 0:
+                    wh2 = line.find(":")
+                    if wh2 >= 0:
+                        sitemap = line[wh2 + 1:].strip()
+                        result.add(sitemap)
+
+        return list(result)
 
     def is_status_ok(self):
         if self.status_code == 0:
@@ -183,7 +214,12 @@ class BasePage(object):
 
     def get_page_ext(self):
         url = self.get_clean_url()
-        if self.url.endswith("/"):
+
+        # domain level does not say anything if it is HTML page, or not
+        if url == self.get_domain():
+            return ""
+
+        if url.endswith("/"):
             return ""
 
         sp = url.split(".")
@@ -486,7 +522,7 @@ class RssPage(DomainAwarePage):
         if self.feed is None:
             self.parse()
 
-        if "author" in self.feed:
+        if "author" in self.feed.feed:
             return self.feed.feed.author
 
 
@@ -780,17 +816,6 @@ class HtmlPage(DomainAwarePage):
 
         if rss_url:
             rss_url = BasePage.get_url_full(self.get_domain(), rss_url)
-            # try:
-            #    parser = RssPage(rss_url)
-            #    feed = parser.parse()
-            #
-            #    print("RSS: {}".format(rss_url))
-            #    print(len(feed.entries))
-            #
-            #    if len(feed.entries) > 0:
-            #        return rss_url
-            # except Exception as e:
-            #    print("WebTools exception {}".format(str(e)))
             return rss_url
 
         if not rss_url and full_check:
@@ -859,10 +884,17 @@ class HtmlPage(DomainAwarePage):
         props["rss_url"] = self.get_rss_url()
         props["page_rating"] = self.get_page_rating()
         props["status_code"] = self.status_code
+
+        if self.is_domain():
+            if self.is_robots_txt():
+                props["robots_txt_url"] = self.get_robots_txt_url()
+                props["site_maps_urls"] = self.get_site_maps()
+
         props["links"] = self.get_links()
         props["links_inner"] = self.get_links_inner()
         props["links_outer"] = self.get_links_outer()
         props["contents"] = self.get_contents()
+
         return props
 
     def get_properties(self):
