@@ -1,6 +1,6 @@
 import django.utils
-
 from django.test import TestCase
+from datetime import timedelta
 
 from ..controllers import (
     LinkDataHyperController,
@@ -36,6 +36,9 @@ class SourceParsePluginTest(WebPageDisabled, TestCase):
     def test_add_new_link_no_slash(self):
         link_name = "https://youtube.com/v=1234"
 
+        current_time = DateUtils.get_datetime_now_utc()
+        creation_date = current_time - timedelta(days=1)
+
         link_data = {
             "link": link_name,
             "source": "https://youtube.com",
@@ -43,14 +46,17 @@ class SourceParsePluginTest(WebPageDisabled, TestCase):
             "description": "description",
             "language": "en",
             "thumbnail": "https://youtube.com/favicon.ico",
-            "date_published": DateUtils.get_datetime_now_utc(),
+            "date_published": creation_date,
         }
 
+        # call tested function
         entry = LinkDataHyperController.add_new_link(link_data)
 
         objs = LinkDataModel.objects.filter(link=link_name)
 
         self.assertTrue(objs.count() == 1)
+        self.assertTrue(objs[0].link == link_name)
+        self.assertTrue(objs[0].date_published == creation_date)
 
     def test_add_new_link_with_slash(self):
         link_name = "https://youtube.com/v=1234/"
@@ -65,6 +71,7 @@ class SourceParsePluginTest(WebPageDisabled, TestCase):
             "date_published": DateUtils.get_datetime_now_utc(),
         }
 
+        # call tested function
         entry = LinkDataHyperController.add_new_link(link_data)
 
         objs = LinkDataModel.objects.filter(link="https://youtube.com/v=1234/")
@@ -92,6 +99,7 @@ class SourceParsePluginTest(WebPageDisabled, TestCase):
         self.assertEqual(objs.count(), 1)
         obj = objs[0]
 
+        # call tested function
         LinkDataHyperController.make_bookmarked(RequestObject(), obj)
 
         objs = LinkDataModel.objects.filter(link=link_name)
@@ -100,6 +108,7 @@ class SourceParsePluginTest(WebPageDisabled, TestCase):
 
         self.assertTrue(obj.bookmarked == True)
 
+        # call tested function
         LinkDataHyperController.make_not_bookmarked(RequestObject(), obj)
 
         objs = LinkDataModel.objects.filter(link=link_name)
@@ -117,10 +126,10 @@ class SourceParsePluginTest(WebPageDisabled, TestCase):
         config.auto_store_domain_info = True
         config.save()
 
-        link_name = "https://youtube.com/v=1234"
+        link_name_0 = "https://youtube.com/v=1234"
 
         link_data = {
-            "link": link_name,
+            "link": link_name_0,
             "source": "https://youtube.com",
             "title": "test",
             "description": "description",
@@ -129,10 +138,43 @@ class SourceParsePluginTest(WebPageDisabled, TestCase):
             "date_published": DateUtils.get_datetime_now_utc(),
         }
 
+        # call tested function
         entry = LinkDataHyperController.add_new_link(link_data, source_is_auto=True)
 
-        objs = LinkDataModel.objects.filter(link=link_name)
+        objs = LinkDataModel.objects.filter(link=link_name_0)
+        domains = DomainsController.objects.all()
 
         # for each domain an entry is created
         self.assertEqual(objs.count(), 1)
-        self.assertEqual(DomainsController.objects.all().count(), 1)
+        self.assertEqual(domains.count(), 1)
+        self.assertEqual(objs[0].domain_obj, domains[0])
+
+        link_name_1 = "https://youtube.com/v=1235"
+
+        link_data = {
+            "link": link_name_1,
+            "source": "https://youtube.com",
+            "title": "test",
+            "description": "description",
+            "language": "en",
+            "thumbnail": "https://youtube.com/favicon.ico",
+            "date_published": DateUtils.get_datetime_now_utc(),
+        }
+
+        # call tested function
+        entry = LinkDataHyperController.add_new_link(link_data, source_is_auto=True)
+
+        objs = LinkDataModel.objects.all()
+        domains = DomainsController.objects.all()
+
+        # for each domain an entry is created
+        self.assertEqual(objs.count(), 3)
+        self.assertEqual(objs[0].link, link_name_1)
+        self.assertEqual(objs[1].link, "https://youtube.com")
+        self.assertEqual(objs[2].link, link_name_0)
+
+        self.assertEqual(domains.count(), 1)
+
+        self.assertEqual(objs[0].domain_obj, domains[0])
+        self.assertEqual(objs[1].domain_obj, domains[0])
+        self.assertEqual(objs[2].domain_obj, domains[0])

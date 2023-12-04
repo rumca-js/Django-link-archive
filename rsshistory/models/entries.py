@@ -9,6 +9,8 @@ import traceback
 from ..apps import LinkDatabase
 from .sources import SourceDataModel
 from .admin import PersistentInfo
+from ..webtools import HtmlPage
+from .domains import Domains
 
 
 class BaseLinkDataModel(models.Model):
@@ -205,8 +207,6 @@ class BaseLinkDataController(BaseLinkDataModel):
             self.language = self.get_source_obj().language
             self.save()
         else:
-            from ..webtools import HtmlPage
-
             page = HtmlPage(self.link)
             if page.is_valid():
                 language = page.get_language()
@@ -392,6 +392,12 @@ class LinkDataModel(BaseLinkDataController):
         null=True,
         blank=True,
     )
+    domain_obj = models.ForeignKey(
+        Domains,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
 
 
 class ArchiveLinkDataModel(BaseLinkDataController):
@@ -399,6 +405,12 @@ class ArchiveLinkDataModel(BaseLinkDataController):
         SourceDataModel,
         on_delete=models.SET_NULL,
         related_name="archive_source",
+        null=True,
+        blank=True,
+    )
+    domain_obj = models.ForeignKey(
+        Domains,
+        on_delete=models.SET_NULL,
         null=True,
         blank=True,
     )

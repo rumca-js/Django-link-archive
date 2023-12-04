@@ -1,8 +1,14 @@
+
 class RequestsObject(object):
     def __init__(self, url, headers, timeout):
         self.status_code = 200
         self.apparent_encoding = "utf-8"
         self.encoding = "utf-8"
+
+        if url == "https://test-with-proper-html.com":
+            self.text = "text"
+            self.content = "text"
+
         self.text = "text"
         self.content = "text"
 

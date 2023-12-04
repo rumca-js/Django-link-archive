@@ -30,6 +30,7 @@ from .controllers import (
 )
 from .configuration import Configuration
 from .dateutils import DateUtils
+from .webtools import HtmlPage
 
 
 class BaseJobHandler(object):
@@ -117,7 +118,6 @@ class LinkDownloadJobHandler(BaseJobHandler):
     def process(self, obj=None):
         try:
             item = LinkDataController.objects.filter(link=obj.subject)[0]
-            from .webtools import HtmlPage
 
             p = HtmlPage(item.link)
             p.download_all()
@@ -227,8 +227,13 @@ class LinkAddJobHandler(BaseJobHandler):
             data = {"user": None, "language": source_obj.language, "bookmarked": False}
 
             print("Adding {} for {}".format(link, source_obj.title))
-            if not LinkDataHyperController.is_link(link):
-                LinkDataHyperController.create_from_youtube(link, data)
+            p = HtmlPage(link)
+            if p.is_youtube():
+                props = LinkDataHyperController.get_youtube_props(link, data)
+                LinkDataHyperController.add_new_link(props)
+            elif p.is_html():
+                props = LinkDataHyperController.get_htmlpage_props(link, data)
+                LinkDataHyperController.add_new_link(props)
 
             return True
 
@@ -734,8 +739,6 @@ class HandlerManager(object):
         return []
 
     def process_all(self):
-        PersistentInfo.create("Processing messages")
-
         config = Configuration.get_object()
         start_processing_time = time.time()
 
@@ -765,8 +768,6 @@ class HandlerManager(object):
                 if passed_seconds >= 60 * 10:
                     PersistentInfo.create("Task exeeded time:{}".format(passed_seconds))
                     break
-
-        PersistentInfo.create("Processing messages done")
 
     def process_one(self):
         PersistentInfo.create("Processing message")

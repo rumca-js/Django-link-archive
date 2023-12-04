@@ -5,8 +5,9 @@ import time
 
 from .sourcegenericplugin import SourceGenericPlugin
 from ..models import PersistentInfo
-from ..controllers import LinkDataController
+from ..controllers import LinkDataController, LinkDataHyperController
 from ..webtools import BasePage, HtmlPage
+from ..apps import LinkDatabase
 
 
 class BaseParsePlugin(SourceGenericPlugin):
@@ -32,33 +33,14 @@ class BaseParsePlugin(SourceGenericPlugin):
 
         if ext == "html" or ext == "htm" or ext == "":
             return True
+
         return False
 
     def get_link_data(self, source, link):
         from ..dateutils import DateUtils
 
         output_map = {}
-
-        link_ob = HtmlPage(link)
-
-        title = link_ob.get_title()
-        description = link_ob.get_description()
-        if description is None:
-            description = title
-
-        language = link_ob.get_language()
-        if not language:
-            language = source.language
-
-        output_map["link"] = link
-        output_map["title"] = title
-        output_map["description"] = description
-        output_map["source"] = source.url
-        output_map["date_published"] = DateUtils.get_datetime_now_utc()
-        output_map["language"] = language
-        output_map["thumbnail"] = link_ob.get_image()
-
-        return output_map
+        return LinkDataHyperController.get_htmlpage_props(link, output_map, source)
 
     def get_link_props(self):
         try:

@@ -6,7 +6,7 @@ from django.utils import timezone
 from django.urls import reverse
 
 from ..models import ConfigurationEntry, ArchiveLinkDataModel
-from ..controllers import SourceDataController, LinkDataController
+from ..controllers import SourceDataController, LinkDataController, DomainsController
 from ..configuration import Configuration
 from ..dateutils import DateUtils
 from .utilities import WebPageDisabled
@@ -22,6 +22,10 @@ class DataWriterTest(WebPageDisabled, TestCase):
         ArchiveLinkDataModel.objects.all().delete()
 
     def create_entries(self, days_before):
+        domain = DomainsController.objects.create(
+                domain ="https://youtube.com",
+                )
+
         source_youtube = SourceDataController.objects.create(
             url="https://youtube.com",
             title="YouTube",
@@ -30,33 +34,42 @@ class DataWriterTest(WebPageDisabled, TestCase):
             export_to_cms=True,
             remove_after_days=1,
         )
-        LinkDataController.objects.create(
+        ob = LinkDataController.objects.create(
             source="https://youtube.com",
             link="https://youtube.com?v=bookmarked",
             title="The first link",
             source_obj=source_youtube,
             bookmarked=True,
-            date_published=days_before,
             language="en",
+            domain_obj = domain,
         )
-        LinkDataController.objects.create(
+        # TODO - check why that does not work out of the box!!!
+        ob.date_published=days_before
+        ob.save()
+
+        ob = LinkDataController.objects.create(
             source="https://youtube.com",
             link="https://youtube.com?v=nonbookmarked",
             title="The second link",
             source_obj=source_youtube,
             bookmarked=False,
-            date_published=days_before,
             language="en",
+            domain_obj = domain,
         )
-        LinkDataController.objects.create(
+        ob.date_published=days_before
+        ob.save()
+
+        ob = LinkDataController.objects.create(
             source="https://youtube.com",
             link="https://youtube.com?v=permanent",
             title="The first link",
             source_obj=source_youtube,
             permanent=True,
-            date_published=days_before,
             language="en",
+            domain_obj = domain,
         )
+        ob.date_published=days_before
+        ob.save()
 
     def test_move_old_links_to_archive(self):
         conf = Configuration.get_object().config_entry
@@ -67,32 +80,46 @@ class DataWriterTest(WebPageDisabled, TestCase):
         self.clear()
         self.create_entries(days_before)
 
+        original_date_published = LinkDataController.objects.filter(
+            link="https://youtube.com?v=nonbookmarked"
+        )[0].date_published
+
+        # call tested function
         LinkDataController.move_old_links_to_archive()
 
         bookmarked = LinkDataController.objects.filter(
             link="https://youtube.com?v=bookmarked"
         )
         self.assertEqual(bookmarked.count(), 1)
+
         permanent = LinkDataController.objects.filter(
             link="https://youtube.com?v=permanent"
         )
         self.assertEqual(permanent.count(), 1)
+
         nonbookmarked = LinkDataController.objects.filter(
             link="https://youtube.com?v=nonbookmarked"
         )
         self.assertEqual(nonbookmarked.count(), 0)
 
-        self.assertEqual(ArchiveLinkDataModel.objects.all().count(), 1)
+        archived = ArchiveLinkDataModel.objects.all()
+        domains = DomainsController.objects.all()
+
+        self.assertEqual(archived.count(), 1)
+        self.assertEqual(domains.count(), 1)
+        self.assertEqual(archived[0].domain_obj, domains[0])
+        self.assertEqual(archived[0].date_published, original_date_published)
 
     def test_clear_old_entries(self):
         conf = Configuration.get_object().config_entry
 
         current_time = DateUtils.get_datetime_now_utc()
-        days_before = current_time - timedelta(days=conf.days_to_remove_links + 1)
+        days_before = current_time - timedelta(days=conf.days_to_remove_links + 2)
 
         self.clear()
         self.create_entries(days_before)
 
+        # call tested function
         LinkDataController.clear_old_entries()
 
         bookmarked = LinkDataController.objects.filter(
@@ -106,6 +133,6 @@ class DataWriterTest(WebPageDisabled, TestCase):
         nonbookmarked = LinkDataController.objects.filter(
             link="https://youtube.com?v=nonbookmarked"
         )
-        self.assertEqual(nonbookmarked.count(), 0)
 
+        self.assertEqual(nonbookmarked.count(), 0)
         self.assertEqual(ArchiveLinkDataModel.objects.all().count(), 0)

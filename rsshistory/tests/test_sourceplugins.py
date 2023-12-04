@@ -141,9 +141,8 @@ class DomainParsePluginTest(WebPageDisabled, TestCase):
         parser = DomainParserPlugin(self.source_youtube.id)
 
         parser.contents = webpage_contents
-        # domains = parser.get_domains()
 
-        props = parser.get_link_props()
+        props = list(parser.get_link_props())
         print(props)
 
         self.assertTrue(self.is_domain(props, "https://test1.com"))
@@ -174,7 +173,7 @@ class BaseParsePluginTest(WebPageDisabled, TestCase):
         parser.contents = webpage_youtube_contents
         # domains = parser.get_domains()
 
-        props = parser.get_link_props()
+        props = list(parser.get_link_props())
         print(props)
 
         self.assertTrue(self.is_domain(props, "https://youtube.com/1"))

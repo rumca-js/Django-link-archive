@@ -54,6 +54,7 @@ class DomainParserPlugin(BaseParsePlugin):
                 )
                 yield link_props
 
+                # TODO better sanity checks!!!
                 index += 1
                 if index > 10:
                     return

@@ -46,7 +46,8 @@ class SourceDataController(SourceDataModel):
         SourceDataController.fix_entries(source)
 
         if Configuration.get_object().config_entry.auto_store_domain_info:
-            DomainsController.add(source_data_map["url"])
+            p = BasePage(source_data_map["url"])
+            LinkDataHyperController.add_simple(p.get_domain())
 
         return source
 
@@ -448,39 +449,6 @@ class LinkDataController(LinkDataModel):
         return reverse("{}:entry-remove".format(LinkDatabase.name), args=[str(self.id)])
 
     def move_old_links_to_archive(limit=0):
-        """
-        from ..dateutils import DateUtils
-
-        conf = Configuration.get_object().config_entry
-
-        if conf.days_to_move_to_archive == 0:
-            return
-
-        current_time = DateUtils.get_datetime_now_utc()
-        days_before = current_time - timedelta(days=conf.days_to_move_to_archive)
-
-        index = 0
-        while True:
-            entries = LinkDataController.objects.filter(
-                bookmarked=False, permanent=False, date_published__lt=days_before
-            )
-
-            if not entries.exists():
-                break
-
-            entry = entries[0]
-
-            print(
-                "[{}]:Moving link to archive: {}".format(LinkDatabase.name, entry.link)
-            )
-
-            LinkDataController.move_to_archive(entry)
-            index += 1
-
-            if limit and index > limit:
-                break
-        """
-
         from ..dateutils import DateUtils
 
         conf = Configuration.get_object().config_entry
@@ -514,7 +482,9 @@ class LinkDataController(LinkDataModel):
         objs = ArchiveLinkDataModel.objects.filter(link=entry.link)
         if objs.count() == 0:
             themap = entry.get_map()
+            domain_obj = entry.domain_obj
             themap["source_obj"] = entry.get_source_obj()
+            themap["domain_obj"] = domain_obj
             try:
                 ArchiveLinkDataModel.objects.create(**themap)
                 entry.delete()
@@ -533,111 +503,6 @@ class LinkDataController(LinkDataModel):
         return reader.get_full_information()
 
     def clear_old_entries(limit=0):
-        """
-        This function can clear many many links, so we do not perform entries.delete.
-        We do it one-by-one.
-        It also could have been by using django batch jobs.
-        These loops are dangerous. We could be finding again some entries,
-         if we added any conditions.
-        """
-        """
-        from ..dateutils import DateUtils
-
-        config = Configuration.get_object().config_entry
-        config_days = config.days_to_remove_links
-
-        index = 0
-
-        sources = SourceDataController.objects.all()
-        for source in sources:
-            if not source.is_removeable():
-                continue
-
-            days = source.get_days_to_remove()
-
-            if config_days != 0 and days == 0:
-                days = config_days
-            if config_days != 0 and config_days < days:
-                days = config_days
-
-            if days > 0:
-                days_before = DateUtils.get_days_before_dt(days)
-
-                while True:
-                    entries = LinkDataController.objects.filter(
-                        source=source.url,
-                        bookmarked=False,
-                        permanent=False,
-                        date_published__lt=days_before,
-                    )
-                    if not entries.exists():
-                        break
-
-                    entry = entries[0]
-
-                    print(
-                            "[{}] Removing link:{}".format(
-                            LinkDatabase.name, entry.link
-                        )
-                    )
-
-                    entry.delete()
-                    index += 1
-                    if limit and index > limit:
-                        return
-
-        days = config_days
-        if days != 0:
-            days_before = DateUtils.get_days_before_dt(days)
-
-            while True:
-                entries = LinkDataController.objects.filter(
-                    bookmarked=False,
-                    permanent=False,
-                    date_published__lt=days_before,
-                )
-
-                if not entries.exists():
-                    break
-
-                entry = entires[0]
-
-                print(
-                        "[{}] Removing link:{}".format(
-                        LinkDatabase.name, entry.link
-                    )
-                )
-
-                entry.delete()
-                index += 1
-
-                if limit and index > limit:
-                    return
-
-            while True:
-                entries = ArchiveLinkDataController.objects.filter(
-                    bookmarked=False,
-                    permanent=False,
-                    date_published__lt=days_before,
-                )
-
-                if not entries.exists():
-                    break
-
-                entry = entires[0]
-
-                print(
-                        "[{}] Removing link:{}".format(
-                        LinkDatabase.name, entry.link
-                    )
-                )
-
-                entry.delete()
-                index += 1
-
-                if limit and index > limit:
-                    return
-        """
         from ..dateutils import DateUtils
 
         config = Configuration.get_object().config_entry
@@ -666,7 +531,7 @@ class LinkDataController(LinkDataModel):
                     permanent=False,
                     date_published__lt=days_before,
                 )
-                if entries.exists():
+                if not entries.exists():
                     continue
 
                 for entry in entries:
@@ -805,6 +670,10 @@ class LinkDataHyperController(object):
 
         return obj
 
+    def add_simple(link_url):
+        props = LinkDataHyperController.get_htmlpage_props(link_url, {})
+        LinkDataHyperController.add_new_link(props)
+
     def is_domain_link_data(link_data):
         p = BasePage(link_data["link"])
         return p.get_domain() == link_data["link"]
@@ -825,6 +694,10 @@ class LinkDataHyperController(object):
         new_link_data = dict(link_data)
         if "date_published" not in new_link_data:
             new_link_data["date_published"] = DateUtils.get_datetime_now_utc()
+
+        domain = DomainsController.add(new_link_data["link"])
+        if domain:
+            new_link_data["domain_obj"] = domain
 
         if not is_archive:
             ob = LinkDataModel.objects.create(**new_link_data)
@@ -895,7 +768,7 @@ class LinkDataHyperController(object):
 
         return False
 
-    def create_from_youtube(url, data):
+    def get_youtube_props(url, data):
         from ..pluginentries.handlervideoyoutube import YouTubeVideoHandler
 
         objs = LinkDataController.objects.filter(link=url)
@@ -935,75 +808,43 @@ class LinkDataHyperController(object):
         if sources.exists():
             link_data["source_obj"] = sources[0]
 
-        return LinkDataHyperController.add_new_link(link_data)
+    def get_htmlpage_props(url, output_map, source_obj = None):
+        from ..dateutils import DateUtils
+
+        link_ob = HtmlPage(url)
+
+        if "link" not in output_map:
+            output_map["link"] = url
+        if "title" not in output_map:
+            title = link_ob.get_title()
+            output_map["title"] = title
+        if "description" not in output_map:
+            description = link_ob.get_description()
+            if description is None:
+                description = title
+            output_map["description"] = description
+
+        if "language" not in output_map:
+            language = link_ob.get_language()
+            if not language:
+                if source_obj:
+                    language = source_obj.language
+            output_map["language"] = language
+
+        if "date_published" not in output_map:
+            output_map["date_published"] = DateUtils.get_datetime_now_utc()
+
+        if "thumbnail" not in output_map:
+            output_map["thumbnail"] = link_ob.get_image()
+
+        return output_map
 
     def add_addition_link_data(link_data):
         try:
-            config = Configuration.get_object().config_entry
-            if config.auto_store_domain_info:
-                domains = set()
+            LinkDataHyperController.add_domains(link_data)
+            LinkDataHyperController.add_keywords(link_data)
+            LinkDataHyperController.add_sources(link_data)
 
-                # TODO - add source domain when source is added
-
-                # if "source" in link_data:
-                #    print("Adding 0 domain for: {}".format(link_data["source"]))
-                #    p = BasePage(link_data["source"])
-                #    domain = p.get_domain()
-                #    if (
-                #        domain == None
-                #        or domain == ""
-                #        or domain == "http://"
-                #        or domain == "https://"
-                #    ):
-                #        LinkDataHyperController.store_error_info(
-                #            domain, "Invalid source domain"
-                #        )
-                #    domains.add(domain)
-
-                p = BasePage(link_data["link"])
-                domain = p.get_domain()
-                domains.add(domain)
-                if (
-                    domain == None
-                    or domain == ""
-                    or domain == "http://"
-                    or domain == "https://"
-                ):
-                    LinkDataHyperController.store_error_info(
-                        domain, "Invalid link domain"
-                    )
-
-                parser = ContentLinkParser(link_data["link"], link_data["description"])
-                description_links = parser.get_links()
-
-                for link in description_links:
-                    ppp = BasePage(link)
-                    domain = ppp.get_domain()
-                    if (
-                        domain == None
-                        or domain == ""
-                        or domain == "http://"
-                        or domain == "https://"
-                    ):
-                        text = "Invalid description line link:{} domain:{} description:{}".format(
-                            link, domain, link_data["description"]
-                        )
-                        LinkDataHyperController.store_error_info(domain, text)
-                    else:
-                        domains.add(domain)
-
-                for domain in domains:
-                    if (
-                        domain != None
-                        and domain != ""
-                        and domain != "http://"
-                        and domain != "https://"
-                    ):
-                        DomainsController.add(domain)
-
-            if config.auto_store_keyword_info:
-                if "title" in link_data:
-                    KeyWords.add_link_data(link_data)
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.exc(
@@ -1015,6 +856,87 @@ class LinkDataHyperController(object):
                 )
             )
             print(error_text)
+
+    def add_domains(link_data):
+        config = Configuration.get_object().config_entry
+        if config.auto_store_domain_info:
+            domains = set()
+
+            p = BasePage(link_data["link"])
+            domain = p.get_domain()
+            domains.add(domain)
+
+            parser = ContentLinkParser(link_data["link"], link_data["description"])
+            description_links = parser.get_links()
+
+            for link in description_links:
+                ppp = BasePage(link)
+                domain = ppp.get_domain()
+                domains.add(domain)
+
+            for domain in domains:
+                LinkDataHyperController.add_simple(domain)
+
+    def add_keywords(link_data):
+        config = Configuration.get_object().config_entry
+
+        if config.auto_store_keyword_info:
+            if "title" in link_data:
+                KeyWords.add_link_data(link_data)
+
+    def add_sources(link_props):
+        conf = Configuration.get_object().config_entry
+
+        if not conf.auto_store_sources:
+            return
+
+        link = link_props["link"]
+        html = HtmlPage(link)
+        props = html.get_properties_map()
+
+        rss_url = props["rss_url"]
+        if not rss_url:
+            return
+
+        if rss_url.endswith("/"):
+            rss_url = rss_url[:-1]
+
+        if SourceDataModel.objects.filter(url=rss_url).count() > 0:
+            return
+
+        parser = RssPage(rss_url)
+        d = parser.parse()
+        if d is None:
+            PersistentInfo.error("RSS is empty: rss_url:{0}".format(rss_url))
+            return
+
+        if len(d.entries) == 0:
+            PersistentInfo.error("RSS no entries: rss_url:{0}".format(rss_url))
+            return
+
+        props = {}
+        props["url"] = rss_url
+
+        title = parser.get_title()
+        if title:
+            props["title"] = title
+        props["export_to_cms"] = False
+        language = parser.get_language()
+        if language:
+            props["language"] = language
+        thumnail = parser.get_thumbnail()
+        if thumnail:
+            props["favicon"] = thumnail
+        props["on_hold"] = not conf.auto_store_sources_enabled
+        props["source_type"] = SourceDataModel.SOURCE_TYPE_RSS
+        props["remove_after_days"] = 2
+        props["category"] = "New"
+        props["subcategory"] = "New"
+
+        try:
+            SourceDataModel.objects.create(**props)
+        except Exception as E:
+            PersistentInfo.error("Exception {}".format(str(E)))
 
     def store_error_info(url, info):
         lines = traceback.format_stack()
@@ -1107,7 +1029,8 @@ class LinkDataHyperController(object):
     def read_domains_from_bookmarks():
         objs = LinkDataModel.objects.filter(bookmarked=True)
         for obj in objs:
-            DomainsController.add(obj.link)
+            p = BasePage(obj.link)
+            LinkDataHyperController.add_simple(p.get_domain())
 
     def get_clean_description(link_data):
         import re
@@ -1161,61 +1084,16 @@ class LinkCommentDataController(LinkCommentDataModel):
 
 class DomainsController(Domains):
     """
-    TODO copy methods from model
     """
 
     class Meta:
         proxy = True
 
-    def create_missing_domains():
-        if not Configuration.get_object().config_entry.auto_store_domain_info:
-            return
-
-        entries = LinkDataController.objects.filter(permanent=True)
-        for entry in entries:
-            if not DomainsController.is_domain_object(entry):
-                p = BasePage(entry.link)
-                if p.is_domain():
-                    print("Create missing domains entry:{} - domain".format(entry.link))
-                    domains = Domains.objects.filter(domain=p.get_domain())
-                    if domains.count() == 0:
-                        print(
-                            "Create missing domains entry:{} - missing domain".format(
-                                entry.link
-                            )
-                        )
-                        DomainsController.add(p.get_domain())
-                    else:
-                        print(
-                            "Create missing domains entry:{} - missing domain link".format(
-                                entry.link
-                            )
-                        )
-                        domain = domains[0]
-                        domain.link_obj = entry.link
-
-    def is_domain_object(entry):
-        if not hasattr(entry, "domain_obj"):
-            return False
-
-        return entry.domain_obj
-
     def add(url):
         """
         Public API
         """
-        wh = url.find(":")
-        if wh > 8:
-            url = url[:wh]
-
-        if url.strip() == "":
-            print("Provided invalid URL, empty")
-            return
-
-        if url.find("http") == -1:
-            url = "https://" + url
-
-        domain_text = DomainsController.get_domain_url(url)
+        domain_text = DomainsController.get_domain_only(url)
         if (
             not domain_text
             or domain_text == ""
@@ -1230,22 +1108,6 @@ class DomainsController(Domains):
             return
 
         return DomainsController.create_or_update_domain(domain_text)
-
-    def get_domain_url(input_url):
-        p = BasePage(input_url)
-        domain_text = p.get_domain_only()
-        return domain_text
-
-    def get_domain_full_url(self, protocol=None):
-        if protocol is None:
-            return self.protocol + "://" + self.domain
-        else:
-            return protocol + "://" + self.domain
-
-    def get_absolute_url(self):
-        return reverse(
-            "{}:domain-detail".format(LinkDatabase.name), args=[str(self.id)]
-        )
 
     def create_or_update_domain(domain_only_text):
         print(
@@ -1263,26 +1125,18 @@ class DomainsController(Domains):
         else:
             obj = objs[0]
 
-        if obj:
-            return obj.id
+        return obj
 
     def create_object(domain_only_text, props):
         import tldextract
 
         if props:
-            entry = DomainsController.add_domain_entry(props)
-            if entry is None:
-                PersistentInfo.error(
-                    "Entry is None, cannot add domain {}".format(domain_only_text)
-                )
-                return
-
             extract = tldextract.TLDExtract()
             domain_data = extract(domain_only_text)
 
             tld = os.path.splitext(domain_only_text)[1][1:]
 
-            old_entries = Domains.objects.filter(link_obj=entry)
+            old_entries = Domains.objects.filter(domain = domain_only_text)
             if old_entries.count() > 0:
                 ob = old_entries[0]
                 ob.domain = domain_only_text
@@ -1299,13 +1153,58 @@ class DomainsController(Domains):
                     subdomain=domain_data.subdomain,
                     suffix=domain_data.suffix,
                     tld=tld,
-                    link_obj=entry,
+                    #link_obj=entry,
                 )
 
                 ob.update_complementary_data(True)
-                ob.check_and_create_source(props)
 
             return ob
+
+    def create_missing_domains():
+        if not Configuration.get_object().config_entry.auto_store_domain_info:
+            return
+
+        entries = LinkDataController.objects.filter(domain_obj=True)
+        for entry in entries:
+            p = BasePage(entry.link)
+            domain_url = p.get_domain()
+            domain_only = p.get_domain_only()
+            print("Entry:{} domain:{} {}".format(entry.link, domain_url, domain_only))
+
+            domains = DomainsController.objects.filter(domain = domain_only)
+            if domains.count() == 0:
+                print(
+                    "Create missing domains entry:{} - missing domain".format(
+                        entry.link
+                    )
+                )
+                domain = DomainsController.add(domain_url)
+                entry.domain_obj = domain
+                entry.save()
+            else:
+                print(
+                    "Create missing domains entry:{} - missing domain link".format(
+                        entry.link
+                    )
+                )
+                entry.domain_obj = domains[0]
+                entry.save()
+
+    def get_domain_only(input_url):
+        p = BasePage(input_url)
+        domain_text = p.get_domain_only()
+        return domain_text
+
+    def get_domain_full_url(self, protocol=None):
+        if protocol is None:
+            return self.protocol + "://" + self.domain
+        else:
+            return protocol + "://" + self.domain
+
+    def get_absolute_url(self):
+        return reverse(
+            "{}:domain-detail".format(LinkDatabase.name), args=[str(self.id)]
+        )
 
     def get_link_properties(domain_only):
         if domain_only.find("http") >= 0:
@@ -1337,7 +1236,7 @@ class DomainsController(Domains):
         # if self.link_obj is not None:
         #    return
 
-        link = DomainsController.get_domain_url(self.get_domain_full_url())
+        link = DomainsController.get_domain_only(self.get_domain_full_url())
         return DomainsController.get_link_properties(link)
 
     def update_object(self, force=False):
@@ -1345,79 +1244,6 @@ class DomainsController(Domains):
             self.update_domain()
 
         self.update_complementary_data(force)
-
-        if self.link_obj == None:
-            props = self.get_page_properties()
-            if props:
-                self.check_and_create_source(props)
-            else:
-                self.dead = True
-                self.save()
-
-    def add_domain_entry(props):
-        link_props = {}
-        link_props["link"] = props["link"]
-        link_props["title"] = props["title"]
-        link_props["description"] = props["description"]
-        link_props["page_rating_contents"] = props["page_rating"]
-        link_props["page_rating"] = props["page_rating"]
-        link_props["language"] = props["language"]
-
-        entry = LinkDataHyperController.add_new_link(link_props)
-        return entry
-
-    def check_and_create_source(self, props):
-        rss_url = props["rss_url"]
-        if not rss_url:
-            return
-
-        if rss_url.endswith("/"):
-            rss_url = rss_url[:-1]
-
-        if SourceDataModel.objects.filter(url=rss_url).count() > 0:
-            return
-
-        if self.link_obj and self.link_obj.dead:
-            return
-
-        conf = Configuration.get_object().config_entry
-
-        if not conf.auto_store_sources:
-            return
-
-        parser = RssPage(rss_url)
-        d = parser.parse()
-        if d is None:
-            PersistentInfo.error("RSS is empty: rss_url:{0}".format(rss_url))
-            return
-
-        if len(d.entries) == 0:
-            PersistentInfo.error("RSS no entries: rss_url:{0}".format(rss_url))
-            return
-
-        props = {}
-        props["url"] = rss_url
-
-        title = parser.get_title()
-        if title:
-            props["title"] = title
-        props["export_to_cms"] = False
-        language = parser.get_language()
-        if language:
-            props["language"] = language
-        thumnail = parser.get_thumbnail()
-        if thumnail:
-            props["favicon"] = thumnail
-        props["on_hold"] = not conf.auto_store_sources_enabled
-        props["source_type"] = SourceDataModel.SOURCE_TYPE_RSS
-        props["remove_after_days"] = 2
-        props["category"] = "New"
-        props["subcategory"] = "New"
-
-        try:
-            SourceDataModel.objects.create(**props)
-        except Exception as E:
-            PersistentInfo.error("Exception {}".format(str(E)))
 
     def get_domain_ext(self, domain_only_text):
         tld = os.path.splitext(domain_only_text)[1][1:]
@@ -1482,12 +1308,6 @@ class DomainsController(Domains):
             print("domain:{} Nothing has changed".format(self.domain))
 
     def update_page_info(self):
-        # if self.title is not None and self.description is not None and self.dead == False and not force:
-        #    print("Domain: not fixing title/description {} {} {}".format(self.domain, self.suffix, self.tld))
-        #    return False
-        if self.link_obj is not None:
-            return
-
         print("Fixing title {}".format(self.domain))
 
         from ..dateutils import DateUtils
@@ -1558,7 +1378,7 @@ class DomainsController(Domains):
             )
 
             domains = Domains.objects.filter(
-                date_update_last__lt=date_before_limit, dead=False, link_obj=None
+                date_update_last__lt=date_before_limit, dead=False
             )
             # domains = Domains.objects.filter(dead = True) #, description__isnull = True)
 
@@ -1569,14 +1389,6 @@ class DomainsController(Domains):
             except Exception as e:
                 print(str(e))
             print("Fixing:{} done".format(domain.domain))
-
-    def remove(self):
-        link = self.get_domain_full_url()
-        entry = LinkDataHyperController.get_link_object(link)
-        if entry:
-            entry.delete()
-
-        self.delete()
 
     def get_map(self):
         result = {
@@ -1629,6 +1441,12 @@ class DomainsController(Domains):
                 return self.description
         else:
             return ""
+
+    def is_domain_object(entry):
+        if not hasattr(entry, "main_domain_obj"):
+            return False
+
+        return entry.main_domain_obj
 
 
 class BackgroundJobController(BackgroundJob):
