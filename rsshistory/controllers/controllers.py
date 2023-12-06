@@ -808,7 +808,7 @@ class LinkDataHyperController(object):
         if sources.exists():
             link_data["source_obj"] = sources[0]
 
-    def get_htmlpage_props(url, output_map, source_obj = None):
+    def get_htmlpage_props(url, output_map, source_obj=None):
         from ..dateutils import DateUtils
 
         link_ob = HtmlPage(url)
@@ -1083,8 +1083,7 @@ class LinkCommentDataController(LinkCommentDataModel):
 
 
 class DomainsController(Domains):
-    """
-    """
+    """ """
 
     class Meta:
         proxy = True
@@ -1127,6 +1126,15 @@ class DomainsController(Domains):
 
         return obj
 
+    def get_link_object(self):
+        if not hasattr(self, "link_obj"):
+            entries = LinkDataController.objects.filter(link=self.get_domain_full_url())
+            if len(entries) > 0:
+                self.link_obj = entries[0]
+                return self.link_obj
+        else:
+            return self.link_obj
+
     def create_object(domain_only_text, props):
         import tldextract
 
@@ -1136,7 +1144,7 @@ class DomainsController(Domains):
 
             tld = os.path.splitext(domain_only_text)[1][1:]
 
-            old_entries = Domains.objects.filter(domain = domain_only_text)
+            old_entries = Domains.objects.filter(domain=domain_only_text)
             if old_entries.count() > 0:
                 ob = old_entries[0]
                 ob.domain = domain_only_text
@@ -1153,7 +1161,7 @@ class DomainsController(Domains):
                     subdomain=domain_data.subdomain,
                     suffix=domain_data.suffix,
                     tld=tld,
-                    #link_obj=entry,
+                    # link_obj=entry,
                 )
 
                 ob.update_complementary_data(True)
@@ -1171,7 +1179,7 @@ class DomainsController(Domains):
             domain_only = p.get_domain_only()
             print("Entry:{} domain:{} {}".format(entry.link, domain_url, domain_only))
 
-            domains = DomainsController.objects.filter(domain = domain_only)
+            domains = DomainsController.objects.filter(domain=domain_only)
             if domains.count() == 0:
                 print(
                     "Create missing domains entry:{} - missing domain".format(

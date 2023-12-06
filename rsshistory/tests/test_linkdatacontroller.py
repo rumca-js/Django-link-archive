@@ -23,8 +23,8 @@ class DataWriterTest(WebPageDisabled, TestCase):
 
     def create_entries(self, days_before):
         domain = DomainsController.objects.create(
-                domain ="https://youtube.com",
-                )
+            domain="https://youtube.com",
+        )
 
         source_youtube = SourceDataController.objects.create(
             url="https://youtube.com",
@@ -41,10 +41,10 @@ class DataWriterTest(WebPageDisabled, TestCase):
             source_obj=source_youtube,
             bookmarked=True,
             language="en",
-            domain_obj = domain,
+            domain_obj=domain,
         )
         # TODO - check why that does not work out of the box!!!
-        ob.date_published=days_before
+        ob.date_published = days_before
         ob.save()
 
         ob = LinkDataController.objects.create(
@@ -54,9 +54,9 @@ class DataWriterTest(WebPageDisabled, TestCase):
             source_obj=source_youtube,
             bookmarked=False,
             language="en",
-            domain_obj = domain,
+            domain_obj=domain,
         )
-        ob.date_published=days_before
+        ob.date_published = days_before
         ob.save()
 
         ob = LinkDataController.objects.create(
@@ -66,9 +66,9 @@ class DataWriterTest(WebPageDisabled, TestCase):
             source_obj=source_youtube,
             permanent=True,
             language="en",
-            domain_obj = domain,
+            domain_obj=domain,
         )
-        ob.date_published=days_before
+        ob.date_published = days_before
         ob.save()
 
     def test_move_old_links_to_archive(self):

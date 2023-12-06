@@ -394,7 +394,7 @@ class LinkDataModel(BaseLinkDataController):
     )
     domain_obj = models.ForeignKey(
         Domains,
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         null=True,
         blank=True,
     )
@@ -410,7 +410,7 @@ class ArchiveLinkDataModel(BaseLinkDataController):
     )
     domain_obj = models.ForeignKey(
         Domains,
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         null=True,
         blank=True,
     )
@@ -448,15 +448,19 @@ class EntryVisits(models.Model):
 
         visits = EntryVisits.objects.filter(entry=entry.link, user=user)
 
-        if visits.count() == 0:
-            visit = EntryVisits.objects.create(
-                entry=entry.link, user=user, visits=1, entry_object=entry
-            )
-        else:
-            visit = visits[0]
-            visit.visits += 1
-            visit.save()
+        try:
+            if visits.count() == 0:
+                visit = EntryVisits.objects.create(
+                    entry=entry.link, user=user, visits=1, entry_object=entry
+                )
+            else:
+                visit = visits[0]
+                visit.visits += 1
+                visit.save()
 
-        BackgroundJobController.update_entry_data(entry.link)
+            BackgroundJobController.update_entry_data(entry.link)
 
-        return visit
+            return visit
+
+        except Exception as E:
+            print(str(E))

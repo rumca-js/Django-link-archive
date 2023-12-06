@@ -1,4 +1,3 @@
-
 class RequestsObject(object):
     def __init__(self, url, headers, timeout):
         self.status_code = 200

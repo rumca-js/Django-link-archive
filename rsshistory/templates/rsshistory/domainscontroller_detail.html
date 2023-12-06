@@ -53,37 +53,37 @@ This domain is marked as dead!
     </tr>
 </table>
 
-<h3><a href="{{object.link_obj.get_absolute_url }}">Link information</a> </h3>
+{% if object.get_link_object %}
 
-{% if object.link_obj %}
+<h3><a href="{{object.get_link_object.get_absolute_url }}">Link information</a> </h3>
 
 <table>
     <tr>
-        <td>Title</td><td>{{object.link_obj.title}}</td>
+        <td>Title</td><td>{{object.get_link_object.title}}</td>
     </tr>
     <tr>
-        <td>Description</td><td>{{object.link_obj.description}}</td>
+        <td>Description</td><td>{{object.get_link_object.description}}</td>
     </tr>
     <tr>
-        <td>Language</td><td>{{object.link_obj.language}}</td>
+        <td>Language</td><td>{{object.get_link_object.language}}</td>
     </tr>
     <tr>
-        <td>Charset</td><td>{{object.link_obj.charset}}</td>
+        <td>Charset</td><td>{{object.get_link_object.charset}}</td>
     </tr>
     <tr>
-        <td>Date published</td><td>{{object.link_obj.date_published}}</td>
+        <td>Date published</td><td>{{object.get_link_object.date_published}}</td>
     </tr>
     <tr>
-        <td>Bookmarked</td><td>{{object.link_obj.bookmarked}}</td>
+        <td>Bookmarked</td><td>{{object.get_link_object.bookmarked}}</td>
     </tr>
     <tr>
-        <td>Permanent</td><td>{{object.link_obj.permanent}}</td>
+        <td>Permanent</td><td>{{object.get_link_object.permanent}}</td>
     </tr>
     <tr>
-        <td>Dead</td><td>{{object.link_obj.dead}}</td>
+        <td>Dead</td><td>{{object.get_link_object.dead}}</td>
     </tr>
     <tr>
-        <td>Status</td><td>{{object.link_obj.status_code}}</td>
+        <td>Status</td><td>{{object.get_link_object.status_code}}</td>
     </tr>
     <tr>
         <td>Artist</td><td>{{object.link_obj.artist}}</td>

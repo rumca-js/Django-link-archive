@@ -377,9 +377,9 @@ class DomainFilter(BaseQueryFilter):
             [
                 "category__icontains",
                 "subcategory__icontains",
-                "link_obj__title__icontains",
+                # TODO re-enable some day "link_obj__title__icontains",
                 "domain__icontains",
-                "link_obj__description__icontains",
+                # "link_obj__description__icontains",
             ]
         )
 

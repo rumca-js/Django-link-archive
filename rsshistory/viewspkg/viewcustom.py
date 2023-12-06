@@ -19,6 +19,7 @@ from ..controllers import (
     BackgroundJobController,
     SourceDataController,
     LinkDataController,
+    DomainsController,
 )
 from ..views import ViewPage
 from ..dateutils import DateUtils
@@ -299,8 +300,6 @@ def show_page_props(request):
     if data is not None:
         return data
 
-    from ..webtools import HtmlPage
-
     if not request.method == "POST":
         form = LinkInputForm()
         form.method = "POST"
@@ -316,7 +315,7 @@ def show_page_props(request):
 
             return p.render("summary_present.html")
         else:
-            from ..pluginentries.youtubelinkhandler import YouTubeLinkHandler
+            from ..pluginentries.handlervideoyoutube import YouTubeVideoHandler
 
             page_link = form.cleaned_data["link"]
 

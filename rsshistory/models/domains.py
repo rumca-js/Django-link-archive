@@ -3,8 +3,6 @@ from django.urls import reverse
 import django.utils
 import traceback
 
-#from .entries import LinkDataModel
-
 
 class Domains(models.Model):
     protocol = models.CharField(
@@ -22,17 +20,17 @@ class Domains(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_update_last = models.DateTimeField(auto_now=True)  # to be removed
 
-    #link_obj = models.OneToOneField(
+    # link_obj = models.OneToOneField(
     #    LinkDataModel,
     #    on_delete=models.SET_NULL,
     #    related_name="main_domain_obj",
     #    null=True,
     #    blank=True,
-    #)
+    # )
 
     class Meta:
         ordering = [
-            #"-link_obj__page_rating",
+            # "-link_obj__page_rating",
             "-category",
             "-subcategory",
             "tld",

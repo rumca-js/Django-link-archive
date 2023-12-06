@@ -195,7 +195,7 @@ def domain_remove(request, pk):
         return data
 
     domain = DomainsController.objects.get(id=pk)
-    domain.remove()
+    domain.delete()
 
     return HttpResponseRedirect(reverse("{}:domains".format(LinkDatabase.name)))
 

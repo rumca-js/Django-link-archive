@@ -40,7 +40,7 @@
                title="{{domain.domain}}"
              >
              - <span class="link-list-item-title">
-                 {% if domain.dead or domain.link_obj.dead %}
+                 {% if domain.dead or domain.get_link_obj.dead %}
                  [DEAD]
                  {% endif %}
                  {{domain.domain}}
@@ -53,16 +53,16 @@
                  {% if domain.subcategory %}
                  [{{domain.subcategory}}]
                  {% endif %}
-                 {% if domain.link_obj.title %}
+                 {% if domain.get_link_obj.title %}
                  {{domain.title  | slice:":100"}}
                  {% endif %}
-                 | {{domain.link_obj.description | slice:":200"}}
+                 | {{domain.get_link_obj.description | slice:":200"}}
              </span>
              </a>
           {% elif type == "clear" %}
           <div>
               -
-             {% if domain.dead or domain.link_obj.dead %}
+             {% if domain.dead or domain.get_link_obj.dead %}
              [DEAD]
              {% endif %}
               {{domain.protocol}}://{{domain.domain}}

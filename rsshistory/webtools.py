@@ -100,12 +100,12 @@ class BasePage(object):
         if contents:
             lines = contents.split("\n")
             for line in lines:
-                line = line.replace("\r","")
+                line = line.replace("\r", "")
                 wh = line.find("Sitemap")
                 if wh >= 0:
                     wh2 = line.find(":")
                     if wh2 >= 0:
-                        sitemap = line[wh2 + 1:].strip()
+                        sitemap = line[wh2 + 1 :].strip()
                         result.add(sitemap)
 
         return list(result)
@@ -970,12 +970,25 @@ class HtmlPage(DomainAwarePage):
         return rating
 
     def is_valid(self):
+        """
+        This is a simple set of rules in which we reject the page.
+        Some checks rely on the title.
+
+        This is because some pages return valid HTTP return code, with a title informing about error.
+        Therefore we use HTML title as means to find some most obvious errors.
+
+        A user could have selected a title with these prohibited keywords, but I must admit this would not be wise
+        to have "Site not found" string in the title.
+        Better to reject such site either way.
+        """
         if BasePage.is_valid(self) == False:
             return False
 
         title = self.get_title()
         is_title_invalid = title and (
-            title.find("Forbidden") >= 0 or title.find("Access denied") >= 0
+            title.find("Forbidden") >= 0
+            or title.find("Access denied") >= 0
+            or title.find("Site not found")
         )
 
         if self.is_status_ok() == False or is_title_invalid:

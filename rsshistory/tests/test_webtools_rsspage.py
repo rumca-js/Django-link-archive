@@ -75,7 +75,7 @@ class RssPageTest(TestCase):
         # default language
         reader = RssPage("http://test.com/my-site-test", webpage_rss)
         reader.parse()
-        self.assertEqual(reader.get_author(), "SAMTIME author")
+        self.assertEqual(reader.get_author(), "SAMTIME name")
 
     def test_rss_entries(self):
         # default language

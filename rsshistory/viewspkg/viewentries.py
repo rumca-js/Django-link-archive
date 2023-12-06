@@ -188,6 +188,13 @@ class EntriesRecentListView(EntriesSearchListView):
         query_filter.get_sources()
         return query_filter
 
+    def get_queryset(self):
+        print("EntriesSearchListView:get_queryset")
+        self.query_filter = self.get_filter()
+        objects = self.get_filtered_objects()
+        print("EntriesSearchListView:get_queryset done {}".format(objects.query))
+        return objects
+
     def get_reset_link(self):
         return reverse("{}:entries-recent-init".format(LinkDatabase.name))
 
