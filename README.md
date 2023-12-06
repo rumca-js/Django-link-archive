@@ -9,7 +9,7 @@ Personal link database, with RSS functionality. Similar to Reddit, but completel
  - Google-like Link search ability
  - RSS feed support
  - You can gather information about: links, domains, feeds
- - It is not a search engine. Suggesting [whoogle-search](https://github.com/benbusby/whoogle-search), or [Marginalia search](https://search.marginalia.nu/)
+ - It is not a search engine. Suggesting better alternatives: [whoogle-search](https://github.com/benbusby/whoogle-search), or [Marginalia search](https://search.marginalia.nu/)
 
 ## Problems with other RSS readers, or apps
 
