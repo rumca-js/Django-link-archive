@@ -50,7 +50,7 @@ Personal link database, with RSS functionality. Similar to Reddit, but completel
  - [Notes about search industry](https://github.com/rumca-js/Django-link-archive/blob/main/README_search.md)
  - [Data analysis](https://github.com/rumca-js/Django-link-archive/blob/main/analysis/readme.md)
 
-# How it works?
+# How does it work?
 
  - First define a RSS source in "Sources" page, or you manually add a link in "Sources" page
  - Every day your bookmarks are exported to a repository, if configured
