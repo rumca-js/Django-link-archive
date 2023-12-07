@@ -38,10 +38,6 @@ class BaseRssPlugin(SourceGenericPlugin):
                 yield prop
 
     def enhance(self, prop):
-        prop["description"] = prop["description"][
-            : BaseLinkDataController.get_description_length() - 2
-        ]
-
         if prop["link"].endswith("/"):
             prop["link"] = prop["link"][:-1]
 

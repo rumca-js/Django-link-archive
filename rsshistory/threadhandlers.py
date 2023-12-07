@@ -616,10 +616,9 @@ class CleanupJobHandler(BaseJobHandler):
 
             if limit == 0:
                 PersistentInfo.remove_old_ones()
-                DomainsController.reset_dynamic_data()
-                DomainsController.create_missing_domains()
+                DomainsController.cleanup()
                 SourceDataModel.reset_dynamic_data()
-                KeyWords.clear()
+                KeyWords.cleanup()
 
             return True
 

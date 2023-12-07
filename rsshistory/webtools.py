@@ -17,6 +17,13 @@ from .models import PersistentInfo
 from .apps import LinkDatabase
 
 
+URL_TYPE_RSS = "rss"
+URL_TYPE_CSS = "css"
+URL_TYPE_JAVASCRIPT = "javascript"
+URL_TYPE_HTML = "html"
+URL_TYPE_UNKNOWN = "unknown"
+
+
 class BasePage(object):
     """
     Should not contain any HTML/RSS content processing
@@ -177,8 +184,8 @@ class BasePage(object):
             error_text = traceback.format_exc()
 
             PersistentInfo.error(
-                "Page: Error while reading page:{};Error:{};{}".format(
-                    self.url, str(e), error_text
+                "Page: Error while reading page:{};Error:{}".format(
+                    self.url, str(e)
                 )
             )
 
@@ -217,10 +224,10 @@ class BasePage(object):
 
         # domain level does not say anything if it is HTML page, or not
         if url == self.get_domain():
-            return ""
+            return
 
         if url.endswith("/"):
-            return ""
+            return
 
         sp = url.split(".")
         if len(sp) > 1:
@@ -228,7 +235,7 @@ class BasePage(object):
             if len(ext) < 5:
                 return ext
 
-        return ""
+        return
 
     def get_clean_url(self):
         url = self.url
@@ -315,33 +322,60 @@ class DomainAwarePage(BasePage):
         if self.url.find("amazonaws.com") >= 0:
             return True
 
-    def is_html(self, check_contents=False):
+    def is_html(self):
+        return self.get_type() == URL_TYPE_HTML
+
+    def is_rss(self):
+        return self.get_type() == URL_TYPE_RSS
+
+    def get_type(self):
+        the_type = self.get_type_by_ext()
+        if the_type:
+            return the_type
+        if self.get_page_ext() == None:
+            return URL_TYPE_HTML
+
+        return URL_TYPE_UNKNOWN
+
+    def get_type_by_ext(self):
         if self.is_analytics():
-            return False
+            return
+
+        ext_mapping = {"css" : URL_TYPE_CSS,
+                "js" : URL_TYPE_JAVASCRIPT,
+                "html" : URL_TYPE_HTML,
+                "htm" : URL_TYPE_HTML,
+                }
 
         ext = self.get_page_ext()
         if ext:
-            if ext == "js" or ext == "css":
-                return False
+            if ext in ext_mapping:
+                return ext_mapping[ext]
 
-        if check_contents:
-            if not self.contents:
-                self.contents = self.get_contents()
+        # if not found, we return none
 
-            if not self.contents:
-                print("Could not obtain contents for {}".format(self.url))
-                return
+    def get_type_by_checking_contents(self):
+        if self.is_contents_html():
+            return URL_TYPE_HTML
+        if self.is_contents_rss():
+            return URL_TYPE_RSS
 
-            if self.contents.find("DOCTYPE html") >= 0:
-                return True
-            if self.contents.find("<html") >= 0:
-                return True
-            if self.contents.find("<body") >= 0:
-                return True
-        else:
+    def is_contents_html(self):
+        if not self.contents:
+            self.contents = self.get_contents()
+
+        if not self.contents:
+            print("Could not obtain contents for {}".format(self.url))
+            return
+
+        if self.contents.find("DOCTYPE html") >= 0:
+            return True
+        if self.contents.find("<html") >= 0:
+            return True
+        if self.contents.find("<body") >= 0:
             return True
 
-    def is_rss(self):
+    def is_contents_rss(self):
         try:
             import feedparser
 
@@ -353,7 +387,31 @@ class DomainAwarePage(BasePage):
             return False
 
 
-class RssPage(DomainAwarePage):
+class ContentInterface(DomainAwarePage):
+
+    def __init__(self, url, contents=None):
+        super().__init__(url, contents)
+
+    def get_title(self):
+        raise NotImplementedError
+
+    def get_description(self):
+        raise NotImplementedError
+
+    def get_language(self):
+        raise NotImplementedError
+
+    def get_thumbnail(self):
+        raise NotImplementedError
+
+    def get_author(self):
+        raise NotImplementedError
+
+    def get_tags(self):
+        raise NotImplementedError
+
+
+class RssPage(ContentInterface):
     """
     Handles RSS parsing.
     Do not use feedparser directly enywhere. We use BasicPage
@@ -492,7 +550,7 @@ class RssPage(DomainAwarePage):
         if "title" in self.feed.feed:
             return self.feed.feed.title
 
-    def get_subtitle(self):
+    def get_description(self):
         if self.feed is None:
             self.parse()
 
@@ -647,7 +705,7 @@ class ContentLinkParser(BasePage):
         return result
 
 
-class HtmlPage(DomainAwarePage):
+class HtmlPage(ContentInterface):
     def __init__(self, url, contents=None):
         super().__init__(url, contents)
 
@@ -752,6 +810,36 @@ class HtmlPage(DomainAwarePage):
             description = description_find["content"]
 
         return description
+
+    def get_author(self):
+        if not self.contents:
+            self.contents = self.get_contents()
+
+        if not self.contents:
+            return None
+
+        author = None
+
+        author_find = self.soup.find("meta", attrs={"name": "author"})
+        if author_find and author_find.has_attr("content"):
+            author = author_find["content"]
+
+        return author
+
+    def get_tags(self):
+        if not self.contents:
+            self.contents = self.get_contents()
+
+        if not self.contents:
+            return None
+
+        keywords = None
+
+        keywords_find = self.soup.find("meta", attrs={"name": "keywords"})
+        if keywords_find and keywords_find.has_attr("content"):
+            keywords = keywords_find["content"]
+
+        return keywords
 
     def get_description(self):
         if not self.contents:
@@ -923,6 +1011,11 @@ class HtmlPage(DomainAwarePage):
         rating += self.get_page_rating_status_code(self.status_code)
         rating += self.get_page_rating_language(language)
 
+        if self.get_author() != None:
+            rating += 1
+        if self.get_tags() != None:
+            rating += 1
+
         if image_og:
             rating += 5
 
@@ -988,7 +1081,7 @@ class HtmlPage(DomainAwarePage):
         is_title_invalid = title and (
             title.find("Forbidden") >= 0
             or title.find("Access denied") >= 0
-            or title.find("Site not found")
+            or title.find("Site not found") >= 0
         )
 
         if self.is_status_ok() == False or is_title_invalid:

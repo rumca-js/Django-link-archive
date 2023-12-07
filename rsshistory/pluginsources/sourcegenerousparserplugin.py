@@ -18,7 +18,7 @@ class SourceGenerousParserPlugin(BaseParsePlugin):
         p = BasePage(address)
         ext = p.get_page_ext()
 
-        if ext == "html" or ext == "htm" or ext == "":
+        if ext == "html" or ext == "htm" or ext == None:
             return True
         else:
             return False

@@ -151,17 +151,16 @@ class KeyWords(models.Model):
 
             return True
 
-    def clear():
-        from ..dateutils import DateUtils
+    def cleanup():
+        if Configuration.get_object().config_entry.auto_store_keyword_info:
+            from ..dateutils import DateUtils
 
-        # entries older than 2 days
-        date_before_limit = KeyWords.get_keywords_date_limit()
-        keys = KeyWords.objects.filter(date_published__lt=date_before_limit)
-        keys.delete()
-
-        ## Each day capture new keywords
-        # keys = KeyWords.objects.all()
-        # keys.delete()
+            date_before_limit = KeyWords.get_keywords_date_limit()
+            keys = KeyWords.objects.filter(date_published__lt=date_before_limit)
+            keys.delete()
+        else:
+            keys = KeyWords.objects.all()
+            keys.delete()
 
     def get_keywords_date_limit():
         from ..dateutils import DateUtils

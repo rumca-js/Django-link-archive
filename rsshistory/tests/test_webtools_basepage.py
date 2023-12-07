@@ -107,7 +107,7 @@ class BasePageTest(TestCase):
         p = BasePage("http://mytestpage.com", webpage_links)
         ext = p.get_page_ext()
 
-        self.assertTrue(ext == "")
+        self.assertTrue(ext == None)
 
     def test_get_page_ext_html_args(self):
         p = BasePage("http://mytestpage.com/page.html?args=some", webpage_links)

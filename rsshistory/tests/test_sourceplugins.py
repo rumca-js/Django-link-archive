@@ -171,7 +171,6 @@ class BaseParsePluginTest(WebPageDisabled, TestCase):
         parser = BaseParsePlugin(self.source_youtube.id)
 
         parser.contents = webpage_youtube_contents
-        # domains = parser.get_domains()
 
         props = list(parser.get_link_props())
         print(props)
