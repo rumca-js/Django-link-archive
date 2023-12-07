@@ -30,6 +30,8 @@ class PageBuilder(object):
         return html
 
     def build_head(self, html):
+        # fmt: off
+
         meta_info = ""
         if self.title:
             meta_info += '<meta name="title" content="{}">\n'.format(self.title)
@@ -43,6 +45,8 @@ class PageBuilder(object):
             meta_info += '<meta property=”og:title” content="{}">\n'.format(self.og_title)
         if self.og_description:
             meta_info += '<meta property=”og:description” content="{}">\n'.format(self.og_description)
+
+        # fmt: on
 
         html = html.replace("${HEAD}", "<head>{}</head>".format(meta_info))
         return html
@@ -84,7 +88,7 @@ webpage_samtime_youtube_rss = """
 </channel>
 </rss>
 """
-        
+
 
 class RequestsObject(object):
     def __init__(self, url, headers, timeout):

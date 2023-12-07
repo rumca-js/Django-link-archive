@@ -184,9 +184,7 @@ class BasePage(object):
             error_text = traceback.format_exc()
 
             PersistentInfo.error(
-                "Page: Error while reading page:{};Error:{}".format(
-                    self.url, str(e)
-                )
+                "Page: Error while reading page:{};Error:{}".format(self.url, str(e))
             )
 
     def get_full_url(self):
@@ -341,11 +339,12 @@ class DomainAwarePage(BasePage):
         if self.is_analytics():
             return
 
-        ext_mapping = {"css" : URL_TYPE_CSS,
-                "js" : URL_TYPE_JAVASCRIPT,
-                "html" : URL_TYPE_HTML,
-                "htm" : URL_TYPE_HTML,
-                }
+        ext_mapping = {
+            "css": URL_TYPE_CSS,
+            "js": URL_TYPE_JAVASCRIPT,
+            "html": URL_TYPE_HTML,
+            "htm": URL_TYPE_HTML,
+        }
 
         ext = self.get_page_ext()
         if ext:
@@ -388,7 +387,6 @@ class DomainAwarePage(BasePage):
 
 
 class ContentInterface(DomainAwarePage):
-
     def __init__(self, url, contents=None):
         super().__init__(url, contents)
 
