@@ -81,7 +81,7 @@ Displays all available domains.
 
 ## Page properties
 
-Applicataion allows to downloda and view page properties
+Each link can be verified to display HTML properties.
 
 ![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/page_properties.PNG)
 
