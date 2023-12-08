@@ -59,6 +59,42 @@ Personal link database, with RSS functionality. Similar to Reddit, but completel
  - You can monitor what kinds of domains were added by the links to you system
  - You can monitor what kind of words generate most buzz
 
+# Ranking algorithm
+
+Each page is ranked by several factors.
+
+ - content ranking
+ - users votes
+ 
+The result is equal according to calculation
+ page ranking = content ranking + users votes
+
+Note: Page rating should not be based 'on time'. Good contents does is not 'worse' because x amount has passed. It should be however a suspect for verification, as it can be a case of abandoned project.
+
+## Content ranking
+
+Each page is automatically ranked by it's contents. There are several factors that are included into the ranking:
+ - meta title
+ - meta description (earns 5 points)
+ - og:title
+ - og:description (earns 5 points)
+ - og:image (earns 5 points)
+ - presence of RSS feed link
+
+ Title point breakdown:
+ - good title earns 10 points
+ - if title is longer than 1000 characters 5 points
+ - if title is one word 5 points
+ - if title has less than 4 chars 2 points
+
+Status code breakdown:
+ - code 200 earns 10 points
+ - code between 200 and 300 earns 5 points
+
+## Votes ranking
+
+Database is managed by RSS link database, and user votes. Avarage of votes is calculated for each link.
+
 # Automatic export
 
 ## Accessible from views, pages
