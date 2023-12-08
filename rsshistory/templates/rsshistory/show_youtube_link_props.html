@@ -10,31 +10,27 @@
 
 <h1>YouTube Link properties</h1>
 
-{% for props in youtube_props %}    
-<div style="display: flex; flex-wrap: wrap">
-    <div style="margin-right: 5px">{{ props.0 }}:</div>
-    <div style="margin-right: 5px">{{ props.1}}</div>
-    <div style="margin-right: 5px"><a href="{{props.1}}">Link</a></div>
-</div>
-{% endfor %}
+<ul>
+    <li>Title: {{title}}</li>
+    <li>WebPage: {{webpage_url}} <a href="{{webpage_url}}">Link</a></li>
+    {%if thumbnail %}
+    <li>Thumbnail: {{thumbnail}} <a href="{{thumbnail}}">Link</a></li>
+    {%endif%}
+    <li>Uploader URL: {{uploader_url}} <a href="{{uploader_url}}">Link</a></li>
+    <li>Channel ID: {{channel_id}}</li>
+    <li>Channel: {{channel}}</li>
+    <li>Channel URL: {{channel_url}} <a href="{{channel_url}}">Link</a></li>
+    <li>Channel feed URL: {{channel_feed_url}} <a href="{{channel_feed_url}}">Link</a></li>
+    <li>Channel follower count: {{channel_follower_count}}</li>
+    <li>View count:{{view_count}} Likes:{{like_count}}</li>
+    <li>Language: {{language}}</li>
+    <li>Upload date: {{upload_date}}</li>
+    <li>Duration: {{duration}}</li>
+    <li>Valid: {{valid}}</li>
+</ul>
 
-<h2>Return dislike properties</h2>
-
-{% for props in return_dislike_props %}    
-<div style="display: flex; flex-wrap: wrap">
-    <div style="margin-right: 5px">{{ props.0 }}</div>
-    <div style="margin-right: 5px">{{ props.1 }}</div>
-</div>
-{% endfor %}
-
-<h2>All YouTube properties</h2>
-
-{% for props in all_youtube_props %}    
-<div style="display: flex; flex-wrap: wrap">
-    <div style="margin-right: 5px">{{ props.0 }}:</div>
-    <div style="margin-right: 5px">{{ props.1}}</div>
-</div>
-{% endfor %}
-<h2>
+{%if thumbnail %}
+<img src="{{thumbnail}}"/>
+{%endif%}
 
 {% endblock %}

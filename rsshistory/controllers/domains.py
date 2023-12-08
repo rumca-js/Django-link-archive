@@ -12,7 +12,7 @@ from ..models import (
     DomainCategories,
     DomainSubCategories,
 )
-
+from .entries import LinkDataController
 from ..configuration import Configuration
 from ..webtools import BasePage, HtmlPage
 from ..apps import LinkDatabase

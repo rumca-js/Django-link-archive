@@ -101,7 +101,9 @@ class DomainCategories(models.Model):
         if category and category != "":
             objs = DomainCategories.objects.filter(category=category)
             if objs.count() == 0:
-                DomainCategories.objects.create(category=category)
+                return DomainCategories.objects.create(category=category)
+            else:
+                return objs[0]
 
 
 class DomainSubCategories(models.Model):
@@ -124,14 +126,18 @@ class DomainSubCategories(models.Model):
         category_objs = DomainCategories.objects.filter(category=category)
         if category_objs.count() > 0:
             category_obj = category_objs[0]
+        else:
+            category_obj = DomainCategories.add(category)
 
         if category and category != "" and subcategory and subcategory != "":
             objs = DomainSubCategories.objects.filter(
                 category=category, subcategory=subcategory
             )
             if objs.count() == 0:
-                DomainSubCategories.objects.create(
+                return DomainSubCategories.objects.create(
                     category=category,
                     subcategory=subcategory,
                     category_obj=category_obj,
                 )
+            else:
+                return objs[0]

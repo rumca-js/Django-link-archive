@@ -7,6 +7,7 @@ from ..controllers import (
     BackgroundJobController,
     LinkDataController,
     SourceDataController,
+    DomainsController,
 )
 from ..models import (
     BackgroundJob,
@@ -15,7 +16,10 @@ from ..models import (
     DataExport,
     SourceExportHistory,
     KeyWords,
+    DomainCategories,
+    DomainSubCategories,
 )
+from ..configuration import Configuration
 from ..threadhandlers import HandlerManager, RefreshThreadHandler, CleanupJobHandler
 from .utilities import WebPageDisabled
 from ..dateutils import DateUtils
@@ -314,6 +318,23 @@ class RefreshThreadHandlerTest(WebPageDisabled, TestCase):
 
 class CleanJobHandlerTest(WebPageDisabled, TestCase):
     def setUp(self):
+        # inserts old data, we will check if those will be removed
+        conf = Configuration.get_object().config_entry
+        conf.auto_store_domain_info = True
+        conf.save()
+
+        p = PersistentInfo.objects.create(info = "info1", level = 10, user="test")
+        p.date = DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M")
+        p.save()
+
+        p = PersistentInfo.objects.create(info = "info2", level = 10, user="test")
+        p.date = DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M")
+        p.save()
+
+        p = PersistentInfo.objects.create(info = "info3", level = 10, user="test")
+        p.date = DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M")
+        p.save()
+
         source_youtube = SourceDataController.objects.create(
             url="https://youtube.com",
             title="YouTube",
@@ -349,13 +370,37 @@ class CleanJobHandlerTest(WebPageDisabled, TestCase):
             language="en",
         )
 
+        DomainsController.objects.create(protocol = "https", domain = "youtube.com", category = "testCategory", subcategory = "testSubcategory")
+        DomainCategories.objects.all().delete()
+        DomainSubCategories.objects.all().delete()
+
         datetime = KeyWords.get_keywords_date_limit() - timedelta(days=1)
         keyword = KeyWords.objects.create(keyword="test")
         keyword.date_published = datetime
         keyword.save()
 
     def test_cleanup_job(self):
-        # TODO insert some data
+        handler = CleanupJobHandler()
+        handler.process()
+
+        self.assertEqual(PersistentInfo.objects.all().count(), 0)
+        self.assertEqual(KeyWords.objects.all().count(), 0)
+
+        self.assertEqual(DomainsController.objects.all().count(), 1)
+        self.assertGreater(DomainCategories.objects.all().count(), 1)
+        self.assertGreater(DomainSubCategories.objects.all().count(), 1)
+
+    def test_cleanup_job_no_store_domains(self):
+        conf = Configuration.get_object().config_entry
+        conf.auto_store_domain_info = False
+        conf.save()
 
         handler = CleanupJobHandler()
         handler.process()
+
+        self.assertEqual(PersistentInfo.objects.all().count(), 0)
+        self.assertEqual(KeyWords.objects.all().count(), 0)
+
+        self.assertEqual(DomainsController.objects.all().count(), 1)
+        self.assertGreater(DomainCategories.objects.all().count(), 0)
+        self.assertGreater(DomainSubCategories.objects.all().count(), 0)

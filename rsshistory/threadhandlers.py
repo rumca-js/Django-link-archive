@@ -609,15 +609,14 @@ class CleanupJobHandler(BaseJobHandler):
                 if obj is not None:
                     limit = int(obj.subject)
             except Exception as E:
-                pass
+                print("Exception:{}".format(str(E)))
 
-            LinkDataController.move_old_links_to_archive(limit)
-            LinkDataController.clear_old_entries(limit)
+            LinkDataController.cleanup(limit)
 
             if limit == 0:
-                PersistentInfo.remove_old_ones()
+                PersistentInfo.cleanup()
                 DomainsController.cleanup()
-                SourceDataModel.reset_dynamic_data()
+                SourceDataController.cleanup()
                 KeyWords.cleanup()
 
             return True
@@ -643,8 +642,9 @@ class CheckDomainsJobHandler(BaseJobHandler):
 
 class RefreshThreadHandler(object):
     """!
-    refreshes sources, synchronously.
-    This handler only adds background jobs, nothing more
+    Checks if tasks should be created.
+
+    @note This handler only adds background jobs, nothing more!
     """
 
     def refresh(self, item=None):
@@ -653,9 +653,6 @@ class RefreshThreadHandler(object):
         self.check_sources()
 
         if SourceExportHistory.is_update_required():
-            # This has to be done before exporting
-            KeyWords.cleanup()
-            
             self.do_update()
             SourceExportHistory.confirm()
 

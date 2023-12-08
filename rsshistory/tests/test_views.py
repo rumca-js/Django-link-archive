@@ -3,11 +3,17 @@ from django.utils import timezone
 from django.urls import reverse
 
 from ..apps import LinkDatabase
-from ..controllers import SourceDataController, LinkDataController
+from ..controllers import SourceDataController, LinkDataController, DomainsController
 from ..dateutils import DateUtils
+from ..models import KeyWords, DataExport
+
+from .utilities import WebPageDisabled
 
 
-class ViewsTest(TestCase):
+class ViewsTest(WebPageDisabled, TestCase):
+    def setUp(self):
+        self.disable_web_pages()
+
     def test_index(self):
         url = reverse("{}:index".format(LinkDatabase.name))
         resp = self.client.get(url)
@@ -271,7 +277,7 @@ class ViewsTest(TestCase):
         self.assertEqual(resp.status_code, 200)
 
     """
-    Other views
+    System views
     """
 
     def test_admin(self):
@@ -328,8 +334,30 @@ class ViewsTest(TestCase):
 
         self.assertEqual(resp.status_code, 200)
 
-    def test_shot_yt_props(self):
+    """
+    Other views
+    """
+
+    def test_shot_youtube_link_props(self):
         url = reverse("{}:show-youtube-link-props".format(LinkDatabase.name))
+        resp = self.client.get(url)
+
+        self.assertEqual(resp.status_code, 200)
+
+    def test_shot_youtube_link_props_page(self):
+        url = reverse("{}:show-youtube-link-props".format(LinkDatabase.name)) + "?page=https://www.youtube.com"
+        resp = self.client.get(url)
+
+        self.assertEqual(resp.status_code, 200)
+
+    def test_shot_page_props(self):
+        url = reverse("{}:show-page-props".format(LinkDatabase.name))
+        resp = self.client.get(url)
+
+        self.assertEqual(resp.status_code, 200)
+
+    def test_shot_page_props_page(self):
+        url = reverse("{}:show-page-props".format(LinkDatabase.name)) + "?page=https://www.youtube.com"
         resp = self.client.get(url)
 
         self.assertEqual(resp.status_code, 200)
@@ -381,6 +409,8 @@ class ViewsTest(TestCase):
 
 class EnhancedViewTest(ViewsTest):
     def setUp(self):
+        self.disable_web_pages()
+
         source_youtube = SourceDataController.objects.create(
             url="https://youtube.com",
             title="YouTube",
@@ -413,6 +443,47 @@ class EnhancedViewTest(ViewsTest):
             category="No",
             subcategory="No",
             export_to_cms=False,
+        )
+
+        domain = DomainsController.objects.create(
+            domain="https://youtube.com",
+        )
+        domain.date_created = DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M")
+        domain.save()
+
+        keyword = KeyWords.objects.create(keyword="test")
+
+        self.export_daily = DataExport.objects.create(
+            export_type=DataExport.EXPORT_TYPE_GIT,
+            export_data=DataExport.EXPORT_DAILY_DATA,
+            local_path=".",
+            remote_path=".",
+            export_entries=True,
+            export_entries_bookmarks=True,
+            export_entries_permanents=True,
+            export_sources=True,
+        )
+
+        self.export_year = DataExport.objects.create(
+            export_type=DataExport.EXPORT_TYPE_GIT,
+            export_data=DataExport.EXPORT_YEAR_DATA,
+            local_path=".",
+            remote_path=".",
+            export_entries=True,
+            export_entries_bookmarks=True,
+            export_entries_permanents=True,
+            export_sources=True,
+        )
+
+        self.export_notime = DataExport.objects.create(
+            export_type=DataExport.EXPORT_TYPE_GIT,
+            export_data=DataExport.EXPORT_NOTIME_DATA,
+            local_path=".",
+            remote_path=".",
+            export_entries=True,
+            export_entries_bookmarks=True,
+            export_entries_permanents=True,
+            export_sources=True,
         )
 
     def test_source_json(self):

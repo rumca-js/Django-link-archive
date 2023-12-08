@@ -171,7 +171,7 @@ class BaseLinkDataController(BaseLinkDataModel):
             self.description = p.get_description()
 
         if self.thumbnail == "" or self.thumbnail is None:
-            self.thumbnail = p.get_image()
+            self.thumbnail = p.get_thumbnail()
 
         if self.language == "" or self.language is None:
             self.language = p.get_language()

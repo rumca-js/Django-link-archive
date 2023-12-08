@@ -46,6 +46,9 @@ class SourceDataController(SourceDataModel):
             "{}:source-detail".format(LinkDatabase.name), args=[str(self.id)]
         )
 
+    def cleanup():
+        SourceDataModel.reset_dynamic_data()
+
     def get_days_to_remove(self):
         days = 0
         try:

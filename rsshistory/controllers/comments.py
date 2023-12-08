@@ -10,7 +10,7 @@ from ..models import (
     LinkDataModel,
     LinkCommentDataModel,
 )
-
+from .entries import LinkDataController
 from ..configuration import Configuration
 
 

@@ -184,7 +184,7 @@ class PersistentInfo(models.Model):
             print("PersistentInfo::exc Exception {}".format(e))
 
     def cleanup():
-        PersistentInfo.remove_old_ones()
+        PersistentInfo.remove_old_infos()
 
         obs = PersistentInfo.objects.filter(level=int(logging.INFO))
         if obs.exists():
@@ -196,7 +196,7 @@ class PersistentInfo(models.Model):
     def get_safe():
         return PersistentInfo.objects.all()[0:100]
 
-    def remove_old_ones():
+    def remove_old_infos():
         from ..dateutils import DateUtils
 
         try:

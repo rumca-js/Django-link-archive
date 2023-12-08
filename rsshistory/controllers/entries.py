@@ -160,6 +160,10 @@ class LinkDataController(LinkDataModel):
         """Returns the URL to access a particular author instance."""
         return reverse("{}:entry-remove".format(LinkDatabase.name), args=[str(self.id)])
 
+    def cleanup(limit = 0):
+        LinkDataController.move_old_links_to_archive(limit)
+        LinkDataController.clear_old_entries(limit)
+
     def move_old_links_to_archive(limit=0):
         from ..dateutils import DateUtils
 
@@ -528,21 +532,21 @@ class LinkDataHyperController(object):
     def get_htmlpage_props(url, output_map, source_obj=None):
         from ..dateutils import DateUtils
 
-        link_ob = HtmlPage(url)
+        link_page = HtmlPage(url)
 
         if "link" not in output_map:
             output_map["link"] = url
         if "title" not in output_map:
-            title = link_ob.get_title()
+            title = link_page.get_title()
             output_map["title"] = title
         if "description" not in output_map:
-            description = link_ob.get_description()
+            description = link_page.get_description()
             if description is None:
                 description = title
             output_map["description"] = description
 
         if "language" not in output_map:
-            language = link_ob.get_language()
+            language = link_page.get_language()
             if not language:
                 if source_obj:
                     language = source_obj.language
@@ -552,7 +556,7 @@ class LinkDataHyperController(object):
             output_map["date_published"] = DateUtils.get_datetime_now_utc()
 
         if "thumbnail" not in output_map:
-            output_map["thumbnail"] = link_ob.get_image()
+            output_map["thumbnail"] = link_page.get_thumbnail()
 
         if "source_obj" not in output_map and source_obj:
             output_map["source_obj"] = source_obj

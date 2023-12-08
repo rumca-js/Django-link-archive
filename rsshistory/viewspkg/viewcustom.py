@@ -24,6 +24,7 @@ from ..controllers import (
 from ..views import ViewPage
 from ..dateutils import DateUtils
 from ..forms import LinkInputForm
+from ..webtools import HtmlPage
 
 
 def get_incorrect_youtube_links():
@@ -221,19 +222,73 @@ def show_youtube_link_props(request):
     if data is not None:
         return data
 
+    def show_youtube_link_props_internal(request, youtube_link):
+        from ..pluginentries.handlervideoyoutube import YouTubeVideoHandler
+
+        handler = YouTubeVideoHandler(youtube_link)
+        handler.download_details()
+
+        youtube_props = []
+        all_youtube_props = []
+
+        if handler.yt_ob:
+            yt_json = handler.yt_ob.get_json()
+            yt_props = str(yt_json)
+
+            feed_url = handler.yt_ob.get_channel_feed_url()
+
+            youtube_props.append(("title", yt_json["title"]))
+            youtube_props.append(("webpage_url", yt_json["webpage_url"]))
+            youtube_props.append(("uploader_url", yt_json["uploader_url"]))
+            youtube_props.append(("channel_id", yt_json["channel_id"]))
+            youtube_props.append(("channel", yt_json["channel"]))
+            youtube_props.append(("channel_url", yt_json["channel_url"]))
+            youtube_props.append(("channel_feed_url", feed_url))
+            youtube_props.append(
+                ("channel_follower_count", yt_json["channel_follower_count"])
+            )
+            youtube_props.append(("view_count", yt_json["view_count"]))
+            youtube_props.append(("like_count", yt_json["like_count"]))
+            if "language" in yt_json:
+                youtube_props.append(("language", yt_json["language"]))
+            youtube_props.append(("upload_date", yt_json["upload_date"]))
+            if "duration_string" in yt_json:
+                youtube_props.append(("duration", yt_json["duration_string"]))
+            youtube_props.append(("valid", handler.is_valid()))
+            youtube_props.append(("thumbnail", yt_json["thumbnail"]))
+
+            for yt_prop in yt_json:
+                all_youtube_props.append((yt_prop, str(yt_json[yt_prop])))
+
+            # TODO rd_json = handler.rd_ob.get_json()
+            # TODO rd_props = str(rd_json)
+
+            # rd_props = []
+            # for rd_prop in rd_json:
+            #    rd_props.append((rd_prop, str(rd_json[rd_prop])))
+
+        p.context.update(youtube_props)
+        # p.context["return_dislike_props"] = rd_props
+        #p.context["all_youtube_props"] = all_youtube_props
+
+        return p.render("show_youtube_link_props.html")
+
     from ..forms import YouTubeLinkSimpleForm
 
     youtube_link = "https:"
-    if not request.method == "POST":
-        form = YouTubeLinkSimpleForm(initial={"youtube_link": youtube_link})
-        form.method = "POST"
-        form.action_url = reverse(
-            "{}:show-youtube-link-props".format(LinkDatabase.name)
-        )
-        p.context["form"] = form
+    if request.method == "GET":
+        if "page" not in request.GET:
+            form = YouTubeLinkSimpleForm(initial={"youtube_link": youtube_link})
+            form.method = "POST"
+            form.action_url = reverse(
+                "{}:show-youtube-link-props".format(LinkDatabase.name)
+            )
+            p.context["form"] = form
 
-        return p.render("form_basic.html")
-
+            return p.render("form_basic.html")
+        else:
+            youtube_link = request.GET["page"]
+            return show_youtube_link_props_internal(request, youtube_link)
     else:
         form = YouTubeLinkSimpleForm(request.POST)
         if not form.is_valid():
@@ -241,56 +296,8 @@ def show_youtube_link_props(request):
 
             return p.render("summary_present.html")
         else:
-            from ..pluginentries.youtubelinkhandler import YouTubeLinkHandler
-
             youtube_link = form.cleaned_data["youtube_link"]
-
-            handler = YouTubeLinkHandler(youtube_link)
-            handler.download_details()
-
-            youtube_props = []
-            all_youtube_props = []
-
-            if handler.yt_ob:
-                yt_json = handler.yt_ob.get_json()
-                # TODO rd_json = handler.rd_ob.get_json()
-
-                yt_props = str(yt_json)
-                # TODO rd_props = str(rd_json)
-
-                feed_url = handler.yt_ob.get_channel_feed_url()
-
-                youtube_props.append(("title", yt_json["title"]))
-                youtube_props.append(("webpage_url", yt_json["webpage_url"]))
-                youtube_props.append(("uploader_url", yt_json["uploader_url"]))
-                youtube_props.append(("channel_id", yt_json["channel_id"]))
-                youtube_props.append(("channel", yt_json["channel"]))
-                youtube_props.append(("channel_url", yt_json["channel_url"]))
-                youtube_props.append(("channel_feed_url", feed_url))
-                youtube_props.append(
-                    ("channel_follower_count", yt_json["channel_follower_count"])
-                )
-                youtube_props.append(("view_count", yt_json["view_count"]))
-                youtube_props.append(("like_count", yt_json["like_count"]))
-                if "language" in yt_json:
-                    youtube_props.append(("language", yt_json["language"]))
-                youtube_props.append(("upload_date", yt_json["upload_date"]))
-                if "duration_string" in yt_json:
-                    youtube_props.append(("duration", yt_json["duration_string"]))
-                youtube_props.append(("valid", handler.is_valid()))
-
-                for yt_prop in yt_json:
-                    all_youtube_props.append((yt_prop, str(yt_json[yt_prop])))
-
-                # rd_props = []
-                # for rd_prop in rd_json:
-                #    rd_props.append((rd_prop, str(rd_json[rd_prop])))
-
-            p.context["youtube_props"] = youtube_props
-            # p.context["return_dislike_props"] = rd_props
-            p.context["all_youtube_props"] = all_youtube_props
-
-            return p.render("show_youtube_link_props.html")
+            return show_youtube_link_props_internal(request, youtube_link)
 
 
 def show_page_props(request):
@@ -300,13 +307,29 @@ def show_page_props(request):
     if data is not None:
         return data
 
-    if not request.method == "POST":
-        form = LinkInputForm()
-        form.method = "POST"
-        form.action_url = reverse("{}:show-page-props".format(LinkDatabase.name))
-        p.context["form"] = form
+    def show_page_props_internal(requests):
+        from ..pluginentries.handlervideoyoutube import YouTubeVideoHandler
 
-        return p.render("form_basic.html")
+        page_link = request.GET["page"]
+
+        page = HtmlPage(page_link)
+
+        #p.context["show_properties"] = page.get_properties()
+        p.context.update(page.get_properties())
+
+        return p.render("show_page_props.html")
+
+    if request.method == "GET":
+        if "page" not in request.GET:
+            form = LinkInputForm()
+            form.method = "POST"
+            form.action_url = reverse("{}:show-page-props".format(LinkDatabase.name))
+            p.context["form"] = form
+
+            return p.render("form_basic.html")
+
+        else:
+            return show_page_props_internal(request)
 
     else:
         form = LinkInputForm(request.POST)
@@ -315,15 +338,7 @@ def show_page_props(request):
 
             return p.render("summary_present.html")
         else:
-            from ..pluginentries.handlervideoyoutube import YouTubeVideoHandler
-
-            page_link = form.cleaned_data["link"]
-
-            page = HtmlPage(page_link)
-
-            p.context["show_properties"] = page.get_properties()
-
-            return p.render("show_properties.html")
+            return show_page_props_internal(request)
 
 
 def test_page(request):
@@ -335,42 +350,52 @@ def test_page(request):
 
     summary_text = "test page"
 
-    from ..models import Domains, LinkTagsDataModel
+    entries = LinkDataController.objects.filter(domain_obj__isnull=True)
+    for entry in entries:
+        print("Entry:{}".format(entry.link))
 
-    domains = Domains.objects.all()
-    for domain in domains:
-        if domain.link_obj:
-            if domain.category == "Personal":
-                tags = LinkTagsDataModel.objects.filter(
-                    link=domain.link_obj.link, tag="personal"
-                )
-                if tags.count() == 0:
-                    LinkTagsDataModel.objects.create(
-                        link=domain.link_obj.link,
-                        tag="personal",
-                        author="rumpel",
-                        link_obj=domain.link_obj,
-                    )
-                else:
-                    tag = tags[0]
-                    tag.link_obj = domain.link_obj
-                    tag.save()
-            # if domain.subcategory == "Substack":
-            #    tags = LinkTagsDataModel.objects.filter(link = domain.link_obj.link, tag = "substack")
-            #    if tags.count() == 0:
-            #        LinkTagsDataModel.objects.create(link = domain.link_obj.link, tag = "substack", author="rumpel", link_obj = domain.link_obj)
-            #    else:
-            #        tag = tags[0]
-            #        tag.link_obj = domain.link_obj
-            #        tag.save()
-            # if domain.subcategory == "Mastodon":
-            #    tags = LinkTagsDataModel.objects.filter(link = domain.link_obj.link, tag = "mastodon")
-            #    if tags.count() == 0:
-            #        LinkTagsDataModel.objects.create(link = domain.link_obj.link, tag = "mastodon", author="rumpel", link_obj = domain.link_obj)
-            #    else:
-            #        tag = tags[0]
-            #        tag.link_obj = domain.link_obj
-            #        tag.save()
+        pp = HtmlPage(entry.link)
+        domain = DomainsController.add(pp.get_domain())
+        if domain:
+            entry.domain_obj = domain
+            entry.save()
+
+    # from ..models import Domains, LinkTagsDataModel
+
+    # domains = Domains.objects.all()
+    # for domain in domains:
+    #    if domain.link_obj:
+    #        if domain.category == "Personal":
+    #            tags = LinkTagsDataModel.objects.filter(
+    #                link=domain.link_obj.link, tag="personal"
+    #            )
+    #            if tags.count() == 0:
+    #                LinkTagsDataModel.objects.create(
+    #                    link=domain.link_obj.link,
+    #                    tag="personal",
+    #                    author="rumpel",
+    #                    link_obj=domain.link_obj,
+    #                )
+    #            else:
+    #                tag = tags[0]
+    #                tag.link_obj = domain.link_obj
+    #                tag.save()
+    #        # if domain.subcategory == "Substack":
+    #        #    tags = LinkTagsDataModel.objects.filter(link = domain.link_obj.link, tag = "substack")
+    #        #    if tags.count() == 0:
+    #        #        LinkTagsDataModel.objects.create(link = domain.link_obj.link, tag = "substack", author="rumpel", link_obj = domain.link_obj)
+    #        #    else:
+    #        #        tag = tags[0]
+    #        #        tag.link_obj = domain.link_obj
+    #        #        tag.save()
+    #        # if domain.subcategory == "Mastodon":
+    #        #    tags = LinkTagsDataModel.objects.filter(link = domain.link_obj.link, tag = "mastodon")
+    #        #    if tags.count() == 0:
+    #        #        LinkTagsDataModel.objects.create(link = domain.link_obj.link, tag = "mastodon", author="rumpel", link_obj = domain.link_obj)
+    #        #    else:
+    #        #        tag = tags[0]
+    #        #        tag.link_obj = domain.link_obj
+    #        #        tag.save()
 
     p.context["summary_text"] = summary_text
 

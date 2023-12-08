@@ -426,6 +426,7 @@ class EntryDetailView(generic.DetailView):
         object_controller.set_user(self.request.user.username)
 
         context["page_title"] = self.object.title
+        context["page_thumbnail"] = self.object.thumbnail
         context["object_controller"] = object_controller
 
         m = WaybackMachine()
@@ -450,6 +451,7 @@ class EntryArchivedDetailView(generic.DetailView):
             self.object.update_language()
 
         context["page_title"] = self.object.title
+        context["page_thumbnail"] = self.object.thumbnail
         context["object_controller"] = EntryControllerBuilder.get(self.object)
 
         from ..services.waybackmachine import WaybackMachine

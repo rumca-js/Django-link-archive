@@ -14,6 +14,12 @@ class EntryYouTubePlugin(YouTubeVideoHandler, EntryGenericPlugin):
     def get_menu_buttons(self):
         return [
             EntryButton(
+                "YouTube Props",
+                reverse(
+                    "{}:show-youtube-link-props".format(LinkDatabase.name)
+                ) + "?page={}".format(self.entry.link),
+            ),
+            EntryButton(
                 "Music",
                 reverse(
                     "{}:entry-download-music".format(LinkDatabase.name),

@@ -35,6 +35,10 @@
         <img src="{% static 'rsshistory/icons/icons8-download-96.png' %}" class="content-icon" />
         Page</a>
 
+    <a href="{% url 'rsshistory:show-page-props' %}?page={{object.link}}" class="simplebutton" title="Shows page properties">
+        <img src="{% static 'rsshistory/icons/icons8-download-96.png' %}" class="content-icon" />
+        Page Props</a>
+
     {% for button in object_controller.get_menu_buttons %}
             <a href="{{button.action}}" class="simplebutton">
                 {% if button.image %}
