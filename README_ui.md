@@ -13,13 +13,19 @@ Available link display types
 
 ## YouTube list
 
+Application provides a youtube list view.
+
 ![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/entries_list_youtube.PNG)
 
 ## Standard list
 
+Application provides a standard list view.
+
 ![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/entries_list_standard.PNG)
 
 ## List with buttons
+
+Application provides a list with buttons view.
 
 ![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/entries_list_buttons.PNG)
 
@@ -73,6 +79,12 @@ Displays all available domains.
 
 ![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/domains.PNG)
 
+## Page properties
+
+Applicataion allows to downloda and view page properties
+
+![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/page_properties.PNG)
+
 # Forms
 
 Most of forms are designed to use Django Model forms.
@@ -84,11 +96,13 @@ There are two stages of adding a new link:
  - for the link all data are obtained
  - then in second form you will be asked to make your manual edits
 
-## Simple UI for adding link
+## Simple UI for adding a link
 
 ![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/entry_new_simple.PNG)
 
-## Advanced UI for adding link
+## Advanced UI for adding a link
+
+Advanced UI for adding a new link
 
 ![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/entry_new.PNG)
 

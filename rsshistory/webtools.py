@@ -824,6 +824,15 @@ class HtmlPage(ContentInterface):
 
         return author
 
+    def get_thumbnail(self):
+        if not self.contents:
+            self.contents = self.get_contents()
+
+        if not self.contents:
+            return None
+
+        return self.get_og_field("image")
+
     def get_tags(self):
         if not self.contents:
             self.contents = self.get_contents()
@@ -856,15 +865,6 @@ class HtmlPage(ContentInterface):
             description = description.strip()
 
         return description
-
-    def get_image(self):
-        if not self.contents:
-            self.contents = self.get_contents()
-
-        if not self.contents:
-            return None
-
-        return self.get_og_field("image")
 
     def get_description_safe(self):
         desc = self.get_description()
@@ -959,11 +959,13 @@ class HtmlPage(ContentInterface):
         props["link"] = self.url
         props["title"] = self.get_title()
         props["description"] = self.get_description()
-        props["meta:title"] = self.get_title_meta()
-        props["meta:description"] = self.get_description_meta()
-        props["og:title"] = self.get_og_field("title")
-        props["og:description"] = self.get_og_field("description")
-        props["og:image"] = self.get_og_field("image")
+        props["author"] = self.get_author()
+        props["thumbnail"] = self.get_og_field("image")
+        props["meta_title"] = self.get_title_meta()
+        props["meta_description"] = self.get_description_meta()
+        props["og_title"] = self.get_og_field("title")
+        props["og_description"] = self.get_og_field("description")
+        props["og_image"] = self.get_og_field("image")
         props["is_html"] = self.is_html()
         props["charset"] = self.get_charset()
         props["language"] = self.get_language()
@@ -980,6 +982,7 @@ class HtmlPage(ContentInterface):
         props["links_inner"] = self.get_links_inner()
         props["links_outer"] = self.get_links_outer()
         props["contents"] = self.get_contents()
+        props["contents_length"] = len(self.get_contents())
 
         return props
 
