@@ -152,6 +152,8 @@ class KeyWords(models.Model):
             return True
 
     def cleanup():
+        from ..configuration import Configuration
+        
         if Configuration.get_object().config_entry.auto_store_keyword_info:
             from ..dateutils import DateUtils
 

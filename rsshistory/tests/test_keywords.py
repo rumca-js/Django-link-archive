@@ -111,7 +111,7 @@ class KeyWordsTest(TestCase):
         keys = KeyWords.objects.all()
         self.assertEqual(keys.count(), 1)
 
-        KeyWords.clear()
+        KeyWords.cleanup()
 
         keys = KeyWords.objects.all()
         self.assertEqual(keys.count(), 0)

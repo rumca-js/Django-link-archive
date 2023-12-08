@@ -648,14 +648,14 @@ class RefreshThreadHandler(object):
     """
 
     def refresh(self, item=None):
-        # This has to be done before exporting
-        KeyWords.clear()
-
         from .controllers import SourceDataController
 
         self.check_sources()
 
         if SourceExportHistory.is_update_required():
+            # This has to be done before exporting
+            KeyWords.cleanup()
+            
             self.do_update()
             SourceExportHistory.confirm()
 
