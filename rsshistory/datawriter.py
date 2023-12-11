@@ -7,7 +7,8 @@ from pathlib import Path
 
 from .dateutils import DateUtils
 from .models import DataExport
-from .serializers.sourceserializer import SourcesEntriesDataWriter
+from .serializers.sourceentriesserializer import SourcesEntriesDataWriter
+from .serializers.sourcesserializer import SourceSerializerWrapper
 
 
 class DataWriterConfiguration(object):
@@ -35,35 +36,17 @@ class BaseDataWriter(object):
             / self.directory
         )
 
-    def get_sources_json(self):
-        from .controllers import SourceDataController
-
-        sources = SourceDataController.objects.filter(export_to_cms=True)
-
-        from .serializers.converters import ModelCollectionConverter, JsonConverter
-
-        cc = ModelCollectionConverter(sources)
-        items = cc.get_map()
-
-        converter = JsonConverter(items)
-        converter.set_export_columns(SourceDataController.get_export_names())
-        text = converter.export()
-
-        return text
-
     def get_domains_json(self):
         from .controllers import DomainsController
+        from .serializers.domainexporter import DomainJsonExporter
 
         domains = DomainsController.objects.all()
-
-        from .serializers.domainexporter import DomainJsonExporter
 
         exp = DomainJsonExporter()
         return exp.get_text(domains)
 
     def get_keywords_json(self, day_iso):
         from .models import KeyWords
-
         from .serializers.keywordexporter import KeywordExporter
 
         keywords = KeyWords.get_keyword_data()
@@ -100,9 +83,8 @@ class DailyDataWriter(BaseDataWriter):
 
     def write_sources(self):
         if self.export_config.export_sources:
-            text = self.get_sources_json()
-            file_name = self.get_directory() / self.config.get_sources_file_name()
-            file_name.write_text(text)
+            serializer = SourceSerializerWrapper()
+            serializer.export(self.get_directory(), self.config.get_sources_file_name())
 
     def write_keywords(self):
         day_iso = self.date_iso
@@ -137,9 +119,8 @@ class YearDataWriter(BaseDataWriter):
 
     def write_sources(self):
         if self.export_config.export_sources:
-            text = self.get_sources_json()
-            file_name = self.get_directory() / self.config.get_sources_file_name()
-            file_name.write_text(text)
+            serializer = SourceSerializerWrapper()
+            serializer.export(self.get_directory(), self.config.get_sources_file_name())
 
 
 class NoTimeDataWriter(BaseDataWriter):
@@ -165,9 +146,8 @@ class NoTimeDataWriter(BaseDataWriter):
 
     def write_sources(self):
         if self.export_config.export_sources:
-            text = self.get_sources_json()
-            file_name = self.get_directory() / self.config.get_sources_file_name()
-            file_name.write_text(text)
+            serializer = SourceSerializerWrapper()
+            serializer.export(self.get_directory(), self.config.get_sources_file_name())
 
 
 class DataWriter(object):

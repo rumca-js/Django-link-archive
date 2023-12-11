@@ -20,6 +20,9 @@ from ..configuration import Configuration
 from ..webtools import BasePage, HtmlPage, RssPage, ContentLinkParser
 from ..apps import LinkDatabase
 
+class YouTubeException(Exception):
+    pass
+
 
 class EntryPageDataReader(object):
     def __init__(self, data):
@@ -160,9 +163,10 @@ class LinkDataController(LinkDataModel):
         """Returns the URL to access a particular author instance."""
         return reverse("{}:entry-remove".format(LinkDatabase.name), args=[str(self.id)])
 
-    def cleanup(limit = 0):
+    def cleanup(limit=0):
         LinkDataController.move_old_links_to_archive(limit)
         LinkDataController.clear_old_entries(limit)
+        # TODO if configured to store domains, but do not store entries - remove all normal non-domain entries
 
     def move_old_links_to_archive(limit=0):
         from ..dateutils import DateUtils
@@ -386,9 +390,28 @@ class LinkDataHyperController(object):
 
         return obj
 
-    def add_simple(link_url):
-        props = LinkDataHyperController.get_htmlpage_props(link_url, {})
-        LinkDataHyperController.add_new_link(props)
+    def add_simple(link_url, input_props={}):
+        objs = LinkDataController.objects.filter(link=link_url)
+        if objs.count() != 0:
+            return False
+
+        p = HtmlPage(link_url)
+
+        if p.is_domain():
+            input_props["permanent"] = True
+
+        if p.is_youtube():
+            from ..pluginentries.handlervideoyoutube import YouTubeVideoHandler
+            handler = YouTubeVideoHandler(link_url)
+            if handler.get_video_code():
+                props = LinkDataHyperController.get_youtube_props(link_url, input_props)
+                if props:
+                    return LinkDataHyperController.add_new_link(props)
+
+        if p.is_html():
+            props = LinkDataHyperController.get_htmlpage_props(link_url, input_props)
+            if props:
+                return LinkDataHyperController.add_new_link(props)
 
     def is_domain_link_data(link_data):
         p = BasePage(link_data["link"])
@@ -416,9 +439,10 @@ class LinkDataHyperController(object):
         if domain:
             new_link_data["domain_obj"] = domain
 
-        new_link_data["description"] = new_link_data["description"][
-            : BaseLinkDataController.get_description_length() - 2
-        ]
+        if new_link_data["description"] != None:
+            new_link_data["description"] = new_link_data["description"][
+                : BaseLinkDataController.get_description_length() - 2
+            ]
 
         if not is_archive:
             ob = LinkDataModel.objects.create(**new_link_data)
@@ -454,15 +478,17 @@ class LinkDataHyperController(object):
     def is_enabled_to_store(link_data, source_is_auto):
         config = Configuration.get_object().config_entry
 
-        if (
-            "permanent" in link_data
-            and link_data["permanent"]
-            and config.auto_store_domain_info
-        ):
-            return True
+        p = BasePage(link_data["link"])
+        is_domain = p.is_domain()
 
-        if source_is_auto and not config.auto_store_entries:
-            return False
+        if not config.auto_store_entries:
+            if is_domain and config.auto_store_domain_info:
+                return True
+            elif "bookmarked" in link_data and link_data["bookmarked"]:
+                return True
+            else:
+                return False
+
         return True
 
     def is_live_video(link_data):
@@ -489,79 +515,78 @@ class LinkDataHyperController(object):
 
         return False
 
-    def get_youtube_props(url, data):
+    def get_youtube_props(url, input_props):
         from ..pluginentries.handlervideoyoutube import YouTubeVideoHandler
-
-        objs = LinkDataController.objects.filter(link=url)
-        if objs.count() != 0:
-            return False
 
         h = YouTubeVideoHandler(url)
         if not h.download_details():
-            PersistentInfo.error("Could not obtain details for link:{}".format(url))
-            return False
+            raise YouTubeException("Could not obtain details for link:{}".format(url))
 
-        link_data = {}
-        source = h.get_channel_feed_url()
-        if source is None:
-            PersistentInfo.error("Could not obtain channel feed url:{}".format(url))
-            return False
-
-        link_data["link"] = h.get_link_url()
-        link_data["title"] = h.get_title()
-        link_data["description"] = h.get_description()
-        link_data["date_published"] = h.get_datetime_published()
-        link_data["thumbnail"] = h.get_thumbnail()
-        link_data["artist"] = h.get_channel_name()
-
-        language = "en"
-        if "language" in data:
-            link_data["language"] = data["language"]
-        user = None
-        if "user" in data:
-            link_data["user"] = data["user"]
-        bookmarked = False
-        if "bookmarked" in data:
-            link_data["bookmarked"] = data["bookmarked"]
+        source_url = h.get_channel_feed_url()
+        if source_url is None:
+            raise YouTubeException("Could not obtain channel feed url:{}".format(source_url))
 
         source_obj = None
-        sources = SourceDataModel.objects.filter(url=source)
-        if sources.exists():
-            link_data["source_obj"] = sources[0]
+        sources = SourceDataModel.objects.filter(url=source_url)
+        if sources.exists:
+            source_obj = sources[0]
 
-    def get_htmlpage_props(url, output_map, source_obj=None):
+        if "link" not in input_props:
+            input_props["link"] = h.get_link_url()
+        if "title" not in input_props:
+            input_props["title"] = h.get_title()
+        if "description" not in input_props:
+            input_props["description"] = h.get_description()
+        if "date_published" not in input_props:
+            input_props["date_published"] = h.get_datetime_published()
+        if "thumbnail" not in input_props:
+            input_props["thumbnail"] = h.get_thumbnail()
+        if "artist" not in input_props:
+            input_props["artist"] = h.get_channel_name()
+
+        if "language" not in input_props:
+            if source_obj:
+                input_props["language"] = source.language
+
+        if "source_obj" not in input_props:
+            if source_obj:
+                input_props["source_obj"] = source_obj
+
+        return input_props
+
+    def get_htmlpage_props(url, input_props, source_obj=None):
         from ..dateutils import DateUtils
 
         link_page = HtmlPage(url)
 
-        if "link" not in output_map:
-            output_map["link"] = url
-        if "title" not in output_map:
+        if "link" not in input_props:
+            input_props["link"] = url
+        if "title" not in input_props:
             title = link_page.get_title()
-            output_map["title"] = title
-        if "description" not in output_map:
+            input_props["title"] = title
+        if "description" not in input_props:
             description = link_page.get_description()
             if description is None:
                 description = title
-            output_map["description"] = description
+            input_props["description"] = description
 
-        if "language" not in output_map:
+        if "language" not in input_props:
             language = link_page.get_language()
             if not language:
                 if source_obj:
                     language = source_obj.language
-            output_map["language"] = language
+            input_props["language"] = language
 
-        if "date_published" not in output_map:
-            output_map["date_published"] = DateUtils.get_datetime_now_utc()
+        if "date_published" not in input_props:
+            input_props["date_published"] = DateUtils.get_datetime_now_utc()
 
-        if "thumbnail" not in output_map:
-            output_map["thumbnail"] = link_page.get_thumbnail()
+        if "thumbnail" not in input_props:
+            input_props["thumbnail"] = link_page.get_thumbnail()
 
-        if "source_obj" not in output_map and source_obj:
-            output_map["source_obj"] = source_obj
+        if "source_obj" not in input_props and source_obj:
+            input_props["source_obj"] = source_obj
 
-        return output_map
+        return input_props
 
     def add_addition_link_data(link_data):
         try:
@@ -618,9 +643,15 @@ class LinkDataHyperController(object):
         html = HtmlPage(link)
         props = html.get_properties_map()
 
-        rss_url = props["rss_url"]
-        if not rss_url:
+        rss_urls = props["rss_urls"]
+        if len(rss_urls) == 0:
             return
+
+        for rss_url in rss_urls:
+            LinkDataHyperController.add_source(rss_url, link_props)
+
+    def add_source(rss_url, link_props):
+        conf = Configuration.get_object().config_entry
 
         if rss_url.endswith("/"):
             rss_url = rss_url[:-1]
@@ -644,7 +675,10 @@ class LinkDataHyperController(object):
         title = parser.get_title()
         if title:
             props["title"] = title
-        props["export_to_cms"] = False
+        if not title:
+            props["title"] = link_props["title"]
+
+        props["export_to_cms"] = True
         language = parser.get_language()
         if language:
             props["language"] = language

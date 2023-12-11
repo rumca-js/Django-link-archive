@@ -34,8 +34,10 @@
     <li>Is html: {{is_html}}</li>
     <li>Charset: {{charset}}</li>
     <li>Language: {{language}}</li>
-    {%if rss_url %}
+    {%if rss_urls %}
+    {%for rss_url in rss_urls %}
     <li>Rss Url: {{rss_url}} <a href="{{rss_url}}">Link</a></li>
+    {%endfor%}
     {%endif%}
 
     <li>Meta title: {{meta_title}}</li>
@@ -45,8 +47,13 @@
     {%if og_image %}
     <li>og image: <a href="{{og_image}}"/>Link</a></li>
     {%endif %}
+    {%if tags %}
+    <li>keywords: {{tags}}</li>
+    {%endif %}
 
+    {%if robots_txt_url %}
     <li>Robots txt URL: {{robots_txt_url}} <a href="{{robots_txt_url}}">Link</a></li>
+    {% endif %}
     {%for site_map in site_maps_urls %}
         <li>Site map: {{site_map}} <a href="{{site_map}}">Link</a>
     {%endfor%}
@@ -61,7 +68,7 @@
 </ul>
 
 {%if og_image%}
-<img src="{{og_image}}"/>
+<img src="{{og_image}}" style="max-width: 50%"/>
 {%endif%}
 
 <h1>Contents</h1>

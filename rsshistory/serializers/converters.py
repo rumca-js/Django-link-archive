@@ -3,6 +3,48 @@ import traceback
 from ..models import PersistentInfo
 
 
+class PageSystem(object):
+    """
+    https://stackoverflow.com/questions/4222176/why-is-iterating-through-a-large-django-queryset-consuming-massive-amounts-of-me
+    https://djangosnippets.org/snippets/1170/
+    https://nextlinklabs.com/resources/insights/django-big-data-iteration
+
+    TODO maybe replace with paginator
+
+    clean code - we might want to not be dependant on some other library. We want to be independent
+    """
+
+    def __init__(self, no_entries, no_entries_per_page):
+        self.no_entries = no_entries
+        self.no_entries_per_page = no_entries_per_page
+
+        if no_entries == 0:
+            self.no_pages = 0
+            return
+
+        pages_float = self.no_entries / self.no_entries_per_page
+        pages = int(pages_float)
+        if pages_float > pages:
+            pages += 1
+
+        self.no_pages = pages
+
+    def get_slice_limits(self, page):
+        if self.no_entries == 0:
+            return
+
+        start_slice = page * self.no_entries_per_page
+        end_slice = (page + 1) * self.no_entries_per_page
+
+        if start_slice > self.no_entries:
+            return
+
+        if end_slice >= self.no_entries:
+            end_slice = self.no_entries
+
+        return [start_slice, end_slice]
+
+
 class ModelCollectionConverter(object):
     def __init__(self, items):
         self.items = items

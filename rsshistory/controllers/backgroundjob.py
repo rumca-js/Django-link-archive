@@ -11,6 +11,7 @@ from ..models import (
     BackgroundJob,
     PersistentInfo,
 )
+from ..webtools import HtmlPage
 
 
 class BackgroundJobController(BackgroundJob):
@@ -41,13 +42,12 @@ class BackgroundJobController(BackgroundJob):
         try:
             items = BackgroundJob.objects.filter(job=job_name, subject=subject)
             if items.count() == 0:
-                BackgroundJob.objects.create(
+                return BackgroundJob.objects.create(
                     job=job_name,
                     task=None,
                     subject=subject,
                     args=args,
                 )
-                return True
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.error(
@@ -78,13 +78,27 @@ class BackgroundJobController(BackgroundJob):
             BackgroundJob.JOB_LINK_UPDATE_DATA, url
         )
 
-    def link_add(url, source):
+    def link_add(url, source = None):
+        h = HtmlPage(url)
+        if h.is_analytics():
+            return
+
         existing = LinkDataModel.objects.filter(link=url)
         if existing.count() > 0:
-            return False
+            return
 
+        if source:
+            return BackgroundJobController.create_single_job(
+                BackgroundJob.JOB_LINK_ADD, url, str(source.id),
+            )
+        else:
+            return BackgroundJobController.create_single_job(
+                BackgroundJob.JOB_LINK_ADD, url,
+            )
+
+    def link_scan(url):
         return BackgroundJobController.create_single_job(
-            BackgroundJob.JOB_LINK_ADD, url, str(source.id)
+            BackgroundJob.JOB_LINK_SCAN, url,
         )
 
     def write_daily_data_range(date_start=date.today(), date_stop=date.today()):

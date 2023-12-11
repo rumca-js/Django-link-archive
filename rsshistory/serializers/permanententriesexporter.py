@@ -1,6 +1,14 @@
 from ..controllers import LinkDataController
 from pathlib import Path
 
+from .converters import (
+    ModelCollectionConverter,
+    JsonConverter,
+    MarkDownConverter,
+    RssConverter,
+    PageSystem,
+)
+
 
 class PermanentEntriesExporter(object):
     def __init__(self, config):
@@ -22,16 +30,15 @@ class PermanentEntriesExporter(object):
             "domain_obj__domain",
         )
 
-        entries_no = self.get_number_of_entries_for_page()
-        pages_float = all_entries.count() / entries_no
-        pages = int(pages_float)
-        if pages_float > pages:
-            pages += 1
+        page_system = PageSystem(
+            all_entries.count(), self.get_number_of_entries_for_page()
+        )
 
-        for page in range(pages):
-            start_slice = page * entries_no
-            end_slice = ((page + 1) * entries_no) - 1
-            entries = all_entries[start_slice:end_slice]
+        for page in range(page_system.no_pages):
+            slice_limits = page_system.get_slice_limits(page)
+            print("Slice limits: {}".format(slice_limits))
+            entries = all_entries[slice_limits[0] : slice_limits[1]]
+
             self.export_inner(
                 entries, "permanent", self.get_page_dir(export_path, page)
             )
@@ -48,12 +55,6 @@ class PermanentEntriesExporter(object):
         export_path.mkdir(parents=True, exist_ok=True)
 
         from ..controllers import LinkDataController
-        from .converters import (
-            ModelCollectionConverter,
-            JsonConverter,
-            MarkDownConverter,
-            RssConverter,
-        )
 
         cc = ModelCollectionConverter(entries)
         items = cc.get_map_full()

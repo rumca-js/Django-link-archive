@@ -15,9 +15,8 @@ class EntryYouTubePlugin(YouTubeVideoHandler, EntryGenericPlugin):
         return [
             EntryButton(
                 "YouTube Props",
-                reverse(
-                    "{}:show-youtube-link-props".format(LinkDatabase.name)
-                ) + "?page={}".format(self.entry.link),
+                reverse("{}:show-youtube-link-props".format(LinkDatabase.name))
+                + "?page={}".format(self.entry.link),
             ),
             EntryButton(
                 "Music",

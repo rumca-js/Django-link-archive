@@ -222,18 +222,22 @@ class LinkAddJobHandler(BaseJobHandler):
     def process(self, obj=None):
         try:
             link = obj.subject
-            source_id = obj.args
-            source_obj = SourceDataController.objects.get(id=int(source_id))
-            data = {"user": None, "language": source_obj.language, "bookmarked": False}
 
-            print("Adding {} for {}".format(link, source_obj.title))
-            p = HtmlPage(link)
-            if p.is_youtube():
-                props = LinkDataHyperController.get_youtube_props(link, data)
-                LinkDataHyperController.add_new_link(props)
-            elif p.is_html():
-                props = LinkDataHyperController.get_htmlpage_props(link, data)
-                LinkDataHyperController.add_new_link(props)
+            data = {"user": None, "bookmarked": False}
+
+            if len(obj.args) > 0:
+                try:
+                    source_id = obj.args
+                    source_obj = SourceDataController.objects.filter(id=int(source_id))
+                    data["source_obj"] = source_obj
+                except Exception as E:
+                    PersistentInfo.error(
+                        "Exception when adding link {0} {1} {2}".format(
+                            obj.subject, str(e), error_text
+                        )
+                    )
+
+            LinkDataHyperController.add_simple(link, data)
 
             return True
 
@@ -640,6 +644,33 @@ class CheckDomainsJobHandler(BaseJobHandler):
             PersistentInfo.error("Exception: {} {}".format(str(e), error_text))
 
 
+class LinkScanJobHandler(BaseJobHandler):
+    def get_job(self):
+        return BackgroundJob.JOB_LINK_SCAN
+
+    def process(self, obj=None):
+        try:
+            p = HtmlPage(obj.subject)
+
+            c = Configuration.get_object()
+            conf = c.config_entry
+
+            if conf.auto_store_domain_info:
+                links = p.get_domains()
+                for link in links:
+                    BackgroundJobController.link_add(link)
+
+            if conf.auto_store_entries:
+                links = p.get_links()
+                for link in links:
+                    BackgroundJobController.link_add(link)
+
+            return True
+        except Exception as e:
+            error_text = traceback.format_exc()
+            PersistentInfo.error("Exception: {} {}".format(str(e), error_text))
+
+
 class RefreshThreadHandler(object):
     """!
     Checks if tasks should be created.
@@ -714,6 +745,7 @@ class HandlerManager(object):
             CleanupJobHandler(),
             ProcessSourceJobHandler(),
             LinkAddJobHandler(),
+            LinkScanJobHandler(),
             LinkDownloadJobHandler(),
             LinkMusicDownloadJobHandler(),
             LinkVideoDownloadJobHandler(),

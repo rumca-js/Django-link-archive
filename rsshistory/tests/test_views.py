@@ -130,6 +130,12 @@ class ViewsTest(WebPageDisabled, TestCase):
 
         self.assertEqual(resp.status_code, 200)
 
+    def test_entry_scan(self):
+        url = reverse("{}:entry-scan".format(LinkDatabase.name), args=[0])
+        resp = self.client.get(url)
+
+        self.assertEqual(resp.status_code, 200)
+
     def test_entry_edit(self):
         url = reverse("{}:entry-edit".format(LinkDatabase.name), args=[0])
         resp = self.client.get(url)
@@ -345,7 +351,10 @@ class ViewsTest(WebPageDisabled, TestCase):
         self.assertEqual(resp.status_code, 200)
 
     def test_shot_youtube_link_props_page(self):
-        url = reverse("{}:show-youtube-link-props".format(LinkDatabase.name)) + "?page=https://www.youtube.com"
+        url = (
+            reverse("{}:show-youtube-link-props".format(LinkDatabase.name))
+            + "?page=https://www.youtube.com"
+        )
         resp = self.client.get(url)
 
         self.assertEqual(resp.status_code, 200)
@@ -357,7 +366,10 @@ class ViewsTest(WebPageDisabled, TestCase):
         self.assertEqual(resp.status_code, 200)
 
     def test_shot_page_props_page(self):
-        url = reverse("{}:show-page-props".format(LinkDatabase.name)) + "?page=https://www.youtube.com"
+        url = (
+            reverse("{}:show-page-props".format(LinkDatabase.name))
+            + "?page=https://www.youtube.com"
+        )
         resp = self.client.get(url)
 
         self.assertEqual(resp.status_code, 200)
@@ -448,7 +460,9 @@ class EnhancedViewTest(ViewsTest):
         domain = DomainsController.objects.create(
             domain="https://youtube.com",
         )
-        domain.date_created = DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M")
+        domain.date_created = DateUtils.from_string(
+            "2023-03-03;16:34", "%Y-%m-%d;%H:%M"
+        )
         domain.save()
 
         keyword = KeyWords.objects.create(keyword="test")

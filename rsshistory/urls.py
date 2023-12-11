@@ -60,6 +60,7 @@ urlpatterns = [
     path("entry-json/<int:pk>/", viewentries.entry_json, name="entry-json"),
     path("entry-archived/<int:pk>/", viewentries.EntryArchivedDetailView.as_view(), name="entry-archived"),
     path("entry-add", viewentries.add_entry, name="entry-add"),
+    path("entry-scan/<int:pk>/", viewentries.entry_scan, name="entry-scan"),
     path("entry-add-simple", viewentries.add_simple_entry, name="entry-add-simple"),
     path("entry-edit/<int:pk>/", viewentries.edit_entry, name="entry-edit"),
     path("entry-remove/<int:pk>/", viewentries.remove_entry, name="entry-remove"),

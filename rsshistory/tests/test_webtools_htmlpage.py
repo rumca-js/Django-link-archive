@@ -68,6 +68,19 @@ webpage_links = """<html>
 </html>
 """
 
+webpage_rss_links = """<html>
+ <head>
+ <TITLE>This is a upper case title</TITLE>
+ <link rel="alternate" type="application/rss+xml" title="9to5Google &raquo; Feed" href="http://your-site.com/your-feed1.rss" />
+ <link rel="alternate" type="application/rss+xml" title="9to5Google &raquo; Feed" href="http://your-site.com/your-feed2.rss" />
+ <link rel="alternate" type="application/rss+xml" title="9to5Google &raquo; Feed" href="http://your-site.com/your-feed3.rss" />
+
+ </head>
+ <body>
+ page body
+ </body>
+"""
+
 
 class HtmlPageTest(TestCase):
     def test_default_language(self):
@@ -175,3 +188,19 @@ class HtmlPageTest(TestCase):
         self.assertTrue("http://mytestpage.com/test/test4.js" not in links)
         self.assertTrue("http://mytestpage.com/test/test5/" in links)
         self.assertTrue("https://test6.domain.com/" in links)
+
+    def test_get_rss_url(self):
+        p = HtmlPage("http://mytestpage.com/nodomain/", webpage_rss_links)
+
+        rss_url = p.get_rss_url()
+
+        self.assertEqual("http://your-site.com/your-feed1.rss", rss_url)
+
+    def test_get_rss_urls(self):
+        p = HtmlPage("http://mytestpage.com/nodomain/", webpage_rss_links)
+
+        all_rss = p.get_rss_urls()
+
+        self.assertTrue("http://your-site.com/your-feed1.rss" in all_rss)
+        self.assertTrue("http://your-site.com/your-feed2.rss" in all_rss)
+        self.assertTrue("http://your-site.com/your-feed3.rss" in all_rss)

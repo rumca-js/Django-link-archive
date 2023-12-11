@@ -20,7 +20,7 @@ from ..models import (
     DomainSubCategories,
 )
 from ..configuration import Configuration
-from ..threadhandlers import HandlerManager, RefreshThreadHandler, CleanupJobHandler
+from ..threadhandlers import HandlerManager, RefreshThreadHandler, CleanupJobHandler, LinkAddJobHandler, LinkScanJobHandler
 from .utilities import WebPageDisabled
 from ..dateutils import DateUtils
 
@@ -323,15 +323,15 @@ class CleanJobHandlerTest(WebPageDisabled, TestCase):
         conf.auto_store_domain_info = True
         conf.save()
 
-        p = PersistentInfo.objects.create(info = "info1", level = 10, user="test")
+        p = PersistentInfo.objects.create(info="info1", level=10, user="test")
         p.date = DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M")
         p.save()
 
-        p = PersistentInfo.objects.create(info = "info2", level = 10, user="test")
+        p = PersistentInfo.objects.create(info="info2", level=10, user="test")
         p.date = DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M")
         p.save()
 
-        p = PersistentInfo.objects.create(info = "info3", level = 10, user="test")
+        p = PersistentInfo.objects.create(info="info3", level=10, user="test")
         p.date = DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M")
         p.save()
 
@@ -370,7 +370,12 @@ class CleanJobHandlerTest(WebPageDisabled, TestCase):
             language="en",
         )
 
-        DomainsController.objects.create(protocol = "https", domain = "youtube.com", category = "testCategory", subcategory = "testSubcategory")
+        DomainsController.objects.create(
+            protocol="https",
+            domain="youtube.com",
+            category="testCategory",
+            subcategory="testSubcategory",
+        )
         DomainCategories.objects.all().delete()
         DomainSubCategories.objects.all().delete()
 
@@ -387,8 +392,8 @@ class CleanJobHandlerTest(WebPageDisabled, TestCase):
         self.assertEqual(KeyWords.objects.all().count(), 0)
 
         self.assertEqual(DomainsController.objects.all().count(), 1)
-        self.assertGreater(DomainCategories.objects.all().count(), 1)
-        self.assertGreater(DomainSubCategories.objects.all().count(), 1)
+        self.assertEqual(DomainCategories.objects.all().count(), 1)
+        self.assertEqual(DomainSubCategories.objects.all().count(), 1)
 
     def test_cleanup_job_no_store_domains(self):
         conf = Configuration.get_object().config_entry
@@ -404,3 +409,34 @@ class CleanJobHandlerTest(WebPageDisabled, TestCase):
         self.assertEqual(DomainsController.objects.all().count(), 1)
         self.assertGreater(DomainCategories.objects.all().count(), 0)
         self.assertGreater(DomainSubCategories.objects.all().count(), 0)
+
+    def test_add_link(self):
+        conf = Configuration.get_object().config_entry
+        conf.auto_store_domain_info = True
+        conf.save()
+
+        LinkDataController.objects.all().delete()
+        DomainsController.objects.all().delete()
+
+        ob = BackgroundJobController.link_add("https://manually-added-link.com")
+
+        handler = LinkAddJobHandler()
+        handler.process(ob)
+
+        self.assertEqual(LinkDataController.objects.all().count(), 1)
+        self.assertEqual(DomainsController.objects.all().count(), 1)
+
+    def test_scan_link(self):
+        conf = Configuration.get_object().config_entry
+        conf.auto_store_domain_info = True
+        conf.save()
+
+        LinkDataController.objects.all().delete()
+        DomainsController.objects.all().delete()
+
+        ob = BackgroundJobController.link_save("https://manually-added-link.com")
+
+        handler = LinkScanJobHandler()
+        handler.process(ob)
+
+        self.assertEqual(BackgroundJobController.objects.all().count(), 0)

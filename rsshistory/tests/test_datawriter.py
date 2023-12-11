@@ -117,23 +117,9 @@ class DataWriterTest(WebPageDisabled, TestCase):
         dw_conf = DataWriterConfiguration(conf, self.export_daily, "daily_data")
         writer = DataWriter.get(dw_conf)
 
+        # call tested function
         json_text = writer.get_domains_json()
 
-        json_obj = json.loads(json_text)
-
-        self.assertEqual(len(json_obj), 1)
-
-    def test_sources_json(self):
-        entry = ConfigurationEntry.get()
-        entry.data_export_path = self.test_export_path
-        entry.save()
-
-        conf = Configuration.get_object()
-
-        dw_conf = DataWriterConfiguration(conf, self.export_daily, "daily_data")
-        writer = DataWriter.get(dw_conf)
-
-        json_text = writer.get_sources_json()
         json_obj = json.loads(json_text)
 
         self.assertEqual(len(json_obj), 1)
@@ -147,6 +133,7 @@ class DataWriterTest(WebPageDisabled, TestCase):
 
         dw_conf = DataWriterConfiguration(conf, self.export_year, "year")
         writer = DataWriter.get(dw_conf)
+        # call tested function
         writer.write()
 
         links = LinkDataController.objects.filter(bookmarked=True)
@@ -184,6 +171,7 @@ class DataWriterTest(WebPageDisabled, TestCase):
 
         dw_conf = DataWriterConfiguration(conf, self.export_notime, "notime")
         writer = DataWriter.get(dw_conf)
+        # call tested function
         writer.write()
 
         links = LinkDataController.objects.filter(bookmarked=True)
@@ -197,13 +185,6 @@ class DataWriterTest(WebPageDisabled, TestCase):
             / "00000"
         )
         self.assertEqual(permanent_path.exists(), True)
-
-        # json_file = conf.get_export_path() / self.export_year.local_path / "notime" / "permanent" / "bookmarks_EN_entries.json"
-        # self.assertEqual(json_file.exists(), True)
-
-        # json_obj = json.loads(json_file.read_text())
-
-        # self.assertEqual(len(json_obj), 1)
 
         json_file = (
             conf.get_export_path()
@@ -224,6 +205,7 @@ class DataWriterTest(WebPageDisabled, TestCase):
             conf, self.export_daily, "daily_data", "2023-03-03"
         )
         writer = DataWriter.get(dw_conf)
+        # call tested function
         writer.write()
 
         json_file = (
@@ -244,6 +226,54 @@ class DataWriterTest(WebPageDisabled, TestCase):
             conf.get_export_path()
             / self.export_year.local_path
             / "daily_data"
+            / "sources.json"
+        )
+        self.assertEqual(json_file.exists(), True)
+
+    def test_write_notime_many_sources(self):
+        entry = ConfigurationEntry.get()
+        entry.data_export_path = self.test_export_path
+        entry.save()
+
+        for source_idx in range(2000):
+            SourceDataController.objects.create(
+                url="https://linkedin.com/{}".format(source_idx),
+                title="LinkedIn{}".format(source_idx),
+                category="No",
+                subcategory="No",
+                export_to_cms=True,
+            )
+
+        conf = Configuration.get_object()
+
+        dw_conf = DataWriterConfiguration(conf, self.export_notime, "notime")
+        writer = DataWriter.get(dw_conf)
+        # call tested function
+        writer.write()
+
+        links = LinkDataController.objects.filter(bookmarked=True)
+        self.assertEqual(links.count(), 1)
+
+        permanent_path = (
+            conf.get_export_path()
+            / self.export_year.local_path
+            / "notime"
+            / "permanent"
+            / "00000"
+        )
+        self.assertEqual(permanent_path.exists(), True)
+
+        json_dir = (
+            conf.get_export_path() / self.export_year.local_path / "notime" / "sources"
+        )
+        self.assertEqual(json_dir.exists(), True)
+
+        json_file = (
+            conf.get_export_path()
+            / self.export_year.local_path
+            / "notime"
+            / "sources"
+            / "00000"
             / "sources.json"
         )
         self.assertEqual(json_file.exists(), True)

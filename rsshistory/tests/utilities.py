@@ -102,17 +102,19 @@ class RequestsObject(object):
         self.content = contents
 
     def get_contents(self, url):
-        if url == "https://test-with-proper-html.com":
+        if url == "https://youtube.com/channel/samtime/rss.xml":
+            return webpage_samtime_youtube_rss
+
+        if url == "https://page-with-two-links.com":
             b = PageBuilder()
             b.title = "Page title"
             b.description = "Page description"
             b.og_title = "Page og_title"
             b.og_description = "Page og_description"
+            b.body = '''<a href="https://link1.com">Link1</a>
+                     <a href="https://link2.com">Link2</a>'''
 
             return b.build_contents()
-
-        if url == "https://youtube.com/channel/samtime/rss.xml":
-            return webpage_samtime_youtube_rss
 
         b = PageBuilder()
         b.title = "Page title"

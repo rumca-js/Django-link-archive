@@ -301,7 +301,7 @@ class DomainAwarePage(BasePage):
         return False
 
     def is_analytics(self):
-        if self.url.find("g.doubleclick") >= 0:
+        if self.url.find("g.doubleclick.net") >= 0:
             return True
         if self.url.find("doubleverify.com") >= 0:
             return True
@@ -311,6 +311,8 @@ class DomainAwarePage(BasePage):
             return True
         if self.url.find("googlesyndication") >= 0:
             return True
+        if self.url.find("www.googletagmanager.com") >= 0:
+            return True
         if self.url.find("google-analytics") >= 0:
             return True
         if self.url.find("googletagservices") >= 0:
@@ -318,6 +320,8 @@ class DomainAwarePage(BasePage):
         if self.url.find("cdn.speedcurve.com") >= 0:
             return True
         if self.url.find("amazonaws.com") >= 0:
+            return True
+        if self.url.find("consent.cookiebot.com") >= 0:
             return True
 
     def is_html(self):
@@ -914,6 +918,47 @@ class HtmlPage(ContentInterface):
             except Exception as e:
                 print("WebTools exception during rss processing {}".format(str(e)))
 
+    def get_rss_urls(self, full_check=False):
+        if not self.contents:
+            self.contents = self.get_contents()
+
+        if not self.contents:
+            return None
+
+        rss_finds = self.soup.find_all("link", attrs={"type": "application/rss+xml"})
+
+        rss_links = []
+        for rss_find in rss_finds:
+            if rss_find and rss_find.has_attr("href"):
+                rss_links.append(rss_find["href"])
+
+        rss_finds = self.soup.find_all(
+            "link", attrs={"type": "application/rss+xml;charset=UTF-8"}
+        )
+
+        for rss_find in rss_finds:
+            if rss_find and rss_find.has_attr("href"):
+                rss_links.append(rss_find["href"])
+
+        feed_url = self.url + "/feed"
+        if full_check and feed_url not in rss_links:
+            lucky_shot = self.url + "/feed"
+            try:
+                parser = RssPage(lucky_shot)
+                feed = parser.parse()
+                if len(feed.entries) > 0:
+                    rss_links.append(lucky_shot)
+            except Exception as e:
+                print("WebTools exception during rss processing {}".format(str(e)))
+
+        if len(rss_links) > 0:
+            rss_urls = []
+            for rss_url in rss_links:
+                rss_url = BasePage.get_url_full(self.get_domain(), rss_url)
+                rss_urls.append(rss_url)
+            return rss_urls
+        return []
+
     def get_links(self):
         p = ContentLinkParser(self.url, self.get_contents())
         links = p.get_links()
@@ -970,6 +1015,7 @@ class HtmlPage(ContentInterface):
         props["charset"] = self.get_charset()
         props["language"] = self.get_language()
         props["rss_url"] = self.get_rss_url()
+        props["rss_urls"] = self.get_rss_urls()
         props["page_rating"] = self.get_page_rating()
         props["status_code"] = self.status_code
 
@@ -982,7 +1028,9 @@ class HtmlPage(ContentInterface):
         props["links_inner"] = self.get_links_inner()
         props["links_outer"] = self.get_links_outer()
         props["contents"] = self.get_contents()
-        props["contents_length"] = len(self.get_contents())
+        if self.get_contents():
+            props["contents_length"] = len(self.get_contents())
+        props["tags"] = self.get_tags()
 
         return props
 
