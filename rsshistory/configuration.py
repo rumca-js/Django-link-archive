@@ -16,7 +16,7 @@ version is split into three digits:
  if a change requires the model to be changed, then second digit is updated, patch is set to 0
  if something should be released to public, then release version changes
 """
-__version__ = "0.31.6"
+__version__ = "0.31.7"
 
 
 from pathlib import Path
@@ -61,7 +61,6 @@ class Configuration(object):
         app_name = str(app_name)
 
         if app_name not in Configuration.obj:
-            print("Creating configuration object")
             c = Configuration(app_name)
             Configuration.obj[app_name] = c
 
@@ -78,7 +77,7 @@ class Configuration(object):
 
         return result
 
-    def enable_logging(self, create_file=True):
+    def enable_logging(self):
         pass
 
     def get_export_path(self, append=False):

@@ -7,6 +7,7 @@ from .controllers import (
     ArchiveLinkDataController,
     DomainsController,
 )
+from .apps import LinkDatabase
 
 try:
     from sympy import sympify
@@ -96,7 +97,7 @@ class BaseQueryFilter(object):
     def time_stop(self):
         from datetime import datetime
 
-        print("Page display time delta:{}".format(datetime.now() - self.time_start))
+        LinkDatabase.info("Page display time delta:{}".format(datetime.now() - self.time_start))
         return ""
 
 
@@ -106,7 +107,7 @@ class SourceFilter(BaseQueryFilter):
 
     def get_filtered_objects_internal(self):
         conditions = self.get_conditions()
-        print("Source filter conditions: {}".format(conditions))
+        LinkDatabase.info("Source filter conditions: {}".format(conditions))
 
         if conditions is not None:
             return SourceDataController.objects.filter(conditions)
@@ -121,13 +122,13 @@ class SourceFilter(BaseQueryFilter):
             self.error = True
 
         if q1 is not None and q2 is not None:
-            print("q1 and q2")
+            LinkDatabase.info("q1 and q2")
             return q1 & q2
         if q1 is not None:
-            print("q1")
+            LinkDatabase.info("q1")
             return q1
         if q2 is not None:
-            print("q2")
+            LinkDatabase.info("q2")
             return q2
 
     def get_omni_conditions(self):
@@ -173,7 +174,7 @@ class EntryFilter(BaseQueryFilter):
 
     def get_filtered_objects_internal(self):
         conditions = self.get_conditions()
-        print(conditions)
+        LinkDatabase.info(conditions)
 
         if conditions is None:
             return LinkDataController.objects.none()
@@ -344,7 +345,7 @@ class DomainFilter(BaseQueryFilter):
 
     def get_filtered_objects_internal(self):
         conditions = self.get_conditions()
-        print(conditions)
+        LinkDatabase.info(conditions)
 
         self.filtered_objects = DomainsController.objects.filter(conditions)
 
@@ -358,13 +359,13 @@ class DomainFilter(BaseQueryFilter):
             self.error = True
 
         if q1 is not None and q2 is not None:
-            print("q1 and q2")
+            LinkDatabase.info("q1 and q2")
             return q1 & q2
         if q1 is not None:
-            print("q1")
+            LinkDatabase.info("q1")
             return q1
         if q2 is not None:
-            print("q2")
+            LinkDatabase.info("q2")
             return q2
 
     def get_omni_conditions(self):
@@ -477,17 +478,17 @@ class OmniSymbolProcessor(object):
         else:
             function = str(expr.func)
             operation_symbol = str(expr)
-            print("Operation: {}".format(function))
+            LinkDatabase.info("Operation: {}".format(function))
 
             return self.make_operation(operation_symbol, function, expr.args)
 
-        # print(f'arg {expr}')
-        # print(f'arg.func: {expr.func}')
-        # print(f'arg.args: {expr.args}')
+        # LinkDatabase.info(f'arg {expr}')
+        # LinkDatabase.info(f'arg.func: {expr.func}')
+        # LinkDatabase.info(f'arg.args: {expr.args}')
 
     def evaluate_symbol(self, symbol):
         condition_text = self.conditions[symbol]
-        print("Evaluation condition {} {}".format(symbol, condition_text))
+        LinkDatabase.info("Evaluation condition {} {}".format(symbol, condition_text))
 
         self.known_results[symbol] = self.symbol_evaluator.evaluate_symbol(
             condition_text
@@ -505,7 +506,7 @@ class OmniSymbolProcessor(object):
         else:
             args1 = None
 
-        print(
+        LinkDatabase.info(
             "Evaluation function: full:{} function:{} args:{} {}".format(
                 operation_symbol, function, args0, args1
             )
@@ -533,12 +534,12 @@ class OmniSymbolEvaluator(object):
     def evaluate_symbol(self, symbol):
         condition_data = self.split_symbol(symbol)
         if condition_data:
-            print("Condition data {}".format(condition_data))
+            LinkDatabase.info("Condition data {}".format(condition_data))
 
             if self.is_translatable(condition_data):
                 condition_data = self.translate_condition(condition_data)
 
-                print("Symbol evaluator condition data:{}".format(condition_data))
+                LinkDatabase.info("Symbol evaluator condition data:{}".format(condition_data))
                 return Q(**condition_data)
             else:
                 self.fields[condition_data[0]] = condition_data[2]
@@ -650,7 +651,7 @@ class OmniSearchFilter(BaseQueryFilter):
 
     def calculate_combined_query(self):
         uses_operator = False
-        print("Self combined query {}".format(self.combined_query))
+        LinkDatabase.info("Self combined query {}".format(self.combined_query))
         if self.combined_query is not None:
             return
 
@@ -667,9 +668,9 @@ class OmniSearchFilter(BaseQueryFilter):
 
         if uses_operator:
             try:
-                print("Using processor")
+                LinkDatabase.info("Using processor")
                 self.combined_query = self.get_combined_query_using_processor()
-                print("Using processor done")
+                LinkDatabase.info("Using processor done")
             except Exception as e:
                 self.error = True
         else:
@@ -704,7 +705,7 @@ class OmniSearchFilter(BaseQueryFilter):
         self.symbol_evaluator.set_translatable(self.translatable_names)
 
         if self.data:
-            print("Have data")
+            LinkDatabase.info("Have data")
             proc = OmniSymbolProcessor(self.data, self.symbol_evaluator)
             combined_q_object = proc.process()
             return combined_q_object
@@ -716,9 +717,9 @@ class OmniSearchFilter(BaseQueryFilter):
         if self.data is not None and self.data != "":
             self.calculate_combined_query()
 
-            print("self.combined query: {}".format(self.combined_query))
+            LinkDatabase.info("self.combined query: {}".format(self.combined_query))
             filtered_queryset = self.query_set.filter(self.combined_query)
-            print("Omni query:{}".format(filtered_queryset.query))
+            LinkDatabase.info("Omni query:{}".format(filtered_queryset.query))
             return filtered_queryset
         else:
             return self.query_set

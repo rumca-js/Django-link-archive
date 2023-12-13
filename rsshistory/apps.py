@@ -7,3 +7,7 @@ class LinkDatabase(AppConfig):
 
     def ready(self):
         pass
+
+    def info(message):
+        print("[{}] {}".format(LinkDatabase.name, message))
+

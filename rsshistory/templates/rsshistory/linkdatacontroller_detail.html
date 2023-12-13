@@ -77,10 +77,12 @@
       {% endif %}
       <a href="{% url 'rsshistory:entries-omni-search'%}?search=artist+%3D+{{ object.artist }}" class="simplebutton">{{ object.artist }}</a>
       <a href="{% url 'rsshistory:entries-omni-search'%}?search=album+%3D+{{ object.album }}" class="simplebutton">{{ object.album }}</a>
-      {% if object.domain_obj %}
-      <a href="{% url 'rsshistory:domain-detail' object.domain_obj.id %}" class="simplebutton" title="{{object.link}}">Domain</a>
-      {% else %}
-      <a href="{% url 'rsshistory:domain-by-name' %}?domain_name={{object.get_domain_only}}" class="simplebutton" title="{{object.get_domain_only}}">Domain</a>
+      {% if config.auto_store_domain_info %}
+          {% if object.domain_obj %}
+              <a href="{% url 'rsshistory:domain-detail' object.domain_obj.id %}" class="simplebutton" title="{{object.link}}">Domain</a>
+          {% else %}
+              <a href="{% url 'rsshistory:domain-by-name' %}?domain_name={{object.get_domain_only}}" class="simplebutton" title="{{object.get_domain_only}}">Domain</a>
+          {% endif %}
       {% endif %}
 
       <a href="{{object.get_archive_link}}" class="simplebutton">

@@ -29,8 +29,10 @@
     <li>Valid: {{valid}}</li>
 </ul>
 
-{%if thumbnail %}
-<img src="{{thumbnail}}" style="max-width: 50%"/>
+{% if user_config.show_icons %}
+    {%if thumbnail %}
+    <img src="{{thumbnail}}" style="max-width: 50%"/>
+    {%endif%}
 {%endif%}
 
 {% endblock %}

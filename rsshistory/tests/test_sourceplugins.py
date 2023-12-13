@@ -15,8 +15,8 @@ from .utilities import WebPageDisabled
 webpage_youtube_contents = """
 <html>
 <body>
-   <a href="https://youtube.com/1">Test1</a>
-   <a href="https://youtube.com/2">Test2</a>
+   <a href="https://linkedin.com/1">Test1</a>
+   <a href="https://linkedin.com/2">Test2</a>
 </body>
 </html>
 """
@@ -117,6 +117,8 @@ class SourceGenerousParsePluginTest(WebPageDisabled, TestCase):
 
 class DomainParsePluginTest(WebPageDisabled, TestCase):
     def setUp(self):
+        self.disable_web_pages()
+
         self.source_youtube = SourceDataController.objects.create(
             url="https://youtube.com",
             title="YouTube",
@@ -124,8 +126,6 @@ class DomainParsePluginTest(WebPageDisabled, TestCase):
             subcategory="No",
             export_to_cms=True,
         )
-
-        self.disable_web_pages()
 
     def is_domain(self, alist, value):
         if alist is None:
@@ -139,7 +139,6 @@ class DomainParsePluginTest(WebPageDisabled, TestCase):
 
     def test_is_props_valid(self):
         parser = DomainParserPlugin(self.source_youtube.id)
-
         parser.contents = webpage_contents
 
         props = list(parser.get_link_props())
@@ -151,14 +150,15 @@ class DomainParsePluginTest(WebPageDisabled, TestCase):
 
 class BaseParsePluginTest(WebPageDisabled, TestCase):
     def setUp(self):
+        self.disable_web_pages()
+
         self.source_youtube = SourceDataController.objects.create(
-            url="https://youtube.com",
-            title="YouTube",
+            url="https://linkedin.com",
+            title="linkedin",
             category="No",
             subcategory="No",
             export_to_cms=True,
         )
-        self.disable_web_pages()
 
     def is_domain(self, alist, value):
         for avalue in alist:
@@ -175,5 +175,5 @@ class BaseParsePluginTest(WebPageDisabled, TestCase):
         props = list(parser.get_link_props())
         print(props)
 
-        self.assertTrue(self.is_domain(props, "https://youtube.com/1"))
-        self.assertTrue(self.is_domain(props, "https://youtube.com/2"))
+        self.assertTrue(self.is_domain(props, "https://linkedin.com/1"))
+        self.assertTrue(self.is_domain(props, "https://linkedin.com/2"))

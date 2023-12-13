@@ -3,6 +3,7 @@ from django.utils import timezone
 from django.urls import reverse
 
 from ..webtools import BasePage
+from .utilities import WebPageDisabled
 
 
 webpage_no_lang = """<html>
@@ -69,7 +70,10 @@ webpage_links = """<html>
 """
 
 
-class BasePageTest(TestCase):
+class BasePageTest(WebPageDisabled, TestCase):
+    def setUp(self):
+        self.disable_web_pages()
+
     def test_get_domain(self):
         # default language
         p = BasePage("http://test.com/my-site-test", webpage_lang_not_default)

@@ -2,6 +2,9 @@ import urllib.request, urllib.error, urllib.parse
 from urllib.parse import urlparse
 import urllib.robotparser
 
+from urllib3.exceptions import InsecureRequestWarning
+from urllib3 import disable_warnings
+
 import html
 import traceback
 import requests
@@ -22,6 +25,14 @@ URL_TYPE_CSS = "css"
 URL_TYPE_JAVASCRIPT = "javascript"
 URL_TYPE_HTML = "html"
 URL_TYPE_UNKNOWN = "unknown"
+
+"""
+This is program is web scraper. If we turn verify, then we discard some of pages.
+Encountered several major pages, which had SSL programs.
+
+SSL is mostly important for interacting with pages. During web scraping it is not that useful.
+"""
+disable_warnings(InsecureRequestWarning)
 
 
 class BasePage(object):
@@ -47,6 +58,9 @@ class BasePage(object):
         if self.contents:
             self.process_contents()
 
+        # Flag to not retry same contents requests for things we already know are dead
+        self.dead = False
+
         self.status_code = 0
 
         if BasePage.get_contents_function is None:
@@ -65,10 +79,13 @@ class BasePage(object):
         if not self.contents:
             self.contents = self.get_contents()
 
-        if self.contents:
-            return True
-        else:
+        if not self.contents:
             return False
+
+        if self.is_status_ok() == False:
+            return False
+
+        return True
 
     def try_decode(self, thebytes):
         try:
@@ -127,15 +144,24 @@ class BasePage(object):
 
         return self.status_code >= 200 and self.status_code < 300
 
-    def get_contents_internal(self, url, headers, timeout):
-        print("[{}] Page: Requesting page: {}".format(LinkDatabase.name, url))
-        return requests.get(url, headers=headers, timeout=timeout)
-
     def get_contents(self):
+        contents = self.get_contents_implementation()
+        if not contents:
+            if self.url.startswith("https://"):
+                self.url = self.url.replace("https://", "http://")
+                contents = self.get_contents_implementation()
+
+        self.contents = contents
+        return contents
+
+    def get_contents_implementation(self):
         if self.contents:
             return self.contents
 
         if not self.user_agent or self.user_agent == "":
+            return None
+
+        if self.dead:
             return None
 
         if self.url == "http://" or self.url == "https://" or self.url == None:
@@ -181,11 +207,23 @@ class BasePage(object):
             return r.text
 
         except Exception as e:
+            self.dead = True
             error_text = traceback.format_exc()
 
             PersistentInfo.error(
                 "Page: Error while reading page:{};Error:{}".format(self.url, str(e))
             )
+
+    def get_contents_internal(self, url, headers, timeout):
+        LinkDatabase.info("Page: Requesting page: {}".format(url))
+
+        """
+        This is program is web scraper. If we turn verify, then we discard some of pages.
+        Encountered several major pages, which had SSL programs.
+
+        SSL is mostly important for interacting with pages. During web scraping it is not that useful.
+        """
+        return requests.get(url, headers=headers, timeout=timeout, verify=False)
 
     def get_full_url(self):
         if self.url.find("http") == -1:
@@ -301,28 +339,54 @@ class DomainAwarePage(BasePage):
         return False
 
     def is_analytics(self):
-        if self.url.find("g.doubleclick.net") >= 0:
+        if self.url.endswith("g.doubleclick.net"):
             return True
-        if self.url.find("doubleverify.com") >= 0:
+        if self.url.endswith("ad.doubleclick.net"):
             return True
-        if self.url.find("adservice.google.com") >= 0:
+        if self.url.endswith("doubleverify.com"):
             return True
-        if self.url.find("amazon-adsystem.com") >= 0:
+        if self.url.endswith("adservice.google.com"):
+            return True
+        if self.url.endswith("amazon-adsystem.com"):
             return True
         if self.url.find("googlesyndication") >= 0:
             return True
-        if self.url.find("www.googletagmanager.com") >= 0:
+        if self.url.endswith("www.googletagmanager.com"):
             return True
         if self.url.find("google-analytics") >= 0:
             return True
         if self.url.find("googletagservices") >= 0:
             return True
-        if self.url.find("cdn.speedcurve.com") >= 0:
+        if self.url.endswith("cdn.speedcurve.com"):
             return True
-        if self.url.find("amazonaws.com") >= 0:
+        if self.url.endswith("amazonaws.com"):
             return True
-        if self.url.find("consent.cookiebot.com") >= 0:
+        if self.url.endswith("consent.cookiebot.com"):
             return True
+        if self.url.endswith("cloudfront.net"):
+            return True
+        if self.url.endswith("prg.smartadserver.com"):
+            return True
+        if self.url.endswith("ads.us.e-planning.net"):
+            return True
+        if self.url.endswith("static.ads-twitter.com"):
+            return True
+        if self.url.endswith("analytics.twitter.com "):
+            return True
+
+    def is_link(self):
+        return self.get_type_for_link() == URL_TYPE_HTML
+
+    def get_type_for_link(self):
+        the_type = self.get_type_by_ext()
+        if the_type:
+            return the_type
+
+        ext = self.get_page_ext()
+        if not ext:
+            return URL_TYPE_HTML
+
+        return URL_TYPE_UNKNOWN
 
     def is_html(self):
         return self.get_type() == URL_TYPE_HTML
@@ -334,8 +398,17 @@ class DomainAwarePage(BasePage):
         the_type = self.get_type_by_ext()
         if the_type:
             return the_type
-        if self.get_page_ext() == None:
+
+        ext = self.get_page_ext()
+        if not ext:
             return URL_TYPE_HTML
+
+        ext = self.get_page_ext()
+        if not ext:
+            return self.get_type_by_checking_contents()
+
+        if ext.lower() == "xml":
+            return self.get_type_by_checking_contents()
 
         return URL_TYPE_UNKNOWN
 
@@ -348,6 +421,8 @@ class DomainAwarePage(BasePage):
             "js": URL_TYPE_JAVASCRIPT,
             "html": URL_TYPE_HTML,
             "htm": URL_TYPE_HTML,
+            "php": URL_TYPE_HTML,
+            "aspx": URL_TYPE_HTML,
         }
 
         ext = self.get_page_ext()
@@ -368,7 +443,7 @@ class DomainAwarePage(BasePage):
             self.contents = self.get_contents()
 
         if not self.contents:
-            print("Could not obtain contents for {}".format(self.url))
+            LinkDatabase.info("Could not obtain contents for {}".format(self.url))
             return
 
         if self.contents.find("DOCTYPE html") >= 0:
@@ -379,10 +454,22 @@ class DomainAwarePage(BasePage):
             return True
 
     def is_contents_rss(self):
+        contents = self.get_contents()
+
+        if not self.contents:
+            LinkDatabase.info("Could not obtain contents for {}".format(self.url))
+            return
+
+        if (contents.find("<channel>") >=0 and
+            contents.find("<title>") >= 0 and
+            contents.find("<item>") >= 0
+            ):
+            return True
+
         try:
             import feedparser
 
-            feed = feedparser.parse(self.get_contents())
+            feed = feedparser.parse(contents)
             if len(feed.entries) > 0:
                 return True
             return False
@@ -410,6 +497,9 @@ class ContentInterface(DomainAwarePage):
         raise NotImplementedError
 
     def get_tags(self):
+        raise NotImplementedError
+
+    def get_page_rating(self):
         raise NotImplementedError
 
 
@@ -585,6 +675,22 @@ class RssPage(ContentInterface):
         if "author" in self.feed.feed:
             return self.feed.feed.author
 
+    def get_page_rating(self):
+        rating = 0
+
+        if self.get_title():
+            rating += 5
+        if self.get_description():
+            rating += 5
+        if self.get_language():
+            rating += 1
+        if self.get_thumbnail():
+            rating += 1
+        if self.get_author():
+            rating += 1
+
+        return rating
+
 
 class ContentLinkParser(BasePage):
     """
@@ -616,6 +722,11 @@ class ContentLinkParser(BasePage):
             links.remove("http://")
         if "https://" in links:
             links.remove("https://")
+
+        result = set()
+        for link in links:
+            link = link.replace("http://", "https://")
+            result.add(link)
 
         return links
 
@@ -657,7 +768,7 @@ class ContentLinkParser(BasePage):
         result = set()
         for link in links:
             p = DomainAwarePage(link)
-            if p.is_html():
+            if p.is_link():
                 result.add(link)
 
         return result
@@ -885,38 +996,9 @@ class HtmlPage(ContentInterface):
         return True
 
     def get_rss_url(self, full_check=False):
-        if not self.contents:
-            self.contents = self.get_contents()
-
-        if not self.contents:
-            return None
-
-        rss_url = None
-
-        rss_find = self.soup.find("link", attrs={"type": "application/rss+xml"})
-
-        if rss_find and rss_find.has_attr("href"):
-            rss_url = rss_find["href"]
-
-        rss_find = self.soup.find(
-            "link", attrs={"type": "application/rss+xml;charset=UTF-8"}
-        )
-        if rss_find and rss_find.has_attr("href"):
-            rss_url = rss_find["href"]
-
-        if rss_url:
-            rss_url = BasePage.get_url_full(self.get_domain(), rss_url)
-            return rss_url
-
-        if not rss_url and full_check:
-            lucky_shot = self.url + "/feed"
-            try:
-                parser = RssPage(lucky_shot)
-                feed = parser.parse()
-                if len(feed.entries) > 0:
-                    rss_url = lucky_shot
-            except Exception as e:
-                print("WebTools exception during rss processing {}".format(str(e)))
+        urls = self.get_rss_urls()
+        if urls and len(urls) > 0:
+            return urls[0]
 
     def get_rss_urls(self, full_check=False):
         if not self.contents:
@@ -949,7 +1031,7 @@ class HtmlPage(ContentInterface):
                 if len(feed.entries) > 0:
                     rss_links.append(lucky_shot)
             except Exception as e:
-                print("WebTools exception during rss processing {}".format(str(e)))
+                LinkDatabase.info("WebTools exception during rss processing {}".format(str(e)))
 
         if len(rss_links) > 0:
             rss_urls = []
@@ -1011,10 +1093,9 @@ class HtmlPage(ContentInterface):
         props["og_title"] = self.get_og_field("title")
         props["og_description"] = self.get_og_field("description")
         props["og_image"] = self.get_og_field("image")
-        props["is_html"] = self.is_html()
+        #props["is_html"] = self.is_html()
         props["charset"] = self.get_charset()
         props["language"] = self.get_language()
-        props["rss_url"] = self.get_rss_url()
         props["rss_urls"] = self.get_rss_urls()
         props["page_rating"] = self.get_page_rating()
         props["status_code"] = self.status_code
@@ -1124,6 +1205,7 @@ class HtmlPage(ContentInterface):
         Better to reject such site either way.
         """
         if BasePage.is_valid(self) == False:
+            LinkDatabase.info("Base page invalid indication")
             return False
 
         title = self.get_title()
@@ -1133,6 +1215,8 @@ class HtmlPage(ContentInterface):
             or title.find("Site not found") >= 0
         )
 
-        if self.is_status_ok() == False or is_title_invalid:
+        if is_title_invalid:
+            LinkDatabase.info("Title is invalid {}".format(title))
             return False
+
         return True

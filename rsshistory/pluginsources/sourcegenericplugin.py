@@ -46,7 +46,7 @@ class SourceGenericPlugin(HtmlPage):
             if not link_data:
                 continue
 
-            entry = LinkDataHyperController.add_new_link(link_data, source_is_auto=True)
+            entry = LinkDataHyperController.add_new_link_internal(link_data, source_is_auto=True)
             if entry:
                 self.on_added_entry(entry)
                 num_entries += 1
@@ -58,9 +58,9 @@ class SourceGenericPlugin(HtmlPage):
         self.hash = self.get_hash()
 
         if self.hash and source.get_page_hash() == self.hash:
-            print(
-                "[{}] Page has is the same, skipping".format(
-                    LinkDatabase.name, source.title
+            LinkDatabase.info(
+                "Page has is the same, skipping".format(
+                    source.title
                 )
             )
             return False
@@ -70,9 +70,8 @@ class SourceGenericPlugin(HtmlPage):
     def is_fetch_possible(self):
         source = self.get_source()
 
-        print(
-            "[{}] Process source:{} type:{} time:{}".format(
-                LinkDatabase.name,
+        LinkDatabase.info(
+            "Process source:{} type:{} time:{}".format(
                 source.title,
                 source.source_type,
                 source.get_date_fetched(),
@@ -80,9 +79,9 @@ class SourceGenericPlugin(HtmlPage):
         )
 
         if not source.is_fetch_possible():
-            print(
-                "[{}] Process source:{}: It is not the right time".format(
-                    LinkDatabase.name, source.title
+            LinkDatabase.info(
+                "Process source:{}: It is not the right time".format(
+                    source.title
                 )
             )
             return False
@@ -98,7 +97,7 @@ class SourceGenericPlugin(HtmlPage):
             try:
                 self.hash = hashlib.md5(text.encode("utf-8")).digest()
             except Exception as E:
-                print("[{}] Could not calculate hash {}".format(LinkDatabase.name, E))
+                LinkDatabase.info("Could not calculate hash {}".format(E))
 
         return self.hash
 
@@ -161,17 +160,6 @@ class SourceGenericPlugin(HtmlPage):
                         )
                     )
                     return False
-
-                from ..webtools import HtmlPage
-
-                p = HtmlPage(props["link"])
-                if p.is_youtube():
-                    from ..pluginentries.handlervideoyoutube import YouTubeVideoHandler
-
-                    handler = YouTubeVideoHandler(props["link"])
-                    handler.download_details()
-                    if not handler.is_valid():
-                        return False
 
                 return True
 

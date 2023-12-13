@@ -1,7 +1,7 @@
+from ..webtools import HtmlPage
+
 class EntryControllerBuilder(object):
     def get(entry):
-        from ..webtools import HtmlPage
-
         p = HtmlPage(entry.link)
         if p.is_youtube():
             from ..pluginentries.handlervideoyoutube import YouTubeVideoHandler

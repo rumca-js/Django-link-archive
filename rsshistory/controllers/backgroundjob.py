@@ -30,7 +30,6 @@ class BackgroundJobController(BackgroundJob):
         jobs = BackgroundJob.objects.all()
         for job in jobs:
             if job.job not in valid_jobs_choices:
-                print("Clearing job {}".format(job.job))
                 job.delete()
 
     def get_number_of_jobs(job_name=None):
@@ -175,13 +174,12 @@ class BackgroundJobController(BackgroundJob):
                 job=BackgroundJob.JOB_LINK_SAVE
             )
             if archive_items.count() < 100:
-                BackgroundJob.objects.create(
+                return BackgroundJob.objects.create(
                     job=BackgroundJob.JOB_LINK_SAVE,
                     task=None,
                     subject=link_url,
                     args="",
                 )
-                return True
             else:
                 for key, obj in enumerate(archive_items):
                     if key > 100:

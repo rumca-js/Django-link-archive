@@ -27,6 +27,8 @@ from ..dateutils import DateUtils
 
 class BackgroundJobControllerTest(WebPageDisabled, TestCase):
     def setUp(self):
+        self.disable_web_pages()
+
         ob = SourceDataController.objects.create(
             url="https://youtube.com", title="YouTube", category="No", subcategory="No"
         )
@@ -35,7 +37,6 @@ class BackgroundJobControllerTest(WebPageDisabled, TestCase):
             link="https://youtube.com?v=12345",
             source_obj=ob,
         )
-        self.disable_web_pages()
 
     def test_push_to_repo_handler(self):
         bg_obj = BackgroundJobController.objects.create(
@@ -208,6 +209,8 @@ class BackgroundJobControllerTest(WebPageDisabled, TestCase):
 
 class RefreshThreadHandlerTest(WebPageDisabled, TestCase):
     def setUp(self):
+        self.disable_web_pages()
+
         SourceDataController.objects.create(
             url="https://youtube.com",
             title="YouTube",
@@ -218,8 +221,6 @@ class RefreshThreadHandlerTest(WebPageDisabled, TestCase):
 
         BackgroundJobController.objects.all().delete()
         SourceExportHistory.objects.all().delete()
-
-        self.disable_web_pages()
 
     def create_exports(self):
         DataExport.objects.create(
@@ -272,6 +273,12 @@ class RefreshThreadHandlerTest(WebPageDisabled, TestCase):
             1,
         )
 
+        persistent_objects = PersistentInfo.objects.all()
+
+        for persistent_object in persistent_objects:
+            print("Persisten object info:{}".format(persistent_object.info))
+
+        self.assertEqual(persistent_objects.count(), 0)
         self.assertEqual(SourceExportHistory.objects.all().count(), 1)
 
     def test_process_with_exports(self):
@@ -318,6 +325,9 @@ class RefreshThreadHandlerTest(WebPageDisabled, TestCase):
 
 class CleanJobHandlerTest(WebPageDisabled, TestCase):
     def setUp(self):
+        self.disable_web_pages()
+
+    def prepare_data(self):
         # inserts old data, we will check if those will be removed
         conf = Configuration.get_object().config_entry
         conf.auto_store_domain_info = True
@@ -385,10 +395,17 @@ class CleanJobHandlerTest(WebPageDisabled, TestCase):
         keyword.save()
 
     def test_cleanup_job(self):
+        self.prepare_data()
+
         handler = CleanupJobHandler()
         handler.process()
 
-        self.assertEqual(PersistentInfo.objects.all().count(), 0)
+        persistent_objects = PersistentInfo.objects.all()
+
+        for persistent_object in persistent_objects:
+            print("Persisten object info:{}".format(persistent_object.info))
+
+        self.assertEqual(persistent_objects.count(), 0)
         self.assertEqual(KeyWords.objects.all().count(), 0)
 
         self.assertEqual(DomainsController.objects.all().count(), 1)
@@ -396,6 +413,8 @@ class CleanJobHandlerTest(WebPageDisabled, TestCase):
         self.assertEqual(DomainSubCategories.objects.all().count(), 1)
 
     def test_cleanup_job_no_store_domains(self):
+        self.prepare_data()
+
         conf = Configuration.get_object().config_entry
         conf.auto_store_domain_info = False
         conf.save()
@@ -403,12 +422,22 @@ class CleanJobHandlerTest(WebPageDisabled, TestCase):
         handler = CleanupJobHandler()
         handler.process()
 
-        self.assertEqual(PersistentInfo.objects.all().count(), 0)
+        persistent_objects = PersistentInfo.objects.all()
+
+        for persistent_object in persistent_objects:
+            print("Persisten object info:{}".format(persistent_object.info))
+
+        self.assertEqual(persistent_objects.count(), 0)
         self.assertEqual(KeyWords.objects.all().count(), 0)
 
-        self.assertEqual(DomainsController.objects.all().count(), 1)
-        self.assertGreater(DomainCategories.objects.all().count(), 0)
-        self.assertGreater(DomainSubCategories.objects.all().count(), 0)
+        self.assertEqual(DomainsController.objects.all().count(), 0)
+        self.assertEqual(DomainCategories.objects.all().count(), 0)
+        self.assertEqual(DomainSubCategories.objects.all().count(), 0)
+
+
+class AddJobHandlerTest(WebPageDisabled, TestCase):
+    def setUp(self):
+        self.disable_web_pages()
 
     def test_add_link(self):
         conf = Configuration.get_object().config_entry
@@ -423,8 +452,19 @@ class CleanJobHandlerTest(WebPageDisabled, TestCase):
         handler = LinkAddJobHandler()
         handler.process(ob)
 
+        persistent_objects = PersistentInfo.objects.all()
+
+        for persistent_object in persistent_objects:
+            print("Persisten object info:{}".format(persistent_object.info))
+
+        self.assertEqual(persistent_objects.count(), 0)
         self.assertEqual(LinkDataController.objects.all().count(), 1)
         self.assertEqual(DomainsController.objects.all().count(), 1)
+
+
+class ScanLinkJobHandlerTest(WebPageDisabled, TestCase):
+    def setUp(self):
+        self.disable_web_pages()
 
     def test_scan_link(self):
         conf = Configuration.get_object().config_entry
@@ -434,9 +474,20 @@ class CleanJobHandlerTest(WebPageDisabled, TestCase):
         LinkDataController.objects.all().delete()
         DomainsController.objects.all().delete()
 
-        ob = BackgroundJobController.link_save("https://manually-added-link.com")
+        ob = BackgroundJobController.link_scan("https://manually-added-link.com")
 
         handler = LinkScanJobHandler()
         handler.process(ob)
 
-        self.assertEqual(BackgroundJobController.objects.all().count(), 0)
+        persistent_objects = PersistentInfo.objects.all()
+
+        for persistent_object in persistent_objects:
+            print("Persisten object info:{}".format(persistent_object.info))
+
+        self.assertEqual(persistent_objects.count(), 0)
+
+        jobs = BackgroundJobController.objects.all()
+        for job in jobs:
+            print("Job:{} {}".format(job.job, job.subject))
+
+        self.assertEqual(jobs.count(), 1)

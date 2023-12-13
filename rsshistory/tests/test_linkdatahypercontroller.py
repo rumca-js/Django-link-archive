@@ -154,6 +154,9 @@ class SourceParsePluginTest(WebPageDisabled, TestCase):
         objs = LinkDataModel.objects.filter(link=link_name_0)
         domains = DomainsController.objects.all()
 
+        for domain in domains:
+            print("Domain:{}".format(domain.domain))
+
         # for each domain an entry is created
         self.assertEqual(objs.count(), 1)
         self.assertEqual(domains.count(), 1)

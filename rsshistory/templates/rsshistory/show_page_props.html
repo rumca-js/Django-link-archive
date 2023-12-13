@@ -67,8 +67,10 @@
     {%endfor%}
 </ul>
 
-{%if og_image%}
-<img src="{{og_image}}" style="max-width: 50%"/>
+{% if user_config.show_icons %}
+    {%if og_image%}
+    <img src="{{og_image}}" style="max-width: 50%"/>
+    {%endif%}
 {%endif%}
 
 <h1>Contents</h1>

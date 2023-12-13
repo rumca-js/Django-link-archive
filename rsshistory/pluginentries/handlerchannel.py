@@ -13,7 +13,10 @@ class DefaultHandler(object):
 class ChannelHandler(object):
     def get(url):
         supported = ChannelHandler.get_supported(url)
-        if supported is None:
+        if supported:
+            return supported
+
+        if not supported:
             return DefaultHandler(url)
 
     def get_supported(url):

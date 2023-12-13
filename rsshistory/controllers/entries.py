@@ -20,109 +20,6 @@ from ..configuration import Configuration
 from ..webtools import BasePage, HtmlPage, RssPage, ContentLinkParser
 from ..apps import LinkDatabase
 
-class YouTubeException(Exception):
-    pass
-
-
-class EntryPageDataReader(object):
-    def __init__(self, data):
-        self.data = data
-        self.p = HtmlPage(self.data["link"])
-
-    def get_full_information(self):
-        p = self.p
-
-        if self.data["link"].endswith("/"):
-            self.data["link"] = self.data["link"][:-1]
-
-        conf = Configuration.get_object().config_entry
-        if conf.auto_store_domain_info and p.get_domain() == self.data["link"]:
-            self.data["permanent"] = True
-
-        if p.is_html():
-            self.data["page_rating_contents"] = p.get_page_rating()
-
-        self.data["thumbnail"] = None
-
-        if p.is_youtube():
-            self.update_info_youtube()
-        if p.is_html():
-            self.update_info_html()
-        if p.is_rss():
-            self.update_info_rss()
-
-        self.update_info_default()
-        return self.data
-
-    def update_info_youtube(self):
-        # TODO there should be some generic handlers
-        from ..pluginentries.handlervideoyoutube import YouTubeVideoHandler
-
-        h = YouTubeVideoHandler(self.data["link"])
-        h.download_details()
-        if h.get_video_code() is None:
-            return self.data
-
-        if "source" not in self.data or self.data["source"].strip() == "":
-            self.data["source"] = h.get_channel_feed_url()
-        self.data["link"] = h.get_link_url()
-        if "title" not in self.data or self.data["title"].strip() == "":
-            self.data["title"] = h.get_title()
-        # TODO limit comes from LinkDataModel, do not hardcode
-        if "description" not in self.data or self.data["description"].strip() == "":
-            self.data["description"] = h.get_description()[:900]
-        self.data["date_published"] = h.get_datetime_published()
-        if (
-            "thumbnail" not in self.data
-            or self.data["thumbnail"] is None
-            or self.data["thumbnail"].strip() == ""
-        ):
-            self.data["thumbnail"] = h.get_thumbnail()
-        self.data["artist"] = h.get_channel_name()
-        self.data["album"] = h.get_channel_name()
-
-        return self.data
-
-    def update_info_html(self):
-        p = self.p
-
-        if "language" not in self.data or not self.data["language"]:
-            self.data["language"] = p.get_language()
-        if "title" not in self.data or not self.data["title"]:
-            self.data["title"] = p.get_title()
-        if "description" not in self.data or not self.data["description"]:
-            self.data["description"] = p.get_title()
-
-        return self.data
-
-    def update_info_rss(self):
-        r = RssPage(self.p.get_contents())
-        # TODO add title and description handling
-        return self.data
-
-    def update_info_default(self):
-        p = self.p
-
-        if "source" not in self.data or not self.data["source"]:
-            self.data["source"] = p.get_domain()
-        if "artist" not in self.data or not self.data["artist"]:
-            self.data["artist"] = p.get_domain()
-        if "album" not in self.data or not self.data["album"]:
-            self.data["album"] = p.get_domain()
-        if "language" not in self.data or not self.data["language"]:
-            self.data["language"] = ""
-        if "title" not in self.data or not self.data["title"]:
-            self.data["title"] = p.get_domain()
-        if "description" not in self.data or not self.data["description"]:
-            self.data["description"] = p.get_domain()
-
-        sources = SourceDataModel.objects.filter(url=self.data["source"])
-        if sources.count() > 0:
-            self.data["artist"] = sources[0].title
-            self.data["album"] = sources[0].title
-
-        return self.data
-
 
 class LinkDataController(LinkDataModel):
     class Meta:
@@ -166,7 +63,49 @@ class LinkDataController(LinkDataModel):
     def cleanup(limit=0):
         LinkDataController.move_old_links_to_archive(limit)
         LinkDataController.clear_old_entries(limit)
+        # LinkDataController.replace_http_link_with_https()
+        # LinkDataController.recreate_from_domains()
+
         # TODO if configured to store domains, but do not store entries - remove all normal non-domain entries
+
+    def recreate_from_domains():
+        from .domains import DomainsController
+        domains = DomainsController.objects.all()
+        for domain in domains:
+            full_domain = "https://" + domain.domain
+            entries = LinkDataController.objects.filter(link = full_domain)
+            if not entries.exist():
+                LinkDatabase.info("Creating entry for domain:{}".format(full_domain))
+                obj = LinkDataHyperController.add_simple(full_domain)
+                if not obj:
+                    PersistentInfo.create("Irreversably removing domain:{}".format(domain.domain))
+                    domain.delete()
+
+    def replace_http_link_with_https():
+        # TODO move tags
+
+        entries = LinkDataController.objects.filter(link__icontains = "http://")
+        for entry in entries:
+            link = entry.link
+            new_link = link.replace("http://", "https://")
+
+            new_entries = LinkDataController.objects.filter(link = new_link)
+            if not new_entries.exists():
+                try:
+                    LinkDatabase.info("Replacing http with https for:{} {}".format(link, new_link))
+                    obj = LinkDataHyperController.add_simple(new_link)
+                    if obj:
+                        LinkDatabase.info("Removing old for:{} {}".format(link, new_link))
+                        if entry.link != obj.link:
+                            entry.delete()
+                    else:
+                        LinkDatabase.info("Could not create - not Removing old for:{} {}".format(link, new_link))
+                except Exception as E:
+                    error_text = traceback.format_exc()
+                    PersistentInfo.error("Cannot create https link:{}".format(error_text))
+            else:
+                LinkDatabase.info("New exists - removing old for:{} {}".format(link, new_link))
+                entry.delete()
 
     def move_old_links_to_archive(limit=0):
         from ..dateutils import DateUtils
@@ -188,8 +127,8 @@ class LinkDataController(LinkDataModel):
             return
 
         for entry in entries:
-            print(
-                "[{}]:Moving link to archive: {}".format(LinkDatabase.name, entry.link)
+            LinkDatabase.info(
+                "Moving link to archive: {}".format(entry.link)
             )
 
             LinkDataController.move_to_archive(entry)
@@ -219,8 +158,9 @@ class LinkDataController(LinkDataModel):
                 PersistentInfo.error("Cannot move to archive {}".format(error_text))
 
     def get_full_information(data):
-        reader = EntryPageDataReader(data)
-        return reader.get_full_information()
+        from ..pluginentries.handlerurl import HandlerUrl
+        url = HandlerUrl(data["link"])
+        return url.get_props()
 
     def clear_old_entries(limit=0):
         from ..dateutils import DateUtils
@@ -255,7 +195,7 @@ class LinkDataController(LinkDataModel):
                     continue
 
                 for entry in entries:
-                    print("[{}] Removing link:{}".format(LinkDatabase.name, entry.link))
+                    LinkDatabase.info("Removing link:{}".format(entry.link))
 
                     entry.delete()
                     index += 1
@@ -274,7 +214,7 @@ class LinkDataController(LinkDataModel):
 
             if entries.exists():
                 for entry in entries:
-                    print("[{}] Removing link:{}".format(LinkDatabase.name, entry.link))
+                    LinkDatabase.info("Removing link:{}".format(entry.link))
 
                     entry.delete()
                     index += 1
@@ -290,7 +230,7 @@ class LinkDataController(LinkDataModel):
 
             if entries.exists():
                 for entry in entries:
-                    print("[{}] Removing link:{}".format(LinkDatabase.name, entry.link))
+                    LinkDatabase.info("Removing link:{}".format(entry.link))
 
                     entry.delete()
                     index += 1
@@ -355,11 +295,37 @@ class LinkDataHyperController(object):
     If there is a possiblity we do not search it, we do not add anything to it.
     """
 
+    def add_simple(link_url, input_props=None):
+        objs = LinkDataController.objects.filter(link=link_url)
+        if objs.count() != 0:
+            return objs[0]
+
+        from ..pluginentries.handlerurl import HandlerUrl
+        url = HandlerUrl(link_url)
+        props = url.get_props()
+        if props:
+            return LinkDataHyperController.add_new_link_internal(props)
+        else:
+            LinkDatabase.info("Could not obtain properties for:{}".format(link_url))
+
     def add_new_link(link_data, source_is_auto=False):
         obj = None
 
         if link_data["link"].endswith("/"):
             link_data["link"] = link_data["link"][:-1]
+
+        # Try with https more that with https
+        if link_data["link"].startswith("http://"):
+            link_data["link"] = link_data["link"].replace("http://", "https://")
+
+        if not LinkDataHyperController.add_new_link_internal(link_data, source_is_auto):
+            # Try with https more that with http
+            link_data["link"] = link_data["link"].replace("https://", "http://")
+
+            return LinkDataHyperController.add_new_link_internal(link_data, source_is_auto)
+
+    def add_new_link_internal(link_data, source_is_auto=False):
+        obj = None
 
         c = Configuration.get_object().config_entry
         if (
@@ -379,39 +345,11 @@ class LinkDataHyperController(object):
             if obj:
                 return obj
 
-            if not LinkDataHyperController.is_live_video(link_data):
-                print(
-                    "[{}] Adding link: {}".format(LinkDatabase.name, link_data["link"])
-                )
-
-                obj = LinkDataHyperController.add_entry_internal(link_data, is_archive)
+            obj = LinkDataHyperController.add_entry_internal(link_data, is_archive)
 
         LinkDataHyperController.add_addition_link_data(link_data)
 
         return obj
-
-    def add_simple(link_url, input_props={}):
-        objs = LinkDataController.objects.filter(link=link_url)
-        if objs.count() != 0:
-            return False
-
-        p = HtmlPage(link_url)
-
-        if p.is_domain():
-            input_props["permanent"] = True
-
-        if p.is_youtube():
-            from ..pluginentries.handlervideoyoutube import YouTubeVideoHandler
-            handler = YouTubeVideoHandler(link_url)
-            if handler.get_video_code():
-                props = LinkDataHyperController.get_youtube_props(link_url, input_props)
-                if props:
-                    return LinkDataHyperController.add_new_link(props)
-
-        if p.is_html():
-            props = LinkDataHyperController.get_htmlpage_props(link_url, input_props)
-            if props:
-                return LinkDataHyperController.add_new_link(props)
 
     def is_domain_link_data(link_data):
         p = BasePage(link_data["link"])
@@ -483,16 +421,23 @@ class LinkDataHyperController(object):
 
         if not config.auto_store_entries:
             if is_domain and config.auto_store_domain_info:
-                return True
+                pass
             elif "bookmarked" in link_data and link_data["bookmarked"]:
-                return True
+                pass
             else:
                 return False
+
+        if LinkDataHyperController.is_live_video(link_data):
+            LinkDatabase.info(
+                "Adding link: {}".format(link_data["link"])
+            )
+            return False
 
         return True
 
     def is_live_video(link_data):
         p = HtmlPage(link_data["link"])
+
         if p.is_youtube():
             from ..pluginentries.handlervideoyoutube import YouTubeVideoHandler
 
@@ -515,79 +460,6 @@ class LinkDataHyperController(object):
 
         return False
 
-    def get_youtube_props(url, input_props):
-        from ..pluginentries.handlervideoyoutube import YouTubeVideoHandler
-
-        h = YouTubeVideoHandler(url)
-        if not h.download_details():
-            raise YouTubeException("Could not obtain details for link:{}".format(url))
-
-        source_url = h.get_channel_feed_url()
-        if source_url is None:
-            raise YouTubeException("Could not obtain channel feed url:{}".format(source_url))
-
-        source_obj = None
-        sources = SourceDataModel.objects.filter(url=source_url)
-        if sources.exists:
-            source_obj = sources[0]
-
-        if "link" not in input_props:
-            input_props["link"] = h.get_link_url()
-        if "title" not in input_props:
-            input_props["title"] = h.get_title()
-        if "description" not in input_props:
-            input_props["description"] = h.get_description()
-        if "date_published" not in input_props:
-            input_props["date_published"] = h.get_datetime_published()
-        if "thumbnail" not in input_props:
-            input_props["thumbnail"] = h.get_thumbnail()
-        if "artist" not in input_props:
-            input_props["artist"] = h.get_channel_name()
-
-        if "language" not in input_props:
-            if source_obj:
-                input_props["language"] = source.language
-
-        if "source_obj" not in input_props:
-            if source_obj:
-                input_props["source_obj"] = source_obj
-
-        return input_props
-
-    def get_htmlpage_props(url, input_props, source_obj=None):
-        from ..dateutils import DateUtils
-
-        link_page = HtmlPage(url)
-
-        if "link" not in input_props:
-            input_props["link"] = url
-        if "title" not in input_props:
-            title = link_page.get_title()
-            input_props["title"] = title
-        if "description" not in input_props:
-            description = link_page.get_description()
-            if description is None:
-                description = title
-            input_props["description"] = description
-
-        if "language" not in input_props:
-            language = link_page.get_language()
-            if not language:
-                if source_obj:
-                    language = source_obj.language
-            input_props["language"] = language
-
-        if "date_published" not in input_props:
-            input_props["date_published"] = DateUtils.get_datetime_now_utc()
-
-        if "thumbnail" not in input_props:
-            input_props["thumbnail"] = link_page.get_thumbnail()
-
-        if "source_obj" not in input_props and source_obj:
-            input_props["source_obj"] = source_obj
-
-        return input_props
-
     def add_addition_link_data(link_data):
         try:
             LinkDataHyperController.add_domains(link_data)
@@ -604,7 +476,7 @@ class LinkDataHyperController(object):
                     error_text,
                 )
             )
-            print(error_text)
+            LinkDatabase.info(error_text)
 
     def add_domains(link_data):
         config = Configuration.get_object().config_entry
@@ -640,8 +512,18 @@ class LinkDataHyperController(object):
             return
 
         link = link_props["link"]
-        html = HtmlPage(link)
+        if "contents" in link_props:
+            html = HtmlPage(link, link_props["contents"])
+        else:
+            html = HtmlPage(link)
+
         props = html.get_properties_map()
+
+        if "rss_urls" not in props:
+            return
+
+        if props["rss_urls"] is None:
+            return
 
         rss_urls = props["rss_urls"]
         if len(rss_urls) == 0:
@@ -659,7 +541,11 @@ class LinkDataHyperController(object):
         if SourceDataModel.objects.filter(url=rss_url).count() > 0:
             return
 
-        parser = RssPage(rss_url)
+        if "contents" in link_props:
+            parser = RssPage(rss_url, link_props["contents"])
+        else:
+            parser = RssPage(rss_url)
+
         d = parser.parse()
         if d is None:
             PersistentInfo.error("RSS is empty: rss_url:{0}".format(rss_url))

@@ -36,7 +36,6 @@ class PermanentEntriesExporter(object):
 
         for page in range(page_system.no_pages):
             slice_limits = page_system.get_slice_limits(page)
-            print("Slice limits: {}".format(slice_limits))
             entries = all_entries[slice_limits[0] : slice_limits[1]]
 
             self.export_inner(

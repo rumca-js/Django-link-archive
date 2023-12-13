@@ -20,6 +20,7 @@ from ..controllers import (
     SourceDataController,
     LinkDataController,
     DomainsController,
+    LinkDataHyperController,
 )
 from ..views import ViewPage
 from ..dateutils import DateUtils
@@ -269,7 +270,7 @@ def show_youtube_link_props(request):
 
         p.context.update(youtube_props)
         # p.context["return_dislike_props"] = rd_props
-        #p.context["all_youtube_props"] = all_youtube_props
+        # p.context["all_youtube_props"] = all_youtube_props
 
         return p.render("show_youtube_link_props.html")
 
@@ -307,14 +308,12 @@ def show_page_props(request):
     if data is not None:
         return data
 
-    def show_page_props_internal(requests):
+    def show_page_props_internal(requests, page_link):
         from ..pluginentries.handlervideoyoutube import YouTubeVideoHandler
-
-        page_link = request.GET["page"]
 
         page = HtmlPage(page_link)
 
-        #p.context["show_properties"] = page.get_properties()
+        # p.context["show_properties"] = page.get_properties()
         p.context.update(page.get_properties())
 
         return p.render("show_page_props.html")
@@ -329,7 +328,8 @@ def show_page_props(request):
             return p.render("form_basic.html")
 
         else:
-            return show_page_props_internal(request)
+            page_link = request.GET["page"]
+            return show_page_props_internal(request, page_link)
 
     else:
         form = LinkInputForm(request.POST)
@@ -338,7 +338,8 @@ def show_page_props(request):
 
             return p.render("summary_present.html")
         else:
-            return show_page_props_internal(request)
+            page_link = form.cleaned_data["link"]
+            return show_page_props_internal(request, page_link)
 
 
 def test_page(request):
@@ -349,53 +350,6 @@ def test_page(request):
         return data
 
     summary_text = "test page"
-
-    entries = LinkDataController.objects.filter(domain_obj__isnull=True)
-    for entry in entries:
-        print("Entry:{}".format(entry.link))
-
-        pp = HtmlPage(entry.link)
-        domain = DomainsController.add(pp.get_domain())
-        if domain:
-            entry.domain_obj = domain
-            entry.save()
-
-    # from ..models import Domains, LinkTagsDataModel
-
-    # domains = Domains.objects.all()
-    # for domain in domains:
-    #    if domain.link_obj:
-    #        if domain.category == "Personal":
-    #            tags = LinkTagsDataModel.objects.filter(
-    #                link=domain.link_obj.link, tag="personal"
-    #            )
-    #            if tags.count() == 0:
-    #                LinkTagsDataModel.objects.create(
-    #                    link=domain.link_obj.link,
-    #                    tag="personal",
-    #                    author="rumpel",
-    #                    link_obj=domain.link_obj,
-    #                )
-    #            else:
-    #                tag = tags[0]
-    #                tag.link_obj = domain.link_obj
-    #                tag.save()
-    #        # if domain.subcategory == "Substack":
-    #        #    tags = LinkTagsDataModel.objects.filter(link = domain.link_obj.link, tag = "substack")
-    #        #    if tags.count() == 0:
-    #        #        LinkTagsDataModel.objects.create(link = domain.link_obj.link, tag = "substack", author="rumpel", link_obj = domain.link_obj)
-    #        #    else:
-    #        #        tag = tags[0]
-    #        #        tag.link_obj = domain.link_obj
-    #        #        tag.save()
-    #        # if domain.subcategory == "Mastodon":
-    #        #    tags = LinkTagsDataModel.objects.filter(link = domain.link_obj.link, tag = "mastodon")
-    #        #    if tags.count() == 0:
-    #        #        LinkTagsDataModel.objects.create(link = domain.link_obj.link, tag = "mastodon", author="rumpel", link_obj = domain.link_obj)
-    #        #    else:
-    #        #        tag = tags[0]
-    #        #        tag.link_obj = domain.link_obj
-    #        #        tag.save()
 
     p.context["summary_text"] = summary_text
 

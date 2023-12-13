@@ -33,9 +33,9 @@ class DomainParserPlugin(BaseParsePlugin):
         for link_str in domains_vec:
             p = HtmlPage(link_str)
             if p.is_valid() == False:
-                print(
-                    "[{}] DomainParserPlugin: link is not valid:{}".format(
-                        LinkDatabase.name, link_str
+                LinkDatabase.info(
+                    "DomainParserPlugin: link is not valid:{}".format(
+                        link_str
                     )
                 )
                 continue
@@ -47,9 +47,9 @@ class DomainParserPlugin(BaseParsePlugin):
             link_props = self.get_link_data(self.get_source(), link_str)
 
             if self.is_link_ok_to_add(link_props):
-                print(
-                    "[{}] DomainParserPlugin: adding domain:{} [{}/{}]".format(
-                        LinkDatabase.name, link_str, index, num_entries
+                LinkDatabase.info(
+                    "DomainParserPlugin: adding domain:{} [{}/{}]".format(
+                        link_str, index, num_entries
                     )
                 )
                 yield link_props

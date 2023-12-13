@@ -48,9 +48,9 @@ class DomainsController(Domains):
         return DomainsController.create_or_update_domain(domain_text)
 
     def create_or_update_domain(domain_only_text):
-        print(
-            "[{}] Creating, or updating domain:{}".format(
-                LinkDatabase.name, domain_only_text
+        LinkDatabase.info(
+            "Creating, or updating domain:{}".format(
+                domain_only_text
             )
         )
         objs = Domains.objects.filter(domain=domain_only_text)
@@ -116,11 +116,11 @@ class DomainsController(Domains):
             p = BasePage(entry.link)
             domain_url = p.get_domain()
             domain_only = p.get_domain_only()
-            print("Entry:{} domain:{} {}".format(entry.link, domain_url, domain_only))
+            LinkDatabase.info("Entry:{} domain:{} {}".format(entry.link, domain_url, domain_only))
 
             domains = DomainsController.objects.filter(domain=domain_only)
             if domains.count() == 0:
-                print(
+                LinkDatabase.info(
                     "Create missing domains entry:{} - missing domain".format(
                         entry.link
                     )
@@ -129,7 +129,7 @@ class DomainsController(Domains):
                 entry.domain_obj = domain
                 entry.save()
             else:
-                print(
+                LinkDatabase.info(
                     "Create missing domains entry:{} - missing domain link".format(
                         entry.link
                     )
@@ -241,7 +241,7 @@ class DomainsController(Domains):
             changed = True
 
         if changed:
-            print(
+            LinkDatabase.info(
                 "domain:{} subdomain:{} suffix:{} tld:{} title:{}".format(
                     self.main, self.subdomain, self.suffix, self.tld, self.title
                 )
@@ -252,11 +252,9 @@ class DomainsController(Domains):
             self.update_complementary_data()
 
         else:
-            print("domain:{} Nothing has changed".format(self.domain))
+            LinkDatabase.info("domain:{} Nothing has changed".format(self.domain))
 
     def update_page_info(self):
-        print("Fixing title {}".format(self.domain))
-
         from ..dateutils import DateUtils
 
         date_before_limit = DateUtils.get_days_before_dt(
@@ -275,13 +273,10 @@ class DomainsController(Domains):
         protocol = self.protocol
 
         if new_title is None:
-            print("{} Trying with http".format(self.domain))
             p = HtmlPage(self.get_domain_full_url("http"))
             new_title = p.get_title()
             new_description = p.get_description_safe()[:998]
             new_language = p.get_language()
-
-        print("Page status:{}".format(p.is_status_ok()))
 
         self.status_code = p.status_code
 
@@ -294,9 +289,6 @@ class DomainsController(Domains):
         if self.dead and p.is_status_ok():
             self.dead = False
             changed = True
-
-        print("New title:{}".format(new_title))
-        print("New description:{}".format(new_description))
 
         if new_title is not None:
             self.title = new_title
@@ -330,12 +322,12 @@ class DomainsController(Domains):
             # domains = Domains.objects.filter(dead = True) #, description__isnull = True)
 
         for domain in domains:
-            print("Fixing:{}".format(domain.domain))
+            LinkDatabase.info("Fixing:{}".format(domain.domain))
             try:
                 domain.update_object()
             except Exception as e:
-                print(str(e))
-            print("Fixing:{} done".format(domain.domain))
+                LinkDatabase.info(str(e))
+            LinkDatabase.info("Fixing:{} done".format(domain.domain))
 
     def get_map(self):
         result = {

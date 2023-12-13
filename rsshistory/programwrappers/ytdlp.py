@@ -3,6 +3,8 @@ import os
 import logging
 from pathlib import Path
 
+from ..apps import LinkDatabase
+
 from .ytdownloader import YouTubeDownloader
 
 
@@ -43,7 +45,9 @@ class YTDLP(YouTubeDownloader):
 
     def download_video(self, file_name):
         cmds = ["yt-dlp", "-f", "bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4", self._url]
-        logging.info("Downloading: " + " ".join(cmds))
+
+        LinkDatabase.info("Downloading: " + " ".join(cmds))
+
         proc = subprocess.run(cmds, cwd=self._path, capture_output=True)
 
         if proc.returncode != 0:
@@ -56,7 +60,7 @@ class YTDLP(YouTubeDownloader):
     def download_data(self, path=None):
         cmds = ["yt-dlp", "--dump-json", str(self._url)]
 
-        print("Downloading: " + " ".join(cmds) + " " + str(path))
+        LinkDatabase.info("Downloading: " + " ".join(cmds) + " " + str(path))
 
         proc = subprocess.run(cmds, capture_output=True)
         if proc.returncode != 0:

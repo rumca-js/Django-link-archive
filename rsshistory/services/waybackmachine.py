@@ -5,6 +5,7 @@ from datetime import datetime, date, timedelta
 from waybackpy import WaybackMachineCDXServerAPI, WaybackMachineSaveAPI
 
 from ..models import PersistentInfo
+from ..apps import LinkDatabase
 
 
 class WaybackMachine(object):
@@ -46,8 +47,8 @@ class WaybackMachine(object):
         time_text = self.get_formatted_date(time)
 
         if not archive_timestamp.startswith(time_text):
-            print(archive_timestamp)
-            print(time_text)
+            LinkDatabase.info(archive_timestamp)
+            LinkDatabase.info(time_text)
             return
 
         return_url = self.get_archive_url_with_overlay(
@@ -77,12 +78,12 @@ class WaybackMachine(object):
         user_agent = BasePage.user_agent
 
         save_api = WaybackMachineSaveAPI(url, user_agent)
-        print("Save url {0}".format(url))
+        LinkDatabase.info("Save url {0}".format(url))
         try:
             val = save_api.save()
             return val
         except Exception as e:
-            print("WaybackMachine: save url: {0} {1}".format(url, str(e)))
+            LinkDatabase.info("WaybackMachine: save url: {0} {1}".format(url, str(e)))
             PersistentInfo.error(
                 "WaybackMachine: save url: {0} {1}".format(url, str(e))
             )
@@ -113,10 +114,10 @@ class WaybackMachine(object):
         return True
 
     def debug_handle(self, handle):
-        print(handle)
-        print(handle.archive_url)
-        print(handle.original)
-        print(handle.urlkey)
-        print(handle.datetime_timestamp)
-        print(handle.statuscode)
-        print(handle.mimetype)
+        LinkDatabase.info(handle)
+        LinkDatabase.info(handle.archive_url)
+        LinkDatabase.info(handle.original)
+        LinkDatabase.info(handle.urlkey)
+        LinkDatabase.info(handle.datetime_timestamp)
+        LinkDatabase.info(handle.statuscode)
+        LinkDatabase.info(handle.mimetype)

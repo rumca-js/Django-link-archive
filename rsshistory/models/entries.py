@@ -156,7 +156,9 @@ class BaseLinkDataController(BaseLinkDataModel):
         for visit in visits:
             sum_num += visit.visits
 
-        return sum_num / visits.count()
+        visits.delete()
+
+        return sum_num
 
     def update_link_data(self):
         p = HtmlPage(self.link)
@@ -182,7 +184,7 @@ class BaseLinkDataController(BaseLinkDataModel):
 
     def update_calculated_vote(self):
         self.page_rating_votes = self.get_vote()
-        self.page_rating_visits = self.get_visits()
+        self.page_rating_visits += self.get_visits()
         self.page_rating = self.page_rating_votes + self.page_rating_contents
         self.save()
 
@@ -213,6 +215,14 @@ class BaseLinkDataController(BaseLinkDataModel):
                 if language != None:
                     self.language = language
                     self.save()
+
+    def reset_data(self):
+        from ..pluginentries.handlerurl import HandlerUrl
+        url = HandlerUrl(self.link)
+        props = url.get_props()
+
+        self.title = props["title"]
+        self.description = props["description"]
 
     def get_favicon(self):
         if self.get_source_obj():
@@ -463,4 +473,4 @@ class EntryVisits(models.Model):
             return visit
 
         except Exception as E:
-            print(str(E))
+            LinkDatabase.info(str(E))

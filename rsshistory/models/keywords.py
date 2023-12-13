@@ -119,8 +119,6 @@ class KeyWords(models.Model):
             if KeyWords.is_common(str_token):
                 continue
 
-            # print("keyword:{} type:{}".format(str_token, token.pos_))
-
             if token.pos_ == "NOUN" or token.pos_ == "PROPN":
                 important_tokens.add(str_token)
 

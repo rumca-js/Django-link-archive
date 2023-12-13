@@ -2,6 +2,7 @@ import json
 
 from ..models import Domains
 from ..controllers import LinkDataController, SourceDataController
+from ..apps import LinkDatabase
 
 
 class InstanceExporter(object):
@@ -60,29 +61,29 @@ class InstanceImporter(object):
             self.import_from_domains(json_data["domains"])
 
     def import_from_links(self, json_data):
-        print("Import from links")
+        LinkDatabase.info("Import from links")
 
         for link_data in json_data:
             LinkDataController.objects.create(**link_data)
 
     def import_from_sources(self, json_data):
-        print("Import from sources")
+        LinkDatabase.info("Import from sources")
 
         for source_data in json_data:
             SourceDataController.objects.create(**source_data)
 
     def import_from_link(self, json_data):
-        print("Import from link")
+        LinkDatabase.info("Import from link")
 
         LinkDataController.objects.create(**json_data)
 
     def import_from_source(self, json_data):
-        print("Import from source")
+        LinkDatabase.info("Import from source")
 
         SourceDataController.objects.create(**json_data)
 
     def import_from_domains(self, json_data):
-        print("Import from domains")
+        LinkDatabase.info("Import from domains")
 
         # TODO add such check for other import functions
         for domains_data in json_data:

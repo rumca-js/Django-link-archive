@@ -1,6 +1,7 @@
 import logging
 import shutil
 from ..models import PersistentInfo
+from ..apps import LinkDatabase
 
 
 class BookmarksExporter(object):
@@ -113,7 +114,22 @@ class BookmarksBigExporter(object):
         self._cfg = config
 
     def get_start_year(self):
-        return 1900
+        """
+        We export from oldest entries
+        """
+        from ..controllers import LinkDataController
+
+        entries = LinkDataController.objects.all().order_by("date_published")
+        if len(entries) > 0:
+            entry = entries[0]
+            if entry.date_published:
+                str_date = entry.date_published.strftime("%Y")
+                try:
+                    return int(str_date)
+                except Exception as E:
+                    LinkDatabase.info("Error: {}".format(str(E)))
+
+        return self.get_current_year()
 
     def get_current_year(self):
         from ..dateutils import DateUtils
@@ -132,7 +148,7 @@ class BookmarksBigExporter(object):
             shutil.rmtree(entries_dir)
 
         for year in range(self.get_start_year(), self.get_current_year() + 1):
-            print("Writing bookmarks for a year {}".format(year))
+            LinkDatabase.info("Writing bookmarks for a year {}".format(year))
 
             start_date = datetime.date(year, 1, 1)
             stop_date = datetime.date(year + 1, 1, 1)

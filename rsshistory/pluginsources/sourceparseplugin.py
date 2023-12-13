@@ -38,9 +38,10 @@ class BaseParsePlugin(SourceGenericPlugin):
 
     def get_link_data(self, source, link):
         from ..dateutils import DateUtils
+        from ..pluginentries.handlerurl import HandlerUrl
 
-        output_map = {}
-        return LinkDataHyperController.get_htmlpage_props(link, output_map, source)
+        url = HandlerUrl(link)
+        return url.get_props()
 
     def get_link_props(self):
         try:
@@ -59,9 +60,9 @@ class BaseParsePlugin(SourceGenericPlugin):
 
                 link_props = self.get_link_data(self.get_source(), link_str)
 
-                print(
-                    "[{}] Processing parsing link {}:[{}/{}]".format(
-                        LinkDatabase.name, link_str, index, num_entries
+                LinkDatabase.info(
+                    "Processing parsing link {}:[{}/{}]".format(
+                        link_str, index, num_entries
                     )
                 )
 

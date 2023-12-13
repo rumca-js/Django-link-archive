@@ -3,15 +3,14 @@ from celery.utils.log import get_task_logger
 import traceback
 
 from linklibrary.celery import app, logger
+from .apps import LinkDatabase
 
 
 def subs_checker_task(arg):
     """!
     Checks for new entries in sources
     """
-    logger.info("Refreshing sources")
-
-    from .apps import LinkDatabase
+    LinkDatabase.info("Refreshing sources")
 
     try:
         from .threadhandlers import RefreshThreadHandler
@@ -20,22 +19,20 @@ def subs_checker_task(arg):
         handler.refresh()
     except Exception as E:
         error_text = traceback.format_exc()
-        print(
-            "[{}] Exception in checker task: {} {}".format(
-                LinkDatabase.name, str(E), error_text
+        LinkDatabase.info(
+            "Exception in checker task: {} {}".format(
+                str(E), error_text
             )
         )
 
-    logger.info("Refreshing sources done")
+    LinkDatabase.info("Refreshing sources done")
 
 
 def process_all_jobs_task(arg):
     """!
     Processes jobs
     """
-    logger.info("Processing source")
-
-    from .apps import LinkDatabase
+    LinkDatabase.info("Processing source")
 
     try:
         from .threadhandlers import HandlerManager
@@ -45,22 +42,20 @@ def process_all_jobs_task(arg):
 
     except Exception as E:
         error_text = traceback.format_exc()
-        print(
-            "[{}] Exception in processing task: {} {}".format(
-                LinkDatabase.name, str(E), error_text
+        LinkDatabase.info(
+            "Exception in processing task: {} {}".format(
+                str(E), error_text
             )
         )
 
-    logger.info("Processing done")
+    LinkDatabase.info("Processing done")
 
 
 def process_one_jobs_task(arg):
     """!
     Processes jobs
     """
-    logger.info("Processing source")
-
-    from .apps import LinkDatabase
+    LinkDatabase.info("Processing source")
 
     try:
         from .threadhandlers import HandlerManager
@@ -70,10 +65,10 @@ def process_one_jobs_task(arg):
 
     except Exception as E:
         error_text = traceback.format_exc()
-        print(
-            "[{}] Exception in processing task: {} {}".format(
-                LinkDatabase.name, str(E), error_text
+        LinkDatabase.info(
+            "Exception in processing task: {} {}".format(
+                str(E), error_text
             )
         )
 
-    logger.info("Processing done")
+    LinkDatabase.info("Processing done")

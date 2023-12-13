@@ -490,7 +490,7 @@ def add_entry(request):
 
         if valid:
             data = form.get_information()
-            if not LinkDataHyperController.add_new_link(data):
+            if not LinkDataHyperController.add_new_link_internal(data):
                 p.context["summary_text"] = "Could not save link"
                 return p.render("summary_present.html")
 
@@ -563,7 +563,6 @@ def add_simple_entry(request):
                 ob = obs[0]
                 return HttpResponseRedirect(ob.get_absolute_url())
 
-            print("I am here")
             data = LinkDataController.get_full_information({"link": link})
             data["user"] = request.user.username
 
@@ -580,6 +579,26 @@ def add_simple_entry(request):
         p.context["form"] = form
 
         return p.render("form_basic.html")
+
+
+def entry_scan(request, pk):
+    p = ViewPage(request)
+    p.set_title("Edit entry")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    p.context["pk"] = pk
+
+    entries = LinkDataController.objects.filter(id=pk)
+    if not entries.exists():
+        p.context["summary_text"] = "Such entry does not exist"
+        return p.render("summary_present.html")
+
+    else:
+        entry = entries[0]
+        BackgroundJobController.link_scan(entry.link)
+        return HttpResponseRedirect(entry.get_absolute_url())
 
 
 def edit_entry(request, pk):

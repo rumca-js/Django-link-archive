@@ -152,7 +152,7 @@ class PersistentInfo(models.Model):
             )
             return
         except Exception as e:
-            print("PersistentInfo::create Exception {}".format(e))
+            LinkDatabase.info("PersistentInfo::create Exception {}".format(e))
 
     def text(info, level=int(logging.INFO), user=None):
         try:
@@ -161,7 +161,7 @@ class PersistentInfo(models.Model):
             )
             return
         except Exception as e:
-            print("PersistentInfo::text Exception {}".format(e))
+            LinkDatabase.info("PersistentInfo::text Exception {}".format(e))
 
     def error(info, level=int(logging.ERROR), user=None):
         try:
@@ -170,7 +170,7 @@ class PersistentInfo(models.Model):
             )
             return
         except Exception as e:
-            print("PersistentInfo::error Exception {}".format(e))
+            LinkDatabase.info("PersistentInfo::error Exception {}".format(e))
 
     def exc(info, level=int(logging.ERROR), exc_data=None, user=None):
         text = "{}. Exception data:\n{}".format(info, str(exc_data))
@@ -181,7 +181,7 @@ class PersistentInfo(models.Model):
             )
             return
         except Exception as e:
-            print("PersistentInfo::exc Exception {}".format(e))
+            LinkDatabase.info("PersistentInfo::exc Exception {}".format(e))
 
     def cleanup():
         PersistentInfo.remove_old_infos()
@@ -210,9 +210,9 @@ class PersistentInfo(models.Model):
                 obj = objs[0]
                 obj.delete()
         except Exception as e:
-            print(
-                "[{}] Could not remove old persistant infos {}".format(
-                    LinkDatabase.name, e
+            LinkDatabase.info(
+                "Could not remove old persistant infos {}".format(
+                    e
                 )
             )
 
@@ -223,6 +223,7 @@ class BackgroundJob(models.Model):
     JOB_LINK_UPDATE_DATA = "link-update-data"
     JOB_LINK_SAVE = "link-save"
     JOB_LINK_SCAN = "link-scan"
+    JOB_LINK_RESET_DATA = "link-reset-data"
     JOB_LINK_DOWNLOAD = "link-download"
     JOB_LINK_DOWNLOAD_MUSIC = "download-music"
     JOB_LINK_DOWNLOAD_VIDEO = "download-video"

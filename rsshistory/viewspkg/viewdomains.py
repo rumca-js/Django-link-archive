@@ -142,7 +142,8 @@ class DomainsByNameDetailView(generic.DetailView):
         context = super(DomainsByNameDetailView, self).get_context_data(**kwargs)
         context = ViewPage.init_context(self.request, context)
 
-        context["page_title"] += " {} domain".format(self.object.domain)
+        if self.object.domain:
+            context["page_title"] += " {} domain".format(self.object.domain)
 
         return context
 

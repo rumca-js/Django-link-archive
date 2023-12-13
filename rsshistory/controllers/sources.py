@@ -230,12 +230,10 @@ class SourceDataController(SourceDataModel):
         # TODO if passed url is youtube video, obtain information, obtain channel feed url
 
         if p.is_rss():
-            print("Page is rss")
             return SourceDataController.get_info_from_rss(data["url"])
         elif p.is_youtube():
             from ..pluginentries.handlervideoyoutube import YouTubeVideoHandler
 
-            print("Page is youtube")
             handler = YouTubeVideoHandler(data["url"])
             handler.download_details()
             return SourceDataController.get_info_from_rss(
@@ -243,10 +241,8 @@ class SourceDataController(SourceDataModel):
             )
         elif p.get_rss_url():
             p = HtmlPage(data["url"])
-            print("Page has RSS url")
             return SourceDataController.get_info_from_rss(p.get_rss_url())
         else:
-            print("Obtaining from page")
             return SourceDataController.get_info_from_page(data["url"], p)
 
     def get_info_from_rss(url):

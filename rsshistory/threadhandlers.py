@@ -244,10 +244,12 @@ class LinkAddJobHandler(BaseJobHandler):
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.error(
-                "Exception when adding YouTube link {0} {1} {2}".format(
+                "Exception when adding link {0} {1} {2}".format(
                     obj.subject, str(e), error_text
                 )
             )
+            # remove object from queue if it cannot be added
+            return True
 
 
 class LinkSaveJobHandler(BaseJobHandler):
@@ -613,7 +615,7 @@ class CleanupJobHandler(BaseJobHandler):
                 if obj is not None:
                     limit = int(obj.subject)
             except Exception as E:
-                print("Exception:{}".format(str(E)))
+                LinkDatabase.info("Exception:{}".format(str(E)))
 
             LinkDataController.cleanup(limit)
 
@@ -664,6 +666,23 @@ class LinkScanJobHandler(BaseJobHandler):
                 links = p.get_links()
                 for link in links:
                     BackgroundJobController.link_add(link)
+
+            return True
+        except Exception as e:
+            error_text = traceback.format_exc()
+            PersistentInfo.error("Exception: {} {}".format(str(e), error_text))
+
+
+class LinkResetDataJobHandler(BaseJobHandler):
+    def get_job(self):
+        return BackgroundJob.JOB_LINK_RESET_DATA
+
+    def process(self, obj=None):
+        try:
+            entries = LinkDataController.objects.filter(link=obj.subject)
+            if len(entries) > 0:
+                entry = entries[0]
+                entry.reset_data()
 
             return True
         except Exception as e:

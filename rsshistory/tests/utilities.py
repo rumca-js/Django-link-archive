@@ -105,6 +105,9 @@ class RequestsObject(object):
         if url == "https://youtube.com/channel/samtime/rss.xml":
             return webpage_samtime_youtube_rss
 
+        if url == "https://rsspage.com/rss.xml":
+            return webpage_samtime_youtube_rss
+
         if url == "https://page-with-two-links.com":
             b = PageBuilder()
             b.title = "Page title"
@@ -115,6 +118,24 @@ class RequestsObject(object):
                      <a href="https://link2.com">Link2</a>'''
 
             return b.build_contents()
+
+        if url == "https://page-with-http-status-500.com":
+            self.status_code = 500
+
+        if url == "https://page-with-http-status-400.com":
+            self.status_code = 400
+
+        if url == "https://page-with-http-status-300.com":
+            self.status_code = 300
+
+        if url == "https://page-with-http-status-200.com":
+            self.status_code = 200
+
+        if url == "https://page-with-http-status-100.com":
+            self.status_code = 100
+
+        if url.endswith("robots.txt"):
+            return """  """
 
         b = PageBuilder()
         b.title = "Page title"
@@ -131,10 +152,11 @@ class WebPageDisabled(object):
         return RequestsObject(url, headers, timeout)
 
     def disable_web_pages(self):
-        from ..webtools import BasePage, HtmlPage
+        from ..webtools import BasePage, HtmlPage, RssPage
 
         BasePage.get_contents_function = self.get_contents_function
         HtmlPage.get_contents_function = self.get_contents_function
+        RssPage.get_contents_function = self.get_contents_function
 
     def print_errors(self):
         infos = PersistentInfo.objects.all()

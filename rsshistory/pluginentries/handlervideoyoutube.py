@@ -1,6 +1,7 @@
 from urllib.parse import urlparse
 from urllib.parse import parse_qs
 
+from ..webtools import HtmlPage
 
 class YouTubeVideoHandler(object):
     def __init__(self, url=None):
@@ -176,8 +177,6 @@ class YouTubeVideoHandler(object):
         return True
 
     def is_valid(self):
-        from ..webtools import HtmlPage
-
         p = HtmlPage(self.url)
         if not p.is_youtube():
             return False
