@@ -167,13 +167,14 @@ class SourceGenericPlugin(HtmlPage):
 
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.error(
-                "Link:{}; Title:{}; Exc:{}\n{}".format(
-                    props["link"],
-                    props["title"],
-                    str(e),
-                    error_text,
+            if props and "link" in props and "title" in props:
+                PersistentInfo.error(
+                    "Link:{}; Title:{}; Exc:{}\n{}".format(
+                        props["link"],
+                        props["title"],
+                        str(e),
+                        error_text,
+                    )
                 )
-            )
 
             return None

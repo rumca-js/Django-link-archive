@@ -24,6 +24,9 @@
    {% endif %}
 
    <span class="link-list-item-title">
+       {% if link.page_rating_votes %}
+       [{{link.page_rating_votes}}]
+       {%endif%}
        {{link.title | slice:":100"}}
    </span>
     <span class="link-list-item-description">

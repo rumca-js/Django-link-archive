@@ -6,16 +6,16 @@ from .entrygenericplugin import EntryGenericPlugin, EntryButton, EntryParameter
 from ..apps import LinkDatabase
 
 
-class EntryOdyseePlugin(OdyseeVideoHandler, EntryGenericPlugin):
-    def __init__(self, entry):
-        super().__init__(entry.link)
-        self.entry = entry
+class EntryOdyseePlugin(EntryGenericPlugin):
+    def __init__(self, entry, user = None):
+        super().__init__(entry, user)
 
     def get_frame(self):
+        h = OdyseeVideoHandler(self.entry.link)
         return """
         <iframe style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%;" width="100%" height="100%" src="{}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen">
         """.format(
-            self.get_link_embed()
+            h.get_link_embed()
         )
 
     def get_parameters(self):

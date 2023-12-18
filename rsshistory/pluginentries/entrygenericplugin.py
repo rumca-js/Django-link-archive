@@ -1,8 +1,25 @@
+
+from ..models import ConfigurationEntry
+
 class EntryButton(object):
-    def __init__(self, name, action, image=None):
+    def __init__(self, user, name, action, access=ConfigurationEntry.ACCESS_TYPE_LOGGED, image=None):
+        self.user=user
         self.name = name
         self.action = action
         self.image = image
+        self.access = access
+
+    def is_shown(self):
+        if self.access == ConfigurationEntry.ACCESS_TYPE_ALL:
+            return True
+
+        if self.access == ConfigurationEntry.ACCESS_TYPE_LOGGED and (self.user.is_staff or self.user.is_authenticated):
+            return True
+
+        if self.access == ConfigurationEntry.ACCESS_TYPE_OWNER and (self.user.is_staff):
+            return True
+
+        return False
 
 
 class EntryParameter(object):
@@ -12,9 +29,9 @@ class EntryParameter(object):
 
 
 class EntryGenericPlugin(object):
-    def __init__(self, entry):
+    def __init__(self, entry, user=None):
         self.entry = entry
-        self.user = None
+        self.user = user
 
     def set_user(self, user):
         self.user = user

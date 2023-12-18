@@ -422,8 +422,7 @@ class EntryDetailView(generic.DetailView):
         context = ViewPage.init_context(self.request, context)
 
         EntryVisits.visited(self.object, self.request.user.username)
-        object_controller = EntryControllerBuilder.get(self.object)
-        object_controller.set_user(self.request.user.username)
+        object_controller = EntryControllerBuilder.get(self.object, self.request.user)
 
         context["page_title"] = self.object.title
         context["page_thumbnail"] = self.object.thumbnail
@@ -452,7 +451,7 @@ class EntryArchivedDetailView(generic.DetailView):
 
         context["page_title"] = self.object.title
         context["page_thumbnail"] = self.object.thumbnail
-        context["object_controller"] = EntryControllerBuilder.get(self.object)
+        context["object_controller"] = EntryControllerBuilder.get(self.object, self.request.user)
 
         from ..services.waybackmachine import WaybackMachine
         from ..dateutils import DateUtils
