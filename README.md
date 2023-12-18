@@ -144,7 +144,7 @@ Scenario to import links from a other instance:
  - select 'Admin' page
  - select 'Import from URL', and paste URL
 
-# User management
+# User management [under construction]
 
 This was created for the single player experience only, but... there is support for more Users.
 
