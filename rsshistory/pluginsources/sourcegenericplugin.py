@@ -46,7 +46,9 @@ class SourceGenericPlugin(HtmlPage):
             if not link_data:
                 continue
 
-            entry = LinkDataHyperController.add_new_link_internal(link_data, source_is_auto=True)
+            entry = LinkDataHyperController.add_new_link_internal(
+                link_data, source_is_auto=True
+            )
             if entry:
                 self.on_added_entry(entry)
                 num_entries += 1
@@ -58,11 +60,7 @@ class SourceGenericPlugin(HtmlPage):
         self.hash = self.get_hash()
 
         if self.hash and source.get_page_hash() == self.hash:
-            LinkDatabase.info(
-                "Page has is the same, skipping".format(
-                    source.title
-                )
-            )
+            LinkDatabase.info("Page has is the same, skipping".format(source.title))
             return False
 
         return True
@@ -80,9 +78,7 @@ class SourceGenericPlugin(HtmlPage):
 
         if not source.is_fetch_possible():
             LinkDatabase.info(
-                "Process source:{}: It is not the right time".format(
-                    source.title
-                )
+                "Process source:{}: It is not the right time".format(source.title)
             )
             return False
 

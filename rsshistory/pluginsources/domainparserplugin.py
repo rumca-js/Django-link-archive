@@ -34,9 +34,7 @@ class DomainParserPlugin(BaseParsePlugin):
             p = HtmlPage(link_str)
             if p.is_valid() == False:
                 LinkDatabase.info(
-                    "DomainParserPlugin: link is not valid:{}".format(
-                        link_str
-                    )
+                    "DomainParserPlugin: link is not valid:{}".format(link_str)
                 )
                 continue
 

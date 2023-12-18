@@ -1,5 +1,6 @@
 from ..webtools import HtmlPage
 
+
 class EntryControllerBuilder(object):
     def get(entry, user=None):
         p = HtmlPage(entry.link)

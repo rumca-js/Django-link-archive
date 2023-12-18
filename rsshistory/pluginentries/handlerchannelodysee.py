@@ -1,5 +1,10 @@
-class OdyseeSourceHandler(object):
+from .defaulturlhandler import DefaultUrlHandler
+
+
+class OdyseeSourceHandler(DefaultUrlHandler):
     def __init__(self, url=None):
+        super().__init__(url)
+
         if url:
             self.code = self.input2code(url)
 

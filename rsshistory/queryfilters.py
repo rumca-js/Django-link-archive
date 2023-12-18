@@ -97,7 +97,9 @@ class BaseQueryFilter(object):
     def time_stop(self):
         from datetime import datetime
 
-        LinkDatabase.info("Page display time delta:{}".format(datetime.now() - self.time_start))
+        LinkDatabase.info(
+            "Page display time delta:{}".format(datetime.now() - self.time_start)
+        )
         return ""
 
 
@@ -539,7 +541,9 @@ class OmniSymbolEvaluator(object):
             if self.is_translatable(condition_data):
                 condition_data = self.translate_condition(condition_data)
 
-                LinkDatabase.info("Symbol evaluator condition data:{}".format(condition_data))
+                LinkDatabase.info(
+                    "Symbol evaluator condition data:{}".format(condition_data)
+                )
                 return Q(**condition_data)
             else:
                 self.fields[condition_data[0]] = condition_data[2]

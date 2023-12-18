@@ -96,7 +96,7 @@ class SourceParsePluginTest(WebPageDisabled, TestCase):
         LinkDataModel.objects.all().delete()
 
         config = Configuration.get_object().config_entry
-        #config = ConfigurationEntry.get()
+        # config = ConfigurationEntry.get()
         config.auto_store_entries = False
         config.auto_store_domain_info = False
         config.save()
@@ -114,7 +114,7 @@ class SourceParsePluginTest(WebPageDisabled, TestCase):
             "language": "en",
             "thumbnail": "https://youtube.com/favicon.ico",
             "date_published": DateUtils.get_datetime_now_utc(),
-            "bookmarked" : False,
+            "bookmarked": False,
         }
 
         # call tested function
@@ -130,7 +130,7 @@ class SourceParsePluginTest(WebPageDisabled, TestCase):
         LinkDataModel.objects.all().delete()
 
         config = Configuration.get_object().config_entry
-        #config = ConfigurationEntry.get()
+        # config = ConfigurationEntry.get()
         config.auto_store_entries = False
         config.auto_store_domain_info = True
         config.save()
@@ -229,4 +229,3 @@ class SourceParsePluginTest(WebPageDisabled, TestCase):
         obj = objs[0]
 
         self.assertTrue(obj.bookmarked == False)
-

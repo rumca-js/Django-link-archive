@@ -233,44 +233,9 @@ def show_youtube_link_props(request):
         all_youtube_props = []
 
         if handler.yt_ob:
-            yt_json = handler.yt_ob.get_json()
-            yt_props = str(yt_json)
-
-            feed_url = handler.yt_ob.get_channel_feed_url()
-
-            youtube_props.append(("title", yt_json["title"]))
-            youtube_props.append(("webpage_url", yt_json["webpage_url"]))
-            youtube_props.append(("uploader_url", yt_json["uploader_url"]))
-            youtube_props.append(("channel_id", yt_json["channel_id"]))
-            youtube_props.append(("channel", yt_json["channel"]))
-            youtube_props.append(("channel_url", yt_json["channel_url"]))
-            youtube_props.append(("channel_feed_url", feed_url))
-            youtube_props.append(
-                ("channel_follower_count", yt_json["channel_follower_count"])
-            )
-            youtube_props.append(("view_count", yt_json["view_count"]))
-            youtube_props.append(("like_count", yt_json["like_count"]))
-            if "language" in yt_json:
-                youtube_props.append(("language", yt_json["language"]))
-            youtube_props.append(("upload_date", yt_json["upload_date"]))
-            if "duration_string" in yt_json:
-                youtube_props.append(("duration", yt_json["duration_string"]))
-            youtube_props.append(("valid", handler.is_valid()))
-            youtube_props.append(("thumbnail", yt_json["thumbnail"]))
-
-            for yt_prop in yt_json:
-                all_youtube_props.append((yt_prop, str(yt_json[yt_prop])))
-
-            # TODO rd_json = handler.rd_ob.get_json()
-            # TODO rd_props = str(rd_json)
-
-            # rd_props = []
-            # for rd_prop in rd_json:
-            #    rd_props.append((rd_prop, str(rd_json[rd_prop])))
-
-        p.context.update(youtube_props)
-        # p.context["return_dislike_props"] = rd_props
-        # p.context["all_youtube_props"] = all_youtube_props
+            props = handler.get_properties()
+            for aproperty in props:
+                p.context.update(props)
 
         return p.render("show_youtube_link_props.html")
 

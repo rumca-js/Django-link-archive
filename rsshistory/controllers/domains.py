@@ -48,11 +48,7 @@ class DomainsController(Domains):
         return DomainsController.create_or_update_domain(domain_text)
 
     def create_or_update_domain(domain_only_text):
-        LinkDatabase.info(
-            "Creating, or updating domain:{}".format(
-                domain_only_text
-            )
-        )
+        LinkDatabase.info("Creating, or updating domain:{}".format(domain_only_text))
         objs = Domains.objects.filter(domain=domain_only_text)
 
         obj = None
@@ -116,7 +112,9 @@ class DomainsController(Domains):
             p = BasePage(entry.link)
             domain_url = p.get_domain()
             domain_only = p.get_domain_only()
-            LinkDatabase.info("Entry:{} domain:{} {}".format(entry.link, domain_url, domain_only))
+            LinkDatabase.info(
+                "Entry:{} domain:{} {}".format(entry.link, domain_url, domain_only)
+            )
 
             domains = DomainsController.objects.filter(domain=domain_only)
             if domains.count() == 0:
@@ -175,9 +173,9 @@ class DomainsController(Domains):
             p = HtmlPage(link)
             if p.get_contents() is None:
                 return
-            return p.get_properties_map()
+            return p.get_properties()
 
-        return p.get_properties_map()
+        return p.get_properties()
 
     def get_page_properties(self):
         # if self.link_obj is not None:

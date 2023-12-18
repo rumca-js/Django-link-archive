@@ -218,6 +218,7 @@ class BaseLinkDataController(BaseLinkDataModel):
 
     def reset_data(self):
         from ..pluginentries.handlerurl import HandlerUrl
+
         url = HandlerUrl(self.link)
         props = url.get_props()
 

@@ -451,7 +451,9 @@ class EntryArchivedDetailView(generic.DetailView):
 
         context["page_title"] = self.object.title
         context["page_thumbnail"] = self.object.thumbnail
-        context["object_controller"] = EntryControllerBuilder.get(self.object, self.request.user)
+        context["object_controller"] = EntryControllerBuilder.get(
+            self.object, self.request.user
+        )
 
         from ..services.waybackmachine import WaybackMachine
         from ..dateutils import DateUtils
@@ -848,18 +850,18 @@ def entries_json(request):
     if "query_type" in request.GET:
         query_type = request.GET["query_type"]
 
+    check_views = [
+        EntriesSearchListView,
+        EntriesRecentListView,
+        EntriesBookmarkedListView,
+        EntriesNotTaggedView,
+        EntriesArchiveListView,
+        EntriesOmniListView,
+    ]
+
     page_limit = "standard"
     if "page_limit" in request.GET:
         page_limit = request.GET["page_limit"]
-
-        check_views = [
-            EntriesSearchListView,
-            EntriesRecentListView,
-            EntriesBookmarkedListView,
-            EntriesNotTaggedView,
-            EntriesArchiveListView,
-            EntriesOmniListView,
-        ]
 
         for view_class in check_views:
             view = view_class()

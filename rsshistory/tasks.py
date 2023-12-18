@@ -19,11 +19,7 @@ def subs_checker_task(arg):
         handler.refresh()
     except Exception as E:
         error_text = traceback.format_exc()
-        LinkDatabase.info(
-            "Exception in checker task: {} {}".format(
-                str(E), error_text
-            )
-        )
+        LinkDatabase.info("Exception in checker task: {} {}".format(str(E), error_text))
 
     LinkDatabase.info("Refreshing sources done")
 
@@ -43,9 +39,7 @@ def process_all_jobs_task(arg):
     except Exception as E:
         error_text = traceback.format_exc()
         LinkDatabase.info(
-            "Exception in processing task: {} {}".format(
-                str(E), error_text
-            )
+            "Exception in processing task: {} {}".format(str(E), error_text)
         )
 
     LinkDatabase.info("Processing done")
@@ -66,9 +60,7 @@ def process_one_jobs_task(arg):
     except Exception as E:
         error_text = traceback.format_exc()
         LinkDatabase.info(
-            "Exception in processing task: {} {}".format(
-                str(E), error_text
-            )
+            "Exception in processing task: {} {}".format(str(E), error_text)
         )
 
     LinkDatabase.info("Processing done")

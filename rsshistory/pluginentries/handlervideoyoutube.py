@@ -2,9 +2,13 @@ from urllib.parse import urlparse
 from urllib.parse import parse_qs
 
 from ..webtools import HtmlPage
+from .defaulturlhandler import DefaultUrlHandler
 
-class YouTubeVideoHandler(object):
+
+class YouTubeVideoHandler(DefaultUrlHandler):
     def __init__(self, url=None):
+        super().__init__(url)
+
         self.url = YouTubeVideoHandler.input2url(url)
         self.yt_text = None
         self.yt_ob = None
@@ -185,3 +189,40 @@ class YouTubeVideoHandler(object):
             return False
 
         return True
+
+    def get_artist(self):
+        return self.get_channel_name()
+
+    def get_album(self):
+        return None
+
+    def get_tags(self):
+        if self.yt_ob:
+            return self.yt_ob.get_tags()
+
+    def get_page_rating(self):
+        return 0
+
+    def get_properties(self):
+        youtube_props = super().get_properties()
+
+        yt_json = self.yt_ob._json
+
+        if yt_json:
+            youtube_props["webpage_url"] = yt_json["webpage_url"]
+            youtube_props["uploader_url"] = yt_json["uploader_url"]
+            youtube_props["channel_id"] = yt_json["channel_id"]
+            youtube_props["channel"] = yt_json["channel"]
+            youtube_props["channel_url"] = yt_json["channel_url"]
+            youtube_props["channel_follower_count"] = yt_json["channel_follower_count"]
+            youtube_props["view_count"] = yt_json["view_count"]
+            youtube_props["like_count"] = yt_json["like_count"]
+            youtube_props["upload_date"] = yt_json["upload_date"]
+            if "duration_string" in yt_json:
+                youtube_props["duration"] = yt_json["duration_string"]
+
+        youtube_props["embed_url"] = self.get_link_embed()
+        youtube_props["valid"] = self.is_valid()
+        youtube_props["channel_feed_url"] = self.get_channel_feed_url()
+
+        return youtube_props

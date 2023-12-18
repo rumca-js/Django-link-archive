@@ -20,7 +20,13 @@ from ..models import (
     DomainSubCategories,
 )
 from ..configuration import Configuration
-from ..threadhandlers import HandlerManager, RefreshThreadHandler, CleanupJobHandler, LinkAddJobHandler, LinkScanJobHandler
+from ..threadhandlers import (
+    HandlerManager,
+    RefreshThreadHandler,
+    CleanupJobHandler,
+    LinkAddJobHandler,
+    LinkScanJobHandler,
+)
 from .utilities import WebPageDisabled
 from ..dateutils import DateUtils
 

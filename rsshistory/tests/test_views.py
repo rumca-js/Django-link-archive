@@ -359,6 +359,15 @@ class ViewsTest(WebPageDisabled, TestCase):
 
         self.assertEqual(resp.status_code, 200)
 
+    def test_shot_youtube_link_props_page2(self):
+        url = (
+            reverse("{}:show-youtube-link-props".format(LinkDatabase.name))
+            + "?page=https://www.youtube.com/watch?v=SwlIAjcYypA"
+        )
+        resp = self.client.get(url)
+
+        self.assertEqual(resp.status_code, 200)
+
     def test_shot_page_props(self):
         url = reverse("{}:show-page-props".format(LinkDatabase.name))
         resp = self.client.get(url)
@@ -500,6 +509,16 @@ class EnhancedViewTest(ViewsTest):
             export_sources=True,
         )
 
+    def test_entry(self):
+        url = reverse("{}:entry-detail".format(LinkDatabase.name), args=[LinkDataController.objects.all()[0].id])
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+
+    def test_source(self):
+        url = reverse("{}:source-detail".format(LinkDatabase.name), args=[SourceDataController.objects.all()[0].id])
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+
     def test_source_json(self):
         sources = SourceDataController.objects.filter(url__icontains="https://youtube")
 
@@ -508,10 +527,26 @@ class EnhancedViewTest(ViewsTest):
 
         self.assertEqual(resp.status_code, 200)
 
+    def test_sources_json(self):
+        sources = SourceDataController.objects.filter(url__icontains="https://youtube")
+
+        url = reverse("{}:sources-json".format(LinkDatabase.name))
+        resp = self.client.get(url)
+
+        self.assertEqual(resp.status_code, 200)
+
     def test_entry_json(self):
         entries = LinkDataController.objects.filter(link__icontains="https://youtube")
 
         url = reverse("{}:entry-json".format(LinkDatabase.name), args=[entries[0].id])
+        resp = self.client.get(url)
+
+        self.assertEqual(resp.status_code, 200)
+
+    def test_entries_json(self):
+        entries = LinkDataController.objects.filter(link__icontains="https://youtube")
+
+        url = reverse("{}:entries-json".format(LinkDatabase.name))
         resp = self.client.get(url)
 
         self.assertEqual(resp.status_code, 200)

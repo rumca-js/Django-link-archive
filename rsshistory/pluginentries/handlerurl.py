@@ -17,9 +17,10 @@ class HandlerUrl(object):
             self.url = self.url[:-1]
 
         from ..pluginentries.handlervideoyoutube import YouTubeVideoHandler
+
         self.youtube_video_handler = YouTubeVideoHandler
 
-    def get_props(self, input_props = None, source_obj=None):
+    def get_props(self, input_props=None, source_obj=None):
         if not input_props:
             input_props = {}
 
@@ -30,14 +31,14 @@ class HandlerUrl(object):
                 # TODO change hardcoded limit
                 props["description"] = props["description"][:900]
 
-        #TODO
-        #if "source" not in input_props:
+        # TODO
+        # if "source" not in input_props:
         #    if not source_obj:
         #        input_props["source"] = p.get_domain()
 
         return props
 
-    def get_props_implementation(self, input_props = None, source_obj=None):
+    def get_props_implementation(self, input_props=None, source_obj=None):
         if not input_props:
             input_props = {}
 
@@ -70,7 +71,7 @@ class HandlerUrl(object):
 
         # TODO provide RSS support
 
-    def get_youtube_props(self, input_props = None, source_obj=None):
+    def get_youtube_props(self, input_props=None, source_obj=None):
         if not input_props:
             input_props = {}
 
@@ -82,7 +83,9 @@ class HandlerUrl(object):
 
         source_url = h.get_channel_feed_url()
         if source_url is None:
-            raise YouTubeException("Could not obtain channel feed url:{}".format(source_url))
+            raise YouTubeException(
+                "Could not obtain channel feed url:{}".format(source_url)
+            )
 
         sources = SourceDataController.objects.filter(url=source_url)
         if sources.exists():
@@ -111,7 +114,7 @@ class HandlerUrl(object):
 
         return input_props
 
-    def get_htmlpage_props(self, input_props = None, source_obj=None):
+    def get_htmlpage_props(self, input_props=None, source_obj=None):
         if not input_props:
             input_props = {}
 
@@ -166,7 +169,7 @@ class HandlerUrl(object):
 
         return input_props
 
-    def get_rsspage_props(self, input_props = None, source_obj=None):
+    def get_rsspage_props(self, input_props=None, source_obj=None):
         if not input_props:
             input_props = {}
 
@@ -239,3 +242,24 @@ class HandlerUrl(object):
             input_props["album"] = sources[0].title
 
         return input_props
+
+
+class NewHandlerUrl(object):
+    def get(url):
+        if url == "https://youtube.com/watch":
+            return YouTubeVideoHandler(url)
+        if url == "https://www.youtube.com/channel":
+            return YouTubeSourceHandler(url)
+        if url == "https://www.youtube.com/feeds":
+            return YouTubeSourceHandler(url)
+        # TODO implement check below
+        if url == "https://odysee.com/user/video":
+            return OdyseeVideoHandler(url)
+        # TODO implement check below
+        if url == "https://odysee.com/user/":
+            return OdyseeSourceHandler(url)
+        if url == "https://odysee.com/$/rss":
+            return OdyseeSourceHandler(url)
+
+        from ..webtools import Url
+        return Url(url)

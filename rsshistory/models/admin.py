@@ -210,11 +210,7 @@ class PersistentInfo(models.Model):
                 obj = objs[0]
                 obj.delete()
         except Exception as e:
-            LinkDatabase.info(
-                "Could not remove old persistant infos {}".format(
-                    e
-                )
-            )
+            LinkDatabase.info("Could not remove old persistant infos {}".format(e))
 
 
 class BackgroundJob(models.Model):
@@ -268,7 +264,7 @@ class BackgroundJob(models.Model):
     # fmt: on
 
     # job - add link, process source, download music, download video, wayback save
-    job = models.CharField(max_length=1000, null=False) #, choices=JOB_CHOICES)
+    job = models.CharField(max_length=1000, null=False)  # , choices=JOB_CHOICES)
     # task name
     task = models.CharField(max_length=1000, null=True)
     subject = models.CharField(max_length=1000, null=False)

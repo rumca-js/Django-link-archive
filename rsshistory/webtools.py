@@ -460,10 +460,11 @@ class DomainAwarePage(BasePage):
             LinkDatabase.info("Could not obtain contents for {}".format(self.url))
             return
 
-        if (contents.find("<channel>") >=0 and
-            contents.find("<title>") >= 0 and
-            contents.find("<item>") >= 0
-            ):
+        if (
+            contents.find("<channel>") >= 0
+            and contents.find("<title>") >= 0
+            and contents.find("<item>") >= 0
+        ):
             return True
 
         try:
@@ -496,11 +497,29 @@ class ContentInterface(DomainAwarePage):
     def get_author(self):
         raise NotImplementedError
 
+    def get_album(self):
+        raise NotImplementedError
+
     def get_tags(self):
         raise NotImplementedError
 
     def get_page_rating(self):
         raise NotImplementedError
+
+    def get_properties(self):
+        props = {}
+
+        props["link"] = self.url
+        props["title"] = self.get_title()
+        props["description"] = self.get_description()
+        props["author"] = self.get_author()
+        props["album"] = self.get_album()
+        props["thumbnail"] = self.get_thumbnail()
+        props["language"] = self.get_language()
+        props["page_rating"] = self.get_page_rating()
+        props["tags"] = self.get_tags()
+
+        return props
 
 
 class RssPage(ContentInterface):
@@ -569,71 +588,69 @@ class RssPage(ContentInterface):
         return props
 
     def get_feed_entry_map(self, feed_entry):
-        from .dateutils import DateUtils
-
         output_map = {}
 
-        if hasattr(feed_entry, "description"):
-            output_map["description"] = feed_entry.description
-        else:
-            output_map["description"] = ""
+        output_map["description"] = self.get_feed_description(feed_entry)
+        output_map["thumbnail"] = self.get_feed_thumbnail(feed_entry)
+        output_map["date_published"] = self.get_feed_date_published(feed_entry)
+        output_map["source"] = self.url
+        output_map["title"] = feed_entry.title
+        output_map["language"] = self.get_language()
+        output_map["link"] = feed_entry.link
+        output_map["artist"] = self.get_author()
+        output_map["album"] = ""
+        output_map["bookmarked"] = False
 
+        from .dateutils import DateUtils
+        if output_map["date_published"] > DateUtils.get_datetime_now_utc():
+            output_map["date_published"] = DateUtils.get_datetime_now_utc()
+
+        if str(feed_entry.title).strip() == "" or feed_entry.title == "undefined":
+            output_map["title"] = output_map["link"]
+
+        return output_map
+
+    def get_feed_description(self, feed_entry):
+        if hasattr(feed_entry, "description"):
+            return feed_entry.description
+        else:
+            return ""
+
+    def get_feed_thumbnail(self, feed_entry):
         if hasattr(feed_entry, "media_thumbnail"):
             if len(feed_entry.media_thumbnail) > 0:
                 thumb = feed_entry.media_thumbnail[0]
                 if "url" in thumb:
-                    output_map["thumbnail"] = thumb["url"]
+                    return thumb["url"]
                 else:
-                    output_map["thumbnail"] = str(thumb)
+                    return str(thumb)
         else:
-            output_map["thumbnail"] = self.get_thumbnail()
+            return self.get_thumbnail()
 
-        if "thumbnail" not in output_map:
-            output_map["thumbnail"] = None
+        return None
+
+    def get_feed_date_published(self, feed_entry):
+        from .dateutils import DateUtils
 
         if hasattr(feed_entry, "published"):
             try:
                 dt = parser.parse(feed_entry.published)
-                output_map["date_published"] = dt
+
+                return DateUtils.to_utc_date(dt)
             except Exception as e:
                 PersistentInfo.error(
                     "Rss parser datetime invalid feed datetime:{}; Exc:{} {}\n{}".format(
                         feed_entry.published, str(e), ""
                     )
                 )
-                output_map["date_published"] = DateUtils.get_datetime_now_utc()
+                return DateUtils.get_datetime_now_utc()
 
         elif self.allow_adding_with_current_time:
-            output_map["date_published"] = DateUtils.get_datetime_now_utc()
+            return DateUtils.get_datetime_now_utc()
         elif self.default_entry_timestamp:
-            output_map["date_published"] = self.default_entry_timestamp
+            return self.default_entry_timestamp
         else:
-            output_map["date_published"] = DateUtils.get_datetime_now_utc()
-
-        output_map["source"] = self.url
-        output_map["title"] = feed_entry.title
-        language = self.get_language()
-        if language:
-            output_map["language"] = language
-        output_map["link"] = feed_entry.link
-        author = self.get_author()
-        if author:
-            output_map["artist"] = author
-        output_map["album"] = ""
-        output_map["bookmarked"] = False
-
-        if str(feed_entry.title).strip() == "" or feed_entry.title == "undefined":
-            output_map["title"] = output_map["link"]
-
-        if output_map["date_published"]:
-            output_map["date_published"] = DateUtils.to_utc_date(
-                output_map["date_published"]
-            )
-
-            if output_map["date_published"] > DateUtils.get_datetime_now_utc():
-                output_map["date_published"] = DateUtils.get_datetime_now_utc()
-
-        return output_map
+            return DateUtils.get_datetime_now_utc()
 
     def get_title(self):
         if self.feed is None:
@@ -674,6 +691,9 @@ class RssPage(ContentInterface):
 
         if "author" in self.feed.feed:
             return self.feed.feed.author
+
+    def get_album(self):
+        return None
 
     def get_page_rating(self):
         rating = 0
@@ -939,6 +959,9 @@ class HtmlPage(ContentInterface):
 
         return author
 
+    def get_album(self):
+        return None
+
     def get_thumbnail(self):
         if not self.contents:
             self.contents = self.get_contents()
@@ -1031,7 +1054,9 @@ class HtmlPage(ContentInterface):
                 if len(feed.entries) > 0:
                     rss_links.append(lucky_shot)
             except Exception as e:
-                LinkDatabase.info("WebTools exception during rss processing {}".format(str(e)))
+                LinkDatabase.info(
+                    "WebTools exception during rss processing {}".format(str(e))
+                )
 
         if len(rss_links) > 0:
             rss_urls = []
@@ -1080,24 +1105,17 @@ class HtmlPage(ContentInterface):
         wget = Wget(self.url)
         wget.download_all()
 
-    def get_properties_map(self):
-        props = {}
+    def get_properties(self):
+        props = super().get_properties()
 
-        props["link"] = self.url
-        props["title"] = self.get_title()
-        props["description"] = self.get_description()
-        props["author"] = self.get_author()
-        props["thumbnail"] = self.get_og_field("image")
         props["meta_title"] = self.get_title_meta()
         props["meta_description"] = self.get_description_meta()
         props["og_title"] = self.get_og_field("title")
         props["og_description"] = self.get_og_field("description")
         props["og_image"] = self.get_og_field("image")
-        #props["is_html"] = self.is_html()
+        # props["is_html"] = self.is_html()
         props["charset"] = self.get_charset()
-        props["language"] = self.get_language()
         props["rss_urls"] = self.get_rss_urls()
-        props["page_rating"] = self.get_page_rating()
         props["status_code"] = self.status_code
 
         if self.is_domain():
@@ -1111,16 +1129,6 @@ class HtmlPage(ContentInterface):
         props["contents"] = self.get_contents()
         if self.get_contents():
             props["contents_length"] = len(self.get_contents())
-        props["tags"] = self.get_tags()
-
-        return props
-
-    def get_properties(self):
-        props = []
-
-        map_props = self.get_properties_map()
-        for key in map_props:
-            props.append((key, map_props[key]))
 
         return props
 
@@ -1220,3 +1228,16 @@ class HtmlPage(ContentInterface):
             return False
 
         return True
+
+
+class Url(object):
+    def get(url, contents = None):
+        """
+        @returns Appropriate handler for the link
+        """
+        p = HtmlPage(url, contents)
+        if p.is_html():
+            return p
+
+        if p.is_rss():
+            return RssPage(url, p.get_contents())

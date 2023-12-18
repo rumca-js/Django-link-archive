@@ -1,5 +1,8 @@
-class OdyseeVideoHandler(object):
+from .defaulturlhandler import DefaultUrlHandler
+
+class OdyseeVideoHandler(DefaultUrlHandler):
     def __init__(self, url=None):
+        super().__init__(url)
         self.url = OdyseeVideoHandler.input2url(url)
 
     def input2url(url):

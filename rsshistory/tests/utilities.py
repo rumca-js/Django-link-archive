@@ -114,8 +114,8 @@ class RequestsObject(object):
             b.description = "Page description"
             b.og_title = "Page og_title"
             b.og_description = "Page og_description"
-            b.body = '''<a href="https://link1.com">Link1</a>
-                     <a href="https://link2.com">Link2</a>'''
+            b.body = """<a href="https://link1.com">Link1</a>
+                     <a href="https://link2.com">Link2</a>"""
 
             return b.build_contents()
 
@@ -165,3 +165,131 @@ class WebPageDisabled(object):
 
     def no_errors(self):
         return PersistentInfo.objects.all().count() == 0
+
+    def create_example_data(self):
+        self.create_example_sources()
+        self.create_example_links()
+        self.create_example_domains()
+        self.create_example_exports()
+
+    def create_example_sources(self):
+        source1 = SourceDataController.objects.create(
+            url="https://youtube.com",
+            title="YouTube",
+            category="No",
+            subcategory="No",
+            export_to_cms=True,
+        )
+        source2 = SourceDataController.objects.create(
+            url="https://linkedin.com",
+            title="LinkedIn",
+            category="No",
+            subcategory="No",
+            export_to_cms=False,
+        )
+        return [source1, source2]
+
+    def create_example_links(self):
+        """
+        All entries are outdated
+        """
+        entry1 = LinkDataController.objects.create(
+            source="https://youtube.com",
+            link="https://youtube.com?v=bookmarked",
+            title="The first link",
+            source_obj=source_youtube,
+            bookmarked=True,
+            date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
+            language="en",
+        )
+        entry2 = LinkDataController.objects.create(
+            source="https://youtube.com",
+            link="https://youtube.com?v=nonbookmarked",
+            title="The second link",
+            source_obj=source_youtube,
+            bookmarked=False,
+            date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
+            language="en",
+        )
+        entry3 = LinkDataController.objects.create(
+            source="https://youtube.com",
+            link="https://youtube.com?v=permanent",
+            title="The first link",
+            source_obj=source_youtube,
+            permanent=True,
+            date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
+            language="en",
+        )
+
+        return [entry1, entry2, entry3]
+
+    def create_example_domains(self):
+        DomainsController.add("https://youtube.com?v=nonbookmarked")
+
+        DomainsController.objects.create(
+            protocol="https",
+            domain="youtube.com",
+            category="testCategory",
+            subcategory="testSubcategory",
+        )
+        DomainCategories.objects.all().delete()
+        DomainSubCategories.objects.all().delete()
+
+    def create_example_keywords(self):
+        datetime = KeyWords.get_keywords_date_limit() - timedelta(days=1)
+        keyword = KeyWords.objects.create(keyword="test")
+        keyword.date_published = datetime
+        keyword.save()
+
+        return [keyword]
+
+    def create_example_exports(self):
+        export1 = DataExport.objects.create(
+            export_type=DataExport.EXPORT_TYPE_GIT,
+            export_data=DataExport.EXPORT_DAILY_DATA,
+            local_path=".",
+            remote_path=".",
+            export_entries=True,
+            export_entries_bookmarks=True,
+            export_entries_permanents=True,
+            export_sources=True,
+        )
+
+        export2 = DataExport.objects.create(
+            export_type=DataExport.EXPORT_TYPE_GIT,
+            export_data=DataExport.EXPORT_YEAR_DATA,
+            local_path=".",
+            remote_path=".",
+            export_entries=True,
+            export_entries_bookmarks=True,
+            export_entries_permanents=True,
+            export_sources=True,
+        )
+
+        export3 = DataExport.objects.create(
+            export_type=DataExport.EXPORT_TYPE_GIT,
+            export_data=DataExport.EXPORT_NOTIME_DATA,
+            local_path=".",
+            remote_path=".",
+            export_entries=True,
+            export_entries_bookmarks=True,
+            export_entries_permanents=True,
+            export_sources=True,
+        )
+
+        return [export1, export2, export3]
+
+    def create_example_permanent_data(self):
+        p1 = PersistentInfo.objects.create(info="info1", level=10, user="test")
+        p1.date = DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M")
+        p1.save()
+
+        p2 = PersistentInfo.objects.create(info="info2", level=10, user="test")
+        p2.date = DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M")
+        p2.save()
+
+        p3 = PersistentInfo.objects.create(info="info3", level=10, user="test")
+        p3.date = DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M")
+        p3.save()
+
+        return [p1, p2, p3]

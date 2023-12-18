@@ -77,7 +77,7 @@ class BackgroundJobController(BackgroundJob):
             BackgroundJob.JOB_LINK_UPDATE_DATA, url
         )
 
-    def link_add(url, source = None):
+    def link_add(url, source=None):
         h = HtmlPage(url)
         if h.is_analytics():
             return
@@ -88,16 +88,20 @@ class BackgroundJobController(BackgroundJob):
 
         if source:
             return BackgroundJobController.create_single_job(
-                BackgroundJob.JOB_LINK_ADD, url, str(source.id),
+                BackgroundJob.JOB_LINK_ADD,
+                url,
+                str(source.id),
             )
         else:
             return BackgroundJobController.create_single_job(
-                BackgroundJob.JOB_LINK_ADD, url,
+                BackgroundJob.JOB_LINK_ADD,
+                url,
             )
 
     def link_scan(url):
         return BackgroundJobController.create_single_job(
-            BackgroundJob.JOB_LINK_SCAN, url,
+            BackgroundJob.JOB_LINK_SCAN,
+            url,
         )
 
     def write_daily_data_range(date_start=date.today(), date_stop=date.today()):

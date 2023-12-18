@@ -7,7 +7,7 @@ from ..apps import LinkDatabase
 
 
 class EntryOdyseePlugin(EntryGenericPlugin):
-    def __init__(self, entry, user = None):
+    def __init__(self, entry, user=None):
         super().__init__(entry, user)
 
     def get_frame(self):
@@ -56,3 +56,15 @@ class EntryOdyseePlugin(EntryGenericPlugin):
         description = self.htmlify(description)
 
         return """{}""".format(description)
+
+    def get_edit_menu_buttons(self):
+        buttons = super().get_edit_menu_buttons()
+        return buttons
+
+    def get_view_menu_buttons(self):
+        buttons = super().get_edit_menu_buttons()
+        return buttons
+
+    def get_advanced_menu_buttons(self):
+        buttons = super().get_advanced_menu_buttons()
+        return buttons

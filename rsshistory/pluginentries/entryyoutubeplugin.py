@@ -8,18 +8,17 @@ from ..models import ConfigurationEntry
 
 
 class EntryYouTubePlugin(EntryGenericPlugin):
-    def __init__(self, entry, user = None):
+    def __init__(self, entry, user=None):
         super().__init__(entry, user)
 
     def get_menu_buttons(self):
         return [
-            EntryButton(
-                self.user,
-                "YouTube Props",
-                reverse("{}:show-youtube-link-props".format(LinkDatabase.name))
-                + "?page={}".format(self.entry.link),
-                ConfigurationEntry.ACCESS_TYPE_OWNER,
-            ),
+        ]
+
+    def get_edit_menu_buttons(self):
+        buttons = super().get_edit_menu_buttons()
+
+        buttons.append(
             EntryButton(
                 self.user,
                 "Music",
@@ -28,8 +27,11 @@ class EntryYouTubePlugin(EntryGenericPlugin):
                     args=[self.entry.id],
                 ),
                 ConfigurationEntry.ACCESS_TYPE_OWNER,
+                "Downloads YouTube music",
                 static("{}/icons/icons8-download-96.png".format(LinkDatabase.name)),
             ),
+        )
+        buttons.append(
             EntryButton(
                 self.user,
                 "Video",
@@ -38,24 +40,23 @@ class EntryYouTubePlugin(EntryGenericPlugin):
                     args=[self.entry.id],
                 ),
                 ConfigurationEntry.ACCESS_TYPE_OWNER,
+                "Downloads YouTube video",
                 static("{}/icons/icons8-download-96.png".format(LinkDatabase.name)),
             ),
+        )
+
+        buttons.append(
             EntryButton(
                 self.user,
-                "Invidious",
-                "https://yewtu.be/watch?v={}".format(self.get_video_code()),
-                ConfigurationEntry.ACCESS_TYPE_ALL,
-                "https://invidious.io/favicon-32x32.png",
+                "YouTube Props",
+                reverse("{}:show-youtube-link-props".format(LinkDatabase.name))
+                + "?page={}".format(self.entry.link),
+                ConfigurationEntry.ACCESS_TYPE_OWNER,
+                "Shows YouTube properties",
             ),
-            EntryButton(
-                self.user,
-                "YouTube Music",
-                "https://music.youtube.com/watch?v={}".format(self.get_video_code()),
-                ConfigurationEntry.ACCESS_TYPE_ALL,
-                static(
-                    "{}/icons/icons8-youtube-music-96.png".format(LinkDatabase.name)
-                ),
-            ),
+        )
+
+        buttons.append(
             EntryButton(
                 self.user,
                 "Update link data",
@@ -64,8 +65,56 @@ class EntryYouTubePlugin(EntryGenericPlugin):
                     args=[self.entry.id],
                 ),
                 ConfigurationEntry.ACCESS_TYPE_OWNER,
+                "Updates link data",
             ),
-        ]
+        )
+
+        return buttons
+
+    def get_view_menu_buttons(self):
+        buttons = super().get_view_menu_buttons()
+
+        buttons.append(
+            EntryButton(
+                self.user,
+                "YouTube Music",
+                "https://music.youtube.com/watch?v={}".format(self.get_video_code()),
+                ConfigurationEntry.ACCESS_TYPE_ALL,
+                "Link to YouTube music",
+                static(
+                    "{}/icons/icons8-youtube-music-96.png".format(LinkDatabase.name)
+                ),
+            ),
+        )
+
+        buttons.append(
+            EntryButton(
+                self.user,
+                "Invidious",
+                "https://yewtu.be/watch?v={}".format(self.get_video_code()),
+                ConfigurationEntry.ACCESS_TYPE_ALL,
+                "Link to Invidious instance",
+                "https://invidious.io/favicon-32x32.png",
+            ),
+        )
+
+        search_term = self.entry.title
+        buttons.append(
+            EntryButton(
+                self.user,
+                "Odysee",
+                "https://odysee.com/$/search?q={}".format(search_term),
+                ConfigurationEntry.ACCESS_TYPE_ALL,
+                "Search for video on odysee",
+                "https://invidious.io/favicon-32x32.png",
+            ),
+        )
+
+        return buttons
+
+    def get_advanced_menu_buttons(self):
+        buttons = super().get_advanced_menu_buttons()
+        return buttons
 
     def get_video_code(self):
         h = YouTubeVideoHandler(self.entry.link)

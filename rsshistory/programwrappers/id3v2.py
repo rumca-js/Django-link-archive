@@ -22,7 +22,9 @@ class Id3v2(object):
         if "track" in self.data:
             track = self.data["track"]
 
-        LinkDatabase.info("Tagging Song:'{0}' Artist:'{1}' Album:'{2}'".format(song, artist, album))
+        LinkDatabase.info(
+            "Tagging Song:'{0}' Artist:'{1}' Album:'{2}'".format(song, artist, album)
+        )
 
         if track:
             subprocess.run(

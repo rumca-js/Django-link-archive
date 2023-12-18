@@ -70,41 +70,56 @@ class LinkDataController(LinkDataModel):
 
     def recreate_from_domains():
         from .domains import DomainsController
+
         domains = DomainsController.objects.all()
         for domain in domains:
             full_domain = "https://" + domain.domain
-            entries = LinkDataController.objects.filter(link = full_domain)
+            entries = LinkDataController.objects.filter(link=full_domain)
             if not entries.exist():
                 LinkDatabase.info("Creating entry for domain:{}".format(full_domain))
                 obj = LinkDataHyperController.add_simple(full_domain)
                 if not obj:
-                    PersistentInfo.create("Irreversably removing domain:{}".format(domain.domain))
+                    PersistentInfo.create(
+                        "Irreversably removing domain:{}".format(domain.domain)
+                    )
                     domain.delete()
 
     def replace_http_link_with_https():
         # TODO move tags
 
-        entries = LinkDataController.objects.filter(link__icontains = "http://")
+        entries = LinkDataController.objects.filter(link__icontains="http://")
         for entry in entries:
             link = entry.link
             new_link = link.replace("http://", "https://")
 
-            new_entries = LinkDataController.objects.filter(link = new_link)
+            new_entries = LinkDataController.objects.filter(link=new_link)
             if not new_entries.exists():
                 try:
-                    LinkDatabase.info("Replacing http with https for:{} {}".format(link, new_link))
+                    LinkDatabase.info(
+                        "Replacing http with https for:{} {}".format(link, new_link)
+                    )
                     obj = LinkDataHyperController.add_simple(new_link)
                     if obj:
-                        LinkDatabase.info("Removing old for:{} {}".format(link, new_link))
+                        LinkDatabase.info(
+                            "Removing old for:{} {}".format(link, new_link)
+                        )
                         if entry.link != obj.link:
                             entry.delete()
                     else:
-                        LinkDatabase.info("Could not create - not Removing old for:{} {}".format(link, new_link))
+                        LinkDatabase.info(
+                            "Could not create - not Removing old for:{} {}".format(
+                                link, new_link
+                            )
+                        )
                 except Exception as E:
                     error_text = traceback.format_exc()
-                    PersistentInfo.error("Cannot create https link:{}".format(error_text))
+                    PersistentInfo.error(
+                        "Cannot create https link:{}".format(error_text)
+                    )
             else:
-                LinkDatabase.info("New exists - removing old for:{} {}".format(link, new_link))
+                LinkDatabase.info(
+                    "New exists - removing old for:{} {}".format(link, new_link)
+                )
                 entry.delete()
 
     def move_old_links_to_archive(limit=0):
@@ -127,9 +142,7 @@ class LinkDataController(LinkDataModel):
             return
 
         for entry in entries:
-            LinkDatabase.info(
-                "Moving link to archive: {}".format(entry.link)
-            )
+            LinkDatabase.info("Moving link to archive: {}".format(entry.link))
 
             LinkDataController.move_to_archive(entry)
             index += 1
@@ -159,6 +172,7 @@ class LinkDataController(LinkDataModel):
 
     def get_full_information(data):
         from ..pluginentries.handlerurl import HandlerUrl
+
         url = HandlerUrl(data["link"])
         return url.get_props()
 
@@ -301,6 +315,7 @@ class LinkDataHyperController(object):
             return objs[0]
 
         from ..pluginentries.handlerurl import HandlerUrl
+
         url = HandlerUrl(link_url)
         props = url.get_props()
         if props:
@@ -322,7 +337,9 @@ class LinkDataHyperController(object):
             # Try with https more that with http
             link_data["link"] = link_data["link"].replace("https://", "http://")
 
-            return LinkDataHyperController.add_new_link_internal(link_data, source_is_auto)
+            return LinkDataHyperController.add_new_link_internal(
+                link_data, source_is_auto
+            )
 
     def add_new_link_internal(link_data, source_is_auto=False):
         obj = None
@@ -428,9 +445,7 @@ class LinkDataHyperController(object):
                 return False
 
         if LinkDataHyperController.is_live_video(link_data):
-            LinkDatabase.info(
-                "Adding link: {}".format(link_data["link"])
-            )
+            LinkDatabase.info("Adding link: {}".format(link_data["link"]))
             return False
 
         return True
@@ -517,7 +532,7 @@ class LinkDataHyperController(object):
         else:
             html = HtmlPage(link)
 
-        props = html.get_properties_map()
+        props = html.get_properties()
 
         if "rss_urls" not in props:
             return

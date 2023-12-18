@@ -1,7 +1,14 @@
-class YouTubeSourceHandler(object):
+from .defaulturlhandler import DefaultUrlHandler
+from ..webtools import Url
+
+
+class YouTubeSourceHandler(DefaultUrlHandler):
     def __init__(self, url=None):
+        super().__init__(url)
+
         if url:
             self.code = self.input2code(url)
+            self.h = Url.get(self.get_channel_url())
 
     def input2url(self, item):
         code = self.input2code(item)
