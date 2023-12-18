@@ -1,4 +1,4 @@
-Personal link database, with RSS functionality. Similar to Reddit, but completely open source, on your local machine.
+Personal link database, link aggregator, with RSS functionality. Similar to Reddit, but completely open source, on your local machine.
 
 # Features
 
@@ -58,7 +58,6 @@ Personal link database, with RSS functionality. Similar to Reddit, but completel
  - Each new link adds words from its title into the 'KeyWords' pool, if configured
  - You can monitor what kinds of domains were added by the links to you system
  - You can monitor what kind of words generate most buzz
-
 # Ranking algorithm
 
 Each page is ranked by several factors.
@@ -93,13 +92,12 @@ Status code breakdown:
 
 ## Votes ranking
 
-Database is managed by RSS link database, and user votes. Avarage of votes is calculated for each link.
+Database is managed by RSS link database, and user votes. Average of votes is calculated for each link.
 
 # Automatic export
 
-## Accessible from views, pages
-
-Most of views contain "Show JSON" button that provides the view data as JSON. This can be used by scripts, for import, export.
+ - Although it archives some data it is not [archive.org](https://archive.org) replacement. It does not automatically store entire pages. It stores meta data about web pages: title, description, thumbnail 
+ - Most of views contain "Show JSON" button that provides the view data as JSON. This can be used by scripts, for import, export
 
 ## Automatic git export
 
@@ -131,7 +129,7 @@ Each day bookmarks and daily repositories are updated with new data. Daily repos
 Scenario to import sources from a other instance:
  - find sources in the other instance. It should be at "Sources" menu button, by default
  - select which sources you would like to export, you can select a filter
- - click 'Show as json', it should produce a nice JSON output
+ - click 'Show as JSON', it should produce a nice JSON output
  - copy link URL of that instance, of that JSON output
  - navigate to your instance
  - select 'Admin' page
@@ -140,7 +138,7 @@ Scenario to import sources from a other instance:
 Scenario to import links from a other instance:
  - find links in the other instance. It should be at "Search" menu button, by default
  - select which links you would like to export, you can select a filter, like a date, tag. etc.
- - click 'Show as json', it should produce a nice JSON output
+ - click 'Show as JSON', it should produce a nice JSON output
  - copy link URL of that instance, of that JSON output
  - navigate to your instance
  - select 'Admin' page
@@ -190,9 +188,8 @@ archive.ph:
 
  - I do not endorse any link every link in the database. I may some links be important because of how bad the content is. I use irony often, therefore beware!
  - Everyone has a right to be forgotten. If any link should be removed from a database please contact me
- - I do not obtain any form of monetary recompensation from link, or data about it. The data link information were already provided by RSS sources. The RSS source is responsible for what they provide free of charge
+ - I do not obtain any form of monetary compensation from link, or data about it. The data link information were already provided by RSS sources. The RSS source is responsible for what they provide free of charge
 
 # Ending notes
 
 All links belong to us!
-
