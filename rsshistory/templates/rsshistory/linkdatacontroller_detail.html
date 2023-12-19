@@ -5,13 +5,16 @@
   {{object_controller.get_frame_html | safe | linebreaks }}
   <div style="clear:both"></div>
 
-  <h1><a href="{{ object.link }}" title="{{ object.link }}">
+  <p>
+  <h1 class="link-title"><a href="{{ object.link }}" title="{{ object.link }}">
           {% if object.bookmarked %}
           [{{object.page_rating_votes}}]
           {% endif %}
           {{ object.title }}
-      </a></h1>
-      <div>{{object.link}}</div>
+      </a>
+  </h1>
+  <span>{{object.link}}</span>
+  </p>
 
   <p>
       {% for button in object_controller.get_edit_menu_buttons %}
