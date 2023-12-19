@@ -431,6 +431,10 @@ class LinkDataHyperController(object):
         return link_data
 
     def is_enabled_to_store(link_data, source_is_auto):
+        # manual entry is always enabled
+        if not source_is_auto:
+            return True
+
         config = Configuration.get_object().config_entry
 
         p = BasePage(link_data["link"])
