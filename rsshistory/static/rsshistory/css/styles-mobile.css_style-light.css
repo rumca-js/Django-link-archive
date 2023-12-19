@@ -50,6 +50,11 @@ hr {
 .link-list a{
 }
 
+.link-title {
+    margin : 0;
+    padding: 0px;
+}
+
 .link-list a:link, .link-list a:visited, .link-list a:active {
 }
 

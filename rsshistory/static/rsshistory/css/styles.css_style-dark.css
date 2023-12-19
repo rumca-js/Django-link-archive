@@ -51,6 +51,11 @@ hr {
 .base-button-container a:hover {
 }
 
+.link-title {
+    margin : 0px;
+    padding: 0px;
+}
+
 .link-list a{
 }
 
@@ -259,6 +264,7 @@ hr {
     text-decoration: none;
     margin-bottom:3px;
 }
+
 .element_line-and-buttons a {
     text-decoration: none;
 }
@@ -276,6 +282,7 @@ hr {
     max-width: 18%; 
     min-width: 18%; 
     width: auto; 
+    aspect-ratio: 1 / 1;
     text-decoration: none;
     margin: 5px;
     display:flex;

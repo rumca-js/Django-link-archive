@@ -50,6 +50,11 @@ hr {
 .base-button-container a:hover {
 }
 
+.link-title {
+    margin : 0;
+    padding: 0px;
+}
+
 .link-list a{
 }
 
@@ -277,6 +282,7 @@ hr {
     max-width: 18%; 
     min-width: 18%; 
     width: auto; 
+    aspect-ratio: 1 / 1;
     text-decoration: none;
     margin: 5px;
     display:flex;
