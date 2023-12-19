@@ -29,10 +29,19 @@
     <li>Valid: {{valid}}</li>
 </ul>
 
+<h1>Icon</h1>
 {% if user_config.show_icons %}
     {%if thumbnail %}
     <img src="{{thumbnail}}" style="max-width: 50%"/>
     {%endif%}
 {%endif%}
+
+<h1>Embed</h1>
+<div class="youtube_player_container">
+    <iframe src="{{embed_url}}" frameborder="0" allowfullscreen class="youtube_player_frame"></iframe>
+</div>
+
+<h1>Contents</h1>
+<pre>{{contents}}</pre>
 
 {% endblock %}
