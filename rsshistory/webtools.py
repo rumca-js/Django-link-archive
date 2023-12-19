@@ -1,3 +1,12 @@
+"""
+If you see contents of your own domain:
+https://support.bunny.net/hc/en-us/articles/360017484759-The-CDN-URLs-are-returning-redirects-back-to-my-domain
+
+Sometimes we see the CDN URLs return a 301 redirect back to your own website. Usually, when this happens, it's caused by a misconfiguration of your origin server and the origin URL of your pull zone. If the origin URL sends back a redirect, our servers will simply forward that to the user.
+
+Disabling SSL validation will not check certificates, if expired.
+"""
+
 import urllib.request, urllib.error, urllib.parse
 from urllib.parse import urlparse
 import urllib.robotparser
@@ -223,7 +232,9 @@ class BasePage(object):
 
         SSL is mostly important for interacting with pages. During web scraping it is not that useful.
         """
-        return requests.get(url, headers=headers, timeout=timeout, verify=False)
+        request_result = requests.get(url, headers=headers, timeout=timeout, verify=False)
+
+        return request_result
 
     def get_full_url(self):
         if self.url.find("http") == -1:
@@ -296,6 +307,8 @@ class BasePage(object):
 
                 ready_url = domain + url
             else:
+                if not domain.endswith("/"):
+                    domain = domain + "/"
                 ready_url = domain + url
         return ready_url
 
@@ -677,13 +690,29 @@ class RssPage(ContentInterface):
         if self.feed is None:
             self.parse()
 
+        image = None
         if "image" in self.feed.feed:
             if "href" in self.feed.feed.image:
-                return self.feed.feed.image["href"]
+                image = self.feed.feed.image["href"]
             elif "url" in self.feed.feed.image:
-                return self.feed.feed.image["url"]
+                image = self.feed.feed.image["url"]
             else:
-                return self.feed.feed.image
+                image = self.feed.feed.image
+
+        if not image:
+            if self.url.find("https://www.youtube.com/feeds/videos.xml") >= 0:
+                image = self.get_thumbnail_manual_from_youtube()
+
+        if image and image.find("https://") == -1:
+            image = BasePage.get_url_full(self.get_domain(), image)
+
+        return image
+
+    def get_thumbnail_manual_from_youtube(self):
+        if "link" in self.feed.feed:
+            link = self.feed.feed.link
+            p = HtmlPage(link)
+            return p.get_thumbnail()
 
     def get_author(self):
         if self.feed is None:
@@ -710,6 +739,9 @@ class RssPage(ContentInterface):
             rating += 1
 
         return rating
+
+    def get_tags(self):
+        return None
 
 
 class ContentLinkParser(BasePage):
@@ -969,7 +1001,11 @@ class HtmlPage(ContentInterface):
         if not self.contents:
             return None
 
-        return self.get_og_field("image")
+        image = self.get_og_field("image")
+        if image and image.find("https://") == -1:
+            image = BasePage.get_url_full(self.get_domain(), image)
+
+        return image
 
     def get_tags(self):
         if not self.contents:
