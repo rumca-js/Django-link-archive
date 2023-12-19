@@ -565,14 +565,18 @@ def add_simple_entry(request):
                 return HttpResponseRedirect(ob.get_absolute_url())
 
             data = LinkDataController.get_full_information({"link": link})
-            data["user"] = request.user.username
+            if data:
+                data["user"] = request.user.username
 
-            form = EntryForm(initial=data)
-            form.method = "POST"
-            form.action_url = reverse("{}:entry-add".format(LinkDatabase.name))
-            p.context["form"] = form
+                form = EntryForm(initial=data)
+                form.method = "POST"
+                form.action_url = reverse("{}:entry-add".format(LinkDatabase.name))
+                p.context["form"] = form
 
-            return p.render("form_basic.html")
+                return p.render("form_basic.html")
+
+            p.context["summary_text"] = "Could not obtain details from link {}".format(link)
+            return p.render("summary_present.html")
     else:
         form = LinkInputForm()
         form.method = "POST"
