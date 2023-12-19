@@ -6,15 +6,21 @@
    class="element_{{user_config.display_type}}"
    {% endif %}
    >
-   {% if user_config.show_icons %}
-   <img src=
-        {% if user_config.thumbnails_as_icons %}
-        "{{link.get_thumbnail}}"
-        {% else %}
-        "{{link.get_favicon}}"
-        {% endif %}
-        width="100%"/>
-   {% endif %}
-   <span class="link-list-item-title">{{link.title| slice:":100"}}</span>
-   <span class="link-list-item-description">{{link.source_obj.title| slice:":100"}}</span>
+   <div style="display: flex; flex-direction:column; align-content:normal; height:100%">
+       <div style="flex: 0 0 70%; flex-shrink: 0;flex-grow:0;max-height:70%">
+           {% if user_config.show_icons %}
+           <img src=
+                {% if user_config.thumbnails_as_icons %}
+                "{{link.get_thumbnail}}"
+                {% else %}
+                "{{link.get_favicon}}"
+                {% endif %}
+                style = "width:100%;max-height:100%;object-fit:cover"/>
+           {% endif %}
+       </div>
+       <div style="flex: 0 0 30%; flex-shrink: 0;flex-grow:0;max-height:30%">
+         <span class="link-list-item-title">{{link.title| slice:":100"}}</span>
+         <span class="link-list-item-description">{{link.source_obj.title| slice:":100"}}</span>
+       </div>
+   </div>
 </a>
