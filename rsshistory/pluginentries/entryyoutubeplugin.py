@@ -106,7 +106,7 @@ class EntryYouTubePlugin(EntryGenericPlugin):
                 "https://odysee.com/$/search?q={}".format(search_term),
                 ConfigurationEntry.ACCESS_TYPE_ALL,
                 "Search for video on odysee",
-                "https://invidious.io/favicon-32x32.png",
+                "https://odysee.com/public/favicon_128.png",
             ),
         )
 
