@@ -17,6 +17,9 @@
     <li>Description: {{description}}</li>
     <li>Author: {{author}}</li>
     <li>Page Rating: {{page_rating}}. Described by <a href="https://github.com/rumca-js/Django-link-archive">Django link archive Readme</a></li>
+    {%if thumbnail %}
+    <li>thumbnail: <a href="{{thumbnail}}"/>Link</a></li>
+    {%endif %}
     <li>Contents length: {{contents_length}}.
         {% if contents_length == 0 %}
         Page is empty.
@@ -31,7 +34,6 @@
         {% endif %}
     </li>
 
-    <li>Is html: {{is_html}}</li>
     <li>Charset: {{charset}}</li>
     <li>Language: {{language}}</li>
     {%if rss_urls %}
@@ -68,6 +70,9 @@
 </ul>
 
 {% if user_config.show_icons %}
+    {%if thumbnail%}
+    <img src="{{thumbnail}}" style="max-width: 50%"/>
+    {%endif%}
     {%if og_image%}
     <img src="{{og_image}}" style="max-width: 50%"/>
     {%endif%}
