@@ -275,8 +275,9 @@ def show_page_props(request):
 
     def show_page_props_internal(requests, page_link):
         from ..pluginentries.handlervideoyoutube import YouTubeVideoHandler
+        from ..webtools import Url
 
-        page = HtmlPage(page_link)
+        page = Url.get(page_link)
 
         # p.context["show_properties"] = page.get_properties()
         p.context.update(page.get_properties())
