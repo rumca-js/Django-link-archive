@@ -60,6 +60,12 @@ class ConfigForm(forms.ModelForm):
             "vote_min",
             "vote_max",
             "number_of_comments_per_day",
+            "display_style",
+            "display_type",
+            "show_icons",
+            "thumbnails_as_icons",
+            "small_icons",
+            "links_per_page",
         ]
 
     def __init__(self, *args, **kwargs):
