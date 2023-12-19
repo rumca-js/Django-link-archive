@@ -125,9 +125,8 @@ class HandlerUrl(object):
 
         p = HtmlPage(url)
 
-        if not p.is_valid():
-            LinkDatabase.info("HTML page is invalid:{}".format(url))
-            return
+        # some pages return invalid code / information. let the user decide
+        # what to do about it
 
         if "link" not in input_props:
             input_props["link"] = p.url
