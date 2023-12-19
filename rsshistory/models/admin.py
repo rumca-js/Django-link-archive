@@ -7,6 +7,28 @@ from django.urls import reverse
 
 from ..apps import LinkDatabase
 
+DISPLAY_STYLE_LIGHT = "style-light"
+DISPLAY_STYLE_DARK = "style-dark"
+
+STYLE_TYPES = (
+    (DISPLAY_STYLE_LIGHT, DISPLAY_STYLE_LIGHT),  #
+    (DISPLAY_STYLE_DARK, DISPLAY_STYLE_DARK),  #
+)
+
+DISPLAY_TYPE_STANDARD = "standard"
+DISPLAY_TYPE_CLICKABLE_TAGS = "clickable-tags"
+DISPLAY_TYPE_LINE_AND_BUTTONS = "line-and-buttons"
+DISPLAY_TYPE_YOUTUBE_THUMBNAILS = "youtube-thumbnails"
+DISPLAY_TYPE_SEARCH_ENGINE = "search-engine"
+
+DISPLAY_TYPE_CHOICES = (
+    (DISPLAY_TYPE_STANDARD, DISPLAY_TYPE_STANDARD),
+    (DISPLAY_TYPE_CLICKABLE_TAGS, DISPLAY_TYPE_CLICKABLE_TAGS),
+    (DISPLAY_TYPE_LINE_AND_BUTTONS, DISPLAY_TYPE_LINE_AND_BUTTONS),
+    (DISPLAY_TYPE_YOUTUBE_THUMBNAILS, DISPLAY_TYPE_YOUTUBE_THUMBNAILS),
+    (DISPLAY_TYPE_SEARCH_ENGINE, DISPLAY_TYPE_SEARCH_ENGINE),
+)
+
 
 class ConfigurationEntry(models.Model):
     ACCESS_TYPE_ALL = "access-type-all"
@@ -62,6 +84,17 @@ class ConfigurationEntry(models.Model):
         max_length=1000,
     )
 
+    display_style = models.CharField(
+        max_length=500, null=True, default="style-light", choices=STYLE_TYPES
+    )
+    display_type = models.CharField(
+        max_length=500, null=True, default="standard", choices=DISPLAY_TYPE_CHOICES
+    )
+    show_icons = models.BooleanField(default=True)
+    thumbnails_as_icons = models.BooleanField(default=True)
+    small_icons = models.BooleanField(default=True)
+    links_per_page = models.IntegerField(default=100)
+
     def get():
         """
         Most probably should not be used directly. Should be cached in application
@@ -77,34 +110,11 @@ class ConfigurationEntry(models.Model):
 
 
 class UserConfig(models.Model):
-    DISPLAY_STYLE_LIGHT = "style-light"
-    DISPLAY_STYLE_DARK = "style-dark"
-
-    STYLE_TYPES = (
-        (DISPLAY_STYLE_LIGHT, DISPLAY_STYLE_LIGHT),  #
-        (DISPLAY_STYLE_DARK, DISPLAY_STYLE_DARK),  #
-    )
-
-    DISPLAY_TYPE_STANDARD = "standard"
-    DISPLAY_TYPE_CLICKABLE_TAGS = "clickable-tags"
-    DISPLAY_TYPE_LINE_AND_BUTTONS = "line-and-buttons"
-    DISPLAY_TYPE_YOUTUBE_THUMBNAILS = "youtube-thumbnails"
-    DISPLAY_TYPE_SEARCH_ENGINE = "search-engine"
-
-    DISPLAY_TYPE_CHOICES = (
-        (DISPLAY_TYPE_STANDARD, DISPLAY_TYPE_STANDARD),
-        (DISPLAY_TYPE_CLICKABLE_TAGS, DISPLAY_TYPE_CLICKABLE_TAGS),
-        (DISPLAY_TYPE_LINE_AND_BUTTONS, DISPLAY_TYPE_LINE_AND_BUTTONS),
-        (DISPLAY_TYPE_YOUTUBE_THUMBNAILS, DISPLAY_TYPE_YOUTUBE_THUMBNAILS),
-        (DISPLAY_TYPE_SEARCH_ENGINE, DISPLAY_TYPE_SEARCH_ENGINE),
-    )
 
     user = models.CharField(max_length=500, unique=True)
-    # theme: light, dark
     display_style = models.CharField(
         max_length=500, null=True, default="style-light", choices=STYLE_TYPES
     )
-    # display type: standard, compact, preview
     display_type = models.CharField(
         max_length=500, null=True, default="standard", choices=DISPLAY_TYPE_CHOICES
     )
@@ -123,7 +133,10 @@ class UserConfig(models.Model):
             if confs.count() != 0:
                 return confs[0]
 
-        return UserConfig()
+        config = ConfigurationEntry.get()
+        return UserConfig(display_style = config.display_style, display_type = config.display_type,
+                show_icons = config.show_icons, thumbnails_as_icons = config.thumbnails_as_icons,
+                links_per_page = config.links_per_page)
 
     def get_or_create(user_name):
         """
