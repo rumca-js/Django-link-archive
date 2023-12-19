@@ -174,6 +174,7 @@ class LinkMusicDownloadJobHandler(BaseJobHandler):
                     obj.subject, str(e), error_text
                 )
             )
+            return True
 
 
 class LinkVideoDownloadJobHandler(BaseJobHandler):
@@ -209,6 +210,7 @@ class LinkVideoDownloadJobHandler(BaseJobHandler):
                     obj.subject, str(e), error_text
                 )
             )
+            return True
 
 
 class LinkAddJobHandler(BaseJobHandler):
