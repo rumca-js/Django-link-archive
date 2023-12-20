@@ -667,9 +667,9 @@ def remove_entry(request, pk):
     return p.render("summary_present.html")
 
 
-def hide_entry(request, pk):
+def entry_dead(request, pk):
     p = ViewPage(request)
-    p.set_title("Hide entry")
+    p.set_title("Mark entry as dead")
     data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
     if data is not None:
         return data
@@ -680,7 +680,30 @@ def hide_entry(request, pk):
     obj = objs[0]
 
     fav = obj.dead
-    obj.dead = not obj.dead
+    obj.dead = True
+    obj.save()
+
+    summary_text = "Link changed to state: " + str(obj.dead)
+
+    p.context["summary_text"] = summary_text
+
+    return p.render("summary_present.html")
+
+
+def entry_not_dead(request, pk):
+    p = ViewPage(request)
+    p.set_title("Marking entry as not dead")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    p.context["pk"] = pk
+
+    objs = LinkDataController.objects.filter(id=pk)
+    obj = objs[0]
+
+    fav = obj.dead
+    obj.dead = False
     obj.save()
 
     summary_text = "Link changed to state: " + str(obj.dead)
