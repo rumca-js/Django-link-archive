@@ -1,5 +1,13 @@
 """
-If you see contents of your own domain:
+#1
+
+This is program is web scraper. If we turn verify, then we discard some of pages.
+Encountered several major pages, which had SSL programs.
+
+SSL is mostly important for interacting with pages. During web scraping it is not that useful.
+
+#2
+If SSL verification is disabled you can see contents of your own domain:
 https://support.bunny.net/hc/en-us/articles/360017484759-The-CDN-URLs-are-returning-redirects-back-to-my-domain
 
 Sometimes we see the CDN URLs return a 301 redirect back to your own website. Usually, when this happens, it's caused by a misconfiguration of your origin server and the origin URL of your pull zone. If the origin URL sends back a redirect, our servers will simply forward that to the user.
@@ -35,14 +43,6 @@ URL_TYPE_JAVASCRIPT = "javascript"
 URL_TYPE_HTML = "html"
 URL_TYPE_UNKNOWN = "unknown"
 
-"""
-This is program is web scraper. If we turn verify, then we discard some of pages.
-Encountered several major pages, which had SSL programs.
-
-SSL is mostly important for interacting with pages. During web scraping it is not that useful.
-"""
-disable_warnings(InsecureRequestWarning)
-
 
 class BasePage(object):
     """
@@ -52,6 +52,7 @@ class BasePage(object):
     # use headers from https://www.supermonitoring.com/blog/check-browser-http-headers/
     user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/116.0"
     get_contents_function = None
+    ssl_verify = True
 
     def __init__(self, url, contents=None):
         self.url = url
@@ -75,11 +76,9 @@ class BasePage(object):
         if BasePage.get_contents_function is None:
             self.get_contents_function = self.get_contents_internal
 
-        if self.contents is None:
-            from .configuration import Configuration
-
-            config = Configuration.get_object()
-            self.user_agent = config.config_entry.user_agent
+    def disable_ssl_warnings():
+        BasePage.ssl_verify = False
+        disable_warnings(InsecureRequestWarning)
 
     def process_contents(self):
         pass
@@ -232,7 +231,10 @@ class BasePage(object):
 
         SSL is mostly important for interacting with pages. During web scraping it is not that useful.
         """
-        request_result = requests.get(url, headers=headers, timeout=timeout, verify=False)
+
+        request_result = requests.get(
+            url, headers=headers, timeout=timeout, verify=BasePage.ssl_verify
+        )
 
         return request_result
 
@@ -293,6 +295,14 @@ class BasePage(object):
             return url
 
     def get_url_full(domain, url):
+        """
+        TODO change function name
+        formats:
+        href="images/facebook.png"
+        href="/images/facebook.png"
+        href="//images/facebook.png"
+        href="https://images/facebook.png"
+        """
         ready_url = ""
         if url.find("http") == 0:
             ready_url = url
@@ -535,6 +545,32 @@ class ContentInterface(DomainAwarePage):
         return props
 
 
+class DefaultContentPage(ContentInterface):
+    def __init__(self, url, contents=None):
+        super().__init__(url, contents)
+
+    def get_title(self):
+        return self.url
+
+    def get_description(self):
+        return None
+
+    def get_language(self):
+        return None
+
+    def get_thumbnail(self):
+        return None
+
+    def get_author(self):
+        return None
+
+    def get_album(self):
+        return None
+
+    def get_tags(self):
+        return None
+
+
 class RssPage(ContentInterface):
     """
     Handles RSS parsing.
@@ -615,6 +651,7 @@ class RssPage(ContentInterface):
         output_map["bookmarked"] = False
 
         from .dateutils import DateUtils
+
         if output_map["date_published"] > DateUtils.get_datetime_now_utc():
             output_map["date_published"] = DateUtils.get_datetime_now_utc()
 
@@ -693,18 +730,19 @@ class RssPage(ContentInterface):
         image = None
         if "image" in self.feed.feed:
             if "href" in self.feed.feed.image:
-                image = self.feed.feed.image["href"]
+                image = str(self.feed.feed.image["href"])
             elif "url" in self.feed.feed.image:
-                image = self.feed.feed.image["url"]
+                image = str(self.feed.feed.image["url"])
             else:
-                image = self.feed.feed.image
+                image = str(self.feed.feed.image)
+                PersistentInfo.info("Unsupported image type:{}".format(image))
 
         if not image:
             if self.url.find("https://www.youtube.com/feeds/videos.xml") >= 0:
                 image = self.get_thumbnail_manual_from_youtube()
 
         if image and image.find("https://") == -1:
-            image = BasePage.get_url_full(self.get_domain(), image)
+            image = BasePage.get_url_full(self.url, image)
 
         return image
 
@@ -871,6 +909,17 @@ class ContentLinkParser(BasePage):
 
 
 class HtmlPage(ContentInterface):
+    """
+    Since links can be passed in various ways and formats, all links need to be "normalized" before
+    returning.
+
+    formats:
+    href="images/facebook.png"
+    href="/images/facebook.png"
+    href="//images/facebook.png"
+    href="https://images/facebook.png"
+    """
+
     def __init__(self, url, contents=None):
         super().__init__(url, contents)
 
@@ -1002,10 +1051,48 @@ class HtmlPage(ContentInterface):
             return None
 
         image = self.get_og_field("image")
+
         if image and image.find("https://") == -1:
-            image = BasePage.get_url_full(self.get_domain(), image)
+            image = BasePage.get_url_full(self.url, image)
 
         return image
+
+    def get_favicons(self, recursive=False):
+        if not self.contents:
+            self.contents = self.get_contents()
+
+        if not self.contents:
+            return []
+
+        favicons = []
+
+        link_finds = self.soup.find_all("link", attrs={"rel": "icon"})
+
+        for link_find in link_finds:
+            if link_find and link_find.has_attr("href"):
+                full_favicon = link_find["href"]
+                if full_favicon.strip() == "":
+                    continue
+                full_favicon = BasePage.get_url_full(self.url, full_favicon)
+                if "sizes" in link_find:
+                    favicons.append([full_favicon, link_find["sizes"]])
+                else:
+                    favicons.append([full_favicon, ""])
+
+        link_finds = self.soup.find_all("link", attrs={"rel": "shortcut icon"})
+
+        for link_find in link_finds:
+            if link_find and link_find.has_attr("href"):
+                full_favicon = link_find["href"]
+                if full_favicon.strip() == "":
+                    continue
+                full_favicon = BasePage.get_url_full(self.url, full_favicon)
+                if "sizes" in link_find:
+                    favicons.append([full_favicon, link_find["sizes"]])
+                else:
+                    favicons.append([full_favicon, ""])
+
+        return favicons
 
     def get_tags(self):
         if not self.contents:
@@ -1064,7 +1151,7 @@ class HtmlPage(ContentInterface):
             self.contents = self.get_contents()
 
         if not self.contents:
-            return None
+            return []
 
         rss_finds = self.soup.find_all("link", attrs={"type": "application/rss+xml"})
 
@@ -1097,7 +1184,7 @@ class HtmlPage(ContentInterface):
         if len(rss_links) > 0:
             rss_urls = []
             for rss_url in rss_links:
-                rss_url = BasePage.get_url_full(self.get_domain(), rss_url)
+                rss_url = BasePage.get_url_full(self.url, rss_url)
                 rss_urls.append(rss_url)
             return rss_urls
         return []
@@ -1162,6 +1249,7 @@ class HtmlPage(ContentInterface):
         props["links"] = self.get_links()
         props["links_inner"] = self.get_links_inner()
         props["links_outer"] = self.get_links_outer()
+        props["favicons"] = self.get_favicons()
         props["contents"] = self.get_contents()
         if self.get_contents():
             props["contents_length"] = len(self.get_contents())
@@ -1267,7 +1355,7 @@ class HtmlPage(ContentInterface):
 
 
 class Url(object):
-    def get(url, contents = None):
+    def get(url, contents=None):
         """
         @returns Appropriate handler for the link
         """
@@ -1277,3 +1365,23 @@ class Url(object):
 
         if p.is_rss():
             return RssPage(url, p.get_contents())
+
+        return DefaultContentPage(url, p.get_contents())
+
+    def get_favicon(url):
+        page = Url.get(url)
+        if not page:
+            return
+
+        if page.is_html():
+            favs = page.get_favicons()
+            if favs and len(favs) > 0:
+                return favs[0][0]
+
+        if not page.is_domain():
+            dom = page.get_domain()
+            page = Url.get(dom)
+            if page.is_html():
+                favs = page.get_favicons()
+                if favs and len(favs) > 0:
+                    return favs[0][0]
