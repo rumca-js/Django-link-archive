@@ -52,9 +52,16 @@ class LinkDataController(LinkDataModel):
             "{}:entry-notbookmark".format(LinkDatabase.name), args=[str(self.id)]
         )
 
-    def get_hide_url(self):
-        """Returns the URL to access a particular author instance."""
-        return reverse("{}:entry-hide".format(LinkDatabase.name), args=[str(self.id)])
+    def get_dead_url(self):
+        if self.dead:
+            """Returns the URL to access a particular author instance."""
+            return reverse(
+                "{}:entry-not-dead".format(LinkDatabase.name), args=[str(self.id)]
+            )
+        else:
+            return reverse(
+                "{}:entry-dead".format(LinkDatabase.name), args=[str(self.id)]
+            )
 
     def get_remove_url(self):
         """Returns the URL to access a particular author instance."""
