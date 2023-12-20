@@ -4,21 +4,27 @@ from ..controllers import SourceDataController
 
 from ..apps import LinkDatabase
 
+from .handlervideoyoutube import YouTubeVideoHandler
+from .handlervideoodysee import OdyseeVideoHandler
+
+from .handlerchannelyoutube import YouTubeChannelHandler
+from .handlerchannelodysee import OdyseeChannelHandler
+
 
 class YouTubeException(Exception):
     pass
 
 
-class HandlerUrl(object):
+class EntryUrlInterface(object):
+    """
+    Provides interface between Entry and URL properties.
+    """
+
     def __init__(self, url):
         self.url = url
 
         if self.url.endswith("/"):
             self.url = self.url[:-1]
-
-        from ..pluginentries.handlervideoyoutube import YouTubeVideoHandler
-
-        self.youtube_video_handler = YouTubeVideoHandler
 
     def get_props(self, input_props=None, source_obj=None):
         if not input_props:
@@ -27,7 +33,7 @@ class HandlerUrl(object):
         props = self.get_props_implementation(input_props)
 
         if props:
-            if "description" in props:
+            if "description" in props and props["description"]:
                 # TODO change hardcoded limit
                 props["description"] = props["description"][:900]
 
@@ -58,9 +64,9 @@ class HandlerUrl(object):
         if "source" not in input_props and source_obj:
             input_props["source"] = source_obj.url
 
-        if p.is_youtube():
-            handler = self.youtube_video_handler(self.url)
-            if handler.get_video_code():
+        h = UrlHandler.get(self.url)
+        if type(h) is UrlHandler.youtube_video_handler:
+            if h.get_video_code():
                 return self.get_youtube_props(input_props)
 
         if p.is_html():
@@ -77,9 +83,12 @@ class HandlerUrl(object):
 
         url = self.url
 
-        h = self.youtube_video_handler(url)
-        if not h.download_details():
-            raise YouTubeException("Could not obtain details for link:{}".format(url))
+        h = UrlHandler.get(self.url)
+        if type(h) is UrlHandler.youtube_video_handler:
+            if not h.download_details():
+                raise YouTubeException(
+                    "Could not obtain details for link:{}".format(url)
+                )
 
         source_url = h.get_channel_feed_url()
         if source_url is None:
@@ -243,22 +252,57 @@ class HandlerUrl(object):
         return input_props
 
 
-class NewHandlerUrl(object):
+class UrlHandler(object):
+    """
+    Provides handler, controller for a link.
+    The controller job is to provide usefull information about link.
+    """
+
+    youtube_video_handler = YouTubeVideoHandler
+    youtube_channel_handler = YouTubeChannelHandler
+    odysee_video_handler = OdyseeVideoHandler
+    odysee_channel_handler = OdyseeChannelHandler
+
     def get(url):
-        if url == "https://youtube.com/watch":
-            return YouTubeVideoHandler(url)
-        if url == "https://www.youtube.com/channel":
-            return YouTubeSourceHandler(url)
-        if url == "https://www.youtube.com/feeds":
-            return YouTubeSourceHandler(url)
-        # TODO implement check below
-        if url == "https://odysee.com/user/video":
-            return OdyseeVideoHandler(url)
-        # TODO implement check below
-        if url == "https://odysee.com/user/":
-            return OdyseeSourceHandler(url)
-        if url == "https://odysee.com/$/rss":
-            return OdyseeSourceHandler(url)
+        url = UrlHandler.get_protololless(url)
+
+        if (
+            url.startswith("www.youtube.com/watch")
+            or url.startswith("youtube.com/watch")
+            or url.startswith("m.youtube.com/watch")
+        ):
+            return UrlHandler.youtube_video_handler(url)
+        if (
+            url.startswith("www.youtube.com/channel")
+            or url.startswith("youtube.com/channel")
+            or url.startswith("m.youtube.com/channel")
+        ):
+            return UrlHandler.youtube_channel_handler(url)
+        if (
+            url.startswith("www.youtube.com/feeds")
+            or url.startswith("youtube.com/feeds")
+            or url.startswith("m.youtube.com/feeds")
+        ):
+            return UrlHandler.youtube_channel_handler(url)
+        if url.startswith("odysee.com/@"):
+            wh1 = url.find("@")
+            wh2 = url.find("/", wh1 + 1)
+            if wh2 >= 0:
+                return UrlHandler.odysee_video_handler(url)
+        if url.startswith("odysee.com/@"):
+            return UrlHandler.odysee_channel_handler(url)
+        if url.startswith("odysee.com/$/rss"):
+            return UrlHandler.odysee_channel_handler(url)
 
         from ..webtools import Url
-        return Url(url)
+
+        return Url.get(url)
+
+    def get_protololless(url):
+        if url.find("https://") >= 0:
+            return url.replace("https://", "")
+        if url.find("http://") >= 0:
+            return url.replace("http://", "")
+
+        if url.endswith("/"):
+            url = url[:-1]

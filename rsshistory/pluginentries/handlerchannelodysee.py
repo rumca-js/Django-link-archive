@@ -1,7 +1,7 @@
 from .defaulturlhandler import DefaultUrlHandler
 
 
-class OdyseeSourceHandler(DefaultUrlHandler):
+class OdyseeChannelHandler(DefaultUrlHandler):
     def __init__(self, url=None):
         super().__init__(url)
 

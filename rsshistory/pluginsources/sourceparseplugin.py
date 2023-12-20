@@ -38,9 +38,9 @@ class BaseParsePlugin(SourceGenericPlugin):
 
     def get_link_data(self, source, link):
         from ..dateutils import DateUtils
-        from ..pluginentries.handlerurl import HandlerUrl
+        from ..pluginentries.entryurlinterface import EntryUrlInterface
 
-        url = HandlerUrl(link)
+        url = EntryUrlInterface(link)
         return url.get_props()
 
     def get_link_props(self):

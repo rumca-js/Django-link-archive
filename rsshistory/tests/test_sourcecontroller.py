@@ -50,3 +50,36 @@ class SourceControllerTest(WebPageDisabled, TestCase):
         )
 
         self.assertEqual(SourceDataController.objects.all().count(), 1)
+
+    def test_source_favicon(self):
+        source = SourceDataController.add(
+            {
+                "url": "https://linkedin.com",
+                "title": "LinkedIn",
+                "category": "No",
+                "subcategory": "No",
+                "export_to_cms": False,
+            }
+        )
+
+        self.assertTrue(source.get_favicon() == "https://linkedin.com/favicon.ico")
+
+    def test_source_get_full_information_page(self):
+        url = "https://linkedin.com"
+
+        SourceDataController.objects.all().delete()
+
+        props = SourceDataController.get_full_information({"url": url})
+
+        self.assertTrue(props != None)
+        self.assertTrue(len(props) > 0)
+
+    def test_source_get_full_information_youtube(self):
+        url = "https://www.youtube.com/watch?v=12312312"
+
+        SourceDataController.objects.all().delete()
+
+        props = SourceDataController.get_full_information({"url": url})
+
+        self.assertTrue(props != None)
+        self.assertTrue(len(props) > 0)

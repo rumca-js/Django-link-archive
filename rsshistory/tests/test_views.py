@@ -148,8 +148,14 @@ class ViewsTest(WebPageDisabled, TestCase):
 
         self.assertEqual(resp.status_code, 200)
 
-    def test_entry_hide(self):
-        url = reverse("{}:entry-hide".format(LinkDatabase.name), args=[0])
+    def test_entry_dead(self):
+        url = reverse("{}:entry-dead".format(LinkDatabase.name), args=[0])
+        resp = self.client.get(url)
+
+        self.assertEqual(resp.status_code, 200)
+
+    def test_entry_not_dead(self):
+        url = reverse("{}:entry-not-dead".format(LinkDatabase.name), args=[0])
         resp = self.client.get(url)
 
         self.assertEqual(resp.status_code, 200)
@@ -510,12 +516,18 @@ class EnhancedViewTest(ViewsTest):
         )
 
     def test_entry(self):
-        url = reverse("{}:entry-detail".format(LinkDatabase.name), args=[LinkDataController.objects.all()[0].id])
+        url = reverse(
+            "{}:entry-detail".format(LinkDatabase.name),
+            args=[LinkDataController.objects.all()[0].id],
+        )
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
 
     def test_source(self):
-        url = reverse("{}:source-detail".format(LinkDatabase.name), args=[SourceDataController.objects.all()[0].id])
+        url = reverse(
+            "{}:source-detail".format(LinkDatabase.name),
+            args=[SourceDataController.objects.all()[0].id],
+        )
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
 

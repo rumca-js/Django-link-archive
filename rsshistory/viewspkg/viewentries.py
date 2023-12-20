@@ -413,7 +413,7 @@ class EntryDetailView(generic.DetailView):
 
     def get_context_data(self, **kwargs):
         from ..models import EntryVisits
-        from ..pluginentries.entrycontrollerbuilder import EntryControllerBuilder
+        from ..pluginentries.entrypreviewcontroller import EntryPreviewController
         from ..services.waybackmachine import WaybackMachine
         from ..dateutils import DateUtils
 
@@ -422,7 +422,7 @@ class EntryDetailView(generic.DetailView):
         context = ViewPage.init_context(self.request, context)
 
         EntryVisits.visited(self.object, self.request.user.username)
-        object_controller = EntryControllerBuilder.get(self.object, self.request.user)
+        object_controller = EntryPreviewController.get(self.object, self.request.user)
 
         context["page_title"] = self.object.title
         context["page_thumbnail"] = self.object.thumbnail
@@ -440,7 +440,7 @@ class EntryArchivedDetailView(generic.DetailView):
     template_name = str(ViewPage.get_full_template("linkdatacontroller_detail.html"))
 
     def get_context_data(self, **kwargs):
-        from ..pluginentries.entrycontrollerbuilder import EntryControllerBuilder
+        from ..pluginentries.entrypreviewcontroller import EntryPreviewController
 
         # Call the base implementation first to get the context
         context = super(EntryArchivedDetailView, self).get_context_data(**kwargs)
@@ -451,7 +451,7 @@ class EntryArchivedDetailView(generic.DetailView):
 
         context["page_title"] = self.object.title
         context["page_thumbnail"] = self.object.thumbnail
-        context["object_controller"] = EntryControllerBuilder.get(
+        context["object_controller"] = EntryPreviewController.get(
             self.object, self.request.user
         )
 
@@ -575,7 +575,9 @@ def add_simple_entry(request):
 
                 return p.render("form_basic.html")
 
-            p.context["summary_text"] = "Could not obtain details from link {}".format(link)
+            p.context["summary_text"] = "Could not obtain details from link {}".format(
+                link
+            )
             return p.render("summary_present.html")
     else:
         form = LinkInputForm()

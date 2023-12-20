@@ -23,9 +23,16 @@ class BaseRssPlugin(SourceGenericPlugin):
         num_entries = len(all_props)
 
         if num_entries == 0:
-            PersistentInfo.error(
-                "Source:{0}; Source has no data".format(self.source_id)
-            )
+            source = self.get_source()
+
+            if source:
+                PersistentInfo.error(
+                    "Source:{}/{}; Source has no data".format(source.url, source.title)
+                )
+            else:
+                PersistentInfo.error(
+                    "Source:{}; Source has no data".format(self.source_id)
+                )
 
         for index, prop in enumerate(all_props):
             prop = self.enhance(prop)

@@ -82,14 +82,14 @@ class YouTubeDownloader(object):
 
         js = youtubelinkjson.YouTubeJson(json_data)
 
-        thumbs_data = self.get_thumbs_data()
-        if not thumbs_data:
-            logging.error("Could not obtain returndislikeapi")
-            return None
+        # thumbs_data = self.get_thumbs_data()
+        # if not thumbs_data:
+        #    logging.error("Could not obtain returndislikeapi")
+        #    return None
 
-        thumbs = returndislikejson.YouTubeThumbsDown(thumbs_data)
+        # thumbs = returndislikejson.YouTubeThumbsDown(thumbs_data)
 
-        js.add_thumbs_data(thumbs)
+        # js.add_thumbs_data(thumbs)
 
         if not js.is_valid():
             logging.error("Data are not valid")

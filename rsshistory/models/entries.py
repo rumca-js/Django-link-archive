@@ -217,23 +217,28 @@ class BaseLinkDataController(BaseLinkDataModel):
                     self.save()
 
     def reset_data(self):
-        from ..pluginentries.handlerurl import HandlerUrl
+        from ..pluginentries.entryurlinterface import EntryUrlInterface
 
-        url = HandlerUrl(self.link)
+        url = EntryUrlInterface(self.link)
         props = url.get_props()
 
         self.title = props["title"]
         self.description = props["description"]
 
     def get_favicon(self):
+        """
+        Prints favicon from source, or from HTML page directly
+        """
+        if self.age and self.age >= 18:
+            return static("{0}/images/sign-304093_640.png".format(LinkDatabase.name))
+
         if self.get_source_obj():
             return self.get_source_obj().get_favicon()
 
         from ..webtools import BasePage
 
-        page = BasePage(self.link)
-        domain = page.get_domain()
-        return domain + "/favicon.ico"
+        # returning real favicon from HTML is too long
+        return BasePage(self.link).get_domain() + "/favicon.ico"
 
     def get_domain_only(self):
         from ..webtools import BasePage
@@ -242,6 +247,9 @@ class BaseLinkDataController(BaseLinkDataModel):
         return page.get_domain_only()
 
     def get_thumbnail(self):
+        """
+        Prints thumbnail, but if it does not have one prints favicon
+        """
         if self.age and self.age >= 18:
             return static("{0}/images/sign-304093_640.png".format(LinkDatabase.name))
 

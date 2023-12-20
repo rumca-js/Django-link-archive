@@ -65,11 +65,11 @@ def data_errors_page(request):
         print("fix_reassign_source_to_nullsource_entries done")
 
     def fix_incorrect_youtube_links_links(entries):
-        from ..pluginentries.youtubevideohandler import YouTubeVideoHandler
+        from ..pluginentries.entryurlinterface import UrlHandler
 
         for entry in entries:
             print("Fixing: {} {} {}".format(entry.link, entry.title, entry.source))
-            h = YouTubeVideoHandler(entry.link)
+            h = UrlHandler.get(entry.link)
             h.download_details()
 
             chan_url = h.get_channel_feed_url()
@@ -142,11 +142,11 @@ def data_errors_page(request):
 
 
 def fix_reset_youtube_link_details(link_id):
-    from ..pluginentries.youtubevideohandler import YouTubeVideoHandler
+    from ..pluginentries.entryurlinterface import UrlHandler
 
     entry = LinkDataController.objects.get(id=link_id)
 
-    h = YouTubeVideoHandler(entry.link)
+    h = UrlHandler.get(entry.link)
     if not h.download_details():
         return False
 

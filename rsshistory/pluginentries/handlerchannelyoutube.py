@@ -2,7 +2,7 @@ from .defaulturlhandler import DefaultUrlHandler
 from ..webtools import Url
 
 
-class YouTubeSourceHandler(DefaultUrlHandler):
+class YouTubeChannelHandler(DefaultUrlHandler):
     def __init__(self, url=None):
         super().__init__(url)
 

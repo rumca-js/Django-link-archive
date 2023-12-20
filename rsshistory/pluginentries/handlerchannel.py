@@ -1,5 +1,5 @@
-from .handlerchannelyoutube import YouTubeSourceHandler
-from .handlerchannelodysee import OdyseeSourceHandler
+from .handlerchannelyoutube import YouTubeChannelHandler
+from .handlerchannelodysee import OdyseeChannelHandler
 
 
 class DefaultHandler(object):
@@ -21,6 +21,6 @@ class ChannelHandler(object):
 
     def get_supported(url):
         if url.find("youtube.com") >= 0:
-            return YouTubeSourceHandler(url)
+            return YouTubeChannelHandler(url)
         if url.find("odysee.com") >= 0:
-            return OdyseeSourceHandler(url)
+            return OdyseeChannelHandler(url)

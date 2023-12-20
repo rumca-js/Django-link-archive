@@ -1,7 +1,6 @@
 from django.urls import reverse
 from django.templatetags.static import static
 
-from .handlervideoyoutube import YouTubeVideoHandler
 from .entrygenericplugin import EntryGenericPlugin, EntryButton, EntryParameter
 from ..apps import LinkDatabase
 from ..models import ConfigurationEntry
@@ -12,8 +11,7 @@ class EntryYouTubePlugin(EntryGenericPlugin):
         super().__init__(entry, user)
 
     def get_menu_buttons(self):
-        return [
-        ]
+        return []
 
     def get_edit_menu_buttons(self):
         buttons = super().get_edit_menu_buttons()
@@ -117,11 +115,15 @@ class EntryYouTubePlugin(EntryGenericPlugin):
         return buttons
 
     def get_video_code(self):
-        h = YouTubeVideoHandler(self.entry.link)
+        from ..pluginentries.entryurlinterface import UrlHandler
+
+        h = UrlHandler.get(self.entry.link)
         return h.get_video_code()
 
     def get_frame(self):
-        h = YouTubeVideoHandler(self.entry.link)
+        from ..pluginentries.entryurlinterface import UrlHandler
+
+        h = UrlHandler.get(self.entry.link)
         return '<iframe src="{0}" frameborder="0" allowfullscreen class="youtube_player_frame"></iframe>'.format(
             h.get_link_embed()
         )

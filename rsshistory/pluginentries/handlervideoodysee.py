@@ -1,5 +1,6 @@
 from .defaulturlhandler import DefaultUrlHandler
 
+
 class OdyseeVideoHandler(DefaultUrlHandler):
     def __init__(self, url=None):
         super().__init__(url)

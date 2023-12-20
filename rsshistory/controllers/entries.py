@@ -178,9 +178,9 @@ class LinkDataController(LinkDataModel):
                 PersistentInfo.error("Cannot move to archive {}".format(error_text))
 
     def get_full_information(data):
-        from ..pluginentries.handlerurl import HandlerUrl
+        from ..pluginentries.entryurlinterface import EntryUrlInterface
 
-        url = HandlerUrl(data["link"])
+        url = EntryUrlInterface(data["link"])
         return url.get_props()
 
     def clear_old_entries(limit=0):
@@ -321,9 +321,9 @@ class LinkDataHyperController(object):
         if objs.count() != 0:
             return objs[0]
 
-        from ..pluginentries.handlerurl import HandlerUrl
+        from ..pluginentries.entryurlinterface import EntryUrlInterface
 
-        url = HandlerUrl(link_url)
+        url = EntryUrlInterface(link_url)
         props = url.get_props()
         if props:
             return LinkDataHyperController.add_new_link_internal(props)
@@ -462,12 +462,10 @@ class LinkDataHyperController(object):
         return True
 
     def is_live_video(link_data):
-        p = HtmlPage(link_data["link"])
+        from ..pluginentries.entryurlinterface import UrlHandler
 
-        if p.is_youtube():
-            from ..pluginentries.handlervideoyoutube import YouTubeVideoHandler
-
-            handler = YouTubeVideoHandler(link_data["link"])
+        handler = UrlHandler.get(link_data["link"])
+        if type(handler) is UrlHandler.youtube_video_handler:
             if handler.get_video_code():
                 handler.download_details()
                 if not handler.is_valid():
@@ -594,9 +592,9 @@ class LinkDataHyperController(object):
         language = parser.get_language()
         if language:
             props["language"] = language
-        thumnail = parser.get_thumbnail()
-        if thumnail:
-            props["favicon"] = thumnail
+        thumbnail = parser.get_thumbnail()
+        if thumbnail:
+            props["favicon"] = thumbnail
         props["on_hold"] = not conf.auto_store_sources_enabled
         props["source_type"] = SourceDataModel.SOURCE_TYPE_RSS
         props["remove_after_days"] = 2

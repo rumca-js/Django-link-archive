@@ -20,6 +20,11 @@
     {%if thumbnail %}
     <li>thumbnail: <a href="{{thumbnail}}"/>Link</a></li>
     {%endif %}
+    {%if favicons %}
+    {%for favicon in favicons %}
+    <li>Favicon: {{favicon}} <a href="{{favicon}}">favicon</a></li>
+    {%endfor%}
+    {%endif%}
     <li>Contents length: {{contents_length}}.
         {% if contents_length == 0 %}
         Page is empty.

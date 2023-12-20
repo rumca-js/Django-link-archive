@@ -120,7 +120,9 @@ class BasePageTest(WebPageDisabled, TestCase):
         self.assertTrue(ext == "html")
 
     def test_get_url_full_normal_join_left_slash(self):
-        url = BasePage.get_url_full("http://mytestpage.com/test/", "images/facebook.com")
+        url = BasePage.get_url_full(
+            "http://mytestpage.com/test/", "images/facebook.com"
+        )
         self.assertEqual(url, "http://mytestpage.com/test/images/facebook.com")
 
     def test_get_url_full_normal_join_right_slash(self):
@@ -132,21 +134,31 @@ class BasePageTest(WebPageDisabled, TestCase):
         self.assertEqual(url, "http://mytestpage.com/test/images/facebook.com")
 
     def test_get_url_full_normal_join_both_slashes(self):
-        url = BasePage.get_url_full("http://mytestpage.com/test/", "/images/facebook.com")
+        url = BasePage.get_url_full(
+            "http://mytestpage.com/test/", "/images/facebook.com"
+        )
         self.assertEqual(url, "http://mytestpage.com/test/images/facebook.com")
 
     def test_get_url_full_path(self):
-        url = BasePage.get_url_full("http://mytestpage.com/test/", "/images/facebook.com")
+        url = BasePage.get_url_full(
+            "http://mytestpage.com/test/", "/images/facebook.com"
+        )
         self.assertEqual(url, "http://mytestpage.com/test/images/facebook.com")
 
     def test_get_url_full_double_path(self):
-        url = BasePage.get_url_full("http://mytestpage.com/test/", "//images/facebook.com")
+        url = BasePage.get_url_full(
+            "http://mytestpage.com/test/", "//images/facebook.com"
+        )
         self.assertEqual(url, "https://images/facebook.com")
 
     def test_get_url_full_http_path(self):
-        url = BasePage.get_url_full("http://mytestpage.com/test/", "http://images/facebook.com")
+        url = BasePage.get_url_full(
+            "http://mytestpage.com/test/", "http://images/facebook.com"
+        )
         self.assertEqual(url, "http://images/facebook.com")
 
     def test_get_url_full_https_path(self):
-        url = BasePage.get_url_full("http://mytestpage.com/test/", "https://images/facebook.com")
+        url = BasePage.get_url_full(
+            "http://mytestpage.com/test/", "https://images/facebook.com"
+        )
         self.assertEqual(url, "https://images/facebook.com")

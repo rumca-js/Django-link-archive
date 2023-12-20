@@ -1,3 +1,10 @@
+"""
+This module provides replacement for the Internet.
+
+ - when test make requests to obtain a page, we return artificial data here
+ - when there is a request to obtain youtube JSON data, we provide artificial data, etc.
+"""
+
 from ..models import PersistentInfo
 
 
@@ -549,6 +556,42 @@ Don't forget that this is 360 video: you can change the angle of view. Nepal is 
 </feed>
 """
 
+webpage_html_favicon = """<html>
+ <head>
+ <link rel="shortcut icon" href="https://www.youtube.com/s/desktop/e4d15d2c/img/favicon.ico" type="image/x-icon"><link rel="icon" href="https://www.youtube.com/s/desktop/e4d15d2c/img/favicon_32x32.png" sizes="32x32"><link rel="icon" href="https://www.youtube.com/s/desktop/e4d15d2c/img/favicon_48x48.png" sizes="48x48"><link rel="icon" href="https://www.youtube.com/s/desktop/e4d15d2c/img/favicon_96x96.png" sizes="96x96"><link rel="icon" href="https://www.youtube.com/s/desktop/e4d15d2c/img/favicon_144x144.png" sizes="144x144">
+ <title>YouTube</title>
+
+ </head>
+ <body>
+ page body
+ </body>
+"""
+
+
+from ..pluginentries.handlervideoyoutube import YouTubeVideoHandler
+
+
+class YouTubeVideoHandlerMock(YouTubeVideoHandler):
+    def __init__(self, url=None):
+        super().__init__(url)
+
+    def download_details_youtube(self):
+        self.yt_text = """{"_filename" : "test.txt",
+        "title" : "test.txt",
+        "description" : "test.txt",
+        "channel_url" : "https://youtube.com/channel/test.txt",
+        "channel" : "JoYoe",
+        "id" : "3433",
+        "channel_id" : "JoYoe",
+        "thumbnail" : "https://youtube.com/files/whatever.png",
+        "upload_date" : "20231113"
+        }"""
+        return True
+
+    def download_details_return_dislike(self):
+        self.rd_text = """{}"""
+        return True
+
 
 class RequestsObject(object):
     def __init__(self, url, headers, timeout):
@@ -568,8 +611,14 @@ class RequestsObject(object):
         if url == "https://youtube.com/channel/airpano/rss.xml":
             return webpage_airpano
 
+        if url == "https://multiple-favicons/page.html":
+            return webpage_html_favicon
+
         if url == "https://rsspage.com/rss.xml":
             return webpage_samtime_youtube_rss
+
+        if url == "https://empty-page.com":
+            return ""
 
         if url == "https://page-with-two-links.com":
             b = PageBuilder()
@@ -615,11 +664,16 @@ class WebPageDisabled(object):
         return RequestsObject(url, headers, timeout)
 
     def disable_web_pages(self):
-        from ..webtools import BasePage, HtmlPage, RssPage
+        from ..webtools import BasePage
 
         BasePage.get_contents_function = self.get_contents_function
-        HtmlPage.get_contents_function = self.get_contents_function
-        RssPage.get_contents_function = self.get_contents_function
+
+        from ..pluginentries.entryurlinterface import UrlHandler
+
+        UrlHandler.youtube_video_handler = YouTubeVideoHandlerMock
+        # UrlHandler.youtube_channel_handler = YouTubeVideoHandlerMock
+        # UrlHandler.odysee_video_handler = YouTubeVideoHandlerMock
+        # UrlHandler.odysee_channel_handler = YouTubeVideoHandlerMock
 
     def print_errors(self):
         infos = PersistentInfo.objects.all()

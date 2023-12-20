@@ -14,7 +14,7 @@ from ..models import (
 )
 
 from ..configuration import Configuration
-from ..webtools import BasePage, HtmlPage, RssPage
+from ..webtools import BasePage, HtmlPage, RssPage, Url
 from ..apps import LinkDatabase
 
 
@@ -166,9 +166,8 @@ class SourceDataController(SourceDataModel):
         if self.favicon:
             return self.favicon
 
-        page = BasePage(self.url)
-        domain = page.get_domain()
-        return domain + "/favicon.ico"
+        # returning real favicon from HTML is too long
+        return BasePage(self.url).get_domain() + "/favicon.ico"
 
     def get_domain(self):
         page = BasePage(self.url)
@@ -226,57 +225,9 @@ class SourceDataController(SourceDataModel):
         return self.get_map()
 
     def get_full_information(data):
-        p = HtmlPage(data["url"])
-        # TODO if passed url is youtube video, obtain information, obtain channel feed url
+        from ..pluginsources.sourceurlinterface import SourceUrlInterface
 
-        if p.is_rss():
-            return SourceDataController.get_info_from_rss(data["url"])
-        elif p.is_youtube():
-            from ..pluginentries.handlervideoyoutube import YouTubeVideoHandler
-
-            handler = YouTubeVideoHandler(data["url"])
-            handler.download_details()
-            return SourceDataController.get_info_from_rss(
-                handler.get_channel_feed_url()
-            )
-        elif p.get_rss_url():
-            p = HtmlPage(data["url"])
-            return SourceDataController.get_info_from_rss(p.get_rss_url())
-        else:
-            return SourceDataController.get_info_from_page(data["url"], p)
-
-    def get_info_from_rss(url):
-        reader = RssPage(url)
-        feed = reader.parse()
-
-        data = {}
-        data["url"] = url
-        data["source_type"] = SourceDataModel.SOURCE_TYPE_RSS
-        title = reader.get_title()
-        if title:
-            data["title"] = title
-        description = reader.get_description()
-        if description:
-            data["description"] = description
-        language = reader.get_language()
-        if language:
-            data["language"] = language
-        thumb = reader.get_thumbnail()
-        if thumb:
-            data["favicon"] = thumb
-        return data
-
-    def get_info_from_page(url, p):
-        from ..pluginsources.sourceparseplugin import BaseParsePlugin
-
-        data = {}
-        data["url"] = url
-        data["source_type"] = BaseParsePlugin.PLUGIN_NAME
-        data["language"] = p.get_language()
-        data["title"] = p.get_title()
-        data["description"] = p.get_title()
-        data["page_rating"] = p.get_page_rating()
-        return data
+        return SourceUrlInterface(data["url"]).get_props()
 
     def get_channel_page_url(self):
         from ..pluginentries.handlerchannel import ChannelHandler

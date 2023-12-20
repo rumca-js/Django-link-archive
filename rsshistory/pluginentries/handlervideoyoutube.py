@@ -10,10 +10,14 @@ class YouTubeVideoHandler(DefaultUrlHandler):
         super().__init__(url)
 
         self.url = YouTubeVideoHandler.input2url(url)
+
         self.yt_text = None
         self.yt_ob = None
+
         self.rd_text = None
         self.rd_ob = None
+
+        self.return_dislike = False
 
     def get_video_code(self):
         return YouTubeVideoHandler.input2code(self.url)
@@ -71,48 +75,9 @@ class YouTubeVideoHandler(DefaultUrlHandler):
     def get_link_music(self):
         return "https://music.youtube.com?v={0}".format(self.get_video_code())
 
-    def load_details(self):
-        from ..serializers.youtubelinkjson import YouTubeJson
-
-        self.yt_ob = YouTubeJson()
-
-        if self.yt_text and not self.yt_ob.loads(self.yt_text):
-            return False
-
-        # from ..serializers.returnyoutubedislikeapijson import YouTubeThumbsDown
-
-        # self.rd_ob = YouTubeThumbsDown()
-        # if self.rd_text and not self.rd_ob.loads(self.rd_text):
-        #    return False
-
-        return True
-
-    def download_details_only(self):
-        if self.download_details_yt():  # and self.download_details_rd():
-            return True
-        return False
-
     def download_details(self):
-        if self.download_details_only():
+        if self.download_details_implementation():
             return self.load_details()
-
-    def download_details_yt(self):
-        from ..programwrappers import ytdlp
-
-        yt = ytdlp.YTDLP(self.url)
-        self.yt_text = yt.download_data()
-        if self.yt_text is None:
-            return False
-        return True
-
-    def download_details_rd(self):
-        from ..serializers.returnyoutubedislikeapijson import YouTubeThumbsDown
-
-        ytr = YouTubeThumbsDown(self)
-        self.rd_text = ytr.download_data()
-        if self.rd_text is None:
-            return False
-        return True
 
     def is_valid(self):
         p = HtmlPage(self.url)
@@ -231,3 +196,46 @@ class YouTubeVideoHandler(DefaultUrlHandler):
         youtube_props["contents"] = self.get_json_text()
 
         return youtube_props
+
+    def load_details(self):
+        from ..serializers.youtubelinkjson import YouTubeJson
+
+        self.yt_ob = YouTubeJson()
+
+        if self.yt_text and not self.yt_ob.loads(self.yt_text):
+            return False
+
+        if self.return_dislike:
+            from ..serializers.returnyoutubedislikeapijson import YouTubeThumbsDown
+
+            self.rd_ob = YouTubeThumbsDown()
+            if self.rd_text and not self.rd_ob.loads(self.rd_text):
+                return False
+
+        return True
+
+    def download_details_implementation(self):
+        if not self.download_details_youtube():
+            return False
+        if not self.download_details_return_dislike():
+            return False
+
+        return True
+
+    def download_details_youtube(self):
+        from ..programwrappers import ytdlp
+
+        yt = ytdlp.YTDLP(self.url)
+        self.yt_text = yt.download_data()
+        if self.yt_text is None:
+            return False
+        return True
+
+    def download_details_return_dislike(self):
+        from ..serializers.returnyoutubedislikeapijson import YouTubeThumbsDown
+
+        ytr = YouTubeThumbsDown(self)
+        self.rd_text = ytr.download_data()
+        if self.rd_text is None:
+            return False
+        return True

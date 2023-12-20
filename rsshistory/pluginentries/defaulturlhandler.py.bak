@@ -7,21 +7,6 @@ class DefaultUrlHandler(object):
         self.url = url
         self.h = None
 
-    def download_details(self):
-        raise NotImplementedError
-
-    def input2code(input_string):
-        raise NotImplementedError
-
-    def input2url(input_string):
-        raise NotImplementedError
-
-    def get_code(self):
-        raise NotImplementedError
-
-    def code2url(input_code):
-        raise NotImplementedError
-
     def set_handler(self):
         if self.h is None:
             self.h = Url.get(self.url)

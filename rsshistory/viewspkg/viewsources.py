@@ -202,13 +202,13 @@ def edit_source(request, pk):
         return p.render("summary_present.html")
     else:
         if not ob.favicon:
-            from ..webtools import BasePage
+            from ..webtools import Url
 
-            page = BasePage(ob.url)
-
-            form = SourceForm(
-                instance=ob, initial={"favicon": page.get_domain() + "/favicon.ico"}
-            )
+            icon = Url.get_favicon(ob.url)
+            if icon:
+                form = SourceForm(instance=ob, initial={"favicon": icon})
+            else:
+                form = SourceForm(instance=ob)
         else:
             form = SourceForm(instance=ob)
 

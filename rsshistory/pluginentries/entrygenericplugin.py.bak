@@ -71,29 +71,25 @@ class EntryGenericPlugin(object):
         )
 
         if self.entry.bookmarked:
-            buttons.append(
+            buttons.append( 
                 EntryButton(
                     self.user,
                     "",
                     self.entry.get_bookmark_unset_url(),
                     ConfigurationEntry.ACCESS_TYPE_OWNER,
                     "Unbookmark entry",
-                    static(
-                        "{}/icons/icons8-not-bookmark-100.png".format(LinkDatabase.name)
-                    ),
+                    static("{}/icons/icons8-not-bookmark-100.png".format(LinkDatabase.name)),
                 )
             )
         else:
-            buttons.append(
+            buttons.append( 
                 EntryButton(
                     self.user,
                     "",
                     self.entry.get_bookmark_set_url(),
                     ConfigurationEntry.ACCESS_TYPE_OWNER,
                     "Bookmark entry",
-                    static(
-                        "{}/icons/icons8-bookmark-100.png".format(LinkDatabase.name)
-                    ),
+                    static("{}/icons/icons8-bookmark-100.png".format(LinkDatabase.name)),
                 )
             )
 
@@ -132,8 +128,7 @@ class EntryGenericPlugin(object):
                 "Page Props",
                 reverse(
                     "{}:show-page-props".format(LinkDatabase.name),
-                )
-                + "?page={}".format(self.entry.link),
+                )+"?page={}".format(self.entry.link),
                 ConfigurationEntry.ACCESS_TYPE_OWNER,
                 "Shows page properties",
                 static("{}/icons/icons8-download-96.png".format(LinkDatabase.name)),
@@ -191,8 +186,7 @@ class EntryGenericPlugin(object):
                     self.entry.artist,
                     reverse(
                         "{}:entries-omni-search".format(LinkDatabase.name),
-                    )
-                    + "?search=artist+%3D+{}".format(self.entry.artist),
+                    ) + "?search=artist+%3D+{}".format(self.entry.artist),
                     ConfigurationEntry.ACCESS_TYPE_ALL,
                     "Search for entries made by {} artist".format(self.entry.artist),
                 ),
@@ -205,8 +199,7 @@ class EntryGenericPlugin(object):
                     self.entry.album,
                     reverse(
                         "{}:entries-omni-search".format(LinkDatabase.name),
-                    )
-                    + "?search=album+%3D+{}".format(self.entry.album),
+                    ) + "?search=album+%3D+{}".format(self.entry.album),
                     ConfigurationEntry.ACCESS_TYPE_ALL,
                     "Search for entries in {} album".format(self.entry.album),
                 ),
@@ -234,8 +227,7 @@ class EntryGenericPlugin(object):
                     "Domain",
                     reverse(
                         "{}:entries-omni-search".format(LinkDatabase.name),
-                    )
-                    + "?search=link+%3D+{}".format(domain_url),
+                    ) + "?search=link+%3D+{}".format(domain_url),
                     ConfigurationEntry.ACCESS_TYPE_ALL,
                     "Domain: {}".format(domain_url),
                 ),
@@ -291,26 +283,26 @@ class EntryGenericPlugin(object):
             buttons.append(
                 EntryButton(
                     self.user,
-                    "Dead",
+                    "Hide",
                     reverse(
-                        "{}:entry-dead".format(LinkDatabase.name),
+                        "{}:entry-hide".format(LinkDatabase.name),
                         args=[self.entry.id],
                     ),
                     ConfigurationEntry.ACCESS_TYPE_OWNER,
-                    "Marks entry as dead:{}".format(self.entry.title),
+                    "Hides entry: {}".format(self.entry.title),
                 ),
             )
         else:
             buttons.append(
                 EntryButton(
                     self.user,
-                    "Not dead",
+                    "Unhide",
                     reverse(
-                        "{}:entry-not-dead".format(LinkDatabase.name),
+                        "{}:entry-unhide".format(LinkDatabase.name),
                         args=[self.entry.id],
                     ),
                     ConfigurationEntry.ACCESS_TYPE_OWNER,
-                    "Marks entry as not dead:{}".format(self.entry.title),
+                    "Unhides entry: {}".format(self.entry.title),
                 ),
             )
 

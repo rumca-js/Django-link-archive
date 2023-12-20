@@ -81,6 +81,17 @@ webpage_rss_links = """<html>
  </body>
 """
 
+webpage_html_favicon = """<html>
+ <head>
+ <link rel="shortcut icon" href="https://www.youtube.com/s/desktop/e4d15d2c/img/favicon.ico" type="image/x-icon"><link rel="icon" href="https://www.youtube.com/s/desktop/e4d15d2c/img/favicon_32x32.png" sizes="32x32"><link rel="icon" href="https://www.youtube.com/s/desktop/e4d15d2c/img/favicon_48x48.png" sizes="48x48"><link rel="icon" href="https://www.youtube.com/s/desktop/e4d15d2c/img/favicon_96x96.png" sizes="96x96"><link rel="icon" href="https://www.youtube.com/s/desktop/e4d15d2c/img/favicon_144x144.png" sizes="144x144">
+ <title>YouTube</title>
+
+ </head>
+ <body>
+ page body
+ </body>
+"""
+
 
 class HtmlPageTest(TestCase):
     def test_default_language(self):
@@ -204,3 +215,29 @@ class HtmlPageTest(TestCase):
         self.assertTrue("http://your-site.com/your-feed1.rss" in all_rss)
         self.assertTrue("http://your-site.com/your-feed2.rss" in all_rss)
         self.assertTrue("http://your-site.com/your-feed3.rss" in all_rss)
+
+    def test_get_favicons(self):
+        p = HtmlPage("http://mytestpage.com/nodomain/", webpage_html_favicon)
+
+        all_favicons = p.get_favicons()
+
+        self.assertEqual(
+            all_favicons[0][0],
+            "https://www.youtube.com/s/desktop/e4d15d2c/img/favicon.ico",
+        )
+        self.assertEqual(
+            all_favicons[1][0],
+            "https://www.youtube.com/s/desktop/e4d15d2c/img/favicon_32x32.png",
+        )
+        self.assertEqual(
+            all_favicons[2][0],
+            "https://www.youtube.com/s/desktop/e4d15d2c/img/favicon_48x48.png",
+        )
+        self.assertEqual(
+            all_favicons[3][0],
+            "https://www.youtube.com/s/desktop/e4d15d2c/img/favicon_96x96.png",
+        )
+        self.assertEqual(
+            all_favicons[4][0],
+            "https://www.youtube.com/s/desktop/e4d15d2c/img/favicon_144x144.png",
+        )

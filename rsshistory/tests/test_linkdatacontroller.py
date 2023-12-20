@@ -12,7 +12,7 @@ from ..dateutils import DateUtils
 from .utilities import WebPageDisabled
 
 
-class DataWriterTest(WebPageDisabled, TestCase):
+class LinkDataControllerTest(WebPageDisabled, TestCase):
     def setUp(self):
         self.disable_web_pages()
 
@@ -136,3 +136,31 @@ class DataWriterTest(WebPageDisabled, TestCase):
 
         self.assertEqual(nonbookmarked.count(), 0)
         self.assertEqual(ArchiveLinkDataModel.objects.all().count(), 0)
+
+    def test_get_favicon_empty_in_model(self):
+        conf = Configuration.get_object().config_entry
+
+        current_time = DateUtils.get_datetime_now_utc()
+        days_before = current_time - timedelta(days=conf.days_to_remove_links + 2)
+
+        self.clear()
+        self.create_entries(days_before)
+
+        entries = LinkDataController.objects.filter(thumbnail__isnull=True)
+
+        self.assertTrue(len(entries) != 0)
+        self.assertTrue(entries[0].get_favicon() == "https://youtube.com/favicon.ico")
+
+    def test_get_thumbnail_empty_in_model(self):
+        conf = Configuration.get_object().config_entry
+
+        current_time = DateUtils.get_datetime_now_utc()
+        days_before = current_time - timedelta(days=conf.days_to_remove_links + 2)
+
+        self.clear()
+        self.create_entries(days_before)
+
+        entries = LinkDataController.objects.filter(thumbnail__isnull=True)
+
+        self.assertTrue(len(entries) != 0)
+        self.assertEqual(entries[0].get_thumbnail(), "https://youtube.com/favicon.ico")
