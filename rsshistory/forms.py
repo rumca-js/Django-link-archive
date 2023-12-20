@@ -40,8 +40,13 @@ class ConfigForm(forms.ModelForm):
     class Meta:
         model = ConfigurationEntry
         fields = [
-            "sources_refresh_period",
+            # important
+            "background_task",
+            "ssl_verification",
             "user_agent",
+            "sources_refresh_period",
+            "access_type",
+            # optional
             "link_save",
             "source_save",
             "auto_store_entries",
@@ -52,13 +57,13 @@ class ConfigForm(forms.ModelForm):
             "track_user_actions",
             "data_export_path",
             "data_import_path",
-            "access_type",
-            "entries_order_by",
             "days_to_move_to_archive",
             "days_to_remove_links",
             "whats_new_days",
             "vote_min",
             "vote_max",
+            # display settings
+            "entries_order_by",
             "number_of_comments_per_day",
             "display_style",
             "display_type",

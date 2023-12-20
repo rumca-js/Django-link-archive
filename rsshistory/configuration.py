@@ -16,7 +16,7 @@ version is split into three digits:
  if a change requires the model to be changed, then second digit is updated, patch is set to 0
  if something should be released to public, then release version changes
 """
-__version__ = "0.32.0"
+__version__ = "0.33.0"
 
 
 from pathlib import Path
@@ -34,6 +34,8 @@ class Configuration(object):
         self.context = {}
         self.config_entry = ConfigurationEntry.get()
         self.get_context()
+        self.apply_ssl_verification()
+        self.apply_user_agent()
 
     def get_context(self):
         if len(self.context) == 0:
@@ -79,6 +81,17 @@ class Configuration(object):
 
     def enable_logging(self):
         pass
+
+    def apply_ssl_verification(self):
+        from .webtools import BasePage
+
+        if not self.config_entry.ssl_verification:
+            BasePage.disable_ssl_warnings()
+
+    def apply_user_agent(self):
+        from .webtools import BasePage
+
+        BasePage.user_agent = self.config_entry.user_agent
 
     def get_export_path(self, append=False):
         directory = Path(ConfigurationEntry.get().data_export_path)

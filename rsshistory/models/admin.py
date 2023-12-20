@@ -44,6 +44,12 @@ class ConfigurationEntry(models.Model):
     )
     # fmt: on
 
+    background_task = models.BooleanField(
+        default=False
+    )  # True if celery is defined, and used
+    ssl_verification = models.BooleanField(
+        default=True
+    )  # Might work faster if disabled, but might capture invalid pages
     sources_refresh_period = models.IntegerField(default=3600)
     link_save = models.BooleanField(default=False)
     source_save = models.BooleanField(default=False)
@@ -110,7 +116,6 @@ class ConfigurationEntry(models.Model):
 
 
 class UserConfig(models.Model):
-
     user = models.CharField(max_length=500, unique=True)
     display_style = models.CharField(
         max_length=500, null=True, default="style-light", choices=STYLE_TYPES
@@ -134,9 +139,13 @@ class UserConfig(models.Model):
                 return confs[0]
 
         config = ConfigurationEntry.get()
-        return UserConfig(display_style = config.display_style, display_type = config.display_type,
-                show_icons = config.show_icons, thumbnails_as_icons = config.thumbnails_as_icons,
-                links_per_page = config.links_per_page)
+        return UserConfig(
+            display_style=config.display_style,
+            display_type=config.display_type,
+            show_icons=config.show_icons,
+            thumbnails_as_icons=config.thumbnails_as_icons,
+            links_per_page=config.links_per_page,
+        )
 
     def get_or_create(user_name):
         """
