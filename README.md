@@ -10,6 +10,7 @@ Personal link database, link aggregator, with RSS functionality. Similar to Redd
  - RSS feed support
  - You can gather information about: links, domains, feeds
  - It is not a search engine. Suggesting better alternatives: [whoogle-search](https://github.com/benbusby/whoogle-search), or [Marginalia search](https://search.marginalia.nu/)
+ - Stores link meta data, therefore it is not [archive.org](https://archive.org) replacement
 
 ## Problems with other RSS readers, or apps
 
