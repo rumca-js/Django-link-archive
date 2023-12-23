@@ -49,14 +49,6 @@ class EntryOdyseePlugin(EntryGenericPlugin):
 
             return frame_text
 
-    def get_description_html(self):
-        import re
-
-        description = self.entry.description
-        description = self.htmlify(description)
-
-        return """{}""".format(description)
-
     def get_edit_menu_buttons(self):
         buttons = super().get_edit_menu_buttons()
         return buttons

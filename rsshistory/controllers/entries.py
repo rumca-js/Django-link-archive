@@ -406,6 +406,8 @@ class LinkDataHyperController(object):
                 : BaseLinkDataController.get_description_length() - 2
             ]
 
+        LinkDatabase.info("Adding link: {}".format(link_data["link"]))
+
         if not is_archive:
             ob = LinkDataModel.objects.create(**new_link_data)
 
@@ -456,7 +458,6 @@ class LinkDataHyperController(object):
                 return False
 
         if LinkDataHyperController.is_live_video(link_data):
-            LinkDatabase.info("Adding link: {}".format(link_data["link"]))
             return False
 
         return True

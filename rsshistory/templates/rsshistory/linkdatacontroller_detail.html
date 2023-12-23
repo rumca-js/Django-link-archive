@@ -5,7 +5,7 @@
   {{object_controller.get_frame_html | safe | linebreaks }}
   <div style="clear:both"></div>
 
-  <p>
+  <div>
   <h1 class="link-title"><a href="{{ object.link }}" title="{{ object.link }}">
           {% if object.bookmarked %}
           [{{object.page_rating_votes}}]
@@ -14,9 +14,9 @@
       </a>
   </h1>
   <span>{{object.link}}</span>
-  </p>
+  </div>
 
-  <p>
+  <div style="margin-bottom: 1%">
       {% for button in object_controller.get_edit_menu_buttons %}
           {% if button.is_shown %}
               <a href="{{button.action}}" class="simplebutton" title="{{button.title}}">
@@ -27,9 +27,9 @@
               </a>
           {% endif %}
       {% endfor %}
-  </p>
+  </div>
 
-  <p>
+  <div style="margin-bottom: 1%">
       {% if user_config.show_icons %}
         <!--img src=
           {% if user_config.thumbnails_as_icons %}
@@ -50,9 +50,9 @@
               </a>
           {% endif %}
       {% endfor %}
-  </p>
+  </div>
 
-  <p>
+  <div>
       {% for button in object_controller.get_advanced_menu_buttons %}
           {% if button.is_shown %}
               <a href="{{button.action}}" class="simplebutton" title="{{button.title}}">
@@ -63,9 +63,9 @@
               </a>
           {% endif %}
       {% endfor %}
-  </p>
+  </div>
 
-  <p>
+  <div>
       {% if object.is_taggable %}
       <div><strong>Tags:</strong>
 	  {% if user.is_authenticated %}
@@ -80,9 +80,9 @@
           {% endif %}
       </div>
       {% endif %}
-  </p>
+  </div>
 
-  <p>
+  <div>
       {% for parameter in object_controller.get_parameters %}
       <span><strong>{{parameter.name | safe}}:</strong> {{parameter.description | safe}}</span>
       {% endfor %}
@@ -90,17 +90,19 @@
       <span><strong>Points contents</strong>{{object.page_rating_contents}}</span>
       <span><strong>Points votes</strong>{{object.page_rating_votes}}</span>
       <span><strong>User visits</strong>{{object.page_rating_visits}}</span>
-  </p>
+  </div>
 
+  <div class="link-detail-description">
   {{object_controller.get_description_html | safe | linebreaks }}
+  <div>
   <div style="clear:both"></div>
 
 {% if object.is_taggable %}
   <hr/>
   <h2>Comments</h2>
-  <p>
+  <div>
   {% for comment in object.comments.all %}
-      <div>{{comment.comment | linebreaks}}</div>
+      <div>{{comment.get_comment | linebreaks}}</div>
       <div>{{comment.date_published}} {{comment.author}}
           {% if comment.author == user.get_username %}
             <a href="{% url 'rsshistory:entry-comment-edit' comment.id %}" class="simplebutton" title="Edit comment">
@@ -113,18 +115,18 @@
       </div>
       <hr/>
   {% endfor %}
-  </p>
+  </div>
 
-  <p>
+  <div>
   {% if user.is_authenticated %}
     <a href="{% url 'rsshistory:entry-comment-add' object.id %}" class="simplebutton">Add comment</a>
   {% endif %}
-  </p>
+  </div>
 
 {% endif %}
 
-  <p>
+  <div>
     <a href="{% url 'rsshistory:entry-json' object.id %}" class="simplebutton">Show JSON</a>
-  </p>
+  </div>
 
 {% endblock %}

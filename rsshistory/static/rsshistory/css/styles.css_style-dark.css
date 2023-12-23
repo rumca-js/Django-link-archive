@@ -65,6 +65,20 @@ hr {
 .link-list a:hover {
 }
 
+.link-detail-thumbnail {
+     clear: both;
+     max-width: 100%;
+     height: auto;
+     float: left;
+}
+
+.link-detail-description img {
+     clear: both;
+     max-width: 100%;
+     height: auto;
+     float: right;
+}
+
 .highlight_background {
 }
 

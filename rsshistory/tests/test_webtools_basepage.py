@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.utils import timezone
 from django.urls import reverse
 
-from ..webtools import BasePage
+from ..webtools import BasePage, InputContent
 from .utilities import WebPageDisabled
 
 
@@ -134,16 +134,19 @@ class BasePageTest(WebPageDisabled, TestCase):
         self.assertEqual(url, "http://mytestpage.com/test/images/facebook.com")
 
     def test_get_url_full_normal_join_both_slashes(self):
+        """
+        slash in the link means that it is against the domain, not the current position.
+        """
         url = BasePage.get_url_full(
             "http://mytestpage.com/test/", "/images/facebook.com"
         )
-        self.assertEqual(url, "http://mytestpage.com/test/images/facebook.com")
+        self.assertEqual(url, "http://mytestpage.com/images/facebook.com")
 
     def test_get_url_full_path(self):
         url = BasePage.get_url_full(
             "http://mytestpage.com/test/", "/images/facebook.com"
         )
-        self.assertEqual(url, "http://mytestpage.com/test/images/facebook.com")
+        self.assertEqual(url, "http://mytestpage.com/images/facebook.com")
 
     def test_get_url_full_double_path(self):
         url = BasePage.get_url_full(
@@ -162,3 +165,43 @@ class BasePageTest(WebPageDisabled, TestCase):
             "http://mytestpage.com/test/", "https://images/facebook.com"
         )
         self.assertEqual(url, "https://images/facebook.com")
+
+
+class InputContentTest(WebPageDisabled, TestCase):
+    def setUp(self):
+        self.disable_web_pages()
+
+    def test_htmlify_two_normal_links(self):
+
+        content = '''this is <a href="https://first-link.com">First Link</a>
+        this is <a href="https://second-link.com">Second Link</a>'''
+
+        c = InputContent(content)
+        result = c.htmlify()
+        self.assertEqual(result, content)
+
+    def test_htmlify_pure_links(self):
+
+        content = '''this is https://first-link.com
+        this is https://second-link.com'''
+
+        c = InputContent(content)
+        result = c.htmlify()
+
+        expected_result = '''this is <a href="https://first-link.com">https://first-link.com</a>
+        this is <a href="https://second-link.com">https://second-link.com</a>'''
+
+        self.assertEqual(result, expected_result)
+
+    def test_htmlify_removes_attrs(self):
+
+        content = '''this is <a href="https://first-link.com" style="clear:both">First Link</a>
+        this is <a href="https://second-link.com" style="display:flex">Second Link</a>'''
+
+        c = InputContent(content)
+        result = c.htmlify()
+
+        expected_result = '''this is <a href="https://first-link.com">First Link</a>
+        this is <a href="https://second-link.com">Second Link</a>'''
+
+        self.assertEqual(result, expected_result)

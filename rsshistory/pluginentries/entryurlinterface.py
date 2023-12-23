@@ -1,4 +1,4 @@
-from ..webtools import HtmlPage, RssPage
+from ..webtools import HtmlPage, RssPage, BasePage, Url
 from ..dateutils import DateUtils
 from ..controllers import SourceDataController
 
@@ -26,6 +26,8 @@ class EntryUrlInterface(object):
         if self.url.endswith("/"):
             self.url = self.url[:-1]
 
+        self.p = Url.get(self.url)
+
     def get_props(self, input_props=None, source_obj=None):
         if not input_props:
             input_props = {}
@@ -36,6 +38,12 @@ class EntryUrlInterface(object):
             if "description" in props and props["description"]:
                 # TODO change hardcoded limit
                 props["description"] = props["description"][:900]
+
+            if self.p.is_domain() and ("thumbnail" not in props or props["thumbnail"] == None):
+                if "favicons" in props:
+                    favicons = props["favicons"]
+                    if favicons and len(favicons) > 0:
+                        props["thumbnail"] = favicons[0][0]
 
         # TODO
         # if "source" not in input_props:
@@ -48,13 +56,11 @@ class EntryUrlInterface(object):
         if not input_props:
             input_props = {}
 
-        p = HtmlPage(self.url)
-
         if "source" not in input_props:
             if source_obj:
                 input_props["source"] = source_obj.url
 
-        if p.is_domain():
+        if self.p.is_domain():
             input_props["permanent"] = True
             input_props["bookmarked"] = False
 
@@ -64,15 +70,14 @@ class EntryUrlInterface(object):
         if "source" not in input_props and source_obj:
             input_props["source"] = source_obj.url
 
-        h = UrlHandler.get(self.url)
-        if type(h) is UrlHandler.youtube_video_handler:
+        if type(self.p) is UrlHandler.youtube_video_handler:
             if h.get_video_code():
                 return self.get_youtube_props(input_props)
 
-        if p.is_html():
+        if self.p.is_html():
             return self.get_htmlpage_props(input_props, source_obj)
 
-        if p.is_rss():
+        if self.p.is_rss():
             return self.get_rsspage_props(input_props, source_obj)
 
         # TODO provide RSS support
@@ -83,14 +88,13 @@ class EntryUrlInterface(object):
 
         url = self.url
 
-        h = UrlHandler.get(self.url)
-        if type(h) is UrlHandler.youtube_video_handler:
-            if not h.download_details():
+        if type(self.p) is UrlHandler.youtube_video_handler:
+            if not self.p.download_details():
                 raise YouTubeException(
                     "Could not obtain details for link:{}".format(url)
                 )
 
-        source_url = h.get_channel_feed_url()
+        source_url = self.p.get_channel_feed_url()
         if source_url is None:
             raise YouTubeException(
                 "Could not obtain channel feed url:{}".format(source_url)
@@ -101,19 +105,19 @@ class EntryUrlInterface(object):
             source_obj = sources[0]
 
         if "link" not in input_props:
-            input_props["link"] = h.get_link_url()
+            input_props["link"] = self.p.get_link_url()
         if "title" not in input_props:
-            input_props["title"] = h.get_title()
+            input_props["title"] = self.p.get_title()
         if "description" not in input_props:
-            input_props["description"] = h.get_description()
+            input_props["description"] = self.p.get_description()
         if "date_published" not in input_props:
-            input_props["date_published"] = h.get_datetime_published()
+            input_props["date_published"] = self.p.get_datetime_published()
         if "thumbnail" not in input_props:
-            input_props["thumbnail"] = h.get_thumbnail()
+            input_props["thumbnail"] = self.p.get_thumbnail()
         if "artist" not in input_props:
-            input_props["artist"] = h.get_channel_name()
+            input_props["artist"] = self.p.get_channel_name()
         if "album" not in input_props:
-            input_props["album"] = h.get_channel_name()
+            input_props["album"] = self.p.get_channel_name()
 
         if "language" not in input_props and source_obj:
             input_props["language"] = source_obj.language
@@ -132,7 +136,7 @@ class EntryUrlInterface(object):
         if url.startswith("http://"):
             url = url.replace("http://", "https://")
 
-        p = HtmlPage(url)
+        p = self.p
 
         # some pages return invalid code / information. let the user decide
         # what to do about it
@@ -186,7 +190,7 @@ class EntryUrlInterface(object):
         if url.startswith("http://"):
             url = url.replace("http://", "https://")
 
-        link_page = RssPage(url)
+        link_page = self.p
 
         if not link_page.is_valid():
             LinkDatabase.info("RSS page is invalid:{}".format(url))
@@ -225,7 +229,7 @@ class EntryUrlInterface(object):
             input_props = {}
 
         url = self.url
-        p = HtmlPage(url)
+        p = self.p
 
         if not p.is_valid():
             LinkDatabase.info("HTML page is invalid:{}".format(url))

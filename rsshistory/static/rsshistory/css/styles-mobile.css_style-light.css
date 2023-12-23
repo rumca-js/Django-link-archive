@@ -55,6 +55,20 @@ hr {
     padding: 0px;
 }
 
+.link-detail-thumbnail {
+     clear: both;
+     max-width: 100%;
+     height: auto;
+     float: left;
+}
+
+.link-detail-description img {
+     clear: both;
+     max-width: 100%;
+     height: auto;
+     float: right;
+}
+
 .link-list a:link, .link-list a:visited, .link-list a:active {
 }
 

@@ -41,14 +41,13 @@ def entry_add_comment(request, link_id):
         # create a form instance and populate it with data from the request:
         form = CommentEntryForm(request.POST)
         if form.is_valid():
-            LinkCommentDataController.save_comment(form.cleaned_data)
-
-            return HttpResponseRedirect(
-                reverse(
-                    "{}:entry-detail".format(LinkDatabase.name),
-                    kwargs={"pk": link.pk},
+            if LinkCommentDataController.save_comment(form.cleaned_data):
+                return HttpResponseRedirect(
+                    reverse(
+                        "{}:entry-detail".format(LinkDatabase.name),
+                        kwargs={"pk": link.pk},
+                    )
                 )
-            )
 
         p.context["summary_text"] = "Could not add a comment"
         return p.render("summary_present.html")

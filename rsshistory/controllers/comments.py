@@ -43,9 +43,19 @@ class LinkCommentDataController(LinkCommentDataModel):
     def save_comment(data):
         entry = LinkDataController.objects.get(id=data["link_id"])
 
-        LinkCommentDataModel.objects.create(
+        if LinkDataController.is_html_contents(data["comment"]):
+            return
+
+        return LinkCommentDataModel.objects.create(
             author=data["author"],
             comment=data["comment"],
             date_published=data["date_published"],
             link_obj=entry,
         )
+
+    def is_html_contents(text):
+        from bs4 import BeautifulSoup
+
+        soup = BeautifulSoup(text, 'html.parser')
+        tags = soup.find_all()
+        return len(tags) > 0

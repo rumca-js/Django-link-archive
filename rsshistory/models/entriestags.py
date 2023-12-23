@@ -138,3 +138,8 @@ class LinkCommentDataModel(models.Model):
         null=True,
         blank=True,
     )
+
+    def get_comment(self):
+        from ..webtools import InputContent
+
+        return InputContent(self.comment).htmlify()

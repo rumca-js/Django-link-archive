@@ -44,6 +44,20 @@ URL_TYPE_HTML = "html"
 URL_TYPE_UNKNOWN = "unknown"
 
 
+def lazy_load_content(func):
+    """
+    Lazy load for functions.
+    We do not want page contents during construction.
+    We want it only when necessary.
+    """
+    def wrapper(self, *args, **kwargs):
+        if not self.contents:
+            self.contents = self.get_contents()
+        return func(self, *args, **kwargs)
+
+    return wrapper
+
+
 class BasePage(object):
     """
     Should not contain any HTML/RSS content processing
@@ -310,6 +324,7 @@ class BasePage(object):
             if url.startswith("//"):
                 ready_url = "https:" + url
             elif url.startswith("/"):
+                domain = BasePage(domain).get_domain()
                 if not domain.endswith("/"):
                     domain = domain + "/"
                 if url.startswith("/"):
@@ -461,10 +476,8 @@ class DomainAwarePage(BasePage):
         if self.is_contents_rss():
             return URL_TYPE_RSS
 
+    @lazy_load_content
     def is_contents_html(self):
-        if not self.contents:
-            self.contents = self.get_contents()
-
         if not self.contents:
             LinkDatabase.info("Could not obtain contents for {}".format(self.url))
             return
@@ -476,24 +489,23 @@ class DomainAwarePage(BasePage):
         if self.contents.find("<body") >= 0:
             return True
 
+    @lazy_load_content
     def is_contents_rss(self):
-        contents = self.get_contents()
-
         if not self.contents:
             LinkDatabase.info("Could not obtain contents for {}".format(self.url))
             return
 
         if (
-            contents.find("<channel>") >= 0
-            and contents.find("<title>") >= 0
-            and contents.find("<item>") >= 0
+            self.contents.find("<channel>") >= 0
+            and self.contents.find("<title>") >= 0
+            and self.contents.find("<item>") >= 0
         ):
             return True
 
         try:
             import feedparser
 
-            feed = feedparser.parse(contents)
+            feed = feedparser.parse(self.contents)
             if len(feed.entries) > 0:
                 return True
             return False
@@ -584,9 +596,10 @@ class RssPage(ContentInterface):
         self.default_entry_timestamp = None
         self.feed = None
 
+    @lazy_load_content
     def parse(self):
         try:
-            contents = self.get_contents()
+            contents = self.contents
 
             if contents is None:
                 return None
@@ -927,10 +940,8 @@ class HtmlPage(ContentInterface):
         if self.contents:
             self.soup = BeautifulSoup(self.contents, "html.parser")
 
+    @lazy_load_content
     def get_language(self):
-        if not self.contents:
-            self.contents = self.get_contents()
-
         if not self.contents:
             return ""
 
@@ -940,10 +951,8 @@ class HtmlPage(ContentInterface):
 
         return ""
 
+    @lazy_load_content
     def get_title_meta(self):
-        if not self.contents:
-            self.contents = self.get_contents()
-
         if not self.contents:
             return None
 
@@ -955,10 +964,8 @@ class HtmlPage(ContentInterface):
 
         return title
 
+    @lazy_load_content
     def get_og_field(self, name):
-        if not self.contents:
-            self.contents = self.get_contents()
-
         if not self.contents:
             return None
 
@@ -970,10 +977,8 @@ class HtmlPage(ContentInterface):
 
         return field
 
+    @lazy_load_content
     def get_title(self):
-        if not self.contents:
-            self.contents = self.get_contents()
-
         if not self.contents:
             return None
 
@@ -996,10 +1001,8 @@ class HtmlPage(ContentInterface):
         return title
         # title = html.unescape(title)
 
+    @lazy_load_content
     def get_charset(self):
-        if not self.contents:
-            self.contents = self.get_contents()
-
         if not self.contents:
             return None
 
@@ -1010,10 +1013,8 @@ class HtmlPage(ContentInterface):
             if "charset" in meta.attrs:
                 return meta.attrs["charset"]
 
+    @lazy_load_content
     def get_description_meta(self):
-        if not self.contents:
-            self.contents = self.get_contents()
-
         if not self.contents:
             return None
 
@@ -1025,10 +1026,8 @@ class HtmlPage(ContentInterface):
 
         return description
 
+    @lazy_load_content
     def get_author(self):
-        if not self.contents:
-            self.contents = self.get_contents()
-
         if not self.contents:
             return None
 
@@ -1043,10 +1042,8 @@ class HtmlPage(ContentInterface):
     def get_album(self):
         return None
 
+    @lazy_load_content
     def get_thumbnail(self):
-        if not self.contents:
-            self.contents = self.get_contents()
-
         if not self.contents:
             return None
 
@@ -1057,10 +1054,8 @@ class HtmlPage(ContentInterface):
 
         return image
 
+    @lazy_load_content
     def get_favicons(self, recursive=False):
-        if not self.contents:
-            self.contents = self.get_contents()
-
         if not self.contents:
             return []
 
@@ -1094,10 +1089,8 @@ class HtmlPage(ContentInterface):
 
         return favicons
 
+    @lazy_load_content
     def get_tags(self):
-        if not self.contents:
-            self.contents = self.get_contents()
-
         if not self.contents:
             return None
 
@@ -1109,10 +1102,8 @@ class HtmlPage(ContentInterface):
 
         return keywords
 
+    @lazy_load_content
     def get_description(self):
-        if not self.contents:
-            self.contents = self.get_contents()
-
         if not self.contents:
             return None
 
@@ -1146,10 +1137,8 @@ class HtmlPage(ContentInterface):
         if urls and len(urls) > 0:
             return urls[0]
 
+    @lazy_load_content
     def get_rss_urls(self, full_check=False):
-        if not self.contents:
-            self.contents = self.get_contents()
-
         if not self.contents:
             return []
 
@@ -1189,20 +1178,23 @@ class HtmlPage(ContentInterface):
             return rss_urls
         return []
 
+    @lazy_load_content
     def get_links(self):
-        p = ContentLinkParser(self.url, self.get_contents())
+        p = ContentLinkParser(self.url, self.contents)
         links = p.get_links()
         links = ContentLinkParser.filter_link_html(links)
         return links
 
+    @lazy_load_content
     def get_links_inner(self):
-        p = ContentLinkParser(self.url, self.get_contents())
+        p = ContentLinkParser(self.url, self.contents)
         links = p.get_links()
         links = ContentLinkParser.filter_link_html(links)
         return ContentLinkParser.filter_link_in_domain(links, self.get_domain())
 
+    @lazy_load_content
     def get_links_outer(self):
-        p = ContentLinkParser(self.url, self.get_contents())
+        p = ContentLinkParser(self.url, self.contents)
         links = p.get_links()
         links = ContentLinkParser.filter_link_html(links)
         in_domain = ContentLinkParser.filter_link_in_domain(
@@ -1210,8 +1202,9 @@ class HtmlPage(ContentInterface):
         )
         return links - in_domain
 
+    @lazy_load_content
     def get_domains(self):
-        p = ContentLinkParser(self.url, self.get_contents())
+        p = ContentLinkParser(self.url, self.contents)
         links = p.get_links()
         links = ContentLinkParser.filter_domains(links)
         return links
@@ -1228,6 +1221,7 @@ class HtmlPage(ContentInterface):
         wget = Wget(self.url)
         wget.download_all()
 
+    @lazy_load_content
     def get_properties(self):
         props = super().get_properties()
 
@@ -1385,3 +1379,73 @@ class Url(object):
                 favs = page.get_favicons()
                 if favs and len(favs) > 0:
                     return favs[0][0]
+
+
+class InputContent(object):
+
+    def __init__(self, text):
+        self.text = text
+
+    def htmlify(self):
+        """
+        Use iterative approach. There is one thing to keep in mind:
+         - text can contain <a href=" links already
+        
+        So some links needs to be translated. Some do not.
+        """
+        self.text = self.strip_html_attributes()
+        self.text = self.linkify("https://")
+        self.text = self.linkify("http://")
+        return self.text
+
+    def strip_html_attributes(self):
+        from bs4 import BeautifulSoup
+        soup = BeautifulSoup(self.text, 'html.parser')
+
+        for tag in soup.find_all(True):
+            if tag.name == 'a':
+                # Preserve "href" attribute for anchor tags
+                tag.attrs = {'href': tag.get('href')}
+            elif tag.name == 'img':
+                # Preserve "src" attribute for image tags
+                tag.attrs = {'src': tag.get('src')}
+            else:
+                # Remove all other attributes
+                tag.attrs = {}
+
+        self.text = str(soup)
+        return self.text
+
+    def linkify(self, protocol="https://"):
+        if self.text.find(protocol) == -1:
+            return self.text
+
+        import re
+
+        result = ""
+        i = 0
+
+        while i < len(self.text):
+            pattern = r'{}\S+(?![\w.])'.format(protocol)
+            match = re.match(pattern, self.text[i:])
+            if match:
+                url = match.group()
+                # Check the previous 10 characters
+                preceding_chars = self.text[max(0, i - 10):i]
+
+                # We do not care who write links using different char order
+                if ('<a href="' not in preceding_chars and
+                   '<img' not in preceding_chars):
+                    result += f'<a href="{url}">{url}</a>'
+                else:
+                    result += url
+                i += len(url)
+            else:
+                result += self.text[i]
+                i += 1
+
+        self.text = result
+
+        return result
+
+

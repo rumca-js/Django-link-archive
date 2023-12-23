@@ -334,26 +334,22 @@ class EntryGenericPlugin(object):
         return parameters
 
     def get_frame_html(self):
+        thumbnail = self.entry.get_thumbnail()
+        if thumbnail:
+            frame_text = """
+            <div>
+                <img src="{}" class="link-detail-thumbnail"/>
+            </div>"""
+
+            frame_text = frame_text.format(self.entry.get_thumbnail())
+            return frame_text
         return ""
 
     def get_description_html(self):
         description = self.entry.description
+        if not description or description == "":
+            return ""
 
-        return """{}""".format(self.htmlify(description))
+        from ..webtools import InputContent
 
-    def htmlify(self, description):
-        import re
-
-        # inside = 0
-        # for index, letter in enumerate(description):
-        #    if letter == "<":
-        #        inside += 1
-        #    if letter == ">":
-        #        inside -= 1
-
-        #    if description[index:index+4] == "http":
-        #        links = re.findall("(https?://[a-zA-Z0-9./\-_]+)", description)
-        #        for link in links:
-        #            description = description.replace(link, '<a href="{}">{}</a>'.format(link, link))
-
-        return description
+        return """{}""".format(InputContent(description).htmlify())

@@ -194,6 +194,7 @@ class YouTubeVideoHandler(DefaultUrlHandler):
         youtube_props["valid"] = self.is_valid()
         youtube_props["channel_feed_url"] = self.get_channel_feed_url()
         youtube_props["contents"] = self.get_json_text()
+        youtube_props["keywords"] = self.get_tags()
 
         return youtube_props
 

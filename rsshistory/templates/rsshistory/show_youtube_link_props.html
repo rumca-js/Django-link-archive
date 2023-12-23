@@ -27,10 +27,11 @@
     <li>Upload date: {{upload_date}}</li>
     <li>Duration: {{duration}}</li>
     <li>Valid: {{valid}}</li>
+    <li>Keywords: {{keywords}}</li>
 </ul>
 
-<h1>Icon</h1>
 {% if user_config.show_icons %}
+<h1>Icon</h1>
     {%if thumbnail %}
     <img src="{{thumbnail}}" style="max-width: 50%"/>
     {%endif%}
