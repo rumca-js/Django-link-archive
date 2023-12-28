@@ -61,10 +61,10 @@ class YouTubeVideoHandler(DefaultUrlHandler):
             return None
 
     def get_link_classic(self):
-        return "https://www.youtube.com?v={0}".format(self.get_video_code())
+        return "https://www.youtube.com/watch?v={0}".format(self.get_video_code())
 
     def get_link_mobile(self):
-        return "https://www.m.youtube.com?v={0}".format(self.get_video_code())
+        return "https://www.m.youtube.com/watch?v={0}".format(self.get_video_code())
 
     def get_link_youtu_be(self):
         return "https://youtu.be/{0}".format(self.get_video_code())

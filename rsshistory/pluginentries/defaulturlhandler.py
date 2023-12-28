@@ -74,3 +74,15 @@ class DefaultUrlHandler(object):
         props["date_published"] = self.get_published_date()
 
         return props
+
+    def is_html(self):
+        url = Url.get(self.url)
+        return url.is_html()
+
+    def is_rss(self):
+        url = Url.get(self.url)
+        return url.is_rss()
+
+    def is_domain(self):
+        url = Url.get(self.url)
+        return url.is_domain()

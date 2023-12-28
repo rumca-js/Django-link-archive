@@ -512,7 +512,10 @@ class ProcessSourceHandlerTest(WebPageDisabled, TestCase):
         ob = BackgroundJobController.objects.create(job = BackgroundJob.JOB_PROCESS_SOURCE, subject="https://manually-added-link.com")
 
         handler = ProcessSourceJobHandler()
-        handler.process(ob)
+        # call tested function
+        result = handler.process(ob)
+
+        self.assertEqual(result, True)
 
         persistent_objects = PersistentInfo.objects.all()
 
@@ -531,12 +534,15 @@ class ProcessSourceHandlerTest(WebPageDisabled, TestCase):
         LinkDataController.objects.all().delete()
         DomainsController.objects.all().delete()
         SourceDataController.objects.all().delete()
-        SourceDataController.objects.create(url = "https://manually-added-link.com")
+        SourceDataController.objects.create(url = "https://www.youtube.com/feeds/channel=samtime")
 
-        ob = BackgroundJobController.objects.create(job = BackgroundJob.JOB_PROCESS_SOURCE, subject="https://manually-added-link.com")
+        ob = BackgroundJobController.objects.create(job = BackgroundJob.JOB_PROCESS_SOURCE, subject="https://www.youtube.com/feeds/channel=samtime")
 
         handler = ProcessSourceJobHandler()
-        handler.process(ob)
+        # call tested function
+        result = handler.process(ob)
+
+        self.assertEqual(result, True)
 
         persistent_objects = PersistentInfo.objects.all()
 
