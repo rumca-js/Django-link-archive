@@ -3,6 +3,7 @@ from django.utils import timezone
 from django.urls import reverse
 
 from ..webtools import RssPage
+from .utilities import WebPageDisabled
 
 
 webpage_rss = """
@@ -43,7 +44,11 @@ webpage_rss = """
 """
 
 
-class RssPageTest(TestCase):
+class RssPageTest(WebPageDisabled, TestCase):
+
+    def setUp(self):
+        self.disable_web_pages()
+
     def test_rss_title(self):
         # default language
         reader = RssPage("http://test.com/my-site-test", webpage_rss)
@@ -86,3 +91,51 @@ class RssPageTest(TestCase):
         entry = entries[0]
         self.assertEqual(entry["title"], "First entry title")
         self.assertEqual(entry["description"], "First entry description")
+
+    def test_rss_entries(self):
+        # default language
+        reader = RssPage("http://test.com/my-site-test", webpage_rss)
+        entries = reader.parse_and_process()
+        self.assertEqual(len(entries), 15)
+
+        entry = entries[0]
+        self.assertEqual(entry["title"], "First entry title")
+        self.assertEqual(entry["description"], "First entry description")
+
+    def test_rss_entry_old_date(self):
+        # default language
+        reader = RssPage("https://youtube.com/channel/2020-year-channel/rss.xml")
+        entries = reader.parse_and_process()
+        self.assertEqual(len(entries), 1)
+
+        entry = entries[0]
+        self.assertEqual(entry["title"], "First entry title")
+        self.assertEqual(entry["description"], "First entry description")
+        self.assertEqual(entry["date_published"].year, 2020)
+
+    def test_rss_entry_no_date(self):
+        # default language
+        reader = RssPage("https://youtube.com/channel/no-pubdate-channel/rss.xml")
+        entries = reader.parse_and_process()
+        self.assertEqual(len(entries), 1)
+
+        entry = entries[0]
+        self.assertEqual(entry["title"], "First entry title")
+        self.assertEqual(entry["description"], "First entry description")
+        self.assertEqual(entry["date_published"].year, 2023)
+
+    """
+    feeder does not parses update time
+    def test_rss_old_pubdate(self):
+        url = RssPage("https://youtube.com/channel/2020-year-channel/rss.xml")
+        date = url.get_date_published()
+
+        self.assertTrue(date)
+        self.assertEqual(date.year, 2020)
+
+    def test_rss_no_pubdate(self):
+        url = RssPage("https://youtube.com/channel/no-pubdate-channel/rss.xml")
+        date = url.get_date_published()
+
+        self.assertTrue(not date)
+    """

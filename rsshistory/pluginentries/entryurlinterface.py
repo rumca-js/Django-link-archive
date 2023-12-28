@@ -26,7 +26,7 @@ class EntryUrlInterface(object):
         if self.url.endswith("/"):
             self.url = self.url[:-1]
 
-        self.p = Url.get(self.url)
+        self.p = UrlHandler.get(self.url)
 
     def get_props(self, input_props=None, source_obj=None):
         if not input_props:
@@ -39,7 +39,8 @@ class EntryUrlInterface(object):
                 # TODO change hardcoded limit
                 props["description"] = props["description"][:900]
 
-            if self.p.is_domain() and ("thumbnail" not in props or props["thumbnail"] == None):
+            is_domain = BasePage(self.url).is_domain()
+            if is_domain and ("thumbnail" not in props or props["thumbnail"] == None):
                 if "favicons" in props:
                     favicons = props["favicons"]
                     if favicons and len(favicons) > 0:
@@ -60,7 +61,10 @@ class EntryUrlInterface(object):
             if source_obj:
                 input_props["source"] = source_obj.url
 
-        if self.p.is_domain():
+        is_domain = BasePage(self.url).is_domain()
+        p = self.p
+
+        if is_domain:
             input_props["permanent"] = True
             input_props["bookmarked"] = False
 
@@ -70,14 +74,14 @@ class EntryUrlInterface(object):
         if "source" not in input_props and source_obj:
             input_props["source"] = source_obj.url
 
-        if type(self.p) is UrlHandler.youtube_video_handler:
-            if h.get_video_code():
+        if type(p) is UrlHandler.youtube_video_handler:
+            if p.get_video_code():
                 return self.get_youtube_props(input_props)
 
-        if self.p.is_html():
+        if p.is_html():
             return self.get_htmlpage_props(input_props, source_obj)
 
-        if self.p.is_rss():
+        if p.is_rss():
             return self.get_rsspage_props(input_props, source_obj)
 
         # TODO provide RSS support
@@ -88,13 +92,15 @@ class EntryUrlInterface(object):
 
         url = self.url
 
-        if type(self.p) is UrlHandler.youtube_video_handler:
-            if not self.p.download_details():
+        p = self.p
+
+        if type(p) is UrlHandler.youtube_video_handler:
+            if not p.download_details():
                 raise YouTubeException(
                     "Could not obtain details for link:{}".format(url)
                 )
 
-        source_url = self.p.get_channel_feed_url()
+        source_url = p.get_channel_feed_url()
         if source_url is None:
             raise YouTubeException(
                 "Could not obtain channel feed url:{}".format(source_url)
@@ -104,20 +110,22 @@ class EntryUrlInterface(object):
         if sources.exists():
             source_obj = sources[0]
 
-        if "link" not in input_props:
-            input_props["link"] = self.p.get_link_url()
+        # always use classic link format in storage
+        print("changin link:{} to {}".format(self.url, p.get_link_classic()))
+        input_props["link"] = p.get_link_classic()
+
         if "title" not in input_props:
-            input_props["title"] = self.p.get_title()
+            input_props["title"] = p.get_title()
         if "description" not in input_props:
-            input_props["description"] = self.p.get_description()
+            input_props["description"] = p.get_description()
         if "date_published" not in input_props:
-            input_props["date_published"] = self.p.get_datetime_published()
+            input_props["date_published"] = p.get_datetime_published()
         if "thumbnail" not in input_props:
-            input_props["thumbnail"] = self.p.get_thumbnail()
+            input_props["thumbnail"] = p.get_thumbnail()
         if "artist" not in input_props:
-            input_props["artist"] = self.p.get_channel_name()
+            input_props["artist"] = p.get_channel_name()
         if "album" not in input_props:
-            input_props["album"] = self.p.get_channel_name()
+            input_props["album"] = p.get_channel_name()
 
         if "language" not in input_props and source_obj:
             input_props["language"] = source_obj.language
@@ -190,37 +198,41 @@ class EntryUrlInterface(object):
         if url.startswith("http://"):
             url = url.replace("http://", "https://")
 
-        link_page = self.p
+        p = self.p
 
-        if not link_page.is_valid():
+        if not p.is_valid():
             LinkDatabase.info("RSS page is invalid:{}".format(url))
             return
 
         if "link" not in input_props:
-            input_props["link"] = link_page.url
+            input_props["link"] = p.url
         if "title" not in input_props:
-            title = link_page.get_title()
+            title = p.get_title()
             input_props["title"] = title
         if "description" not in input_props:
-            description = link_page.get_description()
+            description = p.get_description()
             if description is None:
                 description = title
             input_props["description"] = description
 
         if "language" not in input_props:
-            language = link_page.get_language()
+            language = p.get_language()
             if not language:
                 if source_obj:
                     language = source_obj.language
             input_props["language"] = language
 
         if "date_published" not in input_props:
-            input_props["date_published"] = DateUtils.get_datetime_now_utc()
+            date = p.get_date_published()
+            if date:
+                input_props["date_published"] = date
+            else:
+                input_props["date_published"] = DateUtils.get_datetime_now_utc()
 
         if "thumbnail" not in input_props:
-            input_props["thumbnail"] = link_page.get_thumbnail()
+            input_props["thumbnail"] = p.get_thumbnail()
 
-        input_props["page_rating_contents"] = link_page.get_page_rating()
+        input_props["page_rating_contents"] = p.get_page_rating()
 
         return input_props
 
@@ -269,11 +281,14 @@ class UrlHandler(object):
 
     def get(url):
         url = UrlHandler.get_protololless(url)
+        if not url:
+            return
 
         if (
             url.startswith("www.youtube.com/watch")
             or url.startswith("youtube.com/watch")
             or url.startswith("m.youtube.com/watch")
+            or url.startswith("youtu.be")
         ):
             return UrlHandler.youtube_video_handler(url)
         if (

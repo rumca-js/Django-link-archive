@@ -8,14 +8,18 @@ class CodeProjectPlugin(BaseRssPlugin):
         super().__init__(source_id)
         self.allow_adding_with_current_time = True
 
-    def get_feed_entry_map(self, source, feed_entry):
-        output_map = BaseRssPlugin.get_feed_entry_map(self, source, feed_entry)
+    def enhance(self, props):
+        feed_entry = props["feed_entry"]
+        props = BaseRssPlugin.enhance(self, props)
 
         if "href" in feed_entry.source:
-            output_map["link"] = feed_entry.source["href"]
-            if output_map["link"].strip() == "":
-                output_map["link"] = feed_entry.link
+            props["link"] = feed_entry.source["href"]
+            if props["link"].strip() == "":
+                props["link"] = feed_entry.link
         else:
-            output_map["link"] = feed_entry.link
+            props["link"] = feed_entry.link
 
-        return output_map
+        if props["link"].endswith("/"):
+            props["link"] = props["link"][:-1]
+
+        return props

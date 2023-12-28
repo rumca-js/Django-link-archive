@@ -351,6 +351,8 @@ class LinkDataHyperController(object):
     def add_new_link_internal(link_data, source_is_auto=False):
         obj = None
 
+        link_data = LinkDataHyperController.get_clean_link_data(link_data)
+
         c = Configuration.get_object().config_entry
         if (
             LinkDataHyperController.is_domain_link_data(link_data)
@@ -374,6 +376,16 @@ class LinkDataHyperController(object):
         LinkDataHyperController.add_addition_link_data(link_data)
 
         return obj
+
+    def get_clean_link_data(props):
+        result = {}
+        test = LinkDataController() # create fake controller, to obtain only necessary fields
+
+        for key in props:
+            if hasattr(test, key):
+                result[key] = props[key]
+
+        return result
 
     def is_domain_link_data(link_data):
         p = BasePage(link_data["link"])
@@ -465,12 +477,13 @@ class LinkDataHyperController(object):
     def is_live_video(link_data):
         from ..pluginentries.entryurlinterface import UrlHandler
 
-        handler = UrlHandler.get(link_data["link"])
-        if type(handler) is UrlHandler.youtube_video_handler:
-            if handler.get_video_code():
-                handler.download_details()
-                if not handler.is_valid():
-                    return True
+        if "link" in link_data and link_data["link"]:
+            handler = UrlHandler.get(link_data["link"])
+            if type(handler) is UrlHandler.youtube_video_handler:
+                if handler.get_video_code():
+                    handler.download_details()
+                    if not handler.is_valid():
+                        return True
 
         return False
 

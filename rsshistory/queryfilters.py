@@ -153,7 +153,7 @@ class SourceFilter(BaseQueryFilter):
         return Q(**args)
 
     def get_filter_args_map_keys(self):
-        return ["category", "subcategory", "title"]
+        return ["category", "subcategory", "title", "url"]
 
     def get_model_pagination(self):
         from .viewspkg.viewsources import RssSourceListView

@@ -31,9 +31,7 @@ class SourceControllerBuilder(object):
 
         sources = SourceDataModel.objects.filter(url=source_url)
         if len(sources) == 0:
-            raise NotImplementedError(
-                "Source URL: {}: No such source".format(source_url)
-            )
+            return None
 
         source = sources[0]
         # database operations should be short lived. we do not pass source object.

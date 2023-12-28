@@ -41,6 +41,7 @@
         <img src="{% static 'rsshistory/icons/icons8-update-100.png' %}" class="content-icon" />
     </a>
     <a href="{% url 'rsshistory:source-fix-entries' object.id %}" class="simplebutton" title="Fixes entries for source, objects relationships, langauge">Fix entries</a>
+    <a href="{% url 'rsshistory:show-page-props' %}?page={{object.url}}" class="simplebutton" title="Page properties">Page properties</a>
     {% if handler.is_youtube %}
         <a href="{% url 'rsshistory:source-import-yt-links' object.id %}" class="simplebutton">Fetch all videos</a>
     {% endif %}

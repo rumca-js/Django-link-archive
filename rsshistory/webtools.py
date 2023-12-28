@@ -81,11 +81,12 @@ class BasePage(object):
         self.contents = contents
         if self.contents:
             self.process_contents()
+            self.status_code = 200
+        else:
+            self.status_code = 0
 
         # Flag to not retry same contents requests for things we already know are dead
         self.dead = False
-
-        self.status_code = 0
 
         if BasePage.get_contents_function is None:
             self.get_contents_function = self.get_contents_internal
@@ -97,10 +98,8 @@ class BasePage(object):
     def process_contents(self):
         pass
 
+    @lazy_load_content
     def is_valid(self):
-        if not self.contents:
-            self.contents = self.get_contents()
-
         if not self.contents:
             return False
 
@@ -118,11 +117,18 @@ class BasePage(object):
     def get_robots_txt_url(self):
         return self.get_domain() + "/robots.txt"
 
+    def get_robots_txt_contents(self):
+        if self.robots_contents:
+            return self.robots_contents
+
+        robots_url = self.get_robots_txt_url()
+        p = BasePage(robots_url)
+        self.robots_contents = p.get_contents()
+
+        return self.robots_contents
+
     def is_robots_txt(self):
-        robots_file = self.get_robots_txt_url()
-        p = BasePage(robots_file)
-        if p.get_contents() != None:
-            return True
+        return self.get_robots_txt_contents()
 
     def get_robots_txt_obj(self):
         """
@@ -141,8 +147,7 @@ class BasePage(object):
         """
         result = set()
 
-        p = HtmlPage(self.get_robots_txt_url())
-        contents = p.get_contents()
+        contents = self.get_robots_txt_contents()
         if contents:
             lines = contents.split("\n")
             for line in lines:
@@ -157,6 +162,7 @@ class BasePage(object):
         return list(result)
 
     def is_status_ok(self):
+        print("Status:{}".format(self.status_code))
         if self.status_code == 0:
             return False
 
@@ -448,6 +454,9 @@ class DomainAwarePage(BasePage):
         if ext.lower() == "xml":
             return self.get_type_by_checking_contents()
 
+        if ext.lower() == "aspx":
+            return self.get_type_by_checking_contents()
+
         return URL_TYPE_UNKNOWN
 
     def get_type_by_ext(self):
@@ -459,8 +468,8 @@ class DomainAwarePage(BasePage):
             "js": URL_TYPE_JAVASCRIPT,
             "html": URL_TYPE_HTML,
             "htm": URL_TYPE_HTML,
-            "php": URL_TYPE_HTML,
-            "aspx": URL_TYPE_HTML,
+            #"php": URL_TYPE_HTML,    seen in the wild, where dynamic pages were used to generate RSS :(
+            #"aspx": URL_TYPE_HTML,
         }
 
         ext = self.get_page_ext()
@@ -582,6 +591,9 @@ class DefaultContentPage(ContentInterface):
     def get_tags(self):
         return None
 
+    def get_page_rating(self):
+        return 0
+
 
 class RssPage(ContentInterface):
     """
@@ -662,6 +674,7 @@ class RssPage(ContentInterface):
         output_map["artist"] = self.get_author()
         output_map["album"] = ""
         output_map["bookmarked"] = False
+        output_map["feed_entry"] = feed_entry
 
         from .dateutils import DateUtils
 
@@ -729,6 +742,9 @@ class RssPage(ContentInterface):
         if "subtitle" in self.feed.feed:
             return self.feed.feed.subtitle
 
+        if "description" in self.feed.feed:
+            return self.feed.feed.description
+
     def get_language(self):
         if self.feed is None:
             self.parse()
@@ -775,6 +791,13 @@ class RssPage(ContentInterface):
     def get_album(self):
         return None
 
+    def get_date_published(self):
+        if self.feed is None:
+            self.parse()
+
+        if "published" in self.feed.feed:
+            return self.feed.feed.published
+
     def get_page_rating(self):
         rating = 0
 
@@ -793,6 +816,11 @@ class RssPage(ContentInterface):
 
     def get_tags(self):
         return None
+
+    def get_properties(self):
+        props = ContentInterface.get_properties(self)
+        props["contents"] = self.get_contents()
+        return props
 
 
 class ContentLinkParser(BasePage):
@@ -935,6 +963,7 @@ class HtmlPage(ContentInterface):
 
     def __init__(self, url, contents=None):
         super().__init__(url, contents)
+        self.robots_contents = None
 
     def process_contents(self):
         if self.contents:
@@ -1318,6 +1347,7 @@ class HtmlPage(ContentInterface):
 
         return rating
 
+    @lazy_load_content
     def is_valid(self):
         """
         This is a simple set of rules in which we reject the page.
@@ -1335,10 +1365,16 @@ class HtmlPage(ContentInterface):
             return False
 
         title = self.get_title()
+        if title:
+            title = title.lower()
+
         is_title_invalid = title and (
-            title.find("Forbidden") >= 0
-            or title.find("Access denied") >= 0
-            or title.find("Site not found") >= 0
+            title.find("forbidden") >= 0
+            or title.find("access denied") >= 0
+            or title.find("site not found") >= 0
+            or title.find("page not found") >= 0
+            or title.find("404 not found") >= 0
+            or title.find("error 404") >= 0
         )
 
         if is_title_invalid:

@@ -72,7 +72,7 @@ webpage_samtime_youtube_rss = """
     <link>https://odysee.com/@samtime:1</link>
     </image>
     <generator>RSS for Node</generator>
-    <lastBuildDate>Tue, 28 Nov 2023 13:57:18 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 01 Jan 2020 13:57:18 GMT</lastBuildDate>
     <atom:link href="https://odysee.com/$/rss/@samtime:1" rel="self" type="application/rss+xml"/>
     <language><![CDATA[ci]]></language>
     <itunes:author>SAMTIME author</itunes:author><itunes:category text="Leisure"></itunes:category><itunes:image href="https://thumbnails.lbry.com/UCd6vEDS3SOhWbXZrxbrf_bw"/><itunes:owner><itunes:name>SAMTIME name</itunes:name><itunes:email>no-reply@odysee.com</itunes:email></itunes:owner><itunes:explicit>no</itunes:explicit>
@@ -90,6 +90,52 @@ webpage_samtime_youtube_rss = """
     <item><title><![CDATA[Samsung Reacts to OnePlus Folding Phone]]></title><description><![CDATA[<p><img src="https://thumbnails.lbry.com/heZoeirmqgw" width="480" alt="thumbnail" title="Samsung Reacts to OnePlus Folding Phone" /></p>Samsung responds to the new OnePlus Open folding phone. They’re not impressed!<br /><br />SUPPORT: https://funkytime.tv/patriot-signup/<br />MERCH: https://funkytime.tv/shop/<br />FUNKY TIME WEBSITE: https://funkytime.tv<br /><br />FACEBOOK: http://www.facebook.com/SamtimeNews<br />TWITTER: http://twitter.com/SamtimeNews<br />INSTAGRAM: http://instagram.com/samtimenews<br /><br />-----------------------------------<br /><br />'Escape the ordinary. Embrace the FUNKY!'<br /><br />-----------------------------------<br /><br />For sponsorship enquiries: samtime@bossmgmtgrp.com<br />For other business enquiries: business@funkytime.tv<br />Copyright FUNKY TIME PRODUCTIONS 2023<br />...<br />https://www.youtube.com/watch?v=heZoeirmqgw]]></description><link>https://odysee.com/samsung-reacts-to-oneplus-folding-phone:1b185b09135e7ed38965642f0f95f2b26e6331ae</link><guid isPermaLink="true">https://odysee.com/samsung-reacts-to-oneplus-folding-phone:1b185b09135e7ed38965642f0f95f2b26e6331ae</guid><pubDate>Tue, 24 Oct 2023 17:11:56 GMT</pubDate><enclosure url="https://player.odycdn.com/api/v3/streams/free/samsung-reacts-to-oneplus-folding-phone/1b185b09135e7ed38965642f0f95f2b26e6331ae/04d025.mp4" length="46183132" type="video/mp4"/><itunes:title>Samsung Reacts to OnePlus Folding Phone</itunes:title><itunes:author>SAMTIME</itunes:author><itunes:image href="https://thumbnails.lbry.com/heZoeirmqgw"/><itunes:duration>184</itunes:duration><itunes:explicit>no</itunes:explicit></item>
     <item><title><![CDATA[Apple Introduces Apple Pencil With a Cord]]></title><description><![CDATA[<p><img src="https://thumbnails.lbry.com/-1yi7DqDUr8" width="480" alt="thumbnail" title="Apple Introduces Apple Pencil With a Cord" /></p>Apple just introduced the Apple Pencil USB-C. For when wireless charging is just too dang convenient!<br /><br />Yes, this is a real product: https://www.apple.com/shop/product/MUWA3AM/A/apple-pencil-usb-c<br /><br />SUPPORT: https://funkytime.tv/patriot-signup/<br />MERCH: https://funkytime.tv/shop/<br />FUNKY TIME WEBSITE: https://funkytime.tv<br /><br />FACEBOOK: http://www.facebook.com/SamtimeNews<br />TWITTER: http://twitter.com/SamtimeNews<br />INSTAGRAM: http://instagram.com/samtimenews<br /><br />-----------------------------------<br /><br />'Escape the ordinary. Embrace the FUNKY!'<br /><br />-----------------------------------<br /><br />For sponsorship enquiries: samtime@bossmgmtgrp.com<br />For other business enquiries: business@funkytime.tv<br />Copyright FUNKY TIME PRODUCTIONS 2023<br />...<br />https://www.youtube.com/watch?v=-1yi7DqDUr8]]></description><link>https://odysee.com/apple-introduces-apple-pencil-with-a:36a5fad1b47e74d2795b7bb33cf084917089fd76</link><guid isPermaLink="true">https://odysee.com/apple-introduces-apple-pencil-with-a:36a5fad1b47e74d2795b7bb33cf084917089fd76</guid><pubDate>Thu, 19 Oct 2023 17:56:02 GMT</pubDate><enclosure url="https://player.odycdn.com/api/v3/streams/free/apple-introduces-apple-pencil-with-a/36a5fad1b47e74d2795b7bb33cf084917089fd76/dc4d47.mp4" length="30185132" type="video/mp4"/><itunes:title>Apple Introduces Apple Pencil With a Cord</itunes:title><itunes:author>SAMTIME</itunes:author><itunes:image href="https://thumbnails.lbry.com/-1yi7DqDUr8"/><itunes:duration>196</itunes:duration><itunes:explicit>no</itunes:explicit></item>
     <item><title><![CDATA[Apple Responds to iPhone 15 Screen Burn In]]></title><description><![CDATA[<p><img src="https://thumbnails.lbry.com/CVUMiyl1GVY" width="480" alt="thumbnail" title="Apple Responds to iPhone 15 Screen Burn In" /></p>Apple responds to the screen burn-in issue on the new iPhone 15 Pro Max. Looks like the phone is turning into an iPhone 15 PROblems!<br /><br />ARTICLE: https://www.dailymail.co.uk/sciencetech/article-12636027/iPhone-15-Pro-Max-screen-burn-issues-image-display-Apple.html<br /><br />Apple Responds to iPhone 15 Pro Bending: https://youtu.be/va9NjxmoyJU<br />Apple Responds to iPhone 15 Pro Overheating: https://youtu.be/75bxg24Od_U<br />Apple Responds to Fine Woven Case Issue: https://youtu.be/eMEahWU4mrM<br /><br />-----------------------------------<br /><br />SUPPORT: https://funkytime.tv/patriot-signup/<br />MERCH: https://funkytime.tv/shop/<br />FUNKY TIME WEBSITE: https://funkytime.tv<br /><br />FACEBOOK: http://www.facebook.com/SamtimeNews<br />TWITTER: http://twitter.com/SamtimeNews<br />INSTAGRAM: http://instagram.com/samtimenews<br /><br />-----------------------------------<br /><br />'Escape the ordinary. Embrace the FUNKY!'<br /><br />-----------------------------------<br /><br />For sponsorship enquiries: samtime@bossmgmtgrp.com<br />For other business enquiries: business@funkytime.tv<br />Copyright FUNKY TIME PRODUCTIONS 2023<br />...<br />https://www.youtube.com/watch?v=CVUMiyl1GVY]]></description><link>https://odysee.com/apple-responds-to-iphone-15-screen-burn:dc3690d028b73fb0026d0610dda41531844d2342</link><guid isPermaLink="true">https://odysee.com/apple-responds-to-iphone-15-screen-burn:dc3690d028b73fb0026d0610dda41531844d2342</guid><pubDate>Tue, 17 Oct 2023 17:40:04 GMT</pubDate><enclosure url="https://player.odycdn.com/api/v3/streams/free/apple-responds-to-iphone-15-screen-burn/dc3690d028b73fb0026d0610dda41531844d2342/0ef216.mp4" length="31056471" type="video/mp4"/><itunes:title>Apple Responds to iPhone 15 Screen Burn In</itunes:title><itunes:author>SAMTIME</itunes:author><itunes:image href="https://thumbnails.lbry.com/CVUMiyl1GVY"/><itunes:duration>147</itunes:duration><itunes:explicit>no</itunes:explicit></item>
+</channel>
+</rss>
+"""
+
+webpage_old_pubdate_rss = """
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
+<channel>
+    <title><![CDATA[SAMTIME on Odysee]]></title>
+    <subtitle><![CDATA[SAMTIME subtitle]]></subtitle>
+    <description><![CDATA[SAMTIME channel description]]></description>
+    <link>https://odysee.com/@samtime:1</link>
+    <image><url>https://thumbnails.lbry.com/UCd6vEDS3SOhWbXZrxbrf_bw</url>
+    <title>SAMTIME on Odysee</title>
+    <link>https://odysee.com/@samtime:1</link>
+    </image>
+    <generator>RSS for Node</generator>
+    <lastBuildDate>Tue, 01 Jan 2020 13:57:18 GMT</lastBuildDate>
+    <atom:link href="https://odysee.com/$/rss/@samtime:1" rel="self" type="application/rss+xml"/>
+    <language><![CDATA[ci]]></language>
+    <itunes:author>SAMTIME author</itunes:author><itunes:category text="Leisure"></itunes:category><itunes:image href="https://thumbnails.lbry.com/UCd6vEDS3SOhWbXZrxbrf_bw"/><itunes:owner><itunes:name>SAMTIME name</itunes:name><itunes:email>no-reply@odysee.com</itunes:email></itunes:owner><itunes:explicit>no</itunes:explicit>
+
+    <item><title><![CDATA[First entry title]]></title><description><![CDATA[First entry description]]></description><link>https://odysee.com/youtube-apologises-for-slowing-down:bab8f5ed4fa7bb406264152242bab2558037ee12</link><guid isPermaLink="true">https://odysee.com/youtube-apologises-for-slowing-down:bab8f5ed4fa7bb406264152242bab2558037ee12</guid><pubDate>Mon, 01 Jan 2020 18:50:08 GMT</pubDate><enclosure url="https://player.odycdn.com/api/v3/streams/free/youtube-apologises-for-slowing-down/bab8f5ed4fa7bb406264152242bab2558037ee12/1698dc.mp4" length="29028604" type="video/mp4"/><itunes:title>YouTube Apologises For Slowing Down AdBlock Users</itunes:title><itunes:author>SAMTIME x</itunes:author><itunes:image href="https://thumbnails.lbry.com/a51RgbcCutk"/><itunes:duration>161</itunes:duration><itunes:explicit>no</itunes:explicit></item>
+</channel>
+</rss>
+"""
+
+webpage_no_pubdate_rss = """
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
+<channel>
+    <title><![CDATA[SAMTIME on Odysee]]></title>
+    <subtitle><![CDATA[SAMTIME subtitle]]></subtitle>
+    <description><![CDATA[SAMTIME channel description]]></description>
+    <link>https://odysee.com/@samtime:1</link>
+    <image><url>https://thumbnails.lbry.com/UCd6vEDS3SOhWbXZrxbrf_bw</url>
+    <title>SAMTIME on Odysee</title>
+    <link>https://odysee.com/@samtime:1</link>
+    </image>
+    <generator>RSS for Node</generator>
+    <lastBuildDate>Tue, 01 Jan 2020 13:57:18 GMT</lastBuildDate>
+    <atom:link href="https://odysee.com/$/rss/@samtime:1" rel="self" type="application/rss+xml"/>
+    <language><![CDATA[ci]]></language>
+    <itunes:author>SAMTIME author</itunes:author><itunes:category text="Leisure"></itunes:category><itunes:image href="https://thumbnails.lbry.com/UCd6vEDS3SOhWbXZrxbrf_bw"/><itunes:owner><itunes:name>SAMTIME name</itunes:name><itunes:email>no-reply@odysee.com</itunes:email></itunes:owner><itunes:explicit>no</itunes:explicit>
+
+    <item><title><![CDATA[First entry title]]></title><description><![CDATA[First entry description]]></description><link>https://odysee.com/youtube-apologises-for-slowing-down:bab8f5ed4fa7bb406264152242bab2558037ee12</link><guid isPermaLink="true">https://odysee.com/youtube-apologises-for-slowing-down:bab8f5ed4fa7bb406264152242bab2558037ee12</guid><enclosure url="https://player.odycdn.com/api/v3/streams/free/youtube-apologises-for-slowing-down/bab8f5ed4fa7bb406264152242bab2558037ee12/1698dc.mp4" length="29028604" type="video/mp4"/><itunes:title>YouTube Apologises For Slowing Down AdBlock Users</itunes:title><itunes:author>SAMTIME x</itunes:author><itunes:image href="https://thumbnails.lbry.com/a51RgbcCutk"/><itunes:duration>161</itunes:duration><itunes:explicit>no</itunes:explicit></item>
 </channel>
 </rss>
 """
@@ -567,6 +613,284 @@ webpage_html_favicon = """<html>
  </body>
 """
 
+webpage_code_project_contents = """
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0">
+  <channel>
+    <title>CodeProject Latest News</title>
+    <link>https://www.codeproject.com</link>
+    <description>Latest News from CodeProject</description>
+    <language>en-us</language>
+    <image>
+      <title>CodeProject Latest News</title>
+      <url>https://www.codeproject.com/App_Themes/Std/Img/logo100x30.gif</url>
+      <link>https://www.codeproject.com</link>
+      <width>100</width>
+      <height>30</height>
+      <description>CodeProject</description>
+    </image>
+    <copyright>Copyright  CodeProject, 1999-2023</copyright>
+    <webMaster>Webmaster@codeproject.com (Webmaster)</webMaster>
+    <lastBuildDate>Wed, 27 Dec 2023 05:00:00 GMT</lastBuildDate>
+    <ttl>20</ttl>
+    <generator>C# Hand-coded goodness</generator>
+    <item>
+      <title>Apple is now banned from selling its latest Apple Watches in the US</title>
+      <description>Time to start smuggling Apples across the border?</description>
+      <author>Kent Sharkey</author>
+      <link>https://www.codeproject.com/script/News/View.aspx?nwid=63692</link>
+      <pubDate>Wed, 27 Dec 2023 05:00:00 GMT</pubDate>
+      <source url="https://www.theverge.com/2023/12/26/24012382/apple-import-ban-watch-series-9-ultra-2">The Verge</source>
+      <category>§Industry News</category>
+      <subject>Apple is now banned from selling its latest Apple Watches in the US</subject>
+    </item>
+    <item>
+      <title>Quantum batteries could provide a new kind of energy storage by messing with time</title>
+      <description>When in doubt, slap a "quantum" on it. That solves everything.</description>
+      <author>Kent Sharkey</author>
+      <link>https://www.codeproject.com/script/News/View.aspx?nwid=63693</link>
+      <pubDate>Wed, 27 Dec 2023 05:00:00 GMT</pubDate>
+      <source url="https://www.sciencealert.com/quantum-batteries-could-provide-a-new-kind-of-energy-storage-by-messing-with-time">Science Alert</source>
+      <category>§Science And Technology</category>
+      <subject>Quantum batteries could provide a new kind of energy storage by messing with time</subject>
+    </item>
+    <item>
+      <title>How software engineering will evolve in 2024</title>
+      <description>File, New &gt; Year</description>
+      <author>Kent Sharkey</author>
+      <link>https://www.codeproject.com/script/News/View.aspx?nwid=63694</link>
+      <pubDate>Wed, 27 Dec 2023 05:00:00 GMT</pubDate>
+      <source url="https://www.infoworld.com/article/3711801/how-software-engineering-will-evolve-in-2024.html">Infoworld</source>
+      <category>§Developer News</category>
+      <category>#Headliner</category>
+      <subject>How software engineering will evolve in 2024</subject>
+    </item>
+    <item>
+      <title>Writing code is the same thing as writing prose</title>
+      <description>Once upon a time, there was a variable named 'i'...</description>
+      <author>Kent Sharkey</author>
+      <link>https://www.codeproject.com/script/News/View.aspx?nwid=63695</link>
+      <pubDate>Wed, 27 Dec 2023 05:00:00 GMT</pubDate>
+      <source url="https://www.gybe.ca/writing-code-is-the-same-thing-as-writing-prose/">Michael Hart</source>
+      <category>§Developer News</category>
+      <subject>Writing code is the same thing as writing prose</subject>
+    </item>
+    <item>
+      <title>Physics, AI and music all share a common thread. You just have to look closely enough</title>
+      <description>Something, something, something, quantum!</description>
+      <author>Kent Sharkey</author>
+      <link>https://www.codeproject.com/script/News/View.aspx?nwid=63696</link>
+      <pubDate>Wed, 27 Dec 2023 05:00:00 GMT</pubDate>
+      <source url="https://www.sciencefocus.com/apple-news-ingest/physics-ai-music-common">Science Focus</source>
+      <category>§Science And Technology</category>
+      <subject>Physics, AI and music all share a common thread. You just have to look closely enough</subject>
+    </item>
+    <item>
+      <title>The eternal struggle between open source and proprietary software</title>
+      <description>Many hands make light work, but many eyes don't guarantee fewer bugs</description>
+      <author>Kent Sharkey</author>
+      <link>https://www.codeproject.com/script/News/View.aspx?nwid=63697</link>
+      <pubDate>Wed, 27 Dec 2023 05:00:00 GMT</pubDate>
+      <source url="https://techcrunch.com/2023/12/26/the-eternal-struggle-between-open-source-and-proprietary-software/">Techcrunch</source>
+      <category>§Industry News</category>
+      <subject>The eternal struggle between open source and proprietary software</subject>
+    </item>
+    <item>
+      <title>Modern C++ programming</title>
+      <description>#include &lt;future&gt;</description>
+      <author>Kent Sharkey</author>
+      <link>https://www.codeproject.com/script/News/View.aspx?nwid=63698</link>
+      <pubDate>Wed, 27 Dec 2023 05:00:00 GMT</pubDate>
+      <source url="https://github.com/federico-busato/Modern-CPP-Programming">Federico Busato</source>
+      <category>§Developer News</category>
+      <subject>Modern C++ programming</subject>
+    </item>
+    <item>
+      <title>Burger King giving discounts if facial recognition thinks you're hungover</title>
+      <description>Time for brunch</description>
+      <author>Kent Sharkey</author>
+      <link>https://www.codeproject.com/script/News/View.aspx?nwid=63699</link>
+      <pubDate>Wed, 27 Dec 2023 05:00:00 GMT</pubDate>
+      <source url="https://gizmodo.com/burger-king-giving-discounts-if-facial-recognition-thin-1851124496">Gizmodo</source>
+      <category>§Industry News</category>
+      <subject>Burger King giving discounts if facial recognition thinks you're hungover</subject>
+    </item>
+    <item>
+      <title>I think Amazon is losing the plot</title>
+      <description>People who had that opinion also had this opinion of Amazon...</description>
+      <author>Kent Sharkey</author>
+      <link>https://www.codeproject.com/script/News/View.aspx?nwid=63700</link>
+      <pubDate>Wed, 27 Dec 2023 05:00:00 GMT</pubDate>
+      <source url="https://www.codeproject.com/Messages/5979507/I-think-Amazon-is-losing-the-plot">CodeProject</source>
+      <category>§Hot Threads</category>
+      <subject>I think Amazon is losing the plot</subject>
+    </item>
+    <item>
+      <title>WebGPU now available for testing in Safari Technology Preview</title>
+      <description>WebGPU is a new standards-compliant API that enables high-performance 3D graphics and general-purpose computations on the Web.</description>
+      <author>Kent Sharkey</author>
+      <link>https://www.codeproject.com/script/News/View.aspx?nwid=63678</link>
+      <pubDate>Tue, 26 Dec 2023 05:00:00 GMT</pubDate>
+      <source url="https://webkit.org/blog/14879/webgpu-now-available-for-testing-in-safari-technology-preview/">WebKit</source>
+      <category>§Tips and Tools</category>
+      <subject>WebGPU now available for testing in Safari Technology Preview</subject>
+    </item>
+    <item>
+      <title>Is Blazor the Future of Everything Web?</title>
+      <description>In this article we’ll learn how .NET 8 has changed Blazor’s position in the market with features that have modernized and future-proofed the framework for years to come.</description>
+      <author>Kent Sharkey</author>
+      <link>https://www.codeproject.com/script/News/View.aspx?nwid=63679</link>
+      <pubDate>Tue, 26 Dec 2023 05:00:00 GMT</pubDate>
+      <source url="https://www.telerik.com/blogs/is-blazor-future-everything-web">Telerik</source>
+      <category>§Tips and Tools</category>
+      <category>#Headliner</category>
+      <subject>Is Blazor the Future of Everything Web?</subject>
+    </item>
+    <item>
+      <title>Did anyone try using smart glasses for writing code?</title>
+      <description>Now in 3-D!</description>
+      <author>Kent Sharkey</author>
+      <link>https://www.codeproject.com/script/News/View.aspx?nwid=63680</link>
+      <pubDate>Tue, 26 Dec 2023 05:00:00 GMT</pubDate>
+      <source url="https://www.codeproject.com/Messages/5979276/Did-anyone-try-using-smart-glasses-for-writing-cod">CodeProject</source>
+      <category>§Hot Threads</category>
+      <subject>Did anyone try using smart glasses for writing code?</subject>
+    </item>
+    <item>
+      <title>I was sent this, and..</title>
+      <description>"Bring him home, our wise Odysseus, home at last!"</description>
+      <author>Kent Sharkey</author>
+      <link>https://www.codeproject.com/script/News/View.aspx?nwid=63681</link>
+      <pubDate>Tue, 26 Dec 2023 05:00:00 GMT</pubDate>
+      <source url="https://www.codeproject.com/Messages/5979168/I-was-sent-this-and">CodeProject</source>
+      <category>§Hot Threads</category>
+      <subject>I was sent this, and..</subject>
+    </item>
+    <item>
+      <title>New AI can predict people’s time of death with high degree of accuracy, study finds</title>
+      <description>Especially if it's the one planning your death</description>
+      <author>Kent Sharkey</author>
+      <link>https://www.codeproject.com/script/News/View.aspx?nwid=63682</link>
+      <pubDate>Tue, 26 Dec 2023 05:00:00 GMT</pubDate>
+      <source url="https://www.independent.co.uk/tech/deathbot-ai-predict-life-death-b2466988.html">Independent</source>
+      <category>§Science And Technology</category>
+      <subject>New AI can predict people’s time of death with high degree of accuracy, study finds</subject>
+    </item>
+    <item>
+      <title>Windows 11 Moment 5 is allegedly coming February 2024</title>
+      <description>Just a moment</description>
+      <author>Kent Sharkey</author>
+      <link>https://www.codeproject.com/script/News/View.aspx?nwid=63683</link>
+      <pubDate>Tue, 26 Dec 2023 05:00:00 GMT</pubDate>
+      <source url="https://www.neowin.net/news/windows-11-moment-5-is-allegedly-coming-february-2024/">Neowin</source>
+      <category>§Industry News</category>
+      <subject>Windows 11 Moment 5 is allegedly coming February 2024</subject>
+    </item>
+    <item>
+      <title>We have used too many levels of abstractions and now the future looks bleak</title>
+      <description>Time to bring back realism? Surrealism?</description>
+      <author>Kent Sharkey</author>
+      <link>https://www.codeproject.com/script/News/View.aspx?nwid=63684</link>
+      <pubDate>Tue, 26 Dec 2023 05:00:00 GMT</pubDate>
+      <source url="https://unixsheikh.com/articles/we-have-used-too-many-levels-of-abstractions-and-now-the-future-looks-bleak.html">Unix Sheikh</source>
+      <category>§Developer News</category>
+      <category>#Headliner</category>
+      <subject>We have used too many levels of abstractions and now the future looks bleak</subject>
+    </item>
+    <item>
+      <title>Alternate Futures for “Web Components”</title>
+      <description>It seems like Web Components are always just on the cusp of finally catching on.</description>
+      <author>Kent Sharkey</author>
+      <link>https://www.codeproject.com/script/News/View.aspx?nwid=63685</link>
+      <pubDate>Tue, 26 Dec 2023 05:00:00 GMT</pubDate>
+      <source url="https://blog.carlana.net/post/2023/web-component-alternative-futures/">The Ethically-Trained Programmer</source>
+      <category>§Tips and Tools</category>
+      <subject>Alternate Futures for “Web Components”</subject>
+    </item>
+    <item>
+      <title>The 4 metrics every engineering manager should track</title>
+      <description>Missing KLoC/fortnight</description>
+      <author>Kent Sharkey</author>
+      <link>https://www.codeproject.com/script/News/View.aspx?nwid=63686</link>
+      <pubDate>Tue, 26 Dec 2023 05:00:00 GMT</pubDate>
+      <source url="https://shiftmag.dev/the-4-metrics-every-engineering-manager-should-track-1329/">Shift magazine</source>
+      <category>§Developer News</category>
+      <subject>The 4 metrics every engineering manager should track</subject>
+    </item>
+    <item>
+      <title>Microsoft just paid $76 million for a Wisconsin pumpkin farm</title>
+      <description>"The Great Pumpkin will appear and I'll be waiting for him!"</description>
+      <author>Kent Sharkey</author>
+      <link>https://www.codeproject.com/script/News/View.aspx?nwid=63687</link>
+      <pubDate>Tue, 26 Dec 2023 05:00:00 GMT</pubDate>
+      <source url="https://www.theverge.com/2023/12/22/24012534/microsoft-wisconsin-pumpkin-farm-foxconn-76-million-mount-pleasant">The Verge</source>
+      <category>§Industry News</category>
+      <subject>Microsoft just paid $76 million for a Wisconsin pumpkin farm</subject>
+    </item>
+    <item>
+      <title>Google is testing an 'AI support assistant' for questions about Google services</title>
+      <description>It just returns, "that's cancelled" for every query</description>
+      <author>Kent Sharkey</author>
+      <link>https://www.codeproject.com/script/News/View.aspx?nwid=63688</link>
+      <pubDate>Tue, 26 Dec 2023 05:00:00 GMT</pubDate>
+      <source url="https://www.androidcentral.com/apps-software/google-ai-support-assistant">Android Central</source>
+      <category>§Industry News</category>
+      <subject>Google is testing an 'AI support assistant' for questions about Google services</subject>
+    </item>
+    <item>
+      <title>Android malware Chameleon disables Fingerprint Unlock to steal PINs</title>
+      <description>Good olde 'password' deemed secure</description>
+      <author>Kent Sharkey</author>
+      <link>https://www.codeproject.com/script/News/View.aspx?nwid=63689</link>
+      <pubDate>Tue, 26 Dec 2023 05:00:00 GMT</pubDate>
+      <source url="https://www.bleepingcomputer.com/news/security/android-malware-chameleon-disables-fingerprint-unlock-to-steal-pins/">Bleeping Computer</source>
+      <category>§Industry News</category>
+      <subject>Android malware Chameleon disables Fingerprint Unlock to steal PINs</subject>
+    </item>
+    <item>
+      <title>Lawrence Livermore National Lab simulates ‘Armageddon’-style nuclear asteroid deflection</title>
+      <description>* Bruce Willis not included</description>
+      <author>Kent Sharkey</author>
+      <link>https://www.codeproject.com/script/News/View.aspx?nwid=63690</link>
+      <pubDate>Tue, 26 Dec 2023 05:00:00 GMT</pubDate>
+      <source url="https://techcrunch.com/2023/12/21/national-lab-simulates-armageddon-style-nuclear-asteroid-deflection/amp/">Techcrunch</source>
+      <category>§Science And Technology</category>
+      <subject>Lawrence Livermore National Lab simulates ‘Armageddon’-style nuclear asteroid deflection</subject>
+    </item>
+    <item>
+      <title>What’s new in our code coverage tooling?</title>
+      <description>"Shut the door and cover me"</description>
+      <author>Kent Sharkey</author>
+      <link>https://www.codeproject.com/script/News/View.aspx?nwid=63691</link>
+      <pubDate>Tue, 26 Dec 2023 05:00:00 GMT</pubDate>
+      <source url="https://devblogs.microsoft.com/dotnet/whats-new-in-our-code-coverage-tooling/">.NET</source>
+      <category>§Developer News</category>
+      <subject>What’s new in our code coverage tooling?</subject>
+    </item>
+    <item>
+      <title>Auth0 Templates for .NET: A New Powerful Version Released</title>
+      <description>A new version of the Auth0 Templates for .NET package has been released: discover the new powerful features.</description>
+      <author>Kent Sharkey</author>
+      <link>https://www.codeproject.com/script/News/View.aspx?nwid=63668</link>
+      <pubDate>Tue, 26 Dec 2023 05:00:00 GMT</pubDate>
+      <source url="https://auth0.com/blog/auth0-templates-for-dotnet-powerful-version/">Auth0</source>
+      <category>§Tips and Tools</category>
+      <subject>Auth0 Templates for .NET: A New Powerful Version Released</subject>
+    </item>
+    <item>
+      <title>v0</title>
+      <description>v0 is a generative user interface system by Vercel powered by AI. It generates copy-and-paste friendly React code based on shadcn/ui and Tailwind CSS that people can use in their projects.</description>
+      <author>Kent Sharkey</author>
+      <link>https://www.codeproject.com/script/News/View.aspx?nwid=63669</link>
+      <pubDate>Tue, 26 Dec 2023 05:00:00 GMT</pubDate>
+      <source url="https://v0.dev/faq">Vercel</source>
+      <category>§Tips and Tools</category>
+      <subject>v0</subject>
+    </item>
+  </channel>
+</rss>
+"""
+
 
 from ..pluginentries.handlervideoyoutube import YouTubeVideoHandler
 
@@ -576,16 +900,30 @@ class YouTubeVideoHandlerMock(YouTubeVideoHandler):
         super().__init__(url)
 
     def download_details_youtube(self):
-        self.yt_text = """{"_filename" : "test.txt",
-        "title" : "test.txt",
-        "description" : "test.txt",
-        "channel_url" : "https://youtube.com/channel/test.txt",
-        "channel" : "JoYoe",
-        "id" : "3433",
-        "channel_id" : "JoYoe",
-        "thumbnail" : "https://youtube.com/files/whatever.png",
-        "upload_date" : "20231113"
-        }"""
+        print("Mocked YouTube request URL: {}".format(self.url))
+
+        if self.url == "https://youtube.com/watch?v=123":
+            self.yt_text = """{"_filename" : "test.txt",
+            "title" : "test.txt",
+            "description" : "test.txt",
+            "channel_url" : "https://youtube.com/channel/test.txt",
+            "channel" : "JoYoe",
+            "id" : "3433",
+            "channel_id" : "JoYoe",
+            "thumbnail" : "https://youtube.com/files/whatever.png",
+            "upload_date" : "20231113"
+            }"""
+        else:
+            self.yt_text = """{"_filename" : "test.txt",
+            "title" : "test.txt",
+            "description" : "test.txt",
+            "channel_url" : "https://youtube.com/channel/test.txt",
+            "channel" : "JoYoe",
+            "id" : "3433",
+            "channel_id" : "JoYoe",
+            "thumbnail" : "https://youtube.com/files/whatever.png",
+            "upload_date" : "20231113"
+            }"""
         return True
 
     def download_details_return_dislike(self):
@@ -605,22 +943,35 @@ class RequestsObject(object):
         self.content = contents
 
     def get_contents(self, url):
-        if url == "https://youtube.com/channel/samtime/rss.xml":
+        if url.startswith("https://youtube.com/channel/"):
+            if url == "https://youtube.com/channel/samtime/rss.xml":
+                return webpage_samtime_youtube_rss
+
+            elif url == "https://youtube.com/channel/2020-year-channel/rss.xml":
+                return webpage_old_pubdate_rss
+
+            elif url == "https://youtube.com/channel/no-pubdate-channel/rss.xml":
+                return webpage_no_pubdate_rss
+
+            elif url == "https://youtube.com/channel/airpano/rss.xml":
+                return webpage_airpano
+
+        if url.startswith("https://www.youtube.com/feeds"):
             return webpage_samtime_youtube_rss
 
-        if url == "https://youtube.com/channel/airpano/rss.xml":
-            return webpage_airpano
-
-        if url == "https://multiple-favicons/page.html":
+        elif url == "https://multiple-favicons/page.html":
             return webpage_html_favicon
 
-        if url == "https://rsspage.com/rss.xml":
+        elif url == "https://rsspage.com/rss.xml":
             return webpage_samtime_youtube_rss
 
-        if url == "https://empty-page.com":
+        elif url == "https://empty-page.com":
             return ""
 
-        if url == "https://page-with-two-links.com":
+        elif url == "https://www.codeproject.com/WebServices/NewsRSS.aspx":
+            return webpage_code_project_contents
+
+        elif url == "https://page-with-two-links.com":
             b = PageBuilder()
             b.title = "Page title"
             b.description = "Page description"
@@ -631,22 +982,22 @@ class RequestsObject(object):
 
             return b.build_contents()
 
-        if url == "https://page-with-http-status-500.com":
+        elif url == "https://page-with-http-status-500.com":
             self.status_code = 500
 
-        if url == "https://page-with-http-status-400.com":
+        elif url == "https://page-with-http-status-400.com":
             self.status_code = 400
 
-        if url == "https://page-with-http-status-300.com":
+        elif url == "https://page-with-http-status-300.com":
             self.status_code = 300
 
-        if url == "https://page-with-http-status-200.com":
+        elif url == "https://page-with-http-status-200.com":
             self.status_code = 200
 
-        if url == "https://page-with-http-status-100.com":
+        elif url == "https://page-with-http-status-100.com":
             self.status_code = 100
 
-        if url.endswith("robots.txt"):
+        elif url.endswith("robots.txt"):
             return """  """
 
         b = PageBuilder()

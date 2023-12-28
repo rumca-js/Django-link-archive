@@ -17,8 +17,8 @@ class BaseRssPlugin(SourceGenericPlugin):
     def get_link_props(self):
         from ..webtools import RssPage
 
-        reader = RssPage(self.get_address(), self.get_contents())
-        all_props = reader.parse_and_process()
+        self.reader = RssPage(self.get_address(), self.get_contents())
+        all_props = self.reader.parse_and_process()
 
         num_entries = len(all_props)
 
@@ -50,9 +50,15 @@ class BaseRssPlugin(SourceGenericPlugin):
 
         source = self.get_source()
 
-        prop["source"] = source.url
-        prop["language"] = source.language
-        prop["artist"] = source.title
-        prop["album"] = source.title
+        if source:
+            prop["source"] = source.url
+            prop["language"] = source.language
+            prop["artist"] = source.title
+            prop["album"] = source.title
+        else:
+            RssPage
+            prop["source"] = self.reader.url
+            prop["language"] = self.reader.get_language()
+            prop["artist"] = self.reader.get_artist()
 
         return prop

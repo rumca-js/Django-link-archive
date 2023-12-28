@@ -26,6 +26,7 @@ from ..threadhandlers import (
     CleanupJobHandler,
     LinkAddJobHandler,
     LinkScanJobHandler,
+    ProcessSourceJobHandler,
 )
 from .utilities import WebPageDisabled
 from ..dateutils import DateUtils
@@ -483,6 +484,58 @@ class ScanLinkJobHandlerTest(WebPageDisabled, TestCase):
         ob = BackgroundJobController.link_scan("https://manually-added-link.com")
 
         handler = LinkScanJobHandler()
+        handler.process(ob)
+
+        persistent_objects = PersistentInfo.objects.all()
+
+        for persistent_object in persistent_objects:
+            print("Persisten object info:{}".format(persistent_object.info))
+
+        self.assertEqual(persistent_objects.count(), 0)
+
+        jobs = BackgroundJobController.objects.all()
+        for job in jobs:
+            print("Job:{} {}".format(job.job, job.subject))
+
+        self.assertEqual(jobs.count(), 1)
+
+
+class ProcessSourceHandlerTest(WebPageDisabled, TestCase):
+    def setUp(self):
+        self.disable_web_pages()
+
+    def test_process_source_unknown(self):
+        LinkDataController.objects.all().delete()
+        DomainsController.objects.all().delete()
+        SourceDataController.objects.all().delete()
+
+        ob = BackgroundJobController.objects.create(job = BackgroundJob.JOB_PROCESS_SOURCE, subject="https://manually-added-link.com")
+
+        handler = ProcessSourceJobHandler()
+        handler.process(ob)
+
+        persistent_objects = PersistentInfo.objects.all()
+
+        for persistent_object in persistent_objects:
+            print("Persisten object info:{}".format(persistent_object.info))
+
+        self.assertEqual(persistent_objects.count(), 0)
+
+        jobs = BackgroundJobController.objects.all()
+        for job in jobs:
+            print("Job:{} {}".format(job.job, job.subject))
+
+        self.assertEqual(jobs.count(), 1)
+
+    def test_process_source_known(self):
+        LinkDataController.objects.all().delete()
+        DomainsController.objects.all().delete()
+        SourceDataController.objects.all().delete()
+        SourceDataController.objects.create(url = "https://manually-added-link.com")
+
+        ob = BackgroundJobController.objects.create(job = BackgroundJob.JOB_PROCESS_SOURCE, subject="https://manually-added-link.com")
+
+        handler = ProcessSourceJobHandler()
         handler.process(ob)
 
         persistent_objects = PersistentInfo.objects.all()

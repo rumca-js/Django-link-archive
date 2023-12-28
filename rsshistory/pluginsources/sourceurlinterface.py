@@ -19,7 +19,7 @@ class SourceUrlInterface(object):
         p = Url.get(self.url)
 
         if p.is_rss():
-            return self.get_info_from_rss(self.url, p)
+            return self.get_props_from_rss(self.url, p)
         elif p.is_youtube():
             # Someone might be surprised that added URL is being replaced
             from ..pluginentries.entryurlinterface import UrlHandler

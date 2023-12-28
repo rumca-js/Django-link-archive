@@ -46,12 +46,15 @@ class SourceGenericPlugin(HtmlPage):
             if not link_data:
                 continue
 
-            entry = LinkDataHyperController.add_new_link_internal(
-                link_data, source_is_auto=True
-            )
-            if entry:
-                self.on_added_entry(entry)
-                num_entries += 1
+            if "link" not in link_data or not link_data["link"]:
+                PersistentInfo.error("Invalid link properties. Missing key: {}".format(str(link_data)))
+            else:
+                entry = LinkDataHyperController.add_new_link_internal(
+                    link_data, source_is_auto=True
+                )
+                if entry:
+                    self.on_added_entry(entry)
+                    num_entries += 1
 
         return num_entries
 

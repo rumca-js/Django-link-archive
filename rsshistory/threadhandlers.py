@@ -64,7 +64,8 @@ class ProcessSourceJobHandler(BaseJobHandler):
     def process(self, obj=None):
         try:
             plugin = SourceControllerBuilder.get(obj.subject)
-            plugin.check_for_data()
+            if plugin:
+                plugin.check_for_data()
             return True
 
         except Exception as e:

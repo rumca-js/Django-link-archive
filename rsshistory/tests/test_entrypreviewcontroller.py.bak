@@ -25,6 +25,8 @@ class EntryUrlInterfaceTest(WebPageDisabled, TestCase):
             bookmarked=False,
             language="en",
         )
+        # ob.date_published = days_before
+        ob.save()
 
         ob = LinkDataController.objects.create(
             source="https://odysee.com",
