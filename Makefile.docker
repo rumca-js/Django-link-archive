@@ -1,0 +1,11 @@
+build:
+	docker build -t python-django-app .
+
+run:
+	docker run -p 8000:8000 python-django-app
+
+list:
+	docker ps -a
+
+stop:
+	docker stop container_id
