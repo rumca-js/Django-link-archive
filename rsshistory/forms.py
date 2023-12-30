@@ -288,8 +288,25 @@ class SourceForm(forms.ModelForm):
         widgets = {}
 
     def __init__(self, *args, **kwargs):
+        from .pluginsources.sourcecontrollerbuilder import SourceControllerBuilder
+
         super(SourceForm, self).__init__(*args, **kwargs)
+        # TODO thing below should be handled by model properties
         self.fields["favicon"].required = False
+
+        names = SourceControllerBuilder.get_plugin_names()
+        self.fields["source_type"].widget = forms.Select(
+            choices=self.to_choices(names)
+        )
+
+    def to_choices(self, names):
+        names = sorted(names)
+        result = []
+
+        for name in names:
+            result.append([name, name])
+
+        return result
 
 
 class TagEntryForm(forms.ModelForm):

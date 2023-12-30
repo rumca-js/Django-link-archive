@@ -46,3 +46,10 @@ class SourceControllerBuilder(object):
                 source.title, source.source_type
             )
         )
+
+    def get_plugin_names():
+        result = set()
+        for plugin_def in SourceControllerBuilder.plugins:
+            result.add(plugin_def.PLUGIN_NAME)
+
+        return list(result)

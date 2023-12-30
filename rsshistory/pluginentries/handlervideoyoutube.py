@@ -173,6 +173,9 @@ class YouTubeVideoHandler(DefaultUrlHandler):
         return 0
 
     def get_properties(self):
+        if not self.yt_ob:
+            self.download_details()
+
         youtube_props = super().get_properties()
 
         yt_json = self.yt_ob._json

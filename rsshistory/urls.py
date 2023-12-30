@@ -155,7 +155,6 @@ urlpatterns = [
     path("data-errors", viewcustom.data_errors_page, name="data-errors"),
     path("entry-fix-youtube-details/<int:pk>/", viewcustom.fix_reset_youtube_link_details_page, name="entry-fix-youtube-details",),
     path("fix-entry-tags/<int:entrypk>/", viewcustom.fix_entry_tags, name="fix-entry-tags",),
-    path("show-yt-props", viewcustom.show_youtube_link_props, name="show-youtube-link-props",),
     path("show-page-props", viewcustom.show_page_props, name="show-page-props",),
     path("test-page", viewcustom.test_page, name="test-page"),
     path("test-form-page", viewcustom.test_form_page, name="test-form-page"),

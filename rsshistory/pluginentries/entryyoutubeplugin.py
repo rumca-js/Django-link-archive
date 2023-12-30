@@ -46,17 +46,6 @@ class EntryYouTubePlugin(EntryGenericPlugin):
         buttons.append(
             EntryButton(
                 self.user,
-                "YouTube Props",
-                reverse("{}:show-youtube-link-props".format(LinkDatabase.name))
-                + "?page={}".format(self.entry.link),
-                ConfigurationEntry.ACCESS_TYPE_OWNER,
-                "Shows YouTube properties",
-            ),
-        )
-
-        buttons.append(
-            EntryButton(
-                self.user,
                 "Update link data",
                 reverse(
                     "{}:entry-fix-youtube-details".format(LinkDatabase.name),

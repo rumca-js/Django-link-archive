@@ -274,15 +274,16 @@ def show_page_props(request):
         return data
 
     def show_page_props_internal(requests, page_link):
-        from ..pluginentries.handlervideoyoutube import YouTubeVideoHandler
-        from ..webtools import Url
+        from ..pluginentries.entryurlinterface import UrlHandler
 
-        page = Url.get(page_link)
+        page = UrlHandler.get(page_link)
 
         # p.context["show_properties"] = page.get_properties()
         p.context.update(page.get_properties())
         p.context["is_html"] = page.is_html()
         p.context["is_rss"] = page.is_rss()
+        p.context["is_youtube_video_handler"] = type(page) is UrlHandler.youtube_video_handler
+        p.context["is_odysee_video_handler"] = type(page) is UrlHandler.odysee_video_handler
         p.context["page_object"] = page
 
         return p.render("show_page_props.html")

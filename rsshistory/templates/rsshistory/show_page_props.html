@@ -8,7 +8,9 @@
     </a>
 </div>
 
-{% if is_html %}
+{% if is_youtube_video_handler %}
+  {% include "rsshistory/show_youtube_link_props.html" %}
+{% elif is_html %}
   {% include "rsshistory/show_page_props_html.html" %}
 {% elif is_rss %}
   {% include "rsshistory/show_page_props_rss.html" %}
