@@ -2,6 +2,8 @@ from django.test import TestCase
 from django.utils import timezone
 from django.urls import reverse
 
+from datetime import datetime
+
 from ..webtools import RssPage
 from .utilities import WebPageDisabled
 
@@ -119,10 +121,12 @@ class RssPageTest(WebPageDisabled, TestCase):
         entries = reader.parse_and_process()
         self.assertEqual(len(entries), 1)
 
+        current_date_time = datetime.now()
+
         entry = entries[0]
         self.assertEqual(entry["title"], "First entry title")
         self.assertEqual(entry["description"], "First entry description")
-        self.assertEqual(entry["date_published"].year, 2023)
+        self.assertEqual(entry["date_published"].year, current_date_time.year)
 
     """
     feeder does not parses update time

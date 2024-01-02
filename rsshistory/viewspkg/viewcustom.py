@@ -20,7 +20,7 @@ from ..controllers import (
     SourceDataController,
     LinkDataController,
     DomainsController,
-    LinkDataHyperController,
+    LinkDataWrapper,
 )
 from ..views import ViewPage
 from ..dateutils import DateUtils

@@ -25,7 +25,7 @@ from .controllers import (
     BackgroundJobController,
     LinkDataController,
     SourceDataController,
-    LinkDataHyperController,
+    LinkDataBuilder,
     DomainsController,
 )
 from .configuration import Configuration
@@ -226,7 +226,7 @@ class LinkAddJobHandler(BaseJobHandler):
         try:
             link = obj.subject
 
-            data = {"user": None, "bookmarked": False}
+            data = {"link": link, "user": None, "bookmarked": False}
 
             if len(obj.args) > 0:
                 try:
@@ -240,7 +240,10 @@ class LinkAddJobHandler(BaseJobHandler):
                         )
                     )
 
-            LinkDataHyperController.add_simple(link, data)
+            b = LinkDataBuilder()
+            b.link_data = data
+            b.link = data["link"]
+            b.add_from_link()
 
             return True
 

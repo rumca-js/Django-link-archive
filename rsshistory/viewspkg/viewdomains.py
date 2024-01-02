@@ -8,7 +8,8 @@ from django.utils.http import urlencode
 from ..apps import LinkDatabase
 from ..models import Domains, DomainCategories, DomainSubCategories, ConfigurationEntry
 from ..controllers import (
-    LinkDataHyperController,
+    LinkDataWrapper,
+    LinkDataBuilder,
     LinkDataController,
     DomainsController,
 )
@@ -251,7 +252,7 @@ def domains_read_bookmarks(request):
     if data is not None:
         return data
 
-    LinkDataHyperController.read_domains_from_bookmarks()
+    LinkDataBuilder().read_domains_from_bookmarks()
 
     return HttpResponseRedirect(reverse("{}:domains".format(LinkDatabase.name)))
 

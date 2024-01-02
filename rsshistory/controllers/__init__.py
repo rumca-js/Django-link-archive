@@ -17,5 +17,6 @@ from .comments import (
 from .entries import (
     LinkDataController,
     ArchiveLinkDataController,
-    LinkDataHyperController,
+    LinkDataBuilder,
+    LinkDataWrapper,
 )

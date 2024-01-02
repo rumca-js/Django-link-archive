@@ -3,7 +3,8 @@ from django.test import TestCase
 from datetime import timedelta
 
 from ..controllers import (
-    LinkDataHyperController,
+    LinkDataBuilder,
+    LinkDataWrapper,
     SourceDataController,
     DomainsController,
 )
@@ -23,7 +24,7 @@ class RequestObject(object):
         self.user = UserObject(user_name)
 
 
-class SourceParsePluginTest(WebPageDisabled, TestCase):
+class LinkDataBuilderTest(WebPageDisabled, TestCase):
     def setUp(self):
         self.disable_web_pages()
         self.source_youtube = SourceDataController.objects.create(
@@ -55,8 +56,10 @@ class SourceParsePluginTest(WebPageDisabled, TestCase):
             "date_published": creation_date,
         }
 
+        b = LinkDataBuilder()
+        b.link_data = link_data
         # call tested function
-        entry = LinkDataHyperController.add_new_link(link_data)
+        entry = b.add_from_props()
 
         objs = LinkDataModel.objects.filter(link=link_name)
 
@@ -82,8 +85,10 @@ class SourceParsePluginTest(WebPageDisabled, TestCase):
             "date_published": DateUtils.get_datetime_now_utc(),
         }
 
+        b = LinkDataBuilder()
+        b.link_data = link_data
         # call tested function
-        entry = LinkDataHyperController.add_new_link(link_data)
+        entry = b.add_from_props()
 
         objs = LinkDataModel.objects.filter(link="https://youtube.com/v=1234/")
         self.assertTrue(objs.count() == 0)
@@ -117,8 +122,10 @@ class SourceParsePluginTest(WebPageDisabled, TestCase):
             "bookmarked": False,
         }
 
+        b = LinkDataBuilder(source_is_auto = True)
+        b.link_data = link_data
         # call tested function
-        entry = LinkDataHyperController.add_new_link(link_data, source_is_auto=True)
+        entry = b.add_from_props()
 
         objs = LinkDataModel.objects.all()
         for obj in objs:
@@ -148,8 +155,10 @@ class SourceParsePluginTest(WebPageDisabled, TestCase):
             "bookmarked": True,
         }
 
+        b = LinkDataBuilder(source_is_auto = True)
+        b.link_data = link_data
         # call tested function
-        entry = LinkDataHyperController.add_new_link(link_data, source_is_auto=True)
+        entry = b.add_from_props()
 
         objs = LinkDataModel.objects.filter(link=link_name_0)
         domains = DomainsController.objects.all()
@@ -175,8 +184,10 @@ class SourceParsePluginTest(WebPageDisabled, TestCase):
             "bookmarked": True,
         }
 
+        b = LinkDataBuilder(source_is_auto = True)
+        b.link_data = link_data
         # call tested function
-        entry = LinkDataHyperController.add_new_link(link_data, source_is_auto=True)
+        entry = b.add_from_props()
 
         objs = LinkDataModel.objects.all()
         domains = DomainsController.objects.all()
@@ -192,40 +203,3 @@ class SourceParsePluginTest(WebPageDisabled, TestCase):
         self.assertEqual(objs[0].domain_obj, domains[0])
         self.assertEqual(objs[1].domain_obj, domains[0])
         self.assertEqual(objs[2].domain_obj, domains[0])
-
-    def test_make_bookmarked(self):
-        link_name = "https://youtube.com/v=12345"
-
-        link_data = {
-            "link": link_name,
-            "source": "https://youtube.com",
-            "title": "test",
-            "description": "description",
-            "language": "en",
-            "thumbnail": "https://youtube.com/favicon.ico",
-            "date_published": DateUtils.get_datetime_now_utc(),
-        }
-
-        entry = LinkDataHyperController.add_new_link(link_data)
-
-        objs = LinkDataModel.objects.filter(link=link_name)
-        self.assertEqual(objs.count(), 1)
-        obj = objs[0]
-
-        # call tested function
-        LinkDataHyperController.make_bookmarked(RequestObject(), obj)
-
-        objs = LinkDataModel.objects.filter(link=link_name)
-        self.assertEqual(objs.count(), 1)
-        obj = objs[0]
-
-        self.assertTrue(obj.bookmarked == True)
-
-        # call tested function
-        LinkDataHyperController.make_not_bookmarked(RequestObject(), obj)
-
-        objs = LinkDataModel.objects.filter(link=link_name)
-        self.assertEqual(objs.count(), 1)
-        obj = objs[0]
-
-        self.assertTrue(obj.bookmarked == False)

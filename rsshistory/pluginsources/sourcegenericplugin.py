@@ -4,7 +4,7 @@ import hashlib
 from ..models import PersistentInfo
 from ..webtools import HtmlPage
 from ..dateutils import DateUtils
-from ..controllers import LinkDataHyperController, SourceDataController
+from ..controllers import LinkDataBuilder, SourceDataController
 from ..models import BaseLinkDataController
 from ..apps import LinkDatabase
 
@@ -49,9 +49,11 @@ class SourceGenericPlugin(HtmlPage):
             if "link" not in link_data or not link_data["link"]:
                 PersistentInfo.error("Invalid link properties. Missing key: {}".format(str(link_data)))
             else:
-                entry = LinkDataHyperController.add_new_link_internal(
-                    link_data, source_is_auto=True
-                )
+                b = LinkDataBuilder()
+                b.link_data = link_data
+                b.source_is_auto=True
+
+                entry = b.add_from_props()
                 if entry:
                     self.on_added_entry(entry)
                     num_entries += 1

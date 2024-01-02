@@ -33,10 +33,10 @@ class SourceDataController(SourceDataModel):
         SourceDataController.fix_entries(source)
 
         if Configuration.get_object().config_entry.auto_store_domain_info:
-            from .entries import LinkDataHyperController
+            from .entries import LinkDataBuilder
 
             p = BasePage(source_data_map["url"])
-            LinkDataHyperController.add_simple(p.get_domain())
+            LinkDataBuilder(link = p.get_domain())
 
         return source
 

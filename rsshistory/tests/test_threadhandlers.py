@@ -542,14 +542,13 @@ class ProcessSourceHandlerTest(WebPageDisabled, TestCase):
         # call tested function
         result = handler.process(ob)
 
-        self.assertEqual(result, True)
-
         persistent_objects = PersistentInfo.objects.all()
-
         for persistent_object in persistent_objects:
             print("Persisten object info:{}".format(persistent_object.info))
 
         self.assertEqual(persistent_objects.count(), 0)
+
+        self.assertEqual(result, True)
 
         jobs = BackgroundJobController.objects.all()
         for job in jobs:

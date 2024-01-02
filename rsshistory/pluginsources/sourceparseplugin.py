@@ -5,7 +5,7 @@ import time
 
 from .sourcegenericplugin import SourceGenericPlugin
 from ..models import PersistentInfo
-from ..controllers import LinkDataController, LinkDataHyperController
+from ..controllers import LinkDataController
 from ..webtools import BasePage, HtmlPage
 from ..apps import LinkDatabase
 

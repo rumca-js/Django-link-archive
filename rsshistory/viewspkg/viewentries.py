@@ -15,7 +15,8 @@ from ..models import (
 )
 from ..controllers import (
     LinkDataController,
-    LinkDataHyperController,
+    LinkDataWrapper,
+    LinkDataBuilder,
     ArchiveLinkDataController,
     SourceDataController,
     BackgroundJobController,
@@ -491,7 +492,9 @@ def add_entry(request):
 
         if valid:
             data = form.get_information()
-            if not LinkDataHyperController.add_new_link_internal(data):
+            b = LinkDataBuilder()
+            b.link_data = data
+            if not b.add_from_props_internal():
                 p.context["summary_text"] = "Could not save link"
                 return p.render("summary_present.html")
 
@@ -796,11 +799,13 @@ def make_bookmarked_entry(request, pk):
 
     entry = LinkDataController.objects.get(id=pk)
 
-    if LinkDataHyperController.make_bookmarked(request, entry):
+    new_entry = LinkDataWrapper.make_bookmarked(request, entry)
+
+    if new_entry:
         if Configuration.get_object().config_entry.link_save:
             BackgroundJobController.link_save(entry.link)
 
-    return HttpResponseRedirect(entry.get_absolute_url())
+    return HttpResponseRedirect(new_entry.get_absolute_url())
 
 
 def make_not_bookmarked_entry(request, pk):
@@ -811,11 +816,9 @@ def make_not_bookmarked_entry(request, pk):
         return data
 
     entry = LinkDataController.objects.get(id=pk)
-    LinkDataHyperController.make_not_bookmarked(request, entry)
+    new_entry = LinkDataWrapper.make_not_bookmarked(request, entry)
 
-    entry = LinkDataHyperController.get_link_object(entry.link)
-
-    return HttpResponseRedirect(entry.get_absolute_url())
+    return HttpResponseRedirect(new_entry.get_absolute_url())
 
 
 def download_entry(request, pk):
@@ -956,10 +959,12 @@ def archive_make_bookmarked_entry(request, pk):
 
     entry = ArchiveLinkDataController.objects.get(id=pk)
 
-    if LinkDataHyperController.make_bookmarked(request, entry):
+    new_entry = LinkDataWrapper.make_bookmarked(request, entry)
+
+    if new_entry:
         BackgroundJobController.link_save(entry.link)
 
-    return HttpResponseRedirect(entry.get_absolute_url())
+    return HttpResponseRedirect(new_entry.get_absolute_url())
 
 
 def archive_make_not_bookmarked_entry(request, pk):
@@ -970,9 +975,9 @@ def archive_make_not_bookmarked_entry(request, pk):
         return data
 
     entry = LinkDataController.objects.get(id=pk)
-    LinkDataHyperController.make_not_bookmarked(request, entry)
+    new_entry = LinkDataWrapper.make_not_bookmarked(request, entry)
 
-    return HttpResponseRedirect(entry.get_absolute_url())
+    return HttpResponseRedirect(new_entry.get_absolute_url())
 
 
 def archive_edit_entry(request, pk):

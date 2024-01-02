@@ -111,7 +111,6 @@ class EntryUrlInterface(object):
             source_obj = sources[0]
 
         # always use classic link format in storage
-        print("changin link:{} to {}".format(self.url, p.get_link_classic()))
         input_props["link"] = p.get_link_classic()
 
         if "title" not in input_props:
@@ -288,7 +287,7 @@ class UrlHandler(object):
             url.startswith("www.youtube.com/watch")
             or url.startswith("youtube.com/watch")
             or url.startswith("m.youtube.com/watch")
-            or url.startswith("youtu.be")
+            or (url.startswith("youtu.be/") and len(url) > len("youtu.be/"))
         ):
             return UrlHandler.youtube_video_handler(url)
         if (

@@ -84,7 +84,10 @@ class LinkDataController(LinkDataModel):
             entries = LinkDataController.objects.filter(link=full_domain)
             if not entries.exist():
                 LinkDatabase.info("Creating entry for domain:{}".format(full_domain))
-                obj = LinkDataHyperController.add_simple(full_domain)
+                b = LinkDataBuilder()
+                b.link = full_domain
+                obj = b.get_from_link()
+
                 if not obj:
                     PersistentInfo.create(
                         "Irreversably removing domain:{}".format(domain.domain)
@@ -105,7 +108,10 @@ class LinkDataController(LinkDataModel):
                     LinkDatabase.info(
                         "Replacing http with https for:{} {}".format(link, new_link)
                     )
-                    obj = LinkDataHyperController.add_simple(new_link)
+                    b = LinkDataBuilder()
+                    b.link = new_link
+                    obj = b.get_from_link()
+
                     if obj:
                         LinkDatabase.info(
                             "Removing old for:{} {}".format(link, new_link)
@@ -310,265 +316,137 @@ class ArchiveLinkDataController(ArchiveLinkDataModel):
         )
 
 
-class LinkDataHyperController(object):
-    """
-    Archive managment can be tricky. It is long to process entire archive.
-    If there is a possiblity we do not search it, we do not add anything to it.
-    """
+class LinkDataWrapper(object):
 
-    def add_simple(link_url, input_props=None):
-        objs = LinkDataController.objects.filter(link=link_url)
-        if objs.count() != 0:
-            return objs[0]
+    def __init__(self, link, date = None):
+        self.link = link
+        self.date = date
 
-        from ..pluginentries.entryurlinterface import EntryUrlInterface
+    def is_archive(self):
+        is_archive = BaseLinkDataController.is_archive_by_date(self.date)
+        return is_archive
 
-        url = EntryUrlInterface(link_url)
-        props = url.get_props()
-        if props:
-            return LinkDataHyperController.add_new_link_internal(props)
+    def get(self):
+        if self.date:
+            is_archive = self.is_archive()
+
+            if not is_archive:
+                obj = self.get_from_operational_db()
+                if obj:
+                    return obj
+            else:
+                obj = self.get_from_archive()
+                if obj:
+                    return obj
+
         else:
-            LinkDatabase.info("Could not obtain properties for:{}".format(link_url))
-
-    def add_new_link(link_data, source_is_auto=False):
-        obj = None
-
-        if link_data["link"].endswith("/"):
-            link_data["link"] = link_data["link"][:-1]
-
-        # Try with https more that with https
-        if link_data["link"].startswith("http://"):
-            link_data["link"] = link_data["link"].replace("http://", "https://")
-
-        if not LinkDataHyperController.add_new_link_internal(link_data, source_is_auto):
-            # Try with https more that with http
-            link_data["link"] = link_data["link"].replace("https://", "http://")
-
-            return LinkDataHyperController.add_new_link_internal(
-                link_data, source_is_auto
-            )
-
-    def add_new_link_internal(link_data, source_is_auto=False):
-        obj = None
-
-        link_data = LinkDataHyperController.get_clean_link_data(link_data)
-
-        c = Configuration.get_object().config_entry
-        if (
-            LinkDataHyperController.is_domain_link_data(link_data)
-            and c.auto_store_domain_info
-        ):
-            if c.auto_store_domain_info:
-                link_data["permanent"] = True
-
-        if LinkDataHyperController.is_enabled_to_store(link_data, source_is_auto):
-            link_data = LinkDataHyperController.check_and_set_source_object(link_data)
-
-            is_archive = LinkDataHyperController.is_link_data_for_archive(link_data)
-
-            obj = LinkDataHyperController.get_entry_internal(link_data, is_archive)
-
+            obj = self.get_from_operational_db()
             if obj:
                 return obj
 
-            obj = LinkDataHyperController.add_entry_internal(link_data, is_archive)
+            obj = self.get_from_archive()
+            if obj:
+                return obj
 
-        LinkDataHyperController.add_addition_link_data(link_data)
+    def get_from_archive(self):
+        objs = ArchiveLinkDataModel.objects.filter(link=self.link)
+        if objs.exists():
+            return objs[0]
 
-        return obj
+    def get_from_operational_db(self):
+        objs = LinkDataController.objects.filter(link=self.link)
+        if objs.exists():
+            return objs[0]
 
-    def get_clean_link_data(props):
-        result = {}
-        test = LinkDataController() # create fake controller, to obtain only necessary fields
-
-        for key in props:
-            if hasattr(test, key):
-                result[key] = props[key]
-
-        return result
-
-    def is_domain_link_data(link_data):
-        p = BasePage(link_data["link"])
-        return p.get_domain() == link_data["link"]
-
-    def get_entry_internal(link_data, is_archive):
-        if not is_archive:
-            objs = LinkDataModel.objects.filter(link=link_data["link"])
-            if objs.exists():
-                return objs[0]
-        else:
-            objs = ArchiveLinkDataModel.objects.filter(link=link_data["link"])
-            if objs.exists():
-                return objs[0]
-
-    def add_entry_internal(link_data, is_archive):
-        from ..dateutils import DateUtils
-        from .domains import DomainsController
-
-        new_link_data = dict(link_data)
-        if "date_published" not in new_link_data:
-            new_link_data["date_published"] = DateUtils.get_datetime_now_utc()
-
-        domain = DomainsController.add(new_link_data["link"])
-        if domain:
-            new_link_data["domain_obj"] = domain
-
-        if new_link_data["description"] != None:
-            new_link_data["description"] = new_link_data["description"][
-                : BaseLinkDataController.get_description_length() - 2
-            ]
-
-        LinkDatabase.info("Adding link: {}".format(link_data["link"]))
+    def create(self, link_data):
+        self.date = link_data["date_published"]
+        is_archive = self.is_archive()
+        if "bookmarked" in link_data and link_data["bookmarked"]:
+            is_archive = False
 
         if not is_archive:
-            ob = LinkDataModel.objects.create(**new_link_data)
+            ob = LinkDataModel.objects.create(**link_data)
 
         elif is_archive:
-            ob = ArchiveLinkDataModel.objects.create(**new_link_data)
+            ob = ArchiveLinkDataModel.objects.create(**link_data)
 
         return ob
 
-    def is_link_data_for_archive(link_data):
-        if "bookmarked" in link_data and link_data["bookmarked"]:
-            return False
+    def move_to_archive(entry_obj):
+        objs = ArchiveLinkDataModel.objects.filter(link=entry_obj.link)
 
-        is_archive = False
-        if "date_published" in link_data:
-            is_archive = BaseLinkDataController.is_archive_by_date(
-                link_data["date_published"]
-            )
+        if objs.count() == 0:
+            themap = entry_obj.get_map()
+            themap["source_obj"] = entry_obj.get_source_obj()
+            themap["domain_obj"] = entry_obj.domain_obj
+            try:
+                archive_obj = ArchiveLinkDataModel.objects.create(**themap)
+                entry_obj.delete()
+                return archive_obj
 
-        return is_archive
+            except Exception as e:
+                error_text = traceback.format_exc()
+                PersistentInfo.error("Cannot move to archive {}".format(error_text))
+        else:
+            try:
+                entry.delete()
+            except Exception as e:
+                error_text = traceback.format_exc()
+                PersistentInfo.error("Cannot delete entry {}".format(error_text))
 
-    def check_and_set_source_object(link_data):
-        if "source_obj" not in link_data and "source" in link_data:
-            source_obj = None
-            sources = SourceDataController.objects.filter(url=link_data["source"])
-            if sources.exists():
-                source_obj = sources[0]
+    def move_from_archive(archive_obj):
+        objs = LinkDataController.objects.filter(link=archive_obj.link)
+        if objs.count() == 0:
+            themap = archive_obj.get_map()
+            themap["source_obj"] = archive_obj.get_source_obj()
+            themap["domain_obj"] = archive_obj.domain_obj
+            try:
+                new_obj = LinkDataController.objects.create(**themap)
+                entry.delete()
+                return new_obj
 
-            link_data["source_obj"] = source_obj
+            except Exception as e:
+                error_text = traceback.format_exc()
+        else:
+            try:
+                entry.delete()
+            except Exception as e:
+                error_text = traceback.format_exc()
 
-        return link_data
+    def make_bookmarked(request, entry):
+        if entry.is_archive_entry():
+            entry = LinkDataWrapper.move_from_archive(entry)
 
-    def is_enabled_to_store(link_data, source_is_auto):
-        # manual entry is always enabled
-        if not source_is_auto:
-            return True
+        entry.make_bookmarked(request.user.username)
+        return entry
 
-        config = Configuration.get_object().config_entry
+    def make_not_bookmarked(request, entry):
+        entry.make_not_bookmarked(request.user.username)
+        from ..dateutils import DateUtils
 
-        p = BasePage(link_data["link"])
-        is_domain = p.is_domain()
+        days_diff = DateUtils.get_day_diff(entry.date_published)
 
-        if not config.auto_store_entries:
-            if is_domain and config.auto_store_domain_info:
-                pass
-            elif "bookmarked" in link_data and link_data["bookmarked"]:
-                pass
-            else:
-                return False
-
-        if LinkDataHyperController.is_live_video(link_data):
-            return False
-
-        return True
-
-    def is_live_video(link_data):
-        from ..pluginentries.entryurlinterface import UrlHandler
-
-        if "link" in link_data and link_data["link"]:
-            handler = UrlHandler.get(link_data["link"])
-            if type(handler) is UrlHandler.youtube_video_handler:
-                if handler.get_video_code():
-                    handler.download_details()
-                    if not handler.is_valid():
-                        return True
-
-        return False
-
-    def is_link(link):
-        objs = LinkDataModel.objects.filter(link=link)
-        if objs.exists():
-            return True
-
-        objs = ArchiveLinkDataModel.objects.filter(link=link)
-        if objs.exists():
-            return True
-
-        return False
-
-    def add_addition_link_data(link_data):
-        try:
-            LinkDataHyperController.add_domains(link_data)
-            LinkDataHyperController.add_keywords(link_data)
-            LinkDataHyperController.add_sources(link_data)
-
-        except Exception as e:
-            error_text = traceback.format_exc()
-            PersistentInfo.exc(
-                "Could not process entry: Entry:{} {}; Exc:{}\n{}".format(
-                    link_data["link"],
-                    link_data["title"],
-                    str(e),
-                    error_text,
-                )
-            )
-            LinkDatabase.info(error_text)
-
-    def add_domains(link_data):
-        config = Configuration.get_object().config_entry
-        if config.auto_store_domain_info:
-            domains = set()
-
-            p = BasePage(link_data["link"])
-            domain = p.get_domain()
-            domains.add(domain)
-
-            parser = ContentLinkParser(link_data["link"], link_data["description"])
-            description_links = parser.get_links()
-
-            for link in description_links:
-                ppp = BasePage(link)
-                domain = ppp.get_domain()
-                domains.add(domain)
-
-            for domain in domains:
-                LinkDataHyperController.add_simple(domain)
-
-    def add_keywords(link_data):
-        config = Configuration.get_object().config_entry
-
-        if config.auto_store_keyword_info:
-            if "title" in link_data:
-                KeyWords.add_link_data(link_data)
-
-    def add_sources(link_props):
         conf = Configuration.get_object().config_entry
 
-        if not conf.auto_store_sources:
-            return
+        if days_diff > conf.days_to_move_to_archive:
+            return LinkDataWrapper.move_to_archive(entry)
 
-        link = link_props["link"]
-        if "contents" in link_props:
-            html = HtmlPage(link, link_props["contents"])
-        else:
-            html = HtmlPage(link)
+        return entry
 
-        props = html.get_properties()
+    def get_clean_description(link_data):
+        import re
 
-        if "rss_urls" not in props:
-            return
+        # as per recommendation from @freylis, compile once only
+        CLEANR = re.compile("<.*?>")
 
-        if props["rss_urls"] is None:
-            return
+        cleantext = re.sub(CLEANR, "", link_data["description"])
+        return cleantext
+        # from bs4 import BeautifulSoup
+        # cleantext = BeautifulSoup(link_data["description"], "lxml").text
+        # return cleantext
 
-        rss_urls = props["rss_urls"]
-        if len(rss_urls) == 0:
-            return
 
-        for rss_url in rss_urls:
-            LinkDataHyperController.add_source(rss_url, link_props)
+class LinkSourceBuilder(object):
 
     def add_source(rss_url, link_props):
         conf = Configuration.get_object().config_entry
@@ -620,108 +498,277 @@ class LinkDataHyperController(object):
         except Exception as E:
             PersistentInfo.error("Exception {}".format(str(E)))
 
-    def store_error_info(url, info):
-        lines = traceback.format_stack()
-        line_text = ""
-        for line in lines:
-            line_text += line
 
-        PersistentInfo.error("Domain{};{};Lines:{}".format(url, info, line_text))
+class LinkDataBuilder(object):
+    """
+    Archive managment can be tricky. It is long to process entire archive.
+    If there is a possiblity we do not search it, we do not add anything to it.
+    """
 
-    def get_link_object(link, date=None):
+    def __init__(self, link = None, link_data = None, source_is_auto = False):
+        self.link = link
+        self.link_data = link_data
+        self.source_is_auto = source_is_auto
+
+        if self.link:
+            self.add_from_link()
+
+        if self.link_data:
+            self.add_from_props()
+
+    def add_from_link(self):
+        wrapper = LinkDataWrapper(self.link)
+        obj = wrapper.get_from_operational_db()
+        if obj:
+            return obj
+
+        from ..pluginentries.entryurlinterface import EntryUrlInterface
+
+        url = EntryUrlInterface(self.link)
+        link_data = url.get_props()
+
+        # TODO update missing keys - do not replace them
+
+        if self.link_data and link_data:
+            new_link_data = {**self.link_data, **link_data}
+        if self.link_data:
+            new_link_data = self.link_data
+        if link_data:
+            new_link_data = link_data
+
+        self.link_data = new_link_data
+
+        if self.link_data:
+            return self.add_from_props_internal()
+        else:
+            LinkDatabase.info("Could not obtain properties for:{}".format(self.link))
+
+    def add_from_props(self):
+        obj = None
+
+        wrapper = LinkDataWrapper(self.link)
+        obj = wrapper.get_from_operational_db()
+        if obj:
+            return obj
+
+        # Try with https more that with https
+        if self.link_data["link"].startswith("http://"):
+            self.link_data["link"] = self.link_data["link"].replace("http://", "https://")
+
+        if not self.add_from_props_internal():
+            # Try with https more that with http
+            self.link_data["link"] = self.link_data["link"].replace("https://", "http://")
+
+            return self.add_from_props_internal()
+
+    def add_from_props_internal(self):
+        obj = None
+
+        self.link_data = self.get_clean_link_data()
+
+        c = Configuration.get_object().config_entry
+        if (
+            self.is_domain_link_data()
+            and c.auto_store_domain_info
+        ):
+            if c.auto_store_domain_info:
+                self.link_data["permanent"] = True
+
+        if self.is_enabled_to_store():
+            self.link_data = self.check_and_set_source_object()
+
+            date = None
+            if "date_published" in self.link_data:
+                date = self.link_data["date_published"]
+            wrapper = LinkDataWrapper(self.link_data["link"], date)
+            obj = wrapper.get()
+
+            if obj:
+                return obj
+
+            obj = self.add_entry_internal()
+
+        self.add_addition_link_data()
+
+        return obj
+
+    def get_clean_link_data(self):
+        props = self.link_data
+
+        result = {}
+        test = LinkDataController() # create fake controller, to obtain only necessary fields
+
+        for key in props:
+            if hasattr(test, key):
+                result[key] = props[key]
+
+        if "link" in result and result["link"].endswith("/"):
+            result["link"] = result["link"][:-1]
+
+        return result
+
+    def is_domain_link_data(self):
+        link_data = self.link_data
+        p = BasePage(link_data["link"])
+        return p.get_domain() == link_data["link"]
+
+    def add_entry_internal(self):
         from ..dateutils import DateUtils
+        from .domains import DomainsController
+
+        link_data = self.link_data
+
+        new_link_data = dict(link_data)
+        if "date_published" not in new_link_data:
+            new_link_data["date_published"] = DateUtils.get_datetime_now_utc()
+
+        domain = DomainsController.add(new_link_data["link"])
+        if domain:
+            new_link_data["domain_obj"] = domain
+
+        if new_link_data["description"] != None:
+            new_link_data["description"] = new_link_data["description"][
+                : BaseLinkDataController.get_description_length() - 2
+            ]
+
+        LinkDatabase.info("Adding link: {}".format(link_data["link"]))
+
+        wrapper = LinkDataWrapper(link_data["link"], link_data["date_published"])
+        return wrapper.create(new_link_data)
+
+    def check_and_set_source_object(self):
+        link_data = self.link_data
+
+        if "source_obj" not in link_data and "source" in link_data:
+            source_obj = None
+            sources = SourceDataController.objects.filter(url=link_data["source"])
+            if sources.exists():
+                source_obj = sources[0]
+
+            link_data["source_obj"] = source_obj
+
+        return link_data
+
+    def is_enabled_to_store(self):
+        # manual entry is always enabled
+        if not self.source_is_auto:
+            return True
+
+        config = Configuration.get_object().config_entry
+
+        p = BasePage(self.link_data["link"])
+        is_domain = p.is_domain()
+
+        if not config.auto_store_entries:
+            if is_domain and config.auto_store_domain_info:
+                pass
+            elif "bookmarked" in self.link_data and self.link_data["bookmarked"]:
+                pass
+            else:
+                return False
+
+        if self.is_live_video():
+            return False
+
+        return True
+
+    def is_live_video(self):
+        from ..pluginentries.entryurlinterface import UrlHandler
+
+        link_data = self.link_data
+
+        if "link" in link_data and link_data["link"]:
+            handler = UrlHandler.get(link_data["link"])
+            if type(handler) is UrlHandler.youtube_video_handler:
+                if handler.get_video_code():
+                    handler.download_details()
+                    if not handler.is_valid():
+                        return True
+
+        return False
+
+    def add_addition_link_data(self):
+        try:
+            link_data = self.link_data
+
+            self.add_domains()
+            self.add_keywords()
+            self.add_sources()
+
+        except Exception as e:
+            error_text = traceback.format_exc()
+            PersistentInfo.exc(
+                "Could not process entry: Entry:{} {}; Exc:{}\n{}".format(
+                    link_data["link"],
+                    link_data["title"],
+                    str(e),
+                    error_text,
+                )
+            )
+            LinkDatabase.info(error_text)
+
+    def add_domains(self):
+        link_data = self.link_data
+
+        config = Configuration.get_object().config_entry
+        if config.auto_store_domain_info:
+            domains = set()
+
+            p = BasePage(link_data["link"])
+            domain = p.get_domain()
+            domains.add(domain)
+
+            parser = ContentLinkParser(link_data["link"], link_data["description"])
+            description_links = parser.get_links()
+
+            for link in description_links:
+                ppp = BasePage(link)
+                domain = ppp.get_domain()
+                domains.add(domain)
+
+            for domain in domains:
+                LinkDataBuilder(link = domain)
+
+    def add_keywords(self):
+        link_data = self.link_data
+
+        config = Configuration.get_object().config_entry
+
+        if config.auto_store_keyword_info:
+            if "title" in link_data:
+                KeyWords.add_link_data(link_data)
+
+    def add_sources(self):
+        link_props = self.link_data
 
         conf = Configuration.get_object().config_entry
 
-        if date is None:
-            obj = LinkDataController.objects.filter(link=link)
-            if obj.count() > 0:
-                return obj[0]
-            obj = ArchiveLinkDataController.objects.filter(link=link)
-            if obj.count() > 0:
-                return obj[0]
+        if not conf.auto_store_sources:
+            return
 
-            return None
-
-        is_archive = BaseLinkDataController.is_archive_by_date(date)
-
-        if is_archive:
-            obj = ArchiveLinkDataController.objects.filter(link=link)
-            if obj.count() > 0:
-                return obj[0]
+        link = link_props["link"]
+        if "contents" in link_props:
+            html = HtmlPage(link, link_props["contents"])
         else:
-            obj = LinkDataController.objects.filter(link=link)
-            if obj.count() > 0:
-                return obj[0]
+            html = HtmlPage(link)
 
-    def make_bookmarked(request, entry):
-        if entry.is_archive_entry():
-            LinkDataHyperController.move_from_archive(entry)
+        props = html.get_properties()
 
-        entry.make_bookmarked(request.user.username)
-        return True
+        if "rss_urls" not in props:
+            return
 
-    def make_not_bookmarked(request, entry):
-        entry.make_not_bookmarked(request.user.username)
-        from ..dateutils import DateUtils
+        if props["rss_urls"] is None:
+            return
 
-        days_diff = DateUtils.get_day_diff(entry.date_published)
+        rss_urls = props["rss_urls"]
+        if len(rss_urls) == 0:
+            return
 
-        conf = Configuration.get_object().config_entry
-
-        if days_diff > conf.days_to_move_to_archive:
-            LinkDataHyperController.move_to_archive(entry)
-
-        return True
-
-    def move_to_archive(entry):
-        objs = ArchiveLinkDataModel.objects.filter(link=entry.link)
-        if objs.count() == 0:
-            themap = entry.get_map()
-            themap["source_obj"] = entry.get_source_obj()
-            try:
-                ArchiveLinkDataModel.objects.create(**themap)
-                entry.delete()
-            except Exception as e:
-                error_text = traceback.format_exc()
-                PersistentInfo.error("Cannot move to archive {}".format(error_text))
-        else:
-            try:
-                entry.delete()
-            except Exception as e:
-                error_text = traceback.format_exc()
-                PersistentInfo.error("Cannot delete entry {}".format(error_text))
-
-    def move_from_archive(entry):
-        objs = LinkDataModel.objects.filter(link=entry.link)
-        if objs.count() == 0:
-            themap = entry.get_map()
-            themap["source_obj"] = entry.get_source_obj()
-            try:
-                LinkDataModel.objects.create(**themap)
-                entry.delete()
-            except Exception as e:
-                error_text = traceback.format_exc()
-        else:
-            try:
-                entry.delete()
-            except Exception as e:
-                error_text = traceback.format_exc()
+        for rss_url in rss_urls:
+            LinkSourceBuilder.add_source(rss_url, link_props)
 
     def read_domains_from_bookmarks():
-        objs = LinkDataModel.objects.filter(bookmarked=True)
+        objs = LinkDataController.objects.filter(bookmarked=True)
         for obj in objs:
             p = BasePage(obj.link)
-            LinkDataHyperController.add_simple(p.get_domain())
-
-    def get_clean_description(link_data):
-        import re
-
-        # as per recommendation from @freylis, compile once only
-        CLEANR = re.compile("<.*?>")
-
-        cleantext = re.sub(CLEANR, "", link_data["description"])
-        return cleantext
-        # from bs4 import BeautifulSoup
-        # cleantext = BeautifulSoup(link_data["description"], "lxml").text
-        # return cleantext
+            LinkDataBuilder(link = p.get_domain())

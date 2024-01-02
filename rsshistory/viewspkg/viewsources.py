@@ -11,7 +11,7 @@ from ..controllers import (
     SourceDataController,
     LinkDataController,
     BackgroundJobController,
-    LinkDataHyperController,
+    LinkDataWrapper,
 )
 from ..forms import SourceForm, SourcesChoiceForm
 from ..queryfilters import SourceFilter
@@ -414,7 +414,8 @@ def import_youtube_links_for_source(request, pk):
 
     for link in links:
         print("Adding job {}".format(link))
-        if not LinkDataHyperController.is_link(link):
+        wrapper = LinkDataWrapper(link = link)
+        if not wrapper.get():
             BackgroundJobController.link_add(link, source_obj)
 
     p.context["summary_text"] = ""
