@@ -56,6 +56,6 @@ class LinkCommentDataController(LinkCommentDataModel):
     def is_html_contents(text):
         from bs4 import BeautifulSoup
 
-        soup = BeautifulSoup(text, 'html.parser')
+        soup = BeautifulSoup(text, "html.parser")
         tags = soup.find_all()
         return len(tags) > 0

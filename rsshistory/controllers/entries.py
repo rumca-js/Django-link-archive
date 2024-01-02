@@ -317,8 +317,7 @@ class ArchiveLinkDataController(ArchiveLinkDataModel):
 
 
 class LinkDataWrapper(object):
-
-    def __init__(self, link, date = None):
+    def __init__(self, link, date=None):
         self.link = link
         self.date = date
 
@@ -447,7 +446,6 @@ class LinkDataWrapper(object):
 
 
 class LinkSourceBuilder(object):
-
     def add_source(rss_url, link_props):
         conf = Configuration.get_object().config_entry
 
@@ -505,7 +503,7 @@ class LinkDataBuilder(object):
     If there is a possiblity we do not search it, we do not add anything to it.
     """
 
-    def __init__(self, link = None, link_data = None, source_is_auto = False):
+    def __init__(self, link=None, link_data=None, source_is_auto=False):
         self.link = link
         self.link_data = link_data
         self.source_is_auto = source_is_auto
@@ -553,11 +551,15 @@ class LinkDataBuilder(object):
 
         # Try with https more that with https
         if self.link_data["link"].startswith("http://"):
-            self.link_data["link"] = self.link_data["link"].replace("http://", "https://")
+            self.link_data["link"] = self.link_data["link"].replace(
+                "http://", "https://"
+            )
 
         if not self.add_from_props_internal():
             # Try with https more that with http
-            self.link_data["link"] = self.link_data["link"].replace("https://", "http://")
+            self.link_data["link"] = self.link_data["link"].replace(
+                "https://", "http://"
+            )
 
             return self.add_from_props_internal()
 
@@ -567,10 +569,7 @@ class LinkDataBuilder(object):
         self.link_data = self.get_clean_link_data()
 
         c = Configuration.get_object().config_entry
-        if (
-            self.is_domain_link_data()
-            and c.auto_store_domain_info
-        ):
+        if self.is_domain_link_data() and c.auto_store_domain_info:
             if c.auto_store_domain_info:
                 self.link_data["permanent"] = True
 
@@ -596,7 +595,9 @@ class LinkDataBuilder(object):
         props = self.link_data
 
         result = {}
-        test = LinkDataController() # create fake controller, to obtain only necessary fields
+        test = (
+            LinkDataController()
+        )  # create fake controller, to obtain only necessary fields
 
         for key in props:
             if hasattr(test, key):
@@ -727,7 +728,7 @@ class LinkDataBuilder(object):
                 domains.add(domain)
 
             for domain in domains:
-                LinkDataBuilder(link = domain)
+                LinkDataBuilder(link=domain)
 
     def add_keywords(self):
         link_data = self.link_data
@@ -771,4 +772,4 @@ class LinkDataBuilder(object):
         objs = LinkDataController.objects.filter(bookmarked=True)
         for obj in objs:
             p = BasePage(obj.link)
-            LinkDataBuilder(link = p.get_domain())
+            LinkDataBuilder(link=p.get_domain())

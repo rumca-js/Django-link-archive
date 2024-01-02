@@ -47,7 +47,6 @@ webpage_rss = """
 
 
 class RssPageTest(WebPageDisabled, TestCase):
-
     def setUp(self):
         self.disable_web_pages()
 

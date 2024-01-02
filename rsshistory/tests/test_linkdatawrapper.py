@@ -79,7 +79,7 @@ class LinkDataWrapperTest(WebPageDisabled, TestCase):
             "language": "en",
             "thumbnail": "https://youtube.com/favicon.ico",
             "date_published": DateUtils.get_datetime_now_utc(),
-            "bookmarked" : True,
+            "bookmarked": True,
         }
 
         b = LinkDataBuilder()

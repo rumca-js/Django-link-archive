@@ -42,7 +42,7 @@ class LinkDataControllerTest(WebPageDisabled, TestCase):
             bookmarked=True,
             language="en",
             domain_obj=domain,
-            date_published = days_before,
+            date_published=days_before,
         )
 
         ob = LinkDataController.objects.create(
@@ -53,7 +53,7 @@ class LinkDataControllerTest(WebPageDisabled, TestCase):
             bookmarked=False,
             language="en",
             domain_obj=domain,
-            date_published = days_before,
+            date_published=days_before,
         )
 
         ob = LinkDataController.objects.create(
@@ -64,7 +64,7 @@ class LinkDataControllerTest(WebPageDisabled, TestCase):
             permanent=True,
             language="en",
             domain_obj=domain,
-            date_published = days_before,
+            date_published=days_before,
         )
 
     def test_move_old_links_to_archive(self):

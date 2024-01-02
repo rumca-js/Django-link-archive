@@ -457,8 +457,9 @@ webpage_code_project_contents = """
   </channel>
 </rss>
 """
-class CodeProjectPluginTest(WebPageDisabled, TestCase):
 
+
+class CodeProjectPluginTest(WebPageDisabled, TestCase):
     def setUp(self):
         self.disable_web_pages()
 

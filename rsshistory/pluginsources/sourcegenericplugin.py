@@ -47,11 +47,13 @@ class SourceGenericPlugin(HtmlPage):
                 continue
 
             if "link" not in link_data or not link_data["link"]:
-                PersistentInfo.error("Invalid link properties. Missing key: {}".format(str(link_data)))
+                PersistentInfo.error(
+                    "Invalid link properties. Missing key: {}".format(str(link_data))
+                )
             else:
                 b = LinkDataBuilder()
                 b.link_data = link_data
-                b.source_is_auto=True
+                b.source_is_auto = True
 
                 entry = b.add_from_props()
                 if entry:

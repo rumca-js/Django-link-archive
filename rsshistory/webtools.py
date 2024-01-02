@@ -50,6 +50,7 @@ def lazy_load_content(func):
     We do not want page contents during construction.
     We want it only when necessary.
     """
+
     def wrapper(self, *args, **kwargs):
         if not self.contents:
             self.contents = self.get_contents()
@@ -468,8 +469,8 @@ class DomainAwarePage(BasePage):
             "js": URL_TYPE_JAVASCRIPT,
             "html": URL_TYPE_HTML,
             "htm": URL_TYPE_HTML,
-            #"php": URL_TYPE_HTML,    seen in the wild, where dynamic pages were used to generate RSS :(
-            #"aspx": URL_TYPE_HTML,
+            # "php": URL_TYPE_HTML,    seen in the wild, where dynamic pages were used to generate RSS :(
+            # "aspx": URL_TYPE_HTML,
         }
 
         ext = self.get_page_ext()
@@ -1418,7 +1419,6 @@ class Url(object):
 
 
 class InputContent(object):
-
     def __init__(self, text):
         self.text = text
 
@@ -1426,7 +1426,7 @@ class InputContent(object):
         """
         Use iterative approach. There is one thing to keep in mind:
          - text can contain <a href=" links already
-        
+
         So some links needs to be translated. Some do not.
         """
         self.text = self.strip_html_attributes()
@@ -1436,15 +1436,16 @@ class InputContent(object):
 
     def strip_html_attributes(self):
         from bs4 import BeautifulSoup
-        soup = BeautifulSoup(self.text, 'html.parser')
+
+        soup = BeautifulSoup(self.text, "html.parser")
 
         for tag in soup.find_all(True):
-            if tag.name == 'a':
+            if tag.name == "a":
                 # Preserve "href" attribute for anchor tags
-                tag.attrs = {'href': tag.get('href')}
-            elif tag.name == 'img':
+                tag.attrs = {"href": tag.get("href")}
+            elif tag.name == "img":
                 # Preserve "src" attribute for image tags
-                tag.attrs = {'src': tag.get('src')}
+                tag.attrs = {"src": tag.get("src")}
             else:
                 # Remove all other attributes
                 tag.attrs = {}
@@ -1462,16 +1463,15 @@ class InputContent(object):
         i = 0
 
         while i < len(self.text):
-            pattern = r'{}\S+(?![\w.])'.format(protocol)
+            pattern = r"{}\S+(?![\w.])".format(protocol)
             match = re.match(pattern, self.text[i:])
             if match:
                 url = match.group()
                 # Check the previous 10 characters
-                preceding_chars = self.text[max(0, i - 10):i]
+                preceding_chars = self.text[max(0, i - 10) : i]
 
                 # We do not care who write links using different char order
-                if ('<a href="' not in preceding_chars and
-                   '<img' not in preceding_chars):
+                if '<a href="' not in preceding_chars and "<img" not in preceding_chars:
                     result += f'<a href="{url}">{url}</a>'
                 else:
                     result += url
@@ -1483,5 +1483,3 @@ class InputContent(object):
         self.text = result
 
         return result
-
-

@@ -295,9 +295,7 @@ class SourceForm(forms.ModelForm):
         self.fields["favicon"].required = False
 
         names = SourceControllerBuilder.get_plugin_names()
-        self.fields["source_type"].widget = forms.Select(
-            choices=self.to_choices(names)
-        )
+        self.fields["source_type"].widget = forms.Select(choices=self.to_choices(names))
 
     def to_choices(self, names):
         names = sorted(names)

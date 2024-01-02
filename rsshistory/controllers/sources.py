@@ -36,7 +36,7 @@ class SourceDataController(SourceDataModel):
             from .entries import LinkDataBuilder
 
             p = BasePage(source_data_map["url"])
-            LinkDataBuilder(link = p.get_domain())
+            LinkDataBuilder(link=p.get_domain())
 
         return source
 

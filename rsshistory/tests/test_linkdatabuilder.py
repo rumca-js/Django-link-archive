@@ -122,7 +122,7 @@ class LinkDataBuilderTest(WebPageDisabled, TestCase):
             "bookmarked": False,
         }
 
-        b = LinkDataBuilder(source_is_auto = True)
+        b = LinkDataBuilder(source_is_auto=True)
         b.link_data = link_data
         # call tested function
         entry = b.add_from_props()
@@ -155,7 +155,7 @@ class LinkDataBuilderTest(WebPageDisabled, TestCase):
             "bookmarked": True,
         }
 
-        b = LinkDataBuilder(source_is_auto = True)
+        b = LinkDataBuilder(source_is_auto=True)
         b.link_data = link_data
         # call tested function
         entry = b.add_from_props()
@@ -184,7 +184,7 @@ class LinkDataBuilderTest(WebPageDisabled, TestCase):
             "bookmarked": True,
         }
 
-        b = LinkDataBuilder(source_is_auto = True)
+        b = LinkDataBuilder(source_is_auto=True)
         b.link_data = link_data
         # call tested function
         entry = b.add_from_props()

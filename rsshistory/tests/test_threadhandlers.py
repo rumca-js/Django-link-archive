@@ -509,7 +509,10 @@ class ProcessSourceHandlerTest(WebPageDisabled, TestCase):
         DomainsController.objects.all().delete()
         SourceDataController.objects.all().delete()
 
-        ob = BackgroundJobController.objects.create(job = BackgroundJob.JOB_PROCESS_SOURCE, subject="https://manually-added-link.com")
+        ob = BackgroundJobController.objects.create(
+            job=BackgroundJob.JOB_PROCESS_SOURCE,
+            subject="https://manually-added-link.com",
+        )
 
         handler = ProcessSourceJobHandler()
         # call tested function
@@ -534,9 +537,14 @@ class ProcessSourceHandlerTest(WebPageDisabled, TestCase):
         LinkDataController.objects.all().delete()
         DomainsController.objects.all().delete()
         SourceDataController.objects.all().delete()
-        SourceDataController.objects.create(url = "https://www.youtube.com/feeds/channel=samtime")
+        SourceDataController.objects.create(
+            url="https://www.youtube.com/feeds/channel=samtime"
+        )
 
-        ob = BackgroundJobController.objects.create(job = BackgroundJob.JOB_PROCESS_SOURCE, subject="https://www.youtube.com/feeds/channel=samtime")
+        ob = BackgroundJobController.objects.create(
+            job=BackgroundJob.JOB_PROCESS_SOURCE,
+            subject="https://www.youtube.com/feeds/channel=samtime",
+        )
 
         handler = ProcessSourceJobHandler()
         # call tested function

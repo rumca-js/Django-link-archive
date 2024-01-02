@@ -172,36 +172,33 @@ class InputContentTest(WebPageDisabled, TestCase):
         self.disable_web_pages()
 
     def test_htmlify_two_normal_links(self):
-
-        content = '''this is <a href="https://first-link.com">First Link</a>
-        this is <a href="https://second-link.com">Second Link</a>'''
+        content = """this is <a href="https://first-link.com">First Link</a>
+        this is <a href="https://second-link.com">Second Link</a>"""
 
         c = InputContent(content)
         result = c.htmlify()
         self.assertEqual(result, content)
 
     def test_htmlify_pure_links(self):
-
-        content = '''this is https://first-link.com
-        this is https://second-link.com'''
+        content = """this is https://first-link.com
+        this is https://second-link.com"""
 
         c = InputContent(content)
         result = c.htmlify()
 
-        expected_result = '''this is <a href="https://first-link.com">https://first-link.com</a>
-        this is <a href="https://second-link.com">https://second-link.com</a>'''
+        expected_result = """this is <a href="https://first-link.com">https://first-link.com</a>
+        this is <a href="https://second-link.com">https://second-link.com</a>"""
 
         self.assertEqual(result, expected_result)
 
     def test_htmlify_removes_attrs(self):
-
-        content = '''this is <a href="https://first-link.com" style="clear:both">First Link</a>
-        this is <a href="https://second-link.com" style="display:flex">Second Link</a>'''
+        content = """this is <a href="https://first-link.com" style="clear:both">First Link</a>
+        this is <a href="https://second-link.com" style="display:flex">Second Link</a>"""
 
         c = InputContent(content)
         result = c.htmlify()
 
-        expected_result = '''this is <a href="https://first-link.com">First Link</a>
-        this is <a href="https://second-link.com">Second Link</a>'''
+        expected_result = """this is <a href="https://first-link.com">First Link</a>
+        this is <a href="https://second-link.com">Second Link</a>"""
 
         self.assertEqual(result, expected_result)

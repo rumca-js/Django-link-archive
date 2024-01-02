@@ -6,7 +6,6 @@ from .utilities import WebPageDisabled
 from ..pluginsources.sourceurlinterface import SourceUrlInterface
 
 
-
 class SourceUrlInterfaceTest(WebPageDisabled, TestCase):
     def setUp(self):
         self.disable_web_pages()

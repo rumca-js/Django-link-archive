@@ -414,7 +414,7 @@ def import_youtube_links_for_source(request, pk):
 
     for link in links:
         print("Adding job {}".format(link))
-        wrapper = LinkDataWrapper(link = link)
+        wrapper = LinkDataWrapper(link=link)
         if not wrapper.get():
             BackgroundJobController.link_add(link, source_obj)
 
