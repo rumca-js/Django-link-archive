@@ -1,6 +1,15 @@
+"""
+This program manages "workspaces".
+
+Each app is a "workspace". Each workspace contain separate set of links in the database.
+
+Therefore you can have one "general" workspace, or you can have "music", "movies" etc.
+"""
+
 import os, sys
 import shutil
 from pathlib import Path
+import argparse
 
 
 def get_source_files(path):
@@ -96,6 +105,28 @@ def update_workspace(source_app, destination_app):
     snapshot.restore()
 
 
+def create_workspace(source_app, destination_app):
+    print("Processing app:{}".format(destination_app))
+
+    destination_app = Path(destination_app)
+
+    if destination_app.exists():
+        return False
+
+    source_files = get_source_files(Path(source_app))
+    for source_file in source_files:
+        conv = FileConverter(source_file)
+        if conv.is_ok():
+            conv.convert(source_app, str(destination_app))
+
+    migration_path = destination_app / "migrations"
+    migration_path.mkdir(parents = True, exist_ok = True)
+    migration_path_file = migration_path / "__init__.py"
+    migration_path_file.touch()
+
+    return True
+
+
 def get_workspaces():
     result = []
     items_in_dir = os.listdir(".")
@@ -107,14 +138,38 @@ def get_workspaces():
     return result
 
 
+def parse():
+    parser = argparse.ArgumentParser(
+                        prog='Workspace',
+                        description='Workspace manager')
+
+    parser.add_argument('-c', '--create')
+    parser.add_argument('-u', '--update')
+    parser.add_argument('-U', '--update-all', action="store_true", dest="update_all")
+
+    return parser, parser.parse_args()
+
+
 def main():
-    if len(sys.argv) < 2:
+    parser, args = parse()
+
+    if args.update_all:
         workspaces = get_workspaces()
         for workspace in workspaces:
             if workspace != "rsshistory":
                 update_workspace("rsshistory", workspace)
+
+    elif args.update:
+        update_workspace("rsshistory", args.update)
+
+    elif args.create:
+        if not create_workspace("rsshistory", args.create):
+            print("Could not create workspace")
+        else:
+            print("Call now python makemigration & python migrate")
+
     else:
-        update_workspace("rsshistory", sys.argv[1])
+        parser.print_help()
 
 
 main()
