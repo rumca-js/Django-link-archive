@@ -10,6 +10,7 @@ from ..models import (
     BaseLinkDataModel,
     BaseLinkDataController,
     LinkDataModel,
+    LinkTagsDataModel,
     ArchiveLinkDataModel,
     PersistentInfo,
     SourceDataModel,
@@ -265,6 +266,34 @@ class LinkDataController(LinkDataModel):
                     if limit and index > limit:
                         return
 
+    def get_clean_data(props):
+        result = {}
+        test = LinkDataController()
+
+        for key in props:
+            if hasattr(test, key):
+                result[key] = props[key]
+
+        if "link" in result and result["link"].endswith("/"):
+            result["link"] = result["link"][:-1]
+
+        if "tags" in result:
+            del result["tags"]
+        if "comments" in result:
+            del result["comments"]
+        if "vote" in result:
+            del result["vote"]
+
+        return result
+
+    def tag(self, tags, author=None):
+        data = {"author" : author, "link" : self.link, "tags" : tags}
+        return LinkTagsDataModel.save_tags_internal(data)
+
+    def vote(self, vote):
+        self.page_rating_votes = vote
+        self.save()
+
 
 class ArchiveLinkDataController(ArchiveLinkDataModel):
     class Meta:
@@ -401,11 +430,12 @@ class LinkDataWrapper(object):
             themap["domain_obj"] = archive_obj.domain_obj
             try:
                 new_obj = LinkDataController.objects.create(**themap)
-                entry.delete()
+                archive_obj.delete()
                 return new_obj
 
             except Exception as e:
                 error_text = traceback.format_exc()
+                LinkDatabase.error(error_text)
         else:
             try:
                 entry.delete()
@@ -593,20 +623,7 @@ class LinkDataBuilder(object):
 
     def get_clean_link_data(self):
         props = self.link_data
-
-        result = {}
-        test = (
-            LinkDataController()
-        )  # create fake controller, to obtain only necessary fields
-
-        for key in props:
-            if hasattr(test, key):
-                result[key] = props[key]
-
-        if "link" in result and result["link"].endswith("/"):
-            result["link"] = result["link"][:-1]
-
-        return result
+        return LinkDataController.get_clean_data(props)
 
     def is_domain_link_data(self):
         link_data = self.link_data

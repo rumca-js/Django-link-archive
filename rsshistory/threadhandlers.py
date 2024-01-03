@@ -436,10 +436,14 @@ class ImportInstanceJobHandler(BaseJobHandler):
         import json
 
         json_url = obj.subject
+        author = obj.args
 
         from .serializers.instanceimporter import InstanceImporter
 
-        ie = InstanceImporter(json_url)
+        if author != "":
+            ie = InstanceImporter(json_url, author)
+        else:
+            ie = InstanceImporter(json_url)
         ie.import_all()
 
         return True

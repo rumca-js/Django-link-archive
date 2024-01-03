@@ -8,7 +8,8 @@ from ..controllers import (
     SourceDataController,
     DomainsController,
 )
-from ..models import LinkDataModel, ConfigurationEntry
+from ..models import ConfigurationEntry
+from ..controllers import LinkDataController, ArchiveLinkDataController
 from ..dateutils import DateUtils
 from .utilities import WebPageDisabled
 from ..configuration import Configuration
@@ -52,7 +53,7 @@ class LinkDataWrapperTest(WebPageDisabled, TestCase):
         b.link_data = link_data
         entry = b.add_from_props()
 
-        objs = LinkDataModel.objects.filter(link=link_name)
+        objs = LinkDataController.objects.filter(link=link_name)
         self.assertEqual(objs.count(), 1)
         obj = objs[0]
 
@@ -62,7 +63,7 @@ class LinkDataWrapperTest(WebPageDisabled, TestCase):
         self.assertTrue(result)
         self.assertTrue(not result.is_archive_entry())
 
-        objs = LinkDataModel.objects.filter(link=link_name)
+        objs = LinkDataController.objects.filter(link=link_name)
         self.assertEqual(objs.count(), 1)
         obj = objs[0]
 
@@ -86,7 +87,7 @@ class LinkDataWrapperTest(WebPageDisabled, TestCase):
         b.link_data = link_data
         entry = b.add_from_props()
 
-        objs = LinkDataModel.objects.filter(link=link_name)
+        objs = LinkDataController.objects.filter(link=link_name)
         self.assertEqual(objs.count(), 1)
         obj = objs[0]
 
@@ -95,7 +96,7 @@ class LinkDataWrapperTest(WebPageDisabled, TestCase):
         # call tested function
         LinkDataWrapper.make_not_bookmarked(RequestObject(), obj)
 
-        objs = LinkDataModel.objects.filter(link=link_name)
+        objs = LinkDataController.objects.filter(link=link_name)
         self.assertEqual(objs.count(), 1)
         obj = objs[0]
 
@@ -117,7 +118,7 @@ class LinkDataWrapperTest(WebPageDisabled, TestCase):
             "date_published": DateUtils.get_datetime_now_utc(),
         }
 
-        obj = LinkDataModel.objects.create(**link_data)
+        obj = LinkDataController.objects.create(**link_data)
         self.assertTrue(obj)
 
         # call tested function
@@ -140,11 +141,13 @@ class LinkDataWrapperTest(WebPageDisabled, TestCase):
             "description": "description",
             "language": "en",
             "thumbnail": "https://youtube.com/favicon.ico",
-            "date_published": DateUtils.get_datetime_now_utc() - timedelta(year=1900),
+            "date_published": DateUtils.get_datetime_now_utc() - timedelta(days=365),
         }
 
-        obj = ArchiveLinkDataModel.objects.create(**link_data)
+        obj = ArchiveLinkDataController.objects.create(**link_data)
         self.assertTrue(obj)
+
+        LinkDataController.objects.all().delete()
 
         # call tested function
         result = LinkDataWrapper.move_from_archive(obj)

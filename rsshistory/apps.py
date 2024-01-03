@@ -10,3 +10,6 @@ class LinkDatabase(AppConfig):
 
     def info(message):
         print("[{}] {}".format(LinkDatabase.name, message))
+
+    def error(message):
+        print("[{}] {}".format(LinkDatabase.name, message))

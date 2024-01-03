@@ -246,3 +246,16 @@ class SourceDataController(SourceDataModel):
         for entry in entries:
             entry.source_obj = self
             entry.save()
+
+    def get_clean_data(props):
+        result = {}
+        test = SourceDataController()
+
+        for key in props:
+            if hasattr(test, key):
+                result[key] = props[key]
+
+        if "url" in result and result["url"].endswith("/"):
+            result["url"] = result["url"][:-1]
+
+        return result

@@ -98,6 +98,7 @@ class HtmlPageTest(TestCase):
         # default language
         p = HtmlPage("http://test.com/my-site-test", webpage_no_lang)
         self.assertEqual(p.get_language(), "")
+        self.assertTrue(p.is_html())
 
     def test_language_it(self):
         # default language

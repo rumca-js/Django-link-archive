@@ -227,7 +227,7 @@ class BackgroundJobController(BackgroundJob):
             BackgroundJob.JOB_CHECK_DOMAINS
         )
 
-    def import_from_instance(link):
+    def import_from_instance(link, author = ""):
         return BackgroundJobController.create_single_job(
-            BackgroundJob.JOB_IMPORT_INSTANCE, link
+            BackgroundJob.JOB_IMPORT_INSTANCE, link, author
         )

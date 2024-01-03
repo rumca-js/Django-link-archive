@@ -387,7 +387,14 @@ class DomainsController(Domains):
 
     def cleanup():
         if not Configuration.get_object().config_entry.auto_store_domain_info:
-            Domains.objects.all().delete()
+            DomainsController.unconnect_entries()
+            DomainsController.remove_all()
+        else:
+            DomainsController.reset_dynamic_data()
+            DomainsController.create_missing_domains()
 
-        DomainsController.reset_dynamic_data()
-        DomainsController.create_missing_domains()
+    def unconnect_entries():
+        entries = LinkDataController.objects.filter(domain_obj__isnull = False)
+        for entry in entries:
+            entry.domain_obj = None
+            entry.save()

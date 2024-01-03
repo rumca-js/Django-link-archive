@@ -43,7 +43,7 @@ class LinkCommentDataController(LinkCommentDataModel):
     def save_comment(data):
         entry = LinkDataController.objects.get(id=data["link_id"])
 
-        if LinkDataController.is_html_contents(data["comment"]):
+        if LinkCommentDataController.is_html_contents(data["comment"]):
             return
 
         return LinkCommentDataModel.objects.create(

@@ -891,6 +891,16 @@ webpage_code_project_contents = """
 </rss>
 """
 
+instance_entries_json = """
+{
+"links":
+    [{"source": "https://www.lemonde.fr/en/rss/une.xml", "title": "Yotam Ottolenghi: 'A cuisine is never static'", "description": "The British-Israeli chef", "link": "https://www.lemonde.fr/en/lifestyle/article/2024/01/03/yotam-ottolenghi-a-cuisine-is-never-static_6398241_37.html", "date_published": "2024-01-03T10:30:27+00:00", "permanent": false, "bookmarked": false, "dead": false, "artist": "Le Monde", "album": "Le Monde", "user": null, "language": "en-US", "thumbnail": null, "age": null, "page_rating_contents": 0, "page_rating_votes": 0, "page_rating_visits": 0, "page_rating": 0, "tags": ["testtag1", "testtag2"], "vote": 0, "comments": ["comment1", "comment2"]},
+     {"source": "https://moxie.foxnews.com/google-publisher/latest.xml", "title": "Next hot thing in hot wings, 'trashed' or 'dirty,' breaks the rules of America's favorite bar food", "description": "Double-fried wings, called trash wings in Missouri and dirt wings in Connecticut, have been a regional phenomenon for decades and are poised to become a national trend.", "link": "https://www.foxnews.com/lifestyle/next-hot-thing-hot-wings-trashed-dirty-breaks-rules-americas-favorite-bar-food", "date_published": "2024-01-03T10:28:49+00:00", "permanent": false, "bookmarked": false, "dead": false, "artist": "Fox News", "album": "Fox News", "user": null, "language": "en-US", "thumbnail": "https://global.fncstatic.com/static/orion/styles/img/fox-news/logos/fox-news-desktop.png", "age": null, "page_rating_contents": 0, "page_rating_votes": 0, "page_rating_visits": 0, "page_rating": 0, "tags": [], "vote": 0, "comments": []}
+    ]
+}
+"""
+instance_sources_json = """{"sources": []}"""
+
 
 from ..pluginentries.handlervideoyoutube import YouTubeVideoHandler
 
@@ -959,6 +969,12 @@ class RequestsObject(object):
         if url.startswith("https://www.youtube.com/feeds"):
             return webpage_samtime_youtube_rss
 
+        if url.startswith("https://isocpp.org/blog/rss/category/news"):
+            return webpage_samtime_youtube_rss
+
+        if url.startswith("https://cppcast.com/feed.rss"):
+            return webpage_samtime_youtube_rss
+
         elif url == "https://multiple-favicons/page.html":
             return webpage_html_favicon
 
@@ -996,6 +1012,18 @@ class RequestsObject(object):
 
         elif url == "https://page-with-http-status-100.com":
             self.status_code = 100
+
+        elif url == "https://instance.com/entries":
+            return instance_entries_json
+
+        elif url == "https://instance.com/entries?page=1":
+            return """{}"""
+
+        elif url == "https://instance.com/sources":
+            return instance_sources_json
+
+        elif url == "https://instance.com/sources?page=1":
+            return """{}"""
 
         elif url.endswith("robots.txt"):
             return """  """

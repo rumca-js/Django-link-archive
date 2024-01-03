@@ -5,7 +5,7 @@ from django.test import TestCase
 from django.utils import timezone
 from django.urls import reverse
 
-from ..models import ConfigurationEntry, ArchiveLinkDataModel
+from ..models import ConfigurationEntry, ArchiveLinkDataModel, LinkTagsDataModel
 from ..controllers import SourceDataController, LinkDataController, DomainsController
 from ..configuration import Configuration
 from ..dateutils import DateUtils
@@ -160,3 +160,33 @@ class LinkDataControllerTest(WebPageDisabled, TestCase):
 
         self.assertTrue(len(entries) != 0)
         self.assertEqual(entries[0].get_thumbnail(), "https://youtube.com/favicon.ico")
+
+    def test_tag(self):
+        current_time = DateUtils.get_datetime_now_utc()
+        domain = DomainsController.objects.create(
+            domain="https://youtube.com",
+        )
+        source_youtube = SourceDataController.objects.create(
+            url="https://youtube.com",
+            title="YouTube",
+            category="No",
+            subcategory="No",
+            export_to_cms=True,
+            remove_after_days=1,
+        )
+        ob = LinkDataController.objects.create(
+            source="https://youtube.com",
+            link="https://youtube.com?v=bookmarked",
+            title="The first link",
+            source_obj=source_youtube,
+            bookmarked=True,
+            language="en",
+            domain_obj=domain,
+            date_published=current_time,
+        )
+
+        ob.tag(["test", "tag"], "testuser1")
+
+        tags = LinkTagsDataModel.objects.all()
+
+        self.assertEqual(tags.count(), 2)

@@ -290,6 +290,9 @@ class BasePage(object):
         return False
 
     def get_page_ext(self):
+        """
+        @return extension, or none
+        """
         url = self.get_clean_url()
 
         # domain level does not say anything if it is HTML page, or not
@@ -433,29 +436,33 @@ class DomainAwarePage(BasePage):
 
         return URL_TYPE_UNKNOWN
 
-    def is_html(self):
-        return self.get_type() == URL_TYPE_HTML
+    def is_html(self, fast_check=True):
+        return self.get_type(fast_check) == URL_TYPE_HTML
 
-    def is_rss(self):
-        return self.get_type() == URL_TYPE_RSS
+    def is_rss(self, fast_check=True):
+        return self.get_type(fast_check) == URL_TYPE_RSS
 
-    def get_type(self):
+    def get_type(self, fast_check=True):
         the_type = self.get_type_by_ext()
         if the_type:
             return the_type
 
         ext = self.get_page_ext()
-        if not ext:
-            return URL_TYPE_HTML
+        if ext:
+            if ext.lower() == "xml":
+                return self.get_type_by_checking_contents()
 
-        ext = self.get_page_ext()
-        if not ext:
-            return self.get_type_by_checking_contents()
+            if ext.lower() == "rss":
+                return self.get_type_by_checking_contents()
 
-        if ext.lower() == "xml":
-            return self.get_type_by_checking_contents()
+            if ext.lower() == "aspx":
+                return self.get_type_by_checking_contents()
 
-        if ext.lower() == "aspx":
+        if fast_check:
+            ext = self.get_page_ext()
+            if not ext:
+                return URL_TYPE_HTML
+        else:
             return self.get_type_by_checking_contents()
 
         return URL_TYPE_UNKNOWN
@@ -492,11 +499,13 @@ class DomainAwarePage(BasePage):
             LinkDatabase.info("Could not obtain contents for {}".format(self.url))
             return
 
-        if self.contents.find("DOCTYPE html") >= 0:
+        lower = self.contents.lower()
+
+        if lower.find("doctype html") >= 0:
             return True
-        if self.contents.find("<html") >= 0:
+        if lower.find("<html") >= 0:
             return True
-        if self.contents.find("<body") >= 0:
+        if lower.find("<body") >= 0:
             return True
 
     @lazy_load_content
@@ -505,10 +514,12 @@ class DomainAwarePage(BasePage):
             LinkDatabase.info("Could not obtain contents for {}".format(self.url))
             return
 
+        lower = self.contents.lower()
+
         if (
-            self.contents.find("<channel>") >= 0
-            and self.contents.find("<title>") >= 0
-            and self.contents.find("<item>") >= 0
+            lower.find("<channel>") >= 0
+            and lower.find("<title>") >= 0
+            and lower.find("<item>") >= 0
         ):
             return True
 
@@ -1386,15 +1397,15 @@ class HtmlPage(ContentInterface):
 
 
 class Url(object):
-    def get(url, contents=None):
+    def get(url, contents=None, fast_check=True):
         """
         @returns Appropriate handler for the link
         """
         p = HtmlPage(url, contents)
-        if p.is_html():
+        if p.is_html(fast_check):
             return p
 
-        if p.is_rss():
+        if p.is_rss(fast_check):
             return RssPage(url, p.get_contents())
 
         return DefaultContentPage(url, p.get_contents())

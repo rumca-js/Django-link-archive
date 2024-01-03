@@ -55,6 +55,7 @@ class RssPageTest(WebPageDisabled, TestCase):
         reader = RssPage("http://test.com/my-site-test", webpage_rss)
         reader.parse()
         self.assertEqual(reader.get_title(), "SAMTIME on Odysee")
+        self.assertTrue(reader.is_rss(False))
 
     def test_rss_subtitle(self):
         # default language
@@ -67,6 +68,7 @@ class RssPageTest(WebPageDisabled, TestCase):
         reader = RssPage("http://test.com/my-site-test", webpage_rss)
         reader.parse()
         self.assertEqual(reader.get_language(), "ci")
+        self.assertTrue(reader.is_rss(False))
 
     def test_rss_thumbnail(self):
         # default language
@@ -76,12 +78,14 @@ class RssPageTest(WebPageDisabled, TestCase):
             reader.get_thumbnail(),
             "https://thumbnails.lbry.com/UCd6vEDS3SOhWbXZrxbrf_bw",
         )
+        self.assertTrue(reader.is_rss(False))
 
     def test_rss_author(self):
         # default language
         reader = RssPage("http://test.com/my-site-test", webpage_rss)
         reader.parse()
         self.assertEqual(reader.get_author(), "SAMTIME name")
+        self.assertTrue(reader.is_rss(False))
 
     def test_rss_entries(self):
         # default language
@@ -92,6 +96,7 @@ class RssPageTest(WebPageDisabled, TestCase):
         entry = entries[0]
         self.assertEqual(entry["title"], "First entry title")
         self.assertEqual(entry["description"], "First entry description")
+        self.assertTrue(reader.is_rss())
 
     def test_rss_entries(self):
         # default language
@@ -113,6 +118,7 @@ class RssPageTest(WebPageDisabled, TestCase):
         self.assertEqual(entry["title"], "First entry title")
         self.assertEqual(entry["description"], "First entry description")
         self.assertEqual(entry["date_published"].year, 2020)
+        self.assertTrue(reader.is_rss(False))
 
     def test_rss_entry_no_date(self):
         # default language
@@ -126,6 +132,17 @@ class RssPageTest(WebPageDisabled, TestCase):
         self.assertEqual(entry["title"], "First entry title")
         self.assertEqual(entry["description"], "First entry description")
         self.assertEqual(entry["date_published"].year, current_date_time.year)
+        self.assertTrue(reader.is_rss(False))
+
+    def test_rss_no_ext(self):
+        # default language
+        reader = RssPage("https://isocpp.org/blog/rss/category/news")
+        self.assertTrue(reader.is_rss(False))
+
+    def test_rss_no_ext(self):
+        # default language
+        reader = RssPage("https://cppcast.com/feed.rss")
+        self.assertTrue(reader.is_rss(False))
 
     """
     feeder does not parses update time

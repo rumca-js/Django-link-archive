@@ -16,9 +16,9 @@ class SourceUrlInterface(object):
             self.url = self.url[:-1]
 
     def get_props(self, input_props=None):
-        p = Url.get(self.url)
+        p = Url.get(self.url, fast_check=False)
 
-        if p.is_rss():
+        if p.is_rss(fast_check=False):
             return self.get_props_from_rss(self.url, p)
         elif p.is_youtube():
             # Someone might be surprised that added URL is being replaced

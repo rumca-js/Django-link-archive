@@ -51,22 +51,30 @@ class LinkTagsDataModel(models.Model):
         if current_tags_objs.exists():
             return LinkTagsDataModel.join_elements(current_tags_objs)
 
-    def save_tags(data):
-        link = data["link"]
-        author = data["author"]
-        tags = data["tag"]
-
-        objs = LinkTagsDataModel.objects.filter(author=author, link=link)
-        if objs.exists():
-            objs.delete()
-
+    def process_tag_string(tag_string):
         tags_set = set()
-        tags = tags.split(LinkTagsDataModel.get_delim())
+        tags = tag_string.split(LinkTagsDataModel.get_delim())
         for tag in tags:
             tag = str(tag).strip()
             tag = tag.lower()
             if tag != "":
                 tags_set.add(tag)
+
+        return tags_set
+
+    def save_tags(data):
+        data["tags"] = LinkTagsDataModel.process_tag_string(data["tag"])
+        return LinkTagsDataModel.save_tags_internal(data)
+
+    def save_tags_internal(data):
+        author = data["author"]
+        link = data["link"]
+
+        objs = LinkTagsDataModel.objects.filter(author=author, link=link)
+        if objs.exists():
+            objs.delete()
+
+        tags_set = data["tags"]
 
         link_objs = LinkDataModel.objects.filter(link=link)
 
