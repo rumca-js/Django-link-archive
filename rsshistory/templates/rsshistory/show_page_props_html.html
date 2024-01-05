@@ -1,0 +1,78 @@
+<h1>HTML Page properties</h1>
+
+<ul>
+    <li>Link: {{link}} <a href="{{link}}">Link</a></li>
+    <li>Status code: {{status_code}}</li>
+    <li>Title: {{title}}</li>
+    <li>Description: {{description}}</li>
+    <li>Author: {{author}}</li>
+    <li>Page Rating: {{page_rating}}. Described by <a href="https://github.com/rumca-js/Django-link-archive">Django link archive Readme</a></li>
+    {%if thumbnail %}
+    <li>thumbnail: <a href="{{thumbnail}}"/>Link</a></li>
+    {%endif %}
+    {%if favicons %}
+    {%for favicon in favicons %}
+    <li>Favicon: {{favicon}} <a href="{{favicon}}">favicon</a></li>
+    {%endfor%}
+    {%endif%}
+    <li>Contents length: {{contents_length}}.
+        {% if contents_length == 0 %}
+        Page is empty.
+        {% elif contents_length < 100 %}
+        The site is really tiny.
+        {% elif contents_length < 1000 %}
+        The site is small.
+        {% elif contents_length < 500000 %}
+        The site size is normal
+        {% elif contents_length > 500000 %}
+        That is a humongus page size!
+        {% endif %}
+    </li>
+
+    <li>Charset: {{charset}}</li>
+    <li>Language: {{language}}</li>
+    {%if rss_urls %}
+    {%for rss_url in rss_urls %}
+    <li>Rss Url: {{rss_url}} <a href="{{rss_url}}">Link</a></li>
+    {%endfor%}
+    {%endif%}
+
+    <li>Meta title: {{meta_title}}</li>
+    <li>Meta description: {{meta_description}}</li>
+    <li>og title: {{og_title}}</li>
+    <li>og description: {{og_description}}</li>
+    {%if og_image %}
+    <li>og image: <a href="{{og_image}}"/>Link</a></li>
+    {%endif %}
+    {%if tags %}
+    <li>keywords: {{tags}}</li>
+    {%endif %}
+
+    {%if robots_txt_url %}
+    <li>Robots txt URL: {{robots_txt_url}} <a href="{{robots_txt_url}}">Link</a></li>
+    {% endif %}
+    {%for site_map in site_maps_urls %}
+        <li>Site map: {{site_map}} <a href="{{site_map}}">Link</a>
+    {%endfor%}
+
+    {%for link in link_inner %}
+    <li>Link inner: {{link}} <a href="{{link}}">Link</a></li>
+    {%endfor%}
+
+    {%for link in link_outer %}
+    <li>Link outer: {{link}} <a href="{{link}}">Link</a></li>
+    {%endfor%}
+</ul>
+
+{% if user_config.show_icons %}
+    {%if thumbnail%}
+    <img src="{{thumbnail}}" style="max-width: 50%"/>
+    {%endif%}
+    {%if og_image%}
+    <img src="{{og_image}}" style="max-width: 50%"/>
+    {%endif%}
+{%endif%}
+
+<h1>Contents</h1>
+
+<pre>{{contents}}</pre>

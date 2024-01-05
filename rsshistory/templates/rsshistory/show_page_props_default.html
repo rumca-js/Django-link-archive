@@ -1,0 +1,29 @@
+<h1>Page properties</h1>
+
+<ul>
+    <li>Link: {{link}} <a href="{{link}}">Link</a></li>
+    <li>Status code: {{status_code}}</li>
+    <li>Title: {{title}}</li>
+    <li>Description: {{description}}</li>
+    <li>Author: {{author}}</li>
+    <li>Page Rating: {{page_rating}}. Described by <a href="https://github.com/rumca-js/Django-link-archive">Django link archive Readme</a></li>
+    {%if thumbnail %}
+    <li>thumbnail: <a href="{{thumbnail}}"/>Link</a></li>
+    {%endif %}
+    <li>Contents length: {{contents_length}}.
+    </li>
+    <li>Language: {{language}}</li>
+    {%if tags %}
+    <li>keywords: {{tags}}</li>
+    {%endif %}
+</ul>
+
+{% if user_config.show_icons %}
+    {%if thumbnail%}
+    <img src="{{thumbnail}}" style="max-width: 50%"/>
+    {%endif%}
+{%endif%}
+
+<h1>Contents</h1>
+
+<pre>{{contents}}</pre>
