@@ -226,12 +226,14 @@ def show_page_props(request):
     def show_page_props_internal(requests, page_link):
         from ..pluginentries.entryurlinterface import UrlHandler
 
-        page = UrlHandler.get(page_link)
+        fast_check = False
+
+        page = UrlHandler.get(page_link, fast_check=fast_check)
 
         # p.context["show_properties"] = page.get_properties()
         p.context.update(page.get_properties())
-        p.context["is_html"] = page.is_html()
-        p.context["is_rss"] = page.is_rss()
+        p.context["is_html"] = page.is_html(fast_check=fast_check)
+        p.context["is_rss"] = page.is_rss(fast_check=fast_check)
         p.context["is_youtube_video_handler"] = (
             type(page) is UrlHandler.youtube_video_handler
         )

@@ -53,6 +53,21 @@ class BackgroundJobControllerTest(TestCase):
             1,
         )
 
+    def test_get_job_priority(self):
+        self.assertEqual(
+            BackgroundJobController.get_job_priority(
+                BackgroundJob.JOB_PROCESS_SOURCE
+            ),
+            0,
+        )
+
+        self.assertEqual(
+            BackgroundJobController.get_job_priority(
+                BackgroundJob.JOB_LINK_ADD
+            ),
+            1,
+        )
+
     def test_truncate_invalid_jobs(self):
         invalid_name = "invalid-job-name"
 

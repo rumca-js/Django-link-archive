@@ -37,6 +37,16 @@ class BackgroundJobController(BackgroundJob):
             return BackgroundJob.objects.all().count()
         return BackgroundJob.objects.filter(job=job_name).count()
 
+    def get_job_priority(job_name):
+        index = 0
+        job_choices = BackgroundJob.JOB_CHOICES
+        for job_choice in job_choices:
+            if job_choice[0] == job_name:
+                return index
+            index += 1
+
+        return 100
+
     def create_single_job(job_name, subject="", args=""):
         try:
             items = BackgroundJob.objects.filter(job=job_name, subject=subject)
@@ -46,6 +56,7 @@ class BackgroundJobController(BackgroundJob):
                     task=None,
                     subject=subject,
                     args=args,
+                    priority=BackgroundJobController.get_job_priority(job_name),
                 )
         except Exception as e:
             error_text = traceback.format_exc()
@@ -183,6 +194,7 @@ class BackgroundJobController(BackgroundJob):
                     task=None,
                     subject=link_url,
                     args="",
+                    priority=BackgroundJobController.get_job_priority(BackgroundJob.JOB_LINK_SAVE),
                 )
             else:
                 for key, obj in enumerate(archive_items):
@@ -197,6 +209,11 @@ class BackgroundJobController(BackgroundJob):
     def link_download(link_url):
         return BackgroundJobController.create_single_job(
             BackgroundJob.JOB_LINK_DOWNLOAD, link_url
+        )
+
+    def link_reset_data(entry):
+        return BackgroundJobController.create_single_job(
+            BackgroundJob.JOB_LINK_RESET_DATA, entry.link
         )
 
     def push_to_repo(input_date=""):

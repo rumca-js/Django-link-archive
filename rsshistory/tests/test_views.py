@@ -3,7 +3,7 @@ from django.utils import timezone
 from django.urls import reverse
 
 from ..apps import LinkDatabase
-from ..controllers import SourceDataController, LinkuserDataController, DomainsController
+from ..controllers import SourceDataController, LinkDataController, DomainsController
 from ..dateutils import DateUtils
 from ..models import KeyWords, DataExport
 

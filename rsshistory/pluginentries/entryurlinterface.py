@@ -276,7 +276,7 @@ class UrlHandler(object):
     odysee_video_handler = OdyseeVideoHandler
     odysee_channel_handler = OdyseeChannelHandler
 
-    def get(url):
+    def get(url, fast_check = True):
         url = UrlHandler.get_protololless(url)
         if not url:
             return
@@ -312,7 +312,7 @@ class UrlHandler(object):
 
         from ..webtools import Url
 
-        return Url.get(url)
+        return Url.get(url, fast_check = fast_check)
 
     def get_protololless(url):
         if url.find("https://") >= 0:

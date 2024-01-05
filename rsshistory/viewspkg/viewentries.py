@@ -601,7 +601,7 @@ def add_simple_entry(request):
 
 def entry_scan(request, pk):
     p = ViewPage(request)
-    p.set_title("Edit entry")
+    p.set_title("Scan entry for links")
     data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
     if data is not None:
         return data
@@ -616,6 +616,26 @@ def entry_scan(request, pk):
     else:
         entry = entries[0]
         BackgroundJobController.link_scan(entry.link)
+        return HttpResponseRedirect(entry.get_absolute_url())
+
+
+def entry_reset_data(request, pk):
+    p = ViewPage(request)
+    p.set_title("Rese entry data")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    p.context["pk"] = pk
+
+    entries = LinkDataController.objects.filter(id=pk)
+    if not entries.exists():
+        p.context["summary_text"] = "Such entry does not exist"
+        return p.render("summary_present.html")
+
+    else:
+        entry = entries[0]
+        BackgroundJobController.link_reset_data(entry)
         return HttpResponseRedirect(entry.get_absolute_url())
 
 

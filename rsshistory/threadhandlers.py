@@ -785,14 +785,18 @@ class HandlerManager(object):
         ]
 
     def get_handler_and_object(self):
-        afilter = None
-        for key, handler in enumerate(self.get_handlers()):
-            afilter = handler.get_job_filter()
+        """
+        TODO select should be based on priority
+        """
 
-            objs = BackgroundJob.objects.filter(afilter).order_by("date_created")
-            if objs.count() != 0:
-                obj = objs[0]
-                return [obj, handler]
+        objs = BackgroundJob.objects.all().order_by("priority", "date_created")
+        if objs.count() != 0:
+            obj = objs[0]
+            for key, handler in enumerate(self.get_handlers()):
+                if handler.get_job() == obj.job:
+                    return [obj, handler]
+
+            return [obj, None]
         return []
 
     def process_all(self):
@@ -807,10 +811,19 @@ class HandlerManager(object):
                 obj = items[0]
                 handler = items[1]
 
-                handler.set_config(config)
+                if handler:
+                    handler.set_config(config)
+                else:
+                    PersistentInfo.error(
+                        "Missing handler for job: {0}\n{1}\n{2}".format(
+                            obj.job, str(E), error_text
+                        )
+                    )
 
                 try:
-                    if handler.process(obj):
+                    if handler and handler.process(obj):
+                        obj.delete()
+                    if not handler:
                         obj.delete()
                 except Exception as E:
                     error_text = traceback.format_exc()

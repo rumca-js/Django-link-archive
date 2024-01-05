@@ -296,5 +296,8 @@ class BackgroundJob(models.Model):
     args = models.CharField(max_length=1000, null=True)
     date_created = models.DateTimeField(auto_now_add=True)
 
+    # smaller number = higher priority
+    priority = models.IntegerField(default=0)
+
     class Meta:
-        ordering = ["date_created", "job", "pk", "subject"]
+        ordering = ["priority", "date_created", "job", "pk", "subject"]

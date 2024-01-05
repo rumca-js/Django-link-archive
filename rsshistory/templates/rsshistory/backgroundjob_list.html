@@ -31,7 +31,7 @@
            class="element_{{user_config.display_type}}"
            title="{{job.date_created}} {{job.job}} {{job.task}} {{job.subject}} {{job.args}}"
            >
-           - [{{job.date_created}}] <b>{{job.job}}</b> {{job.task}} {{job.subject}} {{job.args}} 
+           - [{{job.date_created}}] {{job.priority}} <b>{{job.job}}</b> {{job.task}} {{job.subject}} {{job.args}} 
             <a href="{% url 'rsshistory:backgroundjob-remove' job.id %}" class="simplebutton" title="Remove job">
                <img src="{% static 'rsshistory/icons/icons8-trash-100.png' %}" class="content-icon" />
             </a>

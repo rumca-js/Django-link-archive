@@ -213,6 +213,36 @@ class BackgroundJobControllerTest(WebPageDisabled, TestCase):
             handler.get_job(), BackgroundJobController.JOB_IMPORT_DAILY_DATA
         )
 
+    def test_order(self):
+
+        BackgroundJobController.objects.create(
+            job=BackgroundJobController.JOB_PROCESS_SOURCE
+        )
+
+        BackgroundJobController.objects.create(
+            job=BackgroundJobController.JOB_IMPORT_DAILY_DATA
+        )
+
+        mgr = HandlerManager()
+
+        # call tested function
+        handler_obj, handler = mgr.get_handler_and_object()
+
+        self.assertTrue(handler_obj)
+        self.assertEqual(handler_obj.job, BackgroundJobController.JOB_PROCESS_SOURCE)
+
+        if handler_obj:
+            handler_obj.delete()
+
+        # call tested function
+        handler_obj, handler = mgr.get_handler_and_object()
+
+        self.assertTrue(handler_obj)
+        self.assertEqual(handler_obj.job, BackgroundJobController.JOB_IMPORT_DAILY_DATA)
+
+        if handler_obj:
+            handler_obj.delete()
+
 
 class RefreshThreadHandlerTest(WebPageDisabled, TestCase):
     def setUp(self):

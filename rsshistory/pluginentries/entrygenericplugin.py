@@ -143,7 +143,7 @@ class EntryGenericPlugin(object):
         buttons.append(
             EntryButton(
                 self.user,
-                "Scan",
+                "",
                 reverse(
                     "{}:entry-scan".format(LinkDatabase.name),
                     args=[self.entry.id],
@@ -151,6 +151,19 @@ class EntryGenericPlugin(object):
                 ConfigurationEntry.ACCESS_TYPE_OWNER,
                 "Scans entry for new links",
                 static("{}/icons/icons8-radar-64.png".format(LinkDatabase.name)),
+            ),
+        )
+
+        buttons.append(
+            EntryButton(
+                self.user,
+                "Reset data",
+                reverse(
+                    "{}:entry-reset-data".format(LinkDatabase.name),
+                    args=[self.entry.id],
+                ),
+                ConfigurationEntry.ACCESS_TYPE_OWNER,
+                "Resets entry data",
             ),
         )
 
