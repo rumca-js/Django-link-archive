@@ -737,6 +737,7 @@ class LinkDataBuilder(object):
         rss_urls = html.get_rss_urls()
 
         for rss_url in rss_urls:
+            from .sources import LinkSourceBuilder
             LinkSourceBuilder.add_source(rss_url, link_props)
 
     def read_domains_from_bookmarks():

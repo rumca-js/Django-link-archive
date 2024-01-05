@@ -265,7 +265,8 @@ class BackgroundJob(models.Model):
         (JOB_LINK_ADD, JOB_LINK_ADD,),                          # adds link using default properties, may contain link map properties in the map
         (JOB_LINK_UPDATE_DATA, JOB_LINK_UPDATE_DATA),           # update data, recalculate
         (JOB_LINK_SAVE, JOB_LINK_SAVE,),                        # link is saved using thirdparty pages (archive.org)
-        (JOB_LINK_SCAN, JOB_LINK_SCAN,),                        # link is saved using thirdparty pages (archive.org)
+        (JOB_LINK_SCAN, JOB_LINK_SCAN,),
+        (JOB_LINK_RESET_DATA, JOB_LINK_RESET_DATA,),
         (JOB_LINK_DOWNLOAD, JOB_LINK_DOWNLOAD),                 # link is downloaded using wget
         (JOB_LINK_DOWNLOAD_MUSIC, JOB_LINK_DOWNLOAD_MUSIC),     #
         (JOB_LINK_DOWNLOAD_VIDEO, JOB_LINK_DOWNLOAD_VIDEO),     #

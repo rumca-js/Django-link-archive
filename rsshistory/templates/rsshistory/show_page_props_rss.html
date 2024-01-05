@@ -2,7 +2,7 @@
 
 <ul>
     <li>Link: {{link}} <a href="{{link}}">Link</a></li>
-    <li>Status code: {{status_code}}</li>
+    <li>Status code: {{page_object.status_code}}</li>
     <li>Title: {{title}}</li>
     <li>Description: {{description}}</li>
     <li>Author: {{author}}</li>
@@ -42,3 +42,10 @@
 <h1>Contents</h1>
 
 <pre>{{contents}}</pre>
+
+<h1>Feed</h1>
+
+<ul>
+    <li>Feed header: <pre>{{page_object.feed.feed}}</pre></li>
+    <li>Feed entries: <pre>{{page_object.feed.entries}}</pre></li>
+</ul>
