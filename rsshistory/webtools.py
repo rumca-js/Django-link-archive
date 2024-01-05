@@ -775,8 +775,10 @@ class RssPage(ContentInterface):
             elif "url" in self.feed.feed.image:
                 image = str(self.feed.feed.image["url"])
             else:
+                # cannot display self.feed.feed here.
+                # it complains et_thumbnail TypeError: 'DeferredAttribute' object is not callable 
                 PersistentInfo.info(
-                    "Unsupported image type for feed:{}".format(self.feed.feed)
+                    "Unsupported image type for feed."
                 )
 
         if not image:
