@@ -216,56 +216,6 @@ def fix_entry_tags(request, entrypk):
     return p.render("summary_present.html")
 
 
-def show_youtube_link_props(request):
-    p = ViewPage(request)
-    p.set_title("Show YouTube link properties")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
-
-    def show_youtube_link_props_internal(request, youtube_link):
-        from ..pluginentries.handlervideoyoutube import YouTubeVideoHandler
-
-        handler = YouTubeVideoHandler(youtube_link)
-        handler.download_details()
-
-        youtube_props = []
-        all_youtube_props = []
-
-        if handler.yt_ob:
-            props = handler.get_properties()
-            for aproperty in props:
-                p.context.update(props)
-
-        return p.render("show_youtube_link_props.html")
-
-    from ..forms import YouTubeLinkSimpleForm
-
-    youtube_link = "https:"
-    if request.method == "GET":
-        if "page" not in request.GET:
-            form = YouTubeLinkSimpleForm(initial={"youtube_link": youtube_link})
-            form.method = "POST"
-            form.action_url = reverse(
-                "{}:show-youtube-link-props".format(LinkDatabase.name)
-            )
-            p.context["form"] = form
-
-            return p.render("form_basic.html")
-        else:
-            youtube_link = request.GET["page"]
-            return show_youtube_link_props_internal(request, youtube_link)
-    else:
-        form = YouTubeLinkSimpleForm(request.POST)
-        if not form.is_valid():
-            p.context["summary_text"] = "Form is invalid"
-
-            return p.render("summary_present.html")
-        else:
-            youtube_link = form.cleaned_data["youtube_link"]
-            return show_youtube_link_props_internal(request, youtube_link)
-
-
 def show_page_props(request):
     p = ViewPage(request)
     p.set_title("Show page properties")
@@ -282,8 +232,12 @@ def show_page_props(request):
         p.context.update(page.get_properties())
         p.context["is_html"] = page.is_html()
         p.context["is_rss"] = page.is_rss()
-        p.context["is_youtube_video_handler"] = type(page) is UrlHandler.youtube_video_handler
-        p.context["is_odysee_video_handler"] = type(page) is UrlHandler.odysee_video_handler
+        p.context["is_youtube_video_handler"] = (
+            type(page) is UrlHandler.youtube_video_handler
+        )
+        p.context["is_odysee_video_handler"] = (
+            type(page) is UrlHandler.odysee_video_handler
+        )
         p.context["page_object"] = page
 
         return p.render("show_page_props.html")

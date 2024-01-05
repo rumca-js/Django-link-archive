@@ -3,7 +3,7 @@ from django.utils import timezone
 from django.urls import reverse
 
 from ..apps import LinkDatabase
-from ..controllers import SourceDataController, LinkDataController, DomainsController
+from ..controllers import SourceDataController, LinkuserDataController, DomainsController
 from ..dateutils import DateUtils
 from ..models import KeyWords, DataExport
 
@@ -126,6 +126,12 @@ class ViewsTest(WebPageDisabled, TestCase):
 
     def test_entry_add(self):
         url = reverse("{}:entry-add".format(LinkDatabase.name))
+        resp = self.client.get(url)
+
+        self.assertEqual(resp.status_code, 200)
+
+    def test_entry_add_simple(self):
+        url = reverse("{}:entry-add-simple".format(LinkDatabase.name))
         resp = self.client.get(url)
 
         self.assertEqual(resp.status_code, 200)

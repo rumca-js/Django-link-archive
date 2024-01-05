@@ -394,7 +394,7 @@ class DomainsController(Domains):
             DomainsController.create_missing_domains()
 
     def unconnect_entries():
-        entries = LinkDataController.objects.filter(domain_obj__isnull = False)
+        entries = LinkDataController.objects.filter(domain_obj__isnull=False)
         for entry in entries:
             entry.domain_obj = None
             entry.save()

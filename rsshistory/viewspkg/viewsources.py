@@ -17,6 +17,7 @@ from ..forms import SourceForm, SourcesChoiceForm
 from ..queryfilters import SourceFilter
 from ..views import ViewPage
 from ..configuration import Configuration
+from ..webtools import Url
 
 
 class RssSourceListView(generic.ListView):
@@ -149,6 +150,12 @@ def add_source_simple(request):
         if form.is_valid():
             url = form.cleaned_data["url"]
 
+            if not Url.is_web_link(url):
+                p.context[
+                    "summary_text"
+                ] = "Only http links are allowed. Link:{}".format(url)
+                return p.render("summary_present.html")
+
             ob = SourceDataController.objects.filter(url=url)
             if ob.exists():
                 p.context["form"] = form
@@ -202,8 +209,6 @@ def edit_source(request, pk):
         return p.render("summary_present.html")
     else:
         if not ob.favicon:
-            from ..webtools import Url
-
             icon = Url.get_favicon(ob.url)
             if icon:
                 form = SourceForm(instance=ob, initial={"favicon": icon})

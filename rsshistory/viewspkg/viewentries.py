@@ -33,6 +33,7 @@ from ..forms import (
 from ..queryfilters import EntryFilter
 from ..views import ViewPage
 from ..configuration import Configuration
+from ..webtools import Url
 
 
 class EntriesSearchListView(generic.ListView):
@@ -562,6 +563,12 @@ def add_simple_entry(request):
         if form.is_valid():
             link = form.cleaned_data["link"]
 
+            if not Url.is_web_link(link):
+                p.context[
+                    "summary_text"
+                ] = "Only http links are allowed. Link:{}".format(link)
+                return p.render("summary_present.html")
+
             obs = LinkDataController.objects.filter(link=link)
             if obs.exists():
                 ob = obs[0]
@@ -570,6 +577,7 @@ def add_simple_entry(request):
             data = LinkDataController.get_full_information({"link": link})
             if data:
                 data["user"] = request.user.username
+                data["bookmarked"] = True
 
                 form = EntryForm(initial=data)
                 form.method = "POST"

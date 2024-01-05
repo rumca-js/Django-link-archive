@@ -38,6 +38,9 @@ class SourceDataController(SourceDataModel):
             p = BasePage(source_data_map["url"])
             LinkDataBuilder(link=p.get_domain())
 
+        from .backgroundjob import BackgroundJobController
+        BackgroundJobController.download_rss(source)
+
         return source
 
     def get_absolute_url(self):
@@ -259,3 +262,55 @@ class SourceDataController(SourceDataModel):
             result["url"] = result["url"][:-1]
 
         return result
+
+
+class SourceDataBuilder(object):
+    def add_from_url(rss_url, link_props):
+        conf = Configuration.get_object().config_entry
+
+        if rss_url.endswith("/"):
+            rss_url = rss_url[:-1]
+
+        if SourceDataModel.objects.filter(url=rss_url).count() > 0:
+            return
+
+        if "contents" in link_props:
+            parser = RssPage(rss_url, link_props["contents"])
+        else:
+            parser = RssPage(rss_url)
+
+        d = parser.parse()
+        if d is None:
+            PersistentInfo.error("RSS is empty: rss_url:{0}".format(rss_url))
+            return
+
+        if len(d.entries) == 0:
+            PersistentInfo.error("RSS no entries: rss_url:{0}".format(rss_url))
+            return
+
+        props = {}
+        props["url"] = rss_url
+
+        title = parser.get_title()
+        if title:
+            props["title"] = title
+        if not title:
+            props["title"] = link_props["title"]
+
+        props["export_to_cms"] = True
+        language = parser.get_language()
+        if language:
+            props["language"] = language
+        thumbnail = parser.get_thumbnail()
+        if thumbnail:
+            props["favicon"] = thumbnail
+        props["on_hold"] = not conf.auto_store_sources_enabled
+        props["source_type"] = SourceDataModel.SOURCE_TYPE_RSS
+        props["remove_after_days"] = 2
+        props["category"] = "New"
+        props["subcategory"] = "New"
+
+        try:
+            SourceDataModel.objects.create(**props)
+        except Exception as E:
+            PersistentInfo.error("Exception {}".format(str(E)))

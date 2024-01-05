@@ -10,7 +10,6 @@ from ..serializers.instanceimporter import InstanceImporter
 
 
 class InstanceImporterTest(TestCase):
-
     def test_import_entries_no_page(self):
         importer = InstanceImporter("https://instance.com/entries", "renegat0x0")
         url = importer.get_next_page_link()
@@ -22,7 +21,9 @@ class InstanceImporterTest(TestCase):
         self.assertEqual(url, "https://instance.com/entries?page=1")
 
     def test_import_entries_args(self):
-        importer = InstanceImporter("https://instance.com/entries?v=1&page=0", "renegat0x0")
+        importer = InstanceImporter(
+            "https://instance.com/entries?v=1&page=0", "renegat0x0"
+        )
         url = importer.get_next_page_link()
         self.assertEqual(url, "https://instance.com/entries?v=1&page=1")
 

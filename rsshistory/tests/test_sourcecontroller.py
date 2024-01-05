@@ -2,7 +2,10 @@ from django.test import TestCase
 from django.utils import timezone
 from django.urls import reverse
 
-from ..controllers import SourceDataController
+from ..controllers import (
+    SourceDataController,
+    BackgroundJobController,
+)
 from .utilities import WebPageDisabled
 
 
@@ -25,6 +28,9 @@ class SourceControllerTest(WebPageDisabled, TestCase):
         )
 
         self.assertEqual(SourceDataController.objects.all().count(), 1)
+
+        # adding a source adds request to fetch data from it
+        self.assertEqual(BackgroundJobController.objects.all().count(), 1)
 
     def test_new_source_twice(self):
         self.assertEqual(SourceDataController.objects.all().count(), 0)

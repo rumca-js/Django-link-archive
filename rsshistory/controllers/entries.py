@@ -287,7 +287,7 @@ class LinkDataController(LinkDataModel):
         return result
 
     def tag(self, tags, author=None):
-        data = {"author" : author, "link" : self.link, "tags" : tags}
+        data = {"author": author, "link": self.link, "tags": tags}
         return LinkTagsDataModel.save_tags_internal(data)
 
     def vote(self, vote):
@@ -475,58 +475,6 @@ class LinkDataWrapper(object):
         # return cleantext
 
 
-class LinkSourceBuilder(object):
-    def add_source(rss_url, link_props):
-        conf = Configuration.get_object().config_entry
-
-        if rss_url.endswith("/"):
-            rss_url = rss_url[:-1]
-
-        if SourceDataModel.objects.filter(url=rss_url).count() > 0:
-            return
-
-        if "contents" in link_props:
-            parser = RssPage(rss_url, link_props["contents"])
-        else:
-            parser = RssPage(rss_url)
-
-        d = parser.parse()
-        if d is None:
-            PersistentInfo.error("RSS is empty: rss_url:{0}".format(rss_url))
-            return
-
-        if len(d.entries) == 0:
-            PersistentInfo.error("RSS no entries: rss_url:{0}".format(rss_url))
-            return
-
-        props = {}
-        props["url"] = rss_url
-
-        title = parser.get_title()
-        if title:
-            props["title"] = title
-        if not title:
-            props["title"] = link_props["title"]
-
-        props["export_to_cms"] = True
-        language = parser.get_language()
-        if language:
-            props["language"] = language
-        thumbnail = parser.get_thumbnail()
-        if thumbnail:
-            props["favicon"] = thumbnail
-        props["on_hold"] = not conf.auto_store_sources_enabled
-        props["source_type"] = SourceDataModel.SOURCE_TYPE_RSS
-        props["remove_after_days"] = 2
-        props["category"] = "New"
-        props["subcategory"] = "New"
-
-        try:
-            SourceDataModel.objects.create(**props)
-        except Exception as E:
-            PersistentInfo.error("Exception {}".format(str(E)))
-
-
 class LinkDataBuilder(object):
     """
     Archive managment can be tricky. It is long to process entire archive.
@@ -549,6 +497,13 @@ class LinkDataBuilder(object):
         obj = wrapper.get_from_operational_db()
         if obj:
             return obj
+
+        if self.link.startswith("http://"):
+            link = self.link.replace("http://", "https://")
+            wrapper = LinkDataWrapper(link)
+            obj = wrapper.get_from_operational_db()
+            if obj:
+                return obj
 
         from ..pluginentries.entryurlinterface import EntryUrlInterface
 
@@ -574,10 +529,19 @@ class LinkDataBuilder(object):
     def add_from_props(self):
         obj = None
 
+        self.link = self.link_data["link"]
+
         wrapper = LinkDataWrapper(self.link)
         obj = wrapper.get_from_operational_db()
         if obj:
             return obj
+
+        if self.link.startswith("http://"):
+            link = self.link.replace("http://", "https://")
+            wrapper = LinkDataWrapper(link)
+            obj = wrapper.get_from_operational_db()
+            if obj:
+                return obj
 
         # Try with https more that with https
         if self.link_data["link"].startswith("http://"):
@@ -770,17 +734,7 @@ class LinkDataBuilder(object):
         else:
             html = HtmlPage(link)
 
-        props = html.get_properties()
-
-        if "rss_urls" not in props:
-            return
-
-        if props["rss_urls"] is None:
-            return
-
-        rss_urls = props["rss_urls"]
-        if len(rss_urls) == 0:
-            return
+        rss_urls = html.get_rss_urls()
 
         for rss_url in rss_urls:
             LinkSourceBuilder.add_source(rss_url, link_props)

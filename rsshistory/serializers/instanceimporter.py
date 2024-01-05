@@ -34,7 +34,7 @@ class InstanceExporter(object):
 
 
 class InstanceImporter(object):
-    def __init__(self, url, author = None):
+    def __init__(self, url, author=None):
         self.url = url
         self.author = author
 
@@ -100,7 +100,7 @@ class InstanceImporter(object):
             page_param = 0
 
         # Update the 'page' parameter in the query string
-        query_params['page'] = [str(page_param)]
+        query_params["page"] = [str(page_param)]
 
         # Construct the new URL
         new_query_string = urlencode(query_params, doseq=True)
@@ -113,7 +113,7 @@ class InstanceImporter(object):
 
         for link_data in json_data:
             clean_data = LinkDataController.get_clean_data(link_data)
-            entries = LinkDataController.objects.filter(link = clean_data["link"])
+            entries = LinkDataController.objects.filter(link=clean_data["link"])
             if entries.count() == 0:
                 entry = LinkDataController.objects.create(**clean_data)
                 entry.tag(link_data["tags"], self.author)
@@ -128,21 +128,21 @@ class InstanceImporter(object):
 
         for source_data in json_data:
             clean_data = LinkDataController.get_clean_data(source_data)
-            if SourceDataController.objects.filter(url = clean_data["url"]).count() == 0:
+            if SourceDataController.objects.filter(url=clean_data["url"]).count() == 0:
                 SourceDataController.objects.create(**clean_data)
 
     def import_from_link(self, json_data):
         LinkDatabase.info("Import from link")
 
         clean_data = LinkDataController.get_clean_data(json_data)
-        if LinkDataController.objects.filter(link = clean_data["link"]).count() == 0:
+        if LinkDataController.objects.filter(link=clean_data["link"]).count() == 0:
             LinkDataController.objects.create(**clean_data)
 
     def import_from_source(self, json_data):
         LinkDatabase.info("Import from source")
 
         clean_data = LinkDataController.get_clean_data(json_data)
-        if SourceDataController.objects.filter(url = clean_data["url"]).count() == 0:
+        if SourceDataController.objects.filter(url=clean_data["url"]).count() == 0:
             SourceDataController.objects.create(**clean_data)
 
     def import_from_domains(self, json_data):

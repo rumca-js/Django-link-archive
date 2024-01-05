@@ -103,9 +103,9 @@ def import_from_instance(request):
         if form.is_valid():
             link = form.cleaned_data["link"]
 
-            BackgroundJobController.import_from_instance(link)
+            BackgroundJobController.import_from_instance(link, request.user.username)
 
-            p.context["summary_text"] = "Imported"
+            p.context["summary_text"] = "Import job added"
             return p.render("summary_present.html")
 
         else:

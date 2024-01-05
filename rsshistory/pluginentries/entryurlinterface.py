@@ -68,11 +68,19 @@ class EntryUrlInterface(object):
             input_props["permanent"] = True
             input_props["bookmarked"] = False
 
+        if not source_obj:
+            sources = SourceDataController.objects.filter(url=self.url)
+            if sources.exists():
+                source_obj = sources[0]
+
         if "source_obj" not in input_props and source_obj:
             input_props["source_obj"] = source_obj
 
         if "source" not in input_props and source_obj:
             input_props["source"] = source_obj.url
+
+        if "source" not in input_props and not source_obj:
+            input_props["source"] = self.url
 
         if type(p) is UrlHandler.youtube_video_handler:
             if p.get_video_code():
@@ -106,10 +114,6 @@ class EntryUrlInterface(object):
                 "Could not obtain channel feed url:{}".format(source_url)
             )
 
-        sources = SourceDataController.objects.filter(url=source_url)
-        if sources.exists():
-            source_obj = sources[0]
-
         # always use classic link format in storage
         input_props["link"] = p.get_link_classic()
 
@@ -129,8 +133,8 @@ class EntryUrlInterface(object):
         if "language" not in input_props and source_obj:
             input_props["language"] = source_obj.language
 
-        if "source" not in input_props and source_obj:
-            input_props["source"] = source_obj.url
+        if source_url:
+            input_props["source"] = source_url
 
         return input_props
 
@@ -177,12 +181,6 @@ class EntryUrlInterface(object):
 
         if "album" not in input_props:
             input_props["album"] = p.get_domain()
-
-        if "source" not in input_props:
-            if source_obj:
-                input_props["source"] = source_obj.url
-            else:
-                input_props["source"] = p.get_domain()
 
         input_props["page_rating_contents"] = p.get_page_rating()
 
@@ -247,7 +245,7 @@ class EntryUrlInterface(object):
             return
 
         if "source" not in input_props or not input_props["source"]:
-            input_props["source"] = p.get_domain()
+            input_props["source"] = self.url
         if "artist" not in input_props or not input_props["artist"]:
             input_props["artist"] = p.get_domain()
         if "album" not in input_props or not input_props["album"]:
