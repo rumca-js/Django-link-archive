@@ -215,8 +215,6 @@ class BasePage(object):
         }
 
         try:
-            # traceback.print_stack()
-
             r = self.get_contents_function(self.url, headers=hdr, timeout=10)
             self.status_code = r.status_code
 
@@ -252,6 +250,8 @@ class BasePage(object):
 
         SSL is mostly important for interacting with pages. During web scraping it is not that useful.
         """
+
+        # traceback.print_stack()
 
         request_result = requests.get(
             url, headers=headers, timeout=timeout, verify=BasePage.ssl_verify
@@ -775,8 +775,9 @@ class RssPage(ContentInterface):
             elif "url" in self.feed.feed.image:
                 image = str(self.feed.feed.image["url"])
             else:
-                image = str(self.feed.feed.image)
-                PersistentInfo.info("Unsupported image type:{}".format(image))
+                PersistentInfo.info(
+                    "Unsupported image type for feed:{}".format(self.feed.feed)
+                )
 
         if not image:
             if self.url.find("https://www.youtube.com/feeds/videos.xml") >= 0:
@@ -1198,6 +1199,12 @@ class HtmlPage(ContentInterface):
             if rss_find and rss_find.has_attr("href"):
                 rss_links.append(rss_find["href"])
 
+        if len(rss_links) == 0:
+            links = self.get_links_inner()
+            for link in links:
+                if link.find("feed") >= 0 or link.find("rss") >= 0:
+                    rss_links.append(link)
+
         feed_url = self.url + "/feed"
         if full_check and feed_url not in rss_links:
             lucky_shot = self.url + "/feed"
@@ -1427,6 +1434,17 @@ class Url(object):
                 favs = page.get_favicons()
                 if favs and len(favs) > 0:
                     return favs[0][0]
+
+    def is_web_link(url):
+        if (
+            url.startswith("http")
+            or url.startswith("//")
+            or url.startswith("smb:")
+            or url.startswith("ftp:")
+        ):
+            return True
+
+        return False
 
 
 class InputContent(object):
