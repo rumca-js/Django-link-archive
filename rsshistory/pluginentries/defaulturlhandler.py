@@ -75,13 +75,13 @@ class DefaultUrlHandler(object):
 
         return props
 
-    def is_html(self):
-        url = Url.get(self.url)
-        return url.is_html()
+    def is_html(self, fast_check = True):
+        url = Url.get(self.url, fast_check = fast_check)
+        return url.is_html(fast_check = fast_check)
 
-    def is_rss(self):
-        url = Url.get(self.url)
-        return url.is_rss()
+    def is_rss(self, fast_check = True):
+        url = Url.get(self.url, fast_check = fast_check)
+        return url.is_rss(fast_check = fast_check)
 
     def is_domain(self):
         url = Url.get(self.url)

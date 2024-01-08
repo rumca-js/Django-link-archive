@@ -36,9 +36,10 @@ class EntryUrlInterface(object):
         props = self.get_props_implementation(input_props)
 
         if props:
-            if "description" in props and props["description"]:
-                # TODO change hardcoded limit
-                props["description"] = props["description"][:900]
+            if self.is_property_set(input_props, "description"):
+                if len(props["description"]) > 950:
+                    # TODO change hardcoded limit
+                    props["description"] = props["description"][:950] + "[...]"
 
             is_domain = BasePage(self.url).is_domain()
             if is_domain and ("thumbnail" not in props or props["thumbnail"] == None):
@@ -58,7 +59,7 @@ class EntryUrlInterface(object):
         if not input_props:
             input_props = {}
 
-        if "source" not in input_props:
+        if not self.is_property_set(input_props, "source"):
             if source_obj:
                 input_props["source"] = source_obj.url
 
@@ -74,13 +75,13 @@ class EntryUrlInterface(object):
             if sources.exists():
                 source_obj = sources[0]
 
-        if "source_obj" not in input_props and source_obj:
+        if not self.is_property_set(input_props, "source_obj") and source_obj:
             input_props["source_obj"] = source_obj
 
-        if "source" not in input_props and source_obj:
+        if not self.is_property_set(input_props, "source") and source_obj:
             input_props["source"] = source_obj.url
 
-        if "source" not in input_props and not source_obj:
+        if not self.is_property_set(input_props, "source_obj") and not source_obj:
             input_props["source"] = self.url
 
         if type(p) is UrlHandler.youtube_video_handler:
@@ -119,24 +120,26 @@ class EntryUrlInterface(object):
         # always use classic link format in storage
         input_props["link"] = p.get_link_classic()
 
-        if "title" not in input_props:
+        if not self.is_property_set(input_props, "title"):
             input_props["title"] = p.get_title()
-        if "description" not in input_props:
+        if not self.is_property_set(input_props, "description"):
             input_props["description"] = p.get_description()
-        if "date_published" not in input_props:
+        if not self.is_property_set(input_props, "date_published"):
             input_props["date_published"] = p.get_datetime_published()
-        if "thumbnail" not in input_props:
+        if not self.is_property_set(input_props, "thumbnail"):
             input_props["thumbnail"] = p.get_thumbnail()
-        if "artist" not in input_props:
+        if not self.is_property_set(input_props, "artist"):
             input_props["artist"] = p.get_channel_name()
-        if "album" not in input_props:
+        if not self.is_property_set(input_props, "album"):
             input_props["album"] = p.get_channel_name()
 
-        if "language" not in input_props and source_obj:
+        if not self.is_property_set(input_props, "language") and source_obj:
             input_props["language"] = source_obj.language
 
         if source_url:
             input_props["source"] = source_url
+
+        input_props["live"] = p.is_live()
 
         return input_props
 
@@ -154,34 +157,35 @@ class EntryUrlInterface(object):
         # some pages return invalid code / information. let the user decide
         # what to do about it
 
-        if "link" not in input_props:
+        if not self.is_property_set(input_props, "link"):
             input_props["link"] = p.url
-        if "title" not in input_props:
+        if not self.is_property_set(input_props, "title"):
             title = p.get_title()
             input_props["title"] = title
-        if "description" not in input_props:
+        if not self.is_property_set(input_props, "description"):
             description = p.get_description()
             if description is None:
-                description = title
+                if self.is_property_set(input_props, "title"):
+                    description = input_props["title"]
             input_props["description"] = description
 
-        if "language" not in input_props:
+        if not self.is_property_set(input_props, "language"):
             language = p.get_language()
             if not language:
                 if source_obj:
                     language = source_obj.language
             input_props["language"] = language
 
-        if "date_published" not in input_props:
+        if not self.is_property_set(input_props, "date_published"):
             input_props["date_published"] = DateUtils.get_datetime_now_utc()
 
-        if "thumbnail" not in input_props:
+        if not self.is_property_set(input_props, "thumbnail"):
             input_props["thumbnail"] = p.get_thumbnail()
 
-        if "artist" not in input_props:
+        if not self.is_property_set(input_props, "artist"):
             input_props["artist"] = p.get_domain()
 
-        if "album" not in input_props:
+        if not self.is_property_set(input_props, "album"):
             input_props["album"] = p.get_domain()
 
         input_props["page_rating_contents"] = p.get_page_rating()
@@ -203,32 +207,32 @@ class EntryUrlInterface(object):
             LinkDatabase.info("RSS page is invalid:{}".format(url))
             return
 
-        if "link" not in input_props:
+        if not self.is_property_set(input_props, "link"):
             input_props["link"] = p.url
-        if "title" not in input_props:
+        if not self.is_property_set(input_props, "title"):
             title = p.get_title()
             input_props["title"] = title
-        if "description" not in input_props:
+        if not self.is_property_set(input_props, "description"):
             description = p.get_description()
             if description is None:
                 description = title
             input_props["description"] = description
 
-        if "language" not in input_props:
+        if not self.is_property_set(input_props, "language"):
             language = p.get_language()
             if not language:
                 if source_obj:
                     language = source_obj.language
             input_props["language"] = language
 
-        if "date_published" not in input_props:
+        if not self.is_property_set(input_props, "date_published"):
             date = p.get_date_published()
             if date:
                 input_props["date_published"] = date
             else:
                 input_props["date_published"] = DateUtils.get_datetime_now_utc()
 
-        if "thumbnail" not in input_props:
+        if not self.is_property_set(input_props, "thumbnail"):
             input_props["thumbnail"] = p.get_thumbnail()
 
         input_props["page_rating_contents"] = p.get_page_rating()
@@ -246,17 +250,17 @@ class EntryUrlInterface(object):
             LinkDatabase.info("HTML page is invalid:{}".format(url))
             return
 
-        if "source" not in input_props or not input_props["source"]:
+        if not self.is_property_set(input_props, "source"):
             input_props["source"] = self.url
-        if "artist" not in input_props or not input_props["artist"]:
+        if not self.is_property_set(input_props, "artist"):
             input_props["artist"] = p.get_domain()
-        if "album" not in input_props or not input_props["album"]:
+        if not self.is_property_set(input_props, "album"):
             input_props["album"] = p.get_domain()
-        if "language" not in input_props or not input_props["language"]:
-            input_props["language"] = ""
-        if "title" not in input_props or not input_props["title"]:
+        if not self.is_property_set(input_props, "language"):
+            input_props["language"] = None
+        if not self.is_property_set(input_props, "title"):
             input_props["title"] = p.get_domain()
-        if "description" not in input_props or not input_props["description"]:
+        if not self.is_property_set(input_props, "description"):
             input_props["description"] = p.get_domain()
 
         sources = SourceDataModel.objects.filter(url=input_props["source"])
@@ -265,6 +269,9 @@ class EntryUrlInterface(object):
             input_props["album"] = sources[0].title
 
         return input_props
+
+    def is_property_set(self, input_props, property):
+        return property in input_props and input_props[property]
 
 
 class UrlHandler(object):

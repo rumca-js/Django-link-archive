@@ -51,13 +51,24 @@ class ConfigurationEntry(models.Model):
         default=True
     )  # Might work faster if disabled, but might capture invalid pages
     sources_refresh_period = models.IntegerField(default=3600)
-    link_save = models.BooleanField(default=False)
-    source_save = models.BooleanField(default=False)
+
     auto_store_entries = models.BooleanField(default=True)
+    # when reading RSS we may not have all data (thumbnails?).
+    # We will try other means to download data.
+    # Might be slower.
+    auto_store_entries_use_all_data = models.BooleanField(default=False)
+    #when reading we might use RSS description.
+    # This setting allows us to use HTML data for HTML pages only
+    # Might be slower.
+    auto_store_entries_use_clean_page_info = models.BooleanField(default=False)
     auto_store_sources = models.BooleanField(default=False)
     auto_store_sources_enabled = models.BooleanField(default=False)
     auto_store_domain_info = models.BooleanField(default=True)
     auto_store_keyword_info = models.BooleanField(default=True)
+
+    link_save = models.BooleanField(default=False)
+    source_save = models.BooleanField(default=False)
+
     track_user_actions = models.BooleanField(default=True)
     vote_min = models.IntegerField(default=-100)
     vote_max = models.IntegerField(default=100)

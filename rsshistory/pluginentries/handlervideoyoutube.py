@@ -153,7 +153,7 @@ class YouTubeVideoHandler(DefaultUrlHandler):
 
     def is_live(self):
         if self.yt_ob:
-            return self.yt_ob.is_live() or self.yt_ob.was_live()
+            return self.yt_ob.is_live()
         return True
 
     def get_artist(self):
@@ -184,13 +184,13 @@ class YouTubeVideoHandler(DefaultUrlHandler):
         if yt_json:
             youtube_props["webpage_url"] = yt_json["webpage_url"]
             youtube_props["uploader_url"] = yt_json["uploader_url"]
-            youtube_props["channel_id"] = yt_json["channel_id"]
-            youtube_props["channel"] = yt_json["channel"]
-            youtube_props["channel_url"] = yt_json["channel_url"]
+            youtube_props["channel_id"] = self.yt_ob.get_channel_code()
+            youtube_props["channel"] = self.yt_ob.get_channel_name()
+            youtube_props["channel_url"] = self.yt_ob.get_channel_url()
             youtube_props["channel_follower_count"] = yt_json["channel_follower_count"]
-            youtube_props["view_count"] = yt_json["view_count"]
-            youtube_props["like_count"] = yt_json["like_count"]
-            youtube_props["upload_date"] = yt_json["upload_date"]
+            youtube_props["view_count"] = self.yt_ob.get_view_count()
+            youtube_props["like_count"] = self.yt_ob.get_thumbs_up()
+            youtube_props["upload_date"] = self.yt_ob.get_date_published()
             if "duration_string" in yt_json:
                 youtube_props["duration"] = yt_json["duration_string"]
 
@@ -199,6 +199,7 @@ class YouTubeVideoHandler(DefaultUrlHandler):
         youtube_props["channel_feed_url"] = self.get_channel_feed_url()
         youtube_props["contents"] = self.get_json_text()
         youtube_props["keywords"] = self.get_tags()
+        youtube_props["live"] = self.is_live()
 
         return youtube_props
 
@@ -228,6 +229,9 @@ class YouTubeVideoHandler(DefaultUrlHandler):
         return True
 
     def download_details_youtube(self):
+        if self.yt_text is not None:
+            return True
+
         from ..programwrappers import ytdlp
 
         yt = ytdlp.YTDLP(self.url)
@@ -238,6 +242,9 @@ class YouTubeVideoHandler(DefaultUrlHandler):
 
     def download_details_return_dislike(self):
         if not self.return_dislike:
+            return True
+
+        if self.rd_text is not None:
             return True
             
         from ..serializers.returnyoutubedislikeapijson import YouTubeThumbsDown

@@ -328,6 +328,12 @@ class ViewsTest(WebPageDisabled, TestCase):
 
         self.assertEqual(resp.status_code, 200)
 
+    def test_reset_config(self):
+        url = reverse("{}:reset-config".format(LinkDatabase.name))
+        resp = self.client.get(url)
+
+        self.assertEqual(resp.status_code, 200)
+
     def test_system_status(self):
         url = reverse("{}:system-status".format(LinkDatabase.name))
         resp = self.client.get(url)

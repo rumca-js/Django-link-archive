@@ -50,10 +50,13 @@ class ConfigForm(forms.ModelForm):
             "link_save",
             "source_save",
             "auto_store_entries",
+            "auto_store_entries_use_all_data",
+            "auto_store_entries_use_clean_page_info",
             "auto_store_sources",
             "auto_store_sources_enabled",
             "auto_store_domain_info",
             "auto_store_keyword_info",
+
             "track_user_actions",
             "data_export_path",
             "data_import_path",

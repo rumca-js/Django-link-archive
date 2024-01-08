@@ -3,181 +3,9 @@ from django.utils import timezone
 from django.urls import reverse
 
 from ..controllers import SourceDataController
-from ..pluginsources.sourcerssplugin import BaseRssPlugin
-from ..pluginsources.sourceparseplugin import BaseParsePlugin
-from ..pluginsources.sourcegenerousparserplugin import SourceGenerousParserPlugin
-from ..pluginsources.sourceparseditigsplugin import SourceParseDigitsPlugin
-from ..pluginsources.domainparserplugin import DomainParserPlugin
 from ..pluginsources.codeprojectplugin import CodeProjectPlugin
 
 from .utilities import WebPageDisabled
-
-
-webpage_youtube_contents = """
-<html>
-<body>
-   <a href="https://linkedin.com/1">Test1</a>
-   <a href="https://linkedin.com/2">Test2</a>
-</body>
-</html>
-"""
-
-webpage_contents = """
-<html>
-<body>
-   <a href="https://test1.com">Test1</a>
-   <a href="https://test2.com">Test2</a>
-</body>
-</html>
-"""
-
-
-class SourceParsePluginTest(WebPageDisabled, TestCase):
-    def setUp(self):
-        self.source_youtube = SourceDataController.objects.create(
-            url="https://youtube.com",
-            title="YouTube",
-            category="No",
-            subcategory="No",
-            export_to_cms=True,
-        )
-        self.disable_web_pages()
-
-    def test_is_link_valid_html(self):
-        parse = BaseParsePlugin(self.source_youtube.id)
-        self.assertTrue(parse.is_link_valid("https://youtube.com/location/inside.html"))
-
-    def test_is_link_valid_htm(self):
-        parse = BaseParsePlugin(self.source_youtube.id)
-        self.assertTrue(parse.is_link_valid("https://youtube.com/location/inside.htm"))
-
-    def test_is_link_valid_ending_dash(self):
-        parse = BaseParsePlugin(self.source_youtube.id)
-        self.assertTrue(parse.is_link_valid("https://youtube.com/location/inside/"))
-
-    def test_is_link_valid_ending_noext(self):
-        parse = BaseParsePlugin(self.source_youtube.id)
-        self.assertTrue(parse.is_link_valid("https://youtube.com/location/inside"))
-
-    # check if false
-
-    def test_is_link_valid_outside_location(self):
-        parse = BaseParsePlugin(self.source_youtube.id)
-        self.assertFalse(parse.is_link_valid("https://github.com/location/inside"))
-
-    def test_is_link_valid_js(self):
-        parse = BaseParsePlugin(self.source_youtube.id)
-        self.assertFalse(parse.is_link_valid("https://youtube.com/location/inside.js"))
-
-    def test_is_link_valid_css(self):
-        parse = BaseParsePlugin(self.source_youtube.id)
-        self.assertFalse(parse.is_link_valid("https://youtube.com/location/inside.css"))
-
-
-class SourceGenerousParsePluginTest(WebPageDisabled, TestCase):
-    def setUp(self):
-        self.source_youtube = SourceDataController.objects.create(
-            url="https://youtube.com",
-            title="YouTube",
-            category="No",
-            subcategory="No",
-            export_to_cms=True,
-        )
-        self.disable_web_pages()
-
-    def test_is_link_valid_html(self):
-        parse = SourceGenerousParserPlugin(self.source_youtube.id)
-        self.assertTrue(parse.is_link_valid("https://youtube.com/location/inside.html"))
-
-    def test_is_link_valid_htm(self):
-        parse = SourceGenerousParserPlugin(self.source_youtube.id)
-        self.assertTrue(parse.is_link_valid("https://youtube.com/location/inside.htm"))
-
-    def test_is_link_valid_ending_dash(self):
-        parse = SourceGenerousParserPlugin(self.source_youtube.id)
-        self.assertTrue(parse.is_link_valid("https://youtube.com/location/inside/"))
-
-    def test_is_link_valid_ending_noext(self):
-        parse = SourceGenerousParserPlugin(self.source_youtube.id)
-        self.assertTrue(parse.is_link_valid("https://youtube.com/location/inside"))
-
-    # check if false
-
-    def test_is_link_valid_outside_location(self):
-        parse = SourceGenerousParserPlugin(self.source_youtube.id)
-        self.assertFalse(parse.is_link_valid("https://github.com/location/inside"))
-
-    def test_is_link_valid_js(self):
-        parse = SourceGenerousParserPlugin(self.source_youtube.id)
-        self.assertFalse(parse.is_link_valid("https://youtube.com/location/inside.js"))
-
-    def test_is_link_valid_css(self):
-        parse = SourceGenerousParserPlugin(self.source_youtube.id)
-        self.assertFalse(parse.is_link_valid("https://youtube.com/location/inside.css"))
-
-
-class DomainParsePluginTest(WebPageDisabled, TestCase):
-    def setUp(self):
-        self.disable_web_pages()
-
-        self.source_youtube = SourceDataController.objects.create(
-            url="https://youtube.com",
-            title="YouTube",
-            category="No",
-            subcategory="No",
-            export_to_cms=True,
-        )
-
-    def is_domain(self, alist, value):
-        if alist is None:
-            return False
-
-        for avalue in alist:
-            if avalue["link"] == value:
-                return True
-
-        return False
-
-    def test_is_props_valid(self):
-        parser = DomainParserPlugin(self.source_youtube.id)
-        parser.contents = webpage_contents
-
-        props = list(parser.get_link_props())
-        print(props)
-
-        self.assertTrue(self.is_domain(props, "https://test1.com"))
-        self.assertTrue(self.is_domain(props, "https://test2.com"))
-
-
-class BaseParsePluginTest(WebPageDisabled, TestCase):
-    def setUp(self):
-        self.disable_web_pages()
-
-        self.source_youtube = SourceDataController.objects.create(
-            url="https://linkedin.com",
-            title="linkedin",
-            category="No",
-            subcategory="No",
-            export_to_cms=True,
-        )
-
-    def is_domain(self, alist, value):
-        for avalue in alist:
-            if avalue["link"] == value:
-                return True
-
-        return False
-
-    def test_is_props_valid(self):
-        parser = BaseParsePlugin(self.source_youtube.id)
-
-        parser.contents = webpage_youtube_contents
-
-        props = list(parser.get_link_props())
-        print(props)
-
-        self.assertTrue(self.is_domain(props, "https://linkedin.com/1"))
-        self.assertTrue(self.is_domain(props, "https://linkedin.com/2"))
 
 
 webpage_code_project_contents = """
@@ -208,7 +36,7 @@ webpage_code_project_contents = """
       <link>https://www.codeproject.com/script/News/View.aspx?nwid=63692</link>
       <pubDate>Wed, 27 Dec 2023 05:00:00 GMT</pubDate>
       <source url="https://www.theverge.com/2023/12/26/24012382/apple-import-ban-watch-series-9-ultra-2">The Verge</source>
-      <category>ßIndustry News</category>
+      <category>¬ßIndustry News</category>
       <subject>Apple is now banned from selling its latest Apple Watches in the US</subject>
     </item>
     <item>
@@ -218,7 +46,7 @@ webpage_code_project_contents = """
       <link>https://www.codeproject.com/script/News/View.aspx?nwid=63693</link>
       <pubDate>Wed, 27 Dec 2023 05:00:00 GMT</pubDate>
       <source url="https://www.sciencealert.com/quantum-batteries-could-provide-a-new-kind-of-energy-storage-by-messing-with-time">Science Alert</source>
-      <category>ßScience And Technology</category>
+      <category>¬ßScience And Technology</category>
       <subject>Quantum batteries could provide a new kind of energy storage by messing with time</subject>
     </item>
     <item>
@@ -228,7 +56,7 @@ webpage_code_project_contents = """
       <link>https://www.codeproject.com/script/News/View.aspx?nwid=63694</link>
       <pubDate>Wed, 27 Dec 2023 05:00:00 GMT</pubDate>
       <source url="https://www.infoworld.com/article/3711801/how-software-engineering-will-evolve-in-2024.html">Infoworld</source>
-      <category>ßDeveloper News</category>
+      <category>¬ßDeveloper News</category>
       <category>#Headliner</category>
       <subject>How software engineering will evolve in 2024</subject>
     </item>
@@ -239,7 +67,7 @@ webpage_code_project_contents = """
       <link>https://www.codeproject.com/script/News/View.aspx?nwid=63695</link>
       <pubDate>Wed, 27 Dec 2023 05:00:00 GMT</pubDate>
       <source url="https://www.gybe.ca/writing-code-is-the-same-thing-as-writing-prose/">Michael Hart</source>
-      <category>ßDeveloper News</category>
+      <category>¬ßDeveloper News</category>
       <subject>Writing code is the same thing as writing prose</subject>
     </item>
     <item>
@@ -249,7 +77,7 @@ webpage_code_project_contents = """
       <link>https://www.codeproject.com/script/News/View.aspx?nwid=63696</link>
       <pubDate>Wed, 27 Dec 2023 05:00:00 GMT</pubDate>
       <source url="https://www.sciencefocus.com/apple-news-ingest/physics-ai-music-common">Science Focus</source>
-      <category>ßScience And Technology</category>
+      <category>¬ßScience And Technology</category>
       <subject>Physics, AI and music all share a common thread. You just have to look closely enough</subject>
     </item>
     <item>
@@ -259,7 +87,7 @@ webpage_code_project_contents = """
       <link>https://www.codeproject.com/script/News/View.aspx?nwid=63697</link>
       <pubDate>Wed, 27 Dec 2023 05:00:00 GMT</pubDate>
       <source url="https://techcrunch.com/2023/12/26/the-eternal-struggle-between-open-source-and-proprietary-software/">Techcrunch</source>
-      <category>ßIndustry News</category>
+      <category>¬ßIndustry News</category>
       <subject>The eternal struggle between open source and proprietary software</subject>
     </item>
     <item>
@@ -269,7 +97,7 @@ webpage_code_project_contents = """
       <link>https://www.codeproject.com/script/News/View.aspx?nwid=63698</link>
       <pubDate>Wed, 27 Dec 2023 05:00:00 GMT</pubDate>
       <source url="https://github.com/federico-busato/Modern-CPP-Programming">Federico Busato</source>
-      <category>ßDeveloper News</category>
+      <category>¬ßDeveloper News</category>
       <subject>Modern C++ programming</subject>
     </item>
     <item>
@@ -279,7 +107,7 @@ webpage_code_project_contents = """
       <link>https://www.codeproject.com/script/News/View.aspx?nwid=63699</link>
       <pubDate>Wed, 27 Dec 2023 05:00:00 GMT</pubDate>
       <source url="https://gizmodo.com/burger-king-giving-discounts-if-facial-recognition-thin-1851124496">Gizmodo</source>
-      <category>ßIndustry News</category>
+      <category>¬ßIndustry News</category>
       <subject>Burger King giving discounts if facial recognition thinks you're hungover</subject>
     </item>
     <item>
@@ -289,7 +117,7 @@ webpage_code_project_contents = """
       <link>https://www.codeproject.com/script/News/View.aspx?nwid=63700</link>
       <pubDate>Wed, 27 Dec 2023 05:00:00 GMT</pubDate>
       <source url="https://www.codeproject.com/Messages/5979507/I-think-Amazon-is-losing-the-plot">CodeProject</source>
-      <category>ßHot Threads</category>
+      <category>¬ßHot Threads</category>
       <subject>I think Amazon is losing the plot</subject>
     </item>
     <item>
@@ -299,17 +127,17 @@ webpage_code_project_contents = """
       <link>https://www.codeproject.com/script/News/View.aspx?nwid=63678</link>
       <pubDate>Tue, 26 Dec 2023 05:00:00 GMT</pubDate>
       <source url="https://webkit.org/blog/14879/webgpu-now-available-for-testing-in-safari-technology-preview/">WebKit</source>
-      <category>ßTips and Tools</category>
+      <category>¬ßTips and Tools</category>
       <subject>WebGPU now available for testing in Safari Technology Preview</subject>
     </item>
     <item>
       <title>Is Blazor the Future of Everything Web?</title>
-      <description>In this article weíll learn how .NET 8 has changed Blazorís position in the market with features that have modernized and future-proofed the framework for years to come.</description>
+      <description>In this article we‚Äôll learn how .NET 8 has changed Blazor‚Äôs position in the market with features that have modernized and future-proofed the framework for years to come.</description>
       <author>Kent Sharkey</author>
       <link>https://www.codeproject.com/script/News/View.aspx?nwid=63679</link>
       <pubDate>Tue, 26 Dec 2023 05:00:00 GMT</pubDate>
       <source url="https://www.telerik.com/blogs/is-blazor-future-everything-web">Telerik</source>
-      <category>ßTips and Tools</category>
+      <category>¬ßTips and Tools</category>
       <category>#Headliner</category>
       <subject>Is Blazor the Future of Everything Web?</subject>
     </item>
@@ -320,7 +148,7 @@ webpage_code_project_contents = """
       <link>https://www.codeproject.com/script/News/View.aspx?nwid=63680</link>
       <pubDate>Tue, 26 Dec 2023 05:00:00 GMT</pubDate>
       <source url="https://www.codeproject.com/Messages/5979276/Did-anyone-try-using-smart-glasses-for-writing-cod">CodeProject</source>
-      <category>ßHot Threads</category>
+      <category>¬ßHot Threads</category>
       <subject>Did anyone try using smart glasses for writing code?</subject>
     </item>
     <item>
@@ -330,18 +158,18 @@ webpage_code_project_contents = """
       <link>https://www.codeproject.com/script/News/View.aspx?nwid=63681</link>
       <pubDate>Tue, 26 Dec 2023 05:00:00 GMT</pubDate>
       <source url="https://www.codeproject.com/Messages/5979168/I-was-sent-this-and">CodeProject</source>
-      <category>ßHot Threads</category>
+      <category>¬ßHot Threads</category>
       <subject>I was sent this, and..</subject>
     </item>
     <item>
-      <title>New AI can predict peopleís time of death with high degree of accuracy, study finds</title>
+      <title>New AI can predict people‚Äôs time of death with high degree of accuracy, study finds</title>
       <description>Especially if it's the one planning your death</description>
       <author>Kent Sharkey</author>
       <link>https://www.codeproject.com/script/News/View.aspx?nwid=63682</link>
       <pubDate>Tue, 26 Dec 2023 05:00:00 GMT</pubDate>
       <source url="https://www.independent.co.uk/tech/deathbot-ai-predict-life-death-b2466988.html">Independent</source>
-      <category>ßScience And Technology</category>
-      <subject>New AI can predict peopleís time of death with high degree of accuracy, study finds</subject>
+      <category>¬ßScience And Technology</category>
+      <subject>New AI can predict people‚Äôs time of death with high degree of accuracy, study finds</subject>
     </item>
     <item>
       <title>Windows 11 Moment 5 is allegedly coming February 2024</title>
@@ -350,7 +178,7 @@ webpage_code_project_contents = """
       <link>https://www.codeproject.com/script/News/View.aspx?nwid=63683</link>
       <pubDate>Tue, 26 Dec 2023 05:00:00 GMT</pubDate>
       <source url="https://www.neowin.net/news/windows-11-moment-5-is-allegedly-coming-february-2024/">Neowin</source>
-      <category>ßIndustry News</category>
+      <category>¬ßIndustry News</category>
       <subject>Windows 11 Moment 5 is allegedly coming February 2024</subject>
     </item>
     <item>
@@ -360,19 +188,19 @@ webpage_code_project_contents = """
       <link>https://www.codeproject.com/script/News/View.aspx?nwid=63684</link>
       <pubDate>Tue, 26 Dec 2023 05:00:00 GMT</pubDate>
       <source url="https://unixsheikh.com/articles/we-have-used-too-many-levels-of-abstractions-and-now-the-future-looks-bleak.html">Unix Sheikh</source>
-      <category>ßDeveloper News</category>
+      <category>¬ßDeveloper News</category>
       <category>#Headliner</category>
       <subject>We have used too many levels of abstractions and now the future looks bleak</subject>
     </item>
     <item>
-      <title>Alternate Futures for ìWeb Componentsî</title>
+      <title>Alternate Futures for ‚ÄúWeb Components‚Äù</title>
       <description>It seems like Web Components are always just on the cusp of finally catching on.</description>
       <author>Kent Sharkey</author>
       <link>https://www.codeproject.com/script/News/View.aspx?nwid=63685</link>
       <pubDate>Tue, 26 Dec 2023 05:00:00 GMT</pubDate>
       <source url="https://blog.carlana.net/post/2023/web-component-alternative-futures/">The Ethically-Trained Programmer</source>
-      <category>ßTips and Tools</category>
-      <subject>Alternate Futures for ìWeb Componentsî</subject>
+      <category>¬ßTips and Tools</category>
+      <subject>Alternate Futures for ‚ÄúWeb Components‚Äù</subject>
     </item>
     <item>
       <title>The 4 metrics every engineering manager should track</title>
@@ -381,7 +209,7 @@ webpage_code_project_contents = """
       <link>https://www.codeproject.com/script/News/View.aspx?nwid=63686</link>
       <pubDate>Tue, 26 Dec 2023 05:00:00 GMT</pubDate>
       <source url="https://shiftmag.dev/the-4-metrics-every-engineering-manager-should-track-1329/">Shift magazine</source>
-      <category>ßDeveloper News</category>
+      <category>¬ßDeveloper News</category>
       <subject>The 4 metrics every engineering manager should track</subject>
     </item>
     <item>
@@ -391,7 +219,7 @@ webpage_code_project_contents = """
       <link>https://www.codeproject.com/script/News/View.aspx?nwid=63687</link>
       <pubDate>Tue, 26 Dec 2023 05:00:00 GMT</pubDate>
       <source url="https://www.theverge.com/2023/12/22/24012534/microsoft-wisconsin-pumpkin-farm-foxconn-76-million-mount-pleasant">The Verge</source>
-      <category>ßIndustry News</category>
+      <category>¬ßIndustry News</category>
       <subject>Microsoft just paid $76 million for a Wisconsin pumpkin farm</subject>
     </item>
     <item>
@@ -401,7 +229,7 @@ webpage_code_project_contents = """
       <link>https://www.codeproject.com/script/News/View.aspx?nwid=63688</link>
       <pubDate>Tue, 26 Dec 2023 05:00:00 GMT</pubDate>
       <source url="https://www.androidcentral.com/apps-software/google-ai-support-assistant">Android Central</source>
-      <category>ßIndustry News</category>
+      <category>¬ßIndustry News</category>
       <subject>Google is testing an 'AI support assistant' for questions about Google services</subject>
     </item>
     <item>
@@ -411,28 +239,28 @@ webpage_code_project_contents = """
       <link>https://www.codeproject.com/script/News/View.aspx?nwid=63689</link>
       <pubDate>Tue, 26 Dec 2023 05:00:00 GMT</pubDate>
       <source url="https://www.bleepingcomputer.com/news/security/android-malware-chameleon-disables-fingerprint-unlock-to-steal-pins/">Bleeping Computer</source>
-      <category>ßIndustry News</category>
+      <category>¬ßIndustry News</category>
       <subject>Android malware Chameleon disables Fingerprint Unlock to steal PINs</subject>
     </item>
     <item>
-      <title>Lawrence Livermore National Lab simulates ëArmageddoní-style nuclear asteroid deflection</title>
+      <title>Lawrence Livermore National Lab simulates ‚ÄòArmageddon‚Äô-style nuclear asteroid deflection</title>
       <description>* Bruce Willis not included</description>
       <author>Kent Sharkey</author>
       <link>https://www.codeproject.com/script/News/View.aspx?nwid=63690</link>
       <pubDate>Tue, 26 Dec 2023 05:00:00 GMT</pubDate>
       <source url="https://techcrunch.com/2023/12/21/national-lab-simulates-armageddon-style-nuclear-asteroid-deflection/amp/">Techcrunch</source>
-      <category>ßScience And Technology</category>
-      <subject>Lawrence Livermore National Lab simulates ëArmageddoní-style nuclear asteroid deflection</subject>
+      <category>¬ßScience And Technology</category>
+      <subject>Lawrence Livermore National Lab simulates ‚ÄòArmageddon‚Äô-style nuclear asteroid deflection</subject>
     </item>
     <item>
-      <title>Whatís new in our code coverage tooling?</title>
+      <title>What‚Äôs new in our code coverage tooling?</title>
       <description>"Shut the door and cover me"</description>
       <author>Kent Sharkey</author>
       <link>https://www.codeproject.com/script/News/View.aspx?nwid=63691</link>
       <pubDate>Tue, 26 Dec 2023 05:00:00 GMT</pubDate>
       <source url="https://devblogs.microsoft.com/dotnet/whats-new-in-our-code-coverage-tooling/">.NET</source>
-      <category>ßDeveloper News</category>
-      <subject>Whatís new in our code coverage tooling?</subject>
+      <category>¬ßDeveloper News</category>
+      <subject>What‚Äôs new in our code coverage tooling?</subject>
     </item>
     <item>
       <title>Auth0 Templates for .NET: A New Powerful Version Released</title>
@@ -441,7 +269,7 @@ webpage_code_project_contents = """
       <link>https://www.codeproject.com/script/News/View.aspx?nwid=63668</link>
       <pubDate>Tue, 26 Dec 2023 05:00:00 GMT</pubDate>
       <source url="https://auth0.com/blog/auth0-templates-for-dotnet-powerful-version/">Auth0</source>
-      <category>ßTips and Tools</category>
+      <category>¬ßTips and Tools</category>
       <subject>Auth0 Templates for .NET: A New Powerful Version Released</subject>
     </item>
     <item>
@@ -451,7 +279,7 @@ webpage_code_project_contents = """
       <link>https://www.codeproject.com/script/News/View.aspx?nwid=63669</link>
       <pubDate>Tue, 26 Dec 2023 05:00:00 GMT</pubDate>
       <source url="https://v0.dev/faq">Vercel</source>
-      <category>ßTips and Tools</category>
+      <category>¬ßTips and Tools</category>
       <subject>v0</subject>
     </item>
   </channel>
@@ -472,7 +300,7 @@ class CodeProjectPluginTest(WebPageDisabled, TestCase):
         )
 
     def test_parse(self):
-        parser = DomainParserPlugin(self.source_codeproject.id)
+        parser = CodeProjectPlugin(self.source_codeproject.id)
         parser.contents = webpage_code_project_contents
 
         props = list(parser.get_link_props())

@@ -73,3 +73,13 @@ class DomainTest(WebPageDisabled, TestCase):
 
         entries = LinkDataController.objects.all()
         self.assertEqual(entries.count(), 0)
+
+    def test_domain_create_missing_entries(self):
+        LinkDataController.objects.all().delete()
+        DomainsController.objects.all().delete()
+
+        DomainsController.objects.create(domain = "waiterrant.blogspot.com")
+
+        DomainsController.create_missing_entries()
+
+        self.assertEqual(LinkDataController.objects.all().count(), 1)

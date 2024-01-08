@@ -2,7 +2,7 @@ from django.urls import reverse
 from django.templatetags.static import static
 
 from ..apps import LinkDatabase
-from ..models import ConfigurationEntry
+from ..models import ConfigurationEntry, UserConfig
 from ..webtools import HtmlPage
 from ..configuration import Configuration
 
@@ -347,16 +347,22 @@ class EntryGenericPlugin(object):
         return parameters
 
     def get_frame_html(self):
-        thumbnail = self.entry.get_thumbnail()
-        if thumbnail:
-            frame_text = """
-            <div>
-                <img src="{}" class="link-detail-thumbnail"/>
-            </div>"""
+        u = UserConfig.get(self.user.username)
 
-            frame_text = frame_text.format(self.entry.get_thumbnail())
-            return frame_text
-        return ""
+        if not u.show_icons:
+            return ""
+
+        thumbnail = self.entry.get_thumbnail()
+        if not thumbnail:
+            return ""
+
+        frame_text = """
+        <div>
+            <img src="{}" class="link-detail-thumbnail"/>
+        </div>"""
+
+        frame_text = frame_text.format(self.entry.get_thumbnail())
+        return frame_text
 
     def get_description_html(self):
         description = self.entry.description

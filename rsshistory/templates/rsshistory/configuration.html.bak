@@ -6,9 +6,6 @@
     <a href="javascript:history.back()" class="simplebutton">
         <img src="{% static 'rsshistory/icons/icons8-back-100.png' %}" class="content-icon" />
     </a>
-    <a href="{% url 'rsshistory:reset-config' %}" class="simplebutton" title="Resets configuration">
-        Reset config
-    </a>
 </div>
 
 <h1>Config</h1>
