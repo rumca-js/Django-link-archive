@@ -139,6 +139,19 @@ def user_config(request):
     return p.render("user_configuration.html")
 
 
+def reset_config(request):
+    p = ViewPage(request)
+    p.set_title("Reset configuration")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    Configuration.get_object().config_entry = ConfigurationEntry.get()
+
+    p.context["summary_text"] = "Configuration is reset"
+    return p.render("summary_present.html")
+
+
 class BackgroundJobsView(generic.ListView):
     model = BackgroundJob
     context_object_name = "content_list"
