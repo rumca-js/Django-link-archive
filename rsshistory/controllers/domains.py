@@ -12,7 +12,7 @@ from ..models import (
     DomainCategories,
     DomainSubCategories,
 )
-from .entries import LinkDataController
+from .entries import LinkDataController, LinkDataBuilder
 from ..configuration import Configuration
 from ..webtools import BasePage, HtmlPage
 from ..apps import LinkDatabase
@@ -102,38 +102,6 @@ class DomainsController(Domains):
                 ob.update_complementary_data(True)
 
             return ob
-
-    def create_missing_domains():
-        if not Configuration.get_object().config_entry.auto_store_domain_info:
-            return
-
-        entries = LinkDataController.objects.filter(domain_obj=True)
-        for entry in entries:
-            p = BasePage(entry.link)
-            domain_url = p.get_domain()
-            domain_only = p.get_domain_only()
-            LinkDatabase.info(
-                "Entry:{} domain:{} {}".format(entry.link, domain_url, domain_only)
-            )
-
-            domains = DomainsController.objects.filter(domain=domain_only)
-            if domains.count() == 0:
-                LinkDatabase.info(
-                    "Create missing domains entry:{} - missing domain".format(
-                        entry.link
-                    )
-                )
-                domain = DomainsController.add(domain_url)
-                entry.domain_obj = domain
-                entry.save()
-            else:
-                LinkDatabase.info(
-                    "Create missing domains entry:{} - missing domain link".format(
-                        entry.link
-                    )
-                )
-                entry.domain_obj = domains[0]
-                entry.save()
 
     def get_domain_only(input_url):
         p = BasePage(input_url)
@@ -392,9 +360,49 @@ class DomainsController(Domains):
         else:
             DomainsController.reset_dynamic_data()
             DomainsController.create_missing_domains()
+            DomainsController.create_missing_entries()
 
     def unconnect_entries():
         entries = LinkDataController.objects.filter(domain_obj__isnull=False)
         for entry in entries:
             entry.domain_obj = None
             entry.save()
+
+    def create_missing_domains():
+        if not Configuration.get_object().config_entry.auto_store_domain_info:
+            return
+
+        entries = LinkDataController.objects.filter(domain_obj__isnull=True)
+        for entry in entries:
+            p = BasePage(entry.link)
+            domain_url = p.get_domain()
+            domain_only = p.get_domain_only()
+            LinkDatabase.info(
+                "Entry:{} domain:{} {}".format(entry.link, domain_url, domain_only)
+            )
+
+            domains = DomainsController.objects.filter(domain=domain_only)
+            if domains.count() == 0:
+                LinkDatabase.info(
+                    "Create missing domains entry:{} - missing domain".format(
+                        entry.link
+                    )
+                )
+                domain = DomainsController.add(domain_url)
+                entry.domain_obj = domain
+                entry.save()
+            else:
+                LinkDatabase.info(
+                    "Create missing domains entry:{} - missing domain link".format(
+                        entry.link
+                    )
+                )
+                entry.domain_obj = domains[0]
+                entry.save()
+
+    def create_missing_entries():
+        domains = DomainsController.objects.all()
+        for domain in domains:
+            entries = LinkDataController.objects.filter(domain_obj = domain)
+            if entries.count() == 0:
+                LinkDataBuilder(link=domain.get_domain_full_url())
