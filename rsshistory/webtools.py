@@ -712,8 +712,13 @@ class RssPage(ContentInterface):
                     return thumb["url"]
                 else:
                     return str(thumb)
-        else:
-            return self.get_thumbnail()
+        if hasattr(feed_entry, "media_content"):
+            if len(feed_entry.media_content) > 0:
+                thumb = feed_entry.media_content[0]
+                if "url" in thumb:
+                    return thumb["url"]
+                else:
+                    return str(thumb)
 
         return None
 
@@ -771,9 +776,16 @@ class RssPage(ContentInterface):
         image = None
         if "image" in self.feed.feed:
             if "href" in self.feed.feed.image:
-                image = str(self.feed.feed.image["href"])
+                try:
+                    image = str(self.feed.feed.image["href"])
+                except Exception as E:
+                    LinkDatabase.error(str(E))
+
             elif "url" in self.feed.feed.image:
-                image = str(self.feed.feed.image["url"])
+                try:
+                    image = str(self.feed.feed.image["url"])
+                except Exception as E:
+                    LinkDatabase.error(str(E))
             else:
                 # cannot display self.feed.feed here.
                 # it complains et_thumbnail TypeError: 'DeferredAttribute' object is not callable 
