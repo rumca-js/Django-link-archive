@@ -738,7 +738,7 @@ class LinkDataBuilder(object):
 
         for rss_url in rss_urls:
             from .sources import SourceDataBuilder
-            SourceDataBuilder.add_source(rss_url, link_props)
+            SourceDataBuilder.add_from_url(rss_url, link_props)
 
     def read_domains_from_bookmarks():
         objs = LinkDataController.objects.filter(bookmarked=True)

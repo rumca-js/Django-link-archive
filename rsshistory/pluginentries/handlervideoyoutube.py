@@ -1,3 +1,4 @@
+
 from urllib.parse import urlparse
 from urllib.parse import parse_qs
 
@@ -236,11 +237,14 @@ class YouTubeVideoHandler(DefaultUrlHandler):
         return True
 
     def download_details_return_dislike(self):
-        if self.return_dislike:
-            from ..serializers.returnyoutubedislikeapijson import YouTubeThumbsDown
-
-            ytr = YouTubeThumbsDown(self)
-            self.rd_text = ytr.download_data()
-            if self.rd_text is None:
-                return False
+        if not self.return_dislike:
             return True
+            
+        from ..serializers.returnyoutubedislikeapijson import YouTubeThumbsDown
+
+        ytr = YouTubeThumbsDown(self)
+        self.rd_text = ytr.download_data()
+        if self.rd_text is None:
+            return False
+
+        return True

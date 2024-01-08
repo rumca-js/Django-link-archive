@@ -45,6 +45,37 @@ class BackgroundJobControllerTest(WebPageDisabled, TestCase):
             source_obj=ob,
         )
 
+    def test_job_consistency(self):
+        from ..controllers.backgroundjob import BackgroundJobController
+
+        mgr = HandlerManager()
+        handlers = mgr.get_handlers()
+
+        all_is_good = True
+
+        for handler in handlers:
+
+            found = False
+            for choice in BackgroundJobController.JOB_CHOICES:
+                if handler.get_job() == choice[0]:
+                    found = True
+
+            if not found:
+                all_is_good = False
+
+        self.assertTrue(all_is_good)
+
+    def test_invalid_job(self):
+        bg_obj = BackgroundJobController.objects.create(
+            job="invalid-job",
+        )
+
+        mgr = HandlerManager()
+        handler_obj, handler = mgr.get_handler_and_object()
+
+        self.assertEqual(bg_obj, handler_obj)
+        self.assertTrue(not handler)
+
     def test_push_to_repo_handler(self):
         bg_obj = BackgroundJobController.objects.create(
             job=BackgroundJobController.JOB_PUSH_TO_REPO

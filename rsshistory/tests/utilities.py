@@ -912,17 +912,20 @@ class YouTubeVideoHandlerMock(YouTubeVideoHandler):
     def download_details_youtube(self):
         print("Mocked YouTube request URL: {}".format(self.url))
 
-        if self.url == "https://youtube.com/watch?v=123":
-            self.yt_text = """{"_filename" : "test.txt",
-            "title" : "test.txt",
-            "description" : "test.txt",
-            "channel_url" : "https://youtube.com/channel/test.txt",
-            "channel" : "JoYoe",
-            "id" : "3433",
-            "channel_id" : "JoYoe",
-            "thumbnail" : "https://youtube.com/files/whatever.png",
+        if self.url.find("v=1234") >= 0:
+            self.yt_text = """{"_filename" : "1234 test file name",
+            "title" : "1234 test title",
+            "description" : "1234 test description",
+            "channel_url" : "https://youtube.com/channel/1234-channel",
+            "channel" : "1234-channel",
+            "id" : "1234-id",
+            "channel_id" : "1234-channel-id",
+            "thumbnail" : "https://youtube.com/files/1234-thumbnail.png",
             "upload_date" : "20231113"
             }"""
+            return True
+        if self.url.find("v=666") >= 0:
+            return False
         else:
             self.yt_text = """{"_filename" : "test.txt",
             "title" : "test.txt",

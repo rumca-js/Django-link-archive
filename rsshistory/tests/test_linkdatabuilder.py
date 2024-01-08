@@ -35,7 +35,7 @@ class LinkDataBuilderTest(WebPageDisabled, TestCase):
             export_to_cms=True,
         )
 
-    def test_add_new_link_no_slash(self):
+    def test_add_from_props_no_slash(self):
         config = Configuration.get_object().config_entry
         config.auto_store_entries = True
         config.auto_store_domain_info = False
@@ -67,7 +67,7 @@ class LinkDataBuilderTest(WebPageDisabled, TestCase):
         self.assertEqual(objs[0].link, link_name)
         self.assertEqual(objs[0].date_published, creation_date)
 
-    def test_add_new_link_with_slash(self):
+    def test_add_from_props_with_slash(self):
         config = Configuration.get_object().config_entry
         config.auto_store_entries = True
         config.auto_store_domain_info = False
@@ -96,7 +96,7 @@ class LinkDataBuilderTest(WebPageDisabled, TestCase):
         objs = LinkDataModel.objects.filter(link="https://youtube.com/v=1234")
         self.assertTrue(objs.count() == 1)
 
-    def test_add_new_link_not_adds(self):
+    def test_add_from_props_not_adds(self):
         DomainsController.objects.all().delete()
         LinkDataModel.objects.all().delete()
 
@@ -132,7 +132,7 @@ class LinkDataBuilderTest(WebPageDisabled, TestCase):
             print("Added {}".format(obj.link))
         self.assertEqual(objs.count(), 0)
 
-    def test_add_new_link_adds_domain(self):
+    def test_add_from_props_adds_domain(self):
         DomainsController.objects.all().delete()
         LinkDataModel.objects.all().delete()
 

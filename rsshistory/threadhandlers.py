@@ -775,6 +775,7 @@ class HandlerManager(object):
             ProcessSourceJobHandler(),
             LinkAddJobHandler(),
             LinkScanJobHandler(),
+            LinkResetDataJobHandler(),
             LinkDownloadJobHandler(),
             LinkMusicDownloadJobHandler(),
             LinkVideoDownloadJobHandler(),
@@ -815,8 +816,8 @@ class HandlerManager(object):
                     handler.set_config(config)
                 else:
                     PersistentInfo.error(
-                        "Missing handler for job: {0}\n{1}\n{2}".format(
-                            obj.job, str(E), error_text
+                        "Missing handler for job: {0}".format(
+                            obj.job,
                         )
                     )
 

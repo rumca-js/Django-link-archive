@@ -3,6 +3,7 @@ from ..dateutils import DateUtils
 from ..controllers import SourceDataController
 
 from ..apps import LinkDatabase
+from ..models import PersistentInfo
 
 from .handlervideoyoutube import YouTubeVideoHandler
 from .handlervideoodysee import OdyseeVideoHandler
@@ -104,13 +105,14 @@ class EntryUrlInterface(object):
 
         if type(p) is UrlHandler.youtube_video_handler:
             if not p.download_details():
-                raise YouTubeException(
-                    "Could not obtain details for link:{}".format(url)
-                )
+                PersistentInfo.error(
+                    "Could not obtain details for link:{}".format(url))
+
+                return {}
 
         source_url = p.get_channel_feed_url()
         if source_url is None:
-            raise YouTubeException(
+            PersistentInfo.error(
                 "Could not obtain channel feed url:{}".format(source_url)
             )
 

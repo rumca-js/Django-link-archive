@@ -225,6 +225,7 @@ class BaseLinkDataController(BaseLinkDataModel):
         self.title = props["title"]
         self.description = props["description"]
         self.thumbnail = props["thumbnail"]
+        self.save()
 
     def get_favicon(self):
         """

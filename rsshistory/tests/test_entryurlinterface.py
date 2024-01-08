@@ -12,25 +12,35 @@ class EntryUrlInterfaceTest(WebPageDisabled, TestCase):
         self.disable_web_pages()
 
     def test_video_youtube_handler(self):
-        url = EntryUrlInterface("https://www.youtube.com/watch?v=e_QQamQt5x4")
+        url = EntryUrlInterface("https://www.youtube.com/watch?v=1234")
 
         props = url.get_props()
         self.assertTrue(props)
-        self.assertEqual(props["link"], "https://www.youtube.com/watch?v=e_QQamQt5x4")
+        self.assertEqual(props["link"], "https://www.youtube.com/watch?v=1234")
+        self.assertEqual(props["title"], "1234 test title")
 
     def test_video_mobile_youtube_handler(self):
-        url = EntryUrlInterface("https://m.youtube.com/watch?v=e_QQamQt5x4")
+        url = EntryUrlInterface("https://m.youtube.com/watch?v=1234")
 
         props = url.get_props()
         self.assertTrue(props)
-        self.assertEqual(props["link"], "https://www.youtube.com/watch?v=e_QQamQt5x4")
+        self.assertEqual(props["link"], "https://www.youtube.com/watch?v=1234")
+        self.assertEqual(props["title"], "1234 test title")
 
     def test_video_youtu_be_handler(self):
-        url = EntryUrlInterface("https://youtu.be/e_QQamQt5x4")
+        url = EntryUrlInterface("https://youtu.be/1234")
 
         props = url.get_props()
         self.assertTrue(props)
-        self.assertEqual(props["link"], "https://www.youtube.com/watch?v=e_QQamQt5x4")
+        self.assertEqual(props["link"], "https://www.youtube.com/watch?v=1234")
+        self.assertEqual(props["title"], "1234 test title")
+
+    def test_error_download(self):
+        url = EntryUrlInterface("https://m.youtube.com/watch?v=666")
+
+        props = url.get_props()
+        self.assertTrue(props is not None)
+        self.assertEqual(len(props), 0)
 
     def test_html_handler(self):
         url = EntryUrlInterface("https://www.linkedin.com")
