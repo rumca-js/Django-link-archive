@@ -121,13 +121,23 @@ class YouTubeJson(object):
 
     def get_view_count(self):
         if len(self._json) > 0:
-            # return str(self._json["view_count"])
-            return self._json["t_view_count"]
+            if "view_count" in self._json:
+                return str(self._json["view_count"])
+            else:
+                print("No view_count in self._json {}".format(self._json))
+
+            #return self._json["t_view_count"]
+        return 0
 
     def get_thumbs_up(self):
         if len(self._json) > 0:
-            # return str(self._json["like_count"])
-            return self._json["t_likes"]
+            if "like_count" in self._json:
+                return str(self._json["like_count"])
+            else:
+                print("No like_count in self._json {}".format(self._json))
+            #return self._json["t_likes"]
+
+        return 0
 
     def get_thumbs_down(self):
         if len(self._json) > 0:
@@ -143,11 +153,15 @@ class YouTubeJson(object):
 
     def is_live(self):
         if len(self._json) > 0:
-            return self._json["live_status"] == "is_live"
+            is_live = False
+            if "live_status" in self._json:
+                is_live = self._json["live_status"] != "not_live"
 
-    def was_live(self):
-        if len(self._json) > 0:
-            return self._json["was_live"] == True
+            was_live = False
+            if "was_live" in self._json:
+                was_live = self._json["was_live"]
+
+            return is_live or was_live
 
     def get_link_url(self):
         if len(self._json) > 0:

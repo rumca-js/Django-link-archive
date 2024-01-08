@@ -659,13 +659,16 @@ class LinkDataBuilder(object):
 
         link_data = self.link_data
 
+        if "live" in link_data:
+            return link_data["live"]
+
         if "link" in link_data and link_data["link"]:
             handler = UrlHandler.get(link_data["link"])
             if type(handler) is UrlHandler.youtube_video_handler:
-                if handler.get_video_code():
-                    handler.download_details()
-                    if not handler.is_valid():
-                        return True
+                LinkDatabase.info("Checking if youtube link is live")
+                handler.download_details()
+                if not handler.is_valid():
+                    return True
 
         return False
 
