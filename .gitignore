@@ -127,6 +127,7 @@ env/
 venv/
 ENV/
 .bak
+*.bak
 env.bak/
 venv.bak/
 
