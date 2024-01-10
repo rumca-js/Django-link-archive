@@ -149,9 +149,6 @@ class EntryUrlInterface(object):
 
         url = self.url
 
-        if url.startswith("http://"):
-            url = url.replace("http://", "https://")
-
         p = self.p
 
         # some pages return invalid code / information. let the user decide

@@ -175,11 +175,6 @@ class BasePage(object):
 
     def get_contents(self):
         contents = self.get_contents_implementation()
-        if not contents:
-            if self.url.startswith("https://"):
-                self.url = self.url.replace("https://", "http://")
-                contents = self.get_contents_implementation()
-
         self.contents = contents
         return contents
 
@@ -1423,11 +1418,22 @@ class Url(object):
         @returns Appropriate handler for the link
         """
         p = HtmlPage(url, contents)
+
         if p.is_html(fast_check):
             return p
 
         if p.is_rss(fast_check):
             return RssPage(url, p.get_contents())
+
+        if fast_check == False and p.get_contents() == None and url.find("https://") >= 0:
+            url = url.replace("http://", "https://")
+            p = HtmlPage(url, contents)
+
+            if p.is_html(fast_check):
+                return p
+
+            if p.is_rss(fast_check):
+                return RssPage(url, p.get_contents())
 
         return DefaultContentPage(url, p.get_contents())
 

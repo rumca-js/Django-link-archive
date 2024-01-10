@@ -700,6 +700,20 @@ class LinkResetDataJobHandler(BaseJobHandler):
             PersistentInfo.error("Exception: {} {}".format(str(e), error_text))
 
 
+class MoveToArchiveJobHandler(BaseJobHandler):
+    def get_job(self):
+        return BackgroundJob.JOB_MOVE_TO_ARCHIVE
+
+    def process(self, obj=None):
+        try:
+            LinkDataController.move_old_links_to_archive()
+
+            return True
+        except Exception as e:
+            error_text = traceback.format_exc()
+            PersistentInfo.error("Exception: {} {}".format(str(e), error_text))
+
+
 class RefreshThreadHandler(object):
     """!
     Checks if tasks should be created.
@@ -772,6 +786,7 @@ class HandlerManager(object):
             ImportInstanceJobHandler(),
 
             CleanupJobHandler(),
+            MoveToArchiveJobHandler(),
             ProcessSourceJobHandler(),
             LinkAddJobHandler(),
             LinkScanJobHandler(),

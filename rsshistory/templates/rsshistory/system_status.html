@@ -12,7 +12,10 @@
 
 <ul>
     <li>Version: {{app_version}}</li>
-    <li>Current time: {{Current_DateTime}}</li>
+    <li>Current time: {{DateTime_Current}}</li>
+    {% if DateTime_MoveToArchive %}
+      <li>Move to archive date: {{DateTime_MoveToArchive}}</li>
+    {%endif%}
     <li>Sources: {{SourceDataModel}}</li>
     <li>Entries: {{LinkDataModel}}</li>
     <li>ArchiveEntries: {{ArchiveLinkDataModel}}</li>

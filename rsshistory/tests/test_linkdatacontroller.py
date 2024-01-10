@@ -103,6 +103,7 @@ class LinkDataControllerTest(WebPageDisabled, TestCase):
 
         self.assertEqual(archived.count(), 1)
         self.assertEqual(domains.count(), 1)
+
         self.assertEqual(archived[0].domain_obj, domains[0])
         self.assertEqual(archived[0].date_published, original_date_published)
 

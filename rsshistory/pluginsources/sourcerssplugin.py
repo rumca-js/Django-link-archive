@@ -66,6 +66,9 @@ class BaseRssPlugin(SourceGenericPlugin):
     def get_clean_page_info(self, prop):
         i = EntryUrlInterface(prop["link"])
         new_props = i.get_props()
+        if not new_props:
+            return prop
+
         for key in new_props:
             if new_props[key] is not None:
                 prop[key] = new_props[key]

@@ -31,6 +31,8 @@ class DomainsController(Domains):
         if not Configuration.get_object().config_entry.auto_store_domain_info:
             return
 
+        protocol = BasePage(url).protocol
+
         domain_text = DomainsController.get_domain_only(url)
         if (
             not domain_text
@@ -45,17 +47,15 @@ class DomainsController(Domains):
             )
             return
 
-        return DomainsController.create_or_update_domain(domain_text)
+        return DomainsController.create_or_update_domain(domain_text, protocol)
 
-    def create_or_update_domain(domain_only_text):
+    def create_or_update_domain(domain_only_text, protocol):
         LinkDatabase.info("Creating, or updating domain:{}".format(domain_only_text))
         objs = Domains.objects.filter(domain=domain_only_text)
 
         obj = None
         if objs.count() == 0:
-            props = DomainsController.get_link_properties(domain_only_text)
-            if props:
-                obj = DomainsController.create_object(domain_only_text, props)
+            obj = DomainsController.create_object(domain_only_text, protocol)
         else:
             obj = objs[0]
 
@@ -70,38 +70,38 @@ class DomainsController(Domains):
         else:
             return self.link_obj
 
-    def create_object(domain_only_text, props):
+    def create_object(domain_only_text, protocol):
         import tldextract
 
-        if props:
-            extract = tldextract.TLDExtract()
-            domain_data = extract(domain_only_text)
+        extract = tldextract.TLDExtract()
+        domain_data = extract(domain_only_text)
 
-            tld = os.path.splitext(domain_only_text)[1][1:]
+        tld = os.path.splitext(domain_only_text)[1][1:]
 
-            old_entries = Domains.objects.filter(domain=domain_only_text)
-            if old_entries.count() > 0:
-                ob = old_entries[0]
-                ob.domain = domain_only_text
-                ob.main = domain_data.domain
-                ob.subdomain = domain_data.subdomain
-                ob.suffix = domain_data.suffix
-                ob.tld = tld
-                ob.save()
+        old_entries = Domains.objects.filter(domain=domain_only_text)
+        if old_entries.count() > 0:
+            ob = old_entries[0]
+            ob.domain = domain_only_text
+            ob.main = domain_data.domain
+            ob.subdomain = domain_data.subdomain
+            ob.suffix = domain_data.suffix
+            ob.tld = tld
+            ob.protocol = protocol
+            ob.save()
 
-            else:
-                ob = DomainsController.objects.create(
-                    domain=domain_only_text,
-                    main=domain_data.domain,
-                    subdomain=domain_data.subdomain,
-                    suffix=domain_data.suffix,
-                    tld=tld,
-                    # link_obj=entry,
-                )
+        else:
+            ob = DomainsController.objects.create(
+                domain=domain_only_text,
+                main=domain_data.domain,
+                subdomain=domain_data.subdomain,
+                suffix=domain_data.suffix,
+                tld=tld,
+                protocol = protocol,
+            )
 
-                ob.update_complementary_data(True)
+            ob.update_complementary_data(True)
 
-            return ob
+        return ob
 
     def get_domain_only(input_url):
         p = BasePage(input_url)
@@ -109,48 +109,15 @@ class DomainsController(Domains):
         return domain_text
 
     def get_domain_full_url(self, protocol=None):
-        if protocol is None:
-            return self.protocol + "://" + self.domain
-        else:
+        if protocol:
             return protocol + "://" + self.domain
+        else:
+            return self.protocol + "://" + self.domain
 
     def get_absolute_url(self):
         return reverse(
             "{}:domain-detail".format(LinkDatabase.name), args=[str(self.id)]
         )
-
-    def get_link_properties(domain_only):
-        if domain_only.find("http") >= 0:
-            lines = traceback.format_stack()
-            line_text = ""
-            for line in lines:
-                line_text += line
-
-            PersistentInfo.create(
-                "Cannot obtain properties, expecting only domain:{}\n{}".format(
-                    domain_only, line_text
-                )
-            )
-            return
-
-        link = "https://" + domain_only
-
-        p = HtmlPage(link)
-        if p.get_contents() is None:
-            link = "http://" + domain_only
-            p = HtmlPage(link)
-            if p.get_contents() is None:
-                return
-            return p.get_properties()
-
-        return p.get_properties()
-
-    def get_page_properties(self):
-        # if self.link_obj is not None:
-        #    return
-
-        link = DomainsController.get_domain_only(self.get_domain_full_url())
-        return DomainsController.get_link_properties(link)
 
     def update_object(self, force=False):
         if self.is_domain_set() == False:
@@ -220,84 +187,9 @@ class DomainsController(Domains):
         else:
             LinkDatabase.info("domain:{} Nothing has changed".format(self.domain))
 
-    def update_page_info(self):
-        from ..dateutils import DateUtils
-
-        date_before_limit = DateUtils.get_days_before_dt(
-            DomainsController.get_update_days_limit()
-        )
-        if self.date_update_last >= date_before_limit:
-            return
-
-        changed = False
-
-        p = HtmlPage(self.get_domain_full_url())
-
-        new_title = p.get_title()
-        new_description = p.get_description_safe()[:998]
-        new_language = p.get_language()
-        protocol = self.protocol
-
-        if new_title is None:
-            p = HtmlPage(self.get_domain_full_url("http"))
-            new_title = p.get_title()
-            new_description = p.get_description_safe()[:998]
-            new_language = p.get_language()
-
-        self.status_code = p.status_code
-
-        if p.is_valid() == False:
-            self.dead = True
-            self.date_update_last = DateUtils.get_datetime_now_utc()
-            self.save()
-            return
-
-        if self.dead and p.is_status_ok():
-            self.dead = False
-            changed = True
-
-        if new_title is not None:
-            self.title = new_title
-            changed = True
-        if new_description is not None:
-            self.description = new_description
-            changed = True
-        if new_language is not None:
-            self.language = new_language
-            changed = True
-        if new_title is not None and new_description is None:
-            self.description = None
-            changed = True
-
-        if changed:
-            self.date_update_last = DateUtils.get_datetime_now_utc()
-            self.protocol = protocol
-            self.save()
-
-    def update_all(domains=None):
-        if domains is None:
-            from ..dateutils import DateUtils
-
-            date_before_limit = DateUtils.get_days_before_dt(
-                Domains.get_update_days_limit()
-            )
-
-            domains = Domains.objects.filter(
-                date_update_last__lt=date_before_limit, dead=False
-            )
-            # domains = Domains.objects.filter(dead = True) #, description__isnull = True)
-
-        for domain in domains:
-            LinkDatabase.info("Fixing:{}".format(domain.domain))
-            try:
-                domain.update_object()
-            except Exception as e:
-                LinkDatabase.info(str(e))
-            LinkDatabase.info("Fixing:{} done".format(domain.domain))
-
     def get_map(self):
         result = {
-            "protocol": self.protocol,
+            "protocol" : self.protocol,
             "domain": self.domain,
             "main": self.main,
             "subdomain": self.subdomain,
@@ -403,6 +295,28 @@ class DomainsController(Domains):
     def create_missing_entries():
         domains = DomainsController.objects.all()
         for domain in domains:
-            entries = LinkDataController.objects.filter(domain_obj = domain)
+            missing_entry = False
+
+            full_domain = domain.get_domain_full_url()
+            full_domain_http = domain.get_domain_full_url("http")
+
+            entries = LinkDataController.objects.filter(link = full_domain)
+
             if entries.count() == 0:
-                LinkDataBuilder(link=domain.get_domain_full_url())
+                http_entries = LinkDataController.objects.filter(link = full_domain_http)
+                if http_entries.count() == 0:
+                    missing_entry = True
+
+            if missing_entry:
+                b = LinkDataBuilder()
+                b.link = full_domain
+                obj = b.add_from_link()
+                if obj:
+                    domain.protocol = "https"
+                    domain.save()
+                else:
+                    b.link = full_domain_http
+                    obj = b.add_from_link()
+                    if obj:
+                        domain.protocol = "http"
+                        domain.save()

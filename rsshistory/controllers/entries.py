@@ -95,6 +95,11 @@ class LinkDataController(LinkDataModel):
                     )
                     domain.delete()
 
+    def get_cleaned_link(link):
+        if link.endswith("/"):
+            link = link[:-1]
+        return link
+
     def replace_http_link_with_https():
         # TODO move tags
 
@@ -274,8 +279,8 @@ class LinkDataController(LinkDataModel):
             if hasattr(test, key):
                 result[key] = props[key]
 
-        if "link" in result and result["link"].endswith("/"):
-            result["link"] = result["link"][:-1]
+        if "link" in result:
+            LinkDataController.get_cleaned_link(result["link"])
 
         if "tags" in result:
             del result["tags"]
@@ -493,6 +498,8 @@ class LinkDataBuilder(object):
             self.add_from_props()
 
     def add_from_link(self):
+        self.link = LinkDataController.get_cleaned_link(self.link)
+
         wrapper = LinkDataWrapper(self.link)
         obj = wrapper.get_from_operational_db()
         if obj:
@@ -529,6 +536,7 @@ class LinkDataBuilder(object):
     def add_from_props(self):
         obj = None
 
+        self.link_data["link"] = LinkDataController.get_cleaned_link(self.link_data["link"])
         self.link = self.link_data["link"]
 
         wrapper = LinkDataWrapper(self.link)
