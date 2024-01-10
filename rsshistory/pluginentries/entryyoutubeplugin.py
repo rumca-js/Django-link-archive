@@ -110,10 +110,13 @@ class EntryYouTubePlugin(EntryGenericPlugin):
         return h.get_video_code()
 
     def get_frame(self):
+        """
+        @note Some YouTube videos will not play without referrerpolicy.
+        """
         from ..pluginentries.entryurlinterface import UrlHandler
 
         h = UrlHandler.get(self.entry.link)
-        return '<iframe src="{0}" frameborder="0" allowfullscreen class="youtube_player_frame"></iframe>'.format(
+        return '<iframe src="{0}" frameborder="0" allowfullscreen class="youtube_player_frame" referrerpolicy="no-referrer-when-downgrade"></iframe>'.format(
             h.get_link_embed()
         )
 
