@@ -54,7 +54,6 @@ class BackgroundJobControllerTest(WebPageDisabled, TestCase):
         all_is_good = True
 
         for handler in handlers:
-
             found = False
             for choice in BackgroundJobController.JOB_CHOICES:
                 if handler.get_job() == choice[0]:
@@ -245,7 +244,6 @@ class BackgroundJobControllerTest(WebPageDisabled, TestCase):
         )
 
     def test_order(self):
-
         BackgroundJobController.objects.create(
             job=BackgroundJobController.JOB_PROCESS_SOURCE
         )
@@ -447,6 +445,15 @@ class CleanJobHandlerTest(WebPageDisabled, TestCase):
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
         )
+        LinkDataController.objects.create(
+            source="https://youtube.com",
+            link="https://youtube.com",
+            title="The first link",
+            source_obj=source_youtube,
+            permanent=True,
+            date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
+            language="en",
+        )
 
         DomainsController.objects.create(
             protocol="https",
@@ -467,6 +474,9 @@ class CleanJobHandlerTest(WebPageDisabled, TestCase):
 
         handler = CleanupJobHandler()
         handler.process()
+
+        # cleanup of links, domains may trigger creating new entries, which may
+        # trigger unwanted dependencies
 
         persistent_objects = PersistentInfo.objects.all()
 

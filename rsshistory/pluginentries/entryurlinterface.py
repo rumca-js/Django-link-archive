@@ -21,13 +21,13 @@ class EntryUrlInterface(object):
     Provides interface between Entry and URL properties.
     """
 
-    def __init__(self, url):
+    def __init__(self, url, fast_check=True):
         self.url = url
 
         if self.url.endswith("/"):
             self.url = self.url[:-1]
 
-        self.p = UrlHandler.get(self.url)
+        self.p = UrlHandler.get(self.url, fast_check=fast_check)
 
     def get_props(self, input_props=None, source_obj=None):
         if not input_props:
@@ -106,8 +106,7 @@ class EntryUrlInterface(object):
 
         if type(p) is UrlHandler.youtube_video_handler:
             if not p.download_details():
-                PersistentInfo.error(
-                    "Could not obtain details for link:{}".format(url))
+                PersistentInfo.error("Could not obtain details for link:{}".format(url))
 
                 return {}
 
@@ -282,7 +281,7 @@ class UrlHandler(object):
     odysee_video_handler = OdyseeVideoHandler
     odysee_channel_handler = OdyseeChannelHandler
 
-    def get(url, fast_check = True):
+    def get(url, fast_check=True):
         url = UrlHandler.get_protololless(url)
         if not url:
             return
@@ -318,7 +317,7 @@ class UrlHandler(object):
 
         from ..webtools import Url
 
-        return Url.get(url, fast_check = fast_check)
+        return Url.get(url, fast_check=fast_check)
 
     def get_protololless(url):
         if url.find("https://") >= 0:

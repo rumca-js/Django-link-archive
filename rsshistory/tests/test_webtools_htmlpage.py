@@ -27,14 +27,34 @@ webpage_title_upper = """<html>
 </html>
 """
 
+webpage_title_head = """<html>
+ <title>selected title</title>
+</html>
+"""
+
+webpage_title_meta = """<html>
+ <meta name="title" content="selected meta title" />
+</html>
+"""
+
 webpage_title_meta_og = """<html>
  <TITLE>selected meta title</TITLE>
  <meta property="og:title" content="selected og:title" />
 </html>
 """
 
+webpage_description_head = """<html>
+ <description>selected description</description>
+</html>
+"""
+
+webpage_description_meta = """<html>
+ <meta name="description" content="selected meta description"/>
+</html>
+"""
+
 webpage_description_meta_og = """<html>
- <description>selected meta description</TITLE>
+ <description>selected meta description</description>
  <meta property="og:description" content="selected og:description" />
 </html>
 """
@@ -122,10 +142,30 @@ class HtmlPageTest(TestCase):
         p = HtmlPage("http://test.com/my-site-test", webpage_title_upper)
         self.assertEqual(p.get_title(), "This is a upper case title")
 
+    def test_title_head(self):
+        # default language
+        p = HtmlPage("http://test.com/my-site-test", webpage_title_head)
+        self.assertEqual(p.get_title(), "selected title")
+
+    def test_title_meta(self):
+        # default language
+        p = HtmlPage("http://test.com/my-site-test", webpage_title_meta)
+        self.assertEqual(p.get_title(), "selected meta title")
+
     def test_title_meta_og(self):
         # default language
         p = HtmlPage("http://test.com/my-site-test", webpage_title_meta_og)
         self.assertEqual(p.get_title(), "selected og:title")
+
+    def test_description_head(self):
+        # default language
+        p = HtmlPage("http://test.com/my-site-test", webpage_description_head)
+        self.assertEqual(p.get_description(), "selected description")
+
+    def test_description_meta(self):
+        # default language
+        p = HtmlPage("http://test.com/my-site-test", webpage_description_meta)
+        self.assertEqual(p.get_description(), "selected meta description")
 
     def test_description_meta_og(self):
         # default language

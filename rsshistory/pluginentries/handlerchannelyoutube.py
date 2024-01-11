@@ -1,5 +1,5 @@
 from .defaulturlhandler import DefaultUrlHandler
-from ..webtools import Url
+from ..webtools import RssPage
 
 
 class YouTubeChannelHandler(DefaultUrlHandler):
@@ -8,7 +8,8 @@ class YouTubeChannelHandler(DefaultUrlHandler):
 
         if url:
             self.code = self.input2code(url)
-            self.h = Url.get(self.get_channel_url())
+            if self.code:
+                self.h = RssPage(self.get_channel_feed())
 
     def input2url(self, item):
         code = self.input2code(item)

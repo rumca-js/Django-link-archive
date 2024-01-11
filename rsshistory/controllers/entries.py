@@ -192,8 +192,17 @@ class LinkDataController(LinkDataModel):
     def get_full_information(data):
         from ..pluginentries.entryurlinterface import EntryUrlInterface
 
-        url = EntryUrlInterface(data["link"])
-        return url.get_props()
+        info = EntryUrlInterface(data["link"]).get_props()
+
+        if data["link"].find("http://") >= 0:
+            data["link"] = data["link"].replace("http://", "https://")
+            https_info = EntryUrlInterface(data["link"]).get_props()
+
+            if "description" in info and "description" in https_info:
+                if len(https_info["description"]) == len(info["description"]):
+                    return https_info
+
+        return info
 
     def clear_old_entries(limit=0):
         from ..dateutils import DateUtils
@@ -536,7 +545,9 @@ class LinkDataBuilder(object):
     def add_from_props(self):
         obj = None
 
-        self.link_data["link"] = LinkDataController.get_cleaned_link(self.link_data["link"])
+        self.link_data["link"] = LinkDataController.get_cleaned_link(
+            self.link_data["link"]
+        )
         self.link = self.link_data["link"]
 
         wrapper = LinkDataWrapper(self.link)
@@ -749,6 +760,7 @@ class LinkDataBuilder(object):
 
         for rss_url in rss_urls:
             from .sources import SourceDataBuilder
+
             SourceDataBuilder.add_from_url(rss_url, link_props)
 
     def read_domains_from_bookmarks():

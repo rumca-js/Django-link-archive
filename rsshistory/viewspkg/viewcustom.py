@@ -230,7 +230,8 @@ def show_page_props(request):
 
         page = UrlHandler.get(page_link, fast_check=fast_check)
 
-        # p.context["show_properties"] = page.get_properties()
+        p.context["page_type"] = str(type(page))
+        p.context["page_link"] = page_link
         p.context.update(page.get_properties())
         p.context["is_html"] = page.is_html(fast_check=fast_check)
         p.context["is_rss"] = page.is_rss(fast_check=fast_check)

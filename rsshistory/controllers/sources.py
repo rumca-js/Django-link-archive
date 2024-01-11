@@ -22,27 +22,6 @@ class SourceDataController(SourceDataModel):
     class Meta:
         proxy = True
 
-    def add(source_data_map):
-        sources = SourceDataController.objects.filter(url=source_data_map["url"])
-        if sources.count() > 0:
-            return None
-
-        # TODO add domain when adding new source
-        source = SourceDataController.objects.create(**source_data_map)
-
-        SourceDataController.fix_entries(source)
-
-        if Configuration.get_object().config_entry.auto_store_domain_info:
-            from .entries import LinkDataBuilder
-
-            p = BasePage(source_data_map["url"])
-            LinkDataBuilder(link=p.get_domain())
-
-        from .backgroundjob import BackgroundJobController
-        BackgroundJobController.download_rss(source)
-
-        return source
-
     def get_absolute_url(self):
         """Returns the URL to access a particular author instance."""
         return reverse(
@@ -230,7 +209,17 @@ class SourceDataController(SourceDataModel):
     def get_full_information(data):
         from ..pluginsources.sourceurlinterface import SourceUrlInterface
 
-        return SourceUrlInterface(data["url"]).get_props()
+        info = SourceUrlInterface(data["url"]).get_props()
+
+        if data["url"].find("http://") >= 0:
+            data["url"] = data["url"].replace("http://", "https://")
+            https_info = SourceUrlInterface(data["url"]).get_props()
+
+            if "title" in info and "title" in https_info:
+                if len(https_info["title"]) == len(info["title"]):
+                    return https_info
+
+        return info
 
     def get_channel_page_url(self):
         from ..pluginentries.handlerchannel import ChannelHandler
@@ -314,3 +303,26 @@ class SourceDataBuilder(object):
             SourceDataModel.objects.create(**props)
         except Exception as E:
             PersistentInfo.error("Exception {}".format(str(E)))
+
+    def add_from_props(source_data_map):
+        sources = SourceDataController.objects.filter(url=source_data_map["url"])
+        if sources.count() > 0:
+            return None
+
+        # TODO add domain when adding new source
+        source = SourceDataController.objects.create(**source_data_map)
+
+        SourceDataController.fix_entries(source)
+
+        if Configuration.get_object().config_entry.auto_store_domain_info:
+            from .entries import LinkDataBuilder
+
+            p = BasePage(source_data_map["url"])
+            LinkDataBuilder(link=p.get_domain())
+
+        if not source.on_hold:
+            from .backgroundjob import BackgroundJobController
+
+            BackgroundJobController.download_rss(source)
+
+        return source

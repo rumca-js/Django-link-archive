@@ -81,8 +81,15 @@ def system_status(request):
     p.context["BackgroundJob"] = BackgroundJob.objects.count()
 
     from ..dateutils import DateUtils
+    from datetime import timedelta
 
-    p.context["Current_DateTime"] = DateUtils.get_datetime_now_utc()
+    p.context["DateTime_Current"] = DateUtils.get_datetime_now_utc()
+
+    conf = c.config_entry
+    if conf.days_to_move_to_archive != 0:
+        current_time = DateUtils.get_datetime_now_utc()
+        days_before = current_time - timedelta(days=conf.days_to_move_to_archive)
+        p.context["DateTime_MoveToArchive"] = days_before
 
     p.context["ServerLogLength"] = PersistentInfo.objects.count()
     p.context["DomainsLength"] = Domains.objects.count()

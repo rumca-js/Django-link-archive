@@ -4,6 +4,7 @@ from django.urls import reverse
 
 from ..controllers import (
     SourceDataController,
+    SourceDataBuilder,
     BackgroundJobController,
 )
 from .utilities import WebPageDisabled
@@ -17,7 +18,7 @@ class SourceControllerTest(WebPageDisabled, TestCase):
     def test_new_source(self):
         self.assertEqual(SourceDataController.objects.all().count(), 0)
 
-        SourceDataController.add(
+        SourceDataBuilder.add_from_props(
             {
                 "url": "https://linkedin.com",
                 "title": "LinkedIn",
@@ -35,7 +36,7 @@ class SourceControllerTest(WebPageDisabled, TestCase):
     def test_new_source_twice(self):
         self.assertEqual(SourceDataController.objects.all().count(), 0)
 
-        SourceDataController.add(
+        SourceDataBuilder.add_from_props(
             {
                 "url": "https://linkedin.com",
                 "title": "LinkedIn",
@@ -45,7 +46,7 @@ class SourceControllerTest(WebPageDisabled, TestCase):
             }
         )
 
-        SourceDataController.add(
+        SourceDataBuilder.add_from_props(
             {
                 "url": "https://linkedin.com",
                 "title": "LinkedIn",
@@ -58,7 +59,7 @@ class SourceControllerTest(WebPageDisabled, TestCase):
         self.assertEqual(SourceDataController.objects.all().count(), 1)
 
     def test_source_favicon(self):
-        source = SourceDataController.add(
+        source = SourceDataBuilder.add_from_props(
             {
                 "url": "https://linkedin.com",
                 "title": "LinkedIn",

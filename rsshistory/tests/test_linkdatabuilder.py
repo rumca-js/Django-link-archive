@@ -14,16 +14,6 @@ from .utilities import WebPageDisabled
 from ..configuration import Configuration
 
 
-class UserObject(object):
-    def __init__(self, user_name):
-        self.username = user_name
-
-
-class RequestObject(object):
-    def __init__(self, user_name="TestUser"):
-        self.user = UserObject(user_name)
-
-
 class LinkDataBuilderTest(WebPageDisabled, TestCase):
     def setUp(self):
         self.disable_web_pages()

@@ -1,8 +1,14 @@
 import json
 
 from ..models import Domains
-from ..controllers import LinkDataController, SourceDataController
+from ..controllers import (
+    LinkDataController,
+    SourceDataController,
+    SourceDataController,
+    LinkDataBuilder,
+)
 from ..apps import LinkDatabase
+from ..configuration import Configuration
 
 
 class InstanceExporter(object):
@@ -73,14 +79,6 @@ class InstanceImporter(object):
         elif "source" in json_data:
             self.import_from_source(json_data["source"])
 
-        elif "domains" in json_data:
-            self.import_from_domains(json_data["domains"])
-
-            if len(json_data["domains"]) > 0:
-                url = self.get_next_page_link()
-                importer = InstanceImporter(url, self.author)
-                importer.import_all()
-
     def get_next_page_link(self):
         from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
 
@@ -127,28 +125,37 @@ class InstanceImporter(object):
         LinkDatabase.info("Import from sources")
 
         for source_data in json_data:
-            clean_data = LinkDataController.get_clean_data(source_data)
+            clean_data = SourceDataController.get_clean_data(source_data)
             if SourceDataController.objects.filter(url=clean_data["url"]).count() == 0:
-                SourceDataController.objects.create(**clean_data)
+                SourceDataBuilder.add_from_props(clean_data)
 
     def import_from_link(self, json_data):
         LinkDatabase.info("Import from link")
 
+        c = Configuration.get_object().config_entry
+
         clean_data = LinkDataController.get_clean_data(json_data)
-        if LinkDataController.objects.filter(link=clean_data["link"]).count() == 0:
-            LinkDataController.objects.create(**clean_data)
+        entries = LinkDataController.objects.filter(link=clean_data["link"])
+        if entries.count() == 0:
+            # This instance can have their own settings for import, may decide what is
+            # accepted and not. Let the builder deal with it
+            LindDataBuilder(link_data=clean_data)
+        else:
+            entry = entries[0]
+            updated = False
+            if clean_data["bookmarked"] and not entry.bookmarked:
+                entry.bookmarked = True
+                updated = True
+            if clean_data["permanent"] and not entry.permanent:
+                entry.permanent = True
+                updated = True
+
+            if updated:
+                entry.save()
 
     def import_from_source(self, json_data):
         LinkDatabase.info("Import from source")
 
-        clean_data = LinkDataController.get_clean_data(json_data)
+        clean_data = SourceDataController.get_clean_data(json_data)
         if SourceDataController.objects.filter(url=clean_data["url"]).count() == 0:
-            SourceDataController.objects.create(**clean_data)
-
-    def import_from_domains(self, json_data):
-        LinkDatabase.info("Import from domains")
-
-        # TODO add such check for other import functions
-        for domains_data in json_data:
-            if Domains.objects.filter(domain=domains_data["domain"]).count() == 0:
-                Domains.objects.create(**domains_data)
+            SourceDataBuilder.add_from_props(clean_data)

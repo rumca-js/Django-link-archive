@@ -16,9 +16,10 @@ class SourceUrlInterface(object):
             self.url = self.url[:-1]
 
     def get_props(self, input_props=None):
-        p = Url.get(self.url, fast_check=False)
+        fast_check = False
+        p = Url.get(self.url, fast_check=fast_check)
 
-        if p.is_rss(fast_check=False):
+        if p.is_rss(fast_check=fast_check):
             return self.get_props_from_rss(self.url, p)
         elif p.is_youtube():
             # Someone might be surprised that added URL is being replaced
@@ -30,7 +31,7 @@ class SourceUrlInterface(object):
             p = RssPage(handler.get_channel_feed_url())
 
             return self.get_props_from_rss(p.url, p)
-        elif p.is_html() and p.get_rss_url():
+        elif p.is_html(fast_check=fast_check) and p.get_rss_url():
             # Someone might be surprised that added URL is being replaced
             p = RssPage(p.get_rss_url())
             return self.get_props_from_rss(p.url, p)

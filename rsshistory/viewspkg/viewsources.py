@@ -9,6 +9,7 @@ from ..apps import LinkDatabase
 from ..models import ConfigurationEntry
 from ..controllers import (
     SourceDataController,
+    SourceDataBuilder,
     LinkDataController,
     BackgroundJobController,
     LinkDataWrapper,
@@ -107,7 +108,7 @@ def add_source(request):
         form = SourceForm(request.POST)
 
         if form.is_valid():
-            source = SourceDataController.add(form.cleaned_data)
+            source = SourceDataBuilder.add_from_props(form.cleaned_data)
             if not source:
                 p.context["summary_text"] = "Source already exist"
                 return p.render("summary_present.html")

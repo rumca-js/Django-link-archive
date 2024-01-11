@@ -22,9 +22,15 @@ class DefaultUrlHandler(object):
     def code2url(input_code):
         raise NotImplementedError
 
-    def set_handler(self):
-        if self.h is None:
-            self.h = Url.get(self.url)
+    def set_handler(self, handler=None):
+        if handler:
+            print("DefaultUrlHandler: passed from above")
+            self.h = handler
+        else:
+            if self.h is None:
+                print("DefaultUrlHandler: obtaining from url")
+                self.h = Url.get(self.url)
+                self.status_code = self.h.status_code
 
     def get_title(self):
         self.set_handler()
@@ -72,16 +78,21 @@ class DefaultUrlHandler(object):
         props["tags"] = self.get_tags()
         props["page_rating"] = self.get_page_rating()
         props["date_published"] = self.get_published_date()
+        props["contents"] = self.get_contents()
 
         return props
 
-    def is_html(self, fast_check = True):
-        url = Url.get(self.url, fast_check = fast_check)
-        return url.is_html(fast_check = fast_check)
+    def get_contents(self):
+        if self.h:
+            return self.h.get_contents()
 
-    def is_rss(self, fast_check = True):
-        url = Url.get(self.url, fast_check = fast_check)
-        return url.is_rss(fast_check = fast_check)
+    def is_html(self, fast_check=True):
+        url = Url.get(self.url, fast_check=fast_check)
+        return url.is_html(fast_check=fast_check)
+
+    def is_rss(self, fast_check=True):
+        url = Url.get(self.url, fast_check=fast_check)
+        return url.is_rss(fast_check=fast_check)
 
     def is_domain(self):
         url = Url.get(self.url)

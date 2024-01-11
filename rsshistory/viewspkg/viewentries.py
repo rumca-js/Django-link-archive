@@ -562,6 +562,7 @@ def add_simple_entry(request):
         form = LinkInputForm(request.POST)
         if form.is_valid():
             link = form.cleaned_data["link"]
+            link = LinkDataController.get_cleaned_link(link)
 
             if not Url.is_web_link(link):
                 p.context[
@@ -569,13 +570,13 @@ def add_simple_entry(request):
                 ] = "Only http links are allowed. Link:{}".format(link)
                 return p.render("summary_present.html")
 
-            obs = LinkDataController.objects.filter(link=link)
-            if obs.exists():
-                ob = obs[0]
-                return HttpResponseRedirect(ob.get_absolute_url())
-
             data = LinkDataController.get_full_information({"link": link})
             if data:
+                obs = LinkDataController.objects.filter(link=data["link"])
+                if obs.exists():
+                    ob = obs[0]
+                    return HttpResponseRedirect(ob.get_absolute_url())
+
                 data["user"] = request.user.username
                 data["bookmarked"] = True
 
