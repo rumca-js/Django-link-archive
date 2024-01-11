@@ -86,6 +86,8 @@ class BasePage(object):
         else:
             self.status_code = 0
 
+        self.respone_headers = {}
+
         # Flag to not retry same contents requests for things we already know are dead
         self.dead = False
 
@@ -163,7 +165,6 @@ class BasePage(object):
         return list(result)
 
     def is_status_ok(self):
-        print("Status:{}".format(self.status_code))
         if self.status_code == 0:
             return False
 
@@ -212,6 +213,7 @@ class BasePage(object):
         try:
             r = self.get_contents_function(self.url, headers=hdr, timeout=10)
             self.status_code = r.status_code
+            self.respone_headers = r.headers
 
             """
             The default assumed content encoding for text/html is ISO-8859-1 aka Latin-1 :( See RFC-2854. UTF-8 was too young to become the default, it was born in 1993, about the same time as HTML and HTTP.
@@ -229,6 +231,8 @@ class BasePage(object):
             return r.text
 
         except Exception as e:
+            LinkDatabase.info(str(e))
+
             self.dead = True
             error_text = traceback.format_exc()
 
@@ -253,6 +257,13 @@ class BasePage(object):
         )
 
         return request_result
+
+    def is_redirect(self):
+        return self.status_code > 300 and self.status_code < 310
+
+    def get_redirect_url(self):
+        if self.is_redirect() and "Location" in self.respone_headers.headers:
+            return self.respone_headers.headers["Location"]
 
     def get_full_url(self):
         if self.url.find("http") == -1:
@@ -496,11 +507,11 @@ class DomainAwarePage(BasePage):
 
         lower = self.contents.lower()
 
-        if lower.find("doctype html") >= 0:
-            return True
-        if lower.find("<html") >= 0:
-            return True
-        if lower.find("<body") >= 0:
+        if (
+            lower.find("doctype html") >= 0
+            and lower.find("<html") >= 0
+            and lower.find("<body") >= 0
+        ):
             return True
 
     @lazy_load_content
@@ -783,10 +794,8 @@ class RssPage(ContentInterface):
                     LinkDatabase.error(str(E))
             else:
                 # cannot display self.feed.feed here.
-                # it complains et_thumbnail TypeError: 'DeferredAttribute' object is not callable 
-                PersistentInfo.info(
-                    "Unsupported image type for feed."
-                )
+                # it complains et_thumbnail TypeError: 'DeferredAttribute' object is not callable
+                PersistentInfo.info("Unsupported image type for feed.")
 
         if not image:
             if self.url.find("https://www.youtube.com/feeds/videos.xml") >= 0:
@@ -840,7 +849,7 @@ class RssPage(ContentInterface):
         return None
 
     def get_properties(self):
-        props = ContentInterface.get_properties(self)
+        props = super().get_properties()
         props["contents"] = self.get_contents()
         return props
 
@@ -992,52 +1001,44 @@ class HtmlPage(ContentInterface):
             self.soup = BeautifulSoup(self.contents, "html.parser")
 
     @lazy_load_content
-    def get_language(self):
-        if not self.contents:
-            return ""
-
-        html = self.soup.find("html")
-        if html and html.has_attr("lang"):
-            return html["lang"]
-
-        return ""
-
-    @lazy_load_content
-    def get_title_meta(self):
+    def get_head_field(self, field):
         if not self.contents:
             return None
 
-        title = None
+        found_element = self.soup.find(field)
+        if found_element:
+            value = found_element.string
+            if value != "":
+                return value
 
-        title_find = self.soup.find("title")
-        if title_find:
-            title = title_find.string
+    @lazy_load_content
+    def get_meta_field(self, field):
+        if not self.contents:
+            return None
 
-        return title
+        find_element = self.soup.find("meta", attrs={"name": field})
+        if find_element and find_element.has_attr("content"):
+            return find_element["content"]
 
     @lazy_load_content
     def get_og_field(self, name):
         if not self.contents:
             return None
 
-        field = None
-
         field_find = self.soup.find("meta", property="og:{}".format(name))
         if field_find and field_find.has_attr("content"):
-            field = field_find["content"]
-
-        return field
+            return field_find["content"]
 
     @lazy_load_content
     def get_title(self):
         if not self.contents:
             return None
 
-        title = None
-
         title = self.get_og_field("title")
         if not title:
             title = self.get_title_meta()
+            if not title:
+                title = self.get_title_head()
 
         if title:
             title = title.strip()
@@ -1053,45 +1054,54 @@ class HtmlPage(ContentInterface):
         # title = html.unescape(title)
 
     @lazy_load_content
-    def get_charset(self):
+    def get_title_head(self):
         if not self.contents:
             return None
 
-        charset = None
+        return self.get_head_field("title")
 
-        allmeta = self.soup.findAll("meta")
-        for meta in allmeta:
-            if "charset" in meta.attrs:
-                return meta.attrs["charset"]
+    @lazy_load_content
+    def get_title_meta(self):
+        if not self.contents:
+            return None
+
+        return self.get_meta_field("title")
+
+    @lazy_load_content
+    def get_description(self):
+        if not self.contents:
+            return None
+
+        description = self.get_og_field("description")
+        if not description:
+            description = self.get_description_meta()
+            if not description:
+                description = self.get_description_head()
+
+        if description:
+            description = description.strip()
+
+        return description
+
+    def get_description_safe(self):
+        desc = self.get_description()
+        if not desc:
+            return ""
+        return desc
+
+    @lazy_load_content
+    def get_description_head(self):
+        if not self.contents:
+            return None
+
+        return self.get_head_field("description")
 
     @lazy_load_content
     def get_description_meta(self):
         if not self.contents:
             return None
 
-        description = None
-
-        description_find = self.soup.find("meta", attrs={"name": "description"})
-        if description_find and description_find.has_attr("content"):
-            description = description_find["content"]
-
-        return description
-
-    @lazy_load_content
-    def get_author(self):
-        if not self.contents:
-            return None
-
-        author = None
-
-        author_find = self.soup.find("meta", attrs={"name": "author"})
-        if author_find and author_find.has_attr("content"):
-            author = author_find["content"]
-
-        return author
-
-    def get_album(self):
-        return None
+        return self.get_meta_field("description")
 
     @lazy_load_content
     def get_thumbnail(self):
@@ -1104,6 +1114,39 @@ class HtmlPage(ContentInterface):
             image = BasePage.get_url_full(self.url, image)
 
         return image
+
+    @lazy_load_content
+    def get_language(self):
+        if not self.contents:
+            return ""
+
+        html = self.soup.find("html")
+        if html and html.has_attr("lang"):
+            return html["lang"]
+
+        return ""
+
+    @lazy_load_content
+    def get_charset(self):
+        if not self.contents:
+            return None
+
+        charset = None
+
+        allmeta = self.soup.findAll("meta")
+        for meta in allmeta:
+            if "charset" in meta.attrs:
+                return meta.attrs["charset"]
+
+    @lazy_load_content
+    def get_author(self):
+        if not self.contents:
+            return None
+
+        return self.get_meta_field("author")
+
+    def get_album(self):
+        return None
 
     @lazy_load_content
     def get_favicons(self, recursive=False):
@@ -1145,35 +1188,7 @@ class HtmlPage(ContentInterface):
         if not self.contents:
             return None
 
-        keywords = None
-
-        keywords_find = self.soup.find("meta", attrs={"name": "keywords"})
-        if keywords_find and keywords_find.has_attr("content"):
-            keywords = keywords_find["content"]
-
-        return keywords
-
-    @lazy_load_content
-    def get_description(self):
-        if not self.contents:
-            return None
-
-        description = None
-
-        description = self.get_og_field("description")
-        if not description:
-            description = self.get_description_meta()
-
-        if description:
-            description = description.strip()
-
-        return description
-
-    def get_description_safe(self):
-        desc = self.get_description()
-        if not desc:
-            return ""
-        return desc
+        return self.get_meta_field("keywords")
 
     def is_link_valid(self, address):
         return self.is_link_valid_domain(address)
@@ -1417,6 +1432,7 @@ class Url(object):
         """
         @returns Appropriate handler for the link
         """
+
         p = HtmlPage(url, contents)
 
         if p.is_html(fast_check):
@@ -1424,16 +1440,6 @@ class Url(object):
 
         if p.is_rss(fast_check):
             return RssPage(url, p.get_contents())
-
-        if fast_check == False and p.get_contents() == None and url.find("https://") >= 0:
-            url = url.replace("http://", "https://")
-            p = HtmlPage(url, contents)
-
-            if p.is_html(fast_check):
-                return p
-
-            if p.is_rss(fast_check):
-                return RssPage(url, p.get_contents())
 
         return DefaultContentPage(url, p.get_contents())
 
