@@ -39,7 +39,7 @@ class BaseRssPluginTest(WebPageDisabled, TestCase):
         self.disable_web_pages()
 
     def test_get_link_props(self):
-        config = Configuration.get_object().config_entry 
+        config = Configuration.get_object().config_entry
         config.auto_store_entries_use_all_data = False
         config.auto_store_entries_use_clean_page_info = False
         config.save()
@@ -51,7 +51,7 @@ class BaseRssPluginTest(WebPageDisabled, TestCase):
         self.assertEqual(len(props), 13)
 
     def test_get_link_props_use_all_data(self):
-        config = Configuration.get_object().config_entry 
+        config = Configuration.get_object().config_entry
         config.auto_store_entries_use_all_data = True
         config.auto_store_entries_use_clean_page_info = False
         config.save()
@@ -63,7 +63,7 @@ class BaseRssPluginTest(WebPageDisabled, TestCase):
         self.assertEqual(len(props), 13)
 
     def test_get_link_props_use_clean_page_info(self):
-        config = Configuration.get_object().config_entry 
+        config = Configuration.get_object().config_entry
         config.auto_store_entries_use_all_data = False
         config.auto_store_entries_use_clean_page_info = True
         config.save()

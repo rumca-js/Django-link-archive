@@ -16,8 +16,8 @@ class BaseRssPlugin(SourceGenericPlugin):
         super().__init__(source_id)
 
     def get_link_props(self):
-
         from ..configuration import Configuration
+
         c = Configuration.get_object().config_entry
 
         self.reader = RssPage(self.get_address(), self.get_contents())

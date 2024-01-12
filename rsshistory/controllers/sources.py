@@ -16,6 +16,7 @@ from ..models import (
 from ..configuration import Configuration
 from ..webtools import BasePage, HtmlPage, RssPage, Url
 from ..apps import LinkDatabase
+from ..dateutils import DateUtils
 
 
 class SourceDataController(SourceDataModel):
@@ -59,8 +60,6 @@ class SourceDataController(SourceDataModel):
         )
 
     def is_fetch_possible(self):
-        from ..dateutils import DateUtils
-
         if self.on_hold:
             return False
 

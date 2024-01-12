@@ -20,6 +20,7 @@ from .sources import SourceDataController
 from ..configuration import Configuration
 from ..webtools import BasePage, HtmlPage, RssPage, ContentLinkParser
 from ..apps import LinkDatabase
+from ..dateutils import DateUtils
 
 
 class LinkDataController(LinkDataModel):
@@ -142,7 +143,6 @@ class LinkDataController(LinkDataModel):
                 entry.delete()
 
     def move_old_links_to_archive(limit=0):
-        from ..dateutils import DateUtils
 
         conf = Configuration.get_object().config_entry
 
@@ -205,8 +205,6 @@ class LinkDataController(LinkDataModel):
         return info
 
     def clear_old_entries(limit=0):
-        from ..dateutils import DateUtils
-
         config = Configuration.get_object().config_entry
         config_days = config.days_to_remove_links
 
@@ -406,6 +404,9 @@ class LinkDataWrapper(object):
         if "bookmarked" in link_data and link_data["bookmarked"]:
             is_archive = False
 
+        if "id" in link_data:
+            del link_data["id"]
+
         if not is_archive:
             ob = LinkDataModel.objects.create(**link_data)
 
@@ -465,7 +466,6 @@ class LinkDataWrapper(object):
 
     def make_not_bookmarked(request, entry):
         entry.make_not_bookmarked(request.user.username)
-        from ..dateutils import DateUtils
 
         days_diff = DateUtils.get_day_diff(entry.date_published)
 
@@ -587,8 +587,6 @@ class LinkDataBuilder(object):
                 self.link_data["permanent"] = True
 
         if self.is_enabled_to_store():
-            self.link_data = self.check_and_set_source_object()
-
             date = None
             if "date_published" in self.link_data:
                 date = self.link_data["date_published"]
@@ -597,6 +595,9 @@ class LinkDataBuilder(object):
 
             if obj:
                 return obj
+
+            self.link_data = self.check_and_set_source_object()
+            self.link_data = self.set_domain_object()
 
             obj = self.add_entry_internal()
 
@@ -614,18 +615,11 @@ class LinkDataBuilder(object):
         return p.get_domain() == link_data["link"]
 
     def add_entry_internal(self):
-        from ..dateutils import DateUtils
-        from .domains import DomainsController
-
         link_data = self.link_data
 
         new_link_data = dict(link_data)
         if "date_published" not in new_link_data:
             new_link_data["date_published"] = DateUtils.get_datetime_now_utc()
-
-        domain = DomainsController.add(new_link_data["link"])
-        if domain:
-            new_link_data["domain_obj"] = domain
 
         if new_link_data["description"] != None:
             new_link_data["description"] = new_link_data["description"][
@@ -636,6 +630,13 @@ class LinkDataBuilder(object):
 
         wrapper = LinkDataWrapper(link_data["link"], link_data["date_published"])
         return wrapper.create(new_link_data)
+
+    def set_domain_object(self):
+        from .domains import DomainsController
+        domain = DomainsController.add(self.link_data["link"])
+        if domain:
+            self.link_data["domain_obj"] = domain
+        return self.link_data
 
     def check_and_set_source_object(self):
         link_data = self.link_data

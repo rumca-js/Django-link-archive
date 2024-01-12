@@ -22,16 +22,16 @@ import urllib.robotparser
 from urllib3.exceptions import InsecureRequestWarning
 from urllib3 import disable_warnings
 
+from bs4 import BeautifulSoup
+
 import html
 import traceback
 import requests
 import re
-import os
+import json
 
 from datetime import datetime
 from dateutil import parser
-
-from bs4 import BeautifulSoup
 
 from .models import PersistentInfo
 from .apps import LinkDatabase
@@ -508,8 +508,7 @@ class DomainAwarePage(BasePage):
         lower = self.contents.lower()
 
         if (
-            lower.find("doctype html") >= 0
-            and lower.find("<html") >= 0
+            lower.find("<html") >= 0
             and lower.find("<body") >= 0
         ):
             return True
@@ -608,6 +607,52 @@ class DefaultContentPage(ContentInterface):
 
     def get_tags(self):
         return None
+
+    def get_page_rating(self):
+        return 0
+
+
+class JsonPage(ContentInterface):
+    def __init__(self, url, contents=None):
+        super().__init__(url, contents)
+
+        self.json_obj = None
+        try:
+            self.json_obj = json.loads(self.get_contents())
+        except Exception as e:
+            LinkDatabase.error("Could not load json")
+
+    def is_json(self):
+        if self.json_obj:
+            return True
+
+    def get_title(self):
+        if self.json_obj and "title" in self.json_obj:
+            return self.json_obj["title"]
+
+    def get_description(self):
+        if self.json_obj and "description" in self.json_obj:
+            return self.json_obj["description"]
+
+    def get_language(self):
+        if self.json_obj and "language" in self.json_obj:
+            return self.json_obj["language"]
+
+    def get_thumbnail(self):
+        if self.json_obj and "thumbnail" in self.json_obj:
+            return self.json_obj["thumbnail"]
+
+    def get_author(self):
+        if self.json_obj and "author" in self.json_obj:
+            return self.json_obj["author"]
+
+    def get_album(self):
+        if self.json_obj and "album" in self.json_obj:
+            return self.json_obj["album"]
+
+    def get_tags(self):
+        if self.json_obj and "tags" in self.json_obj:
+            return self.json_obj["tags"]
 
     def get_page_rating(self):
         return 0
@@ -1440,6 +1485,13 @@ class Url(object):
 
         if p.is_rss(fast_check):
             return RssPage(url, p.get_contents())
+
+        if fast_check == False:
+            contents = p.get_contents()
+            if contents:
+                j = JsonPage(url, contents)
+                if j.is_json():
+                    return j
 
         return DefaultContentPage(url, p.get_contents())
 

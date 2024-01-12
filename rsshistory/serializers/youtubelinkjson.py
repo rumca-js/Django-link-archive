@@ -126,7 +126,7 @@ class YouTubeJson(object):
             else:
                 print("No view_count in self._json {}".format(self._json))
 
-            #return self._json["t_view_count"]
+            # return self._json["t_view_count"]
         return 0
 
     def get_thumbs_up(self):
@@ -135,7 +135,7 @@ class YouTubeJson(object):
                 return str(self._json["like_count"])
             else:
                 print("No like_count in self._json {}".format(self._json))
-            #return self._json["t_likes"]
+            # return self._json["t_likes"]
 
         return 0
 

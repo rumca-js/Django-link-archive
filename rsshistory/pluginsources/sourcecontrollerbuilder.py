@@ -2,6 +2,7 @@ from .sourcerssplugin import BaseRssPlugin
 from .sourceparseplugin import BaseParsePlugin
 from .sourcegenerousparserplugin import SourceGenerousParserPlugin
 from .domainparserplugin import DomainParserPlugin
+from .sourcejsonplugin import BaseSourceJsonPlugin
 
 from .sourceparseditigsplugin import SourceParseDigitsPlugin
 from .nownownowparserplugin import NowNowNowParserPlugin
@@ -17,6 +18,7 @@ class SourceControllerBuilder(object):
         BaseParsePlugin,
         SourceGenerousParserPlugin,
         DomainParserPlugin,
+        BaseSourceJsonPlugin,
         # domain specific
         SourceParseDigitsPlugin,
         NowNowNowParserPlugin,

@@ -1,7 +1,8 @@
-from ..webtools import BasePage, HtmlPage, RssPage, Url
+from ..webtools import BasePage, HtmlPage, RssPage, Url, JsonPage
 from ..models import (
     SourceDataModel,
 )
+from ..pluginsources.sourceparseplugin import BaseParsePlugin
 
 
 class SourceUrlInterface(object):
@@ -35,6 +36,8 @@ class SourceUrlInterface(object):
             # Someone might be surprised that added URL is being replaced
             p = RssPage(p.get_rss_url())
             return self.get_props_from_rss(p.url, p)
+        elif JsonPage(p.url, p.get_contents()).is_json():
+            return self.get_props_from_json(p.url, p)
         else:
             return self.get_props_from_page(p)
 
@@ -56,14 +59,38 @@ class SourceUrlInterface(object):
             data["favicon"] = thumb
         return data
 
-    def get_props_from_page(self, p):
-        from ..pluginsources.sourceparseplugin import BaseParsePlugin
+    def get_props_from_json(self, url, p):
+        j = JsonPage(p.url, p.get_contents())
+
+        if "source" not in j.json_obj:
+            return self.get_props_from_page(p)
+
+        source_obj = j.json_obj["source"]
 
         data = {}
-        data["url"] = self.url
+        data["source_type"] = SourceDataModel.SOURCE_TYPE_JSON
+        data["url"] = url
+        if "title" in source_obj:
+            data["title"] = source_obj["title"] + " - Proxy"
+        if "description" in source_obj:
+            data["description"] = source_obj["description"]
+        if "category" in source_obj:
+            data["category"] = source_obj["category"]
+        if "subcategory" in source_obj:
+            data["subcategory"] = source_obj["subcategory"]
+        if "language" in source_obj:
+            data["language"] = source_obj["language"]
+        if "favicon" in source_obj:
+            data["favicon"] = source_obj["favicon"]
+
+        return data
+
+    def get_props_from_page(self, p):
+        data = {}
+        data["url"] = p.url
         data["source_type"] = BaseParsePlugin.PLUGIN_NAME
-        data["language"] = p.get_language()
         data["title"] = p.get_title()
         data["description"] = p.get_title()
+        data["language"] = p.get_language()
         data["page_rating"] = p.get_page_rating()
         return data

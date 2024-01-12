@@ -57,7 +57,7 @@ class ConfigurationEntry(models.Model):
     # We will try other means to download data.
     # Might be slower.
     auto_store_entries_use_all_data = models.BooleanField(default=False)
-    #when reading we might use RSS description.
+    # when reading we might use RSS description.
     # This setting allows us to use HTML data for HTML pages only
     # Might be slower.
     auto_store_entries_use_clean_page_info = models.BooleanField(default=False)
@@ -111,6 +111,9 @@ class ConfigurationEntry(models.Model):
     thumbnails_as_icons = models.BooleanField(default=True)
     small_icons = models.BooleanField(default=True)
     links_per_page = models.IntegerField(default=100)
+
+    # background tasks will add everything using this user name
+    admin_user = models.CharField(max_length=500, default="admin", blank=True)
 
     def get():
         """

@@ -96,7 +96,7 @@ class DomainsController(Domains):
                 subdomain=domain_data.subdomain,
                 suffix=domain_data.suffix,
                 tld=tld,
-                protocol = protocol,
+                protocol=protocol,
             )
 
             ob.update_complementary_data(True)
@@ -189,7 +189,7 @@ class DomainsController(Domains):
 
     def get_map(self):
         result = {
-            "protocol" : self.protocol,
+            "protocol": self.protocol,
             "domain": self.domain,
             "main": self.main,
             "subdomain": self.subdomain,
@@ -300,10 +300,10 @@ class DomainsController(Domains):
             full_domain = domain.get_domain_full_url()
             full_domain_http = domain.get_domain_full_url("http")
 
-            entries = LinkDataController.objects.filter(link = full_domain)
+            entries = LinkDataController.objects.filter(link=full_domain)
 
             if entries.count() == 0:
-                http_entries = LinkDataController.objects.filter(link = full_domain_http)
+                http_entries = LinkDataController.objects.filter(link=full_domain_http)
                 if http_entries.count() == 0:
                     missing_entry = True
 

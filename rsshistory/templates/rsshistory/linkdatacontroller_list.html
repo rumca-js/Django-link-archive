@@ -71,7 +71,7 @@
   {% endif %}
 
   <div>
-      <a href="{% url 'rsshistory:entries-json' %}?query_type={{query_type}}&{{ request.GET.urlencode }}" class='simplebutton'>Show JSON</a>
+      <a href="{% url 'rsshistory:entries-json' %}?query_type={{query_type}}&{{ args }}&{{ request.GET.urlencode }}" class='simplebutton'>Show JSON</a>
       <a href="{% url 'rsshistory:entries' %}?query_type={{query_type}}&{{ args }}&type=clear" class='simplebutton'>Show Clear</a>
       <a href="{% url 'rsshistory:entries' %}?query_type={{query_type}}&{{ args }}&type=normal" class='simplebutton'>Show Normal</a>
   </div>

@@ -7,6 +7,13 @@ class DateUtils(object):
     def get_iso_today():
         return date.today().isoformat()
 
+    def get_datetime_now_utc():
+        return django.utils.timezone.now()
+
+    def get_datetime_now_iso():
+        now = django.utils.timezone.now()
+        return now.isoformat()
+
     def to_utc_date(input_date):
         if input_date.tzinfo is None:
             input_date = input_date.replace(tzinfo=timezone("UTC"))
@@ -33,13 +40,6 @@ class DateUtils(object):
 
         return next_day
 
-    def get_datetime_now_utc():
-        return django.utils.timezone.now()
-
-    def get_datetime_now_iso():
-        now = django.utils.timezone.now()
-        return self.get_iso_datetime(now)
-
     def get_datetime_file_name():
         return datetime.today().strftime("%Y-%m-%d_%H-%M-%S")
 
@@ -57,6 +57,12 @@ class DateUtils(object):
 
         date = parser.parse(timestamp)
         date = date.isoformat()
+        return date
+
+    def parse_datetime(timestamp):
+        from dateutil import parser
+
+        date = parser.parse(timestamp)
         return date
 
     def get_datetime_year(datetime):
@@ -103,5 +109,5 @@ class DateUtils(object):
         date_start = DateUtils.get_datetime_now_utc() - timedelta(days=number_of_days)
         return [date_start, date_stop]
 
-    def from_string(string_input, string_format):
+    def from_string(string_input, string_format = "%Y-%m-%dT%H:%M:%SZ"):
         return datetime.strptime(string_input, string_format)

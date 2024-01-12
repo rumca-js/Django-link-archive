@@ -194,7 +194,9 @@ class BackgroundJobController(BackgroundJob):
                     task=None,
                     subject=link_url,
                     args="",
-                    priority=BackgroundJobController.get_job_priority(BackgroundJob.JOB_LINK_SAVE),
+                    priority=BackgroundJobController.get_job_priority(
+                        BackgroundJob.JOB_LINK_SAVE
+                    ),
                 )
             else:
                 for key, obj in enumerate(archive_items):

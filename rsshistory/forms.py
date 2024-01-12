@@ -46,6 +46,7 @@ class ConfigForm(forms.ModelForm):
             "user_agent",
             "sources_refresh_period",
             "access_type",
+            "admin_user",
             # optional
             "link_save",
             "source_save",
@@ -56,7 +57,6 @@ class ConfigForm(forms.ModelForm):
             "auto_store_sources_enabled",
             "auto_store_domain_info",
             "auto_store_keyword_info",
-
             "track_user_actions",
             "data_export_path",
             "data_import_path",

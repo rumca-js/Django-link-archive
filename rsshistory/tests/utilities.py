@@ -6,6 +6,7 @@ This module provides replacement for the Internet.
 """
 
 from ..models import PersistentInfo
+from ..dateutils import DateUtils
 
 
 class PageBuilder(object):
@@ -931,13 +932,123 @@ webpage_code_project_contents = """
 
 instance_entries_json = """
 {
-"links":
-    [{"source": "https://www.lemonde.fr/en/rss/une.xml", "title": "Yotam Ottolenghi: 'A cuisine is never static'", "description": "The British-Israeli chef", "link": "https://www.lemonde.fr/en/lifestyle/article/2024/01/03/yotam-ottolenghi-a-cuisine-is-never-static_6398241_37.html", "date_published": "2024-01-03T10:30:27+00:00", "permanent": false, "bookmarked": false, "dead": false, "artist": "Le Monde", "album": "Le Monde", "user": null, "language": "en-US", "thumbnail": null, "age": null, "page_rating_contents": 0, "page_rating_votes": 0, "page_rating_visits": 0, "page_rating": 0, "tags": ["testtag1", "testtag2"], "vote": 0, "comments": ["comment1", "comment2"]},
-     {"source": "https://moxie.foxnews.com/google-publisher/latest.xml", "title": "Next hot thing in hot wings, 'trashed' or 'dirty,' breaks the rules of America's favorite bar food", "description": "Double-fried wings, called trash wings in Missouri and dirt wings in Connecticut, have been a regional phenomenon for decades and are poised to become a national trend.", "link": "https://www.foxnews.com/lifestyle/next-hot-thing-hot-wings-trashed-dirty-breaks-rules-americas-favorite-bar-food", "date_published": "2024-01-03T10:28:49+00:00", "permanent": false, "bookmarked": false, "dead": false, "artist": "Fox News", "album": "Fox News", "user": null, "language": "en-US", "thumbnail": "https://global.fncstatic.com/static/orion/styles/img/fox-news/logos/fox-news-desktop.png", "age": null, "page_rating_contents": 0, "page_rating_votes": 0, "page_rating_visits": 0, "page_rating": 0, "tags": [], "vote": 0, "comments": []}
-    ]
+  "links": [
+    {
+      "source": "https://www.lemonde.fr/en/rss/une.xml",
+      "title": "Yotam Ottolenghi: 'A cuisine is never static'",
+      "description": "The British-Israeli chef",
+      "link": "https://www.lemonde.fr/en/lifestyle/article/2024/01/03/yotam-ottolenghi-a-cuisine-is-never-static_6398241_37.html",
+      "date_published": "{0}",
+      "permanent": false,
+      "bookmarked": false,
+      "dead": false,
+      "artist": "Le Monde",
+      "album": "Le Monde",
+      "user": null,
+      "language": "en-US",
+      "thumbnail": null,
+      "age": null,
+      "page_rating_contents": 0,
+      "page_rating_votes": 0,
+      "page_rating_visits": 0,
+      "page_rating": 0,
+      "tags": [
+        "testtag1",
+        "testtag2"
+      ],
+      "vote": 0,
+      "comments": [
+        "comment1",
+        "comment2"
+      ]
+    },
+    {
+      "source": "https://moxie.foxnews.com/google-publisher/latest.xml",
+      "title": "Next hot thing in hot wings, 'trashed' or 'dirty,' breaks the rules of America's favorite bar food",
+      "description": "Double-fried wings, called trash wings in Missouri and dirt wings in Connecticut, have been a regional phenomenon for decades and are poised to become a national trend.",
+      "link": "https://www.foxnews.com/lifestyle/next-hot-thing-hot-wings-trashed-dirty-breaks-rules-americas-favorite-bar-food",
+      "date_published": "{0}",
+      "permanent": false,
+      "bookmarked": false,
+      "dead": false,
+      "artist": "Fox News",
+      "album": "Fox News",
+      "user": null,
+      "language": "en-US",
+      "thumbnail": "https://global.fncstatic.com/static/orion/styles/img/fox-news/logos/fox-news-desktop.png",
+      "age": null,
+      "page_rating_contents": 0,
+      "page_rating_votes": 0,
+      "page_rating_visits": 0,
+      "page_rating": 0,
+      "tags": [],
+      "vote": 0,
+      "comments": []
+    }
+  ]
+}
+""".replace("{0}", DateUtils.get_datetime_now_iso())
+
+instance_sources_json_empty = """{"sources": []}"""
+
+instance_entries_json_empty = """{"links": []}"""
+
+instance_entries_source_100_json = """
+{
+  "links": [
+    {
+      "source": "https://www.lemonde.fr/en/rss/une.xml",
+      "title": "Yotam Ottolenghi: 'A cuisine is never static'",
+      "description": "The British-Israeli chef",
+      "link": "https://www.lemonde.fr/en/lifestyle/article/2024/01/03/yotam-ottolenghi-a-cuisine-is-never-static_6398241_37.html",
+      "date_published": "{0}",
+      "permanent": false,
+      "bookmarked": false,
+      "dead": false,
+      "artist": "Le Monde",
+      "album": "Le Monde",
+      "user": null,
+      "language": "en-US",
+      "thumbnail": null,
+      "age": null,
+      "page_rating_contents": 0,
+      "page_rating_votes": 0,
+      "page_rating_visits": 0,
+      "page_rating": 0,
+      "tags": [
+        "testtag1",
+        "testtag2"
+      ],
+      "vote": 0,
+      "comments": [
+        "comment1",
+        "comment2"
+      ]
+    }
+  ]
+}
+""".replace("{0}", DateUtils.get_datetime_now_iso())
+
+instance_source_100_url = "https://www.lemonde.fr/en/rss/une.xml"
+instance_source_100_json = """
+{
+  "source": {
+    "id": 100,
+    "url": "https://www.lemonde.fr/en/rss/une.xml",
+    "title": "Source100",
+    "category": "Source 100 Category",
+    "subcategory": "Source 100 Subcategory",
+    "dead": false,
+    "export_to_cms": true,
+    "remove_after_days": "0",
+    "language": "en-US",
+    "favicon": "https://yt3.ggpht.com/ytc/AGIKgqMox432cx8APsB9u4UELfpZTjZlzO8nGU_M3PZ_nw=s48-c-k-c0x00ffffff-no-rj",
+    "on_hold": false,
+    "fetch_period": 3600,
+    "source_type": "BaseRssPlugin"
+  }
 }
 """
-instance_sources_json = """{"sources": []}"""
 
 
 from ..pluginentries.handlervideoyoutube import YouTubeVideoHandler
@@ -1010,23 +1121,7 @@ class TestRequestObjectMock(object):
 
     def get_contents(self, url):
         if url.startswith("https://youtube.com/channel/"):
-            if url == "https://youtube.com/channel/samtime/rss.xml":
-                return webpage_samtime_youtube_rss
-
-            elif url == "https://youtube.com/channel/2020-year-channel/rss.xml":
-                return webpage_old_pubdate_rss
-
-            elif url == "https://youtube.com/channel/no-pubdate-channel/rss.xml":
-                return webpage_no_pubdate_rss
-
-            elif url == "https://youtube.com/channel/airpano/rss.xml":
-                return webpage_airpano
-
-            elif (
-                url
-                == "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM"
-            ):
-                return webpage_samtime_youtube_rss
+            return self.get_contents_youtube_channel(url)
 
         if url.startswith("https://www.youtube.com/feeds"):
             return webpage_samtime_youtube_rss
@@ -1078,17 +1173,8 @@ class TestRequestObjectMock(object):
         elif url == "https://page-with-http-status-100.com":
             self.status_code = 100
 
-        elif url == "https://instance.com/entries":
-            return instance_entries_json
-
-        elif url == "https://instance.com/entries?page=1":
-            return """{}"""
-
-        elif url == "https://instance.com/sources":
-            return instance_sources_json
-
-        elif url == "https://instance.com/sources?page=1":
-            return """{}"""
+        elif url.startswith("https://instance.com/apps/rsshistory"):
+            return self.get_contents_instance(url)
 
         elif url == "https://title-in-head.com":
             b = PageBuilder()
@@ -1132,6 +1218,53 @@ class TestRequestObjectMock(object):
         b.og_description = "Page og_description"
 
         return b.build_contents()
+
+    def get_contents_youtube_channel(self, url):
+        if url == "https://youtube.com/channel/samtime/rss.xml":
+            return webpage_samtime_youtube_rss
+
+        elif url == "https://youtube.com/channel/2020-year-channel/rss.xml":
+            return webpage_old_pubdate_rss
+
+        elif url == "https://youtube.com/channel/no-pubdate-channel/rss.xml":
+            return webpage_no_pubdate_rss
+
+        elif url == "https://youtube.com/channel/airpano/rss.xml":
+            return webpage_airpano
+
+        elif (
+            url
+            == "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM"
+        ):
+            return webpage_samtime_youtube_rss
+
+    def get_contents_instance(self, url):
+        if url == "https://instance.com/apps/rsshistory/entries-json/?query_type=recent":
+            return instance_entries_json
+
+        elif url == "https://instance.com/apps/rsshistory/entries-json/?query_type=recent&source_title=Source100":
+            return instance_entries_source_100_json
+
+        elif url == "https://instance.com/apps/rsshistory/entries-json/?query_type=recent&page=1":
+            return """{}"""
+
+        elif url == "https://instance.com/apps/rsshistory/sources-json/?page=1":
+            return """{}"""
+
+        elif url == "https://instance.com/apps/rsshistory/source-json/100":
+            return instance_source_100_json
+
+        elif url == "https://instance.com/apps/rsshistory/entry-json/1912018":
+            return """{}"""
+
+        elif "/sources-json/":
+            return instance_sources_json_empty
+
+        elif "/entries-json/":
+            return instance_entries_json_empty
+
+        else:
+            return """{}"""
 
 
 class WebPageDisabled(object):

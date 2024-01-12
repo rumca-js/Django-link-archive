@@ -1,4 +1,3 @@
-
 from urllib.parse import urlparse
 from urllib.parse import parse_qs
 
@@ -246,7 +245,7 @@ class YouTubeVideoHandler(DefaultUrlHandler):
 
         if self.rd_text is not None:
             return True
-            
+
         from ..serializers.returnyoutubedislikeapijson import YouTubeThumbsDown
 
         ytr = YouTubeThumbsDown(self)

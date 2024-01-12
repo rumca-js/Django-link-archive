@@ -13,8 +13,6 @@ class SourceGenericPlugin(HtmlPage):
     def __init__(self, source_id):
         self.source_id = source_id
         super().__init__(self.get_address())
-        self.allow_adding_with_current_time = True
-        self.default_entry_timestamp = None
         self.hash = None
 
     def check_for_data(self):

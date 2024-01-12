@@ -9,6 +9,7 @@ from ..controllers import (
 )
 from ..apps import LinkDatabase
 from ..configuration import Configuration
+from ..dateutils import DateUtils
 
 
 class InstanceExporter(object):
@@ -40,7 +41,7 @@ class InstanceExporter(object):
 
 
 class InstanceImporter(object):
-    def __init__(self, url, author=None):
+    def __init__(self, url=None, author=None):
         self.url = url
         self.author = author
 
@@ -110,36 +111,26 @@ class InstanceImporter(object):
         LinkDatabase.info("Import from links")
 
         for link_data in json_data:
-            clean_data = LinkDataController.get_clean_data(link_data)
-            entries = LinkDataController.objects.filter(link=clean_data["link"])
-            if entries.count() == 0:
-                entry = LinkDataController.objects.create(**clean_data)
-                entry.tag(link_data["tags"], self.author)
-            else:
-                entry = entries[0]
-                entry.tag(link_data["tags"], self.author)
-                if link_data["vote"] > 0:
-                    entry.vote(link_data["vote"])
+            self.import_from_link(link_data)
 
     def import_from_sources(self, json_data):
         LinkDatabase.info("Import from sources")
 
         for source_data in json_data:
-            clean_data = SourceDataController.get_clean_data(source_data)
-            if SourceDataController.objects.filter(url=clean_data["url"]).count() == 0:
-                SourceDataBuilder.add_from_props(clean_data)
+            self.import_from_source(source_data)
 
     def import_from_link(self, json_data):
         LinkDatabase.info("Import from link")
 
         c = Configuration.get_object().config_entry
 
-        clean_data = LinkDataController.get_clean_data(json_data)
+        clean_data = self.get_clean_entry_data(json_data)
+
         entries = LinkDataController.objects.filter(link=clean_data["link"])
         if entries.count() == 0:
             # This instance can have their own settings for import, may decide what is
             # accepted and not. Let the builder deal with it
-            LindDataBuilder(link_data=clean_data)
+            LinkDataBuilder(link_data=clean_data)
         else:
             entry = entries[0]
             updated = False
@@ -153,9 +144,41 @@ class InstanceImporter(object):
             if updated:
                 entry.save()
 
+            entry.tag(link_data["tags"], self.author)
+            if link_data["vote"] > 0:
+                entry.vote(link_data["vote"])
+
     def import_from_source(self, json_data):
         LinkDatabase.info("Import from source")
 
         clean_data = SourceDataController.get_clean_data(json_data)
         if SourceDataController.objects.filter(url=clean_data["url"]).count() == 0:
+            clean_data = self.drop_source_instance_internal_data(clean_data)
             SourceDataBuilder.add_from_props(clean_data)
+
+    def drop_entry_instance_internal_data(self, clean_data):
+        if "domain_obj" in clean_data:
+            del clean_data["domain_obj"]
+        if "source_obj" in clean_data:
+            del clean_data["domain_obj"]
+        if "id" in clean_data:
+            del clean_data["id"]
+
+        return clean_data
+
+    def drop_source_instance_internal_data(self, clean_data):
+        if "dynamic_data" in clean_data:
+            del clean_data["dynamic_data"]
+        if "id" in clean_data:
+            del clean_data["id"]
+
+        return clean_data
+
+    def get_clean_entry_data(self, input_data):
+        clean_data = LinkDataController.get_clean_data(input_data)
+        clean_data = self.drop_entry_instance_internal_data(clean_data)
+
+        if "date_published" in clean_data:
+            clean_data["date_published"] = DateUtils.parse_datetime(clean_data["date_published"])
+
+        return clean_data

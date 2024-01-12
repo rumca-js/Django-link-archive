@@ -3,6 +3,7 @@ from django.utils import timezone
 from django.urls import reverse
 
 from .utilities import WebPageDisabled
+from ..models import SourceDataModel
 from ..pluginsources.sourceurlinterface import SourceUrlInterface
 
 
@@ -17,14 +18,25 @@ class SourceUrlInterfaceTest(WebPageDisabled, TestCase):
         self.assertTrue(props)
         self.assertTrue("url" in props)
         self.assertTrue("title" in props)
+        self.assertEqual(props["source_type"], SourceDataModel.SOURCE_TYPE_RSS)
 
-    def test_youtube(self):
+    def test_youtube_channel(self):
+        url = SourceUrlInterface("https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM")
+        props = url.get_props()
+
+        self.assertTrue(props)
+        self.assertTrue("url" in props)
+        self.assertTrue("title" in props)
+        self.assertEqual(props["source_type"], SourceDataModel.SOURCE_TYPE_RSS)
+
+    def test_youtube_video(self):
         url = SourceUrlInterface("https://www.youtube.com/watch?v=123")
         props = url.get_props()
 
         self.assertTrue(props)
         self.assertTrue("url" in props)
         self.assertTrue("title" in props)
+        self.assertEqual(props["source_type"], SourceDataModel.SOURCE_TYPE_RSS)
 
     def test_html(self):
         url = SourceUrlInterface("https://linkedin.com")
@@ -33,3 +45,17 @@ class SourceUrlInterfaceTest(WebPageDisabled, TestCase):
         self.assertTrue(props)
         self.assertTrue("url" in props)
         self.assertTrue("title" in props)
+
+        self.assertEqual(props["title"], "LinkedIn Page title")
+        self.assertEqual(props["source_type"], SourceDataModel.SOURCE_TYPE_PARSE)
+
+    def test_json(self):
+        url = SourceUrlInterface("https://instance.com/apps/rsshistory/source-json/100")
+        props = url.get_props()
+
+        self.assertTrue(props)
+        self.assertTrue("url" in props)
+        self.assertTrue("title" in props)
+
+        self.assertEqual(props["title"], "Source100")
+        self.assertEqual(props["source_type"], SourceDataModel.SOURCE_TYPE_JSON)
