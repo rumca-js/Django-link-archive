@@ -59,6 +59,7 @@ Personal link database, link aggregator, with RSS functionality. Similar to Redd
  - Each new link adds words from its title into the 'KeyWords' pool, if configured
  - You can monitor what kinds of domains were added by the links to you system
  - You can monitor what kind of words generate most buzz
+
 # Ranking algorithm
 
 Each page is ranked by several factors.
@@ -125,7 +126,30 @@ Each day bookmarks and daily repositories are updated with new data. Daily repos
  - provided in sources.json file
  - provides information about sources, like: title, url, langugage
 
-## Import from another Django-link-archive instance
+# Federated
+
+This project is federated. Therefore you can rely on data from other djang-link-archive instances.
+
+You can:
+ - define proxy source of automatic import from other link archive instance
+ - manually import links from another link archive instance, or
+
+## Proxy sources
+
+First lets define a scenario. You have instance A and instance B. Instance B has defined a source.
+
+You do not want instance A to fetch same data from the internet. You would like to fetch data from instance B.
+
+To do that:
+ - Navigate to instance B sources.
+ - Find your desired source.
+ - Click "Show JSON" (copy location of that address)
+ - Navigate on instance A to sources.
+ - Add a new source
+ - paste the instance B address, the JSON address link
+ - the system should suggest source type to be of JSON
+
+## Manual import
 
 Scenario to import sources from a other instance:
  - find sources in the other instance. It should be at "Sources" menu button, by default
