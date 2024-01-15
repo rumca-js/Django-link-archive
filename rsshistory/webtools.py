@@ -942,6 +942,8 @@ class ContentLinkParser(BasePage):
         cont = str(self.get_contents())
 
         allt = re.findall("(https?://[a-zA-Z0-9./\-_?&=]+)", cont)
+        # links cannot end with "."
+        allt = [link.rstrip('.') for link in allt]
         return set(allt)
 
     def get_links_href(self):
@@ -950,8 +952,10 @@ class ContentLinkParser(BasePage):
 
         cont = str(self.get_contents())
 
-        allt2 = re.findall('href="([a-zA-Z0-9./\-_]+)', cont)
-        for item in allt2:
+        allt = re.findall('href="([a-zA-Z0-9./\-_]+)', cont)
+        allt = [link.rstrip('.') for link in allt]
+
+        for item in allt:
             if item.find("http") == 0:
                 ready_url = item
             else:
