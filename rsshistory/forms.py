@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta, date
 from django import forms
+from django.db.models import Q
 
 from .models import (
     BackgroundJob,
@@ -78,6 +79,15 @@ class ConfigForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(ConfigForm, self).__init__(*args, **kwargs)
+        self.fields["background_task"].help_text = "Informs system that background task, like celery is operational."
+        self.fields["link_save"].help_text = "Links are saved using archive.org."
+        self.fields["source_save"].help_text = "Links are saved using archive.org."
+        self.fields["user_agent"].help_text = "You can check your user agent in <a href=\"https://www.supermonitoring.com/blog/check-browser-http-headers/\">https://www.supermonitoring.com/blog/check-browser-http-headers/</a>."
+        self.fields["access_type"].help_text = "There are three access types available. \"All\" allows anybody view contents. \"Logged\" allows only logged users to view contents. \"Owner\" means application is private, and only owner can view it's contents."
+        self.fields["days_to_move_to_archive"].help_text = "Changing number of days after which links are moved to archive may lead to an issue. If the new number of days is smaller, links are not moved from archive back to the link table at hand."
+        self.fields["auto_store_sources"].help_text = "Sources can be automatically added, if a new 'domain' information is captured. The state of such state is determined by 'Auto sources enabled' property."
+        self.fields["number_of_comments_per_day"].help_text = "The limit is for each user."
+        self.fields["track_user_actions"].help_text = "Among tracked elements: what is searched."
 
 
 class DataExportForm(forms.ModelForm):
@@ -287,6 +297,7 @@ class SourceForm(forms.ModelForm):
             "remove_after_days",
             "favicon",
             "on_hold",
+            "proxy_location",
         ]
         widgets = {}
 
@@ -532,7 +543,9 @@ class BasicEntryChoiceForm(forms.Form):
     def create(self, sources):
         # how to unpack dynamic forms
         # https://stackoverflow.com/questions/60393884/how-to-pass-choices-dynamically-into-a-django-form
-        self.sources = SourceDataController.objects.filter(on_hold=False)
+        condition1 = Q(on_hold=False) & Q(proxy_location = "")
+        condition2 = Q(on_hold=True) & ~Q(proxy_location = "")
+        self.sources = SourceDataController.objects.filter(condition1 or condition2)
 
         categories = self.get_sources_values("category")
         subcategories = self.get_sources_values("subcategory")

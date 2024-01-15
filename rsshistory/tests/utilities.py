@@ -1000,7 +1000,7 @@ instance_entries_source_100_json = """
       "source": "https://www.lemonde.fr/en/rss/une.xml",
       "title": "Yotam Ottolenghi: 'A cuisine is never static'",
       "description": "The British-Israeli chef",
-      "link": "https://www.lemonde.fr/en/lifestyle/article/2024/01/03/yotam-ottolenghi-a-cuisine-is-never-static_6398241_37.html",
+      "link": "https://www.lemonde.fr/first-link.html",
       "date_published": "{0}",
       "permanent": false,
       "bookmarked": false,
@@ -1032,126 +1032,130 @@ instance_entries_source_100_json = """
 instance_source_100_url = "https://www.lemonde.fr/en/rss/une.xml"
 instance_source_100_json = """
 {
-  "source": {
-    "id": 100,
-    "url": "https://www.lemonde.fr/en/rss/une.xml",
-    "title": "Source100",
-    "category": "Source 100 Category",
-    "subcategory": "Source 100 Subcategory",
-    "dead": false,
-    "export_to_cms": true,
-    "remove_after_days": "0",
-    "language": "en-US",
-    "favicon": "https://yt3.ggpht.com/ytc/AGIKgqMox432cx8APsB9u4UELfpZTjZlzO8nGU_M3PZ_nw=s48-c-k-c0x00ffffff-no-rj",
-    "on_hold": false,
-    "fetch_period": 3600,
-    "source_type": "BaseRssPlugin"
-  }
+  "id": 100,
+  "url": "https://www.lemonde.fr/en/rss/une.xml",
+  "title": "Source100",
+  "category": "Source 100 Category",
+  "subcategory": "Source 100 Subcategory",
+  "dead": false,
+  "export_to_cms": true,
+  "remove_after_days": "0",
+  "language": "en-US",
+  "favicon": "https://yt3.ggpht.com/ytc/AGIKgqMox432cx8APsB9u4UELfpZTjZlzO8nGU_M3PZ_nw=s48-c-k-c0x00ffffff-no-rj",
+  "on_hold": false,
+  "fetch_period": 3600,
+  "source_type": "BaseRssPlugin"
 }
 """
 
-instance_sources = """
+instance_source_101_json = """
 {
-  "sources": [
-    {
-      "id": 535,
-      "url": "https://www.reddit.com/r/3Dprinting/.rss",
-      "title": "3D Printing",
-      "category": "Social",
-      "subcategory": "3D",
-      "dead": false,
-      "export_to_cms": true,
-      "remove_after_days": "0",
-      "language": "en",
-      "favicon": "https://www.reddit.com/favicon.ico",
-      "on_hold": false,
-      "fetch_period": 900,
-      "source_type": "BaseRssPlugin"
-    },
-    {
-      "id": 552,
-      "url": "https://3dprinting.com/feed",
-      "title": "3DPrinting.com",
-      "category": "Tech",
-      "subcategory": "News",
-      "dead": false,
-      "export_to_cms": true,
-      "remove_after_days": "0",
-      "language": "en-US",
-      "favicon": "https://3dprinting.com/wp-content/uploads/cropped-3dp-site-icon-32x32.png",
-      "on_hold": false,
-      "fetch_period": 1800,
-      "source_type": "BaseRssPlugin"
-    },
-    {
-      "id": 519,
-      "url": "https://www.404media.co/rss",
-      "title": "404 Media",
-      "category": "New",
-      "subcategory": "New",
-      "dead": false,
-      "export_to_cms": false,
-      "remove_after_days": "0",
-      "language": "en",
-      "favicon": "https://www.404media.co/favicon.png",
-      "on_hold": false,
-      "fetch_period": 900,
-      "source_type": "BaseRssPlugin"
-    }
-  ]
+  "id": 101,
+  "url": "https://3dprinting.com/feed",
+  "title": "3DPrinting.com",
+  "category": "Tech",
+  "subcategory": "News",
+  "dead": false,
+  "export_to_cms": true,
+  "remove_after_days": "0",
+  "language": "en-US",
+  "favicon": "https://3dprinting.com/wp-content/uploads/cropped-3dp-site-icon-32x32.png",
+  "on_hold": false,
+  "fetch_period": 1800,
+  "source_type": "BaseRssPlugin"
 }
 """
 
-instance_sources_page_1 = """
+instance_source_102_json = """
 {
-  "sources": [
-    {
-      "id": 313,
-      "url": "https://9to5linux.com/category/news/feed",
-      "title": "9to5Linux News",
-      "category": "Tech",
-      "subcategory": "Tech",
-      "dead": false,
-      "export_to_cms": true,
-      "remove_after_days": "0",
-      "language": "en-US",
-      "favicon": "https://i0.wp.com/9to5linux.com/wp-content/uploads/2021/04/cropped-9to5linux-logo-mini-copy.png",
-      "on_hold": false,
-      "fetch_period": 900,
-      "source_type": "BaseRssPlugin"
-    },
-    {
-      "id": 349,
-      "url": "https://www.science.org/action/showFeed?type=etoc&feed=rss&jc=scirobotics",
-      "title": "AAAS: Science Robotics: Table of Contents",
-      "category": "Science",
-      "subcategory": "Science",
-      "dead": false,
-      "export_to_cms": true,
-      "remove_after_days": "0",
-      "language": "en-US",
-      "favicon": "https://www.science.org/favicon.ico",
-      "on_hold": false,
-      "fetch_period": 900,
-      "source_type": "BaseRssPlugin"
-    },
-    {
-      "id": 116,
-      "url": "http://feeds.abcnews.com/abcnews/topstories",
-      "title": "ABC News",
-      "category": "News",
-      "subcategory": "News",
-      "dead": false,
-      "export_to_cms": true,
-      "remove_after_days": "0",
-      "language": "en-US",
-      "favicon": "https://abcnews.go.com/favicon.ico",
-      "on_hold": false,
-      "fetch_period": 3600,
-      "source_type": "BaseRssPlugin"
-    },
-  ]
+  "id": 102,
+  "url": "https://www.404media.co/rss",
+  "title": "404 Media",
+  "category": "New",
+  "subcategory": "New",
+  "dead": false,
+  "export_to_cms": false,
+  "remove_after_days": "0",
+  "language": "en",
+  "favicon": "https://www.404media.co/favicon.png",
+  "on_hold": false,
+  "fetch_period": 900,
+  "source_type": "BaseRssPlugin"
 }
+"""
+
+instance_source_103_json = """
+{
+   "id": 313,
+   "url": "https://9to5linux.com/category/news/feed",
+   "title": "9to5Linux News",
+   "category": "Tech",
+   "subcategory": "Tech",
+   "dead": false,
+   "export_to_cms": true,
+   "remove_after_days": "0",
+   "language": "en-US",
+   "favicon": "https://i0.wp.com/9to5linux.com/wp-content/uploads/2021/04/cropped-9to5linux-logo-mini-copy.png",
+   "on_hold": false,
+   "fetch_period": 900,
+   "source_type": "BaseRssPlugin"
+}
+"""
+
+instance_source_104_json = """
+{
+   "id": 104,
+   "url": "https://www.science.org/action/showFeed?type=etoc&feed=rss&jc=scirobotics",
+   "title": "AAAS: Science Robotics: Table of Contents",
+   "category": "Science",
+   "subcategory": "Science",
+   "dead": false,
+   "export_to_cms": true,
+   "remove_after_days": "0",
+   "language": "en-US",
+   "favicon": "https://www.science.org/favicon.ico",
+   "on_hold": false,
+   "fetch_period": 900,
+   "source_type": "BaseRssPlugin"
+}
+"""
+
+instance_source_105_json = """
+{
+   "id": 105,
+   "url": "http://feeds.abcnews.com/abcnews/topstories",
+   "title": "ABC News",
+   "category": "News",
+   "subcategory": "News",
+   "dead": false,
+   "export_to_cms": true,
+   "remove_after_days": "0",
+   "language": "en-US",
+   "favicon": "https://abcnews.go.com/favicon.ico",
+   "on_hold": false,
+   "fetch_period": 3600,
+   "source_type": "BaseRssPlugin"
+}
+"""
+
+instance_sources_page_1 = f"""
+{{
+  "sources": [
+    {instance_source_100_json},
+    {instance_source_101_json},
+    {instance_source_102_json}
+  ]
+}}
+"""
+
+instance_sources_page_2 = f"""
+{{
+  "sources": [
+    {instance_source_103_json},
+    {instance_source_104_json},
+    {instance_source_105_json}
+  ]
+}}
 """
 
 
@@ -1353,19 +1357,37 @@ class TestRequestObjectMock(object):
             return """{}"""
 
         elif url == "https://instance.com/apps/rsshistory/source-json/100":
-            return instance_source_100_json
+            return f'{{ "source": {instance_source_100_json} }}'
+
+        elif url == "https://instance.com/apps/rsshistory/source-json/101":
+            return f'{{ "source": {instance_source_101_json} }}'
+
+        elif url == "https://instance.com/apps/rsshistory/source-json/102":
+            return f'{{ "source": {instance_source_102_json} }}'
+
+        elif url == "https://instance.com/apps/rsshistory/source-json/103":
+            return f'{{ "source": {instance_source_103_json} }}'
+
+        elif url == "https://instance.com/apps/rsshistory/source-json/104":
+            return f'{{ "source": {instance_source_104_json} }}'
+
+        elif url == "https://instance.com/apps/rsshistory/source-json/105":
+            return f'{{ "source": {instance_source_105_json} }}'
 
         elif url == "https://instance.com/apps/rsshistory/entry-json/1912018":
             return """{}"""
 
         elif url == "https://instance.com/apps/rsshistory/sources-json":
-            return instance_sources
+            return instance_sources_page_1
 
         elif url == "https://instance.com/apps/rsshistory/sources-json/?page=1":
-            return """{}"""
+            return instance_sources_page_1
 
         elif url == "https://instance.com/apps/rsshistory/sources-json/?page=2":
-            return instance_sources_page_1
+            return instance_sources_page_2
+
+        elif url == "https://instance.com/apps/rsshistory/sources-json/?page=3":
+            return instance_sources_json_empty
 
         elif "/sources-json/":
             return instance_sources_json_empty

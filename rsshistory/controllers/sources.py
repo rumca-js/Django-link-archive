@@ -173,6 +173,7 @@ class SourceDataController(SourceDataModel):
             "on_hold",
             "fetch_period",
             "source_type",
+            "proxy_location",
         ]
 
     def get_query_names():
@@ -190,6 +191,7 @@ class SourceDataController(SourceDataModel):
             "on_hold",
             "fetch_period",
             "source_type",
+            "proxy_location",
         ]
 
     def get_map(self):

@@ -20,6 +20,9 @@ class SourceDataModel(models.Model):
     fetch_period = models.IntegerField(default=900)
     source_type = models.CharField(max_length=1000, null=False, default=SOURCE_TYPE_RSS)
 
+    # proxy location
+    proxy_location = models.CharField(max_length=200, default="")
+
     class Meta:
         ordering = ["title"]
 

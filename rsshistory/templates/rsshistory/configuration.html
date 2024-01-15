@@ -16,7 +16,36 @@
 <form action="{{config_form.action_url}}" method="{{config_form.method}}">
     <table>
         {% csrf_token %}
-        {{config_form}}
+
+        {% for field in config_form %}
+
+        {% if field.id_for_label == "id_background_task" %}
+        <tr>
+            <td><h3>Admin settings</h3></td>
+        </tr>
+        {%endif%}
+
+        {% if field.id_for_label == "id_link_save" %}
+        <tr>
+            <td><h3>Configuration settings</h3></td>
+        </tr>
+        {%endif%}
+
+        {% if field.id_for_label == "id_entries_order_by" %}
+        <tr>
+            <td><h3>Display settings</h3></td>
+        </tr>
+        {%endif%}
+
+        <tr>
+            <td>{{field.label_tag }}</td>
+            <td>{{field }}</td>
+        </tr>
+        <tr>
+            <td></td><td>{{field.help_text | safe }}</td>
+        </tr>
+        {% endfor %}
+
         <tr>
             <td>
                 <input type="submit" value="Submit" class="simplebutton">
@@ -24,14 +53,5 @@
         </tr>
     </table>
 </form>
-
-Notes:
-<ul>
-    <li>Links are saved using archive.org</li>
-    <li>You can check your user agent in <a href="https://www.supermonitoring.com/blog/check-browser-http-headers/">https://www.supermonitoring.com/blog/check-browser-http-headers/</a></li>
-    <li>There are three access types available. "All" allows anybody view contents. "Logged" allows only logged users to view contents. "Owner" means application is private, and only owner can view it's contents.</li>
-    <li>Changing number of days after which links are moved to archive may lead to an issue. If the new number of days is smaller, links are not moved from archive back to the link table at hand.</li>
-    <li>Sources can be automatically added, if a new 'domain' information is captured. The state of such state is determined by 'Auto sources enabled' property</li>
-</ul>
 
 {% endblock %}

@@ -112,6 +112,7 @@ class BaseSourceJsonPlugin(SourceGenericPlugin):
             # TODO use configured author
             i.author = c.admin_user
 
+            source_prop["proxy_location"] = self.get_source_url(source_prop)
             i.import_from_source(source_prop, instance_import=True)
 
             self.get_links_from_source(source_prop)
@@ -171,4 +172,8 @@ class BaseSourceJsonPlugin(SourceGenericPlugin):
 
     def get_entries_recent_url(self, source_json):
         path = self.get_instance_root() + "/entries-json/?query_type=recent&source_title={}".format(source_json["title"])
+        return str(path)
+
+    def get_source_url(self, source_json):
+        path = self.get_instance_root() + "/source-json/{}".format(source_json["id"])
         return str(path)

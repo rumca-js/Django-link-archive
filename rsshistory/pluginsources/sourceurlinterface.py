@@ -76,6 +76,7 @@ class SourceUrlInterface(object):
 
         data = {}
         data["source_type"] = SourceDataModel.SOURCE_TYPE_JSON
+        data["proxy_location"] = url
         data["url"] = url
         if "title" in source_obj:
             data["title"] = source_obj["title"] + " - Proxy"
@@ -97,6 +98,7 @@ class SourceUrlInterface(object):
 
         data = {}
         data["source_type"] = SourceDataModel.SOURCE_TYPE_JSON
+        data["proxy_location"] = url
         data["url"] = url
         data["title"] = "Instance Proxy"
 

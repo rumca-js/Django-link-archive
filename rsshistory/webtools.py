@@ -618,9 +618,10 @@ class JsonPage(ContentInterface):
 
         self.json_obj = None
         try:
-            self.json_obj = json.loads(self.get_contents())
+            contents = self.get_contents()
+            self.json_obj = json.loads(contents)
         except Exception as e:
-            LinkDatabase.error("Could not load json")
+            LinkDatabase.error("Invalid json:{}".format(contents))
 
     def is_json(self):
         if self.json_obj:
@@ -840,7 +841,7 @@ class RssPage(ContentInterface):
             else:
                 # cannot display self.feed.feed here.
                 # it complains et_thumbnail TypeError: 'DeferredAttribute' object is not callable
-                PersistentInfo.info("Unsupported image type for feed.")
+                PersistentInfo.create("Unsupported image type for feed. {}".format(str(self.feed.feed.image) ))
 
         if not image:
             if self.url.find("https://www.youtube.com/feeds/videos.xml") >= 0:

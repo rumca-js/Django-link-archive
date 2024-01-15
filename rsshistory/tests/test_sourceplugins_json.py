@@ -3,6 +3,7 @@ from django.utils import timezone
 from django.urls import reverse
 import json
 
+from ..configuration import Configuration
 from ..controllers import SourceDataController, LinkDataController
 from ..pluginsources.sourcejsonplugin import BaseSourceJsonPlugin
 from .utilities import WebPageDisabled, instance_entries_source_100_json,instance_entries_json
@@ -60,6 +61,11 @@ class BaseJsonPluginTest(WebPageDisabled, TestCase):
         self.assertEqual(entries[0].source, "https://www.lemonde.fr/en/rss/une.xml")
 
     def test_get_link_props_sources(self):
+        config = Configuration.get_object().config_entry
+        config.auto_store_entries = True
+        config.auto_store_domain_info = False
+        config.save()
+
         LinkDataController.objects.all().delete()
         SourceDataController.objects.all().delete()
 
@@ -85,8 +91,13 @@ class BaseJsonPluginTest(WebPageDisabled, TestCase):
         self.assertEqual(sources[1].on_hold, True)
         self.assertEqual(sources[2].on_hold, True)
 
+        self.assertEqual(sources[0].proxy_location, "https://instance.com/apps/rsshistory/source-json/100")
+        self.assertEqual(sources[1].proxy_location, "https://instance.com/apps/rsshistory/source-json/101")
+        self.assertEqual(sources[2].proxy_location, "https://instance.com/apps/rsshistory/source-json/102")
+
         self.assertEqual(sources[3].on_hold, False)
 
+        # Links are imported
         entries = LinkDataController.objects.all()
-        self.assertEqual(entries.count(), 3)
-
+        self.assertEqual(entries.count(), 1)
+        self.assertEqual(entries[0].link, "https://www.lemonde.fr/first-link.html")

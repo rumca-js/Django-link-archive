@@ -134,16 +134,12 @@ class InstanceImporter(object):
             LinkDataBuilder(link_data=clean_data)
         else:
             entry = entries[0]
-            updated = False
             if clean_data["bookmarked"] and not entry.bookmarked:
                 entry.bookmarked = True
-                updated = True
             if clean_data["permanent"] and not entry.permanent:
                 entry.permanent = True
-                updated = True
 
-            if updated:
-                entry.save()
+            entry.save()
 
             if "tags" in clean_data:
                 entry.tag(clean_data["tags"], self.author)
@@ -166,9 +162,14 @@ class InstanceImporter(object):
         else:
             if instance_import:
                 source = sources[0]
+
                 if source.on_hold != (not clean_data["on_hold"]):
                     source.on_hold = not clean_data["on_hold"]
-                    source.save()
+
+                if source.proxy_location != clean_data["proxy_location"]:
+                    source.proxy_location = clean_data["proxy_location"]
+
+                source.save()
 
     def drop_entry_instance_internal_data(self, clean_data):
         if "domain_obj" in clean_data:
