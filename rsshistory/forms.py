@@ -545,7 +545,7 @@ class BasicEntryChoiceForm(forms.Form):
         # https://stackoverflow.com/questions/60393884/how-to-pass-choices-dynamically-into-a-django-form
         condition1 = Q(on_hold=False) & Q(proxy_location = "")
         condition2 = Q(on_hold=True) & ~Q(proxy_location = "")
-        self.sources = SourceDataController.objects.filter(condition1 or condition2)
+        self.sources = SourceDataController.objects.filter(condition1 | condition2)
 
         categories = self.get_sources_values("category")
         subcategories = self.get_sources_values("subcategory")
