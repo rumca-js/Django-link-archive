@@ -305,3 +305,6 @@ class CodeProjectPluginTest(WebPageDisabled, TestCase):
 
         props = list(parser.get_link_props())
         print(props)
+
+        self.assertTrue(len(props) > 0)
+        self.assertEqual(props[0]["source"], "https://www.codeproject.com/WebServices/NewsRSS.aspx")

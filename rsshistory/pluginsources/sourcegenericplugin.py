@@ -40,6 +40,8 @@ class SourceGenericPlugin(HtmlPage):
     def check_for_data_impl(self):
         num_entries = 0
 
+        source = self.get_source()
+
         for link_data in self.get_link_props():
             if not link_data:
                 continue
@@ -49,6 +51,10 @@ class SourceGenericPlugin(HtmlPage):
                     "Invalid link properties. Missing key: {}".format(str(link_data))
                 )
             else:
+                if source:
+                    link_data["source"] = source.url
+                    link_data["source_obj"] = source
+
                 b = LinkDataBuilder()
                 b.link_data = link_data
                 b.source_is_auto = True

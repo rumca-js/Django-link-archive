@@ -142,8 +142,12 @@ class DomainParsePluginTest(WebPageDisabled, TestCase):
         props = list(parser.get_link_props())
         print(props)
 
+        self.assertEqual(len(props), 2)
+
         self.assertTrue(self.is_domain(props, "https://test1.com"))
         self.assertTrue(self.is_domain(props, "https://test2.com"))
+
+        self.assertEqual(props[0]["source"], "https://youtube.com")
 
 
 class BaseParsePluginTest(WebPageDisabled, TestCase):
@@ -173,5 +177,9 @@ class BaseParsePluginTest(WebPageDisabled, TestCase):
         props = list(parser.get_link_props())
         print(props)
 
+        self.assertEqual(len(props), 2)
+
         self.assertTrue(self.is_domain(props, "https://linkedin.com/1"))
         self.assertTrue(self.is_domain(props, "https://linkedin.com/2"))
+
+        self.assertEqual(props[0]["source"], "https://linkedin.com")

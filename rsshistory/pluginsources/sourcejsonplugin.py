@@ -36,11 +36,21 @@ class BaseSourceJsonPlugin(SourceGenericPlugin):
         if "links" in json:
             self.get_links_from_links(json["links"])
 
+        if "sources" in json:
+            sources = self.get_all_sources(json["sources"])
+            self.get_links_from_sources(sources)
+
         return []
 
-    def get_json(self):
-        address = self.get_address()
-        contents = self.get_contents()
+    def get_json(self, url = None):
+
+        if url is None:
+            address = self.get_address()
+            contents = self.get_contents()
+        else:
+            address = url
+            contents = BasePage(address).get_contents()
+            print("Getting JSON contents for url:{}".format(address))
 
         if not contents:
             PersistentInfo.error("Could not load JSON {} - no data".format(address))
@@ -61,6 +71,50 @@ class BaseSourceJsonPlugin(SourceGenericPlugin):
             i.author = c.admin_user
 
             i.import_from_link(prop)
+
+            ## we do not return any found links, because instance importer imports them directly
+
+    def get_all_sources(self, sources):
+
+        address = self.get_address()
+
+        while True:
+            i = InstanceImporter(address)
+            address = i.get_next_page_link()
+            print("Obtaining address {}".format(address))
+
+            if not address:
+                return sources
+
+            json = self.get_json(address)
+
+            if not json or len(json) == 0:
+                return sources
+
+            print("Obtained json {}".format(json))
+
+            if "sources" in json:
+                new_sources = json["sources"]
+
+                if len(new_sources) == 0:
+                    return sources
+
+                sources.extend(new_sources)
+            else:
+                PersistentInfo.error("No sources")
+                return sources
+
+    def get_links_from_sources(self, sources):
+        c = Configuration.get_object().config_entry
+
+        for index, source_prop in enumerate(sources):
+            i = InstanceImporter()
+            # TODO use configured author
+            i.author = c.admin_user
+
+            i.import_from_source(source_prop, instance_import=True)
+
+            self.get_links_from_source(source_prop)
 
             ## we do not return any found links, because instance importer imports them directly
 
@@ -95,7 +149,7 @@ class BaseSourceJsonPlugin(SourceGenericPlugin):
         @return list of entries JSONs
         """
         recent_url = self.get_entries_recent_url(source_json)
-        print("Recent url:{}".format(recent_url))
+        print("Getting recent link list from url:{}".format(recent_url))
         recent_entries_list_contents = BasePage(recent_url).get_contents()
 
         if not recent_entries_list_contents:
@@ -109,6 +163,9 @@ class BaseSourceJsonPlugin(SourceGenericPlugin):
             PersistentInfo.error("Could not read recent entries JSON {}\n{}".format(recent_entries_list_contents, str(e)))
 
         if recent_entries_json:
+            if "links" not in recent_entries_json:
+                return
+
             for recent_entry in recent_entries_json["links"]:
                 yield recent_entry
 

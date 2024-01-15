@@ -78,7 +78,7 @@ class DomainTest(WebPageDisabled, TestCase):
         LinkDataController.objects.all().delete()
         DomainsController.objects.all().delete()
 
-        DomainsController.objects.create(domain = "waiterrant.blogspot.com")
+        DomainsController.objects.create(domain="waiterrant.blogspot.com")
 
         DomainsController.create_missing_entries()
 

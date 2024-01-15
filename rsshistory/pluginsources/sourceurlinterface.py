@@ -62,9 +62,16 @@ class SourceUrlInterface(object):
     def get_props_from_json(self, url, p):
         j = JsonPage(p.url, p.get_contents())
 
-        if "source" not in j.json_obj:
+        if "source" in j.json_obj:
+            return self.get_props_from_json_source(url, p, j)
+
+        elif "sources" in j.json_obj:
+            return self.get_props_from_json_sources(url, p, j)
+
+        else:
             return self.get_props_from_page(p)
 
+    def get_props_from_json_source(self, url, p, j):
         source_obj = j.json_obj["source"]
 
         data = {}
@@ -82,6 +89,16 @@ class SourceUrlInterface(object):
             data["language"] = source_obj["language"]
         if "favicon" in source_obj:
             data["favicon"] = source_obj["favicon"]
+
+        return data
+
+    def get_props_from_json_sources(self, url, p, j):
+        source_obj = j.json_obj["sources"]
+
+        data = {}
+        data["source_type"] = SourceDataModel.SOURCE_TYPE_JSON
+        data["url"] = url
+        data["title"] = "Instance Proxy"
 
         return data
 

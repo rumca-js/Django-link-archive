@@ -55,16 +55,12 @@ class BackgroundJobControllerTest(TestCase):
 
     def test_get_job_priority(self):
         self.assertEqual(
-            BackgroundJobController.get_job_priority(
-                BackgroundJob.JOB_PROCESS_SOURCE
-            ),
+            BackgroundJobController.get_job_priority(BackgroundJob.JOB_PROCESS_SOURCE),
             0,
         )
 
         self.assertEqual(
-            BackgroundJobController.get_job_priority(
-                BackgroundJob.JOB_LINK_ADD
-            ),
+            BackgroundJobController.get_job_priority(BackgroundJob.JOB_LINK_ADD),
             1,
         )
 

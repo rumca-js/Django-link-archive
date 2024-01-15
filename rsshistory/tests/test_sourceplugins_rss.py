@@ -49,6 +49,7 @@ class BaseRssPluginTest(WebPageDisabled, TestCase):
         props = list(props)
 
         self.assertEqual(len(props), 13)
+        self.assertEqual(props[0]["source"], "https://youtube.com/channel/samtime/rss.xml")
 
     def test_get_link_props_use_all_data(self):
         config = Configuration.get_object().config_entry
@@ -61,6 +62,7 @@ class BaseRssPluginTest(WebPageDisabled, TestCase):
         props = list(props)
 
         self.assertEqual(len(props), 13)
+        self.assertEqual(props[0]["source"], "https://youtube.com/channel/samtime/rss.xml")
 
     def test_get_link_props_use_clean_page_info(self):
         config = Configuration.get_object().config_entry
@@ -73,3 +75,4 @@ class BaseRssPluginTest(WebPageDisabled, TestCase):
         props = list(props)
 
         self.assertEqual(len(props), 13)
+        self.assertEqual(props[0]["source"], "https://youtube.com/channel/samtime/rss.xml")

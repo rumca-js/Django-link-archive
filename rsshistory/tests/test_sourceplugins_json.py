@@ -13,7 +13,7 @@ class BaseJsonPluginTest(WebPageDisabled, TestCase):
 
         self.disable_web_pages()
 
-    def test_get_link_props_sources(self):
+    def test_get_link_props_source(self):
         LinkDataController.objects.all().delete()
 
         self.source_obj = SourceDataController.objects.create(
@@ -34,6 +34,7 @@ class BaseJsonPluginTest(WebPageDisabled, TestCase):
         entries = LinkDataController.objects.filter(link = json_obj["links"][0]["link"])
 
         self.assertEqual(entries.count(), 1)
+        self.assertEqual(entries[0].source, "https://www.lemonde.fr/en/rss/une.xml")
 
     def test_get_link_props_links(self):
         LinkDataController.objects.all().delete()
@@ -56,3 +57,36 @@ class BaseJsonPluginTest(WebPageDisabled, TestCase):
         entries = LinkDataController.objects.filter(link = json_obj["links"][0]["link"])
 
         self.assertEqual(entries.count(), 1)
+        self.assertEqual(entries[0].source, "https://www.lemonde.fr/en/rss/une.xml")
+
+    def test_get_link_props_sources(self):
+        LinkDataController.objects.all().delete()
+        SourceDataController.objects.all().delete()
+
+        self.source_obj = SourceDataController.objects.create(
+            url="https://instance.com/apps/rsshistory/sources-json",
+            title="RSS history instance",
+            category="No",
+            subcategory="No",
+            export_to_cms=True,
+        )
+
+        plugin = BaseSourceJsonPlugin(self.source_obj.id)
+        props = plugin.get_link_props()
+
+        sources = SourceDataController.objects.all().order_by("-on_hold")
+        for source in sources:
+            print("Enabled source:{}".format(source.url))
+
+        # 3 imported, 1 created here in test
+        self.assertEqual(sources.count(), 3+1)
+
+        self.assertEqual(sources[0].on_hold, True)
+        self.assertEqual(sources[1].on_hold, True)
+        self.assertEqual(sources[2].on_hold, True)
+
+        self.assertEqual(sources[3].on_hold, False)
+
+        entries = LinkDataController.objects.all()
+        self.assertEqual(entries.count(), 3)
+

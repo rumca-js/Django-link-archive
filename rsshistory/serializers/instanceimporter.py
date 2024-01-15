@@ -6,6 +6,7 @@ from ..controllers import (
     SourceDataController,
     SourceDataController,
     LinkDataBuilder,
+    SourceDataBuilder,
 )
 from ..apps import LinkDatabase
 from ..configuration import Configuration
@@ -120,7 +121,6 @@ class InstanceImporter(object):
             self.import_from_source(source_data)
 
     def import_from_link(self, json_data):
-        LinkDatabase.info("Import from link")
 
         c = Configuration.get_object().config_entry
 
@@ -130,6 +130,7 @@ class InstanceImporter(object):
         if entries.count() == 0:
             # This instance can have their own settings for import, may decide what is
             # accepted and not. Let the builder deal with it
+            LinkDatabase.info("Importing link:{}".format(clean_data["link"]))
             LinkDataBuilder(link_data=clean_data)
         else:
             entry = entries[0]
@@ -144,17 +145,30 @@ class InstanceImporter(object):
             if updated:
                 entry.save()
 
-            entry.tag(link_data["tags"], self.author)
-            if link_data["vote"] > 0:
-                entry.vote(link_data["vote"])
+            if "tags" in clean_data:
+                entry.tag(clean_data["tags"], self.author)
 
-    def import_from_source(self, json_data):
+            if "vote" in clean_data:
+                if clean_data["vote"] > 0:
+                    entry.vote(clean_data["vote"])
+
+    def import_from_source(self, json_data, instance_import = False):
         LinkDatabase.info("Import from source")
 
         clean_data = SourceDataController.get_clean_data(json_data)
-        if SourceDataController.objects.filter(url=clean_data["url"]).count() == 0:
+
+        sources = SourceDataController.objects.filter(url=clean_data["url"])
+        if sources.count() == 0:
             clean_data = self.drop_source_instance_internal_data(clean_data)
+            if instance_import:
+                clean_data["on_hold"] = True
             SourceDataBuilder.add_from_props(clean_data)
+        else:
+            if instance_import:
+                source = sources[0]
+                if source.on_hold != (not clean_data["on_hold"]):
+                    source.on_hold = not clean_data["on_hold"]
+                    source.save()
 
     def drop_entry_instance_internal_data(self, clean_data):
         if "domain_obj" in clean_data:

@@ -49,7 +49,7 @@ class SourceUrlInterfaceTest(WebPageDisabled, TestCase):
         self.assertEqual(props["title"], "LinkedIn Page title")
         self.assertEqual(props["source_type"], SourceDataModel.SOURCE_TYPE_PARSE)
 
-    def test_json(self):
+    def test_json_source(self):
         url = SourceUrlInterface("https://instance.com/apps/rsshistory/source-json/100")
         props = url.get_props()
 
@@ -57,5 +57,16 @@ class SourceUrlInterfaceTest(WebPageDisabled, TestCase):
         self.assertTrue("url" in props)
         self.assertTrue("title" in props)
 
-        self.assertEqual(props["title"], "Source100")
+        self.assertEqual(props["title"], "Source100 - Proxy")
+        self.assertEqual(props["source_type"], SourceDataModel.SOURCE_TYPE_JSON)
+
+    def test_json_sources(self):
+        url = SourceUrlInterface("https://instance.com/apps/rsshistory/sources-json")
+        props = url.get_props()
+
+        self.assertTrue(props)
+        self.assertTrue("url" in props)
+        self.assertTrue("title" in props)
+
+        self.assertEqual(props["title"], "Instance Proxy")
         self.assertEqual(props["source_type"], SourceDataModel.SOURCE_TYPE_JSON)
