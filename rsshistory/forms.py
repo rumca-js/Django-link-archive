@@ -307,6 +307,7 @@ class SourceForm(forms.ModelForm):
         super(SourceForm, self).__init__(*args, **kwargs)
         # TODO thing below should be handled by model properties
         self.fields["favicon"].required = False
+        self.fields["proxy_location"].required = False
 
         names = SourceControllerBuilder.get_plugin_names()
         self.fields["source_type"].widget = forms.Select(choices=self.to_choices(names))
@@ -543,7 +544,7 @@ class BasicEntryChoiceForm(forms.Form):
     def create(self, sources):
         # how to unpack dynamic forms
         # https://stackoverflow.com/questions/60393884/how-to-pass-choices-dynamically-into-a-django-form
-        condition1 = Q(on_hold=False) & Q(proxy_location = "")
+        condition1 = Q(on_hold=False) # & Q(proxy_location = "")
         condition2 = Q(on_hold=True) & ~Q(proxy_location = "")
         self.sources = SourceDataController.objects.filter(condition1 | condition2)
 
