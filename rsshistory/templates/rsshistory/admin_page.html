@@ -11,17 +11,31 @@
 {% if user.is_staff %}
     <div>
         <h1>Managment links</h1>
-        <a href="{% url 'rsshistory:system-status' %}" title="Displays status" class="simplebutton">Status</a>
-        <a href="{% url 'rsshistory:configuration' %}" title="Instance configuration" class="simplebutton">Configuration</a>
-        <a href="{% url 'rsshistory:backgroundjobs' %}" title="View background jobs" class="simplebutton">Background Jobs</a>
-        <a href="{% url 'rsshistory:logs' %}" title="View all logs" class="simplebutton">Logs</a>
-        <a href="{% url 'rsshistory:show-page-props' %}" title="Shows page properties" class="simplebutton">Show page properties</a>
-        <a href="/admin" title="User administration" class="simplebutton">User admin</a>
+        <a href="{% url 'rsshistory:system-status' %}" title="Displays status" class="simplebutton">
+            <img src="{% static 'rsshistory/icons/icons8-heart-monitor-100.png' %}" class="content-icon" />
+            Status</a>
+        <a href="{% url 'rsshistory:configuration' %}" title="Instance configuration" class="simplebutton">
+            <img src="{% static 'rsshistory/icons/icons8-configuration-67.png' %}" class="content-icon" />
+            Configuration</a>
+        <a href="{% url 'rsshistory:backgroundjobs' %}" title="View background jobs" class="simplebutton">
+            <img src="{% static 'rsshistory/icons/icons8-schedule-100.png' %}" class="content-icon" />
+            Background Jobs</a>
+        <a href="{% url 'rsshistory:logs' %}" title="View all logs" class="simplebutton">
+            <img src="{% static 'rsshistory/icons/icons8-paper-64.png' %}" class="content-icon" />
+            Logs</a>
+        <a href="{% url 'rsshistory:show-page-props' %}" title="Shows page properties" class="simplebutton">
+            <img src="{% static 'rsshistory/icons/icons8-view-details-100.png' %}" class="content-icon" />
+            Page</a>
+        <a href="/admin" title="User administration" class="simplebutton">
+            <img src="{% static 'rsshistory/icons/account.png' %}" class="content-icon" />
+            User admin</a>
     </div>
 
     <div>
         <h1>Import / export</h1>
-        <a href="{% url 'rsshistory:data-exports' %}" title="Configured Data Exports" class="simplebutton">Configured Data Exports</a>
+        <a href="{% url 'rsshistory:data-exports' %}" title="Configured Data Exports" class="simplebutton">
+            <img src="{% static 'rsshistory/icons/icons8-database-export-100.png' %}" class="content-icon" />
+            Data Exports</a>
         <a href="{% url 'rsshistory:import-from-instance' %}" title="Import from another link archive instance" class="simplebutton">Import from instance</a>
         <a href="{% url 'rsshistory:write-bookmarks' %}" class="simplebutton">Write bookmarks</a>
         <a href="{% url 'rsshistory:write-daily-data-form' %}" class="simplebutton">Write daily data</a>

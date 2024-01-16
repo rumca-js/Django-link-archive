@@ -582,6 +582,14 @@ class ContentInterface(DomainAwarePage):
 
         return props
 
+    def guess_date(self):
+        content = self.get_contents()
+        try:
+            parsed_date = parser.parse(content)
+            return parsed_date.strftime("%Y-%m-%d")
+        except ValueError:
+            return None
+
 
 class DefaultContentPage(ContentInterface):
     def __init__(self, url, contents=None):
@@ -1258,26 +1266,12 @@ class HtmlPage(ContentInterface):
         if not self.contents:
             return []
 
-        rss_finds = self.soup.find_all("link", attrs={"type": "application/rss+xml"})
+        rss_links = self.find_feed_links("application/rss+xml") + self.find_feed_links("application/atom+xml") + \
+                    self.find_feed_links("application/rss+xml;charset=UTF-8")
 
-        rss_links = []
-        for rss_find in rss_finds:
-            if rss_find and rss_find.has_attr("href"):
-                rss_links.append(rss_find["href"])
-
-        rss_finds = self.soup.find_all(
-            "link", attrs={"type": "application/rss+xml;charset=UTF-8"}
-        )
-
-        for rss_find in rss_finds:
-            if rss_find and rss_find.has_attr("href"):
-                rss_links.append(rss_find["href"])
-
-        if len(rss_links) == 0:
+        if not rss_links:
             links = self.get_links_inner()
-            for link in links:
-                if link.find("feed") >= 0 or link.find("rss") >= 0:
-                    rss_links.append(link)
+            rss_links.extend(link for link in links if "feed" in link or "rss" in link or "atom" in link)
 
         feed_url = self.url + "/feed"
         if full_check and feed_url not in rss_links:
@@ -1285,20 +1279,16 @@ class HtmlPage(ContentInterface):
             try:
                 parser = RssPage(lucky_shot)
                 feed = parser.parse()
-                if len(feed.entries) > 0:
+                if feed.entries:
                     rss_links.append(lucky_shot)
             except Exception as e:
-                LinkDatabase.info(
-                    "WebTools exception during rss processing {}".format(str(e))
-                )
+                LinkDatabase.info("WebTools exception during rss processing {}".format(str(e)))
 
-        if len(rss_links) > 0:
-            rss_urls = []
-            for rss_url in rss_links:
-                rss_url = BasePage.get_url_full(self.url, rss_url)
-                rss_urls.append(rss_url)
-            return rss_urls
-        return []
+        return [BasePage.get_url_full(self.url, rss_url) for rss_url in rss_links] if rss_links else []
+
+    def find_feed_links(self, feed_type):
+        feed_finds = self.soup.find_all("link", attrs={"type": feed_type})
+        return [feed_find["href"] for feed_find in feed_finds if feed_find and feed_find.has_attr("href")]
 
     @lazy_load_content
     def get_links(self):

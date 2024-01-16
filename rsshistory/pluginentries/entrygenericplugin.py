@@ -102,13 +102,16 @@ class EntryGenericPlugin(object):
                 buttons.append(
                     EntryButton(
                         self.user,
-                        "Vote",
+                        "",
                         reverse(
                             "{}:entry-vote".format(LinkDatabase.name),
                             args=[self.entry.id],
                         ),
                         ConfigurationEntry.ACCESS_TYPE_OWNER,
                         "Vote on entry",
+                        static(
+                            "{}/icons/icons8-rate-100.png".format(LinkDatabase.name)
+                        ),
                     ),
                 )
 
@@ -129,14 +132,14 @@ class EntryGenericPlugin(object):
         buttons.append(
             EntryButton(
                 self.user,
-                "Page Props",
+                "",
                 reverse(
                     "{}:show-page-props".format(LinkDatabase.name),
                 )
                 + "?page={}".format(self.entry.link),
                 ConfigurationEntry.ACCESS_TYPE_OWNER,
                 "Shows page properties",
-                static("{}/icons/icons8-download-96.png".format(LinkDatabase.name)),
+                static("{}/icons/icons8-view-details-100.png".format(LinkDatabase.name)),
             ),
         )
 
