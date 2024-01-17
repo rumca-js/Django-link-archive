@@ -36,6 +36,13 @@ from dateutil import parser
 from .models import PersistentInfo
 from .apps import LinkDatabase
 
+try:
+    from selenium import webdriver
+    from selenium.webdriver.chrome.service import Service
+    from selenium.common.exceptions import TimeoutException
+except Exception as E:
+    print("Cannot include selenium")
+
 
 URL_TYPE_RSS = "rss"
 URL_TYPE_CSS = "css"
@@ -59,6 +66,18 @@ def lazy_load_content(func):
     return wrapper
 
 
+class SeleniumResponseObject(object):
+    def __init__(self, url, contents):
+        self.status_code = 200
+        self.apparent_encoding = "utf-8"
+        self.encoding = "utf-8"
+
+        self.content = contents
+        self.text = contents
+
+        self.headers = {}
+
+
 class BasePage(object):
     """
     Should not contain any HTML/RSS content processing
@@ -69,8 +88,27 @@ class BasePage(object):
     get_contents_function = None
     ssl_verify = True
 
-    def __init__(self, url, contents=None):
-        self.url = url
+    def __init__(self, url, contents=None, use_selenium=False, page_obj=None):
+        """
+        @param url URL
+        @param contents URL page contents
+        @param use_selenium decides if selenium is used
+        @param page_obj All settings are used from page object, with page contents
+        """
+        if page_obj:
+            self.url = page_obj.url
+            self.contents = page_obj.contents
+            self.use_selenium = page_obj.use_selenium
+            self.status_code = page_obj.status_code
+            self.dead = page_obj.dead
+            self.respone_headers = page_obj.respone_headers
+        else:
+            self.url = url
+            self.use_selenium = use_selenium
+            self.respone_headers = {}
+
+            # Flag to not retry same contents requests for things we already know are dead
+            self.dead = False
 
         if self.url.find("https") >= 0:
             self.protocol = "https"
@@ -85,11 +123,6 @@ class BasePage(object):
             self.status_code = 200
         else:
             self.status_code = 0
-
-        self.respone_headers = {}
-
-        # Flag to not retry same contents requests for things we already know are dead
-        self.dead = False
 
         if BasePage.get_contents_function is None:
             self.get_contents_function = self.get_contents_internal
@@ -212,6 +245,7 @@ class BasePage(object):
 
         try:
             r = self.get_contents_function(self.url, headers=hdr, timeout=10)
+
             self.status_code = r.status_code
             self.respone_headers = r.headers
 
@@ -224,7 +258,6 @@ class BasePage(object):
             r.encoding = r.apparent_encoding
 
             self.contents = r.text
-            self.contents_bytes = r.content
 
             self.process_contents()
 
@@ -237,11 +270,18 @@ class BasePage(object):
             error_text = traceback.format_exc()
 
             PersistentInfo.error(
-                "Page: Error while reading page:{};Error:{}".format(self.url, str(e))
+                "Page: Error while reading page:{};Error:{}\n{}".format(self.url, str(e), error_text)
             )
 
     def get_contents_internal(self, url, headers, timeout):
         LinkDatabase.info("Page: Requesting page: {}".format(url))
+
+        if not self.use_selenium:
+            return self.get_contents_via_requests(self.url, headers=headers, timeout=10)
+        else:
+            return self.get_contents_via_selenium_chrome(self.url, headers=headers, timeout=10)
+
+    def get_contents_via_requests(self, url, headers, timeout):
 
         """
         This is program is web scraper. If we turn verify, then we discard some of pages.
@@ -257,6 +297,34 @@ class BasePage(object):
         )
 
         return request_result
+
+    def get_contents_via_selenium_chrome(self, url, headers, timeout):
+        """
+        We cannot use one browser instance for our app. The app can contain multiple threads
+        For simplicity, each call starts it's own browser.
+        It could be optimized in the future.
+        """
+        service = Service(executable_path='/usr/bin/chromedriver')
+        options = webdriver.ChromeOptions()
+        options.add_argument("--headless")
+
+        driver = webdriver.Chrome(service=service, options=options)
+
+        # add 10 seconds for start of browser, etc.
+        selenium_timeout = timeout + 10
+
+        driver.set_page_load_timeout(selenium_timeout)
+
+        try:
+            driver.get(url)
+        except TimeoutException:
+            PersistentInfo.error("Timeout when reading page. {}".format(selenium_timeout))
+
+        html_content = driver.page_source
+
+        driver.quit()
+
+        return SeleniumResponseObject(url, html_content)
 
     def is_redirect(self):
         return self.status_code > 300 and self.status_code < 310
@@ -355,8 +423,8 @@ class BasePage(object):
 
 
 class DomainAwarePage(BasePage):
-    def __init__(self, url, contents=None):
-        super().__init__(url, contents)
+    def __init__(self, url, contents=None, use_selenium=False, page_obj=None):
+        super().__init__(url, contents=contents, use_selenium=use_selenium, page_obj=page_obj)
 
     def is_mainstream(self):
         dom = self.get_domain_only()
@@ -540,8 +608,8 @@ class DomainAwarePage(BasePage):
 
 
 class ContentInterface(DomainAwarePage):
-    def __init__(self, url, contents=None):
-        super().__init__(url, contents)
+    def __init__(self, url, contents=None, use_selenium=False, page_obj=None):
+        super().__init__(url, contents=contents, use_selenium=use_selenium, page_obj=page_obj)
 
     def get_title(self):
         raise NotImplementedError
@@ -583,17 +651,101 @@ class ContentInterface(DomainAwarePage):
         return props
 
     def guess_date(self):
+        """
+        This is ugly, but dateutil.parser does not work. May generate exceptions.
+        Ugly is better than not working.
+
+        Supported formats:
+         - Jan. 15, 2024
+         - Jan 15, 2024
+         - January 15, 2024
+         - 15 January 2024 14:48 UTC
+        """
+        from time import strptime
+        from .dateutils import DateUtils
+
         content = self.get_contents()
-        try:
-            parsed_date = parser.parse(content)
-            return parsed_date.strftime("%Y-%m-%d")
-        except ValueError:
-            return None
+        if not content:
+            return
+
+        # searching will be case insensitive
+        content = content.lower()
+
+        # Get the current year
+        current_year = datetime.now().year
+
+        # Define regular expressions
+        current_year_pattern = re.compile(rf"\b{current_year}\b")
+        four_digit_number_pattern = re.compile(r"\b\d{4}\b")
+        date_pattern = re.compile(rf"\b(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\.?\s*(\d+)\b")
+        full_date_pattern = re.compile(r"(\d{4})-(\d{1,2})-(\d{1,2})")
+
+        # Attempt to find the current year in the string
+        match_current_year = current_year_pattern.search(content)
+
+        match_date = None
+        match_full_date = None
+        year = None
+        scope = None
+
+        if match_current_year:
+            year = int(current_year)
+            # Limit the scope to a specific portion before and after year
+            scope = content[max(0, match_current_year.start() - 15):match_current_year.start() + 20]
+        else:
+            match_four_digit_number = four_digit_number_pattern.search(content)
+            if match_four_digit_number:
+                year = int(match_four_digit_number.group(0))
+                # Limit the scope to a specific portion before and after year
+                scope = content[max(0, match_four_digit_number.start() - 15):match_four_digit_number.start() + 20]
+
+        if scope:
+            match_date = date_pattern.search(scope)
+            match_full_date = full_date_pattern.search(scope)
+
+        date_object = None
+
+        # If a month and day are found, construct a datetime object with year, month, and day
+        if match_date:
+            month, day = match_date.groups()
+
+            str_month = None
+
+            try:
+                str_month = strptime(month,'%b').tm_mon
+                str_month = str(str_month)
+            except Exception as E:
+                pass
+
+            if not str_month:
+                try:
+                    str_month = strptime(month,'%B').tm_mon
+                    str_month = str(str_month)
+                except Exception as E:
+                    pass
+
+            date_object = datetime.strptime(f"{year}-{str_month.zfill(2)}-{day.zfill(2)}", "%Y-%m-%d")
+        elif match_full_date:
+            year, month, day = match_full_date.groups()
+            date_object = datetime.strptime(f"{year}-{month.zfill(2)}-{day.zfill(2)}", "%Y-%m-%d")
+        elif year:
+            if year == current_year:
+                date_object = datetime.now()
+            else:
+                # If only the year is found, construct a datetime object with year
+                date_object = datetime(year, 1, 1)
+
+        # For other scenario to not provide any value
+
+        if date_object:
+            date_object = DateUtils.to_utc_date(date_object)
+
+        return date_object
 
 
 class DefaultContentPage(ContentInterface):
-    def __init__(self, url, contents=None):
-        super().__init__(url, contents)
+    def __init__(self, url, contents=None, use_selenium=False, page_obj=None):
+        super().__init__(url, contents=contents, use_selenium=use_selenium, page_obj=page_obj)
 
     def get_title(self):
         return self.url
@@ -621,8 +773,8 @@ class DefaultContentPage(ContentInterface):
 
 
 class JsonPage(ContentInterface):
-    def __init__(self, url, contents=None):
-        super().__init__(url, contents)
+    def __init__(self, url, contents=None, use_selenium=False, page_obj=None):
+        super().__init__(url, contents=contents, use_selenium=use_selenium, page_obj=page_obj)
 
         self.json_obj = None
         try:
@@ -674,8 +826,8 @@ class RssPage(ContentInterface):
     which allows to define timeouts.
     """
 
-    def __init__(self, url, contents=None):
-        super().__init__(url, contents)
+    def __init__(self, url, contents=None, use_selenium=False, page_obj=None):
+        super().__init__(url, contents=contents, use_selenium=use_selenium, page_obj=page_obj)
         self.allow_adding_with_current_time = True
         self.default_entry_timestamp = None
         self.feed = None
@@ -788,8 +940,8 @@ class RssPage(ContentInterface):
         if hasattr(feed_entry, "published"):
             try:
                 dt = parser.parse(feed_entry.published)
-
                 return DateUtils.to_utc_date(dt)
+
             except Exception as e:
                 PersistentInfo.error(
                     "Rss parser datetime invalid feed datetime:{}; Exc:{} {}\n{}".format(
@@ -913,8 +1065,8 @@ class ContentLinkParser(BasePage):
     TODO filter also html from non html
     """
 
-    def __init__(self, url, contents=None):
-        super().__init__(url, contents)
+    def __init__(self, url, contents=None, use_selenium=False, page_obj=None):
+        super().__init__(url, contents=contents, use_selenium=use_selenium, page_obj=page_obj)
         self.url = self.get_clean_url()
 
     def get_contents(self):
@@ -1050,8 +1202,8 @@ class HtmlPage(ContentInterface):
     href="https://images/facebook.png"
     """
 
-    def __init__(self, url, contents=None):
-        super().__init__(url, contents)
+    def __init__(self, url, contents=None, use_selenium=False, page_obj=None):
+        super().__init__(url, contents=contents, use_selenium=use_selenium, page_obj=page_obj)
         self.robots_contents = None
 
     def process_contents(self):
@@ -1079,13 +1231,20 @@ class HtmlPage(ContentInterface):
             return find_element["content"]
 
     @lazy_load_content
+    def get_property_field(self, name):
+        if not self.contents:
+            return None
+
+        field_find = self.soup.find("meta", property="{}".format(name))
+        if field_find and field_find.has_attr("content"):
+            return field_find["content"]
+
+    @lazy_load_content
     def get_og_field(self, name):
         if not self.contents:
             return None
 
-        field_find = self.soup.find("meta", property="og:{}".format(name))
-        if field_find and field_find.has_attr("content"):
-            return field_find["content"]
+        return self.get_property_field("og:{}".format(name))
 
     @lazy_load_content
     def get_title(self):
@@ -1110,6 +1269,15 @@ class HtmlPage(ContentInterface):
 
         return title
         # title = html.unescape(title)
+
+    @lazy_load_content
+    def get_date_published(self):
+        from .dateutils import DateUtils
+
+        date_str = self.get_property_field("article:published_time")
+        if date_str:
+            parsed_date = parser.parse(date_str)
+            return DateUtils.to_utc_date(parsed_date)
 
     @lazy_load_content
     def get_title_head(self):
@@ -1468,25 +1636,29 @@ class HtmlPage(ContentInterface):
 
 
 class Url(object):
-    def get(url, contents=None, fast_check=True):
+    def get(url, contents=None, fast_check=True, use_selenium=False):
         """
+        @note It is supposed to be more smart. Therefore for walled gardens it will
+        decide about selenium.
+
         @returns Appropriate handler for the link
         """
 
-        p = HtmlPage(url, contents)
+        if use_selenium == False and Url.is_selenium_required(url):
+            use_selenium = True
+
+        p = HtmlPage(url, contents=contents, use_selenium=use_selenium)
 
         if p.is_html(fast_check):
             return p
 
         if p.is_rss(fast_check):
-            return RssPage(url, p.get_contents())
+            return RssPage(url, page_obj = p)
 
         if fast_check == False:
-            contents = p.get_contents()
-            if contents:
-                j = JsonPage(url, contents)
-                if j.is_json():
-                    return j
+            j = JsonPage(url, page_obj = p)
+            if j.is_json():
+                return j
 
         return DefaultContentPage(url, p.get_contents())
 
@@ -1519,6 +1691,14 @@ class Url(object):
 
         return False
 
+    def is_selenium_required(url):
+        if url.find("https://open.spotify.com") >= 0:
+            return True
+        if url.find("https://www.wsj.com") >= 0:
+            return True
+
+        return False
+
 
 class InputContent(object):
     def __init__(self, text):
@@ -1530,6 +1710,8 @@ class InputContent(object):
          - text can contain <a href=" links already
 
         So some links needs to be translated. Some do not.
+
+        @return text with https links changed into real links
         """
         self.text = self.strip_html_attributes()
         self.text = self.linkify("https://")
@@ -1556,6 +1738,9 @@ class InputContent(object):
         return self.text
 
     def linkify(self, protocol="https://"):
+        """
+        @return text with https links changed into real links
+        """
         if self.text.find(protocol) == -1:
             return self.text
 
