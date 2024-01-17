@@ -10,9 +10,10 @@ from ..apps import LinkDatabase
 
 
 class SourceGenericPlugin(HtmlPage):
-    def __init__(self, source_id):
+    def __init__(self, source_id, use_selenium=False):
         self.source_id = source_id
-        super().__init__(self.get_address())
+        self.source = None
+        super().__init__(self.get_address(), use_selenium=use_selenium)
         self.hash = None
 
     def check_for_data(self):
@@ -114,9 +115,12 @@ class SourceGenericPlugin(HtmlPage):
         source.set_operational_info(stop_time, num_entries, total_seconds, hash_value)
 
     def get_source(self):
-        sources = SourceDataController.objects.filter(id=self.source_id)
-        if len(sources) > 0:
-            return sources[0]
+        if self.source is None:
+            sources = SourceDataController.objects.filter(id=self.source_id)
+            if len(sources) > 0:
+                self.source = sources[0]
+
+        return self.source
 
     def get_address(self):
         source = self.get_source()

@@ -6,7 +6,7 @@ import time
 from .sourcegenericplugin import SourceGenericPlugin
 from ..models import PersistentInfo
 from ..controllers import LinkDataController
-from ..webtools import BasePage, HtmlPage
+from ..webtools import BasePage, HtmlPage, Url
 from ..apps import LinkDatabase
 
 
@@ -15,9 +15,19 @@ class BaseParsePlugin(SourceGenericPlugin):
 
     def __init__(self, source_id):
         super().__init__(source_id)
+        self.use_selenium = self.is_selenium_required()
 
     # def get_address(self):
     #    return self.get_source().get_domain()
+
+    def is_selenium_required(self):
+        """
+        Selenium is required for some walled gardens
+        """
+        source = self.get_source()
+        url = source.url
+
+        return Url.is_selenium_required(url)
 
     def is_link_valid(self, address):
         source = self.get_source()

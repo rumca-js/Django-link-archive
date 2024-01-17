@@ -63,6 +63,8 @@
     {%for link in link_outer %}
     <li>Link outer: {{link}} <a href="{{link}}">Link</a></li>
     {%endfor%}
+
+    <li>Selenium: {{page_object.use_selenium}}</li>
 </ul>
 
 {% if user_config.show_icons %}

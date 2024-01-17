@@ -16,9 +16,9 @@ class SourceUrlInterface(object):
         if self.url.endswith("/"):
             self.url = self.url[:-1]
 
-    def get_props(self, input_props=None):
+    def get_props(self, input_props=None, use_selenium=False):
         fast_check = False
-        p = Url.get(self.url, fast_check=fast_check)
+        p = Url.get(self.url, fast_check=fast_check, use_selenium=use_selenium)
 
         if p.is_rss(fast_check=fast_check):
             return self.get_props_from_rss(self.url, p)

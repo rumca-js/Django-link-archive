@@ -227,8 +227,9 @@ def show_page_props(request):
         from ..pluginentries.entryurlinterface import UrlHandler
 
         fast_check = False
+        use_selenium = False
 
-        page = UrlHandler.get(page_link, fast_check=fast_check)
+        page = UrlHandler.get(page_link, fast_check=fast_check, use_selenium=use_selenium)
 
         p.context["page_type"] = str(type(page))
         p.context["page_link"] = page_link

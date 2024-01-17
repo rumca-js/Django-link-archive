@@ -1,4 +1,11 @@
+import atexit
 from django.apps import AppConfig
+
+
+def cleanup_on_exit():
+    # Your cleanup code here
+    # print("App Cleanup")
+    pass
 
 
 class LinkDatabase(AppConfig):
@@ -6,7 +13,8 @@ class LinkDatabase(AppConfig):
     verbose_name = "Personal link database"
 
     def ready(self):
-        pass
+        # print("App Ready {}".format(LinkDatabase.name))
+        atexit.register(cleanup_on_exit)
 
     def info(message):
         print("[{}] {}".format(LinkDatabase.name, message))

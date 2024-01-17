@@ -21,13 +21,16 @@ class EntryUrlInterface(object):
     Provides interface between Entry and URL properties.
     """
 
-    def __init__(self, url, fast_check=True):
+    def __init__(self, url, fast_check=True, use_selenium=False):
         self.url = url
 
         if self.url.endswith("/"):
             self.url = self.url[:-1]
 
-        self.p = UrlHandler.get(self.url, fast_check=fast_check)
+        self.p = UrlHandler.get(self.url, fast_check=fast_check, use_selenium=use_selenium)
+
+    def is_selenium_required(self):
+        return Url.is_selenium_required(self.url)
 
     def get_props(self, input_props=None, source_obj=None):
         if not input_props:
@@ -80,9 +83,6 @@ class EntryUrlInterface(object):
 
         if not self.is_property_set(input_props, "source") and source_obj:
             input_props["source"] = source_obj.url
-
-        if not self.is_property_set(input_props, "source_obj") and not source_obj:
-            input_props["source"] = self.url
 
         if type(p) is UrlHandler.youtube_video_handler:
             if p.get_video_code():
@@ -173,7 +173,15 @@ class EntryUrlInterface(object):
             input_props["language"] = language
 
         if not self.is_property_set(input_props, "date_published"):
-            input_props["date_published"] = DateUtils.get_datetime_now_utc()
+            date = p.get_date_published()
+            if date:
+                input_props["date_published"] = date
+            else:
+                date = p.guess_date()
+                if date:
+                    input_props["date_published"] = date
+                else:
+                    input_props["date_published"] = DateUtils.get_datetime_now_utc()
 
         if not self.is_property_set(input_props, "thumbnail"):
             input_props["thumbnail"] = p.get_thumbnail()
@@ -281,7 +289,7 @@ class UrlHandler(object):
     odysee_video_handler = OdyseeVideoHandler
     odysee_channel_handler = OdyseeChannelHandler
 
-    def get(url, fast_check=True):
+    def get(url, fast_check=True, use_selenium=False):
         url = UrlHandler.get_protololless(url)
         if not url:
             return
@@ -316,8 +324,7 @@ class UrlHandler(object):
             return UrlHandler.odysee_channel_handler(url)
 
         from ..webtools import Url
-
-        return Url.get(url, fast_check=fast_check)
+        return Url.get(url, fast_check=fast_check, use_selenium=use_selenium)
 
     def get_protololless(url):
         if url.find("https://") >= 0:
