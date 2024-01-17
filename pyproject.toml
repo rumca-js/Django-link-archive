@@ -24,6 +24,7 @@ tldextract = "^3.4.4"
 sympy = "^1.12"
 beautifulsoup4 = "^4.12.2"
 spacy = "^3.7.2"
+selenium="*"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.3.0"
