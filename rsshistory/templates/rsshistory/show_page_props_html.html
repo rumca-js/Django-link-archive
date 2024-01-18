@@ -6,6 +6,9 @@
     <li>Status code: {{status_code}}</li>
     <li>Title: {{title}}</li>
     <li>Description: {{description}}</li>
+    {%if {{page_object.get_date_published}} %}
+    <li>Date published: {{page_object.get_date_published}}</li>
+    {%endfor%}
     <li>Author: {{author}}</li>
     <li>Page Rating: {{page_rating}}. Described by <a href="https://github.com/rumca-js/Django-link-archive">Django link archive Readme</a></li>
     {%if thumbnail %}

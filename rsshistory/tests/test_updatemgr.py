@@ -1,15 +1,11 @@
-from pathlib import Path
-import shutil
-
-from django.test import TestCase
-from django.utils import timezone
-from django.urls import reverse
 
 from ..models import DataExport
 from ..controllers import SourceDataController, LinkDataController
 from ..updatemgr import UpdateManager
 from ..configuration import Configuration
 from ..dateutils import DateUtils
+
+from .fakeinternet import FakeInternetTestCase
 
 
 class BaseRepo(object):
@@ -44,8 +40,10 @@ class RepoTestFactory(object):
         return BaseRepo
 
 
-class UpdateManagerTest(TestCase):
+class UpdateManagerTest(FakeInternetTestCase):
     def setUp(self):
+        self.disable_web_pages()
+
         source_youtube = SourceDataController.objects.create(
             url="https://youtube.com",
             title="YouTube",

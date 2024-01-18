@@ -1,11 +1,12 @@
-from django.test import TestCase
-from django.utils import timezone
-from django.urls import reverse
 
 from ..pluginentries.handlerchannelodysee import OdyseeChannelHandler
+from .fakeinternet import FakeInternetTestCase
 
 
-class OdyseeChannelHandlerTest(TestCase):
+class OdyseeChannelHandlerTest(FakeInternetTestCase):
+    def setUp(self):
+        self.disable_web_pages()
+
     def test_source_input2code_channel(self):
         self.assertEqual(
             OdyseeChannelHandler("https://odysee.com/@samtime:1").get_channel_code(),

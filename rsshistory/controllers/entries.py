@@ -193,7 +193,6 @@ class LinkDataController(LinkDataModel):
         from ..pluginentries.entryurlinterface import EntryUrlInterface
 
         info = EntryUrlInterface(data["link"]).get_props()
-
         if data["link"].find("http://") >= 0:
             data["link"] = data["link"].replace("http://", "https://")
             https_info = EntryUrlInterface(data["link"]).get_props()
@@ -479,14 +478,11 @@ class LinkDataWrapper(object):
     def get_clean_description(link_data):
         import re
 
-        # as per recommendation from @freylis, compile once only
+        # remove any html tags
         CLEANR = re.compile("<.*?>")
-
         cleantext = re.sub(CLEANR, "", link_data["description"])
+
         return cleantext
-        # from bs4 import BeautifulSoup
-        # cleantext = BeautifulSoup(link_data["description"], "lxml").text
-        # return cleantext
 
 
 class LinkDataBuilder(object):
@@ -622,9 +618,7 @@ class LinkDataBuilder(object):
             new_link_data["date_published"] = DateUtils.get_datetime_now_utc()
 
         if new_link_data["description"] != None:
-            new_link_data["description"] = new_link_data["description"][
-                : BaseLinkDataController.get_description_length() - 2
-            ]
+            new_link_data["description"] = LinkDataController.get_description_safe(new_link_data["description"])
 
         LinkDatabase.info("Adding link: {}".format(link_data["link"]))
 

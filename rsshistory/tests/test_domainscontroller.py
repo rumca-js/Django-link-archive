@@ -1,16 +1,10 @@
-from pathlib import Path
-import shutil
-
-from django.test import TestCase
-from django.utils import timezone
-from django.urls import reverse
-
 from ..models import ConfigurationEntry
 from ..controllers import LinkDataController, DomainsController
-from .utilities import WebPageDisabled
+
+from .fakeinternet import FakeInternetTestCase
 
 
-class DomainTest(WebPageDisabled, TestCase):
+class DomainTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 

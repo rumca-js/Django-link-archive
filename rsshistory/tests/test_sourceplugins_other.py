@@ -1,11 +1,8 @@
-from django.test import TestCase
-from django.utils import timezone
-from django.urls import reverse
 
 from ..controllers import SourceDataController
 from ..pluginsources.codeprojectplugin import CodeProjectPlugin
 
-from .utilities import WebPageDisabled
+from .fakeinternet import FakeInternetTestCase
 
 
 webpage_code_project_contents = """
@@ -287,7 +284,7 @@ webpage_code_project_contents = """
 """
 
 
-class CodeProjectPluginTest(WebPageDisabled, TestCase):
+class CodeProjectPluginTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 

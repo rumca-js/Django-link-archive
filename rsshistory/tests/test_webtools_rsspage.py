@@ -1,11 +1,8 @@
-from django.test import TestCase
-from django.utils import timezone
-from django.urls import reverse
-
 from datetime import datetime
 
 from ..webtools import RssPage
-from .utilities import WebPageDisabled
+
+from .fakeinternet import FakeInternetTestCase
 
 
 webpage_rss = """
@@ -46,7 +43,7 @@ webpage_rss = """
 """
 
 
-class RssPageTest(WebPageDisabled, TestCase):
+class RssPageTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 

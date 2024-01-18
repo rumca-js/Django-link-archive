@@ -1,9 +1,7 @@
-from django.test import TestCase
-from django.utils import timezone
-from django.urls import reverse
 
 from ..webtools import BasePage, InputContent
-from .utilities import WebPageDisabled
+
+from .fakeinternet import FakeInternetTestCase
 
 
 webpage_no_lang = """<html>
@@ -70,7 +68,7 @@ webpage_links = """<html>
 """
 
 
-class BasePageTest(WebPageDisabled, TestCase):
+class BasePageTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 
@@ -167,7 +165,7 @@ class BasePageTest(WebPageDisabled, TestCase):
         self.assertEqual(url, "https://images/facebook.com")
 
 
-class InputContentTest(WebPageDisabled, TestCase):
+class InputContentTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 

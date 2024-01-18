@@ -1,8 +1,3 @@
-from django.test import TestCase
-from django.utils import timezone
-from django.urls import reverse
-
-from .utilities import WebPageDisabled
 from ..pluginentries.entrypreviewcontroller import EntryPreviewController
 
 from ..pluginentries.entryyoutubeplugin import EntryYouTubePlugin
@@ -13,8 +8,10 @@ from ..controllers import (
     LinkDataController,
 )
 
+from .fakeinternet import FakeInternetTestCase
 
-class EntryUrlInterfaceTest(WebPageDisabled, TestCase):
+
+class EntryUrlInterfaceTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 

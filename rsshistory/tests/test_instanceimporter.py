@@ -1,15 +1,16 @@
-from pathlib import Path
 import django.utils
-from datetime import timedelta
 
-from django.test import TestCase
 from django.utils import timezone
 from django.urls import reverse
 
 from ..serializers.instanceimporter import InstanceImporter
+from .fakeinternet import FakeInternetTestCase
 
 
-class InstanceImporterTest(TestCase):
+class InstanceImporterTest(FakeInternetTestCase):
+    def setUp(self):
+        self.disable_web_pages()
+
     def test_import_entries_no_page(self):
         importer = InstanceImporter("https://instance.com/entries", "renegat0x0")
         url = importer.get_next_page_link()

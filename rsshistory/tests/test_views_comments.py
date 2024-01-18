@@ -1,5 +1,3 @@
-from django.test import TestCase
-from django.utils import timezone
 from django.urls import reverse
 from django.contrib.auth.models import User
 
@@ -8,10 +6,10 @@ from ..controllers import SourceDataController, LinkDataController, DomainsContr
 from ..dateutils import DateUtils
 from ..models import KeyWords, DataExport, LinkCommentDataModel
 
-from .utilities import WebPageDisabled
+from .fakeinternet import FakeInternetTestCase
 
 
-class CommentsViewsTests(WebPageDisabled, TestCase):
+class CommentsViewsTests(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 

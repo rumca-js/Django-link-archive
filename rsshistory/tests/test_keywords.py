@@ -1,16 +1,17 @@
-from pathlib import Path
-import django.utils
 from datetime import timedelta
 
-from django.test import TestCase
+import django.utils
 from django.utils import timezone
 from django.urls import reverse
 
 from ..models import KeyWords
+from .fakeinternet import FakeInternetTestCase
 
 
-class KeyWordsTest(TestCase):
+class KeyWordsTest(FakeInternetTestCase):
     def setUp(self):
+        self.disable_web_pages()
+
         KeyWords.objects.all().delete()
 
     def is_key(self, keys, key):

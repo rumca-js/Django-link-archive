@@ -1,17 +1,15 @@
-from django.test import TestCase
-from django.utils import timezone
-from django.urls import reverse
 import json
 
 from ..configuration import Configuration
 from ..controllers import SourceDataController, LinkDataController
 from ..pluginsources.sourcejsonplugin import BaseSourceJsonPlugin
-from .utilities import WebPageDisabled, instance_entries_source_100_json,instance_entries_json
+
+from .fakeinternet import FakeInternetTestCase
+from .fakeinternetdata import instance_entries_source_100_json,instance_entries_json
 
 
-class BaseJsonPluginTest(WebPageDisabled, TestCase):
+class BaseJsonPluginTest(FakeInternetTestCase):
     def setUp(self):
-
         self.disable_web_pages()
 
     def test_get_link_props_source(self):

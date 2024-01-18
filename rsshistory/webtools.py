@@ -633,6 +633,14 @@ class ContentInterface(DomainAwarePage):
         raise NotImplementedError
 
     def get_page_rating(self):
+        """
+        Should be in range 0 - 100 (percentage).
+
+        Allows us to extend properties, and not break existing page ratings.
+        """
+        raise NotImplementedError
+
+    def get_date_published(self):
         raise NotImplementedError
 
     def get_properties(self):
@@ -646,6 +654,7 @@ class ContentInterface(DomainAwarePage):
         props["thumbnail"] = self.get_thumbnail()
         props["language"] = self.get_language()
         props["page_rating"] = self.get_page_rating()
+        props["date_published"] = self.get_date_published()
         props["tags"] = self.get_tags()
 
         return props
@@ -768,8 +777,32 @@ class DefaultContentPage(ContentInterface):
     def get_tags(self):
         return None
 
+    def get_date_published(self):
+        return None
+
     def get_page_rating(self):
-        return 0
+        page_rating = 0
+
+        if self.get_title() is not None and str(self.get_title()) != "":
+            page_rating += 10
+
+        if self.get_description() is not None and str(self.get_description()) != "":
+            page_rating += 5
+
+        if self.get_language() is not None and str(self.get_language()) != "":
+            page_rating += 1
+
+        if self.get_thumbnail() is not None and str(self.get_thumbnail()) != "":
+            page_rating += 1
+
+        if self.get_date_published() is not None and str(self.get_date_published()) != "":
+            page_rating += 1
+
+        max_page_rating = 10 + 5 + 1 + 1 + 1
+
+        page_rating = (page_rating * 100) / max_page_rating
+
+        return int(page_rating)
 
 
 class JsonPage(ContentInterface):
@@ -814,6 +847,10 @@ class JsonPage(ContentInterface):
     def get_tags(self):
         if self.json_obj and "tags" in self.json_obj:
             return self.json_obj["tags"]
+
+    def get_date_published(self):
+        if self.json_obj and "date_published" in self.json_obj:
+            return self.json_obj["date_published"]
 
     def get_page_rating(self):
         return 0
@@ -1049,7 +1086,12 @@ class RssPage(ContentInterface):
         if self.get_author():
             rating += 1
 
-        return rating
+        rating = (rating * 100 / self.get_max_page_rating())
+
+        return int(rating)
+
+    def get_max_page_rating(self):
+        return 5 + 5 + 1 + 1 + 1
 
     def get_tags(self):
         return None
@@ -1552,10 +1594,17 @@ class HtmlPage(ContentInterface):
         if self.get_tags() != None:
             rating += 1
 
+        if self.get_date_published() != None:
+            rating += 3
+
         if image_og:
             rating += 5
 
-        return rating
+        rating = (rating * 100 / self.get_max_page_rating())
+        return int(rating)
+
+    def get_max_page_rating(self):
+        return 10 + 10 + 5 + 5 + 10 + 5 + 1 + 1 + 3 + 5
 
     def get_page_rating_title(self, title):
         rating = 0

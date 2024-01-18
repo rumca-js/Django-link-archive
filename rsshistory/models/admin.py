@@ -128,6 +128,15 @@ class ConfigurationEntry(models.Model):
     def get_data_export_path(self):
         return self.data_export_path
 
+    def get_entries_order_by(self):
+        """
+        @note valid example "-date_published, -page_rating"
+        """
+        input_string = self.entries_order_by
+        delimiter = ","
+        result_list = [item.strip() for item in input_string.split(delimiter)]
+        return result_list
+
 
 class UserConfig(models.Model):
     user = models.CharField(max_length=500, unique=True)

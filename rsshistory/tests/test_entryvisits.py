@@ -1,16 +1,13 @@
-from pathlib import Path
-import shutil
-
-from django.test import TestCase
-from django.utils import timezone
-from django.urls import reverse
 
 from ..models import EntryVisits
 from ..controllers import LinkDataController, SourceDataController
+from .fakeinternet import FakeInternetTestCase
 
 
-class EntryVisitsTest(TestCase):
+class EntryVisitsTest(FakeInternetTestCase):
     def setUp(self):
+        self.disable_web_pages()
+
         ob = SourceDataController.objects.create(
             url="https://youtube.com", title="YouTube", category="No", subcategory="No"
         )

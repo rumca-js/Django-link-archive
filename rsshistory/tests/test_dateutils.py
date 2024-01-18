@@ -1,15 +1,14 @@
-from pathlib import Path
-import shutil
-from datetime import datetime, timedelta
-
-from django.test import TestCase
-from django.utils import timezone
-from django.urls import reverse
+from datetime import timedelta
 
 from ..dateutils import DateUtils
 
+from .fakeinternet import FakeInternetTestCase
 
-class DateUtilsTest(TestCase):
+
+class DateUtilsTest(FakeInternetTestCase):
+    def setUp(self):
+        self.disable_web_pages()
+
     def test_get_day_diff(self):
         input_time = DateUtils.get_datetime_now_utc() - timedelta(days=17)
         days = DateUtils.get_day_diff(input_time)

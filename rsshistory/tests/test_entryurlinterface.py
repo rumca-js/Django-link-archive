@@ -1,13 +1,9 @@
-from django.test import TestCase
-from django.utils import timezone
-from django.urls import reverse
-
-from .utilities import WebPageDisabled
 from ..pluginentries.entryurlinterface import EntryUrlInterface
 from ..pluginentries.handlervideoyoutube import YouTubeVideoHandler
+from .fakeinternet import FakeInternetTestCase
 
 
-class EntryUrlInterfaceTest(WebPageDisabled, TestCase):
+class EntryUrlInterfaceTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 

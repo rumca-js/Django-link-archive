@@ -70,7 +70,7 @@ class EntriesSearchListView(generic.ListView):
 
         print("EntriesSearchListView:get_queryset")
         self.query_filter = self.get_filter()
-        objects = self.get_filtered_objects().order_by(config.entries_order_by)
+        objects = self.get_filtered_objects().order_by(*config.get_entries_order_by())
         print("EntriesSearchListView:get_queryset done {}".format(objects.query))
         return objects
 
@@ -428,6 +428,7 @@ class EntryDetailView(generic.DetailView):
 
         context["page_title"] = self.object.title
         context["page_thumbnail"] = self.object.thumbnail
+        context["page_date_published"] = self.object.date_published
         context["object_controller"] = object_controller
 
         m = WaybackMachine()
@@ -580,6 +581,9 @@ def add_simple_entry(request):
                 data["user"] = request.user.username
                 data["bookmarked"] = True
 
+                if "description" in data:
+                    data["description"] = LinkDataController.get_description_safe(data["description"])
+
                 form = EntryForm(initial=data)
                 form.method = "POST"
                 form.action_url = reverse("{}:entry-add".format(LinkDatabase.name))
@@ -659,10 +663,9 @@ def edit_entry(request, pk):
         ob.user = str(request.user.username)
         ob.save()
 
-    limit = BaseLinkDataController.get_description_length() - 2
-    if ob.description and len(ob.description) >= limit:
-        ob.description = ob.description[:limit]
-        ob.save()
+    if ob.description:
+            ob.description = LinkDataController.get_description_safe(ob.description)
+            ob.save()
 
     if request.method == "POST":
         form = EntryForm(request.POST, instance=ob)

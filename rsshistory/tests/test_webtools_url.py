@@ -1,12 +1,10 @@
-from django.test import TestCase
-from django.utils import timezone
-from django.urls import reverse
 
-from .utilities import WebPageDisabled
 from ..webtools import Url
 
+from .fakeinternet import FakeInternetTestCase
 
-class UrlTest(WebPageDisabled, TestCase):
+
+class UrlTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 

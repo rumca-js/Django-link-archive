@@ -1,18 +1,14 @@
-from pathlib import Path
 from datetime import timedelta
-
-from django.test import TestCase
-from django.utils import timezone
-from django.urls import reverse
 
 from ..models import ConfigurationEntry, ArchiveLinkDataModel, LinkTagsDataModel
 from ..controllers import SourceDataController, LinkDataController, DomainsController
 from ..configuration import Configuration
 from ..dateutils import DateUtils
-from .utilities import WebPageDisabled
+
+from .fakeinternet import FakeInternetTestCase
 
 
-class LinkDataControllerTest(WebPageDisabled, TestCase):
+class LinkDataControllerTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 

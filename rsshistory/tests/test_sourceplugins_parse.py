@@ -1,13 +1,10 @@
-from django.test import TestCase
-from django.utils import timezone
-from django.urls import reverse
 
 from ..controllers import SourceDataController
 from ..pluginsources.sourceparseplugin import BaseParsePlugin
 from ..pluginsources.sourcegenerousparserplugin import SourceGenerousParserPlugin
 from ..pluginsources.domainparserplugin import DomainParserPlugin
 
-from .utilities import WebPageDisabled
+from .fakeinternet import FakeInternetTestCase
 
 
 webpage_youtube_contents = """
@@ -29,7 +26,7 @@ webpage_contents = """
 """
 
 
-class SourceParsePluginTest(WebPageDisabled, TestCase):
+class SourceParsePluginTest(FakeInternetTestCase):
     def setUp(self):
         self.source_youtube = SourceDataController.objects.create(
             url="https://youtube.com",
@@ -71,7 +68,7 @@ class SourceParsePluginTest(WebPageDisabled, TestCase):
         self.assertFalse(parse.is_link_valid("https://youtube.com/location/inside.css"))
 
 
-class SourceGenerousParsePluginTest(WebPageDisabled, TestCase):
+class SourceGenerousParsePluginTest(FakeInternetTestCase):
     def setUp(self):
         self.source_youtube = SourceDataController.objects.create(
             url="https://youtube.com",
@@ -113,7 +110,7 @@ class SourceGenerousParsePluginTest(WebPageDisabled, TestCase):
         self.assertFalse(parse.is_link_valid("https://youtube.com/location/inside.css"))
 
 
-class DomainParsePluginTest(WebPageDisabled, TestCase):
+class DomainParsePluginTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 
@@ -150,7 +147,7 @@ class DomainParsePluginTest(WebPageDisabled, TestCase):
         self.assertEqual(props[0]["source"], "https://youtube.com")
 
 
-class BaseParsePluginTest(WebPageDisabled, TestCase):
+class BaseParsePluginTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 

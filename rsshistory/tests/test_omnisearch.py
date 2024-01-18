@@ -1,9 +1,8 @@
-from django.test import TestCase
-from django.utils import timezone
-from django.urls import reverse
 
 from ..queryfilters import OmniSearchFilter, StringSymbolEquation, OmniSymbolProcessor
 from ..models import LinkDataModel
+
+from .fakeinternet import FakeInternetTestCase
 
 
 class SymbolEvaluator(object):
@@ -16,7 +15,10 @@ class SymbolEvaluator(object):
             return 0
 
 
-class OmniSearchTest(TestCase):
+class OmniSearchTest(FakeInternetTestCase):
+    def setUp(self):
+        self.disable_web_pages()
+
     def test_filter_query_set_not_translable(self):
         LinkDataModel.objects.create(link="https://test.com")
 

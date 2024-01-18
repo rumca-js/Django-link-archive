@@ -140,13 +140,6 @@ class DomainsController(Domains):
             and self.tld != ""
         )
 
-    def is_page_info_set(self):
-        return (
-            self.title is not None
-            and self.description is not None
-            and self.language is not None
-        )
-
     def is_update_time(self):
         from ..dateutils import DateUtils
 
@@ -229,15 +222,6 @@ class DomainsController(Domains):
         for domain in domains:
             DomainCategories.add(domain.category)
             DomainSubCategories.add(domain.category, domain.subcategory)
-
-    def get_description_safe(self):
-        if self.description:
-            if len(self.description) > 100:
-                return self.description[:100] + "..."
-            else:
-                return self.description
-        else:
-            return ""
 
     def is_domain_object(entry):
         if not hasattr(entry, "main_domain_obj"):

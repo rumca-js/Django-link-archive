@@ -38,12 +38,10 @@ class EntryUrlInterface(object):
 
         props = self.get_props_implementation(input_props)
 
-        if props:
-            if self.is_property_set(input_props, "description"):
-                if len(props["description"]) > 950:
-                    # TODO change hardcoded limit
-                    props["description"] = props["description"][:950] + "[...]"
+        # we do not trim description here. We might need it later, when adding link we scan
+        # description for URLs
 
+        if props:
             is_domain = BasePage(self.url).is_domain()
             if is_domain and ("thumbnail" not in props or props["thumbnail"] == None):
                 if "favicons" in props:
@@ -51,10 +49,7 @@ class EntryUrlInterface(object):
                     if favicons and len(favicons) > 0:
                         props["thumbnail"] = favicons[0][0]
 
-        # TODO
-        # if "source" not in input_props:
-        #    if not source_obj:
-        #        input_props["source"] = p.get_domain()
+            props["page_rating_contents"] = self.p.get_page_rating()
 
         return props
 
@@ -127,10 +122,18 @@ class EntryUrlInterface(object):
             input_props["date_published"] = p.get_datetime_published()
         if not self.is_property_set(input_props, "thumbnail"):
             input_props["thumbnail"] = p.get_thumbnail()
+
+        # https://help.indiefy.net/hc/en-us/articles/360047860834-What-is-a-YouTube-topic-channel-and-how-does-it-work-
+        channel_name = p.get_channel_name()
+        if channel_name:
+            wh_channel = channel_name.find("- Topic")
+            if wh_channel >= 0:
+                channel_name = channel_name[:wh]
+
         if not self.is_property_set(input_props, "artist"):
-            input_props["artist"] = p.get_channel_name()
+            input_props["artist"] = channel_name
         if not self.is_property_set(input_props, "album"):
-            input_props["album"] = p.get_channel_name()
+            input_props["album"] = channel_name
 
         if not self.is_property_set(input_props, "language") and source_obj:
             input_props["language"] = source_obj.language

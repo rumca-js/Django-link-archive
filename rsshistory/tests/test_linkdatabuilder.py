@@ -1,5 +1,3 @@
-import django.utils
-from django.test import TestCase
 from datetime import timedelta
 
 from ..controllers import (
@@ -10,13 +8,15 @@ from ..controllers import (
 )
 from ..models import LinkDataModel, ConfigurationEntry
 from ..dateutils import DateUtils
-from .utilities import WebPageDisabled
 from ..configuration import Configuration
 
+from .fakeinternet import FakeInternetTestCase
 
-class LinkDataBuilderTest(WebPageDisabled, TestCase):
+
+class LinkDataBuilderTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
+
         self.source_youtube = SourceDataController.objects.create(
             url="https://youtube.com",
             title="YouTube",

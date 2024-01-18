@@ -1,10 +1,13 @@
-from pathlib import Path
-from django.test import TestCase
 
 from ..serializers.converters import PageSystem
 
+from .fakeinternet import FakeInternetTestCase
 
-class PageSystemPageTest(TestCase):
+
+class PageSystemPageTest(FakeInternetTestCase):
+    def setUp(self):
+        self.disable_web_pages()
+
     def test_1(self):
         s = PageSystem(0, 1000)
         self.assertEqual(s.no_pages, 0)
@@ -38,7 +41,10 @@ class PageSystemPageTest(TestCase):
         self.assertEqual(s.no_pages, 3)
 
 
-class PageSystemSliceRangeTest(TestCase):
+class PageSystemSliceRangeTest(FakeInternetTestCase):
+    def setUp(self):
+        self.disable_web_pages()
+
     def test_1(self):
         s = PageSystem(0, 1000)
         limit = s.get_slice_limits(0)

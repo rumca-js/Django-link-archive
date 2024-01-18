@@ -2,19 +2,16 @@ from pathlib import Path
 import shutil
 import json
 
-from django.test import TestCase
-from django.utils import timezone
-from django.urls import reverse
-
 from ..models import ConfigurationEntry, PersistentInfo, DataExport
 from ..controllers import SourceDataController, LinkDataController, DomainsController
 from ..configuration import Configuration
 from ..datawriter import DataWriter, DataWriterConfiguration
 from ..dateutils import DateUtils
-from .utilities import WebPageDisabled
+
+from .fakeinternet import FakeInternetTestCase
 
 
-class DataWriterTest(WebPageDisabled, TestCase):
+class DataWriterTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 

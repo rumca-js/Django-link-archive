@@ -1,7 +1,3 @@
-from django.test import TestCase
-from django.utils import timezone
-from django.urls import reverse
-
 from ..controllers import (
     BackgroundJobController,
     LinkDataController,
@@ -9,10 +5,13 @@ from ..controllers import (
 )
 from ..models import BackgroundJob, PersistentInfo
 from ..configuration import Configuration
+from .fakeinternet import FakeInternetTestCase
 
 
-class BackgroundJobControllerTest(TestCase):
+class BackgroundJobControllerTest(FakeInternetTestCase):
     def setUp(self):
+        self.disable_web_pages()
+
         BackgroundJobController.objects.all().delete()
 
         ob = SourceDataController.objects.create(

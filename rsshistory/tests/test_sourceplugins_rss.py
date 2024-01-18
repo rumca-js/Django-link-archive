@@ -1,11 +1,9 @@
-from django.test import TestCase
-from django.utils import timezone
-from django.urls import reverse
 
 from ..controllers import SourceDataController
 from ..configuration import Configuration
 from ..pluginsources.sourcerssplugin import BaseRssPlugin
-from .utilities import WebPageDisabled
+
+from .fakeinternet import FakeInternetTestCase
 
 
 webpage_youtube_contents = """
@@ -27,8 +25,10 @@ webpage_contents = """
 """
 
 
-class BaseRssPluginTest(WebPageDisabled, TestCase):
+class BaseRssPluginTest(FakeInternetTestCase):
     def setUp(self):
+        self.disable_web_pages()
+
         self.source_rss = SourceDataController.objects.create(
             url="https://youtube.com/channel/samtime/rss.xml",
             title="SAMTIME",
@@ -36,7 +36,6 @@ class BaseRssPluginTest(WebPageDisabled, TestCase):
             subcategory="No",
             export_to_cms=True,
         )
-        self.disable_web_pages()
 
     def test_get_link_props(self):
         config = Configuration.get_object().config_entry

@@ -1,6 +1,3 @@
-from django.test import TestCase
-from django.utils import timezone
-from django.urls import reverse
 from datetime import datetime, timedelta
 
 from ..controllers import (
@@ -28,11 +25,12 @@ from ..threadhandlers import (
     LinkScanJobHandler,
     ProcessSourceJobHandler,
 )
-from .utilities import WebPageDisabled
 from ..dateutils import DateUtils
 
+from .fakeinternet import FakeInternetTestCase
 
-class BackgroundJobControllerTest(WebPageDisabled, TestCase):
+
+class BackgroundJobControllerTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 
@@ -273,7 +271,7 @@ class BackgroundJobControllerTest(WebPageDisabled, TestCase):
             handler_obj.delete()
 
 
-class RefreshThreadHandlerTest(WebPageDisabled, TestCase):
+class RefreshThreadHandlerTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 
@@ -389,7 +387,7 @@ class RefreshThreadHandlerTest(WebPageDisabled, TestCase):
         )
 
 
-class CleanJobHandlerTest(WebPageDisabled, TestCase):
+class CleanJobHandlerTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 
@@ -513,7 +511,7 @@ class CleanJobHandlerTest(WebPageDisabled, TestCase):
         self.assertEqual(DomainSubCategories.objects.all().count(), 0)
 
 
-class AddJobHandlerTest(WebPageDisabled, TestCase):
+class AddJobHandlerTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 
@@ -540,7 +538,7 @@ class AddJobHandlerTest(WebPageDisabled, TestCase):
         self.assertEqual(DomainsController.objects.all().count(), 1)
 
 
-class ScanLinkJobHandlerTest(WebPageDisabled, TestCase):
+class ScanLinkJobHandlerTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 
@@ -571,7 +569,7 @@ class ScanLinkJobHandlerTest(WebPageDisabled, TestCase):
         self.assertEqual(jobs.count(), 1)
 
 
-class ProcessSourceHandlerTest(WebPageDisabled, TestCase):
+class ProcessSourceHandlerTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 

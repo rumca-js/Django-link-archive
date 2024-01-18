@@ -1,19 +1,18 @@
-from django.test import TestCase
-from django.utils import timezone
-from django.urls import reverse
 
 from ..controllers import (
     SourceDataController,
     SourceDataBuilder,
     BackgroundJobController,
 )
-from .utilities import WebPageDisabled
+
+from .fakeinternet import FakeInternetTestCase
 
 
-class SourceControllerTest(WebPageDisabled, TestCase):
+class SourceControllerTest(FakeInternetTestCase):
     def setUp(self):
-        source_youtube = SourceDataController.objects.all().delete()
         self.disable_web_pages()
+
+        source_youtube = SourceDataController.objects.all().delete()
 
     def test_new_source(self):
         self.assertEqual(SourceDataController.objects.all().count(), 0)

@@ -1,11 +1,12 @@
-from django.test import TestCase
-from django.utils import timezone
-from django.urls import reverse
 
 from ..pluginentries.handlerchannelyoutube import YouTubeChannelHandler
+from .fakeinternet import FakeInternetTestCase
 
 
-class YouTubeChannelHandlerTest(TestCase):
+class YouTubeChannelHandlerTest(FakeInternetTestCase):
+    def setUp(self):
+        self.disable_web_pages()
+
     def test_source_input2code_channel(self):
         self.assertEqual(
             YouTubeChannelHandler(

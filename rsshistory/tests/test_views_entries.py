@@ -1,5 +1,3 @@
-from django.test import TestCase
-from django.utils import timezone
 from django.urls import reverse
 from django.contrib.auth.models import User
 
@@ -8,10 +6,10 @@ from ..controllers import SourceDataController, LinkDataController, DomainsContr
 from ..dateutils import DateUtils
 from ..models import KeyWords, DataExport
 
-from .utilities import WebPageDisabled
+from .fakeinternet import FakeInternetTestCase
 
 
-class EntriesViewsTests(WebPageDisabled, TestCase):
+class EntriesViewsTests(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 
@@ -22,6 +20,8 @@ class EntriesViewsTests(WebPageDisabled, TestCase):
         self.user.save()
 
     def test_add_simple_entry(self):
+        LinkDataController.objects.all().delete()
+
         self.client.login(username="testuser", password="testpassword")
 
         url = reverse("{}:entry-add-simple".format(LinkDatabase.name))
@@ -36,6 +36,8 @@ class EntriesViewsTests(WebPageDisabled, TestCase):
         self.assertContains(response, test_link, html=False)
 
     def test_add_entry(self):
+        LinkDataController.objects.all().delete()
+
         self.client.login(username="testuser", password="testpassword")
 
         url = reverse("{}:entry-add".format(LinkDatabase.name))
@@ -43,11 +45,15 @@ class EntriesViewsTests(WebPageDisabled, TestCase):
 
         data = {"link": test_link}
         full_data = LinkDataController.get_full_information(data)
+        full_data["description"] = LinkDataController.get_description_safe(full_data["description"])
 
         limited_data = {}
         for key in full_data:
             if full_data[key] is not None:
                 limited_data[key] = full_data[key]
+
+        print("Limited data")
+        print(limited_data)
 
         self.assertEqual(LinkDataController.objects.filter(link=test_link).count(), 0)
 
@@ -59,6 +65,8 @@ class EntriesViewsTests(WebPageDisabled, TestCase):
         self.assertEqual(LinkDataController.objects.filter(link=test_link).count(), 1)
 
     def test_edit_entry(self):
+        LinkDataController.objects.all().delete()
+
         self.client.login(username="testuser", password="testpassword")
 
         test_link = "https://linkedin.com"
@@ -78,13 +86,16 @@ class EntriesViewsTests(WebPageDisabled, TestCase):
 
         data = {"link": test_link}
         full_data = LinkDataController.get_full_information(data)
+        full_data["description"] = LinkDataController.get_description_safe(full_data["description"])
 
         limited_data = {}
         for key in full_data:
             if full_data[key] is not None:
                 limited_data[key] = full_data[key]
         limited_data["date_published"] = "2020-03-03;16:34"
-        print("Limited data: {}".format(limited_data))
+
+        print("Limited data")
+        print(limited_data)
 
         # call user action
         response = self.client.post(url, data=limited_data)

@@ -169,9 +169,6 @@ class YouTubeVideoHandler(DefaultUrlHandler):
         if self.yt_ob:
             return self.yt_ob.get_tags()
 
-    def get_page_rating(self):
-        return 0
-
     def get_properties(self):
         if not self.yt_ob:
             self.download_details()
@@ -189,7 +186,6 @@ class YouTubeVideoHandler(DefaultUrlHandler):
             youtube_props["channel_follower_count"] = yt_json["channel_follower_count"]
             youtube_props["view_count"] = self.yt_ob.get_view_count()
             youtube_props["like_count"] = self.yt_ob.get_thumbs_up()
-            youtube_props["upload_date"] = self.yt_ob.get_date_published()
             if "duration_string" in yt_json:
                 youtube_props["duration"] = yt_json["duration_string"]
 

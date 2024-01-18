@@ -88,6 +88,7 @@ class ConfigForm(forms.ModelForm):
         self.fields["auto_store_sources"].help_text = "Sources can be automatically added, if a new 'domain' information is captured. The state of such state is determined by 'Auto sources enabled' property."
         self.fields["number_of_comments_per_day"].help_text = "The limit is for each user."
         self.fields["track_user_actions"].help_text = "Among tracked elements: what is searched."
+        self.fields["entries_order_by"].help_text = "For Google-like experience set -page_rating. By default it is set to order of publication, -date_published."
 
 
 class DataExportForm(forms.ModelForm):
