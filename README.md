@@ -1,5 +1,7 @@
 Personal link database, link aggregator, with RSS functionality. Similar to Reddit, but completely open source, on your local machine.
 
+You can think of it as 'map of the Iternet', rather than 'copy of the Internet'.
+
 # Features
 
  - Local data, no algorithms, no advertisements

@@ -17,6 +17,7 @@ It should be able to operate on SBC, like raspberry PI.
  - everything that relates to source should start with "Source"
  - new services are handled by 'services' directory (like handling GIT, webarchive, etc.)
  - handling of new sites might require changes in pluginsources, and pluginentries (the first handles source, the second one a entry, link)
+ - this program was not designed to store Internet pages, but to store Internet meta data (title, description). We should rely on other services for cooperation. We cannot store entire Internet on a hard drive. We can store some meta though
 
 # Design
 
