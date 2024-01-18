@@ -1,4 +1,3 @@
-
 from ..models import EntryVisits
 from ..controllers import LinkDataController, SourceDataController
 from .fakeinternet import FakeInternetTestCase

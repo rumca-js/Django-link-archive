@@ -1,4 +1,3 @@
-
 from ..queryfilters import OmniSearchFilter, StringSymbolEquation, OmniSymbolProcessor
 from ..models import LinkDataModel
 

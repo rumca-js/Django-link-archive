@@ -143,7 +143,6 @@ class LinkDataController(LinkDataModel):
                 entry.delete()
 
     def move_old_links_to_archive(limit=0):
-
         conf = Configuration.get_object().config_entry
 
         if conf.days_to_move_to_archive == 0:
@@ -618,7 +617,9 @@ class LinkDataBuilder(object):
             new_link_data["date_published"] = DateUtils.get_datetime_now_utc()
 
         if new_link_data["description"] != None:
-            new_link_data["description"] = LinkDataController.get_description_safe(new_link_data["description"])
+            new_link_data["description"] = LinkDataController.get_description_safe(
+                new_link_data["description"]
+            )
 
         LinkDatabase.info("Adding link: {}".format(link_data["link"]))
 
@@ -627,6 +628,7 @@ class LinkDataBuilder(object):
 
     def set_domain_object(self):
         from .domains import DomainsController
+
         domain = DomainsController.add(self.link_data["link"])
         if domain:
             self.link_data["domain_obj"] = domain

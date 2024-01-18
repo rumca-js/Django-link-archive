@@ -929,7 +929,9 @@ instance_entries_json = """
     }
   ]
 }
-""".replace("{0}", DateUtils.get_datetime_now_iso())
+""".replace(
+    "{0}", DateUtils.get_datetime_now_iso()
+)
 
 instance_sources_json_empty = """{"sources": []}"""
 
@@ -969,7 +971,9 @@ instance_entries_source_100_json = """
     }
   ]
 }
-""".replace("{0}", DateUtils.get_datetime_now_iso())
+""".replace(
+    "{0}", DateUtils.get_datetime_now_iso()
+)
 
 instance_source_100_url = "https://www.lemonde.fr/en/rss/une.xml"
 instance_source_100_json = """

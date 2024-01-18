@@ -1,4 +1,3 @@
-
 from ..serializers.converters import PageSystem
 
 from .fakeinternet import FakeInternetTestCase

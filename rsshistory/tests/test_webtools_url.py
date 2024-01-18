@@ -1,4 +1,3 @@
-
 from ..webtools import Url
 
 from .fakeinternet import FakeInternetTestCase

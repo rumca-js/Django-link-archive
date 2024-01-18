@@ -1,4 +1,3 @@
-
 from ..controllers import SourceDataController
 from ..pluginsources.sourceparseplugin import BaseParsePlugin
 from ..pluginsources.sourcegenerousparserplugin import SourceGenerousParserPlugin

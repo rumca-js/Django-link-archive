@@ -45,7 +45,9 @@ class EntriesViewsTests(FakeInternetTestCase):
 
         data = {"link": test_link}
         full_data = LinkDataController.get_full_information(data)
-        full_data["description"] = LinkDataController.get_description_safe(full_data["description"])
+        full_data["description"] = LinkDataController.get_description_safe(
+            full_data["description"]
+        )
 
         limited_data = {}
         for key in full_data:
@@ -86,7 +88,9 @@ class EntriesViewsTests(FakeInternetTestCase):
 
         data = {"link": test_link}
         full_data = LinkDataController.get_full_information(data)
-        full_data["description"] = LinkDataController.get_description_safe(full_data["description"])
+        full_data["description"] = LinkDataController.get_description_safe(
+            full_data["description"]
+        )
 
         limited_data = {}
         for key in full_data:

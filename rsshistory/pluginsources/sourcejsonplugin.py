@@ -42,8 +42,7 @@ class BaseSourceJsonPlugin(SourceGenericPlugin):
 
         return []
 
-    def get_json(self, url = None):
-
+    def get_json(self, url=None):
         if url is None:
             address = self.get_address()
             contents = self.get_contents()
@@ -60,7 +59,9 @@ class BaseSourceJsonPlugin(SourceGenericPlugin):
             return j
 
         except Exception as e:
-            PersistentInfo.error("Could not load JSON {} - invalid JSON {}".format(address, str(e)))
+            PersistentInfo.error(
+                "Could not load JSON {} - invalid JSON {}".format(address, str(e))
+            )
 
     def get_links_from_source(self, source_json):
         c = Configuration.get_object().config_entry
@@ -75,7 +76,6 @@ class BaseSourceJsonPlugin(SourceGenericPlugin):
             ## we do not return any found links, because instance importer imports them directly
 
     def get_all_sources(self, sources):
-
         address = self.get_address()
 
         while True:
@@ -137,7 +137,7 @@ class BaseSourceJsonPlugin(SourceGenericPlugin):
         address = self.get_address()
         wh = address.rfind("source")
         if wh >= 0:
-            address = address[:wh-1]
+            address = address[: wh - 1]
 
         if address.endswith("/"):
             address = address[:-1]
@@ -154,14 +154,20 @@ class BaseSourceJsonPlugin(SourceGenericPlugin):
         recent_entries_list_contents = BasePage(recent_url).get_contents()
 
         if not recent_entries_list_contents:
-            PersistentInfo.error("Could not obtain JSON for recent entries: {}".format(recent_url))
+            PersistentInfo.error(
+                "Could not obtain JSON for recent entries: {}".format(recent_url)
+            )
             return
 
         recent_entries_json = None
         try:
             recent_entries_json = json.loads(recent_entries_list_contents)
         except Exception as e:
-            PersistentInfo.error("Could not read recent entries JSON {}\n{}".format(recent_entries_list_contents, str(e)))
+            PersistentInfo.error(
+                "Could not read recent entries JSON {}\n{}".format(
+                    recent_entries_list_contents, str(e)
+                )
+            )
 
         if recent_entries_json:
             if "links" not in recent_entries_json:
@@ -171,7 +177,12 @@ class BaseSourceJsonPlugin(SourceGenericPlugin):
                 yield recent_entry
 
     def get_entries_recent_url(self, source_json):
-        path = self.get_instance_root() + "/entries-json/?query_type=recent&source_title={}".format(source_json["title"])
+        path = (
+            self.get_instance_root()
+            + "/entries-json/?query_type=recent&source_title={}".format(
+                source_json["title"]
+            )
+        )
         return str(path)
 
     def get_source_url(self, source_json):

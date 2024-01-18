@@ -5,7 +5,7 @@ from ..controllers import SourceDataController, LinkDataController
 from ..pluginsources.sourcejsonplugin import BaseSourceJsonPlugin
 
 from .fakeinternet import FakeInternetTestCase
-from .fakeinternetdata import instance_entries_source_100_json,instance_entries_json
+from .fakeinternetdata import instance_entries_source_100_json, instance_entries_json
 
 
 class BaseJsonPluginTest(FakeInternetTestCase):
@@ -30,7 +30,7 @@ class BaseJsonPluginTest(FakeInternetTestCase):
 
         json_obj = json.loads(instance_entries_source_100_json)
 
-        entries = LinkDataController.objects.filter(link = json_obj["links"][0]["link"])
+        entries = LinkDataController.objects.filter(link=json_obj["links"][0]["link"])
 
         self.assertEqual(entries.count(), 1)
         self.assertEqual(entries[0].source, "https://www.lemonde.fr/en/rss/une.xml")
@@ -53,7 +53,7 @@ class BaseJsonPluginTest(FakeInternetTestCase):
 
         json_obj = json.loads(instance_entries_json)
 
-        entries = LinkDataController.objects.filter(link = json_obj["links"][0]["link"])
+        entries = LinkDataController.objects.filter(link=json_obj["links"][0]["link"])
 
         self.assertEqual(entries.count(), 1)
         self.assertEqual(entries[0].source, "https://www.lemonde.fr/en/rss/une.xml")
@@ -83,15 +83,24 @@ class BaseJsonPluginTest(FakeInternetTestCase):
             print("Enabled source:{}".format(source.url))
 
         # 3 imported, 1 created here in test
-        self.assertEqual(sources.count(), 3+1)
+        self.assertEqual(sources.count(), 3 + 1)
 
         self.assertEqual(sources[0].on_hold, True)
         self.assertEqual(sources[1].on_hold, True)
         self.assertEqual(sources[2].on_hold, True)
 
-        self.assertEqual(sources[0].proxy_location, "https://instance.com/apps/rsshistory/source-json/100")
-        self.assertEqual(sources[1].proxy_location, "https://instance.com/apps/rsshistory/source-json/101")
-        self.assertEqual(sources[2].proxy_location, "https://instance.com/apps/rsshistory/source-json/102")
+        self.assertEqual(
+            sources[0].proxy_location,
+            "https://instance.com/apps/rsshistory/source-json/100",
+        )
+        self.assertEqual(
+            sources[1].proxy_location,
+            "https://instance.com/apps/rsshistory/source-json/101",
+        )
+        self.assertEqual(
+            sources[2].proxy_location,
+            "https://instance.com/apps/rsshistory/source-json/102",
+        )
 
         self.assertEqual(sources[3].on_hold, False)
 

@@ -27,7 +27,9 @@ class EntryUrlInterface(object):
         if self.url.endswith("/"):
             self.url = self.url[:-1]
 
-        self.p = UrlHandler.get(self.url, fast_check=fast_check, use_selenium=use_selenium)
+        self.p = UrlHandler.get(
+            self.url, fast_check=fast_check, use_selenium=use_selenium
+        )
 
     def is_selenium_required(self):
         return Url.is_selenium_required(self.url)
@@ -327,6 +329,7 @@ class UrlHandler(object):
             return UrlHandler.odysee_channel_handler(url)
 
         from ..webtools import Url
+
         return Url.get(url, fast_check=fast_check, use_selenium=use_selenium)
 
     def get_protololless(url):

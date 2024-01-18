@@ -1,4 +1,3 @@
-
 from ..controllers import SourceDataController
 from ..pluginsources.codeprojectplugin import CodeProjectPlugin
 
@@ -304,4 +303,6 @@ class CodeProjectPluginTest(FakeInternetTestCase):
         print(props)
 
         self.assertTrue(len(props) > 0)
-        self.assertEqual(props[0]["source"], "https://www.codeproject.com/WebServices/NewsRSS.aspx")
+        self.assertEqual(
+            props[0]["source"], "https://www.codeproject.com/WebServices/NewsRSS.aspx"
+        )

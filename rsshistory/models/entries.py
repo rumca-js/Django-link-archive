@@ -406,7 +406,7 @@ class BaseLinkDataController(BaseLinkDataModel):
             return description
 
         length = BaseLinkDataController.get_description_length()
-        return description[:length-10]
+        return description[: length - 10]
 
     def get_description_length():
         return 1000

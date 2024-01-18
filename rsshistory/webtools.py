@@ -270,7 +270,9 @@ class BasePage(object):
             error_text = traceback.format_exc()
 
             PersistentInfo.error(
-                "Page: Error while reading page:{};Error:{}\n{}".format(self.url, str(e), error_text)
+                "Page: Error while reading page:{};Error:{}\n{}".format(
+                    self.url, str(e), error_text
+                )
             )
 
     def get_contents_internal(self, url, headers, timeout):
@@ -279,10 +281,11 @@ class BasePage(object):
         if not self.use_selenium:
             return self.get_contents_via_requests(self.url, headers=headers, timeout=10)
         else:
-            return self.get_contents_via_selenium_chrome(self.url, headers=headers, timeout=10)
+            return self.get_contents_via_selenium_chrome(
+                self.url, headers=headers, timeout=10
+            )
 
     def get_contents_via_requests(self, url, headers, timeout):
-
         """
         This is program is web scraper. If we turn verify, then we discard some of pages.
         Encountered several major pages, which had SSL programs.
@@ -304,7 +307,7 @@ class BasePage(object):
         For simplicity, each call starts it's own browser.
         It could be optimized in the future.
         """
-        service = Service(executable_path='/usr/bin/chromedriver')
+        service = Service(executable_path="/usr/bin/chromedriver")
         options = webdriver.ChromeOptions()
         options.add_argument("--headless")
 
@@ -318,7 +321,9 @@ class BasePage(object):
         try:
             driver.get(url)
         except TimeoutException:
-            PersistentInfo.error("Timeout when reading page. {}".format(selenium_timeout))
+            PersistentInfo.error(
+                "Timeout when reading page. {}".format(selenium_timeout)
+            )
 
         html_content = driver.page_source
 
@@ -424,7 +429,9 @@ class BasePage(object):
 
 class DomainAwarePage(BasePage):
     def __init__(self, url, contents=None, use_selenium=False, page_obj=None):
-        super().__init__(url, contents=contents, use_selenium=use_selenium, page_obj=page_obj)
+        super().__init__(
+            url, contents=contents, use_selenium=use_selenium, page_obj=page_obj
+        )
 
     def is_mainstream(self):
         dom = self.get_domain_only()
@@ -575,10 +582,7 @@ class DomainAwarePage(BasePage):
 
         lower = self.contents.lower()
 
-        if (
-            lower.find("<html") >= 0
-            and lower.find("<body") >= 0
-        ):
+        if lower.find("<html") >= 0 and lower.find("<body") >= 0:
             return True
 
     @lazy_load_content
@@ -609,7 +613,9 @@ class DomainAwarePage(BasePage):
 
 class ContentInterface(DomainAwarePage):
     def __init__(self, url, contents=None, use_selenium=False, page_obj=None):
-        super().__init__(url, contents=contents, use_selenium=use_selenium, page_obj=page_obj)
+        super().__init__(
+            url, contents=contents, use_selenium=use_selenium, page_obj=page_obj
+        )
 
     def get_title(self):
         raise NotImplementedError
@@ -686,7 +692,9 @@ class ContentInterface(DomainAwarePage):
         # Define regular expressions
         current_year_pattern = re.compile(rf"\b{current_year}\b")
         four_digit_number_pattern = re.compile(r"\b\d{4}\b")
-        date_pattern = re.compile(rf"\b(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\.?\s*(\d+)\b")
+        date_pattern = re.compile(
+            rf"\b(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\.?\s*(\d+)\b"
+        )
         full_date_pattern = re.compile(r"(\d{4})-(\d{1,2})-(\d{1,2})")
 
         # Attempt to find the current year in the string
@@ -700,13 +708,21 @@ class ContentInterface(DomainAwarePage):
         if match_current_year:
             year = int(current_year)
             # Limit the scope to a specific portion before and after year
-            scope = content[max(0, match_current_year.start() - 15):match_current_year.start() + 20]
+            scope = content[
+                max(0, match_current_year.start() - 15) : match_current_year.start()
+                + 20
+            ]
         else:
             match_four_digit_number = four_digit_number_pattern.search(content)
             if match_four_digit_number:
                 year = int(match_four_digit_number.group(0))
                 # Limit the scope to a specific portion before and after year
-                scope = content[max(0, match_four_digit_number.start() - 15):match_four_digit_number.start() + 20]
+                scope = content[
+                    max(
+                        0, match_four_digit_number.start() - 15
+                    ) : match_four_digit_number.start()
+                    + 20
+                ]
 
         if scope:
             match_date = date_pattern.search(scope)
@@ -721,22 +737,26 @@ class ContentInterface(DomainAwarePage):
             str_month = None
 
             try:
-                str_month = strptime(month,'%b').tm_mon
+                str_month = strptime(month, "%b").tm_mon
                 str_month = str(str_month)
             except Exception as E:
                 pass
 
             if not str_month:
                 try:
-                    str_month = strptime(month,'%B').tm_mon
+                    str_month = strptime(month, "%B").tm_mon
                     str_month = str(str_month)
                 except Exception as E:
                     pass
 
-            date_object = datetime.strptime(f"{year}-{str_month.zfill(2)}-{day.zfill(2)}", "%Y-%m-%d")
+            date_object = datetime.strptime(
+                f"{year}-{str_month.zfill(2)}-{day.zfill(2)}", "%Y-%m-%d"
+            )
         elif match_full_date:
             year, month, day = match_full_date.groups()
-            date_object = datetime.strptime(f"{year}-{month.zfill(2)}-{day.zfill(2)}", "%Y-%m-%d")
+            date_object = datetime.strptime(
+                f"{year}-{month.zfill(2)}-{day.zfill(2)}", "%Y-%m-%d"
+            )
         elif year:
             if year == current_year:
                 date_object = datetime.now()
@@ -754,7 +774,9 @@ class ContentInterface(DomainAwarePage):
 
 class DefaultContentPage(ContentInterface):
     def __init__(self, url, contents=None, use_selenium=False, page_obj=None):
-        super().__init__(url, contents=contents, use_selenium=use_selenium, page_obj=page_obj)
+        super().__init__(
+            url, contents=contents, use_selenium=use_selenium, page_obj=page_obj
+        )
 
     def get_title(self):
         return self.url
@@ -795,7 +817,10 @@ class DefaultContentPage(ContentInterface):
         if self.get_thumbnail() is not None and str(self.get_thumbnail()) != "":
             page_rating += 1
 
-        if self.get_date_published() is not None and str(self.get_date_published()) != "":
+        if (
+            self.get_date_published() is not None
+            and str(self.get_date_published()) != ""
+        ):
             page_rating += 1
 
         max_page_rating = 10 + 5 + 1 + 1 + 1
@@ -807,7 +832,9 @@ class DefaultContentPage(ContentInterface):
 
 class JsonPage(ContentInterface):
     def __init__(self, url, contents=None, use_selenium=False, page_obj=None):
-        super().__init__(url, contents=contents, use_selenium=use_selenium, page_obj=page_obj)
+        super().__init__(
+            url, contents=contents, use_selenium=use_selenium, page_obj=page_obj
+        )
 
         self.json_obj = None
         try:
@@ -864,7 +891,9 @@ class RssPage(ContentInterface):
     """
 
     def __init__(self, url, contents=None, use_selenium=False, page_obj=None):
-        super().__init__(url, contents=contents, use_selenium=use_selenium, page_obj=page_obj)
+        super().__init__(
+            url, contents=contents, use_selenium=use_selenium, page_obj=page_obj
+        )
         self.allow_adding_with_current_time = True
         self.default_entry_timestamp = None
         self.feed = None
@@ -1038,7 +1067,11 @@ class RssPage(ContentInterface):
             else:
                 # cannot display self.feed.feed here.
                 # it complains et_thumbnail TypeError: 'DeferredAttribute' object is not callable
-                PersistentInfo.create("Unsupported image type for feed. {}".format(str(self.feed.feed.image) ))
+                PersistentInfo.create(
+                    "Unsupported image type for feed. {}".format(
+                        str(self.feed.feed.image)
+                    )
+                )
 
         if not image:
             if self.url.find("https://www.youtube.com/feeds/videos.xml") >= 0:
@@ -1086,7 +1119,7 @@ class RssPage(ContentInterface):
         if self.get_author():
             rating += 1
 
-        rating = (rating * 100 / self.get_max_page_rating())
+        rating = rating * 100 / self.get_max_page_rating()
 
         return int(rating)
 
@@ -1108,7 +1141,9 @@ class ContentLinkParser(BasePage):
     """
 
     def __init__(self, url, contents=None, use_selenium=False, page_obj=None):
-        super().__init__(url, contents=contents, use_selenium=use_selenium, page_obj=page_obj)
+        super().__init__(
+            url, contents=contents, use_selenium=use_selenium, page_obj=page_obj
+        )
         self.url = self.get_clean_url()
 
     def get_contents(self):
@@ -1145,7 +1180,7 @@ class ContentLinkParser(BasePage):
 
         allt = re.findall("(https?://[a-zA-Z0-9./\-_?&=]+)", cont)
         # links cannot end with "."
-        allt = [link.rstrip('.') for link in allt]
+        allt = [link.rstrip(".") for link in allt]
         return set(allt)
 
     def get_links_href(self):
@@ -1155,7 +1190,7 @@ class ContentLinkParser(BasePage):
         cont = str(self.get_contents())
 
         allt = re.findall('href="([a-zA-Z0-9./\-_]+)', cont)
-        allt = [link.rstrip('.') for link in allt]
+        allt = [link.rstrip(".") for link in allt]
 
         for item in allt:
             if item.find("http") == 0:
@@ -1245,7 +1280,9 @@ class HtmlPage(ContentInterface):
     """
 
     def __init__(self, url, contents=None, use_selenium=False, page_obj=None):
-        super().__init__(url, contents=contents, use_selenium=use_selenium, page_obj=page_obj)
+        super().__init__(
+            url, contents=contents, use_selenium=use_selenium, page_obj=page_obj
+        )
         self.robots_contents = None
 
     def process_contents(self):
@@ -1476,12 +1513,19 @@ class HtmlPage(ContentInterface):
         if not self.contents:
             return []
 
-        rss_links = self.find_feed_links("application/rss+xml") + self.find_feed_links("application/atom+xml") + \
-                    self.find_feed_links("application/rss+xml;charset=UTF-8")
+        rss_links = (
+            self.find_feed_links("application/rss+xml")
+            + self.find_feed_links("application/atom+xml")
+            + self.find_feed_links("application/rss+xml;charset=UTF-8")
+        )
 
         if not rss_links:
             links = self.get_links_inner()
-            rss_links.extend(link for link in links if "feed" in link or "rss" in link or "atom" in link)
+            rss_links.extend(
+                link
+                for link in links
+                if "feed" in link or "rss" in link or "atom" in link
+            )
 
         feed_url = self.url + "/feed"
         if full_check and feed_url not in rss_links:
@@ -1492,13 +1536,23 @@ class HtmlPage(ContentInterface):
                 if feed.entries:
                     rss_links.append(lucky_shot)
             except Exception as e:
-                LinkDatabase.info("WebTools exception during rss processing {}".format(str(e)))
+                LinkDatabase.info(
+                    "WebTools exception during rss processing {}".format(str(e))
+                )
 
-        return [BasePage.get_url_full(self.url, rss_url) for rss_url in rss_links] if rss_links else []
+        return (
+            [BasePage.get_url_full(self.url, rss_url) for rss_url in rss_links]
+            if rss_links
+            else []
+        )
 
     def find_feed_links(self, feed_type):
         feed_finds = self.soup.find_all("link", attrs={"type": feed_type})
-        return [feed_find["href"] for feed_find in feed_finds if feed_find and feed_find.has_attr("href")]
+        return [
+            feed_find["href"]
+            for feed_find in feed_finds
+            if feed_find and feed_find.has_attr("href")
+        ]
 
     @lazy_load_content
     def get_links(self):
@@ -1600,7 +1654,7 @@ class HtmlPage(ContentInterface):
         if image_og:
             rating += 5
 
-        rating = (rating * 100 / self.get_max_page_rating())
+        rating = rating * 100 / self.get_max_page_rating()
         return int(rating)
 
     def get_max_page_rating(self):
@@ -1702,10 +1756,10 @@ class Url(object):
             return p
 
         if p.is_rss(fast_check):
-            return RssPage(url, page_obj = p)
+            return RssPage(url, page_obj=p)
 
         if fast_check == False:
-            j = JsonPage(url, page_obj = p)
+            j = JsonPage(url, page_obj=p)
             if j.is_json():
                 return j
 

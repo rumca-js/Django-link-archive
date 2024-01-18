@@ -109,5 +109,5 @@ class DateUtils(object):
         date_start = DateUtils.get_datetime_now_utc() - timedelta(days=number_of_days)
         return [date_start, date_stop]
 
-    def from_string(string_input, string_format = "%Y-%m-%dT%H:%M:%SZ"):
+    def from_string(string_input, string_format="%Y-%m-%dT%H:%M:%SZ"):
         return datetime.strptime(string_input, string_format)

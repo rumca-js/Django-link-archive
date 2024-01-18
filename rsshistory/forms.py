@@ -79,6 +79,8 @@ class ConfigForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(ConfigForm, self).__init__(*args, **kwargs)
+        
+        # fmt: off
         self.fields["background_task"].help_text = "Informs system that background task, like celery is operational."
         self.fields["link_save"].help_text = "Links are saved using archive.org."
         self.fields["source_save"].help_text = "Links are saved using archive.org."
@@ -89,6 +91,7 @@ class ConfigForm(forms.ModelForm):
         self.fields["number_of_comments_per_day"].help_text = "The limit is for each user."
         self.fields["track_user_actions"].help_text = "Among tracked elements: what is searched."
         self.fields["entries_order_by"].help_text = "For Google-like experience set -page_rating. By default it is set to order of publication, -date_published."
+        # fmt: on
 
 
 class DataExportForm(forms.ModelForm):
@@ -545,8 +548,8 @@ class BasicEntryChoiceForm(forms.Form):
     def create(self, sources):
         # how to unpack dynamic forms
         # https://stackoverflow.com/questions/60393884/how-to-pass-choices-dynamically-into-a-django-form
-        condition1 = Q(on_hold=False) # & Q(proxy_location = "")
-        condition2 = Q(on_hold=True) & ~Q(proxy_location = "")
+        condition1 = Q(on_hold=False)  # & Q(proxy_location = "")
+        condition2 = Q(on_hold=True) & ~Q(proxy_location="")
         self.sources = SourceDataController.objects.filter(condition1 | condition2)
 
         categories = self.get_sources_values("category")

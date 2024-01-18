@@ -1,4 +1,3 @@
-
 from ..pluginentries.handlerchannelyoutube import YouTubeChannelHandler
 from .fakeinternet import FakeInternetTestCase
 

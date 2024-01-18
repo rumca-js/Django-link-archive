@@ -1,4 +1,3 @@
-
 from ..webtools import BasePage, InputContent
 
 from .fakeinternet import FakeInternetTestCase

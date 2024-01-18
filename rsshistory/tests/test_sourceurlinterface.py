@@ -1,4 +1,3 @@
-
 from ..models import SourceDataModel
 from ..pluginsources.sourceurlinterface import SourceUrlInterface
 
@@ -19,7 +18,9 @@ class SourceUrlInterfaceTest(FakeInternetTestCase):
         self.assertEqual(props["source_type"], SourceDataModel.SOURCE_TYPE_RSS)
 
     def test_youtube_channel(self):
-        url = SourceUrlInterface("https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM")
+        url = SourceUrlInterface(
+            "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM"
+        )
         props = url.get_props()
 
         self.assertTrue(props)
@@ -57,8 +58,13 @@ class SourceUrlInterfaceTest(FakeInternetTestCase):
         self.assertTrue("proxy_location" in props)
 
         self.assertEqual(props["title"], "Source100 - Proxy")
-        self.assertEqual(props["url"], "https://instance.com/apps/rsshistory/source-json/100")
-        self.assertEqual(props["proxy_location"], "https://instance.com/apps/rsshistory/source-json/100")
+        self.assertEqual(
+            props["url"], "https://instance.com/apps/rsshistory/source-json/100"
+        )
+        self.assertEqual(
+            props["proxy_location"],
+            "https://instance.com/apps/rsshistory/source-json/100",
+        )
         self.assertEqual(props["source_type"], SourceDataModel.SOURCE_TYPE_JSON)
 
     def test_json_sources(self):
@@ -71,4 +77,6 @@ class SourceUrlInterfaceTest(FakeInternetTestCase):
 
         self.assertEqual(props["title"], "Instance Proxy")
         self.assertEqual(props["source_type"], SourceDataModel.SOURCE_TYPE_JSON)
-        self.assertEqual(props["proxy_location"], "https://instance.com/apps/rsshistory/sources-json")
+        self.assertEqual(
+            props["proxy_location"], "https://instance.com/apps/rsshistory/sources-json"
+        )

@@ -582,7 +582,9 @@ def add_simple_entry(request):
                 data["bookmarked"] = True
 
                 if "description" in data:
-                    data["description"] = LinkDataController.get_description_safe(data["description"])
+                    data["description"] = LinkDataController.get_description_safe(
+                        data["description"]
+                    )
 
                 form = EntryForm(initial=data)
                 form.method = "POST"
@@ -664,8 +666,8 @@ def edit_entry(request, pk):
         ob.save()
 
     if ob.description:
-            ob.description = LinkDataController.get_description_safe(ob.description)
-            ob.save()
+        ob.description = LinkDataController.get_description_safe(ob.description)
+        ob.save()
 
     if request.method == "POST":
         form = EntryForm(request.POST, instance=ob)

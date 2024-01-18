@@ -139,7 +139,9 @@ class EntryGenericPlugin(object):
                 + "?page={}".format(self.entry.link),
                 ConfigurationEntry.ACCESS_TYPE_OWNER,
                 "Shows page properties",
-                static("{}/icons/icons8-view-details-100.png".format(LinkDatabase.name)),
+                static(
+                    "{}/icons/icons8-view-details-100.png".format(LinkDatabase.name)
+                ),
             ),
         )
 

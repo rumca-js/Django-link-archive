@@ -121,7 +121,6 @@ class InstanceImporter(object):
             self.import_from_source(source_data)
 
     def import_from_link(self, json_data):
-
         c = Configuration.get_object().config_entry
 
         clean_data = self.get_clean_entry_data(json_data)
@@ -148,7 +147,7 @@ class InstanceImporter(object):
                 if clean_data["vote"] > 0:
                     entry.vote(clean_data["vote"])
 
-    def import_from_source(self, json_data, instance_import = False):
+    def import_from_source(self, json_data, instance_import=False):
         LinkDatabase.info("Import from source")
 
         clean_data = SourceDataController.get_clean_data(json_data)
@@ -194,6 +193,8 @@ class InstanceImporter(object):
         clean_data = self.drop_entry_instance_internal_data(clean_data)
 
         if "date_published" in clean_data:
-            clean_data["date_published"] = DateUtils.parse_datetime(clean_data["date_published"])
+            clean_data["date_published"] = DateUtils.parse_datetime(
+                clean_data["date_published"]
+            )
 
         return clean_data

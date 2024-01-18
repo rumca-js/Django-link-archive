@@ -1,4 +1,3 @@
-
 from ..webtools import HtmlPage
 
 from .fakeinternet import FakeInternetTestCase
@@ -398,28 +397,40 @@ class HtmlPageTest(FakeInternetTestCase):
         )
 
     def test_guess_date_for_full_date(self):
-        p = HtmlPage("https://www.wsj.com/world/middle-east/israel-war-gaza-hamas-perilous-phase-1ed3ea9b?mod=hp_lead_pos7", wall_street_journal_date_full_date)
+        p = HtmlPage(
+            "https://www.wsj.com/world/middle-east/israel-war-gaza-hamas-perilous-phase-1ed3ea9b?mod=hp_lead_pos7",
+            wall_street_journal_date_full_date,
+        )
 
         date = p.guess_date()
         self.assertTrue(date)
         self.assertEqual(date.isoformat(), "2024-01-11T00:00:00+00:00")
 
     def test_guess_date_for_human_date(self):
-        p = HtmlPage("https://www.wsj.com/world/middle-east/israel-war-gaza-hamas-perilous-phase-1ed3ea9b?mod=hp_lead_pos7", wall_street_journal_date_human_date)
+        p = HtmlPage(
+            "https://www.wsj.com/world/middle-east/israel-war-gaza-hamas-perilous-phase-1ed3ea9b?mod=hp_lead_pos7",
+            wall_street_journal_date_human_date,
+        )
 
         date = p.guess_date()
         self.assertTrue(date)
         self.assertEqual(date.isoformat(), "2024-01-10T00:00:00+00:00")
 
     def test_guess_date_for_human_date_dot(self):
-        p = HtmlPage("https://www.wsj.com/world/middle-east/israel-war-gaza-hamas-perilous-phase-1ed3ea9b?mod=hp_lead_pos7", wall_street_journal_date_human_date_dot)
+        p = HtmlPage(
+            "https://www.wsj.com/world/middle-east/israel-war-gaza-hamas-perilous-phase-1ed3ea9b?mod=hp_lead_pos7",
+            wall_street_journal_date_human_date_dot,
+        )
 
         date = p.guess_date()
         self.assertTrue(date)
         self.assertEqual(date.isoformat(), "2024-01-09T00:00:00+00:00")
 
     def test_guess_date_for_human_date_one_digit(self):
-        p = HtmlPage("https://www.wsj.com/world/middle-east/israel-war-gaza-hamas-perilous-phase-1ed3ea9b?mod=hp_lead_pos7", wall_street_journal_date_human_date_one_digit)
+        p = HtmlPage(
+            "https://www.wsj.com/world/middle-east/israel-war-gaza-hamas-perilous-phase-1ed3ea9b?mod=hp_lead_pos7",
+            wall_street_journal_date_human_date_one_digit,
+        )
 
         date = p.guess_date()
         self.assertTrue(date)

@@ -10,27 +10,26 @@ from ..dateutils import DateUtils
 from ..pluginentries.handlervideoyoutube import YouTubeVideoHandler
 
 from .fakeinternetdata import (
-  webpage_samtime_youtube_rss,
-  webpage_simple_rss_page,
-  webpage_old_pubdate_rss,
-  webpage_no_pubdate_rss,
-  webpage_youtube_airpano_feed,
-  webpage_code_project_rss,
-  webpage_html_favicon,
-
-  instance_entries_json,
-  instance_sources_json_empty,
-  instance_entries_json_empty,
-  instance_entries_source_100_json,
-  instance_source_100_url,
-  instance_source_100_json,
-  instance_source_101_json,
-  instance_source_102_json,
-  instance_source_103_json,
-  instance_source_104_json,
-  instance_source_105_json,
-  instance_sources_page_1,
-  instance_sources_page_2,
+    webpage_samtime_youtube_rss,
+    webpage_simple_rss_page,
+    webpage_old_pubdate_rss,
+    webpage_no_pubdate_rss,
+    webpage_youtube_airpano_feed,
+    webpage_code_project_rss,
+    webpage_html_favicon,
+    instance_entries_json,
+    instance_sources_json_empty,
+    instance_entries_json_empty,
+    instance_entries_source_100_json,
+    instance_source_100_url,
+    instance_source_100_json,
+    instance_source_101_json,
+    instance_source_102_json,
+    instance_source_103_json,
+    instance_source_104_json,
+    instance_source_105_json,
+    instance_sources_page_1,
+    instance_sources_page_2,
 )
 
 
@@ -273,13 +272,22 @@ class TestRequestObjectMock(object):
             return webpage_samtime_youtube_rss
 
     def get_contents_instance(self, url):
-        if url == "https://instance.com/apps/rsshistory/entries-json/?query_type=recent":
+        if (
+            url
+            == "https://instance.com/apps/rsshistory/entries-json/?query_type=recent"
+        ):
             return instance_entries_json
 
-        elif url == "https://instance.com/apps/rsshistory/entries-json/?query_type=recent&source_title=Source100":
+        elif (
+            url
+            == "https://instance.com/apps/rsshistory/entries-json/?query_type=recent&source_title=Source100"
+        ):
             return instance_entries_source_100_json
 
-        elif url == "https://instance.com/apps/rsshistory/entries-json/?query_type=recent&page=1":
+        elif (
+            url
+            == "https://instance.com/apps/rsshistory/entries-json/?query_type=recent&page=1"
+        ):
             return """{}"""
 
         elif url == "https://instance.com/apps/rsshistory/source-json/100":
@@ -326,6 +334,7 @@ class TestRequestObjectMock(object):
 
 
 from django.test import TestCase
+
 
 class FakeInternetTestCase(TestCase):
     def get_contents_function(self, url, headers, timeout):

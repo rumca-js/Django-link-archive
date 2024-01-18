@@ -1,4 +1,3 @@
-
 from ..pluginentries.entryurlinterface import UrlHandler
 from ..pluginentries.handlervideoyoutube import YouTubeVideoHandler
 
