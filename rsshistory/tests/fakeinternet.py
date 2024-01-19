@@ -156,6 +156,10 @@ class TestRequestObjectMock(object):
         if url.startswith("https://youtube.com/channel/"):
             return self.get_contents_youtube_channel(url)
 
+        if url.startswith("https://www.youtube.com/watch?v=666"):
+            self.status_code = 500
+            return webpage_no_pubdate_rss
+
         if url.startswith("https://www.youtube.com/feeds"):
             return webpage_samtime_youtube_rss
 
@@ -170,6 +174,10 @@ class TestRequestObjectMock(object):
 
         elif url == "https://rsspage.com/rss.xml":
             return webpage_samtime_youtube_rss
+
+        elif url == "https://invalid.rsspage.com/rss.xml":
+            self.status_code = 500
+            return ""
 
         elif url == "https://simple-rss-page.com/rss.xml":
             return webpage_simple_rss_page

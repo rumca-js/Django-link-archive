@@ -520,6 +520,8 @@ class LinkDataBuilder(object):
 
         url = EntryUrlInterface(self.link)
         link_data = url.get_props()
+        if not link_data:
+            PersistentInfo.error("Could not obtain properties for:{}".format(self.link))
 
         # TODO update missing keys - do not replace them
 
@@ -681,8 +683,6 @@ class LinkDataBuilder(object):
         if "link" in link_data and link_data["link"]:
             handler = UrlHandler.get(link_data["link"])
             if type(handler) is UrlHandler.youtube_video_handler:
-                LinkDatabase.info("Checking if youtube link is live")
-                handler.download_details()
                 if not handler.is_valid():
                     return True
 

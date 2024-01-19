@@ -245,7 +245,7 @@ class PersistentInfo(models.Model):
         from ..dateutils import DateUtils
 
         try:
-            date_range = DateUtils.get_days_range(5)
+            date_range = DateUtils.get_days_range(3)
             while True:
                 objs = PersistentInfo.objects.filter(date__lt=date_range[0])
 

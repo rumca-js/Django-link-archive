@@ -687,7 +687,7 @@ class ContentInterface(DomainAwarePage):
         content = content.lower()
 
         # Get the current year
-        current_year = datetime.now().year
+        current_year = int(datetime.now().year)
 
         # Define regular expressions
         current_year_pattern = re.compile(rf"\b{current_year}\b")
@@ -734,7 +734,7 @@ class ContentInterface(DomainAwarePage):
         if match_date:
             month, day = match_date.groups()
 
-            str_month = None
+            str_month = ""
 
             try:
                 str_month = strptime(month, "%b").tm_mon
@@ -747,18 +747,30 @@ class ContentInterface(DomainAwarePage):
                     str_month = strptime(month, "%B").tm_mon
                     str_month = str(str_month)
                 except Exception as E:
-                    pass
+                    LinkDatabase.error(
+                            "Guessing date error: URL:{};\nscope:{};\nMonth:{}\nExc:{}".format(
+                            self.url, scope, month, str(E)
+                        )
+                    )
 
-            date_object = datetime.strptime(
-                f"{year}-{str_month.zfill(2)}-{day.zfill(2)}", "%Y-%m-%d"
-            )
+            try:
+                date_string = f"{year}-{str_month.zfill(2)}-{day.zfill(2)}"
+
+                date_object = datetime.strptime(date_string, "%Y-%m-%d")
+            except Exception as E:
+                PersistentInfo.error(
+                        "Guessing date error: URL:{}\nscope:{}\nYear:{} Month:{} Day:{}\nDate string:{}\nExc:{}".format(
+                        self.url, scope, year, str_month, day, date_string, str(E)
+                    )
+                )
+
         elif match_full_date:
             year, month, day = match_full_date.groups()
             date_object = datetime.strptime(
                 f"{year}-{month.zfill(2)}-{day.zfill(2)}", "%Y-%m-%d"
             )
         elif year:
-            if year == current_year:
+            if year >= current_year or year < 1900:
                 date_object = datetime.now()
             else:
                 # If only the year is found, construct a datetime object with year
@@ -1301,13 +1313,20 @@ class HtmlPage(ContentInterface):
                 return value
 
     @lazy_load_content
+    def get_meta_custom_field(self, field_type, field):
+        if not self.contents:
+            return None
+
+        find_element = self.soup.find("meta", attrs={field_type: field})
+        if find_element and find_element.has_attr("content"):
+            return find_element["content"]
+
+    @lazy_load_content
     def get_meta_field(self, field):
         if not self.contents:
             return None
 
-        find_element = self.soup.find("meta", attrs={"name": field})
-        if find_element and find_element.has_attr("content"):
-            return find_element["content"]
+        return self.get_meta_custom_field("name", field)
 
     @lazy_load_content
     def get_property_field(self, name):
@@ -1351,12 +1370,35 @@ class HtmlPage(ContentInterface):
 
     @lazy_load_content
     def get_date_published(self):
-        from .dateutils import DateUtils
+        """
+        There could be multiple places to read published time.
+        We try every possible thing.
+        """
 
+        # used by mainstream media. Examples?
         date_str = self.get_property_field("article:published_time")
         if date_str:
-            parsed_date = parser.parse(date_str)
-            return DateUtils.to_utc_date(parsed_date)
+            return self.date_str_to_date(date_str)
+
+        # used by spotify
+        date_str = self.get_meta_field("music:release_date")
+        if date_str:
+            return self.date_str_to_date(date_str)
+
+        # used by youtube
+        date_str = self.get_meta_custom_field("itemprop", "datePublished")
+        if date_str:
+            return self.date_str_to_date(date_str)
+
+    def date_str_to_date(self, date_str):
+        from .dateutils import DateUtils
+
+        if date_str:
+            try:
+                parsed_date = parser.parse(date_str)
+                return DateUtils.to_utc_date(parsed_date)
+            except Exception as E:
+                PersistentInfo.error("Could not parse music:release_date {} Exc:{}".format(date_str, str(E)))
 
     @lazy_load_content
     def get_title_head(self):
@@ -1714,8 +1756,7 @@ class HtmlPage(ContentInterface):
         to have "Site not found" string in the title.
         Better to reject such site either way.
         """
-        if BasePage.is_valid(self) == False:
-            LinkDatabase.info("Base page invalid indication")
+        if super().is_valid() == False:
             return False
 
         title = self.get_title()
@@ -1796,8 +1837,6 @@ class Url(object):
 
     def is_selenium_required(url):
         if url.find("https://open.spotify.com") >= 0:
-            return True
-        if url.find("https://www.wsj.com") >= 0:
             return True
 
         return False

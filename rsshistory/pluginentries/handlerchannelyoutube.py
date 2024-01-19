@@ -8,10 +8,7 @@ class YouTubeChannelHandler(DefaultUrlHandler):
 
         if url:
             self.code = self.input2code(url)
-            if self.code:
-                self.h = RssPage(self.get_channel_feed())
-            else:
-                self.h = None
+        self.h = None
 
     def input2url(self, item):
         code = self.input2code(item)
@@ -33,6 +30,17 @@ class YouTubeChannelHandler(DefaultUrlHandler):
         if url.find("/feeds/") >= 0:
             return self.input2code_feeds(url)
 
+    def get_contents(self):
+        if self.dead:
+            return
+
+        if self.contents is None:
+            if self.code:
+                self.h = RssPage(self.get_channel_feed())
+                self.contents = self.h.get_contents()
+                self.dead = self.h.dead
+                return self.contents
+
     def input2code_channel(self, url):
         wh = url.rfind("/")
         return url[wh + 1 :]
@@ -52,33 +60,33 @@ class YouTubeChannelHandler(DefaultUrlHandler):
         return self.code2feed(self.code)
 
     def get_title(self):
-        if self.h:
+        if self.get_contents():
             return self.h.get_title()
 
     def get_description(self):
-        if self.h:
+        if self.get_contents():
             return self.h.get_description()
 
     def get_date_published(self):
-        if self.h:
+        if self.get_contents():
             return self.h.get_date_published()
 
     def get_language(self):
-        if self.h:
+        if self.get_contents():
             return self.h.get_language()
 
     def get_thumbnail(self):
-        if self.h:
+        if self.get_contents():
             return self.h.get_thumbnail()
 
     def get_author(self):
-        if self.h:
+        if self.get_contents():
             return self.h.get_author()
 
     def get_album(self):
-        if self.h:
+        if self.get_contents():
             return self.h.get_album()
 
     def get_tags(self):
-        if self.h:
+        if self.get_contents():
             return self.h.get_tags()

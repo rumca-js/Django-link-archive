@@ -92,8 +92,8 @@ class EntryUpdateData(BaseJobHandler):
                 entry = entries[0]
                 entry.update_link_data()
             else:
-                PersistentInfo.error(
-                    "Incorrect background job {0}".format(
+                LinkDatabase.info(
+                        "Cannot update data. Missing entry {0}".format(
                         obj.subject,
                     )
                 )

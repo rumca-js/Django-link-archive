@@ -1,5 +1,6 @@
 from ..pluginentries.entryurlinterface import UrlHandler
 from ..pluginentries.handlervideoyoutube import YouTubeVideoHandler
+from ..webtools import RssPage, HtmlPage
 
 from .fakeinternet import FakeInternetTestCase
 
@@ -12,11 +13,13 @@ class UrlHandlerTest(FakeInternetTestCase):
         handler = UrlHandler.get("https://rsspage.com/rss.xml")
 
         self.assertTrue(handler.is_rss())
+        self.assertEqual(type(handler), RssPage)
 
     def test_get_html(self):
         handler = UrlHandler.get("https://linkedin.com")
 
         self.assertTrue(handler.is_html())
+        self.assertEqual(type(handler), HtmlPage)
 
     def test_get_youtube_video(self):
         handler = UrlHandler.get("https://www.youtube.com/watch?v=1234")

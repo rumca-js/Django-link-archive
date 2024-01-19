@@ -70,7 +70,6 @@ def data_errors_page(request):
         for entry in entries:
             print("Fixing: {} {} {}".format(entry.link, entry.title, entry.source))
             h = UrlHandler.get(entry.link)
-            h.download_details()
 
             chan_url = h.get_channel_feed_url()
             link_valid = h.get_link_url()

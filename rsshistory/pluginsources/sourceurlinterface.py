@@ -27,8 +27,6 @@ class SourceUrlInterface(object):
             from ..pluginentries.entryurlinterface import UrlHandler
 
             handler = UrlHandler.get(self.url)
-            handler.download_details()
-
             p = RssPage(handler.get_channel_feed_url())
 
             return self.get_props_from_rss(p.url, p)

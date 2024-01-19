@@ -49,7 +49,6 @@ class BaseSourceJsonPlugin(SourceGenericPlugin):
         else:
             address = url
             contents = BasePage(address).get_contents()
-            print("Getting JSON contents for url:{}".format(address))
 
         if not contents:
             PersistentInfo.error("Could not load JSON {} - no data".format(address))

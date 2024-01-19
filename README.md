@@ -74,25 +74,31 @@ The result is equal according to calculation
 
 Note: Page rating should not be based 'on time'. Good contents does is not 'worse' because x amount has passed. It should be however a suspect for verification, as it can be a case of abandoned project.
 
+Page rating range is 0..100. This means that if everything is correct for a page, a rank 100 is assigned.
+
+With such approach we can extend page rating and range is still in range 0..100, and it does not break the rest of calculated link rank.
+
 ## Content ranking
 
 Each page is automatically ranked by it's contents. There are several factors that are included into the ranking:
  - meta title
- - meta description (earns 5 points)
+ - meta description
  - og:title
- - og:description (earns 5 points)
- - og:image (earns 5 points)
+ - og:description
+ - og:image
  - presence of RSS feed link
+ - presence of meta date published property
 
- Title point breakdown:
- - good title earns 10 points
- - if title is longer than 1000 characters 5 points
- - if title is one word 5 points
- - if title has less than 4 chars 2 points
+Title point breakdown:
+ - good title earns the most amount of points
+ - if title is longer than 1000 characters earns "some" points
+ - if title is one word small amount of points
+ - if title has less than 4 chars small amount of points
 
 Status code breakdown:
- - code 200 earns 10 points
- - code between 200 and 300 earns 5 points
+ - code 200 is good
+ - code between 200 and 300 earns is not that good
+ - other code values are 'bad'
 
 ## Votes ranking
 

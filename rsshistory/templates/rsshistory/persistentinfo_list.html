@@ -18,11 +18,11 @@
 
   {% if content_list %}
       {% for info in content_list %}
-      <div style="display:flex; flex-wrap: wrap; margin-bottom: 2%">
+      <div style="display:flex; flex-wrap: wrap;">
          <div>Date: {{info.date}}</div>
          <div>Level: {{info.level}}</div>
-         <div><pre>{{info.info}}</pre></div>
       </div>
+      <div style="margin-bottom: 2%"><pre>{{info.info}}</pre></div>
       {% endfor %}
   {% else %}
      No logs

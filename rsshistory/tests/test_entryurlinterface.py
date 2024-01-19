@@ -31,12 +31,29 @@ class EntryUrlInterfaceTest(FakeInternetTestCase):
         self.assertEqual(props["link"], "https://www.youtube.com/watch?v=1234")
         self.assertEqual(props["title"], "1234 test title")
 
-    def test_error_download(self):
+    def test_error_html(self):
+        url = EntryUrlInterface("https://page-with-http-status-500.com")
+
+        props = url.get_props()
+        print("Props")
+        print(props)
+        self.assertTrue(props is None)
+
+    def test_error_rrs(self):
+        url = EntryUrlInterface("https://invalid.rsspage.com/rss.xml")
+
+        props = url.get_props()
+        print("Props")
+        print(props)
+        self.assertTrue(props is None)
+
+    def test_error_youtube(self):
         url = EntryUrlInterface("https://m.youtube.com/watch?v=666")
 
         props = url.get_props()
-        self.assertTrue(props is not None)
-        self.assertEqual(len(props), 0)
+        print("Props")
+        print(props)
+        self.assertTrue(props is None)
 
     def test_html_handler(self):
         url = EntryUrlInterface("https://www.linkedin.com")

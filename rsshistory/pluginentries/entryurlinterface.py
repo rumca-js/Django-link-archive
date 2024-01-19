@@ -101,11 +101,9 @@ class EntryUrlInterface(object):
 
         p = self.p
 
-        if type(p) is UrlHandler.youtube_video_handler:
-            if not p.download_details():
-                PersistentInfo.error("Could not obtain details for link:{}".format(url))
-
-                return {}
+        if not p.is_valid():
+            LinkDatabase.info("YouTube page is invalid:{}".format(url))
+            return None
 
         source_url = p.get_channel_feed_url()
         if source_url is None:
@@ -154,6 +152,10 @@ class EntryUrlInterface(object):
         url = self.url
 
         p = self.p
+
+        if not p.is_valid():
+            LinkDatabase.info("HTML page is invalid:{}".format(url))
+            return None
 
         # some pages return invalid code / information. let the user decide
         # what to do about it
@@ -214,7 +216,7 @@ class EntryUrlInterface(object):
 
         if not p.is_valid():
             LinkDatabase.info("RSS page is invalid:{}".format(url))
-            return
+            return None
 
         if not self.is_property_set(input_props, "link"):
             input_props["link"] = p.url
@@ -295,37 +297,37 @@ class UrlHandler(object):
     odysee_channel_handler = OdyseeChannelHandler
 
     def get(url, fast_check=True, use_selenium=False):
-        url = UrlHandler.get_protololless(url)
-        if not url:
+        short_url = UrlHandler.get_protololless(url)
+        if not short_url:
             return
 
         if (
-            url.startswith("www.youtube.com/watch")
-            or url.startswith("youtube.com/watch")
-            or url.startswith("m.youtube.com/watch")
-            or (url.startswith("youtu.be/") and len(url) > len("youtu.be/"))
+            short_url.startswith("www.youtube.com/watch")
+            or short_url.startswith("youtube.com/watch")
+            or short_url.startswith("m.youtube.com/watch")
+            or (short_url.startswith("youtu.be/") and len(short_url) > len("youtu.be/"))
         ):
             return UrlHandler.youtube_video_handler(url)
         if (
-            url.startswith("www.youtube.com/channel")
-            or url.startswith("youtube.com/channel")
-            or url.startswith("m.youtube.com/channel")
+            short_url.startswith("www.youtube.com/channel")
+            or short_url.startswith("youtube.com/channel")
+            or short_url.startswith("m.youtube.com/channel")
         ):
             return UrlHandler.youtube_channel_handler(url)
         if (
-            url.startswith("www.youtube.com/feeds")
-            or url.startswith("youtube.com/feeds")
-            or url.startswith("m.youtube.com/feeds")
+            short_url.startswith("www.youtube.com/feeds")
+            or short_url.startswith("youtube.com/feeds")
+            or short_url.startswith("m.youtube.com/feeds")
         ):
             return UrlHandler.youtube_channel_handler(url)
-        if url.startswith("odysee.com/@"):
-            wh1 = url.find("@")
-            wh2 = url.find("/", wh1 + 1)
+        if short_url.startswith("odysee.com/@"):
+            wh1 = short_url.find("@")
+            wh2 = short_url.find("/", wh1 + 1)
             if wh2 >= 0:
                 return UrlHandler.odysee_video_handler(url)
-        if url.startswith("odysee.com/@"):
+        if short_url.startswith("odysee.com/@"):
             return UrlHandler.odysee_channel_handler(url)
-        if url.startswith("odysee.com/$/rss"):
+        if short_url.startswith("odysee.com/$/rss"):
             return UrlHandler.odysee_channel_handler(url)
 
         from ..webtools import Url

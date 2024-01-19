@@ -7,9 +7,6 @@ class DefaultUrlHandler(DefaultContentPage):
         super().__init__(url)
         self.h = None
 
-    def download_details(self):
-        raise NotImplementedError
-
     def input2code(input_string):
         raise NotImplementedError
 
