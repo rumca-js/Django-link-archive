@@ -194,7 +194,7 @@ class OmniSearchForm(forms.Form):
     Import links form
     """
 
-    search = forms.CharField(label="Search for", max_length=500)
+    search = forms.CharField(label="Search for", max_length=500, required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

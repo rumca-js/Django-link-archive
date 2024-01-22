@@ -56,6 +56,30 @@ webpage_description_meta_og = """<html>
 </html>
 """
 
+webpage_meta_article_date = """<html>
+ <description>selected meta description</description>
+ <meta property="og:description" content="selected og:description" />
+ <meta property="article:published_time" content="2024-01-09T21:26:00Z" />
+</html>
+"""
+
+webpage_meta_music_release_date = """<html>
+ <description>selected meta description</description>
+ <meta property="og:description" content="selected og:description" />
+ <meta name="music:release_date" content="2024-01-09T21:26:00Z"/>
+</html>
+"""
+
+webpage_meta_youtube_publish_date = """<html>
+ <description>selected meta description</description>
+ <meta property="og:description" content="selected og:description" />
+ <meta itemprop="datePublished" content="2024-01-11T09:00:07-00:00">
+ <meta itemprop="uploadDate" content="2024-01-11T09:00:07-00:00">
+ <meta itemprop="genre" content="Science &amp; Technology">
+</html>
+"""
+
+
 webpage_links = """<html>
  <TITLE>This is a upper case title</TITLE>
  <a custom-peroperty="custom-property-value" href="http://otherpage1.net" class="class">
@@ -395,6 +419,36 @@ class HtmlPageTest(FakeInternetTestCase):
             all_favicons[4][0],
             "https://www.youtube.com/s/desktop/e4d15d2c/img/favicon_144x144.png",
         )
+
+    def test_get_date_published_article_date(self):
+        p = HtmlPage(
+            "https://www.wsj.com/world/middle-east/israel-war-gaza-hamas-perilous-phase-1ed3ea9b?mod=hp_lead_pos7",
+            webpage_meta_article_date,
+        )
+
+        date = p.get_date_published()
+        self.assertTrue(date)
+        self.assertEqual(date.isoformat(), "2024-01-09T21:26:00+00:00")
+
+    def test_get_date_published_music_date(self):
+        p = HtmlPage(
+            "https://www.wsj.com/world/middle-east/israel-war-gaza-hamas-perilous-phase-1ed3ea9b?mod=hp_lead_pos7",
+            webpage_meta_music_release_date,
+        )
+
+        date = p.get_date_published()
+        self.assertTrue(date)
+        self.assertEqual(date.isoformat(), "2024-01-09T21:26:00+00:00")
+
+    def test_get_date_published_youtube(self):
+        p = HtmlPage(
+            "https://www.wsj.com/world/middle-east/israel-war-gaza-hamas-perilous-phase-1ed3ea9b?mod=hp_lead_pos7",
+            webpage_meta_youtube_publish_date,
+        )
+
+        date = p.get_date_published()
+        self.assertTrue(date)
+        self.assertEqual(date.isoformat(), "2024-01-11T09:00:07+00:00")
 
     def test_guess_date_for_full_date(self):
         p = HtmlPage(

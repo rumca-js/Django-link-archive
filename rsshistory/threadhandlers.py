@@ -17,6 +17,7 @@ from .models import (
     SourceExportHistory,
     KeyWords,
     DataExport,
+    ConfigurationEntry,
 )
 from .pluginsources.sourcecontrollerbuilder import SourceControllerBuilder
 from .basictypes import fix_path_for_windows
@@ -627,7 +628,8 @@ class CleanupJobHandler(BaseJobHandler):
             except Exception as E:
                 LinkDatabase.info("Exception:{}".format(str(E)))
 
-            LinkDataController.cleanup(limit)
+            limit_s = 60 * 10 # 10 minutes
+            status = LinkDataController.cleanup(limit_s)
 
             if limit == 0:
                 PersistentInfo.cleanup()
@@ -635,7 +637,9 @@ class CleanupJobHandler(BaseJobHandler):
                 SourceDataController.cleanup()
                 KeyWords.cleanup()
 
-            return True
+            # if status is True, everything has been cleared correctly
+            # we can remove the cleanup background job
+            return status
 
         except Exception as e:
             error_text = traceback.format_exc()
@@ -722,6 +726,11 @@ class RefreshThreadHandler(object):
     """
 
     def refresh(self, item=None):
+        # some settings in config could have changed
+        # if we run celery - process need to fetch new settings
+        c = Configuration.get_object()
+        c.config_entry = ConfigurationEntry.get()
+
         from .controllers import SourceDataController
 
         self.check_sources()

@@ -1,6 +1,7 @@
 from datetime import datetime, date, timedelta
 import os
 import traceback
+import time
 
 from django.db import models
 from django.urls import reverse
@@ -69,13 +70,23 @@ class LinkDataController(LinkDataModel):
         """Returns the URL to access a particular author instance."""
         return reverse("{}:entry-remove".format(LinkDatabase.name), args=[str(self.id)])
 
-    def cleanup(limit=0):
-        LinkDataController.move_old_links_to_archive(limit)
-        LinkDataController.clear_old_entries(limit)
+    def cleanup(limit_s=0):
+        """
+        We do not want to starve other threads.
+        Add limit, so that we can exit from cleanup thread
+        """
+
+        # TODO Move to link wrapper
+        moved_all = LinkDataController.move_old_links_to_archive(limit_s)
+        cleared_all = LinkDataController.clear_old_entries(limit_s)
+
         # LinkDataController.replace_http_link_with_https()
         # LinkDataController.recreate_from_domains()
 
         # TODO if configured to store domains, but do not store entries - remove all normal non-domain entries
+
+        # indicate that all has been finished correctly
+        return moved_all and cleared_all
 
     def recreate_from_domains():
         from .domains import DomainsController
@@ -142,7 +153,30 @@ class LinkDataController(LinkDataModel):
                 )
                 entry.delete()
 
-    def move_old_links_to_archive(limit=0):
+    def move_old_links_to_archive(limit_s=0):
+        start_processing_time = time.time()
+
+        while True:
+            entry = LinkDataController.get_next_link_to_move_to_archive()
+            # no more entries to process, cleaned up everything
+            if not entry:
+                return True
+
+            LinkDatabase.info("Moving link to archive: {}".format(entry.link))
+            LinkDataController.move_to_archive(entry)
+
+            passed_seconds = time.time() - start_processing_time
+            if passed_seconds >= 60 * 10:
+                PersistentInfo.create("Task exeeded time:{}".format(passed_seconds))
+                return False
+
+            """
+            Do not remove one after another. Let the processor rest a little bit. He's tired you now?
+            Do not starve other processes.
+            """
+            time.sleep(0.5)
+
+    def get_next_link_to_move_to_archive():
         conf = Configuration.get_object().config_entry
 
         if conf.days_to_move_to_archive == 0:
@@ -151,22 +185,14 @@ class LinkDataController(LinkDataModel):
         current_time = DateUtils.get_datetime_now_utc()
         days_before = current_time - timedelta(days=conf.days_to_move_to_archive)
 
-        index = 0
         entries = LinkDataController.objects.filter(
             bookmarked=False, permanent=False, date_published__lt=days_before
-        )
+        ).order_by("date_published")
 
         if not entries.exists():
             return
 
-        for entry in entries:
-            LinkDatabase.info("Moving link to archive: {}".format(entry.link))
-
-            LinkDataController.move_to_archive(entry)
-            index += 1
-
-            if limit and index > limit:
-                break
+        return entries[0]
 
     def move_to_archive(entry):
         objs = ArchiveLinkDataModel.objects.filter(link=entry.link)
@@ -192,6 +218,9 @@ class LinkDataController(LinkDataModel):
         from ..pluginentries.entryurlinterface import EntryUrlInterface
 
         info = EntryUrlInterface(data["link"]).get_props()
+        if not info:
+            return info
+
         if data["link"].find("http://") >= 0:
             data["link"] = data["link"].replace("http://", "https://")
             https_info = EntryUrlInterface(data["link"]).get_props()
@@ -202,43 +231,96 @@ class LinkDataController(LinkDataModel):
 
         return info
 
-    def clear_old_entries(limit=0):
-        config = Configuration.get_object().config_entry
-        config_days = config.days_to_remove_links
+    def clear_old_entries(limit_s=0):
+        start_processing_time = time.time()
 
-        index = 0
+        print("Clearing for old entries")
 
         sources = SourceDataController.objects.all()
         for source in sources:
-            if not source.is_removeable():
-                continue
+            while True:
+                entry = LinkDataController.get_next_source_entry_to_remove(source)
 
-            days = source.get_days_to_remove()
+                if not entry:
+                    break
 
-            if config_days != 0 and days == 0:
-                days = config_days
-            if config_days != 0 and config_days < days:
-                days = config_days
+                LinkDatabase.info("Removing link:{}".format(entry.link))
 
-            if days > 0:
-                days_before = DateUtils.get_days_before_dt(days)
+                entry.delete()
 
-                entries = LinkDataController.objects.filter(
-                    source=source.url,
-                    bookmarked=False,
-                    permanent=False,
-                    date_published__lt=days_before,
-                )
-                if not entries.exists():
-                    continue
+                passed_seconds = time.time() - start_processing_time
+                if passed_seconds >= 60 * 10:
+                    PersistentInfo.create("Task exeeded time:{}".format(passed_seconds))
+                    return False
 
-                for entry in entries:
-                    LinkDatabase.info("Removing link:{}".format(entry.link))
+                time.sleep(0.5)
 
-                    entry.delete()
-                    index += 1
-                    if limit and index > limit:
-                        return
+        print("Clearing normal links")
+        while True:
+            entry = LinkDataController.get_next_entry_to_remove()
+
+            if not entry:
+                break
+
+            LinkDatabase.info("Removing link:{}".format(entry.link))
+
+            entry.delete()
+
+            passed_seconds = time.time() - start_processing_time
+            if passed_seconds >= 60 * 10:
+                PersistentInfo.create("Task exeeded time:{}".format(passed_seconds))
+                return False
+
+            time.sleep(0.5)
+
+        print("Clearing archive links")
+        while True:
+            entry = LinkDataController.get_next_archive_entry_to_remove()
+
+            if not entry:
+                break
+
+            LinkDatabase.info("Removing link:{}".format(entry.link))
+
+            entry.delete()
+
+            passed_seconds = time.time() - start_processing_time
+            if passed_seconds >= 60 * 10:
+                PersistentInfo.create("Task exeeded time:{}".format(passed_seconds))
+                return False
+
+        return True
+
+    def get_next_source_entry_to_remove(source):
+        config = Configuration.get_object().config_entry
+        config_days = config.days_to_remove_links
+
+        if not source.is_removeable():
+            return
+
+        days = source.get_days_to_remove()
+
+        if config_days != 0 and days == 0:
+            days = config_days
+        if config_days != 0 and config_days < days:
+            days = config_days
+
+        if days > 0:
+            days_before = DateUtils.get_days_before_dt(days)
+
+            entries = LinkDataController.objects.filter(
+                source=source.url,
+                bookmarked=False,
+                permanent=False,
+                date_published__lt=days_before,
+            ).order_by("date_published")
+
+            if entries.exists():
+                return entries[0]
+
+    def get_next_entry_to_remove():
+        config = Configuration.get_object().config_entry
+        config_days = config.days_to_remove_links
 
         days = config_days
         if days != 0:
@@ -251,14 +333,15 @@ class LinkDataController(LinkDataModel):
             )
 
             if entries.exists():
-                for entry in entries:
-                    LinkDatabase.info("Removing link:{}".format(entry.link))
+                return entries[0]
 
-                    entry.delete()
-                    index += 1
+    def get_next_archive_entry_to_remove():
+        config = Configuration.get_object().config_entry
+        config_days = config.days_to_remove_links
 
-                    if limit and index > limit:
-                        return
+        days = config_days
+        if days != 0:
+            days_before = DateUtils.get_days_before_dt(days)
 
             entries = ArchiveLinkDataController.objects.filter(
                 bookmarked=False,
@@ -267,14 +350,7 @@ class LinkDataController(LinkDataModel):
             )
 
             if entries.exists():
-                for entry in entries:
-                    LinkDatabase.info("Removing link:{}".format(entry.link))
-
-                    entry.delete()
-                    index += 1
-
-                    if limit and index > limit:
-                        return
+                return entries[0]
 
     def get_clean_data(props):
         result = {}
@@ -524,6 +600,7 @@ class LinkDataBuilder(object):
             PersistentInfo.error("Could not obtain properties for:{}".format(self.link))
 
         # TODO update missing keys - do not replace them
+        new_link_data = None
 
         if self.link_data and link_data:
             new_link_data = {**self.link_data, **link_data}

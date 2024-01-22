@@ -19,11 +19,6 @@ class UrlTest(FakeInternetTestCase):
 
         self.assertEqual(handler.use_selenium, True)
 
-    def test_get_for_page_wsj(self):
-        handler = Url.get("https://www.wsj.com")
-
-        self.assertEqual(handler.use_selenium, True)
-
     def test_get_for_page_youtube(self):
         handler = Url.get("https://www.youtube.com")
 

@@ -13,6 +13,11 @@ def subs_checker_task(arg):
     LinkDatabase.info("Refreshing sources")
 
     try:
+        from .configuration import Configuration
+
+        if not Configuration.get_object().config_entry.background_task:
+            return
+
         from .threadhandlers import RefreshThreadHandler
 
         handler = RefreshThreadHandler()
@@ -31,6 +36,11 @@ def process_all_jobs_task(arg):
     LinkDatabase.info("Processing source")
 
     try:
+        from .configuration import Configuration
+
+        if not Configuration.get_object().config_entry.background_task:
+            return
+
         from .threadhandlers import HandlerManager
 
         mgr = HandlerManager()
@@ -52,6 +62,11 @@ def process_one_jobs_task(arg):
     LinkDatabase.info("Processing source")
 
     try:
+        from .configuration import Configuration
+
+        if not Configuration.get_object().config_entry.background_task:
+            return
+
         from .threadhandlers import HandlerManager
 
         mgr = HandlerManager()

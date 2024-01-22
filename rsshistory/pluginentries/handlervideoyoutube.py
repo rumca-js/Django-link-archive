@@ -99,11 +99,11 @@ class YouTubeVideoHandler(DefaultUrlHandler):
             self.h = HtmlPage(self.url)
 
         if not self.h.is_youtube():
-            print("It is invalid")
+            print("It is invalid:{} - it is not youtube".format(self.url))
             return False
 
         if not self.h.is_valid():
-            print("It is invalid")
+            print("It is invalid:{} - handle is not valid".format(self.url))
             return False
 
         invalid_text = '{"simpleText":"GO TO HOME"}'
@@ -114,7 +114,7 @@ class YouTubeVideoHandler(DefaultUrlHandler):
 
         live_field = self.h.get_meta_custom_field("itemprop", "isLiveBroadcast")
         if live_field and live_field.lower() == "true":
-            print("It is invalid")
+            print("It is invalid:{} - live".format(self.url))
             return False
 
         return True

@@ -3,6 +3,8 @@
 <ul>
     <li>Link: {{page_link}} <a href="{{page_link}}">Link</a></li>
     <li>Detected page type: {{page_type}}</li>
+    <li>Status code: {{page_object.status_code}}</li>
+    <li>Valid: {{page_object.is_valid}}</li>
     <li>Title: {{title}}</li>
     <li>Description: {{description}}</li>
     {%if page_object.get_date_published %}
