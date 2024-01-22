@@ -228,6 +228,9 @@ def show_page_props(request):
         fast_check = False
         use_selenium = False
 
+        if "use_selenium" in request.GET:
+            use_selenium = True
+
         page = UrlHandler.get(
             page_link, fast_check=fast_check, use_selenium=use_selenium
         )

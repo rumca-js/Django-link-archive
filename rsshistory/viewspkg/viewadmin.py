@@ -14,6 +14,8 @@ from ..models import (
     PersistentInfo,
     SourceExportHistory,
     Domains,
+    UserSearchHistory,
+    KeyWords,
 )
 from ..controllers import (
     SourceDataController,
@@ -79,6 +81,8 @@ def system_status(request):
     p.context["ConfigurationEntry"] = ConfigurationEntry.objects.count()
     p.context["UserConfig"] = UserConfig.objects.count()
     p.context["BackgroundJob"] = BackgroundJob.objects.count()
+    p.context["UserSearchHistory"] = UserSearchHistory.objects.count()
+    p.context["KeyWords"] = KeyWords.objects.count()
 
     from ..dateutils import DateUtils
     from datetime import timedelta

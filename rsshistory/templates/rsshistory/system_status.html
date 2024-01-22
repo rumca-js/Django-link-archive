@@ -16,12 +16,14 @@
     {% if DateTime_MoveToArchive %}
       <li>Move to archive date: {{DateTime_MoveToArchive}}</li>
     {%endif%}
-    <li>Sources: {{SourceDataModel}}</li>
-    <li>Entries: {{LinkDataModel}}</li>
-    <li>ArchiveEntries: {{ArchiveLinkDataModel}}</li>
-    <li>Tags length: {{LinkTagsDataModel}}</li>
-    <li>Configurations: {{ConfigurationEntry}}</li>
-    <li>UserConfig: {{UserConfig}}</li>
+    <li>Number of Sources: {{SourceDataModel}}</li>
+    <li>Number of Entries: {{LinkDataModel}}</li>
+    <li>Number of Archived entries: {{ArchiveLinkDataModel}}</li>
+    <li>Number of Tags: {{LinkTagsDataModel}}</li>
+    <li>Number of Keywords: {{KeyWords}}</li>
+    <li>Number of Configurations: {{ConfigurationEntry}}</li>
+    <li>Number of UserConfig: {{UserConfig}}</li>
+    <li>Number of UserSearchHistory: {{UserSearchHistory}}</li>
 
     <li>BackgroundJob: {{BackgroundJob}}
         <a href="{% url 'rsshistory:backgroundjobs' %}" title="View background jobs" class="simplebutton">View</a>

@@ -101,11 +101,11 @@ class BasePage(object):
             self.use_selenium = page_obj.use_selenium
             self.status_code = page_obj.status_code
             self.dead = page_obj.dead
-            self.respone_headers = page_obj.respone_headers
+            self.response_headers = page_obj.response_headers
         else:
             self.url = url
             self.use_selenium = use_selenium
-            self.respone_headers = {}
+            self.response_headers = {}
 
             # Flag to not retry same contents requests for things we already know are dead
             self.dead = False
@@ -247,7 +247,7 @@ class BasePage(object):
             r = self.get_contents_function(self.url, headers=hdr, timeout=10)
 
             self.status_code = r.status_code
-            self.respone_headers = r.headers
+            self.response_headers = r.headers
 
             """
             The default assumed content encoding for text/html is ISO-8859-1 aka Latin-1 :( See RFC-2854. UTF-8 was too young to become the default, it was born in 1993, about the same time as HTML and HTTP.
@@ -335,8 +335,8 @@ class BasePage(object):
         return self.status_code > 300 and self.status_code < 310
 
     def get_redirect_url(self):
-        if self.is_redirect() and "Location" in self.respone_headers.headers:
-            return self.respone_headers.headers["Location"]
+        if self.is_redirect() and "Location" in self.response_headers.headers:
+            return self.response_headers.headers["Location"]
 
     def get_full_url(self):
         if self.url.find("http") == -1:
