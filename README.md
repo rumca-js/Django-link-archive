@@ -205,7 +205,7 @@ What causes karma change:
 
 # Development
 
-Development is described by a separate README: [https://github.com/rumca-js/Django-link-archive/blob/main/README_development.md](https://github.com/rumca-js/Django-link-archive/blob/main/README_development.md).
+Development is described by a separate README: [README_development.md](https://github.com/rumca-js/Django-link-archive/blob/main/README_development.md).
 
 # Analysis of tools and services
 

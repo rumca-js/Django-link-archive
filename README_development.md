@@ -3,6 +3,21 @@
 The goal is to create personal archive database. We require small footprint.
 It should be able to operate on SBC, like raspberry PI.
 
+# On web scraping
+
+Please do not make anyone live miserable. It was designed to capture information from publicly available data (for example RSS), not to exploit anybody.
+
+On the other hand some web pages use sofisticated barriers that prevents us from successfuly scraping the web contents.
+
+Most common techniques:
+ - Some pages do not display contents, or provide invalid html data. You can use different user agent. Best results can be obtained if we used chrome user agent
+ - Spotify does not display any HTML code if we use common python requests API. For such pages we can use "selenium"
+ - Web page uses cloudflare and checks if you are human. There are several techniques for that. There is chromium stealth and other solutions
+
+RSS reading is not easy: [https://flak.tedunangst.com/post/cloudflare-and-rss](https://flak.tedunangst.com/post/cloudflare-and-rss)
+
+That gives us the conslusion, you have to be a sneaky bot, even if what you are doing is not wrong.
+
 # Development
 
  - installation should be simple and easy. Provide most common installation methods (Python poetry, docker)
