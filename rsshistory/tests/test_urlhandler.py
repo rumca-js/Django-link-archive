@@ -1,4 +1,4 @@
-from ..pluginentries.entryurlinterface import UrlHandler
+from ..pluginentries.urlhandler import UrlHandler
 from ..pluginentries.handlervideoyoutube import YouTubeVideoHandler
 from ..webtools import RssPage, HtmlPage
 
@@ -64,3 +64,17 @@ class UrlHandlerTest(FakeInternetTestCase):
         )
 
         self.assertEqual(handler.get_title(), "SAMTIME on Odysee")
+
+    def test_get_spotify(self):
+        handler = UrlHandler.get("https://open.spotify.com/somebody/episodes")
+
+        self.assertEqual(type(handler), HtmlPage)
+
+        self.assertTrue(handler.options.use_selenium_headless)
+
+    def test_get_warhammer_community(self):
+        handler = UrlHandler.get("https://www.warhammer-community.com")
+
+        self.assertEqual(type(handler), HtmlPage)
+
+        self.assertTrue(handler.options.use_selenium_full)

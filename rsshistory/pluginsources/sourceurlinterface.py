@@ -3,6 +3,7 @@ from ..models import (
     SourceDataModel,
 )
 from ..pluginsources.sourceparseplugin import BaseParsePlugin
+from ..pluginentries.urlhandler import UrlHandler
 
 
 class SourceUrlInterface(object):
@@ -18,13 +19,13 @@ class SourceUrlInterface(object):
 
     def get_props(self, input_props=None, use_selenium=False):
         fast_check = False
-        p = Url.get(self.url, fast_check=fast_check, use_selenium=use_selenium)
+
+        p = UrlHandler.get(self.url, fast_check=fast_check, use_selenium=use_selenium)
 
         if p.is_rss(fast_check=fast_check):
             return self.get_props_from_rss(self.url, p)
         elif p.is_youtube():
             # Someone might be surprised that added URL is being replaced
-            from ..pluginentries.entryurlinterface import UrlHandler
 
             handler = UrlHandler.get(self.url)
             p = RssPage(handler.get_channel_feed_url())

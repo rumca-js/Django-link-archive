@@ -26,6 +26,7 @@ from ..views import ViewPage
 from ..dateutils import DateUtils
 from ..forms import LinkInputForm
 from ..webtools import HtmlPage
+from ..pluginentries.urlhandler import UrlHandler
 
 
 def get_incorrect_youtube_links():
@@ -65,8 +66,6 @@ def data_errors_page(request):
         print("fix_reassign_source_to_nullsource_entries done")
 
     def fix_incorrect_youtube_links_links(entries):
-        from ..pluginentries.entryurlinterface import UrlHandler
-
         for entry in entries:
             print("Fixing: {} {} {}".format(entry.link, entry.title, entry.source))
             h = UrlHandler.get(entry.link)
@@ -141,8 +140,6 @@ def data_errors_page(request):
 
 
 def fix_reset_youtube_link_details(link_id):
-    from ..pluginentries.entryurlinterface import UrlHandler
-
     entry = LinkDataController.objects.get(id=link_id)
 
     h = UrlHandler.get(entry.link)
@@ -223,8 +220,6 @@ def show_page_props(request):
         return data
 
     def show_page_props_internal(requests, page_link):
-        from ..pluginentries.entryurlinterface import UrlHandler
-
         fast_check = False
         use_selenium = False
 

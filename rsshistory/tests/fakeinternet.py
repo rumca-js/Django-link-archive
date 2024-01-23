@@ -354,7 +354,7 @@ class FakeInternetTestCase(TestCase):
 
         BasePage.get_contents_function = self.get_contents_function
 
-        from ..pluginentries.entryurlinterface import UrlHandler
+        from ..pluginentries.urlhandler import UrlHandler
 
         UrlHandler.youtube_video_handler = YouTubeVideoHandlerMock
         # UrlHandler.youtube_channel_handler = YouTubeVideoHandlerMock

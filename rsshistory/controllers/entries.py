@@ -730,7 +730,7 @@ class LinkDataBuilder(object):
         return True
 
     def is_live_video(self):
-        from ..pluginentries.entryurlinterface import UrlHandler
+        from ..pluginentries.urlhandler import UrlHandler
 
         link_data = self.link_data
 

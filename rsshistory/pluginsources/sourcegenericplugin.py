@@ -10,10 +10,10 @@ from ..apps import LinkDatabase
 
 
 class SourceGenericPlugin(HtmlPage):
-    def __init__(self, source_id, use_selenium=False):
+    def __init__(self, source_id, options=None):
         self.source_id = source_id
         self.source = None
-        super().__init__(self.get_address(), use_selenium=use_selenium)
+        super().__init__(self.get_address(), options=options)
         self.hash = None
 
     def check_for_data(self):

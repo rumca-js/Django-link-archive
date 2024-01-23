@@ -94,7 +94,7 @@ class EntryUpdateData(BaseJobHandler):
                 entry.update_link_data()
             else:
                 LinkDatabase.info(
-                        "Cannot update data. Missing entry {0}".format(
+                    "Cannot update data. Missing entry {0}".format(
                         obj.subject,
                     )
                 )
@@ -626,9 +626,9 @@ class CleanupJobHandler(BaseJobHandler):
                 if obj is not None:
                     limit = int(obj.subject)
             except Exception as E:
-                LinkDatabase.info("Exception:{}".format(str(E)))
+                LinkDatabase.info("Cleanup, cannot read limit value:{}".format(str(E)))
 
-            limit_s = 60 * 10 # 10 minutes
+            limit_s = 60 * 10  # 10 minutes
             status = LinkDataController.cleanup(limit_s)
 
             if limit == 0:
@@ -742,7 +742,9 @@ class RefreshThreadHandler(object):
     def check_sources(self):
         from .controllers import SourceDataController
 
-        sources = SourceDataController.objects.filter(on_hold=False)
+        sources = SourceDataController.objects.filter(on_hold=False).order_by(
+            "dynamic_data__date_fetched"
+        )
         for source in sources:
             if source.is_fetch_possible():
                 BackgroundJobController.download_rss(source)

@@ -1,5 +1,6 @@
 from ..webtools import HtmlPage
-from .entryurlinterface import UrlHandler
+
+from .urlhandler import UrlHandler
 
 from .entryyoutubeplugin import EntryYouTubePlugin
 from .entryodyseeplugin import EntryOdyseePlugin

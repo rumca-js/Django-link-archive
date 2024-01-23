@@ -1,7 +1,12 @@
 from datetime import timedelta
 
 from ..models import ConfigurationEntry, LinkTagsDataModel
-from ..controllers import SourceDataController, LinkDataController, ArchiveLinkDataController, DomainsController
+from ..controllers import (
+    SourceDataController,
+    LinkDataController,
+    ArchiveLinkDataController,
+    DomainsController,
+)
 from ..configuration import Configuration
 from ..dateutils import DateUtils
 

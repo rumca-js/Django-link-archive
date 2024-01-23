@@ -94,21 +94,19 @@ class YouTubeVideoHandler(DefaultUrlHandler):
             self.dead = True
 
     def is_valid(self):
-        print("Checking if YouTube is valid")
         if not self.h:
             self.h = HtmlPage(self.url)
 
         if not self.h.is_youtube():
-            print("It is invalid:{} - it is not youtube".format(self.url))
             return False
 
         if not self.h.is_valid():
-            print("It is invalid:{} - handle is not valid".format(self.url))
             return False
+
         # TODO
-        #invalid_text = '{"simpleText":"GO TO HOME"}'
-        #contents = self.h.get_contents()
-        #if contents and contents.find(invalid_text) >= 0:
+        # invalid_text = '{"simpleText":"GO TO HOME"}'
+        # contents = self.h.get_contents()
+        # if contents and contents.find(invalid_text) >= 0:
         #    print("It is invalid:{} - invalid text found".format(self.url))
         #    return False
 

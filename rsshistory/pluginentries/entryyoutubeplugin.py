@@ -1,9 +1,11 @@
 from django.urls import reverse
 from django.templatetags.static import static
 
-from .entrygenericplugin import EntryGenericPlugin, EntryButton, EntryParameter
 from ..apps import LinkDatabase
 from ..models import ConfigurationEntry
+from ..pluginentries.urlhandler import UrlHandler
+
+from .entrygenericplugin import EntryGenericPlugin, EntryButton, EntryParameter
 
 
 class EntryYouTubePlugin(EntryGenericPlugin):
@@ -104,8 +106,6 @@ class EntryYouTubePlugin(EntryGenericPlugin):
         return buttons
 
     def get_video_code(self):
-        from ..pluginentries.entryurlinterface import UrlHandler
-
         h = UrlHandler.get(self.entry.link)
         return h.get_video_code()
 
@@ -113,7 +113,6 @@ class EntryYouTubePlugin(EntryGenericPlugin):
         """
         @note Some YouTube videos will not play without referrerpolicy.
         """
-        from ..pluginentries.entryurlinterface import UrlHandler
 
         h = UrlHandler.get(self.entry.link)
         return '<iframe src="{0}" frameborder="0" allowfullscreen class="youtube_player_frame" referrerpolicy="no-referrer-when-downgrade"></iframe>'.format(

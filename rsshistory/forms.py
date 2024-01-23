@@ -79,7 +79,7 @@ class ConfigForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(ConfigForm, self).__init__(*args, **kwargs)
-        
+
         # fmt: off
         self.fields["background_task"].help_text = "Informs system that background task, like celery is operational."
         self.fields["link_save"].help_text = "Links are saved using archive.org."

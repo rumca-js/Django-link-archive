@@ -1,4 +1,4 @@
-from ..webtools import Url
+from ..webtools import Url, PageOptions
 
 from .fakeinternet import FakeInternetTestCase
 
@@ -15,11 +15,15 @@ class UrlTest(FakeInternetTestCase):
         )
 
     def test_get_for_page_spotify(self):
-        handler = Url.get("https://open.spotify.com")
+        o = PageOptions()
+        o.use_selenium_full = True
+        handler = Url.get("https://open.spotify.com", options=o)
 
-        self.assertEqual(handler.use_selenium, True)
+        self.assertEqual(handler.options.use_selenium_full, True)
 
     def test_get_for_page_youtube(self):
-        handler = Url.get("https://www.youtube.com")
+        o = PageOptions()
+        o.use_selenium_headless = True
+        handler = Url.get("https://open.spotify.com", options=o)
 
-        self.assertEqual(handler.use_selenium, False)
+        self.assertEqual(handler.options.use_selenium_headless, True)

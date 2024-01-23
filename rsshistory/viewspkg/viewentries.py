@@ -429,7 +429,7 @@ class EntryDetailView(generic.DetailView):
         context["page_title"] = self.object.title
         context["page_thumbnail"] = self.object.thumbnail
         if self.object.date_published:
-             context["page_date_published"] = self.object.date_published.isoformat()
+            context["page_date_published"] = self.object.date_published.isoformat()
         context["object_controller"] = object_controller
 
         m = WaybackMachine()

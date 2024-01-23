@@ -3,11 +3,15 @@ import re
 import os
 import time
 
-from .sourcegenericplugin import SourceGenericPlugin
+from ..webtools import BasePage, HtmlPage, PageOptions
+from ..dateutils import DateUtils
 from ..models import PersistentInfo
 from ..controllers import LinkDataController
-from ..webtools import BasePage, HtmlPage, Url
 from ..apps import LinkDatabase
+from ..pluginentries.urlhandler import UrlHandler
+from ..pluginentries.entryurlinterface import EntryUrlInterface
+
+from .sourcegenericplugin import SourceGenericPlugin
 
 
 class BaseParsePlugin(SourceGenericPlugin):
@@ -15,19 +19,7 @@ class BaseParsePlugin(SourceGenericPlugin):
 
     def __init__(self, source_id):
         super().__init__(source_id)
-        self.use_selenium = self.is_selenium_required()
-
-    # def get_address(self):
-    #    return self.get_source().get_domain()
-
-    def is_selenium_required(self):
-        """
-        Selenium is required for some walled gardens
-        """
-        source = self.get_source()
-        url = source.url
-
-        return Url.is_selenium_required(url)
+        self.options = UrlHandler.get_page_options(self.get_address())
 
     def is_link_valid(self, address):
         source = self.get_source()
@@ -47,9 +39,6 @@ class BaseParsePlugin(SourceGenericPlugin):
         return False
 
     def get_link_data(self, source, link):
-        from ..dateutils import DateUtils
-        from ..pluginentries.entryurlinterface import EntryUrlInterface
-
         url = EntryUrlInterface(link)
 
         props = url.get_props()
@@ -75,6 +64,9 @@ class BaseParsePlugin(SourceGenericPlugin):
                     continue
 
                 link_props = self.get_link_data(self.get_source(), link_str)
+
+                if not link_props or len(link_props) == 0:
+                    continue
 
                 LinkDatabase.info(
                     "Processing parsing link {}:[{}/{}]".format(

@@ -78,6 +78,24 @@ class SeleniumResponseObject(object):
         self.headers = {}
 
 
+class PageOptions(object):
+    def __init__(self):
+        self.use_selenium_full = False
+        self.use_selenium_headless = False
+        self.ssl_verify = False
+
+    def is_not_selenium(self):
+        return not self.is_selenium
+
+    def is_selenium(self):
+        return self.use_selenium_full or self.use_selenium_headless
+
+    def __str__(self):
+        return "Full:{} Headless:{} SSL verify:{}".format(
+            self.use_selenium_full, self.use_selenium_headless, self.ssl_verify
+        )
+
+
 class BasePage(object):
     """
     Should not contain any HTML/RSS content processing
@@ -88,7 +106,7 @@ class BasePage(object):
     get_contents_function = None
     ssl_verify = True
 
-    def __init__(self, url, contents=None, use_selenium=False, page_obj=None):
+    def __init__(self, url, contents=None, options=None, page_obj=None):
         """
         @param url URL
         @param contents URL page contents
@@ -98,13 +116,13 @@ class BasePage(object):
         if page_obj:
             self.url = page_obj.url
             self.contents = page_obj.contents
-            self.use_selenium = page_obj.use_selenium
+            self.options = page_obj.options
             self.status_code = page_obj.status_code
             self.dead = page_obj.dead
             self.response_headers = page_obj.response_headers
         else:
             self.url = url
-            self.use_selenium = use_selenium
+            self.options = options
             self.response_headers = {}
 
             # Flag to not retry same contents requests for things we already know are dead
@@ -123,6 +141,9 @@ class BasePage(object):
             self.status_code = 200
         else:
             self.status_code = 0
+
+        if not self.options:
+            self.options = PageOptions()
 
         if BasePage.get_contents_function is None:
             self.get_contents_function = self.get_contents_internal
@@ -276,14 +297,22 @@ class BasePage(object):
             )
 
     def get_contents_internal(self, url, headers, timeout):
-        LinkDatabase.info("Page: Requesting page: {}".format(url))
+        LinkDatabase.info(
+            "Page: Requesting page: {} options:{}".format(url, self.options)
+        )
 
-        if not self.use_selenium:
+        if not self.options.is_not_selenium():
             return self.get_contents_via_requests(self.url, headers=headers, timeout=10)
-        else:
-            return self.get_contents_via_selenium_chrome(
+        elif self.options.use_selenium_full:
+            return self.get_contents_via_selenium_chrome_full(
                 self.url, headers=headers, timeout=10
             )
+        elif self.options.use_selenium_headless:
+            return self.get_contents_via_selenium_chrome_headless(
+                self.url, headers=headers, timeout=10
+            )
+        else:
+            raise NotImplementedError("Could not identify method of page capture")
 
     def get_contents_via_requests(self, url, headers, timeout):
         """
@@ -301,11 +330,11 @@ class BasePage(object):
 
         return request_result
 
-    def get_contents_via_selenium_chrome(self, url, headers, timeout):
+    def get_contents_via_selenium_chrome_headless(self, url, headers, timeout):
         """
-        We cannot use one browser instance for our app. The app can contain multiple threads
-        For simplicity, each call starts it's own browser.
-        It could be optimized in the future.
+        To obtain RSS page you have to run real, full blown browser.
+
+        Headless might not be enough to fool cloudflare.
         """
         service = Service(executable_path="/usr/bin/chromedriver")
         options = webdriver.ChromeOptions()
@@ -320,6 +349,82 @@ class BasePage(object):
 
         try:
             driver.get(url)
+        except TimeoutException:
+            PersistentInfo.error(
+                "Timeout when reading page. {}".format(selenium_timeout)
+            )
+
+        html_content = driver.page_source
+
+        driver.quit()
+
+        return SeleniumResponseObject(url, html_content)
+
+    def get_contents_via_selenium_chrome_full(self, url, headers, timeout):
+        """
+        To obtain RSS page you have to run real, full blown browser.
+
+        It may require some magic things to make the browser running.
+
+        https://stackoverflow.com/questions/50642308/webdriverexception-unknown-error-devtoolsactiveport-file-doesnt-exist-while-t
+        """
+        import os
+
+        os.environ["DISPLAY"] = ":10.0"
+
+        service = Service(executable_path="/usr/bin/chromedriver")
+        options = webdriver.ChromeOptions()
+        # options.add_argument("--headless")
+        options.add_argument("--no-sandbox")
+        options.add_argument("--disable-dev-shm-usage")
+
+        driver = webdriver.Chrome(service=service, options=options)
+
+        # add 10 seconds for start of browser, etc.
+        selenium_timeout = timeout + 20
+
+        driver.set_page_load_timeout(selenium_timeout)
+
+        try:
+            driver.get(url)
+        except TimeoutException:
+            PersistentInfo.error(
+                "Timeout when reading page. {}".format(selenium_timeout)
+            )
+
+        page_source = driver.page_source
+
+        ## Parse the HTML with BeautifulSoup
+        # soup = BeautifulSoup(page_source, 'html.parser')
+
+        ## Extract the RSS content from the HTML body
+        # rss_content = soup.find('body').get_text()
+
+        driver.quit()
+
+        return SeleniumResponseObject(url, page_source)
+
+    def get_contents_via_selenium_chrome_undetected(self, url, headers, timeout):
+        """
+        To obtain RSS page you have to run real, full blown browser.
+
+        It may require some magic things to make the browser running.
+
+        This does not work on raspberry pi
+        """
+        import undetected_chromedriver as uc
+
+        options = uc.ChromeOptions()
+        driver = uc.Chrome(options=options)
+
+        # add 10 seconds for start of browser, etc.
+        selenium_timeout = timeout + 10
+
+        driver.set_page_load_timeout(selenium_timeout)
+
+        try:
+            driver.get(url)
+            time.sleep(5)
         except TimeoutException:
             PersistentInfo.error(
                 "Timeout when reading page. {}".format(selenium_timeout)
@@ -428,10 +533,8 @@ class BasePage(object):
 
 
 class DomainAwarePage(BasePage):
-    def __init__(self, url, contents=None, use_selenium=False, page_obj=None):
-        super().__init__(
-            url, contents=contents, use_selenium=use_selenium, page_obj=page_obj
-        )
+    def __init__(self, url, contents=None, options=None, page_obj=None):
+        super().__init__(url, contents=contents, options=options, page_obj=page_obj)
 
     def is_mainstream(self):
         dom = self.get_domain_only()
@@ -569,37 +672,52 @@ class DomainAwarePage(BasePage):
         # if not found, we return none
 
     def get_type_by_checking_contents(self):
-        if self.is_contents_html():
-            return URL_TYPE_HTML
         if self.is_contents_rss():
             return URL_TYPE_RSS
+        if self.is_contents_html():
+            return URL_TYPE_HTML
 
     @lazy_load_content
     def is_contents_html(self):
+        """
+        We want the checks to be simple yet effective. Check some tokens.
+
+        There can be RSS sources in HTML, HTML inside RSS. Beware
+        """
         if not self.contents:
             LinkDatabase.info("Could not obtain contents for {}".format(self.url))
             return
 
-        lower = self.contents.lower()
+        html_tags = self.get_position_of_html_tags()
+        rss_tags = self.get_position_of_rss_tags()
 
-        if lower.find("<html") >= 0 and lower.find("<body") >= 0:
+        if html_tags >= 0 and rss_tags >= 0:
+            return html_tags < rss_tags
+        if html_tags >= 0:
             return True
 
     @lazy_load_content
     def is_contents_rss(self):
+        """
+        We want the checks to be simple yet effective. Check some tokens.
+
+        There can be RSS sources in HTML, HTML inside RSS. Beware
+        """
         if not self.contents:
             LinkDatabase.info("Could not obtain contents for {}".format(self.url))
             return
 
-        lower = self.contents.lower()
+        html_tags = self.get_position_of_html_tags()
+        rss_tags = self.get_position_of_rss_tags()
 
-        if (
-            lower.find("<channel>") >= 0
-            and lower.find("<title>") >= 0
-            and lower.find("<item>") >= 0
-        ):
+        if html_tags >= 0 and rss_tags >= 0:
+            return rss_tags < html_tags
+        if rss_tags >= 0:
             return True
 
+        """
+        If we want to have full blown parsing. Not worth it.
+        """
         try:
             import feedparser
 
@@ -610,12 +728,36 @@ class DomainAwarePage(BasePage):
         except Exception as e:
             return False
 
+    @lazy_load_content
+    def get_position_of_html_tags(self):
+        if not self.contents:
+            return -1
+
+        lower = self.contents.lower()
+        if lower.find("<html") >= 0 and lower.find("<body") >= 0:
+            return lower.find("<html")
+
+        return -1
+
+    @lazy_load_content
+    def get_position_of_rss_tags(self):
+        if not self.contents:
+            return -1
+
+        lower = self.contents.lower()
+        if (
+            lower.find("<rss") >= 0
+            and lower.find("<channel") >= 0
+            and lower.find("<link") >= 0
+        ):
+            return lower.find("<rss")
+
+        return -1
+
 
 class ContentInterface(DomainAwarePage):
-    def __init__(self, url, contents=None, use_selenium=False, page_obj=None):
-        super().__init__(
-            url, contents=contents, use_selenium=use_selenium, page_obj=page_obj
-        )
+    def __init__(self, url, contents=None, options=None, page_obj=None):
+        super().__init__(url, contents=contents, options=options, page_obj=page_obj)
 
     def get_title(self):
         raise NotImplementedError
@@ -664,6 +806,18 @@ class ContentInterface(DomainAwarePage):
         props["tags"] = self.get_tags()
 
         return props
+
+    def is_cloudflare_protected(self):
+        contents = self.get_contents()
+
+        if (
+            contents
+            and contents.find("https://static.cloudflareinsights.com/beacon.min.js/")
+            >= 0
+        ):
+            return True
+
+        return False
 
     def guess_date(self):
         """
@@ -748,7 +902,7 @@ class ContentInterface(DomainAwarePage):
                     str_month = str(str_month)
                 except Exception as E:
                     LinkDatabase.error(
-                            "Guessing date error: URL:{};\nscope:{};\nMonth:{}\nExc:{}".format(
+                        "Guessing date error: URL:{};\nscope:{};\nMonth:{}\nExc:{}".format(
                             self.url, scope, month, str(E)
                         )
                     )
@@ -759,7 +913,7 @@ class ContentInterface(DomainAwarePage):
                 date_object = datetime.strptime(date_string, "%Y-%m-%d")
             except Exception as E:
                 PersistentInfo.error(
-                        "Guessing date error: URL:{}\nscope:{}\nYear:{} Month:{} Day:{}\nDate string:{}\nExc:{}".format(
+                    "Guessing date error: URL:{}\nscope:{}\nYear:{} Month:{} Day:{}\nDate string:{}\nExc:{}".format(
                         self.url, scope, year, str_month, day, date_string, str(E)
                     )
                 )
@@ -785,10 +939,8 @@ class ContentInterface(DomainAwarePage):
 
 
 class DefaultContentPage(ContentInterface):
-    def __init__(self, url, contents=None, use_selenium=False, page_obj=None):
-        super().__init__(
-            url, contents=contents, use_selenium=use_selenium, page_obj=page_obj
-        )
+    def __init__(self, url, contents=None, options=None, page_obj=None):
+        super().__init__(url, contents=contents, options=options, page_obj=page_obj)
 
     def get_title(self):
         return self.url
@@ -843,10 +995,8 @@ class DefaultContentPage(ContentInterface):
 
 
 class JsonPage(ContentInterface):
-    def __init__(self, url, contents=None, use_selenium=False, page_obj=None):
-        super().__init__(
-            url, contents=contents, use_selenium=use_selenium, page_obj=page_obj
-        )
+    def __init__(self, url, contents=None, options=None, page_obj=None):
+        super().__init__(url, contents=contents, options=options, page_obj=page_obj)
 
         self.json_obj = None
         try:
@@ -902,10 +1052,8 @@ class RssPage(ContentInterface):
     which allows to define timeouts.
     """
 
-    def __init__(self, url, contents=None, use_selenium=False, page_obj=None):
-        super().__init__(
-            url, contents=contents, use_selenium=use_selenium, page_obj=page_obj
-        )
+    def __init__(self, url, contents=None, options=None, page_obj=None):
+        super().__init__(url, contents=contents, options=options, page_obj=page_obj)
         self.allow_adding_with_current_time = True
         self.default_entry_timestamp = None
         self.feed = None
@@ -1152,10 +1300,8 @@ class ContentLinkParser(BasePage):
     TODO filter also html from non html
     """
 
-    def __init__(self, url, contents=None, use_selenium=False, page_obj=None):
-        super().__init__(
-            url, contents=contents, use_selenium=use_selenium, page_obj=page_obj
-        )
+    def __init__(self, url, contents=None, options=None, page_obj=None):
+        super().__init__(url, contents=contents, options=options, page_obj=page_obj)
         self.url = self.get_clean_url()
 
     def get_contents(self):
@@ -1291,10 +1437,8 @@ class HtmlPage(ContentInterface):
     href="https://images/facebook.png"
     """
 
-    def __init__(self, url, contents=None, use_selenium=False, page_obj=None):
-        super().__init__(
-            url, contents=contents, use_selenium=use_selenium, page_obj=page_obj
-        )
+    def __init__(self, url, contents=None, options=None, page_obj=None):
+        super().__init__(url, contents=contents, options=options, page_obj=page_obj)
         self.robots_contents = None
 
     def process_contents(self):
@@ -1398,7 +1542,11 @@ class HtmlPage(ContentInterface):
                 parsed_date = parser.parse(date_str)
                 return DateUtils.to_utc_date(parsed_date)
             except Exception as E:
-                PersistentInfo.error("Could not parse music:release_date {} Exc:{}".format(date_str, str(E)))
+                PersistentInfo.error(
+                    "Could not parse music:release_date {} Exc:{}".format(
+                        date_str, str(E)
+                    )
+                )
 
     @lazy_load_content
     def get_title_head(self):
@@ -1780,7 +1928,7 @@ class HtmlPage(ContentInterface):
 
 
 class Url(object):
-    def get(url, contents=None, fast_check=True, use_selenium=False):
+    def get(url, contents=None, fast_check=True, options=None):
         """
         @note It is supposed to be more smart. Therefore for walled gardens it will
         decide about selenium.
@@ -1788,10 +1936,7 @@ class Url(object):
         @returns Appropriate handler for the link
         """
 
-        if use_selenium == False and Url.is_selenium_required(url):
-            use_selenium = True
-
-        p = HtmlPage(url, contents=contents, use_selenium=use_selenium)
+        p = HtmlPage(url, contents=contents, options=options)
 
         if p.is_html(fast_check):
             return p
@@ -1831,12 +1976,6 @@ class Url(object):
             or url.startswith("smb:")
             or url.startswith("ftp:")
         ):
-            return True
-
-        return False
-
-    def is_selenium_required(url):
-        if url.find("https://open.spotify.com") >= 0:
             return True
 
         return False

@@ -258,7 +258,9 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         conf = Configuration.get_object().config_entry
 
         current_time = DateUtils.get_datetime_now_utc()
-        date_link_publish = current_time - timedelta(days=conf.days_to_move_to_archive + 1)
+        date_link_publish = current_time - timedelta(
+            days=conf.days_to_move_to_archive + 1
+        )
         date_to_remove = current_time - timedelta(days=conf.days_to_remove_links + 1)
 
         self.clear()
@@ -297,4 +299,3 @@ class LinkDataWrapperTest(FakeInternetTestCase):
 
         self.assertEqual(archived[1].domain_obj, domains[0])
         self.assertEqual(archived[1].date_published, date_link_publish)
-
