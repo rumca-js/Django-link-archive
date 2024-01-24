@@ -83,6 +83,8 @@ class PageOptions(object):
         self.use_selenium_full = False
         self.use_selenium_headless = False
         self.ssl_verify = False
+        self.fast_parsing = True
+        self.custom_user_agent = ""
 
     def is_not_selenium(self):
         return not self.is_selenium
@@ -604,6 +606,8 @@ class DomainAwarePage(BasePage):
         if self.url.endswith("static.ads-twitter.com"):
             return True
         if self.url.endswith("analytics.twitter.com "):
+            return True
+        if self.url.find("https://static.cloudflareinsights.com/beacon.min.js/") >= 0:
             return True
 
     def is_link(self):

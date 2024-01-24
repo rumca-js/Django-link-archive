@@ -87,18 +87,6 @@ class EntryYouTubePlugin(EntryGenericPlugin):
             ),
         )
 
-        search_term = self.entry.title
-        buttons.append(
-            EntryButton(
-                self.user,
-                "Odysee",
-                "https://odysee.com/$/search?q={}".format(search_term),
-                ConfigurationEntry.ACCESS_TYPE_ALL,
-                "Search for video on odysee",
-                "https://odysee.com/public/favicon_128.png",
-            ),
-        )
-
         return buttons
 
     def get_advanced_menu_buttons(self):

@@ -1,19 +1,9 @@
-{% if search_term %}
+{% if search_engines %}
 
-Search other places
+    <h3>Search other places</h3>
 <div>
-  <a href="https://en.wikipedia.org/w/index.php?search={{search_term}}" class="simplebutton">Ask Wikipedia</a>
-  <a href="https://google.com/?q={{search_term}}" class="simplebutton">Ask Google.com</a>
-  <a href="https://bing.com/?q={{search_term}}" class="simplebutton">Ask Bing.com</a>
-  <a href="https://chat.openai.com/" class="simplebutton">ChatGPT</a>
-  <a href="https://www.reddit.com/search/?q={{search_term}}" class="simplebutton">Ask Reddit</a>
-  <a href="https://www.quora.com/search?q={{search_term}}" class="simplebutton">Ask Quora</a>
-  <a href="https://www.perplexity.ai/?q={{search_term}}" class="simplebutton">Ask Perplexity AI</a>
-  <a href="https://www.wolframalpha.com/input?i={{search_term}}" class="simplebutton">Ask Wolfram Alpha</a>
-  <a href="https://yewtu.be/search?q={{search_term}}" class="simplebutton">Ask YewTu.be</a>
-  <a href="https://stackoverflow.com/search?q={{search_term}}" class="simplebutton">Ask Stack Overflow</a>
-  <a href="https://www.youtube.com/results?search_query={{search_term}}" class="simplebutton">YouTube</a>
-  <a href="https://open.spotify.com/search/{{search_term}}" class="simplebutton">Spotify</a>
-  <a href="https://search.marginalia.nu/search?query={{search_term}}" class="simplebutton">Ask Marginalia Search</a>
+    {% for search_engine in search_engines.get %}
+    <a href="{{search_engine.get_search_string}}" class="simplebutton">{{search_engine.get_name}}</a>
+    {% endfor %}
 </div>
 {% endif %}

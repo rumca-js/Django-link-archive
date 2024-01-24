@@ -33,6 +33,9 @@ class BaseRssPlugin(SourceGenericPlugin):
                 )
             )
 
+            if self.options.is_selenium():
+                return
+
             if self.is_cloudflare_protected():
                 LinkDatabase.info(
                     "Source:{} Title:{}; Feed is protected by Cloudflare".format(
@@ -51,6 +54,14 @@ class BaseRssPlugin(SourceGenericPlugin):
                 Sometimes RSS might hide in <body>. I know that is stupid.
                 Parse the HTML with BeautifulSoup.
                 """
+                if not contents:
+                    PersistentInfo.error(
+                        "Source:{} Title:{}; Could not obtain contents.\nStatus code:{}\nContents\n{}".format(
+                            source.url, source.title, self.reader.status_code, contents
+                        )
+                    )
+                    return None
+
                 soup = BeautifulSoup(contents, "html.parser")
                 body_find = soup.find("body")
                 if not body_find:

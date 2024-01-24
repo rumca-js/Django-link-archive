@@ -212,7 +212,7 @@ class DataWriterTest(FakeInternetTestCase):
             / "2023"
             / "03"
             / "2023-03-03"
-            / "https.youtube.com_entries.json"
+            / "https...youtube.com_entries.json"
         )
 
         json_obj = json.loads(json_file.read_text())

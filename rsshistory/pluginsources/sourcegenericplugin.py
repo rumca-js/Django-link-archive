@@ -2,18 +2,25 @@ import traceback
 import hashlib
 
 from ..models import PersistentInfo
-from ..webtools import HtmlPage
+from ..webtools import HtmlPage, PageOptions
 from ..dateutils import DateUtils
 from ..controllers import LinkDataBuilder, SourceDataController
 from ..models import BaseLinkDataController
 from ..apps import LinkDatabase
+from ..pluginentries.urlhandler import UrlHandler
 
 
 class SourceGenericPlugin(HtmlPage):
     def __init__(self, source_id, options=None):
         self.source_id = source_id
         self.source = None
+
+        source = self.get_source()
+        if source:
+            options = UrlHandler.get_url_options(source.url)
+
         super().__init__(self.get_address(), options=options)
+
         self.hash = None
 
     def check_for_data(self):

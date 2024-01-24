@@ -258,6 +258,7 @@ class EntryFilter(BaseQueryFilter):
             "album",
             "vote",
             # not related to entry/link
+            "source_id",
             "source_title",
             "category",
             "subcategory",
@@ -276,6 +277,7 @@ class EntryFilter(BaseQueryFilter):
             self.copy_if_is_set_and_translate(parameter_map, self.args, "user")
             self.copy_if_is_set_and_translate(parameter_map, self.args, "tag")
             self.copy_if_is_set_and_translate(parameter_map, self.args, "vote")
+            self.copy_if_is_set_and_translate(parameter_map, self.args, "source_id")
             self.copy_if_is_set_and_translate(parameter_map, self.args, "source_title")
             self.copy_if_is_set_and_translate(parameter_map, self.args, "permanent")
             self.copy_if_is_set_and_translate(parameter_map, self.args, "bookmarked")
@@ -333,6 +335,7 @@ class EntryFilter(BaseQueryFilter):
             "language": "language__icontains",
             "category": "source_obj__category",
             "subcategory": "source_obj__subcategory",
+            "source_id": "source_obj__id",
             "source_title": "source_obj__title",
             "user": "user__icontains",
             "vote": "votes__vote__gt",

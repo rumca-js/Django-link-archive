@@ -16,7 +16,7 @@ class SourceControllerTest(FakeInternetTestCase):
     def test_new_source(self):
         self.assertEqual(SourceDataController.objects.all().count(), 0)
 
-        SourceDataBuilder.add_from_props(
+        SourceDataBuilder(link_data =
             {
                 "url": "https://linkedin.com",
                 "title": "LinkedIn",
@@ -24,7 +24,7 @@ class SourceControllerTest(FakeInternetTestCase):
                 "subcategory": "No",
                 "export_to_cms": False,
             }
-        )
+            ).add_from_props()
 
         self.assertEqual(SourceDataController.objects.all().count(), 1)
 
@@ -34,7 +34,7 @@ class SourceControllerTest(FakeInternetTestCase):
     def test_new_source_twice(self):
         self.assertEqual(SourceDataController.objects.all().count(), 0)
 
-        SourceDataBuilder.add_from_props(
+        SourceDataBuilder(link_data =
             {
                 "url": "https://linkedin.com",
                 "title": "LinkedIn",
@@ -42,9 +42,9 @@ class SourceControllerTest(FakeInternetTestCase):
                 "subcategory": "No",
                 "export_to_cms": False,
             }
-        )
+        ).add_from_props()
 
-        SourceDataBuilder.add_from_props(
+        SourceDataBuilder(link_data =
             {
                 "url": "https://linkedin.com",
                 "title": "LinkedIn",
@@ -52,12 +52,12 @@ class SourceControllerTest(FakeInternetTestCase):
                 "subcategory": "No",
                 "export_to_cms": False,
             }
-        )
+        ).add_from_props()
 
         self.assertEqual(SourceDataController.objects.all().count(), 1)
 
     def test_source_favicon(self):
-        source = SourceDataBuilder.add_from_props(
+        source = SourceDataBuilder(link_data =
             {
                 "url": "https://linkedin.com",
                 "title": "LinkedIn",
@@ -65,7 +65,7 @@ class SourceControllerTest(FakeInternetTestCase):
                 "subcategory": "No",
                 "export_to_cms": False,
             }
-        )
+        ).add_from_props()
 
         self.assertTrue(source.get_favicon() == "https://linkedin.com/favicon.ico")
 

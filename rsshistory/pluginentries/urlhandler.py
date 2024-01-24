@@ -44,13 +44,9 @@ class UrlHandler(object):
         if UrlHandler.is_odysee_channel(short_url):
             return UrlHandler.odysee_channel_handler(url)
 
-        options = PageOptions()
-
-        if not use_selenium:
-            if UrlHandler.is_selenium_full_required(url):
-                options.use_selenium_full = True
-            if UrlHandler.is_selenium_headless_required(url):
-                options.use_selenium_headless = True
+        options = UrlHandler.get_url_options(url)
+        if options.is_not_selenium() and use_selenium:
+            options.use_selenium_headless = True
 
         page = Url.get(url, fast_check=fast_check, options=options)
 
@@ -64,6 +60,16 @@ class UrlHandler(object):
             page = Url.get(url, fast_check=fast_check, options=options)
 
         return page
+
+    def get_url_options(url):
+        options = PageOptions()
+
+        if UrlHandler.is_selenium_full_required(url):
+            options.use_selenium_full = True
+        if UrlHandler.is_selenium_headless_required(url):
+            options.use_selenium_headless = True
+
+        return options
 
     def is_youtube_video(url):
         return (
@@ -101,7 +107,8 @@ class UrlHandler(object):
             return True
 
     def is_selenium_headless_required(url):
-        if url.find("https://open.spotify.com") >= 0:
+        if (url.find("https://open.spotify.com") >= 0 or
+           url.find("https://thehill.com") >= 0):
             return True
 
         return False

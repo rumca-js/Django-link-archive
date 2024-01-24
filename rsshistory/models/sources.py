@@ -2,6 +2,9 @@ from django.db import models
 from django.urls import reverse
 
 
+
+
+
 class SourceDataModel(models.Model):
     SOURCE_TYPE_RSS = "BaseRssPlugin"
     SOURCE_TYPE_JSON = "BaseSourceJsonPlugin"
@@ -9,7 +12,9 @@ class SourceDataModel(models.Model):
 
     url = models.CharField(max_length=2000, unique=True)
     title = models.CharField(max_length=1000)
+    # main category
     category = models.CharField(max_length=1000)
+    # main subcategory
     subcategory = models.CharField(max_length=1000)
     dead = models.BooleanField(default=False)
     export_to_cms = models.BooleanField(default=False)
@@ -20,8 +25,24 @@ class SourceDataModel(models.Model):
     fetch_period = models.IntegerField(default=900)
     source_type = models.CharField(max_length=1000, null=False, default=SOURCE_TYPE_RSS)
 
-    # proxy location
     proxy_location = models.CharField(max_length=200, default="")
+
+    """
+    advanced_category_mapping?
+
+    "Tech/New Age;YouTube/Tech"
+    "Tech;YouTube"
+
+    One subcategory can have multiple sources inside.
+    One source, can be in multiple subcategories
+    source_subcategories = models.ManyToManyField(
+        SourceDataModel,
+        on_delete=models.SET_NULL,
+        related_name="source_objects",
+        null=True,
+        blank=True,
+    )
+    """
 
     class Meta:
         ordering = ["title"]
@@ -69,6 +90,11 @@ class SourceCategories(models.Model):
             if objs.count() == 0:
                 SourceCategories.objects.create(category=category)
 
+    def get(category):
+        objs = SourceCategories.objects.filter(category=category)
+        if objs.count() != 0:
+            return objs[0]
+
 
 class SourceSubCategories(models.Model):
     category = models.CharField(max_length=1000, default="")
@@ -86,3 +112,19 @@ class SourceSubCategories(models.Model):
                 SourceSubCategories.objects.create(
                     category=category, subcategory=subcategory
                 )
+
+    def get(category, subcategory):
+        objs = SourceSubCategories.objects.filter(category=category, subcategory=subcategory)
+        if objs.count() != 0:
+            return objs[0]
+
+    """
+    category_object = models.ForeignKey(
+        SourceCategories,
+        on_delete=models.SET_NULL,
+        related_name="subcategory_objects",
+        null=True,
+        blank=True,
+    )
+    """
+

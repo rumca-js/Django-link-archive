@@ -264,6 +264,9 @@ class BaseLinkDataController(BaseLinkDataModel):
         return self.get_favicon()
 
     def get_export_names():
+        """
+        Provides object export names. No dependencies towards other objects
+        """
         return [
             "source",
             "title",
@@ -286,38 +289,25 @@ class BaseLinkDataController(BaseLinkDataModel):
         ]
 
     def get_query_names():
-        names = BaseLinkDataController.get_export_names()
-        names.append("source_obj__title")
-        names.append("source_obj__category")
-        names.append("source_obj__subcategory")
-        names.append("tags__tag")
-        names.append("votes__vote")
-        return names
+        names = set(BaseLinkDataController.get_export_names())
+        names.add("source_obj__id")
+        names.add("source_obj__title")
+        names.add("source_obj__category")
+        names.add("source_obj__subcategory")
+        names.add("tags__tag")
+        names.add("votes__vote")
+        return list(names)
 
     def get_all_export_names():
-        return [
-            "source",
-            "title",
-            "description",
-            "link",
-            "date_published",
-            "permanent",
-            "bookmarked",
-            "dead",
-            "artist",
-            "album",
-            "user",
-            "language",
-            "thumbnail",
-            "age",
-            "page_rating_contents",
-            "page_rating_votes",
-            "page_rating_visits",
-            "page_rating",
-            "tags",
-            "comments",
-            "vote",
-        ]
+        """
+        Provides object export names with dependencies from other objects
+        """
+        names = set(BaseLinkDataController.get_export_names())
+        names.add("source_obj__id")
+        names.add("tags")
+        names.add("comments")
+        names.add("vote")
+        return list(names)
 
     def get_map(self):
         output_data = {}
@@ -351,6 +341,9 @@ class BaseLinkDataController(BaseLinkDataModel):
             themap["comments"] = comments
         else:
             themap["comments"] = []
+
+        if self.source_obj:
+            themap["source_obj__id"] = self.source_obj.id
 
         return themap
 

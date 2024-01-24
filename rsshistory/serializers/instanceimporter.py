@@ -157,7 +157,7 @@ class InstanceImporter(object):
             clean_data = self.drop_source_instance_internal_data(clean_data)
             if instance_import:
                 clean_data["on_hold"] = True
-            SourceDataBuilder.add_from_props(clean_data)
+            SourceDataBuilder(link_data = clean_data).add_from_props()
         else:
             if instance_import:
                 source = sources[0]

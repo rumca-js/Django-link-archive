@@ -316,6 +316,8 @@ class SourceForm(forms.ModelForm):
         names = SourceControllerBuilder.get_plugin_names()
         self.fields["source_type"].widget = forms.Select(choices=self.to_choices(names))
 
+        self.fields["proxy_location"].help_text = "Proxy location for the source. Proxy location will be used instead of normal processing."
+
     def to_choices(self, names):
         names = sorted(names)
         result = []
@@ -543,7 +545,7 @@ class BasicEntryChoiceForm(forms.Form):
     search = forms.CharField(label="Search", max_length=1000, required=False)
     category = forms.CharField(widget=forms.Select(choices=()), required=False)
     subcategory = forms.CharField(widget=forms.Select(choices=()), required=False)
-    source_title = forms.CharField(widget=forms.Select(choices=()), required=False)
+    source_id = forms.CharField(widget=forms.Select(choices=()), required=False)
 
     def create(self, sources):
         # how to unpack dynamic forms
@@ -552,19 +554,19 @@ class BasicEntryChoiceForm(forms.Form):
         condition2 = Q(on_hold=True) & ~Q(proxy_location="")
         self.sources = SourceDataController.objects.filter(condition1 | condition2)
 
-        categories = self.get_sources_values("category")
-        subcategories = self.get_sources_values("subcategory")
-        title = self.get_sources_values("title")
+        category_choices = self.get_sources_values("category")
+        subcategory_choices = self.get_sources_values("subcategory")
+        title_choices = self.get_sources_ids_values("title")
 
         # custom javascript code
         # https://stackoverflow.com/questions/10099710/how-to-manually-create-a-select-field-from-a-modelform-in-django
         attr = {"onchange": "this.form.submit()"}
 
-        self.fields["category"].widget = forms.Select(choices=categories, attrs=attr)
+        self.fields["category"].widget = forms.Select(choices=category_choices, attrs=attr)
         self.fields["subcategory"].widget = forms.Select(
-            choices=subcategories, attrs=attr
+            choices=subcategory_choices, attrs=attr
         )
-        self.fields["source_title"].widget = forms.Select(choices=title, attrs=attr)
+        self.fields["source_id"].widget = forms.Select(choices=title_choices, attrs=attr)
 
     def get_categories(self):
         from .models import SourceCategories
@@ -601,6 +603,16 @@ class BasicEntryChoiceForm(forms.Form):
         dict_values = self.to_dict(values)
 
         return dict_values
+
+    def get_sources_ids_values(self, field):
+        values = []
+        values.append(("", ""))
+
+        if self.sources.count() > 0:
+            for atuple in self.sources.values_list("id", field):
+                values.append(atuple)
+
+        return values
 
     def to_dict(self, alist):
         result = []

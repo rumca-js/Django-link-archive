@@ -70,5 +70,12 @@
     <p>
     <a href="{% url 'rsshistory:source-json' object.id %}" class="simplebutton">Show JSON</a>
     </p>
+
+    <h3>Search other places</h3>
+    <div>
+        {% for search_engine in search_engines.get %}
+        <a href="{{search_engine.get_search_string}}" class="simplebutton">{{search_engine.get_name}}</a>
+        {% endfor %}
+    </div>
   {% endif %}
 {% endblock %}

@@ -11,6 +11,8 @@ from ..models import (
     PersistentInfo,
     SourceDataModel,
     SourceOperationalData,
+    SourceCategories,
+    SourceSubCategories,
 )
 
 from ..configuration import Configuration
@@ -255,7 +257,19 @@ class SourceDataController(SourceDataModel):
 
 
 class SourceDataBuilder(object):
-    def add_from_url(rss_url, link_props):
+    def __init__(self, link=None, link_data=None):
+        self.link = link
+        self.link_data = link_data
+
+        if self.link:
+            self.add_from_link()
+
+        if self.link_data:
+            self.add_from_props()
+
+    def add_from_link(self):
+        rss_url = self.link
+
         conf = Configuration.get_object().config_entry
 
         if rss_url.endswith("/"):
@@ -264,8 +278,8 @@ class SourceDataBuilder(object):
         if SourceDataModel.objects.filter(url=rss_url).count() > 0:
             return
 
-        if "contents" in link_props:
-            parser = RssPage(rss_url, link_props["contents"])
+        if "contents" in self.link_data:
+            parser = RssPage(rss_url, self.link_data["contents"])
         else:
             parser = RssPage(rss_url)
 
@@ -285,7 +299,7 @@ class SourceDataBuilder(object):
         if title:
             props["title"] = title
         if not title:
-            props["title"] = link_props["title"]
+            props["title"] = self.link_data["title"]
 
         props["export_to_cms"] = True
         language = parser.get_language()
@@ -297,33 +311,61 @@ class SourceDataBuilder(object):
         props["on_hold"] = not conf.auto_store_sources_enabled
         props["source_type"] = SourceDataModel.SOURCE_TYPE_RSS
         props["remove_after_days"] = 2
+
         props["category"] = "New"
         props["subcategory"] = "New"
 
-        try:
-            SourceDataModel.objects.create(**props)
-        except Exception as E:
-            PersistentInfo.error("Exception {}".format(str(E)))
+        self.add_from_props(props)
 
-    def add_from_props(source_data_map):
-        sources = SourceDataController.objects.filter(url=source_data_map["url"])
+    def add_from_props(self):
+        sources = SourceDataController.objects.filter(url=self.link_data["url"])
         if sources.count() > 0:
             return None
 
-        # TODO add domain when adding new source
-        source = SourceDataController.objects.create(**source_data_map)
+        self.add_categories()
+
+        source = self.add_internal()
+        if not source:
+            return None
 
         SourceDataController.fix_entries(source)
 
+        self.add_domains()
+        self.add_to_download(source)
+
+        return source
+
+    def add_internal(self):
+        """
+        Category and subcategory names can be empty, then objects are not set
+        """
+        try:
+            # TODO add domain when adding new source
+            source = SourceDataController.objects.create(**self.link_data)
+            return source
+        except Exception as E:
+            LinkDatabase.error("Exception:{}".format(str(E)))
+            PersistentInfo.error("Exception {}".format(str(E)))
+
+    def add_categories(self):
+        category_name = self.link_data["category"]
+        subcategory_name = self.link_data["subcategory"]
+
+        category_object = SourceCategories.add(category_name)
+        subcategory_object = SourceSubCategories.add(category_name, subcategory_name)
+
+        #self.link_data["category_object"] = category_object
+        #self.link_data["subcategory_object"] = subcategory_object
+
+    def add_domains(self):
         if Configuration.get_object().config_entry.auto_store_domain_info:
             from .entries import LinkDataBuilder
 
-            p = BasePage(source_data_map["url"])
+            p = BasePage(self.link_data["url"])
             LinkDataBuilder(link=p.get_domain())
 
+    def add_to_download(self, source):
         if not source.on_hold:
             from .backgroundjob import BackgroundJobController
 
             BackgroundJobController.download_rss(source)
-
-        return source

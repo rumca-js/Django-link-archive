@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.views import generic
 from django.urls import reverse
 from django.shortcuts import render, redirect
@@ -12,6 +14,7 @@ from ..models import (
     BackgroundJob,
     ConfigurationEntry,
     Domains,
+    EntryVisits,
 )
 from ..controllers import (
     LinkDataController,
@@ -20,6 +23,7 @@ from ..controllers import (
     ArchiveLinkDataController,
     SourceDataController,
     BackgroundJobController,
+    SearchEngines,
 )
 from ..forms import (
     EntryForm,
@@ -34,6 +38,19 @@ from ..queryfilters import EntryFilter
 from ..views import ViewPage
 from ..configuration import Configuration
 from ..webtools import Url
+from ..services.waybackmachine import WaybackMachine
+from ..dateutils import DateUtils
+
+def get_search_term_request(request):
+    search_term = ""
+    if "title" in request.GET:
+        search_term = request.GET["title"]
+    elif "tag" in request.GET:
+        search_term = request.GET["tag"]
+    elif "search" in request.GET:
+        search_term = request.GET["search"]
+
+    return search_term
 
 
 class EntriesSearchListView(generic.ListView):
@@ -44,7 +61,6 @@ class EntriesSearchListView(generic.ListView):
 
     def get(self, *args, **kwargs):
         print("EntriesSearchListView:get")
-        from datetime import datetime
 
         self.time_start = datetime.now()
 
@@ -100,14 +116,9 @@ class EntriesSearchListView(generic.ListView):
         self.filter_form = self.get_form()
         context["filter_form"] = self.filter_form
 
-        if "title" in self.request.GET:
-            context["search_term"] = self.request.GET["title"]
-        elif "tag" in self.request.GET:
-            context["search_term"] = self.request.GET["tag"]
-        elif "search" in self.request.GET:
-            context["search_term"] = self.request.GET["search"]
+        search_term = get_search_term_request(self.request)
 
-        from datetime import datetime
+        context["search_engines"] = SearchEngines(search_term)
 
         print(
             "EntriesSearchListView:get_context_data done. View time delta:{}".format(
@@ -173,7 +184,6 @@ class EntriesSearchListView(generic.ListView):
         return "&" + urlencode(arg_data)
 
     def get_default_range(self):
-        from ..dateutils import DateUtils
 
         config = Configuration.get_object().config_entry
         return DateUtils.get_days_range(config.whats_new_days)
@@ -314,7 +324,6 @@ class EntriesOmniListView(EntriesSearchListView):
 
     def get_filter(self):
         from ..queryfilters import OmniSearchFilter
-
         from ..models import UserSearchHistory
 
         username = self.request.user.username
@@ -414,10 +423,7 @@ class EntryDetailView(generic.DetailView):
     model = LinkDataController
 
     def get_context_data(self, **kwargs):
-        from ..models import EntryVisits
         from ..pluginentries.entrypreviewcontroller import EntryPreviewController
-        from ..services.waybackmachine import WaybackMachine
-        from ..dateutils import DateUtils
 
         # Call the base implementation first to get the context
         context = super(EntryDetailView, self).get_context_data(**kwargs)
@@ -434,6 +440,7 @@ class EntryDetailView(generic.DetailView):
 
         m = WaybackMachine()
         context["archive_org_date"] = m.get_formatted_date(DateUtils.get_date_today())
+        context["search_engines"] = SearchEngines(self.object.get_search_term())
 
         return context
 
@@ -458,9 +465,6 @@ class EntryArchivedDetailView(generic.DetailView):
         context["object_controller"] = EntryPreviewController.get(
             self.object, self.request.user
         )
-
-        from ..services.waybackmachine import WaybackMachine
-        from ..dateutils import DateUtils
 
         m = WaybackMachine()
         context["archive_org_date"] = m.get_formatted_date(DateUtils.get_date_today())
@@ -777,8 +781,9 @@ def entries_omni_search_init(request):
 
     p.context["form"] = filter_form
 
-    if "search" in request.GET:
-        p.context["search_term"] = self.request.GET["search"]
+    search_term = get_search_term_request(request)
+    p.context["search_term"] = search_term
+    p.context["search_engines"] = SearchEngines(search_term)
 
     return p.render("form_search_omni.html")
 

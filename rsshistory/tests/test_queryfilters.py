@@ -147,6 +147,7 @@ class FiltersTest(FakeInternetTestCase):
         self.assertTrue("user__icontains" in filter_args)
         self.assertTrue("tags__tag__icontains" in filter_args)
         self.assertTrue("votes__vote__gt" in filter_args)
+        self.assertTrue("source_obj__id" in filter_args)
         self.assertTrue("source_obj__title" in filter_args)
         self.assertTrue("source_obj__category" in filter_args)
         self.assertTrue("source_obj__subcategory" in filter_args)

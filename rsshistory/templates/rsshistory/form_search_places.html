@@ -1,36 +1,13 @@
 <div>
-  <h2>Other useful places</h2>
+  <h2>Searchable places</h2>
 
-  <a href="https://en.wikipedia.org/w/index.php" class="simplebutton">Wikipedia</a>
+  {% for search_engine in search_engines.get %}
+  <a href="{{search_engine.get_search_string}}" class="simplebutton">{{search_engine.get_name}}</a>
+  {% endfor %}
+
+  <h2>Other places</h2>
   <a href="https://news.ycombinator.com/" class="simplebutton">Hacker News</a>
-
-  <h3>Search engines</h3>
-  <a href="https://google.com/" class="simplebutton">Google.com</a>
-  <a href="https://bing.com/" class="simplebutton">Bing.com</a>
-  <a href="https://yahoo.com/" class="simplebutton">Yahoo.com</a>
-  <a href="https://www.duckduckgo.com/" class="simplebutton">DuckDuckGo</a>
-  <a href="https://hn.algolia.com/?dateRange=all&page=0&prefix=true&query=tim%20cook&sort=byPopularity&type=story" class="simplebutton">Hacker News search</a>
-  <a href="https://chat.openai.com/" class="simplebutton">ChatGPT</a>
-  <a href="https://www.perplexity.ai/" class="simplebutton">Perplexity.AI</a>
-  <a href="https://www.wolframalpha.com/" class="simplebutton">Wolfram</a>
-  <a href="https://kagi.com/" class="simplebutton">Kagi search</a>
-  <a href="https://search.marginalia.nu/" class="simplebutton">Marginalia Search</a>
-  <a href="https://whoogle.io/" class="simplebutton">Whoogle</a>
-  <a href="https://yewtu.be/" class="simplebutton">YewTu.be</a>
-
-  <h3>Mainstream</h3>
-  <a href="https://www.quora.com/" class="simplebutton">Quora</a>
-  <a href="https://stackoverflow.com" class="simplebutton">Stack overflow</a>
-  <a href="https://www.reddit.com/" class="simplebutton">Reddit</a>
   <a href="https://medium.com/" class="simplebutton">Medium</a>
-  <a href="https://substack.com/" class="simplebutton">Substack</a>
-
-  <h3>Social</h3>
   <a href="https://mastodon.social/explore" class="simplebutton">Mastodon</a>
   <a href="https://join-lemmy.org/instances" class="simplebutton">Lemmy</a>
-
-  <a href="https://www.youtube.com/" class="simplebutton">YouTube</a>
-  <a href="https://odysee.com/" class="simplebutton">Odysee</a>
-  <a href="https://rumble.com/" class="simplebutton">Rumble</a>
-  <a href="https://www.spotify.com/" class="simplebutton">Spotify</a>
 </div>

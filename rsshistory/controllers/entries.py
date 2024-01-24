@@ -66,6 +66,32 @@ class LinkDataController(LinkDataModel):
                 "{}:entry-dead".format(LinkDatabase.name), args=[str(self.id)]
             )
 
+    def get_title_safe(self):
+        title = self.title
+        title = title.replace('"', "")
+        title = title.replace("'", "")
+
+        return title
+
+    def get_search_term(self):
+        term = ""
+
+        title = self.get_title_safe()
+        if title and title != "":
+            if term != "":
+                term += " "
+            term += title
+
+        if self.album and self.album != "" and term.find(self.album) == -1:
+            term = self.album + " " + term
+
+        if self.artist and self.artist != "" and term.find(self.artist) == -1:
+            term = self.artist + " " + term
+
+        term.strip()
+
+        return term
+
     def get_remove_url(self):
         """Returns the URL to access a particular author instance."""
         return reverse("{}:entry-remove".format(LinkDatabase.name), args=[str(self.id)])
