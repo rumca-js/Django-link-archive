@@ -1,3 +1,9 @@
+#
+# If you want to kill docker.
+#  - ps auxw | grep runserver
+#  - kill -9 xxx the server
+#
+
 build:
 	docker build -t python-django-app .
 
