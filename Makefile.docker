@@ -9,3 +9,15 @@ list:
 
 stop:
 	docker stop container_id
+
+install:
+	# installation as in https://www.linuxtechi.com/how-to-install-docker-on-linux-mint/#6_Test_Docker_Installation
+	sudo apt install -y apt-transport-https ca-certificates curl gnupg
+	curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/dockerce.gpg
+	echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/dockerce.gpg] https://download.docker.com/linux/ubuntu jammy stable" | sudo tee /etc/apt/sources.list.d/dockerce.list > /dev/null
+	sudo apt update
+	sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
+	sudo usermod -aG docker $USER
+	newgrp docker
+	
+	echo Installation successful, please reboot computer
