@@ -1,12 +1,11 @@
-# Use an official Python runtime as a parent image
 FROM python:3.10 as python-base
 
-# Set environment variables for Python and Poetry
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+# https://python-poetry.org/docs#ci-recommendations
+ENV POETRY_VERSION=1.5.0
 ENV POETRY_HOME=/opt/poetry
-ENV POETRY_VERSION="1.1.11"
 ENV POETRY_VENV=/opt/poetry-venv
+
+# Tell Poetry where to place its cache and virtual environment
 ENV POETRY_CACHE_DIR=/opt/.cache
 
 # Create stage for Poetry installation
@@ -17,17 +16,31 @@ RUN python3 -m venv $POETRY_VENV \
 	&& $POETRY_VENV/bin/pip install -U pip setuptools \
 	&& $POETRY_VENV/bin/pip install poetry==${POETRY_VERSION}
 
-# Set the working directory in the container
+# Create a new stage from the base python image
+FROM python-base as example-app
+
+# Copy Poetry to app image
+COPY --from=poetry-base ${POETRY_VENV} ${POETRY_VENV}
+
+# Add Poetry to PATH
+ENV PATH="${PATH}:${POETRY_VENV}/bin"
+
 WORKDIR /app
 
-# Copy the Poetry files and install dependencies
-COPY pyproject.toml poetry.lock /app/
+# Copy Dependencies
+COPY poetry.lock pyproject.toml ./
 
-# Copy the Django application code into the container
-COPY . /app/
+# [OPTIONAL] Validate the project is properly configured
+RUN poetry check
+
+# Install Dependencies
+RUN poetry install --no-interaction --no-cache --without dev
+
+# Copy Application
+COPY . /app
 
 # Copy the custom settings template
-COPY ./linklibrary/settings_template_default.py /app/settings.py
+COPY ./linklibrary/settings_template_default.py /app/linklibrary/settings.py
 
 # Expose the port that Django will run on
 EXPOSE 8000
