@@ -21,6 +21,10 @@ class ViewPage(object):
         c = Configuration.get_object()
         context.update(c.get_context())
 
+        if "page_description" not in context:
+            if "app_description" in context:
+                context["page_description"] = context["app_description"]
+
         user_name = request.user.get_username()
         context["user_config"] = UserConfig.get(user_name)
 

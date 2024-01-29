@@ -41,6 +41,7 @@ from ..webtools import Url
 from ..services.waybackmachine import WaybackMachine
 from ..dateutils import DateUtils
 
+
 def get_search_term_request(request):
     search_term = ""
     if "title" in request.GET:
@@ -184,7 +185,6 @@ class EntriesSearchListView(generic.ListView):
         return "&" + urlencode(arg_data)
 
     def get_default_range(self):
-
         config = Configuration.get_object().config_entry
         return DateUtils.get_days_range(config.whats_new_days)
 
@@ -433,6 +433,10 @@ class EntryDetailView(generic.DetailView):
         object_controller = EntryPreviewController.get(self.object, self.request.user)
 
         context["page_title"] = self.object.title
+
+        if self.object.description:
+            context["page_description"] = self.object.description[:100]
+
         context["page_thumbnail"] = self.object.thumbnail
         if self.object.date_published:
             context["page_date_published"] = self.object.date_published.isoformat()
