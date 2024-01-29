@@ -107,8 +107,10 @@ class UrlHandler(object):
             return True
 
     def is_selenium_headless_required(url):
-        if (url.find("https://open.spotify.com") >= 0 or
-           url.find("https://thehill.com") >= 0):
+        if (
+            url.find("https://open.spotify.com") >= 0
+            or url.find("https://thehill.com") >= 0
+        ):
             return True
 
         return False

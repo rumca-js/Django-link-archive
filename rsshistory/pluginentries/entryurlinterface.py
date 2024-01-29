@@ -17,8 +17,16 @@ class EntryUrlInterface(object):
     Provides interface between Entry and URL properties.
     """
 
-    def __init__(self, url, fast_check=True, use_selenium=False):
+    def __init__(
+        self, url, fast_check=True, use_selenium=False, log=False, ignore_errors=False
+    ):
+        """
+        Some scenarios, like manual entry should log why it is impossible to check
+        TODO maybe add ignore_errors, so we could add any kind of link?
+        """
         self.url = url
+        self.log = log
+        self.ignore_errors = ignore_errors
 
         if self.url.endswith("/"):
             self.url = self.url[:-1]
@@ -94,8 +102,10 @@ class EntryUrlInterface(object):
 
         p = self.p
 
-        if not p.is_valid():
-            LinkDatabase.info("YouTube page is invalid:{}".format(url))
+        if not self.ignore_errors and not p.is_valid():
+            if self.log:
+                LinkDatabase.info("YouTube page is invalid:{}".format(url))
+                PersistentInfo.error("YouTube page is invalid:{}".format(url))
             return None
 
         source_url = p.get_channel_feed_url()
@@ -146,8 +156,10 @@ class EntryUrlInterface(object):
 
         p = self.p
 
-        if not p.is_valid():
-            LinkDatabase.info("HTML page is invalid:{}".format(url))
+        if not self.ignore_errors and not p.is_valid():
+            if self.log:
+                LinkDatabase.info("HTML page is invalid:{}".format(url))
+                PersistentInfo.error("HTML page is invalid:{}".format(url))
             return None
 
         # some pages return invalid code / information. let the user decide
@@ -207,8 +219,10 @@ class EntryUrlInterface(object):
 
         p = self.p
 
-        if not p.is_valid():
-            LinkDatabase.info("RSS page is invalid:{}".format(url))
+        if not self.ignore_errors and not p.is_valid():
+            if self.log:
+                LinkDatabase.info("RSS page is invalid:{}".format(url))
+                PersistentInfo.error("HTML page is invalid:{}".format(url))
             return None
 
         if not self.is_property_set(input_props, "link"):

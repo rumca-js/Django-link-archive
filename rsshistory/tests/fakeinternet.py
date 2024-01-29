@@ -10,6 +10,7 @@ from ..dateutils import DateUtils
 from ..pluginentries.handlervideoyoutube import YouTubeVideoHandler
 
 from .fakeinternetdata import (
+    webpage_with_real_rss_links,
     webpage_samtime_youtube_rss,
     webpage_simple_rss_page,
     webpage_old_pubdate_rss,
@@ -198,6 +199,9 @@ class TestRequestObjectMock(object):
                      <a href="https://link2.com">Link2</a>"""
 
             return b.build_contents()
+
+        elif url == "https://page-with-real-rss-link.com":
+            return webpage_with_real_rss_links
 
         elif url == "https://page-with-http-status-500.com":
             self.status_code = 500

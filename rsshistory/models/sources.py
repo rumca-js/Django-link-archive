@@ -2,9 +2,6 @@ from django.db import models
 from django.urls import reverse
 
 
-
-
-
 class SourceDataModel(models.Model):
     SOURCE_TYPE_RSS = "BaseRssPlugin"
     SOURCE_TYPE_JSON = "BaseSourceJsonPlugin"
@@ -114,7 +111,9 @@ class SourceSubCategories(models.Model):
                 )
 
     def get(category, subcategory):
-        objs = SourceSubCategories.objects.filter(category=category, subcategory=subcategory)
+        objs = SourceSubCategories.objects.filter(
+            category=category, subcategory=subcategory
+        )
         if objs.count() != 0:
             return objs[0]
 
@@ -127,4 +126,3 @@ class SourceSubCategories(models.Model):
         blank=True,
     )
     """
-

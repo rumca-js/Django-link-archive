@@ -118,6 +118,9 @@ class BaseRssPlugin(SourceGenericPlugin):
                 return None
 
         for index, prop in enumerate(all_props):
+            if "link" not in prop:
+                continue
+
             prop = self.cleanup_data(prop)
 
             if self.is_link_ok_to_add(prop):

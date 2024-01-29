@@ -752,7 +752,6 @@ class DomainAwarePage(BasePage):
         if (
             lower.find("<rss") >= 0
             and lower.find("<channel") >= 0
-            and lower.find("<link") >= 0
         ):
             return lower.find("<rss")
 
@@ -1118,6 +1117,9 @@ class RssPage(ContentInterface):
     def get_feed_entry_map(self, feed_entry):
         output_map = {}
 
+        if "link" not in feed_entry:
+            return output_map
+
         output_map["description"] = self.get_feed_description(feed_entry)
         output_map["thumbnail"] = self.get_feed_thumbnail(feed_entry)
         output_map["date_published"] = self.get_feed_date_published(feed_entry)
@@ -1297,6 +1299,16 @@ class RssPage(ContentInterface):
         props = super().get_properties()
         props["contents"] = self.get_contents()
         return props
+
+    @lazy_load_content
+    def is_valid(self):
+        if super().is_valid() == False:
+            return False
+
+        if not self.is_contents_rss():
+            return False
+
+        return True
 
 
 class ContentLinkParser(BasePage):

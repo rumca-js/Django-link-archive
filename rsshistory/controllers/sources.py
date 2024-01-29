@@ -257,9 +257,10 @@ class SourceDataController(SourceDataModel):
 
 
 class SourceDataBuilder(object):
-    def __init__(self, link=None, link_data=None):
+    def __init__(self, link=None, link_data=None, manual_entry = False):
         self.link = link
         self.link_data = link_data
+        self.manual_entry = manual_entry
 
         if self.link:
             self.add_from_link()
@@ -270,59 +271,43 @@ class SourceDataBuilder(object):
     def add_from_link(self):
         rss_url = self.link
 
-        conf = Configuration.get_object().config_entry
-
         if rss_url.endswith("/"):
             rss_url = rss_url[:-1]
 
-        if SourceDataModel.objects.filter(url=rss_url).count() > 0:
+        page = RssPage(rss_url)
+        if not page.is_valid():
             return
 
-        if "contents" in self.link_data:
-            parser = RssPage(rss_url, self.link_data["contents"])
-        else:
-            parser = RssPage(rss_url)
+        self.link_data = page.get_properties()
 
-        d = parser.parse()
-        if d is None:
-            PersistentInfo.error("RSS is empty: rss_url:{0}".format(rss_url))
-            return
-
-        if len(d.entries) == 0:
-            PersistentInfo.error("RSS no entries: rss_url:{0}".format(rss_url))
-            return
-
-        props = {}
-        props["url"] = rss_url
-
-        title = parser.get_title()
-        if title:
-            props["title"] = title
-        if not title:
-            props["title"] = self.link_data["title"]
-
-        props["export_to_cms"] = True
-        language = parser.get_language()
-        if language:
-            props["language"] = language
-        thumbnail = parser.get_thumbnail()
-        if thumbnail:
-            props["favicon"] = thumbnail
-        props["on_hold"] = not conf.auto_store_sources_enabled
-        props["source_type"] = SourceDataModel.SOURCE_TYPE_RSS
-        props["remove_after_days"] = 2
-
-        props["category"] = "New"
-        props["subcategory"] = "New"
-
-        self.add_from_props(props)
+        return self.add_from_props()
 
     def add_from_props(self):
+        if "link" in self.link_data and "url" not in self.link_data:
+            self.link_data["url"] = self.link_data["link"]
+
+        if "thumbnail" in self.link_data and "favicon" not in self.link_data:
+            self.link_data["favicon"] = self.link_data["thumbnail"]
+
         sources = SourceDataController.objects.filter(url=self.link_data["url"])
         if sources.count() > 0:
             return None
 
         self.add_categories()
+
+        conf = Configuration.get_object().config_entry
+
+        if not self.manual_entry:
+            # TODO if there is no title - inherit it from 'main domain'. same goes for language.
+            # maybe for thumbnail
+            self.link_data["export_to_cms"] = True
+            self.link_data["on_hold"] = not conf.auto_store_sources_enabled
+            self.link_data["source_type"] = SourceDataModel.SOURCE_TYPE_RSS
+            self.link_data["remove_after_days"] = 2
+            self.link_data["category"] = "New"
+            self.link_data["subcategory"] = "New"
+
+        self.get_clean_data()
 
         source = self.add_internal()
         if not source:
@@ -347,15 +332,35 @@ class SourceDataBuilder(object):
             LinkDatabase.error("Exception:{}".format(str(E)))
             PersistentInfo.error("Exception {}".format(str(E)))
 
+    def get_clean_data(self):
+        result = {}
+        props = self.link_data
+        test = SourceDataController()
+
+        for key in props:
+            if hasattr(test, key):
+                result[key] = props[key]
+
+        self.link_data = result
+
+        return result
+
     def add_categories(self):
-        category_name = self.link_data["category"]
-        subcategory_name = self.link_data["subcategory"]
+        category_name = None
+        subcategory_name = None
 
-        category_object = SourceCategories.add(category_name)
-        subcategory_object = SourceSubCategories.add(category_name, subcategory_name)
+        if "category" in self.link_data:
+            category_name = self.link_data["category"]
+        if "subcategory" in self.link_data:
+            subcategory_name = self.link_data["subcategory"]
 
-        #self.link_data["category_object"] = category_object
-        #self.link_data["subcategory_object"] = subcategory_object
+        if category_name:
+            category_object = SourceCategories.add(category_name)
+        if category_name and subcategory_name:
+            subcategory_object = SourceSubCategories.add(category_name, subcategory_name)
+
+        # self.link_data["category_object"] = category_object
+        # self.link_data["subcategory_object"] = subcategory_object
 
     def add_domains(self):
         if Configuration.get_object().config_entry.auto_store_domain_info:

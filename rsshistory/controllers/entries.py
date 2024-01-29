@@ -182,13 +182,16 @@ class LinkDataController(LinkDataModel):
     def get_full_information(data):
         from ..pluginentries.entryurlinterface import EntryUrlInterface
 
-        info = EntryUrlInterface(data["link"]).get_props()
+        info = EntryUrlInterface(data["link"], log=True, ignore_errors=True).get_props()
         if not info:
             return info
 
         if data["link"].find("http://") >= 0:
             data["link"] = data["link"].replace("http://", "https://")
             https_info = EntryUrlInterface(data["link"]).get_props()
+
+            if info and not https_info:
+                return info
 
             if "description" in info and "description" in https_info:
                 if len(https_info["description"]) == len(info["description"]):
@@ -572,10 +575,13 @@ class LinkDataBuilder(object):
     If there is a possiblity we do not search it, we do not add anything to it.
     """
 
-    def __init__(self, link=None, link_data=None, source_is_auto=False):
+    def __init__(
+        self, link=None, link_data=None, source_is_auto=False, allow_recursion=True
+    ):
         self.link = link
         self.link_data = link_data
         self.source_is_auto = source_is_auto
+        self.allow_recursion = allow_recursion
 
         if self.link:
             self.add_from_link()
@@ -775,7 +781,7 @@ class LinkDataBuilder(object):
         try:
             link_data = self.link_data
 
-            self.add_domains()
+            self.add_sub_links()
             self.add_keywords()
             self.add_sources()
 
@@ -791,27 +797,49 @@ class LinkDataBuilder(object):
             )
             LinkDatabase.info(error_text)
 
-    def add_domains(self):
+    def add_sub_links(self):
+        """
+        Adds links from description of that link
+        """
+        if not self.allow_recursion:
+            """
+            We cannot allow to undefinitely traverse Internet and find all domains
+            """
+            return
+
         link_data = self.link_data
 
         config = Configuration.get_object().config_entry
-        if config.auto_store_domain_info:
-            domains = set()
 
-            p = BasePage(link_data["link"])
-            domain = p.get_domain()
-            domains.add(domain)
+        if config.auto_store_entries or config.auto_store_domain_info:
+            links = set()
 
-            parser = ContentLinkParser(link_data["link"], link_data["description"])
-            description_links = parser.get_links()
+            if config.auto_store_domain_info:
+                p = BasePage(link_data["link"])
+                domain = p.get_domain()
+                links.add(domain)
 
-            for link in description_links:
-                ppp = BasePage(link)
-                domain = ppp.get_domain()
-                domains.add(domain)
+            if config.auto_scan_new_entries:
+                if "description" in link_data:
+                    parser = ContentLinkParser(
+                        link_data["link"], link_data["description"]
+                    )
+                    description_links = parser.get_links()
 
-            for domain in domains:
-                LinkDataBuilder(link=domain)
+                    for link in description_links:
+                        links.add(link)
+
+                if "contents" in link_data:
+                    parser = ContentLinkParser(link_data["link"], link_data["contents"])
+                    contents_links = parser.get_links()
+
+                    for link in contents_links:
+                        links.add(link)
+
+            for link in links:
+                LinkDataBuilder(
+                    link=link, source_is_auto=self.source_is_auto, allow_recursion=False
+                )
 
     def add_keywords(self):
         link_data = self.link_data
@@ -823,6 +851,8 @@ class LinkDataBuilder(object):
                 KeyWords.add_link_data(link_data)
 
     def add_sources(self):
+        # TODO if it is RSS link (link_data["link"]), should we also add a source?
+
         link_props = self.link_data
 
         conf = Configuration.get_object().config_entry
@@ -841,7 +871,7 @@ class LinkDataBuilder(object):
         for rss_url in rss_urls:
             from .sources import SourceDataBuilder
 
-            SourceDataBuilder.add_from_url(rss_url, link_props)
+            SourceDataBuilder(link=rss_url).add_from_link()
 
     def read_domains_from_bookmarks():
         objs = LinkDataController.objects.filter(bookmarked=True)

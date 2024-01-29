@@ -103,6 +103,9 @@ class YouTubeVideoHandler(DefaultUrlHandler):
         if not self.h.is_valid():
             return False
 
+        # TODO make this configurable in config
+        block_live_videos = True
+
         # TODO
         # invalid_text = '{"simpleText":"GO TO HOME"}'
         # contents = self.h.get_contents()
@@ -110,10 +113,11 @@ class YouTubeVideoHandler(DefaultUrlHandler):
         #    print("It is invalid:{} - invalid text found".format(self.url))
         #    return False
 
-        live_field = self.h.get_meta_custom_field("itemprop", "isLiveBroadcast")
-        if live_field and live_field.lower() == "true":
-            print("It is invalid:{} - live".format(self.url))
-            return False
+        if block_live_videos:
+            live_field = self.h.get_meta_custom_field("itemprop", "isLiveBroadcast")
+            if live_field and live_field.lower() == "true":
+                print("It is invalid:{} - live".format(self.url))
+                return False
 
         return True
 

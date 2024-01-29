@@ -65,6 +65,7 @@ class ConfigurationEntry(models.Model):
     auto_store_sources_enabled = models.BooleanField(default=False)
     auto_store_domain_info = models.BooleanField(default=True)
     auto_store_keyword_info = models.BooleanField(default=True)
+    auto_scan_new_entries = models.BooleanField(default=False)
 
     link_save = models.BooleanField(default=False)
     source_save = models.BooleanField(default=False)

@@ -16,14 +16,7 @@ from .fakeinternet import FakeInternetTestCase
 class LinkDataBuilderTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
-
-        self.source_youtube = SourceDataController.objects.create(
-            url="https://youtube.com",
-            title="YouTube",
-            category="No",
-            subcategory="No",
-            export_to_cms=True,
-        )
+        LinkDataModel.objects.all().delete()
 
     def test_add_from_props_no_slash(self):
         config = Configuration.get_object().config_entry
@@ -193,3 +186,37 @@ class LinkDataBuilderTest(FakeInternetTestCase):
         self.assertEqual(objs[0].domain_obj, domains[0])
         self.assertEqual(objs[1].domain_obj, domains[0])
         self.assertEqual(objs[2].domain_obj, domains[0])
+
+    def test_source_from_page_contents(self):
+        config = Configuration.get_object().config_entry
+        config.auto_store_entries = True
+        config.auto_store_domain_info = False
+        config.auto_store_sources = True
+        config.save()
+
+        SourceDataController.objects.all().delete()
+
+        link_name = "https://page-with-real-rss-link.com"
+
+        link_data = {
+            "link": link_name,
+            "source": "https://page-with-real-rss-link.com",
+            "title": "test",
+            "description": "description",
+            "language": "en",
+            "thumbnail": "https://page-with-real-rss-link.com/favicon.ico",
+            "date_published": DateUtils.get_datetime_now_utc(),
+        }
+
+        b = LinkDataBuilder()
+        b.link_data = link_data
+        # call tested function
+        entry = b.add_from_props()
+
+        # reading link creates also a source from it
+
+        sources = SourceDataController.objects.all()
+        self.assertEqual(sources.count(), 1)
+        self.assertEqual(sources[0].on_hold, True)
+        self.assertEqual(sources[0].category, "New")
+        self.assertEqual(sources[0].subcategory, "New")

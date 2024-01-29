@@ -1,7 +1,4 @@
-
-
 class SearchEngine(object):
-
     def __init__(self, query_term=None):
         self.query_term = query_term
 
@@ -17,11 +14,13 @@ class SearchEngine(object):
     def get_search_argument(self):
         return "q"
 
-    def get_search_string(self, search_term = None):
+    def get_search_string(self, search_term=None):
         if not search_term:
             search_term = self.query_term
 
-        return "{}?{}={}".format(self.get_search_address(), self.get_search_argument() , search_term)
+        return "{}?{}={}".format(
+            self.get_search_address(), self.get_search_argument(), search_term
+        )
 
 
 class SearchEngineWikipedia(SearchEngine):
@@ -173,7 +172,7 @@ class SearchEngineChatOpenAI(SearchEngine):
     def get_name(self):
         return "ChatGPT"
 
-    def get_search_string(self, search_term = None):
+    def get_search_string(self, search_term=None):
         if not search_term:
             search_term = self.query_term
         return "https://chat.openai.com/"
@@ -220,32 +219,33 @@ class SearchEngineSubstack(SearchEngine):
 
 
 class SearchEngines(object):
-    def __init__(self, search_term = None):
+    def __init__(self, search_term=None):
         self.search_term = search_term
 
     def get_search_engines():
-        return [SearchEngineWikipedia,
-                SearchEngineGoogle,
-                SearchEngineDuckDuckGo,
-                SearchEngineBing,
-                SearchEngineKagi,
-                SearchEngineHnAlgolia,
-                SearchEngineReddit,
-                SearchEngineQuora,
-                SearchEnginePerplexity,
-                SearchEngineWolfram,
-                SearchEngineYewTube,
-                SearchEngineStackOverFlow,
-                SearchEngineYouTube,
-                SearchEngineSpotify,
-                SearchEngineOdysee,
-                SearchEngineTikTok,
-                SearchEngineMarginalia,
-                SearchEngineChatOpenAI,
-                SearchEngineRumble,
-                SearchEngineWhoogle,
-                SearchEngineSubstack,
-                ]
+        return [
+            SearchEngineWikipedia,
+            SearchEngineGoogle,
+            SearchEngineDuckDuckGo,
+            SearchEngineBing,
+            SearchEngineKagi,
+            SearchEngineHnAlgolia,
+            SearchEngineReddit,
+            SearchEngineQuora,
+            SearchEnginePerplexity,
+            SearchEngineWolfram,
+            SearchEngineYewTube,
+            SearchEngineStackOverFlow,
+            SearchEngineYouTube,
+            SearchEngineSpotify,
+            SearchEngineOdysee,
+            SearchEngineTikTok,
+            SearchEngineMarginalia,
+            SearchEngineChatOpenAI,
+            SearchEngineRumble,
+            SearchEngineWhoogle,
+            SearchEngineSubstack,
+        ]
 
     def get(self):
         engine_classes = SearchEngines.get_search_engines()

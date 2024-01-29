@@ -51,6 +51,7 @@ class ConfigForm(forms.ModelForm):
             # optional
             "link_save",
             "source_save",
+            "auto_scan_new_entries",
             "auto_store_entries",
             "auto_store_entries_use_all_data",
             "auto_store_entries_use_clean_page_info",
@@ -316,7 +317,9 @@ class SourceForm(forms.ModelForm):
         names = SourceControllerBuilder.get_plugin_names()
         self.fields["source_type"].widget = forms.Select(choices=self.to_choices(names))
 
-        self.fields["proxy_location"].help_text = "Proxy location for the source. Proxy location will be used instead of normal processing."
+        self.fields[
+            "proxy_location"
+        ].help_text = "Proxy location for the source. Proxy location will be used instead of normal processing."
 
     def to_choices(self, names):
         names = sorted(names)
@@ -562,11 +565,15 @@ class BasicEntryChoiceForm(forms.Form):
         # https://stackoverflow.com/questions/10099710/how-to-manually-create-a-select-field-from-a-modelform-in-django
         attr = {"onchange": "this.form.submit()"}
 
-        self.fields["category"].widget = forms.Select(choices=category_choices, attrs=attr)
+        self.fields["category"].widget = forms.Select(
+            choices=category_choices, attrs=attr
+        )
         self.fields["subcategory"].widget = forms.Select(
             choices=subcategory_choices, attrs=attr
         )
-        self.fields["source_id"].widget = forms.Select(choices=title_choices, attrs=attr)
+        self.fields["source_id"].widget = forms.Select(
+            choices=title_choices, attrs=attr
+        )
 
     def get_categories(self):
         from .models import SourceCategories
