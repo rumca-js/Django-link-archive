@@ -13,6 +13,7 @@ from ..controllers import (
     LinkDataController,
     BackgroundJobController,
     LinkDataWrapper,
+    SearchEngines,
 )
 from ..forms import SourceForm, SourcesChoiceForm
 from ..queryfilters import SourceFilter
@@ -87,6 +88,7 @@ class RssSourceDetailView(generic.DetailView):
 
         context["page_title"] = self.object.title
         context["page_thumbnail"] = self.object.favicon
+        context["search_engines"] = SearchEngines(self.object.title)
         try:
             context["handler"] = SourceControllerBuilder.get(self.object.url)
         except:
@@ -108,7 +110,11 @@ def add_source(request):
         form = SourceForm(request.POST)
 
         if form.is_valid():
-            source = SourceDataBuilder.add_from_props(form.cleaned_data)
+            b = SourceDataBuilder()
+            b.link_data=form.cleaned_data
+            b.manual_entry=True
+            source = b.add_from_props()
+
             if not source:
                 p.context["summary_text"] = "Source already exist"
                 return p.render("summary_present.html")
@@ -190,19 +196,19 @@ def edit_source(request, pk):
 
     p.context["pk"] = pk
 
-    ft = SourceDataController.objects.filter(id=pk)
-    if not ft.exists():
+    sources = SourceDataController.objects.filter(id=pk)
+    if not sources.exists():
         p.context["summary_text"] = "Source does not exist"
         return p.render("summary_present.html")
 
-    ob = ft[0]
+    ob = sources[0]
 
     if request.method == "POST":
         form = SourceForm(request.POST, instance=ob)
         p.context["form"] = form
 
         if form.is_valid():
-            form.save()
+            ob.edit(form.cleaned_data)
 
             return HttpResponseRedirect(ob.get_absolute_url())
 
@@ -336,6 +342,23 @@ def remove_all_sources(request):
         p.context["summary_text"] = "No source to remove"
 
     return p.render("summary_present.html")
+
+
+def enable_all_sources(request):
+    p = ViewPage(request)
+    p.set_title("Remove all sources")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    sources = SourceDataController.objects.filter(on_hold = True)
+    if sources.exists():
+        for source in sources:
+            source.enable()
+
+        return HttpResponseRedirect(reverse("{}:sources".format(LinkDatabase.name)))
+    else:
+        p.context["summary_text"] = "No source to remove"
 
 
 def wayback_save(request, pk):

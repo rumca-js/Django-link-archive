@@ -18,22 +18,22 @@ class BaseRssPlugin(SourceGenericPlugin):
     def __init__(self, source_id):
         super().__init__(source_id)
 
-    def get_link_props(self):
-        c = Configuration.get_object().config_entry
+    def get_contents(self):
+        if self.contents:
+            return self.contents
+        if self.dead:
+            return
 
-        contents = self.get_contents()
         source = self.get_source()
+
+        contents = super().get_contents()
 
         fast_check = False
 
         if not self.is_rss(fast_check=fast_check):
-            PersistentInfo.error(
-                "Source:{} Title:{}; Not RSS.\nStatus code:{}\nContents\n{}".format(
-                    source.url, source.title, self.status_code, contents
-                )
-            )
-
             if self.options.is_selenium():
+                self.store_error(source, "Tried with selenium, still not RSS", contents)
+                self.dead = True
                 return
 
             if self.is_cloudflare_protected():
@@ -48,6 +48,7 @@ class BaseRssPlugin(SourceGenericPlugin):
                 self.get_address(), use_selenium=True, fast_check=fast_check
             )
             contents = self.reader.get_contents()
+            self.status_code = self.reader.status_code
 
             if not self.reader.is_rss(fast_check=fast_check):
                 """
@@ -55,21 +56,15 @@ class BaseRssPlugin(SourceGenericPlugin):
                 Parse the HTML with BeautifulSoup.
                 """
                 if not contents:
-                    PersistentInfo.error(
-                        "Source:{} Title:{}; Could not obtain contents.\nStatus code:{}\nContents\n{}".format(
-                            source.url, source.title, self.reader.status_code, contents
-                        )
-                    )
+                    self.store_error(source, "Coult not obtain contents, even with selenium", contents)
+                    self.dead = True
                     return None
 
                 soup = BeautifulSoup(contents, "html.parser")
                 body_find = soup.find("body")
                 if not body_find:
-                    PersistentInfo.error(
-                        "Source:{} Title:{}; Cannot process source, not RSS.\nStatus code:{}\nContents\n{}".format(
-                            source.url, source.title, self.reader.status_code, contents
-                        )
-                    )
+                    self.store_error(source, "No HTML body in page", contents)
+                    self.dead = True
                     return None
 
                 rss_contents = body_find.get_text()
@@ -77,13 +72,12 @@ class BaseRssPlugin(SourceGenericPlugin):
                 self.reader = RssPage(self.get_address(), contents=rss_contents)
 
                 if not self.reader.is_rss(fast_check=fast_check):
-                    PersistentInfo.error(
-                        "Source:{} Title:{}; Cannot process source, not RSS.\nStatus code:{}\nContents\n{}".format(
-                            source.url, source.title, self.reader.status_code, contents
-                        )
-                    )
+                    self.store_error(source, "HTML body does not provide RSS", contents)
+                    self.dead = True
 
-                return None
+                    return None
+                else:
+                    contents = rss_contents
             else:
                 PersistentInfo.create(
                     "Source:{} Title:{}; Successfull workaround for Cloudlare.".format(
@@ -91,31 +85,49 @@ class BaseRssPlugin(SourceGenericPlugin):
                     )
                 )
 
+        self.contents = contents
+
+        return contents
+
+    def store_error(self, source, text, contents):
+        if contents:
+            print_contents = contents
+        else:
+            print_contents = "None"
+
+        PersistentInfo.error(
+            "Source:{}\nTitle:{}\nStatus code:{}\nText:{}.\nContents\n{}".format(
+                source.url, source.title, self.status_code, text, print_contents[:300]
+            )
+        )
+
+    def get_link_props(self):
+        c = Configuration.get_object().config_entry
+
+        contents = self.get_contents()
+        source = self.get_source()
+
+        if not contents:
+            return
+
         self.reader = RssPage(self.get_address(), contents=contents)
         all_props = self.reader.parse_and_process()
 
         num_entries = len(all_props)
 
-        if num_entries == 0:
-            if source and contents:
-                PersistentInfo.error(
-                    "Source:{} Title:{}; Source page has no data {}".format(
-                        source.url, source.title, contents
-                    )
-                )
-                return None
-            elif not contents:
-                PersistentInfo.error(
-                    "Source:{} Title:{}; could not obtain page".format(
-                        source.url, source.title
-                    )
-                )
-                return None
-            else:
-                PersistentInfo.error(
-                    "Source:{}; Source has no data".format(self.source_id)
-                )
-                return None
+        #if num_entries == 0:
+        #    if not contents:
+        #        PersistentInfo.error(
+        #            "Source:{} Title:{}; could not obtain page".format(
+        #                source.url, source.title
+        #            )
+        #        )
+        #        return None
+        #    elif self.dead:
+        #        PersistentInfo.error(
+        #            "Source:{}; Source has no data".format(self.source_id)
+        #        )
+        #        return None
 
         for index, prop in enumerate(all_props):
             if "link" not in prop:

@@ -112,7 +112,7 @@ class SourceDataController(SourceDataModel):
             return obj.number_of_entries
 
     def set_operational_info(
-        self, date_fetched, number_of_entries, import_seconds, hash_value
+        self, date_fetched, number_of_entries, import_seconds, hash_value, valid=True
     ):
         obj = self.get_op_data()
         if obj:
@@ -120,10 +120,20 @@ class SourceDataController(SourceDataModel):
             obj.import_seconds = import_seconds
             obj.number_of_entries = number_of_entries
             obj.page_hash = hash_value
+
+            if valid:
+                obj.consecutive_errors = 0
+            else:
+                obj.consecutive_errors += 0
+
             obj.save()
         else:
             # previously we could have dangling data without relation
             op_datas = SourceOperationalData.objects.filter(url=self.url)
+
+            consecutive_errors = 0
+            if not valid:
+                consecutive_errors += 1
 
             if op_datas.count() == 0:
                 SourceOperationalData.objects.create(
@@ -132,6 +142,7 @@ class SourceDataController(SourceDataModel):
                     import_seconds=import_seconds,
                     number_of_entries=number_of_entries,
                     page_hash=hash_value,
+                    consecutive_errors = consecutive_errors,
                     source_obj=self,
                 )
             else:
@@ -141,6 +152,12 @@ class SourceDataController(SourceDataModel):
                 obj.number_of_entries = number_of_entries
                 obj.page_hash = hash_value
                 obj.source_obj = self
+
+                if valid:
+                    obj.consecutive_errors = 0
+                else:
+                    obj.consecutive_errors += 0
+
                 obj.save()
 
         return obj
@@ -254,6 +271,54 @@ class SourceDataController(SourceDataModel):
             result["url"] = result["url"][:-1]
 
         return result
+
+    def enable(self):
+        if self.on_hold:
+            from .backgroundjob import BackgroundJobController
+
+            op = source.get_op_data()
+            if op:
+                op.consecutive_errors = 0
+                op.save()
+
+            BackgroundJobController.download_rss(self)
+
+            self.on_hold = False
+            self.save()
+
+    def edit(self, data):
+        """
+        TODO some iteration here?
+        """
+        if "url" in data:
+            self.url = data["url"]
+        if "title" in data:
+            self.title = data["title"]
+        if "category" in data:
+            self.category = data["category"]
+        if "subcategory" in data:
+            self.subcategory = data["subcategory"]
+        if "dead" in data:
+            self.dead = data["dead"]
+        if "export_to_cms" in data:
+            self.export_to_cms = data["export_to_cms"]
+        if "remove_after_days" in data:
+            self.remove_after_days = data["remove_after_days"]
+        if "language" in data:
+            self.language = data["language"]
+        if "favicon" in data:
+            self.favicon = data["favicon"]
+        if "on_hold" in data:
+            if not data["on_hold"]:
+                self.enable()
+        if "fetch_period" in data:
+            self.fetch_period = data["fetch_period"]
+        if "source_type" in data:
+            self.source_type = data["source_type"]
+        if "proxy_location" in data:
+            self.proxy_location = data["proxy_location"]
+
+        self.save()
 
 
 class SourceDataBuilder(object):

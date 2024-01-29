@@ -32,7 +32,7 @@ class SourceGenericPlugin(HtmlPage):
         start_time = DateUtils.get_datetime_now_utc()
         num_entries = 0
 
-        if self.is_page_hash_ok():
+        if self.is_page_ok_to_read():
             num_entries = self.check_for_data_impl()
 
         stop_time = DateUtils.get_datetime_now_utc()
@@ -43,6 +43,11 @@ class SourceGenericPlugin(HtmlPage):
         if hash:
             self.set_operational_info(
                 stop_time, num_entries, total_time.total_seconds(), hash
+            )
+
+        if self.dead:
+            self.set_operational_info(
+                stop_time, num_entries, total_time.total_seconds(), hash, valid=False
             )
 
     def check_for_data_impl(self):
@@ -74,12 +79,15 @@ class SourceGenericPlugin(HtmlPage):
 
         return num_entries
 
-    def is_page_hash_ok(self):
+    def is_page_ok_to_read(self):
         source = self.get_source()
         self.hash = self.get_hash()
 
         if self.hash and source.get_page_hash() == self.hash:
             LinkDatabase.info("Page has is the same, skipping".format(source.title))
+            return False
+        elif not self.hash:
+            LinkDatabase.info("Cannot obtain hash, skipping".format(source.title))
             return False
 
         return True
@@ -116,10 +124,10 @@ class SourceGenericPlugin(HtmlPage):
 
         return self.hash
 
-    def set_operational_info(self, stop_time, num_entries, total_seconds, hash_value):
+    def set_operational_info(self, stop_time, num_entries, total_seconds, hash_value, valid=True):
         source = self.get_source()
 
-        source.set_operational_info(stop_time, num_entries, total_seconds, hash_value)
+        source.set_operational_info(stop_time, num_entries, total_seconds, hash_value, valid)
 
     def get_source(self):
         if self.source is None:
@@ -128,6 +136,49 @@ class SourceGenericPlugin(HtmlPage):
                 self.source = sources[0]
 
         return self.source
+
+    def get_contents(self):
+        if self.contents:
+            return self.contents
+
+        if self.dead:
+            return
+
+        contents = super().get_contents()
+
+        source = self.get_source()
+
+        fast_check = False
+
+        if self.is_cloudflare_protected():
+            LinkDatabase.info(
+                "Source:{} Title:{}; Feed is protected by Cloudflare".format(
+                    source.url, source.title, self.status_code, contents
+                )
+            )
+
+        if self.options.is_selenium():
+            self.dead = True
+            return
+
+        # goes over cloudflare
+        self.reader = UrlHandler.get(
+            self.get_address(), use_selenium=True, fast_check=fast_check
+        )
+        contents = self.reader.get_contents()
+
+        if not contents:
+            PersistentInfo.error(
+                "Source:{} Title:{}; Could not obtain contents.\nStatus code:{}\nContents\n{}".format(
+                    source.url, source.title, self.reader.status_code, contents
+                )
+            )
+            self.dead = True
+            return None
+
+        self.contents = contents
+
+        return contents
 
     def get_address(self):
         source = self.get_source()

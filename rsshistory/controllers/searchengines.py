@@ -133,7 +133,7 @@ class SearchEngineSpotify(SearchEngine):
         return "Spotify"
 
     def get_search_address(self):
-        return "https://open.spotify.com/search/"
+        return "https://open.spotify.com/search"
 
     def get_search_string(self, search_term=None):
         if not search_term:

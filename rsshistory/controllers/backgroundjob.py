@@ -15,6 +15,38 @@ from ..webtools import HtmlPage
 
 
 class BackgroundJobController(BackgroundJob):
+
+    PRIORITY_JOB_CHOICES = (
+        (BackgroundJob.JOB_PUSH_TO_REPO, BackgroundJob.JOB_PUSH_TO_REPO),
+        (BackgroundJob.JOB_PUSH_DAILY_DATA_TO_REPO, BackgroundJob.JOB_PUSH_DAILY_DATA_TO_REPO),
+        (BackgroundJob.JOB_PUSH_YEAR_DATA_TO_REPO, BackgroundJob.JOB_PUSH_YEAR_DATA_TO_REPO),
+        (BackgroundJob.JOB_PUSH_NOTIME_DATA_TO_REPO, BackgroundJob.JOB_PUSH_NOTIME_DATA_TO_REPO),
+
+        (BackgroundJob.JOB_WRITE_DAILY_DATA, BackgroundJob.JOB_WRITE_DAILY_DATA),
+        (BackgroundJob.JOB_WRITE_TOPIC_DATA, BackgroundJob.JOB_WRITE_TOPIC_DATA),
+        (BackgroundJob.JOB_WRITE_BOOKMARKS, BackgroundJob.JOB_WRITE_BOOKMARKS),
+
+        (BackgroundJob.JOB_IMPORT_DAILY_DATA, BackgroundJob.JOB_IMPORT_DAILY_DATA),
+        (BackgroundJob.JOB_IMPORT_BOOKMARKS, BackgroundJob.JOB_IMPORT_BOOKMARKS),
+        (BackgroundJob.JOB_IMPORT_SOURCES, BackgroundJob.JOB_IMPORT_SOURCES),
+        (BackgroundJob.JOB_IMPORT_INSTANCE, BackgroundJob.JOB_IMPORT_INSTANCE),
+
+        # Since cleanup, moving to archives can take forever, we still want to process
+        # source in between
+        (BackgroundJob.JOB_PROCESS_SOURCE, BackgroundJob.JOB_PROCESS_SOURCE,),
+        (BackgroundJob.JOB_CLEANUP, BackgroundJob.JOB_CLEANUP),
+        (BackgroundJob.JOB_MOVE_TO_ARCHIVE, BackgroundJob.JOB_MOVE_TO_ARCHIVE),
+        (BackgroundJob.JOB_LINK_ADD, BackgroundJob.JOB_LINK_ADD,),                          # adds link using default properties, may contain link map properties in the map
+        (BackgroundJob.JOB_LINK_UPDATE_DATA, BackgroundJob.JOB_LINK_UPDATE_DATA),           # update data, recalculate
+        (BackgroundJob.JOB_LINK_SAVE, BackgroundJob.JOB_LINK_SAVE,),                        # link is saved using thirdparty pages (archive.org)
+        (BackgroundJob.JOB_LINK_SCAN, BackgroundJob.JOB_LINK_SCAN,),
+        (BackgroundJob.JOB_LINK_RESET_DATA, BackgroundJob.JOB_LINK_RESET_DATA,),
+        (BackgroundJob.JOB_LINK_DOWNLOAD, BackgroundJob.JOB_LINK_DOWNLOAD),                 # link is downloaded using wget
+        (BackgroundJob.JOB_LINK_DOWNLOAD_MUSIC, BackgroundJob.JOB_LINK_DOWNLOAD_MUSIC),     #
+        (BackgroundJob.JOB_LINK_DOWNLOAD_VIDEO, BackgroundJob.JOB_LINK_DOWNLOAD_VIDEO),     #
+        (BackgroundJob.JOB_CHECK_DOMAINS, BackgroundJob.JOB_CHECK_DOMAINS),
+    )
+
     class Meta:
         proxy = True
 
@@ -22,7 +54,7 @@ class BackgroundJobController(BackgroundJob):
         BackgroundJob.objects.all().delete()
 
     def truncate_invalid_jobs():
-        job_choices = BackgroundJob.JOB_CHOICES
+        job_choices = BackgroundJobController.PRIORITY_JOB_CHOICES
         valid_jobs_choices = []
         for job_choice in job_choices:
             valid_jobs_choices.append(job_choice[0])
@@ -70,7 +102,7 @@ class BackgroundJobController(BackgroundJob):
                 return False
 
         return BackgroundJobController.create_single_job(
-            BackgroundJob.JOB_PROCESS_SOURCE, source.url
+            BackgroundJob.JOB_PROCESS_SOURCE, source.url, source.title
         )
 
     def download_music(item):

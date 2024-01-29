@@ -16,7 +16,7 @@ class SourceDataModel(models.Model):
     dead = models.BooleanField(default=False)
     export_to_cms = models.BooleanField(default=False)
     remove_after_days = models.CharField(max_length=10, default="0")
-    language = models.CharField(max_length=10, default="en")
+    language = models.CharField(max_length=10, blank=True)
     favicon = models.CharField(max_length=1000, null=True)
     on_hold = models.BooleanField(default=False)
     fetch_period = models.IntegerField(default=900)
@@ -62,6 +62,7 @@ class SourceOperationalData(models.Model):
     import_seconds = models.IntegerField(null=True)
     number_of_entries = models.IntegerField(null=True)
     page_hash = models.BinaryField(max_length=30, null=True)
+    consecutive_errors = models.IntegerField(default = 0)
 
     class Meta:
         ordering = ["date_fetched"]

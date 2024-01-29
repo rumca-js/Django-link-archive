@@ -75,6 +75,12 @@ class YTDLP(YouTubeDownloader):
         return self._json_data
 
     def get_channel_video_list(self):
+        """
+        https://www.reddit.com/r/youtubedl/comments/si624k/is_there_any_tool_to_generate_a_list_of_all/
+
+        yt-dlp --print "%(id)s;%(title)s" "URL" > file.csv
+        we could also try non json list
+        """
         def add_commas(json_text):
             wh = 0
             while True:

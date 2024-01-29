@@ -12,18 +12,20 @@
         Reset filters</a>
 
     {% if user.is_staff %}
-    <a href="{% url 'rsshistory:source-add-simple' %}" class="simplebutton">
+    <a href="{% url 'rsshistory:source-add-simple' %}" class="simplebutton" title="Opens add source wizard">
         <img src="{% static 'rsshistory/icons/icons8-channel-add-96.png' %}" class="content-icon" />
         Add source</a>
-    <a href="{% url 'rsshistory:entry-add-simple' %}" class="simplebutton">
+    <a href="{% url 'rsshistory:entry-add-simple' %}" class="simplebutton" title="Opens add entry wizard">
         <img src="{% static 'rsshistory/icons/icons8-add-link-96.png' %}" class="content-icon" />
         Add entry</a>
+    <a href="{% url 'rsshistory:sources-enable-all' %}" class="simplebutton" title="Enable all sources">
+        Enable all</a>
     {% endif %}
-    <a href="{% url 'rsshistory:sources' %}?search=on_hold+%3D+0" class="simplebutton">
+    <a href="{% url 'rsshistory:sources' %}?search=on_hold+%3D+0" class="simplebutton" title="Shows active sources only">
         Active</a>
-    <a href="{% url 'rsshistory:sources' %}?search=on_hold+%3D+1" class="simplebutton">
+    <a href="{% url 'rsshistory:sources' %}?search=on_hold+%3D+1" class="simplebutton" title="Shows disabled sources only">
         On Hold</a>
-    <a href="{% url 'rsshistory:sources' %}?search=category+%3D%3D+New" class="simplebutton">
+    <a href="{% url 'rsshistory:sources' %}?search=category+%3D%3D+New" class="simplebutton" title="Shows new sources only">
         New sources</a>
 </div>
 

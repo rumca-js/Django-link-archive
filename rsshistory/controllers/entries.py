@@ -604,12 +604,21 @@ class LinkDataBuilder(object):
             if obj:
                 return obj
 
+        if not self.link_data:
+            self.link_data = {}
+        self.link_data["link"] = self.link
+
+        # we do not want to obtain properties for non-domain entries, if we capture only
+        # domains
+        if not self.is_enabled_to_store():
+            return
+
         from ..pluginentries.entryurlinterface import EntryUrlInterface
 
         url = EntryUrlInterface(self.link)
         link_data = url.get_props()
         if not link_data:
-            PersistentInfo.error("Could not obtain properties for:{}".format(self.link))
+            PersistentInfo.error("Could not obtain properties for 1:{}".format(self.link))
 
         # TODO update missing keys - do not replace them
         new_link_data = None
@@ -626,7 +635,7 @@ class LinkDataBuilder(object):
         if self.link_data:
             return self.add_from_props_internal()
         else:
-            LinkDatabase.info("Could not obtain properties for:{}".format(self.link))
+            LinkDatabase.info("Could not obtain properties for 2:{}".format(self.link))
 
     def add_from_props(self):
         obj = None
