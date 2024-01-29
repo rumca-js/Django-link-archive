@@ -11,7 +11,7 @@ You can think of it as 'map of the Iternet', rather than 'copy of the Internet'.
  - Google-like Link search ability
  - RSS feed support
  - You can gather information about: links, domains, feeds
- - It is not a search engine. Suggesting better alternatives: [whoogle-search](https://github.com/benbusby/whoogle-search), or [Marginalia search](https://search.marginalia.nu/)
+ - It is not a search engine. Suggesting better alternatives: [whoogle-search](https://github.com/benbusby/whoogle-search), or [Marginalia search](https://search.marginalia.nu/), or [Apache Lucene](https://lucene.apache.org/)
  - Stores link meta data, therefore it is not [archive.org](https://archive.org) replacement
 
 ## Problems with other RSS readers, or apps
