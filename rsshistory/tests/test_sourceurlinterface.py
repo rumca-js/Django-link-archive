@@ -26,7 +26,7 @@ class SourceUrlInterfaceTest(FakeInternetTestCase):
         self.assertTrue(props)
         self.assertTrue("url" in props)
         self.assertTrue("title" in props)
-        self.assertEqual(props["source_type"], SourceDataModel.SOURCE_TYPE_RSS)
+        self.assertEqual(props["source_type"], SourceDataModel.SOURCE_TYPE_YOUTUBE)
 
     def test_youtube_video(self):
         url = SourceUrlInterface("https://www.youtube.com/watch?v=123")
@@ -35,7 +35,7 @@ class SourceUrlInterfaceTest(FakeInternetTestCase):
         self.assertTrue(props)
         self.assertTrue("url" in props)
         self.assertTrue("title" in props)
-        self.assertEqual(props["source_type"], SourceDataModel.SOURCE_TYPE_RSS)
+        self.assertEqual(props["source_type"], SourceDataModel.SOURCE_TYPE_PARSE)
 
     def test_html(self):
         url = SourceUrlInterface("https://linkedin.com")

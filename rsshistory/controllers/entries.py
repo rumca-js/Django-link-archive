@@ -227,6 +227,24 @@ class LinkDataController(LinkDataModel):
         self.page_rating_votes = vote
         self.save()
 
+    def is_delete_time(self):
+        conf = Configuration.get_object().config_entry
+        if conf.days_to_remove_links == 0:
+            return False
+
+        day_to_remove = DateUtils.get_days_before_dt(conf.days_to_remove_links)
+
+        return self.date_published < day_to_remove
+
+    def is_archive_time(self):
+        conf = Configuration.get_object().config_entry
+        if conf.days_to_move_to_archive == 0:
+            return False
+
+        day_to_move = DateUtils.get_days_before_dt(conf.days_to_move_to_archive)
+
+        return self.date_published < day_to_move
+
 
 class ArchiveLinkDataController(ArchiveLinkDataModel):
     class Meta:
@@ -388,11 +406,7 @@ class LinkDataWrapper(object):
     def make_not_bookmarked(request, entry):
         entry.make_not_bookmarked(request.user.username)
 
-        days_diff = DateUtils.get_day_diff(entry.date_published)
-
-        conf = Configuration.get_object().config_entry
-
-        if days_diff > conf.days_to_move_to_archive:
+        if entry.is_archive_time():
             return LinkDataWrapper.move_to_archive(entry)
 
         return entry
@@ -415,13 +429,19 @@ class LinkDataWrapper(object):
             if not entry:
                 return True
 
+            if entry.is_delete_time():
+                LinkDatabase.info("Deleting link: {}".format(entry.link))
+                entry.delete()
+                continue
+
             LinkDatabase.info("Moving link to archive: {}".format(entry.link))
             LinkDataWrapper.move_to_archive(entry)
 
-            passed_seconds = time.time() - start_processing_time
-            if passed_seconds >= 60 * 10:
-                PersistentInfo.create("Task exeeded time:{}".format(passed_seconds))
-                return False
+            if limit_s > 0:
+                passed_seconds = time.time() - start_processing_time
+                if passed_seconds >= 60 * 10:
+                    LinkDatabase.info("Task exeeded time:{}".format(passed_seconds))
+                    return False
 
             """
             Do not remove one after another. Let the processor rest a little bit. He's tired you now?
@@ -464,10 +484,11 @@ class LinkDataWrapper(object):
 
                 entry.delete()
 
-                passed_seconds = time.time() - start_processing_time
-                if passed_seconds >= 60 * 10:
-                    PersistentInfo.create("Task exeeded time:{}".format(passed_seconds))
-                    return False
+                if limit_s != 0:
+                    passed_seconds = time.time() - start_processing_time
+                    if passed_seconds >= 60 * 10:
+                        LinkDatabase.info("Task exeeded time:{}".format(passed_seconds))
+                        return False
 
                 time.sleep(0.5)
 
@@ -482,10 +503,11 @@ class LinkDataWrapper(object):
 
             entry.delete()
 
-            passed_seconds = time.time() - start_processing_time
-            if passed_seconds >= 60 * 10:
-                PersistentInfo.create("Task exeeded time:{}".format(passed_seconds))
-                return False
+            if limit_s != 0:
+                passed_seconds = time.time() - start_processing_time
+                if passed_seconds >= 60 * 10:
+                    LinkDatabase.info("Task exeeded time:{}".format(passed_seconds))
+                    return False
 
             time.sleep(0.5)
 
@@ -500,10 +522,11 @@ class LinkDataWrapper(object):
 
             entry.delete()
 
-            passed_seconds = time.time() - start_processing_time
-            if passed_seconds >= 60 * 10:
-                PersistentInfo.create("Task exeeded time:{}".format(passed_seconds))
-                return False
+            if limit_s != 0:
+                passed_seconds = time.time() - start_processing_time
+                if passed_seconds >= 60 * 10:
+                    LinkDatabase.info("Task exeeded time:{}".format(passed_seconds))
+                    return False
 
         return True
 
@@ -560,8 +583,6 @@ class LinkDataWrapper(object):
             days_before = DateUtils.get_days_before_dt(days)
 
             entries = ArchiveLinkDataController.objects.filter(
-                bookmarked=False,
-                permanent=False,
                 date_published__lt=days_before,
             )
 
@@ -765,6 +786,12 @@ class LinkDataBuilder(object):
             else:
                 return False
 
+        # we do not store link services, we can store only what is behind those links
+        p = HtmlPage(self.link_data["link"])
+        if p.is_link_service():
+            return False
+
+        # heavier checks last
         if self.is_live_video():
             return False
 
@@ -792,7 +819,7 @@ class LinkDataBuilder(object):
 
             self.add_sub_links()
             self.add_keywords()
-            self.add_sources()
+            #self.add_sources()
 
         except Exception as e:
             error_text = traceback.format_exc()

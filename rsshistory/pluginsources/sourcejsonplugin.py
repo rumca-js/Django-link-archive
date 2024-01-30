@@ -7,7 +7,6 @@ from ..apps import LinkDatabase
 from ..webtools import BasePage
 
 from ..configuration import Configuration
-from ..pluginentries.entryurlinterface import EntryUrlInterface
 from ..serializers.instanceimporter import InstanceImporter
 
 from .sourcegenericplugin import SourceGenericPlugin
@@ -25,7 +24,7 @@ class BaseSourceJsonPlugin(SourceGenericPlugin):
     def __init__(self, source_id):
         super().__init__(source_id)
 
-    def get_link_props(self):
+    def get_container_elements(self):
         json = self.get_json()
         if not json:
             return []

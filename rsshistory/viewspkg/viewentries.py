@@ -103,7 +103,7 @@ class EntriesSearchListView(generic.ListView):
         context["page_title"] += self.get_title()
 
         queue_size = BackgroundJobController.get_number_of_jobs(
-            # BackgroundJob.JOB_PROCESS_SOURCE
+            BackgroundJob.JOB_PROCESS_SOURCE
         )
         context["rss_are_fetched"] = queue_size > 0
         context["rss_queue_size"] = queue_size
@@ -328,8 +328,8 @@ class EntriesOmniListView(EntriesSearchListView):
 
         username = self.request.user.username
 
-        if self.request.user.is_authenticated and "search" in self.args:
-            UserSearchHistory.add(username, self.args["search"])
+        if self.request.user.is_authenticated and "search" in self.request.GET:
+            UserSearchHistory.add(username, self.request.GET["search"])
 
         query_filter = OmniSearchFilter(self.request.GET)
 
@@ -503,17 +503,19 @@ def add_entry(request):
 
         if valid:
             data = form.get_information()
+
             b = LinkDataBuilder()
             b.link_data = data
-            if not b.add_from_props_internal():
+            entry = b.add_from_props_internal()
+
+            if not entry:
                 p.context["summary_text"] = "Could not save link"
                 return p.render("summary_present.html")
 
             p.context["form"] = form
 
-            obs = LinkDataController.objects.filter(link=data["link"])
             if obs.exists():
-                p.context["entry"] = obs[0]
+                p.context["entry"] = entry
 
             config = Configuration.get_object().config_entry
 

@@ -551,6 +551,7 @@ class DomainAwarePage(BasePage):
             "www.reddit.com",
             "stackoverflow.com",
             "www.quora.com",
+            "www.instagram.com",
         ]
 
         for item in mainstream:
@@ -565,50 +566,67 @@ class DomainAwarePage(BasePage):
     def is_youtube(self):
         dom = self.get_domain_only()
         if (
-            dom.find("youtube.com") >= 0
-            or dom.find("youtu.be") >= 0
-            or dom.find("www.m.youtube") >= 0
+            dom == "youtube.com"
+            or dom == "youtu.be"
+            or dom == "www.m.youtube.com"
+            or dom == "www.youtube.com"
         ):
             return True
         return False
 
     def is_analytics(self):
-        if self.url.endswith("g.doubleclick.net"):
+        url = self.get_domain_only()
+
+        if url.find("g.doubleclick.net") >= 0:
             return True
-        if self.url.endswith("ad.doubleclick.net"):
+        if url.find("ad.doubleclick.net") >= 0:
             return True
-        if self.url.endswith("doubleverify.com"):
+        if url.find("doubleverify.com") >= 0:
             return True
-        if self.url.endswith("adservice.google.com"):
+        if url.find("adservice.google.com") >= 0:
             return True
-        if self.url.endswith("amazon-adsystem.com"):
+        if url.find("amazon-adsystem.com") >= 0:
             return True
-        if self.url.find("googlesyndication") >= 0:
+        if url.find("googlesyndication") >= 0:
             return True
-        if self.url.endswith("www.googletagmanager.com"):
+        if url.find("www.googletagmanager.com") >= 0:
             return True
-        if self.url.find("google-analytics") >= 0:
+        if url.find("google-analytics") >= 0:
             return True
-        if self.url.find("googletagservices") >= 0:
+        if url.find("googletagservices") >= 0:
             return True
-        if self.url.endswith("cdn.speedcurve.com"):
+        if url.find("cdn.speedcurve.com") >= 0:
             return True
-        if self.url.endswith("amazonaws.com"):
+        if url.find("amazonaws.com") >= 0:
             return True
-        if self.url.endswith("consent.cookiebot.com"):
+        if url.find("consent.cookiebot.com") >= 0:
             return True
-        if self.url.endswith("cloudfront.net"):
+        if url.find("cloudfront.net") >= 0:
             return True
-        if self.url.endswith("prg.smartadserver.com"):
+        if url.find("prg.smartadserver.com") >= 0:
             return True
-        if self.url.endswith("ads.us.e-planning.net"):
+        if url.find("ads.us.e-planning.net") >= 0:
             return True
-        if self.url.endswith("static.ads-twitter.com"):
+        if url.find("static.ads-twitter.com") >= 0:
             return True
-        if self.url.endswith("analytics.twitter.com "):
+        if url.find("analytics.twitter.com") >= 0:
             return True
-        if self.url.find("https://static.cloudflareinsights.com/beacon.min.js/") >= 0:
+        if url.find("static.cloudflareinsights.com") >= 0:
             return True
+
+    def is_link_service(self):
+        url = self.get_domain_only()
+
+        if url.find("lmg.gg") >= 0:
+            return True
+        if url.find("geni.us") >= 0:
+            return True
+        if url.find("tinyurl.com") >= 0:
+            return True
+        if url.find("bit.ly") >= 0:
+            return True
+
+        return False
 
     def is_link(self):
         return self.get_type_for_link() == URL_TYPE_HTML
@@ -1083,14 +1101,14 @@ class RssPage(ContentInterface):
                 )
             )
 
-    def parse_and_process(self):
-        result = []
+    def get_container_elements(self):
         try:
             if self.feed is None:
                 self.feed = self.parse()
 
             if self.feed:
-                result = self.process_feed()
+                for item in self.get_container_elements_maps():
+                    yield item
 
         except Exception as e:
             error_text = traceback.format_exc()
@@ -1102,17 +1120,12 @@ class RssPage(ContentInterface):
             )
             traceback.print_stack()
             traceback.print_exc()
-        return result
 
-    def process_feed(self):
-        props = []
-
+    def get_container_elements_maps(self):
         for feed_entry in self.feed.entries:
             entry_props = self.get_feed_entry_map(feed_entry)
             if entry_props is not None:
-                props.append(entry_props)
-
-        return props
+                yield entry_props
 
     def get_feed_entry_map(self, feed_entry):
         output_map = {}
@@ -1311,7 +1324,7 @@ class RssPage(ContentInterface):
         return True
 
 
-class ContentLinkParser(BasePage):
+class ContentLinkParser(DomainAwarePage):
     """
     TODO filter also html from non html
     """

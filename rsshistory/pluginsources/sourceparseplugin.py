@@ -48,7 +48,7 @@ class BaseParsePlugin(SourceGenericPlugin):
 
         return props
 
-    def get_link_props(self):
+    def get_container_elements(self):
         try:
             start_processing_time = time.time()
 

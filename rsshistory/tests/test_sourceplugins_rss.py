@@ -36,14 +36,14 @@ class BaseRssPluginTest(FakeInternetTestCase):
             export_to_cms=True,
         )
 
-    def test_get_link_props(self):
+    def test_get_container_elements(self):
         config = Configuration.get_object().config_entry
         config.auto_store_entries_use_all_data = False
         config.auto_store_entries_use_clean_page_info = False
         config.save()
 
         plugin = BaseRssPlugin(self.source_rss.id)
-        props = plugin.get_link_props()
+        props = plugin.get_container_elements()
         props = list(props)
 
         self.assertEqual(len(props), 11)
@@ -51,14 +51,14 @@ class BaseRssPluginTest(FakeInternetTestCase):
             props[0]["source"], "https://youtube.com/channel/samtime/rss.xml"
         )
 
-    def test_get_link_props_use_all_data(self):
+    def test_get_container_elements_use_all_data(self):
         config = Configuration.get_object().config_entry
         config.auto_store_entries_use_all_data = True
         config.auto_store_entries_use_clean_page_info = False
         config.save()
 
         plugin = BaseRssPlugin(self.source_rss.id)
-        props = plugin.get_link_props()
+        props = plugin.get_container_elements()
         props = list(props)
 
         self.assertEqual(len(props), 11)
@@ -66,14 +66,14 @@ class BaseRssPluginTest(FakeInternetTestCase):
             props[0]["source"], "https://youtube.com/channel/samtime/rss.xml"
         )
 
-    def test_get_link_props_use_clean_page_info(self):
+    def test_get_container_elements_use_clean_page_info(self):
         config = Configuration.get_object().config_entry
         config.auto_store_entries_use_all_data = False
         config.auto_store_entries_use_clean_page_info = True
         config.save()
 
         plugin = BaseRssPlugin(self.source_rss.id)
-        props = plugin.get_link_props()
+        props = plugin.get_container_elements()
         props = list(props)
 
         self.assertEqual(len(props), 11)

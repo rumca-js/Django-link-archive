@@ -30,18 +30,11 @@ class BaseRssPlugin(SourceGenericPlugin):
 
         fast_check = False
 
-        if not self.is_rss(fast_check=fast_check):
+        if self.is_cloudflare_protected() or not contents or not self.is_rss(fast_check=fast_check):
             if self.options.is_selenium():
                 self.store_error(source, "Tried with selenium, still not RSS", contents)
                 self.dead = True
                 return
-
-            if self.is_cloudflare_protected():
-                LinkDatabase.info(
-                    "Source:{} Title:{}; Feed is protected by Cloudflare".format(
-                        source.url, source.title, self.status_code, contents
-                    )
-                )
 
             # goes over cloudflare
             self.reader = UrlHandler.get(
@@ -101,7 +94,7 @@ class BaseRssPlugin(SourceGenericPlugin):
             )
         )
 
-    def get_link_props(self):
+    def get_container_elements(self):
         c = Configuration.get_object().config_entry
 
         contents = self.get_contents()
@@ -111,23 +104,7 @@ class BaseRssPlugin(SourceGenericPlugin):
             return
 
         self.reader = RssPage(self.get_address(), contents=contents)
-        all_props = self.reader.parse_and_process()
-
-        num_entries = len(all_props)
-
-        #if num_entries == 0:
-        #    if not contents:
-        #        PersistentInfo.error(
-        #            "Source:{} Title:{}; could not obtain page".format(
-        #                source.url, source.title
-        #            )
-        #        )
-        #        return None
-        #    elif self.dead:
-        #        PersistentInfo.error(
-        #            "Source:{}; Source has no data".format(self.source_id)
-        #        )
-        #        return None
+        all_props = self.reader.get_container_elements()
 
         for index, prop in enumerate(all_props):
             if "link" not in prop:
@@ -147,8 +124,8 @@ class BaseRssPlugin(SourceGenericPlugin):
                 prop = self.enhance(prop)
 
                 LinkDatabase.info(
-                    "Rss plugin link:{} [{}/{}]".format(
-                        prop["link"], index, num_entries
+                    "Rss plugin link:{} [{}]".format(
+                        prop["link"], index
                     )
                 )
                 yield prop

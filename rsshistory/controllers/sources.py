@@ -119,7 +119,9 @@ class SourceDataController(SourceDataModel):
             obj.date_fetched = date_fetched
             obj.import_seconds = import_seconds
             obj.number_of_entries = number_of_entries
-            obj.page_hash = hash_value
+
+            if valid:
+                obj.page_hash = hash_value
 
             if valid:
                 obj.consecutive_errors = 0
@@ -150,8 +152,10 @@ class SourceDataController(SourceDataModel):
                 obj.date_fetched = date_fetched
                 obj.import_seconds = import_seconds
                 obj.number_of_entries = number_of_entries
-                obj.page_hash = hash_value
                 obj.source_obj = self
+
+                if valid:
+                    obj.page_hash = hash_value
 
                 if valid:
                     obj.consecutive_errors = 0

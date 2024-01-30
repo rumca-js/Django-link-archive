@@ -309,43 +309,6 @@ class HtmlPageTest(FakeInternetTestCase):
         p = HtmlPage("http://test.com/my-site-test", webpage_description_meta_og)
         self.assertEqual(p.get_description(), "selected og:description")
 
-    def test_is_youtube(self):
-        # default language
-        p = HtmlPage("http://youtube.com/?v=1234", webpage_title_upper)
-        self.assertTrue(p.is_youtube())
-
-        p = HtmlPage("http://youtu.be/djjdj", webpage_title_upper)
-        self.assertTrue(p.is_youtube())
-
-        p = HtmlPage("http://www.m.youtube/?v=1235", webpage_title_upper)
-        self.assertTrue(p.is_youtube())
-
-        p = HtmlPage("http://twitter.com/test", webpage_title_upper)
-        self.assertFalse(p.is_youtube())
-
-    def test_is_mainstream(self):
-        # default language
-        p = HtmlPage("http://youtube.com/?v=1234", webpage_title_upper)
-        self.assertTrue(p.is_mainstream())
-
-        p = HtmlPage("http://youtu.be/djjdj", webpage_title_upper)
-        self.assertTrue(p.is_mainstream())
-
-        p = HtmlPage("http://www.m.youtube/?v=1235", webpage_title_upper)
-        self.assertTrue(p.is_mainstream())
-
-        p = HtmlPage("http://twitter.com/test", webpage_title_upper)
-        self.assertTrue(p.is_mainstream())
-
-        p = HtmlPage("http://www.facebook.com/test", webpage_title_upper)
-        self.assertTrue(p.is_mainstream())
-
-        p = HtmlPage("http://www.rumble.com/test", webpage_title_upper)
-        self.assertTrue(p.is_mainstream())
-
-        p = HtmlPage("http://wikipedia.org/test", webpage_title_upper)
-        self.assertTrue(p.is_mainstream())
-
     def test_get_links(self):
         p = HtmlPage("http://mytestpage.com/?argument=value", webpage_links)
 

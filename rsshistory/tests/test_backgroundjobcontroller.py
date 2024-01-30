@@ -55,12 +55,12 @@ class BackgroundJobControllerTest(FakeInternetTestCase):
     def test_get_job_priority(self):
         self.assertEqual(
             BackgroundJobController.get_job_priority(BackgroundJob.JOB_PROCESS_SOURCE),
-            0,
+            11,
         )
 
         self.assertEqual(
             BackgroundJobController.get_job_priority(BackgroundJob.JOB_LINK_ADD),
-            1,
+            14,
         )
 
     def test_truncate_invalid_jobs(self):

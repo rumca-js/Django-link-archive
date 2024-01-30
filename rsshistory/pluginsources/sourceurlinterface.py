@@ -43,7 +43,10 @@ class SourceUrlInterface(object):
     def get_props_from_rss(self, url, p):
         data = {}
         data["url"] = url
-        data["source_type"] = SourceDataModel.SOURCE_TYPE_RSS
+        if url.startswith("https://www.youtube.com/feeds"):
+            data["source_type"] = SourceDataModel.SOURCE_TYPE_YOUTUBE
+        else:
+            data["source_type"] = SourceDataModel.SOURCE_TYPE_RSS
         title = p.get_title()
         if title:
             data["title"] = title
@@ -106,6 +109,7 @@ class SourceUrlInterface(object):
     def get_props_from_page(self, p):
         data = {}
         data["url"] = p.url
+        # if we do not know what to do with it, we can always collect links from within
         data["source_type"] = BaseParsePlugin.PLUGIN_NAME
         data["title"] = p.get_title()
         data["description"] = p.get_title()

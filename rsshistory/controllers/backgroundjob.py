@@ -16,27 +16,27 @@ from ..webtools import HtmlPage
 
 class BackgroundJobController(BackgroundJob):
 
-    PRIORITY_JOB_CHOICES = (
-        (BackgroundJob.JOB_PUSH_TO_REPO, BackgroundJob.JOB_PUSH_TO_REPO),
-        (BackgroundJob.JOB_PUSH_DAILY_DATA_TO_REPO, BackgroundJob.JOB_PUSH_DAILY_DATA_TO_REPO),
-        (BackgroundJob.JOB_PUSH_YEAR_DATA_TO_REPO, BackgroundJob.JOB_PUSH_YEAR_DATA_TO_REPO),
-        (BackgroundJob.JOB_PUSH_NOTIME_DATA_TO_REPO, BackgroundJob.JOB_PUSH_NOTIME_DATA_TO_REPO),
+    PRIORITY_JOB_CHOICES = [
+        (BackgroundJob.JOB_PUSH_TO_REPO, BackgroundJob.JOB_PUSH_TO_REPO), # 0
+        (BackgroundJob.JOB_PUSH_DAILY_DATA_TO_REPO, BackgroundJob.JOB_PUSH_DAILY_DATA_TO_REPO), # 1
+        (BackgroundJob.JOB_PUSH_YEAR_DATA_TO_REPO, BackgroundJob.JOB_PUSH_YEAR_DATA_TO_REPO), # 2
+        (BackgroundJob.JOB_PUSH_NOTIME_DATA_TO_REPO, BackgroundJob.JOB_PUSH_NOTIME_DATA_TO_REPO), # 3
 
-        (BackgroundJob.JOB_WRITE_DAILY_DATA, BackgroundJob.JOB_WRITE_DAILY_DATA),
-        (BackgroundJob.JOB_WRITE_TOPIC_DATA, BackgroundJob.JOB_WRITE_TOPIC_DATA),
-        (BackgroundJob.JOB_WRITE_BOOKMARKS, BackgroundJob.JOB_WRITE_BOOKMARKS),
+        (BackgroundJob.JOB_WRITE_DAILY_DATA, BackgroundJob.JOB_WRITE_DAILY_DATA), # 4
+        (BackgroundJob.JOB_WRITE_TOPIC_DATA, BackgroundJob.JOB_WRITE_TOPIC_DATA), # 5
+        (BackgroundJob.JOB_WRITE_BOOKMARKS, BackgroundJob.JOB_WRITE_BOOKMARKS), # 6
 
-        (BackgroundJob.JOB_IMPORT_DAILY_DATA, BackgroundJob.JOB_IMPORT_DAILY_DATA),
-        (BackgroundJob.JOB_IMPORT_BOOKMARKS, BackgroundJob.JOB_IMPORT_BOOKMARKS),
-        (BackgroundJob.JOB_IMPORT_SOURCES, BackgroundJob.JOB_IMPORT_SOURCES),
-        (BackgroundJob.JOB_IMPORT_INSTANCE, BackgroundJob.JOB_IMPORT_INSTANCE),
+        (BackgroundJob.JOB_IMPORT_DAILY_DATA, BackgroundJob.JOB_IMPORT_DAILY_DATA), # 7
+        (BackgroundJob.JOB_IMPORT_BOOKMARKS, BackgroundJob.JOB_IMPORT_BOOKMARKS), # 8
+        (BackgroundJob.JOB_IMPORT_SOURCES, BackgroundJob.JOB_IMPORT_SOURCES), # 9
+        (BackgroundJob.JOB_IMPORT_INSTANCE, BackgroundJob.JOB_IMPORT_INSTANCE), # 10
 
         # Since cleanup, moving to archives can take forever, we still want to process
         # source in between
-        (BackgroundJob.JOB_PROCESS_SOURCE, BackgroundJob.JOB_PROCESS_SOURCE,),
-        (BackgroundJob.JOB_CLEANUP, BackgroundJob.JOB_CLEANUP),
-        (BackgroundJob.JOB_MOVE_TO_ARCHIVE, BackgroundJob.JOB_MOVE_TO_ARCHIVE),
-        (BackgroundJob.JOB_LINK_ADD, BackgroundJob.JOB_LINK_ADD,),                          # adds link using default properties, may contain link map properties in the map
+        (BackgroundJob.JOB_PROCESS_SOURCE, BackgroundJob.JOB_PROCESS_SOURCE,), # 11
+        (BackgroundJob.JOB_CLEANUP, BackgroundJob.JOB_CLEANUP), # 12
+        (BackgroundJob.JOB_MOVE_TO_ARCHIVE, BackgroundJob.JOB_MOVE_TO_ARCHIVE), # 13
+        (BackgroundJob.JOB_LINK_ADD, BackgroundJob.JOB_LINK_ADD,), # 14                         # adds link using default properties, may contain link map properties in the map
         (BackgroundJob.JOB_LINK_UPDATE_DATA, BackgroundJob.JOB_LINK_UPDATE_DATA),           # update data, recalculate
         (BackgroundJob.JOB_LINK_SAVE, BackgroundJob.JOB_LINK_SAVE,),                        # link is saved using thirdparty pages (archive.org)
         (BackgroundJob.JOB_LINK_SCAN, BackgroundJob.JOB_LINK_SCAN,),
@@ -45,7 +45,7 @@ class BackgroundJobController(BackgroundJob):
         (BackgroundJob.JOB_LINK_DOWNLOAD_MUSIC, BackgroundJob.JOB_LINK_DOWNLOAD_MUSIC),     #
         (BackgroundJob.JOB_LINK_DOWNLOAD_VIDEO, BackgroundJob.JOB_LINK_DOWNLOAD_VIDEO),     #
         (BackgroundJob.JOB_CHECK_DOMAINS, BackgroundJob.JOB_CHECK_DOMAINS),
-    )
+    ]
 
     class Meta:
         proxy = True
@@ -54,7 +54,7 @@ class BackgroundJobController(BackgroundJob):
         BackgroundJob.objects.all().delete()
 
     def truncate_invalid_jobs():
-        job_choices = BackgroundJobController.PRIORITY_JOB_CHOICES
+        job_choices = BackgroundJobController.JOB_CHOICES
         valid_jobs_choices = []
         for job_choice in job_choices:
             valid_jobs_choices.append(job_choice[0])
@@ -71,7 +71,7 @@ class BackgroundJobController(BackgroundJob):
 
     def get_job_priority(job_name):
         index = 0
-        job_choices = BackgroundJob.JOB_CHOICES
+        job_choices = BackgroundJobController.PRIORITY_JOB_CHOICES
         for job_choice in job_choices:
             if job_choice[0] == job_name:
                 return index

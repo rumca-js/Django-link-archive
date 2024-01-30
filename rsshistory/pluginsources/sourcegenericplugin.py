@@ -11,6 +11,12 @@ from ..pluginentries.urlhandler import UrlHandler
 
 
 class SourceGenericPlugin(HtmlPage):
+    """
+    Class names schemes:
+     - those that are ancestors, and generic use "Base" class prefix
+     - file names start with source, because I did not know if they will not be in one place
+       with entries, so I wanted to be able to distinguish them later
+    """
     def __init__(self, source_id, options=None):
         self.source_id = source_id
         self.source = None
@@ -33,7 +39,7 @@ class SourceGenericPlugin(HtmlPage):
         num_entries = 0
 
         if self.is_page_ok_to_read():
-            num_entries = self.check_for_data_impl()
+            num_entries = self.read_data_from_container_elements()
 
         stop_time = DateUtils.get_datetime_now_utc()
         total_time = stop_time - start_time
@@ -50,12 +56,12 @@ class SourceGenericPlugin(HtmlPage):
                 stop_time, num_entries, total_time.total_seconds(), hash, valid=False
             )
 
-    def check_for_data_impl(self):
+    def read_data_from_container_elements(self):
         num_entries = 0
 
         source = self.get_source()
 
-        for link_data in self.get_link_props():
+        for link_data in self.get_container_elements():
             if not link_data:
                 continue
 
@@ -115,14 +121,20 @@ class SourceGenericPlugin(HtmlPage):
         if self.hash:
             return self.hash
 
+        return self.calculate_hash()
+
+    def calculate_hash(self):
+        """
+        This could be overriden by sub plugin.
+        Hash can be calculated only only by entire contents, but by part of it
+        """
         text = self.get_contents()
         if text:
             try:
                 self.hash = hashlib.md5(text.encode("utf-8")).digest()
+                return self.hash
             except Exception as E:
-                LinkDatabase.info("Could not calculate hash {}".format(E))
-
-        return self.hash
+                PersistentInfo.create("Could not calculate hash {}".format(E))
 
     def set_operational_info(self, stop_time, num_entries, total_seconds, hash_value, valid=True):
         source = self.get_source()
@@ -150,31 +162,31 @@ class SourceGenericPlugin(HtmlPage):
 
         fast_check = False
 
-        if self.is_cloudflare_protected():
+        if self.is_cloudflare_protected() or not contents:
             LinkDatabase.info(
                 "Source:{} Title:{}; Feed is protected by Cloudflare".format(
                     source.url, source.title, self.status_code, contents
                 )
             )
 
-        if self.options.is_selenium():
-            self.dead = True
-            return
+            if self.options.is_selenium():
+                self.dead = True
+                return
 
-        # goes over cloudflare
-        self.reader = UrlHandler.get(
-            self.get_address(), use_selenium=True, fast_check=fast_check
-        )
-        contents = self.reader.get_contents()
-
-        if not contents:
-            PersistentInfo.error(
-                "Source:{} Title:{}; Could not obtain contents.\nStatus code:{}\nContents\n{}".format(
-                    source.url, source.title, self.reader.status_code, contents
-                )
+            # goes over cloudflare
+            self.reader = UrlHandler.get(
+                self.get_address(), use_selenium=True, fast_check=fast_check
             )
-            self.dead = True
-            return None
+            contents = self.reader.get_contents()
+
+            if not contents:
+                PersistentInfo.error(
+                    "Source:{} Title:{}; Could not obtain contents.\nStatus code:{}\nContents\n{}".format(
+                        source.url, source.title, self.reader.status_code, contents
+                    )
+                )
+                self.dead = True
+                return None
 
         self.contents = contents
 
@@ -187,7 +199,7 @@ class SourceGenericPlugin(HtmlPage):
     def is_link_valid(self, address):
         return True
 
-    def get_link_props(self):
+    def get_container_elements(self):
         return []
 
     def on_added_entry(self, entry):

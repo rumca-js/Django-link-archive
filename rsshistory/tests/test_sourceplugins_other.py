@@ -299,7 +299,7 @@ class CodeProjectPluginTest(FakeInternetTestCase):
         parser = CodeProjectPlugin(self.source_codeproject.id)
         parser.contents = webpage_code_project_contents
 
-        props = list(parser.get_link_props())
+        props = list(parser.get_container_elements())
         print(props)
 
         self.assertTrue(len(props) > 0)

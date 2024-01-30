@@ -12,7 +12,7 @@ class BaseJsonPluginTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 
-    def test_get_link_props_source(self):
+    def test_get_container_elements_source(self):
         LinkDataController.objects.all().delete()
 
         self.source_obj = SourceDataController.objects.create(
@@ -24,7 +24,7 @@ class BaseJsonPluginTest(FakeInternetTestCase):
         )
 
         plugin = BaseSourceJsonPlugin(self.source_obj.id)
-        props = plugin.get_link_props()
+        props = plugin.get_container_elements()
 
         self.print_errors()
 
@@ -35,7 +35,7 @@ class BaseJsonPluginTest(FakeInternetTestCase):
         self.assertEqual(entries.count(), 1)
         self.assertEqual(entries[0].source, "https://www.lemonde.fr/en/rss/une.xml")
 
-    def test_get_link_props_links(self):
+    def test_get_container_elements_links(self):
         LinkDataController.objects.all().delete()
 
         self.source_obj = SourceDataController.objects.create(
@@ -47,7 +47,7 @@ class BaseJsonPluginTest(FakeInternetTestCase):
         )
 
         plugin = BaseSourceJsonPlugin(self.source_obj.id)
-        props = plugin.get_link_props()
+        props = plugin.get_container_elements()
 
         self.print_errors()
 
@@ -58,7 +58,7 @@ class BaseJsonPluginTest(FakeInternetTestCase):
         self.assertEqual(entries.count(), 1)
         self.assertEqual(entries[0].source, "https://www.lemonde.fr/en/rss/une.xml")
 
-    def test_get_link_props_sources(self):
+    def test_get_container_elements_sources(self):
         config = Configuration.get_object().config_entry
         config.auto_store_entries = True
         config.auto_store_domain_info = False
@@ -76,7 +76,7 @@ class BaseJsonPluginTest(FakeInternetTestCase):
         )
 
         plugin = BaseSourceJsonPlugin(self.source_obj.id)
-        props = plugin.get_link_props()
+        props = plugin.get_container_elements()
 
         sources = SourceDataController.objects.all().order_by("-on_hold")
         for source in sources:

@@ -6,6 +6,7 @@ class SourceDataModel(models.Model):
     SOURCE_TYPE_RSS = "BaseRssPlugin"
     SOURCE_TYPE_JSON = "BaseSourceJsonPlugin"
     SOURCE_TYPE_PARSE = "BaseParsePlugin"
+    SOURCE_TYPE_YOUTUBE = "YouTubeChannelPlugin"
 
     url = models.CharField(max_length=2000, unique=True)
     title = models.CharField(max_length=1000)

@@ -135,7 +135,7 @@ class DomainParsePluginTest(FakeInternetTestCase):
         parser = DomainParserPlugin(self.source_youtube.id)
         parser.contents = webpage_contents
 
-        props = list(parser.get_link_props())
+        props = list(parser.get_container_elements())
         print(props)
 
         self.assertEqual(len(props), 2)
@@ -170,7 +170,7 @@ class BaseParsePluginTest(FakeInternetTestCase):
 
         parser.contents = webpage_youtube_contents
 
-        props = list(parser.get_link_props())
+        props = list(parser.get_container_elements())
         print(props)
 
         self.assertEqual(len(props), 2)

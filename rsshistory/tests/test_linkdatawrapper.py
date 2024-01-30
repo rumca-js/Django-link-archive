@@ -221,6 +221,8 @@ class LinkDataWrapperTest(FakeInternetTestCase):
 
     def test_clear_old_entries(self):
         conf = Configuration.get_object().config_entry
+        conf.days_to_remove_links = 2
+        conf.save()
 
         current_time = DateUtils.get_datetime_now_utc()
         date_link_publish = current_time - timedelta(days=conf.days_to_remove_links + 2)
@@ -235,7 +237,9 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         self.create_entries(date_link_publish, date_to_remove)
 
         # call tested function
-        LinkDataWrapper.clear_old_entries()
+        status = LinkDataWrapper.clear_old_entries()
+
+        self.assertTrue(status)
 
         bookmarked = LinkDataController.objects.filter(
             link="https://youtube.com?v=bookmarked"
@@ -256,6 +260,9 @@ class LinkDataWrapperTest(FakeInternetTestCase):
 
     def test_move_old_links_to_archive(self):
         conf = Configuration.get_object().config_entry
+        conf.days_to_move_to_archive = 1
+        conf.days_to_remove_links = 2
+        conf.save()
 
         current_time = DateUtils.get_datetime_now_utc()
         date_link_publish = current_time - timedelta(
@@ -299,3 +306,45 @@ class LinkDataWrapperTest(FakeInternetTestCase):
 
         self.assertEqual(archived[1].domain_obj, domains[0])
         self.assertEqual(archived[1].date_published, date_link_publish)
+
+    def test_move_old_links_to_archive(self):
+        conf = Configuration.get_object().config_entry
+        conf.days_to_move_to_archive = 2
+        conf.days_to_remove_links = 2
+        conf.save()
+
+        current_time = DateUtils.get_datetime_now_utc()
+        date_link_publish = current_time - timedelta(
+            days=conf.days_to_move_to_archive + 1
+        )
+        date_to_remove = current_time - timedelta(days=conf.days_to_remove_links + 1)
+
+        self.clear()
+        self.create_entries(date_link_publish, date_to_remove)
+
+        # call tested function
+        LinkDataWrapper.move_old_links_to_archive()
+
+        bookmarked = LinkDataController.objects.filter(
+            link="https://youtube.com?v=bookmarked"
+        )
+        self.assertEqual(bookmarked.count(), 1)
+
+        permanent = LinkDataController.objects.filter(
+            link="https://youtube.com?v=permanent"
+        )
+        self.assertEqual(permanent.count(), 1)
+
+        nonbookmarked = LinkDataController.objects.filter(
+            link="https://youtube.com?v=nonbookmarked"
+        )
+        self.assertEqual(nonbookmarked.count(), 0)
+
+        archived = ArchiveLinkDataController.objects.all()
+        domains = DomainsController.objects.all()
+
+        self.assertEqual(archived.count(), 1)
+        self.assertEqual(domains.count(), 1)
+
+        self.assertEqual(archived[0].domain_obj, domains[0])
+        self.assertEqual(archived[0].date_published, date_to_remove)
