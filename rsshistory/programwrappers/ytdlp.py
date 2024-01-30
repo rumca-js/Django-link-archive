@@ -74,8 +74,11 @@ class YTDLP(YouTubeDownloader):
 
         return self._json_data
 
-    def get_channel_video_list(self):
+    def get_channel_video_list(self, newest=True):
         """
+        TODO
+        add argument ascending / descending. Which is default?
+
         https://www.reddit.com/r/youtubedl/comments/si624k/is_there_any_tool_to_generate_a_list_of_all/
 
         yt-dlp --print "%(id)s;%(title)s" "URL" > file.csv
@@ -95,6 +98,12 @@ class YTDLP(YouTubeDownloader):
         import subprocess
         import json
 
+        """
+        How to limit number of items in playlist?
+        --playlist-start NUMBER          -I NUMBER:
+        --playlist-end NUMBER            -I :NUMBER
+        """
+
         p = subprocess.run(
             ["yt-dlp", "-j", "--flat-playlist", self._url], capture_output=True
         )
@@ -112,6 +121,9 @@ class YTDLP(YouTubeDownloader):
         for item in json:
             if "url" in item and item["url"] is not None:
                 result.append(item["url"])
+
+        if newest == True:
+            result.reverse()
 
         return result
 

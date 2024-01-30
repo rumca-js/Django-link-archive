@@ -128,6 +128,7 @@ class FiltersTest(FakeInternetTestCase):
             "vote": "none",
             "category": "none",
             "subcategory": "none",
+            "source_id": "none",
             "source_title": "none",
             "bookmarked": "none",
             "artist": "none",

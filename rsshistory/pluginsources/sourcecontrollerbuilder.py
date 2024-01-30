@@ -10,6 +10,7 @@ from .searchmysiterssplugin import SearchMySiteRSSPlugin
 from .codeprojectplugin import CodeProjectPlugin
 from .tvn24plugin import TVN24Plugin
 from .spotifyplugin import SpotifyPlugin
+from .sourceyoutubechannel import YouTubePlugin
 
 
 class SourceControllerBuilder(object):
@@ -26,6 +27,7 @@ class SourceControllerBuilder(object):
         CodeProjectPlugin,
         TVN24Plugin,
         SpotifyPlugin,
+        YouTubePlugin,
     ]
 
     def get(source_url):
