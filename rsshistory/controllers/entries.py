@@ -737,7 +737,7 @@ class LinkDataBuilder(object):
         if "date_published" not in new_link_data:
             new_link_data["date_published"] = DateUtils.get_datetime_now_utc()
 
-        if new_link_data["description"] != None:
+        if "description" in new_link_data and new_link_data["description"] != None:
             new_link_data["description"] = LinkDataController.get_description_safe(
                 new_link_data["description"]
             )

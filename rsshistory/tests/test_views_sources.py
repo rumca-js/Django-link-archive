@@ -27,23 +27,25 @@ class SourcesViewsTests(FakeInternetTestCase):
         url = reverse("{}:source-add-simple".format(LinkDatabase.name))
         test_link = "https://linkedin.com"
 
-        post_data = {"link": test_link}
+        post_data = {"url": test_link}
 
         # call user action
         response = self.client.post(url, data=post_data)
+
+        #print(response.content.decode('utf-8'))
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, test_link, html=False)
 
     def test_add_source(self):
-        LinkDataController.objects.all().delete()
+        SourceDataController.objects.all().delete()
 
         self.client.login(username="testuser", password="testpassword")
 
         url = reverse("{}:source-add".format(LinkDatabase.name))
         test_link = "https://linkedin.com"
 
-        data = {"link": test_link}
+        data = {"url": test_link}
         full_data = SourceDataController.get_full_information(data)
 
         limited_data = {}
@@ -59,12 +61,14 @@ class SourcesViewsTests(FakeInternetTestCase):
         # call user action
         response = self.client.post(url, data=limited_data)
 
-        self.assertEqual(response.status_code, 200)
+        # print(response.content.decode('utf-8'))
 
-        self.assertEqual(LinkDataController.objects.filter(link=test_link).count(), 1)
+        self.assertEqual(response.status_code, 302)
+
+        self.assertEqual(SourceDataController.objects.filter(url=test_link).count(), 1)
 
     def test_edit_source(self):
-        LinkDataController.objects.all().delete()
+        SourceDataController.objects.all().delete()
 
         self.client.login(username="testuser", password="testpassword")
 
@@ -73,20 +77,19 @@ class SourcesViewsTests(FakeInternetTestCase):
         source = SourceDataController.objects.create(
             url=test_link,
             title="The first link",
-            date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
         )
+        self.assertEqual(SourceDataController.objects.filter(url=test_link).count(), 1)
 
         url = reverse("{}:source-edit".format(LinkDatabase.name), args=[source.id])
 
-        data = {"link": test_link}
-        full_data = LinkDataController.get_full_information(data)
+        data = {"url": test_link}
+        full_data = SourceDataController.get_full_information(data)
 
         limited_data = {}
         for key in full_data:
             if full_data[key] is not None:
                 limited_data[key] = full_data[key]
-        limited_data["date_published"] = "2020-03-03;16:34"
 
         print("Limited data")
         print(limited_data)
@@ -94,10 +97,12 @@ class SourcesViewsTests(FakeInternetTestCase):
         # call user action
         response = self.client.post(url, data=limited_data)
 
+        print(response.content.decode('utf-8'))
+
         # redirection
         self.assertEqual(response.status_code, 302)
 
         # check that object has been changed
 
-        source = SourceDataController.objects.get(link=test_link)
+        source = SourceDataController.objects.get(url=test_link)
         self.assertEqual(source.title, "LinkedIn Page title")

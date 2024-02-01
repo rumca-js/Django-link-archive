@@ -4,10 +4,17 @@ This module provides replacement for the Internet.
  - when test make requests to obtain a page, we return artificial data here
  - when there is a request to obtain youtube JSON data, we provide artificial data, etc.
 """
+from django.test import TestCase
 
-from ..models import PersistentInfo
+from ..models import PersistentInfo, ConfigurationEntry
 from ..dateutils import DateUtils
+from ..webtools import BasePage
+from ..configuration import Configuration
+
+from ..pluginentries.urlhandler import UrlHandler
 from ..pluginentries.handlervideoyoutube import YouTubeVideoHandler
+from ..pluginentries.handlerchannelyoutube import YouTubeChannelHandler
+
 
 from .fakeinternetdata import (
     webpage_with_real_rss_links,
@@ -139,6 +146,15 @@ class YouTubeVideoHandlerMock(YouTubeVideoHandler):
     def download_details_return_dislike(self):
         self.rd_text = """{}"""
         return True
+
+
+class YouTubeChannelHandlerMock(YouTubeChannelHandler):
+    def __init__(self, url=None):
+        super().__init__(url)
+
+    def get_contents(self):
+        if self.dead:
+            return
 
 
 class TestRequestObjectMock(object):
@@ -345,7 +361,6 @@ class TestRequestObjectMock(object):
             return """{}"""
 
 
-from django.test import TestCase
 
 
 class FakeInternetTestCase(TestCase):
@@ -354,16 +369,34 @@ class FakeInternetTestCase(TestCase):
         return TestRequestObjectMock(url, headers, timeout)
 
     def disable_web_pages(self):
-        from ..webtools import BasePage
-
         BasePage.get_contents_function = self.get_contents_function
 
-        from ..pluginentries.urlhandler import UrlHandler
-
         UrlHandler.youtube_video_handler = YouTubeVideoHandlerMock
-        # UrlHandler.youtube_channel_handler = YouTubeVideoHandlerMock
+        # channel uses RSS page to obtain data. We do not need to mock it
+        # UrlHandler.youtube_channel_handler = YouTubeChannelHandlerMock
         # UrlHandler.odysee_video_handler = YouTubeVideoHandlerMock
         # UrlHandler.odysee_channel_handler = YouTubeVideoHandlerMock
+
+    def setup_configuration(self):
+        # each suite should start with a default configuration entry
+        c = Configuration.get_object()
+        c.config_entry = ConfigurationEntry.get()
+
+        c.config_entry.auto_store_entries = True
+        c.config_entry.auto_store_entries_use_all_data = False
+        c.config_entry.auto_store_entries_use_clean_page_info = False
+        c.config_entry.auto_store_sources = False
+        c.config_entry.auto_store_sources_enabled = False
+        c.config_entry.auto_store_domain_info = True
+        c.config_entry.auto_store_keyword_info = True
+        c.config_entry.auto_scan_new_entries = False
+        c.config_entry.link_save = False
+        c.config_entry.source_save = False
+        c.config_entry.track_user_actions = False
+        c.config_entry.days_to_move_to_archive = 100
+        c.config_entry.days_to_remove_links = 0
+        c.config_entry.whats_new_days = 7
+        c.config_entry.save()
 
     def print_errors(self):
         infos = PersistentInfo.objects.all()

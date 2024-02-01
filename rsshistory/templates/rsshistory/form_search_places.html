@@ -2,7 +2,7 @@
   <h2>Searchable places</h2>
 
   {% for search_engine in search_engines.get %}
-  <a href="{{search_engine.get_search_string}}" class="simplebutton">{{search_engine.get_name}}</a>
+  <a href="{{search_engine.get_search_string}}" class="simplebutton" title="{{search_engine.get_title}}">{{search_engine.get_name}}</a>
   {% endfor %}
 
   <h2>Other places</h2>

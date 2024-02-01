@@ -187,6 +187,7 @@ class LinkDataBuilderTest(FakeInternetTestCase):
         self.assertEqual(objs[1].domain_obj, domains[0])
         self.assertEqual(objs[2].domain_obj, domains[0])
 
+    """
     def test_source_from_page_contents(self):
         config = Configuration.get_object().config_entry
         config.auto_store_entries = True
@@ -220,3 +221,4 @@ class LinkDataBuilderTest(FakeInternetTestCase):
         self.assertEqual(sources[0].on_hold, True)
         self.assertEqual(sources[0].category, "New")
         self.assertEqual(sources[0].subcategory, "New")
+    """

@@ -26,6 +26,14 @@
             </tr>
         </table>
     </form>
+
+    <ul>
+      {% for field, errors in form.errors.items %}
+        {% for error in errors %}
+          <li>{{ field|title }}: {{ error }}</li>
+        {% endfor %}
+      {% endfor %}
+    </ul>
 </p>
 
 <p>

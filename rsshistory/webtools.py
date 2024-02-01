@@ -122,10 +122,12 @@ class BasePage(object):
             self.status_code = page_obj.status_code
             self.dead = page_obj.dead
             self.response_headers = page_obj.response_headers
+            self.robots_contents = page_obj.robots_contents
         else:
             self.url = url
             self.options = options
             self.response_headers = {}
+            self.robots_contents = None
 
             # Flag to not retry same contents requests for things we already know are dead
             self.dead = False
@@ -624,6 +626,8 @@ class DomainAwarePage(BasePage):
         if url.find("tinyurl.com") >= 0:
             return True
         if url.find("bit.ly") >= 0:
+            return True
+        if url.find("amzn.to") >= 0:
             return True
 
         return False
@@ -1468,7 +1472,6 @@ class HtmlPage(ContentInterface):
 
     def __init__(self, url, contents=None, options=None, page_obj=None):
         super().__init__(url, contents=contents, options=options, page_obj=page_obj)
-        self.robots_contents = None
 
     def process_contents(self):
         if self.contents:

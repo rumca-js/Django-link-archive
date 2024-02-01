@@ -632,10 +632,12 @@ class OmniSearchFilter(BaseQueryFilter):
     def __init__(self, args):
         super().__init__(args)
 
-        if "search" in self.args:
-            self.data = self.args["search"]
+        if "search_history" in self.args and self.args["search_history"] != "":
+            self.search_query = self.args["search_history"]
+        elif "search" in self.args and self.args["search"] != "":
+            self.search_query = self.args["search"]
         else:
-            self.data = ""
+            self.search_query = ""
 
         self.query_set = None
         self.default_search_symbols = []
@@ -669,7 +671,7 @@ class OmniSearchFilter(BaseQueryFilter):
             operators.add(symbol)
 
         for symbol in operators:
-            if self.data.find(symbol) >= 0:
+            if self.search_query.find(symbol) >= 0:
                 uses_operator = True
                 break
 
@@ -691,7 +693,7 @@ class OmniSearchFilter(BaseQueryFilter):
             self.combined_query = Q()
 
     def get_combined_query_simple(self):
-        symbol = self.data
+        symbol = self.search_query
 
         if not symbol or symbol == "":
             return Q()
@@ -711,9 +713,9 @@ class OmniSearchFilter(BaseQueryFilter):
         self.symbol_evaluator.set_default_search_symbols(self.default_search_symbols)
         self.symbol_evaluator.set_translatable(self.translatable_names)
 
-        if self.data:
+        if self.search_query:
             LinkDatabase.info("Have data")
-            proc = OmniSymbolProcessor(self.data, self.symbol_evaluator)
+            proc = OmniSymbolProcessor(self.search_query, self.symbol_evaluator)
             combined_q_object = proc.process()
             return combined_q_object
 
@@ -721,7 +723,7 @@ class OmniSearchFilter(BaseQueryFilter):
         if self.query_set is None:
             return []
 
-        if self.data is not None and self.data != "":
+        if self.search_query is not None and self.search_query != "":
             self.calculate_combined_query()
 
             LinkDatabase.info("self.combined query: {}".format(self.combined_query))

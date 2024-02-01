@@ -7,6 +7,7 @@ from .models import (
     LinkTagsDataModel,
     LinkCommentDataModel,
     LinkVoteDataModel,
+    UserSearchHistory,
 )
 from .models import ConfigurationEntry, UserConfig, DataExport
 from .configuration import Configuration
@@ -196,10 +197,24 @@ class OmniSearchForm(forms.Form):
     """
 
     search = forms.CharField(label="Search for", max_length=500, required=False)
+    search_history = forms.CharField(
+        widget=forms.Select(choices=[]), required=False
+    )
 
     def __init__(self, *args, **kwargs):
+        user_choices = [[None,None]]
+        if "user_choices" in kwargs:
+            user_choices = kwargs.pop("user_choices")
+
         super().__init__(*args, **kwargs)
+
         self.fields["search"].widget.attrs.update(size="100")
+
+        attr = {"onchange": "this.form.submit()"}
+        self.fields["search_history"].widget = forms.Select(choices=user_choices, attrs=attr)
+
+    def set_choices(self, choices):
+        self.fields["search_history"].widget = forms.Select(choices=choices)
 
 
 class OmniSearchWithArchiveForm(OmniSearchForm):

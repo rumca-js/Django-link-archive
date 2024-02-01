@@ -34,6 +34,14 @@
     <p class="error-text">There errors with your query</p>
     {% endif %}
 
+    <ul>
+      {% for field, errors in filter_form.errors.items %}
+        {% for error in errors %}
+          <li>{{ field|title }}: {{ error }}</li>
+        {% endfor %}
+      {% endfor %}
+    </ul>
+
   <hr>
 
   {% if content_list %}

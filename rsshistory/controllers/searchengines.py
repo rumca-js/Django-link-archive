@@ -1,9 +1,13 @@
 class SearchEngine(object):
-    def __init__(self, query_term=None):
+    def __init__(self, query_term=None, url=None):
         self.query_term = query_term
+        self.url = url
 
     def get_name(self):
         return ""
+
+    def get_title(self):
+        return self.get_name()
 
     def get_address(self):
         return ""
@@ -42,12 +46,79 @@ class SearchEngineDuckDuckGo(SearchEngine):
         return "https://duckduckgo.com/"
 
 
+class SearchEngineStartPage(SearchEngine):
+    def get_name(self):
+        return "StartPage"
+
+    def get_search_address(self):
+        return "https://www.startpage.com"
+
+
 class SearchEngineGoogle(SearchEngine):
     def get_name(self):
         return "Google"
 
     def get_search_address(self):
         return "https://google.com/"
+
+
+class SearchEngineGoogleCache(SearchEngine):
+    """
+    TODO Should not be registered, for normal search types
+    """
+
+    def get_name(self):
+        return "GoogleCache"
+
+    def get_search_address(self):
+        return "https://webcache.googleusercontent.com"
+
+    def get_search_string(self, search_term=None):
+        """
+        Search term needs to be URL
+
+        TODO do we need this 27 in the search query?
+        is this enough? [https://www.google.com/search?q=cache:seroundtable.com].
+        """
+        if not search_term:
+            search_term = self.query_term
+            if self.url:
+                search_term = self.url
+
+        if not search_term:
+            return self.get_search_address()
+
+        return "{}/{}{}".format(
+            self.get_search_address(), "search?q=cache:", search_term
+        )
+        
+
+class SearchEngineArchiveOrg(SearchEngine):
+
+    def get_name(self):
+        return "Archive.org"
+
+    def get_search_address(self):
+        return "https://web.archive.org"
+
+    def get_search_string(self, search_term=None):
+        """
+        """
+        from ..services.waybackmachine import WaybackMachine
+        from ..dateutils import DateUtils
+
+        if not search_term:
+            search_term = self.query_term
+            if self.url:
+                search_term = self.url
+
+        if not search_term:
+            return self.get_search_address()
+
+        m = WaybackMachine()
+        formatted_date = m.get_formatted_date(DateUtils.get_datetime_now_utc())
+        archive_link = m.get_archive_url_for_date(formatted_date, search_term)
+        return archive_link
 
 
 class SearchEngineBing(SearchEngine):
@@ -178,6 +249,16 @@ class SearchEngineChatOpenAI(SearchEngine):
         return "https://chat.openai.com/"
 
 
+class SearchEngineBard(SearchEngine):
+    def get_name(self):
+        return "Bard"
+
+    def get_search_string(self, search_term=None):
+        if not search_term:
+            search_term = self.query_term
+        return "https://bard.google.com/"
+
+
 class SearchEngineHnAlgolia(SearchEngine):
     def get_name(self):
         return "HackerNews - Algolia"
@@ -205,6 +286,14 @@ class SearchEngineWhoogle(SearchEngine):
         return "https://whoogle.io/search"
 
 
+class SearchEngineMwmbl(SearchEngine):
+    def get_name(self):
+        return "Mwmbl"
+
+    def get_search_address(self):
+        return "https://mwmbl.org/"
+
+
 class SearchEngineSubstack(SearchEngine):
     def get_name(self):
         return "Substack"
@@ -219,40 +308,57 @@ class SearchEngineSubstack(SearchEngine):
 
 
 class SearchEngines(object):
-    def __init__(self, search_term=None):
+    def __init__(self, search_term=None, url=None):
         self.search_term = search_term
+        self.url = url
 
     def get_search_engines():
+        # fmt: off
         return [
-            SearchEngineWikipedia,
+            # search engines
             SearchEngineGoogle,
             SearchEngineDuckDuckGo,
             SearchEngineBing,
             SearchEngineKagi,
-            SearchEngineHnAlgolia,
-            SearchEngineReddit,
-            SearchEngineQuora,
-            SearchEnginePerplexity,
+            SearchEngineStartPage,
+            SearchEngineMwmbl,
+            SearchEngineWikipedia,
             SearchEngineWolfram,
-            SearchEngineYewTube,
-            SearchEngineStackOverFlow,
+            SearchEngineWhoogle,
+            SearchEngineMarginalia,
+
+            # library searches
+            SearchEngineGoogleCache,
+            SearchEngineArchiveOrg,
+
+            # Audio Video
             SearchEngineYouTube,
             SearchEngineSpotify,
-            SearchEngineOdysee,
             SearchEngineTikTok,
-            SearchEngineMarginalia,
-            SearchEngineChatOpenAI,
             SearchEngineRumble,
-            SearchEngineWhoogle,
+            SearchEngineYewTube,
+            SearchEngineOdysee,
+
+            # Social media
+            SearchEngineReddit,
             SearchEngineSubstack,
+            SearchEngineStackOverFlow,
+            SearchEngineQuora,
+            SearchEngineHnAlgolia,
+
+            # AI
+            SearchEngineChatOpenAI,
+            SearchEngineBard,
+            SearchEnginePerplexity,
         ]
+        # fmt: on
 
     def get(self):
         engine_classes = SearchEngines.get_search_engines()
 
         result = []
         for engine_class in engine_classes:
-            engine_object = engine_class(self.search_term)
+            engine_object = engine_class(self.search_term, self.url)
 
             result.append(engine_object)
 

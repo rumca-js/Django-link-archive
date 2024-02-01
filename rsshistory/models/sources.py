@@ -11,9 +11,9 @@ class SourceDataModel(models.Model):
     url = models.CharField(max_length=2000, unique=True)
     title = models.CharField(max_length=1000)
     # main category
-    category = models.CharField(max_length=1000)
+    category = models.CharField(max_length=1000, blank=True)
     # main subcategory
-    subcategory = models.CharField(max_length=1000)
+    subcategory = models.CharField(max_length=1000, blank=True)
     dead = models.BooleanField(default=False)
     export_to_cms = models.BooleanField(default=False)
     remove_after_days = models.CharField(max_length=10, default="0")
@@ -23,7 +23,7 @@ class SourceDataModel(models.Model):
     fetch_period = models.IntegerField(default=900)
     source_type = models.CharField(max_length=1000, null=False, default=SOURCE_TYPE_RSS)
 
-    proxy_location = models.CharField(max_length=200, default="")
+    proxy_location = models.CharField(max_length=200, blank=True)
 
     """
     advanced_category_mapping?

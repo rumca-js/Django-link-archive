@@ -18,6 +18,16 @@ class SourceUrlInterface(object):
             self.url = self.url[:-1]
 
     def get_props(self, input_props=None, use_selenium=False):
+        props = self.get_props_internal(input_props, use_selenium)
+
+        if "remove_after_days" not in props:
+            props["remove_after_days"] = "0"
+        if "fetch_period" not in props:
+            props["fetch_period"] = "3600"
+
+        return props
+
+    def get_props_internal(self, input_props=None, use_selenium=False):
         fast_check = False
 
         p = UrlHandler.get(self.url, fast_check=fast_check, use_selenium=use_selenium)

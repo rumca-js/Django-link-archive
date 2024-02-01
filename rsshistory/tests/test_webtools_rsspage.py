@@ -87,7 +87,8 @@ class RssPageTest(FakeInternetTestCase):
     def test_entries(self):
         # default language
         reader = RssPage("http://test.com/my-site-test", webpage_rss)
-        entries = reader.parse_and_process()
+        entries = reader.get_container_elements()
+        entries = list(entries)
         self.assertEqual(len(entries), 15)
 
         entry = entries[0]
@@ -98,7 +99,8 @@ class RssPageTest(FakeInternetTestCase):
     def test_entry_old_date(self):
         # default language
         reader = RssPage("https://youtube.com/channel/2020-year-channel/rss.xml")
-        entries = reader.parse_and_process()
+        entries = reader.get_container_elements()
+        entries = list(entries)
         self.assertEqual(len(entries), 1)
 
         entry = entries[0]
@@ -110,7 +112,9 @@ class RssPageTest(FakeInternetTestCase):
     def test_entry_no_date(self):
         # default language
         reader = RssPage("https://youtube.com/channel/no-pubdate-channel/rss.xml")
-        entries = reader.parse_and_process()
+        entries = reader.get_container_elements()
+        entries = list(entries)
+
         self.assertEqual(len(entries), 1)
 
         current_date_time = datetime.now()
@@ -134,7 +138,7 @@ class RssPageTest(FakeInternetTestCase):
     def test_rss_is_valid_true(self):
         # default language
         reader = RssPage("https://youtube.com/channel/2020-year-channel/rss.xml")
-        entries = reader.parse_and_process()
+        entries = reader.get_container_elements()
         self.assertTrue(reader.is_valid())
 
     """

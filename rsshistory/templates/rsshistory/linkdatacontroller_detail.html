@@ -132,7 +132,7 @@
     <h3>Search other places</h3>
   <div>
     {% for search_engine in search_engines.get %}
-    <a href="{{search_engine.get_search_string}}" class="simplebutton">{{search_engine.get_name}}</a>
+    <a href="{{search_engine.get_search_string}}" class="simplebutton" title="{{search_engine.get_title}}">{{search_engine.get_name}}</a>
     {% endfor %}
   </div>
 

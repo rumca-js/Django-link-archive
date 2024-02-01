@@ -286,6 +286,7 @@ webpage_code_project_contents = """
 class CodeProjectPluginTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
+        self.setup_configuration()
 
         self.source_codeproject = SourceDataController.objects.create(
             url="https://www.codeproject.com/WebServices/NewsRSS.aspx",
