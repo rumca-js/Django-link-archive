@@ -855,7 +855,6 @@ class ContentInterface(DomainAwarePage):
          - January 15, 2024
          - 15 January 2024 14:48 UTC
         """
-        from time import strptime
         from .dateutils import DateUtils
 
         content = self.get_contents()
@@ -871,16 +870,10 @@ class ContentInterface(DomainAwarePage):
         # Define regular expressions
         current_year_pattern = re.compile(rf"\b{current_year}\b")
         four_digit_number_pattern = re.compile(r"\b\d{4}\b")
-        date_pattern = re.compile(
-            rf"\b(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\.?\s*(\d+)\b"
-        )
-        full_date_pattern = re.compile(r"(\d{4})-(\d{1,2})-(\d{1,2})")
 
         # Attempt to find the current year in the string
         match_current_year = current_year_pattern.search(content)
 
-        match_date = None
-        match_full_date = None
         year = None
         scope = None
 
@@ -904,51 +897,60 @@ class ContentInterface(DomainAwarePage):
                 ]
 
         if scope:
-            match_date = date_pattern.search(scope)
-            match_full_date = full_date_pattern.search(scope)
+            return self.guess_by_scope(scope, year)
+
+    def guess_by_scope(self, scope, year):
+        from .dateutils import DateUtils
+
+        date_pattern_iso = re.compile(r"(\d{4})-(\d{1,2})-(\d{1,2})")
+
+        month_re = "(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\.?"
+
+        # 2024 jan 23
+        date_pattern_us = re.compile(r"(\d{4})\s*{}\s*(\d{1,2})".replace("{}", month_re))
+        # jan 23 2024
+        date_pattern_us2 = re.compile(r"{}\s*(\d{1,2})\s*(\d{4})".replace("{}", month_re))
+        # 23 jan 2024
+        date_pattern_ue = re.compile(r"(\d{1,2})\s*{}\s*(\d{4})".replace("{}", month_re))
+
+        # only Jan 23, without year next by
+        month_date_pattern = re.compile(
+            r"\b{}\s*(\d+)\b".replace("{}", month_re)
+        )
+
+        date_pattern_iso_match = date_pattern_iso.search(scope)
+        date_pattern_us_match = date_pattern_us.search(scope)
+        date_pattern_us2_match = date_pattern_us2.search(scope)
+        date_pattern_ue_match = date_pattern_ue.search(scope)
+
+        month_date_pattern_match = month_date_pattern.search(scope)
 
         date_object = None
 
+        if date_pattern_iso_match:
+            year, month, day = date_pattern_iso_match.groups()
+            date_object = self.format_date(year, month, day)
+
+        elif date_pattern_us_match:
+            year, month, day = date_pattern_us_match.groups()
+            date_object = self.format_date(year, month, day)
+
+        elif date_pattern_us2_match:
+            month, day, year = date_pattern_us2_match.groups()
+            date_object = self.format_date(year, month, day)
+
+        elif date_pattern_ue_match:
+            day, month, year = date_pattern_ue_match.groups()
+            date_object = self.format_date(year, month, day)
+
         # If a month and day are found, construct a datetime object with year, month, and day
-        if match_date:
-            month, day = match_date.groups()
+        elif month_date_pattern_match:
+            month, day = month_date_pattern_match.groups()
+            date_object = self.format_date(year, month, day)
 
-            str_month = ""
-
-            try:
-                str_month = strptime(month, "%b").tm_mon
-                str_month = str(str_month)
-            except Exception as E:
-                pass
-
-            if not str_month:
-                try:
-                    str_month = strptime(month, "%B").tm_mon
-                    str_month = str(str_month)
-                except Exception as E:
-                    LinkDatabase.error(
-                        "Guessing date error: URL:{};\nscope:{};\nMonth:{}\nExc:{}".format(
-                            self.url, scope, month, str(E)
-                        )
-                    )
-
-            try:
-                date_string = f"{year}-{str_month.zfill(2)}-{day.zfill(2)}"
-
-                date_object = datetime.strptime(date_string, "%Y-%m-%d")
-            except Exception as E:
-                PersistentInfo.error(
-                    "Guessing date error: URL:{}\nscope:{}\nYear:{} Month:{} Day:{}\nDate string:{}\nExc:{}".format(
-                        self.url, scope, year, str_month, day, date_string, str(E)
-                    )
-                )
-
-        elif match_full_date:
-            year, month, day = match_full_date.groups()
-            date_object = datetime.strptime(
-                f"{year}-{month.zfill(2)}-{day.zfill(2)}", "%Y-%m-%d"
-            )
         elif year:
+            current_year = int(datetime.now().year)
+
             if year >= current_year or year < 1900:
                 date_object = datetime.now()
             else:
@@ -959,6 +961,43 @@ class ContentInterface(DomainAwarePage):
 
         if date_object:
             date_object = DateUtils.to_utc_date(date_object)
+
+        return date_object
+
+    def format_date(self, year, month, day):
+        from time import strptime
+
+        month_number = None
+
+        try:
+            month_number = int(month)
+            month_number = month
+        except Exception as E:
+            LinkDatabase.info("Error:{}".format(str(E)))
+
+        if not month_number:
+            try:
+                month_number = strptime(month, "%b").tm_mon
+                month_number = str(month_number)
+            except Exception as E:
+                LinkDatabase.info("Error:{}".format(str(E)))
+
+        if not month_number:
+            try:
+                month_number = strptime(month, "%B").tm_mon
+                month_number = str(month_number)
+            except Exception as E:
+                LinkDatabase.info("Error:{}".format(str(E)))
+
+        LinkDatabase.error(
+                "Guessing date error: URL:{};\nYear:{};\nMonth:{}\nDay:{}".format(
+                self.url, year, month, day
+            )
+        )
+
+        date_object = datetime.strptime(
+            f"{year}-{month_number.zfill(2)}-{day.zfill(2)}", "%Y-%m-%d"
+        )
 
         return date_object
 

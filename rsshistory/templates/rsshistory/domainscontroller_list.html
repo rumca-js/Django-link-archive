@@ -83,9 +83,6 @@
   <a href="{% url 'rsshistory:domains' %}?{{ args }}&type=clear" class='simplebutton'>Clear list</a>
   <a href="{% url 'rsshistory:domains' %}?{{ args }}&type=normal" class='simplebutton'>Normal list</a>
 
-  <h1>Details</h1>
-  Domains are added with each new link.
-
-  <a href="https://en.wikipedia.org/wiki/List_of_Internet_top-level_domains">Domain lists on wikipedia</a>
+{% include "rsshistory/domain_help_element.html" %}
 
 {% endblock %}

@@ -68,8 +68,9 @@ class LinkDataController(LinkDataModel):
 
     def get_title_safe(self):
         title = self.title
-        title = title.replace('"', "")
-        title = title.replace("'", "")
+        if title:
+            title = title.replace('"', "")
+            title = title.replace("'", "")
 
         return title
 
@@ -742,9 +743,9 @@ class LinkDataBuilder(object):
                 new_link_data["description"]
             )
 
-        LinkDatabase.info("Adding link: {}".format(link_data["link"]))
+        LinkDatabase.info("Adding link: {}".format(new_link_data["link"]))
 
-        wrapper = LinkDataWrapper(link_data["link"], link_data["date_published"])
+        wrapper = LinkDataWrapper(new_link_data["link"], new_link_data["date_published"])
         return wrapper.create(new_link_data)
 
     def set_domain_object(self):
@@ -874,7 +875,7 @@ class LinkDataBuilder(object):
 
             for link in links:
                 LinkDataBuilder(
-                    link=link, source_is_auto=self.source_is_auto, allow_recursion=False
+                    link=link, source_is_auto=True, allow_recursion=False
                 )
 
     def add_keywords(self):

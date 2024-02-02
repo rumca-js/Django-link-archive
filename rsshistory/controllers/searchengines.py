@@ -121,6 +121,28 @@ class SearchEngineArchiveOrg(SearchEngine):
         return archive_link
 
 
+class SearchEngineArchivePh(SearchEngine):
+
+    def get_name(self):
+        return "archive.ph"
+
+    def get_search_address(self):
+        return "https://archive.ph"
+
+    def get_search_string(self, search_term=None):
+        if not search_term:
+            search_term = self.query_term
+            if self.url:
+                search_term = self.url
+
+        if not search_term:
+            return self.get_search_address()
+
+        return "{}/{}".format(
+            self.get_search_address(), "search?q=cache:", search_term
+        )
+
+
 class SearchEngineBing(SearchEngine):
     def get_name(self):
         return "Bing"
@@ -330,6 +352,7 @@ class SearchEngines(object):
             # library searches
             SearchEngineGoogleCache,
             SearchEngineArchiveOrg,
+            SearchEngineArchivePh,
 
             # Audio Video
             SearchEngineYouTube,

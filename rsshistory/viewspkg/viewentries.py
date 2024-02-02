@@ -15,6 +15,7 @@ from ..models import (
     ConfigurationEntry,
     Domains,
     EntryVisits,
+    UserSearchHistory,
 )
 from ..controllers import (
     LinkDataController,
@@ -44,11 +45,13 @@ from ..dateutils import DateUtils
 
 def get_search_term_request(request):
     search_term = ""
-    if "title" in request.GET:
+    if "title" in request.GET and request.GET["title"] != "":
         search_term = request.GET["title"]
-    elif "tag" in request.GET:
+    elif "tag" in request.GET and request.GET["tag"] != "":
         search_term = request.GET["tag"]
-    elif "search" in request.GET:
+    elif "search_history" in request.GET and request.GET["search_history"] != "":
+        search_term = request.GET["search_history"]
+    elif "search" in request.GET and request.GET["search"] != "":
         search_term = request.GET["search"]
 
     return search_term
@@ -328,8 +331,10 @@ class EntriesOmniListView(EntriesSearchListView):
 
         username = self.request.user.username
 
-        if self.request.user.is_authenticated and "search" in self.request.GET:
-            UserSearchHistory.add(username, self.request.GET["search"])
+        if self.request.user.is_authenticated:
+            search_term = get_search_term_request(self.request)
+            if search_term:
+                UserSearchHistory.add(username, search_term)
 
         query_filter = OmniSearchFilter(self.request.GET)
 
@@ -400,10 +405,15 @@ class EntriesOmniListView(EntriesSearchListView):
 
     def get_form_instance(self):
         config = Configuration.get_object().config_entry
+
+        user = self.request.user.username
+        user_choices = UserSearchHistory.get_user_choices(user)
+
         if config.days_to_move_to_archive == 0:
-            return OmniSearchForm(self.request.GET)
+            f = OmniSearchForm(self.request.GET, user_choices=user_choices)
+            return f
         else:
-            return OmniSearchWithArchiveForm(self.request.GET)
+            return OmniSearchWithArchiveForm(self.request.GET, user_choices=user_choices)
 
     def get_form(self):
         filter_form = self.get_form_instance()
@@ -444,7 +454,7 @@ class EntryDetailView(generic.DetailView):
 
         m = WaybackMachine()
         context["archive_org_date"] = m.get_formatted_date(DateUtils.get_date_today())
-        context["search_engines"] = SearchEngines(self.object.get_search_term())
+        context["search_engines"] = SearchEngines(self.object.get_search_term(), self.object.link)
 
         return context
 
@@ -524,7 +534,9 @@ def add_entry(request):
 
             return p.render("entry_added.html")
 
-        p.context["summary_text"] = "Form is invalid"
+        error_message = "\n".join(["{}: {}".format(field, ", ".join(errors)) for field, errors in form.errors.items()])
+
+        p.context["summary_text"] = "Form is invalid: {}".format(error_message)
         return p.render("summary_present.html")
 
     else:
@@ -689,7 +701,9 @@ def edit_entry(request, pk):
 
             return HttpResponseRedirect(ob.get_absolute_url())
 
-        p.context["summary_text"] = "Could not edit entry"
+        error_message = "\n".join(["{}: {}".format(field, ", ".join(errors)) for field, errors in form.errors.items()])
+
+        p.context["summary_text"] = "Could not edit entry {}".format(error_message)
         return p.render("summary_present.html")
     else:
         form = EntryForm(instance=ob)
@@ -781,7 +795,10 @@ def entries_omni_search_init(request):
     p = ViewPage(request)
     p.set_title("Search entries")
 
-    filter_form = OmniSearchForm()
+    user = request.user.username
+    user_choices = UserSearchHistory.get_user_choices(user)
+
+    filter_form = OmniSearchForm(request.GET, user_choices=user_choices)
     filter_form.method = "GET"
     filter_form.action_url = reverse("{}:entries-omni-search".format(LinkDatabase.name))
 
@@ -1052,7 +1069,9 @@ def archive_edit_entry(request, pk):
             form.save()
             return HttpResponseRedirect(ob.get_absolute_url())
 
-        p.context["summary_text"] = "Could not edit entry"
+        error_message = "\n".join(["{}: {}".format(field, ", ".join(errors)) for field, errors in form.errors.items()])
+
+        p.context["summary_text"] = "Could not edit entry: {}".format(error_message)
 
         return p.render("summary_present.html")
     else:

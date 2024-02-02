@@ -88,7 +88,7 @@ class RssSourceDetailView(generic.DetailView):
 
         context["page_title"] = self.object.title
         context["page_thumbnail"] = self.object.favicon
-        context["search_engines"] = SearchEngines(self.object.title)
+        context["search_engines"] = SearchEngines(self.object.title, self.object.url)
         try:
             context["handler"] = SourceControllerBuilder.get(self.object.url)
         except:
@@ -121,7 +121,9 @@ def add_source(request):
 
             return HttpResponseRedirect(source.get_absolute_url())
         else:
-            p.context["summary_text"] = "Source not added"
+            error_message = "\n".join(["{}: {}".format(field, ", ".join(errors)) for field, errors in form.errors.items()])
+
+            p.context["summary_text"] = "Data: Could not add source {} <div>Data: {}</div>".format(error_message, form.cleaned_data)
             return p.render("summary_present.html")
 
     else:
@@ -139,7 +141,7 @@ def add_source(request):
 
         p.context["form_description_post"] = form_text
 
-    return p.render("form_basic.html")
+    return p.render("form_source_add.html")
 
 
 def add_source_simple(request):
@@ -184,7 +186,7 @@ def add_source_simple(request):
 
         p.context["form"] = form
 
-    return p.render("form_basic.html")
+    return p.render("form_source_add.html")
 
 
 def edit_source(request, pk):
@@ -212,7 +214,9 @@ def edit_source(request, pk):
 
             return HttpResponseRedirect(ob.get_absolute_url())
 
-        p.context["summary_text"] = "Could not edit source"
+        error_message = "\n".join(["{}: {}".format(field, ", ".join(errors)) for field, errors in form.errors.items()])
+
+        p.context["summary_text"] = "Could not edit source {} <div>Data: {}</div>".format(error_message, form.cleaned_data)
         return p.render("summary_present.html")
     else:
         if not ob.favicon:
