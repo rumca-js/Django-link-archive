@@ -1,0 +1,21 @@
+<p>
+    <form action="{{form.action_url}}" method="{{form.method}}">
+        <table>
+            {% csrf_token %}
+            {{ form }}
+            <tr>
+                <td>
+                    <input type="submit" value="Submit" class="simplebutton">
+                </td>
+            </tr>
+        </table>
+    </form>
+
+    <ul>
+      {% for field, errors in form.errors.items %}
+        {% for error in errors %}
+          <li>{{ field|title }}: {{ error }}</li>
+        {% endfor %}
+      {% endfor %}
+    </ul>
+</p>

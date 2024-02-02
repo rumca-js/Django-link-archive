@@ -1,0 +1,13 @@
+<div>
+  <h2>Searchable places</h2>
+
+  {% for search_engine in search_engines.get %}
+  <a href="{{search_engine.get_search_string}}" class="simplebutton" title="{{search_engine.get_title}}">{{search_engine.get_name}}</a>
+  {% endfor %}
+
+  <h2>Other places</h2>
+  <a href="https://news.ycombinator.com/" class="simplebutton">Hacker News</a>
+  <a href="https://medium.com/" class="simplebutton">Medium</a>
+  <a href="https://mastodon.social/explore" class="simplebutton">Mastodon</a>
+  <a href="https://join-lemmy.org/instances" class="simplebutton">Lemmy</a>
+</div>
