@@ -61,6 +61,8 @@ class ConfigForm(forms.ModelForm):
             "auto_store_domain_info",
             "auto_store_keyword_info",
             "track_user_actions",
+            "track_user_searches",
+            "track_user_navigation",
             "data_export_path",
             "data_import_path",
             "days_to_move_to_archive",

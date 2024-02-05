@@ -280,7 +280,7 @@ class SourceDataController(SourceDataModel):
         if self.on_hold:
             from .backgroundjob import BackgroundJobController
 
-            op = source.get_op_data()
+            op = self.get_op_data()
             if op:
                 op.consecutive_errors = 0
                 op.save()
@@ -394,6 +394,9 @@ class SourceDataBuilder(object):
         Category and subcategory names can be empty, then objects are not set
         """
         try:
+            from .entries import LinkDataBuilder
+            LinkDataBuilder(link=self.link_data["url"])
+
             # TODO add domain when adding new source
             source = SourceDataController.objects.create(**self.link_data)
             return source

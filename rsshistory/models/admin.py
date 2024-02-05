@@ -71,6 +71,8 @@ class ConfigurationEntry(models.Model):
     source_save = models.BooleanField(default=False)
 
     track_user_actions = models.BooleanField(default=True)
+    track_user_searches = models.BooleanField(default=True)
+    track_user_navigation = models.BooleanField(default=False)
     vote_min = models.IntegerField(default=-100)
     vote_max = models.IntegerField(default=100)
     number_of_comments_per_day = models.IntegerField(default=1)

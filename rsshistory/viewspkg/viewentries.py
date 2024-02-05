@@ -14,8 +14,9 @@ from ..models import (
     BackgroundJob,
     ConfigurationEntry,
     Domains,
-    EntryVisits,
+    UserEntryVisits,
     UserSearchHistory,
+    UserEntryTransitionHistory,
 )
 from ..controllers import (
     LinkDataController,
@@ -433,13 +434,16 @@ class EntryDetailView(generic.DetailView):
     model = LinkDataController
 
     def get_context_data(self, **kwargs):
-        from ..pluginentries.entrypreviewcontroller import EntryPreviewController
-
         # Call the base implementation first to get the context
         context = super(EntryDetailView, self).get_context_data(**kwargs)
         context = ViewPage.init_context(self.request, context)
 
-        EntryVisits.visited(self.object, self.request.user.username)
+        self.set_visited()
+
+        return self.setup_context(context)
+
+    def setup_context(self, context):
+        from ..pluginentries.entrypreviewcontroller import EntryPreviewController
         object_controller = EntryPreviewController.get(self.object, self.request.user)
 
         context["page_title"] = self.object.title
@@ -452,11 +456,19 @@ class EntryDetailView(generic.DetailView):
             context["page_date_published"] = self.object.date_published.isoformat()
         context["object_controller"] = object_controller
 
+        config = Configuration.get_object().config_entry
+        if config.track_user_actions and config.track_user_navigation:
+            username = self.request.user.username
+            context["transitions"] = UserEntryTransitionHistory.get_related_list(username, self.object)
+
         m = WaybackMachine()
         context["archive_org_date"] = m.get_formatted_date(DateUtils.get_date_today())
         context["search_engines"] = SearchEngines(self.object.get_search_term(), self.object.link)
 
         return context
+
+    def set_visited(self):
+        UserEntryVisits.visited(self.object, self.request.user.username)
 
 
 class EntryArchivedDetailView(generic.DetailView):

@@ -253,7 +253,7 @@ class EntryGenericPlugin(object):
                     reverse(
                         "{}:entries-omni-search".format(LinkDatabase.name),
                     )
-                    + "?search=link+%3D+{}".format(domain_url),
+                    + "?search=link+%3D%3D+{}".format(domain_url),
                     ConfigurationEntry.ACCESS_TYPE_ALL,
                     "Domain: {}".format(domain_url),
                 ),

@@ -4,7 +4,6 @@ from .entries import (
     ArchiveLinkDataModel,
     BaseLinkDataModel,
     BaseLinkDataController,
-    EntryVisits,
 )
 from .sources import (
     SourceDataModel,
@@ -34,7 +33,6 @@ from .keywords import (
 )
 from .searchhistory import (
     UserSearchHistory,
-    EntryHitUserSearchHistory,
-    EntryHitSearchHistory,
-    EntryRelatedHistory,
+    UserEntryVisits,
+    UserEntryTransitionHistory,
 )

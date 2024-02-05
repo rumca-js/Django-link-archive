@@ -26,7 +26,7 @@
         <a href="{% url 'rsshistory:show-page-props' %}" title="Shows page properties" class="simplebutton">
             <img src="{% static 'rsshistory/icons/icons8-view-details-100.png' %}" class="content-icon" />
             Page</a>
-        <a href="/admin" title="User administration" class="simplebutton">
+        <a href="{% url 'admin:index' %}" title="User administration" class="simplebutton">
             <img src="{% static 'rsshistory/icons/account.png' %}" class="content-icon" />
             User admin</a>
     </div>

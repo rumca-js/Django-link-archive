@@ -150,13 +150,12 @@ class BaseLinkDataController(BaseLinkDataModel):
         return sum_num / count
 
     def get_visits(self):
-        visits = EntryVisits.objects.filter(entry=self.link)
+        from .searchhistory import UserEntryVisits
+        visits = UserEntryVisits.objects.filter(entry_object=self)
 
         sum_num = 0
         for visit in visits:
             sum_num += visit.visits
-
-        visits.delete()
 
         return sum_num
 
@@ -443,48 +442,3 @@ class ArchiveLinkDataModel(BaseLinkDataController):
         return True
 
 
-class EntryVisits(models.Model):
-    """
-    Each user vists many places. This table keeps track of it
-    """
-
-    entry = models.CharField(max_length=1000)  # same as link
-    user = models.CharField(max_length=1000, null=True, blank=True)
-    visits = models.IntegerField(blank=True, null=True)
-
-    entry_object = models.ForeignKey(
-        LinkDataModel,
-        on_delete=models.CASCADE,
-        related_name="visits_counter",
-    )
-
-    def visited(entry, user):
-        from ..configuration import Configuration
-        from ..controllers import BackgroundJobController
-
-        config = Configuration.get_object().config_entry
-
-        if not config.track_user_actions:
-            return
-
-        if str(user) == "" or user is None:
-            return
-
-        visits = EntryVisits.objects.filter(entry=entry.link, user=user)
-
-        try:
-            if visits.count() == 0:
-                visit = EntryVisits.objects.create(
-                    entry=entry.link, user=user, visits=1, entry_object=entry
-                )
-            else:
-                visit = visits[0]
-                visit.visits += 1
-                visit.save()
-
-            BackgroundJobController.update_entry_data(entry.link)
-
-            return visit
-
-        except Exception as E:
-            LinkDatabase.info(str(E))

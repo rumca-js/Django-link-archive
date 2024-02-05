@@ -5,6 +5,8 @@
 """
 
 from django.db import models
+from ..controllers import LinkDataController
+from ..configuration import Configuration
 
 
 class UserSearchHistory(models.Model):
@@ -20,6 +22,10 @@ class UserSearchHistory(models.Model):
         ordering = ["-date"]
 
     def add(user, search_query):
+        config_entry = Configuration.get_object().config_entry
+        if not config_entry.track_user_actions or not config_entry.track_user_searches:
+            return
+
         if search_query is not None and search_query != "":
             if UserSearchHistory.get_top_query(user) == search_query:
                 return
@@ -31,6 +37,11 @@ class UserSearchHistory(models.Model):
 
             return theobject
 
+    def cleanup():
+        config_entry = Configuration.get_object().config_entry
+        if not config_entry.track_user_actions or not config_entry.track_user_searches:
+            UserSearchHistory.objects.all().delete()
+
     def get_top_query(user):
         qs = UserSearchHistory.objects.filter(user=user).order_by("-date")
         if qs.exists():
@@ -40,7 +51,7 @@ class UserSearchHistory(models.Model):
         choices = []
         choices.append(["", ""])
 
-        qs = UserSearchHistory.objects.filter(user=user).order_by("-date")
+        qs = UserSearchHistory.objects.filter(user=user).order_by("-date")[:UserSearchHistory.get_choices_limit()]
         for q in qs:
             choices.append([q.search_query, q.search_query])
 
@@ -48,7 +59,7 @@ class UserSearchHistory(models.Model):
 
     def delete_old_entries():
         qs = UserSearchHistory.objects.all().order_by("date")
-        limit = UserSearchHistory.get_choices_limit()
+        limit = UserSearchHistory.get_choices_model_limit()
         if qs.count() > limit:
             too_many = qs.count() - limit
             entries = qs[:too_many]
@@ -60,14 +71,161 @@ class UserSearchHistory(models.Model):
         if entries.exists():
             entries.delete()
 
-    def get_choices_limit():
+    def get_choices_model_limit():
         return 100
+
+    def get_choices_limit():
+        return 15
+
+
+class UserEntryTransitionHistory(models.Model):
+    """
+    Keeps history of which link goes to where. From can be blank at start
+    """
+
+    user = models.CharField(max_length=1000)
+    counter = models.IntegerField(default=0)
+
+    entry_from = models.ForeignKey(
+        LinkDataController,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="transitions_from",
+    )
+    entry_to = models.ForeignKey(
+        LinkDataController,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="transitions_to",
+    )
+
+    class Meta:
+        ordering = ["-counter"]
+
+    def get_related_list(user, navigated_to_entry):
+        """
+        order by counte
+        """
+        result = []
+
+        links = UserEntryTransitionHistory.objects.filter(user=user, entry_from = navigated_to_entry).order_by("-counter")
+        if links.exists():
+            for link_info in links:
+                entries = LinkDataController.objects.filter(id = link_info.entry_to.id)
+                if entries.exists():
+                    entry = entries[0]
+                    result.append(entry)
+
+        return result
+
+    def cleanup():
+        config_entry = Configuration.get_object().config_entry
+        if not config_entry.track_user_actions or not config_entry.track_user_navigation:
+            UserEntryTransitionHistory.objects.all().delete()
+
+    def add(user, entry_from, entry_to):
+        config_entry = Configuration.get_object().config_entry
+        if not config_entry.track_user_actions or not config_entry.track_user_navigation:
+            return
+
+        if entry_from == entry_to:
+            return
+
+        element = UserEntryTransitionHistory.get_element(user, entry_from, entry_to)
+
+        if element:
+            element.counter += 1
+            element.save()
+            return element
+
+        else:
+            return UserEntryTransitionHistory.objects.create(user=user, entry_from=entry_from, entry_to=entry_to, counter = 1)
+
+    def get_element(user, entry_from, entry_to):
+        links = UserEntryTransitionHistory.objects.filter(user=user, entry_from=entry_from, entry_to=entry_to).order_by("-counter")
+        if links.exists():
+            return links[0]
+
+
+    def cleanup():
+        config_entry = Configuration.get_object().config_entry
+        if not config_entry.track_user_actions or not config_entry.track_user_navigation:
+            UserEntryTransitionHistory.objects.all().delete()
+
+
+class UserEntryVisits(models.Model):
+    """
+    Keeps info how many times user entered link,
+    TODO maybe rename to userentrynavigation?
+    """
+
+    user = models.CharField(max_length=1000, null=True, blank=True)
+    visits = models.IntegerField(blank=True, null=True)
+    date_last_visit = models.DateTimeField(blank=True, null=True)
+
+    entry_object = models.ForeignKey(
+        LinkDataController,
+        on_delete=models.CASCADE,
+        related_name="visits_counter",
+    )
+
+    def visited(entry, user):
+        from ..configuration import Configuration
+        from ..dateutils import DateUtils
+        from ..controllers import BackgroundJobController
+
+        config = Configuration.get_object().config_entry
+
+        if not config.track_user_actions or not config.track_user_navigation:
+            return
+
+        if str(user) == "" or user is None:
+            return
+
+
+        visits = UserEntryVisits.objects.filter(entry_object=entry, user=user)
+
+        previous_entry = UserEntryVisits.get_last_user_entry(user)
+        UserEntryTransitionHistory.add(user, previous_entry, entry)
+
+        try:
+
+            if visits.count() == 0:
+                visit = UserEntryVisits.objects.create(
+                    user=user, visits=1, entry_object=entry, date_last_visit = DateUtils.get_datetime_now_utc()
+                )
+            else:
+                visit = visits[0]
+                visit.visits += 1
+                visit.date_last_visit = DateUtils.get_datetime_now_utc()
+                visit.save()
+
+            BackgroundJobController.update_entry_data(entry.link)
+
+            return visit
+
+        except Exception as E:
+            LinkDatabase.info(str(E))
+
+    def get_last_user_entry(user):
+        entries = UserEntryVisits.objects.filter(user=user, date_last_visit__isnull=False).order_by("-date_last_visit")
+        if entries.exists():
+            return entries[0].entry_object
+
+    def cleanup():
+        config_entry = Configuration.get_object().config_entry
+        if not config_entry.track_user_actions or not config_entry.track_user_navigation:
+            UserEntryVisits.objects.all().delete()
 
 
 class EntryHitUserSearchHistory(models.Model):
     """
     User searches for something. Then clicks a link. That is a hit.
     Store it here. Match between search & hit.
+
+    TODO
     """
 
     search_query = models.CharField(max_length=1000)
@@ -84,6 +242,8 @@ class EntryHitSearchHistory(models.Model):
     """
     Same as previous, but for all users.
     TODO How to rank it?
+
+    TODO
     """
 
     search_query = models.CharField(max_length=1000)
@@ -91,12 +251,3 @@ class EntryHitSearchHistory(models.Model):
     vote = models.IntegerField(default=0)
 
 
-class EntryRelatedHistory(models.Model):
-    """
-    Sometimes user goes from a link to another. Store that info.
-    TODO How to rank it?
-    """
-
-    link_from = models.CharField(max_length=1000, unique=True)
-    link_to = models.CharField(max_length=1000, unique=True)
-    vote = models.IntegerField(default=0)

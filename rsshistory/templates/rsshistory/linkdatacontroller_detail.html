@@ -16,120 +16,29 @@
   <span>{{object.link}}</span>
   </div>
 
-  <div style="margin-bottom: 1%">
-      {% for button in object_controller.get_edit_menu_buttons %}
-          {% if button.is_shown %}
-              <a href="{{button.action}}" class="simplebutton" title="{{button.title}}">
-              {% if button.image %}
-                 <img src="{{button.image}}" class="content-icon" />
-              {% endif %}
-              {{button.name}}
-              </a>
-          {% endif %}
-      {% endfor %}
-  </div>
+ {% include "rsshistory/linkdatacontroller_detail_buttons.html" %}
 
-  <div style="margin-bottom: 1%">
-      {% if user_config.show_icons %}
-        <!--img src=
-          {% if user_config.thumbnails_as_icons %}
-              "{{link.get_thumbnail}}"
-          {% else %}
-              "{{link.get_favicon}}"
-          {% endif %}
-          width="30"/-->
-      {% endif %}
-
-      {% for button in object_controller.get_view_menu_buttons %}
-          {% if button.is_shown %}
-              <a href="{{button.action}}" class="simplebutton" title="{{button.title}}">
-              {% if button.image %}
-                 <img src="{{button.image}}" class="content-icon" />
-              {% endif %}
-              {{button.name}}
-              </a>
-          {% endif %}
-      {% endfor %}
-  </div>
-
-  <div>
-      {% for button in object_controller.get_advanced_menu_buttons %}
-          {% if button.is_shown %}
-              <a href="{{button.action}}" class="simplebutton" title="{{button.title}}">
-              {% if button.image %}
-                 <img src="{{button.image}}" class="content-icon" />
-              {% endif %}
-              {{button.name}}
-              </a>
-          {% endif %}
-      {% endfor %}
-  </div>
-
-  <div>
-      {% if object.is_taggable %}
-      <div><strong>Tags:</strong>
-	  {% if user.is_authenticated %}
-          <a href="{% url 'rsshistory:entry-tag' object.id %}" class="simplebutton">
-              <img src="{% static 'rsshistory/icons/icons8-edit-100.png' %}" class="content-icon" />
-          </a>
-          {% endif %}
-          {% if object.has_tags %}
-            {% for tag in object.get_tag_map %}
-              <a href="{% url 'rsshistory:entries-omni-search'%}?search=tags__tag+%3D+{{tag}}" class="simplebutton">{{tag}}</a>
-            {% endfor %}
-          {% endif %}
-      </div>
-      {% endif %}
-  </div>
-
-  <div>
-      {% for parameter in object_controller.get_parameters %}
-      <span><strong>{{parameter.name | safe}}:</strong> {{parameter.description | safe}}</span>
-      {% endfor %}
-      <span><strong>Points</strong>{{object.page_rating}}</span>
-      <span><strong>Points contents</strong>{{object.page_rating_contents}}</span>
-      <span><strong>Points votes</strong>{{object.page_rating_votes}}</span>
-      <span><strong>User visits</strong>{{object.page_rating_visits}}</span>
-  </div>
+ {% include "rsshistory/linkdatacontroller_detail_parameters.html" %}
 
   <div class="link-detail-description">
   {{object_controller.get_description_html | safe | linebreaks }}
   <div>
   <div style="clear:both"></div>
 
-{% if object.is_taggable %}
-  <hr/>
-  <h2>Comments</h2>
-  <div>
-  {% for comment in object.comments.all %}
-      <div>{{comment.get_comment | linebreaks}}</div>
-      <div>{{comment.date_published}} {{comment.author}}
-          {% if comment.author == user.get_username %}
-            <a href="{% url 'rsshistory:entry-comment-edit' comment.id %}" class="simplebutton" title="Edit comment">
-               <img src="{% static 'rsshistory/icons/icons8-edit-100.png' %}" class="content-icon" />
-            </a>
-            <a href="{% url 'rsshistory:entry-comment-remove' comment.id %}" class="simplebutton" title="Remove comment">
-               <img src="{% static 'rsshistory/icons/icons8-trash-100.png' %}" class="content-icon" />
-            </a>
-          {% endif %}
-      </div>
-      <hr/>
-  {% endfor %}
-  </div>
-
-  <div>
-  {% if user.is_authenticated %}
-    <a href="{% url 'rsshistory:entry-comment-add' object.id %}" class="simplebutton">Add comment</a>
-  {% endif %}
-  </div>
-
-{% endif %}
+{% include "rsshistory/linkdatacontroller_detail_comments.html" %}
 
   <div>
     <a href="{% url 'rsshistory:entry-json' object.id %}" class="simplebutton">Show JSON</a>
   </div>
 
-    <h3>Search other places</h3>
+  {%if transitions%}
+       <h3>Related</h3>
+      {% for entry in transitions %}
+          <h4 class="link-title"><a href="{{ entry.link }}" title="{{ entry.link }}">{{entry.title}}</a></h4>
+      {% endfor %}
+  {%endif%}
+
+  <h3>Search other places</h3>
   <div>
     {% for search_engine in search_engines.get %}
     <a href="{{search_engine.get_search_string}}" class="simplebutton" title="{{search_engine.get_title}}">{{search_engine.get_name}}</a>
