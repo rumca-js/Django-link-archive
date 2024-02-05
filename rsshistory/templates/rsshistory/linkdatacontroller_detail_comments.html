@@ -1,0 +1,28 @@
+{% load static %}
+
+{% if object.is_taggable %}
+  <hr/>
+  <h2>Comments</h2>
+  <div>
+  {% for comment in object.comments.all %}
+      <div>{{comment.get_comment | linebreaks}}</div>
+      <div>{{comment.date_published}} {{comment.author}}
+          {% if comment.author == user.get_username %}
+            <a href="{% url 'rsshistory:entry-comment-edit' comment.id %}" class="simplebutton" title="Edit comment">
+               <img src="{% static 'rsshistory/icons/icons8-edit-100.png' %}" class="content-icon" />
+            </a>
+            <a href="{% url 'rsshistory:entry-comment-remove' comment.id %}" class="simplebutton" title="Remove comment">
+               <img src="{% static 'rsshistory/icons/icons8-trash-100.png' %}" class="content-icon" />
+            </a>
+          {% endif %}
+      </div>
+      <hr/>
+  {% endfor %}
+  </div>
+
+  <div>
+  {% if user.is_authenticated %}
+    <a href="{% url 'rsshistory:entry-comment-add' object.id %}" class="simplebutton">Add comment</a>
+  {% endif %}
+  </div>
+{% endif %}

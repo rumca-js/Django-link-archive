@@ -1,0 +1,66 @@
+{% load static %}
+  <div style="margin-bottom: 1%">
+      {% for button in object_controller.get_edit_menu_buttons %}
+          {% if button.is_shown %}
+              <a href="{{button.action}}" class="simplebutton" title="{{button.title}}">
+              {% if button.image %}
+                 <img src="{{button.image}}" class="content-icon" />
+              {% endif %}
+              {{button.name}}
+              </a>
+          {% endif %}
+      {% endfor %}
+  </div>
+
+  <div style="margin-bottom: 1%">
+      {% if user_config.show_icons %}
+        <!--img src=
+          {% if user_config.thumbnails_as_icons %}
+              "{{link.get_thumbnail}}"
+          {% else %}
+              "{{link.get_favicon}}"
+          {% endif %}
+          width="30"/-->
+      {% endif %}
+
+      {% for button in object_controller.get_view_menu_buttons %}
+          {% if button.is_shown %}
+              <a href="{{button.action}}" class="simplebutton" title="{{button.title}}">
+              {% if button.image %}
+                 <img src="{{button.image}}" class="content-icon" />
+              {% endif %}
+              {{button.name}}
+              </a>
+          {% endif %}
+      {% endfor %}
+  </div>
+
+  <div>
+      {% for button in object_controller.get_advanced_menu_buttons %}
+          {% if button.is_shown %}
+              <a href="{{button.action}}" class="simplebutton" title="{{button.title}}">
+              {% if button.image %}
+                 <img src="{{button.image}}" class="content-icon" />
+              {% endif %}
+              {{button.name}}
+              </a>
+          {% endif %}
+      {% endfor %}
+  </div>
+
+  <div>
+      {% if object.is_taggable %}
+      <div><strong>Tags:</strong>
+	  {% if user.is_authenticated %}
+          <a href="{% url 'rsshistory:entry-tag' object.id %}" class="simplebutton">
+              <img src="{% static 'rsshistory/icons/icons8-edit-100.png' %}" class="content-icon" />
+          </a>
+          {% endif %}
+          {% if object.has_tags %}
+            {% for tag in object.get_tag_map %}
+              <a href="{% url 'rsshistory:entries-omni-search'%}?search=tags__tag+%3D+{{tag}}" class="simplebutton">{{tag}}</a>
+            {% endfor %}
+          {% endif %}
+      </div>
+      {% endif %}
+  </div>
