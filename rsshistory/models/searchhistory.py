@@ -30,9 +30,13 @@ class UserSearchHistory(models.Model):
             if UserSearchHistory.get_top_query(user) == search_query:
                 return
 
-            UserSearchHistory.delete_old_user_entries(search_query=search_query, user=user)
+            UserSearchHistory.delete_old_user_entries(
+                search_query=search_query, user=user
+            )
 
-            theobject = UserSearchHistory.objects.create(search_query=search_query, user=user)
+            theobject = UserSearchHistory.objects.create(
+                search_query=search_query, user=user
+            )
             UserSearchHistory.delete_old_entries()
 
             return theobject
@@ -51,7 +55,9 @@ class UserSearchHistory(models.Model):
         choices = []
         choices.append(["", ""])
 
-        qs = UserSearchHistory.objects.filter(user=user).order_by("-date")[:UserSearchHistory.get_choices_limit()]
+        qs = UserSearchHistory.objects.filter(user=user).order_by("-date")[
+            : UserSearchHistory.get_choices_limit()
+        ]
         for q in qs:
             choices.append([q.search_query, q.search_query])
 
@@ -110,10 +116,12 @@ class UserEntryTransitionHistory(models.Model):
         """
         result = []
 
-        links = UserEntryTransitionHistory.objects.filter(user=user, entry_from = navigated_to_entry).order_by("-counter")
+        links = UserEntryTransitionHistory.objects.filter(
+            user=user, entry_from=navigated_to_entry
+        ).order_by("-counter")
         if links.exists():
             for link_info in links:
-                entries = LinkDataController.objects.filter(id = link_info.entry_to.id)
+                entries = LinkDataController.objects.filter(id=link_info.entry_to.id)
                 if entries.exists():
                     entry = entries[0]
                     result.append(entry)
@@ -122,12 +130,18 @@ class UserEntryTransitionHistory(models.Model):
 
     def cleanup():
         config_entry = Configuration.get_object().config_entry
-        if not config_entry.track_user_actions or not config_entry.track_user_navigation:
+        if (
+            not config_entry.track_user_actions
+            or not config_entry.track_user_navigation
+        ):
             UserEntryTransitionHistory.objects.all().delete()
 
     def add(user, entry_from, entry_to):
         config_entry = Configuration.get_object().config_entry
-        if not config_entry.track_user_actions or not config_entry.track_user_navigation:
+        if (
+            not config_entry.track_user_actions
+            or not config_entry.track_user_navigation
+        ):
             return
 
         if entry_from == entry_to:
@@ -141,17 +155,23 @@ class UserEntryTransitionHistory(models.Model):
             return element
 
         else:
-            return UserEntryTransitionHistory.objects.create(user=user, entry_from=entry_from, entry_to=entry_to, counter = 1)
+            return UserEntryTransitionHistory.objects.create(
+                user=user, entry_from=entry_from, entry_to=entry_to, counter=1
+            )
 
     def get_element(user, entry_from, entry_to):
-        links = UserEntryTransitionHistory.objects.filter(user=user, entry_from=entry_from, entry_to=entry_to).order_by("-counter")
+        links = UserEntryTransitionHistory.objects.filter(
+            user=user, entry_from=entry_from, entry_to=entry_to
+        ).order_by("-counter")
         if links.exists():
             return links[0]
 
-
     def cleanup():
         config_entry = Configuration.get_object().config_entry
-        if not config_entry.track_user_actions or not config_entry.track_user_navigation:
+        if (
+            not config_entry.track_user_actions
+            or not config_entry.track_user_navigation
+        ):
             UserEntryTransitionHistory.objects.all().delete()
 
 
@@ -184,17 +204,18 @@ class UserEntryVisits(models.Model):
         if str(user) == "" or user is None:
             return
 
-
         visits = UserEntryVisits.objects.filter(entry_object=entry, user=user)
 
         previous_entry = UserEntryVisits.get_last_user_entry(user)
         UserEntryTransitionHistory.add(user, previous_entry, entry)
 
         try:
-
             if visits.count() == 0:
                 visit = UserEntryVisits.objects.create(
-                    user=user, visits=1, entry_object=entry, date_last_visit = DateUtils.get_datetime_now_utc()
+                    user=user,
+                    visits=1,
+                    entry_object=entry,
+                    date_last_visit=DateUtils.get_datetime_now_utc(),
                 )
             else:
                 visit = visits[0]
@@ -210,13 +231,18 @@ class UserEntryVisits(models.Model):
             LinkDatabase.info(str(E))
 
     def get_last_user_entry(user):
-        entries = UserEntryVisits.objects.filter(user=user, date_last_visit__isnull=False).order_by("-date_last_visit")
+        entries = UserEntryVisits.objects.filter(
+            user=user, date_last_visit__isnull=False
+        ).order_by("-date_last_visit")
         if entries.exists():
             return entries[0].entry_object
 
     def cleanup():
         config_entry = Configuration.get_object().config_entry
-        if not config_entry.track_user_actions or not config_entry.track_user_navigation:
+        if (
+            not config_entry.track_user_actions
+            or not config_entry.track_user_navigation
+        ):
             UserEntryVisits.objects.all().delete()
 
 
@@ -249,5 +275,3 @@ class EntryHitSearchHistory(models.Model):
     search_query = models.CharField(max_length=1000)
     link = models.CharField(max_length=1000, unique=True)
     vote = models.IntegerField(default=0)
-
-

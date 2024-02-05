@@ -863,7 +863,9 @@ class HandlerManager(object):
                 # if 10 minutes passed
                 passed_seconds = time.time() - start_processing_time
                 if passed_seconds >= 60 * 10:
-                    text = "Handler {} exceeded time:{}".format(handler.get_job(), passed_seconds)
+                    text = "Handler {} exceeded time:{}".format(
+                        handler.get_job(), passed_seconds
+                    )
                     PersistentInfo.create(text)
                     break
 

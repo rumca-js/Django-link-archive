@@ -55,7 +55,6 @@ wall_street_journal_date_human_date_ue_format = """
 
 
 class ContentInterfacePageTest(FakeInternetTestCase):
-
     def test_guess_date_for_full_date(self):
         p = ContentInterface(
             "https://www.wsj.com/world/middle-east/israel-war-gaza-hamas-perilous-phase-1ed3ea9b?mod=hp_lead_pos7",

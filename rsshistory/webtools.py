@@ -771,10 +771,7 @@ class DomainAwarePage(BasePage):
             return -1
 
         lower = self.contents.lower()
-        if (
-            lower.find("<rss") >= 0
-            and lower.find("<channel") >= 0
-        ):
+        if lower.find("<rss") >= 0 and lower.find("<channel") >= 0:
             return lower.find("<rss")
 
         return -1
@@ -907,16 +904,20 @@ class ContentInterface(DomainAwarePage):
         month_re = "(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\.?"
 
         # 2024 jan 23
-        date_pattern_us = re.compile(r"(\d{4})\s*{}\s*(\d{1,2})".replace("{}", month_re))
+        date_pattern_us = re.compile(
+            r"(\d{4})\s*{}\s*(\d{1,2})".replace("{}", month_re)
+        )
         # jan 23 2024
-        date_pattern_us2 = re.compile(r"{}\s*(\d{1,2})\s*(\d{4})".replace("{}", month_re))
+        date_pattern_us2 = re.compile(
+            r"{}\s*(\d{1,2})\s*(\d{4})".replace("{}", month_re)
+        )
         # 23 jan 2024
-        date_pattern_ue = re.compile(r"(\d{1,2})\s*{}\s*(\d{4})".replace("{}", month_re))
+        date_pattern_ue = re.compile(
+            r"(\d{1,2})\s*{}\s*(\d{4})".replace("{}", month_re)
+        )
 
         # only Jan 23, without year next by
-        month_date_pattern = re.compile(
-            r"\b{}\s*(\d+)\b".replace("{}", month_re)
-        )
+        month_date_pattern = re.compile(r"\b{}\s*(\d+)\b".replace("{}", month_re))
 
         date_pattern_iso_match = date_pattern_iso.search(scope)
         date_pattern_us_match = date_pattern_us.search(scope)
@@ -990,7 +991,7 @@ class ContentInterface(DomainAwarePage):
                 LinkDatabase.info("Error:{}".format(str(E)))
 
         LinkDatabase.error(
-                "Guessing date error: URL:{};\nYear:{};\nMonth:{}\nDay:{}".format(
+            "Guessing date error: URL:{};\nYear:{};\nMonth:{}\nDay:{}".format(
                 self.url, year, month, day
             )
         )

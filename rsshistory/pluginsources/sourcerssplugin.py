@@ -30,7 +30,11 @@ class BaseRssPlugin(SourceGenericPlugin):
 
         fast_check = False
 
-        if self.is_cloudflare_protected() or not contents or not self.is_rss(fast_check=fast_check):
+        if (
+            self.is_cloudflare_protected()
+            or not contents
+            or not self.is_rss(fast_check=fast_check)
+        ):
             if self.options.is_selenium():
                 self.store_error(source, "Tried with selenium, still not RSS", contents)
                 self.dead = True
@@ -49,7 +53,11 @@ class BaseRssPlugin(SourceGenericPlugin):
                 Parse the HTML with BeautifulSoup.
                 """
                 if not contents:
-                    self.store_error(source, "Coult not obtain contents, even with selenium", contents)
+                    self.store_error(
+                        source,
+                        "Coult not obtain contents, even with selenium",
+                        contents,
+                    )
                     self.dead = True
                     return None
 
@@ -123,11 +131,7 @@ class BaseRssPlugin(SourceGenericPlugin):
 
                 prop = self.enhance(prop)
 
-                LinkDatabase.info(
-                    "Rss plugin link:{} [{}]".format(
-                        prop["link"], index
-                    )
-                )
+                LinkDatabase.info("Rss plugin link:{} [{}]".format(prop["link"], index))
                 yield prop
 
     def cleanup_data(self, prop):

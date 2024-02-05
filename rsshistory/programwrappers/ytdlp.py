@@ -84,6 +84,7 @@ class YTDLP(YouTubeDownloader):
         yt-dlp --print "%(id)s;%(title)s" "URL" > file.csv
         we could also try non json list
         """
+
         def add_commas(json_text):
             wh = 0
             while True:

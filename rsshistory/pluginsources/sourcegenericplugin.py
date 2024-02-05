@@ -17,6 +17,7 @@ class SourceGenericPlugin(HtmlPage):
      - file names start with source, because I did not know if they will not be in one place
        with entries, so I wanted to be able to distinguish them later
     """
+
     def __init__(self, source_id, options=None):
         self.source_id = source_id
         self.source = None
@@ -136,10 +137,14 @@ class SourceGenericPlugin(HtmlPage):
             except Exception as E:
                 PersistentInfo.create("Could not calculate hash {}".format(E))
 
-    def set_operational_info(self, stop_time, num_entries, total_seconds, hash_value, valid=True):
+    def set_operational_info(
+        self, stop_time, num_entries, total_seconds, hash_value, valid=True
+    ):
         source = self.get_source()
 
-        source.set_operational_info(stop_time, num_entries, total_seconds, hash_value, valid)
+        source.set_operational_info(
+            stop_time, num_entries, total_seconds, hash_value, valid
+        )
 
     def get_source(self):
         if self.source is None:

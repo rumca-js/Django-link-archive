@@ -32,7 +32,7 @@ class SourcesViewsTests(FakeInternetTestCase):
         # call user action
         response = self.client.post(url, data=post_data)
 
-        #print(response.content.decode('utf-8'))
+        # print(response.content.decode('utf-8'))
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, test_link, html=False)
@@ -97,7 +97,7 @@ class SourcesViewsTests(FakeInternetTestCase):
         # call user action
         response = self.client.post(url, data=limited_data)
 
-        print(response.content.decode('utf-8'))
+        print(response.content.decode("utf-8"))
 
         # redirection
         self.assertEqual(response.status_code, 302)

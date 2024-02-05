@@ -640,7 +640,9 @@ class LinkDataBuilder(object):
         url = EntryUrlInterface(self.link)
         link_data = url.get_props()
         if not link_data:
-            PersistentInfo.error("Could not obtain properties for 1:{}".format(self.link))
+            PersistentInfo.error(
+                "Could not obtain properties for 1:{}".format(self.link)
+            )
 
         # TODO update missing keys - do not replace them
         new_link_data = None
@@ -745,7 +747,9 @@ class LinkDataBuilder(object):
 
         LinkDatabase.info("Adding link: {}".format(new_link_data["link"]))
 
-        wrapper = LinkDataWrapper(new_link_data["link"], new_link_data["date_published"])
+        wrapper = LinkDataWrapper(
+            new_link_data["link"], new_link_data["date_published"]
+        )
         return wrapper.create(new_link_data)
 
     def set_domain_object(self):
@@ -820,7 +824,7 @@ class LinkDataBuilder(object):
 
             self.add_sub_links()
             self.add_keywords()
-            #self.add_sources()
+            # self.add_sources()
 
         except Exception as e:
             error_text = traceback.format_exc()
@@ -874,9 +878,7 @@ class LinkDataBuilder(object):
                         links.add(link)
 
             for link in links:
-                LinkDataBuilder(
-                    link=link, source_is_auto=True, allow_recursion=False
-                )
+                LinkDataBuilder(link=link, source_is_auto=True, allow_recursion=False)
 
     def add_keywords(self):
         link_data = self.link_data

@@ -414,7 +414,9 @@ class EntriesOmniListView(EntriesSearchListView):
             f = OmniSearchForm(self.request.GET, user_choices=user_choices)
             return f
         else:
-            return OmniSearchWithArchiveForm(self.request.GET, user_choices=user_choices)
+            return OmniSearchWithArchiveForm(
+                self.request.GET, user_choices=user_choices
+            )
 
     def get_form(self):
         filter_form = self.get_form_instance()
@@ -444,6 +446,7 @@ class EntryDetailView(generic.DetailView):
 
     def setup_context(self, context):
         from ..pluginentries.entrypreviewcontroller import EntryPreviewController
+
         object_controller = EntryPreviewController.get(self.object, self.request.user)
 
         context["page_title"] = self.object.title
@@ -459,11 +462,15 @@ class EntryDetailView(generic.DetailView):
         config = Configuration.get_object().config_entry
         if config.track_user_actions and config.track_user_navigation:
             username = self.request.user.username
-            context["transitions"] = UserEntryTransitionHistory.get_related_list(username, self.object)
+            context["transitions"] = UserEntryTransitionHistory.get_related_list(
+                username, self.object
+            )
 
         m = WaybackMachine()
         context["archive_org_date"] = m.get_formatted_date(DateUtils.get_date_today())
-        context["search_engines"] = SearchEngines(self.object.get_search_term(), self.object.link)
+        context["search_engines"] = SearchEngines(
+            self.object.get_search_term(), self.object.link
+        )
 
         return context
 
@@ -546,7 +553,12 @@ def add_entry(request):
 
             return p.render("entry_added.html")
 
-        error_message = "\n".join(["{}: {}".format(field, ", ".join(errors)) for field, errors in form.errors.items()])
+        error_message = "\n".join(
+            [
+                "{}: {}".format(field, ", ".join(errors))
+                for field, errors in form.errors.items()
+            ]
+        )
 
         p.context["summary_text"] = "Form is invalid: {}".format(error_message)
         return p.render("summary_present.html")
@@ -713,7 +725,12 @@ def edit_entry(request, pk):
 
             return HttpResponseRedirect(ob.get_absolute_url())
 
-        error_message = "\n".join(["{}: {}".format(field, ", ".join(errors)) for field, errors in form.errors.items()])
+        error_message = "\n".join(
+            [
+                "{}: {}".format(field, ", ".join(errors))
+                for field, errors in form.errors.items()
+            ]
+        )
 
         p.context["summary_text"] = "Could not edit entry {}".format(error_message)
         return p.render("summary_present.html")
@@ -1081,7 +1098,12 @@ def archive_edit_entry(request, pk):
             form.save()
             return HttpResponseRedirect(ob.get_absolute_url())
 
-        error_message = "\n".join(["{}: {}".format(field, ", ".join(errors)) for field, errors in form.errors.items()])
+        error_message = "\n".join(
+            [
+                "{}: {}".format(field, ", ".join(errors))
+                for field, errors in form.errors.items()
+            ]
+        )
 
         p.context["summary_text"] = "Could not edit entry: {}".format(error_message)
 

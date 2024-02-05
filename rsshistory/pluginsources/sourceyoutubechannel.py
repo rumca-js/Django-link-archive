@@ -1,4 +1,3 @@
-
 import traceback
 from dateutil import parser
 from bs4 import BeautifulSoup

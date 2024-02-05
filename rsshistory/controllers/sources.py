@@ -144,7 +144,7 @@ class SourceDataController(SourceDataModel):
                     import_seconds=import_seconds,
                     number_of_entries=number_of_entries,
                     page_hash=hash_value,
-                    consecutive_errors = consecutive_errors,
+                    consecutive_errors=consecutive_errors,
                     source_obj=self,
                 )
             else:
@@ -326,7 +326,7 @@ class SourceDataController(SourceDataModel):
 
 
 class SourceDataBuilder(object):
-    def __init__(self, link=None, link_data=None, manual_entry = False):
+    def __init__(self, link=None, link_data=None, manual_entry=False):
         self.link = link
         self.link_data = link_data
         self.manual_entry = manual_entry
@@ -395,6 +395,7 @@ class SourceDataBuilder(object):
         """
         try:
             from .entries import LinkDataBuilder
+
             LinkDataBuilder(link=self.link_data["url"])
 
             # TODO add domain when adding new source
@@ -429,7 +430,9 @@ class SourceDataBuilder(object):
         if category_name:
             category_object = SourceCategories.add(category_name)
         if category_name and subcategory_name:
-            subcategory_object = SourceSubCategories.add(category_name, subcategory_name)
+            subcategory_object = SourceSubCategories.add(
+                category_name, subcategory_name
+            )
 
         # self.link_data["category_object"] = category_object
         # self.link_data["subcategory_object"] = subcategory_object

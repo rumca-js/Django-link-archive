@@ -80,5 +80,3 @@ class DomainAwarePageTest(FakeInternetTestCase):
         # default language
         p = DomainAwarePage("http://lmg-not.gg/test", "")
         self.assertTrue(not p.is_link_service())
-
-

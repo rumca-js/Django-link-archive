@@ -361,8 +361,6 @@ class TestRequestObjectMock(object):
             return """{}"""
 
 
-
-
 class FakeInternetTestCase(TestCase):
     def get_contents_function(self, url, headers, timeout):
         print("Mocked Requesting page: {}".format(url))

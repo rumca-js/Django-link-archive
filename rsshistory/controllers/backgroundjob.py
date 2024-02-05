@@ -15,7 +15,7 @@ from ..webtools import HtmlPage
 
 
 class BackgroundJobController(BackgroundJob):
-
+    # fmt: off
     PRIORITY_JOB_CHOICES = [
         (BackgroundJob.JOB_PUSH_TO_REPO, BackgroundJob.JOB_PUSH_TO_REPO), # 0
         (BackgroundJob.JOB_PUSH_DAILY_DATA_TO_REPO, BackgroundJob.JOB_PUSH_DAILY_DATA_TO_REPO), # 1
@@ -46,6 +46,7 @@ class BackgroundJobController(BackgroundJob):
         (BackgroundJob.JOB_LINK_DOWNLOAD_VIDEO, BackgroundJob.JOB_LINK_DOWNLOAD_VIDEO),     #
         (BackgroundJob.JOB_CHECK_DOMAINS, BackgroundJob.JOB_CHECK_DOMAINS),
     ]
+    # fmt: on
 
     class Meta:
         proxy = True

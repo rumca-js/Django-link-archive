@@ -134,7 +134,6 @@ webpage_html_favicon = """<html>
 """
 
 
-
 class HtmlPageTest(FakeInternetTestCase):
     def test_default_language(self):
         # default language

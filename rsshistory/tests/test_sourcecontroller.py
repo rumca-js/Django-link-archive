@@ -23,7 +23,7 @@ class SourceControllerTest(FakeInternetTestCase):
                 "subcategory": "No",
                 "export_to_cms": False,
             },
-            manual_entry = False,
+            manual_entry=False,
         ).add_from_props()
 
         # automatic entry creates on_hold sources, that are not fetched
@@ -43,7 +43,7 @@ class SourceControllerTest(FakeInternetTestCase):
                 "subcategory": "No",
                 "export_to_cms": False,
             },
-            manual_entry = True,
+            manual_entry=True,
         ).add_from_props()
 
         # manual entry adds a new active source, that is fetched
@@ -68,13 +68,13 @@ class SourceControllerTest(FakeInternetTestCase):
         # call tested function
         b = SourceDataBuilder()
 
-        b.link_data={
-                "url": "https://linkedin.com",
-                "title": "LinkedIn",
-                "category": "No",
-                "subcategory": "No",
-                "export_to_cms": False,
-            }
+        b.link_data = {
+            "url": "https://linkedin.com",
+            "title": "LinkedIn",
+            "category": "No",
+            "subcategory": "No",
+            "export_to_cms": False,
+        }
 
         source = b.add_from_props()
 
@@ -86,14 +86,14 @@ class SourceControllerTest(FakeInternetTestCase):
 
         # call tested function
         b = SourceDataBuilder()
-        b.link_data={
-                "url": "https://linkedin.com",
-                "title": "LinkedIn",
-                "category": "No",
-                "subcategory": "No",
-                "export_to_cms": False,
-                "favicon": "https://linkedin.com/images/favicon.ico",
-            }
+        b.link_data = {
+            "url": "https://linkedin.com",
+            "title": "LinkedIn",
+            "category": "No",
+            "subcategory": "No",
+            "export_to_cms": False,
+            "favicon": "https://linkedin.com/images/favicon.ico",
+        }
         source = b.add_from_props()
 
         self.print_errors()

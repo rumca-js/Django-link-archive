@@ -91,10 +91,9 @@ class SearchEngineGoogleCache(SearchEngine):
         return "{}/{}{}".format(
             self.get_search_address(), "search?q=cache:", search_term
         )
-        
+
 
 class SearchEngineArchiveOrg(SearchEngine):
-
     def get_name(self):
         return "Archive.org"
 
@@ -102,8 +101,7 @@ class SearchEngineArchiveOrg(SearchEngine):
         return "https://web.archive.org"
 
     def get_search_string(self, search_term=None):
-        """
-        """
+        """ """
         from ..services.waybackmachine import WaybackMachine
         from ..dateutils import DateUtils
 
@@ -122,7 +120,6 @@ class SearchEngineArchiveOrg(SearchEngine):
 
 
 class SearchEngineArchivePh(SearchEngine):
-
     def get_name(self):
         return "archive.ph"
 
@@ -138,9 +135,7 @@ class SearchEngineArchivePh(SearchEngine):
         if not search_term:
             return self.get_search_address()
 
-        return "{}/{}".format(
-            self.get_search_address(), "search?q=cache:", search_term
-        )
+        return "{}/{}".format(self.get_search_address(), "search?q=cache:", search_term)
 
 
 class SearchEngineBing(SearchEngine):

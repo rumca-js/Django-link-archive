@@ -151,6 +151,7 @@ class BaseLinkDataController(BaseLinkDataModel):
 
     def get_visits(self):
         from .searchhistory import UserEntryVisits
+
         visits = UserEntryVisits.objects.filter(entry_object=self)
 
         sum_num = 0
@@ -440,5 +441,3 @@ class ArchiveLinkDataModel(BaseLinkDataController):
 
     def is_archive_entry(self):
         return True
-
-

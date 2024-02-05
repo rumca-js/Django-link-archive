@@ -111,8 +111,8 @@ def add_source(request):
 
         if form.is_valid():
             b = SourceDataBuilder()
-            b.link_data=form.cleaned_data
-            b.manual_entry=True
+            b.link_data = form.cleaned_data
+            b.manual_entry = True
             source = b.add_from_props()
 
             if not source:
@@ -121,9 +121,18 @@ def add_source(request):
 
             return HttpResponseRedirect(source.get_absolute_url())
         else:
-            error_message = "\n".join(["{}: {}".format(field, ", ".join(errors)) for field, errors in form.errors.items()])
+            error_message = "\n".join(
+                [
+                    "{}: {}".format(field, ", ".join(errors))
+                    for field, errors in form.errors.items()
+                ]
+            )
 
-            p.context["summary_text"] = "Data: Could not add source {} <div>Data: {}</div>".format(error_message, form.cleaned_data)
+            p.context[
+                "summary_text"
+            ] = "Data: Could not add source {} <div>Data: {}</div>".format(
+                error_message, form.cleaned_data
+            )
             return p.render("summary_present.html")
 
     else:
@@ -214,9 +223,18 @@ def edit_source(request, pk):
 
             return HttpResponseRedirect(ob.get_absolute_url())
 
-        error_message = "\n".join(["{}: {}".format(field, ", ".join(errors)) for field, errors in form.errors.items()])
+        error_message = "\n".join(
+            [
+                "{}: {}".format(field, ", ".join(errors))
+                for field, errors in form.errors.items()
+            ]
+        )
 
-        p.context["summary_text"] = "Could not edit source {} <div>Data: {}</div>".format(error_message, form.cleaned_data)
+        p.context[
+            "summary_text"
+        ] = "Could not edit source {} <div>Data: {}</div>".format(
+            error_message, form.cleaned_data
+        )
         return p.render("summary_present.html")
     else:
         if not ob.favicon:
@@ -355,7 +373,7 @@ def enable_all_sources(request):
     if data is not None:
         return data
 
-    sources = SourceDataController.objects.filter(on_hold = True)
+    sources = SourceDataController.objects.filter(on_hold=True)
     if sources.exists():
         for source in sources:
             source.enable()
