@@ -18,6 +18,16 @@ RSS reading is not easy: [https://flak.tedunangst.com/post/cloudflare-and-rss](h
 
 That gives us the conslusion, you have to be a sneaky bot, even if what you are doing is not wrong.
 
+# Keep it small
+
+We want small footprint. The database cannot grow indefinitely.
+
+Keep limits on user actions:
+ - store up to preconfigured amount of data. Searches might be store for a user, but we store only about 100 searches. Newer replace older
+ - store data only for links that are in the operational database. If links leave operational database, so are data related to it: comments, votes
+ - always define archive limit
+ - always define amount of days when entries are removed
+
 # Development
 
  - installation should be simple and easy. Provide most common installation methods (Python poetry, docker)
