@@ -375,7 +375,7 @@ class ViewsTest(FakeInternetTestCase):
 
         self.assertEqual(resp.status_code, 200)
 
-    def test_shot_youtube_link_props(self):
+    def test_show_youtube_link_props(self):
         url = (
             reverse("{}:page-show-props".format(LinkDatabase.name))
             + "?page=https://www.youtube.com/watch?v=SwlIAjcYypA"
@@ -384,10 +384,31 @@ class ViewsTest(FakeInternetTestCase):
 
         self.assertEqual(resp.status_code, 200)
 
-    def test_shot_rss_link_props(self):
+    def test_show_rss_link_props(self):
         url = (
             reverse("{}:page-show-props".format(LinkDatabase.name))
             + "?page=https://www.youtube.com/feeds/samtime.rss"
+        )
+        resp = self.client.get(url)
+
+        self.assertEqual(resp.status_code, 200)
+
+    def test_page_scanner(self):
+        url = reverse("{}:page-scan".format(LinkDatabase.name))
+        resp = self.client.get(url)
+
+        self.assertEqual(resp.status_code, 200)
+
+    def test_page_scanner_input(self):
+        url = reverse("{}:page-scan-input".format(LinkDatabase.name))
+        resp = self.client.get(url)
+
+        self.assertEqual(resp.status_code, 200)
+
+    def test_page_scanner_input_html(self):
+        url = (
+            reverse("{}:page-scan-input".format(LinkDatabase.name))
+            + "?link=https://www.linkedin.com"
         )
         resp = self.client.get(url)
 

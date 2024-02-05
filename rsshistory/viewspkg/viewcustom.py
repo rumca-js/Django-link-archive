@@ -107,8 +107,8 @@ def page_scan_input(request):
         #for link in links:
         #    if LinkDataController.objects.filter(link = link).count() == 0:
         #        to_find.append(link)
-
-        links = list(to_find)
+        #links = list(to_find)
+        links = list(links)
         links = sorted(links)
 
         data = {}
