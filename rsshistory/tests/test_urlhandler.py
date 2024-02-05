@@ -78,3 +78,10 @@ class UrlHandlerTest(FakeInternetTestCase):
         self.assertEqual(type(handler), HtmlPage)
 
         self.assertTrue(handler.options.use_selenium_full)
+
+    def test_get__defcon_org(self):
+        handler = UrlHandler.get("https://defcon.org")
+
+        self.assertEqual(type(handler), HtmlPage)
+
+        self.assertTrue(handler.options.use_selenium_full)

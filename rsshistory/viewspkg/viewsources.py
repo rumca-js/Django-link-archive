@@ -270,7 +270,7 @@ def refresh_source(request, pk):
 
     source = sources[0]
 
-    dynamic_data = source.get_op_data()
+    dynamic_data = source.get_dynamic_data()
     if dynamic_data is not None:
         op = source.dynamic_data
         op.date_fetched = None

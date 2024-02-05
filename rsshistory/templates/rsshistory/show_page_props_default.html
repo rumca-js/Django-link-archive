@@ -3,7 +3,8 @@
 <ul>
     <li>Link: {{page_link}} <a href="{{page_link}}">Link</a></li>
     <li>Detected page type: {{page_type}}</li>
-    <li>Status code: {{status_code}}</li>
+    <li>Status code: {{page_object.status_code}}</li>
+    <li>Valid: {{page_object.is_valid}}</li>
     <li>Title: {{title}}</li>
     <li>Description: {{description}}</li>
     <li>Author: {{author}}</li>
@@ -17,6 +18,8 @@
     {%if tags %}
     <li>keywords: {{tags}}</li>
     {%endif %}
+
+    <li>Selenium: {{page_object.options.is_selenium}}</li>
 </ul>
 
 {% if user_config.show_icons %}

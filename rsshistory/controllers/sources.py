@@ -87,34 +87,34 @@ class SourceDataController(SourceDataModel):
         else:
             return False
 
-    def get_op_data(self):
+    def get_dynamic_data(self):
         if hasattr(self, "dynamic_data"):
             return self.dynamic_data
 
     def get_date_fetched(self):
-        obj = self.get_op_data()
+        obj = self.get_dynamic_data()
         if obj:
             return obj.date_fetched
 
     def get_page_hash(self):
-        obj = self.get_op_data()
+        obj = self.get_dynamic_data()
         if obj:
             return obj.page_hash
 
     def get_import_seconds(self):
-        obj = self.get_op_data()
+        obj = self.get_dynamic_data()
         if obj:
             return obj.import_seconds
 
     def get_number_of_entries(self):
-        obj = self.get_op_data()
+        obj = self.get_dynamic_data()
         if obj:
             return obj.number_of_entries
 
     def set_operational_info(
         self, date_fetched, number_of_entries, import_seconds, hash_value, valid=True
     ):
-        obj = self.get_op_data()
+        obj = self.get_dynamic_data()
         if obj:
             obj.date_fetched = date_fetched
             obj.import_seconds = import_seconds
@@ -280,7 +280,7 @@ class SourceDataController(SourceDataModel):
         if self.on_hold:
             from .backgroundjob import BackgroundJobController
 
-            op = self.get_op_data()
+            op = self.get_dynamic_data()
             if op:
                 op.consecutive_errors = 0
                 op.save()

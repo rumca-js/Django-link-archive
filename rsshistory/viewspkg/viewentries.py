@@ -39,9 +39,10 @@ from ..forms import (
 from ..queryfilters import EntryFilter
 from ..views import ViewPage
 from ..configuration import Configuration
-from ..webtools import Url
+from ..webtools import Url, BasePage
 from ..services.waybackmachine import WaybackMachine
 from ..dateutils import DateUtils
+from ..serializers.instanceimporter import InstanceExporter
 
 
 def get_search_term_request(request):
@@ -218,7 +219,7 @@ class EntriesRecentListView(EntriesSearchListView):
         return reverse("{}:entries-recent".format(LinkDatabase.name))
 
     def get_form_instance(self):
-        form = EntryRecentChoiceForm(self.request.GET)
+        form = EntryRecentChoiceForm(self.request.GET, request=self.request)
         return form
 
     def get_title(self):
@@ -411,7 +412,7 @@ class EntriesOmniListView(EntriesSearchListView):
         user_choices = UserSearchHistory.get_user_choices(user)
 
         if config.days_to_move_to_archive == 0:
-            f = OmniSearchForm(self.request.GET, user_choices=user_choices)
+            f = OmniSearchForm(self.request.GET, user_choices=user_choices, request=self.request)
             return f
         else:
             return OmniSearchWithArchiveForm(
@@ -598,7 +599,6 @@ def add_entry(request):
 
 def add_simple_entry(request):
     from ..forms import ExportDailyDataForm, LinkInputForm
-    from ..controllers import LinkDataController
 
     p = ViewPage(request)
     p.set_title("Add entry")
@@ -673,9 +673,9 @@ def entry_scan(request, pk):
         return HttpResponseRedirect(entry.get_absolute_url())
 
 
-def entry_reset_data(request, pk):
+def entry_update_data(request, pk):
     p = ViewPage(request)
-    p.set_title("Rese entry data")
+    p.set_title("Update entry data")
     data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
     if data is not None:
         return data
@@ -689,7 +689,27 @@ def entry_reset_data(request, pk):
 
     else:
         entry = entries[0]
-        BackgroundJobController.link_reset_data(entry)
+        BackgroundJobController.entry_update_data(entry, True)
+        return HttpResponseRedirect(entry.get_absolute_url())
+
+
+def entry_reset_data(request, pk):
+    p = ViewPage(request)
+    p.set_title("Reset entry data")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    p.context["pk"] = pk
+
+    entries = LinkDataController.objects.filter(id=pk)
+    if not entries.exists():
+        p.context["summary_text"] = "Such entry does not exist"
+        return p.render("summary_present.html")
+
+    else:
+        entry = entries[0]
+        BackgroundJobController.entry_reset_data(entry, True)
         return HttpResponseRedirect(entry.get_absolute_url())
 
 
@@ -827,7 +847,7 @@ def entries_omni_search_init(request):
     user = request.user.username
     user_choices = UserSearchHistory.get_user_choices(user)
 
-    filter_form = OmniSearchForm(request.GET, user_choices=user_choices)
+    filter_form = OmniSearchForm(request.GET, user_choices=user_choices, request = request)
     filter_form.method = "GET"
     filter_form.action_url = reverse("{}:entries-omni-search".format(LinkDatabase.name))
 
@@ -959,7 +979,6 @@ def entry_json(request, pk):
 
     link = links[0]
 
-    from ..serializers.instanceimporter import InstanceExporter
 
     exporter = InstanceExporter()
     json_obj = exporter.export_link(link)
@@ -1004,8 +1023,6 @@ def entries_json(request):
         query_filter.use_page_limit = True
 
     links = query_filter.get_filtered_objects()
-
-    from ..serializers.instanceimporter import InstanceExporter
 
     exporter = InstanceExporter()
     json_obj = exporter.export_links(links)

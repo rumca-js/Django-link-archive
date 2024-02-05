@@ -127,7 +127,7 @@ class LinkVoteDataModel(models.Model):
         # TODO this should be a background task
         entry.update_calculated_vote()
 
-        BackgroundJobController.update_entry_data(entry.link)
+        BackgroundJobController.entry_update_data(entry)
 
         return ob
 

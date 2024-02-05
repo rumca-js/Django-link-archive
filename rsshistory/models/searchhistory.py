@@ -4,9 +4,11 @@
  - the engine needs to know the person it tracks (does anonymization exist for search engines?)
 """
 
+from datetime import timedelta
 from django.db import models
 from ..controllers import LinkDataController
 from ..configuration import Configuration
+from ..apps import LinkDatabase
 
 
 class UserSearchHistory(models.Model):
@@ -52,14 +54,18 @@ class UserSearchHistory(models.Model):
             return qs[0]
 
     def get_user_choices(user):
+        """
+        We want ordered set, but I do not want to use any fancy type
+        """
         choices = []
-        choices.append(["", ""])
 
         qs = UserSearchHistory.objects.filter(user=user).order_by("-date")[
             : UserSearchHistory.get_choices_limit()
         ]
+
         for q in qs:
-            choices.append([q.search_query, q.search_query])
+            if q.search_query not in choices:
+                choices.append(q.search_query)
 
         return choices
 
@@ -192,6 +198,12 @@ class UserEntryVisits(models.Model):
     )
 
     def visited(entry, user):
+        """
+        User visited a link:
+         - if it is just hit before a minute (f5 etc.) do nothing
+         - if we transitioned from other link store that info
+         - increment visits counter
+        """
         from ..configuration import Configuration
         from ..dateutils import DateUtils
         from ..controllers import BackgroundJobController
@@ -206,10 +218,14 @@ class UserEntryVisits(models.Model):
 
         visits = UserEntryVisits.objects.filter(entry_object=entry, user=user)
 
+        if UserEntryVisits.is_link_just_visited(visits):
+            return
+
         previous_entry = UserEntryVisits.get_last_user_entry(user)
-        UserEntryTransitionHistory.add(user, previous_entry, entry)
 
         try:
+            UserEntryTransitionHistory.add(user, previous_entry, entry)
+
             if visits.count() == 0:
                 visit = UserEntryVisits.objects.create(
                     user=user,
@@ -223,19 +239,48 @@ class UserEntryVisits(models.Model):
                 visit.date_last_visit = DateUtils.get_datetime_now_utc()
                 visit.save()
 
-            BackgroundJobController.update_entry_data(entry.link)
+            # to increment visited counter on entry
+            # BackgroundJobController.entry_update_data(entry)
+            # TODO - there should be recalculated JOB. we do not want to udpate it's data
 
             return visit
 
         except Exception as E:
             LinkDatabase.info(str(E))
 
+    def is_link_just_visited(visits):
+        if (visits.count() > 0 and 
+           visits[0].date_last_visit and
+           visits[0].date_last_visit > DateUtils.get_datetime_now_utc() - timedelta(minutes=1)):
+            return True
+
+        return False
+
     def get_last_user_entry(user):
+        """
+        Check last browsed entry.
+         - entries older than 1 hour do not count (user has stopped 'watching')
+         - user may open 10 tabs immediately. Therefore we use smaller limit also
+         - if user opens 10 tabs after 1 hour stop, we return the oldest one
+        """
+        from ..dateutils import DateUtils
+        time_ago_limit = DateUtils.get_datetime_now_utc() - timedelta(hours=1)
+        burst_time_limit = DateUtils.get_datetime_now_utc() - timedelta(minutes=1)
+
         entries = UserEntryVisits.objects.filter(
-            user=user, date_last_visit__isnull=False
+            user=user, date_last_visit__isnull=False, 
+            date_last_visit__gt = time_ago_limit,
+            date_last_visit__lt = burst_time_limit,
         ).order_by("-date_last_visit")
         if entries.exists():
             return entries[0].entry_object
+        else:
+            entries = UserEntryVisits.objects.filter(
+                user=user, date_last_visit__isnull=False, 
+                date_last_visit__gt = time_ago_limit,
+            ).order_by("date_last_visit")
+            if entries.exists():
+                return entries[0].entry_object
 
     def cleanup():
         config_entry = Configuration.get_object().config_entry

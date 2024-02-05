@@ -13,8 +13,9 @@ from ..models import (
     LinkTagsDataModel,
     BaseLinkDataController,
     KeyWords,
+    ConfigurationEntry,
 )
-from ..configuration import ConfigurationEntry
+from ..configuration import Configuration
 from ..controllers import (
     BackgroundJobController,
     SourceDataController,
@@ -24,195 +25,13 @@ from ..controllers import (
 )
 from ..views import ViewPage
 from ..dateutils import DateUtils
-from ..forms import LinkInputForm
-from ..webtools import HtmlPage
+from ..forms import LinkInputForm, ScannerForm
+from ..webtools import HtmlPage, ContentLinkParser
 from ..pluginentries.urlhandler import UrlHandler
 
 
-def get_incorrect_youtube_links():
-    from django.db.models import Q
 
-    criterion1 = Q(link__contains="m.youtube")
-    criterion1a = Q(link__contains="youtu.be")
-
-    # only fix those that have youtube in source. leave other RSS sources
-    criterion2 = Q(link__contains="https://www.youtube.com")
-    criterion3 = Q(source__contains="youtube")
-    criterion4 = Q(source__contains="https://www.youtube.com/feeds")
-
-    criterion5 = Q(source__isnull=True)
-
-    entries_no_object = LinkDataController.objects.filter(criterion1 | criterion1a)
-    entries_no_object |= LinkDataController.objects.filter(
-        criterion2 & criterion3 & ~criterion4
-    )
-    entries_no_object |= LinkDataController.objects.filter(criterion2 & criterion5)
-
-    if entries_no_object.exists():
-        return entries_no_object
-
-
-def data_errors_page(request):
-    def fix_reassign_source_to_nullsource_entries():
-        print("fix_reassign_source_to_nullsource_entries")
-
-        entries_no_object = LinkDataController.objects.filter(source_obj=None)
-        for entry in entries_no_object:
-            source = SourceDataController.objects.filter(url=entry.source)
-            if source.exists():
-                entry.source_obj = source[0]
-                entry.save()
-                print("Fixed {0}, added source object".format(entry.link))
-        print("fix_reassign_source_to_nullsource_entries done")
-
-    def fix_incorrect_youtube_links_links(entries):
-        for entry in entries:
-            print("Fixing: {} {} {}".format(entry.link, entry.title, entry.source))
-            h = UrlHandler.get(entry.link)
-
-            chan_url = h.get_channel_feed_url()
-            link_valid = h.get_link_url()
-            if chan_url:
-                entry.source = chan_url
-                entry.link = link_valid
-                entry.save()
-                print("Fixed: {} {} {}".format(entry.link, entry.title, chan_url))
-            else:
-                print("Not fixed: {}".format(entry.link, entry.title))
-
-    def get_tags_for_missing_links():
-        result = set()
-
-        tags = LinkTagsDataModel.objects.all()
-        for tag in tags:
-            if tag.link_obj is None:
-                result.add(tag)
-                continue
-
-            if tag.link_obj.link != tag.link:
-                result.add(tag)
-                continue
-
-            if not tag.link_obj.bookmarked:
-                result.add(tag)
-                break
-
-        return list(result)
-
-    def get_links_with_incorrect_language():
-        from django.db.models import Q
-
-        criterion1 = Q(language__contains="pl")
-        criterion2 = Q(language__contains="en")
-        criterion3 = Q(language__isnull=True)
-
-        entries_no_object = LinkDataController.objects.filter(
-            ~criterion1 & ~criterion2 & ~criterion3, bookmarked=True
-        )
-
-        if entries_no_object.exists():
-            return entries_no_object
-
-    p = ViewPage(request)
-    p.set_title("Data errors")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
-
-    # fix_reassign_source_to_nullsource_entries()
-    # fix_tags_links()
-
-    summary_text = "Done"
-    try:
-        p.context["links_with_incorrect_language"] = get_links_with_incorrect_language()
-        p.context["incorrect_youtube_links"] = get_incorrect_youtube_links()
-        p.context["tags_for_missing_links"] = get_tags_for_missing_links()
-    except Exception as e:
-        traceback.print_exc(file=sys.stdout)
-
-    # find links without source
-
-    # remove tags, for which we do not have links, or entry is not bookmarked
-
-    # show bookmarked links without tags
-
-    return p.render("data_errors.html")
-
-
-def fix_reset_youtube_link_details(link_id):
-    entry = LinkDataController.objects.get(id=link_id)
-
-    h = UrlHandler.get(entry.link)
-    if not h.download_details():
-        return False
-
-    chan_url = h.get_channel_feed_url()
-    link_valid = h.get_link_url()
-
-    sources_obj = SourceDataController.objects.filter(url=chan_url)
-    source_obj = None
-    if sources_obj.count() > 0:
-        source_obj = sources_obj[0]
-
-    entry.title = h.get_title()
-    entry.description = h.get_description()[
-        : BaseLinkDataController.get_description_length() - 2
-    ]
-    entry.date_published = h.get_datetime_published()
-    entry.thumbnail = h.get_thumbnail()
-    entry.link = link_valid
-    entry.source_obj = source_obj
-
-    if chan_url:
-        entry.source = chan_url
-    else:
-        entry.link = link_valid
-
-    entry.save()
-
-    return True
-
-
-def fix_reset_youtube_link_details_page(request, pk):
-    p = ViewPage(request)
-    p.set_title("Fix YouTube links")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
-
-    summary_text = ""
-    if fix_reset_youtube_link_details(pk):
-        summary_text += "Fixed {}".format(pk)
-    else:
-        summary_text += "Not fixed {}".format(pk)
-
-    p.context["summary_text"] = summary_text
-
-    return p.render("summary_present.html")
-
-
-def fix_entry_tags(request, entrypk):
-    p = ViewPage(request)
-    p.set_title("Fix entry tags")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
-
-    entry = LinkDataController.objects.get(id=entrypk)
-    tags = entry.tags.all()
-
-    summary_text = ""
-    for tag in tags:
-        tag.link = tag.link_obj.link
-        tag.save()
-        summary_text += "Fixed: {}".format(tag.id)
-
-    p.context["summary_text"] = summary_text
-
-    return p.render("summary_present.html")
-
-
-def show_page_props(request):
+def page_show_properties(request):
     p = ViewPage(request)
     p.set_title("Show page properties")
     data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
@@ -269,55 +88,102 @@ def show_page_props(request):
             return show_page_props_internal(request, page_link)
 
 
-def test_page(request):
+def page_scan_input(request):
+
+    def render_page_scan_input(p, link):
+        parser = UrlHandler.get(link)
+
+        c = Configuration.get_object().config_entry
+
+        links = []
+        if c.auto_store_entries:
+            links.extend(parser.get_links())
+        if c.auto_store_domain_info:
+            links.extend(parser.get_domains())
+
+        links = set(links)
+
+        #to_find = []
+        #for link in links:
+        #    if LinkDataController.objects.filter(link = link).count() == 0:
+        #        to_find.append(link)
+
+        links = list(to_find)
+        links = sorted(links)
+
+        data = {}
+        data["body"] = "\n".join(links)
+
+        form = ScannerForm(initial=data)
+        form.method = "POST"
+        form.action_url = reverse("{}:page-scan".format(LinkDatabase.name))
+        p.context["form"] = form
+
+        p.context["summary_text"] = "Render links for {}".format(
+            link
+        )
+        return p.render("form_basic.html")
+
     p = ViewPage(request)
-    p.set_title("Test page")
+    p.set_title("Scans page properties")
     data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
     if data is not None:
         return data
 
-    summary_text = "test page"
+    from ..forms import ExportDailyDataForm
 
-    p.context["summary_text"] = summary_text
+    if request.method == "POST":
+        form = LinkInputForm(request.POST)
+        if not form.is_valid():
+            return p.render("form_basic.html")
 
-    return p.render("summary_present.html")
+        link = form.cleaned_data["link"]
 
+        return render_page_scan_input(p, link)
 
-def test_form_page(request):
-    from ..forms import OmniSearchForm
+    if request.method == "GET":
+        if "link" not in request.GET:
+            form = LinkInputForm()
+            form.method = "POST"
 
-    p = ViewPage(request)
-    p.set_title("Test form page")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
+            p.context["form"] = form
 
-    summary_text = ""
-
-    form = OmniSearchForm(request.GET)
-    p.context["form"] = form
-
-    return p.render("form_basic.html")
-
-
-def fix_bookmarked_yt(request):
-    p = ViewPage(request)
-    p.set_title("Fix bookmarked entries")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
-
-    summary = ""
-    links = LinkDataController.objects.filter(bookmarked=True)
-    for link in links:
-        if fix_reset_youtube_link_details(link.id):
-            summary += "Fixed: {} {}\n".format(link.link, link.title)
+            return p.render("form_basic.html")
         else:
-            summary += "Not Fixed: {} {}\n".format(link.link, link.title)
+            link = request.GET["link"]
+            return render_page_scan_input(p, link)
 
-    p.context["summary_text"] = summary
 
-    return p.render("summary_present.html")
+def page_scan(request):
+    """
+    Displays form, or textarea of available links.
+    User can select which links will be added.
+    """
+    p = ViewPage(request)
+    p.set_title("Scans page properties")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    if request.method == "POST":
+        form = ScannerForm(request.POST)
+        if form.is_valid():
+            links = form.cleaned_data["body"]
+            links = links.split("\n")
+            for link in links:
+                link = link.strip()
+                link = link.replace("\r", "")
+
+                if link != "":
+                    BackgroundJobController.link_add(link)
+
+        p.context["summary_text"] = "Added links"
+        return p.render("summary_present.html")
+
+    else:
+        p.context["summary_text"] = "Error"
+
+        return p.render("summary_present.html")
 
 
 def download_music(request, pk):
@@ -444,3 +310,186 @@ def keyword_remove(request):
             return HttpResponseRedirect(
                 reverse("{}:keywords".format(LinkDatabase.name))
             )
+
+
+def test_page(request):
+    p = ViewPage(request)
+    p.set_title("Test page")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    summary_text = "test page"
+
+    p.context["summary_text"] = summary_text
+
+    return p.render("summary_present.html")
+
+
+def test_form_page(request):
+    from ..forms import OmniSearchForm
+
+    p = ViewPage(request)
+    p.set_title("Test form page")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    summary_text = ""
+
+    form = OmniSearchForm(request.GET)
+    p.context["form"] = form
+
+    return p.render("form_basic.html")
+
+
+def fix_bookmarked_yt(request):
+    p = ViewPage(request)
+    p.set_title("Fix bookmarked entries")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    summary = ""
+    links = LinkDataController.objects.filter(bookmarked=True)
+    for link in links:
+        if fix_reset_youtube_link_details(link.id):
+            summary += "Fixed: {} {}\n".format(link.link, link.title)
+        else:
+            summary += "Not Fixed: {} {}\n".format(link.link, link.title)
+
+    p.context["summary_text"] = summary
+
+    return p.render("summary_present.html")
+
+
+def fix_entry_tags(request, entrypk):
+    p = ViewPage(request)
+    p.set_title("Fix entry tags")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    entry = LinkDataController.objects.get(id=entrypk)
+    tags = entry.tags.all()
+
+    summary_text = ""
+    for tag in tags:
+        tag.link = tag.link_obj.link
+        tag.save()
+        summary_text += "Fixed: {}".format(tag.id)
+
+    p.context["summary_text"] = summary_text
+
+    return p.render("summary_present.html")
+
+
+def get_incorrect_youtube_links():
+    from django.db.models import Q
+
+    criterion1 = Q(link__contains="m.youtube")
+    criterion1a = Q(link__contains="youtu.be")
+
+    # only fix those that have youtube in source. leave other RSS sources
+    criterion2 = Q(link__contains="https://www.youtube.com")
+    criterion3 = Q(source__contains="youtube")
+    criterion4 = Q(source__contains="https://www.youtube.com/feeds")
+
+    criterion5 = Q(source__isnull=True)
+
+    entries_no_object = LinkDataController.objects.filter(criterion1 | criterion1a)
+    entries_no_object |= LinkDataController.objects.filter(
+        criterion2 & criterion3 & ~criterion4
+    )
+    entries_no_object |= LinkDataController.objects.filter(criterion2 & criterion5)
+
+    if entries_no_object.exists():
+        return entries_no_object
+
+
+def data_errors_page(request):
+    def fix_reassign_source_to_nullsource_entries():
+        print("fix_reassign_source_to_nullsource_entries")
+
+        entries_no_object = LinkDataController.objects.filter(source_obj=None)
+        for entry in entries_no_object:
+            source = SourceDataController.objects.filter(url=entry.source)
+            if source.exists():
+                entry.source_obj = source[0]
+                entry.save()
+                print("Fixed {0}, added source object".format(entry.link))
+        print("fix_reassign_source_to_nullsource_entries done")
+
+    def fix_incorrect_youtube_links_links(entries):
+        for entry in entries:
+            print("Fixing: {} {} {}".format(entry.link, entry.title, entry.source))
+            h = UrlHandler.get(entry.link)
+
+            chan_url = h.get_channel_feed_url()
+            link_valid = h.get_link_url()
+            if chan_url:
+                entry.source = chan_url
+                entry.link = link_valid
+                entry.save()
+                print("Fixed: {} {} {}".format(entry.link, entry.title, chan_url))
+            else:
+                print("Not fixed: {}".format(entry.link, entry.title))
+
+    def get_tags_for_missing_links():
+        result = set()
+
+        tags = LinkTagsDataModel.objects.all()
+        for tag in tags:
+            if tag.link_obj is None:
+                result.add(tag)
+                continue
+
+            if tag.link_obj.link != tag.link:
+                result.add(tag)
+                continue
+
+            if not tag.link_obj.bookmarked:
+                result.add(tag)
+                break
+
+        return list(result)
+
+    def get_links_with_incorrect_language():
+        from django.db.models import Q
+
+        criterion1 = Q(language__contains="pl")
+        criterion2 = Q(language__contains="en")
+        criterion3 = Q(language__isnull=True)
+
+        entries_no_object = LinkDataController.objects.filter(
+            ~criterion1 & ~criterion2 & ~criterion3, bookmarked=True
+        )
+
+        if entries_no_object.exists():
+            return entries_no_object
+
+    p = ViewPage(request)
+    p.set_title("Data errors")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    # fix_reassign_source_to_nullsource_entries()
+    # fix_tags_links()
+
+    summary_text = "Done"
+    try:
+        p.context["links_with_incorrect_language"] = get_links_with_incorrect_language()
+        p.context["incorrect_youtube_links"] = get_incorrect_youtube_links()
+        p.context["tags_for_missing_links"] = get_tags_for_missing_links()
+    except Exception as e:
+        traceback.print_exc(file=sys.stdout)
+
+    # find links without source
+
+    # remove tags, for which we do not have links, or entry is not bookmarked
+
+    # show bookmarked links without tags
+
+    return p.render("data_errors.html")
+

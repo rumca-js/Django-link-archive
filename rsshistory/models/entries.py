@@ -160,27 +160,83 @@ class BaseLinkDataController(BaseLinkDataModel):
 
         return sum_num
 
-    def update_link_data(self):
-        p = HtmlPage(self.link)
+    def update_data(self):
+        """
+        Fetches new information about page, and uses valid fields to set this object,
+        but only if current field is not set
 
-        if self.page_rating_contents == 0:
-            self.page_rating_contents = p.get_page_rating()
+         - status code and page rating is update always
+         - title and description could have been set manually, we do not want to change that
+         - some other fields should be set only if present in props
+        """
+        url = EntryUrlInterface(self.link)
+        props = url.get_props()
+        p = url.p
 
-        if self.title == "" or self.title is None:
-            self.title = p.get_title()
-
-        if self.description == "" or self.description is None:
-            self.description = p.get_description()
-
-        if self.thumbnail == "" or self.thumbnail is None:
-            self.thumbnail = p.get_thumbnail()
-
-        if self.language == "" or self.language is None:
-            self.language = p.get_language()
-
+        # always update
+        self.page_rating_contents = p.get_page_rating()
         self.status_code = p.status_code
 
+        if not props:
+            self.save()
+            return
+
+        if "title" in props and props["title"] is not None:
+            if not self.title:
+                self.title = props["title"]
+
+        if "description" in props and props["description"] is not None:
+            if not self.description:
+                self.description = props["description"]
+
+        if "thumbnail" in props and props["thumbnail"] is not None:
+            if not self.thumbnail:
+                self.thumbnail = props["thumbnail"]
+
+        if "language" in props and props["language"] is not None:
+            if not self.language:
+                self.language = props["language"]
+
+        if "date_published" in props and props["date_published"] is not None:
+            self.date_published = props["date_published"]
+
         self.update_calculated_vote()
+
+    def reset_data(self):
+        """
+        Fetches new information about page, and uses valid fields to set this object.
+
+         - status code and page rating is update always
+         - new data are changed only if new data are present at all
+        """
+        from ..pluginentries.entryurlinterface import EntryUrlInterface
+
+        url = EntryUrlInterface(self.link)
+        props = url.get_props()
+
+        self.page_rating_contents = p.get_page_rating()
+        self.status_code = p.status_code
+
+        if not props:
+            self.save()
+            return
+
+        if "title" in props and props["title"] is not None:
+            self.title = props["title"]
+
+        if "description" in props and props["description"] is not None:
+            self.description = props["description"]
+
+        if "thumbnail" in props and props["thumbnail"] is not None:
+            self.thumbnail = props["thumbnail"]
+
+        if "language" in props and props["language"] is not None:
+            self.language = props["language"]
+
+        if "date_published" in props and props["date_published"] is not None:
+            self.date_published = props["date_published"]
+
+        self.save()
 
     def update_calculated_vote(self):
         self.page_rating_votes = self.get_vote()
@@ -215,20 +271,6 @@ class BaseLinkDataController(BaseLinkDataModel):
                 if language != None:
                     self.language = language
                     self.save()
-
-    def reset_data(self):
-        from ..pluginentries.entryurlinterface import EntryUrlInterface
-
-        url = EntryUrlInterface(self.link)
-        props = url.get_props()
-
-        self.title = props["title"]
-        self.description = props["description"]
-        self.thumbnail = props["thumbnail"]
-        if "date_published" in props:
-            self.date_published = props["date_published"]
-
-        self.save()
 
     def get_favicon(self):
         """

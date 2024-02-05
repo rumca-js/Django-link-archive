@@ -91,7 +91,7 @@ class EntryUpdateData(BaseJobHandler):
             entries = LinkDataController.objects.filter(link=obj.subject)
             if len(entries) > 0:
                 entry = entries[0]
-                entry.update_link_data()
+                entry.update_data()
             else:
                 LinkDatabase.info(
                     "Cannot update data. Missing entry {0}".format(

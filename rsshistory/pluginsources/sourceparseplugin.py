@@ -10,6 +10,7 @@ from ..controllers import LinkDataController
 from ..apps import LinkDatabase
 from ..pluginentries.urlhandler import UrlHandler
 from ..pluginentries.entryurlinterface import EntryUrlInterface
+from ..configuration import Configuration
 
 from .sourcegenericplugin import SourceGenericPlugin
 
@@ -47,6 +48,19 @@ class BaseParsePlugin(SourceGenericPlugin):
             props["source_obj"] = source
 
         return props
+
+    def get_links(self):
+        links = super().get_links()
+
+        result = []
+
+        c = Configuration.get_object().config_entry
+        if not c.auto_store_entries and c.auto_store_domain_info:
+            result = self.get_domains()
+        elif c.auto_store_entries:
+            result = links
+
+        return result
 
     def get_container_elements(self):
         try:

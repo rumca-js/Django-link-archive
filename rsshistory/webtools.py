@@ -48,6 +48,7 @@ URL_TYPE_RSS = "rss"
 URL_TYPE_CSS = "css"
 URL_TYPE_JAVASCRIPT = "javascript"
 URL_TYPE_HTML = "html"
+URL_TYPE_FONT = "font"
 URL_TYPE_UNKNOWN = "unknown"
 
 
@@ -87,7 +88,7 @@ class PageOptions(object):
         self.custom_user_agent = ""
 
     def is_not_selenium(self):
-        return not self.is_selenium
+        return not self.is_selenium()
 
     def is_selenium(self):
         return self.use_selenium_full or self.use_selenium_headless
@@ -305,7 +306,7 @@ class BasePage(object):
             "Page: Requesting page: {} options:{}".format(url, self.options)
         )
 
-        if not self.options.is_not_selenium():
+        if self.options.is_not_selenium():
             return self.get_contents_via_requests(self.url, headers=headers, timeout=10)
         elif self.options.use_selenium_full:
             return self.get_contents_via_selenium_chrome_full(
@@ -686,6 +687,8 @@ class DomainAwarePage(BasePage):
             "js": URL_TYPE_JAVASCRIPT,
             "html": URL_TYPE_HTML,
             "htm": URL_TYPE_HTML,
+            "woff2": URL_TYPE_FONT,
+            "tff": URL_TYPE_FONT,
             # "php": URL_TYPE_HTML,    seen in the wild, where dynamic pages were used to generate RSS :(
             # "aspx": URL_TYPE_HTML,
         }
@@ -2008,6 +2011,9 @@ class Url(object):
         @returns Appropriate handler for the link
         """
 
+        if options:
+            fast_check = options.fast_parsing
+
         p = HtmlPage(url, contents=contents, options=options)
 
         if p.is_html(fast_check):
@@ -2021,7 +2027,7 @@ class Url(object):
             if j.is_json():
                 return j
 
-        return DefaultContentPage(url, p.get_contents())
+        return DefaultContentPage(url, page_obj=p)
 
     def get_favicon(url):
         page = Url.get(url)

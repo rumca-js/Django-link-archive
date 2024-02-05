@@ -12,6 +12,7 @@ from ..models import (
     PersistentInfo,
 )
 from ..webtools import HtmlPage
+from ..dateutils import DateUtils
 
 
 class BackgroundJobController(BackgroundJob):
@@ -38,9 +39,9 @@ class BackgroundJobController(BackgroundJob):
         (BackgroundJob.JOB_MOVE_TO_ARCHIVE, BackgroundJob.JOB_MOVE_TO_ARCHIVE), # 13
         (BackgroundJob.JOB_LINK_ADD, BackgroundJob.JOB_LINK_ADD,), # 14                         # adds link using default properties, may contain link map properties in the map
         (BackgroundJob.JOB_LINK_UPDATE_DATA, BackgroundJob.JOB_LINK_UPDATE_DATA),           # update data, recalculate
+        (BackgroundJob.JOB_LINK_RESET_DATA, BackgroundJob.JOB_LINK_RESET_DATA,),
         (BackgroundJob.JOB_LINK_SAVE, BackgroundJob.JOB_LINK_SAVE,),                        # link is saved using thirdparty pages (archive.org)
         (BackgroundJob.JOB_LINK_SCAN, BackgroundJob.JOB_LINK_SCAN,),
-        (BackgroundJob.JOB_LINK_RESET_DATA, BackgroundJob.JOB_LINK_RESET_DATA,),
         (BackgroundJob.JOB_LINK_DOWNLOAD, BackgroundJob.JOB_LINK_DOWNLOAD),                 # link is downloaded using wget
         (BackgroundJob.JOB_LINK_DOWNLOAD_MUSIC, BackgroundJob.JOB_LINK_DOWNLOAD_MUSIC),     #
         (BackgroundJob.JOB_LINK_DOWNLOAD_VIDEO, BackgroundJob.JOB_LINK_DOWNLOAD_VIDEO),     #
@@ -114,11 +115,6 @@ class BackgroundJobController(BackgroundJob):
     def download_video(item):
         return BackgroundJobController.create_single_job(
             BackgroundJob.JOB_LINK_DOWNLOAD_VIDEO, item.link
-        )
-
-    def update_entry_data(url):
-        return BackgroundJobController.create_single_job(
-            BackgroundJob.JOB_LINK_UPDATE_DATA, url
         )
 
     def link_add(url, source=None):
@@ -246,7 +242,26 @@ class BackgroundJobController(BackgroundJob):
             BackgroundJob.JOB_LINK_DOWNLOAD, link_url
         )
 
-    def link_reset_data(entry):
+    def entry_update_data(entry, force=False):
+        """
+        Do not update, if it was updated recently
+        """
+        if not force:
+            if entry.date_update_last > DateUtils.get_datetime_now_utc() - timedelta(days=1):
+                return
+
+        return BackgroundJobController.create_single_job(
+            BackgroundJob.JOB_LINK_UPDATE_DATA, entry.link
+        )
+
+    def entry_reset_data(entry, force=False):
+        """
+        Do not update, if it was updated recently
+        """
+        if not force:
+            if entry.date_update_last > DateUtils.get_datetime_now_utc() - timedelta(days=1):
+                return
+
         return BackgroundJobController.create_single_job(
             BackgroundJob.JOB_LINK_RESET_DATA, entry.link
         )

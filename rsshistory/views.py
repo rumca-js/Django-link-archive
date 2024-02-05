@@ -28,12 +28,15 @@ class ViewPage(object):
         user_name = request.user.get_username()
         context["user_config"] = UserConfig.get(user_name)
 
+        context["is_mobile"] = ViewPage.is_mobile(request)
+
+        return context
+
+    def is_mobile(request):
         from django_user_agents.utils import get_user_agent
 
         user_agent = get_user_agent(request)
-        context["is_mobile"] = user_agent.is_mobile
-
-        return context
+        return user_agent.is_mobile
 
     def get_context(request=None):
         context = {}

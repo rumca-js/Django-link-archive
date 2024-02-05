@@ -1,4 +1,4 @@
-from ..webtools import BasePage, InputContent
+from ..webtools import BasePage, InputContent, PageOptions
 
 from .fakeinternet import FakeInternetTestCase
 
@@ -66,6 +66,64 @@ webpage_links = """<html>
 </html>
 """
 
+class PageOptionsTest(FakeInternetTestCase):
+    def setUp(self):
+        self.disable_web_pages()
+
+    def test_use_selenium_full(self):
+
+        o = PageOptions()
+        o.use_selenium_full = True
+
+        # call tested function
+        self.assertTrue(o.is_selenium())
+
+    def test_use_selenium_headless(self):
+
+        o = PageOptions()
+        o.use_selenium_headless = True
+
+        # call tested function
+        self.assertTrue(o.is_selenium())
+
+    def test_use_selenium_both(self):
+        o = PageOptions()
+        o.use_selenium_headless = True
+        o.use_selenium_full = True
+
+        # call tested function
+        self.assertTrue(o.is_selenium())
+
+    def test_not_use_selenium_full(self):
+        o = PageOptions()
+        o.use_selenium_full = True
+
+        # call tested function
+        self.assertFalse(o.is_not_selenium())
+
+    def test_not_use_selenium_headless(self):
+        o = PageOptions()
+        o.use_selenium_headless = True
+
+        # call tested function
+        self.assertFalse(o.is_not_selenium())
+
+    def test_not_use_selenium_both(self):
+        o = PageOptions()
+        o.use_selenium_headless = True
+        o.use_selenium_full = True
+
+        # call tested function
+        self.assertFalse(o.is_not_selenium())
+
+    def test_not_use_selenium_none(self):
+        o = PageOptions()
+        o.use_selenium_headless = False
+        o.use_selenium_full = False
+
+        # call tested function
+        self.assertTrue(o.is_not_selenium())
+
 
 class BasePageTest(FakeInternetTestCase):
     def setUp(self):
@@ -75,6 +133,26 @@ class BasePageTest(FakeInternetTestCase):
         # default language
         p = BasePage("http://test.com/my-site-test", webpage_lang_not_default)
         self.assertEqual(p.get_domain(), "http://test.com")
+
+    def test_get_domain_web_archive_link(self):
+        link = "https://web.archive.org/web/20000229222350/http://www.quantumpicture.com/Flo_Control/flo_control.htm"
+        p = BasePage(link, "")
+        self.assertEqual(p.get_domain(), "https://web.archive.org")
+
+    def test_get_domain_cell_link(self):
+        link = "https://www.cell.com/cell/fulltext/S0092-8674(23)01344-2?_returnURL=https%3A%2F%2Flinkinghub.elsevier.com%2Fretrieve%2Fpii%2FS0092867423013442%3Fshowall%3Dtrue"
+        p = BasePage(link, "")
+        self.assertEqual(p.get_domain(), "https://www.cell.com")
+
+    def test_is_domain_web_archive_link(self):
+        link = "https://web.archive.org/web/20000229222350/http://www.quantumpicture.com/Flo_Control/flo_control.htm"
+        p = BasePage(link, "")
+        self.assertFalse(p.is_domain())
+
+    def test_is_domain_cell_link(self):
+        link = "https://www.cell.com/cell/fulltext/S0092-8674(23)01344-2?_returnURL=https%3A%2F%2Flinkinghub.elsevier.com%2Fretrieve%2Fpii%2FS0092867423013442%3Fshowall%3Dtrue"
+        p = BasePage(link, "")
+        self.assertFalse(p.is_domain())
 
     def test_get_domain_no_http(self):
         # default language

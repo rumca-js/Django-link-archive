@@ -172,6 +172,10 @@ class SourceInputForm(forms.Form):
         return self.cleaned_data
 
 
+class ScannerForm(forms.Form):
+    body = forms.CharField(widget=forms.Textarea(attrs={'rows':30, 'cols':50}))
+
+
 class ExportTopicForm(forms.Form):
     tag = forms.CharField(label="Tag", max_length=500)
     store_domain_info = forms.BooleanField()
@@ -202,13 +206,26 @@ class OmniSearchForm(forms.Form):
     search_history = forms.CharField(widget=forms.Select(choices=[]), required=False)
 
     def __init__(self, *args, **kwargs):
+        self.request = None
+        self.is_mobile = False
+        if "request" in kwargs:
+            from .views import ViewPage
+            self.request = kwargs.pop("request")
+            self.is_mobile = ViewPage.is_mobile(self.request)
+
         user_choices = [[None, None]]
+
         if "user_choices" in kwargs:
             user_choices = kwargs.pop("user_choices")
+            user_choices = OmniSearchForm.get_user_choices(user_choices)
 
         super().__init__(*args, **kwargs)
 
-        self.fields["search"].widget.attrs.update(size="100")
+        if not self.is_mobile:
+            self.fields["search"].widget.attrs.update(size="100")
+        else:
+            # mobile
+            self.fields["search_history"].widget.attrs.update(size="30")
 
         attr = {"onchange": "this.form.submit()"}
         self.fields["search_history"].widget = forms.Select(
@@ -217,6 +234,24 @@ class OmniSearchForm(forms.Form):
 
     def set_choices(self, choices):
         self.fields["search_history"].widget = forms.Select(choices=choices)
+
+    def get_user_choices(choices):
+        result = []
+        result.append([None, None])
+
+        for row, choice in enumerate(choices):
+            limit = OmniSearchForm.get_search_history_length()
+            if len(choice) > limit:
+                new_choice = choice[:limit] + "(...)"
+            else:
+                new_choice = choice
+            #result.append([choice, new_choice])
+            result.append([choice, choice])
+
+        return result
+
+    def get_search_history_length():
+        return 30
 
 
 class OmniSearchWithArchiveForm(OmniSearchForm):
@@ -565,7 +600,17 @@ class BasicEntryChoiceForm(forms.Form):
     search = forms.CharField(label="Search", max_length=1000, required=False)
     category = forms.CharField(widget=forms.Select(choices=()), required=False)
     subcategory = forms.CharField(widget=forms.Select(choices=()), required=False)
-    source_id = forms.CharField(widget=forms.Select(choices=()), required=False)
+    source_id = forms.CharField(label="Source", widget=forms.Select(choices=()), required=False)
+
+    def __init__(self, *args, **kwargs):
+        self.request = None
+        self.is_mobile = False
+        if "request" in kwargs:
+            from .views import ViewPage
+            self.request = kwargs.pop("request")
+            self.is_mobile = ViewPage.is_mobile(self.request)
+
+        super().__init__(*args, **kwargs)
 
     def create(self, sources):
         # how to unpack dynamic forms
@@ -634,7 +679,13 @@ class BasicEntryChoiceForm(forms.Form):
 
         if self.sources.count() > 0:
             for atuple in self.sources.values_list("id", field):
-                values.append(atuple)
+                new_val = atuple[1]
+
+                if self.is_mobile:
+                    if len(new_val) > 25:
+                        new_val = new_val[:25] + "(...)"
+
+                values.append([atuple[0], new_val])
 
         return values
 

@@ -63,6 +63,7 @@ urlpatterns = [
     path("entry-add", viewentries.add_entry, name="entry-add"),
     path("entry-scan/<int:pk>/", viewentries.entry_scan, name="entry-scan"),
     path("entry-reset-data/<int:pk>/", viewentries.entry_reset_data, name="entry-reset-data"),
+    path("entry-update-data/<int:pk>/", viewentries.entry_update_data, name="entry-update-data"),
     path("entry-add-simple", viewentries.add_simple_entry, name="entry-add-simple"),
     path("entry-edit/<int:pk>/", viewentries.edit_entry, name="entry-edit"),
     path("entry-remove/<int:pk>/", viewentries.remove_entry, name="entry-remove"),
@@ -154,11 +155,13 @@ urlpatterns = [
     path("keyword-remove", viewcustom.keyword_remove, name="keyword-remove",),
     path("keywords-remove-all/", viewcustom.keywords_remove_all, name="keywords-remove-all",),
     # other, debug forms
+    path("page-show-props", viewcustom.page_show_properties, name="page-show-props",),
+    path("page-scan-input", viewcustom.page_scan_input, name="page-scan-input",),
+    path("page-scan", viewcustom.page_scan, name="page-scan",),
+
     path("check-move-archive", viewcustom.check_if_move_to_archive, name="check-move-archive",),
     path("data-errors", viewcustom.data_errors_page, name="data-errors"),
-    path("entry-fix-youtube-details/<int:pk>/", viewcustom.fix_reset_youtube_link_details_page, name="entry-fix-youtube-details",),
     path("fix-entry-tags/<int:entrypk>/", viewcustom.fix_entry_tags, name="fix-entry-tags",),
-    path("show-page-props", viewcustom.show_page_props, name="show-page-props",),
     path("test-page", viewcustom.test_page, name="test-page"),
     path("test-form-page", viewcustom.test_form_page, name="test-form-page"),
     path("fix-bookmarked-yt", viewcustom.fix_bookmarked_yt, name="fix-bookmarked-yt"),
