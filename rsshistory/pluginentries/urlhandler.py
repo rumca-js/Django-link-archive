@@ -47,17 +47,19 @@ class UrlHandler(object):
         options = UrlHandler.get_url_options(url)
         if options.is_not_selenium() and use_selenium:
             options.use_selenium_headless = True
+        options.fast_parsing = fast_check
 
-        page = Url.get(url, fast_check=fast_check, options=options)
+        page = Url.get(url, options=options)
 
         # if response is cloudflare jibberish, try using selenium
-        if page.is_cloudflare_protected() and options.is_not_selenium():
+        if options.is_not_selenium() and (not page.is_valid() or page.is_cloudflare_protected()):
             options = PageOptions()
             # by default we do not want full blown browser to be started
             # this has to be enabled manually in code
             options.use_selenium_headless = True
+            options.fast_parsing = fast_check
 
-            page = Url.get(url, fast_check=fast_check, options=options)
+            page = Url.get(url, options=options)
 
         return page
 
@@ -108,15 +110,16 @@ class UrlHandler(object):
 
     def is_selenium_headless_required(url):
         if (
-            url.find("https://open.spotify.com") >= 0
-            or url.find("https://thehill.com") >= 0
+            url.startswith("https://open.spotify.com")
+            or url.startswith("https://thehill.com")
         ):
             return True
 
         return False
 
     def is_selenium_full_required(url):
-        if url.find("https://www.warhammer-community.com") >= 0:
+        if (url.startswith("https://www.warhammer-community.com") or
+           url.startswith("https://defcon.org")):
             return True
 
         return False

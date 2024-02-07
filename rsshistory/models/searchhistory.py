@@ -249,6 +249,8 @@ class UserEntryVisits(models.Model):
             LinkDatabase.info(str(E))
 
     def is_link_just_visited(visits):
+        from ..dateutils import DateUtils
+
         if (visits.count() > 0 and 
            visits[0].date_last_visit and
            visits[0].date_last_visit > DateUtils.get_datetime_now_utc() - timedelta(minutes=1)):

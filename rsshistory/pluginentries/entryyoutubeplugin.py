@@ -45,19 +45,6 @@ class EntryYouTubePlugin(EntryGenericPlugin):
             ),
         )
 
-        buttons.append(
-            EntryButton(
-                self.user,
-                "Update link data",
-                reverse(
-                    "{}:entry-fix-youtube-details".format(LinkDatabase.name),
-                    args=[self.entry.id],
-                ),
-                ConfigurationEntry.ACCESS_TYPE_OWNER,
-                "Updates link data",
-            ),
-        )
-
         return buttons
 
     def get_view_menu_buttons(self):

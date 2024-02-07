@@ -130,7 +130,7 @@ class InstanceImporter(object):
             # This instance can have their own settings for import, may decide what is
             # accepted and not. Let the builder deal with it
             LinkDatabase.info("Importing link:{}".format(clean_data["link"]))
-            LinkDataBuilder(link_data=clean_data)
+            LinkDataBuilder(link_data=clean_data, source_is_auto=True)
         else:
             entry = entries[0]
             if clean_data["bookmarked"] and not entry.bookmarked:

@@ -134,7 +134,7 @@ class EntryGenericPlugin(object):
                 self.user,
                 "",
                 reverse(
-                    "{}:show-page-props".format(LinkDatabase.name),
+                    "{}:page-show-props".format(LinkDatabase.name),
                 )
                 + "?page={}".format(self.entry.link),
                 ConfigurationEntry.ACCESS_TYPE_OWNER,
@@ -148,27 +148,45 @@ class EntryGenericPlugin(object):
         buttons.append(
             EntryButton(
                 self.user,
-                "",
+                "Update",
                 reverse(
-                    "{}:entry-scan".format(LinkDatabase.name),
+                    "{}:entry-update-data".format(LinkDatabase.name),
                     args=[self.entry.id],
                 ),
                 ConfigurationEntry.ACCESS_TYPE_OWNER,
-                "Scans entry for new links",
-                static("{}/icons/icons8-radar-64.png".format(LinkDatabase.name)),
+                "Updates entry data",
+                static(
+                    "{}/icons/icons8-view-details-100.png".format(LinkDatabase.name)
+                ),
             ),
         )
 
         buttons.append(
             EntryButton(
                 self.user,
-                "Reset data",
+                "Reset",
                 reverse(
                     "{}:entry-reset-data".format(LinkDatabase.name),
                     args=[self.entry.id],
                 ),
                 ConfigurationEntry.ACCESS_TYPE_OWNER,
                 "Resets entry data",
+                static(
+                    "{}/icons/icons8-view-details-100.png".format(LinkDatabase.name)
+                ),
+            ),
+        )
+
+        buttons.append(
+            EntryButton(
+                self.user,
+                "",
+                reverse(
+                    "{}:page-scan-input".format(LinkDatabase.name),
+                )+"?link={}".format(self.entry.link),
+                ConfigurationEntry.ACCESS_TYPE_OWNER,
+                "Scans entry for new links",
+                static("{}/icons/icons8-radar-64.png".format(LinkDatabase.name)),
             ),
         )
 

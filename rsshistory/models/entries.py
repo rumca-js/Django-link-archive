@@ -169,6 +169,8 @@ class BaseLinkDataController(BaseLinkDataModel):
          - title and description could have been set manually, we do not want to change that
          - some other fields should be set only if present in props
         """
+        from ..pluginentries.entryurlinterface import EntryUrlInterface
+
         url = EntryUrlInterface(self.link)
         props = url.get_props()
         p = url.p
@@ -198,7 +200,8 @@ class BaseLinkDataController(BaseLinkDataModel):
                 self.language = props["language"]
 
         if "date_published" in props and props["date_published"] is not None:
-            self.date_published = props["date_published"]
+            if not self.date_published:
+                self.date_published = props["date_published"]
 
         self.update_calculated_vote()
 
@@ -233,8 +236,8 @@ class BaseLinkDataController(BaseLinkDataModel):
         if "language" in props and props["language"] is not None:
             self.language = props["language"]
 
-        if "date_published" in props and props["date_published"] is not None:
-            self.date_published = props["date_published"]
+        #if "date_published" in props and props["date_published"] is not None:
+        #    self.date_published = props["date_published"]
 
         self.save()
 

@@ -598,7 +598,7 @@ class LinkDataBuilder(object):
     """
 
     def __init__(
-        self, link=None, link_data=None, source_is_auto=False, allow_recursion=True
+        self, link=None, link_data=None, source_is_auto=True, allow_recursion=True
     ):
         self.link = link
         self.link_data = link_data

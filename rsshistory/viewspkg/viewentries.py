@@ -536,6 +536,7 @@ def add_entry(request):
 
             b = LinkDataBuilder()
             b.link_data = data
+            b.source_is_auto = False
             entry = b.add_from_props_internal()
 
             if not entry:
