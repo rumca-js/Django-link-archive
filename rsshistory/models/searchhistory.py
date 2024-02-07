@@ -210,6 +210,10 @@ class UserEntryVisits(models.Model):
 
         config = Configuration.get_object().config_entry
 
+        # ignore misinformation, etc.
+        if entry.get_vote() < 0:
+            return
+
         if not config.track_user_actions or not config.track_user_navigation:
             return
 
@@ -267,7 +271,7 @@ class UserEntryVisits(models.Model):
         """
         from ..dateutils import DateUtils
         time_ago_limit = DateUtils.get_datetime_now_utc() - timedelta(hours=1)
-        burst_time_limit = DateUtils.get_datetime_now_utc() - timedelta(minutes=1)
+        burst_time_limit = DateUtils.get_datetime_now_utc() - timedelta(seconds=15)
 
         entries = UserEntryVisits.objects.filter(
             user=user, date_last_visit__isnull=False, 

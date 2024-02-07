@@ -3,6 +3,7 @@ from datetime import timedelta
 from ..models import UserEntryVisits
 from ..controllers import LinkDataController, SourceDataController
 from ..dateutils import DateUtils
+from ..configuration import Configuration
 
 from .fakeinternet import FakeInternetTestCase
 
@@ -10,6 +11,11 @@ from .fakeinternet import FakeInternetTestCase
 class UserEntryVisitsTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
+
+        c = Configuration.get_object().config_entry
+        c.track_user_actions = True
+        c.track_user_navigation = True
+        c.save()
 
         ob = SourceDataController.objects.create(
             url="https://youtube.com", title="YouTube", category="No", subcategory="No"
@@ -33,7 +39,7 @@ class UserEntryVisitsTest(FakeInternetTestCase):
             source_obj=ob,
         )
 
-    def test_entry_visit(self):
+    def test_entry_visit_two_visits(self):
         entries = LinkDataController.objects.filter(link="https://youtube.com?v=12345")
 
         self.assertEqual(entries.count(), 1)
@@ -49,9 +55,11 @@ class UserEntryVisitsTest(FakeInternetTestCase):
         # call tested function
         UserEntryVisits.visited(entries[0], "test_username")
 
+        # this call is not taken into consideration. Happened to fast. refresh, etc.
+
         visits = UserEntryVisits.objects.filter(entry_object=entries[0])
         self.assertEqual(visits.count(), 1)
-        self.assertEqual(visits[0].visits, 2)
+        self.assertEqual(visits[0].visits, 1)
         self.assertEqual(visits[0].user, "test_username")
 
     def test_entry_get_last_user_entry(self):

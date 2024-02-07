@@ -40,9 +40,10 @@ class EntryButton(object):
 
 
 class EntryParameter(object):
-    def __init__(self, name, description):
+    def __init__(self, name, description, title=None):
         self.name = name
         self.description = description
+        self.title = title
 
 
 class EntryGenericPlugin(object):
@@ -125,7 +126,7 @@ class EntryGenericPlugin(object):
                 ),
                 ConfigurationEntry.ACCESS_TYPE_OWNER,
                 "Downloads the page to configured location",
-                static("{}/icons/icons8-download-96.png".format(LinkDatabase.name)),
+                #static("{}/icons/icons8-download-96.png".format(LinkDatabase.name)),
             ),
         )
 
@@ -155,9 +156,9 @@ class EntryGenericPlugin(object):
                 ),
                 ConfigurationEntry.ACCESS_TYPE_OWNER,
                 "Updates entry data",
-                static(
-                    "{}/icons/icons8-view-details-100.png".format(LinkDatabase.name)
-                ),
+                #static(
+                #    "{}/icons/icons8-view-details-100.png".format(LinkDatabase.name)
+                #),
             ),
         )
 
@@ -171,9 +172,9 @@ class EntryGenericPlugin(object):
                 ),
                 ConfigurationEntry.ACCESS_TYPE_OWNER,
                 "Resets entry data",
-                static(
-                    "{}/icons/icons8-view-details-100.png".format(LinkDatabase.name)
-                ),
+                #static(
+                #    "{}/icons/icons8-view-details-100.png".format(LinkDatabase.name)
+                #),
             ),
         )
 
@@ -334,6 +335,7 @@ class EntryGenericPlugin(object):
                     ),
                     ConfigurationEntry.ACCESS_TYPE_OWNER,
                     "Marks entry as dead:{}".format(self.entry.title),
+                    static("{}/icons/icons8-skull-100.png".format(LinkDatabase.name)),
                 ),
             )
         else:
@@ -347,6 +349,7 @@ class EntryGenericPlugin(object):
                     ),
                     ConfigurationEntry.ACCESS_TYPE_OWNER,
                     "Marks entry as not dead:{}".format(self.entry.title),
+                    static("{}/icons/icons8-show-100.png".format(LinkDatabase.name)),
                 ),
             )
 
@@ -357,15 +360,25 @@ class EntryGenericPlugin(object):
 
         parameters.append(EntryParameter("Publish date", self.entry.date_published))
 
-        if self.entry.user != "":
-            parameters.append(EntryParameter("User", self.entry.user))
         if self.entry.status_code:
             parameters.append(EntryParameter("Status code", self.entry.status_code))
 
-        parameters.append(EntryParameter("Vote", self.entry.get_vote()))
         parameters.append(EntryParameter("Language", self.entry.language))
         if self.entry.dead:
             parameters.append(EntryParameter("Dead", self.entry.dead))
+            parameters.append(EntryParameter("Dead since", self.entry.date_dead_since))
+
+        # Artist & album are displayed in buttons
+        # Page rating is displayed in title
+
+        parameters.append(EntryParameter("Visists", self.entry.page_rating_visits))
+
+        points_text = "{} = {} + {}".format(self.entry.page_rating, self.entry.page_rating_contents, self.entry.page_rating_votes)
+        points_title = "Points = content rating + user votes"
+        parameters.append(EntryParameter("Points", points_text, points_title))
+
+        if self.entry.user != "":
+            parameters.append(EntryParameter("User", self.entry.user))
 
         return parameters
 

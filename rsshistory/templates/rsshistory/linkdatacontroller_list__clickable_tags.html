@@ -1,44 +1,44 @@
 <div
-        {% if link.bookmarked %}
-         title="{{link.get_title}} {{link.link}} {{link.get_long_description}}"
-        class="element_{{user_config.display_type}} element_{{user_config.display_type}}_selected"
-        {% else %}
-        class="element_{{user_config.display_type}}"
-        {% endif %}
-        >
+   {% if link.bookmarked %}
+   title="{{link.get_title}} {{link.link}} {{link.get_long_description}}"
+   class="element_{{user_config.display_type}} element_{{user_config.display_type}}_selected"
+   {% else %}
+   class="element_{{user_config.display_type}}"
+   {% endif %}
+   >
 
-        <div class="linklistitem">
-            <a href="{{ link.get_absolute_url }}" class="linklistitemtitle">
-                <div>
-                    {% if user_config.show_icons %}
-                    <img src=
-                         {% if user_config.thumbnails_as_icons %}
-                         "{{link.get_thumbnail}}"
-                         {% else %}
-                         "{{link.get_favicon}}"
-                         {% endif %}
-                         {% if user_config.small_icons %}
-                         class="content-thumbnail"
-                         {% else %}
-                         class="content-big-thumbnail"
-                         {% endif %}
-                         />
+   <div class="linklistitem">
+       <a href="{{ link.get_absolute_url }}" class="linklistitemtitle">
+           <div>
+               {% if user_config.show_icons %}
+               <img src=
+                    {% if user_config.thumbnails_as_icons %}
+                    "{{link.get_thumbnail}}"
+                    {% else %}
+                    "{{link.get_favicon}}"
                     {% endif %}
+                    {% if user_config.small_icons %}
+                    class="content-thumbnail"
+                    {% else %}
+                    class="content-big-thumbnail"
+                    {% endif %}
+                    />
+               {% endif %}
 
-                    {{link.get_title}} {{link.get_long_description}}
-                </div>
-            </a>
-            <div class="linklistitemdescription">
-                {% if link.get_tag_string %}
-                Tags: 
-                {% for tag in link.get_tag_map %}
-                <a href='{% url 'rsshistory:entries'%}?tag="{{tag}}"' class="simplebutton">{{tag}}</a>
-                {% endfor %}
-                {% endif %}
-                {% if link.bookmarked %}
-                User: {{link.user}}
-                {% endif %}
+               {{link.get_title}} {{link.get_long_description}}
+           </div>
+       </a>
+       <div class="linklistitemdescription">
+           {% if link.get_tag_string %}
+           Tags: 
+           {% for tag in link.get_tag_map %}
+           <a href='{% url 'rsshistory:entries'%}?tag="{{tag}}"' class="simplebutton">{{tag}}</a>
+           {% endfor %}
+           {% endif %}
+           {% if link.bookmarked %}
+           User: {{link.user}}
+           {% endif %}
 
-            </div>
-        </div>
+       </div>
+   </div>
 </div>

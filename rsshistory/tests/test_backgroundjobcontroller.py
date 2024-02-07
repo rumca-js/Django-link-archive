@@ -4,7 +4,6 @@ from ..controllers import (
     SourceDataController,
 )
 from ..models import BackgroundJob, PersistentInfo
-from ..configuration import Configuration
 from .fakeinternet import FakeInternetTestCase
 
 

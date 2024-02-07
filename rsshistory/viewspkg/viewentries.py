@@ -793,9 +793,7 @@ def entry_dead(request, pk):
     objs = LinkDataController.objects.filter(id=pk)
     obj = objs[0]
 
-    fav = obj.dead
-    obj.dead = True
-    obj.save()
+    obj.make_dead(True)
 
     summary_text = "Link changed to state: " + str(obj.dead)
 
@@ -816,9 +814,7 @@ def entry_not_dead(request, pk):
     objs = LinkDataController.objects.filter(id=pk)
     obj = objs[0]
 
-    fav = obj.dead
-    obj.dead = False
-    obj.save()
+    obj.make_dead(False)
 
     summary_text = "Link changed to state: " + str(obj.dead)
 
@@ -837,6 +833,10 @@ def entries_search_init(request):
     filter_form.action_url = reverse("{}:entries".format(LinkDatabase.name))
 
     p.context["form"] = filter_form
+
+    search_term = get_search_term_request(request)
+    p.context["search_term"] = search_term
+    p.context["search_engines"] = SearchEngines(search_term)
 
     return p.render("form_search.html")
 
@@ -872,6 +872,10 @@ def entries_bookmarked_init(request):
 
     p.context["form"] = filter_form
 
+    search_term = get_search_term_request(request)
+    p.context["search_term"] = search_term
+    p.context["search_engines"] = SearchEngines(search_term)
+
     return p.render("form_search.html")
 
 
@@ -885,6 +889,10 @@ def entries_recent_init(request):
     filter_form.action_url = reverse("{}:entries-recent".format(LinkDatabase.name))
 
     p.context["form"] = filter_form
+
+    search_term = get_search_term_request(request)
+    p.context["search_term"] = search_term
+    p.context["search_engines"] = SearchEngines(search_term)
 
     return p.render("form_search.html")
 
@@ -943,7 +951,7 @@ def download_entry(request, pk):
 
     link = LinkDataController.objects.get(id=pk)
 
-    BackgroundJobController.link_download(subject=link.link)
+    BackgroundJobController.link_download(link_url=link.link)
     summary_text = "Added to queue"
 
     p.context["summary_text"] = summary_text

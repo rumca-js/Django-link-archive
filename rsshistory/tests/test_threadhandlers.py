@@ -9,7 +9,6 @@ from ..controllers import (
 from ..models import (
     BackgroundJob,
     PersistentInfo,
-    ConfigurationEntry,
     DataExport,
     SourceExportHistory,
     KeyWords,

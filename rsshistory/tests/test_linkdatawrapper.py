@@ -6,7 +6,6 @@ from ..controllers import (
     SourceDataController,
     DomainsController,
 )
-from ..models import ConfigurationEntry
 from ..controllers import LinkDataController, ArchiveLinkDataController
 from ..dateutils import DateUtils
 from ..configuration import Configuration

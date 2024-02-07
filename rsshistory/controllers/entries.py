@@ -745,6 +745,10 @@ class LinkDataBuilder(object):
                 new_link_data["description"]
             )
 
+        if "page_rating" in new_link_data and new_link_data["page_rating"] == 0:
+            if "page_rating_contents" in new_link_data:
+                new_link_data["page_rating"] = new_link_data["page_rating_contents"]
+
         LinkDatabase.info("Adding link: {}".format(new_link_data["link"]))
 
         wrapper = LinkDataWrapper(

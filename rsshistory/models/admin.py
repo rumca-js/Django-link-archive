@@ -195,6 +195,8 @@ class PersistentInfo(models.Model):
 
     def create(info, level=int(logging.INFO), user=None):
         try:
+            PersistentInfo.cleanup_overflow()
+
             PersistentInfo.objects.create(
                 info=info, level=level, date=datetime.now(timezone("UTC")), user=user
             )
@@ -204,6 +206,8 @@ class PersistentInfo(models.Model):
 
     def text(info, level=int(logging.INFO), user=None):
         try:
+            PersistentInfo.cleanup_overflow()
+
             PersistentInfo.objects.create(
                 info=info, level=level, date=datetime.now(timezone("UTC")), user=user
             )
@@ -213,6 +217,8 @@ class PersistentInfo(models.Model):
 
     def error(info, level=int(logging.ERROR), user=None):
         try:
+            PersistentInfo.cleanup_overflow()
+
             PersistentInfo.objects.create(
                 info=info, level=level, date=datetime.now(timezone("UTC")), user=user
             )
@@ -224,6 +230,8 @@ class PersistentInfo(models.Model):
         text = "{}. Exception data:\n{}".format(info, str(exc_data))
 
         try:
+            PersistentInfo.cleanup_overflow()
+
             PersistentInfo.objects.create(
                 info=text, level=level, date=datetime.now(timezone("UTC")), user=user
             )
@@ -237,6 +245,18 @@ class PersistentInfo(models.Model):
         obs = PersistentInfo.objects.filter(level=int(logging.INFO))
         if obs.exists():
             obs.delete()
+
+    def cleanup_overflow():
+        infos = PersistentInfo.objects.all().order_by("date")
+        info_size = infos.count()
+        if info_size > 2000:
+            index = 0
+            for info in infos:
+                info.delete()
+                index += 1
+
+                if info_size - index <= 1000:
+                    return
 
     def truncate():
         PersistentInfo.objects.all().delete()

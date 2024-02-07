@@ -112,3 +112,75 @@ class EntriesViewsTests(FakeInternetTestCase):
         entry = LinkDataController.objects.get(link=test_link)
         self.assertEqual(entry.title, "LinkedIn Page title")
         self.assertEqual(entry.description, "LinkedIn Page description")
+
+    def test_entry_download(self):
+        LinkDataController.objects.all().delete()
+
+        self.client.login(username="testuser", password="testpassword")
+
+        test_link = "https://linkedin.com"
+
+        entry = LinkDataController.objects.create(
+            source="https://linkedin.com",
+            link=test_link,
+            title="The first link",
+            description="the first link description",
+            source_obj=None,
+            bookmarked=True,
+            date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
+            language="en",
+        )
+
+        url = reverse("{}:entry-download".format(LinkDatabase.name),
+                args=[entry.id])
+
+        # call user action
+        response = self.client.get(url)
+
+    def test_entry_download_music(self):
+        LinkDataController.objects.all().delete()
+
+        self.client.login(username="testuser", password="testpassword")
+
+        test_link = "https://www.youtube.com/watch?v=123"
+
+        entry = LinkDataController.objects.create(
+            source="https://linkedin.com",
+            link=test_link,
+            title="The first link",
+            description="the first link description",
+            source_obj=None,
+            bookmarked=True,
+            date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
+            language="en",
+        )
+
+        url = reverse("{}:entry-download-music".format(LinkDatabase.name),
+                args=[entry.id])
+
+        # call user action
+        response = self.client.get(url)
+
+    def test_entry_download_video(self):
+        LinkDataController.objects.all().delete()
+
+        self.client.login(username="testuser", password="testpassword")
+
+        test_link = "https://www.youtube.com/watch?v=123"
+
+        entry = LinkDataController.objects.create(
+            source="https://linkedin.com",
+            link=test_link,
+            title="The first link",
+            description="the first link description",
+            source_obj=None,
+            bookmarked=True,
+            date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
+            language="en",
+        )
+
+        url = reverse("{}:entry-download-video".format(LinkDatabase.name),
+                args=[entry.id])
+
+        # call user action
+        response = self.client.get(url)

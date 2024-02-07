@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from ..models import ConfigurationEntry, LinkTagsDataModel
+from ..models import LinkTagsDataModel
 from ..controllers import (
     SourceDataController,
     LinkDataController,
@@ -93,6 +93,7 @@ class LinkDataControllerTest(FakeInternetTestCase):
         entries = LinkDataController.objects.filter(thumbnail__isnull=True)
 
         self.assertTrue(len(entries) != 0)
+        # call tested function
         self.assertTrue(entries[0].get_favicon() == "https://youtube.com/favicon.ico")
 
     def test_get_thumbnail_empty_in_model(self):
@@ -108,6 +109,7 @@ class LinkDataControllerTest(FakeInternetTestCase):
         entries = LinkDataController.objects.filter(thumbnail__isnull=True)
 
         self.assertTrue(len(entries) != 0)
+        # call tested function
         self.assertEqual(entries[0].get_thumbnail(), "https://youtube.com/favicon.ico")
 
     def test_tag(self):
@@ -123,7 +125,8 @@ class LinkDataControllerTest(FakeInternetTestCase):
             export_to_cms=True,
             remove_after_days=1,
         )
-        ob = LinkDataController.objects.create(
+
+        entry = LinkDataController.objects.create(
             source="https://youtube.com",
             link="https://youtube.com?v=bookmarked",
             title="The first link",
@@ -134,8 +137,113 @@ class LinkDataControllerTest(FakeInternetTestCase):
             date_published=current_time,
         )
 
-        ob.tag(["test", "tag"], "testuser1")
+        # call tested function
+        entry.tag(["test", "tag"], "testuser1")
 
         tags = LinkTagsDataModel.objects.all()
 
         self.assertEqual(tags.count(), 2)
+
+    def test_reset_data_none(self):
+        add_time = DateUtils.get_datetime_now_utc() - timedelta(days=1)
+
+        source_youtube = SourceDataController.objects.create(
+            url="https://youtube.com",
+            title="YouTube",
+            category="No",
+            subcategory="No",
+            export_to_cms=True,
+            remove_after_days=1,
+        )
+
+        entry = LinkDataController.objects.create(
+            source="",
+            link="https://linkedin.com",
+            title=None,
+            description=None,
+            source_obj=source_youtube,
+            bookmarked=False,
+            language=None,
+            domain_obj=None,
+            date_published=add_time,
+        )
+
+        date_updated = entry.date_update_last
+
+        # call tested function
+        entry.reset_data()
+
+        self.assertEqual(entry.title, "LinkedIn Page title")
+        self.assertEqual(entry.description, "LinkedIn Page description")
+        self.assertEqual(entry.date_published, add_time)
+        # self.assertEqual(entry.date_update_last, date_updated)
+
+    def test_update_data_none(self):
+        add_time = DateUtils.get_datetime_now_utc() - timedelta(days=1)
+
+        source_youtube = SourceDataController.objects.create(
+            url="https://youtube.com",
+            title="YouTube",
+            category="No",
+            subcategory="No",
+            export_to_cms=True,
+            remove_after_days=1,
+        )
+
+        entry = LinkDataController.objects.create(
+            source="",
+            link="https://linkedin.com",
+            title=None,
+            description=None,
+            source_obj=source_youtube,
+            bookmarked=False,
+            language=None,
+            domain_obj=None,
+            thumbnail=None,
+            date_published=add_time,
+        )
+
+        date_updated = entry.date_update_last
+
+        # call tested function
+        entry.update_data()
+
+        self.assertEqual(entry.title, "LinkedIn Page title")
+        self.assertEqual(entry.description, "LinkedIn Page description")
+        self.assertEqual(entry.date_published, add_time)
+        # self.assertEqual(entry.date_update_last, date_updated)
+
+    def test_update_data_not_none(self):
+        add_time = DateUtils.get_datetime_now_utc() - timedelta(days=1)
+
+        source_youtube = SourceDataController.objects.create(
+            url="https://youtube.com",
+            title="YouTube",
+            category="No",
+            subcategory="No",
+            export_to_cms=True,
+            remove_after_days=1,
+        )
+
+        entry = LinkDataController.objects.create(
+            source="",
+            link="https://linkedin.com",
+            title="my title",
+            description="my description",
+            bookmarked=False,
+            language="pl",
+            domain_obj=None,
+            date_published=add_time,
+            thumbnail="thumbnail",
+            source_obj=source_youtube,
+        )
+
+        date_updated = entry.date_update_last
+
+        # call tested function
+        entry.update_data()
+
+        self.assertEqual(entry.title, "my title")
+        self.assertEqual(entry.description, "my description")
+        self.assertEqual(entry.date_published, add_time)
+        # self.assertEqual(entry.date_update_last, date_updated)

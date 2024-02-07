@@ -6,7 +6,9 @@
               {% if button.image %}
                  <img src="{{button.image}}" class="content-icon" />
               {% endif %}
-              {{button.name}}
+              {% if not button.image %}
+                {{button.name}}
+              {% endif %}
               </a>
           {% endif %}
       {% endfor %}
@@ -29,7 +31,9 @@
               {% if button.image %}
                  <img src="{{button.image}}" class="content-icon" />
               {% endif %}
-              {{button.name}}
+              {% if not button.image %}
+                {{button.name}}
+              {% endif %}
               </a>
           {% endif %}
       {% endfor %}
@@ -42,7 +46,9 @@
               {% if button.image %}
                  <img src="{{button.image}}" class="content-icon" />
               {% endif %}
-              {{button.name}}
+              {% if not button.image %}
+                {{button.name}}
+              {% endif %}
               </a>
           {% endif %}
       {% endfor %}
@@ -58,7 +64,7 @@
           {% endif %}
           {% if object.has_tags %}
             {% for tag in object.get_tag_map %}
-              <a href="{% url 'rsshistory:entries-omni-search'%}?search=tags__tag+%3D+{{tag}}" class="simplebutton">{{tag}}</a>
+              <a href="{% url 'rsshistory:entries-omni-search'%}?search=tags__tag+%3D%3D+{{tag}}" class="simplebutton">{{tag}}</a>
             {% endfor %}
           {% endif %}
       </div>

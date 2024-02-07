@@ -130,6 +130,9 @@ class BaseLinkDataController(BaseLinkDataModel):
             return ""
 
     def get_vote(self):
+        return self.page_rating_votes
+
+    def calculate_vote(self):
         if not self.is_taggable():
             return 0
         try:
@@ -217,8 +220,8 @@ class BaseLinkDataController(BaseLinkDataModel):
         url = EntryUrlInterface(self.link)
         props = url.get_props()
 
-        self.page_rating_contents = p.get_page_rating()
-        self.status_code = p.status_code
+        self.page_rating_contents = url.p.get_page_rating()
+        self.status_code = url.p.status_code
 
         if not props:
             self.save()
@@ -242,7 +245,7 @@ class BaseLinkDataController(BaseLinkDataModel):
         self.save()
 
     def update_calculated_vote(self):
-        self.page_rating_votes = self.get_vote()
+        self.page_rating_votes = self.calculate_vote()
         self.page_rating_visits += self.get_visits()
         self.page_rating = self.page_rating_votes + self.page_rating_contents
         self.save()
@@ -420,6 +423,19 @@ class BaseLinkDataController(BaseLinkDataModel):
 
         self.bookmarked = False
         self.user = username
+        self.save()
+
+    def make_dead(self, state):
+        from ..dateutils import DateUtils
+
+        if not self.dead and state:
+            self.date_dead_since = DateUtils.get_datetime_now_utc()
+            self.page_rating_contents = 0
+            # remove all tags & comments?
+        elif self.dead and not state:
+            self.date_dead_since = None
+
+        self.dead = state
         self.save()
 
     def is_taggable(self):

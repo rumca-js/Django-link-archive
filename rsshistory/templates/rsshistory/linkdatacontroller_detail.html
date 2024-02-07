@@ -6,9 +6,15 @@
   <div style="clear:both"></div>
 
   <div>
-  <h1 class="link-title"><a href="{{ object.link }}" title="{{ object.link }}">
+  <h1
+      class="link-title"
+       {% if object.page_rating < 0 %}
+       style="opacity: 0.5"
+       {% endif %}
+      >
+      <a href="{{ object.link }}" title="{{ object.link }}">
           {% if object.bookmarked %}
-          [{{object.page_rating_votes}}]
+          [{{object.page_rating}}]
           {% endif %}
           {{ object.title }}
       </a>

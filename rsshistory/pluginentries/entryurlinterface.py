@@ -53,6 +53,7 @@ class EntryUrlInterface(object):
                         props["thumbnail"] = favicons[0][0]
 
             props["page_rating_contents"] = self.p.get_page_rating()
+            props["page_rating"] = self.p.get_page_rating()
 
         return props
 
@@ -285,6 +286,8 @@ class EntryUrlInterface(object):
         if sources.count() > 0:
             input_props["artist"] = sources[0].title
             input_props["album"] = sources[0].title
+
+        input_props["page_rating_contents"] = p.get_page_rating()
 
         return input_props
 

@@ -6,7 +6,7 @@ from ..controllers import (
     SourceDataController,
     DomainsController,
 )
-from ..models import LinkDataModel, ConfigurationEntry
+from ..models import LinkDataModel
 from ..dateutils import DateUtils
 from ..configuration import Configuration
 
@@ -84,7 +84,6 @@ class LinkDataBuilderTest(FakeInternetTestCase):
         LinkDataModel.objects.all().delete()
 
         config = Configuration.get_object().config_entry
-        # config = ConfigurationEntry.get()
         config.auto_store_entries = False
         config.auto_store_domain_info = False
         config.save()
@@ -120,7 +119,6 @@ class LinkDataBuilderTest(FakeInternetTestCase):
         LinkDataModel.objects.all().delete()
 
         config = Configuration.get_object().config_entry
-        # config = ConfigurationEntry.get()
         config.auto_store_entries = False
         config.auto_store_domain_info = True
         config.save()

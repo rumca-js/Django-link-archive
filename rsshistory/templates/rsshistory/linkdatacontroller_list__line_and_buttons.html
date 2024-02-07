@@ -1,48 +1,49 @@
 <div
-         title="{{link.get_title}} {{link.link}} {{link.get_long_description}}"
-        {% if link.bookmarked %}
-        class="element_{{user_config.display_type}} element_{{user_config.display_type}}_selected"
-        {% else %}
-        class="element_{{user_config.display_type}}"
-        {% endif %}
-        >
-        <a href="{{ link.link }}" >
-            <div>
-                {% if user_config.show_icons %}
-                <img src=
-                     {% if user_config.thumbnails_as_icons %}
-                     "{{link.get_thumbnail}}"
-                     {% else %}
-                     "{{link.get_favicon}}"
-                     {% endif %}
-                     {% if user_config.small_icons %}
-                     class="content-thumbnail"
-                     {% else %}
-                     class="content-big-thumbnail"
-                     {% endif %}
-                     />
-                {% endif %}
-                <span class="linklistitemtitle">{{link.title}}</span>
-                <span class="linklistitemdescription">{{link.source_obj.title}}</span>
-            </div>
-        </a>
-
-        {% if user.is_staff %}
+    title="{{link.get_title}} {{link.link}} {{link.get_long_description}}"
+    {% if link.bookmarked %}
+    class="element_{{user_config.display_type}} element_{{user_config.display_type}}_selected"
+    {% else %}
+    class="element_{{user_config.display_type}}"
+    {% endif %}
+    >
+    <a href="{{ link.link }}" >
         <div>
-            <a href="{{ link.get_absolute_url }}" class="simplebutton">
-                Details
-            </a>
-            {% if link.bookmarked %}
-            <a href="{% url 'rsshistory:entry-notbookmark' link.id %}" class="simplebutton">
-                Not bookmarked
-            </a>
-            <a href="{% url 'rsshistory:entry-tag' link.id %}" class="simplebutton">Tag entry</a>
-            {% else %}
-            <a href="{% url 'rsshistory:entry-star' link.id %}" class="simplebutton">
-                Bookmark
-            </a>
+            {% if user_config.show_icons %}
+            <img src=
+                 {% if user_config.thumbnails_as_icons %}
+                 "{{link.get_thumbnail}}"
+                 {% else %}
+                 "{{link.get_favicon}}"
+                 {% endif %}
+                 {% if user_config.small_icons %}
+                 class="content-thumbnail"
+                 {% else %}
+                 class="content-big-thumbnail"
+                 {% endif %}
+                 />
             {% endif %}
+            <span class="linklistitemtitle">{{link.title}}</span>
+            <span class="linklistitemdescription">{{link.source_obj.title}}</span>
         </div>
+    </a>
+
+    {% if user.is_staff %}
+    <div>
+        <a href="{{ link.get_absolute_url }}" class="simplebutton">
+            Details
+        </a>
+        {% if link.bookmarked %}
+        <a href="{% url 'rsshistory:entry-notbookmark' link.id %}" class="simplebutton">
+            Not bookmarked
+        </a>
+        <a href="{% url 'rsshistory:entry-tag' link.id %}" class="simplebutton">Tag entry</a>
         {% else %}
-        <hr>
+        <a href="{% url 'rsshistory:entry-star' link.id %}" class="simplebutton">
+            Bookmark
+        </a>
         {% endif %}
+    </div>
+    {% else %}
+    <hr>
+    {% endif %}
+</div>

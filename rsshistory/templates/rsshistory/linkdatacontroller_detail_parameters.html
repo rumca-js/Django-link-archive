@@ -1,9 +1,14 @@
   <div>
       {% for parameter in object_controller.get_parameters %}
-      <span><strong>{{parameter.name | safe}}:</strong> {{parameter.description | safe}}</span>
+      <span
+          {% if parameter.title %}
+          title="{{parameter.title}}"
+          {% elif parameter.name %}
+          title="{{parameter.name}}"
+          {% endif %}
+          >
+          <strong>{{parameter.name | safe}}:</strong>
+          {{parameter.description | safe}}
+      </span>
       {% endfor %}
-      <span><strong>Points</strong>{{object.page_rating}}</span>
-      <span><strong>Points contents</strong>{{object.page_rating_contents}}</span>
-      <span><strong>Points votes</strong>{{object.page_rating_votes}}</span>
-      <span><strong>User visits</strong>{{object.page_rating_visits}}</span>
   </div>
