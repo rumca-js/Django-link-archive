@@ -61,7 +61,6 @@ urlpatterns = [
     path("entry-json/<int:pk>/", viewentries.entry_json, name="entry-json"),
     path("entry-archived/<int:pk>/", viewentries.EntryArchivedDetailView.as_view(), name="entry-archived"),
     path("entry-add", viewentries.add_entry, name="entry-add"),
-    path("entry-scan/<int:pk>/", viewentries.entry_scan, name="entry-scan"),
     path("entry-reset-data/<int:pk>/", viewentries.entry_reset_data, name="entry-reset-data"),
     path("entry-update-data/<int:pk>/", viewentries.entry_update_data, name="entry-update-data"),
     path("entry-add-simple", viewentries.add_simple_entry, name="entry-add-simple"),
@@ -157,6 +156,7 @@ urlpatterns = [
     # other, debug forms
     path("page-show-props", viewcustom.page_show_properties, name="page-show-props",),
     path("page-scan-input", viewcustom.page_scan_input, name="page-scan-input",),
+    path("page-scan-contents", viewcustom.page_scan_contents, name="page-scan-contents",),
     path("page-scan", viewcustom.page_scan, name="page-scan",),
 
     path("check-move-archive", viewcustom.check_if_move_to_archive, name="check-move-archive",),

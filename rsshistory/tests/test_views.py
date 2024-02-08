@@ -134,12 +134,6 @@ class ViewsTest(FakeInternetTestCase):
 
         self.assertEqual(resp.status_code, 200)
 
-    def test_entry_scan(self):
-        url = reverse("{}:entry-scan".format(LinkDatabase.name), args=[0])
-        resp = self.client.get(url)
-
-        self.assertEqual(resp.status_code, 200)
-
     def test_entry_edit(self):
         url = reverse("{}:entry-edit".format(LinkDatabase.name), args=[0])
         resp = self.client.get(url)

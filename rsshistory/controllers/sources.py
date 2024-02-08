@@ -35,12 +35,7 @@ class SourceDataController(SourceDataModel):
         SourceDataModel.reset_dynamic_data()
 
     def get_days_to_remove(self):
-        days = 0
-        try:
-            days = int(self.remove_after_days)
-        except Exception as E:
-            PersistentInfo.error("Exception {}".format(str(E)))
-
+        days = self.remove_after_days
         return days
 
     def get_long_description(self):

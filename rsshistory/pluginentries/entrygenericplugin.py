@@ -3,7 +3,7 @@ from django.templatetags.static import static
 
 from ..apps import LinkDatabase
 from ..models import ConfigurationEntry, UserConfig
-from ..webtools import HtmlPage
+from ..webtools import HtmlPage, BasePage
 from ..configuration import Configuration
 
 
@@ -191,7 +191,30 @@ class EntryGenericPlugin(object):
             ),
         )
 
+        if not self.entry.source_obj or not self.is_entry_share_source_domain():
+            buttons.append(
+                EntryButton(
+                    self.user,
+                    "",
+                    reverse(
+                        "{}:source-add-simple".format(LinkDatabase.name),
+                    )+"?link={}".format(self.entry.link),
+                    ConfigurationEntry.ACCESS_TYPE_OWNER,
+                    "Add new source",
+                    static("{}/icons/icons8-channel-add-96.png".format(LinkDatabase.name)),
+                ),
+            )
+
         return buttons
+
+    def is_entry_share_source_domain(self):
+        if not self.entry.source_obj:
+            return False
+
+        entry_domain = BasePage(self.entry.link).get_domain()
+        source_domain = BasePage(self.entry.source_obj.url).get_domain()
+
+        return entry_domain == source_domain
 
     def get_view_menu_buttons(self):
         config = Configuration.get_object().config_entry

@@ -993,17 +993,26 @@ class ContentInterface(DomainAwarePage):
             except Exception as E:
                 LinkDatabase.info("Error:{}".format(str(E)))
 
-        LinkDatabase.error(
-            "Guessing date error: URL:{};\nYear:{};\nMonth:{}\nDay:{}".format(
-                self.url, year, month, day
+        if month_number is None:
+            LinkDatabase.error(
+                "Guessing date error: URL:{};\nYear:{};\nMonth:{}\nDay:{}".format(
+                    self.url, year, month, day
+                )
             )
-        )
+            return
 
-        date_object = datetime.strptime(
-            f"{year}-{month_number.zfill(2)}-{day.zfill(2)}", "%Y-%m-%d"
-        )
+        try:
+            date_object = datetime.strptime(
+                f"{year}-{month_number.zfill(2)}-{day.zfill(2)}", "%Y-%m-%d"
+            )
 
-        return date_object
+            return date_object
+        except Exception as E:
+            LinkDatabase.error(
+                "Guessing date error: URL:{};\nYear:{};\nMonth:{}\nDay:{}".format(
+                    self.url, year, month, day
+                )
+            )
 
 
 class DefaultContentPage(ContentInterface):

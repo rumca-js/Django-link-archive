@@ -4,6 +4,7 @@
 import logging
 import time
 import traceback
+import json
 from datetime import date, datetime
 from pathlib import Path
 
@@ -228,12 +229,13 @@ class LinkAddJobHandler(BaseJobHandler):
             link = obj.subject
 
             data = {"link": link, "user": None, "bookmarked": False}
+            cfg = {}
+
+            current_time = DateUtils.get_datetime_now_utc()
 
             if len(obj.args) > 0:
                 try:
-                    source_id = obj.args
-                    source_obj = SourceDataController.objects.filter(id=int(source_id))
-                    data["source_obj"] = source_obj
+                    cfg = json.loads(obj.args)
                 except Exception as E:
                     PersistentInfo.error(
                         "Exception when adding link {0} {1} {2}".format(
@@ -241,10 +243,21 @@ class LinkAddJobHandler(BaseJobHandler):
                         )
                     )
 
+            if "source" in cfg:
+                source_id = cfg["source"]
+                source_objs = SourceDataController.objects.filter(id=int(source_id))
+                data["source_obj"] = source_objs[0]
+
             b = LinkDataBuilder()
             b.link_data = data
             b.link = data["link"]
-            b.add_from_link()
+            entry = b.add_from_link()
+
+            # if this is a new entry, then tag it
+            if entry.date_published:
+                if entry.date_published >= current_time:
+                    if "tag" in cfg:
+                        entry.tag([cfg["tag"]])
 
             return True
 

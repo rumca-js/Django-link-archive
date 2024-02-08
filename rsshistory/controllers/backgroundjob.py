@@ -1,6 +1,7 @@
 from datetime import datetime, date, timedelta
 import os
 import traceback
+import json
 
 from django.db import models
 from django.urls import reverse
@@ -117,7 +118,10 @@ class BackgroundJobController(BackgroundJob):
             BackgroundJob.JOB_LINK_DOWNLOAD_VIDEO, item.link
         )
 
-    def link_add(url, source=None):
+    def link_add(url, source=None, tag=""):
+        if not url.startswith("http"):
+            url = "https://"+url
+
         h = HtmlPage(url)
         if h.is_analytics():
             return
@@ -126,11 +130,19 @@ class BackgroundJobController(BackgroundJob):
         if existing.count() > 0:
             return
 
+        cfg = {}
+
         if source:
+            cfg["source"] = source.id
+
+        if tag:
+            cfg["tag"] = tag
+
+        if cfg != {}:
             return BackgroundJobController.create_single_job(
                 BackgroundJob.JOB_LINK_ADD,
                 url,
-                str(source.id),
+                json.dumps(cfg)
             )
         else:
             return BackgroundJobController.create_single_job(

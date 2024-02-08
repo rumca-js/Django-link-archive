@@ -192,7 +192,7 @@ class YouTubeVideoHandler(DefaultUrlHandler):
             return self.yt_ob.is_live()
         return True
 
-    def get_artist(self):
+    def get_author(self):
         if self.get_contents():
             return self.get_channel_name()
 

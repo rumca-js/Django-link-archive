@@ -16,7 +16,7 @@ class SourceDataModel(models.Model):
     subcategory = models.CharField(max_length=1000, blank=True)
     dead = models.BooleanField(default=False)
     export_to_cms = models.BooleanField(default=False)
-    remove_after_days = models.CharField(max_length=10, default="0")
+    remove_after_days = models.IntegerField(default=0)
     language = models.CharField(max_length=10, blank=True)
     favicon = models.CharField(max_length=1000, null=True)
     on_hold = models.BooleanField(default=False)

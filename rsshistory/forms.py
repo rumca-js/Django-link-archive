@@ -174,6 +174,7 @@ class SourceInputForm(forms.Form):
 
 class ScannerForm(forms.Form):
     body = forms.CharField(widget=forms.Textarea(attrs={'rows':30, 'cols':50}))
+    tag = forms.CharField(label="tag", max_length=500, help_text="Tag is set for each added entry. Tag can be empty", required=False)
 
 
 class ExportTopicForm(forms.Form):

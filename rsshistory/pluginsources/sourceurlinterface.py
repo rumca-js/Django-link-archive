@@ -21,7 +21,7 @@ class SourceUrlInterface(object):
         props = self.get_props_internal(input_props, use_selenium)
 
         if "remove_after_days" not in props:
-            props["remove_after_days"] = "0"
+            props["remove_after_days"] = 0
         if "fetch_period" not in props:
             props["fetch_period"] = "3600"
 

@@ -55,6 +55,9 @@ class EntryUrlInterface(object):
             props["page_rating_contents"] = self.p.get_page_rating()
             props["page_rating"] = self.p.get_page_rating()
 
+            if not self.is_property_set(props, "artist") and self.p.get_author():
+                props["artist"] = self.p.get_author()
+
         return props
 
     def get_props_implementation(self, input_props=None, source_obj=None):
@@ -199,12 +202,6 @@ class EntryUrlInterface(object):
         if not self.is_property_set(input_props, "thumbnail"):
             input_props["thumbnail"] = p.get_thumbnail()
 
-        if not self.is_property_set(input_props, "artist"):
-            input_props["artist"] = p.get_domain()
-
-        if not self.is_property_set(input_props, "album"):
-            input_props["album"] = p.get_domain()
-
         input_props["page_rating_contents"] = p.get_page_rating()
 
         return input_props
@@ -271,21 +268,12 @@ class EntryUrlInterface(object):
 
         if not self.is_property_set(input_props, "source"):
             input_props["source"] = self.url
-        if not self.is_property_set(input_props, "artist"):
-            input_props["artist"] = p.get_domain()
-        if not self.is_property_set(input_props, "album"):
-            input_props["album"] = p.get_domain()
         if not self.is_property_set(input_props, "language"):
             input_props["language"] = None
         if not self.is_property_set(input_props, "title"):
             input_props["title"] = p.get_domain()
         if not self.is_property_set(input_props, "description"):
             input_props["description"] = p.get_domain()
-
-        sources = SourceDataModel.objects.filter(url=input_props["source"])
-        if sources.count() > 0:
-            input_props["artist"] = sources[0].title
-            input_props["album"] = sources[0].title
 
         input_props["page_rating_contents"] = p.get_page_rating()
 
