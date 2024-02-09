@@ -221,8 +221,8 @@ class LinkDataController(LinkDataModel):
         return result
 
     def tag(self, tags, author=None):
-        data = {"author": author, "link": self.link, "tags": tags}
-        return LinkTagsDataModel.save_tags_internal(data)
+        data = {"author": author, "link": self.link, "tags": tags, "entry" : self}
+        return LinkTagsDataModel.set_tags_map(data)
 
     def vote(self, vote):
         self.page_rating_votes = vote
@@ -687,13 +687,15 @@ class LinkDataBuilder(object):
                 "http://", "https://"
             )
 
-        if not self.add_from_props_internal():
+        entry = self.add_from_props_internal()
+        if not entry:
             # Try with https more that with http
             self.link_data["link"] = self.link_data["link"].replace(
                 "https://", "http://"
             )
 
             return self.add_from_props_internal()
+        return entry
 
     def add_from_props_internal(self):
         obj = None

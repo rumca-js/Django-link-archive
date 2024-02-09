@@ -153,9 +153,9 @@ class BaseLinkDataController(BaseLinkDataModel):
         return sum_num / count
 
     def get_visits(self):
-        from .searchhistory import UserEntryVisits
+        from .userhistory import UserEntryVisitHistory
 
-        visits = UserEntryVisits.objects.filter(entry_object=self)
+        visits = UserEntryVisitHistory.objects.filter(entry_object=self)
 
         sum_num = 0
         for visit in visits:

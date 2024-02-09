@@ -14,7 +14,7 @@ from ..models import (
     BackgroundJob,
     ConfigurationEntry,
     Domains,
-    UserEntryVisits,
+    UserEntryVisitHistory,
     UserSearchHistory,
     UserEntryTransitionHistory,
 )
@@ -476,7 +476,7 @@ class EntryDetailView(generic.DetailView):
         return context
 
     def set_visited(self):
-        UserEntryVisits.visited(self.object, self.request.user.username)
+        UserEntryVisitHistory.visited(self.object, self.request.user.username)
 
 
 class EntryArchivedDetailView(generic.DetailView):
@@ -652,26 +652,6 @@ def add_simple_entry(request):
         p.context["form"] = form
 
         return p.render("form_basic.html")
-
-
-def entry_scan(request, pk):
-    p = ViewPage(request)
-    p.set_title("Scan entry for links")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
-
-    p.context["pk"] = pk
-
-    entries = LinkDataController.objects.filter(id=pk)
-    if not entries.exists():
-        p.context["summary_text"] = "Such entry does not exist"
-        return p.render("summary_present.html")
-
-    else:
-        entry = entries[0]
-        BackgroundJobController.link_scan(entry.link)
-        return HttpResponseRedirect(entry.get_absolute_url())
 
 
 def entry_update_data(request, pk):

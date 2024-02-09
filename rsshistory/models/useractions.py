@@ -62,35 +62,66 @@ class LinkTagsDataModel(models.Model):
 
         return tags_set
 
-    def save_tags(data):
+    def set_tags(data):
+        """
+        tags is in form tag1,tag2
+        expecte author also
+        """
         data["tags"] = LinkTagsDataModel.process_tag_string(data["tag"])
-        return LinkTagsDataModel.save_tags_internal(data)
-
-    def save_tags_internal(data):
-        author = data["author"]
-        link = data["link"]
-
-        objs = LinkTagsDataModel.objects.filter(author=author, link=link)
-        if objs.exists():
-            objs.delete()
-
-        tags_set = data["tags"]
-
-        link_objs = LinkDataModel.objects.filter(link=link)
-
-        for tag in tags_set:
-            LinkTagsDataModel.objects.create(
-                link=link, author=author, tag=tag, link_obj=link_objs[0]
-            )
+        return LinkTagsDataModel.set_tags_map(data)
 
     def set_tag(entry, tag_name, author=""):
+        if not entry:
+            PersistentInfo.error("Incorrect call of tags, entry does not exist")
+
         objs = LinkTagsDataModel.objects.filter(
-            link=entry.link, author=author, tag=tag_name
+            link_obj=entry, author=author, tag=tag_name
         )
 
         if objs.count() == 0:
             LinkTagsDataModel.objects.create(
                 link=entry.link, author=author, tag=tag_name, link_obj=entry
+            )
+
+    def set_tags_map(data):
+        """
+        Tags is a container
+        """
+        author = data["author"]
+
+        link = None
+        if "link" in data:
+            link = data["link"]
+        entry = None
+
+        if "entry" in data:
+            entry = data["entry"]
+
+        tag_objs = None
+
+        if entry:
+            tag_objs = LinkTagsDataModel.objects.filter(author=author, link_obj=entry)
+        elif link:
+            tag_objs = LinkTagsDataModel.objects.filter(author=author, link=link)
+        else:
+            PersistentInfo.info("Missing information about entry")
+            return
+
+        if tag_objs.exists():
+            tag_objs.delete()
+
+        tags_set = data["tags"]
+
+        if link:
+            entries = LinkDataModel.objects.filter(link=link)
+            if entries.count() == 0:
+                PersistentInfo.error("Invalid tag call")
+                return
+            entry = entries[0]
+
+        for tag in tags_set:
+            LinkTagsDataModel.objects.create(
+                link=entry.link, author=author, tag=tag, link_obj=entry
             )
 
 

@@ -151,7 +151,7 @@ class HtmlPageTest(FakeInternetTestCase):
         p = HtmlPage("http://test.com/my-site-test", webpage_no_title)
 
         # when page has no title, URL is chosen for the title
-        self.assertEqual(p.get_title(), "http://test.com/my-site-test")
+        self.assertEqual(p.get_title(), None)
 
     def test_title_lowercase(self):
         # default language

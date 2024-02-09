@@ -1,12 +1,14 @@
-from ..controllers import SourceDataController
+from ..models import LinkTagsDataModel
+from ..controllers import SourceDataController, LinkDataController
 from ..pluginsources.sourceparseplugin import BaseParsePlugin
 from ..pluginsources.sourcegenerousparserplugin import SourceGenerousParserPlugin
 from ..pluginsources.domainparserplugin import DomainParserPlugin
+from ..pluginsources.nownownowparserplugin import NowNowNowParserPlugin
 
 from .fakeinternet import FakeInternetTestCase
 
 
-webpage_youtube_contents = """
+webpage_linkedin_contents = """
 <html>
 <body>
    <a href="https://linkedin.com/1">Test1</a>
@@ -35,6 +37,7 @@ class SourceParsePluginTest(FakeInternetTestCase):
             export_to_cms=True,
         )
         self.disable_web_pages()
+        self.setup_configuration()
 
     def test_is_link_valid_html(self):
         parse = BaseParsePlugin(self.source_youtube.id)
@@ -135,6 +138,7 @@ class DomainParsePluginTest(FakeInternetTestCase):
         parser = DomainParserPlugin(self.source_youtube.id)
         parser.contents = webpage_contents
 
+        # call tested function
         props = list(parser.get_container_elements())
         print(props)
 
@@ -146,11 +150,21 @@ class DomainParsePluginTest(FakeInternetTestCase):
         self.assertEqual(props[0]["source"], "https://youtube.com")
 
 
+webpage_linkedin_contents = """
+<html>
+<body>
+   <a href="https://linkedin.com/1">Test1</a>
+   <a href="https://linkedin.com/2">Test2</a>
+</body>
+</html>
+"""
+
+
 class BaseParsePluginTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 
-        self.source_youtube = SourceDataController.objects.create(
+        self.source_linkedin = SourceDataController.objects.create(
             url="https://linkedin.com",
             title="linkedin",
             category="No",
@@ -166,10 +180,11 @@ class BaseParsePluginTest(FakeInternetTestCase):
         return False
 
     def test_is_props_valid(self):
-        parser = BaseParsePlugin(self.source_youtube.id)
+        parser = BaseParsePlugin(self.source_linkedin.id)
 
-        parser.contents = webpage_youtube_contents
+        parser.contents = webpage_linkedin_contents
 
+        # call tested function
         props = list(parser.get_container_elements())
         print(props)
 
@@ -179,3 +194,83 @@ class BaseParsePluginTest(FakeInternetTestCase):
         self.assertTrue(self.is_domain(props, "https://linkedin.com/2"))
 
         self.assertEqual(props[0]["source"], "https://linkedin.com")
+
+
+webpage_linkedin_contents2 = """
+<html>
+<body>
+   <a href="https://youtube.com/1">Test1</a>
+   <a href="https://tiktok.com/2">Test2</a>
+</body>
+</html>
+"""
+
+class NowNowNowPluginTest(FakeInternetTestCase):
+    def setUp(self):
+        self.disable_web_pages()
+        self.setup_configuration()
+
+        self.source_linkedin = SourceDataController.objects.create(
+            url="https://linkedin.com",
+            title="linkedin",
+            category="No",
+            subcategory="No",
+            export_to_cms=True,
+        )
+
+    def is_domain(self, alist, value):
+        for avalue in alist:
+            if avalue["link"] == value:
+                return True
+
+        return False
+
+    def is_link(self, value):
+        entries = LinkDataController.objects.all()
+
+        for entry in entries:
+            if value == entry.link:
+                return True
+
+        return False
+
+    def test_is_props_valid(self):
+        parser = NowNowNowParserPlugin(self.source_linkedin.id)
+
+        parser.contents = webpage_linkedin_contents2
+
+        # call tested function
+        props = list(parser.get_container_elements())
+        print("Props: {}".format(props))
+
+        self.print_errors()
+
+        self.assertEqual(len(props), 2)
+
+        self.assertTrue(self.is_domain(props, "https://youtube.com"))
+        self.assertTrue(self.is_domain(props, "https://tiktok.com"))
+
+        self.assertEqual(props[0]["source"], "https://linkedin.com")
+
+    def test_check_for_data(self):
+        LinkDataController.objects.all().delete()
+        LinkTagsDataModel.objects.all().delete()
+
+        parser = NowNowNowParserPlugin(self.source_linkedin.id)
+
+        parser.contents = webpage_linkedin_contents2
+
+        # call tested function
+        parser.check_for_data()
+
+        self.print_errors()
+
+        entries = LinkDataController.objects.all()
+        tags = LinkTagsDataModel.objects.all()
+
+        self.assertEqual(entries.count(), 2)
+
+        self.assertTrue(self.is_link("https://youtube.com"))
+        self.assertTrue(self.is_link("https://tiktok.com"))
+
+        self.assertEqual(tags.count(), 2)

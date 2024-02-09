@@ -52,11 +52,9 @@ class DomainParserPlugin(BaseParsePlugin):
                 )
                 yield link_props
 
-                # TODO better sanity checks!!!
                 index += 1
-                if index > 10:
-                    return
 
             # if 10 minutes passed
             if time.time() - start_processing_time >= 60 * 10:
+                PersistentInfo.error("Spent too much time in parser")
                 break

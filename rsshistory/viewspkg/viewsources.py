@@ -157,6 +157,31 @@ def add_source_simple(request):
     from ..forms import SourceInputForm
     from ..controllers import SourceDataController
 
+    def get_add_link_form(p, url):
+        if not Url.is_web_link(url):
+            p.context[
+                "summary_text"
+            ] = "Only http links are allowed. Link:{}".format(url)
+            return p.render("summary_present.html")
+
+        ob = SourceDataController.objects.filter(url=url)
+        if ob.exists():
+            p.context["form"] = form
+            p.context["source"] = ob[0]
+
+            return HttpResponseRedirect(ob[0].get_absolute_url())
+
+        data = SourceDataController.get_full_information({"url": url})
+        print(data)
+
+        form = SourceForm(initial=data)
+        form.method = "POST"
+        form.action_url = reverse("{}:source-add".format(LinkDatabase.name))
+
+        p.context["form"] = form
+
+        return p.render("form_source_add.html")
+
     p = ViewPage(request)
     p.set_title("Add source")
     data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
@@ -168,27 +193,11 @@ def add_source_simple(request):
         if form.is_valid():
             url = form.cleaned_data["url"]
 
-            if not Url.is_web_link(url):
-                p.context[
-                    "summary_text"
-                ] = "Only http links are allowed. Link:{}".format(url)
-                return p.render("summary_present.html")
+            return get_add_link_form(p, url)
 
-            ob = SourceDataController.objects.filter(url=url)
-            if ob.exists():
-                p.context["form"] = form
-                p.context["source"] = ob[0]
-
-                return HttpResponseRedirect(ob[0].get_absolute_url())
-
-            data = SourceDataController.get_full_information({"url": url})
-            print(data)
-
-            form = SourceForm(initial=data)
-            form.method = "POST"
-            form.action_url = reverse("{}:source-add".format(LinkDatabase.name))
-
-            p.context["form"] = form
+        p.context["form"] = form
+    elif request.method == "GET" and "link" in request.GET:
+        return get_add_link_form(p, request.GET["link"])
     else:
         form = SourceInputForm()
         form.method = "POST"

@@ -15,7 +15,7 @@ from ..models import (
     SourceExportHistory,
     Domains,
     UserSearchHistory,
-    UserEntryVisits,
+    UserEntryVisitHistory,
     UserEntryTransitionHistory,
     KeyWords,
 )
@@ -84,7 +84,7 @@ def system_status(request):
     p.context["UserConfig"] = UserConfig.objects.count()
     p.context["BackgroundJob"] = BackgroundJob.objects.count()
     p.context["UserSearchHistory"] = UserSearchHistory.objects.count()
-    p.context["UserEntryVisits"] = UserEntryVisits.objects.count()
+    p.context["UserEntryVisitHistory"] = UserEntryVisitHistory.objects.count()
     p.context["UserEntryTransitionHistory"] = UserEntryTransitionHistory.objects.count()
     p.context["KeyWords"] = KeyWords.objects.count()
 

@@ -116,7 +116,7 @@ def tag_entry(request, pk):
         form = TagEntryForm(request.POST)
 
         if form.is_valid():
-            LinkTagsDataModel.save_tags(form.cleaned_data)
+            LinkTagsDataModel.set_tags(form.cleaned_data)
 
             return HttpResponseRedirect(
                 reverse(

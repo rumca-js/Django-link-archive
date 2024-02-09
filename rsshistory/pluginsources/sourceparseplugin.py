@@ -50,52 +50,44 @@ class BaseParsePlugin(SourceGenericPlugin):
         return props
 
     def get_links(self):
-        links = super().get_links()
-
         result = []
 
         c = Configuration.get_object().config_entry
         if not c.auto_store_entries and c.auto_store_domain_info:
             result = self.get_domains()
         elif c.auto_store_entries:
-            result = links
+            result = super().get_links()
 
         return result
 
     def get_container_elements(self):
-        try:
-            start_processing_time = time.time()
+        start_processing_time = time.time()
 
-            links_str_vec = self.get_links()
-            num_entries = len(links_str_vec)
+        links_str_vec = self.get_links()
+        num_entries = len(links_str_vec)
 
-            for index, link_str in enumerate(links_str_vec):
-                if not self.is_link_valid(link_str):
-                    continue
+        for index, link_str in enumerate(links_str_vec):
+            if not self.is_link_valid(link_str):
+                continue
 
-                objs = LinkDataController.objects.filter(link=link_str)
-                if objs.exists():
-                    continue
+            objs = LinkDataController.objects.filter(link=link_str)
+            if objs.exists():
+                continue
 
-                link_props = self.get_link_data(self.get_source(), link_str)
+            link_props = self.get_link_data(self.get_source(), link_str)
 
-                if not link_props or len(link_props) == 0:
-                    continue
+            if not link_props or len(link_props) == 0:
+                continue
 
-                LinkDatabase.info(
-                    "Processing parsing link {}:[{}/{}]".format(
-                        link_str, index, num_entries
-                    )
+            LinkDatabase.info(
+                "Processing parsing link {}:[{}/{}]".format(
+                    link_str, index, num_entries
                 )
-
-                yield link_props
-
-                # if 10 minutes passed
-                if time.time() - start_processing_time >= 60 * 10:
-                    break
-
-        except Exception as e:
-            error_text = traceback.format_exc()
-            PersistentInfo.exc(
-                "Source:{}; Exc:{}\n{}".format(self.source_id, str(e), error_text)
             )
+
+            yield link_props
+
+            # if 10 minutes passed
+            if time.time() - start_processing_time >= 60 * 10:
+                PersistentInfo.info("Spent too much time in parser")
+                break

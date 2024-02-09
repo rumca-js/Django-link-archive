@@ -80,6 +80,7 @@ class SourceGenericPlugin(HtmlPage):
                 b.source_is_auto = True
 
                 entry = b.add_from_props()
+
                 if entry:
                     self.on_added_entry(entry)
                     num_entries += 1

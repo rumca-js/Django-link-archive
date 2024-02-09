@@ -1590,9 +1590,6 @@ class HtmlPage(ContentInterface):
             if title.find("Just a moment...") >= 0:
                 title = self.url
 
-        if not title or title == "":
-            title = self.url
-
         return title
         # title = html.unescape(title)
 

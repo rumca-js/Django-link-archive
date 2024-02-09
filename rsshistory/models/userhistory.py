@@ -181,7 +181,7 @@ class UserEntryTransitionHistory(models.Model):
             UserEntryTransitionHistory.objects.all().delete()
 
 
-class UserEntryVisits(models.Model):
+class UserEntryVisitHistory(models.Model):
     """
     Keeps info how many times user entered link,
     TODO maybe rename to userentrynavigation?
@@ -220,18 +220,18 @@ class UserEntryVisits(models.Model):
         if str(user) == "" or user is None:
             return
 
-        visits = UserEntryVisits.objects.filter(entry_object=entry, user=user)
+        visits = UserEntryVisitHistory.objects.filter(entry_object=entry, user=user)
 
-        if UserEntryVisits.is_link_just_visited(visits):
+        if UserEntryVisitHistory.is_link_just_visited(visits):
             return
 
-        previous_entry = UserEntryVisits.get_last_user_entry(user)
+        previous_entry = UserEntryVisitHistory.get_last_user_entry(user)
 
         try:
             UserEntryTransitionHistory.add(user, previous_entry, entry)
 
             if visits.count() == 0:
-                visit = UserEntryVisits.objects.create(
+                visit = UserEntryVisitHistory.objects.create(
                     user=user,
                     visits=1,
                     entry_object=entry,
@@ -273,7 +273,7 @@ class UserEntryVisits(models.Model):
         time_ago_limit = DateUtils.get_datetime_now_utc() - timedelta(hours=1)
         burst_time_limit = DateUtils.get_datetime_now_utc() - timedelta(seconds=15)
 
-        entries = UserEntryVisits.objects.filter(
+        entries = UserEntryVisitHistory.objects.filter(
             user=user, date_last_visit__isnull=False, 
             date_last_visit__gt = time_ago_limit,
             date_last_visit__lt = burst_time_limit,
@@ -281,7 +281,7 @@ class UserEntryVisits(models.Model):
         if entries.exists():
             return entries[0].entry_object
         else:
-            entries = UserEntryVisits.objects.filter(
+            entries = UserEntryVisitHistory.objects.filter(
                 user=user, date_last_visit__isnull=False, 
                 date_last_visit__gt = time_ago_limit,
             ).order_by("date_last_visit")
@@ -294,7 +294,7 @@ class UserEntryVisits(models.Model):
             not config_entry.track_user_actions
             or not config_entry.track_user_navigation
         ):
-            UserEntryVisits.objects.all().delete()
+            UserEntryVisitHistory.objects.all().delete()
 
 
 class EntryHitUserSearchHistory(models.Model):

@@ -102,12 +102,9 @@ def page_scan_input(request):
             links.extend(parser.get_domains())
 
         links = set(links)
+        if link in links:
+            links.remove(link)
 
-        #to_find = []
-        #for link in links:
-        #    if LinkDataController.objects.filter(link = link).count() == 0:
-        #        to_find.append(link)
-        #links = list(to_find)
         links = list(links)
         links = sorted(links)
 
@@ -169,13 +166,15 @@ def page_scan(request):
         form = ScannerForm(request.POST)
         if form.is_valid():
             links = form.cleaned_data["body"]
+            tag = form.cleaned_data["tag"]
+
             links = links.split("\n")
             for link in links:
                 link = link.strip()
                 link = link.replace("\r", "")
 
                 if link != "":
-                    BackgroundJobController.link_add(link)
+                    BackgroundJobController.link_add(link, tag=tag)
 
         p.context["summary_text"] = "Added links"
         return p.render("summary_present.html")
@@ -184,6 +183,61 @@ def page_scan(request):
         p.context["summary_text"] = "Error"
 
         return p.render("summary_present.html")
+
+
+def page_scan_contents(request):
+    from ..serializers import MarginaliaCrawlerOutput, ReadingList
+
+    def is_reading_list(contents):
+        return contents.startswith("url,title,description,image,date,hnurl")
+
+    def is_marginalia_search(contents):
+        """I do not now how to solve this"""
+        return True
+
+    """
+    Displays form, or textarea of available links.
+    User can select which links will be added.
+    """
+    p = ViewPage(request)
+    p.set_title("Scans page properties")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    if request.method == "POST":
+        form = ScannerForm(request.POST)
+        if form.is_valid():
+            contents = form.cleaned_data["body"]
+            tag = form.cleaned_data["tag"]
+
+            links = []
+            if is_reading_list(contents):
+                parser = ReadingList(contents)
+                links = parser.get_links()
+            # parser should work as good as MarginaliaCrawlerOutput
+            #elif is_marginalia_search(contents):
+            #    parser = MarginaliaCrawlerOutput(contents)
+            #    links = parser.get_links()
+            else:
+                parser = ContentLinkParser(contents)
+                links = parser.get_links()
+
+            for link in links:
+                if link != "":
+                    BackgroundJobController.link_add(link, tag=tag)
+
+        p.context["summary_text"] = "Added links"
+        return p.render("summary_present.html")
+
+    else:
+        form = ScannerForm()
+
+        form.method = "POST"
+        form.action_url = reverse("{}:page-scan-contents".format(LinkDatabase.name))
+        p.context["form"] = form
+
+        return p.render("form_basic.html")
 
 
 def download_music(request, pk):

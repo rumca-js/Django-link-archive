@@ -16,7 +16,7 @@ from ..forms import DataExportForm
 
 
 def import_reading_list_view(request):
-    from ..serializers.readinglist import ReadingList
+    from ..serializers import ReadingListFile
     from ..webtools import BasePage
 
     page = ViewPage(request)
@@ -32,9 +32,9 @@ def import_reading_list_view(request):
 
     rlist_data = import_path.read_text()
 
-    rlist = ReadingList(import_path)
+    rlist = ReadingListFile(import_path)
 
-    for entry in rlist.entries:
+    for entry in rlist.get_entries():
         try:
             print(entry["title"])
 

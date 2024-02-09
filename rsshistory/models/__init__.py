@@ -15,7 +15,7 @@ from .export import (
     SourceExportHistory,
     DataExport,
 )
-from .entriestags import (
+from .useractions import (
     LinkTagsDataModel,
     LinkVoteDataModel,
     LinkCommentDataModel,
@@ -31,8 +31,8 @@ from .domains import (
 from .keywords import (
     KeyWords,
 )
-from .searchhistory import (
+from .userhistory import (
     UserSearchHistory,
-    UserEntryVisits,
+    UserEntryVisitHistory,
     UserEntryTransitionHistory,
 )
