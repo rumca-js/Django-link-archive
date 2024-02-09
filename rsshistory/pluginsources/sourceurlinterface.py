@@ -3,7 +3,7 @@ from ..models import (
     SourceDataModel,
 )
 from ..pluginsources.sourceparseplugin import BaseParsePlugin
-from ..pluginentries.urlhandler import UrlHandler
+from ..pluginurl.urlhandler import UrlHandler
 
 
 class SourceUrlInterface(object):

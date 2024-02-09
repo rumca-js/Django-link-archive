@@ -1,4 +1,4 @@
-from ..pluginentries.handlerchannelodysee import OdyseeChannelHandler
+from ..pluginurl.handlerchannelodysee import OdyseeChannelHandler
 from .fakeinternet import FakeInternetTestCase
 
 

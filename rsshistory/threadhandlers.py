@@ -850,6 +850,7 @@ class HandlerManager(object):
             else:
                 obj = items[0]
                 handler = items[1]
+                subject = obj.subject
 
                 if handler:
                     handler.set_config(config)
@@ -868,8 +869,8 @@ class HandlerManager(object):
                 except Exception as E:
                     error_text = traceback.format_exc()
                     PersistentInfo.error(
-                        "Exception during handler processing {0}\n{1}\n{2}".format(
-                            handler.get_job(), str(E), error_text
+                        "Exception during handler processing {}\n{}\n{}\n{}".format(
+                            handler.get_job(), subject, str(E), error_text
                         )
                     )
 

@@ -1,4 +1,4 @@
-from ..pluginentries.handlervideoyoutube import YouTubeVideoHandler
+from ..pluginurl.handlervideoyoutube import YouTubeVideoHandler
 from .fakeinternet import FakeInternetTestCase
 
 

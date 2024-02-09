@@ -7,7 +7,7 @@ from ..dateutils import DateUtils
 from ..controllers import LinkDataBuilder, SourceDataController
 from ..models import BaseLinkDataController
 from ..apps import LinkDatabase
-from ..pluginentries.urlhandler import UrlHandler
+from ..pluginurl.urlhandler import UrlHandler
 
 
 class SourceGenericPlugin(HtmlPage):
@@ -31,7 +31,6 @@ class SourceGenericPlugin(HtmlPage):
         self.hash = None
 
     def check_for_data(self):
-        from ..dateutils import DateUtils
 
         if not self.is_fetch_possible():
             return

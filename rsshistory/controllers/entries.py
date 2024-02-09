@@ -181,7 +181,7 @@ class LinkDataController(LinkDataModel):
                 entry.delete()
 
     def get_full_information(data):
-        from ..pluginentries.entryurlinterface import EntryUrlInterface
+        from ..pluginurl.entryurlinterface import EntryUrlInterface
 
         info = EntryUrlInterface(data["link"], log=True, ignore_errors=True).get_props()
         if not info:
@@ -635,7 +635,7 @@ class LinkDataBuilder(object):
         if not self.is_enabled_to_store():
             return
 
-        from ..pluginentries.entryurlinterface import EntryUrlInterface
+        from ..pluginurl.entryurlinterface import EntryUrlInterface
 
         url = EntryUrlInterface(self.link)
         link_data = url.get_props()
@@ -809,7 +809,7 @@ class LinkDataBuilder(object):
         return True
 
     def is_live_video(self):
-        from ..pluginentries.urlhandler import UrlHandler
+        from ..pluginurl.urlhandler import UrlHandler
 
         link_data = self.link_data
 

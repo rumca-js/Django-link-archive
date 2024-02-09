@@ -5,15 +5,16 @@ This module provides replacement for the Internet.
  - when there is a request to obtain youtube JSON data, we provide artificial data, etc.
 """
 from django.test import TestCase
+import chardet
 
 from ..models import PersistentInfo, ConfigurationEntry
 from ..dateutils import DateUtils
 from ..webtools import BasePage
 from ..configuration import Configuration
 
-from ..pluginentries.urlhandler import UrlHandler
-from ..pluginentries.handlervideoyoutube import YouTubeVideoHandler
-from ..pluginentries.handlerchannelyoutube import YouTubeChannelHandler
+from ..pluginurl.urlhandler import UrlHandler
+from ..pluginurl.handlervideoyoutube import YouTubeVideoHandler
+from ..pluginurl.handlerchannelyoutube import YouTubeChannelHandler
 
 
 from .fakeinternetdata import (
@@ -160,14 +161,18 @@ class YouTubeChannelHandlerMock(YouTubeChannelHandler):
 class TestRequestObjectMock(object):
     def __init__(self, url, headers, timeout):
         self.status_code = 200
-        self.apparent_encoding = "utf-8"
-        self.encoding = "utf-8"
 
         contents = self.get_contents(url)
 
         self.text = contents
         self.content = contents
         self.headers = {}
+
+        #encoding = chardet.detect(contents)['encoding']
+        encoding = "utf-8"
+        self.apparent_encoding = encoding
+        self.encoding = encoding
+
 
     def get_contents(self, url):
         if url.startswith("https://youtube.com/channel/"):

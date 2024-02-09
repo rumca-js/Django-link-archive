@@ -5,9 +5,8 @@ from bs4 import BeautifulSoup
 from ..models import PersistentInfo
 from ..apps import LinkDatabase
 from ..webtools import RssPage, Url
-from ..pluginentries.entryurlinterface import EntryUrlInterface
+from ..pluginurl.entryurlinterface import EntryUrlInterface, UrlHandler
 from ..configuration import Configuration
-from ..pluginentries.entryurlinterface import UrlHandler
 
 from .sourcegenericplugin import SourceGenericPlugin
 

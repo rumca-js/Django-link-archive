@@ -23,7 +23,8 @@ class YouTubePlugin(BaseRssPlugin):
         if self.dead:
             return
 
-        from ..pluginentries.handlerchannelyoutube import YouTubeChannelHandler
+        # TODO replace with builder?
+        from ..pluginurl.handlerchannelyoutube import YouTubeChannelHandler
 
         source = self.get_source()
         channel = YouTubeChannelHandler(source.url)

@@ -29,6 +29,7 @@ import traceback
 import requests
 import re
 import json
+import chardet
 
 from datetime import datetime
 from dateutil import parser
@@ -70,11 +71,18 @@ def lazy_load_content(func):
 class SeleniumResponseObject(object):
     def __init__(self, url, contents):
         self.status_code = 200
-        self.apparent_encoding = "utf-8"
-        self.encoding = "utf-8"
 
         self.content = contents
         self.text = contents
+
+        # I read selenium always assume utf8 encoding
+
+        #encoding = chardet.detect(contents)['encoding']
+        #self.apparent_encoding = encoding
+        #self.encoding = encoding
+
+        self.apparent_encoding = None
+        self.encoding = None
 
         self.headers = {}
 
@@ -116,6 +124,7 @@ class BasePage(object):
         @param use_selenium decides if selenium is used
         @param page_obj All settings are used from page object, with page contents
         """
+        self.encoding = None
         if page_obj:
             self.url = page_obj.url
             self.contents = page_obj.contents
@@ -282,6 +291,7 @@ class BasePage(object):
             Override encoding by real educated guess as provided by chardet
             """
             r.encoding = r.apparent_encoding
+            self.encoding = r.encoding
 
             self.contents = r.text
 
@@ -1026,6 +1036,8 @@ class DefaultContentPage(ContentInterface):
         return None
 
     def get_language(self):
+        if self.encoding:
+            return self.encoding
         return None
 
     def get_thumbnail(self):
@@ -1281,6 +1293,9 @@ class RssPage(ContentInterface):
 
         if "language" in self.feed.feed:
             return self.feed.feed.language
+
+        if self.encoding:
+            return self.encoding
 
     def get_thumbnail(self):
         if self.feed is None:
@@ -1699,6 +1714,9 @@ class HtmlPage(ContentInterface):
         html = self.soup.find("html")
         if html and html.has_attr("lang"):
             return html["lang"]
+
+        if self.encoding:
+            return self.encoding
 
         return ""
 

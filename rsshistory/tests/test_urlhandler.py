@@ -1,5 +1,5 @@
-from ..pluginentries.urlhandler import UrlHandler
-from ..pluginentries.handlervideoyoutube import YouTubeVideoHandler
+from ..pluginurl.urlhandler import UrlHandler
+from ..pluginurl.handlervideoyoutube import YouTubeVideoHandler
 from ..webtools import RssPage, HtmlPage
 
 from .fakeinternet import FakeInternetTestCase

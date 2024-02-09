@@ -8,8 +8,8 @@ from ..dateutils import DateUtils
 from ..models import PersistentInfo
 from ..controllers import LinkDataController
 from ..apps import LinkDatabase
-from ..pluginentries.urlhandler import UrlHandler
-from ..pluginentries.entryurlinterface import EntryUrlInterface
+from ..pluginurl.urlhandler import UrlHandler
+from ..pluginurl.entryurlinterface import EntryUrlInterface
 from ..configuration import Configuration
 
 from .sourcegenericplugin import SourceGenericPlugin

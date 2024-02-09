@@ -1,18 +1,18 @@
-from ..webtools import HtmlPage
-
-from .urlhandler import UrlHandler
+from ...webtools import HtmlPage
+from ...pluginurl.urlhandler import UrlHandler
 
 from .entryyoutubeplugin import EntryYouTubePlugin
 from .entryodyseeplugin import EntryOdyseePlugin
 from .entrygenericplugin import EntryGenericPlugin
 
 
-class EntryPreviewController(object):
+class EntryPreviewBuilder(object):
     """
     Builds widget plugin.
     Only videos are displayed differently - we have preview for them
 
     TODO streamable?
+    TODO pass request instead of user
     """
 
     def get(entry, user=None):

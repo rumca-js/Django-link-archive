@@ -1,9 +1,9 @@
 from django.urls import reverse
 from django.templatetags.static import static
 
-from ..apps import LinkDatabase
-from ..models import ConfigurationEntry
-from ..pluginentries.urlhandler import UrlHandler
+from ...apps import LinkDatabase
+from ...models import ConfigurationEntry
+from ...pluginurl.urlhandler import UrlHandler
 
 from .entrygenericplugin import EntryGenericPlugin, EntryButton, EntryParameter
 
@@ -106,11 +106,14 @@ class EntryYouTubePlugin(EntryGenericPlugin):
 
         if self.entry.age and self.entry.age >= 18:
             frame_text = """
-            <div>
-                <img src="{}" class="content-thumbnail"/>
-            </div>"""
+            <div class="youtube_player_container">
+               {}
+            </div>
+            <div style="color:red">This material is restricted for age {}<div>"""
 
-            frame_text = frame_text.format(self.entry.get_thumbnail())
+            frame_inner = self.get_frame()
+
+            frame_text = frame_text.format(frame_inner, self.entry.age)
 
             return frame_text
         else:

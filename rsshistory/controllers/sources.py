@@ -240,18 +240,6 @@ class SourceDataController(SourceDataModel):
 
         return info
 
-    def get_channel_page_url(self):
-        from ..pluginentries.handlerchannel import ChannelHandler
-
-        handler = ChannelHandler.get(self.url)
-
-        return handler.get_channel_url()
-
-    def is_channel_page_url(self):
-        from ..pluginentries.handlerchannel import ChannelHandler
-
-        return ChannelHandler.get_supported(self.url)
-
     def fix_entries(self):
         entries = LinkDataModel.objects.filter(source=self.url)
         for entry in entries:

@@ -1,8 +1,7 @@
-from ..pluginentries.entrypreviewcontroller import EntryPreviewController
-
-from ..pluginentries.entryyoutubeplugin import EntryYouTubePlugin
-from ..pluginentries.entryodyseeplugin import EntryOdyseePlugin
-from ..pluginentries.entrygenericplugin import EntryGenericPlugin
+from ..viewspkg.plugins import EntryPreviewBuilder
+from ..viewspkg.plugins import EntryYouTubePlugin
+from ..viewspkg.plugins import EntryOdyseePlugin
+from ..viewspkg.plugins import EntryGenericPlugin
 
 from ..controllers import (
     LinkDataController,
@@ -45,7 +44,7 @@ class EntryUrlInterfaceTest(FakeInternetTestCase):
         )
         entry = entries[0]
 
-        h = EntryPreviewController.get(entry)
+        h = EntryPreviewBuilder.get(entry)
         self.assertTrue(type(h) is EntryYouTubePlugin)
 
     def test_video_odysee_handler(self):
@@ -54,5 +53,5 @@ class EntryUrlInterfaceTest(FakeInternetTestCase):
         )
         entry = entries[0]
 
-        h = EntryPreviewController.get(entry)
+        h = EntryPreviewBuilder.get(entry)
         self.assertTrue(type(h) is EntryOdyseePlugin)

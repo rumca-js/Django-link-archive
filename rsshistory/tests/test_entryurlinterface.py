@@ -1,5 +1,5 @@
-from ..pluginentries.entryurlinterface import EntryUrlInterface
-from ..pluginentries.handlervideoyoutube import YouTubeVideoHandler
+from ..pluginurl.entryurlinterface import EntryUrlInterface
+from ..pluginurl.handlervideoyoutube import YouTubeVideoHandler
 from .fakeinternet import FakeInternetTestCase
 
 

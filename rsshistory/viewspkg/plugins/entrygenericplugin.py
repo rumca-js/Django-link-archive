@@ -1,10 +1,10 @@
 from django.urls import reverse
 from django.templatetags.static import static
 
-from ..apps import LinkDatabase
-from ..models import ConfigurationEntry, UserConfig
-from ..webtools import HtmlPage, BasePage
-from ..configuration import Configuration
+from ...apps import LinkDatabase
+from ...models import ConfigurationEntry, UserConfig
+from ...webtools import HtmlPage, BasePage, InputContent
+from ...configuration import Configuration
 
 
 class EntryButton(object):
@@ -427,7 +427,5 @@ class EntryGenericPlugin(object):
         description = self.entry.description
         if not description or description == "":
             return ""
-
-        from ..webtools import InputContent
 
         return """{}""".format(InputContent(description).htmlify())

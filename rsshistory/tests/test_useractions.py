@@ -50,9 +50,9 @@ class LinkTagsDataModelTest(TestCase):
         tags = LinkTagsDataModel.objects.all()
 
         self.assertEqual(tags.count(), 2)
-        self.assertEqual(tags[0].tag, "tag1")
+        self.assertEqual(tags[0].tag, "tag2")
         self.assertEqual(tags[0].link_obj, self.entry)
-        self.assertEqual(tags[1].tag, "tag2")
+        self.assertEqual(tags[1].tag, "tag1")
         self.assertEqual(tags[1].link_obj, self.entry)
 
     def test_set_tags_map(self):

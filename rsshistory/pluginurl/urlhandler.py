@@ -1,4 +1,4 @@
-from ..webtools import Url, PageOptions
+from ..webtools import Url, PageOptions, DomainAwarePage
 
 from ..apps import LinkDatabase
 from ..models import PersistentInfo
@@ -118,8 +118,10 @@ class UrlHandler(object):
         return False
 
     def is_selenium_full_required(url):
-        if (url.startswith("https://www.warhammer-community.com") or
-           url.startswith("https://defcon.org")):
+        p = DomainAwarePage(url)
+        if (p.is_link_service() or
+            url.startswith("https://www.warhammer-community.com") or
+            url.startswith("https://defcon.org")):
             return True
 
         return False

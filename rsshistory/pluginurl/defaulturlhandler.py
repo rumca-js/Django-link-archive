@@ -3,6 +3,10 @@ from ..dateutils import DateUtils
 
 
 class DefaultUrlHandler(DefaultContentPage):
+    """
+    Default URL handler.
+    Behavior can be changed by setting .h handler property
+    """
     def __init__(self, url=None):
         super().__init__(url)
         self.h = None
@@ -33,3 +37,6 @@ class DefaultUrlHandler(DefaultContentPage):
         if self.h is None:
             self.h = Url.get(self.url, fast_check=True)
         return self.h.is_domain()
+
+    def get_url(self):
+        return self.code2url(self.code)
