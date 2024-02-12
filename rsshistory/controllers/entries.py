@@ -809,6 +809,11 @@ class LinkDataBuilder(object):
         return True
 
     def is_live_video(self):
+        link_data = self.link_data
+        
+        if "live" in link_data and link_data["live"]:
+            return link_data["live"]
+        """
         from ..pluginurl.urlhandler import UrlHandler
 
         link_data = self.link_data
@@ -821,6 +826,7 @@ class LinkDataBuilder(object):
             if type(handler) is UrlHandler.youtube_video_handler:
                 if not handler.is_valid():
                     return True
+        """
 
         return False
 

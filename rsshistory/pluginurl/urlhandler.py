@@ -1,3 +1,5 @@
+import traceback
+
 from ..webtools import Url, PageOptions, DomainAwarePage
 
 from ..apps import LinkDatabase
@@ -26,6 +28,18 @@ class UrlHandler(object):
     odysee_channel_handler = OdyseeChannelHandler
 
     def get(url, fast_check=True, use_selenium=False):
+        if not url or url == "":
+            lines = traceback.format_stack()
+            line_text = ""
+            for line in lines:
+                line_text += line
+
+            PersistentInfo.error(
+                "Invalid use of UrlHandler API {};Lines:{}".format(url, line_text)
+            )
+
+            return
+
         """
         This code eventually will get ugly.
         We want handle different cases here. Use selenium?
@@ -53,6 +67,8 @@ class UrlHandler(object):
 
         # if response is cloudflare jibberish, try using selenium
         if options.is_not_selenium() and (not page.is_valid() or page.is_cloudflare_protected()):
+            LinkDatabase.info("Could not normally obtain contents. Trying selenium:".format(url))
+
             options = PageOptions()
             # by default we do not want full blown browser to be started
             # this has to be enabled manually in code

@@ -296,3 +296,13 @@ class HtmlPageTest(FakeInternetTestCase):
         date = p.get_date_published()
         self.assertTrue(date)
         self.assertEqual(date.isoformat(), "2024-01-11T09:00:07+00:00")
+
+    def test_get_body_hash(self):
+        reader = HtmlPage("https://linkedin.com")
+        hash = reader.get_body_hash()
+        bodytext = str(reader.get_body_text())
+
+        self.assertTrue(bodytext)
+        self.assertTrue(bodytext != "")
+
+        self.assertEqual(hash, reader.calculate_hash(bodytext))

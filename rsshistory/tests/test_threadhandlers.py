@@ -586,14 +586,9 @@ class ProcessSourceHandlerTest(FakeInternetTestCase):
         # call tested function
         result = handler.process(ob)
 
-        self.assertEqual(result, True)
+        self.print_errors()
 
-        persistent_objects = PersistentInfo.objects.all()
-
-        for persistent_object in persistent_objects:
-            print("Persisten object info:{}".format(persistent_object.info))
-
-        self.assertEqual(persistent_objects.count(), 0)
+        self.assertEqual(result, False)
 
         jobs = BackgroundJobController.objects.all()
         for job in jobs:

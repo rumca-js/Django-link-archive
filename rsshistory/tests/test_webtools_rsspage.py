@@ -1,4 +1,5 @@
 from datetime import datetime
+import hashlib
 
 from ..webtools import RssPage
 
@@ -140,6 +141,17 @@ class RssPageTest(FakeInternetTestCase):
         reader = RssPage("https://youtube.com/channel/2020-year-channel/rss.xml")
         entries = reader.get_container_elements()
         self.assertTrue(reader.is_valid())
+
+    def test_get_body_hash(self):
+        # default language
+        reader = RssPage("https://youtube.com/channel/2020-year-channel/rss.xml")
+        hash = reader.get_body_hash()
+
+        entries = str(reader.feed.entries)
+
+        self.assertTrue(entries)
+        self.assertTrue(entries != "")
+        self.assertEqual(hash, reader.calculate_hash(entries))
 
     """
     feeder does not parses update time

@@ -10,7 +10,7 @@ def subs_checker_task(arg):
     """!
     Checks for new entries in sources
     """
-    LinkDatabase.info("Refreshing sources")
+    LinkDatabase.info("subs_checker_task")
 
     try:
         from .configuration import Configuration
@@ -26,14 +26,14 @@ def subs_checker_task(arg):
         error_text = traceback.format_exc()
         LinkDatabase.info("Exception in checker task: {} {}".format(str(E), error_text))
 
-    LinkDatabase.info("Refreshing sources done")
+    LinkDatabase.info("subs_checker_task DONE")
 
 
 def process_all_jobs_task(arg):
     """!
     Processes jobs
     """
-    LinkDatabase.info("Processing source")
+    LinkDatabase.info("process_all_jobs_task")
 
     try:
         from .configuration import Configuration
@@ -52,14 +52,14 @@ def process_all_jobs_task(arg):
             "Exception in processing task: {} {}".format(str(E), error_text)
         )
 
-    LinkDatabase.info("Processing done")
+    LinkDatabase.info("process_all_jobs_task DONE")
 
 
 def process_one_jobs_task(arg):
     """!
     Processes jobs
     """
-    LinkDatabase.info("Processing source")
+    LinkDatabase.info("process_one_jobs_task")
 
     try:
         from .configuration import Configuration
@@ -78,4 +78,4 @@ def process_one_jobs_task(arg):
             "Exception in processing task: {} {}".format(str(E), error_text)
         )
 
-    LinkDatabase.info("Processing done")
+    LinkDatabase.info("process_one_jobs_task DONE")

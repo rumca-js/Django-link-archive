@@ -22,7 +22,10 @@ class LinkDataBuilderTest(FakeInternetTestCase):
         config = Configuration.get_object().config_entry
         config.auto_store_entries = True
         config.auto_store_domain_info = False
+        config.auto_store_sources = False
         config.save()
+        
+        self.mock_page_requests = 0
 
         link_name = "https://youtube.com/v=1234"
 
@@ -49,6 +52,8 @@ class LinkDataBuilderTest(FakeInternetTestCase):
         self.assertEqual(objs.count(), 1)
         self.assertEqual(objs[0].link, link_name)
         self.assertEqual(objs[0].date_published, creation_date)
+        
+        self.assertEqual(self.mock_page_requests, 1)
 
     def test_add_from_props_with_slash(self):
         config = Configuration.get_object().config_entry

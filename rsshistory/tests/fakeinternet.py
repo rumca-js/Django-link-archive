@@ -216,7 +216,7 @@ class TestRequestObjectMock(object):
             b.description_meta = "Page description"
             b.og_title = "Page og_title"
             b.og_description = "Page og_description"
-            b.body = """<a href="https://link1.com">Link1</a>
+            b.body_text = """<a href="https://link1.com">Link1</a>
                      <a href="https://link2.com">Link2</a>"""
 
             return b.build_contents()
@@ -247,7 +247,7 @@ class TestRequestObjectMock(object):
             b.title = "Page title"
             b.description_meta = "Page description"
             b.og_description = "Page og_description"
-            b.body = """Something in the way"""
+            b.body_text = """Something in the way"""
             return b.build_contents()
 
         elif url == "https://title-in-meta.com":
@@ -255,7 +255,7 @@ class TestRequestObjectMock(object):
             b.title = "Page title"
             b.description_meta = "Page description"
             b.og_description = "Page og_description"
-            b.body = """Something in the way"""
+            b.body_text = """Something in the way"""
             return b.build_contents()
 
         elif url == "https://title-in-og.com":
@@ -263,7 +263,7 @@ class TestRequestObjectMock(object):
             b.og_title = "Page title"
             b.description_meta = "Page description"
             b.og_description = "Page og_description"
-            b.body = """Something in the way"""
+            b.body_text = """Something in the way"""
             return b.build_contents()
 
         elif url == "https://linkedin.com":
@@ -272,6 +272,7 @@ class TestRequestObjectMock(object):
             b.description_meta = "LinkedIn Page description"
             b.og_title = "LinkedIn Page og:title"
             b.og_description = "LinkedIn Page og:description"
+            b.body_text = """LinkedIn body"""
             return b.build_contents()
 
         elif url.endswith("robots.txt"):
@@ -367,8 +368,15 @@ class TestRequestObjectMock(object):
 
 
 class FakeInternetTestCase(TestCase):
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.mock_page_requests = 0
+    
     def get_contents_function(self, url, headers, timeout):
         print("Mocked Requesting page: {}".format(url))
+        self.mock_page_requests += 1
+        
         return TestRequestObjectMock(url, headers, timeout)
 
     def disable_web_pages(self):

@@ -22,14 +22,14 @@ import urllib.robotparser
 from urllib3.exceptions import InsecureRequestWarning
 from urllib3 import disable_warnings
 
-from bs4 import BeautifulSoup
-
+import hashlib
 import html
 import traceback
 import requests
 import re
 import json
 import chardet
+from bs4 import BeautifulSoup
 
 from datetime import datetime
 from dateutil import parser
@@ -83,6 +83,9 @@ class SeleniumResponseObject(object):
 
         self.apparent_encoding = None
         self.encoding = None
+        
+        self.apparent_encoding = "utf-8"
+        self.encoding = "utf-8"
 
         self.headers = {}
 
@@ -243,7 +246,13 @@ class BasePage(object):
         return self.status_code >= 200 and self.status_code < 300
 
     def get_contents(self):
+        if self.contents:
+            return self.contents
+
         contents = self.get_contents_implementation()
+
+        self.process_contents()
+
         self.contents = contents
         return contents
 
@@ -279,7 +288,15 @@ class BasePage(object):
         }
 
         try:
+            LinkDatabase.info(
+                "Page: Requesting page: {} options:{}".format(self.url, self.options)
+            )
+
             r = self.get_contents_function(self.url, headers=hdr, timeout=10)
+
+            LinkDatabase.info(
+                "Page: Requesting page: {} DONE".format(self.url, self.options)
+            )
 
             self.status_code = r.status_code
             self.response_headers = r.headers
@@ -294,8 +311,6 @@ class BasePage(object):
             self.encoding = r.encoding
 
             self.contents = r.text
-
-            self.process_contents()
 
             return r.text
 
@@ -312,9 +327,6 @@ class BasePage(object):
             )
 
     def get_contents_internal(self, url, headers, timeout):
-        LinkDatabase.info(
-            "Page: Requesting page: {} options:{}".format(url, self.options)
-        )
 
         if self.options.is_not_selenium():
             return self.get_contents_via_requests(self.url, headers=headers, timeout=10)
@@ -355,6 +367,9 @@ class BasePage(object):
         options = webdriver.ChromeOptions()
         options.add_argument("--headless")
 
+        if not BasePage.ssl_verify:
+            options.add_argument('ignore-certificate-errors')
+
         driver = webdriver.Chrome(service=service, options=options)
 
         # add 10 seconds for start of browser, etc.
@@ -392,6 +407,9 @@ class BasePage(object):
         # options.add_argument("--headless")
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
+
+        if not BasePage.ssl_verify:
+            options.add_argument('ignore-certificate-errors')
 
         driver = webdriver.Chrome(service=service, options=options)
 
@@ -546,6 +564,17 @@ class BasePage(object):
                 ready_url = domain + url
         return ready_url
 
+    def calculate_hash(self, text):
+        try:
+            return hashlib.md5(text.encode("utf-8")).digest()
+        except Exception as E:
+            PersistentInfo.create("Could not calculate hash {}".format(E))
+
+    @lazy_load_content
+    def get_contents_hash(self):
+        if self.contents:
+            return self.calculate_hash(self.contents)
+
 
 class DomainAwarePage(BasePage):
     def __init__(self, url, contents=None, options=None, page_obj=None):
@@ -639,6 +668,10 @@ class DomainAwarePage(BasePage):
         if url.find("bit.ly") >= 0:
             return True
         if url.find("amzn.to") >= 0:
+            return True
+        if url.find("ow.ly") >= 0:
+            return True
+        if url.find("adfoc.us") >= 0:
             return True
 
         return False
@@ -1142,13 +1175,24 @@ class RssPage(ContentInterface):
     """
 
     def __init__(self, url, contents=None, options=None, page_obj=None):
+        if type(page_obj) is RssPage:
+            self.feed = page_obj.feed
+        else:
+            self.feed = None
+
         super().__init__(url, contents=contents, options=options, page_obj=page_obj)
         self.allow_adding_with_current_time = True
         self.default_entry_timestamp = None
-        self.feed = None
+
+    def process_contents(self):
+        if self.contents and not self.feed:
+            self.parse()
 
     @lazy_load_content
     def parse(self):
+        if self.feed:
+            return self.feed
+
         try:
             contents = self.contents
 
@@ -1222,6 +1266,22 @@ class RssPage(ContentInterface):
             output_map["title"] = output_map["link"]
 
         return output_map
+
+    @lazy_load_content
+    def get_body_hash(self):
+        if not self.contents:
+            return
+
+        #    PersistentInfo.error("No rss hash contents")
+        #    return self.calculate_hash("no body hash")
+
+        entries = str(self.feed.entries)
+        if entries == "":
+            if self.contents:
+                PersistentInfo.error("Empty entries")
+                return self.calculate_hash(self.contents)
+        if entries:
+            return self.calculate_hash(entries)
 
     def get_feed_description(self, feed_entry):
         if hasattr(feed_entry, "description"):
@@ -1538,10 +1598,15 @@ class HtmlPage(ContentInterface):
     """
 
     def __init__(self, url, contents=None, options=None, page_obj=None):
+        if type(page_obj) is HtmlPage:
+            self.soup = page_obj.soup
+        else:
+            self.soup = None
+
         super().__init__(url, contents=contents, options=options, page_obj=page_obj)
 
     def process_contents(self):
-        if self.contents:
+        if self.contents and not self.soup:
             self.soup = BeautifulSoup(self.contents, "html.parser")
 
     @lazy_load_content
@@ -2024,6 +2089,34 @@ class HtmlPage(ContentInterface):
             return False
 
         return True
+
+    @lazy_load_content
+    def get_body_text(self):
+        if not self.contents:
+            return
+
+        body_find = self.soup.find("body")
+        if not body_find:
+            return
+
+        return body_find.get_text()
+
+    @lazy_load_content
+    def get_body_hash(self):
+        if not self.contents:
+            return
+
+        body = self.get_body_text()
+
+        if body == "":
+            PersistentInfo.error("Empty body")
+            return self.calculate_hash("no body hash")
+        elif body:
+            return self.calculate_hash(body)
+        else:
+            PersistentInfo.error("No body")
+            if self.contents:
+                return self.calculate_hash(self.contents)
 
 
 class Url(object):

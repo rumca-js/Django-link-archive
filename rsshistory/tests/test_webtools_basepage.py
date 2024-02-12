@@ -1,3 +1,4 @@
+import hashlib
 from ..webtools import BasePage, InputContent, PageOptions
 
 from .fakeinternet import FakeInternetTestCase
@@ -240,6 +241,18 @@ class BasePageTest(FakeInternetTestCase):
             "http://mytestpage.com/test/", "https://images/facebook.com"
         )
         self.assertEqual(url, "https://images/facebook.com")
+
+    def test_calculate_hash(self):
+        p = BasePage("http://mytestpage.com/test/", webpage_links)
+        self.assertEqual(p.calculate_hash(), hashlib.md5(text.encode("utf-8")).digest())
+
+    def test_calculate_hash(self):
+        p = BasePage("http://mytestpage.com/test/", webpage_links)
+        self.assertEqual(p.calculate_hash(webpage_links), hashlib.md5(webpage_links.encode("utf-8")).digest())
+
+    def test_get_content_hash(self):
+        p = BasePage("http://mytestpage.com/test/", webpage_links)
+        self.assertEqual(p.get_contents_hash(), hashlib.md5(webpage_links.encode("utf-8")).digest())
 
 
 class InputContentTest(FakeInternetTestCase):

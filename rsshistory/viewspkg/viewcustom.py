@@ -27,7 +27,7 @@ from ..views import ViewPage
 from ..dateutils import DateUtils
 from ..forms import LinkInputForm, ScannerForm
 from ..webtools import HtmlPage, ContentLinkParser
-from ..pluginentries.urlhandler import UrlHandler
+from ..pluginurl.urlhandler import UrlHandler
 
 
 
@@ -68,7 +68,7 @@ def page_show_properties(request):
         if "page" not in request.GET:
             form = LinkInputForm()
             form.method = "POST"
-            form.action_url = reverse("{}:show-page-props".format(LinkDatabase.name))
+            form.action_url = reverse("{}:page-show-props".format(LinkDatabase.name))
             p.context["form"] = form
 
             return p.render("form_basic.html")

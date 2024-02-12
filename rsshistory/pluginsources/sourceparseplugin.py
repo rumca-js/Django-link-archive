@@ -91,3 +91,16 @@ class BaseParsePlugin(SourceGenericPlugin):
             if time.time() - start_processing_time >= 60 * 10:
                 PersistentInfo.info("Spent too much time in parser")
                 break
+
+    def calculate_plugin_hash(self):
+        """
+        We do not care about RSS title changing. We care only about entries
+        Generic handler uses Html as base. We need to use RSS for body hash
+        """
+        print("Calculating plugin hash")
+        if self.is_html(False):
+            print("Calculating plugin hash is html")
+            p = HtmlPage(self.get_address(), page_obj = self)
+            return p.get_body_hash()
+        else:
+            return self.get_contents_hash()

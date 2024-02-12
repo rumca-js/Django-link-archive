@@ -25,6 +25,8 @@ class BaseRssPluginTest(FakeInternetTestCase):
         config.auto_store_entries_use_all_data = False
         config.auto_store_entries_use_clean_page_info = False
         config.save()
+        
+        self.mock_page_requests = 0
 
         self.assertTrue(self.source_rss)
 
@@ -37,6 +39,9 @@ class BaseRssPluginTest(FakeInternetTestCase):
             props[0]["source"],
             "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM",
         )
+        
+        # 1 rss parent, we do not make additional requests
+        self.assertEqual(self.mock_page_requests, 1)
 
     def test_get_container_elements_use_all_data(self):
         config = Configuration.get_object().config_entry
@@ -77,3 +82,19 @@ class BaseRssPluginTest(FakeInternetTestCase):
             props[0]["source"],
             "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM",
         )
+
+    def test_check_for_data(self):
+        config = Configuration.get_object().config_entry
+        config.auto_store_entries = True
+        config.auto_store_sources = True
+        config.auto_store_entries_use_all_data = True
+        config.auto_store_entries_use_clean_page_info = False
+        config.save()
+
+        self.assertTrue(self.source_rss)
+
+        plugin = BaseRssPlugin(self.source_rss.id)
+        # call tested function
+        plugin.check_for_data()
+
+        self.assertTrue(plugin.hash)

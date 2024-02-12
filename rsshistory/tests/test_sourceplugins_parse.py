@@ -1,5 +1,6 @@
-from ..models import LinkTagsDataModel
+from ..models import LinkTagsDataModel, SourceOperationalData
 from ..controllers import SourceDataController, LinkDataController
+
 from ..pluginsources.sourceparseplugin import BaseParsePlugin
 from ..pluginsources.sourcegenerousparserplugin import SourceGenerousParserPlugin
 from ..pluginsources.domainparserplugin import DomainParserPlugin
@@ -255,6 +256,7 @@ class NowNowNowPluginTest(FakeInternetTestCase):
     def test_check_for_data(self):
         LinkDataController.objects.all().delete()
         LinkTagsDataModel.objects.all().delete()
+        SourceOperationalData.objects.all().delete()
 
         parser = NowNowNowParserPlugin(self.source_linkedin.id)
 
@@ -264,6 +266,8 @@ class NowNowNowPluginTest(FakeInternetTestCase):
         parser.check_for_data()
 
         self.print_errors()
+
+        self.assertTrue(parser.hash)
 
         entries = LinkDataController.objects.all()
         tags = LinkTagsDataModel.objects.all()

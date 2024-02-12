@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 
 from ..models import PersistentInfo
 from ..apps import LinkDatabase
-from ..webtools import RssPage, Url
+from ..webtools import RssPage, Url, HtmlPage
 from ..pluginurl.entryurlinterface import EntryUrlInterface, UrlHandler
 from ..configuration import Configuration
 
@@ -20,6 +20,7 @@ class BaseRssPlugin(SourceGenericPlugin):
     def get_contents(self):
         if self.contents:
             return self.contents
+
         if self.dead:
             return
 
@@ -27,63 +28,30 @@ class BaseRssPlugin(SourceGenericPlugin):
 
         contents = super().get_contents()
 
+        if not contents:
+            self.store_error(
+                source,
+                "Coult not obtain contents, even with selenium",
+                contents,
+            )
+            self.dead = True
+            return
+
         fast_check = False
 
-        if (
-            self.is_cloudflare_protected()
-            or not contents
-            or not self.is_rss(fast_check=fast_check)
-        ):
-            if self.options.is_selenium():
-                self.store_error(source, "Tried with selenium, still not RSS", contents)
-                self.dead = True
-                return
+        if self.is_html(fast_check=fast_check):
+            h = HtmlPage(self.get_address(), page_obj = self)
+            rss_contents = h.get_body_text()
 
-            # goes over cloudflare
-            self.reader = UrlHandler.get(
-                self.get_address(), use_selenium=True, fast_check=fast_check
-            )
-            contents = self.reader.get_contents()
-            self.status_code = self.reader.status_code
+            self.reader = RssPage(self.get_address(), contents=rss_contents)
 
             if not self.reader.is_rss(fast_check=fast_check):
-                """
-                Sometimes RSS might hide in <body>. I know that is stupid.
-                Parse the HTML with BeautifulSoup.
-                """
-                if not contents:
-                    self.store_error(
-                        source,
-                        "Coult not obtain contents, even with selenium",
-                        contents,
-                    )
-                    self.dead = True
-                    return None
+                self.store_error(source, "HTML body does not provide RSS", contents)
+                self.dead = True
 
-                soup = BeautifulSoup(contents, "html.parser")
-                body_find = soup.find("body")
-                if not body_find:
-                    self.store_error(source, "No HTML body in page", contents)
-                    self.dead = True
-                    return None
-
-                rss_contents = body_find.get_text()
-
-                self.reader = RssPage(self.get_address(), contents=rss_contents)
-
-                if not self.reader.is_rss(fast_check=fast_check):
-                    self.store_error(source, "HTML body does not provide RSS", contents)
-                    self.dead = True
-
-                    return None
-                else:
-                    contents = rss_contents
+                return None
             else:
-                PersistentInfo.create(
-                    "Source:{} Title:{}; Successfull workaround for Cloudlare.".format(
-                        source.url, source.title
-                    )
-                )
+                contents = rss_contents
 
         self.contents = contents
 
@@ -114,6 +82,7 @@ class BaseRssPlugin(SourceGenericPlugin):
         all_props = self.reader.get_container_elements()
 
         for index, prop in enumerate(all_props):
+            #LinkDatabase.info("Processing RSS element")
             if "link" not in prop:
                 continue
 
@@ -121,17 +90,16 @@ class BaseRssPlugin(SourceGenericPlugin):
 
             if self.is_link_ok_to_add(prop):
                 if c.auto_store_entries_use_clean_page_info:
-                    print("RSS: use clean page info")
                     prop = self.get_clean_page_info(prop)
 
                 elif c.auto_store_entries_use_all_data:
-                    print("RSS: use updated page info")
                     prop = self.get_updated_page_info(prop)
 
                 prop = self.enhance(prop)
 
-                LinkDatabase.info("Rss plugin link:{} [{}]".format(prop["link"], index))
                 yield prop
+            #LinkDatabase.info("Processing RSS element DONE")
+        #LinkDatabase.info("Processing RSS elements DONE")
 
     def cleanup_data(self, prop):
         if prop["link"].endswith("/"):
@@ -175,3 +143,11 @@ class BaseRssPlugin(SourceGenericPlugin):
                 prop["artist"] = self.reader.get_artist()
 
         return prop
+
+    def calculate_plugin_hash(self):
+        """
+        We do not care about RSS title changing. We care only about entries
+        Generic handler uses Html as base. We need to use RSS for body hash
+        """
+        p = RssPage(self.get_address(), page_obj = self)
+        return p.get_body_hash()

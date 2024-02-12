@@ -43,6 +43,7 @@ from ..webtools import Url, BasePage
 from ..services.waybackmachine import WaybackMachine
 from ..dateutils import DateUtils
 from ..serializers.instanceimporter import InstanceExporter
+from .plugins.entrypreviewbuilder import EntryPreviewBuilder
 
 
 def get_search_term_request(request):
@@ -446,9 +447,8 @@ class EntryDetailView(generic.DetailView):
         return self.setup_context(context)
 
     def setup_context(self, context):
-        from ..pluginentries.entrypreviewcontroller import EntryPreviewController
 
-        object_controller = EntryPreviewController.get(self.object, self.request.user)
+        object_controller = EntryPreviewBuilder.get(self.object, self.request.user)
 
         context["page_title"] = self.object.title
 
@@ -485,8 +485,6 @@ class EntryArchivedDetailView(generic.DetailView):
     template_name = str(ViewPage.get_full_template("linkdatacontroller_detail.html"))
 
     def get_context_data(self, **kwargs):
-        from ..pluginentries.entrypreviewcontroller import EntryPreviewController
-
         # Call the base implementation first to get the context
         context = super(EntryArchivedDetailView, self).get_context_data(**kwargs)
         context = ViewPage.init_context(self.request, context)
@@ -496,7 +494,7 @@ class EntryArchivedDetailView(generic.DetailView):
 
         context["page_title"] = self.object.title
         context["page_thumbnail"] = self.object.thumbnail
-        context["object_controller"] = EntryPreviewController.get(
+        context["object_controller"] = EntryPreviewBuilder.get(
             self.object, self.request.user
         )
 

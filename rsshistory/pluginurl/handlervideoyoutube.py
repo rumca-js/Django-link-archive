@@ -2,6 +2,8 @@ from urllib.parse import urlparse
 from urllib.parse import parse_qs
 
 from ..webtools import HtmlPage
+from ..apps import LinkDatabase
+
 from .defaulturlhandler import DefaultUrlHandler
 
 
@@ -83,17 +85,28 @@ class YouTubeVideoHandler(DefaultUrlHandler):
         if self.contents:
             return self.contents
 
+        LinkDatabase.info("YouTube video Handler. Requesting: {}".format(self.get_video_code()))
+
         status = False
         if self.download_details():
             if self.load_details():
                 status = True
                 self.contents = self.yt_text
+                LinkDatabase.info("YouTube video handler: {} DONE".format(self.get_video_code()))
+
                 return True
 
         if not status:
             self.dead = True
 
     def is_valid(self):
+        self.get_contents()
+        return not self.is_live()
+
+    def is_valid_html(self):
+        """
+        Either use html or JSON.
+        """
         if not self.h:
             self.h = HtmlPage(self.url)
 
@@ -116,7 +129,7 @@ class YouTubeVideoHandler(DefaultUrlHandler):
         if block_live_videos:
             live_field = self.h.get_meta_custom_field("itemprop", "isLiveBroadcast")
             if live_field and live_field.lower() == "true":
-                print("It is invalid:{} - live".format(self.url))
+                #print("It is invalid:{} - live".format(self.url))
                 return False
 
         return True

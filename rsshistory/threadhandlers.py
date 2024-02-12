@@ -67,8 +67,26 @@ class ProcessSourceJobHandler(BaseJobHandler):
         try:
             plugin = SourceControllerBuilder.get(obj.subject)
             if plugin:
-                plugin.check_for_data()
-            return True
+                if plugin.check_for_data():
+                    return True
+                # TODO implement it differently.
+                # it does not have to be the time to download data at all
+                #else:
+                #    """
+                #    We remove the job, then insert new one, if we haven't finished it
+                #    """
+                #    obj.delete()
+
+                #    sources = SourceDataController.objects.filter(url = obj.subject)
+                #    if sources.count() > 0:
+                #        source = sources[0]
+                #        BackgroundJobController.download_rss(source)
+
+                #    return False
+                return True
+
+            PersistentInfo.error("Cannot find controller plugin for {}".format(obj.subject))
+            return False
 
         except Exception as e:
             error_text = traceback.format_exc()
@@ -877,8 +895,8 @@ class HandlerManager(object):
                 # if 10 minutes passed
                 passed_seconds = time.time() - start_processing_time
                 if passed_seconds >= 60 * 10:
-                    text = "Handler {} exceeded time:{}".format(
-                        handler.get_job(), passed_seconds
+                    text = "Threads: last handler {} {} exceeded time:{}".format(
+                        handler.get_job(), subject, passed_seconds
                     )
                     PersistentInfo.create(text)
                     break

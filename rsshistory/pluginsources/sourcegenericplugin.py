@@ -31,6 +31,7 @@ class SourceGenericPlugin(HtmlPage):
         self.hash = None
 
     def check_for_data(self):
+        LinkDatabase.info("Plugin: checking source {}".format(self.get_source().url))
 
         if not self.is_fetch_possible():
             return
@@ -38,6 +39,7 @@ class SourceGenericPlugin(HtmlPage):
         start_time = DateUtils.get_datetime_now_utc()
         num_entries = 0
 
+        self.hash = self.calculate_plugin_hash()
         if self.is_page_ok_to_read():
             num_entries = self.read_data_from_container_elements()
 
@@ -45,23 +47,28 @@ class SourceGenericPlugin(HtmlPage):
         total_time = stop_time - start_time
         total_time.total_seconds()
 
-        hash = self.get_hash()
-        if hash:
+        if self.hash:
+            LinkDatabase.info("Plugin: hash valid {} {}".format(self.get_source().url, self.hash))
             self.set_operational_info(
-                stop_time, num_entries, total_time.total_seconds(), hash
+                stop_time, num_entries, total_time.total_seconds(), self.hash
             )
+            return True
 
         if self.dead:
+            LinkDatabase.info("Plugin: hash not valid {}".format(self.get_source().url))
             self.set_operational_info(
-                stop_time, num_entries, total_time.total_seconds(), hash, valid=False
+                stop_time, num_entries, total_time.total_seconds(), self.hash, valid=False
             )
+            return False
 
     def read_data_from_container_elements(self):
         num_entries = 0
 
+        start_time = DateUtils.get_datetime_now_utc()
         source = self.get_source()
 
         for link_data in self.get_container_elements():
+            LinkDatabase.info("Generic plugin iter start:{}".format(link_data["link"]))
             if not link_data:
                 continue
 
@@ -74,27 +81,31 @@ class SourceGenericPlugin(HtmlPage):
                     link_data["source"] = source.url
                     link_data["source_obj"] = source
 
+                LinkDatabase.info("Generic plugin add:{}".format(link_data["link"]))
+
                 b = LinkDataBuilder()
                 b.link_data = link_data
                 b.source_is_auto = True
-
+                
                 entry = b.add_from_props()
+                
+                LinkDatabase.info("Generic plugin add:{} DONE".format(link_data["link"]))
 
-                if entry:
+                if entry and entry.date_published > start_time:
                     self.on_added_entry(entry)
                     num_entries += 1
+            LinkDatabase.info("Generic plugin iter stop:{}".format(link_data["link"]))
 
         return num_entries
 
     def is_page_ok_to_read(self):
         source = self.get_source()
-        self.hash = self.get_hash()
 
         if self.hash and source.get_page_hash() == self.hash:
-            LinkDatabase.info("Page has is the same, skipping".format(source.title))
+            LinkDatabase.info("Page not changed: {} {}".format(source.url, source.title))
             return False
         elif not self.hash:
-            LinkDatabase.info("Cannot obtain hash, skipping".format(source.title))
+            LinkDatabase.info("Cannot obtain hash, skipping {} {}".format(source.url, source.title))
             return False
 
         return True
@@ -102,40 +113,17 @@ class SourceGenericPlugin(HtmlPage):
     def is_fetch_possible(self):
         source = self.get_source()
 
-        LinkDatabase.info(
-            "Process source:{} type:{} time:{}".format(
-                source.title,
-                source.source_type,
-                source.get_date_fetched(),
-            )
-        )
-
         if not source.is_fetch_possible():
             LinkDatabase.info(
-                "Process source:{}: It is not the right time".format(source.title)
+                "Plugin source:{}: It is not the right time for update".format(source.title)
             )
             return False
 
         return True
 
-    def get_hash(self):
-        if self.hash:
-            return self.hash
-
-        return self.calculate_hash()
-
-    def calculate_hash(self):
-        """
-        This could be overriden by sub plugin.
-        Hash can be calculated only only by entire contents, but by part of it
-        """
-        text = self.get_contents()
-        if text:
-            try:
-                self.hash = hashlib.md5(text.encode("utf-8")).digest()
-                return self.hash
-            except Exception as E:
-                PersistentInfo.create("Could not calculate hash {}".format(E))
+    def calculate_plugin_hash(self):
+        self.get_contents()
+        return self.get_contents_hash()
 
     def set_operational_info(
         self, stop_time, num_entries, total_seconds, hash_value, valid=True
@@ -221,6 +209,7 @@ class SourceGenericPlugin(HtmlPage):
                 props["date_published"]
             )
             if is_archive:
+                # LinkDatabase.info("Link is for archive")
                 return False
 
             objs = LinkDataController.objects.filter(link=props["link"])
@@ -236,6 +225,7 @@ class SourceGenericPlugin(HtmlPage):
                     return False
 
                 if not self.is_link_valid(props["link"]):
+                    LinkDatabase.info("Link is not valid")
                     return False
 
                 if "date_published" not in props:

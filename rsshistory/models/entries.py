@@ -7,9 +7,10 @@ from django.utils import timezone
 import traceback
 
 from ..apps import LinkDatabase
+from ..webtools import HtmlPage
+
 from .sources import SourceDataModel
 from .admin import PersistentInfo
-from ..webtools import HtmlPage
 from .domains import Domains
 
 
@@ -172,7 +173,7 @@ class BaseLinkDataController(BaseLinkDataModel):
          - title and description could have been set manually, we do not want to change that
          - some other fields should be set only if present in props
         """
-        from ..pluginentries.entryurlinterface import EntryUrlInterface
+        from ..pluginurl.entryurlinterface import EntryUrlInterface
 
         url = EntryUrlInterface(self.link)
         props = url.get_props()
@@ -215,7 +216,7 @@ class BaseLinkDataController(BaseLinkDataModel):
          - status code and page rating is update always
          - new data are changed only if new data are present at all
         """
-        from ..pluginentries.entryurlinterface import EntryUrlInterface
+        from ..pluginurl.entryurlinterface import EntryUrlInterface
 
         url = EntryUrlInterface(self.link)
         props = url.get_props()
