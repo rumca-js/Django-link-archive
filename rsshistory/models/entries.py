@@ -26,6 +26,7 @@ class BaseLinkDataModel(models.Model):
     language = models.CharField(max_length=10, null=True, blank=True)
     age = models.IntegerField(blank=True, null=True)
 
+    date_created = models.DateTimeField(auto_now_add=True, null=True)
     date_published = models.DateTimeField(default=timezone.now)
     date_update_last = models.DateTimeField(auto_now=True, null=True)
     date_dead_since = models.DateTimeField(null=True)

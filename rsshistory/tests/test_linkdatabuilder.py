@@ -53,7 +53,8 @@ class LinkDataBuilderTest(FakeInternetTestCase):
         self.assertEqual(objs[0].link, link_name)
         self.assertEqual(objs[0].date_published, creation_date)
         
-        self.assertEqual(self.mock_page_requests, 1)
+        # this is obtained not through page requests
+        self.assertEqual(self.mock_page_requests, 0)
 
     def test_add_from_props_with_slash(self):
         config = Configuration.get_object().config_entry

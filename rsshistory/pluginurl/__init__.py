@@ -4,3 +4,7 @@ This module should include every special handling for URLs, from various service
 By default includes everything that extends behavior.
 We can add different site mechanisms, handlers, controllers.
 """
+
+from .handlervideoyoutube import YouTubeVideoHandler, YouTubeJsonHandler
+
+from .urlhandler import UrlHandler

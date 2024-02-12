@@ -40,7 +40,7 @@ class BaseRssPlugin(SourceGenericPlugin):
         fast_check = False
 
         if self.is_html(fast_check=fast_check):
-            h = HtmlPage(self.get_address(), page_obj = self)
+            h = HtmlPage(self.get_address(), page_object = self)
             rss_contents = h.get_body_text()
 
             self.reader = RssPage(self.get_address(), contents=rss_contents)
@@ -149,5 +149,5 @@ class BaseRssPlugin(SourceGenericPlugin):
         We do not care about RSS title changing. We care only about entries
         Generic handler uses Html as base. We need to use RSS for body hash
         """
-        p = RssPage(self.get_address(), page_obj = self)
+        p = RssPage(self.get_address(), page_object = self)
         return p.get_body_hash()

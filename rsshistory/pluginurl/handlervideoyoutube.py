@@ -1,26 +1,17 @@
 from urllib.parse import urlparse
 from urllib.parse import parse_qs
 
-from ..webtools import HtmlPage
+from ..webtools import HtmlPage, ContentInterface
 from ..apps import LinkDatabase
 
 from .defaulturlhandler import DefaultUrlHandler
 
 
 class YouTubeVideoHandler(DefaultUrlHandler):
-    def __init__(self, url=None):
-        super().__init__(url)
+    def __init__(self, url=None, contents=None, page_object=None, options=None):
+        super().__init__(url, contents=contents, page_object=page_object, options=options)
 
         self.url = YouTubeVideoHandler.input2url(url)
-
-        self.yt_text = None
-        self.yt_ob = None
-
-        self.rd_text = None
-        self.rd_ob = None
-
-        self.return_dislike = False
-        self.h = None
 
     def get_video_code(self):
         return YouTubeVideoHandler.input2code(self.url)
@@ -78,42 +69,20 @@ class YouTubeVideoHandler(DefaultUrlHandler):
     def get_link_music(self):
         return "https://music.youtube.com?v={0}".format(self.get_video_code())
 
-    def get_contents(self):
-        if self.dead:
-            return
 
-        if self.contents:
-            return self.contents
+class YouTubeHtmlHandler(HtmlPage, YouTubeVideoHandler):
 
-        LinkDatabase.info("YouTube video Handler. Requesting: {}".format(self.get_video_code()))
-
-        status = False
-        if self.download_details():
-            if self.load_details():
-                status = True
-                self.contents = self.yt_text
-                LinkDatabase.info("YouTube video handler: {} DONE".format(self.get_video_code()))
-
-                return True
-
-        if not status:
-            self.dead = True
+    def __init__(self, url):
+        self.url = url
 
     def is_valid(self):
-        self.get_contents()
-        return not self.is_live()
-
-    def is_valid_html(self):
         """
         Either use html or JSON.
         """
-        if not self.h:
-            self.h = HtmlPage(self.url)
-
-        if not self.h.is_youtube():
+        if not self.is_youtube():
             return False
 
-        if not self.h.is_valid():
+        if not super().is_valid():
             return False
 
         # TODO make this configurable in config
@@ -138,6 +107,65 @@ class YouTubeVideoHandler(DefaultUrlHandler):
             return False
 
         return True
+
+
+class YouTubeJsonHandler(YouTubeVideoHandler):
+    """
+    TODO Use if above in youtube.h
+    """
+    def __init__(self, url):
+        self.url = url
+
+        self.yt_text = None
+        self.yt_ob = None
+
+        self.rd_text = None
+        self.rd_ob = None
+
+        self.return_dislike = False
+
+        self.contents = None
+        self.dead = False
+        self.encoding = None
+
+    def get_contents(self):
+        if self.dead:
+            return
+
+        if self.contents:
+            return self.contents
+
+        LinkDatabase.info("YouTube video Handler. Requesting: {}".format(self.url))
+
+        status = False
+        if self.download_details():
+            if self.load_details():
+                status = True
+                self.contents = self.yt_text
+                LinkDatabase.info("YouTube video handler: {} DONE".format(self.url))
+
+                return self.contents
+
+        if not status:
+            self.dead = True
+
+    def get_datetime_published(self):
+        if self.get_contents():
+            from datetime import date
+            from datetime import datetime
+            from pytz import timezone
+
+            date_string = self.yt_ob.get_date_published()
+            date = datetime.strptime(date_string, "%Y%m%d")
+            dt = datetime.combine(date, datetime.min.time())
+            dt = dt.replace(tzinfo=timezone("UTC"))
+
+            return dt
+
+    def is_valid(self):
+        if self.get_contents():
+            status = not self.is_live()
+            return status
 
     def get_title(self):
         if self.get_contents():
@@ -203,7 +231,7 @@ class YouTubeVideoHandler(DefaultUrlHandler):
     def is_live(self):
         if self.get_contents():
             return self.yt_ob.is_live()
-        return True
+        return False
 
     def get_author(self):
         if self.get_contents():
@@ -301,3 +329,67 @@ class YouTubeVideoHandler(DefaultUrlHandler):
             return False
 
         return True
+
+    def get_thumbnail(self):
+        if self.get_contents():
+            return self.yt_ob.get_thumbnail()
+
+    def get_upload_date(self):
+        if self.get_contents():
+            return self.yt_ob.get_upload_date()
+
+    def is_rss(self, fast_check=True):
+        return False
+
+    def is_html(self, fast_check=True):
+        return False
+
+    def get_view_count(self):
+        if self.get_contents():
+            return self.rd_ob.get_view_count()
+
+    def get_thumbs_up(self):
+        if self.get_contents():
+            return self.rd_ob.get_thumbs_up()
+
+    def get_thumbs_down(self):
+        if self.get_contents():
+            return self.rd_ob.get_thumbs_down()
+
+    def get_channel_code(self):
+        if self.get_contents():
+            return self.yt_ob.get_channel_code()
+
+    def get_channel_feed_url(self):
+        if self.get_contents():
+            return self.yt_ob.get_channel_feed_url()
+
+    def get_channel_name(self):
+        if self.get_contents():
+            return self.yt_ob.get_channel_name()
+
+    def get_link_url(self):
+        if self.get_contents():
+            return self.yt_ob.get_link_url()
+
+    def is_live(self):
+        if self.get_contents():
+            return self.yt_ob.is_live()
+        return True
+
+    def get_author(self):
+        if self.get_contents():
+            return self.get_channel_name()
+
+    def get_album(self):
+        return None
+
+    def get_json_text(self):
+        if self.get_contents():
+            return self.yt_ob.get_json_data()
+
+    def get_tags(self):
+        if self.get_contents():
+            return self.yt_ob.get_tags()
+
+

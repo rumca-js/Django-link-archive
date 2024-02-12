@@ -5,7 +5,7 @@ from ..webtools import Url, PageOptions, DomainAwarePage
 from ..apps import LinkDatabase
 from ..models import PersistentInfo
 
-from .handlervideoyoutube import YouTubeVideoHandler
+from .handlervideoyoutube import YouTubeVideoHandler, YouTubeJsonHandler
 from .handlervideoodysee import OdyseeVideoHandler
 
 from .handlerchannelyoutube import YouTubeChannelHandler
@@ -22,7 +22,7 @@ class UrlHandler(object):
     The controller job is to provide usefull information about link.
     """
 
-    youtube_video_handler = YouTubeVideoHandler
+    youtube_video_handler = YouTubeJsonHandler
     youtube_channel_handler = YouTubeChannelHandler
     odysee_video_handler = OdyseeVideoHandler
     odysee_channel_handler = OdyseeChannelHandler

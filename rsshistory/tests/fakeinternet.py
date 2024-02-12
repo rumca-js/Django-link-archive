@@ -13,7 +13,7 @@ from ..webtools import BasePage
 from ..configuration import Configuration
 
 from ..pluginurl.urlhandler import UrlHandler
-from ..pluginurl.handlervideoyoutube import YouTubeVideoHandler
+from ..pluginurl.handlervideoyoutube import YouTubeVideoHandler, YouTubeJsonHandler
 from ..pluginurl.handlerchannelyoutube import YouTubeChannelHandler
 
 
@@ -96,14 +96,14 @@ class PageBuilder(object):
         return html
 
 
-class YouTubeVideoHandlerMock(YouTubeVideoHandler):
-    def __init__(self, url=None):
+class YouTubeJsonHandlerMock(YouTubeJsonHandler):
+    def __init__(self, url):
         super().__init__(url)
 
     def download_details_youtube(self):
         print("Mocked YouTube request URL: {}".format(self.url))
 
-        if self.url.find("v=1234") >= 0:
+        if self.get_video_code() == "1234":
             self.yt_text = """{"_filename" : "1234 test file name",
             "title" : "1234 test title",
             "description" : "1234 test description",
@@ -116,9 +116,9 @@ class YouTubeVideoHandlerMock(YouTubeVideoHandler):
             "live_status" : "False"
             }"""
             return True
-        if self.url.find("v=666") >= 0:
+        if self.get_video_code() == "666":
             return False
-        if self.url.find("v=555555") >= 0:
+        if self.get_video_code() == "555555":
             self.yt_text = """{"_filename" : "555555 live video.txt",
             "title" : "555555 live video",
             "description" : "555555 live video description",
@@ -382,7 +382,8 @@ class FakeInternetTestCase(TestCase):
     def disable_web_pages(self):
         BasePage.get_contents_function = self.get_contents_function
 
-        UrlHandler.youtube_video_handler = YouTubeVideoHandlerMock
+        #UrlHandler.youtube_video_handler = YouTubeVideoHandlerMock
+        UrlHandler.youtube_video_handler = YouTubeJsonHandlerMock
         # channel uses RSS page to obtain data. We do not need to mock it
         # UrlHandler.youtube_channel_handler = YouTubeChannelHandlerMock
         # UrlHandler.odysee_video_handler = YouTubeVideoHandlerMock

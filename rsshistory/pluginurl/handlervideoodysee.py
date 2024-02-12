@@ -2,8 +2,8 @@ from .defaulturlhandler import DefaultUrlHandler
 
 
 class OdyseeVideoHandler(DefaultUrlHandler):
-    def __init__(self, url=None):
-        super().__init__(url)
+    def __init__(self, url=None, contents=None, page_object=None, options=None):
+        super().__init__(url, contents=contents, page_object=page_object, options=options)
         self.url = OdyseeVideoHandler.input2url(url)
 
     def input2url(url):

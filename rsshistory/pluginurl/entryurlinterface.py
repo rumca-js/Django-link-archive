@@ -131,7 +131,7 @@ class EntryUrlInterface(object):
             input_props["thumbnail"] = p.get_thumbnail()
 
         # https://help.indiefy.net/hc/en-us/articles/360047860834-What-is-a-YouTube-topic-channel-and-how-does-it-work-
-        channel_name = p.get_channel_name()
+        channel_name = p.get_author()
         if channel_name:
             wh_channel = channel_name.find("- Topic")
             if wh_channel >= 0:

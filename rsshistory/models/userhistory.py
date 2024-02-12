@@ -32,14 +32,17 @@ class UserSearchHistory(models.Model):
             if UserSearchHistory.get_top_query(user) == search_query:
                 return
 
-            UserSearchHistory.delete_old_user_entries(
-                search_query=search_query, user=user
-            )
+            try:
+                UserSearchHistory.delete_old_user_entries(
+                    search_query=search_query, user=user
+                )
 
-            theobject = UserSearchHistory.objects.create(
-                search_query=search_query, user=user
-            )
-            UserSearchHistory.delete_old_entries()
+                theobject = UserSearchHistory.objects.create(
+                    search_query=search_query, user=user
+                )
+                UserSearchHistory.delete_old_entries()
+            except Exception as E:
+                LinkDatabase.info(str(E))
 
             return theobject
 

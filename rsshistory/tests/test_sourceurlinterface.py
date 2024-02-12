@@ -9,6 +9,8 @@ class SourceUrlInterfaceTest(FakeInternetTestCase):
         self.disable_web_pages()
 
     def test_rss(self):
+        self.mock_page_requests = 0
+
         url = SourceUrlInterface("https://www.codeproject.com/WebServices/NewsRSS.aspx")
         props = url.get_props()
 
@@ -17,7 +19,11 @@ class SourceUrlInterfaceTest(FakeInternetTestCase):
         self.assertTrue("title" in props)
         self.assertEqual(props["source_type"], SourceDataModel.SOURCE_TYPE_RSS)
 
+        self.assertEqual(self.mock_page_requests, 1)
+
     def test_youtube_channel(self):
+        self.mock_page_requests = 0
+
         url = SourceUrlInterface(
             "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM"
         )
@@ -27,6 +33,8 @@ class SourceUrlInterfaceTest(FakeInternetTestCase):
         self.assertTrue("url" in props)
         self.assertTrue("title" in props)
         self.assertEqual(props["source_type"], SourceDataModel.SOURCE_TYPE_YOUTUBE)
+
+        self.assertEqual(self.mock_page_requests, 1)
 
     def test_youtube_video(self):
         url = SourceUrlInterface("https://www.youtube.com/watch?v=123")
@@ -38,6 +46,8 @@ class SourceUrlInterfaceTest(FakeInternetTestCase):
         self.assertEqual(props["source_type"], SourceDataModel.SOURCE_TYPE_YOUTUBE)
 
     def test_html(self):
+        self.mock_page_requests = 0
+
         url = SourceUrlInterface("https://linkedin.com")
         props = url.get_props()
 
@@ -47,6 +57,8 @@ class SourceUrlInterfaceTest(FakeInternetTestCase):
 
         self.assertEqual(props["title"], "LinkedIn Page title")
         self.assertEqual(props["source_type"], SourceDataModel.SOURCE_TYPE_PARSE)
+
+        self.assertEqual(self.mock_page_requests, 1)
 
     def test_json_source(self):
         url = SourceUrlInterface("https://instance.com/apps/rsshistory/source-json/100")

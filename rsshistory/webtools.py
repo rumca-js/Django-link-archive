@@ -120,27 +120,31 @@ class BasePage(object):
     get_contents_function = None
     ssl_verify = True
 
-    def __init__(self, url, contents=None, options=None, page_obj=None):
+    def __init__(self, url, contents=None, options=None, page_object=None):
         """
         @param url URL
         @param contents URL page contents
         @param use_selenium decides if selenium is used
-        @param page_obj All settings are used from page object, with page contents
+        @param page_object All settings are used from page object, with page contents
         """
         self.encoding = None
-        if page_obj:
-            self.url = page_obj.url
-            self.contents = page_obj.contents
-            self.options = page_obj.options
-            self.status_code = page_obj.status_code
-            self.dead = page_obj.dead
-            self.response_headers = page_obj.response_headers
-            self.robots_contents = page_obj.robots_contents
+        if page_object:
+            self.url = page_object.url
+            if page_object.contents:
+                self.contents = page_object.contents
+            else:
+                self.contents = contents
+            self.options = page_object.options
+            self.status_code = page_object.status_code
+            self.dead = page_object.dead
+            self.response_headers = page_object.response_headers
+            self.robots_contents = page_object.robots_contents
         else:
             self.url = url
             self.options = options
             self.response_headers = {}
             self.robots_contents = None
+            self.contents = contents
 
             # Flag to not retry same contents requests for things we already know are dead
             self.dead = False
@@ -152,7 +156,6 @@ class BasePage(object):
         else:
             self.protocol = "https"
 
-        self.contents = contents
         if self.contents:
             self.process_contents()
             self.status_code = 200
@@ -249,11 +252,14 @@ class BasePage(object):
         if self.contents:
             return self.contents
 
+        if self.dead:
+            return None
+
         contents = self.get_contents_implementation()
+        self.contents = contents
 
         self.process_contents()
 
-        self.contents = contents
         return contents
 
     def get_contents_implementation(self):
@@ -367,8 +373,8 @@ class BasePage(object):
         options = webdriver.ChromeOptions()
         options.add_argument("--headless")
 
-        if not BasePage.ssl_verify:
-            options.add_argument('ignore-certificate-errors')
+        #if not BasePage.ssl_verify:
+        #    options.add_argument('ignore-certificate-errors')
 
         driver = webdriver.Chrome(service=service, options=options)
 
@@ -408,8 +414,8 @@ class BasePage(object):
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
 
-        if not BasePage.ssl_verify:
-            options.add_argument('ignore-certificate-errors')
+        #if not BasePage.ssl_verify:
+        #    options.add_argument('ignore-certificate-errors')
 
         driver = webdriver.Chrome(service=service, options=options)
 
@@ -577,8 +583,8 @@ class BasePage(object):
 
 
 class DomainAwarePage(BasePage):
-    def __init__(self, url, contents=None, options=None, page_obj=None):
-        super().__init__(url, contents=contents, options=options, page_obj=page_obj)
+    def __init__(self, url, contents=None, options=None, page_object=None):
+        super().__init__(url, contents=contents, options=options, page_object=page_object)
 
     def is_mainstream(self):
         dom = self.get_domain_only()
@@ -743,6 +749,7 @@ class DomainAwarePage(BasePage):
 
         # if not found, we return none
 
+    @lazy_load_content
     def get_type_by_checking_contents(self):
         if self.is_contents_rss():
             return URL_TYPE_RSS
@@ -824,8 +831,8 @@ class DomainAwarePage(BasePage):
 
 
 class ContentInterface(DomainAwarePage):
-    def __init__(self, url, contents=None, options=None, page_obj=None):
-        super().__init__(url, contents=contents, options=options, page_obj=page_obj)
+    def __init__(self, url, contents=None, options=None, page_object=None):
+        super().__init__(url, contents=contents, options=options, page_object=page_object)
 
     def get_title(self):
         raise NotImplementedError
@@ -1059,18 +1066,16 @@ class ContentInterface(DomainAwarePage):
 
 
 class DefaultContentPage(ContentInterface):
-    def __init__(self, url, contents=None, options=None, page_obj=None):
-        super().__init__(url, contents=contents, options=options, page_obj=page_obj)
+    def __init__(self, url, contents=None, options=None, page_object=None):
+        super().__init__(url, contents=contents, options=options, page_object=page_object)
 
     def get_title(self):
-        return self.url
+        return None
 
     def get_description(self):
         return None
 
     def get_language(self):
-        if self.encoding:
-            return self.encoding
         return None
 
     def get_thumbnail(self):
@@ -1117,8 +1122,8 @@ class DefaultContentPage(ContentInterface):
 
 
 class JsonPage(ContentInterface):
-    def __init__(self, url, contents=None, options=None, page_obj=None):
-        super().__init__(url, contents=contents, options=options, page_obj=page_obj)
+    def __init__(self, url, contents=None, options=None, page_object=None):
+        super().__init__(url, contents=contents, options=options, page_object=page_object)
 
         self.json_obj = None
         try:
@@ -1174,13 +1179,14 @@ class RssPage(ContentInterface):
     which allows to define timeouts.
     """
 
-    def __init__(self, url, contents=None, options=None, page_obj=None):
-        if type(page_obj) is RssPage:
-            self.feed = page_obj.feed
+    def __init__(self, url, contents=None, options=None, page_object=None):
+        if type(page_object) is RssPage:
+            self.feed = page_object.feed
         else:
             self.feed = None
 
-        super().__init__(url, contents=contents, options=options, page_obj=page_obj)
+        super().__init__(url, contents=contents, options=options, page_object=page_object)
+
         self.allow_adding_with_current_time = True
         self.default_entry_timestamp = None
 
@@ -1213,14 +1219,14 @@ class RssPage(ContentInterface):
                 )
             )
 
+    @lazy_load_content
     def get_container_elements(self):
-        try:
-            if self.feed is None:
-                self.feed = self.parse()
+        if self.feed is None:
+            return
 
-            if self.feed:
-                for item in self.get_container_elements_maps():
-                    yield item
+        try:
+            for item in self.get_container_elements_maps():
+                yield item
 
         except Exception as e:
             error_text = traceback.format_exc()
@@ -1330,16 +1336,18 @@ class RssPage(ContentInterface):
         else:
             return DateUtils.get_datetime_now_utc()
 
+    @lazy_load_content
     def get_title(self):
         if self.feed is None:
-            self.parse()
+            return
 
         if "title" in self.feed.feed:
             return self.feed.feed.title
 
+    @lazy_load_content
     def get_description(self):
         if self.feed is None:
-            self.parse()
+            return
 
         if "subtitle" in self.feed.feed:
             return self.feed.feed.subtitle
@@ -1347,19 +1355,18 @@ class RssPage(ContentInterface):
         if "description" in self.feed.feed:
             return self.feed.feed.description
 
+    @lazy_load_content
     def get_language(self):
         if self.feed is None:
-            self.parse()
+            return
 
         if "language" in self.feed.feed:
             return self.feed.feed.language
 
-        if self.encoding:
-            return self.encoding
-
+    @lazy_load_content
     def get_thumbnail(self):
         if self.feed is None:
-            self.parse()
+            return
 
         image = None
         if "image" in self.feed.feed:
@@ -1383,39 +1390,51 @@ class RssPage(ContentInterface):
                     )
                 )
 
-        if not image:
-            if self.url.find("https://www.youtube.com/feeds/videos.xml") >= 0:
-                image = self.get_thumbnail_manual_from_youtube()
+        #TODO that does not work
+        #if not image:
+        #    if self.url.find("https://www.youtube.com/feeds/videos.xml") >= 0:
+        #        image = self.get_thumbnail_manual_from_youtube()
 
         if image and image.find("https://") == -1:
             image = BasePage.get_url_full(self.url, image)
 
         return image
 
+    @lazy_load_content
     def get_thumbnail_manual_from_youtube(self):
         if "link" in self.feed.feed:
             link = self.feed.feed.link
             p = HtmlPage(link)
             return p.get_thumbnail()
 
+    @lazy_load_content
     def get_author(self):
         if self.feed is None:
-            self.parse()
+            return
 
         if "author" in self.feed.feed:
             return self.feed.feed.author
 
+    @lazy_load_content
     def get_album(self):
+        if self.feed is None:
+            return
+
         return None
 
+    @lazy_load_content
     def get_date_published(self):
         if self.feed is None:
-            self.parse()
+            return
 
         if "published" in self.feed.feed:
             return self.feed.feed.published
 
+    @lazy_load_content
     def get_page_rating(self):
+        if self.feed is None:
+            return 0
+
         rating = 0
 
         if self.get_title():
@@ -1436,9 +1455,14 @@ class RssPage(ContentInterface):
     def get_max_page_rating(self):
         return 5 + 5 + 1 + 1 + 1
 
+    @lazy_load_content
     def get_tags(self):
+        if self.feed is None:
+            return
+
         return None
 
+    @lazy_load_content
     def get_properties(self):
         props = super().get_properties()
         props["contents"] = self.get_contents()
@@ -1460,8 +1484,8 @@ class ContentLinkParser(DomainAwarePage):
     TODO filter also html from non html
     """
 
-    def __init__(self, url, contents=None, options=None, page_obj=None):
-        super().__init__(url, contents=contents, options=options, page_obj=page_obj)
+    def __init__(self, url, contents=None, options=None, page_object=None):
+        super().__init__(url, contents=contents, options=options, page_object=page_object)
         self.url = self.get_clean_url()
 
     def get_contents(self):
@@ -1597,13 +1621,13 @@ class HtmlPage(ContentInterface):
     href="https://images/facebook.png"
     """
 
-    def __init__(self, url, contents=None, options=None, page_obj=None):
-        if type(page_obj) is HtmlPage:
-            self.soup = page_obj.soup
+    def __init__(self, url, contents=None, options=None, page_object=None):
+        if type(page_object) is HtmlPage:
+            self.soup = page_object.soup
         else:
             self.soup = None
 
-        super().__init__(url, contents=contents, options=options, page_obj=page_obj)
+        super().__init__(url, contents=contents, options=options, page_object=page_object)
 
     def process_contents(self):
         if self.contents and not self.soup:
@@ -2137,14 +2161,14 @@ class Url(object):
             return p
 
         if p.is_rss(fast_check):
-            return RssPage(url, page_obj=p)
+            return RssPage(url, page_object=p, options=options)
 
         if fast_check == False:
-            j = JsonPage(url, page_obj=p)
+            j = JsonPage(url, page_object=p, options=options)
             if j.is_json():
                 return j
 
-        return DefaultContentPage(url, page_obj=p)
+        return DefaultContentPage(url, page_object=p, options=options)
 
     def get_favicon(url):
         page = Url.get(url)

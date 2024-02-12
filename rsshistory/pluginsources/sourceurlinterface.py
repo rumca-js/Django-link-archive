@@ -34,7 +34,7 @@ class SourceUrlInterface(object):
 
         if p.is_rss(fast_check=fast_check):
             return self.get_props_from_rss(self.url, p)
-        elif p.is_youtube():
+        elif type(p) is UrlHandler.youtube_video_handler:
             # Someone might be surprised that added URL is being replaced
 
             handler = UrlHandler.get(self.url)
@@ -57,6 +57,7 @@ class SourceUrlInterface(object):
             data["source_type"] = SourceDataModel.SOURCE_TYPE_YOUTUBE
         else:
             data["source_type"] = SourceDataModel.SOURCE_TYPE_RSS
+
         title = p.get_title()
         if title:
             data["title"] = title
