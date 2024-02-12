@@ -48,7 +48,9 @@ class SourceGenericPlugin(HtmlPage):
         total_time.total_seconds()
 
         if self.hash:
-            LinkDatabase.info("Plugin: hash valid {} {}".format(self.get_source().url, self.hash))
+            LinkDatabase.info(
+                "Plugin: hash valid {} {}".format(self.get_source().url, self.hash)
+            )
             self.set_operational_info(
                 stop_time, num_entries, total_time.total_seconds(), self.hash
             )
@@ -57,7 +59,11 @@ class SourceGenericPlugin(HtmlPage):
         if self.dead:
             LinkDatabase.info("Plugin: hash not valid {}".format(self.get_source().url))
             self.set_operational_info(
-                stop_time, num_entries, total_time.total_seconds(), self.hash, valid=False
+                stop_time,
+                num_entries,
+                total_time.total_seconds(),
+                self.hash,
+                valid=False,
             )
             return False
 
@@ -86,10 +92,12 @@ class SourceGenericPlugin(HtmlPage):
                 b = LinkDataBuilder()
                 b.link_data = link_data
                 b.source_is_auto = True
-                
+
                 entry = b.add_from_props()
-                
-                LinkDatabase.info("Generic plugin add:{} DONE".format(link_data["link"]))
+
+                LinkDatabase.info(
+                    "Generic plugin add:{} DONE".format(link_data["link"])
+                )
 
                 if entry and entry.date_published > start_time:
                     self.on_added_entry(entry)
@@ -102,10 +110,14 @@ class SourceGenericPlugin(HtmlPage):
         source = self.get_source()
 
         if self.hash and source.get_page_hash() == self.hash:
-            LinkDatabase.info("Page not changed: {} {}".format(source.url, source.title))
+            LinkDatabase.info(
+                "Page not changed: {} {}".format(source.url, source.title)
+            )
             return False
         elif not self.hash:
-            LinkDatabase.info("Cannot obtain hash, skipping {} {}".format(source.url, source.title))
+            LinkDatabase.info(
+                "Cannot obtain hash, skipping {} {}".format(source.url, source.title)
+            )
             return False
 
         return True
@@ -115,7 +127,9 @@ class SourceGenericPlugin(HtmlPage):
 
         if not source.is_fetch_possible():
             LinkDatabase.info(
-                "Plugin source:{}: It is not the right time for update".format(source.title)
+                "Plugin source:{}: It is not the right time for update".format(
+                    source.title
+                )
             )
             return False
 

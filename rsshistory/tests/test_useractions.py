@@ -60,7 +60,7 @@ class LinkTagsDataModelTest(TestCase):
 
         data = {}
         data["author"] = "testuser"
-        data["tags"] = ["tag1","tag2"]
+        data["tags"] = ["tag1", "tag2"]
         data["entry"] = self.entry
 
         # call tested function
@@ -88,4 +88,3 @@ class LinkTagsDataModelTest(TestCase):
         self.assertEqual(tags[0].link_obj, self.entry)
         self.assertEqual(tags[1].tag, "tag3")
         self.assertEqual(tags[1].link_obj, self.entry)
-

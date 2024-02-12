@@ -159,9 +159,9 @@ def add_source_simple(request):
 
     def get_add_link_form(p, url):
         if not Url.is_web_link(url):
-            p.context[
-                "summary_text"
-            ] = "Only http links are allowed. Link:{}".format(url)
+            p.context["summary_text"] = "Only http links are allowed. Link:{}".format(
+                url
+            )
             return p.render("summary_present.html")
 
         ob = SourceDataController.objects.filter(url=url)

@@ -6,6 +6,7 @@ import io
 https://www.tdpain.net/blog/a-year-of-reading
 """
 
+
 class ReadingList(object):
     def __init__(self, contents=None):
         self.contents = contents

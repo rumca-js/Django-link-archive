@@ -77,13 +77,13 @@ class SeleniumResponseObject(object):
 
         # I read selenium always assume utf8 encoding
 
-        #encoding = chardet.detect(contents)['encoding']
-        #self.apparent_encoding = encoding
-        #self.encoding = encoding
+        # encoding = chardet.detect(contents)['encoding']
+        # self.apparent_encoding = encoding
+        # self.encoding = encoding
 
         self.apparent_encoding = None
         self.encoding = None
-        
+
         self.apparent_encoding = "utf-8"
         self.encoding = "utf-8"
 
@@ -333,7 +333,6 @@ class BasePage(object):
             )
 
     def get_contents_internal(self, url, headers, timeout):
-
         if self.options.is_not_selenium():
             return self.get_contents_via_requests(self.url, headers=headers, timeout=10)
         elif self.options.use_selenium_full:
@@ -373,7 +372,7 @@ class BasePage(object):
         options = webdriver.ChromeOptions()
         options.add_argument("--headless")
 
-        #if not BasePage.ssl_verify:
+        # if not BasePage.ssl_verify:
         #    options.add_argument('ignore-certificate-errors')
 
         driver = webdriver.Chrome(service=service, options=options)
@@ -414,7 +413,7 @@ class BasePage(object):
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
 
-        #if not BasePage.ssl_verify:
+        # if not BasePage.ssl_verify:
         #    options.add_argument('ignore-certificate-errors')
 
         driver = webdriver.Chrome(service=service, options=options)
@@ -584,7 +583,9 @@ class BasePage(object):
 
 class DomainAwarePage(BasePage):
     def __init__(self, url, contents=None, options=None, page_object=None):
-        super().__init__(url, contents=contents, options=options, page_object=page_object)
+        super().__init__(
+            url, contents=contents, options=options, page_object=page_object
+        )
 
     def is_mainstream(self):
         dom = self.get_domain_only()
@@ -832,7 +833,9 @@ class DomainAwarePage(BasePage):
 
 class ContentInterface(DomainAwarePage):
     def __init__(self, url, contents=None, options=None, page_object=None):
-        super().__init__(url, contents=contents, options=options, page_object=page_object)
+        super().__init__(
+            url, contents=contents, options=options, page_object=page_object
+        )
 
     def get_title(self):
         raise NotImplementedError
@@ -1067,7 +1070,9 @@ class ContentInterface(DomainAwarePage):
 
 class DefaultContentPage(ContentInterface):
     def __init__(self, url, contents=None, options=None, page_object=None):
-        super().__init__(url, contents=contents, options=options, page_object=page_object)
+        super().__init__(
+            url, contents=contents, options=options, page_object=page_object
+        )
 
     def get_title(self):
         return None
@@ -1123,7 +1128,9 @@ class DefaultContentPage(ContentInterface):
 
 class JsonPage(ContentInterface):
     def __init__(self, url, contents=None, options=None, page_object=None):
-        super().__init__(url, contents=contents, options=options, page_object=page_object)
+        super().__init__(
+            url, contents=contents, options=options, page_object=page_object
+        )
 
         self.json_obj = None
         try:
@@ -1185,7 +1192,9 @@ class RssPage(ContentInterface):
         else:
             self.feed = None
 
-        super().__init__(url, contents=contents, options=options, page_object=page_object)
+        super().__init__(
+            url, contents=contents, options=options, page_object=page_object
+        )
 
         self.allow_adding_with_current_time = True
         self.default_entry_timestamp = None
@@ -1390,8 +1399,8 @@ class RssPage(ContentInterface):
                     )
                 )
 
-        #TODO that does not work
-        #if not image:
+        # TODO that does not work
+        # if not image:
         #    if self.url.find("https://www.youtube.com/feeds/videos.xml") >= 0:
         #        image = self.get_thumbnail_manual_from_youtube()
 
@@ -1485,7 +1494,9 @@ class ContentLinkParser(DomainAwarePage):
     """
 
     def __init__(self, url, contents=None, options=None, page_object=None):
-        super().__init__(url, contents=contents, options=options, page_object=page_object)
+        super().__init__(
+            url, contents=contents, options=options, page_object=page_object
+        )
         self.url = self.get_clean_url()
 
     def get_contents(self):
@@ -1627,7 +1638,9 @@ class HtmlPage(ContentInterface):
         else:
             self.soup = None
 
-        super().__init__(url, contents=contents, options=options, page_object=page_object)
+        super().__init__(
+            url, contents=contents, options=options, page_object=page_object
+        )
 
     def process_contents(self):
         if self.contents and not self.soup:

@@ -20,12 +20,14 @@ class MarginaliaCrawlerOutputTest(FakeInternetTestCase):
         self.assertEqual(len(links), 3)
         self.assertEqual(links[0], "www.serious-coin.com")
 
+
 default_reading_list_data = """url,title,description,image,date,hnurl
 https://www.thedrive.com/news/41493/teslas-16000-quote-for-a-700-fix-is-why-right-to-repair-matters,"Tesla’s $16,000 Quote for a $700 Fix Is Why Right to Repair Matters",This is what people are fighting for.,,2021-07-13T22:14:18.423350404Z,https://news.ycombinator.com/item?id=27814621
 https://hakibenita.com/django-nested-transaction,One Database Transaction Too Many | Haki Benita,How I told hundreds of users they got paid when they didn't!,,2021-07-13T22:24:56.413065045Z,https://news.ycombinator.com/item?id=27804716
 https://news.ycombinator.com/item?id=27814080,This Website is hosted on an Casio fx-9750GII Calculator | Hacker News,,,2021-07-13T22:25:42.431079257Z,
 https://www.theverge.com/2021/7/12/22573850/elon-musk-richard-branson-spaceplane-virgin-galactic,Elon Musk has a ticket to ride on Richard Branson’s spaceplane - The Verge,Billionaire Musk will someday fly billionaire Branson’s plane.,,2021-07-13T22:33:11.442269385Z,
 """
+
 
 class ReadingListTest(FakeInternetTestCase):
     def setUp(self):
@@ -36,4 +38,7 @@ class ReadingListTest(FakeInternetTestCase):
         links = p.get_links()
 
         self.assertEqual(len(links), 4)
-        self.assertEqual(links[0], "https://www.thedrive.com/news/41493/teslas-16000-quote-for-a-700-fix-is-why-right-to-repair-matters")
+        self.assertEqual(
+            links[0],
+            "https://www.thedrive.com/news/41493/teslas-16000-quote-for-a-700-fix-is-why-right-to-repair-matters",
+        )

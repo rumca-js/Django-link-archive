@@ -25,7 +25,7 @@ class BaseRssPluginTest(FakeInternetTestCase):
         config.auto_store_entries_use_all_data = False
         config.auto_store_entries_use_clean_page_info = False
         config.save()
-        
+
         self.mock_page_requests = 0
 
         self.assertTrue(self.source_rss)
@@ -39,7 +39,7 @@ class BaseRssPluginTest(FakeInternetTestCase):
             props[0]["source"],
             "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM",
         )
-        
+
         # 1 rss parent, we do not make additional requests
         self.assertEqual(self.mock_page_requests, 1)
 

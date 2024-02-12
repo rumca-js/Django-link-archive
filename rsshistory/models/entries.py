@@ -241,7 +241,7 @@ class BaseLinkDataController(BaseLinkDataModel):
         if "language" in props and props["language"] is not None:
             self.language = props["language"]
 
-        #if "date_published" in props and props["date_published"] is not None:
+        # if "date_published" in props and props["date_published"] is not None:
         #    self.date_published = props["date_published"]
 
         self.save()

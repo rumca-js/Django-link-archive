@@ -206,6 +206,7 @@ webpage_linkedin_contents2 = """
 </html>
 """
 
+
 class NowNowNowPluginTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()

@@ -2,8 +2,10 @@ from .defaulturlhandler import DefaultUrlHandler
 
 
 class OdyseeChannelHandler(DefaultUrlHandler):
-    def __init__(self, url=None, contents=None, page_object = None, options=None):
-        super().__init__(url, contents=contents, page_object=page_object, options=options)
+    def __init__(self, url=None, contents=None, page_object=None, options=None):
+        super().__init__(
+            url, contents=contents, page_object=page_object, options=options
+        )
 
         if url:
             self.code = self.input2code(url)

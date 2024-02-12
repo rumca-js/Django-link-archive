@@ -413,7 +413,9 @@ class EntriesOmniListView(EntriesSearchListView):
         user_choices = UserSearchHistory.get_user_choices(user)
 
         if config.days_to_move_to_archive == 0:
-            f = OmniSearchForm(self.request.GET, user_choices=user_choices, request=self.request)
+            f = OmniSearchForm(
+                self.request.GET, user_choices=user_choices, request=self.request
+            )
             return f
         else:
             return OmniSearchWithArchiveForm(
@@ -447,7 +449,6 @@ class EntryDetailView(generic.DetailView):
         return self.setup_context(context)
 
     def setup_context(self, context):
-
         object_controller = EntryPreviewBuilder.get(self.object, self.request.user)
 
         context["page_title"] = self.object.title
@@ -826,7 +827,9 @@ def entries_omni_search_init(request):
     user = request.user.username
     user_choices = UserSearchHistory.get_user_choices(user)
 
-    filter_form = OmniSearchForm(request.GET, user_choices=user_choices, request = request)
+    filter_form = OmniSearchForm(
+        request.GET, user_choices=user_choices, request=request
+    )
     filter_form.method = "GET"
     filter_form.action_url = reverse("{}:entries-omni-search".format(LinkDatabase.name))
 
@@ -965,7 +968,6 @@ def entry_json(request, pk):
         return p.render("summary_present.html")
 
     link = links[0]
-
 
     exporter = InstanceExporter()
     json_obj = exporter.export_link(link)

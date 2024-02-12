@@ -100,7 +100,7 @@ class BaseParsePlugin(SourceGenericPlugin):
         print("Calculating plugin hash")
         if self.is_html(False):
             print("Calculating plugin hash is html")
-            p = HtmlPage(self.get_address(), page_object = self)
+            p = HtmlPage(self.get_address(), page_object=self)
             return p.get_body_hash()
         else:
             return self.get_contents_hash()

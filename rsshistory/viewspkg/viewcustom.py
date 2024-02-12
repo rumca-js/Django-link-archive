@@ -30,7 +30,6 @@ from ..webtools import HtmlPage, ContentLinkParser
 from ..pluginurl.urlhandler import UrlHandler
 
 
-
 def page_show_properties(request):
     p = ViewPage(request)
     p.set_title("Show page properties")
@@ -89,7 +88,6 @@ def page_show_properties(request):
 
 
 def page_scan_input(request):
-
     def render_page_scan_input(p, link):
         parser = UrlHandler.get(link)
 
@@ -116,9 +114,7 @@ def page_scan_input(request):
         form.action_url = reverse("{}:page-scan".format(LinkDatabase.name))
         p.context["form"] = form
 
-        p.context["summary_text"] = "Render links for {}".format(
-            link
-        )
+        p.context["summary_text"] = "Render links for {}".format(link)
         return p.render("form_basic.html")
 
     p = ViewPage(request)
@@ -216,7 +212,7 @@ def page_scan_contents(request):
                 parser = ReadingList(contents)
                 links = parser.get_links()
             # parser should work as good as MarginaliaCrawlerOutput
-            #elif is_marginalia_search(contents):
+            # elif is_marginalia_search(contents):
             #    parser = MarginaliaCrawlerOutput(contents)
             #    links = parser.get_links()
             else:

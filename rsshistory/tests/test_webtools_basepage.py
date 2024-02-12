@@ -67,12 +67,12 @@ webpage_links = """<html>
 </html>
 """
 
+
 class PageOptionsTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 
     def test_use_selenium_full(self):
-
         o = PageOptions()
         o.use_selenium_full = True
 
@@ -80,7 +80,6 @@ class PageOptionsTest(FakeInternetTestCase):
         self.assertTrue(o.is_selenium())
 
     def test_use_selenium_headless(self):
-
         o = PageOptions()
         o.use_selenium_headless = True
 
@@ -248,11 +247,16 @@ class BasePageTest(FakeInternetTestCase):
 
     def test_calculate_hash(self):
         p = BasePage("http://mytestpage.com/test/", webpage_links)
-        self.assertEqual(p.calculate_hash(webpage_links), hashlib.md5(webpage_links.encode("utf-8")).digest())
+        self.assertEqual(
+            p.calculate_hash(webpage_links),
+            hashlib.md5(webpage_links.encode("utf-8")).digest(),
+        )
 
     def test_get_content_hash(self):
         p = BasePage("http://mytestpage.com/test/", webpage_links)
-        self.assertEqual(p.get_contents_hash(), hashlib.md5(webpage_links.encode("utf-8")).digest())
+        self.assertEqual(
+            p.get_contents_hash(), hashlib.md5(webpage_links.encode("utf-8")).digest()
+        )
 
 
 class InputContentTest(FakeInternetTestCase):

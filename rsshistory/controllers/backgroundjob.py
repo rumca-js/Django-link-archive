@@ -120,7 +120,7 @@ class BackgroundJobController(BackgroundJob):
 
     def link_add(url, source=None, tag=""):
         if not url.startswith("http"):
-            url = "https://"+url
+            url = "https://" + url
 
         h = HtmlPage(url)
         if h.is_analytics():
@@ -140,9 +140,7 @@ class BackgroundJobController(BackgroundJob):
 
         if cfg != {}:
             return BackgroundJobController.create_single_job(
-                BackgroundJob.JOB_LINK_ADD,
-                url,
-                json.dumps(cfg)
+                BackgroundJob.JOB_LINK_ADD, url, json.dumps(cfg)
             )
         else:
             return BackgroundJobController.create_single_job(
@@ -259,7 +257,9 @@ class BackgroundJobController(BackgroundJob):
         Do not update, if it was updated recently
         """
         if not force:
-            if entry.date_update_last > DateUtils.get_datetime_now_utc() - timedelta(days=1):
+            if entry.date_update_last > DateUtils.get_datetime_now_utc() - timedelta(
+                days=1
+            ):
                 return
 
         return BackgroundJobController.create_single_job(
@@ -271,7 +271,9 @@ class BackgroundJobController(BackgroundJob):
         Do not update, if it was updated recently
         """
         if not force:
-            if entry.date_update_last > DateUtils.get_datetime_now_utc() - timedelta(days=1):
+            if entry.date_update_last > DateUtils.get_datetime_now_utc() - timedelta(
+                days=1
+            ):
                 return
 
         return BackgroundJobController.create_single_job(

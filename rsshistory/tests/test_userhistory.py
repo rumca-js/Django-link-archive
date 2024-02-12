@@ -232,9 +232,24 @@ class UserEntryVisitHistoryTest(FakeInternetTestCase):
         date_2 = DateUtils.get_datetime_now_utc() - timedelta(minutes=2)
         date_3 = DateUtils.get_datetime_now_utc() - timedelta(seconds=2)
 
-        UserEntryVisitHistory.objects.create(user="test_username", visits = 2, date_last_visit = date_1, entry_object = self.youtube_object)
-        UserEntryVisitHistory.objects.create(user="test_username", visits = 2, date_last_visit = date_2, entry_object = self.tiktok_object)
-        UserEntryVisitHistory.objects.create(user="test_username", visits = 2, date_last_visit = date_3, entry_object = self.odysee_object)
+        UserEntryVisitHistory.objects.create(
+            user="test_username",
+            visits=2,
+            date_last_visit=date_1,
+            entry_object=self.youtube_object,
+        )
+        UserEntryVisitHistory.objects.create(
+            user="test_username",
+            visits=2,
+            date_last_visit=date_2,
+            entry_object=self.tiktok_object,
+        )
+        UserEntryVisitHistory.objects.create(
+            user="test_username",
+            visits=2,
+            date_last_visit=date_3,
+            entry_object=self.odysee_object,
+        )
 
         # call tested function
         entry = UserEntryVisitHistory.get_last_user_entry("test_username")
@@ -243,7 +258,12 @@ class UserEntryVisitHistoryTest(FakeInternetTestCase):
         self.assertEqual(entry, self.tiktok_object)
 
     def test_entry_get_last_user_entry_not_found(self):
-        UserEntryVisitHistory.objects.create(user="test_username", visits = 2, date_last_visit = DateUtils.get_datetime_now_utc() - timedelta(hours=2), entry_object = self.youtube_object)
+        UserEntryVisitHistory.objects.create(
+            user="test_username",
+            visits=2,
+            date_last_visit=DateUtils.get_datetime_now_utc() - timedelta(hours=2),
+            entry_object=self.youtube_object,
+        )
 
         # call tested function
         entry = UserEntryVisitHistory.get_last_user_entry("test_username")

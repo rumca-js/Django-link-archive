@@ -7,8 +7,11 @@ class DefaultUrlHandler(DefaultContentPage):
     Default URL handler.
     Behavior can be changed by setting .h handler property
     """
+
     def __init__(self, url=None, contents=None, page_object=None, options=None):
-        super().__init__(url, contents=contents, page_object=page_object, options=options)
+        super().__init__(
+            url, contents=contents, page_object=page_object, options=options
+        )
         self.h = None
 
     def input2code(input_string):

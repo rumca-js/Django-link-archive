@@ -168,11 +168,10 @@ class TestRequestObjectMock(object):
         self.content = contents
         self.headers = {}
 
-        #encoding = chardet.detect(contents)['encoding']
+        # encoding = chardet.detect(contents)['encoding']
         encoding = "utf-8"
         self.apparent_encoding = encoding
         self.encoding = encoding
-
 
     def get_contents(self, url):
         if url.startswith("https://youtube.com/channel/"):
@@ -368,21 +367,20 @@ class TestRequestObjectMock(object):
 
 
 class FakeInternetTestCase(TestCase):
-    
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.mock_page_requests = 0
-    
+
     def get_contents_function(self, url, headers, timeout):
         print("Mocked Requesting page: {}".format(url))
         self.mock_page_requests += 1
-        
+
         return TestRequestObjectMock(url, headers, timeout)
 
     def disable_web_pages(self):
         BasePage.get_contents_function = self.get_contents_function
 
-        #UrlHandler.youtube_video_handler = YouTubeVideoHandlerMock
+        # UrlHandler.youtube_video_handler = YouTubeVideoHandlerMock
         UrlHandler.youtube_video_handler = YouTubeJsonHandlerMock
         # channel uses RSS page to obtain data. We do not need to mock it
         # UrlHandler.youtube_channel_handler = YouTubeChannelHandlerMock

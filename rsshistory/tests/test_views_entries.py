@@ -131,8 +131,7 @@ class EntriesViewsTests(FakeInternetTestCase):
             language="en",
         )
 
-        url = reverse("{}:entry-download".format(LinkDatabase.name),
-                args=[entry.id])
+        url = reverse("{}:entry-download".format(LinkDatabase.name), args=[entry.id])
 
         # call user action
         response = self.client.get(url)
@@ -155,8 +154,9 @@ class EntriesViewsTests(FakeInternetTestCase):
             language="en",
         )
 
-        url = reverse("{}:entry-download-music".format(LinkDatabase.name),
-                args=[entry.id])
+        url = reverse(
+            "{}:entry-download-music".format(LinkDatabase.name), args=[entry.id]
+        )
 
         # call user action
         response = self.client.get(url)
@@ -179,8 +179,9 @@ class EntriesViewsTests(FakeInternetTestCase):
             language="en",
         )
 
-        url = reverse("{}:entry-download-video".format(LinkDatabase.name),
-                args=[entry.id])
+        url = reverse(
+            "{}:entry-download-video".format(LinkDatabase.name), args=[entry.id]
+        )
 
         # call user action
         response = self.client.get(url)

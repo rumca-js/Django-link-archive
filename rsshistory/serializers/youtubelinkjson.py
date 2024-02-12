@@ -155,13 +155,19 @@ class YouTubeJson(object):
         if len(self._json) > 0:
             is_live = False
             if "live_status" in self._json:
-                is_live = self._json["live_status"] != "not_live"
+                not_alive = (
+                    self._json["live_status"] == "not_live"
+                    or self._json["live_status"] == "False"
+                )
+
+                is_live = not not_alive
 
             was_live = False
             if "was_live" in self._json:
                 was_live = self._json["was_live"]
 
             return is_live or was_live
+        return False
 
     def get_link_url(self):
         if len(self._json) > 0:

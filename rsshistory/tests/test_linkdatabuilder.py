@@ -24,7 +24,7 @@ class LinkDataBuilderTest(FakeInternetTestCase):
         config.auto_store_domain_info = False
         config.auto_store_sources = False
         config.save()
-        
+
         self.mock_page_requests = 0
 
         link_name = "https://youtube.com/v=1234"
@@ -52,7 +52,7 @@ class LinkDataBuilderTest(FakeInternetTestCase):
         self.assertEqual(objs.count(), 1)
         self.assertEqual(objs[0].link, link_name)
         self.assertEqual(objs[0].date_published, creation_date)
-        
+
         # this is obtained not through page requests
         self.assertEqual(self.mock_page_requests, 0)
 

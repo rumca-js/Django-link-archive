@@ -4,7 +4,9 @@ from ..webtools import RssPage
 
 class YouTubeChannelHandler(RssPage, DefaultUrlHandler):
     def __init__(self, url=None, contents=None, page_object=None, options=None):
-        super().__init__(url, contents=contents, page_object=page_object, options=options)
+        super().__init__(
+            url, contents=contents, page_object=page_object, options=options
+        )
         print("YouTubeChannelHandler contents: {}".format(self.contents))
 
         if url:

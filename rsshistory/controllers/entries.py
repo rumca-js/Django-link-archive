@@ -221,7 +221,7 @@ class LinkDataController(LinkDataModel):
         return result
 
     def tag(self, tags, author=None):
-        data = {"author": author, "link": self.link, "tags": tags, "entry" : self}
+        data = {"author": author, "link": self.link, "tags": tags, "entry": self}
         return LinkTagsDataModel.set_tags_map(data)
 
     def vote(self, vote):
@@ -810,7 +810,7 @@ class LinkDataBuilder(object):
 
     def is_live_video(self):
         link_data = self.link_data
-        
+
         if "live" in link_data and link_data["live"]:
             return link_data["live"]
         """

@@ -258,9 +258,12 @@ class UserEntryVisitHistory(models.Model):
     def is_link_just_visited(visits):
         from ..dateutils import DateUtils
 
-        if (visits.count() > 0 and 
-           visits[0].date_last_visit and
-           visits[0].date_last_visit > DateUtils.get_datetime_now_utc() - timedelta(minutes=1)):
+        if (
+            visits.count() > 0
+            and visits[0].date_last_visit
+            and visits[0].date_last_visit
+            > DateUtils.get_datetime_now_utc() - timedelta(minutes=1)
+        ):
             return True
 
         return False
@@ -273,20 +276,23 @@ class UserEntryVisitHistory(models.Model):
          - if user opens 10 tabs after 1 hour stop, we return the oldest one
         """
         from ..dateutils import DateUtils
+
         time_ago_limit = DateUtils.get_datetime_now_utc() - timedelta(hours=1)
         burst_time_limit = DateUtils.get_datetime_now_utc() - timedelta(seconds=15)
 
         entries = UserEntryVisitHistory.objects.filter(
-            user=user, date_last_visit__isnull=False, 
-            date_last_visit__gt = time_ago_limit,
-            date_last_visit__lt = burst_time_limit,
+            user=user,
+            date_last_visit__isnull=False,
+            date_last_visit__gt=time_ago_limit,
+            date_last_visit__lt=burst_time_limit,
         ).order_by("-date_last_visit")
         if entries.exists():
             return entries[0].entry_object
         else:
             entries = UserEntryVisitHistory.objects.filter(
-                user=user, date_last_visit__isnull=False, 
-                date_last_visit__gt = time_ago_limit,
+                user=user,
+                date_last_visit__isnull=False,
+                date_last_visit__gt=time_ago_limit,
             ).order_by("date_last_visit")
             if entries.exists():
                 return entries[0].entry_object

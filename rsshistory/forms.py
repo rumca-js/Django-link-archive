@@ -173,8 +173,10 @@ class SourceInputForm(forms.Form):
 
 
 class ScannerForm(forms.Form):
+# fmt: off
     body = forms.CharField(widget=forms.Textarea(attrs={'rows':30, 'cols':50}))
     tag = forms.CharField(label="tag", max_length=500, help_text="Tag is set for each added entry. Tag can be empty", required=False)
+# fmt: on
 
 
 class ExportTopicForm(forms.Form):
@@ -211,6 +213,7 @@ class OmniSearchForm(forms.Form):
         self.is_mobile = False
         if "request" in kwargs:
             from .views import ViewPage
+
             self.request = kwargs.pop("request")
             self.is_mobile = ViewPage.is_mobile(self.request)
 
@@ -246,7 +249,7 @@ class OmniSearchForm(forms.Form):
                 new_choice = choice[:limit] + "(...)"
             else:
                 new_choice = choice
-            #result.append([choice, new_choice])
+            # result.append([choice, new_choice])
             result.append([choice, choice])
 
         return result
@@ -601,13 +604,16 @@ class BasicEntryChoiceForm(forms.Form):
     search = forms.CharField(label="Search", max_length=1000, required=False)
     category = forms.CharField(widget=forms.Select(choices=()), required=False)
     subcategory = forms.CharField(widget=forms.Select(choices=()), required=False)
+# fmt: off
     source_id = forms.CharField(label="Source", widget=forms.Select(choices=()), required=False)
+# fmt: on
 
     def __init__(self, *args, **kwargs):
         self.request = None
         self.is_mobile = False
         if "request" in kwargs:
             from .views import ViewPage
+
             self.request = kwargs.pop("request")
             self.is_mobile = ViewPage.is_mobile(self.request)
 

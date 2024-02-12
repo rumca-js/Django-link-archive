@@ -71,7 +71,7 @@ class ProcessSourceJobHandler(BaseJobHandler):
                     return True
                 # TODO implement it differently.
                 # it does not have to be the time to download data at all
-                #else:
+                # else:
                 #    """
                 #    We remove the job, then insert new one, if we haven't finished it
                 #    """
@@ -85,7 +85,9 @@ class ProcessSourceJobHandler(BaseJobHandler):
                 #    return False
                 return True
 
-            PersistentInfo.error("Cannot find controller plugin for {}".format(obj.subject))
+            PersistentInfo.error(
+                "Cannot find controller plugin for {}".format(obj.subject)
+            )
             return False
 
         except Exception as e:

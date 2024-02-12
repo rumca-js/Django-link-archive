@@ -66,8 +66,12 @@ class UrlHandler(object):
         page = Url.get(url, options=options)
 
         # if response is cloudflare jibberish, try using selenium
-        if options.is_not_selenium() and (not page.is_valid() or page.is_cloudflare_protected()):
-            LinkDatabase.info("Could not normally obtain contents. Trying selenium:".format(url))
+        if options.is_not_selenium() and (
+            not page.is_valid() or page.is_cloudflare_protected()
+        ):
+            LinkDatabase.info(
+                "Could not normally obtain contents. Trying selenium:".format(url)
+            )
 
             options = PageOptions()
             # by default we do not want full blown browser to be started
@@ -125,9 +129,8 @@ class UrlHandler(object):
             return True
 
     def is_selenium_headless_required(url):
-        if (
-            url.startswith("https://open.spotify.com")
-            or url.startswith("https://thehill.com")
+        if url.startswith("https://open.spotify.com") or url.startswith(
+            "https://thehill.com"
         ):
             return True
 
@@ -135,9 +138,11 @@ class UrlHandler(object):
 
     def is_selenium_full_required(url):
         p = DomainAwarePage(url)
-        if (p.is_link_service() or
-            url.startswith("https://www.warhammer-community.com") or
-            url.startswith("https://defcon.org")):
+        if (
+            p.is_link_service()
+            or url.startswith("https://www.warhammer-community.com")
+            or url.startswith("https://defcon.org")
+        ):
             return True
 
         return False

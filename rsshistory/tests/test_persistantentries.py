@@ -1,4 +1,3 @@
-
 from ..models import PersistentInfo
 from .fakeinternet import FakeInternetTestCase
 
@@ -8,7 +7,6 @@ class BackgroundJobControllerTest(FakeInternetTestCase):
         self.disable_web_pages()
 
     def test_persistant_limit(self):
-
         for item in range(1, 2100):
             PersistentInfo.create("error")
 

@@ -9,7 +9,9 @@ from .defaulturlhandler import DefaultUrlHandler
 
 class YouTubeVideoHandler(DefaultUrlHandler):
     def __init__(self, url=None, contents=None, page_object=None, options=None):
-        super().__init__(url, contents=contents, page_object=page_object, options=options)
+        super().__init__(
+            url, contents=contents, page_object=page_object, options=options
+        )
 
         self.url = YouTubeVideoHandler.input2url(url)
 
@@ -71,7 +73,6 @@ class YouTubeVideoHandler(DefaultUrlHandler):
 
 
 class YouTubeHtmlHandler(HtmlPage, YouTubeVideoHandler):
-
     def __init__(self, url):
         self.url = url
 
@@ -98,7 +99,7 @@ class YouTubeHtmlHandler(HtmlPage, YouTubeVideoHandler):
         if block_live_videos:
             live_field = self.h.get_meta_custom_field("itemprop", "isLiveBroadcast")
             if live_field and live_field.lower() == "true":
-                #print("It is invalid:{} - live".format(self.url))
+                # print("It is invalid:{} - live".format(self.url))
                 return False
 
         return True
@@ -113,6 +114,7 @@ class YouTubeJsonHandler(YouTubeVideoHandler):
     """
     TODO Use if above in youtube.h
     """
+
     def __init__(self, url):
         self.url = url
 
@@ -391,5 +393,3 @@ class YouTubeJsonHandler(YouTubeVideoHandler):
     def get_tags(self):
         if self.get_contents():
             return self.yt_ob.get_tags()
-
-
