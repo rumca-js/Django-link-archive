@@ -691,6 +691,8 @@ class DomainAwarePage(BasePage):
             return True
         if url.find("adfoc.us") >= 0:
             return True
+        if url.endswith("link.to"):
+            return True
 
         return False
 

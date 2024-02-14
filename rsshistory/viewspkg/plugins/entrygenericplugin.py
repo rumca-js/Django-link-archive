@@ -126,7 +126,7 @@ class EntryGenericPlugin(object):
                 ),
                 ConfigurationEntry.ACCESS_TYPE_OWNER,
                 "Downloads the page to configured location",
-                #static("{}/icons/icons8-download-96.png".format(LinkDatabase.name)),
+                # static("{}/icons/icons8-download-96.png".format(LinkDatabase.name)),
             ),
         )
 
@@ -156,9 +156,9 @@ class EntryGenericPlugin(object):
                 ),
                 ConfigurationEntry.ACCESS_TYPE_OWNER,
                 "Updates entry data",
-                #static(
+                # static(
                 #    "{}/icons/icons8-view-details-100.png".format(LinkDatabase.name)
-                #),
+                # ),
             ),
         )
 
@@ -172,9 +172,9 @@ class EntryGenericPlugin(object):
                 ),
                 ConfigurationEntry.ACCESS_TYPE_OWNER,
                 "Resets entry data",
-                #static(
+                # static(
                 #    "{}/icons/icons8-view-details-100.png".format(LinkDatabase.name)
-                #),
+                # ),
             ),
         )
 
@@ -184,7 +184,8 @@ class EntryGenericPlugin(object):
                 "",
                 reverse(
                     "{}:page-scan-input".format(LinkDatabase.name),
-                )+"?link={}".format(self.entry.link),
+                )
+                + "?link={}".format(self.entry.link),
                 ConfigurationEntry.ACCESS_TYPE_OWNER,
                 "Scans entry for new links",
                 static("{}/icons/icons8-radar-64.png".format(LinkDatabase.name)),
@@ -198,10 +199,13 @@ class EntryGenericPlugin(object):
                     "",
                     reverse(
                         "{}:source-add-simple".format(LinkDatabase.name),
-                    )+"?link={}".format(self.entry.link),
+                    )
+                    + "?link={}".format(self.entry.link),
                     ConfigurationEntry.ACCESS_TYPE_OWNER,
                     "Add new source",
-                    static("{}/icons/icons8-channel-add-96.png".format(LinkDatabase.name)),
+                    static(
+                        "{}/icons/icons8-channel-add-96.png".format(LinkDatabase.name)
+                    ),
                 ),
             )
 
@@ -396,7 +400,11 @@ class EntryGenericPlugin(object):
 
         parameters.append(EntryParameter("Visists", self.entry.page_rating_visits))
 
-        points_text = "{} = {} + {}".format(self.entry.page_rating, self.entry.page_rating_contents, self.entry.page_rating_votes)
+        points_text = "{} = {} + {}".format(
+            self.entry.page_rating,
+            self.entry.page_rating_contents,
+            self.entry.page_rating_votes,
+        )
         points_title = "Points = content rating + user votes"
         parameters.append(EntryParameter("Points", points_text, points_title))
 

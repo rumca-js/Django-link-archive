@@ -4,6 +4,7 @@ import traceback
 
 from linklibrary.celery import app, logger
 from .apps import LinkDatabase
+from .models import PersistentInfo
 
 
 def subs_checker_task(arg):
@@ -24,7 +25,7 @@ def subs_checker_task(arg):
         handler.refresh()
     except Exception as E:
         error_text = traceback.format_exc()
-        LinkDatabase.info("Exception in checker task: {} {}".format(str(E), error_text))
+        PersistentInfo.create("Exception in checker task: {} {}".format(str(E), error_text))
 
     LinkDatabase.info("subs_checker_task DONE")
 
@@ -48,7 +49,7 @@ def process_all_jobs_task(arg):
 
     except Exception as E:
         error_text = traceback.format_exc()
-        LinkDatabase.info(
+        PersistentInfo.create(
             "Exception in processing task: {} {}".format(str(E), error_text)
         )
 
@@ -74,7 +75,7 @@ def process_one_jobs_task(arg):
 
     except Exception as E:
         error_text = traceback.format_exc()
-        LinkDatabase.info(
+        PersistentInfo.create(
             "Exception in processing task: {} {}".format(str(E), error_text)
         )
 

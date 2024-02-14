@@ -253,7 +253,7 @@ class LinkAddJobHandler(BaseJobHandler):
 
             current_time = DateUtils.get_datetime_now_utc()
 
-            if len(obj.args) > 0:
+            if obj.args and len(obj.args) > 0:
                 try:
                     cfg = json.loads(obj.args)
                 except Exception as E:
@@ -808,6 +808,12 @@ class HandlerManager(object):
     @note Uses handler priority when processing jobs.
     """
 
+    def __init__(self, timeout_s = 60 * 10):
+        """
+        Default timeout is 10 minutes
+        """
+        self.timeout_s = timeout_s
+
     def get_handlers(self):
         """
         @returns available handlers. Order is important
@@ -849,18 +855,18 @@ class HandlerManager(object):
         TODO select should be based on priority
         """
 
-        objs = BackgroundJob.objects.filter(enabled=True).order_by("priority", "date_created")
+        objs = BackgroundJobController.objects.filter(enabled=True).order_by("priority", "date_created")
         if objs.count() != 0:
             obj = objs[0]
+
             for key, handler in enumerate(self.get_handlers()):
                 if handler.get_job() == obj.job:
                     return [obj, handler]
-
             return [obj, None]
         return []
 
     def process_all(self):
-        self.start_processing_time = time.time()
+        self.start_processing_time = DateUtils.get_datetime_now_utc()
 
         while True:
             items = self.get_handler_and_object()
@@ -869,10 +875,16 @@ class HandlerManager(object):
 
             self.process_one_for_all(items)
 
-            # if 10 minutes passed
-            passed_seconds = time.time() - self.start_processing_time
-            if passed_seconds >= 60 * 10:
-                self.on_not_safe_exit()
+            passed_seconds = DateUtils.get_datetime_now_utc() - self.start_processing_time
+            if passed_seconds.total_seconds() >= self.timeout_s:
+                obj = items[0]
+                handler = items[1]
+                text = "Threads: last handler {} {} exceeded time:{}".format(
+                    handler.get_job(), obj.subject, passed_seconds
+                )
+                PersistentInfo.create(text)
+
+                self.on_not_safe_exit(items)
                 break
 
     def process_one_for_all(self, items):
@@ -885,18 +897,17 @@ class HandlerManager(object):
 
         if handler:
             handler.set_config(config)
-        else:
-            PersistentInfo.error(
-                "Missing handler for job: {0}".format(
-                    obj.job,
-                )
-            )
 
         try:
             if handler and handler.process(obj):
                 deleted = True
                 obj.delete()
             if not handler:
+                PersistentInfo.error(
+                    "Missing handler for job: {0}".format(
+                        obj.job,
+                    )
+                )
                 deleted = True
                 obj.delete()
 
@@ -910,12 +921,7 @@ class HandlerManager(object):
             if not deleted and obj:
                 obj.on_error()
 
-    def on_not_safe_exit(self):
-        text = "Threads: last handler {} {} exceeded time:{}".format(
-            handler.get_job(), subject, passed_seconds
-        )
-        PersistentInfo.create(text)
-
+    def on_not_safe_exit(self, items):
         jobs = BackgroundJobController.objects.filter(date_created__lt = self.start_processing_time)
         for job in jobs:
             if job.priority > 0:
@@ -923,6 +929,9 @@ class HandlerManager(object):
                 job.save()
 
     def process_one(self):
+        """
+        TODO remove this function, use process_one_for_all one above
+        """
         PersistentInfo.create("Processing message")
 
         config = Configuration.get_object()
@@ -932,21 +941,7 @@ class HandlerManager(object):
         if len(items) == 0:
             return False
 
-        obj = items[0]
-        handler = items[1]
-
-        handler.set_config(config)
-
-        try:
-            if handler.process(obj):
-                obj.delete()
-        except Exception as E:
-            error_text = traceback.format_exc()
-            PersistentInfo.error(
-                "Exception during handler processing {0}\n{1}\n{2}".format(
-                    handler.get_job(), str(E), error_text
-                )
-            )
+        self.process_one_for_all(items)
 
         items = self.get_handler_and_object()
         if len(items) == 0:

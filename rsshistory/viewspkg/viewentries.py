@@ -525,9 +525,8 @@ def add_entry(request):
         valid = form.is_valid()
         link = request.POST.get("link", "")
 
-        obs = LinkDataController.objects.filter(link=link)
-        if obs.exists():
-            ob = obs[0]
+        ob = LinkDataWrapper(link=link).get()
+        if ob:
             return HttpResponseRedirect(ob.get_absolute_url())
 
         if valid:
@@ -544,7 +543,7 @@ def add_entry(request):
 
             p.context["form"] = form
 
-            if obs.exists():
+            if entry:
                 p.context["entry"] = entry
 
             config = Configuration.get_object().config_entry
