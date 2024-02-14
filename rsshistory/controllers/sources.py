@@ -126,7 +126,7 @@ class SourceDataController(SourceDataModel):
             obj.save()
         else:
             # previously we could have dangling data without relation
-            op_datas = SourceOperationalData.objects.filter(url=self.url)
+            op_datas = SourceOperationalData.objects.filter(source_obj=self)
 
             consecutive_errors = 0
             if not valid:
@@ -134,7 +134,6 @@ class SourceDataController(SourceDataModel):
 
             if op_datas.count() == 0:
                 SourceOperationalData.objects.create(
-                    url=self.url,
                     date_fetched=date_fetched,
                     import_seconds=import_seconds,
                     number_of_entries=number_of_entries,

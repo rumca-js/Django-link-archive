@@ -22,14 +22,11 @@ class BackgroundJobControllerTest(FakeInternetTestCase):
             source_obj=ob,
         )
 
-        # pers = PersistentInfo.objects.all()
-        # self.assertEqual(pers[0].info, "")
-        # self.assertEqual(len(pers), 0)
-
     def tearDown(self):
         BackgroundJobController.objects.all().delete()
 
     def test_number_of_jobs(self):
+        # call tested function
         self.assertEqual(
             BackgroundJobController.get_number_of_jobs(
                 BackgroundJob.JOB_LINK_UPDATE_DATA
@@ -44,6 +41,7 @@ class BackgroundJobControllerTest(FakeInternetTestCase):
             args="",
         )
 
+        # call tested function
         self.assertEqual(
             BackgroundJobController.get_number_of_jobs(
                 BackgroundJob.JOB_LINK_UPDATE_DATA
@@ -52,11 +50,13 @@ class BackgroundJobControllerTest(FakeInternetTestCase):
         )
 
     def test_get_job_priority(self):
+        # call tested function
         self.assertEqual(
             BackgroundJobController.get_job_priority(BackgroundJob.JOB_PROCESS_SOURCE),
             11,
         )
 
+        # call tested function
         self.assertEqual(
             BackgroundJobController.get_job_priority(BackgroundJob.JOB_LINK_ADD),
             14,
@@ -73,6 +73,7 @@ class BackgroundJobControllerTest(FakeInternetTestCase):
 
         self.assertEqual(BackgroundJobController.get_number_of_jobs(invalid_name), 1)
 
+        # call tested function
         BackgroundJobController.truncate_invalid_jobs()
 
         self.assertEqual(BackgroundJobController.get_number_of_jobs(invalid_name), 0)
@@ -86,6 +87,7 @@ class BackgroundJobControllerTest(FakeInternetTestCase):
         )
 
         source = SourceDataController.objects.all()[0]
+        # call tested function
         x = BackgroundJobController.download_rss(source)
 
         self.assertEqual(
@@ -104,6 +106,7 @@ class BackgroundJobControllerTest(FakeInternetTestCase):
         )
 
         link = LinkDataController.objects.all()[0]
+        # call tested function
         x = BackgroundJobController.download_music(link)
 
         self.assertEqual(
@@ -122,6 +125,7 @@ class BackgroundJobControllerTest(FakeInternetTestCase):
         )
 
         link = LinkDataController.objects.all()[0]
+        # call tested function
         x = BackgroundJobController.download_video(link)
 
         self.assertEqual(
@@ -138,8 +142,11 @@ class BackgroundJobControllerTest(FakeInternetTestCase):
 
         source = SourceDataController.objects.all()[0]
 
+        # call tested function
         x = BackgroundJobController.link_add("https://youtube.com?v=1", source)
+        # call tested function
         x = BackgroundJobController.link_add("https://youtube.com?v=2", source)
+        # call tested function
         x = BackgroundJobController.link_add("https://youtube.com?v=3", source)
 
         self.assertEqual(
@@ -154,6 +161,7 @@ class BackgroundJobControllerTest(FakeInternetTestCase):
             0,
         )
 
+        # call tested function
         BackgroundJobController.write_daily_data_str("2022-03-02", "2022-03-04")
 
         objects = BackgroundJobController.objects.filter(
@@ -174,6 +182,7 @@ class BackgroundJobControllerTest(FakeInternetTestCase):
             0,
         )
 
+        # call tested function
         BackgroundJobController.write_tag_data("technofeudalism")
 
         self.assertEqual(
@@ -191,6 +200,7 @@ class BackgroundJobControllerTest(FakeInternetTestCase):
             0,
         )
 
+        # call tested function
         BackgroundJobController.write_bookmarks()
 
         self.assertEqual(
@@ -208,6 +218,7 @@ class BackgroundJobControllerTest(FakeInternetTestCase):
             0,
         )
 
+        # call tested function
         BackgroundJobController.import_bookmarks()
 
         self.assertEqual(
@@ -225,6 +236,7 @@ class BackgroundJobControllerTest(FakeInternetTestCase):
             0,
         )
 
+        # call tested function
         BackgroundJobController.import_sources()
 
         self.assertEqual(
@@ -240,6 +252,7 @@ class BackgroundJobControllerTest(FakeInternetTestCase):
             0,
         )
 
+        # call tested function
         BackgroundJobController.link_save("http://youtube.com?v=676767")
 
         self.assertEqual(
@@ -253,6 +266,7 @@ class BackgroundJobControllerTest(FakeInternetTestCase):
             0,
         )
 
+        # call tested function
         BackgroundJobController.link_download("http://youtube.com?v=676767")
 
         self.assertEqual(
@@ -266,6 +280,7 @@ class BackgroundJobControllerTest(FakeInternetTestCase):
             0,
         )
 
+        # call tested function
         BackgroundJobController.push_to_repo("2022-03-01")
 
         self.assertEqual(
@@ -281,6 +296,7 @@ class BackgroundJobControllerTest(FakeInternetTestCase):
             0,
         )
 
+        # call tested function
         BackgroundJobController.push_daily_data_to_repo("2022-03-01")
 
         self.assertEqual(
@@ -289,3 +305,39 @@ class BackgroundJobControllerTest(FakeInternetTestCase):
             ),
             1,
         )
+
+    def test_on_error(self):
+        bj = BackgroundJobController.objects.create(
+            job=BackgroundJob.JOB_LINK_UPDATE_DATA,
+            task=None,
+            subject="https://youtube.com?v=1234",
+            args="",
+        )
+
+        # call tested function
+        bj.on_error()
+
+        self.assertEqual(bj.errors, 1)
+
+        # call tested function
+        bj.on_error()
+
+        self.assertEqual(bj.errors, 2)
+
+    def test_enable(self):
+        bj = BackgroundJobController.objects.create(
+            job=BackgroundJob.JOB_LINK_UPDATE_DATA,
+            task=None,
+            subject="https://youtube.com?v=1234",
+            args="",
+        )
+
+        self.assertTrue(bj.enabled)
+
+        bj.enabled = False
+        bj.save()
+
+        # call tested function
+        bj.enable()
+
+        self.assertTrue(bj.enabled)

@@ -231,6 +231,8 @@ class UserEntryVisitHistory(models.Model):
         previous_entry = UserEntryVisitHistory.get_last_user_entry(user)
 
         try:
+            BackgroundJobController.entry_update_data(entry)
+
             UserEntryTransitionHistory.add(user, previous_entry, entry)
 
             if visits.count() == 0:

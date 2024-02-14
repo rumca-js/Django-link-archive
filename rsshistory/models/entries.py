@@ -341,6 +341,7 @@ class BaseLinkDataController(BaseLinkDataModel):
     def get_query_names():
         names = set(BaseLinkDataController.get_export_names())
         names.add("source_obj__id")
+        names.add("source_obj__url")
         names.add("source_obj__title")
         names.add("source_obj__category")
         names.add("source_obj__subcategory")

@@ -58,7 +58,6 @@ class SourceDataModel(models.Model):
 
 
 class SourceOperationalData(models.Model):
-    url = models.CharField(max_length=2000, unique=True)
     date_fetched = models.DateTimeField(null=True)
     import_seconds = models.IntegerField(null=True)
     number_of_entries = models.IntegerField(null=True)

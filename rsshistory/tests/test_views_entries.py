@@ -2,7 +2,7 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 
 from ..apps import LinkDatabase
-from ..controllers import SourceDataController, LinkDataController, DomainsController
+from ..controllers import SourceDataController, LinkDataController, DomainsController, ArchiveLinkDataController, LinkDataBuilder
 from ..dateutils import DateUtils
 from ..models import KeyWords, DataExport
 
@@ -65,6 +65,78 @@ class EntriesViewsTests(FakeInternetTestCase):
         self.assertEqual(response.status_code, 200)
 
         self.assertEqual(LinkDataController.objects.filter(link=test_link).count(), 1)
+
+    def test_add_entry_exists(self):
+        LinkDataController.objects.all().delete()
+
+        self.client.login(username="testuser", password="testpassword")
+
+        url = reverse("{}:entry-add".format(LinkDatabase.name))
+        test_link = "https://linkedin.com"
+
+        LinkDataBuilder(link = test_link)
+
+        data = {"link": test_link}
+        full_data = LinkDataController.get_full_information(data)
+        full_data["description"] = LinkDataController.get_description_safe(
+            full_data["description"]
+        )
+
+        limited_data = {}
+        for key in full_data:
+            if full_data[key] is not None:
+                limited_data[key] = full_data[key]
+
+        print("Limited data")
+        print(limited_data)
+
+        self.assertEqual(LinkDataController.objects.filter(link=test_link).count(), 1)
+
+        # call user action
+        response = self.client.post(url, data=limited_data)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(LinkDataController.objects.filter(link=test_link).count(), 1)
+
+    def test_add_entry_exists_in_archive(self):
+        LinkDataController.objects.all().delete()
+
+        self.client.login(username="testuser", password="testpassword")
+
+        url = reverse("{}:entry-add".format(LinkDatabase.name))
+        test_link = "https://linkedin.com"
+
+        ob = ArchiveLinkDataController.objects.create(
+            source="https://linkin.com",
+            link=test_link,
+            title="The second link",
+            language="en",
+            date_published=DateUtils.get_datetime_now_utc(),
+        )
+
+        data = {"link": test_link}
+        full_data = LinkDataController.get_full_information(data)
+        full_data["description"] = LinkDataController.get_description_safe(
+            full_data["description"]
+        )
+
+        limited_data = {}
+        for key in full_data:
+            if full_data[key] is not None:
+                limited_data[key] = full_data[key]
+
+        print("Limited data")
+        print(limited_data)
+
+        self.assertEqual(ArchiveLinkDataController.objects.filter(link=test_link).count(), 1)
+        self.assertEqual(LinkDataController.objects.filter(link=test_link).count(), 0)
+
+        # call user action
+        response = self.client.post(url, data=limited_data)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(ArchiveLinkDataController.objects.filter(link=test_link).count(), 1)
+        self.assertEqual(LinkDataController.objects.filter(link=test_link).count(), 0)
 
     def test_edit_entry(self):
         LinkDataController.objects.all().delete()

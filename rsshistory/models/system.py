@@ -352,20 +352,3 @@ class BackgroundJob(models.Model):
 
     class Meta:
         ordering = ["enabled", "priority", "date_created", "job", "pk", "subject", "errors"]
-
-    def on_error(self):
-        self.errors += 1
-
-        if self.errors > 5:
-            self.enabled = False
-
-        PersistentInfo.create("Disabling job due to errors {} {} {}".format(self.job, self.subject, self.args))
-
-        # TODO Add notification
-
-        self.save()
-
-    def enable(self):
-        self.errors = 0
-        self.enabled = True
-        self.save()

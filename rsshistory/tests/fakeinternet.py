@@ -5,7 +5,7 @@ This module provides replacement for the Internet.
  - when there is a request to obtain youtube JSON data, we provide artificial data, etc.
 """
 from django.test import TestCase
-import chardet
+# import chardet
 
 from ..models import PersistentInfo, ConfigurationEntry
 from ..dateutils import DateUtils

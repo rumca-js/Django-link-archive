@@ -31,9 +31,15 @@ class SourceGenericPlugin(HtmlPage):
         self.hash = None
 
     def check_for_data(self):
-        LinkDatabase.info("Plugin: checking source {}".format(self.get_source().url))
+        source = self.get_source()
+        LinkDatabase.info("Plugin: checking source {}".format(source.url))
 
         if not self.is_fetch_possible():
+            LinkDatabase.info(
+                "Plugin source:{}: It is not the right time for update".format(
+                    source.title
+                )
+            )
             return
 
         start_time = DateUtils.get_datetime_now_utc()
@@ -48,16 +54,14 @@ class SourceGenericPlugin(HtmlPage):
         total_time.total_seconds()
 
         if self.hash:
-            LinkDatabase.info(
-                "Plugin: hash valid {} {}".format(self.get_source().url, self.hash)
-            )
             self.set_operational_info(
                 stop_time, num_entries, total_time.total_seconds(), self.hash
             )
             return True
 
         if self.dead:
-            LinkDatabase.info("Plugin: hash not valid {}".format(self.get_source().url))
+            LinkDatabase.info("Plugin: page is dead {}".format(self.get_source().url))
+
             self.set_operational_info(
                 stop_time,
                 num_entries,
@@ -126,11 +130,6 @@ class SourceGenericPlugin(HtmlPage):
         source = self.get_source()
 
         if not source.is_fetch_possible():
-            LinkDatabase.info(
-                "Plugin source:{}: It is not the right time for update".format(
-                    source.title
-                )
-            )
             return False
 
         return True

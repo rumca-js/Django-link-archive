@@ -28,7 +28,7 @@ import traceback
 import requests
 import re
 import json
-import chardet
+# import chardet
 from bs4 import BeautifulSoup
 
 from datetime import datetime

@@ -56,6 +56,23 @@ class BackgroundJobController(BackgroundJob):
     def truncate():
         BackgroundJob.objects.all().delete()
 
+    def on_error(self):
+        self.errors += 1
+
+        if self.errors > 5:
+            self.enabled = False
+
+        PersistentInfo.create("Disabling job due to errors {} {} {}".format(self.job, self.subject, self.args))
+
+        # TODO Add notification
+
+        self.save()
+
+    def enable(self):
+        self.errors = 0
+        self.enabled = True
+        self.save()
+
     def truncate_invalid_jobs():
         job_choices = BackgroundJobController.JOB_CHOICES
         valid_jobs_choices = []
@@ -258,7 +275,7 @@ class BackgroundJobController(BackgroundJob):
         """
         if not force:
             if entry.date_update_last > DateUtils.get_datetime_now_utc() - timedelta(
-                days=1
+                days=30
             ):
                 return
 
