@@ -128,7 +128,7 @@ class YouTubeJsonHandler(YouTubeVideoHandler):
 
         self.contents = None
         self.dead = False
-        self.encoding = None
+        self.encoding = "utf-8"
 
     def get_contents(self):
         if self.dead:

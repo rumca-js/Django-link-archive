@@ -128,17 +128,20 @@ class BasePage(object):
         @param page_object All settings are used from page object, with page contents
         """
         self.encoding = None
+
         if page_object:
             self.url = page_object.url
             if page_object.contents:
                 self.contents = page_object.contents
             else:
                 self.contents = contents
+
             self.options = page_object.options
             self.status_code = page_object.status_code
             self.dead = page_object.dead
             self.response_headers = page_object.response_headers
             self.robots_contents = page_object.robots_contents
+            self.encoding = page_object.encoding
         else:
             self.url = url
             self.options = options
@@ -306,16 +309,7 @@ class BasePage(object):
 
             self.status_code = r.status_code
             self.response_headers = r.headers
-
-            """
-            The default assumed content encoding for text/html is ISO-8859-1 aka Latin-1 :( See RFC-2854. UTF-8 was too young to become the default, it was born in 1993, about the same time as HTML and HTTP.
-            Use .content to access the byte stream, or .text to access the decoded Unicode stream.
-
-            Override encoding by real educated guess as provided by chardet
-            """
-            r.encoding = r.apparent_encoding
             self.encoding = r.encoding
-
             self.contents = r.text
 
             return r.text
@@ -359,6 +353,23 @@ class BasePage(object):
         request_result = requests.get(
             url, headers=headers, timeout=timeout, verify=BasePage.ssl_verify
         )
+
+        """
+        The default assumed content encoding for text/html is ISO-8859-1 aka Latin-1 :( See RFC-2854. UTF-8 was too young to become the default, it was born in 1993, about the same time as HTML and HTTP.
+        Use .content to access the byte stream, or .text to access the decoded Unicode stream.
+
+        chardet does not work on youtube RSS feeds.
+        apparent encoding does not work on youtube RSS feeds.
+        """
+        #encoding = chardet.detect(request_result.content)
+        #request_result.encoding = encoding["encoding"]
+
+        if request_result.text.find('encoding="UTF-8"') >= 0:
+            request_result.encoding = "utf-8"
+        elif request_result.text.find('charset="UTF-8"') >= 0:
+            request_result.encoding = "utf-8"
+        else:
+            request_result.encoding = request_result.apparent_encoding
 
         return request_result
 

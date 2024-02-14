@@ -74,7 +74,7 @@ class SourceGenericPlugin(HtmlPage):
         source = self.get_source()
 
         for link_data in self.get_container_elements():
-            LinkDatabase.info("Generic plugin iter start:{}".format(link_data["link"]))
+            # LinkDatabase.info("Generic plugin item start:{}".format(link_data["link"]))
             if not link_data:
                 continue
 
@@ -87,7 +87,7 @@ class SourceGenericPlugin(HtmlPage):
                     link_data["source"] = source.url
                     link_data["source_obj"] = source
 
-                LinkDatabase.info("Generic plugin add:{}".format(link_data["link"]))
+                # LinkDatabase.info("Generic plugin item add:{}".format(link_data["link"]))
 
                 b = LinkDataBuilder()
                 b.link_data = link_data
@@ -102,7 +102,7 @@ class SourceGenericPlugin(HtmlPage):
                 if entry and entry.date_published > start_time:
                     self.on_added_entry(entry)
                     num_entries += 1
-            LinkDatabase.info("Generic plugin iter stop:{}".format(link_data["link"]))
+            # LinkDatabase.info("Generic plugin item stop:{}".format(link_data["link"]))
 
         return num_entries
 

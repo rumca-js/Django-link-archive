@@ -3,7 +3,7 @@ Here only models should be.
 
 When a model has too much code, some of it is moved to "controllers"
 """
-from .admin import ConfigurationEntry, UserConfig, PersistentInfo, BackgroundJob
+from .system import ConfigurationEntry, UserConfig, PersistentInfo, BackgroundJob
 from .entries import (
     LinkDataModel,
     ArchiveLinkDataModel,

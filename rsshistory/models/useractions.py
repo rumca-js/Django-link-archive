@@ -10,7 +10,7 @@ from django.urls import reverse
 
 from ..apps import LinkDatabase
 from .entries import LinkDataModel
-from .admin import PersistentInfo
+from .system import PersistentInfo
 
 
 class LinkTagsDataModel(models.Model):

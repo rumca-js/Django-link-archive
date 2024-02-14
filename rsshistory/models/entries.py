@@ -10,7 +10,7 @@ from ..apps import LinkDatabase
 from ..webtools import HtmlPage
 
 from .sources import SourceDataModel
-from .admin import PersistentInfo
+from .system import PersistentInfo
 from .domains import Domains
 
 

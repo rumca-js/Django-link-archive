@@ -41,10 +41,10 @@ class UserSearchHistory(models.Model):
                     search_query=search_query, user=user
                 )
                 UserSearchHistory.delete_old_entries()
+
+                return theobject
             except Exception as E:
                 LinkDatabase.info(str(E))
-
-            return theobject
 
     def cleanup():
         config_entry = Configuration.get_object().config_entry

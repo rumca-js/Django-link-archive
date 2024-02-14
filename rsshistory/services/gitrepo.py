@@ -4,9 +4,10 @@ import shutil
 
 
 class GitRepo(object):
-    def __init__(self, git_data):
+    def __init__(self, git_data,timeout_s = 60 * 60):
         self.git_data = git_data
         self.git_repo = git_data.remote_path
+        self.timeout_s = timeout_s
 
     def up(self):
         git_path = Path(self.git_data.local_path)
@@ -20,11 +21,11 @@ class GitRepo(object):
             self.pull()
 
     def add(self, files):
-        subprocess.run(["git", "add", "-A"], cwd=self.get_local_dir())
+        subprocess.run(["git", "add", "-A"], cwd=self.get_local_dir(), timeout=self.timeout_s)
 
     def commit(self, commit_message):
         subprocess.run(
-            ["git", "commit", "-m", commit_message], cwd=self.get_local_dir()
+            ["git", "commit", "-m", commit_message], cwd=self.get_local_dir(), timeout=self.timeout_s
         )
 
     def push(self):
@@ -38,6 +39,7 @@ class GitRepo(object):
                 "https://{0}@github.com/{1}/{2}.git".format(token, user, repo),
             ],
             cwd=self.get_local_dir(),
+            timeout=self.timeout_s
         )
 
     def get_repo_name(self):
@@ -52,10 +54,10 @@ class GitRepo(object):
         return Path(self.git_data.local_path) / last
 
     def clone(self):
-        subprocess.run(["git", "clone", self.git_repo], cwd=self.git_data.local_path)
+        subprocess.run(["git", "clone", self.git_repo], cwd=self.git_data.local_path, timeout=self.timeout_s)
 
     def pull(self):
-        subprocess.run(["git", "pull"], cwd=self.get_local_dir())
+        subprocess.run(["git", "pull"], cwd=self.get_local_dir(), timeout=self.timeout_s)
 
     def copy_tree(self, input_path):
         expected_dir = self.get_local_dir()

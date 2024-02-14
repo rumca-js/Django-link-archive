@@ -849,7 +849,7 @@ class HandlerManager(object):
         TODO select should be based on priority
         """
 
-        objs = BackgroundJob.objects.all().order_by("priority", "date_created")
+        objs = BackgroundJob.objects.filter(enabled=True).order_by("priority", "date_created")
         if objs.count() != 0:
             obj = objs[0]
             for key, handler in enumerate(self.get_handlers()):
@@ -860,48 +860,67 @@ class HandlerManager(object):
         return []
 
     def process_all(self):
-        config = Configuration.get_object()
-        start_processing_time = time.time()
+        self.start_processing_time = time.time()
 
         while True:
             items = self.get_handler_and_object()
             if len(items) == 0:
                 break
-            else:
-                obj = items[0]
-                handler = items[1]
-                subject = obj.subject
 
-                if handler:
-                    handler.set_config(config)
-                else:
-                    PersistentInfo.error(
-                        "Missing handler for job: {0}".format(
-                            obj.job,
-                        )
-                    )
+            self.process_one_for_all(items)
 
-                try:
-                    if handler and handler.process(obj):
-                        obj.delete()
-                    if not handler:
-                        obj.delete()
-                except Exception as E:
-                    error_text = traceback.format_exc()
-                    PersistentInfo.error(
-                        "Exception during handler processing {}\n{}\n{}\n{}".format(
-                            handler.get_job(), subject, str(E), error_text
-                        )
-                    )
+            # if 10 minutes passed
+            passed_seconds = time.time() - self.start_processing_time
+            if passed_seconds >= 60 * 10:
+                self.on_not_safe_exit()
+                break
 
-                # if 10 minutes passed
-                passed_seconds = time.time() - start_processing_time
-                if passed_seconds >= 60 * 10:
-                    text = "Threads: last handler {} {} exceeded time:{}".format(
-                        handler.get_job(), subject, passed_seconds
-                    )
-                    PersistentInfo.create(text)
-                    break
+    def process_one_for_all(self, items):
+        config = Configuration.get_object()
+
+        obj = items[0]
+        handler = items[1]
+        subject = obj.subject
+        deleted = False
+
+        if handler:
+            handler.set_config(config)
+        else:
+            PersistentInfo.error(
+                "Missing handler for job: {0}".format(
+                    obj.job,
+                )
+            )
+
+        try:
+            if handler and handler.process(obj):
+                deleted = True
+                obj.delete()
+            if not handler:
+                deleted = True
+                obj.delete()
+
+        except Exception as E:
+            error_text = traceback.format_exc()
+            PersistentInfo.error(
+                "Exception during handler processing {}\n{}\n{}\n{}".format(
+                    handler.get_job(), subject, str(E), error_text
+                )
+            )
+            if not deleted and obj:
+                obj.on_error()
+
+    def on_not_safe_exit(self):
+        text = "Threads: last handler {} {} exceeded time:{}".format(
+            handler.get_job(), subject, passed_seconds
+        )
+        PersistentInfo.create(text)
+
+        jobs = BackgroundJobController.objects.filter(date_created__lt = self.start_processing_time)
+        for job in jobs:
+            if job.priority > 0:
+                job.priority -= 1
+                job.save()
 
     def process_one(self):
         PersistentInfo.create("Processing message")

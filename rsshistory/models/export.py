@@ -1,7 +1,7 @@
 import traceback
 from django.db import models
 
-from .admin import PersistentInfo
+from .system import PersistentInfo
 
 
 class SourceExportHistory(models.Model):

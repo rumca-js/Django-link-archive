@@ -33,6 +33,13 @@
            >
            - 
             {{ forloop.counter }}
+	    {% if not job.enabled %}
+	    [DISABLED]
+	    {% endif %}
+	    {% if job.errors > 0 %}
+	    ERRORS: {{job.errors}}
+	    {% endif %}
+
             [{{job.date_created}}] {{job.priority}} <b>{{job.job}}</b> {{job.task}} {{job.subject}} {{job.args}} 
 
             <a href="{% url 'rsshistory:backgroundjob-remove' job.id %}" class="simplebutton" title="Remove job">
