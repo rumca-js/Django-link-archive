@@ -1,5 +1,6 @@
 from datetime import timedelta
 from django.test import TestCase
+from django.contrib.auth.models import User
 
 from .fakeinternet import FakeInternetTestCase
 
@@ -42,9 +43,14 @@ class UserSearchHistoryTest(TestCase):
             title="",
         )
 
+        self.user = User.objects.create_user(
+            username="test_username", password="testpassword"
+        )
+
     def test_add(self):
+
         # call tested function
-        theobject = UserSearchHistory.add("test_user1", "query1")
+        theobject = UserSearchHistory.add(self.user, "query1")
 
         objects = UserSearchHistory.objects.all()
 
@@ -58,7 +64,7 @@ class UserSearchHistoryTest(TestCase):
             # print("User:{} Query:{}".format(user, query))
 
             # call tested function
-            UserSearchHistory.add(user, query)
+            UserSearchHistory.add(self.user, query)
 
         objects = UserSearchHistory.objects.all()
 
@@ -97,16 +103,20 @@ class UserEntryTransitionHistoryTest(TestCase):
             title="",
         )
 
+        self.user = User.objects.create_user(
+            username="test_username", password="testpassword"
+        )
+
     def test_add_or_increment(self):
         UserEntryTransitionHistory.objects.all().delete()
 
         # cal tested function
         entry1 = UserEntryTransitionHistory.add(
-            "test_user", self.entry_youtube, self.entry_tiktok
+            self.user, self.entry_youtube, self.entry_tiktok
         )
 
         self.assertTrue(entry1)
-        self.assertEqual(entry1.user, "test_user")
+        self.assertEqual(entry1.user, "test_username")
         self.assertEqual(entry1.entry_from.id, self.entry_youtube.id)
         self.assertEqual(entry1.entry_to.id, self.entry_tiktok.id)
 
@@ -115,7 +125,7 @@ class UserEntryTransitionHistoryTest(TestCase):
 
         # cal tested function
         entry = UserEntryTransitionHistory.add(
-            "test_user", self.entry_youtube, self.entry_youtube
+            self.user, self.entry_youtube, self.entry_youtube
         )
 
         self.assertTrue(not entry)
@@ -124,45 +134,45 @@ class UserEntryTransitionHistoryTest(TestCase):
         UserEntryTransitionHistory.objects.all().delete()
 
         # cal tested function
-        entry1 = UserEntryTransitionHistory.add("test_user", None, self.entry_tiktok)
+        entry1 = UserEntryTransitionHistory.add(self.user, None, self.entry_tiktok)
 
         self.assertTrue(entry1)
-        self.assertEqual(entry1.user, "test_user")
+        self.assertEqual(entry1.user, "test_username")
         self.assertEqual(entry1.entry_from, None)
         self.assertEqual(entry1.entry_to.id, self.entry_tiktok.id)
 
     def test_add_or_increment_two(self):
         # call tested function
         entry1 = UserEntryTransitionHistory.add(
-            "test_user", self.entry_youtube, self.entry_tiktok
+            self.user, self.entry_youtube, self.entry_tiktok
         )
 
         # call tested function
         entry2 = UserEntryTransitionHistory.add(
-            "test_user", self.entry_tiktok, self.entry_youtube
+            self.user, self.entry_tiktok, self.entry_youtube
         )
 
         self.assertTrue(entry2)
-        self.assertEqual(entry2.user, "test_user")
+        self.assertEqual(entry2.user, "test_username")
         self.assertEqual(entry2.entry_from.id, self.entry_tiktok.id)
         self.assertEqual(entry2.entry_to.id, self.entry_youtube.id)
 
     def test_get_related_list(self):
         UserEntryTransitionHistory.add(
-            "test_user", self.entry_youtube, self.entry_tiktok
+            self.user, self.entry_youtube, self.entry_tiktok
         )
 
         UserEntryTransitionHistory.add(
-            "test_user", self.entry_youtube, self.entry_odysee
+            self.user, self.entry_youtube, self.entry_odysee
         )
 
         UserEntryTransitionHistory.add(
-            "test_user", self.entry_tiktok, self.entry_spotify
+            self.user, self.entry_tiktok, self.entry_spotify
         )
 
         # call tested function
         related_list = UserEntryTransitionHistory.get_related_list(
-            "test_user", self.entry_youtube
+            self.user, self.entry_youtube
         )
 
         self.assertEqual(len(related_list), 2)
@@ -201,13 +211,17 @@ class UserEntryVisitHistoryTest(FakeInternetTestCase):
             source_obj=ob,
         )
 
+        self.user = User.objects.create_user(
+            username="test_username", password="testpassword"
+        )
+
     def test_entry_visit_two_visits(self):
         entries = LinkDataController.objects.filter(link="https://youtube.com?v=12345")
 
         self.assertEqual(entries.count(), 1)
 
         # call tested function
-        UserEntryVisitHistory.visited(entries[0], "test_username")
+        UserEntryVisitHistory.visited(entries[0], self.user)
 
         visits = UserEntryVisitHistory.objects.filter(entry_object=entries[0])
         self.assertEqual(visits.count(), 1)
@@ -215,7 +229,7 @@ class UserEntryVisitHistoryTest(FakeInternetTestCase):
         self.assertEqual(visits[0].user, "test_username")
 
         # call tested function
-        UserEntryVisitHistory.visited(entries[0], "test_username")
+        UserEntryVisitHistory.visited(entries[0], self.user)
 
         # this call is not taken into consideration. Happened to fast. refresh, etc.
 
@@ -252,7 +266,7 @@ class UserEntryVisitHistoryTest(FakeInternetTestCase):
         )
 
         # call tested function
-        entry = UserEntryVisitHistory.get_last_user_entry("test_username")
+        entry = UserEntryVisitHistory.get_last_user_entry(self.user)
 
         self.assertTrue(entry)
         self.assertEqual(entry, self.tiktok_object)
@@ -266,6 +280,6 @@ class UserEntryVisitHistoryTest(FakeInternetTestCase):
         )
 
         # call tested function
-        entry = UserEntryVisitHistory.get_last_user_entry("test_username")
+        entry = UserEntryVisitHistory.get_last_user_entry(self.user)
 
         self.assertFalse(entry)

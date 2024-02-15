@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from django.contrib.auth.models import User
 
 from ..controllers import (
     BackgroundJobController,
@@ -41,6 +42,8 @@ class HandlerManagerTest(FakeInternetTestCase):
             link="https://youtube.com?v=12345",
             source_obj=ob,
         )
+
+        self.user = self.get_user(username="test_username", password="testpassword", is_superuser=True)
 
     def test_job_consistency(self):
         from ..controllers.backgroundjob import BackgroundJobController
@@ -381,6 +384,8 @@ class RefreshThreadHandlerTest(FakeInternetTestCase):
         BackgroundJobController.objects.all().delete()
         SourceExportHistory.objects.all().delete()
 
+        self.user = self.get_user(username="test_username", password="testpassword", is_superuser=True)
+
     def create_exports(self):
         DataExport.objects.create(
             enabled=True,
@@ -485,6 +490,8 @@ class RefreshThreadHandlerTest(FakeInternetTestCase):
 class CleanJobHandlerTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
+
+        self.user = self.get_user(username="test_username", password="testpassword", is_superuser=True)
 
     def prepare_data(self):
         # inserts old data, we will check if those will be removed
@@ -610,6 +617,8 @@ class AddJobHandlerTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 
+        self.user = self.get_user(username="test_username", password="testpassword", is_superuser=True)
+
     def test_add_link(self):
         conf = Configuration.get_object().config_entry
         conf.auto_store_domain_info = True
@@ -632,10 +641,34 @@ class AddJobHandlerTest(FakeInternetTestCase):
         self.assertEqual(LinkDataController.objects.all().count(), 1)
         self.assertEqual(DomainsController.objects.all().count(), 1)
 
+    def test_add_link_with_props(self):
+        conf = Configuration.get_object().config_entry
+        conf.auto_store_domain_info = True
+        conf.save()
+
+        LinkDataController.objects.all().delete()
+        DomainsController.objects.all().delete()
+
+        ob = BackgroundJobController.link_add("https://manually-added-link.com", tag="demoscene")
+
+        handler = LinkAddJobHandler()
+        handler.process(ob)
+
+        persistent_objects = PersistentInfo.objects.all()
+
+        for persistent_object in persistent_objects:
+            print("Persisten object info:{}".format(persistent_object.info))
+
+        self.assertEqual(persistent_objects.count(), 0)
+        self.assertEqual(LinkDataController.objects.all().count(), 1)
+        self.assertEqual(DomainsController.objects.all().count(), 1)
+
 
 class ScanLinkJobHandlerTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
+
+        self.user = self.get_user(username="test_username", password="testpassword", is_superuser=True)
 
     def test_scan_link(self):
         conf = Configuration.get_object().config_entry
@@ -667,6 +700,8 @@ class ScanLinkJobHandlerTest(FakeInternetTestCase):
 class ProcessSourceHandlerTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
+
+        self.user = self.get_user(username="test_username", password="testpassword", is_superuser=True)
 
     def test_process_source_unknown(self):
         LinkDataController.objects.all().delete()

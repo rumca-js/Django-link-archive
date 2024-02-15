@@ -332,12 +332,10 @@ class EntriesOmniListView(EntriesSearchListView):
         from ..queryfilters import OmniSearchFilter
         from ..models import UserSearchHistory
 
-        username = self.request.user.username
-
         if self.request.user.is_authenticated:
             search_term = get_search_term_request(self.request)
             if search_term:
-                UserSearchHistory.add(username, search_term)
+                UserSearchHistory.add(self.request.user, search_term)
 
         query_filter = OmniSearchFilter(self.request.GET)
 
@@ -409,7 +407,7 @@ class EntriesOmniListView(EntriesSearchListView):
     def get_form_instance(self):
         config = Configuration.get_object().config_entry
 
-        user = self.request.user.username
+        user = self.request.user
         user_choices = UserSearchHistory.get_user_choices(user)
 
         if config.days_to_move_to_archive == 0:
@@ -465,7 +463,7 @@ class EntryDetailView(generic.DetailView):
         if config.track_user_actions and config.track_user_navigation:
             username = self.request.user.username
             context["transitions"] = UserEntryTransitionHistory.get_related_list(
-                username, self.object
+                self.request.user, self.object
             )
 
         m = WaybackMachine()
@@ -477,7 +475,7 @@ class EntryDetailView(generic.DetailView):
         return context
 
     def set_visited(self):
-        UserEntryVisitHistory.visited(self.object, self.request.user.username)
+        UserEntryVisitHistory.visited(self.object, self.request.user)
 
 
 class EntryArchivedDetailView(generic.DetailView):
@@ -824,7 +822,7 @@ def entries_omni_search_init(request):
     p.set_title("Search entries")
 
     user = request.user.username
-    user_choices = UserSearchHistory.get_user_choices(user)
+    user_choices = UserSearchHistory.get_user_choices(request.user)
 
     filter_form = OmniSearchForm(
         request.GET, user_choices=user_choices, request=request

@@ -4,10 +4,11 @@ from ..webtools import RssPage
 
 class YouTubeChannelHandler(RssPage, DefaultUrlHandler):
     def __init__(self, url=None, contents=None, page_object=None, options=None):
+        print("YouTubeChannelHandler:0")
         super().__init__(
             url, contents=contents, page_object=page_object, options=options
         )
-        print("YouTubeChannelHandler contents: {}".format(self.contents))
+        print("YouTubeChannelHandler:1")
 
         if url:
             self.code = self.input2code(url)

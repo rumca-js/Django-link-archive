@@ -195,6 +195,8 @@ class PersistentInfo(models.Model):
 
     def create(info, level=int(logging.INFO), user=None):
         try:
+            LinkDatabase.info("PersistentInfo::create:{}".format(info))
+
             PersistentInfo.cleanup_overflow()
 
             PersistentInfo.objects.create(
@@ -206,6 +208,8 @@ class PersistentInfo(models.Model):
 
     def text(info, level=int(logging.INFO), user=None):
         try:
+            LinkDatabase.info("PersistentInfo::text:{}".format(info))
+
             PersistentInfo.cleanup_overflow()
 
             PersistentInfo.objects.create(
@@ -217,6 +221,8 @@ class PersistentInfo(models.Model):
 
     def error(info, level=int(logging.ERROR), user=None):
         try:
+            LinkDatabase.info("PersistentInfo::error:{}".format(info))
+
             PersistentInfo.cleanup_overflow()
 
             PersistentInfo.objects.create(
@@ -230,6 +236,8 @@ class PersistentInfo(models.Model):
         text = "{}. Exception data:\n{}".format(info, str(exc_data))
 
         try:
+            LinkDatabase.info("PersistentInfo::exc:{}".format(info))
+
             PersistentInfo.cleanup_overflow()
 
             PersistentInfo.objects.create(

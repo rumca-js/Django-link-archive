@@ -12,10 +12,16 @@ from .sourcegenericplugin import SourceGenericPlugin
 
 
 class BaseRssPlugin(SourceGenericPlugin):
+    """
+    TODO this inherits HTML, not RSS
+    """
     PLUGIN_NAME = "BaseRssPlugin"
 
     def __init__(self, source_id):
+        print("BaseRssPlugin:constr0")
         super().__init__(source_id)
+        source = self.get_source()
+        print("BaseRssPlugin:constr1:{}".format(source.url))
 
     def get_contents(self):
         if self.contents:
@@ -70,6 +76,9 @@ class BaseRssPlugin(SourceGenericPlugin):
         )
 
     def get_container_elements(self):
+        """
+        We override RSS behavior
+        """
         c = Configuration.get_object().config_entry
 
         contents = self.get_contents()
@@ -78,7 +87,7 @@ class BaseRssPlugin(SourceGenericPlugin):
         if not contents:
             return
 
-        self.reader = RssPage(self.get_address(), contents=contents)
+        self.reader = RssPage(self.get_address(), page_object=self)
         all_props = self.reader.get_container_elements()
 
         for index, prop in enumerate(all_props):
@@ -86,54 +95,16 @@ class BaseRssPlugin(SourceGenericPlugin):
             if "link" not in prop:
                 continue
 
-            prop = self.cleanup_data(prop)
+            prop = self.enhance(prop)
 
             if self.is_link_ok_to_add(prop):
                 yield prop
             # LinkDatabase.info("Processing RSS element DONE")
         # LinkDatabase.info("Processing RSS elements DONE")
 
-    def cleanup_data(self, prop):
+    def enhance(self, prop):
         if prop["link"].endswith("/"):
             prop["link"] = prop["link"][:-1]
-        return prop
-
-    def get_clean_page_info(self, prop):
-        i = EntryUrlInterface(prop["link"])
-        new_props = i.get_props()
-        if not new_props:
-            return prop
-
-        for key in new_props:
-            if new_props[key] is not None:
-                prop[key] = new_props[key]
-        return prop
-
-    def get_updated_page_info(self, prop):
-        i = EntryUrlInterface(prop["link"])
-        new_props = i.get_props(prop)
-        return prop
-
-    def enhance(self, prop):
-        prop = self.cleanup_data(prop)
-
-        source = self.get_source()
-
-        if source:
-            prop["source"] = source.url
-            if "language" not in prop:
-                prop["language"] = source.language
-            if "artist" not in prop:
-                prop["artist"] = source.title
-            if "album" not in prop:
-                prop["album"] = source.title
-        else:
-            prop["source"] = self.reader.url
-            if "language" not in prop:
-                prop["language"] = self.reader.get_language()
-            if "artist" not in prop:
-                prop["artist"] = self.reader.get_artist()
-
         return prop
 
     def calculate_plugin_hash(self):
@@ -141,5 +112,6 @@ class BaseRssPlugin(SourceGenericPlugin):
         We do not care about RSS title changing. We care only about entries
         Generic handler uses Html as base. We need to use RSS for body hash
         """
-        p = RssPage(self.get_address(), page_object=self)
-        return p.get_body_hash()
+        self.get_contents()
+        reader = RssPage(self.get_address(), page_object=self)
+        return reader.get_body_hash()

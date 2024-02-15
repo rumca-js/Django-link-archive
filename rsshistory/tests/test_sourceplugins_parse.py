@@ -1,3 +1,5 @@
+from django.contrib.auth.models import User
+
 from ..models import LinkTagsDataModel, SourceOperationalData
 from ..controllers import SourceDataController, LinkDataController
 
@@ -39,6 +41,10 @@ class SourceParsePluginTest(FakeInternetTestCase):
         )
         self.disable_web_pages()
         self.setup_configuration()
+
+        self.user = User.objects.create_user(
+            username="test_username", password="testpassword", is_superuser=True
+        )
 
     def test_is_link_valid_html(self):
         parse = BaseParsePlugin(self.source_youtube.id)
@@ -218,6 +224,10 @@ class NowNowNowPluginTest(FakeInternetTestCase):
             category="No",
             subcategory="No",
             export_to_cms=True,
+        )
+
+        self.user = User.objects.create_user(
+            username="test_username", password="testpassword", is_superuser=True
         )
 
     def is_domain(self, alist, value):

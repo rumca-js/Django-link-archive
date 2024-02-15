@@ -200,8 +200,20 @@ class ViewsTest(FakeInternetTestCase):
 
         self.assertEqual(resp.status_code, 200)
 
+    def test_omni_search_init(self):
+        url = reverse("{}:entries-omni-search-init".format(LinkDatabase.name))
+        resp = self.client.get(url)
+
+        self.assertEqual(resp.status_code, 200)
+
     def test_entries_search_init(self):
         url = reverse("{}:entries-search-init".format(LinkDatabase.name))
+        resp = self.client.get(url)
+
+        self.assertEqual(resp.status_code, 200)
+
+    def test_entries_archived_init(self):
+        url = reverse("{}:entries-archived-init".format(LinkDatabase.name))
         resp = self.client.get(url)
 
         self.assertEqual(resp.status_code, 200)
@@ -217,6 +229,13 @@ class ViewsTest(FakeInternetTestCase):
         resp = self.client.get(url)
 
         self.assertEqual(resp.status_code, 200)
+
+    def test_omni_search(self):
+        url = reverse("{}:entries-omni-search".format(LinkDatabase.name))
+        resp = self.client.get(url)
+
+        self.assertEqual(resp.status_code, 200)
+
 
     """
     Tags

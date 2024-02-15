@@ -129,16 +129,16 @@ def tag_entry(request, pk):
             return p.render("summary_present.html")
 
     else:
-        author = request.user.username
+        user = request.user
         link = obj.link
-        tag_string = LinkTagsDataModel.get_author_tag_string(author, link)
+        tag_string = LinkTagsDataModel.get_user_tag_string(request.user, link)
 
         if tag_string:
             form = TagEntryForm(
-                initial={"link": link, "author": author, "tag": tag_string}
+                initial={"link": link, "user": user, "tag": tag_string}
             )
         else:
-            form = TagEntryForm(initial={"link": link, "author": author})
+            form = TagEntryForm(initial={"link": link, "user": user})
 
         form.method = "POST"
         form.pk = pk
@@ -240,7 +240,7 @@ def tags_entry_show(request, entrypk):
     entry = LinkDataController.objects.get(id=entrypk)
     tags = entry.tags.all()
     for tag in tags:
-        summary += "Link:{} tag:{} author:{}\n".format(tag.link, tag.tag, tag.author)
+        summary += "Link:{} tag:{} user:{}\n".format(tag.link, tag.tag, tag.user)
 
     p.context["summary_text"] = summary
 
@@ -316,7 +316,9 @@ def entry_vote(request, pk):
         form = LinkVoteForm(request.POST)
 
         if form.is_valid():
-            LinkVoteDataModel.save_vote(form.cleaned_data)
+            data = form.cleaned_data
+            data["user"] = request.user
+            LinkVoteDataModel.save_vote(data)
 
             return HttpResponseRedirect(
                 reverse(
@@ -334,14 +336,14 @@ def entry_vote(request, pk):
             return p.render("summary_present.html")
 
     else:
-        author = request.user.username
+        user = request.user
 
         vote = 0
-        votes = obj.votes.filter(author=author)
+        votes = obj.votes.filter(user=user)
         if votes.count() > 0:
             vote = votes[0].vote
 
-        form = LinkVoteForm(initial={"link_id": obj.id, "author": author, "vote": vote})
+        form = LinkVoteForm(initial={"link_id": obj.id, "user": user, "vote": vote})
 
         form.method = "POST"
         form.pk = pk

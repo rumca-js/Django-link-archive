@@ -35,13 +35,44 @@ class EntriesViewsTests(FakeInternetTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, test_link, html=False)
 
-    def test_add_entry(self):
+    def test_add_entry_html(self):
         LinkDataController.objects.all().delete()
 
         self.client.login(username="testuser", password="testpassword")
 
         url = reverse("{}:entry-add".format(LinkDatabase.name))
         test_link = "https://linkedin.com"
+
+        data = {"link": test_link}
+        full_data = LinkDataController.get_full_information(data)
+        full_data["description"] = LinkDataController.get_description_safe(
+            full_data["description"]
+        )
+
+        limited_data = {}
+        for key in full_data:
+            if full_data[key] is not None:
+                limited_data[key] = full_data[key]
+
+        print("Limited data")
+        print(limited_data)
+
+        self.assertEqual(LinkDataController.objects.filter(link=test_link).count(), 0)
+
+        # call user action
+        response = self.client.post(url, data=limited_data)
+
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(LinkDataController.objects.filter(link=test_link).count(), 1)
+
+    def test_add_entry_rss(self):
+        LinkDataController.objects.all().delete()
+
+        self.client.login(username="testuser", password="testpassword")
+
+        url = reverse("{}:entry-add".format(LinkDatabase.name))
+        test_link = "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM"
 
         data = {"link": test_link}
         full_data = LinkDataController.get_full_information(data)

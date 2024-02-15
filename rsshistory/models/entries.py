@@ -53,7 +53,7 @@ class BaseLinkDataModel(models.Model):
     artist = models.CharField(max_length=1000, null=True, blank=True)
     album = models.CharField(max_length=1000, null=True, blank=True)
 
-    status_code = models.IntegerField(default=200)
+    status_code = models.IntegerField(default=0)
 
     page_rating_contents = models.IntegerField(default=0)
     page_rating_votes = models.IntegerField(default=0)

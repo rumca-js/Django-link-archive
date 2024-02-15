@@ -1,4 +1,5 @@
 from datetime import timedelta
+from django.contrib.auth.models import User
 
 from ..models import LinkTagsDataModel
 from ..controllers import (
@@ -16,6 +17,10 @@ from .fakeinternet import FakeInternetTestCase
 class LinkDataControllerTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
+
+        self.user = User.objects.create_user(
+            username="test_username", password="testpassword"
+        )
 
     def clear(self):
         SourceDataController.objects.all().delete()
@@ -138,7 +143,7 @@ class LinkDataControllerTest(FakeInternetTestCase):
         )
 
         # call tested function
-        entry.tag(["tag1", "tag2"], "testuser1")
+        entry.tag(["tag1", "tag2"], self.user)
 
         tags = LinkTagsDataModel.objects.all()
 

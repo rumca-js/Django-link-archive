@@ -170,7 +170,7 @@ def page_scan(request):
                 link = link.replace("\r", "")
 
                 if link != "":
-                    BackgroundJobController.link_add(link, tag=tag)
+                    BackgroundJobController.link_add(link, tag=tag, user=request.user)
 
         p.context["summary_text"] = "Added links"
         return p.render("summary_present.html")
@@ -221,7 +221,7 @@ def page_scan_contents(request):
 
             for link in links:
                 if link != "":
-                    BackgroundJobController.link_add(link, tag=tag)
+                    BackgroundJobController.link_add(link, tag=tag, user=request.user)
 
         p.context["summary_text"] = "Added links"
         return p.render("summary_present.html")
@@ -542,4 +542,3 @@ def data_errors_page(request):
     # show bookmarked links without tags
 
     return p.render("data_errors.html")
-

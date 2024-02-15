@@ -394,7 +394,7 @@ class TagEntryForm(forms.ModelForm):
 
     class Meta:
         model = LinkTagsDataModel
-        fields = ["link", "author", "tag"]
+        fields = ["link", "user", "tag"]
         widgets = {
             #    'date': forms.widgets.DateTimeInput(attrs={'type': 'datetime-local'})
         }
@@ -744,7 +744,7 @@ class CommentEntryForm(forms.Form):
     """
 
     link_id = forms.IntegerField(required=False, widget=forms.HiddenInput())
-    author = forms.CharField(
+    user = forms.CharField(
         max_length=1000, widget=forms.TextInput(attrs={"readonly": "readonly"})
     )
     comment = forms.CharField(widget=forms.Textarea)
@@ -766,12 +766,12 @@ class LinkVoteForm(forms.Form):
     """
 
     link_id = forms.IntegerField(required=False, widget=forms.HiddenInput())
-    author = forms.CharField(max_length=1000)
+    user = forms.CharField(max_length=1000)
     vote = forms.IntegerField(initial=0)
 
     def __init__(self, *args, **kwargs):
         super(LinkVoteForm, self).__init__(*args, **kwargs)
-        self.fields["author"].readonly = True
+        self.fields["user"].readonly = True
 
         config = Configuration.get_object().config_entry
 

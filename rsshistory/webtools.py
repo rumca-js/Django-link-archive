@@ -84,8 +84,8 @@ def date_str_to_date(date_str):
 
 
 class SeleniumResponseObject(object):
-    def __init__(self, url, contents):
-        self.status_code = 200
+    def __init__(self, url, contents, status_code = 200):
+        self.status_code = status_code
 
         self.content = contents
         self.text = contents
@@ -285,6 +285,7 @@ class BasePage(object):
             return self.contents
 
         if not self.user_agent or self.user_agent == "":
+            self.dead=True
             return None
 
         if self.dead:
@@ -300,6 +301,7 @@ class BasePage(object):
                 "Page: Url is invalid{};Lines:{}".format(self.url, line_text)
             )
 
+            self.dead=True
             return None
 
         hdr = {
@@ -353,6 +355,7 @@ class BasePage(object):
                 self.url, headers=headers, timeout=10
             )
         else:
+            self.dead = True
             raise NotImplementedError("Could not identify method of page capture")
 
     def get_contents_via_requests(self, url, headers, timeout):
@@ -414,12 +417,11 @@ class BasePage(object):
             PersistentInfo.error(
                 "Timeout when reading page. {}".format(selenium_timeout)
             )
+            return SeleniumResponseObject(url, None, 500)
 
         html_content = driver.page_source
-
         driver.quit()
-
-        return SeleniumResponseObject(url, html_content)
+        return SeleniumResponseObject(url, html_content, 200)
 
     def get_contents_via_selenium_chrome_full(self, url, headers, timeout):
         """
@@ -455,6 +457,7 @@ class BasePage(object):
             PersistentInfo.error(
                 "Timeout when reading page. {}".format(selenium_timeout)
             )
+            return SeleniumResponseObject(url, None, 500)
 
         page_source = driver.page_source
 
@@ -466,7 +469,7 @@ class BasePage(object):
 
         driver.quit()
 
-        return SeleniumResponseObject(url, page_source)
+        return SeleniumResponseObject(url, page_source, 200)
 
     def get_contents_via_selenium_chrome_undetected(self, url, headers, timeout):
         """
@@ -493,6 +496,7 @@ class BasePage(object):
             PersistentInfo.error(
                 "Timeout when reading page. {}".format(selenium_timeout)
             )
+            return SeleniumResponseObject(url, None, 500)
 
         html_content = driver.page_source
 
@@ -707,6 +711,12 @@ class DomainAwarePage(BasePage):
         if url.find("adfoc.us") >= 0:
             return True
         if url.endswith("link.to"):
+            return True
+        if url.find("mailchi.mp") >= 0:
+            return True
+        if url.find("dbh.la") >= 0:
+            return True
+        if url.find("ffm.to") >= 0:
             return True
 
         return False
@@ -2166,12 +2176,12 @@ class HtmlPage(ContentInterface):
         body = self.get_body_text()
 
         if body == "":
-            PersistentInfo.error("Empty body")
+            PersistentInfo.error("HTML: Empty body")
             return self.calculate_hash("no body hash")
         elif body:
             return self.calculate_hash(body)
         else:
-            PersistentInfo.error("No body")
+            PersistentInfo.error("HTML: Cannot calculate body hash for:{}".format(self.url))
             if self.contents:
                 return self.calculate_hash(self.contents)
 

@@ -4,12 +4,12 @@ from django.contrib.auth.models import User
 from ..apps import LinkDatabase
 from ..controllers import SourceDataController, LinkDataController, DomainsController
 from ..dateutils import DateUtils
-from ..models import KeyWords, DataExport, LinkCommentDataModel
+from ..models import KeyWords, DataExport, LinkVoteDataModel
 
 from .fakeinternet import FakeInternetTestCase
 
 
-class CommentsViewsTests(FakeInternetTestCase):
+class LinkVoteDataModelTests(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 
@@ -19,7 +19,7 @@ class CommentsViewsTests(FakeInternetTestCase):
         self.user.is_staff = True
         self.user.save()
 
-    def test_add_comment(self):
+    def test_add_vote(self):
         self.client.login(username="testuser", password="testpassword")
 
         test_link = "https://linkedin.com"
@@ -35,17 +35,16 @@ class CommentsViewsTests(FakeInternetTestCase):
             language="en",
         )
 
-        self.assertEqual(LinkCommentDataModel.objects.all().count(), 0)
+        self.assertEqual(LinkVoteDataModel.objects.all().count(), 0)
 
-        url = reverse("{}:entry-comment-add".format(LinkDatabase.name), args=[entry.id])
+        url = reverse("{}:entry-vote".format(LinkDatabase.name), args=[entry.id])
 
         data = {"link": test_link}
 
-        comment_data = {
+        vote_data = {
             "link_id": entry.id,
             "user": self.user,
-            "comment": "test comment",
-            "date_published": DateUtils.get_datetime_now_utc(),
+            "vote": "30",
         }
 
         # call user action

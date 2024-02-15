@@ -135,7 +135,7 @@ class BackgroundJobController(BackgroundJob):
             BackgroundJob.JOB_LINK_DOWNLOAD_VIDEO, item.link
         )
 
-    def link_add(url, source=None, tag=""):
+    def link_add(url, source=None, tag="", user=None):
         if not url.startswith("http"):
             url = "https://" + url
 
@@ -154,6 +154,9 @@ class BackgroundJobController(BackgroundJob):
 
         if tag:
             cfg["tag"] = tag
+
+        if user:
+            cfg["user_id"] = user.id
 
         if cfg != {}:
             return BackgroundJobController.create_single_job(

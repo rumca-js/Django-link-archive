@@ -24,7 +24,7 @@ def entry_add_comment(request, link_id):
         return data
 
     user_name = request.user.get_username()
-    if not LinkCommentDataController.can_user_add_comment(link_id, user_name):
+    if not LinkCommentDataController.can_user_add_comment(link_id, request.user):
         p.context[
             "summary_text"
         ] = "User cannot add more comments. Limit to {} comment per day".format(
@@ -41,6 +41,9 @@ def entry_add_comment(request, link_id):
         # create a form instance and populate it with data from the request:
         form = CommentEntryForm(request.POST)
         if form.is_valid():
+            data = form.cleaned_data
+            data["user"] = request.user
+
             if LinkCommentDataController.save_comment(form.cleaned_data):
                 return HttpResponseRedirect(
                     reverse(

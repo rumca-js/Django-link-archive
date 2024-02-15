@@ -9,7 +9,11 @@ class CodeProjectPlugin(BaseRssPlugin):
         self.allow_adding_with_current_time = True
 
     def enhance(self, props):
+        """
+        TODO unused?
+        """
         feed_entry = props["feed_entry"]
+
         props = BaseRssPlugin.enhance(self, props)
 
         if "href" in feed_entry.source:

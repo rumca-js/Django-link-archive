@@ -97,6 +97,11 @@ class BaseParsePlugin(SourceGenericPlugin):
         We do not care about RSS title changing. We care only about entries
         Generic handler uses Html as base. We need to use RSS for body hash
         """
+
+        # this is stupid to write get contents to have contents, to pass it it
+        # to html page
+        self.get_contents()
+
         print("Calculating plugin hash")
         if self.is_html(False):
             print("Calculating plugin hash is html")

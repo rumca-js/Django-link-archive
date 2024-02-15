@@ -54,6 +54,7 @@ class EntryUrlInterface(object):
 
             props["page_rating_contents"] = self.p.get_page_rating()
             props["page_rating"] = self.p.get_page_rating()
+            props["status_code"] = self.p.status_code
 
             if not self.is_property_set(props, "artist") and self.p.get_author():
                 props["artist"] = self.p.get_author()

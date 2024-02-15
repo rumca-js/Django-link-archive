@@ -5,6 +5,7 @@ This module provides replacement for the Internet.
  - when there is a request to obtain youtube JSON data, we provide artificial data, etc.
 """
 from django.test import TestCase
+from django.contrib.auth.models import User
 # import chardet
 
 from ..models import PersistentInfo, ConfigurationEntry
@@ -407,6 +408,27 @@ class FakeInternetTestCase(TestCase):
         c.config_entry.days_to_remove_links = 0
         c.config_entry.whats_new_days = 7
         c.config_entry.save()
+
+    def get_user(self, username="test_username", password="testpassword", is_superuser=False):
+        """
+        TODO test cases should be rewritten to use names as follows:
+         - test_superuser
+         - test_staff
+         - test_authenticated
+        """
+        users = User.objects.filter(username=username)
+        if users.count() > 0:
+            self.user=users[0]
+            self.user.username=username
+            self.user.password=password
+            self.user.is_superuser = is_superuser
+            self.user.save()
+        else:
+            self.user = User.objects.create_user(
+                username=username, password=password, is_superuser=is_superuser
+            )
+
+        return self.user
 
     def print_errors(self):
         infos = PersistentInfo.objects.all()

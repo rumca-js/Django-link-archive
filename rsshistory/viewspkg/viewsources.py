@@ -110,16 +110,21 @@ def add_source(request):
         form = SourceForm(request.POST)
 
         if form.is_valid():
+            sources = SourceDataController.objects.filter(url=form.cleaned_data["url"])
+            if sources.count() > 0:
+                return HttpResponseRedirect(source.get_absolute_url())
+
             b = SourceDataBuilder()
             b.link_data = form.cleaned_data
             b.manual_entry = True
             source = b.add_from_props()
 
             if not source:
-                p.context["summary_text"] = "Source already exist"
+                p.context["summary_text"] = "Cannot add source"
                 return p.render("summary_present.html")
 
             return HttpResponseRedirect(source.get_absolute_url())
+
         else:
             error_message = "\n".join(
                 [
@@ -476,7 +481,7 @@ def import_youtube_links_for_source(request, pk):
         print("Adding job {}".format(link))
         wrapper = LinkDataWrapper(link=link)
         if not wrapper.get():
-            BackgroundJobController.link_add(link, source_obj)
+            BackgroundJobController.link_add(link, source=source_obj, user=request.user)
 
     p.context["summary_text"] = ""
     return p.render("summary_present.html")

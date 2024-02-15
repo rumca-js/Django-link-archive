@@ -3,12 +3,17 @@
  - the causation needs to be established
  - the engine needs to know the person it tracks (does anonymization exist for search engines?)
 """
-
+import time
 from datetime import timedelta
+
 from django.db import models
+from django.conf import settings
+from django.contrib.auth.models import User
+
 from ..controllers import LinkDataController
 from ..configuration import Configuration
 from ..apps import LinkDatabase
+from .system import PersistentInfo
 
 
 class UserSearchHistory(models.Model):
@@ -19,11 +24,18 @@ class UserSearchHistory(models.Model):
     search_query = models.CharField(max_length=1000)
     user = models.CharField(max_length=1000)
     date = models.DateTimeField(auto_now_add=True)
+    user_object = models.ForeignKey(settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name=str(LinkDatabase.name)+'_search_history',
+        null=True)
 
     class Meta:
         ordering = ["-date"]
 
     def add(user, search_query):
+        if not user.is_authenticated:
+            return
+
         config_entry = Configuration.get_object().config_entry
         if not config_entry.track_user_actions or not config_entry.track_user_searches:
             return
@@ -38,9 +50,9 @@ class UserSearchHistory(models.Model):
                 )
 
                 theobject = UserSearchHistory.objects.create(
-                    search_query=search_query, user=user
+                    search_query=search_query, user=user.username, user_object=user
                 )
-                UserSearchHistory.delete_old_entries()
+                UserSearchHistory.delete_old_entries(user)
 
                 return theobject
             except Exception as E:
@@ -51,8 +63,19 @@ class UserSearchHistory(models.Model):
         if not config_entry.track_user_actions or not config_entry.track_user_searches:
             UserSearchHistory.objects.all().delete()
 
+        qs = UserSearchHistory.objects.filter(user_object__isnull = True)
+        for q in qs:
+            users = User.objects.filter(username=q.user)
+            if users.count() > 0:
+                q.user_object = users[0]
+                q.save()
+            else:
+                LinkDatabase.info("Removing invalid search")
+                q.delete()
+                time.sleep(0.5)
+
     def get_top_query(user):
-        qs = UserSearchHistory.objects.filter(user=user).order_by("-date")
+        qs = UserSearchHistory.objects.filter(user=user.username).order_by("-date")
         if qs.exists():
             return qs[0]
 
@@ -62,7 +85,7 @@ class UserSearchHistory(models.Model):
         """
         choices = []
 
-        qs = UserSearchHistory.objects.filter(user=user).order_by("-date")[
+        qs = UserSearchHistory.objects.filter(user=user.username).order_by("-date")[
             : UserSearchHistory.get_choices_limit()
         ]
 
@@ -72,8 +95,8 @@ class UserSearchHistory(models.Model):
 
         return choices
 
-    def delete_old_entries():
-        qs = UserSearchHistory.objects.all().order_by("date")
+    def delete_old_entries(user):
+        qs = UserSearchHistory.objects.filter(user=user.username).order_by("date")
         limit = UserSearchHistory.get_choices_model_limit()
         if qs.count() > limit:
             too_many = qs.count() - limit
@@ -82,7 +105,7 @@ class UserSearchHistory(models.Model):
                 entry.delete()
 
     def delete_old_user_entries(user, search_query):
-        entries = UserSearchHistory.objects.filter(search_query=search_query, user=user)
+        entries = UserSearchHistory.objects.filter(search_query=search_query, user=user.username)
         if entries.exists():
             entries.delete()
 
@@ -100,6 +123,10 @@ class UserEntryTransitionHistory(models.Model):
 
     user = models.CharField(max_length=1000)
     counter = models.IntegerField(default=0)
+    user_object = models.ForeignKey(settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name=str(LinkDatabase.name)+'_entry_transitions',
+        null=True)
 
     entry_from = models.ForeignKey(
         LinkDataController,
@@ -126,7 +153,7 @@ class UserEntryTransitionHistory(models.Model):
         result = []
 
         links = UserEntryTransitionHistory.objects.filter(
-            user=user, entry_from=navigated_to_entry
+            user=user.username, entry_from=navigated_to_entry
         ).order_by("-counter")
         if links.exists():
             for link_info in links:
@@ -136,14 +163,6 @@ class UserEntryTransitionHistory(models.Model):
                     result.append(entry)
 
         return result
-
-    def cleanup():
-        config_entry = Configuration.get_object().config_entry
-        if (
-            not config_entry.track_user_actions
-            or not config_entry.track_user_navigation
-        ):
-            UserEntryTransitionHistory.objects.all().delete()
 
     def add(user, entry_from, entry_to):
         config_entry = Configuration.get_object().config_entry
@@ -165,12 +184,12 @@ class UserEntryTransitionHistory(models.Model):
 
         else:
             return UserEntryTransitionHistory.objects.create(
-                user=user, entry_from=entry_from, entry_to=entry_to, counter=1
+                user=user.username, entry_from=entry_from, entry_to=entry_to, counter=1, user_object = user
             )
 
     def get_element(user, entry_from, entry_to):
         links = UserEntryTransitionHistory.objects.filter(
-            user=user, entry_from=entry_from, entry_to=entry_to
+            user=user.username, entry_from=entry_from, entry_to=entry_to
         ).order_by("-counter")
         if links.exists():
             return links[0]
@@ -183,6 +202,17 @@ class UserEntryTransitionHistory(models.Model):
         ):
             UserEntryTransitionHistory.objects.all().delete()
 
+        qs = UserEntryTransitionHistory.objects.filter(user_object__isnull = True)
+        for q in qs:
+            users = User.objects.filter(username=q.user)
+            if users.count() > 0:
+                q.user_object = users[0]
+                q.save()
+            else:
+                LinkDatabase.info("Cannot find user:'{}'".format(q.user))
+                q.delete()
+                time.sleep(0.5)
+
 
 class UserEntryVisitHistory(models.Model):
     """
@@ -193,6 +223,10 @@ class UserEntryVisitHistory(models.Model):
     user = models.CharField(max_length=1000, null=True, blank=True)
     visits = models.IntegerField(blank=True, null=True)
     date_last_visit = models.DateTimeField(blank=True, null=True)
+    user_object = models.ForeignKey(settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name=str(LinkDatabase.name)+'_entry_visits',
+        null=True)
 
     entry_object = models.ForeignKey(
         LinkDataController,
@@ -211,6 +245,12 @@ class UserEntryVisitHistory(models.Model):
         from ..dateutils import DateUtils
         from ..controllers import BackgroundJobController
 
+        """
+        TODO to think about. are we capturing data about not logged users?
+        """
+        if not user.is_authenticated:
+            return
+
         config = Configuration.get_object().config_entry
 
         # ignore misinformation, etc.
@@ -220,10 +260,10 @@ class UserEntryVisitHistory(models.Model):
         if not config.track_user_actions or not config.track_user_navigation:
             return
 
-        if str(user) == "" or user is None:
+        if str(user.username) == "" or user.username is None:
             return
 
-        visits = UserEntryVisitHistory.objects.filter(entry_object=entry, user=user)
+        visits = UserEntryVisitHistory.objects.filter(entry_object=entry, user=user.username)
 
         if UserEntryVisitHistory.is_link_just_visited(visits):
             return
@@ -237,15 +277,17 @@ class UserEntryVisitHistory(models.Model):
 
             if visits.count() == 0:
                 visit = UserEntryVisitHistory.objects.create(
-                    user=user,
+                    user=user.username,
                     visits=1,
                     entry_object=entry,
                     date_last_visit=DateUtils.get_datetime_now_utc(),
+                    user_object=user,
                 )
             else:
                 visit = visits[0]
                 visit.visits += 1
                 visit.date_last_visit = DateUtils.get_datetime_now_utc()
+                visit.user_object = user
                 visit.save()
 
             # to increment visited counter on entry
@@ -283,7 +325,7 @@ class UserEntryVisitHistory(models.Model):
         burst_time_limit = DateUtils.get_datetime_now_utc() - timedelta(seconds=15)
 
         entries = UserEntryVisitHistory.objects.filter(
-            user=user,
+            user=user.username,
             date_last_visit__isnull=False,
             date_last_visit__gt=time_ago_limit,
             date_last_visit__lt=burst_time_limit,
@@ -292,7 +334,7 @@ class UserEntryVisitHistory(models.Model):
             return entries[0].entry_object
         else:
             entries = UserEntryVisitHistory.objects.filter(
-                user=user,
+                user=user.username,
                 date_last_visit__isnull=False,
                 date_last_visit__gt=time_ago_limit,
             ).order_by("date_last_visit")
@@ -306,6 +348,17 @@ class UserEntryVisitHistory(models.Model):
             or not config_entry.track_user_navigation
         ):
             UserEntryVisitHistory.objects.all().delete()
+
+        qs = UserEntryVisitHistory.objects.filter(user_object__isnull = True)
+        for q in qs:
+            users = User.objects.filter(username=q.user)
+            if users.count() > 0:
+                q.user_object = users[0]
+                q.save()
+            else:
+                LinkDatabase.info("Cannot find user:'{}'".format(q.user))
+                q.delete()
+                time.sleep(0.5)
 
 
 class EntryHitUserSearchHistory(models.Model):

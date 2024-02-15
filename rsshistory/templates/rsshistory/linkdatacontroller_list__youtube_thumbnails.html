@@ -1,6 +1,6 @@
 <a href="{{ link.get_absolute_url }}"
    title="{{link.title}} {{link.link}} {{link.source}}"
-   {% if link.page_rating < 0 %}
+   {% if not link.is_valid %}
    style="opacity: 0.5"
    {% endif %}
 

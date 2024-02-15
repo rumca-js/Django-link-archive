@@ -220,8 +220,8 @@ class LinkDataController(LinkDataModel):
 
         return result
 
-    def tag(self, tags, author=None):
-        data = {"author": author, "link": self.link, "tags": tags, "entry": self}
+    def tag(self, tags, user):
+        data = {"user": user, "link": self.link, "tags": tags, "entry": self}
         return LinkTagsDataModel.set_tags_map(data)
 
     def vote(self, vote):
@@ -348,7 +348,7 @@ class LinkDataWrapper(object):
             del link_data["id"]
 
         if not is_archive:
-            ob = LinkDataModel.objects.create(**link_data)
+            ob = LinkDataController.objects.create(**link_data)
 
         elif is_archive:
             ob = ArchiveLinkDataModel.objects.create(**link_data)
@@ -643,6 +643,7 @@ class LinkDataBuilder(object):
             PersistentInfo.error(
                 "Could not obtain properties for 1:{}".format(self.link)
             )
+            return
 
         # TODO update missing keys - do not replace them
         new_link_data = None

@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from datetime import timedelta
 from django.test import TestCase
 
@@ -36,11 +37,15 @@ class LinkTagsDataModelTest(TestCase):
             date_published=current_time,
         )
 
+        self.user = User.objects.create_user(
+            username="test_username", password="testpassword"
+        )
+
     def test_set_tags(self):
         LinkTagsDataModel.objects.all().delete()
 
         data = {}
-        data["author"] = "testuser"
+        data["user"] = self.user
         data["tag"] = "tag1, tag2"
         data["entry"] = self.entry
 
@@ -49,17 +54,19 @@ class LinkTagsDataModelTest(TestCase):
 
         tags = LinkTagsDataModel.objects.all()
 
+        tag_names = [tag.tag for tag in tags]
+
         self.assertEqual(tags.count(), 2)
-        self.assertEqual(tags[0].tag, "tag1")
+        self.assertTrue("tag1" in tag_names)
+        self.assertTrue("tag2" in tag_names)
         self.assertEqual(tags[0].link_obj, self.entry)
-        self.assertEqual(tags[1].tag, "tag2")
         self.assertEqual(tags[1].link_obj, self.entry)
 
     def test_set_tags_map(self):
         LinkTagsDataModel.objects.all().delete()
 
         data = {}
-        data["author"] = "testuser"
+        data["user"] = self.user
         data["tags"] = ["tag1", "tag2"]
         data["entry"] = self.entry
 
@@ -77,9 +84,11 @@ class LinkTagsDataModelTest(TestCase):
     def test_set_tag(self):
         LinkTagsDataModel.objects.all().delete()
 
+        user = self.user
+
         # call tested function
-        LinkTagsDataModel.set_tag(self.entry, "tag3", "testuser2")
-        LinkTagsDataModel.set_tag(self.entry, "tag4", "testuser2")
+        LinkTagsDataModel.set_tag(self.entry, "tag3", user)
+        LinkTagsDataModel.set_tag(self.entry, "tag4", user)
 
         tags = LinkTagsDataModel.objects.all()
 
