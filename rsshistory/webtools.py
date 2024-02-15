@@ -68,6 +68,21 @@ def lazy_load_content(func):
     return wrapper
 
 
+def date_str_to_date(date_str):
+    from .dateutils import DateUtils
+
+    if date_str:
+        try:
+            parsed_date = parser.parse(date_str)
+            return DateUtils.to_utc_date(parsed_date)
+        except Exception as E:
+            PersistentInfo.error(
+                "Could not parse music:release_date {} Exc:{}".format(
+                    date_str, str(E)
+                )
+            )
+
+
 class SeleniumResponseObject(object):
     def __init__(self, url, contents):
         self.status_code = 200
@@ -880,6 +895,9 @@ class ContentInterface(DomainAwarePage):
         raise NotImplementedError
 
     def get_date_published(self):
+        """
+        This should be date. Not string
+        """
         raise NotImplementedError
 
     def get_properties(self):
@@ -1109,6 +1127,9 @@ class DefaultContentPage(ContentInterface):
         return None
 
     def get_date_published(self):
+        """
+        This should be date. Not string
+        """
         return None
 
     def get_page_rating(self):
@@ -1186,7 +1207,7 @@ class JsonPage(ContentInterface):
 
     def get_date_published(self):
         if self.json_obj and "date_published" in self.json_obj:
-            return self.json_obj["date_published"]
+            return date_str_to_date(self.json_obj["date_published"])
 
     def get_page_rating(self):
         return 0
@@ -1450,7 +1471,7 @@ class RssPage(ContentInterface):
             return
 
         if "published" in self.feed.feed:
-            return self.feed.feed.published
+            return date_str_to_date(self.feed.feed.published)
 
     @lazy_load_content
     def get_page_rating(self):
@@ -1733,31 +1754,17 @@ class HtmlPage(ContentInterface):
         # used by mainstream media. Examples?
         date_str = self.get_property_field("article:published_time")
         if date_str:
-            return self.date_str_to_date(date_str)
+            return date_str_to_date(date_str)
 
         # used by spotify
         date_str = self.get_meta_field("music:release_date")
         if date_str:
-            return self.date_str_to_date(date_str)
+            return date_str_to_date(date_str)
 
         # used by youtube
         date_str = self.get_meta_custom_field("itemprop", "datePublished")
         if date_str:
-            return self.date_str_to_date(date_str)
-
-    def date_str_to_date(self, date_str):
-        from .dateutils import DateUtils
-
-        if date_str:
-            try:
-                parsed_date = parser.parse(date_str)
-                return DateUtils.to_utc_date(parsed_date)
-            except Exception as E:
-                PersistentInfo.error(
-                    "Could not parse music:release_date {} Exc:{}".format(
-                        date_str, str(E)
-                    )
-                )
+            return date_str_to_date(date_str)
 
     @lazy_load_content
     def get_title_head(self):
@@ -2220,6 +2227,61 @@ class Url(object):
             or url.startswith("//")
             or url.startswith("smb:")
             or url.startswith("ftp:")
+        ):
+            return True
+
+        return False
+
+
+class UrlWrapper(object):
+    def __init__(self, url = None, page_object=None, options=None):
+        self.p = self.get_handler(url, page_object, options=options)
+
+    def get_handler(self, url = None, page_object=None, options=None):
+        if url is None:
+            url = page_object.url
+
+        p = HtmlPage(url, page_object = page_object, options=options)
+        if p.is_html():
+            return p
+
+        p = RssPage(url, page_object = p, options=options)
+        if p.is_rss():
+            return p
+
+        p = DefaultContentPage(url, page_object = p, options=options)
+        return p
+
+    def get_domain(self):
+        if self.p.is_domain():
+            return self.p
+        else:
+            return UrlWrapper(self.p.get_domain(), self.p.options)
+
+    def get_favicon(self):
+        page = UrlWrapper(page_object = self.p)
+        if not page:
+            return
+
+        if page.is_html():
+            favs = page.get_favicons()
+            if favs and len(favs) > 0:
+                return favs[0][0]
+
+        if not page.is_domain():
+            dom = page.get_domain()
+            page = UrlWrapper(dom, options = page.options)
+            if page.is_html():
+                favs = page.get_favicons()
+                if favs and len(favs) > 0:
+                    return favs[0][0]
+
+    def is_web_link(self):
+        if (
+            self.p.url.startswith("http")
+            or self.p.url.startswith("//")
+            or self.p.url.startswith("smb:")
+            or self.p.url.startswith("ftp:")
         ):
             return True
 

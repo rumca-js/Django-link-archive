@@ -116,6 +116,9 @@ class YouTubeJsonHandler(YouTubeVideoHandler):
     """
 
     def __init__(self, url):
+        """
+        TODO We should , most probably call the parnet constructor
+        """
         self.url = url
 
         self.yt_text = None
@@ -129,6 +132,7 @@ class YouTubeJsonHandler(YouTubeVideoHandler):
         self.contents = None
         self.dead = False
         self.encoding = "utf-8"
+        self.status_code = 0
 
     def get_contents(self):
         if self.dead:
@@ -151,19 +155,6 @@ class YouTubeJsonHandler(YouTubeVideoHandler):
         if not status:
             self.dead = True
 
-    def get_datetime_published(self):
-        if self.get_contents():
-            from datetime import date
-            from datetime import datetime
-            from pytz import timezone
-
-            date_string = self.yt_ob.get_date_published()
-            date = datetime.strptime(date_string, "%Y%m%d")
-            dt = datetime.combine(date, datetime.min.time())
-            dt = dt.replace(tzinfo=timezone("UTC"))
-
-            return dt
-
     def is_valid(self):
         if self.get_contents():
             status = not self.is_live()
@@ -178,10 +169,6 @@ class YouTubeJsonHandler(YouTubeVideoHandler):
             return self.yt_ob.get_description()
 
     def get_date_published(self):
-        if self.get_contents():
-            return self.yt_ob.get_date_published()
-
-    def get_datetime_published(self):
         if self.get_contents():
             from datetime import date
             from datetime import datetime

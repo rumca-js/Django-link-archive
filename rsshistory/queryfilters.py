@@ -142,6 +142,7 @@ class SourceFilter(BaseQueryFilter):
         query_filter.set_default_search_symbols(
             [
                 "title__icontains",
+                "url__icontains",
             ]
         )
 

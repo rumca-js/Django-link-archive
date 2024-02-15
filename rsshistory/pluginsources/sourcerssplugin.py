@@ -89,14 +89,6 @@ class BaseRssPlugin(SourceGenericPlugin):
             prop = self.cleanup_data(prop)
 
             if self.is_link_ok_to_add(prop):
-                if c.auto_store_entries_use_clean_page_info:
-                    prop = self.get_clean_page_info(prop)
-
-                elif c.auto_store_entries_use_all_data:
-                    prop = self.get_updated_page_info(prop)
-
-                prop = self.enhance(prop)
-
                 yield prop
             # LinkDatabase.info("Processing RSS element DONE")
         # LinkDatabase.info("Processing RSS elements DONE")

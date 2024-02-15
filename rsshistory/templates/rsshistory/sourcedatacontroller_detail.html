@@ -22,6 +22,7 @@
     {% endif %}
       <div><strong>Title:</strong> {{ object.title }}</div>
       <span><strong>On Hold:</strong> {{ object.on_hold }}</span>
+      <span><strong>Fetch period:</strong> {{ object.fetch_period }}</span>
       <span><strong>Category:</strong> {{ object.category }}</span>
       <span><strong>Subcategory:</strong> {{ object.subcategory }}, </span>
       <span><strong>Language:</strong> {{ object.language }}, </span>
@@ -32,7 +33,7 @@
       {% if object.proxy_location %}
       <span><strong>Proxy location:</strong> {{ object.proxy_location }}</span>
       {% endif %}
-      <div>Fetched:{{object.get_date_fetched}} Number of entries:{{object.get_number_of_entries}} Import seconds:{{object.get_import_seconds}} </div>
+      <div>Fetched:{{object.dynamic_data.date_fetched}} Import seconds:{{object.dynamic_data.import_seconds}} Consecutive Errors:{{object.dynamic_data.consecutive_errors}} </div>
   </p>
 
   {% if user.is_staff %}

@@ -384,8 +384,9 @@ class SourceDataBuilder(object):
             source = SourceDataController.objects.create(**self.link_data)
             return source
         except Exception as E:
-            LinkDatabase.error("Exception:{}".format(str(E)))
-            PersistentInfo.error("Exception {}".format(str(E)))
+            error_text = traceback.format_exc()
+            LinkDatabase.error("Exception:{}\n{}".format(str(E), error_text))
+            PersistentInfo.error("Exception:{}\n{}".format(str(E), error_text))
 
     def get_clean_data(self):
         result = {}

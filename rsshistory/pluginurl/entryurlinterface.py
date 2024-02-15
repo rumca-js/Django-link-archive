@@ -126,7 +126,7 @@ class EntryUrlInterface(object):
         if not self.is_property_set(input_props, "description"):
             input_props["description"] = p.get_description()
         if not self.is_property_set(input_props, "date_published"):
-            input_props["date_published"] = p.get_datetime_published()
+            input_props["date_published"] = p.get_date_published()
         if not self.is_property_set(input_props, "thumbnail"):
             input_props["thumbnail"] = p.get_thumbnail()
 

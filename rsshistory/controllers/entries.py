@@ -698,7 +698,8 @@ class LinkDataBuilder(object):
         return entry
 
     def add_from_props_internal(self):
-        obj = None
+        from .backgroundjob import BackgroundJobController
+        entry = None
 
         self.link_data = self.get_clean_link_data()
 
@@ -712,19 +713,27 @@ class LinkDataBuilder(object):
             if "date_published" in self.link_data:
                 date = self.link_data["date_published"]
             wrapper = LinkDataWrapper(self.link_data["link"], date)
-            obj = wrapper.get()
+            entry = wrapper.get()
 
-            if obj:
-                return obj
+            if entry:
+                return entry
 
             self.link_data = self.check_and_set_source_object()
             self.link_data = self.set_domain_object()
 
-            obj = self.add_entry_internal()
+            entry = self.add_entry_internal()
+
+            # TODO if object just created
+            if entry:
+                c = Configuration.get_object().config_entry
+                if c.auto_store_entries_use_clean_page_info:
+                    BackgroundJobController.entry_reset_data(entry)
+                elif c.auto_store_entries_use_all_data:
+                    BackgroundJobController.entry_update_data(entry)
 
         self.add_addition_link_data()
 
-        return obj
+        return entry
 
     def get_clean_link_data(self):
         props = self.link_data
@@ -756,6 +765,7 @@ class LinkDataBuilder(object):
         wrapper = LinkDataWrapper(
             new_link_data["link"], new_link_data["date_published"]
         )
+
         return wrapper.create(new_link_data)
 
     def set_domain_object(self):
