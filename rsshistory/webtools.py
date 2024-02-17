@@ -167,9 +167,9 @@ class BasePage(object):
             # Flag to not retry same contents requests for things we already know are dead
             self.dead = False
 
-        if self.url.find("https") >= 0:
+        if self.url.lower().find("https") >= 0:
             self.protocol = "https"
-        elif self.url.find("http") >= 0:
+        elif self.url.lower().find("http") >= 0:
             self.protocol = "http"
         else:
             self.protocol = "https"
@@ -365,6 +365,7 @@ class BasePage(object):
 
         SSL is mostly important for interacting with pages. During web scraping it is not that useful.
         """
+        print("Requests GET:{}".format(url))
 
         # traceback.print_stack()
 
@@ -397,31 +398,31 @@ class BasePage(object):
 
         Headless might not be enough to fool cloudflare.
         """
-        service = Service(executable_path="/usr/bin/chromedriver")
-        options = webdriver.ChromeOptions()
-        options.add_argument("--headless")
-
-        # if not BasePage.ssl_verify:
-        #    options.add_argument('ignore-certificate-errors')
-
-        driver = webdriver.Chrome(service=service, options=options)
-
-        # add 10 seconds for start of browser, etc.
-        selenium_timeout = timeout + 10
-
-        driver.set_page_load_timeout(selenium_timeout)
-
         try:
+            service = Service(executable_path="/usr/bin/chromedriver")
+            options = webdriver.ChromeOptions()
+            options.add_argument("--headless")
+
+            # if not BasePage.ssl_verify:
+            #    options.add_argument('ignore-certificate-errors')
+
+            driver = webdriver.Chrome(service=service, options=options)
+
+            # add 10 seconds for start of browser, etc.
+            selenium_timeout = timeout + 10
+
+            driver.set_page_load_timeout(selenium_timeout)
+
             driver.get(url)
+            html_content = driver.page_source
+            driver.quit()
+
+            return SeleniumResponseObject(url, html_content, 200)
         except TimeoutException:
             PersistentInfo.error(
                 "Timeout when reading page. {}".format(selenium_timeout)
             )
             return SeleniumResponseObject(url, None, 500)
-
-        html_content = driver.page_source
-        driver.quit()
-        return SeleniumResponseObject(url, html_content, 200)
 
     def get_contents_via_selenium_chrome_full(self, url, headers, timeout):
         """
@@ -431,45 +432,46 @@ class BasePage(object):
 
         https://stackoverflow.com/questions/50642308/webdriverexception-unknown-error-devtoolsactiveport-file-doesnt-exist-while-t
         """
-        import os
-
-        os.environ["DISPLAY"] = ":10.0"
-
-        service = Service(executable_path="/usr/bin/chromedriver")
-        options = webdriver.ChromeOptions()
-        # options.add_argument("--headless")
-        options.add_argument("--no-sandbox")
-        options.add_argument("--disable-dev-shm-usage")
-
-        # if not BasePage.ssl_verify:
-        #    options.add_argument('ignore-certificate-errors')
-
-        driver = webdriver.Chrome(service=service, options=options)
-
-        # add 10 seconds for start of browser, etc.
-        selenium_timeout = timeout + 20
-
-        driver.set_page_load_timeout(selenium_timeout)
 
         try:
+            import os
+
+            os.environ["DISPLAY"] = ":10.0"
+
+            service = Service(executable_path="/usr/bin/chromedriver")
+            options = webdriver.ChromeOptions()
+            # options.add_argument("--headless")
+            options.add_argument("--no-sandbox")
+            options.add_argument("--disable-dev-shm-usage")
+
+            # if not BasePage.ssl_verify:
+            #    options.add_argument('ignore-certificate-errors')
+
+            driver = webdriver.Chrome(service=service, options=options)
+
+            # add 10 seconds for start of browser, etc.
+            selenium_timeout = timeout + 20
+
+            driver.set_page_load_timeout(selenium_timeout)
+
             driver.get(url)
+
+            page_source = driver.page_source
+
+            ## Parse the HTML with BeautifulSoup
+            # soup = BeautifulSoup(page_source, 'html.parser')
+
+            ## Extract the RSS content from the HTML body
+            # rss_content = soup.find('body').get_text()
+
+            driver.quit()
+            return SeleniumResponseObject(url, page_source, 200)
+
         except TimeoutException:
             PersistentInfo.error(
                 "Timeout when reading page. {}".format(selenium_timeout)
             )
             return SeleniumResponseObject(url, None, 500)
-
-        page_source = driver.page_source
-
-        ## Parse the HTML with BeautifulSoup
-        # soup = BeautifulSoup(page_source, 'html.parser')
-
-        ## Extract the RSS content from the HTML body
-        # rss_content = soup.find('body').get_text()
-
-        driver.quit()
-
-        return SeleniumResponseObject(url, page_source, 200)
 
     def get_contents_via_selenium_chrome_undetected(self, url, headers, timeout):
         """
@@ -512,12 +514,12 @@ class BasePage(object):
             return self.response_headers.headers["Location"]
 
     def get_full_url(self):
-        if self.url.find("http") == -1:
+        if self.url.lower().find("http") == -1:
             return "https://" + self.url
         return self.url
 
     def get_domain(self):
-        if self.url.find("http") == -1:
+        if self.url.lower().find("http") == -1:
             self.url = "https://" + self.url
 
         items = urlparse(self.url)
@@ -526,7 +528,7 @@ class BasePage(object):
         return self.protocol + "://" + str(items.netloc)
 
     def get_domain_only(self):
-        if self.url.find("http") == -1:
+        if self.url.lower().find("http") == -1:
             self.url = "https://" + self.url
 
         items = urlparse(self.url)
@@ -580,7 +582,7 @@ class BasePage(object):
         href="https://images/facebook.png"
         """
         ready_url = ""
-        if url.find("http") == 0:
+        if url.lower().find("http") == 0:
             ready_url = url
         else:
             if url.startswith("//"):
@@ -1448,7 +1450,7 @@ class RssPage(ContentInterface):
         #    if self.url.find("https://www.youtube.com/feeds/videos.xml") >= 0:
         #        image = self.get_thumbnail_manual_from_youtube()
 
-        if image and image.find("https://") == -1:
+        if image and image.lower().find("https://") == -1:
             image = BasePage.get_url_full(self.url, image)
 
         return image
@@ -1833,7 +1835,7 @@ class HtmlPage(ContentInterface):
 
         image = self.get_og_field("image")
 
-        if image and image.find("https://") == -1:
+        if image and image.lower().find("https://") == -1:
             image = BasePage.get_url_full(self.url, image)
 
         return image

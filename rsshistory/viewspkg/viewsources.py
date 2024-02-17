@@ -19,7 +19,7 @@ from ..forms import SourceForm, SourcesChoiceForm
 from ..queryfilters import SourceFilter
 from ..views import ViewPage
 from ..configuration import Configuration
-from ..webtools import Url
+from ..webtools import Url, BasePage
 
 
 class RssSourceListView(generic.ListView):
@@ -177,13 +177,29 @@ def add_source_simple(request):
             return HttpResponseRedirect(ob[0].get_absolute_url())
 
         data = SourceDataController.get_full_information({"url": url})
-        print(data)
+        notes = []
+        warnings = []
+        errors = []
 
         form = SourceForm(initial=data)
         form.method = "POST"
         form.action_url = reverse("{}:source-add".format(LinkDatabase.name))
 
         p.context["form"] = form
+
+        page = BasePage(data["url"])
+        domain = page.get_domain()
+
+        if data["url"].find("http://") >= 0:
+            warnings.append("Link is http. Https is more secure protocol")
+        if data["url"].find("http://") == -1 and data["url"].find("https://") == -1:
+            errors.append("Missing protocol. Could be http:// or https://")
+        if domain.lower() != domain:
+            warnings.append("Link is not lowercase. Is that OK?")
+
+        p.context["notes"] = notes
+        p.context["warnings"] = warnings
+        p.context["errors"] = errors
 
         return p.render("form_source_add.html")
 

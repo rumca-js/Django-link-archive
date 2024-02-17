@@ -1,6 +1,6 @@
 import traceback
 
-from ..webtools import Url, PageOptions, DomainAwarePage
+from ..webtools import Url, PageOptions, DomainAwarePage, BasePage
 
 from ..apps import LinkDatabase
 from ..models import PersistentInfo
@@ -129,19 +129,21 @@ class UrlHandler(object):
             return True
 
     def is_selenium_headless_required(url):
-        if url.startswith("https://open.spotify.com") or url.startswith(
-            "https://thehill.com"
-        ):
+        domain = BasePage(url).get_domain_only()
+
+        if domain.startswith("open.spotify.com") or domain.startswith("thehill.com"):
             return True
 
         return False
 
     def is_selenium_full_required(url):
         p = DomainAwarePage(url)
+        domain = p.get_domain_only()
+
         if (
             p.is_link_service()
-            or url.startswith("https://www.warhammer-community.com")
-            or url.startswith("https://defcon.org")
+            or domain.startswith("www.warhammer-community.com")
+            or domain.startswith("defcon.org")
         ):
             return True
 

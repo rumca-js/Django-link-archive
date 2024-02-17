@@ -80,10 +80,43 @@ class LinkDataBuilderTest(FakeInternetTestCase):
         entry = b.add_from_props()
 
         objs = LinkDataModel.objects.filter(link="https://youtube.com/v=1234/")
-        self.assertTrue(objs.count() == 0)
+        self.assertEqual(objs.count(), 0)
 
         objs = LinkDataModel.objects.filter(link="https://youtube.com/v=1234")
-        self.assertTrue(objs.count() == 1)
+        self.assertEqual(objs.count(), 1)
+
+    def test_add_from_props_uppercase(self):
+        config = Configuration.get_object().config_entry
+        config.auto_store_entries = True
+        config.auto_store_domain_info = False
+        config.save()
+
+        link_name = "HTTPS://YouTube.com/v=1234/"
+
+        link_data = {
+            "link": link_name,
+            "source": "https://youtube.com",
+            "title": "test",
+            "description": "description",
+            "language": "en",
+            "thumbnail": "https://youtube.com/favicon.ico",
+            "date_published": DateUtils.get_datetime_now_utc(),
+        }
+
+        b = LinkDataBuilder()
+        b.link_data = link_data
+        # call tested function
+        entry = b.add_from_props()
+
+        objs = LinkDataModel.objects.filter(link="https://youtube.com/v=1234/")
+        self.assertEqual(objs.count(), 0)
+
+        objs = LinkDataModel.objects.filter(link="https://youtube.com/v=1234")
+        self.assertEqual(objs.count(), 1)
+
+        objs = LinkDataModel.objects.all()
+        for obj in objs:
+            print("OBJ: {}".format(obj.link))
 
     def test_add_from_props_not_adds(self):
         DomainsController.objects.all().delete()

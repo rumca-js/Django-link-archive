@@ -31,6 +31,8 @@ class SourceUrlInterface(object):
         fast_check = False
 
         p = UrlHandler.get(self.url, fast_check=fast_check, use_selenium=use_selenium)
+        if not p:
+            return
 
         if p.is_rss(fast_check=fast_check):
             return self.get_props_from_rss(self.url, p)

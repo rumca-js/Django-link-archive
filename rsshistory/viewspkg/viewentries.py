@@ -617,6 +617,10 @@ def add_simple_entry(request):
 
             data = LinkDataController.get_full_information({"link": link})
             if data:
+                notes = []
+                warnings = []
+                errors = []
+
                 obs = LinkDataController.objects.filter(link=data["link"])
                 if obs.exists():
                     ob = obs[0]
@@ -635,7 +639,21 @@ def add_simple_entry(request):
                 form.action_url = reverse("{}:entry-add".format(LinkDatabase.name))
                 p.context["form"] = form
 
-                return p.render("form_basic.html")
+                page = BasePage(data["link"])
+                domain = page.get_domain()
+
+                if data["link"].find("http://") >= 0:
+                    warnings.append("Link is http. Https is more secure protocol")
+                if data["link"].find("http://") == -1 and data["link"].find("https://") == -1:
+                    errors.append("Missing protocol. Could be http:// or https://")
+                if domain.lower() != domain:
+                    warnings.append("Link domain is not lowercase. Is that OK?")
+
+                p.context["notes"] = notes
+                p.context["warnings"] = warnings
+                p.context["errors"] = errors
+
+                return p.render("form_add_entry.html")
 
             p.context["summary_text"] = "Could not obtain details from link {}".format(
                 link

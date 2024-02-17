@@ -9,6 +9,7 @@ from datetime import date, datetime
 from pathlib import Path
 
 from django.db.models import Q
+from django.contrib.auth.models import User
 
 from .apps import LinkDatabase
 from .models import (
@@ -19,7 +20,14 @@ from .models import (
     KeyWords,
     DataExport,
     ConfigurationEntry,
+    LinkTagsDataModel,
+    LinkCommentDataModel,
+    LinkVoteDataModel,
+    UserSearchHistory,
+    UserEntryTransitionHistory,
+    UserEntryVisitHistory,
 )
+
 from .pluginsources.sourcecontrollerbuilder import SourceControllerBuilder
 from .basictypes import fix_path_for_windows
 from .programwrappers import ytdlp, id3v2
@@ -268,16 +276,32 @@ class LinkAddJobHandler(BaseJobHandler):
                 source_objs = SourceDataController.objects.filter(id=int(source_id))
                 data["source_obj"] = source_objs[0]
 
+            user = None
+            if "user_id" in cfg:
+                user = User.objects.get(id=int(cfg["user_id"]))
+            else:
+                users = User.objects.filter(is_superuser=True)
+                if users.count() > 0:
+                    user = users[0]
+                else:
+                    PersistentInfo.error("Could not found super user")
+
             b = LinkDataBuilder()
             b.link_data = data
             b.link = data["link"]
+            b.source_is_auto = True
             entry = b.add_from_link()
+
+            if not entry:
+                # TODO send notification?
+                PersistentInfo.error("Could not add link: {}".format(data["link"]))
+                return True
 
             # if this is a new entry, then tag it
             if entry.date_published:
                 if entry.date_published >= current_time:
                     if "tag" in cfg:
-                        entry.tag([cfg["tag"]])
+                        entry.tag([cfg["tag"]], user)
 
             return True
 
@@ -665,10 +689,13 @@ class CleanupJobHandler(BaseJobHandler):
             status = LinkDataController.cleanup(limit_s)
 
             if limit == 0:
+                SourceDataController.cleanup()
+
                 PersistentInfo.cleanup()
                 DomainsController.cleanup()
-                SourceDataController.cleanup()
                 KeyWords.cleanup()
+
+                self.user_tables_cleanup()
 
             # if status is True, everything has been cleared correctly
             # we can remove the cleanup background job
@@ -677,6 +704,14 @@ class CleanupJobHandler(BaseJobHandler):
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.error("Exception: {} {}".format(str(e), error_text))
+
+    def user_tables_cleanup(self):
+        LinkTagsDataModel.cleanup()
+        LinkCommentDataModel.cleanup()
+        LinkVoteDataModel.cleanup()
+        UserSearchHistory.cleanup()
+        UserEntryTransitionHistory.cleanup()
+        UserEntryVisitHistory.cleanup()
 
 
 class CheckDomainsJobHandler(BaseJobHandler):

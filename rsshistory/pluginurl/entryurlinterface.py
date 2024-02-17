@@ -72,6 +72,9 @@ class EntryUrlInterface(object):
         is_domain = BasePage(self.url).is_domain()
         p = self.p
 
+        if not p:
+            return
+
         if is_domain:
             input_props["permanent"] = True
             input_props["bookmarked"] = False
@@ -212,9 +215,6 @@ class EntryUrlInterface(object):
             input_props = {}
 
         url = self.url
-
-        if url.startswith("http://"):
-            url = url.replace("http://", "https://")
 
         p = self.p
 

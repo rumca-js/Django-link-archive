@@ -137,6 +137,12 @@ class LinkDataController(LinkDataModel):
     def get_cleaned_link(link):
         if link.endswith("/"):
             link = link[:-1]
+
+        # domain is lowercase
+        p = BasePage(link)
+        domain = p.get_domain()
+        if domain:
+            link = link.replace(domain, domain.lower(), 1)
         return link
 
     def replace_http_link_with_https():
@@ -184,20 +190,6 @@ class LinkDataController(LinkDataModel):
         from ..pluginurl.entryurlinterface import EntryUrlInterface
 
         info = EntryUrlInterface(data["link"], log=True, ignore_errors=True).get_props()
-        if not info:
-            return info
-
-        if data["link"].find("http://") >= 0:
-            data["link"] = data["link"].replace("http://", "https://")
-            https_info = EntryUrlInterface(data["link"]).get_props()
-
-            if info and not https_info:
-                return info
-
-            if "description" in info and "description" in https_info:
-                if len(https_info["description"]) == len(info["description"]):
-                    return https_info
-
         return info
 
     def get_clean_data(props):
@@ -209,7 +201,7 @@ class LinkDataController(LinkDataModel):
                 result[key] = props[key]
 
         if "link" in result:
-            LinkDataController.get_cleaned_link(result["link"])
+            result["link"] = LinkDataController.get_cleaned_link(result["link"])
 
         if "tags" in result:
             del result["tags"]
@@ -619,13 +611,6 @@ class LinkDataBuilder(object):
         if obj:
             return obj
 
-        if self.link.startswith("http://"):
-            link = self.link.replace("http://", "https://")
-            wrapper = LinkDataWrapper(link)
-            obj = wrapper.get_from_operational_db()
-            if obj:
-                return obj
-
         if not self.link_data:
             self.link_data = {}
         self.link_data["link"] = self.link
@@ -675,27 +660,7 @@ class LinkDataBuilder(object):
         if obj:
             return obj
 
-        if self.link.startswith("http://"):
-            link = self.link.replace("http://", "https://")
-            wrapper = LinkDataWrapper(link)
-            obj = wrapper.get_from_operational_db()
-            if obj:
-                return obj
-
-        # Try with https more that with https
-        if self.link_data["link"].startswith("http://"):
-            self.link_data["link"] = self.link_data["link"].replace(
-                "http://", "https://"
-            )
-
         entry = self.add_from_props_internal()
-        if not entry:
-            # Try with https more that with http
-            self.link_data["link"] = self.link_data["link"].replace(
-                "https://", "http://"
-            )
-
-            return self.add_from_props_internal()
         return entry
 
     def add_from_props_internal(self):
