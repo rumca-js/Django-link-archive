@@ -7,7 +7,6 @@ from django.shortcuts import render
 from django.http import HttpResponseForbidden, HttpResponseRedirect
 
 from ..models import (
-    LinkCommentDataModel,
     ConfigurationEntry,
 )
 from ..forms import CommentEntryForm
@@ -56,8 +55,9 @@ def entry_add_comment(request, link_id):
         return p.render("summary_present.html")
 
     else:
-        author = request.user.username
-        form = CommentEntryForm(initial={"author": author, "link_id": link.id})
+        form = CommentEntryForm(initial={"user": request.user.username, 
+                                         "entry_id": link.id,
+                                         "user_id": request.user.id})
 
     form.method = "POST"
     form.pk = link_id
@@ -81,7 +81,7 @@ def entry_comment_edit(request, pk):
     if data is not None:
         return data
 
-    comment_obj = LinkCommentDataModel.objects.get(id=pk)
+    comment_obj = LinkCommentDataController.objects.get(id=pk)
     link = comment_obj.link_obj
 
     author = request.user.username
@@ -106,8 +106,9 @@ def entry_comment_edit(request, pk):
             return p.render("summary_present.html")
     else:
         data = {
-            "link_id": link.id,
-            "author": author,
+            "entry_id": link.id,
+            "user_id": request.user.id,
+            "user": request.user.username,
             "comment": comment_obj.comment,
             "date_published": comment_obj.date_published,
         }
@@ -133,7 +134,7 @@ def entry_comment_remove(request, pk):
     if data is not None:
         return data
 
-    comment_obj = LinkCommentDataModel.objects.get(id=pk)
+    comment_obj = LinkCommentDataController.objects.get(id=pk)
     link = comment_obj.link_obj
 
     author = request.user.username

@@ -1,12 +1,15 @@
 from datetime import datetime, timedelta, date
 from django import forms
 from django.db.models import Q
+from django.db.models import IntegerField, Model
+from django.core.validators import MaxValueValidator, MinValueValidator
+
 
 from .models import (
     BackgroundJob,
-    LinkTagsDataModel,
+    UserTags,
     LinkCommentDataModel,
-    LinkVoteDataModel,
+    UserVotes,
     UserSearchHistory,
 )
 from .models import ConfigurationEntry, UserConfig, DataExport
@@ -390,11 +393,12 @@ class SourceForm(forms.ModelForm):
 class TagEntryForm(forms.ModelForm):
     """
     Category choice form
+    TODO remake to standard form?
     """
 
     class Meta:
-        model = LinkTagsDataModel
-        fields = ["link", "user", "tag"]
+        model = UserTags
+        fields = ["entry_object", "user_object", "tag"]
         widgets = {
             #    'date': forms.widgets.DateTimeInput(attrs={'type': 'datetime-local'})
         }
@@ -743,10 +747,11 @@ class CommentEntryForm(forms.Form):
     Using forms not model forms, because we would have to passe link somehow
     """
 
-    link_id = forms.IntegerField(required=False, widget=forms.HiddenInput())
-    user = forms.CharField(
-        max_length=1000, widget=forms.TextInput(attrs={"readonly": "readonly"})
-    )
+    entry_id = forms.IntegerField(required=False, widget=forms.HiddenInput())
+    user_id = forms.IntegerField(required=False, widget=forms.HiddenInput())
+
+    user = forms.CharField(max_length=1000)
+
     comment = forms.CharField(widget=forms.Textarea)
     date_published = forms.DateTimeField(
         initial=datetime.now,
@@ -756,9 +761,6 @@ class CommentEntryForm(forms.Form):
     )
 
 
-from django.db.models import IntegerField, Model
-from django.core.validators import MaxValueValidator, MinValueValidator
-
 
 class LinkVoteForm(forms.Form):
     """
@@ -766,6 +768,7 @@ class LinkVoteForm(forms.Form):
     """
 
     link_id = forms.IntegerField(required=False, widget=forms.HiddenInput())
+    user_id = forms.IntegerField(required=False, widget=forms.HiddenInput())
     user = forms.CharField(max_length=1000)
     vote = forms.IntegerField(initial=0)
 

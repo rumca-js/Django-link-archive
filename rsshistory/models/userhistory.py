@@ -1,4 +1,6 @@
 """
+API needs to check user privileges.
+
  - in order for any search engine to work all actions of user have to be captured
  - the causation needs to be established
  - the engine needs to know the person it tracks (does anonymization exist for search engines?)
@@ -22,7 +24,6 @@ class UserSearchHistory(models.Model):
     """
 
     search_query = models.CharField(max_length=1000)
-    user = models.CharField(max_length=1000)
     date = models.DateTimeField(auto_now_add=True)
     user_object = models.ForeignKey(settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -50,7 +51,7 @@ class UserSearchHistory(models.Model):
                 )
 
                 theobject = UserSearchHistory.objects.create(
-                    search_query=search_query, user=user.username, user_object=user
+                    search_query=search_query, user_object=user
                 )
                 UserSearchHistory.delete_old_entries(user)
 
@@ -75,7 +76,10 @@ class UserSearchHistory(models.Model):
                 time.sleep(0.5)
 
     def get_top_query(user):
-        qs = UserSearchHistory.objects.filter(user=user.username).order_by("-date")
+        if not user.is_authenticated:
+            return
+
+        qs = UserSearchHistory.objects.filter(user_object=user).order_by("-date")
         if qs.exists():
             return qs[0]
 
@@ -85,7 +89,10 @@ class UserSearchHistory(models.Model):
         """
         choices = []
 
-        qs = UserSearchHistory.objects.filter(user=user.username).order_by("-date")[
+        if not user.is_authenticated:
+            return choices
+
+        qs = UserSearchHistory.objects.filter(user_object=user).order_by("-date")[
             : UserSearchHistory.get_choices_limit()
         ]
 
@@ -96,7 +103,7 @@ class UserSearchHistory(models.Model):
         return choices
 
     def delete_old_entries(user):
-        qs = UserSearchHistory.objects.filter(user=user.username).order_by("date")
+        qs = UserSearchHistory.objects.filter(user_object=user).order_by("date")
         limit = UserSearchHistory.get_choices_model_limit()
         if qs.count() > limit:
             too_many = qs.count() - limit
@@ -105,7 +112,7 @@ class UserSearchHistory(models.Model):
                 entry.delete()
 
     def delete_old_user_entries(user, search_query):
-        entries = UserSearchHistory.objects.filter(search_query=search_query, user=user.username)
+        entries = UserSearchHistory.objects.filter(search_query=search_query, user_object=user)
         if entries.exists():
             entries.delete()
 
@@ -121,7 +128,6 @@ class UserEntryTransitionHistory(models.Model):
     Keeps history of which link goes to where. From can be blank at start
     """
 
-    user = models.CharField(max_length=1000)
     counter = models.IntegerField(default=0)
     user_object = models.ForeignKey(settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -152,8 +158,11 @@ class UserEntryTransitionHistory(models.Model):
         """
         result = []
 
+        if not user.is_authenticated:
+            return result
+
         links = UserEntryTransitionHistory.objects.filter(
-            user=user.username, entry_from=navigated_to_entry
+            user_object=user, entry_from=navigated_to_entry
         ).order_by("-counter")
         if links.exists():
             for link_info in links:
@@ -184,12 +193,12 @@ class UserEntryTransitionHistory(models.Model):
 
         else:
             return UserEntryTransitionHistory.objects.create(
-                user=user.username, entry_from=entry_from, entry_to=entry_to, counter=1, user_object = user
+                entry_from=entry_from, entry_to=entry_to, counter=1, user_object = user
             )
 
     def get_element(user, entry_from, entry_to):
         links = UserEntryTransitionHistory.objects.filter(
-            user=user.username, entry_from=entry_from, entry_to=entry_to
+            user_object=user, entry_from=entry_from, entry_to=entry_to
         ).order_by("-counter")
         if links.exists():
             return links[0]
@@ -220,7 +229,6 @@ class UserEntryVisitHistory(models.Model):
     TODO maybe rename to userentrynavigation?
     """
 
-    user = models.CharField(max_length=1000, null=True, blank=True)
     visits = models.IntegerField(blank=True, null=True)
     date_last_visit = models.DateTimeField(blank=True, null=True)
     user_object = models.ForeignKey(settings.AUTH_USER_MODEL,
@@ -263,7 +271,7 @@ class UserEntryVisitHistory(models.Model):
         if str(user.username) == "" or user.username is None:
             return
 
-        visits = UserEntryVisitHistory.objects.filter(entry_object=entry, user=user.username)
+        visits = UserEntryVisitHistory.objects.filter(entry_object=entry, user_object=user)
 
         if UserEntryVisitHistory.is_link_just_visited(visits):
             return
@@ -277,7 +285,6 @@ class UserEntryVisitHistory(models.Model):
 
             if visits.count() == 0:
                 visit = UserEntryVisitHistory.objects.create(
-                    user=user.username,
                     visits=1,
                     entry_object=entry,
                     date_last_visit=DateUtils.get_datetime_now_utc(),
@@ -319,13 +326,15 @@ class UserEntryVisitHistory(models.Model):
          - user may open 10 tabs immediately. Therefore we use smaller limit also
          - if user opens 10 tabs after 1 hour stop, we return the oldest one
         """
+        if not user.is_authenticated:
+            return
         from ..dateutils import DateUtils
 
         time_ago_limit = DateUtils.get_datetime_now_utc() - timedelta(hours=1)
         burst_time_limit = DateUtils.get_datetime_now_utc() - timedelta(seconds=15)
 
         entries = UserEntryVisitHistory.objects.filter(
-            user=user.username,
+            user_object=user,
             date_last_visit__isnull=False,
             date_last_visit__gt=time_ago_limit,
             date_last_visit__lt=burst_time_limit,
@@ -334,7 +343,7 @@ class UserEntryVisitHistory(models.Model):
             return entries[0].entry_object
         else:
             entries = UserEntryVisitHistory.objects.filter(
-                user=user.username,
+                user_object=user,
                 date_last_visit__isnull=False,
                 date_last_visit__gt=time_ago_limit,
             ).order_by("date_last_visit")

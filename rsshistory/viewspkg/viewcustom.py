@@ -10,7 +10,7 @@ from django.http import HttpResponseForbidden, HttpResponseRedirect
 
 from ..apps import LinkDatabase
 from ..models import (
-    LinkTagsDataModel,
+    UserTags,
     BaseLinkDataController,
     KeyWords,
     ConfigurationEntry,
@@ -488,7 +488,7 @@ def data_errors_page(request):
     def get_tags_for_missing_links():
         result = set()
 
-        tags = LinkTagsDataModel.objects.all()
+        tags = UserTags.objects.all()
         for tag in tags:
             if tag.link_obj is None:
                 result.add(tag)

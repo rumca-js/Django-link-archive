@@ -4,12 +4,12 @@ from django.contrib.auth.models import User
 from ..apps import LinkDatabase
 from ..controllers import SourceDataController, LinkDataController, DomainsController
 from ..dateutils import DateUtils
-from ..models import KeyWords, DataExport, LinkTagsDataModel
+from ..models import KeyWords, DataExport, UserTags
 
 from .fakeinternet import FakeInternetTestCase
 
 
-class LinkTagsDataModelTest(FakeInternetTestCase):
+class UserTagsTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 
@@ -35,25 +35,26 @@ class LinkTagsDataModelTest(FakeInternetTestCase):
             language="en",
         )
 
-        self.assertEqual(LinkTagsDataModel.objects.all().count(), 0)
+        self.assertEqual(UserTags.objects.all().count(), 0)
 
         url = reverse("{}:entry-tag".format(LinkDatabase.name), args=[entry.id])
 
-        data = {"link": test_link}
-
         tag_data = {
-            "link_id": entry.id,
-            "user": self.user,
+            "entry_object": entry.id,
+            "user_object": self.user.id,
             "tag": "this, and, that",
         }
 
         # call user action
         response = self.client.post(url, data=tag_data)
 
+        page_source = response.content.decode('utf-8')
+        print("Contents: {}".format(page_source))
+
         # redirect to view the link again
         self.assertEqual(response.status_code, 302)
 
         # check that object has been changed
 
-        entries = LinkTagsDataModel.objects.filter(link_obj=entry)
+        entries = UserTags.objects.filter(entry_object=entry)
         self.assertEqual(entries.count(), 3)

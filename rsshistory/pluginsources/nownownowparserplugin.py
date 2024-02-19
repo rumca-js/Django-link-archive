@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 
-from ..models import LinkTagsDataModel
+from ..models import UserTags
 from .domainparserplugin import DomainParserPlugin
 
 
@@ -20,5 +20,6 @@ class NowNowNowParserPlugin(DomainParserPlugin):
         c = Configuration.get_object()
 
         admin_user = User.objects.get(is_superuser=True)
+        admin_username = admin_user.username
 
-        LinkTagsDataModel.set_tag(entry, "personal", admin_user)
+        UserTags.set_tag(entry, "personal", admin_user)

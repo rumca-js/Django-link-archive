@@ -22,6 +22,7 @@ class BaseRssPluginTest(FakeInternetTestCase):
         config = Configuration.get_object().config_entry
         config.auto_store_entries = True
         config.auto_store_sources = True
+        config.auto_store_domain_info = False
         config.auto_store_entries_use_all_data = False
         config.auto_store_entries_use_clean_page_info = False
         config.save()
@@ -34,7 +35,9 @@ class BaseRssPluginTest(FakeInternetTestCase):
         props = plugin.get_container_elements()
         props = list(props)
 
-        self.assertEqual(len(props), 7)
+        self.print_errors()
+
+        self.assertEqual(len(props), 6)
         self.assertEqual(
             props[0]["source"],
             "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM",
@@ -47,6 +50,7 @@ class BaseRssPluginTest(FakeInternetTestCase):
         config = Configuration.get_object().config_entry
         config.auto_store_entries = True
         config.auto_store_sources = True
+        config.auto_store_domain_info = False
         config.auto_store_entries_use_all_data = True
         config.auto_store_entries_use_clean_page_info = False
         config.save()
@@ -57,7 +61,9 @@ class BaseRssPluginTest(FakeInternetTestCase):
         props = plugin.get_container_elements()
         props = list(props)
 
-        self.assertEqual(len(props), 7)
+        self.print_errors()
+
+        self.assertEqual(len(props), 6)
         self.assertEqual(
             props[0]["source"],
             "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM",
@@ -67,6 +73,7 @@ class BaseRssPluginTest(FakeInternetTestCase):
         config = Configuration.get_object().config_entry
         config.auto_store_entries = True
         config.auto_store_sources = True
+        config.auto_store_domain_info = False
         config.auto_store_entries_use_all_data = False
         config.auto_store_entries_use_clean_page_info = True
         config.save()
@@ -77,7 +84,9 @@ class BaseRssPluginTest(FakeInternetTestCase):
         props = plugin.get_container_elements()
         props = list(props)
 
-        self.assertEqual(len(props), 7)
+        self.print_errors()
+
+        self.assertEqual(len(props), 6)
         self.assertEqual(
             props[0]["source"],
             "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM",
@@ -87,6 +96,7 @@ class BaseRssPluginTest(FakeInternetTestCase):
         config = Configuration.get_object().config_entry
         config.auto_store_entries = True
         config.auto_store_sources = True
+        config.auto_store_domain_info = False
         config.auto_store_entries_use_all_data = True
         config.auto_store_entries_use_clean_page_info = False
         config.save()
@@ -96,5 +106,7 @@ class BaseRssPluginTest(FakeInternetTestCase):
         plugin = BaseRssPlugin(self.source_rss.id)
         # call tested function
         plugin.check_for_data()
+
+        self.print_errors()
 
         self.assertTrue(plugin.hash)

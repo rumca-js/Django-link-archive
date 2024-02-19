@@ -407,25 +407,25 @@ class BaseLinkDataController(BaseLinkDataModel):
         archive_link = m.get_archive_url_for_date(formatted_date, self.link)
         return archive_link
 
-    def make_bookmarked(self, username):
+    def make_bookmarked(self):
         self.bookmarked = True
         self.permanent = True
-        self.user = username
         self.save()
 
-    def make_not_bookmarked(self, username):
-        from ..models import LinkTagsDataModel, LinkVoteDataModel
+    def make_not_bookmarked(self):
+        from ..models import UserTags, UserVotes
 
         self.permanent = False
 
-        tags = LinkTagsDataModel.objects.filter(link_obj=self)
+        # TODO code below I think is not necessary, as entry_object link is cascade
+
+        tags = UserTags.objects.filter(entry_object=self)
         tags.delete()
 
-        votes = LinkVoteDataModel.objects.filter(link_obj=self)
+        votes = UserVotes.objects.filter(entry_object=self)
         votes.delete()
 
         self.bookmarked = False
-        self.user = username
         self.save()
 
     def make_dead(self, state):

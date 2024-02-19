@@ -20,9 +20,8 @@ from .models import (
     KeyWords,
     DataExport,
     ConfigurationEntry,
-    LinkTagsDataModel,
-    LinkCommentDataModel,
-    LinkVoteDataModel,
+    UserTags,
+    UserVotes,
     UserSearchHistory,
     UserEntryTransitionHistory,
     UserEntryVisitHistory,
@@ -37,6 +36,7 @@ from .controllers import (
     SourceDataController,
     LinkDataBuilder,
     DomainsController,
+    LinkCommentDataController,
 )
 from .configuration import Configuration
 from .dateutils import DateUtils
@@ -706,9 +706,9 @@ class CleanupJobHandler(BaseJobHandler):
             PersistentInfo.error("Exception: {} {}".format(str(e), error_text))
 
     def user_tables_cleanup(self):
-        LinkTagsDataModel.cleanup()
-        LinkCommentDataModel.cleanup()
-        LinkVoteDataModel.cleanup()
+        UserTags.cleanup()
+        LinkCommentDataController.cleanup()
+        UserVotes.cleanup()
         UserSearchHistory.cleanup()
         UserEntryTransitionHistory.cleanup()
         UserEntryVisitHistory.cleanup()

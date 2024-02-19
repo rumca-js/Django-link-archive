@@ -4,12 +4,12 @@ from django.contrib.auth.models import User
 from ..apps import LinkDatabase
 from ..controllers import SourceDataController, LinkDataController, DomainsController
 from ..dateutils import DateUtils
-from ..models import KeyWords, DataExport, LinkVoteDataModel
+from ..models import KeyWords, DataExport, UserVotes
 
 from .fakeinternet import FakeInternetTestCase
 
 
-class LinkVoteDataModelTests(FakeInternetTestCase):
+class UserVotesTests(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 
@@ -35,7 +35,7 @@ class LinkVoteDataModelTests(FakeInternetTestCase):
             language="en",
         )
 
-        self.assertEqual(LinkVoteDataModel.objects.all().count(), 0)
+        self.assertEqual(UserVotes.objects.all().count(), 0)
 
         url = reverse("{}:entry-vote".format(LinkDatabase.name), args=[entry.id])
 
@@ -55,5 +55,5 @@ class LinkVoteDataModelTests(FakeInternetTestCase):
 
         # check that object has been changed
 
-        entries = LinkVoteDataModel.objects.filter(link_obj=entry)
+        entries = UserVotes.objects.filter(entry_object=entry)
         self.assertEqual(entries.count(), 1)

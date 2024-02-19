@@ -332,6 +332,8 @@ class EntriesOmniListView(EntriesSearchListView):
         from ..queryfilters import OmniSearchFilter
         from ..models import UserSearchHistory
 
+        username = self.request.user.username
+
         if self.request.user.is_authenticated:
             search_term = get_search_term_request(self.request)
             if search_term:

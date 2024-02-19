@@ -6,14 +6,14 @@ from django.http import HttpResponseForbidden, HttpResponseRedirect
 from datetime import datetime, timedelta
 
 from ..apps import LinkDatabase
-from ..models import LinkTagsDataModel, ConfigurationEntry, LinkVoteDataModel
+from ..models import UserTags, ConfigurationEntry, UserVotes
 from ..controllers import LinkDataController
 from ..forms import TagForm, TagEntryForm, TagRenameForm
 from ..views import ViewPage
 
 
 class AllTags(generic.ListView):
-    model = LinkTagsDataModel
+    model = UserTags
     context_object_name = "content_list"
     paginate_by = 9200
     template_name = str(ViewPage.get_full_template("tags_list.html"))
@@ -26,7 +26,7 @@ class AllTags(generic.ListView):
         return super(AllTags, self).get(*args, **kwargs)
 
     def get_tags_objects(self):
-        return LinkTagsDataModel.objects.all()
+        return UserTags.objects.all()
 
     def get_queryset(self):
         objects = self.get_tags_objects()
@@ -63,7 +63,7 @@ class AllTags(generic.ListView):
 
 
 class RecentTags(AllTags):
-    model = LinkTagsDataModel
+    model = UserTags
     context_object_name = "tags_list"
     paginate_by = 9200
     template_name = str(ViewPage.get_full_template("tags_list.html"))
@@ -74,7 +74,7 @@ class RecentTags(AllTags):
         return DateUtils.get_days_range()
 
     def get_tags_objects(self):
-        return LinkTagsDataModel.objects.filter(date__range=self.get_time_range())
+        return UserTags.objects.filter(date__range=self.get_time_range())
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
@@ -99,14 +99,14 @@ def tag_entry(request, pk):
     p.context["page_title"] += " - tag entry"
     p.context["pk"] = pk
 
-    objs = LinkDataController.objects.filter(id=pk)
+    entries = LinkDataController.objects.filter(id=pk)
 
-    if not objs.exists():
+    if not entries.exists():
         p.context["summary_text"] = "Sorry, such object does not exist"
         return p.render("summary_present.html")
 
-    obj = objs[0]
-    if not obj.is_taggable():
+    entry = entries[0]
+    if not entry.is_taggable():
         p.context["summary_text"] = "Sorry, only bookmarked objects can be tagged"
         return p.render("summary_present.html")
 
@@ -118,36 +118,43 @@ def tag_entry(request, pk):
         if form.is_valid():
             args = form.cleaned_data
             args["user"] = request.user
-            LinkTagsDataModel.set_tags(args)
+            args["entry"] = entry
+            UserTags.set_tags(args)
 
             return HttpResponseRedirect(
                 reverse(
                     "{}:entry-detail".format(LinkDatabase.name),
-                    kwargs={"pk": obj.pk},
+                    kwargs={"pk": entry.pk},
                 )
             )
         else:
-            p.context["summary_text"] = "Entry not added"
+            summary_text = "Cannot add tag due to errors: "
+            errors = form.errors
+            for field, error_msgs in errors.items():
+                for error_msg in error_msgs:
+                    summary_text += " Field:{} Problem:{}".format(field, error_msg)
+
+            p.context["summary_text"] = summary_text
             return p.render("summary_present.html")
 
     else:
         user = request.user
-        link = obj.link
-        tag_string = LinkTagsDataModel.get_user_tag_string(request.user, link)
+        link = entry.link
+        tag_string = UserTags.get_user_tag_string(request.user, entry)
 
         if tag_string:
             form = TagEntryForm(
-                initial={"link": link, "user": user, "tag": tag_string}
+                initial={"entry_object": entry, "user_object": user, "tag": tag_string}
             )
         else:
-            form = TagEntryForm(initial={"link": link, "user": user})
+            form = TagEntryForm(initial={"entry_object": entry, "user_object": user})
 
         form.method = "POST"
         form.pk = pk
         form.action_url = reverse("{}:entry-tag".format(LinkDatabase.name), args=[pk])
         p.context["form"] = form
-        p.context["form_title"] = obj.title
-        p.context["form_description"] = obj.title
+        p.context["form_title"] = entry.title
+        p.context["form_description"] = entry.title
 
     return p.render("form_basic.html")
 
@@ -159,7 +166,7 @@ def tag_remove(request, pk):
     if data is not None:
         return data
 
-    entry = LinkTagsDataModel.objects.get(id=pk)
+    entry = UserTags.objects.get(id=pk)
     entry.delete()
 
     return HttpResponseRedirect(reverse("{}:tags-show-all".format(LinkDatabase.name)))
@@ -178,7 +185,7 @@ def tag_remove_form(request):
         if form.is_valid():
             tag_name = form.cleaned_data["tag"]
 
-            tags = LinkTagsDataModel.objects.filter(tag=tag_name)
+            tags = UserTags.objects.filter(tag=tag_name)
             tags.delete()
 
             return HttpResponseRedirect(
@@ -209,7 +216,7 @@ def tag_remove_str(request, tag_name):
     if data is not None:
         return data
 
-    entries = LinkTagsDataModel.objects.filter(tag=tag_name)
+    entries = UserTags.objects.filter(tag=tag_name)
     entries.delete()
 
     return HttpResponseRedirect(reverse("{}:tags-show-all".format(LinkDatabase.name)))
@@ -263,7 +270,7 @@ def tag_rename(request):
             current_tag = form.cleaned_data["current_tag"]
             new_tag = form.cleaned_data["new_tag"]
 
-            tags = LinkTagsDataModel.objects.filter(tag=current_tag)
+            tags = UserTags.objects.filter(tag=current_tag)
             for tag in tags:
                 tag.tag = new_tag.lower()
                 tag.save()
@@ -320,7 +327,7 @@ def entry_vote(request, pk):
         if form.is_valid():
             data = form.cleaned_data
             data["user"] = request.user
-            LinkVoteDataModel.save_vote(data)
+            UserVotes.save_vote(data)
 
             return HttpResponseRedirect(
                 reverse(
@@ -345,7 +352,7 @@ def entry_vote(request, pk):
         if votes.count() > 0:
             vote = votes[0].vote
 
-        form = LinkVoteForm(initial={"link_id": obj.id, "user": user, "vote": vote})
+        form = LinkVoteForm(initial={"link_id": obj.id, "user_id" : request.user.id, "user": user, "vote": vote})
 
         form.method = "POST"
         form.pk = pk

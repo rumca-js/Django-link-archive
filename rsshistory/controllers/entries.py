@@ -11,11 +11,12 @@ from ..models import (
     BaseLinkDataModel,
     BaseLinkDataController,
     LinkDataModel,
-    LinkTagsDataModel,
     ArchiveLinkDataModel,
     PersistentInfo,
     SourceDataModel,
     KeyWords,
+    UserTags,
+    UserBookmarks,
 )
 from .sources import SourceDataController
 from ..configuration import Configuration
@@ -214,7 +215,7 @@ class LinkDataController(LinkDataModel):
 
     def tag(self, tags, user):
         data = {"user": user, "link": self.link, "tags": tags, "entry": self}
-        return LinkTagsDataModel.set_tags_map(data)
+        return UserTags.set_tags_map(data)
 
     def vote(self, vote):
         self.page_rating_votes = vote
@@ -390,17 +391,30 @@ class LinkDataWrapper(object):
                 error_text = traceback.format_exc()
 
     def make_bookmarked(request, entry):
+        """
+        TODO move this API to UserBookmarks
+        """
+        if entry.bookmarked:
+            UserBookmarks.add(request.user, entry)
+            return
+
         if entry.is_archive_entry():
             entry = LinkDataWrapper.move_from_archive(entry)
 
-        entry.make_bookmarked(request.user.username)
+        if request.user.is_staff:
+            entry.make_bookmarked()
+
         return entry
 
     def make_not_bookmarked(request, entry):
-        entry.make_not_bookmarked(request.user.username)
+        UserBookmarks.remove(request.user, entry)
+        is_bookmarked = UserBookmarks.is_bookmarked(entry)
 
-        if entry.is_archive_time():
-            return LinkDataWrapper.move_to_archive(entry)
+        if not is_bookmarked:
+            entry.make_not_bookmarked()
+
+            if entry.is_archive_time():
+                return LinkDataWrapper.move_to_archive(entry)
 
         return entry
 
@@ -668,6 +682,9 @@ class LinkDataBuilder(object):
         entry = None
 
         self.link_data = self.get_clean_link_data()
+
+        #if self.source_is_auto:
+        #    self.link_data["link"] = self.link_data["link"].lower()
 
         c = Configuration.get_object().config_entry
         if self.is_domain_link_data() and c.auto_store_domain_info:

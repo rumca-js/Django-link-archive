@@ -116,7 +116,7 @@ class UserEntryTransitionHistoryTest(TestCase):
         )
 
         self.assertTrue(entry1)
-        self.assertEqual(entry1.user, "test_username")
+        self.assertEqual(entry1.user_object, self.user)
         self.assertEqual(entry1.entry_from.id, self.entry_youtube.id)
         self.assertEqual(entry1.entry_to.id, self.entry_tiktok.id)
 
@@ -137,7 +137,7 @@ class UserEntryTransitionHistoryTest(TestCase):
         entry1 = UserEntryTransitionHistory.add(self.user, None, self.entry_tiktok)
 
         self.assertTrue(entry1)
-        self.assertEqual(entry1.user, "test_username")
+        self.assertEqual(entry1.user_object, self.user)
         self.assertEqual(entry1.entry_from, None)
         self.assertEqual(entry1.entry_to.id, self.entry_tiktok.id)
 
@@ -153,7 +153,7 @@ class UserEntryTransitionHistoryTest(TestCase):
         )
 
         self.assertTrue(entry2)
-        self.assertEqual(entry2.user, "test_username")
+        self.assertEqual(entry2.user_object, self.user)
         self.assertEqual(entry2.entry_from.id, self.entry_tiktok.id)
         self.assertEqual(entry2.entry_to.id, self.entry_youtube.id)
 
@@ -226,7 +226,7 @@ class UserEntryVisitHistoryTest(FakeInternetTestCase):
         visits = UserEntryVisitHistory.objects.filter(entry_object=entries[0])
         self.assertEqual(visits.count(), 1)
         self.assertEqual(visits[0].visits, 1)
-        self.assertEqual(visits[0].user, "test_username")
+        self.assertEqual(visits[0].user_object, self.user)
 
         # call tested function
         UserEntryVisitHistory.visited(entries[0], self.user)
@@ -236,7 +236,7 @@ class UserEntryVisitHistoryTest(FakeInternetTestCase):
         visits = UserEntryVisitHistory.objects.filter(entry_object=entries[0])
         self.assertEqual(visits.count(), 1)
         self.assertEqual(visits[0].visits, 1)
-        self.assertEqual(visits[0].user, "test_username")
+        self.assertEqual(visits[0].user_object, self.user)
 
     def test_entry_get_last_user_entry(self):
         """
@@ -247,22 +247,22 @@ class UserEntryVisitHistoryTest(FakeInternetTestCase):
         date_3 = DateUtils.get_datetime_now_utc() - timedelta(seconds=2)
 
         UserEntryVisitHistory.objects.create(
-            user="test_username",
             visits=2,
             date_last_visit=date_1,
             entry_object=self.youtube_object,
+            user_object = self.user,
         )
         UserEntryVisitHistory.objects.create(
-            user="test_username",
             visits=2,
             date_last_visit=date_2,
             entry_object=self.tiktok_object,
+            user_object = self.user,
         )
         UserEntryVisitHistory.objects.create(
-            user="test_username",
             visits=2,
             date_last_visit=date_3,
             entry_object=self.odysee_object,
+            user_object = self.user,
         )
 
         # call tested function
@@ -273,7 +273,7 @@ class UserEntryVisitHistoryTest(FakeInternetTestCase):
 
     def test_entry_get_last_user_entry_not_found(self):
         UserEntryVisitHistory.objects.create(
-            user="test_username",
+            user_object=self.user,
             visits=2,
             date_last_visit=DateUtils.get_datetime_now_utc() - timedelta(hours=2),
             entry_object=self.youtube_object,

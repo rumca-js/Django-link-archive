@@ -1,7 +1,7 @@
 from datetime import timedelta
 from django.contrib.auth.models import User
 
-from ..models import LinkTagsDataModel
+from ..models import UserTags
 from ..controllers import (
     SourceDataController,
     LinkDataController,
@@ -145,7 +145,7 @@ class LinkDataControllerTest(FakeInternetTestCase):
         # call tested function
         entry.tag(["tag1", "tag2"], self.user)
 
-        tags = LinkTagsDataModel.objects.all()
+        tags = UserTags.objects.all()
 
         self.assertEqual(tags.count(), 2)
         self.assertEqual(tags[0].tag, "tag2")

@@ -1,4 +1,5 @@
 """
+API needs to check user privileges.
 """
 
 import traceback
@@ -16,11 +17,8 @@ from .entries import LinkDataModel
 from .system import PersistentInfo
 
 
-class LinkTagsDataModel(models.Model):
+class UserTags(models.Model):
     # https://stackoverflow.com/questions/14066531/django-model-with-unique-combination-of-two-fields
-
-    link = models.CharField(max_length=1000)
-    user = models.CharField(max_length=1000)
     date = models.DateTimeField(auto_now_add=True)
     tag = models.CharField(max_length=1000)
 
@@ -29,7 +27,7 @@ class LinkTagsDataModel(models.Model):
         related_name=str(LinkDatabase.name)+'_user_tags',
         null=True)
 
-    link_obj = models.ForeignKey(
+    entry_object = models.ForeignKey(
         LinkDataModel,
         on_delete=models.CASCADE,
         related_name="tags",
@@ -49,19 +47,19 @@ class LinkTagsDataModel(models.Model):
             if tag_string == "":
                 tag_string = element.tag
             else:
-                tag_string += LinkTagsDataModel.get_delim() + " " + element.tag
+                tag_string += UserTags.get_delim() + " " + element.tag
 
         return tag_string
 
-    def get_user_tag_string(user, link):
-        current_tags_objs = LinkTagsDataModel.objects.filter(link=link, user=user.username)
+    def get_user_tag_string(user, entry):
+        current_tags_objs = UserTags.objects.filter(entry_object=entry, user_object=user)
 
         if current_tags_objs.exists():
-            return LinkTagsDataModel.join_elements(current_tags_objs)
+            return UserTags.join_elements(current_tags_objs)
 
     def process_tag_string(tag_string):
         tags_set = set()
-        tags = tag_string.split(LinkTagsDataModel.get_delim())
+        tags = tag_string.split(UserTags.get_delim())
         for tag in tags:
             tag = str(tag).strip()
             tag = tag.lower()
@@ -75,8 +73,8 @@ class LinkTagsDataModel(models.Model):
         tags is in form tag1,tag2
         expecte author also
         """
-        data["tags"] = LinkTagsDataModel.process_tag_string(data["tag"])
-        return LinkTagsDataModel.set_tags_map(data)
+        data["tags"] = UserTags.process_tag_string(data["tag"])
+        return UserTags.set_tags_map(data)
 
     def set_tag(entry, tag_name, user=None):
         if not entry:
@@ -86,13 +84,13 @@ class LinkTagsDataModel(models.Model):
         if user:
             user_name = user.username
 
-        objs = LinkTagsDataModel.objects.filter(
-            link_obj=entry, user=user_name, tag=tag_name
+        objs = UserTags.objects.filter(
+            entry_object=entry, user_object=user, tag=tag_name
         )
 
         if objs.count() == 0:
-            LinkTagsDataModel.objects.create(
-                link=entry.link, user=user, tag=tag_name, link_obj=entry, user_object=user
+            UserTags.objects.create(
+                entry_object=entry, user_object=user, tag=tag_name
             )
 
     def set_tags_map(data):
@@ -101,9 +99,6 @@ class LinkTagsDataModel(models.Model):
         """
         user = data["user"]
 
-        link = None
-        if "link" in data:
-            link = data["link"]
         entry = None
 
         if "entry" in data:
@@ -112,32 +107,23 @@ class LinkTagsDataModel(models.Model):
         tag_objs = None
 
         if entry:
-            tag_objs = LinkTagsDataModel.objects.filter(user=user.username, link_obj=entry)
-        elif link:
-            tag_objs = LinkTagsDataModel.objects.filter(user=user.username, link=link)
-        else:
-            PersistentInfo.info("Missing information about entry")
-            return
+            tag_objs = UserTags.objects.filter(user_object=user, entry_object=entry)
 
-        if tag_objs.exists():
-            tag_objs.delete()
+            if tag_objs.exists():
+                tag_objs.delete()
+        else:
+            PersistentInfo.info("Missing entry object")
+            return
 
         tags_set = data["tags"]
 
-        if link:
-            entries = LinkDataModel.objects.filter(link=link)
-            if entries.count() == 0:
-                PersistentInfo.error("Invalid tag call")
-                return
-            entry = entries[0]
-
         for tag in tags_set:
-            LinkTagsDataModel.objects.create(
-                link=entry.link, user=user.username, tag=tag, link_obj=entry, user_object=user
+            UserTags.objects.create(
+                tag=tag, entry_object=entry, user_object=user
             )
 
     def cleanup():
-        for q in LinkTagsDataModel.objects.filter(user_object__isnull=True):
+        for q in UserTags.objects.filter(user_object__isnull=True):
             users = User.objects.filter(username = q.user)
             if users.count() > 0:
                 q.user_object = users[0]
@@ -148,7 +134,7 @@ class LinkTagsDataModel(models.Model):
                 time.sleep(0.5)
 
 
-class LinkVoteDataModel(models.Model):
+class UserVotes(models.Model):
     user = models.CharField(max_length=1000)
     vote = models.IntegerField(default=0)
 
@@ -157,7 +143,7 @@ class LinkVoteDataModel(models.Model):
         related_name=str(LinkDatabase.name)+'_user_votes',
         null=True)
 
-    link_obj = models.ForeignKey(
+    entry_object = models.ForeignKey(
         LinkDataModel,
         on_delete=models.CASCADE,
         related_name="votes",
@@ -174,13 +160,12 @@ class LinkVoteDataModel(models.Model):
 
         entry = LinkDataModel.objects.get(id=link_id)
 
-        votes = LinkVoteDataModel.objects.filter(user=user, link_obj=entry)
+        votes = UserVotes.objects.filter(user=user, entry_object=entry)
         votes.delete()
 
-        ob = LinkVoteDataModel.objects.create(
-            user=user.username,
+        ob = UserVotes.objects.create(
             vote=vote,
-            link_obj=entry,
+            entry_object=entry,
             user_object=user,
         )
 
@@ -192,7 +177,7 @@ class LinkVoteDataModel(models.Model):
         return ob
 
     def cleanup():
-        for q in LinkVoteDataModel.objects.filter(user_object__isnull=True):
+        for q in UserVotes.objects.filter(user_object__isnull=True):
             users = User.objects.filter(username = q.user)
             if users.count() > 0:
                 q.user_object = users[0]
@@ -204,13 +189,15 @@ class LinkVoteDataModel(models.Model):
 
 
 class LinkCommentDataModel(models.Model):
-    user = models.CharField(max_length=1000)
+    """
+    TODO change name to UserComments. Cannot do that right now. Django says no.
+    """
     comment = models.TextField(max_length=3000)
     date_published = models.DateTimeField(auto_now_add=True)
     date_edited = models.DateTimeField(null=True)
     reply_id = models.IntegerField(null=True)
 
-    link_obj = models.ForeignKey(
+    entry_object = models.ForeignKey(
         LinkDataModel,
         on_delete=models.CASCADE,
         related_name="comments",
@@ -238,3 +225,43 @@ class LinkCommentDataModel(models.Model):
                 LinkDatabase.error("Cannot find user '{}'".format(q.user))
                 q.delete()
                 time.sleep(0.5)
+
+
+class UserBookmarks(models.Model):
+    date_bookmarked = models.DateTimeField(auto_now_add=True)
+
+    entry_object = models.ForeignKey(
+        LinkDataModel,
+        on_delete=models.CASCADE,
+        related_name="bookmarks",
+        null=True,
+        blank=True,
+    )
+
+    user_object = models.ForeignKey(settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name=str(LinkDatabase.name)+'_user_bookmarks',
+        null=True)
+
+    def add(user, entry):
+        if not user.is_authenticated:
+            return
+
+        objs = UserBookmarks.objects.filter(user_object = user, entry_object=entry)
+        if objs.count() == 0:
+            UserBookmarks.objects.create(user_object = user, entry_object=entry)
+
+    def remove(user, entry):
+        if not user.is_authenticated:
+            return
+
+        bookmarks = UserBookmarks.objects.filter(user_object = user, entry_object=entry)
+        bookmarks.delete()
+
+    def is_bookmarked(entry):
+        bookmarks = UserBookmarks.objects.filter(entry_object = entry)
+        for bookmark in bookmarks:
+            if bookmark.user.is_staff:
+                return True
+
+        return False

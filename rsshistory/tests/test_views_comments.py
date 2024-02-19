@@ -42,8 +42,9 @@ class CommentsViewsTests(FakeInternetTestCase):
         data = {"link": test_link}
 
         comment_data = {
-            "link_id": entry.id,
-            "user": self.user,
+            "entry_id": entry.id,
+            "user_id": self.user.id,
+            "user": self.user.username,
             "comment": "test comment",
             "date_published": DateUtils.get_datetime_now_utc(),
         }
@@ -56,5 +57,5 @@ class CommentsViewsTests(FakeInternetTestCase):
 
         # check that object has been changed
 
-        entries = LinkCommentDataModel.objects.filter(link_obj=entry)
+        entries = LinkCommentDataModel.objects.filter(entry_object=entry)
         self.assertEqual(entries.count(), 1)

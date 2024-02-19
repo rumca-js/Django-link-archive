@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 
-from ..models import LinkTagsDataModel, SourceOperationalData
+from ..models import UserTags, SourceOperationalData
 from ..controllers import SourceDataController, LinkDataController
 
 from ..pluginsources.sourceparseplugin import BaseParsePlugin
@@ -266,7 +266,7 @@ class NowNowNowPluginTest(FakeInternetTestCase):
 
     def test_check_for_data(self):
         LinkDataController.objects.all().delete()
-        LinkTagsDataModel.objects.all().delete()
+        UserTags.objects.all().delete()
         SourceOperationalData.objects.all().delete()
 
         parser = NowNowNowParserPlugin(self.source_linkedin.id)
@@ -281,7 +281,7 @@ class NowNowNowPluginTest(FakeInternetTestCase):
         self.assertTrue(parser.hash)
 
         entries = LinkDataController.objects.all()
-        tags = LinkTagsDataModel.objects.all()
+        tags = UserTags.objects.all()
 
         self.assertEqual(entries.count(), 2)
 

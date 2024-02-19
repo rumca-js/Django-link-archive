@@ -1,4 +1,5 @@
 from datetime import timedelta
+from django.contrib.auth.models import User
 
 from ..controllers import (
     LinkDataBuilder,
@@ -13,14 +14,11 @@ from ..configuration import Configuration
 from .fakeinternet import FakeInternetTestCase
 
 
-class UserObject(object):
-    def __init__(self, user_name):
-        self.username = user_name
-
-
 class RequestObject(object):
-    def __init__(self, user_name="TestUser"):
-        self.user = UserObject(user_name)
+    def __init__(self, user_name="TestUser", is_staff=False):
+        self.user = User.objects.create_user(
+            username=user_name, password="testpassword", is_staff=is_staff
+        )
 
 
 class LinkDataWrapperTest(FakeInternetTestCase):
@@ -120,7 +118,7 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         obj = objs[0]
 
         # call tested function
-        result = LinkDataWrapper.make_bookmarked(RequestObject(), obj)
+        result = LinkDataWrapper.make_bookmarked(RequestObject("test_user", is_staff=True), obj)
 
         self.assertTrue(result)
         self.assertTrue(not result.is_archive_entry())
@@ -130,6 +128,39 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         obj = objs[0]
 
         self.assertTrue(obj.bookmarked == True)
+
+    def test_make_bookmarked_now_not_staff(self):
+        link_name = "https://youtube.com/v=12345"
+
+        link_data = {
+            "link": link_name,
+            "source": "https://youtube.com",
+            "title": "test",
+            "description": "description",
+            "language": "en",
+            "thumbnail": "https://youtube.com/favicon.ico",
+            "date_published": DateUtils.get_datetime_now_utc(),
+        }
+
+        b = LinkDataBuilder()
+        b.link_data = link_data
+        entry = b.add_from_props()
+
+        objs = LinkDataController.objects.filter(link=link_name)
+        self.assertEqual(objs.count(), 1)
+        obj = objs[0]
+
+        # call tested function
+        result = LinkDataWrapper.make_bookmarked(RequestObject("test_user", is_staff=False), obj)
+
+        self.assertTrue(result)
+        self.assertTrue(not result.is_archive_entry())
+
+        objs = LinkDataController.objects.filter(link=link_name)
+        self.assertEqual(objs.count(), 1)
+        obj = objs[0]
+
+        self.assertTrue(obj.bookmarked == False)
 
     def test_make_not_bookmarked_now(self):
         link_name = "https://youtube.com/v=12345"

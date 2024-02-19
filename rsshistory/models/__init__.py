@@ -20,11 +20,6 @@ from .export import (
     SourceExportHistory,
     DataExport,
 )
-from .useractions import (
-    LinkTagsDataModel,
-    LinkVoteDataModel,
-    LinkCommentDataModel,
-)
 from .domains import (
     Domains,
     DomainsSuffixes,
@@ -35,6 +30,12 @@ from .domains import (
 )
 from .keywords import (
     KeyWords,
+)
+from .useractions import (
+    UserTags,
+    UserVotes,
+    LinkCommentDataModel,
+    UserBookmarks,
 )
 from .userhistory import (
     UserSearchHistory,

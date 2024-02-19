@@ -7,13 +7,15 @@ from django.http import HttpResponseForbidden, HttpResponseRedirect
 
 from ..apps import LinkDatabase
 from ..models import (
-    LinkTagsDataModel,
     ConfigurationEntry,
     UserConfig,
     BackgroundJob,
     PersistentInfo,
     SourceExportHistory,
     Domains,
+    UserTags,
+    UserVotes,
+    UserBookmarks,
     UserSearchHistory,
     UserEntryVisitHistory,
     UserEntryTransitionHistory,
@@ -23,6 +25,7 @@ from ..controllers import (
     SourceDataController,
     LinkDataController,
     ArchiveLinkDataController,
+    LinkCommentDataController,
 )
 from ..configuration import Configuration
 from ..forms import ConfigForm, UserConfigForm, BackgroundJobForm
@@ -79,10 +82,14 @@ def system_status(request):
     p.context["SourceDataModel"] = SourceDataController.objects.count()
     p.context["LinkDataModel"] = LinkDataController.objects.count()
     p.context["ArchiveLinkDataModel"] = ArchiveLinkDataController.objects.count()
-    p.context["LinkTagsDataModel"] = LinkTagsDataModel.objects.count()
     p.context["ConfigurationEntry"] = ConfigurationEntry.objects.count()
     p.context["UserConfig"] = UserConfig.objects.count()
     p.context["BackgroundJob"] = BackgroundJob.objects.count()
+
+    p.context["UserTags"] = UserTags.objects.count()
+    p.context["UserVotes"] = UserVotes.objects.count()
+    p.context["LinkCommentDataController"] = LinkCommentDataController.objects.count()
+    p.context["UserBookmarks"] = UserBookmarks.objects.count()
     p.context["UserSearchHistory"] = UserSearchHistory.objects.count()
     p.context["UserEntryVisitHistory"] = UserEntryVisitHistory.objects.count()
     p.context["UserEntryTransitionHistory"] = UserEntryTransitionHistory.objects.count()

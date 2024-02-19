@@ -4,11 +4,11 @@ from django.test import TestCase
 
 from ..controllers import LinkDataController, SourceDataController, DomainsController
 from ..configuration import Configuration
-from ..models import LinkTagsDataModel
+from ..models import UserTags
 from ..dateutils import DateUtils
 
 
-class LinkTagsDataModelTest(TestCase):
+class UserTagsTest(TestCase):
     def setUp(self):
         c = Configuration.get_object()
 
@@ -42,7 +42,7 @@ class LinkTagsDataModelTest(TestCase):
         )
 
     def test_set_tags(self):
-        LinkTagsDataModel.objects.all().delete()
+        UserTags.objects.all().delete()
 
         data = {}
         data["user"] = self.user
@@ -50,20 +50,20 @@ class LinkTagsDataModelTest(TestCase):
         data["entry"] = self.entry
 
         # call tested function
-        LinkTagsDataModel.set_tags(data)
+        UserTags.set_tags(data)
 
-        tags = LinkTagsDataModel.objects.all()
+        tags = UserTags.objects.all()
 
         tag_names = [tag.tag for tag in tags]
 
         self.assertEqual(tags.count(), 2)
         self.assertTrue("tag1" in tag_names)
         self.assertTrue("tag2" in tag_names)
-        self.assertEqual(tags[0].link_obj, self.entry)
-        self.assertEqual(tags[1].link_obj, self.entry)
+        self.assertEqual(tags[0].entry_object, self.entry)
+        self.assertEqual(tags[1].entry_object, self.entry)
 
     def test_set_tags_map(self):
-        LinkTagsDataModel.objects.all().delete()
+        UserTags.objects.all().delete()
 
         data = {}
         data["user"] = self.user
@@ -71,29 +71,30 @@ class LinkTagsDataModelTest(TestCase):
         data["entry"] = self.entry
 
         # call tested function
-        LinkTagsDataModel.set_tags_map(data)
+        UserTags.set_tags_map(data)
 
-        tags = LinkTagsDataModel.objects.all()
+        tags = UserTags.objects.all()
 
         self.assertEqual(tags.count(), 2)
         self.assertEqual(tags[0].tag, "tag2")
-        self.assertEqual(tags[0].link_obj, self.entry)
+        self.assertEqual(tags[0].entry_object, self.entry)
         self.assertEqual(tags[1].tag, "tag1")
-        self.assertEqual(tags[1].link_obj, self.entry)
+        self.assertEqual(tags[1].entry_object, self.entry)
 
     def test_set_tag(self):
-        LinkTagsDataModel.objects.all().delete()
+        UserTags.objects.all().delete()
 
         user = self.user
 
         # call tested function
-        LinkTagsDataModel.set_tag(self.entry, "tag3", user)
-        LinkTagsDataModel.set_tag(self.entry, "tag4", user)
+        UserTags.set_tag(self.entry, "tag3", user)
+        # call tested function
+        UserTags.set_tag(self.entry, "tag4", user)
 
-        tags = LinkTagsDataModel.objects.all()
+        tags = UserTags.objects.all()
 
         self.assertEqual(tags.count(), 2)
         self.assertEqual(tags[0].tag, "tag4")
-        self.assertEqual(tags[0].link_obj, self.entry)
+        self.assertEqual(tags[0].entry_object, self.entry)
         self.assertEqual(tags[1].tag, "tag3")
-        self.assertEqual(tags[1].link_obj, self.entry)
+        self.assertEqual(tags[1].entry_object, self.entry)
