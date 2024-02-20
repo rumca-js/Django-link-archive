@@ -6,6 +6,7 @@ This module provides replacement for the Internet.
 """
 from django.test import TestCase
 from django.contrib.auth.models import User
+
 # import chardet
 
 from ..models import PersistentInfo, ConfigurationEntry
@@ -409,7 +410,9 @@ class FakeInternetTestCase(TestCase):
         c.config_entry.whats_new_days = 7
         c.config_entry.save()
 
-    def get_user(self, username="test_username", password="testpassword", is_superuser=False):
+    def get_user(
+        self, username="test_username", password="testpassword", is_superuser=False
+    ):
         """
         TODO test cases should be rewritten to use names as follows:
          - test_superuser
@@ -418,9 +421,9 @@ class FakeInternetTestCase(TestCase):
         """
         users = User.objects.filter(username=username)
         if users.count() > 0:
-            self.user=users[0]
-            self.user.username=username
-            self.user.password=password
+            self.user = users[0]
+            self.user.username = username
+            self.user.password = password
             self.user.is_superuser = is_superuser
             self.user.save()
         else:

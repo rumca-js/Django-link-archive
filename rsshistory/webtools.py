@@ -28,6 +28,7 @@ import traceback
 import requests
 import re
 import json
+
 # import chardet
 from bs4 import BeautifulSoup
 
@@ -77,14 +78,12 @@ def date_str_to_date(date_str):
             return DateUtils.to_utc_date(parsed_date)
         except Exception as E:
             PersistentInfo.error(
-                "Could not parse music:release_date {} Exc:{}".format(
-                    date_str, str(E)
-                )
+                "Could not parse music:release_date {} Exc:{}".format(date_str, str(E))
             )
 
 
 class SeleniumResponseObject(object):
-    def __init__(self, url, contents, status_code = 200):
+    def __init__(self, url, contents, status_code=200):
         self.status_code = status_code
 
         self.content = contents
@@ -285,7 +284,7 @@ class BasePage(object):
             return self.contents
 
         if not self.user_agent or self.user_agent == "":
-            self.dead=True
+            self.dead = True
             return None
 
         if self.dead:
@@ -301,7 +300,7 @@ class BasePage(object):
                 "Page: Url is invalid{};Lines:{}".format(self.url, line_text)
             )
 
-            self.dead=True
+            self.dead = True
             return None
 
         hdr = {
@@ -380,8 +379,8 @@ class BasePage(object):
         chardet does not work on youtube RSS feeds.
         apparent encoding does not work on youtube RSS feeds.
         """
-        #encoding = chardet.detect(request_result.content)
-        #request_result.encoding = encoding["encoding"]
+        # encoding = chardet.detect(request_result.content)
+        # request_result.encoding = encoding["encoding"]
 
         if request_result.text.find('encoding="UTF-8"') >= 0:
             request_result.encoding = "utf-8"
@@ -2183,7 +2182,9 @@ class HtmlPage(ContentInterface):
         elif body:
             return self.calculate_hash(body)
         else:
-            PersistentInfo.error("HTML: Cannot calculate body hash for:{}".format(self.url))
+            PersistentInfo.error(
+                "HTML: Cannot calculate body hash for:{}".format(self.url)
+            )
             if self.contents:
                 return self.calculate_hash(self.contents)
 
@@ -2246,22 +2247,22 @@ class Url(object):
 
 
 class UrlWrapper(object):
-    def __init__(self, url = None, page_object=None, options=None):
+    def __init__(self, url=None, page_object=None, options=None):
         self.p = self.get_handler(url, page_object, options=options)
 
-    def get_handler(self, url = None, page_object=None, options=None):
+    def get_handler(self, url=None, page_object=None, options=None):
         if url is None:
             url = page_object.url
 
-        p = HtmlPage(url, page_object = page_object, options=options)
+        p = HtmlPage(url, page_object=page_object, options=options)
         if p.is_html():
             return p
 
-        p = RssPage(url, page_object = p, options=options)
+        p = RssPage(url, page_object=p, options=options)
         if p.is_rss():
             return p
 
-        p = DefaultContentPage(url, page_object = p, options=options)
+        p = DefaultContentPage(url, page_object=p, options=options)
         return p
 
     def get_domain(self):
@@ -2271,7 +2272,7 @@ class UrlWrapper(object):
             return UrlWrapper(self.p.get_domain(), self.p.options)
 
     def get_favicon(self):
-        page = UrlWrapper(page_object = self.p)
+        page = UrlWrapper(page_object=self.p)
         if not page:
             return
 
@@ -2282,7 +2283,7 @@ class UrlWrapper(object):
 
         if not page.is_domain():
             dom = page.get_domain()
-            page = UrlWrapper(dom, options = page.options)
+            page = UrlWrapper(dom, options=page.options)
             if page.is_html():
                 favs = page.get_favicons()
                 if favs and len(favs) > 0:

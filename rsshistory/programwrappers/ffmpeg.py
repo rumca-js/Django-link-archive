@@ -5,7 +5,7 @@ from ..apps import LinkDatabase
 
 
 class FFmpeg(object):
-    def __init__(self, name, timeout_s = 60 * 60):
+    def __init__(self, name, timeout_s=60 * 60):
         self.name = name
         self.timeout_s = timeout_s
 
@@ -16,7 +16,7 @@ class FFmpeg(object):
             ["ffmpeg", "-y", "-i", self.name, "-vn", mp3_name],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            timeout=self.timeout_s
+            timeout=self.timeout_s,
         )
 
         os.remove(self.name)
@@ -30,7 +30,10 @@ class FFmpeg(object):
     def validate():
         try:
             proc = subprocess.run(
-                ["ffmpeg"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=self.timeout_s
+                ["ffmpeg"],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                timeout=self.timeout_s,
             )
         except:
             return False
@@ -46,14 +49,17 @@ class Vlc(object):
             ["vlc", self.name, "vlc://quit"],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            timeout=self.timeout_s
+            timeout=self.timeout_s,
         )
 
     @staticmethod
     def validate():
         try:
             proc = subprocess.run(
-                ["vlc"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=self.timeout_s
+                ["vlc"],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                timeout=self.timeout_s,
             )
         except:
             return False

@@ -22,10 +22,12 @@ class UserTags(models.Model):
     date = models.DateTimeField(auto_now_add=True)
     tag = models.CharField(max_length=1000)
 
-    user_object = models.ForeignKey(settings.AUTH_USER_MODEL,
+    user_object = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name=str(LinkDatabase.name)+'_user_tags',
-        null=True)
+        related_name=str(LinkDatabase.name) + "_user_tags",
+        null=True,
+    )
 
     entry_object = models.ForeignKey(
         LinkDataModel,
@@ -52,7 +54,9 @@ class UserTags(models.Model):
         return tag_string
 
     def get_user_tag_string(user, entry):
-        current_tags_objs = UserTags.objects.filter(entry_object=entry, user_object=user)
+        current_tags_objs = UserTags.objects.filter(
+            entry_object=entry, user_object=user
+        )
 
         if current_tags_objs.exists():
             return UserTags.join_elements(current_tags_objs)
@@ -89,9 +93,7 @@ class UserTags(models.Model):
         )
 
         if objs.count() == 0:
-            UserTags.objects.create(
-                entry_object=entry, user_object=user, tag=tag_name
-            )
+            UserTags.objects.create(entry_object=entry, user_object=user, tag=tag_name)
 
     def set_tags_map(data):
         """
@@ -118,13 +120,11 @@ class UserTags(models.Model):
         tags_set = data["tags"]
 
         for tag in tags_set:
-            UserTags.objects.create(
-                tag=tag, entry_object=entry, user_object=user
-            )
+            UserTags.objects.create(tag=tag, entry_object=entry, user_object=user)
 
     def cleanup():
         for q in UserTags.objects.filter(user_object__isnull=True):
-            users = User.objects.filter(username = q.user)
+            users = User.objects.filter(username=q.user)
             if users.count() > 0:
                 q.user_object = users[0]
                 q.save()
@@ -138,10 +138,12 @@ class UserVotes(models.Model):
     user = models.CharField(max_length=1000)
     vote = models.IntegerField(default=0)
 
-    user_object = models.ForeignKey(settings.AUTH_USER_MODEL,
+    user_object = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name=str(LinkDatabase.name)+'_user_votes',
-        null=True)
+        related_name=str(LinkDatabase.name) + "_user_votes",
+        null=True,
+    )
 
     entry_object = models.ForeignKey(
         LinkDataModel,
@@ -178,7 +180,7 @@ class UserVotes(models.Model):
 
     def cleanup():
         for q in UserVotes.objects.filter(user_object__isnull=True):
-            users = User.objects.filter(username = q.user)
+            users = User.objects.filter(username=q.user)
             if users.count() > 0:
                 q.user_object = users[0]
                 q.save()
@@ -192,6 +194,7 @@ class LinkCommentDataModel(models.Model):
     """
     TODO change name to UserComments. Cannot do that right now. Django says no.
     """
+
     comment = models.TextField(max_length=3000)
     date_published = models.DateTimeField(auto_now_add=True)
     date_edited = models.DateTimeField(null=True)
@@ -205,10 +208,12 @@ class LinkCommentDataModel(models.Model):
         blank=True,
     )
 
-    user_object = models.ForeignKey(settings.AUTH_USER_MODEL,
+    user_object = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name=str(LinkDatabase.name)+'_user_comments',
-        null=True)
+        related_name=str(LinkDatabase.name) + "_user_comments",
+        null=True,
+    )
 
     def get_comment(self):
         from ..webtools import InputContent
@@ -217,7 +222,7 @@ class LinkCommentDataModel(models.Model):
 
     def cleanup():
         for q in LinkCommentDataModel.objects.filter(user_object__isnull=True):
-            users = User.objects.filter(username = q.user)
+            users = User.objects.filter(username=q.user)
             if users.count() > 0:
                 q.user_object = users[0]
                 q.save()
@@ -238,28 +243,30 @@ class UserBookmarks(models.Model):
         blank=True,
     )
 
-    user_object = models.ForeignKey(settings.AUTH_USER_MODEL,
+    user_object = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name=str(LinkDatabase.name)+'_user_bookmarks',
-        null=True)
+        related_name=str(LinkDatabase.name) + "_user_bookmarks",
+        null=True,
+    )
 
     def add(user, entry):
         if not user.is_authenticated:
             return
 
-        objs = UserBookmarks.objects.filter(user_object = user, entry_object=entry)
+        objs = UserBookmarks.objects.filter(user_object=user, entry_object=entry)
         if objs.count() == 0:
-            UserBookmarks.objects.create(user_object = user, entry_object=entry)
+            UserBookmarks.objects.create(user_object=user, entry_object=entry)
 
     def remove(user, entry):
         if not user.is_authenticated:
             return
 
-        bookmarks = UserBookmarks.objects.filter(user_object = user, entry_object=entry)
+        bookmarks = UserBookmarks.objects.filter(user_object=user, entry_object=entry)
         bookmarks.delete()
 
     def is_bookmarked(entry):
-        bookmarks = UserBookmarks.objects.filter(entry_object = entry)
+        bookmarks = UserBookmarks.objects.filter(entry_object=entry)
         for bookmark in bookmarks:
             if bookmark.user.is_staff:
                 return True

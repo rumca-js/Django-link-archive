@@ -359,4 +359,12 @@ class BackgroundJob(models.Model):
     enabled = models.BooleanField(default=True)
 
     class Meta:
-        ordering = ["enabled", "priority", "date_created", "job", "pk", "subject", "errors"]
+        ordering = [
+            "enabled",
+            "priority",
+            "date_created",
+            "job",
+            "pk",
+            "subject",
+            "errors",
+        ]

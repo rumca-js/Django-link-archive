@@ -2,7 +2,13 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 
 from ..apps import LinkDatabase
-from ..controllers import SourceDataController, LinkDataController, DomainsController, ArchiveLinkDataController, LinkDataBuilder
+from ..controllers import (
+    SourceDataController,
+    LinkDataController,
+    DomainsController,
+    ArchiveLinkDataController,
+    LinkDataBuilder,
+)
 from ..dateutils import DateUtils
 from ..models import KeyWords, DataExport
 
@@ -105,7 +111,7 @@ class EntriesViewsTests(FakeInternetTestCase):
         url = reverse("{}:entry-add".format(LinkDatabase.name))
         test_link = "https://linkedin.com"
 
-        LinkDataBuilder(link = test_link)
+        LinkDataBuilder(link=test_link)
 
         data = {"link": test_link}
         full_data = LinkDataController.get_full_information(data)
@@ -159,14 +165,18 @@ class EntriesViewsTests(FakeInternetTestCase):
         print("Limited data")
         print(limited_data)
 
-        self.assertEqual(ArchiveLinkDataController.objects.filter(link=test_link).count(), 1)
+        self.assertEqual(
+            ArchiveLinkDataController.objects.filter(link=test_link).count(), 1
+        )
         self.assertEqual(LinkDataController.objects.filter(link=test_link).count(), 0)
 
         # call user action
         response = self.client.post(url, data=limited_data)
 
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(ArchiveLinkDataController.objects.filter(link=test_link).count(), 1)
+        self.assertEqual(
+            ArchiveLinkDataController.objects.filter(link=test_link).count(), 1
+        )
         self.assertEqual(LinkDataController.objects.filter(link=test_link).count(), 0)
 
     def test_edit_entry(self):

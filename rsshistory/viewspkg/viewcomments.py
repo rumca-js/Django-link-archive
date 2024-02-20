@@ -55,9 +55,13 @@ def entry_add_comment(request, link_id):
         return p.render("summary_present.html")
 
     else:
-        form = CommentEntryForm(initial={"user": request.user.username, 
-                                         "entry_id": link.id,
-                                         "user_id": request.user.id})
+        form = CommentEntryForm(
+            initial={
+                "user": request.user.username,
+                "entry_id": link.id,
+                "user_id": request.user.id,
+            }
+        )
 
     form.method = "POST"
     form.pk = link_id

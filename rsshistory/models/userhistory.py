@@ -25,10 +25,12 @@ class UserSearchHistory(models.Model):
 
     search_query = models.CharField(max_length=1000)
     date = models.DateTimeField(auto_now_add=True)
-    user_object = models.ForeignKey(settings.AUTH_USER_MODEL,
+    user_object = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name=str(LinkDatabase.name)+'_search_history',
-        null=True)
+        related_name=str(LinkDatabase.name) + "_search_history",
+        null=True,
+    )
 
     class Meta:
         ordering = ["-date"]
@@ -64,7 +66,7 @@ class UserSearchHistory(models.Model):
         if not config_entry.track_user_actions or not config_entry.track_user_searches:
             UserSearchHistory.objects.all().delete()
 
-        qs = UserSearchHistory.objects.filter(user_object__isnull = True)
+        qs = UserSearchHistory.objects.filter(user_object__isnull=True)
         for q in qs:
             users = User.objects.filter(username=q.user)
             if users.count() > 0:
@@ -112,15 +114,20 @@ class UserSearchHistory(models.Model):
                 entry.delete()
 
     def delete_old_user_entries(user, search_query):
-        entries = UserSearchHistory.objects.filter(search_query=search_query, user_object=user)
+        entries = UserSearchHistory.objects.filter(
+            search_query=search_query, user_object=user
+        )
         if entries.exists():
             entries.delete()
 
     def get_choices_model_limit():
-        return 100
+        """
+        TODO move this to configuration?
+        """
+        return 300
 
     def get_choices_limit():
-        return 15
+        return 30
 
 
 class UserEntryTransitionHistory(models.Model):
@@ -129,10 +136,12 @@ class UserEntryTransitionHistory(models.Model):
     """
 
     counter = models.IntegerField(default=0)
-    user_object = models.ForeignKey(settings.AUTH_USER_MODEL,
+    user_object = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name=str(LinkDatabase.name)+'_entry_transitions',
-        null=True)
+        related_name=str(LinkDatabase.name) + "_entry_transitions",
+        null=True,
+    )
 
     entry_from = models.ForeignKey(
         LinkDataController,
@@ -193,7 +202,7 @@ class UserEntryTransitionHistory(models.Model):
 
         else:
             return UserEntryTransitionHistory.objects.create(
-                entry_from=entry_from, entry_to=entry_to, counter=1, user_object = user
+                entry_from=entry_from, entry_to=entry_to, counter=1, user_object=user
             )
 
     def get_element(user, entry_from, entry_to):
@@ -211,7 +220,7 @@ class UserEntryTransitionHistory(models.Model):
         ):
             UserEntryTransitionHistory.objects.all().delete()
 
-        qs = UserEntryTransitionHistory.objects.filter(user_object__isnull = True)
+        qs = UserEntryTransitionHistory.objects.filter(user_object__isnull=True)
         for q in qs:
             users = User.objects.filter(username=q.user)
             if users.count() > 0:
@@ -231,10 +240,12 @@ class UserEntryVisitHistory(models.Model):
 
     visits = models.IntegerField(blank=True, null=True)
     date_last_visit = models.DateTimeField(blank=True, null=True)
-    user_object = models.ForeignKey(settings.AUTH_USER_MODEL,
+    user_object = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name=str(LinkDatabase.name)+'_entry_visits',
-        null=True)
+        related_name=str(LinkDatabase.name) + "_entry_visits",
+        null=True,
+    )
 
     entry_object = models.ForeignKey(
         LinkDataController,
@@ -271,7 +282,9 @@ class UserEntryVisitHistory(models.Model):
         if str(user.username) == "" or user.username is None:
             return
 
-        visits = UserEntryVisitHistory.objects.filter(entry_object=entry, user_object=user)
+        visits = UserEntryVisitHistory.objects.filter(
+            entry_object=entry, user_object=user
+        )
 
         if UserEntryVisitHistory.is_link_just_visited(visits):
             return
@@ -358,7 +371,7 @@ class UserEntryVisitHistory(models.Model):
         ):
             UserEntryVisitHistory.objects.all().delete()
 
-        qs = UserEntryVisitHistory.objects.filter(user_object__isnull = True)
+        qs = UserEntryVisitHistory.objects.filter(user_object__isnull=True)
         for q in qs:
             users = User.objects.filter(username=q.user)
             if users.count() > 0:

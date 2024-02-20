@@ -352,7 +352,14 @@ def entry_vote(request, pk):
         if votes.count() > 0:
             vote = votes[0].vote
 
-        form = LinkVoteForm(initial={"link_id": obj.id, "user_id" : request.user.id, "user": user, "vote": vote})
+        form = LinkVoteForm(
+            initial={
+                "link_id": obj.id,
+                "user_id": request.user.id,
+                "user": user,
+                "vote": vote,
+            }
+        )
 
         form.method = "POST"
         form.pk = pk

@@ -118,7 +118,9 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         obj = objs[0]
 
         # call tested function
-        result = LinkDataWrapper.make_bookmarked(RequestObject("test_user", is_staff=True), obj)
+        result = LinkDataWrapper.make_bookmarked(
+            RequestObject("test_user", is_staff=True), obj
+        )
 
         self.assertTrue(result)
         self.assertTrue(not result.is_archive_entry())
@@ -151,7 +153,9 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         obj = objs[0]
 
         # call tested function
-        result = LinkDataWrapper.make_bookmarked(RequestObject("test_user", is_staff=False), obj)
+        result = LinkDataWrapper.make_bookmarked(
+            RequestObject("test_user", is_staff=False), obj
+        )
 
         self.assertTrue(result)
         self.assertTrue(not result.is_archive_entry())

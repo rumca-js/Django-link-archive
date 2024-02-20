@@ -679,11 +679,12 @@ class LinkDataBuilder(object):
 
     def add_from_props_internal(self):
         from .backgroundjob import BackgroundJobController
+
         entry = None
 
         self.link_data = self.get_clean_link_data()
 
-        #if self.source_is_auto:
+        # if self.source_is_auto:
         #    self.link_data["link"] = self.link_data["link"].lower()
 
         c = Configuration.get_object().config_entry

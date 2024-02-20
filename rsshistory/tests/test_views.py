@@ -236,7 +236,6 @@ class ViewsTest(FakeInternetTestCase):
 
         self.assertEqual(resp.status_code, 200)
 
-
     """
     Tags
     """

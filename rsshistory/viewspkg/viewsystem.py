@@ -224,6 +224,34 @@ def backgroundjob_add(request):
     return p.render("form_basic.html")
 
 
+def backgroundjob_prio_up(request, pk):
+    p = ViewPage(request)
+    p.set_title("Increment job priority")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    job = BackgroundJob.objects.get(id=pk)
+    job.priority -= 1
+    job.save()
+
+    return HttpResponseRedirect(reverse("{}:backgroundjobs".format(LinkDatabase.name)))
+
+
+def backgroundjob_prio_down(request, pk):
+    p = ViewPage(request)
+    p.set_title("Decrement job priority")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    job = BackgroundJob.objects.get(id=pk)
+    job.priority += 1
+    job.save()
+
+    return HttpResponseRedirect(reverse("{}:backgroundjobs".format(LinkDatabase.name)))
+
+
 def backgroundjob_remove(request, pk):
     p = ViewPage(request)
     p.set_title("Remove a new background job")

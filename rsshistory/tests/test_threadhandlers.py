@@ -43,7 +43,9 @@ class HandlerManagerTest(FakeInternetTestCase):
             source_obj=ob,
         )
 
-        self.user = self.get_user(username="test_username", password="testpassword", is_superuser=True)
+        self.user = self.get_user(
+            username="test_username", password="testpassword", is_superuser=True
+        )
 
     def test_job_consistency(self):
         from ..controllers.backgroundjob import BackgroundJobController
@@ -289,8 +291,7 @@ class HandlerManagerTest(FakeInternetTestCase):
 
     def test_get_handler_and_object_job_disabled(self):
         BackgroundJobController.objects.create(
-            job=BackgroundJobController.JOB_PROCESS_SOURCE,
-            enabled=False
+            job=BackgroundJobController.JOB_PROCESS_SOURCE, enabled=False
         )
 
         BackgroundJobController.objects.create(
@@ -327,7 +328,7 @@ class HandlerManagerTest(FakeInternetTestCase):
             subject="https://tiktok.com",
         )
 
-        mgr = HandlerManager(timeout_s = 60)
+        mgr = HandlerManager(timeout_s=60)
 
         # call tested function
         mgr.process_all()
@@ -355,7 +356,7 @@ class HandlerManagerTest(FakeInternetTestCase):
             subject="https://tiktok.com",
         )
 
-        mgr = HandlerManager(timeout_s = 0)
+        mgr = HandlerManager(timeout_s=0)
 
         # call tested function
         mgr.process_all()
@@ -364,9 +365,21 @@ class HandlerManagerTest(FakeInternetTestCase):
 
         self.assertEqual(BackgroundJobController.get_number_of_jobs(), 2)
 
-        jobs = BackgroundJobController.objects.filter(job=BackgroundJobController.JOB_LINK_ADD)
-        self.assertNotEqual(jobs[0].priority, BackgroundJobController.get_job_priority(BackgroundJobController.JOB_LINK_ADD))
-        self.assertNotEqual(jobs[1].priority, BackgroundJobController.get_job_priority(BackgroundJobController.JOB_LINK_ADD))
+        jobs = BackgroundJobController.objects.filter(
+            job=BackgroundJobController.JOB_LINK_ADD
+        )
+        self.assertNotEqual(
+            jobs[0].priority,
+            BackgroundJobController.get_job_priority(
+                BackgroundJobController.JOB_LINK_ADD
+            ),
+        )
+        self.assertNotEqual(
+            jobs[1].priority,
+            BackgroundJobController.get_job_priority(
+                BackgroundJobController.JOB_LINK_ADD
+            ),
+        )
 
 
 class RefreshThreadHandlerTest(FakeInternetTestCase):
@@ -384,7 +397,9 @@ class RefreshThreadHandlerTest(FakeInternetTestCase):
         BackgroundJobController.objects.all().delete()
         SourceExportHistory.objects.all().delete()
 
-        self.user = self.get_user(username="test_username", password="testpassword", is_superuser=True)
+        self.user = self.get_user(
+            username="test_username", password="testpassword", is_superuser=True
+        )
 
     def create_exports(self):
         DataExport.objects.create(
@@ -491,7 +506,9 @@ class CleanJobHandlerTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 
-        self.user = self.get_user(username="test_username", password="testpassword", is_superuser=True)
+        self.user = self.get_user(
+            username="test_username", password="testpassword", is_superuser=True
+        )
 
     def prepare_data(self):
         # inserts old data, we will check if those will be removed
@@ -617,7 +634,9 @@ class AddJobHandlerTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 
-        self.user = self.get_user(username="test_username", password="testpassword", is_superuser=True)
+        self.user = self.get_user(
+            username="test_username", password="testpassword", is_superuser=True
+        )
 
     def test_add_link(self):
         conf = Configuration.get_object().config_entry
@@ -649,7 +668,9 @@ class AddJobHandlerTest(FakeInternetTestCase):
         LinkDataController.objects.all().delete()
         DomainsController.objects.all().delete()
 
-        ob = BackgroundJobController.link_add("https://manually-added-link.com", tag="demoscene")
+        ob = BackgroundJobController.link_add(
+            "https://manually-added-link.com", tag="demoscene"
+        )
 
         handler = LinkAddJobHandler()
         handler.process(ob)
@@ -668,7 +689,9 @@ class ScanLinkJobHandlerTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 
-        self.user = self.get_user(username="test_username", password="testpassword", is_superuser=True)
+        self.user = self.get_user(
+            username="test_username", password="testpassword", is_superuser=True
+        )
 
     def test_scan_link(self):
         conf = Configuration.get_object().config_entry
@@ -701,7 +724,9 @@ class ProcessSourceHandlerTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 
-        self.user = self.get_user(username="test_username", password="testpassword", is_superuser=True)
+        self.user = self.get_user(
+            username="test_username", password="testpassword", is_superuser=True
+        )
 
     def test_process_source_unknown(self):
         LinkDataController.objects.all().delete()

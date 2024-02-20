@@ -14,7 +14,6 @@
     <a href="{% url 'rsshistory:backgroundjobs-check-new' %}" title="Checks if it is time for a new job" class="simplebutton">
        <img src="{% static 'rsshistory/icons/icons8-update-100.png' %}" class="content-icon" />
     </a>
-    <a href="{% url 'rsshistory:backgroundjobs-perform-all' %}" title="Process all" class="simplebutton">Process all</a>
     <a href="{% url 'rsshistory:backgroundjobs-remove-all' %}" title="Removes all background jobs" class="simplebutton" title="Remove all">
         <img src="{% static 'rsshistory/icons/icons8-trash-100.png' %}" class="content-icon" />
         All
@@ -41,6 +40,13 @@
 	    {% endif %}
 
             [{{job.date_created}}] {{job.priority}} <b>{{job.job}}</b> {{job.task}} {{job.subject}} {{job.args}} 
+
+            <a href="{% url 'rsshistory:backgroundjob-prio-up' job.id %}" class="simplebutton" title="Increase priority">
+               <img src="{% static 'rsshistory/icons/icons8-up-100.png' %}" class="content-icon" />
+            </a>
+            <a href="{% url 'rsshistory:backgroundjob-prio-down' job.id %}" class="simplebutton" title="Decrease priority">
+               <img src="{% static 'rsshistory/icons/icons8-down-100.png' %}" class="content-icon" />
+            </a>
 
             <a href="{% url 'rsshistory:backgroundjob-remove' job.id %}" class="simplebutton" title="Remove job">
                <img src="{% static 'rsshistory/icons/icons8-trash-100.png' %}" class="content-icon" />

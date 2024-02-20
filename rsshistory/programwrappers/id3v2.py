@@ -5,7 +5,7 @@ from ..apps import LinkDatabase
 
 
 class Id3v2(object):
-    def __init__(self, file_name, data=None, timeout_s = 60 * 60):
+    def __init__(self, file_name, data=None, timeout_s=60 * 60):
         self.file_name = file_name
         self.timeout_s = timeout_s
         self.data = data
@@ -40,7 +40,7 @@ class Id3v2(object):
                     str(self._track),
                     self.file_name,
                 ],
-                timeout=self.timeout_s
+                timeout=self.timeout_s,
             )
         else:
             subprocess.run(
@@ -50,7 +50,9 @@ class Id3v2(object):
     @staticmethod
     def validate():
         try:
-            proc = subprocess.run(["id3v2"], stdout=subprocess.PIPE, timeout=self.timeout_s)
+            proc = subprocess.run(
+                ["id3v2"], stdout=subprocess.PIPE, timeout=self.timeout_s
+            )
         except:
             return False
         return True

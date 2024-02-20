@@ -25,7 +25,9 @@ def subs_checker_task(arg):
         handler.refresh()
     except Exception as E:
         error_text = traceback.format_exc()
-        PersistentInfo.create("Exception in checker task: {} {}".format(str(E), error_text))
+        PersistentInfo.create(
+            "Exception in checker task: {} {}".format(str(E), error_text)
+        )
 
     LinkDatabase.info("subs_checker_task DONE")
 

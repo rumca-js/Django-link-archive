@@ -62,7 +62,11 @@ class BackgroundJobController(BackgroundJob):
         if self.errors > 5:
             self.enabled = False
 
-        PersistentInfo.create("Disabling job due to errors {} {} {}".format(self.job, self.subject, self.args))
+        PersistentInfo.create(
+            "Disabling job due to errors {} {} {}".format(
+                self.job, self.subject, self.args
+            )
+        )
 
         # TODO Add notification
 

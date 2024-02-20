@@ -15,6 +15,7 @@ class BaseRssPlugin(SourceGenericPlugin):
     """
     TODO this inherits HTML, not RSS
     """
+
     PLUGIN_NAME = "BaseRssPlugin"
 
     def __init__(self, source_id):

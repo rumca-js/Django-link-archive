@@ -48,7 +48,7 @@ class UserTagsTest(FakeInternetTestCase):
         # call user action
         response = self.client.post(url, data=tag_data)
 
-        page_source = response.content.decode('utf-8')
+        page_source = response.content.decode("utf-8")
         print("Contents: {}".format(page_source))
 
         # redirect to view the link again

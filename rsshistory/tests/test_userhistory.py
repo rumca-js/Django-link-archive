@@ -48,7 +48,6 @@ class UserSearchHistoryTest(TestCase):
         )
 
     def test_add(self):
-
         # call tested function
         theobject = UserSearchHistory.add(self.user, "query1")
 
@@ -158,17 +157,11 @@ class UserEntryTransitionHistoryTest(TestCase):
         self.assertEqual(entry2.entry_to.id, self.entry_youtube.id)
 
     def test_get_related_list(self):
-        UserEntryTransitionHistory.add(
-            self.user, self.entry_youtube, self.entry_tiktok
-        )
+        UserEntryTransitionHistory.add(self.user, self.entry_youtube, self.entry_tiktok)
 
-        UserEntryTransitionHistory.add(
-            self.user, self.entry_youtube, self.entry_odysee
-        )
+        UserEntryTransitionHistory.add(self.user, self.entry_youtube, self.entry_odysee)
 
-        UserEntryTransitionHistory.add(
-            self.user, self.entry_tiktok, self.entry_spotify
-        )
+        UserEntryTransitionHistory.add(self.user, self.entry_tiktok, self.entry_spotify)
 
         # call tested function
         related_list = UserEntryTransitionHistory.get_related_list(
@@ -250,19 +243,19 @@ class UserEntryVisitHistoryTest(FakeInternetTestCase):
             visits=2,
             date_last_visit=date_1,
             entry_object=self.youtube_object,
-            user_object = self.user,
+            user_object=self.user,
         )
         UserEntryVisitHistory.objects.create(
             visits=2,
             date_last_visit=date_2,
             entry_object=self.tiktok_object,
-            user_object = self.user,
+            user_object=self.user,
         )
         UserEntryVisitHistory.objects.create(
             visits=2,
             date_last_visit=date_3,
             entry_object=self.odysee_object,
-            user_object = self.user,
+            user_object=self.user,
         )
 
         # call tested function

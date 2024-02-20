@@ -109,6 +109,8 @@ urlpatterns = [
     # background jobs
     path("backgroundjobs/", viewsystem.BackgroundJobsView.as_view(), name="backgroundjobs",),
     path("backgroundjob-add", viewsystem.backgroundjob_add, name="backgroundjob-add",),
+    path("backgroundjob-prio-up/<int:pk>/", viewsystem.backgroundjob_prio_up, name="backgroundjob-prio-up",),
+    path("backgroundjob-prio-down/<int:pk>/", viewsystem.backgroundjob_prio_down, name="backgroundjob-prio-down",),
     path("backgroundjobs-check-new/", viewsystem.backgroundjobs_check_new, name="backgroundjobs-check-new",),
     path("backgroundjobs-perform-all/", viewsystem.backgroundjobs_perform_all, name="backgroundjobs-perform-all",),
     path("backgroundjob-remove/<int:pk>/", viewsystem.backgroundjob_remove, name="backgroundjob-remove",),

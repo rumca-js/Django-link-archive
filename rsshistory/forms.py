@@ -176,10 +176,10 @@ class SourceInputForm(forms.Form):
 
 
 class ScannerForm(forms.Form):
-# fmt: off
+    # fmt: off
     body = forms.CharField(widget=forms.Textarea(attrs={'rows':30, 'cols':50}))
     tag = forms.CharField(label="tag", max_length=500, help_text="Tag is set for each added entry. Tag can be empty", required=False)
-# fmt: on
+    # fmt: on
 
 
 class ExportTopicForm(forms.Form):
@@ -608,9 +608,9 @@ class BasicEntryChoiceForm(forms.Form):
     search = forms.CharField(label="Search", max_length=1000, required=False)
     category = forms.CharField(widget=forms.Select(choices=()), required=False)
     subcategory = forms.CharField(widget=forms.Select(choices=()), required=False)
-# fmt: off
+    # fmt: off
     source_id = forms.CharField(label="Source", widget=forms.Select(choices=()), required=False)
-# fmt: on
+    # fmt: on
 
     def __init__(self, *args, **kwargs):
         self.request = None
@@ -759,7 +759,6 @@ class CommentEntryForm(forms.Form):
             attrs={"type": "datetime-local", "readonly": "readonly"}
         ),
     )
-
 
 
 class LinkVoteForm(forms.Form):

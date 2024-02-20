@@ -646,7 +646,10 @@ def add_simple_entry(request):
 
                 if data["link"].find("http://") >= 0:
                     warnings.append("Link is http. Https is more secure protocol")
-                if data["link"].find("http://") == -1 and data["link"].find("https://") == -1:
+                if (
+                    data["link"].find("http://") == -1
+                    and data["link"].find("https://") == -1
+                ):
                     errors.append("Missing protocol. Could be http:// or https://")
                 if domain.lower() != domain:
                     warnings.append("Link domain is not lowercase. Is that OK?")

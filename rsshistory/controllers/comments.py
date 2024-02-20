@@ -57,7 +57,7 @@ class LinkCommentDataController(LinkCommentDataModel):
             comment=data["comment"],
             date_published=data["date_published"],
             entry_object=entry,
-            user_object = user
+            user_object=user,
         )
 
     def is_html_contents(text):

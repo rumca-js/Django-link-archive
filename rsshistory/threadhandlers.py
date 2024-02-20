@@ -843,7 +843,7 @@ class HandlerManager(object):
     @note Uses handler priority when processing jobs.
     """
 
-    def __init__(self, timeout_s = 60 * 10):
+    def __init__(self, timeout_s=60 * 10):
         """
         Default timeout is 10 minutes
         """
@@ -890,7 +890,9 @@ class HandlerManager(object):
         TODO select should be based on priority
         """
 
-        objs = BackgroundJobController.objects.filter(enabled=True).order_by("priority", "date_created")
+        objs = BackgroundJobController.objects.filter(enabled=True).order_by(
+            "priority", "date_created"
+        )
         if objs.count() != 0:
             obj = objs[0]
 
@@ -910,7 +912,9 @@ class HandlerManager(object):
 
             self.process_one_for_all(items)
 
-            passed_seconds = DateUtils.get_datetime_now_utc() - self.start_processing_time
+            passed_seconds = (
+                DateUtils.get_datetime_now_utc() - self.start_processing_time
+            )
             if passed_seconds.total_seconds() >= self.timeout_s:
                 obj = items[0]
                 handler = items[1]
@@ -957,7 +961,9 @@ class HandlerManager(object):
                 obj.on_error()
 
     def on_not_safe_exit(self, items):
-        jobs = BackgroundJobController.objects.filter(date_created__lt = self.start_processing_time)
+        jobs = BackgroundJobController.objects.filter(
+            date_created__lt=self.start_processing_time
+        )
         for job in jobs:
             if job.priority > 0:
                 job.priority -= 1

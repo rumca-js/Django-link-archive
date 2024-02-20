@@ -15,7 +15,7 @@ class YTDLP(YouTubeDownloader):
     https://github.com/yt-dlp/yt-dlp
     """
 
-    def __init__(self, url=None, path=None, timeout_s = 60 * 60):
+    def __init__(self, url=None, path=None, timeout_s=60 * 60):
         """
         Default timeout 1 hour
         """
@@ -38,7 +38,9 @@ class YTDLP(YouTubeDownloader):
             self._url,
         ]
 
-        proc = subprocess.run(cmds, cwd=self._path, capture_output=True, timeout=self.timeout_s)
+        proc = subprocess.run(
+            cmds, cwd=self._path, capture_output=True, timeout=self.timeout_s
+        )
 
         if proc.returncode != 0:
             return None
@@ -52,7 +54,9 @@ class YTDLP(YouTubeDownloader):
 
         LinkDatabase.info("Downloading: " + " ".join(cmds))
 
-        proc = subprocess.run(cmds, cwd=self._path, capture_output=True, timeout=self.timeout_s)
+        proc = subprocess.run(
+            cmds, cwd=self._path, capture_output=True, timeout=self.timeout_s
+        )
 
         if proc.returncode != 0:
             return None
@@ -110,7 +114,9 @@ class YTDLP(YouTubeDownloader):
         """
 
         p = subprocess.run(
-            ["yt-dlp", "-j", "--flat-playlist", self._url], capture_output=True, timeout=self.timeout_s
+            ["yt-dlp", "-j", "--flat-playlist", self._url],
+            capture_output=True,
+            timeout=self.timeout_s,
         )
         json_text = p.stdout.decode("utf-8")
         json_text = json_text.strip()
@@ -136,7 +142,10 @@ class YTDLP(YouTubeDownloader):
     def validate():
         try:
             proc = subprocess.run(
-                ["yt-dlp"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=self.timeout_s
+                ["yt-dlp"],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                timeout=self.timeout_s,
             )
         except:
             return False
