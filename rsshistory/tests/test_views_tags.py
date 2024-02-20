@@ -40,8 +40,9 @@ class UserTagsTest(FakeInternetTestCase):
         url = reverse("{}:entry-tag".format(LinkDatabase.name), args=[entry.id])
 
         tag_data = {
-            "entry_object": entry.id,
-            "user_object": self.user.id,
+            "entry_id": entry.id,
+            "user_id": self.user.id,
+            "user": self.user.username,
             "tag": "this, and, that",
         }
 

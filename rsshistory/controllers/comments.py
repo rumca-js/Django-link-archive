@@ -44,12 +44,17 @@ class LinkCommentDataController(LinkCommentDataModel):
         return True
 
     def save_comment(data):
-        entry = data["entry_object"]
+        if "entry_object" in data:
+            entry = data["entry_object"]
+
+        if "entry_id" in data:
+            entry_id = data["entry_id"]
+            entry = LinkDataController.objects.get(id=entry_id)
 
         if LinkCommentDataController.is_html_contents(data["comment"]):
             return
 
-        user = data["user_object"]
+        user = data["user"]
         if not user.is_authenticated:
             return
 

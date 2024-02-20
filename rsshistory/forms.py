@@ -390,18 +390,16 @@ class SourceForm(forms.ModelForm):
         return result
 
 
-class TagEntryForm(forms.ModelForm):
+class TagEntryForm(forms.Form):
     """
     Category choice form
     TODO remake to standard form?
     """
 
-    class Meta:
-        model = UserTags
-        fields = ["entry_object", "user_object", "tag"]
-        widgets = {
-            #    'date': forms.widgets.DateTimeInput(attrs={'type': 'datetime-local'})
-        }
+    entry_id = forms.IntegerField(required=False, widget=forms.HiddenInput())
+    user_id = forms.IntegerField(required=False, widget=forms.HiddenInput())
+    user = forms.CharField(max_length=1000)
+    tag = forms.CharField(max_length=1000)
 
 
 class TagRenameForm(forms.Form):
@@ -749,7 +747,6 @@ class CommentEntryForm(forms.Form):
 
     entry_id = forms.IntegerField(required=False, widget=forms.HiddenInput())
     user_id = forms.IntegerField(required=False, widget=forms.HiddenInput())
-
     user = forms.CharField(max_length=1000)
 
     comment = forms.CharField(widget=forms.Textarea)
@@ -766,7 +763,7 @@ class LinkVoteForm(forms.Form):
     Category choice form
     """
 
-    link_id = forms.IntegerField(required=False, widget=forms.HiddenInput())
+    entry_id = forms.IntegerField(required=False, widget=forms.HiddenInput())
     user_id = forms.IntegerField(required=False, widget=forms.HiddenInput())
     user = forms.CharField(max_length=1000)
     vote = forms.IntegerField(initial=0)

@@ -669,6 +669,7 @@ def add_simple_entry(request):
         form.method = "POST"
 
         p.context["form"] = form
+        p.context["form_description_post"] = "Internet is dangerous, so carefully select which links you add"
 
         return p.render("form_basic.html")
 

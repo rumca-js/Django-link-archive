@@ -34,6 +34,11 @@ class SourceDataController(SourceDataModel):
     def cleanup():
         SourceDataModel.reset_dynamic_data()
 
+        from .entries import LinkDataBuilder
+        sources = LinkDataModel.objects.filter(link = self.url)
+        if sources.count() == 0:
+            LinkDataBuilder(link = self.url)
+
     def get_days_to_remove(self):
         days = self.remove_after_days
         return days
@@ -174,6 +179,14 @@ class SourceDataController(SourceDataModel):
     def get_domain_only(self):
         page = BasePage(self.url)
         return page.get_domain_only()
+
+    def get_entry_url(self):
+        entries = LinkDataModel.objects.filter(link=self.url)
+        if entries.count() > 0:
+            return entries[0].link
+
+        else:
+            return self.url
 
     def get_export_names():
         return [

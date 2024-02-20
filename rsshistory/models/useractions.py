@@ -99,12 +99,21 @@ class UserTags(models.Model):
         """
         Tags is a container
         """
-        user = data["user"]
+        user = None
+        if "user" in data:
+            user = data["user"]
+
+        elif "user_id" in data:
+            user_id = data["user_id"]
+            user = User.objects.get(id = user_id)
 
         entry = None
 
         if "entry" in data:
             entry = data["entry"]
+        elif "entry_id" in data:
+            entry_id = data["entry_id"]
+            entry = LinkDataModel.objects.get(id=entry_id)
 
         tag_objs = None
 
@@ -156,11 +165,11 @@ class UserVotes(models.Model):
     def save_vote(input_data):
         from ..controllers import BackgroundJobController
 
-        link_id = input_data["link_id"]
+        entry_id = input_data["entry_id"]
         user = input_data["user"]
         vote = input_data["vote"]
 
-        entry = LinkDataModel.objects.get(id=link_id)
+        entry = LinkDataModel.objects.get(id=entry_id)
 
         votes = UserVotes.objects.filter(user=user, entry_object=entry)
         votes.delete()

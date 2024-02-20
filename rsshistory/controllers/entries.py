@@ -214,7 +214,7 @@ class LinkDataController(LinkDataModel):
         return result
 
     def tag(self, tags, user):
-        data = {"user": user, "link": self.link, "tags": tags, "entry": self}
+        data = {"user": user, "tags": tags, "entry": self}
         return UserTags.set_tags_map(data)
 
     def vote(self, vote):

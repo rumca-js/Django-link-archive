@@ -42,8 +42,9 @@ class UserVotesTests(FakeInternetTestCase):
         data = {"link": test_link}
 
         vote_data = {
-            "link_id": entry.id,
-            "user": self.user,
+            "entry_id": entry.id,
+            "user_id": self.user.id,
+            "user": self.user.username,
             "vote": "30",
         }
 

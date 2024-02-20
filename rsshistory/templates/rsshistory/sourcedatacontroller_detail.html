@@ -8,11 +8,13 @@
     </a>
 </div>
 
-<h1>
-    {% if user_config.show_icons %}
-    <img src="{{object.get_favicon}}"/>
-    {% endif %}
-    {{ object.title }}
+<h1 class="link-title">
+    <a href="{{ object.get_entry_url }}">
+      {% if user_config.show_icons %}
+      <img src="{{object.get_favicon}}"/>
+      {% endif %}
+      {{ object.title }}
+    </a>
 </h1>
 
   <p>

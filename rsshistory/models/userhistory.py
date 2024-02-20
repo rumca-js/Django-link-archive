@@ -127,7 +127,7 @@ class UserSearchHistory(models.Model):
         return 300
 
     def get_choices_limit():
-        return 30
+        return 60
 
 
 class UserEntryTransitionHistory(models.Model):
