@@ -252,6 +252,34 @@ def backgroundjob_prio_down(request, pk):
     return HttpResponseRedirect(reverse("{}:backgroundjobs".format(LinkDatabase.name)))
 
 
+def backgroundjob_enable(request, pk):
+    p = ViewPage(request)
+    p.set_title("Enable job")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    job = BackgroundJob.objects.get(id=pk)
+    job.enabled = True
+    job.save()
+
+    return HttpResponseRedirect(reverse("{}:backgroundjobs".format(LinkDatabase.name)))
+
+
+def backgroundjob_disable(request, pk):
+    p = ViewPage(request)
+    p.set_title("Disable job")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    job = BackgroundJob.objects.get(id=pk)
+    job.enabled = False
+    job.save()
+
+    return HttpResponseRedirect(reverse("{}:backgroundjobs".format(LinkDatabase.name)))
+
+
 def backgroundjob_remove(request, pk):
     p = ViewPage(request)
     p.set_title("Remove a new background job")

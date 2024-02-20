@@ -15,8 +15,7 @@
        <img src="{% static 'rsshistory/icons/icons8-update-100.png' %}" class="content-icon" />
     </a>
     <a href="{% url 'rsshistory:backgroundjobs-remove-all' %}" title="Removes all background jobs" class="simplebutton" title="Remove all">
-        <img src="{% static 'rsshistory/icons/icons8-trash-100.png' %}" class="content-icon" />
-        All
+        <img src="{% static 'rsshistory/icons/icons8-trash-multiple-100.png' %}" class="content-icon" />
     </a>
     {% endif %}
 </div>
@@ -41,6 +40,16 @@
 
             [{{job.date_created}}] {{job.priority}} <b>{{job.job}}</b> {{job.task}} {{job.subject}} {{job.args}} 
 
+	    {% if job.enabled %}
+            <a href="{% url 'rsshistory:backgroundjob-disable' job.id %}" class="simplebutton" title="Disable job">
+               <img src="{% static 'rsshistory/icons/icons8-pause-squared-100.png' %}" class="content-icon" />
+            </a>
+	    {% else %}
+            <a href="{% url 'rsshistory:backgroundjob-enable' job.id %}" class="simplebutton" title="Enable job">
+               <img src="{% static 'rsshistory/icons/icons8-play-100.png' %}" class="content-icon" />
+            </a>
+	    {% endif %}
+
             <a href="{% url 'rsshistory:backgroundjob-prio-up' job.id %}" class="simplebutton" title="Increase priority">
                <img src="{% static 'rsshistory/icons/icons8-up-100.png' %}" class="content-icon" />
             </a>
@@ -51,9 +60,9 @@
             <a href="{% url 'rsshistory:backgroundjob-remove' job.id %}" class="simplebutton" title="Remove job">
                <img src="{% static 'rsshistory/icons/icons8-trash-100.png' %}" class="content-icon" />
             </a>
-            <a href="{% url 'rsshistory:backgroundjobs-remove' job.job %}" class="simplebutton" title="Remove all">
-               <img src="{% static 'rsshistory/icons/icons8-trash-100.png' %}" class="content-icon" />
-               All in type
+            <a href="{% url 'rsshistory:backgroundjobs-remove' job.job %}" class="simplebutton" title="Remove all in type">
+               <img src="{% static 'rsshistory/icons/icons8-trash-multiple-100.png' %}" class="content-icon" />
+               Type
            </a>
 
         </div>
