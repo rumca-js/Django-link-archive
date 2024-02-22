@@ -442,6 +442,9 @@ class BasePage(object):
             # options.add_argument("--headless")
             options.add_argument("--no-sandbox")
             options.add_argument("--disable-dev-shm-usage")
+            options.add_argument('--remote-debugging-pipe')
+            options.add_argument('--remote-debugging-port=9222')
+            options.add_argument('--user-data-dir=~/.config/google-chrome')
 
             # if not BasePage.ssl_verify:
             #    options.add_argument('ignore-certificate-errors')
@@ -1377,8 +1380,8 @@ class RssPage(ContentInterface):
 
             except Exception as e:
                 PersistentInfo.error(
-                    "Rss parser datetime invalid feed datetime:{}; Exc:{} {}\n{}".format(
-                        feed_entry.published, str(e), ""
+                    "Rss parser datetime invalid feed datetime:{}; Exc:{}\n".format(
+                        feed_entry.published, str(e)
                     )
                 )
                 return DateUtils.get_datetime_now_utc()

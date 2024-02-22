@@ -34,10 +34,21 @@ class SourceDataController(SourceDataModel):
     def cleanup():
         SourceDataModel.reset_dynamic_data()
 
-        from .entries import LinkDataBuilder
-        sources = LinkDataModel.objects.filter(link = self.url)
-        if sources.count() == 0:
-            LinkDataBuilder(link = self.url)
+        sources = SourceDataModel.objects.filter(on_hold=False)
+
+        for source in sources:
+            from .entries import LinkDataBuilder
+            entries = LinkDataModel.objects.filter(link = source.url)
+            if entries.count() == 0:
+                b = LinkDataBuilder(link = source.url)
+                if b.result:
+                    entry = b.result
+                    entry.permanent = True
+                    entry.save()
+            else:
+                entry = entries[0]
+                entry.permanent = True
+                entry.save()
 
     def get_days_to_remove(self):
         days = self.remove_after_days
@@ -183,7 +194,7 @@ class SourceDataController(SourceDataModel):
     def get_entry_url(self):
         entries = LinkDataModel.objects.filter(link=self.url)
         if entries.count() > 0:
-            return entries[0].link
+            return entries[0].get_absolute_url()
 
         else:
             return self.url
@@ -391,7 +402,11 @@ class SourceDataBuilder(object):
         try:
             from .entries import LinkDataBuilder
 
-            LinkDataBuilder(link=self.link_data["url"])
+            b = LinkDataBuilder(link=self.link_data["url"])
+            if b.result:
+                entry = b.result
+                entry.permament = True
+                entry.save()
 
             # TODO add domain when adding new source
             source = SourceDataController.objects.create(**self.link_data)

@@ -5,7 +5,7 @@
   <h2>Comments</h2>
   <div>
   {% for comment in object.comments.all %}
-      <div>{{comment.get_comment | linebreaks}}</div>
+      <div>{{comment.get_comment | safe | linebreaks}}</div>
       <div>{{comment.date_published}} {{comment.author}}
           {% if comment.author == user.get_username %}
             <a href="{% url 'rsshistory:entry-comment-edit' comment.id %}" class="simplebutton" title="Edit comment">

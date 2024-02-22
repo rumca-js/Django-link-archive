@@ -386,9 +386,7 @@ class EntryGenericPlugin(object):
         parameters = []
 
         parameters.append(EntryParameter("Publish date", self.entry.date_published))
-
-        if self.entry.status_code:
-            parameters.append(EntryParameter("Status code", self.entry.status_code))
+        parameters.append(EntryParameter("Status code", self.entry.status_code))
 
         parameters.append(EntryParameter("Language", self.entry.language))
         if self.entry.dead:

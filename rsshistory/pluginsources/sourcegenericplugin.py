@@ -150,7 +150,7 @@ class SourceGenericPlugin(HtmlPage):
     def get_source(self):
         if self.source is None:
             sources = SourceDataController.objects.filter(id=self.source_id)
-            if len(sources) > 0:
+            if sources.count() > 0:
                 self.source = sources[0]
 
         return self.source

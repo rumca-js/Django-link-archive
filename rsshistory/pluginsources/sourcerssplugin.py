@@ -72,9 +72,12 @@ class BaseRssPlugin(SourceGenericPlugin):
 
         PersistentInfo.error(
             "Source:{}\nTitle:{}\nStatus code:{}\nText:{}.\nContents\n{}".format(
-                source.url, source.title, self.status_code, text, print_contents[:300]
+                source.url, source.title, self.status_code, text, print_contents[:self.get_contents_size_limit()]
             )
         )
+
+    def get_contents_size_limit(self):
+        return 400
 
     def get_container_elements(self):
         """

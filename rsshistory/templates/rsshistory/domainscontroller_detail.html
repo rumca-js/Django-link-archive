@@ -22,7 +22,11 @@ This domain is marked as dead!
 
 <table>
     <tr>
+        {% if object.get_link_object %}
+	<td>Link</td><td><a href="{{object.get_link_object.get_absolute_url }}">Link information</a></td>
+	{% else %}
         <td>Link</td><td><a href="{{object.protocol}}://{{object.domain}}">{{object.domain}}</a></td>
+	{% endif %}
     </tr>
     <tr>
         <td>Main</td><td>{{object.main}}</td>

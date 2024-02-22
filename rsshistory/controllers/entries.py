@@ -611,6 +611,8 @@ class LinkDataBuilder(object):
         self.source_is_auto = source_is_auto
         self.allow_recursion = allow_recursion
 
+        self.result = None
+
         if self.link:
             self.add_from_link()
 
@@ -623,6 +625,7 @@ class LinkDataBuilder(object):
         wrapper = LinkDataWrapper(self.link)
         obj = wrapper.get_from_operational_db()
         if obj:
+            self.result = obj
             return obj
 
         if not self.link_data:
@@ -670,11 +673,13 @@ class LinkDataBuilder(object):
         self.link = self.link_data["link"]
 
         wrapper = LinkDataWrapper(self.link)
-        obj = wrapper.get_from_operational_db()
-        if obj:
-            return obj
+        entry = wrapper.get_from_operational_db()
+        if entry:
+            self.result = entry
+            return entry
 
         entry = self.add_from_props_internal()
+        self.result = entry
         return entry
 
     def add_from_props_internal(self):

@@ -1125,3 +1125,108 @@ instance_sources_page_2 = f"""
   ]
 }}
 """
+
+hacker_news_rss = """
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Hacker News: Front Page</title><link>https://news.ycombinator.com/</link><description>Hacker News RSS</description><docs>https://hnrss.org/</docs><generator>hnrss v2.1.1</generator><lastBuildDate>Thu, 22 Feb 2024 14:38:46 +0000</lastBuildDate><atom:link href="https://hnrss.org/frontpage" rel="self" type="application/rss+xml"></atom:link><item><title><![CDATA[Launch HN: Danswer (YC W24) – Open-source AI search and chat over private data]]></title><description><![CDATA[
+<p>Hey HN! Chris and Yuhong here from Danswer (<a href="https://github.com/danswer-ai/danswer">https://github.com/danswer-ai/danswer</a>). We’re building an open source and self-hostable ChatGPT-style system that can access your team’s unique knowledge by connecting to 25 of the most common workplace tools (Slack, Google Drive, Jira, etc.). You ask questions in natural language and get back answers based on your team’s documents. Where relevant, answers are backed by citations and links to the exact documents used to generate them.<p>Quick Demo: <a href="https://youtu.be/hqSouur2FXw" rel="nofollow">https://youtu.be/hqSouur2FXw</a><p>Originally Danswer was a side project motivated by a challenge we experienced at work. We noticed that as teams scale, finding the right information becomes more and more challenging. I recall being on call and helping a customer recover from a mission critical failure but the error was related to some obscure legacy feature I had never used. For most projects, a simple question to ChatGPT would have solved it; but in this moment, ChatGPT was completely clueless without additional context (which I also couldn’t find).<p>We believe that within a few years, every org will be using team-specific knowledge assistants. We also understand that teams don’t want to tell us their secrets and not every team has the budget for yet another SaaS solution, so we open-sourced the project. It is just a set of containers that can be deployed on any cloud or on-premise. All of the data is processed and persisted on that same instance. Some teams have even opted to self-host open-source LLMs to truly airgap the system.<p>I also want to share a bit about the actual design of the system (<a href="https://docs.danswer.dev/system_overview" rel="nofollow">https://docs.danswer.dev/system_overview</a>). If you have questions about any parts of the flow such as the model choice, hyperparameters, prompting, etc. we’re happy to go into more depth in the comments.<p>The system revolves around a custom Retrieval Augmented Generation (RAG) pipeline we’ve built. During indexing time (we pull documents from connected sources every 10 minutes), documents are chunked and indexed into hybrid keyword+vector indices (<a href="https://github.com/danswer-ai/danswer/blob/main/backend/danswer/indexing/indexing_pipeline.py#L211">https://github.com/danswer-ai/danswer/blob/main/backend/dans...</a>).<p>For the vector index (which gives the system the flexibility to understand natural language queries), we use state of the art prefix-aware embedding models trained with contrastive loss. Optionally the system can be configured to go over each doc with multiple passes of different granularity to capture wide context vs fine details. We also supplement the vector search with a keyword based BM25 index + N-Grams so that the system performs well even in low data domains. Additionally we’ve added in learning from feedback and time based decay—see our custom ranking function (<a href="https://github.com/danswer-ai/danswer/blob/main/backend/danswer/document_index/vespa/app_config/schemas/danswer_chunk.sd#L187">https://github.com/danswer-ai/danswer/blob/main/backend/dans...</a> – this flexibility is why we love Vespa as a Vector DB).<p>At query time, we preprocess the query with query-augmentation, contextual-rephrasing, as well as standard techniques like removing stopwords and lemmatization. Once the top documents are retrieved, we ask a smaller LLM to decide which of the chunks are “useful for answering the query” (this is something we haven’t seen much of elsewhere, but our tests have shown to be one of the biggest drivers for both precision and recall). Finally the most relevant passages are passed to the LLM along with the user query and chat history to produce the final answer. We post-process by checking guardrails and extracting citations to link the user to relevant documents. (<a href="https://github.com/danswer-ai/danswer/blob/main/backend/danswer/prompts/chat_prompts.py#L20">https://github.com/danswer-ai/danswer/blob/main/backend/dans...</a>)<p>The Vector and Keyword indices are both stored locally and the NLP models run on the same instance (we’ve chosen ones that can run without GPU). The only exception is that the default Generative model is OpenAI’s GPT, however this can also be swapped out (<a href="https://docs.danswer.dev/gen_ai_configs/overview" rel="nofollow">https://docs.danswer.dev/gen_ai_configs/overview</a>).<p>We’ve seen teams use Danswer on problems like: Improving turnaround times for support by reducing time taken to find relevant documentation; Helping sales teams get customer context instantly by combing through calls and notes; Reducing lost engineering time from answering cross-team questions, building duplicate features due to inability to surface old tickets or code merges, and helping on-calls resolve critical issues faster by providing the complete history on an error in one place; Self-serving onboarding for new members who don’t know where to find information.<p>If you’d like to play around with things locally, check out the quickstart guide here: <a href="https://docs.danswer.dev/quickstart" rel="nofollow">https://docs.danswer.dev/quickstart</a>. If you already have Docker, you should be able to get things up and running in <15 minutes. And for folks who want a zero-effort way of trying it out or don’t want to self-host, please visit our Cloud: <a href="https://www.danswer.ai/">https://www.danswer.ai/</a></p>
+<hr>
+<p>Comments URL: <a href="https://news.ycombinator.com/item?id=39467413">https://news.ycombinator.com/item?id=39467413</a></p>
+<p>Points: 5</p>
+<p># Comments: 1</p>
+]]></description><pubDate>Thu, 22 Feb 2024 14:20:15 +0000</pubDate><link>https://news.ycombinator.com/item?id=39467413</link><dc:creator>yuhongsun</dc:creator><comments>https://news.ycombinator.com/item?id=39467413</comments><guid isPermaLink="false">https://news.ycombinator.com/item?id=39467413</guid></item><item><title><![CDATA[AT&T customers report nationwide service disruptions]]></title><description><![CDATA[
+<p>Article URL: <a href="https://www.theverge.com/2024/2/22/24079910/att-network-outage-sos-mode">https://www.theverge.com/2024/2/22/24079910/att-network-outage-sos-mode</a></p>
+<p>Comments URL: <a href="https://news.ycombinator.com/item?id=39466963">https://news.ycombinator.com/item?id=39466963</a></p>
+<p>Points: 24</p>
+<p># Comments: 9</p>
+]]></description><pubDate>Thu, 22 Feb 2024 13:45:34 +0000</pubDate><link>https://www.theverge.com/2024/2/22/24079910/att-network-outage-sos-mode</link><dc:creator>ryukafalz</dc:creator><comments>https://news.ycombinator.com/item?id=39466963</comments><guid isPermaLink="false">https://news.ycombinator.com/item?id=39466963</guid></item><item><title><![CDATA[Stable Diffusion 3]]></title><description><![CDATA[
+<p>Article URL: <a href="https://stability.ai/news/stable-diffusion-3">https://stability.ai/news/stable-diffusion-3</a></p>
+<p>Comments URL: <a href="https://news.ycombinator.com/item?id=39466630">https://news.ycombinator.com/item?id=39466630</a></p>
+<p>Points: 253</p>
+<p># Comments: 113</p>
+]]></description><pubDate>Thu, 22 Feb 2024 13:20:39 +0000</pubDate><link>https://stability.ai/news/stable-diffusion-3</link><dc:creator>reqo</dc:creator><comments>https://news.ycombinator.com/item?id=39466630</comments><guid isPermaLink="false">https://news.ycombinator.com/item?id=39466630</guid></item><item><title><![CDATA[Reading a Programmer's Guide to Common Lisp]]></title><description><![CDATA[
+<p>Article URL: <a href="https://journal.paoloamoroso.com/reading-a-programmers-guide-to-common-lisp">https://journal.paoloamoroso.com/reading-a-programmers-guide-to-common-lisp</a></p>
+<p>Comments URL: <a href="https://news.ycombinator.com/item?id=39466417">https://news.ycombinator.com/item?id=39466417</a></p>
+<p>Points: 45</p>
+<p># Comments: 11</p>
+]]></description><pubDate>Thu, 22 Feb 2024 13:00:22 +0000</pubDate><link>https://journal.paoloamoroso.com/reading-a-programmers-guide-to-common-lisp</link><dc:creator>Tomte</dc:creator><comments>https://news.ycombinator.com/item?id=39466417</comments><guid isPermaLink="false">https://news.ycombinator.com/item?id=39466417</guid></item><item><title><![CDATA[A Plastic Tsunami Is Taking over Farms. What Will Stop Plasticulture?]]></title><description><![CDATA[
+<p>Article URL: <a href="https://modernfarmer.com/2024/02/plastic-farms-stop-plasticulture/">https://modernfarmer.com/2024/02/plastic-farms-stop-plasticulture/</a></p>
+<p>Comments URL: <a href="https://news.ycombinator.com/item?id=39466246">https://news.ycombinator.com/item?id=39466246</a></p>
+<p>Points: 25</p>
+<p># Comments: 5</p>
+]]></description><pubDate>Thu, 22 Feb 2024 12:42:15 +0000</pubDate><link>https://modernfarmer.com/2024/02/plastic-farms-stop-plasticulture/</link><dc:creator>edward</dc:creator><comments>https://news.ycombinator.com/item?id=39466246</comments><guid isPermaLink="false">https://news.ycombinator.com/item?id=39466246</guid></item><item><title><![CDATA[Replacement PCB Replicates Early 80s Modem]]></title><description><![CDATA[
+<p>Article URL: <a href="https://tempestfpga.com/">https://tempestfpga.com/</a></p>
+<p>Comments URL: <a href="https://news.ycombinator.com/item?id=39466160">https://news.ycombinator.com/item?id=39466160</a></p>
+<p>Points: 36</p>
+<p># Comments: 11</p>
+]]></description><pubDate>Thu, 22 Feb 2024 12:32:23 +0000</pubDate><link>https://tempestfpga.com/</link><dc:creator>jnord</dc:creator><comments>https://news.ycombinator.com/item?id=39466160</comments><guid isPermaLink="false">https://news.ycombinator.com/item?id=39466160</guid></item><item><title><![CDATA[Bridging empirical-theoretical gap in neural network formal language learning]]></title><description><![CDATA[
+<p>Article URL: <a href="https://arxiv.org/abs/2402.10013">https://arxiv.org/abs/2402.10013</a></p>
+<p>Comments URL: <a href="https://news.ycombinator.com/item?id=39466021">https://news.ycombinator.com/item?id=39466021</a></p>
+<p>Points: 47</p>
+<p># Comments: 10</p>
+]]></description><pubDate>Thu, 22 Feb 2024 12:15:03 +0000</pubDate><link>https://arxiv.org/abs/2402.10013</link><dc:creator>puttycat</dc:creator><comments>https://news.ycombinator.com/item?id=39466021</comments><guid isPermaLink="false">https://news.ycombinator.com/item?id=39466021</guid></item><item><title><![CDATA[SN Pro Typeface]]></title><description><![CDATA[
+<p>Article URL: <a href="https://supernotes.app/open-source/sn-pro/">https://supernotes.app/open-source/sn-pro/</a></p>
+<p>Comments URL: <a href="https://news.ycombinator.com/item?id=39465891">https://news.ycombinator.com/item?id=39465891</a></p>
+<p>Points: 56</p>
+<p># Comments: 28</p>
+]]></description><pubDate>Thu, 22 Feb 2024 12:01:42 +0000</pubDate><link>https://supernotes.app/open-source/sn-pro/</link><dc:creator>davidbarker</dc:creator><comments>https://news.ycombinator.com/item?id=39465891</comments><guid isPermaLink="false">https://news.ycombinator.com/item?id=39465891</guid></item><item><title><![CDATA[Stepful (YC S21) is hiring a product engineer in New York]]></title><description><![CDATA[
+<p>Article URL: <a href="https://www.ycombinator.com/companies/stepful/jobs/iLjGDJ0-product-engineer">https://www.ycombinator.com/companies/stepful/jobs/iLjGDJ0-product-engineer</a></p>
+<p>Comments URL: <a href="https://news.ycombinator.com/item?id=39465878">https://news.ycombinator.com/item?id=39465878</a></p>
+<p>Points: 0</p>
+<p># Comments: 0</p>
+]]></description><pubDate>Thu, 22 Feb 2024 12:00:36 +0000</pubDate><link>https://www.ycombinator.com/companies/stepful/jobs/iLjGDJ0-product-engineer</link><dc:creator>eserra</dc:creator><comments>https://news.ycombinator.com/item?id=39465878</comments><guid isPermaLink="false">https://news.ycombinator.com/item?id=39465878</guid></item><item><title><![CDATA[How to optimally trap points in high-dimensional spaces inside ellipsoids]]></title><description><![CDATA[
+<p>Article URL: <a href="https://www.adrianriv.com/blog/2024/02/19/minimum_volume_ellipsoid/">https://www.adrianriv.com/blog/2024/02/19/minimum_volume_ellipsoid/</a></p>
+<p>Comments URL: <a href="https://news.ycombinator.com/item?id=39465841">https://news.ycombinator.com/item?id=39465841</a></p>
+<p>Points: 45</p>
+<p># Comments: 8</p>
+]]></description><pubDate>Thu, 22 Feb 2024 11:55:51 +0000</pubDate><link>https://www.adrianriv.com/blog/2024/02/19/minimum_volume_ellipsoid/</link><dc:creator>tartakovsky</dc:creator><comments>https://news.ycombinator.com/item?id=39465841</comments><guid isPermaLink="false">https://news.ycombinator.com/item?id=39465841</guid></item><item><title><![CDATA[DMD Compiler as a Library: A Call to Arms]]></title><description><![CDATA[
+<p>Article URL: <a href="https://dlang.org/blog/2024/02/22/dmd-compiler-as-a-library-a-call-to-arms/">https://dlang.org/blog/2024/02/22/dmd-compiler-as-a-library-a-call-to-arms/</a></p>
+<p>Comments URL: <a href="https://news.ycombinator.com/item?id=39465838">https://news.ycombinator.com/item?id=39465838</a></p>
+<p>Points: 5</p>
+<p># Comments: 0</p>
+]]></description><pubDate>Thu, 22 Feb 2024 11:55:32 +0000</pubDate><link>https://dlang.org/blog/2024/02/22/dmd-compiler-as-a-library-a-call-to-arms/</link><dc:creator>ingve</dc:creator><comments>https://news.ycombinator.com/item?id=39465838</comments><guid isPermaLink="false">https://news.ycombinator.com/item?id=39465838</guid></item><item><title><![CDATA[Oil giant fined just $780k after 'one of biggest ever' methane leaks]]></title><description><![CDATA[
+<p>Article URL: <a href="https://www.independent.co.uk/climate-change/news/kazakhstan-oil-firm-methane-leak-b2498997.html">https://www.independent.co.uk/climate-change/news/kazakhstan-oil-firm-methane-leak-b2498997.html</a></p>
+<p>Comments URL: <a href="https://news.ycombinator.com/item?id=39465761">https://news.ycombinator.com/item?id=39465761</a></p>
+<p>Points: 26</p>
+<p># Comments: 4</p>
+]]></description><pubDate>Thu, 22 Feb 2024 11:45:20 +0000</pubDate><link>https://www.independent.co.uk/climate-change/news/kazakhstan-oil-firm-methane-leak-b2498997.html</link><dc:creator>ljf</dc:creator><comments>https://news.ycombinator.com/item?id=39465761</comments><guid isPermaLink="false">https://news.ycombinator.com/item?id=39465761</guid></item><item><title><![CDATA[Auth0 OSS alternative Ory Kratos now with passwordless and SMS support]]></title><description><![CDATA[
+<p>Article URL: <a href="https://github.com/ory/kratos/releases/tag/v1.1.0">https://github.com/ory/kratos/releases/tag/v1.1.0</a></p>
+<p>Comments URL: <a href="https://news.ycombinator.com/item?id=39465740">https://news.ycombinator.com/item?id=39465740</a></p>
+<p>Points: 106</p>
+<p># Comments: 53</p>
+]]></description><pubDate>Thu, 22 Feb 2024 11:41:48 +0000</pubDate><link>https://github.com/ory/kratos/releases/tag/v1.1.0</link><dc:creator>oporquinho94</dc:creator><comments>https://news.ycombinator.com/item?id=39465740</comments><guid isPermaLink="false">https://news.ycombinator.com/item?id=39465740</guid></item><item><title><![CDATA[GIMP 2.99.18: The last development preview before 3.0]]></title><description><![CDATA[
+<p>Article URL: <a href="https://www.gimp.org/news/2024/02/21/gimp-2-99-18-released/">https://www.gimp.org/news/2024/02/21/gimp-2-99-18-released/</a></p>
+<p>Comments URL: <a href="https://news.ycombinator.com/item?id=39465614">https://news.ycombinator.com/item?id=39465614</a></p>
+<p>Points: 127</p>
+<p># Comments: 63</p>
+]]></description><pubDate>Thu, 22 Feb 2024 11:27:35 +0000</pubDate><link>https://www.gimp.org/news/2024/02/21/gimp-2-99-18-released/</link><dc:creator>Santosh83</dc:creator><comments>https://news.ycombinator.com/item?id=39465614</comments><guid isPermaLink="false">https://news.ycombinator.com/item?id=39465614</guid></item><item><title><![CDATA[A peek at Intel's future foundry tech]]></title><description><![CDATA[
+<p>Article URL: <a href="https://spectrum.ieee.org/intel-18a">https://spectrum.ieee.org/intel-18a</a></p>
+<p>Comments URL: <a href="https://news.ycombinator.com/item?id=39465519">https://news.ycombinator.com/item?id=39465519</a></p>
+<p>Points: 75</p>
+<p># Comments: 25</p>
+]]></description><pubDate>Thu, 22 Feb 2024 11:15:42 +0000</pubDate><link>https://spectrum.ieee.org/intel-18a</link><dc:creator>pseudolus</dc:creator><comments>https://news.ycombinator.com/item?id=39465519</comments><guid isPermaLink="false">https://news.ycombinator.com/item?id=39465519</guid></item><item><title><![CDATA[The Xylophone Maze: Screen-free coding for children]]></title><description><![CDATA[
+<p>Article URL: <a href="https://20y.hu/~slink/journal/xylophone-duplo/">https://20y.hu/~slink/journal/xylophone-duplo/</a></p>
+<p>Comments URL: <a href="https://news.ycombinator.com/item?id=39465485">https://news.ycombinator.com/item?id=39465485</a></p>
+<p>Points: 53</p>
+<p># Comments: 7</p>
+]]></description><pubDate>Thu, 22 Feb 2024 11:09:20 +0000</pubDate><link>https://20y.hu/~slink/journal/xylophone-duplo/</link><dc:creator>b6dybuyv</dc:creator><comments>https://news.ycombinator.com/item?id=39465485</comments><guid isPermaLink="false">https://news.ycombinator.com/item?id=39465485</guid></item><item><title><![CDATA[LongRoPE: Extending LLM Context Window Beyond 2M Tokens]]></title><description><![CDATA[
+<p>Article URL: <a href="https://arxiv.org/abs/2402.13753">https://arxiv.org/abs/2402.13753</a></p>
+<p>Comments URL: <a href="https://news.ycombinator.com/item?id=39465357">https://news.ycombinator.com/item?id=39465357</a></p>
+<p>Points: 35</p>
+<p># Comments: 1</p>
+]]></description><pubDate>Thu, 22 Feb 2024 10:44:35 +0000</pubDate><link>https://arxiv.org/abs/2402.13753</link><dc:creator>nojito</dc:creator><comments>https://news.ycombinator.com/item?id=39465357</comments><guid isPermaLink="false">https://news.ycombinator.com/item?id=39465357</guid></item><item><title><![CDATA[Google to pause Gemini image generation of people after issues]]></title><description><![CDATA[
+<p>Article URL: <a href="https://www.theverge.com/2024/2/21/24079371/google-ai-gemini-generative-inaccurate-historical">https://www.theverge.com/2024/2/21/24079371/google-ai-gemini-generative-inaccurate-historical</a></p>
+<p>Comments URL: <a href="https://news.ycombinator.com/item?id=39465250">https://news.ycombinator.com/item?id=39465250</a></p>
+<p>Points: 255</p>
+<p># Comments: 451</p>
+]]></description><pubDate>Thu, 22 Feb 2024 10:19:50 +0000</pubDate><link>https://www.theverge.com/2024/2/21/24079371/google-ai-gemini-generative-inaccurate-historical</link><dc:creator>helsinkiandrew</dc:creator><comments>https://news.ycombinator.com/item?id=39465250</comments><guid isPermaLink="false">https://news.ycombinator.com/item?id=39465250</guid></item><item><title><![CDATA[Interesting Uses of Ansible's ternary filter]]></title><description><![CDATA[
+<p>Article URL: <a href="https://www.zufallsheld.de/2024/02/21/interesting-use-of-ansible-ternary-filter/">https://www.zufallsheld.de/2024/02/21/interesting-use-of-ansible-ternary-filter/</a></p>
+<p>Comments URL: <a href="https://news.ycombinator.com/item?id=39465235">https://news.ycombinator.com/item?id=39465235</a></p>
+<p>Points: 28</p>
+<p># Comments: 10</p>
+]]></description><pubDate>Thu, 22 Feb 2024 10:16:24 +0000</pubDate><link>https://www.zufallsheld.de/2024/02/21/interesting-use-of-ansible-ternary-filter/</link><dc:creator>zufallsheld</dc:creator><comments>https://news.ycombinator.com/item?id=39465235</comments><guid isPermaLink="false">https://news.ycombinator.com/item?id=39465235</guid></item><item><title><![CDATA[Private company landing on the moon today]]></title><description><![CDATA[
+<p>Article URL: <a href="https://www.intuitivemachines.com/im-1">https://www.intuitivemachines.com/im-1</a></p>
+<p>Comments URL: <a href="https://news.ycombinator.com/item?id=39465230">https://news.ycombinator.com/item?id=39465230</a></p>
+<p>Points: 58</p>
+<p># Comments: 31</p>
+]]></description><pubDate>Thu, 22 Feb 2024 10:15:16 +0000</pubDate><link>https://www.intuitivemachines.com/im-1</link><dc:creator>SigKill9</dc:creator><comments>https://news.ycombinator.com/item?id=39465230</comments><guid isPermaLink="false">https://news.ycombinator.com/item?id=39465230</guid></item></channel></rss>
+"""
