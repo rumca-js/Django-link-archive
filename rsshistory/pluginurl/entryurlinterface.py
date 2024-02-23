@@ -139,7 +139,7 @@ class EntryUrlInterface(object):
         if channel_name:
             wh_channel = channel_name.find("- Topic")
             if wh_channel >= 0:
-                channel_name = channel_name[:wh]
+                channel_name = channel_name[:wh_channel]
 
         if not self.is_property_set(input_props, "artist"):
             input_props["artist"] = channel_name

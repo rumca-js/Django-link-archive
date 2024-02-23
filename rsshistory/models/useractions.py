@@ -72,15 +72,10 @@ class UserTags(models.Model):
 
         return tags_set
 
-    def set_tags(data):
-        """
-        tags is in form tag1,tag2
-        expecte author also
-        """
-        data["tags"] = UserTags.process_tag_string(data["tag"])
-        return UserTags.set_tags_map(data)
-
     def set_tag(entry, tag_name, user=None):
+        """
+        Adds additional tag
+        """
         if not entry:
             PersistentInfo.error("Incorrect call of tags, entry does not exist")
 
@@ -95,9 +90,17 @@ class UserTags(models.Model):
         if objs.count() == 0:
             UserTags.objects.create(entry_object=entry, user_object=user, tag=tag_name)
 
+    def set_tags(data):
+        """
+        Removes all other tags, sets only tags in data
+        """
+        data["tags"] = UserTags.process_tag_string(data["tag"])
+        return UserTags.set_tags_map(data)
+
+
     def set_tags_map(data):
         """
-        Tags is a container
+        Removes all other tags, sets only tags in data
         """
         user = None
         if "user" in data:

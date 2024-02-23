@@ -16,13 +16,17 @@
     {% if DateTime_MoveToArchive %}
       <li>Move to archive date: {{DateTime_MoveToArchive}}</li>
     {%endif%}
+    <li>Number of Configurations: {{ConfigurationEntry}}</li>
+    <li>Number of UserConfig: {{UserConfig}}</li>
+
     <li>Number of Sources: {{SourceDataModel}}</li>
     <li>Number of Entries: {{LinkDataModel}}</li>
     <li>Number of Archived entries: {{ArchiveLinkDataModel}}</li>
-    <li>Number of Tags: {{LinkTagsDataModel}}</li>
     <li>Number of Keywords: {{KeyWords}}</li>
-    <li>Number of Configurations: {{ConfigurationEntry}}</li>
-    <li>Number of UserConfig: {{UserConfig}}</li>
+
+    <li>Number of Tags: {{UserTags}}</li>
+    <li>Number of Votes: {{UserVotes}}</li>
+    <li>Number of Comments: {{LinkCommentDataController}}</li>
     <li>Number of UserSearchHistory: {{UserSearchHistory}}</li>
     <li>Number of UserEntryVisitHistory: {{UserEntryVisitHistory}}</li>
     <li>Number of UserEntryTransitionHistory: {{UserEntryTransitionHistory}}</li>
@@ -31,11 +35,11 @@
         <a href="{% url 'rsshistory:backgroundjobs' %}" title="View background jobs" class="simplebutton">View</a>
     </li>
 
-    <li>Server log length: {{ServerLogLength}} 
+    <li>Server log length: {{PersistentInfo}} 
         <a href="{% url 'rsshistory:logs' %}" title="View all logs" class="simplebutton">View</a>
     </li>
 
-    <li>Domains: {{DomainsLength}}
+    <li>Domains: {{Domains}}
         <a href="{% url 'rsshistory:domains' %}" title="Domains" class="simplebutton">View</a>
         </li>
 </ul>

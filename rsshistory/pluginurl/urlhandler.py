@@ -79,6 +79,9 @@ class UrlHandler(object):
             options.use_selenium_headless = True
             options.fast_parsing = fast_check
 
+            if page.is_cloudflare_protected():
+                options.link_redirect = True
+
             page = Url.get(url, options=options)
 
         return page
@@ -90,6 +93,10 @@ class UrlHandler(object):
             options.use_selenium_full = True
         if UrlHandler.is_selenium_headless_required(url):
             options.use_selenium_headless = True
+
+        p = DomainAwarePage(url)
+        if p.is_link_service():
+            options.link_redirect = True
 
         return options
 

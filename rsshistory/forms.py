@@ -177,7 +177,7 @@ class SourceInputForm(forms.Form):
 
 class ScannerForm(forms.Form):
     # fmt: off
-    body = forms.CharField(widget=forms.Textarea(attrs={'rows':30, 'cols':50}))
+    body = forms.CharField(widget=forms.Textarea(attrs={'rows':30, 'cols':75}))
     tag = forms.CharField(label="tag", max_length=500, help_text="Tag is set for each added entry. Tag can be empty", required=False)
     # fmt: on
 
@@ -268,6 +268,9 @@ class OmniSearchWithArchiveForm(OmniSearchForm):
 
     archive = forms.BooleanField(label="Search archive", required=False)
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
 
 class EntryForm(forms.ModelForm):
     """
@@ -351,6 +354,7 @@ class SourceForm(forms.ModelForm):
         model = SourceDataController
         fields = [
             "url",
+            "on_hold",
             "title",
             "source_type",
             "category",
@@ -360,7 +364,6 @@ class SourceForm(forms.ModelForm):
             "export_to_cms",
             "remove_after_days",
             "favicon",
-            "on_hold",
             "proxy_location",
         ]
         widgets = {}

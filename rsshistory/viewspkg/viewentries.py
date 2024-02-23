@@ -419,7 +419,7 @@ class EntriesOmniListView(EntriesSearchListView):
             return f
         else:
             return OmniSearchWithArchiveForm(
-                self.request.GET, user_choices=user_choices
+                self.request.GET, user_choices=user_choices, request=self.request
             )
 
     def get_form(self):

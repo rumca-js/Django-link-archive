@@ -49,7 +49,7 @@ def page_show_properties(request):
         )
 
         p.context["page_type"] = str(type(page))
-        p.context["page_link"] = page_link
+        p.context["page_link"] = page.url
         p.context.update(page.get_properties())
         p.context["is_html"] = page.is_html(fast_check=fast_check)
         p.context["is_rss"] = page.is_rss(fast_check=fast_check)

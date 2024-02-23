@@ -7,8 +7,8 @@ from datetime import datetime, timedelta
 
 from ..apps import LinkDatabase
 from ..models import UserTags, ConfigurationEntry, UserVotes
-from ..controllers import LinkDataController
-from ..forms import TagForm, TagEntryForm, TagRenameForm
+from ..controllers import LinkDataController, LinkDataWrapper
+from ..forms import TagForm, TagEntryForm, TagRenameForm, ScannerForm
 from ..views import ViewPage
 
 
@@ -29,6 +29,9 @@ class AllTags(generic.ListView):
         return UserTags.objects.all()
 
     def get_queryset(self):
+        """
+        TODO: maybe add aggregation SQL, count on tags?
+        """
         objects = self.get_tags_objects()
 
         tags = objects.values("tag")
@@ -55,9 +58,9 @@ class AllTags(generic.ListView):
         context = super(AllTags, self).get_context_data(**kwargs)
         context = ViewPage.init_context(self.request, context)
 
-        context["page_title"] += " - all tags"
+        context["page_title"] += " Tags"
         context["tag_objects"] = self.result_list
-        context["tags_title"] = "All tags"
+        context["tags_title"] = "Tags"
 
         return context
 
@@ -294,6 +297,49 @@ def tag_rename(request):
         return p.render("form_basic.html")
 
     return p.render("summary_present.html")
+
+
+def tag_many(request):
+    p = ViewPage(request)
+    p.set_title("Tag many links")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    from ..forms import ExportDailyDataForm
+
+    if request.method == "POST":
+        errors = []
+
+        form = ScannerForm(request.POST)
+        if not form.is_valid():
+            return p.render("form_basic.html")
+
+        links = form.cleaned_data["body"]
+        tag = form.cleaned_data["tag"]
+
+        links = links.split("\n")
+        for link in links:
+            link = link.strip()
+            link = link.replace("\r", "")
+
+            if link != "":
+                w = LinkDataWrapper(link)
+                entry = w.get()
+                if entry and not entry.is_archive_entry():
+                    entry.set_tag(tag_name=tag, user=request.user)
+                else:
+                    errors.append("{} not exist, or is archive".format(entry))
+
+        p.context["summary_text"] = "Tagged links\nErrors:{}".format(errors)
+        return p.render("summary_present.html")
+    else:
+        form = ScannerForm()
+        form.method = "POST"
+
+        p.context["form"] = form
+
+        return p.render("form_basic.html")
 
 
 def entry_vote(request, pk):

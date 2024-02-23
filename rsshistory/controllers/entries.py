@@ -217,6 +217,9 @@ class LinkDataController(LinkDataModel):
         data = {"user": user, "tags": tags, "entry": self}
         return UserTags.set_tags_map(data)
 
+    def set_tag(self, tag_name, user):
+        return UserTags.set_tag(self, tag_name, user)
+
     def vote(self, vote):
         self.page_rating_votes = vote
         self.save()
@@ -622,6 +625,26 @@ class LinkDataBuilder(object):
     def add_from_link(self):
         self.link = LinkDataController.get_cleaned_link(self.link)
 
+        p = HtmlPage(self.link)
+        if p.is_link_service():
+            return self.add_from_link_service()
+        else:
+            return self.add_from_normal_link()
+
+    def add_from_link_service(self):
+        from ..pluginurl.entryurlinterface import EntryUrlInterface
+
+        url = EntryUrlInterface(self.link)
+        link_data = url.get_props()
+        if not link_data:
+            PersistentInfo.error(
+                "Could not obtain properties for:{}".format(self.link)
+            )
+            return
+        self.link_data = link_data
+        return self.add_from_props()
+
+    def add_from_normal_link(self):
         wrapper = LinkDataWrapper(self.link)
         obj = wrapper.get_from_operational_db()
         if obj:
@@ -643,7 +666,7 @@ class LinkDataBuilder(object):
         link_data = url.get_props()
         if not link_data:
             PersistentInfo.error(
-                "Could not obtain properties for 1:{}".format(self.link)
+                "Could not obtain properties for:{}".format(self.link)
             )
             return
 

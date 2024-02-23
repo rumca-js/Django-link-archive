@@ -42,6 +42,9 @@ try:
     from selenium import webdriver
     from selenium.webdriver.chrome.service import Service
     from selenium.common.exceptions import TimeoutException
+
+    from selenium.webdriver.support.ui import WebDriverWait
+    from selenium.webdriver.support import expected_conditions as EC
 except Exception as E:
     print("Cannot include selenium")
 
@@ -111,6 +114,7 @@ class PageOptions(object):
         self.ssl_verify = False
         self.fast_parsing = True
         self.custom_user_agent = ""
+        self.link_redirect = False
 
     def is_not_selenium(self):
         return not self.is_selenium()
@@ -119,8 +123,8 @@ class PageOptions(object):
         return self.use_selenium_full or self.use_selenium_headless
 
     def __str__(self):
-        return "Full:{} Headless:{} SSL verify:{}".format(
-            self.use_selenium_full, self.use_selenium_headless, self.ssl_verify
+        return "F:{} H:{} SSL:{} R:{}".format(
+            self.use_selenium_full, self.use_selenium_headless, self.ssl_verify, self.link_redirect
         )
 
 
@@ -397,15 +401,16 @@ class BasePage(object):
 
         Headless might not be enough to fool cloudflare.
         """
+        service = Service(executable_path="/usr/bin/chromedriver")
+        options = webdriver.ChromeOptions()
+        options.add_argument("--headless")
+
+        # if not BasePage.ssl_verify:
+        #    options.add_argument('ignore-certificate-errors')
+
+        driver = webdriver.Chrome(service=service, options=options)
+
         try:
-            service = Service(executable_path="/usr/bin/chromedriver")
-            options = webdriver.ChromeOptions()
-            options.add_argument("--headless")
-
-            # if not BasePage.ssl_verify:
-            #    options.add_argument('ignore-certificate-errors')
-
-            driver = webdriver.Chrome(service=service, options=options)
 
             # add 10 seconds for start of browser, etc.
             selenium_timeout = timeout + 10
@@ -413,15 +418,27 @@ class BasePage(object):
             driver.set_page_load_timeout(selenium_timeout)
 
             driver.get(url)
+            """
+            TODO - if webpage changes link, it should also update it in this object
+            """
+
+            #if self.options.link_redirect:
+            #    WebDriverWait(driver, selenium_timeout).until(EC.url_changes(driver.current_url))
+
             html_content = driver.page_source
-            driver.quit()
+
+            if self.url != driver.current_url:
+                self.url = driver.current_url
 
             return SeleniumResponseObject(url, html_content, 200)
         except TimeoutException:
+            error_text = traceback.format_exc()
             PersistentInfo.error(
-                "Timeout when reading page. {}".format(selenium_timeout)
+                "Timeout when reading page:{}\nURL:{}\n{}".format(selenium_timeout, driver.current_url, error_text)
             )
             return SeleniumResponseObject(url, None, 500)
+        finally:
+            driver.quit()
 
     def get_contents_via_selenium_chrome_full(self, url, headers, timeout):
         """
@@ -431,25 +448,25 @@ class BasePage(object):
 
         https://stackoverflow.com/questions/50642308/webdriverexception-unknown-error-devtoolsactiveport-file-doesnt-exist-while-t
         """
+        import os
+
+        os.environ["DISPLAY"] = ":10.0"
+
+        service = Service(executable_path="/usr/bin/chromedriver")
+        options = webdriver.ChromeOptions()
+        options.add_argument("--headless")
+        #options.add_argument("--no-sandbox")
+        #options.add_argument("--disable-dev-shm-usage")
+        #options.add_argument('--remote-debugging-pipe')
+        #options.add_argument('--remote-debugging-port=9222')
+        #options.add_argument('--user-data-dir=~/.config/google-chrome')
+
+        # if not BasePage.ssl_verify:
+        #    options.add_argument('ignore-certificate-errors')
+
+        driver = webdriver.Chrome(service=service, options=options)
 
         try:
-            import os
-
-            os.environ["DISPLAY"] = ":10.0"
-
-            service = Service(executable_path="/usr/bin/chromedriver")
-            options = webdriver.ChromeOptions()
-            # options.add_argument("--headless")
-            options.add_argument("--no-sandbox")
-            options.add_argument("--disable-dev-shm-usage")
-            options.add_argument('--remote-debugging-pipe')
-            options.add_argument('--remote-debugging-port=9222')
-            options.add_argument('--user-data-dir=~/.config/google-chrome')
-
-            # if not BasePage.ssl_verify:
-            #    options.add_argument('ignore-certificate-errors')
-
-            driver = webdriver.Chrome(service=service, options=options)
 
             # add 10 seconds for start of browser, etc.
             selenium_timeout = timeout + 20
@@ -457,6 +474,12 @@ class BasePage(object):
             driver.set_page_load_timeout(selenium_timeout)
 
             driver.get(url)
+
+            #if self.options.link_redirect:
+            #    WebDriverWait(driver, selenium_timeout).until(EC.url_changes(driver.current_url))
+            """
+            TODO - if webpage changes link, it should also update it in this object
+            """
 
             page_source = driver.page_source
 
@@ -466,14 +489,19 @@ class BasePage(object):
             ## Extract the RSS content from the HTML body
             # rss_content = soup.find('body').get_text()
 
-            driver.quit()
+            if self.url != driver.current_url:
+                self.url = driver.current_url
+
             return SeleniumResponseObject(url, page_source, 200)
 
         except TimeoutException:
+            error_text = traceback.format_exc()
             PersistentInfo.error(
-                "Timeout when reading page. {}".format(selenium_timeout)
+                "Timeout when reading page:{}\nURL:{}\n{}".format(selenium_timeout, driver.current_url, error_text)
             )
             return SeleniumResponseObject(url, None, 500)
+        finally:
+            driver.quit()
 
     def get_contents_via_selenium_chrome_undetected(self, url, headers, timeout):
         """
@@ -931,7 +959,10 @@ class ContentInterface(DomainAwarePage):
         return props
 
     def is_cloudflare_protected(self):
-        contents = self.get_contents()
+        """
+        Should not obtain contents by itself
+        """
+        contents = self.contents
 
         if (
             contents
@@ -1850,9 +1881,6 @@ class HtmlPage(ContentInterface):
         html = self.soup.find("html")
         if html and html.has_attr("lang"):
             return html["lang"]
-
-        if self.encoding:
-            return self.encoding
 
         return ""
 

@@ -7,11 +7,12 @@
         <img src="{% static 'rsshistory/icons/icons8-back-100.png' %}" class="content-icon" />
     </a>
 
-    <a href="{% url 'rsshistory:tags-show-recent' %}" class="simplebutton">Recent tags</a>
-    <a href="{% url 'rsshistory:entries-untagged' %}" class="simplebutton">Untagged bookmarks</a>
+    <a href="{% url 'rsshistory:tags-show-recent' %}" class="simplebutton" title="Shows recent tags">Recent tags</a>
+    <a href="{% url 'rsshistory:entries-untagged' %}" class="simplebutton" title="Shows untagged bookmarks">Untagged bookmarks</a>
     {% if user.is_staff %}
-    <a href="{% url 'rsshistory:tag-rename' %}" class="simplebutton">Rename tag</a>
-    <a href="{% url 'rsshistory:tag-remove-form' %}" class="simplebutton">Remove tag</a>
+    <a href="{% url 'rsshistory:tag-many' %}" class="simplebutton" title="Tags many links">Tag many links</a>
+    <a href="{% url 'rsshistory:tag-rename' %}" class="simplebutton" title="Renames tag">Rename tag</a>
+    <a href="{% url 'rsshistory:tag-remove-form' %}" class="simplebutton" title="Removes tag">Remove tag</a>
     {% endif %}
 </div>
 

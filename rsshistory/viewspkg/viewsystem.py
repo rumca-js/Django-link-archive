@@ -79,12 +79,13 @@ def system_status(request):
     c = Configuration.get_object()
     p.context["directory"] = c.directory
 
+    p.context["ConfigurationEntry"] = ConfigurationEntry.objects.count()
+    p.context["UserConfig"] = UserConfig.objects.count()
+
     p.context["SourceDataModel"] = SourceDataController.objects.count()
     p.context["LinkDataModel"] = LinkDataController.objects.count()
     p.context["ArchiveLinkDataModel"] = ArchiveLinkDataController.objects.count()
-    p.context["ConfigurationEntry"] = ConfigurationEntry.objects.count()
-    p.context["UserConfig"] = UserConfig.objects.count()
-    p.context["BackgroundJob"] = BackgroundJob.objects.count()
+    p.context["KeyWords"] = KeyWords.objects.count()
 
     p.context["UserTags"] = UserTags.objects.count()
     p.context["UserVotes"] = UserVotes.objects.count()
@@ -93,7 +94,8 @@ def system_status(request):
     p.context["UserSearchHistory"] = UserSearchHistory.objects.count()
     p.context["UserEntryVisitHistory"] = UserEntryVisitHistory.objects.count()
     p.context["UserEntryTransitionHistory"] = UserEntryTransitionHistory.objects.count()
-    p.context["KeyWords"] = KeyWords.objects.count()
+
+    p.context["BackgroundJob"] = BackgroundJob.objects.count()
 
     from ..dateutils import DateUtils
     from datetime import timedelta
@@ -106,8 +108,8 @@ def system_status(request):
         days_before = current_time - timedelta(days=conf.days_to_move_to_archive)
         p.context["DateTime_MoveToArchive"] = days_before
 
-    p.context["ServerLogLength"] = PersistentInfo.objects.count()
-    p.context["DomainsLength"] = Domains.objects.count()
+    p.context["PersistentInfo"] = PersistentInfo.objects.count()
+    p.context["Domains"] = Domains.objects.count()
 
     p.context["server_path"] = Path(".").resolve()
     p.context["directory"] = Path(".").resolve()

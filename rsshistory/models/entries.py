@@ -458,6 +458,9 @@ class BaseLinkDataController(BaseLinkDataModel):
         return self.status_code >= 200 and self.status_code < 300
 
     def is_archive_entry(self):
+        """
+        TODO: change to is_archive()
+        """
         return False
 
     def is_archive_by_date(input_date):
