@@ -160,6 +160,11 @@ class YouTubeChannelHandlerMock(YouTubeChannelHandler):
             return
 
 
+class DjangoRequestObject(object):
+    def __init__(self, user):
+        self.user = user
+
+
 class TestRequestObjectMock(object):
     def __init__(self, url, headers, timeout):
         self.status_code = 200

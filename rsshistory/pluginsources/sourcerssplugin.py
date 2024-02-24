@@ -95,8 +95,8 @@ class BaseRssPlugin(SourceGenericPlugin):
         all_props = self.reader.get_container_elements()
 
         for index, prop in enumerate(all_props):
-            # LinkDatabase.info("Processing RSS element")
             if "link" not in prop:
+                LinkDatabase.info("Link not present in RSS:{}".self.get_address())
                 continue
 
             prop = self.enhance(prop)

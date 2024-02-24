@@ -1,6 +1,7 @@
 from datetime import timedelta
 from django.contrib.auth.models import User
 
+from ..models import UserBookmarks
 from ..controllers import (
     LinkDataBuilder,
     LinkDataWrapper,
@@ -11,14 +12,8 @@ from ..controllers import LinkDataController, ArchiveLinkDataController
 from ..dateutils import DateUtils
 from ..configuration import Configuration
 
-from .fakeinternet import FakeInternetTestCase
+from .fakeinternet import FakeInternetTestCase, DjangoRequestObject
 
-
-class RequestObject(object):
-    def __init__(self, user_name="TestUser", is_staff=False):
-        self.user = User.objects.create_user(
-            username=user_name, password="testpassword", is_staff=is_staff
-        )
 
 
 class LinkDataWrapperTest(FakeInternetTestCase):
@@ -31,6 +26,13 @@ class LinkDataWrapperTest(FakeInternetTestCase):
             category="No",
             subcategory="No",
             export_to_cms=True,
+        )
+
+        self.user_staff = User.objects.create_user(
+            username="TestUser", password="testpassword", is_staff=True
+        )
+        self.user_not_staff = User.objects.create_user(
+            username="TestUserNot", password="testpassword", is_staff=False
         )
 
     def clear(self):
@@ -119,7 +121,7 @@ class LinkDataWrapperTest(FakeInternetTestCase):
 
         # call tested function
         result = LinkDataWrapper.make_bookmarked(
-            RequestObject("test_user", is_staff=True), obj
+            DjangoRequestObject(self.user_staff), obj
         )
 
         self.assertTrue(result)
@@ -154,7 +156,7 @@ class LinkDataWrapperTest(FakeInternetTestCase):
 
         # call tested function
         result = LinkDataWrapper.make_bookmarked(
-            RequestObject("test_user", is_staff=False), obj
+            DjangoRequestObject(self.user_not_staff), obj
         )
 
         self.assertTrue(result)
@@ -191,13 +193,117 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         self.assertTrue(obj.bookmarked == True)
 
         # call tested function
-        LinkDataWrapper.make_not_bookmarked(RequestObject(), obj)
+        LinkDataWrapper.make_not_bookmarked(DjangoRequestObject(self.user_staff), obj)
 
         objs = LinkDataController.objects.filter(link=link_name)
         self.assertEqual(objs.count(), 1)
         obj = objs[0]
 
         self.assertTrue(obj.bookmarked == False)
+
+    def test_make_bookmarked_staff(self):
+        add_time = DateUtils.get_datetime_now_utc() - timedelta(days=1)
+
+        entry = LinkDataController.objects.create(
+            source="",
+            link="https://linkedin.com",
+            title="my title",
+            description="my description",
+            bookmarked=False,
+            language="pl",
+            domain_obj=None,
+            date_published=add_time,
+            thumbnail="thumbnail",
+            source_obj=self.source_youtube,
+        )
+
+        date_updated = entry.date_update_last
+
+        request = DjangoRequestObject(self.user_staff)
+
+        # call tested function
+        LinkDataWrapper.make_bookmarked(request, entry)
+
+        self.assertEqual(entry.bookmarked, True)
+        self.assertEqual(UserBookmarks.objects.all().count(), 1)
+
+    def test_make_bookmarked_not_staff(self):
+        add_time = DateUtils.get_datetime_now_utc() - timedelta(days=1)
+
+        entry = LinkDataController.objects.create(
+            source="",
+            link="https://linkedin.com",
+            title="my title",
+            description="my description",
+            bookmarked=False,
+            language="pl",
+            domain_obj=None,
+            date_published=add_time,
+            thumbnail="thumbnail",
+            source_obj=self.source_youtube,
+        )
+
+        date_updated = entry.date_update_last
+
+        request = DjangoRequestObject(self.user_not_staff)
+
+        # call tested function
+        LinkDataWrapper.make_bookmarked(request, entry)
+
+        self.assertEqual(entry.bookmarked, False)
+        self.assertEqual(UserBookmarks.objects.all().count(), 1)
+
+    def test_make_not_bookmarked_staff(self):
+        add_time = DateUtils.get_datetime_now_utc() - timedelta(days=1)
+
+        entry = LinkDataController.objects.create(
+            source="",
+            link="https://linkedin.com",
+            title="my title",
+            description="my description",
+            bookmarked=True,
+            language="pl",
+            domain_obj=None,
+            date_published=add_time,
+            thumbnail="thumbnail",
+            source_obj=self.source_youtube,
+        )
+
+        date_updated = entry.date_update_last
+
+        request = DjangoRequestObject(self.user_staff)
+
+        # call tested function
+        LinkDataWrapper.make_not_bookmarked(request, entry)
+
+        self.assertEqual(entry.bookmarked, True)
+        self.assertEqual(UserBookmarks.objects.all().count(), 1)
+
+    def test_make_not_bookmarked_not_staff(self):
+        add_time = DateUtils.get_datetime_now_utc() - timedelta(days=1)
+
+        entry = LinkDataController.objects.create(
+            source="",
+            link="https://linkedin.com",
+            title="my title",
+            description="my description",
+            bookmarked=True,
+            language="pl",
+            domain_obj=None,
+            date_published=add_time,
+            thumbnail="thumbnail",
+            source_obj=self.source_youtube,
+        )
+
+        date_updated = entry.date_update_last
+
+        request = DjangoRequestObject(self.user_not_staff)
+
+        # call tested function
+        LinkDataWrapper.make_not_bookmarked(request, entry)
+
+        self.assertEqual(entry.bookmarked, False)
+        self.assertEqual(UserBookmarks.objects.all().count(), 1)
 
     def test_move_to_archive(self):
         link_name = "https://youtube.com/v=12345"

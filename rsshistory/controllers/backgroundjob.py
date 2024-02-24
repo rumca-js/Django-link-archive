@@ -139,7 +139,7 @@ class BackgroundJobController(BackgroundJob):
             BackgroundJob.JOB_LINK_DOWNLOAD_VIDEO, item.link
         )
 
-    def link_add(url, source=None, tag="", user=None):
+    def link_add(url, source=None, tag="", user=None, properties=None):
         if not url.startswith("http"):
             url = "https://" + url
 
@@ -162,9 +162,18 @@ class BackgroundJobController(BackgroundJob):
         if user:
             cfg["user_id"] = user.id
 
+        if properties:
+            cfg["properties"] = properties
+
+        args_text = json.dumps(cfg)
+
+        if len(args_text) > 1000:
+            PersistentInfo.error("Link add job configuration is too long:{}".format(args_text))
+            args_text = ""
+
         if cfg != {}:
             return BackgroundJobController.create_single_job(
-                BackgroundJob.JOB_LINK_ADD, url, json.dumps(cfg)
+                BackgroundJob.JOB_LINK_ADD, url, args_text
             )
         else:
             return BackgroundJobController.create_single_job(

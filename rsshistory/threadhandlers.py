@@ -253,55 +253,12 @@ class LinkAddJobHandler(BaseJobHandler):
         return BackgroundJob.JOB_LINK_ADD
 
     def process(self, obj=None):
+        """
+        Object is obligatory
+        """
         try:
-            link = obj.subject
-
-            data = {"link": link, "user": None, "bookmarked": False}
-            cfg = {}
-
-            current_time = DateUtils.get_datetime_now_utc()
-
-            if obj.args and len(obj.args) > 0:
-                try:
-                    cfg = json.loads(obj.args)
-                except Exception as E:
-                    PersistentInfo.error(
-                        "Exception when adding link {0} {1} {2}".format(
-                            obj.subject, str(e), error_text
-                        )
-                    )
-
-            if "source" in cfg:
-                source_id = cfg["source"]
-                source_objs = SourceDataController.objects.filter(id=int(source_id))
-                data["source_obj"] = source_objs[0]
-
-            user = None
-            if "user_id" in cfg:
-                user = User.objects.get(id=int(cfg["user_id"]))
-            else:
-                users = User.objects.filter(is_superuser=True)
-                if users.count() > 0:
-                    user = users[0]
-                else:
-                    PersistentInfo.error("Could not found super user")
-
-            b = LinkDataBuilder()
-            b.link_data = data
-            b.link = data["link"]
-            b.source_is_auto = True
-            entry = b.add_from_link()
-
-            if not entry:
-                # TODO send notification?
-                PersistentInfo.error("Could not add link: {}".format(data["link"]))
-                return True
-
-            # if this is a new entry, then tag it
-            if entry.date_published:
-                if entry.date_published >= current_time:
-                    if "tag" in cfg:
-                        entry.tag([cfg["tag"]], user)
+            data = self.get_data_for_add(obj)
+            self.add_link(data)
 
             return True
 
@@ -314,6 +271,76 @@ class LinkAddJobHandler(BaseJobHandler):
             )
             # remove object from queue if it cannot be added
             return True
+
+    def add_link(self, data):
+        b = LinkDataBuilder()
+        b.link_data = data
+        b.link = data["link"]
+        b.source_is_auto = True
+
+        entry = b.add_from_link()
+
+        if not entry:
+            # TODO send notification?
+            p = HtmlPage(data["link"])
+            if not p.is_link_service():
+                PersistentInfo.error("Could not add link: {}".format(data["link"]))
+            return True
+
+        current_time = DateUtils.get_datetime_now_utc()
+
+        # if this is a new entry, then tag it
+        if entry.date_published:
+            if entry.date_published >= current_time:
+                if "tag" in data:
+                    entry.tag([data["tag"]], data["user_object"])
+
+    def get_data_for_add(self, in_object = None):
+        link = in_object.subject
+
+        cfg = self.get_input_cfg(in_object)
+
+        data = {"link": link, "bookmarked": False}
+
+        if "properties" in cfg:
+            data = cfg["properties"]
+
+        if "source" in cfg:
+            source_id = cfg["source"]
+            source_objs = SourceDataController.objects.filter(id=int(source_id))
+            data["source_obj"] = source_objs[0]
+
+        user = None
+        if "user_id" in cfg:
+            user = User.objects.get(id=int(cfg["user_id"]))
+        else:
+            users = User.objects.filter(is_superuser=True)
+            if users.count() > 0:
+                user = users[0]
+            else:
+                PersistentInfo.error("Could not found super user")
+
+        data["user_object"] = user
+
+        if "tag" in cfg:
+            data["tag"] = cfg["tag"]
+
+        return data
+
+    def get_input_cfg(self, in_object=None):
+        cfg = {}
+
+        if in_object.args and len(in_object.args) > 0:
+            try:
+                cfg = json.loads(in_object.args)
+            except Exception as E:
+                PersistentInfo.error(
+                    "Exception when adding link {0} {1} {2}".format(
+                        in_object.subject, str(e), error_text
+                    )
+                )
+
+        return cfg
 
 
 class LinkSaveJobHandler(BaseJobHandler):

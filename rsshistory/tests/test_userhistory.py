@@ -57,7 +57,9 @@ class UserSearchHistoryTest(TestCase):
         self.assertEqual(objects[0], theobject)
 
     def test_more_than_limit(self):
-        for index in range(1, 102):
+        limit = UserSearchHistory.get_choices_model_limit()
+
+        for index in range(1, limit+20):
             user = "test_user{}".format(index)
             query = "query{}".format(index)
             # print("User:{} Query:{}".format(user, query))
@@ -67,7 +69,7 @@ class UserSearchHistoryTest(TestCase):
 
         objects = UserSearchHistory.objects.all()
 
-        self.assertEqual(objects.count(), UserSearchHistory.get_choices_model_limit())
+        self.assertEqual(objects.count(), limit)
 
 
 class UserEntryTransitionHistoryTest(TestCase):

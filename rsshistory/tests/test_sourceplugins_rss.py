@@ -1,4 +1,4 @@
-from ..controllers import SourceDataController
+from ..controllers import SourceDataController, LinkDataController
 from ..configuration import Configuration
 from ..pluginsources.sourcerssplugin import BaseRssPlugin
 
@@ -19,6 +19,8 @@ class BaseRssPluginTest(FakeInternetTestCase):
         )
 
     def test_get_container_elements(self):
+        LinkDataController.objects.all().delete()
+
         config = Configuration.get_object().config_entry
         config.auto_store_entries = True
         config.auto_store_sources = True
@@ -37,7 +39,7 @@ class BaseRssPluginTest(FakeInternetTestCase):
 
         self.print_errors()
 
-        self.assertEqual(len(props), 6)
+        self.assertEqual(len(props), 12)
         self.assertEqual(
             props[0]["source"],
             "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM",
@@ -47,6 +49,8 @@ class BaseRssPluginTest(FakeInternetTestCase):
         self.assertEqual(self.mock_page_requests, 1)
 
     def test_get_container_elements_use_all_data(self):
+        LinkDataController.objects.all().delete()
+
         config = Configuration.get_object().config_entry
         config.auto_store_entries = True
         config.auto_store_sources = True
@@ -63,13 +67,15 @@ class BaseRssPluginTest(FakeInternetTestCase):
 
         self.print_errors()
 
-        self.assertEqual(len(props), 6)
+        self.assertEqual(len(props), 12)
         self.assertEqual(
             props[0]["source"],
             "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM",
         )
 
     def test_get_container_elements_use_clean_page_info(self):
+        LinkDataController.objects.all().delete()
+
         config = Configuration.get_object().config_entry
         config.auto_store_entries = True
         config.auto_store_sources = True
@@ -86,13 +92,15 @@ class BaseRssPluginTest(FakeInternetTestCase):
 
         self.print_errors()
 
-        self.assertEqual(len(props), 6)
+        self.assertEqual(len(props), 12)
         self.assertEqual(
             props[0]["source"],
             "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM",
         )
 
     def test_check_for_data(self):
+        LinkDataController.objects.all().delete()
+
         config = Configuration.get_object().config_entry
         config.auto_store_entries = True
         config.auto_store_sources = True

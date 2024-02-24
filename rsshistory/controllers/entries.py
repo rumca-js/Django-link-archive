@@ -107,8 +107,6 @@ class LinkDataController(LinkDataModel):
         # TODO Move to link wrapper
         moved_all = LinkDataWrapper.move_old_links_to_archive(limit_s)
         cleared_all = LinkDataWrapper.clear_old_entries(limit_s)
-
-        # LinkDataController.replace_http_link_with_https()
         # LinkDataController.recreate_from_domains()
 
         # TODO if configured to store domains, but do not store entries - remove all normal non-domain entries
@@ -124,16 +122,10 @@ class LinkDataController(LinkDataModel):
             full_domain = "https://" + domain.domain
             entries = LinkDataController.objects.filter(link=full_domain)
             if not entries.exist():
-                LinkDatabase.info("Creating entry for domain:{}".format(full_domain))
-                b = LinkDataBuilder()
-                b.link = full_domain
-                obj = b.get_from_link()
+                from .backgroundjob import BackgroundJobController
 
-                if not obj:
-                    PersistentInfo.create(
-                        "Irreversably removing domain:{}".format(domain.domain)
-                    )
-                    domain.delete()
+                LinkDatabase.info("Creating entry for domain:{}".format(full_domain))
+                BackgroundJobController.link_add(full_domain)
 
     def get_cleaned_link(link):
         if link.endswith("/"):
@@ -145,47 +137,6 @@ class LinkDataController(LinkDataModel):
         if domain:
             link = link.replace(domain, domain.lower(), 1)
         return link
-
-    def replace_http_link_with_https():
-        # TODO move tags
-
-        entries = LinkDataController.objects.filter(link__icontains="http://")
-        for entry in entries:
-            link = entry.link
-            new_link = link.replace("http://", "https://")
-
-            new_entries = LinkDataController.objects.filter(link=new_link)
-            if not new_entries.exists():
-                try:
-                    LinkDatabase.info(
-                        "Replacing http with https for:{} {}".format(link, new_link)
-                    )
-                    b = LinkDataBuilder()
-                    b.link = new_link
-                    obj = b.get_from_link()
-
-                    if obj:
-                        LinkDatabase.info(
-                            "Removing old for:{} {}".format(link, new_link)
-                        )
-                        if entry.link != obj.link:
-                            entry.delete()
-                    else:
-                        LinkDatabase.info(
-                            "Could not create - not Removing old for:{} {}".format(
-                                link, new_link
-                            )
-                        )
-                except Exception as E:
-                    error_text = traceback.format_exc()
-                    PersistentInfo.error(
-                        "Cannot create https link:{}".format(error_text)
-                    )
-            else:
-                LinkDatabase.info(
-                    "New exists - removing old for:{} {}".format(link, new_link)
-                )
-                entry.delete()
 
     def get_full_information(data):
         from ..pluginurl.entryurlinterface import EntryUrlInterface
@@ -214,10 +165,16 @@ class LinkDataController(LinkDataModel):
         return result
 
     def tag(self, tags, user):
+        """
+        TODO Change this API to set_tags
+        """
         data = {"user": user, "tags": tags, "entry": self}
         return UserTags.set_tags_map(data)
 
     def set_tag(self, tag_name, user):
+        """
+        TODO Change this API to add_tag
+        """
         return UserTags.set_tag(self, tag_name, user)
 
     def vote(self, vote):
@@ -602,8 +559,11 @@ class LinkDataWrapper(object):
 
 class LinkDataBuilder(object):
     """
-    Archive managment can be tricky. It is long to process entire archive.
-    If there is a possiblity we do not search it, we do not add anything to it.
+     - sometimes we want to call this object directly, sometimes it should be redirected to "add link background job"
+     - we do not change data in here, we do not correct, we just follow it (I think that is what should be)
+     - all subservent entries are added by background controller, handled in a separate task
+     - we cannot spend too much time in builder from any context. This code should be possibly fast
+     - if there is a possibility to not search it, we do not do it
     """
 
     def __init__(
@@ -835,20 +795,6 @@ class LinkDataBuilder(object):
 
         if "live" in link_data and link_data["live"]:
             return link_data["live"]
-        """
-        from ..pluginurl.urlhandler import UrlHandler
-
-        link_data = self.link_data
-
-        if "live" in link_data:
-            return link_data["live"]
-
-        if "link" in link_data and link_data["link"]:
-            handler = UrlHandler.get(link_data["link"])
-            if type(handler) is UrlHandler.youtube_video_handler:
-                if not handler.is_valid():
-                    return True
-        """
 
         return False
 
@@ -873,6 +819,8 @@ class LinkDataBuilder(object):
             LinkDatabase.info(error_text)
 
     def add_sub_links(self):
+        from .backgroundjob import BackgroundJobController
+
         """
         Adds links from description of that link
         """
@@ -912,7 +860,7 @@ class LinkDataBuilder(object):
                         links.add(link)
 
             for link in links:
-                LinkDataBuilder(link=link, source_is_auto=True, allow_recursion=False)
+                BackgroundJobController.link_add(link)
 
     def add_keywords(self):
         link_data = self.link_data

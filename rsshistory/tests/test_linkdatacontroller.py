@@ -11,7 +11,7 @@ from ..controllers import (
 from ..configuration import Configuration
 from ..dateutils import DateUtils
 
-from .fakeinternet import FakeInternetTestCase
+from .fakeinternet import FakeInternetTestCase, DjangoRequestObject
 
 
 class LinkDataControllerTest(FakeInternetTestCase):
@@ -19,7 +19,10 @@ class LinkDataControllerTest(FakeInternetTestCase):
         self.disable_web_pages()
 
         self.user = User.objects.create_user(
-            username="test_username", password="testpassword"
+            username="test_username", password="testpassword", is_staff=True
+        )
+        self.user_not_staff = User.objects.create_user(
+            username="test_normaluser", password="testpassword", is_staff=False
         )
 
     def clear(self):
