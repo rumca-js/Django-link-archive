@@ -41,6 +41,7 @@ urlpatterns = [
     path("source-fix-entries/<int:source_pk>/", viewsources.source_fix_entries, name="source-fix-entries",),
     path("sources-remove-all/", viewsources.remove_all_sources, name="sources-remove-all"),
     path("sources-enable-all/", viewsources.enable_all_sources, name="sources-enable-all"),
+    path("sources-disable-all/", viewsources.disable_all_sources, name="sources-disable-all"),
     path("sources-manual-refresh/", viewsources.sources_manual_refresh, name="sources-manual-refresh"),
     # entries
     path("entries/", viewentries.EntriesSearchListView.as_view(), name="entries"),

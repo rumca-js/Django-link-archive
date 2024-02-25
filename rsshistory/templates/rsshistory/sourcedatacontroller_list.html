@@ -20,10 +20,12 @@
         Add entry</a>
     <a href="{% url 'rsshistory:sources-enable-all' %}" class="simplebutton" title="Enable all sources">
         Enable all</a>
+    <a href="{% url 'rsshistory:sources-disable-all' %}" class="simplebutton" title="Disable all sources">
+        Disable all</a>
     {% endif %}
-    <a href="{% url 'rsshistory:sources' %}?search=on_hold+%3D+0" class="simplebutton" title="Shows active sources only">
+    <a href="{% url 'rsshistory:sources' %}?search=on_hold+%3D+False" class="simplebutton" title="Shows active sources only">
         Active</a>
-    <a href="{% url 'rsshistory:sources' %}?search=on_hold+%3D+1" class="simplebutton" title="Shows disabled sources only">
+    <a href="{% url 'rsshistory:sources' %}?search=on_hold+%3D+True" class="simplebutton" title="Shows disabled sources only">
         On Hold</a>
     <a href="{% url 'rsshistory:sources' %}?search=category+%3D%3D+New" class="simplebutton" title="Shows new sources only">
         New sources</a>

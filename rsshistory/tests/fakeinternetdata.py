@@ -926,10 +926,10 @@ instance_entries_json = """
         "testtag1",
         "testtag2"
       ],
-      "vote": 0,
+      "vote": 10,
       "comments": [
-        "comment1",
-        "comment2"
+         {"comment": "test", "user": "testuser", "date_published": "2024-02-25T11:35:31.382590+00:00", "date_edited": "2024-02-25T11:35:31.382590+00:00", "reply_id": null
+         }
       ]
     },
     {
@@ -952,7 +952,7 @@ instance_entries_json = """
       "page_rating_visits": 0,
       "page_rating": 0,
       "tags": [],
-      "vote": 0,
+      "vote": 20,
       "comments": []
     }
   ]

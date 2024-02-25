@@ -136,14 +136,22 @@ class UserTags(models.Model):
 
     def cleanup():
         for q in UserTags.objects.filter(user_object__isnull=True):
-            users = User.objects.filter(username=q.user)
+            if q.user_object:
+                users = User.objects.filter(id=q.user_object.id)
+                if users.count() > 0:
+                    q.user_object = users[0]
+                    q.save()
+                    continue
+
+            users = User.objects.filter(is_superuser=True)
             if users.count() > 0:
-                q.user_object = users[0]
+                user = users[0]
+                q.user_object = user
                 q.save()
-            else:
-                LinkDatabase.error("Cannot find user '{}'".format(q.user))
-                q.delete()
-                time.sleep(0.5)
+
+                #LinkDatabase.error("Cannot find user '{}'".format(q.user_object.id))
+                #q.delete()
+                #time.sleep(0.5)
 
 
 class UserVotes(models.Model):
@@ -210,6 +218,7 @@ class LinkCommentDataModel(models.Model):
     comment = models.TextField(max_length=3000)
     date_published = models.DateTimeField(auto_now_add=True)
     date_edited = models.DateTimeField(null=True)
+    # id of previous comment
     reply_id = models.IntegerField(null=True)
 
     entry_object = models.ForeignKey(

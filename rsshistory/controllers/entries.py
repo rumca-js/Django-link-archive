@@ -819,11 +819,12 @@ class LinkDataBuilder(object):
             LinkDatabase.info(error_text)
 
     def add_sub_links(self):
+        """
+        Adds links from description of that link.
+        Store link as-is.
+        """
         from .backgroundjob import BackgroundJobController
 
-        """
-        Adds links from description of that link
-        """
         if not self.allow_recursion:
             """
             We cannot allow to undefinitely traverse Internet and find all domains

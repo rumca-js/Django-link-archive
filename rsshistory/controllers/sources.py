@@ -40,11 +40,9 @@ class SourceDataController(SourceDataModel):
             from .entries import LinkDataBuilder
             entries = LinkDataModel.objects.filter(link = source.url)
             if entries.count() == 0:
-                b = LinkDataBuilder(link = source.url)
-                if b.result:
-                    entry = b.result
-                    entry.permanent = True
-                    entry.save()
+                from .backgroundjob import BackgroundJobController
+                properties = {"permament" : True}
+                BackgroundJobController.link_add(source.url, properties=properties)
             else:
                 entry = entries[0]
                 entry.permanent = True
@@ -283,18 +281,29 @@ class SourceDataController(SourceDataModel):
         return result
 
     def enable(self):
+        if not self.on_hold:
+            return
+
+        from .backgroundjob import BackgroundJobController
+
+        op = self.get_dynamic_data()
+        if op:
+            op.consecutive_errors = 0
+            op.save()
+
+        BackgroundJobController.download_rss(self)
+
+        self.on_hold = False
+        self.save()
+
+    def disable(self):
         if self.on_hold:
-            from .backgroundjob import BackgroundJobController
+            return
 
-            op = self.get_dynamic_data()
-            if op:
-                op.consecutive_errors = 0
-                op.save()
+        from .backgroundjob import BackgroundJobController
 
-            BackgroundJobController.download_rss(self)
-
-            self.on_hold = False
-            self.save()
+        self.on_hold = True
+        self.save()
 
     def edit(self, data):
         """
@@ -400,13 +409,11 @@ class SourceDataBuilder(object):
         Category and subcategory names can be empty, then objects are not set
         """
         try:
-            from .entries import LinkDataBuilder
+            from .backgroundjob import BackgroundJobController
 
-            b = LinkDataBuilder(link=self.link_data["url"])
-            if b.result:
-                entry = b.result
-                entry.permament = True
-                entry.save()
+            properties = {"permament" : True}
+
+            BackgroundJobController.link_add(self.link_data["url"], properties=properties)
 
             # TODO add domain when adding new source
             source = SourceDataController.objects.create(**self.link_data)

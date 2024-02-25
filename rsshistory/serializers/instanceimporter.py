@@ -1,5 +1,7 @@
 import json
 
+from django.contrib.auth.models import User
+
 from ..models import Domains
 from ..controllers import (
     LinkDataController,
@@ -123,14 +125,27 @@ class InstanceImporter(object):
     def import_from_link(self, json_data):
         c = Configuration.get_object().config_entry
 
+        tags = []
+        if "tags" in json_data:
+            tags = json_data["tags"]
+        vote = None
+        if "vote" in json_data:
+            vote = json_data["vote"]
+        comments = []
+        if "comments" in json_data:
+            comments = json_data["comments"]
+
         clean_data = self.get_clean_entry_data(json_data)
+
+        entry = None
 
         entries = LinkDataController.objects.filter(link=clean_data["link"])
         if entries.count() == 0:
             # This instance can have their own settings for import, may decide what is
             # accepted and not. Let the builder deal with it
             LinkDatabase.info("Importing link:{}".format(clean_data["link"]))
-            LinkDataBuilder(link_data=clean_data, source_is_auto=True)
+            b = LinkDataBuilder(link_data=clean_data, source_is_auto=True)
+            entry = b.result
         else:
             entry = entries[0]
             if clean_data["bookmarked"] and not entry.bookmarked:
@@ -140,12 +155,34 @@ class InstanceImporter(object):
 
             entry.save()
 
-            if "tags" in clean_data:
-                entry.tag(clean_data["tags"], self.author)
+        if entry:
+            if len(tags) > 0:
+                user = self.get_superuser()
+                entry.tag(tags, user)
 
-            if "vote" in clean_data:
-                if clean_data["vote"] > 0:
-                    entry.vote(clean_data["vote"])
+            if vote is not None:
+                entry.vote(vote)
+
+            if len(comments) > 0:
+                for comment in comments:
+                    data = {}
+                    data["entry_object"] = entry
+                    data["user"] = self.get_user(comment["username"])
+                    data["comment"] = comment["comment"]
+                    data["date_published"] = comment["date_published"]
+                    data["date_edited"] = comment["date_edited"]
+                    data["reply_id"] = comment["reply_id"]
+                    LinkCommentDataController.save_comment(data)
+
+    def get_superuser(self):
+        users = User.objects.filter(is_superuser = True)
+        if users.count() > 0:
+            return users[0]
+
+    def get_user(self, username):
+        users = User.objects.filter(username = username)
+        if users.count() > 0:
+            return users[0]
 
     def import_from_source(self, json_data, instance_import=False):
         LinkDatabase.info("Import from source")
@@ -158,17 +195,17 @@ class InstanceImporter(object):
             if instance_import:
                 clean_data["on_hold"] = True
             SourceDataBuilder(link_data=clean_data).add_from_props()
-        else:
-            if instance_import:
-                source = sources[0]
+        #else:
+        #    if instance_import:
+        #        source = sources[0]
 
-                if source.on_hold != (not clean_data["on_hold"]):
-                    source.on_hold = not clean_data["on_hold"]
+        #        if source.on_hold != (not clean_data["on_hold"]):
+        #            source.on_hold = not clean_data["on_hold"]
 
-                if source.proxy_location != clean_data["proxy_location"]:
-                    source.proxy_location = clean_data["proxy_location"]
+        #        if source.proxy_location != clean_data["proxy_location"]:
+        #            source.proxy_location = clean_data["proxy_location"]
 
-                source.save()
+        #        source.save()
 
     def drop_entry_instance_internal_data(self, clean_data):
         if "domain_obj" in clean_data:

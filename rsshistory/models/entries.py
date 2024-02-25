@@ -265,8 +265,19 @@ class BaseLinkDataController(BaseLinkDataModel):
         return result
 
     def get_comment_vec(self):
-        # TODO
-        return []
+        result = []
+
+        comments = self.comments.all()
+        for comment in comments:
+            data= {}
+            data["comment"] = comment.comment
+            data["user"] = comment.user_object.username
+            data["date_published"] = comment.date_published.isoformat()
+            data["date_edited"] = comment.date_published.isoformat()
+            data["reply_id"] = comment.reply_id
+            result.append(data)
+
+        return result
 
     def update_language(self):
         if self.get_source_obj():

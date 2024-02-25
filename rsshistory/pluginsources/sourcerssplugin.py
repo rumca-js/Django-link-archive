@@ -96,7 +96,7 @@ class BaseRssPlugin(SourceGenericPlugin):
 
         for index, prop in enumerate(all_props):
             if "link" not in prop:
-                LinkDatabase.info("Link not present in RSS:{}".self.get_address())
+                LinkDatabase.info("Link not present in RSS:{}".format(self.get_address()))
                 continue
 
             prop = self.enhance(prop)

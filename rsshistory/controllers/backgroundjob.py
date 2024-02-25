@@ -140,12 +140,27 @@ class BackgroundJobController(BackgroundJob):
         )
 
     def link_add(url, source=None, tag="", user=None, properties=None):
+        from ..configuration import Configuration
+        """
+        It handles only automatic additions.
+        """
         if not url.startswith("http"):
             url = "https://" + url
 
         h = HtmlPage(url)
         if h.is_analytics():
             return
+
+        """
+        TODO: there should be some one place to verify if link is 'accepted' to be added
+        If it is not link service we may only accept domains.
+        If it is link service - add as is.
+        In link add thread we will 'unpack links service'.
+        """
+        if not h.is_link_service():
+            config = Configuration.get_object().config_entry
+            if not config.auto_store_entries and config.auto_store_domain_info:
+                url = h.get_domain()
 
         existing = LinkDataModel.objects.filter(link=url)
         if existing.count() > 0:

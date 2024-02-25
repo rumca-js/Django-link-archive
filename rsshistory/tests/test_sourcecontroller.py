@@ -31,6 +31,7 @@ class SourceControllerTest(FakeInternetTestCase):
         self.assertEqual(sources.count(), 1)
         self.assertEqual(sources[0].on_hold, True)
 
+        # job to add entry for source?
         self.assertEqual(BackgroundJobController.objects.all().count(), 0)
 
     def test_new_source_manual(self):
@@ -51,6 +52,7 @@ class SourceControllerTest(FakeInternetTestCase):
         self.assertEqual(sources.count(), 1)
         self.assertEqual(sources[0].on_hold, False)
 
+        # job to add entry
         self.assertEqual(BackgroundJobController.objects.all().count(), 1)
 
     def test_new_source_twice(self):

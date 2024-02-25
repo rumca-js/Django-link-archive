@@ -104,7 +104,6 @@ class BaseJsonPluginTest(FakeInternetTestCase):
 
         self.assertEqual(sources[3].on_hold, False)
 
-        # Links are imported, 3 links are created for sources
+        # Links are not imported
         entries = LinkDataController.objects.all()
-        self.assertEqual(entries.count(), 1 + 3)
-        self.assertEqual(entries[3].link, "https://www.lemonde.fr/first-link.html")
+        self.assertEqual(entries.count(), 0)

@@ -273,18 +273,28 @@ class LinkAddJobHandler(BaseJobHandler):
             return True
 
     def add_link(self, data):
+        from .pluginurl import UrlHandler
+
+        # Unpack if link service
+        link = data["link"]
+        if HtmlPage(link).is_link_service():
+            h = UrlHandler()
+            p = h.get(link)
+            if p.get_contents():
+                link = p.url
+                data["link"] = link
+
+        # Add the link
         b = LinkDataBuilder()
         b.link_data = data
-        b.link = data["link"]
+        b.link = link
         b.source_is_auto = True
 
         entry = b.add_from_link()
 
         if not entry:
             # TODO send notification?
-            p = HtmlPage(data["link"])
-            if not p.is_link_service():
-                PersistentInfo.error("Could not add link: {}".format(data["link"]))
+            LinkDatabase.info("Could not add link: {}".format(data["link"]))
             return True
 
         current_time = DateUtils.get_datetime_now_utc()

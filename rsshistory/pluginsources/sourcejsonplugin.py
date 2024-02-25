@@ -113,10 +113,6 @@ class BaseSourceJsonPlugin(SourceGenericPlugin):
             source_prop["proxy_location"] = self.get_source_url(source_prop)
             i.import_from_source(source_prop, instance_import=True)
 
-            self.get_links_from_source(source_prop)
-
-            ## we do not return any found links, because instance importer imports them directly
-
     def get_links_from_links(self, links_json):
         c = Configuration.get_object().config_entry
 

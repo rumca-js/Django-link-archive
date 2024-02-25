@@ -10,8 +10,10 @@ from ..models import (
     LinkDataModel,
     LinkCommentDataModel,
 )
-from .entries import LinkDataController
 from ..configuration import Configuration
+from ..dateutils import DateUtils
+
+from .entries import LinkDataController
 
 
 class LinkCommentDataController(LinkCommentDataModel):
@@ -58,11 +60,20 @@ class LinkCommentDataController(LinkCommentDataModel):
         if not user.is_authenticated:
             return
 
+        reply_id = None
+        if "reply_id" in data:
+            reply_id = data["reply_id"]
+
+        if "date_edited" not in data:
+            data["date_edited"] = DateUtils.get_datetime_now_utc()
+
         return LinkCommentDataModel.objects.create(
             comment=data["comment"],
             date_published=data["date_published"],
+            date_edited=data["date_edited"],
             entry_object=entry,
             user_object=user,
+            reply_id = reply_id,
         )
 
     def is_html_contents(text):
