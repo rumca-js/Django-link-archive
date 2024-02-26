@@ -122,6 +122,14 @@ class DataExportForm(forms.ModelForm):
             "export_sources",
         ]
 
+    def __init__(self, *args, **kwargs):
+        super(DataExportForm, self).__init__(*args, **kwargs)
+
+        # fmt: off
+        self.fields["remote_path"].help_text = "Can be empty"
+        self.fields["user"].help_text = "Can be empty"
+        self.fields["password"].help_text = "Can be empty"
+
 
 class UserConfigForm(forms.ModelForm):
     """

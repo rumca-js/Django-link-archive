@@ -68,10 +68,10 @@ class DataExport(models.Model):
     enabled = models.BooleanField(default=True)
     export_type = models.CharField(max_length=1000, choices=EXPORT_TYPE_CHOICES)
     export_data = models.CharField(max_length=1000, choices=EXPORT_DATA_CHOICES)
-    local_path = models.CharField(max_length=1000)  # relative?
-    remote_path = models.CharField(max_length=1000)
-    user = models.CharField(default="", max_length=2000, null=True)
-    password = models.CharField(default="", max_length=2000, null=True)
+    local_path = models.CharField(max_length=1000, blank=True)  # relative?
+    remote_path = models.CharField(max_length=1000, blank=True)
+    user = models.CharField(default="", max_length=2000, blank=True)
+    password = models.CharField(default="", max_length=2000, blank=True)
 
     # maybe we should make another table, for each EXPORT
     export_entries = models.BooleanField(default=True)

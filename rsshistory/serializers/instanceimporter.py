@@ -167,7 +167,7 @@ class InstanceImporter(object):
                 for comment in comments:
                     data = {}
                     data["entry_object"] = entry
-                    data["user"] = self.get_user(comment["username"])
+                    data["user"] = self.get_user(comment["user"])
                     data["comment"] = comment["comment"]
                     data["date_published"] = comment["date_published"]
                     data["date_edited"] = comment["date_edited"]

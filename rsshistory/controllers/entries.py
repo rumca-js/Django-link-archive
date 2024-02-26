@@ -354,9 +354,7 @@ class LinkDataWrapper(object):
         """
         TODO move this API to UserBookmarks
         """
-        if entry.bookmarked:
-            UserBookmarks.add(request.user, entry)
-            return
+        UserBookmarks.add(request.user, entry)
 
         if entry.is_archive_entry():
             entry = LinkDataWrapper.move_from_archive(entry)
@@ -368,6 +366,7 @@ class LinkDataWrapper(object):
 
     def make_not_bookmarked(request, entry):
         UserBookmarks.remove(request.user, entry)
+
         is_bookmarked = UserBookmarks.is_bookmarked(entry)
 
         if not is_bookmarked:

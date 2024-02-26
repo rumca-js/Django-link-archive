@@ -314,6 +314,7 @@ class LinkAddJobHandler(BaseJobHandler):
 
         if "properties" in cfg:
             data = cfg["properties"]
+            data["link"] = link
 
         if "source" in cfg:
             source_id = cfg["source"]

@@ -276,7 +276,7 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         # call tested function
         LinkDataWrapper.make_not_bookmarked(request, entry)
 
-        self.assertEqual(entry.bookmarked, True)
+        self.assertEqual(entry.bookmarked, False)
         self.assertEqual(UserBookmarks.objects.all().count(), 1)
 
     def test_make_not_bookmarked_not_staff(self):
@@ -303,7 +303,7 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         LinkDataWrapper.make_not_bookmarked(request, entry)
 
         self.assertEqual(entry.bookmarked, False)
-        self.assertEqual(UserBookmarks.objects.all().count(), 1)
+        self.assertEqual(UserBookmarks.objects.all().count(), 0)
 
     def test_move_to_archive(self):
         link_name = "https://youtube.com/v=12345"

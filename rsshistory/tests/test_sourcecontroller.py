@@ -15,7 +15,7 @@ class SourceControllerTest(FakeInternetTestCase):
 
     def test_new_source_automatic(self):
         # call tested function
-        source = SourceDataBuilder(
+        SourceDataBuilder(
             link_data={
                 "url": "https://linkedin.com",
                 "title": "LinkedIn",
@@ -32,7 +32,9 @@ class SourceControllerTest(FakeInternetTestCase):
         self.assertEqual(sources[0].on_hold, True)
 
         # job to add entry for source?
-        self.assertEqual(BackgroundJobController.objects.all().count(), 0)
+        jobs = BackgroundJobController.objects.all()
+        self.assertEqual(jobs.count(), 1)
+        self.assertEqual(jobs[0].job, BackgroundJobController.JOB_LINK_ADD)
 
     def test_new_source_manual(self):
         # call tested function
@@ -53,7 +55,10 @@ class SourceControllerTest(FakeInternetTestCase):
         self.assertEqual(sources[0].on_hold, False)
 
         # job to add entry
-        self.assertEqual(BackgroundJobController.objects.all().count(), 1)
+        jobs = BackgroundJobController.objects.all()
+        self.assertEqual(jobs.count(), 2)
+        self.assertEqual(jobs[0].job, BackgroundJobController.JOB_PROCESS_SOURCE)
+        self.assertEqual(jobs[1].job, BackgroundJobController.JOB_LINK_ADD)
 
     def test_new_source_twice(self):
         # call tested function

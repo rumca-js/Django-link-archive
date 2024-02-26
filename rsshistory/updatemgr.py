@@ -81,6 +81,12 @@ class UpdateExportManager(object):
             repo.commit(commit_message)
             repo.push()
 
+        elif export_data.export_type == DataExport.EXPORT_TYPE_LOC:
+            if export_data.local_path == export_data.remote_path:
+                return
+            if export_data.remote_path is None or export_data.remote_path == "":
+                return
+
         PersistentInfo.create("Pushing repo done")
 
 
