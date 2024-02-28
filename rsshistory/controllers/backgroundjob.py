@@ -32,13 +32,14 @@ class BackgroundJobController(BackgroundJob):
         (BackgroundJob.JOB_IMPORT_BOOKMARKS, BackgroundJob.JOB_IMPORT_BOOKMARKS), # 8
         (BackgroundJob.JOB_IMPORT_SOURCES, BackgroundJob.JOB_IMPORT_SOURCES), # 9
         (BackgroundJob.JOB_IMPORT_INSTANCE, BackgroundJob.JOB_IMPORT_INSTANCE), # 10
+        (BackgroundJob.JOB_IMPORT_FROM_FILES, BackgroundJob.JOB_IMPORT_FROM_FILES), # 11
 
         # Since cleanup, moving to archives can take forever, we still want to process
         # source in between
-        (BackgroundJob.JOB_PROCESS_SOURCE, BackgroundJob.JOB_PROCESS_SOURCE,), # 11
-        (BackgroundJob.JOB_CLEANUP, BackgroundJob.JOB_CLEANUP), # 12
-        (BackgroundJob.JOB_MOVE_TO_ARCHIVE, BackgroundJob.JOB_MOVE_TO_ARCHIVE), # 13
-        (BackgroundJob.JOB_LINK_ADD, BackgroundJob.JOB_LINK_ADD,), # 14                         # adds link using default properties, may contain link map properties in the map
+        (BackgroundJob.JOB_PROCESS_SOURCE, BackgroundJob.JOB_PROCESS_SOURCE,), # 12
+        (BackgroundJob.JOB_CLEANUP, BackgroundJob.JOB_CLEANUP), # 13
+        (BackgroundJob.JOB_MOVE_TO_ARCHIVE, BackgroundJob.JOB_MOVE_TO_ARCHIVE), # 14
+        (BackgroundJob.JOB_LINK_ADD, BackgroundJob.JOB_LINK_ADD,), # 15                         # adds link using default properties, may contain link map properties in the map
         (BackgroundJob.JOB_LINK_UPDATE_DATA, BackgroundJob.JOB_LINK_UPDATE_DATA),           # update data, recalculate
         (BackgroundJob.JOB_LINK_RESET_DATA, BackgroundJob.JOB_LINK_RESET_DATA,),
         (BackgroundJob.JOB_LINK_SAVE, BackgroundJob.JOB_LINK_SAVE,),                        # link is saved using thirdparty pages (archive.org)
@@ -268,6 +269,16 @@ class BackgroundJobController(BackgroundJob):
     def import_sources():
         return BackgroundJobController.create_single_job(
             BackgroundJob.JOB_IMPORT_SOURCES
+        )
+
+    def import_from_files(data=None):
+        if not data:
+            return
+
+        args_text = json.dumps(data)
+
+        return BackgroundJobController.create_single_job(
+            BackgroundJob.JOB_IMPORT_FROM_FILES, args_text
         )
 
     def link_save(link_url):

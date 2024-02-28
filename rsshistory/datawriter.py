@@ -6,7 +6,7 @@ and different output (Year, or page ordered directories)
 from pathlib import Path
 
 from .dateutils import DateUtils
-from .models import DataExport
+from .models import DataExport, PersistentInfo
 from .serializers.sourceentriesserializer import SourcesEntriesDataWriter
 from .serializers.sourcesserializer import SourceSerializerWrapper
 
@@ -115,7 +115,8 @@ class YearDataWriter(BaseDataWriter):
             exporter = BookmarksBigExporter(self.config)
             exporter.export(self.get_directory())
 
-            # TODO implement permanent write
+        if self.export_config.export_entries_permanents:
+            PersistentInfo.error("Bookmark exporting for year structure is not yet supported")
 
     def write_sources(self):
         if self.export_config.export_sources:
@@ -142,7 +143,8 @@ class NoTimeDataWriter(BaseDataWriter):
             exporter = PermanentEntriesExporter(self.config)
             exporter.export("permanents", self.get_directory())
 
-            # TODO implement bookmark writing
+        if self.export_config.export_entries_bookmarks:
+            PersistentInfo.error("Bookmark exporting for no time structure is not yet supported")
 
     def write_sources(self):
         if self.export_config.export_sources:

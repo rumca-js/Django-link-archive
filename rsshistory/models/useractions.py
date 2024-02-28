@@ -286,6 +286,10 @@ class UserBookmarks(models.Model):
         bookmarks = UserBookmarks.objects.filter(user_object=user, entry_object=entry)
         bookmarks.delete()
 
+    def remove_entry(entry):
+        bookmarks = UserBookmarks.objects.filter(entry_object=entry)
+        bookmarks.delete()
+
     def is_bookmarked(entry):
         bookmarks = UserBookmarks.objects.filter(entry_object=entry)
         for bookmark in bookmarks:

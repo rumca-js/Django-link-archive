@@ -545,6 +545,40 @@ class ImportInstanceJobHandler(BaseJobHandler):
         return True
 
 
+class ImportFromFilesJobHandler(BaseJobHandler):
+    """!
+    Imports from files
+    """
+
+    def get_job(self):
+        return BackgroundJob.JOB_IMPORT_FROM_FILES
+
+    def process(self, obj=None):
+        import json
+
+        data = obj.subject
+        data = json.loads(data)
+
+        path = data["path"]
+        import_title = data["import_title"]
+        import_description = data["import_description"]
+        import_tags = data["import_tags"]
+        import_votes = data["import_votes"]
+        username = data["user"]
+        tag = data["tag"]
+
+        user = None
+        if username and username != "":
+            users = User.objects.filter(username = username)
+            if users.count() > 0:
+                user = users[0]
+
+        from .serializers import FileImporter
+        FileImporter(path = path, user=user)
+
+        return True
+
+
 class WriteBookmarksJobHandler(BaseJobHandler):
     """!
     Writes bookmarks data to disk
@@ -907,6 +941,7 @@ class HandlerManager(object):
             ImportBookmarksJobHandler(),
             ImportDailyDataJobHandler(),
             ImportInstanceJobHandler(),
+            ImportFromFilesJobHandler(),
 
             CleanupJobHandler(),
             MoveToArchiveJobHandler(),

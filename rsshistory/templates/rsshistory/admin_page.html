@@ -43,13 +43,10 @@
             <img src="{% static 'rsshistory/icons/icons8-database-export-100.png' %}" class="content-icon" />
             Data Exports</a>
         <a href="{% url 'rsshistory:import-from-instance' %}" title="Import from another link archive instance" class="simplebutton">Import from instance</a>
+        <a href="{% url 'rsshistory:import-from-files' %}" title="Import from a directory" class="simplebutton">Import from a directory</a>
         <a href="{% url 'rsshistory:write-bookmarks' %}" class="simplebutton">Write bookmarks</a>
         <a href="{% url 'rsshistory:write-daily-data-form' %}" class="simplebutton">Write daily data</a>
         <a href="{% url 'rsshistory:write-tag-form' %}" class="simplebutton">Write topic data</a>
-        <a href="{% url 'rsshistory:import-sources' %}" class="simplebutton">Import sources</a>
-        <a href="{% url 'rsshistory:import-bookmarks' %}" class="simplebutton">Import bookmarks</a>
-        <a href="{% url 'rsshistory:import-daily-data' %}" class="simplebutton">Import daily data</a>
-        <a href="{% url 'rsshistory:import-reading-list' %}" class="simplebutton">Import reading list</a>
         <a href="{% url 'rsshistory:push-daily-data-form' %}" class="simplebutton">Push daily data to repo</a>
     </div>
 

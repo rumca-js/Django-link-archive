@@ -89,12 +89,12 @@ class ConfigurationEntry(models.Model):
     whats_new_days = models.IntegerField(default=7)
 
     data_import_path = models.CharField(
-        default="../data/{}/imports".format(LinkDatabase.name),
+        default="../data/imports",
         max_length=2000,
         null=True,
     )
     data_export_path = models.CharField(
-        default="../data/{}/exports".format(LinkDatabase.name),
+        default="../data//exports",
         max_length=2000,
         null=True,
     )
@@ -307,6 +307,7 @@ class BackgroundJob(models.Model):
     JOB_IMPORT_BOOKMARKS = "import-bookmarks"
     JOB_IMPORT_SOURCES = "import-sources"
     JOB_IMPORT_INSTANCE = "import-instance"
+    JOB_IMPORT_FROM_FILES = "import-from-files"
     JOB_PUSH_TO_REPO = "push-to-repo"
     JOB_PUSH_DAILY_DATA_TO_REPO = "push-daily-data-to-repo"
     JOB_PUSH_YEAR_DATA_TO_REPO = "push-year-data-to-repo"
@@ -333,6 +334,7 @@ class BackgroundJob(models.Model):
         (JOB_IMPORT_BOOKMARKS, JOB_IMPORT_BOOKMARKS),
         (JOB_IMPORT_SOURCES, JOB_IMPORT_SOURCES),
         (JOB_IMPORT_INSTANCE, JOB_IMPORT_INSTANCE),
+        (JOB_IMPORT_FROM_FILES, JOB_IMPORT_FROM_FILES),
         (JOB_PUSH_TO_REPO, JOB_PUSH_TO_REPO),
         (JOB_PUSH_DAILY_DATA_TO_REPO, JOB_PUSH_DAILY_DATA_TO_REPO),
         (JOB_PUSH_YEAR_DATA_TO_REPO, JOB_PUSH_YEAR_DATA_TO_REPO),

@@ -1,14 +1,16 @@
-from ..models import DataExport
+from ..models import DataExport, ConfigurationEntry
 from ..controllers import SourceDataController, LinkDataController
 from ..updatemgr import UpdateManager
 from ..configuration import Configuration
 from ..dateutils import DateUtils
+from ..configuration import Configuration
 
 from .fakeinternet import FakeInternetTestCase
 
 
 class BaseRepo(object):
     def __init__(self, git_data):
+        self.git_data = git_data
         self.is_up = False
         self.is_add = False
         self.is_commit = False
@@ -30,6 +32,15 @@ class BaseRepo(object):
     def copy_tree(self, input_path):
         self.is_copy_tree = True
 
+    def set_local_dir(self, adir):
+        self.local_dir = adir
+
+    def get_repo_name(self):
+        last = Path(self.git_data.remote_path).parts[-1]
+        last = Path(last)
+        last = last.stem
+        return last
+
 
 class RepoTestFactory(object):
     used_repos = []
@@ -42,6 +53,14 @@ class RepoTestFactory(object):
 class UpdateManagerGitTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
+
+        c = Configuration.get_object()
+        c.config_entry = ConfigurationEntry.get()
+
+        c.config_entry.auto_store_entries = True
+        c.config_entry.data_import_path ="./data/imports"
+        c.config_entry.data_export_path ="./data/exports"
+        c.config_entry.save()
 
         source_youtube = SourceDataController.objects.create(
             url="https://youtube.com",
@@ -75,8 +94,8 @@ class UpdateManagerGitTest(FakeInternetTestCase):
             enabled=True,
             export_type=DataExport.EXPORT_TYPE_GIT,
             export_data=DataExport.EXPORT_DAILY_DATA,
-            local_path="test",
-            remote_path="test.git",
+            local_path="./daily_dir",
+            remote_path="https://github.com/rumca-js/RSS-Link-Database-DAILY.git",
             user="user",
             password="password",
             export_entries=True,
@@ -88,8 +107,8 @@ class UpdateManagerGitTest(FakeInternetTestCase):
             enabled=True,
             export_type=DataExport.EXPORT_TYPE_GIT,
             export_data=DataExport.EXPORT_YEAR_DATA,
-            local_path="test",
-            remote_path="test.git",
+            local_path="./year_dir",
+            remote_path="https://github.com/rumca-js/RSS-Link-Database-YEAR.git",
             user="user",
             password="password",
             export_entries=True,
@@ -101,8 +120,8 @@ class UpdateManagerGitTest(FakeInternetTestCase):
             enabled=True,
             export_type=DataExport.EXPORT_TYPE_GIT,
             export_data=DataExport.EXPORT_NOTIME_DATA,
-            local_path="test",
-            remote_path="test.git",
+            local_path="./notime_dir",
+            remote_path="https://github.com/rumca-js/RSS-Link-Database-NOTIME.git",
             user="user",
             password="password",
             export_entries=True,
@@ -127,6 +146,9 @@ class UpdateManagerGitTest(FakeInternetTestCase):
 
         self.assertEqual(len(RepoTestFactory.used_repos), 1)
 
+        expected_path = Path("./data/exports/daily_dir/git/RSS-Link-Database-DAILY")
+        self.assertEqual(mgr.get_repo_operating_dir(), expected_path)
+
     def test_year_repo(self):
         RepoTestFactory.used_repos = []
 
@@ -139,6 +161,9 @@ class UpdateManagerGitTest(FakeInternetTestCase):
 
         mgr.write_and_push_year_data()
         self.assertEqual(len(RepoTestFactory.used_repos), 1)
+
+        expected_path = Path("./data/exports/year_dir/git/RSS-Link-Database-YEAR")
+        self.assertEqual(mgr.get_repo_operating_dir(), expected_path)
 
     def test_notime_repo(self):
         RepoTestFactory.used_repos = []
@@ -153,6 +178,9 @@ class UpdateManagerGitTest(FakeInternetTestCase):
         mgr.write_and_push_notime_data()
 
         self.assertEqual(len(RepoTestFactory.used_repos), 1)
+
+        expected_path = Path("./data/exports/notime_dir/git/RSS-Link-Database-NOTIME")
+        self.assertEqual(mgr.get_repo_operating_dir(), expected_path)
 
 
 class UpdateManagerLocTest(FakeInternetTestCase):

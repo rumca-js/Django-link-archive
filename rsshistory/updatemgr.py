@@ -24,6 +24,7 @@ class UpdateExportManager(object):
         self.directory = directory
         self.date = date
         self.repo_builder = repo_builder
+        self.writer_config = None
 
     def process(self):
         self.write()
@@ -40,11 +41,16 @@ class UpdateExportManager(object):
                 self._cfg, self.export_data, self.directory
             )
 
+        self.writer_config = config
+
         writer = DataWriter.get(config)
         writer.write()
 
     def get_directory(self):
         return Path(self.export_data.local_path) / self.directory
+
+    def get_repo_operating_dir(self, repo):
+        return Path(self._cfg.get_export_path()) / self.export_data.local_path / "git" / repo.get_repo_name
 
     def push(self):
         export_data = self.export_data
@@ -72,6 +78,9 @@ class UpdateExportManager(object):
             repo_class = self.repo_builder.get(export_data)
             repo = repo_class(export_data)
 
+            operating_dir = self.get_repo_operating_dir(repo)
+            repo.set_local_dir(operating_dir)
+
             repo.up()
 
             local_dir = self._cfg.get_export_path(self.get_directory())
@@ -80,7 +89,6 @@ class UpdateExportManager(object):
             repo.add([])
             repo.commit(commit_message)
             repo.push()
-
         elif export_data.export_type == DataExport.EXPORT_TYPE_LOC:
             if export_data.local_path == export_data.remote_path:
                 return

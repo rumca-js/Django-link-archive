@@ -297,6 +297,9 @@ class LinkDataWrapper(object):
         if "bookmarked" in link_data and link_data["bookmarked"]:
             is_archive = False
 
+        if "language" in link_data and link_data["language"] and len(link_data["language"]) > 9:
+            PersistentInfo.create("Language setting too long for:{} {}".format(link_data["link"], link_data["language"]))
+
         if "id" in link_data:
             del link_data["id"]
 

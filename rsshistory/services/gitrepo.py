@@ -8,6 +8,17 @@ class GitRepo(object):
         self.git_data = git_data
         self.git_repo = git_data.remote_path
         self.timeout_s = timeout_s
+        self.local_dir = self.calculate_local_dir()
+
+    def get_local_dir(self):
+        return self.local_dir
+
+    def set_local_dir(self, adir):
+        self.local_dir = adir
+
+    def calculate_local_dir(self):
+        last = self.get_repo_name()
+        return Path(self.git_data.local_path) / last
 
     def up(self):
         git_path = Path(self.git_data.local_path)
@@ -52,10 +63,6 @@ class GitRepo(object):
         last = last.stem
         return last
 
-    def get_local_dir(self):
-        last = self.get_repo_name()
-
-        return Path(self.git_data.local_path) / last
 
     def clone(self):
         subprocess.run(

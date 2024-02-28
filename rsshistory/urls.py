@@ -140,6 +140,7 @@ urlpatterns = [
     path("import-sources", viewexport.import_sources, name="import-sources"),
     path("import-reading-list", viewexport.import_reading_list_view, name="import-reading-list",),
     path("import-from-instance", viewexport.import_from_instance, name="import-from-instance",),
+    path("import-from-files", viewexport.import_from_files, name="import-from-files",),
     path("import-source-ia/<int:pk>/", viewexport.import_source_from_ia, name="import-source-ia",),
     # domains
     path("domains/", viewdomains.DomainsListView.as_view(), name="domains",),

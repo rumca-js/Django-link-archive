@@ -151,9 +151,22 @@ class UserConfigForm(forms.ModelForm):
 
 
 class ImportSourceRangeFromInternetArchiveForm(forms.Form):
-    source_url = forms.CharField(label="Source url", max_length=500)
+    source_url = forms.CharField(max_length=500)
     archive_start = forms.DateField(label="Start time")
     archive_stop = forms.DateField(label="Stop time")
+
+
+class ImportFromFilesForm(forms.Form):
+    path = forms.CharField(max_length=500)
+
+    import_title = forms.BooleanField(required=False)
+    import_description = forms.BooleanField(required=False)
+    import_tags = forms.BooleanField(required=False)
+    import_comments = forms.BooleanField(required=False)
+    import_votes = forms.BooleanField(required=False)
+
+    user = forms.CharField(max_length=500, required=False)
+    tag = forms.CharField(max_length=500, required=False)
 
 
 class ExportDailyDataForm(forms.Form):
@@ -197,7 +210,7 @@ class ExportTopicForm(forms.Form):
 
 class TagForm(forms.Form):
     """
-    Import links form
+    Tag links form
     """
 
     tag = forms.CharField(label="Tag name", max_length=500)
@@ -205,7 +218,7 @@ class TagForm(forms.Form):
 
 class YouTubeLinkSimpleForm(forms.Form):
     """
-    Import links form
+    links form
     """
 
     youtube_link = forms.CharField(label="YouTube Link URL", max_length=500)
@@ -213,7 +226,7 @@ class YouTubeLinkSimpleForm(forms.Form):
 
 class OmniSearchForm(forms.Form):
     """
-    Import links form
+    Omni search form
     """
 
     search = forms.CharField(label="Search for", max_length=500, required=False)
@@ -271,7 +284,7 @@ class OmniSearchForm(forms.Form):
 
 class OmniSearchWithArchiveForm(OmniSearchForm):
     """
-    Import links form
+    Omni search with archive links form
     """
 
     archive = forms.BooleanField(label="Search archive", required=False)

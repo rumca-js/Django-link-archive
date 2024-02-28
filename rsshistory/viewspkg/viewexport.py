@@ -125,6 +125,42 @@ def import_from_instance(request):
     return p.render("form_basic.html")
 
 
+def import_from_files(request):
+    from ..forms import ImportFromFilesForm
+
+    p = ViewPage(request)
+    p.set_title("Import from files")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    if request.method == "POST":
+        form = ImportFromFilesForm(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+
+            BackgroundJobController.import_from_files(data)
+
+            p.context["summary_text"] = "Import job added"
+            return p.render("summary_present.html")
+
+        else:
+            p.context["summary_text"] = "Form is invalid"
+            return p.render("summary_present.html")
+
+    else:
+        form = ImportFromFilesForm()
+        form.method = "POST"
+
+        p.context["form_title"] = "Import from files"
+        p.context[
+            "form_description_pre"
+        ] = "Provide detail about the import."
+        p.context["form"] = form
+
+    return p.render("form_basic.html")
+
+
 def get_time_stamps(url, start_time, stop_time):
     time = stop_time
     while time >= start_time:
