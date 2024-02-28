@@ -4,12 +4,14 @@ import json
 from django.contrib.auth.models import User
 
 from ..models import Domains, PersistentInfo, UserBookmarks, UserTags, UserVotes
+
 from ..controllers import (
     LinkDataController,
     SourceDataController,
     SourceDataController,
     LinkDataBuilder,
     SourceDataBuilder,
+    LinkCommentDataController,
 )
 from ..apps import LinkDatabase
 from ..configuration import Configuration

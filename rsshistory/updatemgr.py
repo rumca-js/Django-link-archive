@@ -50,7 +50,7 @@ class UpdateExportManager(object):
         return Path(self.export_data.local_path) / self.directory
 
     def get_repo_operating_dir(self, repo):
-        return Path(self._cfg.get_export_path()) / self.export_data.local_path / "git" / repo.get_repo_name
+        return Path(self._cfg.get_export_path()) / self.export_data.local_path / "git" / repo.get_repo_name()
 
     def push(self):
         export_data = self.export_data
