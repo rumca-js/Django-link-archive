@@ -173,23 +173,27 @@ class UserVotes(models.Model):
         blank=True,
     )
 
-    def save_vote(input_data):
-        from ..controllers import BackgroundJobController
+    def add(user, entry, vote):
+        if not user.is_authenticated:
+            return
 
-        entry_id = input_data["entry_id"]
-        user = input_data["user"]
-        vote = input_data["vote"]
+        votes = UserVotes.objects.filter(user_object = user, entry_object = entry)
 
-        entry = LinkDataModel.objects.get(id=entry_id)
+        if votes.count() == 0:
+            from ..controllers import BackgroundJobController
 
-        votes = UserVotes.objects.filter(user=user, entry_object=entry)
-        votes.delete()
+            votes = UserVotes.objects.filter(user=user, entry_object=entry)
+            votes.delete()
 
-        ob = UserVotes.objects.create(
-            vote=vote,
-            entry_object=entry,
-            user_object=user,
-        )
+            ob = UserVotes.objects.create(
+                vote=vote,
+                entry_object=entry,
+                user_object=user,
+            )
+        else:
+            ob = votes[0]
+            ob.vote = vote
+            ob.save()
 
         # TODO this should be a background task
         entry.update_calculated_vote()
@@ -197,6 +201,18 @@ class UserVotes(models.Model):
         BackgroundJobController.entry_update_data(entry)
 
         return ob
+
+    def save_vote(input_data):
+        """
+        TODO remove this API, probably
+        """
+        entry_id = input_data["entry_id"]
+        user = input_data["user"]
+        vote = input_data["vote"]
+
+        entry = LinkDataModel.objects.get(id=entry_id)
+
+        return UserVotes.add(user, entry, vote)
 
     def cleanup():
         for q in UserVotes.objects.filter(user_object__isnull=True):

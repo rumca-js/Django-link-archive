@@ -26,7 +26,8 @@ class BackgroundJobController(BackgroundJob):
 
         (BackgroundJob.JOB_WRITE_DAILY_DATA, BackgroundJob.JOB_WRITE_DAILY_DATA), # 4
         (BackgroundJob.JOB_WRITE_TOPIC_DATA, BackgroundJob.JOB_WRITE_TOPIC_DATA), # 5
-        (BackgroundJob.JOB_WRITE_BOOKMARKS, BackgroundJob.JOB_WRITE_BOOKMARKS), # 6
+        (BackgroundJob.JOB_WRITE_YEAR_DATA, BackgroundJob.JOB_WRITE_YEAR_DATA), # 6
+        (BackgroundJob.JOB_WRITE_NOTIME_DATA, BackgroundJob.JOB_WRITE_NOTIME_DATA), # 6
 
         (BackgroundJob.JOB_IMPORT_DAILY_DATA, BackgroundJob.JOB_IMPORT_DAILY_DATA), # 7
         (BackgroundJob.JOB_IMPORT_BOOKMARKS, BackgroundJob.JOB_IMPORT_BOOKMARKS), # 8
@@ -63,11 +64,11 @@ class BackgroundJobController(BackgroundJob):
         if self.errors > 5:
             self.enabled = False
 
-        PersistentInfo.create(
-            "Disabling job due to errors {} {} {}".format(
-                self.job, self.subject, self.args
+            PersistentInfo.create(
+                "Disabling job due to errors {} {} {}".format(
+                    self.job, self.subject, self.args
+                )
             )
-        )
 
         # TODO Add notification
 
@@ -76,6 +77,10 @@ class BackgroundJobController(BackgroundJob):
     def enable(self):
         self.errors = 0
         self.enabled = True
+        self.save()
+
+    def disable(self):
+        self.enabled = False
         self.save()
 
     def truncate_invalid_jobs():

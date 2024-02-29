@@ -195,6 +195,9 @@ class PersistentInfo(models.Model):
 
     def create(info, level=int(logging.INFO), user=None):
         try:
+            # TODO replace hardcoded values with something better
+            if len(info) > 2000:
+                info = info[:1999]
             LinkDatabase.info("PersistentInfo::create:{}".format(info))
 
             PersistentInfo.cleanup_overflow()
@@ -208,6 +211,8 @@ class PersistentInfo(models.Model):
 
     def text(info, level=int(logging.INFO), user=None):
         try:
+            if len(info) > 2000:
+                info = info[:1999]
             LinkDatabase.info("PersistentInfo::text:{}".format(info))
 
             PersistentInfo.cleanup_overflow()
@@ -221,6 +226,8 @@ class PersistentInfo(models.Model):
 
     def error(info, level=int(logging.ERROR), user=None):
         try:
+            if len(info) > 2000:
+                info = info[:1999]
             LinkDatabase.info("PersistentInfo::error:{}".format(info))
 
             PersistentInfo.cleanup_overflow()
@@ -236,6 +243,8 @@ class PersistentInfo(models.Model):
         text = "{}. Exception data:\n{}".format(info, str(exc_data))
 
         try:
+            if len(info) > 2000:
+                info = info[:1999]
             LinkDatabase.info("PersistentInfo::exc:{}".format(info))
 
             PersistentInfo.cleanup_overflow()
@@ -301,8 +310,9 @@ class BackgroundJob(models.Model):
     JOB_LINK_DOWNLOAD_VIDEO = "download-video"
     JOB_MOVE_TO_ARCHIVE = "move-to-archive"
     JOB_WRITE_DAILY_DATA = "write-daily-data"
+    JOB_WRITE_YEAR_DATA = "write-year-data"
+    JOB_WRITE_NOTIME_DATA = "write-notime-data"
     JOB_WRITE_TOPIC_DATA = "write-topic-data"
-    JOB_WRITE_BOOKMARKS = "write-bookmarks"
     JOB_IMPORT_DAILY_DATA = "import-daily-data"
     JOB_IMPORT_BOOKMARKS = "import-bookmarks"
     JOB_IMPORT_SOURCES = "import-sources"
@@ -329,7 +339,8 @@ class BackgroundJob(models.Model):
         (JOB_MOVE_TO_ARCHIVE, JOB_MOVE_TO_ARCHIVE),
         (JOB_WRITE_DAILY_DATA, JOB_WRITE_DAILY_DATA),
         (JOB_WRITE_TOPIC_DATA, JOB_WRITE_TOPIC_DATA),
-        (JOB_WRITE_BOOKMARKS, JOB_WRITE_BOOKMARKS),
+        (JOB_WRITE_YEAR_DATA, JOB_WRITE_YEAR_DATA),
+        (JOB_WRITE_NOTIME_DATA, JOB_WRITE_NOTIME_DATA),
         (JOB_IMPORT_DAILY_DATA, JOB_IMPORT_DAILY_DATA),
         (JOB_IMPORT_BOOKMARKS, JOB_IMPORT_BOOKMARKS),
         (JOB_IMPORT_SOURCES, JOB_IMPORT_SOURCES),

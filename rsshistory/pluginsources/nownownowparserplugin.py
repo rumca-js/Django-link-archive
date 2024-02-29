@@ -20,6 +20,5 @@ class NowNowNowParserPlugin(DomainParserPlugin):
         c = Configuration.get_object()
 
         admin_user = User.objects.get(is_superuser=True)
-        admin_username = admin_user.username
 
         UserTags.set_tag(entry, "personal", admin_user)

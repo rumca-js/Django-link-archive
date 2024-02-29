@@ -299,15 +299,27 @@ class LinkDataWrapper(object):
 
         if "language" in link_data and link_data["language"] and len(link_data["language"]) > 9:
             PersistentInfo.create("Language setting too long for:{} {}".format(link_data["link"], link_data["language"]))
+            link_data["language"] = None
+
+        # TODO remove hardcoded links
+        if "title" in link_data and link_data["title"] and len(link_data["title"]) > 999:
+            link_data["title"] = link_data["title"][:998]
+        if "description" in link_data and link_data["description"] and len(link_data["description"]) > 999:
+            link_data["description"] = link_data["description"][:998]
 
         if "id" in link_data:
             del link_data["id"]
 
-        if not is_archive:
-            ob = LinkDataController.objects.create(**link_data)
+        try:
+            if not is_archive:
+                ob = LinkDataController.objects.create(**link_data)
 
-        elif is_archive:
-            ob = ArchiveLinkDataModel.objects.create(**link_data)
+            elif is_archive:
+                ob = ArchiveLinkDataModel.objects.create(**link_data)
+        except Exception as E:
+            error_text = traceback.format_exc()
+            PersistentInfo.error("Cannot create entry {}".format(error_text))
+            return
 
         return ob
 

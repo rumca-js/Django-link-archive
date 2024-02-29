@@ -277,7 +277,7 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         LinkDataWrapper.make_not_bookmarked(request, entry)
 
         self.assertEqual(entry.bookmarked, False)
-        self.assertEqual(UserBookmarks.objects.all().count(), 1)
+        self.assertEqual(UserBookmarks.objects.all().count(), 0)
 
     def test_make_not_bookmarked_not_staff(self):
         add_time = DateUtils.get_datetime_now_utc() - timedelta(days=1)

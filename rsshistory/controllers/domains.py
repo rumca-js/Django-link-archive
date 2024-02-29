@@ -55,7 +55,11 @@ class DomainsController(Domains):
 
         obj = None
         if objs.count() == 0:
-            obj = DomainsController.create_object(domain_only_text, protocol)
+            try:
+                obj = DomainsController.create_object(domain_only_text, protocol)
+            except Exception as E:
+                exc_str = traceback.format_exc()
+                PersistentInfo.create("Cannot create domain data:{}\n{}".format(domain_only_text, exc_str))
         else:
             obj = objs[0]
 

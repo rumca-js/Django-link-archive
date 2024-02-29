@@ -1,5 +1,7 @@
 import logging
 import shutil
+from django.db.models import Q
+
 from ..models import PersistentInfo
 from ..apps import LinkDatabase
 
@@ -159,14 +161,10 @@ class BookmarksBigExporter(object):
                 bookmarked=True, date_published__range=therange
             )
 
-            en_entries = all_entries.filter(language__icontains="en")
-            pl_entries = all_entries.filter(language__icontains="pl")
-
-            converter = BookmarksExporter(self._cfg, en_entries)
-            converter.export("bookmarks_EN", entries_dir / str(year))
-
-            converter = BookmarksExporter(self._cfg, pl_entries)
-            converter.export("bookmarks_PL", entries_dir / str(year))
+            # do not differenciate export on language.
+            # some entries could have not language at all, or some other foreign languages
+            converter = BookmarksExporter(self._cfg, all_entries)
+            converter.export("bookmarks", entries_dir / str(year))
 
 
 class BookmarksTopicExporter(object):

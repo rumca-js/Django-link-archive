@@ -278,8 +278,7 @@ class LinkAddJobHandler(BaseJobHandler):
         # Unpack if link service
         link = data["link"]
         if HtmlPage(link).is_link_service():
-            h = UrlHandler()
-            p = h.get(link)
+            p = UrlHandler.get(link)
             if p.get_contents():
                 link = p.url
                 data["link"] = link
@@ -579,32 +578,51 @@ class ImportFromFilesJobHandler(BaseJobHandler):
         return True
 
 
-class WriteBookmarksJobHandler(BaseJobHandler):
+class WriteYearDataJobHandler(BaseJobHandler):
     """!
-    Writes bookmarks data to disk
+    Writes yearly data to disk
     """
 
     def get_job(self):
-        return BackgroundJob.JOB_WRITE_BOOKMARKS
+        return BackgroundJob.JOB_WRITE_YEAR_DATA
 
     def process(self, obj=None):
         try:
-            from .datawriter import DataWriter
-
-            # some changes could be done externally. Through apache.
-            from django.core.cache import cache
-
-            cache.clear()
+            from .updatemgr import UpdateManager
 
             c = Configuration.get_object()
-            writer = DataWriter(c)
-            writer.write_bookmarks()
+            mgr = UpdateManager(c)
+            mgr.write_year_data()
 
             return True
         except Exception as e:
             error_text = traceback.format_exc()
             PersistentInfo.error(
-                "Exception: Writing bookmarks: {} {}".format(str(e), error_text)
+                "Exception: Writing yearly data: {} {}".format(str(e), error_text)
+            )
+
+
+class WriteNoTimeDataJobHandler(BaseJobHandler):
+    """!
+    Writes yearly data to disk
+    """
+
+    def get_job(self):
+        return BackgroundJob.JOB_WRITE_NOTIME_DATA
+
+    def process(self, obj=None):
+        try:
+            from .updatemgr import UpdateManager
+
+            c = Configuration.get_object()
+            mgr = UpdateManager(c)
+            mgr.write_notime_data()
+
+            return True
+        except Exception as e:
+            error_text = traceback.format_exc()
+            PersistentInfo.error(
+                "Exception: Writing notime: {} {}".format(str(e), error_text)
             )
 
 
@@ -934,7 +952,8 @@ class HandlerManager(object):
             PushNoTimeDataToRepoJobHandler(),
 
             WriteDailyDataJobHandler(),
-            WriteBookmarksJobHandler(),
+            WriteYearDataJobHandler(),
+            WriteNoTimeDataJobHandler(),
             WriteTopicJobHandler(),
 
             ImportSourcesJobHandler(),
@@ -1026,8 +1045,8 @@ class HandlerManager(object):
         except Exception as E:
             error_text = traceback.format_exc()
             PersistentInfo.error(
-                "Exception during handler processing {}\n{}\n{}\n{}".format(
-                    handler.get_job(), subject, str(E), error_text
+                "Exception during handler processing job:{}\nsubject:{}\nException:{}\nError text:{}".format(
+                    obj.job, obj.subject, str(E), error_text
                 )
             )
             if not deleted and obj:

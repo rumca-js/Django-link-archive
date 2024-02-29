@@ -1,5 +1,6 @@
 import os
 import json
+import traceback
 
 from django.contrib.auth.models import User
 
@@ -12,6 +13,7 @@ from ..controllers import (
     LinkDataBuilder,
     SourceDataBuilder,
     LinkCommentDataController,
+    LinkDataWrapper,
 )
 from ..apps import LinkDatabase
 from ..configuration import Configuration
@@ -53,8 +55,17 @@ class BaseImporter(object):
         if self.user is None:
             self.user = self.get_superuser()
 
-        # could be -import_title
         self.import_settings = import_settings
+        if self.import_settings is None:
+            self.import_settings = {}
+            self.import_settings['import_entries'] = True
+            self.import_settings['import_sources'] = True
+            self.import_settings['import_title'] = True
+            self.import_settings['import_description'] = True
+            self.import_settings['import_tags'] = True
+            self.import_settings['import_comments'] = True
+            self.import_settings['import_votes'] = True
+            self.import_settings['import_bookmarks'] = True
 
     def import_from_json(self, json_data):
         if "links" in json_data:
@@ -90,7 +101,11 @@ class BaseImporter(object):
         LinkDatabase.info("Import from links")
 
         for link_data in json_data:
-            self.import_from_link(link_data)
+            try:
+                self.import_from_link(link_data)
+            except Exception as E:
+                exc_string = traceback.format_exc()
+                PersistentInfo.error("Cannot import link {}\nExc:{}".format(str(E), exc_string))
 
         return True
 
@@ -98,11 +113,34 @@ class BaseImporter(object):
         LinkDatabase.info("Import from sources")
 
         for source_data in json_data:
-            self.import_from_source(source_data)
+            try:
+                self.import_from_source(source_data)
+            except Exception as E:
+                exc_string = traceback.format_exc()
+                PersistentInfo.error("Cannot import source {}\nExc:{}".format(str(E), exc_string))
 
         return True
 
+    def copy_props(self, entry, clean_data):
+        if self.import_settings and self.import_settings["import_bookmarks"]:
+            if "bookmarked" in clean_data:
+                entry.bookmarked = clean_data["bookmarked"]
+        if "permanent" in clean_data:
+            entry.permanent = clean_data["permanent"]
+        if self.import_settings and self.import_settings["import_title"]:
+            if "title" in clean_data:
+                entry.title = clean_data["title"]
+        if self.import_settings and self.import_settings["import_description"]:
+            if "description" in clean_data:
+                entry.description = clean_data["description"]
+        if "date_published" in clean_data:
+            entry.date_published = clean_data["date_published"]
+        entry.save()
+
     def import_from_link(self, json_data):
+        """
+        TODO please refactor this function. It is too big
+        """
         c = Configuration.get_object().config_entry
 
         tags = []
@@ -121,44 +159,52 @@ class BaseImporter(object):
 
         entries = LinkDataController.objects.filter(link=clean_data["link"])
         if entries.count() == 0:
-            # This instance can have their own settings for import, may decide what is
-            # accepted and not. Let the builder deal with it
-            LinkDatabase.info("Importing link:{}".format(clean_data["link"]))
-            b = LinkDataBuilder(link_data=clean_data, source_is_auto=True)
-            entry = b.result
+            if self.import_settings and self.import_settings["import_entries"]:
+                # This instance can have their own settings for import, may decide what is
+                # accepted and not. Let the builder deal with it
+                LinkDatabase.info("Importing link:{}".format(clean_data["link"]))
+
+                b = LinkDataBuilder(link_data=clean_data, source_is_auto=True)
+                entry = b.result
+
+                if entry and entry.is_archive_entry():
+                    entry = LinkDataWrapper.move_from_archive(entry)
+
+                    self.copy_props(entry, clean_data)
         else:
             entry = entries[0]
-            if clean_data["bookmarked"] and not entry.bookmarked:
-                entry.bookmarked = True
 
-            if clean_data["permanent"] and not entry.permanent:
-                entry.permanent = True
-
-            entry.save()
+            self.copy_props(entry, clean_data)
 
         if entry:
-            if entry.bookmarked:
-                UserBookmarks.add(self.user, entry)
-            else:
-                UserBookmarks.remove_entry(entry)
+            if self.import_settings and self.import_settings["import_bookmarks"]:
+                if entry.bookmarked:
+                    UserBookmarks.add(self.user, entry)
+                else:
+                    UserBookmarks.remove_entry(entry)
 
-            if len(tags) > 0:
-                user = self.get_superuser()
-                entry.tag(tags, user)
+            if self.import_settings and self.import_settings["import_tags"]:
+                if len(tags) > 0:
+                    user = self.get_superuser()
+                    for tag in tags:
+                        UserTags.set_tag(entry, tag, user)
 
-            if vote is not None:
-                entry.vote(vote)
+            if self.import_settings and self.import_settings["import_votes"]:
+                if vote is not None:
+                    UserVotes.add(self.user, entry, vote)
 
-            if len(comments) > 0:
-                for comment in comments:
-                    data = {}
-                    data["entry_object"] = entry
-                    data["user"] = self.get_user(comment["user"])
-                    data["comment"] = comment["comment"]
-                    data["date_published"] = comment["date_published"]
-                    data["date_edited"] = comment["date_edited"]
-                    data["reply_id"] = comment["reply_id"]
-                    LinkCommentDataController.save_comment(data)
+            if self.import_settings and self.import_settings["import_comments"]:
+                if len(comments) > 0:
+                    for comment in comments:
+                        user = self.get_user(comment["user"])
+                        data = {}
+                        data["entry_object"] = entry
+                        data["user"] = user
+                        data["comment"] = comment["comment"]
+                        data["date_published"] = comment["date_published"]
+                        data["date_edited"] = comment["date_edited"]
+                        data["reply_id"] = comment["reply_id"]
+                        LinkCommentDataController.add(user, entry, data)
 
         return True
 
@@ -183,6 +229,7 @@ class BaseImporter(object):
             if instance_import:
                 clean_data["on_hold"] = True
             SourceDataBuilder(link_data=clean_data).add_from_props()
+        # TODO cleanup
         #else:
         #    if instance_import:
         #        source = sources[0]
@@ -245,6 +292,10 @@ class FileImporter(BaseImporter):
         PersistentInfo.create("Importing from a file")
         super().__init__(user)
 
+        if not os.path.isdir(path):
+            PersistentInfo.create("Directory does not exist!")
+            return
+
         self.import_from_path(path)
 
     def import_from_path(self, path):
@@ -278,6 +329,8 @@ class InstanceImporter(BaseImporter):
         try:
             json_data = json.loads(instance_text)
         except Exception as E:
+            exc_string = traceback.format_exc()
+            PersistentInfo.create("Cannot load JSON:{}\nExc:{}".format(instance_text, exc_string))
             return
 
         if "links" in json_data:

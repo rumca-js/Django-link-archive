@@ -159,11 +159,14 @@ class ImportSourceRangeFromInternetArchiveForm(forms.Form):
 class ImportFromFilesForm(forms.Form):
     path = forms.CharField(max_length=500)
 
+    import_entries = forms.BooleanField(required=False)
+    import_sources = forms.BooleanField(required=False)
     import_title = forms.BooleanField(required=False)
     import_description = forms.BooleanField(required=False)
     import_tags = forms.BooleanField(required=False)
     import_comments = forms.BooleanField(required=False)
     import_votes = forms.BooleanField(required=False)
+    import_bookmarks = forms.BooleanField(required=False)
 
     user = forms.CharField(max_length=500, required=False)
     tag = forms.CharField(max_length=500, required=False)

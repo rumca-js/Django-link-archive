@@ -50,7 +50,7 @@ class UpdateExportManager(object):
         return Path(self.export_data.local_path) / self.directory
 
     def get_repo_operating_dir(self, repo):
-        return Path(self._cfg.get_export_path()) / self.export_data.local_path / "git" / repo.get_repo_name()
+        return Path(self._cfg.get_export_path()) / self.export_data.local_path / "git"
 
     def push(self):
         export_data = self.export_data
@@ -79,7 +79,7 @@ class UpdateExportManager(object):
             repo = repo_class(export_data)
 
             operating_dir = self.get_repo_operating_dir(repo)
-            repo.set_local_dir(operating_dir)
+            repo.set_operating_dir(operating_dir)
 
             repo.up()
 
@@ -173,3 +173,54 @@ class UpdateManager(object):
             mgr.process()
 
         PersistentInfo.create("Pushing data to git - notime data - DONE")
+
+    def write_daily_data(self, input_date=""):
+        """
+        TODO the functions below look like functions. above. refactor?
+        """
+        PersistentInfo.create("Writing data - daily data")
+
+        if input_date == "":
+            write_date = DateUtils.get_date_yesterday()
+        else:
+            write_date = datetime.strptime(input_date, "%Y-%m-%d").date()
+
+        all_export_data = DataExport.objects.filter(
+            export_data=DataExport.EXPORT_DAILY_DATA, enabled=True
+        )
+
+        for export_data in all_export_data:
+            mgr = UpdateExportManager(
+                self._cfg, self.repo_builder, export_data, "daily_data", write_date
+            )
+            mgr.write()
+
+        PersistentInfo.create("Writing data - daily data DONE")
+
+    def write_year_data(self):
+        PersistentInfo.create("Writing data - year data")
+
+        all_export_data = DataExport.objects.filter(
+            export_data=DataExport.EXPORT_YEAR_DATA, enabled=True
+        )
+
+        for export_data in all_export_data:
+            mgr = UpdateExportManager(self._cfg, self.repo_builder, export_data, "year")
+            mgr.write()
+
+        PersistentInfo.create("Writing data - year data - DONE")
+
+    def write_notime_data(self):
+        PersistentInfo.create("Writing data - notime data")
+
+        all_export_data = DataExport.objects.filter(
+            export_data=DataExport.EXPORT_NOTIME_DATA, enabled=True
+        )
+
+        for export_data in all_export_data:
+            mgr = UpdateExportManager(
+                self._cfg, self.repo_builder, export_data, "notime"
+            )
+            mgr.write()
+
+        PersistentInfo.create("Writing data - notime data - DONE")

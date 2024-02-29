@@ -83,7 +83,7 @@ class DomainsTlds(models.Model):
 
 
 class DomainsMains(models.Model):
-    main = models.CharField(max_length=20, null=True, unique=True)
+    main = models.CharField(max_length=200, null=True, unique=True)
 
     def add(main):
         mains = DomainsMains.objects.filter(main=main)

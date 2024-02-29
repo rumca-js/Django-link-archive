@@ -45,7 +45,36 @@ class LinkCommentDataController(LinkCommentDataModel):
 
         return True
 
+    def add(user, entry, data):
+        if not user.is_authenticated:
+            return
+
+        date_published=data["date_published"]
+        comments = LinkCommentDataModel.objects.filter(user_object = user, entry_object = entry, date_published = date_published)
+
+        if comments.count() == 0:
+            reply_id = None
+            if "reply_id" in data:
+                reply_id = data["reply_id"]
+
+            if "date_edited" not in data:
+                data["date_edited"] = DateUtils.get_datetime_now_utc()
+
+            return LinkCommentDataModel.objects.create(
+                comment=data["comment"],
+                date_published=data["date_published"],
+                date_edited=data["date_edited"],
+                entry_object=entry,
+                user_object=user,
+                reply_id = reply_id,
+            )
+
     def save_comment(data):
+        """
+        TODO remove or refactor with the function above
+        """
+        entry = None
+
         if "entry_object" in data:
             entry = data["entry_object"]
 
@@ -57,24 +86,9 @@ class LinkCommentDataController(LinkCommentDataModel):
             return
 
         user = data["user"]
-        if not user.is_authenticated:
-            return
 
-        reply_id = None
-        if "reply_id" in data:
-            reply_id = data["reply_id"]
+        LinkCommentDataController.add(user, entry, data)
 
-        if "date_edited" not in data:
-            data["date_edited"] = DateUtils.get_datetime_now_utc()
-
-        return LinkCommentDataModel.objects.create(
-            comment=data["comment"],
-            date_published=data["date_published"],
-            date_edited=data["date_edited"],
-            entry_object=entry,
-            user_object=user,
-            reply_id = reply_id,
-        )
 
     def is_html_contents(text):
         from bs4 import BeautifulSoup

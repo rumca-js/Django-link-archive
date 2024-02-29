@@ -26,6 +26,7 @@ from ..controllers import (
     LinkDataController,
     ArchiveLinkDataController,
     LinkCommentDataController,
+    BackgroundJobController,
 )
 from ..configuration import Configuration
 from ..forms import ConfigForm, UserConfigForm, BackgroundJobForm
@@ -261,9 +262,8 @@ def backgroundjob_enable(request, pk):
     if data is not None:
         return data
 
-    job = BackgroundJob.objects.get(id=pk)
-    job.enabled = True
-    job.save()
+    job = BackgroundJobController.objects.get(id=pk)
+    job.enable()
 
     return HttpResponseRedirect(reverse("{}:backgroundjobs".format(LinkDatabase.name)))
 
@@ -275,9 +275,8 @@ def backgroundjob_disable(request, pk):
     if data is not None:
         return data
 
-    job = BackgroundJob.objects.get(id=pk)
-    job.enabled = False
-    job.save()
+    job = BackgroundJobController.objects.get(id=pk)
+    job.disable()
 
     return HttpResponseRedirect(reverse("{}:backgroundjobs".format(LinkDatabase.name)))
 
