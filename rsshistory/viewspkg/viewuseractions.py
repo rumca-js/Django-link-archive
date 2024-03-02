@@ -393,10 +393,7 @@ def entry_vote(request, pk):
     else:
         user = request.user
 
-        vote = 0
-        votes = obj.votes.filter(user=user)
-        if votes.count() > 0:
-            vote = votes[0].vote
+        vote = UserVotes.get_user_vote(user, obj)
 
         form = LinkVoteForm(
             initial={

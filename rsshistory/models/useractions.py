@@ -198,6 +198,7 @@ class UserVotes(models.Model):
         # TODO this should be a background task
         entry.update_calculated_vote()
 
+        from ..controllers import BackgroundJobController
         BackgroundJobController.entry_update_data(entry)
 
         return ob
