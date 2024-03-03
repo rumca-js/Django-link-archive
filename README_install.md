@@ -16,6 +16,7 @@ Steps:
 
 Notes:
  - it is best to use on a device with SSD
+ - do not use SQLlite for production, or more advanced setups https://docs.djangoproject.com/en/5.0/ref/databases/#sqlite-notes
 
 # Prerequisites
 
