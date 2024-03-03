@@ -256,11 +256,6 @@ class BackgroundJobController(BackgroundJob):
             BackgroundJob.JOB_WRITE_TOPIC_DATA, tag
         )
 
-    def write_bookmarks():
-        return BackgroundJobController.create_single_job(
-            BackgroundJob.JOB_WRITE_BOOKMARKS
-        )
-
     def import_daily_data():
         return BackgroundJobController.create_single_job(
             BackgroundJob.JOB_IMPORT_DAILY_DATA

@@ -1,5 +1,9 @@
 """
 API needs to check user privileges.
+
+Do not include model.User, include it only in functions.
+Otherwise running tests might not work in postgresql.
+https://github.com/pinax/django-user-accounts/issues/179
 """
 
 import traceback
@@ -76,12 +80,13 @@ class UserTags(models.Model):
         """
         Adds additional tag
         """
+        if not user:
+            return
+
         if not entry:
             PersistentInfo.error("Incorrect call of tags, entry does not exist")
 
-        user_name = ""
-        if user:
-            user_name = user.username
+        user_name = user.username
 
         objs = UserTags.objects.filter(
             entry_object=entry, user_object=user, tag=tag_name
@@ -174,6 +179,9 @@ class UserVotes(models.Model):
     )
 
     def add(user, entry, vote):
+        if not user:
+            return
+    
         if not user.is_authenticated:
             return
 
@@ -203,10 +211,15 @@ class UserVotes(models.Model):
 
         return ob
 
+    def get_user_vote(user, entry):
+        votes = UserVotes.objects.filter(user_object=user, entry_object=entry)
+        if votes.count() > 0:
+            vote = votes[0].vote
+            return vote
+
+        return 0
+
     def save_vote(input_data):
-        """
-        TODO remove this API, probably
-        """
         entry_id = input_data["entry_id"]
         user = input_data["user"]
         vote = input_data["vote"]
@@ -289,6 +302,9 @@ class UserBookmarks(models.Model):
     )
 
     def add(user, entry):
+        if not user:
+            return
+
         if not user.is_authenticated:
             return
 

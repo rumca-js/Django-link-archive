@@ -194,18 +194,6 @@ class HandlerManagerTest(FakeInternetTestCase):
             handler.get_job(), BackgroundJobController.JOB_WRITE_DAILY_DATA
         )
 
-    def test_get_handler_and_object_write_bookmarks_handler(self):
-        bg_obj = BackgroundJobController.objects.create(
-            job=BackgroundJobController.JOB_WRITE_BOOKMARKS
-        )
-
-        mgr = HandlerManager()
-        # call tested function
-        handler_obj, handler = mgr.get_handler_and_object()
-
-        self.assertEqual(bg_obj, handler_obj)
-        self.assertEqual(handler.get_job(), BackgroundJobController.JOB_WRITE_BOOKMARKS)
-
     def test_get_handler_and_object_write_topic_handler(self):
         bg_obj = BackgroundJobController.objects.create(
             job=BackgroundJobController.JOB_WRITE_TOPIC_DATA

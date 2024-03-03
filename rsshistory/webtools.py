@@ -736,8 +736,6 @@ class DomainAwarePage(BasePage):
             return True
         if url.find("bit.ly") >= 0:
             return True
-        if url.find("amzn.to") >= 0:
-            return True
         if url.find("ow.ly") >= 0:
             return True
         if url.find("adfoc.us") >= 0:
@@ -749,6 +747,18 @@ class DomainAwarePage(BasePage):
         if url.find("dbh.la") >= 0:
             return True
         if url.find("ffm.to") >= 0:
+            return True
+        if url.find("kit.co") >= 0:
+            return True
+        if url.find("utm.io") >= 0:
+            return True
+        if url.find("tiny.pl") >= 0:
+            return True
+        if url.find("reurl.cc") >= 0:
+            return True
+
+        # shortcuts
+        if url.find("amzn.to") >= 0:
             return True
 
         return False

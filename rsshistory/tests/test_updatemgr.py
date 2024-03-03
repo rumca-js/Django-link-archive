@@ -34,7 +34,7 @@ class BaseRepo(object):
     def copy_tree(self, input_path):
         self.is_copy_tree = True
 
-    def set_local_dir(self, adir):
+    def set_operating_dir(self, adir):
         self.local_dir = adir
 
     def get_repo_name(self):

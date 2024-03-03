@@ -192,24 +192,6 @@ class BackgroundJobControllerTest(FakeInternetTestCase):
             1,
         )
 
-    def test_write_bookmarks(self):
-        self.assertEqual(
-            BackgroundJobController.get_number_of_jobs(
-                BackgroundJob.JOB_WRITE_BOOKMARKS
-            ),
-            0,
-        )
-
-        # call tested function
-        BackgroundJobController.write_bookmarks()
-
-        self.assertEqual(
-            BackgroundJobController.get_number_of_jobs(
-                BackgroundJob.JOB_WRITE_BOOKMARKS
-            ),
-            1,
-        )
-
     def test_import_bookmarks(self):
         self.assertEqual(
             BackgroundJobController.get_number_of_jobs(
