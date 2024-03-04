@@ -6,8 +6,8 @@
   <div>
   {% for comment in object.comments.all %}
       <div>{{comment.get_comment | safe | linebreaks}}</div>
-      <div>{{comment.date_published}} {{comment.author}}
-          {% if comment.author == user.get_username %}
+      <div>{{comment.date_published}} {{comment.user_object}}
+          {% if comment.user_object.username == user.get_username %}
             <a href="{% url 'rsshistory:entry-comment-edit' comment.id %}" class="simplebutton" title="Edit comment">
                <img src="{% static 'rsshistory/icons/icons8-edit-100.png' %}" class="content-icon" />
             </a>

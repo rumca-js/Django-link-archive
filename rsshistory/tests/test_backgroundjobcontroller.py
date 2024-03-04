@@ -53,7 +53,7 @@ class BackgroundJobControllerTest(FakeInternetTestCase):
         # call tested function
         self.assertEqual(
             BackgroundJobController.get_job_priority(BackgroundJob.JOB_PROCESS_SOURCE),
-            12,
+            13,
         )
 
         # call tested function

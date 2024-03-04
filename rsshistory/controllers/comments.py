@@ -46,6 +46,12 @@ class LinkCommentDataController(LinkCommentDataModel):
         return True
 
     def add(user, entry, data):
+        if not user:
+            return
+
+        if not entry:
+            return
+
         if not user.is_authenticated:
             return
 
@@ -87,8 +93,7 @@ class LinkCommentDataController(LinkCommentDataModel):
 
         user = data["user"]
 
-        LinkCommentDataController.add(user, entry, data)
-
+        return LinkCommentDataController.add(user, entry, data)
 
     def is_html_contents(text):
         from bs4 import BeautifulSoup

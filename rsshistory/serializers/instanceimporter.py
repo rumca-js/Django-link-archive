@@ -198,8 +198,13 @@ class BaseImporter(object):
                     for comment in comments:
                         user = self.get_user(comment["user"])
                         data = {}
-                        data["entry_object"] = entry
-                        data["user"] = user
+
+                        if entry:
+                            data["entry_object"] = entry
+
+                        if user:
+                            data["user"] = user
+
                         data["comment"] = comment["comment"]
                         data["date_published"] = comment["date_published"]
                         data["date_edited"] = comment["date_edited"]

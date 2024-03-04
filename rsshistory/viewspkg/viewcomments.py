@@ -43,7 +43,7 @@ def entry_add_comment(request, link_id):
             data = form.cleaned_data
             data["user"] = request.user
 
-            if LinkCommentDataController.save_comment(form.cleaned_data):
+            if LinkCommentDataController.add(request.user, link, form.cleaned_data):
                 return HttpResponseRedirect(
                     reverse(
                         "{}:entry-detail".format(LinkDatabase.name),
@@ -139,11 +139,9 @@ def entry_comment_remove(request, pk):
         return data
 
     comment_obj = LinkCommentDataController.objects.get(id=pk)
-    link = comment_obj.link_obj
+    link = comment_obj.entry_object
 
-    author = request.user.username
-
-    if author != comment_obj.author:
+    if request.user.id != comment_obj.user_object.id:
         p.context["summary_text"] = "You are not the author!"
         return p.render("summary_present.html")
 

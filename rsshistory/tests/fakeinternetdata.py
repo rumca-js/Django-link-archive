@@ -993,8 +993,8 @@ instance_entries_source_100_json = """
       ],
       "vote": 0,
       "comments": [
-        "comment1",
-        "comment2"
+         {"comment": "test", "user": "testuser", "date_published": "2024-02-25T11:35:31.382590+00:00", "date_edited": "2024-02-25T11:35:31.382590+00:00", "reply_id": null
+         }
       ]
     }
   ]

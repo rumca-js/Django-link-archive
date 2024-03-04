@@ -5,12 +5,17 @@ from django.utils import timezone
 from django.urls import reverse
 
 from ..models import KeyWords
+from ..configuration import Configuration
 from .fakeinternet import FakeInternetTestCase
 
 
 class KeyWordsTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
+
+        c = Configuration.get_object().config_entry
+        c.auto_store_keyword_info = True
+        c.save()
 
         KeyWords.objects.all().delete()
 

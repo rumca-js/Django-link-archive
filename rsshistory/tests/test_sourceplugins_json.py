@@ -1,4 +1,5 @@
 import json
+from django.contrib.auth.models import User
 
 from ..configuration import Configuration
 from ..controllers import SourceDataController, LinkDataController
@@ -11,6 +12,10 @@ from .fakeinternetdata import instance_entries_source_100_json, instance_entries
 class BaseJsonPluginTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
+
+        self.user = User.objects.create_user(
+            username="testuser", password="testpassword", is_superuser=True,
+        )
 
     def test_get_container_elements_source(self):
         LinkDataController.objects.all().delete()

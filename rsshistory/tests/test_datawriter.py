@@ -141,7 +141,7 @@ class DataWriterTest(FakeInternetTestCase):
             / self.export_year.local_path
             / "year"
             / "2023"
-            / "bookmarks_EN_entries.json"
+            / "bookmarks_entries.json"
         )
         print("Test JSON path")
         print(str(json_file))
