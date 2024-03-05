@@ -86,11 +86,11 @@ def entry_comment_edit(request, pk):
         return data
 
     comment_obj = LinkCommentDataController.objects.get(id=pk)
-    link = comment_obj.link_obj
+    link = comment_obj.entry_object
 
-    author = request.user.username
+    user = request.user
 
-    if author != comment_obj.author:
+    if user != comment_obj.user_object:
         p.context["summary_text"] = "You are not the author!"
         return p.render("summary_present.html")
 
@@ -101,9 +101,12 @@ def entry_comment_edit(request, pk):
             comment_obj.comment = form.cleaned_data["comment"]
             comment_obj.save()
 
-            p.context["summary_text"] = "Comment edited"
-
-            return p.render("summary_present.html")
+            return HttpResponseRedirect(
+                reverse(
+                    "{}:entry-detail".format(LinkDatabase.name),
+                    kwargs={"pk": link.pk},
+                )
+            )
         else:
             p.context["summary_text"] = "Form is not valid"
 

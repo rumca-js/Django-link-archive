@@ -555,6 +555,7 @@ class BasePage(object):
         items = urlparse(self.url)
         if items.netloc is None or str(items.netloc) == "":
             return self.url
+
         return self.protocol + "://" + str(items.netloc)
 
     def get_domain_only(self):

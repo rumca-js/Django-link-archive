@@ -257,3 +257,13 @@ class LinkDataControllerTest(FakeInternetTestCase):
         self.assertEqual(entry.description, "my description")
         self.assertEqual(entry.date_published, add_time)
         # self.assertEqual(entry.date_update_last, date_updated)
+
+    def get_cleaned_link(self):
+        cleaned_link = LinkDataController.get_cleaned_link("https://youtube.com/test/")
+        self.assertEqual(cleaned_link, "https://youtube.com/test")
+
+        cleaned_link = LinkDataController.get_cleaned_link("https://YouTube.com/test/")
+        self.assertEqual(cleaned_link, "https://youtube.com/test")
+
+        cleaned_link = LinkDataController.get_cleaned_link("HTTPS://YouTube.com/test/")
+        self.assertEqual(cleaned_link, "https://youtube.com/test")

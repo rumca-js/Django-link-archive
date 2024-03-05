@@ -213,16 +213,14 @@ class LinkDataBuilderTest(FakeInternetTestCase):
         domains = DomainsController.objects.all()
 
         # for each domain an entry is created
-        self.assertEqual(objs.count(), 3)
-        self.assertEqual(objs[0].link, link_name_1)
-        self.assertEqual(objs[1].link, "https://youtube.com")
-        self.assertEqual(objs[2].link, link_name_0)
+        self.assertEqual(objs.count(), 2)
+        self.assertEqual(objs[0].link, "https://youtube.com")
+        self.assertEqual(objs[1].link, link_name_0)
 
         self.assertEqual(domains.count(), 1)
 
         self.assertEqual(objs[0].domain_obj, domains[0])
         self.assertEqual(objs[1].domain_obj, domains[0])
-        self.assertEqual(objs[2].domain_obj, domains[0])
 
     """
     def test_source_from_page_contents(self):

@@ -121,5 +121,11 @@ class CommentsViewsTests(FakeInternetTestCase):
 
         url = reverse("{}:entry-comment-remove".format(LinkDatabase.name), args=[entry.id])
 
+        # call user action
+        response = self.client.post(url)
+
+        # redirect to view the link again
+        self.assertEqual(response.status_code, 200)
+
         entries = LinkCommentDataModel.objects.filter(entry_object=entry)
         self.assertEqual(entries.count(), 0)
