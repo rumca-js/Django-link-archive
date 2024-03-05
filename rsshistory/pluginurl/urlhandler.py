@@ -27,7 +27,7 @@ class UrlHandler(object):
     odysee_video_handler = OdyseeVideoHandler
     odysee_channel_handler = OdyseeChannelHandler
 
-    def get(url, fast_check=True, use_selenium=False):
+    def get(url, fast_check=True, use_selenium=False, page_options=None):
         if not url or url == "":
             lines = traceback.format_stack()
             line_text = ""
@@ -58,16 +58,20 @@ class UrlHandler(object):
         if UrlHandler.is_odysee_channel(short_url):
             return UrlHandler.odysee_channel_handler(url)
 
-        options = UrlHandler.get_url_options(url)
-        if options.is_not_selenium() and use_selenium:
-            options.use_selenium_headless = True
-        options.fast_parsing = fast_check
+        if not page_options:
+            options = UrlHandler.get_url_options(url)
+            if options.is_not_selenium() and use_selenium:
+                options.use_selenium_headless = True
+            options.fast_parsing = fast_check
+        else:
+            options = page_options
 
         page = Url.get(url, options=options)
 
         # if response is cloudflare jibberish, try using selenium
         if options.is_not_selenium() and (
-            not page.is_valid() or page.is_cloudflare_protected()
+            (not page.is_valid() or page.is_cloudflare_protected()) or
+            (page.status_code == 403)
         ):
             LinkDatabase.info(
                 "Could not normally obtain contents. Trying selenium:".format(url)

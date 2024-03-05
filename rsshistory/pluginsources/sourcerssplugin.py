@@ -47,18 +47,28 @@ class BaseRssPlugin(SourceGenericPlugin):
         fast_check = False
 
         if self.is_html(fast_check=fast_check):
-            h = HtmlPage(self.get_address(), page_object=self)
-            rss_contents = h.get_body_text()
+            h = UrlHandler.get(self.get_address(), page_options = self.options)
+            if type(h) is HtmlPage:
+                rss_contents = h.get_body_text()
 
-            self.reader = RssPage(self.get_address(), contents=rss_contents)
+                self.reader = RssPage(self.get_address(), contents=rss_contents)
 
-            if not self.reader.is_rss(fast_check=fast_check):
-                self.store_error(source, "HTML body does not provide RSS", contents)
+                if not self.reader.is_rss(fast_check=fast_check):
+                    self.store_error(source, "HTML body does not provide RSS", contents)
+                    self.dead = True
+
+                    return None
+                else:
+                    contents = rss_contents
+            elif type(h) is RssPage:
+                contents = h.get_contents()
+            else:
+                contents = h.get_contents()
+
+                self.store_error(source, "Page does not provide RSS", contents)
                 self.dead = True
 
                 return None
-            else:
-                contents = rss_contents
 
         self.contents = contents
 
@@ -77,7 +87,7 @@ class BaseRssPlugin(SourceGenericPlugin):
         )
 
     def get_contents_size_limit(self):
-        return 400
+        return 800
 
     def get_container_elements(self):
         """

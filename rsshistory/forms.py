@@ -129,6 +129,9 @@ class DataExportForm(forms.ModelForm):
         self.fields["remote_path"].help_text = "Can be empty"
         self.fields["user"].help_text = "Can be empty"
         self.fields["password"].help_text = "Can be empty"
+        self.fields["local_path"].help_text = "Local path is relative to main configuration export path"
+        self.fields["export_entries_bookmarks"].help_text = "Export entries has to be checked for this to work"
+        self.fields["export_entries_permanents"].help_text = "Export entries has to be checked for this to work"
 
 
 class UserConfigForm(forms.ModelForm):
