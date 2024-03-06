@@ -2,7 +2,7 @@ import logging
 import shutil
 from django.db.models import Q
 
-from ..models import PersistentInfo
+from ..models import AppLogging
 from ..apps import LinkDatabase
 
 
@@ -103,7 +103,7 @@ $channel_text
             return t.safe_substitute(map_data)
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.error(
+            AppLogging.error(
                 "Template exception {0} {1} {2} {3}".format(
                     template_text, str(map_data), str(e), error_text
                 )

@@ -9,7 +9,7 @@ from ..controllers import (
 )
 from ..models import (
     BackgroundJob,
-    PersistentInfo,
+    AppLogging,
     DataExport,
     SourceExportHistory,
     KeyWords,
@@ -440,7 +440,7 @@ class RefreshThreadHandlerTest(FakeInternetTestCase):
             1,
         )
 
-        persistent_objects = PersistentInfo.objects.all()
+        persistent_objects = AppLogging.objects.all()
 
         for persistent_object in persistent_objects:
             print("Persisten object info:{}".format(persistent_object.info))
@@ -504,15 +504,15 @@ class CleanJobHandlerTest(FakeInternetTestCase):
         conf.auto_store_domain_info = True
         conf.save()
 
-        p = PersistentInfo.objects.create(info="info1", level=10, user="test")
+        p = AppLogging.objects.create(info_text="info1", level=10, user="test")
         p.date = DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M")
         p.save()
 
-        p = PersistentInfo.objects.create(info="info2", level=10, user="test")
+        p = AppLogging.objects.create(info_text="info2", level=10, user="test")
         p.date = DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M")
         p.save()
 
-        p = PersistentInfo.objects.create(info="info3", level=10, user="test")
+        p = AppLogging.objects.create(info_text="info3", level=10, user="test")
         p.date = DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M")
         p.save()
 
@@ -583,7 +583,7 @@ class CleanJobHandlerTest(FakeInternetTestCase):
         # cleanup of links, domains may trigger creating new entries, which may
         # trigger unwanted dependencies
 
-        persistent_objects = PersistentInfo.objects.all()
+        persistent_objects = AppLogging.objects.all()
 
         for persistent_object in persistent_objects:
             print("Persisten object info:{}".format(persistent_object.info))
@@ -605,7 +605,7 @@ class CleanJobHandlerTest(FakeInternetTestCase):
         handler = CleanupJobHandler()
         handler.process()
 
-        persistent_objects = PersistentInfo.objects.all()
+        persistent_objects = AppLogging.objects.all()
 
         for persistent_object in persistent_objects:
             print("Persisten object info:{}".format(persistent_object.info))
@@ -639,7 +639,7 @@ class AddJobHandlerTest(FakeInternetTestCase):
         handler = LinkAddJobHandler()
         handler.process(ob)
 
-        persistent_objects = PersistentInfo.objects.all()
+        persistent_objects = AppLogging.objects.all()
 
         for persistent_object in persistent_objects:
             print("Persisten object info:{}".format(persistent_object.info))
@@ -663,7 +663,7 @@ class AddJobHandlerTest(FakeInternetTestCase):
         handler = LinkAddJobHandler()
         handler.process(ob)
 
-        persistent_objects = PersistentInfo.objects.all()
+        persistent_objects = AppLogging.objects.all()
 
         for persistent_object in persistent_objects:
             print("Persisten object info:{}".format(persistent_object.info))
@@ -694,7 +694,7 @@ class ScanLinkJobHandlerTest(FakeInternetTestCase):
         handler = LinkScanJobHandler()
         handler.process(ob)
 
-        persistent_objects = PersistentInfo.objects.all()
+        persistent_objects = AppLogging.objects.all()
 
         for persistent_object in persistent_objects:
             print("Persisten object info:{}".format(persistent_object.info))
@@ -757,9 +757,9 @@ class ProcessSourceHandlerTest(FakeInternetTestCase):
         # call tested function
         result = handler.process(ob)
 
-        persistent_objects = PersistentInfo.objects.all()
+        persistent_objects = AppLogging.objects.all()
         for persistent_object in persistent_objects:
-            print("Persisten object info:{}".format(persistent_object.info))
+            print("AppLogging object info:{}".format(persistent_object.info))
 
         self.assertEqual(persistent_objects.count(), 0)
 

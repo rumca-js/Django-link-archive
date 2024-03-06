@@ -2,7 +2,7 @@ import traceback
 from dateutil import parser
 import json
 
-from ..models import PersistentInfo
+from ..models import AppLogging
 from ..apps import LinkDatabase
 from ..webtools import BasePage
 
@@ -50,14 +50,14 @@ class BaseSourceJsonPlugin(SourceGenericPlugin):
             contents = BasePage(address).get_contents()
 
         if not contents:
-            PersistentInfo.error("Could not load JSON {} - no data".format(address))
+            AppLogging.error("Could not load JSON {} - no data".format(address))
 
         try:
             j = json.loads(contents)
             return j
 
         except Exception as e:
-            PersistentInfo.error(
+            AppLogging.error(
                 "Could not load JSON {} - invalid JSON {}".format(address, str(e))
             )
 
@@ -99,7 +99,7 @@ class BaseSourceJsonPlugin(SourceGenericPlugin):
 
                 sources.extend(new_sources)
             else:
-                PersistentInfo.error("No sources")
+                AppLogging.error("No sources")
                 return sources
 
     def get_links_from_sources(self, sources):
@@ -148,7 +148,7 @@ class BaseSourceJsonPlugin(SourceGenericPlugin):
         recent_entries_list_contents = BasePage(recent_url).get_contents()
 
         if not recent_entries_list_contents:
-            PersistentInfo.error(
+            AppLogging.error(
                 "Could not obtain JSON for recent entries: {}".format(recent_url)
             )
             return
@@ -157,7 +157,7 @@ class BaseSourceJsonPlugin(SourceGenericPlugin):
         try:
             recent_entries_json = json.loads(recent_entries_list_contents)
         except Exception as e:
-            PersistentInfo.error(
+            AppLogging.error(
                 "Could not read recent entries JSON {}\n{}".format(
                     recent_entries_list_contents, str(e)
                 )

@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.templatetags.static import static
 import django.utils
 
-from .system import PersistentInfo
+from .system import AppLogging
 
 
 class KeyWords(models.Model):
@@ -104,7 +104,7 @@ class KeyWords(models.Model):
 
         nlp = KeyWords.load_token_program(language)
         if not nlp:
-            PersistentInfo.error("Cannot load token program for language:{}".format(language))
+            AppLogging.error("Cannot load token program for language:{}".format(language))
             return
 
         doc = nlp(text)

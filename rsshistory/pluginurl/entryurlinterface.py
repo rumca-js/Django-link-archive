@@ -3,7 +3,7 @@ from ..dateutils import DateUtils
 from ..controllers import SourceDataController
 
 from ..apps import LinkDatabase
-from ..models import PersistentInfo
+from ..models import AppLogging
 
 from .urlhandler import UrlHandler
 
@@ -113,12 +113,12 @@ class EntryUrlInterface(object):
         if not self.ignore_errors and not p.is_valid():
             if self.log:
                 LinkDatabase.info("YouTube page is invalid:{}".format(url))
-                PersistentInfo.error("YouTube page is invalid:{}".format(url))
+                AppLogging.error("YouTube page is invalid:{}".format(url))
             return None
 
         source_url = p.get_channel_feed_url()
         if source_url is None:
-            PersistentInfo.error(
+            AppLogging.error(
                 "Could not obtain channel feed url:{}".format(source_url)
             )
 
@@ -167,7 +167,7 @@ class EntryUrlInterface(object):
         if not self.ignore_errors and not p.is_valid():
             if self.log:
                 LinkDatabase.info("HTML page is invalid:{}".format(url))
-                PersistentInfo.error("HTML page is invalid:{}".format(url))
+                AppLogging.error("HTML page is invalid:{}".format(url))
             return None
 
         # some pages return invalid code / information. let the user decide
@@ -221,7 +221,7 @@ class EntryUrlInterface(object):
         if not self.ignore_errors and not p.is_valid():
             if self.log:
                 LinkDatabase.info("RSS page is invalid:{}".format(url))
-                PersistentInfo.error("HTML page is invalid:{}".format(url))
+                AppLogging.error("HTML page is invalid:{}".format(url))
             return None
 
         if not self.is_property_set(input_props, "link"):

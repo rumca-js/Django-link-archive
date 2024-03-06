@@ -8,7 +8,7 @@ from django.db.models import Q
 
 from ..models import (
     LinkDataModel,
-    PersistentInfo,
+    AppLogging,
     SourceDataModel,
     SourceOperationalData,
     SourceCategories,
@@ -421,7 +421,7 @@ class SourceDataBuilder(object):
         except Exception as E:
             error_text = traceback.format_exc()
             LinkDatabase.error("Cannot create source:{}\n{}".format(str(E), error_text))
-            PersistentInfo.error("Cannot create source:{}\n{}".format(str(E), error_text))
+            AppLogging.error("Cannot create source:{}\n{}".format(str(E), error_text))
 
     def get_clean_data(self):
         result = {}

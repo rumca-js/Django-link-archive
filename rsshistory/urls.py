@@ -121,7 +121,7 @@ urlpatterns = [
     path("backgroundjobs-remove/<str:job_type>/", viewsystem.backgroundjobs_remove, name="backgroundjobs-remove",),
     path("backgroundjobs-remove-all/", viewsystem.backgroundjobs_remove_all, name="backgroundjobs-remove-all",),
     # persistant infos
-    path("logs/", viewsystem.PersistentInfoView.as_view(), name="logs",),
+    path("logs/", viewsystem.AppLoggingView.as_view(), name="logs",),
     path("truncate-log", viewsystem.truncate_log, name="truncate-log"),
     path("truncate-log-errors", viewsystem.truncate_log_errors, name="truncate-log-errors"),
     path("truncate-log-all", viewsystem.truncate_log_all, name="truncate-log-all"),

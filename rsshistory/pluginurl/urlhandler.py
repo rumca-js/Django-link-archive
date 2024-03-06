@@ -3,7 +3,7 @@ import traceback
 from ..webtools import Url, PageOptions, DomainAwarePage, BasePage
 
 from ..apps import LinkDatabase
-from ..models import PersistentInfo
+from ..models import AppLogging
 
 from .handlervideoyoutube import YouTubeVideoHandler, YouTubeJsonHandler
 from .handlervideoodysee import OdyseeVideoHandler
@@ -34,7 +34,7 @@ class UrlHandler(object):
             for line in lines:
                 line_text += line
 
-            PersistentInfo.error(
+            AppLogging.error(
                 "Invalid use of UrlHandler API {};Lines:{}".format(url, line_text)
             )
 

@@ -5,7 +5,7 @@ import time
 
 from ..webtools import BasePage, HtmlPage, PageOptions
 from ..dateutils import DateUtils
-from ..models import PersistentInfo
+from ..models import AppLogging
 from ..controllers import LinkDataController
 from ..apps import LinkDatabase
 from ..pluginurl.urlhandler import UrlHandler
@@ -89,7 +89,7 @@ class BaseParsePlugin(SourceGenericPlugin):
 
             # if 10 minutes passed
             if time.time() - start_processing_time >= 60 * 10:
-                PersistentInfo.info("Spent too much time in parser")
+                AppLogging.info("Spent too much time in parser")
                 break
 
     def calculate_plugin_hash(self):

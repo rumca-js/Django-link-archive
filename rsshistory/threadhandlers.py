@@ -13,7 +13,7 @@ from django.contrib.auth.models import User
 
 from .apps import LinkDatabase
 from .models import (
-    PersistentInfo,
+    AppLogging,
     BackgroundJob,
     SourceDataModel,
     SourceExportHistory,
@@ -22,6 +22,7 @@ from .models import (
     ConfigurationEntry,
     UserTags,
     UserVotes,
+    UserBookmarks,
     UserSearchHistory,
     UserEntryTransitionHistory,
     UserEntryVisitHistory,
@@ -93,14 +94,14 @@ class ProcessSourceJobHandler(BaseJobHandler):
                 #    return False
                 return True
 
-            PersistentInfo.error(
+            AppLogging.error(
                 "Cannot find controller plugin for {}".format(obj.subject)
             )
             return False
 
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.error(
+            AppLogging.error(
                 "Exception during parsing page contents {0} {1} {2}".format(
                     obj.subject, str(e), error_text
                 )
@@ -131,7 +132,7 @@ class EntryUpdateData(BaseJobHandler):
             return True
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.error(
+            AppLogging.error(
                 "Exception when updating link data {0} {1} {2}".format(
                     obj.subject, str(e), error_text
                 )
@@ -156,7 +157,7 @@ class LinkDownloadJobHandler(BaseJobHandler):
             return True
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.error(
+            AppLogging.error(
                 "Exception downloading web page {0} {1} {2}".format(
                     obj.subject, str(e), error_text
                 )
@@ -175,7 +176,7 @@ class LinkMusicDownloadJobHandler(BaseJobHandler):
         try:
             item = LinkDataController.objects.filter(link=obj.subject)[0]
 
-            PersistentInfo.create("Downloading music: " + item.link + " " + item.title)
+            AppLogging.info("Downloading music: " + item.link + " " + item.title)
             # TODO pass dir?
 
             file_name = Path(str(item.artist)) / str(item.album) / item.title
@@ -184,7 +185,7 @@ class LinkMusicDownloadJobHandler(BaseJobHandler):
 
             yt = ytdlp.YTDLP(item.link)
             if not yt.download_audio(file_name):
-                PersistentInfo.error(
+                AppLogging.error(
                     "Could not download music: " + item.link + " " + item.title
                 )
                 return
@@ -193,14 +194,14 @@ class LinkMusicDownloadJobHandler(BaseJobHandler):
 
             id3 = id3v2.Id3v2(file_name, data)
             id3.tag()
-            PersistentInfo.create(
+            AppLogging.info(
                 "Downloading music done: " + item.link + " " + item.title
             )
 
             return True
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.error(
+            AppLogging.error(
                 "Exception downloading music {0} {1} {2}".format(
                     obj.subject, str(e), error_text
                 )
@@ -220,23 +221,23 @@ class LinkVideoDownloadJobHandler(BaseJobHandler):
         try:
             item = LinkDataController.objects.filter(link=obj.subject)[0]
 
-            PersistentInfo.create("Downloading video: " + item.link + " " + item.title)
+            AppLogging.info("Downloading video: " + item.link + " " + item.title)
 
             yt = ytdlp.YTDLP(item.link)
             if not yt.download_video("file.mp4"):
-                PersistentInfo.error(
+                AppLogging.error(
                     "Could not download video: " + item.link + " " + item.title
                 )
                 return
 
-            PersistentInfo.create(
+            AppLogging.info(
                 "Downloading video done: " + item.link + " " + item.title
             )
 
             return True
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.error(
+            AppLogging.error(
                 "Exception downloading video {0} {1} {2}".format(
                     obj.subject, str(e), error_text
                 )
@@ -264,7 +265,7 @@ class LinkAddJobHandler(BaseJobHandler):
 
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.error(
+            AppLogging.error(
                 "Exception when adding link {0} {1} {2}".format(
                     obj.subject, str(e), error_text
                 )
@@ -328,7 +329,7 @@ class LinkAddJobHandler(BaseJobHandler):
             if users.count() > 0:
                 user = users[0]
             else:
-                PersistentInfo.error("Could not found super user")
+                AppLogging.error("Could not found super user")
 
         data["user_object"] = user
 
@@ -344,7 +345,7 @@ class LinkAddJobHandler(BaseJobHandler):
             try:
                 cfg = json.loads(in_object.args)
             except Exception as E:
-                PersistentInfo.error(
+                AppLogging.error(
                     "Exception when adding link {0} {1} {2}".format(
                         in_object.subject, str(e), error_text
                     )
@@ -374,7 +375,7 @@ class LinkSaveJobHandler(BaseJobHandler):
             return True
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.error(
+            AppLogging.error(
                 "Exception on LinkArchiveHandler {} {}".format(str(e), error_text)
             )
 
@@ -405,7 +406,7 @@ class WriteDailyDataJobHandler(BaseJobHandler):
             return True
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.error(
+            AppLogging.error(
                 "Exception: Yearly generation: {} {}".format(str(e), error_text)
             )
 
@@ -597,7 +598,7 @@ class WriteYearDataJobHandler(BaseJobHandler):
             return True
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.error(
+            AppLogging.error(
                 "Exception: Writing yearly data: {} {}".format(str(e), error_text)
             )
 
@@ -621,7 +622,7 @@ class WriteNoTimeDataJobHandler(BaseJobHandler):
             return True
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.error(
+            AppLogging.error(
                 "Exception: Writing notime: {} {}".format(str(e), error_text)
             )
 
@@ -652,7 +653,7 @@ class WriteTopicJobHandler(BaseJobHandler):
             return True
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.error(
+            AppLogging.error(
                 "Exception: Writing topic data: {} {}".format(str(e), error_text)
             )
 
@@ -685,7 +686,7 @@ class PushToRepoJobHandler(BaseJobHandler):
                 SourceExportHistory.confirm()
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.error("Exception: {} {}".format(str(e), error_text))
+            AppLogging.error("Exception: {} {}".format(str(e), error_text))
 
 
 class PushYearDataToRepoJobHandler(BaseJobHandler):
@@ -708,7 +709,7 @@ class PushYearDataToRepoJobHandler(BaseJobHandler):
             return True
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.error("Exception: {} {}".format(str(e), error_text))
+            AppLogging.error("Exception: {} {}".format(str(e), error_text))
 
 
 class PushNoTimeDataToRepoJobHandler(BaseJobHandler):
@@ -730,7 +731,7 @@ class PushNoTimeDataToRepoJobHandler(BaseJobHandler):
             return True
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.error("Exception: {} {}".format(str(e), error_text))
+            AppLogging.error("Exception: {} {}".format(str(e), error_text))
 
 
 class PushDailyDataToRepoJobHandler(BaseJobHandler):
@@ -755,7 +756,7 @@ class PushDailyDataToRepoJobHandler(BaseJobHandler):
             return True
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.error("Exception: {} {}".format(str(e), error_text))
+            AppLogging.error("Exception: {} {}".format(str(e), error_text))
 
 
 class CleanupJobHandler(BaseJobHandler):
@@ -781,7 +782,7 @@ class CleanupJobHandler(BaseJobHandler):
             if limit == 0:
                 SourceDataController.cleanup()
 
-                PersistentInfo.cleanup()
+                AppLogging.cleanup()
                 DomainsController.cleanup()
                 KeyWords.cleanup()
 
@@ -793,12 +794,13 @@ class CleanupJobHandler(BaseJobHandler):
 
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.error("Exception: {} {}".format(str(e), error_text))
+            AppLogging.error("Exception: {} {}".format(str(e), error_text))
 
     def user_tables_cleanup(self):
         UserTags.cleanup()
         LinkCommentDataController.cleanup()
         UserVotes.cleanup()
+        UserBookmarks.cleanup()
         UserSearchHistory.cleanup()
         UserEntryTransitionHistory.cleanup()
         UserEntryVisitHistory.cleanup()
@@ -815,7 +817,7 @@ class CheckDomainsJobHandler(BaseJobHandler):
             return True
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.error("Exception: {} {}".format(str(e), error_text))
+            AppLogging.error("Exception: {} {}".format(str(e), error_text))
 
 
 class LinkScanJobHandler(BaseJobHandler):
@@ -842,7 +844,7 @@ class LinkScanJobHandler(BaseJobHandler):
             return True
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.error("Exception: {} {}".format(str(e), error_text))
+            AppLogging.error("Exception: {} {}".format(str(e), error_text))
 
 
 class LinkResetDataJobHandler(BaseJobHandler):
@@ -859,7 +861,7 @@ class LinkResetDataJobHandler(BaseJobHandler):
             return True
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.error("Exception: {} {}".format(str(e), error_text))
+            AppLogging.error("Exception: {} {}".format(str(e), error_text))
 
 
 class MoveToArchiveJobHandler(BaseJobHandler):
@@ -873,7 +875,7 @@ class MoveToArchiveJobHandler(BaseJobHandler):
             return True
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.error("Exception: {} {}".format(str(e), error_text))
+            AppLogging.error("Exception: {} {}".format(str(e), error_text))
 
 
 class RefreshThreadHandler(object):
@@ -1013,7 +1015,7 @@ class HandlerManager(object):
                 text = "Threads: last handler {} {} exceeded time:{}".format(
                     handler.get_job(), obj.subject, passed_seconds
                 )
-                PersistentInfo.create(text)
+                AppLogging.error(text)
 
                 self.on_not_safe_exit(items)
                 break
@@ -1034,7 +1036,7 @@ class HandlerManager(object):
                 deleted = True
                 obj.delete()
             if not handler:
-                PersistentInfo.error(
+                AppLogging.error(
                     "Missing handler for job: {0}".format(
                         obj.job,
                     )
@@ -1044,7 +1046,7 @@ class HandlerManager(object):
 
         except Exception as E:
             error_text = traceback.format_exc()
-            PersistentInfo.error(
+            AppLogging.error(
                 "Exception during handler processing job:{}\nsubject:{}\nException:{}\nError text:{}".format(
                     obj.job, obj.subject, str(E), error_text
                 )
@@ -1065,7 +1067,7 @@ class HandlerManager(object):
         """
         TODO remove this function, use process_one_for_all one above
         """
-        PersistentInfo.create("Processing message")
+        AppLogging.info("Processing message")
 
         config = Configuration.get_object()
         start_processing_time = time.time()
@@ -1080,6 +1082,6 @@ class HandlerManager(object):
         if len(items) == 0:
             return False
 
-        PersistentInfo.create("Processing messages done")
+        AppLogging.info("Processing messages done")
 
         return True

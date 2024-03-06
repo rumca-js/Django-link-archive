@@ -1,6 +1,6 @@
 import logging
 import traceback
-from ..models import PersistentInfo
+from ..models import AppLogging
 
 
 class PageSystem(object):
@@ -181,7 +181,7 @@ class MarkDownConverter(ItemConverterFabric):
             return t.safe_substitute(map_data)
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.error(
+            AppLogging.error(
                 "Template exception {0} {1} {2} {3}".format(
                     self.item_template, str(map_data), str(e), error_text
                 )
@@ -215,7 +215,7 @@ class MarkDownSourceConverter(object):
             return t.safe_substitute(map_data)
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.error(
+            AppLogging.error(
                 "Template exception {0} {1} {2} {3}".format(
                     self.item_template, str(map_data), str(e), error_text
                 )

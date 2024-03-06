@@ -3,7 +3,7 @@ from ..controllers import (
     LinkDataController,
     SourceDataController,
 )
-from ..models import BackgroundJob, PersistentInfo
+from ..models import BackgroundJob
 from .fakeinternet import FakeInternetTestCase
 
 

@@ -12,7 +12,7 @@ from ..models import (
     BaseLinkDataController,
     LinkDataModel,
     ArchiveLinkDataModel,
-    PersistentInfo,
+    AppLogging,
     SourceDataModel,
     KeyWords,
     UserTags,
@@ -298,7 +298,7 @@ class LinkDataWrapper(object):
             is_archive = False
 
         if "language" in link_data and link_data["language"] and len(link_data["language"]) > 9:
-            PersistentInfo.create("Language setting too long for:{} {}".format(link_data["link"], link_data["language"]))
+            AppLogging.error("Language setting too long for:{} {}".format(link_data["link"], link_data["language"]))
             link_data["language"] = None
 
         # TODO remove hardcoded links
@@ -318,7 +318,7 @@ class LinkDataWrapper(object):
                 ob = ArchiveLinkDataModel.objects.create(**link_data)
         except Exception as E:
             error_text = traceback.format_exc()
-            PersistentInfo.error("Cannot create entry {}".format(error_text))
+            AppLogging.error("Cannot create entry {}".format(error_text))
             return
 
         return ob
@@ -337,13 +337,13 @@ class LinkDataWrapper(object):
 
             except Exception as e:
                 error_text = traceback.format_exc()
-                PersistentInfo.error("Cannot move to archive {}".format(error_text))
+                AppLogging.error("Cannot move to archive {}".format(error_text))
         else:
             try:
                 entry_obj.delete()
             except Exception as e:
                 error_text = traceback.format_exc()
-                PersistentInfo.error("Cannot delete entry {}".format(error_text))
+                AppLogging.error("Cannot delete entry {}".format(error_text))
 
     def move_from_archive(archive_obj):
         objs = LinkDataController.objects.filter(link=archive_obj.link)
@@ -611,7 +611,7 @@ class LinkDataBuilder(object):
         url = EntryUrlInterface(self.link)
         link_data = url.get_props()
         if not link_data:
-            PersistentInfo.error(
+            AppLogging.error(
                 "Could not obtain properties for:{}".format(self.link)
             )
             return
@@ -639,7 +639,7 @@ class LinkDataBuilder(object):
         url = EntryUrlInterface(self.link)
         link_data = url.get_props()
         if not link_data:
-            PersistentInfo.error(
+            AppLogging.error(
                 "Could not obtain properties for:{}".format(self.link)
             )
             return
@@ -822,7 +822,7 @@ class LinkDataBuilder(object):
 
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.exc(
+            AppLogging.exc(
                 "Could not process entry: Entry:{} {}; Exc:{}\n{}".format(
                     link_data["link"],
                     link_data["title"],

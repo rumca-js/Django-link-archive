@@ -2,7 +2,7 @@ from pathlib import Path
 import shutil
 import json
 
-from ..models import ConfigurationEntry, PersistentInfo, DataExport
+from ..models import ConfigurationEntry, DataExport
 from ..controllers import SourceDataController, LinkDataController, DomainsController
 from ..configuration import Configuration
 from ..datawriter import DataWriter, DataWriterConfiguration

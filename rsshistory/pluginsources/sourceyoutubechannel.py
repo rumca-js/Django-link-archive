@@ -2,7 +2,6 @@ import traceback
 from dateutil import parser
 from bs4 import BeautifulSoup
 
-from ..models import PersistentInfo
 from ..apps import LinkDatabase
 from ..webtools import RssPage, Url
 from ..configuration import Configuration

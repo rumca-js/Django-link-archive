@@ -10,7 +10,7 @@ from django.db.models import Q
 from ..models import (
     LinkDataModel,
     BackgroundJob,
-    PersistentInfo,
+    AppLogging,
 )
 from ..webtools import HtmlPage
 from ..dateutils import DateUtils
@@ -64,7 +64,7 @@ class BackgroundJobController(BackgroundJob):
         if self.errors > 5:
             self.enabled = False
 
-            PersistentInfo.create(
+            AppLogging.error(
                 "Disabling job due to errors {} {} {}".format(
                     self.job, self.subject, self.args
                 )
@@ -122,7 +122,7 @@ class BackgroundJobController(BackgroundJob):
                 )
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.error(
+            AppLogging.error(
                 "Exception: {}: {} {}".format(job_name, str(e), error_text)
             )
 
@@ -150,7 +150,7 @@ class BackgroundJobController(BackgroundJob):
         """
         It handles only automatic additions.
         """
-        if not url.startswith("http"):
+        if not url.lower().startswith("http"):
             url = "https://" + url
 
         h = HtmlPage(url)
@@ -189,7 +189,7 @@ class BackgroundJobController(BackgroundJob):
         args_text = json.dumps(cfg)
 
         if len(args_text) > 1000:
-            PersistentInfo.error("Link add job configuration is too long:{}".format(args_text))
+            AppLogging.error("Link add job configuration is too long:{}".format(args_text))
             args_text = ""
 
         if cfg != {}:
@@ -211,7 +211,7 @@ class BackgroundJobController(BackgroundJob):
     def write_daily_data_range(date_start=date.today(), date_stop=date.today()):
         try:
             if date_stop < date_start:
-                PersistentInfo.error(
+                AppLogging.error(
                     "Yearly generation: Incorrect configuration of dates start:{} stop:{}".format(
                         date_start, date_stop
                     )
@@ -230,7 +230,7 @@ class BackgroundJobController(BackgroundJob):
             return sent
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.error(
+            AppLogging.error(
                 "Exception: Daily data: {} {}".format(str(e), error_text)
             )
 
@@ -247,7 +247,7 @@ class BackgroundJobController(BackgroundJob):
             BackgroundJobController.write_daily_data_range(date_start, date_stop)
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.error(
+            AppLogging.error(
                 "Exception: Daily data: {} {}".format(str(e), error_text)
             )
 
@@ -302,7 +302,7 @@ class BackgroundJobController(BackgroundJob):
                         obj.delete()
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.error(
+            AppLogging.error(
                 "Exception: Link archive: {} {}".format(str(e), error_text)
             )
 

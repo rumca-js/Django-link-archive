@@ -184,8 +184,8 @@ class UserConfig(models.Model):
         return users[0]
 
 
-class PersistentInfo(models.Model):
-    info = models.CharField(default="", max_length=2000)
+class AppLogging(models.Model):
+    info_text = models.CharField(default="", max_length=2000)
     level = models.IntegerField(default=0)
     date = models.DateTimeField(auto_now_add=True)
     user = models.CharField(max_length=1000, null=True)
@@ -193,78 +193,78 @@ class PersistentInfo(models.Model):
     class Meta:
         ordering = ["-date", "level"]
 
-    def create(info, level=int(logging.INFO), user=None):
+    def info(info_text, level=int(logging.INFO), user=None):
         try:
             # TODO replace hardcoded values with something better
-            if len(info) > 2000:
-                info = info[:1999]
-            LinkDatabase.info("PersistentInfo::create:{}".format(info))
+            if len(info_text) > 2000:
+                info_text = info_text[:1999]
+            LinkDatabase.info("AppLogging::create:{}".format(info_text))
 
-            PersistentInfo.cleanup_overflow()
+            AppLogging.cleanup_overflow()
 
-            PersistentInfo.objects.create(
-                info=info, level=level, date=datetime.now(timezone("UTC")), user=user
+            AppLogging.objects.create(
+                info_text=info_text, level=level, date=datetime.now(timezone("UTC")), user=user
             )
             return
         except Exception as e:
-            LinkDatabase.info("PersistentInfo::create Exception {}".format(e))
+            LinkDatabase.info("AppLogging::info Exception {}".format(e))
 
-    def text(info, level=int(logging.INFO), user=None):
+    def text(info_text, level=int(logging.INFO), user=None):
         try:
-            if len(info) > 2000:
-                info = info[:1999]
-            LinkDatabase.info("PersistentInfo::text:{}".format(info))
+            if len(info_text) > 2000:
+                info_text = info_text[:1999]
+            LinkDatabase.info("AppLogging::text:{}".format(info_text))
 
-            PersistentInfo.cleanup_overflow()
+            AppLogging.cleanup_overflow()
 
-            PersistentInfo.objects.create(
-                info=info, level=level, date=datetime.now(timezone("UTC")), user=user
+            AppLogging.objects.create(
+                info_text=info_text, level=level, date=datetime.now(timezone("UTC")), user=user
             )
             return
         except Exception as e:
-            LinkDatabase.info("PersistentInfo::text Exception {}".format(e))
+            LinkDatabase.info("AppLogging::text Exception {}".format(e))
 
-    def error(info, level=int(logging.ERROR), user=None):
+    def error(info_text, level=int(logging.ERROR), user=None):
         try:
-            if len(info) > 2000:
-                info = info[:1999]
-            LinkDatabase.info("PersistentInfo::error:{}".format(info))
+            if len(info_text) > 2000:
+                info_text = info_text[:1999]
+            LinkDatabase.info("AppLogging::error:{}".format(info_text))
 
-            PersistentInfo.cleanup_overflow()
+            AppLogging.cleanup_overflow()
 
-            PersistentInfo.objects.create(
-                info=info, level=level, date=datetime.now(timezone("UTC")), user=user
+            AppLogging.objects.create(
+                info_text=info_text, level=level, date=datetime.now(timezone("UTC")), user=user
             )
             return
         except Exception as e:
-            LinkDatabase.info("PersistentInfo::error Exception {}".format(e))
+            LinkDatabase.info("AppLogging::error Exception {}".format(e))
 
-    def exc(info, level=int(logging.ERROR), exc_data=None, user=None):
-        text = "{}. Exception data:\n{}".format(info, str(exc_data))
+    def exc(info_text, level=int(logging.ERROR), exc_data=None, user=None):
+        text = "{}. Exception data:\n{}".format(info_text, str(exc_data))
 
         try:
-            if len(info) > 2000:
-                info = info[:1999]
-            LinkDatabase.info("PersistentInfo::exc:{}".format(info))
+            if len(info_text) > 2000:
+                info_text = info_text[:1999]
+            LinkDatabase.info("AppLogging::exc:{}".format(info_text))
 
-            PersistentInfo.cleanup_overflow()
+            AppLogging.cleanup_overflow()
 
-            PersistentInfo.objects.create(
-                info=text, level=level, date=datetime.now(timezone("UTC")), user=user
+            AppLogging.objects.create(
+                info_text=info_text, level=level, date=datetime.now(timezone("UTC")), user=user
             )
             return
         except Exception as e:
-            LinkDatabase.info("PersistentInfo::exc Exception {}".format(e))
+            LinkDatabase.info("AppLogging::exc Exception {}".format(e))
 
     def cleanup():
-        PersistentInfo.remove_old_infos()
+        AppLogging.remove_old_infos()
 
-        obs = PersistentInfo.objects.filter(level=int(logging.INFO))
+        obs = AppLogging.objects.filter(level=int(logging.INFO))
         if obs.exists():
             obs.delete()
 
     def cleanup_overflow():
-        infos = PersistentInfo.objects.all().order_by("date")
+        infos = AppLogging.objects.all().order_by("date")
         info_size = infos.count()
         if info_size > 2000:
             index = 0
@@ -276,10 +276,10 @@ class PersistentInfo(models.Model):
                     return
 
     def truncate():
-        PersistentInfo.objects.all().delete()
+        AppLogging.objects.all().delete()
 
     def get_safe():
-        return PersistentInfo.objects.all()[0:100]
+        return AppLogging.objects.all()[0:100]
 
     def remove_old_infos():
         from ..dateutils import DateUtils
@@ -287,7 +287,7 @@ class PersistentInfo(models.Model):
         try:
             date_range = DateUtils.get_days_range(3)
             while True:
-                objs = PersistentInfo.objects.filter(date__lt=date_range[0])
+                objs = AppLogging.objects.filter(date__lt=date_range[0])
 
                 if not objs.exists():
                     break

@@ -20,7 +20,7 @@
     {% endif %}
 </div>
 
-<h1>Persistant info list</h1>
+<h1>AppLogging info list</h1>
 
   {% if content_list %}
       {% for info in content_list %}
@@ -28,7 +28,7 @@
          <div>Date: {{info.date}}</div>
          <div>Level: {{info.level}}</div>
       </div>
-      <div style="margin-bottom: 2%"><pre>{{info.info}}</pre></div>
+      <div style="margin-bottom: 2%"><pre>{{info.info_text}}</pre></div>
       {% endfor %}
   {% else %}
      No logs

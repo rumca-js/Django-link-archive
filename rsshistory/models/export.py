@@ -1,7 +1,7 @@
 import traceback
 from django.db import models
 
-from .system import PersistentInfo
+from .system import AppLogging
 
 
 class SourceExportHistory(models.Model):
@@ -24,7 +24,7 @@ class SourceExportHistory(models.Model):
 
         except Exception as e:
             error_text = traceback.format_exc()
-            PersistentInfo.error(
+            AppLogging.error(
                 "Exception for update: {0} {1}".format(str(e), error_text)
             )
 

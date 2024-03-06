@@ -10,7 +10,7 @@ from ..models import (
     ConfigurationEntry,
     UserConfig,
     BackgroundJob,
-    PersistentInfo,
+    AppLogging,
     SourceExportHistory,
     Domains,
     UserTags,
@@ -109,7 +109,7 @@ def system_status(request):
         days_before = current_time - timedelta(days=conf.days_to_move_to_archive)
         p.context["DateTime_MoveToArchive"] = days_before
 
-    p.context["PersistentInfo"] = PersistentInfo.objects.count()
+    p.context["AppLogging"] = AppLogging.objects.count()
     p.context["Domains"] = Domains.objects.count()
 
     p.context["server_path"] = Path(".").resolve()
@@ -350,8 +350,8 @@ def backgroundjobs_remove(request, job_type):
     return HttpResponseRedirect(reverse("{}:backgroundjobs".format(LinkDatabase.name)))
 
 
-class PersistentInfoView(generic.ListView):
-    model = PersistentInfo
+class AppLoggingView(generic.ListView):
+    model = AppLogging
     context_object_name = "content_list"
 
     def get(self, *args, **kwargs):
@@ -359,11 +359,11 @@ class PersistentInfoView(generic.ListView):
         data = p.check_access()
         if data:
             return redirect("{}:missing-rights".format(LinkDatabase.name))
-        return super(PersistentInfoView, self).get(*args, **kwargs)
+        return super(AppLoggingView, self).get(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
-        context = super(PersistentInfoView, self).get_context_data(**kwargs)
+        context = super(AppLoggingView, self).get_context_data(**kwargs)
         context = ViewPage.init_context(self.request, context)
         context["page_title"] += " Logs"
 
@@ -377,7 +377,7 @@ def truncate_log_all(request):
     if data is not None:
         return data
 
-    PersistentInfo.truncate()
+    AppLogging.truncate()
 
     return HttpResponseRedirect(reverse("{}:logs".format(LinkDatabase.name)))
 
@@ -389,7 +389,7 @@ def truncate_log(request):
     if data is not None:
         return data
 
-    PersistentInfo.objects.filter(level__lt=40).delete()
+    AppLogging.objects.filter(level__lt=40).delete()
 
     return HttpResponseRedirect(reverse("{}:logs".format(LinkDatabase.name)))
 
@@ -401,6 +401,6 @@ def truncate_log_errors(request):
     if data is not None:
         return data
 
-    PersistentInfo.objects.filter(level=logging.ERROR).delete()
+    AppLogging.objects.filter(level=logging.ERROR).delete()
 
     return HttpResponseRedirect(reverse("{}:logs".format(LinkDatabase.name)))

@@ -18,7 +18,7 @@ from django.contrib.auth.models import User
 
 from ..apps import LinkDatabase
 from .entries import LinkDataModel
-from .system import PersistentInfo
+from .system import AppLogging
 
 
 class UserTags(models.Model):
@@ -84,7 +84,7 @@ class UserTags(models.Model):
             return
 
         if not entry:
-            PersistentInfo.error("Incorrect call of tags, entry does not exist")
+            AppLogging.error("Incorrect call of tags, entry does not exist")
 
         user_name = user.username
 
@@ -131,7 +131,7 @@ class UserTags(models.Model):
             if tag_objs.exists():
                 tag_objs.delete()
         else:
-            PersistentInfo.info("Missing entry object")
+            AppLogging.info("Missing entry object")
             return
 
         tags_set = data["tags"]
@@ -229,6 +229,15 @@ class UserVotes(models.Model):
         return UserVotes.add(user, entry, vote)
 
     def cleanup():
+        # recreate missing entries, from votes alone
+        for entry in LinkDataModel.objects.filter(page_rating_votes__gt = 0):
+            votes = UserVotes.objects.filter(entry_object = entry)
+            if votes.count() == 0:
+                users = User.objects.filter(is_superuser=True)
+                if users.count() > 0:
+                    UserVotes.add(users[0], entry, entry.page_rating_votes)
+
+        # reset missing user object
         for q in UserVotes.objects.filter(user_object__isnull=True):
             users = User.objects.filter(username=q.user)
             if users.count() > 0:
@@ -330,3 +339,12 @@ class UserBookmarks(models.Model):
                 return True
 
         return False
+
+    def cleanup():
+        entries = LinkDataModel.objects.filter(bookmarked=True)
+        for entry in entries:
+            if not UserBookmarks.is_bookmarked(entry):
+                users = User.objects.filter(is_superuser=True)
+
+                if users.count() > 0:
+                    UserBookmarks.add(users[0], entry)

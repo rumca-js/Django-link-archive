@@ -35,7 +35,7 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 from dateutil import parser
 
-from .models import PersistentInfo
+from .models import AppLogging
 from .apps import LinkDatabase
 
 try:
@@ -80,7 +80,7 @@ def date_str_to_date(date_str):
             parsed_date = parser.parse(date_str)
             return DateUtils.to_utc_date(parsed_date)
         except Exception as E:
-            PersistentInfo.error(
+            AppLogging.error(
                 "Could not parse music:release_date {} Exc:{}".format(date_str, str(E))
             )
 
@@ -300,7 +300,7 @@ class BasePage(object):
             for line in lines:
                 line_text += line
 
-            PersistentInfo.error(
+            AppLogging.error(
                 "Page: Url is invalid{};Lines:{}".format(self.url, line_text)
             )
 
@@ -340,7 +340,7 @@ class BasePage(object):
             self.dead = True
             error_text = traceback.format_exc()
 
-            PersistentInfo.error(
+            AppLogging.error(
                 "Page: Error while reading page:{};Error:{}\n{}".format(
                     self.url, str(e), error_text
                 )
@@ -433,7 +433,7 @@ class BasePage(object):
             return SeleniumResponseObject(url, html_content, 200)
         except TimeoutException:
             error_text = traceback.format_exc()
-            PersistentInfo.error(
+            AppLogging.error(
                 "Timeout when reading page:{}\nURL:{}\n{}".format(selenium_timeout, driver.current_url, error_text)
             )
             return SeleniumResponseObject(url, None, 500)
@@ -496,7 +496,7 @@ class BasePage(object):
 
         except TimeoutException:
             error_text = traceback.format_exc()
-            PersistentInfo.error(
+            AppLogging.error(
                 "Timeout when reading page:{}\nURL:{}\n{}".format(selenium_timeout, driver.current_url, error_text)
             )
             return SeleniumResponseObject(url, None, 500)
@@ -525,7 +525,7 @@ class BasePage(object):
             driver.get(url)
             time.sleep(5)
         except TimeoutException:
-            PersistentInfo.error(
+            AppLogging.error(
                 "Timeout when reading page. {}".format(selenium_timeout)
             )
             return SeleniumResponseObject(url, None, 500)
@@ -636,7 +636,7 @@ class BasePage(object):
         try:
             return hashlib.md5(text.encode("utf-8")).digest()
         except Exception as E:
-            PersistentInfo.create("Could not calculate hash {}".format(E))
+            AppLogging.info("Could not calculate hash {}".format(E))
 
     @lazy_load_content
     def get_contents_hash(self):
@@ -1312,7 +1312,7 @@ class RssPage(ContentInterface):
         except Exception as e:
             error_text = traceback.format_exc()
 
-            PersistentInfo.error(
+            AppLogging.error(
                 "RssPage: when parsing:{};Error:{};{}".format(
                     self.url, str(e), error_text
                 )
@@ -1330,7 +1330,7 @@ class RssPage(ContentInterface):
         except Exception as e:
             error_text = traceback.format_exc()
 
-            PersistentInfo.error(
+            AppLogging.error(
                 "RssPage: when parsing:{};Error:{};{}".format(
                     self.url, str(e), error_text
                 )
@@ -1377,13 +1377,13 @@ class RssPage(ContentInterface):
         if not self.contents:
             return
 
-        #    PersistentInfo.error("No rss hash contents")
+        #    AppLogging.error("No rss hash contents")
         #    return self.calculate_hash("no body hash")
 
         entries = str(self.feed.entries)
         if entries == "":
             if self.contents:
-                PersistentInfo.error("Empty entries")
+                AppLogging.error("Empty entries")
                 return self.calculate_hash(self.contents)
         if entries:
             return self.calculate_hash(entries)
@@ -1421,7 +1421,7 @@ class RssPage(ContentInterface):
                 return DateUtils.to_utc_date(dt)
 
             except Exception as e:
-                PersistentInfo.error(
+                AppLogging.error(
                     "Rss parser datetime invalid feed datetime:{}; Exc:{}\n".format(
                         feed_entry.published, str(e)
                     )
@@ -1483,7 +1483,7 @@ class RssPage(ContentInterface):
             else:
                 # cannot display self.feed.feed here.
                 # it complains et_thumbnail TypeError: 'DeferredAttribute' object is not callable
-                PersistentInfo.create(
+                AppLogging.info(
                     "Unsupported image type for feed. {}".format(
                         str(self.feed.feed.image)
                     )
@@ -2219,12 +2219,12 @@ class HtmlPage(ContentInterface):
         body = self.get_body_text()
 
         if body == "":
-            PersistentInfo.error("HTML: Empty body")
+            AppLogging.error("HTML: Empty body")
             return self.calculate_hash("no body hash")
         elif body:
             return self.calculate_hash(body)
         else:
-            PersistentInfo.error(
+            AppLogging.error(
                 "HTML: Cannot calculate body hash for:{}".format(self.url)
             )
             if self.contents:

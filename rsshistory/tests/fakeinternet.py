@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 
 # import chardet
 
-from ..models import PersistentInfo, ConfigurationEntry
+from ..models import AppLogging, ConfigurationEntry
 from ..dateutils import DateUtils
 from ..webtools import BasePage
 from ..configuration import Configuration
@@ -439,12 +439,12 @@ class FakeInternetTestCase(TestCase):
         return self.user
 
     def print_errors(self):
-        infos = PersistentInfo.objects.all()
+        infos = AppLogging.objects.all()
         for info in infos:
             print("Error: {}".format(info.info))
 
     def no_errors(self):
-        return PersistentInfo.objects.all().count() == 0
+        return AppLogging.objects.all().count() == 0
 
     def create_example_data(self):
         self.create_example_sources()
@@ -560,15 +560,15 @@ class FakeInternetTestCase(TestCase):
         return [export1, export2, export3]
 
     def create_example_permanent_data(self):
-        p1 = PersistentInfo.objects.create(info="info1", level=10, user="test")
+        p1 = AppLogging.objects.create(info="info1", level=10, user="test")
         p1.date = DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M")
         p1.save()
 
-        p2 = PersistentInfo.objects.create(info="info2", level=10, user="test")
+        p2 = AppLogging.objects.create(info="info2", level=10, user="test")
         p2.date = DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M")
         p2.save()
 
-        p3 = PersistentInfo.objects.create(info="info3", level=10, user="test")
+        p3 = AppLogging.objects.create(info="info3", level=10, user="test")
         p3.date = DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M")
         p3.save()
 

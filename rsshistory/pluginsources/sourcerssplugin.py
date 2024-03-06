@@ -2,7 +2,7 @@ import traceback
 from dateutil import parser
 from bs4 import BeautifulSoup
 
-from ..models import PersistentInfo
+from ..models import AppLogging
 from ..apps import LinkDatabase
 from ..webtools import RssPage, Url, HtmlPage
 from ..pluginurl.entryurlinterface import EntryUrlInterface, UrlHandler
@@ -80,7 +80,7 @@ class BaseRssPlugin(SourceGenericPlugin):
         else:
             print_contents = "None"
 
-        PersistentInfo.error(
+        AppLogging.error(
             "Source:{}\nTitle:{}\nStatus code:{}\nText:{}.\nContents\n{}".format(
                 source.url, source.title, self.status_code, text, print_contents[:self.get_contents_size_limit()]
             )

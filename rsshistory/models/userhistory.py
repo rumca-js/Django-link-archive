@@ -15,7 +15,6 @@ from django.contrib.auth.models import User
 from ..controllers import LinkDataController
 from ..configuration import Configuration
 from ..apps import LinkDatabase
-from .system import PersistentInfo
 
 
 class UserSearchHistory(models.Model):

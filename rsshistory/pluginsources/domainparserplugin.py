@@ -4,7 +4,7 @@ import traceback
 import time
 
 from ..webtools import HtmlPage
-from ..models import PersistentInfo
+from ..models import AppLogging
 from ..controllers import LinkDataController
 from .sourceparseplugin import BaseParsePlugin
 from ..apps import LinkDatabase
@@ -56,5 +56,5 @@ class DomainParserPlugin(BaseParsePlugin):
 
             # if 10 minutes passed
             if time.time() - start_processing_time >= 60 * 10:
-                PersistentInfo.error("Spent too much time in parser")
+                AppLogging.error("Spent too much time in parser")
                 break

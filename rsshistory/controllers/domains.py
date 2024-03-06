@@ -7,7 +7,7 @@ from django.urls import reverse
 from django.db.models import Q
 
 from ..models import (
-    PersistentInfo,
+    AppLogging,
     Domains,
     DomainCategories,
     DomainSubCategories,
@@ -42,7 +42,7 @@ class DomainsController(Domains):
             or domain_text == "https"
             or domain_text == "http"
         ):
-            PersistentInfo.create(
+            AppLogging.error(
                 "Not a domain text:{}, url:{}".format(domain_text, url)
             )
             return
@@ -59,7 +59,7 @@ class DomainsController(Domains):
                 obj = DomainsController.create_object(domain_only_text, protocol)
             except Exception as E:
                 exc_str = traceback.format_exc()
-                PersistentInfo.create("Cannot create domain data:{}\n{}".format(domain_only_text, exc_str))
+                AppLogging.error("Cannot create domain data:{}\n{}".format(domain_only_text, exc_str))
         else:
             obj = objs[0]
 

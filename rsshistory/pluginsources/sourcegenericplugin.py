@@ -1,7 +1,7 @@
 import traceback
 import hashlib
 
-from ..models import PersistentInfo
+from ..models import AppLogging
 from ..webtools import HtmlPage, PageOptions
 from ..dateutils import DateUtils
 from ..controllers import LinkDataBuilder, SourceDataController
@@ -83,7 +83,7 @@ class SourceGenericPlugin(HtmlPage):
                 continue
 
             if "link" not in link_data or not link_data["link"]:
-                PersistentInfo.error(
+                AppLogging.error(
                     "Invalid link properties. Missing key: {}".format(str(link_data))
                 )
             else:
@@ -186,7 +186,7 @@ class SourceGenericPlugin(HtmlPage):
             contents = self.reader.get_contents()
 
             if not contents:
-                PersistentInfo.error(
+                AppLogging.error(
                     "Source:{} Title:{}; Could not obtain contents.\nStatus code:{}\nContents\n{}".format(
                         source.url, source.title, self.reader.status_code, contents
                     )
@@ -229,7 +229,7 @@ class SourceGenericPlugin(HtmlPage):
 
             if not objs.exists():
                 if "title" not in props:
-                    PersistentInfo.error(
+                    AppLogging.error(
                         "Link:{}; Title:{} missing published field".format(
                             props["link"],
                             props["title"],
@@ -242,7 +242,7 @@ class SourceGenericPlugin(HtmlPage):
                     return False
 
                 if "date_published" not in props:
-                    PersistentInfo.error(
+                    AppLogging.error(
                         "Link:{}; Title:{} missing published field".format(
                             props["link"],
                             props["title"],
@@ -257,7 +257,7 @@ class SourceGenericPlugin(HtmlPage):
         except Exception as e:
             error_text = traceback.format_exc()
             if props and "link" in props and "title" in props:
-                PersistentInfo.error(
+                AppLogging.error(
                     "Link:{}; Title:{}; Exc:{}\n{}".format(
                         props["link"],
                         props["title"],

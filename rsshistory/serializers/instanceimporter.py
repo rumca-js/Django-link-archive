@@ -4,7 +4,7 @@ import traceback
 
 from django.contrib.auth.models import User
 
-from ..models import Domains, PersistentInfo, UserBookmarks, UserTags, UserVotes
+from ..models import Domains, AppLogging, UserBookmarks, UserTags, UserVotes
 
 from ..controllers import (
     LinkDataController,
@@ -105,7 +105,7 @@ class BaseImporter(object):
                 self.import_from_link(link_data)
             except Exception as E:
                 exc_string = traceback.format_exc()
-                PersistentInfo.error("Cannot import link {}\nExc:{}".format(str(E), exc_string))
+                AppLogging.error("Cannot import link {}\nExc:{}".format(str(E), exc_string))
 
         return True
 
@@ -117,7 +117,7 @@ class BaseImporter(object):
                 self.import_from_source(source_data)
             except Exception as E:
                 exc_string = traceback.format_exc()
-                PersistentInfo.error("Cannot import source {}\nExc:{}".format(str(E), exc_string))
+                AppLogging.error("Cannot import source {}\nExc:{}".format(str(E), exc_string))
 
         return True
 
@@ -294,11 +294,11 @@ def read_file_contents(file_path):
 
 class FileImporter(BaseImporter):
     def __init__(self, path=None, user=None):
-        PersistentInfo.create("Importing from a file")
+        AppLogging.info("Importing from a file")
         super().__init__(user)
 
         if not os.path.isdir(path):
-            PersistentInfo.create("Directory does not exist!")
+            AppLogging.info("Directory does not exist!")
             return
 
         self.import_from_path(path)
@@ -335,7 +335,7 @@ class InstanceImporter(BaseImporter):
             json_data = json.loads(instance_text)
         except Exception as E:
             exc_string = traceback.format_exc()
-            PersistentInfo.create("Cannot load JSON:{}\nExc:{}".format(instance_text, exc_string))
+            AppLogging.info("Cannot load JSON:{}\nExc:{}".format(instance_text, exc_string))
             return
 
         if "links" in json_data:
