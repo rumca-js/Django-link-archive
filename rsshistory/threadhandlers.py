@@ -756,7 +756,7 @@ class PushDailyDataToRepoJobHandler(BaseJobHandler):
             return True
         except Exception as e:
             error_text = traceback.format_exc()
-            AppLogging.error("Exception: {} {}".format(str(e), error_text))
+            AppLogging.error("Push daily data exception: {} {}".format(str(e), error_text))
 
 
 class CleanupJobHandler(BaseJobHandler):
@@ -794,7 +794,7 @@ class CleanupJobHandler(BaseJobHandler):
 
         except Exception as e:
             error_text = traceback.format_exc()
-            AppLogging.error("Exception: {} {}".format(str(e), error_text))
+            AppLogging.error("Cleanup exception: {} {}".format(str(e), error_text))
 
     def user_tables_cleanup(self):
         UserTags.cleanup()

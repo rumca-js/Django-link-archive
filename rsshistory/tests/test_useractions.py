@@ -4,7 +4,7 @@ from django.test import TestCase
 
 from ..controllers import LinkDataController, SourceDataController, DomainsController
 from ..configuration import Configuration
-from ..models import UserTags
+from ..models import UserTags, UserVotes, UserBookmarks
 from ..dateutils import DateUtils
 
 
@@ -98,3 +98,73 @@ class UserTagsTest(TestCase):
         self.assertEqual(tags[0].entry_object, self.entry)
         self.assertEqual(tags[1].tag, "tag3")
         self.assertEqual(tags[1].entry_object, self.entry)
+
+
+class UserVotesTest(TestCase):
+    def setUp(self):
+        c = Configuration.get_object()
+
+        self.entry = None
+        self.user = None
+
+    def create_entry(self):
+
+        current_time = DateUtils.get_datetime_now_utc()
+
+        if not self.entry:
+            self.entry = LinkDataController.objects.create(
+                source="https://youtube.com",
+                link="https://youtube.com?v=bookmarked",
+                title="The first link",
+                source_obj=None,
+                bookmarked=True,
+                language="en",
+                domain_obj=None,
+                date_published=current_time,
+            )
+
+        if not self.user:
+            self.user = User.objects.create_user(
+                username="test_username", password="testpassword"
+            )
+
+    def test_add(self):
+        self.create_entry()
+
+        UserVotes.objects.all().delete()
+
+        # call tested function
+        UserVotes.add(self.user, self.entry, 50)
+
+        votes = UserVotes.objects.all()
+        self.assertEqual(votes.count(), 1)
+        self.assertEqual(votes[0].vote, 50)
+
+    def test_get_user_vote(self):
+        self.create_entry()
+
+        UserVotes.objects.all().delete()
+
+        vote = UserVotes.objects.create(
+                user = "testuser",
+                user_object = self.user,
+                entry_object = self.entry,
+                vote = 20,
+                )
+
+        # call tested function
+        vote = UserVotes.get_user_vote(self.user, self.entry)
+
+        self.assertEqual(vote, 20)
+
+    def test_cleanup(self):
+        self.create_entry()
+
+        self.entry.page_rating_votes = 10
+        self.entry.save()
+
+        # call tested function
+        UserVotes.cleanup()
+
+        entries = LinkDataController.objects.all()
+        self.assertTrue(entries.count(), 1)

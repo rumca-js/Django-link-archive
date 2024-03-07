@@ -335,7 +335,7 @@ class UserBookmarks(models.Model):
     def is_bookmarked(entry):
         bookmarks = UserBookmarks.objects.filter(entry_object=entry)
         for bookmark in bookmarks:
-            if bookmark.user.is_staff:
+            if bookmark.user_object.is_staff:
                 return True
 
         return False

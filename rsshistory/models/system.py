@@ -266,7 +266,7 @@ class AppLogging(models.Model):
     def cleanup_overflow():
         infos = AppLogging.objects.all().order_by("date")
         info_size = infos.count()
-        if info_size > 2000:
+        if info_size > AppLogging.get_max_log_entries():
             index = 0
             for info in infos:
                 info.delete()
@@ -274,6 +274,12 @@ class AppLogging(models.Model):
 
                 if info_size - index <= 1000:
                     return
+
+    def get_max_log_entries():
+        """
+        TODO This should be in configuration
+        """
+        return 2000
 
     def truncate():
         AppLogging.objects.all().delete()
