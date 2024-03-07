@@ -194,11 +194,12 @@ class AppLogging(models.Model):
         ordering = ["-date", "level"]
 
     def info(info_text, level=int(logging.INFO), user=None):
+        """
+        TODO errors are not created exactly as we do commonly. Date shoudl be added via dateutils
+        """
         try:
             # TODO replace hardcoded values with something better
-            if len(info_text) > 2000:
-                info_text = info_text[:1999]
-            LinkDatabase.info("AppLogging::create:{}".format(info_text))
+            LinkDatabase.info("AppLogging::info:{}".format(info_text))
 
             AppLogging.cleanup_overflow()
 
@@ -209,11 +210,13 @@ class AppLogging(models.Model):
         except Exception as e:
             LinkDatabase.info("AppLogging::info Exception {}".format(e))
 
-    def text(info_text, level=int(logging.INFO), user=None):
+    def warning(info_text, level=int(logging.WARNING), user=None):
+        """
+        TODO errors are not created exactly as we do commonly. Date shoudl be added via dateutils
+        """
         try:
-            if len(info_text) > 2000:
-                info_text = info_text[:1999]
-            LinkDatabase.info("AppLogging::text:{}".format(info_text))
+            # TODO replace hardcoded values with something better
+            LinkDatabase.info("AppLogging::warning:{}".format(info_text))
 
             AppLogging.cleanup_overflow()
 
@@ -222,12 +225,10 @@ class AppLogging(models.Model):
             )
             return
         except Exception as e:
-            LinkDatabase.info("AppLogging::text Exception {}".format(e))
+            LinkDatabase.info("AppLogging::info Exception {}".format(e))
 
     def error(info_text, level=int(logging.ERROR), user=None):
         try:
-            if len(info_text) > 2000:
-                info_text = info_text[:1999]
             LinkDatabase.info("AppLogging::error:{}".format(info_text))
 
             AppLogging.cleanup_overflow()
@@ -243,8 +244,6 @@ class AppLogging(models.Model):
         text = "{}. Exception data:\n{}".format(info_text, str(exc_data))
 
         try:
-            if len(info_text) > 2000:
-                info_text = info_text[:1999]
             LinkDatabase.info("AppLogging::exc:{}".format(info_text))
 
             AppLogging.cleanup_overflow()
@@ -255,6 +254,29 @@ class AppLogging(models.Model):
             return
         except Exception as e:
             LinkDatabase.info("AppLogging::exc Exception {}".format(e))
+
+    def text(info_text, level=int(logging.INFO), user=None):
+        """
+        TODO remove
+        """
+        try:
+            LinkDatabase.info("AppLogging::text:{}".format(info_text))
+
+            AppLogging.cleanup_overflow()
+
+            AppLogging.objects.create(
+                info_text=info_text, level=level, date=datetime.now(timezone("UTC")), user=user
+            )
+            return
+        except Exception as e:
+            LinkDatabase.info("AppLogging::text Exception {}".format(e))
+
+    def save(self, *args, **kwargs):
+        # Trim the input string to fit within max_length
+        if len(self.info_text) > self._meta.get_field('info_text').max_length:
+            self.info_text = self.info_text[:self._meta.get_field('info_text').max_length]
+
+        super().save(*args, **kwargs)
 
     def cleanup():
         AppLogging.remove_old_infos()
@@ -277,7 +299,7 @@ class AppLogging(models.Model):
 
     def get_max_log_entries():
         """
-        TODO This should be in configuration
+        TODO this should be configurable in the configuration
         """
         return 2000
 

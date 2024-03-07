@@ -107,7 +107,7 @@ class KeyWordsTest(FakeInternetTestCase):
         keys = KeyWords.objects.all()
         self.assertEqual(keys.count(), 0)
 
-    def test_clear_old(self):
+    def test_cleanup(self):
         datetime = KeyWords.get_keywords_date_limit() - timedelta(days=1)
 
         item = KeyWords.objects.create(keyword="test")
@@ -117,6 +117,7 @@ class KeyWordsTest(FakeInternetTestCase):
         keys = KeyWords.objects.all()
         self.assertEqual(keys.count(), 1)
 
+        # call tested function
         KeyWords.cleanup()
 
         keys = KeyWords.objects.all()

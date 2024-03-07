@@ -141,13 +141,6 @@ class UserTags(models.Model):
 
     def cleanup():
         for q in UserTags.objects.filter(user_object__isnull=True):
-            if q.user_object:
-                users = User.objects.filter(id=q.user_object.id)
-                if users.count() > 0:
-                    q.user_object = users[0]
-                    q.save()
-                    continue
-
             users = User.objects.filter(is_superuser=True)
             if users.count() > 0:
                 user = users[0]

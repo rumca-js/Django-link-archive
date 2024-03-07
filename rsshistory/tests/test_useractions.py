@@ -41,6 +41,10 @@ class UserTagsTest(TestCase):
             username="test_username", password="testpassword"
         )
 
+        self.user_super = User.objects.create_user(
+            username="test_username2", password="testpassword", is_superuser=True,
+        )
+
     def test_set_tags(self):
         UserTags.objects.all().delete()
 
@@ -99,6 +103,20 @@ class UserTagsTest(TestCase):
         self.assertEqual(tags[1].tag, "tag3")
         self.assertEqual(tags[1].entry_object, self.entry)
 
+    def test_cleanup(self):
+        user = self.user
+
+        UserTags.objects.create(user_object = None, entry_object = self.entry, tag="test")
+
+        # call tested function
+        UserTags.cleanup()
+
+        tags = UserTags.objects.all()
+
+        self.assertEqual(tags.count(), 1)
+        self.assertEqual(tags[0].entry_object, self.entry)
+        self.assertEqual(tags[0].user_object, self.user_super)
+
 
 class UserVotesTest(TestCase):
     def setUp(self):
@@ -126,6 +144,9 @@ class UserVotesTest(TestCase):
         if not self.user:
             self.user = User.objects.create_user(
                 username="test_username", password="testpassword"
+            )
+            self.user_super = User.objects.create_user(
+                username="test_username2", password="testpassword", is_superuser = True
             )
 
     def test_add(self):
@@ -168,3 +189,49 @@ class UserVotesTest(TestCase):
 
         entries = LinkDataController.objects.all()
         self.assertTrue(entries.count(), 1)
+
+
+class UserBookmarksTest(TestCase):
+    def setUp(self):
+        c = Configuration.get_object()
+
+        self.entry = None
+        self.user = None
+
+    def create_entry(self):
+
+        current_time = DateUtils.get_datetime_now_utc()
+
+        if not self.entry:
+            self.entry = LinkDataController.objects.create(
+                source="https://youtube.com",
+                link="https://youtube.com?v=bookmarked",
+                title="The first link",
+                source_obj=None,
+                bookmarked=True,
+                language="en",
+                domain_obj=None,
+                date_published=current_time,
+            )
+
+        if not self.user:
+            self.user = User.objects.create_user(
+                username="test_username", password="testpassword"
+            )
+            self.user_super = User.objects.create_user(
+                username="test_username2", password="testpassword", is_superuser=True
+            )
+
+    def test_cleanup(self):
+        UserBookmarks.objects.all().delete()
+
+        self.create_entry()
+
+        self.entry.bookmarked = True
+        self.entry.save()
+
+        # call tested function
+        UserBookmarks.cleanup()
+
+        bookmarks = UserBookmarks.objects.all()
+        self.assertTrue(bookmarks.count(), 1)
