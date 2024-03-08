@@ -6,7 +6,7 @@ from django.http import HttpResponseForbidden, HttpResponseRedirect
 from django.utils.http import urlencode
 
 from ..apps import LinkDatabase
-from ..models import ConfigurationEntry
+from ..models import ConfigurationEntry, UserConfig
 from ..controllers import (
     SourceDataController,
     SourceDataBuilder,
@@ -37,6 +37,14 @@ class RssSourceListView(generic.ListView):
     def get_queryset(self):
         self.query_filter = SourceFilter(self.request.GET)
         return self.query_filter.get_filtered_objects()
+
+    def get_paginate_by(self, queryset):
+        if not self.request.user.is_authenticated:
+            config = Configuration.get_object().config_entry
+            return config.sources_per_page
+        else:
+            uc = UserConfig.get(self.request)
+            return uc.sources_per_page
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context

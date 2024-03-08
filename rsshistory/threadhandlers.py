@@ -20,6 +20,7 @@ from .models import (
     KeyWords,
     DataExport,
     ConfigurationEntry,
+    UserConfig,
     UserTags,
     UserVotes,
     UserBookmarks,
@@ -785,6 +786,7 @@ class CleanupJobHandler(BaseJobHandler):
                 AppLogging.cleanup()
                 DomainsController.cleanup()
                 KeyWords.cleanup()
+                UserConfig.cleanup()
 
                 self.user_tables_cleanup()
 

@@ -3,7 +3,7 @@ from pathlib import Path
 import logging
 
 from .basictypes import *
-from .models import ConfigurationEntry, UserConfig
+from .models import ConfigurationEntry
 from .apps import LinkDatabase
 
 """
@@ -16,7 +16,7 @@ version is split into three digits:
  if a change requires the model to be changed, then second digit is updated, patch is set to 0
  if something should be released to public, then release version changes
 """
-__version__ = "0.49.2"
+__version__ = "0.50.0"
 
 
 from pathlib import Path

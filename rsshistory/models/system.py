@@ -4,6 +4,8 @@ from datetime import datetime, date
 
 from django.db import models
 from django.urls import reverse
+from django.conf import settings
+from django.contrib.auth.models import User
 
 from ..apps import LinkDatabase
 
@@ -78,10 +80,14 @@ class ConfigurationEntry(models.Model):
     number_of_comments_per_day = models.IntegerField(default=1)
     user_agent = models.CharField(
         default="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/116.0",
+        max_length=500,
+    )
+    user_headers = models.CharField(
         max_length=1000,
+        blank=True,
     )
     access_type = models.CharField(
-        max_length=1000, null=False, choices=ACCESS_TYPES, default=ACCESS_TYPE_ALL
+        max_length=100, null=False, choices=ACCESS_TYPES, default=ACCESS_TYPE_ALL
     )
 
     days_to_move_to_archive = models.IntegerField(default=100)
@@ -113,7 +119,11 @@ class ConfigurationEntry(models.Model):
     show_icons = models.BooleanField(default=True)
     thumbnails_as_icons = models.BooleanField(default=True)
     small_icons = models.BooleanField(default=True)
+
     links_per_page = models.IntegerField(default=100)
+    sources_per_page = models.IntegerField(default=100)
+    max_links_per_page = models.IntegerField(default=100)
+    max_sources_per_page = models.IntegerField(default=100)
 
     # background tasks will add everything using this user name
     admin_user = models.CharField(max_length=500, default="admin", blank=True)
@@ -142,6 +152,7 @@ class ConfigurationEntry(models.Model):
 
 
 class UserConfig(models.Model):
+    # TODO move this to relation towards Users
     user = models.CharField(max_length=500, unique=True)
     display_style = models.CharField(
         max_length=500, null=True, default="style-light", choices=STYLE_TYPES
@@ -154,15 +165,27 @@ class UserConfig(models.Model):
     small_icons = models.BooleanField(default=True)
     links_per_page = models.IntegerField(default=100)
     karma = models.IntegerField(default=0)
+    birth_date = models.DateField(null=True)
+    links_per_page = models.IntegerField(default=100)
+    sources_per_page = models.IntegerField(default=100)
 
-    def get(user_name=None):
+    user_object = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name=str(LinkDatabase.name) + "_user_configs",
+        null=True,
+    )
+
+    def get(user = None):
         """
         This is used if no request is specified. Use configured by admin setup.
         """
-        if user_name:
-            confs = UserConfig.objects.filter(user=user_name)
+        if user.is_authenticated:
+            confs = UserConfig.objects.filter(user=user.username)
             if confs.count() != 0:
                 return confs[0]
+
+        # create some user from settings
 
         config = ConfigurationEntry.get()
         return UserConfig(
@@ -171,17 +194,48 @@ class UserConfig(models.Model):
             show_icons=config.show_icons,
             thumbnails_as_icons=config.thumbnails_as_icons,
             links_per_page=config.links_per_page,
+            sources_per_page=config.sources_per_page,
         )
 
-    def get_or_create(user_name):
+    def get_or_create(user):
         """
         This is used if no request is specified. Use configured by admin setup.
         """
-        users = UserConfig.objects.filter(user=user_name)
+        if not user.is_authenticated:
+            config = ConfigurationEntry.get()
+            return UserConfig(
+                display_style=config.display_style,
+                display_type=config.display_type,
+                show_icons=config.show_icons,
+                thumbnails_as_icons=config.thumbnails_as_icons,
+                links_per_page=config.links_per_page,
+                sources_per_page=config.sources_per_page,
+            )
+
+        users = UserConfig.objects.filter(user=user.username)
         if not users.exists():
-            user = UserConfig.objects.create(user=user_name)
+            user = UserConfig.objects.create(user=user.username, user_object=user)
             return user
         return users[0]
+
+    def save(self, *args, **kwargs):
+        config = ConfigurationEntry.get()
+
+        # Trim the input string to fit within max_length
+        if self.links_per_page > config.max_links_per_page:
+            self.links_per_page = config.max_links_per_page
+
+        if self.sources_per_page > config.max_sources_per_page:
+            self.sources_per_page = config.max_sources_per_page
+
+        super().save(*args, **kwargs)
+
+    def cleanup():
+        configs = UserConfig.objects.filter(user_object__isnull=True)
+        for uc in configs:
+            u = User.objects.filter(username = uc.user)
+            uc.user_object = u
+            uc.save()
 
 
 class AppLogging(models.Model):

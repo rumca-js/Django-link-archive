@@ -25,8 +25,7 @@ class ViewPage(object):
             if "app_description" in context:
                 context["page_description"] = context["app_description"]
 
-        user_name = request.user.get_username()
-        context["user_config"] = UserConfig.get(user_name)
+        context["user_config"] = UserConfig.get(request.user)
 
         context["is_mobile"] = ViewPage.is_mobile(request)
 

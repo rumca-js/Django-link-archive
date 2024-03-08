@@ -82,9 +82,16 @@ class ConfigForm(forms.ModelForm):
             "thumbnails_as_icons",
             "small_icons",
             "links_per_page",
+            "sources_per_page",
+            "max_links_per_page",
+            "max_sources_per_page",
+            #Advanced
+            "user_headers",
         ]
 
     def __init__(self, *args, **kwargs):
+        self.pop_headers(args, kwargs)
+
         super(ConfigForm, self).__init__(*args, **kwargs)
 
         # fmt: off
@@ -92,13 +99,33 @@ class ConfigForm(forms.ModelForm):
         self.fields["link_save"].help_text = "Links are saved using archive.org."
         self.fields["source_save"].help_text = "Links are saved using archive.org."
         self.fields["user_agent"].help_text = "You can check your user agent in <a href=\"https://www.supermonitoring.com/blog/check-browser-http-headers/\">https://www.supermonitoring.com/blog/check-browser-http-headers/</a>."
+        self.fields["user_headers"].help_text = "Provide JSON configuration of headers. You can check your user agent in <a href=\"https://www.supermonitoring.com/blog/check-browser-http-headers/\">https://www.supermonitoring.com/blog/check-browser-http-headers/</a>."
         self.fields["access_type"].help_text = "There are three access types available. \"All\" allows anybody view contents. \"Logged\" allows only logged users to view contents. \"Owner\" means application is private, and only owner can view it's contents."
         self.fields["days_to_move_to_archive"].help_text = "Changing number of days after which links are moved to archive may lead to an issue. If the new number of days is smaller, links are not moved from archive back to the link table at hand."
         self.fields["auto_store_sources"].help_text = "Sources can be automatically added, if a new 'domain' information is captured. The state of such state is determined by 'Auto sources enabled' property."
         self.fields["number_of_comments_per_day"].help_text = "The limit is for each user."
         self.fields["track_user_actions"].help_text = "Among tracked elements: what is searched."
         self.fields["entries_order_by"].help_text = "For Google-like experience set -page_rating. By default it is set to order of publication, -date_published."
+        self.fields["links_per_page"].label = "Number of links per page"
+        self.fields["sources_per_page"].label = "Number of sources per page"
         # fmt: on
+
+        if self.is_mobile:
+            self.fields["user_agent"].widget.attrs.update(size="20")
+            self.fields["user_headers"].widget=forms.Textarea(attrs={'rows':10, 'cols':20})
+        else:
+            self.fields["user_agent"].widget.attrs.update(size="100")
+            self.fields["user_headers"].widget=forms.Textarea(attrs={'rows':20, 'cols':75})
+
+    def pop_headers(self, args, kwargs):
+        self.request = None
+        self.is_mobile = False
+
+        if "request" in kwargs:
+            from .views import ViewPage
+
+            self.request = kwargs.pop("request")
+            self.is_mobile = ViewPage.is_mobile(self.request)
 
 
 class DataExportForm(forms.ModelForm):
@@ -138,6 +165,13 @@ class UserConfigForm(forms.ModelForm):
     """
     Category choice form
     """
+    #BIRTH_YEAR_CHOICES = ["1970", "]
+
+    def __init__(self, *args, **kwargs):
+        super(UserConfigForm, self).__init__(*args, **kwargs)
+
+        # TODO this does not seem to work
+        self.fields["birth_date"].initial = my_date_to
 
     class Meta:
         model = UserConfig
@@ -147,10 +181,17 @@ class UserConfigForm(forms.ModelForm):
             "small_icons",
             "display_type",
             "display_style",
+            "links_per_page",
+            "sources_per_page",
+            "birth_date",
         ]
         # fields = ['show_icons', 'thumbnails_as_icons', 'small_icons', 'display_type', 'theme', 'links_per_page']
         # widgets = {
         # }
+        #widgets = {
+        #    # DateTimeInput widget does not work my my Android phone
+        #        'birth_date': forms.SelectDateWidget(years=BIRTH_YEAR_CHOICES)
+        #}
 
 
 class ImportSourceRangeFromInternetArchiveForm(forms.Form):

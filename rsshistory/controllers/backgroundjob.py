@@ -167,6 +167,9 @@ class BackgroundJobController(BackgroundJob):
             config = Configuration.get_object().config_entry
             if not config.auto_store_entries and config.auto_store_domain_info:
                 url = h.get_domain()
+        else:
+            """TODO This should be configurable"""
+            return
 
         existing = LinkDataModel.objects.filter(link=url)
         if existing.count() > 0:

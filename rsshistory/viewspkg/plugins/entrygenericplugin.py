@@ -412,7 +412,7 @@ class EntryGenericPlugin(object):
         return parameters
 
     def get_frame_html(self):
-        u = UserConfig.get(self.user.username)
+        u = UserConfig.get(self.user)
 
         if not u.show_icons:
             return ""

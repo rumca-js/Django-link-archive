@@ -52,7 +52,7 @@ def configuration_page(request):
     ob = ConfigurationEntry.get()
 
     if request.method == "POST":
-        form = ConfigForm(request.POST, instance=ob)
+        form = ConfigForm(request.POST, instance=ob, request=request)
         if form.is_valid():
             form.save()
         else:
@@ -60,7 +60,7 @@ def configuration_page(request):
             return p.render("summary_present.html")
 
     ob = ConfigurationEntry.get()
-    form = ConfigForm(instance=ob)
+    form = ConfigForm(instance=ob, request=request)
 
     form.method = "POST"
     form.action_url = reverse("{}:configuration".format(LinkDatabase.name))
@@ -141,9 +141,7 @@ def user_config(request):
     if data is not None:
         return data
 
-    user_name = request.user.get_username()
-
-    user_obj = UserConfig.get_or_create(user_name)
+    user_obj = UserConfig.get_or_create(request.user)
 
     if request.method == "POST":
         form = UserConfigForm(request.POST, instance=user_obj)

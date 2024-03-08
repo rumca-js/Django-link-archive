@@ -54,7 +54,7 @@ class BaseRssPlugin(SourceGenericPlugin):
                 self.reader = RssPage(self.get_address(), contents=rss_contents)
 
                 if not self.reader.is_rss(fast_check=fast_check):
-                    self.store_error(source, "HTML body does not provide RSS", contents)
+                    self.store_error(source, "HTML body does not provide RSS, body", rss_contents)
                     self.dead = True
 
                     return None
