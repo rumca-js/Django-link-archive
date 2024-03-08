@@ -13,6 +13,7 @@ from ..models import (
     BaseLinkDataController,
     BackgroundJob,
     ConfigurationEntry,
+    UserConfig,
     Domains,
     UserEntryVisitHistory,
     UserSearchHistory,
@@ -87,6 +88,14 @@ class EntriesSearchListView(generic.ListView):
         thefilter = query_filter
         print("EntriesSearchListView:get_filter done")
         return thefilter
+
+    def get_paginate_by(self, queryset):
+        if not self.request.user.is_authenticated:
+            config = Configuration.get_object().config_entry
+            return config.links_per_page
+        else:
+            uc = UserConfig.get(self.request.user)
+            return uc.links_per_page
 
     def get_queryset(self):
         config = Configuration.get_object().config_entry

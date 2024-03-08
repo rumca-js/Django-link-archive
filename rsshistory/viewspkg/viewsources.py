@@ -43,7 +43,7 @@ class RssSourceListView(generic.ListView):
             config = Configuration.get_object().config_entry
             return config.sources_per_page
         else:
-            uc = UserConfig.get(self.request)
+            uc = UserConfig.get(self.request.user)
             return uc.sources_per_page
 
     def get_context_data(self, **kwargs):
