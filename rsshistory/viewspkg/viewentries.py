@@ -421,14 +421,20 @@ class EntriesOmniListView(EntriesSearchListView):
         user = self.request.user
         user_choices = UserSearchHistory.get_user_choices(user)
 
+        initial = {}
+        if "search" in self.request.GET and self.request.GET["search"]:
+            initial["search"] = self.request.GET["search"]
+        if "search_history" in self.request.GET and self.request.GET["search_history"]:
+            initial["search"] = self.request.GET["search_history"]
+
         if config.days_to_move_to_archive == 0:
             f = OmniSearchForm(
-                self.request.GET, user_choices=user_choices, request=self.request
+                initial=initial, user_choices=user_choices, request=self.request
             )
             return f
         else:
             return OmniSearchWithArchiveForm(
-                self.request.GET, user_choices=user_choices, request=self.request
+                initial=initial, user_choices=user_choices, request=self.request
             )
 
     def get_form(self):

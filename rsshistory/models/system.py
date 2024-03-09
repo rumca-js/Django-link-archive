@@ -233,9 +233,10 @@ class UserConfig(models.Model):
     def cleanup():
         configs = UserConfig.objects.filter(user_object__isnull=True)
         for uc in configs:
-            u = User.objects.filter(username = uc.user)
-            uc.user_object = u
-            uc.save()
+            us = User.objects.filter(username = uc.user)
+            if us.count() > 0:
+                uc.user_object = us[0]
+                uc.save()
 
 
 class AppLogging(models.Model):

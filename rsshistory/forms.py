@@ -280,13 +280,7 @@ class OmniSearchForm(forms.Form):
     search_history = forms.CharField(widget=forms.Select(choices=[]), required=False)
 
     def __init__(self, *args, **kwargs):
-        self.request = None
-        self.is_mobile = False
-        if "request" in kwargs:
-            from .views import ViewPage
-
-            self.request = kwargs.pop("request")
-            self.is_mobile = ViewPage.is_mobile(self.request)
+        self.pop_headers(args, kwargs)
 
         user_choices = [[None, None]]
 
@@ -306,6 +300,16 @@ class OmniSearchForm(forms.Form):
         self.fields["search_history"].widget = forms.Select(
             choices=user_choices, attrs=attr
         )
+
+    def pop_headers(self, args, kwargs):
+        self.request = None
+        self.is_mobile = False
+
+        if "request" in kwargs:
+            from .views import ViewPage
+
+            self.request = kwargs.pop("request")
+            self.is_mobile = ViewPage.is_mobile(self.request)
 
     def set_choices(self, choices):
         self.fields["search_history"].widget = forms.Select(choices=choices)
