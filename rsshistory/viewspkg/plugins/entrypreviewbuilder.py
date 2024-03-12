@@ -16,7 +16,7 @@ class EntryPreviewBuilder(object):
     """
 
     def get(entry, user=None):
-        h = UrlHandler.get(entry.link)
+        h = UrlHandler.get_type(entry.link)
 
         if type(h) is UrlHandler.youtube_video_handler:
             return EntryYouTubePlugin(entry, user)

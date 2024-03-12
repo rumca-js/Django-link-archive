@@ -48,7 +48,6 @@ class ConfigForm(forms.ModelForm):
             # important
             "background_task",
             "ssl_verification",
-            "user_agent",
             "sources_refresh_period",
             "access_type",
             "admin_user",
@@ -86,6 +85,7 @@ class ConfigForm(forms.ModelForm):
             "max_links_per_page",
             "max_sources_per_page",
             #Advanced
+            "user_agent",
             "user_headers",
         ]
 

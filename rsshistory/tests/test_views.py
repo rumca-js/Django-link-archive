@@ -116,7 +116,7 @@ class ViewsTest(FakeInternetTestCase):
 
         self.assertEqual(resp.status_code, 200)
 
-    def test_entry(self):
+    def test_entry_detail(self):
         url = reverse("{}:entry-detail".format(LinkDatabase.name), args=[0])
         resp = self.client.get(url)
 
@@ -482,7 +482,7 @@ class EnhancedViewTest(ViewsTest):
             subcategory="No",
             export_to_cms=True,
         )
-        LinkDataController.objects.create(
+        self.entry_youtube = LinkDataController.objects.create(
             source="https://youtube.com",
             link="https://youtube.com?v=bookmarked",
             title="The first link",
@@ -494,6 +494,24 @@ class EnhancedViewTest(ViewsTest):
         LinkDataController.objects.create(
             source="https://youtube.com",
             link="https://youtube.com?v=nonbookmarked",
+            title="The second link",
+            source_obj=source_youtube,
+            bookmarked=False,
+            date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
+            language="en",
+        )
+        self.entry_html = LinkDataController.objects.create(
+            source="https://linkedin.com/feed",
+            link="https://linkedin.com",
+            title="The second link",
+            source_obj=source_youtube,
+            bookmarked=False,
+            date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
+            language="en",
+        )
+        self.entry_pdf = LinkDataController.objects.create(
+            source="https://linkedin.com/feed",
+            link="https://linkedin.com/link-to-pdf.pdf",
             title="The second link",
             source_obj=source_youtube,
             bookmarked=False,
@@ -552,10 +570,26 @@ class EnhancedViewTest(ViewsTest):
             export_sources=True,
         )
 
-    def test_entry(self):
+    def test_entry_detail_youtube(self):
         url = reverse(
             "{}:entry-detail".format(LinkDatabase.name),
-            args=[LinkDataController.objects.all()[0].id],
+            args=[self.entry_youtube.id],
+        )
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+
+    def test_entry_detail_html(self):
+        url = reverse(
+            "{}:entry-detail".format(LinkDatabase.name),
+            args=[self.entry_html.id],
+        )
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+
+    def test_entry_detail_pdf(self):
+        url = reverse(
+            "{}:entry-detail".format(LinkDatabase.name),
+            args=[self.entry_pdf.id],
         )
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)

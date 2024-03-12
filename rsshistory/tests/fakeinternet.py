@@ -441,7 +441,7 @@ class FakeInternetTestCase(TestCase):
     def print_errors(self):
         infos = AppLogging.objects.all()
         for info in infos:
-            print("Error: {}".format(info.info))
+            print("Error: {}".format(info.info_text))
 
     def no_errors(self):
         return AppLogging.objects.all().count() == 0

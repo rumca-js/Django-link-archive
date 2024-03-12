@@ -13,7 +13,15 @@
 
     <a href="{{reset_link}}" class="simplebutton">
       <img src="{% static 'rsshistory/icons/icons8-start-100.png' %}" class="content-icon" />
-      <span class="basebutton">Reset filters</span></a>
+      <span class="basebutton">Reset filters</span>
+    </a>
+
+    {% if user.is_staff %}
+    <a href="{% url 'rsshistory:entry-add-simple' %}" class="simplebutton" title="Opens add entry wizard">
+        <img src="{% static 'rsshistory/icons/icons8-add-link-96.png' %}" class="content-icon" />
+        Add entry
+    </a>
+    {% endif %}
 </div>
 
   <form action="{{filter_form.action_url}}" method="{{filter_form.method}}">

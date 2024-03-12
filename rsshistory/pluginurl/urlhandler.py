@@ -90,6 +90,26 @@ class UrlHandler(object):
 
         return page
 
+    def get_type(url):
+        short_url = UrlHandler.get_protololless(url)
+        if not short_url:
+            return
+
+        if UrlHandler.is_youtube_video(short_url):
+            return UrlHandler.youtube_video_handler(url)
+        if UrlHandler.is_youtube_channel(short_url):
+            return UrlHandler.youtube_channel_handler(url)
+        if UrlHandler.is_odysee_video(short_url):
+            return UrlHandler.odysee_video_handler(url)
+        if UrlHandler.is_odysee_channel(short_url):
+            return UrlHandler.odysee_channel_handler(url)
+
+        options = PageOptions()
+        options.fast_parsing = True
+
+        page = Url.get(url, options=options)
+        return page
+
     def get_url_options(url):
         options = PageOptions()
 

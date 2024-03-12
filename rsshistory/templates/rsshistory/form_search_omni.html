@@ -6,6 +6,12 @@
     <a href="javascript:history.back()" class="simplebutton">
         <img src="{% static 'rsshistory/icons/icons8-back-100.png' %}" class="content-icon" />
     </a>
+
+    {% if user.is_staff %}
+    <a href="{% url 'rsshistory:entry-add-simple' %}" class="simplebutton" title="Opens add entry wizard">
+        <img src="{% static 'rsshistory/icons/icons8-add-link-96.png' %}" class="content-icon" />
+        Add entry</a>
+    {% endif %}
 </div>
 
 <form action="{{form.action_url}}" method="{{form.method}}">
