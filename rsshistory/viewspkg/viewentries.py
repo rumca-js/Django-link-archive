@@ -492,7 +492,9 @@ class EntryDetailView(generic.DetailView):
         return context
 
     def set_visited(self):
-        UserEntryVisitHistory.visited(self.object, self.request.user)
+        if self.request.user.is_authenticated:
+            BackgroundJobController.entry_update_data(self.object)
+            UserEntryVisitHistory.visited(self.object, self.request.user)
 
 
 class EntryArchivedDetailView(generic.DetailView):

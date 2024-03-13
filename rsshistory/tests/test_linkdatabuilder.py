@@ -40,6 +40,9 @@ class LinkDataBuilderTest(FakeInternetTestCase):
             "language": "en",
             "thumbnail": "https://youtube.com/favicon.ico",
             "date_published": creation_date,
+            "page_rating_contents": 23,
+            "page_rating_votes": 12,
+            "page_rating": 25,
         }
 
         b = LinkDataBuilder()
@@ -52,6 +55,9 @@ class LinkDataBuilderTest(FakeInternetTestCase):
         self.assertEqual(objs.count(), 1)
         self.assertEqual(objs[0].link, link_name)
         self.assertEqual(objs[0].date_published, creation_date)
+        self.assertEqual(objs[0].page_rating_contents, 23)
+        self.assertEqual(objs[0].page_rating_votes, 12)
+        self.assertEqual(objs[0].page_rating, 25)
 
         # this is obtained not through page requests
         self.assertEqual(self.mock_page_requests, 0)
@@ -85,6 +91,8 @@ class LinkDataBuilderTest(FakeInternetTestCase):
         objs = LinkDataModel.objects.filter(link="https://youtube.com/v=1234")
         self.assertEqual(objs.count(), 1)
 
+        self.assertEqual(self.mock_page_requests, 0)
+
     def test_add_from_props_uppercase(self):
         config = Configuration.get_object().config_entry
         config.auto_store_entries = True
@@ -117,6 +125,8 @@ class LinkDataBuilderTest(FakeInternetTestCase):
         objs = LinkDataModel.objects.all()
         for obj in objs:
             print("OBJ: {}".format(obj.link))
+
+        self.assertEqual(self.mock_page_requests, 0)
 
     def test_add_from_props_not_adds(self):
         DomainsController.objects.all().delete()
@@ -152,6 +162,8 @@ class LinkDataBuilderTest(FakeInternetTestCase):
         for obj in objs:
             print("Added {}".format(obj.link))
         self.assertEqual(objs.count(), 0)
+
+        self.assertEqual(self.mock_page_requests, 0)
 
     def test_add_from_props_adds_domain(self):
         DomainsController.objects.all().delete()
@@ -221,6 +233,9 @@ class LinkDataBuilderTest(FakeInternetTestCase):
 
         self.assertEqual(objs[0].domain_obj, domains[0])
         self.assertEqual(objs[1].domain_obj, domains[0])
+
+        self.assertEqual(self.mock_page_requests, 0)
+
 
     """
     def test_source_from_page_contents(self):

@@ -586,7 +586,7 @@ class CleanJobHandlerTest(FakeInternetTestCase):
         persistent_objects = AppLogging.objects.all()
 
         for persistent_object in persistent_objects:
-            print("Persisten object info:{}".format(persistent_object.info))
+            print("Persisten object info:{}".format(persistent_object.info_text))
 
         self.assertEqual(persistent_objects.count(), 0)
         self.assertEqual(KeyWords.objects.all().count(), 0)
@@ -608,7 +608,7 @@ class CleanJobHandlerTest(FakeInternetTestCase):
         persistent_objects = AppLogging.objects.all()
 
         for persistent_object in persistent_objects:
-            print("Persisten object info:{}".format(persistent_object.info))
+            print("Persisten object info:{}".format(persistent_object.info_text))
 
         self.assertEqual(persistent_objects.count(), 0)
         self.assertEqual(KeyWords.objects.all().count(), 0)
@@ -642,7 +642,7 @@ class AddJobHandlerTest(FakeInternetTestCase):
         persistent_objects = AppLogging.objects.all()
 
         for persistent_object in persistent_objects:
-            print("Persisten object info:{}".format(persistent_object.info))
+            print("Persisten object info:{}".format(persistent_object.info_text))
 
         self.assertEqual(persistent_objects.count(), 0)
         self.assertEqual(LinkDataController.objects.all().count(), 1)
@@ -697,7 +697,7 @@ class ScanLinkJobHandlerTest(FakeInternetTestCase):
         persistent_objects = AppLogging.objects.all()
 
         for persistent_object in persistent_objects:
-            print("Persisten object info:{}".format(persistent_object.info))
+            print("Persisten object info:{}".format(persistent_object.info_text))
 
         self.assertEqual(persistent_objects.count(), 0)
 
@@ -759,7 +759,7 @@ class ProcessSourceHandlerTest(FakeInternetTestCase):
 
         persistent_objects = AppLogging.objects.all()
         for persistent_object in persistent_objects:
-            print("AppLogging object info:{}".format(persistent_object.info))
+            print("AppLogging object info:{}".format(persistent_object.info_text))
 
         self.assertEqual(persistent_objects.count(), 0)
 

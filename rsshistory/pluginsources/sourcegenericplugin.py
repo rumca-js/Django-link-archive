@@ -91,6 +91,9 @@ class SourceGenericPlugin(HtmlPage):
                     link_data["source"] = source.url
                     link_data["source_obj"] = source
 
+                if "page_rating" in link_data:
+                    link_data["page_rating_contents"] = link_data["page_rating"]
+
                 # LinkDatabase.info("Generic plugin item add:{}".format(link_data["link"]))
 
                 b = LinkDataBuilder()

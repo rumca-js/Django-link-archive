@@ -941,11 +941,33 @@ class ContentInterface(DomainAwarePage):
 
     def get_page_rating(self):
         """
-        Should be in range 0 - 100 (percentage).
-
-        Allows us to extend properties, and not break existing page ratings.
+        Default behavior
         """
-        raise NotImplementedError
+        page_rating = 0
+
+        if self.get_title() is not None and str(self.get_title()) != "":
+            page_rating += 10
+
+        if self.get_description() is not None and str(self.get_description()) != "":
+            page_rating += 5
+
+        if self.get_language() is not None and str(self.get_language()) != "":
+            page_rating += 1
+
+        if self.get_thumbnail() is not None and str(self.get_thumbnail()) != "":
+            page_rating += 1
+
+        if (
+            self.get_date_published() is not None
+            and str(self.get_date_published()) != ""
+        ):
+            page_rating += 1
+
+        max_page_rating = 10 + 5 + 1 + 1 + 1
+
+        page_rating = (page_rating * 100) / max_page_rating
+
+        return int(page_rating)
 
     def get_date_published(self):
         """
@@ -1188,33 +1210,6 @@ class DefaultContentPage(ContentInterface):
         """
         return None
 
-    def get_page_rating(self):
-        page_rating = 0
-
-        if self.get_title() is not None and str(self.get_title()) != "":
-            page_rating += 10
-
-        if self.get_description() is not None and str(self.get_description()) != "":
-            page_rating += 5
-
-        if self.get_language() is not None and str(self.get_language()) != "":
-            page_rating += 1
-
-        if self.get_thumbnail() is not None and str(self.get_thumbnail()) != "":
-            page_rating += 1
-
-        if (
-            self.get_date_published() is not None
-            and str(self.get_date_published()) != ""
-        ):
-            page_rating += 1
-
-        max_page_rating = 10 + 5 + 1 + 1 + 1
-
-        page_rating = (page_rating * 100) / max_page_rating
-
-        return int(page_rating)
-
 
 class JsonPage(ContentInterface):
     def __init__(self, url, contents=None, options=None, page_object=None):
@@ -1269,6 +1264,111 @@ class JsonPage(ContentInterface):
         return 0
 
 
+class RssPageEntry(ContentInterface):
+    def __init__(self, feed, feed_entry, page_object):
+        self.feed = page_object.feed
+        self.feed_entry = feed_entry
+        self.page_object = page_object
+
+        super().__init__(
+            page_object.url, page_object=page_object
+        )
+
+        self.allow_adding_with_current_time = True
+        self.default_entry_timestamp = None
+
+    def get_properties(self):
+        output_map = {}
+
+        if "link" not in self.feed_entry:
+            return output_map
+
+        output_map["title"] = self.get_title()
+        output_map["description"] = self.get_description()
+        output_map["thumbnail"] = self.get_thumbnail()
+        output_map["date_published"] = self.get_date_published()
+        output_map["source"] = self.page_object.url
+        output_map["title"] = self.get_title()
+        output_map["language"] = self.get_language()
+        output_map["link"] = self.feed_entry.link
+        output_map["artist"] = self.get_author()
+        output_map["album"] = self.get_album()
+        output_map["bookmarked"] = False
+        output_map["feed_entry"] = self.feed_entry
+        output_map["page_rating"] = self.get_page_rating()
+
+        return output_map
+
+    def get_title(self):
+        return self.feed_entry.title
+
+    def get_description(self):
+        if hasattr(self.feed_entry, "description"):
+            return self.feed_entry.description
+        else:
+            return ""
+
+    def get_thumbnail(self):
+        if hasattr(self.feed_entry, "media_thumbnail"):
+            if len(self.feed_entry.media_thumbnail) > 0:
+                thumb = self.feed_entry.media_thumbnail[0]
+                if "url" in thumb:
+                    return thumb["url"]
+                else:
+                    return str(thumb)
+        if hasattr(self.feed_entry, "media_content"):
+            if len(self.feed_entry.media_content) > 0:
+                thumb = self.feed_entry.media_content[0]
+                if "url" in thumb:
+                    return thumb["url"]
+                else:
+                    return str(thumb)
+
+        return None
+
+    def get_language(self):
+        return self.page_object.get_language()
+
+    def get_date_published(self):
+        date = self.get_date_published_implementation()
+
+        from .dateutils import DateUtils
+
+        if date > DateUtils.get_datetime_now_utc():
+            date = DateUtils.get_datetime_now_utc()
+
+        return date
+
+    def get_date_published_implementation(self):
+        from .dateutils import DateUtils
+
+        if hasattr(self.feed_entry, "published"):
+            try:
+                dt = parser.parse(self.feed_entry.published)
+                return DateUtils.to_utc_date(dt)
+
+            except Exception as e:
+                AppLogging.error(
+                    "Rss parser datetime invalid feed datetime:{}; Exc:{}\n".format(
+                        self.feed_entry.published, str(e)
+                    )
+                )
+                return DateUtils.get_datetime_now_utc()
+
+        elif self.allow_adding_with_current_time:
+            return DateUtils.get_datetime_now_utc()
+        elif self.default_entry_timestamp:
+            return self.default_entry_timestamp
+        else:
+            return DateUtils.get_datetime_now_utc()
+
+    def get_author(self):
+        return self.page_object.get_author()
+
+    def get_album(self):
+        return ""
+
+
 class RssPage(ContentInterface):
     """
     Handles RSS parsing.
@@ -1285,9 +1385,6 @@ class RssPage(ContentInterface):
         super().__init__(
             url, contents=contents, options=options, page_object=page_object
         )
-
-        self.allow_adding_with_current_time = True
-        self.default_entry_timestamp = None
 
     def process_contents(self):
         if self.contents and not self.feed:
@@ -1340,37 +1437,11 @@ class RssPage(ContentInterface):
 
     def get_container_elements_maps(self):
         for feed_entry in self.feed.entries:
-            entry_props = self.get_feed_entry_map(feed_entry)
+            rss_entry = RssPageEntry(self.feed, feed_entry, self)
+            entry_props = rss_entry.get_properties()
+
             if entry_props is not None:
                 yield entry_props
-
-    def get_feed_entry_map(self, feed_entry):
-        output_map = {}
-
-        if "link" not in feed_entry:
-            return output_map
-
-        output_map["description"] = self.get_feed_description(feed_entry)
-        output_map["thumbnail"] = self.get_feed_thumbnail(feed_entry)
-        output_map["date_published"] = self.get_feed_date_published(feed_entry)
-        output_map["source"] = self.url
-        output_map["title"] = feed_entry.title
-        output_map["language"] = self.get_language()
-        output_map["link"] = feed_entry.link
-        output_map["artist"] = self.get_author()
-        output_map["album"] = ""
-        output_map["bookmarked"] = False
-        output_map["feed_entry"] = feed_entry
-
-        from .dateutils import DateUtils
-
-        if output_map["date_published"] > DateUtils.get_datetime_now_utc():
-            output_map["date_published"] = DateUtils.get_datetime_now_utc()
-
-        if str(feed_entry.title).strip() == "" or feed_entry.title == "undefined":
-            output_map["title"] = output_map["link"]
-
-        return output_map
 
     @lazy_load_content
     def get_body_hash(self):
@@ -1388,52 +1459,6 @@ class RssPage(ContentInterface):
         if entries:
             return self.calculate_hash(entries)
 
-    def get_feed_description(self, feed_entry):
-        if hasattr(feed_entry, "description"):
-            return feed_entry.description
-        else:
-            return ""
-
-    def get_feed_thumbnail(self, feed_entry):
-        if hasattr(feed_entry, "media_thumbnail"):
-            if len(feed_entry.media_thumbnail) > 0:
-                thumb = feed_entry.media_thumbnail[0]
-                if "url" in thumb:
-                    return thumb["url"]
-                else:
-                    return str(thumb)
-        if hasattr(feed_entry, "media_content"):
-            if len(feed_entry.media_content) > 0:
-                thumb = feed_entry.media_content[0]
-                if "url" in thumb:
-                    return thumb["url"]
-                else:
-                    return str(thumb)
-
-        return None
-
-    def get_feed_date_published(self, feed_entry):
-        from .dateutils import DateUtils
-
-        if hasattr(feed_entry, "published"):
-            try:
-                dt = parser.parse(feed_entry.published)
-                return DateUtils.to_utc_date(dt)
-
-            except Exception as e:
-                AppLogging.error(
-                    "Rss parser datetime invalid feed datetime:{}; Exc:{}\n".format(
-                        feed_entry.published, str(e)
-                    )
-                )
-                return DateUtils.get_datetime_now_utc()
-
-        elif self.allow_adding_with_current_time:
-            return DateUtils.get_datetime_now_utc()
-        elif self.default_entry_timestamp:
-            return self.default_entry_timestamp
-        else:
-            return DateUtils.get_datetime_now_utc()
 
     @lazy_load_content
     def get_title(self):

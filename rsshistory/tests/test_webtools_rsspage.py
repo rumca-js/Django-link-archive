@@ -55,11 +55,15 @@ class RssPageTest(FakeInternetTestCase):
         self.assertEqual(reader.get_title(), "SAMTIME on Odysee")
         self.assertTrue(reader.is_rss(False))
 
+        self.assertEqual(self.mock_page_requests, 0)
+
     def test_get_subtitle(self):
         # default language
         reader = RssPage("http://test.com/my-site-test", webpage_rss)
         reader.parse()
         self.assertEqual(reader.get_description(), "SAMTIME channel description")
+
+        self.assertEqual(self.mock_page_requests, 0)
 
     def test_get_language(self):
         # default language
@@ -67,6 +71,8 @@ class RssPageTest(FakeInternetTestCase):
         reader.parse()
         self.assertEqual(reader.get_language(), "ci")
         self.assertTrue(reader.is_rss(False))
+
+        self.assertEqual(self.mock_page_requests, 0)
 
     def test_get_thumbnail(self):
         # default language
@@ -78,12 +84,16 @@ class RssPageTest(FakeInternetTestCase):
         )
         self.assertTrue(reader.is_rss(False))
 
+        self.assertEqual(self.mock_page_requests, 0)
+
     def test_get_author(self):
         # default language
         reader = RssPage("http://test.com/my-site-test", webpage_rss)
         reader.parse()
         self.assertEqual(reader.get_author(), "SAMTIME name")
         self.assertTrue(reader.is_rss(False))
+
+        self.assertEqual(self.mock_page_requests, 0)
 
     def test_entries(self):
         # default language
@@ -97,6 +107,8 @@ class RssPageTest(FakeInternetTestCase):
         self.assertEqual(entry["description"], "First entry description")
         self.assertTrue(reader.is_rss(False))
 
+        self.assertEqual(self.mock_page_requests, 0)
+
     def test_entry_old_date(self):
         # default language
         reader = RssPage("https://youtube.com/channel/2020-year-channel/rss.xml")
@@ -109,6 +121,8 @@ class RssPageTest(FakeInternetTestCase):
         self.assertEqual(entry["description"], "First entry description")
         self.assertEqual(entry["date_published"].year, 2020)
         self.assertTrue(reader.is_rss(False))
+
+        self.assertEqual(self.mock_page_requests, 1)
 
     def test_entry_no_date(self):
         # default language
@@ -126,21 +140,42 @@ class RssPageTest(FakeInternetTestCase):
         self.assertEqual(entry["date_published"].year, current_date_time.year)
         self.assertTrue(reader.is_rss(False))
 
+        self.assertEqual(self.mock_page_requests, 1)
+
+    def test_entry_page_rating(self):
+        # default language
+        reader = RssPage("https://youtube.com/channel/no-pubdate-channel/rss.xml")
+        entries = reader.get_container_elements()
+        entries = list(entries)
+
+        self.assertEqual(len(entries), 1)
+
+        entry = entries[0]
+        self.assertTrue(entry["page_rating"] > 0)
+
+        self.assertEqual(self.mock_page_requests, 1)
+
     def test_is_rss(self):
         # default language
         reader = RssPage("https://isocpp.org/blog/rss/category/news")
         self.assertTrue(reader.is_rss(False))
+
+        self.assertEqual(self.mock_page_requests, 1)
 
     def test_is_rss2(self):
         # default language
         reader = RssPage("https://cppcast.com/feed.rss")
         self.assertTrue(reader.is_rss(False))
 
+        self.assertEqual(self.mock_page_requests, 1)
+
     def test_rss_is_valid_true(self):
         # default language
         reader = RssPage("https://youtube.com/channel/2020-year-channel/rss.xml")
         entries = reader.get_container_elements()
         self.assertTrue(reader.is_valid())
+
+        self.assertEqual(self.mock_page_requests, 1)
 
     def test_get_body_hash(self):
         # default language
@@ -152,6 +187,8 @@ class RssPageTest(FakeInternetTestCase):
         self.assertTrue(entries)
         self.assertTrue(entries != "")
         self.assertEqual(hash, reader.calculate_hash(entries))
+
+        self.assertEqual(self.mock_page_requests, 1)
 
     """
     feeder does not parses update time

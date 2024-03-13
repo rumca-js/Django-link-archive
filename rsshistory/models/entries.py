@@ -457,13 +457,20 @@ class BaseLinkDataController(BaseLinkDataModel):
 
     def is_valid(self):
         """
-        We do not know if a page is valid if status code is 0
+        Link is not valid:
+         - if status indicates so
+         - if it is dead (manual indication)
+         - if it was downvoted to oblivion
         """
-        return (self.status_code == 0 or self.is_status_code_valid()) and not self.dead
+        return (self.is_status_code_valid() and self.page_rating > 0 and not self.dead)
 
     def is_status_code_valid(self):
         if self.status_code == 403:
             # Many pages return 403, but they are correct
+            return True
+
+        if self.status_code == 0:
+            # The page has not yet been fetched / checked
             return True
 
         return self.status_code >= 200 and self.status_code < 300

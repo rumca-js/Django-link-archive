@@ -316,10 +316,13 @@ class BackgroundJobController(BackgroundJob):
 
     def entry_update_data(entry, force=False):
         """
-        Do not update, if it was updated recently
+        Do not update, if it was updated recently, or if we are missing key components
         """
+        if entry.dead:
+            return
+
         if not force:
-            if entry.date_update_last > DateUtils.get_datetime_now_utc() - timedelta(
+            if entry.page_rating > 0 and entry.page_rating_contents > 0 and entry.date_update_last > DateUtils.get_datetime_now_utc() - timedelta(
                 days=30
             ):
                 return
@@ -332,6 +335,9 @@ class BackgroundJobController(BackgroundJob):
         """
         Do not update, if it was updated recently
         """
+        if entry.dead:
+            return
+
         if not force:
             if entry.date_update_last > DateUtils.get_datetime_now_utc() - timedelta(
                 days=1

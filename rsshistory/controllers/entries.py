@@ -108,6 +108,7 @@ class LinkDataController(LinkDataModel):
         moved_all = LinkDataWrapper.move_old_links_to_archive(limit_s)
         cleared_all = LinkDataWrapper.clear_old_entries(limit_s)
         # LinkDataController.recreate_from_domains()
+        LinkDataController.update_some_page_ratings()
 
         # TODO if configured to store domains, but do not store entries - remove all normal non-domain entries
 
@@ -126,6 +127,21 @@ class LinkDataController(LinkDataModel):
 
                 LinkDatabase.info("Creating entry for domain:{}".format(full_domain))
                 BackgroundJobController.link_add(full_domain)
+
+    def update_some_page_ratings():
+        """
+        TODO Remove this when database is cleaned up
+        """
+        from .backgroundjob import BackgroundJobController
+
+        zeros = LinkDataController.objects.filter(page_rating = 0, page_rating_contents__gt = 0)
+        for zero in zeros:
+            zero.page_rating = zero.page_rating_contents
+            zero.save()
+
+        real_zeros = LinkDataController.objects.filter(page_rating = 0, page_rating_contents = 0)
+        for zero in real_zeros[:1000]:
+            BackgroundJobController.entry_update_data(zero)
 
     def get_cleaned_link(link):
         if link.endswith("/"):
@@ -742,7 +758,7 @@ class LinkDataBuilder(object):
                 new_link_data["description"]
             )
 
-        if "page_rating" in new_link_data and new_link_data["page_rating"] == 0:
+        if "page_rating" not in new_link_data or "page_rating" in new_link_data and new_link_data["page_rating"] == 0:
             if "page_rating_contents" in new_link_data:
                 new_link_data["page_rating"] = new_link_data["page_rating_contents"]
 
