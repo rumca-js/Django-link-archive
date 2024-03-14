@@ -604,7 +604,8 @@ class LinkDataBuilder(object):
             self.add_from_props()
 
     def add_from_link(self):
-        self.link = LinkDataController.get_cleaned_link(self.link)
+        from ..pluginurl import UrlHandler
+        self.link = UrlHandler.get_cleaned_link(self.link)
 
         p = HtmlPage(self.link)
         if p.is_link_service():
@@ -669,11 +670,10 @@ class LinkDataBuilder(object):
             LinkDatabase.info("Could not obtain properties for 2:{}".format(self.link))
 
     def add_from_props(self):
+        from ..pluginurl import UrlHandler
         obj = None
 
-        self.link_data["link"] = LinkDataController.get_cleaned_link(
-            self.link_data["link"]
-        )
+        self.link_data["link"] = UrlHandler.get_cleaned_link(self.link_data["link"])
         self.link = self.link_data["link"]
 
         wrapper = LinkDataWrapper(self.link)
