@@ -198,3 +198,28 @@ class UrlHandler(object):
 
         if url.endswith("/"):
             url = url[:-1]
+
+    def get_cleaned_link(url):
+        """
+        TODO if possible should make translation between youtube -> canonical youtube link
+        """
+        from urllib.parse import unquote
+
+        url = Url.get_cleaned_link(url)
+
+        stupid_google_string = "https://www.google.com/url?q="
+        if url.find(stupid_google_string) >= 0:
+            wh = url.find("http", len(stupid_google_string))
+            if wh >= 0:
+                url = url[wh:]
+
+        stupid_youtube_string = "https://www.youtube.com/redirect"
+        if url.find(stupid_youtube_string) >= 0:
+            wh = url.rfind("&q=")
+            if wh >= 0:
+                wh = url.find("http", wh)
+                if wh >= 0:
+                    url = url[wh:]
+                    url = unquote(url)
+
+        return url

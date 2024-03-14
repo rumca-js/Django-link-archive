@@ -143,17 +143,6 @@ class LinkDataController(LinkDataModel):
         for zero in real_zeros[:1000]:
             BackgroundJobController.entry_update_data(zero)
 
-    def get_cleaned_link(link):
-        if link.endswith("/"):
-            link = link[:-1]
-
-        # domain is lowercase
-        p = BasePage(link)
-        domain = p.get_domain()
-        if domain:
-            link = link.replace(domain, domain.lower(), 1)
-        return link
-
     def get_full_information(data):
         from ..pluginurl.entryurlinterface import EntryUrlInterface
 
@@ -161,6 +150,8 @@ class LinkDataController(LinkDataModel):
         return info
 
     def get_clean_data(props):
+        from ..pluginurl import UrlHandler
+
         result = {}
         test = LinkDataController()
 
@@ -169,7 +160,7 @@ class LinkDataController(LinkDataModel):
                 result[key] = props[key]
 
         if "link" in result:
-            result["link"] = LinkDataController.get_cleaned_link(result["link"])
+            result["link"] = UrlHandler.get_cleaned_link(result["link"])
 
         if "tags" in result:
             del result["tags"]

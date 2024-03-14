@@ -1283,19 +1283,12 @@ class RssPageEntry(ContentInterface):
         if "link" not in self.feed_entry:
             return output_map
 
-        output_map["title"] = self.get_title()
-        output_map["description"] = self.get_description()
-        output_map["thumbnail"] = self.get_thumbnail()
-        output_map["date_published"] = self.get_date_published()
+        output_map = super().get_properties()
+
         output_map["source"] = self.page_object.url
-        output_map["title"] = self.get_title()
-        output_map["language"] = self.get_language()
         output_map["link"] = self.feed_entry.link
-        output_map["artist"] = self.get_author()
-        output_map["album"] = self.get_album()
         output_map["bookmarked"] = False
         output_map["feed_entry"] = self.feed_entry
-        output_map["page_rating"] = self.get_page_rating()
 
         return output_map
 
@@ -1367,6 +1360,12 @@ class RssPageEntry(ContentInterface):
 
     def get_album(self):
         return ""
+
+    def get_tags(self):
+        if "tags" in self.feed_entry:
+            return self.feed_entry.tags
+
+        return None
 
 
 class RssPage(ContentInterface):
@@ -1583,6 +1582,9 @@ class RssPage(ContentInterface):
     def get_tags(self):
         if self.feed is None:
             return
+
+        if "tags" in self.feed.feed:
+            return self.feed.feed.tags
 
         return None
 
@@ -2311,6 +2313,17 @@ class Url(object):
             return True
 
         return False
+
+    def get_cleaned_link(url):
+        if url.endswith("/"):
+            url = url[:-1]
+
+        # domain is lowercase
+        p = BasePage(url)
+        domain = p.get_domain()
+        if domain:
+            url = url.replace(domain, domain.lower(), 1)
+        return url
 
 
 class UrlWrapper(object):

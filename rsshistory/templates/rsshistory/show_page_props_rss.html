@@ -36,6 +36,7 @@
     {%if tags %}
     <li>keywords: {{tags}}</li>
     {%endif %}
+    <li>keywords: {{page_object.get_tags}}</li>
 
     <li>Selenium: {{page_object.options.is_selenium}}</li>
 

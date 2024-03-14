@@ -20,6 +20,7 @@ from ..queryfilters import SourceFilter
 from ..views import ViewPage
 from ..configuration import Configuration
 from ..webtools import Url, BasePage
+from ..pluginurl import UrlHandler
 
 
 class RssSourceListView(generic.ListView):
@@ -171,6 +172,8 @@ def add_source_simple(request):
     from ..controllers import SourceDataController
 
     def get_add_link_form(p, url):
+        url = UrlHandler.get_cleaned_link(url)
+
         if not Url.is_web_link(url):
             p.context["summary_text"] = "Only http links are allowed. Link:{}".format(
                 url

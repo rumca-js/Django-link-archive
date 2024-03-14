@@ -41,6 +41,7 @@ from ..queryfilters import EntryFilter
 from ..views import ViewPage
 from ..configuration import Configuration
 from ..webtools import Url, BasePage
+from ..pluginurl import UrlHandler
 from ..services.waybackmachine import WaybackMachine
 from ..dateutils import DateUtils
 from ..serializers.instanceimporter import InstanceExporter
@@ -626,7 +627,8 @@ def add_simple_entry(request):
         form = LinkInputForm(request.POST)
         if form.is_valid():
             link = form.cleaned_data["link"]
-            link = LinkDataController.get_cleaned_link(link)
+
+            link = UrlHandler.get_cleaned_link(link)
 
             if not Url.is_web_link(link):
                 p.context[

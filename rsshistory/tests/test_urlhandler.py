@@ -85,3 +85,20 @@ class UrlHandlerTest(FakeInternetTestCase):
         self.assertEqual(type(handler), HtmlPage)
 
         self.assertTrue(handler.options.use_selenium_full)
+
+    def test_get_cleaned_link_stupid_google_link(self):
+        cleaned_link = UrlHandler.get_cleaned_link("https://www.google.com/url?q=https://forum.ddopl.com")
+
+        self.assertEqual(cleaned_link, "https://forum.ddopl.com")
+
+    def test_get_cleaned_link_stupid_youtube_link(self):
+        cleaned_link = UrlHandler.get_cleaned_link("https://www.youtube.com/redirect?event=lorum&redir_token=ipsum&q=https%3A%2F%2Fcorridordigital.com%2F&v=LeB9DcFT810")
+
+        self.assertEqual(cleaned_link, "https://corridordigital.com/&v=LeB9DcFT810")
+
+    def test_get_cleaned_link(self):
+        cleaned_link = UrlHandler.get_cleaned_link("https://www.YouTube.com/Test")
+        self.assertEqual(cleaned_link, "https://www.youtube.com/Test")
+
+        cleaned_link = UrlHandler.get_cleaned_link("https://www.YouTube.com/Test/")
+        self.assertEqual(cleaned_link, "https://www.youtube.com/Test")

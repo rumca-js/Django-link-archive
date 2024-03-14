@@ -53,6 +53,7 @@
     {%if tags %}
     <li>keywords: {{tags}}</li>
     {%endif %}
+    <li>keywords: {{page_object.get_tags}}</li>
 
     {%if robots_txt_url %}
     <li>Robots txt URL: {{robots_txt_url}} <a href="{{robots_txt_url}}">Link</a></li>

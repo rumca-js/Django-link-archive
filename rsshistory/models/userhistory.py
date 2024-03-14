@@ -329,6 +329,34 @@ class UserEntryVisitHistory(models.Model):
 
         return False
 
+    def is_visited(user, entry):
+        """
+        Used to determine entry visibility in lists.
+        If user is not authenticated, all entries should be visible, therefore state 'True'
+        The flag only makes sense if user actions are tracked, and user is authenticated.
+        """
+        if not user.is_authenticated:
+            return True
+
+        config_entry = Configuration.get_object().config_entry
+        if (
+            not config_entry.track_user_actions
+            or not config_entry.track_user_navigation
+            ):
+            return True
+
+        histories = UserEntryVisitHistory.objects.filter(
+            user_object=user,
+            entry_object = entry,
+        )
+
+        if histories.count() > 0:
+            history = histories[0]
+            if entry.visits > 0:
+                return True
+
+        return False
+
     def get_last_user_entry(user):
         """
         Check last browsed entry.
