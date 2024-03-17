@@ -342,12 +342,12 @@ class UserEntryVisitHistory(models.Model):
         if (
             not config_entry.track_user_actions
             or not config_entry.track_user_navigation
-            ):
+        ):
             return True
 
         histories = UserEntryVisitHistory.objects.filter(
             user_object=user,
-            entry_object = entry,
+            entry_object=entry,
         )
 
         if histories.count() > 0:

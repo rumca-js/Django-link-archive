@@ -10,9 +10,9 @@ from ..webtools import ContentLinkParser, HtmlPage, BasePage
 
 class RssScannerPlugin(BaseRssPlugin):
     """
-     - We read RSS
-     - For each item in RSS we find internal links for this source
-     - For each internal link, we read page, and try to add links from inside
+    - We read RSS
+    - For each item in RSS we find internal links for this source
+    - For each internal link, we read page, and try to add links from inside
     """
 
     PLUGIN_NAME = "RssScannerPlugin"

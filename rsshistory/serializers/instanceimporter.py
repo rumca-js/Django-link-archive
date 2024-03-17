@@ -49,7 +49,7 @@ class InstanceExporter(object):
 
 
 class BaseImporter(object):
-    def __init__(self, user=None, import_settings =None):
+    def __init__(self, user=None, import_settings=None):
         self.user = user
 
         if self.user is None:
@@ -58,14 +58,14 @@ class BaseImporter(object):
         self.import_settings = import_settings
         if self.import_settings is None:
             self.import_settings = {}
-            self.import_settings['import_entries'] = True
-            self.import_settings['import_sources'] = True
-            self.import_settings['import_title'] = True
-            self.import_settings['import_description'] = True
-            self.import_settings['import_tags'] = True
-            self.import_settings['import_comments'] = True
-            self.import_settings['import_votes'] = True
-            self.import_settings['import_bookmarks'] = True
+            self.import_settings["import_entries"] = True
+            self.import_settings["import_sources"] = True
+            self.import_settings["import_title"] = True
+            self.import_settings["import_description"] = True
+            self.import_settings["import_tags"] = True
+            self.import_settings["import_comments"] = True
+            self.import_settings["import_votes"] = True
+            self.import_settings["import_bookmarks"] = True
 
     def import_from_json(self, json_data):
         if "links" in json_data:
@@ -105,7 +105,9 @@ class BaseImporter(object):
                 self.import_from_link(link_data)
             except Exception as E:
                 exc_string = traceback.format_exc()
-                AppLogging.error("Cannot import link {}\nExc:{}".format(str(E), exc_string))
+                AppLogging.error(
+                    "Cannot import link {}\nExc:{}".format(str(E), exc_string)
+                )
 
         return True
 
@@ -117,7 +119,9 @@ class BaseImporter(object):
                 self.import_from_source(source_data)
             except Exception as E:
                 exc_string = traceback.format_exc()
-                AppLogging.error("Cannot import source {}\nExc:{}".format(str(E), exc_string))
+                AppLogging.error(
+                    "Cannot import source {}\nExc:{}".format(str(E), exc_string)
+                )
 
         return True
 
@@ -214,12 +218,12 @@ class BaseImporter(object):
         return True
 
     def get_superuser(self):
-        users = User.objects.filter(is_superuser = True)
+        users = User.objects.filter(is_superuser=True)
         if users.count() > 0:
             return users[0]
 
     def get_user(self, username):
-        users = User.objects.filter(username = username)
+        users = User.objects.filter(username=username)
         if users.count() > 0:
             return users[0]
 
@@ -235,7 +239,7 @@ class BaseImporter(object):
                 clean_data["on_hold"] = True
             SourceDataBuilder(link_data=clean_data).add_from_props()
         # TODO cleanup
-        #else:
+        # else:
         #    if instance_import:
         #        source = sources[0]
 
@@ -285,12 +289,14 @@ def get_list_files(directory):
             file_list.append(os.path.join(root, file))
     return file_list
 
+
 def read_file_contents(file_path):
     """
     TODO use pathlib?
     """
     with open(file_path, "r") as f:
         return f.read()
+
 
 class FileImporter(BaseImporter):
     def __init__(self, path=None, user=None):
@@ -335,7 +341,9 @@ class InstanceImporter(BaseImporter):
             json_data = json.loads(instance_text)
         except Exception as E:
             exc_string = traceback.format_exc()
-            AppLogging.info("Cannot load JSON:{}\nExc:{}".format(instance_text, exc_string))
+            AppLogging.info(
+                "Cannot load JSON:{}\nExc:{}".format(instance_text, exc_string)
+            )
             return
 
         if "links" in json_data:
@@ -386,4 +394,3 @@ class InstanceImporter(BaseImporter):
         new_url = urlunparse(parsed_url._replace(query=new_query_string))
 
         return new_url
-

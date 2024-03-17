@@ -116,7 +116,9 @@ class YearDataWriter(BaseDataWriter):
             exporter.export(self.get_directory())
 
         if self.export_config.export_entries_permanents:
-            AppLogging.error("Bookmark exporting for year structure is not yet supported")
+            AppLogging.error(
+                "Bookmark exporting for year structure is not yet supported"
+            )
 
     def write_sources(self):
         if self.export_config.export_sources:
@@ -144,7 +146,9 @@ class NoTimeDataWriter(BaseDataWriter):
             exporter.export("permanents", self.get_directory())
 
         if self.export_config.export_entries_bookmarks:
-            AppLogging.error("Bookmark exporting for no time structure is not yet supported")
+            AppLogging.error(
+                "Bookmark exporting for no time structure is not yet supported"
+            )
 
     def write_sources(self):
         if self.export_config.export_sources:

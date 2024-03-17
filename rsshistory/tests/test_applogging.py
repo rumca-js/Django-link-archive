@@ -48,14 +48,22 @@ class AppLoggingTest(FakeInternetTestCase):
         self.assertEqual(AppLogging.objects.all().count(), 1000 + 98)
 
     def test_cleanup(self):
-        AppLogging.objects.create(info_text = "text", level=int(logging.INFO), date=datetime.now(timezone("UTC")))
+        AppLogging.objects.create(
+            info_text="text",
+            level=int(logging.INFO),
+            date=datetime.now(timezone("UTC")),
+        )
 
         # call tested function
         AppLogging.cleanup()
 
     def test_very_long_message(self):
         long_string = "x" * 3001
-        AppLogging.objects.create(info_text = long_string, level=int(logging.INFO), date=datetime.now(timezone("UTC")))
+        AppLogging.objects.create(
+            info_text=long_string,
+            level=int(logging.INFO),
+            date=datetime.now(timezone("UTC")),
+        )
 
         logs = AppLogging.objects.all()
         self.assertTrue(logs.count(), 1)

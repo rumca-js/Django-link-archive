@@ -14,7 +14,9 @@ class BaseJsonPluginTest(FakeInternetTestCase):
         self.disable_web_pages()
 
         self.user = User.objects.create_user(
-            username="testuser", password="testpassword", is_superuser=True,
+            username="testuser",
+            password="testpassword",
+            is_superuser=True,
         )
 
     def test_get_container_elements_source(self):

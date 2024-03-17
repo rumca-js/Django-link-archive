@@ -84,7 +84,7 @@ class ConfigForm(forms.ModelForm):
             "sources_per_page",
             "max_links_per_page",
             "max_sources_per_page",
-            #Advanced
+            # Advanced
             "user_agent",
             "user_headers",
         ]
@@ -112,10 +112,14 @@ class ConfigForm(forms.ModelForm):
 
         if self.is_mobile:
             self.fields["user_agent"].widget.attrs.update(size="20")
-            self.fields["user_headers"].widget=forms.Textarea(attrs={'rows':10, 'cols':20})
+            self.fields["user_headers"].widget = forms.Textarea(
+                attrs={"rows": 10, "cols": 20}
+            )
         else:
             self.fields["user_agent"].widget.attrs.update(size="100")
-            self.fields["user_headers"].widget=forms.Textarea(attrs={'rows':20, 'cols':75})
+            self.fields["user_headers"].widget = forms.Textarea(
+                attrs={"rows": 20, "cols": 75}
+            )
 
     def pop_headers(self, args, kwargs):
         self.request = None
@@ -165,7 +169,8 @@ class UserConfigForm(forms.ModelForm):
     """
     Category choice form
     """
-    #BIRTH_YEAR_CHOICES = ["1970", "]
+
+    # BIRTH_YEAR_CHOICES = ["1970", "]
 
     def __init__(self, *args, **kwargs):
         super(UserConfigForm, self).__init__(*args, **kwargs)
@@ -188,10 +193,10 @@ class UserConfigForm(forms.ModelForm):
         # fields = ['show_icons', 'thumbnails_as_icons', 'small_icons', 'display_type', 'theme', 'links_per_page']
         # widgets = {
         # }
-        #widgets = {
+        # widgets = {
         #    # DateTimeInput widget does not work my my Android phone
         #        'birth_date': forms.SelectDateWidget(years=BIRTH_YEAR_CHOICES)
-        #}
+        # }
 
 
 class ImportSourceRangeFromInternetArchiveForm(forms.Form):

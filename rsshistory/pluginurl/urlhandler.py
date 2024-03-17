@@ -70,8 +70,8 @@ class UrlHandler(object):
 
         # if response is cloudflare jibberish, try using selenium
         if options.is_not_selenium() and (
-            (not page.is_valid() or page.is_cloudflare_protected()) or
-            (page.status_code == 403)
+            (not page.is_valid() or page.is_cloudflare_protected())
+            or (page.status_code == 403)
         ):
             LinkDatabase.info(
                 "Could not normally obtain contents. Trying selenium:".format(url)

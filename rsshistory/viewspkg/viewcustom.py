@@ -38,27 +38,8 @@ def page_show_properties(request):
         return data
 
     def show_page_props_internal(requests, page_link):
-        fast_check = False
-        use_selenium = False
+        ViewPage.fill_context_type(p.context, page_link)
 
-        if "use_selenium" in request.GET:
-            use_selenium = True
-
-        page = UrlHandler.get(
-            page_link, fast_check=fast_check, use_selenium=use_selenium
-        )
-
-        p.context["page_type"] = str(type(page))
-        p.context["page_link"] = page.url
-        p.context.update(page.get_properties())
-        p.context["is_html"] = page.is_html(fast_check=fast_check)
-        p.context["is_rss"] = page.is_rss(fast_check=fast_check)
-        p.context["is_youtube_video_handler"] = (
-            type(page) is UrlHandler.youtube_video_handler
-        )
-        p.context["is_odysee_video_handler"] = (
-            type(page) is UrlHandler.odysee_video_handler
-        )
         p.context["page_object"] = page
 
         return p.render("show_page_props.html")

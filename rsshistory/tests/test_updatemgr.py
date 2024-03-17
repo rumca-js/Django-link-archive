@@ -60,8 +60,8 @@ class UpdateManagerGitTest(FakeInternetTestCase):
         c.config_entry = ConfigurationEntry.get()
 
         c.config_entry.auto_store_entries = True
-        c.config_entry.data_import_path ="./data/imports"
-        c.config_entry.data_export_path ="./data/exports"
+        c.config_entry.data_import_path = "./data/imports"
+        c.config_entry.data_export_path = "./data/exports"
         c.config_entry.save()
 
         source_youtube = SourceDataController.objects.create(
@@ -146,8 +146,8 @@ class UpdateManagerGitTest(FakeInternetTestCase):
 
         self.assertEqual(len(RepoTestFactory.used_repos), 1)
 
-        #expected_path = Path("./data/exports/daily_dir/git/RSS-Link-Database-DAILY")
-        #self.assertEqual(mgr.get_repo_operating_dir(), expected_path)
+        # expected_path = Path("./data/exports/daily_dir/git/RSS-Link-Database-DAILY")
+        # self.assertEqual(mgr.get_repo_operating_dir(), expected_path)
 
     def test_year_repo(self):
         RepoTestFactory.used_repos = []
@@ -162,8 +162,8 @@ class UpdateManagerGitTest(FakeInternetTestCase):
         mgr.write_and_push_year_data()
         self.assertEqual(len(RepoTestFactory.used_repos), 1)
 
-        #expected_path = Path("./data/exports/year_dir/git/RSS-Link-Database-YEAR")
-        #self.assertEqual(mgr.get_repo_operating_dir(), expected_path)
+        # expected_path = Path("./data/exports/year_dir/git/RSS-Link-Database-YEAR")
+        # self.assertEqual(mgr.get_repo_operating_dir(), expected_path)
 
     def test_notime_repo(self):
         RepoTestFactory.used_repos = []
@@ -179,8 +179,8 @@ class UpdateManagerGitTest(FakeInternetTestCase):
 
         self.assertEqual(len(RepoTestFactory.used_repos), 1)
 
-        #expected_path = Path("./data/exports/notime_dir/git/RSS-Link-Database-NOTIME")
-        #self.assertEqual(mgr.get_repo_operating_dir(), expected_path)
+        # expected_path = Path("./data/exports/notime_dir/git/RSS-Link-Database-NOTIME")
+        # self.assertEqual(mgr.get_repo_operating_dir(), expected_path)
 
 
 class UpdateManagerLocTest(FakeInternetTestCase):

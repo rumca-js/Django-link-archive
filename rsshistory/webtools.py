@@ -124,7 +124,10 @@ class PageOptions(object):
 
     def __str__(self):
         return "F:{} H:{} SSL:{} R:{}".format(
-            self.use_selenium_full, self.use_selenium_headless, self.ssl_verify, self.link_redirect
+            self.use_selenium_full,
+            self.use_selenium_headless,
+            self.ssl_verify,
+            self.link_redirect,
         )
 
 
@@ -411,7 +414,6 @@ class BasePage(object):
         driver = webdriver.Chrome(service=service, options=options)
 
         try:
-
             # add 10 seconds for start of browser, etc.
             selenium_timeout = timeout + 10
 
@@ -422,7 +424,7 @@ class BasePage(object):
             TODO - if webpage changes link, it should also update it in this object
             """
 
-            #if self.options.link_redirect:
+            # if self.options.link_redirect:
             #    WebDriverWait(driver, selenium_timeout).until(EC.url_changes(driver.current_url))
 
             html_content = driver.page_source
@@ -434,7 +436,9 @@ class BasePage(object):
         except TimeoutException:
             error_text = traceback.format_exc()
             AppLogging.error(
-                "Timeout when reading page:{}\nURL:{}\n{}".format(selenium_timeout, driver.current_url, error_text)
+                "Timeout when reading page:{}\nURL:{}\n{}".format(
+                    selenium_timeout, driver.current_url, error_text
+                )
             )
             return SeleniumResponseObject(url, None, 500)
         finally:
@@ -455,11 +459,11 @@ class BasePage(object):
         service = Service(executable_path="/usr/bin/chromedriver")
         options = webdriver.ChromeOptions()
         options.add_argument("--headless")
-        #options.add_argument("--no-sandbox")
-        #options.add_argument("--disable-dev-shm-usage")
-        #options.add_argument('--remote-debugging-pipe')
-        #options.add_argument('--remote-debugging-port=9222')
-        #options.add_argument('--user-data-dir=~/.config/google-chrome')
+        # options.add_argument("--no-sandbox")
+        # options.add_argument("--disable-dev-shm-usage")
+        # options.add_argument('--remote-debugging-pipe')
+        # options.add_argument('--remote-debugging-port=9222')
+        # options.add_argument('--user-data-dir=~/.config/google-chrome')
 
         # if not BasePage.ssl_verify:
         #    options.add_argument('ignore-certificate-errors')
@@ -467,7 +471,6 @@ class BasePage(object):
         driver = webdriver.Chrome(service=service, options=options)
 
         try:
-
             # add 10 seconds for start of browser, etc.
             selenium_timeout = timeout + 20
 
@@ -475,7 +478,7 @@ class BasePage(object):
 
             driver.get(url)
 
-            #if self.options.link_redirect:
+            # if self.options.link_redirect:
             #    WebDriverWait(driver, selenium_timeout).until(EC.url_changes(driver.current_url))
             """
             TODO - if webpage changes link, it should also update it in this object
@@ -497,7 +500,9 @@ class BasePage(object):
         except TimeoutException:
             error_text = traceback.format_exc()
             AppLogging.error(
-                "Timeout when reading page:{}\nURL:{}\n{}".format(selenium_timeout, driver.current_url, error_text)
+                "Timeout when reading page:{}\nURL:{}\n{}".format(
+                    selenium_timeout, driver.current_url, error_text
+                )
             )
             return SeleniumResponseObject(url, None, 500)
         finally:
@@ -525,9 +530,7 @@ class BasePage(object):
             driver.get(url)
             time.sleep(5)
         except TimeoutException:
-            AppLogging.error(
-                "Timeout when reading page. {}".format(selenium_timeout)
-            )
+            AppLogging.error("Timeout when reading page. {}".format(selenium_timeout))
             return SeleniumResponseObject(url, None, 500)
 
         html_content = driver.page_source
@@ -1270,9 +1273,7 @@ class RssPageEntry(ContentInterface):
         self.feed_entry = feed_entry
         self.page_object = page_object
 
-        super().__init__(
-            page_object.url, page_object=page_object
-        )
+        super().__init__(page_object.url, page_object=page_object)
 
         self.allow_adding_with_current_time = True
         self.default_entry_timestamp = None
@@ -1457,7 +1458,6 @@ class RssPage(ContentInterface):
                 return self.calculate_hash(self.contents)
         if entries:
             return self.calculate_hash(entries)
-
 
     @lazy_load_content
     def get_title(self):
@@ -2251,9 +2251,7 @@ class HtmlPage(ContentInterface):
         elif body:
             return self.calculate_hash(body)
         else:
-            AppLogging.error(
-                "HTML: Cannot calculate body hash for:{}".format(self.url)
-            )
+            AppLogging.error("HTML: Cannot calculate body hash for:{}".format(self.url))
             if self.contents:
                 return self.calculate_hash(self.contents)
 

@@ -42,7 +42,9 @@ class UserTagsTest(TestCase):
         )
 
         self.user_super = User.objects.create_user(
-            username="test_username2", password="testpassword", is_superuser=True,
+            username="test_username2",
+            password="testpassword",
+            is_superuser=True,
         )
 
     def test_set_tags(self):
@@ -106,7 +108,7 @@ class UserTagsTest(TestCase):
     def test_cleanup(self):
         user = self.user
 
-        UserTags.objects.create(user_object = None, entry_object = self.entry, tag="test")
+        UserTags.objects.create(user_object=None, entry_object=self.entry, tag="test")
 
         # call tested function
         UserTags.cleanup()
@@ -126,7 +128,6 @@ class UserVotesTest(TestCase):
         self.user = None
 
     def create_entry(self):
-
         current_time = DateUtils.get_datetime_now_utc()
 
         if not self.entry:
@@ -146,7 +147,7 @@ class UserVotesTest(TestCase):
                 username="test_username", password="testpassword"
             )
             self.user_super = User.objects.create_user(
-                username="test_username2", password="testpassword", is_superuser = True
+                username="test_username2", password="testpassword", is_superuser=True
             )
 
     def test_add(self):
@@ -167,11 +168,11 @@ class UserVotesTest(TestCase):
         UserVotes.objects.all().delete()
 
         vote = UserVotes.objects.create(
-                user = "testuser",
-                user_object = self.user,
-                entry_object = self.entry,
-                vote = 20,
-                )
+            user="testuser",
+            user_object=self.user,
+            entry_object=self.entry,
+            vote=20,
+        )
 
         # call tested function
         vote = UserVotes.get_user_vote(self.user, self.entry)
@@ -199,7 +200,6 @@ class UserBookmarksTest(TestCase):
         self.user = None
 
     def create_entry(self):
-
         current_time = DateUtils.get_datetime_now_utc()
 
         if not self.entry:

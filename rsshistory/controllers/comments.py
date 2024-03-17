@@ -55,8 +55,10 @@ class LinkCommentDataController(LinkCommentDataModel):
         if not user.is_authenticated:
             return
 
-        date_published=data["date_published"]
-        comments = LinkCommentDataModel.objects.filter(user_object = user, entry_object = entry, date_published = date_published)
+        date_published = data["date_published"]
+        comments = LinkCommentDataModel.objects.filter(
+            user_object=user, entry_object=entry, date_published=date_published
+        )
 
         if comments.count() == 0:
             reply_id = None
@@ -72,7 +74,7 @@ class LinkCommentDataController(LinkCommentDataModel):
                 date_edited=data["date_edited"],
                 entry_object=entry,
                 user_object=user,
-                reply_id = reply_id,
+                reply_id=reply_id,
             )
 
     def save_comment(data):

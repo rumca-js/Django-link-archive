@@ -236,7 +236,6 @@ class LinkDataBuilderTest(FakeInternetTestCase):
 
         self.assertEqual(self.mock_page_requests, 0)
 
-
     """
     def test_source_from_page_contents(self):
         config = Configuration.get_object().config_entry

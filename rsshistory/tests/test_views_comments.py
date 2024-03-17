@@ -76,9 +76,13 @@ class CommentsViewsTests(FakeInternetTestCase):
             language="en",
         )
 
-        LinkCommentDataModel.objects.create(entry_object = entry, user_object=self.user, comment = "comment")
+        LinkCommentDataModel.objects.create(
+            entry_object=entry, user_object=self.user, comment="comment"
+        )
 
-        url = reverse("{}:entry-comment-edit".format(LinkDatabase.name), args=[entry.id])
+        url = reverse(
+            "{}:entry-comment-edit".format(LinkDatabase.name), args=[entry.id]
+        )
 
         data = {"link": test_link}
 
@@ -117,9 +121,13 @@ class CommentsViewsTests(FakeInternetTestCase):
             language="en",
         )
 
-        LinkCommentDataModel.objects.create(entry_object = entry, user_object=self.user, comment = "comment")
+        LinkCommentDataModel.objects.create(
+            entry_object=entry, user_object=self.user, comment="comment"
+        )
 
-        url = reverse("{}:entry-comment-remove".format(LinkDatabase.name), args=[entry.id])
+        url = reverse(
+            "{}:entry-comment-remove".format(LinkDatabase.name), args=[entry.id]
+        )
 
         # call user action
         response = self.client.post(url)

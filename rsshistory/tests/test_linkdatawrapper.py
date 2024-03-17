@@ -15,7 +15,6 @@ from ..configuration import Configuration
 from .fakeinternet import FakeInternetTestCase, DjangoRequestObject
 
 
-
 class LinkDataWrapperTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()

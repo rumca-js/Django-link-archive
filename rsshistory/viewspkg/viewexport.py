@@ -153,9 +153,7 @@ def import_from_files(request):
         form.method = "POST"
 
         p.context["form_title"] = "Import from files"
-        p.context[
-            "form_description_pre"
-        ] = "Provide detail about the import."
+        p.context["form_description_pre"] = "Provide detail about the import."
         p.context["form"] = form
 
     return p.render("form_basic.html")

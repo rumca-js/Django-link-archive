@@ -98,6 +98,10 @@ class RssSourceDetailView(generic.DetailView):
         context["page_title"] = self.object.title
         context["page_thumbnail"] = self.object.favicon
         context["search_engines"] = SearchEngines(self.object.title, self.object.url)
+        context["page_object"] = UrlHandler.get(self.object.url)
+
+        ViewPage.fill_context_type(context, self.object.url)
+
         try:
             context["handler"] = SourceControllerBuilder.get(self.object.url)
         except:

@@ -47,14 +47,16 @@ class BaseRssPlugin(SourceGenericPlugin):
         fast_check = False
 
         if self.is_html(fast_check=fast_check):
-            h = UrlHandler.get(self.get_address(), page_options = self.options)
+            h = UrlHandler.get(self.get_address(), page_options=self.options)
             if type(h) is HtmlPage:
                 rss_contents = h.get_body_text()
 
                 self.reader = RssPage(self.get_address(), contents=rss_contents)
 
                 if not self.reader.is_rss(fast_check=fast_check):
-                    self.store_error(source, "HTML body does not provide RSS, body", rss_contents)
+                    self.store_error(
+                        source, "HTML body does not provide RSS, body", rss_contents
+                    )
                     self.dead = True
 
                     return None
@@ -82,7 +84,11 @@ class BaseRssPlugin(SourceGenericPlugin):
 
         AppLogging.error(
             "Source:{}\nTitle:{}\nStatus code:{}\nText:{}.\nContents\n{}".format(
-                source.url, source.title, self.status_code, text, print_contents[:self.get_contents_size_limit()]
+                source.url,
+                source.title,
+                self.status_code,
+                text,
+                print_contents[: self.get_contents_size_limit()],
             )
         )
 
@@ -106,7 +112,9 @@ class BaseRssPlugin(SourceGenericPlugin):
 
         for index, prop in enumerate(all_props):
             if "link" not in prop:
-                LinkDatabase.info("Link not present in RSS:{}".format(self.get_address()))
+                LinkDatabase.info(
+                    "Link not present in RSS:{}".format(self.get_address())
+                )
                 continue
 
             prop = self.enhance(prop)

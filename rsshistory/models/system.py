@@ -176,7 +176,7 @@ class UserConfig(models.Model):
         null=True,
     )
 
-    def get(user = None):
+    def get(user=None):
         """
         This is used if no request is specified. Use configured by admin setup.
         """
@@ -233,7 +233,7 @@ class UserConfig(models.Model):
     def cleanup():
         configs = UserConfig.objects.filter(user_object__isnull=True)
         for uc in configs:
-            us = User.objects.filter(username = uc.user)
+            us = User.objects.filter(username=uc.user)
             if us.count() > 0:
                 uc.user_object = us[0]
                 uc.save()
@@ -259,7 +259,10 @@ class AppLogging(models.Model):
             AppLogging.cleanup_overflow()
 
             AppLogging.objects.create(
-                info_text=info_text, level=level, date=datetime.now(timezone("UTC")), user=user
+                info_text=info_text,
+                level=level,
+                date=datetime.now(timezone("UTC")),
+                user=user,
             )
             return
         except Exception as e:
@@ -276,7 +279,10 @@ class AppLogging(models.Model):
             AppLogging.cleanup_overflow()
 
             AppLogging.objects.create(
-                info_text=info_text, level=level, date=datetime.now(timezone("UTC")), user=user
+                info_text=info_text,
+                level=level,
+                date=datetime.now(timezone("UTC")),
+                user=user,
             )
             return
         except Exception as e:
@@ -289,7 +295,10 @@ class AppLogging(models.Model):
             AppLogging.cleanup_overflow()
 
             AppLogging.objects.create(
-                info_text=info_text, level=level, date=datetime.now(timezone("UTC")), user=user
+                info_text=info_text,
+                level=level,
+                date=datetime.now(timezone("UTC")),
+                user=user,
             )
             return
         except Exception as e:
@@ -304,7 +313,10 @@ class AppLogging(models.Model):
             AppLogging.cleanup_overflow()
 
             AppLogging.objects.create(
-                info_text=info_text, level=level, date=datetime.now(timezone("UTC")), user=user
+                info_text=info_text,
+                level=level,
+                date=datetime.now(timezone("UTC")),
+                user=user,
             )
             return
         except Exception as e:
@@ -320,7 +332,10 @@ class AppLogging(models.Model):
             AppLogging.cleanup_overflow()
 
             AppLogging.objects.create(
-                info_text=info_text, level=level, date=datetime.now(timezone("UTC")), user=user
+                info_text=info_text,
+                level=level,
+                date=datetime.now(timezone("UTC")),
+                user=user,
             )
             return
         except Exception as e:
@@ -328,8 +343,10 @@ class AppLogging(models.Model):
 
     def save(self, *args, **kwargs):
         # Trim the input string to fit within max_length
-        if len(self.info_text) > self._meta.get_field('info_text').max_length:
-            self.info_text = self.info_text[:self._meta.get_field('info_text').max_length]
+        if len(self.info_text) > self._meta.get_field("info_text").max_length:
+            self.info_text = self.info_text[
+                : self._meta.get_field("info_text").max_length
+            ]
 
         super().save(*args, **kwargs)
 

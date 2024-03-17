@@ -147,6 +147,7 @@ class BackgroundJobController(BackgroundJob):
 
     def link_add(url, source=None, tag="", user=None, properties=None):
         from ..configuration import Configuration
+
         """
         It handles only automatic additions.
         """
@@ -192,7 +193,9 @@ class BackgroundJobController(BackgroundJob):
         args_text = json.dumps(cfg)
 
         if len(args_text) > 1000:
-            AppLogging.error("Link add job configuration is too long:{}".format(args_text))
+            AppLogging.error(
+                "Link add job configuration is too long:{}".format(args_text)
+            )
             args_text = ""
 
         if cfg != {}:
@@ -233,9 +236,7 @@ class BackgroundJobController(BackgroundJob):
             return sent
         except Exception as e:
             error_text = traceback.format_exc()
-            AppLogging.error(
-                "Exception: Daily data: {} {}".format(str(e), error_text)
-            )
+            AppLogging.error("Exception: Daily data: {} {}".format(str(e), error_text))
 
     def write_daily_data(input_date):
         return BackgroundJobController.create_single_job(
@@ -250,9 +251,7 @@ class BackgroundJobController(BackgroundJob):
             BackgroundJobController.write_daily_data_range(date_start, date_stop)
         except Exception as e:
             error_text = traceback.format_exc()
-            AppLogging.error(
-                "Exception: Daily data: {} {}".format(str(e), error_text)
-            )
+            AppLogging.error("Exception: Daily data: {} {}".format(str(e), error_text))
 
     def write_tag_data(tag):
         return BackgroundJobController.create_single_job(
@@ -322,8 +321,11 @@ class BackgroundJobController(BackgroundJob):
             return
 
         if not force:
-            if entry.page_rating > 0 and entry.page_rating_contents > 0 and entry.date_update_last > DateUtils.get_datetime_now_utc() - timedelta(
-                days=30
+            if (
+                entry.page_rating > 0
+                and entry.page_rating_contents > 0
+                and entry.date_update_last
+                > DateUtils.get_datetime_now_utc() - timedelta(days=30)
             ):
                 return
 

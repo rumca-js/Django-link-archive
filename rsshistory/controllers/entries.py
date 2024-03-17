@@ -134,12 +134,16 @@ class LinkDataController(LinkDataModel):
         """
         from .backgroundjob import BackgroundJobController
 
-        zeros = LinkDataController.objects.filter(page_rating = 0, page_rating_contents__gt = 0)
+        zeros = LinkDataController.objects.filter(
+            page_rating=0, page_rating_contents__gt=0
+        )
         for zero in zeros:
             zero.page_rating = zero.page_rating_contents
             zero.save()
 
-        real_zeros = LinkDataController.objects.filter(page_rating = 0, page_rating_contents = 0)
+        real_zeros = LinkDataController.objects.filter(
+            page_rating=0, page_rating_contents=0
+        )
         for zero in real_zeros[:1000]:
             BackgroundJobController.entry_update_data(zero)
 
@@ -304,14 +308,30 @@ class LinkDataWrapper(object):
         if "bookmarked" in link_data and link_data["bookmarked"]:
             is_archive = False
 
-        if "language" in link_data and link_data["language"] and len(link_data["language"]) > 9:
-            AppLogging.error("Language setting too long for:{} {}".format(link_data["link"], link_data["language"]))
+        if (
+            "language" in link_data
+            and link_data["language"]
+            and len(link_data["language"]) > 9
+        ):
+            AppLogging.error(
+                "Language setting too long for:{} {}".format(
+                    link_data["link"], link_data["language"]
+                )
+            )
             link_data["language"] = None
 
         # TODO remove hardcoded links
-        if "title" in link_data and link_data["title"] and len(link_data["title"]) > 999:
+        if (
+            "title" in link_data
+            and link_data["title"]
+            and len(link_data["title"]) > 999
+        ):
             link_data["title"] = link_data["title"][:998]
-        if "description" in link_data and link_data["description"] and len(link_data["description"]) > 999:
+        if (
+            "description" in link_data
+            and link_data["description"]
+            and len(link_data["description"]) > 999
+        ):
             link_data["description"] = link_data["description"][:998]
 
         if "id" in link_data:
@@ -580,11 +600,11 @@ class LinkDataWrapper(object):
 
 class LinkDataBuilder(object):
     """
-     - sometimes we want to call this object directly, sometimes it should be redirected to "add link background job"
-     - we do not change data in here, we do not correct, we just follow it (I think that is what should be)
-     - all subservent entries are added by background controller, handled in a separate task
-     - we cannot spend too much time in builder from any context. This code should be possibly fast
-     - if there is a possibility to not search it, we do not do it
+    - sometimes we want to call this object directly, sometimes it should be redirected to "add link background job"
+    - we do not change data in here, we do not correct, we just follow it (I think that is what should be)
+    - all subservent entries are added by background controller, handled in a separate task
+    - we cannot spend too much time in builder from any context. This code should be possibly fast
+    - if there is a possibility to not search it, we do not do it
     """
 
     def __init__(
@@ -605,6 +625,7 @@ class LinkDataBuilder(object):
 
     def add_from_link(self):
         from ..pluginurl import UrlHandler
+
         self.link = UrlHandler.get_cleaned_link(self.link)
 
         p = HtmlPage(self.link)
@@ -619,9 +640,7 @@ class LinkDataBuilder(object):
         url = EntryUrlInterface(self.link)
         link_data = url.get_props()
         if not link_data:
-            AppLogging.error(
-                "Could not obtain properties for:{}".format(self.link)
-            )
+            AppLogging.error("Could not obtain properties for:{}".format(self.link))
             return
         self.link_data = link_data
         return self.add_from_props()
@@ -647,9 +666,7 @@ class LinkDataBuilder(object):
         url = EntryUrlInterface(self.link)
         link_data = url.get_props()
         if not link_data:
-            AppLogging.error(
-                "Could not obtain properties for:{}".format(self.link)
-            )
+            AppLogging.error("Could not obtain properties for:{}".format(self.link))
             return
 
         # TODO update missing keys - do not replace them
@@ -671,6 +688,7 @@ class LinkDataBuilder(object):
 
     def add_from_props(self):
         from ..pluginurl import UrlHandler
+
         obj = None
 
         self.link_data["link"] = UrlHandler.get_cleaned_link(self.link_data["link"])
@@ -749,7 +767,11 @@ class LinkDataBuilder(object):
                 new_link_data["description"]
             )
 
-        if "page_rating" not in new_link_data or "page_rating" in new_link_data and new_link_data["page_rating"] == 0:
+        if (
+            "page_rating" not in new_link_data
+            or "page_rating" in new_link_data
+            and new_link_data["page_rating"] == 0
+        ):
             if "page_rating_contents" in new_link_data:
                 new_link_data["page_rating"] = new_link_data["page_rating_contents"]
 

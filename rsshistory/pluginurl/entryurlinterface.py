@@ -118,9 +118,7 @@ class EntryUrlInterface(object):
 
         source_url = p.get_channel_feed_url()
         if source_url is None:
-            AppLogging.error(
-                "Could not obtain channel feed url:{}".format(source_url)
-            )
+            AppLogging.error("Could not obtain channel feed url:{}".format(source_url))
 
         # always use classic link format in storage
         input_props["link"] = p.get_link_classic()

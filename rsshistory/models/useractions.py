@@ -102,7 +102,6 @@ class UserTags(models.Model):
         data["tags"] = UserTags.process_tag_string(data["tag"])
         return UserTags.set_tags_map(data)
 
-
     def set_tags_map(data):
         """
         Removes all other tags, sets only tags in data
@@ -113,7 +112,7 @@ class UserTags(models.Model):
 
         elif "user_id" in data:
             user_id = data["user_id"]
-            user = User.objects.get(id = user_id)
+            user = User.objects.get(id=user_id)
 
         entry = None
 
@@ -147,9 +146,9 @@ class UserTags(models.Model):
                 q.user_object = user
                 q.save()
 
-                #LinkDatabase.error("Cannot find user '{}'".format(q.user_object.id))
-                #q.delete()
-                #time.sleep(0.5)
+                # LinkDatabase.error("Cannot find user '{}'".format(q.user_object.id))
+                # q.delete()
+                # time.sleep(0.5)
 
 
 class UserVotes(models.Model):
@@ -174,11 +173,11 @@ class UserVotes(models.Model):
     def add(user, entry, vote):
         if not user:
             return
-    
+
         if not user.is_authenticated:
             return
 
-        votes = UserVotes.objects.filter(user_object = user, entry_object = entry)
+        votes = UserVotes.objects.filter(user_object=user, entry_object=entry)
 
         if votes.count() == 0:
             from ..controllers import BackgroundJobController
@@ -200,6 +199,7 @@ class UserVotes(models.Model):
         entry.update_calculated_vote()
 
         from ..controllers import BackgroundJobController
+
         BackgroundJobController.entry_update_data(entry)
 
         return ob
@@ -223,8 +223,8 @@ class UserVotes(models.Model):
 
     def cleanup():
         # recreate missing entries, from votes alone
-        for entry in LinkDataModel.objects.filter(page_rating_votes__gt = 0):
-            votes = UserVotes.objects.filter(entry_object = entry)
+        for entry in LinkDataModel.objects.filter(page_rating_votes__gt=0):
+            votes = UserVotes.objects.filter(entry_object=entry)
             if votes.count() == 0:
                 users = User.objects.filter(is_superuser=True)
                 if users.count() > 0:

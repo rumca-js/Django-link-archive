@@ -9,6 +9,8 @@ from .basictypes import *
 from .configuration import Configuration
 from .apps import LinkDatabase
 from .configuration import Configuration
+from .pluginurl.urlhandler import UrlHandler
+from .webtools import HtmlPage, RssPage
 
 
 class ViewPage(object):
@@ -98,6 +100,16 @@ class ViewPage(object):
             return result
 
         return self.render_implementation(template)
+
+    def fill_context_type(context, url):
+        handler = UrlHandler.get_type(url)
+
+        context["is_youtube_video"] = type(handler) == UrlHandler.youtube_video_handler
+        context["is_youtube_channel"] = type(handler) == UrlHandler.youtube_channel_handler
+        context["is_odysee_video"] = type(handler) == UrlHandler.odysee_video_handler
+        context["is_odysee_channel"] = type(handler) == UrlHandler.odysee_channel_handler
+        context["is_html"] = type(handler) == HtmlPage
+        context["is_rss"] = type(handler) == RssPage
 
 
 def index(request):

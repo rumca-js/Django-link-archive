@@ -95,9 +95,7 @@ class ProcessSourceJobHandler(BaseJobHandler):
                 #    return False
                 return True
 
-            AppLogging.error(
-                "Cannot find controller plugin for {}".format(obj.subject)
-            )
+            AppLogging.error("Cannot find controller plugin for {}".format(obj.subject))
             return False
 
         except Exception as e:
@@ -195,9 +193,7 @@ class LinkMusicDownloadJobHandler(BaseJobHandler):
 
             id3 = id3v2.Id3v2(file_name, data)
             id3.tag()
-            AppLogging.info(
-                "Downloading music done: " + item.link + " " + item.title
-            )
+            AppLogging.info("Downloading music done: " + item.link + " " + item.title)
 
             return True
         except Exception as e:
@@ -231,9 +227,7 @@ class LinkVideoDownloadJobHandler(BaseJobHandler):
                 )
                 return
 
-            AppLogging.info(
-                "Downloading video done: " + item.link + " " + item.title
-            )
+            AppLogging.info("Downloading video done: " + item.link + " " + item.title)
 
             return True
         except Exception as e:
@@ -306,7 +300,7 @@ class LinkAddJobHandler(BaseJobHandler):
                 if "tag" in data:
                     entry.tag([data["tag"]], data["user_object"])
 
-    def get_data_for_add(self, in_object = None):
+    def get_data_for_add(self, in_object=None):
         link = in_object.subject
 
         cfg = self.get_input_cfg(in_object)
@@ -570,12 +564,13 @@ class ImportFromFilesJobHandler(BaseJobHandler):
 
         user = None
         if username and username != "":
-            users = User.objects.filter(username = username)
+            users = User.objects.filter(username=username)
             if users.count() > 0:
                 user = users[0]
 
         from .serializers import FileImporter
-        FileImporter(path = path, user=user)
+
+        FileImporter(path=path, user=user)
 
         return True
 
@@ -757,7 +752,9 @@ class PushDailyDataToRepoJobHandler(BaseJobHandler):
             return True
         except Exception as e:
             error_text = traceback.format_exc()
-            AppLogging.error("Push daily data exception: {} {}".format(str(e), error_text))
+            AppLogging.error(
+                "Push daily data exception: {} {}".format(str(e), error_text)
+            )
 
 
 class CleanupJobHandler(BaseJobHandler):

@@ -59,7 +59,7 @@ class UserSearchHistoryTest(TestCase):
     def test_more_than_limit(self):
         limit = UserSearchHistory.get_choices_model_limit()
 
-        for index in range(1, limit+20):
+        for index in range(1, limit + 20):
             user = "test_user{}".format(index)
             query = "query{}".format(index)
             # print("User:{} Query:{}".format(user, query))

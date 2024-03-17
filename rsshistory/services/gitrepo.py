@@ -76,7 +76,6 @@ class GitRepo(object):
         last = last.stem
         return last
 
-
     def clone(self):
         p = subprocess.run(
             ["git", "clone", self.git_repo],

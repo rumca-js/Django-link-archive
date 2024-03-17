@@ -38,10 +38,12 @@ class SourceDataController(SourceDataModel):
 
         for source in sources:
             from .entries import LinkDataBuilder
-            entries = LinkDataModel.objects.filter(link = source.url)
+
+            entries = LinkDataModel.objects.filter(link=source.url)
             if entries.count() == 0:
                 from .backgroundjob import BackgroundJobController
-                properties = {"permament" : True}
+
+                properties = {"permament": True}
                 BackgroundJobController.link_add(source.url, properties=properties)
             else:
                 entry = entries[0]
@@ -411,9 +413,11 @@ class SourceDataBuilder(object):
         try:
             from .backgroundjob import BackgroundJobController
 
-            properties = {"permament" : True}
+            properties = {"permament": True}
 
-            BackgroundJobController.link_add(self.link_data["url"], properties=properties)
+            BackgroundJobController.link_add(
+                self.link_data["url"], properties=properties
+            )
 
             # TODO add domain when adding new source
             source = SourceDataController.objects.create(**self.link_data)

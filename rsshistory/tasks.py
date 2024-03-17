@@ -16,7 +16,7 @@ def subs_checker_task(arg):
     try:
         from .configuration import Configuration
 
-        #if not Configuration.get_object().config_entry.background_task:
+        # if not Configuration.get_object().config_entry.background_task:
         #    return
 
         from .threadhandlers import RefreshThreadHandler
@@ -25,9 +25,7 @@ def subs_checker_task(arg):
         handler.refresh()
     except Exception as E:
         error_text = traceback.format_exc()
-        AppLogging.error(
-            "Exception in checker task: {} {}".format(str(E), error_text)
-        )
+        AppLogging.error("Exception in checker task: {} {}".format(str(E), error_text))
 
     LinkDatabase.info("subs_checker_task DONE")
 
@@ -41,7 +39,7 @@ def process_all_jobs_task(arg):
     try:
         from .configuration import Configuration
 
-        #if not Configuration.get_object().config_entry.background_task:
+        # if not Configuration.get_object().config_entry.background_task:
         #    return
 
         from .threadhandlers import HandlerManager
@@ -67,7 +65,7 @@ def process_one_jobs_task(arg):
     try:
         from .configuration import Configuration
 
-        #if not Configuration.get_object().config_entry.background_task:
+        # if not Configuration.get_object().config_entry.background_task:
         #    return
 
         from .threadhandlers import HandlerManager

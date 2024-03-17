@@ -24,9 +24,7 @@ class SourceExportHistory(models.Model):
 
         except Exception as e:
             error_text = traceback.format_exc()
-            AppLogging.error(
-                "Exception for update: {0} {1}".format(str(e), error_text)
-            )
+            AppLogging.error("Exception for update: {0} {1}".format(str(e), error_text))
 
     def get_safe():
         return SourceExportHistory.objects.all()[:7]

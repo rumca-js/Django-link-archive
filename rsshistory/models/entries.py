@@ -269,7 +269,7 @@ class BaseLinkDataController(BaseLinkDataModel):
 
         comments = self.comments.all()
         for comment in comments:
-            data= {}
+            data = {}
             data["comment"] = comment.comment
             data["user"] = comment.user_object.username
             data["date_published"] = comment.date_published.isoformat()
@@ -462,7 +462,7 @@ class BaseLinkDataController(BaseLinkDataModel):
          - if it is dead (manual indication)
          - if it was downvoted to oblivion
         """
-        return (self.is_status_code_valid() and self.page_rating > 0 and not self.dead)
+        return self.is_status_code_valid() and self.page_rating > 0 and not self.dead
 
     def is_status_code_valid(self):
         if self.status_code == 403:

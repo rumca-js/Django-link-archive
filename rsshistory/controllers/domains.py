@@ -42,9 +42,7 @@ class DomainsController(Domains):
             or domain_text == "https"
             or domain_text == "http"
         ):
-            AppLogging.error(
-                "Not a domain text:{}, url:{}".format(domain_text, url)
-            )
+            AppLogging.error("Not a domain text:{}, url:{}".format(domain_text, url))
             return
 
         return DomainsController.create_or_update_domain(domain_text, protocol)
@@ -59,7 +57,9 @@ class DomainsController(Domains):
                 obj = DomainsController.create_object(domain_only_text, protocol)
             except Exception as E:
                 exc_str = traceback.format_exc()
-                AppLogging.error("Cannot create domain data:{}\n{}".format(domain_only_text, exc_str))
+                AppLogging.error(
+                    "Cannot create domain data:{}\n{}".format(domain_only_text, exc_str)
+                )
         else:
             obj = objs[0]
 

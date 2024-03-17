@@ -16,10 +16,13 @@
       {{ object.title }}
     </a>
 </h1>
-<span><a href="{{ object.url }}">{{ object.url }}</a></span>
-{% if object.is_channel_page_url %}
-      <span>Channel:<a href="{{ object.get_channel_page_url }}">{{ object.get_channel_page_url }}</a></span>
+
+{% if is_youtube_channel %}
+<div>Channel: <a href="{{ page_object.get_channel_url }}">{{ page_object.get_channel_url }}</a></div>
 {% endif %}
+<div>
+  URL: <a href="{{ object.url }}">{{ object.url }}</a>
+</div>
 
   <p>
       <span><strong>On Hold:</strong> {{ object.on_hold }}</span>
@@ -32,7 +35,7 @@
       <span><strong>Favicon:</strong><a href="{{ object.get_favicon }}" title="{{ object.get_favicon }}">Favicon URL</a>, </span>
       <span><strong>Source type:</strong> {{ object.source_type }}</span>
       {% if object.proxy_location %}
-      <span><strong>Proxy location:</strong> {{ object.proxy_location }}</span>
+      <span><strong>Proxy location:</strong><a href="{{ object.proxy_location }}">{{ object.proxy_location }}</a></span>
       {% endif %}
       <div>Fetched:{{object.dynamic_data.date_fetched}} Import seconds:{{object.dynamic_data.import_seconds}} Consecutive Errors:{{object.dynamic_data.consecutive_errors}} </div>
   </p>

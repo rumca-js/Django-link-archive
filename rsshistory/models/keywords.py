@@ -104,7 +104,9 @@ class KeyWords(models.Model):
 
         nlp = KeyWords.load_token_program(language)
         if not nlp:
-            AppLogging.error("Cannot load token program for language:{}".format(language))
+            AppLogging.error(
+                "Cannot load token program for language:{}".format(language)
+            )
             return
 
         doc = nlp(text)
