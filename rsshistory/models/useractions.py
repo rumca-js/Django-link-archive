@@ -86,6 +86,9 @@ class UserTags(models.Model):
         if not entry:
             AppLogging.error("Incorrect call of tags, entry does not exist")
 
+        if not entry.is_taggable():
+            return
+
         user_name = user.username
 
         objs = UserTags.objects.filter(
@@ -124,14 +127,20 @@ class UserTags(models.Model):
 
         tag_objs = None
 
-        if entry:
-            tag_objs = UserTags.objects.filter(user_object=user, entry_object=entry)
+        if not entry.is_taggable():
+            return
 
-            if tag_objs.exists():
-                tag_objs.delete()
-        else:
+        if not entry:
             AppLogging.info("Missing entry object")
             return
+
+        if not entry.is_taggable():
+            return
+
+        tag_objs = UserTags.objects.filter(user_object=user, entry_object=entry)
+
+        if tag_objs.exists():
+            tag_objs.delete()
 
         tags_set = data["tags"]
 

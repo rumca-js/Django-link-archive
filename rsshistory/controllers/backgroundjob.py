@@ -77,6 +77,8 @@ class BackgroundJobController(BackgroundJob):
     def enable(self):
         self.errors = 0
         self.enabled = True
+        self.priority = BackgroundJobController.get_job_priority(self.job)
+
         self.save()
 
     def disable(self):
@@ -192,6 +194,7 @@ class BackgroundJobController(BackgroundJob):
 
         args_text = json.dumps(cfg)
 
+        """TODO fix hardcoded value"""
         if len(args_text) > 1000:
             AppLogging.error(
                 "Link add job configuration is too long:{}".format(args_text)

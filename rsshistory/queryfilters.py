@@ -157,9 +157,9 @@ class SourceFilter(BaseQueryFilter):
         return ["category", "subcategory", "title", "url"]
 
     def get_model_pagination(self):
-        from .viewspkg.viewsources import RssSourceListView
+        from .viewspkg.viewsources import SourceListView
 
-        return int(RssSourceListView.paginate_by)
+        return int(SourceListView.paginate_by)
 
 
 class EntryFilter(BaseQueryFilter):

@@ -174,6 +174,10 @@ class BaseLinkDataController(BaseLinkDataModel):
          - title and description could have been set manually, we do not want to change that
          - some other fields should be set only if present in props
         """
+        if self.dead or self.page_rating_votes < 0:
+            AppLogging.warning("Cannot update link that is dead")
+            return
+
         from ..pluginurl.entryurlinterface import EntryUrlInterface
 
         url = EntryUrlInterface(self.link)
@@ -217,6 +221,10 @@ class BaseLinkDataController(BaseLinkDataModel):
          - status code and page rating is update always
          - new data are changed only if new data are present at all
         """
+        if self.dead or self.page_rating_votes < 0:
+            AppLogging.warning("Cannot update link that is dead")
+            return
+
         from ..pluginurl.entryurlinterface import EntryUrlInterface
 
         url = EntryUrlInterface(self.link)
@@ -453,7 +461,10 @@ class BaseLinkDataController(BaseLinkDataModel):
         self.save()
 
     def is_taggable(self):
-        return self.permanent or self.bookmarked
+        return (self.permanent or self.bookmarked) and self.page_rating_votes >= 0
+
+    def is_commentable(self):
+        return (self.permanent or self.bookmarked) and self.page_rating_votes >= 0
 
     def is_valid(self):
         """

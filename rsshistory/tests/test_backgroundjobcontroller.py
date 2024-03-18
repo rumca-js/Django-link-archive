@@ -312,6 +312,7 @@ class BackgroundJobControllerTest(FakeInternetTestCase):
             task=None,
             subject="https://youtube.com?v=1234",
             args="",
+            priority = 0,
         )
 
         self.assertTrue(bj.enabled)
@@ -323,3 +324,4 @@ class BackgroundJobControllerTest(FakeInternetTestCase):
         bj.enable()
 
         self.assertTrue(bj.enabled)
+        self.assertEqual(bj.priority, BackgroundJobController.get_job_priority(BackgroundJob.JOB_LINK_UPDATE_DATA))

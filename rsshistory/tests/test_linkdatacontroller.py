@@ -257,3 +257,55 @@ class LinkDataControllerTest(FakeInternetTestCase):
         self.assertEqual(entry.description, "my description")
         self.assertEqual(entry.date_published, add_time)
         # self.assertEqual(entry.date_update_last, date_updated)
+
+    def test_is_taggable_true(self):
+        entry = LinkDataController.objects.create(
+            source="https://youtube.com",
+            link="https://youtube.com?v=nonbookmarked",
+            title="The second link",
+            bookmarked=True,
+            permanent=False,
+            language="en",
+            date_published=DateUtils.get_datetime_now_utc(),
+        )
+
+        self.assertTrue(entry.is_taggable())
+
+    def test_is_taggable_false(self):
+        entry = LinkDataController.objects.create(
+            source="https://youtube.com",
+            link="https://youtube.com?v=nonbookmarked",
+            title="The second link",
+            bookmarked=False,
+            permanent=False,
+            language="en",
+            date_published=DateUtils.get_datetime_now_utc(),
+        )
+
+        self.assertFalse(entry.is_taggable())
+
+    def test_is_commentable_true(self):
+        entry = LinkDataController.objects.create(
+            source="https://youtube.com",
+            link="https://youtube.com?v=nonbookmarked",
+            title="The second link",
+            bookmarked=True,
+            permanent=False,
+            language="en",
+            date_published=DateUtils.get_datetime_now_utc(),
+        )
+
+        self.assertTrue(entry.is_commentable())
+
+    def test_is_commentable_false(self):
+        entry = LinkDataController.objects.create(
+            source="https://youtube.com",
+            link="https://youtube.com?v=nonbookmarked",
+            title="The second link",
+            bookmarked=False,
+            permanent=False,
+            language="en",
+            date_published=DateUtils.get_datetime_now_utc(),
+        )
+
+        self.assertFalse(entry.is_commentable())

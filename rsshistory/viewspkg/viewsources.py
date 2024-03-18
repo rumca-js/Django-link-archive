@@ -23,7 +23,7 @@ from ..webtools import Url, BasePage
 from ..pluginurl import UrlHandler
 
 
-class RssSourceListView(generic.ListView):
+class SourceListView(generic.ListView):
     model = SourceDataController
     context_object_name = "content_list"
     paginate_by = 100
@@ -33,7 +33,7 @@ class RssSourceListView(generic.ListView):
         data = p.check_access()
         if data:
             return redirect("{}:missing-rights".format(LinkDatabase.name))
-        return super(RssSourceListView, self).get(*args, **kwargs)
+        return super(SourceListView, self).get(*args, **kwargs)
 
     def get_queryset(self):
         self.query_filter = SourceFilter(self.request.GET)
@@ -49,7 +49,7 @@ class RssSourceListView(generic.ListView):
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
-        context = super(RssSourceListView, self).get_context_data(**kwargs)
+        context = super(SourceListView, self).get_context_data(**kwargs)
         context = ViewPage.init_context(self.request, context)
         # Create any data and add it to the context
 
@@ -85,14 +85,14 @@ class RssSourceListView(generic.ListView):
         return "&" + urlencode(arg_data)
 
 
-class RssSourceDetailView(generic.DetailView):
+class SourceDetailView(generic.DetailView):
     model = SourceDataController
 
     def get_context_data(self, **kwargs):
         from ..pluginsources.sourcecontrollerbuilder import SourceControllerBuilder
 
         # Call the base implementation first to get the context
-        context = super(RssSourceDetailView, self).get_context_data(**kwargs)
+        context = super(SourceDetailView, self).get_context_data(**kwargs)
         context = ViewPage.init_context(self.request, context)
 
         context["page_title"] = self.object.title

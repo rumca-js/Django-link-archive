@@ -109,7 +109,7 @@ class EntryYouTubePlugin(EntryGenericPlugin):
             <div class="youtube_player_container">
                {}
             </div>
-            <div style="color:red">This material is restricted for age {}<div>"""
+            <div style="color:red">This material is restricted for age {}</div>"""
 
             frame_inner = self.get_frame()
 

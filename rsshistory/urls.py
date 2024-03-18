@@ -25,8 +25,8 @@ app_name = str(LinkDatabase.name)
 urlpatterns = [
     path("", views.index, name="index"),
     # sources
-    path("sources/", viewsources.RssSourceListView.as_view(), name="sources"),
-    path("source/<int:pk>/", viewsources.RssSourceDetailView.as_view(), name="source-detail"),
+    path("sources/", viewsources.SourceListView.as_view(), name="sources"),
+    path("source/<int:pk>/", viewsources.SourceDetailView.as_view(), name="source-detail"),
     path("source-json/<int:pk>", viewsources.source_json, name="source-json"),
     path("sources-json/", viewsources.sources_json, name="sources-json"),
     path("source-add", viewsources.add_source, name="source-add"),
