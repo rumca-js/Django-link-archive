@@ -8,7 +8,7 @@ It does not capture page contents. It captures link meta data: title, descriptio
  - Minimal aesthetic: no distraction, compact layout
  - Web GUI, accessible from anywhere: LAN, public, however it is configured
  - Minimal installation, integrator may choose however to use production environment, with a good Database engine. Just as it is supported by Django. I am using SQLite without any problems.
- - Google-like Link search ability
+ - limited link search ability. Does not use elastic search
  - RSS feed support
  - You can gather information about: links, domains, feeds
  - It is not a search engine. Suggesting better alternatives: [whoogle-search](https://github.com/benbusby/whoogle-search), or [Marginalia search](https://search.marginalia.nu/), or [Apache Lucene](https://lucene.apache.org/)
