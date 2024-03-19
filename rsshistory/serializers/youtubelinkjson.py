@@ -69,7 +69,8 @@ class YouTubeJson(object):
 
     def get_tags(self):
         if len(self._json) > 0:
-            return self._json["tags"]
+            if "tags" in self._json:
+                return self._json["tags"]
 
     def get_categories(self):
         if len(self._json) > 0:

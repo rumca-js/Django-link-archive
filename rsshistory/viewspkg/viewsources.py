@@ -468,31 +468,6 @@ def wayback_save(request, pk):
     return p.render("summary_present.html")
 
 
-def process_source_text(request, pk):
-    p = ViewPage(request)
-    p.set_title("Process source")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
-
-    text = """
-    """
-
-    from ..pluginsources.rsssourceprocessor import RssSourceProcessor
-
-    source = SourceDataController.objects.get(id=pk)
-
-    proc = RssSourceProcessor()
-    proc.process_parser_source(source, text)
-
-    return HttpResponseRedirect(
-        reverse(
-            "{}:source-detail".format(LinkDatabase.name),
-            kwargs={"pk": pk},
-        )
-    )
-
-
 def import_youtube_links_for_source(request, pk):
     from ..programwrappers.ytdlp import YTDLP
 

@@ -61,38 +61,38 @@ class ViewPage(object):
                 self.access_type == ConfigurationEntry.ACCESS_TYPE_OWNER
                 and not self.request.user.is_superuser
             ):
-                return self.render_implementation("missing_rights.html")
+                return self.render_implementation("missing_rights.html", 500)
             if (
                 self.access_type == ConfigurationEntry.ACCESS_TYPE_STAFF
                 and not self.request.user.is_staff
             ):
-                return self.render_implementation("missing_rights.html")
+                return self.render_implementation("missing_rights.html", 500)
             if (
                 self.access_type == ConfigurationEntry.ACCESS_TYPE_LOGGED
                 and not self.request.user.is_authenticated
             ):
-                return self.render_implementation("missing_rights.html")
+                return self.render_implementation("missing_rights.html", 500)
 
         config = Configuration.get_object().config_entry
         if (
             config.access_type == ConfigurationEntry.ACCESS_TYPE_OWNER
             and not self.request.user.is_superuser
         ):
-            return self.render_implementation("missing_rights.html")
+            return self.render_implementation("missing_rights.html", 500)
         if (
             config.access_type == ConfigurationEntry.ACCESS_TYPE_LOGGED
             and not self.request.user.is_authenticated
         ):
-            return self.render_implementation("missing_rights.html")
+            return self.render_implementation("missing_rights.html", 500)
 
     def get_full_template(template):
         return Path(LinkDatabase.name) / template
 
-    def render_implementation(self, template):
+    def render_implementation(self, template, status_code=200):
         if self.context is None:
             self.context = self.get_context(self.request)
 
-        return render(self.request, Path(LinkDatabase.name) / template, self.context)
+        return render(self.request, Path(LinkDatabase.name) / template, self.context, status=status_code)
 
     def render(self, template):
         result = self.check_access()

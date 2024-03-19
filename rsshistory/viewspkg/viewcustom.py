@@ -40,7 +40,7 @@ def page_show_properties(request):
     def show_page_props_internal(requests, page_link):
         ViewPage.fill_context_type(p.context, page_link)
 
-        p.context["page_object"] = page
+        p.context["page_object"] = UrlHandler.get(page_link)
 
         return p.render("show_page_props.html")
 
@@ -249,20 +249,6 @@ def download_video(request, pk):
         p.context["summary_text"] = "Failed to add to download queue"
 
     BackgroundJobController.download_video(ft[0])
-
-    return p.render("summary_present.html")
-
-
-def check_if_move_to_archive(request):
-    p = ViewPage(request)
-    p.set_title("Move to archive")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
-
-    LinkDataController.move_all_to_archive()
-
-    p.context["summary_text"] = "Moved links to archive"
 
     return p.render("summary_present.html")
 

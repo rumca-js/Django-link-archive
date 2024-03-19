@@ -119,14 +119,14 @@ class EntryGenericPlugin(object):
         buttons.append(
             EntryButton(
                 self.user,
-                "Page",
+                "",
                 reverse(
                     "{}:entry-download".format(LinkDatabase.name),
                     args=[self.entry.id],
                 ),
                 ConfigurationEntry.ACCESS_TYPE_OWNER,
                 "Downloads the page to configured location",
-                # static("{}/icons/icons8-download-96.png".format(LinkDatabase.name)),
+                static("{}/icons/icons8-download-page-96.png".format(LinkDatabase.name)),
             ),
         )
 
@@ -204,7 +204,7 @@ class EntryGenericPlugin(object):
                     ConfigurationEntry.ACCESS_TYPE_OWNER,
                     "Add new source",
                     static(
-                        "{}/icons/icons8-channel-add-96.png".format(LinkDatabase.name)
+                        "{}/icons/icons8-broadcast-add-100.png".format(LinkDatabase.name)
                     ),
                 ),
             )
@@ -328,7 +328,9 @@ class EntryGenericPlugin(object):
                     ),
                     ConfigurationEntry.ACCESS_TYPE_OWNER,
                     "Saves link in archive.org: {}".format(self.entry.link),
-                    "https://archive.org/offshoot_assets/favicon.ico",
+                    static(
+                        "{}/icons/archive.org.save.ico".format(LinkDatabase.name)
+                    ),
                 ),
             )
 

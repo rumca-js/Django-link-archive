@@ -37,7 +37,6 @@ urlpatterns = [
     path("source-refresh/<int:pk>/", viewsources.refresh_source, name="source-refresh"),
     path("source-save/<int:pk>/", viewsources.wayback_save, name="source-save"),
     path("source-import-yt-links/<int:pk>/", viewsources.import_youtube_links_for_source, name="source-import-yt-links"),
-    path("source-process-text/<int:pk>/", viewsources.process_source_text, name="source-process-text"),
     path("source-fix-entries/<int:source_pk>/", viewsources.source_fix_entries, name="source-fix-entries",),
     path("sources-remove-all/", viewsources.remove_all_sources, name="sources-remove-all"),
     path("sources-enable-all/", viewsources.enable_all_sources, name="sources-enable-all"),
@@ -165,8 +164,6 @@ urlpatterns = [
     path("page-scan-input", viewcustom.page_scan_input, name="page-scan-input",),
     path("page-scan-contents", viewcustom.page_scan_contents, name="page-scan-contents",),
     path("page-scan", viewcustom.page_scan, name="page-scan",),
-
-    path("check-move-archive", viewcustom.check_if_move_to_archive, name="check-move-archive",),
     path("data-errors", viewcustom.data_errors_page, name="data-errors"),
     path("fix-entry-tags/<int:entrypk>/", viewcustom.fix_entry_tags, name="fix-entry-tags",),
     path("test-page", viewcustom.test_page, name="test-page"),

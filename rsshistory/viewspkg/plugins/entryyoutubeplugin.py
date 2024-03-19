@@ -21,27 +21,27 @@ class EntryYouTubePlugin(EntryGenericPlugin):
         buttons.append(
             EntryButton(
                 self.user,
-                "Music",
+                "",
                 reverse(
                     "{}:entry-download-music".format(LinkDatabase.name),
                     args=[self.entry.id],
                 ),
                 ConfigurationEntry.ACCESS_TYPE_OWNER,
                 "Downloads YouTube music",
-                # static("{}/icons/icons8-download-96.png".format(LinkDatabase.name)),
+                static("{}/icons/icons8-download-music-96.png".format(LinkDatabase.name)),
             ),
         )
         buttons.append(
             EntryButton(
                 self.user,
-                "Video",
+                "",
                 reverse(
                     "{}:entry-download-video".format(LinkDatabase.name),
                     args=[self.entry.id],
                 ),
                 ConfigurationEntry.ACCESS_TYPE_OWNER,
                 "Downloads YouTube video",
-                # static("{}/icons/icons8-download-96.png".format(LinkDatabase.name)),
+                static("{}/icons/icons8-download-video-96.png".format(LinkDatabase.name)),
             ),
         )
 
