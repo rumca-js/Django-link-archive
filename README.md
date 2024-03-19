@@ -1,6 +1,6 @@
-Personal link database, link aggregator, with RSS functionality. Similar to Reddit, but completely open source, on your local machine.
+Personal link database, link aggregator, with RSS functionality. Similar to Reddit, but completely open source. You can self host it.
 
-You can think of it as 'map of the Iternet', rather than 'copy of the Internet'.
+It does not capture page contents. It captures link meta data: title, description etc.
 
 # Features
 
