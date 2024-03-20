@@ -55,7 +55,12 @@
     </p>
   {% endif %}
     <p>
-    <a href="{% url 'rsshistory:entries-omni-search' %}?search=source+%3D+{{object.url}}" class="simplebutton">Goto Entries</a>
+    {% if entry_object %}
+      <a href="{% url 'rsshistory:entry-detail' entry_object.id %}" class="simplebutton">
+        <img src="{% static 'rsshistory/icons/icons8-link-90.png' %}" class="content-icon" />
+      </a>
+    {% endif %}
+    <a href="{% url 'rsshistory:entries-omni-search' %}?search=source+%3D+'{{object.url}}'" class="simplebutton">Goto Entries</a>
     </p>
   {% if user.is_staff %}
     <p>

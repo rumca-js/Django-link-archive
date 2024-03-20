@@ -1,12 +1,15 @@
 import logging
 import shutil
 from django.db.models import Q
+from django.contrib.auth.models import User
+import datetime
 
-from ..models import AppLogging
+from ..models import AppLogging, UserBookmarks, UserTags
 from ..apps import LinkDatabase
+from ..controllers import LinkDataController
 
 
-class BookmarksExporter(object):
+class BookmarksEntryExporter(object):
     def __init__(self, config, entries):
         self._entries = entries
         self._cfg = config
@@ -25,7 +28,6 @@ class BookmarksExporter(object):
         if not export_dir.exists():
             export_dir.mkdir(parents=True, exist_ok=True)
 
-        from ..controllers import LinkDataController
         from .converters import (
             ModelCollectionConverter,
             JsonConverter,
@@ -55,8 +57,6 @@ class BookmarksExporter(object):
         file_name.write_text(self.use_rss_wrapper(rss_text))
 
     def get_entries(self):
-        from ..controllers import LinkDataController
-
         entries = LinkDataController.objects.filter(bookmarked=True)
 
     # TODO remove hardcoded link to this site
@@ -111,16 +111,15 @@ $channel_text
         return ""
 
 
-class BookmarksBigExporter(object):
-    def __init__(self, config):
+class BookmarksExporter(object):
+    def __init__(self, config, username=""):
         self._cfg = config
+        self.username = username
 
     def get_start_year(self):
         """
         We export from oldest entries
         """
-        from ..controllers import LinkDataController
-
         entries = LinkDataController.objects.all().order_by("date_published")
         if len(entries) > 0:
             entry = entries[0]
@@ -141,9 +140,6 @@ class BookmarksBigExporter(object):
         return year
 
     def export(self, directory):
-        import datetime
-        from ..controllers import LinkDataController
-
         entries_dir = directory
 
         if entries_dir.exists():
@@ -152,19 +148,44 @@ class BookmarksBigExporter(object):
         for year in range(self.get_start_year(), self.get_current_year() + 1):
             LinkDatabase.info("Writing bookmarks for a year {}".format(year))
 
-            start_date = datetime.date(year, 1, 1)
-            stop_date = datetime.date(year + 1, 1, 1)
+            all_entries = self.get_entries(year)
 
-            therange = (start_date, stop_date)
+            # do not differenciate export on language.
+            # some entries could have not language at all, or some other foreign languages
+            converter = BookmarksEntryExporter(self._cfg, all_entries)
+            converter.export("bookmarks", entries_dir / str(year))
+
+    def get_entries(self, year):
+        start_date = datetime.date(year, 1, 1)
+        stop_date = datetime.date(year + 1, 1, 1)
+
+        therange = (start_date, stop_date)
+
+        all_entries = []
+
+        if self.username != "" and self.username != None:
+            users = User.objects.filter(username = self.username)
+            if users.count () > 0:
+                """TODO implement this shit"""
+                #bookmarks = UserBookmarks.get_user_bookmarks(users[0])
+                #entries = bookmarks.values_list("entry_object", flat=True)
+
+                #all_bookmakred_entries = LinkDataController.objects.filter(
+                #    bookmarked=True, date_published__range=therange
+                #)
+
+                #all_entries = entries & all_bookmakred_entries
+                pass
 
             all_entries = LinkDataController.objects.filter(
                 bookmarked=True, date_published__range=therange
             )
+        else:
+            all_entries = LinkDataController.objects.filter(
+                bookmarked=True, date_published__range=therange
+            )
 
-            # do not differenciate export on language.
-            # some entries could have not language at all, or some other foreign languages
-            converter = BookmarksExporter(self._cfg, all_entries)
-            converter.export("bookmarks", entries_dir / str(year))
+        return all_entries
 
 
 class BookmarksTopicExporter(object):
@@ -172,11 +193,7 @@ class BookmarksTopicExporter(object):
         self._cfg = config
 
     def export(self, topic, directory):
-        import datetime
-        from ..models import RssEntryTagsDataModel
-        from ..controllers import LinkDataController
-
-        tag_objs = RssEntryTagsDataModel.objects.filter(tag=topic)
+        tag_objs = UserTags.objects.filter(tag=topic)
         entries = set()
         for tag_obj in tag_objs:
             if tag_obj.link_obj is not None:
@@ -185,5 +202,5 @@ class BookmarksTopicExporter(object):
         entries = list(entries)
         entries = sorted(entries, key=lambda x: x.date_published)
 
-        converter = BookmarksExporter(self._cfg, entries)
+        converter = BookmarksEntryExporter(self._cfg, entries)
         converter.export("topic_{}".format(topic), directory, "topics")

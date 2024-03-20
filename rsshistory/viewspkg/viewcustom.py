@@ -38,9 +38,12 @@ def page_show_properties(request):
         return data
 
     def show_page_props_internal(requests, page_link):
-        ViewPage.fill_context_type(p.context, page_link)
+        page_object = UrlHandler.get(page_link, fast_check=False)
+        ViewPage.fill_context_type(p.context, handler=page_object)
 
-        p.context["page_object"] = UrlHandler.get(page_link)
+        # fast check is disabled. We want to make sure based on contents if it is RSS or HTML
+        p.context["page_object"] = page_object
+        p.context["page_object_type"] = str(type(page_object))
 
         return p.render("show_page_props.html")
 

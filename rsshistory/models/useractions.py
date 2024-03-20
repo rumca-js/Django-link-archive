@@ -323,6 +323,15 @@ class UserBookmarks(models.Model):
         if objs.count() == 0:
             UserBookmarks.objects.create(user_object=user, entry_object=entry)
 
+    def get_user_bookmarks(user):
+        if not user:
+            return
+
+        if not user.is_authenticated:
+            return
+
+        return UserBookmarks.objects.filter(user_object=user)
+
     def remove(user, entry):
         if not user.is_authenticated:
             return

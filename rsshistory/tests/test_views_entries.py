@@ -20,10 +20,8 @@ class EntriesViewsTests(FakeInternetTestCase):
         self.disable_web_pages()
 
         self.user = User.objects.create_user(
-            username="testuser", password="testpassword"
+            username="testuser", password="testpassword", is_staff=True,
         )
-        self.user.is_staff = True
-        self.user.save()
 
     def test_add_simple_entry(self):
         LinkDataController.objects.all().delete()

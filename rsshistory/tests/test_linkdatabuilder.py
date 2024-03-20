@@ -192,7 +192,7 @@ class LinkDataBuilderTest(FakeInternetTestCase):
         # call tested function
         entry = b.add_from_props()
 
-        objs = LinkDataModel.objects.filter(link=link_name_0)
+        objs = LinkDataModel.objects.all()
         domains = DomainsController.objects.all()
 
         for domain in domains:
@@ -200,6 +200,8 @@ class LinkDataBuilderTest(FakeInternetTestCase):
 
         # for each domain an entry is created
         self.assertEqual(objs.count(), 1)
+        self.assertEqual(objs[0].link, "https://youtube.com")
+
         self.assertEqual(domains.count(), 1)
         self.assertEqual(objs[0].domain_obj, domains[0])
 
@@ -225,14 +227,12 @@ class LinkDataBuilderTest(FakeInternetTestCase):
         domains = DomainsController.objects.all()
 
         # for each domain an entry is created
-        self.assertEqual(objs.count(), 2)
+        self.assertEqual(objs.count(), 1)
         self.assertEqual(objs[0].link, "https://youtube.com")
-        self.assertEqual(objs[1].link, link_name_0)
 
         self.assertEqual(domains.count(), 1)
 
         self.assertEqual(objs[0].domain_obj, domains[0])
-        self.assertEqual(objs[1].domain_obj, domains[0])
 
         self.assertEqual(self.mock_page_requests, 0)
 

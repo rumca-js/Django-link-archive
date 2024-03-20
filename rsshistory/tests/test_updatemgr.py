@@ -1,6 +1,7 @@
 from pathlib import Path
+from django.contrib.auth.models import User
 
-from ..models import DataExport, ConfigurationEntry
+from ..models import DataExport, ConfigurationEntry, UserBookmarks
 from ..controllers import SourceDataController, LinkDataController
 from ..updatemgr import UpdateManager
 from ..configuration import Configuration
@@ -56,6 +57,10 @@ class UpdateManagerGitTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 
+        self.user = User.objects.create_user(
+            username="testuser", password="testpassword", is_staff=True,
+        )
+
         c = Configuration.get_object()
         c.config_entry = ConfigurationEntry.get()
 
@@ -72,7 +77,7 @@ class UpdateManagerGitTest(FakeInternetTestCase):
             export_to_cms=True,
         )
 
-        LinkDataController.objects.create(
+        entry = LinkDataController.objects.create(
             source="https://youtube.com",
             link="https://youtube.com?v=bookmarked",
             title="The first link",
@@ -81,6 +86,9 @@ class UpdateManagerGitTest(FakeInternetTestCase):
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
         )
+
+        date = DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M")
+        UserBookmarks.objects.create(date_bookmarked = date, user_object = self.user, entry_object=entry)
 
         LinkDataController.objects.create(
             source="https://youtube.com",
@@ -98,7 +106,7 @@ class UpdateManagerGitTest(FakeInternetTestCase):
             export_data=DataExport.EXPORT_DAILY_DATA,
             local_path="./daily_dir",
             remote_path="https://github.com/rumca-js/RSS-Link-Database-DAILY.git",
-            user="user",
+            user="testuser",
             password="password",
             export_entries=True,
             export_entries_bookmarks=True,
@@ -111,7 +119,7 @@ class UpdateManagerGitTest(FakeInternetTestCase):
             export_data=DataExport.EXPORT_YEAR_DATA,
             local_path="./year_dir",
             remote_path="https://github.com/rumca-js/RSS-Link-Database-YEAR.git",
-            user="user",
+            user="testuser",
             password="password",
             export_entries=True,
             export_entries_bookmarks=True,
@@ -124,7 +132,7 @@ class UpdateManagerGitTest(FakeInternetTestCase):
             export_data=DataExport.EXPORT_NOTIME_DATA,
             local_path="./notime_dir",
             remote_path="https://github.com/rumca-js/RSS-Link-Database-NOTIME.git",
-            user="user",
+            user="testuser",
             password="password",
             export_entries=True,
             export_entries_bookmarks=True,
@@ -187,6 +195,10 @@ class UpdateManagerLocTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 
+        self.user = User.objects.create_user(
+            username="testuser", password="testpassword", is_staff=True,
+        )
+
         source_youtube = SourceDataController.objects.create(
             url="https://youtube.com",
             title="YouTube",
@@ -195,7 +207,7 @@ class UpdateManagerLocTest(FakeInternetTestCase):
             export_to_cms=True,
         )
 
-        LinkDataController.objects.create(
+        entry = LinkDataController.objects.create(
             source="https://youtube.com",
             link="https://youtube.com?v=bookmarked",
             title="The first link",
@@ -204,6 +216,9 @@ class UpdateManagerLocTest(FakeInternetTestCase):
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
         )
+
+        date = DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M")
+        UserBookmarks.objects.create(date_bookmarked = date, user_object = self.user, entry_object=entry)
 
         LinkDataController.objects.create(
             source="https://youtube.com",
@@ -221,7 +236,7 @@ class UpdateManagerLocTest(FakeInternetTestCase):
             export_data=DataExport.EXPORT_DAILY_DATA,
             local_path="test",
             remote_path="test.git",
-            user="user",
+            user="testuser",
             password="password",
             export_entries=True,
             export_entries_bookmarks=True,
@@ -234,7 +249,7 @@ class UpdateManagerLocTest(FakeInternetTestCase):
             export_data=DataExport.EXPORT_YEAR_DATA,
             local_path="test",
             remote_path="test.git",
-            user="user",
+            user="testuser",
             password="password",
             export_entries=True,
             export_entries_bookmarks=True,
@@ -247,7 +262,7 @@ class UpdateManagerLocTest(FakeInternetTestCase):
             export_data=DataExport.EXPORT_NOTIME_DATA,
             local_path="test",
             remote_path="test.git",
-            user="user",
+            user="testuser",
             password="password",
             export_entries=True,
             export_entries_bookmarks=True,

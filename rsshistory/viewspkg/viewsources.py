@@ -6,10 +6,11 @@ from django.http import HttpResponseForbidden, HttpResponseRedirect
 from django.utils.http import urlencode
 
 from ..apps import LinkDatabase
-from ..models import ConfigurationEntry, UserConfig
+from ..models import ConfigurationEntry, UserConfig, AppLogging
 from ..controllers import (
     SourceDataController,
     SourceDataBuilder,
+    LinkDataBuilder,
     LinkDataController,
     BackgroundJobController,
     LinkDataWrapper,
@@ -98,14 +99,29 @@ class SourceDetailView(generic.DetailView):
         context["page_title"] = self.object.title
         context["page_thumbnail"] = self.object.favicon
         context["search_engines"] = SearchEngines(self.object.title, self.object.url)
-        context["page_object"] = UrlHandler.get(self.object.url)
 
-        ViewPage.fill_context_type(context, self.object.url)
+        handler = UrlHandler.get(self.object.url, fast_check=True)
+        context["page_object"] = handler
 
-        try:
-            context["handler"] = SourceControllerBuilder.get(self.object.url)
-        except:
-            pass
+        entries = LinkDataController.objects.filter(link = self.object.url)
+        if entries.count() > 0:
+            context["entry_object"] = entries[0]
+        else:
+            AppLogging.error("Missing source entry {}".format(self.object.url))
+            builder = LinkDataBuilder(link = self.object.url)
+            if builder.result:
+                entry = builder.result
+                if entry.is_archive_entry():
+                    entry = LinkDataWrapper.move_from_archive(entry)
+
+                entry.permanent = True
+                entry.save()
+
+                context["entry_object"] = entry
+
+        ViewPage.fill_context_type(context, handler = handler)
+
+        context["handler"] = SourceControllerBuilder.get(self.object.url)
 
         return context
 
@@ -337,12 +353,9 @@ def sources_manual_refresh(request):
 
     objs = SourceDataController.objects.all()
 
-    try:
-        for ob in objs:
-            plugin = SourceControllerBuilder.get(source)
-            plugin.check_for_data()
-    except Exception as E:
-        print(str(E))
+    for ob in objs:
+        plugin = SourceControllerBuilder.get(ob.url)
+        plugin.check_for_data()
 
     return HttpResponseRedirect(reverse("{}:sources".format(LinkDatabase.name)))
 

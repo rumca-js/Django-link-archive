@@ -54,6 +54,7 @@ class BaseLinkDataModel(models.Model):
     album = models.CharField(max_length=1000, null=True, blank=True)
 
     status_code = models.IntegerField(default=0)
+    contents_type = models.IntegerField(default=0) # indicates if it is rss, html, etc.
 
     page_rating_contents = models.IntegerField(default=0)
     page_rating_votes = models.IntegerField(default=0)

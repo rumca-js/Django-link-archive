@@ -45,8 +45,11 @@ class YouTubeChannelHandler(RssPage, DefaultUrlHandler):
     def get_channel_code(self):
         return self.code
 
+    def get_channel_name(self):
+        return self.code
+
     def get_channel_url(self):
         return self.code2url(self.code)
 
-    def get_channel_feed(self):
+    def get_channel_feed_url(self):
         return self.code2feed(self.code)

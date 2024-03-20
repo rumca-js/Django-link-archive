@@ -3,6 +3,7 @@ from django.templatetags.static import static
 
 from ...apps import LinkDatabase
 from ...models import ConfigurationEntry, UserConfig
+from ...controllers import LinkDataController
 from ...webtools import HtmlPage, BasePage, InputContent
 from ...configuration import Configuration
 
@@ -59,6 +60,7 @@ class EntryGenericPlugin(object):
 
     def get_edit_menu_buttons(self):
         buttons = []
+        config = Configuration.get_object().config_entry
 
         buttons.append(
             EntryButton(
@@ -165,16 +167,16 @@ class EntryGenericPlugin(object):
         buttons.append(
             EntryButton(
                 self.user,
-                "Reset",
+                "",
                 reverse(
                     "{}:entry-reset-data".format(LinkDatabase.name),
                     args=[self.entry.id],
                 ),
                 ConfigurationEntry.ACCESS_TYPE_OWNER,
                 "Resets entry data",
-                # static(
-                #    "{}/icons/icons8-view-details-100.png".format(LinkDatabase.name)
-                # ),
+                static(
+                   "{}/icons/icons8-update-100.png".format(LinkDatabase.name)
+                ),
             ),
         )
 
@@ -209,6 +211,24 @@ class EntryGenericPlugin(object):
                 ),
             )
 
+        if config.link_save:
+            buttons.append(
+                EntryButton(
+                    self.user,
+                    "Save",
+                    reverse(
+                        "{}:entry-save".format(LinkDatabase.name),
+                        args=[self.entry.id],
+                    ),
+                    ConfigurationEntry.ACCESS_TYPE_OWNER,
+                    "Saves link in archive.org: {}".format(self.entry.link),
+                    static(
+                        "{}/icons/archive.org.save.ico".format(LinkDatabase.name)
+                    ),
+                ),
+            )
+
+
         return buttons
 
     def is_entry_share_source_domain(self):
@@ -225,26 +245,53 @@ class EntryGenericPlugin(object):
         buttons = []
 
         if self.entry.source_obj:
+            source_entries = LinkDataController.objects.filter(link = self.entry.source_obj.url)
+            if source_entries.count() > 0:
+                source_entry = source_entries[0]
+
+                buttons.append(
+                    EntryButton(
+                        self.user,
+                        "Entry",
+                        reverse(
+                            "{}:entry-detail".format(LinkDatabase.name),
+                            args=[source_entry.id],
+                        ),
+                        ConfigurationEntry.ACCESS_TYPE_ALL,
+                        "Source: {}".format(self.entry.source_obj.title),
+                        static(
+                            "{}/icons/icons8-link-90.png".format(LinkDatabase.name)
+                        ),
+                    ),
+                )
+
+        if self.entry.source_obj:
             buttons.append(
                 EntryButton(
                     self.user,
-                    "Source",
+                    "",
                     reverse(
                         "{}:source-detail".format(LinkDatabase.name),
                         args=[self.entry.source_obj.id],
                     ),
                     ConfigurationEntry.ACCESS_TYPE_ALL,
                     "Source: {}".format(self.entry.source_obj.title),
+                    static(
+                        "{}/icons/icons8-broadcast-100.png".format(LinkDatabase.name)
+                    ),
                 ),
             )
         elif self.entry.source and self.entry.source != "":
             buttons.append(
                 EntryButton(
                     self.user,
-                    "Source",
+                    "",
                     self.entry.source,
                     ConfigurationEntry.ACCESS_TYPE_ALL,
                     "Source: {}".format(self.entry.source),
+                    static(
+                        "{}/icons/icons8-broadcast-100.png".format(LinkDatabase.name)
+                    ),
                 ),
             )
 
@@ -287,6 +334,9 @@ class EntryGenericPlugin(object):
                     ),
                     ConfigurationEntry.ACCESS_TYPE_ALL,
                     "Domain: {}".format(self.entry.domain_obj.domain),
+                    static(
+                        "{}/icons/icons8-www-64.png".format(LinkDatabase.name)
+                    ),
                 ),
             )
         else:
@@ -302,6 +352,9 @@ class EntryGenericPlugin(object):
                     + "?search=link+%3D%3D+{}".format(domain_url),
                     ConfigurationEntry.ACCESS_TYPE_ALL,
                     "Domain: {}".format(domain_url),
+                    static(
+                        "{}/icons/icons8-www-64.png".format(LinkDatabase.name)
+                    ),
                 ),
             )
 
@@ -316,23 +369,6 @@ class EntryGenericPlugin(object):
                 "https://archive.org/offshoot_assets/favicon.ico",
             ),
         )
-
-        if config.link_save:
-            buttons.append(
-                EntryButton(
-                    self.user,
-                    "Save",
-                    reverse(
-                        "{}:entry-save".format(LinkDatabase.name),
-                        args=[self.entry.id],
-                    ),
-                    ConfigurationEntry.ACCESS_TYPE_OWNER,
-                    "Saves link in archive.org: {}".format(self.entry.link),
-                    static(
-                        "{}/icons/archive.org.save.ico".format(LinkDatabase.name)
-                    ),
-                ),
-            )
 
         return buttons
 

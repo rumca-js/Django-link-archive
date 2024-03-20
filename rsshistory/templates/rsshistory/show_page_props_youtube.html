@@ -1,47 +1,48 @@
 <h1>YouTube Link properties</h1>
 
 <ul>
-    <li>Link: {{page_link}} <a href="{{page_link}}">Link</a></li>
-    <li>Detected page type: {{page_type}}</li>
+    <li>Link: {{page_object.url}} <a href="{{page_object.url}}">Link</a></li>
+    <li>Detected page type: {{page_object_type}}</li>
     <li>Status code: {{page_object.status_code}}</li>
     <li>Encoding: {{page_object.encoding}}</li>
     <li>Valid: {{page_object.is_valid}}</li>
-    <li>Title: {{title}}</li>
-    <li>Description: {{description}}</li>
+    <li>Title: {{page_object.get_title}}</li>
+    <li>Description: {{page_object.get_description}}</li>
     {%if page_object.get_date_published %}
     <li>Date published: {{page_object.get_date_published}}</li>
+    <li>Author: {{page_object.get_author}}</li>
+    <li>Page Rating: {{page_object.get_page_rating}}. Described by <a href="https://github.com/rumca-js/Django-link-archive">Django link archive Readme</a></li>
     {%endif%}
     <li>WebPage: {{webpage_url}} <a href="{{webpage_url}}">Link</a></li>
     {%if thumbnail %}
-    <li>Thumbnail: {{thumbnail}} <a href="{{thumbnail}}">Link</a></li>
+    <li>Thumbnail: {{page_object.get_thumbnail}} <a href="{{page_object.get_thumbnail}}">Link</a></li>
     {%endif%}
     <li>Uploader URL: {{uploader_url}} <a href="{{uploader_url}}">Link</a></li>
     <li>Channel ID: {{channel_id}}</li>
-    <li>Channel: {{channel}}</li>
-    <li>Channel URL: {{channel_url}} <a href="{{channel_url}}">Link</a></li>
-    <li>Channel feed URL: {{channel_feed_url}} <a href="{{channel_feed_url}}">Link</a></li>
+    <li>Channel: {{page_object.get_channel_code}}</li>
+    <li>Channel URL: {{page_object.get_channel_url}} <a href="{{page_object.get_channel_url}}">Link</a></li>
+    <li>Channel feed URL: {{page_object.get_channel_feed_url}} <a href="{{page_object.get_channel_feed_url}}">Link</a></li>
     <li>Channel follower count: {{channel_follower_count}}</li>
     <li>View count:{{view_count}} Likes:{{like_count}}</li>
-    <li>Language: {{language}}</li>
+    <li>Language: {{page_object.get_language}}</li>
     <li>Upload date: {{upload_date}}</li>
     <li>Duration: {{duration}}</li>
     <li>Valid: {{valid}}</li>
-    <li>Keywords: {{keywords}}</li>
     <li>keywords: {{page_object.get_tags}}</li>
     <li>Live: {{live}}</li>
 </ul>
 
 {% if user_config.show_icons %}
 <h1>Icon</h1>
-    {%if thumbnail %}
-    <img src="{{thumbnail}}" style="max-width: 50%"/>
+    {%if page_object.get_thumbnail %}
+    <img src="{{page_object.get_thumbnail}}" style="max-width: 50%"/>
     {%endif%}
 {%endif%}
 
 <h1>Embed</h1>
 <div class="youtube_player_container">
-    <iframe src="{{embed_url}}" frameborder="0" allowfullscreen class="youtube_player_frame"></iframe>
+    <iframe src="{{page_object.get_link_embed}}" frameborder="0" allowfullscreen class="youtube_player_frame"></iframe>
 </div>
 
 <h1>Contents</h1>
-<pre>{{contents}}</pre>
+<pre>{{page_object.contents}}</pre>

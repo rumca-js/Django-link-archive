@@ -559,6 +559,9 @@ def add_entry(request):
                 p.context["summary_text"] = "Could not save link"
                 return p.render("summary_present.html")
 
+            if entry.bookmarked:
+                new_entry = LinkDataWrapper.make_bookmarked(request, entry)
+
             p.context["form"] = form
 
             if entry:

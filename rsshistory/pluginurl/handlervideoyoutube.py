@@ -147,11 +147,13 @@ class YouTubeJsonHandler(YouTubeVideoHandler):
         if self.download_details():
             if self.load_details():
                 status = True
+                self.status_code = 200
                 self.contents = self.yt_text
                 LinkDatabase.info("YouTube video handler: {} DONE".format(self.url))
 
                 return self.contents
 
+        self.status_code = 500
         if not status:
             self.dead = True
 

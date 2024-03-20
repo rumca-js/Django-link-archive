@@ -109,10 +109,10 @@ class YearDataWriter(BaseDataWriter):
         self.write_sources()
 
     def write_entries(self):
-        from .serializers.bookmarksexporter import BookmarksBigExporter
+        from .serializers.bookmarksexporter import BookmarksExporter
 
         if self.export_config.export_entries_bookmarks:
-            exporter = BookmarksBigExporter(self.config)
+            exporter = BookmarksExporter(self.config, username=self.export_config.user)
             exporter.export(self.get_directory())
 
         if self.export_config.export_entries_permanents:

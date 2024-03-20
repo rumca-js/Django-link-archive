@@ -293,7 +293,7 @@ class LinkDataWrapper(object):
                 return obj
 
     def get_from_archive(self):
-        objs = ArchiveLinkDataModel.objects.filter(link=self.link)
+        objs = ArchiveLinkDataController.objects.filter(link=self.link)
         if objs.exists():
             return objs[0]
 

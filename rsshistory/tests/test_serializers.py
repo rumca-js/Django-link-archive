@@ -1,4 +1,10 @@
-from ..serializers import MarginaliaCrawlerOutput, ReadingList
+from django.contrib.auth.models import User
+
+from ..serializers import MarginaliaCrawlerOutput, ReadingList, BookmarksExporter
+from ..models import UserBookmarks
+from ..controllers import LinkDataController
+from ..dateutils import DateUtils
+from ..configuration import Configuration
 
 from .fakeinternet import FakeInternetTestCase
 
@@ -42,3 +48,86 @@ class ReadingListTest(FakeInternetTestCase):
             links[0],
             "https://www.thedrive.com/news/41493/teslas-16000-quote-for-a-700-fix-is-why-right-to-repair-matters",
         )
+
+
+class BookmarksExporterTest(FakeInternetTestCase):
+    def setUp(self):
+        self.disable_web_pages()
+        self.user = User.objects.create_user(
+            username="testuser", password="testpassword", is_staff=True,
+        )
+
+    def test_bookmarks_for_user_none(self):
+        config = Configuration.get_object().config_entry
+
+        date = DateUtils.from_string("2024-12-08T05:29:52Z")
+
+        entry = LinkDataController.objects.create(
+            source="",
+            link="https://linkedin.com",
+            title="my title",
+            description="my description",
+            bookmarked=True,
+            language="pl",
+            domain_obj=None,
+            date_published=date,
+            thumbnail="thumbnail",
+        )
+
+        # call tested function
+        exporter = BookmarksExporter(config, "testuser")
+
+        entries = exporter.get_entries(2024)
+        self.assertEqual(entries.count(), 0)
+
+    def test_bookmarks_for_user_one(self):
+
+        config = Configuration.get_object().config_entry
+
+        date = DateUtils.from_string("2024-12-08T05:29:52Z")
+
+        entry = LinkDataController.objects.create(
+            source="",
+            link="https://linkedin.com",
+            title="my title",
+            description="my description",
+            bookmarked=True,
+            language="pl",
+            domain_obj=None,
+            date_published=date,
+            thumbnail="thumbnail",
+        )
+
+        bookmark = UserBookmarks.objects.create(date_bookmarked=date, user_object = self.user, entry_object = entry)
+
+        exporter = BookmarksExporter(config, "testuser")
+
+        # call tested function
+        entries = exporter.get_entries(2024)
+        self.assertEqual(entries.count(), 1)
+
+    def test_bookmarks_for_no_user(self):
+
+        config = Configuration.get_object().config_entry
+
+        date = DateUtils.from_string("2024-12-08T05:29:52Z")
+
+        entry = LinkDataController.objects.create(
+            source="",
+            link="https://linkedin.com",
+            title="my title",
+            description="my description",
+            bookmarked=True,
+            language="pl",
+            domain_obj=None,
+            date_published=date,
+            thumbnail="thumbnail",
+        )
+
+        bookmark = UserBookmarks.objects.create(date_bookmarked=date, user_object = self.user, entry_object = entry)
+
+        exporter = BookmarksExporter(config, "")
+
+        # call tested function
+        entries = exporter.get_entries(2024)
+        self.assertEqual(entries.count(), 1)

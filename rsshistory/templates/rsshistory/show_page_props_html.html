@@ -1,20 +1,20 @@
 <h1>HTML Page properties</h1>
 
 <ul>
-    <li>Link: {{page_link}} <a href="{{page_link}}">Link</a></li>
-    <li>Detected page type: {{page_type}}</li>
+    <li>Link: {{page_object.url}} <a href="{{page_object.url}}">Link</a></li>
+    <li>Detected page type: {{page_object_type}}</li>
     <li>Status code: {{page_object.status_code}}</li>
     <li>Encoding: {{page_object.encoding}}</li>
     <li>Valid: {{page_object.is_valid}}</li>
-    <li>Title: {{title}}</li>
-    <li>Description: {{description}}</li>
+    <li>Title: {{page_object.get_title}}</li>
+    <li>Description: {{page_object.get_description}}</li>
     {%if page_object.get_date_published %}
     <li>Date published: {{page_object.get_date_published}}</li>
     {%endif%}
-    <li>Author: {{author}}</li>
-    <li>Page Rating: {{page_rating}}. Described by <a href="https://github.com/rumca-js/Django-link-archive">Django link archive Readme</a></li>
-    {%if thumbnail %}
-    <li>thumbnail: <a href="{{thumbnail}}"/>Link</a></li>
+    <li>Author: {{page_object.get_author}}</li>
+    <li>Page Rating: {{page_object.get_page_rating}}. Described by <a href="https://github.com/rumca-js/Django-link-archive">Django link archive Readme</a></li>
+    {%if page_object.get_thumbnail %}
+    <li>thumbnail: <a href="{{page_object.get_thumbnail}}"/>Link</a></li>
     {%endif %}
     {%if favicons %}
     {%for favicon in favicons %}
@@ -36,7 +36,7 @@
     </li>
 
     <li>Charset: {{charset}}</li>
-    <li>Language: {{language}}</li>
+    <li>Language: {{page_object.get_language}}</li>
     {%if rss_urls %}
     {%for rss_url in rss_urls %}
     <li>Rss Url: {{rss_url}} <a href="{{rss_url}}">Link</a></li>
@@ -49,9 +49,6 @@
     <li>og description: {{og_description}}</li>
     {%if og_image %}
     <li>og image: <a href="{{og_image}}"/>Link</a></li>
-    {%endif %}
-    {%if tags %}
-    <li>keywords: {{tags}}</li>
     {%endif %}
     <li>keywords: {{page_object.get_tags}}</li>
 
@@ -75,8 +72,8 @@
 </ul>
 
 {% if user_config.show_icons %}
-    {%if thumbnail%}
-    <img src="{{thumbnail}}" style="max-width: 50%"/>
+    {%if page_object.get_thumbnail%}
+    <img src="{{page_object.get_thumbnail}}" style="max-width: 50%"/>
     {%endif%}
     {%if og_image%}
     <img src="{{og_image}}" style="max-width: 50%"/>
@@ -88,7 +85,7 @@
 
 <h1>Contents</h1>
 
-<pre>{{contents}}</pre>
+<pre>{{page_object.contents}}</pre>
 
 <h1>Links</h1>
 

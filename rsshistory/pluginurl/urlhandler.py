@@ -90,7 +90,7 @@ class UrlHandler(object):
 
         return page
 
-    def get_type(url):
+    def get_type(url, fast_check=True):
         short_url = UrlHandler.get_protololless(url)
         if not short_url:
             return
@@ -105,7 +105,7 @@ class UrlHandler(object):
             return UrlHandler.odysee_channel_handler(url)
 
         options = PageOptions()
-        options.fast_parsing = True
+        options.fast_parsing = fast_check
 
         page = Url.get(url, options=options)
         return page

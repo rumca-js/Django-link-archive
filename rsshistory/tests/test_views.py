@@ -89,7 +89,7 @@ class ViewsTest(FakeInternetTestCase):
         response = self.client.get(url)
 
         # redirect
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 302)
 
     """
     Entries
