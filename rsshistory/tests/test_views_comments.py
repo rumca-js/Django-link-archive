@@ -17,7 +17,7 @@ class CommentsViewsTests(FakeInternetTestCase):
             username="testuser", password="testpassword", is_staff=True,
         )
 
-    def test_add_comment(self):
+    def test_entry_comment_add(self):
         self.client.login(username="testuser", password="testpassword")
 
         test_link = "https://linkedin.com"
@@ -58,7 +58,7 @@ class CommentsViewsTests(FakeInternetTestCase):
         entries = LinkCommentDataModel.objects.filter(entry_object=entry)
         self.assertEqual(entries.count(), 1)
 
-    def test_edit_comment(self):
+    def test_entry_comment_edit(self):
         self.client.login(username="testuser", password="testpassword")
 
         test_link = "https://linkedin.com"

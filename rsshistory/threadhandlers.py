@@ -153,6 +153,8 @@ class LinkDownloadJobHandler(BaseJobHandler):
             p = HtmlPage(item.link)
             p.download_all()
 
+            AppLogging.info("Page has been downloaded:{}".format(item.link))
+
             return True
         except Exception as e:
             error_text = traceback.format_exc()

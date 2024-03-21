@@ -10,7 +10,7 @@ from ..controllers import (
     LinkDataBuilder,
 )
 from ..dateutils import DateUtils
-from ..models import KeyWords, DataExport
+from ..models import KeyWords, DataExport, UserBookmarks
 
 from .fakeinternet import FakeInternetTestCase
 
@@ -22,6 +22,21 @@ class EntriesViewsTests(FakeInternetTestCase):
         self.user = User.objects.create_user(
             username="testuser", password="testpassword", is_staff=True,
         )
+
+    def get_link_data(self, test_link):
+        data = {"link": test_link}
+
+        full_data = LinkDataController.get_full_information(data)
+        full_data["description"] = LinkDataController.get_description_safe(
+            full_data["description"]
+        )
+
+        limited_data = {}
+        for key in full_data:
+            if full_data[key] is not None:
+                limited_data[key] = full_data[key]
+
+        return limited_data
 
     def test_add_simple_entry(self):
         LinkDataController.objects.all().delete()
@@ -47,19 +62,7 @@ class EntriesViewsTests(FakeInternetTestCase):
         url = reverse("{}:entry-add".format(LinkDatabase.name))
         test_link = "https://linkedin.com"
 
-        data = {"link": test_link}
-        full_data = LinkDataController.get_full_information(data)
-        full_data["description"] = LinkDataController.get_description_safe(
-            full_data["description"]
-        )
-
-        limited_data = {}
-        for key in full_data:
-            if full_data[key] is not None:
-                limited_data[key] = full_data[key]
-
-        print("Limited data")
-        print(limited_data)
+        limited_data = self.get_link_data(test_link)
 
         self.assertEqual(LinkDataController.objects.filter(link=test_link).count(), 0)
 
@@ -70,6 +73,9 @@ class EntriesViewsTests(FakeInternetTestCase):
 
         self.assertEqual(LinkDataController.objects.filter(link=test_link).count(), 1)
 
+        bookmarks = UserBookmarks.get_user_bookmarks(self.user)
+        self.assertEqual(bookmarks.count(), 0)
+
     def test_add_entry_rss(self):
         LinkDataController.objects.all().delete()
 
@@ -78,19 +84,7 @@ class EntriesViewsTests(FakeInternetTestCase):
         url = reverse("{}:entry-add".format(LinkDatabase.name))
         test_link = "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM"
 
-        data = {"link": test_link}
-        full_data = LinkDataController.get_full_information(data)
-        full_data["description"] = LinkDataController.get_description_safe(
-            full_data["description"]
-        )
-
-        limited_data = {}
-        for key in full_data:
-            if full_data[key] is not None:
-                limited_data[key] = full_data[key]
-
-        print("Limited data")
-        print(limited_data)
+        limited_data = self.get_link_data(test_link)
 
         self.assertEqual(LinkDataController.objects.filter(link=test_link).count(), 0)
 
@@ -111,19 +105,7 @@ class EntriesViewsTests(FakeInternetTestCase):
 
         LinkDataBuilder(link=test_link)
 
-        data = {"link": test_link}
-        full_data = LinkDataController.get_full_information(data)
-        full_data["description"] = LinkDataController.get_description_safe(
-            full_data["description"]
-        )
-
-        limited_data = {}
-        for key in full_data:
-            if full_data[key] is not None:
-                limited_data[key] = full_data[key]
-
-        print("Limited data")
-        print(limited_data)
+        limited_data = self.get_link_data(test_link)
 
         self.assertEqual(LinkDataController.objects.filter(link=test_link).count(), 1)
 
@@ -149,19 +131,7 @@ class EntriesViewsTests(FakeInternetTestCase):
             date_published=DateUtils.get_datetime_now_utc(),
         )
 
-        data = {"link": test_link}
-        full_data = LinkDataController.get_full_information(data)
-        full_data["description"] = LinkDataController.get_description_safe(
-            full_data["description"]
-        )
-
-        limited_data = {}
-        for key in full_data:
-            if full_data[key] is not None:
-                limited_data[key] = full_data[key]
-
-        print("Limited data")
-        print(limited_data)
+        limited_data = self.get_link_data(test_link)
 
         self.assertEqual(
             ArchiveLinkDataController.objects.filter(link=test_link).count(), 1
@@ -176,6 +146,29 @@ class EntriesViewsTests(FakeInternetTestCase):
             ArchiveLinkDataController.objects.filter(link=test_link).count(), 1
         )
         self.assertEqual(LinkDataController.objects.filter(link=test_link).count(), 0)
+
+    def test_add_entry_bookmarked(self):
+        LinkDataController.objects.all().delete()
+
+        self.client.login(username="testuser", password="testpassword")
+
+        url = reverse("{}:entry-add".format(LinkDatabase.name))
+        test_link = "https://linkedin.com"
+
+        limited_data = self.get_link_data(test_link)
+        limited_data["bookmarked"] = True
+
+        self.assertEqual(LinkDataController.objects.filter(link=test_link).count(), 0)
+
+        # call user action
+        response = self.client.post(url, data=limited_data)
+
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(LinkDataController.objects.filter(link=test_link).count(), 1)
+
+        bookmarks = UserBookmarks.get_user_bookmarks(self.user)
+        self.assertEqual(bookmarks.count(), 1)
 
     def test_edit_entry(self):
         LinkDataController.objects.all().delete()
@@ -190,27 +183,14 @@ class EntriesViewsTests(FakeInternetTestCase):
             title="The first link",
             description="the first link description",
             source_obj=None,
-            bookmarked=True,
+            bookmarked=False,
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
         )
 
         url = reverse("{}:entry-edit".format(LinkDatabase.name), args=[entry.id])
 
-        data = {"link": test_link}
-        full_data = LinkDataController.get_full_information(data)
-        full_data["description"] = LinkDataController.get_description_safe(
-            full_data["description"]
-        )
-
-        limited_data = {}
-        for key in full_data:
-            if full_data[key] is not None:
-                limited_data[key] = full_data[key]
-        limited_data["date_published"] = "2020-03-03;16:34"
-
-        print("Limited data")
-        print(limited_data)
+        limited_data = self.get_link_data(test_link)
 
         # call user action
         response = self.client.post(url, data=limited_data)
@@ -223,6 +203,47 @@ class EntriesViewsTests(FakeInternetTestCase):
         entry = LinkDataController.objects.get(link=test_link)
         self.assertEqual(entry.title, "LinkedIn Page title")
         self.assertEqual(entry.description, "LinkedIn Page description")
+
+        bookmarks = UserBookmarks.get_user_bookmarks(self.user)
+        self.assertEqual(bookmarks.count(), 0)
+
+    def test_edit_entry_bookmarked(self):
+        LinkDataController.objects.all().delete()
+
+        self.client.login(username="testuser", password="testpassword")
+
+        test_link = "https://linkedin.com"
+
+        entry = LinkDataController.objects.create(
+            source="https://linkedin.com",
+            link=test_link,
+            title="The first link",
+            description="the first link description",
+            source_obj=None,
+            bookmarked=False,
+            date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
+            language="en",
+        )
+
+        url = reverse("{}:entry-edit".format(LinkDatabase.name), args=[entry.id])
+
+        limited_data = self.get_link_data(test_link)
+        limited_data["bookmarked"] = True
+
+        # call user action
+        response = self.client.post(url, data=limited_data)
+
+        # redirection
+        self.assertEqual(response.status_code, 302)
+
+        # check that object has been changed
+
+        entry = LinkDataController.objects.get(link=test_link)
+        self.assertEqual(entry.title, "LinkedIn Page title")
+        self.assertEqual(entry.description, "LinkedIn Page description")
+
+        bookmarks = UserBookmarks.get_user_bookmarks(self.user)
+        self.assertEqual(bookmarks.count(), 1)
 
     def test_entry_download(self):
         LinkDataController.objects.all().delete()

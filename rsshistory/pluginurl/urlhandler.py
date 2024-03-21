@@ -212,6 +212,10 @@ class UrlHandler(object):
             wh = url.find("http", len(stupid_google_string))
             if wh >= 0:
                 url = url[wh:]
+                wh = url.find("&sa=U")
+                if wh >= 0:
+                    url = url[:wh]
+                    url = Url.get_cleaned_link(url)
 
         stupid_youtube_string = "https://www.youtube.com/redirect"
         if url.find(stupid_youtube_string) >= 0:
@@ -221,5 +225,6 @@ class UrlHandler(object):
                 if wh >= 0:
                     url = url[wh:]
                     url = unquote(url)
+                    url = Url.get_cleaned_link(url)
 
         return url

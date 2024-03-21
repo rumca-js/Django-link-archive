@@ -768,6 +768,13 @@ def edit_entry(request, pk):
         if form.is_valid():
             form.save()
 
+            obs = LinkDataController.objects.filter(id=pk)
+            entry = obs[0]
+            if entry.bookmarked:
+                new_entry = LinkDataWrapper.make_bookmarked(request, entry)
+            else:
+                new_entry = LinkDataWrapper.make_not_bookmarked(request, entry)
+
             return HttpResponseRedirect(ob.get_absolute_url())
 
         error_message = "\n".join(

@@ -10,11 +10,15 @@ class SymbolEvaluator(object):
             return 5
         elif symbol == "tag == something":
             return 1
+        elif symbol == 'tag == "something"':
+            return 2
+        elif symbol == 'title == "test"':
+            return 6
         else:
             return 0
 
 
-class OmniSearchTest(FakeInternetTestCase):
+class OmniSearchFilterTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 
@@ -30,7 +34,7 @@ class OmniSearchTest(FakeInternetTestCase):
         # link is not translatable. can be read by fields
 
         self.assertTrue("link" in fields)
-        self.assertTrue(fields["link"] == "https://test.com")
+        self.assertEqual(fields["link"], "https://test.com")
 
     def test_filter_query_set(self):
         LinkDataModel.objects.create(link="https://test.com")
@@ -49,7 +53,7 @@ class OmniSearchTest(FakeInternetTestCase):
 
         self.assertEqual(qs.count(), 1)
 
-    def test_filter_query_set_with_quotes(self):
+    def test_filter_query_set_with_double_quotes(self):
         LinkDataModel.objects.create(link="https://test.com", artist="Sombody Anybody")
 
         args = {"search": 'artist = "Sombody "'}
@@ -65,6 +69,28 @@ class OmniSearchTest(FakeInternetTestCase):
         print("Query set length: {}".format(qs.count()))
 
         self.assertEqual(qs.count(), 1)
+
+    def test_filter_query_set_with_single_quotes(self):
+        LinkDataModel.objects.create(link="https://test.com", artist="Sombody Anybody")
+
+        args = {"search": "artist = 'Sombody '"}
+        processor = OmniSearchFilter(args)
+
+        qs = LinkDataModel.objects.all()
+        print("Query set length: {}".format(qs.count()))
+
+        processor.set_query_set(qs)
+        processor.set_translatable(["link", "artist"])
+
+        qs = processor.get_filtered_objects()
+        print("Query set length: {}".format(qs.count()))
+
+        self.assertEqual(qs.count(), 1)
+
+
+class OmniSearchEquationTest(FakeInternetTestCase):
+    def setUp(self):
+        self.disable_web_pages()
 
     def test_symbol_equation_1(self):
         text = "(title == test & description == none) | title == covid"
@@ -98,6 +124,31 @@ class OmniSearchTest(FakeInternetTestCase):
         self.assertEqual(conditions["A"], "title == test")
         self.assertEqual(conditions["B"], "tag == something")
 
+    def test_symbol_equation_3_double_quotes(self):
+        text = 'title == test & tag == "something"'
+
+        tok = StringSymbolEquation(text)
+        string, conditions = tok.process()
+
+        self.assertEqual(string, "A&B")
+        self.assertEqual(conditions["A"], "title == test")
+        self.assertEqual(conditions["B"], 'tag == "something"')
+
+    def test_symbol_equation_3_single_quotes(self):
+        text = "title == test & tag == 'something'"
+
+        tok = StringSymbolEquation(text)
+        string, conditions = tok.process()
+
+        self.assertEqual(string, "A&B")
+        self.assertEqual(conditions["A"], "title == test")
+        self.assertEqual(conditions["B"], "tag == 'something'")
+
+
+class OmniSearchProcessorTest(FakeInternetTestCase):
+    def setUp(self):
+        self.disable_web_pages()
+
     def test_omni_search_next_and(self):
         args = "title == test & tag == something"
 
@@ -112,6 +163,20 @@ class OmniSearchTest(FakeInternetTestCase):
         # 1 & 5 == 1
         self.assertEqual(value, 1)
 
+    def test_omni_search_quotes(self):
+        args = 'title == "test" & tag == "something"'
+
+        tok = OmniSymbolProcessor(args, SymbolEvaluator())
+        self.assertEqual(tok.eq_string, "A&B")
+
+        value = tok.process()
+
+        self.assertEqual(tok.conditions["A"], 'title == "test"')
+        self.assertEqual(tok.conditions["B"], 'tag == "something"')
+
+        # 2 & 6 == 2
+        self.assertEqual(value, 2)
+
     def test_omni_search_next_or(self):
         args = "title == test | tag == something"
 
@@ -124,3 +189,4 @@ class OmniSearchTest(FakeInternetTestCase):
 
         # 1 | 5 == 1
         self.assertEqual(value, 5)
+

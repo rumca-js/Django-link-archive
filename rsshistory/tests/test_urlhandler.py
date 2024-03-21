@@ -88,7 +88,7 @@ class UrlHandlerTest(FakeInternetTestCase):
 
     def test_get_cleaned_link_stupid_google_link(self):
         cleaned_link = UrlHandler.get_cleaned_link(
-            "https://www.google.com/url?q=https://forum.ddopl.com"
+            "https://www.google.com/url?q=https://forum.ddopl.com/&sa=Udupa"
         )
 
         self.assertEqual(cleaned_link, "https://forum.ddopl.com")

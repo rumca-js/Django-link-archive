@@ -79,12 +79,16 @@ class ViewsTest(FakeInternetTestCase):
     """
 
     def test_source_remove_all(self):
+        self.client.login(username="testuser", password="testpassword")
+
         url = reverse("{}:sources-remove-all".format(LinkDatabase.name))
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
 
     def test_sources_refresh_all(self):
+        self.client.login(username="testuser", password="testpassword")
+
         url = reverse("{}:sources-manual-refresh".format(LinkDatabase.name))
         response = self.client.get(url)
 
@@ -240,74 +244,6 @@ class ViewsTest(FakeInternetTestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
-
-    """
-    Tags - todo move to other test file
-
-    def test_tag_entry(self):
-        url = reverse("{}:entry-tag".format(LinkDatabase.name), args=[0])
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
-    def test_tag_remove(self):
-        url = reverse("{}:tag-remove".format(LinkDatabase.name), args=[0])
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
-    def test_tag_entry_remove(self):
-        url = reverse("{}:tags-entry-remove".format(LinkDatabase.name), args=[0])
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
-    def test_tag_entry_show(self):
-        url = reverse("{}:tags-entry-show".format(LinkDatabase.name), args=[0])
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
-    def test_tag_rename(self):
-        url = reverse("{}:tag-rename".format(LinkDatabase.name))
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
-    def test_tag_show_all(self):
-        url = reverse("{}:tags-show-all".format(LinkDatabase.name))
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
-    def test_tag_show_recent(self):
-        url = reverse("{}:tags-show-recent".format(LinkDatabase.name))
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-    """
-
-    """
-    Comments - TODO move to other file
-
-    def test_comment_add(self):
-        url = reverse("{}:entry-comment-add".format(LinkDatabase.name), args=[0])
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
-    def test_comment_edit(self):
-        url = reverse("{}:entry-comment-edit".format(LinkDatabase.name), args=[0])
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
-    def test_comment_remove(self):
-        url = reverse("{}:entry-comment-remove".format(LinkDatabase.name), args=[0])
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-    """
 
     """
     System views

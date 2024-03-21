@@ -575,18 +575,19 @@ class OmniSymbolEvaluator(object):
     def cleanup_right_operator_part(self, right_part):
         right_part = right_part.strip()
 
-        wh1 = right_part.find('"')
-        wh2 = right_part.find('"', wh1 + 1)
-
-        if wh1 == 0 and wh2 == len(right_part) - 1:
+        if right_part.startswith('"') and right_part.endswith('"'):
+            right_part = right_part[1:-1]
+        if right_part.startswith("'") and right_part.endswith("'"):
             right_part = right_part[1:-1]
 
         return right_part
 
     def split_symbol(self, symbol):
         for op in self.get_operators():
-            sp = symbol.split(op)
-            if len(sp) > 1:
+            wh = symbol.find(op)
+            if wh >= 0:
+                sp = [symbol[:wh], symbol[wh+len(op)+1:]]
+
                 left_part = self.cleanup_left_operator_part(sp[0])
                 right_part = self.cleanup_right_operator_part(sp[1])
 

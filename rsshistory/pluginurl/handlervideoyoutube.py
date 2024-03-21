@@ -30,12 +30,11 @@ class YouTubeVideoHandler(DefaultUrlHandler):
         if not url:
             return
 
-        wh = url.find("youtu.be")
-        video_code = None
-        if wh >= 0:
-            return YouTubeVideoHandler.input2code_youtu_be(url)
-        else:
+        if url.find("watch") >= 0 and url.find("v=") >= 0:
             return YouTubeVideoHandler.input2code_standard(url)
+
+        if url.find("youtu.be") >= 0:
+            return YouTubeVideoHandler.input2code_youtu_be(url)
 
     def input2code_youtu_be(url):
         wh = url.find("youtu.be")
