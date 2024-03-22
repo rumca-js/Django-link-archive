@@ -12,7 +12,16 @@ from .models import (
     UserVotes,
     UserSearchHistory,
 )
+from .pluginsources.sourcecontrollerbuilder import SourceControllerBuilder
+from .models import DomainsSuffixes
+from .models import DomainsTlds
+from .models import DomainsMains
+from .models import DomainCategories
+from .models import DomainSubCategories
+from .models import SourceCategories
+from .models import SourceSubCategories
 from .models import ConfigurationEntry, UserConfig, DataExport
+
 from .configuration import Configuration
 from .controllers import (
     SourceDataController,
@@ -20,21 +29,46 @@ from .controllers import (
     ArchiveLinkDataController,
     DomainsController,
 )
+from .dateutils import DateUtils
 
 
 # https://docs.djangoproject.com/en/4.1/ref/forms/widgets/
 
 
 def my_date_to():
-    from .dateutils import DateUtils
-
     return DateUtils.get_days_range()[1]
 
 
 def my_date_from():
-    from .dateutils import DateUtils
-
     return DateUtils.get_days_range()[0]
+
+
+class UserRequest(object):
+    def __init__(self, args, kwargs):
+        self.pop_headers(args, kwargs)
+
+    def pop_headers(self, args, kwargs):
+        self.request = None
+        self.is_mobile = False
+
+        self.request = self.pop_data(args, kwargs, "request")
+        if self.request:
+            from .views import ViewPage
+            self.is_mobile = ViewPage.is_mobile(self.request)
+            self.user = self.request.user
+
+    def pop_data(self, args, kwargs, data):
+        if data in kwargs:
+            return kwargs.pop(data)
+
+    def get_cols_size(self):
+        if self.is_mobile:
+            return "30"
+        else:
+            return "100"
+
+    def get_submit_attrs(self):
+        attr = {"onchange": "this.form.submit()"}
 
 
 class ConfigForm(forms.ModelForm):
@@ -90,8 +124,7 @@ class ConfigForm(forms.ModelForm):
         ]
 
     def __init__(self, *args, **kwargs):
-        self.pop_headers(args, kwargs)
-
+        self.init = UserRequest(args, kwargs)
         super(ConfigForm, self).__init__(*args, **kwargs)
 
         # fmt: off
@@ -110,26 +143,15 @@ class ConfigForm(forms.ModelForm):
         self.fields["sources_per_page"].label = "Number of sources per page"
         # fmt: on
 
-        if self.is_mobile:
-            self.fields["user_agent"].widget.attrs.update(size="20")
+        self.fields["user_agent"].widget.attrs.update(size=self.init.get_cols_size())
+        if self.init.is_mobile:
             self.fields["user_headers"].widget = forms.Textarea(
                 attrs={"rows": 10, "cols": 20}
             )
         else:
-            self.fields["user_agent"].widget.attrs.update(size="100")
             self.fields["user_headers"].widget = forms.Textarea(
                 attrs={"rows": 20, "cols": 75}
             )
-
-    def pop_headers(self, args, kwargs):
-        self.request = None
-        self.is_mobile = False
-
-        if "request" in kwargs:
-            from .views import ViewPage
-
-            self.request = kwargs.pop("request")
-            self.is_mobile = ViewPage.is_mobile(self.request)
 
 
 class DataExportForm(forms.ModelForm):
@@ -237,12 +259,20 @@ class PushDailyDataForm(forms.Form):
 class LinkInputForm(forms.Form):
     link = forms.CharField(label="Link", max_length=500)
 
+    def __init__(self, *args, **kwargs):
+        self.init = UserRequest(args, kwargs)
+        super().__init__(*args, **kwargs)
+
     def get_information(self):
         return self.cleaned_data
 
 
 class SourceInputForm(forms.Form):
     url = forms.CharField(label="Source URL", max_length=500)
+
+    def __init__(self, *args, **kwargs):
+        self.init = UserRequest(args, kwargs)
+        super().__init__(*args, **kwargs)
 
     def get_information(self):
         return self.cleaned_data
@@ -285,36 +315,31 @@ class OmniSearchForm(forms.Form):
     search_history = forms.CharField(widget=forms.Select(choices=[]), required=False)
 
     def __init__(self, *args, **kwargs):
-        self.pop_headers(args, kwargs)
-
-        user_choices = [[None, None]]
-
-        if "user_choices" in kwargs:
-            user_choices = kwargs.pop("user_choices")
-            user_choices = OmniSearchForm.get_user_choices(user_choices)
+        self.init = UserRequest(args, kwargs)
+        user_choices = self.init.pop_data(args, kwargs, "user_choices")
+        if not user_choices:
+            user_choices = []
+        user_choices = OmniSearchForm.get_user_choices(user_choices)
 
         super().__init__(*args, **kwargs)
-
-        if not self.is_mobile:
-            self.fields["search"].widget.attrs.update(size="100")
-        else:
-            # mobile
-            self.fields["search_history"].widget.attrs.update(size="30")
 
         attr = {"onchange": "this.form.submit()"}
         self.fields["search_history"].widget = forms.Select(
             choices=user_choices, attrs=attr
         )
 
-    def pop_headers(self, args, kwargs):
-        self.request = None
-        self.is_mobile = False
+        self.fields["search"].widget.attrs.update(size=self.init.get_cols_size())
 
-        if "request" in kwargs:
-            from .views import ViewPage
+        if self.init.user:
+            if not self.init.user.is_authenticated:
+                self.fields["search_history"].widget = forms.HiddenInput()
 
-            self.request = kwargs.pop("request")
-            self.is_mobile = ViewPage.is_mobile(self.request)
+        if self.init.is_mobile:
+            # TODO setting size does not work
+            #self.fields["search_history"].widget.attrs.update(size="10")
+            #self.fields["search_history"].widget.attrs.update(width="100%")
+            #self.fields["search_history"].widget.attrs.update(width="10px")
+            pass
 
     def set_choices(self, choices):
         self.fields["search_history"].widget = forms.Select(choices=choices)
@@ -348,6 +373,11 @@ class OmniSearchWithArchiveForm(OmniSearchForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        if self.init.user:
+            if not self.init.user.is_authenticated:
+                self.fields["search_history"].widget = forms.HiddenInput()
+
+
 
 class EntryForm(forms.ModelForm):
     """
@@ -379,6 +409,7 @@ class EntryForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
+        self.init = UserRequest(args, kwargs)
         super(EntryForm, self).__init__(*args, **kwargs)
         self.fields["link"].required = True
         self.fields["source"].required = False
@@ -446,8 +477,7 @@ class SourceForm(forms.ModelForm):
         widgets = {}
 
     def __init__(self, *args, **kwargs):
-        from .pluginsources.sourcecontrollerbuilder import SourceControllerBuilder
-
+        self.init = UserRequest(args, kwargs)
         super(SourceForm, self).__init__(*args, **kwargs)
         # TODO thing below should be handled by model properties
         self.fields["favicon"].required = False
@@ -515,6 +545,7 @@ class DomainEditForm(forms.ModelForm):
         ]
 
     def __init__(self, *args, **kwargs):
+        self.init = UserRequest(args, kwargs)
         super(DomainEditForm, self).__init__(*args, **kwargs)
         self.fields["domain"].widget.attrs["readonly"] = True
 
@@ -532,6 +563,7 @@ class DomainsChoiceForm(forms.Form):
     sort = forms.CharField(widget=forms.Select(choices=()), required=False)
 
     def __init__(self, *args, **kwargs):
+        self.init = UserRequest(args, kwargs)
         super().__init__(*args, **kwargs)
 
         # custom javascript code
@@ -565,8 +597,6 @@ class DomainsChoiceForm(forms.Form):
         return result
 
     def get_suffix_choices(self):
-        from .models import DomainsSuffixes
-
         result = []
         result.append("")
 
@@ -578,8 +608,6 @@ class DomainsChoiceForm(forms.Form):
         return self.to_choices(result)
 
     def get_tld_choices(self):
-        from .models import DomainsTlds
-
         result = []
         result.append("")
 
@@ -591,8 +619,6 @@ class DomainsChoiceForm(forms.Form):
         return self.to_choices(result)
 
     def get_main_choices(self):
-        from .models import DomainsMains
-
         result = []
         result.append("")
 
@@ -608,8 +634,6 @@ class DomainsChoiceForm(forms.Form):
         return self.to_choices(names)
 
     def get_categories(self):
-        from .models import DomainCategories
-
         result = []
         result.append(["", ""])
 
@@ -620,8 +644,6 @@ class DomainsChoiceForm(forms.Form):
         return result
 
     def get_subcategories(self):
-        from .models import DomainSubCategories
-
         result = []
         result.append(["", ""])
 
@@ -642,6 +664,7 @@ class SourcesChoiceForm(forms.Form):
     subcategory = forms.CharField(widget=forms.Select(choices=()), required=False)
 
     def __init__(self, *args, **kwargs):
+        self.init = UserRequest(args, kwargs)
         super().__init__(*args, **kwargs)
 
     def create(self):
@@ -660,8 +683,6 @@ class SourcesChoiceForm(forms.Form):
         )
 
     def get_categories(self):
-        from .models import SourceCategories
-
         result = []
         result.append(["", ""])
 
@@ -671,8 +692,6 @@ class SourcesChoiceForm(forms.Form):
         return result
 
     def get_subcategories(self):
-        from .models import SourceSubCategories
-
         result = []
         result.append(["", ""])
 
@@ -691,14 +710,7 @@ class BasicEntryChoiceForm(forms.Form):
     # fmt: on
 
     def __init__(self, *args, **kwargs):
-        self.request = None
-        self.is_mobile = False
-        if "request" in kwargs:
-            from .views import ViewPage
-
-            self.request = kwargs.pop("request")
-            self.is_mobile = ViewPage.is_mobile(self.request)
-
+        self.init = UserRequest(args, kwargs)
         super().__init__(*args, **kwargs)
 
     def create(self, sources):
@@ -725,9 +737,9 @@ class BasicEntryChoiceForm(forms.Form):
             choices=title_choices, attrs=attr
         )
 
-    def get_categories(self):
-        from .models import SourceCategories
+        self.fields["search"].widget.attrs.update(size=self.init.get_cols_size())
 
+    def get_categories(self):
         result = []
         result.append(["", ""])
 
@@ -738,8 +750,6 @@ class BasicEntryChoiceForm(forms.Form):
         return result
 
     def get_subcategories(self):
-        from .models import SourceSubCategories
-
         result = []
         result.append(["", ""])
 
@@ -769,7 +779,7 @@ class BasicEntryChoiceForm(forms.Form):
             for atuple in self.sources.values_list("id", field):
                 new_val = atuple[1]
 
-                if self.is_mobile:
+                if self.init.is_mobile:
                     if len(new_val) > 25:
                         new_val = new_val[:25] + "(...)"
 
@@ -848,6 +858,7 @@ class LinkVoteForm(forms.Form):
     vote = forms.IntegerField(initial=0)
 
     def __init__(self, *args, **kwargs):
+        self.init = UserRequest(args, kwargs)
         super(LinkVoteForm, self).__init__(*args, **kwargs)
         self.fields["user"].readonly = True
 

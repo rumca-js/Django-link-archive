@@ -15,9 +15,11 @@ Sometimes we see the CDN URLs return a 301 redirect back to your own website. Us
 Disabling SSL validation will not check certificates, if expired.
 """
 
+import html
 import urllib.request, urllib.error, urllib.parse
 from urllib.parse import urlparse
 import urllib.robotparser
+from urllib.parse import unquote
 
 from urllib3.exceptions import InsecureRequestWarning
 from urllib3 import disable_warnings
@@ -1624,7 +1626,9 @@ class ContentLinkParser(DomainAwarePage):
 
         links.update(self.get_links_https())
         links.update(self.get_links_href())
+        links.update(self.get_links_https_encoded())
 
+        # This is most probably redundant
         if None in links:
             links.remove(None)
         if "" in links:
@@ -1651,6 +1655,15 @@ class ContentLinkParser(DomainAwarePage):
         allt = re.findall("(https?://[a-zA-Z0-9./\-_?&=]+)", cont)
         # links cannot end with "."
         allt = [link.rstrip(".") for link in allt]
+        return set(allt)
+
+    def get_links_https_encoded(self):
+        cont = str(self.get_contents())
+
+        allt = re.findall("(https?:&#x2F;&#x2F;[a-zA-Z0-9./\-_?&=#;]+)", cont)
+        # links cannot end with "."
+        allt = [link.rstrip(".") for link in allt]
+        allt = [html.unescape(link) for link in allt]
         return set(allt)
 
     def get_links_href(self):

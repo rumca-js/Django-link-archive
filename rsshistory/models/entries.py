@@ -429,24 +429,22 @@ class BaseLinkDataController(BaseLinkDataModel):
 
     def make_bookmarked(self):
         self.bookmarked = True
-        self.permanent = True
         self.save()
 
     def make_not_bookmarked(self):
         from ..models import UserTags, UserVotes
 
-        self.permanent = False
-
         # TODO code below I think is not necessary, as entry_object link is cascade
-
-        tags = UserTags.objects.filter(entry_object=self)
-        tags.delete()
-
-        votes = UserVotes.objects.filter(entry_object=self)
-        votes.delete()
 
         self.bookmarked = False
         self.save()
+
+        if not self.is_taggable():
+            tags = UserTags.objects.filter(entry_object=self)
+            tags.delete()
+
+            votes = UserVotes.objects.filter(entry_object=self)
+            votes.delete()
 
     def make_dead(self, state):
         from ..dateutils import DateUtils
@@ -466,6 +464,9 @@ class BaseLinkDataController(BaseLinkDataModel):
 
     def is_commentable(self):
         return (self.permanent or self.bookmarked) and self.page_rating_votes >= 0
+
+    def is_permanent(self):
+        return (self.permanent or self.bookmarked)
 
     def is_valid(self):
         """

@@ -133,6 +133,18 @@ webpage_html_favicon = """<html>
  </body>
 """
 
+webpage_html_encoded_links = """<html>
+ <head>
+ <link rel="shortcut icon" href="https://www.youtube.com/s/desktop/e4d15d2c/img/favicon.ico" type="image/x-icon"><link rel="icon" href="https://www.youtube.com/s/desktop/e4d15d2c/img/favicon_32x32.png" sizes="32x32"><link rel="icon" href="https://www.youtube.com/s/desktop/e4d15d2c/img/favicon_48x48.png" sizes="48x48"><link rel="icon" href="https://www.youtube.com/s/desktop/e4d15d2c/img/favicon_96x96.png" sizes="96x96"><link rel="icon" href="https://www.youtube.com/s/desktop/e4d15d2c/img/favicon_144x144.png" sizes="144x144">
+ <title>YouTube</title>
+
+ </head>
+ <body>
+     <a href="https:&#x2F;&#x2F;github.com&#x2F;pyFFTW&#x2F;pyFFTW">https:&#x2F;&#x2F;github.com&#x2F;pyFFTW&#x2F;pyFFTW</a>
+     <a href="http:&#x2F;&#x2F;github-help-wanted.com" rel="nofollow">http:&#x2F;&#x2F;github-help-wanted.com</a>
+ </body>
+"""
+
 
 class HtmlPageTest(FakeInternetTestCase):
     def test_default_language(self):
@@ -306,3 +318,10 @@ class HtmlPageTest(FakeInternetTestCase):
         self.assertTrue(bodytext != "")
 
         self.assertEqual(hash, reader.calculate_hash(bodytext))
+
+    def test_get_links_encoded(self):
+        reader = HtmlPage("https://linkedin.com", webpage_html_encoded_links)
+        links = sorted(list(reader.get_links()))
+
+        self.assertEqual(links[0], "http://github-help-wanted.com")
+        self.assertEqual(links[1], "https://github.com/pyFFTW/pyFFTW")

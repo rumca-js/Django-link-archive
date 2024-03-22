@@ -164,6 +164,7 @@ urlpatterns = [
     path("page-scan-input", viewcustom.page_scan_input, name="page-scan-input",),
     path("page-scan-contents", viewcustom.page_scan_contents, name="page-scan-contents",),
     path("page-scan", viewcustom.page_scan, name="page-scan",),
+    path("cleanup-link", viewcustom.cleanup_link, name="cleanup-link",),
     path("data-errors", viewcustom.data_errors_page, name="data-errors"),
     path("fix-entry-tags/<int:entrypk>/", viewcustom.fix_entry_tags, name="fix-entry-tags",),
     path("test-page", viewcustom.test_page, name="test-page"),

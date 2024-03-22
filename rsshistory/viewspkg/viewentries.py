@@ -293,7 +293,7 @@ class EntriesBookmarkedListView(EntriesSearchListView):
         return reverse("{}:entries-bookmarked".format(LinkDatabase.name))
 
     def get_form_instance(self):
-        return EntryBookmarksChoiceForm(self.request.GET)
+        return EntryBookmarksChoiceForm(self.request.GET, request=self.request)
 
     def get_title(self):
         return " - Bookmarked"
@@ -898,7 +898,7 @@ def entries_bookmarked_init(request):
     p = ViewPage(request)
     p.set_title("Bookmarked entries")
 
-    filter_form = EntryBookmarksChoiceForm()
+    filter_form = EntryBookmarksChoiceForm(request=request)
     filter_form.create(SourceDataController.objects.all())
     filter_form.method = "GET"
     filter_form.action_url = reverse("{}:entries-bookmarked".format(LinkDatabase.name))
@@ -916,7 +916,7 @@ def entries_recent_init(request):
     p = ViewPage(request)
     p.set_title("Search recent entries")
 
-    filter_form = EntryRecentChoiceForm()
+    filter_form = EntryRecentChoiceForm(request=request)
     filter_form.create(SourceDataController.objects.all())
     filter_form.method = "GET"
     filter_form.action_url = reverse("{}:entries-recent".format(LinkDatabase.name))

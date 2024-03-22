@@ -317,3 +317,77 @@ class EntriesViewsTests(FakeInternetTestCase):
 
         # call user action
         response = self.client.get(url)
+
+    def test_entry_bookmark(self):
+
+        test_link = "https://www.youtube.com/watch?v=123"
+
+        entry = LinkDataController.objects.create(
+            source="https://linkedin.com",
+            link=test_link,
+            title="The first link",
+            description="the first link description",
+            source_obj=None,
+            bookmarked=False,
+            permanent=False,
+            date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
+            language="en",
+        )
+
+        self.client.login(username="testuser", password="testpassword")
+        url = reverse("{}:entry-bookmark".format(LinkDatabase.name), args=[entry.id])
+
+        # call user action
+        response = self.client.get(url)
+        print(url)
+
+        entry.refresh_from_db()
+
+        page_source = response.content.decode("utf-8")
+        print("Contents: {}".format(page_source))
+        print(response)
+
+        self.assertEqual(response.status_code, 302)
+
+        self.assertTrue(entry.bookmarked)
+        self.assertFalse(entry.permanent)
+
+        bookmarks = UserBookmarks.objects.filter(entry_object = entry)
+        self.assertEqual(bookmarks.count(), 1)
+
+    def test_entry_notbookmark(self):
+
+        test_link = "https://www.youtube.com/watch?v=123"
+
+        entry = LinkDataController.objects.create(
+            source="https://linkedin.com",
+            link=test_link,
+            title="The first link",
+            description="the first link description",
+            source_obj=None,
+            bookmarked=True,
+            permanent=False,
+            date_published=DateUtils.get_datetime_now_utc(),
+            language="en",
+        )
+
+        UserBookmarks.objects.create(entry_object = entry, user_object=self.user)
+
+        self.client.login(username="testuser", password="testpassword")
+        url = reverse("{}:entry-notbookmark".format(LinkDatabase.name), args=[entry.id])
+
+        # call user action
+        response = self.client.get(url)
+
+        entry.refresh_from_db()
+
+        page_source = response.content.decode("utf-8")
+        print("Contents: {}".format(page_source))
+
+        self.assertEqual(response.status_code, 302)
+
+        self.assertFalse(entry.bookmarked)
+        self.assertFalse(entry.permanent)
+
+        bookmarks = UserBookmarks.objects.filter(entry_object = entry)
+        self.assertEqual(bookmarks.count(), 0)

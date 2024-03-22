@@ -332,6 +332,39 @@ def keyword_remove(request):
             )
 
 
+def cleanup_link(request):
+    from ..forms import LinkInputForm
+
+    p = ViewPage(request)
+    p.set_title("Cleanup Link")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    if request.method == "POST":
+        form = LinkInputForm(request.POST)
+        if form.is_valid():
+            link = form.cleaned_data["link"]
+
+            link = UrlHandler.get_cleaned_link(link)
+
+            summary_text = 'Cleaned up link: <a href="{}">{}</a>'.format(link, link)
+
+            p.context["summary_text"] = summary_text
+
+            return p.render("summary_present.html")
+    else:
+        form = LinkInputForm()
+        form.method = "POST"
+
+        p.context["form"] = form
+        p.context[
+            "form_description_post"
+        ] = "Internet is dangerous, so carefully select which links you add"
+
+        return p.render("form_basic.html")
+
+
 def test_page(request):
     p = ViewPage(request)
     p.set_title("Test page")

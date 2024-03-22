@@ -151,16 +151,16 @@ class EntryGenericPlugin(object):
         buttons.append(
             EntryButton(
                 self.user,
-                "Update",
+                "",
                 reverse(
                     "{}:entry-update-data".format(LinkDatabase.name),
                     args=[self.entry.id],
                 ),
                 ConfigurationEntry.ACCESS_TYPE_OWNER,
                 "Updates entry data",
-                # static(
-                #    "{}/icons/icons8-view-details-100.png".format(LinkDatabase.name)
-                # ),
+                static(
+                   "{}/icons/icons8-update-100.png".format(LinkDatabase.name)
+                ),
             ),
         )
 
@@ -175,7 +175,7 @@ class EntryGenericPlugin(object):
                 ConfigurationEntry.ACCESS_TYPE_OWNER,
                 "Resets entry data",
                 static(
-                   "{}/icons/icons8-update-100.png".format(LinkDatabase.name)
+                   "{}/icons/icons8-update-skull-100.png".format(LinkDatabase.name)
                 ),
             ),
         )

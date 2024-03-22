@@ -129,24 +129,6 @@ class ViewsTest(FakeInternetTestCase):
 
         self.assertEqual(response.status_code, 404)
 
-    def test_entry_add(self):
-        url = reverse("{}:entry-add".format(LinkDatabase.name))
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
-    def test_entry_add_simple(self):
-        url = reverse("{}:entry-add-simple".format(LinkDatabase.name))
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
-    def test_entry_edit(self):
-        url = reverse("{}:entry-edit".format(LinkDatabase.name), args=[0])
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
     def test_entry_remove(self):
         url = reverse("{}:entry-remove".format(LinkDatabase.name), args=[0])
         response = self.client.get(url)
@@ -162,18 +144,6 @@ class ViewsTest(FakeInternetTestCase):
 
     def test_entry_not_dead(self):
         url = reverse("{}:entry-not-dead".format(LinkDatabase.name), args=[0])
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
-    def test_entry_bookmark(self):
-        url = reverse("{}:entry-bookmark".format(LinkDatabase.name), args=[0])
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
-    def test_entry_nobookmark(self):
-        url = reverse("{}:entry-notbookmark".format(LinkDatabase.name), args=[0])
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)

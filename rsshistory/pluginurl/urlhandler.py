@@ -1,4 +1,5 @@
 import traceback
+from urllib.parse import unquote
 
 from ..webtools import Url, PageOptions, DomainAwarePage, BasePage
 
@@ -203,7 +204,6 @@ class UrlHandler(object):
         """
         TODO if possible should make translation between youtube -> canonical youtube link
         """
-        from urllib.parse import unquote
 
         url = Url.get_cleaned_link(url)
 
