@@ -1,5 +1,6 @@
 from ..pluginurl.entryurlinterface import EntryUrlInterface
 from ..pluginurl.handlervideoyoutube import YouTubeVideoHandler
+from ..controllers import SourceDataController
 from .fakeinternet import FakeInternetTestCase
 
 
@@ -70,6 +71,21 @@ class EntryUrlInterfaceTest(FakeInternetTestCase):
 
         self.assertTrue(props["title"])
         self.assertTrue(props["description"])
+
+    def test_video_inherits_language(self):
+        source_link = "https://youtube.com"
+        source_obj = SourceDataController.objects.create(
+            url=source_link,
+            title="The first link",
+            language="ch",
+        )
+
+        url = EntryUrlInterface("https://www.youtube.com/watch?v=1234")
+
+        props = url.get_props(source_obj = source_obj)
+        self.assertTrue(props)
+        self.assertEqual(props["link"], "https://www.youtube.com/watch?v=1234")
+        self.assertEqual(props["language"], "ch")
 
     """
     def test_rss_old_pubdate(self):

@@ -39,7 +39,7 @@ class EntryUrlInterface(object):
         if not input_props:
             input_props = {}
 
-        props = self.get_props_implementation(input_props)
+        props = self.get_props_implementation(input_props, source_obj)
 
         # we do not trim description here. We might need it later, when adding link we scan
         # description for URLs
@@ -92,7 +92,7 @@ class EntryUrlInterface(object):
 
         if type(p) is UrlHandler.youtube_video_handler:
             if p.get_video_code():
-                return self.get_youtube_props(input_props)
+                return self.get_youtube_props(input_props, source_obj)
 
         if p.is_html():
             return self.get_htmlpage_props(input_props, source_obj)

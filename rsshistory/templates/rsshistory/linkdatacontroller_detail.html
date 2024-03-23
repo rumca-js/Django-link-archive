@@ -31,7 +31,9 @@
   <div>
   <div style="clear:both"></div>
 
-{% include "rsshistory/linkdatacontroller_detail_comments.html" %}
+ {% include "rsshistory/linkdatacontroller_detail_comments.html" %}
+
+ {% include "rsshistory/linkdatacontroller_detail_parameters_operation.html" %}
 
   <div>
     <a href="{% url 'rsshistory:entry-json' object.id %}" class="simplebutton">Show JSON</a>

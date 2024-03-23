@@ -1,0 +1,14 @@
+  <div>
+      {% for parameter in object_controller.get_parameters_operation %}
+      <span
+          {% if parameter.title %}
+          title="{{parameter.title}}"
+          {% elif parameter.name %}
+          title="{{parameter.name}}"
+          {% endif %}
+          >
+          <strong>{{parameter.name | safe}}:</strong>
+          {{parameter.description | safe}}
+      </span>
+      {% endfor %}
+  </div>
