@@ -394,7 +394,6 @@ class EntryForm(forms.ModelForm):
             "source",
             "bookmarked",
             "permanent",
-            "dead",
             "language",
             "user",
             "artist",
@@ -402,6 +401,8 @@ class EntryForm(forms.ModelForm):
             "age",
             "thumbnail",
             "page_rating_contents",
+            "manual_status_code",
+            "status_code",
         ]
         widgets = {
             # DateTimeInput widget does not work my my Android phone
@@ -422,6 +423,8 @@ class EntryForm(forms.ModelForm):
         self.fields["user"].widget.attrs["readonly"] = True
         self.fields["age"].required = False
         self.fields["thumbnail"].required = False
+        self.fields["manual_status_code"].required = False
+        self.fields["status_code"].widget.attrs["readonly"] = True
 
     def get_information(self):
         return self.cleaned_data

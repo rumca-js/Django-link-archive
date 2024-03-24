@@ -15,6 +15,17 @@ from .domains import Domains
 
 
 class BaseLinkDataModel(models.Model):
+
+    STATUS_UNDEFINED = 0
+    STATUS_DEAD = 500
+    STATUS_ACTIVE = 200
+
+    MANUAL_STATUS_CODES = (
+      (STATUS_UNDEFINED, 'UNDEFINED'),
+      (STATUS_DEAD, 'DEAD'),
+      (STATUS_ACTIVE, 'ACTIVE'),
+    )
+
     link = models.CharField(max_length=1000, unique=True)
 
     # URL of source, might be RSS source
@@ -34,7 +45,6 @@ class BaseLinkDataModel(models.Model):
     # this entry cannot be removed. Serves a purpose. Domain page, source page
     permanent = models.BooleanField(default=False)
     bookmarked = models.BooleanField(default=False)
-    dead = models.BooleanField(default=False)
 
     # user who added entry
     user = models.CharField(max_length=1000, null=True, blank=True)
@@ -54,6 +64,7 @@ class BaseLinkDataModel(models.Model):
     album = models.CharField(max_length=1000, null=True, blank=True)
 
     status_code = models.IntegerField(default=0)
+    manual_status_code = models.IntegerField(default=0, null=True, blank=True)
     contents_type = models.IntegerField(default=0) # indicates if it is rss, html, etc.
 
     page_rating_contents = models.IntegerField(default=0)
@@ -93,12 +104,12 @@ class BaseLinkDataController(BaseLinkDataModel):
         return "______"
 
     def get_title(self):
-        if self.dead:
+        if self.is_dead():
             return self.get_link_dead_text()
         return self.title
 
     def get_long_description(self):
-        if self.dead:
+        if self.is_dead():
             return self.get_link_dead_text()
         return "{} {}".format(self.date_published, self.get_source_name())
 
@@ -112,7 +123,7 @@ class BaseLinkDataController(BaseLinkDataModel):
         return len(self.tags.all()) > 0
 
     def get_full_description(self):
-        if self.dead:
+        if self.is_dead():
             return self.get_link_dead_text()
         string = self.get_long_description()
 
@@ -175,7 +186,7 @@ class BaseLinkDataController(BaseLinkDataModel):
          - title and description could have been set manually, we do not want to change that
          - some other fields should be set only if present in props
         """
-        if self.dead or self.page_rating_votes < 0:
+        if self.is_dead() or self.page_rating_votes < 0:
             AppLogging.warning("Cannot update link that is dead")
             return
 
@@ -185,13 +196,16 @@ class BaseLinkDataController(BaseLinkDataModel):
         props = url.get_props()
         p = url.p
 
+        if not props or not url.p:
+            AppLogging.error("Could not find entry url interface for:{}".format(self.link))
+            self.status_code = 500
+            self.save()
+            return
+
         # always update
         self.page_rating_contents = p.get_page_rating()
         self.status_code = p.status_code
 
-        if not props:
-            self.save()
-            return
 
         if "title" in props and props["title"] is not None:
             if not self.title:
@@ -222,7 +236,7 @@ class BaseLinkDataController(BaseLinkDataModel):
          - status code and page rating is update always
          - new data are changed only if new data are present at all
         """
-        if self.dead or self.page_rating_votes < 0:
+        if self.is_dead() or self.page_rating_votes < 0:
             AppLogging.warning("Cannot update link that is dead")
             return
 
@@ -231,12 +245,14 @@ class BaseLinkDataController(BaseLinkDataModel):
         url = EntryUrlInterface(self.link)
         props = url.get_props()
 
-        self.page_rating_contents = url.p.get_page_rating()
-        self.status_code = url.p.status_code
-
-        if not props:
+        if not props or not url.p:
+            AppLogging.error("Could not find entry url interface for:{}".format(self.link))
+            self.status_code = 500
             self.save()
             return
+
+        self.page_rating_contents = url.p.get_page_rating()
+        self.status_code = url.p.status_code
 
         if "title" in props and props["title"] is not None:
             self.title = props["title"]
@@ -345,7 +361,6 @@ class BaseLinkDataController(BaseLinkDataModel):
             "date_published",
             "permanent",
             "bookmarked",
-            "dead",
             "artist",
             "album",
             "user",
@@ -356,6 +371,8 @@ class BaseLinkDataController(BaseLinkDataModel):
             "page_rating_votes",
             "page_rating_visits",
             "page_rating",
+            "manual_status_code",
+            "status_code",
         ]
 
     def get_query_names():
@@ -446,17 +463,41 @@ class BaseLinkDataController(BaseLinkDataModel):
             votes = UserVotes.objects.filter(entry_object=self)
             votes.delete()
 
-    def make_dead(self, state):
+    def make_dead(self):
         from ..dateutils import DateUtils
 
-        if not self.dead and state:
-            self.date_dead_since = DateUtils.get_datetime_now_utc()
-            self.page_rating_contents = 0
-            # remove all tags & comments?
-        elif self.dead and not state:
+        if self.manual_status_code == BaseLinkDataController.STATUS_DEAD:
+            return
+
+        self.date_dead_since = DateUtils.get_datetime_now_utc()
+        self.page_rating_contents = 0
+        self.manual_status_code = BaseLinkDataController.STATUS_DEAD
+
+        # remove all tags & comments?
+        self.save()
+
+    def make_active(self):
+        from ..dateutils import DateUtils
+
+        if self.manual_status_code == BaseLinkDataController.STATUS_ACTIVE:
+            return
+
+        self.date_dead_since = None
+        self.manual_status_code = BaseLinkDataController.STATUS_ACTIVE
+
+        self.save()
+
+    def clear_manual_status(self):
+        from ..dateutils import DateUtils
+
+        if self.manual_status_code == BaseLinkDataController.STATUS_UNDEFINED:
+            return
+
+        if self.manual_status_code == BaseLinkDataController.STATUS_DEAD:
             self.date_dead_since = None
 
-        self.dead = state
+        self.manual_status_code = BaseLinkDataController.STATUS_UNDEFINED
+
         self.save()
 
     def is_taggable(self):
@@ -468,14 +509,25 @@ class BaseLinkDataController(BaseLinkDataModel):
     def is_permanent(self):
         return (self.permanent or self.bookmarked)
 
+    def is_dead(self):
+        if self.manual_status_code == BaseLinkDataController.STATUS_DEAD:
+            return True
+
+        if self.manual_status_code == BaseLinkDataController.STATUS_UNDEFINED:
+            return not self.is_status_code_valid()
+
     def is_valid(self):
+        if self.manual_status_code == BaseLinkDataController.STATUS_ACTIVE:
+            return True
+
         """
         Link is not valid:
          - if status indicates so
          - if it is dead (manual indication)
          - if it was downvoted to oblivion
         """
-        return self.is_status_code_valid() and self.page_rating > 0 and not self.dead
+        if self.manual_status_code == STATUS_UNDEFINED:
+            return not self.is_status_code_valid() and self.page_rating > 0
 
     def is_status_code_valid(self):
         if self.status_code == 403:

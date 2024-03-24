@@ -824,13 +824,9 @@ def entry_dead(request, pk):
     objs = LinkDataController.objects.filter(id=pk)
     obj = objs[0]
 
-    obj.make_dead(True)
+    obj.make_dead()
 
-    summary_text = "Link changed to state: " + str(obj.dead)
-
-    p.context["summary_text"] = summary_text
-
-    return p.render("summary_present.html")
+    return HttpResponseRedirect(obj.get_absolute_url())
 
 
 def entry_not_dead(request, pk):
@@ -845,13 +841,9 @@ def entry_not_dead(request, pk):
     objs = LinkDataController.objects.filter(id=pk)
     obj = objs[0]
 
-    obj.make_dead(False)
+    obj.clear_manual_status()
 
-    summary_text = "Link changed to state: " + str(obj.dead)
-
-    p.context["summary_text"] = summary_text
-
-    return p.render("summary_present.html")
+    return HttpResponseRedirect(obj.get_absolute_url())
 
 
 def entries_search_init(request):

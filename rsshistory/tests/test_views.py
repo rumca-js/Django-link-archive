@@ -136,18 +136,6 @@ class ViewsTest(FakeInternetTestCase):
         self.assertEqual(response.status_code, 200)
 
     """ TODO
-    def test_entry_dead(self):
-        url = reverse("{}:entry-dead".format(LinkDatabase.name), args=[0])
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
-    def test_entry_not_dead(self):
-        url = reverse("{}:entry-not-dead".format(LinkDatabase.name), args=[0])
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
     def test_entry_download_music(self):
         url = reverse("{}:entry-download-music".format(LinkDatabase.name), args=[0])
         response = self.client.get(url)

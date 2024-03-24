@@ -57,7 +57,7 @@ class LinkDataController(LinkDataModel):
         )
 
     def get_dead_url(self):
-        if self.dead:
+        if self.is_dead():
             """Returns the URL to access a particular author instance."""
             return reverse(
                 "{}:entry-not-dead".format(LinkDatabase.name), args=[str(self.id)]

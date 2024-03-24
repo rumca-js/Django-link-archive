@@ -4,6 +4,7 @@ import re
 from ..models import UserTags
 from ..configuration import Configuration
 from .sourcerssplugin import BaseRssPlugin
+from ..pluginurl import EntryUrlInterface
 
 from ..webtools import ContentLinkParser, HtmlPage, BasePage
 
@@ -70,8 +71,9 @@ class RssScannerPlugin(BaseRssPlugin):
         parser = ContentLinkParser(p.get_contents())
 
         for link in parser.get_links():
-            i = UrlEntryInterface(link=link)
+            i = EntryUrlInterface(link=link)
             props = i.get_props()
-            all_props.append(props)
+            if props:
+                all_props.append(props)
 
         return all_props

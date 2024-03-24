@@ -391,3 +391,52 @@ class EntriesViewsTests(FakeInternetTestCase):
 
         bookmarks = UserBookmarks.objects.filter(entry_object = entry)
         self.assertEqual(bookmarks.count(), 0)
+
+    def test_entry_dead(self):
+        test_link = "https://www.youtube.com/watch?v=123"
+
+        entry = LinkDataController.objects.create(
+            source="https://linkedin.com",
+            link=test_link,
+            title="The first link",
+            description="the first link description",
+            source_obj=None,
+            bookmarked=True,
+            permanent=False,
+            date_published=DateUtils.get_datetime_now_utc(),
+            language="en",
+        )
+
+        self.client.login(username="testuser", password="testpassword")
+        url = reverse("{}:entry-dead".format(LinkDatabase.name), args=[entry.id])
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 302)
+
+        entry.refresh_from_db()
+        self.assertEqual(entry.manual_status_code, LinkDataController.STATUS_DEAD)
+
+    def test_entry_not_dead(self):
+        test_link = "https://www.youtube.com/watch?v=123"
+
+        entry = LinkDataController.objects.create(
+            source="https://linkedin.com",
+            link=test_link,
+            title="The first link",
+            description="the first link description",
+            source_obj=None,
+            bookmarked=True,
+            permanent=False,
+            date_published=DateUtils.get_datetime_now_utc(),
+            language="en",
+            manual_status_code = LinkDataController.STATUS_DEAD
+        )
+
+        self.client.login(username="testuser", password="testpassword")
+        url = reverse("{}:entry-not-dead".format(LinkDatabase.name), args=[entry.id])
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 302)
+
+        entry.refresh_from_db()
+        self.assertEqual(entry.manual_status_code, LinkDataController.STATUS_UNDEFINED)

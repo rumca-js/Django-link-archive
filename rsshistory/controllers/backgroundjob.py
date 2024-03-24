@@ -320,7 +320,7 @@ class BackgroundJobController(BackgroundJob):
         """
         Do not update, if it was updated recently, or if we are missing key components
         """
-        if entry.dead:
+        if entry.is_dead():
             return
 
         if not force:
@@ -340,7 +340,7 @@ class BackgroundJobController(BackgroundJob):
         """
         Do not update, if it was updated recently
         """
-        if entry.dead:
+        if entry.is_dead():
             return
 
         if not force:

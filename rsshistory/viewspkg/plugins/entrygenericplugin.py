@@ -389,7 +389,7 @@ class EntryGenericPlugin(object):
             ),
         )
 
-        if not self.entry.dead:
+        if not self.entry.is_dead():
             buttons.append(
                 EntryButton(
                     self.user,
@@ -424,17 +424,11 @@ class EntryGenericPlugin(object):
         parameters = []
 
         parameters.append(EntryParameter("Publish date", self.entry.date_published))
-        parameters.append(EntryParameter("Status code", self.entry.status_code))
 
-        parameters.append(EntryParameter("Language", self.entry.language))
-        if self.entry.dead:
-            parameters.append(EntryParameter("Dead", self.entry.dead))
-            parameters.append(EntryParameter("Dead since", self.entry.date_dead_since))
+        return parameters
 
-        # Artist & album are displayed in buttons
-        # Page rating is displayed in title
-
-        parameters.append(EntryParameter("Visists", self.entry.page_rating_visits))
+    def get_parameters_operation(self):
+        parameters = []
 
         points_text = "{} = {} + {}".format(
             self.entry.page_rating,
@@ -443,6 +437,20 @@ class EntryGenericPlugin(object):
         )
         points_title = "Points = content rating + user votes"
         parameters.append(EntryParameter("Points", points_text, points_title))
+
+        parameters.append(EntryParameter("Update date", self.entry.date_update_last))
+
+        parameters.append(EntryParameter("Status code", self.entry.status_code))
+
+        parameters.append(EntryParameter("Language", self.entry.language))
+        if self.entry.is_dead():
+            parameters.append(EntryParameter("Manual status", self.entry.manual_status_code))
+            parameters.append(EntryParameter("Dead since", self.entry.date_dead_since))
+
+        # Artist & album are displayed in buttons
+        # Page rating is displayed in title
+
+        parameters.append(EntryParameter("Visists", self.entry.page_rating_visits))
 
         if self.entry.user != "":
             parameters.append(EntryParameter("User", self.entry.user))
