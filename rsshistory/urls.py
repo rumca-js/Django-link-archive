@@ -161,9 +161,9 @@ urlpatterns = [
     path("keywords-remove-all/", viewcustom.keywords_remove_all, name="keywords-remove-all",),
     # other, debug forms
     path("page-show-props", viewcustom.page_show_properties, name="page-show-props",),
-    path("page-scan-input", viewcustom.page_scan_input, name="page-scan-input",),
+    path("page-scan-link", viewcustom.page_scan_link, name="page-scan-link",),
     path("page-scan-contents", viewcustom.page_scan_contents, name="page-scan-contents",),
-    path("page-scan", viewcustom.page_scan, name="page-scan",),
+    path("page-add-many-links", viewcustom.page_add_many_links, name="page-add-many-links",),
     path("cleanup-link", viewcustom.cleanup_link, name="cleanup-link",),
     path("data-errors", viewcustom.data_errors_page, name="data-errors"),
     path("fix-entry-tags/<int:entrypk>/", viewcustom.fix_entry_tags, name="fix-entry-tags",),

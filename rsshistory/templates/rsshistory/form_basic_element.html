@@ -5,7 +5,11 @@
             {{ form }}
             <tr>
                 <td>
-                    <input type="submit" value="Submit" class="simplebutton">
+		    {% if form_submit_button_name %}
+		       <input type="submit" value="{{ form_submit_button_name }}" class="simplebutton">
+		    {% else %}
+                       <input type="submit" value="Submit" class="simplebutton">
+		    {% endif %}
                 </td>
             </tr>
         </table>

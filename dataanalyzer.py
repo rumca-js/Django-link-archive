@@ -9,19 +9,28 @@ optional arguments:
   --dir DIR             Directory path
   --count               Counts entries
   --summary             Displays summary
+  --daily               Displays daily
   --find-tag find_tag   Find entries with a specific tag
   --find find           Find entries with text
-  --find-tags           Find all available tags
+  --show-tags           Find all available tags
   -i, --ignore-case     Ignores case
   -v VERBOSITY, --verbosity VERBOSITY
                         Verbosity level
 
 TODO
  - datanalayze --source-url hackernews = search from particular source
- - Output in md file?
+ - Output formats? (md)?
  - Maybe it could produce a chart?
+
+Scenario of operation:
+ - What was said about Musk, daily
+  $ --find "Musk" --title --daily
+
+ - 2023-10-26 was DOJ hearing in which he participated, I would like see news
+  $ --find "Musk" --title --date 2023-10-26
 """
 import argparse
+from dateutil import parser
 import os
 import json
 
@@ -31,35 +40,86 @@ def get_list_files(directory):
     for root, dirs, files in os.walk(directory):
         for file in files:
             file_list.append(os.path.join(root, file))
+
+    file_list = sorted(file_list)
     return file_list
 
 def read_file_contents(file_path):
     with open(file_path, "r") as f:
         return f.read()
 
+def date_from_string(string_input):
+    return parser.parse(string_input)
+
 
 class MainObject(object):
     def __init__(self, parser):
         self.parser = parser
-        self.files = get_list_files(self.parser.dir)
+        if self.parser.dir:
+            self.files = get_list_files(self.parser.dir)
+        else:
+            self.files = []
         self.result = None
 
     def process(self):
-        if self.is_entry_search():
-            count = self.find_entries()
-            if self.parser.args.summary:
-                print("Finished with count:{}".format(count))
-        elif self.parser.args.find_tags:
-            count = self.find_tags()
+        if self.is_individual_entry_search():
+            count = self.perform_individual_search()
+        elif self.is_daily_entry_search():
+            self.perform_daily_search()
+        elif self.parser.args.show_tags:
+            count = self.show_all_tags()
         else:
             print("No condition to search")
 
-    def find_entries(self):
-        result_count = 0
+    def perform_individual_search(self):
+        total_count = 0
 
         if self.parser.args.summary:
             print("Entering dir:{}".format(self.parser.dir))
 
+        for entry in self.find_entry():
+            self.print_entry(entry)
+            total_count += 1
+
+        if self.parser.args.summary:
+            print("Leaving dir:{}".format(self.parser.dir))
+
+        if self.parser.args.summary:
+            print("Finished with count:{}".format(count))
+
+    def perform_daily_search(self):
+        if self.parser.args.summary:
+            print("Entering dir:{}".format(self.parser.dir))
+
+        total_count = 0
+
+        current_date = None
+        daily_counter = 0
+        for entry in self.find_entry():
+            date_published = date_from_string(entry["date_published"]).date()
+            if date_published != current_date:
+                if not (current_date == None and daily_counter == 0):
+                    self.print_daily_summary(entry, current_date, daily_counter)
+
+                current_date = date_published
+                daily_counter = 0
+
+            daily_counter += 1
+            total_count += 1
+
+        if self.parser.args.summary:
+            print("Leaving dir:{}".format(self.parser.dir))
+
+        if self.parser.args.summary:
+            print("Finished with count:{}".format(total_count))
+
+    def print_daily_summary(self, entry, date, daily_counter):
+        print("{};{}".format(date, daily_counter))
+
+    def find_entry(self):
+        """
+        Generator
+        """
         for afile in self.files:
             if not afile.endswith(".json"):
                 continue
@@ -70,13 +130,7 @@ class MainObject(object):
 
             for entry in entries:
                 if self.is_entry_found(entry):
-                    self.print_entry(entry)
-                    result_count += 1
-
-        if self.parser.args.summary:
-            print("Leaving dir:{}".format(self.parser.dir))
-
-        return result_count
+                    yield entry
 
     def print_entry(self, entry):
         level = "1"
@@ -137,7 +191,7 @@ class MainObject(object):
                             if "link" in entry:
                                 return entry
 
-    def find_tags(self):
+    def show_all_tags(self):
         tags = {}
         for afile in self.files:
             if not afile.endswith(".json"):
@@ -158,7 +212,19 @@ class MainObject(object):
         for tag in tags:
             print("Tag:{} Count:{}".format(tag, tags[tag]))
 
-    def is_entry_search(self):
+    def is_individual_entry_search(self):
+        if self.parser.args.daily:
+            return False
+
+        if self.parser.args.find_tag:
+            return True
+        if self.parser.args.find:
+            return True
+
+    def is_daily_entry_search(self):
+        if not self.parser.args.daily:
+            return False
+
         if self.parser.args.find_tag:
             return True
         if self.parser.args.find:
@@ -180,6 +246,12 @@ class MainObject(object):
             print("Could not read file: {}".format(afile))
 
     def get_searchable_fields(self):
+        if self.parser.args.title:
+            return ["title"]
+
+        if self.parser.args.description:
+            return ["description"]
+
         return [
                 "title",
                 "link",
@@ -195,9 +267,22 @@ class Parser(object):
         self.parser.add_argument("--dir", help="Directory to be scanned")
         self.parser.add_argument("--count", action="store_true", help="Counts entries")
         self.parser.add_argument("--summary", action="store_true", help="Displays summary at the end")
+        self.parser.add_argument("--daily", action="store_true", help="Displays daily summary at the end")
         self.parser.add_argument("--find-tag", metavar="find_tag", help="Find entries with a specific tag")
         self.parser.add_argument("--find", metavar="find", help="Find entries with text")
-        self.parser.add_argument("--find-tags", action="store_true", help="Find all available tags")
+        self.parser.add_argument("--show-tags", action="store_true", help="Find all available tags")
+
+        # TODO implement
+        self.parser.add_argument("--date", help="Specifies date in which we should search")
+        self.parser.add_argument("--date-from", help="Specifies date in which we should search")
+        self.parser.add_argument("--date-to", help="Specifies date in which we should search")
+
+        # TODO change that from value-less to value?
+        self.parser.add_argument("--title", action="store_true", help="Find in title")
+        self.parser.add_argument("--description", action="store_true", help="Find in description")
+
+        # TODO implement this below
+        self.parser.add_argument("--relative", action="store_true", help="All counters are against the number of all links")
         self.parser.add_argument("-i", "--ignore-case", action="store_true", help="Ignores case")
         self.parser.add_argument("-v", "--verbosity", help="Verbosity level")
         
@@ -205,6 +290,8 @@ class Parser(object):
 
         if self.args.dir:
             self.dir = self.args.dir
+        else:
+            self.dir = None
 
 
 def main():

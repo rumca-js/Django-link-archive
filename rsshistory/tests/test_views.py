@@ -329,21 +329,21 @@ class ViewsTest(FakeInternetTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Detected", html=False)
 
-    def test_page_scanner(self):
-        url = reverse("{}:page-scan".format(LinkDatabase.name))
+    def test_page_scan_contents(self):
+        url = reverse("{}:page-scan-contents".format(LinkDatabase.name))
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
 
-    def test_page_scanner_input(self):
-        url = reverse("{}:page-scan-input".format(LinkDatabase.name))
+    def test_page_scan_link(self):
+        url = reverse("{}:page-scan-link".format(LinkDatabase.name))
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
 
-    def test_page_scanner_input_html(self):
+    def test_page_scan_input_html(self):
         url = (
-            reverse("{}:page-scan-input".format(LinkDatabase.name))
+            reverse("{}:page-scan-link".format(LinkDatabase.name))
             + "?link=https://www.linkedin.com"
         )
         response = self.client.get(url)

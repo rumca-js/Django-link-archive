@@ -62,37 +62,6 @@ class SearchEngineGoogle(SearchEngine):
         return "https://google.com/"
 
 
-class SearchEngineGoogleCache(SearchEngine):
-    """
-    TODO Should not be registered, for normal search types
-    """
-
-    def get_name(self):
-        return "GoogleCache"
-
-    def get_search_address(self):
-        return "https://webcache.googleusercontent.com"
-
-    def get_search_string(self, search_term=None):
-        """
-        Search term needs to be URL
-
-        TODO do we need this 27 in the search query?
-        is this enough? [https://www.google.com/search?q=cache:seroundtable.com].
-        """
-        if not search_term:
-            search_term = self.query_term
-            if self.url:
-                search_term = self.url
-
-        if not search_term:
-            return self.get_search_address()
-
-        return "{}/{}{}".format(
-            self.get_search_address(), "search?q=cache:", search_term
-        )
-
-
 class SearchEngineArchiveOrg(SearchEngine):
     def get_name(self):
         return "Archive.org"
@@ -195,6 +164,19 @@ class SearchEngineYewTube(SearchEngine):
 
     def get_search_address(self):
         return "https://yewtu.be/search"
+
+
+class SearchEngineGitHub(SearchEngine):
+    def get_name(self):
+        return "GitHub"
+
+    def get_search_address(self):
+        return "https://github.com/search"
+
+    def get_search_string(self, search_term=None):
+        data = super().get_search_string(search_term)
+        data = data + "&type=repositories"
+        return data
 
 
 class SearchEngineStackOverFlow(SearchEngine):
@@ -345,7 +327,6 @@ class SearchEngines(object):
             SearchEngineMarginalia,
 
             # library searches
-            SearchEngineGoogleCache,
             SearchEngineArchiveOrg,
             SearchEngineArchivePh,
 
@@ -358,6 +339,7 @@ class SearchEngines(object):
             SearchEngineOdysee,
 
             # Social media
+            SearchEngineGitHub,
             SearchEngineReddit,
             SearchEngineSubstack,
             SearchEngineStackOverFlow,

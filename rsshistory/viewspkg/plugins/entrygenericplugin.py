@@ -185,7 +185,7 @@ class EntryGenericPlugin(object):
                 self.user,
                 "",
                 reverse(
-                    "{}:page-scan-input".format(LinkDatabase.name),
+                    "{}:page-scan-link".format(LinkDatabase.name),
                 )
                 + "?link={}".format(self.entry.link),
                 ConfigurationEntry.ACCESS_TYPE_OWNER,

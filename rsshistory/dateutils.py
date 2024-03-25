@@ -1,4 +1,5 @@
 from datetime import datetime, date, timedelta
+from dateutil import parser
 from pytz import timezone
 import django.utils
 
@@ -53,15 +54,11 @@ class DateUtils(object):
         return [date.strftime("%Y"), date.strftime("%m"), date.strftime("%d")]
 
     def get_iso_datetime(timestamp):
-        from dateutil import parser
-
         date = parser.parse(timestamp)
         date = date.isoformat()
         return date
 
     def parse_datetime(timestamp):
-        from dateutil import parser
-
         date = parser.parse(timestamp)
         return date
 
@@ -110,4 +107,7 @@ class DateUtils(object):
         return [date_start, date_stop]
 
     def from_string(string_input, string_format="%Y-%m-%dT%H:%M:%SZ"):
+        """
+        TODO - remove this, we have already parse_datetime?
+        """
         return datetime.strptime(string_input, string_format)

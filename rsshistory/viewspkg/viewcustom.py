@@ -71,7 +71,17 @@ def page_show_properties(request):
             return show_page_props_internal(request, page_link)
 
 
-def page_scan_input(request):
+def create_scanner_form(links, additional_text=""):
+    data = {}
+    data["body"] = additional_text + "\n" + "\n".join(links)
+
+    form = ScannerForm(initial=data)
+    form.method = "POST"
+    form.action_url = reverse("{}:page-add-many-links".format(LinkDatabase.name))
+    return form
+
+
+def page_scan_link(request):
     def render_page_scan_input(p, link):
         parser = UrlHandler.get(link)
 
@@ -90,15 +100,8 @@ def page_scan_input(request):
         links = list(links)
         links = sorted(links)
 
-        data = {}
-        data["body"] = "\n".join(links)
-
-        form = ScannerForm(initial=data)
-        form.method = "POST"
-        form.action_url = reverse("{}:page-scan".format(LinkDatabase.name))
-        p.context["form"] = form
-
-        p.context["summary_text"] = "Render links for {}".format(link)
+        p.context["form"] = create_scanner_form(links)
+        p.context["form_submit_button_name"] = "Add links"
         return p.render("form_basic.html")
 
     p = ViewPage(request)
@@ -124,6 +127,7 @@ def page_scan_input(request):
             form.method = "POST"
 
             p.context["form"] = form
+            p.context["form_submit_button_name"] = "Scan"
 
             return p.render("form_basic.html")
         else:
@@ -131,7 +135,7 @@ def page_scan_input(request):
             return render_page_scan_input(p, link)
 
 
-def page_scan(request):
+def page_add_many_links(request):
     """
     Displays form, or textarea of available links.
     User can select which links will be added.
@@ -166,15 +170,6 @@ def page_scan(request):
 
 
 def page_scan_contents(request):
-    from ..serializers import MarginaliaCrawlerOutput, ReadingList
-
-    def is_reading_list(contents):
-        return contents.startswith("url,title,description,image,date,hnurl")
-
-    def is_marginalia_search(contents):
-        """I do not now how to solve this"""
-        return True
-
     """
     Displays form, or textarea of available links.
     User can select which links will be added.
@@ -191,30 +186,23 @@ def page_scan_contents(request):
             contents = form.cleaned_data["body"]
             tag = form.cleaned_data["tag"]
 
-            links = []
-            if is_reading_list(contents):
-                parser = ReadingList(contents)
-                links = parser.get_links()
-            # parser should work as good as MarginaliaCrawlerOutput
-            # elif is_marginalia_search(contents):
-            #    parser = MarginaliaCrawlerOutput(contents)
-            #    links = parser.get_links()
-            else:
-                parser = ContentLinkParser(contents)
-                links = parser.get_links()
+            parser = ContentLinkParser(url = "https://", contents = contents)
+            links = sorted(list(parser.get_links()))
 
-            for link in links:
-                if link != "":
-                    BackgroundJobController.link_add(link, tag=tag, user=request.user)
+            form = create_scanner_form(links)
+            p.context["form"] = form
+            p.context["form_submit_button_name"] = "Add links"
+            return p.render("form_basic.html")
 
-        p.context["summary_text"] = "Added links"
-        return p.render("summary_present.html")
+        # form is invalid, it will display error
+        return p.render("form_basic.html")
 
     else:
         form = ScannerForm()
 
         form.method = "POST"
         form.action_url = reverse("{}:page-scan-contents".format(LinkDatabase.name))
+        p.context["form_submit_button_name"] = "Scan"
         p.context["form"] = form
 
         return p.render("form_basic.html")
