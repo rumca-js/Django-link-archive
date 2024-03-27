@@ -10,7 +10,7 @@ from ..models import LinkDataModel
 from ..dateutils import DateUtils
 from ..configuration import Configuration
 
-from .fakeinternet import FakeInternetTestCase
+from .fakeinternet import FakeInternetTestCase, MockRequestCounter
 
 
 class LinkDataBuilderTest(FakeInternetTestCase):
@@ -25,7 +25,7 @@ class LinkDataBuilderTest(FakeInternetTestCase):
         config.auto_store_sources = False
         config.save()
 
-        self.mock_page_requests = 0
+        MockRequestCounter.mock_page_requests = 0
 
         link_name = "https://youtube.com/v=1234"
 
@@ -60,7 +60,7 @@ class LinkDataBuilderTest(FakeInternetTestCase):
         self.assertEqual(objs[0].page_rating, 25)
 
         # this is obtained not through page requests
-        self.assertEqual(self.mock_page_requests, 0)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
     def test_add_from_props_with_slash(self):
         config = Configuration.get_object().config_entry
@@ -91,7 +91,7 @@ class LinkDataBuilderTest(FakeInternetTestCase):
         objs = LinkDataModel.objects.filter(link="https://youtube.com/v=1234")
         self.assertEqual(objs.count(), 1)
 
-        self.assertEqual(self.mock_page_requests, 0)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
     def test_add_from_props_uppercase(self):
         config = Configuration.get_object().config_entry
@@ -126,7 +126,7 @@ class LinkDataBuilderTest(FakeInternetTestCase):
         for obj in objs:
             print("OBJ: {}".format(obj.link))
 
-        self.assertEqual(self.mock_page_requests, 0)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
     def test_add_from_props_not_adds(self):
         DomainsController.objects.all().delete()
@@ -163,7 +163,7 @@ class LinkDataBuilderTest(FakeInternetTestCase):
             print("Added {}".format(obj.link))
         self.assertEqual(objs.count(), 0)
 
-        self.assertEqual(self.mock_page_requests, 0)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
     def test_add_from_props_adds_domain(self):
         DomainsController.objects.all().delete()
@@ -234,7 +234,7 @@ class LinkDataBuilderTest(FakeInternetTestCase):
 
         self.assertEqual(objs[0].domain_obj, domains[0])
 
-        self.assertEqual(self.mock_page_requests, 0)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
     """
     def test_source_from_page_contents(self):

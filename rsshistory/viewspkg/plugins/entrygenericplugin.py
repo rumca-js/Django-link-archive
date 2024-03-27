@@ -4,7 +4,7 @@ from django.templatetags.static import static
 from ...apps import LinkDatabase
 from ...models import ConfigurationEntry, UserConfig
 from ...controllers import LinkDataController
-from ...webtools import HtmlPage, BasePage, InputContent
+from ...webtools import DomainAwarePage, InputContent
 from ...configuration import Configuration
 
 
@@ -235,8 +235,8 @@ class EntryGenericPlugin(object):
         if not self.entry.source_obj:
             return False
 
-        entry_domain = BasePage(self.entry.link).get_domain()
-        source_domain = BasePage(self.entry.source_obj.url).get_domain()
+        entry_domain = DomainAwarePage(self.entry.link).get_domain()
+        source_domain = DomainAwarePage(self.entry.source_obj.url).get_domain()
 
         return entry_domain == source_domain
 
@@ -340,7 +340,7 @@ class EntryGenericPlugin(object):
                 ),
             )
         else:
-            domain_url = HtmlPage(self.entry.link).get_domain()
+            domain_url = DomainAwarePage(self.entry.link).get_domain()
 
             buttons.append(
                 EntryButton(

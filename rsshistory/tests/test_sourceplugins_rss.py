@@ -2,7 +2,7 @@ from ..controllers import SourceDataController, LinkDataController
 from ..configuration import Configuration
 from ..pluginsources.sourcerssplugin import BaseRssPlugin
 
-from .fakeinternet import FakeInternetTestCase
+from .fakeinternet import FakeInternetTestCase, MockRequestCounter
 
 
 class BaseRssPluginTest(FakeInternetTestCase):
@@ -29,7 +29,7 @@ class BaseRssPluginTest(FakeInternetTestCase):
         config.auto_store_entries_use_clean_page_info = False
         config.save()
 
-        self.mock_page_requests = 0
+        MockRequestCounter.mock_page_requests = 0
 
         self.assertTrue(self.source_rss)
 
@@ -46,7 +46,7 @@ class BaseRssPluginTest(FakeInternetTestCase):
         )
 
         # 1 rss parent, we do not make additional requests
-        self.assertEqual(self.mock_page_requests, 1)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
     def test_get_container_elements_use_all_data(self):
         LinkDataController.objects.all().delete()

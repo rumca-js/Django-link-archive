@@ -98,12 +98,17 @@ class PageBuilder(object):
         return html
 
 
+class MockRequestCounter(object):
+    mock_page_requests = 0
+
+
 class YouTubeJsonHandlerMock(YouTubeJsonHandler):
     def __init__(self, url):
         super().__init__(url)
 
     def download_details_youtube(self):
         print("Mocked YouTube request URL: {}".format(self.url))
+        MockRequestCounter.mock_page_requests += 1
 
         if self.get_video_code() == "1234":
             self.yt_text = """{"_filename" : "1234 test file name",
@@ -165,12 +170,16 @@ class DjangoRequestObject(object):
         self.user = user
 
 
-class TestRequestObjectMock(object):
+class TestResponseObject(object):
+    """
+    TODO maybe we should inherit from webtools/PageResponseObject?
+    """
     def __init__(self, url, headers, timeout):
         self.status_code = 200
 
         contents = self.get_contents(url)
 
+        self.url = url
         self.text = contents
         self.content = contents
         self.headers = {}
@@ -376,13 +385,13 @@ class TestRequestObjectMock(object):
 class FakeInternetTestCase(TestCase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.mock_page_requests = 0
+        MockRequestCounter.mock_page_requests = 0
 
     def get_contents_function(self, url, headers, timeout):
         print("Mocked Requesting page: {}".format(url))
-        self.mock_page_requests += 1
+        MockRequestCounter.mock_page_requests += 1
 
-        return TestRequestObjectMock(url, headers, timeout)
+        return TestResponseObject(url, headers, timeout)
 
     def disable_web_pages(self):
         BasePage.get_contents_function = self.get_contents_function

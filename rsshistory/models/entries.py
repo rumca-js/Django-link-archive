@@ -7,7 +7,7 @@ from django.utils import timezone
 import traceback
 
 from ..apps import LinkDatabase
-from ..webtools import HtmlPage
+from ..webtools import HtmlPage, PageResponseObject, DomainAwarePage
 
 from .sources import SourceDataModel
 from .system import AppLogging
@@ -198,14 +198,13 @@ class BaseLinkDataController(BaseLinkDataModel):
 
         if not props or not url.p:
             AppLogging.error("Could not find entry url interface for:{}".format(self.link))
-            self.status_code = 500
+            self.status_code = STATUS_DEAD
             self.save()
             return
 
         # always update
         self.page_rating_contents = p.get_page_rating()
-        self.status_code = p.status_code
-
+        self.status_code = url.h.get_status_code()
 
         if "title" in props and props["title"] is not None:
             if not self.title:
@@ -247,12 +246,12 @@ class BaseLinkDataController(BaseLinkDataModel):
 
         if not props or not url.p:
             AppLogging.error("Could not find entry url interface for:{}".format(self.link))
-            self.status_code = 500
+            self.status_code = BasePage.STATUS_CODE_ERROR
             self.save()
             return
 
         self.page_rating_contents = url.p.get_page_rating()
-        self.status_code = url.p.status_code
+        self.status_code = url.h.get_status_code()
 
         if "title" in props and props["title"] is not None:
             self.title = props["title"]
@@ -326,15 +325,11 @@ class BaseLinkDataController(BaseLinkDataModel):
         if self.get_source_obj():
             return self.get_source_obj().get_favicon()
 
-        from ..webtools import BasePage
-
         # returning real favicon from HTML is too long
-        return BasePage(self.link).get_domain() + "/favicon.ico"
+        return DomainAwarePage(self.link).get_domain() + "/favicon.ico"
 
     def get_domain_only(self):
-        from ..webtools import BasePage
-
-        page = BasePage(self.link)
+        page = DomainAwarePage(self.link)
         return page.get_domain_only()
 
     def get_thumbnail(self):

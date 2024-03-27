@@ -1,9 +1,10 @@
 from datetime import datetime
 import hashlib
 
-from ..webtools import RssPage
+from ..webtools import RssPage, BasePage, calculate_hash
 
-from .fakeinternet import FakeInternetTestCase
+from .fakeinternet import FakeInternetTestCase, MockRequestCounter
+from .fakeinternetdata import webpage_no_pubdate_rss, webpage_old_pubdate_rss, webpage_samtime_youtube_rss
 
 
 webpage_rss = """
@@ -50,54 +51,49 @@ class RssPageTest(FakeInternetTestCase):
 
     def test_get_title(self):
         # default language
-        reader = RssPage("http://test.com/my-site-test", webpage_rss)
-        reader.parse()
+        reader = RssPage("https://linkedin.com/test", webpage_rss)
         self.assertEqual(reader.get_title(), "SAMTIME on Odysee")
-        self.assertTrue(reader.is_rss(False))
+        self.assertTrue(reader.is_valid())
 
-        self.assertEqual(self.mock_page_requests, 0)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
     def test_get_subtitle(self):
         # default language
-        reader = RssPage("http://test.com/my-site-test", webpage_rss)
-        reader.parse()
+        reader = RssPage("https://linkedin.com/test", webpage_rss)
         self.assertEqual(reader.get_description(), "SAMTIME channel description")
 
-        self.assertEqual(self.mock_page_requests, 0)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
     def test_get_language(self):
         # default language
-        reader = RssPage("http://test.com/my-site-test", webpage_rss)
-        reader.parse()
+        reader = RssPage("https://linkedin.com/test", webpage_rss)
         self.assertEqual(reader.get_language(), "ci")
-        self.assertTrue(reader.is_rss(False))
+        self.assertTrue(reader.is_valid())
 
-        self.assertEqual(self.mock_page_requests, 0)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
     def test_get_thumbnail(self):
         # default language
-        reader = RssPage("http://test.com/my-site-test", webpage_rss)
-        reader.parse()
+        reader = RssPage("https://linkedin.com/test", webpage_rss)
         self.assertEqual(
             reader.get_thumbnail(),
             "https://thumbnails.lbry.com/UCd6vEDS3SOhWbXZrxbrf_bw",
         )
-        self.assertTrue(reader.is_rss(False))
+        self.assertTrue(reader.is_valid())
 
-        self.assertEqual(self.mock_page_requests, 0)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
     def test_get_author(self):
         # default language
-        reader = RssPage("http://test.com/my-site-test", webpage_rss)
-        reader.parse()
+        reader = RssPage("https://linkedin.com/test", webpage_rss)
         self.assertEqual(reader.get_author(), "SAMTIME name")
-        self.assertTrue(reader.is_rss(False))
+        self.assertTrue(reader.is_valid())
 
-        self.assertEqual(self.mock_page_requests, 0)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
     def test_entries(self):
         # default language
-        reader = RssPage("http://test.com/my-site-test", webpage_rss)
+        reader = RssPage("https://linkedin.com/test", webpage_rss)
         entries = reader.get_container_elements()
         entries = list(entries)
         self.assertEqual(len(entries), 15)
@@ -105,13 +101,13 @@ class RssPageTest(FakeInternetTestCase):
         entry = entries[0]
         self.assertEqual(entry["title"], "First entry title")
         self.assertEqual(entry["description"], "First entry description")
-        self.assertTrue(reader.is_rss(False))
+        self.assertTrue(reader.is_valid())
 
-        self.assertEqual(self.mock_page_requests, 0)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
     def test_entry_old_date(self):
         # default language
-        reader = RssPage("https://youtube.com/channel/2020-year-channel/rss.xml")
+        reader = RssPage("https://linkedin.com/test", webpage_old_pubdate_rss)
         entries = reader.get_container_elements()
         entries = list(entries)
         self.assertEqual(len(entries), 1)
@@ -120,13 +116,13 @@ class RssPageTest(FakeInternetTestCase):
         self.assertEqual(entry["title"], "First entry title")
         self.assertEqual(entry["description"], "First entry description")
         self.assertEqual(entry["date_published"].year, 2020)
-        self.assertTrue(reader.is_rss(False))
+        self.assertTrue(reader.is_valid())
 
-        self.assertEqual(self.mock_page_requests, 1)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
     def test_entry_no_date(self):
         # default language
-        reader = RssPage("https://youtube.com/channel/no-pubdate-channel/rss.xml")
+        reader = RssPage("https://linkedin.com/test", webpage_no_pubdate_rss)
         entries = reader.get_container_elements()
         entries = list(entries)
 
@@ -138,13 +134,13 @@ class RssPageTest(FakeInternetTestCase):
         self.assertEqual(entry["title"], "First entry title")
         self.assertEqual(entry["description"], "First entry description")
         self.assertEqual(entry["date_published"].year, current_date_time.year)
-        self.assertTrue(reader.is_rss(False))
+        self.assertTrue(reader.is_valid())
 
-        self.assertEqual(self.mock_page_requests, 1)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
     def test_entry_page_rating(self):
         # default language
-        reader = RssPage("https://youtube.com/channel/no-pubdate-channel/rss.xml")
+        reader = RssPage("https://linkedin.com/test", webpage_no_pubdate_rss)
         entries = reader.get_container_elements()
         entries = list(entries)
 
@@ -153,42 +149,35 @@ class RssPageTest(FakeInternetTestCase):
         entry = entries[0]
         self.assertTrue(entry["page_rating"] > 0)
 
-        self.assertEqual(self.mock_page_requests, 1)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
-    def test_is_rss(self):
+    def test_is_valid(self):
         # default language
-        reader = RssPage("https://isocpp.org/blog/rss/category/news")
-        self.assertTrue(reader.is_rss(False))
+        reader = RssPage("https://linkedin.com/test", webpage_samtime_youtube_rss)
+        self.assertTrue(reader.is_valid())
 
-        self.assertEqual(self.mock_page_requests, 1)
-
-    def test_is_rss2(self):
-        # default language
-        reader = RssPage("https://cppcast.com/feed.rss")
-        self.assertTrue(reader.is_rss(False))
-
-        self.assertEqual(self.mock_page_requests, 1)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
     def test_rss_is_valid_true(self):
         # default language
-        reader = RssPage("https://youtube.com/channel/2020-year-channel/rss.xml")
+        reader = RssPage("https://linkedin.com/test", webpage_old_pubdate_rss)
         entries = reader.get_container_elements()
         self.assertTrue(reader.is_valid())
 
-        self.assertEqual(self.mock_page_requests, 1)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
     def test_get_body_hash(self):
         # default language
-        reader = RssPage("https://youtube.com/channel/2020-year-channel/rss.xml")
+        reader = RssPage("https://linkedin.com/test", webpage_old_pubdate_rss)
         hash = reader.get_body_hash()
 
         entries = str(reader.feed.entries)
 
         self.assertTrue(entries)
         self.assertTrue(entries != "")
-        self.assertEqual(hash, reader.calculate_hash(entries))
+        self.assertEqual(hash, calculate_hash(entries))
 
-        self.assertEqual(self.mock_page_requests, 1)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
     """
     feeder does not parses update time

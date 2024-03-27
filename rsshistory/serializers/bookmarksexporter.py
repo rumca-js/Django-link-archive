@@ -161,31 +161,29 @@ class BookmarksExporter(object):
 
         therange = (start_date, stop_date)
 
-        all_entries = []
+        result_entries = []
 
         if self.username != "" and self.username != None:
             users = User.objects.filter(username = self.username)
             if users.count () > 0:
-                """TODO implement this shit"""
-                #bookmarks = UserBookmarks.get_user_bookmarks(users[0])
-                #entries = bookmarks.values_list("entry_object", flat=True)
-
-                #all_bookmakred_entries = LinkDataController.objects.filter(
-                #    bookmarked=True, date_published__range=therange
-                #)
-
-                #all_entries = entries & all_bookmakred_entries
-                pass
-
-            all_entries = LinkDataController.objects.filter(
-                bookmarked=True, date_published__range=therange
-            )
+                bookmarks = UserBookmarks.get_user_bookmarks(users[0])
+                # this returns IDs, not 'objects'
+                result_entries = bookmarks.values_list("entry_object", flat=True)
+                result_entries = LinkDataController.objects.filter(id__in=result_entries)
+                result_entries = result_entries.filter(date_published__range=therange)
+            else:
+                AppLogging.error("Could not find such user name:{}".format(self.username))
+                result_entries = LinkDataController.objects.filter(
+                    bookmarked=True, date_published__range=therange
+                )
         else:
-            all_entries = LinkDataController.objects.filter(
+            result_entries = LinkDataController.objects.filter(
                 bookmarked=True, date_published__range=therange
             )
 
-        return all_entries
+        result_entries = result_entries.order_by("date_published")
+
+        return result_entries
 
 
 class BookmarksTopicExporter(object):
@@ -194,13 +192,11 @@ class BookmarksTopicExporter(object):
 
     def export(self, topic, directory):
         tag_objs = UserTags.objects.filter(tag=topic)
-        entries = set()
-        for tag_obj in tag_objs:
-            if tag_obj.link_obj is not None:
-                entries.add(tag_obj.link_obj)
 
-        entries = list(entries)
-        entries = sorted(entries, key=lambda x: x.date_published)
+        # this returns IDs, not 'objects'
+        result_entries = tag_objs.values_list("entry_object", flat=True)
+        result_entries = LinkDataController.objects.filter(id__in=result_entries)
+        result_entries = result_entries.order_by("date_published")
 
-        converter = BookmarksEntryExporter(self._cfg, entries)
+        converter = BookmarksEntryExporter(self._cfg, result_entries)
         converter.export("topic_{}".format(topic), directory, "topics")

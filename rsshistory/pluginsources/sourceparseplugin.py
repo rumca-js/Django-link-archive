@@ -3,7 +3,7 @@ import re
 import os
 import time
 
-from ..webtools import BasePage, HtmlPage, PageOptions
+from ..webtools import DomainAwarePage, HtmlPage, PageOptions
 from ..dateutils import DateUtils
 from ..models import AppLogging
 from ..controllers import LinkDataController
@@ -20,18 +20,17 @@ class BaseParsePlugin(SourceGenericPlugin):
 
     def __init__(self, source_id):
         super().__init__(source_id)
-        self.options = UrlHandler.get_page_options(self.get_address())
 
     def is_link_valid(self, address):
         source = self.get_source()
 
-        if not self.is_link_valid_domain(address):
+        if not DomainAwarePage(self.get_address()).is_link_in_domain(address):
             return False
 
         if not address.startswith(source.url):
             return False
 
-        p = BasePage(address)
+        p = DomainAwarePage(address)
         ext = p.get_page_ext()
 
         if ext == "html" or ext == "htm" or ext == None:
@@ -48,17 +47,6 @@ class BaseParsePlugin(SourceGenericPlugin):
             props["source_obj"] = source
 
         return props
-
-    def get_links(self):
-        result = []
-
-        c = Configuration.get_object().config_entry
-        if not c.auto_store_entries and c.auto_store_domain_info:
-            result = self.get_domains()
-        elif c.auto_store_entries:
-            result = super().get_links()
-
-        return result
 
     def get_container_elements(self):
         start_processing_time = time.time()
@@ -100,12 +88,13 @@ class BaseParsePlugin(SourceGenericPlugin):
 
         # this is stupid to write get contents to have contents, to pass it it
         # to html page
-        self.get_contents()
+        contents = self.get_contents()
+        url = self.get_address()
 
         print("Calculating plugin hash")
-        if self.is_html(False):
+        p = HtmlPage(url, contents)
+        if p.is_valid:
             print("Calculating plugin hash is html")
-            p = HtmlPage(self.get_address(), page_object=self)
             return p.get_body_hash()
         else:
             return self.get_contents_hash()

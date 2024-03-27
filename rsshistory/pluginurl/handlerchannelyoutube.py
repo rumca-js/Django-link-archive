@@ -1,14 +1,12 @@
 from .defaulturlhandler import DefaultUrlHandler
-from ..webtools import RssPage
+from ..webtools import RssPage, Url, PageResponseObject
 
 
 class YouTubeChannelHandler(RssPage, DefaultUrlHandler):
-    def __init__(self, url=None, contents=None, page_object=None, options=None):
-        print("YouTubeChannelHandler:0")
+    def __init__(self, url=None, contents=None):
         super().__init__(
-            url, contents=contents, page_object=page_object, options=options
+            url, contents=contents,
         )
-        print("YouTubeChannelHandler:1")
 
         if url:
             self.code = self.input2code(url)
@@ -53,3 +51,20 @@ class YouTubeChannelHandler(RssPage, DefaultUrlHandler):
 
     def get_channel_feed_url(self):
         return self.code2feed(self.code)
+
+    def get_contents(self):
+        if self.dead:
+            return
+
+        if self.response and self.response.content:
+            return self.response.content
+
+        u = Url(self.get_channel_feed_url())
+        self.response = u.response
+
+        if not self.response or self.response.status_code == PageResponseObject.STATUS_CODE_ERROR:
+            self.dead = True
+
+        self.process_contents()
+
+        return self.response.content

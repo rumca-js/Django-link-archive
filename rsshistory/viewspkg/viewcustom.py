@@ -1,7 +1,9 @@
 from pathlib import Path
 import traceback, sys
 from datetime import timedelta
+import datetime
 
+from django.contrib.auth.models import User
 from django.views import generic
 from django.urls import reverse
 from django.shortcuts import render
@@ -11,6 +13,7 @@ from django.http import HttpResponseForbidden, HttpResponseRedirect
 from ..apps import LinkDatabase
 from ..models import (
     UserTags,
+    UserBookmarks,
     BaseLinkDataController,
     KeyWords,
     ConfigurationEntry,
@@ -25,8 +28,8 @@ from ..controllers import (
 )
 from ..views import ViewPage
 from ..dateutils import DateUtils
-from ..forms import LinkInputForm, ScannerForm
-from ..webtools import HtmlPage, ContentLinkParser
+from ..forms import LinkInputForm, ScannerForm, OmniSearchForm
+from ..webtools import HtmlPage, ContentLinkParser, PageOptions
 from ..pluginurl.urlhandler import UrlHandler
 
 
@@ -38,11 +41,17 @@ def page_show_properties(request):
         return data
 
     def show_page_props_internal(requests, page_link):
-        page_object = UrlHandler.get(page_link, fast_check=False)
-        ViewPage.fill_context_type(p.context, handler=page_object)
+        options = PageOptions()
+        options.fast_parsing = False
+
+        handler = UrlHandler(page_link, page_options = options)
+        ViewPage.fill_context_type(p.context, handler=handler.p)
+
+        page_object = handler.p
 
         # fast check is disabled. We want to make sure based on contents if it is RSS or HTML
         p.context["page_object"] = page_object
+        p.context["response_object"] = handler.response
         p.context["page_object_type"] = str(type(page_object))
 
         return p.render("show_page_props.html")
@@ -83,7 +92,9 @@ def create_scanner_form(links, additional_text=""):
 
 def page_scan_link(request):
     def render_page_scan_input(p, link):
-        parser = UrlHandler.get(link)
+        h = UrlHandler(link)
+        contents = h.get_contents()
+        parser = ContentLinkParser(link, contents)
 
         c = Configuration.get_object().config_entry
 
@@ -362,14 +373,32 @@ def test_page(request):
 
     summary_text = "test page"
 
+    entries = LinkDataController.objects.filter(bookmarked=True)
+    for entry in entries:
+        if not UserBookmarks.is_bookmarked(entry):
+            UserBookmarks.add(request.user, entry)
+
+    start_date = datetime.date(2020, 1, 1)
+    stop_date = datetime.date(2025 + 1, 1, 1)
+
+    therange = (start_date, stop_date)
+
+    users = User.objects.filter(username = request.user)
+    if users.count () > 0:
+        bookmarks = UserBookmarks.get_user_bookmarks(users[0])
+        # this returns IDs, not 'objects'
+        result_entries = bookmarks.values_list("entry_object", flat=True)
+        result_entries = LinkDataController.objects.filter(id__in=result_entries)
+        result_entries = result_entries.filter(date_published__range=therange)
+
+    summary_text = "Found bookmarked items = {}".format(result_entries.count())
+
     p.context["summary_text"] = summary_text
 
     return p.render("summary_present.html")
 
 
 def test_form_page(request):
-    from ..forms import OmniSearchForm
-
     p = ViewPage(request)
     p.set_title("Test form page")
     data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
@@ -464,7 +493,8 @@ def data_errors_page(request):
     def fix_incorrect_youtube_links_links(entries):
         for entry in entries:
             print("Fixing: {} {} {}".format(entry.link, entry.title, entry.source))
-            h = UrlHandler.get(entry.link)
+            h = UrlHandler(entry.link)
+            h = h.p
 
             chan_url = h.get_channel_feed_url()
             link_valid = h.get_link_url()

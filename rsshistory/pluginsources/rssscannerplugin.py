@@ -6,7 +6,7 @@ from ..configuration import Configuration
 from .sourcerssplugin import BaseRssPlugin
 from ..pluginurl import EntryUrlInterface
 
-from ..webtools import ContentLinkParser, HtmlPage, BasePage
+from ..webtools import ContentLinkParser, HtmlPage, DomainAwarePage
 
 
 class RssScannerPlugin(BaseRssPlugin):
@@ -59,7 +59,7 @@ class RssScannerPlugin(BaseRssPlugin):
             return []
 
     def is_internal_page_processed(self, url):
-        url_page = BasePage(url)
+        url_page = DomainAwarePage(url)
         source_page = BasePage(self.get_source().url)
 
         return url_page.get_domain() == source_page.get_domain()

@@ -1,7 +1,7 @@
 import traceback
 from urllib.parse import unquote
 
-from ..webtools import Url, PageOptions, DomainAwarePage, BasePage
+from ..webtools import Url, PageOptions, DomainAwarePage, DomainAwarePage
 
 from ..apps import LinkDatabase
 from ..models import AppLogging
@@ -13,7 +13,7 @@ from .handlerchannelyoutube import YouTubeChannelHandler
 from .handlerchannelodysee import OdyseeChannelHandler
 
 
-class UrlHandler(object):
+class UrlHandler(Url):
     """
     Provides handler, controller for a link. Should inherit title & description API, just like
     webtools Url.
@@ -28,7 +28,9 @@ class UrlHandler(object):
     odysee_video_handler = OdyseeVideoHandler
     odysee_channel_handler = OdyseeChannelHandler
 
-    def get(url, fast_check=True, use_selenium=False, page_options=None):
+    def __init__(self, url=None, page_object=None, page_options=None):
+        super().__init__(url, page_object=page_object, page_options=page_options)
+
         if not url or url == "":
             lines = traceback.format_stack()
             line_text = ""
@@ -41,6 +43,7 @@ class UrlHandler(object):
 
             return
 
+    def get_handler(self, url=None, page_object=None, page_options=None):
         """
         This code eventually will get ugly.
         We want handle different cases here. Use selenium?
@@ -51,47 +54,54 @@ class UrlHandler(object):
             return
 
         if UrlHandler.is_youtube_video(short_url):
-            return UrlHandler.youtube_video_handler(url)
+            h = UrlHandler.youtube_video_handler(url)
+            h.get_contents()
+            self.response = h.response
+            return h
         if UrlHandler.is_youtube_channel(short_url):
-            return UrlHandler.youtube_channel_handler(url)
+            h = UrlHandler.youtube_channel_handler(url)
+            h.get_contents()
+            self.response = h.response
+            return h
         if UrlHandler.is_odysee_video(short_url):
-            return UrlHandler.odysee_video_handler(url)
+            h = UrlHandler.odysee_video_handler(url)
+            h.get_contents()
+            self.response = h.response
+            return h
         if UrlHandler.is_odysee_channel(short_url):
-            return UrlHandler.odysee_channel_handler(url)
+            h = UrlHandler.odysee_channel_handler(url)
+            h.get_contents()
+            self.response = h.response
+            return h
 
         if not page_options:
             options = UrlHandler.get_url_options(url)
-            if options.is_not_selenium() and use_selenium:
-                options.use_selenium_headless = True
-            options.fast_parsing = fast_check
         else:
             options = page_options
 
-        page = Url.get(url, options=options)
+        u = Url(url, page_options=options)
 
         # if response is cloudflare jibberish, try using selenium
         if options.is_not_selenium() and (
-            (not page.is_valid() or page.is_cloudflare_protected())
-            or (page.status_code == 403)
+            (not u.is_valid() or u.is_cloudflare_protected())
+            or (u.get_status_code() == 403)
         ):
             LinkDatabase.info(
                 "Could not normally obtain contents. Trying selenium:".format(url)
             )
 
-            options = PageOptions()
-            # by default we do not want full blown browser to be started
-            # this has to be enabled manually in code
             options.use_selenium_headless = True
-            options.fast_parsing = fast_check
 
-            if page.is_cloudflare_protected():
+            if u.is_cloudflare_protected():
                 options.link_redirect = True
 
-            page = Url.get(url, options=options)
+            u = Url(url, page_options=options)
 
-        return page
+        self.options = u.options
+        self.response = u.response
+        return u.p
 
-    def get_type(url, fast_check=True):
+    def get_type(url):
         short_url = UrlHandler.get_protololless(url)
         if not short_url:
             return
@@ -105,10 +115,7 @@ class UrlHandler(object):
         if UrlHandler.is_odysee_channel(short_url):
             return UrlHandler.odysee_channel_handler(url)
 
-        options = PageOptions()
-        options.fast_parsing = fast_check
-
-        page = Url.get(url, options=options)
+        page = Url.get_type(url)
         return page
 
     def get_url_options(url):
@@ -161,7 +168,7 @@ class UrlHandler(object):
             return True
 
     def is_selenium_headless_required(url):
-        domain = BasePage(url).get_domain_only()
+        domain = DomainAwarePage(url).get_domain_only()
 
         if domain.startswith("open.spotify.com") or domain.startswith("thehill.com"):
             return True

@@ -3,8 +3,8 @@
 <ul>
     <li>Link: {{page_object.url}} <a href="{{page_object.url}}">Link</a></li>
     <li>Detected page type: {{page_object_type}}</li>
-    <li>Status code: {{page_object.status_code}}</li>
-    <li>Encoding: {{page_object.encoding}}</li>
+    <li>Status code: {{response_object.status_code}}</li>
+    <li>Encoding: {{response_object.encoding}}</li>
     <li>Valid: {{page_object.is_valid}}</li>
     <li>Title: {{page_object.get_title}}</li>
     <li>Description: {{page_object.get_description}}</li>
@@ -16,11 +16,9 @@
     {%if page_object.get_thumbnail %}
     <li>thumbnail: <a href="{{page_object.get_thumbnail}}"/>Link</a></li>
     {%endif %}
-    {%if favicons %}
-    {%for favicon in favicons %}
+    {%for favicon in page_object.get_favicons %}
     <li>Favicon: {{favicon}} <a href="{{favicon}}">favicon</a></li>
     {%endfor%}
-    {%endif%}
     <li>Contents length: {{contents_length}}.
         {% if contents_length == 0 %}
         Page is empty.
@@ -35,7 +33,7 @@
         {% endif %}
     </li>
 
-    <li>Charset: {{charset}}</li>
+    <li>Charset: {{page_object.get_charset}}</li>
     <li>Language: {{page_object.get_language}}</li>
     {%for rss_url in page_object.get_rss_urls %}
       <li>Rss Url: {{rss_url}} <a href="{{rss_url}}">Link</a></li>
@@ -43,10 +41,10 @@
 
     <li>Meta title: {{page_object.get_title_meta}}</li>
     <li>Meta description: {{page_object.get_description_meta}}</li>
-    <li>og title: {{og_title}}</li>
-    <li>og description: {{og_description}}</li>
-    {%if og_image %}
-    <li>og image: <a href="{{og_image}}"/>Link</a></li>
+    <li>og title: {{page_object.get_og_title}}</li>
+    <li>og description: {{page_object.get_og_description}}</li>
+    {%if page_object.get_og_image %}
+    <li>og image: <a href="{{page_object.get_og_image}}"/>Link</a></li>
     {%endif %}
     <li>keywords: {{page_object.get_tags}}</li>
 

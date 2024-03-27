@@ -82,10 +82,13 @@ class UserTagsTest(TestCase):
         tags = UserTags.objects.all()
 
         self.assertEqual(tags.count(), 2)
-        self.assertEqual(tags[0].tag, "tag2")
+
         self.assertEqual(tags[0].entry_object, self.entry)
-        self.assertEqual(tags[1].tag, "tag1")
         self.assertEqual(tags[1].entry_object, self.entry)
+
+        tag_values = UserTags.objects.all().values_list("tag", flat=True)
+        self.assertTrue("tag1" in tag_values)
+        self.assertTrue("tag2" in tag_values)
 
     def test_set_tag(self):
         UserTags.objects.all().delete()
@@ -98,12 +101,14 @@ class UserTagsTest(TestCase):
         UserTags.set_tag(self.entry, "tag4", user)
 
         tags = UserTags.objects.all()
+        tag_values = UserTags.objects.all().values_list("tag", flat=True)
 
         self.assertEqual(tags.count(), 2)
-        self.assertEqual(tags[0].tag, "tag4")
         self.assertEqual(tags[0].entry_object, self.entry)
-        self.assertEqual(tags[1].tag, "tag3")
         self.assertEqual(tags[1].entry_object, self.entry)
+
+        self.assertTrue("tag3" in tag_values)
+        self.assertTrue("tag4" in tag_values)
 
     def test_cleanup(self):
         user = self.user

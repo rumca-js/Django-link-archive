@@ -148,11 +148,11 @@ class LinkDataControllerTest(FakeInternetTestCase):
         # call tested function
         entry.tag(["tag1", "tag2"], self.user)
 
-        tags = UserTags.objects.all()
+        tags = UserTags.objects.all().values_list("tag", flat=True)
 
-        self.assertEqual(tags.count(), 2)
-        self.assertEqual(tags[0].tag, "tag2")
-        self.assertEqual(tags[1].tag, "tag1")
+        self.assertEqual(len(tags), 2)
+        self.assertTrue("tag1" in tags)
+        self.assertTrue("tag2" in tags)
 
     def test_reset_data_none(self):
         add_time = DateUtils.get_datetime_now_utc() - timedelta(days=1)

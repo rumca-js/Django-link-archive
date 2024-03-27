@@ -6,7 +6,7 @@ from ..configuration import Configuration
 from .sourcerssplugin import BaseRssPlugin
 from .rssscannerplugin import RssScannerPlugin
 
-from ..webtools import ContentLinkParser, HtmlPage, BasePage
+from ..webtools import ContentLinkParser, HtmlPage, DomainAwarePage
 
 
 class HackerNewsScannerPlugin(RssScannerPlugin):
@@ -22,6 +22,6 @@ class HackerNewsScannerPlugin(RssScannerPlugin):
         super().__init__(source_id)
 
     def is_internal_page_processed(self, url):
-        url_page = BasePage(url)
+        url_page = DomainAwarePage(url)
 
         return url_page.get_domain().find("news.ycombinator.com") >= 0

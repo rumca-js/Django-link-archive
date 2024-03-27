@@ -3,8 +3,8 @@
 <ul>
     <li>Link: {{page_object.url}} <a href="{{page_object.url}}">Link</a></li>
     <li>Detected page type: {{page_object_type}}</li>
-    <li>Status code: {{page_object.status_code}}</li>
-    <li>Encoding: {{page_object.encoding}}</li>
+    <li>Status code: {{response_object.status_code}}</li>
+    <li>Encoding: {{response_object.encoding}}</li>
     <li>Valid: {{page_object.is_valid}}</li>
     <li>Title: {{page_object.get_title}}</li>
     <li>Description: {{page_object.get_description}}</li>
@@ -30,7 +30,7 @@
         {% endif %}
     </li>
 
-    <li>Charset: {{charset}}</li>
+    <li>Charset: {{page_object.get_charset}}</li>
     <li>Language: {{page_object.get_language}}</li>
     <li>keywords: {{page_object.get_tags}}</li>
     <li>Selenium: {{page_object.options.is_selenium}}</li>

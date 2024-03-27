@@ -40,7 +40,7 @@ from ..forms import (
 from ..queryfilters import EntryFilter
 from ..views import ViewPage
 from ..configuration import Configuration
-from ..webtools import Url, BasePage
+from ..webtools import Url, DomainAwarePage
 from ..pluginurl import UrlHandler
 from ..services.waybackmachine import WaybackMachine
 from ..dateutils import DateUtils
@@ -663,7 +663,7 @@ def add_simple_entry(request):
                 form.action_url = reverse("{}:entry-add".format(LinkDatabase.name))
                 p.context["form"] = form
 
-                page = BasePage(data["link"])
+                page = DomainAwarePage(data["link"])
                 domain = page.get_domain()
 
                 if data["link"].find("http://") >= 0:

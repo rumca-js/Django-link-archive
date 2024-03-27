@@ -10,31 +10,31 @@ class UrlHandlerTest(FakeInternetTestCase):
         self.disable_web_pages()
 
     def test_get_rss(self):
-        handler = UrlHandler.get("https://rsspage.com/rss.xml")
+        handler = UrlHandler("https://rsspage.com/rss.xml")
 
-        self.assertTrue(handler.is_rss())
-        self.assertEqual(type(handler), RssPage)
+        self.assertTrue(handler.is_valid())
+        self.assertEqual(type(handler.p), RssPage)
 
     def test_get_html(self):
-        handler = UrlHandler.get("https://linkedin.com")
+        handler = UrlHandler("https://linkedin.com")
 
-        self.assertTrue(handler.is_html())
-        self.assertEqual(type(handler), HtmlPage)
+        self.assertTrue(handler.is_valid())
+        self.assertEqual(type(handler.p), HtmlPage)
 
     def test_get_youtube_video(self):
-        handler = UrlHandler.get("https://www.youtube.com/watch?v=1234")
+        handler = UrlHandler("https://www.youtube.com/watch?v=1234")
 
-        self.assertEqual(type(handler), UrlHandler.youtube_video_handler)
+        self.assertEqual(type(handler.p), UrlHandler.youtube_video_handler)
 
     def test_get_youtube_channel(self):
-        handler = UrlHandler.get(
+        handler = UrlHandler(
             "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM"
         )
 
-        self.assertEqual(type(handler), UrlHandler.youtube_channel_handler)
+        self.assertEqual(type(handler.p), UrlHandler.youtube_channel_handler)
 
     def test_rss_get_properties(self):
-        handler = UrlHandler.get("https://simple-rss-page.com/rss.xml")
+        handler = UrlHandler("https://simple-rss-page.com/rss.xml")
 
         props = handler.get_properties()
 
@@ -42,7 +42,7 @@ class UrlHandlerTest(FakeInternetTestCase):
         self.assertEqual(props["description"], "Simple description")
 
     def test_html_get_properties(self):
-        handler = UrlHandler.get("https://linkedin.com")
+        handler = UrlHandler("https://linkedin.com")
 
         props = handler.get_properties()
 
@@ -50,39 +50,39 @@ class UrlHandlerTest(FakeInternetTestCase):
         self.assertEqual(props["description"], "LinkedIn Page description")
 
     def test_youtube_channel_get_properties(self):
-        handler = UrlHandler.get(
+        handler = UrlHandler(
             "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM"
         )
 
-        props = handler.get_properties()
+        props = handler.p.get_properties()
 
         self.assertEqual(props["title"], "SAMTIME on Odysee")
 
     def test_youtube_channel_get_title(self):
-        handler = UrlHandler.get(
+        handler = UrlHandler(
             "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM"
         )
 
-        self.assertEqual(handler.get_title(), "SAMTIME on Odysee")
+        self.assertEqual(handler.p.get_title(), "SAMTIME on Odysee")
 
     def test_get_spotify(self):
-        handler = UrlHandler.get("https://open.spotify.com/somebody/episodes")
+        handler = UrlHandler("https://open.spotify.com/somebody/episodes")
 
-        self.assertEqual(type(handler), HtmlPage)
+        self.assertEqual(type(handler.p), HtmlPage)
 
         self.assertTrue(handler.options.use_selenium_headless)
 
     def test_get_warhammer_community(self):
-        handler = UrlHandler.get("https://www.warhammer-community.com")
+        handler = UrlHandler("https://www.warhammer-community.com")
 
-        self.assertEqual(type(handler), HtmlPage)
+        self.assertEqual(type(handler.p), HtmlPage)
 
         self.assertTrue(handler.options.use_selenium_full)
 
     def test_get__defcon_org(self):
-        handler = UrlHandler.get("https://defcon.org")
+        handler = UrlHandler("https://defcon.org")
 
-        self.assertEqual(type(handler), HtmlPage)
+        self.assertEqual(type(handler.p), HtmlPage)
 
         self.assertTrue(handler.options.use_selenium_full)
 

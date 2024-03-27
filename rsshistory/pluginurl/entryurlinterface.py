@@ -1,4 +1,4 @@
-from ..webtools import HtmlPage, RssPage, BasePage, Url, PageOptions
+from ..webtools import HtmlPage, RssPage, DomainAwarePage, Url, PageOptions
 from ..dateutils import DateUtils
 from ..controllers import SourceDataController
 
@@ -31,9 +31,15 @@ class EntryUrlInterface(object):
         if self.url.endswith("/"):
             self.url = self.url[:-1]
 
-        self.p = UrlHandler.get(
-            self.url, fast_check=fast_check, use_selenium=use_selenium
-        )
+        options = PageOptions()
+        options.fast_parsing = fast_check
+        options.use_selenium_headless = use_selenium
+
+        self.h = UrlHandler(self.url, page_options = options)
+        if self.h.response:
+            self.url = self.h.response.url
+
+        self.p = self.h.p
 
     def get_props(self, input_props=None, source_obj=None):
         if not input_props:
@@ -45,16 +51,17 @@ class EntryUrlInterface(object):
         # description for URLs
 
         if props:
-            is_domain = BasePage(self.url).is_domain()
+            is_domain = DomainAwarePage(self.url).is_domain()
             if is_domain and ("thumbnail" not in props or props["thumbnail"] == None):
                 if "favicons" in props:
                     favicons = props["favicons"]
                     if favicons and len(favicons) > 0:
                         props["thumbnail"] = favicons[0][0]
 
-            props["page_rating_contents"] = self.p.get_page_rating()
-            props["page_rating"] = self.p.get_page_rating()
-            props["status_code"] = self.p.status_code
+            page_rating = self.h.get_page_rating()
+            props["page_rating_contents"] = page_rating
+            props["page_rating"] = page_rating
+            props["status_code"] = self.h.get_status_code()
 
             if not self.is_property_set(props, "artist") and self.p.get_author():
                 props["artist"] = self.p.get_author()
@@ -69,7 +76,7 @@ class EntryUrlInterface(object):
             if source_obj:
                 input_props["source"] = source_obj.url
 
-        is_domain = BasePage(self.url).is_domain()
+        is_domain = DomainAwarePage(self.url).is_domain()
         p = self.p
 
         if not p:
@@ -94,10 +101,10 @@ class EntryUrlInterface(object):
             if p.get_video_code():
                 return self.get_youtube_props(input_props, source_obj)
 
-        if p.is_html():
+        if type(p) is HtmlPage:
             return self.get_htmlpage_props(input_props, source_obj)
 
-        if p.is_rss():
+        if type(p) is RssPage:
             return self.get_rsspage_props(input_props, source_obj)
 
         # TODO provide RSS support
@@ -204,8 +211,6 @@ class EntryUrlInterface(object):
         if not self.is_property_set(input_props, "thumbnail"):
             input_props["thumbnail"] = p.get_thumbnail()
 
-        input_props["page_rating_contents"] = p.get_page_rating()
-
         return input_props
 
     def get_rsspage_props(self, input_props=None, source_obj=None):
@@ -250,8 +255,6 @@ class EntryUrlInterface(object):
         if not self.is_property_set(input_props, "thumbnail"):
             input_props["thumbnail"] = p.get_thumbnail()
 
-        input_props["page_rating_contents"] = p.get_page_rating()
-
         return input_props
 
     def update_info_default(self, input_props=None, source_obj=None):
@@ -273,8 +276,6 @@ class EntryUrlInterface(object):
             input_props["title"] = p.get_domain()
         if not self.is_property_set(input_props, "description"):
             input_props["description"] = p.get_domain()
-
-        input_props["page_rating_contents"] = p.get_page_rating()
 
         return input_props
 

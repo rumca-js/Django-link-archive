@@ -20,7 +20,7 @@ from ..forms import SourceForm, SourcesChoiceForm
 from ..queryfilters import SourceFilter
 from ..views import ViewPage
 from ..configuration import Configuration
-from ..webtools import Url, BasePage
+from ..webtools import Url, DomainAwarePage
 from ..pluginurl import UrlHandler
 
 
@@ -100,7 +100,9 @@ class SourceDetailView(generic.DetailView):
         context["page_thumbnail"] = self.object.favicon
         context["search_engines"] = SearchEngines(self.object.title, self.object.url)
 
-        handler = UrlHandler.get(self.object.url, fast_check=True)
+        # TODO this might really slow us down, do we need full url handler?
+        # This will trigger download of data
+        handler = UrlHandler(self.object.url)
         context["page_object"] = handler
 
         entries = LinkDataController.objects.filter(link = self.object.url)
@@ -218,7 +220,7 @@ def add_source_simple(request):
 
         p.context["form"] = form
 
-        page = BasePage(data["url"])
+        page = DomainAwarePage(data["url"])
         domain = page.get_domain()
 
         if data["url"].find("http://") >= 0:

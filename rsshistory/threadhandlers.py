@@ -42,7 +42,8 @@ from .controllers import (
 )
 from .configuration import Configuration
 from .dateutils import DateUtils
-from .webtools import HtmlPage
+from .webtools import HtmlPage, DomainAwarePage, ContentLinkParser
+from .pluginurl import UrlHandler
 
 
 class BaseJobHandler(object):
@@ -271,14 +272,12 @@ class LinkAddJobHandler(BaseJobHandler):
             return True
 
     def add_link(self, data):
-        from .pluginurl import UrlHandler
-
         # Unpack if link service
         link = data["link"]
-        if HtmlPage(link).is_link_service():
-            p = UrlHandler.get(link)
-            if p.get_contents():
-                link = p.url
+        if DomainAwarePage(link).is_link_service():
+            h = UrlHandler(link)
+            if h.get_contents():
+                link = h.response.url
                 data["link"] = link
 
         # Add the link
@@ -827,7 +826,11 @@ class LinkScanJobHandler(BaseJobHandler):
 
     def process(self, obj=None):
         try:
-            p = HtmlPage(obj.subject)
+            link = obj.subject
+            p = UrlHandler(link)
+            contents = p.get_contents()
+
+            p = ContentLinkParser(link, contents)
 
             c = Configuration.get_object()
             conf = c.config_entry

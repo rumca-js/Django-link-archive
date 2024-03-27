@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 
 from ..models import AppLogging
 from ..apps import LinkDatabase
-from ..webtools import RssPage, Url, HtmlPage
+from ..webtools import RssPage, HtmlPage
 from ..pluginurl.entryurlinterface import EntryUrlInterface, UrlHandler
 from ..configuration import Configuration
 
@@ -44,33 +44,35 @@ class BaseRssPlugin(SourceGenericPlugin):
             self.dead = True
             return
 
-        fast_check = False
+        url = self.get_address()
 
-        if self.is_html(fast_check=fast_check):
-            h = UrlHandler.get(self.get_address(), page_options=self.options)
-            if type(h) is HtmlPage:
-                rss_contents = h.get_body_text()
+        p = RssPage(url, contents)
+        if p.is_valid():
+            self.contents = p.get_contents()
+            return self.contents
 
-                self.reader = RssPage(self.get_address(), contents=rss_contents)
+        p = HtmlPage(url, contents)
+        if p.is_valid():
+            rss_contents = p.get_body_text()
 
-                if not self.reader.is_rss(fast_check=fast_check):
-                    self.store_error(
-                        source, "HTML body does not provide RSS, body", rss_contents
-                    )
-                    self.dead = True
+            self.reader = RssPage(self.get_address(), contents=rss_contents)
 
-                    return None
-                else:
-                    contents = rss_contents
-            elif type(h) is RssPage:
-                contents = h.get_contents()
-            else:
-                contents = h.get_contents()
-
-                self.store_error(source, "Page does not provide RSS", contents)
+            if not self.reader.is_valid():
+                self.store_error(
+                    source, "HTML body does not provide RSS, body", rss_contents
+                )
                 self.dead = True
 
                 return None
+            else:
+                contents = rss_contents
+                self.contents = p.get_contents()
+                return contents
+
+        self.store_error(source, "Page does not provide RSS", contents)
+        self.dead = True
+
+        return None
 
         self.contents = contents
 
@@ -82,11 +84,15 @@ class BaseRssPlugin(SourceGenericPlugin):
         else:
             print_contents = "None"
 
+        status_code = None
+        if self.response:
+            status_code = self.response.status_code
+
         AppLogging.error(
             "Source:{}\nTitle:{}\nStatus code:{}\nText:{}.\nContents\n{}".format(
                 source.url,
                 source.title,
-                self.status_code,
+                status_code,
                 text,
                 print_contents[: self.get_contents_size_limit()],
             )
@@ -107,7 +113,7 @@ class BaseRssPlugin(SourceGenericPlugin):
         if not contents:
             return
 
-        self.reader = RssPage(self.get_address(), page_object=self)
+        self.reader = RssPage(self.get_address(), contents)
         all_props = self.reader.get_container_elements()
 
         for index, prop in enumerate(all_props):
@@ -127,6 +133,12 @@ class BaseRssPlugin(SourceGenericPlugin):
     def enhance(self, prop):
         if prop["link"].endswith("/"):
             prop["link"] = prop["link"][:-1]
+
+        source = self.get_source()
+        
+        if self.is_property_set(prop, "language") and source.language != None and source.language != "":
+            prop["language"] = source.language
+
         return prop
 
     def calculate_plugin_hash(self):
@@ -134,6 +146,9 @@ class BaseRssPlugin(SourceGenericPlugin):
         We do not care about RSS title changing. We care only about entries
         Generic handler uses Html as base. We need to use RSS for body hash
         """
-        self.get_contents()
-        reader = RssPage(self.get_address(), page_object=self)
+        contents = self.get_contents()
+        reader = RssPage(self.get_address(), contents)
         return reader.get_body_hash()
+
+    def is_property_set(self, input_props, property):
+        return property in input_props and input_props[property]

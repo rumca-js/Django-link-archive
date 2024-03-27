@@ -6,7 +6,7 @@ from ..controllers import SourceDataController, LinkDataController, DomainsContr
 from ..dateutils import DateUtils
 from ..models import KeyWords, DataExport
 
-from .fakeinternet import FakeInternetTestCase
+from .fakeinternet import FakeInternetTestCase, MockRequestCounter
 
 
 class ViewsTest(FakeInternetTestCase):
@@ -281,6 +281,7 @@ class ViewsTest(FakeInternetTestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_page_show_props_html_get(self):
+        MockRequestCounter.mock_page_requests = 0
         url = (
             reverse("{}:page-show-props".format(LinkDatabase.name))
             + "?page=https://www.linkedin.com"
@@ -291,8 +292,10 @@ class ViewsTest(FakeInternetTestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Detected", html=False)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
     def test_page_show_props_html_post(self):
+        MockRequestCounter.mock_page_requests = 0
         url = (
             reverse("{}:page-show-props".format(LinkDatabase.name))
         )
@@ -304,8 +307,10 @@ class ViewsTest(FakeInternetTestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Detected", html=False)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
     def test_page_show_props_youtube_get(self):
+        MockRequestCounter.mock_page_requests = 0
         url = (
             reverse("{}:page-show-props".format(LinkDatabase.name))
             + "?page=https://www.youtube.com/watch?v=SwlIAjcYypA"
@@ -316,8 +321,10 @@ class ViewsTest(FakeInternetTestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Detected", html=False)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
     def test_page_show_props_ytchannel_get(self):
+        MockRequestCounter.mock_page_requests = 0
         url = (
             reverse("{}:page-show-props".format(LinkDatabase.name))
             + "?page=https://www.youtube.com/feeds/samtime.rss"
@@ -328,6 +335,7 @@ class ViewsTest(FakeInternetTestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Detected", html=False)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
     def test_page_scan_contents(self):
         url = reverse("{}:page-scan-contents".format(LinkDatabase.name))
@@ -342,6 +350,8 @@ class ViewsTest(FakeInternetTestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_page_scan_input_html(self):
+        MockRequestCounter.mock_page_requests = 0
+
         url = (
             reverse("{}:page-scan-link".format(LinkDatabase.name))
             + "?link=https://www.linkedin.com"
@@ -349,6 +359,7 @@ class ViewsTest(FakeInternetTestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
     def test_import_bookmarks(self):
         url = reverse("{}:import-bookmarks".format(LinkDatabase.name))
@@ -494,6 +505,8 @@ class EnhancedViewTest(ViewsTest):
         self.client.login(username="testuser", password="testpassword")
 
     def test_entry_detail_youtube(self):
+        MockRequestCounter.mock_page_requests = 0
+
         url = reverse(
             "{}:entry-detail".format(LinkDatabase.name),
             args=[self.entry_youtube.id],
@@ -501,37 +514,49 @@ class EnhancedViewTest(ViewsTest):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
+
     def test_entry_detail_html(self):
+        MockRequestCounter.mock_page_requests = 0
+
         url = reverse(
             "{}:entry-detail".format(LinkDatabase.name),
             args=[self.entry_html.id],
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
     def test_entry_detail_pdf(self):
+        MockRequestCounter.mock_page_requests = 0
+
         url = reverse(
             "{}:entry-detail".format(LinkDatabase.name),
             args=[self.entry_pdf.id],
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
     def test_source(self):
+        MockRequestCounter.mock_page_requests = 0
         url = reverse(
             "{}:source-detail".format(LinkDatabase.name),
             args=[SourceDataController.objects.all()[0].id],
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
     def test_source_json(self):
+        MockRequestCounter.mock_page_requests = 0
         sources = SourceDataController.objects.filter(url__icontains="https://youtube")
 
         url = reverse("{}:source-json".format(LinkDatabase.name), args=[sources[0].id])
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
     def test_sources_json(self):
         sources = SourceDataController.objects.filter(url__icontains="https://youtube")
@@ -542,17 +567,21 @@ class EnhancedViewTest(ViewsTest):
         self.assertEqual(response.status_code, 200)
 
     def test_entry_json(self):
+        MockRequestCounter.mock_page_requests = 0
         entries = LinkDataController.objects.filter(link__icontains="https://youtube")
 
         url = reverse("{}:entry-json".format(LinkDatabase.name), args=[entries[0].id])
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
     def test_entries_json(self):
+        MockRequestCounter.mock_page_requests = 0
         entries = LinkDataController.objects.filter(link__icontains="https://youtube")
 
         url = reverse("{}:entries-json".format(LinkDatabase.name))
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)

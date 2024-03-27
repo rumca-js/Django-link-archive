@@ -57,7 +57,7 @@ wall_street_journal_date_human_date_ue_format = """
 class ContentInterfacePageTest(FakeInternetTestCase):
     def test_guess_date_for_full_date(self):
         p = ContentInterface(
-            "https://www.wsj.com/world/middle-east/israel-war-gaza-hamas-perilous-phase-1ed3ea9b?mod=hp_lead_pos7",
+            "https://linkedin.com/test",
             wall_street_journal_date_full_date,
         )
 
@@ -67,7 +67,7 @@ class ContentInterfacePageTest(FakeInternetTestCase):
 
     def test_guess_date_for_human_date(self):
         p = ContentInterface(
-            "https://www.wsj.com/world/middle-east/israel-war-gaza-hamas-perilous-phase-1ed3ea9b?mod=hp_lead_pos7",
+            "https://linkedin.com/test",
             wall_street_journal_date_human_date,
         )
 
@@ -77,7 +77,7 @@ class ContentInterfacePageTest(FakeInternetTestCase):
 
     def test_guess_date_for_human_date_dot(self):
         p = ContentInterface(
-            "https://www.wsj.com/world/middle-east/israel-war-gaza-hamas-perilous-phase-1ed3ea9b?mod=hp_lead_pos7",
+            "https://linkedin.com/test",
             wall_street_journal_date_human_date_dot,
         )
 
@@ -87,7 +87,7 @@ class ContentInterfacePageTest(FakeInternetTestCase):
 
     def test_guess_date_for_human_date_one_digit(self):
         p = ContentInterface(
-            "https://www.wsj.com/world/middle-east/israel-war-gaza-hamas-perilous-phase-1ed3ea9b?mod=hp_lead_pos7",
+            "https://linkedin.com/test",
             wall_street_journal_date_human_date_one_digit,
         )
 
@@ -97,7 +97,7 @@ class ContentInterfacePageTest(FakeInternetTestCase):
 
     def test_guess_date_for_human_date_ue_format(self):
         p = ContentInterface(
-            "https://www.wsj.com/world/middle-east/israel-war-gaza-hamas-perilous-phase-1ed3ea9b?mod=hp_lead_pos7",
+            "https://linkedin.com/test",
             wall_street_journal_date_human_date_ue_format,
         )
 

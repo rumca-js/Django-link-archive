@@ -14,7 +14,7 @@ from ..models import (
 )
 from .entries import LinkDataController, LinkDataBuilder
 from ..configuration import Configuration
-from ..webtools import BasePage, HtmlPage
+from ..webtools import HtmlPage, DomainAwarePage
 from ..apps import LinkDatabase
 
 
@@ -31,7 +31,7 @@ class DomainsController(Domains):
         if not Configuration.get_object().config_entry.auto_store_domain_info:
             return
 
-        protocol = BasePage(url).protocol
+        protocol = DomainAwarePage(url).get_scheme()
 
         domain_text = DomainsController.get_domain_only(url)
         if (
@@ -108,7 +108,7 @@ class DomainsController(Domains):
         return ob
 
     def get_domain_only(input_url):
-        p = BasePage(input_url)
+        p = DomainAwarePage(input_url)
         domain_text = p.get_domain_only()
         return domain_text
 
@@ -254,7 +254,7 @@ class DomainsController(Domains):
 
         entries = LinkDataController.objects.filter(domain_obj__isnull=True)
         for entry in entries:
-            p = BasePage(entry.link)
+            p = DomainAwarePage(entry.link)
             domain_url = p.get_domain()
             domain_only = p.get_domain_only()
             LinkDatabase.info(

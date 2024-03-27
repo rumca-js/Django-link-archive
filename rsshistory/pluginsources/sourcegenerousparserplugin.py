@@ -1,7 +1,7 @@
 import os
 import re
 
-from ..webtools import BasePage
+from ..webtools import DomainAwarePage
 from .sourceparseplugin import BaseParsePlugin
 
 
@@ -12,10 +12,10 @@ class SourceGenerousParserPlugin(BaseParsePlugin):
         super().__init__(source_id)
 
     def is_link_valid(self, address):
-        if not self.is_link_valid_domain(address):
+        if not DomainAwarePage(self.get_address()).is_link_in_domain(address):
             return False
 
-        p = BasePage(address)
+        p = DomainAwarePage(address)
         ext = p.get_page_ext()
 
         if ext == "html" or ext == "htm" or ext == None:

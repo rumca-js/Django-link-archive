@@ -16,7 +16,7 @@ from ..models import (
 )
 
 from ..configuration import Configuration
-from ..webtools import BasePage, HtmlPage, RssPage, Url
+from ..webtools import HtmlPage, RssPage, Url, DomainAwarePage
 from ..apps import LinkDatabase
 from ..dateutils import DateUtils
 
@@ -181,14 +181,14 @@ class SourceDataController(SourceDataModel):
             return self.favicon
 
         # returning real favicon from HTML is too long
-        return BasePage(self.url).get_domain() + "/favicon.ico"
+        return DomainAwarePage(self.url).get_domain() + "/favicon.ico"
 
     def get_domain(self):
-        page = BasePage(self.url)
+        page = DomainAwarePage(self.url)
         return page.get_domain()
 
     def get_domain_only(self):
-        page = BasePage(self.url)
+        page = DomainAwarePage(self.url)
         return page.get_domain_only()
 
     def get_entry_url(self):
@@ -463,7 +463,7 @@ class SourceDataBuilder(object):
         if Configuration.get_object().config_entry.auto_store_domain_info:
             from .entries import LinkDataBuilder
 
-            p = BasePage(self.link_data["url"])
+            p = DomainAwarePage(self.link_data["url"])
             LinkDataBuilder(link=p.get_domain())
 
     def add_to_download(self, source):

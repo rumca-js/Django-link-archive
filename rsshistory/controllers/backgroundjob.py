@@ -12,7 +12,7 @@ from ..models import (
     BackgroundJob,
     AppLogging,
 )
-from ..webtools import HtmlPage
+from ..webtools import HtmlPage, DomainAwarePage
 from ..dateutils import DateUtils
 
 
@@ -156,7 +156,7 @@ class BackgroundJobController(BackgroundJob):
         if not url.lower().startswith("http"):
             url = "https://" + url
 
-        h = HtmlPage(url)
+        h = DomainAwarePage(url)
         if h.is_analytics():
             return
 

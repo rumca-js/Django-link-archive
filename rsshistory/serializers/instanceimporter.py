@@ -330,10 +330,10 @@ class InstanceImporter(BaseImporter):
         self.url = url
 
     def import_all(self):
-        from ..webtools import BasePage
+        from ..pluginurl import UrlHandler
 
-        p = BasePage(self.url)
-        instance_text = p.get_contents()
+        u = UrlHandler(self.url)
+        instance_text = u.get_contents()
         if not instance_text:
             return
 

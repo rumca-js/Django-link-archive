@@ -13,11 +13,11 @@ from ..controllers import (
 )
 from ..views import ViewPage
 from ..forms import DataExportForm
+from ..webtools import DomainAwarePage
 
 
 def import_reading_list_view(request):
     from ..serializers import ReadingListFile
-    from ..webtools import BasePage
 
     page = ViewPage(request)
     page.set_title("Import view")
@@ -46,7 +46,7 @@ def import_reading_list_view(request):
                 )
                 continue
             else:
-                p = BasePage(entry["url"])
+                p = DomainAwarePage(entry["url"])
                 if not p.get_domain():
                     summary_text += (
                         entry["title"]

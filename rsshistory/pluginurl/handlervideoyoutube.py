@@ -1,16 +1,16 @@
 from urllib.parse import urlparse
 from urllib.parse import parse_qs
 
-from ..webtools import HtmlPage, ContentInterface
+from ..webtools import HtmlPage, ContentInterface, PageResponseObject
 from ..apps import LinkDatabase
 
 from .defaulturlhandler import DefaultUrlHandler
 
 
 class YouTubeVideoHandler(DefaultUrlHandler):
-    def __init__(self, url=None, contents=None, page_object=None, options=None):
+    def __init__(self, url=None, contents=None):
         super().__init__(
-            url, contents=contents, page_object=page_object, options=options
+            url, contents=contents
         )
 
         self.url = YouTubeVideoHandler.input2url(url)
@@ -73,7 +73,7 @@ class YouTubeVideoHandler(DefaultUrlHandler):
 
 class YouTubeHtmlHandler(HtmlPage, YouTubeVideoHandler):
     def __init__(self, url):
-        self.url = url
+        self.url = YouTubeVideoHandler.input2url(url)
 
     def is_valid(self):
         """
@@ -118,7 +118,7 @@ class YouTubeJsonHandler(YouTubeVideoHandler):
         """
         TODO We should , most probably call the parnet constructor
         """
-        self.url = url
+        self.url = YouTubeVideoHandler.input2url(url)
 
         self.yt_text = None
         self.yt_ob = None
@@ -128,33 +128,37 @@ class YouTubeJsonHandler(YouTubeVideoHandler):
 
         self.return_dislike = False
 
-        self.contents = None
         self.dead = False
-        self.encoding = "utf-8"
-        self.status_code = 0
+        self.response = None
 
     def get_contents(self):
+        if self.response and self.response.content:
+            return self.response.content
+
         if self.dead:
             return
 
-        if self.contents:
-            return self.contents
-
         LinkDatabase.info("YouTube video Handler. Requesting: {}".format(self.url))
+
+        response = PageResponseObject(self.url, "", PageResponseObject.STATUS_CODE_ERROR)
 
         status = False
         if self.download_details():
             if self.load_details():
+                response.content = self.yt_text
+                response.encoding = "utf-8"
+                response.status_code = PageResponseObject.STATUS_CODE_OK
+                response.url = self.get_link_classic()
+
                 status = True
-                self.status_code = 200
-                self.contents = self.yt_text
                 LinkDatabase.info("YouTube video handler: {} DONE".format(self.url))
 
-                return self.contents
+        self.response = response
 
-        self.status_code = 500
-        if not status:
+        if not self.response or self.response.status_code == PageResponseObject.STATUS_CODE_ERROR:
             self.dead = True
+
+        return self.response.content
 
     def is_valid(self):
         if self.get_contents():

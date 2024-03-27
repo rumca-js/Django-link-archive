@@ -20,7 +20,7 @@ from ..models import (
 )
 from .sources import SourceDataController
 from ..configuration import Configuration
-from ..webtools import BasePage, HtmlPage, RssPage, ContentLinkParser
+from ..webtools import BasePage, HtmlPage, RssPage, ContentLinkParser, DomainAwarePage
 from ..apps import LinkDatabase
 from ..dateutils import DateUtils
 
@@ -628,7 +628,7 @@ class LinkDataBuilder(object):
 
         self.link = UrlHandler.get_cleaned_link(self.link)
 
-        p = HtmlPage(self.link)
+        p = DomainAwarePage(self.link)
         if p.is_link_service():
             return self.add_from_link_service()
         else:
@@ -752,7 +752,7 @@ class LinkDataBuilder(object):
 
     def is_domain_link_data(self):
         link_data = self.link_data
-        p = BasePage(link_data["link"])
+        p = DomainAwarePage(link_data["link"])
         return p.get_domain() == link_data["link"]
 
     def add_entry_internal(self):
@@ -811,7 +811,7 @@ class LinkDataBuilder(object):
 
         config = Configuration.get_object().config_entry
 
-        p = BasePage(self.link_data["link"])
+        p = DomainAwarePage(self.link_data["link"])
         is_domain = p.is_domain()
 
         if not config.auto_store_entries:
@@ -823,7 +823,7 @@ class LinkDataBuilder(object):
                 return False
 
         # we do not store link services, we can store only what is behind those links
-        p = HtmlPage(self.link_data["link"])
+        p = DomainAwarePage(self.link_data["link"])
         if p.is_link_service():
             return False
 
@@ -882,7 +882,7 @@ class LinkDataBuilder(object):
             links = set()
 
             if config.auto_store_domain_info:
-                p = BasePage(link_data["link"])
+                p = DomainAwarePage(link_data["link"])
                 domain = p.get_domain()
                 links.add(domain)
 
@@ -941,5 +941,5 @@ class LinkDataBuilder(object):
     def read_domains_from_bookmarks():
         objs = LinkDataController.objects.filter(bookmarked=True)
         for obj in objs:
-            p = BasePage(obj.link)
+            p = DomainAwarePage(obj.link)
             LinkDataBuilder(link=p.get_domain())

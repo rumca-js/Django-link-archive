@@ -1,58 +1,80 @@
-from ..webtools import HtmlPage
+from ..webtools import HtmlPage, BasePage, calculate_hash
 
-from .fakeinternet import FakeInternetTestCase
+from .fakeinternet import FakeInternetTestCase, MockRequestCounter
 
 webpage_no_lang = """<html>
+    <body>
+    </body>
 </html>
 """
 
 webpage_lang_not_default = """<html lang="it">
+    <body>
+    </body>
 </html>
 """
 
 webpage_no_title = """<html>
+    <body>
+    </body>
 </html>
 """
 
 webpage_title_lower = """<html>
  <title>This is a lower case title</title>
+    <body>
+    </body>
 </html>
 """
 
 webpage_title_upper = """<html>
  <TITLE>This is a upper case title</TITLE>
+    <body>
+    </body>
 </html>
 """
 
 webpage_title_head = """<html>
  <title>selected title</title>
+    <body>
+    </body>
 </html>
 """
 
 webpage_title_meta = """<html>
  <meta name="title" content="selected meta title" />
+    <body>
+    </body>
 </html>
 """
 
 webpage_title_meta_og = """<html>
  <TITLE>selected meta title</TITLE>
  <meta property="og:title" content="selected og:title" />
+    <body>
+    </body>
 </html>
 """
 
 webpage_description_head = """<html>
  <description>selected description</description>
+    <body>
+    </body>
 </html>
 """
 
 webpage_description_meta = """<html>
  <meta name="description" content="selected meta description"/>
+    <body>
+    </body>
 </html>
 """
 
 webpage_description_meta_og = """<html>
  <description>selected meta description</description>
  <meta property="og:description" content="selected og:description" />
+    <body>
+    </body>
 </html>
 """
 
@@ -60,6 +82,8 @@ webpage_meta_article_date = """<html>
  <description>selected meta description</description>
  <meta property="og:description" content="selected og:description" />
  <meta property="article:published_time" content="2024-01-09T21:26:00Z" />
+    <body>
+    </body>
 </html>
 """
 
@@ -67,6 +91,8 @@ webpage_meta_music_release_date = """<html>
  <description>selected meta description</description>
  <meta property="og:description" content="selected og:description" />
  <meta name="music:release_date" content="2024-01-09T21:26:00Z"/>
+    <body>
+    </body>
 </html>
 """
 
@@ -76,12 +102,15 @@ webpage_meta_youtube_publish_date = """<html>
  <meta itemprop="datePublished" content="2024-01-11T09:00:07-00:00">
  <meta itemprop="uploadDate" content="2024-01-11T09:00:07-00:00">
  <meta itemprop="genre" content="Science &amp; Technology">
+    <body>
+    </body>
 </html>
 """
 
 
 webpage_links = """<html>
  <TITLE>This is a upper case title</TITLE>
+    <body>
  <a custom-peroperty="custom-property-value" href="http://otherpage1.net" class="class">
    <picture></picture>
    </a>
@@ -106,6 +135,7 @@ webpage_links = """<html>
  <a custom-peroperty="custom-property-value" href="//test6.domain.com/" class="class">
    <picture></picture>
    </a>
+    </body>
 </html>
 """
 
@@ -145,68 +175,134 @@ webpage_html_encoded_links = """<html>
  </body>
 """
 
+webpage_html_meta_charset = """<html>
+ <head>
+   <link rel="shortcut icon" href="https://www.youtube.com/s/desktop/e4d15d2c/img/favicon.ico" type="image/x-icon"><link rel="icon" href="https://www.youtube.com/s/desktop/e4d15d2c/img/favicon_32x32.png" sizes="32x32"><link rel="icon" href="https://www.youtube.com/s/desktop/e4d15d2c/img/favicon_48x48.png" sizes="48x48"><link rel="icon" href="https://www.youtube.com/s/desktop/e4d15d2c/img/favicon_96x96.png" sizes="96x96"><link rel="icon" href="https://www.youtube.com/s/desktop/e4d15d2c/img/favicon_144x144.png" sizes="144x144">
+   <title>YouTube</title>
+   <meta charset="shift_jis" />
+ </head>
+ <body>
+     test
+ </body>
+"""
+webpage_html_meta_http_equiv_charset = """<html>
+ <head>
+   <link rel="shortcut icon" href="https://www.youtube.com/s/desktop/e4d15d2c/img/favicon.ico" type="image/x-icon"><link rel="icon" href="https://www.youtube.com/s/desktop/e4d15d2c/img/favicon_32x32.png" sizes="32x32"><link rel="icon" href="https://www.youtube.com/s/desktop/e4d15d2c/img/favicon_48x48.png" sizes="48x48"><link rel="icon" href="https://www.youtube.com/s/desktop/e4d15d2c/img/favicon_96x96.png" sizes="96x96"><link rel="icon" href="https://www.youtube.com/s/desktop/e4d15d2c/img/favicon_144x144.png" sizes="144x144">
+   <title>YouTube</title>
+   <meta http-equiv="Content-Type" content = "text/html; charset=shift_jis" />
+ </head>
+ <body>
+     test
+ </body>
+"""
+
 
 class HtmlPageTest(FakeInternetTestCase):
     def test_default_language(self):
+        MockRequestCounter.mock_page_requests = 0
+
         # default language
-        p = HtmlPage("http://test.com/my-site-test", webpage_no_lang)
+        p = HtmlPage("https://linkedin.com/test", webpage_no_lang)
         self.assertEqual(p.get_language(), "")
-        self.assertTrue(p.is_html())
+        self.assertTrue(p.is_valid())
+
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
     def test_language_it(self):
+        MockRequestCounter.mock_page_requests = 0
+
         # default language
-        p = HtmlPage("http://test.com/my-site-test", webpage_lang_not_default)
+        p = HtmlPage("https://linkedin.com/test", webpage_lang_not_default)
         self.assertEqual(p.get_language(), "it")
 
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
+
     def test_no_title(self):
+        MockRequestCounter.mock_page_requests = 0
+
         # default language
-        p = HtmlPage("http://test.com/my-site-test", webpage_no_title)
+        p = HtmlPage("https://linkedin.com/test", webpage_no_title)
 
         # when page has no title, URL is chosen for the title
         self.assertEqual(p.get_title(), None)
 
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
+
     def test_title_lowercase(self):
+        MockRequestCounter.mock_page_requests = 0
+
         # default language
-        p = HtmlPage("http://test.com/my-site-test", webpage_title_lower)
+        p = HtmlPage("https://linkedin.com/test", webpage_title_lower)
         self.assertEqual(p.get_title(), "This is a lower case title")
 
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
+
     def test_title_uppercase(self):
+        MockRequestCounter.mock_page_requests = 0
+
         # default language
-        p = HtmlPage("http://test.com/my-site-test", webpage_title_upper)
+        p = HtmlPage("https://linkedin.com/test", webpage_title_upper)
         self.assertEqual(p.get_title(), "This is a upper case title")
 
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
+
     def test_title_head(self):
+        MockRequestCounter.mock_page_requests = 0
+
         # default language
-        p = HtmlPage("http://test.com/my-site-test", webpage_title_head)
+        p = HtmlPage("https://linkedin.com/test", webpage_title_head)
         self.assertEqual(p.get_title(), "selected title")
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
     def test_title_meta(self):
+        MockRequestCounter.mock_page_requests = 0
+
         # default language
-        p = HtmlPage("http://test.com/my-site-test", webpage_title_meta)
+        p = HtmlPage("https://linkedin.com/test", webpage_title_meta)
         self.assertEqual(p.get_title(), "selected meta title")
 
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
+
     def test_title_meta_og(self):
+        MockRequestCounter.mock_page_requests = 0
+
         # default language
-        p = HtmlPage("http://test.com/my-site-test", webpage_title_meta_og)
+        p = HtmlPage("https://linkedin.com/test", webpage_title_meta_og)
         self.assertEqual(p.get_title(), "selected og:title")
 
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
+
     def test_description_head(self):
+        MockRequestCounter.mock_page_requests = 0
+
         # default language
-        p = HtmlPage("http://test.com/my-site-test", webpage_description_head)
+        p = HtmlPage("https://linkedin.com/test", webpage_description_head)
         self.assertEqual(p.get_description(), "selected description")
 
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
+
     def test_description_meta(self):
+        MockRequestCounter.mock_page_requests = 0
+
         # default language
-        p = HtmlPage("http://test.com/my-site-test", webpage_description_meta)
+        p = HtmlPage("https://linkedin.com/test", webpage_description_meta)
         self.assertEqual(p.get_description(), "selected meta description")
 
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
+
     def test_description_meta_og(self):
+        MockRequestCounter.mock_page_requests = 0
+
         # default language
-        p = HtmlPage("http://test.com/my-site-test", webpage_description_meta_og)
+        p = HtmlPage("https://linkedin.com/test", webpage_description_meta_og)
         self.assertEqual(p.get_description(), "selected og:description")
 
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
+
     def test_get_links(self):
-        p = HtmlPage("http://mytestpage.com/?argument=value", webpage_links)
+        MockRequestCounter.mock_page_requests = 0
+
+        p = HtmlPage("http://mytestpage.com/test", webpage_links)
 
         links = p.get_links()
 
@@ -220,9 +316,13 @@ class HtmlPageTest(FakeInternetTestCase):
         self.assertTrue("http://mytestpage.com/test/test4.js" not in links)
         self.assertTrue("http://mytestpage.com/test/test5/" in links)
         self.assertTrue("https://test6.domain.com/" in links)
+
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
     def test_get_links_nodomain(self):
-        p = HtmlPage("http://mytestpage.com/nodomain/", webpage_links)
+        MockRequestCounter.mock_page_requests = 0
+
+        p = HtmlPage("http://mytestpage.com/test", webpage_links)
 
         links = p.get_links()
 
@@ -237,15 +337,23 @@ class HtmlPageTest(FakeInternetTestCase):
         self.assertTrue("http://mytestpage.com/test/test5/" in links)
         self.assertTrue("https://test6.domain.com/" in links)
 
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
+
     def test_get_rss_url(self):
-        p = HtmlPage("http://mytestpage.com/nodomain/", webpage_rss_links)
+        MockRequestCounter.mock_page_requests = 0
+
+        p = HtmlPage("https://linkedin.com/test", webpage_rss_links)
 
         rss_url = p.get_rss_url()
 
         self.assertEqual("http://your-site.com/your-feed1.rss", rss_url)
 
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
+
     def test_get_rss_urls(self):
-        p = HtmlPage("http://mytestpage.com/nodomain/", webpage_rss_links)
+        MockRequestCounter.mock_page_requests = 0
+
+        p = HtmlPage("https://linkedin.com/test", webpage_rss_links)
 
         all_rss = p.get_rss_urls()
 
@@ -253,8 +361,12 @@ class HtmlPageTest(FakeInternetTestCase):
         self.assertTrue("http://your-site.com/your-feed2.rss" in all_rss)
         self.assertTrue("http://your-site.com/your-feed3.rss" in all_rss)
 
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
+
     def test_get_favicons(self):
-        p = HtmlPage("http://mytestpage.com/nodomain/", webpage_html_favicon)
+        MockRequestCounter.mock_page_requests = 0
+
+        p = HtmlPage("https://linkedin.com/test", webpage_html_favicon)
 
         all_favicons = p.get_favicons()
 
@@ -278,10 +390,13 @@ class HtmlPageTest(FakeInternetTestCase):
             all_favicons[4][0],
             "https://www.youtube.com/s/desktop/e4d15d2c/img/favicon_144x144.png",
         )
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
     def test_get_date_published_article_date(self):
+        MockRequestCounter.mock_page_requests = 0
+
         p = HtmlPage(
-            "https://www.wsj.com/world/middle-east/israel-war-gaza-hamas-perilous-phase-1ed3ea9b?mod=hp_lead_pos7",
+                "https://linkedin.com/test",
             webpage_meta_article_date,
         )
 
@@ -289,9 +404,13 @@ class HtmlPageTest(FakeInternetTestCase):
         self.assertTrue(date)
         self.assertEqual(date.isoformat(), "2024-01-09T21:26:00+00:00")
 
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
+
     def test_get_date_published_music_date(self):
+        MockRequestCounter.mock_page_requests = 0
+
         p = HtmlPage(
-            "https://www.wsj.com/world/middle-east/israel-war-gaza-hamas-perilous-phase-1ed3ea9b?mod=hp_lead_pos7",
+                "https://linkedin.com/test",
             webpage_meta_music_release_date,
         )
 
@@ -299,9 +418,13 @@ class HtmlPageTest(FakeInternetTestCase):
         self.assertTrue(date)
         self.assertEqual(date.isoformat(), "2024-01-09T21:26:00+00:00")
 
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
+
     def test_get_date_published_youtube(self):
+        MockRequestCounter.mock_page_requests = 0
+
         p = HtmlPage(
-            "https://www.wsj.com/world/middle-east/israel-war-gaza-hamas-perilous-phase-1ed3ea9b?mod=hp_lead_pos7",
+                "https://linkedin.com/test",
             webpage_meta_youtube_publish_date,
         )
 
@@ -309,19 +432,45 @@ class HtmlPageTest(FakeInternetTestCase):
         self.assertTrue(date)
         self.assertEqual(date.isoformat(), "2024-01-11T09:00:07+00:00")
 
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
+
     def test_get_body_hash(self):
-        reader = HtmlPage("https://linkedin.com")
+        MockRequestCounter.mock_page_requests = 0
+
+        reader = HtmlPage("https://linkedin.com/test", webpage_meta_youtube_publish_date)
         hash = reader.get_body_hash()
         bodytext = str(reader.get_body_text())
 
         self.assertTrue(bodytext)
         self.assertTrue(bodytext != "")
 
-        self.assertEqual(hash, reader.calculate_hash(bodytext))
+        self.assertEqual(hash, calculate_hash(bodytext))
+
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
     def test_get_links_encoded(self):
-        reader = HtmlPage("https://linkedin.com", webpage_html_encoded_links)
+        MockRequestCounter.mock_page_requests = 0
+
+        reader = HtmlPage("https://linkedin.com/test", webpage_html_encoded_links)
         links = sorted(list(reader.get_links()))
 
         self.assertEqual(links[0], "http://github-help-wanted.com")
         self.assertEqual(links[1], "https://github.com/pyFFTW/pyFFTW")
+
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
+
+    def test_get_meta_charset(self):
+        MockRequestCounter.mock_page_requests = 0
+
+        reader = HtmlPage("https://linkedin.com/test", webpage_html_meta_charset)
+        self.assertEqual(reader.get_charset(), "shift_jis")
+
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
+
+    def test_get_meta_http_equiv_charset(self):
+        MockRequestCounter.mock_page_requests = 0
+
+        reader = HtmlPage("https://linkedin.com/test", webpage_html_meta_http_equiv_charset)
+        self.assertEqual(reader.get_charset(), "shift_jis")
+
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)

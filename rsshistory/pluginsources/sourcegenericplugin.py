@@ -2,15 +2,17 @@ import traceback
 import hashlib
 
 from ..models import AppLogging
-from ..webtools import HtmlPage, PageOptions
+from ..webtools import HtmlPage, PageOptions, ContentLinkParser
 from ..dateutils import DateUtils
 from ..controllers import LinkDataBuilder, SourceDataController
+from ..controllers import LinkDataController
+from ..configuration import Configuration
 from ..models import BaseLinkDataController
 from ..apps import LinkDatabase
 from ..pluginurl.urlhandler import UrlHandler
 
 
-class SourceGenericPlugin(HtmlPage):
+class SourceGenericPlugin(object):
     """
     Class names schemes:
      - those that are ancestors, and generic use "Base" class prefix
@@ -21,12 +23,13 @@ class SourceGenericPlugin(HtmlPage):
     def __init__(self, source_id, options=None):
         self.source_id = source_id
         self.source = None
+        self.contents = None
+        self.response = None
+        self.dead = False
 
         source = self.get_source()
         if source:
             options = UrlHandler.get_url_options(source.url)
-
-        super().__init__(self.get_address(), options=options)
 
         self.hash = None
 
@@ -165,37 +168,23 @@ class SourceGenericPlugin(HtmlPage):
         if self.dead:
             return
 
-        contents = super().get_contents()
+        handler = UrlHandler(self.get_address())
+        contents = handler.p.get_contents()
+        self.response = handler.response
+        status_code = None
+        if self.response:
+            status_code = self.response.status_code
 
         source = self.get_source()
 
-        fast_check = False
-
-        if self.is_cloudflare_protected() or not contents:
-            LinkDatabase.info(
-                "Source:{} Title:{}; Feed is protected by Cloudflare".format(
-                    source.url, source.title, self.status_code, contents
+        if not contents:
+            AppLogging.error(
+                "Source:{} Title:{}; Could not obtain contents.\nStatus code:{}\nContents\n{}".format(
+                    source.url, source.title, status_code, contents
                 )
             )
-
-            if self.options.is_selenium():
-                self.dead = True
-                return
-
-            # goes over cloudflare
-            self.reader = UrlHandler.get(
-                self.get_address(), use_selenium=True, fast_check=fast_check
-            )
-            contents = self.reader.get_contents()
-
-            if not contents:
-                AppLogging.error(
-                    "Source:{} Title:{}; Could not obtain contents.\nStatus code:{}\nContents\n{}".format(
-                        source.url, source.title, self.reader.status_code, contents
-                    )
-                )
-                self.dead = True
-                return None
+            self.dead = True
+            return None
 
         self.contents = contents
 
@@ -219,7 +208,6 @@ class SourceGenericPlugin(HtmlPage):
 
     def is_link_ok_to_add(self, props):
         try:
-            from ..controllers import LinkDataController
 
             is_archive = BaseLinkDataController.is_archive_by_date(
                 props["date_published"]
@@ -270,3 +258,38 @@ class SourceGenericPlugin(HtmlPage):
                 )
 
             return None
+
+    def get_links(self):
+        """
+        Helper function that returns all links found in the source address
+        """
+        result = []
+
+        c = Configuration.get_object().config_entry
+        if not c.auto_store_entries and c.auto_store_domain_info:
+            result = self.get_domains()
+        elif c.auto_store_entries:
+            address = self.get_address()
+
+            u = UrlHandler(address)
+            contents = u.get_contents()
+
+            parser = ContentLinkParser(address, contents)
+
+            result = parser.get_links()
+
+        return result
+
+    def get_domains(self):
+        """
+        Helper function that returns all domains found in the source address
+        """
+        address = self.get_address()
+
+        u = UrlHandler(address)
+        contents = u.get_contents()
+
+        parser = ContentLinkParser(address, contents)
+
+        result = parser.get_domains()
+        return result
