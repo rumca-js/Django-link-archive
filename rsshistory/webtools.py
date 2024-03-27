@@ -91,6 +91,7 @@ def date_str_to_date(date_str):
                 "Could not parse music:release_date {} Exc:{}".format(date_str, str(E))
             )
 
+
 def calculate_hash(text):
     try:
         return hashlib.md5(text.encode("utf-8")).digest()
@@ -385,8 +386,6 @@ class DomainAwarePage(object):
         return True
 
 
-
-
 class ContentInterface(object):
     def __init__(self, url, contents):
         self.url = url
@@ -675,10 +674,7 @@ class ContentInterface(object):
 
 class DefaultContentPage(ContentInterface):
     def __init__(self, url, contents):
-        super().__init__(
-            url = url,
-            contents=contents
-        )
+        super().__init__(url=url, contents=contents)
 
     def get_title(self):
         return None
@@ -713,10 +709,7 @@ class DefaultContentPage(ContentInterface):
 
 class JsonPage(ContentInterface):
     def __init__(self, url, contents):
-        super().__init__(
-                url = url,
-            contents=contents
-        )
+        super().__init__(url=url, contents=contents)
 
         self.json_obj = None
         try:
@@ -836,16 +829,19 @@ class RssPageEntry(ContentInterface):
         from .dateutils import DateUtils
 
         if hasattr(self.feed_entry, "published"):
-            try:
-                dt = parser.parse(self.feed_entry.published)
-                return DateUtils.to_utc_date(dt)
+            if str(self.feed_entry.published) == "":
+                return DateUtils.get_datetime_now_utc()
+            else:
+                try:
+                    dt = parser.parse(self.feed_entry.published)
+                    return DateUtils.to_utc_date(dt)
 
-            except Exception as e:
-                AppLogging.error(
+                except Exception as e:
+                    AppLogging.error(
                         "Rss parser datetime invalid feed datetime:{};\nFeed DateTime:{};\nExc:{}\n".format(
-                        self.feed_entry.published, self.feed_entry.published, str(e)
+                            self.feed_entry.published, self.feed_entry.published, str(e)
+                        )
                     )
-                )
                 return DateUtils.get_datetime_now_utc()
 
         elif self.allow_adding_with_current_time:
@@ -878,10 +874,7 @@ class RssPage(ContentInterface):
     def __init__(self, url, contents):
         self.feed = None
 
-        super().__init__(
-            url=url,
-            contents=contents
-        )
+        super().__init__(url=url, contents=contents)
 
         if self.contents and not self.feed:
             self.process_contents()
@@ -1103,10 +1096,7 @@ class ContentLinkParser(ContentInterface):
     """
 
     def __init__(self, url, contents):
-        super().__init__(
-            url = url,
-            contents=contents
-        )
+        super().__init__(url=url, contents=contents)
         self.url = DomainAwarePage(url).get_clean_url()
 
     def get_links(self):
@@ -1245,7 +1235,9 @@ class ContentLinkParser(ContentInterface):
     def get_links_inner(self):
         links = self.get_links()
         links = ContentLinkParser.filter_link_html(links)
-        return ContentLinkParser.filter_link_in_domain(links, DomainAwarePage(self.url).get_domain())
+        return ContentLinkParser.filter_link_in_domain(
+            links, DomainAwarePage(self.url).get_domain()
+        )
 
     def get_links_outer(self):
         links = self.get_links()
@@ -1270,10 +1262,7 @@ class HtmlPage(ContentInterface):
     """
 
     def __init__(self, url, contents):
-        super().__init__(
-            url=url,
-            contents=contents
-        )
+        super().__init__(url=url, contents=contents)
 
         if self.contents:
             self.soup = BeautifulSoup(self.contents, "html.parser")
@@ -1437,12 +1426,12 @@ class HtmlPage(ContentInterface):
                 if attr.lower() == "charset":
                     return meta.attrs[attr]
                 if attr.lower() == "http-equiv":
-                    text = meta.attrs['content'].lower()
+                    text = meta.attrs["content"].lower()
                     wh = text.find("charset")
                     if wh >= 0:
                         wh2 = text.find("=", wh)
                         if wh2 >= 0:
-                            charset = text[wh2+1:].strip()
+                            charset = text[wh2 + 1 :].strip()
                             return charset
 
     def get_author(self):
@@ -1581,9 +1570,9 @@ class HtmlPage(ContentInterface):
         # props["is_html"] = self.is_html()
         props["charset"] = self.get_charset()
         props["rss_urls"] = self.get_rss_urls()
-        #props["status_code"] = self.status_code
+        # props["status_code"] = self.status_code
 
-        #if DomainAwarePage(self.url).is_domain():
+        # if DomainAwarePage(self.url).is_domain():
         #    if self.is_robots_txt():
         #        props["robots_txt_url"] = DomainAwarePage(self.url).get_robots_txt_url()
         #        props["site_maps_urls"] = self.get_site_maps()
@@ -1608,12 +1597,12 @@ class HtmlPage(ContentInterface):
         image_og = self.get_og_image()
         language = self.get_language()
 
-        rating.append( self.get_page_rating_title(title_meta))
-        rating.append( self.get_page_rating_title(title_og))
-        rating.append( self.get_page_rating_description(description_meta))
-        rating.append( self.get_page_rating_description(description_og))
-        rating.append( self.get_page_rating_language(language))
-        #rating.append(self.get_page_rating_status_code(self.response.status_code))
+        rating.append(self.get_page_rating_title(title_meta))
+        rating.append(self.get_page_rating_title(title_og))
+        rating.append(self.get_page_rating_description(description_meta))
+        rating.append(self.get_page_rating_description(description_og))
+        rating.append(self.get_page_rating_language(language))
+        # rating.append(self.get_page_rating_status_code(self.response.status_code))
 
         if self.get_author() != None:
             rating.append([1, 1])
@@ -1783,7 +1772,6 @@ class PageResponseObject(object):
 
 
 class PageOptions(object):
-
     def __init__(self):
         self.use_selenium_full = False
         self.use_selenium_headless = False
@@ -1805,8 +1793,6 @@ class PageOptions(object):
             self.ssl_verify,
             self.link_redirect,
         )
-
-
 
 
 class BasePage(object):
@@ -1943,7 +1929,9 @@ class BasePage(object):
                 "Page: Requesting page: {} options:{}".format(self.url, self.options)
             )
 
-            self.response = self.get_contents_function(self.url, headers=hdr, timeout=10)
+            self.response = self.get_contents_function(
+                self.url, headers=hdr, timeout=10
+            )
 
             LinkDatabase.info(
                 "Page: Requesting page: {} DONE".format(self.url, self.options)
@@ -2002,9 +1990,15 @@ class BasePage(object):
         """
 
         # There might be several encoding texts, if so we do not know which one to use
-        if request_result.text.count("encoding") == 1 and request_result.text.find('encoding="UTF-8"') >= 0:
+        if (
+            request_result.text.count("encoding") == 1
+            and request_result.text.find('encoding="UTF-8"') >= 0
+        ):
             request_result.encoding = "utf-8"
-        elif request_result.text.count("charset") == 1 and request_result.text.find('charset="UTF-8"') >= 0:
+        elif (
+            request_result.text.count("charset") == 1
+            and request_result.text.find('charset="UTF-8"') >= 0
+        ):
             request_result.encoding = "utf-8"
         else:
             set_encoding = False
@@ -2018,7 +2012,12 @@ class BasePage(object):
             if not set_encoding:
                 request_result.encoding = request_result.apparent_encoding
 
-        response = PageResponseObject(url, request_result.text, request_result.status_code, request_result.encoding)
+        response = PageResponseObject(
+            url,
+            request_result.text,
+            request_result.status_code,
+            request_result.encoding,
+        )
         return response
 
     def get_contents_via_selenium_chrome_headless(self, url, headers, timeout):
@@ -2170,16 +2169,16 @@ class BasePage(object):
             return self.response_headers.headers["Location"]
 
 
-
-
 class Url(ContentInterface):
     def __init__(self, url=None, page_object=None, page_options=None):
-        self.url=url
+        self.url = url
         self.response = None
         if page_object:
             self.url = page_object.url
 
-        self.p = self.get_handler(url, page_object=page_object, page_options=page_options)
+        self.p = self.get_handler(
+            url, page_object=page_object, page_options=page_options
+        )
 
     def get_handler(self, url=None, page_object=None, page_options=None):
         if url is None:
@@ -2187,7 +2186,7 @@ class Url(ContentInterface):
 
         p = BasePage(url=url, options=page_options, page_object=page_object)
         self.response = p.get_response()
-        self.options=p.options
+        self.options = p.options
         contents = p.get_contents()
 
         if not p.is_valid():

@@ -214,12 +214,12 @@ class UrlHandler(Url):
 
         url = Url.get_cleaned_link(url)
 
-        stupid_google_string = "https://www.google.com/url?q="
+        stupid_google_string = "https://www.google.com/url"
         if url.find(stupid_google_string) >= 0:
             wh = url.find("http", len(stupid_google_string))
             if wh >= 0:
                 url = url[wh:]
-                wh = url.find("&sa=U")
+                wh = url.find("&")
                 if wh >= 0:
                     url = url[:wh]
                     url = Url.get_cleaned_link(url)

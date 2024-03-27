@@ -130,7 +130,10 @@ class BasePageTest(FakeInternetTestCase):
         self.disable_web_pages()
 
     def test_calculate_hash(self):
-        self.assertEqual(BasePage.calculate_hash(webpage_links), hashlib.md5(text.encode("utf-8")).digest())
+        self.assertEqual(
+            BasePage.calculate_hash(webpage_links),
+            hashlib.md5(text.encode("utf-8")).digest(),
+        )
 
     def test_calculate_hash(self):
         self.assertEqual(

@@ -189,4 +189,3 @@ class OmniSearchProcessorTest(FakeInternetTestCase):
 
         # 1 | 5 == 1
         self.assertEqual(value, 5)
-

@@ -14,7 +14,9 @@ class ViewsTest(FakeInternetTestCase):
         self.disable_web_pages()
 
         self.user = User.objects.create_user(
-            username="testuser", password="testpassword", is_staff=True,
+            username="testuser",
+            password="testpassword",
+            is_staff=True,
         )
         self.client.login(username="testuser", password="testpassword")
 
@@ -296,11 +298,9 @@ class ViewsTest(FakeInternetTestCase):
 
     def test_page_show_props_html_post(self):
         MockRequestCounter.mock_page_requests = 0
-        url = (
-            reverse("{}:page-show-props".format(LinkDatabase.name))
-        )
+        url = reverse("{}:page-show-props".format(LinkDatabase.name))
 
-        data = {"link":"https://www.linkedin.com"}
+        data = {"link": "https://www.linkedin.com"}
         response = self.client.post(url, data=data)
 
         # print(response.content.decode('utf-8'))
@@ -500,7 +500,9 @@ class EnhancedViewTest(ViewsTest):
         )
 
         self.user = User.objects.create_user(
-            username="testuser", password="testpassword", is_staff=True,
+            username="testuser",
+            password="testpassword",
+            is_staff=True,
         )
         self.client.login(username="testuser", password="testpassword")
 

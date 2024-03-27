@@ -105,12 +105,12 @@ class SourceDetailView(generic.DetailView):
         handler = UrlHandler(self.object.url)
         context["page_object"] = handler
 
-        entries = LinkDataController.objects.filter(link = self.object.url)
+        entries = LinkDataController.objects.filter(link=self.object.url)
         if entries.count() > 0:
             context["entry_object"] = entries[0]
         else:
             AppLogging.error("Missing source entry {}".format(self.object.url))
-            builder = LinkDataBuilder(link = self.object.url)
+            builder = LinkDataBuilder(link=self.object.url)
             if builder.result:
                 entry = builder.result
                 if entry.is_archive_entry():
@@ -121,7 +121,7 @@ class SourceDetailView(generic.DetailView):
 
                 context["entry_object"] = entry
 
-        ViewPage.fill_context_type(context, handler = handler)
+        ViewPage.fill_context_type(context, handler=handler)
 
         context["handler"] = SourceControllerBuilder.get(self.object.url)
 

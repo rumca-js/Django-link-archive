@@ -11,7 +11,7 @@ class SourceUrlInterface(object):
     Provides interface between Source and URL Properties
     """
 
-    def __init__(self, url, fast_check = True, use_selenium= False):
+    def __init__(self, url, fast_check=True, use_selenium=False):
         self.url = url
 
         if self.url.endswith("/"):
@@ -21,7 +21,7 @@ class SourceUrlInterface(object):
         options.fast_parsing = fast_check
         options.use_selenium_headless = use_selenium
 
-        self.h = UrlHandler(self.url, page_options = options)
+        self.h = UrlHandler(self.url, page_options=options)
         if self.h.response:
             self.url = self.h.response.url
 
@@ -41,7 +41,6 @@ class SourceUrlInterface(object):
         return props
 
     def get_props_internal(self, input_props=None):
-
         p = self.p
 
         if type(p) is RssPage or type(p) is UrlHandler.youtube_channel_handler:

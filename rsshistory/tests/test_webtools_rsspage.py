@@ -4,7 +4,11 @@ import hashlib
 from ..webtools import RssPage, BasePage, calculate_hash
 
 from .fakeinternet import FakeInternetTestCase, MockRequestCounter
-from .fakeinternetdata import webpage_no_pubdate_rss, webpage_old_pubdate_rss, webpage_samtime_youtube_rss
+from .fakeinternetdata import (
+    webpage_no_pubdate_rss,
+    webpage_old_pubdate_rss,
+    webpage_samtime_youtube_rss,
+)
 
 
 webpage_rss = """

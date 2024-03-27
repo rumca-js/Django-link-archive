@@ -14,7 +14,9 @@ class CommentsViewsTests(FakeInternetTestCase):
         self.disable_web_pages()
 
         self.user = User.objects.create_user(
-            username="testuser", password="testpassword", is_staff=True,
+            username="testuser",
+            password="testpassword",
+            is_staff=True,
         )
 
     def test_entry_comment_add(self):

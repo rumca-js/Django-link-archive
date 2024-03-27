@@ -9,9 +9,7 @@ from .defaulturlhandler import DefaultUrlHandler
 
 class YouTubeVideoHandler(DefaultUrlHandler):
     def __init__(self, url=None, contents=None):
-        super().__init__(
-            url, contents=contents
-        )
+        super().__init__(url, contents=contents)
 
         self.url = YouTubeVideoHandler.input2url(url)
 
@@ -140,7 +138,9 @@ class YouTubeJsonHandler(YouTubeVideoHandler):
 
         LinkDatabase.info("YouTube video Handler. Requesting: {}".format(self.url))
 
-        response = PageResponseObject(self.url, "", PageResponseObject.STATUS_CODE_ERROR)
+        response = PageResponseObject(
+            self.url, "", PageResponseObject.STATUS_CODE_ERROR
+        )
 
         status = False
         if self.download_details():
@@ -155,7 +155,10 @@ class YouTubeJsonHandler(YouTubeVideoHandler):
 
         self.response = response
 
-        if not self.response or self.response.status_code == PageResponseObject.STATUS_CODE_ERROR:
+        if (
+            not self.response
+            or self.response.status_code == PageResponseObject.STATUS_CODE_ERROR
+        ):
             self.dead = True
 
         return self.response.content

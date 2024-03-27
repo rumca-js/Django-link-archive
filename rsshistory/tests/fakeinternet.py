@@ -174,6 +174,7 @@ class TestResponseObject(object):
     """
     TODO maybe we should inherit from webtools/PageResponseObject?
     """
+
     def __init__(self, url, headers, timeout):
         self.status_code = 200
 

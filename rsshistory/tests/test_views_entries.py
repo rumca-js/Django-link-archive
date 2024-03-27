@@ -20,7 +20,9 @@ class EntriesViewsTests(FakeInternetTestCase):
         self.disable_web_pages()
 
         self.user = User.objects.create_user(
-            username="testuser", password="testpassword", is_staff=True,
+            username="testuser",
+            password="testpassword",
+            is_staff=True,
         )
 
     def get_link_data(self, test_link):
@@ -319,7 +321,6 @@ class EntriesViewsTests(FakeInternetTestCase):
         response = self.client.get(url)
 
     def test_entry_bookmark(self):
-
         test_link = "https://www.youtube.com/watch?v=123"
 
         entry = LinkDataController.objects.create(
@@ -344,19 +345,18 @@ class EntriesViewsTests(FakeInternetTestCase):
         entry.refresh_from_db()
 
         page_source = response.content.decode("utf-8")
-        #print("Contents: {}".format(page_source))
-        #print(response)
+        # print("Contents: {}".format(page_source))
+        # print(response)
 
         self.assertEqual(response.status_code, 302)
 
         self.assertTrue(entry.bookmarked)
         self.assertFalse(entry.permanent)
 
-        bookmarks = UserBookmarks.objects.filter(entry_object = entry)
+        bookmarks = UserBookmarks.objects.filter(entry_object=entry)
         self.assertEqual(bookmarks.count(), 1)
 
     def test_entry_notbookmark(self):
-
         test_link = "https://www.youtube.com/watch?v=123"
 
         entry = LinkDataController.objects.create(
@@ -371,7 +371,7 @@ class EntriesViewsTests(FakeInternetTestCase):
             language="en",
         )
 
-        UserBookmarks.objects.create(entry_object = entry, user_object=self.user)
+        UserBookmarks.objects.create(entry_object=entry, user_object=self.user)
 
         self.client.login(username="testuser", password="testpassword")
         url = reverse("{}:entry-notbookmark".format(LinkDatabase.name), args=[entry.id])
@@ -381,15 +381,15 @@ class EntriesViewsTests(FakeInternetTestCase):
 
         entry.refresh_from_db()
 
-        #page_source = response.content.decode("utf-8")
-        #print("Contents: {}".format(page_source))
+        # page_source = response.content.decode("utf-8")
+        # print("Contents: {}".format(page_source))
 
         self.assertEqual(response.status_code, 302)
 
         self.assertFalse(entry.bookmarked)
         self.assertFalse(entry.permanent)
 
-        bookmarks = UserBookmarks.objects.filter(entry_object = entry)
+        bookmarks = UserBookmarks.objects.filter(entry_object=entry)
         self.assertEqual(bookmarks.count(), 0)
 
     def test_entry_dead(self):
@@ -429,7 +429,7 @@ class EntriesViewsTests(FakeInternetTestCase):
             permanent=False,
             date_published=DateUtils.get_datetime_now_utc(),
             language="en",
-            manual_status_code = LinkDataController.STATUS_DEAD
+            manual_status_code=LinkDataController.STATUS_DEAD,
         )
 
         self.client.login(username="testuser", password="testpassword")

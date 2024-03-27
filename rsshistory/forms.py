@@ -54,6 +54,7 @@ class UserRequest(object):
         self.request = self.pop_data(args, kwargs, "request")
         if self.request:
             from .views import ViewPage
+
             self.is_mobile = ViewPage.is_mobile(self.request)
             self.user = self.request.user
 
@@ -262,6 +263,7 @@ class LinkInputForm(forms.Form):
     def __init__(self, *args, **kwargs):
         self.init = UserRequest(args, kwargs)
         super().__init__(*args, **kwargs)
+        self.fields["link"].widget.attrs.update(size=self.init.get_cols_size())
 
     def get_information(self):
         return self.cleaned_data
@@ -336,9 +338,9 @@ class OmniSearchForm(forms.Form):
 
         if self.init.is_mobile:
             # TODO setting size does not work
-            #self.fields["search_history"].widget.attrs.update(size="10")
-            #self.fields["search_history"].widget.attrs.update(width="100%")
-            #self.fields["search_history"].widget.attrs.update(width="10px")
+            # self.fields["search_history"].widget.attrs.update(size="10")
+            # self.fields["search_history"].widget.attrs.update(width="100%")
+            # self.fields["search_history"].widget.attrs.update(width="10px")
             pass
 
     def set_choices(self, choices):
@@ -376,7 +378,6 @@ class OmniSearchWithArchiveForm(OmniSearchForm):
         if self.init.user:
             if not self.init.user.is_authenticated:
                 self.fields["search_history"].widget = forms.HiddenInput()
-
 
 
 class EntryForm(forms.ModelForm):

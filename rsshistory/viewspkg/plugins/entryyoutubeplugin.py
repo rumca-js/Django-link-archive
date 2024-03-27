@@ -28,7 +28,9 @@ class EntryYouTubePlugin(EntryGenericPlugin):
                 ),
                 ConfigurationEntry.ACCESS_TYPE_OWNER,
                 "Downloads YouTube music",
-                static("{}/icons/icons8-download-music-96.png".format(LinkDatabase.name)),
+                static(
+                    "{}/icons/icons8-download-music-96.png".format(LinkDatabase.name)
+                ),
             ),
         )
         buttons.append(
@@ -41,7 +43,9 @@ class EntryYouTubePlugin(EntryGenericPlugin):
                 ),
                 ConfigurationEntry.ACCESS_TYPE_OWNER,
                 "Downloads YouTube video",
-                static("{}/icons/icons8-download-video-96.png".format(LinkDatabase.name)),
+                static(
+                    "{}/icons/icons8-download-video-96.png".format(LinkDatabase.name)
+                ),
             ),
         )
 

@@ -128,7 +128,9 @@ class EntryGenericPlugin(object):
                 ),
                 ConfigurationEntry.ACCESS_TYPE_OWNER,
                 "Downloads the page to configured location",
-                static("{}/icons/icons8-download-page-96.png".format(LinkDatabase.name)),
+                static(
+                    "{}/icons/icons8-download-page-96.png".format(LinkDatabase.name)
+                ),
             ),
         )
 
@@ -158,9 +160,7 @@ class EntryGenericPlugin(object):
                 ),
                 ConfigurationEntry.ACCESS_TYPE_OWNER,
                 "Updates entry data",
-                static(
-                   "{}/icons/icons8-update-100.png".format(LinkDatabase.name)
-                ),
+                static("{}/icons/icons8-update-100.png".format(LinkDatabase.name)),
             ),
         )
 
@@ -175,7 +175,7 @@ class EntryGenericPlugin(object):
                 ConfigurationEntry.ACCESS_TYPE_OWNER,
                 "Resets entry data",
                 static(
-                   "{}/icons/icons8-update-skull-100.png".format(LinkDatabase.name)
+                    "{}/icons/icons8-update-skull-100.png".format(LinkDatabase.name)
                 ),
             ),
         )
@@ -206,7 +206,9 @@ class EntryGenericPlugin(object):
                     ConfigurationEntry.ACCESS_TYPE_OWNER,
                     "Add new source",
                     static(
-                        "{}/icons/icons8-broadcast-add-100.png".format(LinkDatabase.name)
+                        "{}/icons/icons8-broadcast-add-100.png".format(
+                            LinkDatabase.name
+                        )
                     ),
                 ),
             )
@@ -222,12 +224,9 @@ class EntryGenericPlugin(object):
                     ),
                     ConfigurationEntry.ACCESS_TYPE_OWNER,
                     "Saves link in archive.org: {}".format(self.entry.link),
-                    static(
-                        "{}/icons/archive.org.save.ico".format(LinkDatabase.name)
-                    ),
+                    static("{}/icons/archive.org.save.ico".format(LinkDatabase.name)),
                 ),
             )
-
 
         return buttons
 
@@ -245,7 +244,9 @@ class EntryGenericPlugin(object):
         buttons = []
 
         if self.entry.source_obj:
-            source_entries = LinkDataController.objects.filter(link = self.entry.source_obj.url)
+            source_entries = LinkDataController.objects.filter(
+                link=self.entry.source_obj.url
+            )
             if source_entries.count() > 0:
                 source_entry = source_entries[0]
 
@@ -259,9 +260,7 @@ class EntryGenericPlugin(object):
                         ),
                         ConfigurationEntry.ACCESS_TYPE_ALL,
                         "Source: {}".format(self.entry.source_obj.title),
-                        static(
-                            "{}/icons/icons8-link-90.png".format(LinkDatabase.name)
-                        ),
+                        static("{}/icons/icons8-link-90.png".format(LinkDatabase.name)),
                     ),
                 )
 
@@ -334,9 +333,7 @@ class EntryGenericPlugin(object):
                     ),
                     ConfigurationEntry.ACCESS_TYPE_ALL,
                     "Domain: {}".format(self.entry.domain_obj.domain),
-                    static(
-                        "{}/icons/icons8-www-64.png".format(LinkDatabase.name)
-                    ),
+                    static("{}/icons/icons8-www-64.png".format(LinkDatabase.name)),
                 ),
             )
         else:
@@ -352,9 +349,7 @@ class EntryGenericPlugin(object):
                     + "?search=link+%3D%3D+{}".format(domain_url),
                     ConfigurationEntry.ACCESS_TYPE_ALL,
                     "Domain: {}".format(domain_url),
-                    static(
-                        "{}/icons/icons8-www-64.png".format(LinkDatabase.name)
-                    ),
+                    static("{}/icons/icons8-www-64.png".format(LinkDatabase.name)),
                 ),
             )
 
@@ -444,7 +439,9 @@ class EntryGenericPlugin(object):
 
         parameters.append(EntryParameter("Language", self.entry.language))
         if self.entry.is_dead():
-            parameters.append(EntryParameter("Manual status", self.entry.manual_status_code))
+            parameters.append(
+                EntryParameter("Manual status", self.entry.manual_status_code)
+            )
             parameters.append(EntryParameter("Dead since", self.entry.date_dead_since))
 
         # Artist & album are displayed in buttons

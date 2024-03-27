@@ -153,11 +153,15 @@ class DomainAwarePageTest(FakeInternetTestCase):
         self.assertEqual(url, "http://mytestpage.com/test/images/facebook.com")
 
     def test_get_url_full_normal_join_right_slash(self):
-        url = DomainAwarePage.get_url_full("http://mytestpage.com/test", "images/facebook.com")
+        url = DomainAwarePage.get_url_full(
+            "http://mytestpage.com/test", "images/facebook.com"
+        )
         self.assertEqual(url, "http://mytestpage.com/test/images/facebook.com")
 
     def test_get_url_full_normal_join_no_slashes(self):
-        url = DomainAwarePage.get_url_full("http://mytestpage.com/test", "images/facebook.com")
+        url = DomainAwarePage.get_url_full(
+            "http://mytestpage.com/test", "images/facebook.com"
+        )
         self.assertEqual(url, "http://mytestpage.com/test/images/facebook.com")
 
     def test_get_url_full_normal_join_both_slashes(self):

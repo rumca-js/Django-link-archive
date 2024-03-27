@@ -169,7 +169,7 @@ class SourceGenericPlugin(object):
             return
 
         handler = UrlHandler(self.get_address())
-        contents = handler.p.get_contents()
+        contents = handler.get_contents()
         self.response = handler.response
         status_code = None
         if self.response:
@@ -208,7 +208,6 @@ class SourceGenericPlugin(object):
 
     def is_link_ok_to_add(self, props):
         try:
-
             is_archive = BaseLinkDataController.is_archive_by_date(
                 props["date_published"]
             )

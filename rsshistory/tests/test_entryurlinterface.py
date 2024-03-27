@@ -92,7 +92,7 @@ class EntryUrlInterfaceTest(FakeInternetTestCase):
 
         url = EntryUrlInterface("https://www.youtube.com/watch?v=1234")
 
-        props = url.get_props(source_obj = source_obj)
+        props = url.get_props(source_obj=source_obj)
         self.assertTrue(props)
         self.assertEqual(props["link"], "https://www.youtube.com/watch?v=1234")
         self.assertEqual(props["language"], "ch")

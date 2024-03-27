@@ -35,7 +35,7 @@ class EntryUrlInterface(object):
         options.fast_parsing = fast_check
         options.use_selenium_headless = use_selenium
 
-        self.h = UrlHandler(self.url, page_options = options)
+        self.h = UrlHandler(self.url, page_options=options)
         if self.h.response:
             self.url = self.h.response.url
 

@@ -5,7 +5,8 @@ from ..webtools import RssPage, Url, PageResponseObject
 class YouTubeChannelHandler(RssPage, DefaultUrlHandler):
     def __init__(self, url=None, contents=None):
         super().__init__(
-            url, contents=contents,
+            url,
+            contents=contents,
         )
 
         if url:
@@ -62,7 +63,10 @@ class YouTubeChannelHandler(RssPage, DefaultUrlHandler):
         u = Url(self.get_channel_feed_url())
         self.response = u.response
 
-        if not self.response or self.response.status_code == PageResponseObject.STATUS_CODE_ERROR:
+        if (
+            not self.response
+            or self.response.status_code == PageResponseObject.STATUS_CODE_ERROR
+        ):
             self.dead = True
 
         self.process_contents()

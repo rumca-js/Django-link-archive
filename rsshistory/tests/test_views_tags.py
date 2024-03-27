@@ -72,7 +72,9 @@ class UserTagsTest(FakeInternetTestCase):
             language="en",
         )
 
-        tag = UserTags.objects.create(tag="personal", user_object=self.user, entry_object=entry)
+        tag = UserTags.objects.create(
+            tag="personal", user_object=self.user, entry_object=entry
+        )
 
         url = reverse("{}:tag-remove".format(LinkDatabase.name), args=[tag.id])
         response = self.client.get(url)
@@ -93,13 +95,15 @@ class UserTagsTest(FakeInternetTestCase):
             language="en",
         )
 
-        tag = UserTags.objects.create(tag="personal", user_object=self.user, entry_object=entry)
+        tag = UserTags.objects.create(
+            tag="personal", user_object=self.user, entry_object=entry
+        )
 
         url = reverse("{}:tags-entry-remove".format(LinkDatabase.name), args=[entry.id])
         response = self.client.get(url)
 
-        #page_source = response.content.decode("utf-8")
-        #print("Contents: {}".format(page_source))
+        # page_source = response.content.decode("utf-8")
+        # print("Contents: {}".format(page_source))
 
         self.assertEqual(response.status_code, 302)
 
@@ -117,7 +121,9 @@ class UserTagsTest(FakeInternetTestCase):
             language="en",
         )
 
-        tag = UserTags.objects.create(tag="personal", user_object=self.user, entry_object=entry)
+        tag = UserTags.objects.create(
+            tag="personal", user_object=self.user, entry_object=entry
+        )
 
         url = reverse("{}:tags-entry-show".format(LinkDatabase.name), args=[entry.id])
         response = self.client.get(url)
@@ -138,7 +144,9 @@ class UserTagsTest(FakeInternetTestCase):
             language="en",
         )
 
-        tag = UserTags.objects.create(tag="personal", user_object=self.user, entry_object=entry)
+        tag = UserTags.objects.create(
+            tag="personal", user_object=self.user, entry_object=entry
+        )
 
         url = reverse("{}:tag-rename".format(LinkDatabase.name))
         response = self.client.get(url)
@@ -146,7 +154,6 @@ class UserTagsTest(FakeInternetTestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_tag_show_all(self):
-
         entry = LinkDataController.objects.create(
             source="https://linkedin.com",
             link="https://linkedin.com/test",
@@ -158,7 +165,9 @@ class UserTagsTest(FakeInternetTestCase):
             language="en",
         )
 
-        tag = UserTags.objects.create(tag="personal", user_object=self.user, entry_object=entry)
+        tag = UserTags.objects.create(
+            tag="personal", user_object=self.user, entry_object=entry
+        )
 
         url = reverse("{}:tags-show-all".format(LinkDatabase.name))
         response = self.client.get(url)
@@ -166,7 +175,6 @@ class UserTagsTest(FakeInternetTestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_tag_show_recent(self):
-
         entry = LinkDataController.objects.create(
             source="https://linkedin.com",
             link="https://linkedin.com/test",
@@ -178,7 +186,9 @@ class UserTagsTest(FakeInternetTestCase):
             language="en",
         )
 
-        tag = UserTags.objects.create(tag="personal", user_object=self.user, entry_object=entry)
+        tag = UserTags.objects.create(
+            tag="personal", user_object=self.user, entry_object=entry
+        )
 
         url = reverse("{}:tags-show-recent".format(LinkDatabase.name))
         response = self.client.get(url)

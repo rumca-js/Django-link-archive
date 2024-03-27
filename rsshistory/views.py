@@ -92,7 +92,12 @@ class ViewPage(object):
         if self.context is None:
             self.context = self.get_context(self.request)
 
-        return render(self.request, Path(LinkDatabase.name) / template, self.context, status=status_code)
+        return render(
+            self.request,
+            Path(LinkDatabase.name) / template,
+            self.context,
+            status=status_code,
+        )
 
     def render(self, template):
         result = self.check_access()
@@ -106,9 +111,13 @@ class ViewPage(object):
             handler = UrlHandler.get_type(url, fast_check=fast_check)
 
         context["is_youtube_video"] = type(handler) == UrlHandler.youtube_video_handler
-        context["is_youtube_channel"] = type(handler) == UrlHandler.youtube_channel_handler
+        context["is_youtube_channel"] = (
+            type(handler) == UrlHandler.youtube_channel_handler
+        )
         context["is_odysee_video"] = type(handler) == UrlHandler.odysee_video_handler
-        context["is_odysee_channel"] = type(handler) == UrlHandler.odysee_channel_handler
+        context["is_odysee_channel"] = (
+            type(handler) == UrlHandler.odysee_channel_handler
+        )
         context["is_html"] = type(handler) == HtmlPage
         context["is_rss"] = type(handler) == RssPage
 

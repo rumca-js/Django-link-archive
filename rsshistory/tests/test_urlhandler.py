@@ -93,6 +93,13 @@ class UrlHandlerTest(FakeInternetTestCase):
 
         self.assertEqual(cleaned_link, "https://forum.ddopl.com")
 
+    def test_get_cleaned_link_stupid_google_link2(self):
+        cleaned_link = UrlHandler.get_cleaned_link(
+            "https://www.google.com/url?sa=t&source=web&rct=j&opi=89978449&url=https://worldofwarcraft.blizzard.com/&ved=2ahUKEwjtx56Pn5WFAxU2DhAIHYR1CckQFnoECCkQAQ&usg=AOvVaw1pDkx5K7B5loKccvg_079-"
+        )
+
+        self.assertEqual(cleaned_link, "https://worldofwarcraft.blizzard.com")
+
     def test_get_cleaned_link_stupid_youtube_link(self):
         cleaned_link = UrlHandler.get_cleaned_link(
             "https://www.youtube.com/redirect?event=lorum&redir_token=ipsum&q=https%3A%2F%2Fcorridordigital.com%2F&v=LeB9DcFT810"

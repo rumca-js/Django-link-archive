@@ -10,7 +10,8 @@ class DefaultUrlHandler(DefaultContentPage):
 
     def __init__(self, url=None, contents=None):
         super().__init__(
-            url, contents=contents,
+            url,
+            contents=contents,
         )
         self.h = None
         self.response = None

@@ -44,7 +44,7 @@ def page_show_properties(request):
         options = PageOptions()
         options.fast_parsing = False
 
-        handler = UrlHandler(page_link, page_options = options)
+        handler = UrlHandler(page_link, page_options=options)
         ViewPage.fill_context_type(p.context, handler=handler.p)
 
         page_object = handler.p
@@ -197,7 +197,7 @@ def page_scan_contents(request):
             contents = form.cleaned_data["body"]
             tag = form.cleaned_data["tag"]
 
-            parser = ContentLinkParser(url = "https://", contents = contents)
+            parser = ContentLinkParser(url="https://", contents=contents)
             links = sorted(list(parser.get_links()))
 
             form = create_scanner_form(links)
@@ -383,8 +383,8 @@ def test_page(request):
 
     therange = (start_date, stop_date)
 
-    users = User.objects.filter(username = request.user)
-    if users.count () > 0:
+    users = User.objects.filter(username=request.user)
+    if users.count() > 0:
         bookmarks = UserBookmarks.get_user_bookmarks(users[0])
         # this returns IDs, not 'objects'
         result_entries = bookmarks.values_list("entry_object", flat=True)

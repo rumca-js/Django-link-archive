@@ -4,7 +4,8 @@ from .defaulturlhandler import DefaultUrlHandler
 class OdyseeChannelHandler(DefaultUrlHandler):
     def __init__(self, url=None, contents=None):
         super().__init__(
-            url, contents=contents,
+            url,
+            contents=contents,
         )
 
         if url:

@@ -618,6 +618,67 @@ def add_entry(request):
 
 
 def add_simple_entry(request):
+    def display_empty_form(request, p):
+        form = LinkInputForm()
+        form.method = "POST"
+
+        p.context["form"] = form
+        p.context[
+            "form_description_post"
+        ] = "Internet is dangerous, so carefully select which links you add"
+
+        return p.render("form_basic.html")
+
+    def display_init_form(request, p, cleaned_link):
+        form = LinkInputForm(initial={"link": cleaned_link})
+        form.method = "POST"
+
+        p.context["form"] = form
+        p.context[
+            "form_description_post"
+        ] = "Internet is dangerous, so carefully select which links you add"
+
+        return p.render("form_basic.html")
+
+    def display_data_form(request, p, data):
+        notes = []
+        warnings = []
+        errors = []
+
+        obs = LinkDataController.objects.filter(link=data["link"])
+        if obs.exists():
+            ob = obs[0]
+            return HttpResponseRedirect(ob.get_absolute_url())
+
+        data["user"] = request.user.username
+        data["bookmarked"] = True
+
+        if "description" in data:
+            data["description"] = LinkDataController.get_description_safe(
+                data["description"]
+            )
+
+        form = EntryForm(initial=data)
+        form.method = "POST"
+        form.action_url = reverse("{}:entry-add".format(LinkDatabase.name))
+        p.context["form"] = form
+
+        page = DomainAwarePage(data["link"])
+        domain = page.get_domain()
+
+        if data["link"].find("http://") >= 0:
+            warnings.append("Link is http. Https is more secure protocol")
+        if data["link"].find("http://") == -1 and data["link"].find("https://") == -1:
+            errors.append("Missing protocol. Could be http:// or https://")
+        if domain.lower() != domain:
+            warnings.append("Link domain is not lowercase. Is that OK?")
+
+        p.context["notes"] = notes
+        p.context["warnings"] = warnings
+        p.context["errors"] = errors
+
+        return p.render("form_add_entry.html")
+
     from ..forms import ExportDailyDataForm, LinkInputForm
 
     p = ViewPage(request)
@@ -631,7 +692,10 @@ def add_simple_entry(request):
         if form.is_valid():
             link = form.cleaned_data["link"]
 
-            link = UrlHandler.get_cleaned_link(link)
+            cleaned_link = UrlHandler.get_cleaned_link(link)
+
+            if cleaned_link != link:
+                return display_init_form(request, p, cleaned_link)
 
             if not Url.is_web_link(link):
                 p.context[
@@ -641,61 +705,14 @@ def add_simple_entry(request):
 
             data = LinkDataController.get_full_information({"link": link})
             if data:
-                notes = []
-                warnings = []
-                errors = []
-
-                obs = LinkDataController.objects.filter(link=data["link"])
-                if obs.exists():
-                    ob = obs[0]
-                    return HttpResponseRedirect(ob.get_absolute_url())
-
-                data["user"] = request.user.username
-                data["bookmarked"] = True
-
-                if "description" in data:
-                    data["description"] = LinkDataController.get_description_safe(
-                        data["description"]
-                    )
-
-                form = EntryForm(initial=data)
-                form.method = "POST"
-                form.action_url = reverse("{}:entry-add".format(LinkDatabase.name))
-                p.context["form"] = form
-
-                page = DomainAwarePage(data["link"])
-                domain = page.get_domain()
-
-                if data["link"].find("http://") >= 0:
-                    warnings.append("Link is http. Https is more secure protocol")
-                if (
-                    data["link"].find("http://") == -1
-                    and data["link"].find("https://") == -1
-                ):
-                    errors.append("Missing protocol. Could be http:// or https://")
-                if domain.lower() != domain:
-                    warnings.append("Link domain is not lowercase. Is that OK?")
-
-                p.context["notes"] = notes
-                p.context["warnings"] = warnings
-                p.context["errors"] = errors
-
-                return p.render("form_add_entry.html")
+                return display_data_form(request, p, data)
 
             p.context["summary_text"] = "Could not obtain details from link {}".format(
                 link
             )
             return p.render("summary_present.html")
     else:
-        form = LinkInputForm()
-        form.method = "POST"
-
-        p.context["form"] = form
-        p.context[
-            "form_description_post"
-        ] = "Internet is dangerous, so carefully select which links you add"
-
-        return p.render("form_basic.html")
+        return display_empty_form(request, p)
 
 
 def entry_update_data(request, pk):

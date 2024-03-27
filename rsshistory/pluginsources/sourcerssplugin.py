@@ -135,8 +135,12 @@ class BaseRssPlugin(SourceGenericPlugin):
             prop["link"] = prop["link"][:-1]
 
         source = self.get_source()
-        
-        if self.is_property_set(prop, "language") and source.language != None and source.language != "":
+
+        if (
+            self.is_property_set(prop, "language")
+            and source.language != None
+            and source.language != ""
+        ):
             prop["language"] = source.language
 
         return prop

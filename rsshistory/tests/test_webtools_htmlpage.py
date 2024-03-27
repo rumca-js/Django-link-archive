@@ -396,7 +396,7 @@ class HtmlPageTest(FakeInternetTestCase):
         MockRequestCounter.mock_page_requests = 0
 
         p = HtmlPage(
-                "https://linkedin.com/test",
+            "https://linkedin.com/test",
             webpage_meta_article_date,
         )
 
@@ -410,7 +410,7 @@ class HtmlPageTest(FakeInternetTestCase):
         MockRequestCounter.mock_page_requests = 0
 
         p = HtmlPage(
-                "https://linkedin.com/test",
+            "https://linkedin.com/test",
             webpage_meta_music_release_date,
         )
 
@@ -424,7 +424,7 @@ class HtmlPageTest(FakeInternetTestCase):
         MockRequestCounter.mock_page_requests = 0
 
         p = HtmlPage(
-                "https://linkedin.com/test",
+            "https://linkedin.com/test",
             webpage_meta_youtube_publish_date,
         )
 
@@ -437,7 +437,9 @@ class HtmlPageTest(FakeInternetTestCase):
     def test_get_body_hash(self):
         MockRequestCounter.mock_page_requests = 0
 
-        reader = HtmlPage("https://linkedin.com/test", webpage_meta_youtube_publish_date)
+        reader = HtmlPage(
+            "https://linkedin.com/test", webpage_meta_youtube_publish_date
+        )
         hash = reader.get_body_hash()
         bodytext = str(reader.get_body_text())
 
@@ -470,7 +472,9 @@ class HtmlPageTest(FakeInternetTestCase):
     def test_get_meta_http_equiv_charset(self):
         MockRequestCounter.mock_page_requests = 0
 
-        reader = HtmlPage("https://linkedin.com/test", webpage_html_meta_http_equiv_charset)
+        reader = HtmlPage(
+            "https://linkedin.com/test", webpage_html_meta_http_equiv_charset
+        )
         self.assertEqual(reader.get_charset(), "shift_jis")
 
         self.assertEqual(MockRequestCounter.mock_page_requests, 0)

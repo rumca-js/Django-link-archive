@@ -15,15 +15,14 @@ from .domains import Domains
 
 
 class BaseLinkDataModel(models.Model):
-
     STATUS_UNDEFINED = 0
     STATUS_DEAD = 500
     STATUS_ACTIVE = 200
 
     MANUAL_STATUS_CODES = (
-      (STATUS_UNDEFINED, 'UNDEFINED'),
-      (STATUS_DEAD, 'DEAD'),
-      (STATUS_ACTIVE, 'ACTIVE'),
+        (STATUS_UNDEFINED, "UNDEFINED"),
+        (STATUS_DEAD, "DEAD"),
+        (STATUS_ACTIVE, "ACTIVE"),
     )
 
     link = models.CharField(max_length=1000, unique=True)
@@ -65,7 +64,7 @@ class BaseLinkDataModel(models.Model):
 
     status_code = models.IntegerField(default=0)
     manual_status_code = models.IntegerField(default=0, null=True, blank=True)
-    contents_type = models.IntegerField(default=0) # indicates if it is rss, html, etc.
+    contents_type = models.IntegerField(default=0)  # indicates if it is rss, html, etc.
 
     page_rating_contents = models.IntegerField(default=0)
     page_rating_votes = models.IntegerField(default=0)
@@ -197,7 +196,9 @@ class BaseLinkDataController(BaseLinkDataModel):
         p = url.p
 
         if not props or not url.p:
-            AppLogging.error("Could not find entry url interface for:{}".format(self.link))
+            AppLogging.error(
+                "Could not find entry url interface for:{}".format(self.link)
+            )
             self.status_code = STATUS_DEAD
             self.save()
             return
@@ -245,7 +246,9 @@ class BaseLinkDataController(BaseLinkDataModel):
         props = url.get_props()
 
         if not props or not url.p:
-            AppLogging.error("Could not find entry url interface for:{}".format(self.link))
+            AppLogging.error(
+                "Could not find entry url interface for:{}".format(self.link)
+            )
             self.status_code = BasePage.STATUS_CODE_ERROR
             self.save()
             return
@@ -502,7 +505,7 @@ class BaseLinkDataController(BaseLinkDataModel):
         return (self.permanent or self.bookmarked) and self.page_rating_votes >= 0
 
     def is_permanent(self):
-        return (self.permanent or self.bookmarked)
+        return self.permanent or self.bookmarked
 
     def is_dead(self):
         if self.manual_status_code == BaseLinkDataController.STATUS_DEAD:

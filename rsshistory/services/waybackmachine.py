@@ -6,6 +6,7 @@ from waybackpy import WaybackMachineCDXServerAPI, WaybackMachineSaveAPI
 
 from ..models import AppLogging
 from ..apps import LinkDatabase
+from ..webtools import DomainAwarePage
 
 
 class WaybackMachine(object):
@@ -95,9 +96,7 @@ class WaybackMachine(object):
             return ret
 
     def is_saved(self, url):
-        from ..webtools import HtmlPage
-
-        p = HtmlPage(url)
+        p = DomainAwarePage(url)
         if p.is_youtube():
             return False
 

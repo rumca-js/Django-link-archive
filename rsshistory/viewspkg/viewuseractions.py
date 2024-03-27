@@ -252,7 +252,9 @@ def tags_entry_show(request, entrypk):
     entry = LinkDataController.objects.get(id=entrypk)
     tags = entry.tags.all()
     for tag in tags:
-        summary += "Link:{} tag:{} user:{}\n".format(tag.entry_object.link, tag.tag, tag.user_object.username)
+        summary += "Link:{} tag:{} user:{}\n".format(
+            tag.entry_object.link, tag.tag, tag.user_object.username
+        )
 
     p.context["summary_text"] = summary
 

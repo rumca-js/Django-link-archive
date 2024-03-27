@@ -164,15 +164,19 @@ class BookmarksExporter(object):
         result_entries = []
 
         if self.username != "" and self.username != None:
-            users = User.objects.filter(username = self.username)
-            if users.count () > 0:
+            users = User.objects.filter(username=self.username)
+            if users.count() > 0:
                 bookmarks = UserBookmarks.get_user_bookmarks(users[0])
                 # this returns IDs, not 'objects'
                 result_entries = bookmarks.values_list("entry_object", flat=True)
-                result_entries = LinkDataController.objects.filter(id__in=result_entries)
+                result_entries = LinkDataController.objects.filter(
+                    id__in=result_entries
+                )
                 result_entries = result_entries.filter(date_published__range=therange)
             else:
-                AppLogging.error("Could not find such user name:{}".format(self.username))
+                AppLogging.error(
+                    "Could not find such user name:{}".format(self.username)
+                )
                 result_entries = LinkDataController.objects.filter(
                     bookmarked=True, date_published__range=therange
                 )

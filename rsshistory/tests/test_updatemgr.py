@@ -58,7 +58,9 @@ class UpdateManagerGitTest(FakeInternetTestCase):
         self.disable_web_pages()
 
         self.user = User.objects.create_user(
-            username="testuser", password="testpassword", is_staff=True,
+            username="testuser",
+            password="testpassword",
+            is_staff=True,
         )
 
         c = Configuration.get_object()
@@ -88,7 +90,9 @@ class UpdateManagerGitTest(FakeInternetTestCase):
         )
 
         date = DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M")
-        UserBookmarks.objects.create(date_bookmarked = date, user_object = self.user, entry_object=entry)
+        UserBookmarks.objects.create(
+            date_bookmarked=date, user_object=self.user, entry_object=entry
+        )
 
         LinkDataController.objects.create(
             source="https://youtube.com",
@@ -196,7 +200,9 @@ class UpdateManagerLocTest(FakeInternetTestCase):
         self.disable_web_pages()
 
         self.user = User.objects.create_user(
-            username="testuser", password="testpassword", is_staff=True,
+            username="testuser",
+            password="testpassword",
+            is_staff=True,
         )
 
         source_youtube = SourceDataController.objects.create(
@@ -218,7 +224,9 @@ class UpdateManagerLocTest(FakeInternetTestCase):
         )
 
         date = DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M")
-        UserBookmarks.objects.create(date_bookmarked = date, user_object = self.user, entry_object=entry)
+        UserBookmarks.objects.create(
+            date_bookmarked=date, user_object=self.user, entry_object=entry
+        )
 
         LinkDataController.objects.create(
             source="https://youtube.com",

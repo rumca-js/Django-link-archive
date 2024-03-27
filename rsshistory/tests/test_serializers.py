@@ -54,7 +54,9 @@ class BookmarksExporterTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
         self.user = User.objects.create_user(
-            username="testuser", password="testpassword", is_staff=True,
+            username="testuser",
+            password="testpassword",
+            is_staff=True,
         )
 
     def test_bookmarks_for_user_none(self):
@@ -81,7 +83,6 @@ class BookmarksExporterTest(FakeInternetTestCase):
         self.assertEqual(entries.count(), 0)
 
     def test_bookmarks_for_user_one(self):
-
         config = Configuration.get_object().config_entry
 
         date = DateUtils.from_string("2024-12-08T05:29:52Z")
@@ -98,7 +99,9 @@ class BookmarksExporterTest(FakeInternetTestCase):
             thumbnail="thumbnail",
         )
 
-        bookmark = UserBookmarks.objects.create(date_bookmarked=date, user_object = self.user, entry_object = entry)
+        bookmark = UserBookmarks.objects.create(
+            date_bookmarked=date, user_object=self.user, entry_object=entry
+        )
 
         exporter = BookmarksExporter(config, "testuser")
 
@@ -107,7 +110,6 @@ class BookmarksExporterTest(FakeInternetTestCase):
         self.assertEqual(entries.count(), 1)
 
     def test_bookmarks_for_no_user(self):
-
         config = Configuration.get_object().config_entry
 
         date = DateUtils.from_string("2024-12-08T05:29:52Z")
@@ -124,7 +126,9 @@ class BookmarksExporterTest(FakeInternetTestCase):
             thumbnail="thumbnail",
         )
 
-        bookmark = UserBookmarks.objects.create(date_bookmarked=date, user_object = self.user, entry_object = entry)
+        bookmark = UserBookmarks.objects.create(
+            date_bookmarked=date, user_object=self.user, entry_object=entry
+        )
 
         exporter = BookmarksExporter(config, "")
 
