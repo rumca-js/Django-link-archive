@@ -131,8 +131,7 @@ class BaseRssPlugin(SourceGenericPlugin):
         # LinkDatabase.info("Processing RSS elements DONE")
 
     def enhance(self, prop):
-        if prop["link"].endswith("/"):
-            prop["link"] = prop["link"][:-1]
+        prop["link"] = UrlHandler.get_cleaned_link(prop["link"])
 
         source = self.get_source()
 

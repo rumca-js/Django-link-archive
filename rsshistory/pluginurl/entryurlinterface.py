@@ -24,12 +24,10 @@ class EntryUrlInterface(object):
         Some scenarios, like manual entry should log why it is impossible to check
         TODO maybe add ignore_errors, so we could add any kind of link?
         """
-        self.url = url
         self.log = log
         self.ignore_errors = ignore_errors
 
-        if self.url.endswith("/"):
-            self.url = self.url[:-1]
+        self.url = UrlHandler.get_cleaned_link(url)
 
         options = PageOptions()
         options.fast_parsing = fast_check
@@ -62,6 +60,8 @@ class EntryUrlInterface(object):
             props["page_rating_contents"] = page_rating
             props["page_rating"] = page_rating
             props["status_code"] = self.h.get_status_code()
+            if not self.is_property_set(props, "description"):
+                props["description"] = ""
 
             if not self.is_property_set(props, "artist") and self.p.get_author():
                 props["artist"] = self.p.get_author()
@@ -104,7 +104,7 @@ class EntryUrlInterface(object):
         if type(p) is HtmlPage:
             return self.get_htmlpage_props(input_props, source_obj)
 
-        if type(p) is RssPage:
+        if type(p) is RssPage or type(p) is UrlHandler.youtube_channel_handler:
             return self.get_rsspage_props(input_props, source_obj)
 
         # TODO provide RSS support

@@ -93,6 +93,8 @@ class SourceGenericPlugin(object):
                 if source:
                     link_data["source"] = source.url
                     link_data["source_obj"] = source
+                    if source.age > 0:
+                        link_data["age"] = source.age
 
                 if "page_rating" in link_data:
                     link_data["page_rating_contents"] = link_data["page_rating"]

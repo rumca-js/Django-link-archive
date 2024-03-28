@@ -16,7 +16,7 @@
           {% if object.bookmarked %}
           [{{object.page_rating}}]
           {% endif %}
-          {{ object.title }}
+          {{ object_controller.get_title_html }}
       </a>
   </h1>
   <span>{{object.link}}</span>

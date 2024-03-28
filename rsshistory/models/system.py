@@ -1,6 +1,7 @@
 import logging
 from pytz import timezone
 from datetime import datetime, date
+from dateutil.relativedelta import relativedelta 
 
 from django.db import models
 from django.urls import reverse
@@ -180,8 +181,8 @@ class UserConfig(models.Model):
         """
         This is used if no request is specified. Use configured by admin setup.
         """
-        if user.is_authenticated:
-            confs = UserConfig.objects.filter(user=user.username)
+        if user and user.is_authenticated:
+            confs = UserConfig.objects.filter(user_object__id = user.id)
             if confs.count() != 0:
                 return confs[0]
 
@@ -237,6 +238,10 @@ class UserConfig(models.Model):
             if us.count() > 0:
                 uc.user_object = us[0]
                 uc.save()
+
+    def get_age(self):
+        diff = relativedelta(date.today(), self.birth_date).years
+        return diff
 
 
 class AppLogging(models.Model):

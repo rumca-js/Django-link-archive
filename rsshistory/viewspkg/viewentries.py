@@ -19,6 +19,7 @@ from ..models import (
     UserSearchHistory,
     UserEntryTransitionHistory,
 )
+from ..models import UserSearchHistory
 from ..controllers import (
     LinkDataController,
     LinkDataWrapper,
@@ -38,6 +39,7 @@ from ..forms import (
     OmniSearchWithArchiveForm,
 )
 from ..queryfilters import EntryFilter
+from ..queryfilters import OmniSearchFilter
 from ..views import ViewPage
 from ..configuration import Configuration
 from ..webtools import Url, DomainAwarePage
@@ -84,7 +86,8 @@ class EntriesSearchListView(generic.ListView):
 
     def get_filter(self):
         print("EntriesSearchListView:get_filter")
-        query_filter = EntryFilter(self.request.GET)
+
+        query_filter = EntryFilter(self.request.GET, self.request.user)
         query_filter.get_sources()
         thefilter = query_filter
         print("EntriesSearchListView:get_filter done")
@@ -211,7 +214,8 @@ class EntriesRecentListView(EntriesSearchListView):
     paginate_by = 100
 
     def get_filter(self):
-        query_filter = EntryFilter(self.request.GET)
+        query_filter = EntryFilter(self.request.GET, user=self.request.user)
+
         query_filter.set_time_limit(self.get_default_range())
         query_filter.get_sources()
         return query_filter
@@ -246,7 +250,7 @@ class EntriesNotTaggedView(EntriesSearchListView):
     paginate_by = 100
 
     def get_filter(self):
-        query_filter = EntryFilter(self.request.GET)
+        query_filter = EntryFilter(self.request.GET, user=self.request.user)
         query_filter.get_sources()
         query_filter.set_additional_condition(
             Q(tags__tag__isnull=True, bookmarked=True)
@@ -278,7 +282,7 @@ class EntriesBookmarkedListView(EntriesSearchListView):
     paginate_by = 100
 
     def get_filter(self):
-        query_filter = EntryFilter(self.request.GET)
+        query_filter = EntryFilter(self.request.GET, self.request.user)
         query_filter.get_sources()
         query_filter.set_additional_condition(Q(bookmarked=True))
         return query_filter
@@ -309,7 +313,7 @@ class EntriesArchiveListView(EntriesSearchListView):
     template_name = str(ViewPage.get_full_template("linkdatacontroller_list.html"))
 
     def get_filter(self):
-        query_filter = EntryFilter(self.request.GET)
+        query_filter = EntryFilter(self.request.GET, self.request.user)
         query_filter.get_sources()
         query_filter.set_archive_source(True)
         return query_filter
@@ -339,17 +343,15 @@ class EntriesOmniListView(EntriesSearchListView):
     paginate_by = 100
 
     def get_filter(self):
-        from ..queryfilters import OmniSearchFilter
-        from ..models import UserSearchHistory
-
-        username = self.request.user.username
-
         if self.request.user.is_authenticated:
             search_term = get_search_term_request(self.request)
             if search_term:
                 UserSearchHistory.add(self.request.user, search_term)
 
-        query_filter = OmniSearchFilter(self.request.GET)
+        data = self.request.GET.dict()
+        data["user"] = self.request.user
+
+        query_filter = OmniSearchFilter(data)
 
         translate = BaseLinkDataController.get_query_names()
         query_filter.set_translatable(translate)
@@ -479,7 +481,6 @@ class EntryDetailView(generic.DetailView):
 
         config = Configuration.get_object().config_entry
         if config.track_user_actions and config.track_user_navigation:
-            username = self.request.user.username
             context["transitions"] = UserEntryTransitionHistory.get_related_list(
                 self.request.user, self.object
             )
@@ -619,7 +620,7 @@ def add_entry(request):
 
 def add_simple_entry(request):
     def display_empty_form(request, p):
-        form = LinkInputForm()
+        form = LinkInputForm(request=request)
         form.method = "POST"
 
         p.context["form"] = form
@@ -630,7 +631,7 @@ def add_simple_entry(request):
         return p.render("form_basic.html")
 
     def display_init_form(request, p, cleaned_link):
-        form = LinkInputForm(initial={"link": cleaned_link})
+        form = LinkInputForm(initial={"link": cleaned_link}, request=request)
         form.method = "POST"
 
         p.context["form"] = form
@@ -688,7 +689,7 @@ def add_simple_entry(request):
         return data
 
     if request.method == "POST":
-        form = LinkInputForm(request.POST)
+        form = LinkInputForm(request.POST, request=request)
         if form.is_valid():
             link = form.cleaned_data["link"]
 

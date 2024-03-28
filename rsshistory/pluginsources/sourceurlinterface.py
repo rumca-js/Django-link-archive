@@ -12,10 +12,7 @@ class SourceUrlInterface(object):
     """
 
     def __init__(self, url, fast_check=True, use_selenium=False):
-        self.url = url
-
-        if self.url.endswith("/"):
-            self.url = self.url[:-1]
+        self.url = UrlHandler.get_cleaned_link(url)
 
         options = PageOptions()
         options.fast_parsing = fast_check
@@ -37,6 +34,8 @@ class SourceUrlInterface(object):
             props["remove_after_days"] = 0
         if "fetch_period" not in props:
             props["fetch_period"] = "3600"
+        if "age" not in props:
+            props["age"] = 0
 
         return props
 

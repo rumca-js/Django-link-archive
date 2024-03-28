@@ -464,15 +464,32 @@ class EntryGenericPlugin(object):
         if not thumbnail:
             return ""
 
-        frame_text = """
-        <div>
-            <img src="{}" class="link-detail-thumbnail"/>
-        </div>"""
+        if not self.entry.is_user_appropriate(self.user):
+            frame_text = """
+            <div style="color:red">This material is restricted for age {}</div>"""
 
-        frame_text = frame_text.format(self.entry.get_thumbnail())
-        return frame_text
+            frame_text = frame_text.format(self.entry.age)
+
+            return frame_text
+        else:
+            frame_text = """
+            <div>
+                <img src="{}" class="link-detail-thumbnail"/>
+            </div>"""
+
+            frame_text = frame_text.format(self.entry.get_thumbnail())
+            return frame_text
+
+    def get_title_html(self):
+        if not self.entry.is_user_appropriate(self.user):
+            return "Adult content"
+
+        return self.entry.title
 
     def get_description_html(self):
+        if not self.entry.is_user_appropriate(self.user):
+            return "Adult content"
+
         description = self.entry.description
         if not description or description == "":
             return ""

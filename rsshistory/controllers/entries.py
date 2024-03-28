@@ -640,7 +640,7 @@ class LinkDataBuilder(object):
         url = EntryUrlInterface(self.link)
         link_data = url.get_props()
         if not link_data:
-            AppLogging.error("Could not obtain properties for:{}".format(self.link))
+            AppLogging.error('Could not obtain properties for:<a href="{}">{}</a>'.format(self.get_absolute_url(), self.link))
             return
         self.link_data = link_data
         return self.add_from_props()
@@ -666,7 +666,7 @@ class LinkDataBuilder(object):
         url = EntryUrlInterface(self.link)
         link_data = url.get_props()
         if not link_data:
-            AppLogging.error("Could not obtain properties for:{}".format(self.link))
+            AppLogging.error('Could not obtain properties for:<a href="{}">{}</a>'.format(self.link, self.link))
             return
 
         # TODO update missing keys - do not replace them
@@ -684,7 +684,7 @@ class LinkDataBuilder(object):
         if self.link_data:
             return self.add_from_props_internal()
         else:
-            LinkDatabase.info("Could not obtain properties for 2:{}".format(self.link))
+            AppLogging.error('Could not obtain properties for:<a href="{}">{}</a>'.format(self.link, self.link))
 
     def add_from_props(self):
         from ..pluginurl import UrlHandler

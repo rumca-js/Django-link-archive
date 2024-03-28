@@ -108,16 +108,11 @@ class EntryYouTubePlugin(EntryGenericPlugin):
            {}
         </div>"""
 
-        if self.entry.age and self.entry.age >= 18:
+        if not self.entry.is_user_appropriate(self.user):
             frame_text = """
-            <div class="youtube_player_container">
-               {}
-            </div>
             <div style="color:red">This material is restricted for age {}</div>"""
 
-            frame_inner = self.get_frame()
-
-            frame_text = frame_text.format(frame_inner, self.entry.age)
+            frame_text = frame_text.format(self.entry.age)
 
             return frame_text
         else:

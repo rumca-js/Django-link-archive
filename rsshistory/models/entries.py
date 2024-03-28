@@ -197,9 +197,9 @@ class BaseLinkDataController(BaseLinkDataModel):
 
         if not props or not url.p:
             AppLogging.error(
-                "Could not find entry url interface for:{}".format(self.link)
+                'Could not find entry url interface for:<a href="{}">{}</a>'.format(self.get_absolute_url(), self.link)
             )
-            self.status_code = STATUS_DEAD
+            self.status_code = BaseLinkDataModel.STATUS_DEAD
             self.save()
             return
 
@@ -249,7 +249,7 @@ class BaseLinkDataController(BaseLinkDataModel):
             AppLogging.error(
                 "Could not find entry url interface for:{}".format(self.link)
             )
-            self.status_code = BasePage.STATUS_CODE_ERROR
+            self.status_code = BaseLinkDataModel.STATUS_CODE_ERROR
             self.save()
             return
 
@@ -339,9 +339,6 @@ class BaseLinkDataController(BaseLinkDataModel):
         """
         Prints thumbnail, but if it does not have one prints favicon
         """
-        if self.age and self.age >= 18:
-            return static("{0}/images/sign-304093_640.png".format(LinkDatabase.name))
-
         if self.thumbnail:
             return self.thumbnail
 
@@ -499,10 +496,14 @@ class BaseLinkDataController(BaseLinkDataModel):
         self.save()
 
     def is_taggable(self):
-        return (self.permanent or self.bookmarked) and self.page_rating_votes >= 0
+        """
+        We do not check page rating, as someone may want to change vote.
+        Users need to be able to bring back links from dark abyss.
+        """
+        return (self.permanent or self.bookmarked) and not self.is_dead()
 
     def is_commentable(self):
-        return (self.permanent or self.bookmarked) and self.page_rating_votes >= 0
+        return (self.permanent or self.bookmarked) and not self.is_dead()
 
     def is_permanent(self):
         return self.permanent or self.bookmarked
@@ -524,7 +525,7 @@ class BaseLinkDataController(BaseLinkDataModel):
          - if it is dead (manual indication)
          - if it was downvoted to oblivion
         """
-        if self.manual_status_code == STATUS_UNDEFINED:
+        if self.manual_status_code == BasePage.STATUS_UNDEFINED:
             return not self.is_status_code_valid() and self.page_rating > 0
 
     def is_status_code_valid(self):
@@ -563,10 +564,24 @@ class BaseLinkDataController(BaseLinkDataModel):
             return description
 
         length = BaseLinkDataController.get_description_length()
-        return description[: length - 10]
+        description = description[: length - 1]
+
+        return description
 
     def get_description_length():
-        return 1000
+        return BaseLinkDataController._meta.get_field("description").max_length
+
+    def is_user_appropriate(self, user):
+        from .system import UserConfig
+        if self.age and self.age != 0:
+            if not user.is_authenticated:
+                return False
+
+            uc = UserConfig.get(user)
+            age = uc.get_age()
+            return self.age < age
+
+        return True
 
 
 class LinkDataModel(BaseLinkDataController):

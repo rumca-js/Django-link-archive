@@ -8,6 +8,7 @@ from .controllers import (
     DomainsController,
 )
 from .apps import LinkDatabase
+from .models import UserConfig
 
 try:
     from sympy import sympify
@@ -17,7 +18,7 @@ except Exception as E:
 
 
 class BaseQueryFilter(object):
-    def __init__(self, args, page_limit=False):
+    def __init__(self, args, page_limit=False, user=None):
         self.args = args
         self.use_page_limit = page_limit
 
@@ -25,6 +26,8 @@ class BaseQueryFilter(object):
             self.use_archive_source = True
         else:
             self.use_archive_source = False
+
+        self.user = user
 
         self.error = False
 
@@ -104,8 +107,8 @@ class BaseQueryFilter(object):
 
 
 class SourceFilter(BaseQueryFilter):
-    def __init__(self, args):
-        super().__init__(args)
+    def __init__(self, args, user=None):
+        super().__init__(args, user=user)
 
     def get_filtered_objects_internal(self):
         conditions = self.get_conditions()
@@ -134,7 +137,10 @@ class SourceFilter(BaseQueryFilter):
             return q2
 
     def get_omni_conditions(self):
-        query_filter = OmniSearchFilter(self.args)
+        args = self.args.dict()
+        args["user"] = self.user
+
+        query_filter = OmniSearchFilter(args)
 
         translate = SourceDataController.get_query_names()
         query_filter.set_translatable(translate)
@@ -163,8 +169,8 @@ class SourceFilter(BaseQueryFilter):
 
 
 class EntryFilter(BaseQueryFilter):
-    def __init__(self, args):
-        super().__init__(args)
+    def __init__(self, args, user=None):
+        super().__init__(args, user=user)
         self.time_limit = None
 
         self.use_archive_source = False
@@ -205,7 +211,10 @@ class EntryFilter(BaseQueryFilter):
             return q2 & q3
 
     def get_omni_conditions(self):
-        query_filter = OmniSearchFilter(self.args)
+        args = self.args.dict()
+        args["user"] = self.user
+
+        query_filter = OmniSearchFilter(args)
 
         translate = LinkDataController.get_query_names()
         query_filter.set_translatable(translate)
@@ -346,8 +355,8 @@ class EntryFilter(BaseQueryFilter):
 
 
 class DomainFilter(BaseQueryFilter):
-    def __init__(self, args):
-        super().__init__(args)
+    def __init__(self, args, user=None):
+        super().__init__(args, user)
 
     def get_filtered_objects_internal(self):
         conditions = self.get_conditions()
@@ -375,7 +384,10 @@ class DomainFilter(BaseQueryFilter):
             return q2
 
     def get_omni_conditions(self):
-        query_filter = OmniSearchFilter(self.args)
+        args = self.args.dict()
+        args["user"] = self.user
+
+        query_filter = OmniSearchFilter(args)
 
         translate = DomainsController.get_query_names()
         query_filter.set_translatable(translate)
@@ -631,8 +643,8 @@ class OmniSymbolEvaluator(object):
 
 
 class OmniSearchFilter(BaseQueryFilter):
-    def __init__(self, args):
-        super().__init__(args)
+    def __init__(self, args, user=None):
+        super().__init__(args, user=user)
 
         if "search_history" in self.args and self.args["search_history"] != "":
             self.search_query = self.args["search_history"]
@@ -640,6 +652,10 @@ class OmniSearchFilter(BaseQueryFilter):
             self.search_query = self.args["search"]
         else:
             self.search_query = ""
+
+        self.user = None
+        if "user" in self.args:
+            self.user = self.args["user"]
 
         self.query_set = None
         self.default_search_symbols = []
@@ -693,6 +709,21 @@ class OmniSearchFilter(BaseQueryFilter):
         if self.combined_query is None:
             self.error = True
             self.combined_query = Q()
+
+        self.apply_age_limit()
+
+    def apply_age_limit(self):
+        # limit only to what you can see
+        if self.user:
+            if self.user.is_authenticated:
+                uc = UserConfig.get(self.user)
+                #self.combined_query = self.combined_query & (Q(age__lt = uc.get_age()) | Q(age = 0))
+            else:
+                #self.combined_query = self.combined_query & Q(age = 0)
+                pass
+        else:
+            #self.combined_query = self.combined_query & Q(age = 0)
+            pass
 
     def get_combined_query_simple(self):
         symbol = self.search_query

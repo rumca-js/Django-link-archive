@@ -195,12 +195,6 @@ class UserConfigForm(forms.ModelForm):
 
     # BIRTH_YEAR_CHOICES = ["1970", "]
 
-    def __init__(self, *args, **kwargs):
-        super(UserConfigForm, self).__init__(*args, **kwargs)
-
-        # TODO this does not seem to work
-        self.fields["birth_date"].initial = my_date_to
-
     class Meta:
         model = UserConfig
         fields = [
@@ -220,6 +214,10 @@ class UserConfigForm(forms.ModelForm):
         #    # DateTimeInput widget does not work my my Android phone
         #        'birth_date': forms.SelectDateWidget(years=BIRTH_YEAR_CHOICES)
         # }
+
+    def __init__(self, *args, **kwargs):
+        super(UserConfigForm, self).__init__(*args, **kwargs)
+        self.fields["birth_date"].help_text = "Format: 2024-03-28"
 
 
 class ImportSourceRangeFromInternetArchiveForm(forms.Form):
@@ -472,6 +470,7 @@ class SourceForm(forms.ModelForm):
             "category",
             "subcategory",
             "language",
+            "age",
             "fetch_period",
             "export_to_cms",
             "remove_after_days",

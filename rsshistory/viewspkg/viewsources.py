@@ -37,7 +37,7 @@ class SourceListView(generic.ListView):
         return super(SourceListView, self).get(*args, **kwargs)
 
     def get_queryset(self):
-        self.query_filter = SourceFilter(self.request.GET)
+        self.query_filter = SourceFilter(self.request.GET, self.request.user)
         return self.query_filter.get_filtered_objects()
 
     def get_paginate_by(self, queryset):
@@ -575,7 +575,7 @@ def source_json(request, pk):
 
 def sources_json(request):
     # Data
-    query_filter = SourceFilter(request.GET)
+    query_filter = SourceFilter(request.GET, request.user)
     query_filter.use_page_limit = True
     sources = query_filter.get_filtered_objects()
 
