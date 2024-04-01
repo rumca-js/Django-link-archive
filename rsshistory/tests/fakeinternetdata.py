@@ -965,6 +965,27 @@ instance_entries_json = """
     "{0}", DateUtils.get_datetime_now_iso()
 )
 
+webpage_with_rss_link_rss_contents = """
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
+<channel>
+    <title>Page with RSS link - RSS contents</title>
+    <subtitle><![CDATA[SAMTIME subtitle]]></subtitle>
+    <description><![CDATA[SAMTIME channel description]]></description>
+    <link>https://odysee.com/@samtime:1</link>
+    <image><url>https://thumbnails.lbry.com/UCd6vEDS3SOhWbXZrxbrf_bw</url>
+    <title>SAMTIME on Odysee</title>
+    <link>https://page-with-rss-link.com/feed</link>
+    </image>
+    <generator>RSS for Node</generator>
+    <lastBuildDate>Tue, 01 Jan 2020 13:57:18 GMT</lastBuildDate>
+    <atom:link href="https://odysee.com/$/rss/@samtime:1" rel="self" type="application/rss+xml"/>
+    <language><![CDATA[ci]]></language>
+    <item><title><![CDATA[First entry title]]></title><description><![CDATA[First entry description]]></description><link>https://odysee.com/youtube-apologises-for-slowing-down:bab8f5ed4fa7bb406264152242bab2558037ee12</link><guid isPermaLink="true">https://odysee.com/youtube-apologises-for-slowing-down:bab8f5ed4fa7bb406264152242bab2558037ee12</guid><pubDate>{}</pubDate><enclosure url="https://player.odycdn.com/api/v3/streams/free/youtube-apologises-for-slowing-down/bab8f5ed4fa7bb406264152242bab2558037ee12/1698dc.mp4" length="29028604" type="video/mp4"/><itunes:title>YouTube Apologises For Slowing Down AdBlock Users</itunes:title><itunes:author>SAMTIME x</itunes:author><itunes:image href="https://thumbnails.lbry.com/a51RgbcCutk"/><itunes:duration>161</itunes:duration><itunes:explicit>no</itunes:explicit></item>
+    </channel>
+</rss>
+"""
+
 instance_sources_json_empty = """{"sources": []}"""
 
 instance_entries_json_empty = """{"links": []}"""

@@ -46,14 +46,16 @@ class SourceUrlInterface(object):
             return self.get_props_from_rss(input_props)
         elif type(p) is UrlHandler.youtube_video_handler:
             # Someone might be surprised that added URL is being replaced
-
-            self.h = UrlHandler(p.get_channel_feed_url())
+            self.url = p.get_channel_feed_url()
+            self.h = UrlHandler(self.url)
             self.p = self.h.p
 
             return self.get_props_from_rss(input_props)
         elif type(p) is HtmlPage and p.get_rss_url():
             # Someone might be surprised that added URL is being replaced
-            h = UrlHandler(h.p.get_rss_url())
+            self.url = self.h.p.get_rss_url()
+            self.h = UrlHandler(self.url)
+            self.p = self.h.p
             return self.get_props_from_rss(input_props)
         elif type(p) is JsonPage:
             return self.get_props_from_json(input_props)

@@ -237,6 +237,21 @@ class TestResponseObject(object):
 
             return b.build_contents()
 
+        elif url == "https://page-with-rss-link.com":
+            return """
+              <html>
+                 <head>
+                     <link type="application/rss+xml"  href="https://page-with-rss-link.com/feed"/>
+                 </head>
+                 <body>
+                    no body
+                 </body>
+             </html>
+             """
+
+        elif url == "https://page-with-rss-link.com/feed":
+            return webpage_with_rss_link_rss_contents
+
         elif url == "https://page-with-real-rss-link.com":
             return webpage_with_real_rss_links
 
