@@ -236,15 +236,15 @@ class BaseImporter(object):
         if sources.count() == 0:
             clean_data = self.drop_source_instance_internal_data(clean_data)
             if instance_import:
-                clean_data["on_hold"] = True
+                clean_data["enabled"] = False
             SourceDataBuilder(link_data=clean_data).add_from_props()
         # TODO cleanup
         # else:
         #    if instance_import:
         #        source = sources[0]
 
-        #        if source.on_hold != (not clean_data["on_hold"]):
-        #            source.on_hold = not clean_data["on_hold"]
+        #        if source.enabled != (not clean_data["enabled"]):
+        #            source.enabled = not clean_data["enabled"]
 
         #        if source.proxy_location != clean_data["proxy_location"]:
         #            source.proxy_location = clean_data["proxy_location"]

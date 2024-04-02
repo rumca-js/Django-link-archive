@@ -2308,8 +2308,9 @@ class Url(ContentInterface):
         # domain is lowercase
         p = DomainAwarePage(url)
         domain = p.get_domain()
-        if domain:
-            url = url.replace(domain, domain.lower(), 1)
+        domain_lower = domain.lower()
+
+        url = domain_lower + url[len(domain) :]
         return url
 
     def get_title(self):

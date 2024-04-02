@@ -1041,7 +1041,7 @@ instance_source_100_json = """
   "remove_after_days": "0",
   "language": "en-US",
   "favicon": "https://yt3.ggpht.com/ytc/AGIKgqMox432cx8APsB9u4UELfpZTjZlzO8nGU_M3PZ_nw=s48-c-k-c0x00ffffff-no-rj",
-  "on_hold": false,
+  "enabled": true,
   "fetch_period": 3600,
   "source_type": "BaseRssPlugin"
 }
@@ -1059,7 +1059,7 @@ instance_source_101_json = """
   "remove_after_days": "0",
   "language": "en-US",
   "favicon": "https://3dprinting.com/wp-content/uploads/cropped-3dp-site-icon-32x32.png",
-  "on_hold": false,
+  "enabled": true,
   "fetch_period": 1800,
   "source_type": "BaseRssPlugin"
 }
@@ -1077,7 +1077,7 @@ instance_source_102_json = """
   "remove_after_days": "0",
   "language": "en",
   "favicon": "https://www.404media.co/favicon.png",
-  "on_hold": false,
+  "enabled": true,
   "fetch_period": 900,
   "source_type": "BaseRssPlugin"
 }
@@ -1095,7 +1095,7 @@ instance_source_103_json = """
    "remove_after_days": "0",
    "language": "en-US",
    "favicon": "https://i0.wp.com/9to5linux.com/wp-content/uploads/2021/04/cropped-9to5linux-logo-mini-copy.png",
-   "on_hold": false,
+   "enabled": true,
    "fetch_period": 900,
    "source_type": "BaseRssPlugin"
 }
@@ -1113,7 +1113,7 @@ instance_source_104_json = """
    "remove_after_days": "0",
    "language": "en-US",
    "favicon": "https://www.science.org/favicon.ico",
-   "on_hold": false,
+   "enabled": true,
    "fetch_period": 900,
    "source_type": "BaseRssPlugin"
 }
@@ -1131,7 +1131,7 @@ instance_source_105_json = """
    "remove_after_days": "0",
    "language": "en-US",
    "favicon": "https://abcnews.go.com/favicon.ico",
-   "on_hold": false,
+   "enabled": true,
    "fetch_period": 3600,
    "source_type": "BaseRssPlugin"
 }

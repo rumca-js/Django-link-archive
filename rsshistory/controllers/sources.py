@@ -34,7 +34,7 @@ class SourceDataController(SourceDataModel):
     def cleanup():
         SourceDataModel.reset_dynamic_data()
 
-        sources = SourceDataModel.objects.filter(on_hold=False)
+        sources = SourceDataModel.objects.filter(enabled=True)
 
         for source in sources:
             from .entries import LinkDataBuilder
@@ -55,11 +55,11 @@ class SourceDataController(SourceDataModel):
         return days
 
     def get_long_description(self):
-        return "Category:{} Subcategory:{} Export:{} On Hold:{} Type:{}".format(
+        return "Category:{} Subcategory:{} Export:{} Enabled:{} Type:{}".format(
             self.category,
             self.subcategory,
             self.export_to_cms,
-            self.on_hold,
+            self.enabled,
             self.source_type,
         )
 
@@ -73,7 +73,7 @@ class SourceDataController(SourceDataModel):
         )
 
     def is_fetch_possible(self):
-        if self.on_hold:
+        if not self.enabled:
             return False
 
         now = DateUtils.get_datetime_now_utc()
@@ -212,7 +212,7 @@ class SourceDataController(SourceDataModel):
             "language",
             "age",
             "favicon",
-            "on_hold",
+            "enabled",
             "fetch_period",
             "source_type",
             "proxy_location",
@@ -231,7 +231,7 @@ class SourceDataController(SourceDataModel):
             "language",
             "age",
             "favicon",
-            "on_hold",
+            "enabled",
             "fetch_period",
             "source_type",
             "proxy_location",
@@ -285,7 +285,7 @@ class SourceDataController(SourceDataModel):
         return result
 
     def enable(self):
-        if not self.on_hold:
+        if self.enabled:
             return
 
         from .backgroundjob import BackgroundJobController
@@ -297,16 +297,16 @@ class SourceDataController(SourceDataModel):
 
         BackgroundJobController.download_rss(self)
 
-        self.on_hold = False
+        self.enabled = True
         self.save()
 
     def disable(self):
-        if self.on_hold:
+        if not self.enabled:
             return
 
         from .backgroundjob import BackgroundJobController
 
-        self.on_hold = True
+        self.enabled = False
         self.save()
 
     def edit(self, data):
@@ -331,8 +331,8 @@ class SourceDataController(SourceDataModel):
             self.language = data["language"]
         if "favicon" in data:
             self.favicon = data["favicon"]
-        if "on_hold" in data:
-            if not data["on_hold"]:
+        if "enabled" in data:
+            if data["enabled"]:
                 self.enable()
         if "fetch_period" in data:
             self.fetch_period = data["fetch_period"]
@@ -389,7 +389,7 @@ class SourceDataBuilder(object):
             # TODO if there is no title - inherit it from 'main domain'. same goes for language.
             # maybe for thumbnail
             self.link_data["export_to_cms"] = True
-            self.link_data["on_hold"] = not conf.auto_store_sources_enabled
+            self.link_data["enabled"] = conf.auto_store_sources_enabled
             self.link_data["source_type"] = SourceDataModel.SOURCE_TYPE_RSS
             self.link_data["remove_after_days"] = 2
             self.link_data["category"] = "New"
@@ -469,7 +469,7 @@ class SourceDataBuilder(object):
             LinkDataBuilder(link=p.get_domain())
 
     def add_to_download(self, source):
-        if not source.on_hold:
+        if source.enabled:
             from .backgroundjob import BackgroundJobController
 
             BackgroundJobController.download_rss(source)

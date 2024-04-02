@@ -433,7 +433,7 @@ def enable_all_sources(request):
     if data is not None:
         return data
 
-    sources = SourceDataController.objects.filter(on_hold=True)
+    sources = SourceDataController.objects.filter(enabled=False)
     if sources.exists():
         for source in sources:
             source.enable()
@@ -450,7 +450,7 @@ def disable_all_sources(request):
     if data is not None:
         return data
 
-    sources = SourceDataController.objects.filter(on_hold=False)
+    sources = SourceDataController.objects.filter(enabled=True)
     if sources.exists():
         for source in sources:
             source.disable()

@@ -20,7 +20,7 @@ class SourceDataModel(models.Model):
     language = models.CharField(max_length=10, blank=True) # inherited into entries
     age = models.IntegerField(default=0) # inherited into entries
     favicon = models.CharField(max_length=1000, null=True)
-    on_hold = models.BooleanField(default=False)
+    enabled = models.BooleanField(default=True)
     fetch_period = models.IntegerField(default=900)
     source_type = models.CharField(max_length=1000, null=False, default=SOURCE_TYPE_RSS)
 

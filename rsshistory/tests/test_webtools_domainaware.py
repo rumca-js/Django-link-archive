@@ -111,6 +111,11 @@ class DomainAwarePageTest(FakeInternetTestCase):
         p = DomainAwarePage("test.com")
         self.assertEqual(p.get_domain(), "https://test.com")
 
+    def test_get_domain_https_uppercase(self):
+        # default language
+        p = DomainAwarePage("HTTPS://test.com")
+        self.assertEqual(p.get_domain(), "https://test.com")
+
     def test_get_domain_only(self):
         # default language
         p = DomainAwarePage("http://test.com/my-site-test")

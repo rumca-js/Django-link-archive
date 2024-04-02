@@ -85,16 +85,16 @@ class BaseJsonPluginTest(FakeInternetTestCase):
         plugin = BaseSourceJsonPlugin(self.source_obj.id)
         props = plugin.get_container_elements()
 
-        sources = SourceDataController.objects.all().order_by("-on_hold")
+        sources = SourceDataController.objects.all().order_by("-enabled")
         for source in sources:
             print("Enabled source:{}".format(source.url))
 
         # 3 imported, 1 created here in test
         self.assertEqual(sources.count(), 3 + 1)
 
-        self.assertEqual(sources[0].on_hold, True)
-        self.assertEqual(sources[1].on_hold, True)
-        self.assertEqual(sources[2].on_hold, True)
+        self.assertEqual(sources[0].enabled, True)
+        self.assertEqual(sources[1].enabled, True)
+        self.assertEqual(sources[2].enabled, True)
 
         self.assertEqual(
             sources[0].proxy_location,
@@ -109,7 +109,7 @@ class BaseJsonPluginTest(FakeInternetTestCase):
             "https://instance.com/apps/rsshistory/source-json/102",
         )
 
-        self.assertEqual(sources[3].on_hold, False)
+        self.assertEqual(sources[3].enabled, False)
 
         # Links are not imported
         entries = LinkDataController.objects.all()

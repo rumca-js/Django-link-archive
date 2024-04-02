@@ -56,7 +56,11 @@ class SourceUrlInterface(object):
             self.url = self.h.p.get_rss_url()
             self.h = UrlHandler(self.url)
             self.p = self.h.p
-            return self.get_props_from_rss(input_props)
+
+            if type(self.p) is RssPage:
+                return self.get_props_from_rss(input_props)
+            else:
+                return self.get_props_from_page(input_props)
         elif type(p) is JsonPage:
             return self.get_props_from_json(input_props)
         else:

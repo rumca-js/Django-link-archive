@@ -76,10 +76,17 @@ class ProcessSourceJobHandler(BaseJobHandler):
 
     def process(self, obj=None):
         try:
-            plugin = SourceControllerBuilder.get(obj.subject)
+            source_url = obj.subject
+            sources = SourceDataModel.objects.filter(url=source_url)
+            if sources.count() > 0 and not sources[0].enabled:
+                # This source is disabled, and job should be removed
+                return True
+
+            plugin = SourceControllerBuilder.get(source_url)
             if plugin:
                 if plugin.check_for_data():
                     return True
+
                 # TODO implement it differently.
                 # it does not have to be the time to download data at all
                 # else:
@@ -906,7 +913,7 @@ class RefreshThreadHandler(object):
     def check_sources(self):
         from .controllers import SourceDataController
 
-        sources = SourceDataController.objects.filter(on_hold=False).order_by(
+        sources = SourceDataController.objects.filter(enabled=True).order_by(
             "dynamic_data__date_fetched"
         )
         for source in sources:
@@ -927,7 +934,7 @@ class RefreshThreadHandler(object):
         conf = c.config_entry
 
         if conf.source_save:
-            sources = SourceDataController.objects.filter(on_hold=False)
+            sources = SourceDataController.objects.filter(enabled=True)
             for source in sources:
                 BackgroundJobController.link_save(source.url)
 

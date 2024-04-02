@@ -464,7 +464,7 @@ class SourceForm(forms.ModelForm):
         model = SourceDataController
         fields = [
             "url",
-            "on_hold",
+            "enabled",
             "title",
             "source_type",
             "category",
@@ -719,7 +719,7 @@ class BasicEntryChoiceForm(forms.Form):
     def create(self, sources):
         # how to unpack dynamic forms
         # https://stackoverflow.com/questions/60393884/how-to-pass-choices-dynamically-into-a-django-form
-        condition1 = Q(on_hold=False)  # & Q(proxy_location = "")
+        condition1 = Q(enabled=True)  # & Q(proxy_location = "")
         self.sources = SourceDataController.objects.filter(condition1)
 
         category_choices = self.get_sources_values("category")
@@ -746,7 +746,7 @@ class BasicEntryChoiceForm(forms.Form):
         result = []
         result.append(["", ""])
 
-        for category in SourceCategories.objects.filter(on_hold=False):
+        for category in SourceCategories.objects.filter(enabled=True):
             if category and category != "":
                 result.append([category.category, category.category])
 
@@ -756,7 +756,7 @@ class BasicEntryChoiceForm(forms.Form):
         result = []
         result.append(["", ""])
 
-        for subcategory in SourceSubCategories.objects.filter(on_hold=False):
+        for subcategory in SourceSubCategories.objects.filter(enabled=True):
             if subcategory and subcategory != "":
                 result.append([subcategory.subcategory, subcategory.subcategory])
 

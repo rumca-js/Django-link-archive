@@ -26,10 +26,10 @@ class SourceControllerTest(FakeInternetTestCase):
             manual_entry=False,
         ).add_from_props()
 
-        # automatic entry creates on_hold sources, that are not fetched
+        # automatic entry creates disabled sources, that are not fetched
         sources = SourceDataController.objects.all()
         self.assertEqual(sources.count(), 1)
-        self.assertEqual(sources[0].on_hold, True)
+        self.assertEqual(sources[0].enabled, False)
 
         # job to add entry for source?
         jobs = BackgroundJobController.objects.all()
@@ -52,7 +52,7 @@ class SourceControllerTest(FakeInternetTestCase):
         # manual entry adds a new active source, that is fetched
         sources = SourceDataController.objects.all()
         self.assertEqual(sources.count(), 1)
-        self.assertEqual(sources[0].on_hold, False)
+        self.assertEqual(sources[0].enabled, True)
 
         # job to add entry
         jobs = BackgroundJobController.objects.all()

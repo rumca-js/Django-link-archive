@@ -28,6 +28,7 @@ from .fakeinternetdata import (
     webpage_youtube_airpano_feed,
     webpage_code_project_rss,
     webpage_html_favicon,
+    webpage_with_rss_link_rss_contents,
     instance_entries_json,
     instance_sources_json_empty,
     instance_entries_json_empty,

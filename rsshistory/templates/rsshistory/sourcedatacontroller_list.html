@@ -23,10 +23,10 @@
     <a href="{% url 'rsshistory:sources-disable-all' %}" class="simplebutton" title="Disable all sources">
         Disable all</a>
     {% endif %}
-    <a href="{% url 'rsshistory:sources' %}?search=on_hold+%3D+False" class="simplebutton" title="Shows active sources only">
-        Active</a>
-    <a href="{% url 'rsshistory:sources' %}?search=on_hold+%3D+True" class="simplebutton" title="Shows disabled sources only">
-        On Hold</a>
+    <a href="{% url 'rsshistory:sources' %}?search=enabled+%3D+True" class="simplebutton" title="Shows active sources only">
+        Enabled</a>
+    <a href="{% url 'rsshistory:sources' %}?search=enabled+%3D+False" class="simplebutton" title="Shows disabled sources only">
+        Disabled</a>
     <a href="{% url 'rsshistory:sources' %}?search=category+%3D%3D+New" class="simplebutton" title="Shows new sources only">
         New sources</a>
 </div>
@@ -64,7 +64,7 @@
                  {% if source.dead %}
                  [DEAD]
                  {% endif %}
-                 {% if source.on_hold %}
+                 {% if not source.enabled %}
                  [H]
                  {% endif %}
                  {{source.title}}

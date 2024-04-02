@@ -2,7 +2,7 @@ import traceback
 import hashlib
 
 from ..models import AppLogging
-from ..webtools import HtmlPage, PageOptions, ContentLinkParser
+from ..webtools import HtmlPage, PageOptions, ContentLinkParser, calculate_hash
 from ..dateutils import DateUtils
 from ..controllers import LinkDataBuilder, SourceDataController
 from ..controllers import LinkDataController
@@ -28,6 +28,7 @@ class SourceGenericPlugin(object):
         self.dead = False
 
         source = self.get_source()
+
         if source:
             options = UrlHandler.get_url_options(source.url)
 
@@ -35,6 +36,9 @@ class SourceGenericPlugin(object):
 
     def check_for_data(self):
         source = self.get_source()
+        if not source.enabled:
+            return
+
         LinkDatabase.info("Plugin: checking source {}".format(source.url))
 
         if not self.is_fetch_possible():
@@ -145,6 +149,9 @@ class SourceGenericPlugin(object):
     def calculate_plugin_hash(self):
         self.get_contents()
         return self.get_contents_hash()
+
+    def get_contents_hash(self):
+        return calculate_hash(self.contents)
 
     def set_operational_info(
         self, stop_time, num_entries, total_seconds, hash_value, valid=True

@@ -90,7 +90,8 @@ class SourceUrlInterfaceTest(FakeInternetTestCase):
         self.assertEqual(props["title"], "Page with RSS link - RSS contents")
         self.assertEqual(props["source_type"], SourceDataModel.SOURCE_TYPE_RSS)
 
-        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
+        # two requests -> one for page, second one to obtain RSS properties
+        self.assertEqual(MockRequestCounter.mock_page_requests, 2)
 
     def test_json_source(self):
         url = SourceUrlInterface("https://instance.com/apps/rsshistory/source-json/100")
