@@ -210,6 +210,12 @@ def add_source_simple(request):
             return HttpResponseRedirect(ob[0].get_absolute_url())
 
         data = SourceDataController.get_full_information({"url": url})
+        if not data:
+            p.context["summary_text"] = "Could not obtain properties of link:{}".format(
+                url
+            )
+            return p.render("summary_present.html")
+
         notes = []
         warnings = []
         errors = []

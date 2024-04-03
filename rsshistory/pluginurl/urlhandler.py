@@ -235,3 +235,76 @@ class UrlHandler(Url):
                     url = Url.get_cleaned_link(url)
 
         return url
+
+    def is_valid(self):
+        if not super().is_valid():
+            return False
+
+        if self.is_site_not_found():
+            return False
+
+        if self.is_title_porn():
+            return False
+
+        return True
+
+    def is_site_not_found(self):
+        title = self.get_title()
+        print("Title: {}".format(title))
+        if title:
+            title = title.lower()
+        else:
+            title = ""
+
+        is_title_invalid = (
+            title.find("forbidden") >= 0
+            or title.find("access denied") >= 0
+            or title.find("site not found") >= 0
+            or title.find("page not found") >= 0
+            or title.find("404 not found") >= 0
+            or title.find("error 404") >= 0
+            or title.find("squarespace - website expired") >= 0
+        )
+
+        if is_title_invalid:
+            LinkDatabase.info("Title is invalid {}".format(title))
+            return False
+
+    def is_title_porn(self):
+        """
+        TODO This should be configurable - move to configuration
+        """
+        title = self.get_title()
+        print("Title: {}".format(title))
+        if title:
+            title = title.lower()
+        else:
+            title = ""
+
+        critical_keywords = [
+         'masturbat',
+         'porn',
+         'xxx',
+         'sex',
+         'slutt',
+         'nude',
+         'chaturbat',
+        ]
+
+        for keyword in critical_keywords:
+            if title.find(keyword) >= 0:
+                return True
+
+        keywords = [
+         'live',
+         'nast',
+         'slut',
+         'webcam',
+        ]
+
+        points = 0
+        for keyword in keywords:
+            if title.find(keyword) >= 0:
+                points += 1
+
+        return points > 2

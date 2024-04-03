@@ -311,9 +311,9 @@ class BaseLinkDataController(BaseLinkDataModel):
             self.language = self.get_source_obj().language
             self.save()
         else:
-            page = HtmlPage(self.link)
-            if page.is_valid():
-                language = page.get_language()
+            handler = UrlHandler(self.link)
+            if handler.is_valid():
+                language = handler.get_language()
                 if language != None:
                     self.language = language
                     self.save()

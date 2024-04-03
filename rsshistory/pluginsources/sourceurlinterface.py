@@ -22,11 +22,17 @@ class SourceUrlInterface(object):
         if self.h.response:
             self.url = self.h.response.url
 
-        self.p = self.h.p
+        if not self.h.is_valid():
+            self.p = None
+        else:
+            self.p = self.h.p
 
     def get_props(self, input_props=None):
         if not input_props:
             input_props = {}
+
+        if self.p is None:
+            return input_props
 
         props = self.get_props_internal(input_props)
 

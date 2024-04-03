@@ -671,6 +671,30 @@ class ContentInterface(object):
                 )
             )
 
+    def get_position_of_html_tags(self):
+        if not self.contents:
+            return -1
+
+        lower = self.contents.lower()
+        if lower.find("<html") >= 0 and lower.find("<body") >= 0:
+            return lower.find("<html")
+
+        return -1
+
+    def get_position_of_rss_tags(self):
+        if not self.contents:
+            return -1
+
+        lower = self.contents.lower()
+        if lower.find("<rss") >= 0 and lower.find("<channel") >= 0:
+            return lower.find("<rss")
+        if lower.find("<feed") >= 0 and lower.find("<entry") >= 0:
+            return lower.find("<feed")
+        if lower.find("<rdf") >= 0 and lower.find("<channel") >= 0:
+            return lower.find("<rdf")
+
+        return -1
+
 
 class DefaultContentPage(ContentInterface):
     def __init__(self, url, contents):
@@ -725,31 +749,31 @@ class JsonPage(ContentInterface):
 
     def get_title(self):
         if self.json_obj and "title" in self.json_obj:
-            return self.json_obj["title"]
+            return str(self.json_obj["title"])
 
     def get_description(self):
         if self.json_obj and "description" in self.json_obj:
-            return self.json_obj["description"]
+            return str(self.json_obj["description"])
 
     def get_language(self):
         if self.json_obj and "language" in self.json_obj:
-            return self.json_obj["language"]
+            return str(self.json_obj["language"])
 
     def get_thumbnail(self):
         if self.json_obj and "thumbnail" in self.json_obj:
-            return self.json_obj["thumbnail"]
+            return str(self.json_obj["thumbnail"])
 
     def get_author(self):
         if self.json_obj and "author" in self.json_obj:
-            return self.json_obj["author"]
+            return str(self.json_obj["author"])
 
     def get_album(self):
         if self.json_obj and "album" in self.json_obj:
-            return self.json_obj["album"]
+            return str(self.json_obj["album"])
 
     def get_tags(self):
         if self.json_obj and "tags" in self.json_obj:
-            return self.json_obj["tags"]
+            return str(self.json_obj["tags"])
 
     def get_date_published(self):
         if self.json_obj and "date_published" in self.json_obj:
@@ -1065,30 +1089,6 @@ class RssPage(ContentInterface):
         if rss_tags >= 0:
             return True
 
-    def get_position_of_html_tags(self):
-        if not self.contents:
-            return -1
-
-        lower = self.contents.lower()
-        if lower.find("<html") >= 0 and lower.find("<body") >= 0:
-            return lower.find("<html")
-
-        return -1
-
-    def get_position_of_rss_tags(self):
-        if not self.contents:
-            return -1
-
-        lower = self.contents.lower()
-        if lower.find("<rss") >= 0 and lower.find("<channel") >= 0:
-            return lower.find("<rss")
-        if lower.find("<feed") >= 0 and lower.find("<entry") >= 0:
-            return lower.find("<feed")
-        if lower.find("<rdf") >= 0 and lower.find("<channel") >= 0:
-            return lower.find("<rdf")
-
-        return -1
-
 
 class ContentLinkParser(ContentInterface):
     """
@@ -1321,8 +1321,8 @@ class HtmlPage(ContentInterface):
             title = title.strip()
 
             # TODO hardcoded. Some pages provide such a dumb title with redirect
-            if title.find("Just a moment...") >= 0:
-                title = self.url
+            if title.find("Just a moment") >= 0:
+                title = ""
 
         return title
         # title = html.unescape(title)
@@ -1649,34 +1649,11 @@ class HtmlPage(ContentInterface):
 
     def is_valid(self):
         """
-        This is a simple set of rules in which we reject the page.
-        Some checks rely on the title.
-
-        This is because some pages return valid HTTP return code, with a title informing about error.
-        Therefore we use HTML title as means to find some most obvious errors.
-
-        A user could have selected a title with these prohibited keywords, but I must admit this would not be wise
-        to have "Site not found" string in the title.
-        Better to reject such site either way.
+        This is a simple set of rules in which we reject the page:
+         - status code
+         - if valid HTML code
         """
         if not self.is_contents_html():
-            return False
-
-        title = self.get_title()
-        if title:
-            title = title.lower()
-
-        is_title_invalid = title and (
-            title.find("forbidden") >= 0
-            or title.find("access denied") >= 0
-            or title.find("site not found") >= 0
-            or title.find("page not found") >= 0
-            or title.find("404 not found") >= 0
-            or title.find("error 404") >= 0
-        )
-
-        if is_title_invalid:
-            LinkDatabase.info("Title is invalid {}".format(title))
             return False
 
         return True
@@ -1698,26 +1675,6 @@ class HtmlPage(ContentInterface):
             return html_tags < rss_tags
         if html_tags >= 0:
             return True
-
-    def get_position_of_html_tags(self):
-        if not self.contents:
-            return -1
-
-        lower = self.contents.lower()
-        if lower.find("<html") >= 0 and lower.find("<body") >= 0:
-            return lower.find("<html")
-
-        return -1
-
-    def get_position_of_rss_tags(self):
-        if not self.contents:
-            return -1
-
-        lower = self.contents.lower()
-        if lower.find("<rss") >= 0 and lower.find("<channel") >= 0:
-            return lower.find("<rss")
-
-        return -1
 
     def get_body_text(self):
         if not self.contents:
@@ -2179,6 +2136,8 @@ class Url(ContentInterface):
         self.p = self.get_handler(
             url, page_object=page_object, page_options=page_options
         )
+        if not self.is_valid():
+            self.p = None
 
     def get_handler(self, url=None, page_object=None, page_options=None):
         if url is None:

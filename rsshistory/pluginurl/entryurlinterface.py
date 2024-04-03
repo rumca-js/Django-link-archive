@@ -37,11 +37,22 @@ class EntryUrlInterface(object):
         if self.h.response:
             self.url = self.h.response.url
 
-        self.p = self.h.p
+        if not self.ignore_errors and not self.h.is_valid():
+            if self.log:
+                LinkDatabase.info("Page is invalid:{}".format(url))
+                AppLogging.error("Page is invalid:{}".format(url))
+            self.p = None
+            return None
+
+        else:
+            self.p = self.h.p
 
     def get_props(self, input_props=None, source_obj=None):
         if not input_props:
             input_props = {}
+
+        if not self.p:
+            return None
 
         props = self.get_props_implementation(input_props, source_obj)
 
@@ -79,9 +90,6 @@ class EntryUrlInterface(object):
         is_domain = DomainAwarePage(self.url).is_domain()
         p = self.p
 
-        if not p:
-            return
-
         if is_domain:
             input_props["permanent"] = True
             input_props["bookmarked"] = False
@@ -116,12 +124,6 @@ class EntryUrlInterface(object):
         url = self.url
 
         p = self.p
-
-        if not self.ignore_errors and not p.is_valid():
-            if self.log:
-                LinkDatabase.info("YouTube page is invalid:{}".format(url))
-                AppLogging.error("YouTube page is invalid:{}".format(url))
-            return None
 
         source_url = p.get_channel_feed_url()
         if source_url is None:
@@ -263,10 +265,6 @@ class EntryUrlInterface(object):
 
         url = self.url
         p = self.p
-
-        if not p.is_valid():
-            LinkDatabase.info("HTML page is invalid:{}".format(url))
-            return
 
         if not self.is_property_set(input_props, "source"):
             input_props["source"] = self.url

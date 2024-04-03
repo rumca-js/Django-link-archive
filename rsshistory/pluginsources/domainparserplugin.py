@@ -3,7 +3,7 @@ import re
 import traceback
 import time
 
-from ..webtools import HtmlPage
+from ..webtools import DomainAwarePage
 from ..models import AppLogging
 from ..controllers import LinkDataController
 from .sourceparseplugin import BaseParsePlugin
@@ -31,13 +31,6 @@ class DomainParserPlugin(BaseParsePlugin):
 
         index = 0
         for link_str in domains_vec:
-            p = HtmlPage(link_str)
-            if p.is_valid() == False:
-                LinkDatabase.info(
-                    "DomainParserPlugin: link is not valid:{}".format(link_str)
-                )
-                continue
-
             objs = LinkDataController.objects.filter(link=link_str)
             if objs.exists():
                 continue

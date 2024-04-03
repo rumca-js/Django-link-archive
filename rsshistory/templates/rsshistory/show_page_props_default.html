@@ -1,23 +1,36 @@
 <h1>Page properties</h1>
 
 <ul>
-    <li>Link: {{page_link}} <a href="{{page_link}}">Link</a></li>
-    <li>Detected page type: {{page_type}}</li>
-    <li>Status code: {{page_object.status_code}}</li>
-    <li>Encoding: {{page_object.encoding}}</li>
+    <li>Link: {{page_object.url}} <a href="{{page_object.url}}">Link</a></li>
+    <li>Detected page type: {{page_object_type}}</li>
+    <li>Status code: {{response_object.status_code}}</li>
     <li>Valid: {{page_object.is_valid}}</li>
-    <li>Title: {{title}}</li>
-    <li>Description: {{description}}</li>
-    <li>Author: {{author}}</li>
-    <li>Page Rating: {{page_rating}}. Described by <a href="https://github.com/rumca-js/Django-link-archive">Django link archive Readme</a></li>
-    {%if thumbnail %}
-    <li>thumbnail: <a href="{{thumbnail}}"/>Link</a></li>
+    <li>Title: {{page_object.get_title}}</li>
+    <li>Description: {{page_object.get_description}}</li>
+    {%if page_object.get_date_published %}
+    <li>Date published: {{page_object.get_date_published}}</li>
+    {%endif%}
+    <li>Author: {{page_object.get_author}}</li>
+    <li>Page Rating: {{page_object.get_page_rating}}. Described by <a href="https://github.com/rumca-js/Django-link-archive">Django link archive Readme</a></li>
+    {%if page_object.get_thumbnail %}
+    <li>thumbnail: <a href="{{page_object.get_thumbnail}}"/>Link</a></li>
     {%endif %}
     <li>Contents length: {{contents_length}}.
+        {% if contents_length == 0 %}
+        Page is empty.
+        {% elif contents_length < 100 %}
+        The site is really tiny.
+        {% elif contents_length < 1000 %}
+        The site is small.
+        {% elif contents_length < 500000 %}
+        The site size is normal
+        {% elif contents_length > 500000 %}
+        That is a humongus page size!
+        {% endif %}
     </li>
-    <li>Language: {{language}}</li>
+    <li>Language: {{page_object.get_language}}</li>
     {%if tags %}
-    <li>keywords: {{tags}}</li>
+    <li>Keywords: {{page_object.get_tags}}</li>
     {%endif %}
     <li>keywords: {{page_object.get_tags}}</li>
 
@@ -25,11 +38,11 @@
 </ul>
 
 {% if user_config.show_icons %}
-    {%if thumbnail%}
-    <img src="{{thumbnail}}" style="max-width: 50%"/>
+    {%if page_object.get_thumbnail%}
+    <img src="{{page_object.get_thumbnail}}" style="max-width: 50%"/>
     {%endif%}
 {%endif%}
 
 <h1>Contents</h1>
 
-<pre>{{contents}}</pre>
+<pre>{{page_object.contents}}</pre>

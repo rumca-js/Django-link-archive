@@ -362,11 +362,11 @@ class SourceDataBuilder(object):
         if rss_url.endswith("/"):
             rss_url = rss_url[:-1]
 
-        page = RssPage(rss_url)
-        if not page.is_valid():
+        h = UrlHandler(rss_url)
+        if not h.is_valid():
             return
 
-        self.link_data = page.get_properties()
+        self.link_data = h.get_properties()
 
         return self.add_from_props()
 

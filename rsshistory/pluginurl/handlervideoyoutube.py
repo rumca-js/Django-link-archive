@@ -154,6 +154,7 @@ class YouTubeJsonHandler(YouTubeVideoHandler):
                 LinkDatabase.info("YouTube video handler: {} DONE".format(self.url))
 
         self.response = response
+        self.contents = self.response.content
 
         if (
             not self.response

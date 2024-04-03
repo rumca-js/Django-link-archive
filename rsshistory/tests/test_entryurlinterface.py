@@ -74,13 +74,21 @@ class EntryUrlInterfaceTest(FakeInternetTestCase):
         print(props)
         self.assertTrue(props is None)
 
-    def test_error_youtube(self):
+    def test_error_youtube_video(self):
         url = EntryUrlInterface("https://m.youtube.com/watch?v=666")
 
         props = url.get_props()
         print("Props")
         print(props)
         self.assertTrue(props is None)
+
+    def test_error_youtube_feed(self):
+        url = EntryUrlInterface("https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM")
+
+        props = url.get_props()
+        print("Props")
+        print(props)
+        self.assertTrue(props)
 
     def test_video_inherits_language(self):
         source_link = "https://youtube.com"
