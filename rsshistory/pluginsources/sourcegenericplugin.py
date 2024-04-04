@@ -9,7 +9,7 @@ from ..controllers import LinkDataController
 from ..configuration import Configuration
 from ..models import BaseLinkDataController
 from ..apps import LinkDatabase
-from ..pluginurl.urlhandler import UrlHandler
+from ..pluginurl.urlhandler import UrlHandler, UrlPropertyValidator
 
 
 class SourceGenericPlugin(object):
@@ -93,31 +93,34 @@ class SourceGenericPlugin(object):
                 AppLogging.error(
                     "Invalid link properties. Missing key: {}".format(str(link_data))
                 )
-            else:
-                if source:
-                    link_data["source"] = source.url
-                    link_data["source_obj"] = source
-                    if source.age > 0:
-                        link_data["age"] = source.age
 
-                if "page_rating" in link_data:
-                    link_data["page_rating_contents"] = link_data["page_rating"]
+                continue
 
-                # LinkDatabase.info("Generic plugin item add:{}".format(link_data["link"]))
+            if source:
+                link_data["source"] = source.url
+                link_data["source_obj"] = source
+                if source.age > 0:
+                    link_data["age"] = source.age
 
-                b = LinkDataBuilder()
-                b.link_data = link_data
-                b.source_is_auto = True
+            if "page_rating" in link_data:
+                link_data["page_rating_contents"] = link_data["page_rating"]
 
-                entry = b.add_from_props()
+            # LinkDatabase.info("Generic plugin item add:{}".format(link_data["link"]))
 
-                LinkDatabase.info(
-                    "Generic plugin add:{} DONE".format(link_data["link"])
-                )
+            b = LinkDataBuilder()
+            b.link_data = link_data
+            b.source_is_auto = True
 
-                if entry and entry.date_published > start_time:
-                    self.on_added_entry(entry)
-                    num_entries += 1
+            entry = b.add_from_props()
+
+            LinkDatabase.info(
+                "Generic plugin add:{} DONE".format(link_data["link"])
+            )
+
+            if entry and entry.date_published > start_time:
+                self.on_added_entry(entry)
+                num_entries += 1
+
             # LinkDatabase.info("Generic plugin item stop:{}".format(link_data["link"]))
 
         return num_entries

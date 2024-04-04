@@ -5,11 +5,12 @@ from ..models import UserTags
 from ..configuration import Configuration
 from .sourcerssplugin import BaseRssPlugin
 from .rssscannerplugin import RssScannerPlugin
+from ..controllers import BackgroundJobController
 
 from ..webtools import ContentLinkParser, HtmlPage, DomainAwarePage
 
 
-class HackerNewsScannerPlugin(RssScannerPlugin):
+class HackerNewsScannerPlugin(BaseRssPlugin):
     """
     - We read RSS
     - For each item in RSS we find internal links for this source
@@ -21,7 +22,34 @@ class HackerNewsScannerPlugin(RssScannerPlugin):
     def __init__(self, source_id):
         super().__init__(source_id)
 
-    def is_internal_page_processed(self, url):
-        url_page = DomainAwarePage(url)
+    def get_container_elements(self):
+        props = super().get_container_elements()
 
-        return url_page.get_domain().find("news.ycombinator.com") >= 0
+        for prop in props:
+            yield prop
+
+        self.add_all_container_properties_to_queue(props)
+
+    def add_all_container_properties_to_queue(self, props):
+        for prop in props:
+            self.add_additional_links_to_queue(prop)
+
+    def add_additional_links_to_queue(self, entry_props):
+        new_props = []
+
+        self.get_container_element_links(entry_props)
+
+    def get_container_element_links(self, entry_properties):
+        contents = self.get_container_element_contents(entry_properties)
+
+        if contents:
+            parser = ContentLinkParser(contents)
+            links = parser.get_links()
+
+            for link in links:
+                if link.find("news.ycombinator.com") >= 0:
+                    BackgroundJobController.link_scan(link, source=self.get_source() )
+
+    def get_container_element_contents(self, properties):
+        if "description" in properties:
+            return properties["description"]

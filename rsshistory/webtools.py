@@ -427,6 +427,11 @@ class ContentInterface(object):
             page_rating += rating[0]
             max_page_rating += rating[1]
 
+        if page_rating == 0:
+            return 0
+        if max_page_rating == 0:
+            return 0
+
         page_rating = (page_rating * 100) / max_page_rating
 
         return int(page_rating)
@@ -2237,10 +2242,11 @@ class Url(ContentInterface):
         return list(result)
 
     def get_favicon(self):
-        if type(self.p) is HtmlPage:
-            favs = self.p.get_favicons()
-            if favs and len(favs) > 0:
-                return favs[0][0]
+        if self.p:
+            if type(self.p) is HtmlPage:
+                favs = self.p.get_favicons()
+                if favs and len(favs) > 0:
+                    return favs[0][0]
 
         p = DomainAwarePage(self.url)
         if p.is_domain():

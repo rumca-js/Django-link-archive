@@ -19,10 +19,8 @@ class BaseRssPlugin(SourceGenericPlugin):
     PLUGIN_NAME = "BaseRssPlugin"
 
     def __init__(self, source_id):
-        print("BaseRssPlugin:constr0")
         super().__init__(source_id)
         source = self.get_source()
-        print("BaseRssPlugin:constr1:{}".format(source.url))
 
     def get_contents(self):
         if self.contents:

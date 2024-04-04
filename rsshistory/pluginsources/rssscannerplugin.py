@@ -5,6 +5,7 @@ from ..models import UserTags
 from ..configuration import Configuration
 from .sourcerssplugin import BaseRssPlugin
 from ..pluginurl import EntryUrlInterface
+from ..controllers import BackgroundJobController
 
 from ..webtools import ContentLinkParser, HtmlPage, DomainAwarePage
 
@@ -24,56 +25,82 @@ class RssScannerPlugin(BaseRssPlugin):
     def get_container_elements(self):
         props = super().get_container_elements()
 
+        props = self.get_all_container_properties()
+
+        return []
+
+    def get_all_container_properties(self, props):
+        all_new_props = []
         for prop in props:
-            new_props = self.on_container_element(prop)
-            for new_prop in new_props:
-                props.append(new_prop)
+            new_props = self.get_additional_url_props(prop)
+            if len(new_props) > 0:
+                all_new_props.extend(new_props)
 
-        for prop in props:
-            yield prop
+        props.extend(all_new_props)
+        return props
 
-    def on_container_element(self, props):
-        new_props = []
+    def get_additional_url_props(self, entry_props):
+        links = self.get_additional_links(entry_props)
 
-        self.get_container_element_links(props)
-        for container_link in links:
-            if self.is_internal_page_processed(container_link):
-                props = self.process_internal_page(container_link)
+        for link in links:
+            BackgroundJobController.link_add(link, source = self.get_source())
 
-                new_props.extend(props)
+    def get_additional_links(self, entry_props):
+        links = self.get_description_links(entry_props)
+        links.update(self.get_page_links(entry_props))
+        links = list(links)
 
-        return new_props
+        domains = set()
+        for link in links:
+            p = DomainAwarePage(link)
+            domains.add(p.get_domain())
 
-    def get_container_element_contents(self, properties):
-        if "description" in properties:
-            return properties["description"]
+        links.update(domains)
 
-    def get_container_element_links(self, properties):
-        contents = self.get_container_element_contents(properties)
+        return links
+
+    def get_page_links(self, entry_properties):
+        h = UrlHandler(entry_properties["link"])
+        contents = h.get_contents()
+
+        result = set()
+        if not contents:
+            return result
 
         if contents:
             parser = ContentLinkParser(contents)
-            links = parser.get_links()
-            return links
-        else:
-            return []
+            links = set(parser.get_links())
+            result.update(links)
 
-    def is_internal_page_processed(self, url):
-        url_page = DomainAwarePage(url)
-        source_page = BasePage(self.get_source().url)
+        return result
 
-        return url_page.get_domain() == source_page.get_domain()
+    def get_description_links(self, entry_properties):
+        contents = self.get_description_contents(entry_properties)
 
-    def process_internal_page(self, url):
-        all_props = []
+        result = set()
 
-        p = HtmlPage(url)
-        parser = ContentLinkParser(p.get_contents())
+        if contents:
+            parser = ContentLinkParser(contents)
+            links = set(parser.get_links())
+            result.update(links)
 
-        for link in parser.get_links():
-            i = EntryUrlInterface(link=link)
-            props = i.get_props()
-            if props:
-                all_props.append(props)
+        return result
 
-        return all_props
+    def get_description_contents(self, properties):
+        if "description" in properties:
+            return properties["description"]
+
+    def get_parser_links(parser):
+        links = []
+        c = Configuration.get_object().conf_entry
+        if c.auto_store_domain_info:
+            links.extend( parser.get_domains())
+
+        if c.auto_store_entries:
+            links.extend( parser.get_links())
+        return links
+
+    def find_links_in_site(self, url):
+        u = UrlHandler(url)
+        p = ContentLinkParser(url, u.get_contents())
+        return set(self.get_parser_links(p))

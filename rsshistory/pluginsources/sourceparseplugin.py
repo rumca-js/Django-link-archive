@@ -6,7 +6,7 @@ import time
 from ..webtools import DomainAwarePage, HtmlPage, PageOptions
 from ..dateutils import DateUtils
 from ..models import AppLogging
-from ..controllers import LinkDataController
+from ..controllers import LinkDataController, BackgroundJobController
 from ..apps import LinkDatabase
 from ..pluginurl.urlhandler import UrlHandler
 from ..pluginurl.entryurlinterface import EntryUrlInterface
@@ -62,23 +62,9 @@ class BaseParsePlugin(SourceGenericPlugin):
             if objs.exists():
                 continue
 
-            link_props = self.get_link_data(self.get_source(), link_str)
+            BackgroundJobController.link_add(link_str, source=self.get_source())
 
-            if not link_props or len(link_props) == 0:
-                continue
-
-            LinkDatabase.info(
-                "Processing parsing link {}:[{}/{}]".format(
-                    link_str, index, num_entries
-                )
-            )
-
-            yield link_props
-
-            # if 10 minutes passed
-            if time.time() - start_processing_time >= 60 * 10:
-                AppLogging.info("Spent too much time in parser")
-                break
+        return []
 
     def calculate_plugin_hash(self):
         """
@@ -91,10 +77,8 @@ class BaseParsePlugin(SourceGenericPlugin):
         contents = self.get_contents()
         url = self.get_address()
 
-        print("Calculating plugin hash")
         p = HtmlPage(url, contents)
         if p.is_valid:
-            print("Calculating plugin hash is html")
             return p.get_body_hash()
         else:
             return self.get_contents_hash()

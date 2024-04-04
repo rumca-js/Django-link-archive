@@ -12,7 +12,7 @@ from ..models import (
     BackgroundJob,
     AppLogging,
 )
-from ..webtools import HtmlPage, DomainAwarePage
+from ..webtools import HtmlPage, DomainAwarePage, Url
 from ..dateutils import DateUtils
 
 
@@ -153,8 +153,7 @@ class BackgroundJobController(BackgroundJob):
         """
         It handles only automatic additions.
         """
-        if not url.lower().startswith("http"):
-            url = "https://" + url
+        url = Url.get_cleaned_link(url) # TODO maybe urlhandler?
 
         h = DomainAwarePage(url)
         if h.is_analytics():
@@ -211,11 +210,33 @@ class BackgroundJobController(BackgroundJob):
                 url,
             )
 
-    def link_scan(url):
-        return BackgroundJobController.create_single_job(
-            BackgroundJob.JOB_LINK_SCAN,
-            url,
-        )
+    def link_scan(url, source=None):
+
+        cfg = {}
+
+        if source:
+            cfg["source"] = source.id
+
+        args_text = json.dumps(cfg)
+
+        """TODO fix hardcoded value"""
+        if len(args_text) > 1000:
+            AppLogging.error(
+                "Link add job configuration is too long:{}".format(args_text)
+            )
+            args_text = ""
+
+        if cfg != {}:
+            return BackgroundJobController.create_single_job(
+                BackgroundJob.JOB_LINK_SCAN,
+                url,
+                args_text,
+            )
+        else:
+            return BackgroundJobController.create_single_job(
+                BackgroundJob.JOB_LINK_SCAN,
+                url,
+            )
 
     def write_daily_data_range(date_start=date.today(), date_stop=date.today()):
         try:

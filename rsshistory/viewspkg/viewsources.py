@@ -307,7 +307,7 @@ def edit_source(request, pk):
         return p.render("summary_present.html")
     else:
         if not ob.favicon:
-            icon = Url.get_favicon(ob.url)
+            icon = Url(ob.url).get_favicon()
             if icon:
                 form = SourceForm(instance=ob, initial={"favicon": icon})
             else:

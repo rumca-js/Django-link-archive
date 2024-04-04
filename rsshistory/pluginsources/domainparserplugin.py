@@ -5,7 +5,7 @@ import time
 
 from ..webtools import DomainAwarePage
 from ..models import AppLogging
-from ..controllers import LinkDataController
+from ..controllers import LinkDataController, BackgroundJobController
 from .sourceparseplugin import BaseParsePlugin
 from ..apps import LinkDatabase
 
@@ -35,19 +35,6 @@ class DomainParserPlugin(BaseParsePlugin):
             if objs.exists():
                 continue
 
-            link_props = self.get_link_data(self.get_source(), link_str)
+            BackgroundJobController.link_add(link_str, source=self.get_source())
 
-            if self.is_link_ok_to_add(link_props):
-                LinkDatabase.info(
-                    "DomainParserPlugin: adding domain:{} [{}/{}]".format(
-                        link_str, index, num_entries
-                    )
-                )
-                yield link_props
-
-                index += 1
-
-            # if 10 minutes passed
-            if time.time() - start_processing_time >= 60 * 10:
-                AppLogging.error("Spent too much time in parser")
-                break
+        return []

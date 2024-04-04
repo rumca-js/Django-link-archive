@@ -92,7 +92,7 @@
       <a href="{% url 'rsshistory:entries' %}?query_type={{query_type}}&{{ args }}&type=normal" class='simplebutton'>Show Normal</a>
   </div>
 
-{% include "rsshistory/form_search_term_places_element.html" %}
+{% include "rsshistory/search_places_element.html" %}
 
 <div>
 {{ query_filter.time_stop }}

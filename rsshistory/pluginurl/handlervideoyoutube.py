@@ -255,12 +255,15 @@ class YouTubeJsonHandler(YouTubeVideoHandler):
         yt_json = self.yt_ob._json
 
         if yt_json:
-            youtube_props["webpage_url"] = yt_json["webpage_url"]
-            youtube_props["uploader_url"] = yt_json["uploader_url"]
+            if "webpage_url" in yt_json:
+                youtube_props["webpage_url"] = yt_json["webpage_url"]
+            if "uploader_url" in yt_json:
+                youtube_props["uploader_url"] = yt_json["uploader_url"]
             youtube_props["channel_id"] = self.yt_ob.get_channel_code()
             youtube_props["channel"] = self.yt_ob.get_channel_name()
             youtube_props["channel_url"] = self.yt_ob.get_channel_url()
-            youtube_props["channel_follower_count"] = yt_json["channel_follower_count"]
+            if "channel_follower_count" in yt_json:
+                youtube_props["channel_follower_count"] = yt_json["channel_follower_count"]
             youtube_props["view_count"] = self.yt_ob.get_view_count()
             youtube_props["like_count"] = self.yt_ob.get_thumbs_up()
             if "duration_string" in yt_json:

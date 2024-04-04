@@ -240,6 +240,22 @@ class UrlHandler(Url):
         if not super().is_valid():
             return False
 
+        validator = UrlPropertyValidator(properties = self.get_properties())
+        if not validator.is_valid():
+            return False
+
+        return True
+
+
+class UrlPropertyValidator(object):
+    def __init__(self, page_object=None, properties=None):
+        self.properties = []
+        if page_object:
+            self.properties = page_object.get_properties()
+        if properties:
+            self.properties = properties
+
+    def is_valid(self):
         if self.is_site_not_found():
             return False
 
@@ -248,9 +264,12 @@ class UrlHandler(Url):
 
         return True
 
+    def get_title(self):
+        if "title" in self.properties:
+            return self.properties["title"]
+
     def is_site_not_found(self):
         title = self.get_title()
-        print("Title: {}".format(title))
         if title:
             title = title.lower()
         else:
@@ -275,7 +294,6 @@ class UrlHandler(Url):
         TODO This should be configurable - move to configuration
         """
         title = self.get_title()
-        print("Title: {}".format(title))
         if title:
             title = title.lower()
         else:

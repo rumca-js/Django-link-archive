@@ -6,5 +6,5 @@ We can add different site mechanisms, handlers, controllers.
 """
 
 from .handlervideoyoutube import YouTubeVideoHandler, YouTubeJsonHandler
-from .urlhandler import UrlHandler
+from .urlhandler import UrlHandler, UrlPropertyValidator
 from .entryurlinterface import EntryUrlInterface

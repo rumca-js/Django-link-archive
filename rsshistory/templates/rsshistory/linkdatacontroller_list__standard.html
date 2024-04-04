@@ -28,6 +28,7 @@
    {% endif %}
 
    <span class="link-list-item-title">
+       {% if link.is_dead %}[D]{%endif%}
        {% if link.page_rating_votes %}
        [{{link.page_rating_votes}}]
        {%endif%}

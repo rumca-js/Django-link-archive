@@ -654,6 +654,7 @@ class LinkDataBuilder(object):
 
         if not self.link_data:
             self.link_data = {}
+
         self.link_data["link"] = self.link
 
         # we do not want to obtain properties for non-domain entries, if we capture only
@@ -706,10 +707,16 @@ class LinkDataBuilder(object):
 
     def add_from_props_internal(self):
         from .backgroundjob import BackgroundJobController
+        from ..pluginurl import UrlPropertyValidator
 
         entry = None
 
         self.link_data = self.get_clean_link_data()
+
+        v = UrlPropertyValidator(properties = self.link_data)
+        if not v.is_valid():
+            LinkDatabase.error("Url is not valid: {}".format(self.link_data["link"]))
+            return
 
         # if self.source_is_auto:
         #    self.link_data["link"] = self.link_data["link"].lower()

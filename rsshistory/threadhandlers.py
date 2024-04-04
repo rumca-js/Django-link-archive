@@ -65,6 +65,21 @@ class BaseJobHandler(object):
                     result.append(os.path.join(root, afile))
         return result
 
+    def get_input_cfg(self, in_object=None):
+        cfg = {}
+
+        if in_object.args and len(in_object.args) > 0:
+            try:
+                cfg = json.loads(in_object.args)
+            except Exception as E:
+                AppLogging.error(
+                    "Exception when adding link {0} {1} {2}".format(
+                        in_object.subject, str(e), error_text
+                    )
+                )
+
+        return cfg
+
 
 class ProcessSourceJobHandler(BaseJobHandler):
     """!
@@ -322,7 +337,8 @@ class LinkAddJobHandler(BaseJobHandler):
         if "source" in cfg:
             source_id = cfg["source"]
             source_objs = SourceDataController.objects.filter(id=int(source_id))
-            data["source_obj"] = source_objs[0]
+            if source_objs.count() > 0:
+                data["source_obj"] = source_objs[0]
 
         user = None
         if "user_id" in cfg:
@@ -340,21 +356,6 @@ class LinkAddJobHandler(BaseJobHandler):
             data["tag"] = cfg["tag"]
 
         return data
-
-    def get_input_cfg(self, in_object=None):
-        cfg = {}
-
-        if in_object.args and len(in_object.args) > 0:
-            try:
-                cfg = json.loads(in_object.args)
-            except Exception as E:
-                AppLogging.error(
-                    "Exception when adding link {0} {1} {2}".format(
-                        in_object.subject, str(e), error_text
-                    )
-                )
-
-        return cfg
 
 
 class LinkSaveJobHandler(BaseJobHandler):
@@ -834,6 +835,16 @@ class LinkScanJobHandler(BaseJobHandler):
     def process(self, obj=None):
         try:
             link = obj.subject
+
+            cfg = self.get_input_cfg(obj)
+            source = None
+
+            if "source" in cfg:
+                source_id = cfg["source"]
+                source_objs = SourceDataController.objects.filter(id=int(source_id))
+                if source_objs.count() > 0:
+                    source = source_objs[0]
+
             p = UrlHandler(link)
             contents = p.get_contents()
 
@@ -845,12 +856,12 @@ class LinkScanJobHandler(BaseJobHandler):
             if conf.auto_store_domain_info:
                 links = p.get_domains()
                 for link in links:
-                    BackgroundJobController.link_add(link)
+                    BackgroundJobController.link_add(link, source=source)
 
             if conf.auto_store_entries:
                 links = p.get_links()
                 for link in links:
-                    BackgroundJobController.link_add(link)
+                    BackgroundJobController.link_add(link, source=source)
 
             return True
         except Exception as e:
