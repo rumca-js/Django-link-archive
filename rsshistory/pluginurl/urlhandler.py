@@ -199,13 +199,18 @@ class UrlHandler(Url):
         return o
 
     def get_protololless(url):
-        if url.find("https://") >= 0:
-            return url.replace("https://", "")
-        if url.find("http://") >= 0:
-            return url.replace("http://", "")
+        url = Url.get_cleaned_link(url)
 
-        if url.endswith("/"):
-            url = url[:-1]
+        if url.startswith("https://") >= 0:
+            return url.replace("https://", "")
+        if url.startswith("http://") >= 0:
+            return url.replace("http://", "")
+        if url.startswith("ftp://") >= 0:
+            return url.replace("ftp://", "")
+        if url.startswith("smb://") >= 0:
+            return url.replace("smb://", "")
+        if url.startswith("//") >= 0:
+            return url.replace("//", "")
 
     def get_cleaned_link(url):
         """
@@ -262,6 +267,9 @@ class UrlPropertyValidator(object):
         if self.is_title_porn():
             return False
 
+        if self.is_site_not_found():
+            return False
+
         return True
 
     def get_title(self):
@@ -287,7 +295,7 @@ class UrlPropertyValidator(object):
 
         if is_title_invalid:
             LinkDatabase.info("Title is invalid {}".format(title))
-            return False
+            return True
 
     def is_title_porn(self):
         """

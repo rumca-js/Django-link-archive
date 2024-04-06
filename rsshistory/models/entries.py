@@ -1,4 +1,4 @@
-from datetime import datetime, date, timedelta
+from datetime import date, timedelta
 
 from django.db import models
 from django.urls import reverse
@@ -185,10 +185,6 @@ class BaseLinkDataController(BaseLinkDataModel):
          - title and description could have been set manually, we do not want to change that
          - some other fields should be set only if present in props
         """
-        if self.is_dead() or self.page_rating_votes < 0:
-            AppLogging.warning("Cannot update link that is dead")
-            return
-
         from ..pluginurl.entryurlinterface import EntryUrlInterface
 
         url = EntryUrlInterface(self.link)
@@ -236,10 +232,6 @@ class BaseLinkDataController(BaseLinkDataModel):
          - status code and page rating is update always
          - new data are changed only if new data are present at all
         """
-        if self.is_dead() or self.page_rating_votes < 0:
-            AppLogging.warning("Cannot update link that is dead")
-            return
-
         from ..pluginurl.entryurlinterface import EntryUrlInterface
 
         url = EntryUrlInterface(self.link)
@@ -272,6 +264,14 @@ class BaseLinkDataController(BaseLinkDataModel):
         #    self.date_published = props["date_published"]
 
         self.save()
+
+    def is_update_time(self):
+        from ..dateutils import DateUtils
+        return self.date_update_last < DateUtils.get_datetime_now_utc() - timedelta(days=30)
+
+    def is_reset_time(self):
+        from ..dateutils import DateUtils
+        return self.date_update_last < DateUtils.get_datetime_now_utc() - timedelta(days=1)
 
     def update_calculated_vote(self):
         self.page_rating_votes = self.calculate_vote()
@@ -488,10 +488,8 @@ class BaseLinkDataController(BaseLinkDataModel):
         if self.manual_status_code == BaseLinkDataController.STATUS_UNDEFINED:
             return
 
-        if self.manual_status_code == BaseLinkDataController.STATUS_DEAD:
-            self.date_dead_since = None
-
         self.manual_status_code = BaseLinkDataController.STATUS_UNDEFINED
+        self.date_dead_since = None
 
         self.save()
 

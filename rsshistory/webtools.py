@@ -108,31 +108,74 @@ class DomainAwarePage(object):
             return "https://" + self.url
         return self.url
 
+    def parse_url(self):
+        """
+        We cannot use urlparse, as it does not work with ftp:// or smb:// or win location
+        """
+        protocol_pos = self.url.find("://")
+        if protocol_pos >= 0:
+            return self.parse_protocoled_url()
+
+        elif self.url.startswith("//"):
+            return self.parse_netloc("//")
+        elif self.url.startswith("\\\\"):
+            return self.parse_netloc("\\\\")
+
+        else:
+            return ["https", "://", self.url]
+
+    def parse_protocoled_url(self):
+        protocol_pos = self.url.find("://")
+        if protocol_pos >= 0:
+            rest = self.url[protocol_pos+3:]
+            protocol = self.url[:protocol_pos].lower()
+
+            rest_data = self.parse_rest(rest)
+
+            if len(rest_data) > 1:
+                return [protocol, "://", rest_data[0], rest_data[1]]
+            else:
+                return [protocol, "://", rest_data[0]]
+
+    def parse_rest(self, rest):
+        wh1 = rest.find("/")
+        wh2 = rest.find("\\")
+        wh3 = rest.find("?")
+        wh4 = rest.find("#")
+        positions = [wh for wh in [wh1, wh2, wh3, wh4] if wh != -1]
+
+        if len(positions) > 0:
+            smallest_position = min(positions)
+            return [rest[:smallest_position], rest[: smallest_position+1]]
+        return [rest]
+
+    def parse_netloc(self, separator="//"):
+        if self.url.startswith(separator):
+            if separator == "//":
+                lesser_separator = "/"
+            else:
+                lesser_separator = "\\"
+
+            rest = self.url[len(separator):]
+
+            rest_data = self.parse_rest(rest)
+
+            if len(rest_data) > 1:
+                return ["", separator, rest_data[0], rest_data[1]]
+            else:
+                return ["", separator, rest_data[0]]
+
     def get_domain(self):
-        if self.url.lower().find("http") == -1:
-            self.url = "https://" + self.url
-
-        items = urlparse(self.url)
-        if items.netloc is None or str(items.netloc) == "":
-            return self.url
-
-        return items.scheme + "://" + str(items.netloc)
-
-    def get_scheme(self):
-        items = urlparse(self.url)
-        if items.netloc is None or str(items.netloc) == "":
-            return "https"
-
-        return items.scheme
+        parts = self.parse_url()
+        return parts[0] + parts[1] + parts[2].lower()
 
     def get_domain_only(self):
-        if self.url.lower().find("http") == -1:
-            self.url = "https://" + self.url
+        parts = self.parse_url()
+        return parts[2].lower()
 
-        items = urlparse(self.url)
-        if items.netloc is None or str(items.netloc) == "":
-            return self.url
-        return str(items.netloc)
+    def get_scheme(self):
+        parts = self.parse_url()
+        return parts[0]
 
     def is_domain(self):
         url = self.get_full_url()
@@ -614,14 +657,14 @@ class ContentInterface(object):
             month, day = month_date_pattern_match.groups()
             date_object = self.format_date(year, month, day)
 
-        elif year:
-            current_year = int(datetime.now().year)
+        #elif year:
+        #    current_year = int(datetime.now().year)
 
-            if year >= current_year or year < 1900:
-                date_object = datetime.now()
-            else:
-                # If only the year is found, construct a datetime object with year
-                date_object = datetime(year, 1, 1)
+        #    if year >= current_year or year < 1900:
+        #        date_object = datetime.now()
+        #    else:
+        #        # If only the year is found, construct a datetime object with year
+        #        date_object = datetime(year, 1, 1)
 
         # For other scenario to not provide any value
 
@@ -682,6 +725,10 @@ class ContentInterface(object):
 
         lower = self.contents.lower()
         if lower.find("<html") >= 0 and lower.find("<body") >= 0:
+            return lower.find("<html")
+
+        lower = self.contents.lower()
+        if lower.find("<html") >= 0 and lower.find("<meta") >= 0:
             return lower.find("<html")
 
         return -1
@@ -1012,11 +1059,11 @@ class RssPage(ContentInterface):
                 except Exception as E:
                     LinkDatabase.error(str(E))
             else:
-                # cannot display self.feed.feed here.
-                # it complains et_thumbnail TypeError: 'DeferredAttribute' object is not callable
                 AppLogging.info(
-                    "Unsupported image type for feed. {}".format(
-                        str(self.feed.feed.image)
+                        '<a href="{}">{}</a> Unsupported image type for feed. Image:{}'.format(
+                            self.url,
+                            self.url,
+                            str(self.feed.feed.image)
                     )
                 )
 
@@ -1711,6 +1758,7 @@ class HtmlPage(ContentInterface):
 class PageResponseObject(object):
     STATUS_CODE_OK = 200
     STATUS_CODE_ERROR = 500
+    STATUS_CODE_UNDEF = 0
 
     def __init__(self, url, text, status_code=STATUS_CODE_OK, encoding="utf-8"):
         self.url = url
@@ -2062,8 +2110,12 @@ class BasePage(object):
 
             driver.get(url)
 
-            # if self.options.link_redirect:
-            #    WebDriverWait(driver, selenium_timeout).until(EC.url_changes(driver.current_url))
+            try:
+                # if self.options.link_redirect:
+                WebDriverWait(driver, selenium_timeout).until(EC.url_changes(driver.current_url))
+            except TimeoutException:
+                LinkDatabase.error("Exception")
+
             """
             TODO - if webpage changes link, it should also update it in this object
             """
@@ -2133,8 +2185,8 @@ class BasePage(object):
 
 class Url(ContentInterface):
     def __init__(self, url=None, page_object=None, page_options=None):
-        self.url = url
         self.response = None
+        self.options = None
         if page_object:
             self.url = page_object.url
 
@@ -2145,31 +2197,39 @@ class Url(ContentInterface):
             self.p = None
 
     def get_handler(self, url=None, page_object=None, page_options=None):
+        contents = None
+
         if url is None:
             url = page_object.url
 
-        p = BasePage(url=url, options=page_options, page_object=page_object)
-        self.response = p.get_response()
-        self.options = p.options
-        contents = p.get_contents()
+        if url.startswith("https") or url.startswith("http"):
+            p = BasePage(url=url, options=page_options, page_object=page_object)
+            self.response = p.get_response()
+            self.options = p.options
+            contents = p.get_contents()
 
-        if not p.is_valid():
+            if not p.is_valid():
+                return
+
+        # right now we do not have handlers for anything else
+        elif url.startswith("ftp") or url.startswith("smb") or url.startswith("//") or url.startswith("\\\\"):
             return
 
-        p = HtmlPage(url, contents)
-        if p.is_valid():
-            return p
+        if contents:
+            p = HtmlPage(url, contents)
+            if p.is_valid():
+                return p
 
-        p = RssPage(url, contents)
-        if p.is_valid():
-            return p
+            p = RssPage(url, contents)
+            if p.is_valid():
+                return p
 
-        p = JsonPage(url, contents)
-        if p.is_valid():
-            return p
+            p = JsonPage(url, contents)
+            if p.is_valid():
+                return p
 
-        p = DefaultContentPage(url, contents)
-        return p
+            p = DefaultContentPage(url, contents)
+            return p
 
     def get_type(url):
         """
@@ -2359,7 +2419,7 @@ class Url(ContentInterface):
 
     def get_status_code(self):
         if not self.response:
-            return
+            return PageResponseObject.STATUS_CODE_UNDEF
 
         return self.response.status_code
 

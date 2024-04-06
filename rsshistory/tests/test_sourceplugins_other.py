@@ -1,4 +1,4 @@
-from ..controllers import SourceDataController
+from ..controllers import SourceDataController, BackgroundJobController
 from ..pluginsources.codeprojectplugin import CodeProjectPlugin
 
 from .fakeinternet import FakeInternetTestCase
@@ -299,9 +299,9 @@ class CodeProjectPluginTest(FakeInternetTestCase):
     def test_parse(self):
         parser = CodeProjectPlugin(self.source_codeproject.id)
         parser.contents = webpage_code_project_contents
+        BackgroundJobController.objects.all().delete()
 
         props = list(parser.get_container_elements())
-        print(props)
 
         self.assertTrue(len(props) > 0)
         self.assertEqual(

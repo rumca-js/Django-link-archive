@@ -24,11 +24,11 @@ class BaseParsePlugin(SourceGenericPlugin):
     def is_link_valid(self, address):
         source = self.get_source()
 
-        if not DomainAwarePage(self.get_address()).is_link_in_domain(address):
-            return False
+        #if not DomainAwarePage(self.get_address()).is_link_in_domain(address):
+        #    return False
 
-        if not address.startswith(source.url):
-            return False
+        #if not address.startswith(source.url):
+        #    return False
 
         p = DomainAwarePage(address)
         ext = p.get_page_ext()
@@ -49,8 +49,6 @@ class BaseParsePlugin(SourceGenericPlugin):
         return props
 
     def get_container_elements(self):
-        start_processing_time = time.time()
-
         links_str_vec = self.get_links()
         num_entries = len(links_str_vec)
 
@@ -62,9 +60,12 @@ class BaseParsePlugin(SourceGenericPlugin):
             if objs.exists():
                 continue
 
-            BackgroundJobController.link_add(link_str, source=self.get_source())
+            self.add_link(link_str)
 
         return []
+
+    def add_link(self, link_str):
+        BackgroundJobController.link_add(link_str, source=self.get_source())
 
     def calculate_plugin_hash(self):
         """

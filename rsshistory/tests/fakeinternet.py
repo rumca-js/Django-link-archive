@@ -29,6 +29,7 @@ from .fakeinternetdata import (
     webpage_code_project_rss,
     webpage_html_favicon,
     webpage_with_rss_link_rss_contents,
+    webpage_hackernews_rss,
     instance_entries_json,
     instance_sources_json_empty,
     instance_entries_json_empty,
@@ -200,6 +201,12 @@ class TestResponseObject(object):
             return webpage_no_pubdate_rss
 
         if url.startswith("https://www.youtube.com/feeds"):
+            return webpage_samtime_youtube_rss
+
+        if url.startswith("https://hnrss.org"):
+            return webpage_hackernews_rss
+
+        if url.startswith("https://news.ycombinator.com/item?id=39940707"):
             return webpage_samtime_youtube_rss
 
         if url.startswith("https://isocpp.org/blog/rss/category/news"):

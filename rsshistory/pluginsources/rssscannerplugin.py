@@ -4,7 +4,7 @@ import re
 from ..models import UserTags
 from ..configuration import Configuration
 from .sourcerssplugin import BaseRssPlugin
-from ..pluginurl import EntryUrlInterface
+from ..pluginurl import EntryUrlInterface, UrlHandler
 from ..controllers import BackgroundJobController
 
 from ..webtools import ContentLinkParser, HtmlPage, DomainAwarePage
@@ -23,23 +23,14 @@ class RssScannerPlugin(BaseRssPlugin):
         super().__init__(source_id)
 
     def get_container_elements(self):
-        props = super().get_container_elements()
+        for prop in super().get_container_elements():
+            prop = self.get_all_container_properties(prop)
+            yield prop
 
-        props = self.get_all_container_properties()
+    def get_all_container_properties(self, prop):
+        self.add_additional_found_urls(prop)
 
-        return []
-
-    def get_all_container_properties(self, props):
-        all_new_props = []
-        for prop in props:
-            new_props = self.get_additional_url_props(prop)
-            if len(new_props) > 0:
-                all_new_props.extend(new_props)
-
-        props.extend(all_new_props)
-        return props
-
-    def get_additional_url_props(self, entry_props):
+    def add_additional_found_urls(self, entry_props):
         links = self.get_additional_links(entry_props)
 
         for link in links:
@@ -48,7 +39,6 @@ class RssScannerPlugin(BaseRssPlugin):
     def get_additional_links(self, entry_props):
         links = self.get_description_links(entry_props)
         links.update(self.get_page_links(entry_props))
-        links = list(links)
 
         domains = set()
         for link in links:
@@ -60,7 +50,8 @@ class RssScannerPlugin(BaseRssPlugin):
         return links
 
     def get_page_links(self, entry_properties):
-        h = UrlHandler(entry_properties["link"])
+        url = entry_properties["link"]
+        h = UrlHandler(url)
         contents = h.get_contents()
 
         result = set()
@@ -68,19 +59,20 @@ class RssScannerPlugin(BaseRssPlugin):
             return result
 
         if contents:
-            parser = ContentLinkParser(contents)
+            parser = ContentLinkParser(url, contents)
             links = set(parser.get_links())
             result.update(links)
 
         return result
 
     def get_description_links(self, entry_properties):
+        url = entry_properties["link"]
         contents = self.get_description_contents(entry_properties)
 
         result = set()
 
         if contents:
-            parser = ContentLinkParser(contents)
+            parser = ContentLinkParser(url, contents)
             links = set(parser.get_links())
             result.update(links)
 

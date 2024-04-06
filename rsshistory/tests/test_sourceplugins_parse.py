@@ -1,12 +1,14 @@
 from django.contrib.auth.models import User
 
 from ..models import UserTags, SourceOperationalData
-from ..controllers import SourceDataController, LinkDataController
+from ..controllers import SourceDataController, LinkDataController, BackgroundJobController
 
-from ..pluginsources.sourceparseplugin import BaseParsePlugin
-from ..pluginsources.sourcegenerousparserplugin import SourceGenerousParserPlugin
-from ..pluginsources.domainparserplugin import DomainParserPlugin
-from ..pluginsources.nownownowparserplugin import NowNowNowParserPlugin
+from ..pluginsources import BaseParsePlugin
+from ..pluginsources import SourceParseInternalLinks
+from ..pluginsources import DomainParserPlugin
+from ..pluginsources import NowNowNowParserPlugin
+from ..pluginsources import RssScannerPlugin
+from ..pluginsources import HackerNewsScannerPlugin
 
 from .fakeinternet import FakeInternetTestCase
 
@@ -66,7 +68,7 @@ class SourceParsePluginTest(FakeInternetTestCase):
 
     def test_is_link_valid_outside_location(self):
         parse = BaseParsePlugin(self.source_youtube.id)
-        self.assertFalse(parse.is_link_valid("https://github.com/location/inside"))
+        self.assertTrue(parse.is_link_valid("https://github.com/location/inside"))
 
     def test_is_link_valid_js(self):
         parse = BaseParsePlugin(self.source_youtube.id)
@@ -77,7 +79,7 @@ class SourceParsePluginTest(FakeInternetTestCase):
         self.assertFalse(parse.is_link_valid("https://youtube.com/location/inside.css"))
 
 
-class SourceGenerousParsePluginTest(FakeInternetTestCase):
+class SourceParseInternalLinksPluginTest(FakeInternetTestCase):
     def setUp(self):
         self.source_youtube = SourceDataController.objects.create(
             url="https://youtube.com",
@@ -88,34 +90,36 @@ class SourceGenerousParsePluginTest(FakeInternetTestCase):
         )
         self.disable_web_pages()
 
+        self.setup_configuration()
+
     def test_is_link_valid_html(self):
-        parse = SourceGenerousParserPlugin(self.source_youtube.id)
+        parse = SourceParseInternalLinks(self.source_youtube.id)
         self.assertTrue(parse.is_link_valid("https://youtube.com/location/inside.html"))
 
     def test_is_link_valid_htm(self):
-        parse = SourceGenerousParserPlugin(self.source_youtube.id)
+        parse = SourceParseInternalLinks(self.source_youtube.id)
         self.assertTrue(parse.is_link_valid("https://youtube.com/location/inside.htm"))
 
     def test_is_link_valid_ending_dash(self):
-        parse = SourceGenerousParserPlugin(self.source_youtube.id)
+        parse = SourceParseInternalLinks(self.source_youtube.id)
         self.assertTrue(parse.is_link_valid("https://youtube.com/location/inside/"))
 
     def test_is_link_valid_ending_noext(self):
-        parse = SourceGenerousParserPlugin(self.source_youtube.id)
+        parse = SourceParseInternalLinks(self.source_youtube.id)
         self.assertTrue(parse.is_link_valid("https://youtube.com/location/inside"))
 
     # check if false
 
     def test_is_link_valid_outside_location(self):
-        parse = SourceGenerousParserPlugin(self.source_youtube.id)
+        parse = SourceParseInternalLinks(self.source_youtube.id)
         self.assertFalse(parse.is_link_valid("https://github.com/location/inside"))
 
     def test_is_link_valid_js(self):
-        parse = SourceGenerousParserPlugin(self.source_youtube.id)
+        parse = SourceParseInternalLinks(self.source_youtube.id)
         self.assertFalse(parse.is_link_valid("https://youtube.com/location/inside.js"))
 
     def test_is_link_valid_css(self):
-        parse = SourceGenerousParserPlugin(self.source_youtube.id)
+        parse = SourceParseInternalLinks(self.source_youtube.id)
         self.assertFalse(parse.is_link_valid("https://youtube.com/location/inside.css"))
 
 
@@ -124,12 +128,14 @@ class DomainParsePluginTest(FakeInternetTestCase):
         self.disable_web_pages()
 
         self.source_youtube = SourceDataController.objects.create(
-            url="https://youtube.com",
+            url="https://page-with-two-links.com",
             title="YouTube",
             category="No",
             subcategory="No",
             export_to_cms=True,
         )
+
+        self.setup_configuration()
 
     def is_domain(self, alist, value):
         if alist is None:
@@ -147,14 +153,84 @@ class DomainParsePluginTest(FakeInternetTestCase):
 
         # call tested function
         props = list(parser.get_container_elements())
-        print(props)
 
-        self.assertEqual(len(props), 2)
+        self.assertEqual(len(props), 0)
 
-        self.assertTrue(self.is_domain(props, "https://test1.com"))
-        self.assertTrue(self.is_domain(props, "https://test2.com"))
+        jobs = BackgroundJobController.objects.all().values_list("subject", flat=True)
+        self.assertEqual(len(jobs), 2)
 
-        self.assertEqual(props[0]["source"], "https://youtube.com")
+        self.assertTrue("https://link1.com" in jobs)
+        self.assertTrue("https://link2.com" in jobs)
+
+        #TODO check if jobs have source in cfg?
+
+
+class RssScannerPluginTest(FakeInternetTestCase):
+    def setUp(self):
+        self.disable_web_pages()
+
+        self.source_youtube = SourceDataController.objects.create(
+            url="https://hnrss.org/frontpage",
+            title="YouTube",
+            category="No",
+            subcategory="No",
+            export_to_cms=True,
+        )
+
+    def is_domain(self, alist, value):
+        if alist is None:
+            return False
+
+        for avalue in alist:
+            if avalue["link"] == value:
+                return True
+
+        return False
+
+    def test_is_props_valid(self):
+        parser = RssScannerPlugin(self.source_youtube.id)
+
+        # call tested function
+        props = list(parser.get_container_elements())
+
+        self.assertEqual(len(props), 20)
+
+        jobs = BackgroundJobController.objects.all().values_list("subject", flat=True)
+
+        self.assertTrue(jobs.count() > 0)
+
+
+class HackerNewsScannerPluginTest(FakeInternetTestCase):
+    def setUp(self):
+        self.disable_web_pages()
+
+        self.source_youtube = SourceDataController.objects.create(
+            url="https://hnrss.org/frontpage",
+            title="YouTube",
+            category="No",
+            subcategory="No",
+            export_to_cms=True,
+        )
+
+    def is_domain(self, alist, value):
+        if alist is None:
+            return False
+
+        for avalue in alist:
+            if avalue["link"] == value:
+                return True
+
+        return False
+
+    def test_is_props_valid(self):
+        parser = HackerNewsScannerPlugin(self.source_youtube.id)
+
+        # call tested function
+        props = list(parser.get_container_elements())
+
+        self.assertEqual(len(props), 20)
+
+        self.assertEqual(props[0]["source"], "https://hnrss.org/frontpage")
 
 
 webpage_linkedin_contents = """
@@ -172,7 +248,7 @@ class BaseParsePluginTest(FakeInternetTestCase):
         self.disable_web_pages()
 
         self.source_linkedin = SourceDataController.objects.create(
-            url="https://linkedin.com",
+            url="https://page-with-two-links.com",
             title="linkedin",
             category="No",
             subcategory="No",
@@ -189,18 +265,19 @@ class BaseParsePluginTest(FakeInternetTestCase):
     def test_is_props_valid(self):
         parser = BaseParsePlugin(self.source_linkedin.id)
 
-        parser.contents = webpage_linkedin_contents
-
         # call tested function
         props = list(parser.get_container_elements())
-        print(props)
 
-        self.assertEqual(len(props), 2)
+        self.assertEqual(len(props), 0)
 
-        self.assertTrue(self.is_domain(props, "https://linkedin.com/1"))
-        self.assertTrue(self.is_domain(props, "https://linkedin.com/2"))
+        jobs = BackgroundJobController.objects.all().values_list("subject", flat=True)
 
-        self.assertEqual(props[0]["source"], "https://linkedin.com")
+        self.assertEqual(jobs.count(), 2)
+
+        self.assertTrue("https://link1.com" in jobs)
+        self.assertTrue("https://link2.com" in jobs)
+
+        # TODO check if source is in jobs cfg
 
 
 webpage_linkedin_contents2 = """
@@ -219,7 +296,7 @@ class NowNowNowPluginTest(FakeInternetTestCase):
         self.setup_configuration()
 
         self.source_linkedin = SourceDataController.objects.create(
-            url="https://linkedin.com",
+            url="https://page-with-two-links.com",
             title="linkedin",
             category="No",
             subcategory="No",
@@ -249,20 +326,20 @@ class NowNowNowPluginTest(FakeInternetTestCase):
     def test_is_props_valid(self):
         parser = NowNowNowParserPlugin(self.source_linkedin.id)
 
-        parser.contents = webpage_linkedin_contents2
-
         # call tested function
         props = list(parser.get_container_elements())
-        print("Props: {}".format(props))
 
         self.print_errors()
 
-        self.assertEqual(len(props), 2)
+        self.assertEqual(len(props), 0)
 
-        self.assertTrue(self.is_domain(props, "https://youtube.com"))
-        self.assertTrue(self.is_domain(props, "https://tiktok.com"))
+        jobs = BackgroundJobController.objects.all().values_list("subject", flat=True)
+        self.assertEqual(len(jobs), 2)
 
-        self.assertEqual(props[0]["source"], "https://linkedin.com")
+        self.assertTrue("https://link1.com" in jobs)
+        self.assertTrue("https://link2.com" in jobs)
+
+        # TODO check if source is in job cfg
 
     def test_check_for_data(self):
         LinkDataController.objects.all().delete()
@@ -270,8 +347,6 @@ class NowNowNowPluginTest(FakeInternetTestCase):
         SourceOperationalData.objects.all().delete()
 
         parser = NowNowNowParserPlugin(self.source_linkedin.id)
-
-        parser.contents = webpage_linkedin_contents2
 
         # call tested function
         parser.check_for_data()
@@ -283,9 +358,12 @@ class NowNowNowPluginTest(FakeInternetTestCase):
         entries = LinkDataController.objects.all()
         tags = UserTags.objects.all()
 
-        self.assertEqual(entries.count(), 2)
+        self.assertEqual(entries.count(), 0)
 
-        self.assertTrue(self.is_link("https://youtube.com"))
-        self.assertTrue(self.is_link("https://tiktok.com"))
+        jobs = BackgroundJobController.objects.all().values_list("subject", flat=True)
+        self.assertEqual(len(jobs), 2)
 
-        self.assertEqual(tags.count(), 2)
+        self.assertTrue("https://link1.com" in jobs)
+        self.assertTrue("https://link2.com" in jobs)
+
+        # TODO should check if tags and user is in cfg

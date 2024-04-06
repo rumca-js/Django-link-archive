@@ -591,6 +591,9 @@ class CleanJobHandlerTest(FakeInternetTestCase):
         self.assertEqual(persistent_objects.count(), 0)
         self.assertEqual(KeyWords.objects.all().count(), 0)
 
+        for domain in DomainsController.objects.all():
+            print("Domain: {}".format(domain.domain))
+
         self.assertEqual(DomainsController.objects.all().count(), 1)
         self.assertEqual(DomainCategories.objects.all().count(), 1)
         self.assertEqual(DomainSubCategories.objects.all().count(), 1)

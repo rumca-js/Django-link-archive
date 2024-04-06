@@ -1,5 +1,10 @@
 """
 @brief This file provides handlers for 'jobs'.
+
+Jobs:
+  - should do task, not check if task should be done
+  - only exception is refresh task, it should verify what additionally should be done
+  - BackgroundJob API should verify if task should be done
 """
 import logging
 import time
@@ -159,6 +164,23 @@ class EntryUpdateData(BaseJobHandler):
                     obj.subject, str(e), error_text
                 )
             )
+
+
+class LinkResetDataJobHandler(BaseJobHandler):
+    def get_job(self):
+        return BackgroundJob.JOB_LINK_RESET_DATA
+
+    def process(self, obj=None):
+        try:
+            entries = LinkDataController.objects.filter(link=obj.subject)
+            if len(entries) > 0:
+                entry = entries[0]
+                entry.reset_data()
+
+            return True
+        except Exception as e:
+            error_text = traceback.format_exc()
+            AppLogging.error("Exception: {} {}".format(str(e), error_text))
 
 
 class LinkDownloadJobHandler(BaseJobHandler):
@@ -862,23 +884,6 @@ class LinkScanJobHandler(BaseJobHandler):
                 links = p.get_links()
                 for link in links:
                     BackgroundJobController.link_add(link, source=source)
-
-            return True
-        except Exception as e:
-            error_text = traceback.format_exc()
-            AppLogging.error("Exception: {} {}".format(str(e), error_text))
-
-
-class LinkResetDataJobHandler(BaseJobHandler):
-    def get_job(self):
-        return BackgroundJob.JOB_LINK_RESET_DATA
-
-    def process(self, obj=None):
-        try:
-            entries = LinkDataController.objects.filter(link=obj.subject)
-            if len(entries) > 0:
-                entry = entries[0]
-                entry.reset_data()
 
             return True
         except Exception as e:

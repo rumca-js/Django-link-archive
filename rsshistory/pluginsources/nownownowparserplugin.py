@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 
 from ..models import UserTags
+from ..controllers import BackgroundJobController
 from .domainparserplugin import DomainParserPlugin
 
 
@@ -14,11 +15,11 @@ class NowNowNowParserPlugin(DomainParserPlugin):
     def __init__(self, source_id):
         super().__init__(source_id)
 
-    def on_added_entry(self, entry):
+    def add_link(self, link_str):
         from ..configuration import Configuration
 
         c = Configuration.get_object()
 
         admin_user = User.objects.get(is_superuser=True)
 
-        UserTags.set_tag(entry, "personal", admin_user)
+        BackgroundJobController.link_add(link_str, source=self.get_source(), user=admin_user, tag="personal")

@@ -341,16 +341,8 @@ class BackgroundJobController(BackgroundJob):
         """
         Do not update, if it was updated recently, or if we are missing key components
         """
-        if entry.is_dead():
-            return
-
         if not force:
-            if (
-                entry.page_rating > 0
-                and entry.page_rating_contents > 0
-                and entry.date_update_last
-                > DateUtils.get_datetime_now_utc() - timedelta(days=30)
-            ):
+            if not entry.is_update_time():
                 return
 
         return BackgroundJobController.create_single_job(
@@ -361,13 +353,8 @@ class BackgroundJobController(BackgroundJob):
         """
         Do not update, if it was updated recently
         """
-        if entry.is_dead():
-            return
-
         if not force:
-            if entry.date_update_last > DateUtils.get_datetime_now_utc() - timedelta(
-                days=1
-            ):
+            if not entry.is_reset_time():
                 return
 
         return BackgroundJobController.create_single_job(

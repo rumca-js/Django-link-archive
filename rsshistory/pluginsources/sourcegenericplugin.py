@@ -41,13 +41,8 @@ class SourceGenericPlugin(object):
 
         LinkDatabase.info("Plugin: checking source {}".format(source.url))
 
-        if not self.is_fetch_possible():
-            LinkDatabase.info(
-                "Plugin source:{}: It is not the right time for update".format(
-                    source.title
-                )
-            )
-            return
+        # We do not check if data is correct. We can manually add processing to queue
+        # We want the source to be processed then
 
         start_time = DateUtils.get_datetime_now_utc()
         num_entries = 0

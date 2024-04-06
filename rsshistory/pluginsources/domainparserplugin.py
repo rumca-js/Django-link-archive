@@ -24,17 +24,17 @@ class DomainParserPlugin(BaseParsePlugin):
         return True
 
     def get_container_elements(self):
-        start_processing_time = time.time()
-
         domains_vec = self.get_domains()
         num_entries = len(domains_vec)
 
         index = 0
         for link_str in domains_vec:
+            if not self.is_link_valid(link_str):
+                continue
+
             objs = LinkDataController.objects.filter(link=link_str)
             if objs.exists():
                 continue
 
-            BackgroundJobController.link_add(link_str, source=self.get_source())
-
+            self.add_link(link_str)
         return []

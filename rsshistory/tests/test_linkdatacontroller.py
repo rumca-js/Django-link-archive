@@ -309,3 +309,104 @@ class LinkDataControllerTest(FakeInternetTestCase):
         )
 
         self.assertFalse(entry.is_commentable())
+
+    def test_make_dead(self):
+        add_time = DateUtils.get_datetime_now_utc() - timedelta(days=1)
+
+        source_youtube = SourceDataController.objects.create(
+            url="https://youtube.com",
+            title="YouTube",
+            category="No",
+            subcategory="No",
+            export_to_cms=True,
+            remove_after_days=1,
+        )
+
+        entry = LinkDataController.objects.create(
+            source="",
+            link="https://linkedin.com",
+            title="my title",
+            description="my description",
+            bookmarked=False,
+            language="pl",
+            domain_obj=None,
+            date_published=add_time,
+            thumbnail="thumbnail",
+            source_obj=source_youtube,
+        )
+
+        date_updated = entry.date_update_last
+
+        # call tested function
+        entry.make_dead()
+
+        self.assertTrue(entry.date_dead_since is not None)
+        self.assertEqual(entry.manual_status_code, 500)
+
+    def test_make_active(self):
+        add_time = DateUtils.get_datetime_now_utc() - timedelta(days=1)
+
+        source_youtube = SourceDataController.objects.create(
+            url="https://youtube.com",
+            title="YouTube",
+            category="No",
+            subcategory="No",
+            export_to_cms=True,
+            remove_after_days=1,
+        )
+
+        entry = LinkDataController.objects.create(
+            source="",
+            link="https://linkedin.com",
+            title="my title",
+            description="my description",
+            bookmarked=False,
+            language="pl",
+            domain_obj=None,
+            date_published=add_time,
+            thumbnail="thumbnail",
+            source_obj=source_youtube,
+            manual_status_code = 0,
+        )
+
+        date_updated = entry.date_update_last
+
+        # call tested function
+        entry.make_active()
+
+        self.assertTrue(entry.date_dead_since is None)
+        self.assertEqual(entry.manual_status_code, 200)
+
+    def test_clear_manual_status(self):
+        add_time = DateUtils.get_datetime_now_utc() - timedelta(days=1)
+
+        source_youtube = SourceDataController.objects.create(
+            url="https://youtube.com",
+            title="YouTube",
+            category="No",
+            subcategory="No",
+            export_to_cms=True,
+            remove_after_days=1,
+        )
+
+        entry = LinkDataController.objects.create(
+            source="",
+            link="https://linkedin.com",
+            title="my title",
+            description="my description",
+            bookmarked=False,
+            language="pl",
+            domain_obj=None,
+            date_published=add_time,
+            thumbnail="thumbnail",
+            source_obj=source_youtube,
+            manual_status_code = 200,
+        )
+
+        date_updated = entry.date_update_last
+
+        # call tested function
+        entry.clear_manual_status()
+
+        self.assertTrue(entry.date_dead_since is None)
+        self.assertEqual(entry.manual_status_code, 0)

@@ -1,6 +1,6 @@
 from .sourcerssplugin import BaseRssPlugin
 from .sourceparseplugin import BaseParsePlugin
-from .sourcegenerousparserplugin import SourceGenerousParserPlugin
+from .sourceparseinternallinks import SourceParseInternalLinks
 from .domainparserplugin import DomainParserPlugin
 from .sourcejsonplugin import BaseSourceJsonPlugin
 
@@ -19,7 +19,7 @@ class SourceControllerBuilder(object):
     plugins = [
         BaseRssPlugin,
         BaseParsePlugin,
-        SourceGenerousParserPlugin,
+        SourceParseInternalLinks,
         DomainParserPlugin,
         BaseSourceJsonPlugin,
         # domain specific

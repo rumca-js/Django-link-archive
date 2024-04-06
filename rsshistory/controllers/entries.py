@@ -608,12 +608,13 @@ class LinkDataBuilder(object):
     """
 
     def __init__(
-        self, link=None, link_data=None, source_is_auto=True, allow_recursion=True
+        self, link=None, link_data=None, source_is_auto=True, allow_recursion=True, ignore_errors=False
     ):
         self.link = link
         self.link_data = link_data
         self.source_is_auto = source_is_auto
         self.allow_recursion = allow_recursion
+        self.ignore_errors = ignore_errors
 
         self.result = None
 
@@ -621,11 +622,12 @@ class LinkDataBuilder(object):
             self.add_from_link()
 
         if self.link_data:
-            self.add_from_props()
+            self.add_from_props(ignore_errors = self.ignore_errors)
 
-    def add_from_link(self):
+    def add_from_link(self, ignore_errors=False):
         from ..pluginurl import UrlHandler
 
+        self.ignore_errors = ignore_errors
         self.link = UrlHandler.get_cleaned_link(self.link)
 
         p = DomainAwarePage(self.link)
@@ -637,13 +639,24 @@ class LinkDataBuilder(object):
     def add_from_link_service(self):
         from ..pluginurl.entryurlinterface import EntryUrlInterface
 
-        url = EntryUrlInterface(self.link)
+        url = EntryUrlInterface(self.link, ignore_errors = self.ignore_errors)
         link_data = url.get_props()
         if not link_data:
             AppLogging.error('Could not obtain properties for:<a href="{}">{}</a>'.format(self.get_absolute_url(), self.link))
             return
+
         self.link_data = link_data
-        return self.add_from_props()
+        return self.add_from_props(ignore_errors = self.ignore_errors)
+
+    def is_status_code_invalid(self):
+        if self.ignore_errors:
+            return False
+
+        if "status_code" in self.link_data:
+            code = self.link_data["status_code"]
+            return code >= 200 and code < 300
+
+        return False
 
     def add_from_normal_link(self):
         wrapper = LinkDataWrapper(self.link)
@@ -664,10 +677,14 @@ class LinkDataBuilder(object):
 
         from ..pluginurl.entryurlinterface import EntryUrlInterface
 
-        url = EntryUrlInterface(self.link)
+        url = EntryUrlInterface(self.link, ignore_errors = self.ignore_errors)
         link_data = url.get_props()
         if not link_data:
             AppLogging.error('Could not obtain properties for:<a href="{}">{}</a>'.format(self.link, self.link))
+            return
+
+        if self.is_status_code_invalid():
+            AppLogging.error('Cannot add link - page status invalid:<a href="{}">{}</a>'.format(self.link, self.link))
             return
 
         # TODO update missing keys - do not replace them
@@ -687,8 +704,16 @@ class LinkDataBuilder(object):
         else:
             AppLogging.error('Could not obtain properties for:<a href="{}">{}</a>'.format(self.link, self.link))
 
-    def add_from_props(self):
+    def add_from_props(self, ignore_errors = False):
+        self.ignore_errors = ignore_errors
+
         from ..pluginurl import UrlHandler
+
+        url = self.link_data["link"]
+
+        if self.is_status_code_invalid():
+            AppLogging.error('Cannot add link - page status invalid:<a href="{}">{}</a>'.format(self.link, self.link))
+            return
 
         obj = None
 

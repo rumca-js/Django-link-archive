@@ -62,33 +62,35 @@ class EntryUrlInterfaceTest(FakeInternetTestCase):
         url = EntryUrlInterface("https://page-with-http-status-500.com")
 
         props = url.get_props()
-        print("Props")
-        print(props)
         self.assertTrue(props is None)
 
     def test_error_rrs(self):
         url = EntryUrlInterface("https://invalid.rsspage.com/rss.xml")
 
         props = url.get_props()
-        print("Props")
-        print(props)
         self.assertTrue(props is None)
 
     def test_error_youtube_video(self):
         url = EntryUrlInterface("https://m.youtube.com/watch?v=666")
 
         props = url.get_props()
-        print("Props")
-        print(props)
         self.assertTrue(props is None)
 
-    def test_error_youtube_feed(self):
+    def test_youtube_feed(self):
         url = EntryUrlInterface("https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM")
 
         props = url.get_props()
-        print("Props")
-        print(props)
         self.assertTrue(props)
+
+    def test_error_html_ignore_errors(self):
+        url = EntryUrlInterface("https://page-with-http-status-500.com", ignore_errors=True)
+
+        props = url.get_props()
+        self.assertTrue(props)
+        self.assertEqual(props["link"], "https://page-with-http-status-500.com")
+        self.assertEqual(props["title"], None)
+        self.assertTrue(props["date_dead_since"] is not None)
+        self.assertEqual(props["status_code"], 500)
 
     def test_video_inherits_language(self):
         source_link = "https://youtube.com"
@@ -104,6 +106,22 @@ class EntryUrlInterfaceTest(FakeInternetTestCase):
         self.assertTrue(props)
         self.assertEqual(props["link"], "https://www.youtube.com/watch?v=1234")
         self.assertEqual(props["language"], "ch")
+
+    def test_ftp(self):
+        url = EntryUrlInterface("ftp://www.linkedin.com", ignore_errors=True)
+        props = url.get_props()
+
+        self.assertTrue(props)
+        self.assertEqual(props["link"], "ftp://www.linkedin.com")
+        self.assertEqual(props["status_code"], 500)
+
+    def test_smb(self):
+        url = EntryUrlInterface("smb://www.linkedin.com", ignore_errors=True)
+        props = url.get_props()
+
+        self.assertTrue(props)
+        self.assertEqual(props["link"], "smb://www.linkedin.com")
+        self.assertEqual(props["status_code"], 500)
 
     """
     def test_rss_old_pubdate(self):

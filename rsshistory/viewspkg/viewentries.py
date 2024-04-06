@@ -732,7 +732,7 @@ def entry_update_data(request, pk):
 
     else:
         entry = entries[0]
-        BackgroundJobController.entry_update_data(entry, True)
+        BackgroundJobController.entry_update_data(entry, force=True)
         return HttpResponseRedirect(entry.get_absolute_url())
 
 
@@ -752,7 +752,7 @@ def entry_reset_data(request, pk):
 
     else:
         entry = entries[0]
-        BackgroundJobController.entry_reset_data(entry, True)
+        BackgroundJobController.entry_reset_data(entry, force=True)
         return HttpResponseRedirect(entry.get_absolute_url())
 
 

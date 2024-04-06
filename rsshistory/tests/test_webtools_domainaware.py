@@ -81,10 +81,35 @@ class DomainAwarePageTest(FakeInternetTestCase):
         p = DomainAwarePage("http://lmg-not.gg/test")
         self.assertTrue(not p.is_link_service())
 
-    def test_get_domain(self):
+    def test_get_domain_http(self):
         # default language
         p = DomainAwarePage("http://test.com/my-site-test")
         self.assertEqual(p.get_domain(), "http://test.com")
+
+    def test_get_domain_http_digits(self):
+        # default language
+        p = DomainAwarePage("http://127.0.0.1/my-site-test")
+        self.assertEqual(p.get_domain(), "http://127.0.0.1")
+
+    def test_get_domain_ftp(self):
+        # default language
+        p = DomainAwarePage("ftp://test.com/my-site-test")
+        self.assertEqual(p.get_domain(), "ftp://test.com")
+
+    def test_get_domain_smb(self):
+        # default language
+        p = DomainAwarePage("smb://test.com/my-site-test")
+        self.assertEqual(p.get_domain(), "smb://test.com")
+
+    def test_get_domain_smb_lin(self):
+        # default language
+        p = DomainAwarePage("//test.com/my-site-test")
+        self.assertEqual(p.get_domain(), "//test.com")
+
+    def test_get_domain_smb_win(self):
+        # default language
+        p = DomainAwarePage("\\\\test.com\\my-site-test")
+        self.assertEqual(p.get_domain(), "\\\\test.com")
 
     def test_get_domain_web_archive_link(self):
         link = "https://web.archive.org/web/20000229222350/http://www.quantumpicture.com/Flo_Control/flo_control.htm"

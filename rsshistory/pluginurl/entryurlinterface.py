@@ -1,6 +1,6 @@
 from ..webtools import HtmlPage, RssPage, DomainAwarePage, Url, PageOptions
 from ..dateutils import DateUtils
-from ..controllers import SourceDataController
+from ..controllers import SourceDataController, LinkDataController
 
 from ..apps import LinkDatabase
 from ..models import AppLogging
@@ -51,9 +51,7 @@ class EntryUrlInterface(object):
         if not input_props:
             input_props = {}
 
-        if not self.p:
-            return None
-
+        ignore_errors = self.ignore_errors
         props = self.get_props_implementation(input_props, source_obj)
 
         # we do not trim description here. We might need it later, when adding link we scan
@@ -76,12 +74,28 @@ class EntryUrlInterface(object):
 
             if not self.is_property_set(props, "artist") and self.p.get_author():
                 props["artist"] = self.p.get_author()
+        elif ignore_errors:
+            props = {}
+            props["link"] = self.url
+            props["title"] = None
+            props["description"] = None
+            props["author"] = None
+            props["language"] = None
+            props["thumbnail"] = None
+            props["date_published"] = DateUtils.get_datetime_now_utc()
+            props["date_dead_since"] = DateUtils.get_datetime_now_utc()
+            props["page_rating"] = 0
+            props["page_rating_contents"] = 0
+            props["status_code"] = LinkDataController.STATUS_DEAD
 
         return props
 
     def get_props_implementation(self, input_props=None, source_obj=None):
         if not input_props:
             input_props = {}
+
+        if not self.p:
+            return None
 
         if not self.is_property_set(input_props, "source"):
             if source_obj:
