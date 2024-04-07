@@ -69,6 +69,8 @@ class BaseJsonPluginTest(FakeInternetTestCase):
         config = Configuration.get_object().config_entry
         config.auto_store_entries = True
         config.auto_store_domain_info = False
+        config.auto_store_sources_enabled = False
+
         config.save()
 
         LinkDataController.objects.all().delete()
@@ -92,20 +94,25 @@ class BaseJsonPluginTest(FakeInternetTestCase):
         # 3 imported, 1 created here in test
         self.assertEqual(sources.count(), 3 + 1)
 
+        self.assertEqual(sources[0].url, "https://instance.com/apps/rsshistory/sources-json")
         self.assertEqual(sources[0].enabled, True)
-        self.assertEqual(sources[1].enabled, True)
-        self.assertEqual(sources[2].enabled, True)
+        self.assertEqual(sources[1].url, "https://www.lemonde.fr/en/rss/une.xml")
+        self.assertEqual(sources[1].enabled, False)
+        self.assertEqual(sources[2].url, "https://3dprinting.com/feed")
+        self.assertEqual(sources[2].enabled, False)
+        self.assertEqual(sources[3].url, "https://www.404media.co/rss")
+        self.assertEqual(sources[3].enabled, False)
 
         self.assertEqual(
-            sources[0].proxy_location,
+            sources[1].proxy_location,
             "https://instance.com/apps/rsshistory/source-json/100",
         )
         self.assertEqual(
-            sources[1].proxy_location,
+            sources[2].proxy_location,
             "https://instance.com/apps/rsshistory/source-json/101",
         )
         self.assertEqual(
-            sources[2].proxy_location,
+            sources[3].proxy_location,
             "https://instance.com/apps/rsshistory/source-json/102",
         )
 

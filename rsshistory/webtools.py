@@ -1804,6 +1804,9 @@ class PageOptions(object):
             self.link_redirect,
         )
 
+    def get_str(self):
+        return str(self)
+
 
 class BasePage(object):
     """

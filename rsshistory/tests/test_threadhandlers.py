@@ -747,6 +747,7 @@ class ProcessSourceHandlerTest(FakeInternetTestCase):
         LinkDataController.objects.all().delete()
         DomainsController.objects.all().delete()
         SourceDataController.objects.all().delete()
+
         SourceDataController.objects.create(
             url="https://www.youtube.com/feeds/channel=samtime"
         )
@@ -768,8 +769,9 @@ class ProcessSourceHandlerTest(FakeInternetTestCase):
 
         self.assertEqual(result, True)
 
-        jobs = BackgroundJobController.objects.all()
-        for job in jobs:
-            print("Job:{} {}".format(job.job, job.subject))
-
-        self.assertEqual(jobs.count(), 1)
+        subjects = BackgroundJobController.objects.values_list("job", flat=True)
+        self.assertEqual(len(subjects), 2)
+        # still process source is present
+        self.assertTrue("process-source" in subjects)
+        # add link job odysee
+        self.assertTrue("link-add" in subjects)

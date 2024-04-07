@@ -29,7 +29,7 @@ class EntryUrlInterface(object):
 
         self.url = UrlHandler.get_cleaned_link(url)
 
-        options = PageOptions()
+        options = UrlHandler.get_url_options(url)
         options.fast_parsing = fast_check
         options.use_selenium_headless = use_selenium
 

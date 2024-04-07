@@ -478,8 +478,6 @@ class LinkDataWrapper(object):
     def clear_old_entries(limit_s=0):
         start_processing_time = time.time()
 
-        print("Clearing for old entries")
-
         sources = SourceDataController.objects.all()
         for source in sources:
             while True:
@@ -500,7 +498,6 @@ class LinkDataWrapper(object):
 
                 time.sleep(0.5)
 
-        print("Clearing normal links")
         while True:
             entry = LinkDataWrapper.get_next_entry_to_remove()
 
@@ -519,7 +516,6 @@ class LinkDataWrapper(object):
 
             time.sleep(0.5)
 
-        print("Clearing archive links")
         while True:
             entry = LinkDataWrapper.get_next_archive_entry_to_remove()
 
@@ -849,6 +845,8 @@ class LinkDataBuilder(object):
         if not config.auto_store_entries:
             if is_domain and config.auto_store_domain_info:
                 pass
+            elif not is_domain and config.auto_store_domain_info:
+                return False
             elif "bookmarked" in self.link_data and self.link_data["bookmarked"]:
                 pass
             else:
@@ -874,24 +872,20 @@ class LinkDataBuilder(object):
         return False
 
     def add_addition_link_data(self):
-        try:
-            link_data = self.link_data
+        link_data = self.link_data
 
-            self.add_sub_links()
-            self.add_keywords()
-            # self.add_sources()
+        self.add_sub_links()
+        self.add_keywords()
+        self.add_domain()
+        # self.add_sources()
 
-        except Exception as e:
-            error_text = traceback.format_exc()
-            AppLogging.exc(
-                "Could not process entry: Entry:{} {}; Exc:{}\n{}".format(
-                    link_data["link"],
-                    link_data["title"],
-                    str(e),
-                    error_text,
-                )
-            )
-            LinkDatabase.info(error_text)
+    def add_domain(self):
+        from .backgroundjob import BackgroundJobController
+
+        url = DomainAwarePage(self.link_data["link"]).get_domain()
+        entries = LinkDataController.objects.filter(link = url)
+        if entries.count() == 0:
+            BackgroundJobController.link_add(url)
 
     def add_sub_links(self):
         """

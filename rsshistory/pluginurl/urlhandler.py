@@ -183,6 +183,7 @@ class UrlHandler(Url):
             p.is_link_service()
             or domain.startswith("www.warhammer-community.com")
             or domain.startswith("defcon.org")
+            or domain.find("yahoo.com") >= 0
         ):
             return True
 
