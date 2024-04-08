@@ -250,7 +250,9 @@ class ViewsTest(FakeInternetTestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Detected", html=False)
-        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
+
+        # two requests: one for page, one for robots.txt
+        self.assertEqual(MockRequestCounter.mock_page_requests, 2)
 
     def test_page_show_props_html_post(self):
         MockRequestCounter.mock_page_requests = 0
@@ -263,7 +265,9 @@ class ViewsTest(FakeInternetTestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Detected", html=False)
-        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
+
+        # two requests: one for page, one for robots.txt
+        self.assertEqual(MockRequestCounter.mock_page_requests, 2)
 
     def test_page_show_props_youtube_get(self):
         MockRequestCounter.mock_page_requests = 0

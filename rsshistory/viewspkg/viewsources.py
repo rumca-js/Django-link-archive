@@ -489,6 +489,48 @@ def wayback_save(request, pk):
     return p.render("summary_present.html")
 
 
+def pause(request, pk):
+    p = ViewPage(request)
+    p.set_title("Pause source")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    p.context["pk"] = pk
+
+    sources = SourceDataController.objects.filter(id=pk)
+    if not sources.exists():
+        p.context["summary_text"] = "Source does not exist"
+        return p.render("summary_present.html")
+
+    ob = sources[0]
+    ob.enabled=False
+    ob.save()
+
+    return HttpResponseRedirect(ob.get_absolute_url())
+
+
+def resume(request, pk):
+    p = ViewPage(request)
+    p.set_title("Resume source")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    p.context["pk"] = pk
+
+    sources = SourceDataController.objects.filter(id=pk)
+    if not sources.exists():
+        p.context["summary_text"] = "Source does not exist"
+        return p.render("summary_present.html")
+
+    ob = sources[0]
+    ob.enabled=True
+    ob.save()
+
+    return HttpResponseRedirect(ob.get_absolute_url())
+
+
 def import_youtube_links_for_source(request, pk):
     from ..programwrappers.ytdlp import YTDLP
 

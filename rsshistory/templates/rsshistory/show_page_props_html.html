@@ -48,10 +48,10 @@
     {%endif %}
     <li>keywords: {{page_object.get_tags}}</li>
 
-    {%if robots_txt_url %}
-    <li>Robots txt URL: {{robots_txt_url}} <a href="{{robots_txt_url}}">Link</a></li>
+    {%if page_handler.get_robots_txt_url %}
+    <li>Robots txt URL: {{page_handler.get_robots_txt_url}} <a href="{{page_handler.get_robots_txt_url}}">Link</a></li>
     {% endif %}
-    {%for site_map in site_maps_urls %}
+    {%for site_map in page_handler.get_site_maps_urls %}
         <li>Site map: {{site_map}} <a href="{{site_map}}">Link</a>
     {%endfor%}
 

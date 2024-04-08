@@ -370,25 +370,25 @@ class HtmlPageTest(FakeInternetTestCase):
 
         all_favicons = p.get_favicons()
 
-        self.assertEqual(
-            all_favicons[0][0],
-            "https://www.youtube.com/s/desktop/e4d15d2c/img/favicon.ico",
+        self.assertTrue(
+            "https://www.youtube.com/s/desktop/e4d15d2c/img/favicon.ico" in
+            all_favicons
         )
-        self.assertEqual(
-            all_favicons[1][0],
-            "https://www.youtube.com/s/desktop/e4d15d2c/img/favicon_32x32.png",
+        self.assertTrue(
+            "https://www.youtube.com/s/desktop/e4d15d2c/img/favicon_32x32.png" in
+            all_favicons
         )
-        self.assertEqual(
-            all_favicons[2][0],
-            "https://www.youtube.com/s/desktop/e4d15d2c/img/favicon_48x48.png",
+        self.assertTrue(
+            "https://www.youtube.com/s/desktop/e4d15d2c/img/favicon_48x48.png" in
+            all_favicons
         )
-        self.assertEqual(
-            all_favicons[3][0],
-            "https://www.youtube.com/s/desktop/e4d15d2c/img/favicon_96x96.png",
+        self.assertTrue(
+            "https://www.youtube.com/s/desktop/e4d15d2c/img/favicon_96x96.png" in
+            all_favicons
         )
-        self.assertEqual(
-            all_favicons[4][0],
-            "https://www.youtube.com/s/desktop/e4d15d2c/img/favicon_144x144.png",
+        self.assertTrue(
+            "https://www.youtube.com/s/desktop/e4d15d2c/img/favicon_144x144.png" in
+            all_favicons
         )
         self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 

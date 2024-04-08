@@ -44,6 +44,11 @@ from .fakeinternetdata import (
     instance_sources_page_1,
     instance_sources_page_2,
 )
+from .fakeinternetdatayoutube import (
+    youtube_robots_txt,
+    youtube_sitemap_sitemaps,
+    youtube_sitemap_product,
+)
 
 
 class PageBuilder(object):
@@ -203,6 +208,15 @@ class TestResponseObject(object):
         if url.startswith("https://www.youtube.com/feeds"):
             return webpage_samtime_youtube_rss
 
+        if url == "https://www.youtube.com/robots.txt":
+            return youtube_robots_txt
+
+        if url == "https://www.youtube.com/sitemaps/sitemap.xml":
+            return youtube_sitemap_sitemaps
+
+        if url == "https://www.youtube.com/product/sitemap.xml":
+            return youtube_sitemap_product
+
         if url.startswith("https://hnrss.org"):
             return webpage_hackernews_rss
 
@@ -316,6 +330,10 @@ class TestResponseObject(object):
 
         elif url.endswith("robots.txt"):
             return """  """
+
+        elif url.endswith("sitemap.xml"):
+            return """<urlset>
+                      </urlset>"""
 
         b = PageBuilder()
         b.title_meta = "Page title"

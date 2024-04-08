@@ -1058,6 +1058,21 @@ class RssPage(ContentInterface):
                     image = str(self.feed.feed.image["url"])
                 except Exception as E:
                     LinkDatabase.error(str(E))
+            elif "links" in self.feed.feed.image:
+                links = self.feed.feed.image["links"]
+                if len(links) > 0:
+                    if "type" in links[0]:
+                        if links[0]["type"] == "text/html":
+                            pass
+                            # normal scenario, no worries
+                        else:
+                            AppLogging.info(
+                                    '<a href="{}">{}</a> Unsupported image type for feed. Image:{}'.format(
+                                        self.url,
+                                        self.url,
+                                        str(self.feed.feed.image)
+                                )
+                            )
             else:
                 AppLogging.info(
                         '<a href="{}">{}</a> Unsupported image type for feed. Image:{}'.format(
@@ -1497,9 +1512,9 @@ class HtmlPage(ContentInterface):
 
     def get_favicons(self, recursive=False):
         if not self.contents:
-            return []
+            return {}
 
-        favicons = []
+        favicons = {}
 
         link_finds = self.soup.find_all("link", attrs={"rel": "icon"})
 
@@ -1510,9 +1525,9 @@ class HtmlPage(ContentInterface):
                     continue
                 full_favicon = DomainAwarePage.get_url_full(self.url, full_favicon)
                 if "sizes" in link_find:
-                    favicons.append([full_favicon, link_find["sizes"]])
+                    favicons[full_favicon] = link_find["sizes"]
                 else:
-                    favicons.append([full_favicon, ""])
+                    favicons[full_favicon] = ""
 
         link_finds = self.soup.find_all("link", attrs={"rel": "shortcut icon"})
 
@@ -1523,9 +1538,9 @@ class HtmlPage(ContentInterface):
                     continue
                 full_favicon = DomainAwarePage.get_url_full(self.url, full_favicon)
                 if "sizes" in link_find:
-                    favicons.append([full_favicon, link_find["sizes"]])
+                    favicons[full_favicon] = link_find["sizes"]
                 else:
-                    favicons.append([full_favicon, ""])
+                    favicons[full_favicon] = ""
 
         return favicons
 
@@ -1753,6 +1768,32 @@ class HtmlPage(ContentInterface):
             AppLogging.error("HTML: Cannot calculate body hash for:{}".format(self.url))
             if self.contents:
                 return calculate_hash(self.contents)
+
+
+class XmlPage(ContentInterface):
+    def __init__(self, url, contents):
+        super().__init__(url=url, contents=contents)
+
+    def is_valid(self):
+        """
+        This is a simple set of rules in which we reject the page:
+         - status code
+         - if valid HTML code
+        """
+        if not self.is_contents_xml():
+            return False
+
+        return True
+
+    def is_contents_xml(self):
+        if not self.get_contents():
+            return False
+
+        contents = self.get_contents()
+
+        lower = contents.lower()
+        if lower.find("<?xml") >= 0:
+            return lower.find("<?xml") >= 0
 
 
 class PageResponseObject(object):
@@ -2190,8 +2231,12 @@ class Url(ContentInterface):
     def __init__(self, url=None, page_object=None, page_options=None):
         self.response = None
         self.options = None
+        self.robots_contents = None
+
         if page_object:
             self.url = page_object.url
+        elif url:
+            self.url = url
 
         self.p = self.get_handler(
             url, page_object=page_object, page_options=page_options
@@ -2231,6 +2276,10 @@ class Url(ContentInterface):
             if p.is_valid():
                 return p
 
+            p = XmlPage(url, contents)
+            if p.is_valid():
+                return p
+
             p = DefaultContentPage(url, contents)
             return p
 
@@ -2254,17 +2303,30 @@ class Url(ContentInterface):
 
         return self.p.is_valid()
 
+    def is_domain(self):
+        p = DomainAwarePage(self.url)
+        return p.is_domain()
+
     def get_domain(self):
-        if self.p.is_domain():
-            return self.p
+        if self.is_domain():
+            return self
         else:
             return Url(self.p.get_domain(), self.p.options)
 
+    def get_robots_txt_url(self):
+        return DomainAwarePage(self.url).get_robots_txt_url()
+
     def get_robots_txt_contents(self):
+        """
+        We can only ask domain for robots
+        """
+        if not self.is_domain():
+            return
+
         if self.robots_contents:
             return self.robots_contents
 
-        robots_url = DomainAwarePage(self.p.url).get_robots_txt_url()
+        robots_url = self.get_robots_txt_url()
         p = BasePage(robots_url)
         self.robots_contents = p.get_contents()
 
@@ -2273,21 +2335,24 @@ class Url(ContentInterface):
     def is_robots_txt(self):
         return self.get_robots_txt_contents()
 
-    def get_robots_txt_obj(self):
+    def get_robots(self):
         """
         https://developers.google.com/search/docs/crawling-indexing/robots/intro
         """
         self.rp = urllib.robotparser.RobotFileParser()
         domain = self.get_domain()
-        self.rp.set_url(DomainAwarePage(self.p.url).get_robots_txt_url())
+        self.rp.set_url(self.get_robots_txt_url())
 
         return self.rp
 
-    def get_site_maps(self):
+    def get_site_maps_urls(self):
         """
         https://stackoverflow.com/questions/2978144/pythons-robotparser-ignoring-sitemaps
         robot parser does not work. We have to do it manually
         """
+        if not self.is_domain():
+            return
+
         result = set()
 
         contents = self.get_robots_txt_contents()
@@ -2304,12 +2369,41 @@ class Url(ContentInterface):
 
         return list(result)
 
+    def get_all_site_maps_urls(self):
+        sites = set(self.get_site_maps_urls())
+
+        for site in sites:
+            subordinate_sites = self.get_subordinate_sites(site)
+            sites.update(subordinate_sites)
+
+        return list(sites)
+
+    def get_subordinate_sites(self, site):
+        all_subordinates = set()
+
+        b = BasePage(site)
+        contents = b.get_contents()
+
+        # check if it is sitemap / sitemap index
+        # https://www.sitemaps.org/protocol.html#index
+        if contents.find("<urlset") == -1 and contents.find("<sitemapindex") == -1:
+            return all_subordinates
+
+        p = ContentLinkParser(self.url, contents)
+        links = p.get_links()
+
+        for link in links:
+            subordinates = self.get_subordinate_sites(link)
+            all_subordinates.update(subordinates)
+
+        return all_subordinates
+
     def get_favicon(self):
         if self.p:
             if type(self.p) is HtmlPage:
                 favs = self.p.get_favicons()
                 if favs and len(favs) > 0:
-                    return favs[0][0]
+                    return list(favs.keys())[0]
 
         p = DomainAwarePage(self.url)
         if p.is_domain():
