@@ -39,7 +39,7 @@ class BaseRssPluginTest(FakeInternetTestCase):
 
         self.print_errors()
 
-        self.assertEqual(len(props), 12)
+        self.assertEqual(len(props), 13)
         self.assertEqual(
             props[0]["source"],
             "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM",
@@ -67,7 +67,7 @@ class BaseRssPluginTest(FakeInternetTestCase):
 
         self.print_errors()
 
-        self.assertEqual(len(props), 12)
+        self.assertEqual(len(props), 13)
         self.assertEqual(
             props[0]["source"],
             "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM",
@@ -92,7 +92,7 @@ class BaseRssPluginTest(FakeInternetTestCase):
 
         self.print_errors()
 
-        self.assertEqual(len(props), 12)
+        self.assertEqual(len(props), 13)
         self.assertEqual(
             props[0]["source"],
             "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM",

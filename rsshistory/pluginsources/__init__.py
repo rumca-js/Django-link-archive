@@ -15,5 +15,5 @@ from .codeprojectplugin import CodeProjectPlugin
 from .tvn24plugin import TVN24Plugin
 from .spotifyplugin import SpotifyPlugin
 from .sourceyoutubechannel import YouTubePlugin
-from .rssscannerplugin import RssScannerPlugin
-from .hackernewsscannerplugin import HackerNewsScannerPlugin
+from .rssparserplugin import RssParserPlugin
+from .hackernewsparserplugin import HackerNewsParserPlugin

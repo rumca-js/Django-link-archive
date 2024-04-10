@@ -1,10 +1,34 @@
 {% if search_engines %}
 
-    <h3>Search other places</h3>
-<div>
-    {% for search_engine in search_engines.get %}
-    <a href="{{search_engine.get_search_string}}" title="{{search_engine.get_title}}">{{search_engine.get_name}}</a>
-    <!--a href="{{search_engine.get_search_string}}" class="simplebutton" title="{{search_engine.get_title}}">{{search_engine.get_name}}</a-->
-    {% endfor %}
-</div>
+<nav class="navbar navbar-expand-sm">
+    <a class="navbar-brand" href="#">Search online</a>
+
+   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#searchenginesNavBar" aria-controls="searchenginesNavBar" aria-expanded="false" aria-label="Toggle navigation">
+     <span class="navbar-toggler-icon"></span>
+   </button>
+
+   <div class="collapse navbar-collapse" id="searchenginesNavBar">
+       <ul class="nav navbar-nav mr-auto">
+            {% for search_engine in search_engines.get %}
+            <li class="nav-item">
+            <a href="{{search_engine.get_search_string}}" class="nav-link" title="{{search_engine.get_title}}">{{search_engine.get_name}}</a>
+	    </li>
+            {% endfor %}
+
+            <li class="nav-item">
+              <a href="https://news.ycombinator.com/" class="nav-link">Hacker News</a>
+	    </li>
+            <li class="nav-item">
+              <a href="https://medium.com/" class="nav-link">Medium</a>
+	    </li>
+            <li class="nav-item">
+              <a href="https://mastodon.social/explore" class="nav-link">Mastodon</a>
+	    </li>
+            <li class="nav-item">
+              <a href="https://join-lemmy.org/instances" class="nav-link">Lemmy</a>
+	    </li>
+       </ul>
+    </div>
+</nav>
+
 {% endif %}

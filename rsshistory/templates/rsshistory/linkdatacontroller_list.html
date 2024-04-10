@@ -6,18 +6,14 @@
 {{ query_filter.time_start }}
 </div>
 
-<div class="contentbuttonmenu">
-    <a href="javascript:history.back()" class="simplebutton">
-        <img src="{% static 'rsshistory/icons/icons8-back-100.png' %}" class="content-icon" />
-    </a>
-
-    <a href="{{reset_link}}" class="simplebutton">
+<div class="container-fluid">
+    <a href="{{reset_link}}" class="btn btn-secondary" role="button">
       <img src="{% static 'rsshistory/icons/icons8-start-100.png' %}" class="content-icon" />
       <span class="basebutton">Reset filters</span>
     </a>
 
     {% if user.is_staff %}
-    <a href="{% url 'rsshistory:entry-add-simple' %}" class="simplebutton" title="Opens add entry wizard">
+    <a href="{% url 'rsshistory:entry-add-simple' %}" class="btn btn-secondary" role="button" title="Opens add entry wizard">
         <img src="{% static 'rsshistory/icons/icons8-add-link-96.png' %}" class="content-icon" />
         Add entry
     </a>
@@ -29,7 +25,7 @@
      {{ filter_form }}
      <tr>
          <td>
-             <input type="submit" value="Search" class="simplebutton"/>
+             <input type="submit" value="Search" class="btn btn-secondary" role="button"/>
          </td>
      </tr>
      </table>
@@ -74,22 +70,24 @@
   </div>
 
   {% if not page_obj.has_next and has_more_results %}
-  <a href="{{ more_results_link }}" class="simplebutton">More results</a>
+  <a href="{{ more_results_link }}" class="btn btn-secondary" role="button">More results</a>
   {% endif %}
 
   <hr>
-{% include "rsshistory/pagination.html" %}
+  <div class="container">
+   {% include "rsshistory/pagination.html" %}
+  </div>
 
   {% else %}
     <p>There are no links.</p>
 
-    <a href="{{ more_results_link }}" class="simplebutton">More results</a>
+    <a href="{{ more_results_link }}" class="btn btn-secondary" role="button">More results</a>
   {% endif %}
 
-  <div>
-      <a href="{% url 'rsshistory:entries-json' %}?query_type={{query_type}}&{{ args }}&{{ request.GET.urlencode }}" class='simplebutton'>Show JSON</a>
-      <a href="{% url 'rsshistory:entries' %}?query_type={{query_type}}&{{ args }}&type=clear" class='simplebutton'>Show Clear</a>
-      <a href="{% url 'rsshistory:entries' %}?query_type={{query_type}}&{{ args }}&type=normal" class='simplebutton'>Show Normal</a>
+  <div class="container">
+      <a href="{% url 'rsshistory:entries-json' %}?query_type={{query_type}}&{{ args }}&{{ request.GET.urlencode }}" class="btn btn-secondary" role="button">Show JSON</a>
+      <a href="{% url 'rsshistory:entries' %}?query_type={{query_type}}&{{ args }}&type=clear" class="btn btn-secondary" role="button">Show Clear</a>
+      <a href="{% url 'rsshistory:entries' %}?query_type={{query_type}}&{{ args }}&type=normal" class="btn btn-secondary" role="button">Show Normal</a>
   </div>
 
 {% include "rsshistory/search_places_element.html" %}

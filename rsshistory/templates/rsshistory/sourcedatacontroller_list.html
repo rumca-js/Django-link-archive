@@ -2,32 +2,28 @@
 {% load static %}
 {% block content %}
 
-<div class="contentbuttonmenu">
-    <a href="javascript:history.back()" class="simplebutton">
-        <img src="{% static 'rsshistory/icons/icons8-back-100.png' %}" class="content-icon" />
-    </a>
-
-    <a href="{% url 'rsshistory:sources' %}" class='simplebutton'>
+<div class="btn-group flex-wrap">
+    <a href="{% url 'rsshistory:sources' %}" class="btn btn-secondary" role="button">
         <img src="{% static 'rsshistory/icons/icons8-start-100.png' %}" class="content-icon" />
         Reset filters</a>
 
     {% if user.is_staff %}
-    <a href="{% url 'rsshistory:source-add-simple' %}" class="simplebutton" title="Opens add source wizard">
+    <a href="{% url 'rsshistory:source-add-simple' %}" class="btn btn-secondary" role="button" title="Opens add source wizard">
         <img src="{% static 'rsshistory/icons/icons8-broadcast-add-100.png' %}" class="content-icon" />
         Add source</a>
-    <a href="{% url 'rsshistory:entry-add-simple' %}" class="simplebutton" title="Opens add entry wizard">
+    <a href="{% url 'rsshistory:entry-add-simple' %}" class="btn btn-secondary" role="button" title="Opens add entry wizard">
         <img src="{% static 'rsshistory/icons/icons8-add-link-96.png' %}" class="content-icon" />
         Add entry</a>
-    <a href="{% url 'rsshistory:sources-enable-all' %}" class="simplebutton" title="Enable all sources">
+    <a href="{% url 'rsshistory:sources-enable-all' %}" class="btn btn-secondary" role="button" title="Enable all sources">
         Enable all</a>
-    <a href="{% url 'rsshistory:sources-disable-all' %}" class="simplebutton" title="Disable all sources">
+    <a href="{% url 'rsshistory:sources-disable-all' %}" class="btn btn-secondary" role="button" title="Disable all sources">
         Disable all</a>
     {% endif %}
-    <a href="{% url 'rsshistory:sources' %}?search=enabled+%3D+True" class="simplebutton" title="Shows active sources only">
+    <a href="{% url 'rsshistory:sources' %}?search=enabled+%3D+True" class="btn btn-secondary" role="button" title="Shows active sources only">
         Enabled</a>
-    <a href="{% url 'rsshistory:sources' %}?search=enabled+%3D+False" class="simplebutton" title="Shows disabled sources only">
+    <a href="{% url 'rsshistory:sources' %}?search=enabled+%3D+False" class="btn btn-secondary" role="button" title="Shows disabled sources only">
         Disabled</a>
-    <a href="{% url 'rsshistory:sources' %}?search=category+%3D%3D+New" class="simplebutton" title="Shows new sources only">
+    <a href="{% url 'rsshistory:sources' %}?search=category+%3D%3D+New" class="btn btn-secondary" role="button" title="Shows new sources only">
         New sources</a>
 </div>
 
@@ -86,9 +82,11 @@
      <hr>
     {% include "rsshistory/pagination.html" %}
 
-     <a href="{% url 'rsshistory:sources-json' %}?{{ request.GET.urlencode }}" class='simplebutton'>Show JSON</a>
-     <a href="{% url 'rsshistory:sources' %}?{{ args }}&type=clear" class='simplebutton'>Clear list</a>
-     <a href="{% url 'rsshistory:sources' %}?{{ args }}&type=normal" class='simplebutton'>Normal list</a>
+    <div class="container">
+     <a href="{% url 'rsshistory:sources-json' %}?{{ request.GET.urlencode }}" class="btn btn-secondary" role="button">Show JSON</a>
+     <a href="{% url 'rsshistory:sources' %}?{{ args }}&type=clear" class="btn btn-secondary" role="button">Clear list</a>
+     <a href="{% url 'rsshistory:sources' %}?{{ args }}&type=normal" class="btn btn-secondary" role="button">Normal list</a>
+    </div>
 
   {% else %}
     <p>There are no sources.</p>

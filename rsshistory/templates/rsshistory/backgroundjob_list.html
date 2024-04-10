@@ -3,10 +3,6 @@
 {% block content %}
 
 <div class="contentbuttonmenu">
-    <a href="javascript:history.back()" class="simplebutton">
-        <img src="{% static 'rsshistory/icons/icons8-back-100.png' %}" class="content-icon" />
-    </a>
-
     {% if user.is_staff %}
     <a href="{% url 'rsshistory:backgroundjob-add' %}" title="Add a new job" class="simplebutton" title="Add background job">
        <img src="{% static 'rsshistory/icons/icons8-plus-100.png' %}" class="content-icon" />

@@ -42,6 +42,8 @@ class SourceUrlInterface(object):
             props["fetch_period"] = "3600"
         if "age" not in props:
             props["age"] = 0
+        if "status_code" not in props:
+            props["status_code"] = self.h.get_status_code()
 
         return props
 

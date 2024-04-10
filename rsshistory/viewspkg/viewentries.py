@@ -673,6 +673,8 @@ def add_simple_entry(request):
             errors.append("Missing protocol. Could be http:// or https://")
         if domain.lower() != domain:
             warnings.append("Link domain is not lowercase. Is that OK?")
+        if data["status_code"] < 200 or data["status_code"] > 300:
+            errors.append("Information about page availability could not be obtained")
 
         p.context["notes"] = notes
         p.context["warnings"] = warnings

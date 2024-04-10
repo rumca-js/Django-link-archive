@@ -17,38 +17,6 @@ class EntryYouTubePlugin(EntryGenericPlugin):
 
     def get_edit_menu_buttons(self):
         buttons = super().get_edit_menu_buttons()
-
-        buttons.append(
-            EntryButton(
-                self.user,
-                "",
-                reverse(
-                    "{}:entry-download-music".format(LinkDatabase.name),
-                    args=[self.entry.id],
-                ),
-                ConfigurationEntry.ACCESS_TYPE_OWNER,
-                "Downloads YouTube music",
-                static(
-                    "{}/icons/icons8-download-music-96.png".format(LinkDatabase.name)
-                ),
-            ),
-        )
-        buttons.append(
-            EntryButton(
-                self.user,
-                "",
-                reverse(
-                    "{}:entry-download-video".format(LinkDatabase.name),
-                    args=[self.entry.id],
-                ),
-                ConfigurationEntry.ACCESS_TYPE_OWNER,
-                "Downloads YouTube video",
-                static(
-                    "{}/icons/icons8-download-video-96.png".format(LinkDatabase.name)
-                ),
-            ),
-        )
-
         return buttons
 
     def get_view_menu_buttons(self):
@@ -82,6 +50,38 @@ class EntryYouTubePlugin(EntryGenericPlugin):
 
     def get_advanced_menu_buttons(self):
         buttons = super().get_advanced_menu_buttons()
+
+        buttons.append(
+            EntryButton(
+                self.user,
+                "Download music",
+                reverse(
+                    "{}:entry-download-music".format(LinkDatabase.name),
+                    args=[self.entry.id],
+                ),
+                ConfigurationEntry.ACCESS_TYPE_OWNER,
+                "Downloads YouTube music",
+                static(
+                    "{}/icons/icons8-download-music-96.png".format(LinkDatabase.name)
+                ),
+            ),
+        )
+        buttons.append(
+            EntryButton(
+                self.user,
+                "Download video",
+                reverse(
+                    "{}:entry-download-video".format(LinkDatabase.name),
+                    args=[self.entry.id],
+                ),
+                ConfigurationEntry.ACCESS_TYPE_OWNER,
+                "Downloads YouTube video",
+                static(
+                    "{}/icons/icons8-download-video-96.png".format(LinkDatabase.name)
+                ),
+            ),
+        )
+
         return buttons
 
     def get_video_code(self):

@@ -14,7 +14,7 @@ class CodeProjectPlugin(BaseRssPlugin):
         """
         feed_entry = props["feed_entry"]
 
-        props = BaseRssPlugin.enhance(self, props)
+        props = super().enhance(props)
 
         if "href" in feed_entry.source:
             props["link"] = feed_entry.source["href"]

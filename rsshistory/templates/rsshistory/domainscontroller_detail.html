@@ -3,14 +3,11 @@
 {% block content %}
 
 <div class="contentbuttonmenu">
-    <a href="javascript:history.back()" class="simplebutton">
-        <img src="{% static 'rsshistory/icons/icons8-back-100.png' %}" class="content-icon" />
-    </a>
 
     {% if user.is_staff %}
-    <a href="{% url 'rsshistory:domain-update-data' object.id %}" class="simplebutton">Update</a>
-    <a href="{% url 'rsshistory:domain-edit' object.id %}" class="simplebutton">Edit</a>
-    <a href="{% url 'rsshistory:domain-remove' object.id %}" class="simplebutton">Remove</a>
+    <a href="{% url 'rsshistory:domain-update-data' object.id %}" class="btn btn-secondary" role="button">Update</a>
+    <a href="{% url 'rsshistory:domain-edit' object.id %}" class="btn btn-secondary" role="button">Edit</a>
+    <a href="{% url 'rsshistory:domain-remove' object.id %}" class="btn btn-secondary" role="button">Remove</a>
     {% endif %}
 </div>
 
@@ -112,6 +109,6 @@ This domain is marked as dead!
  No link data
 {% endif %}
 
-<a href="{% url 'rsshistory:domain-json' object.id %}" class="simplebutton">Show JSON</a>
+<a href="{% url 'rsshistory:domain-json' object.id %}" class="btn btn-secondary" role="button">Show JSON</a>
 
 {% endblock %}

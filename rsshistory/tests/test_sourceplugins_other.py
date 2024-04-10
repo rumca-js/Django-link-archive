@@ -298,7 +298,6 @@ class CodeProjectPluginTest(FakeInternetTestCase):
 
     def test_parse(self):
         parser = CodeProjectPlugin(self.source_codeproject.id)
-        parser.contents = webpage_code_project_contents
         BackgroundJobController.objects.all().delete()
 
         props = list(parser.get_container_elements())

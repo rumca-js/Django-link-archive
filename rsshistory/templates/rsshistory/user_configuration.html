@@ -3,10 +3,6 @@
 {% block content %}
 
 <div class="contentbuttonmenu">
-    <a href="javascript:history.back()" class="simplebutton">
-        <img src="{% static 'rsshistory/icons/icons8-back-100.png' %}" class="content-icon" />
-    </a>
-
     <a href="{% url 'rsshistory:logout' %}" class="simplebutton">
                 <img src="{% static 'rsshistory/icons/icons8-logout-100.png' %}" class="content-icon" />
                 Logout</a>

@@ -3,12 +3,8 @@
 {% block content %}
 
 <div class="contentbuttonmenu">
-    <a href="javascript:history.back()" class="simplebutton">
-        <img src="{% static 'rsshistory/icons/icons8-back-100.png' %}" class="content-icon" />
-    </a>
-
     {% if user.is_staff %}
-    <a href="{% url 'rsshistory:entry-add-simple' %}" class="simplebutton" title="Opens add entry wizard">
+    <a href="{% url 'rsshistory:entry-add-simple' %}" class="btn btn-secondary" role="button" title="Opens add entry wizard">
         <img src="{% static 'rsshistory/icons/icons8-add-link-96.png' %}" class="content-icon" />
         Add entry</a>
     {% endif %}
@@ -19,13 +15,13 @@
     {{ form }}
     <tr>
         <td>
-        <input type="submit" value="Search" class="simplebutton">
+        <input type="submit" value="Search" class="btn btn-primary" role="button">
         </td>
     </tr>
     </table>
 </form>
 
-{% include "rsshistory/form_search_places_element.html" %} 
+{% include "rsshistory/search_places_element.html" %} 
 <hr/>
 
 {% include "rsshistory/form_search_syntax_element.html" %} 

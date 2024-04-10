@@ -557,6 +557,20 @@ class BaseLinkDataController(BaseLinkDataModel):
             return True
         return False
 
+    def is_removed_by_date(input_date):
+        from ..dateutils import DateUtils
+        from ..configuration import Configuration
+
+        conf = Configuration.get_object().config_entry
+        if conf.days_to_remove_links == 0:
+            return False
+
+        date_to_remove = DateUtils.get_days_before_dt(conf.days_to_remove_links)
+
+        if input_date < date_to_remove:
+            return True
+        return False
+
     def get_description_safe(description):
         if not description or description == "":
             return description

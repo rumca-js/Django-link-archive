@@ -18,7 +18,7 @@
 }
 
 a, a:link, a:visited, a:hover, a:active {
-    color: blue;
+    /* color: blue; */
 }
 
 input {

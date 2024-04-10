@@ -6,6 +6,7 @@ from ...models import ConfigurationEntry, UserConfig
 from ...controllers import LinkDataController
 from ...webtools import DomainAwarePage, InputContent
 from ...configuration import Configuration
+from ...dateutils import DateUtils
 
 
 class EntryButton(object):
@@ -62,50 +63,52 @@ class EntryGenericPlugin(object):
         buttons = []
         config = Configuration.get_object().config_entry
 
-        buttons.append(
-            EntryButton(
-                self.user,
-                "",
-                self.entry.get_edit_url(),
-                ConfigurationEntry.ACCESS_TYPE_OWNER,
-                "Edit entry",
-                static("{}/icons/icons8-edit-100.png".format(LinkDatabase.name)),
-            ),
-        )
+        if self.user.is_authenticated:
+            buttons.append(
+                EntryButton(
+                    self.user,
+                    "Edit",
+                    self.entry.get_edit_url(),
+                    ConfigurationEntry.ACCESS_TYPE_OWNER,
+                    "Edit entry",
+                    static("{}/icons/icons8-edit-100.png".format(LinkDatabase.name)),
+                ),
+            )
 
-        if self.entry.bookmarked:
-            buttons.append(
-                EntryButton(
-                    self.user,
-                    "",
-                    self.entry.get_bookmark_unset_url(),
-                    ConfigurationEntry.ACCESS_TYPE_OWNER,
-                    "Unbookmark entry",
-                    static(
-                        "{}/icons/icons8-not-bookmark-100.png".format(LinkDatabase.name)
-                    ),
+        if self.user.is_authenticated:
+            if self.entry.bookmarked:
+                buttons.append(
+                    EntryButton(
+                        self.user,
+                        "Unbookmark",
+                        self.entry.get_bookmark_unset_url(),
+                        ConfigurationEntry.ACCESS_TYPE_OWNER,
+                        "Unbookmark entry",
+                        static(
+                            "{}/icons/icons8-not-bookmark-100.png".format(LinkDatabase.name)
+                        ),
+                    )
                 )
-            )
-        else:
-            buttons.append(
-                EntryButton(
-                    self.user,
-                    "",
-                    self.entry.get_bookmark_set_url(),
-                    ConfigurationEntry.ACCESS_TYPE_OWNER,
-                    "Bookmark entry",
-                    static(
-                        "{}/icons/icons8-bookmark-100.png".format(LinkDatabase.name)
-                    ),
+            else:
+                buttons.append(
+                    EntryButton(
+                        self.user,
+                        "Bookmark",
+                        self.entry.get_bookmark_set_url(),
+                        ConfigurationEntry.ACCESS_TYPE_OWNER,
+                        "Bookmark entry",
+                        static(
+                            "{}/icons/icons8-bookmark-100.png".format(LinkDatabase.name)
+                        ),
+                    )
                 )
-            )
 
         if self.user.is_authenticated:
             if self.entry.is_taggable():
                 buttons.append(
                     EntryButton(
                         self.user,
-                        "",
+                        "Vote",
                         reverse(
                             "{}:entry-vote".format(LinkDatabase.name),
                             args=[self.entry.id],
@@ -118,115 +121,149 @@ class EntryGenericPlugin(object):
                     ),
                 )
 
-        buttons.append(
-            EntryButton(
-                self.user,
-                "",
-                reverse(
-                    "{}:entry-download".format(LinkDatabase.name),
-                    args=[self.entry.id],
-                ),
-                ConfigurationEntry.ACCESS_TYPE_OWNER,
-                "Downloads the page to configured location",
-                static(
-                    "{}/icons/icons8-download-page-96.png".format(LinkDatabase.name)
-                ),
-            ),
-        )
-
-        buttons.append(
-            EntryButton(
-                self.user,
-                "",
-                reverse(
-                    "{}:page-show-props".format(LinkDatabase.name),
-                )
-                + "?page={}".format(self.entry.link),
-                ConfigurationEntry.ACCESS_TYPE_OWNER,
-                "Shows page properties",
-                static(
-                    "{}/icons/icons8-view-details-100.png".format(LinkDatabase.name)
-                ),
-            ),
-        )
-
-        buttons.append(
-            EntryButton(
-                self.user,
-                "",
-                reverse(
-                    "{}:entry-update-data".format(LinkDatabase.name),
-                    args=[self.entry.id],
-                ),
-                ConfigurationEntry.ACCESS_TYPE_OWNER,
-                "Updates entry data",
-                static("{}/icons/icons8-update-100.png".format(LinkDatabase.name)),
-            ),
-        )
-
-        buttons.append(
-            EntryButton(
-                self.user,
-                "",
-                reverse(
-                    "{}:entry-reset-data".format(LinkDatabase.name),
-                    args=[self.entry.id],
-                ),
-                ConfigurationEntry.ACCESS_TYPE_OWNER,
-                "Resets entry data",
-                static(
-                    "{}/icons/icons8-update-skull-100.png".format(LinkDatabase.name)
-                ),
-            ),
-        )
-
-        buttons.append(
-            EntryButton(
-                self.user,
-                "",
-                reverse(
-                    "{}:page-scan-link".format(LinkDatabase.name),
-                )
-                + "?link={}".format(self.entry.link),
-                ConfigurationEntry.ACCESS_TYPE_OWNER,
-                "Scans entry for new links",
-                static("{}/icons/icons8-radar-64.png".format(LinkDatabase.name)),
-            ),
-        )
-
-        if not self.entry.source_obj or not self.is_entry_share_source_domain():
-            buttons.append(
-                EntryButton(
-                    self.user,
-                    "",
-                    reverse(
-                        "{}:source-add-simple".format(LinkDatabase.name),
-                    )
-                    + "?link={}".format(self.entry.link),
-                    ConfigurationEntry.ACCESS_TYPE_OWNER,
-                    "Add new source",
-                    static(
-                        "{}/icons/icons8-broadcast-add-100.png".format(
-                            LinkDatabase.name
-                        )
+        if self.entry.is_taggable():
+            if self.user.is_authenticated:
+                buttons.append(
+                    EntryButton(
+                        self.user,
+                        "Tag",
+                        reverse(
+                            "{}:entry-tag".format(LinkDatabase.name),
+                            args=[self.entry.id],
+                        ),
+                        ConfigurationEntry.ACCESS_TYPE_OWNER,
+                        "Tags entry: {}".format(self.entry.title),
+                        static("{}/icons/icons8-edit-100.png".format(LinkDatabase.name)),
                     ),
-                ),
-            )
+                )
 
-        if config.link_save:
+        if self.user.is_authenticated:
             buttons.append(
                 EntryButton(
                     self.user,
-                    "Save",
+                    "Update data",
                     reverse(
-                        "{}:entry-save".format(LinkDatabase.name),
+                        "{}:entry-update-data".format(LinkDatabase.name),
                         args=[self.entry.id],
                     ),
                     ConfigurationEntry.ACCESS_TYPE_OWNER,
-                    "Saves link in archive.org: {}".format(self.entry.link),
-                    static("{}/icons/archive.org.save.ico".format(LinkDatabase.name)),
+                    "Updates entry data",
+                    static("{}/icons/icons8-update-100.png".format(LinkDatabase.name)),
                 ),
             )
+
+        if self.user.is_authenticated:
+            buttons.append(
+                EntryButton(
+                    self.user,
+                    "Reset data",
+                    reverse(
+                        "{}:entry-reset-data".format(LinkDatabase.name),
+                        args=[self.entry.id],
+                    ),
+                    ConfigurationEntry.ACCESS_TYPE_OWNER,
+                    "Resets entry data",
+                    static(
+                        "{}/icons/icons8-update-skull-100.png".format(LinkDatabase.name)
+                    ),
+                ),
+            )
+
+        if self.user.is_authenticated:
+            buttons.append(
+                EntryButton(
+                    self.user,
+                    "Scan link",
+                    reverse(
+                        "{}:page-scan-link".format(LinkDatabase.name),
+                    )
+                    + "?link={}".format(self.entry.link),
+                    ConfigurationEntry.ACCESS_TYPE_OWNER,
+                    "Scans entry for new links",
+                    static("{}/icons/icons8-radar-64.png".format(LinkDatabase.name)),
+                ),
+            )
+
+        if self.user.is_authenticated:
+            if not self.entry.source_obj or not self.is_entry_share_source_domain():
+                buttons.append(
+                    EntryButton(
+                        self.user,
+                        "Add source",
+                        reverse(
+                            "{}:source-add-simple".format(LinkDatabase.name),
+                        )
+                        + "?link={}".format(self.entry.link),
+                        ConfigurationEntry.ACCESS_TYPE_OWNER,
+                        "Add new source",
+                        static(
+                            "{}/icons/icons8-broadcast-add-100.png".format(
+                                LinkDatabase.name
+                            )
+                        ),
+                    ),
+                )
+
+        if self.user.is_authenticated:
+            if config.link_save:
+                buttons.append(
+                    EntryButton(
+                        self.user,
+                        "Save",
+                        reverse(
+                            "{}:entry-save".format(LinkDatabase.name),
+                            args=[self.entry.id],
+                        ),
+                        ConfigurationEntry.ACCESS_TYPE_OWNER,
+                        "Saves link in archive.org: {}".format(self.entry.link),
+                        static("{}/icons/archive.org.save.ico".format(LinkDatabase.name)),
+                    ),
+                )
+
+        if self.user.is_authenticated:
+            buttons.append(
+                EntryButton(
+                    self.user,
+                    "Remove",
+                    reverse(
+                        "{}:entry-remove".format(LinkDatabase.name),
+                        args=[self.entry.id],
+                    ),
+                    ConfigurationEntry.ACCESS_TYPE_OWNER,
+                    "Removes entry: {}".format(self.entry.title),
+                    static("{}/icons/icons8-trash-100.png".format(LinkDatabase.name)),
+                ),
+            )
+
+        if self.user.is_authenticated:
+            if not self.entry.is_dead():
+                buttons.append(
+                    EntryButton(
+                        self.user,
+                        "Dead",
+                        reverse(
+                            "{}:entry-dead".format(LinkDatabase.name),
+                            args=[self.entry.id],
+                        ),
+                        ConfigurationEntry.ACCESS_TYPE_OWNER,
+                        "Marks entry as dead:{}".format(self.entry.title),
+                        static("{}/icons/icons8-skull-100.png".format(LinkDatabase.name)),
+                    ),
+                )
+            else:
+                buttons.append(
+                    EntryButton(
+                        self.user,
+                        "Not dead",
+                        reverse(
+                            "{}:entry-not-dead".format(LinkDatabase.name),
+                            args=[self.entry.id],
+                        ),
+                        ConfigurationEntry.ACCESS_TYPE_OWNER,
+                        "Marks entry as not dead:{}".format(self.entry.title),
+                        static("{}/icons/icons8-show-100.png".format(LinkDatabase.name)),
+                    ),
+                )
 
         return buttons
 
@@ -268,7 +305,7 @@ class EntryGenericPlugin(object):
             buttons.append(
                 EntryButton(
                     self.user,
-                    "",
+                    "Source",
                     reverse(
                         "{}:source-detail".format(LinkDatabase.name),
                         args=[self.entry.source_obj.id],
@@ -284,8 +321,8 @@ class EntryGenericPlugin(object):
             buttons.append(
                 EntryButton(
                     self.user,
-                    "",
-                    self.entry.source,
+                    "Source",
+                    self.entry.source, # TODO I think this will not wowk
                     ConfigurationEntry.ACCESS_TYPE_ALL,
                     "Source: {}".format(self.entry.source),
                     static(
@@ -373,52 +410,55 @@ class EntryGenericPlugin(object):
         buttons.append(
             EntryButton(
                 self.user,
-                "",
+                "Download page",
                 reverse(
-                    "{}:entry-remove".format(LinkDatabase.name),
+                    "{}:entry-download".format(LinkDatabase.name),
                     args=[self.entry.id],
                 ),
                 ConfigurationEntry.ACCESS_TYPE_OWNER,
-                "Removes entry: {}".format(self.entry.title),
-                static("{}/icons/icons8-trash-100.png".format(LinkDatabase.name)),
+                "Downloads the page to configured location",
+                static(
+                    "{}/icons/icons8-download-page-96.png".format(LinkDatabase.name)
+                ),
             ),
         )
 
-        if not self.entry.is_dead():
-            buttons.append(
-                EntryButton(
-                    self.user,
-                    "Dead",
-                    reverse(
-                        "{}:entry-dead".format(LinkDatabase.name),
-                        args=[self.entry.id],
-                    ),
-                    ConfigurationEntry.ACCESS_TYPE_OWNER,
-                    "Marks entry as dead:{}".format(self.entry.title),
-                    static("{}/icons/icons8-skull-100.png".format(LinkDatabase.name)),
+        buttons.append(
+            EntryButton(
+                self.user,
+                "Page properties",
+                reverse(
+                    "{}:page-show-props".format(LinkDatabase.name),
+                )
+                + "?page={}".format(self.entry.link),
+                ConfigurationEntry.ACCESS_TYPE_OWNER,
+                "Shows page properties",
+                static(
+                    "{}/icons/icons8-view-details-100.png".format(LinkDatabase.name)
                 ),
-            )
-        else:
-            buttons.append(
-                EntryButton(
-                    self.user,
-                    "Not dead",
-                    reverse(
-                        "{}:entry-not-dead".format(LinkDatabase.name),
-                        args=[self.entry.id],
-                    ),
-                    ConfigurationEntry.ACCESS_TYPE_OWNER,
-                    "Marks entry as not dead:{}".format(self.entry.title),
-                    static("{}/icons/icons8-show-100.png".format(LinkDatabase.name)),
+            ),
+        )
+
+        buttons.append(
+            EntryButton(
+                self.user,
+                "Show JSON",
+                reverse(
+                    "{}:entry-json".format(LinkDatabase.name),
+                    args=[self.entry.id],
                 ),
-            )
+                ConfigurationEntry.ACCESS_TYPE_OWNER,
+                "Shows JSON data",
+            ),
+        )
 
         return buttons
 
     def get_parameters(self):
         parameters = []
 
-        parameters.append(EntryParameter("Publish date", self.entry.date_published))
+        date = DateUtils.get_display_date(self.entry.date_published)
+        parameters.append(EntryParameter("Publish date", date ))
 
         return parameters
 
@@ -433,7 +473,8 @@ class EntryGenericPlugin(object):
         points_title = "Points = content rating + user votes"
         parameters.append(EntryParameter("Points", points_text, points_title))
 
-        parameters.append(EntryParameter("Update date", self.entry.date_update_last))
+        update_date = DateUtils.get_display_date(self.entry.date_update_last)
+        parameters.append(EntryParameter("Update date", update_date))
 
         parameters.append(EntryParameter("Status code", self.entry.status_code))
 
@@ -442,7 +483,8 @@ class EntryGenericPlugin(object):
             parameters.append(
                 EntryParameter("Manual status", self.entry.manual_status_code)
             )
-            parameters.append(EntryParameter("Dead since", self.entry.date_dead_since))
+            date_dead_since = DateUtils.get_display_date(self.entry.date_dead_since)
+            parameters.append(EntryParameter("Dead since", date_dead_since ))
 
         # Artist & album are displayed in buttons
         # Page rating is displayed in title

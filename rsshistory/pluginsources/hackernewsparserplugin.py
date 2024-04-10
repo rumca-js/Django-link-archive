@@ -4,13 +4,12 @@ import re
 from ..models import UserTags
 from ..configuration import Configuration
 from .sourcerssplugin import BaseRssPlugin
-from .rssscannerplugin import RssScannerPlugin
 from ..controllers import BackgroundJobController
 
 from ..webtools import ContentLinkParser, HtmlPage, DomainAwarePage
 
 
-class HackerNewsScannerPlugin(BaseRssPlugin):
+class HackerNewsParserPlugin(BaseRssPlugin):
     """
     - We read RSS
     - For each item in RSS we find internal links for this source

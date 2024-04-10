@@ -7,8 +7,8 @@ from ..pluginsources import BaseParsePlugin
 from ..pluginsources import SourceParseInternalLinks
 from ..pluginsources import DomainParserPlugin
 from ..pluginsources import NowNowNowParserPlugin
-from ..pluginsources import RssScannerPlugin
-from ..pluginsources import HackerNewsScannerPlugin
+from ..pluginsources import RssParserPlugin
+from ..pluginsources import HackerNewsParserPlugin
 
 from .fakeinternet import FakeInternetTestCase
 
@@ -165,7 +165,7 @@ class DomainParsePluginTest(FakeInternetTestCase):
         #TODO check if jobs have source in cfg?
 
 
-class RssScannerPluginTest(FakeInternetTestCase):
+class RssParserPluginTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 
@@ -188,7 +188,7 @@ class RssScannerPluginTest(FakeInternetTestCase):
         return False
 
     def test_is_props_valid(self):
-        parser = RssScannerPlugin(self.source_youtube.id)
+        parser = RssParserPlugin(self.source_youtube.id)
 
         # call tested function
         props = list(parser.get_container_elements())
@@ -200,7 +200,7 @@ class RssScannerPluginTest(FakeInternetTestCase):
         self.assertTrue(jobs.count() > 0)
 
 
-class HackerNewsScannerPluginTest(FakeInternetTestCase):
+class HackerNewsParserPluginTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 
@@ -223,7 +223,7 @@ class HackerNewsScannerPluginTest(FakeInternetTestCase):
         return False
 
     def test_is_props_valid(self):
-        parser = HackerNewsScannerPlugin(self.source_youtube.id)
+        parser = HackerNewsParserPlugin(self.source_youtube.id)
 
         # call tested function
         props = list(parser.get_container_elements())

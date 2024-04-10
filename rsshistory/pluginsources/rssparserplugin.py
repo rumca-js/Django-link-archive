@@ -10,14 +10,14 @@ from ..controllers import BackgroundJobController
 from ..webtools import ContentLinkParser, HtmlPage, DomainAwarePage
 
 
-class RssScannerPlugin(BaseRssPlugin):
+class RssParserPlugin(BaseRssPlugin):
     """
     - We read RSS
     - For each item in RSS we find internal links for this source
     - For each internal link, we read page, and try to add links from inside
     """
 
-    PLUGIN_NAME = "RssScannerPlugin"
+    PLUGIN_NAME = "RssParserPlugin"
 
     def __init__(self, source_id):
         super().__init__(source_id)

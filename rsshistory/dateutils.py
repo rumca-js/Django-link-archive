@@ -111,3 +111,6 @@ class DateUtils(object):
         TODO - remove this, we have already parse_datetime?
         """
         return datetime.strptime(string_input, string_format)
+
+    def get_display_date(date_input):
+        return date_input.strftime("%Y-%m-%d %H:%M:%S")

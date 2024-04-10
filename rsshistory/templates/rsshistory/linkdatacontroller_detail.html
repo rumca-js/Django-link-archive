@@ -22,22 +22,27 @@
   <span>{{object.link}}</span>
   </div>
 
- {% include "rsshistory/linkdatacontroller_detail_buttons.html" %}
+  {% include "rsshistory/linkdatacontroller_detail_parameters.html" %}
 
- {% include "rsshistory/linkdatacontroller_detail_parameters.html" %}
+  {% include "rsshistory/linkdatacontroller_detail_buttons.html" %}
+
+  <div class="contents">
+      {% if object.has_tags %}
+        Tags:
+        {% for tag in object.get_tag_map %}
+          <a href="{% url 'rsshistory:entries-omni-search'%}?search=tags__tag+%3D%3D+{{tag}}" class="btn btn-secondary" role="button">{{tag}}</a>
+        {% endfor %}
+      {% endif %}
+  </div>
 
   <div class="link-detail-description">
   {{object_controller.get_description_html | safe | linebreaks }}
   <div>
   <div style="clear:both"></div>
 
- {% include "rsshistory/linkdatacontroller_detail_comments.html" %}
+  {% include "rsshistory/linkdatacontroller_detail_comments.html" %}
 
- {% include "rsshistory/linkdatacontroller_detail_parameters_operation.html" %}
-
-  <div>
-    <a href="{% url 'rsshistory:entry-json' object.id %}" class="simplebutton">Show JSON</a>
-  </div>
+  {% include "rsshistory/linkdatacontroller_detail_parameters_operation.html" %}
 
   {%if transitions%}
        <h3>Related</h3>
@@ -46,6 +51,6 @@
       {% endfor %}
   {%endif%}
 
-{% include "rsshistory/search_places_element.html" %}
+  {% include "rsshistory/search_places_element.html" %}
 
 {% endblock %}

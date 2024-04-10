@@ -2,12 +2,8 @@
 {% load static %}
 {% block content %}
 
-<div class="contentbuttonmenu">
-    <a href="javascript:history.back()" class="simplebutton">
-        <img src="{% static 'rsshistory/icons/icons8-back-100.png' %}" class="content-icon" />
-    </a>
-
-    <a href="{% url 'rsshistory:keyword-remove' %}" title="Removes keyword" class="simplebutton">Remove a keyword</a>
+<div class="container-fluid">
+    <a href="{% url 'rsshistory:keyword-remove' %}" title="Removes keyword" class="btn btn-secondary" role="button">Remove a keyword</a>
 </div>
 
 <h1>KeyWords</h1>
@@ -18,7 +14,7 @@ Last updated {{last_date}}
   {% if content_list %}
       {% for keyword in content_list %}
       <span class="float-button">
-          <a href="{% url 'rsshistory:entries-recent'%}?search={{keyword.0}}" class="simplebutton">{{keyword.0}} {{keyword.1}}</a>
+          <a href="{% url 'rsshistory:entries-recent'%}?search={{keyword.0}}" class="btn btn-secondary" role="button">{{keyword.0}} {{keyword.1}}</a>
       </span>
       {% endfor %}
     <hr>

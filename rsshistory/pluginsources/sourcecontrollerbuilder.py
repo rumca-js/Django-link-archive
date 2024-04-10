@@ -11,8 +11,8 @@ from .codeprojectplugin import CodeProjectPlugin
 from .tvn24plugin import TVN24Plugin
 from .spotifyplugin import SpotifyPlugin
 from .sourceyoutubechannel import YouTubePlugin
-from .rssscannerplugin import RssScannerPlugin
-from .hackernewsscannerplugin import HackerNewsScannerPlugin
+from .rssparserplugin import RssParserPlugin
+from .hackernewsparserplugin import HackerNewsParserPlugin
 
 
 class SourceControllerBuilder(object):
@@ -30,8 +30,8 @@ class SourceControllerBuilder(object):
         TVN24Plugin,
         SpotifyPlugin,
         YouTubePlugin,
-        RssScannerPlugin,
-        HackerNewsScannerPlugin,
+        RssParserPlugin,
+        HackerNewsParserPlugin,
     ]
 
     def get(source_url):

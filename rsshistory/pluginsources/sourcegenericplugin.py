@@ -215,11 +215,12 @@ class SourceGenericPlugin(object):
 
     def is_link_ok_to_add(self, props):
         try:
-            is_archive = BaseLinkDataController.is_archive_by_date(
+            # We add new links also if link is for archive. if it is archive link -> add to archive
+
+            is_removed = BaseLinkDataController.is_removed_by_date(
                 props["date_published"]
             )
-            if is_archive:
-                # LinkDatabase.info("Link is for archive")
+            if is_removed:
                 return False
 
             objs = LinkDataController.objects.filter(link=props["link"])

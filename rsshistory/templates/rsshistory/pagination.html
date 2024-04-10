@@ -1,25 +1,22 @@
-<div class="pagination">
-    <span class="step-links">
+<div class="btn-group">
         {% if page_obj.has_previous %}
-        <a href="?page=1{{query_filter.get_filter_string}}" class='simplebutton'>|&lt;</a>
-        <a href="?page={{ page_obj.previous_page_number }}{{query_filter.get_filter_string}}" class='simplebutton'>&lt;</a>
+        <a href="?page=1{{query_filter.get_filter_string}}" class="btn btn-primary">|&lt;</a>
+        <a href="?page={{ page_obj.previous_page_number }}{{query_filter.get_filter_string}}" class="btn btn-primary">&lt;</a>
         {% else %}
-        <span class="simplebutton simplebuttondisabled">|&lt;</span>
-        <span class="simplebutton simplebuttondisabled">&lt;</span>
+        <a href="#" class="btn btn-primary" disabled>|&lt;</a>
+        <a href="#" class="btn btn-primary" disabled>&lt;</a>
         {% endif %}
 
         {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}{{query_filter.get_filter_string}}" class='simplebutton'>&gt;</a>
-        <a href="?page={{ page_obj.paginator.num_pages }}{{query_filter.get_filter_string}}" class='simplebutton'>&gt;|</a>
+        <a href="?page={{ page_obj.next_page_number }}{{query_filter.get_filter_string}}" class="btn btn-primary">&gt;</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}{{query_filter.get_filter_string}}" class="btn btn-primary">&gt;|</a>
         {% else %}
-        <span class="simplebutton simplebuttondisabled">&gt;</span>
-        <span class="simplebutton simplebuttondisabled">&gt;|</span>
+        <a href="#" class="btn btn-primary" diablsed>&gt;</a>
+        <a href="#" class="btn btn-primary" disabled>&gt;|</a>
         {% endif %}
-
-        <span class="current">
-            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}. Total:{{page_obj.paginator.object_list.count}}, {{page_obj.paginator.per_page}} per page.
-        </span>
-
-        <!--span>Records: {{content_list | length}} </span-->
-    </span>
 </div>
+
+<span class="current">
+    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}. Total:{{page_obj.paginator.object_list.count}}, {{page_obj.paginator.per_page}} per page.
+</span>
+<!--span>Records: {{content_list | length}} </span-->

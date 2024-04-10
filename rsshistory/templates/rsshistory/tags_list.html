@@ -3,16 +3,12 @@
 {% block content %}
 
 <div class="contentbuttonmenu">
-    <a href="javascript:history.back()" class="simplebutton">
-        <img src="{% static 'rsshistory/icons/icons8-back-100.png' %}" class="content-icon" />
-    </a>
-
-    <a href="{% url 'rsshistory:tags-show-recent' %}" class="simplebutton" title="Shows recent tags">Recent tags</a>
-    <a href="{% url 'rsshistory:entries-untagged' %}" class="simplebutton" title="Shows untagged bookmarks">Untagged bookmarks</a>
+    <a href="{% url 'rsshistory:tags-show-recent' %}" class="btn btn-secondary" role="button" title="Shows recent tags">Recent tags</a>
+    <a href="{% url 'rsshistory:entries-untagged' %}" class="btn btn-secondary" role="button" title="Shows untagged bookmarks">Untagged bookmarks</a>
     {% if user.is_staff %}
-    <a href="{% url 'rsshistory:tag-many' %}" class="simplebutton" title="Tags many links">Tag many links</a>
-    <a href="{% url 'rsshistory:tag-rename' %}" class="simplebutton" title="Renames tag">Rename tag</a>
-    <a href="{% url 'rsshistory:tag-remove-form' %}" class="simplebutton" title="Removes tag">Remove tag</a>
+    <a href="{% url 'rsshistory:tag-many' %}" class="btn btn-secondary" role="button" title="Tags many links">Tag many links</a>
+    <a href="{% url 'rsshistory:tag-rename' %}" class="btn btn-secondary" role="button" title="Renames tag">Rename tag</a>
+    <a href="{% url 'rsshistory:tag-remove-form' %}" class="btn btn-secondary" role="button" title="Removes tag">Remove tag</a>
     {% endif %}
 </div>
 
@@ -21,7 +17,7 @@
 {% if tag_objects %}
     {% for tag in tag_objects %}
         <span class="float-button">
-            <a href='{% url 'rsshistory:entries-omni-search'%}?search=tags__tag+%3D%3D+"{{tag.0}}"' class="simplebutton">
+            <a href='{% url 'rsshistory:entries-omni-search'%}?search=tags__tag+%3D%3D+"{{tag.0}}"' class="btn btn-secondary" role="button">
                 {{tag.0}} {{tag.1}}</a>
         </span>
     {% endfor %}

@@ -2,16 +2,13 @@
 {% load static %}
 {% block content %}
 
-<div class="contentbuttonmenu">
-    <a href="javascript:history.back()" class="simplebutton">
-        <img src="{% static 'rsshistory/icons/icons8-back-100.png' %}" class="content-icon" />
-    </a>
-    <a href="{% url 'rsshistory:domains' %}" class='simplebutton'>
+<div class="container-fluid">
+    <a href="{% url 'rsshistory:domains' %}" class="btn btn-secondary" role="button">
         <img src="{% static 'rsshistory/icons/icons8-start-100.png' %}" class="content-icon" />
         Reset filters</a>
     {% if user.is_staff %}
-    <a href="{% url 'rsshistory:domains-category-list' %}" title="Shows categories" class="simplebutton">View categories</a>
-    <a href="{% url 'rsshistory:domains' %}?search=category+is+null&sort=date_update_last" title="Domains without category" class="simplebutton">Domains without category</a>
+    <a href="{% url 'rsshistory:domains-category-list' %}" title="Shows categories" class="btn btn-secondary" role="button">View categories</a>
+    <a href="{% url 'rsshistory:domains' %}?search=category+is+null&sort=date_update_last" title="Domains without category" class="btn btn-secondary" role="button">Domains without category</a>
     {% endif %}
 </div>
 
@@ -20,7 +17,7 @@
      {{ filter_form }}
      <tr>
          <td>
-             <input type="submit" value="Search" class="simplebutton">
+             <input type="submit" value="Search" class="btn btn-secondary" role="button">
          </td>
      </tr>
      </table>
@@ -79,9 +76,9 @@
     No domains yet
   {% endif %}
 
-  <a href="{% url 'rsshistory:domains-json' %}?{{ request.GET.urlencode }}" class='simplebutton'>Show JSON</a>
-  <a href="{% url 'rsshistory:domains' %}?{{ args }}&type=clear" class='simplebutton'>Clear list</a>
-  <a href="{% url 'rsshistory:domains' %}?{{ args }}&type=normal" class='simplebutton'>Normal list</a>
+  <a href="{% url 'rsshistory:domains-json' %}?{{ request.GET.urlencode }}" class="btn btn-secondary" role="button">Show JSON</a>
+  <a href="{% url 'rsshistory:domains' %}?{{ args }}&type=clear" class="btn btn-secondary" role="button">Clear list</a>
+  <a href="{% url 'rsshistory:domains' %}?{{ args }}&type=normal" class="btn btn-secondary" role="button">Normal list</a>
 
 {% include "rsshistory/domain_help_element.html" %}
 

@@ -1,0 +1,94 @@
+{% load static %}
+
+{% if user.is_staff %}
+<nav class="navbar navbar-expand-sm">
+    <a class="navbar-brand" href="#">Edit</a>
+
+   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#sourceEditNavBar" aria-controls="sourceEditNavBar" aria-expanded="false" aria-label="Toggle navigation">
+     <span class="navbar-toggler-icon"></span>
+   </button>
+
+   <div class="collapse navbar-collapse" id="sourceEditNavBar">
+       <ul class="nav navbar-nav mr-auto">
+            <li class="nav-item">
+              <a href="{% url 'rsshistory:source-edit' object.id %}" class="nav-link" title="Edit source">
+                  <img src="{% static 'rsshistory/icons/icons8-edit-100.png' %}" class="content-icon" />
+		  Edit
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'rsshistory:source-refresh' object.id %}" class="nav-link" title="Checks if the source has new data">
+                  <img src="{% static 'rsshistory/icons/icons8-update-100.png' %}" class="content-icon" />
+		  Refresh
+              </a>
+            </li>
+            {% if object.enabled %}
+            <li class="nav-item">
+              <a href="{% url 'rsshistory:source-pause' object.id %}" class="nav-link" title="Pauses source">
+                  <img src="{% static 'rsshistory/icons/icons8-pause-squared-100.png' %}" class="content-icon" />
+		  Pause
+              </a>
+            </li>
+            {% else %}
+            <li class="nav-item">
+              <a href="{% url 'rsshistory:source-resume' object.id %}" class="nav-link" title="Resumes source">
+                  <img src="{% static 'rsshistory/icons/icons8-play-100.png' %}" class="content-icon" />
+		  Resume
+              </a>
+            </li>
+            {% endif %}
+            <li class="nav-item">
+               <a href="{% url 'rsshistory:source-remove' object.id %}" class="nav-link" title="Remove source">
+                   <img src="{% static 'rsshistory/icons/icons8-trash-100.png' %}" class="content-icon" />
+		   Remove
+               </a>
+            </li>
+            <li class="nav-item">
+               <a href="{% url 'rsshistory:source-remove-entries' object.id %}" class="nav-link">
+                   <img src="{% static 'rsshistory/icons/icons8-trash-multiple-100.png' %}" class="content-icon" />
+		       Remove entries</a>
+            </li>
+      </ul>
+  </div>
+</nav>
+{% endif %}
+
+<nav class="navbar navbar-expand-sm">
+    <a class="navbar-brand" href="#">Advanced</a>
+
+   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#sourceAdvancedNavBar" aria-controls="sourceAdvancedNavBar" aria-expanded="false" aria-label="Toggle navigation">
+     <span class="navbar-toggler-icon"></span>
+   </button>
+
+   <div class="collapse navbar-collapse" id="sourceAdvancedNavBar">
+       <ul class="nav navbar-nav mr-auto">
+
+        {% if entry_object %}
+	<li class="nav-item"
+          <a href="{% url 'rsshistory:entry-detail' entry_object.id %}" class="nav-link">
+            <img src="{% static 'rsshistory/icons/icons8-link-90.png' %}" class="content-icon" />
+	    Go to entry
+          </a>
+	</li>
+        {% endif %}
+	<li class="nav-item"
+          <a href="{% url 'rsshistory:entries-omni-search' %}?search=source+%3D+'{{object.url}}'" class="nav-link">Search for entry</a>
+	</li>
+
+        {% if user.is_staff %}
+            <li class="nav-item">
+               <a href="{% url 'rsshistory:source-fix-entries' object.id %}" class="nav-link" title="Fixes entries for source, objects relationships, langauge">Fix entries</a>
+            </li>
+            {% if handler.is_youtube %}
+            <li class="nav-item">
+                 <a href="{% url 'rsshistory:source-import-yt-links' object.id %}" class="nav-link" title="Fetches all the videos from source">Fetch all videos</a>
+            </li>
+            {% endif %}
+        {% endif %}
+
+            <li class="nav-item">
+               <a href="{% url 'rsshistory:source-json' object.id %}" class="nav-link">Show JSON</a>
+            </li>
+      </ul>
+    </div>
+</nav>

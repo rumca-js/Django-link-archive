@@ -13,7 +13,7 @@ class SourceParseDigitsPlugin(BaseParsePlugin):
         """
         Allow only links with digits at start, after domain
         """
-        if not DomainAwarePage(self.get_address()).is_link_in_domain(address):
+        if not super().is_link_valid(address):
             return False
 
         search_pattern = self.get_domain() + "/[0-9]+"

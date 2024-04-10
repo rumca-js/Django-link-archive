@@ -3,9 +3,6 @@
 {% block content %}
 
 <div class="contentbuttonmenu">
-    <a href="javascript:history.back()" class="simplebutton">
-        <img src="{% static 'rsshistory/icons/icons8-back-100.png' %}" class="content-icon" />
-    </a>
 </div>
 
 <form action="{{form.action_url}}" method="{{form.method}}">
@@ -13,13 +10,13 @@
     {{ form }}
     <tr>
         <td>
-        <input type="submit" value="Search" class="simplebutton">
+        <input type="submit" value="Search" class="btn btn-primary" role="button">
         </td>
     </tr>
     </table>
 </form>
 
-{% include "rsshistory/form_search_places_element.html" %} 
+{% include "rsshistory/search_places_element.html" %} 
 <hr/>
 
 {% endblock %}
