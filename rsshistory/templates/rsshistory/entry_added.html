@@ -2,8 +2,8 @@
 {% block content %}
 
 <ul>
-    <li>Link added: <a href="{{ entry.get_absolute_url }}" class="simplebutton">{{entry.title}}</a></li>
-    <li><a href="{% url 'rsshistory:entry-add-simple' %}" class="simplebutton">Add a new entry</a></li>
+    <li>Link added: <a href="{{ entry.get_absolute_url }}" class="btn btn-secondary" role="button">{{entry.title}}</a></li>
+    <li><a href="{% url 'rsshistory:entry-add-simple' %}" class="btn btn-secondary" role="button">Add a new entry</a></li>
 </ul>
 
 {% endblock %}

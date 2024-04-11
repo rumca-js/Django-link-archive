@@ -2,15 +2,15 @@
 {% load static %}
 {% block content %}
 
-<div class="contentbuttonmenu">
+<div class="container">
     {% if user.is_staff %}
-    <a href="{% url 'rsshistory:backgroundjob-add' %}" title="Add a new job" class="simplebutton" title="Add background job">
+    <a href="{% url 'rsshistory:backgroundjob-add' %}" title="Add a new job" class="btn btn-secondary" role="button" title="Add background job">
        <img src="{% static 'rsshistory/icons/icons8-plus-100.png' %}" class="content-icon" />
     </a>
-    <a href="{% url 'rsshistory:backgroundjobs-check-new' %}" title="Checks if it is time for a new job" class="simplebutton">
+    <a href="{% url 'rsshistory:backgroundjobs-check-new' %}" title="Checks if it is time for a new job" class="btn btn-secondary" role="button">
        <img src="{% static 'rsshistory/icons/icons8-update-100.png' %}" class="content-icon" />
     </a>
-    <a href="{% url 'rsshistory:backgroundjobs-remove-all' %}" title="Removes all background jobs" class="simplebutton" title="Remove all">
+    <a href="{% url 'rsshistory:backgroundjobs-remove-all' %}" title="Removes all background jobs" class="btn btn-secondary" role="button" title="Remove all">
         <img src="{% static 'rsshistory/icons/icons8-trash-multiple-100.png' %}" class="content-icon" />
     </a>
     {% endif %}
@@ -37,26 +37,26 @@
             [{{job.date_created}}] {{job.priority}} <b>{{job.job}}</b> {{job.task}} {{job.subject}} {{job.args}} 
 
 	    {% if job.enabled %}
-            <a href="{% url 'rsshistory:backgroundjob-disable' job.id %}" class="simplebutton" title="Disable job">
+            <a href="{% url 'rsshistory:backgroundjob-disable' job.id %}" class="btn btn-secondary" role="button" title="Disable job">
                <img src="{% static 'rsshistory/icons/icons8-pause-squared-100.png' %}" class="content-icon" />
             </a>
 	    {% else %}
-            <a href="{% url 'rsshistory:backgroundjob-enable' job.id %}" class="simplebutton" title="Enable job">
+            <a href="{% url 'rsshistory:backgroundjob-enable' job.id %}" class="btn btn-secondary" role="button" title="Enable job">
                <img src="{% static 'rsshistory/icons/icons8-play-100.png' %}" class="content-icon" />
             </a>
 	    {% endif %}
 
-            <a href="{% url 'rsshistory:backgroundjob-prio-up' job.id %}" class="simplebutton" title="Increase priority">
+            <a href="{% url 'rsshistory:backgroundjob-prio-up' job.id %}" class="btn btn-secondary" role="button" title="Increase priority">
                <img src="{% static 'rsshistory/icons/icons8-up-100.png' %}" class="content-icon" />
             </a>
-            <a href="{% url 'rsshistory:backgroundjob-prio-down' job.id %}" class="simplebutton" title="Decrease priority">
+            <a href="{% url 'rsshistory:backgroundjob-prio-down' job.id %}" class="btn btn-secondary" role="button" title="Decrease priority">
                <img src="{% static 'rsshistory/icons/icons8-down-100.png' %}" class="content-icon" />
             </a>
 
-            <a href="{% url 'rsshistory:backgroundjob-remove' job.id %}" class="simplebutton" title="Remove job">
+            <a href="{% url 'rsshistory:backgroundjob-remove' job.id %}" class="btn btn-secondary" role="button" title="Remove job">
                <img src="{% static 'rsshistory/icons/icons8-trash-100.png' %}" class="content-icon" />
             </a>
-            <a href="{% url 'rsshistory:backgroundjobs-remove' job.job %}" class="simplebutton" title="Remove all in type">
+            <a href="{% url 'rsshistory:backgroundjobs-remove' job.job %}" class="btn btn-secondary" role="button" title="Remove all in type">
                <img src="{% static 'rsshistory/icons/icons8-trash-multiple-100.png' %}" class="content-icon" />
                Type
            </a>

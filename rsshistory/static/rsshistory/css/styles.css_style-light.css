@@ -9,7 +9,7 @@
 }
 
 .body-style {
-    color: black;
+    /* color: black;*/
     background-color:#ffffff
 }
 
@@ -66,7 +66,10 @@ hr {
 
 .link-detail-thumbnail {
      clear: both;
-     max-width: 100%;
+     max-width: 20%;
+     min-width: 15%;
+     max-height: 20%;
+     min-height: 15%;
      height: auto;
      float: left;
 }
@@ -225,7 +228,7 @@ hr {
 }
 
 .element_standard, .element_standard:link, .element_standard:visited {
-    color : black;
+    /* color : black; */
     padding: 0px 15px;
     text-align: left;
     text-decoration: none;
@@ -233,17 +236,17 @@ hr {
 }
 
 .element_standard:hover, .element_standard:active{
-    color: blue;
+    /* color: blue; */
     background-color: #BFD8FF;
 }
 
 .element_standard_selected, .element_standard_selected:link, .element_standard_selected:visited, .element_standard_selected:active {
-    color : green;  /* not inherited */
+    /* color : green;  /* not inherited */
     text-decoration: none;
 }
 
 .element_standard_selected:hover {
-    color: white;
+    /* color: white; */
     background-color: green;
 }
 

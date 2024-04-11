@@ -41,8 +41,12 @@
             {% include "rsshistory/base_menu.html" %}
         </div>
 
-        <div class="container">{% block content %}{% endblock %}
-            {% include "rsshistory/base_footer.html" %}
+        <div class="container">
+            {% block content %}{% endblock %}
+        </div>
+
+        <div class="container">
+	   {% include "rsshistory/base_footer.html" %}
         </div>
 
         <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>

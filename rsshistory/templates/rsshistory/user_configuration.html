@@ -3,7 +3,7 @@
 {% block content %}
 
 <div class="contentbuttonmenu">
-    <a href="{% url 'rsshistory:logout' %}" class="simplebutton">
+    <a href="{% url 'rsshistory:logout' %}" class="btn btn-secondary">
                 <img src="{% static 'rsshistory/icons/icons8-logout-100.png' %}" class="content-icon" />
                 Logout</a>
 </div>
@@ -18,7 +18,7 @@
         {{config_form}}
         <tr>
             <td>
-                <input type="submit" value="Submit" class="simplebutton">
+                <input type="submit" value="Submit" class="btn btn-primary" role="button">
             </td>
         </tr>
     </table>

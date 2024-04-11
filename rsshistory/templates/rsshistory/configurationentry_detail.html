@@ -2,11 +2,11 @@
 {% block content %}
 
   <span>Filters:</span>
-  <a href="/{{app_name}}/links/" class='simplebutton'>Reset</a>
+  <a href="/{{app_name}}/links/" class="btn btn-secondary" role="button">Reset</a>
 
   <form action="{{filter_form.action_url}}" method="{{filter_form.method}}">
      {{ filter_form }}
-     <input type="submit" value="Submit" class="simplebutton">
+     <input type="submit" value="Submit" class="btn btn-secondary" role="button">
   </form>
 
   <hr>
@@ -33,23 +33,9 @@
     {% endfor %}
   </ul>
 
-    <div class="pagination">
-        <span class="step-links">
-            {% if page_obj.has_previous %}
-               <a href="?page=1{{filters}}" class='simplebutton'>&laquo; first</a>
-               <a href="?page={{ page_obj.previous_page_number }}{{filters}}" class='simplebutton'>previous</a>
-            {% endif %}
-
-            <span class="current">
-                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
-            </span>
-
-            {% if page_obj.has_next %}
-              <a href="?page={{ page_obj.next_page_number }}{{filters}}" class='simplebutton'>next</a>
-              <a href="?page={{ page_obj.paginator.num_pages }}{{filters}}" class='simplebutton'>last &raquo;</a>
-            {% endif %}
-        </span>
-    </div>
+  <div class="container">
+   {% include "rsshistory/pagination.html" %}
+  </div>
 
   {% else %}
     <p>There are no links.</p>

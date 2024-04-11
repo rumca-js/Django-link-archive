@@ -29,16 +29,16 @@
 
     {% if user.is_staff %}
     <div>
-        <a href="{{ link.get_absolute_url }}" class="simplebutton">
+        <a href="{{ link.get_absolute_url }}" class="btn btn-secondary" role="button">
             Details
         </a>
         {% if link.bookmarked %}
-        <a href="{% url 'rsshistory:entry-notbookmark' link.id %}" class="simplebutton">
+        <a href="{% url 'rsshistory:entry-notbookmark' link.id %}" class="btn btn-secondary" role="button">
             Not bookmarked
         </a>
-        <a href="{% url 'rsshistory:entry-tag' link.id %}" class="simplebutton">Tag entry</a>
+        <a href="{% url 'rsshistory:entry-tag' link.id %}" class="btn btn-secondary" role="button">Tag entry</a>
         {% else %}
-        <a href="{% url 'rsshistory:entry-star' link.id %}" class="simplebutton">
+        <a href="{% url 'rsshistory:entry-star' link.id %}" class="btn btn-secondary" role="button">
             Bookmark
         </a>
         {% endif %}

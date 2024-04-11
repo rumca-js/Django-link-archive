@@ -113,4 +113,5 @@ class DateUtils(object):
         return datetime.strptime(string_input, string_format)
 
     def get_display_date(date_input):
-        return date_input.strftime("%Y-%m-%d %H:%M:%S")
+        if date_input:
+            return date_input.strftime("%Y-%m-%d %H:%M:%S")

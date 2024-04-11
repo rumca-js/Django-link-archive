@@ -108,7 +108,7 @@ class ViewPage(object):
 
     def fill_context_type(context, url=None, fast_check=True, handler=None):
         if handler is None:
-            handler = UrlHandler.get_type(url, fast_check=fast_check)
+            handler = UrlHandler.get_type(url)
 
         context["is_youtube_video"] = type(handler) == UrlHandler.youtube_video_handler
         context["is_youtube_channel"] = (

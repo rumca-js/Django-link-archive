@@ -2,10 +2,6 @@
 {% load static %}
 {% block content %}
 
-<div>
-{{ query_filter.time_start }}
-</div>
-
 <div class="container-fluid">
     <a href="{{reset_link}}" class="btn btn-secondary" role="button">
       <img src="{% static 'rsshistory/icons/icons8-start-100.png' %}" class="content-icon" />
@@ -49,7 +45,7 @@
   <hr>
 
   {% if content_list %}
-  <div class="link-list container_{{user_config.display_type}}">
+  <div class="container">
     {% for link in content_list %}
     {% if type == "normal" %}
           {% if user_config.display_type == "clickable-tags" %}
@@ -91,9 +87,5 @@
   </div>
 
 {% include "rsshistory/search_places_element.html" %}
-
-<div>
-{{ query_filter.time_stop }}
-</div>
 
 {% endblock %}

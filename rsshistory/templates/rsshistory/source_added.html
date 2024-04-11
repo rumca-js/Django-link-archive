@@ -2,8 +2,8 @@
 {% block content %}
 
 <ul>
-    <li>Source added: <a href="{{ source.get_absolute_url }}" class="simplebutton">{{source.title}}</a></li>
-    <li><a href="{% url 'rsshistory:source-add' %}" class="simplebutton">Add a new source</a></li>
+    <li>Source added: <a href="{{ source.get_absolute_url }}" class="btn btn-secondary" role="button">{{source.title}}</a></li>
+    <li><a href="{% url 'rsshistory:source-add' %}" class="btn btn-secondary" role="button">Add a new source</a></li>
 </ul>
 
 {% endblock %}

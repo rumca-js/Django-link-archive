@@ -64,16 +64,19 @@
        <ul class="nav navbar-nav mr-auto">
 
         {% if entry_object %}
-	<li class="nav-item"
-          <a href="{% url 'rsshistory:entry-detail' entry_object.id %}" class="nav-link">
-            <img src="{% static 'rsshistory/icons/icons8-link-90.png' %}" class="content-icon" />
-	    Go to entry
-          </a>
-	</li>
+	  <li class="nav-item">
+            <a href="{% url 'rsshistory:entry-detail' entry_object.id %}" class="nav-link">
+              <img src="{% static 'rsshistory/icons/icons8-link-90.png' %}" class="content-icon" />
+	      Go to source entry
+            </a>
+	  </li>
+	{% else %}
+	  <li class="nav-item">
+            <a href="{% url 'rsshistory:entries-omni-search' %}?search=source+%3D+'{{object.url}}'" class="nav-link">
+              <img src="{% static 'rsshistory/icons/icons8-link-90.png' %}" class="content-icon" />
+		    Search for source entry</a>
+	  </li>
         {% endif %}
-	<li class="nav-item"
-          <a href="{% url 'rsshistory:entries-omni-search' %}?search=source+%3D+'{{object.url}}'" class="nav-link">Search for entry</a>
-	</li>
 
         {% if user.is_staff %}
             <li class="nav-item">
@@ -85,6 +88,10 @@
             </li>
             {% endif %}
         {% endif %}
+
+	   <li class="nav-item">
+             <a href="{% url 'rsshistory:page-show-props' %}?page={{object.url}}" class="nav-link">Page properties</a>
+	   </li>
 
             <li class="nav-item">
                <a href="{% url 'rsshistory:source-json' object.id %}" class="nav-link">Show JSON</a>

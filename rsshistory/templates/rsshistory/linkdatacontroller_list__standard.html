@@ -1,41 +1,46 @@
-<a href="{{ link.get_absolute_url | safe }}"
-   title="{{link.title}} {{link.link}} {{link.source}}"
-   {% if not link.is_valid %}
-   style="opacity: 0.5"
-   {% endif %}
+<div class="row border my-2 p-1">
+   <a href="{{ link.get_absolute_url | safe }}"
+      title="{{link.title}} {{link.link}} {{link.source}}"
+      {% if not link.is_valid %}
+      style="opacity: 0.5"
+      {% else %}
+      {% endif %}
 
-   {% if link.bookmarked %}
-   class="element_{{user_config.display_type}} element_{{user_config.display_type}}_selected"
-   {% else %}
-   class="element_{{user_config.display_type}}"
-   {% endif %}
-   >
-
-   {% if user_config.show_icons %}
-   <img src=
-        {% if user_config.thumbnails_as_icons %}
-        "{{link.get_thumbnail}}"
-        {% else %}
-        "{{link.get_favicon}}"
-        {% endif %}
-
-        {% if user_config.small_icons %}
-        class="content-thumbnail"
-        {% else %}
-        class="content-big-thumbnail"
-        {% endif %}
-        />
-   {% endif %}
-
-   <span class="link-list-item-title">
-       {% if link.is_dead %}[D]{%endif%}
-       {% if link.page_rating_votes %}
-       [{{link.page_rating_votes}}]
-       {%endif%}
-       {{link.title | slice:":100"}}
-   </span>
-    <span class="link-list-item-description">
-        {{link.source_obj.title | slice:":100"}}
-        {{link.date_published}}
-    </span>
-</a>
+      {% if link.bookmarked %}
+      class="element_{{user_config.display_type}} element_{{user_config.display_type}}_selected"
+      {% else %}
+      class="element_{{user_config.display_type}}"
+      {% endif %}
+      >
+  
+      {% if user_config.show_icons %}
+      <img src=
+           {% if user_config.thumbnails_as_icons %}
+           "{{link.get_thumbnail}}"
+           {% else %}
+           "{{link.get_favicon}}"
+           {% endif %}
+  
+           {% if user_config.small_icons %}
+           class="img-fluid rounded"
+           style="height:2em; width:2em; object-fit:cover; object-position:0 0;"
+           {% else %}
+           class="img-fluid rounded"
+           style="height:3em; width:3em; object-fit:cover; object-position:0 0;"
+           {% endif %}
+           />
+      {% endif %}
+  
+      <span style="font-weight:bold" class="text-reset">
+          {% if link.is_dead %}[D]{%endif%}
+          {% if link.page_rating_votes %}
+          [{{link.page_rating_votes}}]
+          {%endif%}
+          {{link.title | slice:":100"}}
+      </span>
+      <div class="text-reset">
+           {{link.source_obj.title | slice:":100"}}
+           {{link.date_published}}
+      </div>
+  </a>
+</div>

@@ -13,9 +13,7 @@ Last updated {{last_date}}
 
   {% if content_list %}
       {% for keyword in content_list %}
-      <span class="float-button">
-          <a href="{% url 'rsshistory:entries-recent'%}?search={{keyword.0}}" class="btn btn-secondary" role="button">{{keyword.0}} {{keyword.1}}</a>
-      </span>
+        <a href="{% url 'rsshistory:entries-recent'%}?search={{keyword.0}}" title="{{keyword.0}} {{keyword.1}}">{{keyword.0}}</a>
       {% endfor %}
     <hr>
 

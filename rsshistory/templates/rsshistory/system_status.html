@@ -30,15 +30,15 @@
     <li>Number of UserEntryTransitionHistory: {{UserEntryTransitionHistory}}</li>
 
     <li>BackgroundJob: {{BackgroundJob}}
-        <a href="{% url 'rsshistory:backgroundjobs' %}" title="View background jobs" class="simplebutton">View</a>
+        <a href="{% url 'rsshistory:backgroundjobs' %}" title="View background jobs" class="btn btn-secondary" role="button">View</a>
     </li>
 
     <li>Server log length: {{AppLogging}} 
-        <a href="{% url 'rsshistory:logs' %}" title="View all logs" class="simplebutton">View</a>
+        <a href="{% url 'rsshistory:logs' %}" title="View all logs" class="btn btn-secondary" role="button">View</a>
     </li>
 
     <li>Domains: {{Domains}}
-        <a href="{% url 'rsshistory:domains' %}" title="Domains" class="simplebutton">View</a>
+        <a href="{% url 'rsshistory:domains' %}" title="Domains" class="btn btn-secondary" role="button">View</a>
         </li>
 </ul>
 

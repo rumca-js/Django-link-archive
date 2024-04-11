@@ -10,10 +10,10 @@
 	  {{comment.date_published}} {{comment.user_object}}
           {% if comment.user_object.username == user.get_username %}
             <div class="btn-group">
-              <a href="{% url 'rsshistory:entry-comment-edit' comment.id %}" class="btn btn-secondary" title="Edit comment">
+              <a href="{% url 'rsshistory:entry-comment-edit' comment.id %}" class="btn btn-secondary" role="button" title="Edit comment">
                  <img src="{% static 'rsshistory/icons/icons8-edit-100.png' %}" class="content-icon" />
               </a>
-              <a href="{% url 'rsshistory:entry-comment-remove' comment.id %}" class="btn btn-secondary" title="Remove comment">
+              <a href="{% url 'rsshistory:entry-comment-remove' comment.id %}" class="btn btn-secondary" role="button" title="Remove comment">
                  <img src="{% static 'rsshistory/icons/icons8-trash-100.png' %}" class="content-icon" />
               </a>
 	    </div>
@@ -25,7 +25,7 @@
 
   <div class="container">
   {% if user.is_authenticated %}
-    <a href="{% url 'rsshistory:entry-comment-add' object.id %}" class="btn btn-secondary">Add comment</a>
+    <a href="{% url 'rsshistory:entry-comment-add' object.id %}" class="btn btn-secondary" role="button">Add comment</a>
   {% endif %}
   </div>
 {% endif %}

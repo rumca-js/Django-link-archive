@@ -2,75 +2,166 @@
 {% load static %}
 {% block content %}
 
-<div class="container-fluid">
+<div class="container">
 </div>
 
 {% if user.is_staff %}
-    <div>
-        <h1>Managment links</h1>
-        <a href="{% url 'rsshistory:system-status' %}" title="Displays status" class="btn btn-secondary" role="button">
-            <img src="{% static 'rsshistory/icons/icons8-heart-monitor-100.png' %}" class="content-icon" />
-            Status</a>
-        <a href="{% url 'rsshistory:configuration' %}" title="Instance configuration" class="btn btn-secondary" role="button">
-            <img src="{% static 'rsshistory/icons/icons8-configuration-67.png' %}" class="content-icon" />
-            Configuration</a>
-        <a href="{% url 'rsshistory:backgroundjobs' %}" title="View background jobs" class="btn btn-secondary" role="button">
-            <img src="{% static 'rsshistory/icons/icons8-schedule-100.png' %}" class="content-icon" />
-            Background Jobs</a>
-        <a href="{% url 'rsshistory:logs' %}" title="View all logs" class="btn btn-secondary" role="button">
-            <img src="{% static 'rsshistory/icons/icons8-paper-64.png' %}" class="content-icon" />
-            Logs</a>
-        <a href="{% url 'admin:index' %}" title="User administration" class="btn btn-secondary" role="button">
-            <img src="{% static 'rsshistory/icons/account.png' %}" class="content-icon" />
-            User admin</a>
-    </div>
+<nav class="navbar navbar-expand-sm">
+    <a class="navbar-brand" href="#">Managment links</a>
 
-    <h1>Tools</h1>
-    <div>
-        <a href="{% url 'rsshistory:page-show-props' %}" title="Shows page properties" class="btn btn-secondary" role="button">
-            <img src="{% static 'rsshistory/icons/icons8-view-details-100.png' %}" class="content-icon" />
-            Properties</a>
-        <a href="{% url 'rsshistory:cleanup-link' %}" title="Shows cleanedup link" class="btn btn-secondary" role="button">
-            <img src="{% static 'rsshistory/icons/icons8-view-details-100.png' %}" class="content-icon" />
-            Cleanup Link</a>
-        <a href="{% url 'rsshistory:page-scan-link' %}" title="Scans page" class="btn btn-secondary" role="button">
-            <img src="{% static 'rsshistory/icons/icons8-radar-64.png' %}" class="content-icon" />
-            Scan page</a>
-        <a href="{% url 'rsshistory:page-scan-contents' %}" title="Scans page contents" class="btn btn-secondary" role="button">
-            <img src="{% static 'rsshistory/icons/icons8-radar-64.png' %}" class="content-icon" />
-            Scan contents</a>
-    </div>
+   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mgmtNavBar" aria-controls="mgmtNavBar" aria-expanded="false" aria-label="Toggle navigation">
+     <span class="navbar-toggler-icon"></span>
+   </button>
 
-    <div>
-        <h1>Import / export</h1>
-        <a href="{% url 'rsshistory:data-exports' %}" title="Configured Data Exports" class="btn btn-secondary" role="button">
-            <img src="{% static 'rsshistory/icons/icons8-database-export-100.png' %}" class="content-icon" />
-            Data Exports</a>
-        <a href="{% url 'rsshistory:import-from-instance' %}" title="Import from another link archive instance" class="btn btn-secondary" role="button">Import from instance</a>
-        <a href="{% url 'rsshistory:import-from-files' %}" title="Import from a directory" class="btn btn-secondary" role="button">Import from a directory</a>
-        <a href="{% url 'rsshistory:write-bookmarks' %}" class="btn btn-secondary" role="button">Write bookmarks</a>
-        <a href="{% url 'rsshistory:write-daily-data-form' %}" class="btn btn-secondary" role="button">Write daily data</a>
-        <a href="{% url 'rsshistory:write-tag-form' %}" class="btn btn-secondary" role="button">Write topic data</a>
-        <a href="{% url 'rsshistory:push-daily-data-form' %}" class="btn btn-secondary" role="button">Push daily data to repo</a>
+   <div class="collapse navbar-collapse" id="mgmtNavBar">
+       <ul class="nav navbar-nav mr-auto">
+	  <li class="nav-item">
+             <a href="{% url 'rsshistory:system-status' %}" title="Displays status" class="nav-link">
+                 <img src="{% static 'rsshistory/icons/icons8-heart-monitor-100.png' %}" class="content-icon" />
+                 Status</a>
+	  </li>
+	  <li class="nav-item">
+             <a href="{% url 'rsshistory:configuration' %}" title="Instance configuration" class="nav-link">
+                 <img src="{% static 'rsshistory/icons/icons8-configuration-67.png' %}" class="content-icon" />
+                 Configuration</a>
+	  </li>
+	  <li class="nav-item">
+             <a href="{% url 'rsshistory:backgroundjobs' %}" title="View background jobs" class="nav-link">
+                 <img src="{% static 'rsshistory/icons/icons8-schedule-100.png' %}" class="content-icon" />
+                 Background Jobs</a>
+	  </li>
+	  <li class="nav-item">
+             <a href="{% url 'rsshistory:logs' %}" title="View all logs" class="nav-link">
+                 <img src="{% static 'rsshistory/icons/icons8-paper-64.png' %}" class="content-icon" />
+                 Logs</a>
+	  <li class="nav-item">
+             <a href="{% url 'admin:index' %}" title="User administration" class="nav-link">
+                 <img src="{% static 'rsshistory/icons/account.png' %}" class="content-icon" />
+                 User admin</a>
+	  </li>
     </div>
+</nav>
 
-    <div>
-        <h1>Advanced</h1>
-	    <a href="{% url 'rsshistory:domains-remove-all' %}" title="Removes all domains" class="btn btn-secondary" role="button">Remove all domains</a>
-        <a href="{% url 'rsshistory:keywords-remove-all' %}" title="Removes all keywords" class="btn btn-secondary" role="button">Remove all keywords</a>
-        <a href="{% url 'rsshistory:sources-remove-all' %}" title="Removes all sources" class="btn btn-secondary" role="button">Remove all sources</a>
-        <a href="{% url 'rsshistory:entries-remove-all' %}" title="Remove nonbookmarked entries" class="btn btn-secondary" role="button">Remove all entries</a>
-        <a href="{% url 'rsshistory:entries-archive-remove-all' %}" title="Remove archived entries" class="btn btn-secondary" role="button">Remove all archived entries</a>
-        <a href="{% url 'rsshistory:entries-remove-nonbookmarked' %}" title="Remove nonbookmarked entries" class="btn btn-secondary" role="button">Remove non bookmarked entries</a>
-        <a href="{% url 'rsshistory:data-errors' %}" class="btn btn-secondary" role="button">Show data errors</a>
-    </div>
+<nav class="navbar navbar-expand-sm">
+    <a class="navbar-brand" href="#">Tools</a>
 
-    <div>
-        <h1>Debug</h1>
-        <a href="{% url 'rsshistory:tags-entry-show' '664761' %}" class="btn btn-secondary" role="button">Show entry tags</a>
-        <a href="{% url 'rsshistory:test-page' %}" class="btn btn-secondary" role="button">Test page</a>
-        <a href="{% url 'rsshistory:test-form-page' %}" class="btn btn-secondary" role="button">Test form page</a>
+   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#toolsNavBar" aria-controls="toolsNavBar" aria-expanded="false" aria-label="Toggle navigation">
+     <span class="navbar-toggler-icon"></span>
+   </button>
+
+   <div class="collapse navbar-collapse" id="toolsNavBar">
+       <ul class="nav navbar-nav mr-auto">
+	  <li class="nav-item">
+             <a href="{% url 'rsshistory:page-show-props' %}" title="Shows page properties" class="nav-link">
+                 <img src="{% static 'rsshistory/icons/icons8-view-details-100.png' %}" class="content-icon" />
+                 Properties</a>
+	  </li>
+	  <li class="nav-item">
+             <a href="{% url 'rsshistory:cleanup-link' %}" title="Shows cleanedup link" class="nav-link">
+                 <img src="{% static 'rsshistory/icons/icons8-view-details-100.png' %}" class="content-icon" />
+                 Cleanup Link</a>
+	  </li>
+	  <li class="nav-item">
+             <a href="{% url 'rsshistory:page-scan-link' %}" title="Scans page" class="nav-link">
+                 <img src="{% static 'rsshistory/icons/icons8-radar-64.png' %}" class="content-icon" />
+                 Scan page</a>
+	  <li class="nav-item">
+             <a href="{% url 'rsshistory:page-scan-contents' %}" title="Scans page contents" class="nav-link">
+                 <img src="{% static 'rsshistory/icons/icons8-radar-64.png' %}" class="content-icon" />
+                 Scan contents</a>
+	  </li>
     </div>
+</nav>
+
+<nav class="navbar navbar-expand-sm">
+    <a class="navbar-brand" href="#">Import/Export</a>
+
+   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ImportNavBar" aria-controls="ImportNavBar" aria-expanded="false" aria-label="Toggle navigation">
+     <span class="navbar-toggler-icon"></span>
+   </button>
+
+   <div class="collapse navbar-collapse" id="ImportNavBar">
+       <ul class="nav navbar-nav mr-auto">
+	  <li class="nav-item">
+             <a href="{% url 'rsshistory:data-exports' %}" title="Configured Data Exports" class="nav-link">
+                 <img src="{% static 'rsshistory/icons/icons8-database-export-100.png' %}" class="content-icon" />
+                 Data Exports</a>
+	  </li>
+	  <li class="nav-item">
+             <a href="{% url 'rsshistory:import-from-instance' %}" title="Import from another link archive instance" class="nav-link">Import from instance</a>
+	  </li>
+	  <li class="nav-item">
+             <a href="{% url 'rsshistory:import-from-files' %}" title="Import from a directory" class="nav-link">Import from a directory</a>
+	  </li>
+	  <li class="nav-item">
+             <a href="{% url 'rsshistory:write-bookmarks' %}" class="nav-link">Write bookmarks</a>
+	  </li>
+	  <li class="nav-item">
+             <a href="{% url 'rsshistory:write-daily-data-form' %}" class="nav-link">Write daily data</a>
+	  </li>
+	  <li class="nav-item">
+             <a href="{% url 'rsshistory:write-tag-form' %}" class="nav-link">Write topic data</a>
+	  </li>
+	  <li class="nav-item">
+             <a href="{% url 'rsshistory:push-daily-data-form' %}" class="nav-link">Push daily data to repo</a>
+	  </li>
+    </div>
+</nav>
+
+<nav class="navbar navbar-expand-sm">
+    <a class="navbar-brand" href="#">Advanced</a>
+
+   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#advancedNavBar" aria-controls="advancedNavBar" aria-expanded="false" aria-label="Toggle navigation">
+     <span class="navbar-toggler-icon"></span>
+   </button>
+
+   <div class="collapse navbar-collapse" id="advancedNavBar">
+       <ul class="nav navbar-nav mr-auto">
+	  <li class="nav-item">
+	     <a href="{% url 'rsshistory:domains-remove-all' %}" title="Removes all domains" class="nav-link">Remove all domains</a>
+	  </li>
+	  <li class="nav-item">
+             <a href="{% url 'rsshistory:keywords-remove-all' %}" title="Removes all keywords" class="nav-link">Remove all keywords</a>
+	  </li>
+	  <li class="nav-item">
+             <a href="{% url 'rsshistory:sources-remove-all' %}" title="Removes all sources" class="nav-link">Remove all sources</a>
+	  </li>
+	  <li class="nav-item">
+             <a href="{% url 'rsshistory:entries-remove-all' %}" title="Remove nonbookmarked entries" class="nav-link">Remove all entries</a>
+	  </li>
+	  <li class="nav-item">
+             <a href="{% url 'rsshistory:entries-archive-remove-all' %}" title="Remove archived entries" class="nav-link">Remove all archived entries</a>
+	  </li>
+	  <li class="nav-item">
+             <a href="{% url 'rsshistory:entries-remove-nonbookmarked' %}" title="Remove nonbookmarked entries" class="nav-link">Remove non bookmarked entries</a>
+	  </li>
+	  <li class="nav-item">
+             <a href="{% url 'rsshistory:data-errors' %}" class="nav-link">Show data errors</a>
+	  </li>
+    </div>
+</nav>
+
+<nav class="navbar navbar-expand-sm">
+    <a class="navbar-brand" href="#">Debug</a>
+
+   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#debugNavBar" aria-controls="debugNavBar" aria-expanded="false" aria-label="Toggle navigation">
+     <span class="navbar-toggler-icon"></span>
+   </button>
+
+   <div class="collapse navbar-collapse" id="debugNavBar">
+       <ul class="nav navbar-nav mr-auto">
+	  <li class="nav-item">
+             <a href="{% url 'rsshistory:tags-entry-show' '664761' %}" class="nav-link">Show entry tags</a>
+	  </li>
+	  <li class="nav-item">
+             <a href="{% url 'rsshistory:test-page' %}" class="nav-link">Test page</a>
+	  </li>
+	  <li class="nav-item">
+             <a href="{% url 'rsshistory:test-form-page' %}" class="nav-link">Test form page</a>
+	  </li>
+    </div>
+</nav>
+
 {% endif %}
 
 {% endblock %}

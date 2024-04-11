@@ -2,8 +2,8 @@
 {% load static %}
 {% block content %}
 
-<div class="contentbuttonmenu">
-    <a href="{% url 'rsshistory:reset-config' %}" class="simplebutton" title="Resets configuration">
+<div class="container">
+    <a href="{% url 'rsshistory:reset-config' %}" class="btn btn-secondary" role="button" title="Resets configuration">
         Reset config
     </a>
 </div>
@@ -45,7 +45,7 @@
 
         <tr>
             <td>
-                <input type="submit" value="Submit" class="simplebutton">
+                <input type="submit" value="Submit" class="btn btn-primary" role="button">
             </td>
         </tr>
     </table>
