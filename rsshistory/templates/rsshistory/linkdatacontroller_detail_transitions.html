@@ -1,0 +1,6 @@
+{%if transitions%}
+     <h3>Related</h3>
+     {% for entry in transitions %}
+     <h4><a href="{{ entry.get_absolute_url }}" title="{{ entry.title }}">{{entry.title}}</a></h4>
+     {% endfor %}
+{%endif%}

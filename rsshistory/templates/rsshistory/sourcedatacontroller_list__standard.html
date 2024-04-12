@@ -1,0 +1,27 @@
+<div class="row border my-2 p-1">
+   <a href="{{ source.get_absolute_url }}"
+      class="element_{{user_config.display_type}}"
+      title="{{source.title}} {{source.get_long_description}}"
+      >
+       {% if user_config.show_icons %}
+       <img src="{{source.get_favicon}}" class="content-icon"/>
+       {% endif %}
+       <span class="link-list-item-title">
+           {% if source.dead %}
+           [DEAD]
+           {% endif %}
+           {% if not source.enabled %}
+           [H]
+           {% endif %}
+           {{source.title}}
+       </span>
+       <div class="link-list-item-description">
+           {{source.url}}
+       </div>
+       <div class="link-list-item-description">
+           {{source.get_long_description}}
+       </div>
+   </a>
+</div>
+<!--
+-->

@@ -66,10 +66,10 @@ hr {
 }
 
 .link-detail-thumbnail {
-     clear: both;
-     max-width: 100%;
-     height: auto;
-     float: left;
+     max-width: 20%;
+     min-width: 15%;
+     max-height: 20%;
+     min-height: 15%;
 }
 
 .link-detail-description img {
@@ -83,10 +83,6 @@ hr {
 }
 
 /* Basic Content elements */
-
-.mainbutton-icon {
-    width:20px;
-}
 
 .error-text {
     color : red;
@@ -105,66 +101,6 @@ hr {
 .content-big-thumbnail {
     width:150px;
     float: left;
-}
-
-.mainbutton-container {
-    display: flex;
-    flex-wrap: wrap;
-    align-content: flex-start;
-    flex-direction: column;
-}
-
-.mainbutton, .mainbutton:link, .mainbutton:visited, .mainbutton:active {
-    color : #373737;
-    background-color: #7f7f7f;
-    padding: 3px 12px;
-    text-decoration: none;
-    display: inline-block;
-    border-radius: 10px;
-    margin: 1px;
-}
-
-.mainbutton:hover {
-    color : black;
-    background-color: #95ce8d;
-}
-
-.simplebutton, .simplebutton:link, .simplebutton:active, .simplebutton:visited  {
-    color : #373737;
-    background-color: #7f7f7f;
-    padding: 3px 15px;
-    text-align: center;
-    text-decoration: none;
-    border-radius: 10px;
-    box-shadow: 1px 1px grey;
-    display: inline-block;
-    margin: 1px;
-    border: 0px;
-}
-
-.simplebutton:hover  {
-    color : black;
-    background-color: #95ce8d;
-}
-
-.simplebuttondisabled {
-    color: #5f5f5f;
-    background-color: #6f6f6f;
-    box-shadow: 0px 0px grey;
-}
-
-.simplebuttondisabled:hover {
-    color: #5f5f5f;
-    background-color: #6f6f6f;
-}
-
-.float-button {
-    display:inline-block;
-    margin: 2px;
-}
-
-.simplebuttoninline {
-    display: contents;
 }
 
 .contentbuttonmenu {
@@ -282,6 +218,7 @@ hr {
 .element_line-and-buttons a {
     text-decoration: none;
 }
+
 .element_line-and-buttons a:hover {
     color: green;
     background-color: #f4f4f4;
@@ -328,6 +265,16 @@ hr {
     text-align: left;
     text-decoration: none;
     margin-bottom:3px;
+}
+
+.element_search-engine:hover, .element_search-engine:active{
+    color: blue;
+    background-color: #BFD8FF;
+}
+
+.element_search-engine_selected, .element_search-engine_selected:link, .element_search-engine_selected:visited, .element_search-engine_selected:active {
+    color : green;  /* not inherited */
+    text-decoration: none;
 }
 
 /* end of view elements */

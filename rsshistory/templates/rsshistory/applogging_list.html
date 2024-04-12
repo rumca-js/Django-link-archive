@@ -18,15 +18,18 @@
 
 <h1>AppLogging info list</h1>
 
-  {% if content_list %}
-      {% for info in content_list %}
-      <div style="display:flex; flex-wrap: wrap;">
-         <div>Date: {{info.date}}</div>
-         <div>Level: {{info.level}}</div>
-      </div>
-      <div style="margin-bottom: 2%"><pre>{{info.info_text | safe}}</pre></div>
-      {% endfor %}
-  {% else %}
-     No logs
-  {% endif %}
+{% if content_list %}
+<div class="container">
+    {% for info in content_list %}
+    <div style="display:flex; flex-wrap: wrap;">
+       <div>Date: {{info.date}}</div>
+       <div>Level: {{info.level}}</div>
+    </div>
+    <div style="margin-bottom: 2%"><pre>{{info.info_text | safe}}</pre></div>
+    {% endfor %}
+</div>
+{% else %}
+   No logs
+{% endif %}
+
 {% endblock %}

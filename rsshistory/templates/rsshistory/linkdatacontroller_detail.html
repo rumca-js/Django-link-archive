@@ -2,63 +2,51 @@
 {% load static %}
 {% block content %}
 
-  {{object_controller.get_frame_html | safe }}
-  <h1
-      class="link-title"
-       {% if not object.is_valid %}
-       style="opacity: 0.5"
+   {{object_controller.get_frame_html | safe }}
+   
+   <div>
+      <h1
+          class="link-title"
+           {% if not object.is_valid %}
+           style="opacity: 0.5"
+           {% endif %}
+          >
+          <a href="{{ object.link }}" title="{{ object.link }}">
+              {% if object.bookmarked %}
+              [{{object.page_rating}}]
+              {% endif %}
+              {{ object_controller.get_title_html }}
+          </a>
+      </h1>
+      <span>{{object.link}}</span>
+   </div>
+
+   <div>
+     {% include "rsshistory/linkdatacontroller_detail_parameters.html" %}
+   </div>
+   
+   <div>
+       {% if object.has_tags %}
+         {% for tag in object.get_tag_map %}
+           <a href="{% url 'rsshistory:entries-omni-search'%}?search=tags__tag+%3D%3D+{{tag}}">#{{tag}}</a>,
+         {% endfor %}
        {% endif %}
-      >
-      <a href="{{ object.link }}" title="{{ object.link }}">
-          {% if object.bookmarked %}
-          [{{object.page_rating}}]
-          {% endif %}
-          {{ object_controller.get_title_html }}
-      </a>
-  </h1>
-  <span>{{object.link}}</span>
-  </div>
+   </div>
 
-  <div class="container">
-  {% include "rsshistory/linkdatacontroller_detail_parameters.html" %}
-  </div>
+   {% include "rsshistory/linkdatacontroller_detail_buttons.html" %}
 
-  <div class="container">
-  {% include "rsshistory/linkdatacontroller_detail_buttons.html" %}
-  </div>
+   <div class="link-detail-description">
+   {{object_controller.get_description_html | safe | linebreaks }}
+   </div>
 
-  <div class="container">
-      {% if object.has_tags %}
-        Tags:
-        {% for tag in object.get_tag_map %}
-          <a href="{% url 'rsshistory:entries-omni-search'%}?search=tags__tag+%3D%3D+{{tag}}">#{{tag}}</a>,
-        {% endfor %}
-      {% endif %}
-  </div>
+   {% include "rsshistory/linkdatacontroller_detail_comments.html" %}
 
-  <div class="container link-detail-description">
-  {{object_controller.get_description_html | safe | linebreaks }}
-  </div>
+   {% include "rsshistory/linkdatacontroller_detail_parameters_operation.html" %}
 
-  <div class="container">
-  {% include "rsshistory/linkdatacontroller_detail_comments.html" %}
-  </div>
+   <div class="container">
+   {% include "rsshistory/linkdatacontroller_detail_transitions.html" %}
+   </div>
 
-  <div class="container">
-  {% include "rsshistory/linkdatacontroller_detail_parameters_operation.html" %}
-  </div>
-
-  <div class="container">
-  {%if transitions%}
-       <h3>Related</h3>
-      {% for entry in transitions %}
-          <h4 class="link-title"><a href="{{ entry.get_absolute_url }}" title="{{ entry.title }}">{{entry.title}}</a></h4>
-      {% endfor %}
-  {%endif%}
-  </div>
-
-  <div class="container">
-  {% include "rsshistory/search_places_element.html" %}
-  </div>
+   {% include "rsshistory/search_places_element.html" %}
 
 {% endblock %}

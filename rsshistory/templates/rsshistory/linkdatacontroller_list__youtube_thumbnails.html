@@ -1,10 +1,15 @@
-<div class="row">
+<div>
    <a href="{{ link.get_absolute_url }}"
       title="{{link.title}} {{link.link}} {{link.source}}"
       {% if not link.is_valid %}
       style="opacity: 0.5"
       {% endif %}
-      class="link-underline link-underline-opacity-0"
+
+      {% if link.bookmarked %}
+      class="element_{{user_config.display_type}} element_{{user_config.display_type}}_selected"
+      {% else %}
+      class="element_{{user_config.display_type}}"
+      {% endif %}
       >
       <div style="display: flex; flex-direction:column; align-content:normal; height:100%">
           <div style="flex: 0 0 70%; flex-shrink: 0;flex-grow:0;max-height:70%">

@@ -221,21 +221,6 @@ class EntryGenericPlugin(object):
                 )
 
         if self.user.is_authenticated:
-            buttons.append(
-                EntryButton(
-                    self.user,
-                    "Remove",
-                    reverse(
-                        "{}:entry-remove".format(LinkDatabase.name),
-                        args=[self.entry.id],
-                    ),
-                    ConfigurationEntry.ACCESS_TYPE_OWNER,
-                    "Removes entry: {}".format(self.entry.title),
-                    static("{}/icons/icons8-trash-100.png".format(LinkDatabase.name)),
-                ),
-            )
-
-        if self.user.is_authenticated:
             if not self.entry.is_dead():
                 buttons.append(
                     EntryButton(
@@ -264,6 +249,22 @@ class EntryGenericPlugin(object):
                         static("{}/icons/icons8-show-100.png".format(LinkDatabase.name)),
                     ),
                 )
+
+        if self.user.is_authenticated:
+            buttons.append(
+                EntryButton(
+                    self.user,
+                    "Remove",
+                    reverse(
+                        "{}:entry-remove".format(LinkDatabase.name),
+                        args=[self.entry.id],
+                    ),
+                    ConfigurationEntry.ACCESS_TYPE_OWNER,
+                    "Removes entry: {}".format(self.entry.title),
+                    static("{}/icons/icons8-trash-100.png".format(LinkDatabase.name)),
+                ),
+            )
+
 
         return buttons
 

@@ -1,71 +1,69 @@
 {% load static %}
 
-<div class="container">
+<div class="d-flex">
+  {% if user.is_staff %}
+  <div class="dropdown mx-2">
+     <button class="btn btn-primary" type="button" id="#entryEditDrop" data-bs-toggle="dropdown" aria-expanded="false">
+       Edit
+     </button>
+  
+     <ul class="dropdown-menu">
+          {% for button in object_controller.get_edit_menu_buttons %}
+              {% if button.is_shown %}
+  	    <li>
+                  <a href="{{button.action}}" class="dropdown-item" title="{{button.title}}">
+                  {% if button.image %}
+                     <img src="{{button.image}}" class="content-icon" />
+                  {% endif %}
+                  {{button.name}}
+                  </a>
+              </li>
+              {% endif %}
+          {% endfor %}
+     </ul>
+  </div>
+  {%endif%}
+  
+  <div class="dropdown mx-2">
+     <button class="btn btn-primary" type="button" id="#entryViewDrop" data-bs-toggle="dropdown" aria-expanded="false">
+       View
+     </button>
+  
+     <ul class="dropdown-menu">
+         {% for button in object_controller.get_view_menu_buttons %}
+             {% if button.is_shown %}
+  	   <li>
+                 <a href="{{button.action}}" class="dropdown-item" title="{{button.title}}">
+                 {% if button.image %}
+                    <img src="{{button.image}}" class="content-icon" />
+                 {% endif %}
+                 {{button.name}}
+                 </a>
+  	   </li>
+             {% endif %}
+         {% endfor %}
+     </ul>
+  </div>
 
-{% if user.is_staff %}
-<nav class="navbar navbar-expand-sm">
-    <a class="navbar-brand" href="#">Edit</a>
+  <div class="dropdown mx-2">
+     <button class="btn btn-primary" type="button" id="#entryAdvancedDrop" data-bs-toggle="dropdown" aria-expanded="false">
+       Advanced
+     </button>
+  
+     <ul class="dropdown-menu">
+         {% for button in object_controller.get_advanced_menu_buttons %}
+             {% if button.is_shown %}
+  	   <li>
+                 <a href="{{button.action}}" class="dropdown-item" title="{{button.title}}">
+                 {% if button.image %}
+                    <img src="{{button.image}}" class="content-icon" />
+                 {% endif %}
+                 {{button.name}}
+                 </a>
+             {% endif %}
+  	   </li>
+         {% endfor %}
+     </ul>
+  </div>
 
-   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#entryEditNavBar" aria-controls="entryEditNavBar" aria-expanded="false" aria-label="Toggle navigation">
-     <span class="navbar-toggler-icon"></span>
-   </button>
-
-   <div class="collapse navbar-collapse" id="entryEditNavBar">
-       <ul class="nav navbar-nav mr-auto">
-            {% for button in object_controller.get_edit_menu_buttons %}
-                {% if button.is_shown %}
-  	        <li class="nav-item">
-                    <a href="{{button.action}}" class="nav-link" title="{{button.title}}">
-                    {% if button.image %}
-                       <img src="{{button.image}}" class="content-icon" />
-                    {% endif %}
-                    {{button.name}}
-                    </a>
-  	        </li>
-                {% endif %}
-            {% endfor %}
-       </ul>
-   </div>
-</nav>
-{%endif%}
-
-<nav class="navbar navbar-expand-sm">
-    <a class="navbar-brand" href="#">Advanced</a>
-
-   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#entryAdvancedNavBar" aria-controls="entryAdvancedNavBar" aria-expanded="false" aria-label="Toggle navigation">
-     <span class="navbar-toggler-icon"></span>
-   </button>
-
-   <div class="collapse navbar-collapse" id="entryAdvancedNavBar">
-       <ul class="nav navbar-nav mr-auto">
-           
-            {% for button in object_controller.get_view_menu_buttons %}
-                {% if button.is_shown %}
-  	        <li class="nav-item">
-                    <a href="{{button.action}}" class="nav-link" title="{{button.title}}">
-                    {% if button.image %}
-                       <img src="{{button.image}}" class="content-icon" />
-                    {% endif %}
-                    {{button.name}}
-                    </a>
-	        </li>
-                {% endif %}
-            {% endfor %}
-           
-            {% for button in object_controller.get_advanced_menu_buttons %}
-                {% if button.is_shown %}
-  	        <li class="nav-item">
-                    <a href="{{button.action}}" class="nav-link" title="{{button.title}}">
-                    {% if button.image %}
-                       <img src="{{button.image}}" class="content-icon" />
-                    {% endif %}
-                    {{button.name}}
-                    </a>
-                {% endif %}
-	        </li>
-            {% endfor %}
-       </ul>
-   </div>
-
-</nav>
 </div>

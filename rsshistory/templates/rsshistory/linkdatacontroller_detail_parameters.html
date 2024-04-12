@@ -1,6 +1,6 @@
-  <div>
+  <div class="d-flex flex-wrap">
       {% for parameter in object_controller.get_parameters %}
-      <span
+      <div class ="text-nowrap"
           {% if parameter.title %}
           title="{{parameter.title}}"
           {% elif parameter.name %}
@@ -9,6 +9,6 @@
           >
           <strong>{{parameter.name | safe}}:</strong>
           {{parameter.description | safe}}
-      </span>
+      </div>
       {% endfor %}
   </div>

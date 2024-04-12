@@ -67,16 +67,22 @@
 	  <li class="nav-item">
             <a href="{% url 'rsshistory:entry-detail' entry_object.id %}" class="nav-link">
               <img src="{% static 'rsshistory/icons/icons8-link-90.png' %}" class="content-icon" />
-	      Go to source entry
+	      Source entry
             </a>
 	  </li>
 	{% else %}
 	  <li class="nav-item">
-            <a href="{% url 'rsshistory:entries-omni-search' %}?search=source+%3D+'{{object.url}}'" class="nav-link">
+            <a href="{% url 'rsshistory:entries-omni-search' %}?search=link+%3D+'{{object.url}}'" class="nav-link">
               <img src="{% static 'rsshistory/icons/icons8-link-90.png' %}" class="content-icon" />
-		    Search for source entry</a>
+		    Source entry</a>
 	  </li>
         {% endif %}
+
+	  <li class="nav-item">
+            <a href="{% url 'rsshistory:entries-omni-search' %}?search=source+%3D+'{{object.url}}'" class="nav-link">
+              <img src="{% static 'rsshistory/icons/icons8-link-90.png' %}" class="content-icon" />
+		    Search entries</a>
+	  </li>
 
         {% if user.is_staff %}
             <li class="nav-item">

@@ -45,48 +45,24 @@
   <hr>
 
   {% if content_list %}
-  <div class="linklist container_{{user_config.display_type}}">
-      {% for source in content_list %}
-      {% if type == "normal" %}
-      <a href="{{ source.get_absolute_url }}"
-         class="element_{{user_config.display_type}}"
-         title="{{source.title}} {{source.get_long_description}}"
-         >
-         <div class="linklistitem">
-             {% if user_config.show_icons %}
-             <img src="{{source.get_favicon}}" class="content-icon"/>
+     <div class="container">
+       {% for source in content_list %}
+             {% if user_config.display_type == "clickable-tags" %}
+                 {% include "rsshistory/sourcedatacontroller_list__standard.html" %}
+             {% else %}
+                 {% include "rsshistory/sourcedatacontroller_list__standard.html" %}
              {% endif %}
-             <span class="link-list-item-title">
-                 {% if source.dead %}
-                 [DEAD]
-                 {% endif %}
-                 {% if not source.enabled %}
-                 [H]
-                 {% endif %}
-                 {{source.title}}
-             </span>
-          <span class="link-list-item-description">
-              {{source.url}}
-              {{source.get_long_description}}
-          </span>
-         </div>
-      </a>
-      {% elif type == "clear" %}
-      <div>
-      - {{source.url}} {{source.title}}
-      </div>
-      {% endif %}
-      {% endfor %}
-  </div>
+       {% endfor %}
+     </div>
 
      <hr>
-    {% include "rsshistory/pagination.html" %}
+     {% include "rsshistory/pagination.html" %}
 
-    <div class="container">
-     <a href="{% url 'rsshistory:sources-json' %}?{{ request.GET.urlencode }}" class="btn btn-secondary" role="button">Show JSON</a>
-     <a href="{% url 'rsshistory:sources' %}?{{ args }}&type=clear" class="btn btn-secondary" role="button">Clear list</a>
-     <a href="{% url 'rsshistory:sources' %}?{{ args }}&type=normal" class="btn btn-secondary" role="button">Normal list</a>
-    </div>
+     <div class="container">
+      <a href="{% url 'rsshistory:sources-json' %}?{{ request.GET.urlencode }}" class="btn btn-secondary" role="button">Show JSON</a>
+      <a href="{% url 'rsshistory:sources' %}?{{ args }}&type=clear" class="btn btn-secondary" role="button">Clear list</a>
+      <a href="{% url 'rsshistory:sources' %}?{{ args }}&type=normal" class="btn btn-secondary" role="button">Normal list</a>
+     </div>
 
   {% else %}
     <p>There are no sources.</p>

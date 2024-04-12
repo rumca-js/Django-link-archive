@@ -16,7 +16,7 @@
 }
 
 a, a:link, a:visited, a:hover, a:active {
-    /* color: green; */
+    color: green;
 }
 
 input {
@@ -54,10 +54,10 @@ hr {
 }
 
 .link-detail-thumbnail {
-     clear: both;
-     max-width: 100%;
-     height: auto;
-     float: left;
+     max-width: 30%;
+     min-width: 20%;
+     max-height: 30%;
+     min-height: 20%;
 }
 
 .link-detail-description img {
@@ -65,9 +65,6 @@ hr {
      max-width: 100%;
      height: auto;
      float: right;
-}
-
-.link-list a{
 }
 
 .link-list a:link, .link-list a:visited, .link-list a:active {
@@ -80,10 +77,6 @@ hr {
 }
 
 /* Basic Content elements */
-
-.mainbutton-icon {
-    width:30px;
-}
 
 .error-text {
     color : red;
@@ -102,64 +95,6 @@ hr {
 .content-big-thumbnail {
     width:20%;
     float: left;
-}
-
-.mainbutton-container {
-    display: flex;
-    flex-wrap: wrap;
-    align-content: flex-start;
-}
-
-.mainbutton, .mainbutton:link, .mainbutton:visited, .mainbutton:active {
-    color : #373737;
-    background-color: #7f7f7f;
-    padding: 1% 2%;
-    text-decoration: none;
-    border-radius: 10px;
-    margin : 1px;
-}
-
-.mainbutton:hover {
-    color : black;
-    background-color: #e0e0e0;
-}
-
-.simplebutton, .simplebutton:link, .simplebutton:active, .simplebutton:visited  {
-    color : #373737;
-    background-color: #7f7f7f;
-    padding: 3px 15px;
-    text-align: center;
-    text-decoration: none;
-    border-radius: 10px;
-    box-shadow: 1px 1px grey;
-    display: inline-block;
-    margin: 1px;
-    border: 0px;
-}
-
-.simplebutton:hover  {
-    color : black;
-    background-color: #95ce8d;
-}
-
-.simplebuttondisabled {
-    color: #5f5f5f;
-    background-color: #6f6f6f;
-    box-shadow: 0px 0px grey;
-}
-
-.simplebuttondisabled:hover {
-    color: #5f5f5f;
-    background-color: #6f6f6f;
-}
-
-.float-button {
-    display:inline-block;
-    margin: 2px;
-}
-
-.simplebuttoninline {
-    display: contents;
 }
 
 .contentbuttonmenu {
@@ -342,11 +277,7 @@ hr {
 
 /* Configuration pages */
 .management-box {
-    /* color: grey;*/
     margin: 5px;
     padding: 5px;
     background-color: #f4f4f4;
-    /* border: solid 1px;
-    border-color: grey; */
-    /* box-shadow: 1px 1px grey; */
 }

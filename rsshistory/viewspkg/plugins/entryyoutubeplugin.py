@@ -103,11 +103,6 @@ class EntryYouTubePlugin(EntryGenericPlugin):
         return old_params
 
     def get_frame_html(self):
-        frame_text = """
-        <div class="youtube_player_container">
-           {}
-        </div>"""
-
         if not self.entry.is_user_appropriate(self.user):
             frame_text = """
             <div style="color:red">This material is restricted for age {}</div>"""

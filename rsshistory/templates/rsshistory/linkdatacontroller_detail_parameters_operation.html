@@ -1,14 +1,14 @@
-  <div>
-      {% for parameter in object_controller.get_parameters_operation %}
-      <span
-          {% if parameter.title %}
-          title="{{parameter.title}}"
-          {% elif parameter.name %}
-          title="{{parameter.name}}"
-          {% endif %}
-          >
-          <strong>{{parameter.name | safe}}:</strong>
-          {{parameter.description | safe}}
-      </span>
-      {% endfor %}
-  </div>
+<div class="d-flex flex-wrap">
+    {% for parameter in object_controller.get_parameters_operation %}
+    <div class="text-nowrap mx-1"
+        {% if parameter.title %}
+        title="{{parameter.title}}"
+        {% elif parameter.name %}
+        title="{{parameter.name}}"
+        {% endif %}
+        >
+        <strong>{{parameter.name | safe}}:</strong>
+        {{parameter.description | safe}}
+    </div>
+    {% endfor %}
+</div>

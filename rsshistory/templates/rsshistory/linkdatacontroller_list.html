@@ -45,7 +45,11 @@
   <hr>
 
   {% if content_list %}
+  {% if user_config.display_type == "youtube-thumbnails" %}
+  <div class="d-flex flex-wrap">
+  {% else %}
   <div class="container">
+  {% endif %}
     {% for link in content_list %}
     {% if type == "normal" %}
           {% if user_config.display_type == "clickable-tags" %}
