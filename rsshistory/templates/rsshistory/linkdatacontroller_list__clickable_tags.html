@@ -1,9 +1,12 @@
 <div
    {% if link.bookmarked %}
    title="{{link.get_title}} {{link.link}} {{link.get_long_description}}"
-   class="element_{{user_config.display_type}} element_{{user_config.display_type}}_selected"
+   {% endif %}
+
+   {% if link.bookmarked %}
+   class="my-1 p-1 list-group-item list-group-item-action list-group-item-primary"
    {% else %}
-   class="element_{{user_config.display_type}}"
+   class="my-1 p-1 list-group-item list-group-item-action"
    {% endif %}
    >
 

@@ -1,52 +1,50 @@
-<div class="row border my-2 p-1">
-   <a href="{{ link.get_absolute_url | safe }}"
-      title="{{link.title}} {{link.link}} {{link.source}}"
-      {% if not link.is_valid %}
-      style="opacity: 0.5"
-      {% else %}
-      {% endif %}
+<a href="{{ link.get_absolute_url | safe }}"
+   title="{{link.title}} {{link.link}} {{link.source}}"
+   {% if not link.is_valid %}
+   style="opacity: 0.5"
+   {% else %}
+   {% endif %}
 
-      {% if link.bookmarked %}
-      class="element_{{user_config.display_type}} element_{{user_config.display_type}}_selected"
-      {% else %}
-      class="element_{{user_config.display_type}}"
-      {% endif %}
-      >
-  
-      <div class="d-flex">
-         {% if user_config.show_icons %}
-	 <div>
-            <img src=
-                 {% if user_config.thumbnails_as_icons %}
-                 "{{link.get_thumbnail}}"
-                 {% else %}
-                 "{{link.get_favicon}}"
-                 {% endif %}
-  
-                 {% if user_config.small_icons %}
-                 class="rounded"
-                 style="height:2em; width:2em; object-fit:cover; object-position:0 0;"
-                 {% else %}
-                 class="rounded"
-                 style="height:3em; width:3em; object-fit:cover; object-position:0 0;"
-                 {% endif %}
-                 />
-            {% endif %}
-	 </div>
-	 <div class="mx-2">
-            <span style="font-weight:bold" class="text-reset">
-                {% if link.is_dead %}[D]{%endif%}
-                {% if link.page_rating_votes %}
-                [{{link.page_rating_votes}}]
-                {%endif%}
-                {{link.title | slice:":100"}}
-            </span>
-	 </div>
-      </div>
+   {% if link.bookmarked %}
+   class="my-1 p-1 list-group-item list-group-item-action list-group-item-primary"
+   {% else %}
+   class="my-1 p-1 list-group-item list-group-item-action"
+   {% endif %}
+   >
 
-      <div class="text-reset">
-           {{link.source_obj.title | slice:":100"}}
-           {{link.date_published}}
+   <div class="d-flex">
+      {% if user_config.show_icons %}
+      <div>
+         <img src=
+              {% if user_config.thumbnails_as_icons %}
+              "{{link.get_thumbnail}}"
+              {% else %}
+              "{{link.get_favicon}}"
+              {% endif %}
+
+              {% if user_config.small_icons %}
+              class="rounded"
+              style="height:2em; width:2em; object-fit:cover; object-position:0 0;"
+              {% else %}
+              class="rounded"
+              style="height:3em; width:3em; object-fit:cover; object-position:0 0;"
+              {% endif %}
+              />
+         {% endif %}
       </div>
-  </a>
-</div>
+      <div class="mx-2">
+         <span style="font-weight:bold" class="text-reset">
+             {% if link.is_dead %}[D]{%endif%}
+             {% if link.page_rating_votes %}
+             [{{link.page_rating_votes}}]
+             {%endif%}
+             {{link.title | slice:":100"}}
+         </span>
+      </div>
+   </div>
+
+   <div class="text-reset">
+        {{link.source_obj.title | slice:":100"}}
+        {{link.date_published}}
+   </div>
+</a>

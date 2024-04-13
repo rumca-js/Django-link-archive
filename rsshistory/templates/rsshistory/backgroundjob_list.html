@@ -19,9 +19,9 @@
 <h1>Jobs [{{BackgroundJob}}]</h1>
 
 {% if content_list %}
-<div class="container">
+<div class="container list-group">
     {% for job in content_list %}
-      <div class="row border my-2 p-1"
+      <div class="my-1 p-1 list-group-item list-group-item-action"
          title="{{job.date_created}} {{job.job}} {{job.task}} {{job.subject}} {{job.args}}"
          >
 	 <span>

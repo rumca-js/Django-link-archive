@@ -1,35 +1,33 @@
-<div>
-   <a href="{{ link.get_absolute_url }}"
-      title="{{link.title}} {{link.link}} {{link.source}}"
-      {% if not link.is_valid %}
-      style="opacity: 0.5"
-      {% endif %}
+<a href="{{ link.get_absolute_url }}"
+   title="{{link.title}} {{link.link}} {{link.source}}"
+   {% if not link.is_valid %}
+   style="opacity: 0.5"
+   {% endif %}
 
-      {% if link.bookmarked %}
-      class="element_{{user_config.display_type}} element_{{user_config.display_type}}_selected"
-      {% else %}
-      class="element_{{user_config.display_type}}"
-      {% endif %}
-      >
-      <div style="display: flex; flex-direction:column; align-content:normal; height:100%">
-          <div style="flex: 0 0 70%; flex-shrink: 0;flex-grow:0;max-height:70%">
-              {% if user_config.show_icons %}
-              <img src=
-                   {% if user_config.thumbnails_as_icons %}
-                   "{{link.get_thumbnail}}"
-                   {% else %}
-                   "{{link.get_favicon}}"
-                   {% endif %}
-                   style = "width:100%;max-height:100%;object-fit:cover"/>
-              {% endif %}
-          </div>
-          <div style="flex: 0 0 30%; flex-shrink: 0;flex-grow:0;max-height:30%">
-	     <span style="font-weight:bold" class="text-primary">
-               {% if link.is_dead %}[D]{%endif%}
-               {{link.title| slice:":100"}}
-   	     </span>
-             <div class="link-list-item-description">{{link.source_obj.title| slice:":100"}}</div>
-          </div>
-      </div>
-   </a>
-</div>
+   {% if link.bookmarked %}
+   class="element_{{user_config.display_type}} element_{{user_config.display_type}}_selected"
+   {% else %}
+   class="element_{{user_config.display_type}}"
+   {% endif %}
+   >
+   <div style="display: flex; flex-direction:column; align-content:normal; height:100%">
+       <div style="flex: 0 0 70%; flex-shrink: 0;flex-grow:0;max-height:70%">
+           {% if user_config.show_icons %}
+           <img src=
+                {% if user_config.thumbnails_as_icons %}
+                "{{link.get_thumbnail}}"
+                {% else %}
+                "{{link.get_favicon}}"
+                {% endif %}
+                style = "width:100%;max-height:100%;object-fit:cover"/>
+           {% endif %}
+       </div>
+       <div style="flex: 0 0 30%; flex-shrink: 0;flex-grow:0;max-height:30%">
+          <span style="font-weight:bold" class="text-primary">
+            {% if link.is_dead %}[D]{%endif%}
+            {{link.title| slice:":100"}}
+	     </span>
+          <div class="link-list-item-description">{{link.source_obj.title| slice:":100"}}</div>
+       </div>
+   </div>
+</a>

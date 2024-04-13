@@ -1,41 +1,39 @@
-<div class="row border my-2 p-1">
-   <a href="{{ link.get_absolute_url | safe }}"
-      title="{{link.title}} {{link.link}} {{link.source}}"
-      {% if not link.is_valid %}
-      style="opacity: 0.5"
-      {% endif %}
-   
-      {% if link.bookmarked %}
-      class="element_{{user_config.display_type}} element_{{user_config.display_type}}_selected"
-      {% else %}
-      class="element_{{user_config.display_type}}"
-      {% endif %}
-      >
-   
-      {% if user_config.show_icons %}
-      <img src=
-          {% if user_config.thumbnails_as_icons %}
-          "{{link.get_thumbnail}}"
-          {% else %}
-          "{{link.get_favicon}}"
-          {% endif %}
-   
-          {% if user_config.small_icons %}
-          class="img-fluid rounded"
-  	  style="height:2em; width:2em; object-fit:cover; object-position:0 0;"
-          {% else %}
-          class="img-fluid rounded"
-  	  style="height:3em; width:3em; object-fit:cover; object-position:0 0;"
-          {% endif %}
-           />
-      {% endif %}
-   
-     <span style="font-weight:bold" class="text-reset">
-          {% if link.is_dead %}[D]{%endif%}
-          {{link.title | slice:":100"}}
-     </span>
-     <div class="text-reset">
-          {{link.link}}
-     </div>
-   </a>
-</div>
+<a href="{{ link.get_absolute_url | safe }}"
+   title="{{link.title}} {{link.link}} {{link.source}}"
+   {% if not link.is_valid %}
+   style="opacity: 0.5"
+   {% endif %}
+
+   {% if link.bookmarked %}
+   class="my-1 p-1 list-group-item list-group-item-action list-group-item-primary"
+   {% else %}
+   class="my-1 p-1 list-group-item list-group-item-action"
+   {% endif %}
+   >
+
+   {% if user_config.show_icons %}
+   <img src=
+       {% if user_config.thumbnails_as_icons %}
+       "{{link.get_thumbnail}}"
+       {% else %}
+       "{{link.get_favicon}}"
+       {% endif %}
+
+       {% if user_config.small_icons %}
+       class="img-fluid rounded"
+       style="height:2em; width:2em; object-fit:cover; object-position:0 0;"
+       {% else %}
+       class="img-fluid rounded"
+       style="height:3em; width:3em; object-fit:cover; object-position:0 0;"
+       {% endif %}
+        />
+   {% endif %}
+
+  <span style="font-weight:bold" class="text-reset">
+       {% if link.is_dead %}[D]{%endif%}
+       {{link.title | slice:":100"}}
+  </span>
+  <div class="text-reset">
+       {{link.link}}
+  </div>
+</a>

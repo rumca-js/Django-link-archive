@@ -58,22 +58,8 @@ class EntryUrlInterface(object):
         # description for URLs
 
         if props:
-            is_domain = DomainAwarePage(self.url).is_domain()
-            if is_domain and ("thumbnail" not in props or props["thumbnail"] == None):
-                if "favicons" in props:
-                    favicons = props["favicons"]
-                    if favicons and len(favicons) > 0:
-                        props["thumbnail"] = favicons[0][0]
+            self.update_info_default(props, source_obj)
 
-            page_rating = self.h.get_page_rating()
-            props["page_rating_contents"] = page_rating
-            props["page_rating"] = page_rating
-            props["status_code"] = self.h.get_status_code()
-            if not self.is_property_set(props, "description"):
-                props["description"] = ""
-
-            if not self.is_property_set(props, "artist") and self.p.get_author():
-                props["artist"] = self.p.get_author()
         elif ignore_errors:
             props = {}
             props["link"] = self.url
@@ -185,12 +171,6 @@ class EntryUrlInterface(object):
 
         p = self.p
 
-        if not self.ignore_errors and not p.is_valid():
-            if self.log:
-                LinkDatabase.info("HTML page is invalid:{}".format(url))
-                AppLogging.error("HTML page is invalid:{}".format(url))
-            return None
-
         # some pages return invalid code / information. let the user decide
         # what to do about it
 
@@ -237,12 +217,6 @@ class EntryUrlInterface(object):
 
         p = self.p
 
-        if not self.ignore_errors and not p.is_valid():
-            if self.log:
-                LinkDatabase.info("RSS page is invalid:{}".format(url))
-                AppLogging.error("HTML page is invalid:{}".format(url))
-            return None
-
         if not self.is_property_set(input_props, "link"):
             input_props["link"] = p.url
         if not self.is_property_set(input_props, "title"):
@@ -278,16 +252,32 @@ class EntryUrlInterface(object):
             input_props = {}
 
         url = self.url
+        h = self.h
         p = self.p
 
-        if not self.is_property_set(input_props, "source"):
-            input_props["source"] = self.url
-        if not self.is_property_set(input_props, "language"):
-            input_props["language"] = None
+        if not self.is_property_set(input_props, "link"):
+            input_props["link"] = self.url
         if not self.is_property_set(input_props, "title"):
             input_props["title"] = p.get_domain()
         if not self.is_property_set(input_props, "description"):
             input_props["description"] = p.get_domain()
+        if not self.is_property_set(input_props, "language"):
+            input_props["language"] = p.get_language()
+        if not self.is_property_set(input_props, "thumbnail"):
+            input_props["thumbnail"] = p.get_thumbnail()
+        if not self.is_property_set(input_props, "author"):
+            input_props["author"] = p.get_thumbnail()
+        if not self.is_property_set(input_props, "album"):
+            input_props["album"] = p.get_thumbnail()
+        if not self.is_property_set(input_props, "page_rating_contents"):
+            input_props["page_rating_contents"] = self.h.get_page_rating()
+        if not self.is_property_set(input_props, "status_code"):
+            input_props["status_code"] = self.h.get_status_code()
+
+        is_domain = DomainAwarePage(self.url).is_domain()
+        if is_domain and not self.is_property_set(props, "thumbnail"):
+            if type(p) is HtmlPage and self.h:
+                props["thumbnail"] = self.h.get_favicon()
 
         return input_props
 

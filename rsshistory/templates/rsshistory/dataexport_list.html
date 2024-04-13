@@ -10,10 +10,10 @@
 
 <h1>Exports</h1>
   {% if content_list %}
-     <div class="linklist container_{{user_config.display_type}}">
+     <div class="list-group">
          {% for object in content_list %}
              <a href="{% url 'rsshistory:data-export' object.id %}"
-               class="element_{{user_config.display_type}}"
+               class="my-1 p-1 list-group-item list-group-item-action"
                title="
              Enabled:{{ object.enabled }},
              Remote path:{{ object.remote_path }}
@@ -26,7 +26,6 @@
              Export data:{{ object.export_data }}
              Enabled:{{ object.enabled }}
              </a>
-         </li>
          {% endfor %}
   {% else %}
     No domains yet

@@ -192,9 +192,12 @@ class BaseLinkDataController(BaseLinkDataModel):
         p = url.p
 
         if not props or not url.p:
+            error_text = traceback.format_exc()
+
             AppLogging.error(
-                'Could not find entry url interface for:<a href="{}">{}</a>'.format(self.get_absolute_url(), self.link)
+                'Could not find entry url interface for:<a href="{}">{}</a>\n{}'.format(self.get_absolute_url(), self.link, error_text)
             )
+
             self.status_code = BaseLinkDataModel.STATUS_DEAD
             self.save()
             return

@@ -9,16 +9,12 @@
 }
 
 .body-style {
-    color: #C4C5C4;
-    background-color:#000000
 }
 
 .page-body {
-    background-color:#000000
 }
 
 a, a:link, a:visited, a:hover, a:active {
-    /* color: green; */
 }
 
 input {
@@ -43,6 +39,10 @@ textarea {
 hr {
     margin: 0px;
     padding: 0px;
+}
+
+.mainbutton-icon {
+    width:1em;
 }
 
 .base-button-container a:link, .base-button-container a:visited, .base-button-container a:active {
@@ -89,7 +89,7 @@ hr {
 }
 
 .content-icon {
-    width:20px;
+    width:2em;
     /* float: left; */
 }
 

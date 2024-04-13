@@ -16,6 +16,8 @@ from ..controllers import LinkDataController
 from ..configuration import Configuration
 from ..apps import LinkDatabase
 
+from .system import AppLogging
+
 
 class UserSearchHistory(models.Model):
     """
@@ -65,6 +67,7 @@ class UserSearchHistory(models.Model):
         if not config_entry.track_user_actions or not config_entry.track_user_searches:
             UserSearchHistory.objects.all().delete()
 
+        # safety cleanup, if user is not set
         qs = UserSearchHistory.objects.filter(user_object__isnull=True)
         for q in qs:
             users = User.objects.filter(username=q.user)
@@ -219,6 +222,7 @@ class UserEntryTransitionHistory(models.Model):
         ):
             UserEntryTransitionHistory.objects.all().delete()
 
+        # safety cleanup, if user is not set
         qs = UserEntryTransitionHistory.objects.filter(user_object__isnull=True)
         for q in qs:
             users = User.objects.filter(username=q.user)
@@ -291,7 +295,8 @@ class UserEntryVisitHistory(models.Model):
         previous_entry = UserEntryVisitHistory.get_last_user_entry(user)
 
         try:
-            UserEntryTransitionHistory.add(user, previous_entry, entry)
+            if previous_entry:
+                UserEntryTransitionHistory.add(user, previous_entry, entry)
 
             if visits.count() == 0:
                 visit = UserEntryVisitHistory.objects.create(
@@ -315,6 +320,7 @@ class UserEntryVisitHistory(models.Model):
 
         except Exception as E:
             LinkDatabase.info(str(E))
+            AppLogging.error("Could not add transition")
 
     def is_link_just_visited(visits):
         from ..dateutils import DateUtils
@@ -373,20 +379,11 @@ class UserEntryVisitHistory(models.Model):
 
         entries = UserEntryVisitHistory.objects.filter(
             user_object=user,
-            date_last_visit__isnull=False,
             date_last_visit__gt=time_ago_limit,
             date_last_visit__lt=burst_time_limit,
         ).order_by("-date_last_visit")
         if entries.exists():
             return entries[0].entry_object
-        else:
-            entries = UserEntryVisitHistory.objects.filter(
-                user_object=user,
-                date_last_visit__isnull=False,
-                date_last_visit__gt=time_ago_limit,
-            ).order_by("date_last_visit")
-            if entries.exists():
-                return entries[0].entry_object
 
     def cleanup():
         config_entry = Configuration.get_object().config_entry
@@ -396,6 +393,7 @@ class UserEntryVisitHistory(models.Model):
         ):
             UserEntryVisitHistory.objects.all().delete()
 
+        # safety cleanup, if user is not set
         qs = UserEntryVisitHistory.objects.filter(user_object__isnull=True)
         for q in qs:
             users = User.objects.filter(username=q.user)

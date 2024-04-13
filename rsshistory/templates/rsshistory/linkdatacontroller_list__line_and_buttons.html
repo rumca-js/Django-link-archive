@@ -1,10 +1,10 @@
 <div
     title="{{link.get_title}} {{link.link}} {{link.get_long_description}}"
-    {% if link.bookmarked %}
-    class="element_{{user_config.display_type}} element_{{user_config.display_type}}_selected"
-    {% else %}
-    class="element_{{user_config.display_type}}"
-    {% endif %}
+      {% if link.bookmarked %}
+      class="list-group-item list-group-item-action list-group-item-primary"
+      {% else %}
+      class="list-group-item list-group-item-action"
+      {% endif %}
     >
     <a href="{{ link.link }}" >
         <div>
