@@ -8,7 +8,7 @@
 <h1 class="link-title">
     <a href="{{ object.get_entry_url }}">
       {% if user_config.show_icons %}
-      <img src="{{object.get_favicon}}"/>
+      <img src="{{object.get_favicon}}" class="link-detail-thumbnail"/>
       {% endif %}
       {{ object.title }}
     </a>
@@ -18,27 +18,30 @@
 <div>Channel: <a href="{{ page_object.get_channel_url }}">{{ page_object.get_channel_url }}</a></div>
 {% endif %}
 <div>
-  URL: <a href="{{ object.url }}">{{ object.url }}</a>
+  <a href="{{ object.url }}">{{ object.url }}</a>
 </div>
 
-  <p>
-      <span><strong>Enabled:</strong> {{ object.enabled }}</span>
-      <span><strong>Fetch period:</strong> {{ object.fetch_period }}</span>
-      <span><strong>Category:</strong> {{ object.category }}</span>
-      <span><strong>Subcategory:</strong> {{ object.subcategory }}, </span>
-      <span><strong>Language:</strong> {{ object.language }}, </span>
-      <span><strong>Age:</strong> {{ object.age }}, </span>
-      <span><strong>Export to CMS:</strong> {{ object.export_to_cms }}, </span>
-      <span><strong>Remove after days:</strong> {{ object.remove_after_days }}, </span>
-      <span><strong>Favicon:</strong><a href="{{ object.get_favicon }}" title="{{ object.get_favicon }}">Favicon URL</a>, </span>
-      <span><strong>Source type:</strong> {{ object.source_type }}</span>
-      {% if object.proxy_location %}
-      <span><strong>Proxy location:</strong><a href="{{ object.proxy_location }}">{{ object.proxy_location }}</a></span>
-      {% endif %}
-      <div>Fetched:{{object.dynamic_data.date_fetched}} Import seconds:{{object.dynamic_data.import_seconds}} Consecutive Errors:{{object.dynamic_data.consecutive_errors}} </div>
-  </p>
+<div class="d-flex flex-wrap">
+    <div class="text-nowrap mx-2"><strong>Enabled:</strong> {{ object.enabled }}</div>
+    <div class="text-nowrap mx-2"><strong>Fetch period:</strong> {{ object.fetch_period }}</div>
+    <div class="text-nowrap mx-2"><strong>Category:</strong> {{ object.category }}</div>
+    <div class="text-nowrap mx-2"><strong>Subcategory:</strong> {{ object.subcategory }}, </div>
+    <div class="text-nowrap mx-2"><strong>Language:</strong> {{ object.language }}, </div>
+    <div class="text-nowrap mx-2"><strong>Age:</strong> {{ object.age }}, </div>
+    <div class="text-nowrap mx-2"><strong>Export to CMS:</strong> {{ object.export_to_cms }}, </div>
+    <div class="text-nowrap mx-2"><strong>Remove after days:</strong> {{ object.remove_after_days }}, </div>
+    <div class="text-nowrap mx-2"><strong>Favicon:</strong><a href="{{ object.get_favicon }}" title="{{ object.get_favicon }}">Favicon URL</a>, </div>
+    <div class="text-nowrap mx-2"><strong>Source type:</strong> {{ object.source_type }}</div>
+    {% if object.proxy_location %}
+    <div class="mx-2"><strong>Proxy location:</strong><a href="{{ object.proxy_location }}">{{ object.proxy_location }}</a></div>
+    {% endif %}
+    <div class="text-nowrap mx-2">Fetched:{{object.dynamic_data.date_fetched}}</div>
+    <div class="text-nowrap mx-2">Import seconds:{{object.dynamic_data.import_seconds}}</div>
+    <div class="text-nowrap mx-2">Consecutive Errors:{{object.dynamic_data.consecutive_errors}}</div>
+</div>
 
-    {% include "rsshistory/sourcedatacontroller_detail_buttons.html" %}
+  {% include "rsshistory/sourcedatacontroller_detail_buttons.html" %}
 
-    {% include "rsshistory/search_places_element.html" %}
+  {% include "rsshistory/search_places_element.html" %}
+
 {% endblock %}

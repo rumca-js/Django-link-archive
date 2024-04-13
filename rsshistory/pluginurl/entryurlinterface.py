@@ -258,9 +258,9 @@ class EntryUrlInterface(object):
         if not self.is_property_set(input_props, "link"):
             input_props["link"] = self.url
         if not self.is_property_set(input_props, "title"):
-            input_props["title"] = p.get_domain()
+            input_props["title"] = p.get_title()
         if not self.is_property_set(input_props, "description"):
-            input_props["description"] = p.get_domain()
+            input_props["description"] = p.get_description()
         if not self.is_property_set(input_props, "language"):
             input_props["language"] = p.get_language()
         if not self.is_property_set(input_props, "thumbnail"):
@@ -271,13 +271,15 @@ class EntryUrlInterface(object):
             input_props["album"] = p.get_thumbnail()
         if not self.is_property_set(input_props, "page_rating_contents"):
             input_props["page_rating_contents"] = self.h.get_page_rating()
+        if not self.is_property_set(input_props, "page_rating"):
+            input_props["page_rating"] = self.h.get_page_rating()
         if not self.is_property_set(input_props, "status_code"):
             input_props["status_code"] = self.h.get_status_code()
 
         is_domain = DomainAwarePage(self.url).is_domain()
-        if is_domain and not self.is_property_set(props, "thumbnail"):
+        if is_domain and not self.is_property_set(input_props, "thumbnail"):
             if type(p) is HtmlPage and self.h:
-                props["thumbnail"] = self.h.get_favicon()
+                input_props["thumbnail"] = self.h.get_favicon()
 
         return input_props
 
