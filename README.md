@@ -14,6 +14,8 @@ It does not capture page contents. It captures link meta data: title, descriptio
  - It is not a search engine. Suggesting better alternatives: [whoogle-search](https://github.com/benbusby/whoogle-search), or [Marginalia search](https://search.marginalia.nu/), or [Apache Lucene](https://lucene.apache.org/)
  - Stores link meta data, therefore it is not [archive.org](https://archive.org) replacement
 
+![](https://github.com/rumca-js/Django-link-archive/blob/main/images/django.png?raw=true)
+
 ## Problems with other RSS readers, or apps
 
  - Most RSS clients do not allow manual link input
