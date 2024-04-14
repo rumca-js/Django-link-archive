@@ -276,6 +276,13 @@ class EntryUrlInterface(object):
         if not self.is_property_set(input_props, "status_code"):
             input_props["status_code"] = self.h.get_status_code()
 
+        """
+        Sometimes we want thumbnail sometimes we want favicon.
+         - for search engine we want to store path to favicon if thumbnail is not available
+         - for domains we want to store path to favicon if thumbnail is not available
+         - for not domains? this is not clear cut. If entry is obtained by source, then source thumbnail should be displayed
+        """
+
         is_domain = DomainAwarePage(self.url).is_domain()
         if is_domain and not self.is_property_set(input_props, "thumbnail"):
             if type(p) is HtmlPage and self.h:

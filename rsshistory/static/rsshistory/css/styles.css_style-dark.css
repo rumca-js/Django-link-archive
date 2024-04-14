@@ -14,28 +14,6 @@
 .page-body {
 }
 
-a, a:link, a:visited, a:hover, a:active {
-}
-
-input {
-    /*TBD replace with button container style color: #e9e9e9;*/
-    /* background-color: #e9e9e9; */
-    display: block;
-    text-align: center;
-    text-decoration: none;
-    border-radius: 10px;
-    box-shadow: 1px 1px grey;
-    background-color: #C4C5C4;
-}
-
-select {
-    display: block;
-}
-
-textarea {
-    display: block;
-}
-
 hr {
     margin: 0px;
     padding: 0px;
@@ -89,8 +67,7 @@ hr {
 }
 
 .content-icon {
-    width:2em;
-    /* float: left; */
+    width:1em;
 }
 
 .content-thumbnail {

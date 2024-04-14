@@ -1,25 +1,32 @@
-<p>
-    <form action="{{form.action_url}}" method="{{form.method}}">
-        <table>
-            {% csrf_token %}
-            {{ form }}
-            <tr>
-                <td>
-		    {% if form_submit_button_name %}
-		       <input type="submit" value="{{ form_submit_button_name }}" class="btn btn-primary" role="button">
-		    {% else %}
-                       <input type="submit" value="Submit" class="btn btn-primary" role="button">
-		    {% endif %}
-                </td>
-            </tr>
-        </table>
-    </form>
+<form action="{{form.action_url}}" method="{{form.method}}">
+    {% csrf_token %}
 
-    <ul>
-      {% for field, errors in form.errors.items %}
-        {% for error in errors %}
-          <li>{{ field|title }}: {{ error }}</li>
-        {% endfor %}
-      {% endfor %}
-    </ul>
-</p>
+    {% for field in form %}
+       <div class="form-group row">
+          <label for="{{field.id_for_label}}" class="col-sm-2 col-form-label">{{field.label}}</label>
+          <div class="col-sm-10">
+             <div>
+             {{field }}
+             </div>
+             <small id="{{field.id_for_label}}_help" class="form-text text-muted">
+               {{field.help_text | safe }}
+             </small>
+          </div>
+       </div>
+    {% endfor %}
+
+
+    {% if form_submit_button_name %}
+       <button type="submit" value="{{form_submit_button_name}}" class="btn btn-primary" role="button">{{form_submit_button_name}}</button>
+    {% else %}
+       <button type="submit" value="Submit" class="btn btn-primary" role="button">Submit</button>
+    {% endif %}
+</form>
+
+<ul>
+  {% for field, errors in form.errors.items %}
+    {% for error in errors %}
+      <li>{{ field|title }}: {{ error }}</li>
+    {% endfor %}
+  {% endfor %}
+</ul>

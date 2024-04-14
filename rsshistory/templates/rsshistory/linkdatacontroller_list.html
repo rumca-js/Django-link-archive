@@ -3,11 +3,6 @@
 {% block content %}
 
 <div class="container-fluid">
-    <a href="{{reset_link}}" class="btn btn-secondary" role="button">
-      <img src="{% static 'rsshistory/icons/icons8-start-100.png' %}" class="content-icon" />
-      <span class="basebutton">Reset filters</span>
-    </a>
-
     {% if user.is_staff %}
     <a href="{% url 'rsshistory:entry-add-simple' %}" class="btn btn-secondary" role="button" title="Opens add entry wizard">
         <img src="{% static 'rsshistory/icons/icons8-add-link-96.png' %}" class="content-icon" />
@@ -16,31 +11,22 @@
     {% endif %}
 </div>
 
-  <form action="{{filter_form.action_url}}" method="{{filter_form.method}}">
-     <table>
-     {{ filter_form }}
-     <tr>
-         <td>
-             <input type="submit" value="Search" class="btn btn-secondary" role="button"/>
-         </td>
-     </tr>
-     </table>
-  </form>
+  {% include "rsshistory/filterform_basic_element.html" %}
 
-    {% if rss_are_fetched %}
-      <span class="error-text">Sources are fetched. Queue size: {{rss_queue_size}} </span>
-    {% endif %}
-    {% if query_filter.is_error %}
-    <p class="error-text">There errors with your query</p>
-    {% endif %}
+  {% if rss_are_fetched %}
+    <span class="error-text">Sources are fetched. Queue size: {{rss_queue_size}} </span>
+  {% endif %}
+  {% if query_filter.is_error %}
+  <p class="error-text">There errors with your query</p>
+  {% endif %}
 
-    <ul>
-      {% for field, errors in filter_form.errors.items %}
-        {% for error in errors %}
-          <li>{{ field|title }}: {{ error }}</li>
-        {% endfor %}
+  <ul>
+    {% for field, errors in filter_form.errors.items %}
+      {% for error in errors %}
+        <li>{{ field|title }}: {{ error }}</li>
       {% endfor %}
-    </ul>
+    {% endfor %}
+  </ul>
 
   <hr>
 

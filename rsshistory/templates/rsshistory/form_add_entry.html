@@ -2,27 +2,24 @@
 {% load static %}
 {% block content %}
 
-<div class="contentbuttonmenu">
-</div>
-
 {% include "rsshistory/form_basic_element.html" %}
 
 <div>
-{% for note in notes %}
- <div>{{note}}</div>
-{% endfor %}
+  {% for note in notes %}
+   <div>{{note}}</div>
+  {% endfor %}
 </div>
 
 <div style="color:red">
-{% for warning in warnings %}
- <div>{{warning}}</div>
-{% endfor %}
+  {% for warning in warnings %}
+   <div>{{warning}}</div>
+  {% endfor %}
 </div>
 
 <div style="color:red">
-{% for error in errors %}
- <div>{{error}}</div>
-{% endfor %}
+  {% for error in errors %}
+   <div>{{error}}</div>
+  {% endfor %}
 </div>
 
 <ul>

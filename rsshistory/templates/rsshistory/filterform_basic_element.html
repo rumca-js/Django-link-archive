@@ -1,0 +1,37 @@
+{% load static %}
+
+<form action="{{filter_form.action_url}}" method="{{filter_form.method}}">
+    {% csrf_token %}
+
+    {% for field in filter_form %}
+       <div class="form-group row m-0 p-0">
+          <label for="{{field.id_for_label}}" class="col-sm-2 col-form-label my-0 py-0">{{field.label}}</label>
+          <div class="col-sm-10 my-0 py-0">
+             <div>
+             {{field }}
+             </div>
+	     {% if field.help_text %}
+             <small id="{{field.id_for_label}}_help" class="form-text text-muted">
+               {{field.help_text | safe }}
+             </small>
+	     {% endif %}
+          </div>
+       </div>
+    {% endfor %}
+
+    <button type="submit" value="Submit" class="btn btn-primary" role="button">Submit</button>
+
+    <a href="{{reset_link}}" class="btn btn-secondary" role="button">
+      <img src="{% static 'rsshistory/icons/icons8-start-100.png' %}" class="content-icon" />
+      Reset
+    </a>
+
+</form>
+
+<ul>
+  {% for field, errors in filter_form.errors.items %}
+    {% for error in errors %}
+      <li>{{ field|title }}: {{ error }}</li>
+    {% endfor %}
+  {% endfor %}
+</ul>

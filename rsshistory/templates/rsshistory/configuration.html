@@ -3,52 +3,46 @@
 {% block content %}
 
 <div class="container">
-    <a href="{% url 'rsshistory:reset-config' %}" class="btn btn-secondary" role="button" title="Resets configuration">
-        Reset config
-    </a>
+
+   <h1>Config</h1>
+   
+   <form action="{{config_form.action_url}}" method="{{config_form.method}}">
+      {% csrf_token %}
+   
+      {% for field in config_form %}
+         {% if field.id_for_label == "id_background_task" %}
+             <h3>Admin settings</h3>
+         {%endif%}
+   
+         {% if field.id_for_label == "id_link_save" %}
+             <h3>Configuration settings</h3>
+         {%endif%}
+   
+         {% if field.id_for_label == "id_entries_order_by" %}
+             <h3>Display settings</h3>
+         {%endif%}
+   
+         <div class="form-group row">
+            <label for="{{field.id_for_label}}" class="col-sm-2 col-form-label">{{field.label}}</label>
+            <div class="col-sm-10">
+               <div>
+               {{field }}
+               </div>
+               <small id="{{field.id_for_label}}_help" class="form-text text-muted">
+                 {{field.help_text | safe }}
+               </small>
+            </div>
+         </div>
+      {% endfor %}
+   
+      <button type="submit" value="Submit" class="btn btn-primary" role="button">Submit</button>
+
+      <a href="{% url 'rsshistory:reset-config' %}" class="btn btn-secondary" role="button" title="Resets configuration">
+           Reset config
+      </a>
+   </form>
+
 </div>
 
-<h1>Config</h1>
-
-<form action="{{config_form.action_url}}" method="{{config_form.method}}">
-    <table>
-        {% csrf_token %}
-
-        {% for field in config_form %}
-
-        {% if field.id_for_label == "id_background_task" %}
-        <tr>
-            <td><h3>Admin settings</h3></td>
-        </tr>
-        {%endif%}
-
-        {% if field.id_for_label == "id_link_save" %}
-        <tr>
-            <td><h3>Configuration settings</h3></td>
-        </tr>
-        {%endif%}
-
-        {% if field.id_for_label == "id_entries_order_by" %}
-        <tr>
-            <td><h3>Display settings</h3></td>
-        </tr>
-        {%endif%}
-
-        <tr>
-            <td>{{field.label_tag }}</td>
-            <td>{{field }}</td>
-        </tr>
-        <tr>
-            <td></td><td>{{field.help_text | safe }}</td>
-        </tr>
-        {% endfor %}
-
-        <tr>
-            <td>
-                <input type="submit" value="Submit" class="btn btn-primary" role="button">
-            </td>
-        </tr>
-    </table>
-</form>
-
 {% endblock %}
+

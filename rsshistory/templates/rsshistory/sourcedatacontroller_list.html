@@ -3,10 +3,6 @@
 {% block content %}
 
 <div class="btn-group flex-wrap">
-    <a href="{% url 'rsshistory:sources' %}" class="btn btn-secondary" role="button">
-        <img src="{% static 'rsshistory/icons/icons8-start-100.png' %}" class="content-icon" />
-        Reset filters</a>
-
     {% if user.is_staff %}
     <a href="{% url 'rsshistory:source-add-simple' %}" class="btn btn-secondary" role="button" title="Opens add source wizard">
         <img src="{% static 'rsshistory/icons/icons8-broadcast-add-100.png' %}" class="content-icon" />
@@ -27,16 +23,7 @@
         New sources</a>
 </div>
 
-  <form action="{{filter_form.action_url}}" method="{{filter_form.method}}">
-      <table>
-          {{ filter_form }}
-          <tr>
-              <td>
-                  <input type="submit" value="Search" class="btn btn-secondary" role="button">
-              </td>
-          </tr>
-      </table>
-  </form>
+  {% include "rsshistory/filterform_basic_element.html" %}
 
   {% if query_filter.is_error %}
     <p class="error-text">There errors with your query</p>

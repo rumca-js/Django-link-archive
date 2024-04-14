@@ -2,9 +2,6 @@
 {% load static %}
 {% block content %}
 
-<div class="btn-group flex-wrap">
-</div>
-
 <h1 class="link-title">
     <a href="{{ object.get_entry_url }}">
       {% if user_config.show_icons %}
@@ -15,9 +12,9 @@
 </h1>
 
 {% if is_youtube_channel %}
-<div>Channel: <a href="{{ page_object.get_channel_url }}">{{ page_object.get_channel_url }}</a></div>
+<div class="container">Channel: <a href="{{ page_object.get_channel_url }}">{{ page_object.get_channel_url }}</a></div>
 {% endif %}
-<div>
+<div class="container">
   <a href="{{ object.url }}">{{ object.url }}</a>
 </div>
 
@@ -35,9 +32,9 @@
     {% if object.proxy_location %}
     <div class="mx-2"><strong>Proxy location:</strong><a href="{{ object.proxy_location }}">{{ object.proxy_location }}</a></div>
     {% endif %}
-    <div class="text-nowrap mx-2">Fetched:{{object.dynamic_data.date_fetched}}</div>
-    <div class="text-nowrap mx-2">Import seconds:{{object.dynamic_data.import_seconds}}</div>
-    <div class="text-nowrap mx-2">Consecutive Errors:{{object.dynamic_data.consecutive_errors}}</div>
+    <div class="text-nowrap mx-2"><strong>Fetched:</strong>{{object.dynamic_data.date_fetched}}</div>
+    <div class="text-nowrap mx-2"><strong>Import seconds:</strong>{{object.dynamic_data.import_seconds}}</div>
+    <div class="text-nowrap mx-2"><strong>Consecutive Errors:</strong>{{object.dynamic_data.consecutive_errors}}</div>
 </div>
 
   {% include "rsshistory/sourcedatacontroller_detail_buttons.html" %}
