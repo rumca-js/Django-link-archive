@@ -5,11 +5,11 @@ It does not capture page contents. It captures link meta data: title, descriptio
 # Features
 
  - local data, no algorithms, no advertisements, self-hosted
- - link search functionality. Does not use elastic search
  - organize bookmarks, with tags
+ - link search functionality. Does not use elastic search
  - maintains website metadata (title, description, thumbnail, etc). It is not [archive.org](https://archive.org) replacement
- - add personal comments to links
  - extendable via plugins. RSS feed support. Web page parsing support
+ - add personal comments to links
  - It is not a search engine. Suggesting better alternatives: [whoogle-search](https://github.com/benbusby/whoogle-search), or [Marginalia search](https://search.marginalia.nu/), or [Apache Lucene](https://lucene.apache.org/)
  - Minimal aesthetic. Dark mode, custom list displays
 
