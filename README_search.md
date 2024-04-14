@@ -103,7 +103,9 @@ YouTube subscription page cannot be used effectively used. Especially if you hav
 
 You cannot filter this view at all. What if I want to view only gaming channels? What if I have 'more important' channels which I want to check regularly?
 
-## YouTube search filtering
+# Examples
+
+## YouTube search just does not work
 
 Finding older trailers in YouTube does not work wery well. If I write 'trailers' I am swamped only with new trailers.
 
@@ -111,6 +113,14 @@ When I search for a "trailer" youtube:
  - suggests games, movies, various things. Filtering is limited to expected duration, upload date. I cannot filter game trailers vs movie trailers.
  - there are many ads in search now
  - some trailers are suggested several times at youtube, from various channels. At my setup I have only several youtube channels, which does not spam with same trailers
+
+## Google search just does not work
+
+If if search for "Minecraft" I will have problem finding pages about individual mods, launchers. I will be directed toward news farms, to YouTube videos.
+
+To find interesting contents about amiga I had to add "fanpage" or "fan site" texts to search prompt.
+
+If I type "operating system" I will be directed toward tech news sites instead of producing me a list of links leading directly to operating systems.
 
 # Other analysis of search and algorithms
 
