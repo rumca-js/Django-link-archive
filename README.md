@@ -31,6 +31,8 @@ It does not capture page contents. It captures link meta data: title, descriptio
 
 ## Alternatives
 
+Alternative programs exist.
+
  - [Grimoire](https://github.com/goniszewski/grimoire)
  - [LinkAce](https://www.linkace.org/)
  - [Hoarder](https://hoarder.app/)
