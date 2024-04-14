@@ -47,6 +47,8 @@ Alternative programs exist.
  - [Booky](https://booky.io/)
  - [Webtag](https://webtag.io/)
  - [Historious](https://historio.us/)
+ - [Raindrop](https://raindrop.io/)
+ - [Knowies](https://www.knowies.com)
 
 ## Possible use cases
 
