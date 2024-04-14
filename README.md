@@ -4,15 +4,14 @@ It does not capture page contents. It captures link meta data: title, descriptio
 
 # Features
 
- - Local data, no algorithms, no advertisements
- - Minimal aesthetic: no distraction, compact layout
- - Web GUI, accessible from anywhere: LAN, public, however it is configured
- - Minimal installation, integrator may choose however to use production environment, with a good Database engine. Just as it is supported by Django. I am using SQLite without any problems.
- - limited link search ability. Does not use elastic search
- - RSS feed support
- - You can gather information about: links, domains, feeds
+ - local data, no algorithms, no advertisements, self-hosted
+ - link search functionality. Does not use elastic search
+ - organize bookmarks, with tags
+ - maintains website metadata (title, description, thumbnail, etc). It is not [archive.org](https://archive.org) replacement
+ - add personal comments to links
+ - extendable via plugins. RSS feed support. Web page parsing support
  - It is not a search engine. Suggesting better alternatives: [whoogle-search](https://github.com/benbusby/whoogle-search), or [Marginalia search](https://search.marginalia.nu/), or [Apache Lucene](https://lucene.apache.org/)
- - Stores link meta data, therefore it is not [archive.org](https://archive.org) replacement
+ - Minimal aesthetic. Dark mode, custom list displays
 
 <div align="center">
   <img alt="Django Logo" src="images/django_400.png">
@@ -20,6 +19,7 @@ It does not capture page contents. It captures link meta data: title, descriptio
 
 ## Problems with other RSS readers, or apps
 
+ - Most clients are not open source, or are not self-hosted
  - Most RSS clients do not allow manual link input
  - Some programs are not programs from users perspective, but a service: Feedly, Pockets, Readwise Reader. They require account. Their Terms and service can change
  - Most programs fail to provide consistent and exhaustive search ability (NextCloud "News" application, Thunderbird, Feeder Android app, Newsboat Linux app)
@@ -36,6 +36,10 @@ It does not capture page contents. It captures link meta data: title, descriptio
  - Database of important links: for work, or for school
  - RSS client
  - Data analysis - analyze link rot, how many a page is cited by other sources, analyze link domains
+
+ Alternatives:
+
+  - [Grimoire](https://github.com/goniszewski/grimoire)
 
 ## Suite of projects
 
