@@ -29,7 +29,8 @@ It does not capture page contents. It captures link meta data: title, descriptio
  - License: Reddit is a nice project, but it is not entirely open source
  - Interface: Most of the RSS programs are GUI: Thunderbird, Feeder. I wanted a server app, that can be accessed from anywhere
 
- <h2>Alternatives</h2>
+## Alternatives
+
   - [Grimoire](https://github.com/goniszewski/grimoire)
 
 ## Possible use cases
