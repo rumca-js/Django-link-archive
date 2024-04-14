@@ -31,7 +31,18 @@ It does not capture page contents. It captures link meta data: title, descriptio
 
 ## Alternatives
 
-  - [Grimoire](https://github.com/goniszewski/grimoire)
+ - [Grimoire](https://github.com/goniszewski/grimoire)
+ - [LinkAce](https://www.linkace.org/)
+ - [Hoarder](https://hoarder.app/)
+ - [GGather](https://web.ggather.com/)
+ - [OneKeep](https://onekeep.com/)
+ - [Lasso](https://www.lasso.net/go/)
+ - [CarryLinks](https://carrylinks.com/)
+ - [Zlinky](https://zlinky.com/)
+ - [wakelet](https://wakelet.com/)
+ - [Booky](https://booky.io/)
+ - [Webtag](https://webtag.io/)
+ - [Historious](https://historio.us/)
 
 ## Possible use cases
 
