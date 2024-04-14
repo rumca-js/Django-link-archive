@@ -10,6 +10,7 @@ It does not capture page contents. It captures link meta data: title, descriptio
  - maintains website metadata (title, description, thumbnail, etc). It is not [archive.org](https://archive.org) replacement
  - extendable via plugins. RSS feed support. Web page parsing support
  - add personal comments to links
+ - supports data import and export. This is most important functionality, as files are more important than the APP itself (file over app strategy)
  - It is not a search engine. Suggesting better alternatives: [whoogle-search](https://github.com/benbusby/whoogle-search), or [Marginalia search](https://search.marginalia.nu/), or [Apache Lucene](https://lucene.apache.org/)
  - Minimal aesthetic. Dark mode, custom list displays
 
@@ -28,6 +29,7 @@ It does not capture page contents. It captures link meta data: title, descriptio
  - Goal: Reddit, Lemmy aim is to provide social media experience, this project aims to grant the ability to create database of links
  - License: Reddit is a nice project, but it is not entirely open source
  - Interface: Most of the RSS programs are GUI: Thunderbird, Feeder. I wanted a server app, that can be accessed from anywhere
+ - Import/export. Some programs do not provide any standard to exchange link information, or do not provide any data at all
 
 ## Alternatives
 
