@@ -258,6 +258,75 @@ class LinkDataControllerTest(FakeInternetTestCase):
         self.assertEqual(entry.date_published, add_time)
         # self.assertEqual(entry.date_update_last, date_updated)
 
+    def test_reset_data_removes_old_dead_entry(self):
+        conf = Configuration.get_object().config_entry
+
+        add_time = DateUtils.get_datetime_now_utc() - timedelta(days=conf.days_to_remove_stale_entries+1)
+
+        source_youtube = SourceDataController.objects.create(
+            url="https://youtube.com",
+            title="YouTube",
+            category="No",
+            subcategory="No",
+            export_to_cms=True,
+            remove_after_days=1,
+        )
+
+        entry = LinkDataController.objects.create(
+            source="",
+            link="https://page-with-https-status-500.com",
+            title=None,
+            description=None,
+            source_obj=source_youtube,
+            bookmarked=False,
+            language=None,
+            domain_obj=None,
+            date_published=add_time,
+        )
+
+        date_updated = entry.date_update_last
+
+        # call tested function
+        entry.reset_data()
+
+        entries = LinkDataController.objects.filter(link="https://page-with-https-status-500.com")
+        self.assertTrue(entries.count(), 0)
+
+    def test_update_data_removes_old_dead_entry(self):
+        conf = Configuration.get_object().config_entry
+
+        add_time = DateUtils.get_datetime_now_utc() - timedelta(days=conf.days_to_remove_stale_entries+1)
+
+        source_youtube = SourceDataController.objects.create(
+            url="https://youtube.com",
+            title="YouTube",
+            category="No",
+            subcategory="No",
+            export_to_cms=True,
+            remove_after_days=1,
+        )
+
+        entry = LinkDataController.objects.create(
+            source="",
+            link="https://page-with-https-status-500.com",
+            title=None,
+            description=None,
+            source_obj=source_youtube,
+            bookmarked=False,
+            language=None,
+            domain_obj=None,
+            thumbnail=None,
+            date_published=add_time,
+        )
+
+        date_updated = entry.date_update_last
+
+        # call tested function
+        entry.update_data()
+
+        entries = LinkDataController.objects.filter(link="https://page-with-https-status-500.com")
+        self.assertTrue(entries.count(), 0)
+
     def test_is_taggable_true(self):
         entry = LinkDataController.objects.create(
             source="https://youtube.com",

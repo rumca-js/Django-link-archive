@@ -92,7 +92,8 @@ class ConfigurationEntry(models.Model):
     )
 
     days_to_move_to_archive = models.IntegerField(default=100)
-    days_to_remove_links = models.IntegerField(default=0)
+    days_to_remove_links = models.IntegerField(default=0) # from archive
+    days_to_remove_stale_entries = models.IntegerField(default=30)
     whats_new_days = models.IntegerField(default=7)
 
     data_import_path = models.CharField(

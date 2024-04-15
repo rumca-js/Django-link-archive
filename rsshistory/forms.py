@@ -104,6 +104,7 @@ class ConfigForm(forms.ModelForm):
             "data_import_path",
             "days_to_move_to_archive",
             "days_to_remove_links",
+            "days_to_remove_stale_entries",
             "whats_new_days",
             "vote_min",
             "vote_max",

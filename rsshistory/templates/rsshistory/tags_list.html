@@ -17,9 +17,8 @@
 <div class="container">
  {% if tag_objects %}
      {% for tag in tag_objects %}
-     <a href='{% url 'rsshistory:entries-omni-search'%}?search=tags__tag+%3D%3D+"{{tag.0}}"' title="#{{tag.0}} {{tag.1}}">
-        #{{tag.0}}
-     </a>,
+        <a href='{% url 'rsshistory:entries-omni-search'%}?search=tags__tag+%3D%3D+"{{tag.0}}"' title="#{{tag.0}} {{tag.1}}">
+        #{{tag.0}}</a>,
      {% endfor %}
  {% else %}
    No tags

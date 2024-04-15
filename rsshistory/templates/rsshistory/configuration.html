@@ -21,6 +21,10 @@
          {% if field.id_for_label == "id_entries_order_by" %}
              <h3>Display settings</h3>
          {%endif%}
+
+         {% if field.id_for_label == "id_user_agent" %}
+             <h3>Advanced settings</h3>
+         {%endif%}
    
          <div class="form-group row">
             <label for="{{field.id_for_label}}" class="col-sm-2 col-form-label">{{field.label}}</label>

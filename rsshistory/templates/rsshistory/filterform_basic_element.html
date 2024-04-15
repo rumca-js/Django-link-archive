@@ -4,7 +4,11 @@
     {% csrf_token %}
 
     {% for field in filter_form %}
+       {% if field.is_hidden %}
+       <div style="display:none">
+       {% else %}
        <div class="form-group row m-0 p-0">
+       {% endif %}
           <label for="{{field.id_for_label}}" class="col-sm-2 col-form-label my-0 py-0">{{field.label}}</label>
           <div class="col-sm-10 my-0 py-0">
              <div>

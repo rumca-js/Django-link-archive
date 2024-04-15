@@ -192,6 +192,9 @@ class BaseLinkDataController(BaseLinkDataModel):
         p = url.p
 
         if not props or not url.p:
+            if self.is_entry_permamently_dead():
+                return
+
             error_text = traceback.format_exc()
 
             AppLogging.error(
@@ -241,6 +244,9 @@ class BaseLinkDataController(BaseLinkDataModel):
         props = url.get_props()
 
         if not props or not url.p:
+            if self.is_entry_permamently_dead():
+                return
+
             AppLogging.error(
                 "Could not find entry url interface for:{}".format(self.link)
             )
@@ -267,6 +273,24 @@ class BaseLinkDataController(BaseLinkDataModel):
         #    self.date_published = props["date_published"]
 
         self.save()
+
+    def is_entry_permamently_dead(self):
+        from ..configuration import Configuration
+        conf = Configuration.get_object().config_entry
+
+        remove_days = conf.days_to_remove_stale_entries
+        if remove_days == 0:
+            """
+            If remove_days is 0, then we do not remove any dead files
+            """
+            return False
+
+        if self.is_dead() and self.date_dead_since < DateUtils.get_datetime_now_utc() - timedelta(days=remove_days):
+            self.delete()
+            AppLogging.info("Removed entry {} was dead since.".format(self.link, self.date_dead_since))
+            return True
+
+        return False
 
     def is_update_time(self):
         from ..dateutils import DateUtils
