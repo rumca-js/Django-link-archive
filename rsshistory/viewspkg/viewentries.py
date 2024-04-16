@@ -844,7 +844,7 @@ def entry_dead(request, pk):
     objs = LinkDataController.objects.filter(id=pk)
     obj = objs[0]
 
-    obj.make_dead()
+    obj.make_manual_dead()
 
     return HttpResponseRedirect(obj.get_absolute_url())
 

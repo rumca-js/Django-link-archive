@@ -1,8 +1,6 @@
 {% load static %}
 
 <form action="{{filter_form.action_url}}" method="{{filter_form.method}}">
-    {% csrf_token %}
-
     {% for field in filter_form %}
        {% if field.is_hidden %}
        <div style="display:none">
@@ -23,13 +21,14 @@
        </div>
     {% endfor %}
 
-    <button type="submit" value="Submit" class="btn btn-primary" role="button">Submit</button>
+    <div class="mt-2">
+       <button type="submit" value="Submit" class="btn btn-primary" role="button">Submit</button>
 
-    <a href="{{reset_link}}" class="btn btn-secondary" role="button">
-      <img src="{% static 'rsshistory/icons/icons8-start-100.png' %}" class="content-icon" />
-      Reset
-    </a>
-
+       <a href="{{reset_link}}" class="btn btn-secondary" role="button">
+         <img src="{% static 'rsshistory/icons/icons8-start-100.png' %}" class="content-icon" />
+         Reset
+       </a>
+    </div>
 </form>
 
 <ul>

@@ -113,7 +113,7 @@ class EntryUrlInterfaceTest(FakeInternetTestCase):
 
         self.assertTrue(props)
         self.assertEqual(props["link"], "ftp://www.linkedin.com")
-        self.assertEqual(props["status_code"], 500)
+        self.assertEqual(props["status_code"], 0)
 
     def test_smb(self):
         url = EntryUrlInterface("smb://www.linkedin.com", ignore_errors=True)
@@ -121,7 +121,7 @@ class EntryUrlInterfaceTest(FakeInternetTestCase):
 
         self.assertTrue(props)
         self.assertEqual(props["link"], "smb://www.linkedin.com")
-        self.assertEqual(props["status_code"], 500)
+        self.assertEqual(props["status_code"], 0)
 
     """
     def test_rss_old_pubdate(self):

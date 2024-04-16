@@ -922,9 +922,6 @@ class RefreshThreadHandler(object):
 
         self.check_sources()
 
-        if self.is_no_job():
-            self.check_dead_entry()
-
         if SourceExportHistory.is_update_required():
             self.do_update()
             SourceExportHistory.confirm()
@@ -938,21 +935,6 @@ class RefreshThreadHandler(object):
         for source in sources:
             if source.is_fetch_possible():
                 BackgroundJobController.download_rss(source)
-
-    def is_no_job(self):
-        return BackgroundJobController.objects.filter(enabled=True).count() == 0
-
-    def check_dead_entry(self):
-        """
-        Dead for month. Week is infinity for internet.
-        Update. Update removes entry
-        Not more than 100 entries
-        """
-        date_to_remove = DateUtils.get_datetime_now_utc() - timedelta(days=30)
-        entries = LinkDataController.objects.filter(date_dead_since__lt = date_to_remove)[:100]
-        for entry in entries:
-            # update entry - it is either alive - will be re-enabled, or removed
-            BackgroundJobController.entry_update_data(entry)
 
     def do_update(self):
         if DataExport.is_daily_data_set():

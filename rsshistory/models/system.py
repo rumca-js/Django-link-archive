@@ -72,6 +72,7 @@ class ConfigurationEntry(models.Model):
 
     link_save = models.BooleanField(default=False)
     source_save = models.BooleanField(default=False)
+    accept_dead = models.BooleanField(default=False) # whether dead entries can be introduced into database
 
     track_user_actions = models.BooleanField(default=True)
     track_user_searches = models.BooleanField(default=True)
@@ -93,7 +94,8 @@ class ConfigurationEntry(models.Model):
 
     days_to_move_to_archive = models.IntegerField(default=100)
     days_to_remove_links = models.IntegerField(default=0) # from archive
-    days_to_remove_stale_entries = models.IntegerField(default=30)
+    days_to_check_stale_entries = models.IntegerField(default=10)
+    days_to_remove_stale_entries = models.IntegerField(default=35)
     whats_new_days = models.IntegerField(default=7)
 
     data_import_path = models.CharField(

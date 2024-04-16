@@ -2,14 +2,7 @@
 {% load static %}
 {% block content %}
 
-<div class="container-fluid">
-    {% if user.is_staff %}
-    <a href="{% url 'rsshistory:entry-add-simple' %}" class="btn btn-secondary" role="button" title="Opens add entry wizard">
-        <img src="{% static 'rsshistory/icons/icons8-add-link-96.png' %}" class="content-icon" />
-        Add entry
-    </a>
-    {% endif %}
-</div>
+  {% include "rsshistory/linkdatacontroller_list_actions.html" %}
 
   {% include "rsshistory/filterform_basic_element.html" %}
 
@@ -27,8 +20,6 @@
       {% endfor %}
     {% endfor %}
   </ul>
-
-  <hr>
 
   {% if content_list %}
   {% if user_config.display_type == "youtube-thumbnails" %}

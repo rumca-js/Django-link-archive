@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 from ..models import AppLogging
 from ..apps import LinkDatabase
 from ..webtools import RssPage, HtmlPage
-from ..pluginurl.entryurlinterface import EntryUrlInterface, UrlHandler
+from ..pluginurl.entryurlinterface import UrlHandler
 from ..configuration import Configuration
 
 from .sourcegenericplugin import SourceGenericPlugin

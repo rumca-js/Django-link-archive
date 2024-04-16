@@ -2,34 +2,13 @@
 {% load static %}
 {% block content %}
 
-<div class="btn-group flex-wrap">
-    {% if user.is_staff %}
-    <a href="{% url 'rsshistory:source-add-simple' %}" class="btn btn-secondary" role="button" title="Opens add source wizard">
-        <img src="{% static 'rsshistory/icons/icons8-broadcast-add-100.png' %}" class="content-icon" />
-        Add source</a>
-    <a href="{% url 'rsshistory:entry-add-simple' %}" class="btn btn-secondary" role="button" title="Opens add entry wizard">
-        <img src="{% static 'rsshistory/icons/icons8-add-link-96.png' %}" class="content-icon" />
-        Add entry</a>
-    <a href="{% url 'rsshistory:sources-enable-all' %}" class="btn btn-secondary" role="button" title="Enable all sources">
-        Enable all</a>
-    <a href="{% url 'rsshistory:sources-disable-all' %}" class="btn btn-secondary" role="button" title="Disable all sources">
-        Disable all</a>
-    {% endif %}
-    <a href="{% url 'rsshistory:sources' %}?search=enabled+%3D+True" class="btn btn-secondary" role="button" title="Shows active sources only">
-        Enabled</a>
-    <a href="{% url 'rsshistory:sources' %}?search=enabled+%3D+False" class="btn btn-secondary" role="button" title="Shows disabled sources only">
-        Disabled</a>
-    <a href="{% url 'rsshistory:sources' %}?search=category+%3D%3D+New" class="btn btn-secondary" role="button" title="Shows new sources only">
-        New sources</a>
-</div>
+  {% include "rsshistory/sourcedatacontroller_list_actions.html" %}
 
   {% include "rsshistory/filterform_basic_element.html" %}
 
   {% if query_filter.is_error %}
     <p class="error-text">There errors with your query</p>
   {% endif %}
-
-  <hr>
 
   {% if content_list %}
      <div class="container list-group">

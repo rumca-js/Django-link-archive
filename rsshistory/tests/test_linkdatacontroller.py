@@ -154,7 +154,7 @@ class LinkDataControllerTest(FakeInternetTestCase):
         self.assertTrue("tag1" in tags)
         self.assertTrue("tag2" in tags)
 
-    def test_reset_data_none(self):
+    def test_reset_data__fills_properties(self):
         add_time = DateUtils.get_datetime_now_utc() - timedelta(days=1)
 
         source_youtube = SourceDataController.objects.create(
@@ -188,7 +188,7 @@ class LinkDataControllerTest(FakeInternetTestCase):
         self.assertEqual(entry.date_published, add_time)
         # self.assertEqual(entry.date_update_last, date_updated)
 
-    def test_update_data_none(self):
+    def test_update_data__fills_properties(self):
         add_time = DateUtils.get_datetime_now_utc() - timedelta(days=1)
 
         source_youtube = SourceDataController.objects.create(
@@ -223,7 +223,7 @@ class LinkDataControllerTest(FakeInternetTestCase):
         self.assertEqual(entry.date_published, add_time)
         # self.assertEqual(entry.date_update_last, date_updated)
 
-    def test_update_data_not_none(self):
+    def test_update_data__not_reset_properties(self):
         add_time = DateUtils.get_datetime_now_utc() - timedelta(days=1)
 
         source_youtube = SourceDataController.objects.create(
@@ -274,7 +274,7 @@ class LinkDataControllerTest(FakeInternetTestCase):
 
         entry = LinkDataController.objects.create(
             source="",
-            link="https://page-with-https-status-500.com",
+            link="https://page-with-http-status-500.com",
             title=None,
             description=None,
             source_obj=source_youtube,
@@ -289,7 +289,7 @@ class LinkDataControllerTest(FakeInternetTestCase):
         # call tested function
         entry.reset_data()
 
-        entries = LinkDataController.objects.filter(link="https://page-with-https-status-500.com")
+        entries = LinkDataController.objects.filter(link="https://page-with-http-status-500.com")
         self.assertTrue(entries.count(), 0)
 
     def test_update_data_removes_old_dead_entry(self):
@@ -308,7 +308,7 @@ class LinkDataControllerTest(FakeInternetTestCase):
 
         entry = LinkDataController.objects.create(
             source="",
-            link="https://page-with-https-status-500.com",
+            link="https://page-with-http-status-500.com",
             title=None,
             description=None,
             source_obj=source_youtube,
@@ -324,8 +324,85 @@ class LinkDataControllerTest(FakeInternetTestCase):
         # call tested function
         entry.update_data()
 
-        entries = LinkDataController.objects.filter(link="https://page-with-https-status-500.com")
+        entries = LinkDataController.objects.filter(link="https://page-with-http-status-500.com")
         self.assertTrue(entries.count(), 0)
+
+    def test_update_data__sets_stale_entry_status(self):
+        conf = Configuration.get_object().config_entry
+
+        add_time = DateUtils.get_datetime_now_utc() - timedelta(days=conf.days_to_remove_stale_entries-2)
+
+        source_youtube = SourceDataController.objects.create(
+            url="https://youtube.com",
+            title="YouTube",
+            category="No",
+            subcategory="No",
+            export_to_cms=True,
+            remove_after_days=1,
+        )
+
+        entry = LinkDataController.objects.create(
+            source="",
+            link="https://page-with-http-status-500.com",
+            title=None,
+            description=None,
+            source_obj=source_youtube,
+            bookmarked=False,
+            language=None,
+            domain_obj=None,
+            thumbnail=None,
+            date_published=add_time,
+        )
+
+        date_updated = entry.date_update_last
+
+        # call tested function
+        entry.update_data()
+
+        entries = LinkDataController.objects.filter(link="https://page-with-http-status-500.com")
+        self.assertTrue(entries.count(), 1)
+        self.assertTrue(entries[0].date_dead_since is not None)
+        self.assertEqual(entries[0].status_code, 500)
+        self.assertEqual(entries[0].manual_status_code, 0)
+
+    def test_update_data__clears_stale_entry_status(self):
+        conf = Configuration.get_object().config_entry
+
+        add_time = DateUtils.get_datetime_now_utc() - timedelta(days=conf.days_to_remove_stale_entries-2)
+
+        source_youtube = SourceDataController.objects.create(
+            url="https://youtube.com",
+            title="YouTube",
+            category="No",
+            subcategory="No",
+            export_to_cms=True,
+            remove_after_days=1,
+        )
+
+        entry = LinkDataController.objects.create(
+            source="",
+            link="https://youtube.com",
+            title=None,
+            description=None,
+            source_obj=source_youtube,
+            bookmarked=False,
+            language=None,
+            domain_obj=None,
+            thumbnail=None,
+            date_published=add_time,
+            date_dead_since=add_time,
+        )
+
+        date_updated = entry.date_update_last
+
+        # call tested function
+        entry.update_data()
+
+        entries = LinkDataController.objects.filter(link="https://youtube.com")
+        self.assertTrue(entries.count(), 1)
+        self.assertTrue(entries[0].date_dead_since is None)
+        self.assertEqual(entries[0].status_code, 200)
+        self.assertEqual(entries[0].manual_status_code, 0)
 
     def test_is_taggable_true(self):
         entry = LinkDataController.objects.create(
@@ -379,7 +456,7 @@ class LinkDataControllerTest(FakeInternetTestCase):
 
         self.assertFalse(entry.is_commentable())
 
-    def test_make_dead(self):
+    def test_make_manual_dead(self):
         add_time = DateUtils.get_datetime_now_utc() - timedelta(days=1)
 
         source_youtube = SourceDataController.objects.create(
@@ -407,12 +484,12 @@ class LinkDataControllerTest(FakeInternetTestCase):
         date_updated = entry.date_update_last
 
         # call tested function
-        entry.make_dead()
+        entry.make_manual_dead()
 
         self.assertTrue(entry.date_dead_since is not None)
         self.assertEqual(entry.manual_status_code, 500)
 
-    def test_make_active(self):
+    def test_make_manual_active(self):
         add_time = DateUtils.get_datetime_now_utc() - timedelta(days=1)
 
         source_youtube = SourceDataController.objects.create(
@@ -441,7 +518,7 @@ class LinkDataControllerTest(FakeInternetTestCase):
         date_updated = entry.date_update_last
 
         # call tested function
-        entry.make_active()
+        entry.make_manual_active()
 
         self.assertTrue(entry.date_dead_since is None)
         self.assertEqual(entry.manual_status_code, 200)

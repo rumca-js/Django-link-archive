@@ -8,6 +8,7 @@ import traceback
 
 from ..apps import LinkDatabase
 from ..webtools import HtmlPage, PageResponseObject, DomainAwarePage
+from ..dateutils import DateUtils
 
 from .sources import SourceDataModel
 from .system import AppLogging
@@ -192,18 +193,11 @@ class BaseLinkDataController(BaseLinkDataModel):
         p = url.p
 
         if not props or not url.p:
-            if self.is_entry_permamently_dead():
-                return
-
-            error_text = traceback.format_exc()
-
-            AppLogging.error(
-                'Could not find entry url interface for:<a href="{}">{}</a>\n{}'.format(self.get_absolute_url(), self.link, error_text)
-            )
-
-            self.status_code = BaseLinkDataModel.STATUS_DEAD
-            self.save()
+            self.handle_invalid_response(url)
             return
+
+        if self.date_dead_since:
+            self.date_dead_since = None
 
         # always update
         self.page_rating_contents = p.get_page_rating()
@@ -244,15 +238,11 @@ class BaseLinkDataController(BaseLinkDataModel):
         props = url.get_props()
 
         if not props or not url.p:
-            if self.is_entry_permamently_dead():
-                return
-
-            AppLogging.error(
-                "Could not find entry url interface for:{}".format(self.link)
-            )
-            self.status_code = BaseLinkDataModel.STATUS_CODE_ERROR
-            self.save()
+            self.handle_invalid_response(url)
             return
+
+        if self.date_dead_since:
+            self.date_dead_since = None
 
         self.page_rating_contents = url.p.get_page_rating()
         self.status_code = url.h.get_status_code()
@@ -274,7 +264,34 @@ class BaseLinkDataController(BaseLinkDataModel):
 
         self.save()
 
+    def handle_invalid_response(self, url_entry_interface):
+        if self.is_entry_permamently_dead():
+            self.delete()
+            AppLogging.info("Removed entry <a href='{}'>{}</a>. It was dead since {}.".format(self.link, self.link, self.date_dead_since))
+            return
+
+        if not self.date_dead_since:
+            error_text = traceback.format_exc()
+
+            AppLogging.error(
+                'Cannot access link:<a href="{}">{}</a>\n{}'.format(self.get_absolute_url(), self.link, error_text)
+            )
+            self.date_dead_since = DateUtils.get_datetime_now_utc()
+
+        self.page_rating_contents = 0
+        if url_entry_interface.h:
+            self.status_code = url_entry_interface.h.get_status_code()
+        else:
+            self.status_code = BaseLinkDataController.STATUS_DEAD
+        self.save()
+
     def is_entry_permamently_dead(self):
+        if self.is_permanent():
+            """
+            Cannot remove bookmarks, or permament entries
+            """
+            return False
+
         from ..configuration import Configuration
         conf = Configuration.get_object().config_entry
 
@@ -286,18 +303,14 @@ class BaseLinkDataController(BaseLinkDataModel):
             return False
 
         if self.is_dead() and self.date_dead_since < DateUtils.get_datetime_now_utc() - timedelta(days=remove_days):
-            self.delete()
-            AppLogging.info("Removed entry {} was dead since.".format(self.link, self.date_dead_since))
             return True
 
         return False
 
     def is_update_time(self):
-        from ..dateutils import DateUtils
         return self.date_update_last < DateUtils.get_datetime_now_utc() - timedelta(days=30)
 
     def is_reset_time(self):
-        from ..dateutils import DateUtils
         return self.date_update_last < DateUtils.get_datetime_now_utc() - timedelta(days=1)
 
     def update_calculated_vote(self):
@@ -459,7 +472,6 @@ class BaseLinkDataController(BaseLinkDataModel):
 
     def get_archive_link(self):
         from ..services.waybackmachine import WaybackMachine
-        from ..dateutils import DateUtils
 
         m = WaybackMachine()
         formatted_date = m.get_formatted_date(self.date_published.date())
@@ -485,9 +497,7 @@ class BaseLinkDataController(BaseLinkDataModel):
             votes = UserVotes.objects.filter(entry_object=self)
             votes.delete()
 
-    def make_dead(self):
-        from ..dateutils import DateUtils
-
+    def make_manual_dead(self):
         if self.manual_status_code == BaseLinkDataController.STATUS_DEAD:
             return
 
@@ -498,9 +508,7 @@ class BaseLinkDataController(BaseLinkDataModel):
         # remove all tags & comments?
         self.save()
 
-    def make_active(self):
-        from ..dateutils import DateUtils
-
+    def make_manual_active(self):
         if self.manual_status_code == BaseLinkDataController.STATUS_ACTIVE:
             return
 
@@ -510,8 +518,6 @@ class BaseLinkDataController(BaseLinkDataModel):
         self.save()
 
     def clear_manual_status(self):
-        from ..dateutils import DateUtils
-
         if self.manual_status_code == BaseLinkDataController.STATUS_UNDEFINED:
             return
 
@@ -571,7 +577,6 @@ class BaseLinkDataController(BaseLinkDataModel):
         return False
 
     def is_archive_by_date(input_date):
-        from ..dateutils import DateUtils
         from ..configuration import Configuration
 
         conf = Configuration.get_object().config_entry
@@ -585,7 +590,6 @@ class BaseLinkDataController(BaseLinkDataModel):
         return False
 
     def is_removed_by_date(input_date):
-        from ..dateutils import DateUtils
         from ..configuration import Configuration
 
         conf = Configuration.get_object().config_entry

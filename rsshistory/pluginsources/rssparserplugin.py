@@ -4,7 +4,7 @@ import re
 from ..models import UserTags
 from ..configuration import Configuration
 from .sourcerssplugin import BaseRssPlugin
-from ..pluginurl import EntryUrlInterface, UrlHandler
+from ..pluginurl import UrlHandler
 from ..controllers import BackgroundJobController
 
 from ..webtools import ContentLinkParser, HtmlPage, DomainAwarePage

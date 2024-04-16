@@ -61,6 +61,9 @@ class EntryUrlInterface(object):
             self.update_info_default(props, source_obj)
 
         elif ignore_errors:
+            """
+            TODO should be set any part from self.h?
+            """
             props = {}
             props["link"] = self.url
             props["title"] = None
@@ -71,8 +74,12 @@ class EntryUrlInterface(object):
             props["date_published"] = DateUtils.get_datetime_now_utc()
             props["date_dead_since"] = DateUtils.get_datetime_now_utc()
             props["page_rating"] = 0
+            props["dead"] = True
             props["page_rating_contents"] = 0
-            props["status_code"] = LinkDataController.STATUS_DEAD
+            if self.h:
+                props["status_code"] = self.h.get_status_code()
+            else:
+                props["status_code"] = LinkDataController.STATUS_DEAD
 
         return props
 
