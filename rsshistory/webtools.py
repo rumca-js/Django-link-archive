@@ -56,6 +56,9 @@ except Exception as E:
     print("Cannot include selenium")
 
 
+PAGE_TOO_BIG_BYTES = 5000000 #5 MB
+
+
 URL_TYPE_RSS = "rss"
 URL_TYPE_CSS = "css"
 URL_TYPE_JAVASCRIPT = "javascript"
@@ -87,8 +90,10 @@ def date_str_to_date(date_str):
             parsed_date = parser.parse(date_str)
             return DateUtils.to_utc_date(parsed_date)
         except Exception as E:
+            error_text = traceback.format_exc()
+
             AppLogging.error(
-                "Could not parse music:release_date {} Exc:{}".format(date_str, str(E))
+                "Could not parse date:{}\nExc:{}\n{}".format(date_str, str(E), error_text)
             )
 
 
@@ -127,7 +132,7 @@ class DomainAwarePage(object):
     def parse_protocoled_url(self):
         protocol_pos = self.url.find("://")
         if protocol_pos >= 0:
-            rest = self.url[protocol_pos+3:]
+            rest = self.url[protocol_pos + 3 :]
             protocol = self.url[:protocol_pos].lower()
 
             rest_data = self.parse_rest(rest)
@@ -146,7 +151,7 @@ class DomainAwarePage(object):
 
         if len(positions) > 0:
             smallest_position = min(positions)
-            return [rest[:smallest_position], rest[: smallest_position+1]]
+            return [rest[:smallest_position], rest[: smallest_position + 1]]
         return [rest]
 
     def parse_netloc(self, separator="//"):
@@ -156,7 +161,7 @@ class DomainAwarePage(object):
             else:
                 lesser_separator = "\\"
 
-            rest = self.url[len(separator):]
+            rest = self.url[len(separator) :]
 
             rest_data = self.parse_rest(rest)
 
@@ -370,6 +375,27 @@ class DomainAwarePage(object):
 
         return URL_TYPE_UNKNOWN
 
+    def is_media(self):
+        """
+        TODO - crude, hardcoded
+        """
+        ext = self.get_page_ext()
+        if not ext:
+            return False
+
+        ext_mapping = [
+            "mp3",
+            "mp4",
+            "avi",
+            "ogg",
+            "flac",
+            "rmvb",
+            "wmv",
+            "wma",
+        ]
+
+        return ext in ext_mapping
+
     def is_html(self):
         return self.get_type() == URL_TYPE_HTML
 
@@ -388,6 +414,9 @@ class DomainAwarePage(object):
         return ext
 
     def get_type_by_ext(self):
+        """
+        TODO - crude, hardcoded
+        """
         if self.is_analytics():
             return
 
@@ -396,10 +425,10 @@ class DomainAwarePage(object):
             "js": URL_TYPE_JAVASCRIPT,
             "html": URL_TYPE_HTML,
             "htm": URL_TYPE_HTML,
+            "php": URL_TYPE_HTML,
+            "aspx": URL_TYPE_HTML,
             "woff2": URL_TYPE_FONT,
             "tff": URL_TYPE_FONT,
-            # "php": URL_TYPE_HTML,    seen in the wild, where dynamic pages were used to generate RSS :(
-            # "aspx": URL_TYPE_HTML,
         }
 
         ext = self.get_page_ext()
@@ -657,7 +686,7 @@ class ContentInterface(object):
             month, day = month_date_pattern_match.groups()
             date_object = self.format_date(year, month, day)
 
-        #elif year:
+        # elif year:
         #    current_year = int(datetime.now().year)
 
         #    if year >= current_year or year < 1900:
@@ -1067,18 +1096,14 @@ class RssPage(ContentInterface):
                             # normal scenario, no worries
                         else:
                             AppLogging.info(
-                                    '<a href="{}">{}</a> Unsupported image type for feed. Image:{}'.format(
-                                        self.url,
-                                        self.url,
-                                        str(self.feed.feed.image)
+                                '<a href="{}">{}</a> Unsupported image type for feed. Image:{}'.format(
+                                    self.url, self.url, str(self.feed.feed.image)
                                 )
                             )
             else:
                 AppLogging.info(
-                        '<a href="{}">{}</a> Unsupported image type for feed. Image:{}'.format(
-                            self.url,
-                            self.url,
-                            str(self.feed.feed.image)
+                    '<a href="{}">{}</a> Unsupported image type for feed. Image:{}'.format(
+                        self.url, self.url, str(self.feed.feed.image)
                     )
                 )
 
@@ -2020,21 +2045,30 @@ class BasePage(object):
             self.dead = True
             raise NotImplementedError("Could not identify method of page capture")
 
-    def get_contents_via_requests(self, url, headers, timeout):
-        """
-        This is program is web scraper. If we turn verify, then we discard some of pages.
-        Encountered several major pages, which had SSL programs.
+    def get_content_type(self, request_result):
+        if 'Content-Type' in request_result.headers:
+            return request_result.headers["Content-Type"]
 
-        SSL is mostly important for interacting with pages. During web scraping it is not that useful.
-        """
-        print("Requests GET:{}".format(url))
+        # we have to assume something
+        return "text"
 
-        # traceback.print_stack()
+    def get_content_length(self, request_result):
+        if 'content-length' in request_result.headers:
+            return int(request_result.headers['content-length'])
+        if 'Content-Length' in request_result.headers:
+            return int(request_result.headers['Content-Length'])
 
-        request_result = requests.get(
-            url, headers=headers, timeout=timeout, verify=BasePage.ssl_verify
-        )
+        return 100
 
+    def is_content_type_supported(self, request_result):
+        content_type = self.get_content_type(request_result)
+        if content_type.find("text") >= 0:
+            return True
+        if content_type.find("application") >= 0:
+            return True
+        return False
+
+    def get_encoding(self, url, request_result):
         """
         The default assumed content encoding for text/html is ISO-8859-1 aka Latin-1 :( See RFC-2854. UTF-8 was too young to become the default, it was born in 1993, about the same time as HTML and HTTP.
         Use .content to access the byte stream, or .text to access the decoded Unicode stream.
@@ -2065,6 +2099,47 @@ class BasePage(object):
 
             if not set_encoding:
                 request_result.encoding = request_result.apparent_encoding
+
+        return request_result.encoding
+
+    def get_contents_via_requests(self, url, headers, timeout):
+        """
+        This is program is web scraper. If we turn verify, then we discard some of pages.
+        Encountered several major pages, which had SSL programs.
+
+        SSL is mostly important for interacting with pages. During web scraping it is not that useful.
+        """
+        print("Requests GET:{}".format(url))
+
+        # traceback.print_stack()
+
+        """
+        stream argument allows us to read header before we fetch the page.
+        SSL verification makes everything to work slower.
+        """
+
+        request_result = requests.get(
+            url, headers=headers, timeout=timeout, verify=BasePage.ssl_verify, stream=True
+        )
+        LinkDatabase.info("[H] {}".format(request_result.headers))
+
+        content_length = self.get_content_length(request_result)
+
+        redirect = self.get_redirect_url(request_result)
+        if redirect:
+            self.url = redirect
+
+        if content_length > PAGE_TOO_BIG_BYTES:
+            AppLogging.error("Page {} is too long: {} bytes".format(url, content_length))
+            return
+
+        if not self.is_content_type_supported(request_result):
+            AppLogging.error("Page {} content type is not supported".format(url))
+            return
+
+        # TODO do we want to check also content-type?
+
+        self.get_encoding(url, request_result)
 
         response = PageResponseObject(
             url,
@@ -2156,7 +2231,9 @@ class BasePage(object):
 
             try:
                 # if self.options.link_redirect:
-                WebDriverWait(driver, selenium_timeout).until(EC.url_changes(driver.current_url))
+                WebDriverWait(driver, selenium_timeout).until(
+                    EC.url_changes(driver.current_url)
+                )
             except TimeoutException:
                 LinkDatabase.error("Exception")
 
@@ -2165,12 +2242,6 @@ class BasePage(object):
             """
 
             page_source = driver.page_source
-
-            ## Parse the HTML with BeautifulSoup
-            # soup = BeautifulSoup(page_source, 'html.parser')
-
-            ## Extract the RSS content from the HTML body
-            # rss_content = soup.find('body').get_text()
 
             if self.url != driver.current_url:
                 self.url = driver.current_url
@@ -2219,12 +2290,12 @@ class BasePage(object):
 
         return PageResponseObject(url, html_content)
 
-    def is_redirect(self):
-        return self.status_code > 300 and self.status_code < 310
+    def is_redirect(self, request_result):
+        return request_result.status_code > 300 and request_result.status_code < 310
 
-    def get_redirect_url(self):
-        if self.is_redirect() and "Location" in self.response_headers.headers:
-            return self.response_headers.headers["Location"]
+    def get_redirect_url(self, request_result):
+        if self.is_redirect(request_result) and "Location" in request_result.headers and request_result.headers["Location"]:
+            return request_result.headers["Location"]
 
 
 class Url(ContentInterface):
@@ -2251,16 +2322,23 @@ class Url(ContentInterface):
             url = page_object.url
 
         if url.startswith("https") or url.startswith("http"):
-            p = BasePage(url=url, options=page_options, page_object=page_object)
-            self.response = p.get_response()
-            self.options = p.options
-            contents = p.get_contents()
+            type_check = DomainAwarePage(url)
+            if not type_check.is_media():
+               p = BasePage(url=url, options=page_options, page_object=page_object)
+               self.response = p.get_response()
+               self.options = p.options
+               contents = p.get_contents()
 
-            if not p.is_valid():
-                return
+               if not p.is_valid():
+                   return
 
         # right now we do not have handlers for anything else
-        elif url.startswith("ftp") or url.startswith("smb") or url.startswith("//") or url.startswith("\\\\"):
+        elif (
+            url.startswith("ftp")
+            or url.startswith("smb")
+            or url.startswith("//")
+            or url.startswith("\\\\")
+        ):
             return
 
         if contents:
@@ -2276,9 +2354,10 @@ class Url(ContentInterface):
             if p.is_valid():
                 return p
 
-            p = XmlPage(url, contents)
-            if p.is_valid():
-                return p
+            # TODO
+            #p = XmlPage(url, contents)
+            #if p.is_valid():
+            #    return p
 
             p = DefaultContentPage(url, contents)
             return p

@@ -35,7 +35,9 @@ class BaseLinkDataModel(models.Model):
     description = models.TextField(max_length=1000, null=True, blank=True)
     thumbnail = models.CharField(max_length=1000, null=True, blank=True)
     language = models.CharField(max_length=10, null=True, blank=True)
-    age = models.IntegerField(blank=True, null=True)
+    age = models.IntegerField(
+        blank=True, null=True, help_text="Age limit to view entry"
+    )
 
     date_created = models.DateTimeField(auto_now_add=True, null=True)
     date_published = models.DateTimeField(default=timezone.now)
@@ -43,8 +45,12 @@ class BaseLinkDataModel(models.Model):
     date_dead_since = models.DateTimeField(null=True)
 
     # this entry cannot be removed. Serves a purpose. Domain page, source page
-    permanent = models.BooleanField(default=False)
-    bookmarked = models.BooleanField(default=False)
+    permanent = models.BooleanField(
+        default=False, help_text="This entry will not be automatically removed"
+    )
+    bookmarked = models.BooleanField(
+        default=False, help_text="This entry will not be automatically removed"
+    )
 
     # user who added entry
     user = models.CharField(max_length=1000, null=True, blank=True)
@@ -75,6 +81,40 @@ class BaseLinkDataModel(models.Model):
     class Meta:
         abstract = True
         ordering = ["-date_published", "source", "title"]
+
+    def save(self, *args, **kwargs):
+        """
+        We can fix some database errors here.
+        We can trim title and description. No harm done.
+        We cannot trim thumbnails, or link, it will not work after adding.
+        """
+        title_length = BaseLinkDataModel._meta.get_field("title").max_length
+        description_length = BaseLinkDataModel._meta.get_field("description").max_length
+        artist_length = BaseLinkDataModel._meta.get_field("artist").max_length
+        album_length = BaseLinkDataModel._meta.get_field("album").max_length
+        user_length = BaseLinkDataModel._meta.get_field("user").max_length
+        thumbnail_length = BaseLinkDataModel._meta.get_field("thumbnail").max_length
+
+        # Trim the input string to fit within max_length
+        if self.title and len(self.title) > title_length:
+            self.title = self.title[:title_length-1]
+
+        if self.description and len(self.description) > description_length:
+            self.description = self.description[:description_length-1]
+
+        if self.album and len(self.album) > album_length:
+            self.album = self.description[:album_length-1]
+
+        if self.artist and len(self.artist) > artist_length:
+            self.artist = self.description[:artist_length-1]
+
+        if self.user and len(self.user) > user_length:
+            self.user = None
+
+        if self.thumbnail and len(self.thumbnail) > thumbnail_length:
+            self.thumbnail = None
+
+        super().save(*args, **kwargs)
 
 
 class BaseLinkDataController(BaseLinkDataModel):
@@ -176,142 +216,6 @@ class BaseLinkDataController(BaseLinkDataModel):
             sum_num += visit.visits
 
         return sum_num
-
-    def update_data(self):
-        """
-        Fetches new information about page, and uses valid fields to set this object,
-        but only if current field is not set
-
-         - status code and page rating is update always
-         - title and description could have been set manually, we do not want to change that
-         - some other fields should be set only if present in props
-        """
-        from ..pluginurl.entryurlinterface import EntryUrlInterface
-
-        url = EntryUrlInterface(self.link)
-        props = url.get_props()
-        p = url.p
-
-        if not props or not url.p:
-            self.handle_invalid_response(url)
-            return
-
-        if self.date_dead_since:
-            self.date_dead_since = None
-
-        # always update
-        self.page_rating_contents = p.get_page_rating()
-        self.status_code = url.h.get_status_code()
-
-        if "title" in props and props["title"] is not None:
-            if not self.title:
-                self.title = props["title"]
-
-        if "description" in props and props["description"] is not None:
-            if not self.description:
-                self.description = props["description"]
-
-        if "thumbnail" in props and props["thumbnail"] is not None:
-            if not self.thumbnail:
-                self.thumbnail = props["thumbnail"]
-
-        if "language" in props and props["language"] is not None:
-            if not self.language:
-                self.language = props["language"]
-
-        if "date_published" in props and props["date_published"] is not None:
-            if not self.date_published:
-                self.date_published = props["date_published"]
-
-        self.update_calculated_vote()
-
-    def reset_data(self):
-        """
-        Fetches new information about page, and uses valid fields to set this object.
-
-         - status code and page rating is update always
-         - new data are changed only if new data are present at all
-        """
-        from ..pluginurl.entryurlinterface import EntryUrlInterface
-
-        url = EntryUrlInterface(self.link)
-        props = url.get_props()
-
-        if not props or not url.p:
-            self.handle_invalid_response(url)
-            return
-
-        if self.date_dead_since:
-            self.date_dead_since = None
-
-        self.page_rating_contents = url.p.get_page_rating()
-        self.status_code = url.h.get_status_code()
-
-        if "title" in props and props["title"] is not None:
-            self.title = props["title"]
-
-        if "description" in props and props["description"] is not None:
-            self.description = props["description"]
-
-        if "thumbnail" in props and props["thumbnail"] is not None:
-            self.thumbnail = props["thumbnail"]
-
-        if "language" in props and props["language"] is not None:
-            self.language = props["language"]
-
-        # if "date_published" in props and props["date_published"] is not None:
-        #    self.date_published = props["date_published"]
-
-        self.save()
-
-    def handle_invalid_response(self, url_entry_interface):
-        if self.is_entry_permamently_dead():
-            self.delete()
-            AppLogging.info("Removed entry <a href='{}'>{}</a>. It was dead since {}.".format(self.link, self.link, self.date_dead_since))
-            return
-
-        if not self.date_dead_since:
-            error_text = traceback.format_exc()
-
-            AppLogging.error(
-                'Cannot access link:<a href="{}">{}</a>\n{}'.format(self.get_absolute_url(), self.link, error_text)
-            )
-            self.date_dead_since = DateUtils.get_datetime_now_utc()
-
-        self.page_rating_contents = 0
-        if url_entry_interface.h:
-            self.status_code = url_entry_interface.h.get_status_code()
-        else:
-            self.status_code = BaseLinkDataController.STATUS_DEAD
-        self.save()
-
-    def is_entry_permamently_dead(self):
-        if self.is_permanent():
-            """
-            Cannot remove bookmarks, or permament entries
-            """
-            return False
-
-        from ..configuration import Configuration
-        conf = Configuration.get_object().config_entry
-
-        remove_days = conf.days_to_remove_stale_entries
-        if remove_days == 0:
-            """
-            If remove_days is 0, then we do not remove any dead files
-            """
-            return False
-
-        if self.is_dead() and self.date_dead_since < DateUtils.get_datetime_now_utc() - timedelta(days=remove_days):
-            return True
-
-        return False
-
-    def is_update_time(self):
-        return self.date_update_last < DateUtils.get_datetime_now_utc() - timedelta(days=30)
-
-    def is_reset_time(self):
-        return self.date_update_last < DateUtils.get_datetime_now_utc() - timedelta(days=1)
 
     def update_calculated_vote(self):
         self.page_rating_votes = self.calculate_vote()
@@ -537,6 +441,13 @@ class BaseLinkDataController(BaseLinkDataModel):
         return (self.permanent or self.bookmarked) and not self.is_dead()
 
     def is_permanent(self):
+        from ..configuration import Configuration
+
+        conf = Configuration.get_object().config_entry
+
+        if not conf.keep_permament_items:
+            return False
+
         return self.permanent or self.bookmarked
 
     def is_dead(self):
@@ -616,6 +527,7 @@ class BaseLinkDataController(BaseLinkDataModel):
 
     def is_user_appropriate(self, user):
         from .system import UserConfig
+
         if self.age and self.age != 0:
             if not user.is_authenticated:
                 return False
@@ -625,6 +537,16 @@ class BaseLinkDataController(BaseLinkDataModel):
             return self.age < age
 
         return True
+
+    def is_update_time(self):
+        return self.date_update_last < DateUtils.get_datetime_now_utc() - timedelta(
+            days=30
+        )
+
+    def is_reset_time(self):
+        return self.date_update_last < DateUtils.get_datetime_now_utc() - timedelta(
+            days=1
+        )
 
 
 class LinkDataModel(BaseLinkDataController):

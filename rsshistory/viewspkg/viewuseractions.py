@@ -123,7 +123,7 @@ def tag_entry(request, pk):
             args["user_id"] = request.user.id
             args["user"] = request.user
             args["entry_id"] = entry.id
-            UserTags.set_tags(args)
+            UserTags.set_tags(entry, args["tag"], user=request.user)
 
             return HttpResponseRedirect(
                 reverse(

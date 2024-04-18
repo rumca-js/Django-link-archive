@@ -20,7 +20,9 @@ class SourceUrlInterfaceTest(FakeInternetTestCase):
 
         self.assertTrue(props)
         self.assertTrue("url" in props)
-        self.assertEqual(props['url'], "https://www.codeproject.com/WebServices/NewsRSS.aspx")
+        self.assertEqual(
+            props["url"], "https://www.codeproject.com/WebServices/NewsRSS.aspx"
+        )
         self.assertTrue("title" in props)
         self.assertEqual(props["source_type"], SourceDataModel.SOURCE_TYPE_RSS)
 
@@ -38,7 +40,10 @@ class SourceUrlInterfaceTest(FakeInternetTestCase):
 
         self.assertTrue(props)
         self.assertTrue("url" in props)
-        self.assertEqual(props['url'], "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM")
+        self.assertEqual(
+            props["url"],
+            "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM",
+        )
         self.assertTrue("title" in props)
         self.assertEqual(props["source_type"], SourceDataModel.SOURCE_TYPE_YOUTUBE)
 
@@ -52,7 +57,10 @@ class SourceUrlInterfaceTest(FakeInternetTestCase):
 
         self.assertTrue(props)
         self.assertTrue("url" in props)
-        self.assertEqual(props["url"], "https://www.youtube.com/feeds/videos.xml?channel_id=1234-channel-id")
+        self.assertEqual(
+            props["url"],
+            "https://www.youtube.com/feeds/videos.xml?channel_id=1234-channel-id",
+        )
         self.assertTrue("title" in props)
         self.assertEqual(props["source_type"], SourceDataModel.SOURCE_TYPE_YOUTUBE)
 

@@ -9,6 +9,7 @@ class SourceParseInternalLinks(BaseParsePlugin):
     """
     Maybe this should be integrated with parse plugin, which should have internal properties?
     """
+
     PLUGIN_NAME = "SourceParseInternalLinks"
 
     def __init__(self, source_id):
@@ -19,7 +20,10 @@ class SourceParseInternalLinks(BaseParsePlugin):
             return False
 
         source_address = self.get_address()
-        if DomainAwarePage(source_address).get_domain() != DomainAwarePage(address).get_domain():
+        if (
+            DomainAwarePage(source_address).get_domain()
+            != DomainAwarePage(address).get_domain()
+        ):
             return False
 
         return address.find(source_address) != -1

@@ -371,24 +371,23 @@ class HtmlPageTest(FakeInternetTestCase):
         all_favicons = p.get_favicons()
 
         self.assertTrue(
-            "https://www.youtube.com/s/desktop/e4d15d2c/img/favicon.ico" in
-            all_favicons
+            "https://www.youtube.com/s/desktop/e4d15d2c/img/favicon.ico" in all_favicons
         )
         self.assertTrue(
-            "https://www.youtube.com/s/desktop/e4d15d2c/img/favicon_32x32.png" in
-            all_favicons
+            "https://www.youtube.com/s/desktop/e4d15d2c/img/favicon_32x32.png"
+            in all_favicons
         )
         self.assertTrue(
-            "https://www.youtube.com/s/desktop/e4d15d2c/img/favicon_48x48.png" in
-            all_favicons
+            "https://www.youtube.com/s/desktop/e4d15d2c/img/favicon_48x48.png"
+            in all_favicons
         )
         self.assertTrue(
-            "https://www.youtube.com/s/desktop/e4d15d2c/img/favicon_96x96.png" in
-            all_favicons
+            "https://www.youtube.com/s/desktop/e4d15d2c/img/favicon_96x96.png"
+            in all_favicons
         )
         self.assertTrue(
-            "https://www.youtube.com/s/desktop/e4d15d2c/img/favicon_144x144.png" in
-            all_favicons
+            "https://www.youtube.com/s/desktop/e4d15d2c/img/favicon_144x144.png"
+            in all_favicons
         )
         self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 

@@ -89,6 +89,8 @@ class ConfigForm(forms.ModelForm):
             # optional
             "link_save",
             "source_save",
+            "accept_dead",
+            "accept_ip_addresses",
             "auto_scan_new_entries",
             "auto_store_entries",
             "auto_store_entries_use_all_data",
@@ -103,6 +105,7 @@ class ConfigForm(forms.ModelForm):
             "data_export_path",
             "data_import_path",
             "days_to_move_to_archive",
+            "days_to_check_stale_entries",
             "days_to_remove_links",
             "days_to_remove_stale_entries",
             "whats_new_days",
@@ -127,23 +130,7 @@ class ConfigForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.init = UserRequest(args, kwargs)
-        super(ConfigForm, self).__init__(*args, **kwargs)
-
-        # fmt: off
-        self.fields["background_task"].help_text = "Informs system that background task, like celery is operational."
-        self.fields["link_save"].help_text = "Links are saved using archive.org."
-        self.fields["source_save"].help_text = "Links are saved using archive.org."
-        self.fields["user_agent"].help_text = "You can check your user agent in <a href=\"https://www.supermonitoring.com/blog/check-browser-http-headers/\">https://www.supermonitoring.com/blog/check-browser-http-headers/</a>."
-        self.fields["user_headers"].help_text = "Provide JSON configuration of headers. You can check your user agent in <a href=\"https://www.supermonitoring.com/blog/check-browser-http-headers/\">https://www.supermonitoring.com/blog/check-browser-http-headers/</a>."
-        self.fields["access_type"].help_text = "There are three access types available. \"All\" allows anybody view contents. \"Logged\" allows only logged users to view contents. \"Owner\" means application is private, and only owner can view it's contents."
-        self.fields["days_to_move_to_archive"].help_text = "Changing number of days after which links are moved to archive may lead to an issue. If the new number of days is smaller, links are not moved from archive back to the link table at hand."
-        self.fields["auto_store_sources"].help_text = "Sources can be automatically added, if a new 'domain' information is captured. The state of such state is determined by 'Auto sources enabled' property."
-        self.fields["number_of_comments_per_day"].help_text = "The limit is for each user."
-        self.fields["track_user_actions"].help_text = "Among tracked elements: what is searched."
-        self.fields["entries_order_by"].help_text = "For Google-like experience set -page_rating. By default it is set to order of publication, -date_published."
-        self.fields["links_per_page"].label = "Number of links per page"
-        self.fields["sources_per_page"].label = "Number of sources per page"
-        # fmt: on
+        super().__init__(*args, **kwargs)
 
         self.fields["user_agent"].widget.attrs.update(size=self.init.get_cols_size())
         if self.init.is_mobile:
@@ -178,15 +165,7 @@ class DataExportForm(forms.ModelForm):
         ]
 
     def __init__(self, *args, **kwargs):
-        super(DataExportForm, self).__init__(*args, **kwargs)
-
-        # fmt: off
-        self.fields["remote_path"].help_text = "Can be empty"
-        self.fields["user"].help_text = "Can be empty"
-        self.fields["password"].help_text = "Can be empty"
-        self.fields["local_path"].help_text = "Local path is relative to main configuration export path"
-        self.fields["export_entries_bookmarks"].help_text = "Export entries has to be checked for this to work"
-        self.fields["export_entries_permanents"].help_text = "Export entries has to be checked for this to work"
+        super().__init__(*args, **kwargs)
 
 
 class UserConfigForm(forms.ModelForm):
@@ -217,8 +196,7 @@ class UserConfigForm(forms.ModelForm):
         # }
 
     def __init__(self, *args, **kwargs):
-        super(UserConfigForm, self).__init__(*args, **kwargs)
-        self.fields["birth_date"].help_text = "Format: 2024-03-28"
+        super().__init__(*args, **kwargs)
 
 
 class ImportSourceRangeFromInternetArchiveForm(forms.Form):
@@ -275,6 +253,8 @@ class SourceInputForm(forms.Form):
         self.init = UserRequest(args, kwargs)
         super().__init__(*args, **kwargs)
 
+        self.fields["url"].widget.attrs.update(size=self.init.get_cols_size())
+
     def get_information(self):
         return self.cleaned_data
 
@@ -284,6 +264,10 @@ class ScannerForm(forms.Form):
     body = forms.CharField(widget=forms.Textarea(attrs={'rows':30, 'cols':75}))
     tag = forms.CharField(label="tag", max_length=500, help_text="Tag is set for each added entry. Tag can be empty", required=False)
     # fmt: on
+
+    def __init__(self, *args, **kwargs):
+        self.init = UserRequest(args, kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class ExportTopicForm(forms.Form):
@@ -411,7 +395,13 @@ class EntryForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.init = UserRequest(args, kwargs)
-        super(EntryForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
+
+        self.fields["link"].widget.attrs.update(size=self.init.get_cols_size())
+        self.fields["title"].widget.attrs.update(size=self.init.get_cols_size())
+        self.fields["source"].widget.attrs.update(size=self.init.get_cols_size())
+        self.fields["thumbnail"].widget.attrs.update(size=self.init.get_cols_size())
+
         self.fields["link"].required = True
         self.fields["source"].required = False
         self.fields["language"].required = False
@@ -468,6 +458,7 @@ class SourceForm(forms.ModelForm):
             "enabled",
             "title",
             "source_type",
+            "auto_tag",
             "category",
             "subcategory",
             "language",
@@ -482,17 +473,17 @@ class SourceForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.init = UserRequest(args, kwargs)
-        super(SourceForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
+
+        self.fields["url"].widget.attrs.update(size=self.init.get_cols_size())
+        self.fields["favicon"].widget.attrs.update(size=self.init.get_cols_size())
+
         # TODO thing below should be handled by model properties
         self.fields["favicon"].required = False
         self.fields["proxy_location"].required = False
 
         names = SourceControllerBuilder.get_plugin_names()
         self.fields["source_type"].widget = forms.Select(choices=self.to_choices(names))
-
-        self.fields[
-            "proxy_location"
-        ].help_text = "Proxy location for the source. Proxy location will be used instead of normal processing."
 
     def to_choices(self, names):
         names = sorted(names)
@@ -514,6 +505,12 @@ class TagEntryForm(forms.Form):
     user_id = forms.IntegerField(required=False, widget=forms.HiddenInput())
     user = forms.CharField(max_length=1000)
     tag = forms.CharField(max_length=1000)
+
+    def __init__(self, *args, **kwargs):
+        self.init = UserRequest(args, kwargs)
+        super().__init__(*args, **kwargs)
+
+        self.fields["tag"].widget.attrs.update(size=self.init.get_cols_size())
 
 
 class TagRenameForm(forms.Form):

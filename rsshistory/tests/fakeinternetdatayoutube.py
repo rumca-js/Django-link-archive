@@ -1,4 +1,3 @@
-
 youtube_robots_txt = """
 # robots.txt file for YouTube
 # Created in the distant future (the year 2000) after

@@ -56,7 +56,7 @@ class SourceListView(generic.ListView):
 
         self.init_display_type(context)
 
-        self.filter_form = SourcesChoiceForm(self.request.GET)
+        self.filter_form = SourcesChoiceForm(self.request.GET, request=self.request)
         self.filter_form.create()
         self.filter_form.method = "GET"
         self.filter_form.action_url = reverse("{}:sources".format(LinkDatabase.name))
@@ -138,7 +138,7 @@ def add_source(request):
     if request.method == "POST":
         method = "POST"
 
-        form = SourceForm(request.POST)
+        form = SourceForm(request.POST, request=request)
 
         if form.is_valid():
             sources = SourceDataController.objects.filter(url=form.cleaned_data["url"])
@@ -172,7 +172,7 @@ def add_source(request):
             return p.render("summary_present.html")
 
     else:
-        form = SourceForm()
+        form = SourceForm(request=request)
         form.method = "POST"
         form.action_url = reverse("{}:source-add".format(LinkDatabase.name))
 
@@ -220,7 +220,7 @@ def add_source_simple(request):
         warnings = []
         errors = []
 
-        form = SourceForm(initial=data)
+        form = SourceForm(initial=data, request=request)
         form.method = "POST"
         form.action_url = reverse("{}:source-add".format(LinkDatabase.name))
 
@@ -251,7 +251,7 @@ def add_source_simple(request):
         return data
 
     if request.method == "POST":
-        form = SourceInputForm(request.POST)
+        form = SourceInputForm(request.POST, request=request)
         if form.is_valid():
             url = form.cleaned_data["url"]
 
@@ -261,7 +261,7 @@ def add_source_simple(request):
     elif request.method == "GET" and "link" in request.GET:
         return get_add_link_form(p, request.GET["link"])
     else:
-        form = SourceInputForm()
+        form = SourceInputForm(request=request)
         form.method = "POST"
 
         p.context["form"] = form
@@ -286,7 +286,7 @@ def edit_source(request, pk):
     ob = sources[0]
 
     if request.method == "POST":
-        form = SourceForm(request.POST, instance=ob)
+        form = SourceForm(request.POST, instance=ob, request=request)
         p.context["form"] = form
 
         if form.is_valid():
@@ -311,11 +311,11 @@ def edit_source(request, pk):
         if not ob.favicon:
             icon = Url(ob.url).get_favicon()
             if icon:
-                form = SourceForm(instance=ob, initial={"favicon": icon})
+                form = SourceForm(instance=ob, initial={"favicon": icon}, request=request)
             else:
-                form = SourceForm(instance=ob)
+                form = SourceForm(instance=ob, request=request)
         else:
-            form = SourceForm(instance=ob)
+            form = SourceForm(instance=ob, request=request)
 
         form.method = "POST"
         form.action_url = reverse("{}:source-edit".format(LinkDatabase.name), args=[pk])
@@ -506,7 +506,7 @@ def pause(request, pk):
         return p.render("summary_present.html")
 
     ob = sources[0]
-    ob.enabled=False
+    ob.enabled = False
     ob.save()
 
     return HttpResponseRedirect(ob.get_absolute_url())
@@ -527,7 +527,7 @@ def resume(request, pk):
         return p.render("summary_present.html")
 
     ob = sources[0]
-    ob.enabled=True
+    ob.enabled = True
     ob.save()
 
     return HttpResponseRedirect(ob.get_absolute_url())

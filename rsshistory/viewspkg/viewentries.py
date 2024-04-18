@@ -169,7 +169,7 @@ class EntriesSearchListView(generic.ListView):
         return reverse("{}:entries".format(LinkDatabase.name))
 
     def get_form_instance(self):
-        return EntryChoiceForm(self.request.GET)
+        return EntryChoiceForm(self.request.GET, request=self.request)
 
     def get_form(self):
         filter_form = self.get_form_instance()
@@ -328,7 +328,7 @@ class EntriesArchiveListView(EntriesSearchListView):
         return reverse("{}:entries-archived".format(LinkDatabase.name))
 
     def get_form_instance(self):
-        return EntryChoiceForm(self.request.GET)
+        return EntryChoiceForm(self.request.GET, request=self.request)
 
     def get_title(self):
         return " - Archived"
@@ -538,7 +538,7 @@ def add_entry(request):
         method = "POST"
 
         # create a form instance and populate it with data from the request:
-        form = EntryForm(request.POST)
+        form = EntryForm(request.POST, request=request)
 
         # check whether it's valid:
         valid = form.is_valid()
@@ -591,7 +591,7 @@ def add_entry(request):
         if "link" in request.GET:
             initial["link"] = request.GET["link"]
 
-        form = EntryForm(initial=initial)
+        form = EntryForm(initial=initial, request=request)
         form.method = "POST"
         form.action_url = reverse("{}:entry-add".format(LinkDatabase.name))
         p.context["form"] = form
@@ -659,7 +659,7 @@ def add_simple_entry(request):
                 data["description"]
             )
 
-        form = EntryForm(initial=data)
+        form = EntryForm(initial=data, request=request)
         form.method = "POST"
         form.action_url = reverse("{}:entry-add".format(LinkDatabase.name))
         p.context["form"] = form
@@ -782,7 +782,7 @@ def edit_entry(request, pk):
         ob.save()
 
     if request.method == "POST":
-        form = EntryForm(request.POST, instance=ob)
+        form = EntryForm(request.POST, instance=ob, request=request)
         p.context["form"] = form
 
         if form.is_valid():
@@ -807,7 +807,7 @@ def edit_entry(request, pk):
         p.context["summary_text"] = "Could not edit entry {}".format(error_message)
         return p.render("summary_present.html")
     else:
-        form = EntryForm(instance=ob)
+        form = EntryForm(instance=ob, request=request)
         form.method = "POST"
         form.action_url = reverse("{}:entry-edit".format(LinkDatabase.name), args=[pk])
         p.context["form"] = form
@@ -870,7 +870,7 @@ def entries_search_init(request):
     p = ViewPage(request)
     p.set_title("Search entries")
 
-    filter_form = EntryChoiceForm()
+    filter_form = EntryChoiceForm(request=request)
     filter_form.create(SourceDataController.objects.all())
     filter_form.method = "GET"
     filter_form.action_url = reverse("{}:entries".format(LinkDatabase.name))
@@ -946,7 +946,7 @@ def entries_archived_init(request):
     p = ViewPage(request)
     p.set_title("Search archive entries")
 
-    filter_form = EntryChoiceForm()
+    filter_form = EntryChoiceForm(request=request)
     filter_form.create(SourceDataController.objects.all())
     filter_form.method = "GET"
     filter_form.action_url = reverse("{}:entries-archived".format(LinkDatabase.name))
@@ -1161,7 +1161,7 @@ def archive_edit_entry(request, pk):
         ob.save()
 
     if request.method == "POST":
-        form = EntryArchiveForm(request.POST, instance=ob)
+        form = EntryArchiveForm(request.POST, instance=ob, request=request)
         context["form"] = form
 
         if form.is_valid():
@@ -1179,7 +1179,7 @@ def archive_edit_entry(request, pk):
 
         return p.render("summary_present.html")
     else:
-        form = EntryArchiveForm(instance=ob)
+        form = EntryArchiveForm(instance=ob, request=request)
         form.method = "POST"
         form.action_url = reverse(
             "{}:entry-archive-edit".format(LinkDatabase.name), args=[pk]

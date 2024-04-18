@@ -98,12 +98,23 @@ class UserTags(models.Model):
         if objs.count() == 0:
             UserTags.objects.create(entry_object=entry, user_object=user, tag=tag_name)
 
-    def set_tags(data):
+    def set_tags(entry, tags_string, user=None):
         """
         Removes all other tags, sets only tags in data
         """
-        data["tags"] = UserTags.process_tag_string(data["tag"])
+        data = {}
+        data["tags"] = UserTags.process_tag_string(tags_string)
+        data["entry"] = entry
+        data["user"] = user
+
         return UserTags.set_tags_map(data)
+
+    def is_taggable(self, entry):
+        """
+        We do not check page rating, as someone may want to change vote.
+        Users need to be able to bring back links from dark abyss.
+        """
+        return (entry.permanent or entry.bookmarked) and not entry.is_dead()
 
     def set_tags_map(data):
         """

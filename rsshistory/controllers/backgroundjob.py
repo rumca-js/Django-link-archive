@@ -153,7 +153,7 @@ class BackgroundJobController(BackgroundJob):
         """
         It handles only automatic additions.
         """
-        url = Url.get_cleaned_link(url) # TODO maybe urlhandler?
+        url = Url.get_cleaned_link(url)  # TODO maybe urlhandler?
 
         h = DomainAwarePage(url)
         if h.is_analytics():
@@ -211,7 +211,6 @@ class BackgroundJobController(BackgroundJob):
             )
 
     def link_scan(url, source=None):
-
         cfg = {}
 
         if source:

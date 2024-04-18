@@ -1,14 +1,14 @@
 import traceback
 import hashlib
 
-from ..models import AppLogging
+from ..apps import LinkDatabase
+from ..configuration import Configuration
 from ..webtools import HtmlPage, PageOptions, ContentLinkParser, calculate_hash
 from ..dateutils import DateUtils
-from ..controllers import LinkDataBuilder, SourceDataController
-from ..controllers import LinkDataController
-from ..configuration import Configuration
+from ..models import AppLogging, UserTags
 from ..models import BaseLinkDataController
-from ..apps import LinkDatabase
+from ..controllers import LinkDataBuilder, SourceDataController
+from ..controllers import LinkDataController, BackgroundJobController
 from ..pluginurl.urlhandler import UrlHandler, UrlPropertyValidator
 
 
@@ -108,11 +108,13 @@ class SourceGenericPlugin(object):
 
             entry = b.add_from_props()
 
-            LinkDatabase.info(
-                "Generic plugin add:{} DONE".format(link_data["link"])
-            )
+            LinkDatabase.info("Generic plugin add:{} DONE".format(link_data["link"]))
 
             if entry and entry.date_published > start_time:
+                if source.auto_tag:
+                    user = Configuration.get_object().get_superuser()
+                    UserTags.set_tags(entry, source.auto_tag, user)
+
                 self.on_added_entry(entry)
                 num_entries += 1
 
@@ -206,6 +208,14 @@ class SourceGenericPlugin(object):
 
     def get_container_elements(self):
         return []
+
+    def add_link(self, link_str):
+        tag = ""
+        source = self.get_source()
+        if source.auto_tag != None and source.auto_tag != "":
+            tag = source.auto_tag
+
+        BackgroundJobController.link_add(link_str, source=source, tag=tag)
 
     def on_added_entry(self, entry):
         """

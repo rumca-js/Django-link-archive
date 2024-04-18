@@ -37,7 +37,7 @@ class SourceDataController(SourceDataModel):
         sources = SourceDataModel.objects.filter(enabled=True)
 
         for source in sources:
-            from .entries import LinkDataBuilder
+            from .entriesutils import LinkDataBuilder
 
             entries = LinkDataModel.objects.filter(link=source.url)
             if entries.count() == 0:
@@ -463,7 +463,7 @@ class SourceDataBuilder(object):
 
     def add_domains(self):
         if Configuration.get_object().config_entry.auto_store_domain_info:
-            from .entries import LinkDataBuilder
+            from .entriesutils import LinkDataBuilder
 
             p = DomainAwarePage(self.link_data["url"])
             LinkDataBuilder(link=p.get_domain())

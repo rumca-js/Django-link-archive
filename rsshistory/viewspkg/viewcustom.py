@@ -59,7 +59,7 @@ def page_show_properties(request):
 
     if request.method == "GET":
         if "page" not in request.GET:
-            form = LinkInputForm()
+            form = LinkInputForm(request=request)
             form.method = "POST"
             form.action_url = reverse("{}:page-show-props".format(LinkDatabase.name))
             p.context["form"] = form
@@ -71,7 +71,7 @@ def page_show_properties(request):
             return show_page_props_internal(request, page_link)
 
     else:
-        form = LinkInputForm(request.POST)
+        form = LinkInputForm(request.POST, request=request)
         if not form.is_valid():
             p.context["summary_text"] = "Form is invalid"
 
@@ -81,11 +81,11 @@ def page_show_properties(request):
             return show_page_props_internal(request, page_link)
 
 
-def create_scanner_form(links, additional_text=""):
+def create_scanner_form(request, links, additional_text=""):
     data = {}
     data["body"] = additional_text + "\n" + "\n".join(links)
 
-    form = ScannerForm(initial=data)
+    form = ScannerForm(initial=data, request=request)
     form.method = "POST"
     form.action_url = reverse("{}:page-add-many-links".format(LinkDatabase.name))
     return form
@@ -112,7 +112,7 @@ def page_scan_link(request):
         links = list(links)
         links = sorted(links)
 
-        p.context["form"] = create_scanner_form(links)
+        p.context["form"] = create_scanner_form(request, links)
         p.context["form_submit_button_name"] = "Add links"
         return p.render("form_basic.html")
 
@@ -125,7 +125,7 @@ def page_scan_link(request):
     from ..forms import ExportDailyDataForm
 
     if request.method == "POST":
-        form = LinkInputForm(request.POST)
+        form = LinkInputForm(request.POST, request=request)
         if not form.is_valid():
             return p.render("form_basic.html")
 
@@ -135,7 +135,7 @@ def page_scan_link(request):
 
     if request.method == "GET":
         if "link" not in request.GET:
-            form = LinkInputForm()
+            form = LinkInputForm(request=request)
             form.method = "POST"
 
             p.context["form"] = form
@@ -159,7 +159,7 @@ def page_add_many_links(request):
         return data
 
     if request.method == "POST":
-        form = ScannerForm(request.POST)
+        form = ScannerForm(request.POST, request=request)
         if form.is_valid():
             links = form.cleaned_data["body"]
             tag = form.cleaned_data["tag"]
@@ -193,7 +193,7 @@ def page_scan_contents(request):
         return data
 
     if request.method == "POST":
-        form = ScannerForm(request.POST)
+        form = ScannerForm(request.POST, request=request)
         if form.is_valid():
             contents = form.cleaned_data["body"]
             tag = form.cleaned_data["tag"]
@@ -201,7 +201,7 @@ def page_scan_contents(request):
             parser = ContentLinkParser(url="https://", contents=contents)
             links = sorted(list(parser.get_links()))
 
-            form = create_scanner_form(links)
+            form = create_scanner_form(request, links)
             p.context["form"] = form
             p.context["form_submit_button_name"] = "Add links"
             return p.render("form_basic.html")
@@ -210,7 +210,7 @@ def page_scan_contents(request):
         return p.render("form_basic.html")
 
     else:
-        form = ScannerForm()
+        form = ScannerForm(request=request)
 
         form.method = "POST"
         form.action_url = reverse("{}:page-scan-contents".format(LinkDatabase.name))
@@ -309,7 +309,7 @@ def keyword_remove(request):
     from ..forms import KeywordInputForm
 
     if not request.method == "POST":
-        form = KeywordInputForm()
+        form = KeywordInputForm(request=request)
         form.method = "POST"
         form.action_url = reverse("{}:keyword-remove".format(LinkDatabase.name))
         p.context["form"] = form
@@ -317,7 +317,7 @@ def keyword_remove(request):
         return p.render("form_basic.html")
 
     else:
-        form = KeywordInputForm(request.POST)
+        form = KeywordInputForm(request.POST, request=request)
         if not form.is_valid():
             p.context["summary_text"] = "Form is invalid"
 
@@ -342,7 +342,7 @@ def cleanup_link(request):
         return data
 
     if request.method == "POST":
-        form = LinkInputForm(request.POST)
+        form = LinkInputForm(request.POST, request=request)
         if form.is_valid():
             link = form.cleaned_data["link"]
 
@@ -354,7 +354,7 @@ def cleanup_link(request):
 
             return p.render("summary_present.html")
     else:
-        form = LinkInputForm()
+        form = LinkInputForm(request=request)
         form.method = "POST"
 
         p.context["form"] = form
@@ -408,7 +408,7 @@ def test_form_page(request):
 
     summary_text = ""
 
-    form = OmniSearchForm(request.GET)
+    form = OmniSearchForm(request.GET, request=request)
     p.context["form"] = form
 
     return p.render("form_basic.html")

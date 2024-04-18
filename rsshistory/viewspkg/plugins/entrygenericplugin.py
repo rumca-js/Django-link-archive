@@ -85,7 +85,9 @@ class EntryGenericPlugin(object):
                         ConfigurationEntry.ACCESS_TYPE_OWNER,
                         "Unbookmark entry",
                         static(
-                            "{}/icons/icons8-not-bookmark-100.png".format(LinkDatabase.name)
+                            "{}/icons/icons8-not-bookmark-100.png".format(
+                                LinkDatabase.name
+                            )
                         ),
                     )
                 )
@@ -133,7 +135,9 @@ class EntryGenericPlugin(object):
                         ),
                         ConfigurationEntry.ACCESS_TYPE_OWNER,
                         "Tags entry: {}".format(self.entry.title),
-                        static("{}/icons/icons8-edit-100.png".format(LinkDatabase.name)),
+                        static(
+                            "{}/icons/icons8-edit-100.png".format(LinkDatabase.name)
+                        ),
                     ),
                 )
 
@@ -216,7 +220,9 @@ class EntryGenericPlugin(object):
                         ),
                         ConfigurationEntry.ACCESS_TYPE_OWNER,
                         "Saves link in archive.org: {}".format(self.entry.link),
-                        static("{}/icons/archive.org.save.ico".format(LinkDatabase.name)),
+                        static(
+                            "{}/icons/archive.org.save.ico".format(LinkDatabase.name)
+                        ),
                     ),
                 )
 
@@ -232,7 +238,9 @@ class EntryGenericPlugin(object):
                         ),
                         ConfigurationEntry.ACCESS_TYPE_OWNER,
                         "Marks entry as dead:{}".format(self.entry.title),
-                        static("{}/icons/icons8-skull-100.png".format(LinkDatabase.name)),
+                        static(
+                            "{}/icons/icons8-skull-100.png".format(LinkDatabase.name)
+                        ),
                     ),
                 )
             else:
@@ -246,7 +254,9 @@ class EntryGenericPlugin(object):
                         ),
                         ConfigurationEntry.ACCESS_TYPE_OWNER,
                         "Marks entry as not dead:{}".format(self.entry.title),
-                        static("{}/icons/icons8-show-100.png".format(LinkDatabase.name)),
+                        static(
+                            "{}/icons/icons8-show-100.png".format(LinkDatabase.name)
+                        ),
                     ),
                 )
 
@@ -264,7 +274,6 @@ class EntryGenericPlugin(object):
                     static("{}/icons/icons8-trash-100.png".format(LinkDatabase.name)),
                 ),
             )
-
 
         return buttons
 
@@ -323,7 +332,7 @@ class EntryGenericPlugin(object):
                 EntryButton(
                     self.user,
                     "Source",
-                    self.entry.source, # TODO I think this will not wowk
+                    self.entry.source,  # TODO I think this will not wowk
                     ConfigurationEntry.ACCESS_TYPE_ALL,
                     "Source: {}".format(self.entry.source),
                     static(
@@ -459,7 +468,7 @@ class EntryGenericPlugin(object):
         parameters = []
 
         date = DateUtils.get_display_date(self.entry.date_published)
-        parameters.append(EntryParameter("Publish date", date ))
+        parameters.append(EntryParameter("Publish date", date))
 
         return parameters
 
@@ -485,7 +494,7 @@ class EntryGenericPlugin(object):
                 EntryParameter("Manual status", self.entry.manual_status_code)
             )
             date_dead_since = DateUtils.get_display_date(self.entry.date_dead_since)
-            parameters.append(EntryParameter("Dead since", date_dead_since ))
+            parameters.append(EntryParameter("Dead since", date_dead_since))
 
         # Artist & album are displayed in buttons
         # Page rating is displayed in title

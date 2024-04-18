@@ -212,8 +212,8 @@ class EntryFilter(BaseQueryFilter):
 
         q = self.apply_age_limit(q)
 
-        #AppLogging.info("part query: {}".format(q1, q2, q3))
-        #AppLogging.info("query: {}".format(q))
+        # AppLogging.info("part query: {}".format(q1, q2, q3))
+        # AppLogging.info("query: {}".format(q))
 
         return q
 
@@ -223,11 +223,11 @@ class EntryFilter(BaseQueryFilter):
         if self.user:
             if self.user.is_authenticated:
                 uc = UserConfig.get(self.user)
-                this_query = Q(age__lt = uc.get_age()) | Q(age = 0) | Q(age__isnull = True)
+                this_query = Q(age__lt=uc.get_age()) | Q(age=0) | Q(age__isnull=True)
             else:
-                this_query = Q(age = 0) | Q(age__isnull=True)
+                this_query = Q(age=0) | Q(age__isnull=True)
         else:
-            this_query = Q(age = 0) | Q(age__isnull=True)
+            this_query = Q(age=0) | Q(age__isnull=True)
 
         if query == Q() and this_query:
             query = this_query

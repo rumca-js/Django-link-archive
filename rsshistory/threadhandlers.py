@@ -44,6 +44,8 @@ from .controllers import (
     LinkDataBuilder,
     DomainsController,
     LinkCommentDataController,
+    EntriesCleanupAndUpdate,
+    EntryUpdater,
 )
 from .configuration import Configuration
 from .dateutils import DateUtils
@@ -148,7 +150,9 @@ class EntryUpdateData(BaseJobHandler):
             entries = LinkDataController.objects.filter(link=obj.subject)
             if len(entries) > 0:
                 entry = entries[0]
-                entry.update_data()
+
+                u = EntryUpdater(entry)
+                u.update_data()
             else:
                 LinkDatabase.info(
                     "Cannot update data. Missing entry {0}".format(
@@ -175,7 +179,9 @@ class LinkResetDataJobHandler(BaseJobHandler):
             entries = LinkDataController.objects.filter(link=obj.subject)
             if len(entries) > 0:
                 entry = entries[0]
-                entry.reset_data()
+
+                u = EntryUpdater(entry)
+                u.reset_data()
 
             return True
         except Exception as e:
@@ -343,7 +349,7 @@ class LinkAddJobHandler(BaseJobHandler):
         if entry.date_published:
             if entry.date_published >= current_time:
                 if "tag" in data:
-                    entry.tag([data["tag"]], data["user_object"])
+                    UserTags.set_tags(entry, tag=data["tag"], user=data["user_object"])
 
     def get_data_for_add(self, in_object=None):
         link = in_object.subject
@@ -805,8 +811,7 @@ class CleanupJobHandler(BaseJobHandler):
             except Exception as E:
                 LinkDatabase.info("Cleanup, cannot read limit value:{}".format(str(E)))
 
-            limit_s = 60 * 10  # 10 minutes
-            status = LinkDataController.cleanup(limit_s)
+            status = EntriesCleanupAndUpdate().cleanup()
 
             if limit == 0:
                 SourceDataController.cleanup()

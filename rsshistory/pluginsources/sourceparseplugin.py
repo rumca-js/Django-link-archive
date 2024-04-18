@@ -24,10 +24,10 @@ class BaseParsePlugin(SourceGenericPlugin):
     def is_link_valid(self, address):
         source = self.get_source()
 
-        #if not DomainAwarePage(self.get_address()).is_link_in_domain(address):
+        # if not DomainAwarePage(self.get_address()).is_link_in_domain(address):
         #    return False
 
-        #if not address.startswith(source.url):
+        # if not address.startswith(source.url):
         #    return False
 
         p = DomainAwarePage(address)
@@ -63,9 +63,6 @@ class BaseParsePlugin(SourceGenericPlugin):
             self.add_link(link_str)
 
         return []
-
-    def add_link(self, link_str):
-        BackgroundJobController.link_add(link_str, source=self.get_source())
 
     def calculate_plugin_hash(self):
         """

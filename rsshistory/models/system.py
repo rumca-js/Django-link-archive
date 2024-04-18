@@ -1,7 +1,7 @@
 import logging
 from pytz import timezone
 from datetime import datetime, date
-from dateutil.relativedelta import relativedelta 
+from dateutil.relativedelta import relativedelta
 
 from django.db import models
 from django.urls import reverse
@@ -48,11 +48,32 @@ class ConfigurationEntry(models.Model):
     # fmt: on
 
     background_task = models.BooleanField(
-        default=False
+        default=False,
+        help_text="Informs system that background task, like celery is operational.",
     )  # True if celery is defined, and used
+
     ssl_verification = models.BooleanField(
         default=True
     )  # Might work faster if disabled, but might capture invalid pages
+
+    user_agent = models.CharField(
+        default="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/116.0",
+        max_length=500,
+        help_text='You can check your user agent in <a href="https://www.supermonitoring.com/blog/check-browser-http-headers/">https://www.supermonitoring.com/blog/check-browser-http-headers/</a>.',
+    )
+    user_headers = models.CharField(
+        max_length=1000,
+        blank=True,
+        help_text='Provide JSON configuration of headers. You can check your user agent in <a href="https://www.supermonitoring.com/blog/check-browser-http-headers/">https://www.supermonitoring.com/blog/check-browser-http-headers/</a>.',
+    )
+    access_type = models.CharField(
+        max_length=100,
+        null=False,
+        choices=ACCESS_TYPES,
+        default=ACCESS_TYPE_ALL,
+        help_text='There are three access types available. "All" allows anybody view contents. "Logged" allows only logged users to view contents. "Owner" means application is private, and only owner can view it\'s contents.',
+    )
+
     sources_refresh_period = models.IntegerField(default=3600)
 
     auto_store_entries = models.BooleanField(default=True)
@@ -64,39 +85,64 @@ class ConfigurationEntry(models.Model):
     # This setting allows us to use HTML data for HTML pages only
     # Might be slower.
     auto_store_entries_use_clean_page_info = models.BooleanField(default=False)
-    auto_store_sources = models.BooleanField(default=False)
+    auto_store_sources = models.BooleanField(
+        default=False,
+        help_text="Sources can be automatically added, if a new 'domain' information is captured. The state of such state is determined by 'Auto sources enabled' property.",
+    )
     auto_store_sources_enabled = models.BooleanField(default=False)
     auto_store_domain_info = models.BooleanField(default=True)
     auto_store_keyword_info = models.BooleanField(default=True)
     auto_scan_new_entries = models.BooleanField(default=False)
 
-    link_save = models.BooleanField(default=False)
-    source_save = models.BooleanField(default=False)
-    accept_dead = models.BooleanField(default=False) # whether dead entries can be introduced into database
+    link_save = models.BooleanField(
+        default=False, help_text="Links are saved using archive.org."
+    )
+    source_save = models.BooleanField(
+        default=False, help_text="Links are saved using archive.org."
+    )
+    accept_dead = models.BooleanField(
+        default=False
+    )  # whether dead entries can be introduced into database
+    accept_ip_addresses = models.BooleanField(
+        default=False
+    )
 
-    track_user_actions = models.BooleanField(default=True)
+    track_user_actions = models.BooleanField(
+        default=True, help_text="Among tracked elements: what is searched."
+    )
     track_user_searches = models.BooleanField(default=True)
     track_user_navigation = models.BooleanField(default=False)
     vote_min = models.IntegerField(default=-100)
     vote_max = models.IntegerField(default=100)
-    number_of_comments_per_day = models.IntegerField(default=1)
-    user_agent = models.CharField(
-        default="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/116.0",
-        max_length=500,
-    )
-    user_headers = models.CharField(
-        max_length=1000,
-        blank=True,
-    )
-    access_type = models.CharField(
-        max_length=100, null=False, choices=ACCESS_TYPES, default=ACCESS_TYPE_ALL
+    number_of_comments_per_day = models.IntegerField(
+        default=1,
+        help_text="The limit is for each user. Helps in maintaining proper culture",
     )
 
-    days_to_move_to_archive = models.IntegerField(default=100)
-    days_to_remove_links = models.IntegerField(default=0) # from archive
-    days_to_check_stale_entries = models.IntegerField(default=10)
-    days_to_remove_stale_entries = models.IntegerField(default=35)
-    whats_new_days = models.IntegerField(default=7)
+    keep_permament_items = models.BooleanField(
+        default=True, help_text="This affects permament and bookmarked status entries"
+    )
+    days_to_move_to_archive = models.IntegerField(
+        default=50,
+        help_text="Changing number of days after which links are moved to archive may lead to an issue. If the new number of days is smaller, links are not moved from archive back to the link table at hand.",
+    )
+    days_to_remove_links = models.IntegerField(
+        default=100, help_text="Number of days after which links are removed"
+    )
+    days_to_check_std_entries = models.IntegerField(
+        default=35,
+        help_text="Number of days after which normal entries are checked for status",
+    )
+    days_to_check_stale_entries = models.IntegerField(
+        default=10,
+        help_text="Number of days after which dead entries are checked for status",
+    )
+    days_to_remove_stale_entries = models.IntegerField(
+        default=35, help_text="Number of days after which dead entries are removed"
+    )
+    whats_new_days = models.IntegerField(
+        default=7, help_text="What's new page time range in days"
+    )
 
     data_import_path = models.CharField(
         default="../data/imports",
@@ -104,14 +150,21 @@ class ConfigurationEntry(models.Model):
         null=True,
     )
     data_export_path = models.CharField(
-        default="../data//exports",
+        default="../data/exports",
         max_length=2000,
         null=True,
     )
+
+    # background tasks will add everything using this user name
+    admin_user = models.CharField(max_length=500, default="admin", blank=True)
+
+    # display
+
     # TODO selectable from combo?
     entries_order_by = models.CharField(
         default="-date_published",  # TODO support for multiple columns
         max_length=1000,
+        help_text="For Google-like experience set -page_rating. By default it is set to order of publication, -date_published.",
     )
 
     display_style = models.CharField(
@@ -124,13 +177,14 @@ class ConfigurationEntry(models.Model):
     thumbnails_as_icons = models.BooleanField(default=True)
     small_icons = models.BooleanField(default=True)
 
-    links_per_page = models.IntegerField(default=100)
-    sources_per_page = models.IntegerField(default=100)
+    links_per_page = models.IntegerField(
+        default=100, help_text="Number of links per page"
+    )
+    sources_per_page = models.IntegerField(
+        default=100, help_text="Number of sources per page"
+    )
     max_links_per_page = models.IntegerField(default=100)
     max_sources_per_page = models.IntegerField(default=100)
-
-    # background tasks will add everything using this user name
-    admin_user = models.CharField(max_length=500, default="admin", blank=True)
 
     def get():
         """
@@ -169,7 +223,7 @@ class UserConfig(models.Model):
     small_icons = models.BooleanField(default=True)
     links_per_page = models.IntegerField(default=100)
     karma = models.IntegerField(default=0)
-    birth_date = models.DateField(null=True)
+    birth_date = models.DateField(null=True, help_text="Format: 2024-03-28")
     links_per_page = models.IntegerField(default=100)
     sources_per_page = models.IntegerField(default=100)
 
@@ -185,7 +239,7 @@ class UserConfig(models.Model):
         This is used if no request is specified. Use configured by admin setup.
         """
         if user and user.is_authenticated:
-            confs = UserConfig.objects.filter(user_object__id = user.id)
+            confs = UserConfig.objects.filter(user_object__id=user.id)
             if confs.count() != 0:
                 return confs[0]
 

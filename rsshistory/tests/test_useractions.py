@@ -51,12 +51,10 @@ class UserTagsTest(TestCase):
         UserTags.objects.all().delete()
 
         data = {}
-        data["user"] = self.user
         data["tag"] = "tag1, tag2"
-        data["entry"] = self.entry
 
         # call tested function
-        UserTags.set_tags(data)
+        UserTags.set_tags(self.entry, data["tag"], self.user)
 
         tags = UserTags.objects.all()
 

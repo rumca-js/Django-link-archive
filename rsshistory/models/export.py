@@ -66,15 +66,29 @@ class DataExport(models.Model):
     enabled = models.BooleanField(default=True)
     export_type = models.CharField(max_length=1000, choices=EXPORT_TYPE_CHOICES)
     export_data = models.CharField(max_length=1000, choices=EXPORT_DATA_CHOICES)
-    local_path = models.CharField(max_length=1000, blank=True)  # relative?
-    remote_path = models.CharField(max_length=1000, blank=True)
-    user = models.CharField(default="", max_length=2000, blank=True)
-    password = models.CharField(default="", max_length=2000, blank=True)
+    local_path = models.CharField(
+        max_length=1000,
+        blank=True,
+        help_text="Local path is relative to main configuration export path",
+    )
+    remote_path = models.CharField(
+        max_length=1000, blank=True, help_text="Can be empty"
+    )
+    user = models.CharField(
+        default="", max_length=2000, blank=True, help_text="Can be empty"
+    )
+    password = models.CharField(
+        default="", max_length=2000, blank=True, help_text="Can be empty"
+    )
 
     # maybe we should make another table, for each EXPORT
     export_entries = models.BooleanField(default=True)
-    export_entries_bookmarks = models.BooleanField(default=False)
-    export_entries_permanents = models.BooleanField(default=False)
+    export_entries_bookmarks = models.BooleanField(
+        default=False, help_text="Export entries has to be checked for this to work"
+    )
+    export_entries_permanents = models.BooleanField(
+        default=False, help_text="Export entries has to be checked for this to work"
+    )
     export_sources = models.BooleanField(default=False)
 
     def is_daily_data_set():

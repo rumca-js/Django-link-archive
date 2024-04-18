@@ -94,7 +94,9 @@ class BaseJsonPluginTest(FakeInternetTestCase):
         # 3 imported, 1 created here in test
         self.assertEqual(sources.count(), 3 + 1)
 
-        self.assertEqual(sources[0].url, "https://instance.com/apps/rsshistory/sources-json")
+        self.assertEqual(
+            sources[0].url, "https://instance.com/apps/rsshistory/sources-json"
+        )
         self.assertEqual(sources[0].enabled, True)
         self.assertEqual(sources[1].url, "https://www.lemonde.fr/en/rss/une.xml")
         self.assertEqual(sources[1].enabled, False)

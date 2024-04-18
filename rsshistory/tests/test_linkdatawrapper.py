@@ -358,45 +358,6 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         self.assertTrue(not result.is_archive_entry())
         self.assertEqual(result.domain_obj, domain_obj)
 
-    def test_clear_old_entries(self):
-        conf = Configuration.get_object().config_entry
-        conf.days_to_remove_links = 2
-        conf.save()
-
-        current_time = DateUtils.get_datetime_now_utc()
-        date_link_publish = current_time - timedelta(days=conf.days_to_remove_links + 2)
-        date_to_remove = current_time - timedelta(days=conf.days_to_remove_links + 2)
-
-        print("Date link publish")
-        print(date_link_publish)
-        print("Date to remove")
-        print(date_to_remove)
-
-        self.clear()
-        self.create_entries(date_link_publish, date_to_remove)
-
-        # call tested function
-        status = LinkDataWrapper.clear_old_entries()
-
-        self.assertTrue(status)
-
-        bookmarked = LinkDataController.objects.filter(
-            link="https://youtube.com?v=bookmarked"
-        )
-        self.assertEqual(bookmarked.count(), 1)
-
-        permanent = LinkDataController.objects.filter(
-            link="https://youtube.com?v=permanent"
-        )
-        self.assertEqual(permanent.count(), 1)
-
-        nonbookmarked = LinkDataController.objects.filter(
-            link="https://youtube.com?v=nonbookmarked"
-        )
-        self.assertEqual(nonbookmarked.count(), 0)
-
-        self.assertEqual(ArchiveLinkDataController.objects.all().count(), 0)
-
     def test_move_old_links_to_archive(self):
         conf = Configuration.get_object().config_entry
         conf.days_to_move_to_archive = 1

@@ -14,17 +14,28 @@ class SourceDataModel(models.Model):
     category = models.CharField(max_length=1000, blank=True)
     # main subcategory
     subcategory = models.CharField(max_length=1000, blank=True)
-    dead = models.BooleanField(default=False)
+    dead = models.BooleanField(default=False, help_text="Link is rotten indication")
     export_to_cms = models.BooleanField(default=False)
-    remove_after_days = models.IntegerField(default=0)
-    language = models.CharField(max_length=10, blank=True) # inherited into entries
-    age = models.IntegerField(default=0) # inherited into entries
+    remove_after_days = models.IntegerField(
+        default=0, help_text="Remove entries after [x] days"
+    )
+    language = models.CharField(max_length=10, blank=True)  # inherited into entries
+    age = models.IntegerField(default=0)  # inherited into entries
     favicon = models.CharField(max_length=1000, null=True)
     enabled = models.BooleanField(default=True)
-    fetch_period = models.IntegerField(default=900)
+    fetch_period = models.IntegerField(
+        default=900, help_text="Source is checked for new data after [x] seconds"
+    )
     source_type = models.CharField(max_length=1000, null=False, default=SOURCE_TYPE_RSS)
+    auto_tag = models.CharField(
+        max_length=1000, blank=True, help_text="Automatic tag for new entries"
+    )
 
-    proxy_location = models.CharField(max_length=200, blank=True)
+    proxy_location = models.CharField(
+        max_length=200,
+        blank=True,
+        help_text="Proxy location for the source. Proxy location will be used instead of normal processing.",
+    )
 
     """
     advanced_category_mapping?

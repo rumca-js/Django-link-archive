@@ -47,7 +47,7 @@ class HackerNewsParserPlugin(BaseRssPlugin):
 
             for link in links:
                 if link.find("news.ycombinator.com") >= 0:
-                    BackgroundJobController.link_scan(link, source=self.get_source() )
+                    BackgroundJobController.link_scan(link, source=self.get_source())
 
     def get_container_element_contents(self, properties):
         if "description" in properties:

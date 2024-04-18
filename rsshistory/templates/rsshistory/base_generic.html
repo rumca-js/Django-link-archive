@@ -38,6 +38,12 @@
         <link rel="shortcut icon" type="image/png" href="{% static 'rsshistory/icons/favicon.ico' %}"/>
     </head>
     <body class="body-style">
+	<!-- Third party things below -->
+	<!-- This was placed as last things. For search engines with icons this prevents us from accessing menu -->
+	<script src="{% static 'bootstrap/jquery-3.3.1.slim.min.js' %}"></script>
+	<script src="{% static 'bootstrap/popper1.14.7.min.js' %}"></script>
+	<script src="{% static 'bootstrap/bootstrap4.3.1.min.js' %}"></script>
+	<!-- Third party things above -->
 
         <div class="container">
             {% include "rsshistory/base_menu.html" %}
@@ -51,10 +57,5 @@
 	   {% include "rsshistory/base_footer.html" %}
         </div>
 
-	<!-- Third party things below -->
-	<script src="{% static 'bootstrap/jquery-3.3.1.slim.min.js' %}"></script>
-	<script src="{% static 'bootstrap/popper1.14.7.min.js' %}"></script>
-	<script src="{% static 'bootstrap/bootstrap4.3.1.min.js' %}"></script>
-	<!-- Third party things above -->
     </body>
 </html>

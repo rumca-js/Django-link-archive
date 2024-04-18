@@ -1,6 +1,6 @@
 from ..webtools import HtmlPage, RssPage, DomainAwarePage, Url, PageOptions
 from ..dateutils import DateUtils
-from ..controllers import SourceDataController, LinkDataController
+from ..controllers import SourceDataController
 
 from ..apps import LinkDatabase
 from ..models import AppLogging
@@ -76,10 +76,7 @@ class EntryUrlInterface(object):
             props["page_rating"] = 0
             props["dead"] = True
             props["page_rating_contents"] = 0
-            if self.h:
-                props["status_code"] = self.h.get_status_code()
-            else:
-                props["status_code"] = LinkDataController.STATUS_DEAD
+            props["status_code"] = self.h.get_status_code()
 
         return props
 

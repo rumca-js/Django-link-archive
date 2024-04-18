@@ -267,3 +267,77 @@ class LinkDataBuilderTest(FakeInternetTestCase):
 
         objs = LinkDataController.objects.filter(link=link_name)
         self.assertEqual(objs.count(), 0)
+
+    def test_add_from_props__ipv4_rejects(self):
+        config = Configuration.get_object().config_entry
+        config.auto_store_entries = True
+        config.auto_store_domain_info = False
+        config.auto_store_sources = False
+        config.accept_ip_addresses = False
+        config.save()
+
+        MockRequestCounter.mock_page_requests = 0
+
+        link_name = "https://127.0.0.1/v=1234"
+
+        current_time = DateUtils.get_datetime_now_utc()
+        creation_date = current_time - timedelta(days=1)
+
+        link_data = {
+            "link": link_name,
+            "source": "https://youtube.com",
+            "title": "test",
+            "description": "description",
+            "language": "en",
+            "thumbnail": "https://youtube.com/favicon.ico",
+            "date_published": creation_date,
+            "page_rating_contents": 23,
+            "page_rating_votes": 12,
+            "page_rating": 25,
+        }
+
+        b = LinkDataBuilder()
+        b.link_data = link_data
+        # call tested function
+        entry = b.add_from_props()
+
+        objs = LinkDataController.objects.filter(link=link_name)
+
+        self.assertEqual(objs.count(), 0)
+
+    def test_add_from_props__ipv4_accept(self):
+        config = Configuration.get_object().config_entry
+        config.auto_store_entries = True
+        config.auto_store_domain_info = False
+        config.auto_store_sources = False
+        config.accept_ip_addresses = True
+        config.save()
+
+        MockRequestCounter.mock_page_requests = 0
+
+        link_name = "https://127.0.0.1/v=1234"
+
+        current_time = DateUtils.get_datetime_now_utc()
+        creation_date = current_time - timedelta(days=1)
+
+        link_data = {
+            "link": link_name,
+            "source": "https://youtube.com",
+            "title": "test",
+            "description": "description",
+            "language": "en",
+            "thumbnail": "https://youtube.com/favicon.ico",
+            "date_published": creation_date,
+            "page_rating_contents": 23,
+            "page_rating_votes": 12,
+            "page_rating": 25,
+        }
+
+        b = LinkDataBuilder()
+        b.link_data = link_data
+        # call tested function
+        entry = b.add_from_props()
+
+        objs = LinkDataController.objects.filter(link=link_name)
+
+        self.assertEqual(objs.count(), 1)

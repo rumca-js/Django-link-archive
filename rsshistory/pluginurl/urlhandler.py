@@ -246,7 +246,7 @@ class UrlHandler(Url):
         if not super().is_valid():
             return False
 
-        validator = UrlPropertyValidator(properties = self.get_properties())
+        validator = UrlPropertyValidator(properties=self.get_properties())
         if not validator.is_valid():
             return False
 
@@ -309,13 +309,13 @@ class UrlPropertyValidator(object):
             title = ""
 
         critical_keywords = [
-         'masturbat',
-         'porn',
-         'xxx',
-         'sex',
-         'slutt',
-         'nude',
-         'chaturbat',
+            "masturbat",
+            "porn",
+            "xxx",
+            "sex",
+            "slutt",
+            "nude",
+            "chaturbat",
         ]
 
         for keyword in critical_keywords:
@@ -323,10 +323,10 @@ class UrlPropertyValidator(object):
                 return True
 
         keywords = [
-         'live',
-         'nast',
-         'slut',
-         'webcam',
+            "live",
+            "nast",
+            "slut",
+            "webcam",
         ]
 
         points = 0

@@ -34,7 +34,7 @@ class RssParserPlugin(BaseRssPlugin):
         links = self.get_additional_links(entry_props)
 
         for link in links:
-            BackgroundJobController.link_add(link, source = self.get_source())
+            BackgroundJobController.link_add(link, source=self.get_source())
 
     def get_additional_links(self, entry_props):
         links = self.get_description_links(entry_props)
@@ -86,10 +86,10 @@ class RssParserPlugin(BaseRssPlugin):
         links = []
         c = Configuration.get_object().conf_entry
         if c.auto_store_domain_info:
-            links.extend( parser.get_domains())
+            links.extend(parser.get_domains())
 
         if c.auto_store_entries:
-            links.extend( parser.get_links())
+            links.extend(parser.get_links())
         return links
 
     def find_links_in_site(self, url):

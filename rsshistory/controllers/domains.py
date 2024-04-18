@@ -12,7 +12,7 @@ from ..models import (
     DomainCategories,
     DomainSubCategories,
 )
-from .entries import LinkDataController, LinkDataBuilder
+from .entries import LinkDataController
 from ..configuration import Configuration
 from ..webtools import HtmlPage, DomainAwarePage
 from ..apps import LinkDatabase
@@ -240,7 +240,7 @@ class DomainsController(Domains):
         else:
             DomainsController.reset_dynamic_data()
             DomainsController.create_missing_domains()
-            DomainsController.create_missing_entries()
+            #DomainsController.create_missing_entries()
 
     def unconnect_entries():
         entries = LinkDataController.objects.filter(domain_obj__isnull=False)
@@ -281,6 +281,7 @@ class DomainsController(Domains):
                 entry.save()
 
     def create_missing_entries():
+        from .entriesutils import LinkDataBuilder
         domains = DomainsController.objects.all()
         for domain in domains:
             missing_entry = False

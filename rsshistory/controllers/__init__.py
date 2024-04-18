@@ -21,8 +21,13 @@ from .comments import (
 from .entries import (
     LinkDataController,
     ArchiveLinkDataController,
+)
+from .entriesutils import (
+    EntriesCleanupAndUpdate,
+    EntryUpdater,
     LinkDataBuilder,
     LinkDataWrapper,
+    EntriesCleanup,
 )
 
 from .searchengines import SearchEngines

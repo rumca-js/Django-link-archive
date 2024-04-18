@@ -1,6 +1,7 @@
 from ..pluginurl.entryurlinterface import EntryUrlInterface
 from ..pluginurl.handlervideoyoutube import YouTubeVideoHandler
 from ..controllers import SourceDataController
+from ..configuration import Configuration
 from .fakeinternet import FakeInternetTestCase
 
 
@@ -77,13 +78,17 @@ class EntryUrlInterfaceTest(FakeInternetTestCase):
         self.assertTrue(props is None)
 
     def test_youtube_feed(self):
-        url = EntryUrlInterface("https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM")
+        url = EntryUrlInterface(
+            "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM"
+        )
 
         props = url.get_props()
         self.assertTrue(props)
 
     def test_error_html_ignore_errors(self):
-        url = EntryUrlInterface("https://page-with-http-status-500.com", ignore_errors=True)
+        url = EntryUrlInterface(
+            "https://page-with-http-status-500.com", ignore_errors=True
+        )
 
         props = url.get_props()
         self.assertTrue(props)
@@ -121,6 +126,30 @@ class EntryUrlInterfaceTest(FakeInternetTestCase):
 
         self.assertTrue(props)
         self.assertEqual(props["link"], "smb://www.linkedin.com")
+        self.assertEqual(props["status_code"], 0)
+
+    def test_smb_ips_accepted(self):
+        entry = Configuration.get_object().config_entry
+        entry.accept_ip_addresses = True
+        entry.save()
+
+        url = EntryUrlInterface("//127.0.0.1/resource", ignore_errors=True)
+        props = url.get_props()
+
+        self.assertTrue(props)
+        self.assertEqual(props["link"], "//127.0.0.1/resource")
+        self.assertEqual(props["status_code"], 0)
+
+    def test_smb_ips_not_accepted(self):
+        entry = Configuration.get_object().config_entry
+        entry.accept_ip_addresses = False
+        entry.save()
+
+        url = EntryUrlInterface("//127.0.0.1/resource", ignore_errors=True)
+        props = url.get_props()
+
+        self.assertTrue(props)
+        self.assertEqual(props["link"], "//127.0.0.1/resource")
         self.assertEqual(props["status_code"], 0)
 
     """

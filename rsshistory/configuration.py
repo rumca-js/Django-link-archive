@@ -2,6 +2,8 @@ from datetime import datetime
 from pathlib import Path
 import logging
 
+from django.contrib.auth.models import User
+
 from .basictypes import *
 from .models import ConfigurationEntry
 from .apps import LinkDatabase
@@ -16,7 +18,7 @@ version is split into three digits:
  if a change requires the model to be changed, then second digit is updated, patch is set to 0
  if something should be released to public, then release version changes
 """
-__version__ = "0.56.0"
+__version__ = "0.57.0"
 
 
 from pathlib import Path
@@ -144,3 +146,8 @@ class Configuration(object):
         )
 
         return file_name
+
+    def get_superuser(self):
+        users = User.objects.filter(is_superuser=True)
+        if users.count() > 0:
+            return users[0]
