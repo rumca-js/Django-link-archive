@@ -1,39 +1,48 @@
 {% load static %}
 
-<div class="dropdown">
-    <button class="btn btn-primary" type="button" id="#listDrop" data-bs-toggle="dropdown" aria-expanded="false">
-      Actions
-    </button>
-
-    <ul class="dropdown-menu">
-       {% if user.is_staff %}
-       <li>
-       <a href="{% url 'rsshistory:source-add-simple' %}" class="dropdown-item" title="Opens add source wizard">
-           <img src="{% static 'rsshistory/icons/icons8-broadcast-add-100.png' %}" class="content-icon" />
-           Add source</a>
-       </li>
-       <li>
-       <a href="{% url 'rsshistory:sources-enable-all' %}" class="dropdown-item" title="Enable all sources">
-           Enable all</a>
-       </li>
-       <li>
-       <a href="{% url 'rsshistory:sources-disable-all' %}" class="dropdown-item" title="Disable all sources">
-           Disable all</a>
-       </li>
-       {% endif %}
-
-       <!-- TODO this should go to filters -->
-       <li>
-       <a href="{% url 'rsshistory:sources' %}?search=enabled+%3D+True" class="dropdown-item" title="Shows active sources only">
-           Enabled</a>
-       </li>
-       <li>
-       <a href="{% url 'rsshistory:sources' %}?search=enabled+%3D+False" class="dropdown-item" title="Shows disabled sources only">
-           Disabled</a>
-       </li>
-       <li>
-       <a href="{% url 'rsshistory:sources' %}?search=category+%3D%3D+New" class="dropdown-item" title="Shows new sources only">
-           New sources</a>
-       </li>
-    </ul>
+<div class="d-flex">
+   <div class="dropdown">
+       <button class="btn btn-primary" type="button" id="#actionsDrop" data-bs-toggle="dropdown" aria-expanded="false">
+         Actions
+       </button>
+   
+       <ul class="dropdown-menu">
+          {% if user.is_staff %}
+          <li>
+             <a href="{% url 'rsshistory:source-add-simple' %}" class="dropdown-item" title="Opens add source wizard">
+              <img src="{% static 'rsshistory/icons/icons8-broadcast-add-100.png' %}" class="content-icon" />
+              Add source</a>
+          </li>
+          <li>
+             <a href="{% url 'rsshistory:sources-enable-all' %}" class="dropdown-item" title="Enable all sources">
+              Enable all</a>
+          </li>
+          <li>
+             <a href="{% url 'rsshistory:sources-disable-all' %}" class="dropdown-item" title="Disable all sources">
+              Disable all</a>
+          </li>
+          {% endif %}
+       </ul>
+   </div>
+   
+   <div class="dropdown">
+       <button class="btn btn-primary" type="button" id="#filtersDrop" data-bs-toggle="dropdown" aria-expanded="false">
+         Filters
+       </button>
+   
+       <ul class="dropdown-menu">
+          <li>
+             <a href="{% url 'rsshistory:sources' %}?search=enabled+%3D+True" class="dropdown-item" title="Shows active sources only">
+              Enabled</a>
+          </li>
+          <li>
+             <a href="{% url 'rsshistory:sources' %}?search=enabled+%3D+False" class="dropdown-item" title="Shows disabled sources only">
+              Disabled</a>
+          </li>
+          <li>
+             <a href="{% url 'rsshistory:sources' %}?search=category+%3D%3D+New" class="dropdown-item" title="Shows new sources only">
+              New sources</a>
+          </li>
+       </ul>
+   </div>
 </div>

@@ -1826,7 +1826,7 @@ class PageResponseObject(object):
     STATUS_CODE_ERROR = 500
     STATUS_CODE_UNDEF = 0
 
-    def __init__(self, url, text, status_code=STATUS_CODE_OK, encoding="utf-8"):
+    def __init__(self, url, text, status_code=STATUS_CODE_OK, encoding="utf-8", headers=None):
         self.url = url
         self.status_code = status_code
 
@@ -1844,7 +1844,10 @@ class PageResponseObject(object):
 
         self.encoding = encoding
 
-        self.headers = {}
+        if not headers:
+            self.headers = {}
+        else:
+            self.headers = headers
 
 
 class PageOptions(object):
@@ -2060,12 +2063,20 @@ class BasePage(object):
 
         return 100
 
-    def is_content_type_supported(self, request_result):
+    def is_content_type_supported(self, url, request_result):
+        """
+        You can preview on a browser headers. Ctr-shift-i on ff
+        """
         content_type = self.get_content_type(request_result)
         if content_type.find("text") >= 0:
             return True
         if content_type.find("application") >= 0:
             return True
+        if content_type.find("xml") >= 0:
+            return True
+
+        AppLogging.error("Page {} content type is not supported {}".format(url, content_type))
+
         return False
 
     def get_encoding(self, url, request_result):
@@ -2111,8 +2122,6 @@ class BasePage(object):
         """
         print("Requests GET:{}".format(url))
 
-        # traceback.print_stack()
-
         """
         stream argument allows us to read header before we fetch the page.
         SSL verification makes everything to work slower.
@@ -2133,8 +2142,7 @@ class BasePage(object):
             AppLogging.error("Page {} is too long: {} bytes".format(url, content_length))
             return
 
-        if not self.is_content_type_supported(request_result):
-            AppLogging.error("Page {} content type is not supported".format(url))
+        if not self.is_content_type_supported(url, request_result):
             return
 
         # TODO do we want to check also content-type?
@@ -2146,6 +2154,7 @@ class BasePage(object):
             request_result.text,
             request_result.status_code,
             request_result.encoding,
+            headers = request_result.headers,
         )
         return response
 
@@ -2182,6 +2191,8 @@ class BasePage(object):
 
             if self.url != driver.current_url:
                 self.url = driver.current_url
+
+            # TODO use selenium wire to obtain status code & headers?
 
             return PageResponseObject(self.url, html_content, 200)
         except TimeoutException:
@@ -2309,6 +2320,10 @@ class Url(ContentInterface):
         elif url:
             self.url = url
 
+        if not self.is_url_valid():
+            self.p = None
+            return
+
         self.p = self.get_handler(
             url, page_object=page_object, page_options=page_options
         )
@@ -2375,6 +2390,9 @@ class Url(ContentInterface):
 
         if page_type == URL_TYPE_RSS:
             return RssPage(url, "")
+
+    def is_url_valid(self):
+        return True
 
     def is_valid(self):
         if not self.p:

@@ -18,7 +18,7 @@ version is split into three digits:
  if a change requires the model to be changed, then second digit is updated, patch is set to 0
  if something should be released to public, then release version changes
 """
-__version__ = "0.57.0"
+__version__ = "0.58.0"
 
 
 from pathlib import Path
@@ -151,3 +151,15 @@ class Configuration(object):
         users = User.objects.filter(is_superuser=True)
         if users.count() > 0:
             return users[0]
+
+    def get_blocked_urls(self):
+        if self.config_entry.block_urls:
+            return self.config_entry.block_urls.split(",")
+
+        return []
+
+    def get_blocked_keywords(self):
+        if self.config_entry.block_keywords:
+            return self.config_entry.block_keywords.split(",")
+
+        return []

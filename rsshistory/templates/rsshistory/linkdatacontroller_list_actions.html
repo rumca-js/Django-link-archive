@@ -1,18 +1,63 @@
 {% load static %}
 
-{% if user.is_staff %}
-<div class="dropdown">
-    <button class="btn btn-primary" type="button" id="#listDrop" data-bs-toggle="dropdown" aria-expanded="false">
-      Actions
-    </button>
-
-    <ul class="dropdown-menu">
-       <li>
-          <a href="{% url 'rsshistory:entry-add-simple' %}" class="dropdown-item" title="Opens add entry wizard">
-              <img src="{% static 'rsshistory/icons/icons8-add-link-96.png' %}" class="content-icon" />
-              Add entry
-          </a>
-       </li>
-    </ul>
+<div class="d-flex">
+   {% if user.is_staff %}
+   <div class="dropdown">
+       <button class="btn btn-primary" type="button" id="#listDrop" data-bs-toggle="dropdown" aria-expanded="false">
+         Actions
+       </button>
+   
+       <ul class="dropdown-menu">
+          <li>
+             <a href="{% url 'rsshistory:entry-add-simple' %}" class="dropdown-item" title="Opens add entry wizard">
+                 <img src="{% static 'rsshistory/icons/icons8-add-link-96.png' %}" class="content-icon" />
+                 Add entry
+             </a>
+          </li>
+       </ul>
+   </div>
+   {% endif %}
+   
+   <div class="dropdown">
+       <button class="btn btn-primary" type="button" id="#filtersDrop" data-bs-toggle="dropdown" aria-expanded="false">
+         Filters
+       </button>
+   
+       <ul class="dropdown-menu">
+          <li>
+             <a href="{% url 'rsshistory:entries-omni-search' %}?search=bookmarked+%3D+True" class="dropdown-item" title="Shows bookmarked only">
+              Bookmarked</a>
+          </li>
+          <li>
+             <a href="{% url 'rsshistory:entries-omni-search' %}?search=bookmarked+%3D+False" class="dropdown-item" title="Shows non bookmarked only">
+              Not bookmarked</a>
+          </li>
+          <li>
+             <a href="{% url 'rsshistory:entries-omni-search' %}?search=page_rating_votes+%3E+0" class="dropdown-item" title="Shows entries with votes">
+              Voted</a>
+          </li>
+          <li>
+             <a href="{% url 'rsshistory:entries-omni-search' %}?search=page_rating+%3C+0" class="dropdown-item" title="Shows negative rating entries">
+              Negative rating</a>
+          </li>
+          <li>
+             <!--
+                     %7E - ~
+                     %28 - (
+                     %3D - =
+                     %7C - |
+                     %29 - )
+                     %3C - <
+                     %3E - <
+                     ~(status_code = 200 | status_code = 0)
+             -->
+             <a href="{% url 'rsshistory:entries-omni-search' %}?search=%7E%28status_code+%3D+200+%7C+status_code+%3D+0+%29" class="dropdown-item" title="Shows invalid status code entries">
+              Invalid status codes</a>
+          </li>
+          <li>
+             <a href="{% url 'rsshistory:entries-omni-search' %}?search=%7E%28manual_status_code+%3D+200+%29" class="dropdown-item" title="Shows invalid manual status code entries">
+              Invalid manual status codes</a>
+          </li>
+       </ul>
+   </div>
 </div>
-{% endif %}

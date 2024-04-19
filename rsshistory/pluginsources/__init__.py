@@ -9,8 +9,6 @@ from .domainparserplugin import DomainParserPlugin
 from .sourcejsonplugin import BaseSourceJsonPlugin
 
 from .sourceparseditigsplugin import SourceParseDigitsPlugin
-from .nownownowparserplugin import NowNowNowParserPlugin
-from .searchmysiterssplugin import SearchMySiteRSSPlugin
 from .codeprojectplugin import CodeProjectPlugin
 from .tvn24plugin import TVN24Plugin
 from .spotifyplugin import SpotifyPlugin

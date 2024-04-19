@@ -758,6 +758,26 @@ def entry_reset_data(request, pk):
         return HttpResponseRedirect(entry.get_absolute_url())
 
 
+def entry_reset_local_data(request, pk):
+    p = ViewPage(request)
+    p.set_title("Reset local entry data")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    p.context["pk"] = pk
+
+    entries = LinkDataController.objects.filter(id=pk)
+    if not entries.exists():
+        p.context["summary_text"] = "Such entry does not exist: {}".format(pk)
+        return p.render("summary_present.html")
+
+    else:
+        entry = entries[0]
+        BackgroundJobController.entry_reset_local_data(entry)
+        return HttpResponseRedirect(entry.get_absolute_url())
+
+
 def edit_entry(request, pk):
     p = ViewPage(request)
     p.set_title("Edit entry")

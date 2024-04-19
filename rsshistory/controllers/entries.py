@@ -126,6 +126,7 @@ class LinkDataController(LinkDataModel):
         from ..pluginurl.entryurlinterface import EntryUrlInterface
 
         info = EntryUrlInterface(data["link"], log=True, ignore_errors=True).get_props()
+        info["page_rating_votes"] = 0
         return info
 
     def get_clean_data(props):

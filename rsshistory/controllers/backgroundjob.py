@@ -42,6 +42,7 @@ class BackgroundJobController(BackgroundJob):
         (BackgroundJob.JOB_MOVE_TO_ARCHIVE, BackgroundJob.JOB_MOVE_TO_ARCHIVE), # 14
         (BackgroundJob.JOB_LINK_ADD, BackgroundJob.JOB_LINK_ADD,), # 15                         # adds link using default properties, may contain link map properties in the map
         (BackgroundJob.JOB_LINK_UPDATE_DATA, BackgroundJob.JOB_LINK_UPDATE_DATA),           # update data, recalculate
+        (BackgroundJob.JOB_LINK_RESET_LOCAL_DATA, BackgroundJob.JOB_LINK_RESET_LOCAL_DATA),           # update data, recalculate
         (BackgroundJob.JOB_LINK_RESET_DATA, BackgroundJob.JOB_LINK_RESET_DATA,),
         (BackgroundJob.JOB_LINK_SAVE, BackgroundJob.JOB_LINK_SAVE,),                        # link is saved using thirdparty pages (archive.org)
         (BackgroundJob.JOB_LINK_SCAN, BackgroundJob.JOB_LINK_SCAN,),
@@ -346,6 +347,13 @@ class BackgroundJobController(BackgroundJob):
 
         return BackgroundJobController.create_single_job(
             BackgroundJob.JOB_LINK_UPDATE_DATA, entry.link
+        )
+
+    def entry_reset_local_data(entry):
+        """
+        """
+        return BackgroundJobController.create_single_job(
+            BackgroundJob.JOB_LINK_RESET_LOCAL_DATA, entry.link
         )
 
     def entry_reset_data(entry, force=False):

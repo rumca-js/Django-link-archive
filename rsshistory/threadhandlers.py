@@ -189,6 +189,25 @@ class LinkResetDataJobHandler(BaseJobHandler):
             AppLogging.error("Exception: {} {}".format(str(e), error_text))
 
 
+class LinkResetLocalDataJobHandler(BaseJobHandler):
+    def get_job(self):
+        return BackgroundJob.JOB_LINK_RESET_LOCAL_DATA
+
+    def process(self, obj=None):
+        try:
+            entries = LinkDataController.objects.filter(link=obj.subject)
+            if len(entries) > 0:
+                entry = entries[0]
+
+                u = EntryUpdater(entry)
+                u.reset_local_data()
+
+            return True
+        except Exception as e:
+            error_text = traceback.format_exc()
+            AppLogging.error("Exception: {} {}".format(str(e), error_text))
+
+
 class LinkDownloadJobHandler(BaseJobHandler):
     """!
     downloads entry
@@ -1002,6 +1021,7 @@ class HandlerManager(object):
             LinkAddJobHandler(),
             LinkScanJobHandler(),
             LinkResetDataJobHandler(),
+            LinkResetLocalDataJobHandler(),
             LinkDownloadJobHandler(),
             LinkMusicDownloadJobHandler(),
             LinkVideoDownloadJobHandler(),

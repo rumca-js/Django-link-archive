@@ -98,6 +98,9 @@ class UserTags(models.Model):
         if objs.count() == 0:
             UserTags.objects.create(entry_object=entry, user_object=user, tag=tag_name)
 
+            from ..controllers import BackgroundJobController
+            BackgroundJobController.entry_update_data(entry)
+
     def set_tags(entry, tags_string, user=None):
         """
         Removes all other tags, sets only tags in data
@@ -158,6 +161,9 @@ class UserTags(models.Model):
         for tag in tags_set:
             UserTags.objects.create(tag=tag, entry_object=entry, user_object=user)
 
+        from ..controllers import BackgroundJobController
+        BackgroundJobController.entry_update_data(entry)
+
     def cleanup():
         for q in UserTags.objects.filter(user_object__isnull=True):
             users = User.objects.filter(is_superuser=True)
@@ -215,11 +221,7 @@ class UserVotes(models.Model):
             ob.vote = vote
             ob.save()
 
-        # TODO this should be a background task
-        entry.update_calculated_vote()
-
         from ..controllers import BackgroundJobController
-
         BackgroundJobController.entry_update_data(entry)
 
         return ob

@@ -5,6 +5,7 @@ from ..webtools import Url, PageOptions, DomainAwarePage, DomainAwarePage
 
 from ..apps import LinkDatabase
 from ..models import AppLogging
+from ..configuration import Configuration
 
 from .handlervideoyoutube import YouTubeVideoHandler, YouTubeJsonHandler
 from .handlervideoodysee import OdyseeVideoHandler
@@ -246,29 +247,54 @@ class UrlHandler(Url):
         if not super().is_valid():
             return False
 
-        validator = UrlPropertyValidator(properties=self.get_properties())
+        keywords = Configuration.get_object().get_blocked_keywords()
+        validator = UrlPropertyValidator(properties=self.get_properties(), blocked_keywords = keywords)
+        if len(keywords) > 0:
+            validator.blocked_keywords = keywords
+
         if not validator.is_valid():
             return False
 
         return True
 
+    def is_url_valid(self):
+        if not super().is_url_valid():
+            return False
+
+        urls = Configuration.get_object().get_blocked_urls()
+        for url in urls:
+            if self.url.find(url) >= 0:
+                return False
+
+        return True
+
 
 class UrlPropertyValidator(object):
-    def __init__(self, page_object=None, properties=None):
+    def __init__(self, page_object=None, properties=None, blocked_keywords=None):
         self.properties = []
         if page_object:
             self.properties = page_object.get_properties()
         if properties:
             self.properties = properties
 
+        if blocked_keywords and len(blocked_keywords) > 0:
+            self.blocked_keywords = blocked_keywords
+        else:
+            self.blocked_keywords = [
+                "masturbat",
+                "porn",
+                "xxx",
+                "sex",
+                "slutt",
+                "nude",
+                "chaturbat",
+            ]
+
     def is_valid(self):
         if self.is_site_not_found():
             return False
 
-        if self.is_title_porn():
-            return False
-
-        if self.is_site_not_found():
+        if self.is_title_blocked():
             return False
 
         return True
@@ -298,7 +324,7 @@ class UrlPropertyValidator(object):
             LinkDatabase.info("Title is invalid {}".format(title))
             return True
 
-    def is_title_porn(self):
+    def is_title_blocked(self):
         """
         TODO This should be configurable - move to configuration
         """
@@ -308,17 +334,7 @@ class UrlPropertyValidator(object):
         else:
             title = ""
 
-        critical_keywords = [
-            "masturbat",
-            "porn",
-            "xxx",
-            "sex",
-            "slutt",
-            "nude",
-            "chaturbat",
-        ]
-
-        for keyword in critical_keywords:
+        for keyword in self.blocked_keywords:
             if title.find(keyword) >= 0:
                 return True
 

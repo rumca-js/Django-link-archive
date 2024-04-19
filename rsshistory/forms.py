@@ -68,6 +68,12 @@ class UserRequest(object):
         else:
             return "100"
 
+    def get_long_input_size(self):
+        if self.is_mobile:
+            return "30"
+        else:
+            return "100"
+
     def get_submit_attrs(self):
         attr = {"onchange": "this.form.submit()"}
 
@@ -91,6 +97,8 @@ class ConfigForm(forms.ModelForm):
             "source_save",
             "accept_dead",
             "accept_ip_addresses",
+            "block_keywords",
+            "block_urls",
             "auto_scan_new_entries",
             "auto_store_entries",
             "auto_store_entries_use_all_data",
@@ -133,6 +141,9 @@ class ConfigForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         self.fields["user_agent"].widget.attrs.update(size=self.init.get_cols_size())
+        self.fields["block_keywords"].widget.attrs.update(size=self.init.get_cols_size())
+        self.fields["block_urls"].widget.attrs.update(size=self.init.get_cols_size())
+
         if self.init.is_mobile:
             self.fields["user_headers"].widget = forms.Textarea(
                 attrs={"rows": 10, "cols": 20}
@@ -384,9 +395,13 @@ class EntryForm(forms.ModelForm):
             "album",
             "age",
             "thumbnail",
-            "page_rating_contents",
             "manual_status_code",
+
+            # automatic data. readonly
             "status_code",
+            "page_rating",
+            "page_rating_contents",
+            "page_rating_votes",
         ]
         widgets = {
             # DateTimeInput widget does not work my my Android phone
@@ -414,7 +429,11 @@ class EntryForm(forms.ModelForm):
         self.fields["age"].required = False
         self.fields["thumbnail"].required = False
         self.fields["manual_status_code"].required = False
+
         self.fields["status_code"].widget.attrs["readonly"] = True
+        self.fields["page_rating"].widget.attrs["readonly"] = True
+        self.fields["page_rating_votes"].widget.attrs["readonly"] = True
+        self.fields["page_rating_contents"].widget.attrs["readonly"] = True
 
     def get_information(self):
         return self.cleaned_data

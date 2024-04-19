@@ -101,10 +101,12 @@ class ConfigurationEntry(models.Model):
         default=False, help_text="Links are saved using archive.org."
     )
     accept_dead = models.BooleanField(
-        default=False
+        default=False,
+        help_text = "Accept rotten links, no longer active"
     )  # whether dead entries can be introduced into database
     accept_ip_addresses = models.BooleanField(
-        default=False
+        default=False,
+        help_text = "Accept IP addressed links, like //127.0.0.1/my/directory"
     )
 
     track_user_actions = models.BooleanField(
@@ -185,6 +187,15 @@ class ConfigurationEntry(models.Model):
     )
     max_links_per_page = models.IntegerField(default=100)
     max_sources_per_page = models.IntegerField(default=100)
+
+    block_keywords = models.CharField(
+        max_length=1000, blank=True, default="mastubat, porn",
+        help_text="Links with these keywords will be blocked",
+    )
+    block_urls = models.CharField(
+        max_length=1000, blank=True, default="googletagservices, google-analytics",
+        help_text="Links with these urls will be blocked",
+    )
 
     def get():
         """
@@ -463,13 +474,14 @@ class AppLogging(models.Model):
 class BackgroundJob(models.Model):
     JOB_PROCESS_SOURCE = "process-source"
     JOB_LINK_ADD = "link-add"
-    JOB_LINK_UPDATE_DATA = "link-update-data"
     JOB_LINK_SAVE = "link-save"
-    JOB_LINK_SCAN = "link-scan"
+    JOB_LINK_UPDATE_DATA = "link-update-data"
     JOB_LINK_RESET_DATA = "link-reset-data"
+    JOB_LINK_RESET_LOCAL_DATA = "link-reset-local-data"
     JOB_LINK_DOWNLOAD = "link-download"
     JOB_LINK_DOWNLOAD_MUSIC = "download-music"
     JOB_LINK_DOWNLOAD_VIDEO = "download-video"
+    JOB_LINK_SCAN = "link-scan"
     JOB_MOVE_TO_ARCHIVE = "move-to-archive"
     JOB_WRITE_DAILY_DATA = "write-daily-data"
     JOB_WRITE_YEAR_DATA = "write-year-data"
@@ -491,13 +503,14 @@ class BackgroundJob(models.Model):
     JOB_CHOICES = (
         (JOB_PROCESS_SOURCE, JOB_PROCESS_SOURCE,),              # for RSS sources it checks if there are new data
         (JOB_LINK_ADD, JOB_LINK_ADD,),                          # adds link using default properties, may contain link map properties in the map
-        (JOB_LINK_UPDATE_DATA, JOB_LINK_UPDATE_DATA),           # update data, recalculate
         (JOB_LINK_SAVE, JOB_LINK_SAVE,),                        # link is saved using thirdparty pages (archive.org)
-        (JOB_LINK_SCAN, JOB_LINK_SCAN,),
-        (JOB_LINK_RESET_DATA, JOB_LINK_RESET_DATA,),
+        (JOB_LINK_UPDATE_DATA, JOB_LINK_UPDATE_DATA),           # fetches data from the internet, updates what is missing, updates page rating
+        (JOB_LINK_RESET_DATA, JOB_LINK_RESET_DATA,),            # fetches data from the internet, replaces data, updates page rating
+        (JOB_LINK_RESET_LOCAL_DATA, JOB_LINK_RESET_LOCAL_DATA,),# recalculates page rating
         (JOB_LINK_DOWNLOAD, JOB_LINK_DOWNLOAD),                 # link is downloaded using wget
         (JOB_LINK_DOWNLOAD_MUSIC, JOB_LINK_DOWNLOAD_MUSIC),     #
         (JOB_LINK_DOWNLOAD_VIDEO, JOB_LINK_DOWNLOAD_VIDEO),     #
+        (JOB_LINK_SCAN, JOB_LINK_SCAN,),
         (JOB_MOVE_TO_ARCHIVE, JOB_MOVE_TO_ARCHIVE),
         (JOB_WRITE_DAILY_DATA, JOB_WRITE_DAILY_DATA),
         (JOB_WRITE_TOPIC_DATA, JOB_WRITE_TOPIC_DATA),

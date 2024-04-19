@@ -177,6 +177,23 @@ class EntryGenericPlugin(object):
             buttons.append(
                 EntryButton(
                     self.user,
+                    "Reset local data",
+                    reverse(
+                        "{}:entry-reset-local-data".format(LinkDatabase.name),
+                        args=[self.entry.id],
+                    ),
+                    ConfigurationEntry.ACCESS_TYPE_OWNER,
+                    "Resets entry local data",
+                    static(
+                        "{}/icons/icons8-update-100.png".format(LinkDatabase.name)
+                    ),
+                ),
+            )
+
+        if self.user.is_authenticated:
+            buttons.append(
+                EntryButton(
+                    self.user,
                     "Scan link",
                     reverse(
                         "{}:page-scan-link".format(LinkDatabase.name),
@@ -291,25 +308,19 @@ class EntryGenericPlugin(object):
         buttons = []
 
         if self.entry.source_obj:
-            source_entries = LinkDataController.objects.filter(
-                link=self.entry.source_obj.url
+            buttons.append(
+                EntryButton(
+                    self.user,
+                    "Source Entry [S]",
+                    reverse(
+                        "{}:entries-omni-search".format(LinkDatabase.name),
+                    )
+                    + "?search=link+%3D+{}".format(self.entry.source_obj.url),
+                    ConfigurationEntry.ACCESS_TYPE_ALL,
+                    "Source Entry: {}".format(self.entry.source_obj.title),
+                    static("{}/icons/icons8-link-90.png".format(LinkDatabase.name)),
+                ),
             )
-            if source_entries.count() > 0:
-                source_entry = source_entries[0]
-
-                buttons.append(
-                    EntryButton(
-                        self.user,
-                        "Entry",
-                        reverse(
-                            "{}:entry-detail".format(LinkDatabase.name),
-                            args=[source_entry.id],
-                        ),
-                        ConfigurationEntry.ACCESS_TYPE_ALL,
-                        "Source: {}".format(self.entry.source_obj.title),
-                        static("{}/icons/icons8-link-90.png".format(LinkDatabase.name)),
-                    ),
-                )
 
         if self.entry.source_obj:
             buttons.append(
@@ -345,7 +356,7 @@ class EntryGenericPlugin(object):
             buttons.append(
                 EntryButton(
                     self.user,
-                    self.entry.artist,
+                    "Artist: " + self.entry.artist + " [S]",
                     reverse(
                         "{}:entries-omni-search".format(LinkDatabase.name),
                     )
@@ -359,7 +370,7 @@ class EntryGenericPlugin(object):
             buttons.append(
                 EntryButton(
                     self.user,
-                    self.entry.album,
+                    "Album: " + self.entry.album + " [S]",
                     reverse(
                         "{}:entries-omni-search".format(LinkDatabase.name),
                     )
@@ -389,7 +400,7 @@ class EntryGenericPlugin(object):
             buttons.append(
                 EntryButton(
                     self.user,
-                    "Domain",
+                    "Domain [S]",
                     reverse(
                         "{}:entries-omni-search".format(LinkDatabase.name),
                     )

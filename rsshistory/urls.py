@@ -65,6 +65,7 @@ urlpatterns = [
     path("entry-add", viewentries.add_entry, name="entry-add"),
     path("entry-reset-data/<int:pk>/", viewentries.entry_reset_data, name="entry-reset-data"),
     path("entry-update-data/<int:pk>/", viewentries.entry_update_data, name="entry-update-data"),
+    path("entry-reset-local-data/<int:pk>/", viewentries.entry_reset_local_data, name="entry-reset-local-data"),
     path("entry-add-simple", viewentries.add_simple_entry, name="entry-add-simple"),
     path("entry-edit/<int:pk>/", viewentries.edit_entry, name="entry-edit"),
     path("entry-remove/<int:pk>/", viewentries.remove_entry, name="entry-remove"),

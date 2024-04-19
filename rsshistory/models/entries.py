@@ -94,6 +94,7 @@ class BaseLinkDataModel(models.Model):
         album_length = BaseLinkDataModel._meta.get_field("album").max_length
         user_length = BaseLinkDataModel._meta.get_field("user").max_length
         thumbnail_length = BaseLinkDataModel._meta.get_field("thumbnail").max_length
+        language_length = BaseLinkDataModel._meta.get_field("language").max_length
 
         # Trim the input string to fit within max_length
         if self.title and len(self.title) > title_length:
@@ -113,6 +114,10 @@ class BaseLinkDataModel(models.Model):
 
         if self.thumbnail and len(self.thumbnail) > thumbnail_length:
             self.thumbnail = None
+
+        if self.language and len(self.language) > language_length:
+            AppLogging.error("URL:{} Incorrect language:{}".format(self.link, self.language))
+            self.language = None
 
         super().save(*args, **kwargs)
 
@@ -221,6 +226,12 @@ class BaseLinkDataController(BaseLinkDataModel):
         self.page_rating_votes = self.calculate_vote()
         self.page_rating_visits += self.get_visits()
         self.page_rating = self.page_rating_votes + self.page_rating_contents
+
+        # if we have a tag, then boost vote
+        tags = self.tags.all()
+        if tags.count() > 0:
+            self.page_rating += (self.page_rating * 0.2)
+
         self.save()
 
     def get_tag_map(self):

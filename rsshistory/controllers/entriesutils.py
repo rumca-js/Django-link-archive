@@ -273,7 +273,10 @@ class EntryUpdater(object):
         # if "date_published" in props and props["date_published"] is not None:
         #    entry.date_published = props["date_published"]
 
-        entry.save()
+        entry.update_calculated_vote()
+
+    def reset_local_data(self):
+        self.entry.update_calculated_vote()
 
     def handle_invalid_response(self, url_entry_interface):
         entry = self.entry
