@@ -462,13 +462,16 @@ class BaseLinkDataController(BaseLinkDataModel):
         return self.permanent or self.bookmarked
 
     def is_dead(self):
-        if self.manual_status_code == BaseLinkDataController.STATUS_DEAD:
-            return True
-
-        if self.manual_status_code == BaseLinkDataController.STATUS_UNDEFINED:
-            return not self.is_status_code_valid()
+        """
+        We do not have to make elaborate checks for statuses and manual statuses.
+        If there is a dead date -> it is dead. Period.
+        """
+        return self.date_dead_since is not None
 
     def is_valid(self):
+        """
+        TODO should we use self.is_dead?
+        """
         if self.manual_status_code == BaseLinkDataController.STATUS_ACTIVE:
             return True
 

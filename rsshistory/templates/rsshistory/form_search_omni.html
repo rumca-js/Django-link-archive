@@ -2,22 +2,7 @@
 {% load static %}
 {% block content %}
 
-{% if user.is_staff %}
-<div class="dropdown">
-    <button class="btn btn-primary" type="button" id="#listDrop" data-bs-toggle="dropdown" aria-expanded="false">
-      Actions
-    </button>
-
-    <ul class="dropdown-menu">
-       <li>
-          <a href="{% url 'rsshistory:entry-add-simple' %}" class="dropdown-item" title="Opens add entry wizard">
-              <img src="{% static 'rsshistory/icons/icons8-add-link-96.png' %}" class="content-icon" />
-              Add entry
-          </a>
-       </li>
-    </ul>
-</div>
-{% endif %}
+{% include "rsshistory/linkdatacontroller_list_actions.html" %}
 
 <form action="{{form.action_url}}" method="{{form.method}}">
     <table>

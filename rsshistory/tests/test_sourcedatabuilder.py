@@ -7,7 +7,7 @@ from ..controllers import (
 from .fakeinternet import FakeInternetTestCase
 
 
-class SourceControllerTest(FakeInternetTestCase):
+class SourceDataBuilderTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 

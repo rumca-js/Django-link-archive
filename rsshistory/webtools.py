@@ -247,6 +247,35 @@ class DomainAwarePage(object):
                 ready_url = domain + url
         return ready_url
 
+    def up(self):
+        if self.is_domain():
+            return self.up_domain()
+        else:
+            return self.up_not_domain()
+
+    def up_domain(self):
+        """
+        https://github.com
+        """
+        domain = self.url
+        if domain.count(".") == 1:
+            return None
+
+        else:
+            parts = self.parse_url()
+            if len(parts) < 3:
+                return
+
+            sp = parts[2].split(".")
+            url = parts[0] + parts[1] + ".".join(sp[1:])
+            return DomainAwarePage(url)
+
+    def up_not_domain(self):
+        url = self.url
+        wh = self.url.rfind("/")
+        if wh >= 0:
+            return DomainAwarePage(self.url[:wh])
+
     def is_mainstream(self):
         dom = self.get_domain_only()
 

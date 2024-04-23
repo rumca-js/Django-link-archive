@@ -307,11 +307,28 @@ class EntryGenericPlugin(object):
         config = Configuration.get_object().config_entry
         buttons = []
 
+        p = DomainAwarePage(self.entry.link)
+        p_up = p.up()
+
+        if p_up:
+            buttons.append(
+                EntryButton(
+                    self.user,
+                    "[S] Parent entry",
+                    reverse(
+                        "{}:entries-omni-search".format(LinkDatabase.name),
+                    )
+                    + "?search=link+%3D+{}".format(p_up.url),
+                    ConfigurationEntry.ACCESS_TYPE_ALL,
+                    "Parent Entry: {}".format(p_up.url),
+                ),
+            )
+
         if self.entry.source_obj:
             buttons.append(
                 EntryButton(
                     self.user,
-                    "Source Entry [S]",
+                    "[S] Source Entry",
                     reverse(
                         "{}:entries-omni-search".format(LinkDatabase.name),
                     )
@@ -356,7 +373,7 @@ class EntryGenericPlugin(object):
             buttons.append(
                 EntryButton(
                     self.user,
-                    "Artist: " + self.entry.artist + " [S]",
+                    "[S] Artist: " + self.entry.artist,
                     reverse(
                         "{}:entries-omni-search".format(LinkDatabase.name),
                     )
@@ -370,7 +387,7 @@ class EntryGenericPlugin(object):
             buttons.append(
                 EntryButton(
                     self.user,
-                    "Album: " + self.entry.album + " [S]",
+                    "[S] Album: " + self.entry.album,
                     reverse(
                         "{}:entries-omni-search".format(LinkDatabase.name),
                     )
@@ -400,7 +417,7 @@ class EntryGenericPlugin(object):
             buttons.append(
                 EntryButton(
                     self.user,
-                    "Domain [S]",
+                    "[S] Domain",
                     reverse(
                         "{}:entries-omni-search".format(LinkDatabase.name),
                     )
