@@ -100,11 +100,6 @@ class SourceDetailView(generic.DetailView):
         context["page_thumbnail"] = self.object.favicon
         context["search_engines"] = SearchEngines(self.object.title, self.object.url)
 
-        # TODO this might really slow us down, do we need full url handler?
-        # This will trigger download of data
-        handler = UrlHandler(self.object.url)
-        context["page_object"] = handler
-
         entries = LinkDataController.objects.filter(link=self.object.url)
         if entries.count() > 0:
             context["entry_object"] = entries[0]
@@ -121,7 +116,7 @@ class SourceDetailView(generic.DetailView):
 
                 context["entry_object"] = entry
 
-        ViewPage.fill_context_type(context, handler=handler)
+        ViewPage.fill_context_type(context, url=self.object.url)
 
         context["handler"] = SourceControllerBuilder.get(self.object.url)
 

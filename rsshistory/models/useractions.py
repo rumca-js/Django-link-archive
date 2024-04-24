@@ -99,7 +99,7 @@ class UserTags(models.Model):
             UserTags.objects.create(entry_object=entry, user_object=user, tag=tag_name)
 
             from ..controllers import BackgroundJobController
-            BackgroundJobController.entry_update_data(entry)
+            BackgroundJobController.entry_reset_local_data(entry)
 
     def set_tags(entry, tags_string, user=None):
         """
@@ -162,7 +162,7 @@ class UserTags(models.Model):
             UserTags.objects.create(tag=tag, entry_object=entry, user_object=user)
 
         from ..controllers import BackgroundJobController
-        BackgroundJobController.entry_update_data(entry)
+        BackgroundJobController.entry_reset_local_data(entry)
 
     def cleanup():
         for q in UserTags.objects.filter(user_object__isnull=True):
@@ -206,8 +206,6 @@ class UserVotes(models.Model):
         votes = UserVotes.objects.filter(user_object=user, entry_object=entry)
 
         if votes.count() == 0:
-            from ..controllers import BackgroundJobController
-
             votes = UserVotes.objects.filter(user=user, entry_object=entry)
             votes.delete()
 
@@ -222,7 +220,7 @@ class UserVotes(models.Model):
             ob.save()
 
         from ..controllers import BackgroundJobController
-        BackgroundJobController.entry_update_data(entry)
+        BackgroundJobController.entry_reset_local_data(entry)
 
         return ob
 

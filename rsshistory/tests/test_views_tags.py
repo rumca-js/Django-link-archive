@@ -2,7 +2,7 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 
 from ..apps import LinkDatabase
-from ..controllers import SourceDataController, LinkDataController, DomainsController
+from ..controllers import SourceDataController, LinkDataController, DomainsController, BackgroundJobController
 from ..dateutils import DateUtils
 from ..models import KeyWords, DataExport, UserTags
 
@@ -18,6 +18,8 @@ class UserTagsTest(FakeInternetTestCase):
         )
 
     def test_entry_tag(self):
+        BackgroundJobController.objects.all().delete()
+
         self.client.login(username="testuser", password="testpassword")
 
         test_link = "https://linkedin.com"
@@ -57,6 +59,10 @@ class UserTagsTest(FakeInternetTestCase):
 
         entries = UserTags.objects.filter(entry_object=entry)
         self.assertEqual(entries.count(), 3)
+
+        jobs = BackgroundJobController.objects.all()
+        self.assertEqual(jobs.count(), 1)
+        self.assertEqual(jobs[0].job, BackgroundJobController.JOB_LINK_RESET_LOCAL_DATA)
 
     def test_tag_remove(self):
         self.client.login(username="testuser", password="testpassword")

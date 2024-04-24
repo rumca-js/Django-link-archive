@@ -2,7 +2,7 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 
 from ..apps import LinkDatabase
-from ..controllers import SourceDataController, LinkDataController, DomainsController
+from ..controllers import SourceDataController, LinkDataController, DomainsController, BackgroundJobController
 from ..dateutils import DateUtils
 from ..models import KeyWords, DataExport, UserVotes
 
@@ -20,6 +20,8 @@ class UserVotesTests(FakeInternetTestCase):
         self.user.save()
 
     def test_add_vote(self):
+        BackgroundJobController.objects.all().delete()
+
         self.client.login(username="testuser", password="testpassword")
 
         test_link = "https://linkedin.com"
@@ -58,3 +60,7 @@ class UserVotesTests(FakeInternetTestCase):
 
         entries = UserVotes.objects.filter(entry_object=entry)
         self.assertEqual(entries.count(), 1)
+
+        jobs = BackgroundJobController.objects.all()
+        self.assertEqual(jobs.count(), 1)
+        self.assertEqual(jobs[0].job, BackgroundJobController.JOB_LINK_RESET_LOCAL_DATA)
