@@ -204,10 +204,7 @@ Scenario to import links from a other instance:
 
 # User management [under construction]
 
-This was created for the single player experience only, but... there is support for more Users.
-
-What works?
- - nearly everything for single player experience
+Project uses default user auth module.
 
 Roadmap for the end game.
 
@@ -227,6 +224,13 @@ What causes karma change:
  - adding vote for a link
  - upvotes, or downvotes on comments
  - bans of other users you invited
+
+User actions are tracked by the system, only if it is configured so:
+ - users can post comments for entries
+ - users can tag entries
+ - users can vote for entries
+ - system stores limited amount of search queries, the user can select previous queries from combobox
+ - system stores order of visits on entries. This allows to provide "related" section for each entry. For example if you vist entry "X" after "Y", then "X" will appear on "Y" related section
 
 # Development
 
