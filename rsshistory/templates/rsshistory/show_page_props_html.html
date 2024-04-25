@@ -41,10 +41,12 @@
 
     <li>Meta title: {{page_object.get_title_meta}}</li>
     <li>Meta description: {{page_object.get_description_meta}}</li>
-    <li>og title: {{page_object.get_og_title}}</li>
-    <li>og description: {{page_object.get_og_description}}</li>
+    <li>og:title: {{page_object.get_og_title}}</li>
+    <li>og:description: {{page_object.get_og_description}}</li>
+    <li>og:site_name: {{page_object.get_og_site_name}}</li>
+    <li>og:locale: {{page_object.get_og_locale}}</li>
     {%if page_object.get_og_image %}
-    <li>og image: <a href="{{page_object.get_og_image}}"/>Link</a></li>
+    <li>og:image: <a href="{{page_object.get_og_image}}"/>Link</a></li>
     {%endif %}
     <li>keywords: {{page_object.get_tags}}</li>
 
@@ -76,6 +78,14 @@
     <img src="{{og_image}}" style="max-width: 50%"/>
     {%endif%}
 {%endif%}
+
+<h1>Resources</h1>
+
+<ul>
+   <li><a href="https://ogp.me/">Open Graph protocol</a></li>
+   <li><a href="https://validator.schema.org/">Schema.org</a></li>
+   <li><a href="https://validator.w3.org/">W3C validation service</a></li>
+</ul>
 
 <h1>Headers</h1>
 <li>{{page_handler.response.headers}}</li>

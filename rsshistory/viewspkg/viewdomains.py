@@ -60,6 +60,7 @@ class DomainsListView(generic.ListView):
 
         context["filter_form"] = self.filter_form
         context["query_filter"] = self.query_filter
+        context["reset_link"] = self.get_reset_link()
 
         items = set()
         for cat in DomainCategories.objects.all():
@@ -76,6 +77,9 @@ class DomainsListView(generic.ListView):
 
     def get_form(self):
         return DomainsChoiceForm(self.request.GET)
+
+    def get_reset_link(self):
+        return reverse("{}:domains".format(LinkDatabase.name))
 
     def get_form_action_link(self):
         return reverse("{}:domains".format(LinkDatabase.name))

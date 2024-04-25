@@ -308,7 +308,7 @@ class EntryGenericPlugin(object):
         buttons = []
 
         p = DomainAwarePage(self.entry.link)
-        p_up = p.up()
+        p_up = p.up(skip_internal=True)
 
         if p_up:
             buttons.append(

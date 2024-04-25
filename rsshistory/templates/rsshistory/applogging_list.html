@@ -4,13 +4,13 @@
 
 <div class="contentbuttonmenu">
     {% if user.is_staff %}
-    <a href="{% url 'rsshistory:truncate-log' %}" title="Removes infos" class="btn btn-secondary" role="button">
+    <a href="{% url 'rsshistory:truncate-log' %}" title="Removes infos" class="btn btn-primary" role="button">
        <img src="{% static 'rsshistory/icons/icons8-trash-100.png' %}" class="content-icon" />
          infos</a>
-    <a href="{% url 'rsshistory:truncate-log-errors' %}" title="Removes errors" class="btn btn-secondary" role="button">
+    <a href="{% url 'rsshistory:truncate-log-errors' %}" title="Removes errors" class="btn btn-primary" role="button">
        <img src="{% static 'rsshistory/icons/icons8-trash-100.png' %}" class="content-icon" />
          errors</a>
-    <a href="{% url 'rsshistory:truncate-log-all' %}" title="Removes all logs" class="btn btn-secondary" role="button">
+    <a href="{% url 'rsshistory:truncate-log-all' %}" title="Removes all logs" class="btn btn-primary" role="button">
        <img src="{% static 'rsshistory/icons/icons8-trash-multiple-100.png' %}" class="content-icon" />
     </a>
     {% endif %}
@@ -21,7 +21,15 @@
 {% if content_list %}
 <div class="container">
     {% for info in content_list %}
-    <div style="display:flex; flex-wrap: wrap;">
+    <div 
+     {% if info.is_info %}
+	 class="bg-primary"
+     {% elif info.is_warning %}
+	 class="bg-warning"
+     {% elif info.is_error %}
+         class="bg-danger"
+     {% endif %}
+	    style="display:flex; flex-wrap: wrap;">
        <div>Date: {{info.date}}</div>
        <div>Level: {{info.level}}</div>
     </div>

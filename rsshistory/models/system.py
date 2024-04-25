@@ -470,6 +470,18 @@ class AppLogging(models.Model):
         except Exception as e:
             LinkDatabase.info("Could not remove old persistant infos {}".format(e))
 
+    def is_info(self):
+        return self.level == int(logging.INFO)
+
+    def is_warning(self):
+        return self.level == int(logging.WARNING)
+
+    def is_debug(self):
+        return self.level == int(logging.DEBUG)
+
+    def is_error(self):
+        return self.level == int(logging.ERROR)
+
 
 class BackgroundJob(models.Model):
     JOB_PROCESS_SOURCE = "process-source"

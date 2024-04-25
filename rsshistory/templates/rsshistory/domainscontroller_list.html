@@ -2,26 +2,25 @@
 {% load static %}
 {% block content %}
 
-<div class="container-fluid">
-    <a href="{% url 'rsshistory:domains' %}" class="btn btn-secondary" role="button">
-        <img src="{% static 'rsshistory/icons/icons8-start-100.png' %}" class="content-icon" />
-        Reset filters</a>
-    {% if user.is_staff %}
-    <a href="{% url 'rsshistory:domains-category-list' %}" title="Shows categories" class="btn btn-secondary" role="button">View categories</a>
-    <a href="{% url 'rsshistory:domains' %}?search=category+is+null&sort=date_update_last" title="Domains without category" class="btn btn-secondary" role="button">Domains without category</a>
-    {% endif %}
-</div>
+{% if user.is_staff %}
+<div class="dropdown">
+   <button class="btn btn-primary" type="button" id="#filtersDrop" data-bs-toggle="dropdown" aria-expanded="false">
+     Filters
+   </button>
 
-  <form action="{{filter_form.action_url}}" method="{{filter_form.method}}">
-     <table>
-     {{ filter_form }}
-     <tr>
-         <td>
-             <input type="submit" value="Search" class="btn btn-secondary" role="button">
-         </td>
-     </tr>
-     </table>
-  </form>
+   <ul class="dropdown-menu">
+      <li>
+         <a href="{% url 'rsshistory:domains-category-list' %}" title="Shows categories" class="dropdown-item">View categories</a>
+      </li>
+      <li>
+         <a href="{% url 'rsshistory:domains' %}?search=category+is+null&sort=date_update_last" title="Domains without category" class="dropdown-item">Domains without category</a>
+      </li>
+   </ul>
+</div>
+{% endif %}
+
+{% include "rsshistory/filterform_basic_element.html" %}
+
   {% if query_filter.is_error %}
     <p class="error-text">There errors with your query</p>
   {% endif %}
@@ -36,32 +35,16 @@
                class="my-1 p-1 list-group-item list-group-item-action"
                title="{{domain.domain}}"
              >
-             - <span class="link-list-item-title">
-                 {% if domain.dead or domain.get_link_obj.dead %}
-                 [DEAD]
-                 {% endif %}
+             <span class="link-list-item-title">
                  {{domain.domain}}
              </span>
 
              <span class="link-list-item-description">
-                 {% if domain.category %}
-                 [{{domain.category}}]
-                 {% endif %}
-                 {% if domain.subcategory %}
-                 [{{domain.subcategory}}]
-                 {% endif %}
-                 {% if domain.get_link_obj.title %}
-                 {{domain.title  | slice:":100"}}
-                 {% endif %}
-                 | {{domain.get_link_obj.description | slice:":200"}}
              </span>
              </a>
           {% elif type == "clear" %}
           <div>
               -
-             {% if domain.dead or domain.get_link_obj.dead %}
-             [DEAD]
-             {% endif %}
               {{domain.protocol}}://{{domain.domain}}
               {{domain.title}}
           </div>

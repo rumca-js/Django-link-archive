@@ -37,6 +37,7 @@ from .useractions import (
     UserVotes,
     LinkCommentDataModel,
     UserBookmarks,
+    CompactedTags,
 )
 from .userhistory import (
     UserSearchHistory,

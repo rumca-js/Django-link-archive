@@ -370,3 +370,22 @@ class UserBookmarks(models.Model):
 
                 if users.count() > 0:
                     UserBookmarks.add(users[0], entry)
+
+
+class CompactedTags(models.Model):
+    tag = models.CharField(max_length=1000)
+    count = models.IntegerField(default=0)
+
+    def cleanup():
+        CompactedTags.objects.all().delete()
+
+        tags = UserTags.objects.all()
+        for tag in tags:
+            compacts = CompactedTags.objects.filter(tag = tag.tag)
+
+            if compacts.count() == 0:
+                CompactedTags.objects.create(tag=tag.tag, count = 1)
+            else:
+                compacted = compacts[0]
+                compacted.count += 1
+                compacted.save()
