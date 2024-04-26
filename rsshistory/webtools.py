@@ -247,10 +247,13 @@ class DomainAwarePage(object):
                 ready_url = domain + url
         return ready_url
 
-    def up(self):
+    def up(self, skip_internal=False):
         if self.is_domain():
             return self.up_domain()
         else:
+            if skip_internal:
+                domain = self.get_domain()
+                return DomainAwarePage(domain)
             return self.up_not_domain()
 
     def up_domain(self):
@@ -1423,6 +1426,9 @@ class HtmlPage(ContentInterface):
             return field_find["content"]
 
     def get_og_field(self, name):
+        """
+        Open Graph protocol: https://ogp.me/
+        """
         if not self.contents:
             return None
 
@@ -1433,10 +1439,15 @@ class HtmlPage(ContentInterface):
             return None
 
         title = self.get_og_field("title")
+
         if not title:
             title = self.get_title_meta()
-            if not title:
-                title = self.get_title_head()
+
+        if not title:
+            title = self.get_title_head()
+
+        if not title:
+            title = self.get_og_site_name()
 
         if title:
             title = title.strip()
@@ -1533,6 +1544,10 @@ class HtmlPage(ContentInterface):
         if html and html.has_attr("lang"):
             return html["lang"]
 
+        locale = self.get_og_locale()
+        if locale:
+            return locale
+
         return ""
 
     def get_charset(self):
@@ -1610,8 +1625,14 @@ class HtmlPage(ContentInterface):
     def get_og_description(self):
         return self.get_og_field("description")
 
+    def get_og_site_name(self):
+        return self.get_og_field("site_name")
+
     def get_og_image(self):
         return self.get_og_field("image")
+
+    def get_og_locale(self):
+        return self.get_og_field("locale")
 
     def get_rss_url(self, full_check=False):
         urls = self.get_rss_urls()
@@ -1687,6 +1708,8 @@ class HtmlPage(ContentInterface):
         props["meta_description"] = self.get_description_meta()
         props["og_title"] = self.get_og_title()
         props["og_description"] = self.get_og_description()
+        props["og_site_name"] = self.get_og_site_name()
+        props["og_locale"] = self.get_og_locale()
         props["og_image"] = self.get_og_image()
         # props["is_html"] = self.is_html()
         props["charset"] = self.get_charset()
@@ -2049,13 +2072,13 @@ class BasePage(object):
             )
 
         except Exception as e:
-            LinkDatabase.info(str(e))
-
             self.dead = True
             error_text = traceback.format_exc()
 
+            LinkDatabase.info("Page {} error: {}\n{}".format(self.url, str(e), error_text))
+
             AppLogging.error(
-                "Page: Error while reading page:{};Error:{}\n{}".format(
+                "Page {} error:{}\n{}".format(
                     self.url, str(e), error_text
                 )
             )
@@ -2156,36 +2179,41 @@ class BasePage(object):
         SSL verification makes everything to work slower.
         """
 
-        request_result = requests.get(
-            url, headers=headers, timeout=timeout, verify=BasePage.ssl_verify, stream=True
-        )
-        LinkDatabase.info("[H] {}".format(request_result.headers))
+        try:
+           request_result = requests.get(
+               url, headers=headers, timeout=timeout, verify=BasePage.ssl_verify, stream=True
+           )
+           LinkDatabase.info("[H] {}".format(request_result.headers))
 
-        content_length = self.get_content_length(request_result)
+           content_length = self.get_content_length(request_result)
 
-        redirect = self.get_redirect_url(request_result)
-        if redirect:
-            self.url = redirect
+           redirect = self.get_redirect_url(request_result)
+           if redirect:
+               self.url = redirect
 
-        if content_length > PAGE_TOO_BIG_BYTES:
-            AppLogging.error("Page {} is too long: {} bytes".format(url, content_length))
-            return
+           if content_length > PAGE_TOO_BIG_BYTES:
+               AppLogging.error("Page {} is too long: {} bytes".format(url, content_length))
+               return
 
-        if not self.is_content_type_supported(url, request_result):
-            return
+           if not self.is_content_type_supported(url, request_result):
+               return
 
-        # TODO do we want to check also content-type?
+           # TODO do we want to check also content-type?
 
-        self.get_encoding(url, request_result)
+           self.get_encoding(url, request_result)
 
-        response = PageResponseObject(
-            url,
-            request_result.text,
-            request_result.status_code,
-            request_result.encoding,
-            headers = request_result.headers,
-        )
-        return response
+           response = PageResponseObject(
+               url,
+               request_result.text,
+               request_result.status_code,
+               request_result.encoding,
+               headers = request_result.headers,
+           )
+
+           return response
+        except requests.Timeout:
+            LinkDatabase.error("Page timeout {}".format(self.url))
+            return PageResponseObject(self.url, None, 500)
 
     def get_contents_via_selenium_chrome_headless(self, url, headers, timeout):
         """
@@ -2226,9 +2254,9 @@ class BasePage(object):
             return PageResponseObject(self.url, html_content, 200)
         except TimeoutException:
             error_text = traceback.format_exc()
-            AppLogging.error(
-                "Timeout when reading page:{}\nURL:{}\n{}".format(
-                    selenium_timeout, driver.current_url, error_text
+            LinkDatabase.error(
+                "Page timeout:{}\n{}".format(
+                    self.url, error_text
                 )
             )
             return PageResponseObject(self.url, None, 500)
@@ -2269,14 +2297,10 @@ class BasePage(object):
 
             driver.get(url)
 
-            try:
-                # if self.options.link_redirect:
-                WebDriverWait(driver, selenium_timeout).until(
-                    EC.url_changes(driver.current_url)
-                )
-            except TimeoutException:
-                LinkDatabase.error("Exception")
-
+            # if self.options.link_redirect:
+            WebDriverWait(driver, selenium_timeout).until(
+                EC.url_changes(driver.current_url)
+            )
             """
             TODO - if webpage changes link, it should also update it in this object
             """
@@ -2290,9 +2314,9 @@ class BasePage(object):
 
         except TimeoutException:
             error_text = traceback.format_exc()
-            AppLogging.error(
-                "Timeout when reading page:{}\nURL:{}\n{}".format(
-                    selenium_timeout, driver.current_url, error_text
+            LinkDatabase.error(
+                "Page timeout:{}\n{}".format(
+                    self.url, error_text
                 )
             )
             return PageResponseObject(self.url, None, 500)
@@ -2321,7 +2345,7 @@ class BasePage(object):
             driver.get(url)
             time.sleep(5)
         except TimeoutException:
-            AppLogging.error("Timeout when reading page. {}".format(selenium_timeout))
+            LinkDatabase.error("Page timeout: {}".format(self.url))
             return PageResponseObject(url, None, 500)
 
         html_content = driver.page_source

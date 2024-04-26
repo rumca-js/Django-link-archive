@@ -546,18 +546,24 @@ class EntryGenericPlugin(object):
 
         if not self.entry.is_user_appropriate(self.user):
             frame_text = """
-            <div style="color:red">This material is restricted for age {}</div>"""
+            <a href="{}">
+            <div style="color:red">This material is restricted for age {}</div>
+            </a>
+            """
 
-            frame_text = frame_text.format(self.entry.age)
+            frame_text = frame_text.format(self.entry.link, self.entry.age)
 
             return frame_text
         else:
             frame_text = """
+            <a href="{}">
             <div>
                 <img src="{}" class="link-detail-thumbnail"/>
-            </div>"""
+            </div>
+            </a>
+            """
 
-            frame_text = frame_text.format(self.entry.get_thumbnail())
+            frame_text = frame_text.format(self.entry.link, self.entry.get_thumbnail())
             return frame_text
 
     def get_title_html(self):

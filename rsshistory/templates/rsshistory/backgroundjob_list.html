@@ -4,13 +4,13 @@
 
 <div class="container">
     {% if user.is_staff %}
-    <a href="{% url 'rsshistory:backgroundjob-add' %}" title="Add a new job" class="btn btn-secondary" role="button" title="Add background job">
+    <a href="{% url 'rsshistory:backgroundjob-add' %}" title="Add a new job" class="btn btn-primary" role="button" title="Add background job">
        <img src="{% static 'rsshistory/icons/icons8-plus-100.png' %}" class="content-icon" />
     </a>
-    <a href="{% url 'rsshistory:backgroundjobs-check-new' %}" title="Checks if it is time for a new job" class="btn btn-secondary" role="button">
+    <a href="{% url 'rsshistory:backgroundjobs-check-new' %}" title="Checks if it is time for a new job" class="btn btn-primary" role="button">
        <img src="{% static 'rsshistory/icons/icons8-update-100.png' %}" class="content-icon" />
     </a>
-    <a href="{% url 'rsshistory:backgroundjobs-remove-all' %}" title="Removes all background jobs" class="btn btn-secondary" role="button" title="Remove all">
+    <a href="{% url 'rsshistory:backgroundjobs-remove-all' %}" title="Removes all background jobs" class="btn btn-primary" role="button" title="Remove all">
         <img src="{% static 'rsshistory/icons/icons8-trash-multiple-100.png' %}" class="content-icon" />
     </a>
     {% endif %}

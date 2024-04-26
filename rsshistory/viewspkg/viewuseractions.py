@@ -6,14 +6,14 @@ from django.http import HttpResponseForbidden, HttpResponseRedirect
 from datetime import datetime, timedelta
 
 from ..apps import LinkDatabase
-from ..models import UserTags, ConfigurationEntry, UserVotes
+from ..models import CompactedTags, UserTags, ConfigurationEntry, UserVotes
 from ..controllers import LinkDataController, LinkDataWrapper
 from ..forms import TagForm, TagEntryForm, TagRenameForm, ScannerForm
 from ..views import ViewPage
 
 
 class AllTags(generic.ListView):
-    model = UserTags
+    model = CompactedTags
     context_object_name = "content_list"
     paginate_by = 9200
     template_name = str(ViewPage.get_full_template("tags_list.html"))
@@ -26,7 +26,36 @@ class AllTags(generic.ListView):
         return super(AllTags, self).get(*args, **kwargs)
 
     def get_tags_objects(self):
-        return UserTags.objects.all()
+        return CompactedTags.objects.all()
+
+    def get_queryset(self):
+        """
+        TODO: maybe add aggregation SQL, count on tags?
+        """
+        objects = self.get_tags_objects()
+
+        return objects
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context = ViewPage.init_context(self.request, context)
+
+        context["page_title"] += " Tags"
+        context["tags_title"] = "Tags"
+
+        return context
+
+
+class ActualTags(AllTags):
+    model = UserTags
+    context_object_name = "tags_list"
+    paginate_by = 9200
+    template_name = str(ViewPage.get_full_template("tags_list.html"))
+
+    def get_time_range(self):
+        from ..dateutils import DateUtils
+
+        return DateUtils.get_days_range()
 
     def get_queryset(self):
         """
@@ -54,34 +83,12 @@ class AllTags(generic.ListView):
 
         return objects
 
-    def get_context_data(self, **kwargs):
-        context = super(AllTags, self).get_context_data(**kwargs)
-        context = ViewPage.init_context(self.request, context)
-
-        context["page_title"] += " Tags"
-        context["tag_objects"] = self.result_list
-        context["tags_title"] = "Tags"
-
-        return context
-
-
-class RecentTags(AllTags):
-    model = UserTags
-    context_object_name = "tags_list"
-    paginate_by = 9200
-    template_name = str(ViewPage.get_full_template("tags_list.html"))
-
-    def get_time_range(self):
-        from ..dateutils import DateUtils
-
-        return DateUtils.get_days_range()
-
     def get_tags_objects(self):
         return UserTags.objects.filter(date__range=self.get_time_range())
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
-        context = super(RecentTags, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         time_range = self.get_time_range()
         context["tags_title"] = "Recent tags: {} {}".format(
             time_range[0], time_range[1]
@@ -158,6 +165,7 @@ def tag_entry(request, pk):
         p.context["form"] = form
         p.context["form_title"] = entry.title
         p.context["form_description"] = entry.title
+        p.context["form_description_pre"] = entry.link
 
     return p.render("form_basic.html")
 

@@ -208,6 +208,8 @@ class EntryUpdater(object):
             self.handle_invalid_response(url)
             return
 
+        # TODO too much stuff goes in self.add_links_from_url(url)
+
         if entry.date_dead_since:
             entry.date_dead_since = None
 
@@ -231,7 +233,7 @@ class EntryUpdater(object):
             if not entry.date_published:
                 entry.date_published = props["date_published"]
 
-        entry.update_calculated_vote()
+        self.update_calculated_vote()
 
     def reset_data(self):
         """
@@ -255,6 +257,8 @@ class EntryUpdater(object):
             self.handle_invalid_response(url)
             return
 
+        # TODO too much stuff goes in self.add_links_from_url(url)
+
         if entry.date_dead_since:
             entry.date_dead_since = False
 
@@ -273,10 +277,59 @@ class EntryUpdater(object):
         # if "date_published" in props and props["date_published"] is not None:
         #    entry.date_published = props["date_published"]
 
-        entry.update_calculated_vote()
+        self.update_calculated_vote()
+
+    def add_links_from_url(self, url):
+        parser = ContentLinkParser(url.url, url.p.get_contents())
+        contents_links = parser.get_links()
+
+        for link in contents_links:
+            BackgroundJobController.link_add(link)
 
     def reset_local_data(self):
-        self.entry.update_calculated_vote()
+        self.update_calculated_vote()
+
+    def calculate_vote(self):
+        """
+        TODO use median instead of avarage
+        """
+        if not self.entry.is_taggable():
+            return 0
+
+        votes = self.entry.votes.all()
+        count = votes.count()
+        if count == 0:
+            return 0
+
+        sum_num = 0
+        for vote in votes:
+            sum_num += vote.vote
+
+        return sum_num / count
+
+    def get_visits(self):
+        from ..models import UserEntryVisitHistory
+
+        visits = UserEntryVisitHistory.objects.filter(entry_object=self.entry)
+
+        sum_num = 0
+        for visit in visits:
+            sum_num += visit.visits
+
+        return sum_num
+
+    def update_calculated_vote(self):
+        entry = self.entry
+        entry.page_rating_votes = self.calculate_vote()
+        entry.page_rating_visits = self.get_visits()
+        entry.page_rating = entry.page_rating_votes + entry.page_rating_contents
+
+        # if we have a tag, then boost vote
+        tags = entry.tags.all()
+        if tags.count() > 0:
+            entry.page_rating += (entry.page_rating * 0.2)
+
+        entry.save()
 
     def handle_invalid_response(self, url_entry_interface):
         entry = self.entry

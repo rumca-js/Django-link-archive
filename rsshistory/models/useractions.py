@@ -376,6 +376,9 @@ class CompactedTags(models.Model):
     tag = models.CharField(max_length=1000)
     count = models.IntegerField(default=0)
 
+    class Meta:
+        ordering = ["-count"]
+
     def cleanup():
         CompactedTags.objects.all().delete()
 

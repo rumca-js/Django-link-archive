@@ -191,49 +191,6 @@ class BaseLinkDataController(BaseLinkDataModel):
     def get_vote(self):
         return self.page_rating_votes
 
-    def calculate_vote(self):
-        if not self.is_taggable():
-            return 0
-        try:
-            if not getattr(self, "votes"):
-                return 0
-        except Exception as E:
-            return 0
-
-        votes = self.votes.all()
-        count = votes.count()
-        if count == 0:
-            return 0
-
-        sum_num = 0
-        for vote in votes:
-            sum_num += vote.vote
-
-        return sum_num / count
-
-    def get_visits(self):
-        from .userhistory import UserEntryVisitHistory
-
-        visits = UserEntryVisitHistory.objects.filter(entry_object=self)
-
-        sum_num = 0
-        for visit in visits:
-            sum_num += visit.visits
-
-        return sum_num
-
-    def update_calculated_vote(self):
-        self.page_rating_votes = self.calculate_vote()
-        self.page_rating_visits += self.get_visits()
-        self.page_rating = self.page_rating_votes + self.page_rating_contents
-
-        # if we have a tag, then boost vote
-        tags = self.tags.all()
-        if tags.count() > 0:
-            self.page_rating += (self.page_rating * 0.2)
-
-        self.save()
-
     def get_tag_map(self):
         # TODO should it be done by for tag in self.tags: tag.get_map()?
         result = []
@@ -413,31 +370,32 @@ class BaseLinkDataController(BaseLinkDataModel):
             votes.delete()
 
     def make_manual_dead(self):
-        if self.manual_status_code == BaseLinkDataController.STATUS_DEAD:
-            return
+        """
+        Should we remove all tags & comments?
+        """
 
-        self.date_dead_since = DateUtils.get_datetime_now_utc()
-        self.page_rating_contents = 0
         self.manual_status_code = BaseLinkDataController.STATUS_DEAD
 
-        # remove all tags & comments?
+        if not self.is_valid() and self.date_dead_since is None:
+            self.date_dead_since = DateUtils.get_datetime_now_utc()
+
         self.save()
 
     def make_manual_active(self):
-        if self.manual_status_code == BaseLinkDataController.STATUS_ACTIVE:
-            return
-
-        self.date_dead_since = None
         self.manual_status_code = BaseLinkDataController.STATUS_ACTIVE
+
+        if self.date_dead_since:
+            self.date_dead_since = None
 
         self.save()
 
     def clear_manual_status(self):
-        if self.manual_status_code == BaseLinkDataController.STATUS_UNDEFINED:
-            return
-
         self.manual_status_code = BaseLinkDataController.STATUS_UNDEFINED
-        self.date_dead_since = None
+
+        if self.is_valid():
+            self.date_dead_since = None
+        if not self.is_valid() and self.date_dead_since is None:
+            self.date_dead_since = DateUtils.get_datetime_now_utc()
 
         self.save()
 
@@ -481,8 +439,8 @@ class BaseLinkDataController(BaseLinkDataModel):
          - if it is dead (manual indication)
          - if it was downvoted to oblivion
         """
-        if self.manual_status_code == BasePage.STATUS_UNDEFINED:
-            return not self.is_status_code_valid() and self.page_rating > 0
+        if self.manual_status_code == BaseLinkDataController.STATUS_UNDEFINED:
+            return self.is_status_code_valid() and self.page_rating >= 0
 
     def is_status_code_valid(self):
         if self.status_code == 403:

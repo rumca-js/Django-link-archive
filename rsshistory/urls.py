@@ -92,7 +92,7 @@ urlpatterns = [
     path("tags-entry-show/<int:entrypk>/", viewuseractions.tags_entry_show, name="tags-entry-show",),
     path("tag-rename", viewuseractions.tag_rename, name="tag-rename"),
     path("tags-show-all", viewuseractions.AllTags.as_view(), name="tags-show-all"),
-    path("tags-show-recent", viewuseractions.RecentTags.as_view(), name="tags-show-recent"),
+    path("tags-show-actual", viewuseractions.ActualTags.as_view(), name="tags-show-actual"),
     path("tags-many", viewuseractions.tag_many, name="tag-many"),
     # comment
     path("entry-comment-add/<int:link_id>", viewcomments.entry_add_comment, name="entry-comment-add",),

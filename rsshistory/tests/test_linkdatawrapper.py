@@ -443,7 +443,8 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         archived = ArchiveLinkDataController.objects.all()
         domains = DomainsController.objects.all()
 
-        self.assertEqual(archived.count(), 1)
+        # move old links to archive only moves, does not remove any links
+        self.assertEqual(archived.count(), 2)
         self.assertEqual(domains.count(), 1)
 
         self.assertEqual(archived[0].domain_obj, domains[0])

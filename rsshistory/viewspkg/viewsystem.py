@@ -232,9 +232,11 @@ def backgroundjob_prio_up(request, pk):
     if data is not None:
         return data
 
-    job = BackgroundJob.objects.get(id=pk)
-    job.priority -= 1
-    job.save()
+    jobs = BackgroundJob.objects.filter(id=pk)
+    if jobs.count() > 0:
+        job = jobs[0]
+        job.priority -= 1
+        job.save()
 
     return HttpResponseRedirect(reverse("{}:backgroundjobs".format(LinkDatabase.name)))
 
@@ -246,9 +248,11 @@ def backgroundjob_prio_down(request, pk):
     if data is not None:
         return data
 
-    job = BackgroundJob.objects.get(id=pk)
-    job.priority += 1
-    job.save()
+    jobs = BackgroundJob.objects.filter(id=pk)
+    if jobs.count() > 0:
+        job = jobs[0]
+        job.priority += 1
+        job.save()
 
     return HttpResponseRedirect(reverse("{}:backgroundjobs".format(LinkDatabase.name)))
 
@@ -260,8 +264,9 @@ def backgroundjob_enable(request, pk):
     if data is not None:
         return data
 
-    job = BackgroundJobController.objects.get(id=pk)
-    job.enable()
+    jobs = BackgroundJob.objects.filter(id=pk)
+    if jobs.count() > 0:
+        jobs[0].enable()
 
     return HttpResponseRedirect(reverse("{}:backgroundjobs".format(LinkDatabase.name)))
 
@@ -273,8 +278,9 @@ def backgroundjob_disable(request, pk):
     if data is not None:
         return data
 
-    job = BackgroundJobController.objects.get(id=pk)
-    job.disable()
+    jobs = BackgroundJob.objects.filter(id=pk)
+    if jobs.count() > 0:
+        jobs[0].disable()
 
     return HttpResponseRedirect(reverse("{}:backgroundjobs".format(LinkDatabase.name)))
 
@@ -286,8 +292,9 @@ def backgroundjob_remove(request, pk):
     if data is not None:
         return data
 
-    bg = BackgroundJob.objects.get(id=pk)
-    bg.delete()
+    jobs = BackgroundJob.objects.filter(id=pk)
+    if jobs.count() > 0:
+        jobs.delete()
 
     return HttpResponseRedirect(reverse("{}:backgroundjobs".format(LinkDatabase.name)))
 

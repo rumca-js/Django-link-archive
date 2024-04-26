@@ -180,7 +180,7 @@ class UserTagsTest(FakeInternetTestCase):
 
         self.assertEqual(response.status_code, 200)
 
-    def test_tag_show_recent(self):
+    def test_tag_show_actual(self):
         entry = LinkDataController.objects.create(
             source="https://linkedin.com",
             link="https://linkedin.com/test",
@@ -196,7 +196,7 @@ class UserTagsTest(FakeInternetTestCase):
             tag="personal", user_object=self.user, entry_object=entry
         )
 
-        url = reverse("{}:tags-show-recent".format(LinkDatabase.name))
+        url = reverse("{}:tags-show-actual".format(LinkDatabase.name))
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
