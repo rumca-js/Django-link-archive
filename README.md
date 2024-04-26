@@ -105,25 +105,21 @@ With such approach we can extend page rating and range is still in range 0..100,
 
 ## Content ranking
 
-Each page is automatically ranked by it's contents. There are several factors that are included into the ranking:
- - meta title
- - meta description
- - og:title
- - og:description
- - og:image
- - presence of RSS feed link
- - presence of meta date published property
+To have a good page rating, it is desireable to follow good standards:
+ - [Open Graph Protocol](https://ogp.me/)
+ - [Schema Validator](https://validator.schema.org/)
+ - [W3C Validator](https://validator.w3.org/)
+ - Provide valid title, which is concise, but not too short
+ - Provide valid description, which is concise, but not too short
+ - Provide valid publication date
+ - Provide valid thumbnail
+ - Your page returns valid HTML status code
+ - Provide RSS feed
+ - Provide search engine keywords tags
 
-Title point breakdown:
- - good title earns the most amount of points
- - if title is longer than 1000 characters earns "some" points
- - if title is one word small amount of points
- - if title has less than 4 chars small amount of points
+The equation for content ranking might change in time, so these rules are pretty vague. It is just better to write good pages.
 
-Status code breakdown:
- - code 200 is good
- - code between 200 and 300 earns is not that good
- - other code values are 'bad'
+You may wonder, why am I writing about search engine keywords, if Google does not need them. Well I don't like Google. I would like for other search engines to appear. Such keywords would provide search engine bots to have some idea what the page is about.
 
 ## Votes ranking
 
