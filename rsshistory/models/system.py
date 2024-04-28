@@ -77,22 +77,31 @@ class ConfigurationEntry(models.Model):
     sources_refresh_period = models.IntegerField(default=3600)
 
     auto_store_entries = models.BooleanField(default=True)
-    # when reading RSS we may not have all data (thumbnails?).
-    # We will try other means to download data.
-    # Might be slower.
-    auto_store_entries_use_all_data = models.BooleanField(default=False)
-    # when reading we might use RSS description.
-    # This setting allows us to use HTML data for HTML pages only
-    # Might be slower.
-    auto_store_entries_use_clean_page_info = models.BooleanField(default=False)
+
+    auto_store_entries_use_all_data = models.BooleanField(
+        default=False,
+        help_text="Might slow down adding new entries, as it might fetch more data",
+    )
+    auto_store_entries_use_clean_page_info = models.BooleanField(
+        default=False,
+        help_text="Might slow down adding new entries, as it might fetch more data",
+    )
     auto_store_sources = models.BooleanField(
         default=False,
         help_text="Sources can be automatically added, if a new 'domain' information is captured. The state of such state is determined by 'Auto sources enabled' property.",
     )
     auto_store_sources_enabled = models.BooleanField(default=False)
-    auto_store_domain_info = models.BooleanField(default=True)
-    auto_store_keyword_info = models.BooleanField(default=True)
-    auto_scan_new_entries = models.BooleanField(default=False)
+    auto_store_domain_info = models.BooleanField(
+        default=True, help_text="Allows domains to be stored automatically"
+    )
+    auto_store_keyword_info = models.BooleanField(
+        default=True, help_text="Allows keywords to be stored automatically"
+    )
+
+    auto_scan_new_entries = models.BooleanField(
+        default=False,
+        help_text="Scans for new links, when link is added. From decription, from contents",
+    )
 
     link_save = models.BooleanField(
         default=False, help_text="Links are saved using archive.org."
@@ -101,12 +110,11 @@ class ConfigurationEntry(models.Model):
         default=False, help_text="Links are saved using archive.org."
     )
     accept_dead = models.BooleanField(
-        default=False,
-        help_text = "Accept rotten links, no longer active"
+        default=False, help_text="Accept rotten links, no longer active"
     )  # whether dead entries can be introduced into database
     accept_ip_addresses = models.BooleanField(
         default=False,
-        help_text = "Accept IP addressed links, like //127.0.0.1/my/directory"
+        help_text="Accept IP addressed links, like //127.0.0.1/my/directory",
     )
 
     track_user_actions = models.BooleanField(
@@ -121,6 +129,9 @@ class ConfigurationEntry(models.Model):
         help_text="The limit is for each user. Helps in maintaining proper culture",
     )
 
+    prefer_https = models.BooleanField(
+        default=False, help_text="When adding check if https link exists"
+    )
     keep_permament_items = models.BooleanField(
         default=True, help_text="This affects permament and bookmarked status entries"
     )
@@ -189,11 +200,15 @@ class ConfigurationEntry(models.Model):
     max_sources_per_page = models.IntegerField(default=100)
 
     block_keywords = models.CharField(
-        max_length=1000, blank=True, default="mastubat, porn",
+        max_length=1000,
+        blank=True,
+        default="mastubat, porn",
         help_text="Links with these keywords will be blocked",
     )
     block_urls = models.CharField(
-        max_length=1000, blank=True, default="googletagservices, google-analytics",
+        max_length=1000,
+        blank=True,
+        default="googletagservices, google-analytics",
         help_text="Links with these urls will be blocked",
     )
 

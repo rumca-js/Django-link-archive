@@ -2,7 +2,12 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 
 from ..apps import LinkDatabase
-from ..controllers import SourceDataController, LinkDataController, DomainsController, BackgroundJobController
+from ..controllers import (
+    SourceDataController,
+    LinkDataController,
+    DomainsController,
+    BackgroundJobController,
+)
 from ..dateutils import DateUtils
 from ..models import KeyWords, DataExport, UserTags
 

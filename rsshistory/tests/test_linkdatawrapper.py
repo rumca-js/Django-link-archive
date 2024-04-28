@@ -407,45 +407,111 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         self.assertEqual(archived[1].domain_obj, domains[0])
         self.assertEqual(archived[1].date_published, date_link_publish)
 
-    def test_move_old_links_to_archive(self):
+    def test_get_operational_db(self):
         conf = Configuration.get_object().config_entry
         conf.days_to_move_to_archive = 2
         conf.days_to_remove_links = 2
+        conf.days_to_remove_links = 2
+        conf.prefer_https = True
         conf.save()
 
-        current_time = DateUtils.get_datetime_now_utc()
-        date_link_publish = current_time - timedelta(
-            days=conf.days_to_move_to_archive + 1
+        ob = LinkDataController.objects.create(
+            source="https://youtube.com",
+            link="https://youtube.com?v=1",
+            title="The https link",
+            bookmarked=False,
+            language="en",
         )
-        date_to_remove = current_time - timedelta(days=conf.days_to_remove_links + 1)
 
-        self.clear()
-        self.create_entries(date_link_publish, date_to_remove)
+        ob = LinkDataController.objects.create(
+            source="http://youtube.com",
+            link="http://youtube.com?v=1",
+            title="The http link",
+            bookmarked=False,
+            language="en",
+        )
+
+        ob = ArchiveLinkDataController.objects.create(
+            source="https://archive.com",
+            link="https://archive.com?v=1",
+            title="The archive https link",
+            bookmarked=False,
+            language="en",
+        )
+
+        ob = ArchiveLinkDataController.objects.create(
+            source="http://archive.com",
+            link="http://archive.com?v=1",
+            title="The archive http link",
+            bookmarked=False,
+            language="en",
+        )
 
         # call tested function
-        LinkDataWrapper.move_old_links_to_archive()
+        w = LinkDataWrapper("https://youtube.com?v=1")
+        entry = w.get_from_operational_db()
+        self.assertTrue(entry)
+        self.assertEqual(entry.link, "https://youtube.com?v=1")
 
-        bookmarked = LinkDataController.objects.filter(
-            link="https://youtube.com?v=bookmarked"
+        # call tested function
+        w = LinkDataWrapper("http://youtube.com?v=1")
+        entry = w.get_from_operational_db()
+        self.assertTrue(entry)
+        self.assertEqual(entry.link, "https://youtube.com?v=1")
+
+        # call tested function
+        w = LinkDataWrapper("https://archive.com?v=1")
+        entry = w.get_from_operational_db()
+        self.assertTrue(not entry)
+
+    def test_get_archive(self):
+        conf = Configuration.get_object().config_entry
+        conf.days_to_move_to_archive = 2
+        conf.days_to_remove_links = 2
+        conf.days_to_remove_links = 2
+        conf.prefer_https = True
+        conf.save()
+
+        ob = LinkDataController.objects.create(
+            source="https://youtube.com",
+            link="https://youtube.com?v=1",
+            title="The https link",
+            bookmarked=False,
+            language="en",
         )
-        self.assertEqual(bookmarked.count(), 1)
 
-        permanent = LinkDataController.objects.filter(
-            link="https://youtube.com?v=permanent"
+        ob = LinkDataController.objects.create(
+            source="http://youtube.com",
+            link="http://youtube.com?v=1",
+            title="The http link",
+            bookmarked=False,
+            language="en",
         )
-        self.assertEqual(permanent.count(), 1)
 
-        nonbookmarked = LinkDataController.objects.filter(
-            link="https://youtube.com?v=nonbookmarked"
+        ob = ArchiveLinkDataController.objects.create(
+            source="https://archive.com",
+            link="https://archive.com?v=1",
+            title="The archive https link",
+            bookmarked=False,
+            language="en",
         )
-        self.assertEqual(nonbookmarked.count(), 0)
 
-        archived = ArchiveLinkDataController.objects.all()
-        domains = DomainsController.objects.all()
+        ob = ArchiveLinkDataController.objects.create(
+            source="http://archive.com",
+            link="http://archive.com?v=1",
+            title="The archive http link",
+            bookmarked=False,
+            language="en",
+        )
 
-        # move old links to archive only moves, does not remove any links
-        self.assertEqual(archived.count(), 2)
-        self.assertEqual(domains.count(), 1)
+        # call tested function
+        w = LinkDataWrapper("https://archive.com?v=1")
+        entry = w.get_from_archive()
+        self.assertTrue(entry)
+        self.assertEqual(entry.link, "https://archive.com?v=1")
 
-        self.assertEqual(archived[0].domain_obj, domains[0])
-        self.assertEqual(archived[0].date_published, date_to_remove)
+        # call tested function
+        w = LinkDataWrapper("http://archive.com?v=1")
+        entry = w.get_from_archive()
+        self.assertTrue(entry)
+        self.assertEqual(entry.link, "https://archive.com?v=1")

@@ -99,6 +99,7 @@ class UserTags(models.Model):
             UserTags.objects.create(entry_object=entry, user_object=user, tag=tag_name)
 
             from ..controllers import BackgroundJobController
+
             BackgroundJobController.entry_reset_local_data(entry)
 
     def set_tags(entry, tags_string, user=None):
@@ -162,6 +163,7 @@ class UserTags(models.Model):
             UserTags.objects.create(tag=tag, entry_object=entry, user_object=user)
 
         from ..controllers import BackgroundJobController
+
         BackgroundJobController.entry_reset_local_data(entry)
 
     def cleanup():
@@ -220,6 +222,7 @@ class UserVotes(models.Model):
             ob.save()
 
         from ..controllers import BackgroundJobController
+
         BackgroundJobController.entry_reset_local_data(entry)
 
         return ob
@@ -384,10 +387,10 @@ class CompactedTags(models.Model):
 
         tags = UserTags.objects.all()
         for tag in tags:
-            compacts = CompactedTags.objects.filter(tag = tag.tag)
+            compacts = CompactedTags.objects.filter(tag=tag.tag)
 
             if compacts.count() == 0:
-                CompactedTags.objects.create(tag=tag.tag, count = 1)
+                CompactedTags.objects.create(tag=tag.tag, count=1)
             else:
                 compacted = compacts[0]
                 compacted.count += 1

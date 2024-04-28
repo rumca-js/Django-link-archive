@@ -98,16 +98,16 @@ class BaseLinkDataModel(models.Model):
 
         # Trim the input string to fit within max_length
         if self.title and len(self.title) > title_length:
-            self.title = self.title[:title_length-1]
+            self.title = self.title[: title_length - 1]
 
         if self.description and len(self.description) > description_length:
-            self.description = self.description[:description_length-1]
+            self.description = self.description[: description_length - 1]
 
         if self.album and len(self.album) > album_length:
-            self.album = self.description[:album_length-1]
+            self.album = self.description[: album_length - 1]
 
         if self.artist and len(self.artist) > artist_length:
-            self.artist = self.description[:artist_length-1]
+            self.artist = self.description[: artist_length - 1]
 
         if self.user and len(self.user) > user_length:
             self.user = None
@@ -116,7 +116,9 @@ class BaseLinkDataModel(models.Model):
             self.thumbnail = None
 
         if self.language and len(self.language) > language_length:
-            AppLogging.error("URL:{} Incorrect language:{}".format(self.link, self.language))
+            AppLogging.error(
+                "URL:{} Incorrect language:{}".format(self.link, self.language)
+            )
             self.language = None
 
         super().save(*args, **kwargs)
@@ -536,6 +538,17 @@ class LinkDataModel(BaseLinkDataController):
         blank=True,
     )
 
+    def cleanup_http_duplicate(self):
+        """
+        If this is http entry, and we have https entry -> remove this
+        """
+        url = self.link
+        if url.startswith("http:"):
+            new_url = url.replace("http://", "https://")
+            entries = LinkDataModel.objects.filter(link=new_url)
+            if entries.count() > 0:
+                self.delete()
+
 
 class ArchiveLinkDataModel(BaseLinkDataController):
     source_obj = models.ForeignKey(
@@ -554,3 +567,14 @@ class ArchiveLinkDataModel(BaseLinkDataController):
 
     def is_archive_entry(self):
         return True
+
+    def cleanup_http_duplicate(self):
+        """
+        If this is http entry, and we have https entry -> remove this
+        """
+        url = self.link
+        if url.startswith("http:"):
+            new_url = url.replace("http://", "https://")
+            entries = ArchiveLinkDataModel.objects.filter(link=new_url)
+            if entries.count() > 0:
+                self.delete()

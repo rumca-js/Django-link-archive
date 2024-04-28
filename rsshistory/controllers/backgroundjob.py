@@ -350,8 +350,7 @@ class BackgroundJobController(BackgroundJob):
         )
 
     def entry_reset_local_data(entry):
-        """
-        """
+        """ """
         return BackgroundJobController.create_single_job(
             BackgroundJob.JOB_LINK_RESET_LOCAL_DATA, entry.link
         )

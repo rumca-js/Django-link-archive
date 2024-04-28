@@ -18,7 +18,7 @@ version is split into three digits:
  if a change requires the model to be changed, then second digit is updated, patch is set to 0
  if something should be released to public, then release version changes
 """
-__version__ = "0.59.1"
+__version__ = "0.60.0"
 
 
 from pathlib import Path
@@ -166,4 +166,4 @@ class Configuration(object):
             keywords = self.config_entry.block_keywords.split(",")
             for keyword in keywords:
                 result.append(keyword.strip())
-        return []
+        return result

@@ -98,7 +98,7 @@ class EntriesCleanupTest(FakeInternetTestCase):
             date_published=date_to_remove,
         )
 
-    def test_clear_old_entries_operational(self):
+    def test_cleanup_old_entries_operational(self):
         conf = Configuration.get_object().config_entry
         conf.days_to_remove_links = 2
         conf.save()
@@ -106,11 +106,6 @@ class EntriesCleanupTest(FakeInternetTestCase):
         current_time = DateUtils.get_datetime_now_utc()
         date_link_publish = current_time - timedelta(days=conf.days_to_remove_links + 2)
         date_to_remove = current_time - timedelta(days=conf.days_to_remove_links + 2)
-
-        print("Date link publish")
-        print(date_link_publish)
-        print("Date to remove")
-        print(date_to_remove)
 
         self.clear()
         self.create_entries(date_link_publish, date_to_remove)
@@ -135,7 +130,7 @@ class EntriesCleanupTest(FakeInternetTestCase):
 
         self.assertEqual(ArchiveLinkDataController.objects.all().count(), 1)
 
-    def test_clear_old_entries_archive(self):
+    def test_cleanup__old_entries_archive(self):
         conf = Configuration.get_object().config_entry
         conf.days_to_remove_links = 2
         conf.save()
@@ -143,11 +138,6 @@ class EntriesCleanupTest(FakeInternetTestCase):
         current_time = DateUtils.get_datetime_now_utc()
         date_link_publish = current_time - timedelta(days=conf.days_to_remove_links + 2)
         date_to_remove = current_time - timedelta(days=conf.days_to_remove_links + 2)
-
-        print("Date link publish")
-        print(date_link_publish)
-        print("Date to remove")
-        print(date_to_remove)
 
         self.clear()
         self.create_entries(date_link_publish, date_to_remove)
@@ -171,3 +161,35 @@ class EntriesCleanupTest(FakeInternetTestCase):
         self.assertEqual(nonbookmarked.count(), 1)
 
         self.assertEqual(ArchiveLinkDataController.objects.all().count(), 0)
+
+    def test_cleanup__https_http_duplicates(self):
+        conf = Configuration.get_object().config_entry
+        conf.days_to_remove_links = 2
+        conf.save()
+
+        current_time = DateUtils.get_datetime_now_utc()
+        date_link_publish = current_time - timedelta(days=conf.days_to_remove_links + 2)
+        date_to_remove = current_time - timedelta(days=conf.days_to_remove_links + 2)
+
+        self.clear()
+
+        ob = LinkDataController.objects.create(
+            source="https://youtube.com",
+            link="https://youtube.com?v=permanent",
+            title="The first link",
+            permanent=True,
+            language="en",
+        )
+
+        ob = LinkDataController.objects.create(
+            source="http://youtube.com",
+            link="http://youtube.com?v=permanent",
+            title="The second link",
+            permanent=True,
+            language="en",
+        )
+
+        # call tested function
+        EntriesCleanup().cleanup()
+
+        self.assertEqual(LinkDataController.objects.all().count(), 1)

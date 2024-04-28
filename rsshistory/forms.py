@@ -119,6 +119,7 @@ class ConfigForm(forms.ModelForm):
             "whats_new_days",
             "vote_min",
             "vote_max",
+            "prefer_https",
             # display settings
             "entries_order_by",
             "number_of_comments_per_day",
@@ -141,7 +142,9 @@ class ConfigForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         self.fields["user_agent"].widget.attrs.update(size=self.init.get_cols_size())
-        self.fields["block_keywords"].widget.attrs.update(size=self.init.get_cols_size())
+        self.fields["block_keywords"].widget.attrs.update(
+            size=self.init.get_cols_size()
+        )
         self.fields["block_urls"].widget.attrs.update(size=self.init.get_cols_size())
 
         if self.init.is_mobile:
@@ -396,7 +399,6 @@ class EntryForm(forms.ModelForm):
             "age",
             "thumbnail",
             "manual_status_code",
-
             # automatic data. readonly
             "status_code",
             "page_rating",

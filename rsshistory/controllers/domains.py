@@ -240,7 +240,7 @@ class DomainsController(Domains):
         else:
             DomainsController.reset_dynamic_data()
             DomainsController.create_missing_domains()
-            #DomainsController.create_missing_entries()
+            # DomainsController.create_missing_entries()
 
     def unconnect_entries():
         entries = LinkDataController.objects.filter(domain_obj__isnull=False)
@@ -282,6 +282,7 @@ class DomainsController(Domains):
 
     def create_missing_entries():
         from .entriesutils import LinkDataBuilder
+
         domains = DomainsController.objects.all()
         for domain in domains:
             missing_entry = False

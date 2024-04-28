@@ -166,7 +166,7 @@ class SourceDetailTest(FakeInternetTestCase):
             title="The first link",
             source_obj=self.source_youtube,
             bookmarked=False,
-            permanent = True,
+            permanent=True,
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
         )

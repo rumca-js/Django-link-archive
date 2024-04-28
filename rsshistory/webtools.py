@@ -56,7 +56,7 @@ except Exception as E:
     print("Cannot include selenium")
 
 
-PAGE_TOO_BIG_BYTES = 5000000 #5 MB
+PAGE_TOO_BIG_BYTES = 5000000  # 5 MB
 
 
 URL_TYPE_RSS = "rss"
@@ -93,7 +93,9 @@ def date_str_to_date(date_str):
             error_text = traceback.format_exc()
 
             AppLogging.error(
-                "Could not parse date:{}\nExc:{}\n{}".format(date_str, str(E), error_text)
+                "Could not parse date:{}\nExc:{}\n{}".format(
+                    date_str, str(E), error_text
+                )
             )
 
 
@@ -602,12 +604,14 @@ class ContentInterface(object):
         """
         contents = self.contents
 
-        if (
-            contents
-            and contents.find("https://static.cloudflareinsights.com/beacon.min.js/")
-            >= 0
-        ):
-            return True
+        if contents:
+            if (
+                contents.find("https://static.cloudflareinsights.com/beacon.min.js/")
+                >= 0
+            ):
+                return True
+            if contents.find("https://challenges.cloudflare.com") >= 0:
+                return True
 
         return False
 
@@ -1878,7 +1882,9 @@ class PageResponseObject(object):
     STATUS_CODE_ERROR = 500
     STATUS_CODE_UNDEF = 0
 
-    def __init__(self, url, text, status_code=STATUS_CODE_OK, encoding="utf-8", headers=None):
+    def __init__(
+        self, url, text, status_code=STATUS_CODE_OK, encoding="utf-8", headers=None
+    ):
         self.url = url
         self.status_code = status_code
 
@@ -2075,12 +2081,12 @@ class BasePage(object):
             self.dead = True
             error_text = traceback.format_exc()
 
-            LinkDatabase.info("Page {} error: {}\n{}".format(self.url, str(e), error_text))
+            LinkDatabase.info(
+                "Page {} error: {}\n{}".format(self.url, str(e), error_text)
+            )
 
             AppLogging.error(
-                "Page {} error:{}\n{}".format(
-                    self.url, str(e), error_text
-                )
+                "Page {} error:{}\n{}".format(self.url, str(e), error_text)
             )
 
         return self.response
@@ -2101,17 +2107,17 @@ class BasePage(object):
             raise NotImplementedError("Could not identify method of page capture")
 
     def get_content_type(self, request_result):
-        if 'Content-Type' in request_result.headers:
+        if "Content-Type" in request_result.headers:
             return request_result.headers["Content-Type"]
 
         # we have to assume something
         return "text"
 
     def get_content_length(self, request_result):
-        if 'content-length' in request_result.headers:
-            return int(request_result.headers['content-length'])
-        if 'Content-Length' in request_result.headers:
-            return int(request_result.headers['Content-Length'])
+        if "content-length" in request_result.headers:
+            return int(request_result.headers["content-length"])
+        if "Content-Length" in request_result.headers:
+            return int(request_result.headers["Content-Length"])
 
         return 100
 
@@ -2127,7 +2133,9 @@ class BasePage(object):
         if content_type.find("xml") >= 0:
             return True
 
-        AppLogging.error("Page {} content type is not supported {}".format(url, content_type))
+        AppLogging.error(
+            "Page {} content type is not supported {}".format(url, content_type)
+        )
 
         return False
 
@@ -2180,37 +2188,43 @@ class BasePage(object):
         """
 
         try:
-           request_result = requests.get(
-               url, headers=headers, timeout=timeout, verify=BasePage.ssl_verify, stream=True
-           )
-           LinkDatabase.info("[H] {}".format(request_result.headers))
+            request_result = requests.get(
+                url,
+                headers=headers,
+                timeout=timeout,
+                verify=BasePage.ssl_verify,
+                stream=True,
+            )
+            LinkDatabase.info("[H] {}".format(request_result.headers))
 
-           content_length = self.get_content_length(request_result)
+            content_length = self.get_content_length(request_result)
 
-           redirect = self.get_redirect_url(request_result)
-           if redirect:
-               self.url = redirect
+            redirect = self.get_redirect_url(request_result)
+            if redirect:
+                self.url = redirect
 
-           if content_length > PAGE_TOO_BIG_BYTES:
-               AppLogging.error("Page {} is too long: {} bytes".format(url, content_length))
-               return
+            if content_length > PAGE_TOO_BIG_BYTES:
+                AppLogging.error(
+                    "Page {} is too long: {} bytes".format(url, content_length)
+                )
+                return
 
-           if not self.is_content_type_supported(url, request_result):
-               return
+            if not self.is_content_type_supported(url, request_result):
+                return
 
-           # TODO do we want to check also content-type?
+            # TODO do we want to check also content-type?
 
-           self.get_encoding(url, request_result)
+            self.get_encoding(url, request_result)
 
-           response = PageResponseObject(
-               url,
-               request_result.text,
-               request_result.status_code,
-               request_result.encoding,
-               headers = request_result.headers,
-           )
+            response = PageResponseObject(
+                url,
+                request_result.text,
+                request_result.status_code,
+                request_result.encoding,
+                headers=request_result.headers,
+            )
 
-           return response
+            return response
         except requests.Timeout:
             LinkDatabase.error("Page timeout {}".format(self.url))
             return PageResponseObject(self.url, None, 500)
@@ -2241,6 +2255,8 @@ class BasePage(object):
             TODO - if webpage changes link, it should also update it in this object
             """
 
+            status_code = 200
+
             # if self.options.link_redirect:
             #    WebDriverWait(driver, selenium_timeout).until(EC.url_changes(driver.current_url))
 
@@ -2251,14 +2267,10 @@ class BasePage(object):
 
             # TODO use selenium wire to obtain status code & headers?
 
-            return PageResponseObject(self.url, html_content, 200)
+            return PageResponseObject(self.url, html_content, status_code)
         except TimeoutException:
             error_text = traceback.format_exc()
-            LinkDatabase.error(
-                "Page timeout:{}\n{}".format(
-                    self.url, error_text
-                )
-            )
+            LinkDatabase.error("Page timeout:{}\n{}".format(self.url, error_text))
             return PageResponseObject(self.url, None, 500)
         finally:
             driver.quit()
@@ -2297,6 +2309,8 @@ class BasePage(object):
 
             driver.get(url)
 
+            status_code = 200
+
             # if self.options.link_redirect:
             WebDriverWait(driver, selenium_timeout).until(
                 EC.url_changes(driver.current_url)
@@ -2310,15 +2324,11 @@ class BasePage(object):
             if self.url != driver.current_url:
                 self.url = driver.current_url
 
-            return PageResponseObject(self.url, page_source, 200)
+            return PageResponseObject(self.url, page_source, status_code)
 
         except TimeoutException:
             error_text = traceback.format_exc()
-            LinkDatabase.error(
-                "Page timeout:{}\n{}".format(
-                    self.url, error_text
-                )
-            )
+            LinkDatabase.error("Page timeout:{}\n{}".format(self.url, error_text))
             return PageResponseObject(self.url, None, 500)
         finally:
             driver.quit()
@@ -2358,8 +2368,33 @@ class BasePage(object):
         return request_result.status_code > 300 and request_result.status_code < 310
 
     def get_redirect_url(self, request_result):
-        if self.is_redirect(request_result) and "Location" in request_result.headers and request_result.headers["Location"]:
+        if (
+            self.is_redirect(request_result)
+            and "Location" in request_result.headers
+            and request_result.headers["Location"]
+        ):
             return request_result.headers["Location"]
+
+    def get_selenium_status_code(self, logs):
+        """
+        https://stackoverflow.com/questions/5799228/how-to-get-status-code-by-using-selenium-py-python-code
+        TODO selenium performance logs need to be enabled?
+        """
+        for log in logs:
+            if log["message"]:
+                d = json.loads(log["message"])
+                try:
+                    content_type = (
+                        "text/html"
+                        in d["message"]["params"]["response"]["headers"]["content-type"]
+                    )
+                    response_received = (
+                        d["message"]["method"] == "Network.responseReceived"
+                    )
+                    if content_type and response_received:
+                        return d["message"]["params"]["response"]["status"]
+                except:
+                    pass
 
 
 class Url(ContentInterface):
@@ -2392,13 +2427,13 @@ class Url(ContentInterface):
         if url.startswith("https") or url.startswith("http"):
             type_check = DomainAwarePage(url)
             if not type_check.is_media():
-               p = BasePage(url=url, options=page_options, page_object=page_object)
-               self.response = p.get_response()
-               self.options = p.options
-               contents = p.get_contents()
+                p = BasePage(url=url, options=page_options, page_object=page_object)
+                self.response = p.get_response()
+                self.options = p.options
+                contents = p.get_contents()
 
-               if not p.is_valid():
-                   return
+                if not p.is_valid():
+                    return
 
         # right now we do not have handlers for anything else
         elif (
@@ -2423,8 +2458,8 @@ class Url(ContentInterface):
                 return p
 
             # TODO
-            #p = XmlPage(url, contents)
-            #if p.is_valid():
+            # p = XmlPage(url, contents)
+            # if p.is_valid():
             #    return p
 
             p = DefaultContentPage(url, contents)
@@ -2574,6 +2609,9 @@ class Url(ContentInterface):
         return False
 
     def get_cleaned_link(url):
+        if not url:
+            return
+
         if url.endswith("/"):
             url = url[:-1]
         if url.endswith("."):

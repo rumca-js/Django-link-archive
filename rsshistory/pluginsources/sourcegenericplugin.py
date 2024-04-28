@@ -9,7 +9,7 @@ from ..models import AppLogging, UserTags
 from ..models import BaseLinkDataController
 from ..controllers import LinkDataBuilder, SourceDataController
 from ..controllers import LinkDataController, BackgroundJobController
-from ..pluginurl.urlhandler import UrlHandler, UrlPropertyValidator
+from ..pluginurl.urlhandler import UrlHandler
 
 
 class SourceGenericPlugin(object):

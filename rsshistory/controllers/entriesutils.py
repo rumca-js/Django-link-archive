@@ -42,9 +42,12 @@ class EntriesCleanup(object):
         if entries:
             entries.delete()
 
-        entries = self.get_stale_entries()
-        if entries:
-            entries.delete()
+        if not self.archive_cleanup:
+            entries = self.get_stale_entries()
+            if entries:
+                entries.delete()
+
+        self.cleanup_http_duplicates()
 
     def get_source_entries(self, source):
         config = Configuration.get_object().config_entry
@@ -123,6 +126,16 @@ class EntriesCleanup(object):
 
         if entries.exists():
             return entries
+
+    def cleanup_http_duplicates(self):
+        condition = Q(link__icontains="http://")
+        if not self.archive_cleanup:
+            entries = LinkDataController.objects.filter(condition)
+        else:
+            entries = ArchiveLinkDataController.objects.filter(condition)
+
+        for entry in entries:
+            entry.cleanup_http_duplicate()
 
 
 class EntryCleanup(object):
@@ -208,7 +221,7 @@ class EntryUpdater(object):
             self.handle_invalid_response(url)
             return
 
-        # TODO too much stuff goes in self.add_links_from_url(url)
+        self.add_links_from_url(url)
 
         if entry.date_dead_since:
             entry.date_dead_since = None
@@ -257,7 +270,7 @@ class EntryUpdater(object):
             self.handle_invalid_response(url)
             return
 
-        # TODO too much stuff goes in self.add_links_from_url(url)
+        self.add_links_from_url(url)
 
         if entry.date_dead_since:
             entry.date_dead_since = False
@@ -280,6 +293,11 @@ class EntryUpdater(object):
         self.update_calculated_vote()
 
     def add_links_from_url(self, url):
+        c = Configuration.get_object()
+        config = c.config_entry
+        if not config.auto_scan_new_entries:
+            return
+
         parser = ContentLinkParser(url.url, url.p.get_contents())
         contents_links = parser.get_links()
 
@@ -327,7 +345,7 @@ class EntryUpdater(object):
         # if we have a tag, then boost vote
         tags = entry.tags.all()
         if tags.count() > 0:
-            entry.page_rating += (entry.page_rating * 0.2)
+            entry.page_rating += entry.page_rating * 0.2
 
         entry.save()
 
@@ -454,11 +472,33 @@ class LinkDataWrapper(object):
                 return obj
 
     def get_from_archive(self):
+        conf = Configuration.get_object().config_entry
+
+        if conf.prefer_https:
+            http_index = self.link.find("http://")
+            if http_index >= 0:
+                link_https = self.link.replace("http://", "https://")
+
+                objs = ArchiveLinkDataController.objects.filter(link=link_https)
+                if objs.exists():
+                    return objs[0]
+
         objs = ArchiveLinkDataController.objects.filter(link=self.link)
         if objs.exists():
             return objs[0]
 
     def get_from_operational_db(self):
+        conf = Configuration.get_object().config_entry
+
+        if conf.prefer_https:
+            http_index = self.link.find("http://")
+            if http_index >= 0:
+                link_https = self.link.replace("http://", "https://")
+
+                objs = LinkDataController.objects.filter(link=link_https)
+                if objs.exists():
+                    return objs[0]
+
         objs = LinkDataController.objects.filter(link=self.link)
         if objs.exists():
             return objs[0]
@@ -699,6 +739,9 @@ class LinkDataBuilder(object):
         return False
 
     def add_from_normal_link(self):
+        """
+        TODO move this to a other class OnlyLinkDataBuilder?
+        """
         wrapper = LinkDataWrapper(self.link)
         obj = wrapper.get_from_operational_db()
         if obj:
@@ -727,12 +770,28 @@ class LinkDataBuilder(object):
 
         if self.is_status_code_invalid():
             AppLogging.error(
-                    'Cannot add link - page status invalid:<a href="{}">{}</a>\nData:{}'.format(
+                'Cannot add link - page status invalid:<a href="{}">{}</a>\nData:{}'.format(
                     self.link, self.link, link_data
                 )
             )
             return
 
+        # we obtain links from various places. We do not want technical links with no data, redirect, CDN or other
+        if not self.is_link_data_valid_for_auto_add(link_data):
+            return
+
+        self.merge_link_data(link_data)
+
+        if self.link_data:
+            return self.add_from_props_internal()
+        else:
+            AppLogging.error(
+                'Could not obtain properties for:<a href="{}">{}</a>'.format(
+                    self.link, self.link
+                )
+            )
+
+    def merge_link_data(self, link_data):
         # TODO update missing keys - do not replace them
         new_link_data = None
 
@@ -744,15 +803,22 @@ class LinkDataBuilder(object):
             new_link_data = link_data
 
         self.link_data = new_link_data
+        return self.link_data
 
-        if self.link_data:
-            return self.add_from_props_internal()
-        else:
-            AppLogging.error(
-                'Could not obtain properties for:<a href="{}">{}</a>'.format(
-                    self.link, self.link
-                )
-            )
+    def is_property_set(self, link_data, property_name):
+        return (
+            property_name in link_data
+            and link_data[property_name] != None
+            and len(link_data[property_name]) > 0
+        )
+
+    def is_link_data_valid_for_auto_add(self, link_data):
+        if not self.is_property_set(link_data, "title"):
+            return False
+        if not self.is_property_set(link_data, "description"):
+            return False
+
+        return True
 
     def add_from_props(self, ignore_errors=False):
         self.ignore_errors = ignore_errors
@@ -761,7 +827,7 @@ class LinkDataBuilder(object):
 
         if self.is_status_code_invalid():
             AppLogging.error(
-                    'Cannot add link - page status invalid:<a href="{}">{}</a>\nData:{}'.format(
+                'Cannot add link - page status invalid:<a href="{}">{}</a>\nData:{}'.format(
                     self.link, self.link, self.link_data
                 )
             )
@@ -787,9 +853,14 @@ class LinkDataBuilder(object):
 
         self.link_data = self.get_clean_link_data()
 
-        v = UrlPropertyValidator(properties=self.link_data)
+        keywords = Configuration.get_object().get_blocked_keywords()
+        v = UrlPropertyValidator(properties=self.link_data, blocked_keywords=keywords)
         if not v.is_valid():
-            LinkDatabase.error("Rejecting:{}\nData:{}\n".format(self.link_data["link"], self.link_data["description"]))
+            LinkDatabase.error(
+                "Rejecting:{}\nData:{}\n".format(
+                    self.link_data["link"], self.link_data["description"]
+                )
+            )
             return
 
         # if self.source_is_auto:

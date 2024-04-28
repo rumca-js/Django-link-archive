@@ -248,7 +248,9 @@ class UrlHandler(Url):
             return False
 
         keywords = Configuration.get_object().get_blocked_keywords()
-        validator = UrlPropertyValidator(properties=self.get_properties(), blocked_keywords = keywords)
+        validator = UrlPropertyValidator(
+            properties=self.get_properties(), blocked_keywords=keywords
+        )
         if len(keywords) > 0:
             validator.blocked_keywords = keywords
 

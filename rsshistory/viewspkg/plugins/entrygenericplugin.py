@@ -184,9 +184,7 @@ class EntryGenericPlugin(object):
                     ),
                     ConfigurationEntry.ACCESS_TYPE_OWNER,
                     "Resets entry local data",
-                    static(
-                        "{}/icons/icons8-update-100.png".format(LinkDatabase.name)
-                    ),
+                    static("{}/icons/icons8-update-100.png".format(LinkDatabase.name)),
                 ),
             )
 

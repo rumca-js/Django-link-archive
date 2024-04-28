@@ -22,6 +22,7 @@ class LinkDataController(LinkDataModel):
 
     def get_source_obj(self):
         from .sources import SourceDataController
+
         if self.source_obj:
             return SourceDataController.objects.get(id=self.source_obj.id)
         else:
@@ -167,7 +168,6 @@ class LinkDataController(LinkDataModel):
         return self.date_published < day_to_move
 
 
-
 class ArchiveLinkDataController(ArchiveLinkDataModel):
     """
     Normal operation database is for optimization.
@@ -179,6 +179,7 @@ class ArchiveLinkDataController(ArchiveLinkDataModel):
 
     def get_source_obj(self):
         from .sources import SourceDataController
+
         if self.source_obj:
             return SourceDataController.objects.get(id=self.source_obj.id)
         else:
