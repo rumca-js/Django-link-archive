@@ -79,13 +79,7 @@ Displays all available tags.
 
 Displays all available keywords. The default time span of keywords is 1 day.
 
-![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/keywords.PNG)
-
-# Domains
-
-Displays all available domains.
-
-![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/domains.PNG)
+![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/keywords_view.PNG)
 
 ## Page properties
 
@@ -149,16 +143,16 @@ Provides server status.
 
 Provides user configuration. Each user can configure their view to be shown differently.
 
-![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/user_configuration_page.PNG)
+![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/user_configuration_view.PNG)
 
 ## Logs
 
 All events are stored for maintanance.
 
-![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/logs.PNG)
+![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/logs_view.PNG)
 
 ## Background jobs
 
 Background jobs
 
-![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/background_jobs.PNG)
+![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/backgroundjobs_view.PNG)
