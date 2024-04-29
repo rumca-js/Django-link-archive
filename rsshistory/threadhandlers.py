@@ -737,6 +737,7 @@ class PushToRepoJobHandler(BaseJobHandler):
                     update_mgr.write_and_push_notime_data()
 
                 SourceExportHistory.confirm()
+                AppLogging.info("Successfully pushed data to git")
         except Exception as e:
             error_text = traceback.format_exc()
             AppLogging.error("Exception: {} {}".format(str(e), error_text))
@@ -758,6 +759,7 @@ class PushYearDataToRepoJobHandler(BaseJobHandler):
 
                 update_mgr = UpdateManager(self._config)
                 update_mgr.write_and_push_year_data()
+                AppLogging.info("Successfully pushed data to git")
 
             return True
         except Exception as e:
@@ -780,6 +782,7 @@ class PushNoTimeDataToRepoJobHandler(BaseJobHandler):
 
                 update_mgr = UpdateManager(self._config)
                 update_mgr.write_and_push_notime_data()
+                AppLogging.info("Successfully pushed data to git")
 
             return True
         except Exception as e:
@@ -805,6 +808,7 @@ class PushDailyDataToRepoJobHandler(BaseJobHandler):
 
                 update_mgr = UpdateManager(self._config)
                 update_mgr.write_and_push_daily_data(date_input)
+                AppLogging.info("Successfully pushed data to git")
 
             return True
         except Exception as e:
@@ -845,6 +849,7 @@ class CleanupJobHandler(BaseJobHandler):
 
             # if status is True, everything has been cleared correctly
             # we can remove the cleanup background job
+            AppLogging.info("Successfully cleaned database")
             return status
 
         except Exception as e:

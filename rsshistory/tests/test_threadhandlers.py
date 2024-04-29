@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from django.contrib.auth.models import User
+import logging
 
 from ..controllers import (
     BackgroundJobController,
@@ -583,7 +584,7 @@ class CleanJobHandlerTest(FakeInternetTestCase):
         # cleanup of links, domains may trigger creating new entries, which may
         # trigger unwanted dependencies
 
-        persistent_objects = AppLogging.objects.all()
+        persistent_objects = AppLogging.objects.filter(level = int(logging.ERROR))
 
         for persistent_object in persistent_objects:
             print("Persisten object info:{}".format(persistent_object.info_text))
@@ -608,7 +609,7 @@ class CleanJobHandlerTest(FakeInternetTestCase):
         handler = CleanupJobHandler()
         handler.process()
 
-        persistent_objects = AppLogging.objects.all()
+        persistent_objects = AppLogging.objects.filter(level = int(logging.ERROR))
 
         for persistent_object in persistent_objects:
             print("Persisten object info:{}".format(persistent_object.info_text))
