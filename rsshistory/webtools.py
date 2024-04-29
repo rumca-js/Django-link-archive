@@ -2081,7 +2081,7 @@ class BasePage(object):
             self.dead = True
             error_text = traceback.format_exc()
 
-            LinkDatabase.info(
+            LinkDatabase.error(
                 "Page {} error: {}\n{}".format(self.url, str(e), error_text)
             )
 
@@ -2239,6 +2239,8 @@ class BasePage(object):
         options = webdriver.ChromeOptions()
         options.add_argument("--headless")
 
+        options.set_capability('goog:loggingPrefs', {'performance': 'ALL'})
+
         # if not BasePage.ssl_verify:
         #    options.add_argument('ignore-certificate-errors')
 
@@ -2255,7 +2257,7 @@ class BasePage(object):
             TODO - if webpage changes link, it should also update it in this object
             """
 
-            status_code = 200
+            status_code = self.get_selenium_status_code(driver)
 
             # if self.options.link_redirect:
             #    WebDriverWait(driver, selenium_timeout).until(EC.url_changes(driver.current_url))
@@ -2296,6 +2298,9 @@ class BasePage(object):
         # options.add_argument('--remote-debugging-port=9222')
         # options.add_argument('--user-data-dir=~/.config/google-chrome')
 
+        # options to enable performance log, to read status code
+        options.set_capability('goog:loggingPrefs', {'performance': 'ALL'})
+
         # if not BasePage.ssl_verify:
         #    options.add_argument('ignore-certificate-errors')
 
@@ -2309,7 +2314,7 @@ class BasePage(object):
 
             driver.get(url)
 
-            status_code = 200
+            status_code = self.get_selenium_status_code(driver)
 
             # if self.options.link_redirect:
             WebDriverWait(driver, selenium_timeout).until(
@@ -2375,26 +2380,47 @@ class BasePage(object):
         ):
             return request_result.headers["Location"]
 
-    def get_selenium_status_code(self, logs):
+    def get_selenium_status_code(self, driver):
+        status_code = 200
+        try:
+            logs = driver.get_log("performance")
+            status_code2 = self.get_selenium_status_code_from_logs(logs)
+            if status_code2:
+                status_code = status_code2
+        except Exception as E:
+            AppLogging.error("Chrome webdrider error:{}".format(str(E)))
+        return status_code
+
+    def get_selenium_status_code_from_logs(self, logs):
         """
         https://stackoverflow.com/questions/5799228/how-to-get-status-code-by-using-selenium-py-python-code
-        TODO selenium performance logs need to be enabled?
         """
+        last_status_code = 200
         for log in logs:
             if log["message"]:
                 d = json.loads(log["message"])
+
+                content_type = ""
                 try:
-                    content_type = (
-                        "text/html"
-                        in d["message"]["params"]["response"]["headers"]["content-type"]
-                    )
+                    content_type = d["message"]["params"]["response"]["headers"]["content-type"]
+                except Exception as E:
+                    pass
+                try:
+                    content_type = d["message"]["params"]["response"]["headers"]["Content-Type"]
+                except Exception as E:
+                    pass
+
+                try:
                     response_received = (
                         d["message"]["method"] == "Network.responseReceived"
                     )
-                    if content_type and response_received:
-                        return d["message"]["params"]["response"]["status"]
-                except:
+                    if content_type.find("text/html") >= 0 and response_received:
+                        last_status_code = d["message"]["params"]["response"]["status"]
+                except Exception as E:
+                    #print("Exception: {}".format(str(E)))
                     pass
+
+        return last_status_code
 
 
 class Url(ContentInterface):

@@ -337,15 +337,25 @@ class EntryUpdater(object):
         return sum_num
 
     def update_calculated_vote(self):
+        """
+        Warning: Do not change page rating range. Should be always -100..100
+        The impact of factors can change ratings only in that range
+        """
         entry = self.entry
         entry.page_rating_votes = self.calculate_vote()
         entry.page_rating_visits = self.get_visits()
-        entry.page_rating = entry.page_rating_votes + entry.page_rating_contents
 
-        # if we have a tag, then boost vote
+        are_tags = 0
         tags = entry.tags.all()
         if tags.count() > 0:
-            entry.page_rating += entry.page_rating * 0.2
+            are_tags = 1
+
+        # votes are twice as important as contents
+        page_rating = ((2 * entry.page_rating_votes) + entry.page_rating_contents) + are_tags * 10
+        max_page_rating = 2 * 100 + 100 + 10
+
+        # rating in percentage. Range -100..100
+        entry.page_rating = page_rating * 100 / max_page_rating
 
         entry.save()
 

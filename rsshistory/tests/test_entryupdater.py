@@ -1,10 +1,12 @@
 from datetime import timedelta
+from django.contrib.auth.models import User
 
 from ..controllers import (
     SourceDataController,
     LinkDataController,
     EntryUpdater,
 )
+from ..models import UserTags, UserVotes
 from ..configuration import Configuration
 from ..dateutils import DateUtils
 
@@ -14,6 +16,10 @@ from .fakeinternet import FakeInternetTestCase
 class EntryUpdaterTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
+
+        self.user = User.objects.create_user(
+            username="TestUser", password="testpassword", is_staff=True
+        )
 
     def test_reset_data__fills_properties(self):
         add_time = DateUtils.get_datetime_now_utc() - timedelta(days=1)
@@ -287,3 +293,42 @@ class EntryUpdaterTest(FakeInternetTestCase):
         self.assertTrue(entries[0].date_dead_since is None)
         self.assertEqual(entries[0].status_code, 200)
         self.assertEqual(entries[0].manual_status_code, 0)
+
+    def test_reset_local_data(self):
+        conf = Configuration.get_object().config_entry
+
+        source_youtube = SourceDataController.objects.create(
+            url="https://youtube.com",
+            title="YouTube",
+            category="No",
+            subcategory="No",
+            export_to_cms=True,
+            remove_after_days=1,
+        )
+
+        entry = LinkDataController.objects.create(
+            source="",
+            link="https://youtube.com",
+            title=None,
+            description=None,
+            source_obj=source_youtube,
+            bookmarked=True,
+            language=None,
+            domain_obj=None,
+            thumbnail=None,
+        )
+
+        entry.page_rating_contents = 100
+
+        UserTags.set_tag(entry, "test", user = self.user)
+        UserVotes.add(self.user, entry, 100)
+
+        u = EntryUpdater(entry)
+        # call tested function
+        u.reset_local_data()
+
+        entries = LinkDataController.objects.filter(link="https://youtube.com")
+        self.assertTrue(entries.count(), 1)
+        self.assertEqual(entries[0].page_rating_votes, 100)
+        self.assertEqual(entries[0].page_rating_contents, 100)
+        self.assertEqual(entries[0].page_rating, 100)
