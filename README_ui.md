@@ -73,7 +73,7 @@ Provides ability to:
 
 Displays all available tags.
 
-![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/tag_view.PNG)
+![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/tags_view.PNG)
 
 # Keywords
 
