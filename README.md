@@ -106,20 +106,22 @@ With such approach we can extend page rating and range is still in range 0..100,
 ## Content ranking
 
 To have a good page rating, it is desireable to follow good standards:
- - [Open Graph Protocol](https://ogp.me/)
  - [Schema Validator](https://validator.schema.org/)
  - [W3C Validator](https://validator.w3.org/)
+ - Provide HTML meta information. More info in [Open Graph Protocol](https://ogp.me/)
  - Provide valid title, which is concise, but not too short
  - Provide valid description, which is concise, but not too short
  - Provide valid publication date
- - Provide valid thumbnail
- - Your page returns valid HTML status code
- - Provide RSS feed
+ - Provide valid thumbnail, media image
+ - Provide a valid HTML status code. No fancy redirects, JavaScript redirects
+ - Provide RSS feed. Provide HTML meta information for it [https://www.petefreitag.com/blog/rss-autodiscovery/](https://www.petefreitag.com/blog/rss-autodiscovery/)
  - Provide search engine keywords tags
 
-The equation for content ranking might change in time, so these rules are pretty vague. It is just better to write good pages.
+Your page, domain exist alongside thousands of other pages. Imagine your meta data have an impact on your recognition, and page ranking.
 
-You may wonder, why am I writing about search engine keywords, if Google does not need them. Well I don't like Google. I would like for other search engines to appear. Such keywords would provide search engine bots to have some idea what the page is about.
+Remember: a good page is always ranked higher.
+
+You may wonder, why am I writing about search engine "keywords" meta field, if Google does not need them. Well I don't like Google. If we want alternative solutions to exist, it should be possible to easily find your page from simpler search engines. Provide keywords field if you support open web.
 
 ## Votes ranking
 
