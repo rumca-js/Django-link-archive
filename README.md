@@ -117,7 +117,7 @@ To have a good page rating, it is desireable to follow good standards:
  - Provide RSS feed. Provide HTML meta information for it [https://www.petefreitag.com/blog/rss-autodiscovery/](https://www.petefreitag.com/blog/rss-autodiscovery/)
  - Provide search engine keywords tags
 
-Your page, domain exist alongside thousands of other pages. Imagine your meta data have an impact on your recognition, and page ranking.
+Your page, domain exists alongside thousands of other pages. Imagine your meta data have an impact on your recognition, and page ranking.
 
 Remember: a good page is always ranked higher.
 
