@@ -25,7 +25,7 @@ from .entries import (
 from .entriesutils import (
     EntriesCleanupAndUpdate,
     EntryUpdater,
-    LinkDataBuilder,
+    EntryDataBuilder,
     LinkDataWrapper,
     EntriesCleanup,
 )

@@ -1991,10 +1991,10 @@ class BasePage(object):
         if not self.response:
             return False
 
-        if self.is_status_ok() == False:
+        if self.is_this_status_ok(self.response.status_code) or self.is_this_status_redirect(self.response.status_code):
+            return True
+        else:
             return False
-
-        return True
 
     def try_decode(self, thebytes):
         try:
@@ -2002,18 +2002,23 @@ class BasePage(object):
         except Exception as e:
             pass
 
-    def is_status_ok(self):
-        if not self.response:
+    def is_this_status_ok(self, status_code):
+        if status_code == 0:
             return False
 
-        if self.response.status_code == 0:
-            return False
+        return status_code >= 200 and status_code < 300
 
-        if self.response.status_code == 403:
-            # Many pages return 403, but they are correct
-            return True
+    def is_this_status_redirect(self, status_code):
+        """
+        403 is added since some pages use it to block you
+        """
+        return (status_code > 300 and status_code < 400) or status_code == 403
 
-        return self.response.status_code >= 200 and self.response.status_code < 300
+    def is_this_status_nok(self, status_code):
+        """
+        This function informs that status code is so bad, that further communication does not make any sense
+        """
+        return status_code < 200 or status_code > 403
 
     def get_response(self):
         if self.response:
@@ -2199,10 +2204,6 @@ class BasePage(object):
 
             content_length = self.get_content_length(request_result)
 
-            redirect = self.get_redirect_url(request_result)
-            if redirect:
-                self.url = redirect
-
             if content_length > PAGE_TOO_BIG_BYTES:
                 AppLogging.error(
                     "Page {} is too long: {} bytes".format(url, content_length)
@@ -2212,12 +2213,25 @@ class BasePage(object):
             if not self.is_content_type_supported(url, request_result):
                 return
 
+            if not self.is_this_status_nok(request_result.status_code):
+                """
+                DO NOT USE CONTENTS. it will fetch te response. If status is not ok - just return
+                """
+                response = PageResponseObject(
+                    self.url,
+                    "",
+                    request_result.status_code,
+                )
+
             # TODO do we want to check also content-type?
 
             self.get_encoding(url, request_result)
 
+            if self.url != request_result.url:
+                self.url = request_result.url
+
             response = PageResponseObject(
-                url,
+                self.url,
                 request_result.text,
                 request_result.status_code,
                 request_result.encoding,
@@ -2369,12 +2383,9 @@ class BasePage(object):
 
         return PageResponseObject(url, html_content)
 
-    def is_redirect(self, request_result):
-        return request_result.status_code > 300 and request_result.status_code < 310
-
     def get_redirect_url(self, request_result):
         if (
-            self.is_redirect(request_result)
+            self.is_this_status_redirect(request_result.status_code)
             and "Location" in request_result.headers
             and request_result.headers["Location"]
         ):

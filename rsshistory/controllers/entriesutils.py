@@ -328,6 +328,9 @@ class EntryUpdater(object):
     def get_visits(self):
         from ..models import UserEntryVisitHistory
 
+        if self.entry.is_archive_entry():
+            return 0
+
         visits = UserEntryVisitHistory.objects.filter(entry_object=self.entry)
 
         sum_num = 0
@@ -346,9 +349,10 @@ class EntryUpdater(object):
         entry.page_rating_visits = self.get_visits()
 
         are_tags = 0
-        tags = entry.tags.all()
-        if tags.count() > 0:
-            are_tags = 1
+        if not entry.is_archive_entry():
+            tags = entry.tags.all()
+            if tags.count() > 0:
+                are_tags = 1
 
         # votes are twice as important as contents
         page_rating = ((2 * entry.page_rating_votes) + entry.page_rating_contents) + are_tags * 10
@@ -559,6 +563,10 @@ class LinkDataWrapper(object):
             AppLogging.error("Cannot create entry {}".format(error_text))
             return
 
+        if ob:
+            u = EntryUpdater(ob)
+            u.reset_local_data()
+
         return ob
 
     def move_to_archive(entry_obj):
@@ -679,7 +687,7 @@ class LinkDataWrapper(object):
         return entries
 
 
-class LinkDataBuilder(object):
+class EntryDataBuilder(object):
     """
     - sometimes we want to call this object directly, sometimes it should be redirected to "add link background job"
     - we do not change data in here, we do not correct, we just follow it (I think that is what should be)
@@ -715,6 +723,9 @@ class LinkDataBuilder(object):
             self.add_from_props(ignore_errors=self.ignore_errors)
 
     def add_from_link(self, ignore_errors=False):
+        """
+        TODO extract this to a separate class?
+        """
         self.ignore_errors = ignore_errors
         self.link = UrlHandler.get_cleaned_link(self.link)
 
@@ -1107,7 +1118,7 @@ class LinkDataBuilder(object):
         objs = LinkDataController.objects.filter(bookmarked=True)
         for obj in objs:
             p = DomainAwarePage(obj.link)
-            LinkDataBuilder(link=p.get_domain())
+            EntryDataBuilder(link=p.get_domain())
 
 
 class EntriesCleanupAndUpdate(object):

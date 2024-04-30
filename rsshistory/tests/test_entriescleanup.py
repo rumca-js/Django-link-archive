@@ -3,7 +3,6 @@ from django.contrib.auth.models import User
 
 from ..models import UserBookmarks
 from ..controllers import (
-    LinkDataBuilder,
     LinkDataWrapper,
     SourceDataController,
     DomainsController,

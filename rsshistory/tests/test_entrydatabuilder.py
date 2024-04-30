@@ -1,12 +1,13 @@
 from datetime import timedelta
 
 from ..controllers import (
-    LinkDataBuilder,
+    EntryDataBuilder,
     LinkDataWrapper,
     SourceDataController,
     DomainsController,
     BackgroundJobController,
     LinkDataController,
+    ArchiveLinkDataController,
 )
 from ..models import LinkDataModel
 from ..dateutils import DateUtils
@@ -15,10 +16,11 @@ from ..configuration import Configuration
 from .fakeinternet import FakeInternetTestCase, MockRequestCounter
 
 
-class LinkDataBuilderTest(FakeInternetTestCase):
+class EntryDataBuilderTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
         LinkDataController.objects.all().delete()
+        ArchiveLinkDataController.objects.all().delete()
 
     def test_add_from_props_no_slash(self):
         config = Configuration.get_object().config_entry
@@ -47,7 +49,7 @@ class LinkDataBuilderTest(FakeInternetTestCase):
             "page_rating": 25,
         }
 
-        b = LinkDataBuilder()
+        b = EntryDataBuilder()
         b.link_data = link_data
         # call tested function
         entry = b.add_from_props()
@@ -58,8 +60,12 @@ class LinkDataBuilderTest(FakeInternetTestCase):
         self.assertEqual(objs[0].link, link_name)
         self.assertEqual(objs[0].date_published, creation_date)
         self.assertEqual(objs[0].page_rating_contents, 23)
-        self.assertEqual(objs[0].page_rating_votes, 12)
-        self.assertEqual(objs[0].page_rating, 25)
+        # votes are reset
+        self.assertEqual(objs[0].page_rating_votes, 0)
+        # visits are reset
+        self.assertEqual(objs[0].page_rating_visits, 0)
+        # rating is recalculated
+        self.assertEqual(objs[0].page_rating, 7)
 
         # this is obtained not through page requests
         self.assertEqual(MockRequestCounter.mock_page_requests, 0)
@@ -82,7 +88,7 @@ class LinkDataBuilderTest(FakeInternetTestCase):
             "date_published": DateUtils.get_datetime_now_utc(),
         }
 
-        b = LinkDataBuilder()
+        b = EntryDataBuilder()
         b.link_data = link_data
         # call tested function
         entry = b.add_from_props()
@@ -113,7 +119,7 @@ class LinkDataBuilderTest(FakeInternetTestCase):
             "date_published": DateUtils.get_datetime_now_utc(),
         }
 
-        b = LinkDataBuilder()
+        b = EntryDataBuilder()
         b.link_data = link_data
         # call tested function
         entry = b.add_from_props()
@@ -151,7 +157,7 @@ class LinkDataBuilderTest(FakeInternetTestCase):
             "bookmarked": False,
         }
 
-        b = LinkDataBuilder(source_is_auto=True)
+        b = EntryDataBuilder(source_is_auto=True)
         b.link_data = link_data
         # call tested function
         entry = b.add_from_props()
@@ -185,7 +191,7 @@ class LinkDataBuilderTest(FakeInternetTestCase):
             "bookmarked": True,
         }
 
-        b = LinkDataBuilder(source_is_auto=True)
+        b = EntryDataBuilder(source_is_auto=True)
         b.link_data = link_data
         # call tested function
         entry = b.add_from_props()
@@ -216,7 +222,7 @@ class LinkDataBuilderTest(FakeInternetTestCase):
             "bookmarked": True,
         }
 
-        b = LinkDataBuilder(source_is_auto=True)
+        b = EntryDataBuilder(source_is_auto=True)
         b.link_data = link_data
         # call tested function
         entry = b.add_from_props()
@@ -260,7 +266,7 @@ class LinkDataBuilderTest(FakeInternetTestCase):
             "page_rating": 25,
         }
 
-        b = LinkDataBuilder()
+        b = EntryDataBuilder()
         b.link_data = link_data
         # call tested function
         entry = b.add_from_props()
@@ -296,7 +302,7 @@ class LinkDataBuilderTest(FakeInternetTestCase):
             "page_rating": 25,
         }
 
-        b = LinkDataBuilder()
+        b = EntryDataBuilder()
         b.link_data = link_data
         # call tested function
         entry = b.add_from_props()
@@ -333,7 +339,7 @@ class LinkDataBuilderTest(FakeInternetTestCase):
             "page_rating": 25,
         }
 
-        b = LinkDataBuilder()
+        b = EntryDataBuilder()
         b.link_data = link_data
         # call tested function
         entry = b.add_from_props()

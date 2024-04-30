@@ -501,12 +501,16 @@ class EntryGenericPlugin(object):
     def get_parameters_operation(self):
         parameters = []
 
-        points_text = "{} = {} + {}".format(
+        points_text = "[{}]|C:{}|V:{}".format(
             self.entry.page_rating,
             self.entry.page_rating_contents,
             self.entry.page_rating_votes,
         )
-        points_title = "Points = content rating + user votes"
+        points_title = "Page rating:{} Content rating:{} User rating:{}".format(
+            self.entry.page_rating,
+            self.entry.page_rating_contents,
+            self.entry.page_rating_votes,
+        )
         parameters.append(EntryParameter("Points", points_text, points_title))
 
         update_date = DateUtils.get_display_date(self.entry.date_update_last)

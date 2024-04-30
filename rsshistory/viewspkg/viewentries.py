@@ -23,7 +23,7 @@ from ..models import UserSearchHistory
 from ..controllers import (
     LinkDataController,
     LinkDataWrapper,
-    LinkDataBuilder,
+    EntryDataBuilder,
     ArchiveLinkDataController,
     SourceDataController,
     BackgroundJobController,
@@ -551,7 +551,7 @@ def add_entry(request):
         if valid:
             data = form.get_information()
 
-            b = LinkDataBuilder()
+            b = EntryDataBuilder()
             b.link_data = data
             b.source_is_auto = False
             entry = b.add_from_props_internal()

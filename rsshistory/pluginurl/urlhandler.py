@@ -81,12 +81,7 @@ class UrlHandler(Url):
             options = page_options
 
         u = Url(url, page_options=options)
-
-        # if response is cloudflare jibberish, try using selenium
-        if options.is_not_selenium() and (
-            (not u.is_valid() or u.is_cloudflare_protected())
-            or (u.get_status_code() == 403)
-        ):
+        if self.is_selenium_retry_possible(u, options):
             LinkDatabase.info(
                 "Could not normally obtain contents. Trying selenium:".format(url)
             )
@@ -101,6 +96,23 @@ class UrlHandler(Url):
         self.options = u.options
         self.response = u.response
         return u.p
+
+    def is_selenium_retry_possible(self, u, options):
+        status_code = u.get_status_code()
+
+        if status_code < 200 or status_code > 404:
+            return False
+
+        # if response is cloudflare jibberish, try using selenium
+        # if page is invalid we may try with selenium. Some pages have cloudflare protection, or other
+        if options.is_not_selenium() and (
+            not u.is_valid or u.is_cloudflare_protected()
+        ):
+            return True
+        return False
+
+    def is_status_code_redirect(self, status_code):
+        return (status_code >= 300 and status_code < 400) or status_code == 403
 
     def get_type(url):
         short_url = UrlHandler.get_protololless(url)

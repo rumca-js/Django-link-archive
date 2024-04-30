@@ -7,7 +7,7 @@ from ..controllers import (
     LinkDataController,
     DomainsController,
     ArchiveLinkDataController,
-    LinkDataBuilder,
+    EntryDataBuilder,
 )
 from ..dateutils import DateUtils
 from ..models import KeyWords, DataExport, UserBookmarks
@@ -105,7 +105,7 @@ class EntriesViewsTests(FakeInternetTestCase):
         url = reverse("{}:entry-add".format(LinkDatabase.name))
         test_link = "https://linkedin.com"
 
-        LinkDataBuilder(link=test_link)
+        EntryDataBuilder(link=test_link)
 
         limited_data = self.get_link_data(test_link)
 

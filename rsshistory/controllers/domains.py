@@ -281,7 +281,7 @@ class DomainsController(Domains):
                 entry.save()
 
     def create_missing_entries():
-        from .entriesutils import LinkDataBuilder
+        from .entriesutils import EntryDataBuilder
 
         domains = DomainsController.objects.all()
         for domain in domains:
@@ -298,7 +298,7 @@ class DomainsController(Domains):
                     missing_entry = True
 
             if missing_entry:
-                b = LinkDataBuilder()
+                b = EntryDataBuilder()
                 b.link = full_domain
                 obj = b.add_from_link()
                 if obj:

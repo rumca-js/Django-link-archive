@@ -10,7 +10,7 @@ from ..controllers import (
     LinkDataController,
     SourceDataController,
     SourceDataController,
-    LinkDataBuilder,
+    EntryDataBuilder,
     SourceDataBuilder,
     LinkCommentDataController,
     LinkDataWrapper,
@@ -168,7 +168,7 @@ class BaseImporter(object):
                 # accepted and not. Let the builder deal with it
                 LinkDatabase.info("Importing link:{}".format(clean_data["link"]))
 
-                b = LinkDataBuilder(link_data=clean_data, source_is_auto=True)
+                b = EntryDataBuilder(link_data=clean_data, source_is_auto=True)
                 entry = b.result
 
                 if entry and entry.is_archive_entry():

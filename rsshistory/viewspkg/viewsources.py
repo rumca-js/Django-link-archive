@@ -10,7 +10,7 @@ from ..models import ConfigurationEntry, UserConfig, AppLogging
 from ..controllers import (
     SourceDataController,
     SourceDataBuilder,
-    LinkDataBuilder,
+    EntryDataBuilder,
     LinkDataController,
     BackgroundJobController,
     LinkDataWrapper,
@@ -105,7 +105,7 @@ class SourceDetailView(generic.DetailView):
             context["entry_object"] = entries[0]
         else:
             AppLogging.error("Missing source entry {}".format(self.object.url))
-            builder = LinkDataBuilder(link=self.object.url)
+            builder = EntryDataBuilder(link=self.object.url)
             if builder.result:
                 entry = builder.result
                 if entry.is_archive_entry():

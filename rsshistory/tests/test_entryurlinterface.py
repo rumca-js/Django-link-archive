@@ -17,7 +17,7 @@ class EntryUrlInterfaceTest(FakeInternetTestCase):
         self.assertEqual(props["link"], "https://www.youtube.com/watch?v=1234")
         self.assertEqual(props["title"], "1234 test title")
         self.assertEqual(props["status_code"], 200)
-        self.assertTrue(props["page_rating"] > 0)
+        self.assertEqual(props["page_rating"], 0)
 
     def test_video_mobile_youtube_handler(self):
         url = EntryUrlInterface("https://m.youtube.com/watch?v=1234")
@@ -27,7 +27,7 @@ class EntryUrlInterfaceTest(FakeInternetTestCase):
         self.assertEqual(props["link"], "https://www.youtube.com/watch?v=1234")
         self.assertEqual(props["title"], "1234 test title")
         self.assertEqual(props["status_code"], 200)
-        self.assertTrue(props["page_rating"] > 0)
+        self.assertEqual(props["page_rating"], 0)
 
     def test_video_youtu_be_handler(self):
         url = EntryUrlInterface("https://youtu.be/1234")
@@ -37,7 +37,7 @@ class EntryUrlInterfaceTest(FakeInternetTestCase):
         self.assertEqual(props["link"], "https://www.youtube.com/watch?v=1234")
         self.assertEqual(props["title"], "1234 test title")
         self.assertEqual(props["status_code"], 200)
-        self.assertTrue(props["page_rating"] > 0)
+        self.assertEqual(props["page_rating"], 0)
 
     def test_html_handler(self):
         url = EntryUrlInterface("https://www.linkedin.com")
@@ -45,7 +45,7 @@ class EntryUrlInterfaceTest(FakeInternetTestCase):
 
         self.assertTrue(props)
         self.assertEqual(props["status_code"], 200)
-        self.assertTrue(props["page_rating"] > 0)
+        self.assertEqual(props["page_rating"], 0)
 
     def test_rss_handler(self):
         url = EntryUrlInterface("https://rsspage.com/rss.xml")
@@ -57,7 +57,7 @@ class EntryUrlInterfaceTest(FakeInternetTestCase):
         self.assertTrue(props["title"])
         self.assertTrue(props["description"])
         self.assertEqual(props["status_code"], 200)
-        self.assertTrue(props["page_rating"] > 0)
+        self.assertEqual(props["page_rating"], 0)
 
     def test_error_html(self):
         url = EntryUrlInterface("https://page-with-http-status-500.com")

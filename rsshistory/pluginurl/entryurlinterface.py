@@ -276,7 +276,7 @@ class EntryUrlInterface(object):
         if not self.is_property_set(input_props, "page_rating_contents"):
             input_props["page_rating_contents"] = self.h.get_page_rating()
         if not self.is_property_set(input_props, "page_rating"):
-            input_props["page_rating"] = self.h.get_page_rating()
+            input_props["page_rating"] = 0 # unset
         if not self.is_property_set(input_props, "status_code"):
             input_props["status_code"] = self.h.get_status_code()
 

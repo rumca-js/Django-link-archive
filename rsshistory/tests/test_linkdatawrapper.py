@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 
 from ..models import UserBookmarks
 from ..controllers import (
-    LinkDataBuilder,
+    EntryDataBuilder,
     LinkDataWrapper,
     SourceDataController,
     DomainsController,
@@ -110,7 +110,7 @@ class LinkDataWrapperTest(FakeInternetTestCase):
             "date_published": DateUtils.get_datetime_now_utc(),
         }
 
-        b = LinkDataBuilder()
+        b = EntryDataBuilder()
         b.link_data = link_data
         entry = b.add_from_props()
 
@@ -145,7 +145,7 @@ class LinkDataWrapperTest(FakeInternetTestCase):
             "date_published": DateUtils.get_datetime_now_utc(),
         }
 
-        b = LinkDataBuilder()
+        b = EntryDataBuilder()
         b.link_data = link_data
         entry = b.add_from_props()
 
@@ -181,7 +181,7 @@ class LinkDataWrapperTest(FakeInternetTestCase):
             "bookmarked": True,
         }
 
-        b = LinkDataBuilder()
+        b = EntryDataBuilder()
         b.link_data = link_data
         entry = b.add_from_props()
 

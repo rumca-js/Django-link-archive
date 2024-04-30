@@ -7,7 +7,7 @@ from ..webtools import HtmlPage, PageOptions, ContentLinkParser, calculate_hash
 from ..dateutils import DateUtils
 from ..models import AppLogging, UserTags
 from ..models import BaseLinkDataController
-from ..controllers import LinkDataBuilder, SourceDataController
+from ..controllers import EntryDataBuilder, SourceDataController
 from ..controllers import LinkDataController, BackgroundJobController
 from ..pluginurl.urlhandler import UrlHandler
 
@@ -102,7 +102,7 @@ class SourceGenericPlugin(object):
 
             # LinkDatabase.info("Generic plugin item add:{}".format(link_data["link"]))
 
-            b = LinkDataBuilder()
+            b = EntryDataBuilder()
             b.link_data = link_data
             b.source_is_auto = True
 

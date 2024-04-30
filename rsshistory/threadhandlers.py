@@ -42,7 +42,7 @@ from .controllers import (
     BackgroundJobController,
     LinkDataController,
     SourceDataController,
-    LinkDataBuilder,
+    EntryDataBuilder,
     DomainsController,
     LinkCommentDataController,
     EntriesCleanupAndUpdate,
@@ -351,7 +351,7 @@ class LinkAddJobHandler(BaseJobHandler):
                 data["link"] = link
 
         # Add the link
-        b = LinkDataBuilder()
+        b = EntryDataBuilder()
         b.link_data = data
         b.link = link
         b.source_is_auto = True

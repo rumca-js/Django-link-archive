@@ -9,7 +9,7 @@ from ..apps import LinkDatabase
 from ..models import Domains, DomainCategories, DomainSubCategories, ConfigurationEntry
 from ..controllers import (
     LinkDataWrapper,
-    LinkDataBuilder,
+    EntryDataBuilder,
     LinkDataController,
     DomainsController,
 )
@@ -256,7 +256,7 @@ def domains_read_bookmarks(request):
     if data is not None:
         return data
 
-    LinkDataBuilder().read_domains_from_bookmarks()
+    EntryDataBuilder().read_domains_from_bookmarks()
 
     return HttpResponseRedirect(reverse("{}:domains".format(LinkDatabase.name)))
 
