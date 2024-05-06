@@ -3,7 +3,7 @@ from ..controllers import (
     LinkDataController,
     SourceDataController,
 )
-from ..models import BackgroundJob
+from ..models import BackgroundJob, DataExport
 from .fakeinternet import FakeInternetTestCase
 
 
@@ -256,35 +256,31 @@ class BackgroundJobControllerTest(FakeInternetTestCase):
             1,
         )
 
-    def test_push_to_repo(self):
+    def test_export_data(self):
         self.assertEqual(
-            BackgroundJobController.get_number_of_jobs(BackgroundJob.JOB_PUSH_TO_REPO),
+            BackgroundJobController.get_number_of_jobs(BackgroundJob.JOB_EXPORT_DATA),
             0,
         )
 
-        # call tested function
-        BackgroundJobController.push_to_repo("2022-03-01")
-
-        self.assertEqual(
-            BackgroundJobController.get_number_of_jobs(BackgroundJob.JOB_PUSH_TO_REPO),
-            1,
-        )
-
-    def test_push_daily_data_to_repo(self):
-        self.assertEqual(
-            BackgroundJobController.get_number_of_jobs(
-                BackgroundJob.JOB_PUSH_DAILY_DATA_TO_REPO
-            ),
-            0,
+        export1 = DataExport.objects.create(
+            enabled=True,
+            export_type=DataExport.EXPORT_TYPE_GIT,
+            export_data=DataExport.EXPORT_DAILY_DATA,
+            local_path="./daily_dir",
+            remote_path="https://github.com/rumca-js/RSS-Link-Database-DAILY.git",
+            user="testuser",
+            password="password",
+            export_entries=True,
+            export_entries_bookmarks=True,
+            export_entries_permanents=True,
+            export_sources=True,
         )
 
         # call tested function
-        BackgroundJobController.push_daily_data_to_repo("2022-03-01")
+        BackgroundJobController.export_data(export1)
 
         self.assertEqual(
-            BackgroundJobController.get_number_of_jobs(
-                BackgroundJob.JOB_PUSH_DAILY_DATA_TO_REPO
-            ),
+            BackgroundJobController.get_number_of_jobs(BackgroundJob.JOB_EXPORT_DATA),
             1,
         )
 
