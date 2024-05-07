@@ -1,6 +1,7 @@
 from pathlib import Path
 import subprocess
 import shutil
+from ..models import AppLogging
 
 
 class GitRepo(object):
@@ -30,8 +31,6 @@ class GitRepo(object):
         cwd = self.get_operating_dir()
         local = self.get_local_dir()
 
-        print("Local:{}\ncwd:{}\n".format(local, cwd))
-
         if not cwd.is_dir():
             cwd.mkdir(parents=True)
 
@@ -42,18 +41,18 @@ class GitRepo(object):
 
     def add(self, files):
         p = subprocess.run(
-            ["git", "add", "-A"], cwd=self.get_local_dir(), timeout=self.timeout_s
+            ["git", "add", "-A"], cwd=self.get_local_dir(), timeout=self.timeout_s, capture_output=True,
         )
-        p.check_returncode()
+        self.check_process(p)
 
     def commit(self, commit_message):
         p = subprocess.run(
             ["git", "commit", "-m", commit_message],
             cwd=self.get_local_dir(),
             timeout=self.timeout_s,
+            capture_output=True,
         )
-        if p.returncode != 0:
-            raise IOError("Invalid git return code for add")
+        self.check_process(p)
 
     def push(self):
         token = self.git_data.password
@@ -67,8 +66,9 @@ class GitRepo(object):
             ],
             cwd=self.get_local_dir(),
             timeout=self.timeout_s,
+            capture_output=True,
         )
-        p.check_returncode()
+        self.check_process(p)
 
     def get_repo_name(self):
         last = Path(self.git_repo).parts[-1]
@@ -81,17 +81,25 @@ class GitRepo(object):
             ["git", "clone", self.git_repo],
             cwd=self.get_operating_dir(),
             timeout=self.timeout_s,
+            capture_output=True,
         )
-        p.check_returncode()
+        self.check_process(p)
 
     def pull(self):
-        print("Pulling from directory: {}".format(self.get_local_dir()))
         p = subprocess.run(
-            ["git", "pull"], cwd=self.get_local_dir(), timeout=self.timeout_s
+            ["git", "pull"],
+            cwd=self.get_local_dir(),
+            timeout=self.timeout_s,
+            capture_output=True,
         )
-        p.check_returncode()
+        self.check_process(p)
 
     def copy_tree(self, input_path):
         expected_dir = self.get_local_dir()
 
         shutil.copytree(input_path, expected_dir, dirs_exist_ok=True)
+
+    def check_process(self, p):
+        if p.returncode != 0:
+            AppLogging.error("GIT status:{}\nstdout:{}\nstderr:{}".format(p.returncode, p.stdout.decode(), p.stderr.decode()))
+        p.check_returncode()

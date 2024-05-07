@@ -711,36 +711,42 @@ class WriteTopicJobHandler(BaseJobHandler):
             )
 
 
-class PushToRepoJobHandler(BaseJobHandler):
+class ExportDataJobHandler(BaseJobHandler):
     """!
     Pushes data to repo
     """
 
     def get_job(self):
-        return BackgroundJob.JOB_PUSH_TO_REPO
+        return BackgroundJob.JOB_EXPORT_DATA
 
     def process(self, obj=None):
+        from .updatemgr import UpdateManager
         try:
-            if (
-                DataExport.is_daily_data_set()
-                or DataExport.is_year_data_set()
-                or DataExport.is_notime_data_set()
-            ):
-                from .updatemgr import UpdateManager
+            export = self.get_export(obj)
+            if not export:
+                return
 
-                update_mgr = UpdateManager(self._config)
-                if DataExport.is_year_data_set():
-                    update_mgr.write_and_push_year_data()
-                if DataExport.is_daily_data_set():
-                    update_mgr.write_and_push_daily_data()
-                if DataExport.is_notime_data_set():
-                    update_mgr.write_and_push_notime_data()
+            update_mgr = UpdateManager(self._config)
 
-                SourceExportHistory.confirm()
-                AppLogging.info("Successfully pushed data to git")
+            if export.is_daily_data():
+                update_mgr.write_and_push_daily_data()
+            if export.is_year_data():
+                update_mgr.write_and_push_year_data()
+            if export.is_notime_data():
+                update_mgr.write_and_push_notime_data()
+
+            SourceExportHistory.confirm(export)
+            AppLogging.info("Successfully pushed data to git")
+
+            return True
         except Exception as e:
             error_text = traceback.format_exc()
             AppLogging.error("Exception: {} {}".format(str(e), error_text))
+
+    def get_export(self,obj):
+        exports = DataExport.objects.filter(id = int(obj.subject))
+        if exports.count() > 0:
+            return exports[0]
 
 
 class PushYearDataToRepoJobHandler(BaseJobHandler):
@@ -844,6 +850,7 @@ class CleanupJobHandler(BaseJobHandler):
                 DomainsController.cleanup()
                 KeyWords.cleanup()
                 UserConfig.cleanup()
+                SourceExportHistory.cleanup()
 
                 self.user_tables_cleanup()
 
@@ -953,9 +960,10 @@ class RefreshThreadHandler(object):
 
         self.check_sources()
 
-        if SourceExportHistory.is_update_required():
-            self.do_update()
-            SourceExportHistory.confirm()
+        for export in DataExport.objects.all():
+            if SourceExportHistory.is_update_required(export):
+                self.do_update(export)
+                SourceExportHistory.confirm(export)
 
     def check_sources(self):
         from .controllers import SourceDataController
@@ -967,15 +975,8 @@ class RefreshThreadHandler(object):
             if source.is_fetch_possible():
                 BackgroundJobController.download_rss(source)
 
-    def do_update(self):
-        if DataExport.is_daily_data_set():
-            BackgroundJobController.push_daily_data_to_repo()
-
-        if DataExport.is_year_data_set():
-            BackgroundJobController.push_year_data_to_repo()
-
-        if DataExport.is_notime_data_set():
-            BackgroundJobController.push_notime_data_to_repo()
+    def do_update(self, export):
+        BackgroundJobController.export_data(export)
 
         c = Configuration.get_object()
         conf = c.config_entry
@@ -1005,11 +1006,7 @@ class HandlerManager(object):
         """
         return [
             # fmt: off
-            PushToRepoJobHandler(),
-
-            PushDailyDataToRepoJobHandler(),
-            PushYearDataToRepoJobHandler(),
-            PushNoTimeDataToRepoJobHandler(),
+            ExportDataJobHandler(),
 
             WriteDailyDataJobHandler(),
             WriteYearDataJobHandler(),
@@ -1105,16 +1102,23 @@ class HandlerManager(object):
 
         except Exception as E:
             error_text = traceback.format_exc()
-            AppLogging.error(
-                "Exception during handler processing job:{}\nsubject:{}\nException:{}\nError text:{}".format(
-                    obj.job, obj.subject, str(E), error_text
-                )
-            )
             if not deleted and obj:
+                AppLogging.error(
+                    "Exception during handler processing job:{}\nsubject:{}\nException:{}\nError text:{}".format(
+                        obj.job, obj.subject, str(E), error_text
+                    )
+                )
                 obj.on_error()
+            else:
+                AppLogging.error(
+                    "Exception during handler processing job: Exception:{}\nError text:{}".format(
+                        str(E), error_text
+                    )
+                )
 
     def on_not_safe_exit(self, items):
         jobs = BackgroundJobController.objects.filter(
+            enabled=True,
             date_created__lt=self.start_processing_time
         )
         for job in jobs:

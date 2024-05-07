@@ -79,9 +79,9 @@ class HandlerManagerTest(FakeInternetTestCase):
         self.assertEqual(bg_obj, handler_obj)
         self.assertTrue(not handler)
 
-    def test_get_handler_and_object_push_to_repo_handler(self):
+    def test_get_handler_and_object_export_data_handler(self):
         bg_obj = BackgroundJobController.objects.create(
-            job=BackgroundJobController.JOB_PUSH_TO_REPO
+            job=BackgroundJobController.JOB_EXPORT_DATA
         )
 
         mgr = HandlerManager()
@@ -89,21 +89,7 @@ class HandlerManagerTest(FakeInternetTestCase):
         handler_obj, handler = mgr.get_handler_and_object()
 
         self.assertEqual(bg_obj, handler_obj)
-        self.assertEqual(handler.get_job(), BackgroundJobController.JOB_PUSH_TO_REPO)
-
-    def test_get_handler_and_object_push_daily_data_to_repo_handler(self):
-        bg_obj = BackgroundJobController.objects.create(
-            job=BackgroundJobController.JOB_PUSH_DAILY_DATA_TO_REPO
-        )
-
-        mgr = HandlerManager()
-        # call tested function
-        handler_obj, handler = mgr.get_handler_and_object()
-
-        self.assertEqual(bg_obj, handler_obj)
-        self.assertEqual(
-            handler.get_job(), BackgroundJobController.JOB_PUSH_DAILY_DATA_TO_REPO
-        )
+        self.assertEqual(handler.get_job(), BackgroundJobController.JOB_EXPORT_DATA)
 
     def test_get_handler_and_object_process_source_handler(self):
         bg_obj = BackgroundJobController.objects.create(
@@ -462,26 +448,14 @@ class RefreshThreadHandlerTest(FakeInternetTestCase):
             1,
         )
 
-        self.assertEqual(
-            BackgroundJobController.objects.filter(
-                job=BackgroundJobController.JOB_PUSH_DAILY_DATA_TO_REPO
-            ).count(),
-            1,
-        )
+        export_jobs = BackgroundJobController.objects.filter(
+                job=BackgroundJobController.JOB_EXPORT_DATA
+            )
 
-        self.assertEqual(
-            BackgroundJobController.objects.filter(
-                job=BackgroundJobController.JOB_PUSH_YEAR_DATA_TO_REPO
-            ).count(),
-            1,
-        )
+        self.assertEqual(export_jobs.count(), 3)
 
-        self.assertEqual(
-            BackgroundJobController.objects.filter(
-                job=BackgroundJobController.JOB_PUSH_NOTIME_DATA_TO_REPO
-            ).count(),
-            1,
-        )
+        pks = export_jobs.values_list("subject")
+        # TODO check if export id is in pks
 
         self.assertEqual(
             BackgroundJobController.objects.filter(

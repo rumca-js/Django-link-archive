@@ -47,9 +47,15 @@ class UpdateExportManager(object):
         writer.write()
 
     def get_directory(self):
+        """
+        Path to place where data are written to
+        """
         return Path(self.export_data.local_path) / self.directory
 
     def get_repo_operating_dir(self, repo):
+        """
+        Path to repository, rather absolute
+        """
         return Path(self._cfg.get_export_path()) / self.export_data.local_path / "git"
 
     def push(self):
@@ -71,6 +77,13 @@ class UpdateExportManager(object):
 
             shutil.rmtree(dir)
 
+    def clear_operating_directory(self):
+        dir = self.get_repo_operating_dir()
+        if dir.exists():
+            import shutil
+
+            shutil.rmtree(dir)
+
     def push_implementation(self, export_data, commit_message):
         AppLogging.info("Pushing repo")
 
@@ -81,14 +94,21 @@ class UpdateExportManager(object):
             operating_dir = self.get_repo_operating_dir(repo)
             repo.set_operating_dir(operating_dir)
 
-            repo.up()
+            repo_is_up = False
+            try:
+                repo.up()
+                repo_is_up = True
+            except Exception as E:
+                AppLogging.error("Cannot update repository, removing directory {}".format(operating_dir))
+                self.clear_operating_directory()
 
-            local_dir = self._cfg.get_export_path(self.get_directory())
-            repo.copy_tree(local_dir)
+            if repo_is_up:
+                local_dir = self._cfg.get_export_path(self.get_directory())
+                repo.copy_tree(local_dir)
 
-            repo.add([])
-            repo.commit(commit_message)
-            repo.push()
+                repo.add([])
+                repo.commit(commit_message)
+                repo.push()
         elif export_data.export_type == DataExport.EXPORT_TYPE_LOC:
             if export_data.local_path == export_data.remote_path:
                 return

@@ -519,10 +519,7 @@ class BackgroundJob(models.Model):
     JOB_IMPORT_SOURCES = "import-sources"
     JOB_IMPORT_INSTANCE = "import-instance"
     JOB_IMPORT_FROM_FILES = "import-from-files"
-    JOB_PUSH_TO_REPO = "push-to-repo"
-    JOB_PUSH_DAILY_DATA_TO_REPO = "push-daily-data-to-repo"
-    JOB_PUSH_YEAR_DATA_TO_REPO = "push-year-data-to-repo"
-    JOB_PUSH_NOTIME_DATA_TO_REPO = "push-notime-data-to-repo"
+    JOB_EXPORT_DATA = "export-data"
     JOB_CLEANUP = "cleanup"
     JOB_CHECK_DOMAINS = "check-domains"
 
@@ -548,10 +545,7 @@ class BackgroundJob(models.Model):
         (JOB_IMPORT_SOURCES, JOB_IMPORT_SOURCES),
         (JOB_IMPORT_INSTANCE, JOB_IMPORT_INSTANCE),
         (JOB_IMPORT_FROM_FILES, JOB_IMPORT_FROM_FILES),
-        (JOB_PUSH_TO_REPO, JOB_PUSH_TO_REPO),
-        (JOB_PUSH_DAILY_DATA_TO_REPO, JOB_PUSH_DAILY_DATA_TO_REPO),
-        (JOB_PUSH_YEAR_DATA_TO_REPO, JOB_PUSH_YEAR_DATA_TO_REPO),
-        (JOB_PUSH_NOTIME_DATA_TO_REPO, JOB_PUSH_NOTIME_DATA_TO_REPO),
+        (JOB_EXPORT_DATA, JOB_EXPORT_DATA),
         (JOB_CLEANUP, JOB_CLEANUP),
         (JOB_CHECK_DOMAINS, JOB_CHECK_DOMAINS),
     )

@@ -45,8 +45,12 @@
 
 <h1>Export history</h1>
 <p>
-     {% for ihist in export_history_list %}
-     <div>{{ihist.date}}</div>
+     {% for history_entry in export_history_list %}
+     <div>{{history_entry.date}}, 
+        {% if history_entry.export_obj %}
+           {{history_entry.export_obj.remote_path}}, {{history_entry.export_obj.export_type}}, {{history_entry.export_obj.export_data}}
+        {% endif %}
+     </div>
      {% endfor %}
 </p>
 

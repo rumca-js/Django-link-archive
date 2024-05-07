@@ -2,6 +2,20 @@
 {% load static %}
 {% block content %}
 
+{% if user.is_staff %}
+<div class="dropdown">
+   <button class="btn btn-primary" type="button" id="#actionsDrop" data-bs-toggle="dropdown" aria-expanded="false">
+     Actions
+   </button>
+
+   <ul class="dropdown-menu">
+      <li>
+         <a href="{% url 'rsshistory:data-export-job-add' object.id %}" title="Shows categories" class="dropdown-item">Add to job</a>
+      </li>
+   </ul>
+</div>
+{% endif %}
+
 <div class="contentbuttonmenu">
     <a href="{% url 'rsshistory:data-export-edit' object.id %}" class="btn btn-primary" role="button">
        <img src="{% static 'rsshistory/icons/icons8-edit-100.png' %}" class="content-icon" />

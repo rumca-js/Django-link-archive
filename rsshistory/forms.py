@@ -176,6 +176,7 @@ class DataExportForm(forms.ModelForm):
             "export_entries_bookmarks",
             "export_entries_permanents",
             "export_sources",
+            "export_time",
         ]
 
     def __init__(self, *args, **kwargs):

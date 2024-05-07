@@ -19,28 +19,25 @@ from ..dateutils import DateUtils
 class BackgroundJobController(BackgroundJob):
     # fmt: off
     PRIORITY_JOB_CHOICES = [
-        (BackgroundJob.JOB_PUSH_TO_REPO, BackgroundJob.JOB_PUSH_TO_REPO), # 0
-        (BackgroundJob.JOB_PUSH_DAILY_DATA_TO_REPO, BackgroundJob.JOB_PUSH_DAILY_DATA_TO_REPO), # 1
-        (BackgroundJob.JOB_PUSH_YEAR_DATA_TO_REPO, BackgroundJob.JOB_PUSH_YEAR_DATA_TO_REPO), # 2
-        (BackgroundJob.JOB_PUSH_NOTIME_DATA_TO_REPO, BackgroundJob.JOB_PUSH_NOTIME_DATA_TO_REPO), # 3
+        (BackgroundJob.JOB_EXPORT_DATA, BackgroundJob.JOB_EXPORT_DATA), # 0
 
-        (BackgroundJob.JOB_WRITE_DAILY_DATA, BackgroundJob.JOB_WRITE_DAILY_DATA), # 4
-        (BackgroundJob.JOB_WRITE_TOPIC_DATA, BackgroundJob.JOB_WRITE_TOPIC_DATA), # 5
-        (BackgroundJob.JOB_WRITE_YEAR_DATA, BackgroundJob.JOB_WRITE_YEAR_DATA), # 6
-        (BackgroundJob.JOB_WRITE_NOTIME_DATA, BackgroundJob.JOB_WRITE_NOTIME_DATA), # 6
+        (BackgroundJob.JOB_WRITE_DAILY_DATA, BackgroundJob.JOB_WRITE_DAILY_DATA), # 1
+        (BackgroundJob.JOB_WRITE_TOPIC_DATA, BackgroundJob.JOB_WRITE_TOPIC_DATA), # 2
+        (BackgroundJob.JOB_WRITE_YEAR_DATA, BackgroundJob.JOB_WRITE_YEAR_DATA), # 3
+        (BackgroundJob.JOB_WRITE_NOTIME_DATA, BackgroundJob.JOB_WRITE_NOTIME_DATA), # 4
 
-        (BackgroundJob.JOB_IMPORT_DAILY_DATA, BackgroundJob.JOB_IMPORT_DAILY_DATA), # 7
-        (BackgroundJob.JOB_IMPORT_BOOKMARKS, BackgroundJob.JOB_IMPORT_BOOKMARKS), # 8
-        (BackgroundJob.JOB_IMPORT_SOURCES, BackgroundJob.JOB_IMPORT_SOURCES), # 9
-        (BackgroundJob.JOB_IMPORT_INSTANCE, BackgroundJob.JOB_IMPORT_INSTANCE), # 10
-        (BackgroundJob.JOB_IMPORT_FROM_FILES, BackgroundJob.JOB_IMPORT_FROM_FILES), # 11
+        (BackgroundJob.JOB_IMPORT_DAILY_DATA, BackgroundJob.JOB_IMPORT_DAILY_DATA), # 5
+        (BackgroundJob.JOB_IMPORT_BOOKMARKS, BackgroundJob.JOB_IMPORT_BOOKMARKS), # 6
+        (BackgroundJob.JOB_IMPORT_SOURCES, BackgroundJob.JOB_IMPORT_SOURCES), # 7
+        (BackgroundJob.JOB_IMPORT_INSTANCE, BackgroundJob.JOB_IMPORT_INSTANCE), # 8
+        (BackgroundJob.JOB_IMPORT_FROM_FILES, BackgroundJob.JOB_IMPORT_FROM_FILES), # 9
 
         # Since cleanup, moving to archives can take forever, we still want to process
         # source in between
-        (BackgroundJob.JOB_PROCESS_SOURCE, BackgroundJob.JOB_PROCESS_SOURCE,), # 12
-        (BackgroundJob.JOB_CLEANUP, BackgroundJob.JOB_CLEANUP), # 13
-        (BackgroundJob.JOB_MOVE_TO_ARCHIVE, BackgroundJob.JOB_MOVE_TO_ARCHIVE), # 14
-        (BackgroundJob.JOB_LINK_ADD, BackgroundJob.JOB_LINK_ADD,), # 15                         # adds link using default properties, may contain link map properties in the map
+        (BackgroundJob.JOB_PROCESS_SOURCE, BackgroundJob.JOB_PROCESS_SOURCE,), # 10
+        (BackgroundJob.JOB_CLEANUP, BackgroundJob.JOB_CLEANUP), # 11
+        (BackgroundJob.JOB_MOVE_TO_ARCHIVE, BackgroundJob.JOB_MOVE_TO_ARCHIVE), # 12
+        (BackgroundJob.JOB_LINK_ADD, BackgroundJob.JOB_LINK_ADD,), # 13                         # adds link using default properties, may contain link map properties in the map
         (BackgroundJob.JOB_LINK_UPDATE_DATA, BackgroundJob.JOB_LINK_UPDATE_DATA),           # update data, recalculate
         (BackgroundJob.JOB_LINK_RESET_LOCAL_DATA, BackgroundJob.JOB_LINK_RESET_LOCAL_DATA),           # update data, recalculate
         (BackgroundJob.JOB_LINK_RESET_DATA, BackgroundJob.JOB_LINK_RESET_DATA,),
@@ -367,24 +364,9 @@ class BackgroundJobController(BackgroundJob):
             BackgroundJob.JOB_LINK_RESET_DATA, entry.link
         )
 
-    def push_to_repo(input_date=""):
+    def export_data(export, input_date = None):
         return BackgroundJobController.create_single_job(
-            BackgroundJob.JOB_PUSH_TO_REPO, input_date
-        )
-
-    def push_daily_data_to_repo(input_date=""):
-        return BackgroundJobController.create_single_job(
-            BackgroundJob.JOB_PUSH_DAILY_DATA_TO_REPO, input_date
-        )
-
-    def push_year_data_to_repo(input_date=""):
-        return BackgroundJobController.create_single_job(
-            BackgroundJob.JOB_PUSH_YEAR_DATA_TO_REPO, input_date
-        )
-
-    def push_notime_data_to_repo(input_date=""):
-        return BackgroundJobController.create_single_job(
-            BackgroundJob.JOB_PUSH_NOTIME_DATA_TO_REPO, input_date
+            BackgroundJob.JOB_EXPORT_DATA, str(export.id), input_date
         )
 
     def make_cleanup():

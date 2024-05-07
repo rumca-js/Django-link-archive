@@ -1,43 +1,8 @@
 import traceback
 from django.db import models
+from datetime import time, datetime, date, timedelta
 
 from .system import AppLogging
-
-
-class SourceExportHistory(models.Model):
-    date = models.DateField(unique=True, null=False)
-
-    class Meta:
-        ordering = ["-date"]
-
-    def is_update_required():
-        from ..dateutils import DateUtils
-
-        try:
-            yesterday = DateUtils.get_date_yesterday()
-
-            history = SourceExportHistory.objects.filter(date=yesterday)
-
-            if history.count() != 0:
-                return False
-            return True
-
-        except Exception as e:
-            error_text = traceback.format_exc()
-            AppLogging.error("Exception for update: {0} {1}".format(str(e), error_text))
-
-    def get_safe():
-        return SourceExportHistory.objects.all()[:7]
-
-    def confirm(input_date=None):
-        from ..dateutils import DateUtils
-
-        process_date = DateUtils.get_date_yesterday()
-        if input_date is not None:
-            process_date = input_date
-
-        if SourceExportHistory.objects.filter(date=process_date).count() == 0:
-            SourceExportHistory.objects.create(date=process_date)
 
 
 class DataExport(models.Model):
@@ -90,6 +55,16 @@ class DataExport(models.Model):
         default=False, help_text="Export entries has to be checked for this to work"
     )
     export_sources = models.BooleanField(default=False)
+    export_time = models.TimeField(default=time(0,0))
+
+    def is_daily_data(self):
+        return self.export_data==DataExport.EXPORT_DAILY_DATA
+
+    def is_year_data(self):
+        return self.export_data==DataExport.EXPORT_YEAR_DATA
+
+    def is_notime_data(self):
+        return self.export_data==DataExport.EXPORT_NOTIME_DATA
 
     def is_daily_data_set():
         exps = DataExport.objects.filter(
@@ -120,3 +95,49 @@ class DataExport(models.Model):
             return True
         else:
             return False
+
+
+class SourceExportHistory(models.Model):
+    date = models.DateField(null=False)
+    export_obj = models.ForeignKey(DataExport, related_name='export_history', on_delete=models.CASCADE, null=True, blank=True)
+
+    class Meta:
+        ordering = ["-date"]
+
+    def is_update_required(export):
+        from ..dateutils import DateUtils
+
+        try:
+            yesterday = DateUtils.get_date_yesterday()
+
+            history = SourceExportHistory.objects.filter(date=yesterday, export_obj = export)
+
+            if history.count() != 0:
+                return False
+
+            if datetime.now().time() < export.export_time:
+                return False
+
+            return True
+
+        except Exception as e:
+            error_text = traceback.format_exc()
+            AppLogging.error("Exception for update: {0} {1}".format(str(e), error_text))
+
+    def get_safe():
+        return SourceExportHistory.objects.all()[:7]
+
+    def confirm(export, input_date=None):
+        from ..dateutils import DateUtils
+
+        process_date = DateUtils.get_date_yesterday()
+        if input_date is not None:
+            process_date = input_date
+
+        if SourceExportHistory.objects.filter(date=process_date, export_obj = export).count() == 0:
+            SourceExportHistory.objects.create(date=process_date, export_obj = export)
+
+    def cleanup():
+        remove_threshold = datetime.today() - timedelta(days=30)
+        histories = SourceExportHistory.objects.filter(date__lt = remove_threshold)
+        histories.delete()

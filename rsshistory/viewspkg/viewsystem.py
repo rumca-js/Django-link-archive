@@ -178,6 +178,7 @@ def reset_config(request):
 class BackgroundJobsView(generic.ListView):
     model = BackgroundJob
     context_object_name = "content_list"
+    paginate_by = 500
 
     def get(self, *args, **kwargs):
         p = ViewPage(self.request)
@@ -207,7 +208,7 @@ def backgroundjob_add(request):
     if request.method == "POST":
         form = BackgroundJobForm(request.POST)
         if form.is_valid():
-            BackgroundJob.objects.create(**form.cleaned_data)
+            BackgroundJobController.objects.create(**form.cleaned_data)
 
             return HttpResponseRedirect(
                 reverse("{}:backgroundjobs".format(LinkDatabase.name))
@@ -232,7 +233,7 @@ def backgroundjob_prio_up(request, pk):
     if data is not None:
         return data
 
-    jobs = BackgroundJob.objects.filter(id=pk)
+    jobs = BackgroundJobController.objects.filter(id=pk)
     if jobs.count() > 0:
         job = jobs[0]
         job.priority -= 1
@@ -248,7 +249,7 @@ def backgroundjob_prio_down(request, pk):
     if data is not None:
         return data
 
-    jobs = BackgroundJob.objects.filter(id=pk)
+    jobs = BackgroundJobController.objects.filter(id=pk)
     if jobs.count() > 0:
         job = jobs[0]
         job.priority += 1
@@ -264,7 +265,7 @@ def backgroundjob_enable(request, pk):
     if data is not None:
         return data
 
-    jobs = BackgroundJob.objects.filter(id=pk)
+    jobs = BackgroundJobController.objects.filter(id=pk)
     if jobs.count() > 0:
         jobs[0].enable()
 
@@ -278,7 +279,7 @@ def backgroundjob_disable(request, pk):
     if data is not None:
         return data
 
-    jobs = BackgroundJob.objects.filter(id=pk)
+    jobs = BackgroundJobController.objects.filter(id=pk)
     if jobs.count() > 0:
         jobs[0].disable()
 
@@ -292,7 +293,7 @@ def backgroundjob_remove(request, pk):
     if data is not None:
         return data
 
-    jobs = BackgroundJob.objects.filter(id=pk)
+    jobs = BackgroundJobController.objects.filter(id=pk)
     if jobs.count() > 0:
         jobs.delete()
 
@@ -306,7 +307,7 @@ def backgroundjobs_remove_all(request):
     if data is not None:
         return data
 
-    bg = BackgroundJob.objects.all()
+    bg = BackgroundJobController.objects.all()
     bg.delete()
 
     return HttpResponseRedirect(reverse("{}:backgroundjobs".format(LinkDatabase.name)))
@@ -349,7 +350,7 @@ def backgroundjobs_remove(request, job_type):
     if data is not None:
         return data
 
-    jobs = BackgroundJob.objects.filter(job=job_type)
+    jobs = BackgroundJobController.objects.filter(job=job_type)
     jobs.delete()
 
     return HttpResponseRedirect(reverse("{}:backgroundjobs".format(LinkDatabase.name)))

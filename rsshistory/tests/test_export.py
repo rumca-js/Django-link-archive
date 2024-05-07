@@ -11,7 +11,7 @@ class SourceExportHistoryTest(FakeInternetTestCase):
         self.disable_web_pages()
 
     def create_exports(self):
-        export1 = DataExport.objects.create(
+        self.export1 = DataExport.objects.create(
             enabled=True,
             export_type=DataExport.EXPORT_TYPE_GIT,
             export_data=DataExport.EXPORT_DAILY_DATA,
@@ -24,7 +24,7 @@ class SourceExportHistoryTest(FakeInternetTestCase):
             export_entries_permanents=True,
             export_sources=True,
         )
-        export2 = DataExport.objects.create(
+        self.export2 = DataExport.objects.create(
             enabled=True,
             export_type=DataExport.EXPORT_TYPE_GIT,
             export_data=DataExport.EXPORT_YEAR_DATA,
@@ -37,7 +37,7 @@ class SourceExportHistoryTest(FakeInternetTestCase):
             export_entries_permanents=True,
             export_sources=True,
         )
-        export3 = DataExport.objects.create(
+        self.export3 = DataExport.objects.create(
             enabled=True,
             export_type=DataExport.EXPORT_TYPE_GIT,
             export_data=DataExport.EXPORT_NOTIME_DATA,
@@ -54,8 +54,8 @@ class SourceExportHistoryTest(FakeInternetTestCase):
     def test_cleanup(self):
         self.create_exports()
 
-        date = datetime.date() - timedelta(days=100)
-        SourceExportHistory.objects.create(date = date, export=export)
+        date = datetime.date.today() - timedelta(days=100)
+        SourceExportHistory.objects.create(date = date, export_obj=self.export1)
 
         # call tested function
         SourceExportHistory.cleanup()

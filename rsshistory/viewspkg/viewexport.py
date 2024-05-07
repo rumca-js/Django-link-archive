@@ -300,6 +300,25 @@ def import_sources(request):
     return p.render("summary_present.html")
 
 
+def data_export_job_add(request, pk):
+    p = ViewPage(request)
+    p.set_title("Add job to export data")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    exports = DataExport.objects.filter(id = pk)
+    if exports.count() == 0:
+        p.context["summary_text"] = "No such export"
+        return p.render("summary_present.html")
+
+    export = exports[0]
+
+    BackgroundJobController.export_data(export)
+
+    return redirect("{}:data-exports".format(LinkDatabase.name))
+
+
 def write_daily_data_form(request):
     from ..forms import ExportDailyDataForm
 

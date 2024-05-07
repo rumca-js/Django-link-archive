@@ -133,6 +133,7 @@ urlpatterns = [
     path("data-export-remove/<int:pk>/", viewexport.data_export_remove, name="data-export-remove"),
     path("data-exports/", viewexport.DataExportListView.as_view(), name="data-exports",),
     path("data-export/<int:pk>/", viewexport.DataExportDetailsView.as_view(), name="data-export",),
+    path("data-export-job-add/<int:pk>/", viewexport.data_export_job_add, name="data-export-job-add",),
     path("write-bookmarks", viewexport.write_bookmarks, name="write-bookmarks"),
     path("write-daily-data-form", viewexport.write_daily_data_form, name="write-daily-data-form",),
     path("write-tag-form", viewexport.write_tag_form, name="write-tag-form"),
