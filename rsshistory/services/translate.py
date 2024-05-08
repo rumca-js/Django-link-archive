@@ -19,16 +19,16 @@ class GoogleTranslate(TranslatePage):
         parts[2] = parts[2].replace(".", "-")
 
         if parts[0] == "http":
-            reminder = "?_x_tr_sch=http&_x_tr_sl=auto&_x_tr_tl=en&_x_tr_hl=en&_x_tr_pto=wapp"
+            remainder = "?_x_tr_sch=http&_x_tr_sl=auto&_x_tr_tl=en&_x_tr_hl=en&_x_tr_pto=wapp"
         else:
-            ramainder = "?_x_tr_sl=auto&_x_tr_tl=en&_x_tr_hl=en&_x_tr_pto=wapp"
+            remainder = "?_x_tr_sl=auto&_x_tr_tl=en&_x_tr_hl=en&_x_tr_pto=wapp"
 
         if len(parts) > 4:
-            return "https" + parts[1] + parts[2] +  ".translate.goog" + parts[3] + ramainder + parts[4].replace("?", "&")
+            return "https" + parts[1] + parts[2] +  ".translate.goog" + parts[3] + remainder + parts[4].replace("?", "&")
         elif len(parts) > 3:
-            return "https" + parts[1] + parts[2] +  ".translate.goog" + parts[3] + ramainder
+            return "https" + parts[1] + parts[2] +  ".translate.goog" + parts[3] + remainder
         elif len(parts) > 2:
-            return "https" + parts[1] + parts[2] + ".translate.goog/" + ramainder
+            return "https" + parts[1] + parts[2] + ".translate.goog/" + remainder
 
 
 class TranslateBuilder(object):
