@@ -118,6 +118,7 @@ class DomainAwarePage(object):
     def parse_url(self):
         """
         We cannot use urlparse, as it does not work with ftp:// or smb:// or win location
+        returns tuple [protocol, separator, url]
         """
         protocol_pos = self.url.find("://")
         if protocol_pos >= 0:
@@ -137,26 +138,18 @@ class DomainAwarePage(object):
             rest = self.url[protocol_pos + 3 :]
             protocol = self.url[:protocol_pos].lower()
 
-            rest_data = self.parse_rest(rest)
+            rest_data = self.parse_location(rest)
 
             if len(rest_data) > 1:
-                return [protocol, "://", rest_data[0], rest_data[1]]
+                arg = self.parse_argument(rest_data[1])
+                return [protocol, "://", rest_data[0], arg[0], arg[1]]
             else:
                 return [protocol, "://", rest_data[0]]
 
-    def parse_rest(self, rest):
-        wh1 = rest.find("/")
-        wh2 = rest.find("\\")
-        wh3 = rest.find("?")
-        wh4 = rest.find("#")
-        positions = [wh for wh in [wh1, wh2, wh3, wh4] if wh != -1]
-
-        if len(positions) > 0:
-            smallest_position = min(positions)
-            return [rest[:smallest_position], rest[: smallest_position + 1]]
-        return [rest]
-
     def parse_netloc(self, separator="//"):
+        """
+        returns [domain, separator, rest of the link]
+        """
         if self.url.startswith(separator):
             if separator == "//":
                 lesser_separator = "/"
@@ -165,12 +158,41 @@ class DomainAwarePage(object):
 
             rest = self.url[len(separator) :]
 
-            rest_data = self.parse_rest(rest)
+            rest_data = self.parse_location(rest)
 
             if len(rest_data) > 1:
-                return ["", separator, rest_data[0], rest_data[1]]
+                arg = self.parse_argument(rest_data[1])
+                return ["", separator, rest_data[0], arg[0], arg[1]]
             else:
                 return ["", separator, rest_data[0]]
+
+    def parse_location(self, rest):
+        """
+        returns tuple [link, arguments]
+        """
+        wh1 = rest.find("/")
+        wh2 = rest.find("\\")
+        wh3 = rest.find("?")
+        wh4 = rest.find("#")
+        positions = [wh for wh in [wh1, wh2, wh3, wh4] if wh != -1]
+
+        if len(positions) > 0:
+            smallest_position = min(positions)
+            return [rest[:smallest_position], rest[smallest_position:]]
+        return [rest, ""]
+
+    def parse_argument(self, rest):
+        """
+        returns tuple [link, arguments]
+        """
+        wh1 = rest.find("?")
+        wh2 = rest.find("#")
+        positions = [wh for wh in [wh1, wh2] if wh != -1]
+
+        if len(positions) > 0:
+            smallest_position = min(positions)
+            return [rest[:smallest_position], rest[smallest_position:]]
+        return [rest, ""]
 
     def get_domain(self):
         parts = self.parse_url()

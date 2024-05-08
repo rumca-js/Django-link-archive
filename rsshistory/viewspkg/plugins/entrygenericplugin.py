@@ -7,6 +7,7 @@ from ...controllers import LinkDataController
 from ...webtools import DomainAwarePage, InputContent
 from ...configuration import Configuration
 from ...dateutils import DateUtils
+from ...services import TranslateBuilder
 
 
 class EntryButton(object):
@@ -304,6 +305,18 @@ class EntryGenericPlugin(object):
     def get_view_menu_buttons(self):
         config = Configuration.get_object().config_entry
         buttons = []
+
+        translate_url = TranslateBuilder.get(self.entry.link).get_translate_url()
+
+        buttons.append(
+            EntryButton(
+                self.user,
+                "Translate Page",
+                translate_url,
+                ConfigurationEntry.ACCESS_TYPE_ALL,
+                "Translate Page",
+            ),
+        )
 
         p = DomainAwarePage(self.entry.link)
         p_up = p.up(skip_internal=True)
