@@ -45,6 +45,7 @@
      </ul>
   </div>
 
+  {% if user.is_staff %}
   <div class="dropdown mx-2">
      <button class="btn btn-primary" type="button" id="#entryAdvancedDrop" data-bs-toggle="dropdown" aria-expanded="false">
        Advanced
@@ -65,5 +66,6 @@
          {% endfor %}
      </ul>
   </div>
+  {% endif %}
 
 </div>

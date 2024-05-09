@@ -225,29 +225,28 @@ class EntryGenericPlugin(object):
                 )
 
         if self.user.is_authenticated:
-            if config.link_save:
-                buttons.append(
-                    EntryButton(
-                        self.user,
-                        "Save",
-                        reverse(
-                            "{}:entry-save".format(LinkDatabase.name),
-                            args=[self.entry.id],
-                        ),
-                        ConfigurationEntry.ACCESS_TYPE_OWNER,
-                        "Saves link in archive.org: {}".format(self.entry.link),
-                        static(
-                            "{}/icons/archive.org.save.ico".format(LinkDatabase.name)
-                        ),
+            buttons.append(
+                EntryButton(
+                    self.user,
+                    "Save",
+                    reverse(
+                        "{}:entry-save".format(LinkDatabase.name),
+                        args=[self.entry.id],
                     ),
-                )
+                    ConfigurationEntry.ACCESS_TYPE_OWNER,
+                    "Saves link in archive.org: {}".format(self.entry.link),
+                    static(
+                        "{}/icons/archive.org.save.ico".format(LinkDatabase.name)
+                    ),
+                ),
+            )
 
         if self.user.is_authenticated:
             if not self.entry.is_dead():
                 buttons.append(
                     EntryButton(
                         self.user,
-                        "Dead",
+                        "Mark Dead",
                         reverse(
                             "{}:entry-dead".format(LinkDatabase.name),
                             args=[self.entry.id],
@@ -263,7 +262,7 @@ class EntryGenericPlugin(object):
                 buttons.append(
                     EntryButton(
                         self.user,
-                        "Not dead",
+                        "Mark not dead",
                         reverse(
                             "{}:entry-not-dead".format(LinkDatabase.name),
                             args=[self.entry.id],
@@ -308,16 +307,6 @@ class EntryGenericPlugin(object):
 
         translate_url = TranslateBuilder.get(self.entry.link).get_translate_url()
 
-        buttons.append(
-            EntryButton(
-                self.user,
-                "Translate Page",
-                translate_url,
-                ConfigurationEntry.ACCESS_TYPE_ALL,
-                "Translate Page",
-            ),
-        )
-
         p = DomainAwarePage(self.entry.link)
         p_up = p.up(skip_internal=True)
 
@@ -334,6 +323,16 @@ class EntryGenericPlugin(object):
                     "Parent Entry: {}".format(p_up.url),
                 ),
             )
+
+        buttons.append(
+            EntryButton(
+                self.user,
+                "Translate Page",
+                translate_url,
+                ConfigurationEntry.ACCESS_TYPE_ALL,
+                "Translate Page",
+            ),
+        )
 
         if self.entry.source_obj:
             buttons.append(
@@ -384,7 +383,7 @@ class EntryGenericPlugin(object):
             buttons.append(
                 EntryButton(
                     self.user,
-                    "[S] Artist: " + self.entry.artist,
+                    "[S] Artist: " + self.entry.artist[:20],
                     reverse(
                         "{}:entries-omni-search".format(LinkDatabase.name),
                     )
@@ -398,7 +397,7 @@ class EntryGenericPlugin(object):
             buttons.append(
                 EntryButton(
                     self.user,
-                    "[S] Album: " + self.entry.album,
+                    "[S] Album: " + self.entry.album[:20],
                     reverse(
                         "{}:entries-omni-search".format(LinkDatabase.name),
                     )
@@ -443,7 +442,7 @@ class EntryGenericPlugin(object):
         buttons.append(
             EntryButton(
                 self.user,
-                "Archive.org",
+                "View on Archive.org",
                 archive_link,
                 ConfigurationEntry.ACCESS_TYPE_ALL,
                 "Archive link: {}".format(archive_link),
@@ -514,7 +513,7 @@ class EntryGenericPlugin(object):
     def get_parameters_operation(self):
         parameters = []
 
-        points_text = "[{}]|C:{}|V:{}".format(
+        points_text = "P:{}|C:{}|V:{}".format(
             self.entry.page_rating,
             self.entry.page_rating_contents,
             self.entry.page_rating_votes,

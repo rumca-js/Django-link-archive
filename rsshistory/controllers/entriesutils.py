@@ -366,6 +366,8 @@ class EntryUpdater(object):
     def handle_invalid_response(self, url_entry_interface):
         entry = self.entry
 
+        entry.page_rating = 0
+
         if not entry.date_dead_since:
             error_text = traceback.format_exc()
 

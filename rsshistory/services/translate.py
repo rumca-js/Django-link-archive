@@ -16,6 +16,7 @@ class GoogleTranslate(TranslatePage):
     def get_translate_url(self):
         p = DomainAwarePage(self.url)
         parts = p.parse_url()
+        parts[2] = parts[2].replace("-", "--")
         parts[2] = parts[2].replace(".", "-")
 
         if parts[0] == "http":
