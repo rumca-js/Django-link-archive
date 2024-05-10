@@ -1,3 +1,4 @@
+from ..dateutils import DateUtils
 
 
 class InternetArchiveInterface(object):
@@ -12,13 +13,15 @@ class InternetArchive(InternetArchiveInterface):
     def __init__(self, url):
         super().__init__(url)
 
-    def get_archive_url(self):
-        """
-        TODO what to do with date? obtain from entry? current time stamp?
-        """
-        return "https://web.archive.org/web/20240508000000*/" + self.url
+    def get_archive_url(self, time=None):
+        if not time:
+            time = DateUtils.get_datetime_now_utc()
+
+        if time:
+            time_str = time.strftime("%Y%m%d")
+            return "https://web.archive.org/web/{}110000*/".format(time_str) + self.url
 
 
 class InternetArchiveBuilder(object):
-    def get():
-        pass
+    def get(url):
+        return InternetArchive(url)

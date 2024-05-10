@@ -1437,6 +1437,46 @@ class HtmlPage(ContentInterface):
         if find_element and find_element.has_attr("content"):
             return find_element["content"]
 
+    def get_schema_field(self, itemprop):
+        elements_with_itemprop = self.soup.find_all(attrs={"itemprop": True})
+        for element in elements_with_itemprop:
+            itemprop_v = element.get('itemprop')
+            if itemprop_v != itemprop:
+                continue
+
+            if element.name == 'link':
+                value = element.get('href')
+            elif element.name == 'meta':
+                value = element.get('content')
+            else:
+                value = element.text.strip() if element.text else None
+
+            return value
+
+    def get_schema_field_ex(self, itemtype, itemprop):
+        """
+        itemtype can be "http://schema.org/VideoObject"
+        """
+        # Find elements with itemtype="http://schema.org/VideoObject"
+        video_objects = self.soup.find_all(attrs={"itemtype": itemtype})
+        for video_object in video_objects:
+            # Extract itemprop from elements inside video_object
+            elements_with_itemprop = video_object.find_all(attrs={"itemprop": True})
+            for element in elements_with_itemprop:
+                itemprop_v = element.get('itemprop')
+
+                if itemprop_v != itemprop:
+                    continue
+
+                if element.name == 'link':
+                    value = element.get('href')
+                elif element.name == 'meta':
+                    value = element.get('content')
+                else:
+                    value = element.text.strip() if element.text else None
+
+                return value
+
     def get_meta_field(self, field):
         if not self.contents:
             return None
@@ -1465,6 +1505,9 @@ class HtmlPage(ContentInterface):
             return None
 
         title = self.get_og_field("title")
+
+        if not title:
+            self.get_schema_field("name")
 
         if not title:
             title = self.get_title_meta()
@@ -1502,7 +1545,7 @@ class HtmlPage(ContentInterface):
             return date_str_to_date(date_str)
 
         # used by youtube
-        date_str = self.get_meta_custom_field("itemprop", "datePublished")
+        date_str = self.get_schema_field("datePublished")
         if date_str:
             return date_str_to_date(date_str)
 
@@ -1523,10 +1566,15 @@ class HtmlPage(ContentInterface):
             return None
 
         description = self.get_og_field("description")
+
+        if not description:
+            description = self.get_schema_field("description")
+
         if not description:
             description = self.get_description_meta()
-            if not description:
-                description = self.get_description_head()
+
+        if not description:
+            description = self.get_description_head()
 
         if description:
             description = description.strip()
@@ -1559,6 +1607,9 @@ class HtmlPage(ContentInterface):
 
         if image and image.lower().find("https://") == -1:
             image = DomainAwarePage.get_url_full(self.url, image)
+
+        if not image:
+            image = self.get_schema_field("thumbnailUrl")
 
         return image
 

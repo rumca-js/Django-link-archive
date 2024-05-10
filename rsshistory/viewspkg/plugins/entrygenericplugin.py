@@ -7,7 +7,7 @@ from ...controllers import LinkDataController
 from ...webtools import DomainAwarePage, InputContent
 from ...configuration import Configuration
 from ...dateutils import DateUtils
-from ...services import TranslateBuilder
+from ...services import TranslateBuilder, InternetArchiveBuilder
 
 
 class EntryButton(object):
@@ -438,7 +438,10 @@ class EntryGenericPlugin(object):
                 ),
             )
 
-        archive_link = self.entry.get_archive_link()
+        date = self.entry.date_published
+        builder = InternetArchiveBuilder.get(self.entry.link)
+        archive_link = builder.get_archive_url(date)
+
         buttons.append(
             EntryButton(
                 self.user,

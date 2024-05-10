@@ -196,6 +196,24 @@ webpage_html_meta_http_equiv_charset = """<html>
  </body>
 """
 
+webpage_html_schema_fields = """
+ <head>
+<link itemprop="url" href="https://www.youtube.com/watch?v=111"><meta itemprop="name" content="itemprop name"><meta itemprop="description" content="itemprop description"><meta itemprop="requiresSubscription" content="False"><meta itemprop="identifier" content="i4i-79_9Nvw"><meta itemprop="duration" content="PT11M29S"><span itemprop="author" itemscope itemtype="http://schema.org/Person"><link itemprop="url" href="http://www.youtube.com/@TheFridayCheckout"><link itemprop="name" content="The Friday Checkout"></span><script type="application/ld+json" nonce="NhrRFHqHh-kzADLX-U48Fw">{"@context": "http://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "item": {"@id": "http:\/\/www.youtube.com\/@TheFridayCheckout", "name": "The Friday Checkout"}}]}</script><link itemprop="thumbnailUrl" href="https://thumbnailurl.com"><span itemprop="thumbnail" itemscope itemtype="http://schema.org/ImageObject"><link itemprop="url" href="https://i.ytimg.com/vi/i4i-79_9Nvw/maxresdefault.jpg"><meta itemprop="width" content="1280"><meta itemprop="height" content="720"></span><link itemprop="embedUrl" href="https://www.youtube.com/embed/i4i-79_9Nvw"><meta itemprop="playerType" content="HTML5 Flash"><meta itemprop="width" content="1280"><meta itemprop="height" content="720"><meta itemprop="isFamilyFriendly" content="true"><meta itemprop="regionsAllowed" content="AD,AE,AF,AG,AI,AL,AM,AO,AQ,AR,AS,AT,AU,AW,AX,AZ,BA,BB,BD,BE,BF,BG,BH,BI,BJ,BL,BM,BN,BO,BQ,BR,BS,BT,BV,BW,BY,BZ,CA,CC,CD,CF,CG,CH,CI,CK,CL,CM,CN,CO,CR,CU,CV,CW,CX,CY,CZ,DE,DJ,DK,DM,DO,DZ,EC,EE,EG,EH,ER,ES,ET,FI,FJ,FK,FM,FO,FR,GA,GB,GD,GE,GF,GG,GH,GI,GL,GM,GN,GP,GQ,GR,GS,GT,GU,GW,GY,HK,HM,HN,HR,HT,HU,ID,IE,IL,IM,IN,IO,IQ,IR,IS,IT,JE,JM,JO,JP,KE,KG,KH,KI,KM,KN,KP,KR,KW,KY,KZ,LA,LB,LC,LI,LK,LR,LS,LT,LU,LV,LY,MA,MC,MD,ME,MF,MG,MH,MK,ML,MM,MN,MO,MP,MQ,MR,MS,MT,MU,MV,MW,MX,MY,MZ,NA,NC,NE,NF,NG,NI,NL,NO,NP,NR,NU,NZ,OM,PA,PE,PF,PG,PH,PK,PL,PM,PN,PR,PS,PT,PW,PY,QA,RE,RO,RS,RU,RW,SA,SB,SC,SD,SE,SG,SH,SI,SJ,SK,SL,SM,SN,SO,SR,SS,ST,SV,SX,SY,SZ,TC,TD,TF,TG,TH,TJ,TK,TL,TM,TN,TO,TR,TT,TV,TW,TZ,UA,UG,UM,US,UY,UZ,VA,VC,VE,VG,VI,VN,VU,WF,WS,YE,YT,ZA,ZM,ZW"><meta itemprop="interactionCount" content="2032"><meta itemprop="datePublished" content="2024-05-10T09:04:54-07:00"><meta itemprop="uploadDate" content="2024-05-10T09:04:54-07:00"><meta itemprop="genre" content="Science &amp; Technology">
+ </head>
+ <body>
+     test
+ </body>
+"""
+
+webpage_html_schema_fields_nested = """
+ <head>
+<div id="watch7-content" class="watch-main-col" itemscope itemid="" itemtype="http://schema.org/VideoObject"><link itemprop="url" href="https://www.youtube.com/watch?v=111"><meta itemprop="name" content="itemprop name"><meta itemprop="description" content="itemprop description"><meta itemprop="requiresSubscription" content="False"><meta itemprop="identifier" content="i4i-79_9Nvw"><meta itemprop="duration" content="PT11M29S"><span itemprop="author" itemscope itemtype="http://schema.org/Person"><link itemprop="url" href="http://www.youtube.com/@someotherchannel"><link itemprop="name" content="The Friday Checkout"></span><script type="application/ld+json" nonce="NhrRFHqHh-kzADLX-U48Fw">{"@context": "http://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "item": {"@id": "http:\/\/www.youtube.com\/@TheFridayCheckout", "name": "The Friday Checkout"}}]}</script><link itemprop="thumbnailUrl" href="https://i.ytimg.com/vi/i4i-79_9Nvw/maxresdefault.jpg"><span itemprop="thumbnail" itemscope itemtype="http://schema.org/ImageObject"><link itemprop="url" href="https://i.ytimg.com/vi/i4i-79_9Nvw/maxresdefault.jpg"><meta itemprop="width" content="1280"><meta itemprop="height" content="720"></span><link itemprop="embedUrl" href="https://www.youtube.com/embed/i4i-79_9Nvw"><meta itemprop="playerType" content="HTML5 Flash"><meta itemprop="width" content="1280"><meta itemprop="height" content="720"><meta itemprop="isFamilyFriendly" content="true"><meta itemprop="regionsAllowed" content="AD,AE,AF,AG,AI,AL,AM,AO,AQ,AR,AS,AT,AU,AW,AX,AZ,BA,BB,BD,BE,BF,BG,BH,BI,BJ,BL,BM,BN,BO,BQ,BR,BS,BT,BV,BW,BY,BZ,CA,CC,CD,CF,CG,CH,CI,CK,CL,CM,CN,CO,CR,CU,CV,CW,CX,CY,CZ,DE,DJ,DK,DM,DO,DZ,EC,EE,EG,EH,ER,ES,ET,FI,FJ,FK,FM,FO,FR,GA,GB,GD,GE,GF,GG,GH,GI,GL,GM,GN,GP,GQ,GR,GS,GT,GU,GW,GY,HK,HM,HN,HR,HT,HU,ID,IE,IL,IM,IN,IO,IQ,IR,IS,IT,JE,JM,JO,JP,KE,KG,KH,KI,KM,KN,KP,KR,KW,KY,KZ,LA,LB,LC,LI,LK,LR,LS,LT,LU,LV,LY,MA,MC,MD,ME,MF,MG,MH,MK,ML,MM,MN,MO,MP,MQ,MR,MS,MT,MU,MV,MW,MX,MY,MZ,NA,NC,NE,NF,NG,NI,NL,NO,NP,NR,NU,NZ,OM,PA,PE,PF,PG,PH,PK,PL,PM,PN,PR,PS,PT,PW,PY,QA,RE,RO,RS,RU,RW,SA,SB,SC,SD,SE,SG,SH,SI,SJ,SK,SL,SM,SN,SO,SR,SS,ST,SV,SX,SY,SZ,TC,TD,TF,TG,TH,TJ,TK,TL,TM,TN,TO,TR,TT,TV,TW,TZ,UA,UG,UM,US,UY,UZ,VA,VC,VE,VG,VI,VN,VU,WF,WS,YE,YT,ZA,ZM,ZW"><meta itemprop="interactionCount" content="2032"><meta itemprop="datePublished" content="2024-05-10T09:04:54-07:00"><meta itemprop="uploadDate" content="2024-05-10T09:04:54-07:00"><meta itemprop="genre" content="Science &amp; Technology"></div>
+ </head>
+ <body>
+     test
+ </body>
+"""
+
 
 class HtmlPageTest(FakeInternetTestCase):
     def test_default_language(self):
@@ -477,3 +495,21 @@ class HtmlPageTest(FakeInternetTestCase):
         self.assertEqual(reader.get_charset(), "shift_jis")
 
         self.assertEqual(MockRequestCounter.mock_page_requests, 0)
+
+    def test_get_schema_field(self):
+        
+        reader = HtmlPage(
+            "https://linkedin.com/test", webpage_html_schema_fields
+        )
+        self.assertEqual(reader.get_schema_field("url"), "https://www.youtube.com/watch?v=111")
+        self.assertEqual(reader.get_schema_field("name"), "itemprop name")
+        self.assertEqual(reader.get_schema_field("description"), "itemprop description")
+        self.assertEqual(reader.get_schema_field("thumbnailUrl"), "https://thumbnailurl.com")
+
+    def test_get_schema_field_ex(self):
+        
+        reader = HtmlPage(
+            "https://linkedin.com/test", webpage_html_schema_fields_nested
+        )
+        self.assertEqual(reader.get_schema_field_ex("http://schema.org/VideoObject", "url"), "https://www.youtube.com/watch?v=111")
+        self.assertEqual(reader.get_schema_field_ex("http://schema.org/Person", "url"), "http://www.youtube.com/@someotherchannel")
