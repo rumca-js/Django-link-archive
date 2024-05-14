@@ -84,31 +84,16 @@ class EntriesSearchListView(generic.ListView):
         print("EntriesSearchListView:get done")
         return view
 
-    def get_filter(self):
-        print("EntriesSearchListView:get_filter")
-
-        query_filter = EntryFilter(self.request.GET, self.request.user)
-        query_filter.get_sources()
-        thefilter = query_filter
-        print("EntriesSearchListView:get_filter done")
-        return thefilter
-
-    def get_paginate_by(self, queryset):
-        if not self.request.user.is_authenticated:
-            config = Configuration.get_object().config_entry
-            return config.links_per_page
-        else:
-            uc = UserConfig.get(self.request.user)
-            return uc.links_per_page
-
     def get_queryset(self):
-        config = Configuration.get_object().config_entry
-
         print("EntriesSearchListView:get_queryset")
         self.query_filter = self.get_filter()
-        objects = self.get_filtered_objects().order_by(*config.get_entries_order_by())
+        objects = self.get_filtered_objects().order_by(*self.get_order_by())
         print("EntriesSearchListView:get_queryset done {}".format(objects.query))
         return objects
+
+    def get_order_by(self):
+        config = Configuration.get_object().config_entry
+        return config.get_entries_order_by()
 
     def get_context_data(self, **kwargs):
         print("EntriesSearchListView:get_context_data")
@@ -147,6 +132,23 @@ class EntriesSearchListView(generic.ListView):
         )
 
         return context
+
+    def get_filter(self):
+        print("EntriesSearchListView:get_filter")
+
+        query_filter = EntryFilter(self.request.GET, self.request.user)
+        query_filter.get_sources()
+        thefilter = query_filter
+        print("EntriesSearchListView:get_filter done")
+        return thefilter
+
+    def get_paginate_by(self, queryset):
+        if not self.request.user.is_authenticated:
+            config = Configuration.get_object().config_entry
+            return config.links_per_page
+        else:
+            uc = UserConfig.get(self.request.user)
+            return uc.links_per_page
 
     def get_filtered_objects(self):
         print("EntriesSearchListView:get_filtered_objects")
@@ -208,145 +210,13 @@ class EntriesSearchListView(generic.ListView):
         return DateUtils.get_days_range(config.whats_new_days)
 
 
-class EntriesRecentListView(EntriesSearchListView):
-    model = LinkDataController
-    context_object_name = "content_list"
-    paginate_by = 100
-
-    def get_filter(self):
-        query_filter = EntryFilter(self.request.GET, user=self.request.user)
-
-        query_filter.set_time_limit(self.get_default_range())
-        query_filter.get_sources()
-        return query_filter
-
-    def get_queryset(self):
-        print("EntriesSearchListView:get_queryset")
-        self.query_filter = self.get_filter()
-        objects = self.get_filtered_objects()
-        print("EntriesSearchListView:get_queryset done {}".format(objects.query))
-        return objects
-
-    def get_reset_link(self):
-        return reverse("{}:entries-recent-init".format(LinkDatabase.name))
-
-    def get_form_action_link(self):
-        return reverse("{}:entries-recent".format(LinkDatabase.name))
-
-    def get_form_instance(self):
-        form = EntryRecentChoiceForm(self.request.GET, request=self.request)
-        return form
-
-    def get_title(self):
-        return " - Recent"
-
-    def get_query_type(self):
-        return "recent"
-
-
-class EntriesNotTaggedView(EntriesSearchListView):
-    model = LinkDataController
-    context_object_name = "content_list"
-    paginate_by = 100
-
-    def get_filter(self):
-        query_filter = EntryFilter(self.request.GET, user=self.request.user)
-        query_filter.get_sources()
-        query_filter.set_additional_condition(
-            Q(tags__tag__isnull=True, bookmarked=True)
-        )
-        return query_filter
-
-    def has_more_results(self):
-        return False
-
-    def get_reset_link(self):
-        return reverse("{}:entries-untagged".format(LinkDatabase.name))
-
-    def get_form_action_link(self):
-        return reverse("{}:entries-recent".format(LinkDatabase.name))
-
-    def get_form_instance(self):
-        return EntryChoiceForm(self.request.GET)
-
-    def get_title(self):
-        return " - UnTagged"
-
-    def get_query_type(self):
-        return "not-tagged"
-
-
-class EntriesBookmarkedListView(EntriesSearchListView):
-    model = LinkDataController
-    context_object_name = "content_list"
-    paginate_by = 100
-
-    def get_filter(self):
-        query_filter = EntryFilter(self.request.GET, self.request.user)
-        query_filter.get_sources()
-        query_filter.set_additional_condition(Q(bookmarked=True))
-        return query_filter
-
-    def has_more_results(self):
-        return False
-
-    def get_reset_link(self):
-        return reverse("{}:entries-bookmarked-init".format(LinkDatabase.name))
-
-    def get_form_action_link(self):
-        return reverse("{}:entries-bookmarked".format(LinkDatabase.name))
-
-    def get_form_instance(self):
-        return EntryBookmarksChoiceForm(self.request.GET, request=self.request)
-
-    def get_title(self):
-        return " - Bookmarked"
-
-    def get_query_type(self):
-        return "bookmarked"
-
-
-class EntriesArchiveListView(EntriesSearchListView):
-    model = LinkDataController
-    context_object_name = "content_list"
-    paginate_by = 100
-    template_name = str(ViewPage.get_full_template("linkdatacontroller_list.html"))
-
-    def get_filter(self):
-        query_filter = EntryFilter(self.request.GET, self.request.user)
-        query_filter.get_sources()
-        query_filter.set_archive_source(True)
-        return query_filter
-
-    def has_more_results(self):
-        return False
-
-    def get_reset_link(self):
-        return reverse("{}:entries-archived-init".format(LinkDatabase.name))
-
-    def get_form_action_link(self):
-        return reverse("{}:entries-archived".format(LinkDatabase.name))
-
-    def get_form_instance(self):
-        return EntryChoiceForm(self.request.GET, request=self.request)
-
-    def get_title(self):
-        return " - Archived"
-
-    def get_query_type(self):
-        return "archived"
-
-
 class EntriesOmniListView(EntriesSearchListView):
     model = LinkDataController
     context_object_name = "content_list"
     paginate_by = 100
 
     def get_filter(self):
-        if self.request.user.is_authenticated:
-            search_term = get_search_term_request(self.request)
-            if search_term:
-                UserSearchHistory.add(self.request.user, search_term)
+        self.on_search()
 
         data = self.request.GET.dict()
         data["user"] = self.request.user
@@ -383,17 +253,34 @@ class EntriesOmniListView(EntriesSearchListView):
 
         return query_filter
 
+    def on_search(self):
+        if self.request.user.is_authenticated:
+            search_term = get_search_term_request(self.request)
+            if search_term:
+                UserSearchHistory.add(self.request.user, search_term)
+
     def get_filtered_objects(self):
         fields = self.query_filter.get_fields()
 
         if ("archive" in self.request.GET and self.request.GET["archive"] == "on") or (
             "archive" in fields and fields["archive"] == "1"
         ):
-            self.query_filter.set_query_set(ArchiveLinkDataController.objects.all())
+            query_set = self.get_initial_query_set(archive=True)
         else:
-            self.query_filter.set_query_set(LinkDataController.objects.all())
+            query_set = self.get_initial_query_set(archive=False)
+
+        self.query_filter.set_query_set(query_set)
 
         return self.query_filter.get_filtered_objects()
+
+    def get_initial_query_set(self, archive=False):
+        """
+        TODO rewrite. Filter should return only query sets. pure. without pagination
+        """
+        if archive:
+            return ArchiveLinkDataController.objects.all()
+        else:
+            return LinkDataController.objects.all()
 
     def get_reset_link(self):
         return reverse("{}:entries-omni-search-init".format(LinkDatabase.name))
@@ -452,6 +339,127 @@ class EntriesOmniListView(EntriesSearchListView):
 
     def get_query_type(self):
         return "omni"
+
+
+class EntriesRecentListView(EntriesOmniListView):
+    model = LinkDataController
+    context_object_name = "content_list"
+    paginate_by = 100
+
+    def on_search(self):
+        pass
+
+    def get_initial_query_set(self, archive=False):
+        query_set = super().get_initial_query_set(archive)
+        return query_set.filter(date_published__range = self.get_default_range())
+
+    def get_order_by(self):
+        return ["-date_published"]
+
+    def get_reset_link(self):
+        return reverse("{}:entries-recent-init".format(LinkDatabase.name))
+
+    def get_form_action_link(self):
+        return reverse("{}:entries-recent".format(LinkDatabase.name))
+
+    def get_title(self):
+        return " - Recent"
+
+    def get_query_type(self):
+        return "recent"
+
+
+class EntriesNotTaggedView(EntriesOmniListView):
+    model = LinkDataController
+    context_object_name = "content_list"
+    paginate_by = 100
+
+    def get_order_by(self):
+        return ["-date_published"]
+
+    def on_search(self):
+        pass
+
+    def get_initial_query_set(self, archive=False):
+        query_set = super().get_initial_query_set(archive)
+        tags_is_null = Q(tags__isnull=True)
+        bookmarked = Q(bookmarked=True)
+        permanent = Q(permanent=True)
+        return query_set.filter(tags_is_null & (bookmarked | permanent))
+
+    def has_more_results(self):
+        return False
+
+    def get_reset_link(self):
+        return reverse("{}:entries-untagged".format(LinkDatabase.name))
+
+    def get_form_action_link(self):
+        return reverse("{}:entries-recent".format(LinkDatabase.name))
+
+    def get_title(self):
+        return " - UnTagged"
+
+    def get_query_type(self):
+        return "not-tagged"
+
+
+class EntriesBookmarkedListView(EntriesOmniListView):
+    model = LinkDataController
+    context_object_name = "content_list"
+    paginate_by = 100
+
+    def on_search(self):
+        pass
+
+    def get_initial_query_set(self, archive=False):
+        query_set = super().get_initial_query_set(archive)
+        return query_set.filter(bookmarked = 1)
+
+    def has_more_results(self):
+        return False
+
+    def get_reset_link(self):
+        return reverse("{}:entries-bookmarked-init".format(LinkDatabase.name))
+
+    def get_form_action_link(self):
+        return reverse("{}:entries-bookmarked".format(LinkDatabase.name))
+
+    def get_title(self):
+        return " - Bookmarked"
+
+    def get_query_type(self):
+        return "bookmarked"
+
+
+class EntriesArchiveListView(EntriesSearchListView):
+    model = LinkDataController
+    context_object_name = "content_list"
+    paginate_by = 100
+    template_name = str(ViewPage.get_full_template("linkdatacontroller_list.html"))
+
+    def get_filter(self):
+        query_filter = EntryFilter(self.request.GET, self.request.user)
+        query_filter.get_sources()
+        query_filter.set_archive_source(True)
+        return query_filter
+
+    def has_more_results(self):
+        return False
+
+    def get_reset_link(self):
+        return reverse("{}:entries-archived-init".format(LinkDatabase.name))
+
+    def get_form_action_link(self):
+        return reverse("{}:entries-archived".format(LinkDatabase.name))
+
+    def get_form_instance(self):
+        return EntryChoiceForm(self.request.GET, request=self.request)
+
+    def get_title(self):
+        return " - Archived"
+
+    def get_query_type(self):
+        return "archived"
 
 
 class EntryDetailView(generic.DetailView):

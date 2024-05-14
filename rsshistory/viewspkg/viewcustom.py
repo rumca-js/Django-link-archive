@@ -26,11 +26,21 @@ from ..controllers import (
     DomainsController,
     LinkDataWrapper,
 )
+
+from ..forms import (
+    OmniSearchForm,
+)
 from ..views import ViewPage
 from ..dateutils import DateUtils
 from ..forms import LinkInputForm, ScannerForm, OmniSearchForm
 from ..webtools import HtmlPage, ContentLinkParser, PageOptions
 from ..pluginurl.urlhandler import UrlHandler
+
+
+def index(request):
+    p = ViewPage(request)
+    p.set_title("Index")
+    return p.render("index.html")
 
 
 def page_show_properties(request):

@@ -57,7 +57,14 @@ class BaseQueryFilter(object):
 
         return [start, start + paginate_by]
 
+    def get_conditions(self):
+        return Q()
+
     def get_filtered_objects(self):
+        """
+        This needs to be here for JSON only.
+        TODO rewrite this. JSON should use pagination on filtered objects
+        """
         filtered_objects = self.get_filtered_objects_internal()
         filtered_objects = filtered_objects.distinct()
 

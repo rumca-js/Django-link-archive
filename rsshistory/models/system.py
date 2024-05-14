@@ -228,6 +228,7 @@ class ConfigurationEntry(models.Model):
     def get_entries_order_by(self):
         """
         @note valid example "-date_published, -page_rating"
+        @result tuple of order bies
         """
         input_string = self.entries_order_by
         delimiter = ","

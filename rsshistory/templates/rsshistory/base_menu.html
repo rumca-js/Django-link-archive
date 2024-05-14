@@ -1,7 +1,9 @@
 {% load static %}
 
 <nav class="navbar navbar-expand-sm">
-    <a class="navbar-brand" href="#">Navigation</a>
+    <a class="navbar-brand" href="{% url 'rsshistory:entries-omni-search-init' %}" class="nav-link" title="Home">
+	 <img src="{% static 'rsshistory/icons/icons8-search-100.png' %}" class="mainbutton-icon" />
+    </a>
 
    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNavBar" aria-controls="mainNavBar" aria-expanded="false" aria-label="Toggle navigation">
      <span class="navbar-toggler-icon"></span>
@@ -9,11 +11,6 @@
 
    <div class="collapse navbar-collapse" id="mainNavBar">
        <ul class="nav navbar-nav mr-auto">
-           <li class="nav-item active">
-               <a href="{% url 'rsshistory:index' %}" class="nav-link" title="Index">
-                   <img src="{% static 'rsshistory/icons/icons8-home-96.png' %}" class="mainbutton-icon" />
-                   Home</a>
-           </li>
            <li class="nav-item">
                <a href="{% url 'rsshistory:entries-recent' %}" class="nav-link" title="Shows new entries">
                    <img src="{% static 'rsshistory/icons/icons8-new-100.png' %}" class="mainbutton-icon" />
@@ -23,11 +20,6 @@
                <a href="{% url 'rsshistory:entries-bookmarked' %}" class="nav-link" title="Shows bookmarked links">
                    <img src="{% static 'rsshistory/icons/icons8-bookmarks-100.png' %}" class="mainbutton-icon" />
                    Bookmarks</a>
-           </li>
-           <li class="nav-item">
-               <a href="{% url 'rsshistory:entries-omni-search-init' %}" class="nav-link" title="Advanced search">
-                   <img src="{% static 'rsshistory/icons/icons8-search-100.png' %}" class="mainbutton-icon" />
-                   Search</a>
            </li>
            <li class="nav-item">
                <a href="{% url 'rsshistory:sources' %}" class="nav-link" title="Sources">

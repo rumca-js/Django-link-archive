@@ -120,9 +120,3 @@ class ViewPage(object):
         )
         context["is_html"] = type(handler) == HtmlPage
         context["is_rss"] = type(handler) == RssPage
-
-
-def index(request):
-    p = ViewPage(request)
-    p.set_title("Index")
-    return p.render("index.html")
