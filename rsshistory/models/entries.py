@@ -293,6 +293,9 @@ class BaseLinkDataController(BaseLinkDataModel):
         names.add("source_obj__subcategory")
         names.add("tags__tag")
         names.add("votes__vote")
+
+        names.add("date_dead_since")
+        names.add("date_update_last")
         return list(names)
 
     def get_all_export_names():

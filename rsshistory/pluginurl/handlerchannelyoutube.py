@@ -27,10 +27,17 @@ class YouTubeChannelHandler(RssPage, DefaultUrlHandler):
         if wh == -1:
             return url
 
+        if url.find("www.youtube.com/@") >= 0:
+            return self.input2code_handle(url)
         if url.find("/channel/") >= 0:
             return self.input2code_channel(url)
         if url.find("/feeds/") >= 0:
             return self.input2code_feeds(url)
+
+    def input2code_handle(self, url):
+        pass
+        #u = Url(url)
+        #contents = u.get_contents()
 
     def input2code_channel(self, url):
         wh = url.rfind("/")

@@ -2,17 +2,19 @@ import logging
 import json
 
 
-class YouTubeThumbsDown(object):
-    def __init__(self, link=None):
-        self._link = link
+class ReturnDislike(object):
+    def __init__(self, video_code=None):
+        self._video_code = video_code
+        self.process()
 
-    def download_data(self):
-        return YouTubeThumbsDown.read_code_data(self._link.get_video_code())
+    def process(self):
+        data = self.read_data()
+        self.loads(data)
 
-    def read_code_data(code):
+    def read_data(self):
         from ..pluginurl import UrlHandler
 
-        url = "https://returnyoutubedislikeapi.com/votes?videoId=" + code
+        url = "https://returnyoutubedislikeapi.com/votes?videoId=" + self._video_code
 
         u = UrlHandler(url)
         data = u.get_contents()

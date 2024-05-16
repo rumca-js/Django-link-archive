@@ -324,16 +324,6 @@ class EntryGenericPlugin(object):
                 ),
             )
 
-        buttons.append(
-            EntryButton(
-                self.user,
-                "Translate Page",
-                translate_url,
-                ConfigurationEntry.ACCESS_TYPE_ALL,
-                "Translate Page",
-            ),
-        )
-
         if self.entry.source_obj:
             buttons.append(
                 EntryButton(
@@ -437,6 +427,16 @@ class EntryGenericPlugin(object):
                     static("{}/icons/icons8-www-64.png".format(LinkDatabase.name)),
                 ),
             )
+
+        buttons.append(
+            EntryButton(
+                self.user,
+                "Translate Page",
+                translate_url,
+                ConfigurationEntry.ACCESS_TYPE_ALL,
+                "Translate Page",
+            ),
+        )
 
         date = self.entry.date_published
         builder = InternetArchiveBuilder.get(self.entry.link)

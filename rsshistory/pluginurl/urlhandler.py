@@ -158,6 +158,7 @@ class UrlHandler(Url):
             url.startswith("www.youtube.com/channel")
             or url.startswith("youtube.com/channel")
             or url.startswith("m.youtube.com/channel")
+            or url.startswith("www.youtube.com/@")
         ):
             return True
         if (

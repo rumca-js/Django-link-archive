@@ -44,7 +44,8 @@ from ..views import ViewPage
 from ..configuration import Configuration
 from ..webtools import Url, DomainAwarePage
 from ..pluginurl import UrlHandler
-from ..services.waybackmachine import WaybackMachine
+from ..services import WaybackMachine
+from ..services import ReturnDislike
 from ..dateutils import DateUtils
 from ..serializers.instanceimporter import InstanceExporter
 from .plugins.entrypreviewbuilder import EntryPreviewBuilder
@@ -224,7 +225,7 @@ class EntriesOmniListView(EntriesSearchListView):
         query_filter = OmniSearchFilter(data)
 
         translate = BaseLinkDataController.get_query_names()
-        query_filter.set_translatable(translate)
+        query_filter.set_translation_mapping(translate)
 
         if "archive" in self.request.GET and self.request.GET["archive"] == "on":
             query_filter.set_default_search_symbols(
@@ -249,7 +250,7 @@ class EntriesOmniListView(EntriesSearchListView):
                 ]
             )
 
-        query_filter.calculate_combined_query()
+        query_filter.get_conditions()
 
         return query_filter
 
@@ -260,7 +261,7 @@ class EntriesOmniListView(EntriesSearchListView):
                 UserSearchHistory.add(self.request.user, search_term)
 
     def get_filtered_objects(self):
-        fields = self.query_filter.get_fields()
+        fields = self.query_filter.get_not_translated_conditions()
 
         if ("archive" in self.request.GET and self.request.GET["archive"] == "on") or (
             "archive" in fields and fields["archive"] == "1"
@@ -892,6 +893,36 @@ def entry_not_dead(request, pk):
     obj.clear_manual_status()
 
     return HttpResponseRedirect(obj.get_absolute_url())
+
+
+def entry_show_dislikes(request, pk):
+    p = ViewPage(request)
+    p.set_title("Show entry likes/dislikes")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_LOGGED)
+    if data is not None:
+        return data
+
+    objs = LinkDataController.objects.filter(id=pk)
+    obj = objs[0]
+
+    handler = UrlHandler.get_type(obj.link)
+
+    if type(handler) == UrlHandler.youtube_video_handler:
+
+        code = handler.get_video_code()
+        h = ReturnDislike(code)
+        up = h.get_thumbs_up()
+        down = h.get_thumbs_down()
+        view_count = h.get_view_count()
+        rating = h.get_rating()
+        p.context["summary_text"] = "Likes:{}\nDislikes:{}\nViews:{}\nRating:{}".format(
+                up, down, view_count, rating
+                )
+
+    else:
+        p.context["summary_text"] = "It is not a youtube link"
+
+    return p.render("summary_present.html")
 
 
 def entries_search_init(request):

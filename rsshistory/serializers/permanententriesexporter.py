@@ -28,6 +28,8 @@ class PermanentEntriesExporter(object):
             "domain_obj__suffix",
             "domain_obj__main",
             "domain_obj__domain",
+            "date_published",
+            "link",
         )
 
         page_system = PageSystem(

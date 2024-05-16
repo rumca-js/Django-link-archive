@@ -289,9 +289,9 @@ class YouTubeJsonHandler(YouTubeVideoHandler):
             return False
 
         if self.return_dislike:
-            from ..serializers.returnyoutubedislikeapijson import YouTubeThumbsDown
+            from ..services.returndislike import YouTubeThumbsDown
 
-            self.rd_ob = YouTubeThumbsDown()
+            self.rd_ob = YouTubeThumbsDown(self.get_video_code())
             if self.rd_text and not self.rd_ob.loads(self.rd_text):
                 return False
 
