@@ -347,9 +347,6 @@ class EntriesRecentListView(EntriesOmniListView):
     context_object_name = "content_list"
     paginate_by = 100
 
-    def on_search(self):
-        pass
-
     def get_initial_query_set(self, archive=False):
         query_set = super().get_initial_query_set(archive)
         return query_set.filter(date_published__range = self.get_default_range())
@@ -378,9 +375,6 @@ class EntriesNotTaggedView(EntriesOmniListView):
     def get_order_by(self):
         return ["-date_published"]
 
-    def on_search(self):
-        pass
-
     def get_initial_query_set(self, archive=False):
         query_set = super().get_initial_query_set(archive)
         tags_is_null = Q(tags__isnull=True)
@@ -408,9 +402,6 @@ class EntriesBookmarkedListView(EntriesOmniListView):
     model = LinkDataController
     context_object_name = "content_list"
     paginate_by = 100
-
-    def on_search(self):
-        pass
 
     def get_initial_query_set(self, archive=False):
         query_set = super().get_initial_query_set(archive)

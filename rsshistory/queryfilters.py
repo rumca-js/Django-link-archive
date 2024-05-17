@@ -29,6 +29,42 @@ class BaseQueryFilter(object):
 
         self.user = user
         self.error = False
+        self.filtered_objects = None
+
+    def get_conditions(self):
+        return Q()
+
+    def get_objects(self):
+        return None
+
+    def get_filtered_objects(self):
+        if self.filtered_objects:
+            return self.filtered_objects
+
+        """
+        This needs to be here for JSON only.
+        TODO rewrite this. JSON should use pagination on filtered objects
+        """
+        self.filtered_objects = self.get_filtered_objects_internal()
+        self.filtered_objects = self.filtered_objects.distinct()
+
+        if self.use_page_limit:
+            limit_range = self.get_limit()
+            if limit_range:
+                self.filtered_objects = self.filtered_objects[limit_range[0] : limit_range[1]]
+
+        return self.filtered_objects
+
+    def get_filtered_objects_internal(self):
+        conditions = self.get_conditions()
+        LinkDatabase.info("Filter conditions: {}".format(conditions))
+
+        objects = self.get_objects()
+
+        if conditions is not None:
+            return objects.filter(conditions)
+        else:
+            return objects.none()
 
     def get_filter_string(self):
         infilters = self.args
@@ -56,26 +92,6 @@ class BaseQueryFilter(object):
         start = (page - 1) * paginate_by
 
         return [start, start + paginate_by]
-
-    def get_conditions(self):
-        return Q()
-
-    def get_filtered_objects(self):
-        """
-        This needs to be here for JSON only.
-        TODO rewrite this. JSON should use pagination on filtered objects
-        """
-        filtered_objects = self.get_filtered_objects_internal()
-        filtered_objects = filtered_objects.distinct()
-
-        if self.use_page_limit:
-            limit_range = self.get_limit()
-            if limit_range:
-                filtered_objects = filtered_objects[limit_range[0] : limit_range[1]]
-
-        self.filtered_objects = filtered_objects
-
-        return self.filtered_objects
 
     def is_error(self):
         return self.error
@@ -116,14 +132,8 @@ class SourceFilter(BaseQueryFilter):
     def __init__(self, args, user=None):
         super().__init__(args, user=user)
 
-    def get_filtered_objects_internal(self):
-        conditions = self.get_conditions()
-        LinkDatabase.info("Source filter conditions: {}".format(conditions))
-
-        if conditions is not None:
-            return SourceDataController.objects.filter(conditions)
-        else:
-            return SourceDataController.objects.none()
+    def get_objects(self):
+        return SourceDataController.objects
 
     def get_conditions(self):
         q = Q()
@@ -148,7 +158,7 @@ class SourceFilter(BaseQueryFilter):
         query_filter = OmniSearchFilter(args)
 
         translate = SourceDataController.get_query_names()
-        query_filter.set_translatable(translate)
+        query_filter.set_translation_mapping(translate)
 
         query_filter.set_default_search_symbols(
             [
@@ -157,7 +167,7 @@ class SourceFilter(BaseQueryFilter):
             ]
         )
 
-        query_filter.calculate_combined_query()
+        query_filter.get_conditions()
         return query_filter.combined_query
 
     def get_arg_conditions_query(self):
@@ -186,19 +196,11 @@ class EntryFilter(BaseQueryFilter):
 
         return int(EntriesSearchListView.paginate_by)
 
-    def get_filtered_objects_internal(self):
-        conditions = self.get_conditions()
-        LinkDatabase.info(conditions)
-
-        if conditions is None:
-            return LinkDataController.objects.none()
-
+    def get_objects(self):
         if not self.use_archive_source:
-            self.filtered_objects = LinkDataController.objects.filter(conditions)
+            return LinkDataController.objects
         else:
-            self.filtered_objects = ArchiveLinkDataController.objects.filter(conditions)
-
-        return self.filtered_objects
+            return ArchiveLinkDataController.objects
 
     def get_conditions(self):
         q = Q()
@@ -250,7 +252,7 @@ class EntryFilter(BaseQueryFilter):
         query_filter = OmniSearchFilter(args)
 
         translate = LinkDataController.get_query_names()
-        query_filter.set_translatable(translate)
+        query_filter.set_translation_mapping(translate)
 
         query_filter.set_default_search_symbols(
             [
@@ -261,7 +263,7 @@ class EntryFilter(BaseQueryFilter):
             ]
         )
 
-        query_filter.calculate_combined_query()
+        query_filter.get_conditions()
         return query_filter.combined_query
 
     def get_arg_conditions_query(self):
@@ -391,13 +393,8 @@ class DomainFilter(BaseQueryFilter):
     def __init__(self, args, user=None):
         super().__init__(args, user)
 
-    def get_filtered_objects_internal(self):
-        conditions = self.get_conditions()
-        LinkDatabase.info(conditions)
-
-        self.filtered_objects = DomainsController.objects.filter(conditions)
-
-        return self.filtered_objects
+    def get_objects(self):
+        return DomainsController.objects
 
     def get_conditions(self):
         q = Q()
@@ -422,7 +419,7 @@ class DomainFilter(BaseQueryFilter):
         query_filter = OmniSearchFilter(args)
 
         translate = DomainsController.get_query_names()
-        query_filter.set_translatable(translate)
+        query_filter.set_translation_mapping(translate)
 
         query_filter.set_default_search_symbols(
             [
@@ -434,7 +431,7 @@ class DomainFilter(BaseQueryFilter):
             ]
         )
 
-        query_filter.calculate_combined_query()
+        query_filter.get_conditions()
         return query_filter.combined_query
 
     def get_arg_conditions_query(self):
@@ -504,17 +501,18 @@ class StringSymbolEquation(object):
 
 class OmniSymbolProcessor(object):
     def __init__(self, data, symbol_evaluator):
+        self.data = data
         self.symbol_evaluator = symbol_evaluator
         self.known_results = {}
-
-        self.translate_to_symbol_notation(data)
-        self.expr = sympify(self.eq_string)
 
     def translate_to_symbol_notation(self, data):
         eq = StringSymbolEquation(data)
         self.eq_string, self.conditions = eq.process()
 
     def process(self):
+        self.translate_to_symbol_notation(self.data)
+        self.expr = sympify(self.eq_string)
+
         return self.process_internal(self.expr)
 
     def process_internal(self, expr):
@@ -577,7 +575,9 @@ class OmniSymbolProcessor(object):
 
 class OmniSymbolEvaluator(object):
     def __init__(self):
-        self.fields = {}
+        self.not_translated_conditions = {}
+        self.translated_conditions = {}
+
         self.default_search_symbols = []
         self.translatable_names = []
 
@@ -587,6 +587,11 @@ class OmniSymbolEvaluator(object):
             LinkDatabase.info("Condition data {}".format(condition_data))
 
             if self.is_translatable(condition_data):
+                if condition_data[0].find("__isnull") >= 0:
+                    condition_data[2] = condition_data[2] == "True"
+
+                self.translated_conditions[condition_data[0]] = condition_data[2]
+
                 condition_data = self.translate_condition(condition_data)
 
                 LinkDatabase.info(
@@ -594,7 +599,7 @@ class OmniSymbolEvaluator(object):
                 )
                 return Q(**condition_data)
             else:
-                self.fields[condition_data[0]] = condition_data[2]
+                self.not_translated_conditions[condition_data[0]] = condition_data[2]
         else:
             if not symbol or symbol == "":
                 return
@@ -611,7 +616,11 @@ class OmniSymbolEvaluator(object):
             return result
 
     def get_operators(self):
-        return ("==", "=", "~", "<=", ">=", "<", ">", "is null")
+        """
+        first 2 char operators, then 1 char operators
+        """
+        return ["==", "?=", "<=", ">=", 
+                "~", "=", "<", ">"]
 
     def cleanup_left_operator_part(self, left_part):
         return left_part.strip()
@@ -637,12 +646,12 @@ class OmniSymbolEvaluator(object):
 
                 return [left_part, op, right_part]
 
-        wh = symbol.find("is null")
-        if wh >= 0:
-            return [symbol[:wh].strip(), "is null", ""]
-
     def is_translatable(self, condition):
-        return condition[0] in self.translatable_names
+        for name in self.translatable_names:
+            if condition[0].find(name) >= 0:
+                return True
+
+        return False
 
     def translate_condition(self, condition_data):
         """
@@ -651,18 +660,32 @@ class OmniSymbolEvaluator(object):
 
         if condition_data[1] == "==":
             return {condition_data[0] + "__iexact": condition_data[2]}
-        elif condition_data[1] == "=":
-            return {condition_data[0] + "__icontains": condition_data[2]}
-        elif condition_data[1] == ">":
-            return {condition_data[0] + "__gt": condition_data[2]}
-        elif condition_data[1] == "<":
-            return {condition_data[0] + "__lt": condition_data[2]}
         elif condition_data[1] == ">=":
             return {condition_data[0] + "__gte": condition_data[2]}
         elif condition_data[1] == "<=":
             return {condition_data[0] + "__lte": condition_data[2]}
-        elif condition_data[1] == "is null":
-            return {condition_data[0] + "__isnull": True}
+        elif condition_data[1] == ">":
+            return {condition_data[0] + "__gt": condition_data[2]}
+        elif condition_data[1] == "<":
+            return {condition_data[0] + "__lt": condition_data[2]}
+        elif condition_data[1] == "?=":
+            return {condition_data[0] : condition_data[2]}
+        elif condition_data[1] == "=":
+            # for title__isnull = True, there are no additions
+            if self.is_django_operator(condition_data[0]):
+                return {condition_data[0] : condition_data[2]}
+            # otherwise translate to contains
+            else:
+                return {condition_data[0] + "__icontains": condition_data[2]}
+
+    def is_django_operator(self, operator):
+        return operator.endswith("__isnull") or \
+           operator.endswith("__iexact") or \
+           operator.endswith("__gte") or \
+           operator.endswith("__lte") or \
+           operator.endswith("__gt") or \
+           operator.endswith("__lt") or \
+           operator.endswith("__range")
 
     def is_archive_source(self):
         return False
@@ -670,49 +693,36 @@ class OmniSymbolEvaluator(object):
     def set_default_search_symbols(self, symbols):
         self.default_search_symbols = symbols
 
-    def set_translatable(self, names):
+    def set_translation_mapping(self, names):
         self.translatable_names = names
 
 
-class OmniSearchFilter(BaseQueryFilter):
-    def __init__(self, args, user=None):
-        super().__init__(args, user=user)
-
-        if "search_history" in self.args and self.args["search_history"] != "":
-            self.search_query = self.args["search_history"]
-        elif "search" in self.args and self.args["search"] != "":
-            self.search_query = self.args["search"]
-        else:
-            self.search_query = ""
-
-        self.user = None
-        if "user" in self.args:
-            self.user = self.args["user"]
-
-        self.query_set = None
-        self.default_search_symbols = []
-        self.translatable_names = []
+class OmniSearchConditions(object):
+    def __init__(self, search_query):
+        self.search_query = search_query
         self.combined_query = None
-
         self.symbol_evaluator = OmniSymbolEvaluator()
-
-    def set_query_set(self, query_set):
-        self.query_set = query_set
+        self.processor = OmniSymbolProcessor(self.search_query, self.symbol_evaluator)
+        self.default_search_symbols = []
 
     def set_default_search_symbols(self, symbols):
         self.default_search_symbols = symbols
+        self.symbol_evaluator.set_default_search_symbols(symbols)
 
-    def set_translatable(self, names):
-        self.translatable_names = names
+    def set_translation_mapping(self, name_mapping):
+        self.symbol_evaluator.set_translation_mapping(name_mapping)
 
-    def get_fields(self):
-        return self.symbol_evaluator.fields
+    def get_translated_conditions(self):
+        return self.symbol_evaluator.translated_conditions
 
-    def calculate_combined_query(self):
+    def get_not_translated_conditions(self):
+        return self.symbol_evaluator.not_translated_conditions
+
+    def get_conditions(self):
         uses_operator = False
         LinkDatabase.info("Self combined query {}".format(self.combined_query))
         if self.combined_query is not None:
-            return
+            return Q()
 
         operators = set()
         for symbol in self.symbol_evaluator.get_operators():
@@ -726,21 +736,17 @@ class OmniSearchFilter(BaseQueryFilter):
                 break
 
         if uses_operator:
-            try:
-                LinkDatabase.info("Using processor")
-                self.combined_query = self.get_combined_query_using_processor()
-                LinkDatabase.info("Using processor done")
-            except Exception as e:
-                self.error = True
+            LinkDatabase.info("Using processor")
+            self.combined_query = self.get_combined_query_using_processor()
+            LinkDatabase.info("Using processor done")
         else:
-            try:
-                self.combined_query = self.get_combined_query_simple()
-            except Exception as e:
-                self.error = True
+            self.combined_query = self.get_combined_query_simple()
 
         if self.combined_query is None:
             self.error = True
             self.combined_query = Q()
+
+        return self.combined_query
 
     def get_combined_query_simple(self):
         symbol = self.search_query
@@ -760,24 +766,48 @@ class OmniSearchFilter(BaseQueryFilter):
         return result
 
     def get_combined_query_using_processor(self):
-        self.symbol_evaluator.set_default_search_symbols(self.default_search_symbols)
-        self.symbol_evaluator.set_translatable(self.translatable_names)
-
         if self.search_query:
-            proc = OmniSymbolProcessor(self.search_query, self.symbol_evaluator)
-            combined_q_object = proc.process()
+            combined_q_object = self.processor.process()
             return combined_q_object
 
-    def get_filtered_objects_internal(self):
-        if self.query_set is None:
-            return []
 
-        if self.search_query is not None and self.search_query != "":
-            self.calculate_combined_query()
+class OmniSearchFilter(BaseQueryFilter):
+    def __init__(self, args):
+        super().__init__(args)
 
-            LinkDatabase.info("self.combined query: {}".format(self.combined_query))
-            filtered_queryset = self.query_set.filter(self.combined_query)
-            LinkDatabase.info("Omni query:{}".format(filtered_queryset.query))
-            return filtered_queryset
+        if "search_history" in self.args and self.args["search_history"] != "":
+            self.search_query = self.args["search_history"]
+        elif "search" in self.args and self.args["search"] != "":
+            self.search_query = self.args["search"]
         else:
-            return self.query_set
+            self.search_query = ""
+
+        self.parser = OmniSearchConditions(self.search_query)
+
+        self.query_set = None
+        self.combined_query = None
+
+    def set_query_set(self, query_set):
+        self.query_set = query_set
+
+    def set_default_search_symbols(self, symbols):
+        self.parser.set_default_search_symbols(symbols)
+
+    def set_translation_mapping(self, name_mapping):
+        self.parser.set_translation_mapping(name_mapping)
+
+    def get_conditions(self):
+        if self.combined_query:
+            return self.combined_query
+
+        self.combined_query = self.parser.get_conditions()
+        return self.combined_query
+
+    def get_objects(self):
+        return self.query_set
+
+    def get_translated_conditions(self):
+        return self.parser.get_translated_conditions()
+
+    def get_not_translated_conditions(self):
+        return self.parser.get_not_translated_conditions()

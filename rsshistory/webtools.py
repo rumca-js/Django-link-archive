@@ -2403,10 +2403,11 @@ class BasePage(object):
 
             status_code = self.get_selenium_status_code(driver)
 
+            # This driver wait resulted in timeout on yahoo
             # if self.options.link_redirect:
-            WebDriverWait(driver, selenium_timeout).until(
-                EC.url_changes(driver.current_url)
-            )
+            #WebDriverWait(driver, selenium_timeout).until(
+            #    EC.url_changes(driver.current_url)
+            #)
             """
             TODO - if webpage changes link, it should also update it in this object
             """

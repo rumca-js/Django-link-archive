@@ -48,6 +48,7 @@ class EntriesCleanup(object):
                 entries.delete()
 
         self.cleanup_http_duplicates()
+        self.cleanup_invalid_page_ratings()
 
     def get_source_entries(self, source):
         config = Configuration.get_object().config_entry
@@ -137,6 +138,14 @@ class EntriesCleanup(object):
         for entry in entries:
             entry.cleanup_http_duplicate()
 
+    def cleanup_invalid_page_ratings(self):
+        condition = Q(page_rating__gte = 100)
+        if not self.archive_cleanup:
+            entries = LinkDataController.objects.filter(condition)
+
+            for entry in entries:
+                u = EntryUpdater(entry)
+                u.reset_local_data()
 
 class EntryCleanup(object):
     def __init__(self, entry):
@@ -273,7 +282,7 @@ class EntryUpdater(object):
         self.add_links_from_url(url)
 
         if entry.date_dead_since:
-            entry.date_dead_since = False
+            entry.date_dead_since = None
 
         if "title" in props and props["title"] is not None:
             entry.title = props["title"]

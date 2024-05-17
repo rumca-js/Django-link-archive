@@ -18,33 +18,34 @@ STYLE_TYPES = (
     (DISPLAY_STYLE_DARK, DISPLAY_STYLE_DARK),  #
 )
 
-DISPLAY_TYPE_STANDARD = "standard"
-DISPLAY_TYPE_CLICKABLE_TAGS = "clickable-tags"
-DISPLAY_TYPE_LINE_AND_BUTTONS = "line-and-buttons"
-DISPLAY_TYPE_YOUTUBE_THUMBNAILS = "youtube-thumbnails"
-DISPLAY_TYPE_SEARCH_ENGINE = "search-engine"
-
-DISPLAY_TYPE_CHOICES = (
-    (DISPLAY_TYPE_STANDARD, DISPLAY_TYPE_STANDARD),
-    (DISPLAY_TYPE_CLICKABLE_TAGS, DISPLAY_TYPE_CLICKABLE_TAGS),
-    (DISPLAY_TYPE_LINE_AND_BUTTONS, DISPLAY_TYPE_LINE_AND_BUTTONS),
-    (DISPLAY_TYPE_YOUTUBE_THUMBNAILS, DISPLAY_TYPE_YOUTUBE_THUMBNAILS),
-    (DISPLAY_TYPE_SEARCH_ENGINE, DISPLAY_TYPE_SEARCH_ENGINE),
-)
-
 
 class ConfigurationEntry(models.Model):
+    # fmt: off
     ACCESS_TYPE_ALL = "access-type-all"
     ACCESS_TYPE_LOGGED = "access-type-logged"
     ACCESS_TYPE_OWNER = "access-type-owner"
     ACCESS_TYPE_STAFF = "access-type-staff"
 
-    # fmt: off
     ACCESS_TYPES = (
         (ACCESS_TYPE_ALL, ACCESS_TYPE_ALL),                     #
         (ACCESS_TYPE_LOGGED, ACCESS_TYPE_LOGGED),               #
         (ACCESS_TYPE_OWNER, ACCESS_TYPE_OWNER),                 #
     )
+
+    DISPLAY_TYPE_STANDARD = "standard"
+    DISPLAY_TYPE_CLICKABLE_TAGS = "clickable-tags"
+    DISPLAY_TYPE_LINE_AND_BUTTONS = "line-and-buttons"
+    DISPLAY_TYPE_GALLERY = "gallery"
+    DISPLAY_TYPE_SEARCH_ENGINE = "search-engine"
+
+    DISPLAY_TYPE_CHOICES = (
+        (DISPLAY_TYPE_STANDARD, DISPLAY_TYPE_STANDARD),
+        (DISPLAY_TYPE_CLICKABLE_TAGS, DISPLAY_TYPE_CLICKABLE_TAGS),
+        (DISPLAY_TYPE_LINE_AND_BUTTONS, DISPLAY_TYPE_LINE_AND_BUTTONS),
+        (DISPLAY_TYPE_GALLERY, DISPLAY_TYPE_GALLERY),
+        (DISPLAY_TYPE_SEARCH_ENGINE, DISPLAY_TYPE_SEARCH_ENGINE),
+    )
+
     # fmt: on
 
     background_task = models.BooleanField(
@@ -243,7 +244,7 @@ class UserConfig(models.Model):
         max_length=500, null=True, default="style-light", choices=STYLE_TYPES
     )
     display_type = models.CharField(
-        max_length=500, null=True, default="standard", choices=DISPLAY_TYPE_CHOICES
+        max_length=500, null=True, default="standard", choices=ConfigurationEntry.DISPLAY_TYPE_CHOICES
     )
     show_icons = models.BooleanField(default=True)
     thumbnails_as_icons = models.BooleanField(default=True)

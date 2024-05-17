@@ -1,0 +1,25 @@
+{% extends base_generic %}
+{% load static %}
+{% block content %}
+
+<ul class="list-group mr-auto">
+  <li class="list-group-item">
+      <a href="{% url 'rsshistory:wizard-setup-news' %}" class="btn btn-primary" role="button">Setup for News</a>
+  </li>
+
+  <li class="list-group-item">
+      <a href="{% url 'rsshistory:wizard-setup-gallery' %}" class="btn btn-primary" role="button">Setup for Gallery</a>
+  </li>
+
+  <li class="list-group-item">
+      <a href="{% url 'rsshistory:wizard-setup-search-engine' %}" class="btn btn-primary" role="button">Setup for Search Engine</a>
+  </li>
+
+  <li class="list-group-item">
+      <a href="{% url 'rsshistory:configuration' %}" title="Instance configuration" class="nav-link">
+          <img src="{% static 'rsshistory/icons/icons8-configuration-67.png' %}" class="content-icon" />
+          Configuration
+      </a>
+  </li>
+
+{% endblock %}
