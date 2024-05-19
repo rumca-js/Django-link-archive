@@ -56,7 +56,7 @@ def admin_page(request):
     return p.render("admin_page.html")
 
 
-def configuration_page(request):
+def configuration_advanced_page(request):
     p = ViewPage(request)
     p.set_title("Configuration")
     data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
@@ -77,7 +77,7 @@ def configuration_page(request):
     form = ConfigForm(instance=ob, request=request)
 
     form.method = "POST"
-    form.action_url = reverse("{}:configuration".format(LinkDatabase.name))
+    form.action_url = reverse("{}:configuration-advanced".format(LinkDatabase.name))
 
     p.set_variable("config_form", form)
 
@@ -553,9 +553,9 @@ def page_show_properties(request):
             return show_page_props_internal(request, page_link)
 
 
-def create_scanner_form(request, links, additional_text=""):
+def create_scanner_form(request, links):
     data = {}
-    data["body"] = additional_text + "\n" + "\n".join(links)
+    data["body"] = "\n".join(links)
 
     form = ScannerForm(initial=data, request=request)
     form.method = "POST"
@@ -563,26 +563,33 @@ def create_scanner_form(request, links, additional_text=""):
     return form
 
 
+def get_scan_contents_links(link, contents):
+    parser = ContentLinkParser(link, contents)
+
+    c = Configuration.get_object().config_entry
+
+    links = []
+    if c.auto_store_entries:
+        links.extend(parser.get_links())
+    if c.auto_store_domain_info:
+        links.extend(parser.get_domains())
+
+    links = set(links)
+    if link in links:
+        links.remove(link)
+
+    links = list(links)
+    links = sorted(links)
+
+    return links
+
+
 def page_scan_link(request):
     def render_page_scan_input(p, link):
         h = UrlHandler(link)
         contents = h.get_contents()
-        parser = ContentLinkParser(link, contents)
 
-        c = Configuration.get_object().config_entry
-
-        links = []
-        if c.auto_store_entries:
-            links.extend(parser.get_links())
-        if c.auto_store_domain_info:
-            links.extend(parser.get_domains())
-
-        links = set(links)
-        if link in links:
-            links.remove(link)
-
-        links = list(links)
-        links = sorted(links)
+        links = get_scan_contents_links(link, contents)
 
         p.context["form"] = create_scanner_form(request, links)
         p.context["form_submit_button_name"] = "Add links"
@@ -670,8 +677,8 @@ def page_scan_contents(request):
             contents = form.cleaned_data["body"]
             tag = form.cleaned_data["tag"]
 
-            parser = ContentLinkParser(url="https://", contents=contents)
-            links = sorted(list(parser.get_links()))
+            link = "https://" # TODO this might not work for some URLs
+            links = get_scan_contents_links(link, contents)
 
             form = create_scanner_form(request, links)
             p.context["form"] = form
@@ -733,7 +740,7 @@ def wizard_setup_news(request):
     c.whats_new_days = 7
     c.prefer_https = False
     c.entries_order_by = "-date_published, link"
-    c.display_type = Configuration.DISPLAY_TYPE_STANDARD
+    c.display_type = ConfigurationEntry.DISPLAY_TYPE_STANDARD
 
     c.save()
 
@@ -773,7 +780,7 @@ def wizard_setup_gallery(request):
     c.whats_new_days = 7
     c.prefer_https = False
     c.entries_order_by = "-date_published, link"
-    c.display_type = Configuration.DISPLAY_TYPE_GALLERY
+    c.display_type = ConfigurationEntry.DISPLAY_TYPE_GALLERY
 
     c.save()
 
@@ -813,7 +820,7 @@ def wizard_setup_search_engine(request):
     c.whats_new_days = 7
     c.prefer_https = True
     c.entries_order_by = "-page_rating, link"
-    c.display_type = Configuration.DISPLAY_TYPE_SEARCH_ENGINE
+    c.display_type = ConfigurationEntry.DISPLAY_TYPE_SEARCH_ENGINE
 
     c.save()
 

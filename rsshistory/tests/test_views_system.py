@@ -38,8 +38,8 @@ class SystemViewsTest(FakeInternetTestCase):
 
         self.assertEqual(response.status_code, 200)
 
-    def test_configuration(self):
-        url = reverse("{}:configuration".format(LinkDatabase.name))
+    def test_configuration_advanced(self):
+        url = reverse("{}:configuration-advanced".format(LinkDatabase.name))
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
@@ -197,3 +197,65 @@ class SystemViewsTest(FakeInternetTestCase):
         self.assertEqual(response.status_code, 302)
 
         self.assertEqual(bj.enabled, True)
+
+    """
+    """
+
+    def test_wizard(self):
+        url = reverse("{}:wizard".format(LinkDatabase.name))
+
+        # call tested function
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_wizard_setup_news(self):
+        url = reverse("{}:wizard-setup-news".format(LinkDatabase.name))
+
+        # call tested function
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_wizard_setup_gallery(self):
+        url = reverse("{}:wizard-setup-gallery".format(LinkDatabase.name))
+
+        # call tested function
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_wizard_setup_search_engine(self):
+        url = reverse("{}:wizard-setup-search-engine".format(LinkDatabase.name))
+
+        # call tested function
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+    """
+    """
+
+    def test_page_show_props(self):
+        url = reverse("{}:page-show-props".format(LinkDatabase.name))
+
+        # call tested function
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_page_scan_link(self):
+        url = reverse("{}:page-scan-link".format(LinkDatabase.name))
+
+        # call tested function
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_page_scan_contents(self):
+        url = reverse("{}:page-scan-contents".format(LinkDatabase.name))
+
+        # call tested function
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)

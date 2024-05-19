@@ -102,12 +102,12 @@ urlpatterns = [
     # vote
     path("entry-vote/<int:pk>/", viewuseractions.entry_vote, name="entry-vote"),
     # admin views
-    path("robots.txt", TemplateView.as_view(template_name="robots.txt", content_type="text/plain")),
     path("admin-page/", viewsystem.admin_page, name="admin-page"),
     path("user-config", viewsystem.user_config, name="user-config"),
-    path("configuration/", viewsystem.configuration_page, name="configuration"),
+    path("configuration-advanced/", viewsystem.configuration_advanced_page, name="configuration-advanced"),
     path("system-status/", viewsystem.system_status, name="system-status"),
     path("about/", viewsystem.about, name="about"),
+    path("robots.txt", TemplateView.as_view(template_name="robots.txt", content_type="text/plain")),
     path("missing-rights/", viewsystem.missing_rights, name="missing-rights"),
     path("reset-config/", viewsystem.reset_config, name="reset-config"),
     # background jobs
