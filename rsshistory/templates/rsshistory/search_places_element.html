@@ -1,34 +1,24 @@
 {% if search_engines %}
 
-<nav class="navbar">
-    <a class="navbar-brand" href="#">Search online</a>
+<p class="d-inline-flex gap-1">
+  <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+    Search other places
+  </a>
+</p>
 
-   <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#searchenginesNavBar" aria-controls="searchenginesNavBar" aria-expanded="false" aria-label="Toggle navigation">
-     <span class="navbar-toggler-icon"></span>
-   </button>
+<div class="collapse" id="collapseExample">
+  <div class="card card-body">
+      <div>
+      {% for search_engine in search_engines.get %}
+      <a href="{{search_engine.get_search_string}}" class="btn btn-secondary" title="{{search_engine.get_title}}">{{search_engine.get_name}}</a>
+      {% endfor %}
 
-   <div class="collapse navbar-collapse" id="searchenginesNavBar">
-       <ul class="nav navbar-nav mr-auto">
-            {% for search_engine in search_engines.get %}
-            <li class="nav-item">
-            <a href="{{search_engine.get_search_string}}" class="nav-link" title="{{search_engine.get_title}}">{{search_engine.get_name}}</a>
-	    </li>
-            {% endfor %}
-
-            <li class="nav-item">
-              <a href="https://news.ycombinator.com/" class="nav-link">Hacker News</a>
-	    </li>
-            <li class="nav-item">
-              <a href="https://medium.com/" class="nav-link">Medium</a>
-	    </li>
-            <li class="nav-item">
-              <a href="https://mastodon.social/explore" class="nav-link">Mastodon</a>
-	    </li>
-            <li class="nav-item">
-              <a href="https://join-lemmy.org/instances" class="nav-link">Lemmy</a>
-	    </li>
-       </ul>
+      <a href="https://news.ycombinator.com/" class="btn btn-secondary">Hacker News</a>
+      <a href="https://medium.com/" class="btn btn-secondary">Medium</a>
+      <a href="https://mastodon.social/explore" class="btn btn-secondary">Mastodon</a>
+      <a href="https://join-lemmy.org/instances" class="btn btn-secondary">Lemmy</a>
+      </div>
     </div>
-</nav>
+</div>
 
 {% endif %}

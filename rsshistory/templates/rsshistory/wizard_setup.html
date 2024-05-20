@@ -5,21 +5,25 @@
 <ul class="list-group mr-auto">
   <li class="list-group-item">
       <a href="{% url 'rsshistory:wizard-setup-news' %}" class="btn btn-primary" role="button">Setup for News</a>
+      <div class="text-muted">Setup best suited for RSS clients, news.</div>
   </li>
 
   <li class="list-group-item">
       <a href="{% url 'rsshistory:wizard-setup-gallery' %}" class="btn btn-primary" role="button">Setup for Gallery</a>
+      <div class="text-muted">Setup best suited for YouTube-like players, tiktoks, image galleries.</div>
   </li>
 
   <li class="list-group-item">
       <a href="{% url 'rsshistory:wizard-setup-search-engine' %}" class="btn btn-primary" role="button">Setup for Search Engine</a>
+      <div class="text-muted">Setup best suited for Google like Search engines.</div>
   </li>
 
   <li class="list-group-item">
-      <a href="{% url 'rsshistory:configuration-advanced' %}" title="Instance configuration" class="nav-link">
+      <a href="{% url 'rsshistory:configuration-advanced' %}" title="Instance configuration" class="btn btn-primary" role="button">
           <img src="{% static 'rsshistory/icons/icons8-configuration-67.png' %}" class="content-icon" />
           Advanced configuration
       </a>
+      <div class="text-muted">See all available options.</div>
   </li>
 
 {% endblock %}

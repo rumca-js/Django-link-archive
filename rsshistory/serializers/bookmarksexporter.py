@@ -116,11 +116,14 @@ class BookmarksExporter(object):
         self._cfg = config
         self.username = username
 
+    def get_ordered_queryset(input_queryset):
+        return input_queryset.order_by("date_published", "link")
+
     def get_start_year(self):
         """
         We export from oldest entries
         """
-        entries = LinkDataController.objects.all().order_by("date_published", "link")
+        entries = BookmarksExporter.get_ordered_queryset(LinkDataController.objects.all())
         if len(entries) > 0:
             entry = entries[0]
             if entry.date_published:
@@ -185,7 +188,7 @@ class BookmarksExporter(object):
                 bookmarked=True, date_published__range=therange
             )
 
-        result_entries = result_entries.order_by("date_published")
+        result_entries = BookmarksExporter.get_ordered_queryset(result_entries)
 
         return result_entries
 
@@ -200,7 +203,7 @@ class BookmarksTopicExporter(object):
         # this returns IDs, not 'objects'
         result_entries = tag_objs.values_list("entry_object", flat=True)
         result_entries = LinkDataController.objects.filter(id__in=result_entries)
-        result_entries = result_entries.order_by("date_published")
+        result_entries = BookmarksExporter.get_ordered_queryset(result_entries)
 
         converter = BookmarksEntryExporter(self._cfg, result_entries)
         converter.export("topic_{}".format(topic), directory, "topics")
