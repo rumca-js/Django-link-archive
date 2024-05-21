@@ -6,7 +6,7 @@ from django.http import HttpResponseForbidden, HttpResponseRedirect
 from django.utils.http import urlencode
 
 from ..apps import LinkDatabase
-from ..models import Domains, DomainCategories, DomainSubCategories, ConfigurationEntry
+from ..models import Domains, ConfigurationEntry
 from ..controllers import (
     LinkDataWrapper,
     EntryDataBuilder,
@@ -61,17 +61,6 @@ class DomainsListView(generic.ListView):
         context["filter_form"] = self.filter_form
         context["query_filter"] = self.query_filter
         context["reset_link"] = self.get_reset_link()
-
-        items = set()
-        for cat in DomainCategories.objects.all():
-            items.add(cat.category)
-        items = sorted(list(items))
-        context["categories"] = ",".join(items)
-        items = set()
-        for cat in DomainSubCategories.objects.all():
-            items.add(cat.subcategory)
-        items = sorted(list(items))
-        context["subcategories"] = ",".join(items)
 
         return context
 
@@ -173,12 +162,6 @@ def domain_edit(request, pk):
 
         if form.is_valid():
             domain = form.save()
-            category = domain.category
-            subcategory = domain.subcategory
-
-            DomainCategories.add(category)
-            DomainSubCategories.add(category, subcategory)
-            print("Category:{} subcategory:{}".format(category, subcategory))
 
             return HttpResponseRedirect(domain.get_absolute_url())
 
@@ -297,16 +280,6 @@ def domains_json(request):
 
     # JsonResponse
     return JsonResponse(exp.get_json(domains))
-
-
-def domains_category_list(request):
-    p = ViewPage(request)
-    p.set_title("View categories")
-
-    categories = DomainCategories.objects.all()
-    p.context["category_list"] = categories
-
-    return p.render("domain_category_list.html")
 
 
 def domains_reset_dynamic_data(request):

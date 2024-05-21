@@ -13,8 +13,6 @@ class Domains(models.Model):
     subdomain = models.CharField(max_length=200, null=True)
     suffix = models.CharField(max_length=20, null=True)
     tld = models.CharField(max_length=20, null=True)
-    category = models.CharField(max_length=1000, null=True)
-    subcategory = models.CharField(max_length=1000, null=True)
     dead = models.BooleanField(default=False)  # to be removed
 
     date_created = models.DateTimeField(auto_now_add=True)
@@ -31,8 +29,6 @@ class Domains(models.Model):
     class Meta:
         ordering = [
             # "-link_obj__page_rating",
-            "-category",
-            "-subcategory",
             "tld",
             "suffix",
             "main",
@@ -89,55 +85,3 @@ class DomainsMains(models.Model):
         mains = DomainsMains.objects.filter(main=main)
         if mains.count() == 0:
             DomainsMains.objects.create(main=main)
-
-
-class DomainCategories(models.Model):
-    category = models.CharField(max_length=1000, unique=True)
-
-    class Meta:
-        ordering = ["category"]
-
-    def add(category):
-        if category and category != "":
-            objs = DomainCategories.objects.filter(category=category)
-            if objs.count() == 0:
-                return DomainCategories.objects.create(category=category)
-            else:
-                return objs[0]
-
-
-class DomainSubCategories(models.Model):
-    category = models.CharField(max_length=1000, default="")
-    subcategory = models.CharField(max_length=1000)
-
-    category_obj = models.ForeignKey(
-        DomainCategories,
-        on_delete=models.SET_NULL,
-        related_name="subcategories",
-        null=True,
-        blank=True,
-    )
-
-    class Meta:
-        ordering = ["category", "subcategory"]
-
-    def add(category, subcategory):
-        category_obj = None
-        category_objs = DomainCategories.objects.filter(category=category)
-        if category_objs.count() > 0:
-            category_obj = category_objs[0]
-        else:
-            category_obj = DomainCategories.add(category)
-
-        if category and category != "" and subcategory and subcategory != "":
-            objs = DomainSubCategories.objects.filter(
-                category=category, subcategory=subcategory
-            )
-            if objs.count() == 0:
-                return DomainSubCategories.objects.create(
-                    category=category,
-                    subcategory=subcategory,
-                    category_obj=category_obj,
-                )
-            else:
-                return objs[0]

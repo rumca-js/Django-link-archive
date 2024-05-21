@@ -14,8 +14,6 @@ from ..models import (
     DataExport,
     SourceExportHistory,
     KeyWords,
-    DomainCategories,
-    DomainSubCategories,
 )
 from ..configuration import Configuration
 from ..threadhandlers import (
@@ -409,6 +407,8 @@ class RefreshThreadHandlerTest(FakeInternetTestCase):
 
     def test_process_no_exports(self):
         DataExport.objects.all().delete()
+        SourceExportHistory.objects.all().delete()
+        self.create_exports()
 
         handler = RefreshThreadHandler()
         handler.refresh()
@@ -433,9 +433,11 @@ class RefreshThreadHandlerTest(FakeInternetTestCase):
             print("Persisten object info:{}".format(persistent_object.info))
 
         self.assertEqual(persistent_objects.count(), 0)
-        self.assertEqual(SourceExportHistory.objects.all().count(), 1)
+        self.assertEqual(SourceExportHistory.objects.all().count(), 3)
 
     def test_process_with_exports(self):
+        DataExport.objects.all().delete()
+        SourceExportHistory.objects.all().delete()
         self.create_exports()
 
         handler = RefreshThreadHandler()
@@ -538,12 +540,7 @@ class CleanJobHandlerTest(FakeInternetTestCase):
         DomainsController.objects.create(
             protocol="https",
             domain="youtube.com",
-            category="testCategory",
-            subcategory="testSubcategory",
         )
-        DomainCategories.objects.all().delete()
-        DomainSubCategories.objects.all().delete()
-
         datetime = KeyWords.get_keywords_date_limit() - timedelta(days=1)
         keyword = KeyWords.objects.create(keyword="test")
         keyword.date_published = datetime
@@ -569,9 +566,7 @@ class CleanJobHandlerTest(FakeInternetTestCase):
         for domain in DomainsController.objects.all():
             print("Domain: {}".format(domain.domain))
 
-        self.assertEqual(DomainsController.objects.all().count(), 1)
-        self.assertEqual(DomainCategories.objects.all().count(), 1)
-        self.assertEqual(DomainSubCategories.objects.all().count(), 1)
+        self.assertEqual(DomainsController.objects.all().count(), 0)
 
     def test_cleanup_job_no_store_domains(self):
         self.prepare_data()
@@ -592,8 +587,6 @@ class CleanJobHandlerTest(FakeInternetTestCase):
         self.assertEqual(KeyWords.objects.all().count(), 0)
 
         self.assertEqual(DomainsController.objects.all().count(), 0)
-        self.assertEqual(DomainCategories.objects.all().count(), 0)
-        self.assertEqual(DomainSubCategories.objects.all().count(), 0)
 
 
 class AddJobHandlerTest(FakeInternetTestCase):

@@ -16,6 +16,7 @@ from .fakeinternet import FakeInternetTestCase
 class EntryUpdaterTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
+        self.setup_configuration()
 
         self.user = User.objects.create_user(
             username="TestUser", password="testpassword", is_staff=True

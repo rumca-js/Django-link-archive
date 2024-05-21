@@ -77,3 +77,14 @@ class DomainTest(FakeInternetTestCase):
         DomainsController.create_missing_entries()
 
         self.assertEqual(LinkDataController.objects.all().count(), 1)
+
+    def test_cleanup(self):
+
+        LinkDataController.objects.all().delete()
+        DomainsController.objects.all().delete()
+
+        DomainsController.objects.create(domain="waiterrant.blogspot.com")
+
+        DomainsController.cleanup()
+
+        self.assertEqual(DomainsController.objects.all().count(), 0)

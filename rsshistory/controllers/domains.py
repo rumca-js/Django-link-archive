@@ -9,8 +9,6 @@ from django.db.models import Q
 from ..models import (
     AppLogging,
     Domains,
-    DomainCategories,
-    DomainSubCategories,
 )
 from .entries import LinkDataController
 from ..configuration import Configuration
@@ -192,8 +190,6 @@ class DomainsController(Domains):
             "subdomain": self.subdomain,
             "suffix": self.suffix,
             "tld": self.tld,
-            "category": self.category,
-            "subcategory": self.subcategory,
             "dead": self.dead,
             "date_created": self.date_created.isoformat(),
             "date_update_last": self.date_update_last.isoformat(),
@@ -208,8 +204,6 @@ class DomainsController(Domains):
             "subdomain",
             "suffix",
             "tld",
-            "category",
-            "subcategory",
             "dead",
             "date_created",
             "date_update_last",
@@ -217,15 +211,7 @@ class DomainsController(Domains):
         return result
 
     def reset_dynamic_data():
-        objs = DomainCategories.objects.all()
-        objs.delete()
-        objs = DomainSubCategories.objects.all()
-        objs.delete()
-
-        domains = Domains.objects.all()
-        for domain in domains:
-            DomainCategories.add(domain.category)
-            DomainSubCategories.add(domain.category, domain.subcategory)
+        pass
 
     def is_domain_object(entry):
         if not hasattr(entry, "main_domain_obj"):
@@ -238,9 +224,11 @@ class DomainsController(Domains):
             DomainsController.unconnect_entries()
             DomainsController.remove_all()
         else:
-            DomainsController.reset_dynamic_data()
-            DomainsController.create_missing_domains()
-            # DomainsController.create_missing_entries()
+            DomainsController.remove_unused_domains()
+
+    def remove_unused_domains():
+        domains = DomainsController.objects.filter(Q(entry_objects__isnull = True) & Q(archive_entry_objects__isnull = True))
+        domains.delete()
 
     def unconnect_entries():
         entries = LinkDataController.objects.filter(domain_obj__isnull=False)

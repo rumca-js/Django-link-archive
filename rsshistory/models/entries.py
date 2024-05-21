@@ -537,6 +537,7 @@ class LinkDataModel(BaseLinkDataController):
     domain_obj = models.ForeignKey(
         Domains,
         on_delete=models.CASCADE,
+        related_name="entry_objects",
         null=True,
         blank=True,
     )
@@ -564,6 +565,7 @@ class ArchiveLinkDataModel(BaseLinkDataController):
     domain_obj = models.ForeignKey(
         Domains,
         on_delete=models.CASCADE,
+        related_name="archive_entry_objects",
         null=True,
         blank=True,
     )

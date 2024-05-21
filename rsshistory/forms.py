@@ -16,8 +16,6 @@ from .pluginsources.sourcecontrollerbuilder import SourceControllerBuilder
 from .models import DomainsSuffixes
 from .models import DomainsTlds
 from .models import DomainsMains
-from .models import DomainCategories
-from .models import DomainSubCategories
 from .models import SourceCategories
 from .models import SourceSubCategories
 from .models import ConfigurationEntry, UserConfig, DataExport
@@ -561,8 +559,6 @@ class DomainEditForm(forms.ModelForm):
     class Meta:
         model = DomainsController
         fields = [
-            "category",
-            "subcategory",
             "domain",
             "dead",
         ]
@@ -581,8 +577,6 @@ class DomainsChoiceForm(forms.Form):
     search = forms.CharField(label="Search", max_length=500, required=False)
     suffix = forms.CharField(widget=forms.Select(choices=()), required=False)
     tld = forms.CharField(widget=forms.Select(choices=()), required=False)
-    category = forms.CharField(widget=forms.Select(choices=()), required=False)
-    subcategory = forms.CharField(widget=forms.Select(choices=()), required=False)
     sort = forms.CharField(widget=forms.Select(choices=()), required=False)
 
     def __init__(self, *args, **kwargs):
@@ -601,13 +595,6 @@ class DomainsChoiceForm(forms.Form):
         )
         self.fields["sort"].widget = forms.Select(
             choices=self.get_sort_choices(), attrs=attr
-        )
-
-        categories = self.get_categories()
-        subcategories = self.get_subcategories()
-        self.fields["category"].widget = forms.Select(choices=categories, attrs=attr)
-        self.fields["subcategory"].widget = forms.Select(
-            choices=subcategories, attrs=attr
         )
 
     def to_choices(self, names):
@@ -655,26 +642,6 @@ class DomainsChoiceForm(forms.Form):
         names = DomainsController.get_query_names()
         names.append("")
         return self.to_choices(names)
-
-    def get_categories(self):
-        result = []
-        result.append(["", ""])
-
-        for category in DomainCategories.objects.all():
-            if category and category != "":
-                result.append([category.category, category.category])
-
-        return result
-
-    def get_subcategories(self):
-        result = []
-        result.append(["", ""])
-
-        for subcategory in DomainSubCategories.objects.all():
-            if subcategory and subcategory != "":
-                result.append([subcategory.subcategory, subcategory.subcategory])
-
-        return result
 
 
 class SourcesChoiceForm(forms.Form):

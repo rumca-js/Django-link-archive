@@ -26,8 +26,6 @@ from .domains import (
     DomainsSuffixes,
     DomainsTlds,
     DomainsMains,
-    DomainCategories,
-    DomainSubCategories,
 )
 from .keywords import (
     KeyWords,

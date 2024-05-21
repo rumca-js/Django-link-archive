@@ -156,7 +156,6 @@ urlpatterns = [
     path("domains-fix/", viewdomains.domains_fix, name="domains-fix",),
     path("domains-read-bookmarks/", viewdomains.domains_read_bookmarks, name="domains-read-bookmarks",),
     path("domains-json/", viewdomains.domains_json, name="domains-json"),
-    path("domains-category-list/", viewdomains.domains_category_list, name="domains-category-list"),
     path("domains-reset-dynamic-data/", viewdomains.domains_reset_dynamic_data, name="domains-reset-dynamic-data"),
     path("domains-remove-all/", viewdomains.domains_remove_all, name="domains-remove-all",),
     # keywords
