@@ -7,6 +7,8 @@ It should be able to operate on SBC, like raspberry PI.
 
 Please do not make anyone live miserable. It was designed to capture information from publicly available data (for example RSS), not to exploit anybody.
 
+We should not scrape aggressively. Reads intervals should be sane. We should be reading robots.txt
+
 On the other hand some web pages use sofisticated barriers that prevents us from successfuly scraping the web contents.
 
 Most common techniques:
