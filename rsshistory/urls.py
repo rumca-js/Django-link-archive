@@ -170,6 +170,7 @@ urlpatterns = [
     path("page-show-props", viewsystem.page_show_properties, name="page-show-props",),
     path("page-scan-link", viewsystem.page_scan_link, name="page-scan-link",),
     path("page-scan-contents", viewsystem.page_scan_contents, name="page-scan-contents",),
+    path("page-process-contents", viewsystem.page_process_contents, name="page-process-contents",),
     path("page-add-many-links", viewsystem.page_add_many_links, name="page-add-many-links",),
     # other
     path("cleanup-link", viewcustom.cleanup_link, name="cleanup-link",),

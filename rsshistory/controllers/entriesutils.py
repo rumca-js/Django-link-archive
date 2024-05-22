@@ -5,7 +5,7 @@ import ipaddress
 
 from django.db import models
 from django.urls import reverse
-from django.db.models import Q
+from django.db.models import Q, F
 
 from ..models import (
     BaseLinkDataController,
@@ -140,12 +140,14 @@ class EntriesCleanup(object):
 
     def cleanup_invalid_page_ratings(self):
         condition = Q(page_rating__gte = 100)
+        condition2 = Q(page_rating__gte = F('page_rating_contents')) & Q(page_rating_votes = 0) 
         if not self.archive_cleanup:
-            entries = LinkDataController.objects.filter(condition)
+            entries = LinkDataController.objects.filter(condition | (condition2))
 
             for entry in entries:
                 u = EntryUpdater(entry)
                 u.reset_local_data()
+
 
 class EntryCleanup(object):
     def __init__(self, entry):

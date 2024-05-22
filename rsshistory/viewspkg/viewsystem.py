@@ -27,13 +27,13 @@ from ..controllers import (
     ArchiveLinkDataController,
     LinkCommentDataController,
     BackgroundJobController,
+    EntryDataBuilder,
 )
 from ..configuration import Configuration
-from ..forms import ConfigForm, UserConfigForm, BackgroundJobForm
-from ..forms import LinkInputForm, ScannerForm
+from ..forms import ConfigForm, UserConfigForm, BackgroundJobForm, LinkInputForm, ScannerForm, UrlContentsForm
 from ..views import ViewPage
 from ..pluginurl.urlhandler import UrlHandler
-from ..webtools import ContentLinkParser
+from ..webtools import ContentLinkParser, RssPage
 
 
 def index(request):
@@ -694,6 +694,63 @@ def page_scan_contents(request):
         form.method = "POST"
         form.action_url = reverse("{}:page-scan-contents".format(LinkDatabase.name))
         p.context["form_submit_button_name"] = "Scan"
+        p.context["form"] = form
+
+        return p.render("form_basic.html")
+
+
+def page_process_contents(request):
+    """
+    Displays form, or textarea of available links.
+    User can select which links will be added.
+    """
+    p = ViewPage(request)
+    p.set_title("Scans page properties")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    if request.method == "POST":
+        form = UrlContentsForm(request.POST, request=request)
+        if form.is_valid():
+            contents = form.cleaned_data["body"]
+            link = form.cleaned_data["url"]
+
+            # TODO should this be more connected with source processing?
+            # IT should not be just RssPage, but also HtmlPage, or other handlers
+            reader = RssPage(link, contents=contents)
+            if not reader.is_valid():
+                p.context["summary_text"] = "Contents is invalid"
+                return p.render("summary_present.html")
+
+            summary = "Added: "
+
+            all_props = reader.get_container_elements()
+            for index, prop in enumerate(all_props):
+                prop["link"] = UrlHandler.get_cleaned_link(prop["link"])
+                # TODO use language from source, if we have source for that url/link
+                # TODO update page hash?
+
+                b = EntryDataBuilder()
+                b.link_data = prop
+                b.source_is_auto = True
+                entry = b.add_from_props()
+
+                if entry:
+                    summary += "<a href='{}'>{}:{}</a>,".format(entry.get_absolute_url(), prop["link"], prop["title"])
+
+            p.context["summary_text"] = summary
+            return p.render("summary_present.html")
+
+        # form is invalid, it will display error
+        return p.render("form_basic.html")
+
+    else:
+        form = UrlContentsForm(request=request)
+
+        form.method = "POST"
+        form.action_url = reverse("{}:page-process-contents".format(LinkDatabase.name))
+        p.context["form_submit_button_name"] = "Process"
         p.context["form"] = form
 
         return p.render("form_basic.html")

@@ -283,6 +283,17 @@ class ScannerForm(forms.Form):
         super().__init__(*args, **kwargs)
 
 
+class UrlContentsForm(forms.Form):
+    # fmt: off
+    url = forms.CharField(label="Source URL", max_length=500)
+    body = forms.CharField(widget=forms.Textarea(attrs={'rows':30, 'cols':75}))
+    # fmt: on
+
+    def __init__(self, *args, **kwargs):
+        self.init = UserRequest(args, kwargs)
+        super().__init__(*args, **kwargs)
+
+
 class ExportTopicForm(forms.Form):
     tag = forms.CharField(label="Tag", max_length=500)
     store_domain_info = forms.BooleanField()

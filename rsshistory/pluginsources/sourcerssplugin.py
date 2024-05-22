@@ -125,8 +125,6 @@ class BaseRssPlugin(SourceGenericPlugin):
 
             if self.is_link_ok_to_add(prop):
                 yield prop
-            # LinkDatabase.info("Processing RSS element DONE")
-        # LinkDatabase.info("Processing RSS elements DONE")
 
     def enhance(self, prop):
         prop["link"] = UrlHandler.get_cleaned_link(prop["link"])
