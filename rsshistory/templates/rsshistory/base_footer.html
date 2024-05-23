@@ -1,9 +1,5 @@
 {% load static %}
 
 <div>
-This is a [{{app_name}}] <a href="https://github.com/rumca-js/Django-link-archive">Django-link-archive</a> instance v{{app_version}}.
-</div>
-
-<div>
-<a href="{% url 'rsshistory:about' %}">About</a>
+   <a href="{% url 'rsshistory:about' %}">[{{app_name}}/{{app_version}}] - About</a>
 </div>

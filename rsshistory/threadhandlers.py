@@ -47,6 +47,7 @@ from .controllers import (
     LinkCommentDataController,
     EntriesCleanupAndUpdate,
     EntryUpdater,
+    EntriesUpdater,
 )
 from .configuration import Configuration
 from .dateutils import DateUtils
@@ -965,9 +966,10 @@ class RefreshThreadHandler(object):
                 self.do_update(export)
                 SourceExportHistory.confirm(export)
 
-    def check_sources(self):
-        from .controllers import SourceDataController
+        if self.is_no_backgroundjob_active():
+            self.update_entry()
 
+    def check_sources(self):
         sources = SourceDataController.objects.filter(enabled=True).order_by(
             "dynamic_data__date_fetched"
         )
@@ -987,6 +989,16 @@ class RefreshThreadHandler(object):
                 BackgroundJobController.link_save(source.url)
 
         BackgroundJobController.make_cleanup()
+
+    def is_no_backgroundjob_active(self):
+        objs = BackgroundJobController.objects.filter(enabled=True)
+        return objs.count() == 0
+
+    def update_entry(self):
+        u = EntriesUpdater()
+        entries = u.get_entries_to_update()
+        if entries and entries.count() > 0:
+            BackgroundJobController.entry_update_data(entries[0])
 
 
 class HandlerManager(object):

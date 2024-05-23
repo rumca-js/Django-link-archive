@@ -416,7 +416,7 @@ class EntriesUpdater(object):
         self.update_std_entries()
         self.update_stale_entries()
 
-    def update_std_entries(self):
+    def get_entries_to_update(self):
         c = Configuration.get_object()
         conf = c.config_entry
 
@@ -430,11 +430,20 @@ class EntriesUpdater(object):
         condition_days_to_check = Q(date_update_last__lt=date_to_check)
         condition_status_valid = Q(date_dead_since__isnull=True)
 
-        max_limit_entries = 1000
+        # we also update page if it is voted to be below 0
+        # we need to have up-to-date info if pages go out of the business
+        # we may change design to update it less often
 
         entries = LinkDataController.objects.filter(
             condition_days_to_check & condition_status_valid
-        ).order_by("date_update_last")
+        ).order_by("date_update_last", "link")
+
+        return entries
+
+    def update_std_entries(self):
+        entries = self.get_entries_to_update()
+        max_limit_entries = 1000 # TODO hardcoded value. should be in config
+
         for entry in entries[:max_limit_entries]:
             # update entry - it is either alive - will be re-enabled, or removed
             BackgroundJobController.entry_update_data(entry)

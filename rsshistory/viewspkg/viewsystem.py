@@ -793,7 +793,7 @@ def wizard_setup_news(request):
     c.days_to_move_to_archive = 100
     c.days_to_check_stale_entries = 10
     c.days_to_remove_links = 20
-    c.days_to_remove_stale_entries = 30
+    c.days_to_remove_stale_entries = 0 # do not remove bookmarks?
     c.whats_new_days = 7
     c.prefer_https = False
     c.entries_order_by = "-date_published, link"
@@ -833,7 +833,7 @@ def wizard_setup_gallery(request):
     c.days_to_move_to_archive = 0
     c.days_to_check_stale_entries = 10
     c.days_to_remove_links = 30
-    c.days_to_remove_stale_entries = 30
+    c.days_to_remove_stale_entries = 0 # do not remove bookmarks?
     c.whats_new_days = 7
     c.prefer_https = False
     c.entries_order_by = "-date_published, link"
