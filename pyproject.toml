@@ -25,6 +25,10 @@ sympy = "^1.12"
 beautifulsoup4 = "^4.12.2"
 spacy = "^3.7.2"
 selenium="*"
+chardet = "^5.2.0"
+psycopg2 = "*"
+pyvirtualdisplay = "^3.0"
+undetected-chromedriver = "^3.5.5"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.3.0"
