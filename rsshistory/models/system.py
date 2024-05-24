@@ -213,6 +213,13 @@ class ConfigurationEntry(models.Model):
         help_text="Links with these urls will be blocked",
     )
 
+    internet_test_page = models.CharField(
+        default="https://google.com",
+        max_length=2000,
+        null=True,
+        help_text="Page that is pinged to check if Internet is OK",
+    )
+
     def get():
         """
         Most probably should not be used directly. Should be cached in application

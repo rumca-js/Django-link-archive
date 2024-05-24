@@ -138,6 +138,9 @@ def system_status(request):
     c = Configuration.get_object()
     p.context["directory"] = c.directory
 
+    p.context["is_internet_connection_ok"] = c.is_internet_connection_ok
+    p.context["last_refresh_datetime"] = c.last_refresh_datetime
+
     p.context["ConfigurationEntry"] = ConfigurationEntry.objects.count()
     p.context["UserConfig"] = UserConfig.objects.count()
 

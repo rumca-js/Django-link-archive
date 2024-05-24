@@ -952,10 +952,11 @@ class RefreshThreadHandler(object):
     """
 
     def refresh(self, item=None):
-        # some settings in config could have changed
-        # if we run celery - process need to fetch new settings
         c = Configuration.get_object()
-        c.config_entry = ConfigurationEntry.get()
+        c.refresh()
+
+        if not c.is_internet_connection_ok:
+            return
 
         from .controllers import SourceDataController
 
@@ -1066,6 +1067,10 @@ class HandlerManager(object):
 
     def process_all(self):
         self.start_processing_time = DateUtils.get_datetime_now_utc()
+
+        c = Configuration.get_object()
+        if not c.is_internet_connection_ok:
+            return
 
         while True:
             items = self.get_handler_and_object()

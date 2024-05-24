@@ -412,9 +412,6 @@ class EntryUpdater(object):
 
 
 class EntriesUpdater(object):
-    def update_entries(self):
-        self.update_std_entries()
-        self.update_stale_entries()
 
     def get_entries_to_update(self):
         c = Configuration.get_object()
@@ -428,48 +425,16 @@ class EntriesUpdater(object):
         )
 
         condition_days_to_check = Q(date_update_last__lt=date_to_check)
-        condition_status_valid = Q(date_dead_since__isnull=True)
 
         # we also update page if it is voted to be below 0
         # we need to have up-to-date info if pages go out of the business
         # we may change design to update it less often
 
         entries = LinkDataController.objects.filter(
-            condition_days_to_check & condition_status_valid
+            condition_days_to_check
         ).order_by("date_update_last", "link")
 
         return entries
-
-    def update_std_entries(self):
-        entries = self.get_entries_to_update()
-        max_limit_entries = 1000 # TODO hardcoded value. should be in config
-
-        for entry in entries[:max_limit_entries]:
-            # update entry - it is either alive - will be re-enabled, or removed
-            BackgroundJobController.entry_update_data(entry)
-
-    def update_stale_entries(self):
-        c = Configuration.get_object()
-        conf = c.config_entry
-
-        if conf.days_to_check_stale_entries == 0:
-            return
-
-        date_to_check = DateUtils.get_datetime_now_utc() - timedelta(
-            days=conf.days_to_check_stale_entries
-        )
-
-        condition_days_to_check = Q(date_update_last__lt=date_to_check)
-        condition_status_invalid = Q(date_dead_since__isnull=False)
-
-        max_limit_entries = 1000
-
-        entries = LinkDataController.objects.filter(
-            condition_days_to_check & condition_status_invalid
-        ).order_by("date_update_last")
-        for entry in entries[:max_limit_entries]:
-            # update entry - it is either alive - will be re-enabled, or removed
-            BackgroundJobController.entry_update_data(entry)
 
 
 class LinkDataWrapper(object):
@@ -1152,9 +1117,6 @@ class EntriesCleanupAndUpdate(object):
 
         # TODO Move to link wrapper
         moved_all = LinkDataWrapper.move_old_links_to_archive()
-
-        updater = EntriesUpdater()
-        updater.update_entries()
 
         # LinkDataController.recreate_from_domains()
 

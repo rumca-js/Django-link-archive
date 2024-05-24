@@ -18,7 +18,7 @@ version is split into three digits:
  if a change requires the model to be changed, then second digit is updated, patch is set to 0
  if something should be released to public, then release version changes
 """
-__version__ = "0.62.0"
+__version__ = "0.63.0"
 
 
 from pathlib import Path
@@ -31,6 +31,7 @@ class Configuration(object):
         self.app_name = str(app_name)
         self.directory = Path(".")
         self.version = __version__
+
         self.enable_logging()
 
         self.context = {}
@@ -38,6 +39,9 @@ class Configuration(object):
         self.get_context()
         self.apply_ssl_verification()
         self.apply_user_agent()
+
+        self.ping_internet()
+        self.last_refresh_datetime = None
 
     def get_context(self):
         if len(self.context) == 0:
@@ -167,3 +171,24 @@ class Configuration(object):
             for keyword in keywords:
                 result.append(keyword.strip())
         return result
+
+    def refresh(self):
+        """
+        Called to refresh data
+        """
+        self.config_entry = ConfigurationEntry.get()
+
+        self.ping_internet()
+        self.update_refresh_time()
+
+    def ping_internet(self):
+        from .webtools import BasePage
+
+        test_page_url = self.config_entry.internet_test_page
+
+        p = BasePage(url=test_page_url)
+        self.is_internet_connection_ok = p.ping()
+
+    def update_refresh_time(self):
+        from .dateutils import DateUtils
+        self.last_refresh_datetime = DateUtils.get_datetime_now_utc()

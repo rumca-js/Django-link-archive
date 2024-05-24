@@ -133,6 +133,7 @@ class ConfigForm(forms.ModelForm):
             # Advanced
             "user_agent",
             "user_headers",
+            "internet_test_page",
         ]
 
     def __init__(self, *args, **kwargs):

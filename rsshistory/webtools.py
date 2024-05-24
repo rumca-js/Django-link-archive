@@ -2055,6 +2055,15 @@ class BasePage(object):
         if BasePage.get_contents_function is None:
             self.get_contents_function = self.get_contents_internal
 
+        self.headers = {
+            "User-Agent": self.user_agent,
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Charset": "utf-8,ISO-8859-1;q=0.7,*;q=0.3",
+            "Accept-Encoding": "none",
+            "Accept-Language": "en-US,en;q=0.8",
+            "Connection": "keep-alive",
+        }
+
     def disable_ssl_warnings():
         BasePage.ssl_verify = False
         disable_warnings(InsecureRequestWarning)
@@ -2133,22 +2142,13 @@ class BasePage(object):
             self.dead = True
             return None
 
-        hdr = {
-            "User-Agent": self.user_agent,
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-            "Accept-Charset": "utf-8,ISO-8859-1;q=0.7,*;q=0.3",
-            "Accept-Encoding": "none",
-            "Accept-Language": "en-US,en;q=0.8",
-            "Connection": "keep-alive",
-        }
-
         try:
             LinkDatabase.info(
                 "Page: Requesting page: {} options:{}".format(self.url, self.options)
             )
 
             self.response = self.get_contents_function(
-                self.url, headers=hdr, timeout=10
+                self.url, headers=self.headers, timeout=10
             )
 
             LinkDatabase.info(
@@ -2456,6 +2456,38 @@ class BasePage(object):
         driver.quit()
 
         return PageResponseObject(url, html_content)
+
+    def ping(self, timeout=5):
+        """
+        This is program is web scraper. If we turn verify, then we discard some of pages.
+        Encountered several major pages, which had SSL programs.
+
+        SSL is mostly important for interacting with pages. During web scraping it is not that useful.
+        """
+
+        """
+        stream argument allows us to read header before we fetch the page.
+        SSL verification makes everything to work slower.
+        """
+        url = self.url
+
+        try:
+            request_result = requests.get(
+                url,
+                headers=self.headers,
+                timeout=timeout,
+                verify=BasePage.ssl_verify,
+                stream=True,
+            )
+
+            if not self.is_content_type_supported(url, request_result):
+                return False
+
+            return self.is_this_status_ok(request_result.status_code)
+
+        except requests.Timeout:
+            LinkDatabase.error("Page timeout {}".format(url))
+            return False
 
     def get_redirect_url(self, request_result):
         if (
