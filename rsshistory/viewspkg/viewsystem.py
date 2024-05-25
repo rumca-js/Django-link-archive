@@ -20,6 +20,9 @@ from ..models import (
     UserEntryVisitHistory,
     UserEntryTransitionHistory,
     KeyWords,
+    SystemOperation,
+    DataExport,
+    SourceExportHistory,
 )
 from ..controllers import (
     SourceDataController,
@@ -30,7 +33,14 @@ from ..controllers import (
     EntryDataBuilder,
 )
 from ..configuration import Configuration
-from ..forms import ConfigForm, UserConfigForm, BackgroundJobForm, LinkInputForm, ScannerForm, UrlContentsForm
+from ..forms import (
+    ConfigForm,
+    UserConfigForm,
+    BackgroundJobForm,
+    LinkInputForm,
+    ScannerForm,
+    UrlContentsForm,
+)
 from ..views import ViewPage
 from ..pluginurl.urlhandler import UrlHandler
 from ..webtools import ContentLinkParser, RssPage
@@ -111,9 +121,11 @@ def user_config(request):
 
     return p.render("user_configuration.html")
 
+
 """
 Status views
 """
+
 
 def about(request):
     p = ViewPage(request)
@@ -138,11 +150,14 @@ def system_status(request):
     c = Configuration.get_object()
     p.context["directory"] = c.directory
 
-    p.context["is_internet_connection_ok"] = c.is_internet_connection_ok
-    p.context["last_refresh_datetime"] = c.last_refresh_datetime
+    system = SystemOperation.get()
+
+    p.context["is_internet_connection_ok"] = system.is_internet_connection_ok
+    p.context["last_refresh_datetime"] = system.last_refresh_datetime
 
     p.context["ConfigurationEntry"] = ConfigurationEntry.objects.count()
     p.context["UserConfig"] = UserConfig.objects.count()
+    p.context["SystemOperation"] = SystemOperation.objects.count()
 
     p.context["SourceDataModel"] = SourceDataController.objects.count()
     p.context["LinkDataModel"] = LinkDataController.objects.count()
@@ -151,13 +166,15 @@ def system_status(request):
 
     p.context["UserTags"] = UserTags.objects.count()
     p.context["UserVotes"] = UserVotes.objects.count()
-    p.context["LinkCommentDataController"] = LinkCommentDataController.objects.count()
     p.context["UserBookmarks"] = UserBookmarks.objects.count()
+    p.context["LinkCommentDataController"] = LinkCommentDataController.objects.count()
     p.context["UserSearchHistory"] = UserSearchHistory.objects.count()
     p.context["UserEntryVisitHistory"] = UserEntryVisitHistory.objects.count()
     p.context["UserEntryTransitionHistory"] = UserEntryTransitionHistory.objects.count()
 
     p.context["BackgroundJob"] = BackgroundJob.objects.count()
+    p.context["DataExport"] = DataExport.objects.count()
+    p.context["SourceExportHistory"] = SourceExportHistory.objects.count()
 
     from ..dateutils import DateUtils
     from datetime import timedelta
@@ -441,6 +458,7 @@ def backgroundjobs_remove(request, job_type):
 Keywords
 """
 
+
 def keywords(request):
     p = ViewPage(request)
     p.set_title("Keywords")
@@ -458,6 +476,7 @@ def keywords(request):
         p.context["last_date"] = min_val
 
     return p.render("keywords_list.html")
+
 
 def keywords_remove_all(request):
     p = ViewPage(request)
@@ -504,9 +523,11 @@ def keyword_remove(request):
                 reverse("{}:keywords".format(LinkDatabase.name))
             )
 
+
 """
 Other
 """
+
 
 def page_show_properties(request):
     p = ViewPage(request)
@@ -680,7 +701,7 @@ def page_scan_contents(request):
             contents = form.cleaned_data["body"]
             tag = form.cleaned_data["tag"]
 
-            link = "https://" # TODO this might not work for some URLs
+            link = "https://"  # TODO this might not work for some URLs
             links = get_scan_contents_links(link, contents)
 
             form = create_scanner_form(request, links)
@@ -740,7 +761,9 @@ def page_process_contents(request):
                 entry = b.add_from_props()
 
                 if entry:
-                    summary += "<a href='{}'>{}:{}</a>,".format(entry.get_absolute_url(), prop["link"], prop["title"])
+                    summary += "<a href='{}'>{}:{}</a>,".format(
+                        entry.get_absolute_url(), prop["link"], prop["title"]
+                    )
 
             p.context["summary_text"] = summary
             return p.render("summary_present.html")
@@ -796,7 +819,7 @@ def wizard_setup_news(request):
     c.days_to_move_to_archive = 100
     c.days_to_check_stale_entries = 10
     c.days_to_remove_links = 20
-    c.days_to_remove_stale_entries = 0 # do not remove bookmarks?
+    c.days_to_remove_stale_entries = 0  # do not remove bookmarks?
     c.whats_new_days = 7
     c.prefer_https = False
     c.entries_order_by = "-date_published, link"
@@ -836,7 +859,7 @@ def wizard_setup_gallery(request):
     c.days_to_move_to_archive = 0
     c.days_to_check_stale_entries = 10
     c.days_to_remove_links = 30
-    c.days_to_remove_stale_entries = 0 # do not remove bookmarks?
+    c.days_to_remove_stale_entries = 0  # do not remove bookmarks?
     c.whats_new_days = 7
     c.prefer_https = False
     c.entries_order_by = "-date_published, link"
@@ -872,7 +895,9 @@ def wizard_setup_search_engine(request):
     c.auto_store_keyword_info = False
     c.track_user_actions = True
     c.track_user_searches = True
-    c.track_user_navigation = False # it would be interesting for the search engine though
+    c.track_user_navigation = (
+        False  # it would be interesting for the search engine though
+    )
     c.days_to_move_to_archive = 0
     c.days_to_check_stale_entries = 10
     c.days_to_remove_links = 30

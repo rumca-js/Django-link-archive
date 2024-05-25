@@ -5,7 +5,7 @@ import logging
 from django.contrib.auth.models import User
 
 from .basictypes import *
-from .models import ConfigurationEntry
+from .models import ConfigurationEntry, SystemOperation
 from .apps import LinkDatabase
 
 """
@@ -40,8 +40,8 @@ class Configuration(object):
         self.apply_ssl_verification()
         self.apply_user_agent()
 
-        self.ping_internet()
-        self.last_refresh_datetime = None
+        self.system = SystemOperation.get()
+        self.refresh()
 
     def get_context(self):
         if len(self.context) == 0:
@@ -63,7 +63,6 @@ class Configuration(object):
     def get_object(app_name=None):
         if app_name is None:
             from .apps import LinkDatabase
-
             app_name = LinkDatabase.name
 
         app_name = str(app_name)
@@ -172,23 +171,27 @@ class Configuration(object):
                 result.append(keyword.strip())
         return result
 
-    def refresh(self):
-        """
-        Called to refresh data
-        """
-        self.config_entry = ConfigurationEntry.get()
-
-        self.ping_internet()
-        self.update_refresh_time()
-
     def ping_internet(self):
         from .webtools import BasePage
 
         test_page_url = self.config_entry.internet_test_page
 
         p = BasePage(url=test_page_url)
-        self.is_internet_connection_ok = p.ping()
+        ping_status = p.ping()
+
+        self.system.is_internet_connection_ok = ping_status
+        self.system.save()
 
     def update_refresh_time(self):
         from .dateutils import DateUtils
-        self.last_refresh_datetime = DateUtils.get_datetime_now_utc()
+
+        self.system.last_refresh_datetime = DateUtils.get_datetime_now_utc()
+        self.system.save()
+
+    def refresh(self):
+        from .dateutils import DateUtils
+
+        diff = DateUtils.get_datetime_now_utc() - self.system.last_refresh_datetime
+        if (diff.seconds / 60) > 15:
+            self.update_refresh_time()
+            self.ping_internet()

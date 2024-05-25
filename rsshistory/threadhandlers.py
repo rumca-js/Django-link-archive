@@ -48,6 +48,7 @@ from .controllers import (
     EntriesCleanupAndUpdate,
     EntryUpdater,
     EntriesUpdater,
+    EntryScanner,
 )
 from .configuration import Configuration
 from .dateutils import DateUtils
@@ -722,6 +723,7 @@ class ExportDataJobHandler(BaseJobHandler):
 
     def process(self, obj=None):
         from .updatemgr import UpdateManager
+
         try:
             export = self.get_export(obj)
             if not export:
@@ -744,8 +746,8 @@ class ExportDataJobHandler(BaseJobHandler):
             error_text = traceback.format_exc()
             AppLogging.error("Exception: {} {}".format(str(e), error_text))
 
-    def get_export(self,obj):
-        exports = DataExport.objects.filter(id = int(obj.subject))
+    def get_export(self, obj):
+        exports = DataExport.objects.filter(id=int(obj.subject))
         if exports.count() > 0:
             return exports[0]
 
@@ -899,6 +901,7 @@ class LinkScanJobHandler(BaseJobHandler):
 
             cfg = self.get_input_cfg(obj)
             source = None
+            entry = None
 
             if "source" in cfg:
                 source_id = cfg["source"]
@@ -906,23 +909,21 @@ class LinkScanJobHandler(BaseJobHandler):
                 if source_objs.count() > 0:
                     source = source_objs[0]
 
+            if "entry" in cfg:
+                entry_id = cfg["entry"]
+                entries = LinkDataController.objects.filter(id=int(entry_id))
+                if entries.count() > 0:
+                    entry = entries[0]
+
             p = UrlHandler(link)
             contents = p.get_contents()
 
-            p = ContentLinkParser(link, contents)
-
-            c = Configuration.get_object()
-            conf = c.config_entry
-
-            if conf.auto_store_domain_info:
-                links = p.get_domains()
-                for link in links:
-                    BackgroundJobController.link_add(link, source=source)
-
-            if conf.auto_store_entries:
-                links = p.get_links()
-                for link in links:
-                    BackgroundJobController.link_add(link, source=source)
+            if entry:
+                scanner = EntryScanner(entry=entry, contents=contents)
+                scanner.run()
+            else:
+                scanner = EntryScanner(url=link, contents=contents)
+                scanner.run()
 
             return True
         except Exception as e:
@@ -953,9 +954,10 @@ class RefreshThreadHandler(object):
 
     def refresh(self, item=None):
         c = Configuration.get_object()
+
         c.refresh()
 
-        if not c.is_internet_connection_ok:
+        if not c.system.is_internet_connection_ok:
             return
 
         from .controllers import SourceDataController
@@ -1069,7 +1071,7 @@ class HandlerManager(object):
         self.start_processing_time = DateUtils.get_datetime_now_utc()
 
         c = Configuration.get_object()
-        if not c.is_internet_connection_ok:
+        if not c.system.is_internet_connection_ok:
             return
 
         while True:
@@ -1135,8 +1137,7 @@ class HandlerManager(object):
 
     def on_not_safe_exit(self, items):
         jobs = BackgroundJobController.objects.filter(
-            enabled=True,
-            date_created__lt=self.start_processing_time
+            enabled=True, date_created__lt=self.start_processing_time
         )
         for job in jobs:
             if job.priority > 0:

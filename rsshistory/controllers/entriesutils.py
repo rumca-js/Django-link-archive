@@ -139,8 +139,10 @@ class EntriesCleanup(object):
             entry.cleanup_http_duplicate()
 
     def cleanup_invalid_page_ratings(self):
-        condition = Q(page_rating__gte = 100)
-        condition2 = Q(page_rating__gte = F('page_rating_contents')) & Q(page_rating_votes = 0) 
+        condition = Q(page_rating__gte=100)
+        condition2 = Q(page_rating__gte=F("page_rating_contents")) & Q(
+            page_rating_votes=0
+        )
         if not self.archive_cleanup:
             entries = LinkDataController.objects.filter(condition | (condition2))
 
@@ -201,6 +203,38 @@ class EntryCleanup(object):
         return False
 
 
+class EntryScanner(object):
+    def __init__(self, url=None, entry=None, contents=None):
+        if url:
+            self.url = url
+        if entry:
+            self.url = entry.link
+
+        self.contents = contents
+        self.entry = entry
+
+    def run(self):
+        c = Configuration.get_object()
+        config = c.config_entry
+        if not config.auto_scan_new_entries:
+            return
+
+        if self.entry:
+            if self.entry.page_rating < 0:
+                return
+
+        parser = ContentLinkParser(self.url, self.contents)
+
+        content_links = []
+        if conf.auto_store_domain_info:
+            content_links = parser.get_domains()
+        if conf.auto_store_entries:
+            content_links = parser.get_links()
+
+        for link in contents_links:
+            BackgroundJobController.link_add(link)
+
+
 class EntryUpdater(object):
     def __init__(self, entry):
         self.entry = entry
@@ -232,7 +266,7 @@ class EntryUpdater(object):
             self.handle_invalid_response(url)
             return
 
-        self.add_links_from_url(url)
+        self.add_links_from_url(entry, url)
 
         if entry.date_dead_since:
             entry.date_dead_since = None
@@ -281,7 +315,7 @@ class EntryUpdater(object):
             self.handle_invalid_response(url)
             return
 
-        self.add_links_from_url(url)
+        self.add_links_from_url(entry, url)
 
         if entry.date_dead_since:
             entry.date_dead_since = None
@@ -303,17 +337,9 @@ class EntryUpdater(object):
 
         self.update_calculated_vote()
 
-    def add_links_from_url(self, url):
-        c = Configuration.get_object()
-        config = c.config_entry
-        if not config.auto_scan_new_entries:
-            return
-
-        parser = ContentLinkParser(url.url, url.p.get_contents())
-        contents_links = parser.get_links()
-
-        for link in contents_links:
-            BackgroundJobController.link_add(link)
+    def add_links_from_url(self, entry, url):
+        scanner = EntryScanner(url = url.url, entry=entry, contents = url.p.get_contents())
+        scanner.run()
 
     def reset_local_data(self):
         self.update_calculated_vote()
@@ -366,7 +392,9 @@ class EntryUpdater(object):
                 are_tags = 1
 
         # votes are twice as important as contents
-        page_rating = ((2 * entry.page_rating_votes) + entry.page_rating_contents) + are_tags * 10
+        page_rating = (
+            (2 * entry.page_rating_votes) + entry.page_rating_contents
+        ) + are_tags * 10
         max_page_rating = 2 * 100 + 100 + 10
 
         # rating in percentage. Range -100..100
@@ -412,7 +440,6 @@ class EntryUpdater(object):
 
 
 class EntriesUpdater(object):
-
     def get_entries_to_update(self):
         c = Configuration.get_object()
         conf = c.config_entry
@@ -430,9 +457,9 @@ class EntriesUpdater(object):
         # we need to have up-to-date info if pages go out of the business
         # we may change design to update it less often
 
-        entries = LinkDataController.objects.filter(
-            condition_days_to_check
-        ).order_by("date_update_last", "link")
+        entries = LinkDataController.objects.filter(condition_days_to_check).order_by(
+            "date_update_last", "link"
+        )
 
         return entries
 
@@ -597,6 +624,46 @@ class LinkDataWrapper(object):
                 entry.delete()
             except Exception as e:
                 error_text = traceback.format_exc()
+
+    def move_from_entry_to_entry(entry_obj, destination_entry):
+        """
+        Moves everything related to entry object to destination entry object
+         - tags
+         - votes
+         - comments
+         - transition history?
+        """
+        tags = UserTags.objects.filter(entry_object=entry_obj)
+        for tag in tags:
+            tag.pk = None
+            tag.save()
+
+            tag.entry_object = destination_entry
+            tag.save()
+
+        votes = UserVotes.objects.filter(entry_object=entry_obj)
+        for vote in votes:
+            vote.pk = None
+            vote.save()
+
+            vote.entry_object = destination_entry
+            vote.save()
+
+        comments = LinkDataComments.objects.filter(entry_object=entry_obj)
+        for comment in comments:
+            comment.pk = None
+            comment.save()
+
+            comment.entry_object = destination_entry
+            comment.save()
+
+    def move_from_entry_to_url(entry_obj, destination_url):
+        destination_entries = LinkDataController.objects.filter(destination_url)
+
+        if destination_entries.count() > 0:
+            LinkDataWrapper.move_from_entry_to_entry(entry_obj, destination_entries[0])
+        else:
+            AppLogging.error("Cannot move entries from:{} to:{}".format(entry_obj.link, destination_url))
 
     def make_bookmarked(request, entry):
         """

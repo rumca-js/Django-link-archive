@@ -36,8 +36,8 @@ class YouTubeChannelHandler(RssPage, DefaultUrlHandler):
 
     def input2code_handle(self, url):
         pass
-        #u = Url(url)
-        #contents = u.get_contents()
+        # u = Url(url)
+        # contents = u.get_contents()
 
     def input2code_channel(self, url):
         wh = url.rfind("/")

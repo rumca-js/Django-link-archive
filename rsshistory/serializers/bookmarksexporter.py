@@ -123,7 +123,9 @@ class BookmarksExporter(object):
         """
         We export from oldest entries
         """
-        entries = BookmarksExporter.get_ordered_queryset(LinkDataController.objects.all())
+        entries = BookmarksExporter.get_ordered_queryset(
+            LinkDataController.objects.all()
+        )
         if len(entries) > 0:
             entry = entries[0]
             if entry.date_published:

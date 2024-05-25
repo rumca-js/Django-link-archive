@@ -349,7 +349,7 @@ class EntriesRecentListView(EntriesOmniListView):
 
     def get_initial_query_set(self, archive=False):
         query_set = super().get_initial_query_set(archive)
-        return query_set.filter(date_published__range = self.get_default_range())
+        return query_set.filter(date_published__range=self.get_default_range())
 
     def get_order_by(self):
         return ["-date_published"]
@@ -405,7 +405,7 @@ class EntriesBookmarkedListView(EntriesOmniListView):
 
     def get_initial_query_set(self, archive=False):
         query_set = super().get_initial_query_set(archive)
-        return query_set.filter(bookmarked = 1)
+        return query_set.filter(bookmarked=1)
 
     def has_more_results(self):
         return False
@@ -899,7 +899,6 @@ def entry_show_dislikes(request, pk):
     handler = UrlHandler.get_type(obj.link)
 
     if type(handler) == UrlHandler.youtube_video_handler:
-
         code = handler.get_video_code()
         h = ReturnDislike(code)
         up = h.get_thumbs_up()
@@ -907,8 +906,8 @@ def entry_show_dislikes(request, pk):
         view_count = h.get_view_count()
         rating = h.get_rating()
         p.context["summary_text"] = "Likes:{}\nDislikes:{}\nViews:{}\nRating:{}".format(
-                up, down, view_count, rating
-                )
+            up, down, view_count, rating
+        )
 
     else:
         p.context["summary_text"] = "It is not a youtube link"

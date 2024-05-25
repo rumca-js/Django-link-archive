@@ -55,16 +55,16 @@ class DataExport(models.Model):
         default=False, help_text="Export entries has to be checked for this to work"
     )
     export_sources = models.BooleanField(default=False)
-    export_time = models.TimeField(default=time(0,0))
+    export_time = models.TimeField(default=time(0, 0))
 
     def is_daily_data(self):
-        return self.export_data==DataExport.EXPORT_DAILY_DATA
+        return self.export_data == DataExport.EXPORT_DAILY_DATA
 
     def is_year_data(self):
-        return self.export_data==DataExport.EXPORT_YEAR_DATA
+        return self.export_data == DataExport.EXPORT_YEAR_DATA
 
     def is_notime_data(self):
-        return self.export_data==DataExport.EXPORT_NOTIME_DATA
+        return self.export_data == DataExport.EXPORT_NOTIME_DATA
 
     def is_daily_data_set():
         exps = DataExport.objects.filter(
@@ -99,7 +99,13 @@ class DataExport(models.Model):
 
 class SourceExportHistory(models.Model):
     date = models.DateField(null=False)
-    export_obj = models.ForeignKey(DataExport, related_name='export_history', on_delete=models.CASCADE, null=True, blank=True)
+    export_obj = models.ForeignKey(
+        DataExport,
+        related_name="export_history",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
 
     class Meta:
         ordering = ["-date"]
@@ -110,7 +116,9 @@ class SourceExportHistory(models.Model):
         try:
             yesterday = DateUtils.get_date_yesterday()
 
-            history = SourceExportHistory.objects.filter(date=yesterday, export_obj = export)
+            history = SourceExportHistory.objects.filter(
+                date=yesterday, export_obj=export
+            )
 
             if history.count() != 0:
                 return False
@@ -134,10 +142,15 @@ class SourceExportHistory(models.Model):
         if input_date is not None:
             process_date = input_date
 
-        if SourceExportHistory.objects.filter(date=process_date, export_obj = export).count() == 0:
-            SourceExportHistory.objects.create(date=process_date, export_obj = export)
+        if (
+            SourceExportHistory.objects.filter(
+                date=process_date, export_obj=export
+            ).count()
+            == 0
+        ):
+            SourceExportHistory.objects.create(date=process_date, export_obj=export)
 
     def cleanup():
         remove_threshold = datetime.today() - timedelta(days=30)
-        histories = SourceExportHistory.objects.filter(date__lt = remove_threshold)
+        histories = SourceExportHistory.objects.filter(date__lt=remove_threshold)
         histories.delete()

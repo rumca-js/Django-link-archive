@@ -12,5 +12,7 @@ class GoogleTranslateTest(FakeInternetTestCase):
         # call tested function
         url = p.get_translate_url()
 
-        self.assertEqual(url, "https://www--youtube-com.translate.goog/test?_x_tr_sl=auto&_x_tr_tl=en&_x_tr_hl=en&_x_tr_pto=wapp&parameter=True")
-
+        self.assertEqual(
+            url,
+            "https://www--youtube-com.translate.goog/test?_x_tr_sl=auto&_x_tr_tl=en&_x_tr_hl=en&_x_tr_pto=wapp&parameter=True",
+        )

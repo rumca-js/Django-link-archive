@@ -244,6 +244,25 @@ class ConfigurationEntry(models.Model):
         return result_list
 
 
+class SystemOperation(models.Model):
+    last_refresh_datetime = models.DateTimeField(auto_now_add=True)
+
+    is_internet_connection_ok = models.BooleanField(
+        default=True,
+        help_text="Is connection OK",
+    )
+
+    def get():
+        """
+        Most probably should not be used directly. Should be cached in application
+        """
+        confs = SystemOperation.objects.all()
+        if confs.count() == 0:
+            return SystemOperation.objects.create()
+        else:
+            return confs[0]
+
+
 class UserConfig(models.Model):
     # TODO move this to relation towards Users
     user = models.CharField(max_length=500, unique=True)
@@ -251,7 +270,10 @@ class UserConfig(models.Model):
         max_length=500, null=True, default="style-light", choices=STYLE_TYPES
     )
     display_type = models.CharField(
-        max_length=500, null=True, default="standard", choices=ConfigurationEntry.DISPLAY_TYPE_CHOICES
+        max_length=500,
+        null=True,
+        default="standard",
+        choices=ConfigurationEntry.DISPLAY_TYPE_CHOICES,
     )
     show_icons = models.BooleanField(default=True)
     thumbnails_as_icons = models.BooleanField(default=True)

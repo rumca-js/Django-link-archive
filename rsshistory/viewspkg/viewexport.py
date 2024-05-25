@@ -307,7 +307,7 @@ def data_export_job_add(request, pk):
     if data is not None:
         return data
 
-    exports = DataExport.objects.filter(id = pk)
+    exports = DataExport.objects.filter(id=pk)
     if exports.count() == 0:
         p.context["summary_text"] = "No such export"
         return p.render("summary_present.html")

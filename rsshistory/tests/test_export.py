@@ -55,7 +55,7 @@ class SourceExportHistoryTest(FakeInternetTestCase):
         self.create_exports()
 
         date = datetime.date.today() - timedelta(days=100)
-        SourceExportHistory.objects.create(date = date, export_obj=self.export1)
+        SourceExportHistory.objects.create(date=date, export_obj=self.export1)
 
         # call tested function
         SourceExportHistory.cleanup()

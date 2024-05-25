@@ -235,9 +235,7 @@ class EntryGenericPlugin(object):
                     ),
                     ConfigurationEntry.ACCESS_TYPE_OWNER,
                     "Saves link in archive.org: {}".format(self.entry.link),
-                    static(
-                        "{}/icons/archive.org.save.ico".format(LinkDatabase.name)
-                    ),
+                    static("{}/icons/archive.org.save.ico".format(LinkDatabase.name)),
                 ),
             )
 

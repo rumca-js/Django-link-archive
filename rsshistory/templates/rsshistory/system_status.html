@@ -5,7 +5,7 @@
 <div class="container">
 </div>
 
-<h1>Info</h1>
+<h1>Status</h1>
 
 <ul>
     <li>Version: {{app_version}}</li>
@@ -16,33 +16,42 @@
     {% if DateTime_MoveToArchive %}
       <li>Move to archive date: {{DateTime_MoveToArchive}}</li>
     {%endif%}
-    <li>Number of Configurations: {{ConfigurationEntry}}</li>
-    <li>Number of UserConfig: {{UserConfig}}</li>
+</ul>
 
-    <li>Number of Sources: {{SourceDataModel}}</li>
-    <li>Number of Entries: {{LinkDataModel}}</li>
-    <li>Number of Archived entries: {{ArchiveLinkDataModel}}</li>
-    <li>Number of Keywords: {{KeyWords}}</li>
+<h1>Tables</h1>
+Table usage
+<ul>
+    <li>ConfigurationEntry: {{ConfigurationEntry}}</li>
+    <li>UserConfig: {{UserConfig}}</li>
+    <li>SystemOperation: {{SystemOperation}}</li>
 
-    <li>Number of Tags: {{UserTags}}</li>
-    <li>Number of Votes: {{UserVotes}}</li>
-    <li>Number of Bookmarks: {{UserBookmarks}}</li>
-    <li>Number of Comments: {{LinkCommentDataController}}</li>
-    <li>Number of UserSearchHistory: {{UserSearchHistory}}</li>
-    <li>Number of UserEntryVisitHistory: {{UserEntryVisitHistory}}</li>
-    <li>Number of UserEntryTransitionHistory: {{UserEntryTransitionHistory}}</li>
+    <li>SourceDataModel: {{SourceDataModel}}</li>
+    <li>LinkDataModel: {{LinkDataModel}}</li>
+    <li>ArhiveLinkDataModel: {{ArchiveLinkDataModel}}</li>
+    <li>Keywords: {{KeyWords}}</li>
+
+    <li>UserTags: {{UserTags}}</li>
+    <li>UserVotes: {{UserVotes}}</li>
+    <li>UserBookmarks: {{UserBookmarks}}</li>
+    <li>UserComments: {{LinkCommentDataController}}</li>
+    <li>UserSearchHistory: {{UserSearchHistory}}</li>
+    <li>UserEntryVisitHistory: {{UserEntryVisitHistory}}</li>
+    <li>UserEntryTransitionHistory: {{UserEntryTransitionHistory}}</li>
 
     <li>BackgroundJob: {{BackgroundJob}}
         <a href="{% url 'rsshistory:backgroundjobs' %}" title="View background jobs" class="btn btn-secondary" role="button">View</a>
     </li>
 
-    <li>Server log length: {{AppLogging}} 
+    <li>AppLogging: {{AppLogging}} 
         <a href="{% url 'rsshistory:logs' %}" title="View all logs" class="btn btn-secondary" role="button">View</a>
     </li>
 
     <li>Domains: {{Domains}}
         <a href="{% url 'rsshistory:domains' %}" title="Domains" class="btn btn-secondary" role="button">View</a>
         </li>
+
+    <li>DataExport: {{DataExport}}</li>
+    <li>SourceExportHistory: {{SourceExportHistory}}</li>
 </ul>
 
 

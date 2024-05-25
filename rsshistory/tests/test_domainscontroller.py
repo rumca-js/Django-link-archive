@@ -79,7 +79,6 @@ class DomainTest(FakeInternetTestCase):
         self.assertEqual(LinkDataController.objects.all().count(), 1)
 
     def test_cleanup(self):
-
         LinkDataController.objects.all().delete()
         DomainsController.objects.all().delete()
 

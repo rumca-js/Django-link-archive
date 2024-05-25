@@ -16,6 +16,7 @@ class InternetArchiveTest(FakeInternetTestCase):
         # call tested function
         url = p.get_archive_url(date_input)
 
-        self.assertEqual(url, "https://web.archive.org/web/20240512110000*/https://www-youtube.com/test?parameter=True")
-
-
+        self.assertEqual(
+            url,
+            "https://web.archive.org/web/20240512110000*/https://www-youtube.com/test?parameter=True",
+        )

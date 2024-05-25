@@ -51,7 +51,9 @@ class BaseQueryFilter(object):
         if self.use_page_limit:
             limit_range = self.get_limit()
             if limit_range:
-                self.filtered_objects = self.filtered_objects[limit_range[0] : limit_range[1]]
+                self.filtered_objects = self.filtered_objects[
+                    limit_range[0] : limit_range[1]
+                ]
 
         return self.filtered_objects
 
@@ -619,8 +621,7 @@ class OmniSymbolEvaluator(object):
         """
         first 2 char operators, then 1 char operators
         """
-        return ["==", "?=", "<=", ">=", 
-                "~", "=", "<", ">"]
+        return ["==", "?=", "<=", ">=", "~", "=", "<", ">"]
 
     def cleanup_left_operator_part(self, left_part):
         return left_part.strip()
@@ -669,23 +670,25 @@ class OmniSymbolEvaluator(object):
         elif condition_data[1] == "<":
             return {condition_data[0] + "__lt": condition_data[2]}
         elif condition_data[1] == "?=":
-            return {condition_data[0] : condition_data[2]}
+            return {condition_data[0]: condition_data[2]}
         elif condition_data[1] == "=":
             # for title__isnull = True, there are no additions
             if self.is_django_operator(condition_data[0]):
-                return {condition_data[0] : condition_data[2]}
+                return {condition_data[0]: condition_data[2]}
             # otherwise translate to contains
             else:
                 return {condition_data[0] + "__icontains": condition_data[2]}
 
     def is_django_operator(self, operator):
-        return operator.endswith("__isnull") or \
-           operator.endswith("__iexact") or \
-           operator.endswith("__gte") or \
-           operator.endswith("__lte") or \
-           operator.endswith("__gt") or \
-           operator.endswith("__lt") or \
-           operator.endswith("__range")
+        return (
+            operator.endswith("__isnull")
+            or operator.endswith("__iexact")
+            or operator.endswith("__gte")
+            or operator.endswith("__lte")
+            or operator.endswith("__gt")
+            or operator.endswith("__lt")
+            or operator.endswith("__range")
+        )
 
     def is_archive_source(self):
         return False

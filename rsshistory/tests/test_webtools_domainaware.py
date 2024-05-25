@@ -283,7 +283,6 @@ class DomainAwarePageTest(FakeInternetTestCase):
         self.assertFalse(p)
 
     def test_parse_url(self):
-
         p = DomainAwarePage("https://www.youtube.com/test?parameter=True")
         parts = p.parse_url()
         print(parts)
@@ -296,7 +295,6 @@ class DomainAwarePageTest(FakeInternetTestCase):
         self.assertEqual(parts[4], "?parameter=True")
 
     def test_parse_url2(self):
-
         p = DomainAwarePage("https://www.youtube.com/test#parameter=True")
         parts = p.parse_url()
         print(parts)

@@ -28,41 +28,43 @@ def get_selenium_status_code(logs):
 
             content_type = ""
             try:
-                content_type = d["message"]["params"]["response"]["headers"]["content-type"]
+                content_type = d["message"]["params"]["response"]["headers"][
+                    "content-type"
+                ]
             except Exception as E:
                 pass
             try:
-                content_type = d["message"]["params"]["response"]["headers"]["Content-Type"]
+                content_type = d["message"]["params"]["response"]["headers"][
+                    "Content-Type"
+                ]
             except Exception as E:
                 pass
 
             try:
-                response_received = (
-                    d["message"]["method"] == "Network.responseReceived"
-                )
+                response_received = d["message"]["method"] == "Network.responseReceived"
                 if content_type.find("text/html") >= 0 and response_received:
                     last_status_code = d["message"]["params"]["response"]["status"]
             except Exception as E:
-                #print("Exception: {}".format(str(E)))
+                # print("Exception: {}".format(str(E)))
                 pass
 
     return last_status_code
 
 
-def selenium_headless(url, timeout = 10):
+def selenium_headless(url, timeout=10):
     service = Service(executable_path="/usr/bin/chromedriver")
     options = webdriver.ChromeOptions()
     options.add_argument("--headless")
-    
-    options.set_capability('goog:loggingPrefs', {'performance': 'ALL'})
-    
+
+    options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
+
     # add 10 seconds for start of browser, etc.
     selenium_timeout = timeout + 10
 
     driver = webdriver.Chrome(service=service, options=options)
-    
+
     driver.set_page_load_timeout(selenium_timeout)
-    
+
     driver.get(url)
 
     status_code = 200
@@ -82,7 +84,7 @@ def selenium_headless(url, timeout = 10):
     if url != driver.current_url:
         url = driver.current_url
 
-    #print(html_content)
+    # print(html_content)
     print(status_code)
 
     driver.quit()
@@ -90,12 +92,13 @@ def selenium_headless(url, timeout = 10):
     return html_content
 
 
-def selenium_full(url, timeout = 10):
+def selenium_full(url, timeout=10):
     import os
-    #from pyvirtualdisplay import Display
 
-    #display = Display(visible=0, size=(800, 600))
-    #display.start()
+    # from pyvirtualdisplay import Display
+
+    # display = Display(visible=0, size=(800, 600))
+    # display.start()
 
     os.environ["DISPLAY"] = ":10.0"
 
@@ -103,23 +106,23 @@ def selenium_full(url, timeout = 10):
 
     options = webdriver.ChromeOptions()
     options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage") 
+    options.add_argument("--disable-dev-shm-usage")
 
-    #options.add_argument("--disable-setuid-sandbox") 
-    #options.add_argument("--remote-debugging-port=9222")  # this
-    #options.add_argument("--disable-extensions") 
-    #options.add_argument("--disable-gpu") 
-    #options.add_argument("start-maximized") 
-    #options.add_argument("disable-infobars")
-    #options.add_argument(r"user-data-dir=\home\rumpel\cookies\\")
+    # options.add_argument("--disable-setuid-sandbox")
+    # options.add_argument("--remote-debugging-port=9222")  # this
+    # options.add_argument("--disable-extensions")
+    # options.add_argument("--disable-gpu")
+    # options.add_argument("start-maximized")
+    # options.add_argument("disable-infobars")
+    # options.add_argument(r"user-data-dir=\home\rumpel\cookies\\")
 
-    #options.add_argument("--disable-dev-shm-usage")
+    # options.add_argument("--disable-dev-shm-usage")
     # options.add_argument('--remote-debugging-pipe')
     # options.add_argument('--remote-debugging-port=9222')
     # options.add_argument('--user-data-dir=~/.config/google-chrome')
 
     # options to enable performance log, to read status code
-    options.set_capability('goog:loggingPrefs', {'performance': 'ALL'})
+    options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
 
     # if not BasePage.ssl_verify:
     #    options.add_argument('ignore-certificate-errors')
@@ -144,12 +147,13 @@ def selenium_full(url, timeout = 10):
 
     WebDriverWait(driver, selenium_timeout)
     import time
-    time.sleep(10);
+
+    time.sleep(10)
 
     ## if self.options.link_redirect:
-    #WebDriverWait(driver, selenium_timeout).until(
+    # WebDriverWait(driver, selenium_timeout).until(
     #    EC.url_changes(driver.current_url)
-    #)
+    # )
     """
     TODO - if webpage changes link, it should also update it in this object
     """
@@ -164,22 +168,22 @@ def selenium_full(url, timeout = 10):
     driver.quit()
 
 
-def selenium_undetected(url, timeout = 10):
+def selenium_undetected(url, timeout=10):
     service = Service(executable_path="/usr/bin/chromedriver")
     options = webdriver.ChromeOptions()
     options.add_argument("--headless")
     #
-    #options.set_capability('goog:loggingPrefs', {'performance': 'ALL'})
-    
+    # options.set_capability('goog:loggingPrefs', {'performance': 'ALL'})
+
     # add 10 seconds for start of browser, etc.
     selenium_timeout = timeout + 10
 
     driver = webdriver.Chrome(service=service, options=options)
-    
+
     driver.set_page_load_timeout(selenium_timeout)
-    
+
     driver.get(url)
-    time.sleep(timeout+7)
+    time.sleep(timeout + 7)
 
     status_code = 200
 
@@ -199,12 +203,13 @@ def selenium_undetected(url, timeout = 10):
     return html_content
 
 
-def selenium_full(url, timeout = 10):
+def selenium_full(url, timeout=10):
     import os
-    #from pyvirtualdisplay import Display
 
-    #display = Display(visible=0, size=(800, 600))
-    #display.start()
+    # from pyvirtualdisplay import Display
+
+    # display = Display(visible=0, size=(800, 600))
+    # display.start()
 
     os.environ["DISPLAY"] = ":10.0"
 
@@ -212,23 +217,23 @@ def selenium_full(url, timeout = 10):
 
     options = webdriver.ChromeOptions()
     options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage") 
+    options.add_argument("--disable-dev-shm-usage")
 
-    #options.add_argument("--disable-setuid-sandbox") 
-    #options.add_argument("--remote-debugging-port=9222")  # this
-    #options.add_argument("--disable-extensions") 
-    #options.add_argument("--disable-gpu") 
-    #options.add_argument("start-maximized") 
-    #options.add_argument("disable-infobars")
-    #options.add_argument(r"user-data-dir=\home\rumpel\cookies\\")
+    # options.add_argument("--disable-setuid-sandbox")
+    # options.add_argument("--remote-debugging-port=9222")  # this
+    # options.add_argument("--disable-extensions")
+    # options.add_argument("--disable-gpu")
+    # options.add_argument("start-maximized")
+    # options.add_argument("disable-infobars")
+    # options.add_argument(r"user-data-dir=\home\rumpel\cookies\\")
 
-    #options.add_argument("--disable-dev-shm-usage")
+    # options.add_argument("--disable-dev-shm-usage")
     # options.add_argument('--remote-debugging-pipe')
     # options.add_argument('--remote-debugging-port=9222')
     # options.add_argument('--user-data-dir=~/.config/google-chrome')
 
     # options to enable performance log, to read status code
-    options.set_capability('goog:loggingPrefs', {'performance': 'ALL'})
+    options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
 
     # if not BasePage.ssl_verify:
     #    options.add_argument('ignore-certificate-errors')
@@ -253,12 +258,13 @@ def selenium_full(url, timeout = 10):
 
     WebDriverWait(driver, selenium_timeout)
     import time
-    time.sleep(10);
+
+    time.sleep(10)
 
     ## if self.options.link_redirect:
-    #WebDriverWait(driver, selenium_timeout).until(
+    # WebDriverWait(driver, selenium_timeout).until(
     #    EC.url_changes(driver.current_url)
-    #)
+    # )
     """
     TODO - if webpage changes link, it should also update it in this object
     """
@@ -274,9 +280,10 @@ def selenium_full(url, timeout = 10):
 
 
 def main():
-    #selenium_full("https://www.warhammer-community.com/en-us/feed")
-    #selenium_headless("https://www.warhammer-community.com/")
-    #selenium_headless("https://www.google.com/")
+    # selenium_full("https://www.warhammer-community.com/en-us/feed")
+    # selenium_headless("https://www.warhammer-community.com/")
+    # selenium_headless("https://www.google.com/")
     selenium_undetected("https://www.warhammer-community.com/feed")
+
 
 main()

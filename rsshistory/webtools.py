@@ -1440,14 +1440,14 @@ class HtmlPage(ContentInterface):
     def get_schema_field(self, itemprop):
         elements_with_itemprop = self.soup.find_all(attrs={"itemprop": True})
         for element in elements_with_itemprop:
-            itemprop_v = element.get('itemprop')
+            itemprop_v = element.get("itemprop")
             if itemprop_v != itemprop:
                 continue
 
-            if element.name == 'link':
-                value = element.get('href')
-            elif element.name == 'meta':
-                value = element.get('content')
+            if element.name == "link":
+                value = element.get("href")
+            elif element.name == "meta":
+                value = element.get("content")
             else:
                 value = element.text.strip() if element.text else None
 
@@ -1463,15 +1463,15 @@ class HtmlPage(ContentInterface):
             # Extract itemprop from elements inside video_object
             elements_with_itemprop = video_object.find_all(attrs={"itemprop": True})
             for element in elements_with_itemprop:
-                itemprop_v = element.get('itemprop')
+                itemprop_v = element.get("itemprop")
 
                 if itemprop_v != itemprop:
                     continue
 
-                if element.name == 'link':
-                    value = element.get('href')
-                elif element.name == 'meta':
-                    value = element.get('content')
+                if element.name == "link":
+                    value = element.get("href")
+                elif element.name == "meta":
+                    value = element.get("content")
                 else:
                     value = element.text.strip() if element.text else None
 
@@ -2073,7 +2073,9 @@ class BasePage(object):
         if not self.response:
             return False
 
-        if self.is_this_status_ok(self.response.status_code) or self.is_this_status_redirect(self.response.status_code):
+        if self.is_this_status_ok(
+            self.response.status_code
+        ) or self.is_this_status_redirect(self.response.status_code):
             return True
         else:
             return False
@@ -2326,7 +2328,7 @@ class BasePage(object):
         options = webdriver.ChromeOptions()
         options.add_argument("--headless")
 
-        options.set_capability('goog:loggingPrefs', {'performance': 'ALL'})
+        options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
 
         # if not BasePage.ssl_verify:
         #    options.add_argument('ignore-certificate-errors')
@@ -2386,7 +2388,7 @@ class BasePage(object):
         # options.add_argument('--user-data-dir=~/.config/google-chrome')
 
         # options to enable performance log, to read status code
-        options.set_capability('goog:loggingPrefs', {'performance': 'ALL'})
+        options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
 
         # if not BasePage.ssl_verify:
         #    options.add_argument('ignore-certificate-errors')
@@ -2405,9 +2407,9 @@ class BasePage(object):
 
             # This driver wait resulted in timeout on yahoo
             # if self.options.link_redirect:
-            #WebDriverWait(driver, selenium_timeout).until(
+            # WebDriverWait(driver, selenium_timeout).until(
             #    EC.url_changes(driver.current_url)
-            #)
+            # )
             """
             TODO - if webpage changes link, it should also update it in this object
             """
@@ -2519,11 +2521,15 @@ class BasePage(object):
 
                 content_type = ""
                 try:
-                    content_type = d["message"]["params"]["response"]["headers"]["content-type"]
+                    content_type = d["message"]["params"]["response"]["headers"][
+                        "content-type"
+                    ]
                 except Exception as E:
                     pass
                 try:
-                    content_type = d["message"]["params"]["response"]["headers"]["Content-Type"]
+                    content_type = d["message"]["params"]["response"]["headers"][
+                        "Content-Type"
+                    ]
                 except Exception as E:
                     pass
 
@@ -2534,7 +2540,7 @@ class BasePage(object):
                     if content_type.find("text/html") >= 0 and response_received:
                         last_status_code = d["message"]["params"]["response"]["status"]
                 except Exception as E:
-                    #print("Exception: {}".format(str(E)))
+                    # print("Exception: {}".format(str(E)))
                     pass
 
         return last_status_code

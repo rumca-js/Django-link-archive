@@ -497,19 +497,25 @@ class HtmlPageTest(FakeInternetTestCase):
         self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
     def test_get_schema_field(self):
-        
-        reader = HtmlPage(
-            "https://linkedin.com/test", webpage_html_schema_fields
+        reader = HtmlPage("https://linkedin.com/test", webpage_html_schema_fields)
+        self.assertEqual(
+            reader.get_schema_field("url"), "https://www.youtube.com/watch?v=111"
         )
-        self.assertEqual(reader.get_schema_field("url"), "https://www.youtube.com/watch?v=111")
         self.assertEqual(reader.get_schema_field("name"), "itemprop name")
         self.assertEqual(reader.get_schema_field("description"), "itemprop description")
-        self.assertEqual(reader.get_schema_field("thumbnailUrl"), "https://thumbnailurl.com")
+        self.assertEqual(
+            reader.get_schema_field("thumbnailUrl"), "https://thumbnailurl.com"
+        )
 
     def test_get_schema_field_ex(self):
-        
         reader = HtmlPage(
             "https://linkedin.com/test", webpage_html_schema_fields_nested
         )
-        self.assertEqual(reader.get_schema_field_ex("http://schema.org/VideoObject", "url"), "https://www.youtube.com/watch?v=111")
-        self.assertEqual(reader.get_schema_field_ex("http://schema.org/Person", "url"), "http://www.youtube.com/@someotherchannel")
+        self.assertEqual(
+            reader.get_schema_field_ex("http://schema.org/VideoObject", "url"),
+            "https://www.youtube.com/watch?v=111",
+        )
+        self.assertEqual(
+            reader.get_schema_field_ex("http://schema.org/Person", "url"),
+            "http://www.youtube.com/@someotherchannel",
+        )

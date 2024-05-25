@@ -208,11 +208,21 @@ class BackgroundJobController(BackgroundJob):
                 url,
             )
 
-    def link_scan(url, source=None):
+    def link_scan(url=None, entry=None, source=None):
         cfg = {}
 
         if source:
             cfg["source"] = source.id
+
+        if entry:
+            cfg["entry"] = entry.id
+
+        if entry:
+            url = entry.link
+
+        if url is None:
+            AppLogging.error("URL is NULL")
+            return
 
         args_text = json.dumps(cfg)
 
@@ -364,7 +374,7 @@ class BackgroundJobController(BackgroundJob):
             BackgroundJob.JOB_LINK_RESET_DATA, entry.link
         )
 
-    def export_data(export, input_date = None):
+    def export_data(export, input_date=None):
         return BackgroundJobController.create_single_job(
             BackgroundJob.JOB_EXPORT_DATA, str(export.id), input_date
         )

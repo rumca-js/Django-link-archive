@@ -29,6 +29,7 @@ from .entriesutils import (
     EntryDataBuilder,
     LinkDataWrapper,
     EntriesCleanup,
+    EntryScanner,
 )
 
 from .searchengines import SearchEngines

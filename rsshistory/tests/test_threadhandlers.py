@@ -451,8 +451,8 @@ class RefreshThreadHandlerTest(FakeInternetTestCase):
         )
 
         export_jobs = BackgroundJobController.objects.filter(
-                job=BackgroundJobController.JOB_EXPORT_DATA
-            )
+            job=BackgroundJobController.JOB_EXPORT_DATA
+        )
 
         self.assertEqual(export_jobs.count(), 3)
 
@@ -555,7 +555,7 @@ class CleanJobHandlerTest(FakeInternetTestCase):
         # cleanup of links, domains may trigger creating new entries, which may
         # trigger unwanted dependencies
 
-        persistent_objects = AppLogging.objects.filter(level = int(logging.ERROR))
+        persistent_objects = AppLogging.objects.filter(level=int(logging.ERROR))
 
         for persistent_object in persistent_objects:
             print("Persisten object info:{}".format(persistent_object.info_text))
@@ -578,7 +578,7 @@ class CleanJobHandlerTest(FakeInternetTestCase):
         handler = CleanupJobHandler()
         handler.process()
 
-        persistent_objects = AppLogging.objects.filter(level = int(logging.ERROR))
+        persistent_objects = AppLogging.objects.filter(level=int(logging.ERROR))
 
         for persistent_object in persistent_objects:
             print("Persisten object info:{}".format(persistent_object.info_text))

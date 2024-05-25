@@ -2,7 +2,12 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 
 from ..apps import LinkDatabase
-from ..controllers import SourceDataController, LinkDataController, DomainsController, BackgroundJobController
+from ..controllers import (
+    SourceDataController,
+    LinkDataController,
+    DomainsController,
+    BackgroundJobController,
+)
 from ..dateutils import DateUtils
 from ..models import KeyWords, DataExport
 
@@ -126,7 +131,9 @@ class SystemViewsTest(FakeInternetTestCase):
 
         original_priority = bj.priority
 
-        url = reverse("{}:backgroundjob-prio-up".format(LinkDatabase.name), args=[bj.id])
+        url = reverse(
+            "{}:backgroundjob-prio-up".format(LinkDatabase.name), args=[bj.id]
+        )
         # call tested function
         response = self.client.get(url)
 
@@ -147,7 +154,9 @@ class SystemViewsTest(FakeInternetTestCase):
 
         original_priority = bj.priority
 
-        url = reverse("{}:backgroundjob-prio-down".format(LinkDatabase.name), args=[bj.id])
+        url = reverse(
+            "{}:backgroundjob-prio-down".format(LinkDatabase.name), args=[bj.id]
+        )
         # call tested function
         response = self.client.get(url)
 
@@ -167,7 +176,9 @@ class SystemViewsTest(FakeInternetTestCase):
             enabled=True,
         )
 
-        url = reverse("{}:backgroundjob-disable".format(LinkDatabase.name), args=[bj.id])
+        url = reverse(
+            "{}:backgroundjob-disable".format(LinkDatabase.name), args=[bj.id]
+        )
         # call tested function
         response = self.client.get(url)
 

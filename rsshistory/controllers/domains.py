@@ -227,7 +227,9 @@ class DomainsController(Domains):
             DomainsController.remove_unused_domains()
 
     def remove_unused_domains():
-        domains = DomainsController.objects.filter(Q(entry_objects__isnull = True) & Q(archive_entry_objects__isnull = True))
+        domains = DomainsController.objects.filter(
+            Q(entry_objects__isnull=True) & Q(archive_entry_objects__isnull=True)
+        )
         domains.delete()
 
     def unconnect_entries():

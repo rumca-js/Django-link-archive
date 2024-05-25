@@ -321,7 +321,7 @@ class EntryUpdaterTest(FakeInternetTestCase):
 
         entry.page_rating_contents = 100
 
-        UserTags.set_tag(entry, "test", user = self.user)
+        UserTags.set_tag(entry, "test", user=self.user)
         UserVotes.add(self.user, entry, 100)
 
         u = EntryUpdater(entry)

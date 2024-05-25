@@ -1,5 +1,11 @@
 from django.db.models import Q
-from ..queryfilters import OmniSearchFilter, StringSymbolEquation, OmniSymbolProcessor, OmniSearchConditions, OmniSymbolEvaluator
+from ..queryfilters import (
+    OmniSearchFilter,
+    StringSymbolEquation,
+    OmniSymbolProcessor,
+    OmniSearchConditions,
+    OmniSymbolEvaluator,
+)
 from ..models import LinkDataModel
 
 from .fakeinternet import FakeInternetTestCase
@@ -128,7 +134,7 @@ class OmniSymbolEvaluatorTest(FakeInternetTestCase):
     def test_evauluate_symbol_exact(self):
         ev = OmniSymbolEvaluator()
 
-        ev.set_translation_mapping({"title" : "title"})
+        ev.set_translation_mapping({"title": "title"})
 
         # call tested function
         sym_data = ev.evaluate_symbol("title == something")
@@ -139,7 +145,7 @@ class OmniSymbolEvaluatorTest(FakeInternetTestCase):
     def test_evauluate_symbol_gte(self):
         ev = OmniSymbolEvaluator()
 
-        ev.set_translation_mapping({"title" : "title"})
+        ev.set_translation_mapping({"title": "title"})
 
         # call tested function
         sym_data = ev.evaluate_symbol("title >= something")
@@ -150,7 +156,7 @@ class OmniSymbolEvaluatorTest(FakeInternetTestCase):
     def test_evauluate_symbol_gt(self):
         ev = OmniSymbolEvaluator()
 
-        ev.set_translation_mapping({"title" : "title"})
+        ev.set_translation_mapping({"title": "title"})
 
         # call tested function
         sym_data = ev.evaluate_symbol("title > something")
@@ -161,7 +167,7 @@ class OmniSymbolEvaluatorTest(FakeInternetTestCase):
     def test_evauluate_symbol_equals(self):
         ev = OmniSymbolEvaluator()
 
-        ev.set_translation_mapping({"title" : "title"})
+        ev.set_translation_mapping({"title": "title"})
 
         # call tested function
         sym_data = ev.evaluate_symbol("title = something")
@@ -172,7 +178,7 @@ class OmniSymbolEvaluatorTest(FakeInternetTestCase):
     def test_evauluate_symbol_translate_contains(self):
         ev = OmniSymbolEvaluator()
 
-        ev.set_translation_mapping({"title" : "title"})
+        ev.set_translation_mapping({"title": "title"})
 
         # call tested function
         sym_data = ev.evaluate_symbol("title__isnull = True")
@@ -183,7 +189,7 @@ class OmniSymbolEvaluatorTest(FakeInternetTestCase):
     def test_evauluate_symbol_equals_mapping(self):
         ev = OmniSymbolEvaluator()
 
-        ev.set_translation_mapping({"title.link" : "title_obj__link"})
+        ev.set_translation_mapping({"title.link": "title_obj__link"})
 
         # call tested function
         sym_data = ev.evaluate_symbol("title.link = something")
@@ -214,7 +220,10 @@ class OmniSymbolEvaluatorTest(FakeInternetTestCase):
         sym_data = ev.evaluate_symbol("my test")
 
         str_sym_data = str(sym_data)
-        self.assertEqual(str_sym_data, "(OR: ('title__icontains', 'my test'), ('description__icontains', 'my test'))")
+        self.assertEqual(
+            str_sym_data,
+            "(OR: ('title__icontains', 'my test'), ('description__icontains', 'my test'))",
+        )
 
 
 class OmniSearchConditionsTest(FakeInternetTestCase):
@@ -238,7 +247,6 @@ class OmniSearchConditionsTest(FakeInternetTestCase):
     def test_get_conditions_processor_evaluator(self):
         LinkDataModel.objects.create(link="https://test.com")
 
-
         search_query = "link == https://test.com"
         processor = OmniSearchConditions(search_query)
 
@@ -257,13 +265,18 @@ class OmniSearchConditionsTest(FakeInternetTestCase):
         processor = OmniSearchConditions(search_query)
 
         processor.set_translation_mapping(["link", "title"])
-        processor.set_default_search_symbols(["title__icontains", "description__icontains"])
+        processor.set_default_search_symbols(
+            ["title__icontains", "description__icontains"]
+        )
 
         # call tested function
         conditions = processor.get_conditions()
 
         str_conditions = str(conditions)
-        self.assertEqual(str_conditions, "(OR: ('title__icontains', 'find title'), ('description__icontains', 'find title'))")
+        self.assertEqual(
+            str_conditions,
+            "(OR: ('title__icontains', 'find title'), ('description__icontains', 'find title'))",
+        )
 
 
 class OmniSearchFilterTest(FakeInternetTestCase):
@@ -324,8 +337,12 @@ class OmniSearchFilterTest(FakeInternetTestCase):
         self.assertEqual(qs.count(), 1)
 
     def test_get_filtered_objects_two_properties(self):
-        LinkDataModel.objects.create(link="https://test1.com", title="One title", description="One description")
-        LinkDataModel.objects.create(link="https://test2.com", title="Two title", description="Two description")
+        LinkDataModel.objects.create(
+            link="https://test1.com", title="One title", description="One description"
+        )
+        LinkDataModel.objects.create(
+            link="https://test2.com", title="Two title", description="Two description"
+        )
 
         args = {"search": "link == https://test1.com & title == One Title"}
         processor = OmniSearchFilter(args)

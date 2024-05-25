@@ -41,7 +41,10 @@ class GitRepo(object):
 
     def add(self, files):
         p = subprocess.run(
-            ["git", "add", "-A"], cwd=self.get_local_dir(), timeout=self.timeout_s, capture_output=True,
+            ["git", "add", "-A"],
+            cwd=self.get_local_dir(),
+            timeout=self.timeout_s,
+            capture_output=True,
         )
         self.check_process(p)
 
@@ -101,5 +104,9 @@ class GitRepo(object):
 
     def check_process(self, p):
         if p.returncode != 0:
-            AppLogging.error("GIT status:{}\nstdout:{}\nstderr:{}".format(p.returncode, p.stdout.decode(), p.stderr.decode()))
+            AppLogging.error(
+                "GIT status:{}\nstdout:{}\nstderr:{}".format(
+                    p.returncode, p.stdout.decode(), p.stderr.decode()
+                )
+            )
         p.check_returncode()

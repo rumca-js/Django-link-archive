@@ -10,7 +10,7 @@ from ..webtools import DomainAwarePage
 
 
 class WaybackMachine(object):
-    def __init__(self, url = None):
+    def __init__(self, url=None):
         self.url = url
 
     def capture_limits(self, url):
