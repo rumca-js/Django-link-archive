@@ -309,6 +309,7 @@ class EntryGenericPlugin(object):
         p_up = p.up(skip_internal=True)
 
         if p_up:
+            search_url = p_up.url
             buttons.append(
                 EntryButton(
                     self.user,
@@ -316,13 +317,31 @@ class EntryGenericPlugin(object):
                     reverse(
                         "{}:entries-omni-search".format(LinkDatabase.name),
                     )
-                    + "?search=link+%3D+{}".format(p_up.url),
+                    + "?search=link+%3D+{}".format(search_url),
                     ConfigurationEntry.ACCESS_TYPE_ALL,
-                    "Parent Entry: {}".format(p_up.url),
+                    "Parent Entry: {}".format(search_url),
+                ),
+            )
+
+        if self.entry.link.startswith("http://"):
+            search_url = self.entry.link.replace("http://", "https://")
+
+            buttons.append(
+                EntryButton(
+                    self.user,
+                    "[S] https entry",
+                    reverse(
+                        "{}:entries-omni-search".format(LinkDatabase.name),
+                    )
+                    + "?search=link+%3D+{}".format(search_url),
+                    ConfigurationEntry.ACCESS_TYPE_ALL,
+                    "Https Entry: {}".format(search_url),
                 ),
             )
 
         if self.entry.source_obj:
+            search_url = self.entry.source_obj.url
+
             buttons.append(
                 EntryButton(
                     self.user,
@@ -330,7 +349,7 @@ class EntryGenericPlugin(object):
                     reverse(
                         "{}:entries-omni-search".format(LinkDatabase.name),
                     )
-                    + "?search=link+%3D+{}".format(self.entry.source_obj.url),
+                    + "?search=link+%3D+{}".format(search_url),
                     ConfigurationEntry.ACCESS_TYPE_ALL,
                     "Source Entry: {}".format(self.entry.source_obj.title),
                     static("{}/icons/icons8-link-90.png".format(LinkDatabase.name)),

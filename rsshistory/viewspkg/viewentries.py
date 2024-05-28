@@ -28,6 +28,7 @@ from ..controllers import (
     SourceDataController,
     BackgroundJobController,
     SearchEngines,
+    EntryScanner,
 )
 from ..forms import (
     EntryForm,
@@ -555,6 +556,8 @@ def add_entry(request):
             b.link_data = data
             b.source_is_auto = False
             entry = b.add_from_props_internal()
+
+            BackgroundJobController.link_scan(entry=entry)
 
             if not entry:
                 p.context["summary_text"] = "Could not save link"

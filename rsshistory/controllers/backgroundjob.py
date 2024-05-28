@@ -147,6 +147,7 @@ class BackgroundJobController(BackgroundJob):
 
     def link_add(url, source=None, tag="", user=None, properties=None):
         from ..configuration import Configuration
+        from .entriesutils import LinkDataWrapper
 
         """
         It handles only automatic additions.
@@ -171,8 +172,10 @@ class BackgroundJobController(BackgroundJob):
             """TODO This should be configurable"""
             return
 
-        existing = LinkDataModel.objects.filter(link=url)
-        if existing.count() > 0:
+        w = LinkDataWrapper(url)
+
+        entry = w.get()
+        if entry:
             return
 
         cfg = {}

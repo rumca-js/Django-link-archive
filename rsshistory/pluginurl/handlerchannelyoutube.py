@@ -76,8 +76,9 @@ class YouTubeChannelHandler(RssPage, DefaultUrlHandler):
         ):
             self.dead = True
 
-        self.contents = self.response.content
+        if self.response:
+            self.contents = self.response.content
 
-        self.process_contents()
+            self.process_contents()
 
-        return self.response.content
+            return self.response.content

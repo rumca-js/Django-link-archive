@@ -11,7 +11,7 @@ from django.contrib.auth.models import User
 
 from ..models import AppLogging, ConfigurationEntry
 from ..dateutils import DateUtils
-from ..webtools import BasePage
+from ..webtools import BasePage,PageResponseObject
 from ..configuration import Configuration
 
 from ..pluginurl.urlhandler import UrlHandler
@@ -177,7 +177,7 @@ class DjangoRequestObject(object):
         self.user = user
 
 
-class TestResponseObject(object):
+class TestResponseObject(PageResponseObject):
     """
     TODO maybe we should inherit from webtools/PageResponseObject?
     """

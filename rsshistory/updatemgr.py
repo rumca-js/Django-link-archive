@@ -77,8 +77,8 @@ class UpdateExportManager(object):
 
             shutil.rmtree(dir)
 
-    def clear_operating_directory(self):
-        dir = self.get_repo_operating_dir()
+    def clear_operating_directory(self, repo):
+        dir = self.get_repo_operating_dir(repo)
         if dir.exists():
             import shutil
 

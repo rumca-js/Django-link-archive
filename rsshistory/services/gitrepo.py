@@ -37,6 +37,7 @@ class GitRepo(object):
         if not local.is_dir():
             self.clone()
         else:
+            self.revert_all_changes()
             self.pull()
 
     def add(self, files):
@@ -49,6 +50,9 @@ class GitRepo(object):
         self.check_process(p)
 
     def commit(self, commit_message):
+        if not self.is_different():
+            return
+
         p = subprocess.run(
             ["git", "commit", "-m", commit_message],
             cwd=self.get_local_dir(),
@@ -83,6 +87,27 @@ class GitRepo(object):
         p = subprocess.run(
             ["git", "clone", self.git_repo],
             cwd=self.get_operating_dir(),
+            timeout=self.timeout_s,
+            capture_output=True,
+        )
+        self.check_process(p)
+
+    def is_different(self):
+        p = subprocess.run(
+            ["git", "diff", "--exit-code"],
+            cwd=self.get_operating_dir(),
+            timeout=self.timeout_s,
+            capture_output=True,
+        )
+        if p.returncode == 0:
+            return False
+
+        return True
+
+    def revert_all_changes(self):
+        p = subprocess.run(
+            ["git", "checkout", "."],
+            cwd=self.get_local_dir(),
             timeout=self.timeout_s,
             capture_output=True,
         )

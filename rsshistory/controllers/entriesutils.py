@@ -225,11 +225,11 @@ class EntryScanner(object):
 
         parser = ContentLinkParser(self.url, self.contents)
 
-        content_links = []
-        if conf.auto_store_domain_info:
-            content_links = parser.get_domains()
-        if conf.auto_store_entries:
-            content_links = parser.get_links()
+        contents_links = []
+        if config.auto_store_domain_info:
+            contents_links = parser.get_domains()
+        if config.auto_store_entries:
+            contents_links = parser.get_links()
 
         for link in contents_links:
             BackgroundJobController.link_add(link)
@@ -502,14 +502,28 @@ class LinkDataWrapper(object):
     def get_from_archive(self):
         conf = Configuration.get_object().config_entry
 
-        if conf.prefer_https:
-            http_index = self.link.find("http://")
-            if http_index >= 0:
+        if self.link.startswith("http"):
+            if self.link.startswith("http://"):
                 link_https = self.link.replace("http://", "https://")
+                link_http = self.link
+            if self.link.startswith("https://"):
+                link_https = self.link
+                link_http = self.link.replace("https://", "http://")
 
-                objs = ArchiveLinkDataController.objects.filter(link=link_https)
-                if objs.exists():
-                    return objs[0]
+            https_objs = ArchiveLinkDataController.objects.filter(link=link_https)
+
+            if https_objs.count() > 0 and not https_objs[0].date_dead_since:
+                return https_objs[0]
+
+            http_objs = ArchiveLinkDataController.objects.filter(link=link_http)
+
+            if http_objs.count() > 0 and not http_objs[0].date_dead_since:
+                return http_objs[0]
+
+            if https_objs.count() > 0:
+                return https_objs[0]
+            if http_objs.count() > 0:
+                return http_objs[0]
 
         objs = ArchiveLinkDataController.objects.filter(link=self.link)
         if objs.exists():
@@ -518,14 +532,29 @@ class LinkDataWrapper(object):
     def get_from_operational_db(self):
         conf = Configuration.get_object().config_entry
 
-        if conf.prefer_https:
-            http_index = self.link.find("http://")
-            if http_index >= 0:
+        if self.link.startswith("http"):
+            if self.link.startswith("http://"):
                 link_https = self.link.replace("http://", "https://")
+                link_http = self.link
+            if self.link.startswith("https://"):
+                link_https = self.link
+                link_http = self.link.replace("https://", "http://")
 
-                objs = LinkDataController.objects.filter(link=link_https)
-                if objs.exists():
-                    return objs[0]
+            https_objs = LinkDataController.objects.filter(link=link_https)
+
+            if https_objs.count() > 0 and not https_objs[0].date_dead_since:
+                return https_objs[0]
+
+            http_objs = LinkDataController.objects.filter(link=link_http)
+
+            if http_objs.count() > 0 and not http_objs[0].date_dead_since:
+                return http_objs[0]
+
+            if https_objs.count() > 0:
+                return https_objs[0]
+            if http_objs.count() > 0:
+
+                return http_objs[0]
 
         objs = LinkDataController.objects.filter(link=self.link)
         if objs.exists():
@@ -1184,8 +1213,6 @@ class EntriesCleanupAndUpdate(object):
 
         # TODO Move to link wrapper
         moved_all = LinkDataWrapper.move_old_links_to_archive()
-
-        # LinkDataController.recreate_from_domains()
 
         # indicate that all has been finished correctly
         return moved_all

@@ -1043,7 +1043,7 @@ class RssPage(ContentInterface):
             self.process_contents()
 
     def process_contents(self):
-        contents = self.get_contents()
+        contents = self.contents
         if contents is None:
             return None
 
@@ -1238,6 +1238,16 @@ class RssPage(ContentInterface):
             return rss_tags < html_tags
         if rss_tags >= 0:
             return True
+
+    def get_charset(self):
+        """
+        TODO read from encoding property of xml
+        """
+        if not self.contents:
+            return None
+
+        if self.contents.find("encoding") >= 0:
+            return "utf-8"
 
 
 class ContentLinkParser(ContentInterface):
@@ -1956,12 +1966,10 @@ class PageResponseObject(object):
     STATUS_CODE_UNDEF = 0
 
     def __init__(
-        self, url, text, status_code=STATUS_CODE_OK, encoding="utf-8", headers=None
+        self, url, text, status_code=STATUS_CODE_OK, encoding=None, headers=None
     ):
         self.url = url
         self.status_code = status_code
-
-        self.apparent_encoding = encoding
 
         self.content = text
         # decoded text
@@ -1973,15 +1981,516 @@ class PageResponseObject(object):
         # self.apparent_encoding = encoding
         # self.encoding = encoding
 
-        self.encoding = encoding
-
         if not headers:
             self.headers = {}
         else:
             self.headers = headers
 
+        if not self.is_headers_empty():
+            charset = self.get_content_type_charset()
+            if charset:
+                self.encoding = charset
+                self.apparent_encoding = charset
+            elif encoding:
+                self.encoding = encoding
+                self.apparent_encoding = encoding
+            else:
+                self.encoding = "utf-8"
+                self.apparent_encoding = "utf-8"
+        else:
+            self.encoding = encoding
+            self.apparent_encoding = encoding
+
+    def is_headers_empty(self):
+        return len(self.headers) == 0
+
+    def get_content_type(self):
+        if "Content-Type" in self.headers:
+            return self.headers["Content-Type"]
+        if "content-type" in self.headers:
+            return self.headers["content-type"]
+
+        # we have to assume something
+        return "text"
+
+    def get_content_type_charset(self):
+        content = self.get_content_type()
+        if not content:
+            return
+
+        elements = content.split(";")
+        for element in elements:
+            wh = element.lower().find("charset")
+            if wh >= 0:
+                charset_elements = element.split("=")
+                if len(charset_elements) > 1:
+                    return charset_elements[1]
+
+    def is_content_html(self):
+        content = self.get_content_type()
+        if not content:
+            return False
+
+        if content.lower().find("html") >= 0:
+            return True
+
+    def is_content_rss(self):
+        content = self.get_content_type()
+        if not content:
+            return False
+
+        if content.lower().find("rss") >= 0:
+            return True
+        if content.lower().find("xml") >= 0:
+            return True
+
+    def get_content_length(self):
+        if "content-length" in self.headers:
+            return int(self.headers["content-length"])
+        if "Content-Length" in self.headers:
+            return int(self.headers["Content-Length"])
+
+        return 100
+
+    def is_content_type_supported(self):
+        """
+        You can preview on a browser headers. Ctr-shift-i on ff
+        """
+        content_type = self.get_content_type()
+        if content_type.find("text") >= 0:
+            return True
+        if content_type.find("application") >= 0:
+            return True
+        if content_type.find("xml") >= 0:
+            return True
+
+        AppLogging.error(
+            "Page {} content type is not supported {}".format(self.url, content_type)
+        )
+
+        return False
+
+    def get_redirect_url(self):
+        if (
+            self.is_this_status_redirect()
+            and "Location" in self.headers
+            and self.headers["Location"]
+        ):
+            return self.headers["Location"]
+
+    def is_this_status_ok(self):
+        if self.status_code == 0:
+            return False
+
+        return self.status_code >= 200 and self.status_code < 300
+
+    def is_this_status_redirect(self):
+        """
+        403 is added since some pages use it to block you
+        """
+        return (self.status_code > 300 and self.status_code < 400) or self.status_code == 403
+
+    def is_this_status_nok(self):
+        """
+        This function informs that status code is so bad, that further communication does not make any sense
+        """
+        return self.status_code < 200 or self.status_code > 403
+
+    def is_valid(self):
+        content_length = self.get_content_length()
+
+        if content_length > PAGE_TOO_BIG_BYTES:
+            return False
+
+        if not self.is_content_type_supported():
+            return False
+
+        if self.is_this_status_nok():
+            return False
+
+        return True
+
+
+class RequestsPage(object):
+    def __init__(self, url, headers, timeout_s=10, ping=False):
+        """
+        This is program is web scraper. If we turn verify, then we discard some of pages.
+        Encountered several major pages, which had SSL programs.
+
+        SSL is mostly important for interacting with pages. During web scraping it is not that useful.
+        """
+        self.url = url
+        self.response = None
+
+        LinkDatabase.info("Requests GET:{}".format(url))
+
+        """
+        stream argument allows us to read header before we fetch the page.
+        SSL verification makes everything to work slower.
+        """
+
+        try:
+            request_result = self.build_requests(url, headers, timeout_s)
+
+            self.response = PageResponseObject(
+                    url=url,
+                    text="",
+                    status_code = request_result.status_code,
+                    headers = request_result.headers,)
+
+            if not self.response.is_valid():
+                return
+
+            # TODO do we want to check also content-type?
+
+            encoding = self.get_encoding(request_result, self.response)
+            if encoding:
+                request_result.encoding = encoding
+
+            if self.url != request_result.url:
+                self.url = request_result.url
+
+            self.response = PageResponseObject(
+                url = self.url,
+                text = request_result.text,
+                status_code = request_result.status_code,
+                encoding = request_result.encoding,
+                headers=request_result.headers,
+            )
+
+        except requests.Timeout:
+            LinkDatabase.error("Page timeout {}".format(self.url))
+            self.response = PageResponseObject(self.url, None, 500)
+
+    def get(self):
+        if self.response:
+            return self.response
+
+    def get_encoding(self, request_result, response):
+        """
+        The default assumed content encoding for text/html is ISO-8859-1 aka Latin-1 :( See RFC-2854. UTF-8 was too young to become the default, it was born in 1993, about the same time as HTML and HTTP.
+        Use .content to access the byte stream, or .text to access the decoded Unicode stream.
+
+        chardet does not work on youtube RSS feeds.
+        apparent encoding does not work on youtube RSS feeds.
+        """
+
+        url = self.url
+
+        # There might be several encoding texts, if so we do not know which one to use
+        text = request_result.text.lower()
+
+        encoding = response.get_content_type_charset()
+        if encoding:
+            return encoding
+        else:
+            if response.is_content_html():
+                p = HtmlPage(url, request_result.text)
+                if p.is_valid():
+                    if p.get_charset():
+                        return p.get_charset()
+            if response.is_content_rss():
+                p = RssPage(url, request_result.text)
+                if p.is_valid():
+                    if p.get_charset():
+                        return p.get_charset()
+
+            if (
+                text.count("encoding") == 1
+                and text.find('encoding="utf-8"') >= 0
+            ):
+                return "utf-8"
+            elif (
+                text.count("charset") == 1
+                and text.find('charset="utf-8"') >= 0
+            ):
+                return "utf-8"
+
+    def build_requests(self, url, headers, timeout_s):
+        request_result = requests.get(
+            url,
+            headers=headers,
+            timeout=timeout_s,
+            verify=BasePage.ssl_verify,
+            stream=True,
+        )
+        LinkDatabase.info("[H] {}".format(request_result.headers))
+        return request_result
+
+
+class SeleniumDriver(object):
+
+    def get_selenium_status_code(self, driver):
+        status_code = 200
+        try:
+            logs = driver.get_log("performance")
+            status_code2 = self.get_selenium_status_code_from_logs(logs)
+            if status_code2:
+                status_code = status_code2
+        except Exception as E:
+            AppLogging.error("Chrome webdrider error:{}".format(str(E)))
+        return status_code
+
+    def get_selenium_status_code_from_logs(self, logs):
+        """
+        https://stackoverflow.com/questions/5799228/how-to-get-status-code-by-using-selenium-py-python-code
+        TODO should we use selenium wire?
+        """
+        last_status_code = 200
+        for log in logs:
+            if log["message"]:
+                d = json.loads(log["message"])
+
+                content_type = ""
+                try:
+                    content_type = d["message"]["params"]["response"]["headers"][
+                        "content-type"
+                    ]
+                except Exception as E:
+                    pass
+                try:
+                    content_type = d["message"]["params"]["response"]["headers"][
+                        "Content-Type"
+                    ]
+                except Exception as E:
+                    pass
+
+                try:
+                    response_received = (
+                        d["message"]["method"] == "Network.responseReceived"
+                    )
+                    if content_type.find("text/html") >= 0 and response_received:
+                        last_status_code = d["message"]["params"]["response"]["status"]
+                except Exception as E:
+                    # we expect that some contents do not have this
+                    pass
+
+        return last_status_code
+
+    def get_selenium_headers(self, driver):
+        headers = {}
+        try:
+            logs = driver.get_log("performance")
+            headers = self.get_selenium_headers_logs(logs)
+            return headers
+        except Exception as E:
+            AppLogging.error("Chrome webdrider error:{}".format(str(E)))
+
+        return headers
+
+    def get_selenium_headers_logs(self, logs):
+        """
+        https://stackoverflow.com/questions/5799228/how-to-get-status-code-by-using-selenium-py-python-code
+        TODO should we use selenium wire?
+        """
+        headers = {}
+        for log in logs:
+            if log["message"]:
+                d = json.loads(log["message"])
+
+                content_type = ""
+                try:
+                    headers = d["message"]["params"]["response"]["headers"]
+                except Exception as E:
+                    pass
+
+        return headers
+
+
+class SeleniumHeadless(SeleniumDriver):
+
+    def __init__(self, url, headers, timeout_s=10):
+        """
+        To obtain RSS page you have to run real, full blown browser.
+
+        Headless might not be enough to fool cloudflare.
+        """
+        self.url = url
+        self.response = None
+
+        service = Service(executable_path="/usr/bin/chromedriver")
+        options = webdriver.ChromeOptions()
+        options.add_argument("--headless")
+
+        options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
+
+        # if not BasePage.ssl_verify:
+        #    options.add_argument('ignore-certificate-errors')
+
+        driver = webdriver.Chrome(service=service, options=options)
+
+        try:
+            # add 10 seconds for start of browser, etc.
+            selenium_timeout = timeout_s + 10
+
+            driver.set_page_load_timeout(selenium_timeout)
+
+            driver.get(url)
+            """
+            TODO - if webpage changes link, it should also update it in this object
+            """
+
+            status_code = self.get_selenium_status_code(driver)
+
+            headers = self.get_selenium_headers(driver)
+            AppLogging.info("Selenium headers:{}\n{}".format(url, headers))
+
+            # if self.options.link_redirect:
+            #    WebDriverWait(driver, selenium_timeout).until(EC.url_changes(driver.current_url))
+
+            html_content = driver.page_source
+
+            if self.url != driver.current_url:
+                self.url = driver.current_url
+
+            # TODO use selenium wire to obtain status code & headers?
+
+            self.response =  PageResponseObject(self.url, html_content, status_code)
+        except TimeoutException:
+            error_text = traceback.format_exc()
+            LinkDatabase.error("Page timeout:{}\n{}".format(self.url, error_text))
+            self.response = PageResponseObject(self.url, None, 500)
+        finally:
+            driver.quit()
+
+    def get(self):
+        if self.response:
+            return self.response
+
+
+class SeleniumFull(SeleniumDriver):
+    def __init__(self, url, headers, timeout_s):
+        """
+        To obtain RSS page you have to run real, full blown browser.
+
+        It may require some magic things to make the browser running.
+
+        https://stackoverflow.com/questions/50642308/webdriverexception-unknown-error-devtoolsactiveport-file-doesnt-exist-while-t
+        """
+        self.url = url
+        self.response = None
+
+        import os
+
+        os.environ["DISPLAY"] = ":10.0"
+
+        service = Service(executable_path="/usr/bin/chromedriver")
+        options = webdriver.ChromeOptions()
+        options.add_argument("--headless")
+        # options.add_argument("--no-sandbox")
+        # options.add_argument("--disable-dev-shm-usage")
+        # options.add_argument('--remote-debugging-pipe')
+        # options.add_argument('--remote-debugging-port=9222')
+        # options.add_argument('--user-data-dir=~/.config/google-chrome')
+
+        # options to enable performance log, to read status code
+        options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
+
+        # if not BasePage.ssl_verify:
+        #    options.add_argument('ignore-certificate-errors')
+
+        driver = webdriver.Chrome(service=service, options=options)
+
+        try:
+            # add 10 seconds for start of browser, etc.
+            selenium_timeout = timeout_s + 20
+
+            driver.set_page_load_timeout(selenium_timeout)
+
+            driver.get(url)
+
+            status_code = self.get_selenium_status_code(driver)
+
+            # This driver wait resulted in timeout on yahoo
+            # if self.options.link_redirect:
+            # WebDriverWait(driver, selenium_timeout).until(
+            #    EC.url_changes(driver.current_url)
+            # )
+            """
+            TODO - if webpage changes link, it should also update it in this object
+            """
+
+            page_source = driver.page_source
+
+            if self.url != driver.current_url:
+                self.url = driver.current_url
+
+            self.response = PageResponseObject(self.url, page_source, status_code)
+
+        except TimeoutException:
+            error_text = traceback.format_exc()
+            LinkDatabase.error("Page timeout:{}\n{}".format(self.url, error_text))
+            self.response = PageResponseObject(self.url, None, 500)
+        finally:
+            driver.quit()
+
+    def get(self):
+        if self.response:
+            return self.response
+
+
+class SeleniumUndetected(object):
+    def __init__(url, headers, timeout_s = 10):
+        """
+        To obtain RSS page you have to run real, full blown browser.
+
+        It may require some magic things to make the browser running.
+
+        This does not work on raspberry pi
+        """
+        self.url = url
+        self.response = None
+
+        import undetected_chromedriver as uc
+
+        options = uc.ChromeOptions()
+        options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
+
+        driver = uc.Chrome(options=options)
+
+        try:
+            # add 10 seconds for start of browser, etc.
+            selenium_timeout = timeout_s + 20
+
+            driver.set_page_load_timeout(selenium_timeout)
+
+            driver.get(url)
+
+            status_code = self.get_selenium_status_code(driver)
+
+            # This driver wait resulted in timeout on yahoo
+            # if self.options.link_redirect:
+            # WebDriverWait(driver, selenium_timeout).until(
+            #    EC.url_changes(driver.current_url)
+            # )
+            """
+            TODO - if webpage changes link, it should also update it in this object
+            """
+
+            page_source = driver.page_source
+
+            if self.url != driver.current_url:
+                self.url = driver.current_url
+
+            self.response = PageResponseObject(self.url, page_source, status_code)
+
+        except TimeoutException:
+            error_text = traceback.format_exc()
+            LinkDatabase.error("Page timeout:{}\n{}".format(self.url, error_text))
+            self.response = PageResponseObject(self.url, None, 500)
+        finally:
+            driver.quit()
+
+    def get(self):
+        if self.response:
+            return self.response
+
 
 class PageOptions(object):
+    """
+    Options object, configuration
+    """
+
     def __init__(self):
         self.use_selenium_full = False
         self.use_selenium_headless = False
@@ -2010,7 +2519,8 @@ class PageOptions(object):
 
 class BasePage(object):
     """
-    Should not contain any HTML/RSS content processing
+    Should not contain any HTML/RSS content processing.
+    This should be just a builder.
     """
 
     # use headers from https://www.supermonitoring.com/blog/check-browser-http-headers/
@@ -2073,9 +2583,7 @@ class BasePage(object):
         if not self.response:
             return False
 
-        if self.is_this_status_ok(
-            self.response.status_code
-        ) or self.is_this_status_redirect(self.response.status_code):
+        if self.response.is_this_status_ok() or self.response.is_this_status_redirect():
             return True
         else:
             return False
@@ -2091,18 +2599,6 @@ class BasePage(object):
             return False
 
         return status_code >= 200 and status_code < 300
-
-    def is_this_status_redirect(self, status_code):
-        """
-        403 is added since some pages use it to block you
-        """
-        return (status_code > 300 and status_code < 400) or status_code == 403
-
-    def is_this_status_nok(self, status_code):
-        """
-        This function informs that status code is so bad, that further communication does not make any sense
-        """
-        return status_code < 200 or status_code > 403
 
     def get_response(self):
         if self.response:
@@ -2186,73 +2682,6 @@ class BasePage(object):
             self.dead = True
             raise NotImplementedError("Could not identify method of page capture")
 
-    def get_content_type(self, request_result):
-        if "Content-Type" in request_result.headers:
-            return request_result.headers["Content-Type"]
-
-        # we have to assume something
-        return "text"
-
-    def get_content_length(self, request_result):
-        if "content-length" in request_result.headers:
-            return int(request_result.headers["content-length"])
-        if "Content-Length" in request_result.headers:
-            return int(request_result.headers["Content-Length"])
-
-        return 100
-
-    def is_content_type_supported(self, url, request_result):
-        """
-        You can preview on a browser headers. Ctr-shift-i on ff
-        """
-        content_type = self.get_content_type(request_result)
-        if content_type.find("text") >= 0:
-            return True
-        if content_type.find("application") >= 0:
-            return True
-        if content_type.find("xml") >= 0:
-            return True
-
-        AppLogging.error(
-            "Page {} content type is not supported {}".format(url, content_type)
-        )
-
-        return False
-
-    def get_encoding(self, url, request_result):
-        """
-        The default assumed content encoding for text/html is ISO-8859-1 aka Latin-1 :( See RFC-2854. UTF-8 was too young to become the default, it was born in 1993, about the same time as HTML and HTTP.
-        Use .content to access the byte stream, or .text to access the decoded Unicode stream.
-
-        chardet does not work on youtube RSS feeds.
-        apparent encoding does not work on youtube RSS feeds.
-        """
-
-        # There might be several encoding texts, if so we do not know which one to use
-        if (
-            request_result.text.count("encoding") == 1
-            and request_result.text.find('encoding="UTF-8"') >= 0
-        ):
-            request_result.encoding = "utf-8"
-        elif (
-            request_result.text.count("charset") == 1
-            and request_result.text.find('charset="UTF-8"') >= 0
-        ):
-            request_result.encoding = "utf-8"
-        else:
-            set_encoding = False
-
-            p = HtmlPage(url, request_result.text)
-            if p.is_valid():
-                if p.get_charset():
-                    request_result.encoding = p.get_charset()
-                    set_encoding = True
-
-            if not set_encoding:
-                request_result.encoding = request_result.apparent_encoding
-
-        return request_result.encoding
-
     def get_contents_via_requests(self, url, headers, timeout):
         """
         This is program is web scraper. If we turn verify, then we discard some of pages.
@@ -2260,206 +2689,25 @@ class BasePage(object):
 
         SSL is mostly important for interacting with pages. During web scraping it is not that useful.
         """
-        print("Requests GET:{}".format(url))
+        LinkDatabase.info("Requests GET:{}".format(url))
 
         """
         stream argument allows us to read header before we fetch the page.
         SSL verification makes everything to work slower.
         """
 
-        try:
-            request_result = requests.get(
-                url,
-                headers=headers,
-                timeout=timeout,
-                verify=BasePage.ssl_verify,
-                stream=True,
-            )
-            LinkDatabase.info("[H] {}".format(request_result.headers))
-
-            content_length = self.get_content_length(request_result)
-
-            if content_length > PAGE_TOO_BIG_BYTES:
-                AppLogging.error(
-                    "Page {} is too long: {} bytes".format(url, content_length)
-                )
-                return
-
-            if not self.is_content_type_supported(url, request_result):
-                return
-
-            if not self.is_this_status_nok(request_result.status_code):
-                """
-                DO NOT USE CONTENTS. it will fetch te response. If status is not ok - just return
-                """
-                response = PageResponseObject(
-                    self.url,
-                    "",
-                    request_result.status_code,
-                )
-
-            # TODO do we want to check also content-type?
-
-            self.get_encoding(url, request_result)
-
-            if self.url != request_result.url:
-                self.url = request_result.url
-
-            response = PageResponseObject(
-                self.url,
-                request_result.text,
-                request_result.status_code,
-                request_result.encoding,
-                headers=request_result.headers,
-            )
-
-            return response
-        except requests.Timeout:
-            LinkDatabase.error("Page timeout {}".format(self.url))
-            return PageResponseObject(self.url, None, 500)
+        p = RequestsPage(url, headers, timeout_s = timeout)
+        return p.get()
 
     def get_contents_via_selenium_chrome_headless(self, url, headers, timeout):
-        """
-        To obtain RSS page you have to run real, full blown browser.
-
-        Headless might not be enough to fool cloudflare.
-        """
-        service = Service(executable_path="/usr/bin/chromedriver")
-        options = webdriver.ChromeOptions()
-        options.add_argument("--headless")
-
-        options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
-
-        # if not BasePage.ssl_verify:
-        #    options.add_argument('ignore-certificate-errors')
-
-        driver = webdriver.Chrome(service=service, options=options)
-
-        try:
-            # add 10 seconds for start of browser, etc.
-            selenium_timeout = timeout + 10
-
-            driver.set_page_load_timeout(selenium_timeout)
-
-            driver.get(url)
-            """
-            TODO - if webpage changes link, it should also update it in this object
-            """
-
-            status_code = self.get_selenium_status_code(driver)
-
-            # if self.options.link_redirect:
-            #    WebDriverWait(driver, selenium_timeout).until(EC.url_changes(driver.current_url))
-
-            html_content = driver.page_source
-
-            if self.url != driver.current_url:
-                self.url = driver.current_url
-
-            # TODO use selenium wire to obtain status code & headers?
-
-            return PageResponseObject(self.url, html_content, status_code)
-        except TimeoutException:
-            error_text = traceback.format_exc()
-            LinkDatabase.error("Page timeout:{}\n{}".format(self.url, error_text))
-            return PageResponseObject(self.url, None, 500)
-        finally:
-            driver.quit()
+        p = SeleniumHeadless(url, headers, timeout)
+        return p.get()
 
     def get_contents_via_selenium_chrome_full(self, url, headers, timeout):
-        """
-        To obtain RSS page you have to run real, full blown browser.
+        p = SeleniumFull(url, headers, timeout)
+        return p.get()
 
-        It may require some magic things to make the browser running.
-
-        https://stackoverflow.com/questions/50642308/webdriverexception-unknown-error-devtoolsactiveport-file-doesnt-exist-while-t
-        """
-        import os
-
-        os.environ["DISPLAY"] = ":10.0"
-
-        service = Service(executable_path="/usr/bin/chromedriver")
-        options = webdriver.ChromeOptions()
-        options.add_argument("--headless")
-        # options.add_argument("--no-sandbox")
-        # options.add_argument("--disable-dev-shm-usage")
-        # options.add_argument('--remote-debugging-pipe')
-        # options.add_argument('--remote-debugging-port=9222')
-        # options.add_argument('--user-data-dir=~/.config/google-chrome')
-
-        # options to enable performance log, to read status code
-        options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
-
-        # if not BasePage.ssl_verify:
-        #    options.add_argument('ignore-certificate-errors')
-
-        driver = webdriver.Chrome(service=service, options=options)
-
-        try:
-            # add 10 seconds for start of browser, etc.
-            selenium_timeout = timeout + 20
-
-            driver.set_page_load_timeout(selenium_timeout)
-
-            driver.get(url)
-
-            status_code = self.get_selenium_status_code(driver)
-
-            # This driver wait resulted in timeout on yahoo
-            # if self.options.link_redirect:
-            # WebDriverWait(driver, selenium_timeout).until(
-            #    EC.url_changes(driver.current_url)
-            # )
-            """
-            TODO - if webpage changes link, it should also update it in this object
-            """
-
-            page_source = driver.page_source
-
-            if self.url != driver.current_url:
-                self.url = driver.current_url
-
-            return PageResponseObject(self.url, page_source, status_code)
-
-        except TimeoutException:
-            error_text = traceback.format_exc()
-            LinkDatabase.error("Page timeout:{}\n{}".format(self.url, error_text))
-            return PageResponseObject(self.url, None, 500)
-        finally:
-            driver.quit()
-
-    def get_contents_via_selenium_chrome_undetected(self, url, headers, timeout):
-        """
-        To obtain RSS page you have to run real, full blown browser.
-
-        It may require some magic things to make the browser running.
-
-        This does not work on raspberry pi
-        """
-        import undetected_chromedriver as uc
-
-        options = uc.ChromeOptions()
-        driver = uc.Chrome(options=options)
-
-        # add 10 seconds for start of browser, etc.
-        selenium_timeout = timeout + 10
-
-        driver.set_page_load_timeout(selenium_timeout)
-
-        try:
-            driver.get(url)
-            time.sleep(5)
-        except TimeoutException:
-            LinkDatabase.error("Page timeout: {}".format(self.url))
-            return PageResponseObject(url, None, 500)
-
-        html_content = driver.page_source
-
-        driver.quit()
-
-        return PageResponseObject(url, html_content)
-
-    def ping(self, timeout=5):
+    def ping(self, timeout_s=5):
         """
         This is program is web scraper. If we turn verify, then we discard some of pages.
         Encountered several major pages, which had SSL programs.
@@ -2473,77 +2721,14 @@ class BasePage(object):
         """
         url = self.url
 
-        try:
-            request_result = requests.get(
-                url,
-                headers=self.headers,
-                timeout=timeout,
-                verify=BasePage.ssl_verify,
-                stream=True,
-            )
+        p = RequestsPage(
+           url = url,
+           headers=self.headers,
+           timeout_s=timeout_s,
+           ping=True,
+        )
 
-            if not self.is_content_type_supported(url, request_result):
-                return False
-
-            return self.is_this_status_ok(request_result.status_code)
-
-        except requests.Timeout:
-            LinkDatabase.error("Page timeout {}".format(url))
-            return False
-
-    def get_redirect_url(self, request_result):
-        if (
-            self.is_this_status_redirect(request_result.status_code)
-            and "Location" in request_result.headers
-            and request_result.headers["Location"]
-        ):
-            return request_result.headers["Location"]
-
-    def get_selenium_status_code(self, driver):
-        status_code = 200
-        try:
-            logs = driver.get_log("performance")
-            status_code2 = self.get_selenium_status_code_from_logs(logs)
-            if status_code2:
-                status_code = status_code2
-        except Exception as E:
-            AppLogging.error("Chrome webdrider error:{}".format(str(E)))
-        return status_code
-
-    def get_selenium_status_code_from_logs(self, logs):
-        """
-        https://stackoverflow.com/questions/5799228/how-to-get-status-code-by-using-selenium-py-python-code
-        """
-        last_status_code = 200
-        for log in logs:
-            if log["message"]:
-                d = json.loads(log["message"])
-
-                content_type = ""
-                try:
-                    content_type = d["message"]["params"]["response"]["headers"][
-                        "content-type"
-                    ]
-                except Exception as E:
-                    pass
-                try:
-                    content_type = d["message"]["params"]["response"]["headers"][
-                        "Content-Type"
-                    ]
-                except Exception as E:
-                    pass
-
-                try:
-                    response_received = (
-                        d["message"]["method"] == "Network.responseReceived"
-                    )
-                    if content_type.find("text/html") >= 0 and response_received:
-                        last_status_code = d["message"]["params"]["response"]["status"]
-                except Exception as E:
-                    # print("Exception: {}".format(str(E)))
-                    pass
-
-        return last_status_code
+        return p.get().is_valid()
 
 
 class Url(ContentInterface):
@@ -2594,13 +2779,15 @@ class Url(ContentInterface):
             return
 
         if contents:
-            p = HtmlPage(url, contents)
-            if p.is_valid():
-                return p
+            if not self.response or self.response.is_headers_empty() or self.response.is_content_html():
+                p = HtmlPage(url, contents)
+                if p.is_valid():
+                    return p
 
-            p = RssPage(url, contents)
-            if p.is_valid():
-                return p
+            if not self.response or self.response.is_headers_empty() or self.response.is_content_rss():
+                p = RssPage(url, contents)
+                if p.is_valid():
+                    return p
 
             p = JsonPage(url, contents)
             if p.is_valid():

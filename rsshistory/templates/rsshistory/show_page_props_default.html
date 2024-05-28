@@ -34,7 +34,8 @@
     {%endif %}
     <li>keywords: {{page_object.get_tags}}</li>
 
-    <li>Selenium: {{page_object.options.is_selenium}}</li>
+    <li>Selenium: {{page_handler.options.is_selenium}}</li>
+    <li>Options str: {{page_handler.options.get_str}}</li>
 </ul>
 
 {% if user_config.show_icons %}
@@ -42,6 +43,9 @@
     <img src="{{page_object.get_thumbnail}}" style="max-width: 50%"/>
     {%endif%}
 {%endif%}
+
+<h1>Headers</h1>
+<li>{{page_handler.response.headers}}</li>
 
 <h1>Contents</h1>
 
