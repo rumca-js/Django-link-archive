@@ -115,6 +115,16 @@ class DomainAwarePage(object):
             return "https://" + self.url
         return self.url
 
+    def get_protocol_url(self, protocol = "https"):
+        """
+        replaces any protocol with input protocol
+        """
+        protocol_pos = self.url.find("://")
+        if protocol_pos >= 0:
+            return protocol + "://" + self.url[protocol_pos + 3 :]
+
+        return self.url
+
     def parse_url(self):
         """
         We cannot use urlparse, as it does not work with ftp:// or smb:// or win location
@@ -2141,6 +2151,9 @@ class RequestsPage(object):
             if not self.response.is_valid():
                 return
 
+            if ping:
+                return
+
             # TODO do we want to check also content-type?
 
             encoding = self.get_encoding(request_result, self.response)
@@ -2214,7 +2227,7 @@ class RequestsPage(object):
             verify=BasePage.ssl_verify,
             stream=True,
         )
-        LinkDatabase.info("[H] {}".format(request_result.headers))
+        LinkDatabase.info("[H] {}\n{}".format(url, request_result.headers))
         return request_result
 
 
@@ -2646,7 +2659,7 @@ class BasePage(object):
             )
 
             self.response = self.get_contents_function(
-                self.url, headers=self.headers, timeout=10
+                self.url, headers=self.headers, timeout_s=10
             )
 
             LinkDatabase.info(
@@ -2667,44 +2680,38 @@ class BasePage(object):
 
         return self.response
 
-    def get_contents_internal(self, url, headers, timeout):
+    def get_contents_internal(self, url, headers, timeout_s, ping=False):
         if self.options.is_not_selenium():
-            return self.get_contents_via_requests(self.url, headers=headers, timeout=10)
+            return self.get_contents_via_requests(self.url, headers=headers, timeout_s=10, ping=ping)
         elif self.options.use_selenium_full:
             return self.get_contents_via_selenium_chrome_full(
-                self.url, headers=headers, timeout=10
+                self.url, headers=headers, timeout_s=10, ping=ping
             )
         elif self.options.use_selenium_headless:
             return self.get_contents_via_selenium_chrome_headless(
-                self.url, headers=headers, timeout=10
+                self.url, headers=headers, timeout_s=10, ping=ping
             )
         else:
             self.dead = True
             raise NotImplementedError("Could not identify method of page capture")
 
-    def get_contents_via_requests(self, url, headers, timeout):
+    def get_contents_via_requests(self, url, headers, timeout_s, ping):
         """
         This is program is web scraper. If we turn verify, then we discard some of pages.
         Encountered several major pages, which had SSL programs.
 
         SSL is mostly important for interacting with pages. During web scraping it is not that useful.
         """
-        LinkDatabase.info("Requests GET:{}".format(url))
 
-        """
-        stream argument allows us to read header before we fetch the page.
-        SSL verification makes everything to work slower.
-        """
-
-        p = RequestsPage(url, headers, timeout_s = timeout)
+        p = RequestsPage(url, headers, timeout_s = timeout_s, ping=ping)
         return p.get()
 
-    def get_contents_via_selenium_chrome_headless(self, url, headers, timeout):
-        p = SeleniumHeadless(url, headers, timeout)
+    def get_contents_via_selenium_chrome_headless(self, url, headers, timeout_s, ping):
+        p = SeleniumHeadless(url, headers, timeout_s = timeout_s, ping=ping)
         return p.get()
 
-    def get_contents_via_selenium_chrome_full(self, url, headers, timeout):
-        p = SeleniumFull(url, headers, timeout)
+    def get_contents_via_selenium_chrome_full(self, url, headers, timeout_s, ping):
+        p = SeleniumFull(url, headers, timeout_s = timeout_s, ping=ping)
         return p.get()
 
     def ping(self, timeout_s=5):
@@ -2721,14 +2728,13 @@ class BasePage(object):
         """
         url = self.url
 
-        p = RequestsPage(
+        response = self.get_contents_function(
            url = url,
            headers=self.headers,
            timeout_s=timeout_s,
            ping=True,
         )
-
-        return p.get().is_valid()
+        return response.is_valid()
 
 
 class Url(ContentInterface):

@@ -62,6 +62,9 @@ class GitRepo(object):
         self.check_process(p)
 
     def push(self):
+        if not self.is_different():
+            return
+
         token = self.git_data.password
         user = self.git_data.user
         repo = self.get_repo_name()

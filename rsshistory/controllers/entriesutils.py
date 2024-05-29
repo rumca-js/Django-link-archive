@@ -47,7 +47,7 @@ class EntriesCleanup(object):
             if entries:
                 entries.delete()
 
-        self.cleanup_http_duplicates()
+        #self.cleanup_http_duplicates()
         self.cleanup_invalid_page_ratings()
 
     def get_source_entries(self, source):
@@ -129,6 +129,11 @@ class EntriesCleanup(object):
             return entries
 
     def cleanup_http_duplicates(self):
+        """
+        TODO this function should be eventually removed.
+         - do not allow adding https when http exists
+         - do not allow adding http when https exists
+        """
         condition = Q(link__icontains="http://")
         if not self.archive_cleanup:
             entries = LinkDataController.objects.filter(condition)
@@ -251,6 +256,8 @@ class EntryUpdater(object):
 
         entry = self.entry
 
+        LinkDataWrapper.check_https_http_protocol(entry)
+
         url = EntryUrlInterface(entry.link)
         props = url.get_props()
         p = url.p
@@ -301,6 +308,8 @@ class EntryUpdater(object):
          - new data are changed only if new data are present at all
         """
         entry = self.entry
+
+        LinkDataWrapper.check_https_http_protocol(entry)
 
         url = EntryUrlInterface(entry.link)
         props = url.get_props()
@@ -504,11 +513,13 @@ class LinkDataWrapper(object):
 
         if self.link.startswith("http"):
             if self.link.startswith("http://"):
-                link_https = self.link.replace("http://", "https://")
+                p = DomainAwarePage(self.link)
+                link_https = p.get_protocol_url("https")
                 link_http = self.link
             if self.link.startswith("https://"):
                 link_https = self.link
-                link_http = self.link.replace("https://", "http://")
+                p = DomainAwarePage(self.link)
+                link_http = p.get_protocol_url("http")
 
             https_objs = ArchiveLinkDataController.objects.filter(link=link_https)
 
@@ -534,11 +545,13 @@ class LinkDataWrapper(object):
 
         if self.link.startswith("http"):
             if self.link.startswith("http://"):
-                link_https = self.link.replace("http://", "https://")
+                p = DomainAwarePage(self.link)
+                link_https = p.get_protocol_url("https")
                 link_http = self.link
             if self.link.startswith("https://"):
                 link_https = self.link
-                link_http = self.link.replace("https://", "http://")
+                p = DomainAwarePage(self.link)
+                link_http = p.get_protocol_url("http")
 
             https_objs = LinkDataController.objects.filter(link=link_https)
 
@@ -768,6 +781,77 @@ class LinkDataWrapper(object):
             return
 
         return entries
+
+    def move_https_to_http(entry):
+        if not entry.is_https():
+            return
+
+        url = entry.get_http_url()
+
+        p = BasePage(url)
+        if p.ping():
+            entry.link = url
+            entry.save()
+            return True
+
+        return False
+
+    def move_http_to_https(entry):
+        if not entry.is_http():
+            return
+
+        url = entry.get_https_url()
+
+        p = BasePage(url)
+        if p.ping():
+            entry.link = url
+            entry.save()
+            return True
+
+        return False
+
+    def check_https_http_protocol(entry):
+        if entry.is_https():
+            http_url = entry.get_http_url()
+
+            # if we have both, destroy http entry
+
+            http_entries = LinkDataController.objects.filter(link=http_url)
+            if http_entries.count() != 0:
+                http_entries.delete()
+
+            p = BasePage(entry.link)
+            ping_status = p.ping()
+
+            p=BasePage(http_url)
+            new_ping_status = p.ping()
+
+            if not ping_status and new_ping_status:
+                if LinkDataWrapper.move_https_to_http(entry):
+                    return True
+
+            if ping_status and new_ping_status:
+                http_entries = LinkDataController.objects.filter(link=http_url)
+                if http_entries.count() > 0:
+                    http_entries.delete()
+
+        if entry.is_http():
+            https_url = entry.get_https_url()
+
+            # if we have both, destroy http entry
+            https_entries = LinkDataController.objects.filter(link=https_url)
+            if https_entries.count() != 0:
+                entry.delete()
+                return True
+
+            p=BasePage(https_url)
+            new_ping_status = p.ping()
+
+            if new_ping_status:
+                if LinkDataWrapper.move_http_to_https(entry):
+                    return True
+
+        return False
 
 
 class EntryDataBuilder(object):

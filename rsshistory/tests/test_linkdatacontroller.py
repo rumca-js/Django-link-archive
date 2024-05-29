@@ -263,3 +263,61 @@ class LinkDataControllerTest(FakeInternetTestCase):
 
         self.assertTrue(entry.date_dead_since is None)
         self.assertEqual(entry.manual_status_code, 0)
+
+    def test_is_https(self):
+        entry_https = LinkDataController.objects.create(
+            source="",
+            link="https://linkedin.com",
+            title="my title",
+            description="my description",
+            bookmarked=False,
+            language="pl",
+            domain_obj=None,
+            thumbnail="thumbnail",
+            manual_status_code=200,
+        )
+
+        entry_http = LinkDataController.objects.create(
+            source="",
+            link="http://linkedin.com",
+            title="my title",
+            description="my description",
+            bookmarked=False,
+            language="pl",
+            domain_obj=None,
+            thumbnail="thumbnail",
+            manual_status_code=200,
+        )
+
+        # call tested function
+        self.assertTrue(entry_https.is_https())
+        self.assertFalse(entry_http.is_https())
+
+    def test_is_http(self):
+        entry_https = LinkDataController.objects.create(
+            source="",
+            link="https://linkedin.com",
+            title="my title",
+            description="my description",
+            bookmarked=False,
+            language="pl",
+            domain_obj=None,
+            thumbnail="thumbnail",
+            manual_status_code=200,
+        )
+
+        entry_http = LinkDataController.objects.create(
+            source="",
+            link="http://linkedin.com",
+            title="my title",
+            description="my description",
+            bookmarked=False,
+            language="pl",
+            domain_obj=None,
+            thumbnail="thumbnail",
+            manual_status_code=200,
+        )
+
+        # call tested function
+        self.assertFalse(entry_https.is_http())
+        self.assertTrue(entry_http.is_http())

@@ -515,3 +515,100 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         entry = w.get_from_archive()
         self.assertTrue(entry)
         self.assertEqual(entry.link, "https://archive.com?v=1")
+
+    def test_check_https_http_protocol__http_link(self):
+        conf = Configuration.get_object().config_entry
+        conf.days_to_move_to_archive = 2
+        conf.days_to_remove_links = 2
+        conf.days_to_remove_links = 2
+        conf.prefer_https = True
+        conf.save()
+
+        https_entry = LinkDataController.objects.create(
+            source="https://archive.com",
+            link="https://archive.com?v=1",
+            title="The archive https link",
+            bookmarked=False,
+            language="en",
+        )
+
+        http_entry = LinkDataController.objects.create(
+            source="http://archive.com",
+            link="http://archive.com?v=1",
+            title="The archive http link",
+            bookmarked=False,
+            language="en",
+        )
+
+        # call tested function
+        result = LinkDataWrapper.check_https_http_protocol(http_entry)
+        self.assertTrue(result)
+
+        # function removed http link
+
+        entries = LinkDataController.objects.filter(link__icontains = "archive.com")
+        self.assertEqual(entries.count(), 1)
+        self.assertEqual(entries[0].link, "https://archive.com?v=1")
+
+    def test_check_https_http_protocol__https_link(self):
+        conf = Configuration.get_object().config_entry
+        conf.days_to_move_to_archive = 2
+        conf.days_to_remove_links = 2
+        conf.days_to_remove_links = 2
+        conf.prefer_https = True
+        conf.save()
+
+        https_entry = LinkDataController.objects.create(
+            source="https://archive.com",
+            link="https://archive.com?v=1",
+            title="The archive https link",
+            bookmarked=False,
+            language="en",
+        )
+
+        http_entry = LinkDataController.objects.create(
+            source="http://archive.com",
+            link="http://archive.com?v=1",
+            title="The archive http link",
+            bookmarked=False,
+            language="en",
+        )
+
+        # call tested function
+        result = LinkDataWrapper.check_https_http_protocol(https_entry)
+        self.assertTrue(not result)
+
+        # function removed http link
+
+        entries = LinkDataController.objects.filter(link__icontains = "archive.com")
+        self.assertEqual(entries.count(), 1)
+        self.assertEqual(entries[0].link, "https://archive.com?v=1")
+
+    def test_check_https_http_protocol__https_link_dead(self):
+        conf = Configuration.get_object().config_entry
+        conf.days_to_move_to_archive = 2
+        conf.days_to_remove_links = 2
+        conf.days_to_remove_links = 2
+        conf.prefer_https = True
+        conf.save()
+
+        https_entry = LinkDataController.objects.create(
+            source="https://archive.com",
+            link="https://archive.com?v=1",
+            title="The archive https link",
+            bookmarked=False,
+            language="en",
+            date_dead_since = DateUtils.get_datetime_now_utc(),
+        )
+
+        # call tested function
+        result = LinkDataWrapper.check_https_http_protocol(https_entry)
+
+        # we do not move the thing
+        self.assertFalse(result)
+
+        # we still use https, if we have server reponse for it
+
+        entries = LinkDataController.objects.filter(link__icontains = "archive.com")
+        self.assertEqual(entries.count(), 1)
+        self.assertEqual(entries[0].link, "https://archive.com?v=1")

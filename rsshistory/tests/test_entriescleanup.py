@@ -161,6 +161,9 @@ class EntriesCleanupTest(FakeInternetTestCase):
 
         self.assertEqual(ArchiveLinkDataController.objects.all().count(), 0)
 
+"""
+TODO we do not make active remove of https. Only on entry update/reset
+
     def test_cleanup__https_http_duplicates(self):
         conf = Configuration.get_object().config_entry
         conf.days_to_remove_links = 2
@@ -192,3 +195,4 @@ class EntriesCleanupTest(FakeInternetTestCase):
         EntriesCleanup().cleanup()
 
         self.assertEqual(LinkDataController.objects.all().count(), 1)
+"""

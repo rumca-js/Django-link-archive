@@ -292,6 +292,33 @@ class TestResponseObject(PageResponseObject):
         elif url == "https://page-with-http-status-100.com":
             self.status_code = 100
 
+        elif url == "http://page-with-http-status-500.com":
+            self.status_code = 500
+
+        elif url == "http://page-with-http-status-400.com":
+            self.status_code = 400
+
+        elif url == "http://page-with-http-status-300.com":
+            self.status_code = 300
+
+        elif url == "http://page-with-http-status-200.com":
+            self.status_code = 200
+
+        elif url == "http://page-with-http-status-100.com":
+            self.status_code = 100
+
+        elif url == "https://page-with-https-status-200-http-status-500.com":
+            self.status_code = 100
+
+        elif url == "http://page-with-https-status-200-http-status-500.com":
+            self.status_code = 500
+
+        elif url == "https://page-with-https-status-500-http-status-200.com":
+            self.status_code = 500
+
+        elif url == "http://page-with-https-status-500-http-status-200.com":
+            self.status_code = 200
+
         elif url.startswith("https://instance.com/apps/rsshistory"):
             return self.get_contents_instance(url)
 
@@ -429,11 +456,11 @@ class FakeInternetTestCase(TestCase):
         super().__init__(*args, **kwargs)
         MockRequestCounter.mock_page_requests = 0
 
-    def get_contents_function(self, url, headers, timeout):
+    def get_contents_function(self, url, headers, timeout_s, ping=False):
         print("Mocked Requesting page: {}".format(url))
         MockRequestCounter.mock_page_requests += 1
 
-        return TestResponseObject(url, headers, timeout)
+        return TestResponseObject(url, headers, timeout_s)
 
     def disable_web_pages(self):
         BasePage.get_contents_function = self.get_contents_function

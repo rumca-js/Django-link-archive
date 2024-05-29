@@ -37,23 +37,6 @@ class SourceDataModel(models.Model):
         help_text="Proxy location for the source. Proxy location will be used instead of normal processing.",
     )
 
-    """
-    advanced_category_mapping?
-
-    "Tech/New Age;YouTube/Tech"
-    "Tech;YouTube"
-
-    One subcategory can have multiple sources inside.
-    One source, can be in multiple subcategories
-    source_subcategories = models.ManyToManyField(
-        SourceDataModel,
-        on_delete=models.SET_NULL,
-        related_name="source_objects",
-        null=True,
-        blank=True,
-    )
-    """
-
     class Meta:
         ordering = ["title"]
 
@@ -73,7 +56,7 @@ class SourceOperationalData(models.Model):
     date_fetched = models.DateTimeField(null=True)
     import_seconds = models.IntegerField(null=True)
     number_of_entries = models.IntegerField(null=True)
-    page_hash = models.BinaryField(max_length=30, null=True)
+    page_hash = models.BinaryField(max_length=30, null=True) # TODO Move to entry
     consecutive_errors = models.IntegerField(default=0)
 
     class Meta:
@@ -129,13 +112,3 @@ class SourceSubCategories(models.Model):
         )
         if objs.count() != 0:
             return objs[0]
-
-    """
-    category_object = models.ForeignKey(
-        SourceCategories,
-        on_delete=models.SET_NULL,
-        related_name="subcategory_objects",
-        null=True,
-        blank=True,
-    )
-    """

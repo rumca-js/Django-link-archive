@@ -104,7 +104,7 @@ class UpdateExportManager(object):
                         operating_dir
                     )
                 )
-                self.clear_operating_directory()
+                self.clear_operating_directory(repo)
 
             if repo_is_up:
                 local_dir = self._cfg.get_export_path(self.get_directory())

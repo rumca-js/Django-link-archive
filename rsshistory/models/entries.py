@@ -39,9 +39,13 @@ class BaseLinkDataModel(models.Model):
         blank=True, null=True, help_text="Age limit to view entry"
     )
 
+    # date when link was created in DB
     date_created = models.DateTimeField(auto_now_add=True, null=True)
+    # date when link was introduced to the internet
     date_published = models.DateTimeField(default=timezone.now)
+    # date when link was accessed last by scanned
     date_update_last = models.DateTimeField(auto_now=True, null=True)
+    # date when link was found dead
     date_dead_since = models.DateTimeField(null=True)
 
     # this entry cannot be removed. Serves a purpose. Domain page, source page
@@ -122,6 +126,50 @@ class BaseLinkDataModel(models.Model):
             self.language = None
 
         super().save(*args, **kwargs)
+
+
+'''
+class EntryOperationData(models.Model):
+
+    #entry_obj = models.ForeignKey(
+    #    BaseLinkDataModel,
+    #    on_delete=models.SET_NULL,
+    #    related_name="entry_data",
+    #    null=True,
+    #    blank=True,
+    #    unique=True,
+    #)
+
+    # for example from headers last modified, if no such header is present incremented with each time body_hash changes
+    date_last_modified = models.DateTimeField(null=True)
+
+    contents_hash = models.BinaryField(max_length=30, null=True)
+    body_hash = models.BinaryField(max_length=30, null=True)
+
+    def update(entry):
+        """
+        TODO cleanup.
+
+        Removed when link is removed
+        """
+        h = UrlHandler(entry.link)
+
+        op_entries = EntryOperationData.objects.filter(entry_obj = entry)
+        if op_entries.count() == 0:
+            EntryOperationData.objects.create(entry_obj = entry, date_last_modified = h.get_last_modified(), content_hash = h.get_hash(),
+                    body_hash = h.get_body_hash())
+        else:
+            op_entry = op_entries[0]
+            op_entry.date_last_modified = h.get_last_modified()
+            op_entry.content_hash = h.get_hash()
+            op_entry.body_hash = h.get_body_hash()
+
+    def delete_all():
+        """
+        These information can be re-fetched from the internet
+        """
+        EntryOperationData.objects.all().delete()
+'''
 
 
 class BaseLinkDataController(BaseLinkDataModel):
@@ -430,6 +478,26 @@ class BaseLinkDataController(BaseLinkDataModel):
         If there is a dead date -> it is dead. Period.
         """
         return self.date_dead_since is not None
+
+    def is_https(self):
+        """
+        TODO use DomainAwarePage for that
+        """
+        return self.link.lower().startswith("https://")
+
+    def is_http(self):
+        """
+        TODO use DomainAwarePage for that
+        """
+        return self.link.lower().startswith("http://")
+
+    def get_http_url(self):
+        p = DomainAwarePage(self.link)
+        return p.get_protocol_url("http")
+
+    def get_https_url(self):
+        p = DomainAwarePage(self.link)
+        return p.get_protocol_url("https")
 
     def is_valid(self):
         """
