@@ -1,4 +1,4 @@
-from ..webtools import HtmlPage, RssPage, DomainAwarePage, Url, PageOptions
+from ..webtools import HtmlPage, RssPage, DomainAwarePage, Url, DefaultContentPage
 from ..dateutils import DateUtils
 from ..controllers import SourceDataController
 
@@ -29,11 +29,16 @@ class EntryUrlInterface(object):
 
         self.url = UrlHandler.get_cleaned_link(url)
 
-        options = UrlHandler.get_url_options(url)
-        options.fast_parsing = fast_check
-        options.use_selenium_headless = use_selenium
+        self.options = UrlHandler.get_url_options(url)
+        self.options.fast_parsing = fast_check
+        self.options.use_selenium_headless = use_selenium
 
-        self.h = UrlHandler(self.url, page_options=options)
+        self.make_request()
+
+    def make_request(self):
+        self.h = UrlHandler(self.url, page_options=self.options)
+        self.response = self.h.response
+
         if self.h.response:
             self.url = self.h.response.url
 
@@ -42,10 +47,11 @@ class EntryUrlInterface(object):
                 LinkDatabase.info("Page is invalid:{}".format(url))
                 AppLogging.error("Page is invalid:{}".format(url))
             self.p = None
-            return None
-
         else:
             self.p = self.h.p
+
+    def get_response(self):
+        return self.response
 
     def get_props(self, input_props=None, source_obj=None):
         if not input_props:
@@ -77,6 +83,8 @@ class EntryUrlInterface(object):
             props["dead"] = True
             props["page_rating_contents"] = 0
             props["status_code"] = self.h.get_status_code()
+
+        self.props = props
 
         return props
 
@@ -120,6 +128,31 @@ class EntryUrlInterface(object):
             return self.get_rsspage_props(input_props, source_obj)
 
         # TODO provide RSS support
+
+    def is_update_supported(self):
+        """
+        TODO how to make this check automatically?
+        """
+        if not self.p:
+            return None
+
+        p = self.p
+
+        if type(p) is not DefaultContentPage:
+            return True
+
+        return False
+
+    def is_valid(self):
+        if not self.h.is_valid():
+            return False
+
+        # we support the type, but we do not provide valid properties
+        props = self.props
+        if not props and self.is_update_supported():
+            return False
+
+        return True
 
     def get_youtube_props(self, input_props=None, source_obj=None):
         if not input_props:

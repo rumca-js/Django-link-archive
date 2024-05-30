@@ -245,9 +245,6 @@ class BaseLinkDataController(BaseLinkDataModel):
         # TODO should it be done by for tag in self.tags: tag.get_map()?
         result = []
 
-        if not self.is_taggable():
-            return result
-
         tags = self.tags.all()
         for tag in tags:
             result.append(tag.tag)
@@ -480,15 +477,9 @@ class BaseLinkDataController(BaseLinkDataModel):
         return self.date_dead_since is not None
 
     def is_https(self):
-        """
-        TODO use DomainAwarePage for that
-        """
         return self.link.lower().startswith("https://")
 
     def is_http(self):
-        """
-        TODO use DomainAwarePage for that
-        """
         return self.link.lower().startswith("http://")
 
     def get_http_url(self):

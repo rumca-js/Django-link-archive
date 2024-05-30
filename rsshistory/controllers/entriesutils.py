@@ -269,8 +269,14 @@ class EntryUpdater(object):
             entry.status_code = url.h.get_status_code()
         entry.save()
 
-        if not props or not url.p:
+        response = url.get_response()
+
+        if not url.is_valid():
             self.handle_invalid_response(url)
+            return
+
+        # we may not support update for some types. PDFs, other resources on the web
+        if not props or len(props) == 0:
             return
 
         self.add_links_from_url(entry, url)
@@ -320,8 +326,12 @@ class EntryUpdater(object):
             entry.status_code = url.h.get_status_code()
         entry.save()
 
-        if not props or not url.p:
+        if not url.is_valid():
             self.handle_invalid_response(url)
+            return
+
+        # we may not support update for some types. PDFs, other resources on the web
+        if not props or len(props) == 0:
             return
 
         self.add_links_from_url(entry, url)
@@ -916,16 +926,6 @@ class EntryDataBuilder(object):
         self.link_data = link_data
         return self.add_from_props(ignore_errors=self.ignore_errors)
 
-    def is_status_code_invalid(self):
-        if self.ignore_errors:
-            return False
-
-        if "status_code" in self.link_data:
-            code = self.link_data["status_code"]
-            return code >= 200 and code < 300
-
-        return False
-
     def add_from_normal_link(self):
         """
         TODO move this to a other class OnlyLinkDataBuilder?
@@ -952,14 +952,6 @@ class EntryDataBuilder(object):
             AppLogging.error(
                 'Could not obtain properties for:<a href="{}">{}</a>'.format(
                     self.link, self.link
-                )
-            )
-            return
-
-        if self.is_status_code_invalid():
-            AppLogging.error(
-                'Cannot add link - page status invalid:<a href="{}">{}</a>\nData:{}'.format(
-                    self.link, self.link, link_data
                 )
             )
             return
@@ -1012,14 +1004,6 @@ class EntryDataBuilder(object):
         self.ignore_errors = ignore_errors
 
         url = self.link_data["link"]
-
-        if self.is_status_code_invalid():
-            AppLogging.error(
-                'Cannot add link - page status invalid:<a href="{}">{}</a>\nData:{}'.format(
-                    self.link, self.link, self.link_data
-                )
-            )
-            return
 
         obj = None
 

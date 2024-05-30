@@ -2020,8 +2020,11 @@ class PageResponseObject(object):
         if "content-type" in self.headers:
             return self.headers["content-type"]
 
-        # we have to assume something
-        return "text"
+    def get_last_modified(self):
+        if "Last-Modified" in self.headers:
+            return self.headers["Last-Modified"]
+        if "last-modified" in self.headers:
+            return self.headers["Last-Modified"]
 
     def get_content_type_charset(self):
         content = self.get_content_type()
@@ -2034,7 +2037,12 @@ class PageResponseObject(object):
             if wh >= 0:
                 charset_elements = element.split("=")
                 if len(charset_elements) > 1:
-                    return charset_elements[1]
+                    charset = charset_elements[1]
+
+                    if charset.startswith('"') or charset.startswith("'"):
+                        return charset[1: -1]
+                    else:
+                        return charset
 
     def is_content_html(self):
         content = self.get_content_type()
@@ -2104,16 +2112,12 @@ class PageResponseObject(object):
         """
         This function informs that status code is so bad, that further communication does not make any sense
         """
-        return self.status_code < 200 or self.status_code > 403
+        if self.is_this_status_redirect():
+            return False
+
+        return self.status_code < 200 or self.status_code >= 400
 
     def is_valid(self):
-        content_length = self.get_content_length()
-
-        if content_length > PAGE_TOO_BIG_BYTES:
-            return False
-
-        if not self.is_content_type_supported():
-            return False
 
         if self.is_this_status_nok():
             return False
@@ -2151,6 +2155,10 @@ class RequestsPage(object):
             if not self.response.is_valid():
                 return
 
+            content_length = self.response.get_content_length()
+            if content_length > PAGE_TOO_BIG_BYTES:
+                return
+
             if ping:
                 return
 
@@ -2173,7 +2181,10 @@ class RequestsPage(object):
 
         except requests.Timeout:
             LinkDatabase.error("Page timeout {}".format(self.url))
-            self.response = PageResponseObject(self.url, None, 500)
+            self.response = PageResponseObject(self.url, None, status_code=500)
+        except requests.exceptions.ConnectionError:
+            LinkDatabase.error("Page connection error {}".format(self.url))
+            self.response = PageResponseObject(self.url, None, status_code=500)
 
     def get(self):
         if self.response:
@@ -2232,6 +2243,9 @@ class RequestsPage(object):
 
 
 class SeleniumDriver(object):
+
+    def get_driver(self):
+        raise NotImplementedError("Provide selenium driver implementation!")
 
     def get_selenium_status_code(self, driver):
         status_code = 200
@@ -2312,7 +2326,17 @@ class SeleniumDriver(object):
 
 class SeleniumHeadless(SeleniumDriver):
 
-    def __init__(self, url, headers, timeout_s=10):
+    def get_driver(self):
+        service = Service(executable_path="/usr/bin/chromedriver")
+        options = webdriver.ChromeOptions()
+        options.add_argument("--headless")
+
+        options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
+
+        driver = webdriver.Chrome(service=service, options=options)
+        return driver
+
+    def __init__(self, url, headers, timeout_s=10, ping=False):
         """
         To obtain RSS page you have to run real, full blown browser.
 
@@ -2321,16 +2345,11 @@ class SeleniumHeadless(SeleniumDriver):
         self.url = url
         self.response = None
 
-        service = Service(executable_path="/usr/bin/chromedriver")
-        options = webdriver.ChromeOptions()
-        options.add_argument("--headless")
-
-        options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
 
         # if not BasePage.ssl_verify:
         #    options.add_argument('ignore-certificate-errors')
 
-        driver = webdriver.Chrome(service=service, options=options)
+        driver = self.get_driver()
 
         try:
             # add 10 seconds for start of browser, etc.
@@ -2358,11 +2377,11 @@ class SeleniumHeadless(SeleniumDriver):
 
             # TODO use selenium wire to obtain status code & headers?
 
-            self.response =  PageResponseObject(self.url, html_content, status_code)
+            self.response =  PageResponseObject(self.url, contents=html_content, status_code = status_code)
         except TimeoutException:
             error_text = traceback.format_exc()
             LinkDatabase.error("Page timeout:{}\n{}".format(self.url, error_text))
-            self.response = PageResponseObject(self.url, None, 500)
+            self.response = PageResponseObject(self.url, contents=None, status_code=500)
         finally:
             driver.quit()
 
@@ -2372,21 +2391,8 @@ class SeleniumHeadless(SeleniumDriver):
 
 
 class SeleniumFull(SeleniumDriver):
-    def __init__(self, url, headers, timeout_s):
-        """
-        To obtain RSS page you have to run real, full blown browser.
 
-        It may require some magic things to make the browser running.
-
-        https://stackoverflow.com/questions/50642308/webdriverexception-unknown-error-devtoolsactiveport-file-doesnt-exist-while-t
-        """
-        self.url = url
-        self.response = None
-
-        import os
-
-        os.environ["DISPLAY"] = ":10.0"
-
+    def get_driver(self):
         service = Service(executable_path="/usr/bin/chromedriver")
         options = webdriver.ChromeOptions()
         options.add_argument("--headless")
@@ -2402,7 +2408,24 @@ class SeleniumFull(SeleniumDriver):
         # if not BasePage.ssl_verify:
         #    options.add_argument('ignore-certificate-errors')
 
-        driver = webdriver.Chrome(service=service, options=options)
+        return webdriver.Chrome(service=service, options=options)
+
+    def __init__(self, url, headers, timeout_s, ping=False):
+        """
+        To obtain RSS page you have to run real, full blown browser.
+
+        It may require some magic things to make the browser running.
+
+        https://stackoverflow.com/questions/50642308/webdriverexception-unknown-error-devtoolsactiveport-file-doesnt-exist-while-t
+        """
+        self.url = url
+        self.response = None
+
+        import os
+
+        os.environ["DISPLAY"] = ":10.0"
+
+        driver = self.get_driver()
 
         try:
             # add 10 seconds for start of browser, etc.
@@ -2433,7 +2456,7 @@ class SeleniumFull(SeleniumDriver):
         except TimeoutException:
             error_text = traceback.format_exc()
             LinkDatabase.error("Page timeout:{}\n{}".format(self.url, error_text))
-            self.response = PageResponseObject(self.url, None, 500)
+            self.response = PageResponseObject(self.url, contents=None, status_code=500)
         finally:
             driver.quit()
 
@@ -2443,7 +2466,18 @@ class SeleniumFull(SeleniumDriver):
 
 
 class SeleniumUndetected(object):
-    def __init__(url, headers, timeout_s = 10):
+
+    def get_driver(self):
+        import undetected_chromedriver as uc
+
+        service = Service(executable_path="/usr/bin/chromedriver")
+
+        options = uc.ChromeOptions()
+        options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
+
+        return uc.Chrome(service = service, options=options)
+
+    def __init__(self, url, headers, timeout_s=10, ping=False):
         """
         To obtain RSS page you have to run real, full blown browser.
 
@@ -2454,12 +2488,7 @@ class SeleniumUndetected(object):
         self.url = url
         self.response = None
 
-        import undetected_chromedriver as uc
-
-        options = uc.ChromeOptions()
-        options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
-
-        driver = uc.Chrome(options=options)
+        driver = self.get_driver()
 
         try:
             # add 10 seconds for start of browser, etc.
@@ -2485,12 +2514,12 @@ class SeleniumUndetected(object):
             if self.url != driver.current_url:
                 self.url = driver.current_url
 
-            self.response = PageResponseObject(self.url, page_source, status_code)
+            self.response = PageResponseObject(self.url, contents = page_source, status_code = status_code)
 
         except TimeoutException:
             error_text = traceback.format_exc()
             LinkDatabase.error("Page timeout:{}\n{}".format(self.url, error_text))
-            self.response = PageResponseObject(self.url, None, 500)
+            self.response = PageResponseObject(self.url, contents = None, status_code=500)
         finally:
             driver.quit()
 
@@ -2807,6 +2836,10 @@ class Url(ContentInterface):
             p = DefaultContentPage(url, contents)
             return p
 
+        if self.response and self.response.is_valid():
+            p = DefaultContentPage(url, contents)
+            return p
+
     def get_type(url):
         """
         Based on link structure identify type.
@@ -2826,6 +2859,11 @@ class Url(ContentInterface):
 
     def is_valid(self):
         if not self.p:
+            return False
+
+        # not valid HTTP response
+        response = self.response
+        if not response or not response.is_valid():
             return False
 
         return self.p.is_valid()
@@ -3051,12 +3089,6 @@ class Url(ContentInterface):
             return PageResponseObject.STATUS_CODE_UNDEF
 
         return self.response.status_code
-
-    def is_valid(self):
-        if not self.p:
-            return
-
-        return self.p.is_valid()
 
     def is_cloudflare_protected(self):
         if not self.p:

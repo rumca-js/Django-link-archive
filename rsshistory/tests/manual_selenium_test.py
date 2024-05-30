@@ -773,7 +773,9 @@ def main():
 
     # p = RequestsPage("https://www.google.com/", headers=headers)
     # print(p.get().text)
-    p = SeleniumHeadless("https://www.google.com/", headers=headers)
+    # p = SeleniumHeadless("https://www.google.com/", headers=headers)
+    # print(p.get().text)
+    p = SeleniumUndetected("https://www.google.com/", headers=headers)
     print(p.get().text)
 
 

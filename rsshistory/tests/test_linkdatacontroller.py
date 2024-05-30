@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from datetime import timedelta
 
 from ..controllers import (
@@ -6,6 +7,7 @@ from ..controllers import (
     ArchiveLinkDataController,
     DomainsController,
 )
+from ..models import UserTags
 from ..configuration import Configuration
 from ..dateutils import DateUtils
 
@@ -15,6 +17,10 @@ from .fakeinternet import FakeInternetTestCase
 class LinkDataControllerTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
+
+        self.user = User.objects.create_user(
+            username="test_username", password="testpassword"
+        )
 
     def clear(self):
         SourceDataController.objects.all().delete()
@@ -321,3 +327,51 @@ class LinkDataControllerTest(FakeInternetTestCase):
         # call tested function
         self.assertFalse(entry_https.is_http())
         self.assertTrue(entry_http.is_http())
+
+    def test_get_tag_map(self):
+
+        # demoted page
+        entry = LinkDataController.objects.create(
+            source="",
+            link="https://linkedin.com",
+            title="my title",
+            description="my description",
+            bookmarked=False,
+            language="pl",
+            domain_obj=None,
+            thumbnail="thumbnail",
+        )
+
+        UserTags.objects.create(
+                tag="test tag", user_object=self.user, entry_object = entry
+        )
+
+        tag_vec = entry.get_tag_map()
+        self.assertEqual(len(tag_vec), 1)
+        self.assertEqual(tag_vec[0], "test tag")
+
+    def test_get_tag_map__invalid_page(self):
+
+        # demoted page
+        entry = LinkDataController.objects.create(
+            source="",
+            link="https://linkedin.com",
+            title="my title",
+            description="my description",
+            bookmarked=False,
+            language="pl",
+            domain_obj=None,
+            thumbnail="thumbnail",
+            manual_status_code=200,
+            date_dead_since = DateUtils.get_datetime_now_utc(),
+            page_rating=-100,
+            page_rating_contents=-100,
+        )
+
+        UserTags.objects.create(
+                tag="test tag", user_object=self.user, entry_object = entry
+        )
+
+        tag_vec = entry.get_tag_map()
+        self.assertEqual(len(tag_vec), 1)
+        self.assertEqual(tag_vec[0], "test tag")
