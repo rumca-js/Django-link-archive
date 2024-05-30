@@ -1976,14 +1976,14 @@ class PageResponseObject(object):
     STATUS_CODE_UNDEF = 0
 
     def __init__(
-        self, url, text, status_code=STATUS_CODE_OK, encoding=None, headers=None
+        self, url, contents, status_code=STATUS_CODE_OK, encoding=None, headers=None
     ):
         self.url = url
         self.status_code = status_code
 
-        self.content = text
-        # decoded text
-        self.text = text
+        self.content = contents
+        # decoded contents
+        self.text = contents
 
         # I read selenium always assume utf8 encoding
 
@@ -2148,7 +2148,7 @@ class RequestsPage(object):
 
             self.response = PageResponseObject(
                     url=url,
-                    text="",
+                    contents="",
                     status_code = request_result.status_code,
                     headers = request_result.headers,)
 
@@ -2173,7 +2173,7 @@ class RequestsPage(object):
 
             self.response = PageResponseObject(
                 url = self.url,
-                text = request_result.text,
+                contents = request_result.text,
                 status_code = request_result.status_code,
                 encoding = request_result.encoding,
                 headers=request_result.headers,
@@ -2181,10 +2181,10 @@ class RequestsPage(object):
 
         except requests.Timeout:
             LinkDatabase.error("Page timeout {}".format(self.url))
-            self.response = PageResponseObject(self.url, None, status_code=500)
+            self.response = PageResponseObject(self.url, contents=None, status_code=500)
         except requests.exceptions.ConnectionError:
             LinkDatabase.error("Page connection error {}".format(self.url))
-            self.response = PageResponseObject(self.url, None, status_code=500)
+            self.response = PageResponseObject(self.url, contents=None, status_code=500)
 
     def get(self):
         if self.response:
@@ -2451,7 +2451,7 @@ class SeleniumFull(SeleniumDriver):
             if self.url != driver.current_url:
                 self.url = driver.current_url
 
-            self.response = PageResponseObject(self.url, page_source, status_code)
+            self.response = PageResponseObject(self.url, contents=page_source, status_code=status_code)
 
         except TimeoutException:
             error_text = traceback.format_exc()
@@ -2659,7 +2659,7 @@ class BasePage(object):
             return response.content
 
     def get_response_implementation(self):
-        if self.response and self.response.text:
+        if self.response and self.response.contents:
             return self.response
 
         if not self.user_agent or self.user_agent == "":
