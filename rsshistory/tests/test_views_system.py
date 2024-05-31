@@ -9,7 +9,7 @@ from ..controllers import (
     BackgroundJobController,
 )
 from ..dateutils import DateUtils
-from ..models import KeyWords, DataExport
+from ..models import KeyWords
 
 from .fakeinternet import FakeInternetTestCase, MockRequestCounter
 

@@ -15,6 +15,7 @@ from .viewspkg import (
     viewsystem,
     viewexport,
     viewdomains,
+    viewentryrules,
 )
 
 # register app namespace
@@ -162,6 +163,12 @@ urlpatterns = [
     path("keywords/", viewsystem.keywords, name="keywords",),
     path("keyword-remove", viewsystem.keyword_remove, name="keyword-remove",),
     path("keywords-remove-all/", viewsystem.keywords_remove_all, name="keywords-remove-all",),
+    # entry rules
+    path("entry-rule-add", viewentryrules.entry_rule_add, name="entry-rule-add"),
+    path("entry-rule-edit/<int:pk>/", viewentryrules.entry_rule_edit, name="entry-rule-edit"),
+    path("entry-rule-remove/<int:pk>/", viewentryrules.entry_rule_remove, name="entry-rule-remove"),
+    path("entry-rules/", viewentryrules.EntryRuleListView.as_view(), name="entry-rules",),
+    path("entry-rule/<int:pk>/", viewentryrules.EntryRuleDetailView.as_view(), name="entry-rule",),
     # other, debug forms
     path("wizard", viewsystem.wizard_setup, name="wizard",),
     path("wizard-setup-news", viewsystem.wizard_setup_news, name="wizard-setup-news",),

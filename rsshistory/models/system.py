@@ -206,12 +206,6 @@ class ConfigurationEntry(models.Model):
         default="mastubat, porn",
         help_text="Links with these keywords will be blocked",
     )
-    block_urls = models.CharField(
-        max_length=1000,
-        blank=True,
-        default="googletagservices, google-analytics",
-        help_text="Links with these urls will be blocked",
-    )
 
     internet_test_page = models.CharField(
         default="https://google.com",

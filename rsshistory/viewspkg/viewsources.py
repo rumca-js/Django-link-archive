@@ -34,7 +34,7 @@ class SourceListView(generic.ListView):
         data = p.check_access()
         if data:
             return redirect("{}:missing-rights".format(LinkDatabase.name))
-        return super(SourceListView, self).get(*args, **kwargs)
+        return super().get(*args, **kwargs)
 
     def get_queryset(self):
         self.query_filter = SourceFilter(self.request.GET, self.request.user)
@@ -50,7 +50,7 @@ class SourceListView(generic.ListView):
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
-        context = super(SourceListView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context = ViewPage.init_context(self.request, context)
         # Create any data and add it to the context
 
@@ -93,7 +93,7 @@ class SourceDetailView(generic.DetailView):
         from ..pluginsources.sourcecontrollerbuilder import SourceControllerBuilder
 
         # Call the base implementation first to get the context
-        context = super(SourceDetailView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context = ViewPage.init_context(self.request, context)
 
         context["page_title"] = self.object.title

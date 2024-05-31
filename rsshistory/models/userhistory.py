@@ -12,7 +12,7 @@ from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import User
 
-from ..controllers import LinkDataController
+from .entries import LinkDataModel
 from ..configuration import Configuration
 from ..apps import LinkDatabase
 
@@ -146,14 +146,14 @@ class UserEntryTransitionHistory(models.Model):
     )
 
     entry_from = models.ForeignKey(
-        LinkDataController,
+        LinkDataModel,
         on_delete=models.CASCADE,
         null=True,
         blank=True,
         related_name="transitions_from",
     )
     entry_to = models.ForeignKey(
-        LinkDataController,
+        LinkDataModel,
         on_delete=models.CASCADE,
         null=True,
         blank=True,
@@ -177,7 +177,7 @@ class UserEntryTransitionHistory(models.Model):
         ).order_by("-counter")
         if links.exists():
             for link_info in links:
-                entries = LinkDataController.objects.filter(id=link_info.entry_to.id)
+                entries = LinkDataModel.objects.filter(id=link_info.entry_to.id)
                 if entries.exists():
                     entry = entries[0]
                     result.append(entry)
@@ -251,7 +251,7 @@ class UserEntryVisitHistory(models.Model):
     )
 
     entry_object = models.ForeignKey(
-        LinkDataController,
+        LinkDataModel,
         on_delete=models.CASCADE,
         related_name="visits_counter",
     )

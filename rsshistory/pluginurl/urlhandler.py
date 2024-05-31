@@ -4,7 +4,7 @@ from urllib.parse import unquote
 from ..webtools import Url, PageOptions, DomainAwarePage, DomainAwarePage
 
 from ..apps import LinkDatabase
-from ..models import AppLogging
+from ..models import AppLogging, EntryRule
 from ..configuration import Configuration
 
 from .handlervideoyoutube import YouTubeVideoHandler, YouTubeJsonHandler
@@ -276,7 +276,7 @@ class UrlHandler(Url):
         if not super().is_url_valid():
             return False
 
-        urls = Configuration.get_object().get_blocked_urls()
+        urls = EntryRule.get_blocked_urls()
         for url in urls:
             if self.url.find(url) >= 0:
                 return False

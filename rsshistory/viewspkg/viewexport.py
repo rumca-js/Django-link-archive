@@ -2,7 +2,7 @@ from datetime import timedelta
 
 from django.views import generic
 from django.urls import reverse
-from django.http import HttpResponseForbidden, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 
 from ..apps import LinkDatabase
 from ..models import DataExport, ConfigurationEntry
@@ -446,6 +446,7 @@ def data_export_add(request):
         form = DataExportForm(request.POST)
         if form.is_valid():
             form.save()
+            return HttpResponseRedirect(reverse("{}:data-exports".format(LinkDatabase.name)))
         else:
             p.context["summary_text"] = "Form is invalid"
             return p.render("summary_present.html")

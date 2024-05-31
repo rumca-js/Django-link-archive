@@ -18,7 +18,7 @@ from .models import DomainsTlds
 from .models import DomainsMains
 from .models import SourceCategories
 from .models import SourceSubCategories
-from .models import ConfigurationEntry, UserConfig, DataExport
+from .models import ConfigurationEntry, UserConfig, DataExport, EntryRule
 
 from .configuration import Configuration
 from .controllers import (
@@ -96,7 +96,6 @@ class ConfigForm(forms.ModelForm):
             "accept_dead",
             "accept_ip_addresses",
             "block_keywords",
-            "block_urls",
             "auto_scan_new_entries",
             "auto_store_entries",
             "auto_store_entries_use_all_data",
@@ -176,6 +175,27 @@ class DataExportForm(forms.ModelForm):
             "export_entries_permanents",
             "export_sources",
             "export_time",
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+
+class EntryRuleForm(forms.ModelForm):
+    """
+    Category choice form
+    """
+
+    class Meta:
+        model = EntryRule
+        fields = [
+            "enabled",
+            "rule_name",
+            "rule_url",
+            "block",
+            "auto_tag",
+            "requires_selenium",
+            "requires_selenium_full",
         ]
 
     def __init__(self, *args, **kwargs):

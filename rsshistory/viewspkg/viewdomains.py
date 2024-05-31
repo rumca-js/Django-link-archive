@@ -28,7 +28,7 @@ class DomainsListView(generic.ListView):
         data = p.check_access()
         if data:
             return redirect("{}:missing-rights".format(LinkDatabase.name))
-        return super(DomainsListView, self).get(*args, **kwargs)
+        return super().get(*args, **kwargs)
 
     def get_queryset(self):
         self.sort = "normal"
@@ -47,7 +47,7 @@ class DomainsListView(generic.ListView):
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
-        context = super(DomainsListView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context = ViewPage.init_context(self.request, context)
 
         self.init_display_type(context)
@@ -99,7 +99,7 @@ class DomainsDetailView(generic.DetailView):
         from ..pluginsources.sourcecontrollerbuilder import SourceControllerBuilder
 
         # Call the base implementation first to get the context
-        context = super(DomainsDetailView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context = ViewPage.init_context(self.request, context)
 
         context["page_title"] += " {} domain".format(self.object.domain)
@@ -133,7 +133,7 @@ class DomainsByNameDetailView(generic.DetailView):
         from ..pluginsources.sourcecontrollerbuilder import SourceControllerBuilder
 
         # Call the base implementation first to get the context
-        context = super(DomainsByNameDetailView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context = ViewPage.init_context(self.request, context)
 
         if self.object.domain:

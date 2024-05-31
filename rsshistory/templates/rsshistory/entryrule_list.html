@@ -1,0 +1,28 @@
+{% extends base_generic %}
+{% load static %}
+{% block content %}
+
+<div class="container">
+    <a href="{% url 'rsshistory:entry-rule-add' %}" title="Add new entry rule" class="btn btn-primary" role="button">
+        <img src="{% static 'rsshistory/icons/icons8-plus-100.png' %}" class="content-icon" />
+    </a>
+</div>
+
+<h1>Entry rules</h1>
+  {% if content_list %}
+     <div class="list-group">
+         {% for object in content_list %}
+             <a href="{% url 'rsshistory:entry-rule' object.id %}"
+               class="my-1 p-1 list-group-item list-group-item-action"
+	       title="{{object.rule_name}}">
+	         {{object.rule_name}}
+		 {% if not object.enabled %}
+		    [Disabled]
+		 {% endif %}
+             </a>
+         {% endfor %}
+  {% else %}
+    No rules yet
+  {% endif %}
+
+{% endblock %} 

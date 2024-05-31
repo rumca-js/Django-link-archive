@@ -17,9 +17,6 @@ from ..configuration import Configuration
 from ..webtools import BasePage, HtmlPage, RssPage, ContentLinkParser, DomainAwarePage
 from ..apps import LinkDatabase
 from ..dateutils import DateUtils
-from ..pluginurl import EntryUrlInterface
-from ..pluginurl import UrlHandler
-from ..pluginurl import UrlPropertyValidator
 from .entries import LinkDataController, ArchiveLinkDataController
 from .backgroundjob import BackgroundJobController
 from .domains import DomainsController
@@ -245,6 +242,7 @@ class EntryUpdater(object):
         self.entry = entry
 
     def update_data(self):
+        from ..pluginurl import EntryUrlInterface
         """
         Fetches new information about page, and uses valid fields to set this object,
         but only if current field is not set
@@ -307,6 +305,7 @@ class EntryUpdater(object):
         self.update_calculated_vote()
 
     def reset_data(self):
+        from ..pluginurl import EntryUrlInterface
         """
         Fetches new information about page, and uses valid fields to set this object.
 
@@ -900,6 +899,7 @@ class EntryDataBuilder(object):
             self.add_from_props(ignore_errors=self.ignore_errors)
 
     def add_from_link(self, ignore_errors=False):
+        from ..pluginurl import UrlHandler
         """
         TODO extract this to a separate class?
         """
@@ -913,6 +913,7 @@ class EntryDataBuilder(object):
             return self.add_from_normal_link()
 
     def add_from_link_service(self):
+        from ..pluginurl import EntryUrlInterface
         url = EntryUrlInterface(self.link, ignore_errors=self.ignore_errors)
         link_data = url.get_props()
         if not link_data:
@@ -927,6 +928,7 @@ class EntryDataBuilder(object):
         return self.add_from_props(ignore_errors=self.ignore_errors)
 
     def add_from_normal_link(self):
+        from ..pluginurl import EntryUrlInterface
         """
         TODO move this to a other class OnlyLinkDataBuilder?
         """
@@ -1001,6 +1003,7 @@ class EntryDataBuilder(object):
         return True
 
     def add_from_props(self, ignore_errors=False):
+        from ..pluginurl import UrlHandler
         self.ignore_errors = ignore_errors
 
         url = self.link_data["link"]
@@ -1021,6 +1024,7 @@ class EntryDataBuilder(object):
         return entry
 
     def add_from_props_internal(self):
+        from ..pluginurl import UrlPropertyValidator
         entry = None
 
         self.link_data = self.get_clean_link_data()

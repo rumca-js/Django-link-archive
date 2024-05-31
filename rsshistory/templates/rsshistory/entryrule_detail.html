@@ -1,0 +1,27 @@
+{% extends base_generic %}
+{% load static %}
+{% block content %}
+
+<div class="contentbuttonmenu">
+    <a href="{% url 'rsshistory:entry-rule-edit' object.id %}" class="btn btn-primary" role="button">
+       <img src="{% static 'rsshistory/icons/icons8-edit-100.png' %}" class="content-icon" />
+    </a>
+    <a href="{% url 'rsshistory:entry-rule-remove' object.id %}" class="btn btn-primary" role="button">
+       <img src="{% static 'rsshistory/icons/icons8-trash-100.png' %}" class="content-icon" />
+    </a>
+</div>
+
+<h1>Entry Rule</h1>
+
+<p>
+<div>Enabled: {{object.enabled}}</div>
+<div>Rule URL: {{object.rule_url}}</div>
+<div>Block: {{object.block}}</div>
+<div>Name: {{object.rule_name}}</div>
+<div>Auto tag: {{object.auto_tag}}</div>
+<div>Requires selenium: {{object.requies_selenium}}</div>
+<div>Requires selenium full: {{object.requies_selenium_full}}</div>
+<div>ID: {{object.id}}</div>
+</p>
+
+{% endblock %}

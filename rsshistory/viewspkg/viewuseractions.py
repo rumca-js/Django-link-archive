@@ -23,7 +23,7 @@ class AllTags(generic.ListView):
         data = p.check_access()
         if data:
             return redirect("{}:missing-rights".format(LinkDatabase.name))
-        return super(AllTags, self).get(*args, **kwargs)
+        return super().get(*args, **kwargs)
 
     def get_tags_objects(self):
         return CompactedTags.objects.all()

@@ -30,6 +30,9 @@ from .domains import (
 from .keywords import (
     KeyWords,
 )
+from .entryrules import (
+    EntryRule,
+)
 from .useractions import (
     UserTags,
     UserVotes,
