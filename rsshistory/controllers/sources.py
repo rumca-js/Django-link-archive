@@ -174,13 +174,6 @@ class SourceDataController(SourceDataModel):
 
         return obj
 
-    def get_favicon(self):
-        if self.favicon:
-            return self.favicon
-
-        # returning real favicon from HTML is too long
-        return DomainAwarePage(self.url).get_domain() + "/favicon.ico"
-
     def get_domain(self):
         page = DomainAwarePage(self.url)
         return page.get_domain()

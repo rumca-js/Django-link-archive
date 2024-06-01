@@ -50,23 +50,24 @@
   <a href="{{ more_results_link }}" class="btn btn-secondary" role="button">More results</a>
   {% endif %}
 
-  <hr>
-  <div class="container">
-   {% include "rsshistory/pagination.html" %}
-  </div>
+  {% include "rsshistory/pagination.html" %}
 
   {% else %}
     <p>There are no links.</p>
 
+    {% if search_query_add %}
+       <a href="{% url 'rsshistory:entry-add' %}?link={{search_query_add}}" class="btn btn-secondary" role="button">Add this link</a>
+    {% endif %}
+
     <a href="{{ more_results_link }}" class="btn btn-secondary" role="button">More results</a>
   {% endif %}
 
-  <div class="container">
-      <a href="{% url 'rsshistory:entries-json' %}?query_type={{query_type}}&{{ args }}&{{ request.GET.urlencode }}" class="btn btn-secondary" role="button">Show JSON</a>
-      <a href="{% url 'rsshistory:entries' %}?query_type={{query_type}}&{{ args }}&type=clear" class="btn btn-secondary" role="button">Show Clear</a>
-      <a href="{% url 'rsshistory:entries' %}?query_type={{query_type}}&{{ args }}&type=normal" class="btn btn-secondary" role="button">Show Normal</a>
-  </div>
+   <hr/>
+   <a href="{% url 'rsshistory:entries-json' %}?query_type={{query_type}}&{{ args }}&{{ request.GET.urlencode }}" class="btn btn-secondary" role="button">Show JSON</a>
+   <a href="{% url 'rsshistory:entries' %}?query_type={{query_type}}&{{ args }}&type=clear" class="btn btn-secondary" role="button">Show Clear</a>
+   <a href="{% url 'rsshistory:entries' %}?query_type={{query_type}}&{{ args }}&type=normal" class="btn btn-secondary" role="button">Show Normal</a>
 
+<hr/>
 {% include "rsshistory/search_places_element.html" %}
 
 {% endblock %}

@@ -4,7 +4,7 @@ from pathlib import Path
 from .converters import (
     ModelCollectionConverter,
     JsonConverter,
-    MarkDownConverter,
+    MarkDownDynamicConverter,
     RssConverter,
     PageSystem,
 )
@@ -66,7 +66,8 @@ class PermanentEntriesExporter(object):
         file_name = export_path / (export_file_name + "_entries.json")
         file_name.write_text(js_converter.export())
 
-        md = MarkDownConverter(items, self.md_template_bookmarked)
+        column_order = ["title", "link", "date_published", "tags", "date_dead_since"]
+        md = MarkDownDynamicConverter(items, column_order)
         md_text = md.export()
 
         file_name = export_path / (export_file_name + "_entries.md")

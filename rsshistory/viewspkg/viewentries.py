@@ -127,6 +127,11 @@ class EntriesSearchListView(generic.ListView):
 
         context["search_engines"] = SearchEngines(search_term)
 
+        search_term = self.get_search_link(search_term)
+
+        if Url.is_web_link(search_term):
+            context["search_query_add"] = search_term
+
         print(
             "EntriesSearchListView:get_context_data done. View time delta:{}".format(
                 datetime.now() - self.time_start
@@ -134,6 +139,14 @@ class EntriesSearchListView(generic.ListView):
         )
 
         return context
+
+    def get_search_link(self, search_term):
+        if search_term.find("link =") >= 0 or search_term.find("link=") >= 0:
+            wh = search_term.find("=")
+            if wh >= 0:
+                search_term = search_term[wh+1:].strip()
+
+        return search_term
 
     def get_filter(self):
         print("EntriesSearchListView:get_filter")
@@ -592,7 +605,19 @@ def add_entry(request):
         author = request.user.username
         initial = {"user": author}
         if "link" in request.GET:
-            initial["link"] = request.GET["link"]
+            link = request.GET["link"]
+
+            link = UrlHandler.get_cleaned_link(link)
+
+            if not Url.is_web_link(link):
+                p.context[
+                    "summary_text"
+                ] = "Only http links are allowed. Link:{}".format(link)
+                return p.render("summary_present.html")
+
+            data = LinkDataController.get_full_information({"link": link})
+            if data:
+                initial = data
 
         form = EntryForm(initial=initial, request=request)
         form.method = "POST"
@@ -927,7 +952,7 @@ def entries_search_init(request):
     filter_form.method = "GET"
     filter_form.action_url = reverse("{}:entries".format(LinkDatabase.name))
 
-    p.context["form"] = filter_form
+    p.context["filter_form"] = filter_form
 
     search_term = get_search_term_request(request)
     p.context["search_term"] = search_term
@@ -949,7 +974,7 @@ def entries_omni_search_init(request):
     filter_form.method = "GET"
     filter_form.action_url = reverse("{}:entries-omni-search".format(LinkDatabase.name))
 
-    p.context["form"] = filter_form
+    p.context["filter_form"] = filter_form
 
     search_term = get_search_term_request(request)
     p.context["search_term"] = search_term
@@ -967,7 +992,7 @@ def entries_bookmarked_init(request):
     filter_form.method = "GET"
     filter_form.action_url = reverse("{}:entries-bookmarked".format(LinkDatabase.name))
 
-    p.context["form"] = filter_form
+    p.context["filter_form"] = filter_form
 
     search_term = get_search_term_request(request)
     p.context["search_term"] = search_term
@@ -985,7 +1010,7 @@ def entries_recent_init(request):
     filter_form.method = "GET"
     filter_form.action_url = reverse("{}:entries-recent".format(LinkDatabase.name))
 
-    p.context["form"] = filter_form
+    p.context["filter_form"] = filter_form
 
     search_term = get_search_term_request(request)
     p.context["search_term"] = search_term
@@ -1003,7 +1028,7 @@ def entries_archived_init(request):
     filter_form.method = "GET"
     filter_form.action_url = reverse("{}:entries-archived".format(LinkDatabase.name))
 
-    p.context["form"] = filter_form
+    p.context["filter_form"] = filter_form
 
     return p.render("form_search.html")
 

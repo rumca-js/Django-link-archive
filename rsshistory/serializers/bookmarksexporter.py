@@ -7,19 +7,18 @@ import datetime
 from ..models import AppLogging, UserBookmarks, UserTags
 from ..apps import LinkDatabase
 from ..controllers import LinkDataController
+from .converters import (
+    ModelCollectionConverter,
+    JsonConverter,
+    MarkDownDynamicConverter,
+    RssConverter,
+)
 
 
 class BookmarksEntryExporter(object):
     def __init__(self, config, entries):
         self._entries = entries
         self._cfg = config
-
-        self.md_template_bookmarked = ""
-        self.md_template_bookmarked += "## $title\n"
-        self.md_template_bookmarked += " - [$link]($link)\n"
-        self.md_template_bookmarked += " - date published: $date_published\n"
-        self.md_template_bookmarked += " - user: $user\n"
-        self.md_template_bookmarked += " - tags: $tags\n"
 
     def export(self, export_file_name="bookmarks", export_dir="default"):
         if self._entries.count() == 0:
@@ -28,12 +27,6 @@ class BookmarksEntryExporter(object):
         if not export_dir.exists():
             export_dir.mkdir(parents=True, exist_ok=True)
 
-        from .converters import (
-            ModelCollectionConverter,
-            JsonConverter,
-            MarkDownConverter,
-            RssConverter,
-        )
 
         cc = ModelCollectionConverter(self._entries)
         items = cc.get_map_full()
@@ -44,7 +37,9 @@ class BookmarksEntryExporter(object):
         file_name = export_dir / (export_file_name + "_entries.json")
         file_name.write_text(js_converter.export())
 
-        md = MarkDownConverter(items, self.md_template_bookmarked)
+        column_order = ["title", "link", "date_published", "tags", "date_dead_since"]
+
+        md = MarkDownDynamicConverter(items, column_order)
         md_text = md.export()
 
         file_name = export_dir / (export_file_name + "_entries.md")
@@ -169,7 +164,6 @@ class BookmarksExporter(object):
         result_entries = []
 
         if self.username != "" and self.username != None:
-            # TODO
             #users = User.objects.filter(username=self.username)
             #if users.count() > 0:
             #    bookmarks = UserBookmarks.get_user_bookmarks(users[0])

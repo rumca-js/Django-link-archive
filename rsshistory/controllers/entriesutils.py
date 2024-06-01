@@ -639,7 +639,7 @@ class LinkDataWrapper(object):
 
         if objs.count() == 0:
             themap = entry_obj.get_map()
-            themap["source_obj"] = entry_obj.get_source_obj()
+            themap["source_obj"] = entry_obj.source_obj
             themap["domain_obj"] = entry_obj.domain_obj
             try:
                 archive_obj = ArchiveLinkDataController.objects.create(**themap)
@@ -660,7 +660,7 @@ class LinkDataWrapper(object):
         objs = LinkDataController.objects.filter(link=archive_obj.link)
         if objs.count() == 0:
             themap = archive_obj.get_map()
-            themap["source_obj"] = archive_obj.get_source_obj()
+            themap["source_obj"] = archive_obj.source_obj
             themap["domain_obj"] = archive_obj.domain_obj
             try:
                 new_obj = LinkDataController.objects.create(**themap)

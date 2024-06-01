@@ -1,15 +1,6 @@
 {% include "rsshistory/linkdatacontroller_list_actions.html" %}
 
-<form action="{{form.action_url}}" method="{{form.method}}">
-    <table>
-    {{ form }}
-    <tr>
-        <td>
-        <input type="submit" value="Search" class="btn btn-primary" role="button">
-        </td>
-    </tr>
-    </table>
-</form>
+{% include "rsshistory/filterform_basic_element.html" %} 
 
 <div>
 {% include "rsshistory/form_search_syntax_element.html" %} 

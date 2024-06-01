@@ -34,6 +34,9 @@
        {{link.title | slice:":100"}}
   </span>
   <div class="text-reset">
+       {% if link.get_protocol_img %}
+         <img src="{{link.get_protocol_img}}" style="width:1em;height:1em"/>
+       {% endif %}
        {{link.link}}
   </div>
 </a>

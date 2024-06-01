@@ -1,4 +1,4 @@
-from ..serializers.converters import PageSystem
+from ..serializers import PageSystem, MarkDownConverter, MarkDownDynamicConverter
 
 from .fakeinternet import FakeInternetTestCase
 
@@ -112,3 +112,62 @@ class PageSystemSliceRangeTest(FakeInternetTestCase):
         limit = s.get_slice_limits(2)
         self.assertEqual(limit[0], 2000)
         self.assertEqual(limit[1], 2001)
+
+
+class MarkDownConverterTest(FakeInternetTestCase):
+    def setUp(self):
+        self.disable_web_pages()
+
+    def test_constructor(self):
+        item_template = """ - $title
+ - $link
+"""
+
+        items = [
+                {"title": "test_title_01", "link": "https://test-link-01.com"},
+                {"title": "test_title_02", "link": "https://test-link-02.com"},
+        ]
+
+        converter = MarkDownConverter(items, item_template)
+
+        # call tested function
+        text = converter.export()
+
+        expected_text = """ - test_title_01
+ - https://test-link-01.com
+
+ - test_title_02
+ - https://test-link-02.com
+
+"""
+
+        self.assertEqual(text, expected_text)
+
+
+class MarkDownDynamicConverterTest(FakeInternetTestCase):
+    def setUp(self):
+        self.disable_web_pages()
+
+    def test_constructor(self):
+
+        items = [
+                {"title": "test_title_01", "link": "https://test-link-01.com"},
+                {"title": "test_title_02", "link": "https://test-link-02.com"},
+        ]
+
+        column_order = ["title", "link"]
+
+        converter = MarkDownDynamicConverter(items, column_order)
+
+        # call tested function
+        text = converter.export()
+
+        expected_text = """ ## test_title_01
+ - [https://test-link-01.com](https://test-link-01.com)
+
+ ## test_title_02
+ - [https://test-link-02.com](https://test-link-02.com)
+
+"""
+
+        self.assertEqual(text, expected_text)

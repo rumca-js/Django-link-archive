@@ -20,14 +20,6 @@ class LinkDataController(LinkDataModel):
     class Meta:
         proxy = True
 
-    def get_source_obj(self):
-        from .sources import SourceDataController
-
-        if self.source_obj:
-            return SourceDataController.objects.get(id=self.source_obj.id)
-        else:
-            return None
-
     def get_absolute_url(self):
         """Returns the URL to access a particular author instance."""
         return reverse("{}:entry-detail".format(LinkDatabase.name), args=[str(self.id)])
@@ -176,14 +168,6 @@ class ArchiveLinkDataController(ArchiveLinkDataModel):
 
     class Meta:
         proxy = True
-
-    def get_source_obj(self):
-        from .sources import SourceDataController
-
-        if self.source_obj:
-            return SourceDataController.objects.get(id=self.source_obj.id)
-        else:
-            return None
 
     def get_absolute_url(self):
         """Returns the URL to access a particular author instance."""

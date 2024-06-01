@@ -189,9 +189,19 @@ class BaseLinkDataController(BaseLinkDataModel):
                 "{}:entry-detail".format(LinkDatabase.name), args=[str(self.id)]
             )
 
+    def get_protocol_img(self):
+        if self.link.startswith("ftp://"):
+            return static("{0}/icons/icons8-ftp-96.png".format(LinkDatabase.name))
+        elif self.link.startswith("smb://"):
+            return static("{0}/icons/icons8-nas-96.png".format(LinkDatabase.name))
+        elif self.link.startswith("http://"):
+            return static("{0}/icons/icons8-unlocked-96.png".format(LinkDatabase.name))
+        elif self.link.startswith("https://"):
+            return static("{0}/icons/icons8-locked-100.png".format(LinkDatabase.name))
+
     def get_source_name(self):
-        if self.get_source_obj():
-            return self.get_source_obj().title
+        if self.source_obj:
+            return self.source_obj.title
         else:
             return self.source
 
@@ -266,8 +276,8 @@ class BaseLinkDataController(BaseLinkDataModel):
         return result
 
     def update_language(self):
-        if self.get_source_obj():
-            self.language = self.get_source_obj().language
+        if self.source_obj:
+            self.language = self.source_obj.language
             self.save()
         else:
             handler = UrlHandler(self.link)
@@ -284,8 +294,8 @@ class BaseLinkDataController(BaseLinkDataModel):
         if self.age and self.age >= 18:
             return static("{0}/images/sign-304093_640.png".format(LinkDatabase.name))
 
-        if self.get_source_obj():
-            return self.get_source_obj().get_favicon()
+        if self.source_obj:
+            return self.source_obj.get_favicon()
 
         # returning real favicon from HTML is too long
         return DomainAwarePage(self.link).get_domain() + "/favicon.ico"

@@ -4,22 +4,31 @@
 
    {{object_controller.get_frame_html | safe }}
    
-   <div>
-      <h1
-          class="link-title"
-           {% if not object.is_valid %}
-           style="opacity: 0.5"
-           {% endif %}
-          >
-          <a href="{{ object.link }}" title="{{ object.link }}">
-              {% if object.bookmarked %}
-              [{{object.page_rating}}]
+   <a href="{{ object.link }}" title="{{ object.link }}">
+      <div>
+         <h1
+             class="link-title"
+              {% if not object.is_valid %}
+              style="opacity: 0.5"
               {% endif %}
-              {{ object_controller.get_title_html }}
-          </a>
-      </h1>
-      <span>{{object.link}}</span>
-   </div>
+             >
+
+	     <div>
+                 {% if object.bookmarked %}
+                 [{{object.page_rating}}]
+                 {% endif %}
+                 {{ object_controller.get_title_html }}
+	     </div>
+         </h1>
+
+         <span>
+            {% if object.get_protocol_img %}
+              <img src="{{object.get_protocol_img}}" style="width:1em;height:1em"/>
+            {% endif %}
+            {{object.link}}
+         </span>
+      </div>
+   </a>
 
    <div>
      {% include "rsshistory/linkdatacontroller_detail_parameters.html" %}

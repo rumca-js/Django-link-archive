@@ -84,6 +84,9 @@ class ItemConverterFabric(object):
         return self.export_columns
 
     def get_filtered_columns(self):
+        """
+        TODO - misleading. this is not only columns, but also column values
+        """
         if self.export_columns_all:
             return self.items
 
@@ -161,6 +164,63 @@ class CsvConverter(ItemConverterFabric):
 
 
 from string import Template
+
+
+class MarkDownConverter(ItemConverterFabric):
+    def __init__(self, items, item_template):
+        super().__init__(items)
+        self.item_template = item_template
+
+    def export(self):
+        result = ""
+
+        items_data = self.get_filtered_columns()
+        for item in items_data:
+            item_data = self.use_template(item)
+            result += item_data + "\n"
+
+        return result
+
+    def use_template(self, map_data):
+        try:
+            t = Template(self.item_template)
+            return t.safe_substitute(map_data)
+        except Exception as e:
+            error_text = traceback.format_exc()
+            AppLogging.error(
+                "Template exception {0} {1} {2} {3}".format(
+                    self.item_template, str(map_data), str(e), error_text
+                )
+            )
+        return ""
+
+
+class MarkDownDynamicConverter(object):
+    def __init__(self, items, column_order):
+        self.items = items
+        self.column_order = column_order
+
+    def export(self):
+        result = ""
+
+        for item in self.items:
+            column_index = 0
+            for acolumn in self.column_order:
+                if acolumn in item and item[acolumn] != None and item[acolumn] != []:
+                    aproperty_value = item[acolumn]
+
+                    if acolumn == "title":
+                        result += " ## {}\n".format(aproperty_value)
+                    elif acolumn == "link" or acolumn == "url":
+                        result += " - [{}]({})\n".format(aproperty_value, aproperty_value)
+                    else:
+                        result += " - {}: {}\n".format(acolumn, aproperty_value)
+
+                    column_index += 1
+
+            result += "\n"
+
+        return result
 
 
 class MarkDownConverter(ItemConverterFabric):

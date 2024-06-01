@@ -143,7 +143,6 @@ class ConfigForm(forms.ModelForm):
         self.fields["block_keywords"].widget.attrs.update(
             size=self.init.get_cols_size()
         )
-        self.fields["block_urls"].widget.attrs.update(size=self.init.get_cols_size())
 
         if self.init.is_mobile:
             self.fields["user_headers"].widget = forms.Textarea(

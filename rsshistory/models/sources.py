@@ -51,6 +51,14 @@ class SourceDataModel(models.Model):
             SourceCategories.add(source.category)
             SourceSubCategories.add(source.category, source.subcategory)
 
+    def get_favicon(self):
+        if self.favicon:
+            return self.favicon
+
+        # returning real favicon from HTML is too long
+        from ..webtools import DomainAwarePage
+        return DomainAwarePage(self.url).get_domain() + "/favicon.ico"
+
 
 class SourceOperationalData(models.Model):
     date_fetched = models.DateTimeField(null=True)
