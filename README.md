@@ -15,7 +15,7 @@ It does not capture page contents. It captures link meta data: title, descriptio
  - Minimal aesthetic. Dark mode, custom list displays
 
 <div align="center">
-  <img alt="Django Logo" src="images/django_400.png">
+  <img alt="Django Logo" src="images/django_400.png" width="400px">
 </div>
 
 ## Problems with other RSS readers, or apps
@@ -57,6 +57,10 @@ Alternative programs exist.
  - Database of important links: for work, or for school
  - RSS client
  - Data analysis - analyze link rot, how many a page is cited by other sources, analyze link domains
+
+<div align="center">
+  <img alt="Django Logo" src="images/old-wild-west.jpg" width="500px">
+</div>
 
 ## Suite of projects
 
