@@ -94,8 +94,12 @@ class EntriesSearchListView(generic.ListView):
         return objects
 
     def get_order_by(self):
-        config = Configuration.get_object().config_entry
-        return config.get_entries_order_by()
+        if "order" in self.request.GET:
+            order = self.request.GET["order"]
+            return [order]
+        else:
+            config = Configuration.get_object().config_entry
+            return config.get_entries_order_by()
 
     def get_context_data(self, **kwargs):
         print("EntriesSearchListView:get_context_data")

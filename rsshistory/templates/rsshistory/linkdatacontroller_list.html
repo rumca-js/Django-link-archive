@@ -7,8 +7,12 @@
   {% include "rsshistory/filterform_basic_element.html" %}
 
   {% if rss_are_fetched %}
+    <div class="spinner-border text-danger" role="status">
+      <span class="sr-only"></span>
+    </div>
     <span class="error-text">Sources are fetched. Queue size: {{rss_queue_size}} </span>
   {% endif %}
+
   {% if query_filter.is_error %}
   <p class="error-text">There errors with your query</p>
   {% endif %}

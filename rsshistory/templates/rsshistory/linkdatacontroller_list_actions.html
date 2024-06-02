@@ -18,7 +18,7 @@
    </div>
    {% endif %}
    
-   <div class="dropdown">
+   <div class="dropdown mx-1">
        <button class="btn btn-primary" type="button" id="#filtersDrop" data-bs-toggle="dropdown" aria-expanded="false">
          Filters
        </button>
@@ -31,6 +31,10 @@
           <li>
              <a href="{% url 'rsshistory:entries-omni-search' %}?search=bookmarked+%3D+False" class="dropdown-item" title="Shows non bookmarked only">
               Not bookmarked</a>
+          </li>
+          <li>
+             <a href="{% url 'rsshistory:entries-omni-search' %}?search=tags__tag__isnull+%3D+True" class="dropdown-item" title="Shows not tagged entries">
+              Not tagged</a>
           </li>
           <li>
              <a href="{% url 'rsshistory:entries-omni-search' %}?search=page_rating_votes+%3E+0" class="dropdown-item" title="Shows entries with votes">
@@ -61,6 +65,47 @@
           <li>
              <a href="{% url 'rsshistory:entries-omni-search' %}?search=%7E%28manual_status_code+%3D+200+%29" class="dropdown-item" title="Shows invalid manual status code entries">
               Invalid manual status codes</a>
+          </li>
+       </ul>
+   </div>
+
+   <div class="dropdown mx-1">
+       <button class="btn btn-primary" type="button" id="#orderDrop" data-bs-toggle="dropdown" aria-expanded="false">
+         Order
+       </button>
+   
+       <ul class="dropdown-menu">
+          <li>
+		  <a href="{% url 'rsshistory:entries-omni-search' %}?order=page_rating" class="dropdown-item" title="Order by page rating">
+              Page rating</a>
+          </li>
+          <li>
+		  <a href="{% url 'rsshistory:entries-omni-search' %}?order=-page_rating" class="dropdown-item" title="Order by page rating">
+              Page rating</a>
+          </li>
+          <li>
+		  <a href="{% url 'rsshistory:entries-omni-search' %}?order=date_published" class="dropdown-item" title="Order by date published">
+              Date published</a>
+          </li>
+          <li>
+		  <a href="{% url 'rsshistory:entries-omni-search' %}?order=-date_published" class="dropdown-item" title="Order by date published">
+              Date published</a>
+          </li>
+          <li>
+		  <a href="{% url 'rsshistory:entries-omni-search' %}?order=date_updated" class="dropdown-item" title="Order by date updated">
+              Date updated</a>
+          </li>
+          <li>
+		  <a href="{% url 'rsshistory:entries-omni-search' %}?order=-date_updated" class="dropdown-item" title="Order by date updated">
+              Date updated</a>
+          </li>
+          <li>
+		  <a href="{% url 'rsshistory:entries-omni-search' %}?order=link" class="dropdown-item" title="Order by link name">
+              Link</a>
+          </li>
+          <li>
+		  <a href="{% url 'rsshistory:entries-omni-search' %}?order=-link" class="dropdown-item" title="Order by link name">
+              Link</a>
           </li>
        </ul>
    </div>
