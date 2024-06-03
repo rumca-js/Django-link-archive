@@ -169,7 +169,7 @@ You can:
  - define proxy source of automatic import from other link archive instance
  - manually import links from another link archive instance, or
 
-## Proxy sources
+## Proxy sources [under construction]
 
 First lets define a scenario. You have instance A and instance B. Instance B has defined a source.
 
