@@ -170,10 +170,10 @@ class RssPageTest(FakeInternetTestCase):
 
         self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
-    def test_get_body_hash(self):
+    def test_get_contents_body_hash(self):
         # default language
         reader = RssPage("https://linkedin.com/test", webpage_old_pubdate_rss)
-        hash = reader.get_body_hash()
+        hash = reader.get_contents_body_hash()
 
         entries = str(reader.feed.entries)
 

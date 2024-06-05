@@ -118,6 +118,7 @@ class ConfigForm(forms.ModelForm):
             "vote_max",
             "prefer_https",
             # display settings
+            "time_zone",
             "entries_order_by",
             "number_of_comments_per_day",
             "display_style",
@@ -553,8 +554,6 @@ class TagEntryForm(forms.Form):
     """
 
     entry_id = forms.IntegerField(required=False, widget=forms.HiddenInput())
-    user_id = forms.IntegerField(required=False, widget=forms.HiddenInput())
-    user = forms.CharField(max_length=1000)
     tag = forms.CharField(max_length=1000)
 
     def __init__(self, *args, **kwargs):
@@ -874,14 +873,11 @@ class LinkVoteForm(forms.Form):
     """
 
     entry_id = forms.IntegerField(required=False, widget=forms.HiddenInput())
-    user_id = forms.IntegerField(required=False, widget=forms.HiddenInput())
-    user = forms.CharField(max_length=1000)
     vote = forms.IntegerField(initial=0)
 
     def __init__(self, *args, **kwargs):
         self.init = UserRequest(args, kwargs)
         super(LinkVoteForm, self).__init__(*args, **kwargs)
-        self.fields["user"].readonly = True
 
         config = Configuration.get_object().config_entry
 

@@ -100,6 +100,10 @@ class SourceDetailView(generic.DetailView):
         context["page_thumbnail"] = self.object.favicon
         context["search_engines"] = SearchEngines(self.object.title, self.object.url)
 
+        c = Configuration.get_object()
+        if hasattr(self.object, "dynamic_data"):
+            context["date_fetched"] = c.get_local_time(self.object.dynamic_data.date_fetched)
+
         entries = LinkDataController.objects.filter(link=self.object.url)
         if entries.count() > 0:
             context["entry_object"] = entries[0]

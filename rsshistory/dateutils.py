@@ -26,6 +26,34 @@ class DateUtils(object):
         days_diff = time_diff.days
         return days_diff
 
+    def get_local_time(utc_time, time_zone):
+        """
+        Time zone is a string
+        @returns string
+        """
+
+        if not utc_time:
+            return ""
+
+        tzn = timezone(time_zone)
+        local_time = utc_time.astimezone(tzn)
+
+        return local_time.strftime("%Y-%m-%d %H:%M:%S")
+
+    def get_local_time_object(utc_time, time_zone):
+        """
+        Time zone is a string
+        @returns datetime object
+        """
+
+        if not utc_time:
+            return ""
+
+        tzn = timezone(time_zone)
+        local_time = utc_time.astimezone(tzn)
+
+        return local_time
+
     def get_date_yesterday():
         current_date = date.today()
         prev_day = current_date - timedelta(days=1)

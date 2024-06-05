@@ -608,8 +608,9 @@ class ContentInterface(object):
         raise NotImplementedError
 
     def get_contents_hash(self):
-        if self.contents:
-            return calculate_hash(self.contents)
+        contents = self.get_contents()
+        if contents:
+            return calculate_hash(contents)
 
     def get_contents_body_hash(self):
         return self.get_contents_hash()
@@ -1099,7 +1100,7 @@ class RssPage(ContentInterface):
             if entry_props is not None:
                 yield entry_props
 
-    def get_body_hash(self):
+    def get_contents_body_hash(self):
         if not self.contents:
             return
 
@@ -1927,7 +1928,7 @@ class HtmlPage(ContentInterface):
 
         return body_find.get_text()
 
-    def get_body_hash(self):
+    def get_contents_body_hash(self):
         if not self.contents:
             return
 
@@ -1942,6 +1943,22 @@ class HtmlPage(ContentInterface):
             AppLogging.error("HTML: Cannot calculate body hash for:{}".format(self.url))
             if self.contents:
                 return calculate_hash(self.contents)
+
+    def is_pwa(self):
+        """
+        @returns true, if it is progressive web app
+        """
+        if self.get_pwa_manifest():
+            return True
+
+    def get_pwa_manifest(self):
+        link_finds = self.soup.find_all("link", attrs={"rel": "manifest"})
+
+        for link_find in link_finds:
+            if link_find and link_find.has_attr("href"):
+                manifest_path = link_find["href"]
+
+                return manifest_path
 
 
 class XmlPage(ContentInterface):
@@ -2021,10 +2038,13 @@ class PageResponseObject(object):
             return self.headers["content-type"]
 
     def get_last_modified(self):
+        date = None
         if "Last-Modified" in self.headers:
-            return self.headers["Last-Modified"]
+            date = self.headers["Last-Modified"]
         if "last-modified" in self.headers:
-            return self.headers["Last-Modified"]
+            date = self.headers["Last-Modified"]
+
+        return date_str_to_date(date)
 
     def get_content_type_charset(self):
         content = self.get_content_type()
@@ -2123,6 +2143,9 @@ class PageResponseObject(object):
             return False
 
         return True
+
+    def get_status_code(self):
+        return self.status_code
 
 
 class RequestsPage(object):
@@ -2814,12 +2837,12 @@ class Url(ContentInterface):
             return
 
         if contents:
-            if not self.response or self.response.is_headers_empty() or self.response.is_content_html():
+            if not self.response or self.response.get_content_type() is None or self.response.is_content_html():
                 p = HtmlPage(url, contents)
                 if p.is_valid():
                     return p
 
-            if not self.response or self.response.is_headers_empty() or self.response.is_content_rss():
+            if not self.response or self.response.get_content_type() is None or self.response.is_content_rss():
                 p = RssPage(url, contents)
                 if p.is_valid():
                     return p
@@ -3095,6 +3118,9 @@ class Url(ContentInterface):
             return False
 
         return self.p.is_cloudflare_protected()
+
+    def get_response(self):
+        return self.response
 
 
 class InputContent(object):

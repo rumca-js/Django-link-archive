@@ -130,6 +130,8 @@ def tag_entry(request, pk):
             args["user_id"] = request.user.id
             args["user"] = request.user
             args["entry_id"] = entry.id
+            args["entry"] = entry
+
             UserTags.set_tags(entry, args["tag"], user=request.user)
 
             return HttpResponseRedirect(
@@ -152,7 +154,7 @@ def tag_entry(request, pk):
         user = request.user
         tag_string = UserTags.get_user_tag_string(request.user, entry)
 
-        data_init = {"entry_id": entry.id, "user_id": user.id, "user": user.username}
+        data_init = {"entry_id": entry.id}
 
         if tag_string:
             data_init["tag"] = tag_string
@@ -408,8 +410,6 @@ def entry_vote(request, pk):
         form = LinkVoteForm(
             initial={
                 "entry_id": obj.id,
-                "user_id": request.user.id,
-                "user": user,
                 "vote": vote,
             }
         )

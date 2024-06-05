@@ -112,6 +112,7 @@ class SourceExportHistory(models.Model):
 
     def is_update_required(export):
         from ..dateutils import DateUtils
+        from ..configuration import Configuration
 
         try:
             yesterday = DateUtils.get_date_yesterday()
@@ -123,7 +124,12 @@ class SourceExportHistory(models.Model):
             if history.count() != 0:
                 return False
 
-            if datetime.now().time() < export.export_time:
+            c = Configuration.get_object()
+
+            now = DateUtils.get_datetime_now_utc()
+            local = c.get_local_time_object(now)
+
+            if local.time() < export.export_time:
                 return False
 
             return True

@@ -40,13 +40,15 @@ class BaseLinkDataModel(models.Model):
     )
 
     # date when link was created in DB
-    date_created = models.DateTimeField(auto_now_add=True, null=True)
+    date_created = models.DateTimeField(auto_now_add=True, null=True, help_text="Date when entry was created in the database")
     # date when link was introduced to the internet
-    date_published = models.DateTimeField(default=timezone.now)
+    date_published = models.DateTimeField(default=timezone.now, help_text="Date when page was published")
     # date when link was accessed last by scanned
-    date_update_last = models.DateTimeField(auto_now=True, null=True)
+    date_update_last = models.DateTimeField(auto_now=True, null=True, help_text="Date when page was last checked")
     # date when link was found dead
-    date_dead_since = models.DateTimeField(null=True)
+    date_dead_since = models.DateTimeField(null=True, help_text="Date when page became inactive")
+    # date of last modification
+    date_last_modified = models.DateTimeField(null=True, help_text="Date of last page modification")
 
     # this entry cannot be removed. Serves a purpose. Domain page, source page
     permanent = models.BooleanField(
@@ -81,6 +83,9 @@ class BaseLinkDataModel(models.Model):
     page_rating_votes = models.IntegerField(default=0)
     page_rating_visits = models.IntegerField(default=0)
     page_rating = models.IntegerField(default=0)
+
+    contents_hash = models.BinaryField(max_length=30, null=True)
+    body_hash = models.BinaryField(max_length=30, null=True)
 
     class Meta:
         abstract = True
@@ -126,50 +131,6 @@ class BaseLinkDataModel(models.Model):
             self.language = None
 
         super().save(*args, **kwargs)
-
-
-'''
-class EntryOperationData(models.Model):
-
-    #entry_obj = models.ForeignKey(
-    #    BaseLinkDataModel,
-    #    on_delete=models.SET_NULL,
-    #    related_name="entry_data",
-    #    null=True,
-    #    blank=True,
-    #    unique=True,
-    #)
-
-    # for example from headers last modified, if no such header is present incremented with each time body_hash changes
-    date_last_modified = models.DateTimeField(null=True)
-
-    contents_hash = models.BinaryField(max_length=30, null=True)
-    body_hash = models.BinaryField(max_length=30, null=True)
-
-    def update(entry):
-        """
-        TODO cleanup.
-
-        Removed when link is removed
-        """
-        h = UrlHandler(entry.link)
-
-        op_entries = EntryOperationData.objects.filter(entry_obj = entry)
-        if op_entries.count() == 0:
-            EntryOperationData.objects.create(entry_obj = entry, date_last_modified = h.get_last_modified(), content_hash = h.get_hash(),
-                    body_hash = h.get_body_hash())
-        else:
-            op_entry = op_entries[0]
-            op_entry.date_last_modified = h.get_last_modified()
-            op_entry.content_hash = h.get_hash()
-            op_entry.body_hash = h.get_body_hash()
-
-    def delete_all():
-        """
-        These information can be re-fetched from the internet
-        """
-        EntryOperationData.objects.all().delete()
-'''
 
 
 class BaseLinkDataController(BaseLinkDataModel):
@@ -239,6 +200,11 @@ class BaseLinkDataController(BaseLinkDataModel):
             string += " User:{}".format(self.user)
 
         return string
+
+    def get_local_date_published(self):
+        from ..configuration import Configuration
+        c = Configuration.get_object()
+        return c.get_local_time(self.date_published)
 
     def get_tag_string(self):
         try:

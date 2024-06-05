@@ -197,12 +197,67 @@ class TestResponseObject(PageResponseObject):
         self.apparent_encoding = encoding
         self.encoding = encoding
 
+        self.set_headers(url)
+        self.set_status(url)
+
+    def set_headers(self, url):
+        if url == "https://page-with-last-modified-header.com":
+            self.headers["Last-Modified"] = "Wed, 03 Apr 2024 09:39:30 GMT"
+
+    def set_status(self, url):
+        if url.startswith("https://www.youtube.com/watch?v=666"):
+            self.status_code = 500
+
+        elif url == "https://invalid.rsspage.com/rss.xml":
+            self.status_code = 500
+
+        elif url == "https://page-with-http-status-500.com":
+            self.status_code = 500
+
+        elif url == "https://page-with-http-status-400.com":
+            self.status_code = 400
+
+        elif url == "https://page-with-http-status-300.com":
+            self.status_code = 300
+
+        elif url == "https://page-with-http-status-200.com":
+            self.status_code = 200
+
+        elif url == "https://page-with-http-status-100.com":
+            self.status_code = 100
+
+        elif url == "http://page-with-http-status-500.com":
+            self.status_code = 500
+
+        elif url == "http://page-with-http-status-400.com":
+            self.status_code = 400
+
+        elif url == "http://page-with-http-status-300.com":
+            self.status_code = 300
+
+        elif url == "http://page-with-http-status-200.com":
+            self.status_code = 200
+
+        elif url == "http://page-with-http-status-100.com":
+            self.status_code = 100
+
+        elif url == "https://page-with-https-status-200-http-status-500.com":
+            self.status_code = 200
+
+        elif url == "http://page-with-https-status-200-http-status-500.com":
+            self.status_code = 500
+
+        elif url == "https://page-with-https-status-500-http-status-200.com":
+            self.status_code = 500
+
+        elif url == "http://page-with-https-status-500-http-status-200.com":
+            self.status_code = 200
+
     def get_contents(self, url):
         if url.startswith("https://youtube.com/channel/"):
             return self.get_contents_youtube_channel(url)
 
         if url.startswith("https://www.youtube.com/watch?v=666"):
-            self.status_code = 500
             return webpage_no_pubdate_rss
 
         if url.startswith("https://www.youtube.com/feeds"):
@@ -236,7 +291,6 @@ class TestResponseObject(PageResponseObject):
             return webpage_samtime_youtube_rss
 
         elif url == "https://invalid.rsspage.com/rss.xml":
-            self.status_code = 500
             return ""
 
         elif url == "https://simple-rss-page.com/rss.xml":
@@ -277,47 +331,6 @@ class TestResponseObject(PageResponseObject):
         elif url == "https://page-with-real-rss-link.com":
             return webpage_with_real_rss_links
 
-        elif url == "https://page-with-http-status-500.com":
-            self.status_code = 500
-
-        elif url == "https://page-with-http-status-400.com":
-            self.status_code = 400
-
-        elif url == "https://page-with-http-status-300.com":
-            self.status_code = 300
-
-        elif url == "https://page-with-http-status-200.com":
-            self.status_code = 200
-
-        elif url == "https://page-with-http-status-100.com":
-            self.status_code = 100
-
-        elif url == "http://page-with-http-status-500.com":
-            self.status_code = 500
-
-        elif url == "http://page-with-http-status-400.com":
-            self.status_code = 400
-
-        elif url == "http://page-with-http-status-300.com":
-            self.status_code = 300
-
-        elif url == "http://page-with-http-status-200.com":
-            self.status_code = 200
-
-        elif url == "http://page-with-http-status-100.com":
-            self.status_code = 100
-
-        elif url == "https://page-with-https-status-200-http-status-500.com":
-            self.status_code = 100
-
-        elif url == "http://page-with-https-status-200-http-status-500.com":
-            self.status_code = 500
-
-        elif url == "https://page-with-https-status-500-http-status-200.com":
-            self.status_code = 500
-
-        elif url == "http://page-with-https-status-500-http-status-200.com":
-            self.status_code = 200
 
         elif url.startswith("https://instance.com/apps/rsshistory"):
             return self.get_contents_instance(url)
@@ -354,6 +367,9 @@ class TestResponseObject(PageResponseObject):
             b.og_description = "LinkedIn Page og:description"
             b.body_text = """LinkedIn body"""
             return b.build_contents()
+
+        if url == "https://page-with-last-modified-header.com":
+            return webpage_html_favicon
 
         elif url.endswith("robots.txt"):
             return """  """

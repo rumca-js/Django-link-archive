@@ -32,7 +32,7 @@
     {% if object.proxy_location %}
     <div class="mx-2"><strong>Proxy location:</strong><a href="{{ object.proxy_location }}">{{ object.proxy_location }}</a></div>
     {% endif %}
-    <div class="text-nowrap mx-2"><strong>Fetched:</strong>{{object.dynamic_data.date_fetched}}</div>
+    <div class="text-nowrap mx-2"><strong>Fetched:</strong>{{date_fetched}}</div>
     <div class="text-nowrap mx-2"><strong>Import seconds:</strong>{{object.dynamic_data.import_seconds}}</div>
     <div class="text-nowrap mx-2"><strong>Consecutive Errors:</strong>{{object.dynamic_data.consecutive_errors}}</div>
 </div>

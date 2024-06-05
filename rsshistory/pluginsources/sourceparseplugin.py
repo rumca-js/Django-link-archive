@@ -77,6 +77,6 @@ class BaseParsePlugin(SourceGenericPlugin):
 
         p = HtmlPage(url, contents)
         if p.is_valid:
-            return p.get_body_hash()
+            return p.get_contents_body_hash()
         else:
             return self.get_contents_hash()

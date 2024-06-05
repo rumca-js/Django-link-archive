@@ -236,11 +236,27 @@ class UserVotes(models.Model):
         return 0
 
     def save_vote(input_data):
-        entry_id = input_data["entry_id"]
-        user = input_data["user"]
-        vote = input_data["vote"]
+        entry = None
+        user = None
 
-        entry = LinkDataModel.objects.get(id=entry_id)
+        if "entry_id" in input_data:
+            entry_id = input_data["entry_id"]
+            entry = LinkDataModel.objects.get(id=entry_id)
+        if "entry" in input_data:
+            entry = input_data["entry"]
+
+        if "user" in input_data:
+            user = input_data["user"]
+
+        if not entry:
+            AppLogging.error("Missing entry for vote")
+            return
+
+        if not user:
+            AppLogging.error("Missing user for vote")
+            return
+
+        vote = input_data["vote"]
 
         return UserVotes.add(user, entry, vote)
 

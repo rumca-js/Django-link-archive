@@ -39,8 +39,8 @@ class EntryUrlInterface(object):
         self.h = UrlHandler(self.url, page_options=self.options)
         self.response = self.h.response
 
-        if self.h.response:
-            self.url = self.h.response.url
+        if self.response:
+            self.url = self.response.url
 
         if not self.ignore_errors and not self.h.is_valid():
             if self.log:
@@ -65,6 +65,12 @@ class EntryUrlInterface(object):
 
         if props:
             self.update_info_default(props, source_obj)
+
+            # some Internet sources provide invalid publication date
+
+            if "date_published" in props:
+                if props["date_published"] > DateUtils.get_datetime_now_utc():
+                    props["date_published"] = DateUtils.get_datetime_now_utc()
 
         elif ignore_errors:
             """
@@ -312,6 +318,13 @@ class EntryUrlInterface(object):
             input_props["page_rating"] = 0  # unset
         if not self.is_property_set(input_props, "status_code"):
             input_props["status_code"] = self.h.get_status_code()
+        if not self.is_property_set(input_props, "contents_hash"):
+            input_props["contents_hash"] = self.h.get_contents_hash()
+        if not self.is_property_set(input_props, "contents_body_hash"):
+            input_props["contents_body_hash"] = self.h.get_contents_body_hash()
+        if not self.is_property_set(input_props, "date_last_modified"):
+            if self.response:
+                input_props["date_last_modified"] = self.response.get_last_modified()
 
         """
         Sometimes we want thumbnail sometimes we want favicon.

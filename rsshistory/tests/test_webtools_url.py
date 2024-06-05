@@ -204,3 +204,15 @@ class UrlTest(FakeInternetTestCase):
         self.assertEqual(handler.options.use_selenium_headless, True)
 
         self.assertEqual(MockRequestCounter.mock_page_requests, 1)
+
+    def test_get_last_modified(self):
+        MockRequestCounter.mock_page_requests = 0
+
+        handler = Url("https://page-with-last-modified-header.com")
+
+        response = handler.get_response()
+
+        self.assertTrue(response)
+
+        last_modified = response.get_last_modified()
+        self.assertTrue(last_modified)

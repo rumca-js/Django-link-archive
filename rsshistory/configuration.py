@@ -18,7 +18,7 @@ version is split into three digits:
  if a change requires the model to be changed, then second digit is updated, patch is set to 0
  if something should be released to public, then release version changes
 """
-__version__ = "0.64.2"
+__version__ = "0.65.0"
 
 
 from pathlib import Path
@@ -154,6 +154,30 @@ class Configuration(object):
         users = User.objects.filter(is_superuser=True)
         if users.count() > 0:
             return users[0]
+
+    def get_local_time(self, utc_time):
+        """
+        We can configure system to display various time zones
+        @return time string, in local time
+        """
+        from .dateutils import DateUtils
+
+        config = self.config_entry
+        time_zone = config.time_zone
+
+        return DateUtils.get_local_time(utc_time, time_zone)
+
+    def get_local_time_object(self, utc_time):
+        """
+        We can configure system to display various time zones
+        @return time string, in local time
+        """
+        from .dateutils import DateUtils
+
+        config = self.config_entry
+        time_zone = config.time_zone
+
+        return DateUtils.get_local_time_object(utc_time, time_zone)
 
     def get_blocked_keywords(self):
         result = []

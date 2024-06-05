@@ -3,7 +3,7 @@ from django.templatetags.static import static
 
 from ...apps import LinkDatabase
 from ...models import ConfigurationEntry, UserConfig
-from ...controllers import LinkDataController
+from ...controllers import LinkDataController, SearchEngineGoogleCache
 from ...webtools import DomainAwarePage, InputContent
 from ...configuration import Configuration
 from ...dateutils import DateUtils
@@ -462,10 +462,24 @@ class EntryGenericPlugin(object):
         buttons.append(
             EntryButton(
                 self.user,
-                "View on Archive.org",
+                "Archived page",
                 archive_link,
                 ConfigurationEntry.ACCESS_TYPE_ALL,
                 "Archive link: {}".format(archive_link),
+                "https://archive.org/offshoot_assets/favicon.ico",
+            ),
+        )
+
+        e = SearchEngineGoogleCache(self.entry.link)
+        cache_link = e.get_search_string()
+
+        buttons.append(
+            EntryButton(
+                self.user,
+                "Cached page",
+                cache_link,
+                ConfigurationEntry.ACCESS_TYPE_ALL,
+                "Cache link: {}".format(cache_link),
                 "https://archive.org/offshoot_assets/favicon.ico",
             ),
         )
@@ -525,12 +539,15 @@ class EntryGenericPlugin(object):
     def get_parameters(self):
         parameters = []
 
-        date = DateUtils.get_display_date(self.entry.date_published)
-        parameters.append(EntryParameter("Publish date", date))
+        c = Configuration.get_object()
+        date_published = c.get_local_time(self.entry.date_published)
+        parameters.append(EntryParameter("Publish date", date_published))
 
         return parameters
 
     def get_parameters_operation(self):
+        c = Configuration.get_object()
+
         parameters = []
 
         points_text = "P:{}|C:{}|V:{}".format(
@@ -545,8 +562,11 @@ class EntryGenericPlugin(object):
         )
         parameters.append(EntryParameter("Points", points_text, points_title))
 
-        update_date = DateUtils.get_display_date(self.entry.date_update_last)
+        update_date = c.get_local_time(self.entry.date_update_last)
         parameters.append(EntryParameter("Update date", update_date))
+
+        modified_date = c.get_local_time(self.entry.date_last_modified)
+        parameters.append(EntryParameter("Modified date", modified_date))
 
         parameters.append(EntryParameter("Status code", self.entry.status_code))
 
@@ -555,7 +575,7 @@ class EntryGenericPlugin(object):
             parameters.append(
                 EntryParameter("Manual status", self.entry.manual_status_code)
             )
-            date_dead_since = DateUtils.get_display_date(self.entry.date_dead_since)
+            date_dead_since = c.get_local_time(self.entry.date_dead_since)
             parameters.append(EntryParameter("Dead since", date_dead_since))
 
         # Artist & album are displayed in buttons

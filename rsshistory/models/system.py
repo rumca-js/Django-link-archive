@@ -214,6 +214,8 @@ class ConfigurationEntry(models.Model):
         help_text="Page that is pinged to check if Internet is OK",
     )
 
+    time_zone = models.CharField(max_length=50, default="UTC", help_text = "List of available timezones can be found at https://en.wikipedia.org/wiki/List_of_tz_database_time_zones. For example Europe/Warsaw")
+
     def get():
         """
         Most probably should not be used directly. Should be cached in application

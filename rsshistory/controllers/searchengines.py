@@ -1,3 +1,5 @@
+import urllib.parse
+
 class SearchEngine(object):
     def __init__(self, query_term=None, url=None):
         self.query_term = query_term
@@ -59,7 +61,29 @@ class SearchEngineGoogle(SearchEngine):
         return "Google"
 
     def get_search_address(self):
-        return "https://google.com/"
+        return "https://google.com/search"
+
+
+class SearchEngineGoogleCache(SearchEngine):
+    def get_name(self):
+        return "GoogleCache"
+
+    def get_search_address(self):
+        return "http://webcache.googleusercontent.com/search"
+
+    def get_search_argument(self):
+        return "q"
+
+    def encode_url(self, url):
+        return urllib.parse.quote(url)
+
+    def get_search_string(self, search_term=None):
+        if not search_term:
+            search_term = self.query_term
+
+        return "{}?{}=cache:{}".format(
+            self.get_search_address(), self.get_search_argument(), self.encode_url(search_term)
+        )
 
 
 class SearchEngineArchiveOrg(SearchEngine):
@@ -316,6 +340,7 @@ class SearchEngines(object):
         return [
             # search engines
             SearchEngineGoogle,
+            SearchEngineGoogleCache,
             SearchEngineDuckDuckGo,
             SearchEngineBing,
             SearchEngineKagi,

@@ -309,14 +309,29 @@ class UrlPropertyValidator(object):
         if self.is_site_not_found():
             return False
 
-        if self.is_title_blocked():
+        if self.is_porn_blocked():
+            return False
+
+        if self.is_casino_blocked():
             return False
 
         return True
 
     def get_title(self):
         if "title" in self.properties:
+            if self.properties["title"] is None:
+                return ""
             return self.properties["title"]
+        else:
+            return ""
+
+    def get_description(self):
+        if "description" in self.properties:
+            if self.properties["description"] is None:
+                return ""
+            return self.properties["description"]
+        else:
+            return ""
 
     def is_site_not_found(self):
         title = self.get_title()
@@ -339,15 +354,12 @@ class UrlPropertyValidator(object):
             LinkDatabase.info("Title is invalid {}".format(title))
             return True
 
-    def is_title_blocked(self):
+    def is_porn_blocked(self):
         """
         TODO This should be configurable - move to configuration
         """
         title = self.get_title()
-        if title:
-            title = title.lower()
-        else:
-            title = ""
+        title = title.lower()
 
         for keyword in self.blocked_keywords:
             if title.find(keyword) >= 0:
@@ -365,4 +377,23 @@ class UrlPropertyValidator(object):
             if title.find(keyword) >= 0:
                 points += 1
 
-        return points > 2
+        return points > 3
+
+    def is_casino_blocked(self):
+        """
+        TODO This should be configurable - move to configuration
+        """
+        title = self.get_title()
+        title = title.lower()
+
+        description = self.get_description()
+        description = description.lower()
+
+        text = title + "\n" + description
+
+        keywords = ["casino", "lotter", "bingo", "slot", "poker"]
+
+        for keyword in keywords:
+            sum = text.count(keyword)
+
+        return sum > 3

@@ -241,6 +241,60 @@ class EntryUpdater(object):
     def __init__(self, entry):
         self.entry = entry
 
+    def is_entry_changed(self, url_handler):
+        entry = self.entry
+
+        response = url_handler.get_response()
+        if not response:
+            return True
+
+        last_modified_date = response.get_last_modified()
+        if last_modified_date:
+            if not entry.date_last_modified:
+                return True
+
+            if last_modified_date > entry.date_last_modified:
+                return True
+
+            return False
+
+        body_hash = url_handler.get_contents_body_hash()
+        if body_hash:
+            if not entry.body_hash:
+                return True
+
+            if entry.body_hash == body_hash:
+                return False
+
+            return True
+
+        contents_hash = url_handler.get_contents_hash()
+        if contents_hash:
+            if not entry.contents_hash:
+                return True
+
+            if entry.contents_hash == contents_hash:
+                return False
+
+            return True
+
+        return True
+
+    def update_entry(self, url_handler):
+        entry = self.entry
+
+        response = url_handler.get_response()
+        if response:
+            entry.date_last_modified = response.get_last_modified()
+            entry.status_code = response.get_status_code()
+        entry.date_update_last = DateUtils.get_datetime_now_utc()
+
+        entry.body_hash = url_handler.get_contents_body_hash()
+        entry.contents_hash = url_handler.get_contents_hash()
+        entry.page_rating_contents = url_handler.get_page_rating()
+
+        entry.save()
+
     def update_data(self):
         from ..pluginurl import EntryUrlInterface
         """
@@ -260,14 +314,9 @@ class EntryUpdater(object):
         props = url.get_props()
         p = url.p
 
-        # always update
-        if url.p:
-            entry.page_rating_contents = url.p.get_page_rating()
-        if url.h:
-            entry.status_code = url.h.get_status_code()
-        entry.save()
+        entry_changed = self.is_entry_changed(url.h)
 
-        response = url.get_response()
+        self.update_entry(url.h)
 
         if not url.is_valid():
             self.handle_invalid_response(url)
@@ -277,7 +326,8 @@ class EntryUpdater(object):
         if not props or len(props) == 0:
             return
 
-        self.add_links_from_url(entry, url)
+        if entry_changed:
+            self.add_links_from_url(entry, url)
 
         if entry.date_dead_since:
             entry.date_dead_since = None
@@ -319,11 +369,9 @@ class EntryUpdater(object):
         url = EntryUrlInterface(entry.link)
         props = url.get_props()
 
-        if url.p:
-            entry.page_rating_contents = url.p.get_page_rating()
-        if url.h:
-            entry.status_code = url.h.get_status_code()
-        entry.save()
+        entry_changed = self.is_entry_changed(url.h)
+
+        self.update_entry(url.h)
 
         if not url.is_valid():
             self.handle_invalid_response(url)
@@ -333,7 +381,8 @@ class EntryUpdater(object):
         if not props or len(props) == 0:
             return
 
-        self.add_links_from_url(entry, url)
+        if entry_changed:
+            self.add_links_from_url(entry, url)
 
         if entry.date_dead_since:
             entry.date_dead_since = None

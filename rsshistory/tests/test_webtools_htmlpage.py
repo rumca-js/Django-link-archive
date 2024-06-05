@@ -214,6 +214,20 @@ webpage_html_schema_fields_nested = """
  </body>
 """
 
+webpage_progressive_web_app = """<html>
+<head>
+ <description>selected meta description</description>
+ <meta property="og:description" content="selected og:description" />
+ <meta itemprop="datePublished" content="2024-01-11T09:00:07-00:00">
+ <meta itemprop="uploadDate" content="2024-01-11T09:00:07-00:00">
+ <meta itemprop="genre" content="Science &amp; Technology">
+ <link rel="manifest" href="test_page_manifest.json" />
+ </head>
+    <body>
+    </body>
+</html>
+"""
+
 
 class HtmlPageTest(FakeInternetTestCase):
     def test_default_language(self):
@@ -451,13 +465,13 @@ class HtmlPageTest(FakeInternetTestCase):
 
         self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
-    def test_get_body_hash(self):
+    def test_get_contents_body_hash(self):
         MockRequestCounter.mock_page_requests = 0
 
         reader = HtmlPage(
             "https://linkedin.com/test", webpage_meta_youtube_publish_date
         )
-        hash = reader.get_body_hash()
+        hash = reader.get_contents_body_hash()
         bodytext = str(reader.get_body_text())
 
         self.assertTrue(bodytext)
@@ -519,3 +533,23 @@ class HtmlPageTest(FakeInternetTestCase):
             reader.get_schema_field_ex("http://schema.org/Person", "url"),
             "http://www.youtube.com/@someotherchannel",
         )
+
+    def test_is_pwa(self):
+        page = HtmlPage(
+            "https://linkedin.com/test", webpage_progressive_web_app
+        )
+
+        self.assertTrue( page.is_pwa())
+
+        page = HtmlPage(
+            "https://linkedin.com/test", webpage_html_schema_fields_nested
+        )
+
+        self.assertFalse( page.is_pwa())
+
+    def test_get_pwa_manifest(self):
+        page = HtmlPage(
+            "https://linkedin.com/test", webpage_progressive_web_app
+        )
+
+        self.assertEqual( page.get_pwa_manifest(), "test_page_manifest.json")

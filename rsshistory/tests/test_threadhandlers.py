@@ -413,6 +413,13 @@ class RefreshThreadHandlerTest(FakeInternetTestCase):
         handler = RefreshThreadHandler()
         handler.refresh()
 
+        persistent_objects = AppLogging.objects.all()
+
+        for persistent_object in persistent_objects:
+            print("Persisten object info:{}".format(persistent_object.info))
+
+        self.assertEqual(persistent_objects.count(), 0)
+
         self.assertEqual(
             BackgroundJobController.objects.filter(
                 job=BackgroundJobController.JOB_PROCESS_SOURCE
@@ -427,12 +434,6 @@ class RefreshThreadHandlerTest(FakeInternetTestCase):
             1,
         )
 
-        persistent_objects = AppLogging.objects.all()
-
-        for persistent_object in persistent_objects:
-            print("Persisten object info:{}".format(persistent_object.info))
-
-        self.assertEqual(persistent_objects.count(), 0)
         self.assertEqual(SourceExportHistory.objects.all().count(), 3)
 
     def test_process_with_exports(self):

@@ -32,4 +32,4 @@ from .entriesutils import (
     EntryScanner,
 )
 
-from .searchengines import SearchEngines
+from .searchengines import SearchEngines, SearchEngineGoogle, SearchEngineGoogleCache

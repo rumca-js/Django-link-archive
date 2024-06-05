@@ -153,7 +153,9 @@ def system_status(request):
     system = SystemOperation.get()
 
     p.context["is_internet_connection_ok"] = system.is_internet_connection_ok
-    p.context["last_refresh_datetime"] = system.last_refresh_datetime
+
+    last_refresh_datetime = c.get_local_time(system.last_refresh_datetime)
+    p.context["last_refresh_datetime"] = last_refresh_datetime
 
     p.context["ConfigurationEntry"] = ConfigurationEntry.objects.count()
     p.context["UserConfig"] = UserConfig.objects.count()
@@ -179,7 +181,8 @@ def system_status(request):
     from ..dateutils import DateUtils
     from datetime import timedelta
 
-    p.context["DateTime_Current"] = DateUtils.get_datetime_now_utc()
+    now = c.get_local_time(DateUtils.get_datetime_now_utc())
+    p.context["DateTime_Current"] = now
 
     conf = c.config_entry
     if conf.days_to_move_to_archive != 0:
