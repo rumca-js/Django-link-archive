@@ -65,12 +65,7 @@ class EntryUrlInterface(object):
 
         if props:
             self.update_info_default(props, source_obj)
-
-            # some Internet sources provide invalid publication date
-
-            if "date_published" in props:
-                if props["date_published"] > DateUtils.get_datetime_now_utc():
-                    props["date_published"] = DateUtils.get_datetime_now_utc()
+            self.fix_properties(props)
 
         elif ignore_errors:
             """
@@ -337,6 +332,22 @@ class EntryUrlInterface(object):
         if is_domain and not self.is_property_set(input_props, "thumbnail"):
             if type(p) is HtmlPage and self.h:
                 input_props["thumbnail"] = self.h.get_favicon()
+
+        return input_props
+
+    def fix_properties(self, input_props=None):
+        if not input_props:
+            input_props = {}
+            # some Internet sources provide invalid publication date
+
+            if self.is_property_set(input_props, "date_published"):
+                if input_props["date_published"] > DateUtils.get_datetime_now_utc():
+                    input_props["date_published"] = DateUtils.get_datetime_now_utc()
+
+            if self.is_property_set(input_props, "date_last_modified") and \
+               self.is_property_set(input_props, "date_published"):
+               if input_props["date_last_modified"] < input_props["date_published"]:
+                   input_props["date_published"] = input_props["date_last_modified"]
 
         return input_props
 

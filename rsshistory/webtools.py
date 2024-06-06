@@ -90,11 +90,14 @@ def date_str_to_date(date_str):
             parsed_date = parser.parse(date_str)
             return DateUtils.to_utc_date(parsed_date)
         except Exception as E:
+            stack_lines = traceback.format_stack()
+            stack_str = ''.join(stack_lines)
+
             error_text = traceback.format_exc()
 
             AppLogging.error(
-                "Could not parse date:{}\nExc:{}\n{}".format(
-                    date_str, str(E), error_text
+                "Could not parse date:{}\nExc:{}\n{}\nStack:{}".format(
+                    date_str, str(E), error_text, stack_str
                 )
             )
 

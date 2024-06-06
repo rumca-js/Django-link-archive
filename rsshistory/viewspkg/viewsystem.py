@@ -188,7 +188,7 @@ def system_status(request):
     if conf.days_to_move_to_archive != 0:
         current_time = DateUtils.get_datetime_now_utc()
         days_before = current_time - timedelta(days=conf.days_to_move_to_archive)
-        p.context["DateTime_MoveToArchive"] = days_before
+        p.context["DateTime_MoveToArchive"] = c.get_local_time(days_before)
 
     p.context["AppLogging"] = AppLogging.objects.count()
     p.context["Domains"] = Domains.objects.count()

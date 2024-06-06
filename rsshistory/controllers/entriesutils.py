@@ -293,6 +293,11 @@ class EntryUpdater(object):
         entry.contents_hash = url_handler.get_contents_hash()
         entry.page_rating_contents = url_handler.get_page_rating()
 
+        # if server says that entry was last modified in 2006, then it was present in 2006!
+        if entry.date_last_modified:
+            if not entry.date_published or entry.date_last_modified < entry.date_published:
+                entry.date_published = entry.date_last_modified
+
         entry.save()
 
     def update_data(self):

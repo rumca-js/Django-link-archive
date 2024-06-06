@@ -363,6 +363,11 @@ class AppLogging(models.Model):
     class Meta:
         ordering = ["-date", "level"]
 
+    def get_local_time(self):
+        from ..configuration import Configuration
+        c = Configuration.get_object()
+        return c.get_local_time(self.date)
+
     def info(info_text, level=int(logging.INFO), user=None):
         """
         TODO errors are not created exactly as we do commonly. Date shoudl be added via dateutils

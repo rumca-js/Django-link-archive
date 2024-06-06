@@ -30,8 +30,8 @@
          class="bg-danger"
      {% endif %}
 	    style="display:flex; flex-wrap: wrap;">
-       <div>Date: {{info.date}}</div>
-       <div>Level: {{info.level}}</div>
+       <div class="mx-1">Time: {{info.get_local_time}}</div>
+       <div class="mx-1">Level: {{info.level}}</div>
     </div>
     <div style="margin-bottom: 2%"><pre>{{info.info_text | safe}}</pre></div>
     {% endfor %}
