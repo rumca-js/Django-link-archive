@@ -403,15 +403,9 @@ class SourceDataBuilder(object):
         """
         Category and subcategory names can be empty, then objects are not set
         """
+        self.add_entry()
+
         try:
-            from .backgroundjob import BackgroundJobController
-
-            properties = {"permament": True}
-
-            BackgroundJobController.link_add(
-                self.link_data["url"], properties=properties
-            )
-
             # TODO add domain when adding new source
             source = SourceDataController.objects.create(**self.link_data)
             return source
@@ -419,6 +413,15 @@ class SourceDataBuilder(object):
             error_text = traceback.format_exc()
             LinkDatabase.error("Cannot create source:{}\n{}".format(str(E), error_text))
             AppLogging.error("Cannot create source:{}\n{}".format(str(E), error_text))
+
+    def add_entry(self):
+        from .backgroundjob import BackgroundJobController
+
+        properties = {"permament": True}
+
+        BackgroundJobController.link_add(
+            self.link_data["url"], properties=properties
+        )
 
     def get_clean_data(self):
         result = {}

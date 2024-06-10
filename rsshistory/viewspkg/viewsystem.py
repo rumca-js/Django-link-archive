@@ -444,6 +444,36 @@ def backgroundjobs_perform_all(request):
     return HttpResponseRedirect(reverse("{}:backgroundjobs".format(LinkDatabase.name)))
 
 
+def backgroundjobs_enable_all(request):
+    p = ViewPage(request)
+    p.set_title("Enables all background jobs")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    jobs = BackgroundJobController.objects.all()
+    for job in jobs:
+        job.enabled = True
+        job.save()
+
+    return HttpResponseRedirect(reverse("{}:backgroundjobs".format(LinkDatabase.name)))
+
+
+def backgroundjobs_disable_all(request):
+    p = ViewPage(request)
+    p.set_title("Disables all background jobs")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    jobs = BackgroundJobController.objects.all()
+    for job in jobs:
+        job.enabled = False
+        job.save()
+
+    return HttpResponseRedirect(reverse("{}:backgroundjobs".format(LinkDatabase.name)))
+
+
 def backgroundjobs_remove(request, job_type):
     p = ViewPage(request)
     p.set_title("Remove background jobs")

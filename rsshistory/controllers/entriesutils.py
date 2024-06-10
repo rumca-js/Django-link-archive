@@ -331,6 +331,8 @@ class EntryUpdater(object):
         if not props or len(props) == 0:
             return
 
+        self.check_for_sources(entry, url)
+
         if entry_changed:
             self.add_links_from_url(entry, url)
 
@@ -386,6 +388,8 @@ class EntryUpdater(object):
         if not props or len(props) == 0:
             return
 
+        self.check_for_sources(entry, url)
+
         if entry_changed:
             self.add_links_from_url(entry, url)
 
@@ -409,12 +413,40 @@ class EntryUpdater(object):
 
         self.update_calculated_vote()
 
-    def add_links_from_url(self, entry, url):
-        scanner = EntryScanner(url = url.url, entry=entry, contents = url.p.get_contents())
+    def add_links_from_url(self, entry, url_interface):
+        url_handler = url_interface.h
+
+        if not url_handler:
+            return
+
+        if not url_handler.p:
+            return
+
+        scanner = EntryScanner(url = url_handler.url, entry=entry, contents = url_handler.p.get_contents())
         scanner.run()
 
     def reset_local_data(self):
         self.update_calculated_vote()
+
+    def check_for_sources(self, entry, url_interface):
+        conf = Configuration.get_object().config_entry
+
+        if not conf.auto_store_sources:
+            return
+
+        url_handler = url_interface.h
+
+        if not url_handler:
+            return
+
+        if not url_handler.p:
+            return
+
+        if url_handler.is_html():
+            rss_urls = url_handler.p.get_rss_urls()
+
+            for rss_url in rss_urls:
+                SourceDataBuilder(link=rss_url).add_from_link()
 
     def calculate_vote(self):
         """
@@ -1242,7 +1274,6 @@ class EntryDataBuilder(object):
         self.add_sub_links()
         self.add_keywords()
         self.add_domain()
-        # self.add_sources()
 
     def add_domain(self):
         url = DomainAwarePage(self.link_data["link"]).get_domain()
@@ -1301,27 +1332,6 @@ class EntryDataBuilder(object):
         if config.auto_store_keyword_info:
             if "title" in link_data:
                 KeyWords.add_link_data(link_data)
-
-    def add_sources(self):
-        # TODO if it is RSS link (link_data["link"]), should we also add a source?
-
-        link_props = self.link_data
-
-        conf = Configuration.get_object().config_entry
-
-        if not conf.auto_store_sources:
-            return
-
-        link = link_props["link"]
-        if "contents" in link_props:
-            html = HtmlPage(link, link_props["contents"])
-        else:
-            html = HtmlPage(link)
-
-        rss_urls = html.get_rss_urls()
-
-        for rss_url in rss_urls:
-            SourceDataBuilder(link=rss_url).add_from_link()
 
     def read_domains_from_bookmarks():
         objs = LinkDataController.objects.filter(bookmarked=True)

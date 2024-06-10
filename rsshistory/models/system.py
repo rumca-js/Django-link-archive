@@ -239,6 +239,18 @@ class ConfigurationEntry(models.Model):
         result_list = [item.strip() for item in input_string.split(delimiter)]
         return result_list
 
+    def save(self, *args, **kwargs):
+        """
+        Fix errors here
+        """
+
+        try:
+           tzn = timezone(self.time_zone)
+        except Exception as E:
+            self.time_zone = "UTC"
+
+        super().save(*args, **kwargs)
+
 
 class SystemOperation(models.Model):
     last_refresh_datetime = models.DateTimeField(auto_now_add=True)

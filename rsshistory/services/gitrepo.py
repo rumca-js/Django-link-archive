@@ -98,7 +98,7 @@ class GitRepo(object):
     def is_different(self):
         p = subprocess.run(
             ["git", "diff", "--exit-code"],
-            cwd=self.get_operating_dir(),
+            cwd=self.get_local_dir(),
             timeout=self.timeout_s,
             capture_output=True,
         )

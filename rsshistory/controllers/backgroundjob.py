@@ -176,6 +176,12 @@ class BackgroundJobController(BackgroundJob):
 
         entry = w.get()
         if entry:
+            if properties is not None:
+                if "permanent" in properties:
+                    entry.permanent = properties["permanent"]
+                if "bookmarked" in properties:
+                    entry.bookmarked = properties["bookmarked"]
+            entry.save()
             return
 
         cfg = {}

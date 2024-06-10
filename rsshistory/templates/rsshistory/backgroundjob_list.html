@@ -10,6 +10,12 @@
     <a href="{% url 'rsshistory:backgroundjobs-check-new' %}" title="Checks if it is time for a new job" class="btn btn-primary" role="button">
        <img src="{% static 'rsshistory/icons/icons8-update-100.png' %}" class="content-icon" />
     </a>
+    <a href="{% url 'rsshistory:backgroundjobs-enable-all' %}" title="Enables all background jobs" class="btn btn-primary" role="button" title="Enable all">
+       <img src="{% static 'rsshistory/icons/icons8-play-100.png' %}" class="content-icon" />
+    </a>
+    <a href="{% url 'rsshistory:backgroundjobs-disable-all' %}" title="Disable all background jobs" class="btn btn-primary" role="button" title="Disable all">
+       <img src="{% static 'rsshistory/icons/icons8-pause-squared-100.png' %}" class="content-icon" />
+    </a>
     <a href="{% url 'rsshistory:backgroundjobs-remove-all' %}" title="Removes all background jobs" class="btn btn-primary" role="button" title="Remove all">
         <img src="{% static 'rsshistory/icons/icons8-trash-multiple-100.png' %}" class="content-icon" />
     </a>

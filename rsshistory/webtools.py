@@ -1747,7 +1747,6 @@ class HtmlPage(ContentInterface):
         rss_links = (
             self.find_feed_links("application/rss+xml")
             + self.find_feed_links("application/atom+xml")
-            + self.find_feed_links("application/rss+xml;charset=UTF-8")
         )
 
         if not rss_links:
@@ -1765,12 +1764,16 @@ class HtmlPage(ContentInterface):
         )
 
     def find_feed_links(self, feed_type):
-        feed_finds = self.soup.find_all("link", attrs={"type": feed_type})
-        return [
-            feed_find["href"]
-            for feed_find in feed_finds
-            if feed_find and feed_find.has_attr("href")
-        ]
+        result_links = []
+
+        found_elements = self.soup.find_all("link")
+        for found_element in found_elements:
+            if found_element.has_attr("type"):
+                link_type = str(found_element["type"])
+                if link_type.find(feed_type) >= 0:
+                    result_links.append(found_element["href"])
+
+        return result_links
 
     def get_links(self):
         p = ContentLinkParser(self.url, self.contents)
@@ -2039,6 +2042,9 @@ class PageResponseObject(object):
             return self.headers["Content-Type"]
         if "content-type" in self.headers:
             return self.headers["content-type"]
+
+    def get_headers(self):
+        return self.headers
 
     def get_last_modified(self):
         date = None
@@ -2789,7 +2795,19 @@ class BasePage(object):
            timeout_s=timeout_s,
            ping=True,
         )
-        return response.is_valid()
+        return response is not None and response.is_valid()
+
+    def get_headers(self, timeout_s=5):
+        url = self.url
+
+        response = self.get_contents_function(
+           url = url,
+           headers=self.headers,
+           timeout_s=timeout_s,
+           ping=True,
+        )
+        if response and response.is_valid():
+            return response.get_headers()
 
 
 class Url(ContentInterface):
@@ -2840,12 +2858,12 @@ class Url(ContentInterface):
             return
 
         if contents:
-            if not self.response or self.response.get_content_type() is None or self.response.is_content_html():
+            if not self.response or self.response.get_content_type() is None or self.is_html():
                 p = HtmlPage(url, contents)
                 if p.is_valid():
                     return p
 
-            if not self.response or self.response.get_content_type() is None or self.response.is_content_rss():
+            if not self.response or self.response.get_content_type() is None or self.is_rss():
                 p = RssPage(url, contents)
                 if p.is_valid():
                     return p
@@ -2865,6 +2883,14 @@ class Url(ContentInterface):
         if self.response and self.response.is_valid():
             p = DefaultContentPage(url, contents)
             return p
+
+    def is_html(self):
+        if self.response and self.response.get_content_type() is not None and self.response.is_content_html():
+            return True
+
+    def is_rss(self):
+        if self.response and self.response.get_content_type() is not None and self.response.is_content_rss():
+            return True
 
     def get_type(url):
         """
