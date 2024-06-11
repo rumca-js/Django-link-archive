@@ -36,6 +36,7 @@ from ..forms import (
     ConfigForm,
     EntryBookmarksChoiceForm,
     EntryRecentChoiceForm,
+    EntryArchiveForm,
     OmniSearchForm,
     OmniSearchWithArchiveForm,
 )

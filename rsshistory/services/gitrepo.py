@@ -10,6 +10,7 @@ class GitRepo(object):
         self.git_repo = git_data.remote_path
         self.timeout_s = timeout_s
         self.operating_dir = self.git_data.local_path
+        self.is_different_flag = None
 
     def get_local_dir(self):
         """
@@ -50,7 +51,8 @@ class GitRepo(object):
         self.check_process(p)
 
     def commit(self, commit_message):
-        if not self.is_different():
+        self.is_different_flag = self.is_different()
+        if not self.is_different_flag:
             return
 
         p = subprocess.run(
@@ -62,7 +64,7 @@ class GitRepo(object):
         self.check_process(p)
 
     def push(self):
-        if not self.is_different():
+        if not self.is_different_flag:
             return
 
         token = self.git_data.password

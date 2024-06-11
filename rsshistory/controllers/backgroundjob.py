@@ -361,6 +361,9 @@ class BackgroundJobController(BackgroundJob):
             if not entry.is_update_time():
                 return
 
+        if BackgroundJobController.is_update_or_reset_entry_job(entry):
+             return
+
         return BackgroundJobController.create_single_job(
             BackgroundJob.JOB_LINK_UPDATE_DATA, entry.link
         )
@@ -378,6 +381,9 @@ class BackgroundJobController(BackgroundJob):
         if not force:
             if not entry.is_reset_time():
                 return
+
+        if BackgroundJobController.is_update_or_reset_entry_job(entry):
+             return
 
         return BackgroundJobController.create_single_job(
             BackgroundJob.JOB_LINK_RESET_DATA, entry.link
@@ -400,3 +406,20 @@ class BackgroundJobController(BackgroundJob):
         return BackgroundJobController.create_single_job(
             BackgroundJob.JOB_IMPORT_INSTANCE, link, author
         )
+
+    def is_update_or_reset_job():
+        condition_reset = Q(job = BackgroundJob.JOB_LINK_RESET_DATA)
+        condition_update = Q(job = BackgroundJob.JOB_LINK_UPDATE_DATA)
+        condition_enabled = Q(enabled=True)
+        
+        objs = BackgroundJobController.objects.filter(condition_enabled & (condition_update | condition_reset))
+        return objs.count() > 0
+
+    def is_update_or_reset_entry_job(entry):
+        condition_reset = Q(job = BackgroundJob.JOB_LINK_RESET_DATA)
+        condition_update = Q(job = BackgroundJob.JOB_LINK_UPDATE_DATA)
+        condition_enabled = Q(enabled=True)
+        condition_subject = Q(subject=entry.link)
+        
+        objs = BackgroundJobController.objects.filter(condition_subject & condition_enabled & (condition_update | condition_reset))
+        return objs.count() > 0

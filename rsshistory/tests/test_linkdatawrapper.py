@@ -330,6 +330,35 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         self.assertTrue(result.is_archive_entry())
         self.assertEqual(result.domain_obj, domain_obj)
 
+    def test_make_bookmarked_archived(self):
+        link_name = "https://youtube.com/v=12345"
+
+        link_data = {
+            "link": link_name,
+            "source": "https://youtube.com",
+            "title": "test",
+            "description": "description",
+            "language": "en",
+            "thumbnail": "https://youtube.com/favicon.ico",
+            "date_published": DateUtils.get_datetime_now_utc() - timedelta(days=365),
+        }
+
+        archive_entry = ArchiveLinkDataController.objects.create(**link_data)
+
+        # call tested function
+        result = LinkDataWrapper.make_bookmarked(
+            DjangoRequestObject(self.user_staff), archive_entry
+        )
+
+        self.assertTrue(result)
+        self.assertTrue(not result.is_archive_entry())
+
+        objs = LinkDataController.objects.filter(link=link_name)
+        self.assertEqual(objs.count(), 1)
+        obj = objs[0]
+
+        self.assertTrue(obj.bookmarked == True)
+
     def test_move_from_archive(self):
         link_name = "https://youtube.com/v=12345"
 

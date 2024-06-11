@@ -392,6 +392,44 @@ class EntriesViewsTests(FakeInternetTestCase):
         bookmarks = UserBookmarks.objects.filter(entry_object=entry)
         self.assertEqual(bookmarks.count(), 0)
 
+    def test_archive_entry_bookmark(self):
+        test_link = "https://www.youtube.com/watch?v=123"
+
+        entry = ArchiveLinkDataController.objects.create(
+            source="https://linkedin.com",
+            link=test_link,
+            title="The first link",
+            description="the first link description",
+            source_obj=None,
+            bookmarked=False,
+            permanent=False,
+            date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
+            language="en",
+        )
+
+        self.client.login(username="testuser", password="testpassword")
+        url = reverse("{}:entry-archive-bookmark".format(LinkDatabase.name), args=[entry.id])
+
+        # call user action
+        response = self.client.get(url)
+
+        page_source = response.content.decode("utf-8")
+        # print("Contents: {}".format(page_source))
+        # print(response)
+
+        self.assertEqual(response.status_code, 302)
+
+        entries = LinkDataController.objects.filter(link=test_link)
+        self.assertTrue(entries.count() > 0)
+
+        entry = entries[0]
+
+        self.assertTrue(entry.bookmarked)
+        self.assertFalse(entry.permanent)
+
+        bookmarks = UserBookmarks.objects.filter(entry_object=entry)
+        self.assertEqual(bookmarks.count(), 1)
+
     def test_entry_dead(self):
         test_link = "https://www.youtube.com/watch?v=123"
 

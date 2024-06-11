@@ -44,6 +44,8 @@ class SourceUrlInterface(object):
             props["age"] = 0
         if "status_code" not in props:
             props["status_code"] = self.h.get_status_code()
+        if "language" not in props or props["language"] is None:
+            props["language"] = ""
 
         return props
 

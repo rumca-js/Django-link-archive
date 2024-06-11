@@ -348,6 +348,7 @@ class SourceDataBuilder(object):
             self.add_from_props()
 
     def add_from_link(self):
+        from ..pluginurl import UrlHandler
         rss_url = self.link
 
         if rss_url.endswith("/"):
@@ -406,7 +407,8 @@ class SourceDataBuilder(object):
         self.add_entry()
 
         try:
-            # TODO add domain when adding new source
+            if "language" not in self.link_data or self.link_data["language"] is None:
+                self.link_data["language"] = ""
             source = SourceDataController.objects.create(**self.link_data)
             return source
         except Exception as E:

@@ -755,12 +755,13 @@ class LinkDataWrapper(object):
 
             except Exception as e:
                 error_text = traceback.format_exc()
-                LinkDatabase.error(error_text)
+                AppLogging.error(error_text)
         else:
             try:
-                entry.delete()
+                archive_obj.delete()
             except Exception as e:
                 error_text = traceback.format_exc()
+                AppLogging.error(error_text)
 
     def move_from_entry_to_entry(entry_obj, destination_entry):
         """
@@ -806,10 +807,13 @@ class LinkDataWrapper(object):
         """
         TODO move this API to UserBookmarks
         """
-        UserBookmarks.add(request.user, entry)
-
         if entry.is_archive_entry():
             entry = LinkDataWrapper.move_from_archive(entry)
+            if not entry:
+                AppLogging.error("Coult not move from archive")
+                return
+
+        UserBookmarks.add(request.user, entry)
 
         if request.user.is_staff:
             entry.make_bookmarked()

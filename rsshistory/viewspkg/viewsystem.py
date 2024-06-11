@@ -79,6 +79,7 @@ def configuration_advanced_page(request):
         form = ConfigForm(request.POST, instance=ob, request=request)
         if form.is_valid():
             form.save()
+            return HttpResponseRedirect(reverse("{}:admin-page".format(LinkDatabase.name)))
         else:
             p.set_variable("summary_text", "Form is invalid")
             return p.render("summary_present.html")

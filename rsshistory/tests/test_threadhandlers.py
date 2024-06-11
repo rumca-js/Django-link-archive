@@ -32,6 +32,7 @@ from .fakeinternet import FakeInternetTestCase
 class HandlerManagerTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
+        self.setup_configuration()
 
         ob = SourceDataController.objects.create(
             url="https://youtube.com", title="YouTube", category="No", subcategory="No"
@@ -716,6 +717,7 @@ class ProcessSourceHandlerTest(FakeInternetTestCase):
         LinkDataController.objects.all().delete()
         DomainsController.objects.all().delete()
         SourceDataController.objects.all().delete()
+        BackgroundJobController.objects.all().delete()
 
         SourceDataController.objects.create(
             url="https://www.youtube.com/feeds/channel=samtime"
@@ -739,6 +741,7 @@ class ProcessSourceHandlerTest(FakeInternetTestCase):
         self.assertEqual(result, True)
 
         subjects = BackgroundJobController.objects.values_list("job", flat=True)
+
         self.assertEqual(len(subjects), 2)
         # still process source is present
         self.assertTrue("process-source" in subjects)

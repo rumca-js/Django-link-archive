@@ -994,8 +994,7 @@ class RefreshThreadHandler(object):
         BackgroundJobController.make_cleanup()
 
     def is_no_backgroundjob_active(self):
-        objs = BackgroundJobController.objects.filter(enabled=True)
-        return objs.count() == 0
+        return BackgroundJobController.is_update_or_reset_job() == False
 
     def update_entry(self):
         u = EntriesUpdater()

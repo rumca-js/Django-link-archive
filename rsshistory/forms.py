@@ -170,6 +170,7 @@ class DataExportForm(forms.ModelForm):
             "remote_path",
             "user",
             "password",
+            "db_user",
             "export_entries",
             "export_entries_bookmarks",
             "export_entries_permanents",

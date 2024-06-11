@@ -44,7 +44,7 @@ class BaseLinkDataModel(models.Model):
     # date when link was introduced to the internet
     date_published = models.DateTimeField(default=timezone.now, help_text="Date when page was published")
     # date when link was accessed last by scanned
-    date_update_last = models.DateTimeField(auto_now=True, null=True, help_text="Date when page was last checked")
+    date_update_last = models.DateTimeField(null=True, help_text="Date when page was last checked")
     # date when link was found dead
     date_dead_since = models.DateTimeField(null=True, help_text="Date when page became inactive")
     # date of last modification
@@ -551,11 +551,17 @@ class BaseLinkDataController(BaseLinkDataModel):
         return True
 
     def is_update_time(self):
+        if self.date_update_last is None:
+            return True
+
         return self.date_update_last < DateUtils.get_datetime_now_utc() - timedelta(
             days=30
         )
 
     def is_reset_time(self):
+        if self.date_update_last is None:
+            return True
+
         return self.date_update_last < DateUtils.get_datetime_now_utc() - timedelta(
             days=1
         )

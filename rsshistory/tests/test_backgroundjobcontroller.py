@@ -10,6 +10,7 @@ from .fakeinternet import FakeInternetTestCase
 class BackgroundJobControllerTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
+        self.setup_configuration()
 
         BackgroundJobController.objects.all().delete()
 
@@ -326,3 +327,39 @@ class BackgroundJobControllerTest(FakeInternetTestCase):
                 BackgroundJob.JOB_LINK_UPDATE_DATA
             ),
         )
+
+    def test_update_or_reset_entry(self):
+        entry = LinkDataController.objects.all()[0]
+        entry.date_update_last = None
+        entry.save()
+
+        # call tested functions
+        BackgroundJobController.entry_update_data(entry)
+        # call tested functions
+        BackgroundJobController.entry_reset_data(entry)
+
+        # there can only be update, or reset job
+
+        jobs = BackgroundJobController.objects.all()
+        self.assertTrue(jobs.count(), 1)
+
+        job = jobs[0]
+        self.assertEqual(job.job, BackgroundJobController.JOB_LINK_UPDATE_DATA)
+
+    def test_reset_or_update_entry(self):
+        entry = LinkDataController.objects.all()[0]
+        entry.date_update_last = None
+        entry.save()
+
+        # call tested functions
+        BackgroundJobController.entry_reset_data(entry)
+        # call tested functions
+        BackgroundJobController.entry_update_data(entry)
+
+        # there can only be update, or reset job
+
+        jobs = BackgroundJobController.objects.all()
+        self.assertTrue(jobs.count(), 1)
+
+        job = jobs[0]
+        self.assertEqual(job.job, BackgroundJobController.JOB_LINK_RESET_DATA)
