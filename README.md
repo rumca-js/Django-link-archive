@@ -19,41 +19,6 @@ It does not capture page contents. It captures link meta data: title, descriptio
   <img alt="Django Logo" src="images/django_400.png" width="400px">
 </div>
 
-## Problems with other RSS readers, or apps
-
- - some clients are not open source, or are not self-hosted
- - some programs are not programs from users perspective, but a service: Feedly, Pockets, Readwise Reader. They require account. Their Terms and service can change
- - most programs fail to provide consistent and exhaustive search ability (NextCloud "News" application, Thunderbird, Feeder Android app, Newsboat Linux app)
- - most programs do not provide ability to add tag to a link (Thunderbird, Android Feeder app)
- - some programs do not provide link rating
- - most programs do not provide easy export / import
- - Scale: Lemmy software is replacement for Reddit, but requires a lot of resources to operate. This project aims to provide "single user" experience
- - Goal: Reddit, Lemmy aim is to provide social media experience, this project aims to grant the ability to create database of links
- - License: Reddit is a nice project, but it is not entirely open source
- - Interface: Most of the RSS programs are GUI: Thunderbird, Feeder. I wanted a server app, that can be accessed from anywhere
- - Import/export. Some programs do not provide any standard to exchange link information, or do not provide any data at all
-
-## Alternatives
-
-Alternative programs exist.
-
- - [Grimoire](https://github.com/goniszewski/grimoire)
- - [BookmarkOS](https://bookmarkos.com/)
- - [Raindrop](https://raindrop.io/)
- - [LinkAce](https://www.linkace.org/)
- - [Hoarder](https://hoarder.app/)
- - [GGather](https://web.ggather.com/)
- - [Zotero](https://www.zotero.org/)
- - [OneKeep](https://onekeep.com/)
- - [Lasso](https://www.lasso.net/go/)
- - [CarryLinks](https://carrylinks.com/)
- - [Zlinky](https://zlinky.com/)
- - [wakelet](https://wakelet.com/)
- - [Booky](https://booky.io/)
- - [Webtag](https://webtag.io/)
- - [Historious](https://historio.us/)
- - [Knowies](https://www.knowies.com)
-
 ## Project use cases
 
  - YouTube filter. You add only your own subscriptions. You can categorize, filter entries from your sources
@@ -62,6 +27,18 @@ Alternative programs exist.
  - RSS client
  - data analysis - analyze link rot, how many a page is cited by other sources, analyze link domains
  - simple search engine
+
+## Problems with other RSS readers, or apps
+
+ - License: some clients are not open source, or not entirely open source (for example Reddit). Some programs are not programs from users perspective, but a service: Feedly, Pockets, Readwise Reader. They require account. Their Terms and service can change
+ - Interface: Most of the RSS programs are GUI: Thunderbird, Feeder. I wanted a web page, an app that can be accessed from anywhere
+ - missing search ability (NextCloud "News" application, Thunderbird, Feeder Android app, Newsboat Linux app)
+ - missing tag support (Thunderbird, Android Feeder app)
+ - some programs do not provide link rating
+ - Import / Export: most programs do not provide easy way to do that (I want JSON files!)
+ - Scale: Some projects are BIG. This project focuses on providing "single user" experience. I do not want many dependencies here
+ - Goal: Reddit, Lemmy aim is to provide social media experience, this project aims to grant the ability to create database of links
+
 
 <div align="center">
   <img alt="Django Logo" src="images/old-wild-west.jpg" width="500px">
@@ -86,6 +63,27 @@ Alternative programs exist.
  - [https://renegat0x0.ddns.net/apps/various/](https://renegat0x0.ddns.net/apps/various/) - 'verious' demo instance
  - [Notes about search industry](https://github.com/rumca-js/Django-link-archive/blob/main/README_search.md)
  - [Data analysis](https://github.com/rumca-js/Django-link-archive/blob/main/analysis/readme.md)
+
+## Alternatives
+
+Alternative programs do exist.
+
+ - [Grimoire](https://github.com/goniszewski/grimoire)
+ - [BookmarkOS](https://bookmarkos.com/)
+ - [Raindrop](https://raindrop.io/)
+ - [LinkAce](https://www.linkace.org/)
+ - [Hoarder](https://hoarder.app/)
+ - [GGather](https://web.ggather.com/)
+ - [Zotero](https://www.zotero.org/)
+ - [OneKeep](https://onekeep.com/)
+ - [Lasso](https://www.lasso.net/go/)
+ - [CarryLinks](https://carrylinks.com/)
+ - [Zlinky](https://zlinky.com/)
+ - [wakelet](https://wakelet.com/)
+ - [Booky](https://booky.io/)
+ - [Webtag](https://webtag.io/)
+ - [Historious](https://historio.us/)
+ - [Knowies](https://www.knowies.com)
 
 # How does it work?
 
