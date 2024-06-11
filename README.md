@@ -8,8 +8,9 @@ It does not capture page contents. It captures link meta data: title, descriptio
  - organize bookmarks, with tags
  - link search functionality. Does not use elastic search
  - maintains website metadata (title, description, thumbnail, etc). It is not [archive.org](https://archive.org) replacement
- - extendable via plugins. RSS feed support. Web page parsing support
- - add personal comments to links
+ - extendable via plugins. RSS feed support
+ - web page parsing capabilities
+ - users can comment, tag, rate links
  - supports data import and export. This is most important functionality, as files are more important than the APP itself (file over app strategy)
  - It is not a search engine. Suggesting better alternatives: [whoogle-search](https://github.com/benbusby/whoogle-search), or [Marginalia search](https://search.marginalia.nu/), or [Apache Lucene](https://lucene.apache.org/)
  - Minimal aesthetic. Dark mode, custom list displays
@@ -20,11 +21,12 @@ It does not capture page contents. It captures link meta data: title, descriptio
 
 ## Problems with other RSS readers, or apps
 
- - Most clients are not open source, or are not self-hosted
- - Most RSS clients do not allow manual link input
- - Some programs are not programs from users perspective, but a service: Feedly, Pockets, Readwise Reader. They require account. Their Terms and service can change
- - Most programs fail to provide consistent and exhaustive search ability (NextCloud "News" application, Thunderbird, Feeder Android app, Newsboat Linux app)
- - Most programs do not provide ability to add tag to a link (Thunderbird, Android Feeder app)
+ - some clients are not open source, or are not self-hosted
+ - some programs are not programs from users perspective, but a service: Feedly, Pockets, Readwise Reader. They require account. Their Terms and service can change
+ - most programs fail to provide consistent and exhaustive search ability (NextCloud "News" application, Thunderbird, Feeder Android app, Newsboat Linux app)
+ - most programs do not provide ability to add tag to a link (Thunderbird, Android Feeder app)
+ - some programs do not provide link rating
+ - most programs do not provide easy export / import
  - Scale: Lemmy software is replacement for Reddit, but requires a lot of resources to operate. This project aims to provide "single user" experience
  - Goal: Reddit, Lemmy aim is to provide social media experience, this project aims to grant the ability to create database of links
  - License: Reddit is a nice project, but it is not entirely open source
@@ -36,9 +38,12 @@ It does not capture page contents. It captures link meta data: title, descriptio
 Alternative programs exist.
 
  - [Grimoire](https://github.com/goniszewski/grimoire)
+ - [BookmarkOS](https://bookmarkos.com/)
+ - [Raindrop](https://raindrop.io/)
  - [LinkAce](https://www.linkace.org/)
  - [Hoarder](https://hoarder.app/)
  - [GGather](https://web.ggather.com/)
+ - [Zotero](https://www.zotero.org/)
  - [OneKeep](https://onekeep.com/)
  - [Lasso](https://www.lasso.net/go/)
  - [CarryLinks](https://carrylinks.com/)
@@ -47,16 +52,16 @@ Alternative programs exist.
  - [Booky](https://booky.io/)
  - [Webtag](https://webtag.io/)
  - [Historious](https://historio.us/)
- - [Raindrop](https://raindrop.io/)
  - [Knowies](https://www.knowies.com)
 
-## Possible use cases
+## Project use cases
 
  - YouTube filter. You add only your own subscriptions. You can categorize, filter entries from your sources
- - Link aggregator. Similar to Lemmy, Reddit
- - Database of important links: for work, or for school
+ - link aggregator. Similar to Lemmy, Reddit
+ - database of important links: for work, or for school
  - RSS client
- - Data analysis - analyze link rot, how many a page is cited by other sources, analyze link domains
+ - data analysis - analyze link rot, how many a page is cited by other sources, analyze link domains
+ - simple search engine
 
 <div align="center">
   <img alt="Django Logo" src="images/old-wild-west.jpg" width="500px">
@@ -84,12 +89,10 @@ Alternative programs exist.
 
 # How does it work?
 
- - First define a RSS source in "Sources" page, or you manually add a link in "Sources" page
- - Every day your bookmarks are exported to a repository, if configured
- - Each new link adds its domain into the 'Domains' pool, if configured
- - Each new link adds words from its title into the 'KeyWords' pool, if configured
- - You can monitor what kinds of domains were added by the links to you system
- - You can monitor what kind of words generate most buzz
+ - first define a RSS source in "Sources" page, or you manually add a link in "Sources" page
+ - RSS sources are checked for new links
+ - new links are inserted into database
+ - every day your bookmarks can be exported to a repository, if configured
 
 # Ranking algorithm
 
