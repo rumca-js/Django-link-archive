@@ -87,10 +87,11 @@ Alternative programs do exist.
 
 # How does it work?
 
- - first define a RSS source in "Sources" page, or you manually add a link in "Sources" page
- - RSS sources are checked for new links
+ - first define a RSS source in "Sources" page
+ - RSS sources are checked from time to time if they have new links
  - new links are inserted into database
  - every day your bookmarks can be exported to a repository, if configured
+ - new links are used to populate popular "keywords"
 
 # Ranking algorithm
 
@@ -239,15 +240,20 @@ User actions are tracked by the system, only if it is configured so:
 
 Development is described by a separate README: [README_development.md](https://github.com/rumca-js/Django-link-archive/blob/main/README_development.md).
 
-# Analysis of tools and services
+# Additional notes
+
+What grinds my gears?
+ - Google does not provide easy way to see cached site, like archive.org. They have it, they just do not let you access it
+ - It is not easy to discover new places on the Internet. When did you found any 'new' site worth seeing? A blog? Personal site? Google has index of billions of pages, yet the Internet looks empty
+ - Old web page will never be at first place in Google Search
+ - There is no button in Google search to translate the destination link
+ - YouTube provides "related" section for videos. Why Google does not provide 'related' link list in search?
+ - It is really difficult to find anything about Amiga, or old tech stuff
 
 Archive.org:
  - Is not reliable. Sometimes it gets painfully slow. It is still better than nothing
  - Most mainstream media RSS is covered, but the coverage is spotty. Not all days are covered
  - Internet Archive (archive.org) does not provide snapshots for each and every day for all RSS sources. It is sometimes pretty slow. We would like to be sure that a such snapshot takes place. Therefore we need to export links to daily repo ourselves. Django RSS app also makes requests to archive to make the snapshots
-
-archive.ph:
- - does not support link + date URL interface
 
 # Legal
 
