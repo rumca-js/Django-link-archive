@@ -81,8 +81,8 @@ Alternative programs exist.
  - [Screenshots](https://github.com/rumca-js/Django-link-archive/blob/main/README_ui.md)
  - [Installation, configuration](https://github.com/rumca-js/Django-link-archive/blob/main/README_install.md)
  - [https://renegat0x0.ddns.net/apps/rsshistory/](https://renegat0x0.ddns.net/apps/rsshistory/) - 'news' demo instance. May or may not be runnig actually
- - [https://renegat0x0.ddns.net/apps/catalog/](https://renegat0x0.ddns.net/apps/catalog/) - 'music' demo instance
- - [https://renegat0x0.ddns.net/apps/places/](https://renegat0x0.ddns.net/apps/places/) - 'places' demo instance. Imprtant places
+ - [https://renegat0x0.ddns.net/apps/places/](https://renegat0x0.ddns.net/apps/places/) - domain database
+ - [https://renegat0x0.ddns.net/apps/catalog/](https://renegat0x0.ddns.net/apps/catalog/) - instance which looks like YouTube replacement
  - [https://renegat0x0.ddns.net/apps/various/](https://renegat0x0.ddns.net/apps/various/) - 'verious' demo instance
  - [Notes about search industry](https://github.com/rumca-js/Django-link-archive/blob/main/README_search.md)
  - [Data analysis](https://github.com/rumca-js/Django-link-archive/blob/main/analysis/readme.md)
