@@ -249,6 +249,7 @@ What grinds my gears?
  - There is no button in Google search to translate the destination link
  - YouTube provides "related" section for videos. Why Google does not provide 'related' link list in search?
  - It is really difficult to find anything about Amiga, or old tech stuff
+ - First page fallacy. Second Google Search result do matter. Second Google Search page also matters. If I search for "PHP" there are thousands of frameworks, projects worth seeing. Why I cannot find them easily using Google Search? We give Google Search too much credit
 
 Archive.org:
  - Is not reliable. Sometimes it gets painfully slow. It is still better than nothing
