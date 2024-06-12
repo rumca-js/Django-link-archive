@@ -1,5 +1,6 @@
 from .defaulturlhandler import DefaultUrlHandler
 from ..webtools import RssPage, Url, PageResponseObject
+from ..models import AppLogging
 
 
 class YouTubeChannelHandler(RssPage, DefaultUrlHandler):
@@ -61,6 +62,10 @@ class YouTubeChannelHandler(RssPage, DefaultUrlHandler):
         return self.code2feed(self.code)
 
     def get_contents(self):
+        """
+        We obtain information about channel.
+        We cannot use HTML page to obtain thumbnail - as web page asks to log in to view this
+        """
         if self.dead:
             return
 

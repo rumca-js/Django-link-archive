@@ -31,7 +31,7 @@
          title="{{job.date_created}} {{job.job}} {{job.task}} {{job.subject}} {{job.args}}"
          >
 	 <span>
-          {{ forloop.counter }}
+          {{ job.id }}
           {% if not job.enabled %}
           [DISABLED]
           {% endif %}

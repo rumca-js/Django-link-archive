@@ -333,3 +333,36 @@ class EntryUpdaterTest(FakeInternetTestCase):
         self.assertEqual(entries[0].page_rating_votes, 100)
         self.assertEqual(entries[0].page_rating_contents, 100)
         self.assertEqual(entries[0].page_rating, 100)
+
+    def test_update_data__removes_casinos(self):
+        add_time = DateUtils.get_datetime_now_utc() - timedelta(days=1)
+
+        source_youtube = SourceDataController.objects.create(
+            url="https://youtube.com",
+            title="YouTube",
+            category="No",
+            subcategory="No",
+            export_to_cms=True,
+            remove_after_days=1,
+        )
+
+        entry = LinkDataController.objects.create(
+            source="",
+            link="https://slot-casino-page.com",
+            title="Casino casino casino casino casino",
+            description=None,
+            source_obj=source_youtube,
+            bookmarked=False,
+            language=None,
+            domain_obj=None,
+            thumbnail=None,
+            date_published=add_time,
+        )
+
+        date_updated = entry.date_update_last
+
+        u = EntryUpdater(entry)
+        # call tested function
+        u.update_data()
+
+        self.assertEqual(LinkDataController.objects.all().count(), 0)

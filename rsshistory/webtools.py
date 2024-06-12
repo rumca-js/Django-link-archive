@@ -2821,15 +2821,9 @@ class Url(ContentInterface):
         elif url:
             self.url = url
 
-        if not self.is_url_valid():
-            self.p = None
-            return
-
         self.p = self.get_handler(
             url, page_object=page_object, page_options=page_options
         )
-        if not self.is_valid():
-            self.p = None
 
     def get_handler(self, url=None, page_object=None, page_options=None):
         contents = None
@@ -2911,6 +2905,9 @@ class Url(ContentInterface):
 
     def is_valid(self):
         if not self.p:
+            return False
+
+        if not self.is_url_valid():
             return False
 
         # not valid HTTP response

@@ -336,7 +336,7 @@ def tag_many(request):
             link = link.replace("\r", "")
 
             if link != "":
-                w = LinkDataWrapper(link)
+                w = LinkDataWrapper(link=link)
                 entry = w.get()
                 if entry and not entry.is_archive_entry():
                     entry.set_tag(tag_name=tag, user=request.user)

@@ -7,9 +7,9 @@
     <a href="{{ entry.get_absolute_url }}" title="{{ entry.title }}">
       {% if user_config.show_icons%}
         {% if user_config.thumbnails_as_icons %}
-          <img src="{{entry.get_thumbnail}}" class="rounded" style="height:3em; width:4em; object-fit:cover; object-position:0 0;"/>
+          <img src="{{entry.get_thumbnail}}" class="rounded icon-normal"/>
         {% else %}
-          <img src="{{entry.get_favicon}}" class="rounded" style="height:3em; width:4em; object-fit:cover; object-position:0 0;"/>
+          <img src="{{entry.get_favicon}}" class="rounded icon-normal"/>
         {% endif %}
 
         <h4>{{entry.title}}</h4>

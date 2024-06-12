@@ -30,6 +30,7 @@ from .fakeinternetdata import (
     webpage_html_favicon,
     webpage_with_rss_link_rss_contents,
     webpage_hackernews_rss,
+    webpage_html_casinos,
     instance_entries_json,
     instance_sources_json_empty,
     instance_entries_json_empty,
@@ -327,6 +328,9 @@ class TestResponseObject(PageResponseObject):
 
         elif url == "https://page-with-rss-link.com/feed":
             return webpage_with_rss_link_rss_contents
+
+        elif url == "https://slot-casino-page.com":
+            return webpage_html_casinos
 
         elif url == "https://page-with-real-rss-link.com":
             return webpage_with_real_rss_links

@@ -313,11 +313,16 @@ class EntryUpdater(object):
 
         entry = self.entry
 
-        LinkDataWrapper.check_https_http_protocol(entry)
+        LinkDataWrapper(entry = entry).check_https_http_protocol()
 
         url = EntryUrlInterface(entry.link)
         props = url.get_props()
         p = url.p
+
+        if url.h:
+            if url.h.is_blocked():
+                entry.delete()
+                return
 
         entry_changed = self.is_entry_changed(url.h)
 
@@ -371,10 +376,15 @@ class EntryUpdater(object):
         """
         entry = self.entry
 
-        LinkDataWrapper.check_https_http_protocol(entry)
+        LinkDataWrapper(entry=entry).check_https_http_protocol()
 
         url = EntryUrlInterface(entry.link)
         props = url.get_props()
+
+        if url.h:
+            if url.h.is_blocked():
+                entry.delete()
+                return
 
         entry_changed = self.is_entry_changed(url.h)
 
@@ -573,9 +583,19 @@ class LinkDataWrapper(object):
     Perform actions for both -> normal, and archive
     """
 
-    def __init__(self, link, date=None):
-        self.link = link
+    def __init__(self, link=None, date=None, entry=None):
         self.date = date
+        self.entry = entry
+
+        if link is None:
+            if self.entry:
+                self.link = self.entry.link
+        else:
+            self.link = link
+
+        if date is None:
+            if self.entry:
+                self.date = self.entry.date_published
 
     def is_archive(self):
         is_archive = BaseLinkDataController.is_archive_by_date(self.date)
@@ -720,7 +740,9 @@ class LinkDataWrapper(object):
 
         return ob
 
-    def move_to_archive(entry_obj):
+    def move_to_archive(self):
+        entry_obj = self.entry
+
         objs = ArchiveLinkDataController.objects.filter(link=entry_obj.link)
 
         if objs.count() == 0:
@@ -742,7 +764,9 @@ class LinkDataWrapper(object):
                 error_text = traceback.format_exc()
                 AppLogging.error("Cannot delete entry {}".format(error_text))
 
-    def move_from_archive(archive_obj):
+    def move_from_archive(self):
+        archive_obj = self.entry
+
         objs = LinkDataController.objects.filter(link=archive_obj.link)
         if objs.count() == 0:
             themap = archive_obj.get_map()
@@ -763,7 +787,7 @@ class LinkDataWrapper(object):
                 error_text = traceback.format_exc()
                 AppLogging.error(error_text)
 
-    def move_from_entry_to_entry(entry_obj, destination_entry):
+    def move_from_entry_to_entry(self, destination_entry):
         """
         Moves everything related to entry object to destination entry object
          - tags
@@ -771,6 +795,8 @@ class LinkDataWrapper(object):
          - comments
          - transition history?
         """
+        entry_obj = self.entry
+
         tags = UserTags.objects.filter(entry_object=entry_obj)
         for tag in tags:
             tag.pk = None
@@ -795,20 +821,22 @@ class LinkDataWrapper(object):
             comment.entry_object = destination_entry
             comment.save()
 
-    def move_from_entry_to_url(entry_obj, destination_url):
+    def move_from_entry_to_url(self, destination_url):
         destination_entries = LinkDataController.objects.filter(destination_url)
 
         if destination_entries.count() > 0:
-            LinkDataWrapper.move_from_entry_to_entry(entry_obj, destination_entries[0])
+            self.move_from_entry_to_entry(destination_entries[0])
         else:
-            AppLogging.error("Cannot move entries from:{} to:{}".format(entry_obj.link, destination_url))
+            AppLogging.error("Cannot move entries from:{} to:{}".format(self.entry.link, destination_url))
 
-    def make_bookmarked(request, entry):
+    def make_bookmarked(self, request):
         """
         TODO move this API to UserBookmarks
         """
+        entry = self.entry
+
         if entry.is_archive_entry():
-            entry = LinkDataWrapper.move_from_archive(entry)
+            entry = self.move_from_archive()
             if not entry:
                 AppLogging.error("Coult not move from archive")
                 return
@@ -820,7 +848,9 @@ class LinkDataWrapper(object):
 
         return entry
 
-    def make_not_bookmarked(request, entry):
+    def make_not_bookmarked(self, request):
+        entry = self.entry
+
         UserBookmarks.remove(request.user, entry)
 
         is_bookmarked = UserBookmarks.is_bookmarked(entry)
@@ -828,10 +858,51 @@ class LinkDataWrapper(object):
         if not is_bookmarked:
             entry.make_not_bookmarked()
 
-            if entry.is_archive_time():
-                return LinkDataWrapper.move_to_archive(entry)
+            self.evaluate()
 
         return entry
+
+    def evaluate(self):
+        """
+        Evaluates entry. Checks if it is necessary, permanent, if should be removed.
+        We do not want to remove tags, or votes. If entry goes below votes.
+        """
+        config = Configuration.get_object().config_entry
+
+        entry = self.entry
+
+        p = DomainAwarePage(entry.link)
+        is_domain = p.is_domain()
+
+        if not config.auto_store_entries:
+            if is_domain and config.auto_store_domain_info:
+                pass
+            elif not is_domain and config.auto_store_domain_info:
+                """
+                tags and votes, are deleted automatically
+                """
+                entry.delete()
+                self.entry = None
+                return
+            elif entry.bookmarked:
+                pass
+            else:
+                entry.delete()
+                self.entry = None
+                return
+
+        if not entry.should_entry_be_permanent():
+            entry.permament = False
+        else:
+            entry.permament = True
+        entry.save()
+
+        if not entry.is_permanent():
+            if entry.is_remove_time():
+                entry.delete()
+                self.entry = None
+            elif entry.is_archive_time():
+                return self.move_to_archive()
 
     def get_clean_description(link_data):
         import re
@@ -855,7 +926,7 @@ class LinkDataWrapper(object):
 
         for entry in entries:
             LinkDatabase.info("Moving link to archive: {}".format(entry.link))
-            LinkDataWrapper.move_to_archive(entry)
+            LinkDataWrapper(entry=entry).move_to_archive()
 
             if limit_s > 0:
                 passed_seconds = time.time() - start_processing_time
@@ -881,7 +952,9 @@ class LinkDataWrapper(object):
 
         return entries
 
-    def move_https_to_http(entry):
+    def move_https_to_http(self):
+        entry = self.entry
+
         if not entry.is_https():
             return
 
@@ -895,7 +968,8 @@ class LinkDataWrapper(object):
 
         return False
 
-    def move_http_to_https(entry):
+    def move_http_to_https(self):
+        entry = self.entry
         if not entry.is_http():
             return
 
@@ -909,7 +983,9 @@ class LinkDataWrapper(object):
 
         return False
 
-    def check_https_http_protocol(entry):
+    def check_https_http_protocol(self):
+        entry = self.entry
+
         if entry.is_https():
             http_url = entry.get_http_url()
 
@@ -926,7 +1002,7 @@ class LinkDataWrapper(object):
             new_ping_status = p.ping()
 
             if not ping_status and new_ping_status:
-                if LinkDataWrapper.move_https_to_http(entry):
+                if LinkDataWrapper(entry=entry).move_https_to_http():
                     return True
 
             if ping_status and new_ping_status:
@@ -947,7 +1023,7 @@ class LinkDataWrapper(object):
             new_ping_status = p.ping()
 
             if new_ping_status:
-                if LinkDataWrapper.move_http_to_https(entry):
+                if LinkDataWrapper(entry=entry).move_http_to_https():
                     return True
 
         return False
@@ -1022,7 +1098,7 @@ class EntryDataBuilder(object):
         """
         TODO move this to a other class OnlyLinkDataBuilder?
         """
-        wrapper = LinkDataWrapper(self.link)
+        wrapper = LinkDataWrapper(link = self.link)
         obj = wrapper.get_from_operational_db()
         if obj:
             self.result = obj
@@ -1103,7 +1179,7 @@ class EntryDataBuilder(object):
         self.link_data["link"] = UrlHandler.get_cleaned_link(self.link_data["link"])
         self.link = self.link_data["link"]
 
-        wrapper = LinkDataWrapper(self.link)
+        wrapper = LinkDataWrapper(link = self.link)
         entry = wrapper.get_from_operational_db()
         if entry:
             self.result = entry
@@ -1141,7 +1217,7 @@ class EntryDataBuilder(object):
             date = None
             if "date_published" in self.link_data:
                 date = self.link_data["date_published"]
-            wrapper = LinkDataWrapper(self.link_data["link"], date)
+            wrapper = LinkDataWrapper(link = self.link_data["link"], date=date)
             entry = wrapper.get()
 
             if entry:
@@ -1179,6 +1255,8 @@ class EntryDataBuilder(object):
         new_link_data = dict(link_data)
         if "date_published" not in new_link_data:
             new_link_data["date_published"] = DateUtils.get_datetime_now_utc()
+        if "date_update_last" not in new_link_data:
+            new_link_data["date_update_last"] = DateUtils.get_datetime_now_utc()
 
         if "description" in new_link_data and new_link_data["description"] != None:
             new_link_data["description"] = LinkDataController.get_description_safe(
@@ -1196,7 +1274,7 @@ class EntryDataBuilder(object):
         LinkDatabase.info("Adding link: {}".format(new_link_data["link"]))
 
         wrapper = LinkDataWrapper(
-            new_link_data["link"], new_link_data["date_published"]
+            link = new_link_data["link"], date = new_link_data["date_published"]
         )
 
         return wrapper.create(new_link_data)

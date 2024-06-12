@@ -14,10 +14,10 @@
              >
 
 	     <div>
-                 {% if object.bookmarked %}
-                 [{{object.page_rating}}]
-                 {% endif %}
-                 {{ object_controller.get_title_html }}
+             {% if object.bookmarked %}
+             [{{object.page_rating}}]
+             {% endif %}
+             {{ object_controller.get_title_html }}
 	     </div>
          </h1>
 
@@ -30,14 +30,32 @@
    <div>
      {% include "rsshistory/linkdatacontroller_detail_parameters.html" %}
    </div>
-   
-   <div>
+
+   <div class="mb-2">
        {% if object.has_tags %}
          {% for tag in object.get_tag_map %}
            <a href="{% url 'rsshistory:entries-omni-search'%}?search=tags__tag+%3D%3D+{{tag}}">#{{tag}}</a>,
          {% endfor %}
        {% endif %}
    </div>
+
+   {% if object.source_obj %}
+   <div>
+       <a href="{{object.source_obj.get_absolute_url}}">
+	  {% if object.get_thumbnail != object.source_obj.get_favicon %}
+             {% if user_config.show_icons%}
+                 {% if user_config.small_icons %}
+                   <img src="{{object.source_obj.get_favicon}}" class="rounded icon-small"/>
+                 {% else %}
+                   <img src="{{object.source_obj.get_favicon}}" class="rounded icon-normal"/>
+                 {% endif %}
+             {% endif %}
+          {% endif %}
+
+          {{object.source_obj.title}}
+       </a>
+   </div>
+   {% endif %}
 
    {% include "rsshistory/linkdatacontroller_detail_buttons.html" %}
 

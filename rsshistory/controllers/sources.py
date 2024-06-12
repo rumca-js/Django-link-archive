@@ -25,12 +25,6 @@ class SourceDataController(SourceDataModel):
     class Meta:
         proxy = True
 
-    def get_absolute_url(self):
-        """Returns the URL to access a particular author instance."""
-        return reverse(
-            "{}:source-detail".format(LinkDatabase.name), args=[str(self.id)]
-        )
-
     def cleanup():
         SourceDataModel.reset_dynamic_data()
 
@@ -39,14 +33,28 @@ class SourceDataController(SourceDataModel):
         for source in sources:
             entries = LinkDataModel.objects.filter(link=source.url)
             if entries.count() == 0:
-                from .backgroundjob import BackgroundJobController
-
-                properties = {"permament": True}
-                BackgroundJobController.link_add(source.url, properties=properties)
+                SourceDataController.add_link(source)
             else:
                 entry = entries[0]
                 entry.permanent = True
                 entry.save()
+
+    def add_entry(source):
+        """
+        It can be used by search engine. If we add link for every source, we will be swamped
+        """
+        if not source:
+            return
+
+        if not source.enabled:
+            return
+
+        from .backgroundjob import BackgroundJobController
+
+        properties = {"permament": True}
+        BackgroundJobController.link_add(
+            source.url, properties=properties
+        )
 
     def get_days_to_remove(self):
         days = self.remove_after_days
@@ -286,6 +294,10 @@ class SourceDataController(SourceDataModel):
             op.consecutive_errors = 0
             op.save()
 
+        entries = LinkDataModel.objects.filter(link = self.url)
+        if entries.count() == 0:
+            SourceDataController.add_entry(self)
+
         BackgroundJobController.download_rss(self)
 
         self.enabled = True
@@ -296,9 +308,16 @@ class SourceDataController(SourceDataModel):
             return
 
         from .backgroundjob import BackgroundJobController
+        from .entriesutils import LinkDataWrapper
 
         self.enabled = False
         self.save()
+
+        entries = LinkDataModel.objects.filter(link = self.url)
+        if entries.count() > 0:
+            for entry in entries:
+                w = LinkDataWrapper(entry=entry)
+                w.evaluate()
 
     def edit(self, data):
         """
@@ -404,26 +423,21 @@ class SourceDataBuilder(object):
         """
         Category and subcategory names can be empty, then objects are not set
         """
-        self.add_entry()
+        source = None
+
+        if "language" not in self.link_data or self.link_data["language"] is None:
+            self.link_data["language"] = ""
 
         try:
-            if "language" not in self.link_data or self.link_data["language"] is None:
-                self.link_data["language"] = ""
             source = SourceDataController.objects.create(**self.link_data)
-            return source
         except Exception as E:
             error_text = traceback.format_exc()
             LinkDatabase.error("Cannot create source:{}\n{}".format(str(E), error_text))
             AppLogging.error("Cannot create source:{}\n{}".format(str(E), error_text))
 
-    def add_entry(self):
-        from .backgroundjob import BackgroundJobController
+        SourceDataController.add_entry(source)
 
-        properties = {"permament": True}
-
-        BackgroundJobController.link_add(
-            self.link_data["url"], properties=properties
-        )
+        return source
 
     def get_clean_data(self):
         result = {}

@@ -159,6 +159,17 @@ class LinkDataController(LinkDataModel):
 
         return self.date_published < day_to_move
 
+    def is_remove_time(self):
+        conf = Configuration.get_object().config_entry
+        if conf.days_to_remove_links == 0:
+            return False
+
+        day_to_remove = DateUtils.get_datetime_now_utc() - timedelta(
+            days=conf.days_to_remove_links
+        )
+
+        return self.date_published < day_to_remove
+
 
 class ArchiveLinkDataController(ArchiveLinkDataModel):
     """

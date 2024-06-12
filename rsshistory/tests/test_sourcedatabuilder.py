@@ -10,10 +10,11 @@ from .fakeinternet import FakeInternetTestCase
 class SourceDataBuilderTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
+        self.setup_configuration()
 
         SourceDataController.objects.all().delete()
 
-    def test_new_source_automatic(self):
+    def test_add_from_props__ads_job(self):
         # call tested function
         SourceDataBuilder(
             link_data={
@@ -22,6 +23,7 @@ class SourceDataBuilderTest(FakeInternetTestCase):
                 "category": "No",
                 "subcategory": "No",
                 "export_to_cms": False,
+                "enabled" : True,
             },
             manual_entry=False,
         ).add_from_props()
@@ -30,11 +32,6 @@ class SourceDataBuilderTest(FakeInternetTestCase):
         sources = SourceDataController.objects.all()
         self.assertEqual(sources.count(), 1)
         self.assertEqual(sources[0].enabled, False)
-
-        # job to add entry for source?
-        jobs = BackgroundJobController.objects.all()
-        self.assertEqual(jobs.count(), 1)
-        self.assertEqual(jobs[0].job, BackgroundJobController.JOB_LINK_ADD)
 
     def test_new_source_manual(self):
         # call tested function
@@ -45,6 +42,54 @@ class SourceDataBuilderTest(FakeInternetTestCase):
                 "category": "No",
                 "subcategory": "No",
                 "export_to_cms": False,
+            },
+            manual_entry=True,
+        ).add_from_props()
+
+        # manual entry adds a new active source, that is fetched
+        sources = SourceDataController.objects.all()
+        self.assertEqual(sources.count(), 1)
+        self.assertEqual(sources[0].enabled, True)
+
+        # job to add entry
+        jobs = BackgroundJobController.objects.all()
+        self.assertEqual(jobs.count(), 2)
+        self.assertEqual(jobs[0].job, BackgroundJobController.JOB_PROCESS_SOURCE)
+        self.assertEqual(jobs[1].job, BackgroundJobController.JOB_LINK_ADD)
+
+    def test_new_source_manual_enabled_false(self):
+        # call tested function
+        SourceDataBuilder(
+            link_data={
+                "url": "https://linkedin.com",
+                "title": "LinkedIn",
+                "category": "No",
+                "subcategory": "No",
+                "export_to_cms": False,
+                "enabled": False,
+            },
+            manual_entry=True,
+        ).add_from_props()
+
+        # manual entry adds a new active source, that is fetched
+        sources = SourceDataController.objects.all()
+        self.assertEqual(sources.count(), 1)
+        self.assertEqual(sources[0].enabled, False)
+
+        # job to add entry
+        jobs = BackgroundJobController.objects.all()
+        self.assertEqual(jobs.count(), 0)
+
+    def test_new_source_manual_enabled_true(self):
+        # call tested function
+        SourceDataBuilder(
+            link_data={
+                "url": "https://linkedin.com",
+                "title": "LinkedIn",
+                "category": "No",
+                "subcategory": "No",
+                "export_to_cms": False,
+                "enabled": True,
             },
             manual_entry=True,
         ).add_from_props()

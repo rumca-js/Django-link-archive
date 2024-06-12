@@ -347,3 +347,36 @@ class EntryDataBuilderTest(FakeInternetTestCase):
         objs = LinkDataController.objects.filter(link=link_name)
 
         self.assertEqual(objs.count(), 1)
+
+    def test_add_from_props__adds_date_published(self):
+        config = Configuration.get_object().config_entry
+        config.auto_store_entries = True
+        config.auto_store_domain_info = False
+        config.auto_store_sources = False
+        config.accept_ip_addresses = True
+        config.save()
+
+        MockRequestCounter.mock_page_requests = 0
+
+        link_name = "https://127.0.0.1/v=1234"
+
+        link_data = {
+            "link": link_name,
+            "source": "https://youtube.com",
+            "title": "test",
+            "description": "description",
+            "language": "en",
+            "thumbnail": "https://youtube.com/favicon.ico",
+        }
+
+        b = EntryDataBuilder()
+        b.link_data = link_data
+        # call tested function
+        entry = b.add_from_props()
+
+        objs = LinkDataController.objects.filter(link=link_name)
+        self.assertEqual(objs.count(), 1)
+
+        self.assertTrue(entry)
+        self.assertTrue(entry.date_published is not None)
+        self.assertTrue(entry.date_update_last is not None)

@@ -52,8 +52,6 @@ class GitRepo(object):
 
     def commit(self, commit_message):
         self.is_different_flag = self.is_different()
-        if not self.is_different_flag:
-            return
 
         p = subprocess.run(
             ["git", "commit", "-m", commit_message],
@@ -65,6 +63,7 @@ class GitRepo(object):
 
     def push(self):
         if not self.is_different_flag:
+            AppLogging.info("Repository was not changed")
             return
 
         token = self.git_data.password
@@ -99,12 +98,15 @@ class GitRepo(object):
 
     def is_different(self):
         p = subprocess.run(
-            ["git", "diff", "--exit-code"],
+            ["git", "status", "--porcelain"],
             cwd=self.get_local_dir(),
             timeout=self.timeout_s,
             capture_output=True,
         )
-        if p.returncode == 0:
+
+        text = p.stdout.decode().strip()
+
+        if text == "":
             return False
 
         return True

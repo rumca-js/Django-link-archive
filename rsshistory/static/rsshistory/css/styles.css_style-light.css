@@ -70,14 +70,19 @@ hr {
     width:1em;
 }
 
-.content-thumbnail {
-    width:60px;
-    float: left;
+.icon-small {
+    /* icon image of generic icons. related icons, etc */
+    height:3em;
+    width:3em;
+    object-fit:cover;
+    object-position:0 0;
 }
-
-.content-big-thumbnail {
-    width:150px;
-    float: left;
+.icon-normal {
+    /* icon image of generic icons. related icons, etc */
+    height:4em;
+    width:4em;
+    object-fit:cover;
+    object-position:0 0;
 }
 
 .contentbuttonmenu {

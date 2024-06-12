@@ -381,19 +381,8 @@ class BaseLinkDataController(BaseLinkDataModel):
         self.save()
 
     def make_not_bookmarked(self):
-        from ..models import UserTags, UserVotes
-
-        # TODO code below I think is not necessary, as entry_object link is cascade
-
         self.bookmarked = False
         self.save()
-
-        if not self.is_taggable():
-            tags = UserTags.objects.filter(entry_object=self)
-            tags.delete()
-
-            votes = UserVotes.objects.filter(entry_object=self)
-            votes.delete()
 
     def make_manual_dead(self):
         """
@@ -427,13 +416,13 @@ class BaseLinkDataController(BaseLinkDataModel):
 
     def is_taggable(self):
         """
-        We do not check page rating, as someone may want to change vote.
-        Users need to be able to bring back links from dark abyss.
+        We do not want to check any state of entry.
+        Users may want to tag dead entries, or malicious sites
         """
-        return (self.permanent or self.bookmarked) and not self.is_dead()
+        return (self.permanent or self.bookmarked)
 
     def is_commentable(self):
-        return (self.permanent or self.bookmarked) and not self.is_dead()
+        return (self.permanent or self.bookmarked)
 
     def is_permanent(self):
         from ..configuration import Configuration
@@ -444,6 +433,20 @@ class BaseLinkDataController(BaseLinkDataModel):
             return False
 
         return self.permanent or self.bookmarked
+
+    def should_entry_be_permanent(self):
+        from ..configuration import Configuration
+        conf = Configuration.get_object().config_entry
+
+        p = DomainAwarePage(self.link)
+
+        if p.is_domain() and conf.auto_store_domain_info:
+            return True
+
+        if self.source_obj:
+            return self.source_obj.enabled
+
+        return False
 
     def is_dead(self):
         """

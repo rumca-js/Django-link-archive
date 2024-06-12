@@ -113,7 +113,7 @@ class SourceDetailView(generic.DetailView):
             if builder.result:
                 entry = builder.result
                 if entry.is_archive_entry():
-                    entry = LinkDataWrapper.move_from_archive(entry)
+                    entry = LinkDataWrapper(entry=entry).move_from_archive()
 
                 entry.permanent = True
                 entry.save()

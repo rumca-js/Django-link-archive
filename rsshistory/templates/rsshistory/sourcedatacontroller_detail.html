@@ -12,13 +12,18 @@
 </h1>
 
 {% if is_youtube_channel %}
-<div class="container">Channel: <a href="{{ page_object.get_channel_url }}">{{ page_object.get_channel_url }}</a></div>
+<a href="{{ page_object.get_channel_url }}">{{ page_object.get_channel_url }}</a>
 {% endif %}
-<div class="container">
+
+<div>
   <a href="{{ object.url }}">{{ object.url }}</a>
 </div>
 
-<div class="d-flex flex-wrap">
+<hr/>
+
+{% include "rsshistory/sourcedatacontroller_detail_buttons.html" %}
+
+<div class="d-flex flex-wrap mb-2">
     <div class="text-nowrap mx-2"><strong>Enabled:</strong> {{ object.enabled }}</div>
     <div class="text-nowrap mx-2"><strong>Fetch period:</strong> {{ object.fetch_period }}</div>
     <div class="text-nowrap mx-2"><strong>Category:</strong> {{ object.category }}</div>
@@ -37,10 +42,6 @@
     <div class="text-nowrap mx-2"><strong>Consecutive Errors:</strong>{{object.dynamic_data.consecutive_errors}}</div>
 </div>
 
-  {% include "rsshistory/sourcedatacontroller_detail_buttons.html" %}
-
-<div class="container">
-  {% include "rsshistory/search_places_element.html" %}
-</div>
+{% include "rsshistory/search_places_element.html" %}
 
 {% endblock %}

@@ -1037,6 +1037,16 @@ webpage_html_favicon = """<html>
  </body>
 """
 
+webpage_html_casinos = """<html>
+ <head>
+ <title>Casino casino casino slots bitcoin lottery bingo casino</title>
+
+ </head>
+ <body>
+ page body
+ </body>
+"""
+
 webpage_code_project_rss = """
 <?xml version="1.0" encoding="utf-8"?>
 <rss version="2.0">

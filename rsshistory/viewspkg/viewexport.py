@@ -2,6 +2,7 @@ from datetime import timedelta
 
 from django.views import generic
 from django.urls import reverse
+from django.shortcuts import redirect
 from django.http import HttpResponseRedirect
 
 from ..apps import LinkDatabase

@@ -1,5 +1,6 @@
 from django.db import models
 from django.urls import reverse
+from ..apps import LinkDatabase
 
 
 class SourceDataModel(models.Model):
@@ -39,6 +40,12 @@ class SourceDataModel(models.Model):
 
     class Meta:
         ordering = ["title"]
+
+    def get_absolute_url(self):
+        """Returns the URL to access a particular author instance."""
+        return reverse(
+            "{}:source-detail".format(LinkDatabase.name), args=[str(self.id)]
+        )
 
     def reset_dynamic_data():
         objs = SourceCategories.objects.all()

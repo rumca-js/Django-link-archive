@@ -20,10 +20,11 @@
                     {% else %}
                     "{{link.get_favicon}}"
                     {% endif %}
+
                     {% if user_config.small_icons %}
-                    class="content-thumbnail"
+                    class="rounded icon-small"
                     {% else %}
-                    class="content-big-thumbnail"
+                    class="rounded icon-normal"
                     {% endif %}
                     />
                {% endif %}

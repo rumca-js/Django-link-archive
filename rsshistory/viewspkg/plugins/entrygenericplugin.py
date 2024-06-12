@@ -356,36 +356,6 @@ class EntryGenericPlugin(object):
                 ),
             )
 
-        if self.entry.source_obj:
-            buttons.append(
-                EntryButton(
-                    self.user,
-                    "Source",
-                    reverse(
-                        "{}:source-detail".format(LinkDatabase.name),
-                        args=[self.entry.source_obj.id],
-                    ),
-                    ConfigurationEntry.ACCESS_TYPE_ALL,
-                    "Source: {}".format(self.entry.source_obj.title),
-                    static(
-                        "{}/icons/icons8-broadcast-100.png".format(LinkDatabase.name)
-                    ),
-                ),
-            )
-        elif self.entry.source and self.entry.source != "":
-            buttons.append(
-                EntryButton(
-                    self.user,
-                    "Source",
-                    self.entry.source,  # TODO I think this will not wowk
-                    ConfigurationEntry.ACCESS_TYPE_ALL,
-                    "Source: {}".format(self.entry.source),
-                    static(
-                        "{}/icons/icons8-broadcast-100.png".format(LinkDatabase.name)
-                    ),
-                ),
-            )
-
         if self.entry.artist and self.entry.artist != "":
             buttons.append(
                 EntryButton(

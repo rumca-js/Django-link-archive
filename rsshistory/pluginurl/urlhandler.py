@@ -260,6 +260,12 @@ class UrlHandler(Url):
         if not super().is_valid():
             return False
 
+        if self.is_blocked():
+            return False
+
+        return True
+
+    def is_blocked(self):
         keywords = Configuration.get_object().get_blocked_keywords()
         validator = UrlPropertyValidator(
             properties=self.get_properties(), blocked_keywords=keywords
@@ -268,9 +274,10 @@ class UrlHandler(Url):
             validator.blocked_keywords = keywords
 
         if not validator.is_valid():
-            return False
+            return True
 
-        return True
+        if not self.is_url_valid():
+            return True
 
     def is_url_valid(self):
         if not super().is_url_valid():
@@ -386,6 +393,9 @@ class UrlPropertyValidator(object):
         title = self.get_title()
         title = title.lower()
 
+        if title.find("slot server") >= 0:
+            return True
+
         description = self.get_description()
         description = description.lower()
 
@@ -393,7 +403,8 @@ class UrlPropertyValidator(object):
 
         keywords = ["casino", "lotter", "bingo", "slot", "poker"]
 
+        sum = 0
         for keyword in keywords:
-            sum = text.count(keyword)
+            sum += text.count(keyword)
 
         return sum > 3
