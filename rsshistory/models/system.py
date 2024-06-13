@@ -77,7 +77,7 @@ class ConfigurationEntry(models.Model):
 
     sources_refresh_period = models.IntegerField(default=3600)
 
-    auto_store_entries = models.BooleanField(default=True, help_text="Allows entries to be stored from automate sources")
+    auto_store_entries = models.BooleanField(default=True, help_text="Allows entries to be stored from automates")
 
     auto_store_entries_use_all_data = models.BooleanField(
         default=False,

@@ -284,6 +284,7 @@ class BaseLinkDataController(BaseLinkDataModel):
         Provides object export names. No dependencies towards other objects
         """
         return [
+            "id",
             "source",
             "title",
             "description",

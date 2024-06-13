@@ -10,11 +10,7 @@ from .controllers import (
 from .apps import LinkDatabase
 from .models import UserConfig, AppLogging
 
-try:
-    from sympy import sympify
-    import sympy
-except Exception as E:
-    pass
+from .omnisearch import SingleSymbolEvaluator, OmniSearch
 
 
 class BaseQueryFilter(object):
@@ -447,215 +443,35 @@ class DomainFilter(BaseQueryFilter):
         return ["suffix", "tld", "main", "domain", "category", "subcategory"]
 
 
-class StringSymbolEquation(object):
-    def __init__(self, data):
-        self.data = data
-        self.current_symbol = ord("A") - 1
-
-    def get_operators():
-        return ("(", ")", "&", "|", "~", "^", "!")
-
-    def get_whitespaces():
-        return (" ", "\t")
-
-    def is_operator(char):
-        return char in StringSymbolEquation.get_operators()
-
-    def is_whitespace(char):
-        return char in StringSymbolEquation.get_whitespaces()
-
-    def process(self):
-        result_string = ""
-        inside_text = False
-        self.conditions = {}
-        self.current_condition = ""
-
-        for char in self.data:
-            if StringSymbolEquation.is_operator(char):
-                inside_text = False
-                result_string += char
-
-                self.add_condition()
-
-            elif inside_text:
-                self.current_condition += char
-            else:
-                self.current_condition += char
-
-                if not StringSymbolEquation.is_whitespace(char):
-                    inside_text = True
-                    result_string += self.get_next_symbol()
-
-        self.add_condition()
-
-        return result_string, self.conditions
-
-    def add_condition(self):
-        self.current_condition = self.current_condition.strip()
-        if self.current_condition != "":
-            self.conditions[self.get_current_symbol()] = self.current_condition
-            self.current_condition = ""
-
-    def get_current_symbol(self):
-        return chr(self.current_symbol)
-
-    def get_next_symbol(self):
-        self.current_symbol += 1
-        return chr(self.current_symbol)
-
-
-class OmniSymbolProcessor(object):
-    def __init__(self, data, symbol_evaluator):
-        self.data = data
-        self.symbol_evaluator = symbol_evaluator
-        self.known_results = {}
-
-    def translate_to_symbol_notation(self, data):
-        eq = StringSymbolEquation(data)
-        self.eq_string, self.conditions = eq.process()
-
-    def process(self):
-        self.translate_to_symbol_notation(self.data)
-        self.expr = sympify(self.eq_string)
-
-        return self.process_internal(self.expr)
-
-    def process_internal(self, expr):
-        for arg in expr.args:
-            self.process_internal(arg)
-
-        if expr.func == sympy.core.symbol.Symbol:
-            symbol = str(expr)
-
-            return self.evaluate_symbol(symbol)
-        else:
-            function = str(expr.func)
-            operation_symbol = str(expr)
-            LinkDatabase.info("Operation: {}".format(function))
-
-            return self.make_operation(operation_symbol, function, expr.args)
-
-        # LinkDatabase.info(f'arg {expr}')
-        # LinkDatabase.info(f'arg.func: {expr.func}')
-        # LinkDatabase.info(f'arg.args: {expr.args}')
-
-    def evaluate_symbol(self, symbol):
-        condition_text = self.conditions[symbol]
-        LinkDatabase.info("Evaluation condition {} {}".format(symbol, condition_text))
-
-        self.known_results[symbol] = self.symbol_evaluator.evaluate_symbol(
-            condition_text
-        )
-
-        return self.known_results[symbol]
-
-    def make_operation(self, operation_symbol, function, args):
-        args0 = str(args[0])
-        args0 = self.known_results[args0]
-
-        if len(args) > 1:
-            args1 = str(args[1])
-            args1 = self.known_results[args1]
-        else:
-            args1 = None
-
-        LinkDatabase.info(
-            "Evaluation function: full:{} function:{} args:{} {}".format(
-                operation_symbol, function, args0, args1
-            )
-        )
-
-        if function == "And":  # & sign
-            self.known_results[operation_symbol] = args0 & args1
-            return self.known_results[operation_symbol]
-        elif function == "Or":  # | sign
-            self.known_results[operation_symbol] = args0 | args1
-            return self.known_results[operation_symbol]
-        elif function == "Not":  # ~ sign
-            self.known_results[operation_symbol] = ~args0
-            return self.known_results[operation_symbol]
-        else:
-            raise NotImplementedError("Not implemented function: {}".format(function))
-
-
-class OmniSymbolEvaluator(object):
+class DjangoSingleSymbolEvaluator(SingleSymbolEvaluator):
     def __init__(self):
-        self.not_translated_conditions = {}
-        self.translated_conditions = {}
-
+        super().__init__()
         self.default_search_symbols = []
-        self.translatable_names = []
 
-    def evaluate_symbol(self, symbol):
-        condition_data = self.split_symbol(symbol)
+    def evaluate_complex_symbol(self, symbol, condition_data):
+        condition_data = super().evaluate_complex_symbol(symbol, condition_data)
+
         if condition_data:
-            LinkDatabase.info("Condition data {}".format(condition_data))
+            LinkDatabase.info(
+                "Symbol evaluator condition data:{}".format(condition_data)
+            )
+            return Q(**condition_data)
 
-            if self.is_translatable(condition_data):
-                if condition_data[0].find("__isnull") >= 0:
-                    condition_data[2] = condition_data[2] == "True"
+    def evaluate_simple_symbol(self, symbol):
+        result = None
+        for item in self.default_search_symbols:
+            input_map = {item: symbol}
 
-                self.translated_conditions[condition_data[0]] = condition_data[2]
-
-                condition_data = self.translate_condition(condition_data)
-
-                LinkDatabase.info(
-                    "Symbol evaluator condition data:{}".format(condition_data)
-                )
-                return Q(**condition_data)
+            if result is None:
+                result = Q(**input_map)
             else:
-                self.not_translated_conditions[condition_data[0]] = condition_data[2]
-        else:
-            if not symbol or symbol == "":
-                return
+                result |= Q(**input_map)
 
-            result = None
-            for item in self.default_search_symbols:
-                input_map = {item: symbol}
+        return result
 
-                if result is None:
-                    result = Q(**input_map)
-                else:
-                    result |= Q(**input_map)
-
-            return result
-
-    def get_operators(self):
-        """
-        first 2 char operators, then 1 char operators
-        """
-        return ["==", "?=", "<=", ">=", "~", "=", "<", ">"]
-
-    def cleanup_left_operator_part(self, left_part):
-        return left_part.strip()
-
-    def cleanup_right_operator_part(self, right_part):
-        right_part = right_part.strip()
-
-        if right_part.startswith('"') and right_part.endswith('"'):
-            right_part = right_part[1:-1]
-        if right_part.startswith("'") and right_part.endswith("'"):
-            right_part = right_part[1:-1]
-
-        return right_part
-
-    def split_symbol(self, symbol):
-        for op in self.get_operators():
-            wh = symbol.find(op)
-            if wh >= 0:
-                sp = [symbol[:wh], symbol[wh + len(op) + 1 :]]
-
-                left_part = self.cleanup_left_operator_part(sp[0])
-                right_part = self.cleanup_right_operator_part(sp[1])
-
-                return [left_part, op, right_part]
-
-    def is_translatable(self, condition):
-        for name in self.translatable_names:
-            if condition[0].find(name) >= 0:
-                return True
-
-        return False
+    def enhance_condition_data(self, condition_data):
+        if condition_data[0].find("__isnull") >= 0:
+            condition_data[2] = condition_data[2] == "True"
 
     def translate_condition(self, condition_data):
         """
@@ -699,60 +515,33 @@ class OmniSymbolEvaluator(object):
     def set_default_search_symbols(self, symbols):
         self.default_search_symbols = symbols
 
-    def set_translation_mapping(self, names):
-        self.translatable_names = names
 
+class OmniSearchWithDefault(OmniSearch):
+    def __init__(self, search_query, evaluator):
+        super().__init__(search_query, evaluator)
 
-class OmniSearchConditions(object):
-    def __init__(self, search_query):
-        self.search_query = search_query
-        self.combined_query = None
-        self.symbol_evaluator = OmniSymbolEvaluator()
-        self.processor = OmniSymbolProcessor(self.search_query, self.symbol_evaluator)
         self.default_search_symbols = []
 
     def set_default_search_symbols(self, symbols):
         self.default_search_symbols = symbols
-        self.symbol_evaluator.set_default_search_symbols(symbols)
+        self.symbol_evaluator.default_search_symbols = symbols
 
-    def set_translation_mapping(self, name_mapping):
-        self.symbol_evaluator.set_translation_mapping(name_mapping)
+    def get_combined_query(self):
+        """
+        To speed things up, if query does not have any operator, use default scheme for searching
+        """
+        query = Q()
 
-    def get_translated_conditions(self):
-        return self.symbol_evaluator.translated_conditions
-
-    def get_not_translated_conditions(self):
-        return self.symbol_evaluator.not_translated_conditions
-
-    def get_conditions(self):
-        uses_operator = False
-        LinkDatabase.info("Self combined query {}".format(self.combined_query))
-        if self.combined_query is not None:
-            return Q()
-
-        operators = set()
-        for symbol in self.symbol_evaluator.get_operators():
-            operators.add(symbol)
-        for symbol in StringSymbolEquation.get_operators():
-            operators.add(symbol)
-
-        for symbol in operators:
-            if self.search_query.find(symbol) >= 0:
-                uses_operator = True
-                break
-
-        if uses_operator:
-            LinkDatabase.info("Using processor")
-            self.combined_query = self.get_combined_query_using_processor()
-            LinkDatabase.info("Using processor done")
+        if self.is_complex_query():
+            query = super().get_combined_query()
         else:
-            self.combined_query = self.get_combined_query_simple()
+            query = self.get_combined_query_simple()
 
-        if self.combined_query is None:
+        if query is None:
             self.error = True
-            self.combined_query = Q()
+            query = Q()
 
-        return self.combined_query
+        return query
 
     def get_combined_query_simple(self):
         symbol = self.search_query
@@ -771,11 +560,6 @@ class OmniSearchConditions(object):
 
         return result
 
-    def get_combined_query_using_processor(self):
-        if self.search_query:
-            combined_q_object = self.processor.process()
-            return combined_q_object
-
 
 class OmniSearchFilter(BaseQueryFilter):
     def __init__(self, args):
@@ -788,7 +572,7 @@ class OmniSearchFilter(BaseQueryFilter):
         else:
             self.search_query = ""
 
-        self.parser = OmniSearchConditions(self.search_query)
+        self.parser = OmniSearchWithDefault(self.search_query, DjangoSingleSymbolEvaluator())
 
         self.query_set = None
         self.combined_query = None
@@ -806,7 +590,7 @@ class OmniSearchFilter(BaseQueryFilter):
         if self.combined_query:
             return self.combined_query
 
-        self.combined_query = self.parser.get_conditions()
+        self.combined_query = self.parser.get_query_result()
         return self.combined_query
 
     def get_objects(self):

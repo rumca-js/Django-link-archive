@@ -1,10 +1,14 @@
 from django.db.models import Q
 from ..queryfilters import (
     OmniSearchFilter,
+    DjangoSingleSymbolEvaluator,
+    OmniSearchWithDefault,
+)
+from ..omnisearch import (
     StringSymbolEquation,
     OmniSymbolProcessor,
-    OmniSearchConditions,
-    OmniSymbolEvaluator,
+    SingleSymbolEvaluator,
+    OmniSearch,
 )
 from ..models import LinkDataModel
 
@@ -127,12 +131,12 @@ class OmniSymbolProcessorTest(FakeInternetTestCase):
         self.assertEqual(value, 5)
 
 
-class OmniSymbolEvaluatorTest(FakeInternetTestCase):
+class DjangoSingleSymbolEvaluatorTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 
     def test_evauluate_symbol_exact(self):
-        ev = OmniSymbolEvaluator()
+        ev = DjangoSingleSymbolEvaluator()
 
         ev.set_translation_mapping({"title": "title"})
 
@@ -143,7 +147,7 @@ class OmniSymbolEvaluatorTest(FakeInternetTestCase):
         self.assertEqual(str_sym_data, "(AND: ('title__iexact', 'something'))")
 
     def test_evauluate_symbol_gte(self):
-        ev = OmniSymbolEvaluator()
+        ev = DjangoSingleSymbolEvaluator()
 
         ev.set_translation_mapping({"title": "title"})
 
@@ -154,7 +158,7 @@ class OmniSymbolEvaluatorTest(FakeInternetTestCase):
         self.assertEqual(str_sym_data, "(AND: ('title__gte', 'something'))")
 
     def test_evauluate_symbol_gt(self):
-        ev = OmniSymbolEvaluator()
+        ev = DjangoSingleSymbolEvaluator()
 
         ev.set_translation_mapping({"title": "title"})
 
@@ -165,7 +169,7 @@ class OmniSymbolEvaluatorTest(FakeInternetTestCase):
         self.assertEqual(str_sym_data, "(AND: ('title__gt', 'something'))")
 
     def test_evauluate_symbol_equals(self):
-        ev = OmniSymbolEvaluator()
+        ev = DjangoSingleSymbolEvaluator()
 
         ev.set_translation_mapping({"title": "title"})
 
@@ -176,7 +180,7 @@ class OmniSymbolEvaluatorTest(FakeInternetTestCase):
         self.assertEqual(str_sym_data, "(AND: ('title__icontains', 'something'))")
 
     def test_evauluate_symbol_translate_contains(self):
-        ev = OmniSymbolEvaluator()
+        ev = DjangoSingleSymbolEvaluator()
 
         ev.set_translation_mapping({"title": "title"})
 
@@ -187,7 +191,7 @@ class OmniSymbolEvaluatorTest(FakeInternetTestCase):
         self.assertEqual(str_sym_data, "(AND: ('title__isnull', True))")
 
     def test_evauluate_symbol_equals_mapping(self):
-        ev = OmniSymbolEvaluator()
+        ev = DjangoSingleSymbolEvaluator()
 
         ev.set_translation_mapping({"title.link": "title_obj__link"})
 
@@ -198,7 +202,7 @@ class OmniSymbolEvaluatorTest(FakeInternetTestCase):
         self.assertEqual(str_sym_data, "(AND: ('title.link__icontains', 'something'))")
 
     def test_evauluate_symbol_equals_none(self):
-        ev = OmniSymbolEvaluator()
+        ev = DjangoSingleSymbolEvaluator()
 
         # call tested function
         sym_data = ev.evaluate_symbol("title = something")
@@ -212,7 +216,7 @@ class OmniSymbolEvaluatorTest(FakeInternetTestCase):
         self.assertEqual(conditions["title"], "something")
 
     def test_evauluate_symbol_default_symbols(self):
-        ev = OmniSymbolEvaluator()
+        ev = DjangoSingleSymbolEvaluator()
 
         ev.set_default_search_symbols(["title__icontains", "description__icontains"])
 
@@ -226,7 +230,7 @@ class OmniSymbolEvaluatorTest(FakeInternetTestCase):
         )
 
 
-class OmniSearchConditionsTest(FakeInternetTestCase):
+class OmniSearchWithDefaultTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 
@@ -234,9 +238,9 @@ class OmniSearchConditionsTest(FakeInternetTestCase):
         LinkDataModel.objects.create(link="https://test.com")
 
         search_query = "link == https://test.com"
-        c = OmniSearchConditions(search_query)
+        c = OmniSearchWithDefault(search_query, DjangoSingleSymbolEvaluator())
 
-        c.get_conditions()
+        c.get_query_result()
 
         # call tested function
         conditions = c.get_not_translated_conditions()
@@ -244,25 +248,25 @@ class OmniSearchConditionsTest(FakeInternetTestCase):
         self.assertTrue("link" in conditions)
         self.assertEqual(conditions["link"], "https://test.com")
 
-    def test_get_conditions_processor_evaluator(self):
+    def test_get_query_result__processor_evaluator(self):
         LinkDataModel.objects.create(link="https://test.com")
 
         search_query = "link == https://test.com"
-        processor = OmniSearchConditions(search_query)
+        processor = OmniSearchWithDefault(search_query, DjangoSingleSymbolEvaluator())
 
         processor.set_translation_mapping(["link"])
 
         # call tested function
-        conditions = processor.get_conditions()
+        conditions = processor.get_query_result()
 
         str_conditions = str(conditions)
         self.assertEqual(str_conditions, "(AND: ('link__iexact', 'https://test.com'))")
 
-    def test_get_conditions_default_symbols(self):
+    def test_get_query_result__default_symbols(self):
         LinkDataModel.objects.create(link="https://test.com", title="find title")
 
         search_query = "find title"
-        processor = OmniSearchConditions(search_query)
+        processor = OmniSearchWithDefault(search_query, DjangoSingleSymbolEvaluator())
 
         processor.set_translation_mapping(["link", "title"])
         processor.set_default_search_symbols(
@@ -270,7 +274,7 @@ class OmniSearchConditionsTest(FakeInternetTestCase):
         )
 
         # call tested function
-        conditions = processor.get_conditions()
+        conditions = processor.get_query_result()
 
         str_conditions = str(conditions)
         self.assertEqual(

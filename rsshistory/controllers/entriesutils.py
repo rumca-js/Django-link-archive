@@ -298,6 +298,11 @@ class EntryUpdater(object):
             if not entry.date_published or entry.date_last_modified < entry.date_published:
                 entry.date_published = entry.date_last_modified
 
+        # if update date says that was published before, then it must have was published then
+        if entry.date_published and entry.date_update_last:
+            if entry.date_update_last < entry.date_published:
+                entry.date_published = entry.date_update_last
+
         entry.save()
 
     def update_data(self):
@@ -418,8 +423,9 @@ class EntryUpdater(object):
         if "language" in props and props["language"] is not None:
             entry.language = props["language"]
 
-        # if "date_published" in props and props["date_published"] is not None:
-        #    entry.date_published = props["date_published"]
+        if "date_published" in props and props["date_published"] is not None:
+            if not entry.date_published:
+                entry.date_published = props["date_published"]
 
         self.update_calculated_vote()
 

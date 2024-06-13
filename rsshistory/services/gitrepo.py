@@ -63,7 +63,7 @@ class GitRepo(object):
 
     def push(self):
         if not self.is_different_flag:
-            AppLogging.info("Repository was not changed")
+            AppLogging.info("Repository is not different")
             return
 
         token = self.git_data.password

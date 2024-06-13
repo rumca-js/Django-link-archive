@@ -33,16 +33,69 @@ import argparse
 from dateutil import parser
 import os
 import json
+from rsshistory.omnisearch import SingleSymbolEvaluator, OmniSearch
 
 
-def get_list_files(directory):
-    file_list = []
-    for root, dirs, files in os.walk(directory):
-        for file in files:
-            file_list.append(os.path.join(root, file))
+class DirReader(object):
 
-    file_list = sorted(file_list)
-    return file_list
+    def __init__(self, source_files_directory, accepted_extensions = None):
+        self.dir = source_files_directory
+        if accepted_extensions is None:
+            self.accepted_extensions = [".json"]
+
+    def get_files(self):
+        file_list = []
+        for root, dirs, files in os.walk(self.dir):
+            for file in files:
+                file_split = os.path.splitext(file)
+                if file_split[1] in self.accepted_extensions:
+                    file_list.append(os.path.join(root, file))
+
+        file_list = sorted(file_list)
+        return file_list
+
+
+class AnalyzerSymbolEvaluator(SingleSymbolEvaluator):
+    """
+    return 1 if true
+    """
+
+    def __init__(self, entry):
+        self.entry = entry
+
+    def evaluate_complex_symbol(self, symbol, condition_data):
+        if condition_data[0] not in self.entry:
+            print("evaluate_complex_symbol: symbol {} not in entry".format(condition_data[0]))
+            return
+
+        entry_field_value = self.entry[condition_data[0]]
+
+        if condition_data[1] == "==":
+            return entry_field_value == condition_data[2]
+
+        if condition_data[1] == "!=":
+            return entry_field_value != condition_data[2]
+
+        if condition_data[1] == ">":
+            return entry_field_value > condition_data[2]
+
+        if condition_data[1] == "<":
+            return entry_field_value < condition_data[2]
+
+        if condition_data[1] == ">=":
+            return entry_field_value >= condition_data[2]
+
+        if condition_data[1] == "<=":
+            return entry_field_value <= condition_data[2]
+
+        if condition_data[1] == "=":
+            return entry_field_value.find(condition_data[2]) >= 0
+
+        raise IOError("Unsupported operator")
+
+    def evaluate_simple_symbol(self, symbol):
+        return symbol
+
 
 def read_file_contents(file_path):
     with open(file_path, "r") as f:
@@ -52,17 +105,20 @@ def date_from_string(string_input):
     return parser.parse(string_input)
 
 
-class MainObject(object):
+class DataAnalyzer(object):
     def __init__(self, parser):
         self.parser = parser
         if self.parser.dir:
-            self.files = get_list_files(self.parser.dir)
+            reader = DirReader(self.parser.dir)
+            self.files = reader.get_files()
         else:
             self.files = []
         self.result = None
 
     def process(self):
-        if self.is_individual_entry_search():
+        if self.is_omni_search():
+            self.perform_omni_search()
+        elif self.is_individual_entry_search():
             count = self.perform_individual_search()
         elif self.is_daily_entry_search():
             self.perform_daily_search()
@@ -70,6 +126,23 @@ class MainObject(object):
             count = self.show_all_tags()
         else:
             print("No condition to search")
+
+    def perform_omni_search(self):
+        reader = DirReader(source_files_directory = self.parser.dir)
+        files = reader.get_files()
+
+        for afile in files:
+            entries = self.read_file(afile)
+            if not entries:
+                continue
+
+            for entry in entries:
+                if self.is_omni_match(entry):
+                    self.print_entry(entry)
+
+    def is_omni_match(self, entry):
+        search = OmniSearch(self.parser.args.search, AnalyzerSymbolEvaluator(entry))
+        return search.get_query_result()
 
     def perform_individual_search(self):
         total_count = 0
@@ -221,6 +294,10 @@ class MainObject(object):
         if self.parser.args.find:
             return True
 
+    def is_omni_search(self):
+        if self.parser.args.search:
+            return True
+
     def is_daily_entry_search(self):
         if not self.parser.args.daily:
             return False
@@ -277,6 +354,9 @@ class Parser(object):
         self.parser.add_argument("--date-from", help="Specifies date in which we should search")
         self.parser.add_argument("--date-to", help="Specifies date in which we should search")
 
+        # TODO implement
+        self.parser.add_argument("--search", help="Search, with syntax same as the main program / site.")
+
         # TODO change that from value-less to value?
         self.parser.add_argument("--title", action="store_true", help="Find in title")
         self.parser.add_argument("--description", action="store_true", help="Find in description")
@@ -298,7 +378,7 @@ def main():
     p = Parser()
     p.parse()
 
-    m = MainObject(p)
+    m = DataAnalyzer(p)
     m.process()
 
 

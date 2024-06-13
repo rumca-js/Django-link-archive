@@ -33,7 +33,7 @@ class SourceDataController(SourceDataModel):
         for source in sources:
             entries = LinkDataModel.objects.filter(link=source.url)
             if entries.count() == 0:
-                SourceDataController.add_link(source)
+                SourceDataController.add_entry(source)
             else:
                 entry = entries[0]
                 entry.permanent = True
