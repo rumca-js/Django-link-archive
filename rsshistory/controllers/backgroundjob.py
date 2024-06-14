@@ -407,13 +407,13 @@ class BackgroundJobController(BackgroundJob):
             BackgroundJob.JOB_IMPORT_INSTANCE, link, author
         )
 
-    def is_update_or_reset_job():
+    def get_number_of_update_reset_jobs():
         condition_reset = Q(job = BackgroundJob.JOB_LINK_RESET_DATA)
         condition_update = Q(job = BackgroundJob.JOB_LINK_UPDATE_DATA)
         condition_enabled = Q(enabled=True)
         
         objs = BackgroundJobController.objects.filter(condition_enabled & (condition_update | condition_reset))
-        return objs.count() > 0
+        return objs.count()
 
     def is_update_or_reset_entry_job(entry):
         condition_reset = Q(job = BackgroundJob.JOB_LINK_RESET_DATA)

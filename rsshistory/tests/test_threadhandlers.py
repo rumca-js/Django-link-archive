@@ -406,12 +406,13 @@ class RefreshThreadHandlerTest(FakeInternetTestCase):
             password="password",
         )
 
-    def test_process_no_exports(self):
+    def test_refresh__process_no_exports(self):
         DataExport.objects.all().delete()
         SourceExportHistory.objects.all().delete()
         self.create_exports()
 
         handler = RefreshThreadHandler()
+        # call tested function
         handler.refresh()
 
         persistent_objects = AppLogging.objects.all()
@@ -437,12 +438,13 @@ class RefreshThreadHandlerTest(FakeInternetTestCase):
 
         self.assertEqual(SourceExportHistory.objects.all().count(), 3)
 
-    def test_process_with_exports(self):
+    def test_refresh__process_with_exports(self):
         DataExport.objects.all().delete()
         SourceExportHistory.objects.all().delete()
         self.create_exports()
 
         handler = RefreshThreadHandler()
+        # call tested function
         handler.refresh()
 
         self.assertEqual(
@@ -464,6 +466,33 @@ class RefreshThreadHandlerTest(FakeInternetTestCase):
         self.assertEqual(
             BackgroundJobController.objects.filter(
                 job=BackgroundJobController.JOB_CLEANUP
+            ).count(),
+            1,
+        )
+
+    def test_refresh__adds_update_entry_job(self):
+        DataExport.objects.all().delete()
+        SourceExportHistory.objects.all().delete()
+
+        LinkDataController.objects.create(
+            source="https://youtube.com",
+            link="https://youtube.com?v=12345",
+        )
+
+        handler = RefreshThreadHandler()
+        # call tested function
+        handler.refresh()
+
+        persistent_objects = AppLogging.objects.all()
+
+        for persistent_object in persistent_objects:
+            print("Persisten object info:{}".format(persistent_object.info))
+
+        self.assertEqual(persistent_objects.count(), 0)
+
+        self.assertEqual(
+            BackgroundJobController.objects.filter(
+                job=BackgroundJobController.JOB_LINK_UPDATE_DATA
             ).count(),
             1,
         )

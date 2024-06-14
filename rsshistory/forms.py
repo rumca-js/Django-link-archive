@@ -109,6 +109,8 @@ class ConfigForm(forms.ModelForm):
             "track_user_navigation",
             "data_export_path",
             "data_import_path",
+            "days_to_check_std_entries",
+            "number_of_update_entries",
             "days_to_move_to_archive",
             "days_to_check_stale_entries",
             "days_to_remove_links",

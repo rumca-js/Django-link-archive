@@ -969,8 +969,7 @@ class RefreshThreadHandler(object):
                 self.do_update(export)
                 SourceExportHistory.confirm(export)
 
-        if self.is_no_backgroundjob_active():
-            self.update_entry()
+        self.update_entries()
 
     def check_sources(self):
         sources = SourceDataController.objects.filter(enabled=True).order_by(
@@ -993,14 +992,31 @@ class RefreshThreadHandler(object):
 
         BackgroundJobController.make_cleanup()
 
-    def is_no_backgroundjob_active(self):
-        return BackgroundJobController.is_update_or_reset_job() == False
+    def update_entries(self):
+        c = Configuration.get_object()
+        conf = c.config_entry
 
-    def update_entry(self):
+        max_number_of_update_entries = conf.number_of_update_entries
+
+        if max_number_of_update_entries == 0:
+            return
+
         u = EntriesUpdater()
         entries = u.get_entries_to_update()
-        if entries and entries.count() > 0:
-            BackgroundJobController.entry_update_data(entries[0])
+
+        number_of_entries = entries.count()
+
+        if entries and number_of_entries > 0:
+            current_num_of_jobs = BackgroundJobController.get_number_of_update_reset_jobs()
+
+            if current_num_of_jobs >= max_number_of_update_entries:
+                return
+
+            jobs_to_add = max_number_of_update_entries - current_num_of_jobs
+            jobs_to_add = min(jobs_to_add, number_of_entries)
+
+            for index in range(jobs_to_add):
+                BackgroundJobController.entry_update_data(entries[index])
 
 
 class HandlerManager(object):

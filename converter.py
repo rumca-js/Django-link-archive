@@ -10,6 +10,117 @@ import json
 import argparse
 
 
+class EntryTable(object):
+    """
+    Low level database implementation. Maybe use sqlalchemy?
+    """
+    def __init__(self):
+        self.fields = [
+                {"name" : 'id',                    "properties" : "INTEGER AUTO_INCREMENT PRIMARY KEY"},
+                {"name" : 'link',                  "properties" : "TEXT NOT NULL UNIQUE"},
+                {"name" : 'title',                 "properties" : "TEXT NOT NULL"},
+                {"name" : 'description',           "properties" : "TEXT NOT NULL"},
+                {"name" : 'thumbnail',             "properties" : "TEXT NULL"},
+                {"name" : 'language',              "properties" : "TEXT NULL"},
+                {"name" : 'age',                   "properties" : "INTEGER"},
+                {"name" : 'date_created',          "properties" : "TEXT NULL"},
+                {"name" : 'date_published',        "properties" : "TEXT NULL"},
+                {"name" : 'date_update_last',      "properties" : "TEXT NULL"},
+                {"name" : 'date_dead_since',       "properties" : "TEXT NULL"},
+                {"name" : 'date_last_modified',    "properties" : "TEXT NULL"},
+                {"name" : 'status_code',           "properties" : "INTEGER NULL"},
+                {"name" : 'tags',                  "properties" : "TEXT NULL"},
+                {"name" : 'page_rating',           "properties" : "INTEGER"},
+                {"name" : 'page_rating_votes',     "properties" : "INTEGER"},
+                {"name" : 'page_rating_contents',  "properties" : "INTEGER"},
+                ]
+
+    def get_query_create_table(self):
+        query_start = """
+        CREATE TABLE IF NOT EXISTS entries (
+        """
+        query_stop = """
+            )
+        """
+
+        fields_len = len(self.fields)
+
+        query_body = ""
+        for key, field in enumerate(self.fields):
+            query_body += field["name"] + " " + field["properties"]
+
+            if key != fields_len -1:
+                query_body += ","
+
+        return query_start + query_body + query_stop
+
+    def get_query_insert(self, entry_dict, auto_increment = False):
+        query_start = """
+        INSERT INTO entries (
+        """
+        query_stop = """
+        )
+        """
+
+        values_start = """ VALUES (
+        """
+        values_stop = """
+        )
+        """
+
+        fields_len = len(self.fields)
+
+        query_body = ""
+        for key, field in enumerate(self.fields):
+            if auto_increment == True and field["name"] == "id":
+                continue
+
+            query_body += field["name"]
+
+            if key != fields_len -1:
+                query_body += ","
+
+        values_body = ""
+        for key, field in enumerate(self.fields):
+            if auto_increment == True and field["name"] == "id":
+                continue
+
+            value = self.get_entry_value(field, entry_dict)
+            values_body += "'" + str(value) + "'"
+
+            if key != fields_len -1:
+                values_body += ","
+
+        return query_start + query_body + query_stop + values_start + values_body + values_stop
+
+    def get_entry_value(self, field, entry_dict):
+        field_name = field["name"]
+        field_props = field["properties"]
+
+        if field_name not in entry_dict or entry_dict[field_name] is None:
+            if field_props.find("TEXT") >= 0:
+                return ""
+            elif field_props.find("INTEGER") >= 0:
+                return 0
+        else:
+            entry_value = entry_dict[field_name]
+            if type(entry_value) == list:
+                entry_value = ", ".join(entry_value)
+
+            if field_props.find("TEXT") >= 0:
+                if entry_value.find("'") >= 0:
+                    entry_value = entry_value.replace("'", "")
+
+            return entry_value
+
+    def get_query_is_entry(self, entry):
+        query = """
+        SELECT * FROM entries WHERE link = '{}'
+        """.format(entry["link"])
+
+        return query
+
+
 class DirReader(object):
 
     def __init__(self, source_files_directory, accepted_extensions = None):
@@ -32,12 +143,16 @@ class DirReader(object):
 class DataBase(object):
     def __init__(self, output_file = "test.db", parser = None):
         self.conn = None
+        self.cursor = None
+
         if output_file:
             self.output_file = output_file
         else:
             self.output_file = "test.db"
 
         self.parser = parser
+
+        self.entry_table = EntryTable()
 
         self.create_database()
         self.create_entry_table()
@@ -47,106 +162,36 @@ class DataBase(object):
 
         try:
             self.conn = sqlite3.connect(file_name)
+            self.cursor = self.conn.cursor()
         except Exception as E:
             print("Could not create sqlite3 database file:{}. Exception:{}".format(file_name, str(E)))
 
     def create_entry_table(self):
-        query = """
-        CREATE TABLE IF NOT EXISTS entries (
-            id INTEGER AUTO_INCREMENT PRIMARY KEY,
-            link TEXT NOT NULL UNIQUE,
-            title TEXT NOT NULL,
-            description TEXT NOT NULL,
-            date_published TEXT NULL,
-            page_rating INTEGER,
-            page_rating_votes INTEGER,
-            language TEXT NULL,
-            status_code INTEGER NULL
-            )
-        """
-
-        c = self.conn.cursor()
-        c.execute(query)
-        self.conn.commit()
+        query = self.entry_table.get_query_create_table()
+        #print(query)
+        self.cursor.execute(query)
 
     def add_entry(self, entry):
-        self.clean_up_entry(entry)
-
         if self.parser and self.parser.preserve_id:
             self.add_entry_as_is(entry)
         else:
             self.add_entry_auto_increment(entry)
 
-    def clean_up_entry(self, entry):
-        if "title" not in entry:
-            entry["title"] = ""
-        if "description" not in entry:
-            entry["description"] = ""
-        if "date_published" not in entry:
-            entry["date_published"] = ""
-        if "page_rating" not in entry:
-            entry["page_rating"] = 0
-        if "page_rating_votes" not in entry:
-            entry["page_rating_votes"] = 0
-        if "language" not in entry:
-            entry["language"] = ""
-        if "status_code" not in entry:
-            entry["status_code"] = 0
-
     def add_entry_auto_increment(self, entry):
-
-        # TODO maybe we should encapsulate, unescape, or something. This is ugly
-        title = entry["title"].replace("'", "")
-        description = entry["description"].replace("'", "")
-
-        query = """
-        INSERT INTO entries (
-            link,
-            title,
-            description,
-            date_published,
-            page_rating,
-            page_rating_votes,
-            language,
-            status_code)
-            VALUES
-            ('{}','{}','{}','{}','{}','{}','{}','{}')
-        """.format(entry["link"],
-                title,
-                description,
-                entry["date_published"],
-                entry["page_rating"],
-                entry["page_rating_votes"],
-                entry["language"],
-                entry["status_code"],
-                )
-
-        c = self.conn.cursor()
-        c.execute(query)
-        self.conn.commit()
+        query = self.entry_table.get_query_insert(entry, auto_increment=True)
+        #print(query)
+        self.cursor.execute(query)
 
     def add_entry_as_is(self, entry):
-        print("Adding entry:{}".format(entry))
-
-        query = """
-        INSERT INTO entries (
-            link)
-            VALUES
-            ('{}')
-        """.format(entry["link"])
-
-        c = self.conn.cursor()
-        c.execute(query)
-        self.conn.commit()
+        query = self.entry_table.get_query_insert(entry, auto_increment=False)
+        #print(query)
+        self.cursor.execute(query)
 
     def is_entry(self, entry):
-        query = """
-        SELECT * FROM entries WHERE link = '{}'
-        """.format(entry["link"])
-
-        c = self.conn.cursor()
-        c.execute(query)
-        rows = c.fetchall()
+        query = self.entry_table.get_query_is_entry(entry)
+        #print(query)
+        self.cursor.execute(query)
+        rows = self.cursor.fetchall()
 
         return len(rows) > 0
 
@@ -155,6 +200,7 @@ class DataBase(object):
 
     def close(self):
         if self.conn:
+            self.conn.commit()
             self.conn.close()
 
 
@@ -169,7 +215,10 @@ class Converter(object):
         self.files = self.file_reader.get_files()
 
     def convert(self):
-        for afile in self.files:
+        total_num_files = len(self.files)
+
+        for row, afile in enumerate(self.files):
+            print("[{}/{}]: file:{}".format(row, total_num_files, afile))
             self.convert_file(afile)
 
     def convert_file(self, file_name):
@@ -177,20 +226,22 @@ class Converter(object):
         if not data:
             return
 
-        for key, entry in enumerate(data):
+        total_rows = len(data)
+
+        for row, entry in enumerate(data):
             if "link" in entry:
                 if self.parser and self.parser.preserve_id:
                     if "id" not in entry:
                         print("Entry {} is missing ID".format(entry["link"]))
                         continue
                 else:
-                    entry["id"] = key
+                    entry["id"] = row
 
                 if not self.conn.is_entry(entry):
-                    print("Adding entry:{}".format(entry.link))
+                    print(" -> [{}/{}] Link:{} Added".format(row, total_rows, entry["link"]))
                     self.conn.add_entry(entry)
                 else:
-                    print("NOT adding entry:{}".format(entry.link))
+                    print(" -> [{}/{}] Link:{} Skipped".format(row, total_rows, entry["link"]))
 
     def read_file_contents(self, file_name):
         with open(file_name, "r") as f:

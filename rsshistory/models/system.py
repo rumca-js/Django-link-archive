@@ -130,6 +130,11 @@ class ConfigurationEntry(models.Model):
         help_text="The limit is for each user. Helps in maintaining proper culture",
     )
 
+    number_of_update_entries = models.IntegerField(
+        default=1,
+        help_text="The amount of entries that will be updated at each refresh",
+    )
+
     prefer_https = models.BooleanField(
         default=False, help_text="When adding check if https link exists"
     )

@@ -86,6 +86,10 @@ def date_str_to_date(date_str):
     from .dateutils import DateUtils
 
     if date_str:
+        wh = date_str.find("Published:")
+        if wh >= 0:
+            date_str = date_str[wh+1:].strip()
+
         try:
             parsed_date = parser.parse(date_str)
             return DateUtils.to_utc_date(parsed_date)

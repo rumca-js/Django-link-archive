@@ -572,12 +572,13 @@ class EntriesUpdater(object):
         )
 
         condition_days_to_check = Q(date_update_last__lt=date_to_check)
+        condition_update_null = Q(date_update_last__isnull=True)
 
         # we also update page if it is voted to be below 0
         # we need to have up-to-date info if pages go out of the business
         # we may change design to update it less often
 
-        entries = LinkDataController.objects.filter(condition_days_to_check).order_by(
+        entries = LinkDataController.objects.filter(condition_days_to_check | condition_update_null).order_by(
             "date_update_last", "link"
         )
 

@@ -40,19 +40,25 @@
    </div>
 
    {% if object.source_obj %}
-   <div>
+   <div class="container">
        <a href="{{object.source_obj.get_absolute_url}}">
-	  {% if object.get_thumbnail != object.source_obj.get_favicon %}
-             {% if user_config.show_icons%}
-                 {% if user_config.small_icons %}
-                   <img src="{{object.source_obj.get_favicon}}" class="rounded icon-small"/>
-                 {% else %}
-                   <img src="{{object.source_obj.get_favicon}}" class="rounded icon-normal"/>
-                 {% endif %}
+          <div class="d-flex">
+	     {% if object.get_thumbnail != object.source_obj.get_favicon %}
+                {% if user_config.show_icons%}
+	            <div>
+                    {% if user_config.small_icons %}
+                      <img src="{{object.source_obj.get_favicon}}" class="rounded icon-small"/>
+                    {% else %}
+                      <img src="{{object.source_obj.get_favicon}}" class="rounded icon-normal"/>
+                    {% endif %}
+	            </div>
+                {% endif %}
              {% endif %}
-          {% endif %}
 
-          {{object.source_obj.title}}
+	     <div>
+             {{object.source_obj.title}}
+	     </div>
+	  </div>
        </a>
    </div>
    {% endif %}
