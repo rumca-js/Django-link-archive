@@ -509,7 +509,7 @@ class CleanJobHandlerTest(FakeInternetTestCase):
     def prepare_data(self):
         # inserts old data, we will check if those will be removed
         conf = Configuration.get_object().config_entry
-        conf.auto_store_domain_info = True
+        conf.accept_domains = True
         conf.save()
 
         p = AppLogging.objects.create(info_text="info1", level=10, user="test")
@@ -603,7 +603,7 @@ class CleanJobHandlerTest(FakeInternetTestCase):
         self.prepare_data()
 
         conf = Configuration.get_object().config_entry
-        conf.auto_store_domain_info = False
+        conf.accept_domains = False
         conf.save()
 
         handler = CleanupJobHandler()
@@ -630,7 +630,7 @@ class AddJobHandlerTest(FakeInternetTestCase):
 
     def test_add_link(self):
         conf = Configuration.get_object().config_entry
-        conf.auto_store_domain_info = True
+        conf.accept_domains = True
         conf.save()
 
         LinkDataController.objects.all().delete()
@@ -652,7 +652,7 @@ class AddJobHandlerTest(FakeInternetTestCase):
 
     def test_add_link_with_props(self):
         conf = Configuration.get_object().config_entry
-        conf.auto_store_domain_info = True
+        conf.accept_domains = True
         conf.save()
 
         LinkDataController.objects.all().delete()
@@ -685,7 +685,7 @@ class ScanLinkJobHandlerTest(FakeInternetTestCase):
 
     def test_scan_link(self):
         conf = Configuration.get_object().config_entry
-        conf.auto_store_domain_info = True
+        conf.accept_domains = True
         conf.save()
 
         LinkDataController.objects.all().delete()

@@ -22,11 +22,11 @@ class BaseRssPluginTest(FakeInternetTestCase):
         LinkDataController.objects.all().delete()
 
         config = Configuration.get_object().config_entry
-        config.auto_store_entries = True
-        config.auto_store_sources = True
-        config.auto_store_domain_info = False
-        config.auto_store_entries_use_all_data = False
-        config.auto_store_entries_use_clean_page_info = False
+        config.accept_not_domain_entries = True
+        config.auto_create_sources = True
+        config.accept_domains = False
+        config.new_entries_merge_data = False
+        config.new_entries_use_clean_data = False
         config.save()
 
         MockRequestCounter.mock_page_requests = 0
@@ -52,11 +52,11 @@ class BaseRssPluginTest(FakeInternetTestCase):
         LinkDataController.objects.all().delete()
 
         config = Configuration.get_object().config_entry
-        config.auto_store_entries = True
-        config.auto_store_sources = True
-        config.auto_store_domain_info = False
-        config.auto_store_entries_use_all_data = True
-        config.auto_store_entries_use_clean_page_info = False
+        config.accept_not_domain_entries = True
+        config.auto_create_sources = True
+        config.accept_domains = False
+        config.new_entries_merge_data = True
+        config.new_entries_use_clean_data = False
         config.save()
 
         self.assertTrue(self.source_rss)
@@ -77,11 +77,11 @@ class BaseRssPluginTest(FakeInternetTestCase):
         LinkDataController.objects.all().delete()
 
         config = Configuration.get_object().config_entry
-        config.auto_store_entries = True
-        config.auto_store_sources = True
-        config.auto_store_domain_info = False
-        config.auto_store_entries_use_all_data = False
-        config.auto_store_entries_use_clean_page_info = True
+        config.accept_not_domain_entries = True
+        config.auto_create_sources = True
+        config.accept_domains = False
+        config.new_entries_merge_data = False
+        config.new_entries_use_clean_data = True
         config.save()
 
         self.assertTrue(self.source_rss)
@@ -102,11 +102,11 @@ class BaseRssPluginTest(FakeInternetTestCase):
         LinkDataController.objects.all().delete()
 
         config = Configuration.get_object().config_entry
-        config.auto_store_entries = True
-        config.auto_store_sources = True
-        config.auto_store_domain_info = False
-        config.auto_store_entries_use_all_data = True
-        config.auto_store_entries_use_clean_page_info = False
+        config.accept_not_domain_entries = True
+        config.auto_create_sources = True
+        config.accept_domains = False
+        config.new_entries_merge_data = True
+        config.new_entries_use_clean_data = False
         config.save()
 
         self.assertTrue(self.source_rss)

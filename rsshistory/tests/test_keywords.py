@@ -14,7 +14,7 @@ class KeyWordsTest(FakeInternetTestCase):
         self.disable_web_pages()
 
         c = Configuration.get_object().config_entry
-        c.auto_store_keyword_info = True
+        c.enable_keyword_support = True
         c.save()
 
         KeyWords.objects.all().delete()

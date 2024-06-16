@@ -497,14 +497,15 @@ class FakeInternetTestCase(TestCase):
         c = Configuration.get_object()
         c.config_entry = ConfigurationEntry.get()
 
-        c.config_entry.auto_store_entries = True
-        c.config_entry.auto_store_entries_use_all_data = False
-        c.config_entry.auto_store_entries_use_clean_page_info = False
-        c.config_entry.auto_store_sources = False
-        c.config_entry.auto_store_sources_enabled = False
-        c.config_entry.auto_store_domain_info = True
-        c.config_entry.auto_store_keyword_info = True
-        c.config_entry.auto_scan_new_entries = False
+        c.config_entry.enable_keyword_support = True
+        c.config_entry.enable_domain_support = True
+        c.config_entry.accept_domains = True
+        c.config_entry.accept_not_domain_entries = True
+        c.config_entry.new_entries_merge_data = False
+        c.config_entry.new_entries_use_clean_data = False
+        c.config_entry.new_source_enabled_state = False
+        c.config_entry.auto_create_sources = False
+        c.config_entry.auto_scan_entries = False
         c.config_entry.link_save = False
         c.config_entry.source_save = False
         c.config_entry.track_user_actions = False

@@ -283,9 +283,9 @@ class SourceGenericPlugin(object):
         result = []
 
         c = Configuration.get_object().config_entry
-        if not c.auto_store_entries and c.auto_store_domain_info:
+        if not c.accept_not_domain_entries and c.accept_domains:
             result = self.get_domains()
-        elif c.auto_store_entries:
+        elif c.accept_not_domain_entries:
             address = self.get_address()
 
             u = UrlHandler(address)

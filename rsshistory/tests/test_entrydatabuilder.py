@@ -24,9 +24,9 @@ class EntryDataBuilderTest(FakeInternetTestCase):
 
     def test_add_from_props_no_slash(self):
         config = Configuration.get_object().config_entry
-        config.auto_store_entries = True
-        config.auto_store_domain_info = False
-        config.auto_store_sources = False
+        config.accept_not_domain_entries = True
+        config.accept_domains = False
+        config.auto_create_sources = False
         config.save()
 
         MockRequestCounter.mock_page_requests = 0
@@ -72,8 +72,8 @@ class EntryDataBuilderTest(FakeInternetTestCase):
 
     def test_add_from_props_with_slash(self):
         config = Configuration.get_object().config_entry
-        config.auto_store_entries = True
-        config.auto_store_domain_info = False
+        config.accept_not_domain_entries = True
+        config.accept_domains = False
         config.save()
 
         link_name = "https://youtube.com/v=1234/"
@@ -103,8 +103,8 @@ class EntryDataBuilderTest(FakeInternetTestCase):
 
     def test_add_from_props_uppercase(self):
         config = Configuration.get_object().config_entry
-        config.auto_store_entries = True
-        config.auto_store_domain_info = False
+        config.accept_not_domain_entries = True
+        config.accept_domains = False
         config.save()
 
         link_name = "HTTPS://YouTube.com/v=1234/"
@@ -137,8 +137,8 @@ class EntryDataBuilderTest(FakeInternetTestCase):
         LinkDataController.objects.all().delete()
 
         config = Configuration.get_object().config_entry
-        config.auto_store_entries = False
-        config.auto_store_domain_info = False
+        config.accept_not_domain_entries = False
+        config.accept_domains = False
         config.save()
 
         objs = LinkDataController.objects.all()
@@ -172,8 +172,8 @@ class EntryDataBuilderTest(FakeInternetTestCase):
         LinkDataController.objects.all().delete()
 
         config = Configuration.get_object().config_entry
-        config.auto_store_entries = False
-        config.auto_store_domain_info = True
+        config.accept_not_domain_entries = False
+        config.accept_domains = True
         config.save()
 
         MockRequestCounter.mock_page_requests = 0
@@ -241,9 +241,9 @@ class EntryDataBuilderTest(FakeInternetTestCase):
 
     def test_does_not_add_site_not_found(self):
         config = Configuration.get_object().config_entry
-        config.auto_store_entries = True
-        config.auto_store_domain_info = False
-        config.auto_store_sources = False
+        config.accept_not_domain_entries = True
+        config.accept_domains = False
+        config.auto_create_sources = False
         config.save()
 
         MockRequestCounter.mock_page_requests = 0
@@ -276,9 +276,9 @@ class EntryDataBuilderTest(FakeInternetTestCase):
 
     def test_add_from_props__ipv4_rejects(self):
         config = Configuration.get_object().config_entry
-        config.auto_store_entries = True
-        config.auto_store_domain_info = False
-        config.auto_store_sources = False
+        config.accept_not_domain_entries = True
+        config.accept_domains = False
+        config.auto_create_sources = False
         config.accept_ip_addresses = False
         config.save()
 
@@ -313,9 +313,9 @@ class EntryDataBuilderTest(FakeInternetTestCase):
 
     def test_add_from_props__ipv4_accept(self):
         config = Configuration.get_object().config_entry
-        config.auto_store_entries = True
-        config.auto_store_domain_info = False
-        config.auto_store_sources = False
+        config.accept_not_domain_entries = True
+        config.accept_domains = False
+        config.auto_create_sources = False
         config.accept_ip_addresses = True
         config.save()
 
@@ -350,9 +350,9 @@ class EntryDataBuilderTest(FakeInternetTestCase):
 
     def test_add_from_props__adds_date_published(self):
         config = Configuration.get_object().config_entry
-        config.auto_store_entries = True
-        config.auto_store_domain_info = False
-        config.auto_store_sources = False
+        config.accept_not_domain_entries = True
+        config.accept_domains = False
+        config.auto_create_sources = False
         config.accept_ip_addresses = True
         config.save()
 

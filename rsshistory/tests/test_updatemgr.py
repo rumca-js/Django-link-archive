@@ -66,7 +66,7 @@ class UpdateManagerGitTest(FakeInternetTestCase):
         c = Configuration.get_object()
         c.config_entry = ConfigurationEntry.get()
 
-        c.config_entry.auto_store_entries = True
+        c.config_entry.accept_not_domain_entries = True
         c.config_entry.data_import_path = "./data/imports"
         c.config_entry.data_export_path = "./data/exports"
         c.config_entry.save()

@@ -133,7 +133,7 @@ class KeyWords(models.Model):
     def add_link_data(link_data):
         from ..configuration import Configuration
 
-        if Configuration.get_object().config_entry.auto_store_keyword_info:
+        if Configuration.get_object().config_entry.enable_keyword_support:
             if "language" not in link_data:
                 return False
 
@@ -157,7 +157,7 @@ class KeyWords(models.Model):
     def cleanup():
         from ..configuration import Configuration
 
-        if Configuration.get_object().config_entry.auto_store_keyword_info:
+        if Configuration.get_object().config_entry.enable_keyword_support:
             from ..dateutils import DateUtils
 
             date_before_limit = KeyWords.get_keywords_date_limit()

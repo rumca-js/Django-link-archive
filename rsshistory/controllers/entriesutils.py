@@ -218,7 +218,7 @@ class EntryScanner(object):
     def run(self):
         c = Configuration.get_object()
         config = c.config_entry
-        if not config.auto_scan_new_entries:
+        if not config.auto_scan_entries:
             return
 
         if self.entry:
@@ -228,9 +228,9 @@ class EntryScanner(object):
         parser = ContentLinkParser(self.url, self.contents)
 
         contents_links = []
-        if config.auto_store_domain_info:
+        if config.accept_domains:
             contents_links = parser.get_domains()
-        if config.auto_store_entries:
+        if config.accept_not_domain_entries:
             contents_links = parser.get_links()
 
         for link in contents_links:
@@ -447,7 +447,7 @@ class EntryUpdater(object):
     def check_for_sources(self, entry, url_interface):
         conf = Configuration.get_object().config_entry
 
-        if not conf.auto_store_sources:
+        if not conf.auto_create_sources:
             return
 
         url_handler = url_interface.h
@@ -881,10 +881,10 @@ class LinkDataWrapper(object):
         p = DomainAwarePage(entry.link)
         is_domain = p.is_domain()
 
-        if not config.auto_store_entries:
-            if is_domain and config.auto_store_domain_info:
+        if not config.accept_not_domain_entries:
+            if is_domain and config.accept_domains:
                 pass
-            elif not is_domain and config.auto_store_domain_info:
+            elif not is_domain and config.accept_domains:
                 """
                 tags and votes, are deleted automatically
                 """
@@ -1216,8 +1216,8 @@ class EntryDataBuilder(object):
         #    self.link_data["link"] = self.link_data["link"].lower()
 
         c = Configuration.get_object().config_entry
-        if self.is_domain_link_data() and c.auto_store_domain_info:
-            if c.auto_store_domain_info:
+        if self.is_domain_link_data() and c.accept_domains:
+            if c.accept_domains:
                 self.link_data["permanent"] = True
 
         if self.is_enabled_to_store():
@@ -1238,9 +1238,9 @@ class EntryDataBuilder(object):
             # TODO if object just created
             if entry:
                 c = Configuration.get_object().config_entry
-                if c.auto_store_entries_use_clean_page_info:
+                if c.new_entries_use_clean_data:
                     BackgroundJobController.entry_reset_data(entry)
-                elif c.auto_store_entries_use_all_data:
+                elif c.new_entries_merge_data:
                     BackgroundJobController.entry_update_data(entry)
 
         self.add_addition_link_data()
@@ -1287,9 +1287,13 @@ class EntryDataBuilder(object):
         return wrapper.create(new_link_data)
 
     def set_domain_object(self):
-        domain = DomainsController.add(self.link_data["link"])
-        if domain:
-            self.link_data["domain_obj"] = domain
+        config = Configuration.get_object().config_entry
+
+        if config.enable_domain_support:
+            domain = DomainsController.add(self.link_data["link"])
+
+            if domain:
+                self.link_data["domain_obj"] = domain
         return self.link_data
 
     def check_and_set_source_object(self):
@@ -1317,10 +1321,10 @@ class EntryDataBuilder(object):
         is_domain = p.is_domain()
         domain = p.get_domain_only()
 
-        if not config.auto_store_entries:
-            if is_domain and config.auto_store_domain_info:
+        if not config.accept_not_domain_entries:
+            if is_domain and config.accept_domains:
                 pass
-            elif not is_domain and config.auto_store_domain_info:
+            elif not is_domain and config.accept_domains:
                 return False
             elif "bookmarked" in self.link_data and self.link_data["bookmarked"]:
                 pass
@@ -1385,15 +1389,15 @@ class EntryDataBuilder(object):
 
         config = Configuration.get_object().config_entry
 
-        if config.auto_store_entries or config.auto_store_domain_info:
+        if config.accept_not_domain_entries or config.accept_domains:
             links = set()
 
-            if config.auto_store_domain_info:
+            if config.accept_domains:
                 p = DomainAwarePage(link_data["link"])
                 domain = p.get_domain()
                 links.add(domain)
 
-            if config.auto_scan_new_entries:
+            if config.auto_scan_entries:
                 if "description" in link_data:
                     parser = ContentLinkParser(
                         link_data["link"], link_data["description"]
@@ -1418,7 +1422,7 @@ class EntryDataBuilder(object):
 
         config = Configuration.get_object().config_entry
 
-        if config.auto_store_keyword_info:
+        if config.enable_keyword_support:
             if "title" in link_data:
                 KeyWords.add_link_data(link_data)
 

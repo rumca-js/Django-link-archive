@@ -441,7 +441,7 @@ class BaseLinkDataController(BaseLinkDataModel):
 
         p = DomainAwarePage(self.link)
 
-        if p.is_domain() and conf.auto_store_domain_info:
+        if p.is_domain() and conf.accept_domains:
             return True
 
         if self.source_obj:

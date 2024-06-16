@@ -31,6 +31,7 @@ class BaseJsonPluginTest(FakeInternetTestCase):
         )
 
         plugin = BaseSourceJsonPlugin(self.source_obj.id)
+        # call tested function
         props = plugin.get_container_elements()
 
         self.print_errors()
@@ -54,6 +55,7 @@ class BaseJsonPluginTest(FakeInternetTestCase):
         )
 
         plugin = BaseSourceJsonPlugin(self.source_obj.id)
+        # call tested function
         props = plugin.get_container_elements()
 
         self.print_errors()
@@ -67,9 +69,9 @@ class BaseJsonPluginTest(FakeInternetTestCase):
 
     def test_get_container_elements_sources(self):
         config = Configuration.get_object().config_entry
-        config.auto_store_entries = True
-        config.auto_store_domain_info = False
-        config.auto_store_sources_enabled = False
+        config.accept_not_domain_entries = True
+        config.accept_domains = False
+        config.new_source_enabled_state = False
 
         config.save()
 
@@ -85,6 +87,7 @@ class BaseJsonPluginTest(FakeInternetTestCase):
         )
 
         plugin = BaseSourceJsonPlugin(self.source_obj.id)
+        # call tested function
         props = plugin.get_container_elements()
 
         sources = SourceDataController.objects.all().order_by("-enabled")

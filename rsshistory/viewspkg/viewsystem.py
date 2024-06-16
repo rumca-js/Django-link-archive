@@ -632,9 +632,9 @@ def get_scan_contents_links(link, contents):
     c = Configuration.get_object().config_entry
 
     links = []
-    if c.auto_store_entries:
+    if c.accept_not_domain_entries:
         links.extend(parser.get_links())
-    if c.auto_store_domain_info:
+    if c.accept_domains:
         links.extend(parser.get_domains())
 
     links = set(links)
@@ -847,11 +847,11 @@ def wizard_setup_news(request):
     c.source_save = False
     c.accept_dead = False
     c.accpte_ip_addresses = False
-    c.auto_scan_new_entries = False
-    c.auto_store_entries = True
+    c.auto_scan_entries = False
+    c.accept_not_domain_entries = True
     c.auto_store_sources = False
-    c.auto_store_domain_info = False
-    c.auto_store_keyword_info = True
+    c.accept_domains = False
+    c.enable_keyword_support = True
     c.track_user_actions = True
     c.track_user_searches = True
     c.track_user_navigation = False
@@ -887,11 +887,11 @@ def wizard_setup_gallery(request):
     c.source_save = False
     c.accept_dead = False
     c.accpte_ip_addresses = False
-    c.auto_scan_new_entries = False
-    c.auto_store_entries = True
+    c.auto_scan_entries = False
+    c.accept_not_domain_entries = True
     c.auto_store_sources = False
-    c.auto_store_domain_info = False
-    c.auto_store_keyword_info = False
+    c.accept_domains = False
+    c.enable_keyword_support = False
     c.track_user_actions = True
     c.track_user_searches = True
     c.track_user_navigation = True
@@ -927,11 +927,11 @@ def wizard_setup_search_engine(request):
     c.source_save = False
     c.accept_dead = False
     c.accpte_ip_addresses = False
-    c.auto_scan_new_entries = True
-    c.auto_store_entries = True
+    c.auto_scan_entries = True
+    c.accept_not_domain_entries = True
     c.auto_store_sources = True
-    c.auto_store_domain_info = True
-    c.auto_store_keyword_info = False
+    c.accept_domains = True
+    c.enable_keyword_support = False
     c.track_user_actions = True
     c.track_user_searches = True
     c.track_user_navigation = (

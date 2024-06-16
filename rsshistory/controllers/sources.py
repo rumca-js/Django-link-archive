@@ -400,7 +400,7 @@ class SourceDataBuilder(object):
             # TODO if there is no title - inherit it from 'main domain'. same goes for language.
             # maybe for thumbnail
             self.link_data["export_to_cms"] = True
-            self.link_data["enabled"] = conf.auto_store_sources_enabled
+            self.link_data["enabled"] = conf.new_source_enabled_state
             self.link_data["source_type"] = SourceDataModel.SOURCE_TYPE_RSS
             self.link_data["remove_after_days"] = 2
             self.link_data["category"] = "New"
@@ -472,7 +472,7 @@ class SourceDataBuilder(object):
         # self.link_data["subcategory_object"] = subcategory_object
 
     def add_domains(self):
-        if Configuration.get_object().config_entry.auto_store_domain_info:
+        if Configuration.get_object().config_entry.enable_domain_support:
             from .entriesutils import EntryDataBuilder
 
             p = DomainAwarePage(self.link_data["url"])

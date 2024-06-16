@@ -67,6 +67,7 @@ class ConfigurationEntry(models.Model):
         blank=True,
         help_text='Provide JSON configuration of headers. You can check your user agent in <a href="https://www.supermonitoring.com/blog/check-browser-http-headers/">https://www.supermonitoring.com/blog/check-browser-http-headers/</a>.',
     )
+
     access_type = models.CharField(
         max_length=100,
         null=False,
@@ -75,59 +76,65 @@ class ConfigurationEntry(models.Model):
         help_text='There are three access types available. "All" allows anybody view contents. "Logged" allows only logged users to view contents. "Owner" means application is private, and only owner can view it\'s contents.',
     )
 
-    sources_refresh_period = models.IntegerField(default=3600)
+    sources_refresh_period = models.IntegerField(default=3600, help_text="Unit [s]. Defines how often sources are checked for data.")
 
-    auto_store_entries = models.BooleanField(default=True, help_text="Allows entries to be stored from automates")
-
-    auto_store_entries_use_all_data = models.BooleanField(
-        default=False,
-        help_text="Might slow down adding new entries, as it might fetch more data",
-    )
-    auto_store_entries_use_clean_page_info = models.BooleanField(
-        default=False,
-        help_text="Might slow down adding new entries, as it might fetch more data",
-    )
-    auto_store_sources = models.BooleanField(
-        default=False,
-        help_text="Sources can be automatically added, if a new 'domain' information is captured. The state of such state is determined by 'Auto sources enabled' property.",
-    )
-    auto_store_sources_enabled = models.BooleanField(default=False)
-    auto_store_domain_info = models.BooleanField(
-        default=True, help_text="Allows domains to be stored automatically"
-    )
-    auto_store_keyword_info = models.BooleanField(
-        default=True, help_text="Allows keywords to be stored automatically"
-    )
-
-    auto_scan_new_entries = models.BooleanField(
+    auto_scan_entries = models.BooleanField(
         default=False,
         help_text="Scans for new links, when link is added. From decription, from contents",
     )
 
-    link_save = models.BooleanField(
-        default=False, help_text="Links are saved using archive.org."
+    auto_create_sources = models.BooleanField(
+        default=False,
+        help_text="Adds any new found source",
     )
-    source_save = models.BooleanField(
-        default=False, help_text="Links are saved using archive.org."
+
+    new_source_enabled_state = models.BooleanField(default=False, help_text="Default state of a new source")
+
+    new_entries_merge_data = models.BooleanField(
+        default=False,
+        help_text="Tries to merge data for new entries - captures what is missing",
     )
+
+    new_entries_use_clean_data = models.BooleanField(
+        default=False,
+        help_text="Fetches clean information from the Internet for new entries",
+    )
+
+    accept_domains = models.BooleanField(
+        default=True, help_text="Domain links can be added to system"
+    )
+
+    accept_not_domain_entries = models.BooleanField(
+        default=True, help_text="Links that are not domains can be added to system"
+    )
+
     accept_dead = models.BooleanField(
-        default=False, help_text="Accept rotten links, no longer active"
+            default=False, help_text="Accept rotten links, no longer active, to be added to the database"
     )  # whether dead entries can be introduced into database
+
     accept_ip_addresses = models.BooleanField(
         default=False,
         help_text="Accept IP addressed links, like //127.0.0.1/my/directory",
     )
 
-    track_user_actions = models.BooleanField(
-        default=True, help_text="Among tracked elements: what is searched."
+    enable_keyword_support = models.BooleanField(
+        default=True, help_text="Enable keyword feature support"
     )
-    track_user_searches = models.BooleanField(default=True)
-    track_user_navigation = models.BooleanField(default=False)
-    vote_min = models.IntegerField(default=-100)
-    vote_max = models.IntegerField(default=100)
-    number_of_comments_per_day = models.IntegerField(
-        default=1,
-        help_text="The limit is for each user. Helps in maintaining proper culture",
+
+    enable_domain_support = models.BooleanField(
+        default=True, help_text="Enable domain feature support"
+    )
+
+    link_save = models.BooleanField(
+        default=False, help_text="Links are saved using archive.org."
+    )
+
+    source_save = models.BooleanField(
+        default=False, help_text="Links are saved using archive.org."
+    )
+
+    prefer_https = models.BooleanField(
+        default=False, help_text="When adding check if https link exists"
     )
 
     number_of_update_entries = models.IntegerField(
@@ -135,25 +142,23 @@ class ConfigurationEntry(models.Model):
         help_text="The amount of entries that will be updated at each refresh",
     )
 
-    prefer_https = models.BooleanField(
-        default=False, help_text="When adding check if https link exists"
-    )
     keep_permament_items = models.BooleanField(
         default=True, help_text="This affects permament and bookmarked status entries"
     )
+
     days_to_move_to_archive = models.IntegerField(
         default=50,
-        help_text="Changing number of days after which links are moved to archive may lead to an issue. If the new number of days is smaller, links are not moved from archive back to the link table at hand.",
+        help_text="Number of days, after which entries are moved to archive",
     )
     days_to_remove_links = models.IntegerField(
-        default=100, help_text="Number of days after which links are removed"
+        default=100, help_text="Number of days, after which links are removed"
     )
     days_to_check_std_entries = models.IntegerField(
         default=35,
         help_text="Number of days after which normal entries are checked for status",
     )
     days_to_check_stale_entries = models.IntegerField(
-        default=10,
+        default=35,
         help_text="Number of days after which dead entries are checked for status",
     )
     days_to_remove_stale_entries = models.IntegerField(
@@ -176,6 +181,20 @@ class ConfigurationEntry(models.Model):
 
     # background tasks will add everything using this user name
     admin_user = models.CharField(max_length=500, default="admin", blank=True)
+
+    # User settings
+
+    track_user_actions = models.BooleanField(
+        default=True, help_text="Among tracked elements: what is searched."
+    )
+    track_user_searches = models.BooleanField(default=True)
+    track_user_navigation = models.BooleanField(default=False)
+    vote_min = models.IntegerField(default=-100)
+    vote_max = models.IntegerField(default=100)
+    number_of_comments_per_day = models.IntegerField(
+        default=1,
+        help_text="The limit is for each user. Helps in maintaining proper culture",
+    )
 
     # display
 

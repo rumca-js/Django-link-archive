@@ -26,7 +26,7 @@ class DomainsController(Domains):
         """
         Public API
         """
-        if not Configuration.get_object().config_entry.auto_store_domain_info:
+        if not Configuration.get_object().config_entry.accept_domains:
             return
 
         protocol = DomainAwarePage(url).get_scheme()
@@ -220,7 +220,7 @@ class DomainsController(Domains):
         return entry.main_domain_obj
 
     def cleanup():
-        if not Configuration.get_object().config_entry.auto_store_domain_info:
+        if not Configuration.get_object().config_entry.accept_domains:
             DomainsController.unconnect_entries()
             DomainsController.remove_all()
         else:
@@ -239,7 +239,7 @@ class DomainsController(Domains):
             entry.save()
 
     def create_missing_domains():
-        if not Configuration.get_object().config_entry.auto_store_domain_info:
+        if not Configuration.get_object().config_entry.accept_domains:
             return
 
         entries = LinkDataController.objects.filter(domain_obj__isnull=True)

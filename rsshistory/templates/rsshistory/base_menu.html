@@ -27,7 +27,7 @@
                    Sources</a>
            </li>
            <li class="nav-item">
-               {% if config.auto_store_domain_info %}
+               {% if config.enable_domain_support %}
                <a href="{% url 'rsshistory:domains' %}" class="nav-link" title="Captured domains">
                    <img src="{% static 'rsshistory/icons/icons8-www-64.png' %}" class="mainbutton-icon" />
                    Domains</a>
@@ -39,7 +39,7 @@
                    Tags</a>
            </li>
            <li class="nav-item">
-               {% if config.auto_store_keyword_info %}
+               {% if config.enable_keyword_support %}
                <a href="{% url 'rsshistory:keywords' %}" class="nav-link" title="Shows keywords used by links">
                    <img src="{% static 'rsshistory/icons/icons8-letters-96.png' %}" class="mainbutton-icon" />
                    Keywords</a>
