@@ -62,9 +62,15 @@ class BaseSourceJsonPlugin(SourceGenericPlugin):
             )
 
     def get_links_from_source(self, source_json):
+        if not source_json["enabled"]:
+            return
+
         c = Configuration.get_object().config_entry
 
         for index, prop in enumerate(self.get_entries_for_source(source_json)):
+            if prop["dead"]:
+                continue
+
             i = InstanceImporter()
             # TODO use configured author
             i.author = c.admin_user
@@ -106,6 +112,9 @@ class BaseSourceJsonPlugin(SourceGenericPlugin):
         c = Configuration.get_object().config_entry
 
         for index, source_prop in enumerate(sources):
+            if not source_prop["enabled"]:
+                continue
+
             i = InstanceImporter()
             # TODO use configured author
             i.author = c.admin_user
@@ -117,6 +126,9 @@ class BaseSourceJsonPlugin(SourceGenericPlugin):
         c = Configuration.get_object().config_entry
 
         for index, prop in enumerate(links_json):
+            if prop["dead"]:
+                continue
+
             i = InstanceImporter()
             i.author = c.admin_user
 

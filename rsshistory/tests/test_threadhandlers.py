@@ -718,7 +718,7 @@ class ProcessSourceHandlerTest(FakeInternetTestCase):
             username="test_username", password="testpassword", is_superuser=True
         )
 
-    def test_process_source_unknown(self):
+    def test_process__source_unknown(self):
         LinkDataController.objects.all().delete()
         DomainsController.objects.all().delete()
         SourceDataController.objects.all().delete()
@@ -736,25 +736,26 @@ class ProcessSourceHandlerTest(FakeInternetTestCase):
 
         self.assertEqual(result, False)
 
+        ob.refresh_from_db()
+
         jobs = BackgroundJobController.objects.all()
-        for job in jobs:
-            print("Job:{} {}".format(job.job, job.subject))
-
         self.assertEqual(jobs.count(), 1)
+        job = jobs[0]
+        self.assertEqual(job.enabled, False)
 
-    def test_process_source_known(self):
+    def test_process__source_known(self):
         LinkDataController.objects.all().delete()
         DomainsController.objects.all().delete()
         SourceDataController.objects.all().delete()
         BackgroundJobController.objects.all().delete()
 
-        SourceDataController.objects.create(
+        source = SourceDataController.objects.create(
             url="https://www.youtube.com/feeds/channel=samtime"
         )
 
         ob = BackgroundJobController.objects.create(
             job=BackgroundJob.JOB_PROCESS_SOURCE,
-            subject="https://www.youtube.com/feeds/channel=samtime",
+            subject=str(source.id),
         )
 
         handler = ProcessSourceJobHandler()

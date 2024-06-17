@@ -4,10 +4,14 @@
 
 <h1 class="link-title">
     <a href="{{ object.get_entry_url }}">
-      {% if user_config.show_icons %}
-      <img src="{{object.get_favicon}}" class="link-detail-thumbnail"/>
-      {% endif %}
-      {{ object.title }}
+       <div class="d-flex">
+           {% if user_config.show_icons %}
+             <img src="{{object.get_favicon}}" class="link-detail-thumbnail border rounded"/>
+           {% endif %}
+	   <div class="mx-2">
+             {{ object.title }}
+	   </div>
+       </div>
     </a>
 </h1>
 

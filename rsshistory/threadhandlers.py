@@ -101,13 +101,24 @@ class ProcessSourceJobHandler(BaseJobHandler):
 
     def process(self, obj=None):
         try:
-            source_url = obj.subject
-            sources = SourceDataModel.objects.filter(url=source_url)
+            try:
+                source_id = int(obj.subject)
+            except Exception as e:
+                AppLogging.error("Incorrect source ID:{}".format(obj.subject))
+
+                obj.enabled=False
+                obj.save()
+
+                return False
+
+            sources = SourceDataModel.objects.filter(id=source_id)
             if sources.count() > 0 and not sources[0].enabled:
                 # This source is disabled, and job should be removed
                 return True
 
-            plugin = SourceControllerBuilder.get(source_url)
+            source = sources[0]
+
+            plugin = SourceControllerBuilder.get(source_id)
             if plugin:
                 if plugin.check_for_data():
                     return True
@@ -150,7 +161,14 @@ class EntryUpdateData(BaseJobHandler):
 
     def process(self, obj=None):
         try:
-            entries = LinkDataController.objects.filter(link=obj.subject)
+            try:
+                link_id = int(obj.subject)
+            except Exception as e:
+                AppLogging.error("Incorrect link ID:{}".format(obj.subject))
+                # consume job
+                return True
+
+            entries = LinkDataController.objects.filter(id=link_id)
             if len(entries) > 0:
                 entry = entries[0]
 
@@ -179,7 +197,14 @@ class LinkResetDataJobHandler(BaseJobHandler):
 
     def process(self, obj=None):
         try:
-            entries = LinkDataController.objects.filter(link=obj.subject)
+            try:
+                link_id = int(obj.subject)
+            except Exception as e:
+                AppLogging.error("Incorrect link ID:{}".format(obj.subject))
+                # consume job
+                return True
+
+            entries = LinkDataController.objects.filter(id=link_id)
             if len(entries) > 0:
                 entry = entries[0]
 
@@ -198,7 +223,14 @@ class LinkResetLocalDataJobHandler(BaseJobHandler):
 
     def process(self, obj=None):
         try:
-            entries = LinkDataController.objects.filter(link=obj.subject)
+            try:
+                link_id = int(obj.subject)
+            except Exception as e:
+                AppLogging.error("Incorrect link ID:{}".format(obj.subject))
+                # consume job
+                return True
+
+            entries = LinkDataController.objects.filter(id=link_id)
             if len(entries) > 0:
                 entry = entries[0]
 
@@ -383,6 +415,12 @@ class LinkAddJobHandler(BaseJobHandler):
         if "properties" in cfg:
             data = cfg["properties"]
             data["link"] = link
+
+        if "source_id" in cfg:
+            source_id = cfg["source_id"]
+            source_objs = SourceDataController.objects.filter(id=int(source_id))
+            if source_objs.count() > 0:
+                data["source_obj"] = source_objs[0]
 
         if "source" in cfg:
             source_id = cfg["source"]
@@ -902,6 +940,18 @@ class LinkScanJobHandler(BaseJobHandler):
             cfg = self.get_input_cfg(obj)
             source = None
             entry = None
+
+            if "source_id" in cfg:
+                source_id = cfg["source_id"]
+                source_objs = SourceDataController.objects.filter(id=int(source_id))
+                if source_objs.count() > 0:
+                    source = source_objs[0]
+
+            if "entry_id" in cfg:
+                entry_id = cfg["entry_id"]
+                entries = LinkDataController.objects.filter(id=int(entry_id))
+                if entries.count() > 0:
+                    entry = entries[0]
 
             if "source" in cfg:
                 source_id = cfg["source"]

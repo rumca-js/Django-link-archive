@@ -351,8 +351,17 @@ class BackgroundJobControllerTest(FakeInternetTestCase):
         entry.date_update_last = None
         entry.save()
 
+        BackgroundJobController.objects.all().delete()
+
         # call tested functions
         BackgroundJobController.entry_reset_data(entry)
+
+        jobs = BackgroundJobController.objects.all()
+        self.assertTrue(jobs.count(), 1)
+
+        job = jobs[0]
+        self.assertEqual(job.job, BackgroundJobController.JOB_LINK_RESET_DATA)
+
         # call tested functions
         BackgroundJobController.entry_update_data(entry)
 

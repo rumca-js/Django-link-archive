@@ -7,6 +7,7 @@ from .sourceparseplugin import BaseParsePlugin
 from .sourceparseinternallinks import SourceParseInternalLinks
 from .domainparserplugin import DomainParserPlugin
 from .sourcejsonplugin import BaseSourceJsonPlugin
+from .sourcegenericplugin import SourceGenericPlugin
 
 from .sourceparseditigsplugin import SourceParseDigitsPlugin
 from .codeprojectplugin import CodeProjectPlugin

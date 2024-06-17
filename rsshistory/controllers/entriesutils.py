@@ -1372,7 +1372,10 @@ class EntryDataBuilder(object):
         url = DomainAwarePage(self.link_data["link"]).get_domain()
         entries = LinkDataController.objects.filter(link=url)
         if entries.count() == 0:
-            BackgroundJobController.link_add(url)
+            if "source_obj" in self.link_data:
+                BackgroundJobController.link_add(url=url, source=self.link_data["source_obj"])
+            else:
+                BackgroundJobController.link_add(url=url)
 
     def add_sub_links(self):
         """
@@ -1415,7 +1418,10 @@ class EntryDataBuilder(object):
                         links.add(link)
 
             for link in links:
-                BackgroundJobController.link_add(link)
+                if "source_obj" in link_data:
+                    BackgroundJobController.link_add(url =link, source=link_data["source_obj"])
+                else:
+                    BackgroundJobController.link_add(url =link)
 
     def add_keywords(self):
         link_data = self.link_data

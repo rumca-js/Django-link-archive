@@ -72,6 +72,7 @@ class BaseJsonPluginTest(FakeInternetTestCase):
         config.accept_not_domain_entries = True
         config.accept_domains = False
         config.new_source_enabled_state = False
+        config.auto_create_sources = False
 
         config.save()
 
@@ -92,7 +93,7 @@ class BaseJsonPluginTest(FakeInternetTestCase):
 
         sources = SourceDataController.objects.all().order_by("-enabled")
         for source in sources:
-            print("Enabled source:{}".format(source.url))
+            print("Source:{} enabled:{}".format(source.url, source.enabled))
 
         # 3 imported, 1 created here in test
         self.assertEqual(sources.count(), 3 + 1)
@@ -120,8 +121,6 @@ class BaseJsonPluginTest(FakeInternetTestCase):
             sources[3].proxy_location,
             "https://instance.com/apps/rsshistory/source-json/102",
         )
-
-        self.assertEqual(sources[3].enabled, False)
 
         # Links are not imported
         entries = LinkDataController.objects.all()

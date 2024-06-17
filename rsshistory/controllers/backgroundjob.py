@@ -9,6 +9,7 @@ from django.db.models import Q
 
 from ..models import (
     LinkDataModel,
+    SourceDataModel,
     BackgroundJob,
     AppLogging,
 )
@@ -72,6 +73,65 @@ class BackgroundJobController(BackgroundJob):
 
         self.save()
 
+    def get_link(self):
+        if self.job == BackgroundJob.JOB_PROCESS_SOURCE:
+            source = self.get_text_to_source(self.subject)
+            if source:
+                return source.get_absolute_url()
+        elif self.job == BackgroundJob.JOB_LINK_UPDATE_DATA:
+            entry = self.get_text_to_entry(self.subject)
+            if entry:
+                 return entry.get_absolute_url()
+        elif self.job == BackgroundJob.JOB_LINK_RESET_DATA:
+            entry = self.get_text_to_entry(self.subject)
+            if entry:
+                 return entry.get_absolute_url()
+        elif self.job == BackgroundJob.JOB_LINK_RESET_LOCAL_DATA:
+            entry = self.get_text_to_entry(self.subject)
+            if entry:
+                 return entry.get_absolute_url()
+
+        if self.args and self.args != "":
+            try:
+                cfg = json.loads(self.args)
+            except Exception as e:
+                print("Exception: {}".format(str(e)))
+                return
+
+            if "entry_id" in cfg:
+                entry = self.get_text_to_entry(cfg["entry_id"])
+                if entry:
+                     return entry.get_absolute_url()
+            elif "source_id" in cfg:
+                source = self.get_text_to_source(cfg["source_id"])
+                if source:
+                    return source.get_absolute_url()
+
+    def is_subject_link(self):
+        p = DomainAwarePage(self.subject)
+        if p.is_web_link():
+            return True
+
+    def get_text_to_source(self, text):
+        try:
+            source_id = int(text)
+        except Exception as e:
+            return
+
+        sources = SourceDataModel.objects.filter(id = source_id)
+        if sources.exists():
+            return sources[0]
+
+    def get_text_to_entry(self, text):
+        try:
+            entry_id = int(text)
+        except Exception as e:
+            return
+
+        entries = LinkDataModel.objects.filter(id = entry_id)
+        if entries.exists():
+            return entries[0]
+
     def enable(self):
         self.errors = 0
         self.enabled = True
@@ -132,7 +192,7 @@ class BackgroundJobController(BackgroundJob):
                 return False
 
         return BackgroundJobController.create_single_job(
-            BackgroundJob.JOB_PROCESS_SOURCE, source.url, source.title
+            BackgroundJob.JOB_PROCESS_SOURCE, source.id, source.title
         )
 
     def download_music(item):
@@ -187,7 +247,7 @@ class BackgroundJobController(BackgroundJob):
         cfg = {}
 
         if source:
-            cfg["source"] = source.id
+            cfg["source_id"] = source.id
 
         if tag:
             cfg["tag"] = tag
@@ -221,10 +281,10 @@ class BackgroundJobController(BackgroundJob):
         cfg = {}
 
         if source:
-            cfg["source"] = source.id
+            cfg["source_id"] = source.id
 
         if entry:
-            cfg["entry"] = entry.id
+            cfg["entry_id"] = entry.id
 
         if entry:
             url = entry.link
@@ -365,13 +425,13 @@ class BackgroundJobController(BackgroundJob):
              return
 
         return BackgroundJobController.create_single_job(
-            BackgroundJob.JOB_LINK_UPDATE_DATA, entry.link
+            BackgroundJob.JOB_LINK_UPDATE_DATA, entry.id, entry.link,
         )
 
     def entry_reset_local_data(entry):
         """ """
         return BackgroundJobController.create_single_job(
-            BackgroundJob.JOB_LINK_RESET_LOCAL_DATA, entry.link
+            BackgroundJob.JOB_LINK_RESET_LOCAL_DATA, entry.id, entry.link,
         )
 
     def entry_reset_data(entry, force=False):
@@ -386,7 +446,7 @@ class BackgroundJobController(BackgroundJob):
              return
 
         return BackgroundJobController.create_single_job(
-            BackgroundJob.JOB_LINK_RESET_DATA, entry.link
+            BackgroundJob.JOB_LINK_RESET_DATA, entry.id, entry.link
         )
 
     def export_data(export, input_date=None):
@@ -419,7 +479,7 @@ class BackgroundJobController(BackgroundJob):
         condition_reset = Q(job = BackgroundJob.JOB_LINK_RESET_DATA)
         condition_update = Q(job = BackgroundJob.JOB_LINK_UPDATE_DATA)
         condition_enabled = Q(enabled=True)
-        condition_subject = Q(subject=entry.link)
+        condition_subject = Q(subject=str(entry.id))
         
         objs = BackgroundJobController.objects.filter(condition_subject & condition_enabled & (condition_update | condition_reset))
         return objs.count() > 0

@@ -32,6 +32,7 @@ from ..controllers import (
     BackgroundJobController,
     EntryDataBuilder,
     EntriesUpdater,
+    BackgroundJobController,
 )
 from ..configuration import Configuration
 from ..forms import (
@@ -283,9 +284,10 @@ Background jobs
 
 
 class BackgroundJobsView(generic.ListView):
-    model = BackgroundJob
+    model = BackgroundJobController
     context_object_name = "content_list"
     paginate_by = 500
+    template_name = str(ViewPage.get_full_template("backgroundjob_list.html"))
 
     def get(self, *args, **kwargs):
         p = ViewPage(self.request)

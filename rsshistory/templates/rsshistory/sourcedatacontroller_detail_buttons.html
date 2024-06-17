@@ -80,9 +80,13 @@
         </li>
    
         {% if user.is_staff %}
-        <li>
-           <a href="{% url 'rsshistory:source-fix-entries' object.id %}" class="dropdown-item" title="Fixes entries for source, objects relationships, langauge">Fix entries</a>
-        </li>
+           <li>
+              <a href="{% url 'rsshistory:source-fix-entries' object.id %}" class="dropdown-item" title="Fixes entries for source, objects relationships, langauge">Fix entries</a>
+           </li>
+           <li>
+              <a href="{% url 'rsshistory:source-process-contents' object.id %}" class="dropdown-item" title="Processes text as if it was source contents">Process source contents</a>
+           </li>
+
            {% if handler.is_youtube %}
               <li>
                  <a href="{% url 'rsshistory:source-import-yt-links' object.id %}" class="dropdown-item" title="Fetches all the videos from source">Fetch all videos</a>

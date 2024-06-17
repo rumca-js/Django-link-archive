@@ -41,6 +41,7 @@ urlpatterns = [
     path("source-resume/<int:pk>/", viewsources.resume, name="source-resume"),
     path("source-import-yt-links/<int:pk>/", viewsources.import_youtube_links_for_source, name="source-import-yt-links"),
     path("source-fix-entries/<int:source_pk>/", viewsources.source_fix_entries, name="source-fix-entries",),
+    path("source-process-contents/<int:pk>/", viewsources.source_process_contents, name="source-process-contents",),
     path("sources-remove-all/", viewsources.remove_all_sources, name="sources-remove-all"),
     path("sources-enable-all/", viewsources.enable_all_sources, name="sources-enable-all"),
     path("sources-disable-all/", viewsources.disable_all_sources, name="sources-disable-all"),

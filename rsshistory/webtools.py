@@ -88,6 +88,7 @@ def date_str_to_date(date_str):
     if date_str:
         wh = date_str.find("Published:")
         if wh >= 0:
+            wh = date_str.find(":", wh)
             date_str = date_str[wh+1:].strip()
 
         try:
@@ -116,6 +117,17 @@ def calculate_hash(text):
 class DomainAwarePage(object):
     def __init__(self, url):
         self.url = url
+
+    def is_web_link(self):
+        if (
+            self.url.startswith("http")
+            or self.url.startswith("//")
+            or self.url.startswith("smb:")
+            or self.url.startswith("ftp:")
+        ):
+            return True
+
+        return False
 
     def get_full_url(self):
         if self.url.lower().find("http") == -1:
@@ -510,17 +522,6 @@ class DomainAwarePage(object):
                 return ext_mapping[ext]
 
         # if not found, we return none
-
-    def is_web_link(self):
-        if (
-            self.p.url.startswith("http")
-            or self.p.url.startswith("//")
-            or self.p.url.startswith("smb:")
-            or self.p.url.startswith("ftp:")
-        ):
-            return True
-
-        return False
 
     def get_robots_txt_url(self):
         return self.get_domain() + "/robots.txt"

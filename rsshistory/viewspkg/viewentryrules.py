@@ -34,8 +34,6 @@ class EntryRuleDetailView(generic.DetailView):
     context_object_name = "object_detail"
 
     def get_context_data(self, **kwargs):
-        from ..pluginsources.sourcecontrollerbuilder import SourceControllerBuilder
-
         # Call the base implementation first to get the context
         context = super().get_context_data(**kwargs)
         context = ViewPage.init_context(self.request, context)

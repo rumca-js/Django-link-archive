@@ -30,10 +30,10 @@ class SourceControllerBuilder(object):
         HackerNewsParserPlugin,
     ]
 
-    def get(source_url):
+    def get(source_id):
         from ..models import SourceDataModel
 
-        sources = SourceDataModel.objects.filter(url=source_url)
+        sources = SourceDataModel.objects.filter(id=source_id)
         if len(sources) == 0:
             return None
 
@@ -41,7 +41,7 @@ class SourceControllerBuilder(object):
         # database operations should be short lived. we do not pass source object.
 
         for plugin_def in SourceControllerBuilder.plugins:
-            plugin = plugin_def(source.id)
+            plugin = plugin_def(source_id)
             if source.source_type == plugin.PLUGIN_NAME:
                 return plugin
 

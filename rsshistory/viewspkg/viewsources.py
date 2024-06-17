@@ -16,12 +16,13 @@ from ..controllers import (
     LinkDataWrapper,
     SearchEngines,
 )
-from ..forms import SourceForm, SourcesChoiceForm
+from ..forms import SourceForm, ContentsForm, SourcesChoiceForm
 from ..queryfilters import SourceFilter
 from ..views import ViewPage
 from ..configuration import Configuration
 from ..webtools import Url, DomainAwarePage
 from ..pluginurl import UrlHandler
+from ..pluginsources import SourceGenericPlugin
 
 
 class SourceListView(generic.ListView):
@@ -122,7 +123,7 @@ class SourceDetailView(generic.DetailView):
 
         ViewPage.fill_context_type(context, url=self.object.url)
 
-        context["handler"] = SourceControllerBuilder.get(self.object.url)
+        context["handler"] = SourceControllerBuilder.get(self.object.id)
 
         return context
 
@@ -365,7 +366,7 @@ def sources_manual_refresh(request):
     objs = SourceDataController.objects.all()
 
     for ob in objs:
-        plugin = SourceControllerBuilder.get(ob.url)
+        plugin = SourceControllerBuilder.get(ob.id)
         plugin.check_for_data()
 
     return HttpResponseRedirect(reverse("{}:sources".format(LinkDatabase.name)))
@@ -532,6 +533,40 @@ def resume(request, pk):
     ob.save()
 
     return HttpResponseRedirect(ob.get_absolute_url())
+
+
+def source_process_contents(request, pk):
+    p = ViewPage(request)
+    p.set_title("Source process contents")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    p.context["pk"] = pk
+
+    sources = SourceDataController.objects.filter(id=pk)
+    if not sources.exists():
+        p.context["summary_text"] = "Source does not exist"
+        return p.render("summary_present.html")
+
+    source = sources[0]
+
+    if request.method == "POST":
+        form = ContentsForm(request.POST, request=request)
+
+        if form.is_valid():
+            source_text = form.cleaned_data["body"]
+            p = SourceGenericPlugin(pk)
+            p.contents = source_text
+            p.check_for_data()
+        else:
+            p.context["summary_text"] = "Form is invalid"
+            return p.render("summary_present.html")
+    else:
+        form = ContentsForm(request=request)
+        p.context["form"] = form
+
+        return p.render("form_basic.html")
 
 
 def import_youtube_links_for_source(request, pk):
