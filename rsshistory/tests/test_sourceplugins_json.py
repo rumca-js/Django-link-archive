@@ -72,7 +72,9 @@ class BaseJsonPluginTest(FakeInternetTestCase):
         config.accept_not_domain_entries = True
         config.accept_domains = False
         config.new_source_enabled_state = False
-        config.auto_create_sources = False
+        config.scan_create_sources = False
+        config.scan_create_domains = False
+        config.scan_create_not_domains = False
 
         config.save()
 

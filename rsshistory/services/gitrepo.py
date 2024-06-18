@@ -53,6 +53,9 @@ class GitRepo(object):
     def commit(self, commit_message):
         self.is_different_flag = self.is_different()
 
+        if self.is_different:
+            return False
+
         p = subprocess.run(
             ["git", "commit", "-m", commit_message],
             cwd=self.get_local_dir(),
@@ -60,11 +63,12 @@ class GitRepo(object):
             capture_output=True,
         )
         self.check_process(p)
+        return True
 
     def push(self):
         if not self.is_different_flag:
             AppLogging.info("Repository is not different")
-            return
+            return False
 
         token = self.git_data.password
         user = self.git_data.user
@@ -80,6 +84,7 @@ class GitRepo(object):
             capture_output=True,
         )
         self.check_process(p)
+        return True
 
     def get_repo_name(self):
         last = Path(self.git_repo).parts[-1]

@@ -504,7 +504,9 @@ class FakeInternetTestCase(TestCase):
         c.config_entry.new_entries_merge_data = False
         c.config_entry.new_entries_use_clean_data = False
         c.config_entry.new_source_enabled_state = False
-        c.config_entry.auto_create_sources = False
+        c.config_entry.scan_create_sources = False
+        c.config_entry.scan_create_domains = False
+        c.config_entry.scan_create_not_domains = False
         c.config_entry.auto_scan_entries = False
         c.config_entry.link_save = False
         c.config_entry.source_save = False

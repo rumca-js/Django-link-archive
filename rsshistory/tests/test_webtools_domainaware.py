@@ -305,3 +305,16 @@ class DomainAwarePageTest(FakeInternetTestCase):
         self.assertEqual(parts[2], "www.youtube.com")
         self.assertEqual(parts[3], "/test")
         self.assertEqual(parts[4], "#parameter=True")
+
+    def test_is_web_link(self):
+        p = DomainAwarePage("https://www.youtube.com")
+        # call tested function
+        self.assertTrue(p.is_web_link())
+
+        p = DomainAwarePage("https://youtube.com")
+        # call tested function
+        self.assertTrue(p.is_web_link())
+
+        p = DomainAwarePage("https://com")
+        # call tested function
+        self.assertFalse(p.is_web_link())

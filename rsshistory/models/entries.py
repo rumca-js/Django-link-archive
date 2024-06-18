@@ -420,9 +420,15 @@ class BaseLinkDataController(BaseLinkDataModel):
         We do not want to check any state of entry.
         Users may want to tag dead entries, or malicious sites
         """
+        if self.is_archive_entry():
+            return False
+
         return (self.permanent or self.bookmarked)
 
     def is_commentable(self):
+        if self.is_archive_entry():
+            return False
+
         return (self.permanent or self.bookmarked)
 
     def is_permanent(self):

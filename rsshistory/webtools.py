@@ -121,10 +121,14 @@ class DomainAwarePage(object):
     def is_web_link(self):
         if (
             self.url.startswith("http")
-            or self.url.startswith("//")
             or self.url.startswith("smb:")
             or self.url.startswith("ftp:")
+            or self.url.startswith("//")
         ):
+            # https://mailto is not a good link
+            if self.url.find(".") == -1:
+                return False
+
             return True
 
         return False

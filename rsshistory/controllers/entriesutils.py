@@ -447,7 +447,7 @@ class EntryUpdater(object):
     def check_for_sources(self, entry, url_interface):
         conf = Configuration.get_object().config_entry
 
-        if not conf.auto_create_sources:
+        if not conf.scan_create_sources:
             return
 
         url_handler = url_interface.h

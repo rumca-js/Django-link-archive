@@ -8,117 +8,11 @@ import os
 import sqlite3
 import json
 import argparse
+import time
 
+from sqlalchemy import create_engine, Table, MetaData, select, Column, Integer, String, Boolean, DateTime
+from dateutil import parser
 
-class EntryTable(object):
-    """
-    Low level database implementation. Maybe use sqlalchemy?
-    """
-    def __init__(self):
-        self.fields = [
-                {"name" : 'id',                    "properties" : "INTEGER AUTO_INCREMENT PRIMARY KEY"},
-                {"name" : 'link',                  "properties" : "TEXT NOT NULL UNIQUE"},
-                {"name" : 'title',                 "properties" : "TEXT NOT NULL"},
-                {"name" : 'description',           "properties" : "TEXT NOT NULL"},
-                {"name" : 'thumbnail',             "properties" : "TEXT NULL"},
-                {"name" : 'language',              "properties" : "TEXT NULL"},
-                {"name" : 'age',                   "properties" : "INTEGER"},
-                {"name" : 'date_created',          "properties" : "TEXT NULL"},
-                {"name" : 'date_published',        "properties" : "TEXT NULL"},
-                {"name" : 'date_update_last',      "properties" : "TEXT NULL"},
-                {"name" : 'date_dead_since',       "properties" : "TEXT NULL"},
-                {"name" : 'date_last_modified',    "properties" : "TEXT NULL"},
-                {"name" : 'status_code',           "properties" : "INTEGER NULL"},
-                {"name" : 'tags',                  "properties" : "TEXT NULL"},
-                {"name" : 'page_rating',           "properties" : "INTEGER"},
-                {"name" : 'page_rating_votes',     "properties" : "INTEGER"},
-                {"name" : 'page_rating_contents',  "properties" : "INTEGER"},
-                ]
-
-    def get_query_create_table(self):
-        query_start = """
-        CREATE TABLE IF NOT EXISTS entries (
-        """
-        query_stop = """
-            )
-        """
-
-        fields_len = len(self.fields)
-
-        query_body = ""
-        for key, field in enumerate(self.fields):
-            query_body += field["name"] + " " + field["properties"]
-
-            if key != fields_len -1:
-                query_body += ","
-
-        return query_start + query_body + query_stop
-
-    def get_query_insert(self, entry_dict, auto_increment = False):
-        query_start = """
-        INSERT INTO entries (
-        """
-        query_stop = """
-        )
-        """
-
-        values_start = """ VALUES (
-        """
-        values_stop = """
-        )
-        """
-
-        fields_len = len(self.fields)
-
-        query_body = ""
-        for key, field in enumerate(self.fields):
-            if auto_increment == True and field["name"] == "id":
-                continue
-
-            query_body += field["name"]
-
-            if key != fields_len -1:
-                query_body += ","
-
-        values_body = ""
-        for key, field in enumerate(self.fields):
-            if auto_increment == True and field["name"] == "id":
-                continue
-
-            value = self.get_entry_value(field, entry_dict)
-            values_body += "'" + str(value) + "'"
-
-            if key != fields_len -1:
-                values_body += ","
-
-        return query_start + query_body + query_stop + values_start + values_body + values_stop
-
-    def get_entry_value(self, field, entry_dict):
-        field_name = field["name"]
-        field_props = field["properties"]
-
-        if field_name not in entry_dict or entry_dict[field_name] is None:
-            if field_props.find("TEXT") >= 0:
-                return ""
-            elif field_props.find("INTEGER") >= 0:
-                return 0
-        else:
-            entry_value = entry_dict[field_name]
-            if type(entry_value) == list:
-                entry_value = ", ".join(entry_value)
-
-            if field_props.find("TEXT") >= 0:
-                if entry_value.find("'") >= 0:
-                    entry_value = entry_value.replace("'", "")
-
-            return entry_value
-
-    def get_query_is_entry(self, entry):
-        query = """
-        SELECT * FROM entries WHERE link = '{}'
-        """.format(entry["link"])
-
-        return query
 
 
 class DirReader(object):
@@ -152,56 +46,139 @@ class DataBase(object):
 
         self.parser = parser
 
-        self.entry_table = EntryTable()
+        if not self.create_database():
+            print("Could not connect to database")
+            return
 
-        self.create_database()
-        self.create_entry_table()
+        self.define_tables()
+        self.conn = self.engine.connect()
+        self.transaction = self.conn.begin()
 
     def create_database(self):
         file_name = self.get_database_file()
 
         try:
-            self.conn = sqlite3.connect(file_name)
-            self.cursor = self.conn.cursor()
-        except Exception as E:
-            print("Could not create sqlite3 database file:{}. Exception:{}".format(file_name, str(E)))
+            #self.engine = create_engine('sqlite:///'+file_name, echo=True)
+            self.engine = create_engine('sqlite:///'+file_name)
+            return True
+        except Exception as e:
+            print("Could not create sqlite3 database file:{}. Exception:{}".format(file_name, str(e)))
+            return False
 
-    def create_entry_table(self):
-        query = self.entry_table.get_query_create_table()
-        #print(query)
-        self.cursor.execute(query)
+    def define_tables(self):
+        metadata = MetaData()
+
+        self.entries = Table(
+           'entries', metadata,
+           Column('id', Integer, primary_key=True),
+           Column('link',                  String, unique=True),
+           Column('title',                 String),
+           Column('description',           String),
+           Column('thumbnail',             String, nullable=True),
+           Column('language',              String, nullable=True),
+           Column('age',                   Integer, default=0),
+           Column('date_created',          DateTime, nullable=True), # TODO convert to timestamp
+           Column('date_published',        DateTime, nullable=True),
+           Column('date_update_last',      DateTime, nullable=True),
+           Column('date_dead_since',       DateTime, nullable=True),
+           Column('date_last_modified',    DateTime, nullable=True),
+           Column('status_code',           Integer, default=0),
+           Column('page_rating',           Integer, default=0),
+           Column('page_rating_votes',     Integer, default=0),
+           Column('page_rating_contents',  Integer, default=0),
+           Column('dead',                  Boolean, default=False),
+           Column('bookmarked',            Boolean, default=False),
+           Column('permanent',             Boolean, default=False),
+           Column('source',                String, nullable=True),
+
+           # advanced / foreign
+           Column('source_obj__id',        Integer, nullable=True),
+           Column('tags',                  String, nullable=True),
+        )
+
+        with self.engine.connect() as connection:
+            if not self.engine.dialect.has_table(connection, "entries"):
+                print("Does not have table, creating one")
+                metadata.create_all(self.engine)
 
     def add_entry(self, entry):
         if self.parser and self.parser.preserve_id:
-            self.add_entry_as_is(entry)
+            return self.add_entry_as_is(entry)
         else:
-            self.add_entry_auto_increment(entry)
+            return self.add_entry_auto_increment(entry)
 
     def add_entry_auto_increment(self, entry):
-        query = self.entry_table.get_query_insert(entry, auto_increment=True)
-        #print(query)
-        self.cursor.execute(query)
+        data = {}
+        for key in entry:
+            if key == "id":
+                continue
+            elif key == "tags":
+                data[key] = ", ".join(entry[key])
+            elif key.startswith("date"):
+                date = parser.parse(entry[key])
+                data[key] = date
+            else:
+                data[key] = entry[key]
+
+        try:
+            self.conn.execute(
+                self.entries.insert(),
+                [
+                    data
+                ]
+            )
+
+        except Exception as e:
+            print(e)
+            return False
+        return True
 
     def add_entry_as_is(self, entry):
-        query = self.entry_table.get_query_insert(entry, auto_increment=False)
-        #print(query)
-        self.cursor.execute(query)
+        data = {}
+        for key in entry:
+            if key == "tags":
+                data[key] = ", ".join(entry[key])
+            elif key.startswith("date"):
+                date = parser.parse(entry[key])
+                data[key] = date
+            else:
+                data[key] = entry[key]
+
+        try:
+            self.conn.execute(
+                self.entries.insert(),
+                [
+                    data
+                ]
+            )
+
+        except Exception as e:
+            print(e)
+            return False
+        return True
 
     def is_entry(self, entry):
-        query = self.entry_table.get_query_is_entry(entry)
-        #print(query)
-        self.cursor.execute(query)
-        rows = self.cursor.fetchall()
+        query = select(self.entries).where(self.entries.c.link == entry["link"])
 
-        return len(rows) > 0
+        result = self.conn.execute(query)
+        row = result.fetchone()
+
+        if row:
+            return True
+        else:
+            return False
 
     def get_database_file(self):
         return self.output_file
 
     def close(self):
-        if self.conn:
-            self.conn.commit()
-            self.conn.close()
+        try:
+            self.transaction.commit()
+        except Exception as e:
+            self.transaction.rollback()
+
+        self.conn.close()
+        self.engine.dispose()
 
 
 class Converter(object):
@@ -238,10 +215,14 @@ class Converter(object):
                     entry["id"] = row
 
                 if not self.conn.is_entry(entry):
-                    print(" -> [{}/{}] Link:{} Added".format(row, total_rows, entry["link"]))
-                    self.conn.add_entry(entry)
+                    if self.conn.add_entry(entry):
+                        if self.parser.args.verbose:
+                            print(" -> [{}/{}] Link:{} Added".format(row, total_rows, entry["link"]))
+                    else:
+                        print(" -> [{}/{}] Link:{} NOT Added".format(row, total_rows, entry["link"]))
                 else:
-                    print(" -> [{}/{}] Link:{} Skipped".format(row, total_rows, entry["link"]))
+                    if self.parser.args.verbose:
+                        print(" -> [{}/{}] Link:{} Skipped".format(row, total_rows, entry["link"]))
 
     def read_file_contents(self, file_name):
         with open(file_name, "r") as f:
@@ -259,7 +240,7 @@ class Converter(object):
                 return j["sources"]
 
             return j
-        except Exception as E:
+        except Exception as e:
             print("Could not read file: {}".format(afile))
 
 
@@ -272,6 +253,9 @@ class Parser(object):
         self.parser.add_argument("--preserve-id", action="store_true", help="Preserves ID of objects")
         self.parser.add_argument("--language", help="Accept language") # TODO implement
         self.parser.add_argument("--vote-min", help="Minimum amount of entry vote") # TODO implement
+        self.parser.add_argument("--entries", help="Convert entries") # TODO implement
+        self.parser.add_argument("--sources", help="Convert sources") # TODO implement
+        self.parser.add_argument("--verbose", action="store_true", help="Shows more info")
 
         self.args = self.parser.parse_args()
 
@@ -298,8 +282,21 @@ def main():
 
     db = DataBase(output_file = parser.output_file)
 
-    c = Converter(db, parser)
-    c.convert()
+    try:
+        start_time = time.time()
+
+        c = Converter(db, parser)
+        c.convert()
+
+        elapsed_time_seconds = time.time() - start_time
+        elapsed_minutes = int(elapsed_time_seconds // 60)
+        elapsed_seconds = int(elapsed_time_seconds % 60)
+        print(f"Time: {elapsed_minutes}:{elapsed_seconds}")
+
+    except Exception as e:
+        print("Exception: {}".format(e))
+    except KeyboardInterrupt as e:
+        print("Exception: {}".format(e))
 
     db.close()
     print("Processing DONE")

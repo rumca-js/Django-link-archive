@@ -83,9 +83,19 @@ class ConfigurationEntry(models.Model):
         help_text="Scans for new links, when link is added. From decription, from contents",
     )
 
-    auto_create_sources = models.BooleanField(
+    scan_create_sources = models.BooleanField(
         default=False,
         help_text="Adds any new found source",
+    )
+
+    scan_create_domains = models.BooleanField(
+        default=False,
+        help_text="Adds any new found domain",
+    )
+
+    scan_create_not_domains = models.BooleanField(
+        default=False,
+        help_text="Adds any new found link, not domain",
     )
 
     new_source_enabled_state = models.BooleanField(default=False, help_text="Default state of a new source")
