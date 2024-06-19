@@ -54,7 +54,9 @@ def entry_rule_add(request):
         form = EntryRuleForm(request.POST)
         if form.is_valid():
             form.save()
-            return HttpResponseRedirect(reverse("{}:entry-rules".format(LinkDatabase.name)))
+            return HttpResponseRedirect(
+                reverse("{}:entry-rules".format(LinkDatabase.name))
+            )
         else:
             p.context["summary_text"] = "Form is invalid"
             return p.render("summary_present.html")
@@ -90,9 +92,7 @@ def entry_rule_edit(request, pk):
 
     form = EntryRuleForm(instance=objs[0])
     form.method = "POST"
-    form.action_url = reverse(
-        "{}:entry-rule-edit".format(LinkDatabase.name), args=[pk]
-    )
+    form.action_url = reverse("{}:entry-rule-edit".format(LinkDatabase.name), args=[pk])
 
     p.context["config_form"] = form
 

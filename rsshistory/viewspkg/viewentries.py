@@ -7,6 +7,7 @@ from django.db.models import Q
 from django.http import JsonResponse
 from django.http import HttpResponseForbidden, HttpResponseRedirect
 from django.utils.http import urlencode
+from django.core.paginator import Paginator
 
 from ..apps import LinkDatabase
 from ..models import (
@@ -67,6 +68,28 @@ def get_search_term_request(request):
     return search_term
 
 
+def get_request_order_by(request):
+    if "order" in request.GET:
+        order = request.GET["order"]
+        return [order]
+    else:
+        config = Configuration.get_object().config_entry
+        return config.get_entries_order_by()
+
+
+def get_request_page_num(request):
+    if "page" in request.GET:
+        page = request.GET["page"]
+        try:
+           page =  int(page)
+        except Exception as e:
+            page = 1
+
+        return page
+    else:
+        return 1
+
+
 class EntriesSearchListView(generic.ListView):
     model = LinkDataController
     context_object_name = "content_list"
@@ -74,6 +97,9 @@ class EntriesSearchListView(generic.ListView):
     template_name = str(ViewPage.get_full_template("linkdatacontroller_list.html"))
 
     def get(self, *args, **kwargs):
+        """
+        API: Used to redirect if user does not have rights
+        """
         print("EntriesSearchListView:get")
 
         self.time_start = datetime.now()
@@ -82,30 +108,40 @@ class EntriesSearchListView(generic.ListView):
         data = p.check_access()
         if data:
             return redirect("{}:missing-rights".format(LinkDatabase.name))
+
         print("EntriesSearchListView:get constructor of list view")
-        view = super(EntriesSearchListView, self).get(*args, **kwargs)
+        view = super().get(*args, **kwargs)
         print("EntriesSearchListView:get done")
         return view
 
     def get_queryset(self):
+        """
+        API: Returns queryset
+        """
         print("EntriesSearchListView:get_queryset")
         self.query_filter = self.get_filter()
         objects = self.get_filtered_objects().order_by(*self.get_order_by())
         print("EntriesSearchListView:get_queryset done {}".format(objects.query))
         return objects
 
-    def get_order_by(self):
-        if "order" in self.request.GET:
-            order = self.request.GET["order"]
-            return [order]
-        else:
+    def get_paginate_by(self, queryset):
+        """
+        API: Returns pagination value
+        """
+        if not self.request.user.is_authenticated:
             config = Configuration.get_object().config_entry
-            return config.get_entries_order_by()
+            return config.links_per_page
+        else:
+            uc = UserConfig.get(self.request.user)
+            return uc.links_per_page
 
     def get_context_data(self, **kwargs):
+        """
+        API:
+        """
         print("EntriesSearchListView:get_context_data")
         # Call the base implementation first to get the context
-        context = super(EntriesSearchListView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
 
         context = ViewPage.init_context(self.request, context)
         # Create any data and add it to the context
@@ -121,6 +157,7 @@ class EntriesSearchListView(generic.ListView):
 
         context["query_filter"] = self.query_filter
         context["reset_link"] = self.get_reset_link()
+        context["view_link"] = self.get_view_link()
         context["more_results_link"] = self.get_more_results_link()
         context["has_more_results"] = self.has_more_results()
         context["query_type"] = self.get_query_type()
@@ -145,13 +182,8 @@ class EntriesSearchListView(generic.ListView):
 
         return context
 
-    def get_search_link(self, search_term):
-        if search_term.find("link =") >= 0 or search_term.find("link=") >= 0:
-            wh = search_term.find("=")
-            if wh >= 0:
-                search_term = search_term[wh+1:].strip()
-
-        return search_term
+    def get_order_by(self):
+        return get_request_order_by(self.request)
 
     def get_filter(self):
         print("EntriesSearchListView:get_filter")
@@ -162,20 +194,15 @@ class EntriesSearchListView(generic.ListView):
         print("EntriesSearchListView:get_filter done")
         return thefilter
 
-    def get_paginate_by(self, queryset):
-        if not self.request.user.is_authenticated:
-            config = Configuration.get_object().config_entry
-            return config.links_per_page
-        else:
-            uc = UserConfig.get(self.request.user)
-            return uc.links_per_page
-
     def get_filtered_objects(self):
         print("EntriesSearchListView:get_filtered_objects")
         return self.query_filter.get_filtered_objects()
 
     def get_reset_link(self):
         return reverse("{}:entries-search-init".format(LinkDatabase.name))
+
+    def get_view_link(self):
+        return reverse("{}:entries".format(LinkDatabase.name))
 
     def has_more_results(self):
         return True
@@ -186,6 +213,14 @@ class EntriesSearchListView(generic.ListView):
             + "?"
             + self.query_filter.get_filter_string()
         )
+
+    def get_search_link(self, search_term):
+        if search_term.find("link =") >= 0 or search_term.find("link=") >= 0:
+            wh = search_term.find("=")
+            if wh >= 0:
+                search_term = search_term[wh + 1 :].strip()
+
+        return search_term
 
     def get_form_action_link(self):
         return reverse("{}:entries".format(LinkDatabase.name))
@@ -211,16 +246,16 @@ class EntriesSearchListView(generic.ListView):
     def init_display_type(self, context):
         # TODO https://stackoverflow.com/questions/57487336/change-value-for-paginate-by-on-the-fly
         # if type is not normal, no pagination
-        if "type" in self.request.GET:
-            context["type"] = self.request.GET["type"]
+        if "display_type" in self.request.GET:
+            context["display_type"] = self.request.GET["display_type"]
         else:
-            context["type"] = "normal"
+            context["display_type"] = "normal"
         context["args"] = self.get_args()
 
     def get_args(self):
         arg_data = {}
         for arg in self.request.GET:
-            if arg != "type":
+            if arg != "display_type":
                 arg_data[arg] = self.request.GET[arg]
 
         return "&" + urlencode(arg_data)
@@ -308,6 +343,9 @@ class EntriesOmniListView(EntriesSearchListView):
     def get_form_action_link(self):
         return reverse("{}:entries-omni-search".format(LinkDatabase.name))
 
+    def get_view_link(self):
+        return reverse("{}:entries-omni-search".format(LinkDatabase.name))
+
     def has_more_results(self):
         if "archive" in self.request.GET:
             return False
@@ -379,6 +417,9 @@ class EntriesRecentListView(EntriesOmniListView):
     def get_form_action_link(self):
         return reverse("{}:entries-recent".format(LinkDatabase.name))
 
+    def get_view_link(self):
+        return reverse("{}:entries-recent".format(LinkDatabase.name))
+
     def get_title(self):
         return " - Recent"
 
@@ -408,7 +449,10 @@ class EntriesNotTaggedView(EntriesOmniListView):
         return reverse("{}:entries-untagged".format(LinkDatabase.name))
 
     def get_form_action_link(self):
-        return reverse("{}:entries-recent".format(LinkDatabase.name))
+        return reverse("{}:entries-untagged".format(LinkDatabase.name))
+
+    def get_view_link(self):
+        return reverse("{}:entries-untagged".format(LinkDatabase.name))
 
     def get_title(self):
         return " - UnTagged"
@@ -433,6 +477,9 @@ class EntriesBookmarkedListView(EntriesOmniListView):
         return reverse("{}:entries-bookmarked-init".format(LinkDatabase.name))
 
     def get_form_action_link(self):
+        return reverse("{}:entries-bookmarked".format(LinkDatabase.name))
+
+    def get_view_link(self):
         return reverse("{}:entries-bookmarked".format(LinkDatabase.name))
 
     def get_title(self):
@@ -463,6 +510,9 @@ class EntriesArchiveListView(EntriesSearchListView):
     def get_form_action_link(self):
         return reverse("{}:entries-archived".format(LinkDatabase.name))
 
+    def get_view_link(self):
+        return reverse("{}:entries-archived".format(LinkDatabase.name))
+
     def get_form_instance(self):
         return EntryChoiceForm(self.request.GET, request=self.request)
 
@@ -478,7 +528,7 @@ class EntryDetailView(generic.DetailView):
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
-        context = super(EntryDetailView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context = ViewPage.init_context(self.request, context)
 
         self.set_visited()
@@ -525,7 +575,7 @@ class EntryArchivedDetailView(generic.DetailView):
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
-        context = super(EntryArchivedDetailView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context = ViewPage.init_context(self.request, context)
 
         if self.object.language == None:
@@ -1139,33 +1189,28 @@ def entries_json(request):
         EntriesOmniListView,
     ]
 
-    page_limit = "standard"
-    if "page_limit" in request.GET:
-        page_limit = request.GET["page_limit"]
+    view_to_use = None
 
-        for view_class in check_views:
-            view = view_class()
-            view.request = request
-            if query_type == view.get_query_type():
-                query_filter = view.get_filter()
-                if page_limit != "no-limit":
-                    query_filter.use_page_limit = True
-                found_view = True
-                break
-
-    if not found_view:
-        view = check_views[0]()
+    for view_class in check_views:
+        view = view_class()
         view.request = request
-        query_filter = view.get_filter()
-        query_filter.use_page_limit = True
+        if query_type == view.get_query_type():
+            view_to_use = view
 
-    links = query_filter.get_filtered_objects()
+    page_num = get_request_page_num(request)
 
-    exporter = InstanceExporter()
-    json_obj = exporter.export_links(links)
+    if view_to_use:
+        links = view_to_use.get_queryset()
+        p = Paginator(links, view.get_paginate_by(links))
+        page_obj = p.get_page(page_num)
 
-    # JsonResponse
-    return JsonResponse(json_obj)
+        objects = links[page_obj.start_index()-1: page_obj.end_index()]
+
+        exporter = InstanceExporter()
+        json_obj = exporter.export_links(objects)
+
+        # JsonResponse
+        return JsonResponse(json_obj)
 
 
 def entries_remove_all(request):

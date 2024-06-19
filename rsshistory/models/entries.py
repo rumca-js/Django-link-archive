@@ -40,15 +40,27 @@ class BaseLinkDataModel(models.Model):
     )
 
     # date when link was created in DB
-    date_created = models.DateTimeField(auto_now_add=True, null=True, help_text="Date when entry was created in the database")
+    date_created = models.DateTimeField(
+        auto_now_add=True,
+        null=True,
+        help_text="Date when entry was created in the database",
+    )
     # date when link was introduced to the internet
-    date_published = models.DateTimeField(default=timezone.now, help_text="Date when page was published")
+    date_published = models.DateTimeField(
+        default=timezone.now, help_text="Date when page was published"
+    )
     # date when link was accessed last by scanned
-    date_update_last = models.DateTimeField(null=True, help_text="Date when page was last checked")
+    date_update_last = models.DateTimeField(
+        null=True, help_text="Date when page was last checked"
+    )
     # date when link was found dead
-    date_dead_since = models.DateTimeField(null=True, help_text="Date when page became inactive")
+    date_dead_since = models.DateTimeField(
+        null=True, help_text="Date when page became inactive"
+    )
     # date of last modification
-    date_last_modified = models.DateTimeField(null=True, help_text="Date of last page modification")
+    date_last_modified = models.DateTimeField(
+        null=True, help_text="Date of last page modification"
+    )
 
     # this entry cannot be removed. Serves a purpose. Domain page, source page
     permanent = models.BooleanField(
@@ -203,6 +215,7 @@ class BaseLinkDataController(BaseLinkDataModel):
 
     def get_local_date_published(self):
         from ..configuration import Configuration
+
         c = Configuration.get_object()
         return c.get_local_time(self.date_published)
 
@@ -328,7 +341,7 @@ class BaseLinkDataController(BaseLinkDataModel):
         names.add("source_obj__id")
         names.add("tags")
         names.add("comments")
-        names.add("vote")
+        names.add("vote")  # TODO is this used?
         return list(names)
 
     def get_map(self):
@@ -423,13 +436,13 @@ class BaseLinkDataController(BaseLinkDataModel):
         if self.is_archive_entry():
             return False
 
-        return (self.permanent or self.bookmarked)
+        return self.permanent or self.bookmarked
 
     def is_commentable(self):
         if self.is_archive_entry():
             return False
 
-        return (self.permanent or self.bookmarked)
+        return self.permanent or self.bookmarked
 
     def is_permanent(self):
         from ..configuration import Configuration
@@ -443,6 +456,7 @@ class BaseLinkDataController(BaseLinkDataModel):
 
     def should_entry_be_permanent(self):
         from ..configuration import Configuration
+
         conf = Configuration.get_object().config_entry
 
         p = DomainAwarePage(self.link)

@@ -535,21 +535,15 @@ class HtmlPageTest(FakeInternetTestCase):
         )
 
     def test_is_pwa(self):
-        page = HtmlPage(
-            "https://linkedin.com/test", webpage_progressive_web_app
-        )
+        page = HtmlPage("https://linkedin.com/test", webpage_progressive_web_app)
 
-        self.assertTrue( page.is_pwa())
+        self.assertTrue(page.is_pwa())
 
-        page = HtmlPage(
-            "https://linkedin.com/test", webpage_html_schema_fields_nested
-        )
+        page = HtmlPage("https://linkedin.com/test", webpage_html_schema_fields_nested)
 
-        self.assertFalse( page.is_pwa())
+        self.assertFalse(page.is_pwa())
 
     def test_get_pwa_manifest(self):
-        page = HtmlPage(
-            "https://linkedin.com/test", webpage_progressive_web_app
-        )
+        page = HtmlPage("https://linkedin.com/test", webpage_progressive_web_app)
 
-        self.assertEqual( page.get_pwa_manifest(), "test_page_manifest.json")
+        self.assertEqual(page.get_pwa_manifest(), "test_page_manifest.json")

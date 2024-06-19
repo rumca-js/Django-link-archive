@@ -92,7 +92,7 @@ class OmniSymbolProcessor(object):
         else:
             function = str(expr.func)
             operation_symbol = str(expr)
-            #print("Operation: {}".format(function))
+            # print("Operation: {}".format(function))
 
             return self.make_operation(operation_symbol, function, expr.args)
 
@@ -102,7 +102,7 @@ class OmniSymbolProcessor(object):
 
     def evaluate_symbol(self, symbol):
         condition_text = self.conditions[symbol]
-        #print("Evaluation condition {} {}".format(symbol, condition_text))
+        # print("Evaluation condition {} {}".format(symbol, condition_text))
 
         self.known_results[symbol] = self.symbol_evaluator.evaluate_symbol(
             condition_text
@@ -120,11 +120,11 @@ class OmniSymbolProcessor(object):
         else:
             args1 = None
 
-        #print(
+        # print(
         #    "Evaluation function: full:{} function:{} args:{} {}".format(
         #        operation_symbol, function, args0, args1
         #    )
-        #)
+        # )
 
         if function == "And":  # & sign
             self.known_results[operation_symbol] = args0 & args1
@@ -143,6 +143,7 @@ class SingleSymbolEvaluator(object):
     """
     Evaluates single operation, like "Thing = Anything"
     """
+
     def __init__(self):
         self.not_translated_conditions = {}
         self.translated_conditions = {}

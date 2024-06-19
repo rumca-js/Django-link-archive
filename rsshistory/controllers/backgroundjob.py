@@ -81,15 +81,15 @@ class BackgroundJobController(BackgroundJob):
         elif self.job == BackgroundJob.JOB_LINK_UPDATE_DATA:
             entry = self.get_text_to_entry(self.subject)
             if entry:
-                 return entry.get_absolute_url()
+                return entry.get_absolute_url()
         elif self.job == BackgroundJob.JOB_LINK_RESET_DATA:
             entry = self.get_text_to_entry(self.subject)
             if entry:
-                 return entry.get_absolute_url()
+                return entry.get_absolute_url()
         elif self.job == BackgroundJob.JOB_LINK_RESET_LOCAL_DATA:
             entry = self.get_text_to_entry(self.subject)
             if entry:
-                 return entry.get_absolute_url()
+                return entry.get_absolute_url()
 
         if self.args and self.args != "":
             try:
@@ -101,7 +101,7 @@ class BackgroundJobController(BackgroundJob):
             if "entry_id" in cfg:
                 entry = self.get_text_to_entry(cfg["entry_id"])
                 if entry:
-                     return entry.get_absolute_url()
+                    return entry.get_absolute_url()
             elif "source_id" in cfg:
                 source = self.get_text_to_source(cfg["source_id"])
                 if source:
@@ -118,7 +118,7 @@ class BackgroundJobController(BackgroundJob):
         except Exception as e:
             return
 
-        sources = SourceDataModel.objects.filter(id = source_id)
+        sources = SourceDataModel.objects.filter(id=source_id)
         if sources.exists():
             return sources[0]
 
@@ -128,7 +128,7 @@ class BackgroundJobController(BackgroundJob):
         except Exception as e:
             return
 
-        entries = LinkDataModel.objects.filter(id = entry_id)
+        entries = LinkDataModel.objects.filter(id=entry_id)
         if entries.exists():
             return entries[0]
 
@@ -422,16 +422,20 @@ class BackgroundJobController(BackgroundJob):
                 return
 
         if BackgroundJobController.is_update_or_reset_entry_job(entry):
-             return
+            return
 
         return BackgroundJobController.create_single_job(
-            BackgroundJob.JOB_LINK_UPDATE_DATA, entry.id, entry.link,
+            BackgroundJob.JOB_LINK_UPDATE_DATA,
+            entry.id,
+            entry.link,
         )
 
     def entry_reset_local_data(entry):
         """ """
         return BackgroundJobController.create_single_job(
-            BackgroundJob.JOB_LINK_RESET_LOCAL_DATA, entry.id, entry.link,
+            BackgroundJob.JOB_LINK_RESET_LOCAL_DATA,
+            entry.id,
+            entry.link,
         )
 
     def entry_reset_data(entry, force=False):
@@ -443,7 +447,7 @@ class BackgroundJobController(BackgroundJob):
                 return
 
         if BackgroundJobController.is_update_or_reset_entry_job(entry):
-             return
+            return
 
         return BackgroundJobController.create_single_job(
             BackgroundJob.JOB_LINK_RESET_DATA, entry.id, entry.link
@@ -468,18 +472,22 @@ class BackgroundJobController(BackgroundJob):
         )
 
     def get_number_of_update_reset_jobs():
-        condition_reset = Q(job = BackgroundJob.JOB_LINK_RESET_DATA)
-        condition_update = Q(job = BackgroundJob.JOB_LINK_UPDATE_DATA)
+        condition_reset = Q(job=BackgroundJob.JOB_LINK_RESET_DATA)
+        condition_update = Q(job=BackgroundJob.JOB_LINK_UPDATE_DATA)
         condition_enabled = Q(enabled=True)
-        
-        objs = BackgroundJobController.objects.filter(condition_enabled & (condition_update | condition_reset))
+
+        objs = BackgroundJobController.objects.filter(
+            condition_enabled & (condition_update | condition_reset)
+        )
         return objs.count()
 
     def is_update_or_reset_entry_job(entry):
-        condition_reset = Q(job = BackgroundJob.JOB_LINK_RESET_DATA)
-        condition_update = Q(job = BackgroundJob.JOB_LINK_UPDATE_DATA)
+        condition_reset = Q(job=BackgroundJob.JOB_LINK_RESET_DATA)
+        condition_update = Q(job=BackgroundJob.JOB_LINK_UPDATE_DATA)
         condition_enabled = Q(enabled=True)
         condition_subject = Q(subject=str(entry.id))
-        
-        objs = BackgroundJobController.objects.filter(condition_subject & condition_enabled & (condition_update | condition_reset))
+
+        objs = BackgroundJobController.objects.filter(
+            condition_subject & condition_enabled & (condition_update | condition_reset)
+        )
         return objs.count() > 0

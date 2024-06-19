@@ -43,7 +43,7 @@ class EntryRuleTests(FakeInternetTestCase):
         url = reverse("{}:entry-rule-add".format(LinkDatabase.name), args=[])
 
         form_data = {
-            "enabled" : "False",
+            "enabled": "False",
             "rule_name": "test_rule_edited",
         }
 
@@ -54,18 +54,20 @@ class EntryRuleTests(FakeInternetTestCase):
 
     def test_entry_rule_edit(self):
         entry_rule = EntryRule.objects.create(
-                enabled=True,
-                rule_name = "test_rule",
-                rule_url = "https://neocities.com",
-                auto_tag="personal",
+            enabled=True,
+            rule_name="test_rule",
+            rule_url="https://neocities.com",
+            auto_tag="personal",
         )
 
         self.client.login(username="testuser", password="testpassword")
 
-        url = reverse("{}:entry-rule-edit".format(LinkDatabase.name), args=[entry_rule.id])
+        url = reverse(
+            "{}:entry-rule-edit".format(LinkDatabase.name), args=[entry_rule.id]
+        )
 
         form_data = {
-            "enabled" : False,
+            "enabled": False,
             "rule_name": "test_rule_edited",
         }
 
@@ -76,15 +78,17 @@ class EntryRuleTests(FakeInternetTestCase):
 
     def test_entry_rule_remove(self):
         entry_rule = EntryRule.objects.create(
-                enabled=True,
-                rule_name = "test_rule",
-                rule_url = "https://neocities.com",
-                auto_tag="personal",
+            enabled=True,
+            rule_name="test_rule",
+            rule_url="https://neocities.com",
+            auto_tag="personal",
         )
 
         self.client.login(username="testuser", password="testpassword")
 
-        url = reverse("{}:entry-rule-remove".format(LinkDatabase.name), args=[entry_rule.id])
+        url = reverse(
+            "{}:entry-rule-remove".format(LinkDatabase.name), args=[entry_rule.id]
+        )
 
         # call user action
         response = self.client.get(url)
@@ -95,10 +99,10 @@ class EntryRuleTests(FakeInternetTestCase):
 
     def test_entry_rule_list(self):
         entry_rule = EntryRule.objects.create(
-                enabled=True,
-                rule_name = "test_rule",
-                rule_url = "https://neocities.com",
-                auto_tag="personal",
+            enabled=True,
+            rule_name="test_rule",
+            rule_url="https://neocities.com",
+            auto_tag="personal",
         )
 
         self.client.login(username="testuser", password="testpassword")
@@ -112,10 +116,10 @@ class EntryRuleTests(FakeInternetTestCase):
 
     def test_entry_rule_detail(self):
         entry_rule = EntryRule.objects.create(
-                enabled=True,
-                rule_name = "test_rule",
-                rule_url = "https://neocities.com",
-                auto_tag="personal",
+            enabled=True,
+            rule_name="test_rule",
+            rule_url="https://neocities.com",
+            auto_tag="personal",
         )
 
         self.client.login(username="testuser", password="testpassword")

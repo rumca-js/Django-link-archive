@@ -1,3 +1,5 @@
+import urllib.parse
+
 from django.urls import reverse
 from django.templatetags.static import static
 
@@ -7,7 +9,8 @@ from ...controllers import LinkDataController, SearchEngineGoogleCache
 from ...webtools import DomainAwarePage, InputContent
 from ...configuration import Configuration
 from ...dateutils import DateUtils
-from ...services import TranslateBuilder, InternetArchiveBuilder
+from ...services import TranslateBuilder, InternetArchiveBuilder, SchemaOrg, WhoIs, W3CValidator
+
 
 
 class EntryButton(object):
@@ -53,6 +56,9 @@ class EntryGenericPlugin(object):
     def __init__(self, entry, user=None):
         self.entry = entry
         self.user = user
+
+    def encode_url(self, url):
+        return urllib.parse.quote(url)
 
     def set_user(self, user):
         self.user = user
@@ -501,6 +507,47 @@ class EntryGenericPlugin(object):
                 ),
                 ConfigurationEntry.ACCESS_TYPE_OWNER,
                 "Shows JSON data",
+            ),
+        )
+
+        link = self.entry.link
+
+        buttons.append(
+            EntryButton(
+                self.user,
+                "Who Is",
+                WhoIs(link).get_validate_url(),
+                ConfigurationEntry.ACCESS_TYPE_ALL,
+                "Shows Who is information",
+                static(
+                    "{}/icons/icons8-download-page-96.png".format(LinkDatabase.name)
+                ),
+            ),
+        )
+
+        buttons.append(
+            EntryButton(
+                self.user,
+                "W3C validator",
+                W3CValidator(link).get_validate_url(),
+                ConfigurationEntry.ACCESS_TYPE_ALL,
+                "Shows Who is information",
+                static(
+                    "{}/icons/icons8-download-page-96.png".format(LinkDatabase.name)
+                ),
+            ),
+        )
+
+        buttons.append(
+            EntryButton(
+                self.user,
+                "Schema.org validator",
+                SchemaOrg(link).get_validate_url(),
+                ConfigurationEntry.ACCESS_TYPE_ALL,
+                "Shows Who is information",
+                static(
+                    "{}/icons/icons8-download-page-96.png".format(LinkDatabase.name)
+                ),
             ),
         )
 

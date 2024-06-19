@@ -40,14 +40,20 @@ class DataExport(models.Model):
         max_length=1000, blank=True, help_text="Can be empty"
     )
     user = models.CharField(
-        default="", max_length=2000, blank=True, help_text="Repo user name. Can be empty"
+        default="",
+        max_length=2000,
+        blank=True,
+        help_text="Repo user name. Can be empty",
     )
     password = models.CharField(
         default="", max_length=2000, blank=True, help_text="Repo password. Can be empty"
     )
 
     db_user = models.CharField(
-        default="", max_length=2000, blank=True, help_text="This instance user that Can be empty"
+        default="",
+        max_length=2000,
+        blank=True,
+        help_text="This instance user that Can be empty",
     )
 
     # maybe we should make another table, for each EXPORT

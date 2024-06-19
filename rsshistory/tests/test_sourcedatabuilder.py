@@ -23,7 +23,7 @@ class SourceDataBuilderTest(FakeInternetTestCase):
                 "category": "No",
                 "subcategory": "No",
                 "export_to_cms": False,
-                "enabled" : True,
+                "enabled": True,
             },
             manual_entry=False,
         ).add_from_props()

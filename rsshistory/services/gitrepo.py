@@ -53,7 +53,7 @@ class GitRepo(object):
     def commit(self, commit_message):
         self.is_different_flag = self.is_different()
 
-        if self.is_different:
+        if not self.is_different:
             return False
 
         p = subprocess.run(

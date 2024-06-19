@@ -112,7 +112,9 @@ class YearDataWriter(BaseDataWriter):
         from .serializers.bookmarksexporter import BookmarksExporter
 
         if self.export_config.export_entries_bookmarks:
-            exporter = BookmarksExporter(self.config, username=self.export_config.db_user)
+            exporter = BookmarksExporter(
+                self.config, username=self.export_config.db_user
+            )
             exporter.export(self.get_directory())
 
         if self.export_config.export_entries_permanents:

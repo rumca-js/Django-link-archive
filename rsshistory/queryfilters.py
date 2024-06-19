@@ -572,7 +572,9 @@ class OmniSearchFilter(BaseQueryFilter):
         else:
             self.search_query = ""
 
-        self.parser = OmniSearchWithDefault(self.search_query, DjangoSingleSymbolEvaluator())
+        self.parser = OmniSearchWithDefault(
+            self.search_query, DjangoSingleSymbolEvaluator()
+        )
 
         self.query_set = None
         self.combined_query = None

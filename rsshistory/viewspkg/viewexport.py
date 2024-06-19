@@ -447,7 +447,9 @@ def data_export_add(request):
         form = DataExportForm(request.POST)
         if form.is_valid():
             form.save()
-            return HttpResponseRedirect(reverse("{}:data-exports".format(LinkDatabase.name)))
+            return HttpResponseRedirect(
+                reverse("{}:data-exports".format(LinkDatabase.name))
+            )
         else:
             p.context["summary_text"] = "Form is invalid"
             return p.render("summary_present.html")

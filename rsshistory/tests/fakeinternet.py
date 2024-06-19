@@ -11,7 +11,7 @@ from django.contrib.auth.models import User
 
 from ..models import AppLogging, ConfigurationEntry
 from ..dateutils import DateUtils
-from ..webtools import BasePage,PageResponseObject
+from ..webtools import BasePage, PageResponseObject
 from ..configuration import Configuration
 
 from ..pluginurl.urlhandler import UrlHandler
@@ -335,7 +335,6 @@ class TestResponseObject(PageResponseObject):
         elif url == "https://page-with-real-rss-link.com":
             return webpage_with_real_rss_links
 
-
         elif url.startswith("https://instance.com/apps/rsshistory"):
             return self.get_contents_instance(url)
 
@@ -504,9 +503,7 @@ class FakeInternetTestCase(TestCase):
         c.config_entry.new_entries_merge_data = False
         c.config_entry.new_entries_use_clean_data = False
         c.config_entry.new_source_enabled_state = False
-        c.config_entry.scan_create_sources = False
-        c.config_entry.scan_create_domains = False
-        c.config_entry.scan_create_not_domains = False
+        c.config_entry.auto_create_sources = False
         c.config_entry.auto_scan_entries = False
         c.config_entry.link_save = False
         c.config_entry.source_save = False

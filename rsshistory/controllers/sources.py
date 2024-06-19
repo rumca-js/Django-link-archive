@@ -52,9 +52,7 @@ class SourceDataController(SourceDataModel):
         from .backgroundjob import BackgroundJobController
 
         properties = {"permament": True}
-        BackgroundJobController.link_add(
-            source.url, properties=properties
-        )
+        BackgroundJobController.link_add(source.url, properties=properties)
 
     def get_days_to_remove(self):
         days = self.remove_after_days
@@ -294,7 +292,7 @@ class SourceDataController(SourceDataModel):
             op.consecutive_errors = 0
             op.save()
 
-        entries = LinkDataModel.objects.filter(link = self.url)
+        entries = LinkDataModel.objects.filter(link=self.url)
         if entries.count() == 0:
             SourceDataController.add_entry(self)
 
@@ -313,7 +311,7 @@ class SourceDataController(SourceDataModel):
         self.enabled = False
         self.save()
 
-        entries = LinkDataModel.objects.filter(link = self.url)
+        entries = LinkDataModel.objects.filter(link=self.url)
         if entries.count() > 0:
             for entry in entries:
                 w = LinkDataWrapper(entry=entry)
@@ -368,6 +366,7 @@ class SourceDataBuilder(object):
 
     def add_from_link(self):
         from ..pluginurl import UrlHandler
+
         rss_url = self.link
 
         if rss_url.endswith("/"):

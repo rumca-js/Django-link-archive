@@ -408,7 +408,9 @@ class EntriesViewsTests(FakeInternetTestCase):
         )
 
         self.client.login(username="testuser", password="testpassword")
-        url = reverse("{}:entry-archive-bookmark".format(LinkDatabase.name), args=[entry.id])
+        url = reverse(
+            "{}:entry-archive-bookmark".format(LinkDatabase.name), args=[entry.id]
+        )
 
         # call user action
         response = self.client.get(url)

@@ -106,7 +106,7 @@ class ProcessSourceJobHandler(BaseJobHandler):
             except Exception as e:
                 AppLogging.error("Incorrect source ID:{}".format(obj.subject))
 
-                obj.enabled=False
+                obj.enabled = False
                 obj.save()
 
                 return False
@@ -1057,7 +1057,9 @@ class RefreshThreadHandler(object):
         number_of_entries = entries.count()
 
         if entries and number_of_entries > 0:
-            current_num_of_jobs = BackgroundJobController.get_number_of_update_reset_jobs()
+            current_num_of_jobs = (
+                BackgroundJobController.get_number_of_update_reset_jobs()
+            )
 
             if current_num_of_jobs >= max_number_of_update_entries:
                 return

@@ -23,9 +23,7 @@ class BaseRssPluginTest(FakeInternetTestCase):
 
         config = Configuration.get_object().config_entry
         config.accept_not_domain_entries = True
-        config.scan_create_sources = True
-        config.scan_create_domains = False
-        config.scan_create_not_domains = False
+        config.auto_create_sources = True
         config.accept_domains = False
         config.new_entries_merge_data = False
         config.new_entries_use_clean_data = False
@@ -55,9 +53,7 @@ class BaseRssPluginTest(FakeInternetTestCase):
 
         config = Configuration.get_object().config_entry
         config.accept_not_domain_entries = True
-        config.scan_create_sources = True
-        config.scan_create_domains = False
-        config.scan_create_not_domains = False
+        config.auto_create_sources = True
         config.accept_domains = False
         config.new_entries_merge_data = True
         config.new_entries_use_clean_data = False
@@ -82,9 +78,7 @@ class BaseRssPluginTest(FakeInternetTestCase):
 
         config = Configuration.get_object().config_entry
         config.accept_not_domain_entries = True
-        config.scan_create_sources = True
-        config.scan_create_domains = False
-        config.scan_create_not_domains = False
+        config.auto_create_sources = True
         config.accept_domains = False
         config.new_entries_merge_data = False
         config.new_entries_use_clean_data = True
@@ -109,9 +103,7 @@ class BaseRssPluginTest(FakeInternetTestCase):
 
         config = Configuration.get_object().config_entry
         config.accept_not_domain_entries = True
-        config.scan_create_sources = True
-        config.scan_create_domains = False
-        config.scan_create_not_domains = False
+        config.auto_create_sources = True
         config.accept_domains = False
         config.new_entries_merge_data = True
         config.new_entries_use_clean_data = False

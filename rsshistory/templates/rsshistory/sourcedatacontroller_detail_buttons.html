@@ -51,8 +51,8 @@
    {% endif %}
 
    <div class="dropdown mx-2">
-     <button class="btn btn-primary" type="button" id="#entryAdvancedDrop" data-bs-toggle="dropdown" aria-expanded="false">
-       Advanced
+     <button class="btn btn-primary" type="button" id="#entryViewDrop" data-bs-toggle="dropdown" aria-expanded="false">
+       View
      </button>
    
      <ul class="dropdown-menu">
@@ -79,6 +79,15 @@
             </a>
         </li>
    
+      </ul>
+   </div>
+
+   <div class="dropdown mx-2">
+     <button class="btn btn-primary" type="button" id="#entryAdvancedDrop" data-bs-toggle="dropdown" aria-expanded="false">
+       Advanced
+     </button>
+   
+     <ul class="dropdown-menu">
         {% if user.is_staff %}
            <li>
               <a href="{% url 'rsshistory:source-fix-entries' object.id %}" class="dropdown-item" title="Fixes entries for source, objects relationships, langauge">Fix entries</a>

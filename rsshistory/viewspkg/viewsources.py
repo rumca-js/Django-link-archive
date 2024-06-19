@@ -25,6 +25,15 @@ from ..pluginurl import UrlHandler
 from ..pluginsources import SourceGenericPlugin
 
 
+def get_request_order_by(request):
+    if "order" in request.GET:
+        order = request.GET["order"]
+        return [order]
+    else:
+        config = Configuration.get_object().config_entry
+        return config.get_entries_order_by()
+
+
 class SourceListView(generic.ListView):
     model = SourceDataController
     context_object_name = "content_list"
@@ -103,7 +112,9 @@ class SourceDetailView(generic.DetailView):
 
         c = Configuration.get_object()
         if hasattr(self.object, "dynamic_data"):
-            context["date_fetched"] = c.get_local_time(self.object.dynamic_data.date_fetched)
+            context["date_fetched"] = c.get_local_time(
+                self.object.dynamic_data.date_fetched
+            )
 
         entries = LinkDataController.objects.filter(link=self.object.url)
         if entries.count() > 0:
@@ -660,15 +671,28 @@ def source_json(request, pk):
 
 
 def sources_json(request):
-    # Data
-    query_filter = SourceFilter(request.GET, request.user)
-    query_filter.use_page_limit = True
-    sources = query_filter.get_filtered_objects()
+    check_views = [
+        SourceListView,
+    ]
 
-    from ..serializers.instanceimporter import InstanceExporter
+    view_to_use = None
 
-    exporter = InstanceExporter()
-    json_obj = exporter.export_sources(sources)
+    for view_class in check_views:
+        view = view_class()
+        view.request = request
+        view_to_use = view
 
-    # JsonResponse
-    return JsonResponse(json_obj)
+    page_num = get_request_page_num(request)
+
+    if view_to_use:
+        links = view_to_use.get_queryset()
+        p = Paginator(links, view.get_paginate_by(links))
+        page_obj = p.get_page(page_num)
+
+        objects = links[page_obj.start_index()-1: page_obj.end_index()]
+
+        exporter = InstanceExporter()
+        json_obj = exporter.export_sources(objects)
+
+        # JsonResponse
+        return JsonResponse(json_obj)

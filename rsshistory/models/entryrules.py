@@ -1,4 +1,3 @@
-
 from django.db import models
 
 from .entries import LinkDataModel
@@ -10,12 +9,9 @@ from ..apps import LinkDatabase
 class EntryRule(models.Model):
     enabled = models.BooleanField(default=True)
 
-    rule_url = models.CharField(max_length=1000) # url syntax
+    rule_url = models.CharField(max_length=1000)  # url syntax
 
-    rule_name = models.CharField(
-        max_length=1000,
-        blank=True,
-        help_text="Rule name")
+    rule_name = models.CharField(max_length=1000, blank=True, help_text="Rule name")
 
     block = models.BooleanField(
         default=False,
@@ -23,9 +19,8 @@ class EntryRule(models.Model):
     )
 
     auto_tag = models.CharField(
-        max_length=1000,
-        blank=True,
-        help_text="Automatically tag")
+        max_length=1000, blank=True, help_text="Automatically tag"
+    )
 
     requires_selenium = models.BooleanField(
         default=False,

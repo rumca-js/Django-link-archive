@@ -1,5 +1,6 @@
 import urllib.parse
 
+
 class SearchEngine(object):
     def __init__(self, query_term=None, url=None):
         self.query_term = query_term
@@ -82,7 +83,9 @@ class SearchEngineGoogleCache(SearchEngine):
             search_term = self.query_term
 
         return "{}?{}=cache:{}".format(
-            self.get_search_address(), self.get_search_argument(), self.encode_url(search_term)
+            self.get_search_address(),
+            self.get_search_argument(),
+            self.encode_url(search_term),
         )
 
 

@@ -124,8 +124,8 @@ class MarkDownConverterTest(FakeInternetTestCase):
 """
 
         items = [
-                {"title": "test_title_01", "link": "https://test-link-01.com"},
-                {"title": "test_title_02", "link": "https://test-link-02.com"},
+            {"title": "test_title_01", "link": "https://test-link-01.com"},
+            {"title": "test_title_02", "link": "https://test-link-02.com"},
         ]
 
         converter = MarkDownConverter(items, item_template)
@@ -149,10 +149,9 @@ class MarkDownDynamicConverterTest(FakeInternetTestCase):
         self.disable_web_pages()
 
     def test_constructor(self):
-
         items = [
-                {"title": "test_title_01", "link": "https://test-link-01.com"},
-                {"title": "test_title_02", "link": "https://test-link-02.com"},
+            {"title": "test_title_01", "link": "https://test-link-01.com"},
+            {"title": "test_title_02", "link": "https://test-link-02.com"},
         ]
 
         column_order = ["title", "link"]

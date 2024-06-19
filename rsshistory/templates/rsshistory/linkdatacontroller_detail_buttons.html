@@ -10,7 +10,7 @@
         <ul class="dropdown-menu">
              {% for button in object_controller.get_edit_menu_buttons %}
                  {% if button.is_shown %}
-     	    <li>
+     	         <li>
                      <a href="{{button.action}}" class="dropdown-item" title="{{button.title}}">
                      {% if button.image %}
                         <img src="{{button.image}}" class="content-icon" />
@@ -54,7 +54,7 @@
      <ul class="dropdown-menu">
          {% for button in object_controller.get_advanced_menu_buttons %}
              {% if button.is_shown %}
-  	   <li>
+  	     <li>
                  <a href="{{button.action}}" class="dropdown-item" title="{{button.title}}">
                  {% if button.image %}
                     <img src="{{button.image}}" class="content-icon" />
@@ -62,7 +62,7 @@
                  {{button.name}}
                  </a>
              {% endif %}
-  	   </li>
+  	     </li>
          {% endfor %}
      </ul>
   </div>

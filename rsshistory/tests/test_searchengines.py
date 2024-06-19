@@ -1,5 +1,5 @@
 from ..webtools import Url, PageOptions, HtmlPage, PageResponseObject
-from ..controllers import SearchEngines, SearchEngineGoogle,SearchEngineGoogleCache
+from ..controllers import SearchEngines, SearchEngineGoogle, SearchEngineGoogleCache
 
 from .fakeinternet import FakeInternetTestCase, MockRequestCounter
 
@@ -18,4 +18,7 @@ class SearchEnginesTest(FakeInternetTestCase):
 
         s = SearchEngineGoogleCache(url)
 
-        self.assertEqual(s.get_search_string(), "http://webcache.googleusercontent.com/search?q=cache:https%3A//lifehacker.com/how-to-access")
+        self.assertEqual(
+            s.get_search_string(),
+            "http://webcache.googleusercontent.com/search?q=cache:https%3A//lifehacker.com/how-to-access",
+        )

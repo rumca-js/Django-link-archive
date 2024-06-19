@@ -44,7 +44,7 @@ class EntriesCleanup(object):
             if entries:
                 entries.delete()
 
-        #self.cleanup_http_duplicates()
+        # self.cleanup_http_duplicates()
         self.cleanup_invalid_page_ratings()
 
     def get_source_entries(self, source):
@@ -295,7 +295,10 @@ class EntryUpdater(object):
 
         # if server says that entry was last modified in 2006, then it was present in 2006!
         if entry.date_last_modified:
-            if not entry.date_published or entry.date_last_modified < entry.date_published:
+            if (
+                not entry.date_published
+                or entry.date_last_modified < entry.date_published
+            ):
                 entry.date_published = entry.date_last_modified
 
         # if update date says that was published before, then it must have was published then
@@ -307,6 +310,7 @@ class EntryUpdater(object):
 
     def update_data(self):
         from ..pluginurl import EntryUrlInterface
+
         """
         Fetches new information about page, and uses valid fields to set this object,
         but only if current field is not set
@@ -318,7 +322,7 @@ class EntryUpdater(object):
 
         entry = self.entry
 
-        LinkDataWrapper(entry = entry).check_https_http_protocol()
+        LinkDataWrapper(entry=entry).check_https_http_protocol()
 
         url = EntryUrlInterface(entry.link)
         props = url.get_props()
@@ -373,6 +377,7 @@ class EntryUpdater(object):
 
     def reset_data(self):
         from ..pluginurl import EntryUrlInterface
+
         """
         Fetches new information about page, and uses valid fields to set this object.
 
@@ -438,7 +443,9 @@ class EntryUpdater(object):
         if not url_handler.p:
             return
 
-        scanner = EntryScanner(url = url_handler.url, entry=entry, contents = url_handler.p.get_contents())
+        scanner = EntryScanner(
+            url=url_handler.url, entry=entry, contents=url_handler.p.get_contents()
+        )
         scanner.run()
 
     def reset_local_data(self):
@@ -447,7 +454,7 @@ class EntryUpdater(object):
     def check_for_sources(self, entry, url_interface):
         conf = Configuration.get_object().config_entry
 
-        if not conf.scan_create_sources:
+        if not conf.auto_create_sources:
             return
 
         url_handler = url_interface.h
@@ -578,9 +585,9 @@ class EntriesUpdater(object):
         # we need to have up-to-date info if pages go out of the business
         # we may change design to update it less often
 
-        entries = LinkDataController.objects.filter(condition_days_to_check | condition_update_null).order_by(
-            "date_update_last", "link"
-        )
+        entries = LinkDataController.objects.filter(
+            condition_days_to_check | condition_update_null
+        ).order_by("date_update_last", "link")
 
         return entries
 
@@ -688,7 +695,6 @@ class LinkDataWrapper(object):
             if https_objs.count() > 0:
                 return https_objs[0]
             if http_objs.count() > 0:
-
                 return http_objs[0]
 
         objs = LinkDataController.objects.filter(link=self.link)
@@ -834,7 +840,11 @@ class LinkDataWrapper(object):
         if destination_entries.count() > 0:
             self.move_from_entry_to_entry(destination_entries[0])
         else:
-            AppLogging.error("Cannot move entries from:{} to:{}".format(self.entry.link, destination_url))
+            AppLogging.error(
+                "Cannot move entries from:{} to:{}".format(
+                    self.entry.link, destination_url
+                )
+            )
 
     def make_bookmarked(self, request):
         """
@@ -1005,7 +1015,7 @@ class LinkDataWrapper(object):
             p = BasePage(entry.link)
             ping_status = p.ping()
 
-            p=BasePage(http_url)
+            p = BasePage(http_url)
             new_ping_status = p.ping()
 
             if not ping_status and new_ping_status:
@@ -1026,7 +1036,7 @@ class LinkDataWrapper(object):
                 entry.delete()
                 return True
 
-            p=BasePage(https_url)
+            p = BasePage(https_url)
             new_ping_status = p.ping()
 
             if new_ping_status:
@@ -1073,6 +1083,7 @@ class EntryDataBuilder(object):
 
     def add_from_link(self, ignore_errors=False):
         from ..pluginurl import UrlHandler
+
         """
         TODO extract this to a separate class?
         """
@@ -1087,6 +1098,7 @@ class EntryDataBuilder(object):
 
     def add_from_link_service(self):
         from ..pluginurl import EntryUrlInterface
+
         url = EntryUrlInterface(self.link, ignore_errors=self.ignore_errors)
         link_data = url.get_props()
         if not link_data:
@@ -1102,10 +1114,11 @@ class EntryDataBuilder(object):
 
     def add_from_normal_link(self):
         from ..pluginurl import EntryUrlInterface
+
         """
         TODO move this to a other class OnlyLinkDataBuilder?
         """
-        wrapper = LinkDataWrapper(link = self.link)
+        wrapper = LinkDataWrapper(link=self.link)
         obj = wrapper.get_from_operational_db()
         if obj:
             self.result = obj
@@ -1177,6 +1190,7 @@ class EntryDataBuilder(object):
 
     def add_from_props(self, ignore_errors=False):
         from ..pluginurl import UrlHandler
+
         self.ignore_errors = ignore_errors
 
         url = self.link_data["link"]
@@ -1186,7 +1200,7 @@ class EntryDataBuilder(object):
         self.link_data["link"] = UrlHandler.get_cleaned_link(self.link_data["link"])
         self.link = self.link_data["link"]
 
-        wrapper = LinkDataWrapper(link = self.link)
+        wrapper = LinkDataWrapper(link=self.link)
         entry = wrapper.get_from_operational_db()
         if entry:
             self.result = entry
@@ -1198,6 +1212,7 @@ class EntryDataBuilder(object):
 
     def add_from_props_internal(self):
         from ..pluginurl import UrlPropertyValidator
+
         entry = None
 
         self.link_data = self.get_clean_link_data()
@@ -1224,7 +1239,7 @@ class EntryDataBuilder(object):
             date = None
             if "date_published" in self.link_data:
                 date = self.link_data["date_published"]
-            wrapper = LinkDataWrapper(link = self.link_data["link"], date=date)
+            wrapper = LinkDataWrapper(link=self.link_data["link"], date=date)
             entry = wrapper.get()
 
             if entry:
@@ -1281,7 +1296,7 @@ class EntryDataBuilder(object):
         LinkDatabase.info("Adding link: {}".format(new_link_data["link"]))
 
         wrapper = LinkDataWrapper(
-            link = new_link_data["link"], date = new_link_data["date_published"]
+            link=new_link_data["link"], date=new_link_data["date_published"]
         )
 
         return wrapper.create(new_link_data)
@@ -1373,7 +1388,9 @@ class EntryDataBuilder(object):
         entries = LinkDataController.objects.filter(link=url)
         if entries.count() == 0:
             if "source_obj" in self.link_data:
-                BackgroundJobController.link_add(url=url, source=self.link_data["source_obj"])
+                BackgroundJobController.link_add(
+                    url=url, source=self.link_data["source_obj"]
+                )
             else:
                 BackgroundJobController.link_add(url=url)
 
@@ -1419,9 +1436,11 @@ class EntryDataBuilder(object):
 
             for link in links:
                 if "source_obj" in link_data:
-                    BackgroundJobController.link_add(url =link, source=link_data["source_obj"])
+                    BackgroundJobController.link_add(
+                        url=link, source=link_data["source_obj"]
+                    )
                 else:
-                    BackgroundJobController.link_add(url =link)
+                    BackgroundJobController.link_add(url=link)
 
     def add_keywords(self):
         link_data = self.link_data

@@ -161,6 +161,7 @@ class EntriesCleanupTest(FakeInternetTestCase):
 
         self.assertEqual(ArchiveLinkDataController.objects.all().count(), 0)
 
+
 """
 TODO we do not make active remove of https. Only on entry update/reset
 

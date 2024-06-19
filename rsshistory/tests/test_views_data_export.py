@@ -43,7 +43,7 @@ class DataExportTests(FakeInternetTestCase):
         url = reverse("{}:data-export-add".format(LinkDatabase.name), args=[])
 
         form_data = {
-            "enabled" : "False",
+            "enabled": "False",
             "rule_name": "test_rule_edited",
         }
 
@@ -54,17 +54,19 @@ class DataExportTests(FakeInternetTestCase):
 
     def test_data_export_edit(self):
         data_export = DataExport.objects.create(
-                enabled=True,
-                export_type = "export-type-git",
-                export_data = "export-dtype-daily-data",
+            enabled=True,
+            export_type="export-type-git",
+            export_data="export-dtype-daily-data",
         )
 
         self.client.login(username="testuser", password="testpassword")
 
-        url = reverse("{}:data-export-edit".format(LinkDatabase.name), args=[data_export.id])
+        url = reverse(
+            "{}:data-export-edit".format(LinkDatabase.name), args=[data_export.id]
+        )
 
         form_data = {
-            "enabled" : False,
+            "enabled": False,
             "export_type": "export-type-git",
         }
 
@@ -75,14 +77,16 @@ class DataExportTests(FakeInternetTestCase):
 
     def test_data_export_remove(self):
         data_export = DataExport.objects.create(
-                enabled=True,
-                export_type = "export-type-git",
-                export_data = "export-dtype-daily-data",
+            enabled=True,
+            export_type="export-type-git",
+            export_data="export-dtype-daily-data",
         )
 
         self.client.login(username="testuser", password="testpassword")
 
-        url = reverse("{}:data-export-remove".format(LinkDatabase.name), args=[data_export.id])
+        url = reverse(
+            "{}:data-export-remove".format(LinkDatabase.name), args=[data_export.id]
+        )
 
         # call user action
         response = self.client.get(url)
@@ -93,9 +97,9 @@ class DataExportTests(FakeInternetTestCase):
 
     def test_data_export_list(self):
         data_export = DataExport.objects.create(
-                enabled=True,
-                export_type = "export-type-git",
-                export_data = "export-dtype-daily-data",
+            enabled=True,
+            export_type="export-type-git",
+            export_data="export-dtype-daily-data",
         )
 
         self.client.login(username="testuser", password="testpassword")
@@ -109,9 +113,9 @@ class DataExportTests(FakeInternetTestCase):
 
     def test_data_export_detail(self):
         data_export = DataExport.objects.create(
-                enabled=True,
-                export_type = "export-type-git",
-                export_data = "export-dtype-daily-data",
+            enabled=True,
+            export_type="export-type-git",
+            export_data="export-dtype-daily-data",
         )
 
         self.client.login(username="testuser", password="testpassword")

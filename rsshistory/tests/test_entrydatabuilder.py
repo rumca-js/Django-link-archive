@@ -27,9 +27,7 @@ class EntryDataBuilderTest(FakeInternetTestCase):
         config = Configuration.get_object().config_entry
         config.accept_not_domain_entries = True
         config.accept_domains = False
-        config.scan_create_sources = False
-        config.scan_create_domains = False
-        config.scan_create_not_domains = False
+        config.auto_create_sources = False
         config.save()
 
         MockRequestCounter.mock_page_requests = 0
@@ -246,9 +244,7 @@ class EntryDataBuilderTest(FakeInternetTestCase):
         config = Configuration.get_object().config_entry
         config.accept_not_domain_entries = True
         config.accept_domains = False
-        config.scan_create_sources = False
-        config.scan_create_domains = False
-        config.scan_create_not_domains = False
+        config.auto_create_sources = False
         config.save()
 
         MockRequestCounter.mock_page_requests = 0
@@ -283,9 +279,7 @@ class EntryDataBuilderTest(FakeInternetTestCase):
         config = Configuration.get_object().config_entry
         config.accept_not_domain_entries = True
         config.accept_domains = False
-        config.scan_create_sources = False
-        config.scan_create_domains = False
-        config.scan_create_not_domains = False
+        config.auto_create_sources = False
         config.accept_ip_addresses = False
         config.save()
 
@@ -322,9 +316,7 @@ class EntryDataBuilderTest(FakeInternetTestCase):
         config = Configuration.get_object().config_entry
         config.accept_not_domain_entries = True
         config.accept_domains = False
-        config.scan_create_sources = False
-        config.scan_create_domains = False
-        config.scan_create_not_domains = False
+        config.auto_create_sources = False
         config.accept_ip_addresses = True
         config.save()
 
@@ -361,9 +353,7 @@ class EntryDataBuilderTest(FakeInternetTestCase):
         config = Configuration.get_object().config_entry
         config.accept_not_domain_entries = True
         config.accept_domains = False
-        config.scan_create_sources = False
-        config.scan_create_domains = False
-        config.scan_create_not_domains = False
+        config.auto_create_sources = False
         config.accept_ip_addresses = True
         config.save()
 

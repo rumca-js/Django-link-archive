@@ -27,7 +27,6 @@ class BookmarksEntryExporter(object):
         if not export_dir.exists():
             export_dir.mkdir(parents=True, exist_ok=True)
 
-
         cc = ModelCollectionConverter(self._entries)
         items = cc.get_map_full()
 
@@ -169,9 +168,7 @@ class BookmarksExporter(object):
             bookmarks = UserBookmarks.get_user_bookmarks(user)
             # this returns IDs, not 'objects'
             result_entries = bookmarks.values_list("entry_object", flat=True)
-            result_entries = LinkDataController.objects.filter(
-                id__in=result_entries
-            )
+            result_entries = LinkDataController.objects.filter(id__in=result_entries)
             result_entries = result_entries.filter(date_published__range=therange)
         else:
             result_entries = LinkDataController.objects.filter(

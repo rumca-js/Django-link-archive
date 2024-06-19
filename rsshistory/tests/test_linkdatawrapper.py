@@ -120,7 +120,7 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         obj = objs[0]
 
         # call tested function
-        result = LinkDataWrapper(entry = obj).make_bookmarked(
+        result = LinkDataWrapper(entry=obj).make_bookmarked(
             DjangoRequestObject(self.user_staff)
         )
 
@@ -155,7 +155,7 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         obj = objs[0]
 
         # call tested function
-        result = LinkDataWrapper(entry = obj).make_bookmarked(
+        result = LinkDataWrapper(entry=obj).make_bookmarked(
             DjangoRequestObject(self.user_not_staff),
         )
 
@@ -193,7 +193,9 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         self.assertTrue(obj.bookmarked == True)
 
         # call tested function
-        LinkDataWrapper(entry = obj).make_not_bookmarked(DjangoRequestObject(self.user_staff))
+        LinkDataWrapper(entry=obj).make_not_bookmarked(
+            DjangoRequestObject(self.user_staff)
+        )
 
         objs = LinkDataController.objects.filter(link=link_name)
         self.assertEqual(objs.count(), 1)
@@ -222,7 +224,7 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         request = DjangoRequestObject(self.user_staff)
 
         # call tested function
-        LinkDataWrapper(entry = entry).make_bookmarked(request)
+        LinkDataWrapper(entry=entry).make_bookmarked(request)
 
         self.assertEqual(entry.bookmarked, True)
         self.assertEqual(UserBookmarks.objects.all().count(), 1)
@@ -248,7 +250,7 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         request = DjangoRequestObject(self.user_not_staff)
 
         # call tested function
-        LinkDataWrapper(entry = entry).make_bookmarked(request)
+        LinkDataWrapper(entry=entry).make_bookmarked(request)
 
         self.assertEqual(entry.bookmarked, False)
         self.assertEqual(UserBookmarks.objects.all().count(), 1)
@@ -274,7 +276,7 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         request = DjangoRequestObject(self.user_staff)
 
         # call tested function
-        LinkDataWrapper(entry = entry).make_not_bookmarked(request)
+        LinkDataWrapper(entry=entry).make_not_bookmarked(request)
 
         self.assertEqual(entry.bookmarked, False)
         self.assertEqual(UserBookmarks.objects.all().count(), 0)
@@ -300,7 +302,7 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         request = DjangoRequestObject(self.user_not_staff)
 
         # call tested function
-        LinkDataWrapper(entry = entry).make_not_bookmarked(request)
+        LinkDataWrapper(entry=entry).make_not_bookmarked(request)
 
         self.assertEqual(entry.bookmarked, False)
         self.assertEqual(UserBookmarks.objects.all().count(), 0)
@@ -325,7 +327,7 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         self.assertTrue(obj)
 
         # call tested function
-        result = LinkDataWrapper(entry = obj).move_to_archive()
+        result = LinkDataWrapper(entry=obj).move_to_archive()
 
         self.assertTrue(result)
         self.assertTrue(result.is_archive_entry())
@@ -347,7 +349,7 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         archive_entry = ArchiveLinkDataController.objects.create(**link_data)
 
         # call tested function
-        result = LinkDataWrapper(entry = archive_entry).make_bookmarked(
+        result = LinkDataWrapper(entry=archive_entry).make_bookmarked(
             DjangoRequestObject(self.user_staff)
         )
 
@@ -382,7 +384,7 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         LinkDataController.objects.all().delete()
 
         # call tested function
-        result = LinkDataWrapper(entry = obj).move_from_archive()
+        result = LinkDataWrapper(entry=obj).move_from_archive()
 
         self.assertTrue(result)
         self.assertTrue(not result.is_archive_entry())
@@ -478,19 +480,19 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         )
 
         # call tested function
-        w = LinkDataWrapper(link ="https://youtube.com?v=1")
+        w = LinkDataWrapper(link="https://youtube.com?v=1")
         entry = w.get_from_operational_db()
         self.assertTrue(entry)
         self.assertEqual(entry.link, "https://youtube.com?v=1")
 
         # call tested function
-        w = LinkDataWrapper(link = "http://youtube.com?v=1")
+        w = LinkDataWrapper(link="http://youtube.com?v=1")
         entry = w.get_from_operational_db()
         self.assertTrue(entry)
         self.assertEqual(entry.link, "https://youtube.com?v=1")
 
         # call tested function
-        w = LinkDataWrapper(link = "https://archive.com?v=1")
+        w = LinkDataWrapper(link="https://archive.com?v=1")
         entry = w.get_from_operational_db()
         self.assertTrue(not entry)
 
@@ -535,13 +537,13 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         )
 
         # call tested function
-        w = LinkDataWrapper(link = "https://archive.com?v=1")
+        w = LinkDataWrapper(link="https://archive.com?v=1")
         entry = w.get_from_archive()
         self.assertTrue(entry)
         self.assertEqual(entry.link, "https://archive.com?v=1")
 
         # call tested function
-        w = LinkDataWrapper(link = "http://archive.com?v=1")
+        w = LinkDataWrapper(link="http://archive.com?v=1")
         entry = w.get_from_archive()
         self.assertTrue(entry)
         self.assertEqual(entry.link, "https://archive.com?v=1")
@@ -571,12 +573,12 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         )
 
         # call tested function
-        result = LinkDataWrapper(entry = http_entry).check_https_http_protocol()
+        result = LinkDataWrapper(entry=http_entry).check_https_http_protocol()
         self.assertTrue(result)
 
         # function removed http link
 
-        entries = LinkDataController.objects.filter(link__icontains = "archive.com")
+        entries = LinkDataController.objects.filter(link__icontains="archive.com")
         self.assertEqual(entries.count(), 1)
         self.assertEqual(entries[0].link, "https://archive.com?v=1")
 
@@ -605,12 +607,12 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         )
 
         # call tested function
-        result = LinkDataWrapper(entry = https_entry).check_https_http_protocol()
+        result = LinkDataWrapper(entry=https_entry).check_https_http_protocol()
         self.assertTrue(not result)
 
         # function removed http link
 
-        entries = LinkDataController.objects.filter(link__icontains = "archive.com")
+        entries = LinkDataController.objects.filter(link__icontains="archive.com")
         self.assertEqual(entries.count(), 1)
         self.assertEqual(entries[0].link, "https://archive.com?v=1")
 
@@ -628,18 +630,18 @@ class LinkDataWrapperTest(FakeInternetTestCase):
             title="The archive https link",
             bookmarked=False,
             language="en",
-            date_dead_since = DateUtils.get_datetime_now_utc(),
+            date_dead_since=DateUtils.get_datetime_now_utc(),
         )
 
         # call tested function
-        result = LinkDataWrapper(entry = https_entry).check_https_http_protocol()
+        result = LinkDataWrapper(entry=https_entry).check_https_http_protocol()
 
         # we do not move the thing
         self.assertFalse(result)
 
         # we still use https, if we have server reponse for it
 
-        entries = LinkDataController.objects.filter(link__icontains = "archive.com")
+        entries = LinkDataController.objects.filter(link__icontains="archive.com")
         self.assertEqual(entries.count(), 1)
         self.assertEqual(entries[0].link, "https://archive.com?v=1")
 
@@ -660,17 +662,19 @@ class LinkDataWrapperTest(FakeInternetTestCase):
             title="The archive https link",
             bookmarked=False,
             language="en",
-            date_dead_since = DateUtils.get_datetime_now_utc() - timedelta(days=5),
-            date_published = DateUtils.get_datetime_now_utc() - timedelta(days=5),
+            date_dead_since=DateUtils.get_datetime_now_utc() - timedelta(days=5),
+            date_published=DateUtils.get_datetime_now_utc() - timedelta(days=5),
         )
 
         # call tested function
-        result = LinkDataWrapper(entry = https_entry).evaluate()
+        result = LinkDataWrapper(entry=https_entry).evaluate()
 
-        entries = LinkDataController.objects.filter(link__icontains = "archive.com")
+        entries = LinkDataController.objects.filter(link__icontains="archive.com")
         self.assertEqual(entries.count(), 0)
 
-        entries = ArchiveLinkDataController.objects.filter(link__icontains = "archive.com")
+        entries = ArchiveLinkDataController.objects.filter(
+            link__icontains="archive.com"
+        )
         self.assertEqual(entries.count(), 0)
 
     def test_evaluate__removes_entry_not_domain(self):
@@ -690,17 +694,19 @@ class LinkDataWrapperTest(FakeInternetTestCase):
             title="The archive https link",
             bookmarked=False,
             language="en",
-            date_dead_since = DateUtils.get_datetime_now_utc() - timedelta(days=5),
-            date_published = DateUtils.get_datetime_now_utc() - timedelta(days=5),
+            date_dead_since=DateUtils.get_datetime_now_utc() - timedelta(days=5),
+            date_published=DateUtils.get_datetime_now_utc() - timedelta(days=5),
         )
 
         # call tested function
-        result = LinkDataWrapper(entry = https_entry).evaluate()
+        result = LinkDataWrapper(entry=https_entry).evaluate()
 
-        entries = LinkDataController.objects.filter(link__icontains = "archive.com")
+        entries = LinkDataController.objects.filter(link__icontains="archive.com")
         self.assertEqual(entries.count(), 0)
 
-        entries = ArchiveLinkDataController.objects.filter(link__icontains = "archive.com")
+        entries = ArchiveLinkDataController.objects.filter(
+            link__icontains="archive.com"
+        )
         self.assertEqual(entries.count(), 0)
 
     def test_evaluate__moves_entry(self):
@@ -718,15 +724,17 @@ class LinkDataWrapperTest(FakeInternetTestCase):
             title="The archive https link",
             bookmarked=False,
             language="en",
-            date_dead_since = DateUtils.get_datetime_now_utc() - timedelta(days=3),
-            date_published = DateUtils.get_datetime_now_utc() - timedelta(days=3),
+            date_dead_since=DateUtils.get_datetime_now_utc() - timedelta(days=3),
+            date_published=DateUtils.get_datetime_now_utc() - timedelta(days=3),
         )
 
         # call tested function
-        result = LinkDataWrapper(entry = https_entry).evaluate()
+        result = LinkDataWrapper(entry=https_entry).evaluate()
 
-        entries = LinkDataController.objects.filter(link__icontains = "archive.com")
+        entries = LinkDataController.objects.filter(link__icontains="archive.com")
         self.assertEqual(entries.count(), 0)
 
-        entries = ArchiveLinkDataController.objects.filter(link__icontains = "archive.com")
+        entries = ArchiveLinkDataController.objects.filter(
+            link__icontains="archive.com"
+        )
         self.assertEqual(entries.count(), 1)

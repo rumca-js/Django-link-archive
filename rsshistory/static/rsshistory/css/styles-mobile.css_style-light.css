@@ -17,6 +17,36 @@ hr {
     padding: 0px;
 }
 
+textarea {
+    width:100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+input {
+    width:100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align:left;
+}
+select {
+    width:100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+option {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+option:hover {
+    overflow: visible;
+    white-space: normal;
+}
+
 .mainbutton-icon {
     width:2em;
 }

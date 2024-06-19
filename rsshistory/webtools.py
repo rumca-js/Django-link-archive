@@ -89,14 +89,14 @@ def date_str_to_date(date_str):
         wh = date_str.find("Published:")
         if wh >= 0:
             wh = date_str.find(":", wh)
-            date_str = date_str[wh+1:].strip()
+            date_str = date_str[wh + 1 :].strip()
 
         try:
             parsed_date = parser.parse(date_str)
             return DateUtils.to_utc_date(parsed_date)
         except Exception as E:
             stack_lines = traceback.format_stack()
-            stack_str = ''.join(stack_lines)
+            stack_str = "".join(stack_lines)
 
             error_text = traceback.format_exc()
 
@@ -138,7 +138,7 @@ class DomainAwarePage(object):
             return "https://" + self.url
         return self.url
 
-    def get_protocol_url(self, protocol = "https"):
+    def get_protocol_url(self, protocol="https"):
         """
         replaces any protocol with input protocol
         """
@@ -1753,9 +1753,8 @@ class HtmlPage(ContentInterface):
         if not self.contents:
             return []
 
-        rss_links = (
-            self.find_feed_links("application/rss+xml")
-            + self.find_feed_links("application/atom+xml")
+        rss_links = self.find_feed_links("application/rss+xml") + self.find_feed_links(
+            "application/atom+xml"
         )
 
         if not rss_links:
@@ -2078,7 +2077,7 @@ class PageResponseObject(object):
                     charset = charset_elements[1]
 
                     if charset.startswith('"') or charset.startswith("'"):
-                        return charset[1: -1]
+                        return charset[1:-1]
                     else:
                         return charset
 
@@ -2144,7 +2143,9 @@ class PageResponseObject(object):
         """
         403 is added since some pages use it to block you
         """
-        return (self.status_code > 300 and self.status_code < 400) or self.status_code == 403
+        return (
+            self.status_code > 300 and self.status_code < 400
+        ) or self.status_code == 403
 
     def is_this_status_nok(self):
         """
@@ -2156,7 +2157,6 @@ class PageResponseObject(object):
         return self.status_code < 200 or self.status_code >= 400
 
     def is_valid(self):
-
         if self.is_this_status_nok():
             return False
 
@@ -2188,10 +2188,11 @@ class RequestsPage(object):
             request_result = self.build_requests(url, headers, timeout_s)
 
             self.response = PageResponseObject(
-                    url=url,
-                    contents="",
-                    status_code = request_result.status_code,
-                    headers = request_result.headers,)
+                url=url,
+                contents="",
+                status_code=request_result.status_code,
+                headers=request_result.headers,
+            )
 
             if not self.response.is_valid():
                 return
@@ -2213,10 +2214,10 @@ class RequestsPage(object):
                 self.url = request_result.url
 
             self.response = PageResponseObject(
-                url = self.url,
-                contents = request_result.text,
-                status_code = request_result.status_code,
-                encoding = request_result.encoding,
+                url=self.url,
+                contents=request_result.text,
+                status_code=request_result.status_code,
+                encoding=request_result.encoding,
                 headers=request_result.headers,
             )
 
@@ -2260,15 +2261,9 @@ class RequestsPage(object):
                     if p.get_charset():
                         return p.get_charset()
 
-            if (
-                text.count("encoding") == 1
-                and text.find('encoding="utf-8"') >= 0
-            ):
+            if text.count("encoding") == 1 and text.find('encoding="utf-8"') >= 0:
                 return "utf-8"
-            elif (
-                text.count("charset") == 1
-                and text.find('charset="utf-8"') >= 0
-            ):
+            elif text.count("charset") == 1 and text.find('charset="utf-8"') >= 0:
                 return "utf-8"
 
     def build_requests(self, url, headers, timeout_s):
@@ -2284,7 +2279,6 @@ class RequestsPage(object):
 
 
 class SeleniumDriver(object):
-
     def get_driver(self):
         """
         https://www.lambdatest.com/blog/internationalization-with-selenium-webdriver/
@@ -2379,7 +2373,6 @@ class SeleniumDriver(object):
 
 
 class SeleniumHeadless(SeleniumDriver):
-
     def get_driver(self):
         service = Service(executable_path="/usr/bin/chromedriver")
         options = webdriver.ChromeOptions()
@@ -2399,7 +2392,6 @@ class SeleniumHeadless(SeleniumDriver):
         """
         self.url = url
         self.response = None
-
 
         # if not BasePage.ssl_verify:
         #    options.add_argument('ignore-certificate-errors')
@@ -2432,7 +2424,9 @@ class SeleniumHeadless(SeleniumDriver):
 
             # TODO use selenium wire to obtain status code & headers?
 
-            self.response =  PageResponseObject(self.url, contents=html_content, status_code = status_code)
+            self.response = PageResponseObject(
+                self.url, contents=html_content, status_code=status_code
+            )
         except TimeoutException:
             error_text = traceback.format_exc()
             LinkDatabase.error("Page timeout:{}\n{}".format(self.url, error_text))
@@ -2446,7 +2440,6 @@ class SeleniumHeadless(SeleniumDriver):
 
 
 class SeleniumFull(SeleniumDriver):
-
     def get_driver(self):
         service = Service(executable_path="/usr/bin/chromedriver")
         options = webdriver.ChromeOptions()
@@ -2507,7 +2500,9 @@ class SeleniumFull(SeleniumDriver):
             if self.url != driver.current_url:
                 self.url = driver.current_url
 
-            self.response = PageResponseObject(self.url, contents=page_source, status_code=status_code)
+            self.response = PageResponseObject(
+                self.url, contents=page_source, status_code=status_code
+            )
 
         except TimeoutException:
             error_text = traceback.format_exc()
@@ -2522,7 +2517,6 @@ class SeleniumFull(SeleniumDriver):
 
 
 class SeleniumUndetected(object):
-
     def get_driver(self):
         import undetected_chromedriver as uc
 
@@ -2532,7 +2526,7 @@ class SeleniumUndetected(object):
         options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
         options.add_argument("--lang={}".format("en-US"))
 
-        return uc.Chrome(service = service, options=options)
+        return uc.Chrome(service=service, options=options)
 
     def __init__(self, url, headers, timeout_s=10, ping=False):
         """
@@ -2571,12 +2565,14 @@ class SeleniumUndetected(object):
             if self.url != driver.current_url:
                 self.url = driver.current_url
 
-            self.response = PageResponseObject(self.url, contents = page_source, status_code = status_code)
+            self.response = PageResponseObject(
+                self.url, contents=page_source, status_code=status_code
+            )
 
         except TimeoutException:
             error_text = traceback.format_exc()
             LinkDatabase.error("Page timeout:{}\n{}".format(self.url, error_text))
-            self.response = PageResponseObject(self.url, contents = None, status_code=500)
+            self.response = PageResponseObject(self.url, contents=None, status_code=500)
         finally:
             driver.quit()
 
@@ -2768,7 +2764,9 @@ class BasePage(object):
 
     def get_contents_internal(self, url, headers, timeout_s, ping=False):
         if self.options.is_not_selenium():
-            return self.get_contents_via_requests(self.url, headers=headers, timeout_s=10, ping=ping)
+            return self.get_contents_via_requests(
+                self.url, headers=headers, timeout_s=10, ping=ping
+            )
         elif self.options.use_selenium_full:
             return self.get_contents_via_selenium_chrome_full(
                 self.url, headers=headers, timeout_s=10, ping=ping
@@ -2789,15 +2787,15 @@ class BasePage(object):
         SSL is mostly important for interacting with pages. During web scraping it is not that useful.
         """
 
-        p = RequestsPage(url, headers, timeout_s = timeout_s, ping=ping)
+        p = RequestsPage(url, headers, timeout_s=timeout_s, ping=ping)
         return p.get()
 
     def get_contents_via_selenium_chrome_headless(self, url, headers, timeout_s, ping):
-        p = SeleniumHeadless(url, headers, timeout_s = timeout_s, ping=ping)
+        p = SeleniumHeadless(url, headers, timeout_s=timeout_s, ping=ping)
         return p.get()
 
     def get_contents_via_selenium_chrome_full(self, url, headers, timeout_s, ping):
-        p = SeleniumFull(url, headers, timeout_s = timeout_s, ping=ping)
+        p = SeleniumFull(url, headers, timeout_s=timeout_s, ping=ping)
         return p.get()
 
     def ping(self, timeout_s=5):
@@ -2815,10 +2813,10 @@ class BasePage(object):
         url = self.url
 
         response = self.get_contents_function(
-           url = url,
-           headers=self.headers,
-           timeout_s=timeout_s,
-           ping=True,
+            url=url,
+            headers=self.headers,
+            timeout_s=timeout_s,
+            ping=True,
         )
         return response is not None and response.is_valid()
 
@@ -2826,10 +2824,10 @@ class BasePage(object):
         url = self.url
 
         response = self.get_contents_function(
-           url = url,
-           headers=self.headers,
-           timeout_s=timeout_s,
-           ping=True,
+            url=url,
+            headers=self.headers,
+            timeout_s=timeout_s,
+            ping=True,
         )
         if response and response.is_valid():
             return response.get_headers()
@@ -2877,12 +2875,20 @@ class Url(ContentInterface):
             return
 
         if contents:
-            if not self.response or self.response.get_content_type() is None or self.is_html():
+            if (
+                not self.response
+                or self.response.get_content_type() is None
+                or self.is_html()
+            ):
                 p = HtmlPage(url, contents)
                 if p.is_valid():
                     return p
 
-            if not self.response or self.response.get_content_type() is None or self.is_rss():
+            if (
+                not self.response
+                or self.response.get_content_type() is None
+                or self.is_rss()
+            ):
                 p = RssPage(url, contents)
                 if p.is_valid():
                     return p
@@ -2904,11 +2910,19 @@ class Url(ContentInterface):
             return p
 
     def is_html(self):
-        if self.response and self.response.get_content_type() is not None and self.response.is_content_html():
+        if (
+            self.response
+            and self.response.get_content_type() is not None
+            and self.response.is_content_html()
+        ):
             return True
 
     def is_rss(self):
-        if self.response and self.response.get_content_type() is not None and self.response.is_content_rss():
+        if (
+            self.response
+            and self.response.get_content_type() is not None
+            and self.response.is_content_rss()
+        ):
             return True
 
     def get_type(url):
@@ -3052,15 +3066,8 @@ class Url(ContentInterface):
         return Url(domain).get_favicon()
 
     def is_web_link(url):
-        if (
-            url.startswith("http")
-            or url.startswith("//")
-            or url.startswith("smb:")
-            or url.startswith("ftp:")
-        ):
-            return True
-
-        return False
+        p = DomainAwarePage(url)
+        return p.is_web_link()
 
     def get_cleaned_link(url):
         if not url:

@@ -16,7 +16,9 @@ class SourceDataModel(models.Model):
     # main subcategory
     subcategory = models.CharField(max_length=1000, blank=True)
     dead = models.BooleanField(default=False, help_text="Link is rotten indication")
-    export_to_cms = models.BooleanField(default=True, help_text="Entries from this source are eligible to export to CMS")
+    export_to_cms = models.BooleanField(
+        default=True, help_text="Entries from this source are eligible to export to CMS"
+    )
     remove_after_days = models.IntegerField(
         default=0, help_text="Remove entries after [x] days"
     )
@@ -64,6 +66,7 @@ class SourceDataModel(models.Model):
 
         # returning real favicon from HTML is too long
         from ..webtools import DomainAwarePage
+
         return DomainAwarePage(self.url).get_domain() + "/favicon.ico"
 
 
@@ -71,7 +74,7 @@ class SourceOperationalData(models.Model):
     date_fetched = models.DateTimeField(null=True)
     import_seconds = models.IntegerField(null=True)
     number_of_entries = models.IntegerField(null=True)
-    page_hash = models.BinaryField(max_length=30, null=True) # TODO Move to entry
+    page_hash = models.BinaryField(max_length=30, null=True)  # TODO Move to entry
     consecutive_errors = models.IntegerField(default=0)
 
     class Meta:

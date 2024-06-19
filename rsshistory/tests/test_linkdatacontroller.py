@@ -329,7 +329,6 @@ class LinkDataControllerTest(FakeInternetTestCase):
         self.assertTrue(entry_http.is_http())
 
     def test_get_tag_map(self):
-
         # demoted page
         entry = LinkDataController.objects.create(
             source="",
@@ -343,7 +342,7 @@ class LinkDataControllerTest(FakeInternetTestCase):
         )
 
         UserTags.objects.create(
-                tag="test tag", user_object=self.user, entry_object = entry
+            tag="test tag", user_object=self.user, entry_object=entry
         )
 
         tag_vec = entry.get_tag_map()
@@ -351,7 +350,6 @@ class LinkDataControllerTest(FakeInternetTestCase):
         self.assertEqual(tag_vec[0], "test tag")
 
     def test_get_tag_map__invalid_page(self):
-
         # demoted page
         entry = LinkDataController.objects.create(
             source="",
@@ -363,13 +361,13 @@ class LinkDataControllerTest(FakeInternetTestCase):
             domain_obj=None,
             thumbnail="thumbnail",
             manual_status_code=200,
-            date_dead_since = DateUtils.get_datetime_now_utc(),
+            date_dead_since=DateUtils.get_datetime_now_utc(),
             page_rating=-100,
             page_rating_contents=-100,
         )
 
         UserTags.objects.create(
-                tag="test tag", user_object=self.user, entry_object = entry
+            tag="test tag", user_object=self.user, entry_object=entry
         )
 
         tag_vec = entry.get_tag_map()

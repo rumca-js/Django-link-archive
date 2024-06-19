@@ -212,7 +212,9 @@ class MarkDownDynamicConverter(object):
                     if acolumn == "title":
                         result += " ## {}\n".format(aproperty_value)
                     elif acolumn == "link" or acolumn == "url":
-                        result += " - [{}]({})\n".format(aproperty_value, aproperty_value)
+                        result += " - [{}]({})\n".format(
+                            aproperty_value, aproperty_value
+                        )
                     else:
                         result += " - {}: {}\n".format(acolumn, aproperty_value)
 

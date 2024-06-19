@@ -21,16 +21,18 @@ from selenium.webdriver.support import expected_conditions as EC
 
 PAGE_TOO_BIG_BYTES = 5000000  # 5 MB
 
-user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/116.0"
+user_agent = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/116.0"
+)
 
 headers = {
-            "User-Agent": user_agent,
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-            "Accept-Charset": "utf-8,ISO-8859-1;q=0.7,*;q=0.3",
-            "Accept-Encoding": "none",
-            "Accept-Language": "en-US,en;q=0.8",
-            "Connection": "keep-alive",
-        }
+    "User-Agent": user_agent,
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Charset": "utf-8,ISO-8859-1;q=0.7,*;q=0.3",
+    "Accept-Encoding": "none",
+    "Accept-Language": "en-US,en;q=0.8",
+    "Connection": "keep-alive",
+}
 
 
 class PageResponseObject(object):
@@ -145,7 +147,9 @@ class PageResponseObject(object):
         """
         403 is added since some pages use it to block you
         """
-        return (self.status_code > 300 and self.status_code < 400) or self.status_code == 403
+        return (
+            self.status_code > 300 and self.status_code < 400
+        ) or self.status_code == 403
 
     def is_this_status_nok(self):
         """
@@ -167,6 +171,7 @@ class PageResponseObject(object):
 
         return True
 
+
 class RequestsPage(object):
     def __init__(self, url, headers, timeout_s=10, ping=False):
         """
@@ -187,10 +192,11 @@ class RequestsPage(object):
             request_result = self.build_requests(url, headers, timeout_s)
 
             self.response = PageResponseObject(
-                    url=url,
-                    text="",
-                    status_code = request_result.status_code,
-                    headers = request_result.headers,)
+                url=url,
+                text="",
+                status_code=request_result.status_code,
+                headers=request_result.headers,
+            )
 
             if not self.response.is_valid():
                 return
@@ -208,10 +214,10 @@ class RequestsPage(object):
                 self.url = request_result.url
 
             self.response = PageResponseObject(
-                url = self.url,
-                text = request_result.text,
-                status_code = request_result.status_code,
-                encoding = request_result.encoding,
+                url=self.url,
+                text=request_result.text,
+                status_code=request_result.status_code,
+                encoding=request_result.encoding,
                 headers=request_result.headers,
             )
 
@@ -248,15 +254,9 @@ class RequestsPage(object):
                     if p.get_charset():
                         return p.get_charset()
 
-            if (
-                text.count("encoding") == 1
-                and text.find('encoding="utf-8"') >= 0
-            ):
+            if text.count("encoding") == 1 and text.find('encoding="utf-8"') >= 0:
                 return "utf-8"
-            elif (
-                text.count("charset") == 1
-                and text.find('charset="utf-8"') >= 0
-            ):
+            elif text.count("charset") == 1 and text.find('charset="utf-8"') >= 0:
                 return "utf-8"
 
         if not set_encoding:
@@ -275,7 +275,6 @@ class RequestsPage(object):
 
 
 class SeleniumDriver(object):
-
     def get_selenium_status_code(self, driver):
         status_code = 200
         try:
@@ -324,7 +323,6 @@ class SeleniumDriver(object):
 
 
 class SeleniumHeadless(SeleniumDriver):
-
     def __init__(self, url, headers, timeout_s=10):
         """
         To obtain RSS page you have to run real, full blown browser.
@@ -367,7 +365,7 @@ class SeleniumHeadless(SeleniumDriver):
 
             # TODO use selenium wire to obtain status code & headers?
 
-            self.response =  PageResponseObject(self.url, html_content, status_code)
+            self.response = PageResponseObject(self.url, html_content, status_code)
         except TimeoutException:
             error_text = traceback.format_exc()
             LinkDatabase.error("Page timeout:{}\n{}".format(self.url, error_text))
@@ -449,7 +447,7 @@ class SeleniumFull(object):
 
 
 class SeleniumUndetected(object):
-    def __init__(url, headers, timeout_s = 10):
+    def __init__(url, headers, timeout_s=10):
         """
         To obtain RSS page you have to run real, full blown browser.
 

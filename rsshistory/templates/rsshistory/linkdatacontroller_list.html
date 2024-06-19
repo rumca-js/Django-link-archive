@@ -32,7 +32,7 @@
   <div class="container list-group">
   {% endif %}
     {% for link in content_list %}
-    {% if type == "normal" %}
+    {% if display_type == "normal" %}
           {% if user_config.display_type == "clickable-tags" %}
               {% include "rsshistory/linkdatacontroller_list__clickable_tags.html" %}
           {% elif user_config.display_type == "line-and-buttons" %}
@@ -44,7 +44,7 @@
           {% else %}
               {% include "rsshistory/linkdatacontroller_list__standard.html" %}
           {% endif %}
-    {% elif type == "clear" %}
+    {% elif display_type == "clear" %}
               {% include "rsshistory/linkdatacontroller_list__clean_list.html" %}
     {% endif %}
     {% endfor %}
@@ -68,8 +68,8 @@
 
    <hr/>
    <a href="{% url 'rsshistory:entries-json' %}?query_type={{query_type}}&{{ args }}&{{ request.GET.urlencode }}" class="btn btn-secondary" role="button">Show JSON</a>
-   <a href="{% url 'rsshistory:entries' %}?query_type={{query_type}}&{{ args }}&type=clear" class="btn btn-secondary" role="button">Show Clear</a>
-   <a href="{% url 'rsshistory:entries' %}?query_type={{query_type}}&{{ args }}&type=normal" class="btn btn-secondary" role="button">Show Normal</a>
+   <a href="{{view_link}}?query_type={{query_type}}&{{ args }}&display_type=clear" class="btn btn-secondary" role="button">Show Clear</a>
+   <a href="{{view_link}}?query_type={{query_type}}&{{ args }}&display_type=normal" class="btn btn-secondary" role="button">Show Normal</a>
 
 <hr/>
 {% include "rsshistory/search_places_element.html" %}

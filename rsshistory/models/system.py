@@ -76,29 +76,24 @@ class ConfigurationEntry(models.Model):
         help_text='There are three access types available. "All" allows anybody view contents. "Logged" allows only logged users to view contents. "Owner" means application is private, and only owner can view it\'s contents.',
     )
 
-    sources_refresh_period = models.IntegerField(default=3600, help_text="Unit [s]. Defines how often sources are checked for data.")
+    sources_refresh_period = models.IntegerField(
+        default=3600,
+        help_text="Unit [s]. Defines how often sources are checked for data.",
+    )
 
     auto_scan_entries = models.BooleanField(
         default=False,
         help_text="Scans for new links, when link is added. From decription, from contents",
     )
 
-    scan_create_sources = models.BooleanField(
+    auto_create_sources = models.BooleanField( # TODO rename to auto_create_sources?
         default=False,
         help_text="Adds any new found source",
     )
 
-    scan_create_domains = models.BooleanField(
-        default=False,
-        help_text="Adds any new found domain",
+    new_source_enabled_state = models.BooleanField(
+        default=False, help_text="Default state of a new source"
     )
-
-    scan_create_not_domains = models.BooleanField(
-        default=False,
-        help_text="Adds any new found link, not domain",
-    )
-
-    new_source_enabled_state = models.BooleanField(default=False, help_text="Default state of a new source")
 
     new_entries_merge_data = models.BooleanField(
         default=False,
@@ -119,7 +114,8 @@ class ConfigurationEntry(models.Model):
     )
 
     accept_dead = models.BooleanField(
-            default=False, help_text="Accept rotten links, no longer active, to be added to the database"
+        default=False,
+        help_text="Accept rotten links, no longer active, to be added to the database",
     )  # whether dead entries can be introduced into database
 
     accept_ip_addresses = models.BooleanField(
@@ -248,7 +244,11 @@ class ConfigurationEntry(models.Model):
         help_text="Page that is pinged to check if Internet is OK",
     )
 
-    time_zone = models.CharField(max_length=50, default="UTC", help_text = "List of available timezones can be found at https://en.wikipedia.org/wiki/List_of_tz_database_time_zones. For example Europe/Warsaw")
+    time_zone = models.CharField(
+        max_length=50,
+        default="UTC",
+        help_text="List of available timezones can be found at https://en.wikipedia.org/wiki/List_of_tz_database_time_zones. For example Europe/Warsaw",
+    )
 
     def get():
         """
@@ -279,7 +279,7 @@ class ConfigurationEntry(models.Model):
         """
 
         try:
-           tzn = timezone(self.time_zone)
+            tzn = timezone(self.time_zone)
         except Exception as E:
             self.time_zone = "UTC"
 
@@ -411,6 +411,7 @@ class AppLogging(models.Model):
 
     def get_local_time(self):
         from ..configuration import Configuration
+
         c = Configuration.get_object()
         return c.get_local_time(self.date)
 

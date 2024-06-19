@@ -24,16 +24,16 @@ class EntryUpdaterTest(FakeInternetTestCase):
 
     def test_entry_rule_get_blocked_urls__filed(self):
         EntryRule.objects.create(
-                enabled=True,
-                block=True,
-                rule_name = "Rule1",
-                rule_url = ".test1.com, .test2.com",
+            enabled=True,
+            block=True,
+            rule_name="Rule1",
+            rule_url=".test1.com, .test2.com",
         )
         EntryRule.objects.create(
-                enabled=True,
-                block=True,
-                rule_name = "Rule2",
-                rule_url = ".test3.com, .test4.com",
+            enabled=True,
+            block=True,
+            rule_name="Rule2",
+            rule_url=".test3.com, .test4.com",
         )
 
         # call tested function
@@ -47,16 +47,16 @@ class EntryUpdaterTest(FakeInternetTestCase):
 
     def test_entry_rule_get_blocked_urls__not_filed(self):
         EntryRule.objects.create(
-                enabled=True,
-                block=False,
-                rule_name = "Rule1",
-                rule_url = ".test1.com, .test2.com",
+            enabled=True,
+            block=False,
+            rule_name="Rule1",
+            rule_url=".test1.com, .test2.com",
         )
         EntryRule.objects.create(
-                enabled=True,
-                block=False,
-                rule_name = "Rule2",
-                rule_url = ".test3.com, .test4.com",
+            enabled=True,
+            block=False,
+            rule_name="Rule2",
+            rule_url=".test3.com, .test4.com",
         )
 
         # call tested function
