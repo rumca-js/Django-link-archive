@@ -12,6 +12,7 @@ from ..models import (
     SourceDataModel,
     BackgroundJob,
     AppLogging,
+    ModelFiles,
 )
 from ..webtools import HtmlPage, DomainAwarePage, Url
 from ..dateutils import DateUtils
@@ -47,6 +48,7 @@ class BackgroundJobController(BackgroundJob):
         (BackgroundJob.JOB_LINK_DOWNLOAD, BackgroundJob.JOB_LINK_DOWNLOAD),                 # link is downloaded using wget
         (BackgroundJob.JOB_LINK_DOWNLOAD_MUSIC, BackgroundJob.JOB_LINK_DOWNLOAD_MUSIC),     #
         (BackgroundJob.JOB_LINK_DOWNLOAD_VIDEO, BackgroundJob.JOB_LINK_DOWNLOAD_VIDEO),     #
+        (BackgroundJob.JOB_DOWNLOAD_FILE, BackgroundJob.JOB_DOWNLOAD_FILE,),
         (BackgroundJob.JOB_CHECK_DOMAINS, BackgroundJob.JOB_CHECK_DOMAINS),
     ]
     # fmt: on
@@ -167,7 +169,8 @@ class BackgroundJobController(BackgroundJob):
                 return index
             index += 1
 
-        return 100
+        # anything not in priority list goes at the end
+        return len(BackgroundJobController.JOB_CHOICES) + 1
 
     def create_single_job(job_name, subject="", args=""):
         try:
@@ -313,6 +316,15 @@ class BackgroundJobController(BackgroundJob):
                 BackgroundJob.JOB_LINK_SCAN,
                 url,
             )
+
+    def download_file(url=None):
+        if url is None:
+            return
+
+        if not ModelFiles.objects.filter(file_name = url).exists():
+            return BackgroundJobController.create_single_job(
+                BackgroundJob.JOB_DOWNLOAD_FILE,
+                url,)
 
     def write_daily_data_range(date_start=date.today(), date_stop=date.today()):
         try:

@@ -1638,11 +1638,15 @@ class HtmlPage(ContentInterface):
 
         image = self.get_og_field("image")
 
-        if image and image.lower().find("https://") == -1:
-            image = DomainAwarePage.get_url_full(self.url, image)
 
         if not image:
             image = self.get_schema_field("thumbnailUrl")
+
+        # do not return favicon here.
+        # we use thumbnails in <img, but icons do not work correctly there
+
+        if image and image.lower().find("https://") == -1:
+            image = DomainAwarePage.get_url_full(self.url, image)
 
         return image
 
@@ -2007,14 +2011,20 @@ class PageResponseObject(object):
     STATUS_CODE_UNDEF = 0
 
     def __init__(
-        self, url, contents, status_code=STATUS_CODE_OK, encoding=None, headers=None
+        self, url, contents=None, status_code=STATUS_CODE_OK, encoding=None, headers=None, binary=None
     ):
+        """
+        @param contents Text
+
+        TODO this should be cleaned up. We should pass binary, and encoding
+        """
         self.url = url
         self.status_code = status_code
 
         self.content = contents
         # decoded contents
         self.text = contents
+        self.binary = binary
 
         # I read selenium always assume utf8 encoding
 
@@ -2087,6 +2097,14 @@ class PageResponseObject(object):
             return False
 
         if content.lower().find("html") >= 0:
+            return True
+
+    def is_content_image(self):
+        content = self.get_content_type()
+        if not content:
+            return False
+
+        if content.lower().find("image") >= 0:
             return True
 
     def is_content_rss(self):
@@ -2165,6 +2183,12 @@ class PageResponseObject(object):
     def get_status_code(self):
         return self.status_code
 
+    def get_contents(self):
+        return self.content
+
+    def get_binary(self):
+        return self.binary
+
 
 class RequestsPage(object):
     def __init__(self, url, headers, timeout_s=10, ping=False):
@@ -2219,6 +2243,7 @@ class RequestsPage(object):
                 status_code=request_result.status_code,
                 encoding=request_result.encoding,
                 headers=request_result.headers,
+                binary=request_result.content,
             )
 
         except requests.Timeout:
@@ -2243,13 +2268,12 @@ class RequestsPage(object):
 
         url = self.url
 
-        # There might be several encoding texts, if so we do not know which one to use
-        text = request_result.text.lower()
-
         encoding = response.get_content_type_charset()
         if encoding:
             return encoding
+
         else:
+            # There might be several encoding texts, if so we do not know which one to use
             if response.is_content_html():
                 p = HtmlPage(url, request_result.text)
                 if p.is_valid():
@@ -2260,6 +2284,8 @@ class RequestsPage(object):
                 if p.is_valid():
                     if p.get_charset():
                         return p.get_charset()
+
+            text = request_result.text.lower()
 
             if text.count("encoding") == 1 and text.find('encoding="utf-8"') >= 0:
                 return "utf-8"
@@ -2647,6 +2673,9 @@ class BasePage(object):
             # Flag to not retry same contents requests for things we already know are dead
             self.dead = False
 
+        if self.url is None:
+            return
+
         if self.url.lower().find("https") >= 0:
             self.protocol = "https"
         elif self.url.lower().find("http") >= 0:
@@ -2709,7 +2738,12 @@ class BasePage(object):
     def get_contents(self):
         response = self.get_response()
         if response:
-            return response.content
+            return response.get_contents()
+
+    def get_binary(self):
+        response = self.get_response()
+        if response:
+            return response.get_binary()
 
     def get_response_implementation(self):
         if self.response and self.response.contents:

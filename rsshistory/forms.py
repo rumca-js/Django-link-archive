@@ -94,6 +94,7 @@ class ConfigForm(forms.ModelForm):
             #
             "enable_domain_support",
             "enable_keyword_support",
+            "enable_file_support",
             "accept_dead",
             "accept_ip_addresses",
             "accept_domains",

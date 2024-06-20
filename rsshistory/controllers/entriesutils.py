@@ -12,6 +12,7 @@ from ..models import (
     AppLogging,
     KeyWords,
     UserBookmarks,
+    ModelFiles,
 )
 from ..configuration import Configuration
 from ..webtools import BasePage, HtmlPage, RssPage, ContentLinkParser, DomainAwarePage
@@ -345,11 +346,6 @@ class EntryUpdater(object):
         if not props or len(props) == 0:
             return
 
-        self.check_for_sources(entry, url)
-
-        if entry_changed:
-            self.add_links_from_url(entry, url)
-
         if entry.date_dead_since:
             entry.date_dead_since = None
 
@@ -362,8 +358,8 @@ class EntryUpdater(object):
                 entry.description = props["description"]
 
         if "thumbnail" in props and props["thumbnail"] is not None:
-            if not entry.thumbnail:
-                entry.thumbnail = props["thumbnail"]
+            # always update
+            entry.thumbnail = props["thumbnail"]
 
         if "language" in props and props["language"] is not None:
             if not entry.language:
@@ -374,6 +370,14 @@ class EntryUpdater(object):
                 entry.date_published = props["date_published"]
 
         self.update_calculated_vote()
+        # save is performed by the above
+
+        self.check_for_sources(entry, url)
+
+        if entry_changed:
+            self.add_links_from_url(entry, url)
+
+        self.store_thumbnail(entry)
 
     def reset_data(self):
         from ..pluginurl import EntryUrlInterface
@@ -408,11 +412,6 @@ class EntryUpdater(object):
         if not props or len(props) == 0:
             return
 
-        self.check_for_sources(entry, url)
-
-        if entry_changed:
-            self.add_links_from_url(entry, url)
-
         if entry.date_dead_since:
             entry.date_dead_since = None
 
@@ -433,6 +432,21 @@ class EntryUpdater(object):
                 entry.date_published = props["date_published"]
 
         self.update_calculated_vote()
+
+        if entry_changed:
+            self.add_links_from_url(entry, url)
+
+        self.check_for_sources(entry, url)
+        self.store_thumbnail(entry)
+
+    def store_thumbnail(self, entry):
+        if entry.page_rating_votes > 0: # TODO should that be configurable?
+            from .modelfiles import ModelFilesBuilder
+
+            c = Configuration.get_object()
+            config = c.config_entry
+            if config.auto_store_thumbnails:
+                ModelFilesBuilder().build(file_name = entry.thumbnail)
 
     def add_links_from_url(self, entry, url_interface):
         url_handler = url_interface.h
@@ -1258,7 +1272,7 @@ class EntryDataBuilder(object):
                 elif c.new_entries_merge_data:
                     BackgroundJobController.entry_update_data(entry)
 
-        self.add_addition_link_data()
+        self.add_addition_link_data(entry)
 
         return entry
 
@@ -1376,12 +1390,15 @@ class EntryDataBuilder(object):
 
         return False
 
-    def add_addition_link_data(self):
+    def add_addition_link_data(self, entry):
         link_data = self.link_data
 
         self.add_sub_links()
         self.add_keywords()
         self.add_domain()
+
+        if entry:
+            self.download_thumbnail(entry.thumbnail)
 
     def add_domain(self):
         url = DomainAwarePage(self.link_data["link"]).get_domain()
@@ -1393,6 +1410,12 @@ class EntryDataBuilder(object):
                 )
             else:
                 BackgroundJobController.link_add(url=url)
+
+    def download_thumbnail(self, thumbnail_path):
+        if thumbnail_path:
+            config = Configuration.get_object().config_entry
+            if config.auto_store_thumbnails:
+                BackgroundJobController.download_file(thumbnail_path)
 
     def add_sub_links(self):
         """

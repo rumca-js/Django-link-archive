@@ -105,6 +105,11 @@ class ConfigurationEntry(models.Model):
         help_text="Fetches clean information from the Internet for new entries",
     )
 
+    auto_store_thumbnails = models.BooleanField(
+        default=False,
+        help_text="Automatically stores thumbnail. Available when file support is enabled",
+    )
+
     accept_domains = models.BooleanField(
         default=True, help_text="Domain links can be added to system"
     )
@@ -129,6 +134,10 @@ class ConfigurationEntry(models.Model):
 
     enable_domain_support = models.BooleanField(
         default=True, help_text="Enable domain feature support"
+    )
+
+    enable_file_support = models.BooleanField(
+        default=False, help_text="Enable file feature support"
     )
 
     link_save = models.BooleanField(
@@ -218,8 +227,9 @@ class ConfigurationEntry(models.Model):
         max_length=500, null=True, default="standard", choices=DISPLAY_TYPE_CHOICES
     )
     show_icons = models.BooleanField(default=True)
-    thumbnails_as_icons = models.BooleanField(default=True)
+    thumbnails_as_icons = models.BooleanField(default=True, help_text="If false, source favicons are used as thumbnails")
     small_icons = models.BooleanField(default=True)
+    local_icons = models.BooleanField(default=False, help_text="If true, only locally stored icons are displayed")
 
     links_per_page = models.IntegerField(
         default=100, help_text="Number of links per page"
@@ -587,6 +597,7 @@ class BackgroundJob(models.Model):
     JOB_LINK_DOWNLOAD = "link-download"
     JOB_LINK_DOWNLOAD_MUSIC = "download-music"
     JOB_LINK_DOWNLOAD_VIDEO = "download-video"
+    JOB_DOWNLOAD_FILE = "download-file" # TODO stor file, should mention DB
     JOB_LINK_SCAN = "link-scan"
     JOB_MOVE_TO_ARCHIVE = "move-to-archive"
     JOB_WRITE_DAILY_DATA = "write-daily-data"
@@ -613,6 +624,7 @@ class BackgroundJob(models.Model):
         (JOB_LINK_DOWNLOAD, JOB_LINK_DOWNLOAD),                 # link is downloaded using wget
         (JOB_LINK_DOWNLOAD_MUSIC, JOB_LINK_DOWNLOAD_MUSIC),     #
         (JOB_LINK_DOWNLOAD_VIDEO, JOB_LINK_DOWNLOAD_VIDEO),     #
+        (JOB_DOWNLOAD_FILE, JOB_DOWNLOAD_FILE),     #
         (JOB_LINK_SCAN, JOB_LINK_SCAN,),
         (JOB_MOVE_TO_ARCHIVE, JOB_MOVE_TO_ARCHIVE),
         (JOB_WRITE_DAILY_DATA, JOB_WRITE_DAILY_DATA),

@@ -16,6 +16,7 @@ from .viewspkg import (
     viewexport,
     viewdomains,
     viewentryrules,
+    modelfiles,
 )
 
 # register app namespace
@@ -71,9 +72,10 @@ urlpatterns = [
     path("entry-add-simple", viewentries.add_simple_entry, name="entry-add-simple"),
     path("entry-edit/<int:pk>/", viewentries.edit_entry, name="entry-edit"),
     path("entry-remove/<int:pk>/", viewentries.remove_entry, name="entry-remove"),
-    path("entry-dead/<int:pk>/", viewentries.entry_dead, name="entry-dead"),
     path("entry-show-dislikes/<int:pk>/", viewentries.entry_show_dislikes, name="entry-show-dislikes"),
-    path("entry-not-dead/<int:pk>/", viewentries.entry_not_dead, name="entry-not-dead"),
+    path("entry-dead/<int:pk>/", viewentries.entry_dead, name="entry-dead"),
+    path("entry-active/<int:pk>/", viewentries.entry_active, name="entry-active"),
+    path("entry-clear-status/<int:pk>/", viewentries.entry_clear_status, name="entry-clear-status"),
     path("entry-bookmark/<int:pk>/", viewentries.make_bookmarked_entry, name="entry-bookmark"),
     path("entry-notbookmark/<int:pk>/", viewentries.make_not_bookmarked_entry, name="entry-notbookmark"),
     path("entry-download-music/<int:pk>/", viewcustom.download_music, name="entry-download-music",),
@@ -103,6 +105,9 @@ urlpatterns = [
     path("entry-comment-remove/<int:pk>/", viewcomments.entry_comment_remove, name="entry-comment-remove",),
     # vote
     path("entry-vote/<int:pk>/", viewuseractions.entry_vote, name="entry-vote"),
+    # files
+    path("model-file/<int:pk>/", modelfiles.model_file, name="model-file"),
+    path("model-files/", modelfiles.ModelFilesListView.as_view(), name="model-files"),
     # admin views
     path("admin-page/", viewsystem.admin_page, name="admin-page"),
     path("user-config", viewsystem.user_config, name="user-config"),

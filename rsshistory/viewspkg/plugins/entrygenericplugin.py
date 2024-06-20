@@ -246,7 +246,22 @@ class EntryGenericPlugin(object):
             )
 
         if self.user.is_authenticated:
-            if not self.entry.is_dead():
+            if self.entry.manual_status_code == 0:
+                buttons.append(
+                    EntryButton(
+                        self.user,
+                        "Mark Active",
+                        reverse(
+                            "{}:entry-active".format(LinkDatabase.name),
+                            args=[self.entry.id],
+                        ),
+                        ConfigurationEntry.ACCESS_TYPE_OWNER,
+                        "Marks entry as active:{}".format(self.entry.title),
+                        static(
+                            "{}/icons/icons8-skull-100.png".format(LinkDatabase.name)
+                        ),
+                    ),
+                )
                 buttons.append(
                     EntryButton(
                         self.user,
@@ -266,9 +281,9 @@ class EntryGenericPlugin(object):
                 buttons.append(
                     EntryButton(
                         self.user,
-                        "Mark not dead",
+                        "Clear manual status",
                         reverse(
-                            "{}:entry-not-dead".format(LinkDatabase.name),
+                            "{}:entry-clear-status".format(LinkDatabase.name),
                             args=[self.entry.id],
                         ),
                         ConfigurationEntry.ACCESS_TYPE_OWNER,

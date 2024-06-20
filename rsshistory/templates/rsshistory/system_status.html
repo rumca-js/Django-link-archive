@@ -28,6 +28,7 @@ Table usage
 
     <li>SourceDataModel: {{SourceDataModel}}</li>
     <li>LinkDataModel: {{LinkDataModel}}</li>
+    <li>LinkDataModel to update: {{LinkDataModel_toupdate}}</li>
     <li>ArhiveLinkDataModel: {{ArchiveLinkDataModel}}</li>
     <li>Keywords: {{KeyWords}}</li>
 
@@ -38,25 +39,33 @@ Table usage
     <li>UserSearchHistory: {{UserSearchHistory}}</li>
     <li>UserEntryVisitHistory: {{UserEntryVisitHistory}}</li>
     <li>UserEntryTransitionHistory: {{UserEntryTransitionHistory}}</li>
-
-    <li>LinkDataModel to update: {{LinkDataModel_toupdate}}</li>
+    <li>ModelFiles: {{ModelFiles}}
+        <div>
+        <a href="{% url 'rsshistory:model-files' %}" title="View background jobs" class="btn btn-secondary" role="button">View</a>
+        </div>
+    </li>
 
     <li>DataExport: {{DataExport}}</li>
     <li>SourceExportHistory: {{SourceExportHistory}}</li>
 
     <li>BackgroundJob: {{BackgroundJob}}
+        <div>
         <a href="{% url 'rsshistory:backgroundjobs' %}" title="View background jobs" class="btn btn-secondary" role="button">View</a>
+        </div>
     </li>
 
     <li>AppLogging: {{AppLogging}} 
+        <div>
         <a href="{% url 'rsshistory:logs' %}" title="View all logs" class="btn btn-secondary" role="button">View</a>
+        </div>
     </li>
 
     <li>Domains: {{Domains}}
+        <div>
         <a href="{% url 'rsshistory:domains' %}" title="Domains" class="btn btn-secondary" role="button">View</a>
+        </div>
     </li>
 </ul>
-
 
 <h1>Export history</h1>
 <p>

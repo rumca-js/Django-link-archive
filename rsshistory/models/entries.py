@@ -287,6 +287,21 @@ class BaseLinkDataController(BaseLinkDataModel):
         """
         Prints thumbnail, but if it does not have one prints favicon
         """
+        from ..configuration import Configuration
+        conf = Configuration.get_object().config_entry
+
+        thumbnail_url = self.get_thumbnail_url()
+
+        if conf.enable_file_support:
+            from .modelfiles import ModelFiles
+            if thumbnail_url:
+                model_files = ModelFiles.objects.filter(file_name = thumbnail_url)
+                if model_files.exists():
+                    return model_files[0].get_url()
+
+        return thumbnail_url
+
+    def get_thumbnail_url(self):
         if self.thumbnail:
             return self.thumbnail
 

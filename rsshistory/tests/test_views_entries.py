@@ -432,6 +432,32 @@ class EntriesViewsTests(FakeInternetTestCase):
         bookmarks = UserBookmarks.objects.filter(entry_object=entry)
         self.assertEqual(bookmarks.count(), 1)
 
+    def test_entry_active(self):
+        test_link = "https://www.youtube.com/watch?v=123"
+
+        entry = LinkDataController.objects.create(
+            source="https://linkedin.com",
+            link=test_link,
+            title="The first link",
+            description="the first link description",
+            source_obj=None,
+            bookmarked=True,
+            permanent=False,
+            date_published=DateUtils.get_datetime_now_utc(),
+            date_dead_since=DateUtils.get_datetime_now_utc(),
+            language="en",
+        )
+
+        self.client.login(username="testuser", password="testpassword")
+        url = reverse("{}:entry-active".format(LinkDatabase.name), args=[entry.id])
+        # call tested function
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 302)
+
+        entry.refresh_from_db()
+        self.assertEqual(entry.manual_status_code, LinkDataController.STATUS_ACTIVE)
+
     def test_entry_dead(self):
         test_link = "https://www.youtube.com/watch?v=123"
 
@@ -449,6 +475,7 @@ class EntriesViewsTests(FakeInternetTestCase):
 
         self.client.login(username="testuser", password="testpassword")
         url = reverse("{}:entry-dead".format(LinkDatabase.name), args=[entry.id])
+        # call tested function
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 302)
@@ -456,7 +483,7 @@ class EntriesViewsTests(FakeInternetTestCase):
         entry.refresh_from_db()
         self.assertEqual(entry.manual_status_code, LinkDataController.STATUS_DEAD)
 
-    def test_entry_not_dead(self):
+    def test_entry_clear_status(self):
         test_link = "https://www.youtube.com/watch?v=123"
 
         entry = LinkDataController.objects.create(
@@ -473,7 +500,8 @@ class EntriesViewsTests(FakeInternetTestCase):
         )
 
         self.client.login(username="testuser", password="testpassword")
-        url = reverse("{}:entry-not-dead".format(LinkDatabase.name), args=[entry.id])
+        url = reverse("{}:entry-clear-status".format(LinkDatabase.name), args=[entry.id])
+        # call tested function
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 302)

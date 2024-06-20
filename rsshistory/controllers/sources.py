@@ -39,21 +39,6 @@ class SourceDataController(SourceDataModel):
                 entry.permanent = True
                 entry.save()
 
-    def add_entry(source):
-        """
-        It can be used by search engine. If we add link for every source, we will be swamped
-        """
-        if not source:
-            return
-
-        if not source.enabled:
-            return
-
-        from .backgroundjob import BackgroundJobController
-
-        properties = {"permament": True}
-        BackgroundJobController.link_add(source.url, properties=properties)
-
     def get_days_to_remove(self):
         days = self.remove_after_days
         return days
@@ -351,6 +336,21 @@ class SourceDataController(SourceDataModel):
 
         self.save()
 
+    def add_entry(source):
+        """
+        It can be used by search engine. If we add link for every source, we will be swamped
+        """
+        if not source:
+            return
+
+        if not source.enabled:
+            return
+
+        from .backgroundjob import BackgroundJobController
+
+        properties = {"permament": True}
+        BackgroundJobController.link_add(source.url, properties=properties)
+
 
 class SourceDataBuilder(object):
     def __init__(self, link=None, link_data=None, manual_entry=False):
@@ -434,9 +434,15 @@ class SourceDataBuilder(object):
             LinkDatabase.error("Cannot create source:{}\n{}".format(str(E), error_text))
             AppLogging.error("Cannot create source:{}\n{}".format(str(E), error_text))
 
-        SourceDataController.add_entry(source)
+        self.additional_source_operations(source)
 
         return source
+
+    def additional_source_operations(self, source):
+        from .backgroundjob import BackgroundJobController
+        if source:
+            SourceDataController.add_entry(source)
+            BackgroundJobController.download_file(source.favicon)
 
     def get_clean_data(self):
         result = {}

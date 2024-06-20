@@ -937,6 +937,23 @@ def remove_entry(request, pk):
     return p.render("summary_present.html")
 
 
+def entry_active(request, pk):
+    p = ViewPage(request)
+    p.set_title("Mark entry as active")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    p.context["pk"] = pk
+
+    objs = LinkDataController.objects.filter(id=pk)
+    obj = objs[0]
+
+    obj.make_manual_active()
+
+    return HttpResponseRedirect(obj.get_absolute_url())
+
+
 def entry_dead(request, pk):
     p = ViewPage(request)
     p.set_title("Mark entry as dead")
@@ -954,9 +971,9 @@ def entry_dead(request, pk):
     return HttpResponseRedirect(obj.get_absolute_url())
 
 
-def entry_not_dead(request, pk):
+def entry_clear_status(request, pk):
     p = ViewPage(request)
-    p.set_title("Marking entry as not dead")
+    p.set_title("Clearing entry status")
     data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
     if data is not None:
         return data
@@ -1177,6 +1194,7 @@ def entry_json(request, pk):
 def entries_json(request):
     found_view = False
 
+    query_type = "standard"
     if "query_type" in request.GET:
         query_type = request.GET["query_type"]
 

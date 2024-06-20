@@ -186,7 +186,7 @@ class TestResponseObject(PageResponseObject):
     def __init__(self, url, headers, timeout):
         self.status_code = 200
 
-        contents = self.get_contents(url)
+        contents = self.get_contents_for_url(url)
 
         self.url = url
         self.text = contents
@@ -254,7 +254,7 @@ class TestResponseObject(PageResponseObject):
         elif url == "http://page-with-https-status-500-http-status-200.com":
             self.status_code = 200
 
-    def get_contents(self, url):
+    def get_contents_for_url(self, url):
         if url.startswith("https://youtube.com/channel/"):
             return self.get_contents_youtube_channel(url)
 

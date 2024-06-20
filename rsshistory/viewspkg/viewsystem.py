@@ -23,6 +23,7 @@ from ..models import (
     SystemOperation,
     DataExport,
     SourceExportHistory,
+    ModelFiles,
 )
 from ..controllers import (
     SourceDataController,
@@ -186,6 +187,7 @@ def system_status(request):
     p.context["BackgroundJob"] = BackgroundJob.objects.count()
     p.context["DataExport"] = DataExport.objects.count()
     p.context["SourceExportHistory"] = SourceExportHistory.objects.count()
+    p.context["ModelFiles"] = ModelFiles.objects.count()
 
     from ..dateutils import DateUtils
     from datetime import timedelta

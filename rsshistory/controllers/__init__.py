@@ -31,5 +31,8 @@ from .entriesutils import (
     EntriesCleanup,
     EntryScanner,
 )
+from .modelfiles import (
+    ModelFilesBuilder,
+)
 
 from .searchengines import SearchEngines, SearchEngineGoogle, SearchEngineGoogleCache

@@ -18,7 +18,7 @@ version is split into three digits:
  if a change requires the model to be changed, then second digit is updated, patch is set to 0
  if something should be released to public, then release version changes
 """
-__version__ = "0.67.2"
+__version__ = "0.68.0"
 
 
 from pathlib import Path
@@ -212,3 +212,20 @@ class Configuration(object):
         if (diff.seconds / 60) > 15:
             self.update_refresh_time()
             self.ping_internet()
+
+    def encrypt(self, message):
+        from django.conf import settings
+        from cryptography.fernet import Fernet
+
+        key = settings.SECRET_KEY
+
+        fernet = Fernet(key)
+        return fernet.encrypt(message.encode())
+
+    def decrypt(self, message):
+        from cryptography.fernet import Fernet
+
+        key = settings.SECRET_KEY
+
+        fernet = Fernet(key)
+        return fernet.decrypt(message).decode()

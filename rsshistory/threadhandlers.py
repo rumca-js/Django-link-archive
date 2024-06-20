@@ -49,10 +49,11 @@ from .controllers import (
     EntryUpdater,
     EntriesUpdater,
     EntryScanner,
+    ModelFilesBuilder,
 )
 from .configuration import Configuration
 from .dateutils import DateUtils
-from .webtools import HtmlPage, DomainAwarePage, ContentLinkParser
+from .webtools import HtmlPage, DomainAwarePage, ContentLinkParser, BasePage
 from .pluginurl import UrlHandler
 
 
@@ -341,6 +342,40 @@ class LinkVideoDownloadJobHandler(BaseJobHandler):
             error_text = traceback.format_exc()
             AppLogging.error(
                 "Exception downloading video {0} {1} {2}".format(
+                    obj.subject, str(e), error_text
+                )
+            )
+            return True
+
+
+class DownloadModelFileJobHandler(BaseJobHandler):
+    """!
+    downloads entry video
+    """
+
+    def get_job(self):
+        return BackgroundJob.JOB_DOWNLOAD_FILE
+
+    def process(self, obj=None):
+        try:
+            c = Configuration.get_object()
+            if not c.config_entry.enable_file_support:
+                # consume
+                return True
+
+            file_name = obj.subject
+            p = DomainAwarePage(file_name)
+            if not p.is_web_link():
+                # consume
+                return True
+
+            ModelFilesBuilder().build(file_name)
+
+            return True
+        except Exception as e:
+            error_text = traceback.format_exc()
+            AppLogging.error(
+                "Exception downloading file {0} {1} {2}".format(
                     obj.subject, str(e), error_text
                 )
             )
@@ -1111,6 +1146,7 @@ class HandlerManager(object):
             LinkDownloadJobHandler(),
             LinkMusicDownloadJobHandler(),
             LinkVideoDownloadJobHandler(),
+            DownloadModelFileJobHandler(),
             EntryUpdateData(),
             LinkSaveJobHandler(),
             CheckDomainsJobHandler(),

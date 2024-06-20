@@ -4,6 +4,7 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.http import HttpResponseForbidden, HttpResponseRedirect
 from django.utils.http import urlencode
+from django.core.paginator import Paginator
 
 from ..apps import LinkDatabase
 from ..models import ConfigurationEntry, UserConfig, AppLogging
@@ -23,6 +24,7 @@ from ..configuration import Configuration
 from ..webtools import Url, DomainAwarePage
 from ..pluginurl import UrlHandler
 from ..pluginsources import SourceGenericPlugin
+from ..serializers.instanceimporter import InstanceExporter
 
 
 def get_request_order_by(request):
@@ -32,6 +34,19 @@ def get_request_order_by(request):
     else:
         config = Configuration.get_object().config_entry
         return config.get_entries_order_by()
+
+
+def get_request_page_num(request):
+    if "page" in request.GET:
+        page = request.GET["page"]
+        try:
+           page =  int(page)
+        except Exception as e:
+            page = 1
+
+        return page
+    else:
+        return 1
 
 
 class SourceListView(generic.ListView):
@@ -660,8 +675,6 @@ def source_json(request, pk):
         return p.render("summary_present.html")
 
     source = sources[0]
-
-    from ..serializers.instanceimporter import InstanceExporter
 
     exporter = InstanceExporter()
     json_obj = exporter.export_source(source)
