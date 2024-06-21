@@ -33,6 +33,7 @@ from .models import (
     UserSearchHistory,
     UserEntryTransitionHistory,
     UserEntryVisitHistory,
+    ModelFiles,
 )
 
 from .pluginsources.sourcecontrollerbuilder import SourceControllerBuilder
@@ -162,6 +163,8 @@ class EntryUpdateData(BaseJobHandler):
 
     def process(self, obj=None):
         try:
+            link_id = None
+
             try:
                 link_id = int(obj.subject)
             except Exception as e:
@@ -927,6 +930,7 @@ class CleanupJobHandler(BaseJobHandler):
                 KeyWords.cleanup()
                 UserConfig.cleanup()
                 SourceExportHistory.cleanup()
+                ModelFiles.cleanup()
 
                 self.user_tables_cleanup()
 

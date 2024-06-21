@@ -2,6 +2,14 @@
 {% load static %}
 {% block content %}
 
+<div class="container">
+    {% if user.is_staff %}
+    <a href="{% url 'rsshistory:model-files-remove' %}" title="Removes all model files" class="btn btn-primary" role="button" title="Remove all">
+        <img src="{% static 'rsshistory/icons/icons8-trash-multiple-100.png' %}" class="content-icon" />
+    </a>
+    {% endif %}
+</div>
+
 <h1>{{page_obj.paginator.count}} Files</h1>
 Size:{{sum_size_megabytes}}MB, {{sum_size_kilobytes}}KB, {{sum_size_bytes}}B
 
@@ -14,7 +22,12 @@ Size:{{sum_size_megabytes}}MB, {{sum_size_kilobytes}}KB, {{sum_size_bytes}}B
 
 	       <div>
 	         <a href="{% url 'rsshistory:model-file' object.id %}" class="btn btn-primary" role="button">Model file</a>
+
+      	         <a href="{% url 'rsshistory:model-file-remove' object.id %}" class="btn btn-secondary" role="button" title="Remove model file">
+      	            <img src="{% static 'rsshistory/icons/icons8-trash-100.png' %}" class="content-icon" />
+      	         </a>
 	       </div>
+
 	    </div>
          {% endfor %}
   {% else %}

@@ -374,7 +374,6 @@ def import_daily_data(request):
     BackgroundJobController.import_daily_data()
 
     p.context["summary_text"] = "Import job started"
-
     return p.render("summary_present.html")
 
 
@@ -507,8 +506,8 @@ def data_export_remove(request, pk):
         return p.render("summary_present.html")
     else:
         objs.delete()
-        p.context["summary_text"] = "Removed object"
-        return p.render("summary_present.html")
+
+        return redirect("{}:data-exports".format(LinkDatabase.name))
 
 
 class DataExportListView(generic.ListView):

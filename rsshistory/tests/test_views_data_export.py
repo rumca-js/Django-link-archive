@@ -91,7 +91,7 @@ class DataExportTests(FakeInternetTestCase):
         # call user action
         response = self.client.get(url)
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 302)
 
         self.assertEqual(DataExport.objects.all().count(), 0)
 

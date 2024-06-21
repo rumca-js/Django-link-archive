@@ -53,3 +53,35 @@ def model_file(request, pk):
         data = model_files[0].contents
 
         return HttpResponse(data, content_type='application/octet-stream')
+
+
+def model_file_remove(request, pk):
+    from ..forms import ImportSourceRangeFromInternetArchiveForm
+
+    p = ViewPage(request)
+    p.set_title("Remove model file")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    model_files = ModelFiles.objects.filter(id = pk)
+    if model_files.exists():
+        model_files.delete()
+
+        return redirect("{}:model-files".format(LinkDatabase.name))
+    else:
+        p.context["summary_text"] = "Cannot find such model file"
+        return p.render("summary_present.html")
+
+
+def model_files_remove(request):
+    from ..forms import ImportSourceRangeFromInternetArchiveForm
+
+    p = ViewPage(request)
+    p.set_title("Remove model file")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    ModelFiles.objects.all().delete()
+    return redirect("{}:model-files".format(LinkDatabase.name))

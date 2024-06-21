@@ -48,3 +48,33 @@ class ModelFilesTests(FakeInternetTestCase):
 
         # redirect to view the link again
         self.assertEqual(response.status_code, 200)
+
+    def test_model_file_remove(self):
+        ModelFiles.objects.all().delete()
+        data = "data"
+        obj = ModelFiles.objects.create(file_name = "test", contents = data.encode())
+
+        self.client.login(username="testuser", password="testpassword")
+
+        url = reverse("{}:model-file-remove".format(LinkDatabase.name), args=[obj.id])
+
+        # call user action
+        response = self.client.get(url)
+
+        # redirect to view the link again
+        self.assertEqual(response.status_code, 302)
+
+    def test_model_files_remove(self):
+        ModelFiles.objects.all().delete()
+        data = "data"
+        obj = ModelFiles.objects.create(file_name = "test", contents = data.encode())
+
+        self.client.login(username="testuser", password="testpassword")
+
+        url = reverse("{}:model-files-remove".format(LinkDatabase.name))
+
+        # call user action
+        response = self.client.get(url)
+
+        # redirect to view the link again
+        self.assertEqual(response.status_code, 302)

@@ -228,10 +228,20 @@ class DomainAwarePage(object):
         return [rest, ""]
 
     def get_domain(self):
+        """
+        for https://domain.com/test
+
+        @return https://domain.com
+        """
         parts = self.parse_url()
         return parts[0] + parts[1] + parts[2].lower()
 
     def get_domain_only(self):
+        """
+        for https://domain.com/test
+
+        @return domain.com
+        """
         parts = self.parse_url()
         return parts[2].lower()
 
@@ -570,6 +580,8 @@ class ContentInterface(object):
         Default behavior
         """
         rating_vector = self.get_page_rating_vector()
+        link_rating = self.get_link_rating()
+        rating_vector.extend(link_rating)
 
         page_rating = 0
         max_page_rating = 0
@@ -582,7 +594,7 @@ class ContentInterface(object):
         if max_page_rating == 0:
             return 0
 
-        page_rating = (page_rating * 100) / max_page_rating
+        page_rating = (float(page_rating) * 100.0) / float(max_page_rating)
 
         return int(page_rating)
 
@@ -856,6 +868,43 @@ class ContentInterface(object):
             return lower.find("<rdf")
 
         return -1
+
+    def get_link_rating(self):
+        rating = []
+
+        if self.url.startswith("https://"):
+            rating.append([1, 1])
+        elif self.url.startswith("ftp://"):
+            rating.append([1, 1])
+        elif self.url.startswith("smb://"):
+            rating.append([1, 1])
+        elif self.url.startswith("http://"):
+            rating.append([0, 1])
+        else:
+            rating.append([0, 1])
+
+        p = DomainAwarePage(self.url)
+        if p.is_domain():
+            rating.append([1, 1])
+
+        domain_only = p.get_domain_only()
+        if domain_only.count(".") == 1:
+            rating.append([2, 2])
+        elif domain_only.count(".") == 2:
+            rating.append([1, 2])
+        else:
+            rating.append([0, 2])
+
+        # as example https://www.youtube.com has 23 chars
+
+        if len(self.url) < 25:
+            rating.append([2, 2])
+        elif len(self.url) < 30:
+            rating.append([1, 2])
+        else:
+            rating.append([0, 2])
+
+        return rating
 
 
 class DefaultContentPage(ContentInterface):
@@ -1685,10 +1734,17 @@ class HtmlPage(ContentInterface):
                             return charset
 
     def get_author(self):
+        """
+        <head><author>Something</author></head>
+        """
         if not self.contents:
             return None
 
-        return self.get_meta_field("author")
+        author =  self.get_meta_field("author")
+        if not author:
+            author = self.get_og_field("author")
+
+        return author
 
     def get_album(self):
         return None
@@ -2674,6 +2730,11 @@ class BasePage(object):
             self.dead = False
 
         if self.url is None:
+
+            stack_lines = traceback.format_stack()
+            stack_str = "".join(stack_lines)
+
+            AppLogging.error("Passed incorrect url {}".format(stack_str))
             return
 
         if self.url.lower().find("https") >= 0:
@@ -2846,25 +2907,56 @@ class BasePage(object):
         """
         url = self.url
 
-        response = self.get_contents_function(
-            url=url,
-            headers=self.headers,
-            timeout_s=timeout_s,
-            ping=True,
-        )
-        return response is not None and response.is_valid()
+        if url is None:
+            stack_lines = traceback.format_stack()
+            stack_str = "".join(stack_lines)
+
+            AppLogging.error("Passed incorrect url {}".format(stack_str))
+            return
+
+        try:
+            response = self.get_contents_function(
+                url=url,
+                headers=self.headers,
+                timeout_s=timeout_s,
+                ping=True,
+            )
+
+            return response is not None and response.is_valid()
+
+        except Exception as e:
+            stack_lines = traceback.format_stack()
+            stack_str = "".join(stack_lines)
+
+            AppLogging.error("Exception during ping. Url:{}\nExc:{}\n{}".format(self.url, str(e), stack_str))
+            return False
 
     def get_headers(self, timeout_s=5):
         url = self.url
 
-        response = self.get_contents_function(
-            url=url,
-            headers=self.headers,
-            timeout_s=timeout_s,
-            ping=True,
-        )
-        if response and response.is_valid():
-            return response.get_headers()
+        if url is None:
+            stack_lines = traceback.format_stack()
+            stack_str = "".join(stack_lines)
+
+            AppLogging.error("Passed incorrect url {}".format(stack_str))
+            return
+
+        try:
+            response = self.get_contents_function(
+                url=url,
+                headers=self.headers,
+                timeout_s=timeout_s,
+                ping=True,
+            )
+            if response and response.is_valid():
+                return response.get_headers()
+
+        except Exception as e:
+            stack_lines = traceback.format_stack()
+            stack_str = "".join(stack_lines)
+
+            AppLogging.error("Exception during headers. Url:{}\nExc:{}\n{}".format(self.url, str(e), stack_str))
+            return None
 
 
 class Url(ContentInterface):

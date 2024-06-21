@@ -107,7 +107,9 @@ urlpatterns = [
     path("entry-vote/<int:pk>/", viewuseractions.entry_vote, name="entry-vote"),
     # files
     path("model-file/<int:pk>/", modelfiles.model_file, name="model-file"),
+    path("model-file-remove/<int:pk>/", modelfiles.model_file_remove, name="model-file-remove"),
     path("model-files/", modelfiles.ModelFilesListView.as_view(), name="model-files"),
+    path("model-files-remove/", modelfiles.model_files_remove, name="model-files-remove"),
     # admin views
     path("admin-page/", viewsystem.admin_page, name="admin-page"),
     path("user-config", viewsystem.user_config, name="user-config"),

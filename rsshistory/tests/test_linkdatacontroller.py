@@ -373,3 +373,43 @@ class LinkDataControllerTest(FakeInternetTestCase):
         tag_vec = entry.get_tag_map()
         self.assertEqual(len(tag_vec), 1)
         self.assertEqual(tag_vec[0], "test tag")
+
+    def test_get_http_url(self):
+        # demoted page
+        entry = LinkDataController.objects.create(
+            source="",
+            link="https://linkedin.com",
+            title="my title",
+            description="my description",
+            bookmarked=False,
+            language="pl",
+            domain_obj=None,
+            thumbnail="thumbnail",
+            manual_status_code=200,
+            date_dead_since=DateUtils.get_datetime_now_utc(),
+            page_rating=-100,
+            page_rating_contents=-100,
+        )
+
+        # call tested function
+        self.assertEqual(entry.get_http_url(), "http://linkedin.com")
+
+    def test_get_https_url(self):
+        # demoted page
+        entry = LinkDataController.objects.create(
+            source="",
+            link="http://linkedin.com",
+            title="my title",
+            description="my description",
+            bookmarked=False,
+            language="pl",
+            domain_obj=None,
+            thumbnail="thumbnail",
+            manual_status_code=200,
+            date_dead_since=DateUtils.get_datetime_now_utc(),
+            page_rating=-100,
+            page_rating_contents=-100,
+        )
+
+        # call tested function
+        self.assertEqual(entry.get_https_url(), "https://linkedin.com")

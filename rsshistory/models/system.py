@@ -149,7 +149,7 @@ class ConfigurationEntry(models.Model):
     )
 
     prefer_https = models.BooleanField(
-        default=False, help_text="When adding check if https link exists"
+        default=True, help_text="Https is preferred. If update takes place, and https is available, we upgrade link."
     )
 
     number_of_update_entries = models.IntegerField(

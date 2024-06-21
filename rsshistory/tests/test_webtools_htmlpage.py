@@ -228,6 +228,30 @@ webpage_progressive_web_app = """<html>
 </html>
 """
 
+webpage_perfect_contents = """<html lang="pl">
+<head>
+ <title>title</title>
+ <description>selected meta description</description>
+ <author>author</author>
+ <keywords>nothing else matters</keywords>
+ <meta name="title" content="meta title" />
+ <meta name="description" content="meta description" />
+
+ <meta property="og:title" content="selected og:title" />
+ <meta property="og:description" content="selected og:description" />
+ <meta property="og:image" href="https://something-someting.com" />
+
+ <meta itemprop="datePublished" content="2024-01-11T09:00:07-00:00">
+ <meta itemprop="uploadDate" content="2024-01-11T09:00:07-00:00">
+ <meta itemprop="genre" content="Science &amp; Technology">
+
+ <link rel="manifest" href="test_page_manifest.json" />
+</head>
+    <body>
+    </body>
+</html>
+"""
+
 
 class HtmlPageTest(FakeInternetTestCase):
     def test_default_language(self):
@@ -547,3 +571,26 @@ class HtmlPageTest(FakeInternetTestCase):
         page = HtmlPage("https://linkedin.com/test", webpage_progressive_web_app)
 
         self.assertEqual(page.get_pwa_manifest(), "test_page_manifest.json")
+
+    def test_get_page_rating__perfect(self):
+
+        page = HtmlPage("https://perfect.com", webpage_perfect_contents)
+
+        # call tested function
+        rating_100 = page.get_page_rating()
+
+        self.assertEqual(rating_100, 100)
+
+        page = HtmlPage("https://www.perfect.com", webpage_perfect_contents)
+
+        # call tested function
+        rating_1 = page.get_page_rating()
+
+        self.assertLess(rating_1, rating_100)
+
+        page = HtmlPage("https://something.www.perfect.com", webpage_perfect_contents)
+
+        # call tested function
+        rating_2 = page.get_page_rating()
+
+        self.assertLess(rating_2, rating_1)

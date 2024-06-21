@@ -45,7 +45,6 @@ class EntriesCleanup(object):
             if entries:
                 entries.delete()
 
-        # self.cleanup_http_duplicates()
         self.cleanup_invalid_page_ratings()
 
     def get_source_entries(self, source):
@@ -125,21 +124,6 @@ class EntriesCleanup(object):
 
         if entries.exists():
             return entries
-
-    def cleanup_http_duplicates(self):
-        """
-        TODO this function should be eventually removed.
-         - do not allow adding https when http exists
-         - do not allow adding http when https exists
-        """
-        condition = Q(link__icontains="http://")
-        if not self.archive_cleanup:
-            entries = LinkDataController.objects.filter(condition)
-        else:
-            entries = ArchiveLinkDataController.objects.filter(condition)
-
-        for entry in entries:
-            entry.cleanup_http_duplicate()
 
     def cleanup_invalid_page_ratings(self):
         condition = Q(page_rating__gte=100)
@@ -1017,6 +1001,10 @@ class LinkDataWrapper(object):
     def check_https_http_protocol(self):
         entry = self.entry
 
+        c = Configuration.get_object().config_entry
+        if not c.prefer_https:
+            return
+
         if entry.is_https():
             http_url = entry.get_http_url()
 
@@ -1026,10 +1014,10 @@ class LinkDataWrapper(object):
             if http_entries.count() != 0:
                 http_entries.delete()
 
-            p = BasePage(entry.link)
+            p = BasePage(url = entry.link)
             ping_status = p.ping()
 
-            p = BasePage(http_url)
+            p = BasePage(url = http_url)
             new_ping_status = p.ping()
 
             if not ping_status and new_ping_status:
