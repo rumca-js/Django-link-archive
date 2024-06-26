@@ -36,10 +36,10 @@ class GitRepo(object):
             cwd.mkdir(parents=True)
 
         if not local.is_dir():
-            self.clone()
+            return self.clone()
         else:
             self.revert_all_changes()
-            self.pull()
+            return self.pull()
 
     def add(self, files):
         p = subprocess.run(
@@ -48,7 +48,7 @@ class GitRepo(object):
             timeout=self.timeout_s,
             capture_output=True,
         )
-        self.check_process(p)
+        return self.check_process(p)
 
     def commit(self, commit_message):
         self.is_different_flag = self.is_different()
@@ -62,8 +62,7 @@ class GitRepo(object):
             timeout=self.timeout_s,
             capture_output=True,
         )
-        self.check_process(p)
-        return True
+        return self.check_process(p)
 
     def push(self):
         if not self.is_different_flag:
@@ -83,8 +82,7 @@ class GitRepo(object):
             timeout=self.timeout_s,
             capture_output=True,
         )
-        self.check_process(p)
-        return True
+        return self.check_process(p)
 
     def get_repo_name(self):
         last = Path(self.git_repo).parts[-1]
@@ -99,7 +97,7 @@ class GitRepo(object):
             timeout=self.timeout_s,
             capture_output=True,
         )
-        self.check_process(p)
+        return self.check_process(p)
 
     def is_different(self):
         p = subprocess.run(
@@ -123,7 +121,7 @@ class GitRepo(object):
             timeout=self.timeout_s,
             capture_output=True,
         )
-        self.check_process(p)
+        return self.check_process(p)
 
     def pull(self):
         p = subprocess.run(
@@ -132,7 +130,7 @@ class GitRepo(object):
             timeout=self.timeout_s,
             capture_output=True,
         )
-        self.check_process(p)
+        return self.check_process(p)
 
     def copy_tree(self, input_path):
         expected_dir = self.get_local_dir()
@@ -146,4 +144,4 @@ class GitRepo(object):
                     p.returncode, p.stdout.decode(), p.stderr.decode()
                 )
             )
-        p.check_returncode()
+        return p.returncode

@@ -111,15 +111,22 @@ class UpdateExportManager(object):
                 repo.copy_tree(local_dir)
 
                 repo.add([])
-                repo.commit(commit_message)
-                repo.push()
+                if repo.commit(commit_message) == 0:
+                    repo.push()
+
+                    return True
         elif export_data.export_type == DataExport.EXPORT_TYPE_LOC:
             if export_data.local_path == export_data.remote_path:
                 return
             if export_data.remote_path is None or export_data.remote_path == "":
                 return
 
+            # TODO implement
+
+            return True
+
         AppLogging.info("Pushing repo done")
+        return False
 
 
 class UpdateManager(object):

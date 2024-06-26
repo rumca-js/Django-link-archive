@@ -8,7 +8,7 @@
 {% if user.is_staff %}
 <div class="d-flex flex-wrap align-self-stretch">
    <div class="m-2" style="flex-grow:1">
-    <h2>Managment links</h2>
+       <h2>Managment links</h2>
 
        <ul class="list-group mr-auto">
 	  <li class="list-group-item">
@@ -45,7 +45,7 @@
    </div>
 
    <div class="m-2" style="flex-grow:1">
-   <h2>Tools</h2>
+       <h2>Tools</h2>
 
        <ul class="list-group mr-auto">
 	  <li class="list-group-item">
@@ -76,7 +76,8 @@
    </div>
 
    <div class="m-2" style="flex-grow:1">
-   <h2>Import/Export</h2>
+       <h2>Import/Export</h2>
+
        <ul class="list-group mr-auto">
 	  <li class="list-group-item">
              <a href="{% url 'rsshistory:data-exports' %}" title="Configured Data Exports" class="nav-link">
@@ -105,7 +106,7 @@
    </div>
 
    <div class="m-2" style="flex-grow:1">
-   <h2>Advanced</h2>
+       <h2>Advanced</h2>
 
        <ul class="list-group mr-auto">
 	  <li class="list-group-item">
@@ -126,27 +127,32 @@
 	  <li class="list-group-item">
              <a href="{% url 'rsshistory:entries-remove-nonbookmarked' %}" title="Remove nonbookmarked entries" class="nav-link">Remove non bookmarked entries</a>
 	  </li>
-	  <li class="list-group-item">
-             <a href="{% url 'rsshistory:data-errors' %}" class="nav-link">Show data errors</a>
-	  </li>
        </ul>
    </div>
 
+   {% if config.debug_mode %}
    <div class="m-2" style="flex-grow:1">
-    <h2>Debug</h2>
+      <h2>Debug</h2>
 
-       <ul class="list-group mr-auto">
-	  <li class="list-group-item">
-             <a href="{% url 'rsshistory:tags-entry-show' '664761' %}" class="nav-link">Show entry tags</a>
-	  </li>
-	  <li class="list-group-item">
-             <a href="{% url 'rsshistory:test-page' %}" class="nav-link">Test page</a>
-	  </li>
-	  <li class="list-group-item">
-             <a href="{% url 'rsshistory:test-form-page' %}" class="nav-link">Test form page</a>
-	  </li>
-       </ul>
+      <ul class="list-group mr-auto">
+	 <li class="list-group-item">
+            <a href="{% url 'rsshistory:reset-cache' %}" class="nav-link">Reset Django Cache</a>
+	 </li>
+	 <li class="list-group-item">
+            <a href="{% url 'rsshistory:data-errors' %}" class="nav-link">Show data errors</a>
+	 </li>
+         <li class="list-group-item">
+            <a href="{% url 'rsshistory:tags-entry-show' '664761' %}" class="nav-link">Show entry tags</a>
+         </li>
+         <li class="list-group-item">
+            <a href="{% url 'rsshistory:test-page' %}" class="nav-link">Test page</a>
+         </li>
+         <li class="list-group-item">
+            <a href="{% url 'rsshistory:test-form-page' %}" class="nav-link">Test form page</a>
+         </li>
+      </ul>
    </div>
+   {% endif %}
 </div>
 {% endif %}
 

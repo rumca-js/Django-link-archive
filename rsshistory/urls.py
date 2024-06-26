@@ -115,6 +115,7 @@ urlpatterns = [
     path("user-config", viewsystem.user_config, name="user-config"),
     path("configuration-advanced/", viewsystem.configuration_advanced_page, name="configuration-advanced"),
     path("system-status/", viewsystem.system_status, name="system-status"),
+    path("reset-cache/", viewsystem.reset_cache, name="reset-cache"),
     path("about/", viewsystem.about, name="about"),
     path("robots.txt", TemplateView.as_view(template_name="robots.txt", content_type="text/plain")),
     path("missing-rights/", viewsystem.missing_rights, name="missing-rights"),

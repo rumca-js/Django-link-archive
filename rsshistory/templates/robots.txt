@@ -1,3 +1,10 @@
+# robots.txt is stupid https://wiki.archiveteam.org/index.php?title=Robots.txt
+# [Sarcasm] lets write urls that people should not look at. Pretty please!
+
 User-Agent: *
 Disallow: /private/
 Disallow: /junk/
+
+Disallow: /harming/humans
+Disallow: /ignoring/human/orders
+Disallow: /harm/to/self

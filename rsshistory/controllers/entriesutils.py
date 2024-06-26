@@ -1104,11 +1104,12 @@ class EntryDataBuilder(object):
         url = EntryUrlInterface(self.link, ignore_errors=self.ignore_errors)
         link_data = url.get_props()
         if not link_data:
-            AppLogging.error(
-                'Could not obtain properties for:<a href="{}">{}</a>'.format(
-                    self.get_absolute_url(), self.link
+            if Configuration.get_object().config_entry.debug_mode:
+                AppLogging.error(
+                    'Could not obtain properties for:<a href="{}">{}</a>'.format(
+                        self.get_absolute_url(), self.link
+                    )
                 )
-            )
             return
 
         self.link_data = link_data
@@ -1139,11 +1140,12 @@ class EntryDataBuilder(object):
         url = EntryUrlInterface(self.link, ignore_errors=self.ignore_errors)
         link_data = url.get_props()
         if not link_data:
-            AppLogging.error(
-                'Could not obtain properties for:<a href="{}">{}</a>'.format(
-                    self.link, self.link
+            if Configuration.get_object().config_entry.debug_mode:
+                AppLogging.error(
+                    'Could not obtain properties for:<a href="{}">{}</a>'.format(
+                        self.link, self.link
+                    )
                 )
-            )
             return
 
         # we obtain links from various places. We do not want technical links with no data, redirect, CDN or other
@@ -1155,11 +1157,12 @@ class EntryDataBuilder(object):
         if self.link_data:
             return self.add_from_props_internal()
         else:
-            AppLogging.error(
-                'Could not obtain properties for:<a href="{}">{}</a>'.format(
-                    self.link, self.link
+            if Configuration.get_object().config_entry.debug_mode:
+                AppLogging.error(
+                    'Could not obtain properties for:<a href="{}">{}</a>'.format(
+                        self.link, self.link
+                    )
                 )
-            )
 
     def merge_link_data(self, link_data):
         # TODO update missing keys - do not replace them

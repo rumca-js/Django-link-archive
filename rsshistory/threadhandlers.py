@@ -34,6 +34,7 @@ from .models import (
     UserEntryTransitionHistory,
     UserEntryVisitHistory,
     ModelFiles,
+    SystemOperation,
 )
 
 from .pluginsources.sourcecontrollerbuilder import SourceControllerBuilder
@@ -520,24 +521,19 @@ class WriteDailyDataJobHandler(BaseJobHandler):
 
     def process(self, obj=None):
         try:
+            from .updatemgr import UpdateManager
             from .datawriter import DataWriter
-
-            # some changes could be done externally. Through apache.
-            from django.core.cache import cache
-
-            cache.clear()
-
-            writer = DataWriter(self._config)
 
             date_input = datetime.strptime(obj.subject, "%Y-%m-%d").date()
 
-            writer.write_daily_data(date_input.isoformat())
+            update_mgr = UpdateManager(self._config)
+            update_mgr.write_daily_data(date_input.isoformat())
 
             return True
         except Exception as e:
             error_text = traceback.format_exc()
             AppLogging.error(
-                "Exception: Yearly generation: {} {}".format(str(e), error_text)
+                "Exception: Daily data job handler: {} {}".format(str(e), error_text)
             )
 
 
@@ -772,7 +768,6 @@ class WriteTopicJobHandler(BaseJobHandler):
 
             # some changes could be done externally. Through apache.
             from django.core.cache import cache
-
             cache.clear()
 
             topic = obj.subject
@@ -1043,10 +1038,9 @@ class RefreshThreadHandler(object):
 
     def refresh(self, item=None):
         c = Configuration.get_object()
+        c.refresh(0)
 
-        c.refresh()
-
-        if not c.system.is_internet_connection_ok:
+        if not SystemOperation.is_internet_ok():
             return
 
         from .controllers import SourceDataController
@@ -1157,50 +1151,39 @@ class HandlerManager(object):
             # fmt: on
         ]
 
-    def get_handler_and_object(self):
-        """
-        TODO select should be based on priority
-        """
-
-        objs = BackgroundJobController.objects.filter(enabled=True).order_by(
-            "priority", "date_created"
-        )
-        if objs.count() != 0:
-            obj = objs[0]
-
-            for key, handler in enumerate(self.get_handlers()):
-                if handler.get_job() == obj.job:
-                    return [obj, handler]
-            return [obj, None]
-        return []
-
     def process_all(self):
-        self.start_processing_time = DateUtils.get_datetime_now_utc()
+        try:
+            self.start_processing_time = DateUtils.get_datetime_now_utc()
 
-        c = Configuration.get_object()
-        if not c.system.is_internet_connection_ok:
-            return
+            c = Configuration.get_object()
+            c.refresh(1)
 
-        while True:
-            items = self.get_handler_and_object()
-            if len(items) == 0:
-                break
+            if not SystemOperation.is_internet_ok():
+                return
 
-            self.process_one_for_all(items)
+            while True:
+                items = self.get_handler_and_object()
+                if len(items) == 0:
+                    break
 
-            passed_seconds = (
-                DateUtils.get_datetime_now_utc() - self.start_processing_time
-            )
-            if passed_seconds.total_seconds() >= self.timeout_s:
-                obj = items[0]
-                handler = items[1]
-                text = "Threads: last handler {} {} exceeded time:{}".format(
-                    handler.get_job(), obj.subject, passed_seconds
+                self.process_one_for_all(items)
+
+                passed_seconds = (
+                    DateUtils.get_datetime_now_utc() - self.start_processing_time
                 )
-                AppLogging.error(text)
+                if passed_seconds.total_seconds() >= self.timeout_s:
+                    obj = items[0]
+                    handler = items[1]
+                    text = "Threads: last handler {} {} exceeded time:{}".format(
+                        handler.get_job(), obj.subject, passed_seconds
+                    )
+                    AppLogging.error(text)
 
-                self.on_not_safe_exit(items)
-                break
+                    self.on_not_safe_exit(items)
+                    break
+        except Exception as e:
+            error_text = traceback.format_exc()
+            AppLogging.error(error_text)
 
     def process_one_for_all(self, items):
         config = Configuration.get_object()
@@ -1216,15 +1199,23 @@ class HandlerManager(object):
         try:
             if handler and handler.process(obj):
                 deleted = True
-                obj.delete()
+                if obj:
+                    obj.delete()
             if not handler:
-                AppLogging.error(
-                    "Missing handler for job: {0}".format(
-                        obj.job,
+                if obj:
+                    AppLogging.error(
+                        "Missing handler for job: {0}".format(
+                            obj.job,
+                        )
                     )
-                )
                 deleted = True
-                obj.delete()
+                if obj:
+                    obj.delete()
+
+            if not config.config_entry.debug_mode:
+                if not deleted and obj:
+                    obj.delete()
+                    deleted = True
 
         except Exception as E:
             error_text = traceback.format_exc()
@@ -1242,6 +1233,50 @@ class HandlerManager(object):
                     )
                 )
 
+    def process_one(self):
+        """
+        TODO remove this function, use process_one_for_all one above
+        """
+        try:
+            AppLogging.info("Processing message")
+
+            config = Configuration.get_object()
+            start_processing_time = time.time()
+
+            items = self.get_handler_and_object()
+            if len(items) == 0:
+                return False
+
+            self.process_one_for_all(items)
+
+            items = self.get_handler_and_object()
+            if len(items) == 0:
+                return False
+
+            AppLogging.info("Processing messages done")
+        except Exception as e:
+            error_text = traceback.format_exc()
+            AppLogging.error(error_text)
+
+        return True
+
+    def get_handler_and_object(self):
+        """
+        TODO select should be based on priority
+        """
+
+        objs = BackgroundJobController.objects.filter(enabled=True).order_by(
+            "priority", "date_created"
+        )
+        if objs.count() != 0:
+            obj = objs[0]
+
+            for key, handler in enumerate(self.get_handlers()):
+                if handler.get_job() == obj.job:
+                    return [obj, handler]
+            return [obj, None]
+        return []
+
     def on_not_safe_exit(self, items):
         jobs = BackgroundJobController.objects.filter(
             enabled=True, date_created__lt=self.start_processing_time
@@ -1250,26 +1285,3 @@ class HandlerManager(object):
             if job.priority > 0:
                 job.priority -= 1
                 job.save()
-
-    def process_one(self):
-        """
-        TODO remove this function, use process_one_for_all one above
-        """
-        AppLogging.info("Processing message")
-
-        config = Configuration.get_object()
-        start_processing_time = time.time()
-
-        items = self.get_handler_and_object()
-        if len(items) == 0:
-            return False
-
-        self.process_one_for_all(items)
-
-        items = self.get_handler_and_object()
-        if len(items) == 0:
-            return False
-
-        AppLogging.info("Processing messages done")
-
-        return True

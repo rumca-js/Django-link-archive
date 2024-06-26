@@ -4,6 +4,7 @@ This module provides replacement for the Internet.
  - when test make requests to obtain a page, we return artificial data here
  - when there is a request to obtain youtube JSON data, we provide artificial data, etc.
 """
+import logging
 from django.test import TestCase
 from django.contrib.auth.models import User
 
@@ -49,6 +50,9 @@ from .fakeinternetdatayoutube import (
     youtube_robots_txt,
     youtube_sitemap_sitemaps,
     youtube_sitemap_product,
+)
+from .fake.robotstxtcom import (
+    robots_txt_example_com_robots,
 )
 
 
@@ -371,8 +375,11 @@ class TestResponseObject(PageResponseObject):
             b.body_text = """LinkedIn body"""
             return b.build_contents()
 
-        if url == "https://page-with-last-modified-header.com":
+        elif url == "https://page-with-last-modified-header.com":
             return webpage_html_favicon
+
+        elif url == "https://robots-txt.com/robots.txt":
+            return robots_txt_example_com_robots
 
         elif url.endswith("robots.txt"):
             return """  """
@@ -510,8 +517,11 @@ class FakeInternetTestCase(TestCase):
         c.config_entry.track_user_actions = False
         c.config_entry.days_to_move_to_archive = 100
         c.config_entry.days_to_remove_links = 0
+        c.config_entry.use_robots_txt = False
         c.config_entry.whats_new_days = 7
         c.config_entry.save()
+
+        c.apply_robots_txt()
 
     def get_user(
         self, username="test_username", password="testpassword", is_superuser=False
@@ -537,12 +547,13 @@ class FakeInternetTestCase(TestCase):
         return self.user
 
     def print_errors(self):
-        infos = AppLogging.objects.all()
+        infos = AppLogging.objects.filter(level = int(logging.ERROR))
         for info in infos:
             print("Error: {}".format(info.info_text))
 
     def no_errors(self):
-        return AppLogging.objects.all().count() == 0
+        infos = AppLogging.objects.filter(level = int(logging.ERROR))
+        return infos.count() == 0
 
     def create_example_data(self):
         self.create_example_sources()

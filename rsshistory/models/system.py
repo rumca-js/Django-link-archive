@@ -1,6 +1,7 @@
 import logging
+
 from pytz import timezone
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from dateutil.relativedelta import relativedelta
 
 from django.db import models
@@ -51,6 +52,16 @@ class ConfigurationEntry(models.Model):
     background_task = models.BooleanField(
         default=False,
         help_text="Informs system that background task, like celery is operational.",
+    )  # True if celery is defined, and used
+
+    debug_mode = models.BooleanField(
+        default=False,
+        help_text="Debug mode allows to see errors more clearly",
+    )  # True if celery is defined, and used
+
+    use_robots_txt = models.BooleanField(
+        default=True,
+        help_text="Use robots.txt information. Some functionality can not work: for example YouTube channels",
     )  # True if celery is defined, and used
 
     ssl_verification = models.BooleanField(
@@ -297,22 +308,84 @@ class ConfigurationEntry(models.Model):
 
 
 class SystemOperation(models.Model):
-    last_refresh_datetime = models.DateTimeField(auto_now_add=True)
+    thread_id = models.IntegerField(
+        default=0,
+        help_text="Thread ID",
+    )
+
+    date_created = models.DateTimeField(auto_now_add=True, null=True)
+
+    is_internet_connection_checked = models.BooleanField(
+        default=False,
+        help_text="Is connection OK",
+    )
 
     is_internet_connection_ok = models.BooleanField(
         default=True,
         help_text="Is connection OK",
     )
 
-    def get():
-        """
-        Most probably should not be used directly. Should be cached in application
-        """
-        confs = SystemOperation.objects.all()
-        if confs.count() == 0:
-            return SystemOperation.objects.create()
+    class Meta:
+        ordering = ["-date_created"]
+
+    def cleanup():
+        from ..dateutils import DateUtils
+
+        all_entries = SystemOperation.objects.filter(date_created__isnull = True)
+        all_entries.delete()
+
+        now = DateUtils.get_datetime_now_utc() - timedelta(seconds=60*60)
+
+        all_entries = SystemOperation.objects.filter(date_created__lt = now)
+        all_entries.delete()
+
+    def is_internet_ok():
+        entries = SystemOperation.objects.filter(is_internet_connection_checked = True)
+        if entries.exists():
+            return entries[0].is_internet_connection_ok
         else:
-            return confs[0]
+            return True
+
+    def get_last_thread_signal(thread_id):
+        entries = SystemOperation.objects.filter(thread_id = thread_id)
+
+        if entries.exists():
+            return entries[0].date_created
+
+    def get_last_internet_check():
+        entries = SystemOperation.objects.filter(is_internet_connection_checked = True)
+
+        if entries.exists():
+            return entries[0].date_created
+
+    def get_last_internet_status():
+        entries = SystemOperation.objects.filter(is_internet_connection_checked = True)
+
+        if entries.exists():
+            return entries[0].is_internet_connection_ok
+
+    def add_by_thread(thread_id, internet_status_checked = False, internet_status_ok = True):
+
+        # delete all entries without internet check
+        all_entries = SystemOperation.objects.filter(thread_id = thread_id, is_internet_connection_checked = False)
+        all_entries.delete()
+
+        # leave one entry with time check
+        all_entries = SystemOperation.objects.filter(thread_id = thread_id, is_internet_connection_checked = True)
+        if all_entries.exists() and all_entries.count() > 1:
+            entries = all_entries[1:]
+            for entry in entries:
+                entry.delete()
+
+        SystemOperation.objects.create(thread_id = thread_id, is_internet_connection_checked = internet_status_checked, is_internet_connection_ok = internet_status_ok)
+
+    def get_thread_ids():
+        thread_ids = set()
+        all_entries = SystemOperation.objects.all()
+        for entry in all_entries:
+            thread_ids.add(entry.thread_id)
+
+        return thread_ids
 
 
 class UserConfig(models.Model):

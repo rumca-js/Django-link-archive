@@ -156,12 +156,10 @@ def system_status(request):
     c = Configuration.get_object()
     p.context["directory"] = c.directory
 
-    system = SystemOperation.get()
+    p.context["last_internet_status"] = SystemOperation.get_last_internet_status()
 
-    p.context["is_internet_connection_ok"] = system.is_internet_connection_ok
-
-    last_refresh_datetime = c.get_local_time(system.last_refresh_datetime)
-    p.context["last_refresh_datetime"] = last_refresh_datetime
+    last_internet_check = c.get_local_time(SystemOperation.get_last_internet_check())
+    p.context["last_internet_check"] = last_internet_check
 
     p.context["ConfigurationEntry"] = ConfigurationEntry.objects.count()
     p.context["UserConfig"] = UserConfig.objects.count()
@@ -572,6 +570,19 @@ def keyword_remove(request):
 """
 Other
 """
+
+
+def reset_cache(request):
+    p = ViewPage(request)
+    p.set_title("Reset cache")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    from django.core.cache import cache
+    cache.clear()
+
+    return HttpResponseRedirect(reverse("{}:admin-page".format(LinkDatabase.name)))
 
 
 def page_show_properties(request):

@@ -22,6 +22,8 @@ from ..threadhandlers import (
     CleanupJobHandler,
     LinkAddJobHandler,
     LinkScanJobHandler,
+    WriteDailyDataJobHandler,
+    ExportDataJobHandler,
     ProcessSourceJobHandler,
 )
 from ..dateutils import DateUtils
@@ -777,3 +779,97 @@ class ProcessSourceHandlerTest(FakeInternetTestCase):
         self.assertTrue("process-source" in subjects)
         # add link job odysee
         self.assertTrue("link-add" in subjects)
+
+
+class WriteDailyDataJobHandlerTest(FakeInternetTestCase):
+    def setUp(self):
+        self.disable_web_pages()
+
+        self.user = self.get_user(
+            username="test_username", password="testpassword", is_superuser=True
+        )
+        self.create_exports()
+
+    def create_exports(self):
+        DataExport.objects.create(
+            enabled=True,
+            export_type=DataExport.EXPORT_TYPE_GIT,
+            export_data=DataExport.EXPORT_DAILY_DATA,
+            local_path="test",
+            remote_path="test.git",
+            user="user",
+            password="password",
+        )
+
+    def test_process(self):
+        LinkDataController.objects.all().delete()
+        DomainsController.objects.all().delete()
+        SourceDataController.objects.all().delete()
+
+        ob = BackgroundJobController.objects.create(
+            job=BackgroundJob.JOB_WRITE_DAILY_DATA,
+            subject="2024-06-23",
+        )
+
+        LinkDataController.objects.create(
+            source="https://youtube.com",
+            link="https://youtube.com?v=12345",
+            date_published = DateUtils.from_string("2024-06-23T11:35:31Z")
+        )
+
+        handler = WriteDailyDataJobHandler()
+        handler.set_config(Configuration.get_object())
+        # call tested function
+        result = handler.process(ob)
+
+        self.print_errors()
+
+        self.assertEqual(result, True)
+
+
+class ExportDataJobHandlerTest(FakeInternetTestCase):
+    def setUp(self):
+        self.disable_web_pages()
+
+        self.user = self.get_user(
+            username="test_username", password="testpassword", is_superuser=True
+        )
+        self.create_exports()
+
+    def create_exports(self):
+        self.export_obj = DataExport.objects.create(
+            enabled=True,
+            export_type=DataExport.EXPORT_TYPE_GIT,
+            export_data=DataExport.EXPORT_DAILY_DATA,
+            local_path="test",
+            remote_path="test.git",
+            user="user",
+            password="password",
+        )
+        self.export_id = self.export_obj.id
+
+    def test_process(self):
+        LinkDataController.objects.all().delete()
+        DomainsController.objects.all().delete()
+        SourceDataController.objects.all().delete()
+
+        ob = BackgroundJobController.objects.create(
+            job=BackgroundJob.JOB_EXPORT_DATA,
+            subject=str(self.export_id)
+        )
+
+        LinkDataController.objects.create(
+            source="https://youtube.com",
+            link="https://youtube.com?v=12345",
+            date_published = DateUtils.from_string("2024-06-23T11:35:31Z")
+        )
+
+        handler = ExportDataJobHandler()
+        handler.set_config(Configuration.get_object())
+
+        # call tested function
+        result = handler.process(ob)
+
+        self.print_errors()
+
+        self.assertEqual(result, True)

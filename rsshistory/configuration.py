@@ -18,7 +18,7 @@ version is split into three digits:
  if a change requires the model to be changed, then second digit is updated, patch is set to 0
  if something should be released to public, then release version changes
 """
-__version__ = "0.68.1"
+__version__ = "0.69.0"
 
 
 from pathlib import Path
@@ -39,9 +39,7 @@ class Configuration(object):
         self.get_context()
         self.apply_ssl_verification()
         self.apply_user_agent()
-
-        self.system = SystemOperation.get()
-        self.refresh()
+        self.apply_robots_txt()
 
     def get_context(self):
         if len(self.context) == 0:
@@ -98,6 +96,11 @@ class Configuration(object):
         from .webtools import BasePage
 
         BasePage.user_agent = self.config_entry.user_agent
+
+    def apply_robots_txt(self):
+        from .webtools import DomainCache
+
+        DomainCache.use_robots_txt = self.config_entry.use_robots_txt
 
     def get_export_path(self, append=False):
         directory = Path(ConfigurationEntry.get().data_export_path)
@@ -188,30 +191,35 @@ class Configuration(object):
                 result.append(keyword.strip())
         return result
 
-    def ping_internet(self):
+    def refresh(self, thread_id):
+        from .dateutils import DateUtils
+
+        if thread_id == 0:
+            if self.is_it_time_to_ping:
+                if self.ping_internet(thread_id):
+                    SystemOperation.add_by_thread(thread_id, internet_status_checked = True, internet_status_ok = True)
+                else:
+                    SystemOperation.add_by_thread(thread_id, internet_status_checked = True, internet_status_ok = False)
+        else:
+            SystemOperation.add_by_thread(thread_id)
+
+    def is_it_time_to_ping(self):
+        datetime = SystemOperation.get_last_internet_check()
+        if not datetime:
+            return True
+
+        timedelta = DateUtils.get_datetime_now_utc() - datetime
+        if (timedelta.seconds / 60) > 15:
+            return True
+        return False
+
+    def ping_internet(self, thread_id):
         from .webtools import BasePage
 
         test_page_url = self.config_entry.internet_test_page
 
         p = BasePage(url=test_page_url)
-        ping_status = p.ping()
-
-        self.system.is_internet_connection_ok = ping_status
-        self.system.save()
-
-    def update_refresh_time(self):
-        from .dateutils import DateUtils
-
-        self.system.last_refresh_datetime = DateUtils.get_datetime_now_utc()
-        self.system.save()
-
-    def refresh(self):
-        from .dateutils import DateUtils
-
-        diff = DateUtils.get_datetime_now_utc() - self.system.last_refresh_datetime
-        if (diff.seconds / 60) > 15:
-            self.update_refresh_time()
-            self.ping_internet()
+        return p.ping()
 
     def encrypt(self, message):
         from django.conf import settings
@@ -229,3 +237,10 @@ class Configuration(object):
 
         fernet = Fernet(key)
         return fernet.decrypt(message).decode()
+
+    def get_thread_info(self):
+        result = []
+        for thread in SystemOperation.get_thread_ids():
+            result.append([thread, SystemOperation.get_last_thread_signal(thread)])
+
+        return result

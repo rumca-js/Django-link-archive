@@ -9,10 +9,14 @@
 
 <ul>
     <li>Version: {{app_version}}</li>
-    <li>Internet connection status: {{is_internet_connection_ok}}</li>
-
     <li>Current time: {{DateTime_Current}}</li>
-    <li>Last jobs check: {{last_refresh_datetime}}</li>
+
+    <li>Last internet connection check: {{last_internet_check}}</li>
+    <li>Last internet connection status: {{last_internet_status}}</li>
+
+    {% for thread_info in c.get_thread_info %}
+    <li>Thread: {{thread_info.0}} {{thread_info.1}}</li>
+    {% endfor %}
 
     {% if DateTime_MoveToArchive %}
       <li>Move to archive date: {{DateTime_MoveToArchive}}</li>

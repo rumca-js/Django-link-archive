@@ -1839,7 +1839,10 @@ class HtmlPage(ContentInterface):
             if found_element.has_attr("type"):
                 link_type = str(found_element["type"])
                 if link_type.find(feed_type) >= 0:
-                    result_links.append(found_element["href"])
+                    if found_element.has_attr("href"):
+                        result_links.append(found_element["href"])
+                    else:
+                        AppLogging.error("Found {} link without href. Str:{}".format(feed_type, str(found_element)))
 
         return result_links
 
@@ -2980,9 +2983,10 @@ class Url(ContentInterface):
         if url is None:
             url = page_object.url
 
+        dap = DomainAwarePage(url)
+
         if url.startswith("https") or url.startswith("http"):
-            type_check = DomainAwarePage(url)
-            if not type_check.is_media():
+            if not dap.is_media():
                 p = BasePage(url=url, options=page_options, page_object=page_object)
                 self.response = p.get_response()
                 self.options = p.options
@@ -2992,12 +2996,7 @@ class Url(ContentInterface):
                     return
 
         # right now we do not have handlers for anything else
-        elif (
-            url.startswith("ftp")
-            or url.startswith("smb")
-            or url.startswith("//")
-            or url.startswith("\\\\")
-        ):
+        elif not dap.is_web_link():
             return
 
         if contents:
@@ -3094,88 +3093,6 @@ class Url(ContentInterface):
 
     def get_robots_txt_url(self):
         return DomainAwarePage(self.url).get_robots_txt_url()
-
-    def get_robots_txt_contents(self):
-        """
-        We can only ask domain for robots
-        """
-        if not self.is_domain():
-            return
-
-        if self.robots_contents:
-            return self.robots_contents
-
-        robots_url = self.get_robots_txt_url()
-        p = BasePage(robots_url)
-        self.robots_contents = p.get_contents()
-
-        return self.robots_contents
-
-    def is_robots_txt(self):
-        return self.get_robots_txt_contents()
-
-    def get_robots(self):
-        """
-        https://developers.google.com/search/docs/crawling-indexing/robots/intro
-        """
-        self.rp = urllib.robotparser.RobotFileParser()
-        domain = self.get_domain()
-        self.rp.set_url(self.get_robots_txt_url())
-
-        return self.rp
-
-    def get_site_maps_urls(self):
-        """
-        https://stackoverflow.com/questions/2978144/pythons-robotparser-ignoring-sitemaps
-        robot parser does not work. We have to do it manually
-        """
-        if not self.is_domain():
-            return
-
-        result = set()
-
-        contents = self.get_robots_txt_contents()
-        if contents:
-            lines = contents.split("\n")
-            for line in lines:
-                line = line.replace("\r", "")
-                wh = line.find("Sitemap")
-                if wh >= 0:
-                    wh2 = line.find(":")
-                    if wh2 >= 0:
-                        sitemap = line[wh2 + 1 :].strip()
-                        result.add(sitemap)
-
-        return list(result)
-
-    def get_all_site_maps_urls(self):
-        sites = set(self.get_site_maps_urls())
-
-        for site in sites:
-            subordinate_sites = self.get_subordinate_sites(site)
-            sites.update(subordinate_sites)
-
-        return list(sites)
-
-    def get_subordinate_sites(self, site):
-        all_subordinates = set()
-
-        b = BasePage(site)
-        contents = b.get_contents()
-
-        # check if it is sitemap / sitemap index
-        # https://www.sitemaps.org/protocol.html#index
-        if contents.find("<urlset") == -1 and contents.find("<sitemapindex") == -1:
-            return all_subordinates
-
-        p = ContentLinkParser(self.url, contents)
-        links = p.get_links()
-
-        for link in links:
-            subordinates = self.get_subordinate_sites(link)
-            all_subordinates.update(subordinates)
-
-        return all_subordinates
 
     def get_favicon(self):
         if self.p:
@@ -3305,6 +3222,192 @@ class Url(ContentInterface):
 
     def get_response(self):
         return self.response
+
+    def get_domain_info(self):
+        return DomainCache.get_object(self.url)
+
+
+class DomainCacheInfo(object):
+    """
+    is_access_valid
+    """
+    def __init__(self, url, use_robots_txt = True):
+        p = DomainAwarePage(url)
+
+        self.use_robots_txt = use_robots_txt
+
+        self.url = p.get_domain()
+        self.robots_contents = None
+
+        if self.use_robots_txt:
+            self.robots_contents = self.get_robots_txt_contents()
+            self.robots = self.get_robots_txt()
+
+    def is_allowed(self, url):
+        if self.use_robots_txt and self.robots:
+            user_agent = "*"
+            return self.robots.can_fetch(user_agent, url)
+        else:
+            return True
+
+    def get_robots_txt_url(self):
+        p = DomainAwarePage(self.url)
+        return p.get_robots_txt_url()
+
+    def get_robots_txt(self):
+        """
+        https://developers.google.com/search/docs/crawling-indexing/robots/intro
+        """
+        contents = self.get_robots_txt_contents()
+        if contents:
+            rp = urllib.robotparser.RobotFileParser()
+            rp.parse(contents)
+            return rp
+
+    def is_robots_txt(self):
+        return self.get_robots_txt_contents()
+
+    def get_robots_txt_contents(self):
+        """
+        We can only ask domain for robots
+        """
+        if self.robots_contents:
+            return self.robots_contents
+
+        robots_url = self.get_robots_txt_url()
+        p = BasePage(robots_url)
+        self.robots_contents = p.get_contents()
+
+        return self.robots_contents
+
+    def get_site_maps_urls(self):
+        """
+        https://stackoverflow.com/questions/2978144/pythons-robotparser-ignoring-sitemaps
+        robot parser does not work. We have to do it manually
+        """
+        result = set()
+
+        contents = self.get_robots_txt_contents()
+        if contents:
+            lines = contents.split("\n")
+            for line in lines:
+                line = line.replace("\r", "")
+                wh = line.find("Sitemap")
+                if wh >= 0:
+                    wh2 = line.find(":")
+                    if wh2 >= 0:
+                        sitemap = line[wh2 + 1 :].strip()
+                        result.add(sitemap)
+
+        return list(result)
+
+    def get_site_urls(self):
+        result = []
+
+        contents = self.get_robots_txt_contents()
+        if contents:
+            lines = contents.split("\n")
+            for line in lines:
+                if line.find("Disallow") >= 0 or line.find("Allow") >= 0:
+                    link = process_allow_link(line)
+                    result.append(link)
+
+        urls = self.get_site_maps_urls()
+        for url in urls:
+            p = BasePage(url=url)
+            contents = p.get_contents()
+            if contents:
+                parser = ContentLinkParser(url, contents)
+                parser = ContentLinkParser(self.url, contents)
+                links = parser.get_links()
+
+                result.extend(links)
+
+        return result
+
+    def process_allow_link(self, line):
+        wh = line.find(":")
+        if wh >= 0:
+            part = line[wh+1 : ].strip()
+            # robots can have wildcards, we cannot now what kind of location it is
+            if part.find("*") == -1:
+                return self.url + part
+
+    def get_all_site_maps_urls(self):
+        sites = set(self.get_site_maps_urls())
+
+        for site in sites:
+            subordinate_sites = self.get_subordinate_sites(site)
+            sites.update(subordinate_sites)
+
+        return list(sites)
+
+    def get_subordinate_sites(self, site):
+        all_subordinates = set()
+
+        b = BasePage(site)
+        contents = b.get_contents()
+
+        # check if it is sitemap / sitemap index
+        # https://www.sitemaps.org/protocol.html#index
+        if contents.find("<urlset") == -1 and contents.find("<sitemapindex") == -1:
+            return all_subordinates
+
+        p = ContentLinkParser(self.url, contents)
+        links = p.get_links()
+
+        for link in links:
+            subordinates = self.get_subordinate_sites(link)
+            all_subordinates.update(subordinates)
+
+        return all_subordinates
+
+
+class DomainCache(object):
+    """
+    DomainCache.get_object("https://youtube.com/mysite/something").is_allowed("url")
+    Url().get_domain_cache().is_allowed()
+    """
+    object = None
+    default_cache_size = 400 # 400 domains
+    use_robots_txt = True
+
+    def get_object(domain_url):
+        if DomainCache.object is None:
+            DomainCache.object = DomainCache(DomainCache.default_cache_size, use_robots_txt = True)
+
+        return DomainCache.object.get_domain_info(domain_url)
+
+    def __init__(self, cache_size = 400, use_robots_txt = True):
+        self.cache_size = cache_size
+        self.cache = {}
+        self.use_robots_txt = use_robots_txt
+
+    def get_domain_info(self, input_url):
+        domain_url = DomainAwarePage(input_url).get_domain_only()
+
+        if not domain_url in self.cache:
+            self.remove_from_cache()
+            self.cache[domain_url] = {"date" : DateUtils.get_datetime_now_utc(), "domain" :  self.read_info(domain_url)}
+
+        return self.cache[domain_url]["domain"]
+
+    def read_info(self, domain_url):
+        return DomainCacheInfo(domain_url, self.use_robots_txt)
+
+    def remove_from_cache(self):
+        if len(self.cache) < self.cache_size:
+            return
+
+        thelist = []
+        for domain in self.cache:
+            thelist.append([domain, self.cache["date"], self.cache["domain"]])
+
+        thelist = thelist.sort(key=lambda x: x[1])
+        thelist = thelist[-self.cache_size: -1]
+
+        for item in thelist:
+            self.cache[item[0]] = {"date" : item[1], "domain" : item[2]}
 
 
 class InputContent(object):

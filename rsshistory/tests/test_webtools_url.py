@@ -237,3 +237,15 @@ class UrlTest(FakeInternetTestCase):
 
         last_modified = response.get_last_modified()
         self.assertTrue(last_modified)
+
+    def test_cache_info__is_allowed(self):
+        MockRequestCounter.mock_page_requests = 0
+
+        # call tested function
+        handler = Url("https://robots-txt.com/page.html")
+
+        domain_info = handler.get_domain_info()
+        self.assertTrue(domain_info)
+        self.assertEqual(domain_info.url, "https://robots-txt.com")
+        self.assertTrue(domain_info.is_allowed("https://robots-txt.com/any"))
+        self.assertFalse(domain_info.is_allowed("https://robots-txt.com/admin"))

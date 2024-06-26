@@ -141,6 +141,8 @@ class ConfigForm(forms.ModelForm):
             "user_agent",
             "user_headers",
             "internet_test_page",
+            "debug_mode",
+            "use_robots_txt",
         ]
 
     def __init__(self, *args, **kwargs):
