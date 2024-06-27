@@ -115,6 +115,7 @@ class ConfigForm(forms.ModelForm):
             "block_keywords",
             # optional
             "prefer_https",
+            "prefer_non_www_sites",
             "link_save",
             "source_save",
             # user
@@ -142,7 +143,7 @@ class ConfigForm(forms.ModelForm):
             "user_headers",
             "internet_test_page",
             "debug_mode",
-            "use_robots_txt",
+            "respect_robots_txt",
         ]
 
     def __init__(self, *args, **kwargs):

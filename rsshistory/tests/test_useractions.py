@@ -37,6 +37,17 @@ class UserTagsTest(TestCase):
             date_published=current_time,
         )
 
+        self.entry_new = LinkDataController.objects.create(
+            source="https://youtube.com",
+            link="http://youtube.com?v=bookmarked",
+            title="The first link",
+            source_obj=source_youtube,
+            bookmarked=True,
+            language="en",
+            domain_obj=domain,
+            date_published=current_time,
+        )
+
         self.user = User.objects.create_user(
             username="test_username", password="testpassword"
         )
@@ -122,6 +133,19 @@ class UserTagsTest(TestCase):
         self.assertEqual(tags[0].entry_object, self.entry)
         self.assertEqual(tags[0].user_object, self.user_super)
 
+    def test_move_entry(self):
+        user = self.user
+
+        UserTags.set_tag(self.entry, "tag3", user)
+        # call tested function
+        UserTags.move_entry(self.entry, self.entry_new)
+
+        tags = UserTags.objects.all()
+
+        self.assertEqual(tags.count(), 1)
+        self.assertEqual(tags[0].entry_object, self.entry_new)
+        self.assertEqual(tags[0].user_object, self.user)
+
 
 class UserVotesTest(TestCase):
     def setUp(self):
@@ -137,6 +161,16 @@ class UserVotesTest(TestCase):
             self.entry = LinkDataController.objects.create(
                 source="https://youtube.com",
                 link="https://youtube.com?v=bookmarked",
+                title="The first link",
+                source_obj=None,
+                bookmarked=True,
+                language="en",
+                domain_obj=None,
+                date_published=current_time,
+            )
+            self.entry_new = LinkDataController.objects.create(
+                source="https://youtube.com",
+                link="http://youtube.com?v=bookmarked",
                 title="The first link",
                 source_obj=None,
                 bookmarked=True,
@@ -164,6 +198,7 @@ class UserVotesTest(TestCase):
         votes = UserVotes.objects.all()
         self.assertEqual(votes.count(), 1)
         self.assertEqual(votes[0].vote, 50)
+        self.assertEqual(votes[0].entry_object, self.entry)
 
     def test_get_user_vote(self):
         self.create_entry()
@@ -194,6 +229,21 @@ class UserVotesTest(TestCase):
         entries = LinkDataController.objects.all()
         self.assertTrue(entries.count(), 1)
 
+    def test_move_entry(self):
+        self.create_entry()
+
+        UserVotes.objects.all().delete()
+
+        UserVotes.add(self.user, self.entry, 50)
+
+        # call tested function
+        UserVotes.move_entry(self.entry, self.entry_new)
+
+        votes = UserVotes.objects.all()
+        self.assertEqual(votes.count(), 1)
+        self.assertEqual(votes[0].vote, 50)
+        self.assertEqual(votes[0].entry_object, self.entry_new)
+
 
 class UserBookmarksTest(TestCase):
     def setUp(self):
@@ -216,6 +266,16 @@ class UserBookmarksTest(TestCase):
                 domain_obj=None,
                 date_published=current_time,
             )
+            self.entry_new = LinkDataController.objects.create(
+                source="https://youtube.com",
+                link="http://youtube.com?v=bookmarked",
+                title="The first link",
+                source_obj=None,
+                bookmarked=True,
+                language="en",
+                domain_obj=None,
+                date_published=current_time,
+            )
 
         if not self.user:
             self.user = User.objects.create_user(
@@ -224,6 +284,21 @@ class UserBookmarksTest(TestCase):
             self.user_super = User.objects.create_user(
                 username="test_username2", password="testpassword", is_superuser=True
             )
+
+    def test_add(self):
+        UserBookmarks.objects.all().delete()
+
+        self.create_entry()
+
+        self.entry.bookmarked = False
+        self.entry.save()
+
+        # call tested function
+        UserBookmarks.add(self.user, self.entry)
+
+        bookmarks = UserBookmarks.objects.all()
+        self.assertTrue(bookmarks.count(), 1)
+        self.assertEqual(bookmarks[0].entry_object, self.entry)
 
     def test_cleanup(self):
         UserBookmarks.objects.all().delete()
@@ -238,6 +313,20 @@ class UserBookmarksTest(TestCase):
 
         bookmarks = UserBookmarks.objects.all()
         self.assertTrue(bookmarks.count(), 1)
+
+    def test_move_entry(self):
+        UserBookmarks.objects.all().delete()
+
+        self.create_entry()
+
+        UserBookmarks.add(self.user, self.entry)
+
+        # call tested function
+        UserBookmarks.move_entry(self.entry, self.entry_new)
+
+        bookmarks = UserBookmarks.objects.all()
+        self.assertTrue(bookmarks.count(), 1)
+        self.assertEqual(bookmarks[0].entry_object, self.entry_new)
 
 
 class CompactedTagsTest(TestCase):

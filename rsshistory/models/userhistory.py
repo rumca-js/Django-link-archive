@@ -234,6 +234,32 @@ class UserEntryTransitionHistory(models.Model):
                 q.delete()
                 time.sleep(0.5)
 
+    def move_entry(source_entry, destination_entry):
+        """
+        We move entry from https:// to http://. We want that history to be preserved
+        """
+        transitions = UserEntryTransitionHistory.objects.filter(entry_from = source_entry)
+        for transition in transitions:
+            dst_transitions = UserEntryTransitionHistory.objects.filter(entry_from = destination_entry, user_object = transition.user_object)
+            if dst_transitions.exists():
+                dst_transitions[0].counter += transition.counter
+                transition.delete()
+                continue
+
+            transition.entry_from = destination_entry
+            transition.save()
+
+        transitions = UserEntryTransitionHistory.objects.filter(entry_to = source_entry)
+        for transition in transitions:
+            dst_transitions = UserEntryTransitionHistory.objects.filter(entry_to = destination_entry, user_object = transition.user_object)
+            if dst_transitions.exists():
+                dst_transitions[0].counter += transition.counter
+                transition.delete()
+                continue
+
+            transition.entry_from = destination_entry
+            transition.save()
+
 
 class UserEntryVisitHistory(models.Model):
     """
@@ -404,6 +430,20 @@ class UserEntryVisitHistory(models.Model):
                 LinkDatabase.info("Cannot find user:'{}'".format(q.user))
                 q.delete()
                 time.sleep(0.5)
+
+    def move_entry(source_entry, destination_entry):
+        visits = UserEntryVisitHistory.objects.filter(entry_object = source_entry)
+        for visit in visits:
+            dst_visits = UserEntryVisitHistory.objects.filter(entry_object = destination_entry, user_object = visit.user_object)
+            if dst_visits.exists():
+                dst_visits.visits += visit.visits
+                if visit.date_last_visit > dst_visits.date_last_visit:
+                    dst_visits.date_last_visit = visit.date_last_visit
+                visit.delete()
+                continue
+
+            visit.entry_object = destination_entry
+            visit.save()
 
 
 class EntryHitUserSearchHistory(models.Model):

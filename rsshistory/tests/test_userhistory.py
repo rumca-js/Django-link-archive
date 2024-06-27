@@ -108,6 +108,12 @@ class UserEntryTransitionHistoryTest(TestCase):
             username="test_username", password="testpassword"
         )
 
+        self.entry_youtube_new = LinkDataController.objects.create(
+            link="http://youtube.com",
+            description="",
+            title="",
+        )
+
     def test_add_or_increment(self):
         UserEntryTransitionHistory.objects.all().delete()
 
@@ -120,6 +126,34 @@ class UserEntryTransitionHistoryTest(TestCase):
         self.assertEqual(entry1.user_object, self.user)
         self.assertEqual(entry1.entry_from.id, self.entry_youtube.id)
         self.assertEqual(entry1.entry_to.id, self.entry_tiktok.id)
+
+    def test_move_entry__from(self):
+        UserEntryTransitionHistory.objects.all().delete()
+
+        entry1 = UserEntryTransitionHistory.add(
+            self.user, self.entry_youtube, self.entry_tiktok
+        )
+
+        # cal tested function
+        UserEntryTransitionHistory.move_entry(self.entry_youtube, self.entry_youtube_new)
+
+        transitions = UserEntryTransitionHistory.objects.all()
+        self.assertTrue(transitions.count() > 0)
+        self.assertTrue(transitions[0].entry_from, self.entry_youtube_new)
+
+    def test_move_entry__to(self):
+        UserEntryTransitionHistory.objects.all().delete()
+
+        entry1 = UserEntryTransitionHistory.add(
+            self.user, self.entry_tiktok, self.entry_youtube
+        )
+
+        # cal tested function
+        UserEntryTransitionHistory.move_entry(self.entry_youtube, self.entry_youtube_new)
+
+        transitions = UserEntryTransitionHistory.objects.all()
+        self.assertTrue(transitions.count() > 0)
+        self.assertTrue(transitions[0].entry_to, self.entry_youtube_new)
 
     def test_add_to_same(self):
         UserEntryTransitionHistory.objects.all().delete()
@@ -206,6 +240,12 @@ class UserEntryVisitHistoryTest(FakeInternetTestCase):
             source_obj=ob,
         )
 
+        self.youtube_object_new = LinkDataController.objects.create(
+            source="https://youtube.com",
+            link="http://youtube.com?v=12345",
+            source_obj=ob,
+        )
+
         self.user = User.objects.create_user(
             username="test_username", password="testpassword"
         )
@@ -278,3 +318,14 @@ class UserEntryVisitHistoryTest(FakeInternetTestCase):
         entry = UserEntryVisitHistory.get_last_user_entry(self.user)
 
         self.assertFalse(entry)
+
+    def test_move_entry(self):
+        UserEntryVisitHistory.visited(self.youtube_object, self.user)
+
+        # call tested function
+        UserEntryVisitHistory.move_entry(self.youtube_object, self.youtube_object_new)
+
+        rows = UserEntryVisitHistory.objects.filter(entry_object = self.youtube_object_new)
+
+        self.assertTrue(rows.count() > 0)
+        self.assertEqual(rows[0].entry_object, self.youtube_object_new)

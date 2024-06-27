@@ -307,7 +307,15 @@ class EntryUpdater(object):
 
         entry = self.entry
 
-        LinkDataWrapper(entry=entry).check_https_http_protocol()
+        w = LinkDataWrapper(entry=entry)
+        entry_new = w.check_https_http_protocol()
+        if entry_new:
+            entry = entry_new
+
+        w = LinkDataWrapper(entry=entry)
+        entry_new = w.check_link_www_start()
+        if entry_new:
+            entry = entry_new
 
         url = EntryUrlInterface(entry.link)
         props = url.get_props()
@@ -374,7 +382,14 @@ class EntryUpdater(object):
         """
         entry = self.entry
 
-        LinkDataWrapper(entry=entry).check_https_http_protocol()
+        w = LinkDataWrapper(entry=entry)
+        entry_new = w.check_https_http_protocol()
+        if entry_new:
+            entry = entry_new
+        w = LinkDataWrapper(entry=entry)
+        entry_new = w.check_link_www_start()
+        if entry_new:
+            entry = entry_new
 
         url = EntryUrlInterface(entry.link)
         props = url.get_props()
@@ -618,84 +633,69 @@ class LinkDataWrapper(object):
             is_archive = self.is_archive()
 
             if not is_archive:
-                obj = self.get_from_operational_db()
+                obj = self.get_from_db(LinkDataController.objects)
                 if obj:
                     return obj
             else:
-                obj = self.get_from_archive()
+                obj = self.get_from_db(ArchiveLinkDataController.objects)
                 if obj:
                     return obj
 
         else:
-            obj = self.get_from_operational_db()
+            obj = self.get_from_db(LinkDataController.objects)
             if obj:
                 return obj
 
-            obj = self.get_from_archive()
+            obj = self.get_from_db(ArchiveLinkDataController.objects)
             if obj:
                 return obj
 
-    def get_from_archive(self):
+    def get_from_db(self, objects):
         conf = Configuration.get_object().config_entry
 
         if self.link.startswith("http"):
-            if self.link.startswith("http://"):
-                p = DomainAwarePage(self.link)
-                link_https = p.get_protocol_url("https")
-                link_http = self.link
-            if self.link.startswith("https://"):
-                link_https = self.link
-                p = DomainAwarePage(self.link)
-                link_http = p.get_protocol_url("http")
+            p = DomainAwarePage(self.link)
 
-            https_objs = ArchiveLinkDataController.objects.filter(link=link_https)
+            """
+            If there are links with www. at front, and without it, return the one without it
+            """
+            if p.get_domain_only().startswith("www."):
+                link_url = p.get_protocol_url("https")
+                link_url = link_url.replace("www.", "")
+                entry_objs = objects.filter(link=link_url)
 
-            if https_objs.count() > 0 and not https_objs[0].date_dead_since:
+                if entry_objs.count() > 0 and not entry_objs[0].is_dead():
+                    return entry_objs[0]
+
+                link_url = p.get_protocol_url("http")
+                link_url = link_url.replace("www.", "")
+                entry_objs = objects.filter(link=link_url)
+
+                if entry_objs.count() > 0 and not entry_objs[0].is_dead():
+                    return entry_objs[0]
+
+            link_https = p.get_protocol_url("https")
+            https_objs = objects.filter(link=link_https)
+
+            if https_objs.count() > 0 and not https_objs[0].is_dead():
                 return https_objs[0]
 
-            http_objs = ArchiveLinkDataController.objects.filter(link=link_http)
+            link_http = p.get_protocol_url("http")
+            http_objs = objects.filter(link=link_http)
 
-            if http_objs.count() > 0 and not http_objs[0].date_dead_since:
+            if http_objs.count() > 0 and not http_objs[0].is_dead():
                 return http_objs[0]
+
+            """
+            If both are dead - return https
+            """
 
             if https_objs.count() > 0:
                 return https_objs[0]
             if http_objs.count() > 0:
                 return http_objs[0]
 
-        objs = ArchiveLinkDataController.objects.filter(link=self.link)
-        if objs.exists():
-            return objs[0]
-
-    def get_from_operational_db(self):
-        conf = Configuration.get_object().config_entry
-
-        if self.link.startswith("http"):
-            if self.link.startswith("http://"):
-                p = DomainAwarePage(self.link)
-                link_https = p.get_protocol_url("https")
-                link_http = self.link
-            if self.link.startswith("https://"):
-                link_https = self.link
-                p = DomainAwarePage(self.link)
-                link_http = p.get_protocol_url("http")
-
-            https_objs = LinkDataController.objects.filter(link=link_https)
-
-            if https_objs.count() > 0 and not https_objs[0].date_dead_since:
-                return https_objs[0]
-
-            http_objs = LinkDataController.objects.filter(link=link_http)
-
-            if http_objs.count() > 0 and not http_objs[0].date_dead_since:
-                return http_objs[0]
-
-            if https_objs.count() > 0:
-                return https_objs[0]
-            if http_objs.count() > 0:
-                return http_objs[0]
-
-        objs = LinkDataController.objects.filter(link=self.link)
+        objs = objects.filter(link=self.link)
         if objs.exists():
             return objs[0]
 
@@ -999,6 +999,11 @@ class LinkDataWrapper(object):
         return False
 
     def check_https_http_protocol(self):
+        """
+        TODO maybe should be returning valid object if moved?
+
+        @returns new object, or None object has not been changed
+        """
         entry = self.entry
 
         c = Configuration.get_object().config_entry
@@ -1022,12 +1027,14 @@ class LinkDataWrapper(object):
 
             if not ping_status and new_ping_status:
                 if LinkDataWrapper(entry=entry).move_https_to_http():
-                    return True
+                    return entry
 
             if ping_status and new_ping_status:
                 http_entries = LinkDataController.objects.filter(link=http_url)
                 if http_entries.count() > 0:
                     http_entries.delete()
+
+            return entry
 
         if entry.is_http():
             https_url = entry.get_https_url()
@@ -1036,16 +1043,64 @@ class LinkDataWrapper(object):
             https_entries = LinkDataController.objects.filter(link=https_url)
             if https_entries.count() != 0:
                 entry.delete()
-                return True
+                return https_entries[0]
 
             p = BasePage(https_url)
             new_ping_status = p.ping()
 
             if new_ping_status:
                 if LinkDataWrapper(entry=entry).move_http_to_https():
-                    return True
+                    return entry
 
-        return False
+        return entry
+
+    def check_link_www_start(self):
+        """
+        This function checks if there is non www link, similar to original.
+        If there is we can remove link with www, to have less links to operate with.
+
+        @returns new object, or None if object has not been changed
+        """
+        c = Configuration.get_object().config_entry
+
+        if not c.prefer_non_www_sites:
+            return
+
+        entry = self.entry
+        p = DomainAwarePage(entry.link)
+        domain_only = p.get_domain_only()
+        if not domain_only.startswith("www."):
+            return
+
+        destination_link = entry.link.replace("www.", "")
+
+        w = LinkDataWrapper(link=destination_link)
+        destination_entry = w.get()
+
+        if not destination_entry:
+            p = BasePage(url = destination_entry.link)
+            if p.ping():
+                entry.link = destination_link
+                entry.save()
+
+            return entry
+        else:
+            if not destination_entry.is_dead():
+                self.move_entry(source_entry = self.entry, destination_entry = destination_entry)
+                return destination_entry
+            else:
+                return entry
+
+    def move_entry(self, source_entry, destination_entry):
+        UserTags.move_entry(source_entry, destination_entry)
+        UserVotes.move_entry(source_entry, destination_entry)
+        LinkCommentDataModel.move_entry(source_entry, destination_entry)
+        UserBookmarks.move_entry(source_entry, destination_entry)
+        UserEntryVisitHistory.move_entry(source_entry, destination_entry)
+        UserEntryTransitionHistory.move_entry(source_entry, destination_entry)
+
+        source_entry.delete()
+        return destination_entry
 
 
 class EntryDataBuilder(object):
@@ -1122,7 +1177,7 @@ class EntryDataBuilder(object):
         TODO move this to a other class OnlyLinkDataBuilder?
         """
         wrapper = LinkDataWrapper(link=self.link)
-        obj = wrapper.get_from_operational_db()
+        obj = wrapper.get_from_db(LinkDataController.objects)
         if obj:
             self.result = obj
             return obj
@@ -1206,7 +1261,7 @@ class EntryDataBuilder(object):
         self.link = self.link_data["link"]
 
         wrapper = LinkDataWrapper(link=self.link)
-        entry = wrapper.get_from_operational_db()
+        entry = wrapper.get_from_db(LinkDataController.objects)
         if entry:
             self.result = entry
             return entry

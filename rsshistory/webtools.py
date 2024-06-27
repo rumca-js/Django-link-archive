@@ -1334,9 +1334,11 @@ class ContentLinkParser(ContentInterface):
     def get_links(self):
         links = set()
 
-        links.update(self.get_links_https())
+        links.update(self.get_links_https("https"))
+        links.update(self.get_links_https_encoded("https"))
+        links.update(self.get_links_https("http"))
+        links.update(self.get_links_https_encoded("http"))
         links.update(self.get_links_href())
-        links.update(self.get_links_https_encoded())
 
         # This is most probably redundant
         if None in links:
@@ -1354,23 +1356,27 @@ class ContentLinkParser(ContentInterface):
 
         result = set()
         for link in links:
-            link = link.replace("http://", "https://")
-            result.add(link)
+            if DomainAwarePage(link).is_web_link():
+                result.add(link)
 
         return links
 
-    def get_links_https(self):
+    def get_links_https(self, protocol = "https"):
         cont = str(self.get_contents())
 
-        allt = re.findall("(https?://[a-zA-Z0-9./\-_?&=]+)", cont)
+        pattern = "("+protocol+"?://[a-zA-Z0-9./\-_?&=]+)"
+
+        allt = re.findall(pattern, cont)
         # links cannot end with "."
         allt = [link.rstrip(".") for link in allt]
         return set(allt)
 
-    def get_links_https_encoded(self):
+    def get_links_https_encoded(self, protocol="https"):
         cont = str(self.get_contents())
 
-        allt = re.findall("(https?:&#x2F;&#x2F;[a-zA-Z0-9./\-_?&=#;]+)", cont)
+        pattern = "("+protocol+"?:&#x2F;&#x2F;[a-zA-Z0-9./\-_?&=#;]+)"
+
+        allt = re.findall(pattern, cont)
         # links cannot end with "."
         allt = [link.rstrip(".") for link in allt]
         allt = [html.unescape(link) for link in allt]
@@ -3231,20 +3237,20 @@ class DomainCacheInfo(object):
     """
     is_access_valid
     """
-    def __init__(self, url, use_robots_txt = True):
+    def __init__(self, url, respect_robots_txt = True):
         p = DomainAwarePage(url)
 
-        self.use_robots_txt = use_robots_txt
+        self.respect_robots_txt = respect_robots_txt
 
         self.url = p.get_domain()
         self.robots_contents = None
 
-        if self.use_robots_txt:
+        if self.respect_robots_txt:
             self.robots_contents = self.get_robots_txt_contents()
             self.robots = self.get_robots_txt()
 
     def is_allowed(self, url):
-        if self.use_robots_txt and self.robots:
+        if self.respect_robots_txt and self.robots:
             user_agent = "*"
             return self.robots.can_fetch(user_agent, url)
         else:
@@ -3261,7 +3267,8 @@ class DomainCacheInfo(object):
         contents = self.get_robots_txt_contents()
         if contents:
             rp = urllib.robotparser.RobotFileParser()
-            rp.parse(contents)
+            rp.set_url(self.get_robots_txt_url())
+            rp.parse(contents.split("\n"))
             return rp
 
     def is_robots_txt(self):
@@ -3370,18 +3377,18 @@ class DomainCache(object):
     """
     object = None
     default_cache_size = 400 # 400 domains
-    use_robots_txt = True
+    respect_robots_txt = True
 
     def get_object(domain_url):
         if DomainCache.object is None:
-            DomainCache.object = DomainCache(DomainCache.default_cache_size, use_robots_txt = True)
+            DomainCache.object = DomainCache(DomainCache.default_cache_size, respect_robots_txt = True)
 
         return DomainCache.object.get_domain_info(domain_url)
 
-    def __init__(self, cache_size = 400, use_robots_txt = True):
+    def __init__(self, cache_size = 400, respect_robots_txt = True):
         self.cache_size = cache_size
         self.cache = {}
-        self.use_robots_txt = use_robots_txt
+        self.respect_robots_txt = respect_robots_txt
 
     def get_domain_info(self, input_url):
         domain_url = DomainAwarePage(input_url).get_domain_only()
@@ -3393,7 +3400,7 @@ class DomainCache(object):
         return self.cache[domain_url]["domain"]
 
     def read_info(self, domain_url):
-        return DomainCacheInfo(domain_url, self.use_robots_txt)
+        return DomainCacheInfo(domain_url, self.respect_robots_txt)
 
     def remove_from_cache(self):
         if len(self.cache) < self.cache_size:

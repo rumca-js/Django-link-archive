@@ -18,7 +18,7 @@ version is split into three digits:
  if a change requires the model to be changed, then second digit is updated, patch is set to 0
  if something should be released to public, then release version changes
 """
-__version__ = "0.69.0"
+__version__ = "0.70.0"
 
 
 from pathlib import Path
@@ -100,7 +100,7 @@ class Configuration(object):
     def apply_robots_txt(self):
         from .webtools import DomainCache
 
-        DomainCache.use_robots_txt = self.config_entry.use_robots_txt
+        DomainCache.respect_robots_txt = self.config_entry.respect_robots_txt
 
     def get_export_path(self, append=False):
         directory = Path(ConfigurationEntry.get().data_export_path)

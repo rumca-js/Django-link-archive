@@ -517,7 +517,7 @@ class FakeInternetTestCase(TestCase):
         c.config_entry.track_user_actions = False
         c.config_entry.days_to_move_to_archive = 100
         c.config_entry.days_to_remove_links = 0
-        c.config_entry.use_robots_txt = False
+        c.config_entry.respect_robots_txt = False
         c.config_entry.whats_new_days = 7
         c.config_entry.save()
 

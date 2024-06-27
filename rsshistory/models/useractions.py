@@ -178,6 +178,17 @@ class UserTags(models.Model):
                 # q.delete()
                 # time.sleep(0.5)
 
+    def move_entry(source_entry, destination_entry):
+        tags = UserTags.objects.filter(entry_object = source_entry)
+        for tag in tags:
+            dst_tags = UserTags.objects.filter(entry_object = destination_entry, user_object = tag.user_object, tag = tag.tag)
+            if dst_tags.exists():
+                tag.delete()
+                continue
+
+            tag.entry_object = destination_entry
+            tag.save()
+
 
 class UserVotes(models.Model):
     user = models.CharField(max_length=1000)
@@ -280,6 +291,17 @@ class UserVotes(models.Model):
                 q.delete()
                 time.sleep(0.5)
 
+    def move_entry(source_entry, destination_entry):
+        votes = UserVotes.objects.filter(entry_object = source_entry)
+        for vote in votes:
+            dst_votes = UserVotes.objects.filter(entry_object = destination_entry, user_object = vote.user_object, vote = vote.vote)
+            if dst_votes.exists():
+                vote.delete()
+                continue
+
+            vote.entry_object = destination_entry
+            vote.save()
+
 
 class LinkCommentDataModel(models.Model):
     """
@@ -322,6 +344,17 @@ class LinkCommentDataModel(models.Model):
                 LinkDatabase.error("Cannot find user '{}'".format(q.user))
                 q.delete()
                 time.sleep(0.5)
+
+    def move_entry(source_entry, destination_entry):
+        comments = LinkCommentDataModel.objects.filter(entry_object = source_entry)
+        for comment in comments:
+            dst_comments = LinkCommentDataModel.objects.filter(entry_object = destination_entry, user_object = tag.user_object, comment = comment.comment)
+            if dst_comments.exist():
+                comment.delete()
+                continue
+
+            comment.entry_object = destination_entry
+            comment.save()
 
 
 class UserBookmarks(models.Model):
@@ -389,6 +422,20 @@ class UserBookmarks(models.Model):
 
                 if users.count() > 0:
                     UserBookmarks.add(users[0], entry)
+
+    def move_entry(source_entry, destination_entry):
+        bookmarks = UserBookmarks.objects.filter(entry_object = source_entry)
+        for bookmark in bookmarks:
+            dst_bookmarks = UserBookmarks.objects.filter(entry_object = destination_entry, user_object = bookmark.user_object)
+            if dst_bookmarks.exists():
+                bookmark.delete()
+                continue
+
+            bookmark.entry_object = destination_entry
+            bookmark.save()
+
+        destination_entry.bookmarked = True
+        destination_entry.save()
 
 
 class CompactedTags(models.Model):

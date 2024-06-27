@@ -765,11 +765,6 @@ class WriteTopicJobHandler(BaseJobHandler):
     def process(self, obj=None):
         try:
             from ..serializers.bookmarksexporter import BookmarksTopicExporter
-
-            # some changes could be done externally. Through apache.
-            from django.core.cache import cache
-            cache.clear()
-
             topic = obj.subject
 
             c = Configuration.get_object()
@@ -926,6 +921,7 @@ class CleanupJobHandler(BaseJobHandler):
                 UserConfig.cleanup()
                 SourceExportHistory.cleanup()
                 ModelFiles.cleanup()
+                SystemOperation.cleanup()
 
                 self.user_tables_cleanup()
 

@@ -59,7 +59,7 @@ class ConfigurationEntry(models.Model):
         help_text="Debug mode allows to see errors more clearly",
     )  # True if celery is defined, and used
 
-    use_robots_txt = models.BooleanField(
+    respect_robots_txt = models.BooleanField(
         default=True,
         help_text="Use robots.txt information. Some functionality can not work: for example YouTube channels",
     )  # True if celery is defined, and used
@@ -161,6 +161,10 @@ class ConfigurationEntry(models.Model):
 
     prefer_https = models.BooleanField(
         default=True, help_text="Https is preferred. If update takes place, and https is available, we upgrade link."
+    )
+
+    prefer_non_www_sites = models.BooleanField(
+        default=False, help_text="Non www sites are preferred. If update takes place www links could be replaced with clean links without it."
     )
 
     number_of_update_entries = models.IntegerField(
@@ -334,10 +338,21 @@ class SystemOperation(models.Model):
         all_entries = SystemOperation.objects.filter(date_created__isnull = True)
         all_entries.delete()
 
-        now = DateUtils.get_datetime_now_utc() - timedelta(seconds=60*60)
+        thread_ids = SystemOperation.get_thread_ids()
+        for thread_id in thread_ids:
+            # leave one entry with time check
+            all_entries = SystemOperation.objects.filter(thread_id = thread_id, is_internet_connection_checked = True)
+            if all_entries.exists() and all_entries.count() > 1:
+                entries = all_entries[1:]
+                for entry in entries:
+                    entry.delete()
 
-        all_entries = SystemOperation.objects.filter(date_created__lt = now)
-        all_entries.delete()
+            # leave one entry without time check
+            all_entries = SystemOperation.objects.filter(thread_id = thread_id, is_internet_connection_checked = False)
+            if all_entries.exists() and all_entries.count() > 1:
+                entries = all_entries[1:]
+                for entry in entries:
+                    entry.delete()
 
     def is_internet_ok():
         entries = SystemOperation.objects.filter(is_internet_connection_checked = True)

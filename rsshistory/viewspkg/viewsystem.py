@@ -572,19 +572,6 @@ Other
 """
 
 
-def reset_cache(request):
-    p = ViewPage(request)
-    p.set_title("Reset cache")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
-
-    from django.core.cache import cache
-    cache.clear()
-
-    return HttpResponseRedirect(reverse("{}:admin-page".format(LinkDatabase.name)))
-
-
 def page_show_properties(request):
     p = ViewPage(request)
     p.set_title("Show page properties")

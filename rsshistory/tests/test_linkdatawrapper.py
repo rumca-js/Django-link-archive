@@ -439,7 +439,7 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         self.assertEqual(archived[1].domain_obj, domains[0])
         self.assertEqual(archived[1].date_published, date_to_remove)
 
-    def test_get_operational_db(self):
+    def test_get_from_db__linkdatacontroller(self):
         conf = Configuration.get_object().config_entry
         conf.days_to_move_to_archive = 2
         conf.days_to_remove_links = 2
@@ -447,7 +447,7 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         conf.prefer_https = True
         conf.save()
 
-        ob = LinkDataController.objects.create(
+        LinkDataController.objects.create(
             source="https://youtube.com",
             link="https://youtube.com?v=1",
             title="The https link",
@@ -455,7 +455,7 @@ class LinkDataWrapperTest(FakeInternetTestCase):
             language="en",
         )
 
-        ob = LinkDataController.objects.create(
+        LinkDataController.objects.create(
             source="http://youtube.com",
             link="http://youtube.com?v=1",
             title="The http link",
@@ -463,7 +463,7 @@ class LinkDataWrapperTest(FakeInternetTestCase):
             language="en",
         )
 
-        ob = ArchiveLinkDataController.objects.create(
+        ArchiveLinkDataController.objects.create(
             source="https://archive.com",
             link="https://archive.com?v=1",
             title="The archive https link",
@@ -471,7 +471,7 @@ class LinkDataWrapperTest(FakeInternetTestCase):
             language="en",
         )
 
-        ob = ArchiveLinkDataController.objects.create(
+        ArchiveLinkDataController.objects.create(
             source="http://archive.com",
             link="http://archive.com?v=1",
             title="The archive http link",
@@ -479,24 +479,30 @@ class LinkDataWrapperTest(FakeInternetTestCase):
             language="en",
         )
 
-        # call tested function
         w = LinkDataWrapper(link="https://youtube.com?v=1")
-        entry = w.get_from_operational_db()
+        # call tested function
+        entry = w.get_from_db(LinkDataController.objects)
         self.assertTrue(entry)
         self.assertEqual(entry.link, "https://youtube.com?v=1")
 
-        # call tested function
         w = LinkDataWrapper(link="http://youtube.com?v=1")
-        entry = w.get_from_operational_db()
+        # call tested function
+        entry = w.get_from_db(LinkDataController.objects)
         self.assertTrue(entry)
         self.assertEqual(entry.link, "https://youtube.com?v=1")
 
+        w = LinkDataWrapper(link="http://www.youtube.com?v=1")
         # call tested function
+        entry = w.get_from_db(LinkDataController.objects)
+        self.assertTrue(entry)
+        self.assertEqual(entry.link, "https://youtube.com?v=1")
+
         w = LinkDataWrapper(link="https://archive.com?v=1")
-        entry = w.get_from_operational_db()
+        # call tested function
+        entry = w.get_from_db(LinkDataController.objects)
         self.assertTrue(not entry)
 
-    def test_get_archive(self):
+    def test_get_from_db__archivelinkdatacontroller(self):
         conf = Configuration.get_object().config_entry
         conf.days_to_move_to_archive = 2
         conf.days_to_remove_links = 2
@@ -536,15 +542,21 @@ class LinkDataWrapperTest(FakeInternetTestCase):
             language="en",
         )
 
-        # call tested function
         w = LinkDataWrapper(link="https://archive.com?v=1")
-        entry = w.get_from_archive()
+        # call tested function
+        entry = w.get_from_db(ArchiveLinkDataController.objects)
         self.assertTrue(entry)
         self.assertEqual(entry.link, "https://archive.com?v=1")
 
-        # call tested function
         w = LinkDataWrapper(link="http://archive.com?v=1")
-        entry = w.get_from_archive()
+        # call tested function
+        entry = w.get_from_db(ArchiveLinkDataController.objects)
+        self.assertTrue(entry)
+        self.assertEqual(entry.link, "https://archive.com?v=1")
+
+        w = LinkDataWrapper(link="http://www.archive.com?v=1")
+        # call tested function
+        entry = w.get_from_db(ArchiveLinkDataController.objects)
         self.assertTrue(entry)
         self.assertEqual(entry.link, "https://archive.com?v=1")
 
@@ -607,8 +619,8 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         )
 
         # call tested function
-        result = LinkDataWrapper(entry=https_entry).check_https_http_protocol()
-        self.assertTrue(not result)
+        entry = LinkDataWrapper(entry=https_entry).check_https_http_protocol()
+        self.assertEqual(entry, https_entry)
 
         # function removed http link
 
@@ -634,10 +646,10 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         )
 
         # call tested function
-        result = LinkDataWrapper(entry=https_entry).check_https_http_protocol()
+        entry = LinkDataWrapper(entry=https_entry).check_https_http_protocol()
 
         # we do not move the thing
-        self.assertFalse(result)
+        self.assertEqual(entry, https_entry)
 
         # we still use https, if we have server reponse for it
 

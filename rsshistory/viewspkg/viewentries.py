@@ -19,8 +19,8 @@ from ..models import (
     UserEntryVisitHistory,
     UserSearchHistory,
     UserEntryTransitionHistory,
+    UserSearchHistory,
 )
-from ..models import UserSearchHistory
 from ..controllers import (
     LinkDataController,
     LinkDataWrapper,
@@ -41,15 +41,14 @@ from ..forms import (
     OmniSearchForm,
     OmniSearchWithArchiveForm,
 )
-from ..queryfilters import EntryFilter
-from ..queryfilters import OmniSearchFilter
-from ..views import ViewPage
-from ..configuration import Configuration
-from ..webtools import Url, DomainAwarePage
-from ..pluginurl import UrlHandler
-from ..services import WaybackMachine
-from ..services import ReturnDislike
 from ..dateutils import DateUtils
+from ..views import ViewPage
+from ..queryfilters import EntryFilter, OmniSearchFilter
+from ..omnisearch import SingleSymbolEvaluator
+from ..configuration import Configuration
+from ..webtools import Url, DomainAwarePage, DomainCache
+from ..pluginurl import UrlHandler
+from ..services import WaybackMachine, ReturnDislike
 from ..serializers.instanceimporter import InstanceExporter
 from .plugins.entrypreviewbuilder import EntryPreviewBuilder
 
@@ -750,6 +749,8 @@ def add_simple_entry(request):
         page = DomainAwarePage(data["link"])
         domain = page.get_domain()
 
+        info = DomainCache.get_object(data["link"])
+
         if data["link"].find("http://") >= 0:
             warnings.append("Link is http. Https is more secure protocol")
         if data["link"].find("http://") == -1 and data["link"].find("https://") == -1:
@@ -758,6 +759,8 @@ def add_simple_entry(request):
             warnings.append("Link domain is not lowercase. Is that OK?")
         if data["status_code"] < 200 or data["status_code"] > 300:
             errors.append("Information about page availability could not be obtained")
+        if info and not info.is_allowed(data["link"]):
+            warnings.append("Link is not allowed by site robots.txt")
 
         p.context["notes"] = notes
         p.context["warnings"] = warnings
@@ -1052,6 +1055,8 @@ def entries_omni_search_init(request):
 
     search_term = get_search_term_request(request)
     p.context["search_term"] = search_term
+    p.context["entry_query_names"] = LinkDataController.get_query_names()
+    p.context["entry_query_operators"] = SingleSymbolEvaluator().get_operators()
     p.context["search_engines"] = SearchEngines(search_term)
 
     return p.render("form_search_omni.html")
