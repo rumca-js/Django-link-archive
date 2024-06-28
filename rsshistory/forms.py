@@ -53,7 +53,7 @@ class UserRequest(object):
         if self.request:
             from .views import ViewPage
 
-            self.is_mobile = ViewPage.is_mobile(self.request)
+            self.is_mobile = ViewPage(self.request).is_mobile()
             self.user = self.request.user
 
     def pop_data(self, args, kwargs, data):
@@ -85,10 +85,12 @@ class ConfigForm(forms.ModelForm):
         model = ConfigurationEntry
         fields = [
             # important
+            "instance_title",
+            "instance_description",
+            "admin_user",
             "background_task",
             "ssl_verification",
             "access_type",
-            "admin_user",
             "data_export_path",
             "data_import_path",
             #

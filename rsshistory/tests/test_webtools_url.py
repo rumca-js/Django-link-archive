@@ -248,4 +248,5 @@ class UrlTest(FakeInternetTestCase):
         self.assertTrue(domain_info)
         self.assertEqual(domain_info.url, "https://robots-txt.com")
         self.assertTrue(domain_info.is_allowed("https://robots-txt.com/any"))
-        self.assertFalse(domain_info.is_allowed("https://robots-txt.com/admin"))
+        self.assertFalse(domain_info.is_allowed("https://robots-txt.com/admin/"))
+        self.assertTrue(domain_info.is_allowed("https://robots-txt.com/admin"))

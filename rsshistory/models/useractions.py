@@ -296,6 +296,10 @@ class UserVotes(models.Model):
         for vote in votes:
             dst_votes = UserVotes.objects.filter(entry_object = destination_entry, user_object = vote.user_object, vote = vote.vote)
             if dst_votes.exists():
+                dst_vote = dst_votes[0]
+                dst_vote.vote = max(dst_vote.vote, vote.vote)
+                dst_vote.save()
+
                 vote.delete()
                 continue
 

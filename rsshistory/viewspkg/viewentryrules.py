@@ -17,14 +17,14 @@ class EntryRuleListView(generic.ListView):
     def get(self, *args, **kwargs):
         p = ViewPage(self.request)
         data = p.check_access()
-        if data:
+        if data is not None:
             return redirect("{}:missing-rights".format(LinkDatabase.name))
         return super().get(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
         context = super().get_context_data(**kwargs)
-        context = ViewPage.init_context(self.request, context)
+        context = ViewPage(self.request).init_context(context)
 
         return context
 
@@ -33,10 +33,23 @@ class EntryRuleDetailView(generic.DetailView):
     model = EntryRule
     context_object_name = "object_detail"
 
+    def get(self, *args, **kwargs):
+        """
+        API: Used to redirect if user does not have rights
+        """
+
+        p = ViewPage(self.request)
+        data = p.check_access()
+        if data is not None:
+            return redirect("{}:missing-rights".format(LinkDatabase.name))
+
+        view = super().get(*args, **kwargs)
+        return view
+
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
         context = super().get_context_data(**kwargs)
-        context = ViewPage.init_context(self.request, context)
+        context = ViewPage(self.request).init_context(context)
 
         context["page_title"] += " {} entry rule".format(self.object.rule_name)
 

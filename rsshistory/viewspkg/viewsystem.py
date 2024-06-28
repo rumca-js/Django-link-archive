@@ -4,6 +4,7 @@ import logging
 from django.views import generic
 from django.urls import reverse
 from django.http import HttpResponseForbidden, HttpResponseRedirect
+from django.shortcuts import redirect
 
 from ..apps import LinkDatabase
 from ..models import (
@@ -46,13 +47,20 @@ from ..forms import (
 )
 from ..views import ViewPage
 from ..pluginurl.urlhandler import UrlHandler
-from ..webtools import ContentLinkParser, RssPage
+from ..webtools import ContentLinkParser, RssPage, DomainCache
 
 
 def index(request):
     p = ViewPage(request)
     p.set_title("Index")
-    return p.render("index.html")
+    if p.is_user_allowed(ConfigurationEntry.ACCESS_TYPE_ALL):
+        return redirect("{}:entries-omni-search-init".format(LinkDatabase.name))
+    else:
+        exports = DataExport.get_public_export_names()
+        p.context["public_exports"] = exports
+
+        # we forcefully display about page. Always. It is a feature.
+        return p.render_implementation("about.html")
 
 
 """
@@ -136,7 +144,10 @@ Status views
 def about(request):
     p = ViewPage(request)
     p.set_title("About")
-    return p.render("about.html")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
+
+    # we forcefully display about page. Always. It is a feature.
+    return p.render_implementation("about.html")
 
 
 def missing_rights(request):
@@ -172,7 +183,8 @@ def system_status(request):
 
     u = EntriesUpdater()
     entries = u.get_entries_to_update()
-    p.context["LinkDataModel_toupdate"] = entries.count()
+    if entries:
+        p.context["LinkDataModel_toupdate"] = entries.count()
 
     p.context["UserTags"] = UserTags.objects.count()
     p.context["UserVotes"] = UserVotes.objects.count()
@@ -193,11 +205,28 @@ def system_status(request):
     now = c.get_local_time(DateUtils.get_datetime_now_utc())
     p.context["DateTime_Current"] = now
 
+    current_time = DateUtils.get_datetime_now_utc()
+
     conf = c.config_entry
     if conf.days_to_move_to_archive != 0:
-        current_time = DateUtils.get_datetime_now_utc()
         days_before = current_time - timedelta(days=conf.days_to_move_to_archive)
-        p.context["DateTime_MoveToArchive"] = c.get_local_time(days_before)
+        p.context["days_to_move_to_archive"] = c.get_local_time(days_before)
+
+    if conf.days_to_remove_links != 0:
+        days_before = current_time - timedelta(days=conf.days_to_remove_links)
+        p.context["days_to_remove_links"] = c.get_local_time(days_before)
+
+    if conf.days_to_remove_stale_entries != 0:
+        days_before = current_time - timedelta(days=conf.days_to_remove_stale_entries)
+        p.context["days_to_remove_stale_entries"] = c.get_local_time(days_before)
+
+    if conf.days_to_check_std_entries != 0:
+        days_before = current_time - timedelta(days=conf.days_to_check_std_entries)
+        p.context["days_to_check_std_entries"] = c.get_local_time(days_before)
+
+    if conf.days_to_check_stale_entries != 0:
+        days_before = current_time - timedelta(days=conf.days_to_check_stale_entries)
+        p.context["days_to_check_stale_entries"] = c.get_local_time(days_before)
 
     p.context["AppLogging"] = AppLogging.objects.count()
     p.context["Domains"] = Domains.objects.count()
@@ -218,14 +247,14 @@ class AppLoggingView(generic.ListView):
     def get(self, *args, **kwargs):
         p = ViewPage(self.request)
         data = p.check_access()
-        if data:
+        if data is not None:
             return redirect("{}:missing-rights".format(LinkDatabase.name))
         return super(AppLoggingView, self).get(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
         context = super(AppLoggingView, self).get_context_data(**kwargs)
-        context = ViewPage.init_context(self.request, context)
+        context = ViewPage(self.request).init_context(context)
         context["page_title"] += " Logs"
 
         return context
@@ -294,14 +323,14 @@ class BackgroundJobsView(generic.ListView):
     def get(self, *args, **kwargs):
         p = ViewPage(self.request)
         data = p.check_access()
-        if data:
+        if data is not None:
             return redirect("{}:missing-rights".format(LinkDatabase.name))
         return super(BackgroundJobsView, self).get(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
         context = super(BackgroundJobsView, self).get_context_data(**kwargs)
-        context = ViewPage.init_context(self.request, context)
+        context = ViewPage(self.request).init_context(context)
 
         context["BackgroundJob"] = BackgroundJob.objects.count()
         context["page_title"] += " Jobs"
@@ -593,6 +622,7 @@ def page_show_properties(request):
         p.context["page_handler"] = page_handler
         p.context["response_object"] = page_handler.response
         p.context["page_object_type"] = str(type(page_object))
+        p.context["is_link_allowed"] = DomainCache.get_object(page_link).is_allowed(page_link)
 
         return p.render("show_page_props.html")
 
@@ -792,6 +822,8 @@ def page_process_contents(request):
 
             summary = "Added: "
 
+            summary += "<ul>"
+
             all_props = reader.get_container_elements()
             for index, prop in enumerate(all_props):
                 prop["link"] = UrlHandler.get_cleaned_link(prop["link"])
@@ -804,9 +836,11 @@ def page_process_contents(request):
                 entry = b.add_from_props()
 
                 if entry:
-                    summary += "<a href='{}'>{}:{}</a>,".format(
+                    summary += "<li><a href='{}'>{}:{}</a></li>".format(
                         entry.get_absolute_url(), prop["link"], prop["title"]
                     )
+
+            summary += "</ul>"
 
             p.context["summary_text"] = summary
             return p.render("summary_present.html")

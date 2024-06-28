@@ -25,7 +25,7 @@ app_name = str(LinkDatabase.name)
 
 # fmt: off
 urlpatterns = [
-    path("", viewentries.entries_omni_search_init, name="index"),
+    path("", viewsystem.index, name="index"),
     # sources
     path("sources/", viewsources.SourceListView.as_view(), name="sources"),
     path("source/<int:pk>/", viewsources.SourceDetailView.as_view(), name="source-detail"),

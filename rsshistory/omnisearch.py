@@ -235,6 +235,7 @@ class OmniSearch(object):
     def __init__(self, search_query, evaluator):
         self.search_query = search_query
         self.query_result = None
+        self.errors = []
 
         self.symbol_evaluator = evaluator
         self.processor = OmniSymbolProcessor(self.search_query, self.symbol_evaluator)

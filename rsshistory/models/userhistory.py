@@ -242,7 +242,10 @@ class UserEntryTransitionHistory(models.Model):
         for transition in transitions:
             dst_transitions = UserEntryTransitionHistory.objects.filter(entry_from = destination_entry, user_object = transition.user_object)
             if dst_transitions.exists():
-                dst_transitions[0].counter += transition.counter
+                dst_transition = dst_transitions[0]
+                dst_transition.counter += transition.counter
+                dst_transition.save()
+
                 transition.delete()
                 continue
 
@@ -253,7 +256,10 @@ class UserEntryTransitionHistory(models.Model):
         for transition in transitions:
             dst_transitions = UserEntryTransitionHistory.objects.filter(entry_to = destination_entry, user_object = transition.user_object)
             if dst_transitions.exists():
-                dst_transitions[0].counter += transition.counter
+                dst_transition = dst_transitions[0]
+                dst_transition.counter += transition.counter
+                dst_transition.save()
+
                 transition.delete()
                 continue
 
@@ -436,9 +442,12 @@ class UserEntryVisitHistory(models.Model):
         for visit in visits:
             dst_visits = UserEntryVisitHistory.objects.filter(entry_object = destination_entry, user_object = visit.user_object)
             if dst_visits.exists():
-                dst_visits.visits += visit.visits
-                if visit.date_last_visit > dst_visits.date_last_visit:
-                    dst_visits.date_last_visit = visit.date_last_visit
+                dst_visit = dst_visits[0]
+                dst_visit.visits += visit.visits
+                if visit.date_last_visit > dst_visit.date_last_visit:
+                    dst_visit.date_last_visit = visit.date_last_visit
+                dst_visit.save()
+
                 visit.delete()
                 continue
 

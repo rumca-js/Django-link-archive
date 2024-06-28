@@ -1,7 +1,7 @@
 <h1>HTML Page properties</h1>
 
 <ul>
-    <li>Link: {{page_object.url}} <a href="{{page_object.url}}">Link</a></li>
+    <li>Link: <a href="{{page_object.url}}">{{page_object.url}}</a></li>
     <li>Detected page type: {{page_object_type}}</li>
     <li>Status code: {{response_object.status_code}}</li>
     <li>Encoding: {{response_object.encoding}}</li>
@@ -14,10 +14,10 @@
     <li>Author: {{page_object.get_author}}</li>
     <li>Page Rating: {{page_object.get_page_rating}}. Described by <a href="https://github.com/rumca-js/Django-link-archive">Django link archive Readme</a></li>
     {%if page_object.get_thumbnail %}
-    <li>thumbnail: <a href="{{page_object.get_thumbnail}}"/>Link</a></li>
+    <li>thumbnail: <a href="{{page_object.get_thumbnail}}"/>{{page_object.get_thumbnail}}</a></li>
     {%endif %}
     {%for favicon in page_object.get_favicons %}
-    <li>Favicon: {{favicon}} <a href="{{favicon}}">favicon</a></li>
+    <li>Favicon: <a href="{{favicon}}">{{favicon}}</a></li>
     {%endfor%}
     <li>Contents length: {{contents_length}}.
         {% if contents_length == 0 %}
@@ -46,23 +46,24 @@
     <li>og:site_name: {{page_object.get_og_site_name}}</li>
     <li>og:locale: {{page_object.get_og_locale}}</li>
     {%if page_object.get_og_image %}
-    <li>og:image: <a href="{{page_object.get_og_image}}"/>Link</a></li>
+    <li>og:image: <a href="{{page_object.get_og_image}}"/>{{page_object.get_og_image}}</a></li>
     {%endif %}
     <li>keywords: {{page_object.get_tags}}</li>
 
     {%if page_handler.get_robots_txt_url %}
-    <li>Robots txt URL: {{page_handler.get_robots_txt_url}} <a href="{{page_handler.get_robots_txt_url}}">Link</a></li>
+    <li>Robots txt URL: <a href="{{page_handler.get_robots_txt_url}}">{{page_handler.get_robots_txt_url}}</a></li>
     {% endif %}
     {%for site_map in page_handler.get_site_maps_urls %}
-        <li>Site map: {{site_map}} <a href="{{site_map}}">Link</a>
+        <li>Site map: <a href="{{site_map}}">{{site_map}}</a>
     {%endfor%}
+    <li>Allowed by robots.txt? {{is_link_allowed}}</li>
 
     {%for link in link_inner %}
-    <li>Link inner: {{link}} <a href="{{link}}">Link</a></li>
+    <li>Link inner: <a href="{{link}}">{{link}}</a></li>
     {%endfor%}
 
     {%for link in link_outer %}
-    <li>Link outer: {{link}} <a href="{{link}}">Link</a></li>
+    <li>Link outer: {{link}} <a href="{{link}}">{{link}}</a></li>
     {%endfor%}
 
     <li>Selenium: {{page_handler.options.is_selenium}}</li>

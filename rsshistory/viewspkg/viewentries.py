@@ -105,7 +105,7 @@ class EntriesSearchListView(generic.ListView):
 
         p = ViewPage(self.request)
         data = p.check_access()
-        if data:
+        if data is not None:
             return redirect("{}:missing-rights".format(LinkDatabase.name))
 
         print("EntriesSearchListView:get constructor of list view")
@@ -142,7 +142,7 @@ class EntriesSearchListView(generic.ListView):
         # Call the base implementation first to get the context
         context = super().get_context_data(**kwargs)
 
-        context = ViewPage.init_context(self.request, context)
+        context = ViewPage(self.request).init_context(context)
         # Create any data and add it to the context
         self.init_display_type(context)
 
@@ -525,10 +525,23 @@ class EntriesArchiveListView(EntriesSearchListView):
 class EntryDetailView(generic.DetailView):
     model = LinkDataController
 
+    def get(self, *args, **kwargs):
+        """
+        API: Used to redirect if user does not have rights
+        """
+
+        p = ViewPage(self.request)
+        data = p.check_access()
+        if data is not None:
+            return redirect("{}:missing-rights".format(LinkDatabase.name))
+
+        view = super().get(*args, **kwargs)
+        return view
+
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
         context = super().get_context_data(**kwargs)
-        context = ViewPage.init_context(self.request, context)
+        context = ViewPage(self.request).init_context(context)
 
         self.set_visited()
 
@@ -575,7 +588,7 @@ class EntryArchivedDetailView(generic.DetailView):
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
         context = super().get_context_data(**kwargs)
-        context = ViewPage.init_context(self.request, context)
+        context = ViewPage(self.request).init_context(context)
 
         if self.object.language == None:
             self.object.update_language()
@@ -590,6 +603,19 @@ class EntryArchivedDetailView(generic.DetailView):
         context["archive_org_date"] = m.get_formatted_date(DateUtils.get_date_today())
 
         return context
+
+    def get(self, *args, **kwargs):
+        """
+        API: Used to redirect if user does not have rights
+        """
+
+        p = ViewPage(self.request)
+        data = p.check_access()
+        if data is not None:
+            return redirect("{}:missing-rights".format(LinkDatabase.name))
+
+        view = super().get(*args, **kwargs)
+        return view
 
 
 def add_entry(request):

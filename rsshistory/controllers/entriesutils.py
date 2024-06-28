@@ -581,10 +581,14 @@ class EntryUpdater(object):
 
 class EntriesUpdater(object):
     def get_entries_to_update(self):
+        """
+        TODO implemented different way of handling normal vs dead entries. Methods belo should be used
+        TODO probably this method should be removed
+        """
         c = Configuration.get_object()
         conf = c.config_entry
 
-        if conf.days_to_check_stale_entries == 0:
+        if conf.days_to_check_std_entries == 0:
             return
 
         date_to_check = DateUtils.get_datetime_now_utc() - timedelta(
@@ -600,6 +604,56 @@ class EntriesUpdater(object):
 
         entries = LinkDataController.objects.filter(
             condition_days_to_check | condition_update_null
+        ).order_by("date_update_last", "link")
+
+        return entries
+
+    def get_std_entries_to_update(self):
+        c = Configuration.get_object()
+        conf = c.config_entry
+
+        if conf.days_to_check_std_entries == 0:
+            return
+
+        date_to_check = DateUtils.get_datetime_now_utc() - timedelta(
+            days=conf.days_to_check_std_entries
+        )
+
+        condition_days_to_check = Q(date_update_last__lt=date_to_check)
+        condition_update_null = Q(date_update_last__isnull=True)
+        condition_not_dead = Q(date_dead_since__isnull=True)
+
+        # we also update page if it is voted to be below 0
+        # we need to have up-to-date info if pages go out of the business
+        # we may change design to update it less often
+
+        entries = LinkDataController.objects.filter(
+            (condition_days_to_check | condition_update_null) & condition_not_dead
+        ).order_by("date_update_last", "link")
+
+        return entries
+
+    def get_stale_entries_to_update(self):
+        c = Configuration.get_object()
+        conf = c.config_entry
+
+        if conf.days_to_remove_stale_entries == 0:
+            return
+
+        date_to_check = DateUtils.get_datetime_now_utc() - timedelta(
+            days=conf.days_to_remove_stale_entries
+        )
+
+        condition_days_to_check = Q(date_update_last__lt=date_to_check)
+        condition_update_null = Q(date_update_last__isnull=True)
+        condition_dead = Q(date_dead_since__isnull=False)
+
+        # we also update page if it is voted to be below 0
+        # we need to have up-to-date info if pages go out of the business
+        # we may change design to update it less often
+
+        entries = LinkDataController.objects.filter(
+            (condition_days_to_check | condition_update_null) & condition_dead
         ).order_by("date_update_last", "link")
 
         return entries
@@ -1078,7 +1132,7 @@ class LinkDataWrapper(object):
         destination_entry = w.get()
 
         if not destination_entry:
-            p = BasePage(url = destination_entry.link)
+            p = BasePage(url = destination_link)
             if p.ping():
                 entry.link = destination_link
                 entry.save()
@@ -1092,6 +1146,8 @@ class LinkDataWrapper(object):
                 return entry
 
     def move_entry(self, source_entry, destination_entry):
+        from ..models import UserTags, UserVotes, LinkCommentDataModel, UserBookmarks, UserEntryVisitHistory, UserEntryTransitionHistory
+
         UserTags.move_entry(source_entry, destination_entry)
         UserVotes.move_entry(source_entry, destination_entry)
         LinkCommentDataModel.move_entry(source_entry, destination_entry)

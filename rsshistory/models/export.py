@@ -106,6 +106,18 @@ class DataExport(models.Model):
         else:
             return False
 
+    def get_public_export_names():
+        names = []
+
+        exps = DataExport.objects.filter(
+            export_type=DataExport.EXPORT_TYPE_GIT, enabled=True
+        )
+
+        for exp in exps:
+            names.append(exp.remote_path)
+
+        return names
+
 
 class SourceExportHistory(models.Model):
     date = models.DateField(null=False)

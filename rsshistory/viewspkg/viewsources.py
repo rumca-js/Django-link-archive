@@ -23,7 +23,7 @@ from ..views import ViewPage
 from ..configuration import Configuration
 from ..webtools import Url, DomainAwarePage
 from ..pluginurl import UrlHandler
-from ..pluginsources import SourceGenericPlugin
+from ..pluginsources import SourceControllerBuilder
 from ..serializers.instanceimporter import InstanceExporter
 
 
@@ -57,7 +57,7 @@ class SourceListView(generic.ListView):
     def get(self, *args, **kwargs):
         p = ViewPage(self.request)
         data = p.check_access()
-        if data:
+        if data is not None:
             return redirect("{}:missing-rights".format(LinkDatabase.name))
         return super().get(*args, **kwargs)
 
@@ -76,7 +76,7 @@ class SourceListView(generic.ListView):
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
         context = super().get_context_data(**kwargs)
-        context = ViewPage.init_context(self.request, context)
+        context = ViewPage(self.request).init_context(context)
         # Create any data and add it to the context
 
         self.init_display_type(context)
@@ -114,12 +114,19 @@ class SourceListView(generic.ListView):
 class SourceDetailView(generic.DetailView):
     model = SourceDataController
 
+    def get(self, *args, **kwargs):
+        p = ViewPage(self.request)
+        data = p.check_access()
+        if data is not None:
+            return redirect("{}:missing-rights".format(LinkDatabase.name))
+        return super().get(*args, **kwargs)
+
     def get_context_data(self, **kwargs):
         from ..pluginsources.sourcecontrollerbuilder import SourceControllerBuilder
 
         # Call the base implementation first to get the context
         context = super().get_context_data(**kwargs)
-        context = ViewPage.init_context(self.request, context)
+        context = ViewPage(self.request).init_context(context)
 
         context["page_title"] = self.object.title
         context["page_thumbnail"] = self.object.favicon
@@ -582,14 +589,18 @@ def source_process_contents(request, pk):
 
         if form.is_valid():
             source_text = form.cleaned_data["body"]
-            p = SourceGenericPlugin(pk)
-            p.contents = source_text
-            p.check_for_data()
+            plugin = SourceControllerBuilder.get(pk)
+            plugin.contents = source_text
+            plugin.check_for_data()
+
+            p.context["summary_text"] = "Processed"
+            return p.render("summary_present.html")
         else:
             p.context["summary_text"] = "Form is invalid"
             return p.render("summary_present.html")
     else:
         form = ContentsForm(request=request)
+        form.method = "POST"
         p.context["form"] = form
 
         return p.render("form_basic.html")

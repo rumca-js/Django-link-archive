@@ -5,20 +5,33 @@
 Read more on project page <a href="https://github.com/rumca-js/Django-link-archive">https://github.com/rumca-js/Django-link-archive</a>
   </p>
 
-  It can be a personal
-  <ul>
-      <li>Link aggregator</li>
-      <li>RSS client</li>
-      <li>YouTube filter</li>
-      <li>Reddit</li>
-  </ul>
+  {% if not is_user_allowed %}
+  <p class="font-weight-bold">
+  You do not have permissions to access this site. Contact administrator.
+  </p>
+  {% endif %}
 
-  Notes:
-  <ul>
-  <li>I have not verified links agains malware, or viruses</li>
-  <li>Internet is dangerous</li>
-  <li>You can live in woods if you like</li>
-  </ul>
+  {% if public_exports %}
+  <div>
+    You can access exported data in the following locations:
+    <ul>
+  {% for public_export in public_exports %}
+     <li><a href="{{public_export}}">{{public_export}}</a></li>
+  {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  {% if is_user_allowed %}
+  <div>
+    Notes:
+    <ul>
+    <li>I have not verified links agains malware, or viruses</li>
+    <li>Internet is dangerous</li>
+    <li>You can live in woods if you like</li>
+    </ul>
+  </div>
+  {% endif %}
 
   <div>
   </div>

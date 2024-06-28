@@ -48,6 +48,20 @@ class ConfigurationEntry(models.Model):
     )
 
     # fmt: on
+    instance_title = models.CharField(
+        default="Personal Link Database",
+        max_length=500,
+        help_text='Instance title',
+    )
+
+    instance_description = models.CharField(
+        default="Personal Link Database. May work as link aggregator, may link as YouTube subscription filter.",
+        max_length=500,
+        help_text='Instance description',
+    )
+
+    # background tasks will add everything using this user name
+    admin_user = models.CharField(max_length=500, default="admin", blank=True)
 
     background_task = models.BooleanField(
         default=False,
@@ -209,8 +223,6 @@ class ConfigurationEntry(models.Model):
         null=True,
     )
 
-    # background tasks will add everything using this user name
-    admin_user = models.CharField(max_length=500, default="admin", blank=True)
 
     # User settings
 

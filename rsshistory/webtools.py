@@ -3408,10 +3408,13 @@ class DomainCache(object):
 
         thelist = []
         for domain in self.cache:
-            thelist.append([domain, self.cache["date"], self.cache["domain"]])
+            info = self.cache[domain]
+            thelist.append([domain, info["date"], info["domain"]])
 
-        thelist = thelist.sort(key=lambda x: x[1])
+        thelist.sort(key=lambda x: x[1])
         thelist = thelist[-self.cache_size: -1]
+
+        self.cache.clear()
 
         for item in thelist:
             self.cache[item[0]] = {"date" : item[1], "domain" : item[2]}

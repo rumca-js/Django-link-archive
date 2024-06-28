@@ -26,7 +26,7 @@ class DomainsListView(generic.ListView):
     def get(self, *args, **kwargs):
         p = ViewPage(self.request)
         data = p.check_access()
-        if data:
+        if data is not None:
             return redirect("{}:missing-rights".format(LinkDatabase.name))
         return super().get(*args, **kwargs)
 
@@ -48,7 +48,7 @@ class DomainsListView(generic.ListView):
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get the context
         context = super().get_context_data(**kwargs)
-        context = ViewPage.init_context(self.request, context)
+        context = ViewPage(self.request).init_context(context)
 
         self.init_display_type(context)
 
@@ -95,12 +95,25 @@ class DomainsDetailView(generic.DetailView):
     model = DomainsController
     context_object_name = "domain_detail"
 
+    def get(self, *args, **kwargs):
+        """
+        API: Used to redirect if user does not have rights
+        """
+
+        p = ViewPage(self.request)
+        data = p.check_access()
+        if data is not None:
+            return redirect("{}:missing-rights".format(LinkDatabase.name))
+
+        view = super().get(*args, **kwargs)
+        return view
+
     def get_context_data(self, **kwargs):
         from ..pluginsources.sourcecontrollerbuilder import SourceControllerBuilder
 
         # Call the base implementation first to get the context
         context = super().get_context_data(**kwargs)
-        context = ViewPage.init_context(self.request, context)
+        context = ViewPage(self.request).init_context(context)
 
         context["page_title"] += " {} domain".format(self.object.domain)
 
@@ -134,7 +147,7 @@ class DomainsByNameDetailView(generic.DetailView):
 
         # Call the base implementation first to get the context
         context = super().get_context_data(**kwargs)
-        context = ViewPage.init_context(self.request, context)
+        context = ViewPage(self.request).init_context(context)
 
         if self.object.domain:
             context["page_title"] += " {} domain".format(self.object.domain)

@@ -16,3 +16,5 @@ from .spotifyplugin import SpotifyPlugin
 from .sourceyoutubechannel import YouTubePlugin
 from .rssparserplugin import RssParserPlugin
 from .hackernewsparserplugin import HackerNewsParserPlugin
+
+from .sourcecontrollerbuilder import SourceControllerBuilder

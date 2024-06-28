@@ -16,32 +16,45 @@ from .webtools import HtmlPage, RssPage
 class ViewPage(object):
     def __init__(self, request):
         self.request = request
-        self.context = ViewPage.get_context(request)
         self.access_type = None
 
-    def init_context(request, context):
-        c = Configuration.get_object()
-        context.update(c.get_context())
+        self.context = None
+        self.context = self.get_context()
+
+    def init_context(self, context):
+        if self.is_user_allowed(self.access_type):
+            c = Configuration.get_object()
+            context.update(c.get_context())
+
+            context["is_user_allowed"] = True
+        else:
+            context.update(Configuration.get_context_minimal())
+            context["is_user_allowed"] = False
 
         if "page_description" not in context:
             if "app_description" in context:
                 context["page_description"] = context["app_description"]
 
-        context["user_config"] = UserConfig.get(request.user)
-
-        context["is_mobile"] = ViewPage.is_mobile(request)
+        context["user_config"] = UserConfig.get(self.request.user)
+        context["is_mobile"] = self.is_mobile()
 
         return context
 
-    def is_mobile(request):
+    def is_mobile(self):
         from django_user_agents.utils import get_user_agent
 
-        user_agent = get_user_agent(request)
+        user_agent = get_user_agent(self.request)
         return user_agent.is_mobile
 
-    def get_context(request=None):
+    def get_context(self, request=None):
+        if self.context is not None:
+            return self.context
+
         context = {}
-        context = ViewPage.init_context(request, context)
+        context = self.init_context(context)
+
+        self.context = context
+
         return context
 
     def set_title(self, title):
@@ -56,46 +69,60 @@ class ViewPage(object):
         self.context[variable_name] = variable_value
 
     def check_access(self):
-        if self.access_type:
-            if (
-                self.access_type == ConfigurationEntry.ACCESS_TYPE_OWNER
-                and not self.request.user.is_superuser
-            ):
-                return self.render_implementation("missing_rights.html", 500)
-            if (
-                self.access_type == ConfigurationEntry.ACCESS_TYPE_STAFF
-                and not self.request.user.is_staff
-            ):
-                return self.render_implementation("missing_rights.html", 500)
-            if (
-                self.access_type == ConfigurationEntry.ACCESS_TYPE_LOGGED
-                and not self.request.user.is_authenticated
-            ):
-                return self.render_implementation("missing_rights.html", 500)
+        if not self.is_user_allowed(self.access_type):
+            return self.render_implementation("missing_rights.html", 500)
 
+    def is_user_allowed(self, access_type):
+        if not self.is_user_allowed_on_page_level(self.access_type):
+            return False
+
+        if not self.is_user_allowed_on_system_level():
+            return False
+
+        return True
+
+    def is_user_allowed_on_page_level(self, access_type):
+        if (
+            access_type == ConfigurationEntry.ACCESS_TYPE_OWNER
+            and not self.request.user.is_superuser
+        ):
+            return False
+        if (
+            access_type == ConfigurationEntry.ACCESS_TYPE_STAFF
+            and not self.request.user.is_staff
+        ):
+            return False
+        if (
+            access_type == ConfigurationEntry.ACCESS_TYPE_LOGGED
+            and not self.request.user.is_authenticated
+        ):
+            return False
+
+        return True
+
+    def is_user_allowed_on_system_level(self):
         config = Configuration.get_object().config_entry
         if (
             config.access_type == ConfigurationEntry.ACCESS_TYPE_OWNER
             and not self.request.user.is_superuser
         ):
-            return self.render_implementation("missing_rights.html", 500)
+            return False
         if (
             config.access_type == ConfigurationEntry.ACCESS_TYPE_LOGGED
             and not self.request.user.is_authenticated
         ):
-            return self.render_implementation("missing_rights.html", 500)
+            return False
+
+        return True
 
     def get_full_template(template):
         return Path(LinkDatabase.name) / template
 
     def render_implementation(self, template, status_code=200):
-        if self.context is None:
-            self.context = self.get_context(self.request)
-
         return render(
             self.request,
             Path(LinkDatabase.name) / template,
-            self.context,
+            self.get_context(),
             status=status_code,
         )
 

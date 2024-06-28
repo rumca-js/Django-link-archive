@@ -1,3 +1,4 @@
+import traceback
 from django.db.models import Q
 from django.utils.http import urlencode
 
@@ -24,7 +25,7 @@ class BaseQueryFilter(object):
             self.use_archive_source = False
 
         self.user = user
-        self.error = False
+        self.errors = []
         self.filtered_objects = None
 
     def get_conditions(self):
@@ -60,7 +61,13 @@ class BaseQueryFilter(object):
         objects = self.get_objects()
 
         if conditions is not None:
-            return objects.filter(conditions)
+            try:
+                return objects.filter(conditions)
+            except Exception as E:
+                error_text = "{}\n{}".format(str(E), traceback.format_exc())
+
+                self.errors.append(error_text)
+                return objects.none()
         else:
             return objects.none()
 
@@ -92,7 +99,7 @@ class BaseQueryFilter(object):
         return [start, start + paginate_by]
 
     def is_error(self):
-        return self.error
+        return len(self.errors) > 0
 
     def get_filter_args_map(self):
         parameter_map = {}
@@ -140,7 +147,7 @@ class SourceFilter(BaseQueryFilter):
         q2 = self.get_omni_conditions()
 
         if q1 is None or q2 is None:
-            self.error = True
+            self.errors.append("Both queries are none")
 
         if q1:
             q &= q1
@@ -211,7 +218,7 @@ class EntryFilter(BaseQueryFilter):
         q3 = self.additional_condition
 
         if q1 is None or q2 is None:
-            self.error = True
+            self.errors.append("Both queries are none")
 
         if q1:
             q &= q1
@@ -404,7 +411,7 @@ class DomainFilter(BaseQueryFilter):
         q2 = self.get_omni_conditions()
 
         if q1 is None or q2 is None:
-            self.error = True
+            self.errors.append("Both queries are none")
 
         if q1:
             q &= q1
@@ -538,7 +545,7 @@ class OmniSearchWithDefault(OmniSearch):
             query = self.get_combined_query_simple()
 
         if query is None:
-            self.error = True
+            self.errors.append("Query is none")
             query = Q()
 
         return query
@@ -593,6 +600,8 @@ class OmniSearchFilter(BaseQueryFilter):
             return self.combined_query
 
         self.combined_query = self.parser.get_query_result()
+        self.errors.extend(self.parser.errors)
+
         return self.combined_query
 
     def get_objects(self):

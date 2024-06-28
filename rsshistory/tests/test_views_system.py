@@ -29,7 +29,8 @@ class SystemViewsTest(FakeInternetTestCase):
         url = reverse("{}:index".format(LinkDatabase.name))
         response = self.client.get(url)
 
-        self.assertEqual(response.status_code, 200)
+        # redirect to search
+        self.assertEqual(response.status_code, 302)
 
     def test_admin(self):
         url = reverse("{}:admin-page".format(LinkDatabase.name))

@@ -41,13 +41,29 @@ class Configuration(object):
         self.apply_user_agent()
         self.apply_robots_txt()
 
+    def get_context_minimal():
+        config_entry = ConfigurationEntry.get()
+        return {
+                "page_title": "[{}]".format(LinkDatabase.name),
+                "app_name": str(LinkDatabase.name),
+                "app_title": config_entry.instance_title,
+                "app_description": config_entry.instance_description,
+                "admin_email": "renegat@renegat0x0.ddns.net",
+                "admin_user": config_entry.admin_user,
+                "app_version": __version__,
+                "config": config_entry,
+                "base_generic": str(Path(LinkDatabase.name) / "base_generic.html"),
+                }
+
     def get_context(self):
         if len(self.context) == 0:
+            config_entry = ConfigurationEntry.get()
+
             self.context = {
                 "page_title": "[{}]".format(self.app_name),
                 "app_name": str(self.app_name),
-                "app_title": "Personal Link Database",
-                "app_description": "Personal Link Database. May work as link aggregator, may link as YouTube subscription filter.",
+                "app_title": config_entry.instance_title,
+                "app_description": config_entry.instance_description,
                 "admin_email": "renegat@renegat0x0.ddns.net",
                 "admin_user": self.config_entry.admin_user,
                 "app_version": self.version,
