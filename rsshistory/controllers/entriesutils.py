@@ -29,25 +29,56 @@ class EntriesCleanup(object):
     def __init__(self, archive_cleanup=False):
         self.archive_cleanup = archive_cleanup
 
-    def cleanup(self):
+    def cleanup(self, limit_s = 0):
+        start_processing_time = time.time()
+
+        if limit_s == 0:
+            limit_s = 60*10 # 10 minutes
+
         sources = SourceDataController.objects.all()
         for source in sources:
+            LinkDatabase.info("Removing for source:{}".format(source.title))
             entries = self.get_source_entries(source)
+
             if entries:
+                for entry in entries:
+                    LinkDatabase.info("Removing entry:{}".format(entry.link))
                 entries.delete()
+
+            passed_seconds = time.time() - start_processing_time
+            if passed_seconds >= limit_s:
+                LinkDatabase.info("Task exeeded time:{}".format(passed_seconds))
+                return False
 
         entries = self.get_general_entries()
         if entries:
+            for entry in entries:
+                LinkDatabase.info("Removing entry:{}".format(entry.link))
             entries.delete()
+
+            passed_seconds = time.time() - start_processing_time
+            if passed_seconds >= limit_s:
+                LinkDatabase.info("Task exeeded time:{}".format(passed_seconds))
+                return False
 
         if not self.archive_cleanup:
             entries = self.get_stale_entries()
             if entries:
+                for entry in entries:
+                    LinkDatabase.info("Removing entry:{}".format(entry.link))
                 entries.delete()
+
+                passed_seconds = time.time() - start_processing_time
+                if passed_seconds >= limit_s:
+                    LinkDatabase.info("Task exeeded time:{}".format(passed_seconds))
+                    return False
 
         self.cleanup_invalid_page_ratings()
 
     def get_source_entries(self, source):
+        """
+        Choose shorter date - configured, or source limit
+        """
         config = Configuration.get_object().config_entry
         config_days = config.days_to_remove_links
 
@@ -583,7 +614,6 @@ class EntriesUpdater(object):
     def get_entries_to_update(self):
         """
         TODO implemented different way of handling normal vs dead entries. Methods belo should be used
-        TODO probably this method should be removed
         """
         c = Configuration.get_object()
         conf = c.config_entry
@@ -997,11 +1027,15 @@ class LinkDataWrapper(object):
             LinkDatabase.info("Moving link to archive: {}".format(entry.link))
             LinkDataWrapper(entry=entry).move_to_archive()
 
-            if limit_s > 0:
-                passed_seconds = time.time() - start_processing_time
-                if passed_seconds >= 60 * 10:
-                    LinkDatabase.info("Task exeeded time:{}".format(passed_seconds))
-                    return False
+            if limit_s == 0:
+                limit_s = 60*10 # 10 minutes
+
+            passed_seconds = time.time() - start_processing_time
+            if passed_seconds >= limit_s:
+                LinkDatabase.info("Task exeeded time:{}".format(passed_seconds))
+                return False
+
+        return True
 
     def get_links_to_move_to_archive():
         conf = Configuration.get_object().config_entry
@@ -1584,14 +1618,14 @@ class EntryDataBuilder(object):
 
 
 class EntriesCleanupAndUpdate(object):
-    def cleanup(self):
+    def cleanup(self, limit_s = 0):
         cleanup = EntriesCleanup(archive_cleanup=False)
-        cleanup.cleanup()
+        cleanup.cleanup(limit_s)
         cleanup = EntriesCleanup(archive_cleanup=True)
-        cleanup.cleanup()
+        cleanup.cleanup(limit_s)
 
         # TODO Move to link wrapper
-        moved_all = LinkDataWrapper.move_old_links_to_archive()
+        moved_all = LinkDataWrapper.move_old_links_to_archive(limit_s)
 
         # indicate that all has been finished correctly
         return moved_all

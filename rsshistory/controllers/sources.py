@@ -80,6 +80,9 @@ class SourceDataController(SourceDataModel):
         return True
 
     def is_removeable(self):
+        """
+        TODO rename this function. is_days_to_remove_defined, or sth. This does not remove source.
+        """
         days = self.get_days_to_remove()
 
         if days > 0:

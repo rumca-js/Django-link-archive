@@ -903,16 +903,16 @@ class CleanupJobHandler(BaseJobHandler):
 
     def process(self, obj=None):
         try:
-            limit = 0
+            limit_s = 0
             try:
                 if obj is not None:
-                    limit = int(obj.subject)
+                    limit_s = int(obj.subject)
             except Exception as E:
                 LinkDatabase.info("Cleanup, cannot read limit value:{}".format(str(E)))
 
-            status = EntriesCleanupAndUpdate().cleanup()
+            status = EntriesCleanupAndUpdate().cleanup(limit_s)
 
-            if limit == 0:
+            if limit_s == 0:
                 SourceDataController.cleanup()
 
                 AppLogging.cleanup()
@@ -1082,6 +1082,8 @@ class RefreshThreadHandler(object):
 
         u = EntriesUpdater()
         entries = u.get_entries_to_update()
+        if not entries:
+            return
 
         number_of_entries = entries.count()
 
@@ -1274,10 +1276,17 @@ class HandlerManager(object):
         return []
 
     def on_not_safe_exit(self, items):
+        blocker = items[0]
+        if not blocker:
+            return
+
         jobs = BackgroundJobController.objects.filter(
             enabled=True, date_created__lt=self.start_processing_time
         )
         for job in jobs:
-            if job.priority > 0:
-                job.priority -= 1
-                job.save()
+            if job != blocker and job.priority > 0:
+                if job.priority > blocker.priority:
+                    job.priority = blocker.priority - 1
+                else:
+                    job.priority -= 1
+                    job.save()
