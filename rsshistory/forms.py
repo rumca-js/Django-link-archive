@@ -145,6 +145,7 @@ class ConfigForm(forms.ModelForm):
             "user_headers",
             "internet_test_page",
             "debug_mode",
+            "logging_level",
             "respect_robots_txt",
         ]
 

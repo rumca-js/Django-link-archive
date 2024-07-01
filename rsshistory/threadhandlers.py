@@ -258,12 +258,11 @@ class LinkDownloadJobHandler(BaseJobHandler):
 
     def process(self, obj=None):
         try:
-            item = LinkDataController.objects.filter(link=obj.subject)[0]
+            url = obj.subject
 
-            p = HtmlPage(item.link)
-            p.download_all()
+            Url.download_all(url)
 
-            AppLogging.info("Page has been downloaded:{}".format(item.link))
+            AppLogging.info("Page has been downloaded:{}".format(url))
 
             return True
         except Exception as e:
@@ -285,27 +284,31 @@ class LinkMusicDownloadJobHandler(BaseJobHandler):
 
     def process(self, obj=None):
         try:
-            item = LinkDataController.objects.filter(link=obj.subject)[0]
+            data = self.get_data(obj)
 
-            AppLogging.info("Downloading music: " + item.link + " " + item.title)
-            # TODO pass dir?
+            url = data["url"]
+            title = data["title"]
+            artist = data["artist"]
+            album = data["album"]
 
-            file_name = Path(str(item.artist)) / str(item.album) / item.title
-            file_name = str(file_name) + ".mp3"
-            file_name = fix_path_for_windows(file_name)
+            if not DomainAwarePage(url).is_youtube():
+                AppLogging.error("Unsupported download operation URL:{}".format(url))
+                return True
 
-            yt = ytdlp.YTDLP(item.link)
+            AppLogging.info("Downloading music: " + url + " " + title)
+
+            file_name = self.get_file_name(data)
+
+            yt = ytdlp.YTDLP(url)
             if not yt.download_audio(file_name):
                 AppLogging.error(
-                    "Could not download music: " + item.link + " " + item.title
+                    "Could not download music: " + url + " " + title
                 )
                 return
 
-            data = {"artist": item.artist, "album": item.album, "title": item.title}
-
             id3 = id3v2.Id3v2(file_name, data)
             id3.tag()
-            AppLogging.info("Downloading music done: " + item.link + " " + item.title)
+            AppLogging.info("Downloading music done: " + url + " " + title)
 
             return True
         except Exception as e:
@@ -316,6 +319,36 @@ class LinkMusicDownloadJobHandler(BaseJobHandler):
                 )
             )
             return True
+
+    def get_data(self, obj):
+        title = ""
+        artist = None
+        album = None
+
+        url = obj.subject
+
+        entries = LinkDataController.objects.filter(link=url)
+        if entries.exists():
+            entry = entries[0]
+            title = entry.title
+            artist = entry.artist
+            album = entry.album
+
+        data = {"artist": str(artist), "album": str(album), "title": str(title), "url" : url}
+
+        return data
+
+    def get_file_name(self, data):
+        file_name = Path(str(data["title"]) + ".mp3")
+        if data["album"]:
+            file_name = Path(data["album"]) / file_name
+
+        if data["artist"]:
+            file_name = Path(data["artist"]) / file_name
+
+        file_name = fix_path_for_windows(file_name)
+
+        return file_name
 
 
 class LinkVideoDownloadJobHandler(BaseJobHandler):
@@ -328,18 +361,29 @@ class LinkVideoDownloadJobHandler(BaseJobHandler):
 
     def process(self, obj=None):
         try:
-            item = LinkDataController.objects.filter(link=obj.subject)[0]
+            data = self.get_data(obj)
 
-            AppLogging.info("Downloading video: " + item.link + " " + item.title)
+            url = data["url"]
+            title = data["title"]
+            artist = data["artist"]
+            album = data["album"]
 
-            yt = ytdlp.YTDLP(item.link)
+            if not DomainAwarePage(url).is_youtube():
+                AppLogging.error("Unsupported download operation URL:{}".format(url))
+                return True
+
+            AppLogging.info("Downloading music: " + url + " " + title)
+
+            file_name = self.get_file_name(data)
+
+            yt = ytdlp.YTDLP(url)
             if not yt.download_video("file.mp4"):
                 AppLogging.error(
-                    "Could not download video: " + item.link + " " + item.title
+                    "Could not download video: " + url + " " + title
                 )
                 return
 
-            AppLogging.info("Downloading video done: " + item.link + " " + item.title)
+            AppLogging.info("Downloading video done: " + url + " " + title)
 
             return True
         except Exception as e:
@@ -350,6 +394,36 @@ class LinkVideoDownloadJobHandler(BaseJobHandler):
                 )
             )
             return True
+
+    def get_data(self, obj):
+        title = ""
+        artist = None
+        album = None
+
+        url = obj.subject
+
+        entries = LinkDataController.objects.filter(link=url)
+        if entries.exists():
+            entry = entries[0]
+            title = entry.title
+            artist = entry.artist
+            album = entry.album
+
+        data = {"artist": str(artist), "album": str(album), "title": str(title), "url" : url}
+
+        return data
+
+    def get_file_name(self, data):
+        file_name = Path(str(data["title"]) + ".mp3")
+        if data["album"]:
+            file_name = Path(data["album"]) / file_name
+
+        if data["artist"]:
+            file_name = Path(data["artist"]) / file_name
+
+        file_name = fix_path_for_windows(file_name)
+
+        return file_name
 
 
 class DownloadModelFileJobHandler(BaseJobHandler):

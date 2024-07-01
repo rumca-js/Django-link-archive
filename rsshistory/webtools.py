@@ -100,7 +100,7 @@ def date_str_to_date(date_str):
 
             error_text = traceback.format_exc()
 
-            AppLogging.error(
+            AppLogging.warning(
                 "Could not parse date:{}\nExc:{}\n{}\nStack:{}".format(
                     date_str, str(E), error_text, stack_str
                 )
@@ -1073,8 +1073,8 @@ class RssPageEntry(ContentInterface):
 
                 except Exception as e:
                     AppLogging.error(
-                        "Rss parser datetime invalid feed datetime:{};\nFeed DateTime:{};\nExc:{}\n".format(
-                            self.feed_entry.published, self.feed_entry.published, str(e)
+                        "RSS parser {} datetime invalid feed datetime:{};\nFeed DateTime:{};\nExc:{}\n".format(
+                            self.url, self.feed_entry.published, self.feed_entry.published, str(e)
                         )
                     )
                 return DateUtils.get_datetime_now_utc()
@@ -1875,12 +1875,6 @@ class HtmlPage(ContentInterface):
             return self
 
         return Page(self.get_domain())
-
-    def download_all(self):
-        from .programwrappers.wget import Wget
-
-        wget = Wget(self.url)
-        wget.download_all()
 
     def get_properties(self):
         props = super().get_properties()
@@ -2707,6 +2701,8 @@ class BasePage(object):
     """
     Should not contain any HTML/RSS content processing.
     This should be just a builder.
+
+    TODO rename HttpRequest
     """
 
     # use headers from https://www.supermonitoring.com/blog/check-browser-http-headers/
@@ -3001,10 +2997,6 @@ class Url(ContentInterface):
                 if not p.is_valid():
                     return
 
-        # right now we do not have handlers for anything else
-        elif not dap.is_web_link():
-            return
-
         if contents:
             if (
                 not self.response
@@ -3232,6 +3224,12 @@ class Url(ContentInterface):
     def get_domain_info(self):
         return DomainCache.get_object(self.url)
 
+    def download_all(url):
+        from .programwrappers.wget import Wget
+
+        wget = Wget(url)
+        wget.download_all()
+
 
 class DomainCacheInfo(object):
     """
@@ -3386,6 +3384,9 @@ class DomainCache(object):
         return DomainCache.object.get_domain_info(domain_url)
 
     def __init__(self, cache_size = 400, respect_robots_txt = True):
+        """
+        @note Not public
+        """
         self.cache_size = cache_size
         self.cache = {}
         self.respect_robots_txt = respect_robots_txt

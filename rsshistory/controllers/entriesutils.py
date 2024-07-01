@@ -181,11 +181,9 @@ class EntryCleanup(object):
             return False
 
         if self.is_delete_by_config():
-            self.entry.delete()
             return True
 
         if self.is_stale_and_dead_permanently():
-            self.entry.delete()
             return True
 
         return False
@@ -595,6 +593,8 @@ class EntryUpdater(object):
         date = self.entry.date_dead_since
 
         if cleanup.is_delete_time():
+            self.entry.delete()
+
             AppLogging.info(
                 "Removed entry <a href='{}'>{}</a>. It was dead since {}.".format(
                     link, link, date
@@ -613,7 +613,9 @@ class EntryUpdater(object):
 class EntriesUpdater(object):
     def get_entries_to_update(self):
         """
-        TODO implemented different way of handling normal vs dead entries. Methods belo should be used
+        @note
+        Normal entries are checked with interval days_to_check_std_entries
+        Dead entries are checked with interval days_to_check_stale_entries
         """
         c = Configuration.get_object()
         conf = c.config_entry
@@ -621,69 +623,25 @@ class EntriesUpdater(object):
         if conf.days_to_check_std_entries == 0:
             return
 
-        date_to_check = DateUtils.get_datetime_now_utc() - timedelta(
+        date_to_check_std = DateUtils.get_datetime_now_utc() - timedelta(
             days=conf.days_to_check_std_entries
         )
-
-        condition_days_to_check = Q(date_update_last__lt=date_to_check)
-        condition_update_null = Q(date_update_last__isnull=True)
-
-        # we also update page if it is voted to be below 0
-        # we need to have up-to-date info if pages go out of the business
-        # we may change design to update it less often
-
-        entries = LinkDataController.objects.filter(
-            condition_days_to_check | condition_update_null
-        ).order_by("date_update_last", "link")
-
-        return entries
-
-    def get_std_entries_to_update(self):
-        c = Configuration.get_object()
-        conf = c.config_entry
-
-        if conf.days_to_check_std_entries == 0:
-            return
-
-        date_to_check = DateUtils.get_datetime_now_utc() - timedelta(
-            days=conf.days_to_check_std_entries
+        date_to_check_stale = DateUtils.get_datetime_now_utc() - timedelta(
+            days=conf.days_to_check_stale_entries
         )
 
-        condition_days_to_check = Q(date_update_last__lt=date_to_check)
-        condition_update_null = Q(date_update_last__isnull=True)
-        condition_not_dead = Q(date_dead_since__isnull=True)
+        condition_days_to_check_std = Q(date_update_last__lt=date_to_check_std)
+        condition_days_to_check_stale = Q(date_update_last__lt=date_to_check_stale)
 
-        # we also update page if it is voted to be below 0
-        # we need to have up-to-date info if pages go out of the business
-        # we may change design to update it less often
+        condition_not_dead = Q(date_dead_since__isnull=False)
+        condition_dead = Q(date_dead_since__isnull=True)
+
+        condition_update_null = Q(date_update_last__isnull=True)
 
         entries = LinkDataController.objects.filter(
-            (condition_days_to_check | condition_update_null) & condition_not_dead
-        ).order_by("date_update_last", "link")
-
-        return entries
-
-    def get_stale_entries_to_update(self):
-        c = Configuration.get_object()
-        conf = c.config_entry
-
-        if conf.days_to_remove_stale_entries == 0:
-            return
-
-        date_to_check = DateUtils.get_datetime_now_utc() - timedelta(
-            days=conf.days_to_remove_stale_entries
-        )
-
-        condition_days_to_check = Q(date_update_last__lt=date_to_check)
-        condition_update_null = Q(date_update_last__isnull=True)
-        condition_dead = Q(date_dead_since__isnull=False)
-
-        # we also update page if it is voted to be below 0
-        # we need to have up-to-date info if pages go out of the business
-        # we may change design to update it less often
-
-        entries = LinkDataController.objects.filter(
-            (condition_days_to_check | condition_update_null) & condition_dead
+             condition_update_null |
+             (condition_not_dead & condition_days_to_check_std) |
+             (condition_dead & condition_days_to_check_stale)
         ).order_by("date_update_last", "link")
 
         return entries
@@ -1250,7 +1208,7 @@ class EntryDataBuilder(object):
         link_data = url.get_props()
         if not link_data:
             if Configuration.get_object().config_entry.debug_mode:
-                AppLogging.error(
+                AppLogging.warning(
                     'Could not obtain properties for:<a href="{}">{}</a>'.format(
                         self.get_absolute_url(), self.link
                     )
@@ -1286,7 +1244,7 @@ class EntryDataBuilder(object):
         link_data = url.get_props()
         if not link_data:
             if Configuration.get_object().config_entry.debug_mode:
-                AppLogging.error(
+                AppLogging.warning(
                     'Could not obtain properties for:<a href="{}">{}</a>'.format(
                         self.link, self.link
                     )
@@ -1303,7 +1261,7 @@ class EntryDataBuilder(object):
             return self.add_from_props_internal()
         else:
             if Configuration.get_object().config_entry.debug_mode:
-                AppLogging.error(
+                AppLogging.warning(
                     'Could not obtain properties for:<a href="{}">{}</a>'.format(
                         self.link, self.link
                     )
@@ -1381,7 +1339,7 @@ class EntryDataBuilder(object):
         #    self.link_data["link"] = self.link_data["link"].lower()
 
         c = Configuration.get_object().config_entry
-        if self.is_domain_link_data() and c.accept_domains:
+        if self.is_domain_link_data() and c.accept_domains and c.keep_domains:
             if c.accept_domains:
                 self.link_data["permanent"] = True
 

@@ -10,6 +10,13 @@ class AppLoggingTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 
+    def test_debug(self):
+        AppLogging.objects.all().delete()
+        # call tested function
+        AppLogging.debug("debug")
+
+        self.assertEqual(AppLogging.objects.all().count(), 1)
+
     def test_info(self):
         AppLogging.objects.all().delete()
         # call tested function

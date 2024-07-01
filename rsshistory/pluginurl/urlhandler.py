@@ -352,9 +352,18 @@ class UrlPropertyValidator(object):
             or title.find("access denied") >= 0
             or title.find("site not found") >= 0
             or title.find("page not found") >= 0
+            or title.find("this page could not found") >= 0
             or title.find("404 not found") >= 0
+            or title.find("404: not found") >= 0
+            or title.find("404 not_found") >= 0
             or title.find("error 404") >= 0
+            or title.find("404 error") >= 0
+            or title.find("404 page") >= 0
+            or title.find("404 file not found") >= 0
             or title.find("squarespace - website expired") >= 0
+            or title.find("domain name for sale") >= 0
+            or title.find("account suspended") >= 0
+            or title.find("the request could not be satisfied") >= 0
         )
 
         if is_title_invalid:

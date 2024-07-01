@@ -1,9 +1,17 @@
   {% load static %}
 
+  {% if config.instance_title %}
+  <h1>{{config.instance_title}} [{{app_name}}]</h1>
+  {% else %}
   <h1>Personal Link Database [{{app_name}}]</h1>
-  <p>This is a Personal Link Database.
-Read more on project page <a href="https://github.com/rumca-js/Django-link-archive">https://github.com/rumca-js/Django-link-archive</a>
+  {% endif %}
+
+  {% if config.instance_description %}
+  <p>{{config.instance_description}}
   </p>
+  {% else %}
+  <p>This is a Personal Link Database.</p>
+  {% endif %}
 
   {% if not is_user_allowed %}
   <p class="font-weight-bold">
@@ -32,6 +40,8 @@ Read more on project page <a href="https://github.com/rumca-js/Django-link-archi
     </ul>
   </div>
   {% endif %}
+
+  <a href="https://github.com/rumca-js/Django-link-archive">https://github.com/rumca-js/Django-link-archive</a></p>
 
   <div>
   </div>

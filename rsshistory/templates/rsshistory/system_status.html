@@ -22,16 +22,16 @@
       <li>Move to archive date: {{days_to_move_to_archive}}</li>
     {%endif%}
     {% if days_to_remove_links %}
-      <li>Remove links date: {{days_to_remove_links}}</li>
-    {%endif%}
-    {% if days_to_remove_stale_entries %}
-      <li>Remove stale links date: {{days_to_remove_stale_entries}}</li>
+      <li>Remove entries by date: {{days_to_remove_links}}</li>
     {%endif%}
     {% if days_to_check_std_entries %}
-      <li>Check std entries: {{days_to_check_std_entries}}</li>
+      <li>Normal entries are checked if older than: {{days_to_check_std_entries}}</li>
     {%endif%}
     {% if days_to_check_stale_entries %}
-      <li>Check stale entries: {{days_to_check_stale_entries}}</li>
+      <li>Dead entries are checked if older than: {{days_to_check_stale_entries}}</li>
+    {%endif%}
+    {% if days_to_remove_stale_entries %}
+      <li>Remove dead links before date: {{days_to_remove_stale_entries}}</li>
     {%endif%}
 </ul>
 

@@ -146,6 +146,17 @@ class DjangoSingleSymbolEvaluatorTest(FakeInternetTestCase):
         str_sym_data = str(sym_data)
         self.assertEqual(str_sym_data, "(AND: ('title__iexact', 'something'))")
 
+    def test_evauluate_symbol_no_space(self):
+        ev = DjangoSingleSymbolEvaluator()
+
+        ev.set_translation_mapping({"title": "title"})
+
+        # call tested function
+        sym_data = ev.evaluate_symbol("title==something")
+
+        str_sym_data = str(sym_data)
+        self.assertEqual(str_sym_data, "(AND: ('title__iexact', 'something'))")
+
     def test_evauluate_symbol_gte(self):
         ev = DjangoSingleSymbolEvaluator()
 

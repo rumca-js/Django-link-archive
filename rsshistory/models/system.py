@@ -73,6 +73,8 @@ class ConfigurationEntry(models.Model):
         help_text="Debug mode allows to see errors more clearly",
     )  # True if celery is defined, and used
 
+    logging_level = models.IntegerField(default=int(logging.INFO))
+
     respect_robots_txt = models.BooleanField(
         default=True,
         help_text="Use robots.txt information. Some functionality can not work: for example YouTube channels",
@@ -151,6 +153,10 @@ class ConfigurationEntry(models.Model):
     accept_ip_addresses = models.BooleanField(
         default=False,
         help_text="Accept IP addressed links, like //127.0.0.1/my/directory",
+    )
+
+    keep_domains = models.BooleanField(
+        default=False, help_text="If true domains will be made permanent"
     )
 
     enable_keyword_support = models.BooleanField(
@@ -530,8 +536,36 @@ class AppLogging(models.Model):
         TODO errors are not created exactly as we do commonly. Date shoudl be added via dateutils
         """
         try:
+            config = ConfigurationEntry.get()
+            if level < config.logging_level:
+                return
+
             # TODO replace hardcoded values with something better
             LinkDatabase.info("AppLogging::info:{}".format(info_text))
+
+            AppLogging.cleanup_overflow()
+
+            AppLogging.objects.create(
+                info_text=info_text,
+                level=level,
+                date=datetime.now(timezone("UTC")),
+                user=user,
+            )
+            return
+        except Exception as e:
+            LinkDatabase.info("AppLogging::info Exception {}".format(e))
+
+    def debug(info_text, level=int(logging.DEBUG), user=None):
+        """
+        TODO errors are not created exactly as we do commonly. Date shoudl be added via dateutils
+        """
+        try:
+            config = ConfigurationEntry.get()
+            if level < config.logging_level:
+                return
+
+            # TODO replace hardcoded values with something better
+            LinkDatabase.info("AppLogging::debug:{}".format(info_text))
 
             AppLogging.cleanup_overflow()
 
@@ -550,6 +584,10 @@ class AppLogging(models.Model):
         TODO errors are not created exactly as we do commonly. Date shoudl be added via dateutils
         """
         try:
+            config = ConfigurationEntry.get()
+            if level < config.logging_level:
+                return
+
             # TODO replace hardcoded values with something better
             LinkDatabase.info("AppLogging::warning:{}".format(info_text))
 
@@ -567,6 +605,10 @@ class AppLogging(models.Model):
 
     def error(info_text, level=int(logging.ERROR), user=None):
         try:
+            config = ConfigurationEntry.get()
+            if level < config.logging_level:
+                return
+
             LinkDatabase.info("AppLogging::error:{}".format(info_text))
 
             AppLogging.cleanup_overflow()
@@ -585,6 +627,10 @@ class AppLogging(models.Model):
         text = "{}. Exception data:\n{}".format(info_text, str(exc_data))
 
         try:
+            config = ConfigurationEntry.get()
+            if level < config.logging_level:
+                return
+
             LinkDatabase.info("AppLogging::exc:{}".format(info_text))
 
             AppLogging.cleanup_overflow()
@@ -598,25 +644,6 @@ class AppLogging(models.Model):
             return
         except Exception as e:
             LinkDatabase.info("AppLogging::exc Exception {}".format(e))
-
-    def text(info_text, level=int(logging.INFO), user=None):
-        """
-        TODO remove
-        """
-        try:
-            LinkDatabase.info("AppLogging::text:{}".format(info_text))
-
-            AppLogging.cleanup_overflow()
-
-            AppLogging.objects.create(
-                info_text=info_text,
-                level=level,
-                date=datetime.now(timezone("UTC")),
-                user=user,
-            )
-            return
-        except Exception as e:
-            LinkDatabase.info("AppLogging::text Exception {}".format(e))
 
     def save(self, *args, **kwargs):
         # Trim the input string to fit within max_length

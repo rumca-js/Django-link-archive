@@ -202,7 +202,7 @@ class SingleSymbolEvaluator(object):
         for op in self.get_operators():
             wh = symbol.find(op)
             if wh >= 0:
-                sp = [symbol[:wh], symbol[wh + len(op) + 1 :]]
+                sp = [symbol[:wh], symbol[wh + len(op) :]]
 
                 left_part = self.cleanup_left_operator_part(sp[0])
                 right_part = self.cleanup_right_operator_part(sp[1])

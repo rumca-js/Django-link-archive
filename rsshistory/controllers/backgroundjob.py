@@ -198,14 +198,24 @@ class BackgroundJobController(BackgroundJob):
             BackgroundJob.JOB_PROCESS_SOURCE, source.id, source.title
         )
 
-    def download_music(item):
+    def download_music(entry):
         return BackgroundJobController.create_single_job(
-            BackgroundJob.JOB_LINK_DOWNLOAD_MUSIC, item.link
+            BackgroundJob.JOB_LINK_DOWNLOAD_MUSIC, entry.link
         )
 
-    def download_video(item):
+    def download_video(entry):
         return BackgroundJobController.create_single_job(
-            BackgroundJob.JOB_LINK_DOWNLOAD_VIDEO, item.link
+            BackgroundJob.JOB_LINK_DOWNLOAD_VIDEO, entry.link
+        )
+
+    def download_music_url(url):
+        return BackgroundJobController.create_single_job(
+            BackgroundJob.JOB_LINK_DOWNLOAD_MUSIC, url
+        )
+
+    def download_video_url(entry):
+        return BackgroundJobController.create_single_job(
+            BackgroundJob.JOB_LINK_DOWNLOAD_VIDEO, url
         )
 
     def link_add(url, source=None, tag="", user=None, properties=None):

@@ -102,6 +102,7 @@ class EntriesSearchListView(generic.ListView):
         print("EntriesSearchListView:get")
 
         self.time_start = datetime.now()
+        self.query = None
 
         p = ViewPage(self.request)
         data = p.check_access()
@@ -121,6 +122,11 @@ class EntriesSearchListView(generic.ListView):
         self.query_filter = self.get_filter()
         objects = self.get_filtered_objects().order_by(*self.get_order_by())
         print("EntriesSearchListView:get_queryset done {}".format(objects.query))
+
+        config = Configuration.get_object().config_entry
+        if config.debug_mode:
+            self.query = objects.query
+
         return objects
 
     def get_paginate_by(self, queryset):
@@ -160,6 +166,7 @@ class EntriesSearchListView(generic.ListView):
         context["more_results_link"] = self.get_more_results_link()
         context["has_more_results"] = self.has_more_results()
         context["query_type"] = self.get_query_type()
+        context["query"] = self.query
 
         self.filter_form = self.get_form()
         context["filter_form"] = self.filter_form
@@ -167,6 +174,7 @@ class EntriesSearchListView(generic.ListView):
         search_term = get_search_term_request(self.request)
 
         context["search_engines"] = SearchEngines(search_term)
+        context["query"] = self.query
 
         search_term = self.get_search_link(search_term)
 

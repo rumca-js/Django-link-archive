@@ -22,16 +22,30 @@ from ..pluginurl.handlerchannelyoutube import YouTubeChannelHandler
 
 from .fakeinternetdata import (
     webpage_with_real_rss_links,
-    webpage_samtime_youtube_rss,
     webpage_simple_rss_page,
     webpage_old_pubdate_rss,
     webpage_no_pubdate_rss,
-    webpage_youtube_airpano_feed,
-    webpage_code_project_rss,
     webpage_html_favicon,
     webpage_with_rss_link_rss_contents,
-    webpage_hackernews_rss,
     webpage_html_casinos,
+)
+from .fake.youtube import (
+    youtube_robots_txt,
+    youtube_sitemap_sitemaps,
+    youtube_sitemap_product,
+    webpage_youtube_airpano_feed,
+    webpage_samtime_youtube_rss,
+)
+from .fake.robotstxtcom import (
+    robots_txt_example_com_robots,
+)
+from .fake.codeproject import (
+    webpage_code_project_rss,
+)
+from .fake.hackernews import (
+    webpage_hackernews_rss,
+)
+from .fake.instance import (
     instance_entries_json,
     instance_sources_json_empty,
     instance_entries_json_empty,
@@ -45,14 +59,6 @@ from .fakeinternetdata import (
     instance_source_105_json,
     instance_sources_page_1,
     instance_sources_page_2,
-)
-from .fakeinternetdatayoutube import (
-    youtube_robots_txt,
-    youtube_sitemap_sitemaps,
-    youtube_sitemap_product,
-)
-from .fake.robotstxtcom import (
-    robots_txt_example_com_robots,
 )
 
 

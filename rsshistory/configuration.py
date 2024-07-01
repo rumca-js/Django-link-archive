@@ -18,7 +18,7 @@ version is split into three digits:
  if a change requires the model to be changed, then second digit is updated, patch is set to 0
  if something should be released to public, then release version changes
 """
-__version__ = "0.70.1"
+__version__ = "0.71.0"
 
 
 from pathlib import Path
@@ -254,9 +254,16 @@ class Configuration(object):
         fernet = Fernet(key)
         return fernet.decrypt(message).decode()
 
-    def get_thread_info(self):
+    def get_thread_info(self, display=True):
+        """
+        @display If true, then provide dates meant for display (local time)
+        """
         result = []
         for thread in SystemOperation.get_thread_ids():
-            result.append([thread, SystemOperation.get_last_thread_signal(thread)])
+            date = SystemOperation.get_last_thread_signal(thread)
+            if date:
+                date = self.get_local_time(date)
+
+            result.append([thread, date])
 
         return result

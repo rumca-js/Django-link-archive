@@ -115,6 +115,31 @@ def test_page(request):
 
     summary_text = "test page"
 
+    from ..controllers import EntriesCleanup
+
+    entries = LinkDataController.objects.filter(title__icontains="slot server")
+    entries.delete()
+
+    # entries = LinkDataController.objects.filter(bookmarked=True)
+    # for entry in entries:
+    #    if not UserBookmarks.is_bookmarked(entry):
+    #        UserBookmarks.add(request.user, entry)
+
+    # start_date = datetime.date(2020, 1, 1)
+    # stop_date = datetime.date(2025 + 1, 1, 1)
+
+    # therange = (start_date, stop_date)
+
+    # users = User.objects.filter(username=request.user)
+    # if users.count() > 0:
+    #    bookmarks = UserBookmarks.get_user_bookmarks(users[0])
+    #    # this returns IDs, not 'objects'
+    #    result_entries = bookmarks.values_list("entry_object", flat=True)
+    #    result_entries = LinkDataController.objects.filter(id__in=result_entries)
+    #    result_entries = result_entries.filter(date_published__range=therange)
+
+    # summary_text = "Found bookmarked items = {}".format(result_entries.count())
+
     p.context["summary_text"] = summary_text
 
     return p.render("summary_present.html")

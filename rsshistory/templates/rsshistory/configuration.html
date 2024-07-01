@@ -3,7 +3,11 @@
 {% block content %}
 
 <div class="container">
+    <a href="{% url 'rsshistory:configuration-advanced-json' %}" title="Show JSON" class="btn btn-primary" role="button">JSON
+    </a>
+</div>
 
+<div class="container">
    <h1>Config</h1>
    
    <form action="{{config_form.action_url}}" method="{{config_form.method}}">

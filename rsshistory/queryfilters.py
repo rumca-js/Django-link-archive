@@ -186,7 +186,7 @@ class SourceFilter(BaseQueryFilter):
         return ["category", "subcategory", "title", "url"]
 
     def get_model_pagination(self):
-        from .viewspkg.viewsources import SourceListView
+        from .viewspkg.sources import SourceListView
 
         return int(SourceListView.paginate_by)
 
@@ -200,7 +200,7 @@ class EntryFilter(BaseQueryFilter):
         self.additional_condition = Q()
 
     def get_model_pagination(self):
-        from .viewspkg.viewentries import EntriesSearchListView
+        from .viewspkg.entries import EntriesSearchListView
 
         return int(EntriesSearchListView.paginate_by)
 

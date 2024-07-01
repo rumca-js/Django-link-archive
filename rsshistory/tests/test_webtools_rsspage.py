@@ -7,6 +7,8 @@ from .fakeinternet import FakeInternetTestCase, MockRequestCounter
 from .fakeinternetdata import (
     webpage_no_pubdate_rss,
     webpage_old_pubdate_rss,
+)
+from .fake.youtube import (
     webpage_samtime_youtube_rss,
 )
 
