@@ -28,15 +28,11 @@
               class="rounded icon-normal"
               {% endif %}
               />
-         {% endif %}
       </div>
+      {% endif %}
       <div class="mx-2">
          <span style="font-weight:bold" class="text-reset">
-             {% if link.is_dead %}[D]{%endif%}
-             {% if link.page_rating_votes %}
-             [{{link.page_rating_votes}}]
-             {%endif%}
-             {{link.title | slice:":100"}}
+             {{link.get_title | safe}}
          </span>
       </div>
    </div>

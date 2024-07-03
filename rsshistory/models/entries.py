@@ -182,9 +182,28 @@ class BaseLinkDataController(BaseLinkDataModel):
         return "______"
 
     def get_title(self):
+        title = self.title[:100]
+
+        code = self.get_title_info_string()
+        votes = self.page_rating_votes
+
+        if code:
+            title = "[{}|{}] ".format(votes, code) + title
+        else:
+            title = "[{}] ".format(votes) + title
+
+        return title
+
+    def get_title_info_string(self):
+        code = ""
         if self.is_dead():
-            return self.get_link_dead_text()
-        return self.title
+            code += "D"
+        if self.age != 0 and self.age is not None:
+            code += "A"
+        if self.page_rating_votes < 0:
+            code += "V"
+
+        return code
 
     def get_long_description(self):
         if self.is_dead():

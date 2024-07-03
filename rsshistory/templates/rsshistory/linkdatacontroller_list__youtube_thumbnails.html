@@ -24,9 +24,8 @@
        </div>
        <div style="flex: 0 0 30%; flex-shrink: 0;flex-grow:0;max-height:30%">
           <span style="font-weight:bold" class="text-primary">
-            {% if link.is_dead %}[D]{%endif%}
-            {{link.title| slice:":100"}}
-	     </span>
+             {{link.get_title | safe}}
+	      </span>
           <div class="link-list-item-description">{{link.source_obj.title| slice:":100"}}</div>
        </div>
    </div>

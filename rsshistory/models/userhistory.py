@@ -48,19 +48,16 @@ class UserSearchHistory(models.Model):
             if UserSearchHistory.get_top_query(user) == search_query:
                 return
 
-            try:
-                UserSearchHistory.delete_old_user_entries(
-                    search_query=search_query, user=user
-                )
+            UserSearchHistory.delete_old_user_entries(
+                search_query=search_query, user=user
+            )
 
-                theobject = UserSearchHistory.objects.create(
-                    search_query=search_query, user_object=user
-                )
-                UserSearchHistory.delete_old_entries(user)
+            theobject = UserSearchHistory.objects.create(
+                search_query=search_query, user_object=user
+            )
+            UserSearchHistory.delete_old_entries(user)
 
-                return theobject
-            except Exception as E:
-                LinkDatabase.info(str(E))
+            return theobject
 
     def cleanup():
         config_entry = Configuration.get_object().config_entry
@@ -303,6 +300,7 @@ class UserEntryVisitHistory(models.Model):
         TODO to think about. are we capturing data about not logged users?
         """
         if not user.is_authenticated:
+            print("user is not authenticated")
             return
 
         config = Configuration.get_object().config_entry
@@ -317,45 +315,48 @@ class UserEntryVisitHistory(models.Model):
         if str(user.username) == "" or user.username is None:
             return
 
-        visits = UserEntryVisitHistory.objects.filter(
-            entry_object=entry, user_object=user
-        )
-
-        if UserEntryVisitHistory.is_link_just_visited(visits):
+        if UserEntryVisitHistory.is_link_just_visited(user, entry):
             return
 
         previous_entry = UserEntryVisitHistory.get_last_user_entry(user)
 
-        try:
-            if previous_entry:
-                UserEntryTransitionHistory.add(user, previous_entry, entry)
+        visits = UserEntryVisitHistory.objects.filter(
+            user_object=user, entry_object = entry
+        )
 
-            if visits.count() == 0:
-                visit = UserEntryVisitHistory.objects.create(
-                    visits=1,
-                    entry_object=entry,
-                    date_last_visit=DateUtils.get_datetime_now_utc(),
-                    user_object=user,
-                )
-            else:
-                visit = visits[0]
-                visit.visits += 1
-                visit.date_last_visit = DateUtils.get_datetime_now_utc()
-                visit.user_object = user
-                visit.save()
+        if visits.count() == 0:
+            visit = UserEntryVisitHistory.objects.create(
+                visits=1,
+                entry_object=entry,
+                date_last_visit=DateUtils.get_datetime_now_utc(),
+                user_object=user,
+            )
+        else:
+            visit = visits[0]
+            visit.visits += 1
+            visit.date_last_visit = DateUtils.get_datetime_now_utc()
+            visit.user_object = user
+            visit.save()
 
-            # to increment visited counter on entry
-            # BackgroundJobController.entry_update_data(entry)
-            # TODO - there should be recalculated JOB. we do not want to udpate it's data
+        if previous_entry:
+            UserEntryTransitionHistory.add(user, previous_entry, entry)
 
-            return visit
+        # to increment visited counter on entry
+        # BackgroundJobController.entry_update_data(entry)
+        # TODO - there should be recalculated JOB. we do not want to udpate it's data
 
-        except Exception as E:
-            LinkDatabase.info(str(E))
-            AppLogging.error("Could not add transition")
+        return visit
 
-    def is_link_just_visited(visits):
+    def is_link_just_visited(user, entry):
         from ..dateutils import DateUtils
+
+        last_entry = UserEntryVisitHistory.get_last_user_entry(user)
+        if last_entry != entry:
+            return False
+
+        visits = UserEntryVisitHistory.objects.filter(
+            user_object=user, entry_object = entry
+        )
 
         if (
             visits.count() > 0
@@ -414,6 +415,15 @@ class UserEntryVisitHistory(models.Model):
             date_last_visit__gt=time_ago_limit,
             date_last_visit__lt=burst_time_limit,
         ).order_by("-date_last_visit")
+        if entries.exists():
+            return entries[0].entry_object
+
+        # something might be in burst time
+
+        entries = UserEntryVisitHistory.objects.filter(
+            user_object=user,
+            date_last_visit__gt=time_ago_limit,
+        ).order_by("date_last_visit")
         if entries.exists():
             return entries[0].entry_object
 

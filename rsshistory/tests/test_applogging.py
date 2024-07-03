@@ -3,12 +3,18 @@ from datetime import datetime, date
 import logging
 
 from ..models import AppLogging
+from ..configuration import Configuration
+
 from .fakeinternet import FakeInternetTestCase
 
 
 class AppLoggingTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
+
+        c = Configuration.get_object()
+        c.config_entry.logging_level = AppLogging.DEBUG
+        c.config_entry.save()
 
     def test_debug(self):
         AppLogging.objects.all().delete()
@@ -44,6 +50,14 @@ class AppLoggingTest(FakeInternetTestCase):
 
         # call tested function
         AppLogging.exc("exc")
+
+        self.assertEqual(AppLogging.objects.all().count(), 1)
+
+    def test_notification(self):
+        AppLogging.objects.all().delete()
+
+        # call tested function
+        AppLogging.notify("notify")
 
         self.assertEqual(AppLogging.objects.all().count(), 1)
 

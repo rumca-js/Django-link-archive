@@ -304,7 +304,7 @@ class FileImporter(BaseImporter):
         super().__init__(user)
 
         if not os.path.isdir(path):
-            AppLogging.info("Directory does not exist!")
+            AppLogging.error("Directory does not exist!")
             return
 
         self.import_from_path(path)

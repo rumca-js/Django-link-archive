@@ -1,4 +1,5 @@
 import logging
+import traceback
 
 from pytz import timezone
 from datetime import datetime, date, timedelta
@@ -522,6 +523,13 @@ class AppLogging(models.Model):
     date = models.DateTimeField(auto_now_add=True)
     user = models.CharField(max_length=1000, null=True)
 
+    DEBUG = 10
+    INFO = 20
+    WARNING = 30
+    ERROR = 40
+    CRITICAL = 50
+    NOTIFICATION = 60 # notifications for the user
+
     class Meta:
         ordering = ["-date", "level"]
 
@@ -531,119 +539,47 @@ class AppLogging(models.Model):
         c = Configuration.get_object()
         return c.get_local_time(self.date)
 
-    def info(info_text, level=int(logging.INFO), user=None):
-        """
-        TODO errors are not created exactly as we do commonly. Date shoudl be added via dateutils
-        """
-        try:
-            config = ConfigurationEntry.get()
-            if level < config.logging_level:
-                return
-
-            # TODO replace hardcoded values with something better
-            LinkDatabase.info("AppLogging::info:{}".format(info_text))
-
-            AppLogging.cleanup_overflow()
-
-            AppLogging.objects.create(
-                info_text=info_text,
-                level=level,
-                date=datetime.now(timezone("UTC")),
-                user=user,
-            )
+    def create_entry(info_text, description="", level=INFO, date=None, user=None):
+        config = ConfigurationEntry.get()
+        if level < config.logging_level:
             return
-        except Exception as e:
-            LinkDatabase.info("AppLogging::info Exception {}".format(e))
 
-    def debug(info_text, level=int(logging.DEBUG), user=None):
-        """
-        TODO errors are not created exactly as we do commonly. Date shoudl be added via dateutils
-        """
-        try:
-            config = ConfigurationEntry.get()
-            if level < config.logging_level:
-                return
+        # TODO replace hardcoded values with something better
+        LinkDatabase.info("AppLogging::{}:{}".format(level, info_text))
 
-            # TODO replace hardcoded values with something better
-            LinkDatabase.info("AppLogging::debug:{}".format(info_text))
+        AppLogging.cleanup_overflow()
 
-            AppLogging.cleanup_overflow()
+        AppLogging.objects.create(
+            info_text=info_text,
+            level=level,
+            date=datetime.now(timezone("UTC")),
+            user=user,
+        )
 
-            AppLogging.objects.create(
-                info_text=info_text,
-                level=level,
-                date=datetime.now(timezone("UTC")),
-                user=user,
-            )
-            return
-        except Exception as e:
-            LinkDatabase.info("AppLogging::info Exception {}".format(e))
+    def info(info_text, user=None):
+        AppLogging.create_entry(info_text, level = AppLogging.INFO)
 
-    def warning(info_text, level=int(logging.WARNING), user=None):
-        """
-        TODO errors are not created exactly as we do commonly. Date shoudl be added via dateutils
-        """
-        try:
-            config = ConfigurationEntry.get()
-            if level < config.logging_level:
-                return
+    def debug(info_text, user=None):
+        AppLogging.create_entry(info_text, level = AppLogging.DEBUG)
 
-            # TODO replace hardcoded values with something better
-            LinkDatabase.info("AppLogging::warning:{}".format(info_text))
+    def warning(info_text, user=None):
+        AppLogging.create_entry(info_text, level = AppLogging.WARNING)
 
-            AppLogging.cleanup_overflow()
+    def error(info_text, user=None):
+        AppLogging.create_entry(info_text, level = AppLogging.ERROR)
 
-            AppLogging.objects.create(
-                info_text=info_text,
-                level=level,
-                date=datetime.now(timezone("UTC")),
-                user=user,
-            )
-            return
-        except Exception as e:
-            LinkDatabase.info("AppLogging::info Exception {}".format(e))
+    def notify(info_text, user=None):
+        AppLogging.create_entry(info_text, level = AppLogging.NOTIFICATION)
 
-    def error(info_text, level=int(logging.ERROR), user=None):
-        try:
-            config = ConfigurationEntry.get()
-            if level < config.logging_level:
-                return
+    def exc(exception_object, info_text=None, user=None):
+        error_text = traceback.format_exc()
 
-            LinkDatabase.info("AppLogging::error:{}".format(info_text))
+        if info_text:
+            text = "{}\nException:{}\nException Data:\n{}".format(info_text, str(exception_object), error_text)
+        else:
+            text = "Exception:{}\nException Data:\n{}".format(str(exception_object), error_text)
 
-            AppLogging.cleanup_overflow()
-
-            AppLogging.objects.create(
-                info_text=info_text,
-                level=level,
-                date=datetime.now(timezone("UTC")),
-                user=user,
-            )
-            return
-        except Exception as e:
-            LinkDatabase.info("AppLogging::error Exception {}".format(e))
-
-    def exc(info_text, level=int(logging.ERROR), exc_data=None, user=None):
-        text = "{}. Exception data:\n{}".format(info_text, str(exc_data))
-
-        try:
-            config = ConfigurationEntry.get()
-            if level < config.logging_level:
-                return
-
-            LinkDatabase.info("AppLogging::exc:{}".format(info_text))
-
-            AppLogging.cleanup_overflow()
-
-            AppLogging.objects.create(
-                info_text=info_text,
-                level=level,
-                date=datetime.now(timezone("UTC")),
-                user=user,
-            )
-            return
-        except Exception as e:
-            LinkDatabase.info("AppLogging::exc Exception {}".format(e))
+        AppLogging.create_entry(text, level = AppLogging.ERROR)
 
     def save(self, *args, **kwargs):
         # Trim the input string to fit within max_length
@@ -702,16 +638,19 @@ class AppLogging(models.Model):
             LinkDatabase.info("Could not remove old persistant infos {}".format(e))
 
     def is_info(self):
-        return self.level == int(logging.INFO)
+        return self.level == AppLogging.INFO
 
     def is_warning(self):
-        return self.level == int(logging.WARNING)
+        return self.level == AppLogging.WARNING
 
     def is_debug(self):
-        return self.level == int(logging.DEBUG)
+        return self.level == AppLogging.DEBUG
 
     def is_error(self):
-        return self.level == int(logging.ERROR)
+        return self.level == AppLogging.ERROR
+
+    def is_notification(self):
+        return self.level == AppLogging.NOTIFICATION
 
 
 class BackgroundJob(models.Model):

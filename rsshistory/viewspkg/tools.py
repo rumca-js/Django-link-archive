@@ -1,10 +1,12 @@
 from django.urls import reverse
+from django.http import JsonResponse
 
 from ..apps import LinkDatabase
 from ..models import (
     ConfigurationEntry,
 )
 from ..controllers import (
+    LinkDataController,
     EntryDataBuilder,
     BackgroundJobController,
 )
@@ -278,6 +280,12 @@ def page_process_contents(request):
 
 
 def download_url(request):
+    def download_url_internal(p, url):
+        BackgroundJobController.download_file(url)
+
+        p.context["summary_text"] = "Added to download queue"
+        return p.render("summary_present.html")
+
     p = ViewPage(request)
     p.set_title("Download url")
     data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
@@ -296,10 +304,7 @@ def download_url(request):
         else:
             url = request.GET["page"]
 
-            BackgroundJobController.download_file(url)
-
-            p.context["summary_text"] = "Added to download queue"
-            return p.render("summary_present.html")
+            return download_url_internal(p, url)
 
     else:
         form = LinkInputForm(request.POST, request=request)
@@ -310,13 +315,16 @@ def download_url(request):
 
         url = form.cleaned_data["link"]
 
-        BackgroundJobController.download_file(url)
+        return download_url_internal(p, url)
+
+
+def download_music(request):
+    def download_music_internal(p, url):
+        BackgroundJobController.download_music_url(url)
 
         p.context["summary_text"] = "Added to download queue"
         return p.render("summary_present.html")
 
-
-def download_music(request):
     p = ViewPage(request)
     p.set_title("Download music")
     data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
@@ -335,10 +343,7 @@ def download_music(request):
         else:
             url = request.GET["page"]
 
-            BackgroundJobController.download_music_url(url)
-
-            p.context["summary_text"] = "Added to download queue"
-            return p.render("summary_present.html")
+            return download_music_internal(p, url)
 
     else:
         form = LinkInputForm(request.POST, request=request)
@@ -349,13 +354,16 @@ def download_music(request):
 
         url = form.cleaned_data["link"]
 
-        BackgroundJobController.download_music_url(url)
+        return download_music_internal(p, url)
+
+
+def download_video(request):
+    def download_video_internal(p, url):
+        BackgroundJobController.download_video_url(url)
 
         p.context["summary_text"] = "Added to download queue"
         return p.render("summary_present.html")
 
-
-def download_video(request):
     p = ViewPage(request)
     p.set_title("Download video")
     data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
@@ -374,10 +382,7 @@ def download_video(request):
         else:
             url = request.GET["page"]
 
-            BackgroundJobController.download_video_url(url)
-
-            p.context["summary_text"] = "Added to download queue"
-            return p.render("summary_present.html")
+            return download_video_internal(p, url)
 
     else:
         form = LinkInputForm(request.POST, request=request)
@@ -387,14 +392,20 @@ def download_video(request):
             return p.render("summary_present.html")
 
         url = form.cleaned_data["link"]
-
-        BackgroundJobController.download_video_url(url)
-
-        p.context["summary_text"] = "Added to download queue"
-        return p.render("summary_present.html")
+        return download_video_internal(p, url)
 
 
 def is_url_allowed(request):
+    def is_url_allowed_internal(p, url):
+        c = DomainCache.get_object(url)
+        status = c.is_allowed(url)
+
+        if status:
+            p.context["summary_text"] = "{} is allowed by <a href='{}'>robots.txt</a>".format(url, c.get_robots_txt_url())
+        else:
+            p.context["summary_text"] = "{} is NOT allowed by <a href='{}'>robots.txt</a>".format(url, c.get_robots_txt_url())
+        return p.render("summary_present.html")
+
     p = ViewPage(request)
     p.set_title("Is link allowed by robots.txt")
     data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
@@ -413,14 +424,7 @@ def is_url_allowed(request):
         else:
             url = request.GET["page"]
 
-            c = DomainCache.get_object(url)
-            status = c.is_allowed(url)
-
-            if status:
-                p.context["summary_text"] = "{} is allowed by <a href='{}'>robots.txt</a>".format(url, c.get_robots_txt_url())
-            else:
-                p.context["summary_text"] = "{} is NOT allowed by <a href='{}'>robots.txt</a>".format(url, c.get_robots_txt_url())
-            return p.render("summary_present.html")
+            return is_url_allowed_internal(p, url)
 
     else:
         form = LinkInputForm(request.POST, request=request)
@@ -431,11 +435,54 @@ def is_url_allowed(request):
 
         url = form.cleaned_data["link"]
 
-        c = DomainCache.get_object(url)
-        status = c.is_allowed(url)
+        return is_url_allowed_internal(p, url)
 
-        if status:
-            p.context["summary_text"] = "{} is allowed by <a href='{}'>robots.txt</a>".format(url, c.get_robots_txt_url())
+
+def page_verify(request):
+    def page_verify_internal(url):
+        entries = LinkDataController.objects.filter(link = url)
+        data = {}
+
+        if entries.exists():
+            entry = entries[0]
+            data["entry"] = entry.get_map()
+
+            domain_url = DomainAwarePage(entry.link).get_domain()
+
+            domains = LinkDataController.objects.filter(link = domain_url)
+            if domains.exists():
+                domain = domains[0]
+                data["domain"] = domain.get_map()
+
+        return JsonResponse(data)
+
+    p = ViewPage(request)
+    p.set_title("Verify page")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    if request.method == "GET":
+        if "page" not in request.GET:
+            form = LinkInputForm(request=request)
+            form.method = "POST"
+            form.action_url = reverse("{}:page-verify".format(LinkDatabase.name))
+            p.context["form"] = form
+
+            return p.render("form_basic.html")
+
         else:
-            p.context["summary_text"] = "{} is NOT allowed by <a href='{}'>robots.txt</a>".format(url, c.get_robots_txt_url())
-        return p.render("summary_present.html")
+            url = request.GET["page"]
+
+            return page_verify_internal(url)
+
+    else:
+        form = LinkInputForm(request.POST, request=request)
+        if not form.is_valid():
+            p.context["summary_text"] = "Form is invalid"
+
+            return p.render("summary_present.html")
+
+        url = form.cleaned_data["link"]
+
+        return page_verify_internal(url)

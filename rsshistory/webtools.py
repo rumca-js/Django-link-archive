@@ -95,9 +95,6 @@ def date_str_to_date(date_str):
             parsed_date = parser.parse(date_str)
             return DateUtils.to_utc_date(parsed_date)
         except Exception as E:
-            stack_lines = traceback.format_stack()
-            stack_str = "".join(stack_lines)
-
             error_text = traceback.format_exc()
 
             AppLogging.warning(
@@ -111,7 +108,7 @@ def calculate_hash(text):
     try:
         return hashlib.md5(text.encode("utf-8")).digest()
     except Exception as E:
-        AppLogging.info("Could not calculate hash {}".format(E))
+        AppLogging.error("Could not calculate hash {}".format(E))
 
 
 class DomainAwarePage(object):
@@ -1225,13 +1222,13 @@ class RssPage(ContentInterface):
                             pass
                             # normal scenario, no worries
                         else:
-                            AppLogging.info(
+                            AppLogging.error(
                                 '<a href="{}">{}</a> Unsupported image type for feed. Image:{}'.format(
                                     self.url, self.url, str(self.feed.feed.image)
                                 )
                             )
             else:
-                AppLogging.info(
+                AppLogging.error(
                     '<a href="{}">{}</a> Unsupported image type for feed. Image:{}'.format(
                         self.url, self.url, str(self.feed.feed.image)
                     )
@@ -2497,7 +2494,7 @@ class SeleniumHeadless(SeleniumDriver):
             status_code = self.get_selenium_status_code(driver)
 
             headers = self.get_selenium_headers(driver)
-            AppLogging.info("Selenium headers:{}\n{}".format(url, headers))
+            AppLogging.debug("Selenium headers:{}\n{}".format(url, headers))
 
             # if self.options.link_redirect:
             #    WebDriverWait(driver, selenium_timeout).until(EC.url_changes(driver.current_url))

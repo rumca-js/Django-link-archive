@@ -262,7 +262,7 @@ class LinkDownloadJobHandler(BaseJobHandler):
 
             Url.download_all(url)
 
-            AppLogging.info("Page has been downloaded:{}".format(url))
+            AppLogging.notify("Page has been downloaded:{}".format(url))
 
             return True
         except Exception as e:
@@ -308,7 +308,7 @@ class LinkMusicDownloadJobHandler(BaseJobHandler):
 
             id3 = id3v2.Id3v2(file_name, data)
             id3.tag()
-            AppLogging.info("Downloading music done: " + url + " " + title)
+            AppLogging.notify("Downloading music done: " + url + " " + title)
 
             return True
         except Exception as e:
@@ -383,7 +383,7 @@ class LinkVideoDownloadJobHandler(BaseJobHandler):
                 )
                 return
 
-            AppLogging.info("Downloading video done: " + url + " " + title)
+            AppLogging.notify("Downloading video done: " + url + " " + title)
 
             return True
         except Exception as e:
@@ -879,7 +879,7 @@ class ExportDataJobHandler(BaseJobHandler):
                 update_mgr.write_and_push_notime_data()
 
             SourceExportHistory.confirm(export)
-            AppLogging.info("Successfully pushed data to git")
+            AppLogging.notify("Successfully pushed data to git")
 
             return True
         except Exception as e:
@@ -908,7 +908,7 @@ class PushYearDataToRepoJobHandler(BaseJobHandler):
 
                 update_mgr = UpdateManager(self._config)
                 update_mgr.write_and_push_year_data()
-                AppLogging.info("Successfully pushed data to git")
+                AppLogging.notify("Successfully pushed data to git")
 
             return True
         except Exception as e:
@@ -931,7 +931,7 @@ class PushNoTimeDataToRepoJobHandler(BaseJobHandler):
 
                 update_mgr = UpdateManager(self._config)
                 update_mgr.write_and_push_notime_data()
-                AppLogging.info("Successfully pushed data to git")
+                AppLogging.notify("Successfully pushed data to git")
 
             return True
         except Exception as e:
@@ -957,7 +957,7 @@ class PushDailyDataToRepoJobHandler(BaseJobHandler):
 
                 update_mgr = UpdateManager(self._config)
                 update_mgr.write_and_push_daily_data(date_input)
-                AppLogging.info("Successfully pushed data to git")
+                AppLogging.notify("Successfully pushed data to git")
 
             return True
         except Exception as e:
@@ -1310,7 +1310,7 @@ class HandlerManager(object):
         TODO remove this function, use process_one_for_all one above
         """
         try:
-            AppLogging.info("Processing message")
+            AppLogging.debug("Processing message")
 
             config = Configuration.get_object()
             start_processing_time = time.time()
@@ -1325,7 +1325,7 @@ class HandlerManager(object):
             if len(items) == 0:
                 return False
 
-            AppLogging.info("Processing messages done")
+            AppLogging.debug("Processing messages done")
         except Exception as e:
             error_text = traceback.format_exc()
             AppLogging.error(error_text)

@@ -1,7 +1,15 @@
 from datetime import timedelta
 from django.contrib.auth.models import User
 
-from ..models import UserBookmarks
+from ..models import (
+    UserBookmarks,
+    UserTags,
+    UserVotes,
+    LinkCommentDataModel,
+    UserBookmarks,
+    UserEntryTransitionHistory,
+    UserEntryVisitHistory,
+)
 from ..controllers import (
     EntryDataBuilder,
     LinkDataWrapper,
@@ -19,6 +27,12 @@ class LinkDataWrapperTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
         self.setup_configuration()
+
+        c = Configuration.get_object()
+        c.config_entry.track_user_actions = True
+        c.config_entry.track_user_searches = True
+        c.config_entry.track_user_navigation = True
+        c.config_entry.save()
 
         self.source_youtube = SourceDataController.objects.create(
             url="https://youtube.com",
@@ -750,3 +764,98 @@ class LinkDataWrapperTest(FakeInternetTestCase):
             link__icontains="archive.com"
         )
         self.assertEqual(entries.count(), 1)
+
+    def test_move_entry(self):
+
+        https_entry = LinkDataController.objects.create(
+            source="https://archive.com/test",
+            link="https://testlink.com",
+            title="The archive https link",
+            bookmarked=True,
+            language="en",
+            date_published=DateUtils.get_datetime_now_utc() - timedelta(days=3),
+        )
+
+        http_entry = LinkDataController.objects.create(
+            source="http://archive.com/test",
+            link="http://testlink.com",
+            title="The archive https link",
+            bookmarked=True,
+            language="en",
+            date_published=DateUtils.get_datetime_now_utc() - timedelta(days=3),
+        )
+
+        youtube_entry = LinkDataController.objects.create(
+            source="http://youtube.com/test",
+            link="http://youtube.com?v=1",
+            title="The archive https link",
+            bookmarked=True,
+            language="en",
+            date_published=DateUtils.get_datetime_now_utc() - timedelta(days=3),
+        )
+
+        UserTags.set_tag(http_entry, "test", self.user_not_staff)
+        UserVotes.add(self.user_not_staff, http_entry, 30)
+        LinkCommentDataModel.add(self.user_not_staff, http_entry, "This is stupid")
+        UserBookmarks.add(self.user_not_staff, http_entry)
+
+        #UserEntryTransitionHistory.add(self.user_not_staff, entry_from = http_entry, entry_to = youtube_entry)
+        #UserEntryTransitionHistory.add(self.user_not_staff, entry_from = youtube_entry, entry_to = http_entry)
+
+        UserEntryVisitHistory.visited(http_entry, self.user_not_staff)
+        UserEntryVisitHistory.visited(youtube_entry, self.user_not_staff)
+
+        # verify before call
+
+        tags = UserTags.objects.all()
+        self.assertEqual(tags.count(), 1)
+
+        all_transitions = UserEntryTransitionHistory.objects.all()
+        self.assertEqual(all_transitions.count(), 1)
+        transition = all_transitions[0]
+        self.assertEqual(transition.entry_from, http_entry)
+        self.assertEqual(transition.entry_to, youtube_entry)
+
+        # call tested function
+        result = LinkDataWrapper(entry=https_entry).move_entry(http_entry, https_entry)
+
+        # Check expected behavior
+
+        self.print_errors()
+
+        https_entries = LinkDataController.objects.filter(link="https://testlink.com")
+        http_entries = LinkDataController.objects.filter(link="http://testlink.com")
+
+        self.assertEqual(https_entries.count(), 1)
+        self.assertEqual(http_entries.count(), 0)
+
+        tags = UserTags.objects.all()
+        self.assertEqual(tags.count(), 1)
+        tag = tags[0]
+        self.assertEqual(tag.entry_object, https_entry)
+
+        votes = UserVotes.objects.all()
+        self.assertEqual(votes.count(), 1)
+        vote = votes[0]
+        self.assertEqual(vote.entry_object, https_entry)
+
+        comments = LinkCommentDataModel.objects.all()
+        self.assertEqual(comments.count(), 1)
+        comment = comments[0]
+        self.assertEqual(comment.entry_object, https_entry)
+
+        bookmarks = UserBookmarks.objects.all()
+        self.assertEqual(bookmarks.count(), 1)
+        bookmark = bookmarks[0]
+        self.assertEqual(bookmark.entry_object, https_entry)
+
+        all_transitions = UserEntryTransitionHistory.objects.all()
+        self.assertEqual(all_transitions.count(), 1)
+
+        from_entries = UserEntryTransitionHistory.objects.filter(entry_from = https_entry)
+        self.assertEqual(from_entries.count(), 1)
+
+        visits = UserEntryVisitHistory.objects.all()
+        self.assertEqual(visits.count(), 2)
+        visit = visits[0]
+        self.assertEqual(visit.entry_object, https_entry)

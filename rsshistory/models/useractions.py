@@ -85,8 +85,10 @@ class UserTags(models.Model):
 
         if not entry:
             AppLogging.error("Incorrect call of tags, entry does not exist")
+            return
 
         if not entry.is_taggable():
+            AppLogging.error("Tried to tag not taggable entry! ID:{}".format(entry.id))
             return
 
         user_name = user.username
@@ -143,10 +145,11 @@ class UserTags(models.Model):
         tag_objs = None
 
         if not entry.is_taggable():
+            AppLogging.error("Tags: Tried to tag not taggable entry! ID:{}".format(entry.id))
             return
 
         if not entry:
-            AppLogging.info("Missing entry object")
+            AppLogging.error("Tags: Missing entry object. Data:{}".format(data))
             return
 
         if not entry.is_taggable():
@@ -333,6 +336,9 @@ class LinkCommentDataModel(models.Model):
         null=True,
     )
 
+    def add(user, entry, comment):
+        return LinkCommentDataModel.objects.create(user_object = user, entry_object = entry, comment = comment)
+
     def get_comment(self):
         from ..webtools import InputContent
 
@@ -352,8 +358,8 @@ class LinkCommentDataModel(models.Model):
     def move_entry(source_entry, destination_entry):
         comments = LinkCommentDataModel.objects.filter(entry_object = source_entry)
         for comment in comments:
-            dst_comments = LinkCommentDataModel.objects.filter(entry_object = destination_entry, user_object = tag.user_object, comment = comment.comment)
-            if dst_comments.exist():
+            dst_comments = LinkCommentDataModel.objects.filter(entry_object = destination_entry, user_object = comment.user_object, comment = comment.comment)
+            if dst_comments.exists():
                 comment.delete()
                 continue
 

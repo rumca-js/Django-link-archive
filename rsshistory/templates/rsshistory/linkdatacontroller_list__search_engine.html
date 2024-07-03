@@ -28,8 +28,7 @@
    {% endif %}
 
   <span style="font-weight:bold" class="text-reset">
-       {% if link.is_dead %}[D]{%endif%}
-       {{link.title | slice:":100"}}
+       {{link.get_title | safe}}
   </span>
   <div class="text-reset">
        {{link.link}}

@@ -229,9 +229,6 @@ class EntryFilter(BaseQueryFilter):
 
         q = self.apply_age_limit(q)
 
-        # AppLogging.info("part query: {}".format(q1, q2, q3))
-        # AppLogging.info("query: {}".format(q))
-
         return q
 
     def apply_age_limit(self, query):

@@ -75,6 +75,12 @@ class EntriesCleanup(object):
 
         self.cleanup_invalid_page_ratings()
 
+        config = Configuration.get_object().config_entry
+        if config.prefer_https:
+            self.move_existing_http_to_https()
+        if config.prefer_non_www_sites:
+            self.move_existing_www_to_nonwww()
+
     def get_source_entries(self, source):
         """
         Choose shorter date - configured, or source limit
@@ -595,7 +601,7 @@ class EntryUpdater(object):
         if cleanup.is_delete_time():
             self.entry.delete()
 
-            AppLogging.info(
+            AppLogging.notify(
                 "Removed entry <a href='{}'>{}</a>. It was dead since {}.".format(
                     link, link, date
                 )
@@ -840,51 +846,6 @@ class LinkDataWrapper(object):
                 error_text = traceback.format_exc()
                 AppLogging.error(error_text)
 
-    def move_from_entry_to_entry(self, destination_entry):
-        """
-        Moves everything related to entry object to destination entry object
-         - tags
-         - votes
-         - comments
-         - transition history?
-        """
-        entry_obj = self.entry
-
-        tags = UserTags.objects.filter(entry_object=entry_obj)
-        for tag in tags:
-            tag.pk = None
-            tag.save()
-
-            tag.entry_object = destination_entry
-            tag.save()
-
-        votes = UserVotes.objects.filter(entry_object=entry_obj)
-        for vote in votes:
-            vote.pk = None
-            vote.save()
-
-            vote.entry_object = destination_entry
-            vote.save()
-
-        comments = LinkDataComments.objects.filter(entry_object=entry_obj)
-        for comment in comments:
-            comment.pk = None
-            comment.save()
-
-            comment.entry_object = destination_entry
-            comment.save()
-
-    def move_from_entry_to_url(self, destination_url):
-        destination_entries = LinkDataController.objects.filter(destination_url)
-
-        if destination_entries.count() > 0:
-            self.move_from_entry_to_entry(destination_entries[0])
-        else:
-            AppLogging.error(
-                "Cannot move entries from:{} to:{}".format(
-                    self.entry.link, destination_url
-                )
-            )
 
     def make_bookmarked(self, request):
         """
@@ -1013,40 +974,40 @@ class LinkDataWrapper(object):
 
         return entries
 
-    def move_https_to_http(self):
-        entry = self.entry
+    def move_existing_http_to_https(self):
+        http_entries = LinkDataController.objects.filter(link="http://")
+        if http_entries.exists():
+            for http_entry in http_entries:
+                https_url = http_entries.get_https_url()
+                https_entries = LinkDataController.objects.filter(link=https_url)
+                if https_entries.exists():
+                    w = LinkDataWrapper(http_entry)
+                    w.move_entry(http_entry, https_entries[0])
 
-        if not entry.is_https():
-            return
+    def move_existing_www_to_nonwww(self):
+        www_entries = LinkDataController.objects.filter(link="https://www.")
+        if www_entries.exists():
+            for www_entry in www_entries:
+                nonwww_url = www_entry.link.replace("https://www.", "https://")
+                nonwww_entries = LinkDataController.objects.filter(link=nonwww_url)
+                if nonwww_entries.exists():
+                    w = LinkDataWrapper(www_entry)
+                    w.move_entry(www_entry, nonwww_entries[0])
 
-        url = entry.get_http_url()
-
-        p = BasePage(url)
-        if p.ping():
-            entry.link = url
-            entry.save()
-            return True
-
-        return False
-
-    def move_http_to_https(self):
-        entry = self.entry
-        if not entry.is_http():
-            return
-
-        url = entry.get_https_url()
-
-        p = BasePage(url)
-        if p.ping():
-            entry.link = url
-            entry.save()
-            return True
-
-        return False
+        www_entries = LinkDataController.objects.filter(link="http://www.")
+        if www_entries.exists():
+            for www_entry in www_entries:
+                nonwww_url = www_entry.link.replace("http://www.", "http://")
+                nonwww_entries = LinkDataController.objects.filter(link=nonwww_url)
+                if nonwww_entries.exists():
+                    w = LinkDataWrapper(www_entry)
+                    w.move_entry(www_entry, nonwww_entries[0])
 
     def check_https_http_protocol(self):
         """
         TODO maybe should be returning valid object if moved?
+        TODO rewrite check_entry_versions(https_link_name, http_link_name)
+        TODO rewrite check_entry_versions(nonwww_link_name, www_link_name)
 
         @returns new object, or None object has not been changed
         """
@@ -1072,7 +1033,10 @@ class LinkDataWrapper(object):
             new_ping_status = p.ping()
 
             if not ping_status and new_ping_status:
-                if LinkDataWrapper(entry=entry).move_https_to_http():
+                new_entry = LinkDataWrapper(entry=entry).move_entry_to_url(http_url)
+                if new_entry:
+                    return new_entry
+                else:
                     return entry
 
             if ping_status and new_ping_status:
@@ -1095,7 +1059,10 @@ class LinkDataWrapper(object):
             new_ping_status = p.ping()
 
             if new_ping_status:
-                if LinkDataWrapper(entry=entry).move_http_to_https():
+                new_entry = LinkDataWrapper(entry=entry).move_entry_to_url(https_url)
+                if new_entry:
+                    return new_entry
+                else:
                     return entry
 
         return entry
@@ -1126,8 +1093,7 @@ class LinkDataWrapper(object):
         if not destination_entry:
             p = BasePage(url = destination_link)
             if p.ping():
-                entry.link = destination_link
-                entry.save()
+                self.move_entry_to_url(destination_link)
 
             return entry
         else:
@@ -1138,6 +1104,9 @@ class LinkDataWrapper(object):
                 return entry
 
     def move_entry(self, source_entry, destination_entry):
+        if destination_entry.is_dead():
+            return None
+
         from ..models import UserTags, UserVotes, LinkCommentDataModel, UserBookmarks, UserEntryVisitHistory, UserEntryTransitionHistory
 
         UserTags.move_entry(source_entry, destination_entry)
@@ -1149,6 +1118,15 @@ class LinkDataWrapper(object):
 
         source_entry.delete()
         return destination_entry
+
+    def move_entry_to_url(self, destination_url):
+        destination_entries = LinkDataController.objects.filter(destination_url)
+
+        if destination_entries.count() > 0:
+            return self.move_entry(self.entry, destination_entries[0])
+        else:
+            self.entry.link = destination_url
+            return self.entry
 
 
 class EntryDataBuilder(object):
@@ -1208,7 +1186,7 @@ class EntryDataBuilder(object):
         link_data = url.get_props()
         if not link_data:
             if Configuration.get_object().config_entry.debug_mode:
-                AppLogging.warning(
+                AppLogging.debug(
                     'Could not obtain properties for:<a href="{}">{}</a>'.format(
                         self.get_absolute_url(), self.link
                     )
@@ -1244,7 +1222,7 @@ class EntryDataBuilder(object):
         link_data = url.get_props()
         if not link_data:
             if Configuration.get_object().config_entry.debug_mode:
-                AppLogging.warning(
+                AppLogging.debug(
                     'Could not obtain properties for:<a href="{}">{}</a>'.format(
                         self.link, self.link
                     )
@@ -1261,7 +1239,7 @@ class EntryDataBuilder(object):
             return self.add_from_props_internal()
         else:
             if Configuration.get_object().config_entry.debug_mode:
-                AppLogging.warning(
+                AppLogging.debug(
                     'Could not obtain properties for:<a href="{}">{}</a>'.format(
                         self.link, self.link
                     )

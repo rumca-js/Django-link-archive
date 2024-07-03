@@ -97,7 +97,7 @@ class BackgroundJobController(BackgroundJob):
             try:
                 cfg = json.loads(self.args)
             except Exception as e:
-                print("Exception: {}".format(str(e)))
+                AppLogging.error("Exception: {}".format(str(e)))
                 return
 
             if "entry_id" in cfg:
