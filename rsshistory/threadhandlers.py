@@ -64,8 +64,21 @@ class BaseJobHandler(object):
     Base handler
     """
 
-    def get_job_filter(self):
-        return Q(job=self.get_job())
+    def __init__(self, config=None):
+        self._config = config
+        self.start_processing_time = DateUtils.get_datetime_now_utc()
+
+    def get_time_diff(self):
+        """
+        To obtain difference in seconds call total_seconds()
+        """
+        return (DateUtils.get_datetime_now_utc() - self.start_processing_time)
+
+    def get_time_diff_sec(self):
+        """
+        To obtain difference in seconds call total_seconds()
+        """
+        return self.get_time_diff().total_seconds()
 
     def set_config(self, config):
         self._config = config
@@ -99,7 +112,7 @@ class ProcessSourceJobHandler(BaseJobHandler):
     Processes source, checks if contains new entries
     """
 
-    def get_job(self):
+    def get_job():
         return BackgroundJob.JOB_PROCESS_SOURCE
 
     def process(self, obj=None):
@@ -124,25 +137,13 @@ class ProcessSourceJobHandler(BaseJobHandler):
             plugin = SourceControllerBuilder.get(source_id)
             if plugin:
                 if plugin.check_for_data():
+                    elapsed_sec = self.get_time_diff_sec()
+                    AppLogging.debug("Processed source:{}. Time[s]:{}".format(source.url, elapsed_sec))
+
                     return True
-
-                # TODO implement it differently.
-                # it does not have to be the time to download data at all
-                # else:
-                #    """
-                #    We remove the job, then insert new one, if we haven't finished it
-                #    """
-                #    obj.delete()
-
-                #    sources = SourceDataController.objects.filter(url = obj.subject)
-                #    if sources.count() > 0:
-                #        source = sources[0]
-                #        BackgroundJobController.download_rss(source)
-
-                #    return False
                 return True
 
-            AppLogging.error("Cannot find controller plugin for {}".format(obj.subject))
+            AppLogging.error("Cannot find controller plugin for source:{}".format(obj.subject))
             return False
 
         except Exception as e:
@@ -159,7 +160,7 @@ class EntryUpdateData(BaseJobHandler):
     downloads entry
     """
 
-    def get_job(self):
+    def get_job():
         return BackgroundJob.JOB_LINK_UPDATE_DATA
 
     def process(self, obj=None):
@@ -197,7 +198,7 @@ class EntryUpdateData(BaseJobHandler):
 
 
 class LinkResetDataJobHandler(BaseJobHandler):
-    def get_job(self):
+    def get_job():
         return BackgroundJob.JOB_LINK_RESET_DATA
 
     def process(self, obj=None):
@@ -223,7 +224,7 @@ class LinkResetDataJobHandler(BaseJobHandler):
 
 
 class LinkResetLocalDataJobHandler(BaseJobHandler):
-    def get_job(self):
+    def get_job():
         return BackgroundJob.JOB_LINK_RESET_LOCAL_DATA
 
     def process(self, obj=None):
@@ -253,7 +254,7 @@ class LinkDownloadJobHandler(BaseJobHandler):
     downloads entry
     """
 
-    def get_job(self):
+    def get_job():
         return BackgroundJob.JOB_LINK_DOWNLOAD
 
     def process(self, obj=None):
@@ -262,7 +263,7 @@ class LinkDownloadJobHandler(BaseJobHandler):
 
             Url.download_all(url)
 
-            AppLogging.notify("Page has been downloaded:{}".format(url))
+            AppLogging.notify("Page has been downloaded:{} Time[s]:{}".format(url, self.get_time_diff_sec()))
 
             return True
         except Exception as e:
@@ -279,7 +280,7 @@ class LinkMusicDownloadJobHandler(BaseJobHandler):
     downloads entry music
     """
 
-    def get_job(self):
+    def get_job():
         return BackgroundJob.JOB_LINK_DOWNLOAD_MUSIC
 
     def process(self, obj=None):
@@ -308,7 +309,10 @@ class LinkMusicDownloadJobHandler(BaseJobHandler):
 
             id3 = id3v2.Id3v2(file_name, data)
             id3.tag()
-            AppLogging.notify("Downloading music done: " + url + " " + title)
+
+            elapsed_sec = self.get_time_diff_sec()
+
+            AppLogging.notify("Downloading music done: {} {}. Time[s]:{}".format(url, title, elapsed_sec))
 
             return True
         except Exception as e:
@@ -356,7 +360,7 @@ class LinkVideoDownloadJobHandler(BaseJobHandler):
     downloads entry video
     """
 
-    def get_job(self):
+    def get_job():
         return BackgroundJob.JOB_LINK_DOWNLOAD_VIDEO
 
     def process(self, obj=None):
@@ -383,7 +387,8 @@ class LinkVideoDownloadJobHandler(BaseJobHandler):
                 )
                 return
 
-            AppLogging.notify("Downloading video done: " + url + " " + title)
+            elapsed_sec = self.get_time_diff_sec()
+            AppLogging.notify("Downloading video done: {} {}. Time[s]:{}".format(url, title, elapsed_sec))
 
             return True
         except Exception as e:
@@ -431,7 +436,7 @@ class DownloadModelFileJobHandler(BaseJobHandler):
     downloads entry video
     """
 
-    def get_job(self):
+    def get_job():
         return BackgroundJob.JOB_DOWNLOAD_FILE
 
     def process(self, obj=None):
@@ -465,7 +470,7 @@ class LinkAddJobHandler(BaseJobHandler):
     Adds entry to database
     """
 
-    def get_job(self):
+    def get_job():
         return BackgroundJob.JOB_LINK_ADD
 
     def process(self, obj=None):
@@ -564,7 +569,7 @@ class LinkSaveJobHandler(BaseJobHandler):
     Archives entry to database
     """
 
-    def get_job(self):
+    def get_job():
         return BackgroundJob.JOB_LINK_SAVE
 
     def process(self, obj=None):
@@ -590,7 +595,7 @@ class WriteDailyDataJobHandler(BaseJobHandler):
     Writes daily data to disk
     """
 
-    def get_job(self):
+    def get_job():
         return BackgroundJob.JOB_WRITE_DAILY_DATA
 
     def process(self, obj=None):
@@ -616,7 +621,7 @@ class ImportDailyDataJobHandler(BaseJobHandler):
     Writes daily data to disk
     """
 
-    def get_job(self):
+    def get_job():
         return BackgroundJob.JOB_IMPORT_DAILY_DATA
 
     def process(self, obj=None):
@@ -660,7 +665,7 @@ class ImportBookmarksJobHandler(BaseJobHandler):
     Writes daily data to disk
     """
 
-    def get_job(self):
+    def get_job():
         return BackgroundJob.JOB_IMPORT_BOOKMARKS
 
     def process(self, obj=None):
@@ -696,7 +701,7 @@ class ImportSourcesJobHandler(BaseJobHandler):
     Writes daily data to disk
     """
 
-    def get_job(self):
+    def get_job():
         return BackgroundJob.JOB_IMPORT_SOURCES
 
     def process(self, obj=None):
@@ -725,7 +730,7 @@ class ImportInstanceJobHandler(BaseJobHandler):
     Imports from instance
     """
 
-    def get_job(self):
+    def get_job():
         return BackgroundJob.JOB_IMPORT_INSTANCE
 
     def process(self, obj=None):
@@ -750,7 +755,7 @@ class ImportFromFilesJobHandler(BaseJobHandler):
     Imports from files
     """
 
-    def get_job(self):
+    def get_job():
         return BackgroundJob.JOB_IMPORT_FROM_FILES
 
     def process(self, obj=None):
@@ -785,7 +790,7 @@ class WriteYearDataJobHandler(BaseJobHandler):
     Writes yearly data to disk
     """
 
-    def get_job(self):
+    def get_job():
         return BackgroundJob.JOB_WRITE_YEAR_DATA
 
     def process(self, obj=None):
@@ -809,7 +814,7 @@ class WriteNoTimeDataJobHandler(BaseJobHandler):
     Writes yearly data to disk
     """
 
-    def get_job(self):
+    def get_job():
         return BackgroundJob.JOB_WRITE_NOTIME_DATA
 
     def process(self, obj=None):
@@ -833,7 +838,7 @@ class WriteTopicJobHandler(BaseJobHandler):
     Writes topic data to disk
     """
 
-    def get_job(self):
+    def get_job():
         return BackgroundJob.JOB_WRITE_TOPIC_DATA
 
     def process(self, obj=None):
@@ -858,7 +863,7 @@ class ExportDataJobHandler(BaseJobHandler):
     Pushes data to repo
     """
 
-    def get_job(self):
+    def get_job():
         return BackgroundJob.JOB_EXPORT_DATA
 
     def process(self, obj=None):
@@ -879,7 +884,9 @@ class ExportDataJobHandler(BaseJobHandler):
                 update_mgr.write_and_push_notime_data()
 
             SourceExportHistory.confirm(export)
-            AppLogging.notify("Successfully pushed data to git")
+
+            elapsed_sec = self.get_time_diff_sec()
+            AppLogging.notify("Successfully pushed data to git. Time[s]:{}".format(elapsed_sec))
 
             return True
         except Exception as e:
@@ -897,7 +904,7 @@ class PushYearDataToRepoJobHandler(BaseJobHandler):
     Pushes data to repo
     """
 
-    def get_job(self):
+    def get_job():
         return BackgroundJob.JOB_PUSH_YEAR_DATA_TO_REPO
 
     def process(self, obj=None):
@@ -908,7 +915,9 @@ class PushYearDataToRepoJobHandler(BaseJobHandler):
 
                 update_mgr = UpdateManager(self._config)
                 update_mgr.write_and_push_year_data()
-                AppLogging.notify("Successfully pushed data to git")
+
+                elapsed_sec = self.get_time_diff_sec()
+                AppLogging.notify("Successfully pushed data to git. Time[s]:{}".format(elapsed_sec))
 
             return True
         except Exception as e:
@@ -921,7 +930,7 @@ class PushNoTimeDataToRepoJobHandler(BaseJobHandler):
     Pushes data to repo
     """
 
-    def get_job(self):
+    def get_job():
         return BackgroundJob.JOB_PUSH_NOTIME_DATA_TO_REPO
 
     def process(self, obj=None):
@@ -931,7 +940,9 @@ class PushNoTimeDataToRepoJobHandler(BaseJobHandler):
 
                 update_mgr = UpdateManager(self._config)
                 update_mgr.write_and_push_notime_data()
-                AppLogging.notify("Successfully pushed data to git")
+
+                elapsed_sec = self.get_time_diff_sec()
+                AppLogging.notify("Successfully pushed data to git. Time[s]:{}".format(elapsed_sec))
 
             return True
         except Exception as e:
@@ -944,7 +955,7 @@ class PushDailyDataToRepoJobHandler(BaseJobHandler):
     Pushes data to repo
     """
 
-    def get_job(self):
+    def get_job():
         return BackgroundJob.JOB_PUSH_DAILY_DATA_TO_REPO
 
     def process(self, obj=None):
@@ -957,7 +968,9 @@ class PushDailyDataToRepoJobHandler(BaseJobHandler):
 
                 update_mgr = UpdateManager(self._config)
                 update_mgr.write_and_push_daily_data(date_input)
-                AppLogging.notify("Successfully pushed data to git")
+
+                elapsed_sec = self.get_time_diff_sec()
+                AppLogging.notify("Successfully pushed data to git. Time[s]:{}".format(elapsed_sec))
 
             return True
         except Exception as e:
@@ -972,7 +985,7 @@ class CleanupJobHandler(BaseJobHandler):
     Pushes data to repo
     """
 
-    def get_job(self):
+    def get_job():
         return BackgroundJob.JOB_CLEANUP
 
     def process(self, obj=None):
@@ -1001,7 +1014,9 @@ class CleanupJobHandler(BaseJobHandler):
 
             # if status is True, everything has been cleared correctly
             # we can remove the cleanup background job
-            AppLogging.info("Successfully cleaned database")
+
+            elapsed_sec = self.get_time_diff_sec()
+            AppLogging.info("Successfully cleaned database. Time[s]:{}".format(elapsed_sec))
             return status
 
         except Exception as e:
@@ -1020,7 +1035,7 @@ class CleanupJobHandler(BaseJobHandler):
 
 
 class CheckDomainsJobHandler(BaseJobHandler):
-    def get_job(self):
+    def get_job():
         return BackgroundJob.JOB_CHECK_DOMAINS
 
     def process(self, obj=None):
@@ -1034,7 +1049,7 @@ class CheckDomainsJobHandler(BaseJobHandler):
 
 
 class LinkScanJobHandler(BaseJobHandler):
-    def get_job(self):
+    def get_job():
         return BackgroundJob.JOB_LINK_SCAN
 
     def process(self, obj=None):
@@ -1086,7 +1101,7 @@ class LinkScanJobHandler(BaseJobHandler):
 
 
 class MoveToArchiveJobHandler(BaseJobHandler):
-    def get_job(self):
+    def get_job():
         return BackgroundJob.JOB_MOVE_TO_ARCHIVE
 
     def process(self, obj=None):
@@ -1193,33 +1208,33 @@ class HandlerManager(object):
         """
         return [
             # fmt: off
-            ExportDataJobHandler(),
+            ExportDataJobHandler,
 
-            WriteDailyDataJobHandler(),
-            WriteYearDataJobHandler(),
-            WriteNoTimeDataJobHandler(),
-            WriteTopicJobHandler(),
+            WriteDailyDataJobHandler,
+            WriteYearDataJobHandler,
+            WriteNoTimeDataJobHandler,
+            WriteTopicJobHandler,
 
-            ImportSourcesJobHandler(),
-            ImportBookmarksJobHandler(),
-            ImportDailyDataJobHandler(),
-            ImportInstanceJobHandler(),
-            ImportFromFilesJobHandler(),
+            ImportSourcesJobHandler,
+            ImportBookmarksJobHandler,
+            ImportDailyDataJobHandler,
+            ImportInstanceJobHandler,
+            ImportFromFilesJobHandler,
 
-            CleanupJobHandler(),
-            MoveToArchiveJobHandler(),
-            ProcessSourceJobHandler(),
-            LinkAddJobHandler(),
-            LinkScanJobHandler(),
-            LinkResetDataJobHandler(),
-            LinkResetLocalDataJobHandler(),
-            LinkDownloadJobHandler(),
-            LinkMusicDownloadJobHandler(),
-            LinkVideoDownloadJobHandler(),
-            DownloadModelFileJobHandler(),
-            EntryUpdateData(),
-            LinkSaveJobHandler(),
-            CheckDomainsJobHandler(),
+            CleanupJobHandler,
+            MoveToArchiveJobHandler,
+            ProcessSourceJobHandler,
+            LinkAddJobHandler,
+            LinkScanJobHandler,
+            LinkResetDataJobHandler,
+            LinkResetLocalDataJobHandler,
+            LinkDownloadJobHandler,
+            LinkMusicDownloadJobHandler,
+            LinkVideoDownloadJobHandler,
+            DownloadModelFileJobHandler,
+            EntryUpdateData,
+            LinkSaveJobHandler,
+            CheckDomainsJobHandler,
             # fmt: on
         ]
 
@@ -1261,12 +1276,13 @@ class HandlerManager(object):
         config = Configuration.get_object()
 
         obj = items[0]
-        handler = items[1]
+        handler_class = items[1]
+        handler = None
         subject = obj.subject
         deleted = False
 
-        if handler:
-            handler.set_config(config)
+        if handler_class:
+            handler = handler_class(config)
 
         try:
             if handler and handler.process(obj):
@@ -1343,9 +1359,9 @@ class HandlerManager(object):
         if objs.count() != 0:
             obj = objs[0]
 
-            for key, handler in enumerate(self.get_handlers()):
-                if handler.get_job() == obj.job:
-                    return [obj, handler]
+            for key, handler_class in enumerate(self.get_handlers()):
+                if handler_class.get_job() == obj.job:
+                    return [obj, handler_class]
             return [obj, None]
         return []
 

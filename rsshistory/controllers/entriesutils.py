@@ -26,15 +26,62 @@ from .sources import SourceDataController
 
 
 class EntriesCleanup(object):
-    def __init__(self, archive_cleanup=False):
+    def __init__(self, archive_cleanup=False, start_processing_time=None, limit_s=0):
         self.archive_cleanup = archive_cleanup
 
-    def cleanup(self, limit_s = 0):
-        start_processing_time = time.time()
+        if start_processing_time is None:
+            self.start_processing_time = time.time()
+        else:
+            self.start_processing_time = start_processing_time
 
         if limit_s == 0:
-            limit_s = 60*10 # 10 minutes
+            self.limit_s = 60*10 # 10 minutes
+        else:
+            self.limit_s = limit_s
 
+    def cleanup(self, limit_s = 0):
+        """
+        @return True if successful
+        """
+        if not self.cleanup_remove_entries():
+            return False
+
+        if self.is_time_exceeded():
+            return False
+
+        self.cleanup_invalid_page_ratings()
+
+        if self.is_time_exceeded():
+            return False
+
+        config = Configuration.get_object().config_entry
+        if config.prefer_https:
+            self.move_existing_http_to_https()
+
+        if self.is_time_exceeded():
+            return False
+
+        if config.prefer_non_www_sites:
+            self.move_existing_www_to_nonwww()
+
+        if self.is_time_exceeded():
+            return False
+
+        if not self.archive_cleanup:
+            moved_all = self.move_old_links_to_archive()
+            return moved_all
+
+        if self.is_time_exceeded():
+            return False
+
+        #self.cleanup_permanent_flags()
+
+        #if self.is_time_exceeded():
+        #    return False
+
+        return True
+
+    def cleanup_remove_entries(self, limit_s = 0):
         sources = SourceDataController.objects.all()
         for source in sources:
             LinkDatabase.info("Removing for source:{}".format(source.title))
@@ -45,9 +92,7 @@ class EntriesCleanup(object):
                     LinkDatabase.info("Removing entry:{}".format(entry.link))
                 entries.delete()
 
-            passed_seconds = time.time() - start_processing_time
-            if passed_seconds >= limit_s:
-                LinkDatabase.info("Task exeeded time:{}".format(passed_seconds))
+            if self.is_time_exceeded():
                 return False
 
         entries = self.get_general_entries()
@@ -56,9 +101,7 @@ class EntriesCleanup(object):
                 LinkDatabase.info("Removing entry:{}".format(entry.link))
             entries.delete()
 
-            passed_seconds = time.time() - start_processing_time
-            if passed_seconds >= limit_s:
-                LinkDatabase.info("Task exeeded time:{}".format(passed_seconds))
+            if self.is_time_exceeded():
                 return False
 
         if not self.archive_cleanup:
@@ -68,18 +111,15 @@ class EntriesCleanup(object):
                     LinkDatabase.info("Removing entry:{}".format(entry.link))
                 entries.delete()
 
-                passed_seconds = time.time() - start_processing_time
-                if passed_seconds >= limit_s:
-                    LinkDatabase.info("Task exeeded time:{}".format(passed_seconds))
-                    return False
+        return True
 
-        self.cleanup_invalid_page_ratings()
+    def is_time_exceeded(self):
+        passed_seconds = time.time() - self.start_processing_time
+        if passed_seconds >= self.limit_s:
+            LinkDatabase.info("Task exeeded time:{}".format(passed_seconds))
+            return True
 
-        config = Configuration.get_object().config_entry
-        if config.prefer_https:
-            self.move_existing_http_to_https()
-        if config.prefer_non_www_sites:
-            self.move_existing_www_to_nonwww()
+        return False
 
     def get_source_entries(self, source):
         """
@@ -173,6 +213,94 @@ class EntriesCleanup(object):
             for entry in entries:
                 u = EntryUpdater(entry)
                 u.reset_local_data()
+
+    def move_old_links_to_archive(self):
+        """
+        TODO Refactor IT? I think we should operate on 'chunks' rather than entry-entry
+        """
+        entries = self.get_links_to_move_to_archive()
+        # no more entries to process, cleaned up everything
+        if not entries:
+            return True
+
+        for entry in entries:
+            LinkDatabase.info("Moving link to archive: {}".format(entry.link))
+            LinkDataWrapper(entry=entry).move_to_archive()
+
+            if self.is_time_exceeded():
+                return False
+
+        return True
+
+    def get_links_to_move_to_archive(self):
+        conf = Configuration.get_object().config_entry
+
+        if conf.days_to_move_to_archive == 0:
+            return
+
+        current_time = DateUtils.get_datetime_now_utc()
+        days_before = current_time - timedelta(days=conf.days_to_move_to_archive)
+
+        entries = LinkDataController.objects.filter(
+            bookmarked=False, permanent=False, date_published__lt=days_before
+        ).order_by("date_published")
+
+        if not entries.exists():
+            return
+
+        return entries
+
+    def move_existing_http_to_https(self):
+        """
+        Moves all duplicate links matching criteria
+        """
+        http_entries = LinkDataController.objects.filter(link="http://")
+        if http_entries.exists():
+            for http_entry in http_entries:
+                https_url = http_entries.get_https_url()
+                https_entries = LinkDataController.objects.filter(link=https_url)
+                if https_entries.exists():
+                    w = LinkDataWrapper(http_entry)
+                    w.move_entry(https_entries[0])
+
+    def move_existing_www_to_nonwww(self):
+        """
+        Moves all duplicate links matching criteria
+        """
+        www_entries = LinkDataController.objects.filter(link="https://www.")
+        if www_entries.exists():
+            for www_entry in www_entries:
+                nonwww_url = www_entry.link.replace("https://www.", "https://")
+                nonwww_entries = LinkDataController.objects.filter(link=nonwww_url)
+                if nonwww_entries.exists():
+                    w = LinkDataWrapper(www_entry)
+                    w.move_entry(nonwww_entries[0])
+
+        www_entries = LinkDataController.objects.filter(link="http://www.")
+        if www_entries.exists():
+            for www_entry in www_entries:
+                nonwww_url = www_entry.link.replace("http://www.", "http://")
+                nonwww_entries = LinkDataController.objects.filter(link=nonwww_url)
+                if nonwww_entries.exists():
+                    w = LinkDataWrapper(www_entry)
+                    w.move_entry(nonwww_entries[0])
+
+    def cleanup_permanent_flags(self):
+        """
+        Permaments are:
+         - if enable_domain_support & keep_domains
+        This could be intensive
+        """
+        link_is_url = Q(source_obj__url = F('link'))
+        domain_is_notnull = Q(domain_obj__isnull=False)
+        is_permanent = Q(permanent = True)
+
+        # domain is not null and link is url are valid scenarios
+
+        entries = LinkDataController.objects.filter( ~(link_is_url | domain_is_notnull) & is_permanent)
+        for entry in entries:
+            entry.permanent = False
+            entry.save()
 
 
 class EntryCleanup(object):
@@ -340,17 +468,15 @@ class EntryUpdater(object):
          - some other fields should be set only if present in props
         """
 
-        entry = self.entry
+        w = LinkDataWrapper(entry=self.entry)
+        w.evaluate()
+        w.check_https_http_availability()
+        w.check_www_nonww_availability()
 
-        w = LinkDataWrapper(entry=entry)
-        entry_new = w.check_https_http_protocol()
-        if entry_new:
-            entry = entry_new
+        if not w.entry:
+            return
 
-        w = LinkDataWrapper(entry=entry)
-        entry_new = w.check_link_www_start()
-        if entry_new:
-            entry = entry_new
+        entry = w.entry
 
         url = EntryUrlInterface(entry.link)
         props = url.get_props()
@@ -415,16 +541,15 @@ class EntryUpdater(object):
          - status code and page rating is update always
          - new data are changed only if new data are present at all
         """
-        entry = self.entry
+        w = LinkDataWrapper(entry=self.entry)
+        w.evaluate()
+        w.check_https_http_availability()
+        w.check_www_nonww_availability()
 
-        w = LinkDataWrapper(entry=entry)
-        entry_new = w.check_https_http_protocol()
-        if entry_new:
-            entry = entry_new
-        w = LinkDataWrapper(entry=entry)
-        entry_new = w.check_link_www_start()
-        if entry_new:
-            entry = entry_new
+        if not w.entry:
+            return
+
+        entry = w.entry
 
         url = EntryUrlInterface(entry.link)
         props = url.get_props()
@@ -655,7 +780,10 @@ class EntriesUpdater(object):
 
 class LinkDataWrapper(object):
     """
-    Perform actions for both -> normal, and archive
+    Wrapper for entry. Entries can reside in many places (operation table, archive table).
+    This is unified API for them.
+
+    Provides API to make links more uniform (http vs https)
     """
 
     def __init__(self, link=None, date=None, entry=None):
@@ -672,11 +800,14 @@ class LinkDataWrapper(object):
             if self.entry:
                 self.date = self.entry.date_published
 
-    def is_archive(self):
-        is_archive = BaseLinkDataController.is_archive_by_date(self.date)
-        return is_archive
-
     def get(self):
+        """
+        returns object from any relevant table: operation, archive
+        """
+        ob = self.get_internal()
+        self.entry = ob
+
+    def get_internal(self):
         if self.date:
             is_archive = self.is_archive()
 
@@ -875,19 +1006,24 @@ class LinkDataWrapper(object):
 
         if not is_bookmarked:
             entry.make_not_bookmarked()
-
             self.evaluate()
 
         return entry
 
     def evaluate(self):
         """
-        Evaluates entry. Checks if it is necessary, permanent, if should be removed.
-        We do not want to remove tags, or votes. If entry goes below votes.
+        TODO rename to update()
+
+        Checks:
+         - if entry should be removed due to config accept_domains
+         - updates permanent
+         - if entry should be moved to archive
         """
         config = Configuration.get_object().config_entry
 
         entry = self.entry
+        if not entry:
+            return
 
         p = DomainAwarePage(entry.link)
         is_domain = p.is_domain()
@@ -922,95 +1058,65 @@ class LinkDataWrapper(object):
             elif entry.is_archive_time():
                 return self.move_to_archive()
 
-    def get_clean_description(link_data):
-        import re
-
-        # remove any html tags
-        CLEANR = re.compile("<.*?>")
-        cleantext = re.sub(CLEANR, "", link_data["description"])
-
-        return cleantext
-
-    def move_old_links_to_archive(limit_s=0):
+    def move_entry(self, destination_entry):
         """
-        TODO Refactor this shit. I think we should operate on 'chunks' rather than entry-entry
+        Moves entry to destination entry. Both objects need to exist.
+
+        All properties are moved from source entry to destination entry.
+        Source entry is destroyed
         """
-        start_processing_time = time.time()
+        if destination_entry.is_dead():
+            return None
 
-        entries = LinkDataWrapper.get_links_to_move_to_archive()
-        # no more entries to process, cleaned up everything
-        if not entries:
-            return True
+        from ..models import UserTags, UserVotes, LinkCommentDataModel, UserBookmarks, UserEntryVisitHistory, UserEntryTransitionHistory
 
-        for entry in entries:
-            LinkDatabase.info("Moving link to archive: {}".format(entry.link))
-            LinkDataWrapper(entry=entry).move_to_archive()
+        source_entry = self.entry
 
-            if limit_s == 0:
-                limit_s = 60*10 # 10 minutes
+        UserTags.move_entry(source_entry, destination_entry)
+        UserVotes.move_entry(source_entry, destination_entry)
+        LinkCommentDataModel.move_entry(source_entry, destination_entry)
+        UserBookmarks.move_entry(source_entry, destination_entry)
+        UserEntryVisitHistory.move_entry(source_entry, destination_entry)
+        UserEntryTransitionHistory.move_entry(source_entry, destination_entry)
 
-            passed_seconds = time.time() - start_processing_time
-            if passed_seconds >= limit_s:
-                LinkDatabase.info("Task exeeded time:{}".format(passed_seconds))
-                return False
+        source_entry.delete()
+        self.entry = destination_entry
 
-        return True
+        return self.entry
 
-    def get_links_to_move_to_archive():
-        conf = Configuration.get_object().config_entry
-
-        if conf.days_to_move_to_archive == 0:
-            return
-
-        current_time = DateUtils.get_datetime_now_utc()
-        days_before = current_time - timedelta(days=conf.days_to_move_to_archive)
-
-        entries = LinkDataController.objects.filter(
-            bookmarked=False, permanent=False, date_published__lt=days_before
-        ).order_by("date_published")
-
-        if not entries.exists():
-            return
-
-        return entries
-
-    def move_existing_http_to_https(self):
-        http_entries = LinkDataController.objects.filter(link="http://")
-        if http_entries.exists():
-            for http_entry in http_entries:
-                https_url = http_entries.get_https_url()
-                https_entries = LinkDataController.objects.filter(link=https_url)
-                if https_entries.exists():
-                    w = LinkDataWrapper(http_entry)
-                    w.move_entry(http_entry, https_entries[0])
-
-    def move_existing_www_to_nonwww(self):
-        www_entries = LinkDataController.objects.filter(link="https://www.")
-        if www_entries.exists():
-            for www_entry in www_entries:
-                nonwww_url = www_entry.link.replace("https://www.", "https://")
-                nonwww_entries = LinkDataController.objects.filter(link=nonwww_url)
-                if nonwww_entries.exists():
-                    w = LinkDataWrapper(www_entry)
-                    w.move_entry(www_entry, nonwww_entries[0])
-
-        www_entries = LinkDataController.objects.filter(link="http://www.")
-        if www_entries.exists():
-            for www_entry in www_entries:
-                nonwww_url = www_entry.link.replace("http://www.", "http://")
-                nonwww_entries = LinkDataController.objects.filter(link=nonwww_url)
-                if nonwww_entries.exists():
-                    w = LinkDataWrapper(www_entry)
-                    w.move_entry(www_entry, nonwww_entries[0])
-
-    def check_https_http_protocol(self):
+    def move_entry_to_url(self, destination_url):
         """
+        Moves entry to destination url.
+        """
+        destination_entries = LinkDataController.objects.filter(link = destination_url)
+
+        if destination_entries.count() > 0:
+            return self.move_entry(destination_entries[0])
+        else:
+            self.entry.link = destination_url
+            self.entry.save()
+
+            return self.entry
+
+    def is_archive(self):
+        is_archive = BaseLinkDataController.is_archive_by_date(self.date)
+        return is_archive
+
+    def check_https_http_availability(self):
+        """
+        TODO name is bad
+
         TODO maybe should be returning valid object if moved?
         TODO rewrite check_entry_versions(https_link_name, http_link_name)
         TODO rewrite check_entry_versions(nonwww_link_name, www_link_name)
 
         @returns new object, or None object has not been changed
         """
+        if not entry:
+            return
+
+        self.check_https_http_availability_entries()
+
         entry = self.entry
 
         c = Configuration.get_object().config_entry
@@ -1020,60 +1126,44 @@ class LinkDataWrapper(object):
         if entry.is_https():
             http_url = entry.get_http_url()
 
-            # if we have both, destroy http entry
-
-            http_entries = LinkDataController.objects.filter(link=http_url)
-            if http_entries.count() != 0:
-                http_entries.delete()
-
             p = BasePage(url = entry.link)
             ping_status = p.ping()
 
-            p = BasePage(url = http_url)
-            new_ping_status = p.ping()
+            if not ping_status:
+                p = BasePage(url = http_url)
+                new_ping_status = p.ping()
 
-            if not ping_status and new_ping_status:
-                new_entry = LinkDataWrapper(entry=entry).move_entry_to_url(http_url)
-                if new_entry:
-                    return new_entry
-                else:
-                    return entry
+                if new_ping_status:
+                    return LinkDataWrapper(entry=entry).move_entry_to_url(http_url)
 
-            if ping_status and new_ping_status:
-                http_entries = LinkDataController.objects.filter(link=http_url)
-                if http_entries.count() > 0:
-                    http_entries.delete()
-
-            return entry
+            return self.entry
 
         if entry.is_http():
             https_url = entry.get_https_url()
-
-            # if we have both, destroy http entry
-            https_entries = LinkDataController.objects.filter(link=https_url)
-            if https_entries.count() != 0:
-                entry.delete()
-                return https_entries[0]
 
             p = BasePage(https_url)
             new_ping_status = p.ping()
 
             if new_ping_status:
-                new_entry = LinkDataWrapper(entry=entry).move_entry_to_url(https_url)
-                if new_entry:
-                    return new_entry
-                else:
-                    return entry
+                return LinkDataWrapper(entry=entry).move_entry_to_url(https_url)
 
-        return entry
+        return self.entry
 
-    def check_link_www_start(self):
+    def check_www_nonww_availability(self):
         """
         This function checks if there is non www link, similar to original.
         If there is we can remove link with www, to have less links to operate with.
 
+        # TODO shouldn't we use UrlHandler? Yes, but it does not have 'ping'
+        # Using basepage is errnous, since some pages might not return correct ping status
+
         @returns new object, or None if object has not been changed
         """
+        if not entry:
+            return
+
+        self.check_www_nonww_availability_entries()
+
         c = Configuration.get_object().config_entry
 
         if not c.prefer_non_www_sites:
@@ -1087,46 +1177,64 @@ class LinkDataWrapper(object):
 
         destination_link = entry.link.replace("www.", "")
 
-        w = LinkDataWrapper(link=destination_link)
-        destination_entry = w.get()
+        p = BasePage(url = destination_link)
+        if p.ping():
+            self.move_entry_to_url(destination_link)
 
-        if not destination_entry:
-            p = BasePage(url = destination_link)
-            if p.ping():
-                self.move_entry_to_url(destination_link)
+        return self.entry
 
-            return entry
+    def check_https_http_availability_entries(self):
+        """
+        Removes http<>https duplicates, if we have http and https pages select https to be present
+        """
+        entry = self.entry
+
+        if entry.is_https():
+            http_url = entry.get_http_url()
+
+            http_entries = LinkDataController.objects.filter(link=http_url)
+            if http_entries.count() != 0:
+                w = LinkDataWrapper(entry = http_entries[0])
+                w.move_entry(entry)
+
+        if entry.is_http():
+            https_url = entry.get_https_url()
+
+            # if we have both, destroy http entry
+            https_entries = LinkDataController.objects.filter(link=https_url)
+            if https_entries.count() != 0:
+                self.move_entry(https_entries[0])
+
+        return self.entry
+
+    def check_www_nonww_availability_entries(self):
+        """
+        Removes non-www and www pages duplicates.
+        """
+        entry = self.entry
+
+        p = DomainAwarePage(entry.link)
+
+        url_parts = p.parse_url()
+        domain_only = url_parts[2].lower()
+
+        if domain_only.startswith("www."):
+            link_with_www = entry.link
+            link_without_www = entry.link.replace("www.", "")
         else:
-            if not destination_entry.is_dead():
-                self.move_entry(source_entry = self.entry, destination_entry = destination_entry)
-                return destination_entry
-            else:
-                return entry
+            # TODO should there be API for that?
+            link_without_www = entry.link
+            joined = "/".join(url_parts[1:])
+            link_with_www = url_parts[0] + "www." + joined
 
-    def move_entry(self, source_entry, destination_entry):
-        if destination_entry.is_dead():
-            return None
-
-        from ..models import UserTags, UserVotes, LinkCommentDataModel, UserBookmarks, UserEntryVisitHistory, UserEntryTransitionHistory
-
-        UserTags.move_entry(source_entry, destination_entry)
-        UserVotes.move_entry(source_entry, destination_entry)
-        LinkCommentDataModel.move_entry(source_entry, destination_entry)
-        UserBookmarks.move_entry(source_entry, destination_entry)
-        UserEntryVisitHistory.move_entry(source_entry, destination_entry)
-        UserEntryTransitionHistory.move_entry(source_entry, destination_entry)
-
-        source_entry.delete()
-        return destination_entry
-
-    def move_entry_to_url(self, destination_url):
-        destination_entries = LinkDataController.objects.filter(destination_url)
-
-        if destination_entries.count() > 0:
-            return self.move_entry(self.entry, destination_entries[0])
+        if domain_only.startswith("www."):
+            entries = LinkDataController.objects.filter(link=link_without_www)
+            if entries.exists():
+                self.move_entry(entry = entries[0])
         else:
-            self.entry.link = destination_url
-            return self.entry
+            entries = LinkDataController.objects.filter(link=link_with_www)
+            if entries.exists():
+                self.move_entry(entry = self.entry)
 
 
 class EntryDataBuilder(object):
@@ -1555,13 +1663,15 @@ class EntryDataBuilder(object):
 
 class EntriesCleanupAndUpdate(object):
     def cleanup(self, limit_s = 0):
-        cleanup = EntriesCleanup(archive_cleanup=False)
-        cleanup.cleanup(limit_s)
-        cleanup = EntriesCleanup(archive_cleanup=True)
-        cleanup.cleanup(limit_s)
+        start_processing_time = time.time()
 
-        # TODO Move to link wrapper
-        moved_all = LinkDataWrapper.move_old_links_to_archive(limit_s)
+        cleanup = EntriesCleanup(archive_cleanup=False, start_processing_time=start_processing_time)
+        if not cleanup.cleanup(limit_s):
+            return False
+
+        cleanup = EntriesCleanup(archive_cleanup=True, start_processing_time=start_processing_time)
+        if not cleanup.cleanup(limit_s):
+            return False
 
         # indicate that all has been finished correctly
-        return moved_all
+        return True

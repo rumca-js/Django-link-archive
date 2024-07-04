@@ -412,10 +412,10 @@ def remove_source(request, pk):
     if data is not None:
         return data
 
-    ft = SourceDataController.objects.filter(id=pk)
-    if ft.exists():
-        source_url = ft[0].url
-        ft.delete()
+    sources = SourceDataController.objects.filter(id=pk)
+    if sources.exists():
+        for source in sources:
+            source.custom_remove()
 
         return HttpResponseRedirect(reverse("{}:sources".format(LinkDatabase.name)))
     else:
@@ -458,9 +458,10 @@ def remove_all_sources(request):
     if data is not None:
         return data
 
-    ft = SourceDataController.objects.all()
-    if ft.exists():
-        ft.delete()
+    sources = SourceDataController.objects.all()
+    if sources.exists():
+        for source in sources:
+            source.custom_remove()
 
         return HttpResponseRedirect(reverse("{}:sources".format(LinkDatabase.name)))
     else:

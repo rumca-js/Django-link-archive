@@ -368,6 +368,7 @@ def wizard_setup_news(request):
     c.accept_not_domain_entries = True
     c.auto_store_sources = False
     c.accept_domains = False
+    c.keep_domains = False
     c.enable_keyword_support = True
     c.track_user_actions = True
     c.track_user_searches = True
@@ -408,6 +409,7 @@ def wizard_setup_gallery(request):
     c.accept_not_domain_entries = True
     c.auto_store_sources = False
     c.accept_domains = False
+    c.keep_domains = False
     c.enable_keyword_support = False
     c.track_user_actions = True
     c.track_user_searches = True

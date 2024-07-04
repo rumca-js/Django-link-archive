@@ -646,7 +646,8 @@ def add_entry(request):
         valid = form.is_valid()
         link = request.POST.get("link", "")
 
-        ob = LinkDataWrapper(link=link).get()
+        w = LinkDataWrapper(link=link)
+        ob = w.get()
         if ob:
             return HttpResponseRedirect(ob.get_absolute_url())
 
@@ -762,9 +763,10 @@ def add_simple_entry(request):
         warnings = []
         errors = []
 
-        obs = LinkDataController.objects.filter(link=data["link"])
-        if obs.exists():
-            ob = obs[0]
+        link = data["link"]
+
+        ob = LinkDataWrapper(link=link).get()
+        if ob:
             return HttpResponseRedirect(ob.get_absolute_url())
 
         data["user"] = request.user.username

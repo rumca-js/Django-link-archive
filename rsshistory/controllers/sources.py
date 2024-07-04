@@ -352,7 +352,15 @@ class SourceDataController(SourceDataModel):
         from .backgroundjob import BackgroundJobController
 
         properties = {"permament": True}
-        BackgroundJobController.link_add(source.url, properties=properties)
+        BackgroundJobController.link_add(url = source.url, properties=properties, source=source)
+
+    def custom_remove(self):
+        entries = LinkDataModel.objects.filter(link = self.url)
+        if entries.exists():
+            entry = entries[0]
+            entry.permament = False
+
+        self.delete()
 
 
 class SourceDataBuilder(object):
