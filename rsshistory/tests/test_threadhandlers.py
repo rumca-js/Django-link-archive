@@ -31,6 +31,14 @@ from ..dateutils import DateUtils
 from .fakeinternet import FakeInternetTestCase
 
 
+class HandlerThatThrowsExceptionInProcess(object):
+    def __init__(self, config=None):
+        pass
+
+    def process(self, obj=None):
+        raise IOError("Though luck")
+
+
 class HandlerManagerTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
@@ -356,6 +364,24 @@ class HandlerManagerTest(FakeInternetTestCase):
                 BackgroundJobController.JOB_LINK_ADD
             ),
         )
+
+    def test_process_one_for_all__exception(self):
+        obj = BackgroundJobController.objects.create(
+            job=BackgroundJobController.JOB_CLEANUP,
+            enabled=True,
+        )
+
+        items = [obj, HandlerThatThrowsExceptionInProcess]
+
+        mgr = HandlerManager(timeout_s=0)
+
+        # call tested function
+        mgr.process_one_for_all(items)
+
+        jobs = BackgroundJobController.objects.filter(
+            job=BackgroundJobController.JOB_LINK_ADD
+        )
+        self.assertEqual(jobs.count(), 0)
 
 
 class RefreshThreadHandlerTest(FakeInternetTestCase):

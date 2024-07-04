@@ -98,9 +98,9 @@ class BaseJobHandler(object):
             try:
                 cfg = json.loads(in_object.args)
             except Exception as E:
-                AppLogging.error(
-                    "Exception when adding link {0} {1} {2}".format(
-                        in_object.subject, str(e), error_text
+                AppLogging.exc(exception_object = E,
+                    info_text = "Exception when adding link {0}".format(
+                        in_object.subject
                     )
                 )
 
@@ -119,8 +119,8 @@ class ProcessSourceJobHandler(BaseJobHandler):
         try:
             try:
                 source_id = int(obj.subject)
-            except Exception as e:
-                AppLogging.error("Incorrect source ID:{}".format(obj.subject))
+            except Exception as E:
+                AppLogging.exc(exception_object = E, info_text="Incorrect source ID:{}".format(obj.subject))
 
                 obj.enabled = False
                 obj.save()
@@ -146,12 +146,9 @@ class ProcessSourceJobHandler(BaseJobHandler):
             AppLogging.error("Cannot find controller plugin for source:{}".format(obj.subject))
             return False
 
-        except Exception as e:
-            error_text = traceback.format_exc()
-            AppLogging.error(
-                "Exception during parsing page contents {0} {1} {2}".format(
-                    obj.subject, str(e), error_text
-                )
+        except Exception as E:
+            AppLogging.exc(exception_object = E, 
+                info_text = "Exception during parsing page contents {0} {1} {2}".format(obj.subject)
             )
 
 
@@ -169,8 +166,8 @@ class EntryUpdateData(BaseJobHandler):
 
             try:
                 link_id = int(obj.subject)
-            except Exception as e:
-                AppLogging.error("Incorrect link ID:{}".format(obj.subject))
+            except Exception as E:
+                AppLogging.exc(exception_object = E, info_text="Incorrect link ID:{}".format(obj.subject))
                 # consume job
                 return True
 
@@ -188,12 +185,9 @@ class EntryUpdateData(BaseJobHandler):
                 )
 
             return True
-        except Exception as e:
-            error_text = traceback.format_exc()
-            AppLogging.error(
-                "Exception when updating link data {0} {1} {2}".format(
-                    obj.subject, str(e), error_text
-                )
+        except Exception as E:
+            AppLogging.exc(exception_object = E, 
+                info_text = "Exception when updating link data {0} {1} {2}".format(obj.subject)
             )
 
 
@@ -205,8 +199,8 @@ class LinkResetDataJobHandler(BaseJobHandler):
         try:
             try:
                 link_id = int(obj.subject)
-            except Exception as e:
-                AppLogging.error("Incorrect link ID:{}".format(obj.subject))
+            except Exception as E:
+                AppLogging.exc(exception_object = E, info_text = "Incorrect link ID:{}".format(obj.subject))
                 # consume job
                 return True
 
@@ -218,9 +212,8 @@ class LinkResetDataJobHandler(BaseJobHandler):
                 u.reset_data()
 
             return True
-        except Exception as e:
-            error_text = traceback.format_exc()
-            AppLogging.error("Exception: {} {}".format(str(e), error_text))
+        except Exception as E:
+            AppLogging.exc(exception_object = E,)
 
 
 class LinkResetLocalDataJobHandler(BaseJobHandler):
@@ -231,8 +224,8 @@ class LinkResetLocalDataJobHandler(BaseJobHandler):
         try:
             try:
                 link_id = int(obj.subject)
-            except Exception as e:
-                AppLogging.error("Incorrect link ID:{}".format(obj.subject))
+            except Exception as E:
+                AppLogging.exc(exception_object = E, info_text = "Incorrect link ID:{}".format(obj.subject))
                 # consume job
                 return True
 
@@ -244,9 +237,8 @@ class LinkResetLocalDataJobHandler(BaseJobHandler):
                 u.reset_local_data()
 
             return True
-        except Exception as e:
-            error_text = traceback.format_exc()
-            AppLogging.error("Exception: {} {}".format(str(e), error_text))
+        except Exception as E:
+            AppLogging.exc(exception_object = E,)
 
 
 class LinkDownloadJobHandler(BaseJobHandler):
@@ -266,12 +258,9 @@ class LinkDownloadJobHandler(BaseJobHandler):
             AppLogging.notify("Page has been downloaded:{} Time[s]:{}".format(url, self.get_time_diff_sec()))
 
             return True
-        except Exception as e:
-            error_text = traceback.format_exc()
-            AppLogging.error(
-                "Exception downloading web page {0} {1} {2}".format(
-                    obj.subject, str(e), error_text
-                )
+        except Exception as E:
+            AppLogging.exc(exception_object = E,
+                info_text = "Exception downloading web page {0}".format(obj.subject)
             )
 
 
@@ -315,11 +304,10 @@ class LinkMusicDownloadJobHandler(BaseJobHandler):
             AppLogging.notify("Downloading music done: {} {}. Time[s]:{}".format(url, title, elapsed_sec))
 
             return True
-        except Exception as e:
-            error_text = traceback.format_exc()
-            AppLogging.error(
-                "Exception downloading music {0} {1} {2}".format(
-                    obj.subject, str(e), error_text
+        except Exception as E:
+            AppLogging.exc(exception_object = E,
+                info_text = "Exception downloading music {0}".format(
+                    obj.subject
                 )
             )
             return True
@@ -391,11 +379,10 @@ class LinkVideoDownloadJobHandler(BaseJobHandler):
             AppLogging.notify("Downloading video done: {} {}. Time[s]:{}".format(url, title, elapsed_sec))
 
             return True
-        except Exception as e:
-            error_text = traceback.format_exc()
-            AppLogging.error(
-                "Exception downloading video {0} {1} {2}".format(
-                    obj.subject, str(e), error_text
+        except Exception as E:
+            AppLogging.exc(exception_object = E,
+                info_text = "Exception downloading video {0}".format(
+                    obj.subject
                 )
             )
             return True
@@ -455,11 +442,10 @@ class DownloadModelFileJobHandler(BaseJobHandler):
             ModelFilesBuilder().build(file_name)
 
             return True
-        except Exception as e:
-            error_text = traceback.format_exc()
-            AppLogging.error(
-                "Exception downloading file {0} {1} {2}".format(
-                    obj.subject, str(e), error_text
+        except Exception as E:
+            AppLogging.exc(exception_object = E,
+                info_text = "Exception downloading file {0} {1} {2}".format(
+                    obj.subject
                 )
             )
             return True
@@ -483,12 +469,9 @@ class LinkAddJobHandler(BaseJobHandler):
 
             return True
 
-        except Exception as e:
-            error_text = traceback.format_exc()
-            AppLogging.error(
-                "Exception when adding link {0} {1} {2}".format(
-                    obj.subject, str(e), error_text
-                )
+        except Exception as E:
+            AppLogging.exc(exception_object = E,
+                info_text = "Exception when adding link {0}".format(obj.subject)
             )
             # remove object from queue if it cannot be added
             return True
@@ -583,11 +566,8 @@ class LinkSaveJobHandler(BaseJobHandler):
                 wb.save(item)
 
             return True
-        except Exception as e:
-            error_text = traceback.format_exc()
-            AppLogging.error(
-                "Exception on LinkArchiveHandler {} {}".format(str(e), error_text)
-            )
+        except Exception as E:
+            AppLogging.exc(exception_object = E,)
 
 
 class WriteDailyDataJobHandler(BaseJobHandler):
@@ -609,11 +589,8 @@ class WriteDailyDataJobHandler(BaseJobHandler):
             update_mgr.write_daily_data(date_input.isoformat())
 
             return True
-        except Exception as e:
-            error_text = traceback.format_exc()
-            AppLogging.error(
-                "Exception: Daily data job handler: {} {}".format(str(e), error_text)
-            )
+        except Exception as E:
+            AppLogging.exc(exception_object = E,)
 
 
 class ImportDailyDataJobHandler(BaseJobHandler):
@@ -802,11 +779,8 @@ class WriteYearDataJobHandler(BaseJobHandler):
             mgr.write_year_data()
 
             return True
-        except Exception as e:
-            error_text = traceback.format_exc()
-            AppLogging.error(
-                "Exception: Writing yearly data: {} {}".format(str(e), error_text)
-            )
+        except Exception as E:
+            AppLogging.exc(exception_object = E,)
 
 
 class WriteNoTimeDataJobHandler(BaseJobHandler):
@@ -826,11 +800,8 @@ class WriteNoTimeDataJobHandler(BaseJobHandler):
             mgr.write_notime_data()
 
             return True
-        except Exception as e:
-            error_text = traceback.format_exc()
-            AppLogging.error(
-                "Exception: Writing notime: {} {}".format(str(e), error_text)
-            )
+        except Exception as E:
+            AppLogging.exc(exception_object = E,)
 
 
 class WriteTopicJobHandler(BaseJobHandler):
@@ -851,11 +822,8 @@ class WriteTopicJobHandler(BaseJobHandler):
             exporter.export(topic)
 
             return True
-        except Exception as e:
-            error_text = traceback.format_exc()
-            AppLogging.error(
-                "Exception: Writing topic data: {} {}".format(str(e), error_text)
-            )
+        except Exception as E:
+            AppLogging.exc(exception_object = E,)
 
 
 class ExportDataJobHandler(BaseJobHandler):
@@ -889,9 +857,8 @@ class ExportDataJobHandler(BaseJobHandler):
             AppLogging.notify("Successfully pushed data to git. Time[s]:{}".format(elapsed_sec))
 
             return True
-        except Exception as e:
-            error_text = traceback.format_exc()
-            AppLogging.error("Exception: {} {}".format(str(e), error_text))
+        except Exception as E:
+            AppLogging.exc(exception_object = E,)
 
     def get_export(self, obj):
         exports = DataExport.objects.filter(id=int(obj.subject))
@@ -920,9 +887,8 @@ class PushYearDataToRepoJobHandler(BaseJobHandler):
                 AppLogging.notify("Successfully pushed data to git. Time[s]:{}".format(elapsed_sec))
 
             return True
-        except Exception as e:
-            error_text = traceback.format_exc()
-            AppLogging.error("Exception: {} {}".format(str(e), error_text))
+        except Exception as E:
+            AppLogging.exc(exception_object = E,)
 
 
 class PushNoTimeDataToRepoJobHandler(BaseJobHandler):
@@ -945,9 +911,8 @@ class PushNoTimeDataToRepoJobHandler(BaseJobHandler):
                 AppLogging.notify("Successfully pushed data to git. Time[s]:{}".format(elapsed_sec))
 
             return True
-        except Exception as e:
-            error_text = traceback.format_exc()
-            AppLogging.error("Exception: {} {}".format(str(e), error_text))
+        except Exception as E:
+            AppLogging.exc(exception_object = E,)
 
 
 class PushDailyDataToRepoJobHandler(BaseJobHandler):
@@ -973,11 +938,8 @@ class PushDailyDataToRepoJobHandler(BaseJobHandler):
                 AppLogging.notify("Successfully pushed data to git. Time[s]:{}".format(elapsed_sec))
 
             return True
-        except Exception as e:
-            error_text = traceback.format_exc()
-            AppLogging.error(
-                "Push daily data exception: {} {}".format(str(e), error_text)
-            )
+        except Exception as E:
+            AppLogging.exc(exception_object = E,)
 
 
 class CleanupJobHandler(BaseJobHandler):
@@ -1019,9 +981,8 @@ class CleanupJobHandler(BaseJobHandler):
             AppLogging.info("Successfully cleaned database. Time[s]:{}".format(elapsed_sec))
             return status
 
-        except Exception as e:
-            error_text = traceback.format_exc()
-            AppLogging.error("Cleanup exception: {} {}".format(str(e), error_text))
+        except Exception as E:
+            AppLogging.exc(exception_object = E,)
 
     def user_tables_cleanup(self):
         UserTags.cleanup()
@@ -1043,9 +1004,8 @@ class CheckDomainsJobHandler(BaseJobHandler):
             DomainsController.update_all()
 
             return True
-        except Exception as e:
-            error_text = traceback.format_exc()
-            AppLogging.error("Exception: {} {}".format(str(e), error_text))
+        except Exception as E:
+            AppLogging.exc(exception_object = E,)
 
 
 class LinkScanJobHandler(BaseJobHandler):
@@ -1095,9 +1055,8 @@ class LinkScanJobHandler(BaseJobHandler):
                 scanner.run()
 
             return True
-        except Exception as e:
-            error_text = traceback.format_exc()
-            AppLogging.error("Exception: {} {}".format(str(e), error_text))
+        except Exception as E:
+            AppLogging.exc(exception_object = E,)
 
 
 class MoveToArchiveJobHandler(BaseJobHandler):
@@ -1109,9 +1068,8 @@ class MoveToArchiveJobHandler(BaseJobHandler):
             LinkDataController.move_old_links_to_archive()
 
             return True
-        except Exception as e:
-            error_text = traceback.format_exc()
-            AppLogging.error("Exception: {} {}".format(str(e), error_text))
+        except Exception as E:
+            AppLogging.exc(exception_object = E,)
 
 
 class RefreshThreadHandler(object):
@@ -1268,9 +1226,8 @@ class HandlerManager(object):
 
                     self.on_not_safe_exit(items)
                     break
-        except Exception as e:
-            error_text = traceback.format_exc()
-            AppLogging.error(error_text)
+        except Exception as E:
+            AppLogging.exc(exception_object = E,)
 
     def process_one_for_all(self, items):
         config = Configuration.get_object()
@@ -1308,18 +1265,15 @@ class HandlerManager(object):
         except Exception as E:
             error_text = traceback.format_exc()
             if not deleted and obj:
-                AppLogging.error(
-                    "Exception during handler processing job:{}\nsubject:{}\nException:{}\nError text:{}".format(
-                        obj.job, obj.subject, str(E), error_text
+                AppLogging.exc(
+                    exception_object = E,
+                    info_text = "Job:{}, Subject:{}".format(
+                        obj.job, obj.subject
                     )
                 )
                 obj.on_error()
             else:
-                AppLogging.error(
-                    "Exception during handler processing job: Exception:{}\nError text:{}".format(
-                        str(E), error_text
-                    )
-                )
+                AppLogging.exc(exception_object = E,)
 
     def process_one(self):
         """
@@ -1342,9 +1296,8 @@ class HandlerManager(object):
                 return False
 
             AppLogging.debug("Processing messages done")
-        except Exception as e:
-            error_text = traceback.format_exc()
-            AppLogging.error(error_text)
+        except Exception as E:
+            AppLogging.exc(exception_object = E,)
 
         return True
 

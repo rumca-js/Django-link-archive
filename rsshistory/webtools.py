@@ -1728,13 +1728,14 @@ class HtmlPage(ContentInterface):
                 if attr.lower() == "charset":
                     return meta.attrs[attr]
                 if attr.lower() == "http-equiv":
-                    text = meta.attrs["content"].lower()
-                    wh = text.find("charset")
-                    if wh >= 0:
-                        wh2 = text.find("=", wh)
-                        if wh2 >= 0:
-                            charset = text[wh2 + 1 :].strip()
-                            return charset
+                    if "content" in meta.attrs:
+                        text = meta.attrs["content"].lower()
+                        wh = text.find("charset")
+                        if wh >= 0:
+                            wh2 = text.find("=", wh)
+                            if wh2 >= 0:
+                                charset = text[wh2 + 1 :].strip()
+                                return charset
 
     def get_author(self):
         """
