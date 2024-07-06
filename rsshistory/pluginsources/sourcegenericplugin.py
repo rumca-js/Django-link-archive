@@ -39,7 +39,7 @@ class SourceGenericPlugin(object):
         if not source.enabled:
             return
 
-        LinkDatabase.info("Plugin: checking source {}".format(source.url))
+        AppLogging.debug("Plugin: checking source {}".format(source.url))
 
         # We do not check if data is correct. We can manually add processing to queue
         # We want the source to be processed then
@@ -62,7 +62,7 @@ class SourceGenericPlugin(object):
             return True
 
         if self.dead:
-            LinkDatabase.info("Plugin: page is dead {}".format(self.get_source().url))
+            AppLogging.debug("Plugin: page is dead {}".format(self.get_source().url))
 
             self.set_operational_info(
                 stop_time,
@@ -126,12 +126,12 @@ class SourceGenericPlugin(object):
         source = self.get_source()
 
         if self.hash and source.get_page_hash() == self.hash:
-            LinkDatabase.info(
+            AppLogging.debug(
                 "Page not changed: {} {}".format(source.url, source.title)
             )
             return False
         elif not self.hash:
-            LinkDatabase.info(
+            AppLogging.debug(
                 "Cannot obtain hash, skipping {} {}".format(source.url, source.title)
             )
             return False

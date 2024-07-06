@@ -17,6 +17,10 @@
   <p class="error-text">There errors with your query</p>
   {% endif %}
 
+  {% if query %}
+  <!--p>{{query}}</p-->
+  {% endif %}
+
   <ul>
     {% for field, errors in filter_form.errors.items %}
       {% for error in errors %}

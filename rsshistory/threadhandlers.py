@@ -957,7 +957,7 @@ class CleanupJobHandler(BaseJobHandler):
                 if obj is not None:
                     limit_s = int(obj.subject)
             except Exception as E:
-                LinkDatabase.info("Cleanup, cannot read limit value:{}".format(str(E)))
+                AppLogging.debug("Cleanup, cannot read limit value:{}".format(str(E)))
 
             status = EntriesCleanupAndUpdate().cleanup(limit_s)
 

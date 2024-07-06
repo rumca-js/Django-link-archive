@@ -74,7 +74,7 @@ class ConfigurationEntry(models.Model):
         help_text="Debug mode allows to see errors more clearly",
     )  # True if celery is defined, and used
 
-    logging_level = models.IntegerField(default=int(logging.INFO))
+    logging_level = models.IntegerField(default=int(logging.WARNING))
 
     respect_robots_txt = models.BooleanField(
         default=True,
@@ -160,6 +160,10 @@ class ConfigurationEntry(models.Model):
         default=False, help_text="If true domains will be made permanent"
     )
 
+    keep_permanent_items = models.BooleanField(
+        default=True, help_text="This affects permament and bookmarked status entries"
+    )
+
     enable_keyword_support = models.BooleanField(
         default=True, help_text="Enable keyword feature support"
     )
@@ -191,10 +195,6 @@ class ConfigurationEntry(models.Model):
     number_of_update_entries = models.IntegerField(
         default=1,
         help_text="The amount of entries that will be updated at each refresh",
-    )
-
-    keep_permament_items = models.BooleanField(
-        default=True, help_text="This affects permament and bookmarked status entries"
     )
 
     days_to_move_to_archive = models.IntegerField(
@@ -560,7 +560,7 @@ class AppLogging(models.Model):
         AppLogging.create_entry(info_text, level = AppLogging.INFO)
 
     def debug(info_text, user=None):
-        AppLogging.create_entry(info_text, level = AppLogging.DEBUG)
+        LinkDatabase.info(info_text)
 
     def warning(info_text, user=None):
         AppLogging.create_entry(info_text, level = AppLogging.WARNING)

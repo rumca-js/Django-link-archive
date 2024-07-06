@@ -25,7 +25,7 @@
 <div class="container">
     {% for info in content_list %}
     <div 
-     {% if info.is_info %}
+     {% if info.is_info or info.is_notification%}
 	 class="bg-primary"
      {% elif info.is_warning %}
 	 class="bg-warning"

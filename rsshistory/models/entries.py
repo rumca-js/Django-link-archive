@@ -182,15 +182,20 @@ class BaseLinkDataController(BaseLinkDataModel):
         return "______"
 
     def get_title(self):
+        if not self.title:
+            return
+
         title = self.title[:100]
 
         code = self.get_title_info_string()
         votes = self.page_rating_votes
 
-        if code:
+        if votes > 0 and code:
             title = "[{}|{}] ".format(votes, code) + title
-        else:
+        elif votes > 0:
             title = "[{}] ".format(votes) + title
+        elif code:
+            title = "[{}] ".format(code) + title
 
         return title
 
@@ -483,7 +488,7 @@ class BaseLinkDataController(BaseLinkDataModel):
 
         conf = Configuration.get_object().config_entry
 
-        if not conf.keep_permament_items:
+        if not conf.keep_permanent_items:
             return False
 
         return self.permanent or self.bookmarked

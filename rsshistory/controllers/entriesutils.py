@@ -84,12 +84,12 @@ class EntriesCleanup(object):
     def cleanup_remove_entries(self, limit_s = 0):
         sources = SourceDataController.objects.all()
         for source in sources:
-            LinkDatabase.info("Removing for source:{}".format(source.title))
+            AppLogging.debug("Removing for source:{}".format(source.title))
             entries = self.get_source_entries(source)
 
             if entries:
                 for entry in entries:
-                    LinkDatabase.info("Removing entry:{}".format(entry.link))
+                    AppLogging.debug("Removing entry:{}".format(entry.link))
                 entries.delete()
 
             if self.is_time_exceeded():
@@ -98,7 +98,7 @@ class EntriesCleanup(object):
         entries = self.get_general_entries()
         if entries:
             for entry in entries:
-                LinkDatabase.info("Removing entry:{}".format(entry.link))
+                AppLogging.debug("Removing entry:{}".format(entry.link))
             entries.delete()
 
             if self.is_time_exceeded():
@@ -108,7 +108,7 @@ class EntriesCleanup(object):
             entries = self.get_stale_entries()
             if entries:
                 for entry in entries:
-                    LinkDatabase.info("Removing entry:{}".format(entry.link))
+                    AppLogging.debug("Removing entry:{}".format(entry.link))
                 entries.delete()
 
         return True
@@ -144,7 +144,7 @@ class EntriesCleanup(object):
         days_before = DateUtils.get_days_before_dt(days)
 
         condition_source = Q(source=source.url) & Q(date_published__lt=days_before)
-        if config.keep_permament_items:
+        if config.keep_permanent_items:
             condition_source &= Q(bookmarked=False, permanent=False)
 
         if not self.archive_cleanup:
@@ -171,7 +171,7 @@ class EntriesCleanup(object):
         days_before = DateUtils.get_days_before_dt(days)
 
         condition = Q(date_published__lt=days_before)
-        if config.keep_permament_items:
+        if config.keep_permanent_items:
             condition &= Q(bookmarked=False, permanent=False)
 
         if not self.archive_cleanup:
@@ -194,7 +194,7 @@ class EntriesCleanup(object):
         days_before = DateUtils.get_days_before_dt(days)
 
         condition = Q(date_published__lt=days_before)
-        if config.keep_permament_items:
+        if config.keep_permanent_items:
             condition &= Q(bookmarked=False, permanent=False)
 
         entries = LinkDataController.objects.filter(condition)
@@ -224,7 +224,7 @@ class EntriesCleanup(object):
             return True
 
         for entry in entries:
-            LinkDatabase.info("Moving link to archive: {}".format(entry.link))
+            AppLogging.debug("Moving link to archive: {}".format(entry.link))
             LinkDataWrapper(entry=entry).move_to_archive()
 
             if self.is_time_exceeded():
@@ -806,6 +806,7 @@ class LinkDataWrapper(object):
         """
         ob = self.get_internal()
         self.entry = ob
+        return ob
 
     def get_internal(self):
         if self.date:
@@ -845,7 +846,7 @@ class LinkDataWrapper(object):
 
                 if entry_objs.count() > 0 and not entry_objs[0].is_dead():
                     return entry_objs[0]
-
+                
                 link_url = p.get_protocol_url("http")
                 link_url = link_url.replace("www.", "")
                 entry_objs = objects.filter(link=link_url)
@@ -920,8 +921,8 @@ class LinkDataWrapper(object):
             elif is_archive:
                 ob = ArchiveLinkDataController.objects.create(**link_data)
         except Exception as E:
-            error_text = traceback.format_exc()
-            AppLogging.error("Cannot create entry {}".format(error_text))
+            traceback.print_stack()
+            AppLogging.exc(E, "Link data:{}".format(link_data))
             return
 
         if ob:
@@ -1112,7 +1113,7 @@ class LinkDataWrapper(object):
 
         @returns new object, or None object has not been changed
         """
-        if not entry:
+        if not self.entry:
             return
 
         self.check_https_http_availability_entries()
@@ -1159,7 +1160,7 @@ class LinkDataWrapper(object):
 
         @returns new object, or None if object has not been changed
         """
-        if not entry:
+        if not self.entry:
             return
 
         self.check_www_nonww_availability_entries()
@@ -1230,11 +1231,11 @@ class LinkDataWrapper(object):
         if domain_only.startswith("www."):
             entries = LinkDataController.objects.filter(link=link_without_www)
             if entries.exists():
-                self.move_entry(entry = entries[0])
+                self.move_entry(entries[0])
         else:
             entries = LinkDataController.objects.filter(link=link_with_www)
             if entries.exists():
-                self.move_entry(entry = self.entry)
+                self.move_entry(self.entry)
 
 
 class EntryDataBuilder(object):
@@ -1311,7 +1312,7 @@ class EntryDataBuilder(object):
         TODO move this to a other class OnlyLinkDataBuilder?
         """
         wrapper = LinkDataWrapper(link=self.link)
-        obj = wrapper.get_from_db(LinkDataController.objects)
+        obj = wrapper.get()
         if obj:
             self.result = obj
             return obj
@@ -1395,7 +1396,7 @@ class EntryDataBuilder(object):
         self.link = self.link_data["link"]
 
         wrapper = LinkDataWrapper(link=self.link)
-        entry = wrapper.get_from_db(LinkDataController.objects)
+        entry = wrapper.get()
         if entry:
             self.result = entry
             return entry
@@ -1487,7 +1488,7 @@ class EntryDataBuilder(object):
             if "page_rating_contents" in new_link_data:
                 new_link_data["page_rating"] = new_link_data["page_rating_contents"]
 
-        LinkDatabase.info("Adding link: {}".format(new_link_data["link"]))
+        AppLogging.debug("Adding link: {}".format(new_link_data["link"]))
 
         wrapper = LinkDataWrapper(
             link=new_link_data["link"], date=new_link_data["date_published"]

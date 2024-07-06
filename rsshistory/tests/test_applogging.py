@@ -21,7 +21,8 @@ class AppLoggingTest(FakeInternetTestCase):
         # call tested function
         AppLogging.debug("debug")
 
-        self.assertEqual(AppLogging.objects.all().count(), 1)
+        # debugs are not stored
+        self.assertEqual(AppLogging.objects.all().count(), 0)
 
     def test_info(self):
         AppLogging.objects.all().delete()

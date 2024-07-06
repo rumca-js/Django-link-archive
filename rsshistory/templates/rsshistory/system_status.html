@@ -35,8 +35,7 @@
     {%endif%}
 </ul>
 
-<h1>Tables</h1>
-Table usage
+<h1>Table row count()</h1>
 <ul>
     <li>ConfigurationEntry: {{ConfigurationEntry}}</li>
     <li>UserConfig: {{UserConfig}}</li>
@@ -44,7 +43,9 @@ Table usage
 
     <li>SourceDataModel: {{SourceDataModel}}</li>
     <li>LinkDataModel: {{LinkDataModel}}</li>
+    {% if LinkDataModel_toupdate %}
     <li>LinkDataModel to update: {{LinkDataModel_toupdate}}</li>
+    {% endif %}
     <li>ArhiveLinkDataModel: {{ArchiveLinkDataModel}}</li>
     <li>Keywords: {{KeyWords}}</li>
 

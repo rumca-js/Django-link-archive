@@ -11,6 +11,9 @@ def get_ascii_text(text):
 
 
 def fix_path_for_windows(file_path):
+    """
+    @param file_path needs to be string
+    """
     chars = [
         ">",
         "<",

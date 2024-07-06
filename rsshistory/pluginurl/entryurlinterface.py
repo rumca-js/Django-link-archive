@@ -1,9 +1,10 @@
-from ..webtools import HtmlPage, RssPage, DomainAwarePage, Url, DefaultContentPage
-from ..dateutils import DateUtils
-from ..controllers import SourceDataController
-
 from ..apps import LinkDatabase
+from ..controllers import SourceDataController
+from ..configuration import Configuration
 from ..models import AppLogging
+
+from ..dateutils import DateUtils
+from ..webtools import HtmlPage, RssPage, DomainAwarePage, Url, DefaultContentPage
 
 from .urlhandler import UrlHandler
 
@@ -103,8 +104,11 @@ class EntryUrlInterface(object):
         is_domain = DomainAwarePage(self.url).is_domain()
         p = self.p
 
+        c = Configuration.get_object().config_entry
+
         if is_domain:
-            input_props["permanent"] = True
+            if c.keep_domains:
+                input_props["permanent"] = True
             input_props["bookmarked"] = False
 
         if not source_obj:

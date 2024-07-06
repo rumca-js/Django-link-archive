@@ -56,7 +56,7 @@ except Exception as E:
     print("Cannot include selenium")
 
 
-PAGE_TOO_BIG_BYTES = 5000000  # 5 MB
+PAGE_TOO_BIG_BYTES = 1000000  # 1 MB
 
 
 URL_TYPE_RSS = "rss"
@@ -2194,10 +2194,6 @@ class PageResponseObject(object):
         if content_type.find("xml") >= 0:
             return True
 
-        AppLogging.error(
-            "Page {} content type is not supported {}".format(self.url, content_type)
-        )
-
         return False
 
     def get_redirect_url(self):
@@ -2280,6 +2276,7 @@ class RequestsPage(object):
 
             content_length = self.response.get_content_length()
             if content_length > PAGE_TOO_BIG_BYTES:
+                AppLogging.warning("Page {} is too big. Size:{}".format(self.url, content_length))
                 return
 
             if ping:
@@ -2287,28 +2284,38 @@ class RequestsPage(object):
 
             # TODO do we want to check also content-type?
 
-            encoding = self.get_encoding(request_result, self.response)
-            if encoding:
-                request_result.encoding = encoding
+            content_type = self.response.get_content_type()
 
-            if self.url != request_result.url:
-                self.url = request_result.url
+            if not content_type or self.response.is_content_type_supported():
+                """
+                IF we do not know the content type, or content type is supported
+                """
+                encoding = self.get_encoding(request_result, self.response)
+                if encoding:
+                    request_result.encoding = encoding
 
-            self.response = PageResponseObject(
-                url=self.url,
-                contents=request_result.text,
-                status_code=request_result.status_code,
-                encoding=request_result.encoding,
-                headers=request_result.headers,
-                binary=request_result.content,
-            )
+                if self.url != request_result.url:
+                    self.url = request_result.url
+
+                self.response = PageResponseObject(
+                    url=self.url,
+                    contents=request_result.text,
+                    status_code=request_result.status_code,
+                    encoding=request_result.encoding,
+                    headers=request_result.headers,
+                    binary=request_result.content,
+                )
+            else:
+                AppLogging.warning("Page {} is not supported {}".format(self.url, content_type))
 
         except requests.Timeout:
-            LinkDatabase.error("Page timeout {}".format(self.url))
+            AppLogging.debug("Page timeout {}".format(self.url))
             self.response = PageResponseObject(self.url, contents=None, status_code=500)
         except requests.exceptions.ConnectionError:
-            LinkDatabase.error("Page connection error {}".format(self.url))
+            AppLogging.debug("Page connection error {}".format(self.url))
             self.response = PageResponseObject(self.url, contents=None, status_code=500)
+        except Exception as E:
+            AppLogging.exc(E, "Other webpage requests error")
 
     def get(self):
         if self.response:
@@ -2342,6 +2349,7 @@ class RequestsPage(object):
                     if p.get_charset():
                         return p.get_charset()
 
+            # TODO this might trigger download of a big file
             text = request_result.text.lower()
 
             if text.count("encoding") == 1 and text.find('encoding="utf-8"') >= 0:
@@ -2357,7 +2365,8 @@ class RequestsPage(object):
             verify=BasePage.ssl_verify,
             stream=True,
         )
-        LinkDatabase.info("[H] {}\n{}".format(url, request_result.headers))
+
+        AppLogging.info("[H] {}\n{}".format(url, request_result.headers))
         return request_result
 
 
@@ -2512,7 +2521,7 @@ class SeleniumHeadless(SeleniumDriver):
             )
         except TimeoutException:
             error_text = traceback.format_exc()
-            LinkDatabase.error("Page timeout:{}\n{}".format(self.url, error_text))
+            AppLogging.debug("Page timeout:{}\n{}".format(self.url, error_text))
             self.response = PageResponseObject(self.url, contents=None, status_code=500)
         finally:
             driver.quit()
@@ -2589,7 +2598,7 @@ class SeleniumFull(SeleniumDriver):
 
         except TimeoutException:
             error_text = traceback.format_exc()
-            LinkDatabase.error("Page timeout:{}\n{}".format(self.url, error_text))
+            AppLogging.debug("Page timeout:{}\n{}".format(self.url, error_text))
             self.response = PageResponseObject(self.url, contents=None, status_code=500)
         finally:
             driver.quit()
@@ -2654,7 +2663,7 @@ class SeleniumUndetected(object):
 
         except TimeoutException:
             error_text = traceback.format_exc()
-            LinkDatabase.error("Page timeout:{}\n{}".format(self.url, error_text))
+            AppLogging.debug("Page timeout:{}\n{}".format(self.url, error_text))
             self.response = PageResponseObject(self.url, contents=None, status_code=500)
         finally:
             driver.quit()
@@ -2849,10 +2858,6 @@ class BasePage(object):
         except Exception as e:
             self.dead = True
             error_text = traceback.format_exc()
-
-            LinkDatabase.error(
-                "Page {} error: {}\n{}".format(self.url, str(e), error_text)
-            )
 
             AppLogging.error(
                 "Page {} error:{}\n{}".format(self.url, str(e), error_text)

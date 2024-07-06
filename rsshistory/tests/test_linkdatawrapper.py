@@ -525,7 +525,58 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         self.assertTrue(entry)
         self.assertEqual(entry.link, "https://archive.com?v=1")
 
-    def test_check_https_http_protocol__http_link(self):
+    def test_get(self):
+        conf = Configuration.get_object().config_entry
+        conf.days_to_move_to_archive = 2
+        conf.days_to_remove_links = 2
+        conf.days_to_remove_links = 2
+        conf.prefer_https = True
+        conf.save()
+
+        LinkDataController.objects.create(
+            source="https://youtube.com",
+            link="https://youtube.com?v=1",
+            title="The https link",
+            bookmarked=False,
+            language="en",
+        )
+
+        LinkDataController.objects.create(
+            source="http://youtube.com",
+            link="http://youtube.com?v=1",
+            title="The http link",
+            bookmarked=False,
+            language="en",
+        )
+
+        ArchiveLinkDataController.objects.create(
+            source="https://archive.com",
+            link="https://archive.com?v=1",
+            title="The archive https link",
+            bookmarked=False,
+            language="en",
+        )
+
+        ArchiveLinkDataController.objects.create(
+            source="http://archive.com",
+            link="http://archive.com?v=1",
+            title="The archive http link",
+            bookmarked=False,
+            language="en",
+        )
+
+        w = LinkDataWrapper(link="https://youtube.com?v=1")
+        # call tested function
+        entry = w.get()
+        self.assertTrue(entry)
+        self.assertEqual(entry.link, "https://youtube.com?v=1")
+
+        w = LinkDataWrapper(link="https://archive.com?v=1")
+        # call tested function
+        entry = w.get()
+        self.assertTrue(entry)
+
+    def test_check_https_http_availability__http_link(self):
         conf = Configuration.get_object().config_entry
         conf.days_to_move_to_archive = 2
         conf.days_to_remove_links = 2
@@ -550,7 +601,7 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         )
 
         # call tested function
-        result = LinkDataWrapper(entry=http_entry).check_https_http_protocol()
+        result = LinkDataWrapper(entry=http_entry).check_https_http_availability()
         self.assertTrue(result)
 
         # function removed http link
@@ -559,7 +610,7 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         self.assertEqual(entries.count(), 1)
         self.assertEqual(entries[0].link, "https://archive.com?v=1")
 
-    def test_check_https_http_protocol__https_link(self):
+    def test_check_https_http_availability__https_link(self):
         conf = Configuration.get_object().config_entry
         conf.days_to_move_to_archive = 2
         conf.days_to_remove_links = 2
@@ -584,7 +635,7 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         )
 
         # call tested function
-        entry = LinkDataWrapper(entry=https_entry).check_https_http_protocol()
+        entry = LinkDataWrapper(entry=https_entry).check_https_http_availability()
         self.assertEqual(entry, https_entry)
 
         # function removed http link
@@ -593,7 +644,7 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         self.assertEqual(entries.count(), 1)
         self.assertEqual(entries[0].link, "https://archive.com?v=1")
 
-    def test_check_https_http_protocol__https_link_dead(self):
+    def test_check_https_http_availability__https_link_dead(self):
         conf = Configuration.get_object().config_entry
         conf.days_to_move_to_archive = 2
         conf.days_to_remove_links = 2
@@ -611,7 +662,7 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         )
 
         # call tested function
-        entry = LinkDataWrapper(entry=https_entry).check_https_http_protocol()
+        entry = LinkDataWrapper(entry=https_entry).check_https_http_availability()
 
         # we do not move the thing
         self.assertEqual(entry, https_entry)
@@ -749,9 +800,6 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         UserVotes.add(self.user_not_staff, http_entry, 30)
         LinkCommentDataModel.add(self.user_not_staff, http_entry, "This is stupid")
         UserBookmarks.add(self.user_not_staff, http_entry)
-
-        #UserEntryTransitionHistory.add(self.user_not_staff, entry_from = http_entry, entry_to = youtube_entry)
-        #UserEntryTransitionHistory.add(self.user_not_staff, entry_from = youtube_entry, entry_to = http_entry)
 
         UserEntryVisitHistory.visited(http_entry, self.user_not_staff)
         UserEntryVisitHistory.visited(youtube_entry, self.user_not_staff)
