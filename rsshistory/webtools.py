@@ -56,7 +56,7 @@ except Exception as E:
     print("Cannot include selenium")
 
 
-PAGE_TOO_BIG_BYTES = 1000000  # 1 MB
+PAGE_TOO_BIG_BYTES = 5000000  # 5 MB. There are some RSS more than 1MB
 
 
 URL_TYPE_RSS = "rss"
@@ -2309,13 +2309,13 @@ class RequestsPage(object):
                 AppLogging.warning("Page {} is not supported {}".format(self.url, content_type))
 
         except requests.Timeout:
-            AppLogging.debug("Page timeout {}".format(self.url))
+            AppLogging.debug("Page: {}. Timeout".format(self.url))
             self.response = PageResponseObject(self.url, contents=None, status_code=500)
         except requests.exceptions.ConnectionError:
-            AppLogging.debug("Page connection error {}".format(self.url))
+            AppLogging.debug("Page: {}. Connection error {}".format(self.url))
             self.response = PageResponseObject(self.url, contents=None, status_code=500)
         except Exception as E:
-            AppLogging.exc(E, "Other webpage requests error")
+            AppLogging.exc(E, "Page: {}: General exception".format(self.url))
 
     def get(self):
         if self.response:

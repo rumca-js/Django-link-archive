@@ -33,6 +33,32 @@ class BackgroundJobsViewsTest(FakeInternetTestCase):
 
         self.assertEqual(response.status_code, 200)
 
+    def test_backgroundjob_add(self):
+        BackgroundJobController.objects.all.delete()
+
+        url = reverse(
+            "{}:backgroundjob-add".format(LinkDatabase.name)
+        )
+
+        background_add_data = {
+            "job": BackgroundJobController.JOB_CLEANUP,
+            "task": "",
+            "subject": "",
+            "args": "",
+        }
+
+        # call tested function
+        response = self.client.post(url, data=background_add_data)
+
+        # redirect to see all jobs
+        self.assertEqual(response.status_code, 302)
+
+        jobs = BackgroundJobController.objects.all().count()
+
+        self.assertEqual(jobs, 1)
+        # priority is not default, null
+        self.assertEqual(jobs[0].priority > 0)
+
     def test_backgroundjob_remove(self):
         bj = BackgroundJobController.objects.create(
             job=BackgroundJobController.JOB_LINK_UPDATE_DATA,

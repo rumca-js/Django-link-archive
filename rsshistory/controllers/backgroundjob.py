@@ -1,6 +1,5 @@
 from datetime import datetime, date, timedelta
 import os
-import traceback
 import json
 
 from django.db import models
@@ -94,10 +93,11 @@ class BackgroundJobController(BackgroundJob):
                 return entry.get_absolute_url()
 
         if self.args and self.args != "":
+            cfg = {}
             try:
                 cfg = json.loads(self.args)
-            except Exception as e:
-                AppLogging.error("Exception: {}".format(str(e)))
+            except Exception as E:
+                AppLogging.exc(E, "Error when loading JSON: {}".format(self.args))
                 return
 
             if "entry_id" in cfg:
@@ -183,10 +183,9 @@ class BackgroundJobController(BackgroundJob):
                     args=args,
                     priority=BackgroundJobController.get_job_priority(job_name),
                 )
-        except Exception as e:
-            error_text = traceback.format_exc()
-            AppLogging.error(
-                "Exception: {}: {} {}".format(job_name, str(e), error_text)
+        except Exception as E:
+            AppLogging.exc(
+                    E, "Creating single job_name:{}, subject:{}, args:{}".format(job_name, subject, args)
             )
 
     def download_rss(source, force=False):
@@ -356,9 +355,8 @@ class BackgroundJobController(BackgroundJob):
                 sent = True
 
             return sent
-        except Exception as e:
-            error_text = traceback.format_exc()
-            AppLogging.error("Exception: Daily data: {} {}".format(str(e), error_text))
+        except Exception as E:
+            AppLogging.exc(E, "write_daily_data_range: {} {}".format(date_start, date_stop))
 
     def write_daily_data(input_date):
         return BackgroundJobController.create_single_job(
@@ -372,8 +370,7 @@ class BackgroundJobController(BackgroundJob):
 
             BackgroundJobController.write_daily_data_range(date_start, date_stop)
         except Exception as e:
-            error_text = traceback.format_exc()
-            AppLogging.error("Exception: Daily data: {} {}".format(str(e), error_text))
+            AppLogging.exc(E, "write_daily_data_str: {} {}".format(date_start, date_stop))
 
     def write_tag_data(tag):
         return BackgroundJobController.create_single_job(
@@ -424,10 +421,9 @@ class BackgroundJobController(BackgroundJob):
                 for key, obj in enumerate(archive_items):
                     if key > 100:
                         obj.delete()
-        except Exception as e:
-            error_text = traceback.format_exc()
-            AppLogging.error(
-                "Exception: Link archive: {} {}".format(str(e), error_text)
+        except Exception as E:
+            AppLogging.exc(
+                    "link_save. Link URL:{}".format(link_url)
             )
 
     def link_download(link_url):

@@ -49,30 +49,36 @@ class EntriesCleanup(object):
         if self.is_time_exceeded():
             return False
 
-        self.cleanup_invalid_page_ratings()
+        if not self.cleanup_invalid_page_ratings():
+            return False
 
         if self.is_time_exceeded():
             return False
 
         config = Configuration.get_object().config_entry
         if config.prefer_https:
-            self.move_existing_http_to_https()
+            if not self.move_existing_http_to_https():
+                return False
 
         if self.is_time_exceeded():
             return False
 
         if config.prefer_non_www_sites:
-            self.move_existing_www_to_nonwww()
+            if not self.move_existing_www_to_nonwww():
+                return False
 
         if self.is_time_exceeded():
             return False
 
         if not self.archive_cleanup:
-            moved_all = self.move_old_links_to_archive()
-            return moved_all
+            if not self.move_old_links_to_archive():
+                return False
 
         if self.is_time_exceeded():
             return False
+
+        # TODO it may take very long time, exceed time, and be correct, we should
+        # return True then. Check if everything has been done, not only exceeded time
 
         #self.cleanup_permanent_flags()
 
@@ -214,6 +220,11 @@ class EntriesCleanup(object):
                 u = EntryUpdater(entry)
                 u.reset_local_data()
 
+            if self.is_time_exceeded():
+                return False
+
+        return True
+
     def move_old_links_to_archive(self):
         """
         TODO Refactor IT? I think we should operate on 'chunks' rather than entry-entry
@@ -254,36 +265,49 @@ class EntriesCleanup(object):
         """
         Moves all duplicate links matching criteria
         """
-        http_entries = LinkDataController.objects.filter(link="http://")
+        http_entries = LinkDataController.objects.filter(link__icontains="http://")
         if http_entries.exists():
             for http_entry in http_entries:
-                https_url = http_entries.get_https_url()
+                https_url = http_entry.get_https_url()
                 https_entries = LinkDataController.objects.filter(link=https_url)
                 if https_entries.exists():
-                    w = LinkDataWrapper(http_entry)
+                    w = LinkDataWrapper(entry = http_entry)
                     w.move_entry(https_entries[0])
+
+            if self.is_time_exceeded():
+                return False
+
+        return True
 
     def move_existing_www_to_nonwww(self):
         """
         Moves all duplicate links matching criteria
         """
-        www_entries = LinkDataController.objects.filter(link="https://www.")
+        www_entries = LinkDataController.objects.filter(link__icontains="https://www.")
         if www_entries.exists():
             for www_entry in www_entries:
                 nonwww_url = www_entry.link.replace("https://www.", "https://")
                 nonwww_entries = LinkDataController.objects.filter(link=nonwww_url)
                 if nonwww_entries.exists():
-                    w = LinkDataWrapper(www_entry)
+                    w = LinkDataWrapper(entry = www_entry)
                     w.move_entry(nonwww_entries[0])
 
-        www_entries = LinkDataController.objects.filter(link="http://www.")
+                if self.is_time_exceeded():
+                    return False
+
+        www_entries = LinkDataController.objects.filter(link__icontains="http://www.")
         if www_entries.exists():
             for www_entry in www_entries:
                 nonwww_url = www_entry.link.replace("http://www.", "http://")
                 nonwww_entries = LinkDataController.objects.filter(link=nonwww_url)
                 if nonwww_entries.exists():
-                    w = LinkDataWrapper(www_entry)
+                    w = LinkDataWrapper(entry = www_entry)
                     w.move_entry(nonwww_entries[0])
+
+                if self.is_time_exceeded():
+                    return False
+
+        return True
 
     def cleanup_permanent_flags(self):
         """
@@ -1066,6 +1090,9 @@ class LinkDataWrapper(object):
         All properties are moved from source entry to destination entry.
         Source entry is destroyed
         """
+        if self.entry is None:
+            return
+
         if destination_entry.is_dead():
             return None
 
@@ -1082,6 +1109,7 @@ class LinkDataWrapper(object):
 
         source_entry.delete()
         self.entry = destination_entry
+        self.entry.reset_local_data()
 
         return self.entry
 

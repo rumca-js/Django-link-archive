@@ -51,7 +51,13 @@ def backgroundjob_add(request):
     if request.method == "POST":
         form = BackgroundJobForm(request.POST)
         if form.is_valid():
-            BackgroundJobController.objects.create(**form.cleaned_data)
+
+            job = form.cleaned_data["job"]
+            themap = form.cleaned_data
+
+            themap["priority"] = BackgroundJobController.get_job_priority(job)
+
+            BackgroundJobController.objects.create(**themap)
 
             return HttpResponseRedirect(
                 reverse("{}:backgroundjobs".format(LinkDatabase.name))

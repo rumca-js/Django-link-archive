@@ -210,19 +210,10 @@ class EntriesCleanupTest(FakeInternetTestCase):
         self.assertEqual(archived[1].domain_obj, domains[0])
         self.assertEqual(archived[1].date_published, date_to_remove)
 
-
-
-"""
-TODO we do not make active remove of https. Only on entry update/reset
-
     def test_cleanup__https_http_duplicates(self):
         conf = Configuration.get_object().config_entry
-        conf.days_to_remove_links = 2
+        conf.prefer_https = True
         conf.save()
-
-        current_time = DateUtils.get_datetime_now_utc()
-        date_link_publish = current_time - timedelta(days=conf.days_to_remove_links + 2)
-        date_to_remove = current_time - timedelta(days=conf.days_to_remove_links + 2)
 
         self.clear()
 
@@ -245,5 +236,34 @@ TODO we do not make active remove of https. Only on entry update/reset
         # call tested function
         EntriesCleanup().cleanup()
 
-        self.assertEqual(LinkDataController.objects.all().count(), 1)
-"""
+        self.assertEqual(LinkDataController.objects.filter(link="https://youtube.com?v=permanent").count(), 1)
+        self.assertEqual(LinkDataController.objects.filter(link="http://youtube.com?v=permanent").count(), 0)
+
+    def test_cleanup__prefer_non_www_sites(self):
+        conf = Configuration.get_object().config_entry
+        conf.prefer_non_www_sites = True
+        conf.save()
+
+        self.clear()
+
+        ob = LinkDataController.objects.create(
+            source="https://youtube.com",
+            link="https://youtube.com?v=permanent",
+            title="The first link",
+            permanent=True,
+            language="en",
+        )
+
+        ob = LinkDataController.objects.create(
+            source="http://youtube.com",
+            link="https://www.youtube.com?v=permanent",
+            title="The second link",
+            permanent=True,
+            language="en",
+        )
+
+        # call tested function
+        EntriesCleanup().cleanup()
+
+        self.assertEqual(LinkDataController.objects.filter(link="https://youtube.com?v=permanent").count(), 1)
+        self.assertEqual(LinkDataController.objects.filter(link="https://www.youtube.com?v=permanent").count(), 0)

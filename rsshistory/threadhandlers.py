@@ -978,7 +978,7 @@ class CleanupJobHandler(BaseJobHandler):
             # we can remove the cleanup background job
 
             elapsed_sec = self.get_time_diff_sec()
-            AppLogging.info("Successfully cleaned database. Time[s]:{}".format(elapsed_sec))
+            AppLogging.notify("Successfully cleaned database. Time[s]:{}".format(elapsed_sec))
             return status
 
         except Exception as E:

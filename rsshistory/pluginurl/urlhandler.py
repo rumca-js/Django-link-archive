@@ -322,6 +322,9 @@ class UrlPropertyValidator(object):
         if self.is_casino_blocked():
             return False
 
+        if self.is_blocked_keywords():
+            return False
+
         return True
 
     def get_title(self):
@@ -339,6 +342,19 @@ class UrlPropertyValidator(object):
             return self.properties["description"]
         else:
             return ""
+
+    def is_blocked_keywords(self):
+        """
+        TODO This should be configurable - move to configuration
+        """
+        title = self.get_title()
+        title = title.lower()
+
+        for keyword in self.blocked_keywords:
+            if title.find(keyword) >= 0:
+                return True
+
+        return False
 
     def is_site_not_found(self):
         title = self.get_title()
@@ -377,7 +393,17 @@ class UrlPropertyValidator(object):
         title = self.get_title()
         title = title.lower()
 
-        for keyword in self.blocked_keywords:
+        porn_keywords = [
+            "masturbat",
+            "porn",
+            "xxx",
+            "sex",
+            "slutt",
+            "nude",
+            "chaturbat",
+        ]
+
+        for keyword in porn_keywords:
             if title.find(keyword) >= 0:
                 return True
 
@@ -410,7 +436,7 @@ class UrlPropertyValidator(object):
 
         text = title + "\n" + description
 
-        keywords = ["casino", "lotter", "bingo", "slot", "poker"]
+        keywords = ["casino", "lotter", "bingo", "slot", "poker", "jackpot", "gacor"]
 
         sum = 0
         for keyword in keywords:
