@@ -34,7 +34,7 @@ class BackgroundJobsViewsTest(FakeInternetTestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_backgroundjob_add(self):
-        BackgroundJobController.objects.all.delete()
+        BackgroundJobController.objects.all().delete()
 
         url = reverse(
             "{}:backgroundjob-add".format(LinkDatabase.name)

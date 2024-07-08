@@ -1109,7 +1109,9 @@ class LinkDataWrapper(object):
 
         source_entry.delete()
         self.entry = destination_entry
-        self.entry.reset_local_data()
+
+        u = EntryUpdater(self.entry)
+        u.reset_local_data()
 
         return self.entry
 

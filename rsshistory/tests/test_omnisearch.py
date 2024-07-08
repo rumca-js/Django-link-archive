@@ -5,8 +5,8 @@ from ..queryfilters import (
     OmniSearchWithDefault,
 )
 from ..omnisearch import (
-    StringSymbolEquation,
-    OmniSymbolProcessor,
+    EquationTranslator,
+    EquationEvaluator,
     SingleSymbolEvaluator,
     OmniSearch,
 )
@@ -29,14 +29,14 @@ class SymbolEvaluator(object):
             return 0
 
 
-class OmniSearchEquationTest(FakeInternetTestCase):
+class EquationTranslatorTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 
     def test_symbol_equation_1(self):
         text = "(title == test & description == none) | title == covid"
 
-        tok = StringSymbolEquation(text)
+        tok = EquationTranslator(text)
         string, conditions = tok.process()
 
         self.assertEqual(string, "(A&B)|C")
@@ -47,7 +47,7 @@ class OmniSearchEquationTest(FakeInternetTestCase):
     def test_symbol_equation_2(self):
         text = "(title == test & description == none) | !(title == covid)"
 
-        tok = StringSymbolEquation(text)
+        tok = EquationTranslator(text)
         string, conditions = tok.process()
 
         self.assertEqual(string, "(A&B)|!(C)")
@@ -58,7 +58,7 @@ class OmniSearchEquationTest(FakeInternetTestCase):
     def test_symbol_equation_3(self):
         text = "title == test & tag == something"
 
-        tok = StringSymbolEquation(text)
+        tok = EquationTranslator(text)
         string, conditions = tok.process()
 
         self.assertEqual(string, "A&B")
@@ -68,7 +68,7 @@ class OmniSearchEquationTest(FakeInternetTestCase):
     def test_symbol_equation_3_double_quotes(self):
         text = 'title == test & tag == "something"'
 
-        tok = StringSymbolEquation(text)
+        tok = EquationTranslator(text)
         string, conditions = tok.process()
 
         self.assertEqual(string, "A&B")
@@ -78,7 +78,7 @@ class OmniSearchEquationTest(FakeInternetTestCase):
     def test_symbol_equation_3_single_quotes(self):
         text = "title == test & tag == 'something'"
 
-        tok = StringSymbolEquation(text)
+        tok = EquationTranslator(text)
         string, conditions = tok.process()
 
         self.assertEqual(string, "A&B")
@@ -86,14 +86,14 @@ class OmniSearchEquationTest(FakeInternetTestCase):
         self.assertEqual(conditions["B"], "tag == 'something'")
 
 
-class OmniSymbolProcessorTest(FakeInternetTestCase):
+class EquationEvaluatorTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 
     def test_omni_search_next_and(self):
         args = "title == test & tag == something"
 
-        tok = OmniSymbolProcessor(args, SymbolEvaluator())
+        tok = EquationEvaluator(args, SymbolEvaluator())
         value = tok.process()
 
         self.assertEqual(tok.eq_string, "A&B")
@@ -106,7 +106,7 @@ class OmniSymbolProcessorTest(FakeInternetTestCase):
     def test_omni_search_quotes(self):
         args = 'title == "test" & tag == "something"'
 
-        tok = OmniSymbolProcessor(args, SymbolEvaluator())
+        tok = EquationEvaluator(args, SymbolEvaluator())
 
         value = tok.process()
 
@@ -120,7 +120,7 @@ class OmniSymbolProcessorTest(FakeInternetTestCase):
     def test_omni_search_next_or(self):
         args = "title == test | tag == something"
 
-        tok = OmniSymbolProcessor(args, SymbolEvaluator())
+        tok = EquationEvaluator(args, SymbolEvaluator())
         value = tok.process()
 
         self.assertEqual(tok.eq_string, "A|B")

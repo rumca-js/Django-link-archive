@@ -93,21 +93,24 @@ class BackgroundJobController(BackgroundJob):
                 return entry.get_absolute_url()
 
         if self.args and self.args != "":
-            cfg = {}
+            p = DomainAwarePage(self.args)
+            if p.is_web_link():
+                return self.args
+
             try:
                 cfg = json.loads(self.args)
-            except Exception as E:
-                AppLogging.exc(E, "Error when loading JSON: {}".format(self.args))
-                return
 
-            if "entry_id" in cfg:
-                entry = self.get_text_to_entry(cfg["entry_id"])
-                if entry:
-                    return entry.get_absolute_url()
-            elif "source_id" in cfg:
-                source = self.get_text_to_source(cfg["source_id"])
-                if source:
-                    return source.get_absolute_url()
+                if "entry_id" in cfg:
+                    entry = self.get_text_to_entry(cfg["entry_id"])
+                    if entry:
+                        return entry.get_absolute_url()
+                elif "source_id" in cfg:
+                    source = self.get_text_to_source(cfg["source_id"])
+                    if source:
+                        return source.get_absolute_url()
+            except Exception as E:
+                AppLogging.debug(E, "Error when loading JSON: {}".format(self.args))
+                return
 
     def is_subject_link(self):
         p = DomainAwarePage(self.subject)

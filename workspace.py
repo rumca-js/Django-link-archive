@@ -1,5 +1,5 @@
 """
-This program manages "workspaces".
+@breif This program manages "workspaces".
 
 Each app is a "workspace". Each workspace contain separate set of links in the database.
 
@@ -29,7 +29,7 @@ class FileConverter(object):
         self.abs_source_file = source_file
 
     def convert(self, source_app, destination_app):
-        destination_abs_file_name = self.get_new_name(source_app, destination_app)
+        destination_abs_file_name = self.get_destination_full_name(source_app, destination_app)
 
         destination_abs_file_name.parent.mkdir(parents=True, exist_ok=True)
 
@@ -42,18 +42,31 @@ class FileConverter(object):
             original_contents = self.abs_source_file.read_bytes()
             destination_abs_file_name.write_bytes(original_contents)
 
+    def copy(self, source_app, destination_app, overwrite=False):
+        destination_abs_file_name = self.get_destination_full_name(source_app, destination_app)
 
-    def get_new_name(self, source_app, destination_app):
+        if destination_abs_file_name.exists():
+            return
+
+        destination_abs_file_name.parent.mkdir(parents=True, exist_ok=True)
+
+        original_contents = self.abs_source_file.read_text()
+        destination_abs_file_name.write_text(original_contents)
+
+    def get_destination_full_name(self, source_app, destination_app):
         file_name = str(self.abs_source_file)
 
         destionation_path = file_name.replace(source_app, destination_app)
         return Path(destionation_path)
 
-    def is_ok(self):
+    def is_convert_ok(self):
         if str(self.abs_source_file).find("__pycache__") >= 0 or \
            str(self.abs_source_file).find("migrations") >= 0:
             return False
         return True
+
+    def is_copy_ok(self):
+        return str(self.abs_source_file).startswith("prj")
 
 
 def remove_path(path):
@@ -96,11 +109,17 @@ def update_workspace(source_app, destination_app):
 
     remove_path(destination_app)
 
-    source_files = get_source_files(Path(source_app))
-    for source_file in source_files:
-        conv = FileConverter(source_file)
-        if conv.is_ok():
-            conv.convert(source_app, destination_app)
+    try:
+        source_files = get_source_files(Path(source_app))
+        for source_file in source_files:
+            conv = FileConverter(source_file)
+
+            if conv.is_convert_ok():
+                conv.convert(source_app, destination_app)
+            elif conv.is_copy_ok():
+                conv.copy(source_app, destination_app)
+    except Exception as e:
+        print("Exception when trying to copy files {}".format(str(e)))
 
     snapshot.restore()
 
@@ -116,7 +135,7 @@ def create_workspace(source_app, destination_app):
     source_files = get_source_files(Path(source_app))
     for source_file in source_files:
         conv = FileConverter(source_file)
-        if conv.is_ok():
+        if conv.is_convert_ok():
             conv.convert(source_app, str(destination_app))
 
     migration_path = destination_app / "migrations"

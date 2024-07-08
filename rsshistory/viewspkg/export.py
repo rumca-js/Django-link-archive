@@ -346,6 +346,19 @@ def write_daily_data_form(request):
                     time_start, time_stop
                 )
             return p.render("summary_present.html")
+        else:
+            error_message = "\n".join(
+                [
+                    "{}: {}".format(field, ", ".join(errors))
+                    for field, errors in form.errors.items()
+                ]
+            )
+
+            text = "Form is invalid."
+            text += "\n" + error_message
+
+            p.context["summary_text"] = text
+            return p.render("summary_present.html")
 
     from ..dateutils import DateUtils
 
