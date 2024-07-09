@@ -572,12 +572,15 @@ class AppLogging(models.Model):
         AppLogging.create_entry(info_text, level = AppLogging.NOTIFICATION)
 
     def exc(exception_object, info_text=None, user=None):
-        error_text = traceback.format_exc()
+        stack_lines = traceback.format_stack()
+        stack_string = "".join(stack_lines)
+
+        #error_text = traceback.format_exc()
 
         if info_text:
-            text = "{}\nException:{}\nException Data:\n{}".format(info_text, str(exception_object), error_text)
+            text = "{}\nException:{}\nStack:\n{}".format(info_text, str(exception_object), stack_string)
         else:
-            text = "Exception:{}\nException Data:\n{}".format(str(exception_object), error_text)
+            text = "Exception:{}\n{}\nStack:\n{}".format(str(exception_object), stack_string)
 
         AppLogging.create_entry(text, level = AppLogging.ERROR)
 

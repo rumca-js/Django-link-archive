@@ -95,6 +95,9 @@ def date_str_to_date(date_str):
             parsed_date = parser.parse(date_str)
             return DateUtils.to_utc_date(parsed_date)
         except Exception as E:
+            stack_lines = traceback.format_stack()
+            stack_str = "".join(stack_lines)
+
             error_text = traceback.format_exc()
 
             AppLogging.warning(
@@ -117,9 +120,10 @@ class DomainAwarePage(object):
 
     def is_web_link(self):
         if (
-            self.url.startswith("http")
-            or self.url.startswith("smb:")
-            or self.url.startswith("ftp:")
+            self.url.startswith("http://")
+            or self.url.startswith("https://")
+            or self.url.startswith("smb://")
+            or self.url.startswith("ftp://")
             or self.url.startswith("//")
         ):
             # https://mailto is not a good link
@@ -2829,7 +2833,7 @@ class BasePage(object):
         if self.dead:
             return None
 
-        if self.url == "http://" or self.url == "https://" or self.url == None:
+        if not self.is_url_valid():
             lines = traceback.format_stack()
             line_text = ""
             for line in lines:
@@ -2864,6 +2868,16 @@ class BasePage(object):
             )
 
         return self.response
+
+    def is_url_valid(self):
+        if self.url == None:
+             return False
+
+        p = DomainAwarePage(self.url)
+        if not p.is_web_link():
+            return False
+
+        return True
 
     def get_contents_internal(self, url, headers, timeout_s, ping=False):
         if self.options.is_not_selenium():
