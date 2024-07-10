@@ -9,6 +9,9 @@ from django.db.models import Q
 from ..models import (
     AppLogging,
     Domains,
+    DomainsTlds,
+    DomainsSuffixes,
+    DomainsMains,
 )
 from .entries import LinkDataController
 from ..configuration import Configuration
@@ -225,6 +228,15 @@ class DomainsController(Domains):
             DomainsController.remove_all()
         else:
             DomainsController.remove_unused_domains()
+
+        tlds = DomainsTlds.objects.filter(tld__icontains = ":")
+        tlds.delete()
+
+        suffixes = DomainsSuffixes.objects.filter(suffix__icontains = ":")
+        suffixes.delete()
+
+        mains = DomainsMains.objects.filter(main__icontains = ":")
+        mains.delete()
 
     def remove_unused_domains():
         domains = DomainsController.objects.filter(

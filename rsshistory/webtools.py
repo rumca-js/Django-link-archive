@@ -134,6 +134,13 @@ class DomainAwarePage(object):
 
         return False
 
+    def get_protocolless(self):
+        protocol_pos = self.url.find("://")
+        if protocol_pos >= 0:
+            return self.url[protocol_pos + 3 :]
+
+        return self.url
+
     def get_full_url(self):
         if self.url.lower().find("http") == -1:
             return "https://" + self.url
@@ -235,6 +242,11 @@ class DomainAwarePage(object):
         @return https://domain.com
         """
         parts = self.parse_url()
+
+        wh = parts[2].find(":")
+        if wh >= 0:
+            parts[2] = parts[2][:wh]
+
         return parts[0] + parts[1] + parts[2].lower()
 
     def get_domain_only(self):
@@ -1251,7 +1263,7 @@ class RssPage(ContentInterface):
     def get_thumbnail_manual_from_youtube(self):
         if "link" in self.feed.feed:
             link = self.feed.feed.link
-            p = BasePage(link)
+            p = RequestBuilder(link)
             p = HtmlPage(link, p.get_contents())
             return p.get_thumbnail()
 
@@ -1365,51 +1377,86 @@ class ContentLinkParser(ContentInterface):
     def get_links_https(self, protocol = "https"):
         cont = str(self.get_contents())
 
-        pattern = "("+protocol+"?://[a-zA-Z0-9./\-_?&=]+)"
+        pattern = "("+protocol+"?://[a-zA-Z0-9./\-_?&=#;:]+)"
 
-        allt = re.findall(pattern, cont)
+        all_matches = re.findall(pattern, cont)
         # links cannot end with "."
-        allt = [link.rstrip(".") for link in allt]
-        return set(allt)
+        all_matches = [link.rstrip(".") for link in all_matches]
+        return set(all_matches)
 
     def get_links_https_encoded(self, protocol="https"):
         cont = str(self.get_contents())
 
-        pattern = "("+protocol+"?:&#x2F;&#x2F;[a-zA-Z0-9./\-_?&=#;]+)"
+        pattern = "("+protocol+"?:&#x2F;&#x2F;[a-zA-Z0-9./\-_?&=#;:]+)"
 
-        allt = re.findall(pattern, cont)
+        all_matches = re.findall(pattern, cont)
         # links cannot end with "."
-        allt = [link.rstrip(".") for link in allt]
-        allt = [html.unescape(link) for link in allt]
-        return set(allt)
+        all_matches = [link.rstrip(".") for link in all_matches]
+        all_matches = [ContentLinkParser.decode_url(link) for link in all_matches]
+        return set(all_matches)
+
+    def join_url_parts(self, partone, parttwo):
+        if not partone.endswith("/"):
+            partone = partone + "/"
+        if parttwo.startswith("/"):
+            parttwo = parttwo[1:]
+
+        return partone + parttwo
+
+    def decode_url(url):
+        return html.unescape(url)
 
     def get_links_href(self):
-        url = self.url
         links = set()
+
+        url = self.url
+        domain = DomainAwarePage(self.url).get_domain()
 
         cont = str(self.get_contents())
 
-        allt = re.findall('href="([a-zA-Z0-9./\-_]+)', cont)
-        allt = [link.rstrip(".") for link in allt]
+        all_matches = re.findall('href="([a-zA-Z0-9./\-_?&=@#;:]+)', cont)
 
-        for item in allt:
-            if item.find("http") == 0:
-                ready_url = item
-            else:
-                if item.startswith("//"):
-                    ready_url = "https:" + item
+        for item in all_matches:
+            ready_url = None
+
+            item = item.strip()
+
+            # exclude mailto: tel: sms:
+            pattern = '^[a-zA-Z0-9]+:'
+            if re.match(pattern, item):
+                if not item.startswith("http") \
+                   and not item.startswith("ftp") \
+                   and not item.startswith("smb"):
+                    wh = item.find(":")
+                    item = item[wh+1:]
+
+            if item.startswith("//"):
+                if not item.startswith("http"):
+                    item = "https:" + item
+
+            if item.startswith("/"):
+                item = self.join_url_parts(domain, item)
+
+            # for urls like user@domain.com/location
+            pattern = '^[a-zA-Z0-9]+@'
+            if re.match(pattern, item):
+                wh = item.find("@")
+                item = item[wh+1:]
+
+            # not absolute path
+            if not (item.startswith("http") \
+               and not item.startswith("ftp")):
+                if item.count(".") <= 0:
+                    item = self.join_url_parts(url, item)
                 else:
-                    if item.startswith("/"):
-                        url = DomainAwarePage(self.url).get_domain()
+                    if not item.startswith("http"):
+                        item = "https://" + item
 
-                    if not url.endswith("/"):
-                        url = url + "/"
-                    if item.startswith("/"):
-                        item = item[1:]
+            if item.startswith("https:&#x2F;&#x2F") or item.startswith("http:&#x2F;&#x2F"):
+                item = ContentLinkParser.decode_url(item)
 
-                    ready_url = url + item
-
-            links.add(ready_url)
+            if item:
+                links.add(item)
 
         return links
 
@@ -2316,7 +2363,7 @@ class RequestsPage(object):
             AppLogging.debug("Page: {}. Timeout".format(self.url))
             self.response = PageResponseObject(self.url, contents=None, status_code=500)
         except requests.exceptions.ConnectionError:
-            AppLogging.debug("Page: {}. Connection error {}".format(self.url))
+            AppLogging.debug("Page: {}. Connection error".format(self.url))
             self.response = PageResponseObject(self.url, contents=None, status_code=500)
         except Exception as E:
             AppLogging.exc(E, "Page: {}: General exception".format(self.url))
@@ -2366,7 +2413,7 @@ class RequestsPage(object):
             url,
             headers=headers,
             timeout=timeout_s,
-            verify=BasePage.ssl_verify,
+            verify=RequestBuilder.ssl_verify,
             stream=True,
         )
 
@@ -2489,7 +2536,7 @@ class SeleniumHeadless(SeleniumDriver):
         self.url = url
         self.response = None
 
-        # if not BasePage.ssl_verify:
+        # if not RequestBuilder.ssl_verify:
         #    options.add_argument('ignore-certificate-errors')
 
         driver = self.get_driver()
@@ -2550,7 +2597,7 @@ class SeleniumFull(SeleniumDriver):
         # options to enable performance log, to read status code
         options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
 
-        # if not BasePage.ssl_verify:
+        # if not RequestBuilder.ssl_verify:
         #    options.add_argument('ignore-certificate-errors')
 
         return webdriver.Chrome(service=service, options=options)
@@ -2708,7 +2755,7 @@ class PageOptions(object):
         return str(self)
 
 
-class BasePage(object):
+class RequestBuilder(object):
     """
     Should not contain any HTML/RSS content processing.
     This should be just a builder.
@@ -2763,7 +2810,7 @@ class BasePage(object):
         if not self.options:
             self.options = PageOptions()
 
-        if BasePage.get_contents_function is None:
+        if RequestBuilder.get_contents_function is None:
             self.get_contents_function = self.get_contents_internal
 
         self.headers = {
@@ -2776,7 +2823,7 @@ class BasePage(object):
         }
 
     def disable_ssl_warnings():
-        BasePage.ssl_verify = False
+        RequestBuilder.ssl_verify = False
         disable_warnings(InsecureRequestWarning)
 
     @lazy_load_content
@@ -2953,7 +3000,7 @@ class BasePage(object):
             AppLogging.error("Exception during ping. Url:{}\nExc:{}\n{}".format(self.url, str(e), stack_str))
             return False
 
-    def get_headers(self, timeout_s=5):
+    def get_headers_response(self, timeout_s=5):
         url = self.url
 
         if url is None:
@@ -2971,7 +3018,7 @@ class BasePage(object):
                 ping=True,
             )
             if response and response.is_valid():
-                return response.get_headers()
+                return response
 
         except Exception as e:
             stack_lines = traceback.format_stack()
@@ -2982,6 +3029,9 @@ class BasePage(object):
 
 
 class Url(ContentInterface):
+    """
+    Encapsulates data page, and builder to make request
+    """
     def __init__(self, url=None, page_object=None, page_options=None):
         self.response = None
         self.options = None
@@ -3006,13 +3056,18 @@ class Url(ContentInterface):
 
         if url.startswith("https") or url.startswith("http"):
             if not dap.is_media():
-                p = BasePage(url=url, options=page_options, page_object=page_object)
+                p = RequestBuilder(url=url, options=page_options, page_object=page_object)
                 self.response = p.get_response()
                 self.options = p.options
                 contents = p.get_contents()
 
                 if not p.is_valid():
                     return
+
+        else:
+            # Other protocols have not been yet implemented
+            # there is no request, there is no response
+            pass
 
         if contents:
             if (
@@ -3071,6 +3126,8 @@ class Url(ContentInterface):
         Should provide a faster means of obtaining handler, without the need
         to obtain the page
         """
+        # based on link 'appearance'
+
         page_type = DomainAwarePage(url).get_type()
 
         if page_type == URL_TYPE_HTML:
@@ -3297,7 +3354,7 @@ class DomainCacheInfo(object):
             return self.robots_contents
 
         robots_url = self.get_robots_txt_url()
-        p = BasePage(robots_url)
+        p = RequestBuilder(robots_url)
         self.robots_contents = p.get_contents()
 
         return self.robots_contents
@@ -3336,7 +3393,7 @@ class DomainCacheInfo(object):
 
         urls = self.get_site_maps_urls()
         for url in urls:
-            p = BasePage(url=url)
+            p = RequestBuilder(url=url)
             contents = p.get_contents()
             if contents:
                 parser = ContentLinkParser(url, contents)
@@ -3367,7 +3424,7 @@ class DomainCacheInfo(object):
     def get_subordinate_sites(self, site):
         all_subordinates = set()
 
-        b = BasePage(site)
+        b = RequestBuilder(site)
         contents = b.get_contents()
 
         # check if it is sitemap / sitemap index

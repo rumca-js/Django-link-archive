@@ -15,7 +15,7 @@ from ..models import (
     ModelFiles,
 )
 from ..configuration import Configuration
-from ..webtools import BasePage, HtmlPage, RssPage, ContentLinkParser, DomainAwarePage
+from ..webtools import RequestBuilder, HtmlPage, RssPage, ContentLinkParser, DomainAwarePage
 from ..apps import LinkDatabase
 from ..dateutils import DateUtils
 from .entries import LinkDataController, ArchiveLinkDataController
@@ -41,18 +41,19 @@ class EntriesCleanup(object):
 
     def cleanup(self, limit_s = 0):
         """
+        We do not exit prematurely.
+
+        Reason: if user has 200'000 links it make take a long time.
+        During cleanup new links may become outdated.
+        Cleanup may never end if we enter here for a few seconds only.
+        Provide more queues, if you want such jobs to not clog queues.
+
         @return True if successful
         """
         if not self.cleanup_remove_entries():
             return False
 
-        if self.is_time_exceeded():
-            return False
-
         if not self.cleanup_invalid_page_ratings():
-            return False
-
-        if self.is_time_exceeded():
             return False
 
         config = Configuration.get_object().config_entry
@@ -60,22 +61,15 @@ class EntriesCleanup(object):
             if not self.move_existing_http_to_https():
                 return False
 
-        if self.is_time_exceeded():
-            return False
-
         if config.prefer_non_www_sites:
             if not self.move_existing_www_to_nonwww():
                 return False
-
-        if self.is_time_exceeded():
-            return False
 
         if not self.archive_cleanup:
             if not self.move_old_links_to_archive():
                 return False
 
-        if self.is_time_exceeded():
-            return False
+        # self.cleanup_entries_with_ports()
 
         # TODO it may take very long time, exceed time, and be correct, we should
         # return True then. Check if everything has been done, not only exceeded time
@@ -86,6 +80,43 @@ class EntriesCleanup(object):
         #    return False
 
         return True
+
+    def cleanup_entries_with_ports(self):
+        """
+        This will only fix domains
+        """
+        invalid_domains = DomainsController.objects.filter(domain__icontains = ":")
+        for invalid_domain in invalid_domains:
+            invalid_domain_name = invalid_domain.domain
+            wh = invalid_domain_name.find(":")
+            if wh == -1:
+                AppLogging.error("Somethign is wrong with clear")
+                return
+
+            invalid_entry = None
+            invalid_entries = invalid_domain.entry_objects.all()
+            if invalid_entries.count() > 0:
+                invalid_entry = invalid_entries[0]
+
+            valid_domain_name = invalid_domain_name[:wh]
+            link_with_https = "https://"+valid_domain_name
+
+            b = EntryDataBuilder(link=link_with_https)
+            if not b.result:
+                AppLogging.error("Could not build the entry")
+
+            if b.result == invalid_entry:
+                # unattach
+                invalid_entry.domain_obj = None
+
+                invalid_domain.delete()
+
+            elif b.result != invalid_entry:
+                w = LinkDataWrapper(invalid_entry)
+                w.move_entry(b.result)
+
+                # should also remove incorrect entry
+                invalid_domain.delete()
 
     def cleanup_remove_entries(self, limit_s = 0):
         sources = SourceDataController.objects.all()
@@ -98,17 +129,11 @@ class EntriesCleanup(object):
                     AppLogging.debug("Removing entry:{}".format(entry.link))
                 entries.delete()
 
-            if self.is_time_exceeded():
-                return False
-
         entries = self.get_general_entries()
         if entries:
             for entry in entries:
                 AppLogging.debug("Removing entry:{}".format(entry.link))
             entries.delete()
-
-            if self.is_time_exceeded():
-                return False
 
         if not self.archive_cleanup:
             entries = self.get_stale_entries()
@@ -220,9 +245,6 @@ class EntriesCleanup(object):
                 u = EntryUpdater(entry)
                 u.reset_local_data()
 
-            if self.is_time_exceeded():
-                return False
-
         return True
 
     def move_old_links_to_archive(self):
@@ -237,9 +259,6 @@ class EntriesCleanup(object):
         for entry in entries:
             AppLogging.debug("Moving link to archive: {}".format(entry.link))
             LinkDataWrapper(entry=entry).move_to_archive()
-
-            if self.is_time_exceeded():
-                return False
 
         return True
 
@@ -274,9 +293,6 @@ class EntriesCleanup(object):
                     w = LinkDataWrapper(entry = http_entry)
                     w.move_entry(https_entries[0])
 
-            if self.is_time_exceeded():
-                return False
-
         return True
 
     def move_existing_www_to_nonwww(self):
@@ -292,9 +308,6 @@ class EntriesCleanup(object):
                     w = LinkDataWrapper(entry = www_entry)
                     w.move_entry(nonwww_entries[0])
 
-                if self.is_time_exceeded():
-                    return False
-
         www_entries = LinkDataController.objects.filter(link__icontains="http://www.")
         if www_entries.exists():
             for www_entry in www_entries:
@@ -303,9 +316,6 @@ class EntriesCleanup(object):
                 if nonwww_entries.exists():
                     w = LinkDataWrapper(entry = www_entry)
                     w.move_entry(nonwww_entries[0])
-
-                if self.is_time_exceeded():
-                    return False
 
         return True
 
@@ -1157,11 +1167,11 @@ class LinkDataWrapper(object):
         if entry.is_https():
             http_url = entry.get_http_url()
 
-            p = BasePage(url = entry.link)
+            p = RequestBuilder(url = entry.link)
             ping_status = p.ping()
 
             if not ping_status:
-                p = BasePage(url = http_url)
+                p = RequestBuilder(url = http_url)
                 new_ping_status = p.ping()
 
                 if new_ping_status:
@@ -1172,7 +1182,7 @@ class LinkDataWrapper(object):
         if entry.is_http():
             https_url = entry.get_https_url()
 
-            p = BasePage(https_url)
+            p = RequestBuilder(https_url)
             new_ping_status = p.ping()
 
             if new_ping_status:
@@ -1208,7 +1218,7 @@ class LinkDataWrapper(object):
 
         destination_link = entry.link.replace("www.", "")
 
-        p = BasePage(url = destination_link)
+        p = RequestBuilder(url = destination_link)
         if p.ping():
             self.move_entry_to_url(destination_link)
 

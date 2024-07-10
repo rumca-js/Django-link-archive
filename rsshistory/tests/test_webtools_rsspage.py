@@ -1,7 +1,7 @@
 from datetime import datetime
 import hashlib
 
-from ..webtools import RssPage, BasePage, calculate_hash
+from ..webtools import RssPage, RequestBuilder, calculate_hash
 
 from .fakeinternet import FakeInternetTestCase, MockRequestCounter
 from .fakeinternetdata import (

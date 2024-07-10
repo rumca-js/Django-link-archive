@@ -55,7 +55,7 @@ from .controllers import (
 )
 from .configuration import Configuration
 from .dateutils import DateUtils
-from .webtools import HtmlPage, DomainAwarePage, ContentLinkParser, BasePage
+from .webtools import HtmlPage, DomainAwarePage, ContentLinkParser, RequestBuilder
 from .pluginurl import UrlHandler
 
 
@@ -73,12 +73,6 @@ class BaseJobHandler(object):
         To obtain difference in seconds call total_seconds()
         """
         return (DateUtils.get_datetime_now_utc() - self.start_processing_time)
-
-    def get_time_diff_sec(self):
-        """
-        To obtain difference in seconds call total_seconds()
-        """
-        return self.get_time_diff().total_seconds()
 
     def set_config(self, config):
         self._config = config
@@ -137,8 +131,8 @@ class ProcessSourceJobHandler(BaseJobHandler):
             plugin = SourceControllerBuilder.get(source_id)
             if plugin:
                 if plugin.check_for_data():
-                    elapsed_sec = self.get_time_diff_sec()
-                    AppLogging.debug("Processed source:{}. Time[s]:{}".format(source.url, elapsed_sec))
+                    elapsed_sec = self.get_time_diff()
+                    AppLogging.debug("Processed source:{}. Time:{}".format(source.url, elapsed_sec))
 
                     return True
                 return True
@@ -255,7 +249,7 @@ class LinkDownloadJobHandler(BaseJobHandler):
 
             Url.download_all(url)
 
-            AppLogging.notify("Page has been downloaded:{} Time[s]:{}".format(url, self.get_time_diff_sec()))
+            AppLogging.notify("Page has been downloaded:{} Time:{}".format(url, self.get_time_diff()))
 
             return True
         except Exception as E:
@@ -299,9 +293,9 @@ class LinkMusicDownloadJobHandler(BaseJobHandler):
             id3 = id3v2.Id3v2(file_name, data)
             id3.tag()
 
-            elapsed_sec = self.get_time_diff_sec()
+            elapsed_sec = self.get_time_diff()
 
-            AppLogging.notify("Downloading music done: {} {}. Time[s]:{}".format(url, title, elapsed_sec))
+            AppLogging.notify("Downloading music done: {} {}. Time:{}".format(url, title, elapsed_sec))
 
             return True
         except Exception as E:
@@ -375,8 +369,8 @@ class LinkVideoDownloadJobHandler(BaseJobHandler):
                 )
                 return
 
-            elapsed_sec = self.get_time_diff_sec()
-            AppLogging.notify("Downloading video done: {} {}. Time[s]:{}".format(url, title, elapsed_sec))
+            elapsed_sec = self.get_time_diff()
+            AppLogging.notify("Downloading video done: {} {}. Time:{}".format(url, title, elapsed_sec))
 
             return True
         except Exception as E:
@@ -853,8 +847,8 @@ class ExportDataJobHandler(BaseJobHandler):
 
             SourceExportHistory.confirm(export)
 
-            elapsed_sec = self.get_time_diff_sec()
-            AppLogging.notify("Successfully pushed data to git. Time[s]:{}".format(elapsed_sec))
+            elapsed_sec = self.get_time_diff()
+            AppLogging.notify("Successfully pushed data to git. Time:{}".format(elapsed_sec))
 
             return True
         except Exception as E:
@@ -883,8 +877,8 @@ class PushYearDataToRepoJobHandler(BaseJobHandler):
                 update_mgr = UpdateManager(self._config)
                 update_mgr.write_and_push_year_data()
 
-                elapsed_sec = self.get_time_diff_sec()
-                AppLogging.notify("Successfully pushed data to git. Time[s]:{}".format(elapsed_sec))
+                elapsed_sec = self.get_time_diff()
+                AppLogging.notify("Successfully pushed data to git. Time:{}".format(elapsed_sec))
 
             return True
         except Exception as E:
@@ -907,8 +901,8 @@ class PushNoTimeDataToRepoJobHandler(BaseJobHandler):
                 update_mgr = UpdateManager(self._config)
                 update_mgr.write_and_push_notime_data()
 
-                elapsed_sec = self.get_time_diff_sec()
-                AppLogging.notify("Successfully pushed data to git. Time[s]:{}".format(elapsed_sec))
+                elapsed_sec = self.get_time_diff()
+                AppLogging.notify("Successfully pushed data to git. Time:{}".format(elapsed_sec))
 
             return True
         except Exception as E:
@@ -934,8 +928,8 @@ class PushDailyDataToRepoJobHandler(BaseJobHandler):
                 update_mgr = UpdateManager(self._config)
                 update_mgr.write_and_push_daily_data(date_input)
 
-                elapsed_sec = self.get_time_diff_sec()
-                AppLogging.notify("Successfully pushed data to git. Time[s]:{}".format(elapsed_sec))
+                elapsed_sec = self.get_time_diff()
+                AppLogging.notify("Successfully pushed data to git. Time:{}".format(elapsed_sec))
 
             return True
         except Exception as E:
@@ -977,8 +971,8 @@ class CleanupJobHandler(BaseJobHandler):
             # if status is True, everything has been cleared correctly
             # we can remove the cleanup background job
 
-            elapsed_sec = self.get_time_diff_sec()
-            AppLogging.notify("Successfully cleaned database. Time[s]:{}".format(elapsed_sec))
+            elapsed_sec = self.get_time_diff()
+            AppLogging.notify("Successfully cleaned database. Time:{}".format(elapsed_sec))
             return status
 
         except Exception as E:
@@ -1213,13 +1207,11 @@ class HandlerManager(object):
 
                 self.process_one_for_all(items)
 
-                passed_seconds = (
-                    DateUtils.get_datetime_now_utc() - self.start_processing_time
-                )
+                passed_seconds = DateUtils.get_datetime_now_utc() - self.start_processing_time
                 if passed_seconds.total_seconds() >= self.timeout_s:
                     obj = items[0]
                     handler = items[1]
-                    text = "Threads: last handler {} {} exceeded time:{}".format(
+                    text = "Threads: last handler {} {} Time:{}".format(
                         handler.get_job(), obj.subject, passed_seconds
                     )
                     AppLogging.error(text)
@@ -1263,7 +1255,6 @@ class HandlerManager(object):
                     deleted = True
 
         except Exception as E:
-            error_text = traceback.format_exc()
             if not deleted and obj:
                 AppLogging.exc(
                     exception_object = E,

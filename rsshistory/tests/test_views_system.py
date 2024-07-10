@@ -50,6 +50,12 @@ class SystemViewsTest(FakeInternetTestCase):
 
         self.assertEqual(response.status_code, 200)
 
+    def test_configuration_json(self):
+        url = reverse("{}:configuration-advanced-json".format(LinkDatabase.name))
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
     def test_system_status(self):
         url = reverse("{}:system-status".format(LinkDatabase.name))
         response = self.client.get(url)

@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.http import JsonResponse
 from django.shortcuts import redirect
-from django.core import serializers
+from django.forms.models import model_to_dict
 
 from ..apps import LinkDatabase
 from ..models import (
@@ -102,18 +102,16 @@ def configuration_advanced_page(request):
     return p.render("configuration.html")
 
 
-def configuration_advanced_json(request, pk):
-    links = LinkDataController.objects.filter(id=pk)
-
-    if links.count() == 0:
-        p = ViewPage(request)
-        p.set_title("Entry JSON")
-        p.context["summary_text"] = "No such link in the database {}".format(pk)
-        return p.render("summary_present.html")
+def configuration_advanced_json(request):
+    p = ViewPage(request)
+    p.set_title("Configuration JSON")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
 
     config = ConfigurationEntry.get()
 
-    data = serializers.serialize('json', config)
+    json_obj = model_to_dict(config)
 
     # JsonResponse
     return JsonResponse(json_obj)

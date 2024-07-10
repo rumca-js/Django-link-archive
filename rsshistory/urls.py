@@ -186,8 +186,9 @@ urlpatterns = [
     path("entry-rule-add", entryrules.entry_rule_add, name="entry-rule-add"),
     path("entry-rule-edit/<int:pk>/", entryrules.entry_rule_edit, name="entry-rule-edit"),
     path("entry-rule-remove/<int:pk>/", entryrules.entry_rule_remove, name="entry-rule-remove"),
-    path("entry-rules/", entryrules.EntryRuleListView.as_view(), name="entry-rules",),
-    path("entry-rule/<int:pk>/", entryrules.EntryRuleDetailView.as_view(), name="entry-rule",),
+    path("entry-rules/", entryrules.EntryRulesListView.as_view(), name="entry-rules",),
+    path("entry-rules-json/", entryrules.entry_rules_json, name="entry-rules-json",),
+    path("entry-rule/<int:pk>/", entryrules.EntryRulesDetailView.as_view(), name="entry-rule",),
     # other, debug forms
     path("page-show-props", tools.page_show_properties, name="page-show-props",),
     path("page-scan-link", tools.page_scan_link, name="page-scan-link",),

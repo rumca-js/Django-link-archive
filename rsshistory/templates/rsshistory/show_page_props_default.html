@@ -4,7 +4,7 @@
     <li>Link: <a href="{{page_object.url}}">{{page_object.url}}</a></li>
     <li>Detected page type: {{page_object_type}}</li>
     <li>Status code: {{response_object.status_code}}</li>
-    <li>Valid: {{page_object.is_valid}}</li>
+    <li>Valid: {{page_handler.is_valid}}</li>
     <li>Title: {{page_object.get_title}}</li>
     <li>Description: {{page_object.get_description}}</li>
     {%if page_object.get_date_published %}

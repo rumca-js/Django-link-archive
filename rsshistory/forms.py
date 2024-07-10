@@ -18,7 +18,7 @@ from .models import DomainsTlds
 from .models import DomainsMains
 from .models import SourceCategories
 from .models import SourceSubCategories
-from .models import ConfigurationEntry, UserConfig, DataExport, EntryRule
+from .models import ConfigurationEntry, UserConfig, DataExport, EntryRules
 
 from .configuration import Configuration
 from .controllers import (
@@ -197,21 +197,21 @@ class DataExportForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
 
-class EntryRuleForm(forms.ModelForm):
+class EntryRulesForm(forms.ModelForm):
     """
     Category choice form
     """
 
     class Meta:
-        model = EntryRule
+        model = EntryRules
         fields = [
             "enabled",
             "rule_name",
             "rule_url",
             "block",
             "auto_tag",
-            "requires_selenium",
-            "requires_selenium_full",
+            "requires_headless",
+            "requires_full_browser",
         ]
 
     def __init__(self, *args, **kwargs):

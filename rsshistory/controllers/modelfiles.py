@@ -1,6 +1,6 @@
 
 from ..models import ModelFiles
-from ..webtools import BasePage
+from ..webtools import RequestBuilder
 from ..configuration import Configuration
 
 class ModelFilesBuilder(object):
@@ -17,7 +17,7 @@ class ModelFilesBuilder(object):
         if not c.enabled_file_support:
             return
 
-        p = BasePage(url = file_name)
+        p = RequestBuilder(url = file_name)
         response = p.get_response()
 
         if not response:

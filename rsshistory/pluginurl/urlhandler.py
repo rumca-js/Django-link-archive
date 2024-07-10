@@ -4,7 +4,7 @@ from urllib.parse import unquote
 from ..webtools import Url, PageOptions, DomainAwarePage, DomainAwarePage
 
 from ..apps import LinkDatabase
-from ..models import AppLogging, EntryRule
+from ..models import AppLogging, EntryRules
 from ..configuration import Configuration
 
 from .handlervideoyoutube import YouTubeVideoHandler, YouTubeJsonHandler
@@ -134,9 +134,9 @@ class UrlHandler(Url):
     def get_url_options(url):
         options = PageOptions()
 
-        if UrlHandler.is_selenium_full_required(url):
+        if UrlHandler.is_full_browser_required(url):
             options.use_selenium_full = True
-        if UrlHandler.is_selenium_headless_required(url):
+        if UrlHandler.is_headless_browser_required(url):
             options.use_selenium_headless = True
 
         p = DomainAwarePage(url)
@@ -181,7 +181,10 @@ class UrlHandler(Url):
         if url.startswith("odysee.com/$/rss"):
             return True
 
-    def is_selenium_headless_required(url):
+    def is_headless_browser_required(url):
+        if EntryRules.is_headless_browser_required(url):
+            return True
+
         domain = DomainAwarePage(url).get_domain_only()
 
         if domain.startswith("open.spotify.com") or domain.startswith("thehill.com"):
@@ -189,26 +192,34 @@ class UrlHandler(Url):
 
         return False
 
-    def is_selenium_full_required(url):
+    def is_full_browser_required(url):
         p = DomainAwarePage(url)
+        if (p.is_link_service()):
+            return True
+
+        if EntryRules.is_full_browser_required(url):
+            return True
+
+        require_full_browser = [
+                'www.warhammer-community.com',
+                'warhammer-community.com',
+                'defcon.org',
+                'yahoo.com',
+        ]
         domain = p.get_domain_only()
 
-        if (
-            p.is_link_service()
-            or domain.startswith("www.warhammer-community.com")
-            or domain.startswith("defcon.org")
-            or domain.find("yahoo.com") >= 0
-        ):
-            return True
+        for rule in require_full_browser:
+            if domain.find(rule) >= 0:
+                return True
 
         return False
 
     def get_page_options(url):
         o = PageOptions()
 
-        if UrlHandler.is_selenium_full_required(url):
+        if UrlHandler.is_full_browser_required(url):
             o.use_selenium_full = True
-        if UrlHandler.is_selenium_headless_required(url):
+        if UrlHandler.is_headless_browser_required(url):
             o.use_selenium_headless = True
 
         return o
@@ -276,17 +287,15 @@ class UrlHandler(Url):
         if not validator.is_valid():
             return True
 
+        if EntryRules.is_blocked(self.url):
+            return True
+
         if not self.is_url_valid():
             return True
 
     def is_url_valid(self):
         if not super().is_url_valid():
             return False
-
-        urls = EntryRule.get_blocked_urls()
-        for url in urls:
-            if self.url.find(url) >= 0:
-                return False
 
         return True
 

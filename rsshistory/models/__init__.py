@@ -37,7 +37,7 @@ from .keywords import (
     KeyWords,
 )
 from .entryrules import (
-    EntryRule,
+    EntryRules,
 )
 from .useractions import (
     UserTags,

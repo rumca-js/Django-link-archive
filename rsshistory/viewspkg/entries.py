@@ -20,6 +20,7 @@ from ..models import (
     UserSearchHistory,
     UserEntryTransitionHistory,
     UserSearchHistory,
+    EntryRules,
 )
 from ..controllers import (
     LinkDataController,
@@ -40,6 +41,7 @@ from ..forms import (
     EntryArchiveForm,
     OmniSearchForm,
     OmniSearchWithArchiveForm,
+    LinkInputForm,
 )
 from ..dateutils import DateUtils
 from ..views import ViewPage
@@ -626,6 +628,88 @@ class EntryArchivedDetailView(generic.DetailView):
         return view
 
 
+def func_display_empty_form(request, p):
+    form = LinkInputForm(request=request)
+    form.method = "POST"
+
+    p.context["form"] = form
+    p.context[
+        "form_description_post"
+    ] = "Internet is dangerous, so carefully select which links you add"
+
+    return p.render("form_basic.html")
+
+def func_display_init_form(request, p, cleaned_link):
+    form = LinkInputForm(initial={"link": cleaned_link}, request=request)
+    form.method = "POST"
+
+    p.context["form"] = form
+    p.context[
+        "form_description_post"
+    ] = "Internet is dangerous, so carefully select which links you add"
+
+    return p.render("form_basic.html")
+
+def func_display_data_form(request, p, data):
+    notes = []
+    warnings = []
+    errors = []
+
+    link = data["link"]
+
+    ob = LinkDataWrapper(link=link).get()
+    if ob:
+        return HttpResponseRedirect(ob.get_absolute_url())
+
+    data["user"] = request.user.username
+    data["bookmarked"] = True
+
+    if "description" in data:
+        data["description"] = LinkDataController.get_description_safe(
+            data["description"]
+        )
+
+    form = EntryForm(initial=data, request=request)
+    form.method = "POST"
+    form.action_url = reverse("{}:entry-add".format(LinkDatabase.name))
+    p.context["form"] = form
+
+    page = DomainAwarePage(link)
+    domain = page.get_domain()
+
+    config = Configuration.get_object().config_entry
+
+    info = DomainCache.get_object(link)
+
+    if config.prefer_https and link.find("http://") >= 0:
+        warnings.append("Detected http protocol. Choose https if possible. It is a more secure protocol")
+    if config.prefer_non_www_sites and domain.find("www.") >= 0:
+        warnings.append("Detected www in domain link name. Select non www link if possible")
+    if domain.lower() != domain:
+        warnings.append("Link domain is not lowercase. Are you sure link name is OK?")
+    if config.respect_robots_txt and info and not info.is_allowed(link):
+        warnings.append("Link is not allowed by site robots.txt")
+    if link.find("?") >= 0:
+        warnings.append("Link contains arguments. Is that intentional?")
+    if link.find("#") >= 0:
+        warnings.append("Link contains arguments. Is that intentional?")
+    if page.get_protocolless().find(":") >= 0:
+        warnings.append("Link contains port. Is that intentional?")
+
+    if not page.is_web_link():
+        errors.append("Not a web link. Forget http:// or https:// etc.?")
+    if data["status_code"] < 200 or data["status_code"] > 300:
+        errors.append("Information about page availability could not be obtained")
+    if EntryRules.is_blocked(link):
+        errors.append("Entry is blocked by entry rules")
+
+    p.context["notes"] = notes
+    p.context["warnings"] = warnings
+    p.context["errors"] = errors
+
+    return p.render("form_add_entry.html")
+
+
 def add_entry(request):
     from ..controllers import LinkDataController
 
@@ -659,11 +743,11 @@ def add_entry(request):
             b.source_is_auto = False
             entry = b.add_from_props_internal()
 
-            BackgroundJobController.link_scan(entry=entry)
-
             if not entry:
                 p.context["summary_text"] = "Could not save link"
                 return p.render("summary_present.html")
+
+            BackgroundJobController.link_scan(entry=entry)
 
             if entry.bookmarked:
                 new_entry = LinkDataWrapper(entry=entry).make_bookmarked(request)
@@ -706,106 +790,18 @@ def add_entry(request):
 
             data = LinkDataController.get_full_information({"link": link})
             if data:
-                initial = data
+                return func_display_data_form(request, p, data)
 
-        form = EntryForm(initial=initial, request=request)
-        form.method = "POST"
-        form.action_url = reverse("{}:entry-add".format(LinkDatabase.name))
-        p.context["form"] = form
+            p.context["summary_text"] = "Could not obtain details from link {}".format(
+                link
+            )
+            return p.render("summary_present.html")
 
-        p.context["form_title"] = "Add new entry"
-
-        form_text = "<pre>"
-        form_text += "Required fields:\n"
-        form_text += " - Link [required]\n"
-        form_text += "\n"
-        form_text += "For YouTube links:\n"
-        form_text += " - Title, description, Date published, source, language is set automatically\n"
-        form_text += " - manual setting of language overrides the default (en)\n"
-        form_text += "\n"
-        form_text += "For standard links:\n"
-        form_text += " - Title, description, source, language is set automatically, if not specified\n"
-        form_text += " - Always specify date published [required]\n"
-        form_text += " - Better specify language\n"
-        form_text += " - In case of errors, specify title, and description\n"
-        form_text += "</pre>"
-
-        p.context["form_description_post"] = form_text
-
-    return p.render("form_basic.html")
+        else:
+            return func_display_empty_form(request, p)
 
 
 def add_simple_entry(request):
-    def display_empty_form(request, p):
-        form = LinkInputForm(request=request)
-        form.method = "POST"
-
-        p.context["form"] = form
-        p.context[
-            "form_description_post"
-        ] = "Internet is dangerous, so carefully select which links you add"
-
-        return p.render("form_basic.html")
-
-    def display_init_form(request, p, cleaned_link):
-        form = LinkInputForm(initial={"link": cleaned_link}, request=request)
-        form.method = "POST"
-
-        p.context["form"] = form
-        p.context[
-            "form_description_post"
-        ] = "Internet is dangerous, so carefully select which links you add"
-
-        return p.render("form_basic.html")
-
-    def display_data_form(request, p, data):
-        notes = []
-        warnings = []
-        errors = []
-
-        link = data["link"]
-
-        ob = LinkDataWrapper(link=link).get()
-        if ob:
-            return HttpResponseRedirect(ob.get_absolute_url())
-
-        data["user"] = request.user.username
-        data["bookmarked"] = True
-
-        if "description" in data:
-            data["description"] = LinkDataController.get_description_safe(
-                data["description"]
-            )
-
-        form = EntryForm(initial=data, request=request)
-        form.method = "POST"
-        form.action_url = reverse("{}:entry-add".format(LinkDatabase.name))
-        p.context["form"] = form
-
-        page = DomainAwarePage(data["link"])
-        domain = page.get_domain()
-
-        info = DomainCache.get_object(data["link"])
-
-        if data["link"].find("http://") >= 0:
-            warnings.append("Link is http. Https is more secure protocol")
-        if data["link"].find("http://") == -1 and data["link"].find("https://") == -1:
-            errors.append("Missing protocol. Could be http:// or https://")
-        if domain.lower() != domain:
-            warnings.append("Link domain is not lowercase. Is that OK?")
-        if data["status_code"] < 200 or data["status_code"] > 300:
-            errors.append("Information about page availability could not be obtained")
-        if info and not info.is_allowed(data["link"]):
-            warnings.append("Link is not allowed by site robots.txt")
-
-        p.context["notes"] = notes
-        p.context["warnings"] = warnings
-        p.context["errors"] = errors
-
-        return p.render("form_add_entry.html")
-
-    from ..forms import ExportDailyDataForm, LinkInputForm
-
     p = ViewPage(request)
     p.set_title("Add entry")
     data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
@@ -820,7 +816,7 @@ def add_simple_entry(request):
             cleaned_link = UrlHandler.get_cleaned_link(link)
 
             if cleaned_link != link:
-                return display_init_form(request, p, cleaned_link)
+                return func_display_init_form(request, p, cleaned_link)
 
             if not Url.is_web_link(link):
                 p.context[
@@ -830,14 +826,20 @@ def add_simple_entry(request):
 
             data = LinkDataController.get_full_information({"link": link})
             if data:
-                return display_data_form(request, p, data)
+                return func_display_data_form(request, p, data)
 
             p.context["summary_text"] = "Could not obtain details from link {}".format(
                 link
             )
             return p.render("summary_present.html")
+
+        else:
+            p.context["summary_text"] = "Form is invalid {}".format(
+                link
+            )
+            return p.render("summary_present.html")
     else:
-        return display_empty_form(request, p)
+        return func_display_empty_form(request, p)
 
 
 def entry_update_data(request, pk):

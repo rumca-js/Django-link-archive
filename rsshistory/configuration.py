@@ -18,7 +18,7 @@ version is split into three digits:
  if a change requires the model to be changed, then second digit is updated, patch is set to 0
  if something should be released to public, then release version changes
 """
-__version__ = "0.71.6"
+__version__ = "0.72.0"
 
 
 from pathlib import Path
@@ -103,15 +103,15 @@ class Configuration(object):
         pass
 
     def apply_ssl_verification(self):
-        from .webtools import BasePage
+        from .webtools import RequestBuilder
 
         if not self.config_entry.ssl_verification:
-            BasePage.disable_ssl_warnings()
+            RequestBuilder.disable_ssl_warnings()
 
     def apply_user_agent(self):
-        from .webtools import BasePage
+        from .webtools import RequestBuilder
 
-        BasePage.user_agent = self.config_entry.user_agent
+        RequestBuilder.user_agent = self.config_entry.user_agent
 
     def apply_robots_txt(self):
         from .webtools import DomainCache
@@ -230,11 +230,11 @@ class Configuration(object):
         return False
 
     def ping_internet(self, thread_id):
-        from .webtools import BasePage
+        from .webtools import RequestBuilder
 
         test_page_url = self.config_entry.internet_test_page
 
-        p = BasePage(url=test_page_url)
+        p = RequestBuilder(url=test_page_url)
         return p.ping()
 
     def encrypt(self, message):

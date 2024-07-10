@@ -318,3 +318,12 @@ class DomainAwarePageTest(FakeInternetTestCase):
         p = DomainAwarePage("https://com")
         # call tested function
         self.assertFalse(p.is_web_link())
+
+    def test_get_protocolless(self):
+        p = DomainAwarePage("https://www.youtube.com:443")
+        # call tested function
+        self.assertEqual(p.get_protocolless(), "www.youtube.com:443")
+
+        p = DomainAwarePage("https://www.youtube.com:443/test")
+        # call tested function
+        self.assertEqual(p.get_protocolless(), "www.youtube.com:443/test")

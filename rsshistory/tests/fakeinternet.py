@@ -12,7 +12,7 @@ from django.contrib.auth.models import User
 
 from ..models import AppLogging, ConfigurationEntry
 from ..dateutils import DateUtils
-from ..webtools import BasePage, PageResponseObject
+from ..webtools import RequestBuilder, PageResponseObject
 from ..configuration import Configuration
 
 from ..pluginurl.urlhandler import UrlHandler
@@ -495,7 +495,7 @@ class FakeInternetTestCase(TestCase):
         return TestResponseObject(url, headers, timeout_s)
 
     def disable_web_pages(self):
-        BasePage.get_contents_function = self.get_contents_function
+        RequestBuilder.get_contents_function = self.get_contents_function
 
         # UrlHandler.youtube_video_handler = YouTubeVideoHandlerMock
         UrlHandler.youtube_video_handler = YouTubeJsonHandlerMock

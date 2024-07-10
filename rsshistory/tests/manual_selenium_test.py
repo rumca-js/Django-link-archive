@@ -337,7 +337,7 @@ class SeleniumHeadless(SeleniumDriver):
 
         options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
 
-        # if not BasePage.ssl_verify:
+        # if not RequestBuilder.ssl_verify:
         #    options.add_argument('ignore-certificate-errors')
 
         driver = webdriver.Chrome(service=service, options=options)
@@ -404,7 +404,7 @@ class SeleniumFull(object):
         # options to enable performance log, to read status code
         options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
 
-        # if not BasePage.ssl_verify:
+        # if not RequestBuilder.ssl_verify:
         #    options.add_argument('ignore-certificate-errors')
 
         driver = webdriver.Chrome(service=service, options=options)
@@ -608,7 +608,7 @@ def selenium_full(url, timeout=10):
     # options to enable performance log, to read status code
     options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
 
-    # if not BasePage.ssl_verify:
+    # if not RequestBuilder.ssl_verify:
     #    options.add_argument('ignore-certificate-errors')
 
     driver = webdriver.Chrome(service=service, options=options)
@@ -719,7 +719,7 @@ def selenium_full(url, timeout=10):
     # options to enable performance log, to read status code
     options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
 
-    # if not BasePage.ssl_verify:
+    # if not RequestBuilder.ssl_verify:
     #    options.add_argument('ignore-certificate-errors')
 
     driver = webdriver.Chrome(service=service, options=options)

@@ -53,11 +53,11 @@ class BackgroundJobsViewsTest(FakeInternetTestCase):
         # redirect to see all jobs
         self.assertEqual(response.status_code, 302)
 
-        jobs = BackgroundJobController.objects.all().count()
+        jobs = BackgroundJobController.objects.all()
 
-        self.assertEqual(jobs, 1)
+        self.assertEqual(jobs.count(), 1)
         # priority is not default, null
-        self.assertEqual(jobs[0].priority > 0)
+        self.assertTrue(jobs[0].priority > 0)
 
     def test_backgroundjob_remove(self):
         bj = BackgroundJobController.objects.create(

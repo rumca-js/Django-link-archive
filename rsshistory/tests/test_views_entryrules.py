@@ -9,12 +9,12 @@ from ..controllers import (
     BackgroundJobController,
 )
 from ..dateutils import DateUtils
-from ..models import EntryRule
+from ..models import EntryRules
 
 from .fakeinternet import FakeInternetTestCase
 
 
-class EntryRuleTests(FakeInternetTestCase):
+class EntryRulesTests(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 
@@ -23,7 +23,7 @@ class EntryRuleTests(FakeInternetTestCase):
         )
 
     def test_entry_rule_add_form(self):
-        EntryRule.objects.all().delete()
+        EntryRules.objects.all().delete()
 
         self.client.login(username="testuser", password="testpassword")
 
@@ -36,7 +36,7 @@ class EntryRuleTests(FakeInternetTestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_entry_rule_add_form(self):
-        EntryRule.objects.all().delete()
+        EntryRules.objects.all().delete()
 
         self.client.login(username="testuser", password="testpassword")
 
@@ -53,7 +53,7 @@ class EntryRuleTests(FakeInternetTestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_entry_rule_edit(self):
-        entry_rule = EntryRule.objects.create(
+        entry_rule = EntryRules.objects.create(
             enabled=True,
             rule_name="test_rule",
             rule_url="https://neocities.com",
@@ -77,7 +77,7 @@ class EntryRuleTests(FakeInternetTestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_entry_rule_remove(self):
-        entry_rule = EntryRule.objects.create(
+        entry_rule = EntryRules.objects.create(
             enabled=True,
             rule_name="test_rule",
             rule_url="https://neocities.com",
@@ -95,10 +95,10 @@ class EntryRuleTests(FakeInternetTestCase):
 
         self.assertEqual(response.status_code, 302)
 
-        self.assertEqual(EntryRule.objects.all().count(), 0)
+        self.assertEqual(EntryRules.objects.all().count(), 0)
 
     def test_entry_rule_list(self):
-        entry_rule = EntryRule.objects.create(
+        entry_rule = EntryRules.objects.create(
             enabled=True,
             rule_name="test_rule",
             rule_url="https://neocities.com",
@@ -115,7 +115,7 @@ class EntryRuleTests(FakeInternetTestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_entry_rule_detail(self):
-        entry_rule = EntryRule.objects.create(
+        entry_rule = EntryRules.objects.create(
             enabled=True,
             rule_name="test_rule",
             rule_url="https://neocities.com",
@@ -125,6 +125,23 @@ class EntryRuleTests(FakeInternetTestCase):
         self.client.login(username="testuser", password="testpassword")
 
         url = reverse("{}:entry-rule".format(LinkDatabase.name), args=[entry_rule.id])
+
+        # call user action
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_entry_rule_json(self):
+        entry_rule = EntryRules.objects.create(
+            enabled=True,
+            rule_name="test_rule",
+            rule_url="https://neocities.com",
+            auto_tag="personal",
+        )
+
+        self.client.login(username="testuser", password="testpassword")
+
+        url = reverse("{}:entry-rules-json".format(LinkDatabase.name))
 
         # call user action
         response = self.client.get(url)

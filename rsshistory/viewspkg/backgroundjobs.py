@@ -201,8 +201,7 @@ def backgroundjobs_enable_all(request):
 
     jobs = BackgroundJobController.objects.all()
     for job in jobs:
-        job.enabled = True
-        job.save()
+        job.enable()
 
     return HttpResponseRedirect(reverse("{}:backgroundjobs".format(LinkDatabase.name)))
 

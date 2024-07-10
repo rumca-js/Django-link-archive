@@ -6,7 +6,7 @@ from .system import AppLogging
 from ..apps import LinkDatabase
 
 
-class EntryRule(models.Model):
+class EntryRules(models.Model):
     enabled = models.BooleanField(default=True)
 
     rule_url = models.CharField(max_length=1000)  # url syntax
@@ -22,34 +22,51 @@ class EntryRule(models.Model):
         max_length=1000, blank=True, help_text="Automatically tag"
     )
 
-    requires_selenium = models.BooleanField(
+    requires_headless = models.BooleanField(
         default=False,
-        help_text="Requires selenium",
+        help_text="Requires headless browser",
     )
 
-    requires_selenium_full = models.BooleanField(
+    requires_full_browser = models.BooleanField(
         default=False,
-        help_text="Requires full selenium setup",
+        help_text="Requires full browser setup",
     )
 
-    def add_default():
-        """
-        Creates default, sane rules
-        """
-        pass
+    def get_rule_urls(self):
+        result = set()
 
-    def get_blocked_urls():
-        block_urls = set()
+        urls = self.rule_url.split(",")
+        for url in urls:
+            result.add(url.strip())
 
-        rules = EntryRule.objects.all()
+        return result
+
+    def is_blocked(url):
+        rules = EntryRules.objects.filter(block=True, enabled=True)
         for rule in rules:
-            if not rule.block:
-                continue
+            rule_urls = rule.get_rule_urls()
+            for rule_url in rule_urls:
+                if url.find(rule_url) >= 0:
+                    return True
 
-            urls = rule.rule_url.split(",")
-            for url in urls:
-                block_urls.add(url.strip())
+        return False
 
-        print(block_urls)
+    def is_headless_browser_required(url):
+        rules = EntryRules.objects.filter(requires_headless=True, enabled=True)
+        for rule in rules:
+            rule_urls = rule.get_rule_urls()
+            for rule_url in rule_urls:
+                if url.find(rule_url) >= 0:
+                    return True
 
-        return list(block_urls)
+        return False
+
+    def is_full_browser_required(url):
+        rules = EntryRules.objects.filter(requires_full_browser=True, enabled=True)
+        for rule in rules:
+            rule_urls = rule.get_rule_urls()
+            for rule_url in rule_urls:
+                if url.find(rule_url) >= 0:
+                    return True
+
+        return False

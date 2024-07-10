@@ -18,7 +18,7 @@ from ..forms import (
 )
 from ..views import ViewPage
 from ..pluginurl.urlhandler import UrlHandler
-from ..webtools import ContentLinkParser, RssPage, DomainCache
+from ..webtools import ContentLinkParser, RssPage, DomainCache, DomainAwarePage
 
 
 def page_show_properties(request):
@@ -117,8 +117,6 @@ def page_scan_link(request):
     data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
     if data is not None:
         return data
-
-    from ..forms import ExportDailyDataForm
 
     if request.method == "POST":
         form = LinkInputForm(request.POST, request=request)
@@ -447,8 +445,8 @@ def page_verify(request):
             entry = entries[0]
             data["entry"] = entry.get_map()
 
-            domain_url = DomainAwarePage(entry.link).get_domain()
-
+        domain_url = DomainAwarePage(url).get_domain()
+        if domain_url != url:
             domains = LinkDataController.objects.filter(link = domain_url)
             if domains.exists():
                 domain = domains[0]
