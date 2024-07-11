@@ -17,6 +17,7 @@ COMPANION_APP = catalog
 install:
 	poetry install
 	poetry run python -m spacy download en_core_web_sm
+	poetry run playwright install
 	@$(CP) $(PROJECT_NAME)/settings_template.py $(PROJECT_NAME)/settings.py
 	@echo "*******************************************************************"
 	@echo "Please configure your django application linklibrary in settings.py"
@@ -29,6 +30,7 @@ install:
 install-minimal:
 	poetry install
 	poetry run python -m spacy download en_core_web_sm
+	poetry run playwright install
 	@$(CP) $(PROJECT_NAME)/settings_template_minimal.py $(PROJECT_NAME)/settings.py
 	@echo "*******************************************************************"
 	@echo "Please configure your django application linklibrary in settings.py"
@@ -65,7 +67,8 @@ run: run-celery run-server
 run-minimal: run-server
 
 run-celery:
-	poetry run celery -A linklibrary worker -l INFO -B &
+	rm -rf celerybeat-schedule.db
+	poetry run celery -A linklibrary worker -l INFO -B
 
 run-server:
 	poetry run python manage.py runserver 0.0.0.0:$(PORT)
