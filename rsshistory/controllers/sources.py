@@ -294,7 +294,7 @@ class SourceDataController(SourceDataModel):
             return
 
         from .backgroundjob import BackgroundJobController
-        from .entriesutils import LinkDataWrapper
+        from .entriesutils import EntryWrapper
 
         self.enabled = False
         self.save()
@@ -302,7 +302,7 @@ class SourceDataController(SourceDataModel):
         entries = LinkDataModel.objects.filter(link=self.url)
         if entries.count() > 0:
             for entry in entries:
-                w = LinkDataWrapper(entry=entry)
+                w = EntryWrapper(entry=entry)
                 w.evaluate()
 
     def edit(self, data):

@@ -12,7 +12,7 @@ from ..models import (
 )
 from ..controllers import (
     EntryDataBuilder,
-    LinkDataWrapper,
+    EntryWrapper,
     SourceDataController,
     DomainsController,
 )
@@ -23,7 +23,7 @@ from ..configuration import Configuration
 from .fakeinternet import FakeInternetTestCase, DjangoRequestObject
 
 
-class LinkDataWrapperTest(FakeInternetTestCase):
+class EntryWrapperTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
         self.setup_configuration()
@@ -134,7 +134,7 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         obj = objs[0]
 
         # call tested function
-        result = LinkDataWrapper(entry=obj).make_bookmarked(
+        result = EntryWrapper(entry=obj).make_bookmarked(
             DjangoRequestObject(self.user_staff)
         )
 
@@ -169,7 +169,7 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         obj = objs[0]
 
         # call tested function
-        result = LinkDataWrapper(entry=obj).make_bookmarked(
+        result = EntryWrapper(entry=obj).make_bookmarked(
             DjangoRequestObject(self.user_not_staff),
         )
 
@@ -207,7 +207,7 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         self.assertTrue(obj.bookmarked == True)
 
         # call tested function
-        LinkDataWrapper(entry=obj).make_not_bookmarked(
+        EntryWrapper(entry=obj).make_not_bookmarked(
             DjangoRequestObject(self.user_staff)
         )
 
@@ -238,7 +238,7 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         request = DjangoRequestObject(self.user_staff)
 
         # call tested function
-        LinkDataWrapper(entry=entry).make_bookmarked(request)
+        EntryWrapper(entry=entry).make_bookmarked(request)
 
         self.assertEqual(entry.bookmarked, True)
         self.assertEqual(UserBookmarks.objects.all().count(), 1)
@@ -264,7 +264,7 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         request = DjangoRequestObject(self.user_not_staff)
 
         # call tested function
-        LinkDataWrapper(entry=entry).make_bookmarked(request)
+        EntryWrapper(entry=entry).make_bookmarked(request)
 
         self.assertEqual(entry.bookmarked, False)
         self.assertEqual(UserBookmarks.objects.all().count(), 1)
@@ -290,7 +290,7 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         request = DjangoRequestObject(self.user_staff)
 
         # call tested function
-        LinkDataWrapper(entry=entry).make_not_bookmarked(request)
+        EntryWrapper(entry=entry).make_not_bookmarked(request)
 
         self.assertEqual(entry.bookmarked, False)
         self.assertEqual(UserBookmarks.objects.all().count(), 0)
@@ -316,7 +316,7 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         request = DjangoRequestObject(self.user_not_staff)
 
         # call tested function
-        LinkDataWrapper(entry=entry).make_not_bookmarked(request)
+        EntryWrapper(entry=entry).make_not_bookmarked(request)
 
         self.assertEqual(entry.bookmarked, False)
         self.assertEqual(UserBookmarks.objects.all().count(), 0)
@@ -341,7 +341,7 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         self.assertTrue(obj)
 
         # call tested function
-        result = LinkDataWrapper(entry=obj).move_to_archive()
+        result = EntryWrapper(entry=obj).move_to_archive()
 
         self.assertTrue(result)
         self.assertTrue(result.is_archive_entry())
@@ -363,7 +363,7 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         archive_entry = ArchiveLinkDataController.objects.create(**link_data)
 
         # call tested function
-        result = LinkDataWrapper(entry=archive_entry).make_bookmarked(
+        result = EntryWrapper(entry=archive_entry).make_bookmarked(
             DjangoRequestObject(self.user_staff)
         )
 
@@ -398,7 +398,7 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         LinkDataController.objects.all().delete()
 
         # call tested function
-        result = LinkDataWrapper(entry=obj).move_from_archive()
+        result = EntryWrapper(entry=obj).move_from_archive()
 
         self.assertTrue(result)
         self.assertTrue(not result.is_archive_entry())
@@ -444,25 +444,25 @@ class LinkDataWrapperTest(FakeInternetTestCase):
             language="en",
         )
 
-        w = LinkDataWrapper(link="https://youtube.com?v=1")
+        w = EntryWrapper(link="https://youtube.com?v=1")
         # call tested function
         entry = w.get_from_db(LinkDataController.objects)
         self.assertTrue(entry)
         self.assertEqual(entry.link, "https://youtube.com?v=1")
 
-        w = LinkDataWrapper(link="http://youtube.com?v=1")
+        w = EntryWrapper(link="http://youtube.com?v=1")
         # call tested function
         entry = w.get_from_db(LinkDataController.objects)
         self.assertTrue(entry)
         self.assertEqual(entry.link, "https://youtube.com?v=1")
 
-        w = LinkDataWrapper(link="http://www.youtube.com?v=1")
+        w = EntryWrapper(link="http://www.youtube.com?v=1")
         # call tested function
         entry = w.get_from_db(LinkDataController.objects)
         self.assertTrue(entry)
         self.assertEqual(entry.link, "https://youtube.com?v=1")
 
-        w = LinkDataWrapper(link="https://archive.com?v=1")
+        w = EntryWrapper(link="https://archive.com?v=1")
         # call tested function
         entry = w.get_from_db(LinkDataController.objects)
         self.assertTrue(not entry)
@@ -507,19 +507,19 @@ class LinkDataWrapperTest(FakeInternetTestCase):
             language="en",
         )
 
-        w = LinkDataWrapper(link="https://archive.com?v=1")
+        w = EntryWrapper(link="https://archive.com?v=1")
         # call tested function
         entry = w.get_from_db(ArchiveLinkDataController.objects)
         self.assertTrue(entry)
         self.assertEqual(entry.link, "https://archive.com?v=1")
 
-        w = LinkDataWrapper(link="http://archive.com?v=1")
+        w = EntryWrapper(link="http://archive.com?v=1")
         # call tested function
         entry = w.get_from_db(ArchiveLinkDataController.objects)
         self.assertTrue(entry)
         self.assertEqual(entry.link, "https://archive.com?v=1")
 
-        w = LinkDataWrapper(link="http://www.archive.com?v=1")
+        w = EntryWrapper(link="http://www.archive.com?v=1")
         # call tested function
         entry = w.get_from_db(ArchiveLinkDataController.objects)
         self.assertTrue(entry)
@@ -565,13 +565,13 @@ class LinkDataWrapperTest(FakeInternetTestCase):
             language="en",
         )
 
-        w = LinkDataWrapper(link="https://youtube.com?v=1")
+        w = EntryWrapper(link="https://youtube.com?v=1")
         # call tested function
         entry = w.get()
         self.assertTrue(entry)
         self.assertEqual(entry.link, "https://youtube.com?v=1")
 
-        w = LinkDataWrapper(link="https://archive.com?v=1")
+        w = EntryWrapper(link="https://archive.com?v=1")
         # call tested function
         entry = w.get()
         self.assertTrue(entry)
@@ -601,7 +601,7 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         )
 
         # call tested function
-        result = LinkDataWrapper(entry=http_entry).check_https_http_availability()
+        result = EntryWrapper(entry=http_entry).check_https_http_availability()
         self.assertTrue(result)
 
         # function removed http link
@@ -635,7 +635,7 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         )
 
         # call tested function
-        entry = LinkDataWrapper(entry=https_entry).check_https_http_availability()
+        entry = EntryWrapper(entry=https_entry).check_https_http_availability()
         self.assertEqual(entry, https_entry)
 
         # function removed http link
@@ -662,7 +662,7 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         )
 
         # call tested function
-        entry = LinkDataWrapper(entry=https_entry).check_https_http_availability()
+        entry = EntryWrapper(entry=https_entry).check_https_http_availability()
 
         # we do not move the thing
         self.assertEqual(entry, https_entry)
@@ -695,7 +695,7 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         )
 
         # call tested function
-        result = LinkDataWrapper(entry=https_entry).evaluate()
+        result = EntryWrapper(entry=https_entry).evaluate()
 
         entries = LinkDataController.objects.filter(link__icontains="archive.com")
         self.assertEqual(entries.count(), 0)
@@ -727,7 +727,7 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         )
 
         # call tested function
-        result = LinkDataWrapper(entry=https_entry).evaluate()
+        result = EntryWrapper(entry=https_entry).evaluate()
 
         entries = LinkDataController.objects.filter(link__icontains="archive.com")
         self.assertEqual(entries.count(), 0)
@@ -757,7 +757,7 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         )
 
         # call tested function
-        result = LinkDataWrapper(entry=https_entry).evaluate()
+        result = EntryWrapper(entry=https_entry).evaluate()
 
         entries = LinkDataController.objects.filter(link__icontains="archive.com")
         self.assertEqual(entries.count(), 0)
@@ -816,7 +816,7 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         self.assertEqual(transition.entry_to, youtube_entry)
 
         # call tested function
-        result = LinkDataWrapper(entry=http_entry).move_entry(https_entry)
+        result = EntryWrapper(entry=http_entry).move_entry(https_entry)
 
         # Check expected behavior
 
@@ -911,7 +911,7 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         self.assertEqual(transition.entry_to, youtube_entry)
 
         # call tested function
-        result = LinkDataWrapper(entry=http_entry).move_entry_to_url(https_entry.link)
+        result = EntryWrapper(entry=http_entry).move_entry_to_url(https_entry.link)
 
         # Check expected behavior
 
@@ -997,7 +997,7 @@ class LinkDataWrapperTest(FakeInternetTestCase):
         self.assertEqual(transition.entry_to, youtube_entry)
 
         # call tested function
-        result = LinkDataWrapper(entry=http_entry).move_entry_to_url(http_entry.get_https_url())
+        result = EntryWrapper(entry=http_entry).move_entry_to_url(http_entry.get_https_url())
 
         # Check expected behavior
 

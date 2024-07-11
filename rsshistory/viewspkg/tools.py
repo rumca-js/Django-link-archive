@@ -444,6 +444,10 @@ def page_verify(request):
         if entries.exists():
             entry = entries[0]
             data["entry"] = entry.get_map()
+        else:
+            c = Configuration.get_object().config_entry
+            if c.auto_scan_entries:
+                BackgroundJobController.link_add(url)
 
         domain_url = DomainAwarePage(url).get_domain()
         if domain_url != url:

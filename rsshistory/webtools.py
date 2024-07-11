@@ -45,6 +45,9 @@ from .models import AppLogging
 from .apps import LinkDatabase
 from .dateutils import DateUtils
 
+selenium_feataure_enabled = True
+crawlee_feataure_enabled = True
+
 try:
     from selenium import webdriver
     from selenium.webdriver.chrome.service import Service
@@ -53,7 +56,19 @@ try:
     from selenium.webdriver.support.ui import WebDriverWait
     from selenium.webdriver.support import expected_conditions as EC
 except Exception as E:
-    print("Cannot include selenium")
+    selenium_feataure_enabled = False
+
+try:
+    import asyncio
+
+    # https://github.com/apify/crawlee-python
+    # https://crawlee.dev/python/api
+    from crawlee.beautifulsoup_crawler import BeautifulSoupCrawler, BeautifulSoupCrawlingContext
+    from crawlee.basic_crawler import BasicCrawler
+    from crawlee.basic_crawler.types import BasicCrawlingContext
+    from crawlee.playwright_crawler import PlaywrightCrawler, PlaywrightCrawlingContext
+except Exception as E:
+    crawlee_feataure_enabled = False
 
 
 PAGE_TOO_BIG_BYTES = 5000000  # 5 MB. There are some RSS more than 1MB
@@ -2515,7 +2530,7 @@ class SeleniumDriver(object):
         return headers
 
 
-class SeleniumHeadless(SeleniumDriver):
+class SeleniumChromeHeadless(SeleniumDriver):
     def get_driver(self):
         service = Service(executable_path="/usr/bin/chromedriver")
         options = webdriver.ChromeOptions()
@@ -2582,7 +2597,7 @@ class SeleniumHeadless(SeleniumDriver):
             return self.response
 
 
-class SeleniumFull(SeleniumDriver):
+class SeleniumChromeFull(SeleniumDriver):
     def get_driver(self):
         service = Service(executable_path="/usr/bin/chromedriver")
         options = webdriver.ChromeOptions()
@@ -2653,6 +2668,114 @@ class SeleniumFull(SeleniumDriver):
             self.response = PageResponseObject(self.url, contents=None, status_code=500)
         finally:
             driver.quit()
+
+    def get(self):
+        if self.response:
+            return self.response
+
+
+class CrawleeHeadless(object):
+    def __init__(self, url, headers, timeout_s=10, ping=False):
+        """
+        Calling async method from class
+        https://stackoverflow.com/questions/42009202/how-to-call-a-async-function-contained-in-a-class
+        """
+        self.url = url
+        self.timeout_s = timeout_s
+
+        self.loop = asyncio.get_event_loop()
+        self.loop.run_until_complete(self.process())
+
+    async def process(self) -> None:
+        result = {}
+
+        # https://crawlee.dev/python/api/class/BeautifulSoupCrawler
+
+        crawler = BeautifulSoupCrawler(
+            # Limit the crawl to max requests. Remove or increase it for crawling all links.
+            max_requests_per_crawl=10,
+            request_handler_timeout = timedelta(seconds = timeout_s),
+        )
+
+        # Define the default request handler, which will be called for every request.
+        @crawler.router.default_handler
+        async def request_handler(context: BeautifulSoupCrawlingContext) -> None:
+            context.log.info(f'Processing {context.request.url} ...')
+
+            # maybe we could send header information that we accept text/rss
+
+            result['request_url'] = context.request.url
+            result['loaded_url'] = context.request.loaded_url
+            result['status_code'] = context.http_response.status_code
+            result['headers'] = context.http_response.headers
+
+            # todo check in headers if we accept payload
+            result['page_content'] = context.soup.contents
+
+            # TODO - what if there is redirection. should we use context.request.loaded_url?
+
+        # Run the crawler with the initial list of URLs.
+        await crawler.run([url])
+
+        response = PageResponseObject(self.url)
+        if "headers" in result:
+            response.headers = result["headers"]
+        if "status_code" in result:
+            response.status_code = result["status_code"]
+        if 'page_content' in result:
+            response.content = response["page_content"]
+
+        self.response = response
+
+    def get(self):
+        if self.response:
+            return self.response
+
+
+class CrawleeFull(object):
+    def __init__(self, url, headers, timeout_s=10, ping=False):
+        self.url = url
+        self.timeout_s = timeout_s
+
+        self.loop = asyncio.get_event_loop()
+        self.loop.run_until_complete(self.process())
+
+    async def process(self) -> None:
+        result = {}
+
+        crawler = PlaywrightCrawler(
+            # Limit the crawl to max requests. Remove or increase it for crawling all links.
+            max_requests_per_crawl=10,
+            request_handler_timeout = timedelta(seconds = timeout_s),
+        )
+
+        # Define the default request handler, which will be called for every request.
+        @crawler.router.default_handler
+        async def request_handler(context: PlaywrightCrawlingContext) -> None:
+            context.log.info(f'Processing {context.request.url} ...')
+
+            if context.page is None:
+                context.log.info(f'Page is none ...')
+                return
+
+            result['request_url'] = context.request.url
+            result['loaded_url'] = context.page.url
+            result['status_code'] = context.http_response.status_code
+            result['headers'] = context.http_response.headers
+            result['page_content'] = await context.page.content()
+
+        # Run the crawler with the initial list of requests.
+        await crawler.run([url])
+
+        response = PageResponseObject(self.url)
+        if "headers" in result:
+            response.headers = result["headers"]
+        if "status_code" in result:
+            response.status_code = result["status_code"]
+        if 'page_content' in result:
+            response.content = response["page_content"]
+
+        self.response = response
 
     def get(self):
         if self.response:
@@ -2730,23 +2853,23 @@ class PageOptions(object):
     """
 
     def __init__(self):
-        self.use_selenium_full = False
-        self.use_selenium_headless = False
+        self.use_full_browser = False
+        self.use_headless_browser = False
         self.ssl_verify = False
         self.fast_parsing = True
         self.custom_user_agent = ""
         self.link_redirect = False
 
-    def is_not_selenium(self):
-        return not self.is_selenium()
+    def use_basic_crawler(self):
+        return not self.is_advanced_processing_required()
 
-    def is_selenium(self):
-        return self.use_selenium_full or self.use_selenium_headless
+    def is_advanced_processing_required(self):
+        return self.use_full_browser or self.use_headless_browser
 
     def __str__(self):
         return "F:{} H:{} SSL:{} R:{}".format(
-            self.use_selenium_full,
-            self.use_selenium_headless,
+            self.use_full_browser,
+            self.use_headless_browser,
             self.ssl_verify,
             self.link_redirect,
         )
@@ -2826,28 +2949,6 @@ class RequestBuilder(object):
         RequestBuilder.ssl_verify = False
         disable_warnings(InsecureRequestWarning)
 
-    @lazy_load_content
-    def is_valid(self):
-        if not self.response:
-            return False
-
-        if self.response.is_this_status_ok() or self.response.is_this_status_redirect():
-            return True
-        else:
-            return False
-
-    def try_decode(self, thebytes):
-        try:
-            return thebytes.decode("UTF-8", errors="replace")
-        except Exception as e:
-            pass
-
-    def is_this_status_ok(self, status_code):
-        if status_code == 0:
-            return False
-
-        return status_code >= 200 and status_code < 300
-
     def get_response(self):
         if self.response:
             return self.response
@@ -2869,76 +2970,37 @@ class RequestBuilder(object):
         if response:
             return response.get_binary()
 
-    def get_response_implementation(self):
-        if self.response and self.response.contents:
-            return self.response
-
-        if not self.user_agent or self.user_agent == "":
-            self.dead = True
-            return None
-
-        if self.dead:
-            return None
-
-        if not self.is_url_valid():
-            lines = traceback.format_stack()
-            line_text = ""
-            for line in lines:
-                line_text += line
-
-            AppLogging.error(
-                "Page: Url is invalid{};Lines:{}".format(self.url, line_text)
-            )
-
-            self.dead = True
-            return None
-
-        try:
-            LinkDatabase.info(
-                "Page: Requesting page: {} options:{}".format(self.url, self.options)
-            )
-
-            self.response = self.get_contents_function(
-                self.url, headers=self.headers, timeout_s=10
-            )
-
-            LinkDatabase.info(
-                "Page: Requesting page: {} DONE".format(self.url, self.options)
-            )
-
-        except Exception as e:
-            self.dead = True
-            error_text = traceback.format_exc()
-
-            AppLogging.error(
-                "Page {} error:{}\n{}".format(self.url, str(e), error_text)
-            )
-
-        return self.response
-
-    def is_url_valid(self):
-        if self.url == None:
-             return False
-
-        p = DomainAwarePage(self.url)
-        if not p.is_web_link():
-            return False
-
-        return True
-
     def get_contents_internal(self, url, headers, timeout_s, ping=False):
-        if self.options.is_not_selenium():
+        if self.options.use_basic_crawler():
             return self.get_contents_via_requests(
-                self.url, headers=headers, timeout_s=10, ping=ping
+                self.url, headers=headers, timeout_s=timeout_s, ping=ping
             )
-        elif self.options.use_selenium_full:
-            return self.get_contents_via_selenium_chrome_full(
-                self.url, headers=headers, timeout_s=10, ping=ping
-            )
-        elif self.options.use_selenium_headless:
-            return self.get_contents_via_selenium_chrome_headless(
-                self.url, headers=headers, timeout_s=10, ping=ping
-            )
+        elif self.options.use_headless_browser:
+            if crawlee_feataure_enabled:
+                return self.get_contents_via_crawlee_headless(
+                    self.url, headers=headers, timeout_s=timeout_s, ping=ping
+                )
+            elif selenium_feataure_enabled:
+                return self.get_contents_via_selenium_chrome_headless(
+                    self.url, headers=headers, timeout_s=timeout_s, ping=ping
+                )
+            else:
+                return self.get_contents_via_requests(
+                    self.url, headers=headers, timeout_s=timeout_s, ping=ping
+                )
+        elif self.options.use_full_browser:
+            if crawlee_feataure_enabled:
+                return self.get_contents_via_crawlee_full(
+                    self.url, headers=headers, timeout_s=timeout_s, ping=ping
+                )
+            elif selenium_feataure_enabled:
+                return self.get_contents_via_selenium_chrome_full(
+                    self.url, headers=headers, timeout_s=timeout_s, ping=ping
+                )
+            else:
+                return self.get_contents_via_requests(
+                    self.url, headers=headers, timeout_s=timeout_s, ping=ping
+                )
         else:
             self.dead = True
             raise NotImplementedError("Could not identify method of page capture")
@@ -2955,11 +3017,19 @@ class RequestBuilder(object):
         return p.get()
 
     def get_contents_via_selenium_chrome_headless(self, url, headers, timeout_s, ping):
-        p = SeleniumHeadless(url, headers, timeout_s=timeout_s, ping=ping)
+        p = SeleniumChromeHeadless(url, headers, timeout_s=timeout_s, ping=ping)
         return p.get()
 
     def get_contents_via_selenium_chrome_full(self, url, headers, timeout_s, ping):
-        p = SeleniumFull(url, headers, timeout_s=timeout_s, ping=ping)
+        p = SeleniumChromeFull(url, headers, timeout_s=timeout_s, ping=ping)
+        return p.get()
+
+    def get_contents_via_crawlee_headless(self, url, headers, timeout_s, ping):
+        p = CrawleeHeadless(url, headers, timeout_s=timeout_s, ping=ping)
+        return p.get()
+
+    def get_contents_via_crawlee_full(self, url, headers, timeout_s, ping):
+        p = CrawleeFull(url, headers, timeout_s=timeout_s, ping=ping)
         return p.get()
 
     def ping(self, timeout_s=5):
@@ -3026,6 +3096,85 @@ class RequestBuilder(object):
 
             AppLogging.error("Exception during headers. Url:{}\nExc:{}\n{}".format(self.url, str(e), stack_str))
             return None
+
+    def get_response_implementation(self):
+        if self.response and self.response.contents:
+            return self.response
+
+        if not self.user_agent or self.user_agent == "":
+            self.dead = True
+            return None
+
+        if self.dead:
+            return None
+
+        if not self.is_url_valid():
+            lines = traceback.format_stack()
+            line_text = ""
+            for line in lines:
+                line_text += line
+
+            AppLogging.error(
+                "Page: Url is invalid{};Lines:{}".format(self.url, line_text)
+            )
+
+            self.dead = True
+            return None
+
+        try:
+            LinkDatabase.info(
+                "Page: Requesting page: {} options:{}".format(self.url, self.options)
+            )
+
+            self.response = self.get_contents_function(
+                self.url, headers=self.headers, timeout_s=10
+            )
+
+            LinkDatabase.info(
+                "Page: Requesting page: {} DONE".format(self.url, self.options)
+            )
+
+        except Exception as e:
+            self.dead = True
+            error_text = traceback.format_exc()
+
+            AppLogging.error(
+                "Page {} error:{}\n{}".format(self.url, str(e), error_text)
+            )
+
+        return self.response
+
+    @lazy_load_content
+    def is_valid(self):
+        if not self.response:
+            return False
+
+        if self.response.is_this_status_ok() or self.response.is_this_status_redirect():
+            return True
+        else:
+            return False
+
+    def is_url_valid(self):
+        if self.url == None:
+             return False
+
+        p = DomainAwarePage(self.url)
+        if not p.is_web_link():
+            return False
+
+        return True
+
+    def try_decode(self, thebytes):
+        try:
+            return thebytes.decode("UTF-8", errors="replace")
+        except Exception as e:
+            pass
+
+    def is_this_status_ok(self, status_code):
+        if status_code == 0:
+            return False
+
+        return status_code >= 200 and status_code < 300
 
 
 class Url(ContentInterface):

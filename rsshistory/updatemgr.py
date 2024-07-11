@@ -3,7 +3,7 @@ from pathlib import Path
 from datetime import timedelta, datetime
 
 from .dateutils import DateUtils
-from .models import AppLogging, SourceExportHistory, DataExport
+from .models import AppLogging, DataExport
 from .controllers import SourceDataController, LinkDataController
 from .repotypes import *
 from .datawriter import DataWriter, DataWriterConfiguration
@@ -138,120 +138,30 @@ class UpdateManager(object):
         else:
             self.repo_builder = repo_builder
 
-    def write_and_push_to_git(self, input_date=""):
-        try:
-            if not SourceExportHistory.is_update_required():
-                return
-
-            AppLogging.info("Pushing data to git")
-
-            self.write_and_push_notime_data()
-            self.write_and_push_year_data()
-            self.write_and_push_daily_data(input_date)
-
-            AppLogging.info("Pushing data to git: Done")
-
-        except Exception as e:
-            error_text = traceback.format_exc()
-            AppLogging.error(
-                "Exception during refresh: {0} {1}".format(str(e), error_text)
-            )
-
-    def write_and_push_daily_data(self, input_date=""):
-        AppLogging.info("Pushing data to git - daily data")
+    def write_and_push(self, export_data, input_date=""):
+        AppLogging.info("Export:{}. Writing and Pushing data".format(export_data.id))
 
         if input_date == "":
             write_date = DateUtils.get_date_yesterday()
         else:
             write_date = datetime.strptime(input_date, "%Y-%m-%d").date()
 
-        all_export_data = DataExport.objects.filter(
-            export_data=DataExport.EXPORT_DAILY_DATA, enabled=True
+        mgr = UpdateExportManager(
+            self._cfg, self.repo_builder, export_data, "daily_data", write_date
         )
+        mgr.process()
 
-        for export_data in all_export_data:
-            mgr = UpdateExportManager(
-                self._cfg, self.repo_builder, export_data, "daily_data", write_date
-            )
-            mgr.process()
+        AppLogging.info("Export:{}. Writing and Pushing data - DONE".format(export_data.id))
 
-        AppLogging.info("Pushing data to git - daily data - DONE")
-
-    def write_and_push_year_data(self):
-        AppLogging.info("Pushing data to git - year data")
-
-        all_export_data = DataExport.objects.filter(
-            export_data=DataExport.EXPORT_YEAR_DATA, enabled=True
-        )
-
-        for export_data in all_export_data:
-            mgr = UpdateExportManager(self._cfg, self.repo_builder, export_data, "year")
-            mgr.process()
-
-        AppLogging.info("Pushing data to git - year data - DONE")
-
-    def write_and_push_notime_data(self):
-        AppLogging.info("Pushing data to git - notime data")
-
-        all_export_data = DataExport.objects.filter(
-            export_data=DataExport.EXPORT_NOTIME_DATA, enabled=True
-        )
-
-        for export_data in all_export_data:
-            mgr = UpdateExportManager(
-                self._cfg, self.repo_builder, export_data, "notime"
-            )
-            mgr.process()
-
-        AppLogging.info("Pushing data to git - notime data - DONE")
-
-    def write_daily_data(self, input_date=""):
-        """
-        TODO the functions below look like functions. above. refactor?
-        """
-        AppLogging.info("Writing data - daily data")
-
+    def write(self, export_data, input_date=""):
         if input_date == "":
             write_date = DateUtils.get_date_yesterday()
         else:
             write_date = datetime.strptime(input_date, "%Y-%m-%d").date()
 
-        all_export_data = DataExport.objects.filter(
-            export_data=DataExport.EXPORT_DAILY_DATA, enabled=True
+        mgr = UpdateExportManager(
+            self._cfg, self.repo_builder, export_data, "daily_data", write_date
         )
-
-        for export_data in all_export_data:
-            mgr = UpdateExportManager(
-                self._cfg, self.repo_builder, export_data, "daily_data", write_date
-            )
-            mgr.write()
+        mgr.write()
 
         AppLogging.info("Writing data - daily data DONE")
-
-    def write_year_data(self):
-        AppLogging.info("Writing data - year data")
-
-        all_export_data = DataExport.objects.filter(
-            export_data=DataExport.EXPORT_YEAR_DATA, enabled=True
-        )
-
-        for export_data in all_export_data:
-            mgr = UpdateExportManager(self._cfg, self.repo_builder, export_data, "year")
-            mgr.write()
-
-        AppLogging.info("Writing data - year data - DONE")
-
-    def write_notime_data(self):
-        AppLogging.info("Writing data - notime data")
-
-        all_export_data = DataExport.objects.filter(
-            export_data=DataExport.EXPORT_NOTIME_DATA, enabled=True
-        )
-
-        for export_data in all_export_data:
-            mgr = UpdateExportManager(
-                self._cfg, self.repo_builder, export_data, "notime"
-            )
-            mgr.write()
-
-        AppLogging.info("Writing data - notime data - DONE")

@@ -21,10 +21,13 @@
              Export data:{{ object.export_data }},
                "
              >
-             - <b>{{ object.remote_path }}</b>,
+             - 
+             {% if not object.enabled %}
+                [DISABLED]
+             {% endif %}
+             <b>{{ object.remote_path }}</b>,
              Export type:{{ object.export_type }},
              Export data:{{ object.export_data }}
-             Enabled:{{ object.enabled }}
              </a>
          {% endfor %}
   {% else %}

@@ -2,7 +2,7 @@ from datetime import timedelta
 
 from ..controllers import (
     EntryDataBuilder,
-    LinkDataWrapper,
+    EntryWrapper,
     SourceDataController,
     DomainsController,
     BackgroundJobController,

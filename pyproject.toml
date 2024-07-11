@@ -7,7 +7,7 @@ license = "GPL3"
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.9"
 Django = "^4.2.9"
 feedparser = "^6.0.10"
 requests = "^2.25.1"
@@ -24,11 +24,18 @@ tldextract = "^3.4.4"
 sympy = "^1.12"
 beautifulsoup4 = "^4.12.2"
 spacy = "^3.7.2"
+
+#  use things below if you want to use selenium
 selenium="*"
 chardet = "^5.2.0"
 psycopg2 = "*"
 pyvirtualdisplay = "^3.0"
 undetected-chromedriver = "^3.5.5"
+
+#  use things below if you want to use crawlee
+crawlee="0.0.2"
+playwright="1.45.0"
+lxml="5.2.2"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.3.0"

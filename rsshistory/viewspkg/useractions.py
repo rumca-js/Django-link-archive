@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 
 from ..apps import LinkDatabase
 from ..models import CompactedTags, UserTags, ConfigurationEntry, UserVotes
-from ..controllers import LinkDataController, LinkDataWrapper
+from ..controllers import LinkDataController, EntryWrapper
 from ..forms import TagForm, TagEntryForm, TagRenameForm, ScannerForm
 from ..views import ViewPage
 
@@ -336,7 +336,7 @@ def tag_many(request):
             link = link.replace("\r", "")
 
             if link != "":
-                w = LinkDataWrapper(link=link)
+                w = EntryWrapper(link=link)
                 entry = w.get()
                 if entry and not entry.is_archive_entry():
                     entry.set_tag(tag_name=tag, user=request.user)

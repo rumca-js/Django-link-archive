@@ -14,7 +14,7 @@ from ..controllers import (
     EntryDataBuilder,
     LinkDataController,
     BackgroundJobController,
-    LinkDataWrapper,
+    EntryWrapper,
     SearchEngines,
 )
 from ..forms import SourceForm, ContentsForm, SourcesChoiceForm
@@ -147,7 +147,7 @@ class SourceDetailView(generic.DetailView):
             if builder.result:
                 entry = builder.result
                 if entry.is_archive_entry():
-                    entry = LinkDataWrapper(entry=entry).move_from_archive()
+                    entry = EntryWrapper(entry=entry).move_from_archive()
 
                 entry.permanent = True
                 entry.save()
@@ -641,7 +641,7 @@ def import_youtube_links_for_source(request, pk):
 
     for link in links:
         print("Adding job {}".format(link))
-        wrapper = LinkDataWrapper(link=link)
+        wrapper = EntryWrapper(link=link)
         if not wrapper.get():
             BackgroundJobController.link_add(link, source=source_obj, user=request.user)
 

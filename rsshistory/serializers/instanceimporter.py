@@ -13,7 +13,7 @@ from ..controllers import (
     EntryDataBuilder,
     SourceDataBuilder,
     LinkCommentDataController,
-    LinkDataWrapper,
+    EntryWrapper,
 )
 from ..apps import LinkDatabase
 from ..configuration import Configuration
@@ -172,7 +172,7 @@ class BaseImporter(object):
                 entry = b.result
 
                 if entry and entry.is_archive_entry():
-                    entry = LinkDataWrapper.move_from_archive(entry)
+                    entry = EntryWrapper.move_from_archive(entry)
 
                     self.copy_props(entry, clean_data)
         else:

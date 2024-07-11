@@ -28,9 +28,13 @@
 <h1>Data Export</h1>
 
 <p>
+{% if object.enabled %}
+<div>Enabled: {{object.enabled}}</div>
+{% else %}
+<div class="fw-bold">Enabled: {{object.enabled}}</div>
+{% endif %}
 <div>Remote path: {{object.remote_path}}</div>
 <div>Local path: {{object.local_path}}</div>
-<div>Enabled: {{object.enabled}}</div>
 <div>Export type: {{object.export_type}}</div>
 <div>Export data: {{object.export_data}}</div>
 <div>ID: {{object.id}}</div>

@@ -22,7 +22,7 @@ class DataExportTests(FakeInternetTestCase):
             username="testuser", password="testpassword", is_staff=True
         )
 
-    def test_data_export_add_form(self):
+    def test_add_form(self):
         DataExport.objects.all().delete()
 
         self.client.login(username="testuser", password="testpassword")
@@ -35,7 +35,7 @@ class DataExportTests(FakeInternetTestCase):
         # redirect to view the link again
         self.assertEqual(response.status_code, 200)
 
-    def test_data_export_add_form(self):
+    def test_add_form(self):
         DataExport.objects.all().delete()
 
         self.client.login(username="testuser", password="testpassword")
@@ -52,7 +52,10 @@ class DataExportTests(FakeInternetTestCase):
 
         self.assertEqual(response.status_code, 200)
 
-    def test_data_export_edit(self):
+        exports = DataExport.objects.all()
+        self.assertEqual(exports.count(), 1)
+
+    def test_edit(self):
         data_export = DataExport.objects.create(
             enabled=True,
             export_type="export-type-git",
@@ -75,7 +78,7 @@ class DataExportTests(FakeInternetTestCase):
 
         self.assertEqual(response.status_code, 200)
 
-    def test_data_export_remove(self):
+    def test_remove(self):
         data_export = DataExport.objects.create(
             enabled=True,
             export_type="export-type-git",
@@ -95,7 +98,7 @@ class DataExportTests(FakeInternetTestCase):
 
         self.assertEqual(DataExport.objects.all().count(), 0)
 
-    def test_data_export_list(self):
+    def test_list(self):
         data_export = DataExport.objects.create(
             enabled=True,
             export_type="export-type-git",
@@ -111,7 +114,7 @@ class DataExportTests(FakeInternetTestCase):
 
         self.assertEqual(response.status_code, 200)
 
-    def test_data_export_detail(self):
+    def test_detail(self):
         data_export = DataExport.objects.create(
             enabled=True,
             export_type="export-type-git",
@@ -126,3 +129,59 @@ class DataExportTests(FakeInternetTestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
+
+    def test_run__true(self):
+        BackgroundJobController.objects.all().delete()
+
+        data_export = DataExport.objects.create(
+            enabled=True,
+            export_type="export-type-git",
+            export_data="export-dtype-daily-data",
+        )
+
+        self.client.login(username="testuser", password="testpassword")
+
+        url = reverse(
+            "{}:data-export-run".format(LinkDatabase.name), args=[data_export.id]
+        )
+
+        form_data = {
+            "enabled": False,
+            "export_type": "export-type-git",
+        }
+
+        # call user action
+        response = self.client.post(url, data=form_data)
+
+        self.assertEqual(response.status_code, 200)
+
+        jobs = BackgroundJobController.objects.all()
+        self.assertEqual(jobs.count(), 1)
+
+    def test_run__false(self):
+        BackgroundJobController.objects.all().delete()
+
+        data_export = DataExport.objects.create(
+            enabled=False,
+            export_type="export-type-git",
+            export_data="export-dtype-daily-data",
+        )
+
+        self.client.login(username="testuser", password="testpassword")
+
+        url = reverse(
+            "{}:data-export-run".format(LinkDatabase.name), args=[data_export.id]
+        )
+
+        form_data = {
+            "enabled": False,
+            "export_type": "export-type-git",
+        }
+
+        # call user action
+        response = self.client.post(url, data=form_data)
+
+        self.assertEqual(response.status_code, 200)
+
+        jobs = BackgroundJobController.objects.all()
+        self.assertEqual(jobs.count(), 0)

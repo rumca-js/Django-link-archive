@@ -24,7 +24,7 @@ from ..models import (
 )
 from ..controllers import (
     LinkDataController,
-    LinkDataWrapper,
+    EntryWrapper,
     EntryDataBuilder,
     ArchiveLinkDataController,
     SourceDataController,
@@ -657,7 +657,7 @@ def func_display_data_form(request, p, data):
 
     link = data["link"]
 
-    ob = LinkDataWrapper(link=link).get()
+    ob = EntryWrapper(link=link).get()
     if ob:
         return HttpResponseRedirect(ob.get_absolute_url())
 
@@ -730,7 +730,7 @@ def add_entry(request):
         valid = form.is_valid()
         link = request.POST.get("link", "")
 
-        w = LinkDataWrapper(link=link)
+        w = EntryWrapper(link=link)
         ob = w.get()
         if ob:
             return HttpResponseRedirect(ob.get_absolute_url())
@@ -750,7 +750,7 @@ def add_entry(request):
             BackgroundJobController.link_scan(entry=entry)
 
             if entry.bookmarked:
-                new_entry = LinkDataWrapper(entry=entry).make_bookmarked(request)
+                new_entry = EntryWrapper(entry=entry).make_bookmarked(request)
 
             p.context["form"] = form
 
@@ -935,7 +935,7 @@ def edit_entry(request, pk):
             obs = LinkDataController.objects.filter(id=pk)
             entry = obs[0]
 
-            w = LinkDataWrapper(entry=entry)
+            w = EntryWrapper(entry=entry)
             if entry.bookmarked:
                 new_entry = w.make_bookmarked(request)
             else:
@@ -1159,7 +1159,7 @@ def make_bookmarked_entry(request, pk):
 
     entry = LinkDataController.objects.get(id=pk)
 
-    new_entry = LinkDataWrapper(entry=entry).make_bookmarked(request)
+    new_entry = EntryWrapper(entry=entry).make_bookmarked(request)
 
     if new_entry:
         if Configuration.get_object().config_entry.link_save:
@@ -1176,7 +1176,7 @@ def make_not_bookmarked_entry(request, pk):
         return data
 
     entry = LinkDataController.objects.get(id=pk)
-    new_entry = LinkDataWrapper(entry=entry).make_not_bookmarked(request)
+    new_entry = EntryWrapper(entry=entry).make_not_bookmarked(request)
 
     return HttpResponseRedirect(new_entry.get_absolute_url())
 
@@ -1311,7 +1311,7 @@ def archive_make_bookmarked_entry(request, pk):
 
     entry = ArchiveLinkDataController.objects.get(id=pk)
 
-    new_entry = LinkDataWrapper(entry=entry).make_bookmarked(request)
+    new_entry = EntryWrapper(entry=entry).make_bookmarked(request)
 
     if new_entry:
         BackgroundJobController.link_save(entry.link)
@@ -1327,7 +1327,7 @@ def archive_make_not_bookmarked_entry(request, pk):
         return data
 
     entry = LinkDataController.objects.get(id=pk)
-    new_entry = LinkDataWrapper(entry=entry).make_not_bookmarked(request)
+    new_entry = EntryWrapper(entry=entry).make_not_bookmarked(request)
 
     return HttpResponseRedirect(new_entry.get_absolute_url())
 

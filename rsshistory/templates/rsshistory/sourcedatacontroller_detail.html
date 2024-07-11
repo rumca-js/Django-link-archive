@@ -28,22 +28,26 @@
 {% include "rsshistory/sourcedatacontroller_detail_buttons.html" %}
 
 <div class="d-flex flex-wrap mb-2">
-    <div class="text-nowrap mx-2"><strong>Enabled:</strong> {{ object.enabled }}</div>
-    <div class="text-nowrap mx-2"><strong>Fetch period:</strong> {{ object.fetch_period }}</div>
-    <div class="text-nowrap mx-2"><strong>Category:</strong> {{ object.category }}</div>
-    <div class="text-nowrap mx-2"><strong>Subcategory:</strong> {{ object.subcategory }}, </div>
-    <div class="text-nowrap mx-2"><strong>Language:</strong> {{ object.language }}, </div>
-    <div class="text-nowrap mx-2"><strong>Age:</strong> {{ object.age }}, </div>
-    <div class="text-nowrap mx-2"><strong>Export to CMS:</strong> {{ object.export_to_cms }}, </div>
-    <div class="text-nowrap mx-2"><strong>Remove after days:</strong> {{ object.remove_after_days }}, </div>
-    <div class="text-nowrap mx-2"><strong>Favicon:</strong><a href="{{ object.get_favicon }}" title="{{ object.get_favicon }}">Favicon URL</a>, </div>
-    <div class="text-nowrap mx-2"><strong>Source type:</strong> {{ object.source_type }}</div>
+{% if object.enabled %}
+    <div class="text-nowrap mx-2">Enabled: {{ object.enabled }}</div>
+{% else %}
+    <div class="text-nowrap mx-2 fw-bold">Enabled: {{ object.enabled }}</div>
+{% endif %}
+    <div class="text-nowrap mx-2">Fetch period: {{ object.fetch_period }}</div>
+    <div class="text-nowrap mx-2">Category: {{ object.category }}</div>
+    <div class="text-nowrap mx-2">Subcategory: {{ object.subcategory }}, </div>
+    <div class="text-nowrap mx-2">Language: {{ object.language }}, </div>
+    <div class="text-nowrap mx-2">Age: {{ object.age }}, </div>
+    <div class="text-nowrap mx-2">Export to CMS: {{ object.export_to_cms }}, </div>
+    <div class="text-nowrap mx-2">Remove after days: {{ object.remove_after_days }}, </div>
+    <div class="text-nowrap mx-2">Favicon:<a href="{{ object.get_favicon }}" title="{{ object.get_favicon }}">Favicon URL</a>, </div>
+    <div class="text-nowrap mx-2">Source type: {{ object.source_type }}</div>
     {% if object.proxy_location %}
-    <div class="mx-2"><strong>Proxy location:</strong><a href="{{ object.proxy_location }}">{{ object.proxy_location }}</a></div>
+    <div class="mx-2">Proxy location:<a href="{{ object.proxy_location }}">{{ object.proxy_location }}</a></div>
     {% endif %}
-    <div class="text-nowrap mx-2"><strong>Fetched:</strong>{{date_fetched}}</div>
-    <div class="text-nowrap mx-2"><strong>Import seconds:</strong>{{object.dynamic_data.import_seconds}}</div>
-    <div class="text-nowrap mx-2"><strong>Consecutive Errors:</strong>{{object.dynamic_data.consecutive_errors}}</div>
+    <div class="text-nowrap mx-2">Fetched:{{date_fetched}}</div>
+    <div class="text-nowrap mx-2">Import seconds:{{object.dynamic_data.import_seconds}}</div>
+    <div class="text-nowrap mx-2">Consecutive Errors:{{object.dynamic_data.consecutive_errors}}</div>
 </div>
 
 {% include "rsshistory/search_places_element.html" %}

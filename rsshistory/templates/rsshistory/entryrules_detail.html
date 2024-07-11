@@ -14,7 +14,11 @@
 <h1>Entry Rule</h1>
 
 <p>
+{% if object.enabled %}
 <div>Enabled: {{object.enabled}}</div>
+{% else %}
+<div class="fw-bold">Enabled: {{object.enabled}}</div>
+{% endif %}
 <div>Rule URL: {{object.rule_url}}</div>
 <div>Block: {{object.block}}</div>
 <div>Name: {{object.rule_name}}</div>

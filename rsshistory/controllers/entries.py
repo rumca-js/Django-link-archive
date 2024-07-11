@@ -95,7 +95,7 @@ class LinkDataController(LinkDataModel):
         cleanup.cleanup()
 
         # TODO Move to link wrapper
-        moved_all = LinkDataWrapper.move_old_links_to_archive(limit_s)
+        moved_all = EntryWrapper.move_old_links_to_archive(limit_s)
 
         # LinkDataController.recreate_from_domains()
         LinkDataController.update_entries()

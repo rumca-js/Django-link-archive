@@ -485,6 +485,10 @@ class LinkAddJobHandler(BaseJobHandler):
         b.link = link
         b.source_is_auto = True
 
+        if not DomainAwarePage(link).is_web_link():
+            AppLogging.error("Someone posted wrong link:{}".format(link))
+            return
+
         entry = b.add_from_link()
 
         if not entry:
@@ -558,29 +562,6 @@ class LinkSaveJobHandler(BaseJobHandler):
             wb = WaybackMachine()
             if wb.is_saved(item):
                 wb.save(item)
-
-            return True
-        except Exception as E:
-            AppLogging.exc(exception_object = E,)
-
-
-class WriteDailyDataJobHandler(BaseJobHandler):
-    """!
-    Writes daily data to disk
-    """
-
-    def get_job():
-        return BackgroundJob.JOB_WRITE_DAILY_DATA
-
-    def process(self, obj=None):
-        try:
-            from .updatemgr import UpdateManager
-            from .datawriter import DataWriter
-
-            date_input = datetime.strptime(obj.subject, "%Y-%m-%d").date()
-
-            update_mgr = UpdateManager(self._config)
-            update_mgr.write_daily_data(date_input.isoformat())
 
             return True
         except Exception as E:
@@ -756,6 +737,35 @@ class ImportFromFilesJobHandler(BaseJobHandler):
         return True
 
 
+class WriteDailyDataJobHandler(BaseJobHandler):
+    """!
+    Writes daily data to disk
+    """
+
+    def get_job():
+        return BackgroundJob.JOB_WRITE_DAILY_DATA
+
+    def process(self, obj=None):
+        try:
+            from .updatemgr import UpdateManager
+            from .datawriter import DataWriter
+
+            date_input = datetime.strptime(obj.subject, "%Y-%m-%d").date()
+
+            update_mgr = UpdateManager(self._config)
+
+            all_export_data = DataExport.objects.filter(
+                export_data=DataExport.EXPORT_DAILY_DATA, enabled=True
+            )
+
+            for export_data in all_export_data:
+                mgr.write(export_data, date_input.isoformat())
+
+            return True
+        except Exception as E:
+            AppLogging.exc(exception_object = E,)
+
+
 class WriteYearDataJobHandler(BaseJobHandler):
     """!
     Writes yearly data to disk
@@ -770,7 +780,13 @@ class WriteYearDataJobHandler(BaseJobHandler):
 
             c = Configuration.get_object()
             mgr = UpdateManager(c)
-            mgr.write_year_data()
+
+            all_export_data = DataExport.objects.filter(
+                export_data=DataExport.EXPORT_DAILY_DATA, enabled=True
+            )
+
+            for export_data in all_export_data:
+                mgr.write(export_data)
 
             return True
         except Exception as E:
@@ -791,7 +807,13 @@ class WriteNoTimeDataJobHandler(BaseJobHandler):
 
             c = Configuration.get_object()
             mgr = UpdateManager(c)
-            mgr.write_notime_data()
+
+            all_export_data = DataExport.objects.filter(
+                export_data=DataExport.EXPORT_NOTIME_DATA, enabled=True
+            )
+
+            for export_data in all_export_data:
+                mgr.write(export_data)
 
             return True
         except Exception as E:
@@ -834,21 +856,15 @@ class ExportDataJobHandler(BaseJobHandler):
         try:
             export = self.get_export(obj)
             if not export:
+                AppLogging.error("Export {} does not exist".format(obj.subject))
                 return
 
             update_mgr = UpdateManager(self._config)
 
-            if export.is_daily_data():
-                update_mgr.write_and_push_daily_data()
-            if export.is_year_data():
-                update_mgr.write_and_push_year_data()
-            if export.is_notime_data():
-                update_mgr.write_and_push_notime_data()
-
-            SourceExportHistory.confirm(export)
+            update_mgr.write_and_push(export)
 
             elapsed_sec = self.get_time_diff()
-            AppLogging.notify("Successfully pushed data to git. Time:{}".format(elapsed_sec))
+            AppLogging.notify("Successfully pushed data to git. Export:{} Time:{}".format(obj.subject, elapsed_sec))
 
             return True
         except Exception as E:
@@ -871,14 +887,19 @@ class PushYearDataToRepoJobHandler(BaseJobHandler):
     def process(self, obj=None):
         # TODO read year from string
         try:
-            if DataExport.is_year_data_set():
-                from .updatemgr import UpdateManager
+            from .updatemgr import UpdateManager
 
-                update_mgr = UpdateManager(self._config)
-                update_mgr.write_and_push_year_data()
+            update_mgr = UpdateManager(self._config)
 
-                elapsed_sec = self.get_time_diff()
-                AppLogging.notify("Successfully pushed data to git. Time:{}".format(elapsed_sec))
+            all_export_data = DataExport.objects.filter(
+                export_data=DataExport.EXPORT_YEAR_DATA, enabled=True
+            )
+
+            for export_data in all_export_data:
+                update_mgr.write_and_push(export_data)
+
+            elapsed_sec = self.get_time_diff()
+            AppLogging.notify("Successfully pushed data to git. Time:{}".format(elapsed_sec))
 
             return True
         except Exception as E:
@@ -895,14 +916,19 @@ class PushNoTimeDataToRepoJobHandler(BaseJobHandler):
 
     def process(self, obj=None):
         try:
-            if DataExport.is_notime_data_set():
-                from .updatemgr import UpdateManager
+            from .updatemgr import UpdateManager
 
-                update_mgr = UpdateManager(self._config)
-                update_mgr.write_and_push_notime_data()
+            update_mgr = UpdateManager(self._config)
 
-                elapsed_sec = self.get_time_diff()
-                AppLogging.notify("Successfully pushed data to git. Time:{}".format(elapsed_sec))
+            all_export_data = DataExport.objects.filter(
+                export_data=DataExport.EXPORT_NOTIME_DATA, enabled=True
+            )
+
+            for export_data in all_export_data:
+                update_mgr.write_and_push(export_data)
+
+            elapsed_sec = self.get_time_diff()
+            AppLogging.notify("Successfully pushed data to git. Time:{}".format(elapsed_sec))
 
             return True
         except Exception as E:
@@ -920,16 +946,25 @@ class PushDailyDataToRepoJobHandler(BaseJobHandler):
     def process(self, obj=None):
         # TODO read date from string
         try:
-            if DataExport.is_daily_data_set():
-                from .updatemgr import UpdateManager
+            from .updatemgr import UpdateManager
+            date_input = obj.subject
 
-                date_input = obj.subject
+            if date_input == "":
+                date_input = DateUtils.get_date_yesterday()
+            else:
+                date_input = datetime.strptime(date_input, "%Y-%m-%d").date()
 
-                update_mgr = UpdateManager(self._config)
-                update_mgr.write_and_push_daily_data(date_input)
+            update_mgr = UpdateManager(self._config)
 
-                elapsed_sec = self.get_time_diff()
-                AppLogging.notify("Successfully pushed data to git. Time:{}".format(elapsed_sec))
+            all_export_data = DataExport.objects.filter(
+                export_data=DataExport.EXPORT_NOTIME_DATA, enabled=True
+            )
+
+            for export_data in all_export_data:
+                update_mgr.write_and_push(export_data, date_input)
+
+            elapsed_sec = self.get_time_diff()
+            AppLogging.notify("Successfully pushed data to git. Time:{}".format(elapsed_sec))
 
             return True
         except Exception as E:
@@ -1068,9 +1103,11 @@ class MoveToArchiveJobHandler(BaseJobHandler):
 
 class RefreshThreadHandler(object):
     """!
-    Checks if tasks should be created.
+    One of the most important tasks.
+    It checks what needs to be done, and produces 'new' tasks'.
 
-    @note This handler only adds background jobs, nothing more!
+    @note This handler should only do limited amount of work.
+    Mostly it should only add background jobs, and nothing more!
     """
 
     def refresh(self, item=None):

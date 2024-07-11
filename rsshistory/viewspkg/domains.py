@@ -8,7 +8,7 @@ from django.utils.http import urlencode
 from ..apps import LinkDatabase
 from ..models import Domains, ConfigurationEntry
 from ..controllers import (
-    LinkDataWrapper,
+    EntryWrapper,
     EntryDataBuilder,
     LinkDataController,
     DomainsController,

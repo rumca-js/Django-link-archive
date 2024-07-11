@@ -1,6 +1,7 @@
 from datetime import datetime, date, timedelta
 import os
 import json
+import traceback
 
 from django.db import models
 from django.urls import reverse
@@ -222,11 +223,13 @@ class BackgroundJobController(BackgroundJob):
 
     def link_add(url, source=None, tag="", user=None, properties=None):
         from ..configuration import Configuration
-        from .entriesutils import LinkDataWrapper
+        from .entriesutils import EntryWrapper
 
         """
         It handles only automatic additions.
         """
+        input_url = url
+
         url = Url.get_cleaned_link(url)  # TODO maybe urlhandler?
 
         h = DomainAwarePage(url)
@@ -247,7 +250,7 @@ class BackgroundJobController(BackgroundJob):
             """TODO This should be configurable"""
             return
 
-        w = LinkDataWrapper(url)
+        w = EntryWrapper(url)
 
         entry = w.get()
         if entry:
@@ -281,6 +284,15 @@ class BackgroundJobController(BackgroundJob):
                 "Link add job configuration is too long:{}".format(args_text)
             )
             args_text = ""
+
+        p = DomainAwarePage(url)
+        if not p.is_web_link():
+
+            stack_lines = traceback.format_stack()
+            error_lines = "".join(stack_lines)
+
+            AppLogging.error("Someone tries to add invalid link:{} input_url:{} lines:\n{}".format(url, input_url, error_lines))
+            return
 
         if cfg != {}:
             return BackgroundJobController.create_single_job(

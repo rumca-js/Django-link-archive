@@ -47,7 +47,7 @@ class UrlHandler(Url):
     def get_handler(self, url=None, page_object=None, page_options=None):
         """
         This code eventually will get ugly.
-        We want handle different cases here. Use selenium?
+        We want handle different cases here.
         We do not want to handle that in web tools.
         """
         short_url = UrlHandler.get_protololless(url)
@@ -81,12 +81,12 @@ class UrlHandler(Url):
             options = page_options
 
         u = Url(url, page_options=options)
-        if self.is_selenium_retry_possible(u, options):
+        if self.is_advanced_processing_possible(u, options):
             LinkDatabase.info(
-                "Could not normally obtain contents. Trying selenium:".format(url)
+                "Could not normally obtain contents. Trying more advanced solutions:".format(url)
             )
 
-            options.use_selenium_headless = True
+            options.use_headless_browser = True
 
             if u.is_cloudflare_protected():
                 options.link_redirect = True
@@ -97,15 +97,15 @@ class UrlHandler(Url):
         self.response = u.response
         return u.p
 
-    def is_selenium_retry_possible(self, u, options):
+    def is_advanced_processing_possible(self, u, options):
         status_code = u.get_status_code()
 
         if status_code < 200 or status_code > 404:
             return False
 
-        # if response is cloudflare jibberish, try using selenium
-        # if page is invalid we may try with selenium. Some pages have cloudflare protection, or other
-        if options.is_not_selenium() and (
+        # if response is cloudflare jibberish, try using advanced solutions
+        # if page is invalid we may try with more advanced solutions. Some pages have cloudflare protection, or other
+        if options.use_basic_crawler() and (
             not u.is_valid or u.is_cloudflare_protected()
         ):
             return True
@@ -135,9 +135,9 @@ class UrlHandler(Url):
         options = PageOptions()
 
         if UrlHandler.is_full_browser_required(url):
-            options.use_selenium_full = True
+            options.use_full_browser = True
         if UrlHandler.is_headless_browser_required(url):
-            options.use_selenium_headless = True
+            options.use_headless_browser = True
 
         p = DomainAwarePage(url)
         if p.is_link_service():
@@ -218,9 +218,9 @@ class UrlHandler(Url):
         o = PageOptions()
 
         if UrlHandler.is_full_browser_required(url):
-            o.use_selenium_full = True
+            o.use_full_browser = True
         if UrlHandler.is_headless_browser_required(url):
-            o.use_selenium_headless = True
+            o.use_headless_browser = True
 
         return o
 

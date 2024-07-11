@@ -112,7 +112,7 @@ class EntriesCleanup(object):
                 invalid_domain.delete()
 
             elif b.result != invalid_entry:
-                w = LinkDataWrapper(invalid_entry)
+                w = EntryWrapper(invalid_entry)
                 w.move_entry(b.result)
 
                 # should also remove incorrect entry
@@ -258,7 +258,7 @@ class EntriesCleanup(object):
 
         for entry in entries:
             AppLogging.debug("Moving link to archive: {}".format(entry.link))
-            LinkDataWrapper(entry=entry).move_to_archive()
+            EntryWrapper(entry=entry).move_to_archive()
 
         return True
 
@@ -290,7 +290,7 @@ class EntriesCleanup(object):
                 https_url = http_entry.get_https_url()
                 https_entries = LinkDataController.objects.filter(link=https_url)
                 if https_entries.exists():
-                    w = LinkDataWrapper(entry = http_entry)
+                    w = EntryWrapper(entry = http_entry)
                     w.move_entry(https_entries[0])
 
         return True
@@ -305,7 +305,7 @@ class EntriesCleanup(object):
                 nonwww_url = www_entry.link.replace("https://www.", "https://")
                 nonwww_entries = LinkDataController.objects.filter(link=nonwww_url)
                 if nonwww_entries.exists():
-                    w = LinkDataWrapper(entry = www_entry)
+                    w = EntryWrapper(entry = www_entry)
                     w.move_entry(nonwww_entries[0])
 
         www_entries = LinkDataController.objects.filter(link__icontains="http://www.")
@@ -314,7 +314,7 @@ class EntriesCleanup(object):
                 nonwww_url = www_entry.link.replace("http://www.", "http://")
                 nonwww_entries = LinkDataController.objects.filter(link=nonwww_url)
                 if nonwww_entries.exists():
-                    w = LinkDataWrapper(entry = www_entry)
+                    w = EntryWrapper(entry = www_entry)
                     w.move_entry(nonwww_entries[0])
 
         return True
@@ -502,7 +502,7 @@ class EntryUpdater(object):
          - some other fields should be set only if present in props
         """
 
-        w = LinkDataWrapper(entry=self.entry)
+        w = EntryWrapper(entry=self.entry)
         w.evaluate()
         w.check_https_http_availability()
         w.check_www_nonww_availability()
@@ -575,7 +575,7 @@ class EntryUpdater(object):
          - status code and page rating is update always
          - new data are changed only if new data are present at all
         """
-        w = LinkDataWrapper(entry=self.entry)
+        w = EntryWrapper(entry=self.entry)
         w.evaluate()
         w.check_https_http_availability()
         w.check_www_nonww_availability()
@@ -812,7 +812,7 @@ class EntriesUpdater(object):
         return entries
 
 
-class LinkDataWrapper(object):
+class EntryWrapper(object):
     """
     Wrapper for entry. Entries can reside in many places (operation table, archive table).
     This is unified API for them.
@@ -1175,7 +1175,7 @@ class LinkDataWrapper(object):
                 new_ping_status = p.ping()
 
                 if new_ping_status:
-                    return LinkDataWrapper(entry=entry).move_entry_to_url(http_url)
+                    return EntryWrapper(entry=entry).move_entry_to_url(http_url)
 
             return self.entry
 
@@ -1186,7 +1186,7 @@ class LinkDataWrapper(object):
             new_ping_status = p.ping()
 
             if new_ping_status:
-                return LinkDataWrapper(entry=entry).move_entry_to_url(https_url)
+                return EntryWrapper(entry=entry).move_entry_to_url(https_url)
 
         return self.entry
 
@@ -1235,7 +1235,7 @@ class LinkDataWrapper(object):
 
             http_entries = LinkDataController.objects.filter(link=http_url)
             if http_entries.count() != 0:
-                w = LinkDataWrapper(entry = http_entries[0])
+                w = EntryWrapper(entry = http_entries[0])
                 w.move_entry(entry)
 
         if entry.is_http():
@@ -1351,7 +1351,7 @@ class EntryDataBuilder(object):
         """
         TODO move this to a other class OnlyLinkDataBuilder?
         """
-        wrapper = LinkDataWrapper(link=self.link)
+        wrapper = EntryWrapper(link=self.link)
         obj = wrapper.get()
         if obj:
             self.result = obj
@@ -1435,7 +1435,7 @@ class EntryDataBuilder(object):
         self.link_data["link"] = UrlHandler.get_cleaned_link(self.link_data["link"])
         self.link = self.link_data["link"]
 
-        wrapper = LinkDataWrapper(link=self.link)
+        wrapper = EntryWrapper(link=self.link)
         entry = wrapper.get()
         if entry:
             self.result = entry
@@ -1474,7 +1474,7 @@ class EntryDataBuilder(object):
             date = None
             if "date_published" in self.link_data:
                 date = self.link_data["date_published"]
-            wrapper = LinkDataWrapper(link=self.link_data["link"], date=date)
+            wrapper = EntryWrapper(link=self.link_data["link"], date=date)
             entry = wrapper.get()
 
             if entry:
@@ -1530,7 +1530,7 @@ class EntryDataBuilder(object):
 
         AppLogging.debug("Adding link: {}".format(new_link_data["link"]))
 
-        wrapper = LinkDataWrapper(
+        wrapper = EntryWrapper(
             link=new_link_data["link"], date=new_link_data["date_published"]
         )
 

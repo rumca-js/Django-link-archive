@@ -24,7 +24,7 @@ from ..controllers import (
     SourceDataController,
     LinkDataController,
     DomainsController,
-    LinkDataWrapper,
+    EntryWrapper,
 )
 
 from ..forms import (
