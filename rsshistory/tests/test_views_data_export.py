@@ -1,5 +1,6 @@
 from django.urls import reverse
 from django.contrib.auth.models import User
+from datetime import time
 
 from ..apps import LinkDatabase
 from ..controllers import (
@@ -22,7 +23,7 @@ class DataExportTests(FakeInternetTestCase):
             username="testuser", password="testpassword", is_staff=True
         )
 
-    def test_add_form(self):
+    def test_add_form__init(self):
         DataExport.objects.all().delete()
 
         self.client.login(username="testuser", password="testpassword")
@@ -35,22 +36,30 @@ class DataExportTests(FakeInternetTestCase):
         # redirect to view the link again
         self.assertEqual(response.status_code, 200)
 
-    def test_add_form(self):
+    def test_add_form__post_data(self):
         DataExport.objects.all().delete()
 
         self.client.login(username="testuser", password="testpassword")
 
-        url = reverse("{}:data-export-add".format(LinkDatabase.name), args=[])
+        url = reverse("{}:data-export-add".format(LinkDatabase.name))
 
         form_data = {
-            "enabled": "False",
-            "rule_name": "test_rule_edited",
+            "enabled": True,
+            "export_type" : "export-type-git",
+            "export_data" : "export-dtype-daily-data",
+            "local_path" : "",
+            "remote_path" : "",
+            "user" : "",
+            "password" : "",
+            "db_user" : "",
+            "export_time" : time(0,0),
         }
 
         # call user action
         response = self.client.post(url, data=form_data)
+        #print(response.content.decode())
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 302)
 
         exports = DataExport.objects.all()
         self.assertEqual(exports.count(), 1)
@@ -142,7 +151,7 @@ class DataExportTests(FakeInternetTestCase):
         self.client.login(username="testuser", password="testpassword")
 
         url = reverse(
-            "{}:data-export-run".format(LinkDatabase.name), args=[data_export.id]
+            "{}:data-export-job-add".format(LinkDatabase.name), args=[data_export.id]
         )
 
         form_data = {
@@ -153,7 +162,7 @@ class DataExportTests(FakeInternetTestCase):
         # call user action
         response = self.client.post(url, data=form_data)
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 302)
 
         jobs = BackgroundJobController.objects.all()
         self.assertEqual(jobs.count(), 1)
@@ -170,7 +179,7 @@ class DataExportTests(FakeInternetTestCase):
         self.client.login(username="testuser", password="testpassword")
 
         url = reverse(
-            "{}:data-export-run".format(LinkDatabase.name), args=[data_export.id]
+            "{}:data-export-job-add".format(LinkDatabase.name), args=[data_export.id]
         )
 
         form_data = {

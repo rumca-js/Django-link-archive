@@ -98,6 +98,39 @@ class BaseRssPluginTest(FakeInternetTestCase):
             "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM",
         )
 
+    def test_get_container_elements__encoded(self):
+        LinkDataController.objects.all().delete()
+
+        config = Configuration.get_object().config_entry
+        config.accept_not_domain_entries = True
+        config.auto_create_sources = True
+        config.accept_domains = False
+        config.new_entries_merge_data = False
+        config.new_entries_use_clean_data = True
+        config.save()
+
+        self.source_rss = SourceDataController.objects.create(
+            url="https://warhammer-community.com/feed",
+            title="Warhammer community",
+            category="No",
+            subcategory="No",
+            export_to_cms=True,
+        )
+
+        self.assertTrue(self.source_rss)
+
+        plugin = BaseRssPlugin(self.source_rss.id)
+        props = plugin.get_container_elements()
+        props = list(props)
+
+        self.print_errors()
+
+        self.assertEqual(len(props), 5)
+        self.assertEqual(
+            props[0]["source"],
+            "https://warhammer-community.com/feed",
+        )
+
     def test_check_for_data(self):
         LinkDataController.objects.all().delete()
 

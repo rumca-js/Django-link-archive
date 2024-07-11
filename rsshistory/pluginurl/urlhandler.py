@@ -136,7 +136,7 @@ class UrlHandler(Url):
 
         if UrlHandler.is_full_browser_required(url):
             options.use_full_browser = True
-        if UrlHandler.is_headless_browser_required(url):
+        elif UrlHandler.is_headless_browser_required(url):
             options.use_headless_browser = True
 
         p = DomainAwarePage(url)

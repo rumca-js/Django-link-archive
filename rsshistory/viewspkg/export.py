@@ -471,15 +471,14 @@ def data_export_add(request):
                 reverse("{}:data-exports".format(LinkDatabase.name))
             )
         else:
-            p.context["summary_text"] = "Form is invalid"
-            return p.render("summary_present.html")
+            p.context["form"] = form
+            return p.render("form_basic.html")
 
     form = DataExportForm()
     form.method = "POST"
     form.action_url = reverse("{}:data-export-add".format(LinkDatabase.name))
 
     p.context["form"] = form
-
     return p.render("form_basic.html")
 
 

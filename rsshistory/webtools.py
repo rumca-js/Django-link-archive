@@ -256,13 +256,26 @@ class DomainAwarePage(object):
 
         @return https://domain.com
         """
+        if not self.url:
+            return
+
         parts = self.parse_url()
 
         wh = parts[2].find(":")
         if wh >= 0:
             parts[2] = parts[2][:wh]
 
-        return parts[0] + parts[1] + parts[2].lower()
+        text = parts[0] + parts[1] + parts[2].lower()
+        x = DomainAwarePage(text)
+        if self.url and not x.is_web_link():
+            AppLogging.error("WebTools: Invalid domain processing. Input link:{} Domain:{}".format(self.url, text))
+
+        # if passed email, with user
+        wh = text.find("@")
+        if wh >= 0:
+            return parts[0] + parts[1] + text[wh+1:]
+
+        return text
 
     def get_domain_only(self):
         """
@@ -1524,7 +1537,8 @@ class ContentLinkParser(ContentInterface):
         result = set()
         for link in links:
             p = DomainAwarePage(link)
-            result.add(p.get_domain())
+            new_link = p.get_domain()
+            result.add(new_link)
 
         return result
 

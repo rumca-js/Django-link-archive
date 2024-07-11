@@ -123,6 +123,16 @@ class DomainAwarePageTest(FakeInternetTestCase):
         # call tested function
         self.assertEqual(p.get_domain(), "\\\\test.com")
 
+    def test_get_domain__null(self):
+        p = DomainAwarePage(None)
+        # call tested function
+        self.assertEqual(p.get_domain(), None)
+
+    def test_get_domain__email(self):
+        p = DomainAwarePage("https://user@gmail.com")
+        # call tested function
+        self.assertEqual(p.get_domain(), "https://gmail.com")
+
     def test_get_domain_web_archive_link(self):
         link = "https://web.archive.org/web/20000229222350/http://www.quantumpicture.com/Flo_Control/flo_control.htm"
         p = DomainAwarePage(link)
