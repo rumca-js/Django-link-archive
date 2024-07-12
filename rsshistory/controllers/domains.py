@@ -58,7 +58,8 @@ class DomainsController(Domains):
                 obj = DomainsController.create_object(domain_only_text, protocol)
             except Exception as E:
                 exc_str = traceback.format_exc()
-                AppLogging.error(
+                AppLogging.exc(
+                    E, 
                     "Cannot create domain data:{}\n{}".format(domain_only_text, exc_str)
                 )
         else:

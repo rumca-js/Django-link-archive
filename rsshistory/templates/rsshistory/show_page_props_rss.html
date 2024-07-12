@@ -54,15 +54,27 @@
 {%endif%}
 
 <h1>Headers</h1>
-<li>{{page_handler.response.headers}}</li>
+
+<a class="btn btn-secondary" data-bs-toggle="collapse" href="#collapseHeaders" role="button" aria-expanded="false" aria-controls="collapseHeaders">
+    Show Details
+</a>
+<div class="collapse" id="collapseHeaders"><pre>{{page_handler.response.headers}}</pre></div>
 
 <h1>Contents</h1>
 
-<pre>{{page_object.contents}}</pre>
+<a class="btn btn-secondary" data-bs-toggle="collapse" href="#collapseContents" role="button" aria-expanded="false" aria-controls="collapseContents">
+    Show Details
+</a>
+<div class="collapse" id="collapseContents"><pre>{{page_object.contents}}</pre></div>
 
 <h1>Feed</h1>
 
-<ul>
-    <li>Feed header: <pre>{{page_object.feed.feed}}</pre></li>
-    <li>Feed entries: <pre>{{page_object.feed.entries}}</pre></li>
-</ul>
+<a class="btn btn-secondary" data-bs-toggle="collapse" href="#collapseFeed" role="button" aria-expanded="false" aria-controls="collapseFeed">
+    Show Details
+</a>
+<div class="collapse" id="collapseFeed">
+   <ul>
+       <li>Feed header: <pre>{{page_object.feed.feed}}</pre></li>
+       <li>Feed entries: <pre>{{page_object.feed.entries}}</pre></li>
+   </ul>
+</div>

@@ -19,7 +19,7 @@ class EntryUrlInterface(object):
     """
 
     def __init__(
-        self, url, fast_check=True, use_selenium=False, log=False, ignore_errors=False
+        self, url, fast_check=True, use_headless_browser=False, log=False, ignore_errors=False
     ):
         """
         Some scenarios, like manual entry should log why it is impossible to check
@@ -32,7 +32,7 @@ class EntryUrlInterface(object):
 
         self.options = UrlHandler.get_url_options(url)
         self.options.fast_parsing = fast_check
-        self.options.use_selenium_headless = use_selenium
+        self.options.use_headless_browser = use_headless_browser
 
         self.make_request()
 
@@ -45,7 +45,6 @@ class EntryUrlInterface(object):
 
         if not self.ignore_errors and not self.h.is_valid():
             if self.log:
-                LinkDatabase.info("Page is invalid:{}".format(url))
                 AppLogging.error("Page is invalid:{}".format(url))
             self.p = None
         else:

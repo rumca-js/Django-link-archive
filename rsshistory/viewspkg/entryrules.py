@@ -109,9 +109,8 @@ def entry_rule_edit(request, pk):
     form.method = "POST"
     form.action_url = reverse("{}:entry-rule-edit".format(LinkDatabase.name), args=[pk])
 
-    p.context["config_form"] = form
-
-    return p.render("configuration.html")
+    p.context["form"] = form
+    return p.render("form_basic.html")
 
 
 def entry_rule_remove(request, pk):

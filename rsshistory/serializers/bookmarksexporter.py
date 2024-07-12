@@ -95,11 +95,11 @@ $channel_text
         try:
             t = Template(template_text)
             return t.safe_substitute(map_data)
-        except Exception as e:
-            error_text = traceback.format_exc()
-            AppLogging.error(
-                "Template exception {0} {1} {2} {3}".format(
-                    template_text, str(map_data), str(e), error_text
+        except Exception as E:
+            AppLogging.exc(
+                E, 
+                "Template exception {0} {1}".format(
+                    template_text, str(map_data),
                 )
             )
         return ""

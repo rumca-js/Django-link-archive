@@ -1,22 +1,27 @@
 """
 #1
-
-This is program is web scraper. If we turn verify, then we discard some of pages.
-Encountered several major pages, which had SSL programs.
-
-SSL is mostly important for interacting with pages. During web scraping it is not that useful.
+Do not harm anyone. Write ethical programs, and scrapers.
 
 #2
+By default SSL verification is disabled. Speeds up processing. At least in my experience.
+
+SSL is mostly important for interacting with pages, not when web scraping. I think. I am not an expert.
+
+#3
 If SSL verification is disabled you can see contents of your own domain:
 https://support.bunny.net/hc/en-us/articles/360017484759-The-CDN-URLs-are-returning-redirects-back-to-my-domain
 
 Sometimes we see the CDN URLs return a 301 redirect back to your own website. Usually, when this happens, it's caused by a misconfiguration of your origin server and the origin URL of your pull zone. If the origin URL sends back a redirect, our servers will simply forward that to the user.
 
-Disabling SSL validation will not check certificates, if expired.
+TODO:
+    - currently there is a hard limit for file size. If page is too big, it is just skipped
+    - we should check meta info before obtaining entire file. Currently it is not done so. Encoding may be read from file, in some cases
+    - maybe lists of mainstream media, or link services could be each in one class. Configurable, so that it can be overriden
 
-
-# TODO Base class uses child. Architectural problem.
-When basepage reads page it should try to read as HTML, then read charset, then decode
+Main classes are:
+    - Url - most things should be done through it
+    - PageOptions - upper layers should decide how a page should be called. Supplied to Url
+    - PageResponseObject - page response, interface for all implementations
 """
 
 import html
@@ -115,10 +120,11 @@ def date_str_to_date(date_str):
 
             error_text = traceback.format_exc()
 
+            detail_text = "Exc:{}\n{}\nStack:{}".format(error_text, stack_str)
+
             AppLogging.warning(
-                "Could not parse date:{}\nExc:{}\n{}\nStack:{}".format(
-                    date_str, str(E), error_text, stack_str
-                )
+                "Could not parse date:{}\n".format(date_str, str(E), ),
+                detail_text = detail_text,
             )
 
 
@@ -126,7 +132,7 @@ def calculate_hash(text):
     try:
         return hashlib.md5(text.encode("utf-8")).digest()
     except Exception as E:
-        AppLogging.error("Could not calculate hash {}".format(E))
+        AppLogging.exc(E, "Could not calculate hash")
 
 
 class DomainAwarePage(object):
@@ -176,6 +182,9 @@ class DomainAwarePage(object):
         We cannot use urlparse, as it does not work with ftp:// or smb:// or win location
         returns tuple [protocol, separator, url]
         """
+        if not self.url:
+            return
+
         protocol_pos = self.url.find("://")
         if protocol_pos >= 0:
             return self.parse_protocoled_url()
@@ -268,7 +277,7 @@ class DomainAwarePage(object):
         text = parts[0] + parts[1] + parts[2].lower()
         x = DomainAwarePage(text)
         if self.url and not x.is_web_link():
-            AppLogging.error("WebTools: Invalid domain processing. Input link:{} Domain:{}".format(self.url, text))
+            return
 
         # if passed email, with user
         wh = text.find("@")
@@ -284,11 +293,13 @@ class DomainAwarePage(object):
         @return domain.com
         """
         parts = self.parse_url()
-        return parts[2].lower()
+        if parts:
+            return parts[2].lower()
 
     def get_scheme(self):
         parts = self.parse_url()
-        return parts[0]
+        if parts:
+            return parts[0]
 
     def is_domain(self):
         url = self.get_full_url()
@@ -426,6 +437,9 @@ class DomainAwarePage(object):
     def is_analytics(self):
         url = self.get_domain_only()
 
+        if not url:
+            return False
+
         if url.find("g.doubleclick.net") >= 0:
             return True
         if url.find("ad.doubleclick.net") >= 0:
@@ -465,6 +479,9 @@ class DomainAwarePage(object):
 
     def is_link_service(self):
         url = self.get_domain_only()
+
+        if not url:
+            return False
 
         if url.find("lmg.gg") >= 0:
             return True
@@ -2292,7 +2309,8 @@ class PageResponseObject(object):
 
     def is_this_status_redirect(self):
         """
-        403 is added since some pages use it to block you
+        HTML code 403 - some pages block you because of your user agent. This code says exactly that.
+        https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
         """
         return (
             self.status_code > 300 and self.status_code < 400
@@ -2438,6 +2456,10 @@ class RequestsPage(object):
                 return "utf-8"
 
     def build_requests(self, url, headers, timeout_s):
+        """
+        stream argument - will fetch page contents, when we access contents of page.
+        """
+
         request_result = requests.get(
             url,
             headers=headers,
@@ -2696,14 +2718,16 @@ class CrawleeHeadless(object):
         """
         self.url = url
         self.timeout_s = timeout_s
+        self.ping = ping
 
         self.loop = asyncio.get_event_loop()
         self.loop.run_until_complete(self.process())
 
     async def process(self) -> None:
+        """
+        https://crawlee.dev/python/api/class/BeautifulSoupCrawler
+        """
         result = {}
-
-        # https://crawlee.dev/python/api/class/BeautifulSoupCrawler
 
         crawler = BeautifulSoupCrawler(
             # Limit the crawl to max requests. Remove or increase it for crawling all links.
@@ -2723,8 +2747,9 @@ class CrawleeHeadless(object):
             result['status_code'] = context.http_response.status_code
             result['headers'] = context.http_response.headers
 
-            # todo check in headers if we accept payload
-            result['page_content'] = context.soup.contents
+            if not self.ping:
+                # todo check in headers if we accept payload
+                result['page_content'] = context.soup.contents
 
             # TODO - what if there is redirection. should we use context.request.loaded_url?
 
@@ -2750,6 +2775,7 @@ class CrawleeFull(object):
     def __init__(self, url, headers, timeout_s=10, ping=False):
         self.url = url
         self.timeout_s = timeout_s
+        self.ping = ping
 
         self.loop = asyncio.get_event_loop()
         self.loop.run_until_complete(self.process())
@@ -2773,10 +2799,12 @@ class CrawleeFull(object):
                 return
 
             result['request_url'] = context.request.url
-            result['loaded_url'] = context.page.url
             result['status_code'] = context.http_response.status_code
             result['headers'] = context.http_response.headers
-            result['page_content'] = await context.page.content()
+
+            if not self.ping:
+                result['loaded_url'] = context.page.url
+                result['page_content'] = await context.page.content()
 
         # Run the crawler with the initial list of requests.
         await crawler.run([url])
@@ -3048,15 +3076,7 @@ class RequestBuilder(object):
 
     def ping(self, timeout_s=5):
         """
-        This is program is web scraper. If we turn verify, then we discard some of pages.
-        Encountered several major pages, which had SSL programs.
-
-        SSL is mostly important for interacting with pages. During web scraping it is not that useful.
-        """
-
-        """
-        stream argument allows us to read header before we fetch the page.
-        SSL verification makes everything to work slower.
+        Checks if page is available or not
         """
         url = self.url
 
@@ -3359,6 +3379,10 @@ class Url(ContentInterface):
         # domain is lowercase
         p = DomainAwarePage(url)
         domain = p.get_domain()
+        if not domain:
+            AppLogging.error("Could not obtain domain for:{}".format(url))
+            return
+
         domain_lower = domain.lower()
 
         url = domain_lower + url[len(domain) :]

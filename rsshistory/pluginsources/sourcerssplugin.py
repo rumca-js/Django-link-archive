@@ -36,7 +36,7 @@ class BaseRssPlugin(SourceGenericPlugin):
         if not contents:
             self.store_error(
                 source,
-                "Coult not obtain contents, even with selenium",
+                "Coult not obtain contents",
                 contents,
             )
             self.dead = True
@@ -86,14 +86,15 @@ class BaseRssPlugin(SourceGenericPlugin):
         if self.response:
             status_code = self.response.status_code
 
-        AppLogging.error(
-            "Source:{}\nTitle:{}\nStatus code:{}\nText:{}.\nContents\n{}".format(
-                source.url,
-                source.title,
+        detail_text = "Status code:{}\n\nContents\n{}".format(
                 status_code,
                 text,
                 print_contents[: self.get_contents_size_limit()],
-            )
+        )
+
+        AppLogging.error(
+            "{}. Source:{}. Title:{}".format(text, source.url, source.title,),
+            detail_text = detail_text,
         )
 
     def get_contents_size_limit(self):

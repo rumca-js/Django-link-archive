@@ -24,8 +24,7 @@ def subs_checker_task(arg):
         handler = RefreshThreadHandler()
         handler.refresh()
     except Exception as E:
-        error_text = traceback.format_exc()
-        AppLogging.error("Exception in checker task: {} {}".format(str(E), error_text))
+        AppLogging.exc(E, "Exception in checker task")
 
     LinkDatabase.info("subs_checker_task DONE")
 
@@ -48,10 +47,7 @@ def process_all_jobs_task(arg):
         return mgr.process_all()
 
     except Exception as E:
-        error_text = traceback.format_exc()
-        AppLogging.error(
-            "Exception in processing task: {} {}".format(str(E), error_text)
-        )
+        AppLogging.exc(E, "Exception in processing task",)
 
     LinkDatabase.info("process_all_jobs_task DONE")
 
@@ -74,9 +70,6 @@ def process_one_jobs_task(arg):
         return mgr.process_one()
 
     except Exception as E:
-        error_text = traceback.format_exc()
-        AppLogging.error(
-            "Exception in processing task: {} {}".format(str(E), error_text)
-        )
+        AppLogging.exc(E, "Exception in processing task")
 
     LinkDatabase.info("process_one_jobs_task DONE")

@@ -208,10 +208,10 @@ class UrlTest(FakeInternetTestCase):
         MockRequestCounter.mock_page_requests = 0
 
         o = PageOptions()
-        o.use_selenium_full = True
+        o.use_full_browser = True
         handler = Url("https://open.spotify.com", page_options=o)
 
-        self.assertEqual(handler.options.use_selenium_full, True)
+        self.assertEqual(handler.options.use_full_browser, True)
 
         self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
@@ -219,10 +219,10 @@ class UrlTest(FakeInternetTestCase):
         MockRequestCounter.mock_page_requests = 0
 
         o = PageOptions()
-        o.use_selenium_headless = True
+        o.use_headless_browser = True
         handler = Url("https://open.spotify.com", page_options=o)
 
-        self.assertEqual(handler.options.use_selenium_headless, True)
+        self.assertEqual(handler.options.use_headless_browser, True)
 
         self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 

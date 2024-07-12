@@ -188,9 +188,10 @@ class SourceGenericPlugin(object):
 
         if not contents:
             AppLogging.error(
-                "Source:{} Title:{}; Could not obtain contents.\nStatus code:{}\nContents\n{}".format(
-                    source.url, source.title, status_code, contents
-                )
+                info_text = "Source:{} Title:{}; Could not obtain contents.".format(
+                    source.url, source.title,
+                ),
+                detail_text = "Status code:{}\nContents\n{}".format(status_code, contents,)
             )
             self.dead = True
             return None

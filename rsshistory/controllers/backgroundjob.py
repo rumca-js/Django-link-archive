@@ -232,6 +232,9 @@ class BackgroundJobController(BackgroundJob):
 
         url = Url.get_cleaned_link(url)  # TODO maybe urlhandler?
 
+        if not url:
+            return
+
         h = DomainAwarePage(url)
         if h.is_analytics():
             return

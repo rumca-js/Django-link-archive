@@ -518,7 +518,13 @@ class UserConfig(models.Model):
 
 
 class AppLogging(models.Model):
+    """
+    info_text should be one liner.
+    detail_text can be longer.
+    """
+
     info_text = models.CharField(default="", max_length=2000)
+    detail_text = models.CharField(blank=True, max_length=2000, help_text="Used to provide details about log event")
     level = models.IntegerField(default=0)
     date = models.DateTimeField(auto_now_add=True)
     user = models.CharField(max_length=1000, null=True)
@@ -539,7 +545,7 @@ class AppLogging(models.Model):
         c = Configuration.get_object()
         return c.get_local_time(self.date)
 
-    def create_entry(info_text, description="", level=INFO, date=None, user=None):
+    def create_entry(info_text, detail_text="", level=INFO, date=None, user=None):
         config = ConfigurationEntry.get()
         if level < config.logging_level:
             return
@@ -549,47 +555,56 @@ class AppLogging(models.Model):
 
         AppLogging.cleanup_overflow()
 
+        if len(info_text) > 1900:
+            info_text = info_text[:1900]
+        if len(detail_text) > 1900:
+            detail_text = detail_text[:1900]
+
         AppLogging.objects.create(
             info_text=info_text,
+            detail_text=detail_text,
             level=level,
             date=datetime.now(timezone("UTC")),
             user=user,
         )
 
-    def info(info_text, user=None):
+    def info(info_text, detail_text="", user=None):
         AppLogging.create_entry(info_text, level = AppLogging.INFO)
 
-    def debug(info_text, user=None):
+    def debug(info_text, detail_text="", user=None):
         LinkDatabase.info(info_text)
 
-    def warning(info_text, user=None):
+    def warning(info_text, detail_text="", user=None):
         AppLogging.create_entry(info_text, level = AppLogging.WARNING)
 
-    def error(info_text, user=None):
+    def error(info_text, detail_text="", user=None):
         AppLogging.create_entry(info_text, level = AppLogging.ERROR)
 
-    def notify(info_text, user=None):
+    def notify(info_text, detail_text="", user=None):
         AppLogging.create_entry(info_text, level = AppLogging.NOTIFICATION)
 
     def exc(exception_object, info_text=None, user=None):
-        stack_lines = traceback.format_stack()
-        print("Stack:")
-        print("".join(stack_lines))
-
         error_text = traceback.format_exc()
         print("Exception format")
         print(error_text)
 
-        # only 5 lines!
-        stack_lines = stack_lines[-5:]
+        stack_lines = traceback.format_stack()
         stack_string = "".join(stack_lines)
+        print("Stack:")
+        print("".join(stack_lines))
+
+        # only 5 lines!
+        # stack_lines = stack_lines[-5:]
+        # stack_string = "".join(stack_lines)
 
         if info_text:
-            text = "{}\nException:{}\nData:\n{}\nStack:\n{}".format(info_text, str(exception_object), error_text, stack_string)
+            info_text += ". Exception:{}".format(str(exception_object))
+            detail_text = "Data:\n{}\nStack:\n{}".format(error_text, stack_string)
         else:
-            text = "Exception:{}\nData:\n{}Stack:\n{}".format(str(exception_object), error_text, stack_string)
+            info_text = "{}".format(str(exception_object))
+            detail_text = "Data:\n{}Stack:\n{}".format(error_text, stack_string)
 
-        AppLogging.create_entry(text, level = AppLogging.ERROR)
+        AppLogging.create_entry(info_text = info_text, detail_text = detail_text, level = AppLogging.ERROR)
 
     def save(self, *args, **kwargs):
         # Trim the input string to fit within max_length

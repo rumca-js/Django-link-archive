@@ -441,9 +441,7 @@ class SourceDataBuilder(object):
         try:
             source = SourceDataController.objects.create(**self.link_data)
         except Exception as E:
-            error_text = traceback.format_exc()
-            LinkDatabase.error("Cannot create source:{}\n{}".format(str(E), error_text))
-            AppLogging.error("Cannot create source:{}\n{}".format(str(E), error_text))
+            AppLogging.exc(E, "Cannot create source:{}\n{}".format(self.link_data))
 
         self.additional_source_operations(source)
 

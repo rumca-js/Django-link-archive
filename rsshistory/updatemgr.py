@@ -99,7 +99,8 @@ class UpdateExportManager(object):
                 repo.up()
                 repo_is_up = True
             except Exception as E:
-                AppLogging.error(
+                AppLogging.exc(
+                    E,
                     "Cannot update repository, removing directory {}".format(
                         operating_dir
                     )

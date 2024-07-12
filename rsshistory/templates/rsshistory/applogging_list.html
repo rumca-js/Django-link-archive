@@ -24,19 +24,29 @@
 {% if content_list %}
 <div class="container">
     {% for info in content_list %}
-    <div 
-     {% if info.is_info or info.is_notification%}
-	 class="bg-primary"
-     {% elif info.is_warning %}
-	 class="bg-warning"
-     {% elif info.is_error %}
-         class="bg-danger"
-     {% endif %}
-	    style="display:flex; flex-wrap: wrap;">
-       <div class="mx-1">Time: {{info.get_local_time}}</div>
-       <div class="mx-1">Level: {{info.level}}</div>
-    </div>
-    <div style="margin-bottom: 2%"><pre>{{info.info_text | safe}}</pre></div>
+       <div style="margin-bottom: 2%">
+          <div 
+           {% if info.is_info or info.is_notification%}
+	       class="bg-primary"
+           {% elif info.is_warning %}
+	       class="bg-warning"
+           {% elif info.is_error %}
+               class="bg-danger"
+           {% endif %}
+	          style="display:flex; flex-wrap: wrap;">
+             <div class="mx-1">Time: {{info.get_local_time}}</div>
+             <div class="mx-1">Level: {{info.level}}</div>
+          </div>
+
+          <div>{{info.info_text}}</div>
+
+          {% if info.detail_text %}
+            <a class="btn btn-secondary" data-bs-toggle="collapse" href="#collapseDetails{{info.id}}" role="button" aria-expanded="false" aria-controls="collapseDetails{{info.id}}">
+                Show Details
+            </a>
+            <div class="collapse" id="collapseDetails{{info.id}}"><pre>{{info.detail_text}}</pre></div>
+          {% endif %}
+       </div>
     {% endfor %}
 </div>
 {% else %}

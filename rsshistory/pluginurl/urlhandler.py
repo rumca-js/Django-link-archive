@@ -115,6 +115,9 @@ class UrlHandler(Url):
         return (status_code >= 300 and status_code < 400) or status_code == 403
 
     def get_type(url):
+        if not url:
+            return
+
         short_url = UrlHandler.get_protololless(url)
         if not short_url:
             return

@@ -83,9 +83,8 @@ class WaybackMachine(object):
         try:
             val = save_api.save()
             return val
-        except Exception as e:
-            LinkDatabase.info("WaybackMachine: save url: {0} {1}".format(url, str(e)))
-            AppLogging.error("WaybackMachine: save url: {0} {1}".format(url, str(e)))
+        except Exception as E:
+            AppLogging.exc("WaybackMachine: save url: {0}".format(url))
             time.sleep(5)  # wait 5 seconds. Ain't nobody got time for that
 
     def save(self, url):

@@ -11,12 +11,12 @@ class SourceUrlInterface(object):
     Provides interface between Source and URL Properties
     """
 
-    def __init__(self, url, fast_check=True, use_selenium=False):
+    def __init__(self, url, fast_check=True, use_headless_browser=False):
         self.url = UrlHandler.get_cleaned_link(url)
 
         options = UrlHandler.get_url_options(url)
         options.fast_parsing = fast_check
-        options.use_selenium_headless = use_selenium
+        options.use_headless_browser = use_headless_browser
 
         self.h = UrlHandler(self.url, page_options=options)
         if self.h.response:

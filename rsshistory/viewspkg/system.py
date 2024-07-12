@@ -469,3 +469,17 @@ def wizard_setup_search_engine(request):
     p.context["summary_text"] = "Set configuration for search engine"
 
     return p.render("summary_present.html")
+
+
+def setup_default_rules(request):
+    p = ViewPage(request)
+    p.set_title("Entry rule update")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    EntryRules.update_link_service_rule()
+    EntryRules.update_webspam_rule()
+
+    p.context["summary_text"] = "Updated rules"
+    return p.render("summary_present.html")

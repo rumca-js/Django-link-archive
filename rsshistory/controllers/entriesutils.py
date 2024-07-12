@@ -955,7 +955,6 @@ class EntryWrapper(object):
             elif is_archive:
                 ob = ArchiveLinkDataController.objects.create(**link_data)
         except Exception as E:
-            traceback.print_stack()
             AppLogging.exc(E, "Link data:{}".format(link_data))
             return
 
@@ -967,6 +966,7 @@ class EntryWrapper(object):
 
     def move_to_archive(self):
         entry_obj = self.entry
+        link = entry_obj.link
 
         objs = ArchiveLinkDataController.objects.filter(link=entry_obj.link)
 
@@ -979,18 +979,17 @@ class EntryWrapper(object):
                 entry_obj.delete()
                 return archive_obj
 
-            except Exception as e:
-                error_text = traceback.format_exc()
-                AppLogging.error("Cannot move to archive {}".format(error_text))
+            except Exception as E:
+                AppLogging.exc(E, "Cannot move to archive {}".format(link))
         else:
             try:
                 entry_obj.delete()
-            except Exception as e:
-                error_text = traceback.format_exc()
-                AppLogging.error("Cannot delete entry {}".format(error_text))
+            except Exception as E:
+                AppLogging.exc(E, "Cannot delete entry {}".format(link))
 
     def move_from_archive(self):
         archive_obj = self.entry
+        link = archive_obj.link
 
         objs = LinkDataController.objects.filter(link=archive_obj.link)
         if objs.count() == 0:
@@ -1002,15 +1001,13 @@ class EntryWrapper(object):
                 archive_obj.delete()
                 return new_obj
 
-            except Exception as e:
-                error_text = traceback.format_exc()
-                AppLogging.error(error_text)
+            except Exception as E:
+                AppLogging.exc(E, "Canont move link to archive {}".format(link))
         else:
             try:
                 archive_obj.delete()
-            except Exception as e:
-                error_text = traceback.format_exc()
-                AppLogging.error(error_text)
+            except Exception as E:
+                AppLogging.exc(E, "Canont move link to archive {}".format(link))
 
 
     def make_bookmarked(self, request):
@@ -1145,11 +1142,9 @@ class EntryWrapper(object):
 
     def check_https_http_availability(self):
         """
-        TODO name is bad
-
-        TODO maybe should be returning valid object if moved?
-        TODO rewrite check_entry_versions(https_link_name, http_link_name)
-        TODO rewrite check_entry_versions(nonwww_link_name, www_link_name)
+        TODO - we should use EntryUrlInterface to check if we receive valid
+        information.
+        Some information might be missing in https:// version of a site
 
         @returns new object, or None object has not been changed
         """
@@ -1192,11 +1187,9 @@ class EntryWrapper(object):
 
     def check_www_nonww_availability(self):
         """
-        This function checks if there is non www link, similar to original.
-        If there is we can remove link with www, to have less links to operate with.
-
-        # TODO shouldn't we use UrlHandler? Yes, but it does not have 'ping'
-        # Using basepage is errnous, since some pages might not return correct ping status
+        TODO - we should use EntryUrlInterface to check if we receive valid
+        information.
+        Some information might be missing in https:// version of a site
 
         @returns new object, or None if object has not been changed
         """
@@ -1321,6 +1314,8 @@ class EntryDataBuilder(object):
         """
         self.ignore_errors = ignore_errors
         self.link = UrlHandler.get_cleaned_link(self.link)
+        if not self.link:
+            return
 
         p = DomainAwarePage(self.link)
         if p.is_link_service():
@@ -1429,6 +1424,8 @@ class EntryDataBuilder(object):
         self.ignore_errors = ignore_errors
 
         url = self.link_data["link"]
+        if not url:
+            return
 
         obj = None
 

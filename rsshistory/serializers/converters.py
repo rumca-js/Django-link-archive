@@ -185,11 +185,10 @@ class MarkDownConverter(ItemConverterFabric):
         try:
             t = Template(self.item_template)
             return t.safe_substitute(map_data)
-        except Exception as e:
-            error_text = traceback.format_exc()
-            AppLogging.error(
-                "Template exception {0} {1} {2} {3}".format(
-                    self.item_template, str(map_data), str(e), error_text
+        except Exception as E:
+            AppLogging.exc(
+                "Template exception {0} {1}".format(
+                    self.item_template, str(map_data),
                 )
             )
         return ""
@@ -244,11 +243,11 @@ class MarkDownConverter(ItemConverterFabric):
         try:
             t = Template(self.item_template)
             return t.safe_substitute(map_data)
-        except Exception as e:
-            error_text = traceback.format_exc()
-            AppLogging.error(
-                "Template exception {0} {1} {2} {3}".format(
-                    self.item_template, str(map_data), str(e), error_text
+        except Exception as E:
+            AppLogging.exc(
+                E,
+                "Template exception {0} {1}".format(
+                    self.item_template, str(map_data),
                 )
             )
         return ""
@@ -278,11 +277,11 @@ class MarkDownSourceConverter(object):
         try:
             t = Template(self.item_template)
             return t.safe_substitute(map_data)
-        except Exception as e:
-            error_text = traceback.format_exc()
-            AppLogging.error(
-                "Template exception {0} {1} {2} {3}".format(
-                    self.item_template, str(map_data), str(e), error_text
+        except Exception as E:
+            AppLogging.exc(
+                E,
+                "Template exception {0} {1}".format(
+                    self.item_template, str(map_data),
                 )
             )
         return ""
