@@ -1,6 +1,6 @@
 Personal link database, link aggregator, with RSS functionality. Similar to Reddit, but completely open source. You can self host it.
 
-It does not capture page contents. It captures link meta data: title, description etc.
+Manages link meta information.
 
 # Features
 
@@ -12,7 +12,7 @@ It does not capture page contents. It captures link meta data: title, descriptio
  - web page parsing capabilities
  - users can comment, tag, rate links
  - supports data import and export. This is most important functionality, as files are more important than the APP itself (file over app strategy)
- - It is not a search engine. Suggesting better alternatives: [whoogle-search](https://github.com/benbusby/whoogle-search), or [Marginalia search](https://search.marginalia.nu/), or [Apache Lucene](https://lucene.apache.org/)
+ - It is not a search engine. Suggesting better alternatives: [whoogle-search](https://github.com/benbusby/whoogle-search), or [Marginalia search](https://search.marginalia.nu/), or [Apache Lucene](https://lucene.apache.org/). It can serve as a simple engine
  - Minimal aesthetic. Dark mode, custom list displays
 
 <div align="center">
@@ -67,27 +67,12 @@ It does not capture page contents. It captures link meta data: title, descriptio
 
 Alternative programs do exist.
 
- - [Grimoire](https://github.com/goniszewski/grimoire)
- - [BookmarkOS](https://bookmarkos.com/)
- - [Raindrop](https://raindrop.io/)
- - [LinkAce](https://www.linkace.org/)
- - [Hoarder](https://hoarder.app/)
- - [GGather](https://web.ggather.com/)
- - [Zotero](https://www.zotero.org/)
- - [OneKeep](https://onekeep.com/)
- - [Lasso](https://www.lasso.net/go/)
- - [CarryLinks](https://carrylinks.com/)
- - [Zlinky](https://zlinky.com/)
- - [wakelet](https://wakelet.com/)
- - [Booky](https://booky.io/)
- - [Webtag](https://webtag.io/)
- - [Historious](https://historio.us/)
- - [Knowies](https://www.knowies.com)
+[Grimoire](https://github.com/goniszewski/grimoire), [BookmarkOS](https://bookmarkos.com/), [Raindrop](https://raindrop.io/), [LinkAce](https://www.linkace.org/), [Hoarder](https://hoarder.app/), [GGather](https://web.ggather.com/), [Zotero](https://www.zotero.org/), [OneKeep](https://onekeep.com/), [Lasso](https://www.lasso.net/go/), [CarryLinks](https://carrylinks.com/), [Zlinky](https://zlinky.com/), [wakelet](https://wakelet.com/), [Booky](https://booky.io/), [Webtag](https://webtag.io/), [Historious](https://historio.us/), [Knowies](https://www.knowies.com)
 
 # How does it work?
 
- - first define a RSS source in "Sources" page
- - RSS sources are checked from time to time if they have new links
+ - System reads defined "Sources" regularly
+ - Each source is checked regularly for new data. RSS feeds are checked if they contain new links
  - new links are inserted into database
  - every day your bookmarks can be exported to a repository, if configured
  - new links are used to populate popular "keywords"
@@ -96,17 +81,11 @@ Alternative programs do exist.
 
 Each page is ranked by several factors.
 
- - content ranking
- - users votes
+ - content ranking. [0..100] range
+ - users votes. [-100..100] range
  
 The result is equal according to calculation
- page ranking = content ranking + users votes
-
-Note: Page rating should not be based 'on time'. Good contents does is not 'worse' because x amount has passed. It should be however a suspect for verification, as it can be a case of abandoned project.
-
-Page rating range is 0..100. This means that if everything is correct for a page, a rank 100 is assigned.
-
-With such approach we can extend page rating and range is still in range 0..100, and it does not break the rest of calculated link rank.
+ - page ranking = content ranking + users votes
 
 ## Content ranking
 
