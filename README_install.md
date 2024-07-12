@@ -2,7 +2,10 @@
 
 This project uses the following technologies:
  - django
- - celery
+ - celery - background task processing
+ - Postgresql - use of SQLite is discouraged
+ - spacy - for text/keyword analysis
+ - crawlee - for crawling the web
  - rabbitmq-server
  - memcached - without it memory locking does not work
 
@@ -56,6 +59,8 @@ Parts of it are described below.
 # Configure
 
 ## settings.py
+
+Django [Settings](https://docs.djangoproject.com/en/5.0/ref/settings/) are most important part of the configuration
 
 During install step user is informed that settings.py file should be updated:
  - SECRET_KEY needs to be defined
