@@ -12,7 +12,7 @@ Manages link meta information.
  - web page parsing capabilities
  - users can comment, tag, rate links
  - supports data import and export. This is most important functionality, as files are more important than the APP itself (file over app strategy)
- - It is not a search engine. Suggesting better alternatives: [whoogle-search](https://github.com/benbusby/whoogle-search), or [Marginalia search](https://search.marginalia.nu/), or [Apache Lucene](https://lucene.apache.org/). It can serve as a simple engine
+ - It is not a search engine. Suggesting better alternatives: [whoogle-search](https://github.com/benbusby/whoogle-search), or [Marginalia search](https://search.marginalia.nu/), or [Apache Lucene](https://lucene.apache.org/), but it can serve as a simple engine
  - Minimal aesthetic. Dark mode, custom list displays
 
 <div align="center">
