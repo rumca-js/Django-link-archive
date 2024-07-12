@@ -38,6 +38,11 @@ RUN poetry check
 # Install Dependencies
 RUN poetry install --no-interaction --no-cache --without dev
 
+# spacy needs a file to be downloaded
+RUN poetry run python -m spacy download en_core_web_sm
+# playwright needs a browser
+RUN poetry run playwright install
+
 # Copy Application
 COPY . /app
 
