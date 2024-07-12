@@ -154,7 +154,7 @@ class UpdateManagerGitTest(FakeInternetTestCase):
             export_data=DataExport.EXPORT_DAILY_DATA
         )[0]
 
-        mgr.write_and_push_daily_data()
+        mgr.write_and_push(export_config)
 
         self.assertEqual(len(RepoTestFactory.used_repos), 1)
 
@@ -171,7 +171,7 @@ class UpdateManagerGitTest(FakeInternetTestCase):
             export_data=DataExport.EXPORT_YEAR_DATA
         )[0]
 
-        mgr.write_and_push_year_data()
+        mgr.write_and_push(export_config)
         self.assertEqual(len(RepoTestFactory.used_repos), 1)
 
         # expected_path = Path("./data/exports/year_dir/git/RSS-Link-Database-YEAR")
@@ -187,7 +187,7 @@ class UpdateManagerGitTest(FakeInternetTestCase):
             export_data=DataExport.EXPORT_NOTIME_DATA
         )[0]
 
-        mgr.write_and_push_notime_data()
+        mgr.write_and_push(export_config)
 
         self.assertEqual(len(RepoTestFactory.used_repos), 1)
 
@@ -290,7 +290,7 @@ class UpdateManagerLocTest(FakeInternetTestCase):
             export_data=DataExport.EXPORT_DAILY_DATA
         )[0]
 
-        mgr.write_and_push_daily_data()
+        mgr.write_and_push(export_config)
 
         self.assertEqual(len(RepoTestFactory.used_repos), 0)
 
@@ -304,7 +304,7 @@ class UpdateManagerLocTest(FakeInternetTestCase):
             export_data=DataExport.EXPORT_YEAR_DATA
         )[0]
 
-        mgr.write_and_push_year_data()
+        mgr.write_and_push(export_config)
         self.assertEqual(len(RepoTestFactory.used_repos), 0)
 
     def test_notime_repo(self):
@@ -317,6 +317,6 @@ class UpdateManagerLocTest(FakeInternetTestCase):
             export_data=DataExport.EXPORT_NOTIME_DATA
         )[0]
 
-        mgr.write_and_push_notime_data()
+        mgr.write_and_push(export_config)
 
         self.assertEqual(len(RepoTestFactory.used_repos), 0)

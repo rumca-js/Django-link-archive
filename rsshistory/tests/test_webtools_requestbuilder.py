@@ -72,57 +72,57 @@ class PageOptionsTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 
-    def test_use_selenium_full(self):
+    def test_use_browser__full(self):
         o = PageOptions()
-        o.use_selenium_full = True
+        o.use_full_browser = True
 
         # call tested function
-        self.assertTrue(o.is_selenium())
+        self.assertTrue(o.is_advanced_processing_required())
 
-    def test_use_selenium_headless(self):
+    def test_use_browser__headless(self):
         o = PageOptions()
-        o.use_selenium_headless = True
+        o.use_headless_browser = True
 
         # call tested function
-        self.assertTrue(o.is_selenium())
+        self.assertTrue(o.is_advanced_processing_required())
 
-    def test_use_selenium_both(self):
+    def test_use_browser__both(self):
         o = PageOptions()
-        o.use_selenium_headless = True
-        o.use_selenium_full = True
+        o.use_headless_browser = True
+        o.use_full_browser = True
 
         # call tested function
-        self.assertTrue(o.is_selenium())
+        self.assertTrue(o.is_advanced_processing_required())
 
-    def test_not_use_selenium_full(self):
+    def test_use_basic_crawler__full(self):
         o = PageOptions()
-        o.use_selenium_full = True
+        o.use_full_browser = True
 
         # call tested function
-        self.assertFalse(o.is_not_selenium())
+        self.assertFalse(o.use_basic_crawler())
 
-    def test_not_use_selenium_headless(self):
+    def test_use_basic_crawler__headless(self):
         o = PageOptions()
-        o.use_selenium_headless = True
+        o.use_headless_browser = True
 
         # call tested function
-        self.assertFalse(o.is_not_selenium())
+        self.assertFalse(o.use_basic_crawler())
 
-    def test_not_use_selenium_both(self):
+    def test_use_basic_crawler__both(self):
         o = PageOptions()
-        o.use_selenium_headless = True
-        o.use_selenium_full = True
+        o.use_headless_browser = True
+        o.use_full_browser = True
 
         # call tested function
-        self.assertFalse(o.is_not_selenium())
+        self.assertFalse(o.use_basic_crawler())
 
-    def test_not_use_selenium_none(self):
+    def test_use_basic_crawler__none(self):
         o = PageOptions()
-        o.use_selenium_headless = False
-        o.use_selenium_full = False
+        o.use_headless_browser = False
+        o.use_full_browser = False
 
         # call tested function
-        self.assertTrue(o.is_not_selenium())
+        self.assertTrue(o.use_basic_crawler())
 
 
 class RequestBuilderTest(FakeInternetTestCase):

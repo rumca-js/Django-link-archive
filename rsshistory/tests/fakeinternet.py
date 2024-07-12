@@ -45,6 +45,9 @@ from .fake.codeproject import (
 from .fake.hackernews import (
     webpage_hackernews_rss,
 )
+from .fake.warhammercommunity import (
+    warhammer_community_rss,
+)
 from .fake.instance import (
     instance_entries_json,
     instance_sources_json_empty,
@@ -288,6 +291,9 @@ class TestResponseObject(PageResponseObject):
 
         if url.startswith("https://news.ycombinator.com/item?id=39940707"):
             return webpage_samtime_youtube_rss
+
+        if url.startswith("https://warhammer-community.com/feed"):
+            return warhammer_community_rss
 
         if url.startswith("https://isocpp.org/blog/rss/category/news"):
             return webpage_samtime_youtube_rss

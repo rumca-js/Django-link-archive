@@ -752,7 +752,7 @@ class WriteDailyDataJobHandler(BaseJobHandler):
 
             date_input = datetime.strptime(obj.subject, "%Y-%m-%d").date()
 
-            update_mgr = UpdateManager(self._config)
+            mgr = UpdateManager(self._config)
 
             all_export_data = DataExport.objects.filter(
                 export_data=DataExport.EXPORT_DAILY_DATA, enabled=True

@@ -70,21 +70,21 @@ class UrlHandlerTest(FakeInternetTestCase):
 
         self.assertEqual(type(handler.p), HtmlPage)
 
-        self.assertTrue(handler.options.use_selenium_headless)
+        self.assertTrue(handler.options.use_headless_browser)
 
     def test_get_warhammer_community(self):
         handler = UrlHandler("https://www.warhammer-community.com")
 
         self.assertEqual(type(handler.p), HtmlPage)
 
-        self.assertTrue(handler.options.use_selenium_full)
+        self.assertTrue(handler.options.use_full_browser)
 
     def test_get__defcon_org(self):
         handler = UrlHandler("https://defcon.org")
 
         self.assertEqual(type(handler.p), HtmlPage)
 
-        self.assertTrue(handler.options.use_selenium_full)
+        self.assertTrue(handler.options.use_full_browser)
 
     def test_get_cleaned_link_stupid_google_link(self):
         cleaned_link = UrlHandler.get_cleaned_link(
