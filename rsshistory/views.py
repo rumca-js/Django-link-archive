@@ -10,7 +10,7 @@ from .configuration import Configuration
 from .apps import LinkDatabase
 from .configuration import Configuration
 from .pluginurl.urlhandler import UrlHandler
-from .webtools import HtmlPage, RssPage
+from .webtools import HtmlPage, RssPage, InternetPageHandler
 
 
 class ViewPage(object):
@@ -133,17 +133,19 @@ class ViewPage(object):
 
         return self.render_implementation(template)
 
-    def fill_context_type(context, url=None, fast_check=True, handler=None):
-        if handler is None and url:
-            handler = UrlHandler.get_type(url)
+    def fill_context_type(context, url=None, fast_check=True, urlhandler=None):
+        if urlhandler is None and url:
+            urlhandler = UrlHandler(url)
 
-        context["is_youtube_video"] = type(handler) == UrlHandler.youtube_video_handler
+        context["is_youtube_video"] = type(urlhandler.get_handler()) == UrlHandler.youtube_video_handler
         context["is_youtube_channel"] = (
-            type(handler) == UrlHandler.youtube_channel_handler
+            type(urlhandler.get_handler()) == UrlHandler.youtube_channel_handler
         )
-        context["is_odysee_video"] = type(handler) == UrlHandler.odysee_video_handler
+        context["is_odysee_video"] = type(urlhandler.get_handler()) == UrlHandler.odysee_video_handler
         context["is_odysee_channel"] = (
-            type(handler) == UrlHandler.odysee_channel_handler
+            type(urlhandler.get_handler()) == UrlHandler.odysee_channel_handler
         )
-        context["is_html"] = type(handler) == HtmlPage
-        context["is_rss"] = type(handler) == RssPage
+
+        if type(urlhandler.get_handler()) == InternetPageHandler:
+            context["is_html"] = type(urlhandler.get_handler().p) == HtmlPage
+            context["is_rss"] = type(urlhandler.get_handler().p) == RssPage

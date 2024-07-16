@@ -42,7 +42,6 @@
     {%endfor%}
     <li>Allowed by robots.txt? {{is_link_allowed}}</li>
 
-    <li>Selenium: {{page_handler.options.is_selenium}}</li>
     <li>Options str: {{page_handler.options.get_str}}</li>
 </ul>
 
@@ -64,4 +63,4 @@
 <a class="btn btn-secondary" data-bs-toggle="collapse" href="#collapseContents" role="button" aria-expanded="false" aria-controls="collapseContents">
     Show Details
 </a>
-<div class="collapse" id="collapseContents"><pre>{{page_object.contents}}</pre></div>
+<div class="collapse" id="collapseContents"><pre>{{page_handler.get_contents}}</pre></div>

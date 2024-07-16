@@ -30,12 +30,20 @@ def page_show_properties(request):
 
     def show_page_props_internal(requests, page_link):
         options = UrlHandler.get_url_options(page_link)
+
+        if "method" in request.GET and request.GET["method"] == "headless":
+            options.use_headless_browser = True
+        if "method" in request.GET and request.GET["method"] == "full":
+            options.use_full_browser = True
+
         options.fast_parsing = False
 
         page_handler = UrlHandler(page_link, page_options=options)
-        ViewPage.fill_context_type(p.context, handler=page_handler.p)
+        page_handler.get_response()
 
-        page_object = page_handler.p
+        ViewPage.fill_context_type(p.context, urlhandler=page_handler)
+
+        page_object = page_handler.get_handler()
 
         # fast check is disabled. We want to make sure based on contents if it is RSS or HTML
         p.context["page_object"] = page_object

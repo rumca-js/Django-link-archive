@@ -128,9 +128,14 @@ class SourceDetailView(generic.DetailView):
         context = super().get_context_data(**kwargs)
         context = ViewPage(self.request).init_context(context)
 
+        handler = UrlHandler(self.object.url)
+
         context["page_title"] = self.object.title
         context["page_thumbnail"] = self.object.favicon
         context["search_engines"] = SearchEngines(self.object.title, self.object.url)
+        context["page_handler"] = handler.get_handler()
+
+        ViewPage.fill_context_type(context, urlhandler=handler)
 
         c = Configuration.get_object()
         if hasattr(self.object, "dynamic_data"):

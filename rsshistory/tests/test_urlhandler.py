@@ -1,6 +1,6 @@
 from ..pluginurl.urlhandler import UrlHandler
 from ..pluginurl.handlervideoyoutube import YouTubeVideoHandler
-from ..webtools import RssPage, HtmlPage
+from ..webtools import RssPage, HtmlPage, InternetPageHandler
 
 from .fakeinternet import FakeInternetTestCase
 
@@ -11,31 +11,35 @@ class UrlHandlerTest(FakeInternetTestCase):
 
     def test_get_rss(self):
         handler = UrlHandler("https://rsspage.com/rss.xml")
+        handler.get_response()
 
         self.assertTrue(handler.is_valid())
-        self.assertEqual(type(handler.p), RssPage)
+        self.assertEqual(type(handler.get_handler()), InternetPageHandler)
+        self.assertEqual(type(handler.get_handler().p), RssPage)
 
     def test_get_html(self):
         handler = UrlHandler("https://linkedin.com")
+        handler.get_response()
 
         self.assertTrue(handler.is_valid())
-        self.assertEqual(type(handler.p), HtmlPage)
+        self.assertEqual(type(handler.get_handler()), InternetPageHandler)
+        self.assertEqual(type(handler.get_handler().p), HtmlPage)
 
     def test_get_youtube_video(self):
         handler = UrlHandler("https://www.youtube.com/watch?v=1234")
 
-        self.assertEqual(type(handler.p), UrlHandler.youtube_video_handler)
+        self.assertEqual(type(handler.get_handler()), UrlHandler.youtube_video_handler)
 
     def test_get_youtube_channel(self):
         handler = UrlHandler(
             "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM"
         )
 
-        self.assertEqual(type(handler.p), UrlHandler.youtube_channel_handler)
+        self.assertEqual(type(handler.get_handler()), UrlHandler.youtube_channel_handler)
 
     def test_rss_get_properties(self):
         handler = UrlHandler("https://simple-rss-page.com/rss.xml")
-
+        handler.get_response()
         props = handler.get_properties()
 
         self.assertEqual(props["title"], "Simple title")
@@ -43,6 +47,7 @@ class UrlHandlerTest(FakeInternetTestCase):
 
     def test_html_get_properties(self):
         handler = UrlHandler("https://linkedin.com")
+        handler.get_response()
 
         props = handler.get_properties()
 
@@ -53,8 +58,10 @@ class UrlHandlerTest(FakeInternetTestCase):
         handler = UrlHandler(
             "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM"
         )
+        handler.get_response()
 
-        props = handler.p.get_properties()
+        props = handler.get_properties()
+        print(props)
 
         self.assertEqual(props["title"], "SAMTIME on Odysee")
 
@@ -62,27 +69,34 @@ class UrlHandlerTest(FakeInternetTestCase):
         handler = UrlHandler(
             "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM"
         )
+        handler.get_response()
 
-        self.assertEqual(handler.p.get_title(), "SAMTIME on Odysee")
+        self.assertEqual(handler.get_title(), "SAMTIME on Odysee")
 
     def test_get_spotify(self):
         handler = UrlHandler("https://open.spotify.com/somebody/episodes")
+        handler.get_response()
 
-        self.assertEqual(type(handler.p), HtmlPage)
+        self.assertEqual(type(handler.get_handler()), InternetPageHandler)
+        self.assertEqual(type(handler.get_handler().p), HtmlPage)
 
         self.assertTrue(handler.options.use_headless_browser)
 
     def test_get_warhammer_community(self):
         handler = UrlHandler("https://www.warhammer-community.com")
+        handler.get_response()
 
-        self.assertEqual(type(handler.p), HtmlPage)
+        self.assertEqual(type(handler.get_handler()), InternetPageHandler)
+        self.assertEqual(type(handler.get_handler().p), HtmlPage)
 
         self.assertTrue(handler.options.use_full_browser)
 
     def test_get__defcon_org(self):
         handler = UrlHandler("https://defcon.org")
+        handler.get_response()
 
-        self.assertEqual(type(handler.p), HtmlPage)
+        self.assertEqual(type(handler.get_handler()), InternetPageHandler)
+        self.assertEqual(type(handler.get_handler().p), HtmlPage)
 
         self.assertTrue(handler.options.use_full_browser)
 

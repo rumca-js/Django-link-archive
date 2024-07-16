@@ -118,12 +118,11 @@ def date_str_to_date(date_str):
             stack_lines = traceback.format_stack()
             stack_str = "".join(stack_lines)
 
-            error_text = traceback.format_exc()
-
-            detail_text = "Exc:{}\n{}\nStack:{}".format(error_text, stack_str)
+            # we want to know who generated this issue
+            detail_text = "Exception Data:{}\nStack:{}".format(str(E), stack_str)
 
             AppLogging.warning(
-                "Could not parse date:{}\n".format(date_str, str(E), ),
+                "Could not parse date:{}\n".format(date_str),
                 detail_text = detail_text,
             )
 
@@ -302,6 +301,9 @@ class DomainAwarePage(object):
             return parts[0]
 
     def is_domain(self):
+        if not self.url:
+            return False
+
         url = self.get_full_url()
         if url == self.get_domain():
             return True
@@ -966,7 +968,7 @@ class ContentInterface(object):
 
 
 class DefaultContentPage(ContentInterface):
-    def __init__(self, url, contents):
+    def __init__(self, url, contents = ""):
         super().__init__(url=url, contents=contents)
 
     def get_title(self):
@@ -998,6 +1000,9 @@ class DefaultContentPage(ContentInterface):
 
     def is_valid(self):
         return True
+
+    def get_response(self):
+        return ""
 
 
 class JsonPage(ContentInterface):
@@ -1555,7 +1560,8 @@ class ContentLinkParser(ContentInterface):
         for link in links:
             p = DomainAwarePage(link)
             new_link = p.get_domain()
-            result.add(new_link)
+            if new_link:
+                result.add(new_link)
 
         return result
 
@@ -2107,7 +2113,7 @@ class HtmlPage(ContentInterface):
         body = self.get_body_text()
 
         if body == "":
-            AppLogging.error("HTML: Empty body")
+            AppLogging.error("Page:{}: HTML: Empty body".format(self.url))
             return calculate_hash("no body hash")
         elif body:
             return calculate_hash(body)
@@ -3075,9 +3081,6 @@ class RequestBuilder(object):
         return p.get()
 
     def ping(self, timeout_s=5):
-        """
-        Checks if page is available or not
-        """
         url = self.url
 
         if url is None:
@@ -3211,37 +3214,40 @@ class RequestBuilder(object):
         return status_code >= 200 and status_code < 300
 
 
-class Url(ContentInterface):
-    """
-    Encapsulates data page, and builder to make request
-    """
-    def __init__(self, url=None, page_object=None, page_options=None):
+class InternetPageHandler(ContentInterface):
+
+    def __init__(self, url=None, page_options=None):
+        super().__init__(url=url, contents=None)
+
+        self.p = None # page contents object, HtmlPage, RssPage, or whathver
         self.response = None
-        self.options = None
-        self.robots_contents = None
+        self.options = page_options
 
-        if page_object:
-            self.url = page_object.url
-        elif url:
-            self.url = url
+    def get_contents(self): 
+        if self.response and self.response.get_contents():
+            return self.response.get_contents()
 
-        self.p = self.get_handler(
-            url, page_object=page_object, page_options=page_options
-        )
+        return self.get_contents_implementation()
 
-    def get_handler(self, url=None, page_object=None, page_options=None):
-        contents = None
+    def get_contents_implementation(self): 
+        self.p = self.get_page_handler_simple()
 
-        if url is None:
-            url = page_object.url
+        if self.is_advanced_processing_possible():
+            self.options.use_headless_browser = True
+            self.p = self.get_page_handler_simple()
+
+        if self.response:
+            return self.response.get_contents()
+
+    def get_page_handler_simple(self): 
+        url = self.url
 
         dap = DomainAwarePage(url)
 
         if url.startswith("https") or url.startswith("http"):
             if not dap.is_media():
-                p = RequestBuilder(url=url, options=page_options, page_object=page_object)
+                p = RequestBuilder(url=url, options=self.options)
                 self.response = p.get_response()
-                self.options = p.options
                 contents = p.get_contents()
 
                 if not p.is_valid():
@@ -3287,6 +3293,35 @@ class Url(ContentInterface):
             p = DefaultContentPage(url, contents)
             return p
 
+    def is_advanced_processing_possible(self):
+        """
+        If we do not have data, but we think we can do better
+        """
+        if not self.response:
+            return True
+
+        status_code = self.response.get_status_code()
+
+        if status_code < 200 or status_code > 404:
+            return False
+
+        if not self.options.use_basic_crawler():
+            return False
+
+        if not self.p:
+            return True
+
+        if self.p and self.p.is_cloudflare_protected():
+            return True
+
+        if not self.p.is_valid():
+            # if we have response, but it is invalid, we may try obtaining contents with more advanced processing
+            return True
+        return False
+
+    def is_status_code_redirect(self, status_code):
+        return (status_code >= 300 and status_code < 400) or status_code == 403
+
     def is_html(self):
         if (
             self.response
@@ -3302,91 +3337,6 @@ class Url(ContentInterface):
             and self.response.is_content_rss()
         ):
             return True
-
-    def get_type(url):
-        """
-        Based on link structure identify type.
-        Should provide a faster means of obtaining handler, without the need
-        to obtain the page
-        """
-        # based on link 'appearance'
-
-        page_type = DomainAwarePage(url).get_type()
-
-        if page_type == URL_TYPE_HTML:
-            return HtmlPage(url, "")
-
-        if page_type == URL_TYPE_RSS:
-            return RssPage(url, "")
-
-    def is_url_valid(self):
-        return True
-
-    def is_valid(self):
-        if not self.p:
-            return False
-
-        if not self.is_url_valid():
-            return False
-
-        # not valid HTTP response
-        response = self.response
-        if not response or not response.is_valid():
-            return False
-
-        return self.p.is_valid()
-
-    def is_domain(self):
-        p = DomainAwarePage(self.url)
-        return p.is_domain()
-
-    def get_domain(self):
-        if self.is_domain():
-            return self
-        else:
-            return Url(self.p.get_domain(), self.p.options)
-
-    def get_robots_txt_url(self):
-        return DomainAwarePage(self.url).get_robots_txt_url()
-
-    def get_favicon(self):
-        if self.p:
-            if type(self.p) is HtmlPage:
-                favs = self.p.get_favicons()
-                if favs and len(favs) > 0:
-                    return list(favs.keys())[0]
-
-        p = DomainAwarePage(self.url)
-        if p.is_domain():
-            return
-
-        domain = p.get_domain()
-        return Url(domain).get_favicon()
-
-    def is_web_link(url):
-        p = DomainAwarePage(url)
-        return p.is_web_link()
-
-    def get_cleaned_link(url):
-        if not url:
-            return
-
-        if url.endswith("/"):
-            url = url[:-1]
-        if url.endswith("."):
-            url = url[:-1]
-
-        # domain is lowercase
-        p = DomainAwarePage(url)
-        domain = p.get_domain()
-        if not domain:
-            AppLogging.error("Could not obtain domain for:{}".format(url))
-            return
-
-        domain_lower = domain.lower()
-
-        url = domain_lower + url[len(domain) :]
-        return url
 
     def get_title(self):
         if not self.p:
@@ -3461,17 +3411,22 @@ class Url(ContentInterface):
 
         return [rating, 10]
 
-    def get_contents(self):
-        if not self.p:
-            return
-
-        return self.p.get_contents()
-
     def get_status_code(self):
         if not self.response:
             return PageResponseObject.STATUS_CODE_UNDEF
 
         return self.response.status_code
+
+    def is_valid(self):
+        if not self.p:
+            return False
+
+        # not valid HTTP response
+        response = self.response
+        if not response or not response.is_valid():
+            return False
+
+        return self.p.is_valid()
 
     def is_cloudflare_protected(self):
         if not self.p:
@@ -3480,7 +3435,172 @@ class Url(ContentInterface):
         return self.p.is_cloudflare_protected()
 
     def get_response(self):
-        return self.response
+        if self.response:
+            return self.response
+
+        self.get_contents_implementation()
+
+        if self.response:
+            return self.response
+
+    def get_favicon(self):
+        if self.p:
+            if type(self.p) is HtmlPage:
+                favs = self.p.get_favicons()
+                if favs and len(favs) > 0:
+                    return list(favs.keys())[0]
+
+
+class Url(ContentInterface):
+    """
+    Encapsulates data page, and builder to make request
+    """
+    def __init__(self, url=None, page_object=None, page_options=None):
+        if page_object:
+            self.url = page_object.url
+        else:
+            self.url = url
+
+        self.options = self.get_init_page_options(page_options)
+
+        self.handler = None
+        self.response = None
+        self.contents = None
+
+    def get_init_page_options(self, initial_options = None):
+        options = PageOptions()
+
+        if initial_options and initial_options.use_headless_browser:
+            options.use_headless_browser = initial_options.use_headless_browser
+        if initial_options and initial_options.use_full_browser:
+            options.use_full_browser = initial_options.use_full_browser
+
+        return options
+
+    def get_contents(self):
+        if self.contents:
+            return self.contents
+
+        self.handler = self.get_handler_implementation()
+        if self.handler:
+            self.contents = self.handler.get_contents()
+            self.response = self.handler.get_response()
+
+            return self.contents
+
+    def get_response(self):
+        if self.response:
+            return self.response
+
+        self.handler = self.get_handler_implementation()
+        if self.handler:
+            self.response = self.handler.get_response()
+            self.contents = self.handler.get_contents()
+
+            return self.response
+
+    def get_handler(self):
+        """
+        This function does not fetch anything by itself
+        """
+        if self.handler:
+            return self.handler
+
+        self.handler = self.get_handler_implementation()
+        return self.handler
+
+    def get_type(url):
+        """
+        Based on link structure identify type.
+        Should provide a faster means of obtaining handler, without the need
+        to obtain the page
+        """
+        # based on link 'appearance'
+
+        page_type = DomainAwarePage(url).get_type()
+
+        if page_type == URL_TYPE_HTML:
+            return HtmlPage(url, "")
+
+        if page_type == URL_TYPE_RSS:
+            return RssPage(url, "")
+
+    def get_handler_implementation(self):
+        contents = None
+        url = self.url
+
+        if url.startswith("https") or url.startswith("http"):
+            return InternetPageHandler(url, page_options=self.options)
+        elif url.startswith("smb") or url.startswith("ftp"):
+            return DefaultContentPage(url)
+
+    def is_url_valid(self):
+        return True
+
+    def is_domain(self):
+        p = DomainAwarePage(self.url)
+        return p.is_domain()
+
+    def get_domain(self):
+        if self.is_domain():
+            return self
+        else:
+            p = DomainAwarePage(self.url)
+            return Url(p.get_domain(), self.p.options)
+
+    def get_robots_txt_url(self):
+        return DomainAwarePage(self.url).get_robots_txt_url()
+
+    def get_favicon(self):
+        self.get_response()
+        if not self.response:
+            return
+
+        if not self.url:
+            return
+
+        p = DomainAwarePage(self.url)
+        if not p.is_web_link():
+            return
+
+        if self.handler:
+            favicon = self.handler.get_favicon()
+            if favicon:
+                return favicon
+
+        p = DomainAwarePage(self.url)
+        if p.is_domain():
+            return
+
+        domain = p.get_domain()
+        url = Url(domain)
+
+        return url.get_favicon()
+
+    def is_web_link(url):
+        p = DomainAwarePage(url)
+        return p.is_web_link()
+
+    def get_cleaned_link(url):
+        if not url:
+            return
+
+        if url.endswith("/"):
+            url = url[:-1]
+        if url.endswith("."):
+            url = url[:-1]
+
+        # domain is lowercase
+        p = DomainAwarePage(url)
+        domain = p.get_domain()
+        if not domain:
+            AppLogging.error("Could not obtain domain for:{}".format(url))
+            return
+
+        domain_lower = domain.lower()
+
+        url = domain_lower + url[len(domain) :]
+        return url
 
     def get_domain_info(self):
         return DomainCache.get_object(self.url)
@@ -3490,6 +3610,65 @@ class Url(ContentInterface):
 
         wget = Wget(url)
         wget.download_all()
+
+    def __str__(self):
+        return "{}".format(self.options)
+
+    def is_valid(self):
+        if not self.handler:
+            return False
+
+        if not self.is_url_valid():
+            return False
+
+        if self.response is None:
+            return False
+
+        if self.response and not self.response.is_valid():
+            return False
+
+        if not self.handler.is_valid():
+            return False
+
+        return True
+
+    def get_title(self):
+        if self.handler:
+            return self.handler.get_title()
+
+    def get_description(self):
+        if self.handler:
+            return self.handler.get_description()
+
+    def get_language(self):
+        if self.handler:
+            return self.handler.get_language()
+
+    def get_thumbnail(self):
+        if self.handler:
+            return self.handler.get_thumbnail()
+
+    def get_author(self):
+        if self.handler:
+            return self.handler.get_author()
+
+    def get_album(self):
+        if self.handler:
+            return self.handler.get_album()
+
+    def get_tags(self):
+        if self.handler:
+            return self.handler.get_tags()
+
+    def get_date_published(self):
+        if self.handler:
+            return self.handler.get_date_published()
+
+    def get_status_code(self):
+        if self.response:
+            return self.response.get_status_code()
+
+        return 0
 
 
 class DomainCacheInfo(object):

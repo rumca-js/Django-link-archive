@@ -5,20 +5,22 @@
 
   <div class="container">
     {% for entry in transitions %}
-       <a href="{{ entry.get_absolute_url }}" title="{{ entry.title }}" class="my-1">
-       <div class="d-flex">
-          {% if user_config.show_icons%}
-             <div>
-               {% if user_config.thumbnails_as_icons %}
-                 <img src="{{entry.get_thumbnail}}" class="rounded icon-normal"/>
-               {% else %}
-                 <img src="{{entry.get_favicon}}" class="rounded icon-normal"/>
-               {% endif %}
+       <div class="my-1">
+          <a href="{{ entry.get_absolute_url }}" title="{{ entry.title }}">
+             <div class="d-flex">
+                {% if user_config.show_icons%}
+                   <div>
+                     {% if user_config.thumbnails_as_icons %}
+                       <img src="{{entry.get_thumbnail}}" class="rounded icon-normal"/>
+                     {% else %}
+                       <img src="{{entry.get_favicon}}" class="rounded icon-normal"/>
+                     {% endif %}
+                   </div>
+                   <div>{{entry.title}}</div>
+                {% endif %}
              </div>
-             <div>{{entry.title}}</div>
-          {% endif %}
+          </a>
        </div>
-       </a>
     {% endfor %}
   </div>
 

@@ -4,9 +4,9 @@ from ..configuration import Configuration
 from ..models import AppLogging
 
 from ..dateutils import DateUtils
-from ..webtools import HtmlPage, RssPage, DomainAwarePage, Url, DefaultContentPage
+from ..webtools import HtmlPage, RssPage, DomainAwarePage, Url, DefaultContentPage, InternetPageHandler
 
-from .urlhandler import UrlHandler
+from .urlhandler import UrlHandler, UrlAgeModerator
 
 
 class YouTubeException(Exception):
@@ -38,7 +38,7 @@ class EntryUrlInterface(object):
 
     def make_request(self):
         self.h = UrlHandler(self.url, page_options=self.options)
-        self.response = self.h.response
+        self.response = self.h.get_response()
 
         if self.response:
             self.url = self.response.url
@@ -46,9 +46,6 @@ class EntryUrlInterface(object):
         if not self.ignore_errors and not self.h.is_valid():
             if self.log:
                 AppLogging.error("Page is invalid:{}".format(url))
-            self.p = None
-        else:
-            self.p = self.h.p
 
     def get_response(self):
         return self.response
@@ -56,6 +53,9 @@ class EntryUrlInterface(object):
     def get_props(self, input_props=None, source_obj=None):
         if not input_props:
             input_props = {}
+
+        if not self.ignore_errors and not self.h.is_valid():
+            return
 
         ignore_errors = self.ignore_errors
         props = self.get_props_implementation(input_props, source_obj)
@@ -93,7 +93,7 @@ class EntryUrlInterface(object):
         if not input_props:
             input_props = {}
 
-        if not self.p:
+        if not self.h:
             return None
 
         if not self.is_property_set(input_props, "source"):
@@ -101,7 +101,7 @@ class EntryUrlInterface(object):
                 input_props["source"] = source_obj.url
 
         is_domain = DomainAwarePage(self.url).is_domain()
-        p = self.p
+        handler = self.h.get_handler()
 
         c = Configuration.get_object().config_entry
 
@@ -121,14 +121,18 @@ class EntryUrlInterface(object):
         if not self.is_property_set(input_props, "source") and source_obj:
             input_props["source"] = source_obj.url
 
-        if type(p) is UrlHandler.youtube_video_handler:
-            if p.get_video_code():
+        if type(handler) is UrlHandler.youtube_video_handler:
+            if handler.get_video_code():
                 return self.get_youtube_props(input_props, source_obj)
 
-        if type(p) is HtmlPage:
-            return self.get_htmlpage_props(input_props, source_obj)
+        if type(handler) is InternetPageHandler:
+            if type(handler.p) is HtmlPage:
+                return self.get_htmlpage_props(input_props, source_obj)
 
-        if type(p) is RssPage or type(p) is UrlHandler.youtube_channel_handler:
+            if type(handler.p) is RssPage:
+                return self.get_rsspage_props(input_props, source_obj)
+
+        if type(handler) is UrlHandler.youtube_channel_handler:
             return self.get_rsspage_props(input_props, source_obj)
 
         # TODO provide RSS support
@@ -137,10 +141,10 @@ class EntryUrlInterface(object):
         """
         TODO how to make this check automatically?
         """
-        if not self.p:
+        if not self.h:
             return None
 
-        p = self.p
+        p = self.h.get_handler()
 
         if type(p) is not DefaultContentPage:
             return True
@@ -164,7 +168,7 @@ class EntryUrlInterface(object):
 
         url = self.url
 
-        p = self.p
+        p = self.h.get_handler()
 
         source_url = p.get_channel_feed_url()
         if source_url is None:
@@ -210,7 +214,7 @@ class EntryUrlInterface(object):
 
         url = self.url
 
-        p = self.p
+        p = self.h.get_handler()
 
         # some pages return invalid code / information. let the user decide
         # what to do about it
@@ -256,7 +260,7 @@ class EntryUrlInterface(object):
 
         url = self.url
 
-        p = self.p
+        p = self.h.get_handler()
 
         if not self.is_property_set(input_props, "link"):
             input_props["link"] = p.url
@@ -294,7 +298,7 @@ class EntryUrlInterface(object):
 
         url = self.url
         h = self.h
-        p = self.p
+        p = self.h.get_handler()
 
         if not self.is_property_set(input_props, "link"):
             input_props["link"] = self.url
@@ -323,6 +327,13 @@ class EntryUrlInterface(object):
         if not self.is_property_set(input_props, "date_last_modified"):
             if self.response:
                 input_props["date_last_modified"] = self.response.get_last_modified()
+
+        if not self.is_property_set(input_props, "age"):
+            if self.is_property_set(input_props, "title") and self.is_property_set(input_props, "description"):
+                properties = {"title" : input_props["title"],
+                              "description" : input_props["description"]}
+                moderator = UrlAgeModerator(properties=properties)
+                input_props["age"] = moderator.get_age()
 
         """
         Sometimes we want thumbnail sometimes we want favicon.

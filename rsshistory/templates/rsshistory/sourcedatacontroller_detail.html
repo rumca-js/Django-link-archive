@@ -3,7 +3,7 @@
 {% block content %}
 
 <h1 class="link-title">
-    <a href="{{ object.get_entry_url }}">
+    <a href="{{ object.url }}">
        <div class="d-flex">
            {% if user_config.show_icons %}
              <img src="{{object.get_favicon}}" class="link-detail-thumbnail border rounded"/>
@@ -14,10 +14,6 @@
        </div>
     </a>
 </h1>
-
-{% if is_youtube_channel %}
-<a href="{{ page_object.get_channel_url }}">{{ page_object.get_channel_url }}</a>
-{% endif %}
 
 <div>
   <a href="{{ object.url }}">{{ object.url }}</a>

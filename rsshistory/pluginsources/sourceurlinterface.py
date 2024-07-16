@@ -1,4 +1,4 @@
-from ..webtools import HtmlPage, RssPage, Url, JsonPage, PageOptions
+from ..webtools import HtmlPage, RssPage, Url, JsonPage, PageOptions, InternetPageHandler
 from ..models import (
     SourceDataModel,
 )
@@ -14,24 +14,21 @@ class SourceUrlInterface(object):
     def __init__(self, url, fast_check=True, use_headless_browser=False):
         self.url = UrlHandler.get_cleaned_link(url)
 
-        options = UrlHandler.get_url_options(url)
+        options = UrlHandler(url).get_init_page_options()
         options.fast_parsing = fast_check
         options.use_headless_browser = use_headless_browser
 
         self.h = UrlHandler(self.url, page_options=options)
+        self.response = self.h.get_response()
+
         if self.h.response:
             self.url = self.h.response.url
-
-        if not self.h.is_valid():
-            self.p = None
-        else:
-            self.p = self.h.p
 
     def get_props(self, input_props=None):
         if not input_props:
             input_props = {}
 
-        if self.p is None:
+        if self.h is None:
             return input_props
 
         props = self.get_props_internal(input_props)
@@ -50,62 +47,65 @@ class SourceUrlInterface(object):
         return props
 
     def get_props_internal(self, input_props=None):
-        p = self.p
+        handler = self.h.get_handler()
 
-        if type(p) is RssPage or type(p) is UrlHandler.youtube_channel_handler:
+        if type(handler) is InternetPageHandler and type(handler.p) is RssPage:
             return self.get_props_from_rss(input_props)
-        elif type(p) is UrlHandler.youtube_video_handler:
+        elif type(handler) is UrlHandler.youtube_channel_handler:
+            return self.get_props_from_rss(input_props)
+        elif type(handler) is UrlHandler.youtube_video_handler:
             # Someone might be surprised that added URL is being replaced
-            self.url = p.get_channel_feed_url()
+            self.url = handler.get_channel_feed_url()
             self.h = UrlHandler(self.url)
-            self.p = self.h.p
 
             return self.get_props_from_rss(input_props)
-        elif type(p) is HtmlPage and p.get_rss_url():
+        if type(handler) is InternetPageHandler and type(handler.p) is HtmlPage and handler.p.get_rss_url():
             # Someone might be surprised that added URL is being replaced
-            self.url = self.h.p.get_rss_url()
-            self.h = UrlHandler(self.url)
-            self.p = self.h.p
+            self.url = handler.p.get_rss_url()
 
-            if type(self.p) is RssPage:
+            handler = UrlHandler(self.url)
+            self.h = handler
+
+            if type(handler) is InternetPageHandler and type(handler.p) is RssPage:
+                return self.get_props_from_rss(input_props)
+            elif type(handler) is UrlHandler.youtube_channel_handler:
                 return self.get_props_from_rss(input_props)
             else:
                 return self.get_props_from_page(input_props)
-        elif type(p) is JsonPage:
+        if type(handler) is InternetPageHandler and type(handler.p) is JsonPage:
             return self.get_props_from_json(input_props)
         else:
             return self.get_props_from_page(input_props)
 
     def get_props_from_rss(self, input_props=None):
-        p = self.p
+        h = self.h
         url = self.url
 
         input_props["url"] = self.url
 
-        if type(p) is UrlHandler.youtube_channel_handler:
+        if type(h) is UrlHandler.youtube_channel_handler:
             input_props["source_type"] = SourceDataModel.SOURCE_TYPE_YOUTUBE
         else:
             input_props["source_type"] = SourceDataModel.SOURCE_TYPE_RSS
 
-        title = p.get_title()
-        print("title: {}".format(title))
+        title = h.get_title()
         if title:
             input_props["title"] = title
-        description = p.get_description()
+        description = h.get_description()
         if description:
             input_props["description"] = description
-        language = p.get_language()
+        language = h.get_language()
         if language:
             input_props["language"] = language
-        thumb = p.get_thumbnail()
+        thumb = h.get_thumbnail()
         if thumb:
             input_props["favicon"] = thumb
         return input_props
 
     def get_props_from_json(self, input_props):
-        p = self.p
+        h = self.h
 
-        j = JsonPage(p.url, p.get_contents())
+        j = JsonPage(h.url, h.get_contents())
 
         if "source" in j.json_obj:
             return self.get_props_from_json_source(input_props, j)
@@ -119,7 +119,6 @@ class SourceUrlInterface(object):
             return input_props
 
     def get_props_from_json_source(self, input_props, j):
-        p = self.p
         url = self.url
 
         source_obj = j.json_obj["source"]
@@ -154,7 +153,7 @@ class SourceUrlInterface(object):
         return input_props
 
     def get_props_from_page(self, input_props):
-        p = self.p
+        p = self.h
 
         input_props["url"] = p.url
         # if we do not know what to do with it, we can always collect links from within

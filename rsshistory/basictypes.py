@@ -10,7 +10,7 @@ def get_ascii_text(text):
     return thebytes.decode()
 
 
-def fix_path_for_windows(file_path):
+def fix_path_for_windows(file_path, max_path = 260, limit=False):
     """
     @param file_path needs to be string
     """
@@ -28,10 +28,17 @@ def fix_path_for_windows(file_path):
     for item in chars:
         file_path = file_path.replace(item, "")
 
+    # remove duplicate white spaces?
     file_path = " ".join(file_path.split())
     file_path = file_path.strip()
 
-    return file_path
+    parts = os.path.splitext(file_path)
+    if len(parts) < 2:
+        return file_path
+
+    parts0 = parts[0][:max_path-1]
+
+    return parts0 + parts[1]
 
 
 def get_directory_size_bytes(start_path="."):

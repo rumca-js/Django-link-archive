@@ -1,4 +1,4 @@
-from ..webtools import Url, PageOptions, HtmlPage, PageResponseObject
+from ..webtools import Url, PageOptions, HtmlPage, PageResponseObject, InternetPageHandler
 
 from .fakeinternet import FakeInternetTestCase, MockRequestCounter
 
@@ -149,20 +149,56 @@ class UrlTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 
+    def test_get_contents__pass(self):
+        url = Url("https://multiple-favicons/page.html")
+        # call tested function
+        contents = url.get_contents()
+        self.assertTrue(contents != None)
+
+    def test_get_page_options(self):
+        page_options = PageOptions()
+        page_options.use_full_browser = True
+
+        url = Url("https://multiple-favicons/page.html", page_options = page_options)
+        # call tested function
+        options = url.options
+        self.assertTrue(options.use_full_browser)
+
+        page_options = PageOptions()
+        page_options.use_headless_browser = True
+
+        url = Url("https://multiple-favicons/page.html", page_options = page_options)
+        # call tested function
+        options = url.options
+        self.assertTrue(options.use_headless_browser)
+
+    def test_get_contents__fails(self):
+        url = Url("https://page-with-http-status-500.com")
+
+        # call tested function
+        contents = url.get_contents()
+        self.assertFalse(url.is_valid())
+
     def test_p_is_html(self):
         MockRequestCounter.mock_page_requests = 0
 
-        # call tested function
         url = Url("https://multiple-favicons/page.html")
+        url.get_response()
 
-        self.assertEqual(type(url.p), HtmlPage)
+        self.assertEqual(type(url.get_handler()), InternetPageHandler)
+        # call tested function
+        self.assertEqual(type(url.get_handler().p), HtmlPage)
+
         self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
     def test_is_valid__true(self):
         MockRequestCounter.mock_page_requests = 0
         url = Url("https://multiple-favicons/page.html")
 
-        self.assertEqual(type(url.p), HtmlPage)
+        self.assertEqual(url.get_handler().p, None)
+        url.get_response()
+
+        self.assertEqual(type(url.get_handler().p), HtmlPage)
 
         # call tested function
         self.assertTrue(url.is_valid())
@@ -175,7 +211,13 @@ class UrlTest(FakeInternetTestCase):
         link = "https://multiple-favicons/page.html"
         url = Url(link)
 
-        self.assertEqual(type(url.p), HtmlPage)
+        self.assertEqual(type(url.get_handler()), InternetPageHandler)
+
+        self.assertEqual(url.get_handler().p, None)
+        url.get_response()
+
+        self.assertEqual(type(url.get_handler().p), HtmlPage)
+
         url.response = PageResponseObject(link, None, status_code=500)
 
         # call tested function
@@ -187,8 +229,13 @@ class UrlTest(FakeInternetTestCase):
         MockRequestCounter.mock_page_requests = 0
         url = Url("https://multiple-favicons/page.html")
 
-        self.assertEqual(type(url.p), HtmlPage)
-        url.p = None
+        self.assertEqual(type(url.get_handler()), InternetPageHandler)
+
+        self.assertEqual(url.get_handler().p, None)
+        url.get_response()
+
+        self.assertEqual(type(url.get_handler().p), HtmlPage)
+        url.handler.p = None
 
         self.assertFalse(url.is_valid())
 
@@ -213,7 +260,7 @@ class UrlTest(FakeInternetTestCase):
 
         self.assertEqual(handler.options.use_full_browser, True)
 
-        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
     def test_get_for_page_youtube(self):
         MockRequestCounter.mock_page_requests = 0
@@ -224,7 +271,7 @@ class UrlTest(FakeInternetTestCase):
 
         self.assertEqual(handler.options.use_headless_browser, True)
 
-        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
     def test_get_last_modified(self):
         MockRequestCounter.mock_page_requests = 0
@@ -237,6 +284,8 @@ class UrlTest(FakeInternetTestCase):
 
         last_modified = response.get_last_modified()
         self.assertTrue(last_modified)
+
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
     def test_cache_info__is_allowed(self):
         MockRequestCounter.mock_page_requests = 0

@@ -24,13 +24,11 @@ class SourceGenericPlugin(object):
         self.source_id = source_id
         self.source = None
         self.contents = None
+        self.content_handler = None
         self.response = None
         self.dead = False
 
-        source = self.get_source()
-
-        if source:
-            options = UrlHandler.get_url_options(source.url)
+        self.get_source()
 
         self.hash = None
 
@@ -178,8 +176,11 @@ class SourceGenericPlugin(object):
             return
 
         handler = UrlHandler(self.get_address())
+
         contents = handler.get_contents()
         self.response = handler.response
+        self.content_handler = handler
+
         status_code = None
         if self.response:
             status_code = self.response.status_code
@@ -191,7 +192,7 @@ class SourceGenericPlugin(object):
                 info_text = "Source:{} Title:{}; Could not obtain contents.".format(
                     source.url, source.title,
                 ),
-                detail_text = "Status code:{}\nContents\n{}".format(status_code, contents,)
+                detail_text = "Status code:{}\nOptions:{}\nContents\n{}".format(status_code, str(handler.options), contents,)
             )
             self.dead = True
             return None

@@ -66,7 +66,6 @@
     <li>Link outer: {{link}} <a href="{{link}}">{{link}}</a></li>
     {%endfor%}
 
-    <li>Selenium: {{page_handler.options.is_selenium}}</li>
     <li>Options str: {{page_handler.options.get_str}}</li>
 
 </ul>
@@ -100,7 +99,7 @@
 <a class="btn btn-secondary" data-bs-toggle="collapse" href="#collapseContents" role="button" aria-expanded="false" aria-controls="collapseContents">
     Show Details
 </a>
-<div class="collapse" id="collapseContents"><pre>{{page_object.contents}}</pre></div>
+<div class="collapse" id="collapseContents"><pre>{{page_handler.contents}}</pre></div>
 
 <h1>Links</h1>
 

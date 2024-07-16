@@ -1,6 +1,6 @@
 from ..models import SourceDataModel
 from ..pluginsources.sourceurlinterface import SourceUrlInterface
-from ..webtools import HtmlPage, RssPage
+from ..webtools import HtmlPage, RssPage, InternetPageHandler
 from ..pluginurl import UrlHandler
 
 from .fakeinternet import FakeInternetTestCase, MockRequestCounter
@@ -14,7 +14,8 @@ class SourceUrlInterfaceTest(FakeInternetTestCase):
         MockRequestCounter.mock_page_requests = 0
 
         url = SourceUrlInterface("https://www.codeproject.com/WebServices/NewsRSS.aspx")
-        self.assertTrue(type(url.p), RssPage)
+        self.assertTrue(type(url.h.get_handler()), InternetPageHandler)
+        self.assertTrue(type(url.h.get_handler().p), RssPage)
 
         props = url.get_props()
 
@@ -34,7 +35,7 @@ class SourceUrlInterfaceTest(FakeInternetTestCase):
         url = SourceUrlInterface(
             "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM"
         )
-        self.assertTrue(type(url.p), UrlHandler.youtube_channel_handler)
+        self.assertTrue(type(url.h.get_handler()), UrlHandler.youtube_channel_handler)
 
         props = url.get_props()
 
@@ -51,7 +52,7 @@ class SourceUrlInterfaceTest(FakeInternetTestCase):
 
     def test_youtube_video(self):
         url = SourceUrlInterface("https://www.youtube.com/watch?v=1234")
-        self.assertTrue(type(url.p), UrlHandler.youtube_video_handler)
+        self.assertTrue(type(url.h.get_handler()), UrlHandler.youtube_video_handler)
 
         props = url.get_props()
 
@@ -68,7 +69,8 @@ class SourceUrlInterfaceTest(FakeInternetTestCase):
         MockRequestCounter.mock_page_requests = 0
 
         url = SourceUrlInterface("https://linkedin.com")
-        self.assertTrue(type(url.p), HtmlPage)
+        self.assertTrue(type(url.h.get_handler()), InternetPageHandler)
+        self.assertTrue(type(url.h.get_handler().p), HtmlPage)
 
         props = url.get_props()
 
@@ -86,7 +88,8 @@ class SourceUrlInterfaceTest(FakeInternetTestCase):
         MockRequestCounter.mock_page_requests = 0
 
         url = SourceUrlInterface("https://page-with-rss-link.com")
-        self.assertTrue(type(url.p), HtmlPage)
+        self.assertTrue(type(url.h.get_handler()), InternetPageHandler)
+        self.assertTrue(type(url.h.get_handler().p), HtmlPage)
 
         props = url.get_props()
 

@@ -34,11 +34,6 @@ class BaseRssPlugin(SourceGenericPlugin):
         contents = super().get_contents()
 
         if not contents:
-            self.store_error(
-                source,
-                "Coult not obtain contents",
-                contents,
-            )
             self.dead = True
             return
 
@@ -86,9 +81,9 @@ class BaseRssPlugin(SourceGenericPlugin):
         if self.response:
             status_code = self.response.status_code
 
-        detail_text = "Status code:{}\n\nContents\n{}".format(
+        detail_text = "Status code:{}\nOptions:{}\nContents:\n{}".format(
                 status_code,
-                text,
+                self.content_handler.options,
                 print_contents[: self.get_contents_size_limit()],
         )
 

@@ -130,11 +130,17 @@ class YouTubeJsonHandler(YouTubeVideoHandler):
         self.response = None
 
     def get_contents(self):
-        if self.response and self.response.content:
-            return self.response.content
+        if self.response and self.response.get_contents():
+            return self.response.get_contents()
 
         if self.dead:
             return
+
+        return self.get_response().get_contents()
+
+    def get_response(self):
+        if self.response:
+            return self.response
 
         LinkDatabase.info("YouTube video Handler. Requesting: {}".format(self.url))
 
@@ -162,7 +168,7 @@ class YouTubeJsonHandler(YouTubeVideoHandler):
         ):
             self.dead = True
 
-        return self.response.content
+        return self.response
 
     def is_valid(self):
         if self.get_contents():

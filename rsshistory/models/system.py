@@ -545,10 +545,19 @@ class AppLogging(models.Model):
         c = Configuration.get_object()
         return c.get_local_time(self.date)
 
-    def create_entry(info_text, detail_text="", level=INFO, date=None, user=None):
+    def create_entry(info_text, detail_text="", level=INFO, date=None, user=None, stack=False):
         config = ConfigurationEntry.get()
         if level < config.logging_level:
             return
+
+        if stack:
+            stack_lines = traceback.format_stack()
+            stack_string = "".join(stack_lines)
+            # TODO - only 5 lines?
+
+            if detail_text != "":
+                detail_text += ". "
+            detail_text += stack_string
 
         # TODO replace hardcoded values with something better
         LinkDatabase.info("AppLogging::{}:{}".format(level, info_text))
@@ -568,20 +577,29 @@ class AppLogging(models.Model):
             user=user,
         )
 
-    def info(info_text, detail_text="", user=None):
-        AppLogging.create_entry(info_text, level = AppLogging.INFO)
+    def info(info_text, detail_text="", user=None, stack=False):
+        AppLogging.create_entry(info_text, detail_text = detail_text, level = AppLogging.INFO, stack=stack)
 
-    def debug(info_text, detail_text="", user=None):
+    def debug(info_text, detail_text="", user=None, stack=False):
+        if stack:
+            stack_lines = traceback.format_stack()
+            stack_string = "".join(stack_lines)
+
+            if detail_text != "":
+                detail_text += ". "
+            detail_text += stack_string
+
         LinkDatabase.info(info_text)
+        LinkDatabase.info(detail_text)
 
-    def warning(info_text, detail_text="", user=None):
-        AppLogging.create_entry(info_text, level = AppLogging.WARNING)
+    def warning(info_text, detail_text="", user=None, stack=False):
+        AppLogging.create_entry(info_text, detail_text=detail_text, level = AppLogging.WARNING, stack=stack)
 
-    def error(info_text, detail_text="", user=None):
-        AppLogging.create_entry(info_text, level = AppLogging.ERROR)
+    def error(info_text, detail_text="", user=None, stack=False):
+        AppLogging.create_entry(info_text, detail_text=detail_text, level = AppLogging.ERROR, stack=stack)
 
     def notify(info_text, detail_text="", user=None):
-        AppLogging.create_entry(info_text, level = AppLogging.NOTIFICATION)
+        AppLogging.create_entry(info_text, detail_text=detail_text, level = AppLogging.NOTIFICATION)
 
     def exc(exception_object, info_text=None, user=None):
         error_text = traceback.format_exc()

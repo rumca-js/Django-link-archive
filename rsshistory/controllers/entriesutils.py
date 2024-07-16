@@ -463,6 +463,8 @@ class EntryUpdater(object):
         return True
 
     def update_entry(self, url_handler):
+        from ..pluginurl import UrlAgeModerator
+
         entry = self.entry
 
         response = url_handler.get_response()
@@ -487,6 +489,13 @@ class EntryUpdater(object):
         if entry.date_published and entry.date_update_last:
             if entry.date_update_last < entry.date_published:
                 entry.date_published = entry.date_update_last
+
+        properties = {"title" : entry.title, "description" : entry.description}
+        moderator = UrlAgeModerator(properties = properties)
+        age = moderator.get_age()
+
+        if not entry.age or not age or entry.age < age:
+            entry.age = age
 
         entry.save()
 
@@ -514,7 +523,6 @@ class EntryUpdater(object):
 
         url = EntryUrlInterface(entry.link)
         props = url.get_props()
-        p = url.p
 
         if url.h:
             if url.h.is_blocked():
@@ -647,11 +655,11 @@ class EntryUpdater(object):
         if not url_handler:
             return
 
-        if not url_handler.p:
+        if not url_handler.get_response():
             return
 
         scanner = EntryScanner(
-            url=url_handler.url, entry=entry, contents=url_handler.p.get_contents()
+            url=url_handler.url, entry=entry, contents=url_handler.get_contents()
         )
         scanner.run()
 
@@ -931,7 +939,7 @@ class EntryWrapper(object):
             )
             link_data["language"] = None
 
-        # TODO remove hardcoded links
+        # TODO remove hardcoded values
         if (
             "title" in link_data
             and link_data["title"]

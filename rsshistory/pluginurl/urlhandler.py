@@ -44,75 +44,34 @@ class UrlHandler(Url):
 
             return
 
-    def get_handler(self, url=None, page_object=None, page_options=None):
+    def get_handler_implementation(self):
         """
         This code eventually will get ugly.
         We want handle different cases here.
         We do not want to handle that in web tools.
         """
+        url = self.url
+        page_options = self.options
+
         short_url = UrlHandler.get_protololless(url)
         if not short_url:
             return
 
         if UrlHandler.is_youtube_video(short_url):
             h = UrlHandler.youtube_video_handler(url)
-            h.get_contents()
-            self.response = h.response
             return h
-        if UrlHandler.is_youtube_channel(short_url):
+        elif UrlHandler.is_youtube_channel(short_url):
             h = UrlHandler.youtube_channel_handler(url)
-            h.get_contents()
-            self.response = h.response
             return h
-        if UrlHandler.is_odysee_video(short_url):
+        elif UrlHandler.is_odysee_video(short_url):
             h = UrlHandler.odysee_video_handler(url)
-            h.get_contents()
-            self.response = h.response
             return h
-        if UrlHandler.is_odysee_channel(short_url):
+        elif UrlHandler.is_odysee_channel(short_url):
             h = UrlHandler.odysee_channel_handler(url)
-            h.get_contents()
-            self.response = h.response
             return h
-
-        if not page_options:
-            options = UrlHandler.get_url_options(url)
         else:
-            options = page_options
-
-        u = Url(url, page_options=options)
-        if self.is_advanced_processing_possible(u, options):
-            LinkDatabase.info(
-                "Could not normally obtain contents. Trying more advanced solutions:".format(url)
-            )
-
-            options.use_headless_browser = True
-
-            if u.is_cloudflare_protected():
-                options.link_redirect = True
-
-            u = Url(url, page_options=options)
-
-        self.options = u.options
-        self.response = u.response
-        return u.p
-
-    def is_advanced_processing_possible(self, u, options):
-        status_code = u.get_status_code()
-
-        if status_code < 200 or status_code > 404:
-            return False
-
-        # if response is cloudflare jibberish, try using advanced solutions
-        # if page is invalid we may try with more advanced solutions. Some pages have cloudflare protection, or other
-        if options.use_basic_crawler() and (
-            not u.is_valid or u.is_cloudflare_protected()
-        ):
-            return True
-        return False
-
-    def is_status_code_redirect(self, status_code):
-        return (status_code >= 300 and status_code < 400) or status_code == 403
+            h = super().get_handler_implementation()
+            return h
 
     def get_type(url):
         if not url:
@@ -217,12 +176,12 @@ class UrlHandler(Url):
 
         return False
 
-    def get_page_options(url):
-        o = PageOptions()
+    def get_init_page_options(self, init_options=None):
+        o = super().get_init_page_options(init_options)
 
-        if UrlHandler.is_full_browser_required(url):
+        if UrlHandler.is_full_browser_required(self.url):
             o.use_full_browser = True
-        if UrlHandler.is_headless_browser_required(url):
+        if UrlHandler.is_headless_browser_required(self.url):
             o.use_headless_browser = True
 
         return o
@@ -247,6 +206,8 @@ class UrlHandler(Url):
         """
 
         url = Url.get_cleaned_link(url)
+        if not url:
+            return
 
         stupid_google_string = "https://www.google.com/url"
         if url.find(stupid_google_string) >= 0:
@@ -302,8 +263,41 @@ class UrlHandler(Url):
 
         return True
 
+    def __str__(self):
+        return "{}".format(self.options)
 
-class UrlPropertyValidator(object):
+
+class UrlContentsModerator(object):
+    def __init__(self, page_object=None, properties=None, blocked_keywords=None):
+        self.properties = []
+
+    def get_title(self):
+        if "title" in self.properties:
+            if self.properties["title"] is None:
+                return ""
+            return self.properties["title"]
+        else:
+            return ""
+
+    def get_description(self):
+        if "description" in self.properties:
+            if self.properties["description"] is None:
+                return ""
+            return self.properties["description"]
+        else:
+            return ""
+
+    def get_descriptive_pulp(self):
+        title = self.get_title()
+        title = title.lower()
+
+        description = self.get_description()
+        description = description.lower()
+
+        return title + "\n" + description
+
+
+class UrlPropertyValidator(UrlContentsModerator):
     def __init__(self, page_object=None, properties=None, blocked_keywords=None):
         self.properties = []
         if page_object:
@@ -338,22 +332,6 @@ class UrlPropertyValidator(object):
             return False
 
         return True
-
-    def get_title(self):
-        if "title" in self.properties:
-            if self.properties["title"] is None:
-                return ""
-            return self.properties["title"]
-        else:
-            return ""
-
-    def get_description(self):
-        if "description" in self.properties:
-            if self.properties["description"] is None:
-                return ""
-            return self.properties["description"]
-        else:
-            return ""
 
     def is_blocked_keywords(self):
         """
@@ -448,10 +426,52 @@ class UrlPropertyValidator(object):
 
         text = title + "\n" + description
 
-        keywords = ["casino", "lotter", "bingo", "slot", "poker", "jackpot", "gacor"]
+        keywords = ["casino",
+                    "lotter",
+                    "bingo",
+                    "slot",
+                    "poker",
+                    "jackpot",
+                    "gacor"]
 
         sum = 0
         for keyword in keywords:
             sum += text.count(keyword)
 
         return sum > 3
+
+
+class UrlAgeModerator(UrlContentsModerator):
+    def __init__(self, page_object=None, properties=None, blocked_keywords=None):
+        self.properties = []
+        if page_object:
+            self.properties = page_object.get_properties()
+        if properties:
+            self.properties = properties
+
+    def get_age(self):
+        """
+        implement more types of checks?
+
+        @return age requirement, or None
+        """
+        age0 = self.get_age__sexual()
+
+        return age0
+
+    def get_age__sexual(self):
+        text = self.get_descriptive_pulp()
+
+        keywords = ["sexua",
+                    "lesbian",
+                    "bisexual",
+                    "queer ",
+                    "drag quee",
+                    "fuck"]
+
+        sum = 0
+        for keyword in keywords:
+            sum += text.count(keyword)
+
+        if sum > 1:
+            return 15

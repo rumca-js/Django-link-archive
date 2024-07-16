@@ -181,7 +181,7 @@ class EntryUpdateData(BaseJobHandler):
             return True
         except Exception as E:
             AppLogging.exc(exception_object = E, 
-                info_text = "Exception when updating link data {0} {1} {2}".format(obj.subject)
+                info_text = "Exception when updating link data {}".format(obj.subject)
             )
 
 
