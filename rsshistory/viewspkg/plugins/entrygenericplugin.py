@@ -338,7 +338,7 @@ class EntryGenericPlugin(object):
                     reverse(
                         "{}:entries-omni-search".format(LinkDatabase.name),
                     )
-                    + "?search=link+%3D+{}".format(search_url),
+                    + "?search=link+%3D%3D+{}".format(search_url),
                     ConfigurationEntry.ACCESS_TYPE_ALL,
                     "Parent Entry: {}".format(search_url),
                 ),
@@ -354,7 +354,7 @@ class EntryGenericPlugin(object):
                     reverse(
                         "{}:entries-omni-search".format(LinkDatabase.name),
                     )
-                    + "?search=link+%3D+{}".format(search_url),
+                    + "?search=link+%3D%3D+{}".format(search_url),
                     ConfigurationEntry.ACCESS_TYPE_ALL,
                     "Https Entry: {}".format(search_url),
                 ),
@@ -370,7 +370,7 @@ class EntryGenericPlugin(object):
                     reverse(
                         "{}:entries-omni-search".format(LinkDatabase.name),
                     )
-                    + "?search=link+%3D+{}".format(search_url),
+                    + "?search=link+%3D%3D+{}".format(search_url),
                     ConfigurationEntry.ACCESS_TYPE_ALL,
                     "Source Entry: {}".format(self.entry.source_obj.title),
                     static("{}/icons/icons8-link-90.png".format(LinkDatabase.name)),

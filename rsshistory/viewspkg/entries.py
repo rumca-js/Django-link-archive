@@ -227,6 +227,10 @@ class EntriesSearchListView(generic.ListView):
         if search_term.find("link =") >= 0 or search_term.find("link=") >= 0:
             wh = search_term.find("=")
             if wh >= 0:
+                wh2 = search_term.find("=", wh+1)
+                if wh2 >= 0:
+                    wh = wh2
+
                 search_term = search_term[wh + 1 :].strip()
 
         return search_term

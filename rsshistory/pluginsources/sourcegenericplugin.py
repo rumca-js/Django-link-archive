@@ -178,6 +178,7 @@ class SourceGenericPlugin(object):
         handler = UrlHandler(self.get_address())
 
         contents = handler.get_contents()
+
         self.response = handler.response
         self.content_handler = handler
 

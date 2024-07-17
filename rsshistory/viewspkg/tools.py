@@ -31,14 +31,19 @@ def page_show_properties(request):
     def show_page_props_internal(requests, page_link):
         options = UrlHandler.get_url_options(page_link)
 
+        method = "standard"
+
         if "method" in request.GET and request.GET["method"] == "headless":
             options.use_headless_browser = True
+            method = request.GET["method"]
         if "method" in request.GET and request.GET["method"] == "full":
             options.use_full_browser = True
+            method = request.GET["method"]
 
         options.fast_parsing = False
 
         page_handler = UrlHandler(page_link, page_options=options)
+        page_handler.get_handler().browser_promotions = False
         page_handler.get_response()
 
         ViewPage.fill_context_type(p.context, urlhandler=page_handler)
@@ -51,6 +56,7 @@ def page_show_properties(request):
         p.context["response_object"] = page_handler.response
         p.context["page_object_type"] = str(type(page_object))
         p.context["is_link_allowed"] = DomainCache.get_object(page_link).is_allowed(page_link)
+        p.context["method"] = method
 
         return p.render("show_page_props.html")
 

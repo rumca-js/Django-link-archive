@@ -199,10 +199,10 @@ class ConfigurationEntry(models.Model):
 
     days_to_move_to_archive = models.IntegerField(
         default=50,
-        help_text="Number of days, after which entries are moved to archive",
+        help_text="Number of days, after which entries are moved to archive. Disabled if 0.",
     )
     days_to_remove_links = models.IntegerField(
-        default=100, help_text="Number of days, after which links are removed"
+        default=100, help_text="Number of days, after which links are removed. Disabled if 0."
     )
     days_to_check_std_entries = models.IntegerField(
         default=35,

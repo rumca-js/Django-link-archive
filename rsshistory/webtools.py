@@ -3222,6 +3222,7 @@ class InternetPageHandler(ContentInterface):
         self.p = None # page contents object, HtmlPage, RssPage, or whathver
         self.response = None
         self.options = page_options
+        self.browser_promotions = True
 
     def get_contents(self): 
         if self.response and self.response.get_contents():
@@ -3232,7 +3233,9 @@ class InternetPageHandler(ContentInterface):
     def get_contents_implementation(self): 
         self.p = self.get_page_handler_simple()
 
-        if self.is_advanced_processing_possible():
+        if self.browser_promotions and self.is_advanced_processing_possible():
+            # we warn, so that admin can deifine entry rules for that page
+            AppLogging.warning("Page:{}. Trying to workaround with headless browser".format(self.url))
             self.options.use_headless_browser = True
             self.p = self.get_page_handler_simple()
 
@@ -3303,7 +3306,10 @@ class InternetPageHandler(ContentInterface):
         status_code = self.response.get_status_code()
 
         if status_code < 200 or status_code > 404:
-            return False
+            if self.options.use_basic_crawler():
+                return True
+            else:
+                return False
 
         if not self.options.use_basic_crawler():
             return False
@@ -3317,6 +3323,10 @@ class InternetPageHandler(ContentInterface):
         if not self.p.is_valid():
             # if we have response, but it is invalid, we may try obtaining contents with more advanced processing
             return True
+
+        if self.get_contents() == "" or self.get_contents() is None:
+            return True
+
         return False
 
     def is_status_code_redirect(self, status_code):

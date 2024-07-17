@@ -79,11 +79,12 @@ class SourceUrlInterface(object):
 
     def get_props_from_rss(self, input_props=None):
         h = self.h
+        handler = self.h.get_handler()
         url = self.url
 
         input_props["url"] = self.url
 
-        if type(h) is UrlHandler.youtube_channel_handler:
+        if type(handler) is UrlHandler.youtube_channel_handler:
             input_props["source_type"] = SourceDataModel.SOURCE_TYPE_YOUTUBE
         else:
             input_props["source_type"] = SourceDataModel.SOURCE_TYPE_RSS

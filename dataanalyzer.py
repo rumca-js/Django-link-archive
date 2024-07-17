@@ -38,6 +38,114 @@ from rsshistory.omnisearch import SingleSymbolEvaluator, EquationEvaluator, Omni
 from sqlalchemy import and_, or_, not_
 
 from sqlmodel import SqlModel
+import requests
+
+try:
+    import asyncio
+
+    # https://github.com/apify/crawlee-python
+    # https://crawlee.dev/python/api
+    from crawlee.beautifulsoup_crawler import BeautifulSoupCrawler, BeautifulSoupCrawlingContext
+    from crawlee.basic_crawler import BasicCrawler
+    from crawlee.basic_crawler.types import BasicCrawlingContext
+    from crawlee.playwright_crawler import PlaywrightCrawler, PlaywrightCrawlingContext
+except Exception as E:
+    crawlee_feataure_enabled = False
+
+
+class Url(object):
+
+    user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/116.0"
+
+    def __init__(self, url, timeout_s = 10):
+        self.url = url
+        self.timeout_s = timeout_s
+
+    def is_valid(self):
+        """
+        Calling async method from class
+        https://stackoverflow.com/questions/42009202/how-to-call-a-async-function-contained-in-a-class
+        """
+        self.make_request()
+
+        if self.result is {}:
+            return False
+
+        if self.result["status_code"] > 200 and self.result["status_code"] > 400:
+            return False
+
+        if not self.result["page_content"]:
+            return False
+
+        if self.result["page_content"] == "":
+            return False
+
+        if self.result["page_content"] == None:
+            return False
+
+        return True
+
+    def make_request(self):
+        self.result = {}
+
+        request_result = requests.get(
+            self.url,
+            headers=self.get_headers(),
+            timeout=self.timeout_s,
+            verify=True,
+            stream=True,
+        )
+
+        self.result["status_code"] = request_result.status_code
+        self.result["page_content"] = request_result.text
+
+        return requests
+
+    def get_headers(self):
+        return {
+            "User-Agent": self.user_agent,
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Charset": "utf-8,ISO-8859-1;q=0.7,*;q=0.3",
+            "Accept-Encoding": "none",
+            "Accept-Language": "en-US,en;q=0.8",
+            "Connection": "keep-alive",
+        }
+
+    def make_request_crawlee(self):
+        self.loop = asyncio.get_event_loop()
+        self.loop.run_until_complete(self.process())
+
+    async def process(self) -> None:
+        """
+        https://crawlee.dev/python/api/class/BeautifulSoupCrawler
+        """
+        self.result = {}
+
+        crawler = BeautifulSoupCrawler(
+            # Limit the crawl to max requests. Remove or increase it for crawling all links.
+            max_requests_per_crawl=10,
+            request_handler_timeout = timedelta(seconds = timeout_s),
+        )
+
+        # Define the default request handler, which will be called for every request.
+        @crawler.router.default_handler
+        async def request_handler(context: BeautifulSoupCrawlingContext) -> None:
+            context.log.info(f'Processing {context.request.url} ...')
+
+            # maybe we could send header information that we accept text/rss
+
+            self.result['request_url'] = context.request.url
+            self.result['loaded_url'] = context.request.loaded_url
+            self.result['status_code'] = context.http_response.status_code
+            self.result['headers'] = context.http_response.headers
+
+            # todo check in headers if we accept payload
+            self.result['page_content'] = context.soup.contents
+
+            # TODO - what if there is redirection. should we use context.request.loaded_url?
+
+        # Run the crawler with the initial list of URLs.
+        await crawler.run([url])
 
 
 class DirReader(object):
@@ -48,15 +156,16 @@ class DirReader(object):
             self.accepted_extensions = [".json"]
 
     def get_files(self):
-        file_list = []
+        """
+        Should we sort the files? It might be important for some reason
+        for example to search using date, etc.
+        """
         for root, dirs, files in os.walk(self.dir):
             for file in files:
                 file_split = os.path.splitext(file)
                 if file_split[1] in self.accepted_extensions:
-                    file_list.append(os.path.join(root, file))
-
-        file_list = sorted(file_list)
-        return file_list
+                    file_name = os.path.join(root, file)
+                    yield file_name
 
 
 class EntrySymbolEvaluator(SingleSymbolEvaluator):
@@ -69,7 +178,7 @@ class EntrySymbolEvaluator(SingleSymbolEvaluator):
 
     def evaluate_complex_symbol(self, symbol, condition_data):
         if condition_data[0] not in self.entry:
-            print("evaluate_complex_symbol: symbol {} not in entry".format(condition_data[0]))
+            # print("evaluate_complex_symbol: symbol {} not in entry".format(condition_data[0]))
             return
 
         entry_field_value = self.entry[condition_data[0]]
@@ -202,20 +311,20 @@ class SearchInterface(object):
         else:
             self.files = []
 
-    def print_entry(self, entry):
-        level = "1"
-        if self.parser.args.verbosity:
-            level = self.parser.args.verbosity
+        self.total_entries = 0
+        self.good_entries = 0
+        self.dead_entries = 0
 
-        if level == "1":
+    def print_entry(self, entry):
+        level = self.parser.get_verbosity_level():
+
+        if level >= 1:
             print("{}".format(entry["link"]))
-        elif level == "2":
+        elif level >= 2:
             description = ""
             if "description" in entry:
                 description = entry["description"]
             print("{}\n{}".format(entry["link"], description))
-        elif level == "0":
-            pass
         else:
             print("{}".format(entry["link"]))
 
@@ -243,6 +352,39 @@ class SearchInterface(object):
         elapsed_seconds = int(elapsed_time_seconds % 60)
         print(f"Time: {elapsed_minutes}:{elapsed_seconds}")
 
+    def handle_row(self, row):
+        """
+        Row is to be expected a 'dict', eg. row["link"]
+        """
+        link = row["link"]
+
+        level = self.parser.get_verbosity_level():
+
+        if self.parser.args.verify:
+            url = Url(link)
+            if level >= 2:
+                print("Checking link:{}".format(link))
+
+            if url.is_valid():
+                print("{}: Valid".format(link))
+                self.good_entries += 1
+            else:
+                print("{}: Dead".format(link))
+                self.dead_entries += 1
+
+            time.sleep(self.parser.args.request_sleep)
+        else:
+            self.print_entry(row)
+
+        self.total_entries += 1
+
+    def summary(self):
+        if self.parser.args.summary:
+            if self.parser.args.verify:
+                print("total:{} good:{} dead:{}".format(self.total_entries, self.good_entries, self.dead_entries))
+            else:
+                print("total:{}".format(self.total_entries))
+
 
 class OmniDirSearcher(SearchInterface):
 
@@ -250,16 +392,15 @@ class OmniDirSearcher(SearchInterface):
         self.omni = OmniSearch(self.parser.args.search, EntrySymbolEvaluator())
 
         reader = DirReader(source_files_directory = self.parser.dir)
-        files = reader.get_files()
 
-        for afile in files:
+        for afile in reader.get_files():
             entries = self.read_file(afile)
             if not entries:
                 continue
 
             for entry in entries:
                 if self.is_omni_match(entry):
-                    self.print_entry(entry)
+                    self.handle_row(entry)
 
     def is_omni_match(self, entry):
         self.omni.set_symbol_evaluator(EntrySymbolEvaluator(entry))
@@ -436,8 +577,9 @@ class SqlLiteSearcher(SearchInterface):
         combined_query_conditions = search.get_combined_query()
 
         rows = model.select_conditions(combined_query_conditions)
-        for row in rows:
-            print(row.link)
+
+        for key, row in enumerate(rows):
+            self.handle_row(row.__dict__)
 
 
 class DataAnalyzer(object):
@@ -450,10 +592,19 @@ class DataAnalyzer(object):
             searcher = SqlLiteSearcher(self.parser)
             searcher.process()
             searcher.print_time_diff()
+
+            if self.parser.args.summary:
+                searcher.summary()
+
         elif self.is_omni_search():
+            # it is too slow?
             searcher = OmniDirSearcher(self.parser)
             searcher.process()
             searcher.print_time_diff()
+
+            if self.parser.args.summary:
+                searcher.summary()
+
         elif self.parser.args.show_tags:
             tags = TagsSearcher(self.parser)
             count = tags.process()
@@ -496,22 +647,17 @@ class Parser(object):
         self.parser = argparse.ArgumentParser(description="Data analyzer program")
         self.parser.add_argument("--dir", help="Directory to be scanned")
         self.parser.add_argument("--db", help="DB to be scanned")
-        self.parser.add_argument("--search", help="Search, with syntax same as the main program / site. Slower")
+        self.parser.add_argument("--search", help="Search, with syntax same as the main program / site.")
 
-        self.parser.add_argument("--find", metavar="find", help="Find entries with specified text")
         self.parser.add_argument("--summary", action="store_true", help="Displays summary at the end")
         self.parser.add_argument("--daily", action="store_true", help="Displays daily summary at the end")
-        self.parser.add_argument("--find-tag", metavar="find_tag", help="Find entries with a specific tag")
         self.parser.add_argument("--show-tags", action="store_true", help="Find all available tags")
 
-        self.parser.add_argument("--title", action="store_true", help="Find in title") # TODO change that from value-less to value?
-        self.parser.add_argument("--description", action="store_true", help="Find in description")# TODO change that from value-less to value?
-
-        self.parser.add_argument("--date", help="Specifies date in which we should search") # TODO implement
-        self.parser.add_argument("--date-from", help="Specifies date in which we should search") # TODO implement
-        self.parser.add_argument("--date-to", help="Specifies date in which we should search") # TODO implement
-
+        self.parser.add_argument("--verify", action="store_true", help="verifies link, if are active")
+        self.parser.add_argument("--timeout_s", default=10, help="Timeout for validating page")
+        self.parser.add_argument("--request-sleep", default=1, help="Sleep between page requests. We do not want to flood servers with too many requests")
         self.parser.add_argument("--relative", action="store_true", help="All counters are against the number of all links") # TODO implement this below
+
         self.parser.add_argument("-i", "--ignore-case", action="store_true", help="Ignores case")
         self.parser.add_argument("-v", "--verbosity", help="Verbosity level")
         
@@ -521,6 +667,16 @@ class Parser(object):
             self.dir = self.args.dir
         else:
             self.dir = None
+
+    def get_verbosity_level(self):
+        level = 1
+        if self.args.verbosity:
+            try:
+                level = int(self.args.verbosity)
+            except Exception as E:
+                print(str(E))
+
+        return level
 
 
 def main():
