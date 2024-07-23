@@ -16,8 +16,8 @@ def subs_checker_task(arg):
     try:
         from .configuration import Configuration
 
-        # if not Configuration.get_object().config_entry.background_task:
-        #    return
+        if not Configuration.get_object().config_entry.background_tasks:
+           return
 
         from .threadhandlers import RefreshThreadHandler
 
@@ -38,8 +38,8 @@ def process_all_jobs_task(arg):
     try:
         from .configuration import Configuration
 
-        # if not Configuration.get_object().config_entry.background_task:
-        #    return
+        if not Configuration.get_object().config_entry.background_tasks:
+           return
 
         from .threadhandlers import HandlerManager
 
@@ -61,8 +61,8 @@ def process_one_jobs_task(arg):
     try:
         from .configuration import Configuration
 
-        # if not Configuration.get_object().config_entry.background_task:
-        #    return
+        if not Configuration.get_object().config_entry.background_tasks:
+           return
 
         from .threadhandlers import HandlerManager
 

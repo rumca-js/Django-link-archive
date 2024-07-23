@@ -73,6 +73,9 @@ class BaseParsePlugin(SourceGenericPlugin):
         # this is stupid to write get contents to have contents, to pass it it
         # to html page
         contents = self.get_contents()
+        if not contents:
+            return
+
         url = self.get_address()
 
         p = HtmlPage(url, contents)

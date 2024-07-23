@@ -88,12 +88,11 @@ class ConfigForm(forms.ModelForm):
             "instance_title",
             "instance_description",
             "admin_user",
-            "background_task",
-            "ssl_verification",
             "access_type",
             "data_export_path",
             "data_import_path",
-            #
+            "logging_level",
+            # entry, source configuration
             "enable_domain_support",
             "enable_keyword_support",
             "enable_file_support",
@@ -143,12 +142,15 @@ class ConfigForm(forms.ModelForm):
             "max_links_per_page",
             "max_sources_per_page",
             # Advanced
+            "ssl_verification",
             "user_agent",
             "user_headers",
             "internet_test_page",
-            "debug_mode",
-            "logging_level",
             "respect_robots_txt",
+            "background_tasks",
+            "debug_mode",
+            "crawling_headless_script",
+            "crawling_full_script",
         ]
 
     def __init__(self, *args, **kwargs):

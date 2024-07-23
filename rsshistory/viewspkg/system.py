@@ -42,6 +42,7 @@ from ..forms import (
     UserConfigForm,
 )
 from ..views import ViewPage
+from ..webtools import selenium_feataure_enabled
 
 
 def index(request):
@@ -177,6 +178,7 @@ def system_status(request):
     p.context["directory"] = c.directory
 
     p.context["last_internet_status"] = SystemOperation.get_last_internet_status()
+    p.context["selenium_feataure_enabled"] = selenium_feataure_enabled
 
     last_internet_check = c.get_local_time(SystemOperation.get_last_internet_check())
     p.context["last_internet_check"] = last_internet_check

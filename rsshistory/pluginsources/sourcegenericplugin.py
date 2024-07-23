@@ -60,7 +60,7 @@ class SourceGenericPlugin(object):
             return True
 
         if self.dead:
-            AppLogging.debug("Plugin: page is dead {}".format(self.get_source().url))
+            AppLogging.debug("Url:{} Title:{}. Plugin: page is dead".format(source.url, source.title))
 
             self.set_operational_info(
                 stop_time,
@@ -82,9 +82,10 @@ class SourceGenericPlugin(object):
             if not link_data:
                 continue
 
-            if "link" not in link_data or not link_data["link"]:
+            if not self.is_link_ok_to_add(link_data):
                 AppLogging.error(
-                    "Invalid link properties. Missing key: {}".format(str(link_data))
+                        "Url:{} Title:{}. Cannot add link: {}".format(source.url, source.title, str(link_data)),
+                    stack=True,
                 )
 
                 continue
@@ -106,7 +107,7 @@ class SourceGenericPlugin(object):
 
             entry = b.add_from_props()
 
-            LinkDatabase.info("Generic plugin add:{} DONE".format(link_data["link"]))
+            # AppLogging.debug("Source:{} Title:{}. Generic plugin add:{} DONE".format(source.url, source.title, link_data["link"]))
 
             if entry and entry.date_published > start_time:
                 if source.auto_tag:
@@ -125,12 +126,12 @@ class SourceGenericPlugin(object):
 
         if self.hash and source.get_page_hash() == self.hash:
             AppLogging.debug(
-                "Page not changed: {} {}".format(source.url, source.title)
+                    "Url:{} Title:{}. Not changed.".format(source.url, source.title)
             )
             return False
         elif not self.hash:
             AppLogging.debug(
-                "Cannot obtain hash, skipping {} {}".format(source.url, source.title)
+                    "Url:{} Title:{}. Cannot obtain hash, skipping ".format(source.url, source.title)
             )
             return False
 
@@ -190,7 +191,7 @@ class SourceGenericPlugin(object):
 
         if not contents:
             AppLogging.error(
-                info_text = "Source:{} Title:{}; Could not obtain contents.".format(
+                info_text = "Url:{} Title:{}; Could not obtain contents.".format(
                     source.url, source.title,
                 ),
                 detail_text = "Status code:{}\nOptions:{}\nContents\n{}".format(status_code, str(handler.options), contents,)
@@ -227,57 +228,14 @@ class SourceGenericPlugin(object):
         pass
 
     def is_link_ok_to_add(self, props):
-        try:
-            # We add new links also if link is for archive. if it is archive link -> add to archive
-
-            is_removed = BaseLinkDataController.is_removed_by_date(
-                props["date_published"]
-            )
-            if is_removed:
-                return False
-
-            objs = LinkDataController.objects.filter(link=props["link"])
-
-            if not objs.exists():
-                if "title" not in props:
-                    AppLogging.error(
-                        "Link:{}; Title:{} missing published field".format(
-                            props["link"],
-                            props["title"],
-                        )
-                    )
-                    return False
-
-                if not self.is_link_valid(props["link"]):
-                    LinkDatabase.info("Link is not valid")
-                    return False
-
-                if "date_published" not in props:
-                    AppLogging.error(
-                        "Link:{}; Title:{} missing published field".format(
-                            props["link"],
-                            props["title"],
-                        )
-                    )
-                    return False
-
-                return True
-
+        if "link" not in props:
+            return False
+        if props["link"] is None:
+            return False
+        if props["link"] == "":
             return False
 
-        except Exception as e:
-            error_text = traceback.format_exc()
-            if props and "link" in props and "title" in props:
-                AppLogging.error(
-                    "Link:{}; Title:{}; Exc:{}\n{}".format(
-                        props["link"],
-                        props["title"],
-                        str(e),
-                        error_text,
-                    )
-                )
-
-            return None
+        return True
 
     def get_links(self):
         """

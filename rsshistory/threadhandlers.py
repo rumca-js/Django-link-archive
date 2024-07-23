@@ -1121,7 +1121,7 @@ class RefreshThreadHandler(object):
 
         self.check_sources()
 
-        for export in DataExport.objects.all():
+        for export in DataExport.objects.filter(enabled=True):
             if SourceExportHistory.is_update_required(export):
                 self.do_update(export)
                 SourceExportHistory.confirm(export)

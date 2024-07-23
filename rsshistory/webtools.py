@@ -14,6 +14,7 @@ https://support.bunny.net/hc/en-us/articles/360017484759-The-CDN-URLs-are-return
 Sometimes we see the CDN URLs return a 301 redirect back to your own website. Usually, when this happens, it's caused by a misconfiguration of your origin server and the origin URL of your pull zone. If the origin URL sends back a redirect, our servers will simply forward that to the user.
 
 TODO:
+    - selenium and other drivers should be created once, then only asked for urls. Currently they are re-created each time we ask for a page
     - currently there is a hard limit for file size. If page is too big, it is just skipped
     - we should check meta info before obtaining entire file. Currently it is not done so. Encoding may be read from file, in some cases
     - maybe lists of mainstream media, or link services could be each in one class. Configurable, so that it can be overriden
@@ -39,16 +40,18 @@ import traceback
 import requests
 import re
 import json
+import subprocess
 
 # import chardet
 from bs4 import BeautifulSoup
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from dateutil import parser
 
 from .models import AppLogging
 from .apps import LinkDatabase
 from .dateutils import DateUtils
+from .ipc import PageResponseObject
 
 selenium_feataure_enabled = True
 crawlee_feataure_enabled = True
@@ -61,6 +64,7 @@ try:
     from selenium.webdriver.support.ui import WebDriverWait
     from selenium.webdriver.support import expected_conditions as EC
 except Exception as E:
+    print(str(E))
     selenium_feataure_enabled = False
 
 try:
@@ -73,6 +77,7 @@ try:
     from crawlee.basic_crawler.types import BasicCrawlingContext
     from crawlee.playwright_crawler import PlaywrightCrawler, PlaywrightCrawlingContext
 except Exception as E:
+    print(str(E))
     crawlee_feataure_enabled = False
 
 
@@ -85,6 +90,12 @@ URL_TYPE_JAVASCRIPT = "javascript"
 URL_TYPE_HTML = "html"
 URL_TYPE_FONT = "font"
 URL_TYPE_UNKNOWN = "unknown"
+
+HTTP_STATUS_CODE_EXCEPTION = 600
+HTTP_STATUS_CODE_CONNECTION_ERROR = 603
+HTTP_STATUS_CODE_TIMEOUT = 604
+HTTP_STATUS_CODE_FILE_TOO_BIG = 612
+HTTP_STATUS_CODE_PAGE_UNSUPPORTED = 613
 
 
 def lazy_load_content(func):
@@ -121,7 +132,7 @@ def date_str_to_date(date_str):
             # we want to know who generated this issue
             detail_text = "Exception Data:{}\nStack:{}".format(str(E), stack_str)
 
-            AppLogging.warning(
+            AppLogging.info(
                 "Could not parse date:{}\n".format(date_str),
                 detail_text = detail_text,
             )
@@ -605,6 +616,34 @@ class DomainAwarePage(object):
             return False
         return True
 
+    def split(self):
+        result = []
+        parts = self.parse_url()
+
+        if len(parts)> 2:
+            result.append(parts[0] + parts[1] + parts[2])
+        if len(parts)> 3:
+            for part in parts[3:]:
+                result.append(part)
+
+        return result
+
+    def join(self, parts):
+        result = ""
+
+        for part in parts:
+            if result.endswith("/"):
+                result = result[:-1]
+            if part.startswith("/"):
+                part = part[1:]
+
+            if part.startswith("?") or part.startswith("#"):
+                result = result + part
+            else:
+                result = result + "/" + part
+
+        return result
+
 
 class ContentInterface(object):
     def __init__(self, url, contents):
@@ -1058,26 +1097,36 @@ class JsonPage(ContentInterface):
 
 
 class RssPageEntry(ContentInterface):
-    def __init__(self, feed, feed_entry, page_object):
-        self.feed = page_object.feed
+    def __init__(self, feed, feed_entry, url, contents, page_object_properties):
+        self.feed = feed
         self.feed_entry = feed_entry
-        self.page_object = page_object
+        self.url = url
+        self.contents = contents
+        self.page_object_properties = page_object_properties
 
-        super().__init__(url=self.page_object.url, contents=page_object.get_contents())
+        super().__init__(url=self.url, contents=contents)
 
         self.allow_adding_with_current_time = True
         self.default_entry_timestamp = None
 
     def get_properties(self):
+        """
+        Obtaining link does not work for https://thehill.com/feed,  why?
+        """
         output_map = {}
 
-        if "link" not in self.feed_entry:
+        if "link" in self.feed_entry:
+            if self.feed_entry.link != "":
+                output_map["link"] = self.feed_entry.link
+
+        if "link" not in output_map:
+            print("Link not in output map")
             return output_map
 
         output_map = super().get_properties()
 
-        output_map["source"] = self.page_object.url
         output_map["link"] = self.feed_entry.link
+        output_map["source"] = self.url
         output_map["bookmarked"] = False
         output_map["feed_entry"] = self.feed_entry
 
@@ -1111,7 +1160,8 @@ class RssPageEntry(ContentInterface):
         return None
 
     def get_language(self):
-        return self.page_object.get_language()
+        if "language" in self.page_object_properties:
+            return self.page_object_properties["language"]
 
     def get_date_published(self):
         date = self.get_date_published_implementation()
@@ -1150,7 +1200,8 @@ class RssPageEntry(ContentInterface):
             return DateUtils.get_datetime_now_utc()
 
     def get_author(self):
-        return self.page_object.get_author()
+        if "author" in self.page_object_properties:
+            return self.page_object_properties["author"]
 
     def get_album(self):
         return ""
@@ -1184,17 +1235,13 @@ class RssPage(ContentInterface):
 
         try:
             import feedparser
-
             self.feed = feedparser.parse(contents)
             return self.feed
 
-        except Exception as e:
-            error_text = traceback.format_exc()
-
-            AppLogging.error(
-                "RssPage: when parsing:{};Error:{};{}".format(
-                    self.url, str(e), error_text
-                )
+        except Exception as E:
+            AppLogging.exc(
+                E,
+                "Url:{}. RssPage, when parsing.".format(self.url)
             )
 
     def get_container_elements(self):
@@ -1205,24 +1252,30 @@ class RssPage(ContentInterface):
             for item in self.get_container_elements_maps():
                 yield item
 
-        except Exception as e:
-            error_text = traceback.format_exc()
-
-            AppLogging.error(
-                "RssPage: when parsing:{};Error:{};{}".format(
-                    self.url, str(e), error_text
+        except Exception as E:
+            AppLogging.exc(
+                E,
+                "Url:{}. RSS parsing error".format(
+                    self.url
                 )
             )
-            traceback.print_stack()
-            traceback.print_exc()
 
     def get_container_elements_maps(self):
         for feed_entry in self.feed.entries:
-            rss_entry = RssPageEntry(self.feed, feed_entry, self)
+            rss_entry = RssPageEntry(self.feed, feed_entry, self.url, self.get_contents(), self.get_properties())
             entry_props = rss_entry.get_properties()
 
-            if entry_props is not None:
-                yield entry_props
+            if not entry_props:
+                AppLogging.debug("No properties for feed entry:{}".format(str(feed_entry)))
+                continue
+
+            if "link" not in entry_props or entry_props["link"] is None:
+                AppLogging.error("Url:{}. Missing link in RSS".format(self.url),
+                        detail_text = str(feed_entry)
+                )
+                continue
+
+            yield entry_props
 
     def get_contents_body_hash(self):
         if not self.contents:
@@ -1234,7 +1287,6 @@ class RssPage(ContentInterface):
         entries = str(self.feed.entries)
         if entries == "":
             if self.contents:
-                AppLogging.error("Empty entries")
                 return calculate_hash(self.contents)
         if entries:
             return calculate_hash(entries)
@@ -1603,7 +1655,12 @@ class HtmlPage(ContentInterface):
         super().__init__(url=url, contents=contents)
 
         if self.contents:
-            self.soup = BeautifulSoup(self.contents, "html.parser")
+            try:
+                self.soup = BeautifulSoup(self.contents, "html.parser")
+            except Exception as E:
+                AppLogging.exc(E, "Contents type:{}".format(type(self.contents)))
+                self.contents = None
+                self.soup = None
         else:
             self.soup = None
 
@@ -2113,8 +2170,7 @@ class HtmlPage(ContentInterface):
         body = self.get_body_text()
 
         if body == "":
-            AppLogging.error("Page:{}: HTML: Empty body".format(self.url))
-            return calculate_hash("no body hash")
+            return
         elif body:
             return calculate_hash(body)
         else:
@@ -2165,188 +2221,6 @@ class XmlPage(ContentInterface):
             return lower.find("<?xml") >= 0
 
 
-class PageResponseObject(object):
-    STATUS_CODE_OK = 200
-    STATUS_CODE_ERROR = 500
-    STATUS_CODE_UNDEF = 0
-
-    def __init__(
-        self, url, contents=None, status_code=STATUS_CODE_OK, encoding=None, headers=None, binary=None
-    ):
-        """
-        @param contents Text
-
-        TODO this should be cleaned up. We should pass binary, and encoding
-        """
-        self.url = url
-        self.status_code = status_code
-
-        self.content = contents
-        # decoded contents
-        self.text = contents
-        self.binary = binary
-
-        # I read selenium always assume utf8 encoding
-
-        # encoding = chardet.detect(contents)['encoding']
-        # self.apparent_encoding = encoding
-        # self.encoding = encoding
-
-        if not headers:
-            self.headers = {}
-        else:
-            self.headers = headers
-
-        if not self.is_headers_empty():
-            charset = self.get_content_type_charset()
-            if charset:
-                self.encoding = charset
-                self.apparent_encoding = charset
-            elif encoding:
-                self.encoding = encoding
-                self.apparent_encoding = encoding
-            else:
-                self.encoding = "utf-8"
-                self.apparent_encoding = "utf-8"
-        else:
-            self.encoding = encoding
-            self.apparent_encoding = encoding
-
-    def is_headers_empty(self):
-        return len(self.headers) == 0
-
-    def get_content_type(self):
-        if "Content-Type" in self.headers:
-            return self.headers["Content-Type"]
-        if "content-type" in self.headers:
-            return self.headers["content-type"]
-
-    def get_headers(self):
-        return self.headers
-
-    def get_last_modified(self):
-        date = None
-        if "Last-Modified" in self.headers:
-            date = self.headers["Last-Modified"]
-        if "last-modified" in self.headers:
-            date = self.headers["Last-Modified"]
-
-        return date_str_to_date(date)
-
-    def get_content_type_charset(self):
-        content = self.get_content_type()
-        if not content:
-            return
-
-        elements = content.split(";")
-        for element in elements:
-            wh = element.lower().find("charset")
-            if wh >= 0:
-                charset_elements = element.split("=")
-                if len(charset_elements) > 1:
-                    charset = charset_elements[1]
-
-                    if charset.startswith('"') or charset.startswith("'"):
-                        return charset[1:-1]
-                    else:
-                        return charset
-
-    def is_content_html(self):
-        content = self.get_content_type()
-        if not content:
-            return False
-
-        if content.lower().find("html") >= 0:
-            return True
-
-    def is_content_image(self):
-        content = self.get_content_type()
-        if not content:
-            return False
-
-        if content.lower().find("image") >= 0:
-            return True
-
-    def is_content_rss(self):
-        content = self.get_content_type()
-        if not content:
-            return False
-
-        if content.lower().find("rss") >= 0:
-            return True
-        if content.lower().find("xml") >= 0:
-            return True
-
-    def get_content_length(self):
-        if "content-length" in self.headers:
-            return int(self.headers["content-length"])
-        if "Content-Length" in self.headers:
-            return int(self.headers["Content-Length"])
-
-        return 100
-
-    def is_content_type_supported(self):
-        """
-        You can preview on a browser headers. Ctr-shift-i on ff
-        """
-        content_type = self.get_content_type()
-        if content_type.find("text") >= 0:
-            return True
-        if content_type.find("application") >= 0:
-            return True
-        if content_type.find("xml") >= 0:
-            return True
-
-        return False
-
-    def get_redirect_url(self):
-        if (
-            self.is_this_status_redirect()
-            and "Location" in self.headers
-            and self.headers["Location"]
-        ):
-            return self.headers["Location"]
-
-    def is_this_status_ok(self):
-        if self.status_code == 0:
-            return False
-
-        return self.status_code >= 200 and self.status_code < 300
-
-    def is_this_status_redirect(self):
-        """
-        HTML code 403 - some pages block you because of your user agent. This code says exactly that.
-        https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
-        """
-        return (
-            self.status_code > 300 and self.status_code < 400
-        ) or self.status_code == 403
-
-    def is_this_status_nok(self):
-        """
-        This function informs that status code is so bad, that further communication does not make any sense
-        """
-        if self.is_this_status_redirect():
-            return False
-
-        return self.status_code < 200 or self.status_code >= 400
-
-    def is_valid(self):
-        if self.is_this_status_nok():
-            return False
-
-        return True
-
-    def get_status_code(self):
-        return self.status_code
-
-    def get_contents(self):
-        return self.content
-
-    def get_binary(self):
-        return self.binary
-
-
 class RequestsPage(object):
     def __init__(self, url, headers, timeout_s=10, ping=False):
         """
@@ -2380,7 +2254,8 @@ class RequestsPage(object):
 
             content_length = self.response.get_content_length()
             if content_length > PAGE_TOO_BIG_BYTES:
-                AppLogging.warning("Page {} is too big. Size:{}".format(self.url, content_length))
+                self.response.status_code = status_code=HTTP_STATUS_CODE_FILE_TOO_BIG
+                self.response.add_error("Page is too big")
                 return
 
             if ping:
@@ -2410,16 +2285,20 @@ class RequestsPage(object):
                     binary=request_result.content,
                 )
             else:
-                AppLogging.warning("Page {} is not supported {}".format(self.url, content_type))
+                self.response.status_code=HTTP_STATUS_CODE_PAGE_UNSUPPORTE
+                self.response.add_error("Page {} is not supported {}".format(self.url, content_type))
 
         except requests.Timeout:
-            AppLogging.debug("Page: {}. Timeout".format(self.url))
-            self.response = PageResponseObject(self.url, contents=None, status_code=500)
+            self.response = PageResponseObject(self.url, contents=None, status_code=HTTP_STATUS_CODE_TIMEOUT)
+            self.response.add_error("Page timeout")
         except requests.exceptions.ConnectionError:
-            AppLogging.debug("Page: {}. Connection error".format(self.url))
-            self.response = PageResponseObject(self.url, contents=None, status_code=500)
+            self.response = PageResponseObject(self.url, contents=None, status_code=HTTP_STATUS_CODE_CONNECTION_ERROR)
+            self.response.add_error("Connection error")
         except Exception as E:
-            AppLogging.exc(E, "Page: {}: General exception".format(self.url))
+            AppLogging.exc(E, "Url: {}: General exception".format(self.url))
+
+            self.response = PageResponseObject(self.url, contents=None, status_code=HTTP_STATUS_CODE_EXCEPTION)
+            self.response.add_error("General page exception")
 
     def get(self):
         if self.response:
@@ -2503,7 +2382,7 @@ class SeleniumDriver(object):
             if status_code2:
                 status_code = status_code2
         except Exception as E:
-            AppLogging.error("Chrome webdrider error:{}".format(str(E)))
+            AppLogging.exc(E, "Chrome webdrider error.")
         return status_code
 
     def get_selenium_status_code_from_logs(self, logs):
@@ -2549,7 +2428,7 @@ class SeleniumDriver(object):
             headers = self.get_selenium_headers_logs(logs)
             return headers
         except Exception as E:
-            AppLogging.error("Chrome webdrider error:{}".format(str(E)))
+            AppLogging.exc(E, "Chrome webdrider error")
 
         return headers
 
@@ -2630,7 +2509,10 @@ class SeleniumChromeHeadless(SeleniumDriver):
         except TimeoutException:
             error_text = traceback.format_exc()
             AppLogging.debug("Page timeout:{}\n{}".format(self.url, error_text))
-            self.response = PageResponseObject(self.url, contents=None, status_code=500)
+            self.response = PageResponseObject(self.url, contents=None, status_code=HTTP_STATUS_CODE_TIMEOUT)
+        except Exception as E:
+            AppLogging.exc(E, "Url:{}".format(self.url))
+            self.response = PageResponseObject(self.url, contents=None, status_code=HTTP_STATUS_CODE_EXCEPTION)
         finally:
             driver.quit()
 
@@ -2707,123 +2589,12 @@ class SeleniumChromeFull(SeleniumDriver):
         except TimeoutException:
             error_text = traceback.format_exc()
             AppLogging.debug("Page timeout:{}\n{}".format(self.url, error_text))
-            self.response = PageResponseObject(self.url, contents=None, status_code=500)
+            self.response = PageResponseObject(self.url, contents=None, status_code=HTTP_STATUS_CODE_TIMEOUT)
+        except Exception as E:
+            AppLogging.exc(E, "Url:{}".format(self.url))
+            self.response = PageResponseObject(self.url, contents=None, status_code=HTTP_STATUS_CODE_EXCEPTION)
         finally:
             driver.quit()
-
-    def get(self):
-        if self.response:
-            return self.response
-
-
-class CrawleeHeadless(object):
-    def __init__(self, url, headers, timeout_s=10, ping=False):
-        """
-        Calling async method from class
-        https://stackoverflow.com/questions/42009202/how-to-call-a-async-function-contained-in-a-class
-        """
-        self.url = url
-        self.timeout_s = timeout_s
-        self.ping = ping
-
-        self.loop = asyncio.get_event_loop()
-        self.loop.run_until_complete(self.process())
-
-    async def process(self) -> None:
-        """
-        https://crawlee.dev/python/api/class/BeautifulSoupCrawler
-        """
-        result = {}
-
-        crawler = BeautifulSoupCrawler(
-            # Limit the crawl to max requests. Remove or increase it for crawling all links.
-            max_requests_per_crawl=10,
-            request_handler_timeout = timedelta(seconds = timeout_s),
-        )
-
-        # Define the default request handler, which will be called for every request.
-        @crawler.router.default_handler
-        async def request_handler(context: BeautifulSoupCrawlingContext) -> None:
-            context.log.info(f'Processing {context.request.url} ...')
-
-            # maybe we could send header information that we accept text/rss
-
-            result['request_url'] = context.request.url
-            result['loaded_url'] = context.request.loaded_url
-            result['status_code'] = context.http_response.status_code
-            result['headers'] = context.http_response.headers
-
-            if not self.ping:
-                # todo check in headers if we accept payload
-                result['page_content'] = context.soup.contents
-
-            # TODO - what if there is redirection. should we use context.request.loaded_url?
-
-        # Run the crawler with the initial list of URLs.
-        await crawler.run([url])
-
-        response = PageResponseObject(self.url)
-        if "headers" in result:
-            response.headers = result["headers"]
-        if "status_code" in result:
-            response.status_code = result["status_code"]
-        if 'page_content' in result:
-            response.content = response["page_content"]
-
-        self.response = response
-
-    def get(self):
-        if self.response:
-            return self.response
-
-
-class CrawleeFull(object):
-    def __init__(self, url, headers, timeout_s=10, ping=False):
-        self.url = url
-        self.timeout_s = timeout_s
-        self.ping = ping
-
-        self.loop = asyncio.get_event_loop()
-        self.loop.run_until_complete(self.process())
-
-    async def process(self) -> None:
-        result = {}
-
-        crawler = PlaywrightCrawler(
-            # Limit the crawl to max requests. Remove or increase it for crawling all links.
-            max_requests_per_crawl=10,
-            request_handler_timeout = timedelta(seconds = timeout_s),
-        )
-
-        # Define the default request handler, which will be called for every request.
-        @crawler.router.default_handler
-        async def request_handler(context: PlaywrightCrawlingContext) -> None:
-            context.log.info(f'Processing {context.request.url} ...')
-
-            if context.page is None:
-                context.log.info(f'Page is none ...')
-                return
-
-            result['request_url'] = context.request.url
-            result['status_code'] = context.http_response.status_code
-            result['headers'] = context.http_response.headers
-
-            if not self.ping:
-                result['loaded_url'] = context.page.url
-                result['page_content'] = await context.page.content()
-
-        # Run the crawler with the initial list of requests.
-        await crawler.run([url])
-
-        response = PageResponseObject(self.url)
-        if "headers" in result:
-            response.headers = result["headers"]
-        if "status_code" in result:
-            response.status_code = result["status_code"]
-        if 'page_content' in result:
-            response.content = response["page_content"]
-
-        self.response = response
 
     def get(self):
         if self.response:
@@ -2886,7 +2657,7 @@ class SeleniumUndetected(object):
         except TimeoutException:
             error_text = traceback.format_exc()
             AppLogging.debug("Page timeout:{}\n{}".format(self.url, error_text))
-            self.response = PageResponseObject(self.url, contents=None, status_code=500)
+            self.response = PageResponseObject(self.url, contents=None, status_code=HTTP_STATUS_CODE_TIMEOUT)
         finally:
             driver.quit()
 
@@ -3028,27 +2799,27 @@ class RequestBuilder(object):
                 return self.get_contents_via_crawlee_headless(
                     self.url, headers=headers, timeout_s=timeout_s, ping=ping
                 )
-            elif selenium_feataure_enabled:
+            if selenium_feataure_enabled:
                 return self.get_contents_via_selenium_chrome_headless(
                     self.url, headers=headers, timeout_s=timeout_s, ping=ping
                 )
-            else:
-                return self.get_contents_via_requests(
-                    self.url, headers=headers, timeout_s=timeout_s, ping=ping
-                )
+
+            return self.get_contents_via_requests(
+                self.url, headers=headers, timeout_s=timeout_s, ping=ping
+            )
         elif self.options.use_full_browser:
             if crawlee_feataure_enabled:
                 return self.get_contents_via_crawlee_full(
                     self.url, headers=headers, timeout_s=timeout_s, ping=ping
                 )
-            elif selenium_feataure_enabled:
+            if selenium_feataure_enabled:
                 return self.get_contents_via_selenium_chrome_full(
                     self.url, headers=headers, timeout_s=timeout_s, ping=ping
                 )
-            else:
-                return self.get_contents_via_requests(
-                    self.url, headers=headers, timeout_s=timeout_s, ping=ping
-                )
+
+            return self.get_contents_via_requests(
+                self.url, headers=headers, timeout_s=timeout_s, ping=ping
+            )
         else:
             self.dead = True
             raise NotImplementedError("Could not identify method of page capture")
@@ -3061,24 +2832,68 @@ class RequestBuilder(object):
         SSL is mostly important for interacting with pages. During web scraping it is not that useful.
         """
 
-        p = RequestsPage(url, headers, timeout_s=timeout_s, ping=ping)
+        p = RequestsPage(url, headers=headers, timeout_s=timeout_s, ping=ping)
         return p.get()
 
     def get_contents_via_selenium_chrome_headless(self, url, headers, timeout_s, ping):
-        p = SeleniumChromeHeadless(url, headers, timeout_s=timeout_s, ping=ping)
+        p = SeleniumChromeHeadless(url, headers=headers, timeout_s=timeout_s, ping=ping)
         return p.get()
 
     def get_contents_via_selenium_chrome_full(self, url, headers, timeout_s, ping):
-        p = SeleniumChromeFull(url, headers, timeout_s=timeout_s, ping=ping)
+        p = SeleniumChromeFull(url, headers=headers, timeout_s=timeout_s, ping=ping)
         return p.get()
 
     def get_contents_via_crawlee_headless(self, url, headers, timeout_s, ping):
-        p = CrawleeHeadless(url, headers, timeout_s=timeout_s, ping=ping)
-        return p.get()
+        return self.get_contents_via_localhost_app(url, headers, timeout_s, ping)
 
     def get_contents_via_crawlee_full(self, url, headers, timeout_s, ping):
-        p = CrawleeFull(url, headers, timeout_s=timeout_s, ping=ping)
-        return p.get()
+        return self.get_contents_via_localhost_app(url, headers, timeout_s, ping)
+
+    def get_contents_via_localhost_app(self, url, headers, timeout_s, ping):
+        import os
+        from pathlib import Path
+        # TODO we should be able to "configure this model from outside. We should not 
+        # need to call configuration
+        from .configuration import Configuration
+
+        configuration = Configuration.get_object()
+        c = configuration.config_entry
+
+        script = c.crawling_headless_script
+        if script is None or script == "":
+            AppLogging.error("Headless script is not configured")
+            return
+
+        file_path = os.path.realpath(__file__)
+        full_path = Path(file_path)
+
+        operating_path = full_path.parents[1]
+        response_file_location = full_path.parents[0] / "response.txt"
+
+        script = script.replace("$URL", url)
+        script = script.replace("$RESPONSE_FILE", str(response_file_location))
+
+        #AppLogging.debug(operating_path)
+        #AppLogging.debug(response_file_location)
+
+        p = subprocess.run(script, shell=True, capture_output=True, cwd=operating_path)
+
+        if p.stdout:
+            stdout_str = p.stdout.decode()
+            AppLogging.debug(stdout_str)
+        if p.stderr:
+            stderr_str = p.stderr.decode()
+            if stderr_str and stderr_str != "":
+                AppLogging.error(stderr_str)
+
+        # TODO this cannot be same PageResponseObject name
+
+        with open(str(response_file_location), "rb") as fh:
+            all_bytes = fh.read()
+            o = PageResponseObject(url)
+            o.from_bytes(all_bytes)
+
+            return o
 
     def ping(self, timeout_s=5):
         url = self.url
@@ -3100,11 +2915,8 @@ class RequestBuilder(object):
 
             return response is not None and response.is_valid()
 
-        except Exception as e:
-            stack_lines = traceback.format_stack()
-            stack_str = "".join(stack_lines)
-
-            AppLogging.error("Exception during ping. Url:{}\nExc:{}\n{}".format(self.url, str(e), stack_str))
+        except Exception as E:
+            AppLogging.exc(E, "Url:{}. Ping error\n".format(self.url))
             return False
 
     def get_headers_response(self, timeout_s=5):
@@ -3127,11 +2939,8 @@ class RequestBuilder(object):
             if response and response.is_valid():
                 return response
 
-        except Exception as e:
-            stack_lines = traceback.format_stack()
-            stack_str = "".join(stack_lines)
-
-            AppLogging.error("Exception during headers. Url:{}\nExc:{}\n{}".format(self.url, str(e), stack_str))
+        except Exception as E:
+            AppLogging.exc(E, "Url:{}. Header request error\n".format(self.url))
             return None
 
     def get_response_implementation(self):
@@ -3152,7 +2961,7 @@ class RequestBuilder(object):
                 line_text += line
 
             AppLogging.error(
-                "Page: Url is invalid{};Lines:{}".format(self.url, line_text)
+                "Url: Url is invalid{};Lines:{}".format(self.url, line_text)
             )
 
             self.dead = True
@@ -3160,7 +2969,7 @@ class RequestBuilder(object):
 
         try:
             LinkDatabase.info(
-                "Page: Requesting page: {} options:{}".format(self.url, self.options)
+                "Url: Requesting page: {} options:{}".format(self.url, self.options)
             )
 
             self.response = self.get_contents_function(
@@ -3168,15 +2977,13 @@ class RequestBuilder(object):
             )
 
             LinkDatabase.info(
-                "Page: Requesting page: {} DONE".format(self.url, self.options)
+                "Url: Requesting page: {} DONE".format(self.url, self.options)
             )
 
-        except Exception as e:
+        except Exception as E:
             self.dead = True
-            error_text = traceback.format_exc()
-
-            AppLogging.error(
-                "Page {} error:{}\n{}".format(self.url, str(e), error_text)
+            AppLogging.exc(
+                    E, "Url:{}".format(self.url)
             )
 
         return self.response
@@ -3235,7 +3042,7 @@ class InternetPageHandler(ContentInterface):
 
         if self.browser_promotions and self.is_advanced_processing_possible():
             # we warn, so that admin can deifine entry rules for that page
-            AppLogging.warning("Page:{}. Trying to workaround with headless browser".format(self.url))
+            AppLogging.info("Url:{}. Trying to workaround with headless browser".format(self.url))
             self.options.use_headless_browser = True
             self.p = self.get_page_handler_simple()
 
@@ -3304,6 +3111,8 @@ class InternetPageHandler(ContentInterface):
             return True
 
         status_code = self.response.get_status_code()
+        if status_code == HTTP_STATUS_CODE_CONNECTION_ERROR:
+            return False
 
         if status_code < 200 or status_code > 404:
             if self.options.use_basic_crawler():

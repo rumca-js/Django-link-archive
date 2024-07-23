@@ -1,3 +1,6 @@
+"""
+This file should not include any other or django related files.
+"""
 from datetime import datetime, date, timedelta
 from dateutil import parser
 from pytz import timezone

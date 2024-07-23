@@ -525,6 +525,62 @@ class RefreshThreadHandlerTest(FakeInternetTestCase):
             1,
         )
 
+    def test_refresh__adds_export_all(self):
+        DataExport.objects.all().delete()
+        SourceExportHistory.objects.all().delete()
+        self.create_exports()
+
+        handler = RefreshThreadHandler()
+        # call tested function
+        handler.refresh()
+
+        persistent_objects = AppLogging.objects.all()
+
+        for persistent_object in persistent_objects:
+            print("Persisten object info:{}".format(persistent_object.info))
+
+        self.assertEqual(persistent_objects.count(), 0)
+
+        self.assertEqual(
+            BackgroundJobController.objects.filter(
+                job=BackgroundJobController.JOB_EXPORT_DATA
+            ).count(),
+            3,
+        )
+
+        export_histories = SourceExportHistory.objects.all()
+        self.assertEqual(export_histories.count(), 3)
+
+    def test_refresh__adds_export_not_failed(self):
+        DataExport.objects.all().delete()
+        SourceExportHistory.objects.all().delete()
+        self.create_exports()
+
+        for data_export in DataExport.objects.all():
+            data_export.enabled = False
+            data_export.save()
+
+        handler = RefreshThreadHandler()
+        # call tested function
+        handler.refresh()
+
+        persistent_objects = AppLogging.objects.all()
+
+        for persistent_object in persistent_objects:
+            print("Persisten object info:{}".format(persistent_object.info))
+
+        self.assertEqual(persistent_objects.count(), 0)
+
+        self.assertEqual(
+            BackgroundJobController.objects.filter(
+                job=BackgroundJobController.JOB_EXPORT_DATA
+            ).count(),
+            0,
+        )
+
+        export_histories = SourceExportHistory.objects.all()
+        self.assertEqual(export_histories.count(), 0)
+
 
 class CleanJobHandlerTest(FakeInternetTestCase):
     def setUp(self):

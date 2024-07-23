@@ -129,7 +129,7 @@ class SourceDataController(SourceDataModel):
             if valid:
                 obj.consecutive_errors = 0
             else:
-                obj.consecutive_errors += 0
+                obj.consecutive_errors += 1
 
             obj.save()
         else:

@@ -64,22 +64,22 @@ class ConfigurationEntry(models.Model):
     # background tasks will add everything using this user name
     admin_user = models.CharField(max_length=500, default="admin", blank=True)
 
-    background_task = models.BooleanField(
-        default=False,
-        help_text="Informs system that background task, like celery is operational.",
-    )  # True if celery is defined, and used
+    background_tasks = models.BooleanField(
+        default=True,
+        help_text="If disabled, background tasks, and jobs are disabled.",
+    )
 
     debug_mode = models.BooleanField(
         default=False,
         help_text="Debug mode allows to see errors more clearly",
-    )  # True if celery is defined, and used
+    )
 
     logging_level = models.IntegerField(default=int(logging.WARNING))
 
     respect_robots_txt = models.BooleanField(
         default=True,
         help_text="Use robots.txt information. Some functionality can not work: for example YouTube channels",
-    )  # True if celery is defined, and used
+    )
 
     ssl_verification = models.BooleanField(
         default=True
@@ -228,6 +228,20 @@ class ConfigurationEntry(models.Model):
         default="../data/exports",
         max_length=2000,
         null=True,
+    )
+
+    crawling_headless_script = models.CharField(
+        blank=True,
+        max_length=1000,
+        null=True,
+        help_text = "Script that is called when headless request needs to be made. Supported variables $URL $TIMEOUT $RESPONSE_FILE. Example: ./crawleeheadless.sh --url $URL -o $RESPONSE_FILE"
+    )
+
+    crawling_full_script = models.CharField(
+        blank=True,
+        max_length=1000,
+        null=True,
+        help_text = "Script that is called when full request needs to be made. Supported variables $URL $TIMEOUT $RESPONSE_FILE. Example: ./crawleefull.sh --url $URL -o $RESPONSE_FILE"
     )
 
 
@@ -590,7 +604,8 @@ class AppLogging(models.Model):
             detail_text += stack_string
 
         LinkDatabase.info(info_text)
-        LinkDatabase.info(detail_text)
+        if detail_text != "":
+            LinkDatabase.info(detail_text)
 
     def warning(info_text, detail_text="", user=None, stack=False):
         AppLogging.create_entry(info_text, detail_text=detail_text, level = AppLogging.WARNING, stack=stack)

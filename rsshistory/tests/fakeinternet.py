@@ -277,6 +277,10 @@ class TestResponseObject(PageResponseObject):
         if url.startswith("https://www.youtube.com/feeds"):
             return webpage_samtime_youtube_rss
 
+        if url.startswith("https://www.reddit.com/r/searchengines/.rss"):
+            # providy any rss, to have data
+            return webpage_samtime_youtube_rss
+
         if url == "https://www.youtube.com/robots.txt":
             return youtube_robots_txt
 

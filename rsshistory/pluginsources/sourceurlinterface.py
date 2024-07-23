@@ -1,9 +1,9 @@
-from ..webtools import HtmlPage, RssPage, Url, JsonPage, PageOptions, InternetPageHandler
 from ..models import (
     SourceDataModel,
 )
 from ..pluginsources.sourceparseplugin import BaseParsePlugin
 from ..pluginurl.urlhandler import UrlHandler
+from ..webtools import HtmlPage, RssPage, JsonPage, InternetPageHandler, DomainAwarePage
 
 
 class SourceUrlInterface(object):
@@ -49,9 +49,7 @@ class SourceUrlInterface(object):
     def get_props_internal(self, input_props=None):
         handler = self.h.get_handler()
 
-        if type(handler) is InternetPageHandler and type(handler.p) is RssPage:
-            return self.get_props_from_rss(input_props)
-        elif type(handler) is UrlHandler.youtube_channel_handler:
+        if type(handler) is UrlHandler.youtube_channel_handler:
             return self.get_props_from_rss(input_props)
         elif type(handler) is UrlHandler.youtube_video_handler:
             # Someone might be surprised that added URL is being replaced
@@ -59,23 +57,34 @@ class SourceUrlInterface(object):
             self.h = UrlHandler(self.url)
 
             return self.get_props_from_rss(input_props)
-        if type(handler) is InternetPageHandler and type(handler.p) is HtmlPage and handler.p.get_rss_url():
-            # Someone might be surprised that added URL is being replaced
-            self.url = handler.p.get_rss_url()
+        elif type(handler) is InternetPageHandler:
+            if self.is_reddit_channel():
+                rss = self.get_reddit_rss()
+                if not rss:
+                    return self.get_props_from_page(input_props)
 
-            handler = UrlHandler(self.url)
-            self.h = handler
+                self.url = rss
+                handler = UrlHandler(self.url)
+                self.h = handler
+                return self.get_props_internal(input_props)
 
-            if type(handler) is InternetPageHandler and type(handler.p) is RssPage:
+            elif type(handler.p) is RssPage:
                 return self.get_props_from_rss(input_props)
-            elif type(handler) is UrlHandler.youtube_channel_handler:
-                return self.get_props_from_rss(input_props)
+            elif type(handler.p) is HtmlPage and handler.p.get_rss_url():
+                # Someone might be surprised that added URL is being replaced
+                url = handler.p.get_rss_url()
+                if not url:
+                    return self.get_props_from_page(input_props)
+
+                self.url = url
+                handler = UrlHandler(self.url)
+                self.h = handler
+
+                return self.get_props_internal(input_props)
+            elif type(handler.p) is JsonPage:
+                return self.get_props_from_json(input_props)
             else:
                 return self.get_props_from_page(input_props)
-        if type(handler) is InternetPageHandler and type(handler.p) is JsonPage:
-            return self.get_props_from_json(input_props)
-        else:
-            return self.get_props_from_page(input_props)
 
     def get_props_from_rss(self, input_props=None):
         h = self.h
@@ -167,3 +176,25 @@ class SourceUrlInterface(object):
 
     def is_property_set(self, input_props, property):
         return property in input_props and input_props[property]
+
+    def is_reddit_channel(self):
+        p = DomainAwarePage(self.url)
+        if p.get_domain_only().startswith("reddit.com"):
+            parts = p.split()
+            if len(parts) == 3 and parts[1] == "r":
+                return True
+
+        return False
+
+    def get_reddit_rss(self):
+        return self.get_reddit_channel_path() + "/.rss"
+
+    def get_reddit_channel_name(self):
+        p = DomainAwarePage(self.url)
+        parts = p.split()
+        return parts[2]
+
+    def get_reddit_channel_path(self):
+        p = DomainAwarePage(self.url)
+        parts = p.split()
+        return p.join([parts[0], parts[1], parts[2]])

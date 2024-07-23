@@ -28,8 +28,11 @@ class LinkDatabase(AppConfig):
             current_date = DateUtils.get_datetime_now_utc()
             current_date = c.get_local_time(current_date)
 
-            AppLogging.notify("System is ready {}".format(current_date))
+            AppLogging.notify("System is ready {}.".format(current_date))
+
         except Exception as E:
+            # TODO this is stupid, that it prints errors during migrations
+            print(str(E))
             print("Exception can occur, if this is first run of migrations. Do not worry.")
 
     def info(message):

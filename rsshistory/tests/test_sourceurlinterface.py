@@ -136,3 +136,22 @@ class SourceUrlInterfaceTest(FakeInternetTestCase):
         self.assertEqual(
             props["proxy_location"], "https://instance.com/apps/rsshistory/sources-json"
         )
+
+    def test_reddit_channel(self):
+        MockRequestCounter.mock_page_requests = 0
+
+        url = SourceUrlInterface("https://www.reddit.com/r/searchengines/")
+        self.assertTrue(type(url.h.get_handler()), InternetPageHandler)
+        self.assertTrue(type(url.h.get_handler().p), RssPage)
+
+        props = url.get_props()
+
+        self.assertTrue(props)
+        self.assertTrue("url" in props)
+        self.assertEqual(
+            props["url"], "https://www.reddit.com/r/searchengines/.rss"
+        )
+        self.assertTrue("title" in props)
+        self.assertEqual(props["source_type"], SourceDataModel.SOURCE_TYPE_RSS)
+
+        self.assertEqual(MockRequestCounter.mock_page_requests, 1)

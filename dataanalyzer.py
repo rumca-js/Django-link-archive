@@ -668,6 +668,13 @@ class Parser(object):
         else:
             self.dir = None
 
+        if self.parser.args.verify:
+            if not crawlee_feataure_enabled:
+                print("Crawlee feature is not enabled")
+                return False
+
+        return True
+
     def get_verbosity_level(self):
         level = 1
         if self.args.verbosity:
@@ -681,7 +688,9 @@ class Parser(object):
 
 def main():
     p = Parser()
-    p.parse()
+    if not p.parse():
+        print("Could not parse options")
+        return
 
     m = DataAnalyzer(p)
     m.process()

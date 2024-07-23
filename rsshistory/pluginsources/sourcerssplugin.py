@@ -41,12 +41,24 @@ class BaseRssPlugin(SourceGenericPlugin):
 
         p = RssPage(url, contents)
         if p.is_valid():
-            self.contents = p.get_contents()
+            self.contents = contents
             return self.contents
 
         p = HtmlPage(url, contents)
         if p.is_valid():
-            rss_contents = p.get_body_text()
+            contents = p.get_contents()
+            wh1 = contents.find("<rss")
+            wh2 = contents.find("</rss", wh1+1)
+            wh3 = contents.find(">", wh2+1)
+            if wh1 == -1 or wh2 == -1 or wh3 == -1:
+                self.store_error(
+                    source, "HTML body does not provide RSS, body", rss_contents
+                )
+                self.dead = True
+
+                return None
+
+            rss_contents = contents[wh1:wh3+1]
 
             self.reader = RssPage(self.get_address(), contents=rss_contents)
 
@@ -55,8 +67,6 @@ class BaseRssPlugin(SourceGenericPlugin):
                     source, "HTML body does not provide RSS, body", rss_contents
                 )
                 self.dead = True
-
-                return None
             else:
                 contents = rss_contents
                 self.contents = p.get_contents()
@@ -111,9 +121,10 @@ class BaseRssPlugin(SourceGenericPlugin):
         all_props = self.reader.get_container_elements()
 
         for index, prop in enumerate(all_props):
-            if "link" not in prop:
-                LinkDatabase.info(
-                    "Link not present in RSS:{}".format(self.get_address())
+            if not self.is_link_ok_to_add(prop):
+                AppLogging.warning(
+                        "Page:{}. Cannot add link".format(self.get_address(), prop),
+                        stack=True
                 )
                 continue
 
@@ -142,6 +153,9 @@ class BaseRssPlugin(SourceGenericPlugin):
         Generic handler uses Html as base. We need to use RSS for body hash
         """
         contents = self.get_contents()
+        if not contents:
+            return
+
         reader = RssPage(self.get_address(), contents)
         return reader.get_contents_body_hash()
 

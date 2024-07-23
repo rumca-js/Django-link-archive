@@ -292,6 +292,30 @@ class DomainAwarePageTest(FakeInternetTestCase):
 
         self.assertFalse(p)
 
+    def test_split(self):
+        p = DomainAwarePage("http://www.youtube.com/test1/test2?whatever=1&something=2")
+        # call tested function
+        parts = p.split()
+
+        self.assertEqual(len(parts), 4)
+        self.assertEqual(parts[0], "http://www.youtube.com")
+        self.assertEqual(parts[1], "test1")
+        self.assertEqual(parts[2], "test2")
+        self.assertEqual(parts[3], "?whatever=1&something=2")
+
+    def test_join(self):
+        parts = [
+            "http://www.youtube.com",
+            "test1",
+            "test2",
+            "?whatever=1&something=2",]
+
+        p = DomainAwarePage("")
+        # call tested function
+        result = p.join(parts)
+
+        self.assertEqual(result, "http://www.youtube.com/test1/test2?whatever=1&something=2")
+
     def test_parse_url(self):
         p = DomainAwarePage("https://www.youtube.com/test?parameter=True")
         parts = p.parse_url()
@@ -315,6 +339,17 @@ class DomainAwarePageTest(FakeInternetTestCase):
         self.assertEqual(parts[2], "www.youtube.com")
         self.assertEqual(parts[3], "/test")
         self.assertEqual(parts[4], "#parameter=True")
+
+    def test_parse_url3(self):
+        p = DomainAwarePage("https://www.youtube.com/test/")
+        parts = p.parse_url()
+        print(parts)
+
+        self.assertTrue(len(parts) == 4)
+        self.assertEqual(parts[0], "https")
+        self.assertEqual(parts[1], "://")
+        self.assertEqual(parts[2], "www.youtube.com")
+        self.assertEqual(parts[3], "/test")
 
     def test_is_web_link(self):
         p = DomainAwarePage("https://www.youtube.com")
