@@ -35,7 +35,9 @@ class UrlHandlerTest(FakeInternetTestCase):
             "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM"
         )
 
-        self.assertEqual(type(handler.get_handler()), UrlHandler.youtube_channel_handler)
+        self.assertEqual(
+            type(handler.get_handler()), UrlHandler.youtube_channel_handler
+        )
 
     def test_rss_get_properties(self):
         handler = UrlHandler("https://simple-rss-page.com/rss.xml")

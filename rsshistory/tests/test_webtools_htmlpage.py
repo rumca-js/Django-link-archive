@@ -573,7 +573,6 @@ class HtmlPageTest(FakeInternetTestCase):
         self.assertEqual(page.get_pwa_manifest(), "test_page_manifest.json")
 
     def test_get_page_rating__perfect(self):
-
         page = HtmlPage("https://perfect.com", webpage_perfect_contents)
 
         # call tested function

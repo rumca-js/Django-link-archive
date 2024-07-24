@@ -352,10 +352,12 @@ class SourceDataController(SourceDataModel):
         from .backgroundjob import BackgroundJobController
 
         properties = {"permament": True}
-        BackgroundJobController.link_add(url = source.url, properties=properties, source=source)
+        BackgroundJobController.link_add(
+            url=source.url, properties=properties, source=source
+        )
 
     def custom_remove(self):
-        entries = LinkDataModel.objects.filter(link = self.url)
+        entries = LinkDataModel.objects.filter(link=self.url)
         if entries.exists():
             entry = entries[0]
             entry.permament = False
@@ -449,6 +451,7 @@ class SourceDataBuilder(object):
 
     def additional_source_operations(self, source):
         from .backgroundjob import BackgroundJobController
+
         if source:
             SourceDataController.add_entry(source)
             BackgroundJobController.download_file(source.favicon)

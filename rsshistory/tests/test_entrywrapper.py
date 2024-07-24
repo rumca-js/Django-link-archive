@@ -768,7 +768,6 @@ class EntryWrapperTest(FakeInternetTestCase):
         self.assertEqual(entries.count(), 1)
 
     def test_move_entry__destination_exists(self):
-
         https_entry = LinkDataController.objects.create(
             source="https://archive.com/test",
             link="https://testlink.com",
@@ -851,7 +850,7 @@ class EntryWrapperTest(FakeInternetTestCase):
         all_transitions = UserEntryTransitionHistory.objects.all()
         self.assertEqual(all_transitions.count(), 1)
 
-        from_entries = UserEntryTransitionHistory.objects.filter(entry_from = https_entry)
+        from_entries = UserEntryTransitionHistory.objects.filter(entry_from=https_entry)
         self.assertEqual(from_entries.count(), 1)
 
         visits = UserEntryVisitHistory.objects.all()
@@ -860,7 +859,6 @@ class EntryWrapperTest(FakeInternetTestCase):
         self.assertEqual(visit.entry_object, https_entry)
 
     def test_move_entry_to_url__destination_exists(self):
-
         https_entry = LinkDataController.objects.create(
             source="https://archive.com/test",
             link="https://testlink.com",
@@ -893,8 +891,8 @@ class EntryWrapperTest(FakeInternetTestCase):
         LinkCommentDataModel.add(self.user_not_staff, http_entry, "This is stupid")
         UserBookmarks.add(self.user_not_staff, http_entry)
 
-        #UserEntryTransitionHistory.add(self.user_not_staff, entry_from = http_entry, entry_to = youtube_entry)
-        #UserEntryTransitionHistory.add(self.user_not_staff, entry_from = youtube_entry, entry_to = http_entry)
+        # UserEntryTransitionHistory.add(self.user_not_staff, entry_from = http_entry, entry_to = youtube_entry)
+        # UserEntryTransitionHistory.add(self.user_not_staff, entry_from = youtube_entry, entry_to = http_entry)
 
         UserEntryVisitHistory.visited(http_entry, self.user_not_staff)
         UserEntryVisitHistory.visited(youtube_entry, self.user_not_staff)
@@ -946,7 +944,7 @@ class EntryWrapperTest(FakeInternetTestCase):
         all_transitions = UserEntryTransitionHistory.objects.all()
         self.assertEqual(all_transitions.count(), 1)
 
-        from_entries = UserEntryTransitionHistory.objects.filter(entry_from = https_entry)
+        from_entries = UserEntryTransitionHistory.objects.filter(entry_from=https_entry)
         self.assertEqual(from_entries.count(), 1)
 
         visits = UserEntryVisitHistory.objects.all()
@@ -955,7 +953,6 @@ class EntryWrapperTest(FakeInternetTestCase):
         self.assertEqual(visit.entry_object, https_entry)
 
     def test_move_entry_to_url__destination_does_not_exist(self):
-
         http_entry = LinkDataController.objects.create(
             source="http://archive.com/test",
             link="http://testlink.com",
@@ -979,8 +976,8 @@ class EntryWrapperTest(FakeInternetTestCase):
         LinkCommentDataModel.add(self.user_not_staff, http_entry, "This is stupid")
         UserBookmarks.add(self.user_not_staff, http_entry)
 
-        #UserEntryTransitionHistory.add(self.user_not_staff, entry_from = http_entry, entry_to = youtube_entry)
-        #UserEntryTransitionHistory.add(self.user_not_staff, entry_from = youtube_entry, entry_to = http_entry)
+        # UserEntryTransitionHistory.add(self.user_not_staff, entry_from = http_entry, entry_to = youtube_entry)
+        # UserEntryTransitionHistory.add(self.user_not_staff, entry_from = youtube_entry, entry_to = http_entry)
 
         UserEntryVisitHistory.visited(http_entry, self.user_not_staff)
         UserEntryVisitHistory.visited(youtube_entry, self.user_not_staff)
@@ -997,7 +994,9 @@ class EntryWrapperTest(FakeInternetTestCase):
         self.assertEqual(transition.entry_to, youtube_entry)
 
         # call tested function
-        result = EntryWrapper(entry=http_entry).move_entry_to_url(http_entry.get_https_url())
+        result = EntryWrapper(entry=http_entry).move_entry_to_url(
+            http_entry.get_https_url()
+        )
 
         # Check expected behavior
 
@@ -1034,7 +1033,7 @@ class EntryWrapperTest(FakeInternetTestCase):
         all_transitions = UserEntryTransitionHistory.objects.all()
         self.assertEqual(all_transitions.count(), 1)
 
-        from_entries = UserEntryTransitionHistory.objects.filter(entry_from = http_entry)
+        from_entries = UserEntryTransitionHistory.objects.filter(entry_from=http_entry)
         self.assertEqual(from_entries.count(), 1)
 
         visits = UserEntryVisitHistory.objects.all()

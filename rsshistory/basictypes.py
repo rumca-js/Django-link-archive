@@ -10,7 +10,7 @@ def get_ascii_text(text):
     return thebytes.decode()
 
 
-def fix_path_for_windows(file_path, max_path = 260, limit=False):
+def fix_path_for_windows(file_path, max_path=260, limit=False):
     """
     @param file_path needs to be string
     """
@@ -36,7 +36,7 @@ def fix_path_for_windows(file_path, max_path = 260, limit=False):
     if len(parts) < 2:
         return file_path
 
-    parts0 = parts[0][:max_path-1]
+    parts0 = parts[0][: max_path - 1]
 
     return parts0 + parts[1]
 

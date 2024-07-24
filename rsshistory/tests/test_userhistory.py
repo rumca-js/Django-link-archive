@@ -135,7 +135,9 @@ class UserEntryTransitionHistoryTest(TestCase):
         )
 
         # cal tested function
-        UserEntryTransitionHistory.move_entry(self.entry_youtube, self.entry_youtube_new)
+        UserEntryTransitionHistory.move_entry(
+            self.entry_youtube, self.entry_youtube_new
+        )
 
         transitions = UserEntryTransitionHistory.objects.all()
         self.assertTrue(transitions.count() > 0)
@@ -149,7 +151,9 @@ class UserEntryTransitionHistoryTest(TestCase):
         )
 
         # cal tested function
-        UserEntryTransitionHistory.move_entry(self.entry_youtube, self.entry_youtube_new)
+        UserEntryTransitionHistory.move_entry(
+            self.entry_youtube, self.entry_youtube_new
+        )
 
         transitions = UserEntryTransitionHistory.objects.all()
         self.assertTrue(transitions.count() > 0)
@@ -325,13 +329,14 @@ class UserEntryVisitHistoryTest(FakeInternetTestCase):
         # call tested function
         UserEntryVisitHistory.move_entry(self.youtube_object, self.youtube_object_new)
 
-        rows = UserEntryVisitHistory.objects.filter(entry_object = self.youtube_object_new)
+        rows = UserEntryVisitHistory.objects.filter(
+            entry_object=self.youtube_object_new
+        )
 
         self.assertTrue(rows.count() > 0)
         self.assertEqual(rows[0].entry_object, self.youtube_object_new)
 
     def test_visit_burst(self):
-
         https_entry = LinkDataController.objects.create(
             source="https://archive.com/test",
             link="https://testlink.com",

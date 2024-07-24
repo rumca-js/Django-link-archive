@@ -104,10 +104,7 @@ class BaseImporter(object):
             try:
                 self.import_from_link(link_data)
             except Exception as E:
-                AppLogging.exc(
-                    E,
-                    "Cannot import link data {}".format(link_data)
-                )
+                AppLogging.exc(E, "Cannot import link data {}".format(link_data))
 
         return True
 
@@ -118,10 +115,7 @@ class BaseImporter(object):
             try:
                 self.import_from_source(source_data)
             except Exception as E:
-                AppLogging.exc(
-                    E,
-                    "Cannot import source data {}".format(source_data)
-                )
+                AppLogging.exc(E, "Cannot import source data {}".format(source_data))
 
         return True
 

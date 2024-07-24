@@ -7,7 +7,7 @@ class ConfigurationTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 
-    #def test_encrypt_decrypt(self):
+    # def test_encrypt_decrypt(self):
     #    c = Configuration.get_object()
 
     #    # call tested function

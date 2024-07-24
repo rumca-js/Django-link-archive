@@ -6,7 +6,7 @@ https://realpython.com/python-sockets/   "Sending an Application Message"
 import argparse
 from datetime import timedelta
 import json
-import rsshistory.ipc
+import rsshistory.webtools
 
 PAGE_TOO_BIG_BYTES = 5000000
 
@@ -39,30 +39,26 @@ class Parser(object):
 
 
 async def main() -> None:
-    p = Parser()
-    p.parse()
-    print("Parsing")
+    parser = Parser()
+    parser.parse()
 
-    if "url" not in p.args:
+    if "url" not in parser.args:
         print("Url file not in args")
         return
 
-    if "output_file" not in p.args:
+    if "output_file" not in parser.args:
         print("Output file not in args")
         return
 
-    if p.args.url is None:
+    if parser.args.url is None:
         print("Url file not in args")
         return
 
-    if p.args.output_file is None:
+    if parser.args.output_file is None:
         print("Output file not in args")
         return
 
-    print("Cralwer")
-    print(p.args.output_file)
-
-    crawler = BeautifulSoupCrawler(
+    crawler = PlaywrightCrawler(
         # Limit the crawl to max requests. Remove or increase it for crawling all links.
         max_requests_per_crawl=10,
         request_handler_timeout = timedelta(seconds = 10),
@@ -71,28 +67,37 @@ async def main() -> None:
     async def save_error(response):
         response.status_code = 500
         all_bytes = response.to_bytes()
-        with open(p.args.output_file, "wb") as fh:
+        with open(parser.args.output_file, "wb") as fh:
+            fh.write(all_bytes)
+
+    async def save_response(response):
+        all_bytes = response.to_bytes()
+        with open(parser.args.output_file, "wb") as fh:
             fh.write(all_bytes)
 
     # Define the default request handler, which will be called for every request.
     @crawler.router.default_handler
-    async def request_handler(context: BeautifulSoupCrawlingContext) -> None:
+    async def request_handler(context: PlaywrightCrawlingContext) -> None:
         print(f'Processing {context.request.url} ...')
 
         try:
             result = {}
             # maybe we could send header information that we accept text/rss
-
             result['url'] = context.request.url
             result['loaded_url'] = context.request.loaded_url
-            result['status_code'] = context.http_response.status_code
+            result['status_code'] = context.response.status
 
             headers = {}
-            for item in context.http_response.headers:
-                headers[item] = context.http_response.headers[item]
+            for item in context.response.headers:
+                headers[item] = context.response.headers[item]
             result['headers'] = headers
 
-            response = rsshistory.ipc.PageResponseObject(result['url'], headers = result['headers'])
+            response = rsshistory.webtools.PageResponseObject(result['url'], headers = result['headers'])
+
+            if parser.args.ping:
+                await save_response(response)
+                return
+
             if response.get_content_length() > PAGE_TOO_BIG_BYTES:
                 await save_error(response)
                 print("Response too big")
@@ -104,23 +109,23 @@ async def main() -> None:
                 print("Content not supported")
                 return
 
-            # todo check in headers if we accept payload
-            result['page_content'] = str(context.soup)
+            # result['loaded_url'] = context.page.url
+            result['page_content'] = await context.page.content()
 
             response.content = result['page_content']
 
-            all_bytes = response.to_bytes()
-            with open(p.args.output_file, "wb") as fh:
-                fh.write(all_bytes)
+            await save_response(response)
+
+            print(f'Processing {context.request.url} ...DONE')
         except Exception as E:
             print("Exception:{}".format(str(E)))
 
-            response = rsshistory.ipc.PageResponseObject(result['url'])
+            response = rsshistory.webtools.PageResponseObject(result['url'])
             await save_error(response)
 
 
     # Run the crawler with the initial list of URLs.
-    await crawler.run([p.args.url])
+    await crawler.run([parser.args.url])
 
 
 if __name__ == '__main__':

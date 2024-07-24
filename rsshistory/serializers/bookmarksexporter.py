@@ -97,10 +97,11 @@ $channel_text
             return t.safe_substitute(map_data)
         except Exception as E:
             AppLogging.exc(
-                E, 
+                E,
                 "Template exception {0} {1}".format(
-                    template_text, str(map_data),
-                )
+                    template_text,
+                    str(map_data),
+                ),
             )
         return ""
 

@@ -15,7 +15,7 @@ from ..forms import (
     BackgroundJobForm,
 )
 from ..views import ViewPage
- 
+
 
 class BackgroundJobsView(generic.ListView):
     model = BackgroundJobController
@@ -51,7 +51,6 @@ def backgroundjob_add(request):
     if request.method == "POST":
         form = BackgroundJobForm(request.POST)
         if form.is_valid():
-
             job = form.cleaned_data["job"]
             themap = form.cleaned_data
 

@@ -308,13 +308,16 @@ class DomainAwarePageTest(FakeInternetTestCase):
             "http://www.youtube.com",
             "test1",
             "test2",
-            "?whatever=1&something=2",]
+            "?whatever=1&something=2",
+        ]
 
         p = DomainAwarePage("")
         # call tested function
         result = p.join(parts)
 
-        self.assertEqual(result, "http://www.youtube.com/test1/test2?whatever=1&something=2")
+        self.assertEqual(
+            result, "http://www.youtube.com/test1/test2?whatever=1&something=2"
+        )
 
     def test_parse_url(self):
         p = DomainAwarePage("https://www.youtube.com/test?parameter=True")

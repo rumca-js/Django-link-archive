@@ -45,19 +45,19 @@ class DataExportTests(FakeInternetTestCase):
 
         form_data = {
             "enabled": True,
-            "export_type" : "export-type-git",
-            "export_data" : "export-dtype-daily-data",
-            "local_path" : "",
-            "remote_path" : "",
-            "user" : "",
-            "password" : "",
-            "db_user" : "",
-            "export_time" : time(0,0),
+            "export_type": "export-type-git",
+            "export_data": "export-dtype-daily-data",
+            "local_path": "",
+            "remote_path": "",
+            "user": "",
+            "password": "",
+            "db_user": "",
+            "export_time": time(0, 0),
         }
 
         # call user action
         response = self.client.post(url, data=form_data)
-        #print(response.content.decode())
+        # print(response.content.decode())
 
         self.assertEqual(response.status_code, 302)
 

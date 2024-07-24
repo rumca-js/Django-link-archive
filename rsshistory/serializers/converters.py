@@ -188,7 +188,8 @@ class MarkDownConverter(ItemConverterFabric):
         except Exception as E:
             AppLogging.exc(
                 "Template exception {0} {1}".format(
-                    self.item_template, str(map_data),
+                    self.item_template,
+                    str(map_data),
                 )
             )
         return ""
@@ -247,8 +248,9 @@ class MarkDownConverter(ItemConverterFabric):
             AppLogging.exc(
                 E,
                 "Template exception {0} {1}".format(
-                    self.item_template, str(map_data),
-                )
+                    self.item_template,
+                    str(map_data),
+                ),
             )
         return ""
 
@@ -281,7 +283,8 @@ class MarkDownSourceConverter(object):
             AppLogging.exc(
                 E,
                 "Template exception {0} {1}".format(
-                    self.item_template, str(map_data),
-                )
+                    self.item_template,
+                    str(map_data),
+                ),
             )
         return ""

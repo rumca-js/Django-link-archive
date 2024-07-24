@@ -22,7 +22,7 @@ class ModelFilesTests(FakeInternetTestCase):
     def test_model_files(self):
         ModelFiles.objects.all().delete()
         data = "data"
-        obj = ModelFiles.objects.create(file_name = "test", contents = data.encode())
+        obj = ModelFiles.objects.create(file_name="test", contents=data.encode())
 
         self.client.login(username="testuser", password="testpassword")
 
@@ -37,7 +37,7 @@ class ModelFilesTests(FakeInternetTestCase):
     def test_model_file(self):
         ModelFiles.objects.all().delete()
         data = "data"
-        obj = ModelFiles.objects.create(file_name = "test", contents = data.encode())
+        obj = ModelFiles.objects.create(file_name="test", contents=data.encode())
 
         self.client.login(username="testuser", password="testpassword")
 
@@ -52,7 +52,7 @@ class ModelFilesTests(FakeInternetTestCase):
     def test_model_file_remove(self):
         ModelFiles.objects.all().delete()
         data = "data"
-        obj = ModelFiles.objects.create(file_name = "test", contents = data.encode())
+        obj = ModelFiles.objects.create(file_name="test", contents=data.encode())
 
         self.client.login(username="testuser", password="testpassword")
 
@@ -67,7 +67,7 @@ class ModelFilesTests(FakeInternetTestCase):
     def test_model_files_remove(self):
         ModelFiles.objects.all().delete()
         data = "data"
-        obj = ModelFiles.objects.create(file_name = "test", contents = data.encode())
+        obj = ModelFiles.objects.create(file_name="test", contents=data.encode())
 
         self.client.login(username="testuser", password="testpassword")
 

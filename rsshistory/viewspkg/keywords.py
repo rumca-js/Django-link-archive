@@ -73,4 +73,3 @@ def keyword_remove(request):
             return HttpResponseRedirect(
                 reverse("{}:keywords".format(LinkDatabase.name))
             )
-

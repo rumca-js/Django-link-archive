@@ -896,7 +896,7 @@ class WriteDailyDataJobHandlerTest(FakeInternetTestCase):
         LinkDataController.objects.create(
             source="https://youtube.com",
             link="https://youtube.com?v=12345",
-            date_published = DateUtils.from_string("2024-06-23T11:35:31Z")
+            date_published=DateUtils.from_string("2024-06-23T11:35:31Z"),
         )
 
         handler = WriteDailyDataJobHandler()
@@ -936,14 +936,13 @@ class ExportDataJobHandlerTest(FakeInternetTestCase):
         SourceDataController.objects.all().delete()
 
         ob = BackgroundJobController.objects.create(
-            job=BackgroundJob.JOB_EXPORT_DATA,
-            subject=str(self.export_id)
+            job=BackgroundJob.JOB_EXPORT_DATA, subject=str(self.export_id)
         )
 
         LinkDataController.objects.create(
             source="https://youtube.com",
             link="https://youtube.com?v=12345",
-            date_published = DateUtils.from_string("2024-06-23T11:35:31Z")
+            date_published=DateUtils.from_string("2024-06-23T11:35:31Z"),
         )
 
         handler = ExportDataJobHandler()

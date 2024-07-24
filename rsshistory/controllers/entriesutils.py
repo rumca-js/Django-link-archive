@@ -15,7 +15,13 @@ from ..models import (
     ModelFiles,
 )
 from ..configuration import Configuration
-from ..webtools import RequestBuilder, HtmlPage, RssPage, ContentLinkParser, DomainAwarePage
+from ..webtools import (
+    RequestBuilder,
+    HtmlPage,
+    RssPage,
+    ContentLinkParser,
+    DomainAwarePage,
+)
 from ..apps import LinkDatabase
 from ..dateutils import DateUtils
 from .entries import LinkDataController, ArchiveLinkDataController
@@ -35,11 +41,11 @@ class EntriesCleanup(object):
             self.start_processing_time = start_processing_time
 
         if limit_s == 0:
-            self.limit_s = 60*10 # 10 minutes
+            self.limit_s = 60 * 10  # 10 minutes
         else:
             self.limit_s = limit_s
 
-    def cleanup(self, limit_s = 0):
+    def cleanup(self, limit_s=0):
         """
         We do not exit prematurely.
 
@@ -74,9 +80,9 @@ class EntriesCleanup(object):
         # TODO it may take very long time, exceed time, and be correct, we should
         # return True then. Check if everything has been done, not only exceeded time
 
-        #self.cleanup_permanent_flags()
+        # self.cleanup_permanent_flags()
 
-        #if self.is_time_exceeded():
+        # if self.is_time_exceeded():
         #    return False
 
         return True
@@ -85,7 +91,7 @@ class EntriesCleanup(object):
         """
         This will only fix domains
         """
-        invalid_domains = DomainsController.objects.filter(domain__icontains = ":")
+        invalid_domains = DomainsController.objects.filter(domain__icontains=":")
         for invalid_domain in invalid_domains:
             invalid_domain_name = invalid_domain.domain
             wh = invalid_domain_name.find(":")
@@ -99,7 +105,7 @@ class EntriesCleanup(object):
                 invalid_entry = invalid_entries[0]
 
             valid_domain_name = invalid_domain_name[:wh]
-            link_with_https = "https://"+valid_domain_name
+            link_with_https = "https://" + valid_domain_name
 
             b = EntryDataBuilder(link=link_with_https)
             if not b.result:
@@ -118,7 +124,7 @@ class EntriesCleanup(object):
                 # should also remove incorrect entry
                 invalid_domain.delete()
 
-    def cleanup_remove_entries(self, limit_s = 0):
+    def cleanup_remove_entries(self, limit_s=0):
         sources = SourceDataController.objects.all()
         for source in sources:
             AppLogging.debug("Removing for source:{}".format(source.title))
@@ -290,7 +296,7 @@ class EntriesCleanup(object):
                 https_url = http_entry.get_https_url()
                 https_entries = LinkDataController.objects.filter(link=https_url)
                 if https_entries.exists():
-                    w = EntryWrapper(entry = http_entry)
+                    w = EntryWrapper(entry=http_entry)
                     w.move_entry(https_entries[0])
 
         return True
@@ -305,7 +311,7 @@ class EntriesCleanup(object):
                 nonwww_url = www_entry.link.replace("https://www.", "https://")
                 nonwww_entries = LinkDataController.objects.filter(link=nonwww_url)
                 if nonwww_entries.exists():
-                    w = EntryWrapper(entry = www_entry)
+                    w = EntryWrapper(entry=www_entry)
                     w.move_entry(nonwww_entries[0])
 
         www_entries = LinkDataController.objects.filter(link__icontains="http://www.")
@@ -314,7 +320,7 @@ class EntriesCleanup(object):
                 nonwww_url = www_entry.link.replace("http://www.", "http://")
                 nonwww_entries = LinkDataController.objects.filter(link=nonwww_url)
                 if nonwww_entries.exists():
-                    w = EntryWrapper(entry = www_entry)
+                    w = EntryWrapper(entry=www_entry)
                     w.move_entry(nonwww_entries[0])
 
         return True
@@ -325,13 +331,15 @@ class EntriesCleanup(object):
          - if enable_domain_support & keep_domains
         This could be intensive
         """
-        link_is_url = Q(source_obj__url = F('link'))
+        link_is_url = Q(source_obj__url=F("link"))
         domain_is_notnull = Q(domain_obj__isnull=False)
-        is_permanent = Q(permanent = True)
+        is_permanent = Q(permanent=True)
 
         # domain is not null and link is url are valid scenarios
 
-        entries = LinkDataController.objects.filter( ~(link_is_url | domain_is_notnull) & is_permanent)
+        entries = LinkDataController.objects.filter(
+            ~(link_is_url | domain_is_notnull) & is_permanent
+        )
         for entry in entries:
             entry.permanent = False
             entry.save()
@@ -490,8 +498,8 @@ class EntryUpdater(object):
             if entry.date_update_last < entry.date_published:
                 entry.date_published = entry.date_update_last
 
-        properties = {"title" : entry.title, "description" : entry.description}
-        moderator = UrlAgeModerator(properties = properties)
+        properties = {"title": entry.title, "description": entry.description}
+        moderator = UrlAgeModerator(properties=properties)
         age = moderator.get_age()
 
         if not entry.age or not age or entry.age < age:
@@ -641,13 +649,13 @@ class EntryUpdater(object):
         self.store_thumbnail(entry)
 
     def store_thumbnail(self, entry):
-        if entry.page_rating_votes > 0: # TODO should that be configurable?
+        if entry.page_rating_votes > 0:  # TODO should that be configurable?
             from .modelfiles import ModelFilesBuilder
 
             c = Configuration.get_object()
             config = c.config_entry
             if config.auto_store_thumbnails:
-                ModelFilesBuilder().build(file_name = entry.thumbnail)
+                ModelFilesBuilder().build(file_name=entry.thumbnail)
 
     def add_links_from_url(self, entry, url_interface):
         url_handler = url_interface.h
@@ -812,9 +820,9 @@ class EntriesUpdater(object):
         condition_update_null = Q(date_update_last__isnull=True)
 
         entries = LinkDataController.objects.filter(
-             condition_update_null |
-             (condition_not_dead & condition_days_to_check_std) |
-             (condition_dead & condition_days_to_check_stale)
+            condition_update_null
+            | (condition_not_dead & condition_days_to_check_std)
+            | (condition_dead & condition_days_to_check_stale)
         ).order_by("date_update_last", "link")
 
         return entries
@@ -888,7 +896,7 @@ class EntryWrapper(object):
 
                 if entry_objs.count() > 0 and not entry_objs[0].is_dead():
                     return entry_objs[0]
-                
+
                 link_url = p.get_protocol_url("http")
                 link_url = link_url.replace("www.", "")
                 entry_objs = objects.filter(link=link_url)
@@ -1017,7 +1025,6 @@ class EntryWrapper(object):
             except Exception as E:
                 AppLogging.exc(E, "Canont move link to archive {}".format(link))
 
-
     def make_bookmarked(self, request):
         """
         TODO move this API to UserBookmarks
@@ -1111,7 +1118,14 @@ class EntryWrapper(object):
         if destination_entry.is_dead():
             return None
 
-        from ..models import UserTags, UserVotes, LinkCommentDataModel, UserBookmarks, UserEntryVisitHistory, UserEntryTransitionHistory
+        from ..models import (
+            UserTags,
+            UserVotes,
+            LinkCommentDataModel,
+            UserBookmarks,
+            UserEntryVisitHistory,
+            UserEntryTransitionHistory,
+        )
 
         source_entry = self.entry
 
@@ -1134,7 +1148,7 @@ class EntryWrapper(object):
         """
         Moves entry to destination url.
         """
-        destination_entries = LinkDataController.objects.filter(link = destination_url)
+        destination_entries = LinkDataController.objects.filter(link=destination_url)
 
         if destination_entries.count() > 0:
             return self.move_entry(destination_entries[0])
@@ -1170,11 +1184,11 @@ class EntryWrapper(object):
         if entry.is_https():
             http_url = entry.get_http_url()
 
-            p = RequestBuilder(url = entry.link)
+            p = RequestBuilder(url=entry.link)
             ping_status = p.ping()
 
             if not ping_status:
-                p = RequestBuilder(url = http_url)
+                p = RequestBuilder(url=http_url)
                 new_ping_status = p.ping()
 
                 if new_ping_status:
@@ -1219,7 +1233,7 @@ class EntryWrapper(object):
 
         destination_link = entry.link.replace("www.", "")
 
-        p = RequestBuilder(url = destination_link)
+        p = RequestBuilder(url=destination_link)
         if p.ping():
             self.move_entry_to_url(destination_link)
 
@@ -1236,7 +1250,7 @@ class EntryWrapper(object):
 
             http_entries = LinkDataController.objects.filter(link=http_url)
             if http_entries.count() != 0:
-                w = EntryWrapper(entry = http_entries[0])
+                w = EntryWrapper(entry=http_entries[0])
                 w.move_entry(entry)
 
         if entry.is_http():
@@ -1708,14 +1722,18 @@ class EntryDataBuilder(object):
 
 
 class EntriesCleanupAndUpdate(object):
-    def cleanup(self, limit_s = 0):
+    def cleanup(self, limit_s=0):
         start_processing_time = time.time()
 
-        cleanup = EntriesCleanup(archive_cleanup=False, start_processing_time=start_processing_time)
+        cleanup = EntriesCleanup(
+            archive_cleanup=False, start_processing_time=start_processing_time
+        )
         if not cleanup.cleanup(limit_s):
             return False
 
-        cleanup = EntriesCleanup(archive_cleanup=True, start_processing_time=start_processing_time)
+        cleanup = EntriesCleanup(
+            archive_cleanup=True, start_processing_time=start_processing_time
+        )
         if not cleanup.cleanup(limit_s):
             return False
 

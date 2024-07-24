@@ -20,7 +20,7 @@ pymemcache = "^4.0.0"
 celery = "^5.3.6"
 django-celery-results = "^2.5.1"
 sqlalchemy = "^2.0.23"
-tldextract = "^3.4.4"
+tldextract = "5.1.2"
 sympy = "^1.12"
 beautifulsoup4 = "^4.12.2"
 spacy = "^3.7.2"
@@ -33,8 +33,8 @@ pyvirtualdisplay = "^3.0"
 undetected-chromedriver = "^3.5.5"
 
 #  use things below if you want to use crawlee
-crawlee="0.0.2"
-playwright="1.45.0"
+crawlee="0.1.1"
+playwright="*"
 lxml="5.2.2"
 
 [tool.poetry.group.dev.dependencies]

@@ -156,17 +156,19 @@ class UrlHandler(Url):
 
     def is_full_browser_required(url):
         p = DomainAwarePage(url)
-        if (p.is_link_service()):
+        if p.is_link_service():
             return True
 
         if EntryRules.is_full_browser_required(url):
             return True
 
         require_full_browser = [
-                'www.warhammer-community.com',
-                'warhammer-community.com',
-                'defcon.org',
-                'yahoo.com',
+            "www.warhammer-community.com",
+            "warhammer-community.com",
+            "defcon.org",
+            "reuters.com",
+            "yahoo.com",
+            "techcrunch.com",
         ]
         domain = p.get_domain_only()
 
@@ -426,13 +428,7 @@ class UrlPropertyValidator(UrlContentsModerator):
 
         text = title + "\n" + description
 
-        keywords = ["casino",
-                    "lotter",
-                    "bingo",
-                    "slot",
-                    "poker",
-                    "jackpot",
-                    "gacor"]
+        keywords = ["casino", "lotter", "bingo", "slot", "poker", "jackpot", "gacor"]
 
         sum = 0
         for keyword in keywords:
@@ -462,12 +458,7 @@ class UrlAgeModerator(UrlContentsModerator):
     def get_age__sexual(self):
         text = self.get_descriptive_pulp()
 
-        keywords = ["sexua",
-                    "lesbian",
-                    "bisexual",
-                    "queer ",
-                    "drag quee",
-                    "fuck"]
+        keywords = ["sexua", "lesbian", "bisexual", "queer ", "drag quee", "fuck"]
 
         sum = 0
         for keyword in keywords:

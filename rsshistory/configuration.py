@@ -37,23 +37,26 @@ class Configuration(object):
         self.context = {}
         self.config_entry = ConfigurationEntry.get()
         self.get_context()
+
         self.apply_ssl_verification()
         self.apply_user_agent()
+        self.apply_crawling_scripts()
         self.apply_robots_txt()
+        self.apply_web_logger()
 
     def get_context_minimal():
         config_entry = ConfigurationEntry.get()
         return {
-                "page_title": "[{}]".format(LinkDatabase.name),
-                "app_name": str(LinkDatabase.name),
-                "app_title": config_entry.instance_title,
-                "app_description": config_entry.instance_description,
-                "admin_email": "renegat@renegat0x0.ddns.net",
-                "admin_user": config_entry.admin_user,
-                "app_version": __version__,
-                "config": config_entry,
-                "base_generic": str(Path(LinkDatabase.name) / "base_generic.html"),
-                }
+            "page_title": "[{}]".format(LinkDatabase.name),
+            "app_name": str(LinkDatabase.name),
+            "app_title": config_entry.instance_title,
+            "app_description": config_entry.instance_description,
+            "admin_email": "renegat@renegat0x0.ddns.net",
+            "admin_user": config_entry.admin_user,
+            "app_version": __version__,
+            "config": config_entry,
+            "base_generic": str(Path(LinkDatabase.name) / "base_generic.html"),
+        }
 
     def get_context(self):
         if len(self.context) == 0:
@@ -113,10 +116,24 @@ class Configuration(object):
 
         RequestBuilder.user_agent = self.config_entry.user_agent
 
+    def apply_crawling_scripts(self):
+        from .webtools import RequestBuilder
+
+        c = self.config_entry
+
+        RequestBuilder.crawling_full_script = c.crawling_full_script
+        RequestBuilder.crawling_headless_script = c.crawling_headless_script
+
     def apply_robots_txt(self):
         from .webtools import DomainCache
 
         DomainCache.respect_robots_txt = self.config_entry.respect_robots_txt
+
+    def apply_web_logger(self):
+        from .webtools import WebLogger
+        from .models import AppLogging
+
+        WebLogger.web_logger = AppLogging
 
     def get_export_path(self, append=False):
         directory = Path(ConfigurationEntry.get().data_export_path)
@@ -213,9 +230,15 @@ class Configuration(object):
         if thread_id == 0:
             if self.is_it_time_to_ping:
                 if self.ping_internet(thread_id):
-                    SystemOperation.add_by_thread(thread_id, internet_status_checked = True, internet_status_ok = True)
+                    SystemOperation.add_by_thread(
+                        thread_id, internet_status_checked=True, internet_status_ok=True
+                    )
                 else:
-                    SystemOperation.add_by_thread(thread_id, internet_status_checked = True, internet_status_ok = False)
+                    SystemOperation.add_by_thread(
+                        thread_id,
+                        internet_status_checked=True,
+                        internet_status_ok=False,
+                    )
         else:
             SystemOperation.add_by_thread(thread_id)
 

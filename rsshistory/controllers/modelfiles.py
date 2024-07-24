@@ -1,13 +1,13 @@
-
 from ..models import ModelFiles
 from ..webtools import RequestBuilder
 from ..configuration import Configuration
+
 
 class ModelFilesBuilder(object):
     def __init__(self):
         pass
 
-    def build(self, file_name = None):
+    def build(self, file_name=None):
         if file_name is None:
             return
         if file_name == "":
@@ -17,7 +17,7 @@ class ModelFilesBuilder(object):
         if not c.enabled_file_support:
             return
 
-        p = RequestBuilder(url = file_name)
+        p = RequestBuilder(url=file_name)
         response = p.get_response()
 
         if not response:
@@ -27,5 +27,5 @@ class ModelFilesBuilder(object):
         contents = p.get_binary()
 
         if contents:
-            if not ModelFiles.objects.filter(file_name = file_name).exists():
+            if not ModelFiles.objects.filter(file_name=file_name).exists():
                 ModelFiles.add(file_name, contents)

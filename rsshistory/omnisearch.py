@@ -161,6 +161,7 @@ class EquationEvaluator(object):
     """
     Evaluates equations
     """
+
     def __init__(self, data, symbol_evaluator):
         self.data = data
         self.symbol_evaluator = symbol_evaluator
@@ -194,7 +195,9 @@ class EquationEvaluator(object):
             operation_symbol = str(expr)
             # print("Operation: {}".format(function))
 
-            return self.evaluate_function_and_store(operation_symbol, function, expr.args)
+            return self.evaluate_function_and_store(
+                operation_symbol, function, expr.args
+            )
 
         # print(f'arg {expr}')
         # print(f'arg.func: {expr.func}')
@@ -225,7 +228,6 @@ class EquationEvaluator(object):
         return self.known_results[operation_symbol]
 
     def evaluate_function(self, operation_symbol, function, args0, args1):
-
         if function == "And":  # & sign
             return args0 & args1
         elif function == "Or":  # | sign
@@ -240,7 +242,7 @@ class EquationEvaluator(object):
 
 
 class OmniSearch(object):
-    def __init__(self, search_query, symbol_evaluator = None, equation_evaluator =None):
+    def __init__(self, search_query, symbol_evaluator=None, equation_evaluator=None):
         """
         I assume that either symbol_evaluator is specified, or equation_evaluator
         """
@@ -256,7 +258,9 @@ class OmniSearch(object):
         if equation_evaluator:
             self.equation_evaluator = equation_evaluator
         else:
-            self.equation_evaluator = EquationEvaluator(self.search_query, self.symbol_evaluator)
+            self.equation_evaluator = EquationEvaluator(
+                self.search_query, self.symbol_evaluator
+            )
 
     def set_symbol_evaluator(self, symbol_evaluator):
         self.symbol_evaluator = symbol_evaluator

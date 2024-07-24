@@ -40,7 +40,7 @@ def get_request_page_num(request):
     if "page" in request.GET:
         page = request.GET["page"]
         try:
-           page =  int(page)
+            page = int(page)
         except Exception as e:
             page = 1
 
@@ -719,7 +719,7 @@ def sources_json(request):
         p = Paginator(links, view.get_paginate_by(links))
         page_obj = p.get_page(page_num)
 
-        objects = links[page_obj.start_index()-1: page_obj.end_index()]
+        objects = links[page_obj.start_index() - 1 : page_obj.end_index()]
 
         exporter = InstanceExporter()
         json_obj = exporter.export_sources(objects)

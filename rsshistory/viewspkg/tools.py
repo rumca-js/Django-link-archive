@@ -35,10 +35,22 @@ def page_show_properties(request):
 
         if "method" in request.GET and request.GET["method"] == "headless":
             options.use_headless_browser = True
+            options.use_full_browser = False
             method = request.GET["method"]
-        if "method" in request.GET and request.GET["method"] == "full":
+        elif "method" in request.GET and request.GET["method"] == "full":
             options.use_full_browser = True
+            options.use_headless_browser = False
+        elif "method" in request.GET and request.GET["method"] == "standard":
+            options.use_full_browser = False
+            options.use_headless_browser = False
             method = request.GET["method"]
+        else:
+            if options.use_full_browser:
+                method = "full"
+            elif options.use_headless_browser:
+                method = "headless"
+            else:
+                method = "standard"
 
         options.fast_parsing = False
 
@@ -55,7 +67,9 @@ def page_show_properties(request):
         p.context["page_handler"] = page_handler
         p.context["response_object"] = page_handler.response
         p.context["page_object_type"] = str(type(page_object))
-        p.context["is_link_allowed"] = DomainCache.get_object(page_link).is_allowed(page_link)
+        p.context["is_link_allowed"] = DomainCache.get_object(page_link).is_allowed(
+            page_link
+        )
         p.context["method"] = method
 
         return p.render("show_page_props.html")
@@ -413,9 +427,17 @@ def is_url_allowed(request):
         status = c.is_allowed(url)
 
         if status:
-            p.context["summary_text"] = "{} is allowed by <a href='{}'>robots.txt</a>".format(url, c.get_robots_txt_url())
+            p.context[
+                "summary_text"
+            ] = "{} is allowed by <a href='{}'>robots.txt</a>".format(
+                url, c.get_robots_txt_url()
+            )
         else:
-            p.context["summary_text"] = "{} is NOT allowed by <a href='{}'>robots.txt</a>".format(url, c.get_robots_txt_url())
+            p.context[
+                "summary_text"
+            ] = "{} is NOT allowed by <a href='{}'>robots.txt</a>".format(
+                url, c.get_robots_txt_url()
+            )
         return p.render("summary_present.html")
 
     p = ViewPage(request)
@@ -452,7 +474,7 @@ def is_url_allowed(request):
 
 def page_verify(request):
     def page_verify_internal(url):
-        entries = LinkDataController.objects.filter(link = url)
+        entries = LinkDataController.objects.filter(link=url)
         data = {}
 
         if entries.exists():
@@ -465,7 +487,7 @@ def page_verify(request):
 
         domain_url = DomainAwarePage(url).get_domain()
         if domain_url != url:
-            domains = LinkDataController.objects.filter(link = domain_url)
+            domains = LinkDataController.objects.filter(link=domain_url)
             if domains.exists():
                 domain = domains[0]
                 data["domain"] = domain.get_map()

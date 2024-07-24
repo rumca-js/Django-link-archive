@@ -4,7 +4,14 @@ from ..configuration import Configuration
 from ..models import AppLogging
 
 from ..dateutils import DateUtils
-from ..webtools import HtmlPage, RssPage, DomainAwarePage, Url, DefaultContentPage, InternetPageHandler
+from ..webtools import (
+    HtmlPage,
+    RssPage,
+    DomainAwarePage,
+    Url,
+    DefaultContentPage,
+    InternetPageHandler,
+)
 
 from .urlhandler import UrlHandler, UrlAgeModerator
 
@@ -19,7 +26,12 @@ class EntryUrlInterface(object):
     """
 
     def __init__(
-        self, url, fast_check=True, use_headless_browser=False, log=False, ignore_errors=False
+        self,
+        url,
+        fast_check=True,
+        use_headless_browser=False,
+        log=False,
+        ignore_errors=False,
     ):
         """
         Some scenarios, like manual entry should log why it is impossible to check
@@ -329,9 +341,13 @@ class EntryUrlInterface(object):
                 input_props["date_last_modified"] = self.response.get_last_modified()
 
         if not self.is_property_set(input_props, "age"):
-            if self.is_property_set(input_props, "title") and self.is_property_set(input_props, "description"):
-                properties = {"title" : input_props["title"],
-                              "description" : input_props["description"]}
+            if self.is_property_set(input_props, "title") and self.is_property_set(
+                input_props, "description"
+            ):
+                properties = {
+                    "title": input_props["title"],
+                    "description": input_props["description"],
+                }
                 moderator = UrlAgeModerator(properties=properties)
                 input_props["age"] = moderator.get_age()
 

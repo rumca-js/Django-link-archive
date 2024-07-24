@@ -80,25 +80,33 @@ class EntryUpdaterTest(FakeInternetTestCase):
         EntryRules.objects.create(
             enabled=True,
             block=False,
-            requires_headless = True,
+            requires_headless=True,
             rule_name="Rule1",
             rule_url=".test1.com, .test2.com",
         )
 
         # call tested function
-        self.assertFalse(EntryRules.is_headless_browser_required("https://www.test0.com"))
+        self.assertFalse(
+            EntryRules.is_headless_browser_required("https://www.test0.com")
+        )
         # call tested function
-        self.assertTrue(EntryRules.is_headless_browser_required("https://www.test1.com"))
+        self.assertTrue(
+            EntryRules.is_headless_browser_required("https://www.test1.com")
+        )
         # call tested function
-        self.assertTrue(EntryRules.is_headless_browser_required("https://www.test2.com"))
+        self.assertTrue(
+            EntryRules.is_headless_browser_required("https://www.test2.com")
+        )
         # call tested function
-        self.assertFalse(EntryRules.is_headless_browser_required("https://www.test3.com"))
+        self.assertFalse(
+            EntryRules.is_headless_browser_required("https://www.test3.com")
+        )
 
     def test_entry_rule_is_full_browser_required(self):
         EntryRules.objects.create(
             enabled=True,
             block=False,
-            requires_full_browser = True,
+            requires_full_browser=True,
             rule_name="Rule1",
             rule_url=".test1.com, .test2.com",
         )

@@ -235,9 +235,11 @@ class UserEntryTransitionHistory(models.Model):
         """
         We move entry from https:// to http://. We want that history to be preserved
         """
-        transitions = UserEntryTransitionHistory.objects.filter(entry_from = source_entry)
+        transitions = UserEntryTransitionHistory.objects.filter(entry_from=source_entry)
         for transition in transitions:
-            dst_transitions = UserEntryTransitionHistory.objects.filter(entry_from = destination_entry, user_object = transition.user_object)
+            dst_transitions = UserEntryTransitionHistory.objects.filter(
+                entry_from=destination_entry, user_object=transition.user_object
+            )
             if dst_transitions.exists():
                 dst_transition = dst_transitions[0]
                 dst_transition.counter += transition.counter
@@ -249,9 +251,11 @@ class UserEntryTransitionHistory(models.Model):
             transition.entry_from = destination_entry
             transition.save()
 
-        transitions = UserEntryTransitionHistory.objects.filter(entry_to = source_entry)
+        transitions = UserEntryTransitionHistory.objects.filter(entry_to=source_entry)
         for transition in transitions:
-            dst_transitions = UserEntryTransitionHistory.objects.filter(entry_to = destination_entry, user_object = transition.user_object)
+            dst_transitions = UserEntryTransitionHistory.objects.filter(
+                entry_to=destination_entry, user_object=transition.user_object
+            )
             if dst_transitions.exists():
                 dst_transition = dst_transitions[0]
                 dst_transition.counter += transition.counter
@@ -321,7 +325,7 @@ class UserEntryVisitHistory(models.Model):
         previous_entry = UserEntryVisitHistory.get_last_user_entry(user)
 
         visits = UserEntryVisitHistory.objects.filter(
-            user_object=user, entry_object = entry
+            user_object=user, entry_object=entry
         )
 
         if visits.count() == 0:
@@ -355,7 +359,7 @@ class UserEntryVisitHistory(models.Model):
             return False
 
         visits = UserEntryVisitHistory.objects.filter(
-            user_object=user, entry_object = entry
+            user_object=user, entry_object=entry
         )
 
         if (
@@ -448,9 +452,11 @@ class UserEntryVisitHistory(models.Model):
                 time.sleep(0.5)
 
     def move_entry(source_entry, destination_entry):
-        visits = UserEntryVisitHistory.objects.filter(entry_object = source_entry)
+        visits = UserEntryVisitHistory.objects.filter(entry_object=source_entry)
         for visit in visits:
-            dst_visits = UserEntryVisitHistory.objects.filter(entry_object = destination_entry, user_object = visit.user_object)
+            dst_visits = UserEntryVisitHistory.objects.filter(
+                entry_object=destination_entry, user_object=visit.user_object
+            )
             if dst_visits.exists():
                 dst_visit = dst_visits[0]
                 dst_visit.visits += visit.visits

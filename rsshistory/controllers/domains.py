@@ -59,8 +59,10 @@ class DomainsController(Domains):
             except Exception as E:
                 exc_str = traceback.format_exc()
                 AppLogging.exc(
-                    E, 
-                    "Cannot create domain data:{}\n{}".format(domain_only_text, exc_str)
+                    E,
+                    "Cannot create domain data:{}\n{}".format(
+                        domain_only_text, exc_str
+                    ),
                 )
         else:
             obj = objs[0]
@@ -230,13 +232,13 @@ class DomainsController(Domains):
         else:
             DomainsController.remove_unused_domains()
 
-        tlds = DomainsTlds.objects.filter(tld__icontains = ":")
+        tlds = DomainsTlds.objects.filter(tld__icontains=":")
         tlds.delete()
 
-        suffixes = DomainsSuffixes.objects.filter(suffix__icontains = ":")
+        suffixes = DomainsSuffixes.objects.filter(suffix__icontains=":")
         suffixes.delete()
 
-        mains = DomainsMains.objects.filter(main__icontains = ":")
+        mains = DomainsMains.objects.filter(main__icontains=":")
         mains.delete()
 
     def remove_unused_domains():

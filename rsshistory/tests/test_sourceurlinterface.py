@@ -148,9 +148,7 @@ class SourceUrlInterfaceTest(FakeInternetTestCase):
 
         self.assertTrue(props)
         self.assertTrue("url" in props)
-        self.assertEqual(
-            props["url"], "https://www.reddit.com/r/searchengines/.rss"
-        )
+        self.assertEqual(props["url"], "https://www.reddit.com/r/searchengines/.rss")
         self.assertTrue("title" in props)
         self.assertEqual(props["source_type"], SourceDataModel.SOURCE_TYPE_RSS)
 

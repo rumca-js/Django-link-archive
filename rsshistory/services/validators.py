@@ -24,6 +24,7 @@ class WhoIs(Validator):
         p = DomainAwarePage(self.url)
         return "https://who.is/whois/" + p.get_domain_only()
 
+
 class W3CValidator(Validator):
     def __init__(self, url):
         self.url = url

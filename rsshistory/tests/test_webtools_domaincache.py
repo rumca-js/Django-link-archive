@@ -16,7 +16,7 @@ class DomainCacheInfoTest(FakeInternetTestCase):
         MockRequestCounter.mock_page_requests = 0
 
         # call tested function
-        cache = DomainCache(cache_size = 5, respect_robots_txt = True)
+        cache = DomainCache(cache_size=5, respect_robots_txt=True)
         cache_info = cache.get_domain_info("https://robots-txt.com/page.html")
 
         self.assertTrue(cache_info)
@@ -25,7 +25,7 @@ class DomainCacheInfoTest(FakeInternetTestCase):
         MockRequestCounter.mock_page_requests = 0
 
         # call tested function
-        cache = DomainCache(cache_size = 5, respect_robots_txt = True)
+        cache = DomainCache(cache_size=5, respect_robots_txt=True)
         cache_info = cache.get_domain_info("https://robots-txt.com/page.html")
 
         self.assertEqual(cache_info.url, "https://robots-txt.com")
@@ -34,16 +34,18 @@ class DomainCacheInfoTest(FakeInternetTestCase):
         MockRequestCounter.mock_page_requests = 0
 
         # call tested function
-        cache = DomainCache(cache_size = 5, respect_robots_txt = True)
+        cache = DomainCache(cache_size=5, respect_robots_txt=True)
         cache_info = cache.get_domain_info("https://robots-txt.com/page.html")
 
-        self.assertEqual(cache_info.get_robots_txt_url(), "https://robots-txt.com/robots.txt")
+        self.assertEqual(
+            cache_info.get_robots_txt_url(), "https://robots-txt.com/robots.txt"
+        )
 
     def test_cache_info__is_allowed(self):
         MockRequestCounter.mock_page_requests = 0
 
         # call tested function
-        cache = DomainCache(cache_size = 5, respect_robots_txt = True)
+        cache = DomainCache(cache_size=5, respect_robots_txt=True)
         cache_info = cache.get_domain_info("https://robots-txt.com/page.html")
 
         self.assertTrue(cache_info.is_allowed("https://robots-txt.com"))
@@ -56,9 +58,11 @@ class DomainCacheInfoTest(FakeInternetTestCase):
         MockRequestCounter.mock_page_requests = 0
 
         # call tested function
-        cache = DomainCache(cache_size = 5, respect_robots_txt = True)
+        cache = DomainCache(cache_size=5, respect_robots_txt=True)
 
         for key in range(1, 10):
-            cache_info = cache.get_domain_info("https://robots-txt{}.com/page.html".format(key))
+            cache_info = cache.get_domain_info(
+                "https://robots-txt{}.com/page.html".format(key)
+            )
 
         self.assertEqual(len(cache.cache), 5)

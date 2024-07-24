@@ -9,8 +9,13 @@ from ...controllers import LinkDataController, SearchEngineGoogleCache
 from ...webtools import DomainAwarePage, InputContent
 from ...configuration import Configuration
 from ...dateutils import DateUtils
-from ...services import TranslateBuilder, InternetArchiveBuilder, SchemaOrg, WhoIs, W3CValidator
-
+from ...services import (
+    TranslateBuilder,
+    InternetArchiveBuilder,
+    SchemaOrg,
+    WhoIs,
+    W3CValidator,
+)
 
 
 class EntryButton(object):

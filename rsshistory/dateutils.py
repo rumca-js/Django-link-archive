@@ -1,9 +1,16 @@
 """
 This file should not include any other or django related files.
+
+TODO Remove dependency towards django.utils
+
+use:
+ from datetime import datetime, timezone
+ now = datetime.now(timezone.utc)
 """
 from datetime import datetime, date, timedelta
 from dateutil import parser
 from pytz import timezone
+
 import django.utils
 
 

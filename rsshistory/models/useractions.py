@@ -145,7 +145,9 @@ class UserTags(models.Model):
         tag_objs = None
 
         if not entry.is_taggable():
-            AppLogging.error("Tags: Tried to tag not taggable entry! ID:{}".format(entry.id))
+            AppLogging.error(
+                "Tags: Tried to tag not taggable entry! ID:{}".format(entry.id)
+            )
             return
 
         if not entry:
@@ -182,9 +184,11 @@ class UserTags(models.Model):
                 # time.sleep(0.5)
 
     def move_entry(source_entry, destination_entry):
-        tags = UserTags.objects.filter(entry_object = source_entry)
+        tags = UserTags.objects.filter(entry_object=source_entry)
         for tag in tags:
-            dst_tags = UserTags.objects.filter(entry_object = destination_entry, user_object = tag.user_object, tag = tag.tag)
+            dst_tags = UserTags.objects.filter(
+                entry_object=destination_entry, user_object=tag.user_object, tag=tag.tag
+            )
             if dst_tags.exists():
                 tag.delete()
                 continue
@@ -295,9 +299,13 @@ class UserVotes(models.Model):
                 time.sleep(0.5)
 
     def move_entry(source_entry, destination_entry):
-        votes = UserVotes.objects.filter(entry_object = source_entry)
+        votes = UserVotes.objects.filter(entry_object=source_entry)
         for vote in votes:
-            dst_votes = UserVotes.objects.filter(entry_object = destination_entry, user_object = vote.user_object, vote = vote.vote)
+            dst_votes = UserVotes.objects.filter(
+                entry_object=destination_entry,
+                user_object=vote.user_object,
+                vote=vote.vote,
+            )
             if dst_votes.exists():
                 dst_vote = dst_votes[0]
                 dst_vote.vote = max(dst_vote.vote, vote.vote)
@@ -337,7 +345,9 @@ class LinkCommentDataModel(models.Model):
     )
 
     def add(user, entry, comment):
-        return LinkCommentDataModel.objects.create(user_object = user, entry_object = entry, comment = comment)
+        return LinkCommentDataModel.objects.create(
+            user_object=user, entry_object=entry, comment=comment
+        )
 
     def get_comment(self):
         from ..webtools import InputContent
@@ -356,9 +366,13 @@ class LinkCommentDataModel(models.Model):
                 time.sleep(0.5)
 
     def move_entry(source_entry, destination_entry):
-        comments = LinkCommentDataModel.objects.filter(entry_object = source_entry)
+        comments = LinkCommentDataModel.objects.filter(entry_object=source_entry)
         for comment in comments:
-            dst_comments = LinkCommentDataModel.objects.filter(entry_object = destination_entry, user_object = comment.user_object, comment = comment.comment)
+            dst_comments = LinkCommentDataModel.objects.filter(
+                entry_object=destination_entry,
+                user_object=comment.user_object,
+                comment=comment.comment,
+            )
             if dst_comments.exists():
                 comment.delete()
                 continue
@@ -434,9 +448,11 @@ class UserBookmarks(models.Model):
                     UserBookmarks.add(users[0], entry)
 
     def move_entry(source_entry, destination_entry):
-        bookmarks = UserBookmarks.objects.filter(entry_object = source_entry)
+        bookmarks = UserBookmarks.objects.filter(entry_object=source_entry)
         for bookmark in bookmarks:
-            dst_bookmarks = UserBookmarks.objects.filter(entry_object = destination_entry, user_object = bookmark.user_object)
+            dst_bookmarks = UserBookmarks.objects.filter(
+                entry_object=destination_entry, user_object=bookmark.user_object
+            )
             if dst_bookmarks.exists():
                 bookmark.delete()
                 continue

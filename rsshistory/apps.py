@@ -18,6 +18,7 @@ class LinkDatabase(AppConfig):
 
         try:
             from .models import SystemOperation
+
             SystemOperation.objects.all().delete()
 
             from .models import AppLogging
@@ -31,9 +32,10 @@ class LinkDatabase(AppConfig):
             AppLogging.notify("System is ready {}.".format(current_date))
 
         except Exception as E:
-            # TODO this is stupid, that it prints errors during migrations
             print(str(E))
-            print("Exception can occur, if this is first run of migrations. Do not worry.")
+            print(
+                "Exception can occur, if this is first run of migrations. Do not worry."
+            )
 
     def info(message):
         print("[{}] {}".format(LinkDatabase.name, message))

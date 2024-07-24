@@ -236,8 +236,18 @@ class EntriesCleanupTest(FakeInternetTestCase):
         # call tested function
         EntriesCleanup().cleanup()
 
-        self.assertEqual(LinkDataController.objects.filter(link="https://youtube.com?v=permanent").count(), 1)
-        self.assertEqual(LinkDataController.objects.filter(link="http://youtube.com?v=permanent").count(), 0)
+        self.assertEqual(
+            LinkDataController.objects.filter(
+                link="https://youtube.com?v=permanent"
+            ).count(),
+            1,
+        )
+        self.assertEqual(
+            LinkDataController.objects.filter(
+                link="http://youtube.com?v=permanent"
+            ).count(),
+            0,
+        )
 
     def test_cleanup__prefer_non_www_sites(self):
         conf = Configuration.get_object().config_entry
@@ -265,5 +275,15 @@ class EntriesCleanupTest(FakeInternetTestCase):
         # call tested function
         EntriesCleanup().cleanup()
 
-        self.assertEqual(LinkDataController.objects.filter(link="https://youtube.com?v=permanent").count(), 1)
-        self.assertEqual(LinkDataController.objects.filter(link="https://www.youtube.com?v=permanent").count(), 0)
+        self.assertEqual(
+            LinkDataController.objects.filter(
+                link="https://youtube.com?v=permanent"
+            ).count(),
+            1,
+        )
+        self.assertEqual(
+            LinkDataController.objects.filter(
+                link="https://www.youtube.com?v=permanent"
+            ).count(),
+            0,
+        )

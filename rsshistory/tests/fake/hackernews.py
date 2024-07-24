@@ -1,5 +1,3 @@
-
-
 webpage_hackernews_rss = """
 <rss version="2.0">
 	<channel>

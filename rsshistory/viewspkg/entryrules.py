@@ -140,7 +140,7 @@ def entry_rules_json(request):
     for entry_rule in EntryRules.objects.all():
         rule_data.append(model_to_dict(entry_rule))
 
-    dict_data = {"entryrules" : rule_data}
+    dict_data = {"entryrules": rule_data}
 
     # JsonResponse
     return JsonResponse(dict_data)

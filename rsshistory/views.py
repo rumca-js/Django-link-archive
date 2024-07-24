@@ -137,11 +137,15 @@ class ViewPage(object):
         if urlhandler is None and url:
             urlhandler = UrlHandler(url)
 
-        context["is_youtube_video"] = type(urlhandler.get_handler()) == UrlHandler.youtube_video_handler
+        context["is_youtube_video"] = (
+            type(urlhandler.get_handler()) == UrlHandler.youtube_video_handler
+        )
         context["is_youtube_channel"] = (
             type(urlhandler.get_handler()) == UrlHandler.youtube_channel_handler
         )
-        context["is_odysee_video"] = type(urlhandler.get_handler()) == UrlHandler.odysee_video_handler
+        context["is_odysee_video"] = (
+            type(urlhandler.get_handler()) == UrlHandler.odysee_video_handler
+        )
         context["is_odysee_channel"] = (
             type(urlhandler.get_handler()) == UrlHandler.odysee_channel_handler
         )

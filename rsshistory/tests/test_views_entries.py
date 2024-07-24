@@ -500,7 +500,9 @@ class EntriesViewsTests(FakeInternetTestCase):
         )
 
         self.client.login(username="testuser", password="testpassword")
-        url = reverse("{}:entry-clear-status".format(LinkDatabase.name), args=[entry.id])
+        url = reverse(
+            "{}:entry-clear-status".format(LinkDatabase.name), args=[entry.id]
+        )
         # call tested function
         response = self.client.get(url)
 

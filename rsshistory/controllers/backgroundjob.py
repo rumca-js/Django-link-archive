@@ -66,7 +66,7 @@ class BackgroundJobController(BackgroundJob):
             self.enabled = False
 
             AppLogging.error(
-                "Disabling job due to errors {} {} {}".format(
+                    "Job:{}. Disabling job due to errors {} {}".format(
                     self.job, self.subject, self.args
                 )
             )
@@ -189,7 +189,10 @@ class BackgroundJobController(BackgroundJob):
                 )
         except Exception as E:
             AppLogging.exc(
-                    E, "Creating single job_name:{}, subject:{}, args:{}".format(job_name, subject, args)
+                E,
+                "Creating single job_name:{}, subject:{}, args:{}".format(
+                    job_name, subject, args
+                ),
             )
 
     def download_rss(source, force=False):
@@ -290,11 +293,14 @@ class BackgroundJobController(BackgroundJob):
 
         p = DomainAwarePage(url)
         if not p.is_web_link():
-
             stack_lines = traceback.format_stack()
             error_lines = "".join(stack_lines[-10:])
 
-            AppLogging.error("Attempt to add invalid link:{} input_url:{} lines:\n{}".format(url, input_url, error_lines))
+            AppLogging.error(
+                "Attempt to add invalid link:{} input_url:{} lines:\n{}".format(
+                    url, input_url, error_lines
+                )
+            )
             return
 
         if cfg != {}:
@@ -348,10 +354,11 @@ class BackgroundJobController(BackgroundJob):
         if url is None:
             return
 
-        if not ModelFiles.objects.filter(file_name = url).exists():
+        if not ModelFiles.objects.filter(file_name=url).exists():
             return BackgroundJobController.create_single_job(
                 BackgroundJob.JOB_DOWNLOAD_FILE,
-                url,)
+                url,
+            )
 
     def write_daily_data_range(date_start=date.today(), date_stop=date.today()):
         try:
@@ -374,7 +381,9 @@ class BackgroundJobController(BackgroundJob):
 
             return sent
         except Exception as E:
-            AppLogging.exc(E, "write_daily_data_range: {} {}".format(date_start, date_stop))
+            AppLogging.exc(
+                E, "write_daily_data_range: {} {}".format(date_start, date_stop)
+            )
 
     def write_daily_data(input_date):
         return BackgroundJobController.create_single_job(
@@ -388,7 +397,9 @@ class BackgroundJobController(BackgroundJob):
 
             BackgroundJobController.write_daily_data_range(date_start, date_stop)
         except Exception as e:
-            AppLogging.exc(E, "write_daily_data_str: {} {}".format(date_start, date_stop))
+            AppLogging.exc(
+                E, "write_daily_data_str: {} {}".format(date_start, date_stop)
+            )
 
     def write_tag_data(tag):
         return BackgroundJobController.create_single_job(
@@ -440,9 +451,7 @@ class BackgroundJobController(BackgroundJob):
                     if key > 100:
                         obj.delete()
         except Exception as E:
-            AppLogging.exc(
-                    "link_save. Link URL:{}".format(link_url)
-            )
+            AppLogging.exc("link_save. Link URL:{}".format(link_url))
 
     def link_download(link_url):
         return BackgroundJobController.create_single_job(

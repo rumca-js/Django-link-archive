@@ -29,7 +29,6 @@ contents_with_links = """
 
 class ContentLinkParserTest(FakeInternetTestCase):
     def test_get_links(self):
-
         p = ContentLinkParser(
             "https://test_get_links.com/test",
             contents_with_links,
@@ -42,7 +41,9 @@ class ContentLinkParserTest(FakeInternetTestCase):
         self.assertTrue("https://www.youtube.com:443" in links)
         self.assertTrue("https://www.youtube.com:443/location" in links)
         self.assertTrue("https://www.youtube.com/location" in links)
-        self.assertTrue("https://www.youtube.com/location?v=12323&test=q#whatever" in links)
+        self.assertTrue(
+            "https://www.youtube.com/location?v=12323&test=q#whatever" in links
+        )
         self.assertTrue("https://test.com/location" in links)
         self.assertTrue("https://test_get_links.com/location" in links)
         self.assertTrue("https://test_get_links.com/test/location" in links)
@@ -50,7 +51,6 @@ class ContentLinkParserTest(FakeInternetTestCase):
         self.assertTrue("https://www.cedarpolicy.com" in links)
 
     def test_get_domains(self):
-
         p = ContentLinkParser(
             "https://test_get_links.com/test",
             contents_with_links,

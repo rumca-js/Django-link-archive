@@ -66,7 +66,9 @@ class DataExport(models.Model):
     )
     export_sources = models.BooleanField(default=False)
 
-    export_time = models.TimeField(default=time(0, 0), help_text="Time at which export is performed")
+    export_time = models.TimeField(
+        default=time(0, 0), help_text="Time at which export is performed"
+    )
 
     def is_daily_data(self):
         return self.export_data == DataExport.EXPORT_DAILY_DATA

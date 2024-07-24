@@ -112,7 +112,6 @@ webpage_no_pubdate_rss = """
 """
 
 
-
 webpage_html_favicon = """<html>
  <head>
  <link rel="shortcut icon" href="https://www.youtube.com/s/desktop/e4d15d2c/img/favicon.ico" type="image/x-icon">
@@ -159,4 +158,3 @@ webpage_with_rss_link_rss_contents = """
     </channel>
 </rss>
 """
-

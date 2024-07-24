@@ -48,11 +48,11 @@ def model_file(request, pk):
     if data is not None:
         return data
 
-    model_files = ModelFiles.objects.filter(id = pk)
+    model_files = ModelFiles.objects.filter(id=pk)
     if model_files.exists():
         data = model_files[0].contents
 
-        return HttpResponse(data, content_type='application/octet-stream')
+        return HttpResponse(data, content_type="application/octet-stream")
 
 
 def model_file_remove(request, pk):
@@ -64,7 +64,7 @@ def model_file_remove(request, pk):
     if data is not None:
         return data
 
-    model_files = ModelFiles.objects.filter(id = pk)
+    model_files = ModelFiles.objects.filter(id=pk)
     if model_files.exists():
         model_files.delete()
 

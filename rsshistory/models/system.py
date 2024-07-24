@@ -52,13 +52,13 @@ class ConfigurationEntry(models.Model):
     instance_title = models.CharField(
         default="Personal Link Database",
         max_length=500,
-        help_text='Instance title',
+        help_text="Instance title",
     )
 
     instance_description = models.CharField(
         default="Personal Link Database. May work as link aggregator, may link as YouTube subscription filter.",
         max_length=500,
-        help_text='Instance description',
+        help_text="Instance description",
     )
 
     # background tasks will add everything using this user name
@@ -114,7 +114,7 @@ class ConfigurationEntry(models.Model):
         help_text="Scans for new links, when link is added. From decription, from contents",
     )
 
-    auto_create_sources = models.BooleanField( # TODO rename to auto_create_sources?
+    auto_create_sources = models.BooleanField(  # TODO rename to auto_create_sources?
         default=False,
         help_text="Adds any new found source",
     )
@@ -185,11 +185,13 @@ class ConfigurationEntry(models.Model):
     )
 
     prefer_https = models.BooleanField(
-        default=True, help_text="Https is preferred. If update takes place, and https is available, we upgrade link."
+        default=True,
+        help_text="Https is preferred. If update takes place, and https is available, we upgrade link.",
     )
 
     prefer_non_www_sites = models.BooleanField(
-        default=False, help_text="Non www sites are preferred. If update takes place www links could be replaced with clean links without it."
+        default=False,
+        help_text="Non www sites are preferred. If update takes place www links could be replaced with clean links without it.",
     )
 
     number_of_update_entries = models.IntegerField(
@@ -202,7 +204,8 @@ class ConfigurationEntry(models.Model):
         help_text="Number of days, after which entries are moved to archive. Disabled if 0.",
     )
     days_to_remove_links = models.IntegerField(
-        default=100, help_text="Number of days, after which links are removed. Disabled if 0."
+        default=100,
+        help_text="Number of days, after which links are removed. Disabled if 0.",
     )
     days_to_check_std_entries = models.IntegerField(
         default=35,
@@ -234,16 +237,15 @@ class ConfigurationEntry(models.Model):
         blank=True,
         max_length=1000,
         null=True,
-        help_text = "Script that is called when headless request needs to be made. Supported variables $URL $TIMEOUT $RESPONSE_FILE. Example: ./crawleeheadless.sh --url $URL -o $RESPONSE_FILE"
+        help_text="Script that is called when headless request needs to be made. Supported variables $URL $TIMEOUT $RESPONSE_FILE. Example: ./crawleeheadless.sh --url $URL -o $RESPONSE_FILE",
     )
 
     crawling_full_script = models.CharField(
         blank=True,
         max_length=1000,
         null=True,
-        help_text = "Script that is called when full request needs to be made. Supported variables $URL $TIMEOUT $RESPONSE_FILE. Example: ./crawleefull.sh --url $URL -o $RESPONSE_FILE"
+        help_text="Script that is called when full request needs to be made. Supported variables $URL $TIMEOUT $RESPONSE_FILE. Example: ./crawleefull.sh --url $URL -o $RESPONSE_FILE",
     )
-
 
     # User settings
 
@@ -275,9 +277,13 @@ class ConfigurationEntry(models.Model):
         max_length=500, null=True, default="standard", choices=DISPLAY_TYPE_CHOICES
     )
     show_icons = models.BooleanField(default=True)
-    thumbnails_as_icons = models.BooleanField(default=True, help_text="If false, source favicons are used as thumbnails")
+    thumbnails_as_icons = models.BooleanField(
+        default=True, help_text="If false, source favicons are used as thumbnails"
+    )
     small_icons = models.BooleanField(default=True)
-    local_icons = models.BooleanField(default=False, help_text="If true, only locally stored icons are displayed")
+    local_icons = models.BooleanField(
+        default=False, help_text="If true, only locally stored icons are displayed"
+    )
 
     links_per_page = models.IntegerField(
         default=100, help_text="Number of links per page"
@@ -368,64 +374,77 @@ class SystemOperation(models.Model):
     def cleanup():
         from ..dateutils import DateUtils
 
-        all_entries = SystemOperation.objects.filter(date_created__isnull = True)
+        all_entries = SystemOperation.objects.filter(date_created__isnull=True)
         all_entries.delete()
 
         thread_ids = SystemOperation.get_thread_ids()
         for thread_id in thread_ids:
             # leave one entry with time check
-            all_entries = SystemOperation.objects.filter(thread_id = thread_id, is_internet_connection_checked = True)
+            all_entries = SystemOperation.objects.filter(
+                thread_id=thread_id, is_internet_connection_checked=True
+            )
             if all_entries.exists() and all_entries.count() > 1:
                 entries = all_entries[1:]
                 for entry in entries:
                     entry.delete()
 
             # leave one entry without time check
-            all_entries = SystemOperation.objects.filter(thread_id = thread_id, is_internet_connection_checked = False)
+            all_entries = SystemOperation.objects.filter(
+                thread_id=thread_id, is_internet_connection_checked=False
+            )
             if all_entries.exists() and all_entries.count() > 1:
                 entries = all_entries[1:]
                 for entry in entries:
                     entry.delete()
 
     def is_internet_ok():
-        entries = SystemOperation.objects.filter(is_internet_connection_checked = True)
+        entries = SystemOperation.objects.filter(is_internet_connection_checked=True)
         if entries.exists():
             return entries[0].is_internet_connection_ok
         else:
             return True
 
     def get_last_thread_signal(thread_id):
-        entries = SystemOperation.objects.filter(thread_id = thread_id)
+        entries = SystemOperation.objects.filter(thread_id=thread_id)
 
         if entries.exists():
             return entries[0].date_created
 
     def get_last_internet_check():
-        entries = SystemOperation.objects.filter(is_internet_connection_checked = True)
+        entries = SystemOperation.objects.filter(is_internet_connection_checked=True)
 
         if entries.exists():
             return entries[0].date_created
 
     def get_last_internet_status():
-        entries = SystemOperation.objects.filter(is_internet_connection_checked = True)
+        entries = SystemOperation.objects.filter(is_internet_connection_checked=True)
 
         if entries.exists():
             return entries[0].is_internet_connection_ok
 
-    def add_by_thread(thread_id, internet_status_checked = False, internet_status_ok = True):
-
+    def add_by_thread(
+        thread_id, internet_status_checked=False, internet_status_ok=True
+    ):
         # delete all entries without internet check
-        all_entries = SystemOperation.objects.filter(thread_id = thread_id, is_internet_connection_checked = False)
+        all_entries = SystemOperation.objects.filter(
+            thread_id=thread_id, is_internet_connection_checked=False
+        )
         all_entries.delete()
 
         # leave one entry with time check
-        all_entries = SystemOperation.objects.filter(thread_id = thread_id, is_internet_connection_checked = True)
+        all_entries = SystemOperation.objects.filter(
+            thread_id=thread_id, is_internet_connection_checked=True
+        )
         if all_entries.exists() and all_entries.count() > 1:
             entries = all_entries[1:]
             for entry in entries:
                 entry.delete()
 
-        SystemOperation.objects.create(thread_id = thread_id, is_internet_connection_checked = internet_status_checked, is_internet_connection_ok = internet_status_ok)
+        SystemOperation.objects.create(
+            thread_id=thread_id,
+            is_internet_connection_checked=internet_status_checked,
+            is_internet_connection_ok=internet_status_ok,
+        )
 
     def get_thread_ids():
         thread_ids = set()
@@ -538,7 +557,9 @@ class AppLogging(models.Model):
     """
 
     info_text = models.CharField(default="", max_length=2000)
-    detail_text = models.CharField(blank=True, max_length=2000, help_text="Used to provide details about log event")
+    detail_text = models.CharField(
+        blank=True, max_length=2000, help_text="Used to provide details about log event"
+    )
     level = models.IntegerField(default=0)
     date = models.DateTimeField(auto_now_add=True)
     user = models.CharField(max_length=1000, null=True)
@@ -548,7 +569,7 @@ class AppLogging(models.Model):
     WARNING = 30
     ERROR = 40
     CRITICAL = 50
-    NOTIFICATION = 60 # notifications for the user
+    NOTIFICATION = 60  # notifications for the user
 
     class Meta:
         ordering = ["-date", "level"]
@@ -559,7 +580,9 @@ class AppLogging(models.Model):
         c = Configuration.get_object()
         return c.get_local_time(self.date)
 
-    def create_entry(info_text, detail_text="", level=INFO, date=None, user=None, stack=False):
+    def create_entry(
+        info_text, detail_text="", level=INFO, date=None, user=None, stack=False
+    ):
         config = ConfigurationEntry.get()
         if level < config.logging_level:
             return
@@ -592,7 +615,9 @@ class AppLogging(models.Model):
         )
 
     def info(info_text, detail_text="", user=None, stack=False):
-        AppLogging.create_entry(info_text, detail_text = detail_text, level = AppLogging.INFO, stack=stack)
+        AppLogging.create_entry(
+            info_text, detail_text=detail_text, level=AppLogging.INFO, stack=stack
+        )
 
     def debug(info_text, detail_text="", user=None, stack=False):
         if stack:
@@ -608,13 +633,19 @@ class AppLogging(models.Model):
             LinkDatabase.info(detail_text)
 
     def warning(info_text, detail_text="", user=None, stack=False):
-        AppLogging.create_entry(info_text, detail_text=detail_text, level = AppLogging.WARNING, stack=stack)
+        AppLogging.create_entry(
+            info_text, detail_text=detail_text, level=AppLogging.WARNING, stack=stack
+        )
 
     def error(info_text, detail_text="", user=None, stack=False):
-        AppLogging.create_entry(info_text, detail_text=detail_text, level = AppLogging.ERROR, stack=stack)
+        AppLogging.create_entry(
+            info_text, detail_text=detail_text, level=AppLogging.ERROR, stack=stack
+        )
 
     def notify(info_text, detail_text="", user=None):
-        AppLogging.create_entry(info_text, detail_text=detail_text, level = AppLogging.NOTIFICATION)
+        AppLogging.create_entry(
+            info_text, detail_text=detail_text, level=AppLogging.NOTIFICATION
+        )
 
     def exc(exception_object, info_text=None, user=None):
         error_text = traceback.format_exc()
@@ -637,7 +668,9 @@ class AppLogging(models.Model):
             info_text = "{}".format(str(exception_object))
             detail_text = "Data:\n{}Stack:\n{}".format(error_text, stack_string)
 
-        AppLogging.create_entry(info_text = info_text, detail_text = detail_text, level = AppLogging.ERROR)
+        AppLogging.create_entry(
+            info_text=info_text, detail_text=detail_text, level=AppLogging.ERROR
+        )
 
     def save(self, *args, **kwargs):
         # Trim the input string to fit within max_length
@@ -721,7 +754,7 @@ class BackgroundJob(models.Model):
     JOB_LINK_DOWNLOAD = "link-download"
     JOB_LINK_DOWNLOAD_MUSIC = "download-music"
     JOB_LINK_DOWNLOAD_VIDEO = "download-video"
-    JOB_DOWNLOAD_FILE = "download-file" # TODO stor file, should mention DB
+    JOB_DOWNLOAD_FILE = "download-file"  # TODO stor file, should mention DB
     JOB_LINK_SCAN = "link-scan"
     JOB_MOVE_TO_ARCHIVE = "move-to-archive"
     JOB_WRITE_DAILY_DATA = "write-daily-data"

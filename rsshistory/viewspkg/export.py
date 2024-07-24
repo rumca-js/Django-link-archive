@@ -320,7 +320,9 @@ def data_export_job_add(request, pk):
             "{}:data-export".format(LinkDatabase.name), args=[str(export.id)]
         )
 
-        p.context["summary_text"] = "Export is not enabled. <a href='{}'>Export</a>.".format(job_link)
+        p.context[
+            "summary_text"
+        ] = "Export is not enabled. <a href='{}'>Export</a>.".format(job_link)
         return p.render("summary_present.html")
 
     BackgroundJobController.export_data(export)

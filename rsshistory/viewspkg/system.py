@@ -332,7 +332,6 @@ def reset_config(request):
     return p.render("summary_present.html")
 
 
-
 """
 Other
 """

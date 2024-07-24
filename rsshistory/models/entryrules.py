@@ -73,7 +73,7 @@ class EntryRules(models.Model):
 
     def update_link_service_rule():
         name = "link service"
-        link_services = EntryRules.objects.filter(rule_name = name)
+        link_services = EntryRules.objects.filter(rule_name=name)
         if link_services.exists():
             link_service = link_services[0]
         else:
@@ -85,12 +85,14 @@ class EntryRules(models.Model):
 
     def update_link_service_rule():
         name = "web spam"
-        link_services = EntryRules.objects.filter(rule_name = name)
+        link_services = EntryRules.objects.filter(rule_name=name)
         if link_services.exists():
             link_service = link_services[0]
         else:
             link_service = EntryRules.objects.create(rule_name=name)
 
-        link_service.link_url = ".shoparena.pl, .ascii.uk, .bestbuenosaireshotels.com, .itch.io"
+        link_service.link_url = (
+            ".shoparena.pl, .ascii.uk, .bestbuenosaireshotels.com, .itch.io"
+        )
         link_service.block = True
         link_service.save()

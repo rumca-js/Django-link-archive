@@ -4,8 +4,8 @@ from bs4 import BeautifulSoup
 
 from ..models import AppLogging
 from ..apps import LinkDatabase
-from ..webtools import RssPage, HtmlPage
-from ..pluginurl.entryurlinterface import UrlHandler
+from ..webtools import RssPage, HtmlPage, InternetPageHandler
+from ..pluginurl import UrlHandler, YouTubeChannelHandler
 from ..configuration import Configuration
 
 from .sourcegenericplugin import SourceGenericPlugin
@@ -22,85 +22,14 @@ class BaseRssPlugin(SourceGenericPlugin):
         super().__init__(source_id)
         source = self.get_source()
 
-    def get_contents(self):
-        if self.contents:
-            return self.contents
+    def is_rss(self, handler):
+        if type(handler) is YouTubeChannelHandler:
+            return True
 
-        if self.dead:
-            return
+        if type(handler) is InternetPageHandler and handler.is_rss():
+            return True
 
-        source = self.get_source()
-
-        contents = super().get_contents()
-
-        if not contents:
-            self.dead = True
-            return
-
-        url = self.get_address()
-
-        p = RssPage(url, contents)
-        if p.is_valid():
-            self.contents = contents
-            return self.contents
-
-        p = HtmlPage(url, contents)
-        if p.is_valid():
-            contents = p.get_contents()
-            wh1 = contents.find("<rss")
-            wh2 = contents.find("</rss", wh1+1)
-            wh3 = contents.find(">", wh2+1)
-            if wh1 == -1 or wh2 == -1 or wh3 == -1:
-                self.store_error(
-                    source, "HTML body does not provide RSS, body", rss_contents
-                )
-                self.dead = True
-
-                return None
-
-            rss_contents = contents[wh1:wh3+1]
-
-            self.reader = RssPage(self.get_address(), contents=rss_contents)
-
-            if not self.reader.is_valid():
-                self.store_error(
-                    source, "HTML body does not provide RSS, body", rss_contents
-                )
-                self.dead = True
-            else:
-                contents = rss_contents
-                self.contents = p.get_contents()
-                return contents
-
-        self.store_error(source, "Page does not provide RSS", contents)
-        self.dead = True
-
-        return None
-
-        self.contents = contents
-
-        return contents
-
-    def store_error(self, source, text, contents):
-        if contents:
-            print_contents = contents
-        else:
-            print_contents = "None"
-
-        status_code = None
-        if self.response:
-            status_code = self.response.status_code
-
-        detail_text = "Status code:{}\nOptions:{}\nContents:\n{}".format(
-                status_code,
-                self.content_handler.options,
-                print_contents[: self.get_contents_size_limit()],
-        )
-
-        AppLogging.error(
-            "{}. Source:{}. Title:{}".format(text, source.url, source.title,),
-            detail_text = detail_text,
-        )
+        return False
 
     def get_contents_size_limit(self):
         return 800
@@ -117,21 +46,27 @@ class BaseRssPlugin(SourceGenericPlugin):
         if not contents:
             return
 
+        # we could check if content-type suggests it is a RSS page
+        # but server might say it is text/html (which is not)
+        # This plugin handles RssPages
+
         self.reader = RssPage(self.get_address(), contents)
+        if not self.reader.is_valid():
+            AppLogging.error("Url:{}. RSS page is not valid".format(source.url))
+            return
+
         all_props = self.reader.get_container_elements()
 
         for index, prop in enumerate(all_props):
             if not self.is_link_ok_to_add(prop):
-                AppLogging.warning(
-                        "Page:{}. Cannot add link".format(self.get_address(), prop),
-                        stack=True
+                AppLogging.error(
+                    "Page:{}. Cannot add link".format(self.get_address(), prop),
+                    stack=True,
                 )
                 continue
 
             prop = self.enhance(prop)
-
-            if self.is_link_ok_to_add(prop):
-                yield prop
+            yield prop
 
     def enhance(self, prop):
         prop["link"] = UrlHandler.get_cleaned_link(prop["link"])

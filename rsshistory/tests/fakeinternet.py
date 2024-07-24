@@ -563,12 +563,12 @@ class FakeInternetTestCase(TestCase):
         return self.user
 
     def print_errors(self):
-        infos = AppLogging.objects.filter(level = int(logging.ERROR))
+        infos = AppLogging.objects.filter(level=int(logging.ERROR))
         for info in infos:
             print("Error: {}".format(info.info_text))
 
     def no_errors(self):
-        infos = AppLogging.objects.filter(level = int(logging.ERROR))
+        infos = AppLogging.objects.filter(level=int(logging.ERROR))
         return infos.count() == 0
 
     def create_example_data(self):

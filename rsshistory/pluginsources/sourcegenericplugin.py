@@ -60,7 +60,9 @@ class SourceGenericPlugin(object):
             return True
 
         if self.dead:
-            AppLogging.debug("Url:{} Title:{}. Plugin: page is dead".format(source.url, source.title))
+            AppLogging.debug(
+                "Url:{} Title:{}. Plugin: page is dead".format(source.url, source.title)
+            )
 
             self.set_operational_info(
                 stop_time,
@@ -84,7 +86,9 @@ class SourceGenericPlugin(object):
 
             if not self.is_link_ok_to_add(link_data):
                 AppLogging.error(
-                        "Url:{} Title:{}. Cannot add link: {}".format(source.url, source.title, str(link_data)),
+                    "Url:{} Title:{}. Cannot add link: {}".format(
+                        source.url, source.title, str(link_data)
+                    ),
                     stack=True,
                 )
 
@@ -107,7 +111,7 @@ class SourceGenericPlugin(object):
 
             entry = b.add_from_props()
 
-            # AppLogging.debug("Source:{} Title:{}. Generic plugin add:{} DONE".format(source.url, source.title, link_data["link"]))
+            # AppLogging.debug("Url:{} Title:{}. Generic plugin add:{} DONE".format(source.url, source.title, link_data["link"]))
 
             if entry and entry.date_published > start_time:
                 if source.auto_tag:
@@ -126,12 +130,14 @@ class SourceGenericPlugin(object):
 
         if self.hash and source.get_page_hash() == self.hash:
             AppLogging.debug(
-                    "Url:{} Title:{}. Not changed.".format(source.url, source.title)
+                "Url:{} Title:{}. Not changed.".format(source.url, source.title)
             )
             return False
         elif not self.hash:
             AppLogging.debug(
-                    "Url:{} Title:{}. Cannot obtain hash, skipping ".format(source.url, source.title)
+                "Url:{} Title:{}. Cannot obtain hash, skipping ".format(
+                    source.url, source.title
+                )
             )
             return False
 
@@ -176,12 +182,9 @@ class SourceGenericPlugin(object):
         if self.dead:
             return
 
-        handler = UrlHandler(self.get_address())
-
-        contents = handler.get_contents()
-
-        self.response = handler.response
-        self.content_handler = handler
+        self.content_handler = UrlHandler(self.get_address())
+        self.contents = self.content_handler.get_contents()
+        self.response = self.content_handler.response
 
         status_code = None
         if self.response:
@@ -189,19 +192,22 @@ class SourceGenericPlugin(object):
 
         source = self.get_source()
 
-        if not contents:
+        if not self.contents:
             AppLogging.error(
-                info_text = "Url:{} Title:{}; Could not obtain contents.".format(
-                    source.url, source.title,
+                info_text="Url:{} Title:{}; Could not obtain contents.".format(
+                    source.url,
+                    source.title,
                 ),
-                detail_text = "Status code:{}\nOptions:{}\nContents\n{}".format(status_code, str(handler.options), contents,)
+                detail_text="Status code:{}\nOptions:{}\nContents\n{}".format(
+                    status_code,
+                    str(self.content_handler.options),
+                    self.contents,
+                ),
             )
             self.dead = True
             return None
 
-        self.contents = contents
-
-        return contents
+        return self.contents
 
     def get_address(self):
         source = self.get_source()

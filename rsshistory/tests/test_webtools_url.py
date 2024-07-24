@@ -1,4 +1,10 @@
-from ..webtools import Url, PageOptions, HtmlPage, PageResponseObject, InternetPageHandler
+from ..webtools import (
+    Url,
+    PageOptions,
+    HtmlPage,
+    PageResponseObject,
+    InternetPageHandler,
+)
 
 from .fakeinternet import FakeInternetTestCase, MockRequestCounter
 
@@ -159,7 +165,7 @@ class UrlTest(FakeInternetTestCase):
         page_options = PageOptions()
         page_options.use_full_browser = True
 
-        url = Url("https://multiple-favicons/page.html", page_options = page_options)
+        url = Url("https://multiple-favicons/page.html", page_options=page_options)
         # call tested function
         options = url.options
         self.assertTrue(options.use_full_browser)
@@ -167,7 +173,7 @@ class UrlTest(FakeInternetTestCase):
         page_options = PageOptions()
         page_options.use_headless_browser = True
 
-        url = Url("https://multiple-favicons/page.html", page_options = page_options)
+        url = Url("https://multiple-favicons/page.html", page_options=page_options)
         # call tested function
         options = url.options
         self.assertTrue(options.use_headless_browser)

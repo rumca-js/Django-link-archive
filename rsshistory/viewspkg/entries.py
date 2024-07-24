@@ -82,7 +82,7 @@ def get_request_page_num(request):
     if "page" in request.GET:
         page = request.GET["page"]
         try:
-           page =  int(page)
+            page = int(page)
         except Exception as e:
             page = 1
 
@@ -227,7 +227,7 @@ class EntriesSearchListView(generic.ListView):
         if search_term.find("link =") >= 0 or search_term.find("link=") >= 0:
             wh = search_term.find("=")
             if wh >= 0:
-                wh2 = search_term.find("=", wh+1)
+                wh2 = search_term.find("=", wh + 1)
                 if wh2 >= 0:
                     wh = wh2
 
@@ -643,6 +643,7 @@ def func_display_empty_form(request, p):
 
     return p.render("form_basic.html")
 
+
 def func_display_init_form(request, p, cleaned_link):
     form = LinkInputForm(initial={"link": cleaned_link}, request=request)
     form.method = "POST"
@@ -653,6 +654,7 @@ def func_display_init_form(request, p, cleaned_link):
     ] = "Internet is dangerous, so carefully select which links you add"
 
     return p.render("form_basic.html")
+
 
 def func_display_data_form(request, p, data):
     notes = []
@@ -686,9 +688,13 @@ def func_display_data_form(request, p, data):
     info = DomainCache.get_object(link)
 
     if config.prefer_https and link.find("http://") >= 0:
-        warnings.append("Detected http protocol. Choose https if possible. It is a more secure protocol")
+        warnings.append(
+            "Detected http protocol. Choose https if possible. It is a more secure protocol"
+        )
     if config.prefer_non_www_sites and domain.find("www.") >= 0:
-        warnings.append("Detected www in domain link name. Select non www link if possible")
+        warnings.append(
+            "Detected www in domain link name. Select non www link if possible"
+        )
     if domain.lower() != domain:
         warnings.append("Link domain is not lowercase. Are you sure link name is OK?")
     if config.respect_robots_txt and info and not info.is_allowed(link):
@@ -838,9 +844,7 @@ def add_simple_entry(request):
             return p.render("summary_present.html")
 
         else:
-            p.context["summary_text"] = "Form is invalid {}".format(
-                link
-            )
+            p.context["summary_text"] = "Form is invalid {}".format(link)
             return p.render("summary_present.html")
     else:
         return func_display_empty_form(request, p)
@@ -1269,7 +1273,7 @@ def entries_json(request):
         p = Paginator(links, view.get_paginate_by(links))
         page_obj = p.get_page(page_num)
 
-        objects = links[page_obj.start_index()-1: page_obj.end_index()]
+        objects = links[page_obj.start_index() - 1 : page_obj.end_index()]
 
         exporter = InstanceExporter()
         json_obj = exporter.export_links(objects)

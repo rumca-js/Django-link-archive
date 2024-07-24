@@ -103,7 +103,7 @@ class UpdateExportManager(object):
                     E,
                     "Cannot update repository, removing directory {}".format(
                         operating_dir
-                    )
+                    ),
                 )
                 self.clear_operating_directory(repo)
 
@@ -152,7 +152,9 @@ class UpdateManager(object):
         )
         mgr.process()
 
-        AppLogging.info("Export:{}. Writing and Pushing data - DONE".format(export_data.id))
+        AppLogging.info(
+            "Export:{}. Writing and Pushing data - DONE".format(export_data.id)
+        )
 
     def write(self, export_data, input_date=""):
         if input_date == "":
