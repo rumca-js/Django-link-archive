@@ -1,7 +1,7 @@
 .PHONY: install install-minimal
 .PHONY: createtables createtables-minimal createtables-celery createsuperuser installsysdeps configuresysdeps
-.PHONY: run run-celery run-server run-minimal
-.PHONY: update oncommit test create-companion-app static migrate reformat
+.PHONY: run run-celery run-server run-web-server run-minimal run-crawlee-server
+.PHONY: update update-instances static migrate reformat oncommit test create-companion-app
 .PHONY: clear-celery
 
 CP = cp
@@ -56,21 +56,26 @@ createsuperuser:
 # - assume you are using sudo for this command. solve it later https://github.com/rumca-js/Django-link-archive/issues/10
 # http://pont.ist/rabbit-mq/
 installsysdeps:
-	apt -y install rabbitmq-server memcached wget id3v2 chromium-browser chromium-chromedriver
+	apt -y install rabbitmq-server, memcached, wget, id3v2, chromium-chromedriver
 	systemctl enable rabbitmq-server
 	systemctl start rabbitmq-server
 	systemctl enable memcached.service
 	systemctl start memcached.service
 
-run: run-celery run-server
+run: run-server run-web-server
 
 run-minimal: run-server
+
+run-server: run-script-server run-celery
+
+run-script-server:
+	poetry run python script_server.py &
 
 run-celery:
 	rm -rf celerybeat-schedule.db
 	poetry run celery -A linklibrary worker -l INFO -B
 
-run-server:
+run-web-server:
 	poetry run python manage.py runserver 0.0.0.0:$(PORT)
 
 # Assumptions:
@@ -85,11 +90,14 @@ static:
 migrations-check:
 	poetry run python -m manage makemigrations --check --dry-run
 
+update-instances:
+	poetry run python3 workspace.py -U
+
 migrate:
 	poetry run python manage.py makemigrations
 	poetry run python manage.py migrate
 
-update: migrate static
+update: update-instances migrate static
 
 test: migrations-check
 	@poetry run python manage.py test $(APP_NAME) -v 2
