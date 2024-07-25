@@ -69,6 +69,8 @@ Alternative programs do exist.
 
 [Grimoire](https://github.com/goniszewski/grimoire), [BookmarkOS](https://bookmarkos.com/), [Raindrop](https://raindrop.io/), [LinkAce](https://www.linkace.org/), [Hoarder](https://hoarder.app/), [GGather](https://web.ggather.com/), [Zotero](https://www.zotero.org/), [OneKeep](https://onekeep.com/), [Lasso](https://www.lasso.net/go/), [CarryLinks](https://carrylinks.com/), [Zlinky](https://zlinky.com/), [wakelet](https://wakelet.com/), [Booky](https://booky.io/), [Webtag](https://webtag.io/), [Historious](https://historio.us/), [Knowies](https://www.knowies.com)
 
+Awasome list at [Github](https://github.com/awesome-selfhosted/awesome-selfhosted?tab=readme-ov-file#bookmarks-and-link-sharing).
+
 # How does it work?
 
  - System reads defined "Sources" regularly
