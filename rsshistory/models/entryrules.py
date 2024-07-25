@@ -9,7 +9,7 @@ from ..apps import LinkDatabase
 class EntryRules(models.Model):
     enabled = models.BooleanField(default=True)
 
-    rule_url = models.CharField(max_length=1000)  # url syntax
+    rule_url = models.CharField(max_length=1000, help_text="New entries can added using colon")  # url syntax
 
     rule_name = models.CharField(max_length=1000, blank=True, help_text="Rule name")
 

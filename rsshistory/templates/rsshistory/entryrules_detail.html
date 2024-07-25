@@ -11,7 +11,7 @@
     </a>
 </div>
 
-<h1>Entry Rule</h1>
+<h1>{{object.rule_name}}</h1>
 
 <p>
 {% if object.enabled %}
@@ -21,7 +21,6 @@
 {% endif %}
 <div>Rule URL: {{object.rule_url}}</div>
 <div>Block: {{object.block}}</div>
-<div>Name: {{object.rule_name}}</div>
 <div>Auto tag: {{object.auto_tag}}</div>
 <div>Requires selenium: {{object.requies_selenium}}</div>
 <div>Requires selenium full: {{object.requies_selenium_full}}</div>

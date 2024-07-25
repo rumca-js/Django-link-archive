@@ -237,14 +237,14 @@ class ConfigurationEntry(models.Model):
         blank=True,
         max_length=1000,
         null=True,
-        help_text="Script that is called when headless request needs to be made. Supported variables $URL $TIMEOUT $RESPONSE_FILE. Example: ./crawleeheadless.sh --url $URL -o $RESPONSE_FILE",
+        help_text="Script that is called when headless request needs to be made. Supported variables $URL $TIMEOUT $RESPONSE_FILE. Example: ./crawleeheadless.sh --url '$URL' -o '$RESPONSE_FILE'",
     )
 
     crawling_full_script = models.CharField(
         blank=True,
         max_length=1000,
         null=True,
-        help_text="Script that is called when full request needs to be made. Supported variables $URL $TIMEOUT $RESPONSE_FILE. Example: ./crawleefull.sh --url $URL -o $RESPONSE_FILE",
+        help_text="Script that is called when full request needs to be made. Supported variables $URL $TIMEOUT $RESPONSE_FILE. Example: ./crawleefull.sh --url '$URL' -o '$RESPONSE_FILE'",
     )
 
     # User settings

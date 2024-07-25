@@ -2786,8 +2786,12 @@ class PageOptions(object):
         self.use_headless_browser = False
         self.ssl_verify = False
         self.fast_parsing = True
-        self.custom_user_agent = ""
         self.link_redirect = False
+
+        self.user_agent = None
+        self.headers = {}
+        self.timeout = 0 # None
+        self.ping = False
 
     def use_basic_crawler(self):
         return not self.is_advanced_processing_required()

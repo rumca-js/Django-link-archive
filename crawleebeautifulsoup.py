@@ -45,7 +45,7 @@ class Parser(object):
     def parse(self):
         self.parser = argparse.ArgumentParser(description="Data analyzer program")
         self.parser.add_argument("--url", help="Directory to be scanned")
-        self.parser.add_argument("--timeout", help="Timeout expressed in seconds")
+        self.parser.add_argument("--timeout", default="10", help="Timeout expressed in seconds")
         self.parser.add_argument("--ping", help="Ping only")
         self.parser.add_argument("-o", "--output-file", help="Output file")
 
@@ -75,7 +75,7 @@ async def main() -> None:
     crawler = BeautifulSoupCrawler(
         # Limit the crawl to max requests. Remove or increase it for crawling all links.
         max_requests_per_crawl=10,
-        request_handler_timeout = timedelta(seconds = 10),
+        request_handler_timeout = timedelta(seconds = int(parser.args.timeout)),
     )
 
     async def save_error(response):
@@ -98,8 +98,9 @@ async def main() -> None:
             result = {}
             # maybe we could send header information that we accept text/rss
 
-            result['url'] = context.request.url
-            result['loaded_url'] = context.request.loaded_url
+            #result['url'] = context.request.url
+            #result['loaded_url'] = context.request.loaded_url
+            result['url'] = context.request.loaded_url
             result['status_code'] = context.http_response.status_code
 
             headers = {}
