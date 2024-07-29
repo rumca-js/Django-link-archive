@@ -220,6 +220,15 @@ User actions are tracked by the system, only if it is configured so:
 
 Development is described by a separate README: [README_development.md](https://github.com/rumca-js/Django-link-archive/blob/main/README_development.md).
 
+# Scripts
+
+There are some scripts that can be used without Django application:
+ - converter.py - converts JSON files to SQLite table
+ - dataanalyzer.py - analyzes data in JSON files / SQLite table. You can query the data
+ - script_server.py - server that can be used to dispatch crawlers for certain URLs, to obtain meta data
+ - script_client.py - client that can be used to connect to server, and perform requests
+ - workspace.py - workspace management. Can be used to update project
+
 # Additional notes
 
 What grinds my gears?
