@@ -297,15 +297,22 @@ class DomainAwarePageTest(FakeInternetTestCase):
         # call tested function
         parts = p.split()
 
-        self.assertEqual(len(parts), 4)
-        self.assertEqual(parts[0], "http://www.youtube.com")
-        self.assertEqual(parts[1], "test1")
-        self.assertEqual(parts[2], "test2")
-        self.assertEqual(parts[3], "?whatever=1&something=2")
+        print(parts)
+
+        self.assertEqual(len(parts), 6)
+
+        self.assertEqual(parts[0], "http")
+        self.assertEqual(parts[1], "://")
+        self.assertEqual(parts[2], "www.youtube.com")
+        self.assertEqual(parts[3], "test1")
+        self.assertEqual(parts[4], "test2")
+        self.assertEqual(parts[5], "?whatever=1&something=2")
 
     def test_join(self):
         parts = [
-            "http://www.youtube.com",
+            "http",
+            "://",
+            "www.youtube.com",
             "test1",
             "test2",
             "?whatever=1&something=2",
@@ -324,7 +331,7 @@ class DomainAwarePageTest(FakeInternetTestCase):
         parts = p.parse_url()
         print(parts)
 
-        self.assertTrue(len(parts) == 5)
+        self.assertEqual(len(parts), 5)
         self.assertEqual(parts[0], "https")
         self.assertEqual(parts[1], "://")
         self.assertEqual(parts[2], "www.youtube.com")
@@ -336,7 +343,7 @@ class DomainAwarePageTest(FakeInternetTestCase):
         parts = p.parse_url()
         print(parts)
 
-        self.assertTrue(len(parts) == 5)
+        self.assertEqual(len(parts), 5)
         self.assertEqual(parts[0], "https")
         self.assertEqual(parts[1], "://")
         self.assertEqual(parts[2], "www.youtube.com")
@@ -348,11 +355,11 @@ class DomainAwarePageTest(FakeInternetTestCase):
         parts = p.parse_url()
         print(parts)
 
-        self.assertTrue(len(parts) == 4)
+        self.assertEqual(len(parts), 4)
         self.assertEqual(parts[0], "https")
         self.assertEqual(parts[1], "://")
         self.assertEqual(parts[2], "www.youtube.com")
-        self.assertEqual(parts[3], "/test")
+        self.assertEqual(parts[3], "/test/")
 
     def test_is_web_link(self):
         p = DomainAwarePage("https://www.youtube.com")
@@ -366,6 +373,22 @@ class DomainAwarePageTest(FakeInternetTestCase):
         p = DomainAwarePage("https://com")
         # call tested function
         self.assertFalse(p.is_web_link())
+
+        p = DomainAwarePage("smb://youtube.com")
+        # call tested function
+        self.assertTrue(p.is_web_link())
+
+        p = DomainAwarePage("ftp://youtube.com")
+        # call tested function
+        self.assertTrue(p.is_web_link())
+
+        p = DomainAwarePage("//127.0.0.1")
+        # call tested function
+        self.assertTrue(p.is_web_link())
+
+        p = DomainAwarePage("\\\\127.0.0.1")
+        # call tested function
+        self.assertTrue(p.is_web_link())
 
     def test_get_protocolless(self):
         p = DomainAwarePage("https://www.youtube.com:443")

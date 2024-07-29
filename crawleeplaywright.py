@@ -6,7 +6,9 @@ https://realpython.com/python-sockets/   "Sending an Application Message"
 import argparse
 from datetime import timedelta
 import json
-import rsshistory.webtools
+from rsshistory import webtools
+import crawlerscript
+import traceback
 
 PAGE_TOO_BIG_BYTES = 5000000
 
@@ -26,103 +28,78 @@ except Exception as E:
     crawlee_feataure_enabled = False
 
 
-class Parser(object):
-
-    def parse(self):
-        self.parser = argparse.ArgumentParser(description="Data analyzer program")
-        self.parser.add_argument("--url", help="Directory to be scanned")
-        self.parser.add_argument("--timeout", default="10", help="Timeout expressed in seconds")
-        self.parser.add_argument("--ping", help="Ping only")
-        self.parser.add_argument("-o", "--output-file", help="Output file")
-
-        self.args = self.parser.parse_args()
-
-
 async def main() -> None:
-    parser = Parser()
+    parser = crawlerscript.Parser()
     parser.parse()
-
-    if "url" not in parser.args:
-        print("Url file not in args")
+    if not parser.is_valid():
         return
 
-    if "output_file" not in parser.args:
-        print("Output file not in args")
-        return
-
-    if parser.args.url is None:
-        print("Url file not in args")
-        return
-
-    if parser.args.output_file is None:
-        print("Output file not in args")
-        return
+    request = parser.get_request()
+    print("Running request:{}".format(request))
 
     crawler = PlaywrightCrawler(
         # Limit the crawl to max requests. Remove or increase it for crawling all links.
         max_requests_per_crawl=10,
-        request_handler_timeout = timedelta(seconds = int(paresr.args.timeout) ),
+        request_handler_timeout = timedelta(seconds = request.timeout_s),
     )
-
-    async def save_error(response):
-        response.status_code = 500
-        all_bytes = response.to_bytes()
-        with open(parser.args.output_file, "wb") as fh:
-            fh.write(all_bytes)
-
-    async def save_response(response):
-        all_bytes = response.to_bytes()
-        with open(parser.args.output_file, "wb") as fh:
-            fh.write(all_bytes)
 
     # Define the default request handler, which will be called for every request.
     @crawler.router.default_handler
     async def request_handler(context: PlaywrightCrawlingContext) -> None:
         print(f'Processing {context.request.url} ...')
 
+        response = webtools.PageResponseObject(request.url)
         try:
-            result = {}
             # maybe we could send header information that we accept text/rss
-            #result['url'] = context.request.url
-            #result['loaded_url'] = context.request.loaded_url
-            result['url'] = context.request.loaded_url
-            result['status_code'] = context.response.status
 
             headers = {}
             for item in context.response.headers:
                 headers[item] = context.response.headers[item]
-            result['headers'] = headers
 
-            response = rsshistory.webtools.PageResponseObject(result['url'], headers = result['headers'])
+            response.url = context.request.loaded_url
+            # result['loaded_url'] = context.page.url
+            response.status_code = context.response.status
+            response.headers = headers
 
-            if parser.args.ping:
-                await save_response(response)
+            if request.ping:
+                c = crawlerscript.ScriptCrawlerInterface(parser, None)
+                c.response = response
+                c.save_response()
                 return
 
             if response.get_content_length() > PAGE_TOO_BIG_BYTES:
-                await save_error(response)
+                c = crawlerscript.ScriptCrawlerInterface(parser, None)
+                response.status_code = 500
+                c.response = response
+                c.save_response()
                 print("Response too big")
                 return
 
             content_type = response.get_content_type()
             if content_type and not response.is_content_type_supported():
-                await save_error(response)
+                c = crawlerscript.ScriptCrawlerInterface(parser, None)
+                response.status_code = 500
+                c.response = response
+                c.save_response()
                 print("Content not supported")
                 return
 
-            # result['loaded_url'] = context.page.url
-            result['page_content'] = await context.page.content()
+            response.set_text(await context.page.content())
 
-            response.content = result['page_content']
-
-            await save_response(response)
+            c = crawlerscript.ScriptCrawlerInterface(parser, None)
+            c.response = response
+            c.save_response()
 
             print(f'Processing {context.request.url} ...DONE')
         except Exception as E:
-            print("Exception:{}".format(str(E)))
+            print(str(E))
+            error_text = traceback.format_exc()
+            print(error_text)
 
-            response = rsshistory.webtools.PageResponseObject(result['url'])
-            await save_error(response)
+            c = crawlerscript.ScriptCrawlerInterface(parser, None)
+            response.status_code = 500
+            c.response = response
+            c.save_response()
 
 
     # Run the crawler with the initial list of URLs.

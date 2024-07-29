@@ -152,4 +152,4 @@ class SourceUrlInterfaceTest(FakeInternetTestCase):
         self.assertTrue("title" in props)
         self.assertEqual(props["source_type"], SourceDataModel.SOURCE_TYPE_RSS)
 
-        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 2)

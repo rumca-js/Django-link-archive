@@ -12,7 +12,7 @@ from django.contrib.auth.models import User
 
 from ..models import AppLogging, ConfigurationEntry
 from ..dateutils import DateUtils
-from ..webtools import RequestBuilder, PageResponseObject
+from ..webtools import RequestBuilder, PageResponseObject, WebLogger
 from ..configuration import Configuration
 
 from ..pluginurl.urlhandler import UrlHandler
@@ -199,11 +199,11 @@ class TestResponseObject(PageResponseObject):
     def __init__(self, url, headers, timeout):
         self.status_code = 200
 
-        contents = self.get_contents_for_url(url)
+        text = self.get_text_for_url(url)
 
         self.url = url
-        self.text = contents
-        self.content = contents
+        self.text = text
+        self.binary = text.encode()
         self.headers = {}
 
         # encoding = chardet.detect(contents)['encoding']
@@ -217,6 +217,12 @@ class TestResponseObject(PageResponseObject):
     def set_headers(self, url):
         if url == "https://page-with-last-modified-header.com":
             self.headers["Last-Modified"] = "Wed, 03 Apr 2024 09:39:30 GMT"
+
+        elif url == "https://page-with-rss-link.com/feed":
+            self.headers["Content-Type"] = "application/+rss"
+
+        elif url.find("instance.com") >= 0 and url.find("json") >= 0:
+            self.headers["Content-Type"] = "json"
 
     def set_status(self, url):
         if url.startswith("https://www.youtube.com/watch?v=666"):
@@ -267,7 +273,7 @@ class TestResponseObject(PageResponseObject):
         elif url == "http://page-with-https-status-500-http-status-200.com":
             self.status_code = 200
 
-    def get_contents_for_url(self, url):
+    def get_text_for_url(self, url):
         if url.startswith("https://youtube.com/channel/"):
             return self.get_contents_youtube_channel(url)
 
@@ -492,17 +498,31 @@ class TestResponseObject(PageResponseObject):
         else:
             return """{}"""
 
+    def __str__(self):
+        return "TestResponseObject: Url:{} Status code:{} Headers:{}".format(
+            self.url,
+            self.status_code,
+            self.headers,
+        )
+
 
 class FakeInternetTestCase(TestCase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         MockRequestCounter.mock_page_requests = 0
 
-    def get_contents_function(self, url, headers, timeout_s, ping=False):
-        print("Mocked Requesting page: {}".format(url))
+    def get_contents_function(self, url=None, headers = None, timeout_s = 10, ping=False, request=None):
         MockRequestCounter.mock_page_requests += 1
 
-        return TestResponseObject(url, headers, timeout_s)
+        if not request:
+            request = PageRequestObject(url)
+
+        if headers:
+            request.headers = headers
+
+        request.timeout_s = timeout_s
+
+        return TestResponseObject(request.url, request.headers, request.timeout_s)
 
     def disable_web_pages(self):
         RequestBuilder.get_contents_function = self.get_contents_function
@@ -513,6 +533,8 @@ class FakeInternetTestCase(TestCase):
         # UrlHandler.youtube_channel_handler = YouTubeChannelHandlerMock
         # UrlHandler.odysee_video_handler = YouTubeVideoHandlerMock
         # UrlHandler.odysee_channel_handler = YouTubeVideoHandlerMock
+
+        WebLogger.web_logger = AppLogging
 
     def setup_configuration(self):
         # each suite should start with a default configuration entry

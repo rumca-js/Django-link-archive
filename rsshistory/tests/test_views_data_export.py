@@ -57,7 +57,7 @@ class DataExportTests(FakeInternetTestCase):
 
         # call user action
         response = self.client.post(url, data=form_data)
-        # print(response.content.decode())
+        # print(response.text.decode())
 
         self.assertEqual(response.status_code, 302)
 

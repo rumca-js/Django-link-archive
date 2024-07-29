@@ -180,7 +180,7 @@ class ViewsTest(FakeInternetTestCase):
         )
         response = self.client.get(url)
 
-        # print(response.content.decode('utf-8'))
+        # print(response.text.decode('utf-8'))
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Detected", html=False)
@@ -195,7 +195,7 @@ class ViewsTest(FakeInternetTestCase):
         data = {"link": "https://www.linkedin.com"}
         response = self.client.post(url, data=data)
 
-        # print(response.content.decode('utf-8'))
+        # print(response.text.decode('utf-8'))
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Detected", html=False)
@@ -211,7 +211,7 @@ class ViewsTest(FakeInternetTestCase):
         )
         response = self.client.get(url)
 
-        # print(response.content.decode('utf-8'))
+        # print(response.text.decode('utf-8'))
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Detected", html=False)
@@ -225,7 +225,7 @@ class ViewsTest(FakeInternetTestCase):
         )
         response = self.client.get(url)
 
-        # print(response.content.decode('utf-8'))
+        # print(response.text.decode('utf-8'))
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Detected", html=False)

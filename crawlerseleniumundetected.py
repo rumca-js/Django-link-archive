@@ -10,15 +10,15 @@ from selenium.common.exceptions import TimeoutException
 
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-import undetected_chromedriver as uc
 
-from rsshistory.webtools import PageResponseObject
+from rsshistory import webtools
+import crawlerscript
 
 
 PAGE_TOO_BIG_BYTES = 5000000  # 5 MB
 
 
-class SeleniumDriver(object):
+class SeleniumDriver(crawlerscript.ScriptCrawlerInterface):
     def get_selenium_status_code(self, driver):
         status_code = 200
         try:
@@ -67,13 +67,13 @@ class SeleniumDriver(object):
 
 
 class SeleniumUndetected(SeleniumDriver):
-    def __init__(self, url, response_file, timeout_s=10, ping=False):
+    def __init__(self, parser, request):
         """
         To obtain RSS page you have to run real, full blown browser.
 
         Headless might not be enough to fool cloudflare.
         """
-        self.url = url
+        super().__init__(parser, request)
 
         options = uc.ChromeOptions()
         options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
@@ -89,6 +89,8 @@ class SeleniumUndetected(SeleniumDriver):
 
 
         driver = uc.Chrome(options=options)
+        
+        response = PageResponseObject(self.request.url)
 
         try:
             driver.set_page_load_timeout(timeout_s)
@@ -106,61 +108,38 @@ class SeleniumUndetected(SeleniumDriver):
             html_content = driver.page_source
 
             if self.url != driver.current_url:
-                self.url = driver.current_url
+                response.url = driver.current_url
 
-            # TODO use selenium wire to obtain status code & headers?
+            response.set_text(html_content)
+            response.status_code = status_code
 
-            self.response = PageResponseObject(self.url, html_content, status_code)
         except TimeoutException:
-            self.response = PageResponseObject(self.url, None, 500)
+            response.set_binary(None)
+
         finally:
             driver.quit()
+
+        self.response = response
 
     def get(self):
         return self.response
 
 
-
-class Parser(object):
-
-    def parse(self):
-        self.parser = argparse.ArgumentParser(description="Data analyzer program")
-        self.parser.add_argument("--url", help="Directory to be scanned")
-        self.parser.add_argument("--timeout", default=10, help="Timeout expressed in seconds")
-        self.parser.add_argument("--ping", default=False, help="Ping only")
-        self.parser.add_argument("-o", "--output-file", help="Output file")
-
-        self.args = self.parser.parse_args()
-
-
 def main():
-    parser = Parser()
+    parser = crawlerscript.Parser()
     parser.parse()
-
-    if "url" not in parser.args:
-        print("Url file not in args")
+    if not parser.is_valid():
         return
 
-    if "output_file" not in parser.args:
-        print("Output file not in args")
-        return
+    request = parser.get_request()
 
-    if parser.args.url is None:
-        print("Url file not in args")
-        return
-
-    if parser.args.output_file is None:
-        print("Output file not in args")
-        return
-
-    page = SeleniumUndetected(parser.args.url, parser.args.output_file, parser.args.timeout, parser.args.ping)
+    page = SeleniumUndetected(parser, request)
     response = page.get()
 
     print(f'Processing {parser.args.url} ...DONE')
 
-    all_bytes = response.to_bytes()
-    with open(parser.args.output_file, "wb") as fh:
-        fh.write(all_bytes)
+    i.response = response
+    i.save_response()
 
 
 main()

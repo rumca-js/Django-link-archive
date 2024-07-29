@@ -1,79 +1,99 @@
 """
-We could use 
-https://realpython.com/python-sockets/   "Sending an Application Message"
+This is server that accepts scraping commands, scrapes web page, and produces results.
 
-TODO - solve race condition, where 2 clients at the same time might perform a query, and write an
-output file.
+We communicate through binary interface:
+ - PageRequestObject
+ - PageResponseObject
 
-use mutex for running. cleanup files after reading.
-this will slow down our operations, but who cares?
+Since scraping can be done through celery, and web server, it is convinient to limit the amount
+of running browsers. We require only 1 browser at a time.
+
+We are not nasty, we are not in a hurry. We are good scrapers.
 """
 
 import socket
 import threading
 from pathlib import Path
-from rsshistory.socketconnection import *
+from rsshistory import ipc, webtools
 import subprocess
+import traceback
 
 
 mutex = threading.Lock()
 
 
 def handle_connection_inner(conn, address):
-    c = SocketConnection(conn)
+    def run_script(script, request):
+        if script is None:
+            print("Client has not set script to execute")
+            return
 
-    timeout = 10
+        output_file = Path("output.txt")
+
+        # TODO pass through socket
+        script = '{} --url "{}" -o "{}" --timeout {}'.format(script, request.url, str(output_file), request.timeout_s)
+
+        print("Running {} with timeout:{}".format(script, request.timeout_s))
+        with mutex:
+            try:
+                p = subprocess.run(script, shell=True, timeout = request.timeout_s+3)
+            except Exception as E:
+                print(str(E))
+                print("Could not finish command")
+                return
+
+        all_bytes = None
+
+        if output_file.exists():
+            print("File exists")
+            with open(str(output_file), "rb") as fh:
+                all_bytes = fh.read()
+
+            output_file.unlink()
+        else:
+            print("Error! File does not exist!")
+
+        return all_bytes
+
+    c = ipc.SocketConnection(conn)
+
+    timeout_s = 10
     script = None
 
     while True:
-        command = c.get_command_list()
+        command = c.get_command_and_data()
 
         if not command:
+            print("No more commands. Closing")
             c.close()
             return
 
-        if command[0] == "url":
-            print("Trying to obtain URL contents")
+        if command[0] == "PageRequestObject.__init__":
+            pass
+
+        elif command[0] == "PageRequestObject.url":
 
             url = command[1].decode()
 
-            if script is None:
-                print("Client has not set script to execute")
-                return
-
-            output_file = Path("output.txt")
-
-            # TODO pass through socket
-            script = '{} --url "{}" -o "{}" --timeout {}'.format(script, url, str(output_file), timeout)
-
-            print("Running {} with timeout:{}".format(script, timeout))
-            with mutex:
-                try:
-                    p = subprocess.run(script, shell=True, timeout = timeout+3)
-                except Exception as E:
-                    print(str(E))
-                    print("Could not finish command")
-                    c.close()
-                    return
-
-            if output_file.exists():
-                with open(str(output_file), "rb") as fh:
-                    all_bytes = fh.read()
-                    c.send(all_bytes)
-
-                output_file.unlink()
+            request = webtools.PageRequestObject(url=url, timeout_s = timeout_s)
+            data = run_script(script, request)
+            if data:
+                c.send(data)
 
             c.close()
 
             print("Sent everything successfully")
 
-        elif command[0] == "timeout":
-            timeout = int(command[1].decode())
-            print("Applying timeout:{}".format(timeout))
+        elif command[0] == "PageRequestObject.timeout":
+            timeout_s = int(command[1].decode())
+            print("Set timeout:{}".format(timeout_s))
 
-        elif command[0] == "script":
+        elif command[0] == "PageRequestObject.script":
             script = command[1].decode()
-            print("Applying script:{}".format(script))
+            print("Set script:{}".format(script))
+
+        elif command[0] == "PageRequestObject.__del__":
+            pass
 
         else:
             print("Unknown command request:{}".format(command[0]))
@@ -92,6 +112,7 @@ def server_program():
     port = 5007
 
     server_socket = socket.socket()
+    server_socket.settimeout(1.0) # to be able to make ctrl-c on server
 
     try:
         server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -100,21 +121,31 @@ def server_program():
 
         print("Listening on port {}".format(port))
 
-        server_socket.listen()
+        server_socket.listen(1)
 
         started = False
 
-        while True:
-            conn, address = server_socket.accept()
+        print("Accepting new connections")
 
-            client_thread = threading.Thread(target=handle_connection,
-                    args=(conn,address),
-                )
-            client_thread.daemon = True
-            client_thread.start()
+        while True:
+            try:
+                conn, address = server_socket.accept()
+
+                client_thread = threading.Thread(target=handle_connection,
+                        args=(conn,address),
+                    )
+                client_thread.daemon = True
+                client_thread.start()
+            except socket.timeout:
+                #print("Timeout")
+                pass
+
     except Exception as E:
         print(str(E))
+        error_text = traceback.format_exc()
+        print(error_text)
 
+    print("Closing")
     server_socket.close()
 
 

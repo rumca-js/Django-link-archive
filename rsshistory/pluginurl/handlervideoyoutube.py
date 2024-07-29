@@ -130,13 +130,13 @@ class YouTubeJsonHandler(YouTubeVideoHandler):
         self.response = None
 
     def get_contents(self):
-        if self.response and self.response.get_contents():
-            return self.response.get_contents()
+        if self.response and self.response.get_text():
+            return self.response.get_text()
 
         if self.dead:
             return
 
-        return self.get_response().get_contents()
+        return self.get_response().get_text()
 
     def get_response(self):
         if self.response:
@@ -151,8 +151,7 @@ class YouTubeJsonHandler(YouTubeVideoHandler):
         status = False
         if self.download_details():
             if self.load_details():
-                response.content = self.yt_text
-                response.encoding = "utf-8"
+                response.set_text(self.yt_text, "utf-8")
                 response.status_code = PageResponseObject.STATUS_CODE_OK
                 response.url = self.get_link_classic()
 
@@ -160,7 +159,7 @@ class YouTubeJsonHandler(YouTubeVideoHandler):
                 LinkDatabase.info("YouTube video handler: {} DONE".format(self.url))
 
         self.response = response
-        self.contents = self.response.content
+        self.contents = self.response.get_text()
 
         if (
             not self.response

@@ -71,7 +71,7 @@ class YouTubeChannelHandler(RssPage, DefaultUrlHandler):
 
         response = self.get_response()
         if response:
-            return self.response.get_contents()
+            return self.response.get_text()
 
     def get_response(self):
         if self.response:
@@ -87,7 +87,7 @@ class YouTubeChannelHandler(RssPage, DefaultUrlHandler):
             self.dead = True
 
         if self.response:
-            self.contents = self.response.get_contents()
+            self.contents = self.response.get_text()
             self.process_contents()
 
             return self.response

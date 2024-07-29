@@ -54,7 +54,7 @@ class UserTagsTest(FakeInternetTestCase):
         # call user action
         response = self.client.post(url, data=tag_data)
 
-        # page_source = response.content.decode("utf-8")
+        # page_source = response.text.decode("utf-8")
         # print("Contents: {}".format(page_source))
 
         # redirect to view the link again
@@ -113,7 +113,7 @@ class UserTagsTest(FakeInternetTestCase):
         url = reverse("{}:tags-entry-remove".format(LinkDatabase.name), args=[entry.id])
         response = self.client.get(url)
 
-        # page_source = response.content.decode("utf-8")
+        # page_source = response.text.decode("utf-8")
         # print("Contents: {}".format(page_source))
 
         self.assertEqual(response.status_code, 302)

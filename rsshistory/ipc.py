@@ -1,0 +1,146 @@
+"""
+This file should not include any other or django related files.
+"""
+import json
+import pickle
+
+
+def object_to_bytes(input_object):
+    return pickle.dumps(input_object, protocol=pickle.HIGHEST_PROTOCOL)
+
+def object_from_bytes(all_bytes):
+    return pickle.loads(all_bytes)
+
+def object_to_command(command_string, input_object):
+    """
+    TODO: All three functions are not currently used
+    Pickle uses 0 byte for something.
+    I use it signal end of command.
+
+    We could rewrite protocol to support pickle, but that would be a pickle!
+    """
+    data = object_to_bytes(input_object)
+    return bytes_to_command(command_string, data)
+
+def bytes_to_command(command_string, bytes):
+    command_string = command_string + ":"
+
+    total = bytearray(command_string.encode())
+    total.extend(bytearray(bytes))
+    total.extend(bytearray((0).to_bytes(1, byteorder="big")))
+    return total
+
+def string_to_command(command_string, string):
+    return bytes_to_command(command_string, string.encode())
+
+def commands_from_bytes(read_message):
+    """
+    returns vector of [command, data]
+    """
+    result = []
+
+    index = 0
+    while True:
+        command, data, read_message = get_command_and_data(read_message)
+        if not command:
+            break
+
+        result.append([command, data])
+
+    return result
+
+def get_command_and_data(read_message):
+    command, remaining = get_command_bytes(read_message)
+
+    if not command:
+        return [None, None, None]
+
+    wh = command.find(b"\x3A")
+    if not wh:
+        print("Cannot find ':' in response")
+        return [None, None, None]
+
+    else:
+        command_string = command[:wh].decode()
+        data = command[wh + 1 :]
+        return [command_string, data, remaining]
+
+def get_command_bytes(read_message):
+    wh = read_message.find(b"\x00")
+
+    if wh >= 0:
+        command = read_message[:wh]
+        read_message = read_message[wh + 1 :]
+
+        return [command, read_message]
+
+    return [None, None]
+
+
+class SocketConnection(object):
+    def __init__(self, conn):
+        self.conn = conn
+        self.read_message = bytearray()
+        self.closed = False
+
+    def send(self, bytes):
+        self.conn.send(bytes)
+
+    def send_command_bytes(self, command_string, bytes):
+        bytes = bytes_to_command(command_string, bytes)
+        self.conn.send(bytes)
+
+    def send_command_string(self, command_string, string):
+        bytes = string_to_command(command_string, string)
+        self.conn.send(bytes)
+
+    def get_command_bytes(self):
+        while True:
+            wh = self.read_message.find(b'\x00')
+
+            if wh >= 0:
+                command = self.read_message[:wh]
+                self.read_message = self.read_message[wh+1:]
+
+                return command
+
+            try:
+                bytes = self.conn.recv(1024)
+                self.read_message.extend(bytearray(bytes))
+            except Exception as E:
+                print("Exception {}".format(str(E)))
+                self.closed = True
+                return
+
+            if not bytes:
+                self.closed = True
+                return
+
+            wh = self.read_message.find(b'\x00')
+
+            if wh >= 0:
+                command = self.read_message[:wh]
+                self.read_message = self.read_message[wh+1:]
+
+                return command
+
+    def get_command_and_data(self):
+        command = self.get_command_bytes()
+
+        if not command:
+            return
+
+        wh = command.find(b'\x3A')
+        if not wh:
+            print("Cannot find ':' in response")
+            return
+
+        else:
+            command_string = command[:wh].decode()
+            data = command[wh+1:]
+            return [command_string, data]
+
+    def close(self):
+        self.conn.close()
+
+

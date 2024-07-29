@@ -55,6 +55,7 @@ class SourceUrlInterface(object):
             # Someone might be surprised that added URL is being replaced
             self.url = handler.get_channel_feed_url()
             self.h = UrlHandler(self.url)
+            self.h.get_response()
 
             return self.get_props_from_rss(input_props)
         elif type(handler) is InternetPageHandler:
@@ -66,6 +67,8 @@ class SourceUrlInterface(object):
                 self.url = rss
                 handler = UrlHandler(self.url)
                 self.h = handler
+                self.h.get_response()
+
                 return self.get_props_internal(input_props)
 
             elif type(handler.p) is RssPage:
@@ -77,8 +80,9 @@ class SourceUrlInterface(object):
                     return self.get_props_from_page(input_props)
 
                 self.url = url
-                handler = UrlHandler(self.url)
+                handler = UrlHandler(url)
                 self.h = handler
+                self.h.get_response()
 
                 return self.get_props_internal(input_props)
             elif type(handler.p) is JsonPage:
@@ -179,22 +183,20 @@ class SourceUrlInterface(object):
 
     def is_reddit_channel(self):
         p = DomainAwarePage(self.url)
-        if p.get_domain_only().startswith("reddit.com"):
+        if p.get_domain_only().find("reddit.com") >= 0:
             parts = p.split()
-            if len(parts) == 3 and parts[1] == "r":
+            if len(parts) == 5 and parts[3] == "r":
                 return True
 
         return False
 
     def get_reddit_rss(self):
-        return self.get_reddit_channel_path() + "/.rss"
+        if self.url.endswith("/"):
+            return self.url + ".rss"
+        else:
+            return self.url + "/.rss"
 
     def get_reddit_channel_name(self):
         p = DomainAwarePage(self.url)
         parts = p.split()
-        return parts[2]
-
-    def get_reddit_channel_path(self):
-        p = DomainAwarePage(self.url)
-        parts = p.split()
-        return p.join([parts[0], parts[1], parts[2]])
+        return parts[4]
