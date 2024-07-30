@@ -4,30 +4,25 @@ Manages link meta information.
 
 # Features
 
- - local data, no algorithms, no advertisements, self-hosted
- - organize bookmarks, with tags
- - link search functionality. Does not use elastic search
+ - bookmarks management, with tags, and comment support
+ - RSS feed support
+ - some Internet crawling capabilities
+ - link search. Simple implementation, does not use elastic search
  - maintains website metadata (title, description, thumbnail, etc). It is not [archive.org](https://archive.org) replacement
- - extendable via plugins. RSS feed support
- - web page parsing capabilities
- - users can comment, tag, rate links
- - supports data import and export. This is most important functionality, as files are more important than the APP itself (file over app strategy)
- - It is not a search engine. Suggesting better alternatives: [whoogle-search](https://github.com/benbusby/whoogle-search), or [Marginalia search](https://search.marginalia.nu/), or [Apache Lucene](https://lucene.apache.org/), but it can serve as a simple engine
+ - import and export. To github. For example [Internet domains, users, projects](https://github.com/rumca-js/Internet-Places-Database)
  - Minimal aesthetic. Dark mode, custom list displays
+ - local data, no algorithms, no advertisements, self-hosted
 
 <div align="center">
   <img alt="Django Logo" src="images/django_400.png" width="400px">
 </div>
 
-## Project use cases
+## Other use cases
 
- - YouTube filter. You add only your own subscriptions. You can categorize, filter entries from your sources
- - link aggregator. Similar to Lemmy, Reddit
+ - YouTube client / filter. You will not be able to search YouTube catalog, but if you add YouTube channels as sources of data, new videos will be fetched into the database
  - database of important links: for work, or for school
- - RSS client
- - data analysis - analyze link rot, how many a page is cited by other sources, analyze link domains
- - simple search engine
-
+ - data analysis - analyze link rot, how many a page is cited by other sources, analyze link domains, etc.
+ 
 ## Problems with other RSS readers, or apps
 
  - License: some clients are not open source, or not entirely open source (for example Reddit). Some programs are not programs from users perspective, but a service: Feedly, Pockets, Readwise Reader. They require account. Their Terms and service can change
@@ -65,7 +60,7 @@ Manages link meta information.
 
 ## Alternatives
 
-Alternative programs do exist.
+Alternative programs for link bookmarking do exist.
 
 [Grimoire](https://github.com/goniszewski/grimoire), [BookmarkOS](https://bookmarkos.com/), [Raindrop](https://raindrop.io/), [LinkAce](https://www.linkace.org/), [Hoarder](https://hoarder.app/), [GGather](https://web.ggather.com/), [Zotero](https://www.zotero.org/), [OneKeep](https://onekeep.com/), [Lasso](https://www.lasso.net/go/), [CarryLinks](https://carrylinks.com/), [Zlinky](https://zlinky.com/), [wakelet](https://wakelet.com/), [Booky](https://booky.io/), [Webtag](https://webtag.io/), [Historious](https://historio.us/), [Knowies](https://www.knowies.com)
 
@@ -226,7 +221,7 @@ There are some scripts that can be used without Django application:
  - converter.py - converts JSON files to SQLite table
  - dataanalyzer.py - analyzes data in JSON files / SQLite table. You can query the data
  - script_server.py - server that can be used to dispatch crawlers for certain URLs, to obtain meta data
- - script_client.py - client that can be used to connect to server, and perform requests
+ - script_client.py - client that can be used to connect to server, and debug crawler scripts
  - workspace.py - workspace management. Can be used to update project
 
 # Additional notes
