@@ -6,12 +6,6 @@ You can try try checking official demo on [renegat0x0.ddns.net](https://renegat0
 
 Pinky promise the app will be up, and running.
 
-# Index
-
-Displays index page. Can be customized by a template file
-
-![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/index.PNG)
-
 # Link lists
 
 Available link display types
