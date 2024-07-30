@@ -39,6 +39,8 @@ Available link display types
 
 ![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/source_list.PNG)
 
+# Source details
+
 ![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/source_details.PNG)
 
 # Tags, keywords, and other views
@@ -46,8 +48,6 @@ Available link display types
 ![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/tags_view.PNG)
 
 ![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/keywords_view.PNG)
-
-![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/page_properties.PNG)
 
 # Forms
 
