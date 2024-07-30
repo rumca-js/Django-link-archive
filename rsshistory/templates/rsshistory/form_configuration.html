@@ -1,0 +1,100 @@
+{% extends base_generic %}
+{% load static %}
+{% block content %}
+
+<div class="container">
+    <a href="{% url 'rsshistory:configuration-advanced-json' %}" title="Show JSON" class="btn btn-primary" role="button">JSON
+    </a>
+</div>
+
+<div class="container">
+   <h1>Config</h1>
+   
+   <form action="{{config_form.action_url}}" method="{{config_form.method}}">
+      {% csrf_token %}
+   
+      {% for field in config_form %}
+         {% if field.id_for_label == "id_enable_domain_support" %}
+             <h3>Features</h3>
+         {%endif%}
+   
+         {% if field.id_for_label == "id_accept_dead" %}
+             <h3>Link rules</h3>
+         {%endif%}
+
+         {% if field.id_for_label == "id_sources_refresh_period" %}
+             <h3>Updates</h3>
+         {%endif%}
+
+         {% if field.id_for_label == "id_ssl_verification" %}
+             <h3>Networking</h3>
+         {%endif%}
+
+         {% if field.id_for_label == "id_track_user_actions" %}
+             <h3>User settings</h3>
+         {%endif%}
+
+         {% if field.id_for_label == "id_whats_new_days" %}
+             <h3>Display</h3>
+         {%endif%}
+
+         {% if field.id_for_label == "id_debug_mode" %}
+             <h3>Other</h3>
+         {%endif%}
+   
+         <div class="form-group row">
+            <label for="{{field.id_for_label}}" class="col-sm-2 col-form-label">{{field.label}}</label>
+            <div class="col-sm-10">
+               <div>
+               {{field }}
+               </div>
+               <small id="{{field.id_for_label}}_help" class="form-text text-muted">
+                 {{field.help_text | safe }}
+               </small>
+            </div>
+         </div>
+      {% endfor %}
+   
+      <button type="submit" value="Submit" class="btn btn-primary" role="button">Submit</button>
+
+      <a href="{% url 'rsshistory:reset-config' %}" class="btn btn-secondary" role="button" title="Resets configuration">
+           Reset config
+      </a>
+   </form>
+
+</div>
+
+<ul>
+  {% for field, errors in form.errors.items %}
+    {% for error in errors %}
+      <li>{{ field|title }}: {{ error }}</li>
+    {% endfor %}
+  {% endfor %}
+</ul>
+
+{% if form_notes %}
+  <div>
+    {% for note in form_notes %}
+     <div>{{note}}</div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+{% if form_warnings %}
+  <div style="color:red">
+    {% for warning in form_warnings %}
+     <div>{{warning}}</div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+{% if form_errors %}
+  <div style="color:red">
+    {% for error in form_errors %}
+     <div>{{error}}</div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+{% endblock %}
+
