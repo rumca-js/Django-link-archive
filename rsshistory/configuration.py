@@ -123,6 +123,7 @@ class Configuration(object):
 
         RequestBuilder.crawling_full_script = c.crawling_full_script
         RequestBuilder.crawling_headless_script = c.crawling_headless_script
+        RequestBuilder.crawling_server_port = c.crawling_server_port
 
     def apply_robots_txt(self):
         from .webtools import DomainCache

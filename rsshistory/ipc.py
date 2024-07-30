@@ -3,6 +3,10 @@ This file should not include any other or django related files.
 """
 import json
 import pickle
+import socket
+
+
+DEFAULT_PORT = 5007
 
 
 def object_to_bytes(input_object):
@@ -78,10 +82,17 @@ def get_command_bytes(read_message):
 
 
 class SocketConnection(object):
-    def __init__(self, conn):
+    def __init__(self, conn = None):
         self.conn = conn
         self.read_message = bytearray()
         self.closed = False
+
+    def gethostname():
+        return socket.gethostname()
+
+    def connect(self, host, port):
+        self.conn = socket.socket()
+        self.conn.connect((host, port))
 
     def send(self, bytes):
         self.conn.send(bytes)

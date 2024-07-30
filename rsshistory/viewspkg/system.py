@@ -7,6 +7,7 @@ from django.http import HttpResponseRedirect
 from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.forms.models import model_to_dict
+from django.contrib.auth.models import User
 
 from ..apps import LinkDatabase
 from ..models import (
@@ -92,15 +93,38 @@ def configuration_advanced_page(request):
             p.set_variable("summary_text", "Form is invalid")
             return p.render("summary_present.html")
 
-    ob = ConfigurationEntry.get()
-    form = ConfigForm(instance=ob, request=request)
+    configuration_entry = ConfigurationEntry.get()
+    form = ConfigForm(instance=configuration_entry, request=request)
 
     form.method = "POST"
     form.action_url = reverse("{}:configuration-advanced".format(LinkDatabase.name))
 
     p.set_variable("config_form", form)
 
-    return p.render("configuration.html")
+    errors = []
+
+    if (configuration_entry.days_to_move_to_archive > 0 and
+       configuration_entry.days_to_remove_links > 0 and
+       configuration_entry.days_to_remove_links < configuration_entry.days_to_move_to_archive):
+       errors.append("Links are removed before they can get to archive. Check your configuration")
+
+    if (configuration_entry.whats_new_days > 0 and configuration_entry.days_to_remove_links > 0 and
+       configuration_entry.whats_new_days > configuration_entry.days_to_remove_links):
+       errors.append("Links are removed before limit of whats new filter")
+
+    if configuration_entry.data_export_path != "" and not Path(configuration_entry.data_export_path).exists():
+        errors.append(f"Data export directory does not exist:{configuration_entry.data_export_path}")
+
+    if configuration_entry.data_import_path != "" and not Path(configuration_entry.data_import_path).exists():
+        errors.append(f"Data import directory does not exist:{configuration_entry.data_import_path}")
+
+    if configuration_entry.admin_user != "" and User.objects.filter(username = configuration_entry.admin_user).count() == 0:
+        errors.append(f"Admin user does not exist:{configuration_entry.admin_user}")
+
+    if len(errors) > 0:
+        p.set_variable("form_errors", errors)
+
+    return p.render("form_configuration.html")
 
 
 def configuration_advanced_json(request):

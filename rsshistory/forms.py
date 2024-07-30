@@ -89,13 +89,20 @@ class ConfigForm(forms.ModelForm):
             "instance_description",
             "admin_user",
             "access_type",
+            "logging_level",
+            "background_tasks",
             "data_export_path",
             "data_import_path",
-            "logging_level",
-            # entry, source configuration
+            "auto_store_thumbnails",
+
+            # features
             "enable_domain_support",
             "enable_keyword_support",
             "enable_file_support",
+            "link_save",
+            "source_save",
+
+            # database link contents
             "accept_dead",
             "accept_ip_addresses",
             "accept_domains",
@@ -107,6 +114,10 @@ class ConfigForm(forms.ModelForm):
             "new_entries_use_clean_data",
             "auto_create_sources",
             "new_source_enabled_state",
+            "prefer_https",
+            "prefer_non_www_sites",
+            "block_keywords",
+
             # updates
             "sources_refresh_period",
             "days_to_move_to_archive",
@@ -115,23 +126,29 @@ class ConfigForm(forms.ModelForm):
             "days_to_check_std_entries",
             "days_to_check_stale_entries",
             "number_of_update_entries",
-            "block_keywords",
-            # optional
-            "prefer_https",
-            "prefer_non_www_sites",
-            "link_save",
-            "source_save",
+
+            # Networking
+            "ssl_verification",
+            "user_agent",
+            "user_headers",
+            "internet_test_page",
+            "respect_robots_txt",
+            "crawling_server_port",
+            "crawling_headless_script",
+            "crawling_full_script",
+
             # user
             "track_user_actions",
             "track_user_searches",
             "track_user_navigation",
             "vote_min",
             "vote_max",
-            # display settings
-            "whats_new_days",
-            "time_zone",
-            "entries_order_by",
             "number_of_comments_per_day",
+
+            # display settings
+            "time_zone",
+            "whats_new_days",
+            "entries_order_by",
             "display_style",
             "display_type",
             "show_icons",
@@ -141,16 +158,9 @@ class ConfigForm(forms.ModelForm):
             "sources_per_page",
             "max_links_per_page",
             "max_sources_per_page",
-            # Advanced
-            "ssl_verification",
-            "user_agent",
-            "user_headers",
-            "internet_test_page",
-            "respect_robots_txt",
-            "background_tasks",
+
+            # other
             "debug_mode",
-            "crawling_headless_script",
-            "crawling_full_script",
         ]
 
     def __init__(self, *args, **kwargs):

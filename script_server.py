@@ -31,7 +31,7 @@ def handle_connection_inner(conn, address):
         output_file = Path("output.txt")
 
         # TODO pass through socket
-        script = '{} --url "{}" -o "{}" --timeout {}'.format(script, request.url, str(output_file), request.timeout_s)
+        script = '{} --url "{}" -o "{}" --timeout {} --ssl-verify {}'.format(script, request.url, str(output_file), request.timeout_s, request.ssl_verify)
 
         print("Running {} with timeout:{}".format(script, request.timeout_s))
         with mutex:
@@ -59,6 +59,7 @@ def handle_connection_inner(conn, address):
 
     timeout_s = 10
     script = None
+    ssl_verify = True
 
     while True:
         command = c.get_command_and_data()
@@ -75,7 +76,7 @@ def handle_connection_inner(conn, address):
 
             url = command[1].decode()
 
-            request = webtools.PageRequestObject(url=url, timeout_s = timeout_s)
+            request = webtools.PageRequestObject(url=url, timeout_s = timeout_s, ssl_verify=ssl_verify)
             data = run_script(script, request)
             if data:
                 c.send(data)
@@ -91,6 +92,16 @@ def handle_connection_inner(conn, address):
         elif command[0] == "PageRequestObject.script":
             script = command[1].decode()
             print("Set script:{}".format(script))
+
+        elif command[0] == "PageRequestObject.headers":
+            print("{} is not yet supported".format(command[0]))
+
+        elif command[0] == "PageRequestObject.user_agent":
+            print("{} is not yet supported".format(command[0]))
+
+        elif command[0] == "PageRequestObject.ssl_verify":
+            ssl_verify = (command[1].decode() == "True")
+            print("SSL verify:{}".format(ssl_verify))
 
         elif command[0] == "PageRequestObject.__del__":
             pass
@@ -109,7 +120,7 @@ def handle_connection(conn, address):
 def server_program():
     # get the hostname
     host = socket.gethostname()
-    port = 5007
+    port = ipc.DEFAULT_PORT
 
     server_socket = socket.socket()
     server_socket.settimeout(1.0) # to be able to make ctrl-c on server

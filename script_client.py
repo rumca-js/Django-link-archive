@@ -1,3 +1,6 @@
+"""
+Script that can be used for debuggin server, checking connection
+"""
 import socket
 import json
 
@@ -5,12 +8,10 @@ from rsshistory import ipc
 
 
 def client_program():
-    host = socket.gethostname()
-    port = 5007
+    port = ipc.DEFAULT_PORT
 
-    client_socket = socket.socket()
-    client_socket.connect((host, port))
-    c = ipc.SocketConnection(client_socket)
+    c = ipc.SocketConnection()
+    c.connect(ipc.SocketConnection.gethostname(), port)
 
     c.send_command_string("PageRequestObject.timeout", "15")
     c.send_command_string("PageRequestObject.script", "poetry run python crawleebeautifulsoup.py")
@@ -37,7 +38,8 @@ def client_program():
                 elif command_data[0] == "PageResponseObject.__del__":
                     pass
                 else:
-                    print("Unknown command")
+                    print("Unsupported command:{}".format(command_data[0]))
+                    break
 
             else:
                 print("No data")

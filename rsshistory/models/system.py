@@ -11,6 +11,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 
 from ..apps import LinkDatabase
+from ..ipc import DEFAULT_PORT
 
 DISPLAY_STYLE_LIGHT = "style-light"
 DISPLAY_STYLE_DARK = "style-dark"
@@ -61,40 +62,7 @@ class ConfigurationEntry(models.Model):
         help_text="Instance description",
     )
 
-    # background tasks will add everything using this user name
-    admin_user = models.CharField(max_length=500, default="admin", blank=True)
-
-    background_tasks = models.BooleanField(
-        default=True,
-        help_text="If disabled, background tasks, and jobs are disabled.",
-    )
-
-    debug_mode = models.BooleanField(
-        default=False,
-        help_text="Debug mode allows to see errors more clearly",
-    )
-
-    logging_level = models.IntegerField(default=int(logging.WARNING))
-
-    respect_robots_txt = models.BooleanField(
-        default=True,
-        help_text="Use robots.txt information. Some functionality can not work: for example YouTube channels",
-    )
-
-    ssl_verification = models.BooleanField(
-        default=True
-    )  # Might work faster if disabled, but might capture invalid pages
-
-    user_agent = models.CharField(
-        default="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/116.0",
-        max_length=500,
-        help_text='You can check your user agent in <a href="https://www.supermonitoring.com/blog/check-browser-http-headers/">https://www.supermonitoring.com/blog/check-browser-http-headers/</a>.',
-    )
-    user_headers = models.CharField(
-        max_length=1000,
-        blank=True,
-        help_text='Provide JSON configuration of headers. You can check your user agent in <a href="https://www.supermonitoring.com/blog/check-browser-http-headers/">https://www.supermonitoring.com/blog/check-browser-http-headers/</a>.',
-    )
+    admin_user = models.CharField(max_length=500, default="admin", blank=True, help_text="Admin user name")
 
     access_type = models.CharField(
         max_length=100,
@@ -104,33 +72,22 @@ class ConfigurationEntry(models.Model):
         help_text='There are three access types available. "All" allows anybody view contents. "Logged" allows only logged users to view contents. "Owner" means application is private, and only owner can view it\'s contents.',
     )
 
-    sources_refresh_period = models.IntegerField(
-        default=3600,
-        help_text="Unit [s]. Defines how often sources are checked for data.",
+    logging_level = models.IntegerField(default=int(logging.WARNING))
+
+    background_tasks = models.BooleanField(
+        default=True,
+        help_text="If disabled, background tasks, and jobs are disabled.",
     )
 
-    auto_scan_entries = models.BooleanField(
-        default=False,
-        help_text="Scans for new links, when link is added. From decription, from contents",
+    data_import_path = models.CharField(
+        default="../data/imports",
+        max_length=2000,
+        null=True,
     )
-
-    auto_create_sources = models.BooleanField(  # TODO rename to auto_create_sources?
-        default=False,
-        help_text="Adds any new found source",
-    )
-
-    new_source_enabled_state = models.BooleanField(
-        default=False, help_text="Default state of a new source"
-    )
-
-    new_entries_merge_data = models.BooleanField(
-        default=False,
-        help_text="Tries to merge data for new entries - captures what is missing",
-    )
-
-    new_entries_use_clean_data = models.BooleanField(
-        default=False,
-        help_text="Fetches clean information from the Internet for new entries",
+    data_export_path = models.CharField(
+        default="../data/exports",
+        max_length=2000,
+        null=True,
     )
 
     auto_store_thumbnails = models.BooleanField(
@@ -138,31 +95,7 @@ class ConfigurationEntry(models.Model):
         help_text="Automatically stores thumbnail. Available when file support is enabled",
     )
 
-    accept_domains = models.BooleanField(
-        default=True, help_text="Domain links can be added to system"
-    )
-
-    accept_not_domain_entries = models.BooleanField(
-        default=True, help_text="Links that are not domains can be added to system"
-    )
-
-    accept_dead = models.BooleanField(
-        default=False,
-        help_text="Accept rotten links, no longer active, to be added to the database",
-    )  # whether dead entries can be introduced into database
-
-    accept_ip_addresses = models.BooleanField(
-        default=False,
-        help_text="Accept IP addressed links, like //127.0.0.1/my/directory",
-    )
-
-    keep_domains = models.BooleanField(
-        default=False, help_text="If true domains will be made permanent"
-    )
-
-    keep_permanent_items = models.BooleanField(
-        default=True, help_text="This affects permament and bookmarked status entries"
-    )
+    # features
 
     enable_keyword_support = models.BooleanField(
         default=True, help_text="Enable keyword feature support"
@@ -184,6 +117,58 @@ class ConfigurationEntry(models.Model):
         default=False, help_text="Links are saved using archive.org."
     )
 
+    # database link contents
+
+    accept_dead = models.BooleanField(
+        default=False,
+        help_text="Accept rotten links, no longer active, to be added to the database",
+    )  # whether dead entries can be introduced into database
+
+    accept_ip_addresses = models.BooleanField(
+        default=False,
+        help_text="Accept IP addressed links, like //127.0.0.1/my/directory",
+    )
+
+    accept_domains = models.BooleanField(
+        default=True, help_text="Domain links can be added to system"
+    )
+
+    accept_not_domain_entries = models.BooleanField(
+        default=True, help_text="Links that are not domains can be added to system"
+    )
+
+    keep_domains = models.BooleanField(
+        default=False, help_text="If true domains will be made permanent"
+    )
+
+    keep_permanent_items = models.BooleanField(
+        default=True, help_text="This affects permament and bookmarked status entries"
+    )
+
+    auto_scan_entries = models.BooleanField(
+        default=False,
+        help_text="Scans for new links, when link is added. From decription, from contents",
+    )
+
+    new_entries_merge_data = models.BooleanField(
+        default=False,
+        help_text="Tries to merge data for new entries - captures what is missing",
+    )
+
+    new_entries_use_clean_data = models.BooleanField(
+        default=False,
+        help_text="Fetches clean information from the Internet for new entries",
+    )
+
+    auto_create_sources = models.BooleanField(  # TODO rename to auto_create_sources?
+        default=False,
+        help_text="Adds any new found source",
+    )
+
+    new_source_enabled_state = models.BooleanField(
+        default=False, help_text="Default state of a new source"
+    )
+
     prefer_https = models.BooleanField(
         default=True,
         help_text="Https is preferred. If update takes place, and https is available, we upgrade link.",
@@ -194,44 +179,80 @@ class ConfigurationEntry(models.Model):
         help_text="Non www sites are preferred. If update takes place www links could be replaced with clean links without it.",
     )
 
-    number_of_update_entries = models.IntegerField(
-        default=1,
-        help_text="The amount of entries that will be updated at each refresh",
+    block_keywords = models.CharField(
+        max_length=1000,
+        blank=True,
+        default="mastubat, porn",
+        help_text="Links with these keywords will be blocked",
+    )
+
+    # updates
+
+    sources_refresh_period = models.IntegerField(
+        default=3600,
+        help_text="Unit [s]. Defines how often sources are checked for data.",
     )
 
     days_to_move_to_archive = models.IntegerField(
         default=50,
         help_text="Number of days, after which entries are moved to archive. Disabled if 0.",
     )
+
     days_to_remove_links = models.IntegerField(
         default=100,
         help_text="Number of days, after which links are removed. Disabled if 0.",
     )
+
+    days_to_remove_stale_entries = models.IntegerField(
+        default=35, help_text="Number of days after which dead entries are removed"
+    )
+
     days_to_check_std_entries = models.IntegerField(
         default=35,
         help_text="Number of days after which normal entries are checked for status",
     )
+
     days_to_check_stale_entries = models.IntegerField(
         default=35,
         help_text="Number of days after which dead entries are checked for status",
     )
-    days_to_remove_stale_entries = models.IntegerField(
-        default=35, help_text="Number of days after which dead entries are removed"
-    )
-    whats_new_days = models.IntegerField(
-        default=7, help_text="What's new page time range in days"
+
+    number_of_update_entries = models.IntegerField(
+        default=1,
+        help_text="The amount of entries that will be updated at each refresh",
     )
 
-    data_import_path = models.CharField(
-        default="../data/imports",
+    # Networking
+
+    ssl_verification = models.BooleanField(
+        default=True
+    )  # Might work faster if disabled, but might capture invalid pages
+
+    user_agent = models.CharField(
+        default="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/116.0",
+        max_length=500,
+        help_text='You can check your user agent in <a href="https://www.supermonitoring.com/blog/check-browser-http-headers/">https://www.supermonitoring.com/blog/check-browser-http-headers/</a>.',
+    )
+
+    user_headers = models.CharField(
+        max_length=1000,
+        blank=True,
+        help_text='Provide JSON configuration of headers. You can check your user agent in <a href="https://www.supermonitoring.com/blog/check-browser-http-headers/">https://www.supermonitoring.com/blog/check-browser-http-headers/</a>.',
+    )
+
+    internet_test_page = models.CharField(
+        default="https://google.com",
         max_length=2000,
         null=True,
+        help_text="Page that is pinged to check if Internet is OK",
     )
-    data_export_path = models.CharField(
-        default="../data/exports",
-        max_length=2000,
-        null=True,
+
+    respect_robots_txt = models.BooleanField(
+        default=True,
+        help_text="Use robots.txt information. Some functionality can not work: for example YouTube channels",
     )
+
+    crawling_server_port = models.IntegerField(default=0, help_text=f"If this port is configured, then advanced crawling occurs through this server. 0 means not configured. By default server uses {DEFAULT_PORT}")
 
     crawling_headless_script = models.CharField(
         blank=True,
@@ -252,16 +273,31 @@ class ConfigurationEntry(models.Model):
     track_user_actions = models.BooleanField(
         default=True, help_text="Among tracked elements: what is searched."
     )
+
     track_user_searches = models.BooleanField(default=True)
+
     track_user_navigation = models.BooleanField(default=False)
+
     vote_min = models.IntegerField(default=-100)
+
     vote_max = models.IntegerField(default=100)
+
     number_of_comments_per_day = models.IntegerField(
         default=1,
         help_text="The limit is for each user. Helps in maintaining proper culture",
     )
 
     # display
+
+    time_zone = models.CharField(
+        max_length=50,
+        default="UTC",
+        help_text="List of available timezones can be found at https://en.wikipedia.org/wiki/List_of_tz_database_time_zones. For example Europe/Warsaw",
+    )
+
+    whats_new_days = models.IntegerField(
+        default=7, help_text="What's new page time range in days"
+    )
 
     # TODO selectable from combo?
     entries_order_by = models.CharField(
@@ -294,24 +330,9 @@ class ConfigurationEntry(models.Model):
     max_links_per_page = models.IntegerField(default=100)
     max_sources_per_page = models.IntegerField(default=100)
 
-    block_keywords = models.CharField(
-        max_length=1000,
-        blank=True,
-        default="mastubat, porn",
-        help_text="Links with these keywords will be blocked",
-    )
-
-    internet_test_page = models.CharField(
-        default="https://google.com",
-        max_length=2000,
-        null=True,
-        help_text="Page that is pinged to check if Internet is OK",
-    )
-
-    time_zone = models.CharField(
-        max_length=50,
-        default="UTC",
-        help_text="List of available timezones can be found at https://en.wikipedia.org/wiki/List_of_tz_database_time_zones. For example Europe/Warsaw",
+    debug_mode = models.BooleanField(
+        default=False,
+        help_text="Debug mode allows to see errors more clearly",
     )
 
     def get():
@@ -341,6 +362,10 @@ class ConfigurationEntry(models.Model):
         """
         Fix errors here
         """
+
+        users = User.objects.filter(username = self.admin_user)
+        if users.count() == 0:
+            self.admin_user = ""
 
         try:
             tzn = timezone(self.time_zone)

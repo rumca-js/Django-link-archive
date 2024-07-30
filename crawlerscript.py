@@ -13,6 +13,7 @@ class Parser(object):
         self.parser.add_argument("--url", help="Directory to be scanned")
         self.parser.add_argument("--timeout",default=10, type=int, help="Timeout expressed in seconds")
         self.parser.add_argument("--ping", default=False, help="Ping only")
+        self.parser.add_argument("--ssl-verify", default=False, help="SSL verify")
 
         # TODO implement
         self.parser.add_argument("--input-data", help="Input request file")

@@ -1483,11 +1483,15 @@ class RssPage(ContentInterface):
         return image
 
     def get_thumbnail_manual_from_youtube(self):
+        """
+        TODO check if crawlee can extract thumbnail. For channels I am receiving cookie accept banners
         if "link" in self.feed.feed:
             link = self.feed.feed.link
             p = RequestBuilder(link)
-            p = HtmlPage(link, p.get_contents())
+            p = HtmlPage(link, p.get_text())
             return p.get_thumbnail()
+        """
+        pass
 
     def get_author(self):
         if self.feed is None:
@@ -2351,17 +2355,14 @@ class XmlPage(ContentInterface):
 
 
 class RequestsPage(object):
-    def __init__(self, url, headers, timeout_s=10, ping=False):
+    def __init__(self, request):
         """
-        This is program is web scraper. If we turn verify, then we discard some of pages.
-        Encountered several major pages, which had SSL programs.
-
-        SSL is mostly important for interacting with pages. During web scraping it is not that useful.
+        Wrapper for python requests.
         """
-        self.url = url
+        self.request = request
         self.response = None
 
-        WebLogger.debug("Requests GET:{}".format(url))
+        WebLogger.debug("Requests GET:{}".format(self.request.url))
 
         """
         stream argument allows us to read header before we fetch the page.
@@ -2369,10 +2370,10 @@ class RequestsPage(object):
         """
 
         try:
-            request_result = self.build_requests(url, headers, timeout_s)
+            request_result = self.build_requests()
 
             self.response = PageResponseObject(
-                url=url,
+                url=request_result.url,
                 text="",
                 status_code=request_result.status_code,
                 headers=request_result.headers,
@@ -2387,7 +2388,7 @@ class RequestsPage(object):
                 self.response.add_error("Page is too big")
                 return
 
-            if ping:
+            if self.request.ping:
                 return
 
             # TODO do we want to check also content-type?
@@ -2402,11 +2403,8 @@ class RequestsPage(object):
                 if encoding:
                     request_result.encoding = encoding
 
-                if self.url != request_result.url:
-                    self.url = request_result.url
-
                 self.response = PageResponseObject(
-                    url=self.url,
+                    url=request_result.url,
                     text=request_result.text,
                     status_code=request_result.status_code,
                     encoding=request_result.encoding,
@@ -2416,24 +2414,24 @@ class RequestsPage(object):
             else:
                 self.response.status_code = HTTP_STATUS_CODE_PAGE_UNSUPPORTE
                 self.response.add_error(
-                    "Page {} is not supported {}".format(self.url, content_type)
+                    "Url:{} is not supported {}".format(self.request.url, content_type)
                 )
 
         except requests.Timeout:
             self.response = PageResponseObject(
-                self.url, text=None, status_code=HTTP_STATUS_CODE_TIMEOUT
+                self.request.url, text=None, status_code=HTTP_STATUS_CODE_TIMEOUT
             )
-            self.response.add_error("Page timeout")
+            self.response.add_error("Url:{} Page timeout".format(self.request.url))
         except requests.exceptions.ConnectionError:
             self.response = PageResponseObject(
                 self.url, text=None, status_code=HTTP_STATUS_CODE_CONNECTION_ERROR
             )
-            self.response.add_error("Connection error")
+            self.response.add_error("Url:{} Connection error".format(self.request.url))
         except Exception as E:
-            WebLogger.exc(E, "Url: {}: General exception".format(self.url))
+            WebLogger.exc(E, "Url:{} General exception".format(self.request.url))
 
             self.response = PageResponseObject(
-                self.url, text=None, status_code=HTTP_STATUS_CODE_EXCEPTION
+                self.request.url, text=None, status_code=HTTP_STATUS_CODE_EXCEPTION
             )
             self.response.add_error("General page exception")
 
@@ -2450,7 +2448,7 @@ class RequestsPage(object):
         apparent encoding does not work on youtube RSS feeds.
         """
 
-        url = self.url
+        url = self.request.url
 
         encoding = response.get_content_type_charset()
         if encoding:
@@ -2477,20 +2475,20 @@ class RequestsPage(object):
             elif text.count("charset") == 1 and text.find('charset="utf-8"') >= 0:
                 return "utf-8"
 
-    def build_requests(self, url, headers, timeout_s):
+    def build_requests(self):
         """
         stream argument - will fetch page contents, when we access contents of page.
         """
 
         request_result = requests.get(
-            url,
-            headers=headers,
-            timeout=timeout_s,
-            verify=RequestBuilder.ssl_verify,
+            self.request.url,
+            headers=self.request.headers,
+            timeout=self.request.timeout_s,
+            verify=self.request.ssl_verify,
             stream=True,
         )
 
-        WebLogger.info("[H] {}\n{}".format(url, request_result.headers))
+        WebLogger.info("[H] {}\n{}".format(self.request.url, request_result.headers))
         return request_result
 
 
@@ -2609,9 +2607,6 @@ class SeleniumChromeHeadless(SeleniumDriver):
         self.request = request
         self.response = None
 
-        # if not RequestBuilder.ssl_verify:
-        #    options.add_argument('ignore-certificate-errors')
-
         driver = self.get_driver()
 
         try:
@@ -2673,9 +2668,6 @@ class SeleniumChromeFull(SeleniumDriver):
 
         # options to enable performance log, to read status code
         options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
-
-        # if not RequestBuilder.ssl_verify:
-        #    options.add_argument('ignore-certificate-errors')
 
         return webdriver.Chrome(service=service, options=options)
 
@@ -2836,7 +2828,7 @@ class PageOptions(object):
 
 class PageRequestObject(object):
 
-    def __init__(self, url, headers=None, user_agent=None, timeout_s = 10, ping = False):
+    def __init__(self, url, headers=None, user_agent=None, timeout_s = 10, ping = False, ssl_verify=True):
         self.url = url
 
         self.user_agent = user_agent
@@ -2847,6 +2839,7 @@ class PageRequestObject(object):
 
         self.timeout_s = timeout_s
         self.ping = False
+        self.ssl_verify = True
 
     def __str__(self):
         return "Url:{} Timeout:{} Ping:{}".format(self.url, self.timeout_s, self.ping)
@@ -3081,6 +3074,42 @@ class PageResponseObject(object):
         )
 
 
+def get_request_to_bytes(request, script):
+    from .ipc import string_to_command
+
+    total_bytes = bytearray()
+
+    bytes1 = string_to_command("PageRequestObject.__init__", "OK")
+    bytes2 = string_to_command("PageRequestObject.timeout", str(request.timeout_s))
+    if request.user_agent != None:
+        bytes3 = string_to_command("PageRequestObject.user_agent", str(request.user_agent))
+    else:
+        bytes3 = bytearray()
+    if request.headers != None:
+        bytes4 = string_to_command("PageRequestObject.headers", json.dumps(request.headers))
+    else:
+        bytes4 = bytearray()
+
+    bytes5 = string_to_command("PageRequestObject.ssl_verify", str(request.ssl_verify))
+    bytes6 = string_to_command("PageRequestObject.script", script)
+
+    bytes7 = string_to_command("PageRequestObject.script", script)
+    bytes8 = string_to_command("PageRequestObject.url", request.url)
+    bytes9 = string_to_command("PageRequestObject.__del__", "OK")
+
+    total_bytes.extend(bytes1)
+    total_bytes.extend(bytes2)
+    total_bytes.extend(bytes3)
+    total_bytes.extend(bytes4)
+    total_bytes.extend(bytes5)
+    total_bytes.extend(bytes6)
+    total_bytes.extend(bytes7)
+    total_bytes.extend(bytes8)
+    total_bytes.extend(bytes9)
+
+    return total_bytes
+
+
 def get_response_from_bytes(all_bytes):
     from .ipc import commands_from_bytes
     response = PageResponseObject("")
@@ -3109,6 +3138,7 @@ def get_response_from_bytes(all_bytes):
     return response
 
 
+
 class RequestBuilder(object):
     """
     Should not contain any HTML/RSS content processing.
@@ -3123,6 +3153,7 @@ class RequestBuilder(object):
     ssl_verify = True
     crawling_headless_script = None
     crawling_full_script = None
+    crawling_server_port = None
 
     def __init__(self, url=None, options=None, page_object=None, request = None):
         """
@@ -3192,7 +3223,7 @@ class RequestBuilder(object):
 
         return self.response
 
-    def get_contents(self):
+    def get_text(self):
         response = self.get_response()
         if response:
             return response.get_text()
@@ -3212,6 +3243,10 @@ class RequestBuilder(object):
                 request = request
             )
         elif self.options.use_headless_browser:
+            if RequestBuilder.crawling_server_port:
+                return self.get_contents_via_server_headless(
+                    request = request
+                )
             if RequestBuilder.crawling_headless_script:
                 return self.get_contents_via_script_headless(
                     request = request
@@ -3225,6 +3260,10 @@ class RequestBuilder(object):
                 request = request
             )
         elif self.options.use_full_browser:
+            if RequestBuilder.crawling_server_port:
+                return self.get_contents_via_server_full(
+                    request = request
+                )
             if RequestBuilder.crawling_full_script:
                 return self.get_contents_via_script_full(
                     request = request
@@ -3269,6 +3308,63 @@ class RequestBuilder(object):
         script = RequestBuilder.crawling_full_script
 
         return self.get_contents_via_script(script, request)
+
+    def get_contents_via_server_headless(self, request):
+        script = RequestBuilder.crawling_headless_script
+        port = RequestBuilder.crawling_server_port
+
+        return self.get_contents_via_server(script, port, request)
+
+    def get_contents_via_server_full(self, request):
+        script = RequestBuilder.crawling_full_script
+        port = RequestBuilder.crawling_server_port
+
+        return self.get_contents_via_server(script, port, request)
+
+    def get_contents_via_server(self, script, port, request):
+        from .ipc import SocketConnection
+
+        bytes = get_request_to_bytes(request, script)
+
+        connection = SocketConnection()
+        connection.connect(SocketConnection.gethostname(), port)
+        connection.send(bytes)
+
+        response = PageResponseObject(request.url)
+        response.status_code = HTTP_STATUS_CODE_CONNECTION_ERROR
+
+        while True:
+            command_data = connection.get_command_and_data()
+            if not command_data:
+                return
+
+            if command_data[0] == "PageResponseObject.__init__":
+                pass
+            elif command_data[0] == "PageResponseObject.url":
+                response.url = command_data[1].decode()
+            elif command_data[0] == "PageResponseObject.headers":
+                try:
+                    response.headers = json.loads(command_data[1].decode())
+                except Exception as E:
+                    WebLogger.exc(E, "Cannot load response headers from crawling server")
+
+            elif command_data[0] == "PageResponseObject.status_code":
+                try:
+                    response.status_code = int(command_data[1].decode())
+                except Exception as E:
+                    WebLogger.exc(E, "Cannot load status_code from crawling server")
+
+            elif command_data[0] == "PageResponseObject.text":
+                response.set_text(command_data[1].decode())
+            elif command_data[0] == "PageResponseObject.__del__":
+                pass
+            else:
+                WebLogger.error("Unsupported command:{}".format(command_data[0]))
+                break
+
+        connection.close()
+
+        return response
 
     def get_contents_via_script(self, script, request):
         """
@@ -3398,13 +3494,13 @@ class RequestBuilder(object):
                 "Url:{}. Requesting page: options:{}".format(self.url, self.options)
             )
 
-            o = PageRequestObject(
+            request = PageRequestObject(
                     url=self.url,
                     headers=self.headers,
                     timeout_s=self.timeout_s,
                 )
 
-            self.response = self.get_contents_function(request = o)
+            self.response = self.get_contents_function(request=request)
 
             WebLogger.debug(
                 "Url:{}. Requesting page: DONE".format(self.url, self.options)
@@ -3989,7 +4085,7 @@ class DomainCacheInfo(object):
 
         robots_url = self.get_robots_txt_url()
         p = RequestBuilder(robots_url)
-        self.robots_contents = p.get_contents()
+        self.robots_contents = p.get_text()
 
         return self.robots_contents
 
@@ -4028,7 +4124,7 @@ class DomainCacheInfo(object):
         urls = self.get_site_maps_urls()
         for url in urls:
             p = RequestBuilder(url=url)
-            contents = p.get_contents()
+            contents = p.get_text()
             if contents:
                 parser = ContentLinkParser(url, contents)
                 parser = ContentLinkParser(self.url, contents)
@@ -4059,7 +4155,7 @@ class DomainCacheInfo(object):
         all_subordinates = set()
 
         b = RequestBuilder(site)
-        contents = b.get_contents()
+        contents = b.get_text()
 
         # check if it is sitemap / sitemap index
         # https://www.sitemaps.org/protocol.html#index

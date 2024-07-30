@@ -34,3 +34,27 @@
     {% endfor %}
   {% endfor %}
 </ul>
+
+{% if form_notes %}
+  <div>
+    {% for note in form_notes %}
+     <div>{{note}}</div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+{% if form_warnings %}
+  <div style="color:red">
+    {% for warning in form_warnings %}
+     <div>{{warning}}</div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+{% if form_errors %}
+  <div style="color:red">
+    {% for error in form_errors %}
+     <div>{{error}}</div>
+    {% endfor %}
+  </div>
+{% endif %}
