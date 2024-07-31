@@ -155,6 +155,7 @@ urlpatterns = [
     path("wizard-setup-gallery", system.wizard_setup_gallery, name="wizard-setup-gallery",),
     path("wizard-setup-search-engine", system.wizard_setup_search_engine, name="wizard-setup-search-engine",),
     path("setup-default-rules", system.setup_default_rules, name="setup-default-rules",),
+    path("is-system-ok", system.is_system_ok, name="is-system-ok",),
     # logging
     path("logs/", system.AppLoggingView.as_view(), name="logs",),
     path("truncate-log", system.truncate_log, name="truncate-log"),

@@ -1,5 +1,6 @@
 from pathlib import Path
 import logging
+from datetime import timedelta
 
 from django.views import generic
 from django.urls import reverse
@@ -44,6 +45,7 @@ from ..forms import (
 )
 from ..views import ViewPage
 from ..webtools import selenium_feataure_enabled
+from ..dateutils import DateUtils
 
 
 def index(request):
@@ -233,9 +235,6 @@ def system_status(request):
     p.context["DataExport"] = DataExport.objects.count()
     p.context["SourceExportHistory"] = SourceExportHistory.objects.count()
     p.context["ModelFiles"] = ModelFiles.objects.count()
-
-    from ..dateutils import DateUtils
-    from datetime import timedelta
 
     now = c.get_local_time(DateUtils.get_datetime_now_utc())
     p.context["DateTime_Current"] = now
@@ -508,3 +507,24 @@ def setup_default_rules(request):
 
     p.context["summary_text"] = "Updated rules"
     return p.render("summary_present.html")
+
+
+def is_system_ok(request):
+    """
+    Some parts are configured by celery.
+    Assumming tasks run faster than 1 hour.
+    """
+    p = ViewPage(request)
+    p.set_title("Is systme OK")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
+    if data is not None:
+        return data
+
+    system_is_ok = SystemOperation.is_system_healthy()
+
+    if system_is_ok:
+        p.context["summary_text"] = "YES"
+    else:
+        p.context["summary_text"] = "NO"
+
+    return p.render("summary_present.html", 200 if system_is_ok else 500)

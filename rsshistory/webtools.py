@@ -2412,7 +2412,7 @@ class RequestsPage(object):
                     binary=request_result.content,
                 )
             else:
-                self.response.status_code = HTTP_STATUS_CODE_PAGE_UNSUPPORTE
+                self.response.status_code = HTTP_STATUS_CODE_PAGE_UNSUPPORTED
                 self.response.add_error(
                     "Url:{} is not supported {}".format(self.request.url, content_type)
                 )
@@ -2871,9 +2871,9 @@ class PageResponseObject(object):
         self.binary = None
         self.text = None
 
-        if self.binary:
+        if binary:
             self.binary = binary
-        if self.text:
+        if text:
             self.text = text
 
         # I read selenium always assume utf8 encoding
@@ -3067,10 +3067,15 @@ class PageResponseObject(object):
         self.errors.append(error_text)
 
     def __str__(self):
-        return "PageResponseObject: Url:{} Status code:{} Headers:{}".format(
+        has_text_data = "Yes" if self.text else "No"
+        has_binary_data = "Yes" if self.binary else "No"
+
+        return "PageResponseObject: Url:{} Status code:{} Headers:{} Text:{} Binary:{}".format(
             self.url,
             self.status_code,
             self.headers,
+            has_text_data,
+            has_binary_data,
         )
 
 
@@ -3093,9 +3098,8 @@ def get_request_to_bytes(request, script):
     bytes5 = string_to_command("PageRequestObject.ssl_verify", str(request.ssl_verify))
     bytes6 = string_to_command("PageRequestObject.script", script)
 
-    bytes7 = string_to_command("PageRequestObject.script", script)
-    bytes8 = string_to_command("PageRequestObject.url", request.url)
-    bytes9 = string_to_command("PageRequestObject.__del__", "OK")
+    bytes7 = string_to_command("PageRequestObject.url", request.url)
+    bytes8 = string_to_command("PageRequestObject.__del__", "OK")
 
     total_bytes.extend(bytes1)
     total_bytes.extend(bytes2)
@@ -3105,7 +3109,6 @@ def get_request_to_bytes(request, script):
     total_bytes.extend(bytes6)
     total_bytes.extend(bytes7)
     total_bytes.extend(bytes8)
-    total_bytes.extend(bytes9)
 
     return total_bytes
 
@@ -3311,23 +3314,35 @@ class RequestBuilder(object):
 
     def get_contents_via_server_headless(self, request):
         script = RequestBuilder.crawling_headless_script
+        if script is None:
+            script = "poetry run python crawleebeautifulsoup.py"
         port = RequestBuilder.crawling_server_port
 
         return self.get_contents_via_server(script, port, request)
 
     def get_contents_via_server_full(self, request):
         script = RequestBuilder.crawling_full_script
+        if script is None:
+            script = "poetry run python crawleeplaywright.py"
         port = RequestBuilder.crawling_server_port
 
         return self.get_contents_via_server(script, port, request)
 
     def get_contents_via_server(self, script, port, request):
+        """
+        TODO what about timeout?
+        """
         from .ipc import SocketConnection
 
         bytes = get_request_to_bytes(request, script)
 
         connection = SocketConnection()
-        connection.connect(SocketConnection.gethostname(), port)
+        try:
+            connection.connect(SocketConnection.gethostname(), port)
+        except Exception as E:
+            WebLogger.exc(E, "Cannot connect to port{}".format(port))
+            return
+
         connection.send(bytes)
 
         response = PageResponseObject(request.url)
@@ -3336,7 +3351,7 @@ class RequestBuilder(object):
         while True:
             command_data = connection.get_command_and_data()
             if not command_data:
-                return
+                break
 
             if command_data[0] == "PageResponseObject.__init__":
                 pass
@@ -3584,7 +3599,10 @@ class InternetPageHandler(ContentInterface):
             if not dap.is_media():
                 p = RequestBuilder(url=url, options=self.options)
                 self.response = p.get_response()
-                contents = p.get_contents()
+                if not self.response:
+                    return
+
+                contents = self.response.get_text()
 
                 if not p.is_valid():
                     return
@@ -3668,7 +3686,9 @@ class InternetPageHandler(ContentInterface):
             # if we have response, but it is invalid, we may try obtaining contents with more advanced processing
             return True
 
-        if self.get_contents() == "" or self.get_contents() is None:
+        text = self.response.get_text()
+
+        if text == "" or text is None:
             return True
 
         return False

@@ -4,11 +4,16 @@ from ..models import AppLogging
 
 
 class YouTubeChannelHandler(RssPage, DefaultUrlHandler):
+    """
+    Natively since we inherit RssPage, the contents should be RssPage
+    """
     def __init__(self, url=None, contents=None):
         super().__init__(
             url,
             contents=contents,
         )
+
+        self.html_page = None # channel html page contains useful info
 
         if url:
             self.code = self.input2code(url)
@@ -30,15 +35,31 @@ class YouTubeChannelHandler(RssPage, DefaultUrlHandler):
 
         if url.find("www.youtube.com/@") >= 0:
             return self.input2code_handle(url)
+        if url.find("www.youtube.com/user") >= 0:
+            return self.input2code_handle(url)
         if url.find("/channel/") >= 0:
             return self.input2code_channel(url)
         if url.find("/feeds/") >= 0:
             return self.input2code_feeds(url)
 
+    def get_html_page(self, url):
+        from .urlhandler import UrlHandler
+
+        if self.html_page:
+            return self.html_page
+
+        options = UrlHandler.get_url_options(url)
+        u = Url(url, page_options=options)
+        u.get_response()
+        self.html_page = u.handler.p
+        return self.html_page
+
     def input2code_handle(self, url):
-        pass
-        # u = Url(url)
-        # contents = u.get_contents()
+        if not self.html_page:
+            self.get_html_page(url)
+
+        if self.html_page:
+            return self.html_page.get_schema_field("identifier")
 
     def input2code_channel(self, url):
         wh = url.rfind("/")
@@ -56,10 +77,12 @@ class YouTubeChannelHandler(RssPage, DefaultUrlHandler):
         return self.code
 
     def get_channel_url(self):
-        return self.code2url(self.code)
+        if self.code:
+            return self.code2url(self.code)
 
     def get_channel_feed_url(self):
-        return self.code2feed(self.code)
+        if self.code:
+            return self.code2feed(self.code)
 
     def get_contents(self):
         """
@@ -69,15 +92,27 @@ class YouTubeChannelHandler(RssPage, DefaultUrlHandler):
         if self.dead:
             return
 
+        if self.contents:
+            return self.contents
+
         response = self.get_response()
         if response:
             return self.response.get_text()
 
     def get_response(self):
+        from .urlhandler import UrlHandler
+
         if self.response:
             return self.response
 
-        u = Url(self.get_channel_feed_url())
+        feed_url = self.get_channel_feed_url()
+        if not feed_url:
+            AppLogging.error("Url:{} Cannot read YouTube channel feed URL".format(self.url))
+            self.dead = True
+            return
+
+        options = UrlHandler.get_url_options(feed_url)
+        u = Url(feed_url, page_options=options)
         self.response = u.get_response()
 
         if (
@@ -91,3 +126,12 @@ class YouTubeChannelHandler(RssPage, DefaultUrlHandler):
             self.process_contents()
 
             return self.response
+
+    def get_thumbnail(self):
+        if not self.html_page:
+            channel_url = self.get_channel_url()
+            if channel_url:
+                self.get_html_page(channel_url)
+
+        if self.html_page:
+            return self.html_page.get_thumbnail()

@@ -121,6 +121,9 @@ class UrlHandler(Url):
             or url.startswith("youtube.com/channel")
             or url.startswith("m.youtube.com/channel")
             or url.startswith("www.youtube.com/@")
+            or url.startswith("youtube.com/@")
+            or url.startswith("www.youtube.com/user")
+            or url.startswith("youtube.com/user")
         ):
             return True
         if (
@@ -144,12 +147,24 @@ class UrlHandler(Url):
             return True
 
     def is_headless_browser_required(url):
+        p = DomainAwarePage(url)
+
         if EntryRules.is_headless_browser_required(url):
             return True
 
-        domain = DomainAwarePage(url).get_domain_only()
+        require_headless_browser = [
+            "open.spotify.com",
+            "thehill.com",
+        ]
+        domain = p.get_domain_only()
 
-        if domain.startswith("open.spotify.com") or domain.startswith("thehill.com"):
+        for rule in require_headless_browser:
+            if domain.find(rule) >= 0:
+                return True
+
+        # to work around cookie banner requests
+        if (url.find("youtube.com/user/") >= 0 or
+            url.find("youtube.com/channel/") >= 0):
             return True
 
         return False

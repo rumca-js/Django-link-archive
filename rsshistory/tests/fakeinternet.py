@@ -35,6 +35,8 @@ from .fake.youtube import (
     youtube_sitemap_product,
     webpage_youtube_airpano_feed,
     webpage_samtime_youtube_rss,
+    youtube_channel_html_linus_tech_tips,
+    youtube_channel_rss_linus_tech_tips,
 )
 from .fake.robotstxtcom import (
     robots_txt_example_com_robots,
@@ -47,6 +49,9 @@ from .fake.hackernews import (
 )
 from .fake.warhammercommunity import (
     warhammer_community_rss,
+)
+from .fake.thehill import (
+    thehill_rss,
 )
 from .fake.instance import (
     instance_entries_json,
@@ -221,6 +226,12 @@ class TestResponseObject(PageResponseObject):
         elif url == "https://page-with-rss-link.com/feed":
             self.headers["Content-Type"] = "application/+rss"
 
+        elif url.startswith("https://warhammer-community.com/feed"):
+            self.headers["Content-Type"] = "application/+rss"
+
+        elif url.startswith("https://thehill.com/feed"):
+            self.headers["Content-Type"] = "application/+rss"
+
         elif url.find("instance.com") >= 0 and url.find("json") >= 0:
             self.headers["Content-Type"] = "json"
 
@@ -280,6 +291,12 @@ class TestResponseObject(PageResponseObject):
         if url.startswith("https://www.youtube.com/watch?v=666"):
             return webpage_no_pubdate_rss
 
+        if url.startswith("https://www.youtube.com/user/linustechtips"):
+            return youtube_channel_html_linus_tech_tips
+
+        if url.startswith("https://www.youtube.com/feeds/videos.xml?channel_id=UCXuqSBlHAE6Xw-yeJA0Tunw"):
+            return youtube_channel_rss_linus_tech_tips
+
         if url.startswith("https://www.youtube.com/feeds"):
             return webpage_samtime_youtube_rss
 
@@ -304,6 +321,9 @@ class TestResponseObject(PageResponseObject):
 
         if url.startswith("https://warhammer-community.com/feed"):
             return warhammer_community_rss
+
+        if url.startswith("https://thehill.com/feed"):
+            return thehill_rss
 
         if url.startswith("https://isocpp.org/blog/rss/category/news"):
             return webpage_samtime_youtube_rss

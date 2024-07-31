@@ -126,12 +126,12 @@ class ViewPage(object):
             status=status_code,
         )
 
-    def render(self, template):
+    def render(self, template, status_code=200):
         result = self.check_access()
         if result is not None:
             return result
 
-        return self.render_implementation(template)
+        return self.render_implementation(template, status_code)
 
     def fill_context_type(context, url=None, fast_check=True, urlhandler=None):
         if urlhandler is None and url:

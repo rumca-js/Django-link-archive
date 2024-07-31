@@ -1,4 +1,6 @@
 import argparse
+import json
+
 from rsshistory import webtools
 from rsshistory import ipc
 
@@ -74,7 +76,7 @@ class ScriptCrawlerInterface(object):
         bytes2 = ipc.string_to_command("PageResponseObject.url", self.response.url)
         bytes3 = ipc.string_to_command("PageResponseObject.status_code", str(self.response.status_code))
         bytes4 = ipc.string_to_command("PageResponseObject.text", self.response.text)
-        bytes5 = ipc.string_to_command("PageResponseObject.headers", str(self.response.headers))
+        bytes5 = ipc.string_to_command("PageResponseObject.headers", json.dumps(self.response.headers))
         bytes6 = ipc.string_to_command("PageResponseObject.__del__", "OK")
 
         all_bytes.extend(bytes1)

@@ -532,8 +532,8 @@ class EntryUpdater(object):
         url = EntryUrlInterface(entry.link)
         props = url.get_props()
 
-        if url.h:
-            if url.h.is_blocked():
+        if url.u:
+            if url.u.is_blocked():
                 entry.delete()
                 return
 
@@ -604,8 +604,8 @@ class EntryUpdater(object):
         url = EntryUrlInterface(entry.link)
         props = url.get_props()
 
-        if url.h:
-            if url.h.is_blocked():
+        if url.u:
+            if url.u.is_blocked():
                 entry.delete()
                 return
 

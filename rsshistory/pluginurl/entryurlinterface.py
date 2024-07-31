@@ -46,16 +46,14 @@ class EntryUrlInterface(object):
         self.options.fast_parsing = fast_check
         self.options.use_headless_browser = use_headless_browser
 
-        self.make_request()
-
     def make_request(self):
-        self.h = UrlHandler(self.url, page_options=self.options)
-        self.response = self.h.get_response()
+        self.u = UrlHandler(self.url, page_options=self.options)
+        self.response = self.u.get_response()
 
         if self.response:
             self.url = self.response.url
 
-        if not self.ignore_errors and not self.h.is_valid():
+        if not self.ignore_errors and not self.u.is_valid():
             if self.log:
                 AppLogging.error("Page is invalid:{}".format(url))
 
@@ -63,10 +61,12 @@ class EntryUrlInterface(object):
         return self.response
 
     def get_props(self, input_props=None, source_obj=None):
+        self.make_request()
+
         if not input_props:
             input_props = {}
 
-        if not self.ignore_errors and not self.h.is_valid():
+        if not self.ignore_errors and not self.u.is_valid():
             return
 
         ignore_errors = self.ignore_errors
@@ -81,7 +81,7 @@ class EntryUrlInterface(object):
 
         elif ignore_errors:
             """
-            TODO should be set any part from self.h?
+            TODO should be set any part from self.u?
             """
             props = {}
             props["link"] = self.url
@@ -95,7 +95,7 @@ class EntryUrlInterface(object):
             props["page_rating"] = 0
             props["dead"] = True
             props["page_rating_contents"] = 0
-            props["status_code"] = self.h.get_status_code()
+            props["status_code"] = self.u.get_status_code()
 
         self.props = props
 
@@ -105,7 +105,7 @@ class EntryUrlInterface(object):
         if not input_props:
             input_props = {}
 
-        if not self.h:
+        if not self.u:
             return None
 
         if not self.is_property_set(input_props, "source"):
@@ -113,7 +113,7 @@ class EntryUrlInterface(object):
                 input_props["source"] = source_obj.url
 
         is_domain = DomainAwarePage(self.url).is_domain()
-        handler = self.h.get_handler()
+        handler = self.u.get_handler()
 
         c = Configuration.get_object().config_entry
 
@@ -153,10 +153,10 @@ class EntryUrlInterface(object):
         """
         TODO how to make this check automatically?
         """
-        if not self.h:
+        if not self.u:
             return None
 
-        p = self.h.get_handler()
+        p = self.u.get_handler()
 
         if type(p) is not DefaultContentPage:
             return True
@@ -164,7 +164,7 @@ class EntryUrlInterface(object):
         return False
 
     def is_valid(self):
-        if not self.h.is_valid():
+        if not self.u.is_valid():
             return False
 
         # we support the type, but we do not provide valid properties
@@ -180,7 +180,7 @@ class EntryUrlInterface(object):
 
         url = self.url
 
-        p = self.h.get_handler()
+        p = self.u.get_handler()
 
         source_url = p.get_channel_feed_url()
         if source_url is None:
@@ -226,7 +226,7 @@ class EntryUrlInterface(object):
 
         url = self.url
 
-        p = self.h.get_handler()
+        p = self.u.get_handler()
 
         # some pages return invalid code / information. let the user decide
         # what to do about it
@@ -272,7 +272,7 @@ class EntryUrlInterface(object):
 
         url = self.url
 
-        p = self.h.get_handler()
+        p = self.u.get_handler()
 
         if not self.is_property_set(input_props, "link"):
             input_props["link"] = p.url
@@ -309,8 +309,7 @@ class EntryUrlInterface(object):
             input_props = {}
 
         url = self.url
-        h = self.h
-        p = self.h.get_handler()
+        p = self.u.get_handler()
 
         if not self.is_property_set(input_props, "link"):
             input_props["link"] = self.url
@@ -327,15 +326,15 @@ class EntryUrlInterface(object):
         if not self.is_property_set(input_props, "album"):
             input_props["album"] = p.get_thumbnail()
         if not self.is_property_set(input_props, "page_rating_contents"):
-            input_props["page_rating_contents"] = self.h.get_page_rating()
+            input_props["page_rating_contents"] = self.u.get_page_rating()
         if not self.is_property_set(input_props, "page_rating"):
             input_props["page_rating"] = 0  # unset
         if not self.is_property_set(input_props, "status_code"):
-            input_props["status_code"] = self.h.get_status_code()
+            input_props["status_code"] = self.u.get_status_code()
         if not self.is_property_set(input_props, "contents_hash"):
-            input_props["contents_hash"] = self.h.get_contents_hash()
+            input_props["contents_hash"] = self.u.get_contents_hash()
         if not self.is_property_set(input_props, "contents_body_hash"):
-            input_props["contents_body_hash"] = self.h.get_contents_body_hash()
+            input_props["contents_body_hash"] = self.u.get_contents_body_hash()
         if not self.is_property_set(input_props, "date_last_modified"):
             if self.response:
                 input_props["date_last_modified"] = self.response.get_last_modified()
@@ -360,8 +359,8 @@ class EntryUrlInterface(object):
 
         is_domain = DomainAwarePage(self.url).is_domain()
         if is_domain and not self.is_property_set(input_props, "thumbnail"):
-            if type(p) is HtmlPage and self.h:
-                input_props["thumbnail"] = self.h.get_favicon()
+            if type(p) is HtmlPage and self.u:
+                input_props["thumbnail"] = self.u.get_favicon()
 
         return input_props
 
