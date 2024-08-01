@@ -132,20 +132,20 @@ class EntriesCleanup(object):
 
             if entries:
                 for entry in entries:
-                    AppLogging.debug("Removing entry:{}".format(entry.link))
+                    AppLogging.debug("Removing source entry:{}".format(entry.link))
                 entries.delete()
 
         entries = self.get_general_entries()
         if entries:
             for entry in entries:
-                AppLogging.debug("Removing entry:{}".format(entry.link))
+                AppLogging.debug("Removing general entry:{}".format(entry.link))
             entries.delete()
 
         if not self.archive_cleanup:
             entries = self.get_stale_entries()
             if entries:
                 for entry in entries:
-                    AppLogging.debug("Removing entry:{}".format(entry.link))
+                    AppLogging.debug("Removing stale entry:{}".format(entry.link))
                 entries.delete()
 
         return True
@@ -180,7 +180,7 @@ class EntriesCleanup(object):
 
         days_before = DateUtils.get_days_before_dt(days)
 
-        condition_source = Q(source=source.url) & Q(date_published__lt=days_before)
+        condition_source = Q(source_obj=source) & Q(date_published__lt=days_before)
         if config.keep_permanent_items:
             condition_source &= Q(bookmarked=False, permanent=False)
 
@@ -537,9 +537,9 @@ class EntryUpdater(object):
                 entry.delete()
                 return
 
-        entry_changed = self.is_entry_changed(url.h)
+        entry_changed = self.is_entry_changed(url.u)
 
-        self.update_entry(url.h)
+        self.update_entry(url.u)
 
         if not url.is_valid():
             self.handle_invalid_response(url)
@@ -609,9 +609,9 @@ class EntryUpdater(object):
                 entry.delete()
                 return
 
-        entry_changed = self.is_entry_changed(url.h)
+        entry_changed = self.is_entry_changed(url.u)
 
-        self.update_entry(url.h)
+        self.update_entry(url.u)
 
         if not url.is_valid():
             self.handle_invalid_response(url)
@@ -658,7 +658,7 @@ class EntryUpdater(object):
                 ModelFilesBuilder().build(file_name=entry.thumbnail)
 
     def add_links_from_url(self, entry, url_interface):
-        url_handler = url_interface.h
+        url_handler = url_interface.u
 
         if not url_handler:
             return
@@ -784,8 +784,8 @@ class EntryUpdater(object):
             return
 
         entry.page_rating_contents = 0
-        if url_entry_interface.h:
-            entry.status_code = url_entry_interface.h.get_status_code()
+        if url_entry_interface.u:
+            entry.status_code = url_entry_interface.u.get_status_code()
         else:
             entry.status_code = BaseLinkDataController.STATUS_DEAD
         entry.save()

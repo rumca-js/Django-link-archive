@@ -14,10 +14,11 @@ class SourceUrlInterfaceTest(FakeInternetTestCase):
         MockRequestCounter.mock_page_requests = 0
 
         url = SourceUrlInterface("https://www.codeproject.com/WebServices/NewsRSS.aspx")
+        # call tested function
+        props = url.get_props()
+
         self.assertTrue(type(url.u.get_handler()), InternetPageHandler)
         self.assertTrue(type(url.u.get_handler().p), RssPage)
-
-        props = url.get_props()
 
         self.assertTrue(props)
         self.assertTrue("url" in props)
@@ -35,9 +36,11 @@ class SourceUrlInterfaceTest(FakeInternetTestCase):
         url = SourceUrlInterface(
             "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM"
         )
-        self.assertTrue(type(url.u.get_handler()), UrlHandler.youtube_channel_handler)
 
+        # call tested function
         props = url.get_props()
+
+        self.assertTrue(type(url.u.get_handler()), UrlHandler.youtube_channel_handler)
 
         self.assertTrue(props)
         self.assertTrue("url" in props)
@@ -54,9 +57,11 @@ class SourceUrlInterfaceTest(FakeInternetTestCase):
 
     def test_youtube_video(self):
         url = SourceUrlInterface("https://www.youtube.com/watch?v=1234")
-        self.assertTrue(type(url.u.get_handler()), UrlHandler.youtube_video_handler)
 
+        # call tested function
         props = url.get_props()
+
+        self.assertTrue(type(url.u.get_handler()), UrlHandler.youtube_video_handler)
 
         self.assertTrue(props)
         self.assertTrue("url" in props)
@@ -71,10 +76,12 @@ class SourceUrlInterfaceTest(FakeInternetTestCase):
         MockRequestCounter.mock_page_requests = 0
 
         url = SourceUrlInterface("https://linkedin.com")
+
+        # call tested function
+        props = url.get_props()
+
         self.assertTrue(type(url.u.get_handler()), InternetPageHandler)
         self.assertTrue(type(url.u.get_handler().p), HtmlPage)
-
-        props = url.get_props()
 
         self.assertTrue(props)
         self.assertTrue("url" in props)
@@ -90,10 +97,12 @@ class SourceUrlInterfaceTest(FakeInternetTestCase):
         MockRequestCounter.mock_page_requests = 0
 
         url = SourceUrlInterface("https://page-with-rss-link.com")
+
+        # call tested function
+        props = url.get_props()
+
         self.assertTrue(type(url.u.get_handler()), InternetPageHandler)
         self.assertTrue(type(url.u.get_handler().p), HtmlPage)
-
-        props = url.get_props()
 
         self.assertTrue(props)
         self.assertTrue("url" in props)
@@ -108,6 +117,8 @@ class SourceUrlInterfaceTest(FakeInternetTestCase):
 
     def test_json_source(self):
         url = SourceUrlInterface("https://instance.com/apps/rsshistory/source-json/100")
+
+        # call tested function
         props = url.get_props()
 
         self.assertTrue(props)
@@ -127,6 +138,8 @@ class SourceUrlInterfaceTest(FakeInternetTestCase):
 
     def test_json_sources(self):
         url = SourceUrlInterface("https://instance.com/apps/rsshistory/sources-json")
+
+        # call tested function
         props = url.get_props()
 
         self.assertTrue(props)
@@ -143,10 +156,12 @@ class SourceUrlInterfaceTest(FakeInternetTestCase):
         MockRequestCounter.mock_page_requests = 0
 
         url = SourceUrlInterface("https://www.reddit.com/r/searchengines/")
+
+        # call tested function
+        props = url.get_props()
+
         self.assertTrue(type(url.u.get_handler()), InternetPageHandler)
         self.assertTrue(type(url.u.get_handler().p), RssPage)
-
-        props = url.get_props()
 
         self.assertTrue(props)
         self.assertTrue("url" in props)

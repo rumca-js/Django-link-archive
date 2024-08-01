@@ -57,6 +57,8 @@ async def main() -> None:
                 headers[item] = context.response.headers[item]
 
             response.url = context.request.loaded_url
+            response.request_url = request.url
+
             # result['loaded_url'] = context.page.url
             response.status_code = context.response.status
             response.headers = headers

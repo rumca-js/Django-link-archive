@@ -92,18 +92,34 @@ class SocketConnection(object):
 
     def connect(self, host, port):
         self.conn = socket.socket()
-        self.conn.connect((host, port))
+        self.conn.settimeout(1.0) # to be able to make ctrl-c
+
+        try:
+            self.conn.connect((host, port))
+            return True
+
+        except Exception as E:
+            self.closed = True
+            return False
 
     def send(self, bytes):
-        self.conn.send(bytes)
+        if self.closed:
+            return False
+
+        try:
+            self.conn.send(bytes)
+            return True
+        except Exception as E:
+            self.closed = True
+            return False
 
     def send_command_bytes(self, command_string, bytes):
         bytes = bytes_to_command(command_string, bytes)
-        self.conn.send(bytes)
+        self.send(bytes)
 
     def send_command_string(self, command_string, string):
         bytes = string_to_command(command_string, string)
-        self.conn.send(bytes)
+        self.send(bytes)
 
     def get_command_bytes(self):
         while True:
@@ -115,17 +131,25 @@ class SocketConnection(object):
 
                 return command
 
+            bytes = None
             try:
                 bytes = self.conn.recv(1024)
-                self.read_message.extend(bytearray(bytes))
+
+            except socket.timeout:
+                return
+
             except Exception as E:
-                print("Exception {}".format(str(E)))
                 self.closed = True
                 return
 
-            if not bytes:
-                self.closed = True
+            if bytes:
+                self.read_message.extend(bytearray(bytes))
+
+            if not bytes and self.closed:
                 return
+
+            if not bytes:
+                continue
 
             wh = self.read_message.find(b'\x00')
 
@@ -152,6 +176,8 @@ class SocketConnection(object):
             return [command_string, data]
 
     def close(self):
-        self.conn.close()
+        if not self.closed:
+            self.conn.close()
+            self.closed=True
 
 

@@ -145,7 +145,7 @@ class YouTubeJsonHandler(YouTubeVideoHandler):
         LinkDatabase.info("YouTube video Handler. Requesting: {}".format(self.url))
 
         response = PageResponseObject(
-            self.url, "", PageResponseObject.STATUS_CODE_ERROR
+            url = self.url, text = "", status_code = PageResponseObject.STATUS_CODE_ERROR
         )
 
         status = False

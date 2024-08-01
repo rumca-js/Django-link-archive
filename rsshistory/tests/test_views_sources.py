@@ -127,8 +127,6 @@ class SourcesViewsTests(FakeInternetTestCase):
         # call user action
         response = self.client.post(url, data=limited_data)
 
-        print(response.text.decode("utf-8"))
-
         # redirection
         self.assertEqual(response.status_code, 302)
 

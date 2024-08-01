@@ -55,20 +55,21 @@ class EntriesCleanupTest(FakeInternetTestCase):
 
         ob = LinkDataController.objects.create(
             source="https://youtube.com",
+            source_obj = source_youtube,
             link="https://youtube.com?v=bookmarked",
             title="The first link",
-            source_obj=source_youtube,
             bookmarked=True,
             language="en",
             domain_obj=domain,
             date_published=date_link_publish,
         )
+        UserBookmarks.add(self.user_not_staff, ob)
 
         ob = LinkDataController.objects.create(
             source="https://youtube.com",
+            source_obj = source_youtube,
             link="https://youtube.com?v=nonbookmarked",
             title="The second link",
-            source_obj=source_youtube,
             bookmarked=False,
             language="en",
             domain_obj=domain,
@@ -77,9 +78,9 @@ class EntriesCleanupTest(FakeInternetTestCase):
 
         ob = LinkDataController.objects.create(
             source="https://youtube.com",
+            source_obj = source_youtube,
             link="https://youtube.com?v=permanent",
             title="The first link",
-            source_obj=source_youtube,
             permanent=True,
             language="en",
             domain_obj=domain,
@@ -88,9 +89,9 @@ class EntriesCleanupTest(FakeInternetTestCase):
 
         ob = ArchiveLinkDataController.objects.create(
             source="https://youtube.com",
+            source_obj=source_youtube,
             link="https://youtube.com?v=nonbookmarked2",
             title="The second link",
-            source_obj=source_youtube,
             bookmarked=False,
             language="en",
             domain_obj=domain,

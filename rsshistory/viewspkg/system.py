@@ -4,6 +4,7 @@ from datetime import timedelta
 
 from django.views import generic
 from django.urls import reverse
+from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.http import JsonResponse
 from django.shortcuts import redirect
@@ -522,9 +523,7 @@ def is_system_ok(request):
 
     system_is_ok = SystemOperation.is_system_healthy()
 
-    if system_is_ok:
-        p.context["summary_text"] = "YES"
-    else:
-        p.context["summary_text"] = "NO"
+    text = "YES" if system_is_ok else "NO"
+    status_code = 200 if system_is_ok else 500
 
-    return p.render("summary_present.html", 200 if system_is_ok else 500)
+    return HttpResponse(text, status=status_code)

@@ -2377,6 +2377,7 @@ class RequestsPage(object):
                 text="",
                 status_code=request_result.status_code,
                 headers=request_result.headers,
+                request_url = self.request.url,
             )
 
             if not self.response.is_valid():
@@ -2410,6 +2411,7 @@ class RequestsPage(object):
                     encoding=request_result.encoding,
                     headers=request_result.headers,
                     binary=request_result.content,
+                    request_url = self.request.url,
                 )
             else:
                 self.response.status_code = HTTP_STATUS_CODE_PAGE_UNSUPPORTED
@@ -2419,19 +2421,22 @@ class RequestsPage(object):
 
         except requests.Timeout:
             self.response = PageResponseObject(
-                self.request.url, text=None, status_code=HTTP_STATUS_CODE_TIMEOUT
+                self.request.url, text=None, status_code=HTTP_STATUS_CODE_TIMEOUT,
+                request_url = self.request.url,
             )
             self.response.add_error("Url:{} Page timeout".format(self.request.url))
         except requests.exceptions.ConnectionError:
             self.response = PageResponseObject(
-                self.url, text=None, status_code=HTTP_STATUS_CODE_CONNECTION_ERROR
+                self.url, text=None, status_code=HTTP_STATUS_CODE_CONNECTION_ERROR,
+                request_url = self.request.url,
             )
             self.response.add_error("Url:{} Connection error".format(self.request.url))
         except Exception as E:
             WebLogger.exc(E, "Url:{} General exception".format(self.request.url))
 
             self.response = PageResponseObject(
-                self.request.url, text=None, status_code=HTTP_STATUS_CODE_EXCEPTION
+                self.request.url, text=None, status_code=HTTP_STATUS_CODE_EXCEPTION,
+                request_url = self.request.url,
             )
             self.response.add_error("General page exception")
 
@@ -2633,18 +2638,21 @@ class SeleniumChromeHeadless(SeleniumDriver):
             # TODO use selenium wire to obtain status code & headers?
 
             self.response = PageResponseObject(
-                driver.current_url, text=html_content, status_code=status_code
+                driver.current_url, text=html_content, status_code=status_code,
+                request_url = self.request.url,
             )
         except TimeoutException:
             error_text = traceback.format_exc()
             WebLogger.debug("Page timeout:{}\n{}".format(self.request.url, error_text))
             self.response = PageResponseObject(
-                self.request.url, text=None, status_code=HTTP_STATUS_CODE_TIMEOUT
+                self.request.url, text=None, status_code=HTTP_STATUS_CODE_TIMEOUT,
+                request_url = self.request.url,
             )
         except Exception as E:
             WebLogger.exc(E, "Url:{}".format(self.request.url))
             self.response = PageResponseObject(
-                self.request.url, text=None, status_code=HTTP_STATUS_CODE_EXCEPTION
+                self.request.url, text=None, status_code=HTTP_STATUS_CODE_EXCEPTION,
+                request_url = self.request.url,
             )
         finally:
             driver.quit()
@@ -2710,19 +2718,22 @@ class SeleniumChromeFull(SeleniumDriver):
             page_source = driver.page_source
 
             self.response = PageResponseObject(
-                driver.current_url, text=page_source, status_code=status_code
+                driver.current_url, text=page_source, status_code=status_code,
+                request_url = self.request.url,
             )
 
         except TimeoutException:
             error_text = traceback.format_exc()
             WebLogger.debug("Page timeout:{}\n{}".format(self.request.url, error_text))
             self.response = PageResponseObject(
-                self.request.url, text=None, status_code=HTTP_STATUS_CODE_TIMEOUT
+                self.request.url, text=None, status_code=HTTP_STATUS_CODE_TIMEOUT,
+                request_url = self.request.url,
             )
         except Exception as E:
             WebLogger.exc(E, "Url:{}".format(self.request.url))
             self.response = PageResponseObject(
-                self.request.url, text=None, status_code=HTTP_STATUS_CODE_EXCEPTION
+                self.request.url, text=None, status_code=HTTP_STATUS_CODE_EXCEPTION,
+                request_url = self.request.url,
             )
         finally:
             driver.quit()
@@ -2779,14 +2790,16 @@ class SeleniumUndetected(object):
             page_source = driver.page_source
 
             self.response = PageResponseObject(
-                driver.current_url, text=page_source, status_code=status_code
+                driver.current_url, text=page_source, status_code=status_code,
+                request_url = self.request.url,
             )
 
         except TimeoutException:
             error_text = traceback.format_exc()
             WebLogger.debug("Page timeout:{}\n{}".format(self.request.url, error_text))
             self.response = PageResponseObject(
-                self.request.url, text=None, status_code=HTTP_STATUS_CODE_TIMEOUT
+                self.request.url, text=None, status_code=HTTP_STATUS_CODE_TIMEOUT,
+                request_url = self.request.url,
             )
         finally:
             driver.quit()
@@ -2852,12 +2865,13 @@ class PageResponseObject(object):
 
     def __init__(
         self,
-        url,
+        url, # received url
         binary=None,
         text=None,
         status_code=STATUS_CODE_OK,
         encoding=None,
         headers=None,
+        request_url=None,
     ):
         """
         @param contents Text
@@ -2866,6 +2880,7 @@ class PageResponseObject(object):
         """
         self.errors = []
         self.url = url
+        self.request_url = request_url
         self.status_code = status_code
 
         self.binary = None
@@ -3085,20 +3100,20 @@ def get_request_to_bytes(request, script):
     total_bytes = bytearray()
 
     bytes1 = string_to_command("PageRequestObject.__init__", "OK")
-    bytes2 = string_to_command("PageRequestObject.timeout", str(request.timeout_s))
+    bytes2 = string_to_command("PageRequestObject.url", request.url)
+    bytes3 = string_to_command("PageRequestObject.timeout", str(request.timeout_s))
     if request.user_agent != None:
-        bytes3 = string_to_command("PageRequestObject.user_agent", str(request.user_agent))
-    else:
-        bytes3 = bytearray()
-    if request.headers != None:
-        bytes4 = string_to_command("PageRequestObject.headers", json.dumps(request.headers))
+        bytes4 = string_to_command("PageRequestObject.user_agent", str(request.user_agent))
     else:
         bytes4 = bytearray()
+    if request.headers != None:
+        bytes5 = string_to_command("PageRequestObject.headers", json.dumps(request.headers))
+    else:
+        bytes5 = bytearray()
 
-    bytes5 = string_to_command("PageRequestObject.ssl_verify", str(request.ssl_verify))
-    bytes6 = string_to_command("PageRequestObject.script", script)
+    bytes6 = string_to_command("PageRequestObject.ssl_verify", str(request.ssl_verify))
+    bytes7 = string_to_command("PageRequestObject.script", script)
 
-    bytes7 = string_to_command("PageRequestObject.url", request.url)
     bytes8 = string_to_command("PageRequestObject.__del__", "OK")
 
     total_bytes.extend(bytes1)
@@ -3109,6 +3124,39 @@ def get_request_to_bytes(request, script):
     total_bytes.extend(bytes6)
     total_bytes.extend(bytes7)
     total_bytes.extend(bytes8)
+
+    return total_bytes
+
+
+def get_response_to_bytes(response):
+    from .ipc import string_to_command
+
+    total_bytes = bytearray()
+
+    bytes1 = string_to_command("PageResponseObject.__init__", "OK")
+    bytes2 = string_to_command("PageResponseObject.url", response.url)
+    bytes3 = string_to_command("PageResponseObject.status_code", str(response.status_code))
+    if response.headers != None:
+        bytes4 = string_to_command("PageResponseObject.headers", json.dumps(response.headers))
+    else:
+        bytes4 = bytearray()
+
+    if response.text:
+        bytes5 = string_to_command("PageResponseObject.text", response.text)
+    elif response.binary:
+        bytes5 = bytes_to_command("PageResponseObject.text", response.binary)
+    else:
+        bytes5 = bytearray()
+    bytes6 = string_to_command("PageResponseObject.request_url", str(response.request_url))
+    bytes7 = string_to_command("PageResponseObject.__del__", "OK")
+
+    total_bytes.extend(bytes1)
+    total_bytes.extend(bytes2)
+    total_bytes.extend(bytes3)
+    total_bytes.extend(bytes4)
+    total_bytes.extend(bytes5)
+    total_bytes.extend(bytes6)
+    total_bytes.extend(bytes7)
 
     return total_bytes
 
@@ -3334,11 +3382,19 @@ class RequestBuilder(object):
         """
         from .ipc import SocketConnection
 
+        limit = DateUtils.get_datetime_now_utc() + timedelta(seconds = request.timeout_s)
+
         bytes = get_request_to_bytes(request, script)
 
         connection = SocketConnection()
         try:
-            connection.connect(SocketConnection.gethostname(), port)
+            if not connection.connect(SocketConnection.gethostname(), port):
+                WebLogger.exc(E, "Cannot connect to port{}".format(port))
+
+                response = PageResponseObject(
+                    self.request.url, text=None, status_code=HTTP_STATUS_CODE_CONNECTION_ERROR,
+                    request_url = self.request.url,
+                )
         except Exception as E:
             WebLogger.exc(E, "Cannot connect to port{}".format(port))
             return
@@ -3350,32 +3406,47 @@ class RequestBuilder(object):
 
         while True:
             command_data = connection.get_command_and_data()
-            if not command_data:
-                break
 
-            if command_data[0] == "PageResponseObject.__init__":
-                pass
-            elif command_data[0] == "PageResponseObject.url":
-                response.url = command_data[1].decode()
-            elif command_data[0] == "PageResponseObject.headers":
-                try:
-                    response.headers = json.loads(command_data[1].decode())
-                except Exception as E:
-                    WebLogger.exc(E, "Cannot load response headers from crawling server")
+            if DateUtils.get_datetime_now_utc() > limit:
+                response = PageResponseObject(
+                    self.request.url, text=None, status_code=HTTP_STATUS_CODE_TIMEOUT,
+                    request_url = self.request.url,
+                )
+                return response
 
-            elif command_data[0] == "PageResponseObject.status_code":
-                try:
-                    response.status_code = int(command_data[1].decode())
-                except Exception as E:
-                    WebLogger.exc(E, "Cannot load status_code from crawling server")
+            if command_data:
+                if command_data[0] == "PageResponseObject.__init__":
+                    pass
 
-            elif command_data[0] == "PageResponseObject.text":
-                response.set_text(command_data[1].decode())
-            elif command_data[0] == "PageResponseObject.__del__":
-                pass
+                elif command_data[0] == "PageResponseObject.url":
+                    response.url = command_data[1].decode()
+
+                elif command_data[0] == "PageResponseObject.headers":
+                    try:
+                        response.headers = json.loads(command_data[1].decode())
+                    except Exception as E:
+                        WebLogger.exc(E, "Cannot load response headers from crawling server")
+
+                elif command_data[0] == "PageResponseObject.status_code":
+                    try:
+                        response.status_code = int(command_data[1].decode())
+                    except Exception as E:
+                        WebLogger.exc(E, "Cannot load status_code from crawling server")
+
+                elif command_data[0] == "PageResponseObject.text":
+                    response.set_text(command_data[1].decode())
+
+                elif command_data[0] == "PageResponseObject.request_url":
+                    response.request_url = command_data[1].decode()
+
+                elif command_data[0] == "PageResponseObject.__del__":
+                    break
+                else:
+                    WebLogger.error("Unsupported command:{}".format(command_data[0]))
+                    break
             else:
-                WebLogger.error("Unsupported command:{}".format(command_data[0]))
-                break
+                if connection.closed:
+                    return response
 
         connection.close()
 
@@ -3424,7 +3495,8 @@ class RequestBuilder(object):
                 if stderr_str and stderr_str != "":
                     WebLogger.error("Url:{}. {}".format(url, stderr_str))
 
-        return PageResponseObject( request.url, contents=None, status_code=HTTP_STATUS_CODE_EXCEPTION)
+        return PageResponseObject( request.url, contents=None, status_code=HTTP_STATUS_CODE_EXCEPTION,
+                request_url = request.url)
 
     def ping(self, timeout_s=5):
         url = self.url

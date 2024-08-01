@@ -113,6 +113,7 @@ class SeleniumFull(SeleniumDriver):
 
             response.set_text(html_content)
             response.status_code = status_code
+            response.request_url = self.request.url
 
         except TimeoutException:
             response.set_binary(None)

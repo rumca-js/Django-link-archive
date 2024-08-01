@@ -7,9 +7,8 @@ use:
  from datetime import datetime, timezone
  now = datetime.now(timezone.utc)
 """
-from datetime import datetime, date, timedelta
+from datetime import datetime, date, timedelta, timezone
 from dateutil import parser
-from pytz import timezone
 
 import django.utils
 
@@ -19,10 +18,10 @@ class DateUtils(object):
         return date.today().isoformat()
 
     def get_datetime_now_utc():
-        return django.utils.timezone.now()
+        return datetime.now(timezone.utc)
 
     def get_datetime_now_iso():
-        now = django.utils.timezone.now()
+        now = DateUtils.get_datetime_now_utc()
         return now.isoformat()
 
     def to_utc_date(input_date):

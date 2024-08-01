@@ -221,7 +221,7 @@ class ViewsTest(FakeInternetTestCase):
         MockRequestCounter.mock_page_requests = 0
         url = (
             reverse("{}:page-show-props".format(LinkDatabase.name))
-            + "?page=https://www.youtube.com/feeds/samtime.rss"
+            + "?page=https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM"
         )
         response = self.client.get(url)
 
@@ -229,7 +229,9 @@ class ViewsTest(FakeInternetTestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Detected", html=False)
-        self.assertEqual(MockRequestCounter.mock_page_requests, 1)
+
+        # one to read RSS, one to read HTML page for thumbnail
+        self.assertEqual(MockRequestCounter.mock_page_requests, 2)
 
     def test_page_scan_contents(self):
         url = reverse("{}:page-scan-contents".format(LinkDatabase.name))
