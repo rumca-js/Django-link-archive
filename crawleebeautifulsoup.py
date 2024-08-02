@@ -51,14 +51,15 @@ async def main() -> None:
 
     request = parser.get_request()
     print("Running request:{}".format(request))
-    print("Running request timoeut:{}".format(request.timeout_s))
 
     crawler = BeautifulSoupCrawler(
         # Limit the crawl to max requests. Remove or increase it for crawling all links.
         max_requests_per_crawl=10,
         request_handler_timeout=timedelta(seconds=request.timeout_s),
+        retry_on_blocked = False,
+        max_session_rotations = 2,
     )
-
+    
     # Define the default request handler, which will be called for every request.
     @crawler.router.default_handler
     async def request_handler(context: BeautifulSoupCrawlingContext) -> None:

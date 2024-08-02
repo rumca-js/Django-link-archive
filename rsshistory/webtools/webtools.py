@@ -38,7 +38,6 @@ import html
 import traceback
 import re
 import json
-import subprocess
 from datetime import datetime, timedelta
 from dateutil import parser
 
