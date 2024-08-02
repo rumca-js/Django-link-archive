@@ -32,7 +32,8 @@ import socket
 import threading
 import json
 from pathlib import Path
-from rsshistory import ipc, webtools
+from rsshistory import webtools
+from rsshistory.webtools import ipc
 import subprocess
 import traceback
 
@@ -43,10 +44,10 @@ mutex = threading.Lock()
 # TODO request mapping [connection] => url
 # TODO send responses using it
 # request[url] -> list of connections
-# 
+#
 
 
-requests = {} # connection is key
+requests = {}  # connection is key
 
 
 def run_script(script, request, parser):
@@ -55,7 +56,7 @@ def run_script(script, request, parser):
         return
 
     # run response through file, only if requested
-    if 'output_file' in parser.args and parser.args.output_file:
+    if "output_file" in parser.args and parser.args.output_file:
         return run_script_with_file(script, request, parser)
     else:
         run_script_with_port(script, request, parser)
@@ -66,13 +67,15 @@ def run_script_with_port(script, request, parser):
         print("Client has not set script to execute")
         return
 
-    if 'port' in parser.args:
-        script = '{} --url "{}" --port "{}" --timeout {} --ssl-verify {}'.format(script, request.url, ipc.DEFAULT_PORT, request.timeout_s, request.ssl_verify)
+    if "port" in parser.args:
+        script = '{} --url "{}" --port "{}" --timeout {} --ssl-verify {}'.format(
+            script, request.url, ipc.DEFAULT_PORT, request.timeout_s, request.ssl_verify
+        )
 
     print("Running {} with timeout:{}".format(script, request.timeout_s))
 
     try:
-        p = subprocess.run(script, shell=True, timeout = request.timeout_s+3)
+        p = subprocess.run(script, shell=True, timeout=request.timeout_s + 3)
     except Exception as E:
         print(str(E))
         print("Could not finish command")
@@ -86,14 +89,16 @@ def run_script_with_file(script, request, parser):
 
     output_file = Path("output.txt")
 
-    if 'output_file' in parser.args:
-        script = '{} --url "{}" --output-file "{}" --timeout {} --ssl-verify {}'.format(script, request.url, str(output_file), request.timeout_s, request.ssl_verify)
+    if "output_file" in parser.args:
+        script = '{} --url "{}" --output-file "{}" --timeout {} --ssl-verify {}'.format(
+            script, request.url, str(output_file), request.timeout_s, request.ssl_verify
+        )
 
     print("Running {} with timeout:{}".format(script, request.timeout_s))
 
     with mutex:
         try:
-            p = subprocess.run(script, shell=True, timeout = request.timeout_s+3)
+            p = subprocess.run(script, shell=True, timeout=request.timeout_s + 3)
         except Exception as E:
             print(str(E))
             print("Could not finish command")
@@ -116,7 +121,6 @@ def run_script_with_file(script, request, parser):
 
 
 def handle_connection_inner(conn, address, parser):
-
     c = ipc.SocketConnection(conn)
 
     script = None
@@ -162,7 +166,7 @@ def handle_connection_inner(conn, address, parser):
             request.user_agent = command[1].decode()
 
         elif command[0] == "PageRequestObject.ssl_verify":
-            ssl_verify = (command[1].decode() == "True")
+            ssl_verify = command[1].decode() == "True"
             print("SSL verify:{}".format(ssl_verify))
             request.ssl_verify = ssl_verify
 
@@ -256,7 +260,7 @@ def server_program(parser):
         port = ipc.DEFAULT_PORT
 
     server_socket = socket.socket()
-    server_socket.settimeout(1.0) # to be able to make ctrl-c on server
+    server_socket.settimeout(1.0)  # to be able to make ctrl-c on server
 
     try:
         server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -287,13 +291,14 @@ def server_program(parser):
 
                         index += 1
 
-                client_thread = threading.Thread(target=handle_connection,
-                        args=(conn, address, parser),
-                    )
+                client_thread = threading.Thread(
+                    target=handle_connection,
+                    args=(conn, address, parser),
+                )
                 client_thread.daemon = True
                 client_thread.start()
             except socket.timeout:
-                #print("Timeout")
+                # print("Timeout")
                 pass
 
     except Exception as E:
@@ -321,7 +326,7 @@ class Parser(object):
         return True
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     p = Parser()
     p.parse()
 

@@ -3,7 +3,7 @@ from django.templatetags.static import static
 
 from ...apps import LinkDatabase
 from ...models import ConfigurationEntry
-from ...pluginurl import YouTubeVideoHandler
+from ...webtools import YouTubeVideoHandler
 
 from .entrygenericplugin import EntryGenericPlugin, EntryButton, EntryParameter
 

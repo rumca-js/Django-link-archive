@@ -19,7 +19,10 @@ try:
 
     # https://github.com/apify/crawlee-python
     # https://crawlee.dev/python/api
-    from crawlee.beautifulsoup_crawler import BeautifulSoupCrawler, BeautifulSoupCrawlingContext
+    from crawlee.beautifulsoup_crawler import (
+        BeautifulSoupCrawler,
+        BeautifulSoupCrawlingContext,
+    )
     from crawlee.basic_crawler import BasicCrawler
     from crawlee.basic_crawler.types import BasicCrawlingContext
     from crawlee.playwright_crawler import PlaywrightCrawler, PlaywrightCrawlingContext
@@ -40,13 +43,13 @@ async def main() -> None:
     crawler = PlaywrightCrawler(
         # Limit the crawl to max requests. Remove or increase it for crawling all links.
         max_requests_per_crawl=10,
-        request_handler_timeout = timedelta(seconds = request.timeout_s),
+        request_handler_timeout=timedelta(seconds=request.timeout_s),
     )
 
     # Define the default request handler, which will be called for every request.
     @crawler.router.default_handler
     async def request_handler(context: PlaywrightCrawlingContext) -> None:
-        print(f'Processing {context.request.url} ...')
+        print(f"Processing {context.request.url} ...")
 
         response = webtools.PageResponseObject(request.url)
         try:
@@ -92,7 +95,7 @@ async def main() -> None:
             c.response = response
             c.save_response()
 
-            print(f'Processing {context.request.url} ...DONE')
+            print(f"Processing {context.request.url} ...DONE")
         except Exception as E:
             print(str(E))
             error_text = traceback.format_exc()
@@ -103,10 +106,9 @@ async def main() -> None:
             c.response = response
             c.save_response()
 
-
     # Run the crawler with the initial list of URLs.
     await crawler.run([parser.args.url])
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     asyncio.run(main())

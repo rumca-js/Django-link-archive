@@ -1,6 +1,6 @@
 from ..models import SourceDataModel
 from ..pluginsources.sourceurlinterface import SourceUrlInterface
-from ..webtools import HtmlPage, RssPage, InternetPageHandler
+from ..webtools import HtmlPage, RssPage, HttpPageHandler
 from ..pluginurl import UrlHandler
 
 from .fakeinternet import FakeInternetTestCase, MockRequestCounter
@@ -17,7 +17,7 @@ class SourceUrlInterfaceTest(FakeInternetTestCase):
         # call tested function
         props = url.get_props()
 
-        self.assertTrue(type(url.u.get_handler()), InternetPageHandler)
+        self.assertTrue(type(url.u.get_handler()), HttpPageHandler)
         self.assertTrue(type(url.u.get_handler().p), RssPage)
 
         self.assertTrue(props)
@@ -80,7 +80,7 @@ class SourceUrlInterfaceTest(FakeInternetTestCase):
         # call tested function
         props = url.get_props()
 
-        self.assertTrue(type(url.u.get_handler()), InternetPageHandler)
+        self.assertTrue(type(url.u.get_handler()), HttpPageHandler)
         self.assertTrue(type(url.u.get_handler().p), HtmlPage)
 
         self.assertTrue(props)
@@ -101,7 +101,7 @@ class SourceUrlInterfaceTest(FakeInternetTestCase):
         # call tested function
         props = url.get_props()
 
-        self.assertTrue(type(url.u.get_handler()), InternetPageHandler)
+        self.assertTrue(type(url.u.get_handler()), HttpPageHandler)
         self.assertTrue(type(url.u.get_handler().p), HtmlPage)
 
         self.assertTrue(props)
@@ -160,7 +160,7 @@ class SourceUrlInterfaceTest(FakeInternetTestCase):
         # call tested function
         props = url.get_props()
 
-        self.assertTrue(type(url.u.get_handler()), InternetPageHandler)
+        self.assertTrue(type(url.u.get_handler()), HttpPageHandler)
         self.assertTrue(type(url.u.get_handler().p), RssPage)
 
         self.assertTrue(props)

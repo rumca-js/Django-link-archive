@@ -1,9 +1,7 @@
 from urllib.parse import urlparse
 from urllib.parse import parse_qs
 
-from ..webtools import HtmlPage, ContentInterface, PageResponseObject
-from ..apps import LinkDatabase
-
+from .webtools import HtmlPage, ContentInterface, PageResponseObject, WebLogger
 from .defaulturlhandler import DefaultUrlHandler
 
 
@@ -142,10 +140,10 @@ class YouTubeJsonHandler(YouTubeVideoHandler):
         if self.response:
             return self.response
 
-        LinkDatabase.info("YouTube video Handler. Requesting: {}".format(self.url))
+        WebLogger.info("YouTube video Handler. Requesting: {}".format(self.url))
 
         response = PageResponseObject(
-            url = self.url, text = "", status_code = PageResponseObject.STATUS_CODE_ERROR
+            url=self.url, text="", status_code=PageResponseObject.STATUS_CODE_ERROR
         )
 
         status = False
@@ -156,7 +154,7 @@ class YouTubeJsonHandler(YouTubeVideoHandler):
                 response.url = self.get_link_classic()
 
                 status = True
-                LinkDatabase.info("YouTube video handler: {} DONE".format(self.url))
+                WebLogger.info("YouTube video handler: {} DONE".format(self.url))
 
         self.response = response
         self.contents = self.response.get_text()

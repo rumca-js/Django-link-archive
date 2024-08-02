@@ -24,7 +24,7 @@ class BaseSourceJsonPlugin(SourceGenericPlugin):
     def __init__(self, source_id):
         super().__init__(source_id)
 
-    def get_container_elements(self):
+    def get_entries(self):
         json = self.get_json()
         if not json:
             return []

@@ -3,7 +3,7 @@ from ..models import (
 )
 from ..pluginsources.sourceparseplugin import BaseParsePlugin
 from ..pluginurl.urlhandler import UrlHandler
-from ..webtools import HtmlPage, RssPage, JsonPage, InternetPageHandler, DomainAwarePage
+from ..webtools import HtmlPage, RssPage, JsonPage, HttpPageHandler, DomainAwarePage
 
 
 class SourceUrlInterface(object):
@@ -60,7 +60,7 @@ class SourceUrlInterface(object):
             self.u.get_response()
 
             return self.get_props_from_rss(input_props)
-        elif type(handler) is InternetPageHandler:
+        elif type(handler) is HttpPageHandler:
             if self.is_reddit_channel():
                 rss = self.get_reddit_rss()
                 if not rss:

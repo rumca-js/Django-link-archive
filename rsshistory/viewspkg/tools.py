@@ -270,7 +270,7 @@ def page_process_contents(request):
 
             summary += "<ul>"
 
-            all_props = reader.get_container_elements()
+            all_props = reader.get_entries()
             for index, prop in enumerate(all_props):
                 prop["link"] = UrlHandler.get_cleaned_link(prop["link"])
                 # TODO use language from source, if we have source for that url/link

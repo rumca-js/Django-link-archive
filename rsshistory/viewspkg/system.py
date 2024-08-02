@@ -106,22 +106,44 @@ def configuration_advanced_page(request):
 
     errors = []
 
-    if (configuration_entry.days_to_move_to_archive > 0 and
-       configuration_entry.days_to_remove_links > 0 and
-       configuration_entry.days_to_remove_links < configuration_entry.days_to_move_to_archive):
-       errors.append("Links are removed before they can get to archive. Check your configuration")
+    if (
+        configuration_entry.days_to_move_to_archive > 0
+        and configuration_entry.days_to_remove_links > 0
+        and configuration_entry.days_to_remove_links
+        < configuration_entry.days_to_move_to_archive
+    ):
+        errors.append(
+            "Links are removed before they can get to archive. Check your configuration"
+        )
 
-    if (configuration_entry.whats_new_days > 0 and configuration_entry.days_to_remove_links > 0 and
-       configuration_entry.whats_new_days > configuration_entry.days_to_remove_links):
-       errors.append("Links are removed before limit of whats new filter")
+    if (
+        configuration_entry.whats_new_days > 0
+        and configuration_entry.days_to_remove_links > 0
+        and configuration_entry.whats_new_days
+        > configuration_entry.days_to_remove_links
+    ):
+        errors.append("Links are removed before limit of whats new filter")
 
-    if configuration_entry.data_export_path != "" and not Path(configuration_entry.data_export_path).exists():
-        errors.append(f"Data export directory does not exist:{configuration_entry.data_export_path}")
+    if (
+        configuration_entry.data_export_path != ""
+        and not Path(configuration_entry.data_export_path).exists()
+    ):
+        errors.append(
+            f"Data export directory does not exist:{configuration_entry.data_export_path}"
+        )
 
-    if configuration_entry.data_import_path != "" and not Path(configuration_entry.data_import_path).exists():
-        errors.append(f"Data import directory does not exist:{configuration_entry.data_import_path}")
+    if (
+        configuration_entry.data_import_path != ""
+        and not Path(configuration_entry.data_import_path).exists()
+    ):
+        errors.append(
+            f"Data import directory does not exist:{configuration_entry.data_import_path}"
+        )
 
-    if configuration_entry.admin_user != "" and User.objects.filter(username = configuration_entry.admin_user).count() == 0:
+    if (
+        configuration_entry.admin_user != ""
+        and User.objects.filter(username=configuration_entry.admin_user).count() == 0
+    ):
         errors.append(f"Admin user does not exist:{configuration_entry.admin_user}")
 
     if len(errors) > 0:

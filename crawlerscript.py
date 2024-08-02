@@ -2,7 +2,7 @@ import argparse
 import json
 
 from rsshistory import webtools
-from rsshistory import ipc
+from rsshistory.webtools import ipc
 
 
 class Parser(object):
@@ -13,7 +13,9 @@ class Parser(object):
     def parse(self):
         self.parser = argparse.ArgumentParser(description="Data analyzer program")
         self.parser.add_argument("--url", help="Directory to be scanned")
-        self.parser.add_argument("--timeout",default=10, type=int, help="Timeout expressed in seconds")
+        self.parser.add_argument(
+            "--timeout", default=10, type=int, help="Timeout expressed in seconds"
+        )
         self.parser.add_argument("--ping", default=False, help="Ping only")
         self.parser.add_argument("--port", type=int, help="Port")
         self.parser.add_argument("--ssl-verify", default=False, help="SSL verify")
@@ -57,6 +59,7 @@ class ScriptCrawlerInterface(object):
     """
     Interface that can be inherited by any browser, browser engine, crawler
     """
+
     def __init__(self, parser, request):
         self.parser = parser
         self.request = request
@@ -75,10 +78,16 @@ class ScriptCrawlerInterface(object):
         # same as PageResponseObject
         bytes1 = ipc.string_to_command("PageResponseObject.__init__", "OK")
         bytes2 = ipc.string_to_command("PageResponseObject.url", self.response.url)
-        bytes3 = ipc.string_to_command("PageResponseObject.request_url", self.response.request_url)
-        bytes4 = ipc.string_to_command("PageResponseObject.status_code", str(self.response.status_code))
+        bytes3 = ipc.string_to_command(
+            "PageResponseObject.request_url", self.response.request_url
+        )
+        bytes4 = ipc.string_to_command(
+            "PageResponseObject.status_code", str(self.response.status_code)
+        )
         bytes5 = ipc.string_to_command("PageResponseObject.text", self.response.text)
-        bytes6 = ipc.string_to_command("PageResponseObject.headers", json.dumps(self.response.headers))
+        bytes6 = ipc.string_to_command(
+            "PageResponseObject.headers", json.dumps(self.response.headers)
+        )
         bytes7 = ipc.string_to_command("PageResponseObject.__del__", "OK")
 
         all_bytes.extend(bytes1)

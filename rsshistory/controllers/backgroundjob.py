@@ -66,7 +66,7 @@ class BackgroundJobController(BackgroundJob):
             self.enabled = False
 
             AppLogging.error(
-                    "Job:{}. Disabling job due to errors {} {}".format(
+                "Job:{}. Disabling job due to errors {} {}".format(
                     self.job, self.subject, self.args
                 )
             )

@@ -3,7 +3,7 @@ from ..webtools import (
     PageOptions,
     HtmlPage,
     PageResponseObject,
-    InternetPageHandler,
+    HttpPageHandler,
 )
 
 from .fakeinternet import FakeInternetTestCase, MockRequestCounter
@@ -156,7 +156,7 @@ class UrlTest(FakeInternetTestCase):
         self.disable_web_pages()
 
     def test_get_contents__pass(self):
-        url = Url("https://multiple-favicons/page.html")
+        url = Url("https://multiple-favicons.com/page.html")
         # call tested function
         contents = url.get_contents()
         self.assertTrue(contents != None)
@@ -165,7 +165,7 @@ class UrlTest(FakeInternetTestCase):
         page_options = PageOptions()
         page_options.use_full_browser = True
 
-        url = Url("https://multiple-favicons/page.html", page_options=page_options)
+        url = Url("https://multiple-favicons.com/page.html", page_options=page_options)
         # call tested function
         options = url.options
         self.assertTrue(options.use_full_browser)
@@ -173,7 +173,7 @@ class UrlTest(FakeInternetTestCase):
         page_options = PageOptions()
         page_options.use_headless_browser = True
 
-        url = Url("https://multiple-favicons/page.html", page_options=page_options)
+        url = Url("https://multiple-favicons.com/page.html", page_options=page_options)
         # call tested function
         options = url.options
         self.assertTrue(options.use_headless_browser)
@@ -188,10 +188,10 @@ class UrlTest(FakeInternetTestCase):
     def test_p_is_html(self):
         MockRequestCounter.mock_page_requests = 0
 
-        url = Url("https://multiple-favicons/page.html")
+        url = Url("https://multiple-favicons.com/page.html")
         url.get_response()
 
-        self.assertEqual(type(url.get_handler()), InternetPageHandler)
+        self.assertEqual(type(url.get_handler()), HttpPageHandler)
         # call tested function
         self.assertEqual(type(url.get_handler().p), HtmlPage)
 
@@ -199,9 +199,10 @@ class UrlTest(FakeInternetTestCase):
 
     def test_is_valid__true(self):
         MockRequestCounter.mock_page_requests = 0
-        url = Url("https://multiple-favicons/page.html")
+        url = Url("https://multiple-favicons.com/page.html")
 
         self.assertEqual(url.get_handler().p, None)
+
         url.get_response()
 
         self.assertEqual(type(url.get_handler().p), HtmlPage)
@@ -214,10 +215,10 @@ class UrlTest(FakeInternetTestCase):
     def test_is_valid__false_response_invalid(self):
         MockRequestCounter.mock_page_requests = 0
 
-        link = "https://multiple-favicons/page.html"
+        link = "https://multiple-favicons.com/page.html"
         url = Url(link)
 
-        self.assertEqual(type(url.get_handler()), InternetPageHandler)
+        self.assertEqual(type(url.get_handler()), HttpPageHandler)
 
         self.assertEqual(url.get_handler().p, None)
         url.get_response()
@@ -233,9 +234,9 @@ class UrlTest(FakeInternetTestCase):
 
     def test_is_valid__false_p_is_None(self):
         MockRequestCounter.mock_page_requests = 0
-        url = Url("https://multiple-favicons/page.html")
+        url = Url("https://multiple-favicons.com/page.html")
 
-        self.assertEqual(type(url.get_handler()), InternetPageHandler)
+        self.assertEqual(type(url.get_handler()), HttpPageHandler)
 
         self.assertEqual(url.get_handler().p, None)
         url.get_response()
@@ -249,7 +250,7 @@ class UrlTest(FakeInternetTestCase):
 
     def test_get_favicon(self):
         MockRequestCounter.mock_page_requests = 0
-        favicon = Url("https://multiple-favicons/page.html").get_favicon()
+        favicon = Url("https://multiple-favicons.com/page.html").get_favicon()
 
         self.assertEqual(
             favicon, "https://www.youtube.com/s/desktop/e4d15d2c/img/favicon.ico"

@@ -4,8 +4,8 @@ from bs4 import BeautifulSoup
 
 from ..models import AppLogging
 from ..apps import LinkDatabase
-from ..webtools import RssPage, HtmlPage, InternetPageHandler
-from ..pluginurl import UrlHandler, YouTubeChannelHandler
+from ..webtools import RssPage, HtmlPage, HttpPageHandler, YouTubeChannelHandler
+from ..pluginurl import UrlHandler
 from ..configuration import Configuration
 
 from .sourcegenericplugin import SourceGenericPlugin
@@ -26,7 +26,7 @@ class BaseRssPlugin(SourceGenericPlugin):
         if type(handler) is YouTubeChannelHandler:
             return True
 
-        if type(handler) is InternetPageHandler and handler.is_rss():
+        if type(handler) is HttpPageHandler and handler.is_rss():
             return True
 
         return False
@@ -34,7 +34,7 @@ class BaseRssPlugin(SourceGenericPlugin):
     def get_contents_size_limit(self):
         return 800
 
-    def get_container_elements(self):
+    def get_entries(self):
         """
         We override RSS behavior
         """

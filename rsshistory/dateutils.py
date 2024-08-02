@@ -26,7 +26,7 @@ class DateUtils(object):
 
     def to_utc_date(input_date):
         if input_date.tzinfo is None:
-            input_date = input_date.replace(tzinfo=timezone("UTC"))
+            input_date = input_date.replace(tzinfo=timezone.utc)
         return input_date
 
     def get_day_diff(time_input):

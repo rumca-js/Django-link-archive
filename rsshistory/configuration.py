@@ -18,7 +18,7 @@ version is split into three digits:
  if a change requires the model to be changed, then second digit is updated, patch is set to 0
  if something should be released to public, then release version changes
 """
-__version__ = "0.74.4"
+__version__ = "0.74.5"
 
 
 from pathlib import Path
@@ -106,24 +106,24 @@ class Configuration(object):
         pass
 
     def apply_ssl_verification(self):
-        from .webtools import RequestBuilder
+        from .webtools import HttpRequestBuilder
 
         if not self.config_entry.ssl_verification:
-            RequestBuilder.disable_ssl_warnings()
+            HttpRequestBuilder.disable_ssl_warnings()
 
     def apply_user_agent(self):
-        from .webtools import RequestBuilder
+        from .webtools import HttpRequestBuilder
 
-        RequestBuilder.user_agent = self.config_entry.user_agent
+        HttpRequestBuilder.user_agent = self.config_entry.user_agent
 
     def apply_crawling_scripts(self):
-        from .webtools import RequestBuilder
+        from .webtools import HttpRequestBuilder
 
         c = self.config_entry
 
-        RequestBuilder.crawling_full_script = c.crawling_full_script
-        RequestBuilder.crawling_headless_script = c.crawling_headless_script
-        RequestBuilder.crawling_server_port = c.crawling_server_port
+        HttpRequestBuilder.crawling_full_script = c.crawling_full_script
+        HttpRequestBuilder.crawling_headless_script = c.crawling_headless_script
+        HttpRequestBuilder.crawling_server_port = c.crawling_server_port
 
     def apply_robots_txt(self):
         from .webtools import DomainCache
@@ -254,11 +254,11 @@ class Configuration(object):
         return False
 
     def ping_internet(self, thread_id):
-        from .webtools import RequestBuilder
+        from .webtools import HttpRequestBuilder
 
         test_page_url = self.config_entry.internet_test_page
 
-        p = RequestBuilder(url=test_page_url)
+        p = HttpRequestBuilder(url=test_page_url)
         return p.ping()
 
     def encrypt(self, message):

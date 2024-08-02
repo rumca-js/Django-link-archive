@@ -79,7 +79,7 @@ class SourceGenericPlugin(object):
         start_time = DateUtils.get_datetime_now_utc()
         source = self.get_source()
 
-        for link_data in self.get_container_elements():
+        for link_data in self.get_entries():
             # LinkDatabase.info("Generic plugin item start:{}".format(link_data["link"]))
             if not link_data:
                 continue

@@ -344,7 +344,7 @@ class EntriesViewsTests(FakeInternetTestCase):
 
         entry.refresh_from_db()
 
-        #page_source = response.text.decode("utf-8")
+        # page_source = response.text.decode("utf-8")
         # print("Contents: {}".format(page_source))
         # print(response)
 
@@ -415,7 +415,7 @@ class EntriesViewsTests(FakeInternetTestCase):
         # call user action
         response = self.client.get(url)
 
-        #page_source = response.text.decode("utf-8")
+        # page_source = response.text.decode("utf-8")
         # print("Contents: {}".format(page_source))
         # print(response)
 

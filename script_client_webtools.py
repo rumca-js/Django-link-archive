@@ -5,7 +5,7 @@ import socket
 import json
 import traceback
 
-from rsshistory.webtools import RequestBuilder, PageOptions, WebLogger
+from rsshistory.webtools import HttpRequestBuilder, PageOptions, WebLogger
 from rsshistory import ipc
 
 
@@ -45,12 +45,12 @@ class ClientWebLogger(object):
 
 def test_requests():
     print("Test requests")
-    RequestBuilder.crawling_server_port = 0
-    RequestBuilder.crawling_headless_script = None
+    HttpRequestBuilder.crawling_server_port = 0
+    HttpRequestBuilder.crawling_headless_script = None
 
     options = PageOptions()
 
-    b = RequestBuilder(url="https://google.com", options=options)
+    b = HttpRequestBuilder(url="https://google.com", options=options)
 
     response = b.get_response()
 
@@ -59,13 +59,15 @@ def test_requests():
 
 def test_headless():
     print("Test headless")
-    RequestBuilder.crawling_server_port = ipc.DEFAULT_PORT
-    RequestBuilder.crawling_headless_script = "poetry run python crawleebeautifulsoup.py"
+    HttpRequestBuilder.crawling_server_port = ipc.DEFAULT_PORT
+    HttpRequestBuilder.crawling_headless_script = (
+        "poetry run python crawleebeautifulsoup.py"
+    )
 
     options = PageOptions()
     options.use_headless_browser = True
 
-    b = RequestBuilder(url="https://google.com", options=options)
+    b = HttpRequestBuilder(url="https://google.com", options=options)
 
     response = b.get_response()
 
@@ -80,7 +82,7 @@ def test_full():
     options = PageOptions()
     options.use_full_browser = True
 
-    b = RequestBuilder(url="https://google.com", options=options)
+    b = HttpRequestBuilder(url="https://google.com", options=options)
 
     response = b.get_response()
 
@@ -95,6 +97,6 @@ def client_program():
     test_full()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     client_program()
     # data = bytes.decode(errors="ignore")  # receive response

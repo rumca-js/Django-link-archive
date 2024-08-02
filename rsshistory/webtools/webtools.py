@@ -42,8 +42,6 @@ import subprocess
 from datetime import datetime, timedelta
 from dateutil import parser
 
-import requests
-
 import html
 import urllib.request, urllib.error, urllib.parse
 import urllib.robotparser
@@ -54,20 +52,7 @@ from urllib3 import disable_warnings
 # import chardet
 from bs4 import BeautifulSoup
 
-from .dateutils import DateUtils
-
-selenium_feataure_enabled = True
-
-try:
-    from selenium import webdriver
-    from selenium.webdriver.chrome.service import Service
-    from selenium.common.exceptions import TimeoutException
-
-    from selenium.webdriver.support.ui import WebDriverWait
-    from selenium.webdriver.support import expected_conditions as EC
-except Exception as E:
-    print(str(E))
-    selenium_feataure_enabled = False
+from ..dateutils import DateUtils
 
 
 PAGE_TOO_BIG_BYTES = 5000000  # 5 MB. There are some RSS more than 1MB
@@ -131,8 +116,6 @@ def lazy_load_content(func):
 
 
 def date_str_to_date(date_str):
-    from .dateutils import DateUtils
-
     if date_str:
         wh = date_str.find("Published:")
         if wh >= 0:
@@ -311,6 +294,7 @@ class DomainAwarePage(object):
         text = parts[0] + parts[1] + parts[2].lower()
         x = DomainAwarePage(text)
         if self.url and not x.is_web_link():
+            print("1")
             return
 
         # if passed email, with user
@@ -878,8 +862,6 @@ class ContentInterface(object):
             return self.guess_by_scope(scope, year)
 
     def guess_by_scope(self, scope, year):
-        from .dateutils import DateUtils
-
         date_pattern_iso = re.compile(r"(\d{4})-(\d{1,2})-(\d{1,2})")
 
         month_re = "(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\.?"
@@ -1162,8 +1144,7 @@ class RssPageEntry(ContentInterface):
         self.default_entry_timestamp = None
 
     def get_properties(self):
-        """
-        """
+        """ """
         output_map = {}
 
         link = None
@@ -1210,29 +1191,29 @@ class RssPageEntry(ContentInterface):
         wh = 0
         while index <= self.feed_index:
             if item_search_wh >= 0:
-                wh = contents.find("<item", wh+1)
+                wh = contents.find("<item", wh + 1)
                 if wh == -1:
                     return
             if entry_search_wh >= 0:
-                wh = contents.find("<entry", wh+1)
+                wh = contents.find("<entry", wh + 1)
                 if wh == -1:
                     return
 
             index += 1
 
-        wh = contents.find("<link", wh+1)
+        wh = contents.find("<link", wh + 1)
         if wh == -1:
             return
 
-        wh = contents.find(">", wh+1)
+        wh = contents.find(">", wh + 1)
         if wh == -1:
             return
 
-        wh2 = contents.find("<", wh+1)
+        wh2 = contents.find("<", wh + 1)
         if wh2 == -1:
             return
 
-        text = contents[wh+1 : wh2]
+        text = contents[wh + 1 : wh2]
 
         return text
 
@@ -1270,16 +1251,12 @@ class RssPageEntry(ContentInterface):
     def get_date_published(self):
         date = self.get_date_published_implementation()
 
-        from .dateutils import DateUtils
-
         if date > DateUtils.get_datetime_now_utc():
             date = DateUtils.get_datetime_now_utc()
 
         return date
 
     def get_date_published_implementation(self):
-        from .dateutils import DateUtils
-
         if hasattr(self.feed_entry, "published"):
             if str(self.feed_entry.published) == "":
                 return DateUtils.get_datetime_now_utc()
@@ -1357,7 +1334,7 @@ class RssPage(ContentInterface):
         except Exception as E:
             WebLogger.exc(E, "Url:{}. RssPage, when parsing.".format(self.url))
 
-    def get_container_elements(self):
+    def get_entries(self):
         if self.feed is None:
             return
 
@@ -1482,17 +1459,6 @@ class RssPage(ContentInterface):
 
         return image
 
-    def get_thumbnail_manual_from_youtube(self):
-        """
-        TODO check if crawlee can extract thumbnail. For channels I am receiving cookie accept banners
-        if "link" in self.feed.feed:
-            link = self.feed.feed.link
-            p = RequestBuilder(link)
-            p = HtmlPage(link, p.get_text())
-            return p.get_thumbnail()
-        """
-        pass
-
     def get_author(self):
         if self.feed is None:
             return
@@ -1545,10 +1511,10 @@ class RssPage(ContentInterface):
         if not self.contents:
             return
 
-        #html_tags = self.get_position_of_html_tags()
+        # html_tags = self.get_position_of_html_tags()
         rss_tags = self.get_position_of_rss_tags()
 
-        #if html_tags >= 0 and rss_tags >= 0:
+        # if html_tags >= 0 and rss_tags >= 0:
         #    return rss_tags < html_tags
         if rss_tags >= 0:
             return True
@@ -2354,461 +2320,6 @@ class XmlPage(ContentInterface):
             return lower.find("<?xml") >= 0
 
 
-class RequestsPage(object):
-    def __init__(self, request):
-        """
-        Wrapper for python requests.
-        """
-        self.request = request
-        self.response = None
-
-        WebLogger.debug("Requests GET:{}".format(self.request.url))
-
-        """
-        stream argument allows us to read header before we fetch the page.
-        SSL verification makes everything to work slower.
-        """
-
-        try:
-            request_result = self.build_requests()
-
-            self.response = PageResponseObject(
-                url=request_result.url,
-                text="",
-                status_code=request_result.status_code,
-                headers=request_result.headers,
-                request_url = self.request.url,
-            )
-
-            if not self.response.is_valid():
-                return
-
-            content_length = self.response.get_content_length()
-            if content_length > PAGE_TOO_BIG_BYTES:
-                self.response.status_code = status_code = HTTP_STATUS_CODE_FILE_TOO_BIG
-                self.response.add_error("Page is too big")
-                return
-
-            if self.request.ping:
-                return
-
-            # TODO do we want to check also content-type?
-
-            content_type = self.response.get_content_type()
-
-            if not content_type or self.response.is_content_type_supported():
-                """
-                IF we do not know the content type, or content type is supported
-                """
-                encoding = self.get_encoding(request_result, self.response)
-                if encoding:
-                    request_result.encoding = encoding
-
-                self.response = PageResponseObject(
-                    url=request_result.url,
-                    text=request_result.text,
-                    status_code=request_result.status_code,
-                    encoding=request_result.encoding,
-                    headers=request_result.headers,
-                    binary=request_result.content,
-                    request_url = self.request.url,
-                )
-            else:
-                self.response.status_code = HTTP_STATUS_CODE_PAGE_UNSUPPORTED
-                self.response.add_error(
-                    "Url:{} is not supported {}".format(self.request.url, content_type)
-                )
-
-        except requests.Timeout:
-            self.response = PageResponseObject(
-                self.request.url, text=None, status_code=HTTP_STATUS_CODE_TIMEOUT,
-                request_url = self.request.url,
-            )
-            self.response.add_error("Url:{} Page timeout".format(self.request.url))
-        except requests.exceptions.ConnectionError:
-            self.response = PageResponseObject(
-                self.url, text=None, status_code=HTTP_STATUS_CODE_CONNECTION_ERROR,
-                request_url = self.request.url,
-            )
-            self.response.add_error("Url:{} Connection error".format(self.request.url))
-        except Exception as E:
-            WebLogger.exc(E, "Url:{} General exception".format(self.request.url))
-
-            self.response = PageResponseObject(
-                self.request.url, text=None, status_code=HTTP_STATUS_CODE_EXCEPTION,
-                request_url = self.request.url,
-            )
-            self.response.add_error("General page exception")
-
-    def get(self):
-        if self.response:
-            return self.response
-
-    def get_encoding(self, request_result, response):
-        """
-        The default assumed content encoding for text/html is ISO-8859-1 aka Latin-1 :( See RFC-2854. UTF-8 was too young to become the default, it was born in 1993, about the same time as HTML and HTTP.
-        Use .content to access the byte stream, or .text to access the decoded Unicode stream.
-
-        chardet does not work on youtube RSS feeds.
-        apparent encoding does not work on youtube RSS feeds.
-        """
-
-        url = self.request.url
-
-        encoding = response.get_content_type_charset()
-        if encoding:
-            return encoding
-
-        else:
-            # There might be several encoding texts, if so we do not know which one to use
-            if response.is_content_html():
-                p = HtmlPage(url, request_result.text)
-                if p.is_valid():
-                    if p.get_charset():
-                        return p.get_charset()
-            if response.is_content_rss():
-                p = RssPage(url, request_result.text)
-                if p.is_valid():
-                    if p.get_charset():
-                        return p.get_charset()
-
-            # TODO this might trigger download of a big file
-            text = request_result.text.lower()
-
-            if text.count("encoding") == 1 and text.find('encoding="utf-8"') >= 0:
-                return "utf-8"
-            elif text.count("charset") == 1 and text.find('charset="utf-8"') >= 0:
-                return "utf-8"
-
-    def build_requests(self):
-        """
-        stream argument - will fetch page contents, when we access contents of page.
-        """
-
-        request_result = requests.get(
-            self.request.url,
-            headers=self.request.headers,
-            timeout=self.request.timeout_s,
-            verify=self.request.ssl_verify,
-            stream=True,
-        )
-
-        WebLogger.info("[H] {}\n{}".format(self.request.url, request_result.headers))
-        return request_result
-
-
-class SeleniumDriver(object):
-    def get_driver(self):
-        """
-        https://www.lambdatest.com/blog/internationalization-with-selenium-webdriver/
-
-        locale="en-US"
-
-        For chrome
-        options.add_argument("--lang={}".format(locale))
-
-        # For firefox:
-        profile = webdriver.FirefoxProfile()
-        profile.set_preferences("intl.accept_languages", locale)
-        profile.update_preferences()
-        """
-        raise NotImplementedError("Provide selenium driver implementation!")
-
-    def get_selenium_status_code(self, driver):
-        status_code = 200
-        try:
-            logs = driver.get_log("performance")
-            status_code2 = self.get_selenium_status_code_from_logs(logs)
-            if status_code2:
-                status_code = status_code2
-        except Exception as E:
-            WebLogger.exc(E, "Chrome webdrider error.")
-        return status_code
-
-    def get_selenium_status_code_from_logs(self, logs):
-        """
-        https://stackoverflow.com/questions/5799228/how-to-get-status-code-by-using-selenium-py-python-code
-        TODO should we use selenium wire?
-        """
-        last_status_code = 200
-        for log in logs:
-            if log["message"]:
-                d = json.loads(log["message"])
-
-                content_type = ""
-                try:
-                    content_type = d["message"]["params"]["response"]["headers"][
-                        "content-type"
-                    ]
-                except Exception as E:
-                    pass
-                try:
-                    content_type = d["message"]["params"]["response"]["headers"][
-                        "Content-Type"
-                    ]
-                except Exception as E:
-                    pass
-
-                try:
-                    response_received = (
-                        d["message"]["method"] == "Network.responseReceived"
-                    )
-                    if content_type.find("text/html") >= 0 and response_received:
-                        last_status_code = d["message"]["params"]["response"]["status"]
-                except Exception as E:
-                    # we expect that some contents do not have this
-                    pass
-
-        return last_status_code
-
-    def get_selenium_headers(self, driver):
-        headers = {}
-        try:
-            logs = driver.get_log("performance")
-            headers = self.get_selenium_headers_logs(logs)
-            return headers
-        except Exception as E:
-            WebLogger.exc(E, "Chrome webdrider error")
-
-        return headers
-
-    def get_selenium_headers_logs(self, logs):
-        """
-        https://stackoverflow.com/questions/5799228/how-to-get-status-code-by-using-selenium-py-python-code
-        TODO should we use selenium wire?
-        """
-        headers = {}
-        for log in logs:
-            if log["message"]:
-                d = json.loads(log["message"])
-
-                content_type = ""
-                try:
-                    headers = d["message"]["params"]["response"]["headers"]
-                except Exception as E:
-                    pass
-
-        return headers
-
-
-class SeleniumChromeHeadless(SeleniumDriver):
-    def get_driver(self):
-        service = Service(executable_path="/usr/bin/chromedriver")
-        options = webdriver.ChromeOptions()
-        options.add_argument("--headless")
-        options.add_argument("--lang={}".format("en-US"))
-
-        options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
-
-        driver = webdriver.Chrome(service=service, options=options)
-        return driver
-
-    def __init__(self, request):
-        """
-        To obtain RSS page you have to run real, full blown browser.
-
-        Headless might not be enough to fool cloudflare.
-        """
-        self.request = request
-        self.response = None
-
-        driver = self.get_driver()
-
-        try:
-            # add 10 seconds for start of browser, etc.
-            selenium_timeout = self.request.timeout_s + 10
-
-            driver.set_page_load_timeout(selenium_timeout)
-
-            driver.get(self.request.url)
-            """
-            TODO - if webpage changes link, it should also update it in this object
-            """
-
-            status_code = self.get_selenium_status_code(driver)
-
-            headers = self.get_selenium_headers(driver)
-            WebLogger.debug("Selenium headers:{}\n{}".format(self.request.url, headers))
-
-            # if self.options.link_redirect:
-            #    WebDriverWait(driver, selenium_timeout).until(EC.url_changes(driver.current_url))
-
-            html_content = driver.page_source
-
-            # TODO use selenium wire to obtain status code & headers?
-
-            self.response = PageResponseObject(
-                driver.current_url, text=html_content, status_code=status_code,
-                request_url = self.request.url,
-            )
-        except TimeoutException:
-            error_text = traceback.format_exc()
-            WebLogger.debug("Page timeout:{}\n{}".format(self.request.url, error_text))
-            self.response = PageResponseObject(
-                self.request.url, text=None, status_code=HTTP_STATUS_CODE_TIMEOUT,
-                request_url = self.request.url,
-            )
-        except Exception as E:
-            WebLogger.exc(E, "Url:{}".format(self.request.url))
-            self.response = PageResponseObject(
-                self.request.url, text=None, status_code=HTTP_STATUS_CODE_EXCEPTION,
-                request_url = self.request.url,
-            )
-        finally:
-            driver.quit()
-
-    def get(self):
-        if self.response:
-            return self.response
-
-
-class SeleniumChromeFull(SeleniumDriver):
-    def get_driver(self):
-        service = Service(executable_path="/usr/bin/chromedriver")
-        options = webdriver.ChromeOptions()
-        options.add_argument("--headless")
-        options.add_argument("--lang={}".format("en-US"))
-        # options.add_argument("--no-sandbox")
-        # options.add_argument("--disable-dev-shm-usage")
-        # options.add_argument('--remote-debugging-pipe')
-        # options.add_argument('--remote-debugging-port=9222')
-        # options.add_argument('--user-data-dir=~/.config/google-chrome')
-
-        # options to enable performance log, to read status code
-        options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
-
-        return webdriver.Chrome(service=service, options=options)
-
-    def __init__(self, request):
-        """
-        To obtain RSS page you have to run real, full blown browser.
-
-        It may require some magic things to make the browser running.
-
-        https://stackoverflow.com/questions/50642308/webdriverexception-unknown-error-devtoolsactiveport-file-doesnt-exist-while-t
-        """
-        self.request = request
-        self.response = None
-
-        import os
-
-        os.environ["DISPLAY"] = ":10.0"
-
-        driver = self.get_driver()
-
-        try:
-            # add 10 seconds for start of browser, etc.
-            selenium_timeout = self.request.timeout_s + 20
-
-            driver.set_page_load_timeout(selenium_timeout)
-
-            driver.get(self.request.url)
-
-            status_code = self.get_selenium_status_code(driver)
-
-            # This driver wait resulted in timeout on yahoo
-            # if self.options.link_redirect:
-            # WebDriverWait(driver, selenium_timeout).until(
-            #    EC.url_changes(driver.current_url)
-            # )
-            """
-            TODO - if webpage changes link, it should also update it in this object
-            """
-
-            page_source = driver.page_source
-
-            self.response = PageResponseObject(
-                driver.current_url, text=page_source, status_code=status_code,
-                request_url = self.request.url,
-            )
-
-        except TimeoutException:
-            error_text = traceback.format_exc()
-            WebLogger.debug("Page timeout:{}\n{}".format(self.request.url, error_text))
-            self.response = PageResponseObject(
-                self.request.url, text=None, status_code=HTTP_STATUS_CODE_TIMEOUT,
-                request_url = self.request.url,
-            )
-        except Exception as E:
-            WebLogger.exc(E, "Url:{}".format(self.request.url))
-            self.response = PageResponseObject(
-                self.request.url, text=None, status_code=HTTP_STATUS_CODE_EXCEPTION,
-                request_url = self.request.url,
-            )
-        finally:
-            driver.quit()
-
-    def get(self):
-        if self.response:
-            return self.response
-
-
-class SeleniumUndetected(object):
-    def get_driver(self):
-        import undetected_chromedriver as uc
-
-        service = Service(executable_path="/usr/bin/chromedriver")
-
-        options = uc.ChromeOptions()
-        options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
-        options.add_argument("--lang={}".format("en-US"))
-
-        return uc.Chrome(service=service, options=options)
-
-    def __init__(self, request):
-        """
-        To obtain RSS page you have to run real, full blown browser.
-
-        It may require some magic things to make the browser running.
-
-        This does not work on raspberry pi
-        """
-        self.request = request
-        self.response = None
-
-        driver = self.get_driver()
-
-        try:
-            # add 10 seconds for start of browser, etc.
-            selenium_timeout = self.request.timeout_s + 20
-
-            driver.set_page_load_timeout(selenium_timeout)
-
-            driver.get(self.request.url)
-
-            status_code = self.get_selenium_status_code(driver)
-
-            # This driver wait resulted in timeout on yahoo
-            # if self.options.link_redirect:
-            # WebDriverWait(driver, selenium_timeout).until(
-            #    EC.url_changes(driver.current_url)
-            # )
-            """
-            TODO - if webpage changes link, it should also update it in this object
-            """
-
-            page_source = driver.page_source
-
-            self.response = PageResponseObject(
-                driver.current_url, text=page_source, status_code=status_code,
-                request_url = self.request.url,
-            )
-
-        except TimeoutException:
-            error_text = traceback.format_exc()
-            WebLogger.debug("Page timeout:{}\n{}".format(self.request.url, error_text))
-            self.response = PageResponseObject(
-                self.request.url, text=None, status_code=HTTP_STATUS_CODE_TIMEOUT,
-                request_url = self.request.url,
-            )
-        finally:
-            driver.quit()
-
-    def get(self):
-        if self.response:
-            return self.response
-
-
 class PageOptions(object):
     """
     Options object, configuration
@@ -2840,8 +2351,15 @@ class PageOptions(object):
 
 
 class PageRequestObject(object):
-
-    def __init__(self, url, headers=None, user_agent=None, timeout_s = 10, ping = False, ssl_verify=True):
+    def __init__(
+        self,
+        url,
+        headers=None,
+        user_agent=None,
+        timeout_s=10,
+        ping=False,
+        ssl_verify=True,
+    ):
         self.url = url
 
         self.user_agent = user_agent
@@ -2865,7 +2383,7 @@ class PageResponseObject(object):
 
     def __init__(
         self,
-        url, # received url
+        url,  # received url
         binary=None,
         text=None,
         status_code=STATUS_CODE_OK,
@@ -3103,11 +2621,15 @@ def get_request_to_bytes(request, script):
     bytes2 = string_to_command("PageRequestObject.url", request.url)
     bytes3 = string_to_command("PageRequestObject.timeout", str(request.timeout_s))
     if request.user_agent != None:
-        bytes4 = string_to_command("PageRequestObject.user_agent", str(request.user_agent))
+        bytes4 = string_to_command(
+            "PageRequestObject.user_agent", str(request.user_agent)
+        )
     else:
         bytes4 = bytearray()
     if request.headers != None:
-        bytes5 = string_to_command("PageRequestObject.headers", json.dumps(request.headers))
+        bytes5 = string_to_command(
+            "PageRequestObject.headers", json.dumps(request.headers)
+        )
     else:
         bytes5 = bytearray()
 
@@ -3135,9 +2657,13 @@ def get_response_to_bytes(response):
 
     bytes1 = string_to_command("PageResponseObject.__init__", "OK")
     bytes2 = string_to_command("PageResponseObject.url", response.url)
-    bytes3 = string_to_command("PageResponseObject.status_code", str(response.status_code))
+    bytes3 = string_to_command(
+        "PageResponseObject.status_code", str(response.status_code)
+    )
     if response.headers != None:
-        bytes4 = string_to_command("PageResponseObject.headers", json.dumps(response.headers))
+        bytes4 = string_to_command(
+            "PageResponseObject.headers", json.dumps(response.headers)
+        )
     else:
         bytes4 = bytearray()
 
@@ -3147,7 +2673,9 @@ def get_response_to_bytes(response):
         bytes5 = bytes_to_command("PageResponseObject.text", response.binary)
     else:
         bytes5 = bytearray()
-    bytes6 = string_to_command("PageResponseObject.request_url", str(response.request_url))
+    bytes6 = string_to_command(
+        "PageResponseObject.request_url", str(response.request_url)
+    )
     bytes7 = string_to_command("PageResponseObject.__del__", "OK")
 
     total_bytes.extend(bytes1)
@@ -3163,6 +2691,7 @@ def get_response_to_bytes(response):
 
 def get_response_from_bytes(all_bytes):
     from .ipc import commands_from_bytes
+
     response = PageResponseObject("")
 
     commands_data = commands_from_bytes(all_bytes)
@@ -3187,1140 +2716,6 @@ def get_response_from_bytes(all_bytes):
             pass
 
     return response
-
-
-
-class RequestBuilder(object):
-    """
-    Should not contain any HTML/RSS content processing.
-    This should be just a builder.
-
-    TODO rename HttpRequest
-    """
-
-    # use headers from https://www.supermonitoring.com/blog/check-browser-http-headers/
-    user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/116.0"
-    get_contents_function = None
-    ssl_verify = True
-    crawling_headless_script = None
-    crawling_full_script = None
-    crawling_server_port = None
-
-    def __init__(self, url=None, options=None, page_object=None, request = None):
-        """
-        @param url URL
-        @param contents URL page contents
-        @param use_selenium decides if selenium is used
-        @param page_object All settings are used from page object, with page contents
-        """
-        self.request = request
-        self.response = None
-        self.timeout_s = 10
-
-        if page_object:
-            self.url = page_object.url
-            self.options = page_object.options
-            self.dead = page_object.dead
-            self.robots_contents = page_object.robots_contents
-        else:
-            self.url = url
-            self.options = options
-            self.robots_contents = None
-
-            # Flag to not retry same contents requests for things we already know are dead
-            self.dead = False
-
-        if self.url is None:
-            stack_lines = traceback.format_stack()
-            stack_str = "".join(stack_lines)
-
-            WebLogger.error("Passed incorrect url {}".format(stack_str))
-            return
-
-        if self.url.lower().find("https") >= 0:
-            self.protocol = "https"
-        elif self.url.lower().find("http") >= 0:
-            self.protocol = "http"
-        else:
-            self.protocol = "https"
-
-        if not self.options:
-            self.options = PageOptions()
-
-        if RequestBuilder.get_contents_function is None:
-            self.get_contents_function = self.get_contents_internal
-
-        self.headers = {
-            "User-Agent": self.user_agent,
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-            "Accept-Charset": "utf-8,ISO-8859-1;q=0.7,*;q=0.3",
-            "Accept-Encoding": "none",
-            "Accept-Language": "en-US,en;q=0.8",
-            "Connection": "keep-alive",
-        }
-
-    def disable_ssl_warnings():
-        RequestBuilder.ssl_verify = False
-        disable_warnings(InsecureRequestWarning)
-
-    def get_response(self):
-        if self.response:
-            return self.response
-
-        if self.dead:
-            return None
-
-        self.get_response_implementation()
-
-        return self.response
-
-    def get_text(self):
-        response = self.get_response()
-        if response:
-            return response.get_text()
-
-    def get_binary(self):
-        response = self.get_response()
-        if response:
-            return response.get_binary()
-
-    def get_contents_internal(self, url = None, headers = None, timeout_s = 10, ping=False, request=None):
-
-        if not request:
-            request = PageRequestObject(url = url, headers=headers, timeout_s = timeout_s, ping=ping)
-
-        if self.options.use_basic_crawler():
-            return self.get_contents_via_requests(
-                request = request
-            )
-        elif self.options.use_headless_browser:
-            if RequestBuilder.crawling_server_port:
-                return self.get_contents_via_server_headless(
-                    request = request
-                )
-            if RequestBuilder.crawling_headless_script:
-                return self.get_contents_via_script_headless(
-                    request = request
-                )
-            if selenium_feataure_enabled:
-                return self.get_contents_via_selenium_chrome_headless(
-                    request = request
-                )
-
-            return self.get_contents_via_requests(
-                request = request
-            )
-        elif self.options.use_full_browser:
-            if RequestBuilder.crawling_server_port:
-                return self.get_contents_via_server_full(
-                    request = request
-                )
-            if RequestBuilder.crawling_full_script:
-                return self.get_contents_via_script_full(
-                    request = request
-                )
-            if selenium_feataure_enabled:
-                return self.get_contents_via_selenium_chrome_full(
-                    request = request
-                )
-
-            return self.get_contents_via_requests(
-                request = request
-            )
-        else:
-            self.dead = True
-            raise NotImplementedError("Could not identify method of page capture")
-
-    def get_contents_via_requests(self, request):
-        """
-        This is program is web scraper. If we turn verify, then we discard some of pages.
-        Encountered several major pages, which had SSL programs.
-
-        SSL is mostly important for interacting with pages. During web scraping it is not that useful.
-        """
-
-        p = RequestsPage(request)
-        return p.get()
-
-    def get_contents_via_selenium_chrome_headless(self, request):
-        p = SeleniumChromeHeadless(request)
-        return p.get()
-
-    def get_contents_via_selenium_chrome_full(self, request):
-        p = SeleniumChromeFull(request)
-        return p.get()
-
-    def get_contents_via_script_headless(self, request):
-        script = RequestBuilder.crawling_headless_script
-
-        return self.get_contents_via_script(script, request)
-
-    def get_contents_via_script_full(self, request):
-        script = RequestBuilder.crawling_full_script
-
-        return self.get_contents_via_script(script, request)
-
-    def get_contents_via_server_headless(self, request):
-        script = RequestBuilder.crawling_headless_script
-        if script is None:
-            script = "poetry run python crawleebeautifulsoup.py"
-        port = RequestBuilder.crawling_server_port
-
-        return self.get_contents_via_server(script, port, request)
-
-    def get_contents_via_server_full(self, request):
-        script = RequestBuilder.crawling_full_script
-        if script is None:
-            script = "poetry run python crawleeplaywright.py"
-        port = RequestBuilder.crawling_server_port
-
-        return self.get_contents_via_server(script, port, request)
-
-    def get_contents_via_server(self, script, port, request):
-        """
-        TODO what about timeout?
-        """
-        from .ipc import SocketConnection
-
-        limit = DateUtils.get_datetime_now_utc() + timedelta(seconds = request.timeout_s)
-
-        bytes = get_request_to_bytes(request, script)
-
-        connection = SocketConnection()
-        try:
-            if not connection.connect(SocketConnection.gethostname(), port):
-                WebLogger.exc(E, "Cannot connect to port{}".format(port))
-
-                response = PageResponseObject(
-                    self.request.url, text=None, status_code=HTTP_STATUS_CODE_CONNECTION_ERROR,
-                    request_url = self.request.url,
-                )
-        except Exception as E:
-            WebLogger.exc(E, "Cannot connect to port{}".format(port))
-            return
-
-        connection.send(bytes)
-
-        response = PageResponseObject(request.url)
-        response.status_code = HTTP_STATUS_CODE_CONNECTION_ERROR
-
-        while True:
-            command_data = connection.get_command_and_data()
-
-            if DateUtils.get_datetime_now_utc() > limit:
-                response = PageResponseObject(
-                    self.request.url, text=None, status_code=HTTP_STATUS_CODE_TIMEOUT,
-                    request_url = self.request.url,
-                )
-                return response
-
-            if command_data:
-                if command_data[0] == "PageResponseObject.__init__":
-                    pass
-
-                elif command_data[0] == "PageResponseObject.url":
-                    response.url = command_data[1].decode()
-
-                elif command_data[0] == "PageResponseObject.headers":
-                    try:
-                        response.headers = json.loads(command_data[1].decode())
-                    except Exception as E:
-                        WebLogger.exc(E, "Cannot load response headers from crawling server")
-
-                elif command_data[0] == "PageResponseObject.status_code":
-                    try:
-                        response.status_code = int(command_data[1].decode())
-                    except Exception as E:
-                        WebLogger.exc(E, "Cannot load status_code from crawling server")
-
-                elif command_data[0] == "PageResponseObject.text":
-                    response.set_text(command_data[1].decode())
-
-                elif command_data[0] == "PageResponseObject.request_url":
-                    response.request_url = command_data[1].decode()
-
-                elif command_data[0] == "PageResponseObject.__del__":
-                    break
-                else:
-                    WebLogger.error("Unsupported command:{}".format(command_data[0]))
-                    break
-            else:
-                if connection.closed:
-                    return response
-
-        connection.close()
-
-        return response
-
-    def get_contents_via_script(self, script, request):
-        """
-        TODO There might be collision if apache and celery called same script at the same time.
-        """
-        import os
-        from pathlib import Path
-
-        file_path = os.path.realpath(__file__)
-        full_path = Path(file_path)
-
-        operating_path = full_path.parents[1]
-        response_file_location = full_path.parents[0] / "response.txt"
-
-        script = script.replace("$URL", request.url)
-        script = script.replace("$RESPONSE_FILE", str(response_file_location))
-
-        if response_file_location.exists():
-            response_file_location.unlink()
-
-        # WebLogger.debug(operating_path)
-        # WebLogger.debug(response_file_location)
-
-        p = subprocess.run(script, shell=True, capture_output=True, cwd=operating_path, timeout=request.timeout_s)
-
-        if p.stdout:
-            stdout_str = p.stdout.decode()
-            WebLogger.debug(stdout_str)
-
-        if response_file_location.exists():
-            with open(str(response_file_location), "rb") as fh:
-                all_bytes = fh.read()
-
-                return get_response_from_bytes(all_bytes)
-
-            WebLogger.error("Url:{}. Not found response in response file:{}".format(request.url, str(response_file_location)))
-            return
-
-        else:
-            if p.stderr:
-                stderr_str = p.stderr.decode()
-                if stderr_str and stderr_str != "":
-                    WebLogger.error("Url:{}. {}".format(url, stderr_str))
-
-        return PageResponseObject( request.url, contents=None, status_code=HTTP_STATUS_CODE_EXCEPTION,
-                request_url = request.url)
-
-    def ping(self, timeout_s=5):
-        url = self.url
-
-        if url is None:
-            stack_lines = traceback.format_stack()
-            stack_str = "".join(stack_lines)
-
-            WebLogger.error("Passed incorrect url {}".format(stack_str))
-            return
-
-        o = PageRequestObject(
-                url=self.url,
-                headers=self.headers,
-                timeout_s=timeout_s,
-                ping=True,
-            )
-
-        try:
-            response = self.get_contents_function(request = o)
-
-            return response is not None and response.is_valid()
-
-        except Exception as E:
-            WebLogger.exc(E, "Url:{}. Ping error\n".format(self.url))
-            return False
-
-    def get_headers_response(self, timeout_s=5):
-        url = self.url
-
-        if url is None:
-            stack_lines = traceback.format_stack()
-            stack_str = "".join(stack_lines)
-
-            WebLogger.error("Passed incorrect url {}".format(stack_str))
-            return
-
-        try:
-            o = PageRequestObject(
-                    url=self.url,
-                    headers=self.headers,
-                    timeout_s=timeout_s,
-                    ping=True,
-                )
-
-            response = self.get_contents_function(
-                request = o
-            )
-            if response and response.is_valid():
-                return response
-
-        except Exception as E:
-            WebLogger.exc(E, "Url:{}. Header request error\n".format(self.url))
-            return None
-
-    def get_response_implementation(self):
-        if self.response and self.response.text:
-            return self.response
-
-        if not self.user_agent or self.user_agent == "":
-            self.dead = True
-            return None
-
-        if self.dead:
-            return None
-
-        if not self.is_url_valid():
-            lines = traceback.format_stack()
-            line_text = ""
-            for line in lines:
-                line_text += line
-
-            WebLogger.error(
-                "Url:{} is invalid. Lines:{}".format(self.url, line_text)
-            )
-
-            self.dead = True
-            return None
-
-        try:
-            WebLogger.debug(
-                "Url:{}. Requesting page: options:{}".format(self.url, self.options)
-            )
-
-            request = PageRequestObject(
-                    url=self.url,
-                    headers=self.headers,
-                    timeout_s=self.timeout_s,
-                )
-
-            self.response = self.get_contents_function(request=request)
-
-            WebLogger.debug(
-                "Url:{}. Requesting page: DONE".format(self.url, self.options)
-            )
-
-        except Exception as E:
-            self.dead = True
-            WebLogger.exc(E, "Url:{}".format(self.url))
-
-        return self.response
-
-    @lazy_load_content
-    def is_valid(self):
-        if not self.response:
-            return False
-
-        if self.response.is_this_status_ok() or self.response.is_this_status_redirect():
-            return True
-        else:
-            return False
-
-    def is_url_valid(self):
-        if self.url == None:
-            return False
-
-        p = DomainAwarePage(self.url)
-        if not p.is_web_link():
-            return False
-
-        return True
-
-    def try_decode(self, thebytes):
-        try:
-            return thebytes.decode("UTF-8", errors="replace")
-        except Exception as e:
-            pass
-
-    def is_this_status_ok(self, status_code):
-        if status_code == 0:
-            return False
-
-        return status_code >= 200 and status_code < 300
-
-
-class InternetPageHandler(ContentInterface):
-    def __init__(self, url=None, page_options=None):
-        super().__init__(url=url, contents=None)
-
-        self.p = None  # page contents object, HtmlPage, RssPage, or whathver
-        self.response = None
-        self.options = page_options
-        self.browser_promotions = True
-
-    def get_contents(self):
-        if self.response and self.response.get_text():
-            return self.response.get_text()
-
-        return self.get_contents_implementation()
-
-    def get_contents_implementation(self):
-        self.p = self.get_page_handler_simple()
-
-        if self.browser_promotions and self.is_advanced_processing_possible():
-            # we warn, because if that happens too often, it is easy just to
-            # define EntryRule for that domain
-            WebLogger.error(
-                "Url:{}. Trying to workaround with headless browser".format(self.url)
-            )
-            self.options.use_headless_browser = True
-            self.p = self.get_page_handler_simple()
-
-        if self.response:
-            return self.response.get_text()
-
-    def get_page_handler_simple(self):
-        url = self.url
-
-        dap = DomainAwarePage(url)
-
-        if url.startswith("https") or url.startswith("http"):
-            if not dap.is_media():
-                p = RequestBuilder(url=url, options=self.options)
-                self.response = p.get_response()
-                if not self.response:
-                    return
-
-                contents = self.response.get_text()
-
-                if not p.is_valid():
-                    return
-
-        else:
-            # Other protocols have not been yet implemented
-            # there is no request, there is no response
-            pass
-
-        if contents:
-            """
-            Found servers that return content-type "text/html" for RSS sources :(
-            """
-
-            if self.is_html():
-                p = HtmlPage(url, contents)
-                return p
-
-            if self.is_rss():
-                p = RssPage(url, contents)
-                return p
-
-            if self.is_json():
-                p = JsonPage(url, contents)
-                if p.is_valid():
-                    return p
-
-            # we do not know what it is. Guess
-
-            p = HtmlPage(url, contents)
-            if p.is_valid():
-                return p
-
-            p = RssPage(url, contents)
-            if p.is_valid():
-                return p
-
-            p = JsonPage(url, contents)
-            if p.is_valid():
-                return p
-
-            # TODO
-            # p = XmlPage(url, contents)
-            # if p.is_valid():
-            #    return p
-
-            p = DefaultContentPage(url, contents)
-            return p
-
-        if self.response and self.response.is_valid():
-            p = DefaultContentPage(url, contents)
-            return p
-
-    def is_advanced_processing_possible(self):
-        """
-        If we do not have data, but we think we can do better
-        """
-        if not self.response:
-            return True
-
-        status_code = self.response.get_status_code()
-        if status_code == HTTP_STATUS_CODE_CONNECTION_ERROR:
-            return False
-
-        if status_code < 200 or status_code > 404:
-            if self.options.use_basic_crawler():
-                return True
-            else:
-                return False
-
-        if not self.options.use_basic_crawler():
-            return False
-
-        if not self.p:
-            return True
-
-        if self.p and self.p.is_cloudflare_protected():
-            return True
-
-        if not self.p.is_valid():
-            # if we have response, but it is invalid, we may try obtaining contents with more advanced processing
-            return True
-
-        text = self.response.get_text()
-
-        if text == "" or text is None:
-            return True
-
-        return False
-
-    def is_status_code_redirect(self, status_code):
-        return (status_code >= 300 and status_code < 400) or status_code == 403
-
-    def is_html(self):
-        if (
-            self.response
-            and self.response.get_content_type() is not None
-            and self.response.is_content_html()
-        ):
-            return True
-
-    def is_rss(self):
-        if (
-            self.response
-            and self.response.get_content_type() is not None
-            and self.response.is_content_rss()
-        ):
-            return True
-
-    def is_json(self):
-        if (
-            self.response
-            and self.response.get_content_type() is not None
-            and self.response.is_content_json()
-        ):
-            return True
-
-    def get_title(self):
-        if not self.p:
-            return
-        return self.p.get_title()
-
-    def get_description(self):
-        if not self.p:
-            return
-        return self.p.get_description()
-
-    def get_language(self):
-        if not self.p:
-            return
-        return self.p.get_language()
-
-    def get_thumbnail(self):
-        if not self.p:
-            return
-        return self.p.get_thumbnail()
-
-    def get_author(self):
-        if not self.p:
-            return
-        return self.p.get_author()
-
-    def get_album(self):
-        if not self.p:
-            return
-        return self.p.get_album()
-
-    def get_tags(self):
-        if not self.p:
-            return
-        return self.p.get_tags()
-
-    def get_date_published(self):
-        if not self.p:
-            return
-        return self.p.get_date_published()
-
-    def get_properties(self):
-        if not self.p:
-            return
-
-        props = self.p.get_properties()
-        props["status_code"] = self.response.status_code
-        return props
-
-    def get_page_rating_vector(self):
-        result = []
-        if not self.p:
-            return result
-
-        """
-        TODO include this somehow
-        """
-        if self.response:
-            result.append(self.get_page_rating_status_code(self.response.status_code))
-
-        result.extend(self.p.get_page_rating_vector())
-        return result
-
-    def get_page_rating_status_code(self, status_code):
-        rating = 0
-        if status_code == 200:
-            rating += 10
-        elif status_code >= 200 and status_code <= 300:
-            rating += 5
-        elif status_code != 0:
-            rating += 1
-
-        return [rating, 10]
-
-    def get_status_code(self):
-        if not self.response:
-            return PageResponseObject.STATUS_CODE_UNDEF
-
-        return self.response.status_code
-
-    def is_valid(self):
-        if not self.p:
-            return False
-
-        # not valid HTTP response
-        response = self.response
-        if not response or not response.is_valid():
-            return False
-
-        return self.p.is_valid()
-
-    def is_cloudflare_protected(self):
-        if not self.p:
-            return False
-
-        return self.p.is_cloudflare_protected()
-
-    def get_response(self):
-        if self.response:
-            return self.response
-
-        self.get_contents_implementation()
-
-        if self.response:
-            return self.response
-
-    def get_favicon(self):
-        if self.p:
-            if type(self.p) is HtmlPage:
-                favs = self.p.get_favicons()
-                if favs and len(favs) > 0:
-                    return list(favs.keys())[0]
-
-
-class Url(ContentInterface):
-    """
-    Encapsulates data page, and builder to make request
-    """
-
-    def __init__(self, url=None, page_object=None, page_options=None):
-        if page_object:
-            self.url = page_object.url
-        else:
-            self.url = url
-
-        self.options = self.get_init_page_options(page_options)
-
-        self.handler = None
-        self.response = None
-        self.contents = None
-
-    def get_init_page_options(self, initial_options=None):
-        options = PageOptions()
-
-        if initial_options and initial_options.use_headless_browser:
-            options.use_headless_browser = initial_options.use_headless_browser
-        if initial_options and initial_options.use_full_browser:
-            options.use_full_browser = initial_options.use_full_browser
-
-        return options
-
-    def get_contents(self):
-        if self.contents:
-            return self.contents
-
-        self.handler = self.get_handler_implementation()
-        if self.handler:
-            self.contents = self.handler.get_contents()
-            self.response = self.handler.get_response()
-
-            return self.contents
-
-    def get_response(self):
-        if self.response:
-            return self.response
-
-        self.handler = self.get_handler_implementation()
-        if self.handler:
-            self.response = self.handler.get_response()
-            self.contents = self.handler.get_contents()
-
-            return self.response
-
-    def get_handler(self):
-        """
-        This function does not fetch anything by itself
-        """
-        if self.handler:
-            return self.handler
-
-        self.handler = self.get_handler_implementation()
-        return self.handler
-
-    def get_type(url):
-        """
-        Based on link structure identify type.
-        Should provide a faster means of obtaining handler, without the need
-        to obtain the page
-        """
-        # based on link 'appearance'
-
-        page_type = DomainAwarePage(url).get_type()
-
-        if page_type == URL_TYPE_HTML:
-            return HtmlPage(url, "")
-
-        if page_type == URL_TYPE_RSS:
-            return RssPage(url, "")
-
-    def get_handler_implementation(self):
-        contents = None
-        url = self.url
-
-        if url.startswith("https") or url.startswith("http"):
-            return InternetPageHandler(url, page_options=self.options)
-        elif url.startswith("smb") or url.startswith("ftp"):
-            return DefaultContentPage(url)
-
-    def is_url_valid(self):
-        return True
-
-    def is_domain(self):
-        p = DomainAwarePage(self.url)
-        return p.is_domain()
-
-    def get_domain(self):
-        if self.is_domain():
-            return self
-        else:
-            p = DomainAwarePage(self.url)
-            return Url(p.get_domain(), self.p.options)
-
-    def get_robots_txt_url(self):
-        return DomainAwarePage(self.url).get_robots_txt_url()
-
-    def get_favicon(self):
-        self.get_response()
-        if not self.response:
-            return
-
-        if not self.url:
-            return
-
-        p = DomainAwarePage(self.url)
-        if not p.is_web_link():
-            return
-
-        if self.handler:
-            favicon = self.handler.get_favicon()
-            if favicon:
-                return favicon
-
-        p = DomainAwarePage(self.url)
-        if p.is_domain():
-            return
-
-        domain = p.get_domain()
-        url = Url(domain)
-
-        return url.get_favicon()
-
-    def is_web_link(url):
-        p = DomainAwarePage(url)
-        return p.is_web_link()
-
-    def get_cleaned_link(url):
-        if not url:
-            return
-
-        if url.endswith("/"):
-            url = url[:-1]
-        if url.endswith("."):
-            url = url[:-1]
-
-        # domain is lowercase
-        p = DomainAwarePage(url)
-        domain = p.get_domain()
-        if not domain:
-            WebLogger.error("Could not obtain domain for:{}".format(url))
-            return
-
-        domain_lower = domain.lower()
-
-        url = domain_lower + url[len(domain) :]
-        return url
-
-    def get_domain_info(self):
-        return DomainCache.get_object(self.url)
-
-    def download_all(url):
-        from .programwrappers.wget import Wget
-
-        wget = Wget(url)
-        wget.download_all()
-
-    def __str__(self):
-        return "{}".format(self.options)
-
-    def is_valid(self):
-        if not self.handler:
-            return False
-
-        if not self.is_url_valid():
-            return False
-
-        if self.response is None:
-            return False
-
-        if self.response and not self.response.is_valid():
-            return False
-
-        if not self.handler.is_valid():
-            return False
-
-        return True
-
-    def get_title(self):
-        if self.handler:
-            return self.handler.get_title()
-
-    def get_description(self):
-        if self.handler:
-            return self.handler.get_description()
-
-    def get_language(self):
-        if self.handler:
-            return self.handler.get_language()
-
-    def get_thumbnail(self):
-        if self.handler:
-            return self.handler.get_thumbnail()
-
-    def get_author(self):
-        if self.handler:
-            return self.handler.get_author()
-
-    def get_album(self):
-        if self.handler:
-            return self.handler.get_album()
-
-    def get_tags(self):
-        if self.handler:
-            return self.handler.get_tags()
-
-    def get_date_published(self):
-        if self.handler:
-            return self.handler.get_date_published()
-
-    def get_status_code(self):
-        if self.response:
-            return self.response.get_status_code()
-
-        return 0
-
-
-class DomainCacheInfo(object):
-    """
-    is_access_valid
-    """
-
-    def __init__(self, url, respect_robots_txt=True):
-        p = DomainAwarePage(url)
-
-        self.respect_robots_txt = respect_robots_txt
-
-        self.url = p.get_domain()
-        self.robots_contents = None
-
-        if self.respect_robots_txt:
-            self.robots_contents = self.get_robots_txt_contents()
-            self.robots = self.get_robots_txt()
-
-    def is_allowed(self, url):
-        if self.respect_robots_txt and self.robots:
-            user_agent = "*"
-            return self.robots.can_fetch(user_agent, url)
-        else:
-            return True
-
-    def get_robots_txt_url(self):
-        p = DomainAwarePage(self.url)
-        return p.get_robots_txt_url()
-
-    def get_robots_txt(self):
-        """
-        https://developers.google.com/search/docs/crawling-indexing/robots/intro
-        """
-        contents = self.get_robots_txt_contents()
-        if contents:
-            rp = urllib.robotparser.RobotFileParser()
-            rp.set_url(self.get_robots_txt_url())
-            rp.parse(contents.split("\n"))
-            return rp
-
-    def is_robots_txt(self):
-        return self.get_robots_txt_contents()
-
-    def get_robots_txt_contents(self):
-        """
-        We can only ask domain for robots
-        """
-        if self.robots_contents:
-            return self.robots_contents
-
-        robots_url = self.get_robots_txt_url()
-        p = RequestBuilder(robots_url)
-        self.robots_contents = p.get_text()
-
-        return self.robots_contents
-
-    def get_site_maps_urls(self):
-        """
-        https://stackoverflow.com/questions/2978144/pythons-robotparser-ignoring-sitemaps
-        robot parser does not work. We have to do it manually
-        """
-        result = set()
-
-        contents = self.get_robots_txt_contents()
-        if contents:
-            lines = contents.split("\n")
-            for line in lines:
-                line = line.replace("\r", "")
-                wh = line.find("Sitemap")
-                if wh >= 0:
-                    wh2 = line.find(":")
-                    if wh2 >= 0:
-                        sitemap = line[wh2 + 1 :].strip()
-                        result.add(sitemap)
-
-        return list(result)
-
-    def get_site_urls(self):
-        result = []
-
-        contents = self.get_robots_txt_contents()
-        if contents:
-            lines = contents.split("\n")
-            for line in lines:
-                if line.find("Disallow") >= 0 or line.find("Allow") >= 0:
-                    link = process_allow_link(line)
-                    result.append(link)
-
-        urls = self.get_site_maps_urls()
-        for url in urls:
-            p = RequestBuilder(url=url)
-            contents = p.get_text()
-            if contents:
-                parser = ContentLinkParser(url, contents)
-                parser = ContentLinkParser(self.url, contents)
-                links = parser.get_links()
-
-                result.extend(links)
-
-        return result
-
-    def process_allow_link(self, line):
-        wh = line.find(":")
-        if wh >= 0:
-            part = line[wh + 1 :].strip()
-            # robots can have wildcards, we cannot now what kind of location it is
-            if part.find("*") == -1:
-                return self.url + part
-
-    def get_all_site_maps_urls(self):
-        sites = set(self.get_site_maps_urls())
-
-        for site in sites:
-            subordinate_sites = self.get_subordinate_sites(site)
-            sites.update(subordinate_sites)
-
-        return list(sites)
-
-    def get_subordinate_sites(self, site):
-        all_subordinates = set()
-
-        b = RequestBuilder(site)
-        contents = b.get_text()
-
-        # check if it is sitemap / sitemap index
-        # https://www.sitemaps.org/protocol.html#index
-        if contents.find("<urlset") == -1 and contents.find("<sitemapindex") == -1:
-            return all_subordinates
-
-        p = ContentLinkParser(self.url, contents)
-        links = p.get_links()
-
-        for link in links:
-            subordinates = self.get_subordinate_sites(link)
-            all_subordinates.update(subordinates)
-
-        return all_subordinates
-
-
-class DomainCache(object):
-    """
-    DomainCache.get_object("https://youtube.com/mysite/something").is_allowed("url")
-    Url().get_domain_cache().is_allowed()
-    """
-
-    object = None
-    default_cache_size = 400  # 400 domains
-    respect_robots_txt = True
-
-    def get_object(domain_url):
-        if DomainCache.object is None:
-            DomainCache.object = DomainCache(
-                DomainCache.default_cache_size, respect_robots_txt=True
-            )
-
-        return DomainCache.object.get_domain_info(domain_url)
-
-    def __init__(self, cache_size=400, respect_robots_txt=True):
-        """
-        @note Not public
-        """
-        self.cache_size = cache_size
-        self.cache = {}
-        self.respect_robots_txt = respect_robots_txt
-
-    def get_domain_info(self, input_url):
-        domain_url = DomainAwarePage(input_url).get_domain_only()
-
-        if not domain_url in self.cache:
-            self.remove_from_cache()
-            self.cache[domain_url] = {
-                "date": DateUtils.get_datetime_now_utc(),
-                "domain": self.read_info(domain_url),
-            }
-
-        return self.cache[domain_url]["domain"]
-
-    def read_info(self, domain_url):
-        return DomainCacheInfo(domain_url, self.respect_robots_txt)
-
-    def remove_from_cache(self):
-        if len(self.cache) < self.cache_size:
-            return
-
-        thelist = []
-        for domain in self.cache:
-            info = self.cache[domain]
-            thelist.append([domain, info["date"], info["domain"]])
-
-        thelist.sort(key=lambda x: x[1])
-        thelist = thelist[-self.cache_size : -1]
-
-        self.cache.clear()
-
-        for item in thelist:
-            self.cache[item[0]] = {"date": item[1], "domain": item[2]}
 
 
 class InputContent(object):

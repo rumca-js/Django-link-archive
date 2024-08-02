@@ -14,10 +14,8 @@ from sqlmodel import SqlModel
 from dateutil import parser
 
 
-
 class DirReader(object):
-
-    def __init__(self, source_files_directory, accepted_extensions = None):
+    def __init__(self, source_files_directory, accepted_extensions=None):
         self.dir = source_files_directory
         if accepted_extensions is None:
             self.accepted_extensions = [".json"]
@@ -38,10 +36,11 @@ class Converter(object):
     """
     Performs actual conversion between file and database
     """
+
     def __init__(self, db_conn, parser):
         self.conn = db_conn
         self.parser = parser
-        self.file_reader = DirReader(source_files_directory = parser.dir)
+        self.file_reader = DirReader(source_files_directory=parser.dir)
         self.files = self.file_reader.get_files()
 
     def convert(self):
@@ -70,12 +69,24 @@ class Converter(object):
                 if self.is_entry_to_be_added(entry):
                     if self.conn.add_entry(entry):
                         if self.parser.args.verbose:
-                            print(" -> [{}/{}] Link:{} Added".format(row, total_rows, entry["link"]))
+                            print(
+                                " -> [{}/{}] Link:{} Added".format(
+                                    row, total_rows, entry["link"]
+                                )
+                            )
                     else:
-                        print(" -> [{}/{}] Link:{} NOT Added".format(row, total_rows, entry["link"]))
+                        print(
+                            " -> [{}/{}] Link:{} NOT Added".format(
+                                row, total_rows, entry["link"]
+                            )
+                        )
                 else:
                     if self.parser.args.verbose:
-                        print(" -> [{}/{}] Link:{} Skipped".format(row, total_rows, entry["link"]))
+                        print(
+                            " -> [{}/{}] Link:{} Skipped".format(
+                                row, total_rows, entry["link"]
+                            )
+                        )
 
     def is_entry_to_be_added(self, entry):
         # entry already exists
@@ -109,17 +120,20 @@ class Converter(object):
 
 
 class Parser(object):
-
     def parse(self):
         self.parser = argparse.ArgumentParser(description="Data converter program")
         self.parser.add_argument("--dir", help="Directory to be scanned")
         self.parser.add_argument("--output-file", help="Output file")
-        self.parser.add_argument("--preserve-id", action="store_true", help="Preserves ID of objects")
+        self.parser.add_argument(
+            "--preserve-id", action="store_true", help="Preserves ID of objects"
+        )
         self.parser.add_argument("--vote-min", help="Minimum amount of entry vote")
-        self.parser.add_argument("--language", help="Accept language") # TODO implement
-        self.parser.add_argument("--entries", help="Convert entries") # TODO implement
-        self.parser.add_argument("--sources", help="Convert sources") # TODO implement
-        self.parser.add_argument("--verbose", action="store_true", help="Shows more info")
+        self.parser.add_argument("--language", help="Accept language")  # TODO implement
+        self.parser.add_argument("--entries", help="Convert entries")  # TODO implement
+        self.parser.add_argument("--sources", help="Convert sources")  # TODO implement
+        self.parser.add_argument(
+            "--verbose", action="store_true", help="Shows more info"
+        )
 
         self.args = self.parser.parse_args()
 
@@ -149,7 +163,7 @@ def main():
     parser = Parser()
     parser.parse()
 
-    db = SqlModel(db_file = parser.output_file)
+    db = SqlModel(db_file=parser.output_file)
 
     try:
         start_time = time.time()
@@ -169,5 +183,6 @@ def main():
 
     db.close()
     print("Processing DONE")
+
 
 main()

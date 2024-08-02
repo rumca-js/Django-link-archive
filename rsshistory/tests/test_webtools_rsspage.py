@@ -1,7 +1,7 @@
 from datetime import datetime
 import hashlib
 
-from ..webtools import RssPage, RequestBuilder, calculate_hash
+from ..webtools import RssPage, calculate_hash
 
 from .fakeinternet import FakeInternetTestCase, MockRequestCounter
 from .fakeinternetdata import (
@@ -100,7 +100,7 @@ class RssPageTest(FakeInternetTestCase):
     def test_entries(self):
         # default language
         reader = RssPage("https://linkedin.com/test", webpage_rss)
-        entries = reader.get_container_elements()
+        entries = reader.get_entries()
         entries = list(entries)
         self.assertEqual(len(entries), 15)
 
@@ -114,7 +114,7 @@ class RssPageTest(FakeInternetTestCase):
     def test_entry_old_date(self):
         # default language
         reader = RssPage("https://linkedin.com/test", webpage_old_pubdate_rss)
-        entries = reader.get_container_elements()
+        entries = reader.get_entries()
         entries = list(entries)
         self.assertEqual(len(entries), 1)
 
@@ -129,7 +129,7 @@ class RssPageTest(FakeInternetTestCase):
     def test_entry_no_date(self):
         # default language
         reader = RssPage("https://linkedin.com/test", webpage_no_pubdate_rss)
-        entries = reader.get_container_elements()
+        entries = reader.get_entries()
         entries = list(entries)
 
         self.assertEqual(len(entries), 1)
@@ -147,7 +147,7 @@ class RssPageTest(FakeInternetTestCase):
     def test_entry_page_rating(self):
         # default language
         reader = RssPage("https://linkedin.com/test", webpage_no_pubdate_rss)
-        entries = reader.get_container_elements()
+        entries = reader.get_entries()
         entries = list(entries)
 
         self.assertEqual(len(entries), 1)
@@ -167,7 +167,7 @@ class RssPageTest(FakeInternetTestCase):
     def test_rss_is_valid_true(self):
         # default language
         reader = RssPage("https://linkedin.com/test", webpage_old_pubdate_rss)
-        entries = reader.get_container_elements()
+        entries = reader.get_entries()
         self.assertTrue(reader.is_valid())
 
         self.assertEqual(MockRequestCounter.mock_page_requests, 0)

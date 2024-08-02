@@ -55,7 +55,7 @@ class EntriesCleanupTest(FakeInternetTestCase):
 
         ob = LinkDataController.objects.create(
             source="https://youtube.com",
-            source_obj = source_youtube,
+            source_obj=source_youtube,
             link="https://youtube.com?v=bookmarked",
             title="The first link",
             bookmarked=True,
@@ -67,7 +67,7 @@ class EntriesCleanupTest(FakeInternetTestCase):
 
         ob = LinkDataController.objects.create(
             source="https://youtube.com",
-            source_obj = source_youtube,
+            source_obj=source_youtube,
             link="https://youtube.com?v=nonbookmarked",
             title="The second link",
             bookmarked=False,
@@ -78,7 +78,7 @@ class EntriesCleanupTest(FakeInternetTestCase):
 
         ob = LinkDataController.objects.create(
             source="https://youtube.com",
-            source_obj = source_youtube,
+            source_obj=source_youtube,
             link="https://youtube.com?v=permanent",
             title="The first link",
             permanent=True,

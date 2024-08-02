@@ -300,7 +300,7 @@ class CodeProjectPluginTest(FakeInternetTestCase):
         parser = CodeProjectPlugin(self.source_codeproject.id)
         BackgroundJobController.objects.all().delete()
 
-        props = list(parser.get_container_elements())
+        props = list(parser.get_entries())
 
         self.assertTrue(len(props) > 0)
         self.assertEqual(

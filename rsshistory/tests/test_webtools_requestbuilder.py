@@ -1,5 +1,5 @@
 import hashlib
-from ..webtools import RequestBuilder, InputContent, PageOptions, calculate_hash
+from ..webtools import HttpRequestBuilder, InputContent, PageOptions, calculate_hash
 
 from .fakeinternet import FakeInternetTestCase
 
@@ -125,13 +125,13 @@ class PageOptionsTest(FakeInternetTestCase):
         self.assertTrue(o.use_basic_crawler())
 
 
-class RequestBuilderTest(FakeInternetTestCase):
+class HttpRequestBuilderTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 
     def test_calculate_hash(self):
         self.assertEqual(
-            RequestBuilder.calculate_hash(webpage_links),
+            HttpRequestBuilder.calculate_hash(webpage_links),
             hashlib.md5(text.encode("utf-8")).digest(),
         )
 

@@ -48,7 +48,7 @@ class BaseParsePlugin(SourceGenericPlugin):
 
         return props
 
-    def get_container_elements(self):
+    def get_entries(self):
         links_str_vec = self.get_links()
         num_entries = len(links_str_vec)
 

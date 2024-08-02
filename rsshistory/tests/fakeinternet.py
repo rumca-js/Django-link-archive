@@ -12,12 +12,15 @@ from django.contrib.auth.models import User
 
 from ..models import AppLogging, ConfigurationEntry
 from ..dateutils import DateUtils
-from ..webtools import RequestBuilder, PageResponseObject, WebLogger
+from ..webtools import HttpRequestBuilder, PageResponseObject, WebLogger
 from ..configuration import Configuration
 
-from ..pluginurl.urlhandler import UrlHandler
-from ..pluginurl.handlervideoyoutube import YouTubeVideoHandler, YouTubeJsonHandler
-from ..pluginurl.handlerchannelyoutube import YouTubeChannelHandler
+from ..webtools import (
+    YouTubeVideoHandler,
+    YouTubeJsonHandler,
+    YouTubeChannelHandler,
+    Url,
+)
 
 
 from .fakeinternetdata import (
@@ -294,7 +297,9 @@ class TestResponseObject(PageResponseObject):
         if url.startswith("https://www.youtube.com/user/linustechtips"):
             return youtube_channel_html_linus_tech_tips
 
-        if url.startswith("https://www.youtube.com/feeds/videos.xml?channel_id=UCXuqSBlHAE6Xw-yeJA0Tunw"):
+        if url.startswith(
+            "https://www.youtube.com/feeds/videos.xml?channel_id=UCXuqSBlHAE6Xw-yeJA0Tunw"
+        ):
             return youtube_channel_rss_linus_tech_tips
 
         if url.startswith("https://www.youtube.com/feeds"):
@@ -331,7 +336,7 @@ class TestResponseObject(PageResponseObject):
         if url.startswith("https://cppcast.com/feed.rss"):
             return webpage_samtime_youtube_rss
 
-        elif url == "https://multiple-favicons/page.html":
+        elif url == "https://multiple-favicons.com/page.html":
             return webpage_html_favicon
 
         elif url == "https://rsspage.com/rss.xml":
@@ -531,7 +536,9 @@ class FakeInternetTestCase(TestCase):
         super().__init__(*args, **kwargs)
         MockRequestCounter.mock_page_requests = 0
 
-    def get_contents_function(self, url=None, headers = None, timeout_s = 10, ping=False, request=None):
+    def get_contents_function(
+        self, url=None, headers=None, timeout_s=10, ping=False, request=None
+    ):
         MockRequestCounter.mock_page_requests += 1
 
         if not request:
@@ -545,14 +552,14 @@ class FakeInternetTestCase(TestCase):
         return TestResponseObject(request.url, request.headers, request.timeout_s)
 
     def disable_web_pages(self):
-        RequestBuilder.get_contents_function = self.get_contents_function
+        HttpRequestBuilder.get_contents_function = self.get_contents_function
 
-        # UrlHandler.youtube_video_handler = YouTubeVideoHandlerMock
-        UrlHandler.youtube_video_handler = YouTubeJsonHandlerMock
+        # Url.youtube_video_handler = YouTubeVideoHandlerMock
+        Url.youtube_video_handler = YouTubeJsonHandlerMock
         # channel uses RSS page to obtain data. We do not need to mock it
-        # UrlHandler.youtube_channel_handler = YouTubeChannelHandlerMock
-        # UrlHandler.odysee_video_handler = YouTubeVideoHandlerMock
-        # UrlHandler.odysee_channel_handler = YouTubeVideoHandlerMock
+        # Url.youtube_channel_handler = YouTubeChannelHandlerMock
+        # Url.odysee_video_handler = YouTubeVideoHandlerMock
+        # Url.odysee_channel_handler = YouTubeVideoHandlerMock
 
         WebLogger.web_logger = AppLogging
 

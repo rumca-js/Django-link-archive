@@ -1,19 +1,22 @@
+import traceback
+
 from .defaulturlhandler import DefaultUrlHandler
-from ..webtools import RssPage, Url, PageResponseObject
-from ..models import AppLogging
+from .webtools import RssPage, PageResponseObject
+from .handlerhttppage import HttpPageHandler
 
 
 class YouTubeChannelHandler(RssPage, DefaultUrlHandler):
     """
     Natively since we inherit RssPage, the contents should be RssPage
     """
+
     def __init__(self, url=None, contents=None):
+        self.html = None  # channel html page contains useful info
+
         super().__init__(
             url,
             contents=contents,
         )
-
-        self.html_page = None # channel html page contains useful info
 
         if url:
             self.code = self.input2code(url)
@@ -43,23 +46,42 @@ class YouTubeChannelHandler(RssPage, DefaultUrlHandler):
             return self.input2code_feeds(url)
 
     def get_html_page(self, url):
-        from .urlhandler import UrlHandler
+        if self.html:
+            handler = self.html.get_handler()
+            if not handler:
+                return
 
-        if self.html_page:
-            return self.html_page
+            if not handler.p:
+                return
 
-        options = UrlHandler.get_url_options(url)
-        u = Url(url, page_options=options)
+            return handler.p
+
+        else:
+            self.fetch_html_page(url)
+
+            if self.html:
+                handler = self.html.get_handler()
+                if not handler:
+                    return
+
+                if not handler.p:
+                    return
+
+                return handler.p
+
+    def fetch_html_page(self, url):
+        from .url import Url
+
+        options = Url.get_url_options(url)
+        u = Url(url, page_options=options, handler_class=HttpPageHandler)
         u.get_response()
-        self.html_page = u.handler.p
-        return self.html_page
+        self.html = u
 
     def input2code_handle(self, url):
-        if not self.html_page:
-            self.get_html_page(url)
+        html_page = self.get_html_page(url)
 
-        if self.html_page:
-            return self.html_page.get_schema_field("identifier")
+        if html_page:
+            return html_page.get_schema_field("identifier")
 
     def input2code_channel(self, url):
         wh = url.rfind("/")
@@ -100,19 +122,21 @@ class YouTubeChannelHandler(RssPage, DefaultUrlHandler):
             return self.response.get_text()
 
     def get_response(self):
-        from .urlhandler import UrlHandler
+        from .url import Url
 
         if self.response:
             return self.response
 
         feed_url = self.get_channel_feed_url()
         if not feed_url:
-            AppLogging.error("Url:{} Cannot read YouTube channel feed URL".format(self.url))
+            AppLogging.error(
+                "Url:{} Cannot read YouTube channel feed URL".format(self.url)
+            )
             self.dead = True
             return
 
-        options = UrlHandler.get_url_options(feed_url)
-        u = Url(feed_url, page_options=options)
+        options = Url.get_url_options(feed_url)
+        u = Url(feed_url, page_options=options, handler_class=HttpPageHandler)
         self.response = u.get_response()
 
         if (
@@ -128,10 +152,9 @@ class YouTubeChannelHandler(RssPage, DefaultUrlHandler):
             return self.response
 
     def get_thumbnail(self):
-        if not self.html_page:
-            channel_url = self.get_channel_url()
-            if channel_url:
-                self.get_html_page(channel_url)
+        channel_url = self.get_channel_url()
+        if channel_url:
+            html_page = self.get_html_page(channel_url)
 
-        if self.html_page:
-            return self.html_page.get_thumbnail()
+            if html_page:
+                return html_page.get_thumbnail()

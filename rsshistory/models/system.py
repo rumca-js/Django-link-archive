@@ -62,7 +62,9 @@ class ConfigurationEntry(models.Model):
         help_text="Instance description",
     )
 
-    admin_user = models.CharField(max_length=500, default="admin", blank=True, help_text="Admin user name")
+    admin_user = models.CharField(
+        max_length=500, default="admin", blank=True, help_text="Admin user name"
+    )
 
     access_type = models.CharField(
         max_length=100,
@@ -252,7 +254,10 @@ class ConfigurationEntry(models.Model):
         help_text="Use robots.txt information. Some functionality can not work: for example YouTube channels",
     )
 
-    crawling_server_port = models.IntegerField(default=0, help_text=f"If this port is configured, then advanced crawling occurs through this server. 0 means not configured. By default server uses {DEFAULT_PORT}")
+    crawling_server_port = models.IntegerField(
+        default=0,
+        help_text=f"If this port is configured, then advanced crawling occurs through this server. 0 means not configured. By default server uses {DEFAULT_PORT}",
+    )
 
     crawling_headless_script = models.CharField(
         blank=True,
@@ -363,7 +368,7 @@ class ConfigurationEntry(models.Model):
         Fix errors here
         """
 
-        users = User.objects.filter(username = self.admin_user)
+        users = User.objects.filter(username=self.admin_user)
         if users.count() == 0:
             self.admin_user = ""
 
@@ -488,14 +493,17 @@ class SystemOperation(models.Model):
         if c.background_tasks:
             # I assume at least one check should be made
             if SystemOperation.get_last_internet_check():
-                delta = DateUtils.get_datetime_now_utc() - SystemOperation.get_last_internet_check()
+                delta = (
+                    DateUtils.get_datetime_now_utc()
+                    - SystemOperation.get_last_internet_check()
+                )
 
-                hours_limit = 3600 # TODO hardcoded refresh task should be running more often than 1 hour?
+                hours_limit = 3600  # TODO hardcoded refresh task should be running more often than 1 hour?
 
                 if delta.total_seconds() > hours_limit:
                     status_is_valid = False
 
-            hours_limit = 3*3600 # processing task can push things to git
+            hours_limit = 3 * 3600  # processing task can push things to git
 
             thread_ids = SystemOperation.get_thread_ids()
 

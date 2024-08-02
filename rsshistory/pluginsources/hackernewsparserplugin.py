@@ -21,8 +21,8 @@ class HackerNewsParserPlugin(BaseRssPlugin):
     def __init__(self, source_id):
         super().__init__(source_id)
 
-    def get_container_elements(self):
-        props = super().get_container_elements()
+    def get_entries(self):
+        props = super().get_entries()
 
         for prop in props:
             yield prop

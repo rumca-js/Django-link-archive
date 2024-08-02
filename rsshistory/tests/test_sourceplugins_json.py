@@ -19,7 +19,7 @@ class BaseJsonPluginTest(FakeInternetTestCase):
             is_superuser=True,
         )
 
-    def test_get_container_elements_source(self):
+    def test_get_entries__source(self):
         LinkDataController.objects.all().delete()
 
         self.source_obj = SourceDataController.objects.create(
@@ -32,7 +32,7 @@ class BaseJsonPluginTest(FakeInternetTestCase):
 
         plugin = BaseSourceJsonPlugin(self.source_obj.id)
         # call tested function
-        props = plugin.get_container_elements()
+        props = plugin.get_entries()
 
         self.print_errors()
 
@@ -43,7 +43,7 @@ class BaseJsonPluginTest(FakeInternetTestCase):
         self.assertEqual(entries.count(), 1)
         self.assertEqual(entries[0].source, "https://www.lemonde.fr/en/rss/une.xml")
 
-    def test_get_container_elements_links(self):
+    def test_get_entries__links(self):
         LinkDataController.objects.all().delete()
 
         self.source_obj = SourceDataController.objects.create(
@@ -56,7 +56,7 @@ class BaseJsonPluginTest(FakeInternetTestCase):
 
         plugin = BaseSourceJsonPlugin(self.source_obj.id)
         # call tested function
-        props = plugin.get_container_elements()
+        props = plugin.get_entries()
 
         self.print_errors()
 
@@ -67,7 +67,7 @@ class BaseJsonPluginTest(FakeInternetTestCase):
         self.assertEqual(entries.count(), 1)
         self.assertEqual(entries[0].source, "https://www.lemonde.fr/en/rss/une.xml")
 
-    def test_get_container_elements_sources(self):
+    def test_get_entries__sources(self):
         config = Configuration.get_object().config_entry
         config.accept_not_domain_entries = True
         config.accept_domains = False
@@ -89,7 +89,7 @@ class BaseJsonPluginTest(FakeInternetTestCase):
 
         plugin = BaseSourceJsonPlugin(self.source_obj.id)
         # call tested function
-        props = plugin.get_container_elements()
+        props = plugin.get_entries()
 
         sources = SourceDataController.objects.all().order_by("-enabled")
         for source in sources:

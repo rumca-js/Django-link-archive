@@ -1,6 +1,6 @@
 from ..pluginurl.urlhandler import UrlHandler
-from ..pluginurl.handlervideoyoutube import YouTubeVideoHandler
-from ..webtools import RssPage, HtmlPage, InternetPageHandler
+from ..webtools import YouTubeVideoHandler
+from ..webtools import RssPage, HtmlPage, HttpPageHandler
 
 from .fakeinternet import FakeInternetTestCase
 
@@ -14,7 +14,7 @@ class UrlHandlerTest(FakeInternetTestCase):
         handler.get_response()
 
         self.assertTrue(handler.is_valid())
-        self.assertEqual(type(handler.get_handler()), InternetPageHandler)
+        self.assertEqual(type(handler.get_handler()), HttpPageHandler)
         self.assertEqual(type(handler.get_handler().p), RssPage)
 
     def test_get_html(self):
@@ -22,7 +22,7 @@ class UrlHandlerTest(FakeInternetTestCase):
         handler.get_response()
 
         self.assertTrue(handler.is_valid())
-        self.assertEqual(type(handler.get_handler()), InternetPageHandler)
+        self.assertEqual(type(handler.get_handler()), HttpPageHandler)
         self.assertEqual(type(handler.get_handler().p), HtmlPage)
 
     def test_get_youtube_video(self):
@@ -79,7 +79,7 @@ class UrlHandlerTest(FakeInternetTestCase):
         handler = UrlHandler("https://open.spotify.com/somebody/episodes")
         handler.get_response()
 
-        self.assertEqual(type(handler.get_handler()), InternetPageHandler)
+        self.assertEqual(type(handler.get_handler()), HttpPageHandler)
         self.assertEqual(type(handler.get_handler().p), HtmlPage)
 
         self.assertTrue(handler.options.use_headless_browser)
@@ -88,7 +88,7 @@ class UrlHandlerTest(FakeInternetTestCase):
         handler = UrlHandler("https://www.warhammer-community.com")
         handler.get_response()
 
-        self.assertEqual(type(handler.get_handler()), InternetPageHandler)
+        self.assertEqual(type(handler.get_handler()), HttpPageHandler)
         self.assertEqual(type(handler.get_handler().p), HtmlPage)
 
         self.assertTrue(handler.options.use_full_browser)
@@ -97,7 +97,7 @@ class UrlHandlerTest(FakeInternetTestCase):
         handler = UrlHandler("https://defcon.org")
         handler.get_response()
 
-        self.assertEqual(type(handler.get_handler()), InternetPageHandler)
+        self.assertEqual(type(handler.get_handler()), HttpPageHandler)
         self.assertEqual(type(handler.get_handler().p), HtmlPage)
 
         self.assertTrue(handler.options.use_full_browser)

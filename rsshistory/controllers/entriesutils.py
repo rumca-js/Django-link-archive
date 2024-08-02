@@ -16,7 +16,7 @@ from ..models import (
 )
 from ..configuration import Configuration
 from ..webtools import (
-    RequestBuilder,
+    HttpRequestBuilder,
     HtmlPage,
     RssPage,
     ContentLinkParser,
@@ -1184,11 +1184,11 @@ class EntryWrapper(object):
         if entry.is_https():
             http_url = entry.get_http_url()
 
-            p = RequestBuilder(url=entry.link)
+            p = HttpRequestBuilder(url=entry.link)
             ping_status = p.ping()
 
             if not ping_status:
-                p = RequestBuilder(url=http_url)
+                p = HttpRequestBuilder(url=http_url)
                 new_ping_status = p.ping()
 
                 if new_ping_status:
@@ -1199,7 +1199,7 @@ class EntryWrapper(object):
         if entry.is_http():
             https_url = entry.get_https_url()
 
-            p = RequestBuilder(https_url)
+            p = HttpRequestBuilder(https_url)
             new_ping_status = p.ping()
 
             if new_ping_status:
@@ -1233,7 +1233,7 @@ class EntryWrapper(object):
 
         destination_link = entry.link.replace("www.", "")
 
-        p = RequestBuilder(url=destination_link)
+        p = HttpRequestBuilder(url=destination_link)
         if p.ping():
             self.move_entry_to_url(destination_link)
 

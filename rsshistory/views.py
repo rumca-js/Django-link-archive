@@ -10,7 +10,7 @@ from .configuration import Configuration
 from .apps import LinkDatabase
 from .configuration import Configuration
 from .pluginurl.urlhandler import UrlHandler
-from .webtools import HtmlPage, RssPage, InternetPageHandler
+from .webtools import HtmlPage, RssPage, HttpPageHandler
 
 
 class ViewPage(object):
@@ -150,6 +150,6 @@ class ViewPage(object):
             type(urlhandler.get_handler()) == UrlHandler.odysee_channel_handler
         )
 
-        if type(urlhandler.get_handler()) == InternetPageHandler:
+        if type(urlhandler.get_handler()) == HttpPageHandler:
             context["is_html"] = type(urlhandler.get_handler().p) == HtmlPage
             context["is_rss"] = type(urlhandler.get_handler().p) == RssPage

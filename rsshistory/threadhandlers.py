@@ -55,7 +55,7 @@ from .controllers import (
 )
 from .configuration import Configuration
 from .dateutils import DateUtils
-from .webtools import HtmlPage, DomainAwarePage, ContentLinkParser, RequestBuilder
+from .webtools import HtmlPage, DomainAwarePage, ContentLinkParser
 from .pluginurl import UrlHandler
 
 
@@ -136,15 +136,15 @@ class ProcessSourceJobHandler(BaseJobHandler):
             if plugin:
                 if plugin.check_for_data():
                     elapsed_sec = self.get_time_diff()
-                    AppLogging.debug(
-                        "Url:{}. Time:{}".format(source.url, elapsed_sec)
-                    )
+                    AppLogging.debug("Url:{}. Time:{}".format(source.url, elapsed_sec))
 
                     return True
                 return True
 
             AppLogging.error(
-                    "Source:{}. Cannot find controller plugin for source".format(obj.subject)
+                "Source:{}. Cannot find controller plugin for source".format(
+                    obj.subject
+                )
             )
             return False
 

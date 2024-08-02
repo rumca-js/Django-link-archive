@@ -23,7 +23,7 @@ class DomainParserPlugin(BaseParsePlugin):
     def is_link_valid(self, link):
         return True
 
-    def get_container_elements(self):
+    def get_entries(self):
         domains_vec = self.get_domains()
         num_entries = len(domains_vec)
 

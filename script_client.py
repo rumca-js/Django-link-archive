@@ -5,7 +5,7 @@ import socket
 import argparse
 import json
 
-from rsshistory import ipc
+from rsshistory.webtools import ipc
 
 
 def client_program(parser):
@@ -22,13 +22,15 @@ def client_program(parser):
         print(f"Connect to host at port {port}")
 
     message = ""
-    while message.lower().strip() != 'bye':
+    while message.lower().strip() != "bye":
         message = input(" -> ")
 
         c.send_command_string("PageRequestObject.__init__", "OK")
         c.send_command_string("PageRequestObject.url", message)
         c.send_command_string("PageRequestObject.timeout", "15")
-        c.send_command_string("PageRequestObject.script", "poetry run python crawleebeautifulsoup.py")
+        c.send_command_string(
+            "PageRequestObject.script", "poetry run python crawleebeautifulsoup.py"
+        )
         c.send_command_string("PageRequestObject.__del__", "OK")
 
         while True:
@@ -80,7 +82,7 @@ class Parser(object):
         return True
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     p = Parser()
     p.parse()
 

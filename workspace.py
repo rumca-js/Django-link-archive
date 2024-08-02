@@ -16,20 +16,21 @@ def get_source_files(path):
     result_files = []
 
     for root, dirs, files in os.walk(str(path), topdown=False):
-       for name in files:
-           file_name = os.path.join(root, name)
-           result_files.append(Path(file_name))
+        for name in files:
+            file_name = os.path.join(root, name)
+            result_files.append(Path(file_name))
 
     return result_files
 
 
 class FileConverter(object):
-
     def __init__(self, source_file):
         self.abs_source_file = source_file
 
     def convert(self, source_app, destination_app):
-        destination_abs_file_name = self.get_destination_full_name(source_app, destination_app)
+        destination_abs_file_name = self.get_destination_full_name(
+            source_app, destination_app
+        )
 
         destination_abs_file_name.parent.mkdir(parents=True, exist_ok=True)
 
@@ -43,7 +44,9 @@ class FileConverter(object):
             destination_abs_file_name.write_bytes(original_contents)
 
     def copy(self, source_app, destination_app, overwrite=False):
-        destination_abs_file_name = self.get_destination_full_name(source_app, destination_app)
+        destination_abs_file_name = self.get_destination_full_name(
+            source_app, destination_app
+        )
 
         if destination_abs_file_name.exists():
             return
@@ -60,8 +63,10 @@ class FileConverter(object):
         return Path(destionation_path)
 
     def is_convert_ok(self):
-        if str(self.abs_source_file).find("__pycache__") >= 0 or \
-           str(self.abs_source_file).find("migrations") >= 0:
+        if (
+            str(self.abs_source_file).find("__pycache__") >= 0
+            or str(self.abs_source_file).find("migrations") >= 0
+        ):
             return False
         return True
 
@@ -76,7 +81,6 @@ def remove_path(path):
 
 
 class Snapshot(object):
-
     def __init__(self):
         self.files_data = []
 
@@ -105,7 +109,7 @@ def update_workspace(source_app, destination_app):
 
     snapshot = Snapshot()
     snapshot.add(Path(destination_app) / "migrations")
-    snapshot.add(Path(destination_app) / "static" / destination_app / "icons" )
+    snapshot.add(Path(destination_app) / "static" / destination_app / "icons")
 
     remove_path(destination_app)
 
@@ -139,7 +143,7 @@ def create_workspace(source_app, destination_app):
             conv.convert(source_app, str(destination_app))
 
     migration_path = destination_app / "migrations"
-    migration_path.mkdir(parents = True, exist_ok = True)
+    migration_path.mkdir(parents=True, exist_ok=True)
     migration_path_file = migration_path / "__init__.py"
     migration_path_file.touch()
 
@@ -152,19 +156,17 @@ def get_workspaces():
     for item in items_in_dir:
         full_path_item = item + "/apps.py"
         if os.path.isfile(full_path_item):
-             result.append(item)
+            result.append(item)
 
     return result
 
 
 def parse():
-    parser = argparse.ArgumentParser(
-                        prog='Workspace',
-                        description='Workspace manager')
+    parser = argparse.ArgumentParser(prog="Workspace", description="Workspace manager")
 
-    parser.add_argument('-c', '--create')
-    parser.add_argument('-u', '--update')
-    parser.add_argument('-U', '--update-all', action="store_true", dest="update_all")
+    parser.add_argument("-c", "--create")
+    parser.add_argument("-u", "--update")
+    parser.add_argument("-U", "--update-all", action="store_true", dest="update_all")
 
     return parser, parser.parse_args()
 

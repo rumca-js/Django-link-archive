@@ -94,14 +94,12 @@ class ConfigForm(forms.ModelForm):
             "data_export_path",
             "data_import_path",
             "auto_store_thumbnails",
-
             # features
             "enable_domain_support",
             "enable_keyword_support",
             "enable_file_support",
             "link_save",
             "source_save",
-
             # database link contents
             "accept_dead",
             "accept_ip_addresses",
@@ -117,7 +115,6 @@ class ConfigForm(forms.ModelForm):
             "prefer_https",
             "prefer_non_www_sites",
             "block_keywords",
-
             # updates
             "sources_refresh_period",
             "days_to_move_to_archive",
@@ -126,7 +123,6 @@ class ConfigForm(forms.ModelForm):
             "days_to_check_std_entries",
             "days_to_check_stale_entries",
             "number_of_update_entries",
-
             # Networking
             "ssl_verification",
             "user_agent",
@@ -136,7 +132,6 @@ class ConfigForm(forms.ModelForm):
             "crawling_server_port",
             "crawling_headless_script",
             "crawling_full_script",
-
             # user
             "track_user_actions",
             "track_user_searches",
@@ -144,7 +139,6 @@ class ConfigForm(forms.ModelForm):
             "vote_min",
             "vote_max",
             "number_of_comments_per_day",
-
             # display settings
             "time_zone",
             "whats_new_days",
@@ -158,7 +152,6 @@ class ConfigForm(forms.ModelForm):
             "sources_per_page",
             "max_links_per_page",
             "max_sources_per_page",
-
             # other
             "debug_mode",
         ]

@@ -1,4 +1,4 @@
-from ..webtools import Url, DefaultContentPage
+from .webtools import DefaultContentPage
 from ..dateutils import DateUtils
 
 

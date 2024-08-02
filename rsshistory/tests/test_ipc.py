@@ -1,11 +1,9 @@
-
 from ..ipc import *
 from ..webtools import get_response_from_bytes
 from .fakeinternet import FakeInternetTestCase
 
 
 class TestBytes(FakeInternetTestCase):
-
     def test_string_to_command(self):
         # call tested function
         google_bytes = string_to_command("url", "https://google.com")
@@ -30,7 +28,9 @@ class TestBytes(FakeInternetTestCase):
         bytes1 = string_to_command("PageResponseObject.url", "https://google.com")
         bytes2 = string_to_command("PageResponseObject.status_code", "201")
         bytes3 = string_to_command("PageResponseObject.text", "page text")
-        bytes4 = string_to_command("PageResponseObject.headers", '{"Content-Type" : "text/html"}')
+        bytes4 = string_to_command(
+            "PageResponseObject.headers", '{"Content-Type" : "text/html"}'
+        )
 
         total_bytes = bytearray()
         total_bytes.extend(bytes1)

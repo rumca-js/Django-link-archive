@@ -1,10 +1,7 @@
 """
-We could use 
-https://realpython.com/python-sockets/   "Sending an Application Message"
-
 I wanted to use crawlee with socket server
-  - create socket server program
-  - when socket accepts connection we perform query using crawlee crawler
+  - there are problems with running crawlee in any project
+  - I have been using asyncio,
 
   - on windows such system works
   - on linux raspberry it does not. Asyncio does not allow to define new loop from task
@@ -18,6 +15,7 @@ The effect is that it easier just to call script, which always works.
 """
 
 import argparse
+import sys
 from datetime import timedelta
 import json
 from rsshistory import webtools
@@ -33,7 +31,10 @@ try:
 
     # https://github.com/apify/crawlee-python
     # https://crawlee.dev/python/api
-    from crawlee.beautifulsoup_crawler import BeautifulSoupCrawler, BeautifulSoupCrawlingContext
+    from crawlee.beautifulsoup_crawler import (
+        BeautifulSoupCrawler,
+        BeautifulSoupCrawlingContext,
+    )
     from crawlee.basic_crawler import BasicCrawler
     from crawlee.basic_crawler.types import BasicCrawlingContext
     from crawlee.playwright_crawler import PlaywrightCrawler, PlaywrightCrawlingContext
@@ -50,28 +51,29 @@ async def main() -> None:
 
     request = parser.get_request()
     print("Running request:{}".format(request))
+    print("Running request timoeut:{}".format(request.timeout_s))
 
     crawler = BeautifulSoupCrawler(
         # Limit the crawl to max requests. Remove or increase it for crawling all links.
         max_requests_per_crawl=10,
-        request_handler_timeout = timedelta(seconds = request.timeout_s),
+        request_handler_timeout=timedelta(seconds=request.timeout_s),
     )
 
     # Define the default request handler, which will be called for every request.
     @crawler.router.default_handler
     async def request_handler(context: BeautifulSoupCrawlingContext) -> None:
-        print(f'Processing {context.request.url} ...')
+        print(f"Processing {context.request.url} ...")
 
         response = webtools.PageResponseObject(request.url)
         try:
             # maybe we could send header information that we accept text/rss
-            
+
             headers = {}
             for item in context.http_response.headers:
                 headers[item] = context.http_response.headers[item]
-                
-            #result['url'] = context.request.url
-            #result['loaded_url'] = context.request.loaded_url
+
+            # result['url'] = context.request.url
+            # result['loaded_url'] = context.request.loaded_url
             response.url = context.request.loaded_url
             response.request_url = request.url
             response.status_code = context.http_response.status_code
@@ -106,7 +108,7 @@ async def main() -> None:
             c.response = response
             c.save_response()
 
-            print(f'Processing {context.request.url} ...DONE')
+            print(f"Processing {context.request.url} ...DONE")
         except Exception as E:
             print(str(E))
             error_text = traceback.format_exc()
@@ -117,10 +119,16 @@ async def main() -> None:
             c.response = response
             c.save_response()
 
+            sys.exit(1)
 
-    # Run the crawler with the initial list of URLs.
-    await crawler.run([parser.args.url])
+    try:
+        # Run the crawler with the initial list of URLs.
+        await crawler.run([parser.args.url])
+    except Exception as E:
+        print(str(E))
+        error_text = traceback.format_exc()
+        print(error_text)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     asyncio.run(main())

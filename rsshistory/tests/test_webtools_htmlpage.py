@@ -1,4 +1,4 @@
-from ..webtools import HtmlPage, RequestBuilder, calculate_hash
+from ..webtools import HtmlPage, calculate_hash
 
 from .fakeinternet import FakeInternetTestCase, MockRequestCounter
 

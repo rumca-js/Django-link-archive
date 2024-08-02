@@ -1,5 +1,5 @@
 from ..models import ModelFiles
-from ..webtools import RequestBuilder
+from ..webtools import Url
 from ..configuration import Configuration
 
 
@@ -17,7 +17,7 @@ class ModelFilesBuilder(object):
         if not c.enabled_file_support:
             return
 
-        p = RequestBuilder(url=file_name)
+        p = Url(url=file_name)
         response = p.get_response()
 
         if not response:

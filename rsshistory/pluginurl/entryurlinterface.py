@@ -10,7 +10,7 @@ from ..webtools import (
     DomainAwarePage,
     Url,
     DefaultContentPage,
-    InternetPageHandler,
+    HttpPageHandler,
 )
 
 from .urlhandler import UrlHandler, UrlAgeModerator
@@ -137,7 +137,7 @@ class EntryUrlInterface(object):
             if handler.get_video_code():
                 return self.get_youtube_props(input_props, source_obj)
 
-        if type(handler) is InternetPageHandler:
+        if type(handler) is HttpPageHandler:
             if type(handler.p) is HtmlPage:
                 return self.get_htmlpage_props(input_props, source_obj)
 

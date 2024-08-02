@@ -1,7 +1,7 @@
 from django.urls import reverse
 from django.templatetags.static import static
 
-from ...pluginurl.handlervideoodysee import OdyseeVideoHandler
+from ...webtools import OdyseeVideoHandler
 from ...apps import LinkDatabase
 
 from .entrygenericplugin import EntryGenericPlugin, EntryButton, EntryParameter

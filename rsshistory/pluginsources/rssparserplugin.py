@@ -22,8 +22,8 @@ class RssParserPlugin(BaseRssPlugin):
     def __init__(self, source_id):
         super().__init__(source_id)
 
-    def get_container_elements(self):
-        for prop in super().get_container_elements():
+    def get_entries(self):
+        for prop in super().get_entries():
             prop = self.get_all_container_properties(prop)
             yield prop
 

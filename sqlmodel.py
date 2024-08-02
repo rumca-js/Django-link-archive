@@ -2,11 +2,21 @@
 Library package.
 """
 
-from sqlalchemy import create_engine, Table, MetaData, select, Column, Integer, String, Boolean, DateTime
+from sqlalchemy import (
+    create_engine,
+    Table,
+    MetaData,
+    select,
+    Column,
+    Integer,
+    String,
+    Boolean,
+    DateTime,
+)
 
 
 class SqlModel(object):
-    def __init__(self, db_file = "test.db", parser = None):
+    def __init__(self, db_file="test.db", parser=None):
         self.conn = None
         self.cursor = None
 
@@ -29,42 +39,48 @@ class SqlModel(object):
         file_name = self.get_database_file()
 
         try:
-            #self.engine = create_engine('sqlite:///'+file_name, echo=True)
-            self.engine = create_engine('sqlite:///'+file_name)
+            # self.engine = create_engine('sqlite:///'+file_name, echo=True)
+            self.engine = create_engine("sqlite:///" + file_name)
             return True
         except Exception as e:
-            print("Could not create sqlite3 database file:{}. Exception:{}".format(file_name, str(e)))
+            print(
+                "Could not create sqlite3 database file:{}. Exception:{}".format(
+                    file_name, str(e)
+                )
+            )
             return False
 
     def define_tables(self):
         metadata = MetaData()
 
         self.entries = Table(
-           'entries', metadata,
-           Column('id', Integer, primary_key=True),
-           Column('link',                  String, unique=True),
-           Column('title',                 String),
-           Column('description',           String),
-           Column('thumbnail',             String, nullable=True),
-           Column('language',              String, nullable=True),
-           Column('age',                   Integer, default=0),
-           Column('date_created',          DateTime, nullable=True), # TODO convert to timestamp
-           Column('date_published',        DateTime, nullable=True),
-           Column('date_update_last',      DateTime, nullable=True),
-           Column('date_dead_since',       DateTime, nullable=True),
-           Column('date_last_modified',    DateTime, nullable=True),
-           Column('status_code',           Integer, default=0),
-           Column('page_rating',           Integer, default=0),
-           Column('page_rating_votes',     Integer, default=0),
-           Column('page_rating_contents',  Integer, default=0),
-           Column('dead',                  Boolean, default=False),
-           Column('bookmarked',            Boolean, default=False),
-           Column('permanent',             Boolean, default=False),
-           Column('source',                String, nullable=True),
-
-           # advanced / foreign
-           Column('source_obj__id',        Integer, nullable=True),
-           Column('tags',                  String, nullable=True),
+            "entries",
+            metadata,
+            Column("id", Integer, primary_key=True),
+            Column("link", String, unique=True),
+            Column("title", String),
+            Column("description", String),
+            Column("thumbnail", String, nullable=True),
+            Column("language", String, nullable=True),
+            Column("age", Integer, default=0),
+            Column(
+                "date_created", DateTime, nullable=True
+            ),  # TODO convert to timestamp
+            Column("date_published", DateTime, nullable=True),
+            Column("date_update_last", DateTime, nullable=True),
+            Column("date_dead_since", DateTime, nullable=True),
+            Column("date_last_modified", DateTime, nullable=True),
+            Column("status_code", Integer, default=0),
+            Column("page_rating", Integer, default=0),
+            Column("page_rating_votes", Integer, default=0),
+            Column("page_rating_contents", Integer, default=0),
+            Column("dead", Boolean, default=False),
+            Column("bookmarked", Boolean, default=False),
+            Column("permanent", Boolean, default=False),
+            Column("source", String, nullable=True),
+            # advanced / foreign
+            Column("source_obj__id", Integer, nullable=True),
+            Column("tags", String, nullable=True),
         )
 
         with self.engine.connect() as connection:
@@ -92,12 +108,7 @@ class SqlModel(object):
                 data[key] = entry[key]
 
         try:
-            self.conn.execute(
-                self.entries.insert(),
-                [
-                    data
-                ]
-            )
+            self.conn.execute(self.entries.insert(), [data])
 
         except Exception as e:
             print(e)
@@ -116,12 +127,7 @@ class SqlModel(object):
                 data[key] = entry[key]
 
         try:
-            self.conn.execute(
-                self.entries.insert(),
-                [
-                    data
-                ]
-            )
+            self.conn.execute(self.entries.insert(), [data])
 
         except Exception as e:
             print(e)
