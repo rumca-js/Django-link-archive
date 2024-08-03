@@ -55,7 +55,7 @@ class BaseRssPlugin(SourceGenericPlugin):
             AppLogging.error("Url:{}. RSS page is not valid".format(source.url))
             return
 
-        all_props = self.reader.get_container_elements()
+        all_props = self.reader.get_entries()
 
         for index, prop in enumerate(all_props):
             if not self.is_link_ok_to_add(prop):

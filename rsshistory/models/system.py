@@ -11,7 +11,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 
 from ..apps import LinkDatabase
-from ..ipc import DEFAULT_PORT
+from ..webtools.ipc import DEFAULT_PORT
 
 DISPLAY_STYLE_LIGHT = "style-light"
 DISPLAY_STYLE_DARK = "style-dark"

@@ -1,9 +1,16 @@
 import requests
 
 from .webtools import (
+    RssPage,
+    HtmlPage,
     PageResponseObject,
-    PAGE_TOO_BIG_BYTES,
     WebLogger,
+    PAGE_TOO_BIG_BYTES,
+    HTTP_STATUS_CODE_EXCEPTION,
+    HTTP_STATUS_CODE_CONNECTION_ERROR,
+    HTTP_STATUS_CODE_TIMEOUT,
+    HTTP_STATUS_CODE_FILE_TOO_BIG,
+    HTTP_STATUS_CODE_PAGE_UNSUPPORTED,
 )
 
 

@@ -40,6 +40,7 @@ class DateUtils(object):
         Time zone is a string
         @returns string
         """
+        from pytz import timezone
 
         if not utc_time:
             return ""
@@ -54,6 +55,7 @@ class DateUtils(object):
         Time zone is a string
         @returns datetime object
         """
+        from pytz import timezone
 
         if not utc_time:
             return ""
