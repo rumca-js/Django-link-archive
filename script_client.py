@@ -4,8 +4,12 @@ Script that can be used for debuggin server, checking connection
 import socket
 import argparse
 import json
+from datetime import datetime, timedelta
 
 from rsshistory.webtools import ipc
+
+
+max_transaction_timeout_s = 40
 
 
 def client_program(parser):
@@ -25,6 +29,8 @@ def client_program(parser):
     while message.lower().strip() != "bye":
         message = input(" -> ")
 
+        c.send_command_string("commands.debug", "15")
+
         c.send_command_string("PageRequestObject.__init__", "OK")
         c.send_command_string("PageRequestObject.url", message)
         c.send_command_string("PageRequestObject.timeout", "15")
@@ -33,9 +39,16 @@ def client_program(parser):
         )
         c.send_command_string("PageRequestObject.__del__", "OK")
 
+        print("Sent request correctly")
+
+        time_start = datetime.now()
+
         while True:
             command_data = c.get_command_and_data()
             if command_data:
+
+                # response
+
                 if command_data[0] == "PageResponseObject.__init__":
                     pass
                 elif command_data[0] == "PageResponseObject.url":
@@ -50,6 +63,12 @@ def client_program(parser):
                     return
                 elif command_data[0] == "PageResponseObject.request_url":
                     print("Received request url:{}".format(command_data[1].decode()))
+
+                # other commands
+
+                elif command_data[0] == "debug.requests":
+                    print("Requests len:{}".format(command_data[1].decode()))
+
                 else:
                     print("Unsupported command:{}".format(command_data[0]))
                     break
@@ -58,6 +77,12 @@ def client_program(parser):
                 print("Closed")
                 return
             # normal scenario - there is no command from server
+
+            diff = datetime.now() - time_start
+
+            if diff.total_seconds() > max_transaction_timeout_s:
+                print("Could not obtain data in time limit")
+                c.close()
 
         if c.closed:
             print("Closed")

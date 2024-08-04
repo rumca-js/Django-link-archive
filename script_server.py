@@ -31,14 +31,17 @@ import argparse
 import socket
 import threading
 import json
+
 from pathlib import Path
 from rsshistory import webtools
 from rsshistory.webtools import ipc
 import subprocess
 import traceback
+from datetime import datetime, timedelta
 
 
 mutex = threading.Lock()
+max_transaction_timeout_s = 40
 
 
 # TODO request mapping [connection] => url
@@ -47,7 +50,7 @@ mutex = threading.Lock()
 #
 
 
-requests = {}  # connection is key
+requests = []  # date, connection, request
 
 
 def run_script(script, request, parser):
@@ -120,23 +123,46 @@ def run_script_with_file(script, request, parser):
     return all_bytes
 
 
-def handle_connection_inner(conn, address, parser):
-    c = ipc.SocketConnection(conn)
+def delete_connection(c):
+    for index, request_data in enumerate(requests):
+        connection = request_data['connection']
 
+        if c == connection:
+            del requests[index]
+            c.close()
+            break
+
+
+def permanent_error(string_error):
+    error_text = traceback.format_exc()
+
+    with open("server_errors.txt", "w") as fh:
+        fh.write("Error:{}\n{}".format(string_error, error_text))
+
+
+def handle_connection_inner(c, address, parser):
     script = None
     request = None
     response = None
+
+    time_start_s = datetime.now()
 
     while True:
         command = c.get_command_and_data()
 
         if not command and c.closed:
             print("No more commands. Closing")
-            c.close()
+            delete_connection(c)
             return
 
         if not command:
             continue
+
+        diff = datetime.now() - time_start_s
+        if diff.total_seconds() > max_transaction_timeout_s:
+            permanent_error("Timeout - closing")
+            delete_connection(c)
+            return
 
         # Request handling
 
@@ -176,11 +202,17 @@ def handle_connection_inner(conn, address, parser):
             # two clients might ask for the same URL
             # do not run browser again in that case
             should_run_script = True
-            for one in requests:
+            for request_data in requests:
+                one = request_data["request"]
+
                 if one.url == request.url:
                     should_run_script = False
 
-            requests[c] = request
+            request_data = {}
+            request_data['request'] = request
+            request_data['connection'] = c
+            request_data['datetime'] = datetime.now()
+            requests.append(request_data)
 
             if should_run_script:
                 data = run_script(script, request, parser)
@@ -221,8 +253,9 @@ def handle_connection_inner(conn, address, parser):
             all_bytes = webtools.get_response_to_bytes(response)
 
             to_delete = []
-            for connection in requests:
-                request = requests[connection]
+            for index, request_data in enumerate(requests):
+                connection = request_data["connection"]
+                request = request_data["request"]
 
                 if request.url == response.request_url:
                     connection.send(all_bytes)
@@ -230,8 +263,7 @@ def handle_connection_inner(conn, address, parser):
 
             for connection in to_delete:
                 print("Closing connection")
-                connection.close()
-                del requests[connection]
+                delete_connection(connection)
 
             response = None
             c.close()
@@ -239,15 +271,52 @@ def handle_connection_inner(conn, address, parser):
             print("Response handling complete")
             break
 
+        # Other commands handling
+        elif command[0] == "commands.debug":
+            print("Requests:{}".format(len(requests)))
+            c.send_command_string("debug.requests", str(len(requests)))
+
+        elif command[0] == "debug.requests":
+            pass
+
         else:
-            print("Unknown command request:{}".format(command[0]))
+            permanent_error("Unknown command request:{}".format(command[0]))
+
+
+def remove_stale_connections():
+    to_delete = []
+    for index, request_data in enumerate(requests):
+        connection = request_data["connection"]
+        request = request_data["request"]
+        dt = request_data["datetime"]
+
+        diff = datetime.now() - dt
+
+        if diff.total_seconds() > 40:
+            to_delete.append(connection)
+
+    for connection in to_delete:
+        permanent_error("Removed stale connection")
+        delete_connection(connection)
 
 
 def handle_connection(conn, address, parser):
-    print("Handling connection from: " + str(address))
-    handle_connection_inner(conn, address, parser)
-    conn.close()
-    print("Handling connection from:{} DONE".format(str(address)))
+    now = datetime.now()
+    print("[{}] Handling connection from:{}. Requests len:{}".format(now, str(address), len(requests)))
+
+    c = ipc.SocketConnection(conn)
+    try:
+        handle_connection_inner(c, address, parser)
+    except Exception as E:
+        error_text = "Exception during handling command:{}".format(str(E))
+        permanent_error(error_text)
+
+        delete_connection(c)
+
+    c.close()
+
+    now = datetime.now()
+    print("[{}] Handling connection from:{} DONE. Requests len:{}.".format(now, str(address), len(requests)))
 
 
 def server_program(parser):
@@ -277,6 +346,8 @@ def server_program(parser):
 
         while True:
             try:
+                remove_stale_connections()
+
                 conn, address = server_socket.accept()
 
                 if len(requests) > 10:

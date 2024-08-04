@@ -1,5 +1,5 @@
 from ..pluginurl.urlhandler import UrlHandler, UrlAgeModerator
-from ..pluginurl.handlervideoyoutube import YouTubeVideoHandler
+from ..webtools.handlervideoyoutube import YouTubeVideoHandler
 from ..webtools import RssPage, HtmlPage
 
 from .fakeinternet import FakeInternetTestCase

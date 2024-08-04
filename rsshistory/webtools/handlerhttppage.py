@@ -136,6 +136,7 @@ class HttpRequestBuilder(object):
             request = PageRequestObject(
                 url=url, headers=headers, timeout_s=timeout_s, ping=ping
             )
+            self.request = request
 
         if self.options.use_basic_crawler():
             return self.get_contents_via_requests(request=request)
@@ -222,10 +223,10 @@ class HttpRequestBuilder(object):
                 WebLogger.exc(E, "Cannot connect to port{}".format(port))
 
                 response = PageResponseObject(
-                    self.request.url,
+                    request.url,
                     text=None,
                     status_code=HTTP_STATUS_CODE_CONNECTION_ERROR,
-                    request_url=self.request.url,
+                    request_url=request.url,
                 )
         except Exception as E:
             WebLogger.exc(E, "Cannot connect to port{}".format(port))
@@ -241,10 +242,10 @@ class HttpRequestBuilder(object):
 
             if DateUtils.get_datetime_now_utc() > limit:
                 response = PageResponseObject(
-                    self.request.url,
+                    request.url,
                     text=None,
                     status_code=HTTP_STATUS_CODE_TIMEOUT,
-                    request_url=self.request.url,
+                    request_url=request.url,
                 )
                 return response
 
@@ -277,12 +278,16 @@ class HttpRequestBuilder(object):
 
                 elif command_data[0] == "PageResponseObject.__del__":
                     break
+
+                elif command[0] == "commands.debug":
+                    pass
+
+                elif command[0] == "debug.requests":
+                    pass
+
                 else:
                     WebLogger.error("Unsupported command:{}".format(command_data[0]))
                     break
-            else:
-                if connection.closed:
-                    return response
 
         connection.close()
 

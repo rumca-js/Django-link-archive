@@ -4,7 +4,7 @@ from django.shortcuts import render
 from django.views import generic
 from django.urls import reverse
 
-from .models import UserConfig, ConfigurationEntry
+from .models import UserConfig, ConfigurationEntry, AppLogging
 from .basictypes import *
 from .configuration import Configuration
 from .apps import LinkDatabase
@@ -43,8 +43,13 @@ class ViewPage(object):
     def is_mobile(self):
         from django_user_agents.utils import get_user_agent
 
-        user_agent = get_user_agent(self.request)
-        return user_agent.is_mobile
+        try:
+            user_agent = get_user_agent(self.request)
+            return user_agent.is_mobile
+        except Exception as E:
+            AppLogging.exc(E, "Could not read django user agent")
+
+            return False
 
     def get_context(self, request=None):
         if self.context is not None:

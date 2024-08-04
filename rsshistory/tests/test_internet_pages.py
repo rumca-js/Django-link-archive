@@ -1,5 +1,5 @@
 from ..pluginurl.urlhandler import UrlHandler
-from ..pluginurl.handlervideoyoutube import YouTubeVideoHandler
+from ..webtools.handlervideoyoutube import YouTubeVideoHandler
 from ..webtools import RssPage, HtmlPage, HttpPageHandler
 
 from .fakeinternet import FakeInternetTestCase
@@ -58,4 +58,4 @@ class InternetTest(FakeInternetTestCase):
 
         props = handler.get_properties()
 
-        elf.assertEqual(props["title"], "Linus Tech Tips")
+        self.assertEqual(props["title"], "Linus Tech Tips")

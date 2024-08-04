@@ -9,6 +9,12 @@ from .webtools import (
     ContentInterface,
     PageOptions,
     WebLogger,
+    URL_TYPE_RSS,
+    URL_TYPE_CSS,
+    URL_TYPE_JAVASCRIPT,
+    URL_TYPE_HTML,
+    URL_TYPE_FONT,
+    URL_TYPE_UNKNOWN,
 )
 from .handlerhttppage import (
     HttpPageHandler,

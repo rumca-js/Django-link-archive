@@ -2451,12 +2451,15 @@ class PageResponseObject(object):
         return self.headers
 
     def get_last_modified(self):
+        date = None
+
         if "Last-Modified" in self.headers:
             date = self.headers["Last-Modified"]
-            return date
         if "last-modified" in self.headers:
             date = self.headers["last-modified"]
-            return date
+            
+        if date:
+            return date_str_to_date(date)
 
     def get_content_type_charset(self):
         content = self.get_content_type()

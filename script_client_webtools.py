@@ -6,7 +6,7 @@ import json
 import traceback
 
 from rsshistory.webtools import HttpRequestBuilder, PageOptions, WebLogger
-from rsshistory import ipc
+from rsshistory.webtools import ipc
 
 
 class ClientWebLogger(object):
@@ -76,8 +76,8 @@ def test_headless():
 
 def test_full():
     print("Test full")
-    RequestBuilder.crawling_server_port = ipc.DEFAULT_PORT
-    RequestBuilder.crawling_full_script = "poetry run python crawleebeautifulsoup.py"
+    HttpRequestBuilder.crawling_server_port = ipc.DEFAULT_PORT
+    HttpRequestBuilder.crawling_full_script = "poetry run python crawleebeautifulsoup.py"
 
     options = PageOptions()
     options.use_full_browser = True
