@@ -4,6 +4,7 @@ This file should not include any other or django related files.
 import json
 import pickle
 import socket
+import time
 
 
 DEFAULT_PORT = 5007
@@ -110,11 +111,11 @@ class SocketConnection(object):
             return False
 
     def send(self, bytes):
-        if self.closed:
+        if self.is_closed():
             return False
 
         try:
-            self.conn.send(bytes)
+            self.conn.sendall(bytes)
             return True
         except Exception as E:
             self.closed = True
@@ -138,9 +139,15 @@ class SocketConnection(object):
 
                 return command
 
+            if self.is_closed():
+                return
+
             bytes = None
             try:
-                bytes = self.conn.recv(1024)
+                if self.is_data():
+                    bytes = self.conn.recv(1024)
+                else:
+                    time.sleep(1)
 
             except socket.timeout:
                 return
@@ -149,14 +156,14 @@ class SocketConnection(object):
                 self.closed = True
                 return
 
-            if bytes:
-                self.read_message.extend(bytearray(bytes))
-
-            if not bytes and self.closed:
+            if not bytes:
                 return
 
-            if not bytes:
-                continue
+            if len(bytes) == 0:
+                return
+
+            if bytes:
+                self.read_message.extend(bytearray(bytes))
 
             wh = self.read_message.find(b"\x00")
 
@@ -183,6 +190,26 @@ class SocketConnection(object):
             return [command_string, data]
 
     def close(self):
-        if not self.closed:
-            self.conn.close()
+        if not self.is_closed():
+            try:
+                self.conn.close()
+            except Exception as E:
+                pass
+
             self.closed = True
+
+    def is_data(self):
+        try:
+            bytes = self.conn.recv(1024, socket.MSG_DONTWAIT | socket.MSG_PEEK)
+            if bytes:
+                return len(bytes) > 0
+            else:
+                return False
+        except Exception as E:
+            return False
+
+    def is_closed(self):
+        return self.closed
+
+    def __str__(self):
+        return "{} {}".format(self.conn, self.closed)

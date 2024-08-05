@@ -1343,7 +1343,10 @@ class RssPage(ContentInterface):
             WebLogger.exc(E, "Url:{}. RSS parsing error".format(self.url))
 
     def get_container_elements_maps(self):
-        parent_properties = self.get_properties()
+        parent_properties = {}
+        parent_properties["language"] = self.get_language()
+        parent_properties["author"] = self.get_author()
+
         contents = self.get_contents()
 
         for feed_index, feed_entry in enumerate(self.feed.entries):

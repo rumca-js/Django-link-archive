@@ -108,7 +108,7 @@ class RequestsPage(object):
             self.response.add_error("Url:{} Page timeout".format(self.request.url))
         except requests.exceptions.ConnectionError:
             self.response = PageResponseObject(
-                self.url,
+                self.request.url,
                 text=None,
                 status_code=HTTP_STATUS_CODE_CONNECTION_ERROR,
                 request_url=self.request.url,

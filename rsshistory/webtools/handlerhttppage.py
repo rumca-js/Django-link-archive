@@ -215,8 +215,6 @@ class HttpRequestBuilder(object):
 
         limit = DateUtils.get_datetime_now_utc() + timedelta(seconds=request.timeout_s)
 
-        bytes = get_request_to_bytes(request, script)
-
         connection = SocketConnection()
         try:
             if not connection.connect(SocketConnection.gethostname(), port):
@@ -228,26 +226,29 @@ class HttpRequestBuilder(object):
                     status_code=HTTP_STATUS_CODE_CONNECTION_ERROR,
                     request_url=request.url,
                 )
+                return response
         except Exception as E:
             WebLogger.exc(E, "Cannot connect to port{}".format(port))
-            return
 
+            response = PageResponseObject(
+                request.url,
+                text=None,
+                status_code=HTTP_STATUS_CODE_CONNECTION_ERROR,
+                request_url=request.url,
+            )
+            return response
+
+        WebLogger.info("Url:{} Running via server.\nRequest:{}\nScript:{}".format(request.url, request, script))
+
+        bytes = get_request_to_bytes(request, script)
         connection.send(bytes)
 
         response = PageResponseObject(request.url)
-        response.status_code = HTTP_STATUS_CODE_CONNECTION_ERROR
+        response.status_code = HTTP_STATUS_CODE_TIMEOUT
+        response.request_url = request.url
 
         while True:
             command_data = connection.get_command_and_data()
-
-            if DateUtils.get_datetime_now_utc() > limit:
-                response = PageResponseObject(
-                    request.url,
-                    text=None,
-                    status_code=HTTP_STATUS_CODE_TIMEOUT,
-                    request_url=request.url,
-                )
-                return response
 
             if command_data:
                 if command_data[0] == "PageResponseObject.__init__":
@@ -288,6 +289,20 @@ class HttpRequestBuilder(object):
                 else:
                     WebLogger.error("Unsupported command:{}".format(command_data[0]))
                     break
+
+            if connection.is_closed():
+                break
+
+            if DateUtils.get_datetime_now_utc() > limit:
+                WebLogger.error("Url:{} Timeout on socket connection".format(request.url))
+
+                response = PageResponseObject(
+                    request.url,
+                    text=None,
+                    status_code=HTTP_STATUS_CODE_TIMEOUT,
+                    request_url=request.url,
+                )
+                break
 
         connection.close()
 
@@ -386,7 +401,7 @@ class HttpRequestBuilder(object):
             return
 
         o = PageRequestObject(
-            url=self.url,
+            url=url,
             headers=self.headers,
             timeout_s=timeout_s,
             ping=True,
@@ -398,7 +413,7 @@ class HttpRequestBuilder(object):
             return response is not None and response.is_valid()
 
         except Exception as E:
-            WebLogger.exc(E, "Url:{}. Ping error\n".format(self.url))
+            WebLogger.exc(E, "Url:{}. Ping error\n".format(url))
             return False
 
     def get_headers_response(self, timeout_s=5):
@@ -413,7 +428,7 @@ class HttpRequestBuilder(object):
 
         try:
             o = PageRequestObject(
-                url=self.url,
+                url=url,
                 headers=self.headers,
                 timeout_s=timeout_s,
                 ping=True,
@@ -424,7 +439,7 @@ class HttpRequestBuilder(object):
                 return response
 
         except Exception as E:
-            WebLogger.exc(E, "Url:{}. Header request error\n".format(self.url))
+            WebLogger.exc(E, "Url:{}. Header request error\n".format(url))
             return None
 
     def get_response_implementation(self):
@@ -460,8 +475,8 @@ class HttpRequestBuilder(object):
 
             self.response = self.get_contents_function(request=request)
 
-            WebLogger.debug(
-                "Url:{}. Requesting page: DONE".format(self.url, self.options)
+            WebLogger.info(
+                "Url:{}. Options{} Requesting page: DONE".format(self.url, self.options)
             )
 
         except Exception as E:

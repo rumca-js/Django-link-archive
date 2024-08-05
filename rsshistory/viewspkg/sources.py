@@ -21,7 +21,7 @@ from ..forms import SourceForm, ContentsForm, SourcesChoiceForm
 from ..queryfilters import SourceFilter
 from ..views import ViewPage
 from ..configuration import Configuration
-from ..webtools import Url, DomainAwarePage
+from ..webtools import Url, DomainAwarePage, HttpPageHandler
 from ..pluginurl import UrlHandler
 from ..pluginsources import SourceControllerBuilder
 from ..serializers.instanceimporter import InstanceExporter
@@ -347,7 +347,14 @@ def edit_source(request, pk):
         return p.render("summary_present.html")
     else:
         if not ob.favicon:
-            icon = Url(ob.url).get_favicon()
+            icon = Url(ob.url).get_thumbnail()
+
+            if not icon:
+                page = DomainAwarePage(ob.url)
+                domain = page.get_domain()
+                u = Url(domain, handler_class=HttpPageHandler)
+                icon = u.get_favicon()
+
             if icon:
                 form = SourceForm(
                     instance=ob, initial={"favicon": icon}, request=request

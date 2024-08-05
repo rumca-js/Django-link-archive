@@ -153,16 +153,15 @@ def read_source(source):
     options.use_headless_browser = False
     options.use_full_browser = False
 
-    # We should be using Url, but I do not want properties() to fetch thumbnail from HTTTP (twice as slow)
-    handler = HttpPageHandler(source_url, page_options = options)
-    response = handler.get_response()
+    url = Url(url = source_url, page_options = options)
+    handler = url.get_handler()
+    response = url.get_response()
 
     if response:
-        if handler.is_rss():
-            for item in handler.get_entries():
-                item["source"] = source_url
-                item["source_title"] = source_title
-                result.append(item)
+        for item in handler.get_entries():
+            item["source"] = source_url
+            item["source_title"] = source_title
+            result.append(item)
 
     return result
 

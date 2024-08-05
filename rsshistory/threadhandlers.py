@@ -891,7 +891,7 @@ class WriteTopicJobHandler(BaseJobHandler):
 
 class ExportDataJobHandler(BaseJobHandler):
     """!
-    Pushes data to repo
+    Exports data to repo
     """
 
     def get_job():
@@ -905,6 +905,12 @@ class ExportDataJobHandler(BaseJobHandler):
             if not export:
                 AppLogging.error("Export {} does not exist".format(obj.subject))
                 return
+
+            AppLogging.notify(
+                "Exporting data. Export:{}".format(
+                    obj.subject
+                )
+            )
 
             update_mgr = UpdateManager(self._config)
 

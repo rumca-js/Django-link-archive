@@ -133,6 +133,15 @@ def delete_connection(c):
             break
 
 
+def delete_request_connection(url):
+    for index, request_data in enumerate(requests):
+        request = request_data['request']
+        connection = request_data['connection']
+
+        if request.url == url:
+            del requests[index]
+
+
 def permanent_error(string_error):
     error_text = traceback.format_exc()
 
@@ -150,19 +159,19 @@ def handle_connection_inner(c, address, parser):
     while True:
         command = c.get_command_and_data()
 
-        if not command and c.closed:
+        if not command and c.is_closed():
             print("No more commands. Closing")
             delete_connection(c)
             return
-
-        if not command:
-            continue
 
         diff = datetime.now() - time_start_s
         if diff.total_seconds() > max_transaction_timeout_s:
             permanent_error("Timeout - closing")
             delete_connection(c)
             return
+
+        if not command:
+            continue
 
         # Request handling
 
@@ -220,7 +229,6 @@ def handle_connection_inner(c, address, parser):
                     c.send(data)
 
             print("Processed request successfully")
-            break
 
         # Response handling
 
@@ -258,12 +266,10 @@ def handle_connection_inner(c, address, parser):
                 request = request_data["request"]
 
                 if request.url == response.request_url:
+                    print("Sending response to connection:{} bytes:{}".format(connection, len(all_bytes)))
                     connection.send(all_bytes)
-                    to_delete.append(connection)
 
-            for connection in to_delete:
-                print("Closing connection")
-                delete_connection(connection)
+            delete_request_connection(response.request_url)
 
             response = None
             c.close()
@@ -278,6 +284,9 @@ def handle_connection_inner(c, address, parser):
 
         elif command[0] == "debug.requests":
             pass
+
+        elif comand[0] == "commands.close":
+            delete_connection(c)
 
         else:
             permanent_error("Unknown command request:{}".format(command[0]))
