@@ -57,6 +57,7 @@ Manages link meta information.
  - [https://renegat0x0.ddns.net/apps/various/](https://renegat0x0.ddns.net/apps/various/) - demo instance, which contains various things
  - [Notes about search industry](https://github.com/rumca-js/Django-link-archive/blob/main/README_search.md)
  - [Data analysis](https://github.com/rumca-js/Django-link-archive/blob/main/analysis/readme.md)
+ - [Development](https://github.com/rumca-js/Django-link-archive/blob/main/README_development.md)
 
 ## Alternatives
 
@@ -210,10 +211,6 @@ User actions are tracked by the system, only if it is configured so:
  - users can vote for entries
  - system stores limited amount of search queries, the user can select previous queries from combobox
  - system stores order of visits on entries. This allows to provide "related" section for each entry. For example if you vist entry "X" after "Y", then "X" will appear on "Y" related section
-
-# Development
-
-Development is described by a separate README: [README_development.md](https://github.com/rumca-js/Django-link-archive/blob/main/README_development.md).
 
 # Scripts
 
