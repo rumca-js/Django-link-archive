@@ -129,6 +129,23 @@ def entry_rule_remove(request, pk):
         return HttpResponseRedirect(reverse("{}:entry-rules".format(LinkDatabase.name)))
 
 
+def entry_rule_run(request, pk):
+    p = ViewPage(request)
+    p.set_title("Remove data export")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    objs = EntryRules.objects.filter(id=pk)
+    if objs.count() == 0:
+        p.context["summary_text"] = "No such object"
+        return p.render("summary_present.html")
+
+    BackgroundJobs.run_rule(objs[0])
+
+    return HttpResponseRedirect(reverse("{}:entry-rules".format(LinkDatabase.name)))
+
+
 def entry_rules_json(request):
     p = ViewPage(request)
     p.set_title("Entry Rules")

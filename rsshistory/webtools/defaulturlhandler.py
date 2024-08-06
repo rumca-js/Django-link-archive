@@ -17,6 +17,9 @@ class DefaultUrlHandler(DefaultContentPage):
         self.response = None
         self.dead = None
 
+    def is_handled_by(url):
+        return True
+
     def input2code(input_string):
         raise NotImplementedError
 

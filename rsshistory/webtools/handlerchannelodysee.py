@@ -11,6 +11,15 @@ class OdyseeChannelHandler(DefaultUrlHandler):
         if url:
             self.code = self.input2code(url)
 
+    def is_handled_by(url):
+        from .url import Url
+        short_url = Url.get_protololless(url)
+
+        if short_url.startswith("odysee.com/@"):
+            return True
+        if short_url.startswith("odysee.com/$/rss"):
+            return True
+
     def input2url(self, item):
         code = self.input2code(item)
         return self.code2url(code)

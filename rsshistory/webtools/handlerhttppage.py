@@ -138,9 +138,13 @@ class HttpRequestBuilder(object):
             )
             self.request = request
 
+        request.timeout_s = max(request.timeout_s, 10)
+
         if self.options.use_basic_crawler():
             return self.get_contents_via_requests(request=request)
         elif self.options.use_headless_browser:
+            request.timeout_s = max(request.timeout_s, 20)
+
             if HttpRequestBuilder.crawling_server_port:
                 return self.get_contents_via_server_headless(request=request)
             if HttpRequestBuilder.crawling_headless_script:
@@ -150,6 +154,8 @@ class HttpRequestBuilder(object):
 
             return self.get_contents_via_requests(request=request)
         elif self.options.use_full_browser:
+            request.timeout_s = max(request.timeout_s, 30)
+
             if HttpRequestBuilder.crawling_server_port:
                 return self.get_contents_via_server_full(request=request)
             if HttpRequestBuilder.crawling_full_script:
@@ -213,7 +219,7 @@ class HttpRequestBuilder(object):
         """
         from .ipc import SocketConnection
 
-        limit = DateUtils.get_datetime_now_utc() + timedelta(seconds=request.timeout_s)
+        script_time_start = DateUtils.get_datetime_now_utc()
 
         connection = SocketConnection()
         try:
@@ -237,8 +243,6 @@ class HttpRequestBuilder(object):
                 request_url=request.url,
             )
             return response
-
-        WebLogger.info("Url:{} Running via server.\nRequest:{}\nScript:{}".format(request.url, request, script))
 
         bytes = get_request_to_bytes(request, script)
         connection.send(bytes)
@@ -293,8 +297,9 @@ class HttpRequestBuilder(object):
             if connection.is_closed():
                 break
 
-            if DateUtils.get_datetime_now_utc() > limit:
-                WebLogger.error("Url:{} Timeout on socket connection".format(request.url))
+            diff = DateUtils.get_datetime_now_utc() - script_time_start
+            if diff.total_seconds() > request.timeout_s:
+                WebLogger.error("Url:{} Timeout on socket connection:{}/{}".format(request.url, diff.total_seconds(), request.timeout_s))
 
                 response = PageResponseObject(
                     request.url,
@@ -526,6 +531,11 @@ class HttpPageHandler(ContentInterface):
         self.response = None
         self.options = page_options
         self.browser_promotions = True
+
+    def is_handled_by(url):
+        if url.startswith("https") or url.startswith("http"):
+            return True
+        return False
 
     def get_contents(self):
         if self.response and self.response.get_text():

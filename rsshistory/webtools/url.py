@@ -104,6 +104,14 @@ class Url(ContentInterface):
 
             return self.response
 
+    def get_handlers():
+        return [
+           Url.youtube_video_handler,
+           Url.youtube_channel_handler,
+           Url.odysee_video_handler,
+           Url.odysee_channel_handler,
+        ]
+
     def get_handler(self):
         """
         This function does not fetch anything by itself
@@ -131,16 +139,14 @@ class Url(ContentInterface):
         if not short_url:
             return
 
-        if Url.is_youtube_video(short_url):
-            return Url.youtube_video_handler(url)
-        if Url.is_youtube_channel(short_url):
-            return Url.youtube_channel_handler(url)
-        if Url.is_odysee_video(short_url):
-            return Url.odysee_video_handler(url)
-        if Url.is_odysee_channel(short_url):
-            return Url.odysee_channel_handler(url)
+        handlers = Url.get_handlers()
+        for handler in handlers:
+            if handler.is_handled_by(url):
+                return handler(url)
 
         page_type = DomainAwarePage(url).get_type()
+
+        # TODO this should return HttpPageHandler?
 
         if page_type == URL_TYPE_HTML:
             return HtmlPage(url, "")
@@ -172,18 +178,10 @@ class Url(ContentInterface):
         if not short_url:
             return
 
-        if Url.is_youtube_video(short_url):
-            h = Url.youtube_video_handler(url)
-            return h
-        elif Url.is_youtube_channel(short_url):
-            h = Url.youtube_channel_handler(url)
-            return h
-        elif Url.is_odysee_video(short_url):
-            h = Url.odysee_video_handler(url)
-            return h
-        elif Url.is_odysee_channel(short_url):
-            h = Url.odysee_channel_handler(url)
-            return h
+        handlers = Url.get_handlers()
+        for handler in handlers:
+            if handler.is_handled_by(url):
+                return handler(url)
 
         if url.startswith("https") or url.startswith("http"):
             return HttpPageHandler(url, page_options=self.options)
@@ -347,45 +345,6 @@ class Url(ContentInterface):
             return self.response.get_status_code()
 
         return 0
-
-    def is_youtube_video(url):
-        return (
-            url.startswith("www.youtube.com/watch")
-            or url.startswith("youtube.com/watch")
-            or url.startswith("m.youtube.com/watch")
-            or (url.startswith("youtu.be/") and len(url) > len("youtu.be/"))
-        )
-
-    def is_youtube_channel(url):
-        if (
-            url.startswith("www.youtube.com/channel")
-            or url.startswith("youtube.com/channel")
-            or url.startswith("m.youtube.com/channel")
-            or url.startswith("www.youtube.com/@")
-            or url.startswith("youtube.com/@")
-            or url.startswith("www.youtube.com/user")
-            or url.startswith("youtube.com/user")
-        ):
-            return True
-        if (
-            url.startswith("www.youtube.com/feeds")
-            or url.startswith("youtube.com/feeds")
-            or url.startswith("m.youtube.com/feeds")
-        ):
-            return True
-
-    def is_odysee_video(url):
-        if url.startswith("odysee.com/@"):
-            wh1 = url.find("@")
-            wh2 = url.find("/", wh1 + 1)
-            if wh2 >= 0:
-                return True
-
-    def is_odysee_channel(url):
-        if url.startswith("odysee.com/@"):
-            return True
-        if url.startswith("odysee.com/$/rss"):
-            return True
 
     def get_protololless(url):
         url = Url.get_cleaned_link(url)

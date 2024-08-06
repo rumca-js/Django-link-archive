@@ -185,16 +185,6 @@ class UrlTest(FakeInternetTestCase):
         contents = url.get_contents()
         self.assertFalse(url.is_valid())
 
-    def test_p_is_html(self):
-        MockRequestCounter.mock_page_requests = 0
-
-        url = Url("https://multiple-favicons.com/page.html")
-        url.get_response()
-
-        self.assertEqual(type(url.get_handler()), HttpPageHandler)
-        # call tested function
-        self.assertEqual(type(url.get_handler().p), HtmlPage)
-
         self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
     def test_is_valid__true(self):
@@ -306,3 +296,75 @@ class UrlTest(FakeInternetTestCase):
         self.assertTrue(domain_info.is_allowed("https://robots-txt.com/any"))
         self.assertFalse(domain_info.is_allowed("https://robots-txt.com/admin/"))
         self.assertTrue(domain_info.is_allowed("https://robots-txt.com/admin"))
+
+    def test_get_handler__html_page(self):
+        MockRequestCounter.mock_page_requests = 0
+
+        url = Url("https://multiple-favicons.com/page.html")
+        url.get_response()
+
+        self.assertEqual(type(url.get_handler()), HttpPageHandler)
+        # call tested function
+        self.assertEqual(type(url.get_handler().p), HtmlPage)
+
+    def test_get_handler__rss_page(self):
+        MockRequestCounter.mock_page_requests = 0
+
+        # call tested function
+        url = Url("https://www.codeproject.com/WebServices/NewsRSS.aspx")
+
+        handler = url.get_handler()
+
+        self.assertTrue(type(handler), HttpPageHandler)
+
+    def test_get_handler__youtube_channel(self):
+        MockRequestCounter.mock_page_requests = 0
+
+        # call tested function
+        url = Url("https://www.youtube.com/feeds/videos.xml?channel_id=UCXuqSBlHAE6Xw-yeJA0Tunw")
+
+        handler = url.get_handler()
+
+        self.assertTrue(type(handler), Url.youtube_channel_handler)
+
+    def test_get_handler__youtube_video(self):
+        MockRequestCounter.mock_page_requests = 0
+
+        # call tested function
+        url = Url("https://www.youtube.com/watch?v=1234")
+
+        handler = url.get_handler()
+
+        self.assertTrue(type(handler), Url.youtube_video_handler)
+
+    def test_get_type__html_page(self):
+        MockRequestCounter.mock_page_requests = 0
+
+        handler = Url.get_type("https://multiple-favicons.com/page.html")
+
+        # call tested function
+        self.assertEqual(type(handler), HtmlPage)
+
+    def test_get_handler__rss_page(self):
+        MockRequestCounter.mock_page_requests = 0
+
+        # call tested function
+        handler = Url.get_type("https://www.codeproject.com/WebServices/NewsRSS.aspx")
+
+        self.assertTrue(type(handler), HtmlPage)
+
+    def test_get_handler__youtube_channel(self):
+        MockRequestCounter.mock_page_requests = 0
+
+        # call tested function
+        handler = Url.get_type("https://www.youtube.com/feeds/videos.xml?channel_id=UCXuqSBlHAE6Xw-yeJA0Tunw")
+
+        self.assertTrue(type(handler), Url.youtube_channel_handler)
+
+    def test_get_handler__youtube_video(self):
+        MockRequestCounter.mock_page_requests = 0
+
+        # call tested function
+        handler = Url.get_type("https://www.youtube.com/watch?v=1234")
+
+        self.assertTrue(type(handler), Url.youtube_video_handler)

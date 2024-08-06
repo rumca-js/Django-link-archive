@@ -53,6 +53,14 @@ class EntryRules(models.Model):
 
         return False
 
+    def is_blocked_by_rule(self, url):
+        rule_urls = self.get_rule_urls()
+        for rule_url in rule_urls:
+            if url.find(rule_url) >= 0:
+                return True
+
+        return False
+
     def is_headless_browser_required(url):
         rules = EntryRules.objects.filter(requires_headless=True, enabled=True)
         for rule in rules:

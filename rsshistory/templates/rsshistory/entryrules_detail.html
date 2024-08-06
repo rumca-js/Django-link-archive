@@ -6,6 +6,9 @@
     <a href="{% url 'rsshistory:entry-rule-edit' object.id %}" class="btn btn-primary" role="button">
        <img src="{% static 'rsshistory/icons/icons8-edit-100.png' %}" class="content-icon" />
     </a>
+    <a href="{% url 'rsshistory:entry-rule-run' object.id %}" class="btn btn-primary" role="button">
+       <img src="{% static 'rsshistory/icons/icons8-play-100.png' %}" class="content-icon" />
+    </a>
     <a href="{% url 'rsshistory:entry-rule-remove' object.id %}" class="btn btn-primary" role="button">
        <img src="{% static 'rsshistory/icons/icons8-trash-100.png' %}" class="content-icon" />
     </a>

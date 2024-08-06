@@ -15,6 +15,7 @@ from pathlib import Path
 
 from django.db.models import Q
 from django.contrib.auth.models import User
+from django.core.paginator import Paginator
 
 from .apps import LinkDatabase
 from .models import (
@@ -1183,6 +1184,33 @@ class MoveToArchiveJobHandler(BaseJobHandler):
             )
 
 
+class RunRuleJobHandler(BaseJobHandler):
+    def get_job():
+        return BackgroundJob.JOB_RUN_RULE
+
+    def process(self, obj=None):
+        try:
+            rule_id = int(obj.subject)
+
+            rules = EntryRules.objects.filter(id = rule_id)
+
+            entries_all = LinkDataController.objects.all()
+            p = Paginator(entries_all, 1000)
+            for page in p.num_pages:
+                page_obj = p.get_page(page_num)
+                entries = entries_all[page_obj.start_index() - 1 : page_obj.end_index()]
+
+                for rule in rules:
+                    if rule.is_blocked_by_rule(entry.link):
+                        entry.delete()
+
+            return True
+        except Exception as E:
+            AppLogging.exc(
+                exception_object=E,
+            )
+
+
 class RefreshThreadHandler(object):
     """!
     One of the most important tasks.
@@ -1306,6 +1334,7 @@ class HandlerManager(object):
             EntryUpdateData,
             LinkSaveJobHandler,
             CheckDomainsJobHandler,
+            RunRuleJobHandler,
             # fmt: on
         ]
 

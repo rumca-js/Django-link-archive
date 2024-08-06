@@ -38,3 +38,6 @@ from .handlervideoyoutube import YouTubeVideoHandler, YouTubeJsonHandler
 
 from .handlerchannelodysee import OdyseeChannelHandler
 from .handlervideoodysee import OdyseeVideoHandler
+
+from .scrapingclient import ScrapingClientParser, ScrapingClient
+from .scrapingserver import ScrapingServerParser, ScrapingServer

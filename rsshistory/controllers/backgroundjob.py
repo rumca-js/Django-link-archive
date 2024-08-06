@@ -50,6 +50,7 @@ class BackgroundJobController(BackgroundJob):
         (BackgroundJob.JOB_LINK_DOWNLOAD_VIDEO, BackgroundJob.JOB_LINK_DOWNLOAD_VIDEO),     #
         (BackgroundJob.JOB_DOWNLOAD_FILE, BackgroundJob.JOB_DOWNLOAD_FILE,),
         (BackgroundJob.JOB_CHECK_DOMAINS, BackgroundJob.JOB_CHECK_DOMAINS),
+        (BackgroundJob.JOB_RUN_RULE, BackgroundJob.JOB_RUN_RULE),
     ]
     # fmt: on
 
@@ -176,6 +177,27 @@ class BackgroundJobController(BackgroundJob):
         # anything not in priority list goes at the end
         return len(BackgroundJobController.JOB_CHOICES) + 1
 
+    def get_number_of_update_reset_jobs():
+        condition_reset = Q(job=BackgroundJob.JOB_LINK_RESET_DATA)
+        condition_update = Q(job=BackgroundJob.JOB_LINK_UPDATE_DATA)
+        condition_enabled = Q(enabled=True)
+
+        objs = BackgroundJobController.objects.filter(
+            condition_enabled & (condition_update | condition_reset)
+        )
+        return objs.count()
+
+    def is_update_or_reset_entry_job(entry):
+        condition_reset = Q(job=BackgroundJob.JOB_LINK_RESET_DATA)
+        condition_update = Q(job=BackgroundJob.JOB_LINK_UPDATE_DATA)
+        condition_enabled = Q(enabled=True)
+        condition_subject = Q(subject=str(entry.id))
+
+        objs = BackgroundJobController.objects.filter(
+            condition_subject & condition_enabled & (condition_update | condition_reset)
+        )
+        return objs.count() > 0
+
     def create_single_job(job_name, subject="", args=""):
         try:
             items = BackgroundJob.objects.filter(job=job_name, subject=subject)
@@ -194,6 +216,8 @@ class BackgroundJobController(BackgroundJob):
                     job_name, subject, args
                 ),
             )
+
+    # job functions are defined below
 
     def download_rss(source, force=False):
         if force == False:
@@ -516,23 +540,7 @@ class BackgroundJobController(BackgroundJob):
             BackgroundJob.JOB_IMPORT_INSTANCE, link, author
         )
 
-    def get_number_of_update_reset_jobs():
-        condition_reset = Q(job=BackgroundJob.JOB_LINK_RESET_DATA)
-        condition_update = Q(job=BackgroundJob.JOB_LINK_UPDATE_DATA)
-        condition_enabled = Q(enabled=True)
-
-        objs = BackgroundJobController.objects.filter(
-            condition_enabled & (condition_update | condition_reset)
+    def run_rule(rule):
+        return BackgroundJobController.create_single_job(
+            BackgroundJob.JOB_RUN_RULE, str(rule.id)
         )
-        return objs.count()
-
-    def is_update_or_reset_entry_job(entry):
-        condition_reset = Q(job=BackgroundJob.JOB_LINK_RESET_DATA)
-        condition_update = Q(job=BackgroundJob.JOB_LINK_UPDATE_DATA)
-        condition_enabled = Q(enabled=True)
-        condition_subject = Q(subject=str(entry.id))
-
-        objs = BackgroundJobController.objects.filter(
-            condition_subject & condition_enabled & (condition_update | condition_reset)
-        )
-        return objs.count() > 0

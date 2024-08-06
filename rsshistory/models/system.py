@@ -835,6 +835,7 @@ class BackgroundJob(models.Model):
     JOB_IMPORT_FROM_FILES = "import-from-files"
     JOB_EXPORT_DATA = "export-data"
     JOB_CLEANUP = "cleanup"
+    JOB_RUN_RULE = "run-rule"
     JOB_CHECK_DOMAINS = "check-domains"
 
     # fmt: off
@@ -863,6 +864,7 @@ class BackgroundJob(models.Model):
         (JOB_EXPORT_DATA, JOB_EXPORT_DATA),
         (JOB_CLEANUP, JOB_CLEANUP),
         (JOB_CHECK_DOMAINS, JOB_CHECK_DOMAINS),
+        (JOB_RUN_RULE, JOB_RUN_RULE),
     )
     # fmt: on
 

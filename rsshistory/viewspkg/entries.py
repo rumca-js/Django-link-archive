@@ -120,6 +120,11 @@ class EntriesSearchListView(generic.ListView):
         """
         API: Returns queryset
         """
+        p = ViewPage(self.request)
+        data = p.check_access()
+        if data is not None:
+            return redirect("{}:missing-rights".format(LinkDatabase.name))
+
         print("EntriesSearchListView:get_queryset")
         self.query_filter = self.get_filter()
         objects = self.get_filtered_objects().order_by(*self.get_order_by())

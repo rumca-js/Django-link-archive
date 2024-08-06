@@ -11,6 +11,17 @@ class YouTubeVideoHandler(DefaultUrlHandler):
 
         self.url = YouTubeVideoHandler.input2url(url)
 
+    def is_handled_by(url):
+        from .url import Url
+        protocol_less = Url.get_protololless(url)
+
+        return (
+            protocol_less.startswith("www.youtube.com/watch")
+            or protocol_less.startswith("youtube.com/watch")
+            or protocol_less.startswith("m.youtube.com/watch")
+            or (protocol_less.startswith("youtu.be/") and len(protocol_less) > len("youtu.be/"))
+        )
+
     def get_video_code(self):
         return YouTubeVideoHandler.input2code(self.url)
 

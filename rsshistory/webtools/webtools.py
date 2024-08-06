@@ -2383,7 +2383,7 @@ class PageResponseObject(object):
 
     def __init__(
         self,
-        url,  # received url
+        url=None,  # received url
         binary=None,
         text=None,
         status_code=STATUS_CODE_OK,
