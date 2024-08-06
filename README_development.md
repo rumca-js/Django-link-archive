@@ -1,7 +1,6 @@
 # Hardware requirements
 
-The goal is to create personal archive database. We require small footprint.
-It should be able to operate on SBC, like raspberry PI.
+The goal is to create personal archive database. We require small footprint. It should be able to run on SBC, like raspberry PI 5.
 
 # On web scraping
 
@@ -25,10 +24,8 @@ That gives us the conslusion, you have to be a sneaky bot, even if what you are 
 We want small footprint. The database cannot grow indefinitely.
 
 Keep limits on user actions:
- - store up to preconfigured amount of data. Searches might be store for a user, but we store only about 100 searches. Newer replace older
- - store data only for links that are in the operational database. If links leave operational database, so are data related to it: comments, votes
- - always define archive limit
- - always define amount of days when entries are removed
+ - store data only necessary amount of data
+ - always define archive limit, we do not allow the database to grow indefinitely
 
 # Development
 
@@ -36,19 +33,30 @@ Keep limits on user actions:
  - limit barriers of entry. There should be no obstacles
  - easy import and exported data. The user need to be able to create a new instance in a matter of minutes
  - default configuration should cover 90% of needs
- - KISS. Do not focus on javascript, and other libraries that make the project bloated, hard to develop for
+ - KISS. Do not focus on javascript, and other libraries that make the project bloated, hard to develop for. I know that we already use bootstrap, but we still limit the libraries / frameworks
 
 # Conventions
 
  - everything that relates to link should start with "Entry"
  - everything that relates to source should start with "Source"
  - new services are handled by 'services' directory (like handling GIT, webarchive, etc.)
- - handling of new sites might require changes in pluginsources, and pluginentries (the first handles source, the second one a entry, link)
+ - serialization is handled by 'serializers' directory
+ - we use one queue to check for jobs, and processing queue. We do not need many queues, as it makes system more difficult. We do not need speed, as we are ethical scrapers
  - this program was not designed to store Internet pages, but to store Internet meta data (title, description). We should rely on other services for cooperation. We cannot store entire Internet on a hard drive. We can store some meta though
 
-# Design
+# Scraping algorithm
 
- - all links are stored in LinkDataModel. Links older than the configured period are moved to archive table.
+Parts:
+ - django application
+ - scraping server (script_server.py)
+ - scraping script (for example crawleebeautifulsoup.py)
+
+Scenario:
+ - Django app detects it needs meta data
+ - Connects to scraping server, sends request
+ - scraping server starts script
+ - scraping script tries to obtain info about link, returns data to scraping server
+ - scraping server sends data back to caller (django app)
 
 ## Notes
 
