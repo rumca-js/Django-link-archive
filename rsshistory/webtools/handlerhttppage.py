@@ -20,6 +20,7 @@ from .webtools import (
     DomainAwarePage,
     lazy_load_content,
     get_request_to_bytes,
+    get_response_from_bytes,
     HTTP_STATUS_CODE_EXCEPTION,
     HTTP_STATUS_CODE_CONNECTION_ERROR,
     HTTP_STATUS_CODE_TIMEOUT,
@@ -224,7 +225,7 @@ class HttpRequestBuilder(object):
         connection = SocketConnection()
         try:
             if not connection.connect(SocketConnection.gethostname(), port):
-                WebLogger.exc(E, "Cannot connect to port{}".format(port))
+                WebLogger.error("Cannot connect to port{}".format(port))
 
                 response = PageResponseObject(
                     request.url,
@@ -639,6 +640,11 @@ class HttpPageHandler(ContentInterface):
         """
         if not self.response:
             return True
+
+        # content is defined, and it is not support
+        content_type = self.response.get_content_type()
+        if content_type and not self.response.is_content_type_supported():
+            return False
 
         status_code = self.response.get_status_code()
         if status_code == HTTP_STATUS_CODE_CONNECTION_ERROR:

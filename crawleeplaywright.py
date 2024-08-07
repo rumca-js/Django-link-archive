@@ -10,8 +10,6 @@ from rsshistory import webtools
 import crawlerscript
 import traceback
 
-PAGE_TOO_BIG_BYTES = 5000000
-
 
 crawlee_feataure_enabled = True
 try:
@@ -72,7 +70,7 @@ async def main() -> None:
                 c.save_response()
                 return
 
-            if response.get_content_length() > PAGE_TOO_BIG_BYTES:
+            if response.get_content_length() > webtools.PAGE_TOO_BIG_BYTES:
                 c = crawlerscript.ScriptCrawlerInterface(parser, None)
                 response.status_code = 500
                 c.response = response
@@ -83,7 +81,7 @@ async def main() -> None:
             content_type = response.get_content_type()
             if content_type and not response.is_content_type_supported():
                 c = crawlerscript.ScriptCrawlerInterface(parser, None)
-                response.status_code = 500
+                response.status_code = webtools.HTTP_STATUS_CODE_PAGE_UNSUPPORTED
                 c.response = response
                 c.save_response()
                 print("Content not supported")

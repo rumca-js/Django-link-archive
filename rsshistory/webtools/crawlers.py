@@ -75,28 +75,29 @@ class RequestsPage(object):
 
             content_type = self.response.get_content_type()
 
-            if not content_type or self.response.is_content_type_supported():
-                """
-                IF we do not know the content type, or content type is supported
-                """
-                encoding = self.get_encoding(request_result, self.response)
-                if encoding:
-                    request_result.encoding = encoding
-
-                self.response = PageResponseObject(
-                    url=request_result.url,
-                    text=request_result.text,
-                    status_code=request_result.status_code,
-                    encoding=request_result.encoding,
-                    headers=request_result.headers,
-                    binary=request_result.content,
-                    request_url=self.request.url,
-                )
-            else:
+            if content_type and not self.response.is_content_type_supported():
                 self.response.status_code = HTTP_STATUS_CODE_PAGE_UNSUPPORTED
                 self.response.add_error(
                     "Url:{} is not supported {}".format(self.request.url, content_type)
                 )
+                return
+
+            """
+            IF we do not know the content type, or content type is supported
+            """
+            encoding = self.get_encoding(request_result, self.response)
+            if encoding:
+                request_result.encoding = encoding
+
+            self.response = PageResponseObject(
+                url=request_result.url,
+                text=request_result.text,
+                status_code=request_result.status_code,
+                encoding=request_result.encoding,
+                headers=request_result.headers,
+                binary=request_result.content,
+                request_url=self.request.url,
+            )
 
         except requests.Timeout:
             self.response = PageResponseObject(

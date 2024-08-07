@@ -84,7 +84,12 @@ class ScriptCrawlerInterface(object):
         bytes4 = ipc.string_to_command(
             "PageResponseObject.status_code", str(self.response.status_code)
         )
-        bytes5 = ipc.string_to_command("PageResponseObject.text", self.response.text)
+
+        if self.response.text:
+            bytes5 = ipc.string_to_command("PageResponseObject.text", self.response.text)
+        else:
+            bytes5 = bytearray()
+
         bytes6 = ipc.string_to_command(
             "PageResponseObject.headers", json.dumps(self.response.headers)
         )
