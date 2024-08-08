@@ -1,5 +1,5 @@
 """
-This file should not include any other or django related files.
+Inter process communication. Communication between scraping/crawl server
 """
 import json
 import pickle

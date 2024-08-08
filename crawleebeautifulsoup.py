@@ -47,6 +47,10 @@ async def main() -> None:
     if not parser.is_valid():
         return
 
+    if not crawlee_feataure_enabled:
+        print("Python: crawlee package is not available")
+        return
+
     request = parser.get_request()
     print("Running request:{}".format(request))
 

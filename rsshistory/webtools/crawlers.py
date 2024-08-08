@@ -1,4 +1,5 @@
 import requests
+import json
 
 from .webtools import (
     RssPage,
@@ -319,9 +320,6 @@ class SeleniumChromeHeadless(SeleniumDriver):
             headers = self.get_selenium_headers(driver)
             WebLogger.debug("Selenium headers:{}\n{}".format(self.request.url, headers))
 
-            # if self.options.link_redirect:
-            #    WebDriverWait(driver, selenium_timeout).until(EC.url_changes(driver.current_url))
-
             html_content = driver.page_source
 
             # TODO use selenium wire to obtain status code & headers?
@@ -405,11 +403,6 @@ class SeleniumChromeFull(SeleniumDriver):
 
             status_code = self.get_selenium_status_code(driver)
 
-            # This driver wait resulted in timeout on yahoo
-            # if self.options.link_redirect:
-            # WebDriverWait(driver, selenium_timeout).until(
-            #    EC.url_changes(driver.current_url)
-            # )
             """
             TODO - if webpage changes link, it should also update it in this object
             """
@@ -487,11 +480,6 @@ class SeleniumUndetected(object):
 
             status_code = self.get_selenium_status_code(driver)
 
-            # This driver wait resulted in timeout on yahoo
-            # if self.options.link_redirect:
-            # WebDriverWait(driver, selenium_timeout).until(
-            #    EC.url_changes(driver.current_url)
-            # )
             """
             TODO - if webpage changes link, it should also update it in this object
             """

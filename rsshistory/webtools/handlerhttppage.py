@@ -41,16 +41,11 @@ class HttpRequestBuilder(object):
     Should not contain any HTML/RSS content processing.
     This should be just a builder.
 
-    TODO rename HttpRequest
+    It should not be called directly, nor used
     """
 
     # use headers from https://www.supermonitoring.com/blog/check-browser-http-headers/
-    user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/116.0"
     get_contents_function = None
-    ssl_verify = True
-    crawling_headless_script = None
-    crawling_full_script = None
-    crawling_server_port = None
 
     def __init__(self, url=None, options=None, page_object=None, request=None):
         """
@@ -93,21 +88,31 @@ class HttpRequestBuilder(object):
         if not self.options:
             self.options = PageOptions()
 
+        self.user_agent = None
+        if request:
+            if request.user_agent:
+                self.user_agent = request.user_agent
+
+        if not self.user_agent:
+            self.user_agent = HttpPageHandler.user_agent
+
         if HttpRequestBuilder.get_contents_function is None:
             self.get_contents_function = self.get_contents_internal
 
-        self.headers = {
-            "User-Agent": self.user_agent,
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-            "Accept-Charset": "utf-8,ISO-8859-1;q=0.7,*;q=0.3",
-            "Accept-Encoding": "none",
-            "Accept-Language": "en-US,en;q=0.8",
-            "Connection": "keep-alive",
-        }
+        self.headers = None
+        if request:
+            if request.headers:
+                self.headers = request.headers
 
-    def disable_ssl_warnings():
-        HttpRequestBuilder.ssl_verify = False
-        disable_warnings(InsecureRequestWarning)
+        if not self.headers:
+            self.headers = {
+                "User-Agent": self.user_agent,
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                "Accept-Charset": "utf-8,ISO-8859-1;q=0.7,*;q=0.3",
+                "Accept-Encoding": "none",
+                "Accept-Language": "en-US,en;q=0.8",
+                "Connection": "keep-alive",
+            }
 
     def get_response(self):
         if self.response:
@@ -130,25 +135,21 @@ class HttpRequestBuilder(object):
         if response:
             return response.get_binary()
 
-    def get_contents_internal(
-        self, url=None, headers=None, timeout_s=10, ping=False, request=None
-    ):
-        if not request:
-            request = PageRequestObject(
-                url=url, headers=headers, timeout_s=timeout_s, ping=ping
-            )
-            self.request = request
-
+    def get_contents_internal(self, request):
         request.timeout_s = max(request.timeout_s, 10)
+        if self.options:
+            request.ssl_verify = self.options.ssl_verify
+        if self.options:
+            request.ping = self.options.ping
 
         if self.options.use_basic_crawler():
             return self.get_contents_via_requests(request=request)
         elif self.options.use_headless_browser:
             request.timeout_s = max(request.timeout_s, 20)
 
-            if HttpRequestBuilder.crawling_server_port:
+            if HttpPageHandler.crawling_server_port:
                 return self.get_contents_via_server_headless(request=request)
-            if HttpRequestBuilder.crawling_headless_script:
+            if HttpPageHandler.crawling_headless_script:
                 return self.get_contents_via_script_headless(request=request)
             if selenium_feataure_enabled:
                 return self.get_contents_via_selenium_chrome_headless(request=request)
@@ -157,9 +158,9 @@ class HttpRequestBuilder(object):
         elif self.options.use_full_browser:
             request.timeout_s = max(request.timeout_s, 30)
 
-            if HttpRequestBuilder.crawling_server_port:
+            if HttpPageHandler.crawling_server_port:
                 return self.get_contents_via_server_full(request=request)
-            if HttpRequestBuilder.crawling_full_script:
+            if HttpPageHandler.crawling_full_script:
                 return self.get_contents_via_script_full(request=request)
             if selenium_feataure_enabled:
                 return self.get_contents_via_selenium_chrome_full(request=request)
@@ -189,28 +190,28 @@ class HttpRequestBuilder(object):
         return p.get()
 
     def get_contents_via_script_headless(self, request):
-        script = HttpRequestBuilder.crawling_headless_script
+        script = HttpPageHandler.crawling_headless_script
 
         return self.get_contents_via_script(script, request)
 
     def get_contents_via_script_full(self, request):
-        script = HttpRequestBuilder.crawling_full_script
+        script = HttpPageHandler.crawling_full_script
 
         return self.get_contents_via_script(script, request)
 
     def get_contents_via_server_headless(self, request):
-        script = HttpRequestBuilder.crawling_headless_script
+        script = HttpPageHandler.crawling_headless_script
         if script is None:
             script = "poetry run python crawleebeautifulsoup.py"
-        port = HttpRequestBuilder.crawling_server_port
+        port = HttpPageHandler.crawling_server_port
 
         return self.get_contents_via_server(script, port, request)
 
     def get_contents_via_server_full(self, request):
-        script = HttpRequestBuilder.crawling_full_script
+        script = HttpPageHandler.crawling_full_script
         if script is None:
             script = "poetry run python crawleeplaywright.py"
-        port = HttpRequestBuilder.crawling_server_port
+        port = HttpPageHandler.crawling_server_port
 
         return self.get_contents_via_server(script, port, request)
 
@@ -340,8 +341,7 @@ class HttpRequestBuilder(object):
                 request_url=request.url,
             )
 
-        script = script.replace("$URL", request.url)
-        script = script.replace("$RESPONSE_FILE", str(response_file_location))
+        script = script + ' --url "{}" --output-file="{}"'.format(request.url, str(response_file_location))
 
         if response_file_location.exists():
             response_file_location.unlink()
@@ -525,13 +525,24 @@ class HttpRequestBuilder(object):
 
 
 class HttpPageHandler(ContentInterface):
+
+    user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/116.0"
+    ssl_verify = True
+
+    crawling_headless_script = None
+    crawling_full_script = None
+    crawling_server_port = None
+
     def __init__(self, url=None, page_options=None):
         super().__init__(url=url, contents=None)
 
         self.p = None  # page contents object, HtmlPage, RssPage, or whathver
         self.response = None
         self.options = page_options
-        self.browser_promotions = True
+
+    def disable_ssl_warnings():
+        HttpPageHandler.ssl_verify = False
+        disable_warnings(InsecureRequestWarning)
 
     def is_handled_by(url):
         if url.startswith("https") or url.startswith("http"):
@@ -556,7 +567,7 @@ class HttpPageHandler(ContentInterface):
     def get_contents_implementation(self):
         self.p = self.get_page_handler_simple()
 
-        if self.browser_promotions and self.is_advanced_processing_possible():
+        if self.options.use_browser_promotions and self.is_advanced_processing_possible():
             # we warn, because if that happens too often, it is easy just to
             # define EntryRule for that domain
             WebLogger.error(

@@ -28,7 +28,6 @@ class EntryUrlInterface(object):
     def __init__(
         self,
         url,
-        fast_check=True,
         use_headless_browser=False,
         log=False,
         ignore_errors=False,
@@ -43,7 +42,6 @@ class EntryUrlInterface(object):
         self.url = UrlHandler.get_cleaned_link(url)
 
         self.options = UrlHandler.get_url_options(url)
-        self.options.fast_parsing = fast_check
         self.options.use_headless_browser = use_headless_browser
 
     def make_request(self):

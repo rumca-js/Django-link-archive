@@ -18,7 +18,7 @@ version is split into three digits:
  if a change requires the model to be changed, then second digit is updated, patch is set to 0
  if something should be released to public, then release version changes
 """
-__version__ = "0.74.10"
+__version__ = "0.74.11"
 
 
 from pathlib import Path
@@ -106,24 +106,24 @@ class Configuration(object):
         pass
 
     def apply_ssl_verification(self):
-        from .webtools import HttpRequestBuilder
+        from .webtools import HttpPageHandler
 
         if not self.config_entry.ssl_verification:
-            HttpRequestBuilder.disable_ssl_warnings()
+            HttpPageHandler.disable_ssl_warnings()
 
     def apply_user_agent(self):
-        from .webtools import HttpRequestBuilder
+        from .webtools import HttpPageHandler
 
-        HttpRequestBuilder.user_agent = self.config_entry.user_agent
+        HttpPageHandler.user_agent = self.config_entry.user_agent
 
     def apply_crawling_scripts(self):
-        from .webtools import HttpRequestBuilder
+        from .webtools import HttpPageHandler
 
         c = self.config_entry
 
-        HttpRequestBuilder.crawling_full_script = c.crawling_full_script
-        HttpRequestBuilder.crawling_headless_script = c.crawling_headless_script
-        HttpRequestBuilder.crawling_server_port = c.crawling_server_port
+        HttpPageHandler.crawling_full_script = c.crawling_full_script
+        HttpPageHandler.crawling_headless_script = c.crawling_headless_script
+        HttpPageHandler.crawling_server_port = c.crawling_server_port
 
     def apply_robots_txt(self):
         from .webtools import DomainCache
@@ -131,10 +131,10 @@ class Configuration(object):
         DomainCache.respect_robots_txt = self.config_entry.respect_robots_txt
 
     def apply_web_logger(self):
-        from .webtools import WebLogger
+        from .webtools import WebConfig
         from .models import AppLogging
 
-        WebLogger.web_logger = AppLogging
+        WebConfig.use_logger(AppLogging)
 
     def get_export_path(self, append=False):
         directory = Path(ConfigurationEntry.get().data_export_path)
@@ -254,6 +254,8 @@ class Configuration(object):
         return False
 
     def ping_internet(self, thread_id):
+        # TODO this should be done by Url. ping
+
         from .webtools import HttpRequestBuilder
 
         test_page_url = self.config_entry.internet_test_page

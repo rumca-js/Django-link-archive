@@ -1,13 +1,11 @@
 """
-This server accepts web scraping commands.
+Scraping server
 
 We communicate through binary interface:
  - PageRequestObject
  - PageResponseObject
 
-Communication through port should be used, communication through single file is a potential bottleneck
-
-Communication is only for request - response pairs.
+Communication is done by port.
 
 Communication breakdown:
     [server] Server starts, listens for incoming clients
@@ -40,7 +38,6 @@ import traceback
 from datetime import datetime, timedelta
 
 
-mutex = threading.Lock()
 max_transaction_timeout_s = 40
 
 

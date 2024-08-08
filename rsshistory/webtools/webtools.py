@@ -70,6 +70,9 @@ HTTP_STATUS_CODE_PAGE_UNSUPPORTED = 613
 
 
 class WebLogger(object):
+    """
+    Logging interface
+    """
     web_logger = None
 
     def info(info_text, detail_text="", user=None, stack=False):
@@ -95,6 +98,55 @@ class WebLogger(object):
     def exc(exception_object, info_text=None, user=None):
         if WebLogger.web_logger:
             WebLogger.web_logger.exc(exception_object, info_text)
+
+
+class PrintWebLogger(object):
+    """
+    Implementation of weblogger that only prints to std out
+    """
+    def info(info_text, detail_text="", user=None, stack=False):
+        print(info_text)
+        print(detail_text)
+
+    def debug(info_text, detail_text="", user=None, stack=False):
+        print(info_text)
+        print(detail_text)
+
+    def warning(info_text, detail_text="", user=None, stack=False):
+        print(info_text)
+        print(detail_text)
+
+    def error(info_text, detail_text="", user=None, stack=False):
+        print(info_text)
+        print(detail_text)
+
+    def notify(info_text, detail_text="", user=None):
+        print(info_text)
+        print(detail_text)
+
+    def exc(exception_object, info_text=None, user=None):
+        print(str(exception_object))
+
+        error_text = traceback.format_exc()
+        print("Exception format")
+        print(error_text)
+
+        stack_lines = traceback.format_stack()
+        stack_string = "".join(stack_lines)
+        print("Stack:")
+        print("".join(stack_lines))
+
+
+class WebConfig(object):
+    """
+    API to configure webtools
+    """
+
+    def use_logger(Logger):
+        WebLogger.web_logger = Logger
+
+    def use_print_logging():
+        WebLogger.web_logger = PrintWebLogger
 
 
 def lazy_load_content(func):
@@ -2322,15 +2374,22 @@ class XmlPage(ContentInterface):
 
 class PageOptions(object):
     """
-    Options object, configuration
+    Page request options. Serves more like request API.
+
+    API user defines if headless browser is required.
+    WebTools can be configured to use a script, port, or whatever
+
+    Fields:
+     - Ping - only check status code, and headers of page. Does not download contents
+     - Browser promotions - if requests cannot receive response we can try with headless or full browser
     """
 
     def __init__(self):
         self.use_full_browser = False
         self.use_headless_browser = False
         self.ssl_verify = False
-        self.fast_parsing = True
-        self.link_redirect = False
+        self.ping = False
+        self.use_browser_promotions = True # tries headles if normal processing does not work
 
     def use_basic_crawler(self):
         return not self.is_advanced_processing_required()
@@ -2339,11 +2398,12 @@ class PageOptions(object):
         return self.use_full_browser or self.use_headless_browser
 
     def __str__(self):
-        return "F:{} H:{} SSL:{} R:{}".format(
+        return "P:{} F:{} H:{} SSL:{} PR:{}".format(
+            self.ping,
             self.use_full_browser,
             self.use_headless_browser,
             self.ssl_verify,
-            self.link_redirect,
+            self.use_browser_promotions,
         )
 
     def get_str(self):
@@ -2351,6 +2411,10 @@ class PageOptions(object):
 
 
 class PageRequestObject(object):
+    """
+    Precise information for scraping.
+    """
+
     def __init__(
         self,
         url,
@@ -2366,7 +2430,7 @@ class PageRequestObject(object):
         if headers:
             self.headers = headers
         else:
-            self.headers = {}
+            self.headers = None # not set, use default
 
         self.timeout_s = timeout_s
         self.ping = False

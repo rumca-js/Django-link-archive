@@ -6,48 +6,14 @@ import json
 import traceback
 
 from rsshistory.webtools import (
-   HttpRequestBuilder,
    PageOptions,
+   WebConfig,
    WebLogger,
    DomainCache,
    Url,
    HttpPageHandler,
    ContentLinkParser,
 )
-
-
-class ClientWebLogger(object):
-    def info(info_text, detail_text="", user=None, stack=False):
-        print(info_text)
-        print(detail_text)
-
-    def debug(info_text, detail_text="", user=None, stack=False):
-        print(info_text)
-        print(detail_text)
-
-    def warning(info_text, detail_text="", user=None, stack=False):
-        print(info_text)
-        print(detail_text)
-
-    def error(info_text, detail_text="", user=None, stack=False):
-        print(info_text)
-        print(detail_text)
-
-    def notify(info_text, detail_text="", user=None):
-        print(info_text)
-        print(detail_text)
-
-    def exc(exception_object, info_text=None, user=None):
-        print(str(exception_object))
-
-        error_text = traceback.format_exc()
-        print("Exception format")
-        print(error_text)
-
-        stack_lines = traceback.format_stack()
-        stack_string = "".join(stack_lines)
-        print("Stack:")
-        print("".join(stack_lines))
 
 
 class Crawler(object):
@@ -109,19 +75,22 @@ class Crawler(object):
 
 
 def main():
-    HttpRequestBuilder.crawling_server_port = 0
-    # when python requests cannot handle a scenario, we run crawlee
-    HttpRequestBuilder.crawling_headless_script = "poetry run python crawleebeautifulsoup.py --url $URL --output-file $RESPONSE_FILE"
-    HttpRequestBuilder.crawling_full_script = "poetry run python crawleebeautifulsoup.py --url $URL --output-file $RESPONSE_FILE"
+    WebConfig.use_print_logging()
 
-    # WebLogger.web_logger = ClientWebLogger
+    # scraping server is not running, port is unset
+    HttpPageHandler.crawling_server_port = 0
+
+    # scripts that are called
+    HttpPageHandler.crawling_headless_script = "poetry run python crawleebeautifulsoup.py"
+    HttpPageHandler.crawling_full_script = "poetry run python crawleebeautifulsoup.py"
+
+    # WebLogger.web_logger = StandardClientWebLogger
 
     print("Enter page to crawl")
     url = input("->")
 
     c = Crawler()
     c.crawl(url)
-
 
 
 if __name__ == "__main__":
