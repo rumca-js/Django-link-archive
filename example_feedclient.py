@@ -4,6 +4,7 @@ This is example script about how to use this project as a simple RSS reader
 import socket
 import json
 import traceback
+import argparse
 
 from rsshistory.webtools import (
     PageOptions,
@@ -125,7 +126,59 @@ def read_source(source):
     return result
 
 
-def main():
+class HtmlWriter(object):
+    def __init__(self, file_name, entries):
+        self.file_name = file_name
+        self.entries = entries
+
+    def write(self):
+        complete_text = "<html><body><ul>{}</ul></body></html>"
+
+        text = ""
+        for entry in self.entries:
+            thumbnail = entry["thumbnail"]
+            title = entry["title"]
+            link = entry["link"]
+            description = entry["description"]
+            date_published = entry["date_published"]
+            source_title = entry["source_title"]
+
+            text += f'<li><img style="width:400px;height=300px" src="{thumbnail}" /><a href="{link}">{title}</a><p>{description}</p></li></a>'
+
+        complete_text = complete_text.format(text)
+
+        with open(self.file_name, "w") as fh:
+            fh.write(complete_text)
+
+
+class OutputWriter(object):
+
+    def __init__(self, entries):
+        self.entries = entries
+
+    def write(self):
+        for entry in self.entries:
+            print("{} {} {} / {}".format(entry["date_published"], entry["link"], entry["title"], entry["source_title"]))
+
+
+class Parser(object):
+    """
+    Headers can only be passed by input binary file
+    """
+
+    def parse(self):
+        self.parser = argparse.ArgumentParser(description="Data analyzer program")
+        self.parser.add_argument(
+            "--timeout", default=10, type=int, help="Timeout expressed in seconds"
+        )
+        self.parser.add_argument("--port", type=int, help="Port")
+
+        self.parser.add_argument("-o", "--output-file", help="Response binary file")
+
+        self.args = self.parser.parse_args()
+
+
+def do_main(parser):
     WebConfig.use_print_logging()
 
     # scraping server is not running, we do not use port
@@ -141,9 +194,20 @@ def main():
         entries.extend(source_entries)
     
     entries = sorted(entries, key = lambda x: x['date_published'], reverse=True)
-    
-    for entry in entries:
-        print("{} {} {} / {}".format(entry["date_published"], entry["link"], entry["title"], entry["source_title"]))
+
+    if parser.args.output_file:
+        w = HtmlWriter(parser.args.output_file, entries)
+        w.write()
+    else:
+        w = OutputWriter(entries)
+        w.write()
+
+
+def main():
+    p = Parser()
+    p.parse()
+
+    do_main(p)
 
 
 main()
