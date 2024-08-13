@@ -7,6 +7,7 @@ from sqlalchemy import (
     Table,
     MetaData,
     select,
+    func,
     Column,
     Integer,
     String,
@@ -51,6 +52,10 @@ class SqlModel(object):
             return False
 
     def define_tables(self):
+        self.define_entries()
+        self.define_sources()
+
+    def define_entries(self):
         metadata = MetaData()
 
         self.entries = Table(
@@ -85,7 +90,23 @@ class SqlModel(object):
 
         with self.engine.connect() as connection:
             if not self.engine.dialect.has_table(connection, "entries"):
-                print("Does not have table, creating one")
+                print("Does not have entries table, creating one")
+                metadata.create_all(self.engine)
+
+    def define_sources(self):
+        metadata = MetaData()
+
+        self.sources = Table(
+            "sources",
+            metadata,
+            Column("id", Integer, primary_key=True),
+            Column("url", String, unique=True),
+            Column("title", String),
+        )
+
+        with self.engine.connect() as connection:
+            if not self.engine.dialect.has_table(connection, "sources"):
+                print("Does not have sources table, creating one")
                 metadata.create_all(self.engine)
 
     def add_entry(self, entry):
@@ -100,10 +121,17 @@ class SqlModel(object):
             if key == "id":
                 continue
             elif key == "tags":
-                data[key] = ", ".join(entry[key])
+                if entry[key]:
+                    data[key] = ", ".join(entry[key])
+                else:
+                    data[key] = None
+
             elif key.startswith("date"):
-                date = parser.parse(entry[key])
-                data[key] = date
+                if type(entry[key]) == str:
+                    date = parser.parse(entry[key])
+                    data[key] = date
+                else:
+                    data[key] = entry[key]
             else:
                 data[key] = entry[key]
 
@@ -119,10 +147,16 @@ class SqlModel(object):
         data = {}
         for key in entry:
             if key == "tags":
-                data[key] = ", ".join(entry[key])
+                if entry[key]:
+                    data[key] = ", ".join(entry[key])
+                else:
+                    data[key] = None
             elif key.startswith("date"):
-                date = parser.parse(entry[key])
-                data[key] = date
+                if type(entry[key]) == str:
+                    date = parser.parse(entry[key])
+                    data[key] = date
+                else:
+                    data[key] = entry[key]
             else:
                 data[key] = entry[key]
 
@@ -145,20 +179,66 @@ class SqlModel(object):
         else:
             return False
 
+    def add_source(self, source):
+        """
+        Source is a map of props
+        """
+        try:
+            self.conn.execute(self.entries.insert(), [source])
+
+        except Exception as e:
+            print(e)
+            return False
+        return True
+
+    def is_source(self, source):
+        query = select(self.sources).where(self.sources.c.url == entry["url"])
+
+        result = self.conn.execute(query)
+        row = result.fetchone()
+
+        if row:
+            return True
+        else:
+            return False
+
+    def count(self, table):
+        st = select(func.count()).select_from(table)
+        return self.conn.execute(st).scalar()
+
     def select_conditions(self, conditions):
         query = select(self.entries).where(conditions)
 
         result = self.conn.execute(query)
         return result.fetchall()
 
+    def select_all(self):
+        query = select(self.entries).order_by(self.entries.c.date_published.desc())
+        result = self.conn.execute(query)
+        return result.fetchall()
+
     def get_database_file(self):
         return self.db_file
 
+    def commit(self):
+        if self.transaction:
+            try:
+                self.transaction.commit()
+            except Exception as e:
+                self.transaction.rollback()
+
+            self.transaction = self.conn.begin()
+
     def close(self):
-        try:
-            self.transaction.commit()
-        except Exception as e:
-            self.transaction.rollback()
+        if self.transaction:
+            try:
+                self.transaction.commit()
+            except Exception as e:
+                self.transaction.rollback()
 
         self.conn.close()
         self.engine.dispose()
+
+    def remove_older_than_days(self, days):
+        # TODO implement
+        pass
