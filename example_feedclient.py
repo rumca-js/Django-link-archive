@@ -6,6 +6,7 @@ import json
 import traceback
 import argparse
 from sqlmodel import SqlModel
+from datetime import timedelta, datetime, timezone
 
 
 from rsshistory.webtools import (
@@ -16,6 +17,9 @@ from rsshistory.webtools import (
     Url,
     HttpPageHandler,
 )
+
+
+day_limit = 7
 
 
 sources = [
@@ -203,7 +207,10 @@ def fetch(conn):
         source_entries = read_source(source)
 
         for entry in source_entries:
-            if not conn.is_entry(entry):
+            now = datetime.now(timezone.utc)
+            limit = now - timedelta(days = day_limit)
+
+            if entry['date_published'] > limit and not conn.is_entry(entry):
                 conn.add_entry(entry)
 
         print("Count:{}".format(conn.count(conn.entries)))
@@ -220,11 +227,12 @@ def do_main(parser):
     HttpPageHandler.crawling_headless_script = "poetry run python crawleebeautifulsoup.py"
     HttpPageHandler.crawling_full_script = "poetry run python crawleebeautifulsoup.py"
 
-    db = SqlModel(db_file="test.db")
-    db.remove_older_than_days(7)
+    db = SqlModel(db_file="feedclient.db")
+    db.remove_older_than_days(day_limit)
 
     if parser.args.fetch:
         fetch(db)
+
     elif parser.args.output_file:
         w = HtmlWriter(parser.args.output_file, db)
         w.write()

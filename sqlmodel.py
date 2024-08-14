@@ -13,7 +13,9 @@ from sqlalchemy import (
     String,
     Boolean,
     DateTime,
+    delete,
 )
+from datetime import timedelta, datetime, timezone
 
 
 class SqlModel(object):
@@ -192,7 +194,7 @@ class SqlModel(object):
         return True
 
     def is_source(self, source):
-        query = select(self.sources).where(self.sources.c.url == entry["url"])
+        query = select(self.sources).where(self.sources.c.url == source["url"])
 
         result = self.conn.execute(query)
         row = result.fetchone()
@@ -240,5 +242,8 @@ class SqlModel(object):
         self.engine.dispose()
 
     def remove_older_than_days(self, days):
-        # TODO implement
-        pass
+        now = datetime.now(timezone.utc)
+        limit = now - timedelta(days = days)
+        query = delete(self.entries).where(self.entries.c.date_published < limit)
+        result = self.conn.execute(query)
+        return result
