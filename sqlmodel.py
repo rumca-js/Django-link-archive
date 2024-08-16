@@ -186,7 +186,7 @@ class SqlModel(object):
         Source is a map of props
         """
         try:
-            self.conn.execute(self.entries.insert(), [source])
+            self.conn.execute(self.sources.insert(), [source])
 
         except Exception as e:
             print(e)

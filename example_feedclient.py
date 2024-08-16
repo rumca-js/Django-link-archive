@@ -192,6 +192,7 @@ class Parser(object):
 
         self.parser.add_argument("-o", "--output-file", help="Response binary file")
         self.parser.add_argument("-u", "--fetch", action="store_true", help="Fetch files")
+        self.parser.add_argument("--stats", action="store_true", help="Show statistics")
 
         self.args = self.parser.parse_args()
 
@@ -218,6 +219,14 @@ def fetch(conn):
     conn.commit()
 
 
+def show_stats(connection):
+    count_entries = connection.count(connection.entries)
+    count_sources = connection.count(connection.sources)
+
+    print(f"Entires:{count_entries}")
+    print(f"Sources:{count_sources}")
+
+
 def do_main(parser):
     WebConfig.use_print_logging()
 
@@ -236,6 +245,10 @@ def do_main(parser):
     elif parser.args.output_file:
         w = HtmlWriter(parser.args.output_file, db)
         w.write()
+
+    elif parser.args.stats:
+        show_stats(db)
+
     else:
         w = OutputWriter(db)
         w.write()
