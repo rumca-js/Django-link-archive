@@ -13,7 +13,7 @@ feedparser = "^6.0.10"
 requests = "^2.25.1"
 django-user-agents = "^0.4.0"
 python-dateutil = "^2.8.2"
-yt-dlp = "^2023.12.30"
+yt-dlp = "^2024.8.6"
 waybackpy = "^3.0.6"
 pytz = "^2021.1"
 pymemcache = "^4.0.0"
@@ -36,6 +36,10 @@ undetected-chromedriver = "^3.5.5"
 crawlee="0.1.1"
 playwright="*"
 lxml="5.2.2"
+
+# there is a conflict between yt-dlp and puppeteer on websockets
+# https://github.com/pyppeteer/pyppeteer/issues/179
+# pyppeteer="2.0.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.3.0"

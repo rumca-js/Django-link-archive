@@ -208,14 +208,19 @@ class SqlModel(object):
         st = select(func.count()).select_from(table)
         return self.conn.execute(st).scalar()
 
-    def select_conditions(self, conditions):
-        query = select(self.entries).where(conditions)
+    def select_entries(self, conditions=None):
+        if conditions:
+            query = select(self.entries).where(conditions).order_by(self.entries.c.date_published.desc())
 
-        result = self.conn.execute(query)
-        return result.fetchall()
+            result = self.conn.execute(query)
+            return result.fetchall()
+        else:
+            query = select(self.entries).order_by(self.entries.c.date_published.desc())
+            result = self.conn.execute(query)
+            return result.fetchall()
 
-    def select_all(self):
-        query = select(self.entries).order_by(self.entries.c.date_published.desc())
+    def select_sources(self):
+        query = select(self.sources)
         result = self.conn.execute(query)
         return result.fetchall()
 
@@ -231,6 +236,9 @@ class SqlModel(object):
 
             self.transaction = self.conn.begin()
 
+    def truncate(self, table_name):
+        self.conn.execute("TRUNCATE TABLE {}".format(table_name))
+
     def close(self):
         if self.transaction:
             try:
@@ -245,5 +253,10 @@ class SqlModel(object):
         now = datetime.now(timezone.utc)
         limit = now - timedelta(days = days)
         query = delete(self.entries).where(self.entries.c.date_published < limit)
+        result = self.conn.execute(query)
+        return result
+
+    def remove_source(self, source_url):
+        query = delete(self.sources).where(self.sources.c.url == source_url)
         result = self.conn.execute(query)
         return result

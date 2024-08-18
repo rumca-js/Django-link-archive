@@ -22,6 +22,7 @@ from rsshistory.webtools import (
 day_limit = 7
 
 
+# Initial sources list. Will be used to populate SQLite
 sources = [
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCXGgrKt94gR6lmN4aN3mYTg", "title" : "austin evans"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCyl5V3-J_Bsy3x-EBCJwepg", "title" : "babylon bee"},
@@ -112,8 +113,8 @@ sources = [
 def read_source(source):
     result = []
 
-    source_url = source["url"]
-    source_title = source["title"]
+    source_url = source.url
+    source_title = source.title
 
     options = PageOptions()
     options.use_headless_browser = False
@@ -138,7 +139,7 @@ class HtmlWriter(object):
         self.conn = conn
 
     def write(self):
-        rows = self.conn.select_all()
+        rows = self.conn.select_entries()
 
         complete_text = "<html><body><ul>{}</ul></body></html>"
         text = ""
@@ -166,7 +167,7 @@ class OutputWriter(object):
         self.conn = conn
 
     def write(self):
-        rows = self.conn.select_all()
+        rows = self.conn.select_entries()
         for entry in rows:
             thumbnail = entry.thumbnail
             title = entry.title
@@ -178,33 +179,13 @@ class OutputWriter(object):
             print("{} {} {} / {}".format(entry.date_published, entry.link, entry.title, entry.source_title))
 
 
-class Parser(object):
-    """
-    Headers can only be passed by input binary file
-    """
-
-    def parse(self):
-        self.parser = argparse.ArgumentParser(description="Data analyzer program")
-        self.parser.add_argument(
-            "--timeout", default=10, type=int, help="Timeout expressed in seconds"
-        )
-        self.parser.add_argument("--port", type=int, help="Port")
-
-        self.parser.add_argument("-o", "--output-file", help="Response binary file")
-        self.parser.add_argument("-u", "--fetch", action="store_true", help="Fetch files")
-        self.parser.add_argument("--stats", action="store_true", help="Show statistics")
-
-        self.args = self.parser.parse_args()
-
-
 def fetch(conn):
     print("Count:{}".format(conn.count(conn.entries)))
 
-    for source in sources:
-        if not conn.is_source(source):
-            conn.add_source(source)
+    sources = conn.select_sources()
 
-        print("Reading {}".format(source))
+    for source in sources:
+        print("Reading {}".format(source.url))
         source_entries = read_source(source)
 
         for entry in source_entries:
@@ -227,6 +208,45 @@ def show_stats(connection):
     print(f"Sources:{count_sources}")
 
 
+def follow_url(conn, url):
+    source = {}
+    u = Url(url=url)
+    response = u.get_response()
+    title = u.get_title()
+
+    if not title:
+        title = input("Specify title of URL")
+
+    source["url"] = url
+    source["title"] = title
+
+    if conn.is_source(source):
+        return False
+
+    conn.add_source(source)
+    conn.commit()
+    return True
+
+
+def unfollow_url(conn, url):
+    conn.remove_source(url)
+    conn.commit()
+    return True
+
+
+def add_init_sources(conn):
+    for source in sources:
+        if not conn.is_source(source):
+            conn.add_source(source)
+
+
+def list_sources(conn):
+    sources = conn.select_sources()
+    for source in sources:
+        print("Title:{}".format(source.title))
+        print("Url:{}".format(source.url))
+
+
 def do_main(parser):
     WebConfig.use_print_logging()
 
@@ -236,11 +256,30 @@ def do_main(parser):
     HttpPageHandler.crawling_headless_script = "poetry run python crawleebeautifulsoup.py"
     HttpPageHandler.crawling_full_script = "poetry run python crawleebeautifulsoup.py"
 
-    db = SqlModel(db_file="feedclient.db")
+    database_file = parser.args.db
+
+    db = SqlModel(db_file=database_file)
+    add_init_sources(db)
+
     db.remove_older_than_days(day_limit)
 
-    if parser.args.fetch:
+    if parser.args.cleanup:
+        db.truncate("entries")
+
+    elif parser.args.follow:
+        if not follow_url(db, parser.args.follow):
+            print("Cannot add urL")
+        else:
+            print("Added urL")
+
+    elif parser.args.unfollow:
+        unfollow_url(db, parser.args.unfollow)
+
+    elif parser.args.refresh_on_start:
         fetch(db)
+
+    elif parser.args.list_sources:
+        list_sources(db)
 
     elif parser.args.output_file:
         w = HtmlWriter(parser.args.output_file, db)
@@ -254,6 +293,33 @@ def do_main(parser):
         w.write()
 
     db.close()
+
+
+
+class Parser(object):
+    """
+    Headers can only be passed by input binary file
+    """
+
+    def parse(self):
+        self.parser = argparse.ArgumentParser(description="Data analyzer program")
+        self.parser.add_argument(
+            "--timeout", default=10, type=int, help="Timeout expressed in seconds"
+        )
+        self.parser.add_argument("--port", type=int, help="Port")
+
+        self.parser.add_argument("-o", "--output-file", help="Response binary file")
+        self.parser.add_argument("-r", "--refresh-on-start", action="store_true", help="Refreshes on start")
+        self.parser.add_argument("--stats", action="store_true", help="Show statistics")
+        self.parser.add_argument("--cleanup", action="store_true", help="Remove unreferenced items")
+        self.parser.add_argument("--follow", help="Follows specific url")
+        self.parser.add_argument("--unfollow", help="Unfollows specific url")
+        self.parser.add_argument("--list-sources",action="store_true", help="Lists sources")
+        self.parser.add_argument("--db", default="feedclient.db", help="SQLite database file")
+
+        # --since "2024-01-01 12:03
+
+        self.args = self.parser.parse_args()
 
 
 def main():
