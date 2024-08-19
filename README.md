@@ -12,6 +12,7 @@ Manages link meta information.
  - import and export. To github. For example [Internet domains, users, projects](https://github.com/rumca-js/Internet-Places-Database)
  - Minimal aesthetic. Dark mode, custom list displays
  - local data, no algorithms, no advertisements, self-hosted
+ - does not support proxy rotation. This is ethical web scraper, it should not spam with requests
 
 <div align="center">
   <img alt="Django Logo" src="images/django_400.png" width="400px">
@@ -217,6 +218,7 @@ User actions are tracked by the system, only if it is configured so:
 There are some scripts that can be used without Django application:
  - example_feedclient.py - example script that can serve as a simple RSS reader
  - example_page_crawler.py - example script that can crawl through web page
+ - example_compare_crawlers.py - shows how much time it takes to execute different crawlers
  - converter.py - converts JSON files to SQLite table
  - dataanalyzer.py - analyzes data in JSON files / SQLite table. You can query the data
  - script_server.py - server that can be used to dispatch crawlers for certain URLs, to obtain meta data
