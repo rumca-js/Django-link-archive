@@ -1,3 +1,8 @@
+"""
+Provides cralwers implmenetation that can be used directly in program.
+
+Some crawlers / scrapers cannot be easily called from a thread, etc, because of asyncio.
+"""
 
 import json
 

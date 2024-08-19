@@ -106,6 +106,7 @@ sources = [
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCFLwN7vRu8M057qJF8TsBaA", "title" : "up is not down"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCvg_4SPPEZ7y4pk_iB7z6sw", "title" : "whimsu"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCxXu9tCU63mF1ntk89XPkzA", "title" : "worthkids"},
+        {"url" : "https://hnrss.org/frontpage", "title" : "Hacker News Front Page"},
        # {"url" : "https://www.warhammer-community.com/feed", "title" : "Warhammer community"},
 ]
 
@@ -153,7 +154,10 @@ class HtmlWriter(object):
             source = entry.source
             #source_title = entry.source
 
-            text += f'<a href="{link}"><div><img style="width:400px;height=300px" src="{thumbnail}" /></div><div>{title}</div></a><div>{source}</div><div><pre>{description}</pre></div>'
+            if thumbnail:
+                text += f'<a href="{link}"><div><img style="width:400px;height=300px" src="{thumbnail}" /></div><div>{title}</div></a><div>{source}</div><div><pre>{description}</pre></div>'
+            else:
+                text += f'<a href="{link}"><div>{title}</div></a><div>{source}</div><div><pre>{description}</pre></div>'
 
         complete_text = complete_text.format(text)
 
@@ -179,7 +183,7 @@ class OutputWriter(object):
 
 
 def fetch(db):
-    print("Count:{}".format(db.entries_table.count()))
+    print("Number of entries:{}".format(db.entries_table.count()))
 
     sources = db.sources_table.select()
 
@@ -194,7 +198,7 @@ def fetch(db):
             if entry['date_published'] > limit and not db.entries_table.is_entry(entry):
                 db.entries_table.add_entry(entry)
 
-        print("Count:{}".format(db.entries_table.count()))
+        print("Number of entries:{}".format(db.entries_table.count()))
 
     db.commit()
 
@@ -207,7 +211,7 @@ def show_stats(entries_table, sources_table):
     print(f"Sources:{count_sources}")
 
 
-def follow_url(sources_table, url):
+def follow_url(db, url):
     source = {}
     u = Url(url=url)
     response = u.get_response()
@@ -219,17 +223,17 @@ def follow_url(sources_table, url):
     source["url"] = url
     source["title"] = title
 
-    if sources_table.is_source(source):
+    if db.sources_table.is_source(source):
         return False
 
-    sources_table.add_source(source)
-    sources_table.commit()
+    db.sources_table.add_source(source)
+    db.sources_table.commit()
     return True
 
 
-def unfollow_url(sources_table, url):
-    sources_table.remove(url)
-    sources_table.commit()
+def unfollow_url(db, url):
+    db.sources_table.remove(url)
+    db.sources_table.commit()
     return True
 
 
@@ -250,7 +254,7 @@ def do_main(parser):
     WebConfig.use_print_logging()
 
     # scraping server is not running, we do not use port
-    HttpPageHandler.crawling_server_port = 0
+    HttpPageHandler.crawling_server_port = parser.args.port
     # when python requests cannot handle a scenario, we run crawlee
     HttpPageHandler.crawling_headless_script = "poetry run python crawleebeautifulsoup.py"
     HttpPageHandler.crawling_full_script = "poetry run python crawleebeautifulsoup.py"
@@ -259,36 +263,39 @@ def do_main(parser):
 
     db = SqlModel(database_file=database_file)
 
-    add_init_sources(db)
+    if parser.args.init_sources:
+        add_init_sources(db)
 
     db.entries_table.remove(day_limit)
 
     if parser.args.cleanup:
         db.entries_table.truncate()
 
-    elif parser.args.follow:
+    if parser.args.follow:
         if not follow_url(db, parser.args.follow):
-            print("Cannot add urL")
+            print("Cannot follow {}".format(parser.args.follow))
         else:
-            print("Added urL")
+            print("Added {}".format(parser.args.follow))
 
-    elif parser.args.unfollow:
+    if parser.args.unfollow:
         unfollow_url(db, parser.args.unfollow)
 
-    elif parser.args.refresh_on_start:
+
+    # one of the below needs to be true
+    if parser.args.refresh_on_start:
         fetch(db)
 
     elif parser.args.list_sources:
         list_sources(db)
 
+    elif parser.args.stats:
+        show_stats(db)
+
     elif parser.args.output_file:
         w = HtmlWriter(db, parser.args.output_file)
         w.write()
 
-    elif parser.args.stats:
-        show_stats(db)
-
-    else:
+    elif parser.args.print:
         w = OutputWriter(db)
         w.write()
 
@@ -306,15 +313,16 @@ class Parser(object):
         self.parser.add_argument(
             "--timeout", default=10, type=int, help="Timeout expressed in seconds"
         )
-        self.parser.add_argument("--port", type=int, help="Port")
-
-        self.parser.add_argument("-o", "--output-file", help="Response binary file")
+        self.parser.add_argument("--port", type=int, default=0, help="Port")
+        self.parser.add_argument("-o", "--output-file", help="HTML output file, with entry data")
+        self.parser.add_argument("--print", help="Print entries to stdout")
         self.parser.add_argument("-r", "--refresh-on-start", action="store_true", help="Refreshes on start")
         self.parser.add_argument("--stats", action="store_true", help="Show statistics")
         self.parser.add_argument("--cleanup", action="store_true", help="Remove unreferenced items")
         self.parser.add_argument("--follow", help="Follows specific url")
         self.parser.add_argument("--unfollow", help="Unfollows specific url")
         self.parser.add_argument("--list-sources",action="store_true", help="Lists sources")
+        self.parser.add_argument("--init-sources",action="store_true", help="Initializes sources")
         self.parser.add_argument("--db", default="feedclient.db", help="SQLite database file")
 
         # --since "2024-01-01 12:03
