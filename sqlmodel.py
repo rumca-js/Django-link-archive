@@ -18,15 +18,15 @@ from sqlalchemy import (
 from datetime import timedelta, datetime, timezone
 
 
-class SqlModel(object):
-    def __init__(self, db_file="test.db", parser=None):
+
+class SqlConnection(object):
+    """
+    Simple wrapper for connection
+    """
+    def __init__(self, database_file="test.db", parser=None):
         self.conn = None
         self.cursor = None
-
-        if db_file:
-            self.db_file = db_file
-        else:
-            self.db_file = "test.db"
+        self.database_file = database_file
 
         self.parser = parser
 
@@ -34,7 +34,6 @@ class SqlModel(object):
             print("Could not connect to database")
             return
 
-        self.define_tables()
         self.conn = self.engine.connect()
         self.transaction = self.conn.begin()
 
@@ -53,15 +52,73 @@ class SqlModel(object):
             )
             return False
 
-    def define_tables(self):
-        self.define_entries()
-        self.define_sources()
+    def commit(self):
+        if self.transaction:
+            try:
+                self.transaction.commit()
+            except Exception as e:
+                self.transaction.rollback()
 
-    def define_entries(self):
+            self.transaction = self.conn.begin()
+
+    def close(self):
+        if self.transaction:
+            try:
+                self.transaction.commit()
+            except Exception as e:
+                self.transaction.rollback()
+
+        self.conn.close()
+        self.engine.dispose()
+
+    def get_database_file(self):
+        return self.database_file
+
+
+class GenericTable(object):
+    def __init__(self, sqlconnection):
+        self.conn = sqlconnection
+
+        self.table_name = None
+        self.table = None
+
+    def create(self):
+        """
+        Expected to set self.table
+        """
+        raise NotImplementedError("GenericTable: create function has not been implemeneted")
+
+    def count(self):
+        from sqlalchemy.sql import text
+        st = select(func.count()).select_from(text(self.table_name))
+        return self.get_connection().execute(st).scalar()
+
+    def select(self):
+        query = select(self.table)
+        result = self.get_connection().execute(query)
+        return result.fetchall()
+
+    def truncate(self):
+        self.conn.execute("TRUNCATE TABLE {}".format(table_name))
+
+    def get_connection(self):
+        return self.conn.conn
+
+    def commit(self):
+        self.conn.commit()
+
+
+class EntriesTable(GenericTable):
+    def __init__(self, conn, preserve_ids = False):
+        super().__init__(conn)
+        self.table_name = "entries"
+        self.preserve_ids = preserve_ids
+
+    def create(self):
         metadata = MetaData()
 
-        self.entries = Table(
-            "entries",
+        self.table = Table(
+            self.table_name,
             metadata,
             Column("id", Integer, primary_key=True),
             Column("link", String, unique=True),
@@ -90,29 +147,14 @@ class SqlModel(object):
             Column("tags", String, nullable=True),
         )
 
-        with self.engine.connect() as connection:
-            if not self.engine.dialect.has_table(connection, "entries"):
+        engine = self.conn.engine
+        with engine.connect() as connection:
+            if not engine.dialect.has_table(connection, "entries"):
                 print("Does not have entries table, creating one")
                 metadata.create_all(self.engine)
 
-    def define_sources(self):
-        metadata = MetaData()
-
-        self.sources = Table(
-            "sources",
-            metadata,
-            Column("id", Integer, primary_key=True),
-            Column("url", String, unique=True),
-            Column("title", String),
-        )
-
-        with self.engine.connect() as connection:
-            if not self.engine.dialect.has_table(connection, "sources"):
-                print("Does not have sources table, creating one")
-                metadata.create_all(self.engine)
-
     def add_entry(self, entry):
-        if self.parser and self.parser.preserve_id:
+        if self.preserve_ids:
             return self.add_entry_as_is(entry)
         else:
             return self.add_entry_auto_increment(entry)
@@ -138,7 +180,7 @@ class SqlModel(object):
                 data[key] = entry[key]
 
         try:
-            self.conn.execute(self.entries.insert(), [data])
+            self.get_connection().execute(self.table.insert(), [data])
 
         except Exception as e:
             print(e)
@@ -163,7 +205,7 @@ class SqlModel(object):
                 data[key] = entry[key]
 
         try:
-            self.conn.execute(self.entries.insert(), [data])
+            self.get_connection().execute(self.table.insert(), [data])
 
         except Exception as e:
             print(e)
@@ -171,9 +213,9 @@ class SqlModel(object):
         return True
 
     def is_entry(self, entry):
-        query = select(self.entries).where(self.entries.c.link == entry["link"])
+        query = select(self.table).where(self.table.c.link == entry["link"])
 
-        result = self.conn.execute(query)
+        result = self.get_connection().execute(query)
         row = result.fetchone()
 
         if row:
@@ -181,12 +223,53 @@ class SqlModel(object):
         else:
             return False
 
+    def select(self, conditions=None):
+        if conditions:
+            query = select(self.table).where(conditions).order_by(self.table.c.date_published.desc())
+
+            result = self.get_connection().execute(query)
+            return result.fetchall()
+        else:
+            query = select(self.table).order_by(self.table.c.date_published.desc())
+            result = self.get_connection().execute(query)
+            return result.fetchall()
+
+    def remove(self, days):
+        now = datetime.now(timezone.utc)
+        limit = now - timedelta(days = days)
+        query = delete(self.table).where(self.table.c.date_published < limit)
+        result = self.get_connection().execute(query)
+        return result
+
+
+class SourcesTable(GenericTable):
+    def __init__(self, conn):
+        super().__init__(conn)
+        self.table_name = "sources"
+
+    def create(self):
+        metadata = MetaData()
+
+        self.table = Table(
+            self.table_name,
+            metadata,
+            Column("id", Integer, primary_key=True),
+            Column("url", String, unique=True),
+            Column("title", String),
+        )
+
+        engine = self.get_connection().engine
+        with engine.connect() as connection:
+            if not engine.dialect.has_table(connection, "sources"):
+                print("Does not have sources table, creating one")
+                metadata.create_all(self.engine)
+
     def add_source(self, source):
         """
         Source is a map of props
         """
         try:
-            self.conn.execute(self.sources.insert(), [source])
+            self.get_connection().execute(self.table.insert(), [source])
 
         except Exception as e:
             print(e)
@@ -194,9 +277,9 @@ class SqlModel(object):
         return True
 
     def is_source(self, source):
-        query = select(self.sources).where(self.sources.c.url == source["url"])
+        query = select(self.table).where(self.table.c.url == source["url"])
 
-        result = self.conn.execute(query)
+        result = self.get_connection().execute(query)
         row = result.fetchone()
 
         if row:
@@ -204,59 +287,29 @@ class SqlModel(object):
         else:
             return False
 
-    def count(self, table):
-        st = select(func.count()).select_from(table)
-        return self.conn.execute(st).scalar()
-
-    def select_entries(self, conditions=None):
-        if conditions:
-            query = select(self.entries).where(conditions).order_by(self.entries.c.date_published.desc())
-
-            result = self.conn.execute(query)
-            return result.fetchall()
-        else:
-            query = select(self.entries).order_by(self.entries.c.date_published.desc())
-            result = self.conn.execute(query)
-            return result.fetchall()
-
-    def select_sources(self):
-        query = select(self.sources)
-        result = self.conn.execute(query)
+    def select(self):
+        query = select(self.table)
+        result = self.get_connection().execute(query)
         return result.fetchall()
 
-    def get_database_file(self):
-        return self.db_file
+    def remove(self, source_url):
+        query = delete(self.table).where(self.table.c.url == source_url)
+        result = self.get_connection().execute(query)
+        return result
+
+
+class SqlModel(object):
+    def __init__(self, database_file="test.db", parser=None):
+        self.conn = SqlConnection(database_file=database_file)
+
+        self.entries_table = EntriesTable(self.conn)
+        self.entries_table.create()
+
+        self.sources_table = SourcesTable(self.conn)
+        self.sources_table.create()
 
     def commit(self):
-        if self.transaction:
-            try:
-                self.transaction.commit()
-            except Exception as e:
-                self.transaction.rollback()
-
-            self.transaction = self.conn.begin()
-
-    def truncate(self, table_name):
-        self.conn.execute("TRUNCATE TABLE {}".format(table_name))
+        self.conn.commit()
 
     def close(self):
-        if self.transaction:
-            try:
-                self.transaction.commit()
-            except Exception as e:
-                self.transaction.rollback()
-
         self.conn.close()
-        self.engine.dispose()
-
-    def remove_older_than_days(self, days):
-        now = datetime.now(timezone.utc)
-        limit = now - timedelta(days = days)
-        query = delete(self.entries).where(self.entries.c.date_published < limit)
-        result = self.conn.execute(query)
-        return result
-
-    def remove_source(self, source_url):
-        query = delete(self.sources).where(self.sources.c.url == source_url)
-        result = self.conn.execute(query)
-        return result

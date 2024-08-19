@@ -30,6 +30,7 @@ TODO:
 Main classes are:
     - Url - most things should be done through it
     - PageOptions - upper layers should decide how a page should be called. Supplied to Url
+    - PageRequestObject - request
     - PageResponseObject - page response, interface for all implementations
 """
 
@@ -2387,7 +2388,7 @@ class PageOptions(object):
     def __init__(self):
         self.use_full_browser = False
         self.use_headless_browser = False
-        self.ssl_verify = False
+        self.ssl_verify = True
         self.ping = False
         self.use_browser_promotions = True # tries headles if normal processing does not work
 
@@ -2413,6 +2414,10 @@ class PageOptions(object):
 class PageRequestObject(object):
     """
     Precise information for scraping.
+    Should contain information about what is to be scraped. Means of scraping should not be apart of this.
+
+    @example Url, timeout is OK.
+    @example Scarping script name, port, is not OK
     """
 
     def __init__(
@@ -2498,6 +2503,10 @@ class PageResponseObject(object):
         else:
             self.encoding = encoding
             self.apparent_encoding = encoding
+
+        if not self.encoding:
+            self.encoding = "utf-8"
+            self.apparent_encoding = "utf-8"
 
         if self.binary and not self.text:
             self.text = self.binary.decode(self.encoding)

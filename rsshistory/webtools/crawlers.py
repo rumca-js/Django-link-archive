@@ -1,4 +1,4 @@
-import requests
+
 import json
 
 from .webtools import (
@@ -14,9 +14,20 @@ from .webtools import (
     HTTP_STATUS_CODE_PAGE_UNSUPPORTED,
 )
 
+from .ipc import(
+    string_to_command,
+    SocketConnection,
+)
+
+requests_feataure_enabled = True
+try:
+    import requests
+except Exception as E:
+    print(str(E))
+    requests_feataure_enabled = False
+
 
 selenium_feataure_enabled = True
-
 try:
     from selenium import webdriver
     from selenium.webdriver.chrome.service import Service
@@ -29,18 +40,101 @@ except Exception as E:
     selenium_feataure_enabled = False
 
 
-class RequestsPage(object):
+class CrawlerInterface(object):
+
+    def __init__(self, request, response_file=None, response_port=None):
+        """
+        @param response_file If set, response is stored in a file
+        @param response_port If set, response is sent through port
+        """
+        self.request = request
+        self.response = None
+        self.response_file = response_file
+        self.response_port = response_port
+
+    def run(self):
+        """
+         - does its job
+         - sets self.response
+         - clears everything from memory, it created
+
+        @return response, None if feature is not available
+        """
+        return self.response
+
+    def response_to_bytes(self):
+        all_bytes = bytearray()
+
+        # same as PageResponseObject
+        bytes1 = string_to_command("PageResponseObject.__init__", "OK")
+        bytes2 = string_to_command("PageResponseObject.url", self.response.url)
+        bytes3 = string_to_command(
+            "PageResponseObject.request_url", self.response.request_url
+        )
+        bytes4 = string_to_command(
+            "PageResponseObject.status_code", str(self.response.status_code)
+        )
+
+        if self.response.text:
+            bytes5 = string_to_command("PageResponseObject.text", self.response.text)
+        else:
+            bytes5 = bytearray()
+
+        bytes6 = string_to_command(
+            "PageResponseObject.headers", json.dumps(self.response.headers)
+        )
+        bytes7 = string_to_command("PageResponseObject.__del__", "OK")
+
+        all_bytes.extend(bytes1)
+        all_bytes.extend(bytes2)
+        all_bytes.extend(bytes3)
+        all_bytes.extend(bytes4)
+        all_bytes.extend(bytes5)
+        all_bytes.extend(bytes6)
+        all_bytes.extend(bytes7)
+        return all_bytes
+
+    def get_response(self):
+        return self.response
+
+    def save_response(self):
+        if not self.response:
+            WebLogger.error("Have not received response")
+            return False
+
+        all_bytes = self.response_to_bytes()
+
+        if self.response_file:
+            with open(self.response_file, "wb") as fh:
+                fh.write(all_bytes)
+
+        elif self.response_port:
+            con = SocketConnection()
+            con.connect(SocketConnection.gethostname(), self.response_port)
+            con.send(all_bytes)
+
+        else:
+            WebLogger.error("Response binary interface was not set up correctly")
+            return False
+
+        return True
+
+
+class RequestsPage(CrawlerInterface):
     """
     Python requests crawler interface
     # TODO rename to RequestCrawler
     """
 
-    def __init__(self, request):
+    def __init__(self, request, response_file=None, response_port=None):
         """
         Wrapper for python requests.
         """
-        self.request = request
-        self.response = None
+        super().__init__(request, response_file=response_file, response_port=response_port)
+
+    def run(self):
+        if not requests_feataure_enabled:
+            return
 
         WebLogger.debug("Requests GET:{}".format(self.request.url))
 
@@ -56,21 +150,21 @@ class RequestsPage(object):
                 url=request_result.url,
                 text="",
                 status_code=request_result.status_code,
-                headers=request_result.headers,
+                headers=dict(request_result.headers),
                 request_url=self.request.url,
             )
 
             if not self.response.is_valid():
-                return
+                return self.response
 
             content_length = self.response.get_content_length()
             if content_length > PAGE_TOO_BIG_BYTES:
                 self.response.status_code = status_code = HTTP_STATUS_CODE_FILE_TOO_BIG
                 self.response.add_error("Page is too big")
-                return
+                return self.response
 
             if self.request.ping:
-                return
+                return self.response
 
             # TODO do we want to check also content-type?
 
@@ -81,7 +175,7 @@ class RequestsPage(object):
                 self.response.add_error(
                     "Url:{} is not supported {}".format(self.request.url, content_type)
                 )
-                return
+                return self.response
 
             """
             IF we do not know the content type, or content type is supported
@@ -95,7 +189,7 @@ class RequestsPage(object):
                 text=request_result.text,
                 status_code=request_result.status_code,
                 encoding=request_result.encoding,
-                headers=request_result.headers,
+                headers=dict(request_result.headers),
                 binary=request_result.content,
                 request_url=self.request.url,
             )
@@ -108,6 +202,7 @@ class RequestsPage(object):
                 request_url=self.request.url,
             )
             self.response.add_error("Url:{} Page timeout".format(self.request.url))
+
         except requests.exceptions.ConnectionError:
             self.response = PageResponseObject(
                 self.request.url,
@@ -116,6 +211,7 @@ class RequestsPage(object):
                 request_url=self.request.url,
             )
             self.response.add_error("Url:{} Connection error".format(self.request.url))
+
         except Exception as E:
             WebLogger.exc(E, "Url:{} General exception".format(self.request.url))
 
@@ -127,9 +223,7 @@ class RequestsPage(object):
             )
             self.response.add_error("General page exception")
 
-    def get(self):
-        if self.response:
-            return self.response
+        return self.response
 
     def get_encoding(self, request_result, response):
         """
@@ -183,7 +277,11 @@ class RequestsPage(object):
         return request_result
 
 
-class SeleniumDriver(object):
+class SeleniumDriver(CrawlerInterface):
+
+    def __init__(self, request, response_file=None, response_port=None):
+        super().__init__(request, response_file=response_file, response_port=response_port)
+
     def get_driver(self):
         """
         https://www.lambdatest.com/blog/internationalization-with-selenium-webdriver/
@@ -283,26 +381,31 @@ class SeleniumChromeHeadless(SeleniumDriver):
     """
 
     def get_driver(self):
-        service = Service(executable_path="/usr/bin/chromedriver")
-        options = webdriver.ChromeOptions()
-        options.add_argument("--headless")
-        options.add_argument("--lang={}".format("en-US"))
+        try:
+            service = Service(executable_path="/usr/bin/chromedriver")
+            options = webdriver.ChromeOptions()
+            options.add_argument("--headless")
+            options.add_argument("--lang={}".format("en-US"))
 
-        options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
+            options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
 
-        driver = webdriver.Chrome(service=service, options=options)
-        return driver
+            driver = webdriver.Chrome(service=service, options=options)
+            return driver
+        except Exception as E:
+            return
 
-    def __init__(self, request):
+    def run(self):
         """
         To obtain RSS page you have to run real, full blown browser.
 
         Headless might not be enough to fool cloudflare.
         """
-        self.request = request
-        self.response = None
+        if not selenium_feataure_enabled:
+            return
 
         driver = self.get_driver()
+        if not driver:
+            return
 
         try:
             # add 10 seconds for start of browser, etc.
@@ -348,11 +451,13 @@ class SeleniumChromeHeadless(SeleniumDriver):
                 request_url=self.request.url,
             )
         finally:
+            try:
+                driver.close()
+            except Exception as E:
+                pass
             driver.quit()
 
-    def get(self):
-        if self.response:
-            return self.response
+        return self.response
 
 
 class SeleniumChromeFull(SeleniumDriver):
@@ -361,22 +466,25 @@ class SeleniumChromeFull(SeleniumDriver):
     """
 
     def get_driver(self):
-        service = Service(executable_path="/usr/bin/chromedriver")
-        options = webdriver.ChromeOptions()
-        options.add_argument("--headless")
-        options.add_argument("--lang={}".format("en-US"))
-        # options.add_argument("--no-sandbox")
-        # options.add_argument("--disable-dev-shm-usage")
-        # options.add_argument('--remote-debugging-pipe')
-        # options.add_argument('--remote-debugging-port=9222')
-        # options.add_argument('--user-data-dir=~/.config/google-chrome')
+        try:
+            service = Service(executable_path="/usr/bin/chromedriver")
+            options = webdriver.ChromeOptions()
+            options.add_argument("--headless")
+            options.add_argument("--lang={}".format("en-US"))
+            # options.add_argument("--no-sandbox")
+            # options.add_argument("--disable-dev-shm-usage")
+            # options.add_argument('--remote-debugging-pipe')
+            # options.add_argument('--remote-debugging-port=9222')
+            # options.add_argument('--user-data-dir=~/.config/google-chrome')
 
-        # options to enable performance log, to read status code
-        options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
+            # options to enable performance log, to read status code
+            options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
 
-        return webdriver.Chrome(service=service, options=options)
+            return webdriver.Chrome(service=service, options=options)
+        except Exception as E:
+            return
 
-    def __init__(self, request):
+    def run(self):
         """
         To obtain RSS page you have to run real, full blown browser.
 
@@ -384,8 +492,11 @@ class SeleniumChromeFull(SeleniumDriver):
 
         https://stackoverflow.com/questions/50642308/webdriverexception-unknown-error-devtoolsactiveport-file-doesnt-exist-while-t
         """
-        self.request = request
-        self.response = None
+        if not selenium_feataure_enabled:
+            return
+
+        if not driver:
+            return
 
         import os
 
@@ -434,30 +545,33 @@ class SeleniumChromeFull(SeleniumDriver):
                 request_url=self.request.url,
             )
         finally:
+            try:
+                driver.close()
+            except Exception as E:
+                pass
             driver.quit()
 
-    def get(self):
-        if self.response:
-            return self.response
+        return self.response
 
 
-class SeleniumUndetected(object):
+class SeleniumUndetected(SeleniumDriver):
     """
     Selenium undetected
     """
 
     def get_driver(self):
-        import undetected_chromedriver as uc
+        try:
+            import undetected_chromedriver as uc
 
-        service = Service(executable_path="/usr/bin/chromedriver")
+            options = uc.ChromeOptions()
+            options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
+            options.add_argument("--lang={}".format("en-US"))
 
-        options = uc.ChromeOptions()
-        options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
-        options.add_argument("--lang={}".format("en-US"))
+            return uc.Chrome(options=options)
+        except Exception as E:
+            return
 
-        return uc.Chrome(service=service, options=options)
-
-    def __init__(self, request):
+    def run(self):
         """
         To obtain RSS page you have to run real, full blown browser.
 
@@ -465,10 +579,11 @@ class SeleniumUndetected(object):
 
         This does not work on raspberry pi
         """
-        self.request = request
-        self.response = None
 
         driver = self.get_driver()
+
+        if not driver:
+            return
 
         try:
             # add 10 seconds for start of browser, etc.
@@ -503,8 +618,10 @@ class SeleniumUndetected(object):
                 request_url=self.request.url,
             )
         finally:
+            try:
+                driver.close()
+            except Exception as E:
+                pass
             driver.quit()
 
-    def get(self):
-        if self.response:
-            return self.response
+        return self.response

@@ -67,7 +67,7 @@ class Converter(object):
                     entry["id"] = row
 
                 if self.is_entry_to_be_added(entry):
-                    if self.conn.add_entry(entry):
+                    if self.conn.entries_table.add_entry(entry):
                         if self.parser.args.verbose:
                             print(
                                 " -> [{}/{}] Link:{} Added".format(
@@ -90,7 +90,7 @@ class Converter(object):
 
     def is_entry_to_be_added(self, entry):
         # entry already exists
-        if self.conn.is_entry(entry):
+        if self.conn.entries_table.is_entry(entry):
             return False
 
         if self.parser.vote_min:
@@ -163,7 +163,7 @@ def main():
     parser = Parser()
     parser.parse()
 
-    db = SqlModel(db_file=parser.output_file)
+    db = SqlModel(database_file=parser.output_file)
 
     try:
         start_time = time.time()

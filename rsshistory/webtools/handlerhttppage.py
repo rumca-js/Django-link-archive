@@ -136,6 +136,12 @@ class HttpRequestBuilder(object):
             return response.get_binary()
 
     def get_contents_internal(self, request):
+        """
+        There are 3 levels of scraping:
+         - requests (fast)
+         - if above fails we can use headless browser
+         - if above fails we can use full browser (most advanced, resource consuming)
+        """
         request.timeout_s = max(request.timeout_s, 10)
         if self.options:
             request.ssl_verify = self.options.ssl_verify
@@ -143,29 +149,56 @@ class HttpRequestBuilder(object):
             request.ping = self.options.ping
 
         if self.options.use_basic_crawler():
-            return self.get_contents_via_requests(request=request)
+            preference_table = [
+                    self.get_contents_via_requests,
+                    self.get_contents_via_server_headless,
+                    self.get_contents_via_script_headless,
+                    self.get_contents_via_selenium_chrome_headless,
+                    self.get_contents_via_server_full,
+                    self.get_contents_via_script_full,
+                    self.get_contents_via_selenium_chrome_full,
+                    ]
+
+            for function in preference_table:
+                result = function(request=request)
+                if result:
+                    return result
+
         elif self.options.use_headless_browser:
             request.timeout_s = max(request.timeout_s, 20)
 
-            if HttpPageHandler.crawling_server_port:
-                return self.get_contents_via_server_headless(request=request)
-            if HttpPageHandler.crawling_headless_script:
-                return self.get_contents_via_script_headless(request=request)
-            if selenium_feataure_enabled:
-                return self.get_contents_via_selenium_chrome_headless(request=request)
+            preference_table = [
+                self.get_contents_via_server_headless,
+                self.get_contents_via_script_headless,
+                self.get_contents_via_selenium_chrome_headless,
+                self.get_contents_via_server_full,
+                self.get_contents_via_script_full,
+                self.get_contents_via_selenium_chrome_full,
+                self.get_contents_via_requests,
+            ]
 
-            return self.get_contents_via_requests(request=request)
+            for function in preference_table:
+                result = function(request=request)
+                if result:
+                    return result
+
         elif self.options.use_full_browser:
             request.timeout_s = max(request.timeout_s, 30)
 
-            if HttpPageHandler.crawling_server_port:
-                return self.get_contents_via_server_full(request=request)
-            if HttpPageHandler.crawling_full_script:
-                return self.get_contents_via_script_full(request=request)
-            if selenium_feataure_enabled:
-                return self.get_contents_via_selenium_chrome_full(request=request)
+            preference_table = [
+                self.get_contents_via_server_full,
+                self.get_contents_via_script_full,
+                self.get_contents_via_selenium_chrome_full,
+                self.get_contents_via_server_headless,
+                self.get_contents_via_script_headless,
+                self.get_contents_via_selenium_chrome_headless,
+                self.get_contents_via_requests,
+            ]
 
-            return self.get_contents_via_requests(request=request)
+            for function in preference_table:
+                result = function(request=request)
+                if result:
+                    return result
         else:
             self.dead = True
             raise NotImplementedError("Could not identify method of page capture")
@@ -179,27 +212,39 @@ class HttpRequestBuilder(object):
         """
 
         p = RequestsPage(request)
-        return p.get()
+        p.run()
+        return p.get_response()
 
     def get_contents_via_selenium_chrome_headless(self, request):
         p = SeleniumChromeHeadless(request)
-        return p.get()
+        p.run()
+        return p.get_response()
 
     def get_contents_via_selenium_chrome_full(self, request):
         p = SeleniumChromeFull(request)
-        return p.get()
+        p.run()
+        return p.get_response()
 
     def get_contents_via_script_headless(self, request):
+        if not HttpPageHandler.crawling_headless_script:
+            return
+
         script = HttpPageHandler.crawling_headless_script
 
         return self.get_contents_via_script(script, request)
 
     def get_contents_via_script_full(self, request):
+        if not HttpPageHandler.crawling_full_script:
+            return
+
         script = HttpPageHandler.crawling_full_script
 
         return self.get_contents_via_script(script, request)
 
     def get_contents_via_server_headless(self, request):
+        if not HttpPageHandler.crawling_server_port:
+            return
+
         script = HttpPageHandler.crawling_headless_script
         if script is None:
             script = "poetry run python crawleebeautifulsoup.py"
@@ -208,6 +253,9 @@ class HttpRequestBuilder(object):
         return self.get_contents_via_server(script, port, request)
 
     def get_contents_via_server_full(self, request):
+        if not HttpPageHandler.crawling_server_port:
+            return
+
         script = HttpPageHandler.crawling_full_script
         if script is None:
             script = "poetry run python crawleeplaywright.py"
@@ -237,14 +285,7 @@ class HttpRequestBuilder(object):
                 return response
         except Exception as E:
             WebLogger.exc(E, "Cannot connect to port{}".format(port))
-
-            response = PageResponseObject(
-                request.url,
-                text=None,
-                status_code=HTTP_STATUS_CODE_CONNECTION_ERROR,
-                request_url=request.url,
-            )
-            return response
+            return
 
         bytes = get_request_to_bytes(request, script)
         connection.send(bytes)
@@ -328,18 +369,8 @@ class HttpRequestBuilder(object):
         operating_path = full_path.parents[2]
         response_file_location = full_path.parents[1] / "response.txt"
 
-        if script.find("$URL") == -1:
-            WebLogger.error(
-                "Url:{}. script requires passing URL and RESPONSE_FILE script options:{}".format(
-                    request.url, script
-                )
-            )
-            return PageResponseObject(
-                request.url,
-                text=None,
-                status_code=HTTP_STATUS_CODE_EXCEPTION,
-                request_url=request.url,
-            )
+        if not Path(script).exists():
+            return
 
         script = script + ' --url "{}" --output-file="{}"'.format(request.url, str(response_file_location))
 
@@ -471,7 +502,7 @@ class HttpRequestBuilder(object):
             return None
 
         try:
-            WebLogger.info("[R] Url:{}. options:{}".format(self.url, self.options))
+            WebLogger.info("[R] Url:{}. Options:{}".format(self.url, self.options))
 
             request = PageRequestObject(
                 url=self.url,
@@ -482,7 +513,7 @@ class HttpRequestBuilder(object):
             self.response = self.get_contents_function(request=request)
 
             WebLogger.info(
-                "Url:{}. Options{} Requesting page: DONE".format(self.url, self.options)
+                    "Url:{}. Options:{} Requesting page: DONE".format(self.url, self.options)
             )
 
         except Exception as E:

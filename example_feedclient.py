@@ -134,17 +134,17 @@ def read_source(source):
 
 
 class HtmlWriter(object):
-    def __init__(self, file_name, conn):
+    def __init__(self, db, file_name):
+        self.db = db
         self.file_name = file_name
-        self.conn = conn
 
     def write(self):
-        rows = self.conn.select_entries()
+        entries = self.db.entries_table.select()
 
         complete_text = "<html><body><ul>{}</ul></body></html>"
         text = ""
 
-        for entry in rows:
+        for entry in entries:
             thumbnail = entry.thumbnail
             title = entry.title
             link = entry.link
@@ -157,32 +157,31 @@ class HtmlWriter(object):
 
         complete_text = complete_text.format(text)
 
-        with open(self.file_name, "w") as fh:
+        with open(self.file_name, "w", encoding="utf-8") as fh:
             fh.write(complete_text)
 
 
 class OutputWriter(object):
 
-    def __init__(self, conn):
-        self.conn = conn
+    def __init__(self, db):
+        self.db = db
 
     def write(self):
-        rows = self.conn.select_entries()
-        for entry in rows:
+        entries = self.db.entries_table.select()
+        for entry in entries:
             thumbnail = entry.thumbnail
             title = entry.title
             link = entry.link
             description = entry.description
             date_published = entry.date_published
-            source_title = entry.source_title
 
-            print("{} {} {} / {}".format(entry.date_published, entry.link, entry.title, entry.source_title))
+            print("{} {} {}".format(entry.date_published, entry.link, entry.title,))
 
 
-def fetch(conn):
-    print("Count:{}".format(conn.count(conn.entries)))
+def fetch(db):
+    print("Count:{}".format(db.entries_table.count()))
 
-    sources = conn.select_sources()
+    sources = db.sources_table.select()
 
     for source in sources:
         print("Reading {}".format(source.url))
@@ -192,23 +191,23 @@ def fetch(conn):
             now = datetime.now(timezone.utc)
             limit = now - timedelta(days = day_limit)
 
-            if entry['date_published'] > limit and not conn.is_entry(entry):
-                conn.add_entry(entry)
+            if entry['date_published'] > limit and not db.entries_table.is_entry(entry):
+                db.entries_table.add_entry(entry)
 
-        print("Count:{}".format(conn.count(conn.entries)))
+        print("Count:{}".format(db.entries_table.count()))
 
-    conn.commit()
+    db.commit()
 
 
-def show_stats(connection):
-    count_entries = connection.count(connection.entries)
-    count_sources = connection.count(connection.sources)
+def show_stats(entries_table, sources_table):
+    count_entries = entries_table.count()
+    count_sources = sources_table.count()
 
     print(f"Entires:{count_entries}")
     print(f"Sources:{count_sources}")
 
 
-def follow_url(conn, url):
+def follow_url(sources_table, url):
     source = {}
     u = Url(url=url)
     response = u.get_response()
@@ -220,28 +219,28 @@ def follow_url(conn, url):
     source["url"] = url
     source["title"] = title
 
-    if conn.is_source(source):
+    if sources_table.is_source(source):
         return False
 
-    conn.add_source(source)
-    conn.commit()
+    sources_table.add_source(source)
+    sources_table.commit()
     return True
 
 
-def unfollow_url(conn, url):
-    conn.remove_source(url)
-    conn.commit()
+def unfollow_url(sources_table, url):
+    sources_table.remove(url)
+    sources_table.commit()
     return True
 
 
-def add_init_sources(conn):
+def add_init_sources(db):
     for source in sources:
-        if not conn.is_source(source):
-            conn.add_source(source)
+        if not db.sources_table.is_source(source):
+            db.sources_table.add_source(source)
 
 
-def list_sources(conn):
-    sources = conn.select_sources()
+def list_sources(db):
+    sources = db.sources_table.select()
     for source in sources:
         print("Title:{}".format(source.title))
         print("Url:{}".format(source.url))
@@ -258,13 +257,14 @@ def do_main(parser):
 
     database_file = parser.args.db
 
-    db = SqlModel(db_file=database_file)
+    db = SqlModel(database_file=database_file)
+
     add_init_sources(db)
 
-    db.remove_older_than_days(day_limit)
+    db.entries_table.remove(day_limit)
 
     if parser.args.cleanup:
-        db.truncate("entries")
+        db.entries_table.truncate()
 
     elif parser.args.follow:
         if not follow_url(db, parser.args.follow):
@@ -282,7 +282,7 @@ def do_main(parser):
         list_sources(db)
 
     elif parser.args.output_file:
-        w = HtmlWriter(parser.args.output_file, db)
+        w = HtmlWriter(db, parser.args.output_file)
         w.write()
 
     elif parser.args.stats:

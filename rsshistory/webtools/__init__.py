@@ -14,7 +14,13 @@ from .crawlers import (
     RequestsPage,
     SeleniumChromeHeadless,
     SeleniumChromeFull,
+    SeleniumUndetected,
     selenium_feataure_enabled,
+)
+from .crawlerscript import (
+    ScriptCrawlerParser,
+    CrawlerInterface,
+    ScriptCrawlerInterface,
 )
 
 from .handlerchannelyoutube import YouTubeChannelHandler

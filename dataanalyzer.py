@@ -40,6 +40,11 @@ from sqlalchemy import and_, or_, not_
 from sqlmodel import SqlModel
 import requests
 
+from rsshistory.webtools import (
+   Url,
+   WebConfig,
+)
+
 try:
     import asyncio
 
@@ -51,101 +56,6 @@ try:
     from crawlee.playwright_crawler import PlaywrightCrawler, PlaywrightCrawlingContext
 except Exception as E:
     crawlee_feataure_enabled = False
-
-
-class Url(object):
-
-    user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/116.0"
-
-    def __init__(self, url, timeout_s = 10):
-        self.url = url
-        self.timeout_s = timeout_s
-
-    def is_valid(self):
-        """
-        Calling async method from class
-        https://stackoverflow.com/questions/42009202/how-to-call-a-async-function-contained-in-a-class
-        """
-        self.make_request()
-
-        if self.result is {}:
-            return False
-
-        if self.result["status_code"] > 200 and self.result["status_code"] > 400:
-            return False
-
-        if not self.result["page_content"]:
-            return False
-
-        if self.result["page_content"] == "":
-            return False
-
-        if self.result["page_content"] == None:
-            return False
-
-        return True
-
-    def make_request(self):
-        self.result = {}
-
-        request_result = requests.get(
-            self.url,
-            headers=self.get_headers(),
-            timeout=self.timeout_s,
-            verify=True,
-            stream=True,
-        )
-
-        self.result["status_code"] = request_result.status_code
-        self.result["page_content"] = request_result.text
-
-        return requests
-
-    def get_headers(self):
-        return {
-            "User-Agent": self.user_agent,
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-            "Accept-Charset": "utf-8,ISO-8859-1;q=0.7,*;q=0.3",
-            "Accept-Encoding": "none",
-            "Accept-Language": "en-US,en;q=0.8",
-            "Connection": "keep-alive",
-        }
-
-    def make_request_crawlee(self):
-        self.loop = asyncio.get_event_loop()
-        self.loop.run_until_complete(self.process())
-
-    async def process(self) -> None:
-        """
-        https://crawlee.dev/python/api/class/BeautifulSoupCrawler
-        """
-        self.result = {}
-
-        crawler = BeautifulSoupCrawler(
-            # Limit the crawl to max requests. Remove or increase it for crawling all links.
-            max_requests_per_crawl=10,
-            request_handler_timeout = timedelta(seconds = timeout_s),
-        )
-
-        # Define the default request handler, which will be called for every request.
-        @crawler.router.default_handler
-        async def request_handler(context: BeautifulSoupCrawlingContext) -> None:
-            context.log.info(f'Processing {context.request.url} ...')
-
-            # maybe we could send header information that we accept text/rss
-
-            self.result['request_url'] = context.request.url
-            self.result['loaded_url'] = context.request.loaded_url
-            self.result['status_code'] = context.http_response.status_code
-            self.result['headers'] = context.http_response.headers
-
-            # todo check in headers if we accept payload
-            self.result['page_content'] = context.soup.contents
-
-            # TODO - what if there is redirection. should we use context.request.loaded_url?
-
-        # Run the crawler with the initial list of URLs.
-        await crawler.run([url])
 
 
 class DirReader(object):
@@ -570,13 +480,13 @@ class SqlLiteSearcher(SearchInterface):
         model = SqlModel(self.parser.args.db)
 
         search_term = self.parser.args.search
-        symbol_evaluator = AlchemySymbolEvaluator(model.entries)
+        symbol_evaluator = AlchemySymbolEvaluator(model.entries_table.table)
         equation_evaluator = AlchemyEquationEvaluator(search_term, symbol_evaluator)
 
         search = OmniSearch(self.parser.args.search, equation_evaluator = equation_evaluator)
         combined_query_conditions = search.get_combined_query()
 
-        rows = model.select_conditions(combined_query_conditions)
+        rows = model.entries_table.select(combined_query_conditions)
 
         for key, row in enumerate(rows):
             self.handle_row(row.__dict__)
@@ -687,6 +597,14 @@ class Parser(object):
 
 
 def main():
+    WebConfig.use_print_logging()
+
+    # scraping server is not running, we do not use port
+    HttpPageHandler.crawling_server_port = 0
+    # when python requests cannot handle a scenario, we run crawlee
+    HttpPageHandler.crawling_headless_script = "poetry run python crawleebeautifulsoup.py"
+    HttpPageHandler.crawling_full_script = "poetry run python crawleebeautifulsoup.py"
+
     p = Parser()
     if not p.parse():
         print("Could not parse options")
