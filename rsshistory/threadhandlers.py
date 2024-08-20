@@ -56,7 +56,7 @@ from .controllers import (
 )
 from .configuration import Configuration
 from .dateutils import DateUtils
-from .webtools import HtmlPage, DomainAwarePage, ContentLinkParser
+from .webtools import HtmlPage, DomainAwarePage, ContentLinkParser, Url
 from .pluginurl import UrlHandler
 
 
