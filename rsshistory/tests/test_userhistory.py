@@ -4,8 +4,9 @@ from django.contrib.auth.models import User
 
 from .fakeinternet import FakeInternetTestCase
 
-from ..models import UserEntryVisitHistory
-from ..models import UserSearchHistory, UserEntryTransitionHistory
+from ..models import (
+    UserEntryVisitHistory, UserSearchHistory, UserEntryTransitionHistory
+)
 from ..controllers import LinkDataController, SourceDataController
 from ..dateutils import DateUtils
 from ..configuration import Configuration
@@ -254,7 +255,7 @@ class UserEntryVisitHistoryTest(FakeInternetTestCase):
             username="test_username", password="testpassword"
         )
 
-    def test_entry_visit_two_visits(self):
+    def test_visited__two_times_same(self):
         entries = LinkDataController.objects.filter(link="https://youtube.com?v=12345")
 
         self.assertEqual(entries.count(), 1)
@@ -276,6 +277,27 @@ class UserEntryVisitHistoryTest(FakeInternetTestCase):
         self.assertEqual(visits.count(), 1)
         self.assertEqual(visits[0].visits, 1)
         self.assertEqual(visits[0].user_object, self.user)
+
+    def test_visited__argument_transition_from(self):
+        youtube_entries = LinkDataController.objects.filter(link="https://youtube.com?v=12345")
+        tiktok_entries = LinkDataController.objects.filter(link="https://tiktok.com?v=12345")
+
+        self.assertEqual(youtube_entries.count(), 1)
+        self.assertEqual(tiktok_entries.count(), 1)
+
+        # call tested function
+        UserEntryVisitHistory.visited(youtube_entries[0], self.user, tiktok_entries[0])
+
+        visits = UserEntryVisitHistory.objects.filter(entry_object=youtube_entries[0])
+        self.assertEqual(visits.count(), 1)
+        self.assertEqual(visits[0].visits, 1)
+        self.assertEqual(visits[0].user_object, self.user)
+
+        all_transitions = UserEntryTransitionHistory.objects.all()
+        self.assertEqual(all_transitions.count(), 1)
+        transition = all_transitions[0]
+        self.assertEqual(transition.entry_from, tiktok_entries[0])
+        self.assertEqual(transition.entry_to, youtube_entries[0])
 
     def test_entry_get_last_user_entry(self):
         """

@@ -74,9 +74,9 @@ class WaybackMachine(object):
             time -= timedelta(days=1)
 
     def save_impl(self, url):
-        from ..webtools import HttpRequestBuilder
+        from ..webtools import HttpPageHandler
 
-        user_agent = HttpRequestBuilder.user_agent
+        user_agent = HttpPageHandler.user_agent
 
         save_api = WaybackMachineSaveAPI(url, user_agent)
         LinkDatabase.info("Save url {0}".format(url))

@@ -289,7 +289,7 @@ class UserEntryVisitHistory(models.Model):
         related_name="visits_counter",
     )
 
-    def visited(entry, user):
+    def visited(entry, user, previous_entry=None):
         """
         User visited a link:
          - if it is just hit before a minute (f5 etc.) do nothing
@@ -322,7 +322,8 @@ class UserEntryVisitHistory(models.Model):
         if UserEntryVisitHistory.is_link_just_visited(user, entry):
             return
 
-        previous_entry = UserEntryVisitHistory.get_last_user_entry(user)
+        if not previous_entry:
+            previous_entry = UserEntryVisitHistory.get_last_user_entry(user)
 
         visits = UserEntryVisitHistory.objects.filter(
             user_object=user, entry_object=entry

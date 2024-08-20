@@ -9,8 +9,12 @@ from ..controllers import (
     ArchiveLinkDataController,
     EntryDataBuilder,
 )
-from ..dateutils import DateUtils
 from ..models import KeyWords, DataExport, UserBookmarks
+from ..models import (
+    UserEntryVisitHistory, UserSearchHistory, UserEntryTransitionHistory
+)
+from ..configuration import Configuration
+from ..dateutils import DateUtils
 
 from .fakeinternet import FakeInternetTestCase, MockRequestCounter
 
@@ -532,7 +536,7 @@ class EntriesViewsTests2(FakeInternetTestCase):
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
         )
-        LinkDataController.objects.create(
+        self.entry_non_bookmarked = LinkDataController.objects.create(
             source="https://youtube.com",
             link="https://youtube.com?v=nonbookmarked",
             title="The second link",
@@ -625,6 +629,7 @@ class EntriesViewsTests2(FakeInternetTestCase):
             "{}:entry-detail".format(LinkDatabase.name),
             args=[self.entry_youtube.id],
         )
+        # call tested function
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
@@ -637,6 +642,7 @@ class EntriesViewsTests2(FakeInternetTestCase):
             "{}:entry-detail".format(LinkDatabase.name),
             args=[self.entry_html.id],
         )
+        # call tested function
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(MockRequestCounter.mock_page_requests, 0)
@@ -648,6 +654,7 @@ class EntriesViewsTests2(FakeInternetTestCase):
             "{}:entry-detail".format(LinkDatabase.name),
             args=[self.entry_pdf.id],
         )
+        # call tested function
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(MockRequestCounter.mock_page_requests, 0)
@@ -657,6 +664,7 @@ class EntriesViewsTests2(FakeInternetTestCase):
         entries = LinkDataController.objects.filter(link__icontains="https://youtube")
 
         url = reverse("{}:entry-json".format(LinkDatabase.name), args=[entries[0].id])
+        # call tested function
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
@@ -667,7 +675,67 @@ class EntriesViewsTests2(FakeInternetTestCase):
         entries = LinkDataController.objects.filter(link__icontains="https://youtube")
 
         url = reverse("{}:entries-json".format(LinkDatabase.name))
+        # call tested function
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(MockRequestCounter.mock_page_requests, 0)
+
+    def test_entry_detail__visit(self):
+        c = Configuration.get_object()
+        c.config_entry.track_user_actions = True
+        c.config_entry.track_user_searches = True
+        c.config_entry.track_user_navigation = True
+        c.config_entry.save()
+
+        MockRequestCounter.mock_page_requests = 0
+
+        self.client.login(username="testuser", password="testpassword")
+        url = reverse(
+            "{}:entry-detail".format(LinkDatabase.name),
+            args=[self.entry_youtube.id],
+        )
+        # call tested function
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
+
+        visits = UserEntryVisitHistory.objects.all()
+
+        self.assertEqual(visits.count(), 1)
+        self.assertEqual(visits[0].visits, 1)
+        self.assertEqual(visits[0].user_object, self.user)
+
+    def test_entry_detail__visit_from(self):
+        c = Configuration.get_object()
+        c.config_entry.track_user_actions = True
+        c.config_entry.track_user_searches = True
+        c.config_entry.track_user_navigation = True
+        c.config_entry.save()
+
+        MockRequestCounter.mock_page_requests = 0
+
+        self.client.login(username="testuser", password="testpassword")
+        url = reverse(
+            "{}:entry-detail".format(LinkDatabase.name),
+            args=[self.entry_youtube.id],
+        ) + "?from_entry_id=" + str(self.entry_html.id)
+
+        # call tested function
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)
+
+        visits = UserEntryVisitHistory.objects.all()
+
+        self.assertEqual(visits.count(), 1)
+        self.assertEqual(visits[0].visits, 1)
+        self.assertEqual(visits[0].user_object, self.user)
+
+        all_transitions = UserEntryTransitionHistory.objects.all()
+        self.assertEqual(all_transitions.count(), 1)
+        transition = all_transitions[0]
+        self.assertEqual(transition.entry_from, self.entry_html)
+        self.assertEqual(transition.entry_to, self.entry_youtube)

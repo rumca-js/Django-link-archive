@@ -580,6 +580,8 @@ class FakeInternetTestCase(TestCase):
         c.config_entry.link_save = False
         c.config_entry.source_save = False
         c.config_entry.track_user_actions = False
+        c.config_entry.track_user_searches = False
+        c.config_entry.track_user_navigation = False
         c.config_entry.days_to_move_to_archive = 100
         c.config_entry.days_to_remove_links = 0
         c.config_entry.respect_robots_txt = False

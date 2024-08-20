@@ -596,7 +596,19 @@ class EntryDetailView(generic.DetailView):
     def set_visited(self):
         if self.request.user.is_authenticated:
             BackgroundJobController.entry_update_data(self.object)
-            UserEntryVisitHistory.visited(self.object, self.request.user)
+            from_entry = self.get_from_entry()
+
+            UserEntryVisitHistory.visited(self.object, self.request.user, from_entry)
+
+    def get_from_entry(self):
+        from_entry = None
+        if "from_entry_id" in self.request.GET:
+            from_entry_id = self.request.GET["from_entry_id"]
+            entries = LinkDataController.objects.filter(id = from_entry_id)
+            if entries.exists():
+                from_entry = entries[0]
+
+        return from_entry
 
 
 class EntryArchivedDetailView(generic.DetailView):
