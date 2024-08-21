@@ -45,9 +45,9 @@ def page_show_properties(request):
         elif "method" in request.GET and request.GET["method"] == "standard":
             options.use_full_browser = False
             options.use_headless_browser = False
-            options.user_browser_promotions = True
-            method = request.GET["method"]
+            options.user_browser_promotions = False
         else:
+            options.user_browser_promotions = True
             if options.use_full_browser:
                 method = "full"
             elif options.use_headless_browser:
@@ -55,18 +55,17 @@ def page_show_properties(request):
             else:
                 method = "standard"
 
-        page_handler = UrlHandler(page_link, page_options=options)
-        page_handler.get_response()
+        page_url = UrlHandler(page_link, page_options=options)
+        page_url.get_response()
 
-        ViewPage.fill_context_type(p.context, urlhandler=page_handler)
+        ViewPage.fill_context_type(p.context, urlhandler=page_url)
 
-        page_object = page_handler.get_handler()
+        page_handler = page_url.get_handler()
 
         # fast check is disabled. We want to make sure based on contents if it is RSS or HTML
-        p.context["page_object"] = page_object
+        p.context["page_url"] = page_url
         p.context["page_handler"] = page_handler
-        p.context["response_object"] = page_handler.response
-        p.context["page_object_type"] = str(type(page_object))
+        p.context["page_handler_type"] = str(type(page_handler))
         p.context["is_link_allowed"] = DomainCache.get_object(page_link).is_allowed(
             page_link
         )

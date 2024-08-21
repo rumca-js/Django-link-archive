@@ -119,8 +119,9 @@ class CrawlerInterface(object):
             con.send(all_bytes)
 
         else:
-            WebLogger.error("Response binary interface was not set up correctly")
-            return False
+            response = self.get_response()
+            print("Response:{}".format(response))
+            print(response.text)
 
         return True
 
@@ -500,14 +501,13 @@ class SeleniumChromeFull(SeleniumDriver):
         if not selenium_feataure_enabled:
             return
 
-        if not driver:
-            return
-
         import os
 
         os.environ["DISPLAY"] = ":10.0"
 
         driver = self.get_driver()
+        if not driver:
+            return
 
         try:
             # add 10 seconds for start of browser, etc.
@@ -586,7 +586,6 @@ class SeleniumUndetected(SeleniumDriver):
         """
 
         driver = self.get_driver()
-
         if not driver:
             return
 

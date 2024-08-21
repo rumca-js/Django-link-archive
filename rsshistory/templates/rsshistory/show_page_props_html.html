@@ -1,22 +1,22 @@
 <h1>HTML Page properties</h1>
 
 <ul>
-    <li>Link: <a href="{{page_object.url}}">{{page_object.url}}</a></li>
-    <li>Detected page type: {{page_object_type}}</li>
-    <li>Status code: {{response_object.status_code}}</li>
+    <li>Link: <a href="{{page_handler.url}}">{{page_handler.url}}</a></li>
+    <li>Detected page type: {{page_handler_type}}</li>
+    <li>Status code: {{page_url.response.status_code}}</li>
     <li>Encoding: {{response_object.encoding}}</li>
-    <li>Valid: {{page_handler.is_valid}}</li>
-    <li>Title: {{page_object.get_title}}</li>
-    <li>Description: {{page_object.get_description}}</li>
-    {%if page_object.get_date_published %}
-    <li>Date published: {{page_object.get_date_published}}</li>
+    <li>Valid: {{page_url.is_valid}}</li>
+    <li>Title: {{page_handler.get_title}}</li>
+    <li>Description: {{page_handler.get_description}}</li>
+    {%if page_handler.get_date_published %}
+    <li>Date published: {{page_handler.get_date_published}}</li>
     {%endif%}
-    <li>Author: {{page_object.get_author}}</li>
-    <li>Page Rating: {{page_object.get_page_rating}}. Described by <a href="https://github.com/rumca-js/Django-link-archive">Django link archive Readme</a></li>
-    {%if page_object.get_thumbnail %}
-    <li>thumbnail: <a href="{{page_object.get_thumbnail}}"/>{{page_object.get_thumbnail}}</a></li>
+    <li>Author: {{page_handler.get_author}}</li>
+    <li>Page Rating: {{page_handler.get_page_rating}}. Described by <a href="https://github.com/rumca-js/Django-link-archive">Django link archive Readme</a></li>
+    {%if page_handler.get_thumbnail %}
+    <li>thumbnail: <a href="{{page_handler.get_thumbnail}}"/>{{page_handler.get_thumbnail}}</a></li>
     {%endif %}
-    {%for favicon in page_object.get_favicons %}
+    {%for favicon in page_handler.get_favicons %}
     <li>Favicon: <a href="{{favicon}}">{{favicon}}</a></li>
     {%endfor%}
     <li>Contents length: {{contents_length}}.
@@ -33,27 +33,27 @@
         {% endif %}
     </li>
 
-    <li>Charset: {{page_object.get_charset}}</li>
-    <li>Language: {{page_object.get_language}}</li>
-    {%for rss_url in page_object.get_rss_urls %}
+    <li>Charset: {{page_handler.get_charset}}</li>
+    <li>Language: {{page_handler.get_language}}</li>
+    {%for rss_url in page_handler.get_rss_urls %}
       <li>Rss Url: {{rss_url}} <a href="{{rss_url}}">Link</a></li>
     {%endfor%}
 
-    <li>Meta title: {{page_object.get_title_meta}}</li>
-    <li>Meta description: {{page_object.get_description_meta}}</li>
-    <li>og:title: {{page_object.get_og_title}}</li>
-    <li>og:description: {{page_object.get_og_description}}</li>
-    <li>og:site_name: {{page_object.get_og_site_name}}</li>
-    <li>og:locale: {{page_object.get_og_locale}}</li>
-    {%if page_object.get_og_image %}
-    <li>og:image: <a href="{{page_object.get_og_image}}"/>{{page_object.get_og_image}}</a></li>
+    <li>Meta title: {{page_handler.get_title_meta}}</li>
+    <li>Meta description: {{page_handler.get_description_meta}}</li>
+    <li>og:title: {{page_handler.get_og_title}}</li>
+    <li>og:description: {{page_handler.get_og_description}}</li>
+    <li>og:site_name: {{page_handler.get_og_site_name}}</li>
+    <li>og:locale: {{page_handler.get_og_locale}}</li>
+    {%if page_handler.get_og_image %}
+    <li>og:image: <a href="{{page_handler.get_og_image}}"/>{{page_handler.get_og_image}}</a></li>
     {%endif %}
-    <li>keywords: {{page_object.get_tags}}</li>
+    <li>keywords: {{page_handler.get_tags}}</li>
 
-    {%if page_handler.get_robots_txt_url %}
-    <li>Robots txt URL: <a href="{{page_handler.get_robots_txt_url}}">{{page_handler.get_robots_txt_url}}</a></li>
+    {%if page_url.get_robots_txt_url %}
+    <li>Robots txt URL: <a href="{{page_url.get_robots_txt_url}}">{{page_url.get_robots_txt_url}}</a></li>
     {% endif %}
-    {%for site_map in page_handler.get_site_maps_urls %}
+    {%for site_map in page_url.get_site_maps_urls %}
         <li>Site map: <a href="{{site_map}}">{{site_map}}</a>
     {%endfor%}
     <li>Allowed by robots.txt? {{is_link_allowed}}</li>
@@ -66,13 +66,13 @@
     <li>Link outer: {{link}} <a href="{{link}}">{{link}}</a></li>
     {%endfor%}
 
-    <li>Options str: {{page_handler.options.get_str}}</li>
+    <li>Options str: {{page_url.options.get_str}}</li>
 
 </ul>
 
 {% if user_config.show_icons %}
-    {%if page_object.get_thumbnail%}
-    <img src="{{page_object.get_thumbnail}}" style="max-width: 50%"/>
+    {%if page_handler.get_thumbnail%}
+    <img src="{{page_handler.get_thumbnail}}" style="max-width: 50%"/>
     {%endif%}
     {%if og_image%}
     <img src="{{og_image}}" style="max-width: 50%"/>
@@ -92,18 +92,18 @@
 <a class="btn btn-secondary" data-bs-toggle="collapse" href="#collapseHeaders" role="button" aria-expanded="false" aria-controls="collapseHeaders">
     Show Details
 </a>
-<div class="collapse" id="collapseHeaders"><pre>{{page_handler.response.headers}}</pre></div>
+<div class="collapse" id="collapseHeaders"><pre>{{page_url.response.headers}}</pre></div>
 
 <h1>Contents</h1>
 
 <a class="btn btn-secondary" data-bs-toggle="collapse" href="#collapseContents" role="button" aria-expanded="false" aria-controls="collapseContents">
     Show Details
 </a>
-<div class="collapse" id="collapseContents"><pre>{{page_handler.contents}}</pre></div>
+<div class="collapse" id="collapseContents"><pre>{{page_url.contents}}</pre></div>
 
 <h1>Links</h1>
 
 <a class="btn btn-secondary" data-bs-toggle="collapse" href="#collapseLinks" role="button" aria-expanded="false" aria-controls="collapseLinks">
     Show Details
 </a>
-<div class="collapse" id="collapseLinks"><pre>{{page_object.get_links}}</pre></div>
+<div class="collapse" id="collapseLinks"><pre>{{page_handler.get_links}}</pre></div>

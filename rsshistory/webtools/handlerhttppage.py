@@ -369,9 +369,6 @@ class HttpRequestBuilder(object):
         operating_path = full_path.parents[2]
         response_file_location = full_path.parents[1] / "response.txt"
 
-        if not Path(script).exists():
-            return
-
         script = script + ' --url "{}" --output-file="{}"'.format(request.url, str(response_file_location))
 
         if response_file_location.exists():
@@ -391,6 +388,9 @@ class HttpRequestBuilder(object):
             cwd=operating_path,
             timeout=request.timeout_s,
         )
+
+        if p.returncode != 0:
+            return
 
         if p.stdout:
             stdout_str = p.stdout.decode()
@@ -634,19 +634,47 @@ class HttpPageHandler(ContentInterface):
 
         if contents:
             """
-            Found servers that return content-type "text/html" for RSS sources :(
             """
 
             if self.is_html():
                 p = HtmlPage(url, contents)
-                return p
+                if p.is_valid():
+                    return p
+
+                # some servers might return text/html for RSS sources
+                # we verify if content type is valid
+
+                p = RssPage(url, contents)
+                if p.is_valid():
+                    return p
+
+                p = JsonPage(url, contents)
+                if p.is_valid():
+                    return p
 
             if self.is_rss():
                 p = RssPage(url, contents)
-                return p
+                if p.is_valid():
+                    return p
+
+                p = HtmlPage(url, contents)
+                if p.is_valid():
+                    return p
+
+                p = JsonPage(url, contents)
+                if p.is_valid():
+                    return p
 
             if self.is_json():
                 p = JsonPage(url, contents)
+                if p.is_valid():
+                    return p
+
+                p = RssPage(url, contents)
+                if p.is_valid():
+                    return p
+
+                p = HtmlPage(url, contents)
                 if p.is_valid():
                     return p
 
@@ -705,6 +733,8 @@ class HttpPageHandler(ContentInterface):
             return True
 
         if self.p and self.p.is_cloudflare_protected():
+            text = self.response.get_text()
+            print(text)
             return True
 
         if not self.p.is_valid():

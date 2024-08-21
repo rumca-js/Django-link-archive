@@ -5,14 +5,14 @@
 <div class="contentbuttonmenu">
 Select request options:
    {% if method == "headless" %}
-      <a class="btn brn-primary" href="{% url 'rsshistory:page-show-props' %}?method=standard">Standard</a>
-      <a class="btn brn-primary" href="{% url 'rsshistory:page-show-props' %}?method=full">Full</a>
+   <a class="btn brn-primary" href="{% url 'rsshistory:page-show-props' %}?method=standard&page={{page_url.url}}">Standard</a>
+   <a class="btn brn-primary" href="{% url 'rsshistory:page-show-props' %}?method=full&page={{page_url.url}}">Full</a>
    {% elif method == "full" %}
-      <a class="btn brn-primary" href="{% url 'rsshistory:page-show-props' %}?method=standard">Standard</a>
-      <a class="btn brn-primary" href="{% url 'rsshistory:page-show-props' %}?method=headless">Headless</a>
+   <a class="btn brn-primary" href="{% url 'rsshistory:page-show-props' %}?method=standard&page={{page_url.url}}">Standard</a>
+   <a class="btn brn-primary" href="{% url 'rsshistory:page-show-props' %}?method=headless&page={{page_url.url}}">Headless</a>
    {% else %}
-      <a class="btn brn-primary" href="{% url 'rsshistory:page-show-props' %}?method=headless">Headless</a>
-      <a class="btn brn-primary" href="{% url 'rsshistory:page-show-props' %}?method=full">Full</a>
+   <a class="btn brn-primary" href="{% url 'rsshistory:page-show-props' %}?method=headless&page={{page_url.url}}">Headless</a>
+   <a class="btn brn-primary" href="{% url 'rsshistory:page-show-props' %}?method=full&page={{page_url.url}}">Full</a>
    {% endif %}
 </div>
 

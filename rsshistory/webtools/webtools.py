@@ -847,11 +847,6 @@ class ContentInterface(object):
         contents = self.contents
 
         if contents:
-            if (
-                contents.find("https://static.cloudflareinsights.com/beacon.min.js/")
-                >= 0
-            ):
-                return True
             if contents.find("https://challenges.cloudflare.com") >= 0:
                 return True
 

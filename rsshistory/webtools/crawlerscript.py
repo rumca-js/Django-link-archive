@@ -42,10 +42,6 @@ class ScriptCrawlerParser(object):
             print("Url file not in args")
             return False
 
-        if self.args.output_file is None and self.args.port is None:
-            print("Output file and port not in args")
-            return False
-
         return True
 
     def get_request(self):

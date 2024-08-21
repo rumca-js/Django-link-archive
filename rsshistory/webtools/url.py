@@ -49,7 +49,10 @@ class Url(ContentInterface):
         else:
             self.url = url
 
-        self.options = self.get_init_page_options(page_options)
+        if page_options:
+            self.options = page_options
+        else:
+            self.options = self.get_init_page_options(page_options)
 
         if handler_class:
             self.handler = handler_class(url, page_options=self.options)
@@ -388,8 +391,6 @@ class Url(ContentInterface):
             return True
 
         require_full_browser = [
-            "www.warhammer-community.com",
-            "warhammer-community.com",
             "defcon.org",
             "reuters.com",
             "yahoo.com",
@@ -460,7 +461,8 @@ class DomainCacheInfo(object):
         robots_url = self.get_robots_txt_url()
         u = Url(robots_url)
         response = u.get_response()
-        self.robots_contents = response.get_text()
+        if response:
+            self.robots_contents = response.get_text()
 
         return self.robots_contents
 

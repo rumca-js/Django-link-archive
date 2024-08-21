@@ -1,39 +1,39 @@
 <h1>YouTube Link properties</h1>
 
 <ul>
-    <li>Link: <a href="{{page_object.url}}">{{page_object.url}}</a></li>
-    <li>Detected page type: {{page_object_type}}</li>
-    <li>Status code: {{page_object.status_code}}</li>
-    <li>Encoding: {{page_object.encoding}}</li>
-    <li>Valid: {{page_handler.is_valid}}</li>
-    <li>Title: {{page_object.get_title}}</li>
-    <li>Description: {{page_object.get_description}}</li>
-    {%if page_object.get_date_published %}
-    <li>Date published: {{page_object.get_date_published}}</li>
-    <li>Author: {{page_object.get_author}}</li>
-    <li>Page Rating: {{page_object.get_page_rating}}. Described by <a href="https://github.com/rumca-js/Django-link-archive">Django link archive Readme</a></li>
+    <li>Link: <a href="{{page_handler.url}}">{{page_handler.url}}</a></li>
+    <li>Detected page type: {{page_handler_type}}</li>
+    <li>Status code: {{page_handler.status_code}}</li>
+    <li>Encoding: {{page_handler.encoding}}</li>
+    <li>Valid: {{page_url.is_valid}}</li>
+    <li>Title: {{page_handler.get_title}}</li>
+    <li>Description: {{page_handler.get_description}}</li>
+    {%if page_handler.get_date_published %}
+    <li>Date published: {{page_handler.get_date_published}}</li>
+    <li>Author: {{page_handler.get_author}}</li>
+    <li>Page Rating: {{page_handler.get_page_rating}}. Described by <a href="https://github.com/rumca-js/Django-link-archive">Django link archive Readme</a></li>
     {%endif%}
     <li>WebPage: <a href="{{webpage_url}}">{{webpage_url}}</a></li>
     {%if thumbnail %}
-    <li>Thumbnail: <a href="{{page_object.get_thumbnail}}">{{page_object.get_thumbnail}}</a></li>
+    <li>Thumbnail: <a href="{{page_handler.get_thumbnail}}">{{page_handler.get_thumbnail}}</a></li>
     {%endif%}
     <li>Uploader URL: <a href="{{uploader_url}}">{{uploader_url}}</a></li>
     <li>Channel ID: {{channel_id}}</li>
-    <li>Channel: {{page_object.get_channel_code}}</li>
-    <li>Channel URL: <a href="{{page_object.get_channel_url}}">{{page_object.get_channel_url}}</a></li>
-    <li>Channel feed URL: <a href="{{page_object.get_channel_feed_url}}">{{page_object.get_channel_feed_url}}</a></li>
+    <li>Channel: {{page_handler.get_channel_code}}</li>
+    <li>Channel URL: <a href="{{page_handler.get_channel_url}}">{{page_handler.get_channel_url}}</a></li>
+    <li>Channel feed URL: <a href="{{page_handler.get_channel_feed_url}}">{{page_handler.get_channel_feed_url}}</a></li>
     <li>Channel follower count: {{channel_follower_count}}</li>
     <li>View count:{{view_count}} Likes:{{like_count}}</li>
-    <li>Language: {{page_object.get_language}}</li>
+    <li>Language: {{page_handler.get_language}}</li>
     <li>Upload date: {{upload_date}}</li>
     <li>Duration: {{duration}}</li>
     <li>Valid: {{valid}}</li>
-    <li>keywords: {{page_object.get_tags}}</li>
+    <li>keywords: {{page_handler.get_tags}}</li>
 
-    {%if page_handler.get_robots_txt_url %}
-    <li>Robots txt URL: <a href="{{page_handler.get_robots_txt_url}}">{{page_handler.get_robots_txt_url}}</a></li>
+    {%if page_url.get_robots_txt_url %}
+    <li>Robots txt URL: <a href="{{page_url.get_robots_txt_url}}">{{page_url.get_robots_txt_url}}</a></li>
     {% endif %}
-    {%for site_map in page_handler.get_site_maps_urls %}
+    {%for site_map in page_url.get_site_maps_urls %}
         <li>Site map: <a href="{{site_map}}">{{site_map}}</a>
     {%endfor%}
     <li>Allowed by robots.txt? {{is_link_allowed}}</li>
@@ -43,14 +43,14 @@
 
 {% if user_config.show_icons %}
 <h1>Icon</h1>
-    {%if page_object.get_thumbnail %}
-    <img src="{{page_object.get_thumbnail}}" style="max-width: 50%"/>
+    {%if page_handler.get_thumbnail %}
+    <img src="{{page_handler.get_thumbnail}}" style="max-width: 50%"/>
     {%endif%}
 {%endif%}
 
 <h1>Embed</h1>
 <div class="youtube_player_container">
-    <iframe src="{{page_object.get_link_embed}}" frameborder="0" allowfullscreen class="youtube_player_frame"></iframe>
+    <iframe src="{{page_handler.get_link_embed}}" frameborder="0" allowfullscreen class="youtube_player_frame"></iframe>
 </div>
 
 <h1>Contents</h1>
@@ -58,4 +58,4 @@
 <a class="btn btn-secondary" data-bs-toggle="collapse" href="#collapseContents" role="button" aria-expanded="false" aria-controls="collapseContents">
     Show Details
 </a>
-<div class="collapse" id="collapseContents"><pre>{{page_object.contents}}</pre></div>
+<div class="collapse" id="collapseContents"><pre>{{page_handler.contents}}</pre></div>

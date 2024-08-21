@@ -738,6 +738,20 @@ def func_display_data_form(request, p, data):
 
 
 def add_entry(request):
+    def on_added_entry(request, entry):
+        # if you add a link you must have visited it?
+        UserEntryVisitHistory.visited(entry, request.user)
+
+        BackgroundJobController.link_scan(entry=entry)
+
+        if entry.bookmarked:
+            new_entry = EntryWrapper(entry=entry).make_bookmarked(request)
+
+        config = Configuration.get_object().config_entry
+
+        if config.link_save:
+            BackgroundJobController.link_save(entry.link)
+
     from ..controllers import LinkDataController
 
     p = ViewPage(request)
@@ -774,20 +788,10 @@ def add_entry(request):
                 p.context["summary_text"] = "Could not save link"
                 return p.render("summary_present.html")
 
-            BackgroundJobController.link_scan(entry=entry)
-
-            if entry.bookmarked:
-                new_entry = EntryWrapper(entry=entry).make_bookmarked(request)
-
+            p.context["entry"] = entry
             p.context["form"] = form
 
-            if entry:
-                p.context["entry"] = entry
-
-            config = Configuration.get_object().config_entry
-
-            if config.link_save:
-                BackgroundJobController.link_save(data["link"])
+            on_added_entry(request, entry)
 
             return p.render("entry_added.html")
 
