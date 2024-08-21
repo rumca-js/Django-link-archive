@@ -62,6 +62,12 @@ class ConfigurationEntry(models.Model):
         help_text="Instance description",
     )
 
+    instance_internet_location = models.CharField(
+        blank=True,
+        max_length=200,
+        help_text="Instance location. For example https://my-domain.com/apps/rsshistory",
+    )
+
     admin_user = models.CharField(
         max_length=500, default="admin", blank=True, help_text="Admin user name"
     )

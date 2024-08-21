@@ -36,6 +36,10 @@
 	<!-- Third party things above -->
 
         <link rel="shortcut icon" type="image/png" href="{% static 'rsshistory/icons/favicon.ico' %}"/>
+
+        {% if config.instance_internet_location %}
+        <link rel="search" href="opensearch.xml" type="application/opensearchdescription+xml" title="Django archive search">
+        {% endif %}
     </head>
     <body class="body-style">
 	<!-- Third party things below -->

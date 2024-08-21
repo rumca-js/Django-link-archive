@@ -123,7 +123,7 @@ class Parser(object):
     def parse(self):
         self.parser = argparse.ArgumentParser(description="Data converter program")
         self.parser.add_argument("--dir", help="Directory to be scanned")
-        self.parser.add_argument("--output-file", help="Output file")
+        self.parser.add_argument("--db",default="converted.sqlite", help="Database output file")
         self.parser.add_argument(
             "--preserve-id", action="store_true", help="Preserves ID of objects"
         )
@@ -142,11 +142,6 @@ class Parser(object):
         else:
             self.dir = None
 
-        if self.args.output_file:
-            self.output_file = self.args.output_file
-        else:
-            self.output_file = None
-
         if self.args.preserve_id:
             self.preserve_id = self.args.preserve_id
         else:
@@ -163,7 +158,7 @@ def main():
     parser = Parser()
     parser.parse()
 
-    db = SqlModel(database_file=parser.output_file)
+    db = SqlModel(database_file=parser.args.db)
 
     try:
         start_time = time.time()

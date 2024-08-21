@@ -87,6 +87,7 @@ class ConfigForm(forms.ModelForm):
             # important
             "instance_title",
             "instance_description",
+            "instance_internet_location",
             "admin_user",
             "access_type",
             "logging_level",

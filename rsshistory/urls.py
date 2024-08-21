@@ -147,7 +147,9 @@ urlpatterns = [
     path("configuration-advanced-json/", system.configuration_advanced_json, name="configuration-advanced-json"),
     path("system-status/", system.system_status, name="system-status"),
     path("about/", system.about, name="about"),
-    path("robots.txt", TemplateView.as_view(template_name="robots.txt", content_type="text/plain")),
+    path("robots.txt", TemplateView.as_view(template_name="robots.txt", content_type="text/plain")), # https://en.wikipedia.org/wiki/Robots.txt
+    path("opensearch.xml", system.opensearchxml, name="opensearchxml"), # https://developer.mozilla.org/en-US/docs/Web/OpenSearch
+    path("search-suggestions", system.search_suggestions, name="search-suggestions"),
     path("missing-rights/", system.missing_rights, name="missing-rights"),
     path("reset-config/", system.reset_config, name="reset-config"),
     path("wizard", system.wizard_setup, name="wizard",),
