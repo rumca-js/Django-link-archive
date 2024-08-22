@@ -1,5 +1,6 @@
 from urllib.parse import unquote
 import urllib.robotparser
+import asyncio
 
 from .webtools import (
     RssPage,
@@ -611,3 +612,29 @@ class DomainCache(object):
 
         for item in thelist:
             self.cache[item[0]] = {"date": item[1], "domain": item[2]}
+
+
+def fetch_url(link):
+    u = Url(url = link)
+    u.get_response()
+    return u
+
+
+async def fetch_all_urls(links, max_concurrency=10):
+    num_pages = int(len(links) / max_concurrency)
+    num_pages_mod = len(links) % max_concurrency
+
+    if num_pages_mod != 0:
+        num_pages += 1
+
+    for num_page in range(num_pages):
+        page_start = num_page * max_concurrency
+        page_stop = page_start + max_concurrency
+
+        tasks = []
+
+        for link in links[page_start : page_stop]:
+            tasks.append(asyncio.to_thread(fetch_url, link))
+
+        result = await asyncio.gather(*tasks)
+        return result

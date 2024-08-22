@@ -1222,7 +1222,7 @@ class RefreshThreadHandler(object):
 
     def refresh(self, item=None):
         c = Configuration.get_object()
-        c.refresh(0)
+        c.refresh(str(type(self)))
 
         if not SystemOperation.is_internet_ok():
             return
@@ -1290,7 +1290,7 @@ class RefreshThreadHandler(object):
                 BackgroundJobController.entry_update_data(entries[index])
 
 
-class HandlerManager(object):
+class GenericJobsProcessor(object):
     """!
     @note Uses handler priority when processing jobs.
     """
@@ -1343,7 +1343,7 @@ class HandlerManager(object):
             self.start_processing_time = DateUtils.get_datetime_now_utc()
 
             c = Configuration.get_object()
-            c.refresh(1)
+            c.refresh(str(type(self)))
 
             if not SystemOperation.is_internet_ok():
                 return
@@ -1446,12 +1446,26 @@ class HandlerManager(object):
 
         return True
 
+    def get_supported_jobs(self):
+        return []
+
     def get_handler_and_object(self):
         """
         TODO select should be based on priority
         """
 
-        objs = BackgroundJobController.objects.filter(enabled=True).order_by(
+        jobs = self.get_supported_jobs()
+
+        query_conditions = Q(enabled=True)
+        if len(jobs) > 0:
+            jobs_conditions = Q()
+
+            for ajob in jobs:
+                jobs_conditions |= Q(job = ajob)
+
+            query_conditions &= jobs_conditions
+
+        objs = BackgroundJobController.objects.filter(query_conditions).order_by(
             "priority", "date_created"
         )
         if objs.count() != 0:
@@ -1478,3 +1492,38 @@ class HandlerManager(object):
                 else:
                     job.priority -= 1
                     job.save()
+
+
+class SourceJobsProcessor(GenericJobsProcessor):
+    """
+    Processes only source jobs
+    """
+
+    def get_supported_jobs(self):
+        return [BackgroundJob.JOB_PROCESS_SOURCE,]
+
+
+class WriteJobsProcessor(GenericJobsProcessor):
+    """
+    Processes only write / export jobs
+    """
+
+    def get_supported_jobs(self):
+        return [BackgroundJob.JOB_WRITE_DAILY_DATA,
+                BackgroundJob.JOB_WRITE_TOPIC_DATA,
+                BackgroundJob.JOB_WRITE_YEAR_DATA,
+                BackgroundJob.JOB_WRITE_NOTIME_DATA,
+                BackgroundJob.JOB_EXPORT_DATA,]
+
+
+class ImportJobsProcessor(GenericJobsProcessor):
+    """
+    Processes only import jobs
+    """
+
+    def get_supported_jobs(self):
+        return [BackgroundJob.JOB_IMPORT_DAILY_DATA,
+                BackgroundJob.JOB_IMPORT_BOOKMARKS,
+                BackgroundJob.JOB_IMPORT_SOURCES,
+                BackgroundJob.JOB_IMPORT_INSTANCE,
+                BackgroundJob.JOB_IMPORT_FROM_FILES,]

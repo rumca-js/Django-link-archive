@@ -31,6 +31,7 @@ import argparse
 import socket
 import threading
 import json
+import shutil
 
 from pathlib import Path
 from rsshistory import webtools
@@ -41,6 +42,8 @@ from datetime import datetime, timedelta
 
 
 if __name__ == "__main__":
+    shutil.rmtree("./storage", ignore_errors=True, onerror=None)
+
     p = ScrapingServerParser()
     p.parse()
 

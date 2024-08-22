@@ -14,10 +14,12 @@ from ..models import (
     DataExport,
     SourceExportHistory,
     KeyWords,
+    SystemOperation,
 )
 from ..configuration import Configuration
 from ..threadhandlers import (
-    HandlerManager,
+    GenericJobsProcessor,
+    SourceJobsProcessor,
     RefreshThreadHandler,
     CleanupJobHandler,
     LinkAddJobHandler,
@@ -31,357 +33,7 @@ from ..dateutils import DateUtils
 from .fakeinternet import FakeInternetTestCase
 
 
-class HandlerThatThrowsExceptionInProcess(object):
-    def __init__(self, config=None):
-        pass
-
-    def process(self, obj=None):
-        raise IOError("Though luck")
-
-
-class HandlerManagerTest(FakeInternetTestCase):
-    def setUp(self):
-        self.disable_web_pages()
-        self.setup_configuration()
-
-        ob = SourceDataController.objects.create(
-            url="https://youtube.com", title="YouTube", category="No", subcategory="No"
-        )
-        LinkDataController.objects.create(
-            source="https://youtube.com",
-            link="https://youtube.com?v=12345",
-            source_obj=ob,
-        )
-
-        self.user = self.get_user(
-            username="test_username", password="testpassword", is_superuser=True
-        )
-
-    def test_job_consistency(self):
-        from ..controllers.backgroundjob import BackgroundJobController
-
-        mgr = HandlerManager()
-        handlers = mgr.get_handlers()
-
-        all_is_good = True
-
-        for handler in handlers:
-            found = False
-            for choice in BackgroundJobController.JOB_CHOICES:
-                if handler.get_job() == choice[0]:
-                    found = True
-
-            if not found:
-                all_is_good = False
-
-        self.assertTrue(all_is_good)
-
-    def test_get_handler_and_object_invalid_job(self):
-        bg_obj = BackgroundJobController.objects.create(
-            job="invalid-job",
-        )
-
-        mgr = HandlerManager()
-        # call tested function
-        handler_obj, handler = mgr.get_handler_and_object()
-
-        self.assertEqual(bg_obj, handler_obj)
-        self.assertTrue(not handler)
-
-    def test_get_handler_and_object_export_data_handler(self):
-        bg_obj = BackgroundJobController.objects.create(
-            job=BackgroundJobController.JOB_EXPORT_DATA
-        )
-
-        mgr = HandlerManager()
-        # call tested function
-        handler_obj, handler = mgr.get_handler_and_object()
-
-        self.assertEqual(bg_obj, handler_obj)
-        self.assertEqual(handler.get_job(), BackgroundJobController.JOB_EXPORT_DATA)
-
-    def test_get_handler_and_object_process_source_handler(self):
-        bg_obj = BackgroundJobController.objects.create(
-            job=BackgroundJobController.JOB_PROCESS_SOURCE
-        )
-
-        mgr = HandlerManager()
-        # call tested function
-        handler_obj, handler = mgr.get_handler_and_object()
-
-        self.assertEqual(bg_obj, handler_obj)
-        self.assertEqual(handler.get_job(), BackgroundJobController.JOB_PROCESS_SOURCE)
-
-    def test_get_handler_and_object_link_add_handler(self):
-        bg_obj = BackgroundJobController.objects.create(
-            job=BackgroundJobController.JOB_LINK_ADD
-        )
-
-        mgr = HandlerManager()
-        # call tested function
-        handler_obj, handler = mgr.get_handler_and_object()
-
-        self.assertEqual(bg_obj, handler_obj)
-        self.assertEqual(handler.get_job(), BackgroundJobController.JOB_LINK_ADD)
-
-    def test_get_handler_and_object_link_download_handler(self):
-        bg_obj = BackgroundJobController.objects.create(
-            job=BackgroundJobController.JOB_LINK_DOWNLOAD
-        )
-
-        mgr = HandlerManager()
-        # call tested function
-        handler_obj, handler = mgr.get_handler_and_object()
-
-        self.assertEqual(bg_obj, handler_obj)
-        self.assertEqual(handler.get_job(), BackgroundJobController.JOB_LINK_DOWNLOAD)
-
-    def test_get_handler_and_object_link_music_handler(self):
-        bg_obj = BackgroundJobController.objects.create(
-            job=BackgroundJobController.JOB_LINK_DOWNLOAD_MUSIC
-        )
-
-        mgr = HandlerManager()
-        # call tested function
-        handler_obj, handler = mgr.get_handler_and_object()
-
-        self.assertEqual(bg_obj, handler_obj)
-        self.assertEqual(
-            handler.get_job(), BackgroundJobController.JOB_LINK_DOWNLOAD_MUSIC
-        )
-
-    def test_get_handler_and_object_link_video_handler(self):
-        bg_obj = BackgroundJobController.objects.create(
-            job=BackgroundJobController.JOB_LINK_DOWNLOAD_VIDEO
-        )
-
-        mgr = HandlerManager()
-        # call tested function
-        handler_obj, handler = mgr.get_handler_and_object()
-
-        self.assertEqual(bg_obj, handler_obj)
-        self.assertEqual(
-            handler.get_job(), BackgroundJobController.JOB_LINK_DOWNLOAD_VIDEO
-        )
-
-    def test_get_handler_and_object_link_save_handler(self):
-        bg_obj = BackgroundJobController.objects.create(
-            job=BackgroundJobController.JOB_LINK_SAVE
-        )
-
-        mgr = HandlerManager()
-        # call tested function
-        handler_obj, handler = mgr.get_handler_and_object()
-
-        self.assertEqual(bg_obj, handler_obj)
-        self.assertEqual(handler.get_job(), BackgroundJobController.JOB_LINK_SAVE)
-
-    def test_get_handler_and_object_write_daily_data(self):
-        bg_obj = BackgroundJobController.objects.create(
-            job=BackgroundJobController.JOB_WRITE_DAILY_DATA
-        )
-
-        mgr = HandlerManager()
-        # call tested function
-        handler_obj, handler = mgr.get_handler_and_object()
-
-        self.assertEqual(bg_obj, handler_obj)
-        self.assertEqual(
-            handler.get_job(), BackgroundJobController.JOB_WRITE_DAILY_DATA
-        )
-
-    def test_get_handler_and_object_write_topic_handler(self):
-        bg_obj = BackgroundJobController.objects.create(
-            job=BackgroundJobController.JOB_WRITE_TOPIC_DATA
-        )
-
-        mgr = HandlerManager()
-        # call tested function
-        handler_obj, handler = mgr.get_handler_and_object()
-
-        self.assertEqual(bg_obj, handler_obj)
-        self.assertEqual(
-            handler.get_job(), BackgroundJobController.JOB_WRITE_TOPIC_DATA
-        )
-
-    def test_get_handler_and_object_import_sources(self):
-        bg_obj = BackgroundJobController.objects.create(
-            job=BackgroundJobController.JOB_IMPORT_SOURCES
-        )
-
-        mgr = HandlerManager()
-        # call tested function
-        handler_obj, handler = mgr.get_handler_and_object()
-
-        self.assertEqual(bg_obj, handler_obj)
-        self.assertEqual(handler.get_job(), BackgroundJobController.JOB_IMPORT_SOURCES)
-
-    def test_get_handler_and_object_import_bookmarks(self):
-        bg_obj = BackgroundJobController.objects.create(
-            job=BackgroundJobController.JOB_IMPORT_BOOKMARKS
-        )
-
-        mgr = HandlerManager()
-        # call tested function
-        handler_obj, handler = mgr.get_handler_and_object()
-
-        self.assertEqual(bg_obj, handler_obj)
-        self.assertEqual(
-            handler.get_job(), BackgroundJobController.JOB_IMPORT_BOOKMARKS
-        )
-
-    def test_get_handler_and_object_import_daily_data(self):
-        bg_obj = BackgroundJobController.objects.create(
-            job=BackgroundJobController.JOB_IMPORT_DAILY_DATA
-        )
-
-        mgr = HandlerManager()
-        # call tested function
-        handler_obj, handler = mgr.get_handler_and_object()
-
-        self.assertEqual(bg_obj, handler_obj)
-        self.assertEqual(
-            handler.get_job(), BackgroundJobController.JOB_IMPORT_DAILY_DATA
-        )
-
-    def test_get_handler_and_object_order(self):
-        BackgroundJobController.objects.create(
-            job=BackgroundJobController.JOB_PROCESS_SOURCE
-        )
-
-        BackgroundJobController.objects.create(
-            job=BackgroundJobController.JOB_IMPORT_DAILY_DATA
-        )
-
-        mgr = HandlerManager()
-
-        # call tested function
-        handler_obj, handler = mgr.get_handler_and_object()
-
-        self.assertTrue(handler_obj)
-        self.assertEqual(handler_obj.job, BackgroundJobController.JOB_PROCESS_SOURCE)
-
-        if handler_obj:
-            handler_obj.delete()
-
-        # call tested function
-        handler_obj, handler = mgr.get_handler_and_object()
-
-        self.assertTrue(handler_obj)
-        self.assertEqual(handler_obj.job, BackgroundJobController.JOB_IMPORT_DAILY_DATA)
-
-        if handler_obj:
-            handler_obj.delete()
-
-    def test_get_handler_and_object_job_disabled(self):
-        BackgroundJobController.objects.create(
-            job=BackgroundJobController.JOB_PROCESS_SOURCE, enabled=False
-        )
-
-        BackgroundJobController.objects.create(
-            job=BackgroundJobController.JOB_IMPORT_DAILY_DATA
-        )
-
-        mgr = HandlerManager()
-
-        # call tested function
-        handler_obj, handler = mgr.get_handler_and_object()
-
-        self.assertTrue(handler_obj)
-        self.assertEqual(handler_obj.job, BackgroundJobController.JOB_IMPORT_DAILY_DATA)
-
-        if handler_obj:
-            handler_obj.delete()
-
-        # call tested function
-        items = mgr.get_handler_and_object()
-
-        self.assertFalse(items)
-
-    def test_process_all_add_link(self):
-        LinkDataController.objects.all().delete()
-
-        BackgroundJobController.objects.create(
-            job=BackgroundJobController.JOB_LINK_ADD,
-            enabled=True,
-            subject="https://youtube.com",
-        )
-        BackgroundJobController.objects.create(
-            job=BackgroundJobController.JOB_LINK_ADD,
-            enabled=True,
-            subject="https://tiktok.com",
-        )
-
-        mgr = HandlerManager(timeout_s=60)
-
-        # call tested function
-        mgr.process_all()
-
-        self.print_errors()
-
-        self.assertEqual(BackgroundJobController.get_number_of_jobs(), 0)
-        self.assertEqual(LinkDataController.objects.all().count(), 2)
-
-    def test_process_all_timeout_changes_priority(self):
-        LinkDataController.objects.all().delete()
-
-        BackgroundJobController.objects.create(
-            job=BackgroundJobController.JOB_CLEANUP,
-            enabled=True,
-        )
-        BackgroundJobController.objects.create(
-            job=BackgroundJobController.JOB_LINK_ADD,
-            enabled=True,
-            subject="https://youtube.com",
-        )
-        BackgroundJobController.objects.create(
-            job=BackgroundJobController.JOB_LINK_ADD,
-            enabled=True,
-            subject="https://tiktok.com",
-        )
-
-        mgr = HandlerManager(timeout_s=0)
-
-        # call tested function
-        mgr.process_all()
-
-        self.print_errors()
-
-        self.assertEqual(BackgroundJobController.get_number_of_jobs(), 2)
-
-        jobs = BackgroundJobController.objects.filter(
-            job=BackgroundJobController.JOB_LINK_ADD
-        )
-        self.assertNotEqual(
-            jobs[0].priority,
-            BackgroundJobController.get_job_priority(
-                BackgroundJobController.JOB_LINK_ADD
-            ),
-        )
-        self.assertNotEqual(
-            jobs[1].priority,
-            BackgroundJobController.get_job_priority(
-                BackgroundJobController.JOB_LINK_ADD
-            ),
-        )
-
-    def test_process_one_for_all__exception(self):
-        obj = BackgroundJobController.objects.create(
-            job=BackgroundJobController.JOB_CLEANUP,
-            enabled=True,
-        )
-
-        items = [obj, HandlerThatThrowsExceptionInProcess]
-
-        mgr = HandlerManager(timeout_s=0)
-
-        # call tested function
-        mgr.process_one_for_all(items)
-
-        jobs = BackgroundJobController.objects.filter(
-            job=BackgroundJobController.JOB_LINK_ADD
-        )
-        self.assertEqual(jobs.count(), 0)
+# Test individual handlers
 
 
 class RefreshThreadHandlerTest(FakeInternetTestCase):
@@ -443,7 +95,7 @@ class RefreshThreadHandlerTest(FakeInternetTestCase):
         # call tested function
         handler.refresh()
 
-        persistent_objects = AppLogging.objects.all()
+        persistent_objects = AppLogging.objects.filter(level=int(logging.ERROR))
 
         for persistent_object in persistent_objects:
             print("Persisten object info:{}".format(persistent_object.info))
@@ -511,7 +163,7 @@ class RefreshThreadHandlerTest(FakeInternetTestCase):
         # call tested function
         handler.refresh()
 
-        persistent_objects = AppLogging.objects.all()
+        persistent_objects = AppLogging.objects.filter(level=int(logging.ERROR))
 
         for persistent_object in persistent_objects:
             print("Persisten object info:{}".format(persistent_object.info))
@@ -534,7 +186,7 @@ class RefreshThreadHandlerTest(FakeInternetTestCase):
         # call tested function
         handler.refresh()
 
-        persistent_objects = AppLogging.objects.all()
+        persistent_objects = AppLogging.objects.filter(level=int(logging.ERROR))
 
         for persistent_object in persistent_objects:
             print("Persisten object info:{}".format(persistent_object.info))
@@ -564,7 +216,7 @@ class RefreshThreadHandlerTest(FakeInternetTestCase):
         # call tested function
         handler.refresh()
 
-        persistent_objects = AppLogging.objects.all()
+        persistent_objects = AppLogging.objects.filter(level=int(logging.ERROR))
 
         for persistent_object in persistent_objects:
             print("Persisten object info:{}".format(persistent_object.info))
@@ -725,7 +377,7 @@ class AddJobHandlerTest(FakeInternetTestCase):
         handler = LinkAddJobHandler()
         handler.process(ob)
 
-        persistent_objects = AppLogging.objects.all()
+        persistent_objects = AppLogging.objects.filter(level=int(logging.ERROR))
 
         for persistent_object in persistent_objects:
             print("Persisten object info:{}".format(persistent_object.info_text))
@@ -749,7 +401,7 @@ class AddJobHandlerTest(FakeInternetTestCase):
         handler = LinkAddJobHandler()
         handler.process(ob)
 
-        persistent_objects = AppLogging.objects.all()
+        persistent_objects = AppLogging.objects.filter(level=int(logging.ERROR))
 
         for persistent_object in persistent_objects:
             print("Persisten object info:{}".format(persistent_object.info))
@@ -780,7 +432,7 @@ class ScanLinkJobHandlerTest(FakeInternetTestCase):
         handler = LinkScanJobHandler()
         handler.process(ob)
 
-        persistent_objects = AppLogging.objects.all()
+        persistent_objects = AppLogging.objects.filter(level=int(logging.ERROR))
 
         for persistent_object in persistent_objects:
             print("Persisten object info:{}".format(persistent_object.info_text))
@@ -846,7 +498,7 @@ class ProcessSourceHandlerTest(FakeInternetTestCase):
         # call tested function
         result = handler.process(ob)
 
-        persistent_objects = AppLogging.objects.all()
+        persistent_objects = AppLogging.objects.filter(level=int(logging.ERROR))
         for persistent_object in persistent_objects:
             print("AppLogging object info:{}".format(persistent_object.info_text))
 
@@ -954,3 +606,425 @@ class ExportDataJobHandlerTest(FakeInternetTestCase):
         self.print_errors()
 
         self.assertEqual(result, True)
+
+
+class HandlerThatThrowsExceptionInProcess(object):
+    def __init__(self, config=None):
+        pass
+
+    def process(self, obj=None):
+        raise IOError("Though luck")
+
+
+# test processors
+
+
+class GenericJobsProcessorTest(FakeInternetTestCase):
+    def setUp(self):
+        self.disable_web_pages()
+        self.setup_configuration()
+
+        ob = SourceDataController.objects.create(
+            url="https://youtube.com", title="YouTube", category="No", subcategory="No"
+        )
+        LinkDataController.objects.create(
+            source="https://youtube.com",
+            link="https://youtube.com?v=12345",
+            source_obj=ob,
+        )
+
+        self.user = self.get_user(
+            username="test_username", password="testpassword", is_superuser=True
+        )
+
+    def test_job_consistency(self):
+        from ..controllers.backgroundjob import BackgroundJobController
+
+        mgr = GenericJobsProcessor()
+        handlers = mgr.get_handlers()
+
+        all_is_good = True
+
+        for handler in handlers:
+            found = False
+            for choice in BackgroundJobController.JOB_CHOICES:
+                if handler.get_job() == choice[0]:
+                    found = True
+
+            if not found:
+                all_is_good = False
+
+        self.assertTrue(all_is_good)
+
+    def test_get_handler_and_object_invalid_job(self):
+        bg_obj = BackgroundJobController.objects.create(
+            job="invalid-job",
+        )
+
+        mgr = GenericJobsProcessor()
+        # call tested function
+        handler_obj, handler = mgr.get_handler_and_object()
+
+        self.assertEqual(bg_obj, handler_obj)
+        self.assertTrue(not handler)
+
+    def test_get_handler_and_object_export_data_handler(self):
+        bg_obj = BackgroundJobController.objects.create(
+            job=BackgroundJobController.JOB_EXPORT_DATA
+        )
+
+        mgr = GenericJobsProcessor()
+        # call tested function
+        handler_obj, handler = mgr.get_handler_and_object()
+
+        self.assertEqual(bg_obj, handler_obj)
+        self.assertEqual(handler.get_job(), BackgroundJobController.JOB_EXPORT_DATA)
+
+    def test_get_handler_and_object_process_source_handler(self):
+        bg_obj = BackgroundJobController.objects.create(
+            job=BackgroundJobController.JOB_PROCESS_SOURCE
+        )
+
+        mgr = GenericJobsProcessor()
+        # call tested function
+        handler_obj, handler = mgr.get_handler_and_object()
+
+        self.assertEqual(bg_obj, handler_obj)
+        self.assertEqual(handler.get_job(), BackgroundJobController.JOB_PROCESS_SOURCE)
+
+    def test_get_handler_and_object_link_add_handler(self):
+        bg_obj = BackgroundJobController.objects.create(
+            job=BackgroundJobController.JOB_LINK_ADD
+        )
+
+        mgr = GenericJobsProcessor()
+        # call tested function
+        handler_obj, handler = mgr.get_handler_and_object()
+
+        self.assertEqual(bg_obj, handler_obj)
+        self.assertEqual(handler.get_job(), BackgroundJobController.JOB_LINK_ADD)
+
+    def test_get_handler_and_object_link_download_handler(self):
+        bg_obj = BackgroundJobController.objects.create(
+            job=BackgroundJobController.JOB_LINK_DOWNLOAD
+        )
+
+        mgr = GenericJobsProcessor()
+        # call tested function
+        handler_obj, handler = mgr.get_handler_and_object()
+
+        self.assertEqual(bg_obj, handler_obj)
+        self.assertEqual(handler.get_job(), BackgroundJobController.JOB_LINK_DOWNLOAD)
+
+    def test_get_handler_and_object_link_music_handler(self):
+        bg_obj = BackgroundJobController.objects.create(
+            job=BackgroundJobController.JOB_LINK_DOWNLOAD_MUSIC
+        )
+
+        mgr = GenericJobsProcessor()
+        # call tested function
+        handler_obj, handler = mgr.get_handler_and_object()
+
+        self.assertEqual(bg_obj, handler_obj)
+        self.assertEqual(
+            handler.get_job(), BackgroundJobController.JOB_LINK_DOWNLOAD_MUSIC
+        )
+
+    def test_get_handler_and_object_link_video_handler(self):
+        bg_obj = BackgroundJobController.objects.create(
+            job=BackgroundJobController.JOB_LINK_DOWNLOAD_VIDEO
+        )
+
+        mgr = GenericJobsProcessor()
+        # call tested function
+        handler_obj, handler = mgr.get_handler_and_object()
+
+        self.assertEqual(bg_obj, handler_obj)
+        self.assertEqual(
+            handler.get_job(), BackgroundJobController.JOB_LINK_DOWNLOAD_VIDEO
+        )
+
+    def test_get_handler_and_object_link_save_handler(self):
+        bg_obj = BackgroundJobController.objects.create(
+            job=BackgroundJobController.JOB_LINK_SAVE
+        )
+
+        mgr = GenericJobsProcessor()
+        # call tested function
+        handler_obj, handler = mgr.get_handler_and_object()
+
+        self.assertEqual(bg_obj, handler_obj)
+        self.assertEqual(handler.get_job(), BackgroundJobController.JOB_LINK_SAVE)
+
+    def test_get_handler_and_object_write_daily_data(self):
+        bg_obj = BackgroundJobController.objects.create(
+            job=BackgroundJobController.JOB_WRITE_DAILY_DATA
+        )
+
+        mgr = GenericJobsProcessor()
+        # call tested function
+        handler_obj, handler = mgr.get_handler_and_object()
+
+        self.assertEqual(bg_obj, handler_obj)
+        self.assertEqual(
+            handler.get_job(), BackgroundJobController.JOB_WRITE_DAILY_DATA
+        )
+
+    def test_get_handler_and_object_write_topic_handler(self):
+        bg_obj = BackgroundJobController.objects.create(
+            job=BackgroundJobController.JOB_WRITE_TOPIC_DATA
+        )
+
+        mgr = GenericJobsProcessor()
+        # call tested function
+        handler_obj, handler = mgr.get_handler_and_object()
+
+        self.assertEqual(bg_obj, handler_obj)
+        self.assertEqual(
+            handler.get_job(), BackgroundJobController.JOB_WRITE_TOPIC_DATA
+        )
+
+    def test_get_handler_and_object_import_sources(self):
+        bg_obj = BackgroundJobController.objects.create(
+            job=BackgroundJobController.JOB_IMPORT_SOURCES
+        )
+
+        mgr = GenericJobsProcessor()
+        # call tested function
+        handler_obj, handler = mgr.get_handler_and_object()
+
+        self.assertEqual(bg_obj, handler_obj)
+        self.assertEqual(handler.get_job(), BackgroundJobController.JOB_IMPORT_SOURCES)
+
+    def test_get_handler_and_object_import_bookmarks(self):
+        bg_obj = BackgroundJobController.objects.create(
+            job=BackgroundJobController.JOB_IMPORT_BOOKMARKS
+        )
+
+        mgr = GenericJobsProcessor()
+        # call tested function
+        handler_obj, handler = mgr.get_handler_and_object()
+
+        self.assertEqual(bg_obj, handler_obj)
+        self.assertEqual(
+            handler.get_job(), BackgroundJobController.JOB_IMPORT_BOOKMARKS
+        )
+
+    def test_get_handler_and_object_import_daily_data(self):
+        bg_obj = BackgroundJobController.objects.create(
+            job=BackgroundJobController.JOB_IMPORT_DAILY_DATA
+        )
+
+        mgr = GenericJobsProcessor()
+        # call tested function
+        handler_obj, handler = mgr.get_handler_and_object()
+
+        self.assertEqual(bg_obj, handler_obj)
+        self.assertEqual(
+            handler.get_job(), BackgroundJobController.JOB_IMPORT_DAILY_DATA
+        )
+
+    def test_get_handler_and_object_order(self):
+        BackgroundJobController.objects.create(
+            job=BackgroundJobController.JOB_PROCESS_SOURCE
+        )
+
+        BackgroundJobController.objects.create(
+            job=BackgroundJobController.JOB_IMPORT_DAILY_DATA
+        )
+
+        mgr = GenericJobsProcessor()
+
+        # call tested function
+        handler_obj, handler = mgr.get_handler_and_object()
+
+        self.assertTrue(handler_obj)
+        self.assertEqual(handler_obj.job, BackgroundJobController.JOB_PROCESS_SOURCE)
+
+        if handler_obj:
+            handler_obj.delete()
+
+        # call tested function
+        handler_obj, handler = mgr.get_handler_and_object()
+
+        self.assertTrue(handler_obj)
+        self.assertEqual(handler_obj.job, BackgroundJobController.JOB_IMPORT_DAILY_DATA)
+
+        if handler_obj:
+            handler_obj.delete()
+
+    def test_get_handler_and_object_job_disabled(self):
+        BackgroundJobController.objects.create(
+            job=BackgroundJobController.JOB_PROCESS_SOURCE, enabled=False
+        )
+
+        BackgroundJobController.objects.create(
+            job=BackgroundJobController.JOB_IMPORT_DAILY_DATA
+        )
+
+        mgr = GenericJobsProcessor()
+
+        # call tested function
+        handler_obj, handler = mgr.get_handler_and_object()
+
+        self.assertTrue(handler_obj)
+        self.assertEqual(handler_obj.job, BackgroundJobController.JOB_IMPORT_DAILY_DATA)
+
+        if handler_obj:
+            handler_obj.delete()
+
+        # call tested function
+        items = mgr.get_handler_and_object()
+
+        self.assertFalse(items)
+
+    def test_process_all__adds_link(self):
+        LinkDataController.objects.all().delete()
+
+        BackgroundJobController.objects.create(
+            job=BackgroundJobController.JOB_LINK_ADD,
+            enabled=True,
+            subject="https://youtube.com",
+        )
+        BackgroundJobController.objects.create(
+            job=BackgroundJobController.JOB_LINK_ADD,
+            enabled=True,
+            subject="https://tiktok.com",
+        )
+
+        mgr = GenericJobsProcessor(timeout_s=60)
+
+        # call tested function
+        mgr.process_all()
+
+        self.print_errors()
+
+        self.assertEqual(BackgroundJobController.get_number_of_jobs(), 0)
+        self.assertEqual(LinkDataController.objects.all().count(), 2)
+
+    def test_process_all_timeout_changes_priority(self):
+        LinkDataController.objects.all().delete()
+
+        BackgroundJobController.objects.create(
+            job=BackgroundJobController.JOB_CLEANUP,
+            enabled=True,
+        )
+        BackgroundJobController.objects.create(
+            job=BackgroundJobController.JOB_LINK_ADD,
+            enabled=True,
+            subject="https://youtube.com",
+        )
+        BackgroundJobController.objects.create(
+            job=BackgroundJobController.JOB_LINK_ADD,
+            enabled=True,
+            subject="https://tiktok.com",
+        )
+
+        mgr = GenericJobsProcessor(timeout_s=0)
+
+        # call tested function
+        mgr.process_all()
+
+        self.print_errors()
+
+        self.assertEqual(BackgroundJobController.get_number_of_jobs(), 2)
+
+        jobs = BackgroundJobController.objects.filter(
+            job=BackgroundJobController.JOB_LINK_ADD
+        )
+        self.assertNotEqual(
+            jobs[0].priority,
+            BackgroundJobController.get_job_priority(
+                BackgroundJobController.JOB_LINK_ADD
+            ),
+        )
+        self.assertNotEqual(
+            jobs[1].priority,
+            BackgroundJobController.get_job_priority(
+                BackgroundJobController.JOB_LINK_ADD
+            ),
+        )
+
+    def test_process_all__adds_system_operation(self):
+        LinkDataController.objects.all().delete()
+
+        BackgroundJobController.objects.create(
+            job=BackgroundJobController.JOB_LINK_ADD,
+            enabled=True,
+            subject="https://youtube.com",
+        )
+        BackgroundJobController.objects.create(
+            job=BackgroundJobController.JOB_LINK_ADD,
+            enabled=True,
+            subject="https://tiktok.com",
+        )
+
+        mgr = GenericJobsProcessor(timeout_s=60)
+
+        # call tested function
+        mgr.process_all()
+
+        operations = SystemOperation.objects.all()
+        self.assertTrue(operations.count(), 1)
+
+    def test_process_one_for_all__exception(self):
+        obj = BackgroundJobController.objects.create(
+            job=BackgroundJobController.JOB_CLEANUP,
+            enabled=True,
+        )
+
+        items = [obj, HandlerThatThrowsExceptionInProcess]
+
+        mgr = GenericJobsProcessor(timeout_s=0)
+
+        # call tested function
+        mgr.process_one_for_all(items)
+
+        jobs = BackgroundJobController.objects.filter(
+            job=BackgroundJobController.JOB_LINK_ADD
+        )
+        self.assertEqual(jobs.count(), 0)
+
+
+class SourceJobsProcessorTest(FakeInternetTestCase):
+    def setUp(self):
+        self.disable_web_pages()
+        self.setup_configuration()
+
+        ob = SourceDataController.objects.create(
+            url="https://youtube.com", title="YouTube", category="No", subcategory="No"
+        )
+        LinkDataController.objects.create(
+            source="https://youtube.com",
+            link="https://youtube.com?v=12345",
+            source_obj=ob,
+        )
+
+        self.user = self.get_user(
+            username="test_username", password="testpassword", is_superuser=True
+        )
+
+    def test_get_handler__supported(self):
+        bg_obj = BackgroundJobController.objects.create(
+            job=BackgroundJobController.JOB_PROCESS_SOURCE
+        )
+
+        mgr = SourceJobsProcessor()
+        # call tested function
+        items = mgr.get_handler_and_object()
+        handler_obj = items[0]
+        handler = items[1]
+
+        self.assertEqual(handler_obj, bg_obj)
+        self.assertEqual(handler.get_job(), BackgroundJobController.JOB_PROCESS_SOURCE)
+
+    def test_get_handler__not_supported(self):
+        bg_obj = BackgroundJobController.objects.create(
+            job=BackgroundJobController.JOB_EXPORT_DATA
+        )
+
+        mgr = SourceJobsProcessor()
+        # call tested function
+        items = mgr.get_handler_and_object()
+
+        self.assertEqual(items, [])

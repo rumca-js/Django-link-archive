@@ -5,6 +5,8 @@ import socket
 import json
 import traceback
 import argparse
+import asyncio
+
 from sqlmodel import SqlModel
 from datetime import timedelta, datetime, timezone
 
@@ -203,6 +205,35 @@ def fetch(db):
     db.commit()
 
 
+async def fetch_async(db):
+    """
+    Async version is really really fast
+    """
+    print("Number of entries:{}".format(db.entries_table.count()))
+
+    sources = db.sources_table.select()
+
+    threads = []
+    for source in sources:
+        thread = asyncio.to_thread(read_source, source)
+        threads.append(thread)
+
+    results = await asyncio.gather(*threads)
+
+    for result in results:
+        for entry in result:
+            now = datetime.now(timezone.utc)
+            limit = now - timedelta(days = day_limit)
+
+            if entry['date_published'] > limit and not db.entries_table.is_entry(entry):
+                db.entries_table.add_entry(entry)
+
+    print("Number of entries:{}".format(db.entries_table.count()))
+
+    db.commit()
+
+
+
 def show_stats(entries_table, sources_table):
     count_entries = entries_table.count()
     count_sources = sources_table.count()
@@ -280,10 +311,10 @@ def do_main(parser):
     if parser.args.unfollow:
         unfollow_url(db, parser.args.unfollow)
 
-
     # one of the below needs to be true
     if parser.args.refresh_on_start:
         fetch(db)
+        #asyncio.run(fetch_async(db))
 
     elif parser.args.list_sources:
         list_sources(db)

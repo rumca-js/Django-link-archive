@@ -5,24 +5,29 @@ import traceback
 from linklibrary.celery import app, logger
 from .apps import LinkDatabase
 from .models import AppLogging
+from .configuration import Configuration
+from .threadhandlers import (
+    GenericJobsProcessor,
+    SourceJobsProcessor,
+    WriteJobsProcessor,
+    ImportJobsProcessor,
+)
+
+from .threadhandlers import RefreshThreadHandler
 
 
-def subs_checker_task(arg):
+def jobs_checker_task(arg):
     """!
     Checks for new entries in sources
     """
     LinkDatabase.info("subs_checker_task")
 
     try:
-        from .configuration import Configuration
-
         c = Configuration.get_object()
         if not c.config_entry.background_tasks:
             return
 
         c.config_entry = ConfigurationEntry.get()
-
-        from .threadhandlers import RefreshThreadHandler
 
         handler = RefreshThreadHandler()
         handler.refresh()
@@ -32,56 +37,22 @@ def subs_checker_task(arg):
     LinkDatabase.info("subs_checker_task DONE")
 
 
-def process_all_jobs_task(arg):
+def process_jobs_task(Processor):
     """!
-    Processes jobs
+    Checks for new entries in sources
     """
-    LinkDatabase.info("process_all_jobs_task")
+    LinkDatabase.info("process_jobs_task")
 
     try:
-        from .configuration import Configuration
-
         c = Configuration.get_object()
         if not c.config_entry.background_tasks:
             return
 
         c.config_entry = ConfigurationEntry.get()
 
-        from .threadhandlers import HandlerManager
-
-        mgr = HandlerManager()
-        return mgr.process_all()
-
+        handler = Processor()
+        handler.process_all()
     except Exception as E:
-        AppLogging.exc(
-            E,
-            "Exception in processing task",
-        )
+        AppLogging.exc(E, "Exception in processor task")
 
-    LinkDatabase.info("process_all_jobs_task DONE")
-
-
-def process_one_jobs_task(arg):
-    """!
-    Processes jobs
-    """
-    LinkDatabase.info("process_one_jobs_task")
-
-    try:
-        from .configuration import Configuration
-
-        c = Configuration.get_object()
-        if not c.config_entry.background_tasks:
-            return
-
-        c.config_entry = ConfigurationEntry.get()
-
-        from .threadhandlers import HandlerManager
-
-        mgr = HandlerManager()
-        return mgr.process_one()
-
-    except Exception as E:
-        AppLogging.exc(E, "Exception in processing task")
-
-    LinkDatabase.info("process_one_jobs_task DONE")
+    LinkDatabase.info("process_jobs_task DONE")

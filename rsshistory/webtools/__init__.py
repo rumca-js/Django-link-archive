@@ -4,6 +4,8 @@ from .url import (
     Url,
     DomainCache,
     DomainCacheInfo,
+    fetch_url,
+    fetch_all_urls,
 )
 from .handlerhttppage import (
     HttpRequestBuilder,

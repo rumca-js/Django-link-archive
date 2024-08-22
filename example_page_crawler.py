@@ -1,5 +1,9 @@
 """
 Simple scraping script.
+
+ - reads site map, reads links
+ - follows each link t read more links
+ - etc. etc.
 """
 import socket
 import json

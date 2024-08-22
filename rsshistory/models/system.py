@@ -387,9 +387,10 @@ class ConfigurationEntry(models.Model):
 
 
 class SystemOperation(models.Model):
-    thread_id = models.IntegerField(
-        default=0,
+    thread_id = models.CharField(
+        blank=True,
         help_text="Thread ID",
+        max_length = 100,
     )
 
     date_created = models.DateTimeField(auto_now_add=True, null=True)

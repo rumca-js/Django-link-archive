@@ -1,3 +1,11 @@
+"""
+This file should be updated to fit needs of your own project.
+
+Provides means:
+  - how to configure basic setup for threads
+  - for more apps more code needs to be written (depends on your project)
+"""
+
 import os
 import time
 from contextlib import contextmanager
@@ -58,36 +66,44 @@ def setup_periodic_tasks(sender, **kwargs):
 
     # in seconds
     sender.add_periodic_task(
-        300.0, rsshistory_main_checker_task.s("hello"), name="rsshistory Checker task"
+        300.0, jobs_checker_task.s("hello"), name="Jobs checker task"
     )
     sender.add_periodic_task(
         60.0,
-        rsshistory_main_process_all_jobs_task.s("hello"),
+        process_all_jobs.s("hello"),
         name="rsshistory Processing task",
     )
 
 
 @app.task(bind=True)
-def rsshistory_main_checker_task(self, arg):
+def jobs_checker_task(self, arg):
     lock_id = "{0}-lock".format(self.name)
     with memcache_lock(lock_id, self.app.oid) as acquired:
         logger.info("Lock on:%s acquired:%s", self.name, acquired)
         if acquired:
             from rsshistory.tasks import (
-                subs_checker_task as rsshistory_subs_checker_task,
+                jobs_checker_task as rsshistory_jobs_checker_task,
             )
 
-            rsshistory_subs_checker_task(arg)
+            rsshistory_jobs_checker_task(arg)
 
 
 @app.task(bind=True)
-def rsshistory_main_process_all_jobs_task(self, arg):
+def process_all_jobs(self, arg):
     lock_id = "{0}-lock".format(self.name)
     with memcache_lock(lock_id, self.app.oid) as acquired:
         logger.info("Lock on:%s acquired:%s", self.name, acquired)
         if acquired:
-            from rsshistory.tasks import (
-                process_all_jobs_task as rsshistory_process_all_jobs_task,
-            )
+            from rsshistory.threadhandlers import GenericJobsProcessor
+            from rsshistory.tasks import process_jobs_task
 
-            rsshistory_process_all_jobs_task(arg)
+            # we could device jobs between various threads
+
+            processors = [
+                    #SourceJobsProcessor,
+                    #WriteJobsProcessor,
+                    #ImportJobsProcessor,
+                    GenericJobsProcessor,]
+
+            for processor in processors:
+                process_jobs_task(processor)
