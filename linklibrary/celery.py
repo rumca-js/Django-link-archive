@@ -7,13 +7,13 @@ Provides means:
 """
 
 import os
-import time
 from contextlib import contextmanager
-from hashlib import md5
-
-from celery import Celery
 
 from django.core.cache import cache
+
+from celery import Celery
+from celery.utils.log import get_task_logger
+import importlib.util
 
 
 # Set the default Django settings module for the 'celery' program.
@@ -30,7 +30,6 @@ app.config_from_object("django.conf:settings", namespace="CELERY")
 # Load task modules from all registered Django apps.
 app.autodiscover_tasks()
 
-from celery.utils.log import get_task_logger
 
 logger = get_task_logger(__name__)
 
@@ -62,48 +61,48 @@ def memcache_lock(lock_id, oid):
 
 @app.on_after_configure.connect
 def setup_periodic_tasks(sender, **kwargs):
+    """
+    SQLite with Django does not like many tasks.
+    If you plan use SQLite do not use this treading solution
+    """
     cache.clear()
 
-    # in seconds
-    sender.add_periodic_task(
-        300.0, jobs_checker_task.s("hello"), name="Jobs checker task"
-    )
-    sender.add_periodic_task(
-        60.0,
-        process_all_jobs.s("hello"),
-        name="rsshistory Processing task",
-    )
+    # define for which apps support celery
+    apps = [ "rsshistory", ]
 
+    for app in apps:
+        # periodic task names should be unique, new app tasks should not replace
+        # the other task names
+        # https://docs.celeryq.dev/en/stable/userguide/periodic-tasks.html
 
-@app.task(bind=True)
-def jobs_checker_task(self, arg):
-    lock_id = "{0}-lock".format(self.name)
-    with memcache_lock(lock_id, self.app.oid) as acquired:
-        logger.info("Lock on:%s acquired:%s", self.name, acquired)
-        if acquired:
-            from rsshistory.tasks import (
-                jobs_checker_task as rsshistory_jobs_checker_task,
+        tasks_module = importlib.import_module(app + ".tasks", package=None)
+        tasks = tasks_module.get_tasks()
+
+        # in seconds
+        for task_info in tasks:
+            time_s = task_info[0]
+            task_processor = task_info[1]
+
+            sender.add_periodic_task(
+                time_s,
+                process_all_jobs.s(app + ".threadhandlers." + str(task_processor)),
+                name=app + " " + processor + " task ",
             )
 
-            rsshistory_jobs_checker_task(arg)
-
 
 @app.task(bind=True)
-def process_all_jobs(self, arg):
+def process_all_jobs(self, processor):
     lock_id = "{0}-lock".format(self.name)
     with memcache_lock(lock_id, self.app.oid) as acquired:
         logger.info("Lock on:%s acquired:%s", self.name, acquired)
         if acquired:
-            from rsshistory.threadhandlers import GenericJobsProcessor
-            from rsshistory.tasks import process_jobs_task
+            app = processor.split(".")[0]
+            processor_file_name = processor.split(".")[1]
+            processor_class_name = processor.split(".")[2]
 
-            # we could device jobs between various threads
+            tasks_module = importlib.import_module(app + ".tasks", package=None)
+            threadhandlers_module = importlib.import_module(app + ".threadhandlers", package=None)
 
-            processors = [
-                    #SourceJobsProcessor,
-                    #WriteJobsProcessor,
-                    #ImportJobsProcessor,
-                    GenericJobsProcessor,]
+            processor_class = getattr(threadhandlers_module, processor_class_name)
 
-            for processor in processors:
-                process_jobs_task(processor)
+            tasks_module.process_jobs_task(processor_class)

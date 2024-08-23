@@ -20,13 +20,6 @@ from rsshistory.webtools import (
 async def main():
     WebConfig.use_print_logging()
 
-    # scraping server is not running, port is unset
-    HttpPageHandler.crawling_server_port = 0
-
-    # scripts that are called
-    HttpPageHandler.crawling_headless_script = "poetry run python crawleebeautifulsoup.py"
-    HttpPageHandler.crawling_full_script = "poetry run python crawleebeautifulsoup.py"
-
     # TODO - there seems to be some problems with feedparser, when used with asyncio threads
     # module 'xml.sax.expatreader' has no attribute 'create_parser'
 

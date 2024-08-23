@@ -44,6 +44,8 @@ lxml="5.2.2"
 # [optional] use things below if you want to use seleniumbase
 # seleniumbase="4.29.9"
 
+# botasaurus
+
 [tool.poetry.group.dev.dependencies]
 black = "^23.3.0"
 

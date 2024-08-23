@@ -18,6 +18,7 @@ from rsshistory.webtools import (
    HttpPageHandler,
    ContentLinkParser,
 )
+from rsshistory.webtools import run_server_task
 
 
 class Crawler(object):
@@ -81,14 +82,11 @@ class Crawler(object):
 def main():
     WebConfig.use_print_logging()
 
-    # scraping server is not running, port is unset
-    HttpPageHandler.crawling_server_port = 0
-
-    # scripts that are called
-    HttpPageHandler.crawling_headless_script = "poetry run python crawleebeautifulsoup.py"
+    # more advanced processing is possible through other frameworks
+    server = run_server_task()
+    HttpPageHandler.crawling_server_port = server.port
     HttpPageHandler.crawling_full_script = "poetry run python crawleebeautifulsoup.py"
-
-    # WebLogger.web_logger = StandardClientWebLogger
+    HttpPageHandler.crawling_headless_script = "poetry run python crawleebeautifulsoup.py"
 
     print("Enter page to crawl")
     url = input("->")

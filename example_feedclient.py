@@ -19,6 +19,7 @@ from rsshistory.webtools import (
     Url,
     HttpPageHandler,
 )
+from rsshistory.webtools import run_server_task
 
 
 day_limit = 7
@@ -281,15 +282,7 @@ def list_sources(db):
         print("Url:{}".format(source.url))
 
 
-def do_main(parser):
-    WebConfig.use_print_logging()
-
-    # scraping server is not running, we do not use port
-    HttpPageHandler.crawling_server_port = parser.args.port
-    # when python requests cannot handle a scenario, we run crawlee
-    HttpPageHandler.crawling_headless_script = "poetry run python crawleebeautifulsoup.py"
-    HttpPageHandler.crawling_full_script = "poetry run python crawleebeautifulsoup.py"
-
+def do_main(parser, server):
     database_file = parser.args.db
 
     db = SqlModel(database_file=database_file)
@@ -365,7 +358,14 @@ def main():
     p = Parser()
     p.parse()
 
-    do_main(p)
+    WebConfig.use_print_logging()
+
+    # scraping server is not running, we do not use port
+    HttpPageHandler.crawling_server_port = p.args.port
+    HttpPageHandler.crawling_full_script = "poetry run python crawleebeautifulsoup.py"
+    HttpPageHandler.crawling_headless_script = "poetry run python crawleebeautifulsoup.py"
+
+    do_main(p, server)
 
 
 main()

@@ -20,9 +20,16 @@ class ScrapingResponseHandler(object):
 
 class ScrapingClient(object):
 
-    def __init__(self, host, port, response_handler=None, scraping_script=None):
-        self.host = host
-        self.port = port
+    def __init__(self, host=None, port=None, response_handler=None, scraping_script=None):
+        if host:
+            self.host = host
+        else:
+            self.host = ipc.SocketConnection.gethostname()
+
+        if port:
+            self.port = port
+        else:
+            self.port = ipc.DEFAULT_PORT
 
         if scraping_script:
             self.scraping_script = scraping_script

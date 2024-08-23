@@ -31,6 +31,7 @@ import threading
 import json
 
 from pathlib import Path
+import shutil
 from rsshistory import webtools
 from rsshistory.webtools import ipc
 import subprocess
@@ -112,7 +113,7 @@ def handle_connection_inner(c, address, port):
 
         diff = datetime.now() - time_start_s
         if diff.total_seconds() > max_transaction_timeout_s:
-            permanent_error("Timeout - closing")
+            #permanent_error("Timeout - closing")
             delete_connection(c)
             return
 
@@ -255,6 +256,15 @@ def remove_stale_connections():
         delete_connection(connection)
 
 
+def remove_temporary_files():
+    """
+    Crawlee storage
+    """
+    path = Path("./storage")
+    if path.exists() and len(requests) == 0:
+        shutil.rmtree(str(path))
+
+
 def handle_connection(conn, address, port):
     now = datetime.now()
     print("[{}] Handling connection from:{}. Requests len:{}".format(now, str(address), len(requests)))
@@ -276,9 +286,18 @@ def handle_connection(conn, address, port):
 
 class ScrapingServer(object):
 
-    def __init__(self, host, port):
-        self.host = host
-        self.port = port
+    def __init__(self, host=None, port=None):
+        if host:
+            self.host = host
+        else:
+            self.host = ipc.SocketConnection.gethostname()
+
+        if port:
+            self.port = port
+        else:
+            self.port = ipc.DEFAULT_PORT
+
+        self.close_request = False
 
     def serve_forever(self):
         # get the hostname
@@ -302,6 +321,7 @@ class ScrapingServer(object):
             while True:
                 try:
                     remove_stale_connections()
+                    remove_temporary_files()
 
                     conn, address = server_socket.accept()
 
@@ -336,8 +356,7 @@ class ScrapingServer(object):
         server_socket.close()
 
     def close(self):
-        # TODO not yet implemented
-        pass
+        self.close_request = True
 
 
 class ScrapingServerParser(object):
@@ -347,12 +366,16 @@ class ScrapingServerParser(object):
 
     def parse(self):
         self.parser = argparse.ArgumentParser(description="Script server")
+        self.parser.add_argument("--host", help="Host")
         self.parser.add_argument("--port", type=int, help="Port")
         self.parser.add_argument("-o", "--output-file", help="Response binary file")
 
         self.args = self.parser.parse_args()
 
-        self.host = socket.gethostname()
+        if "host" in self.args and self.args.host:
+            self.host = self.args.host
+        else:
+            self.host = socket.gethostname()
 
         if "port" in self.args and self.args.port:
             self.port = self.args.port
@@ -361,6 +384,20 @@ class ScrapingServerParser(object):
 
     def is_valid(self):
         return True
+
+
+def run_server_task(host=None, port=None):
+    """
+    Starts server task, starts listening for new input
+    """
+    def task(server):
+        server.serve_forever()
+
+    s = ScrapingServer()
+    thread = threading.Thread(target = task, args = [s])
+    thread.daemon = True
+    thread.start()
+    return s
 
 
 if __name__ == "__main__":

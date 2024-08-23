@@ -215,6 +215,8 @@ User actions are tracked by the system, only if it is configured so:
 
 # Scripts
 
+Web-scraping functionality can be also used without django.
+
 There are some scripts that can be used without Django application:
  - example_feedclient.py - example script that can serve as a simple RSS reader
  - example_page_crawler.py - example script that can crawl through web page

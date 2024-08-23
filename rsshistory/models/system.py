@@ -484,10 +484,13 @@ class SystemOperation(models.Model):
         )
 
     def get_thread_ids():
-        thread_ids = set()
-        all_entries = SystemOperation.objects.all()
-        for entry in all_entries:
-            thread_ids.add(entry.thread_id)
+        from ..tasks import get_processors, get_tasks
+        from ..threadhandlers import LeftOverJobsProcessor, RefreshProcessor
+
+        thread_ids = []
+
+        for task in get_tasks():
+            thread_ids.append(task[1].__name__)
 
         return thread_ids
 

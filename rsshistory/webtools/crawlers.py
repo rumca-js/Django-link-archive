@@ -574,6 +574,7 @@ class SeleniumUndetected(SeleniumDriver):
 
             return uc.Chrome(options=options)
         except Exception as E:
+            print(str(E))
             return
 
     def run(self):

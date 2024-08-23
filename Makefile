@@ -1,8 +1,8 @@
 .PHONY: install install-minimal
 .PHONY: createtables createtables-minimal createtables-celery createsuperuser installsysdeps configuresysdeps
-.PHONY: run run-celery run-server run-web-server run-minimal run-crawlee-server
+.PHONY: run run-celery run-server run-web-server run-minimal run-crawlee-server 
 .PHONY: update update-instances static migrate reformat oncommit test create-companion-app
-.PHONY: clear-celery
+.PHONY: clear clear-crawlee-files clear-celery
 
 CP = cp
 PROJECT_NAME = linklibrary
@@ -115,5 +115,10 @@ create-companion-app:
 	@echo " - register app in INSTALLED_APPS, add '$(COMPANION_APP).apps.LinkDatabase',
 	@echo "*******************************************************************"
 
+clear: clear-celery clear-crawlee-files
+
 clear-celery:
 	rm -f celerybeat-schedule.db
+
+clear-crawlee-files:
+	rm -rf storage

@@ -168,10 +168,10 @@ def backgroundjobs_check_new(request):
     if data is not None:
         return data
 
-    from ..threadhandlers import RefreshThreadHandler
+    from ..threadhandlers import RefreshProcessor
 
-    refresh_handler = RefreshThreadHandler()
-    refresh_handler.refresh()
+    refresh_handler = RefreshProcessor()
+    refresh_handler.run()
 
     return HttpResponseRedirect(reverse("{}:backgroundjobs".format(LinkDatabase.name)))
 
@@ -183,10 +183,10 @@ def backgroundjobs_perform_all(request):
     if data is not None:
         return data
 
-    from ..threadhandlers import HandlerManager, RefreshThreadHandler
+    from ..threadhandlers import GenericJobsProcessor
 
-    mgr = HandlerManager()
-    mgr.process_all()
+    mgr = GenericJobsProcessor()
+    mgr.run()
 
     return HttpResponseRedirect(reverse("{}:backgroundjobs".format(LinkDatabase.name)))
 

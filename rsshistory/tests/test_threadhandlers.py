@@ -20,7 +20,8 @@ from ..configuration import Configuration
 from ..threadhandlers import (
     GenericJobsProcessor,
     SourceJobsProcessor,
-    RefreshThreadHandler,
+    LeftOverJobsProcessor,
+    RefreshProcessor,
     CleanupJobHandler,
     LinkAddJobHandler,
     LinkScanJobHandler,
@@ -91,9 +92,9 @@ class RefreshThreadHandlerTest(FakeInternetTestCase):
         SourceExportHistory.objects.all().delete()
         self.create_exports()
 
-        handler = RefreshThreadHandler()
+        handler = RefreshProcessor()
         # call tested function
-        handler.refresh()
+        handler.run()
 
         persistent_objects = AppLogging.objects.filter(level=int(logging.ERROR))
 
@@ -123,9 +124,9 @@ class RefreshThreadHandlerTest(FakeInternetTestCase):
         SourceExportHistory.objects.all().delete()
         self.create_exports()
 
-        handler = RefreshThreadHandler()
+        handler = RefreshProcessor()
         # call tested function
-        handler.refresh()
+        handler.run()
 
         self.assertEqual(
             BackgroundJobController.objects.filter(
@@ -159,9 +160,9 @@ class RefreshThreadHandlerTest(FakeInternetTestCase):
             link="https://youtube.com?v=12345",
         )
 
-        handler = RefreshThreadHandler()
+        handler = RefreshProcessor()
         # call tested function
-        handler.refresh()
+        handler.run()
 
         persistent_objects = AppLogging.objects.filter(level=int(logging.ERROR))
 
@@ -182,9 +183,9 @@ class RefreshThreadHandlerTest(FakeInternetTestCase):
         SourceExportHistory.objects.all().delete()
         self.create_exports()
 
-        handler = RefreshThreadHandler()
+        handler = RefreshProcessor()
         # call tested function
-        handler.refresh()
+        handler.run()
 
         persistent_objects = AppLogging.objects.filter(level=int(logging.ERROR))
 
@@ -212,9 +213,9 @@ class RefreshThreadHandlerTest(FakeInternetTestCase):
             data_export.enabled = False
             data_export.save()
 
-        handler = RefreshThreadHandler()
+        handler = RefreshProcessor()
         # call tested function
-        handler.refresh()
+        handler.run()
 
         persistent_objects = AppLogging.objects.filter(level=int(logging.ERROR))
 
@@ -878,7 +879,7 @@ class GenericJobsProcessorTest(FakeInternetTestCase):
 
         self.assertFalse(items)
 
-    def test_process_all__adds_link(self):
+    def test_run__adds_link(self):
         LinkDataController.objects.all().delete()
 
         BackgroundJobController.objects.create(
@@ -895,14 +896,14 @@ class GenericJobsProcessorTest(FakeInternetTestCase):
         mgr = GenericJobsProcessor(timeout_s=60)
 
         # call tested function
-        mgr.process_all()
+        mgr.run()
 
         self.print_errors()
 
         self.assertEqual(BackgroundJobController.get_number_of_jobs(), 0)
         self.assertEqual(LinkDataController.objects.all().count(), 2)
 
-    def test_process_all_timeout_changes_priority(self):
+    def test_run_timeout_changes_priority(self):
         LinkDataController.objects.all().delete()
 
         BackgroundJobController.objects.create(
@@ -923,7 +924,7 @@ class GenericJobsProcessorTest(FakeInternetTestCase):
         mgr = GenericJobsProcessor(timeout_s=0)
 
         # call tested function
-        mgr.process_all()
+        mgr.run()
 
         self.print_errors()
 
@@ -945,7 +946,7 @@ class GenericJobsProcessorTest(FakeInternetTestCase):
             ),
         )
 
-    def test_process_all__adds_system_operation(self):
+    def test_run__adds_system_operation(self):
         LinkDataController.objects.all().delete()
 
         BackgroundJobController.objects.create(
@@ -962,7 +963,7 @@ class GenericJobsProcessorTest(FakeInternetTestCase):
         mgr = GenericJobsProcessor(timeout_s=60)
 
         # call tested function
-        mgr.process_all()
+        mgr.run()
 
         operations = SystemOperation.objects.all()
         self.assertTrue(operations.count(), 1)
@@ -1028,3 +1029,34 @@ class SourceJobsProcessorTest(FakeInternetTestCase):
         items = mgr.get_handler_and_object()
 
         self.assertEqual(items, [])
+
+
+class LeftOverJobsProcessorTest(FakeInternetTestCase):
+    def setUp(self):
+        self.disable_web_pages()
+        self.setup_configuration()
+
+        ob = SourceDataController.objects.create(
+            url="https://youtube.com", title="YouTube", category="No", subcategory="No"
+        )
+        LinkDataController.objects.create(
+            source="https://youtube.com",
+            link="https://youtube.com?v=12345",
+            source_obj=ob,
+        )
+
+        self.user = self.get_user(
+            username="test_username", password="testpassword", is_superuser=True
+        )
+
+    def test_get_handler__supported(self):
+        bg_obj = BackgroundJobController.objects.create(
+            job=BackgroundJobController.JOB_PROCESS_SOURCE
+        )
+
+        mgr = LeftOverJobsProcessor([SourceJobsProcessor])
+
+        jobs = mgr.get_supported_jobs()
+
+        self.assertTrue(BackgroundJob.JOB_PROCESS_SOURCE not in jobs)
+        self.assertTrue(BackgroundJob.JOB_WRITE_DAILY_DATA in jobs)

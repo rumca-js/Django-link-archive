@@ -1211,7 +1211,12 @@ class RunRuleJobHandler(BaseJobHandler):
             )
 
 
-class RefreshThreadHandler(object):
+class CeleryTaskInterface(object):
+    def run(self):
+        raise NotImplementedError("Not implemented")
+
+
+class RefreshProcessor(CeleryTaskInterface):
     """!
     One of the most important tasks.
     It checks what needs to be done, and produces 'new' tasks'.
@@ -1220,9 +1225,9 @@ class RefreshThreadHandler(object):
     Mostly it should only add background jobs, and nothing more!
     """
 
-    def refresh(self, item=None):
+    def run(self):
         c = Configuration.get_object()
-        c.refresh(str(type(self)))
+        c.refresh(self.__class__.__name__)
 
         if not SystemOperation.is_internet_ok():
             return
@@ -1290,7 +1295,7 @@ class RefreshThreadHandler(object):
                 BackgroundJobController.entry_update_data(entries[index])
 
 
-class GenericJobsProcessor(object):
+class GenericJobsProcessor(CeleryTaskInterface):
     """!
     @note Uses handler priority when processing jobs.
     """
@@ -1338,12 +1343,12 @@ class GenericJobsProcessor(object):
             # fmt: on
         ]
 
-    def process_all(self):
+    def run(self):
         try:
             self.start_processing_time = DateUtils.get_datetime_now_utc()
 
             c = Configuration.get_object()
-            c.refresh(str(type(self)))
+            c.refresh(self.__class__.__name__)
 
             if not SystemOperation.is_internet_ok():
                 return
@@ -1527,3 +1532,29 @@ class ImportJobsProcessor(GenericJobsProcessor):
                 BackgroundJob.JOB_IMPORT_SOURCES,
                 BackgroundJob.JOB_IMPORT_INSTANCE,
                 BackgroundJob.JOB_IMPORT_FROM_FILES,]
+
+
+class LeftOverJobsProcessor(GenericJobsProcessor):
+    def __init__(self):
+        super().__init__()
+
+    def get_supported_jobs(self):
+        from .tasks import get_processors
+        jobs = []
+        choices = BackgroundJobController.JOB_CHOICES
+
+        for choice in choices:
+            jobs.append(choice[0])
+
+        for processor in get_processors():
+            if processor.__name__ == LeftOverJobsProcessor.__name__:
+                continue
+
+            processor_object = processor()
+
+            processor_jobs = processor_object.get_supported_jobs()
+            for processor_job in processor_jobs:
+                if processor_job in jobs:
+                    jobs.remove(processor_job)
+
+        return jobs
