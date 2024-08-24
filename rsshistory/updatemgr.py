@@ -2,6 +2,7 @@ import traceback
 from pathlib import Path
 from datetime import timedelta, datetime
 
+from .apps import LinkDatabase
 from .dateutils import DateUtils
 from .models import AppLogging, DataExport
 from .controllers import SourceDataController, LinkDataController
@@ -18,10 +19,9 @@ class RepoFactory(object):
 
 
 class UpdateExportManager(object):
-    def __init__(self, config, repo_builder, export_data, directory=None, date=None):
+    def __init__(self, config, repo_builder, export_data, date=None):
         self._cfg = config
         self.export_data = export_data
-        self.directory = directory
         self.date = date
         self.repo_builder = repo_builder
         self.writer_config = None
@@ -34,11 +34,11 @@ class UpdateExportManager(object):
     def write(self):
         if self.date:
             config = DataWriterConfiguration(
-                self._cfg, self.export_data, self.directory, self.date.isoformat()
+                self._cfg, self.export_data, self.get_directory(), self.date.isoformat()
             )
         else:
             config = DataWriterConfiguration(
-                self._cfg, self.export_data, self.directory
+                self._cfg, self.export_data, self.get_directory()
             )
 
         self.writer_config = config
@@ -50,7 +50,16 @@ class UpdateExportManager(object):
         """
         Path to place where data are written to
         """
-        return Path(self.export_data.local_path) / self.directory
+        if self.export_data.export_data == DataExport.EXPORT_DAILY_DATA:
+            directory = "daily_data"
+        elif self.export_data.export_data == DataExport.EXPORT_YEAR_DATA:
+            directory = "yearly_data"
+        elif self.export_data.export_data == DataExport.EXPORT_NOTIME_DATA:
+            directory = "notime_data"
+
+        app = LinkDatabase.name
+
+        return Path(self.export_data.local_path) / app / directory
 
     def get_repo_operating_dir(self, repo):
         """
@@ -148,7 +157,7 @@ class UpdateManager(object):
             write_date = datetime.strptime(input_date, "%Y-%m-%d").date()
 
         mgr = UpdateExportManager(
-            self._cfg, self.repo_builder, export_data, "daily_data", write_date
+            self._cfg, self.repo_builder, export_data, write_date
         )
         mgr.process()
 
@@ -163,7 +172,7 @@ class UpdateManager(object):
             write_date = datetime.strptime(input_date, "%Y-%m-%d").date()
 
         mgr = UpdateExportManager(
-            self._cfg, self.repo_builder, export_data, "daily_data", write_date
+            self._cfg, self.repo_builder, export_data, write_date
         )
         mgr.write()
 

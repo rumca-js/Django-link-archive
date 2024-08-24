@@ -3,10 +3,11 @@ from django.contrib.auth.models import User
 
 from ..models import DataExport, ConfigurationEntry, UserBookmarks
 from ..controllers import SourceDataController, LinkDataController
-from ..updatemgr import UpdateManager
+from ..updatemgr import UpdateManager, UpdateExportManager
 from ..configuration import Configuration
 from ..dateutils import DateUtils
 from ..configuration import Configuration
+from ..apps import LinkDatabase
 
 from .fakeinternet import FakeInternetTestCase
 
@@ -320,3 +321,74 @@ class UpdateManagerLocTest(FakeInternetTestCase):
         mgr.write_and_push(export_config)
 
         self.assertEqual(len(RepoTestFactory.used_repos), 0)
+
+
+class UpdateExportManagerTest(FakeInternetTestCase):
+    def setUp(self):
+        self.disable_web_pages()
+
+        DataExport.objects.create(
+            enabled=True,
+            export_type=DataExport.EXPORT_TYPE_GIT,
+            export_data=DataExport.EXPORT_DAILY_DATA,
+            local_path="./daily_dir",
+            remote_path="https://github.com/rumca-js/RSS-Link-Database-DAILY.git",
+            user="testuser",
+            password="password",
+            export_entries=True,
+            export_entries_bookmarks=True,
+            export_entries_permanents=True,
+            export_sources=True,
+        )
+        DataExport.objects.create(
+            enabled=True,
+            export_type=DataExport.EXPORT_TYPE_GIT,
+            export_data=DataExport.EXPORT_YEAR_DATA,
+            local_path="./year_dir",
+            remote_path="https://github.com/rumca-js/RSS-Link-Database-YEAR.git",
+            user="testuser",
+            password="password",
+            export_entries=True,
+            export_entries_bookmarks=True,
+            export_entries_permanents=True,
+            export_sources=True,
+        )
+        DataExport.objects.create(
+            enabled=True,
+            export_type=DataExport.EXPORT_TYPE_GIT,
+            export_data=DataExport.EXPORT_NOTIME_DATA,
+            local_path="./notime_dir",
+            remote_path="https://github.com/rumca-js/RSS-Link-Database-NOTIME.git",
+            user="testuser",
+            password="password",
+            export_entries=True,
+            export_entries_bookmarks=True,
+            export_entries_permanents=True,
+            export_sources=True,
+        )
+
+    def test_get_directory__notime(self):
+
+        config = Configuration.get_object()
+        export_config = DataExport.objects.filter(
+            export_data=DataExport.EXPORT_NOTIME_DATA
+        )[0]
+
+        mgr = UpdateExportManager(config, RepoTestFactory, export_config)
+
+        expected_path = Path("./notime_dir") / LinkDatabase.name / "notime_data"
+
+        self.assertEqual(mgr.get_directory(), expected_path)
+
+    def test_get_directory__daily(self):
+
+        config = Configuration.get_object()
+        export_config = DataExport.objects.filter(
+            export_data=DataExport.EXPORT_DAILY_DATA
+        )[0]
+
+        mgr = UpdateExportManager(config, RepoTestFactory, export_config)
+
+        expected_path = Path("./daily_dir") / LinkDatabase.name / "daily_data"
+
+        self.assertEqual(mgr.get_directory(), expected_path)

@@ -52,6 +52,16 @@ class DataWriterTest(FakeInternetTestCase):
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
         )
+        LinkDataController.objects.create(
+            source="https://youtube.com",
+            link="https://youtube.com?v=permanent2",
+            title="The first link",
+            source_obj=source_youtube,
+            permanent=True,
+            bookmarked=True,
+            date_published=DateUtils.from_string("2024-03-03;16:34", "%Y-%m-%d;%H:%M"),
+            language="en",
+        )
 
         SourceDataController.objects.create(
             url="https://linkedin.com",
@@ -134,7 +144,7 @@ class DataWriterTest(FakeInternetTestCase):
         writer.write()
 
         links = LinkDataController.objects.filter(bookmarked=True)
-        self.assertEqual(links.count(), 1)
+        self.assertEqual(links.count(), 2)
 
         json_file = (
             conf.get_export_path()
@@ -143,8 +153,6 @@ class DataWriterTest(FakeInternetTestCase):
             / "2023"
             / "bookmarks_entries.json"
         )
-        print("Test JSON path")
-        print(str(json_file))
         self.assertEqual(json_file.exists(), True)
 
         json_obj = json.loads(json_file.read_text())
@@ -156,6 +164,15 @@ class DataWriterTest(FakeInternetTestCase):
             / self.export_year.local_path
             / "year"
             / "sources.json"
+        )
+        self.assertEqual(json_file.exists(), True)
+
+        json_file = (
+            conf.get_export_path()
+            / self.export_year.local_path
+            / "year"
+            / "2024"
+            / "bookmarks_entries.json"
         )
         self.assertEqual(json_file.exists(), True)
 
@@ -172,7 +189,7 @@ class DataWriterTest(FakeInternetTestCase):
         writer.write()
 
         links = LinkDataController.objects.filter(bookmarked=True)
-        self.assertEqual(links.count(), 1)
+        self.assertEqual(links.count(), 2)
 
         permanent_path = (
             conf.get_export_path()
@@ -214,7 +231,6 @@ class DataWriterTest(FakeInternetTestCase):
             / "2023-03-03"
             / "https...youtube.com_entries.json"
         )
-
         json_obj = json.loads(json_file.read_text())
 
         self.assertEqual(len(json_obj), 3)
@@ -226,6 +242,16 @@ class DataWriterTest(FakeInternetTestCase):
             / "sources.json"
         )
         self.assertEqual(json_file.exists(), True)
+
+        # 2024 should not be exported
+        json_file = (
+            conf.get_export_path()
+            / self.export_year.local_path
+            / "daily_data"
+            / "2024"
+            / "03"
+        )
+        self.assertEqual(json_file.exists(), False)
 
     def test_write_notime_many_sources(self):
         entry = ConfigurationEntry.get()
@@ -249,7 +275,7 @@ class DataWriterTest(FakeInternetTestCase):
         writer.write()
 
         links = LinkDataController.objects.filter(bookmarked=True)
-        self.assertEqual(links.count(), 1)
+        self.assertEqual(links.count(), 2)
 
         permanent_path = (
             conf.get_export_path()

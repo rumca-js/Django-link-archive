@@ -34,7 +34,7 @@ class DataExport(models.Model):
     local_path = models.CharField(
         max_length=1000,
         blank=True,
-        help_text="Local path is relative to main configuration export path",
+        help_text="Local path is relative to main configuration export path. This path will be appended with app name and type of export",
     )
     remote_path = models.CharField(
         max_length=1000, blank=True, help_text="Can be empty"
