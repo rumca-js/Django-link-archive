@@ -109,6 +109,25 @@ sources = [
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCFLwN7vRu8M057qJF8TsBaA", "title" : "up is not down"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCvg_4SPPEZ7y4pk_iB7z6sw", "title" : "whimsu"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCxXu9tCU63mF1ntk89XPkzA", "title" : "worthkids"},
+
+        {"url" : "https://www.reddit.com/r/3Dprinting/.rss", "title" : "3D Printing"},
+        {"url" : "https://www.reddit.com/r/Warhammer/.rss", "title" : "Warhammer"},
+        {"url" : "https://www.reddit.com/r/amiga/.rss", "title" : "Amiga"},
+        {"url" : "https://www.reddit.com/r/boardgames/.rss", "title" : "BoardGames"},
+        {"url" : "https://www.reddit.com/r/emulation/.rss", "title" : "Emulation"},
+        {"url" : "https://www.reddit.com/r/selfhosted/.rss", "title" : "Self-Hosted"},
+        {"url" : "https://www.reddit.com/r/RISCV/.rss", "title" : "RISC-V"},
+        {"url" : "https://www.reddit.com/r/webscraping/.rss", "title" : "WebScraping"},
+        {"url" : "https://www.reddit.com/r/programming/.rss", "title" : "Programming"},
+        {"url" : "https://www.reddit.com/r/raspberry_pi/.rss", "title" : "Raspberry PI"},
+        {"url" : "https://www.reddit.com/.rss", "title" : "Reddit - Front page"},
+        {"url" : "https://www.reddit.com/r/news/.rss", "title" : "News"},
+        {"url" : "https://www.reddit.com/r/politics/.rss", "title" : "Politics"},
+        {"url" : "https://www.reddit.com/r/worldnews/.rss", "title" : "World News"},
+        {"url" : "https://www.reddit.com/r/ReverseEngineering/.rss", "title" : "ReverseEngineering"},
+        {"url" : "https://www.reddit.com/r/Warhammer40k/.rss", "title" : "Warhammer40k"},
+        {"url" : "https://www.reddit.com/r/searchengines/.rss", "title" : "Search Engines"},
+
         {"url" : "https://hnrss.org/frontpage", "title" : "Hacker News Front Page"},
        # {"url" : "https://www.warhammer-community.com/feed", "title" : "Warhammer community"},
 ]
@@ -157,10 +176,18 @@ class HtmlWriter(object):
             source = entry.source
             #source_title = entry.source
 
-            if thumbnail:
-                text += f'<a href="{link}"><div><img style="width:400px;height=300px" src="{thumbnail}" /></div><div>{title}</div></a><div>{source}</div><div><pre>{description}</pre></div>'
+            show_thumbnail = True
+
+            if thumbnail and description and description.find(thumbnail) >= 0:
+                show_thumbnail = False
+
+            if not thumbnail:
+                show_thumbnail = False
+
+            if show_thumbnail:
+                text += f'<a href="{link}"><div><img style="width:400px;height=300px" src="{thumbnail}" /></div><h1>{title}</h1></a><div>{source}</div><div><pre>{description}</pre></div><hr/>\n'
             else:
-                text += f'<a href="{link}"><div>{title}</div></a><div>{source}</div><div><pre>{description}</pre></div>'
+                text += f'<a href="{link}"><h1>{title}</h1></a><div>{source}</div><div><pre>{description}</pre></div><hr/>\n'
 
         complete_text = complete_text.format(text)
 
@@ -272,6 +299,7 @@ def unfollow_url(db, url):
 def add_init_sources(db):
     for source in sources:
         if not db.sources_table.is_source(source):
+            print("Adding source:{}".format(source["title"]))
             db.sources_table.add_source(source)
 
 

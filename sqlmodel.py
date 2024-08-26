@@ -165,9 +165,10 @@ class EntriesTable(GenericTable):
             if key == "id":
                 continue
             elif key == "tags":
-                if entry[key]:
-                    data[key] = ", ".join(entry[key])
-                else:
+                try:
+                    if entry[key]:
+                        data[key] = ", ".join(entry[key])
+                except Exception as E:
                     data[key] = None
 
             elif key.startswith("date"):

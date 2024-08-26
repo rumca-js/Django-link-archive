@@ -407,7 +407,8 @@ class Url(ContentInterface):
 
     def get_entries(self):
         handler = self.get_handler()
-        return handler.get_entries()
+        if handler:
+            return handler.get_entries()
 
 
 class DomainCacheInfo(object):
