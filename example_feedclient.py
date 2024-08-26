@@ -282,7 +282,7 @@ def list_sources(db):
         print("Url:{}".format(source.url))
 
 
-def do_main(parser, server):
+def do_main(parser):
     database_file = parser.args.db
 
     db = SqlModel(database_file=database_file)
@@ -365,7 +365,7 @@ def main():
     HttpPageHandler.crawling_full_script = "poetry run python crawleebeautifulsoup.py"
     HttpPageHandler.crawling_headless_script = "poetry run python crawleebeautifulsoup.py"
 
-    do_main(p, server)
+    do_main(p)
 
 
 main()
