@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from ..basictypes import fix_path_for_os
 from webtools import Url, YouTubeVideoHandler
 
@@ -31,14 +33,18 @@ def get_youtube_style():
 
 
 class HtmlEntryExporter(object):
-    def __init__(self, output_directory, entry):
+    def __init__(self, output_directory, entry, index_file = None):
         self.entry = entry
         self.output_directory = output_directory
+        self.index_file = index_file
 
     def write(self):
         text = self.get_entry_text()
 
-        with open(self.get_entry_file_name(), "w", encoding="utf-8") as fh:
+        file_name = self.get_entry_file_name()
+        print("Writing:{}".format(file_name))
+
+        with open(file_name, "w", encoding="utf-8") as fh:
             fh.write(text)
 
     def get_entry_text(self):
@@ -61,6 +67,11 @@ class HtmlEntryExporter(object):
         if not thumbnail:
             show_thumbnail = False
 
+        index_file = "index.html"
+
+        if self.index_file:
+            index_file = self.index_file.get_file_name()
+
         text = ""
         text = "<!DOCTYPE html>"
         text += "<html>"
@@ -70,7 +81,7 @@ class HtmlEntryExporter(object):
         text += "</style>"
         text += "</head>"
         text += "<body>"
-        text += '<a href="index.html"><h2>Index</h2></a>'
+        text += f'<a href="{index_file}"><h2>Index</h2></a>'
         text += f'<a href="{link}">'
 
         if show_thumbnail:
@@ -103,39 +114,24 @@ class HtmlEntryExporter(object):
         return self.output_directory / fix_entry_link_name(link)
 
 
-class HtmlExporter(object):
-    def __init__(self, output_directory, entries):
-        self.output_directory = output_directory
-        self.entries = entries
+class HtmlIndexExporter(object):
+    def __init__(self, cwd = Path("."), output_file="index.html", previous_index = None):
+        self.output_file = output_file
+        self.output_directory = cwd
 
-    def write(self):
-        text = "<!DOCTYPE html>"
-        text += "<html>"
-        text += "<head>"
-        text += "<style>"
-        text += get_youtube_style()
-        text += "</style>"
-        text += "</head>"
-        text += "<body>"
-        text += "<ul>"
+        self.text = "<!DOCTYPE html>"
+        self.text += "<html>"
+        self.text += "<head>"
+        self.text += "<style>"
+        self.text += get_youtube_style()
+        self.text += "</style>"
+        self.text += "</head>"
+        self.text += "<body>"
+        self.text += "<ul>"
 
-        for entry in self.entries:
-            print("Writing:{}".format(self.get_entry_file_name(entry)))
-            self.write_entry_file(entry)
-            text += self.get_entry_index_text(entry)
+        self.previous_index = previous_index
 
-        text += "</body>"
-        text += "</html>"
-
-        with open(self.get_index_file_name(), "w", encoding="utf-8") as fh:
-            fh.write(text)
-
-    def write_entry_file(self, entry):
-        # write entry file
-        w = HtmlEntryExporter(self.output_directory, entry)
-        w.write()
-
-    def get_entry_index_text(self, entry):
+    def add_entry(self, entry):
         # index.html entry text
         thumbnail = entry.thumbnail
         title = entry.title
@@ -147,20 +143,71 @@ class HtmlExporter(object):
 
         entry_file_name = self.get_entry_file_name(entry)
 
-        text = ""
-        text += f'<a href="{entry_file_name}">'
+        self.text += f'<a href="{entry_file_name}">'
         if thumbnail:
-            text += f'<div><img style="width:400px;height=300px" src="{thumbnail}" /></div>'
+            self.text += f'<div><img style="width:400px;height=300px" src="{thumbnail}" /></div>'
 
-        text += f'<h1>{title}</h1>'
-        text += f'</a>'
-        text += f'<div>{source}</div>'
-        text += f'<div>{date_published}</div>'
-        text += f'<hr/>'
-        return text
+        self.text += f'<h1>{title}</h1>'
+        self.text += f'</a>'
+        self.text += f'<div>{source}</div>'
+        self.text += f'<div>{date_published}</div>'
+        self.text += f'<hr/>'
 
-    def get_index_file_name(self):
-        return self.output_directory / "index.html"
+    def write(self, next_index = None):
+        if self.previous_index:
+            previous_file = self.previous_index.get_file_name()
+            self.text += f'<a href="{previous_file}"><h2>Previous Index</h2></a>'
+
+        if next_index:
+            next_file = next_index.get_file_name()
+            self.text += f'<a href="{next_file}"><h2>Next Index</h2></a>'
+
+        self.text += "</ul>"
+        self.text += "</body>"
+        self.text += "</html>"
+
+        with open(str(self.output_directory / self.output_file), "w", encoding="utf-8") as fh:
+            fh.write(self.text)
+
+    def get_file_name(self):
+        return self.output_file
 
     def get_entry_file_name(self, entry):
         return fix_entry_link_name(entry.link)
+
+
+class HtmlExporter(object):
+    def __init__(self, output_directory, entries):
+        self.output_directory = output_directory
+        self.entries = entries
+        self.current_index = None
+
+    def write(self):
+        index_number = 0
+
+        self.current_index = HtmlIndexExporter(cwd = self.output_directory, output_file = self.get_index_file_name(index_number))
+
+        for row_index, entry in enumerate(self.entries):
+            if row_index % 100 == 99:
+                index_number += 1
+                next_index = HtmlIndexExporter(cwd = self.output_directory, output_file = self.get_index_file_name(index_number), previous_index=self.current_index)
+
+                self.current_index.write(next_index)
+
+                self.current_index = next_index
+
+            self.write_entry_file(entry)
+            self.current_index.add_entry(entry)
+
+        self.current_index.write()
+
+    def write_entry_file(self, entry):
+        # write entry file
+        w = HtmlEntryExporter(self.output_directory, entry, self.current_index)
+        w.write()
+
+    def get_index_file_name(self, index_number):
+        if index_number == 0:
+            return "index.html"
+        else:
+            return f"index_{index_number}.html"

@@ -24,7 +24,7 @@ from webtools import run_server_task
 from utils.serializers import HtmlExporter
 
 
-__version__ = "0.0.1"
+__version__ = "0.0.2"
 
 
 day_limit = 7
