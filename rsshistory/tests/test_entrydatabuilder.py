@@ -1,5 +1,7 @@
 from datetime import timedelta
 
+from utils.dateutils import DateUtils
+
 from ..controllers import (
     EntryDataBuilder,
     EntryWrapper,
@@ -10,7 +12,6 @@ from ..controllers import (
     ArchiveLinkDataController,
 )
 from ..models import LinkDataModel
-from ..dateutils import DateUtils
 from ..configuration import Configuration
 
 from .fakeinternet import FakeInternetTestCase, MockRequestCounter

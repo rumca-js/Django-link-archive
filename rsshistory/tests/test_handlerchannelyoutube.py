@@ -1,4 +1,4 @@
-from ..webtools import YouTubeChannelHandler
+from webtools import YouTubeChannelHandler
 from .fakeinternet import FakeInternetTestCase
 
 

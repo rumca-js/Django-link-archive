@@ -1,7 +1,6 @@
 import shutil
 
 from .services.gitrepo import GitRepo
-from .dateutils import DateUtils
 
 
 class DefaultRepo(GitRepo):

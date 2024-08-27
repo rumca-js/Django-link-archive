@@ -4,7 +4,8 @@ import logging
 
 from django.contrib.auth.models import User
 
-from .basictypes import *
+from utils.dateutils import DateUtils
+
 from .models import ConfigurationEntry, SystemOperation
 from .apps import LinkDatabase
 
@@ -18,10 +19,7 @@ version is split into three digits:
  if a change requires the model to be changed, then second digit is updated, patch is set to 0
  if something should be released to public, then release version changes
 """
-__version__ = "0.77.1"
-
-
-from pathlib import Path
+__version__ = "0.77.2"
 
 
 class Configuration(object):
@@ -106,18 +104,18 @@ class Configuration(object):
         pass
 
     def apply_ssl_verification(self):
-        from .webtools import HttpPageHandler
+        from webtools import HttpPageHandler
 
         if not self.config_entry.ssl_verification:
             HttpPageHandler.disable_ssl_warnings()
 
     def apply_user_agent(self):
-        from .webtools import HttpPageHandler
+        from webtools import HttpPageHandler
 
         HttpPageHandler.user_agent = self.config_entry.user_agent
 
     def apply_crawling_scripts(self):
-        from .webtools import HttpPageHandler
+        from webtools import HttpPageHandler
 
         c = self.config_entry
 
@@ -126,12 +124,12 @@ class Configuration(object):
         HttpPageHandler.crawling_server_port = c.crawling_server_port
 
     def apply_robots_txt(self):
-        from .webtools import DomainCache
+        from webtools import DomainCache
 
         DomainCache.respect_robots_txt = self.config_entry.respect_robots_txt
 
     def apply_web_logger(self):
-        from .webtools import WebConfig
+        from webtools import WebConfig
         from .models import AppLogging
 
         WebConfig.use_logger(AppLogging)
@@ -166,7 +164,6 @@ class Configuration(object):
         return "keywords.json"
 
     def get_daily_data_day_path(self, day_iso=None):
-        from .dateutils import DateUtils
 
         if day_iso == None:
             day_iso = DateUtils.get_date_today().isoformat()
@@ -198,8 +195,6 @@ class Configuration(object):
         We can configure system to display various time zones
         @return time string, in local time
         """
-        from .dateutils import DateUtils
-
         config = self.config_entry
         time_zone = config.time_zone
 
@@ -210,8 +205,6 @@ class Configuration(object):
         We can configure system to display various time zones
         @return time string, in local time
         """
-        from .dateutils import DateUtils
-
         config = self.config_entry
         time_zone = config.time_zone
 
@@ -226,8 +219,6 @@ class Configuration(object):
         return result
 
     def refresh(self, thread_id):
-        from .dateutils import DateUtils
-
         if thread_id == 0:
             if self.is_it_time_to_ping:
                 if self.ping_internet(thread_id):
@@ -256,7 +247,7 @@ class Configuration(object):
     def ping_internet(self, thread_id):
         # TODO this should be done by Url. ping
 
-        from .webtools import HttpRequestBuilder
+        from webtools import HttpRequestBuilder
 
         test_page_url = self.config_entry.internet_test_page
 

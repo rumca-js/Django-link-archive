@@ -18,7 +18,7 @@ import sys
 import os
 from datetime import timedelta
 import json
-from rsshistory import webtools
+import webtools
 import traceback
 
 os.environ["CRAWLEE_STORAGE_DIR"] = "./storage/{}".format(os.getpid())

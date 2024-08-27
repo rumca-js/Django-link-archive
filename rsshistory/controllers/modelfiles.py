@@ -1,5 +1,6 @@
+from webtools import Url
+
 from ..models import ModelFiles
-from ..webtools import Url
 from ..configuration import Configuration
 
 

@@ -6,12 +6,13 @@ import json
 import traceback
 import argparse
 import asyncio
+from pathlib import Path
+import shutil
 
-from sqlmodel import SqlModel
+from utils.sqlmodel import SqlModel
 from datetime import timedelta, datetime, timezone
 
-
-from rsshistory.webtools import (
+from webtools import (
     PageOptions,
     WebConfig,
     WebLogger,
@@ -19,7 +20,11 @@ from rsshistory.webtools import (
     Url,
     HttpPageHandler,
 )
-from rsshistory.webtools import run_server_task
+from webtools import run_server_task
+from utils.serializers import HtmlExporter
+
+
+__version__ = "0.0.1"
 
 
 day_limit = 7
@@ -129,7 +134,7 @@ sources = [
         {"url" : "https://www.reddit.com/r/searchengines/.rss", "title" : "Search Engines"},
 
         {"url" : "https://hnrss.org/frontpage", "title" : "Hacker News Front Page"},
-       # {"url" : "https://www.warhammer-community.com/feed", "title" : "Warhammer community"},
+        {"url" : "https://warhammer-community.com/feed", "title" : "Warhammer community"},
 ]
 
 
@@ -154,45 +159,6 @@ def read_source(source):
             result.append(item)
 
     return result
-
-
-class HtmlWriter(object):
-    def __init__(self, db, file_name):
-        self.db = db
-        self.file_name = file_name
-
-    def write(self):
-        entries = self.db.entries_table.select()
-
-        complete_text = "<html><body><ul>{}</ul></body></html>"
-        text = ""
-
-        for entry in entries:
-            thumbnail = entry.thumbnail
-            title = entry.title
-            link = entry.link
-            description = entry.description
-            date_published = entry.date_published
-            source = entry.source
-            #source_title = entry.source
-
-            show_thumbnail = True
-
-            if thumbnail and description and description.find(thumbnail) >= 0:
-                show_thumbnail = False
-
-            if not thumbnail:
-                show_thumbnail = False
-
-            if show_thumbnail:
-                text += f'<a href="{link}"><div><img style="width:400px;height=300px" src="{thumbnail}" /></div><h1>{title}</h1></a><div>{source}</div><div><pre>{description}</pre></div><hr/>\n'
-            else:
-                text += f'<a href="{link}"><h1>{title}</h1></a><div>{source}</div><div><pre>{description}</pre></div><hr/>\n'
-
-        complete_text = complete_text.format(text)
-
-        with open(self.file_name, "w", encoding="utf-8") as fh:
-            fh.write(complete_text)
 
 
 class OutputWriter(object):
@@ -337,14 +303,22 @@ def do_main(parser):
         fetch(db)
         #asyncio.run(fetch_async(db))
 
-    elif parser.args.list_sources:
+
+    if parser.args.list_sources:
         list_sources(db)
 
-    elif parser.args.stats:
+    if parser.args.stats:
         show_stats(db)
 
-    elif parser.args.output_file:
-        w = HtmlWriter(db, parser.args.output_file)
+    if parser.args.output_dir:
+        directory = Path(parser.args.output_dir)
+        if not directory.exists():
+            directory.mkdir(parents=True, exist_ok=True)
+        else:
+            shutil.rmtree(str(directory))
+            directory.mkdir(parents=True, exist_ok=True)
+
+        w = HtmlExporter(directory, db.entries_table.select())
         w.write()
 
     elif parser.args.print:
@@ -366,7 +340,7 @@ class Parser(object):
             "--timeout", default=10, type=int, help="Timeout expressed in seconds"
         )
         self.parser.add_argument("--port", type=int, default=0, help="Port")
-        self.parser.add_argument("-o", "--output-file", help="HTML output file, with entry data")
+        self.parser.add_argument("-o", "--output-dir", help="HTML output directory")
         self.parser.add_argument("--print", help="Print entries to stdout")
         self.parser.add_argument("-r", "--refresh-on-start", action="store_true", help="Refreshes on start")
         self.parser.add_argument("--stats", action="store_true", help="Show statistics")
@@ -375,6 +349,7 @@ class Parser(object):
         self.parser.add_argument("--unfollow", help="Unfollows specific url")
         self.parser.add_argument("--list-sources",action="store_true", help="Lists sources")
         self.parser.add_argument("--init-sources",action="store_true", help="Initializes sources")
+        self.parser.add_argument("-v", "--verbose",action="store_true", help="Verbose")
         self.parser.add_argument("--db", default="feedclient.db", help="SQLite database file")
 
         # --since "2024-01-01 12:03

@@ -1,9 +1,10 @@
 from django.contrib.auth.models import User
 
+from .dateutils import DateUtils
+
 from ..serializers import MarginaliaCrawlerOutput, ReadingList, BookmarksExporter
 from ..models import UserBookmarks
 from ..controllers import LinkDataController
-from ..dateutils import DateUtils
 from ..configuration import Configuration
 
 from .fakeinternet import FakeInternetTestCase

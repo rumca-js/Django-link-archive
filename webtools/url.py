@@ -21,12 +21,12 @@ from .handlerhttppage import (
     HttpPageHandler,
 )
 
-from .handlervideoyoutube import YouTubeVideoHandler, YouTubeJsonHandler
+from .handlervideoyoutube import YouTubeJsonHandler
 from .handlervideoodysee import OdyseeVideoHandler
 from .handlerchannelyoutube import YouTubeChannelHandler
 from .handlerchannelodysee import OdyseeChannelHandler
 
-from ..dateutils import DateUtils
+from utils.dateutils import DateUtils
 
 
 class Url(ContentInterface):

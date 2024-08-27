@@ -6,6 +6,8 @@ from django.http import HttpResponseForbidden, HttpResponseRedirect
 from django.utils.http import urlencode
 from django.core.paginator import Paginator
 
+from webtools import Url, DomainAwarePage, HttpPageHandler
+
 from ..apps import LinkDatabase
 from ..models import ConfigurationEntry, UserConfig, AppLogging
 from ..controllers import (
@@ -21,7 +23,6 @@ from ..forms import SourceForm, ContentsForm, SourcesChoiceForm
 from ..queryfilters import SourceFilter
 from ..views import ViewPage
 from ..configuration import Configuration
-from ..webtools import Url, DomainAwarePage, HttpPageHandler
 from ..pluginurl import UrlHandler
 from ..pluginsources import SourceControllerBuilder
 from ..serializers.instanceimporter import InstanceExporter

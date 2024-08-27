@@ -1,7 +1,8 @@
 import os
 import re
 
-from ..webtools import DomainAwarePage
+from webtools import DomainAwarePage
+
 from .sourceparseplugin import BaseParsePlugin
 
 

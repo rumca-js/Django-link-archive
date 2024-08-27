@@ -1,6 +1,8 @@
 from django.urls import reverse
 from django.contrib.auth.models import User
 
+from utils.dateutils import DateUtils
+
 from ..apps import LinkDatabase
 from ..controllers import (
     SourceDataController,
@@ -14,7 +16,6 @@ from ..models import (
     UserEntryVisitHistory, UserSearchHistory, UserEntryTransitionHistory
 )
 from ..configuration import Configuration
-from ..dateutils import DateUtils
 
 from .fakeinternet import FakeInternetTestCase, MockRequestCounter
 

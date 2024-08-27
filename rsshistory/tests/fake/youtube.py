@@ -1,4 +1,4 @@
-from ...dateutils import DateUtils
+from utils.dateutils import DateUtils
 
 
 youtube_robots_txt = """

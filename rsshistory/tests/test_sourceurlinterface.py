@@ -1,6 +1,7 @@
+from webtools import HtmlPage, RssPage, HttpPageHandler
+
 from ..models import SourceDataModel
 from ..pluginsources.sourceurlinterface import SourceUrlInterface
-from ..webtools import HtmlPage, RssPage, HttpPageHandler
 from ..pluginurl import UrlHandler
 
 from .fakeinternet import FakeInternetTestCase, MockRequestCounter

@@ -193,6 +193,8 @@ class YouTubeJsonHandler(YouTubeVideoHandler):
 
     def get_date_published(self):
         if self.get_contents():
+            # TODO use dateutils
+
             from datetime import date
             from datetime import datetime
             from pytz import timezone
@@ -295,7 +297,7 @@ class YouTubeJsonHandler(YouTubeVideoHandler):
         return youtube_props
 
     def load_details(self):
-        from ..serializers.youtubelinkjson import YouTubeJson
+        from utils.serializers import YouTubeJson
 
         self.yt_ob = YouTubeJson()
 
@@ -303,9 +305,9 @@ class YouTubeJsonHandler(YouTubeVideoHandler):
             return False
 
         if self.return_dislike:
-            from ..services.returndislike import YouTubeThumbsDown
+            from utils.serializers import ReturnDislike
 
-            self.rd_ob = YouTubeThumbsDown(self.get_video_code())
+            self.rd_ob = ReturnDislike(self.get_video_code())
             if self.rd_text and not self.rd_ob.loads(self.rd_text):
                 return False
 
@@ -323,7 +325,7 @@ class YouTubeJsonHandler(YouTubeVideoHandler):
         if self.yt_text is not None:
             return True
 
-        from ..programwrappers import ytdlp
+        from programwrappers import ytdlp
 
         yt = ytdlp.YTDLP(self.url)
         self.yt_text = yt.download_data()
@@ -338,11 +340,10 @@ class YouTubeJsonHandler(YouTubeVideoHandler):
         if self.rd_text is not None:
             return True
 
-        from ..serializers.returnyoutubedislikeapijson import YouTubeThumbsDown
+        from utils.serializers import ReturnDislike
 
-        ytr = YouTubeThumbsDown(self)
-        self.rd_text = ytr.download_data()
-        if self.rd_text is None:
+        self.rd_ob = ReturnDislike(self.get_video_code())
+        if self.rd_text and not self.rd_ob.loads(self.rd_text):
             return False
 
         return True

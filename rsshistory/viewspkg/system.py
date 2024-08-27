@@ -11,6 +11,9 @@ from django.shortcuts import redirect
 from django.forms.models import model_to_dict
 from django.contrib.auth.models import User
 
+from webtools import selenium_feataure_enabled
+from utils.dateutils import DateUtils
+
 from ..apps import LinkDatabase
 from ..models import (
     ConfigurationEntry,
@@ -45,8 +48,6 @@ from ..forms import (
     UserConfigForm,
 )
 from ..views import ViewPage
-from ..webtools import selenium_feataure_enabled
-from ..dateutils import DateUtils
 
 
 def index(request):

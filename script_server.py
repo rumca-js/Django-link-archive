@@ -34,8 +34,8 @@ import json
 import shutil
 
 from pathlib import Path
-from rsshistory import webtools
-from rsshistory.webtools import ipc, ScrapingServer, ScrapingServerParser
+import webtools
+from webtools import ipc, ScrapingServer, ScrapingServerParser
 import subprocess
 import traceback
 from datetime import datetime, timedelta

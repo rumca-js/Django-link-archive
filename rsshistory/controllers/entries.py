@@ -7,13 +7,14 @@ from django.db import models
 from django.urls import reverse
 from django.db.models import Q
 
+from utils.dateutils import DateUtils
+
 from ..models import (
     LinkDataModel,
     ArchiveLinkDataModel,
 )
 from ..configuration import Configuration
 from ..apps import LinkDatabase
-from ..dateutils import DateUtils
 
 
 class LinkDataController(LinkDataModel):

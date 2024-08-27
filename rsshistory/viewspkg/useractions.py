@@ -4,6 +4,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponseForbidden, HttpResponseRedirect
 
 from datetime import datetime, timedelta
+from utils.dateutils import DateUtils
 
 from ..apps import LinkDatabase
 from ..models import CompactedTags, UserTags, ConfigurationEntry, UserVotes
@@ -53,8 +54,6 @@ class ActualTags(AllTags):
     template_name = str(ViewPage.get_full_template("tags_list.html"))
 
     def get_time_range(self):
-        from ..dateutils import DateUtils
-
         return DateUtils.get_days_range()
 
     def get_queryset(self):

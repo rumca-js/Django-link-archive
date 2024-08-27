@@ -1,13 +1,13 @@
 import os
 import re
 
+from webtools import ContentLinkParser, DomainAwarePage
+
 from ..models import UserTags
 from ..configuration import Configuration
 from .sourcerssplugin import BaseRssPlugin
 from ..pluginurl import UrlHandler
 from ..controllers import BackgroundJobController
-
-from ..webtools import ContentLinkParser, HtmlPage, DomainAwarePage
 
 
 class RssParserPlugin(BaseRssPlugin):

@@ -4,6 +4,8 @@ import traceback
 
 from django.contrib.auth.models import User
 
+from utils.dateutils import DateUtils
+
 from ..models import Domains, AppLogging, UserBookmarks, UserTags, UserVotes
 
 from ..controllers import (
@@ -17,7 +19,6 @@ from ..controllers import (
 )
 from ..apps import LinkDatabase
 from ..configuration import Configuration
-from ..dateutils import DateUtils
 
 
 class InstanceExporter(object):

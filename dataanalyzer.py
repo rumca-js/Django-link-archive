@@ -37,10 +37,9 @@ import json
 from rsshistory.omnisearch import SingleSymbolEvaluator, EquationEvaluator, OmniSearch
 from sqlalchemy import and_, or_, not_
 
-from sqlmodel import SqlModel
-import requests
+from utils.sqlmodel import SqlModel
 
-from rsshistory.webtools import (
+from webtools import (
    Url,
    WebConfig,
 )

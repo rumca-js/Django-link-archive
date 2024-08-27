@@ -4,9 +4,10 @@ from datetime import datetime, date, timedelta
 
 from waybackpy import WaybackMachineCDXServerAPI, WaybackMachineSaveAPI
 
+from webtools import DomainAwarePage, HttpRequestBuilder, HttpPageHandler
+
 from ..models import AppLogging
 from ..apps import LinkDatabase
-from ..webtools import DomainAwarePage
 
 
 class WaybackMachine(object):
@@ -16,8 +17,6 @@ class WaybackMachine(object):
     def capture_limits(self, url):
         if self.url != url:
             self.url = url
-
-            from ..webtools import HttpRequestBuilder
 
             user_agent = HttpRequestBuilder.user_agent
 
@@ -36,8 +35,6 @@ class WaybackMachine(object):
         if self.url:
             if self.oldest.date() > time or self.newest.date() < time:
                 return
-
-        from ..webtools import HttpRequestBuilder
 
         user_agent = HttpRequestBuilder.user_agent
 
@@ -74,7 +71,6 @@ class WaybackMachine(object):
             time -= timedelta(days=1)
 
     def save_impl(self, url):
-        from ..webtools import HttpPageHandler
 
         user_agent = HttpPageHandler.user_agent
 

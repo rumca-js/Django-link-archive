@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from ..webtools import DomainAwarePage
+from webtools import DomainAwarePage
 
 from .fakeinternet import FakeInternetTestCase
 

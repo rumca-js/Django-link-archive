@@ -16,6 +16,8 @@ In my setup it was around:
 import time
 import subprocess
 
+__version__ = "0.0.1"
+
 
 # change test webpage to see if other pages can be scraped using different scrapers
 test_webpage = "https://google.com"

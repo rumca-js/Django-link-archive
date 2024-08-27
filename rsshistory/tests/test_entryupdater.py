@@ -1,6 +1,8 @@
 from datetime import timedelta
 from django.contrib.auth.models import User
 
+from utils.dateutils import DateUtils
+
 from ..controllers import (
     SourceDataController,
     LinkDataController,
@@ -8,7 +10,6 @@ from ..controllers import (
 )
 from ..models import UserTags, UserVotes
 from ..configuration import Configuration
-from ..dateutils import DateUtils
 
 from .fakeinternet import FakeInternetTestCase
 

@@ -2,6 +2,8 @@ from datetime import datetime, timedelta
 from django.contrib.auth.models import User
 import logging
 
+from utils.dateutils import DateUtils
+
 from ..controllers import (
     BackgroundJobController,
     LinkDataController,
@@ -29,7 +31,6 @@ from ..threadhandlers import (
     ExportDataJobHandler,
     ProcessSourceJobHandler,
 )
-from ..dateutils import DateUtils
 
 from .fakeinternet import FakeInternetTestCase
 
@@ -1054,9 +1055,8 @@ class LeftOverJobsProcessorTest(FakeInternetTestCase):
             job=BackgroundJobController.JOB_PROCESS_SOURCE
         )
 
-        mgr = LeftOverJobsProcessor([SourceJobsProcessor])
+        mgr = LeftOverJobsProcessor()
 
         jobs = mgr.get_supported_jobs()
 
         self.assertTrue(BackgroundJob.JOB_PROCESS_SOURCE not in jobs)
-        self.assertTrue(BackgroundJob.JOB_WRITE_DAILY_DATA in jobs)

@@ -5,8 +5,7 @@ import socket
 import json
 import traceback
 
-from rsshistory.webtools import HttpRequestBuilder, PageOptions, WebLogger
-from rsshistory.webtools import ipc
+from webtools import HttpRequestBuilder, PageOptions, WebLogger, ipc
 
 
 class ClientWebLogger(object):

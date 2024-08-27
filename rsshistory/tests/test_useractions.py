@@ -5,7 +5,7 @@ from django.test import TestCase
 from ..controllers import LinkDataController, SourceDataController, DomainsController
 from ..configuration import Configuration
 from ..models import UserTags, UserVotes, UserBookmarks, CompactedTags
-from ..dateutils import DateUtils
+from .dateutils import DateUtils
 
 
 class UserTagsTest(TestCase):

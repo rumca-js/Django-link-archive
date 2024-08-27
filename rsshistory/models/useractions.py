@@ -16,6 +16,8 @@ from django.conf import settings
 from django.urls import reverse
 from django.contrib.auth.models import User
 
+from webtools import InputContent
+
 from ..apps import LinkDatabase
 from .entries import LinkDataModel
 from .system import AppLogging
@@ -350,8 +352,6 @@ class LinkCommentDataModel(models.Model):
         )
 
     def get_comment(self):
-        from ..webtools import InputContent
-
         return InputContent(self.comment).htmlify()
 
     def cleanup():

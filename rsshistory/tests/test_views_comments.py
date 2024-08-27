@@ -1,9 +1,10 @@
 from django.urls import reverse
 from django.contrib.auth.models import User
 
+from utils.dateutils import DateUtils
+
 from ..apps import LinkDatabase
 from ..controllers import SourceDataController, LinkDataController, DomainsController
-from ..dateutils import DateUtils
 from ..models import KeyWords, DataExport, LinkCommentDataModel
 
 from .fakeinternet import FakeInternetTestCase

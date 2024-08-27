@@ -1,12 +1,12 @@
 import os
 import re
 
+from webtools import ContentLinkParser
+
 from ..models import UserTags
 from ..configuration import Configuration
 from .sourcerssplugin import BaseRssPlugin
 from ..controllers import BackgroundJobController
-
-from ..webtools import ContentLinkParser, HtmlPage, DomainAwarePage
 
 
 class HackerNewsParserPlugin(BaseRssPlugin):

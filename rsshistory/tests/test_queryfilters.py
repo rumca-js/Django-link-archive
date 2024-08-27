@@ -1,6 +1,7 @@
+from utils.dateutils import DateUtils
+
 from ..controllers import SourceDataController, LinkDataController
 from ..queryfilters import SourceFilter, EntryFilter
-from ..dateutils import DateUtils
 
 from .fakeinternet import FakeInternetTestCase
 

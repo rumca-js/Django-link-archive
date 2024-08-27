@@ -1,8 +1,9 @@
 import logging
 import shutil
-from django.db.models import Q
 from django.contrib.auth.models import User
 import datetime
+
+from utils.dateutils import DateUtils
 
 from ..models import AppLogging, UserBookmarks, UserTags
 from ..apps import LinkDatabase
@@ -133,8 +134,6 @@ class BookmarksExporter(object):
         return self.get_current_year()
 
     def get_current_year(self):
-        from ..dateutils import DateUtils
-
         today = DateUtils.get_date_today()
         year = int(DateUtils.get_datetime_year(today))
         return year

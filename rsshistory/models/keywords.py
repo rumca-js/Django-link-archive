@@ -3,7 +3,8 @@ from datetime import datetime, date, timedelta
 from django.db import models
 from django.urls import reverse
 from django.templatetags.static import static
-import django.utils
+
+from utils.dateutils import DateUtils
 
 from .system import AppLogging
 
@@ -158,8 +159,6 @@ class KeyWords(models.Model):
         from ..configuration import Configuration
 
         if Configuration.get_object().config_entry.enable_keyword_support:
-            from ..dateutils import DateUtils
-
             date_before_limit = KeyWords.get_keywords_date_limit()
             keys = KeyWords.objects.filter(date_published__lt=date_before_limit)
             keys.delete()
@@ -168,8 +167,6 @@ class KeyWords(models.Model):
             keys.delete()
 
     def get_keywords_date_limit():
-        from ..dateutils import DateUtils
-
         return DateUtils.get_days_before_dt(1)
 
     def get_keyword_data(day_iso=None):
@@ -204,7 +201,6 @@ class KeyWords(models.Model):
     def is_keyword_date_range(input_date):
         # TODO we clear every beginning of
         # maybe we should clear
-        from ..dateutils import DateUtils
         from ..configuration import Configuration
 
         conf = Configuration.get_object().config_entry

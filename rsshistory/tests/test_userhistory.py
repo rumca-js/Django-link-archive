@@ -8,7 +8,7 @@ from ..models import (
     UserEntryVisitHistory, UserSearchHistory, UserEntryTransitionHistory
 )
 from ..controllers import LinkDataController, SourceDataController
-from ..dateutils import DateUtils
+from .dateutils import DateUtils
 from ..configuration import Configuration
 
 

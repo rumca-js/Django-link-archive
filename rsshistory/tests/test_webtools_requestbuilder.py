@@ -1,5 +1,5 @@
 import hashlib
-from ..webtools import HttpRequestBuilder, InputContent, PageOptions, calculate_hash
+from webtools import HttpRequestBuilder, InputContent, PageOptions, calculate_hash
 
 from .fakeinternet import FakeInternetTestCase
 

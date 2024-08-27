@@ -1,5 +1,8 @@
 from django.db import models
 from django.urls import reverse
+
+from webtools import DomainAwarePage
+
 from ..apps import LinkDatabase
 
 
@@ -65,7 +68,6 @@ class SourceDataModel(models.Model):
             return self.favicon
 
         # returning real favicon from HTML is too long
-        from ..webtools import DomainAwarePage
 
         return DomainAwarePage(self.url).get_domain() + "/favicon.ico"
 

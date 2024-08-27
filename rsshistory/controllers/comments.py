@@ -6,12 +6,13 @@ from django.db import models
 from django.urls import reverse
 from django.db.models import Q
 
+from utils.dateutils import DateUtils
+
 from ..models import (
     LinkDataModel,
     LinkCommentDataModel,
 )
 from ..configuration import Configuration
-from ..dateutils import DateUtils
 
 from .entries import LinkDataController
 

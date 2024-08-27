@@ -5,7 +5,8 @@ and different output (Year, or page ordered directories)
 
 from pathlib import Path
 
-from .dateutils import DateUtils
+from utils.dateutils import DateUtils
+
 from .models import DataExport, AppLogging
 from .serializers.sourceentriesserializer import SourcesEntriesDataWriter
 from .serializers.sourcesserializer import SourceSerializerWrapper

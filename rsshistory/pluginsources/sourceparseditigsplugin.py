@@ -1,6 +1,8 @@
 import re
+
+from webtools import DomainAwarePage
+
 from .sourceparseplugin import BaseParsePlugin
-from ..webtools import DomainAwarePage
 
 
 class SourceParseDigitsPlugin(BaseParsePlugin):

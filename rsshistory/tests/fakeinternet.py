@@ -9,18 +9,20 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 
 # import chardet
-
-from ..models import AppLogging, ConfigurationEntry
-from ..dateutils import DateUtils
-from ..webtools import HttpRequestBuilder, PageResponseObject, WebLogger
-from ..configuration import Configuration
-
-from ..webtools import (
+from utils.dateutils import DateUtils
+from webtools import (
     YouTubeVideoHandler,
     YouTubeJsonHandler,
     YouTubeChannelHandler,
     Url,
+    HttpRequestBuilder,
+    PageResponseObject,
+    WebLogger
 )
+
+from ..models import AppLogging, ConfigurationEntry
+from ..configuration import Configuration
+
 
 
 from .fakeinternetdata import (

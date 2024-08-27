@@ -2,8 +2,9 @@ import traceback
 from dateutil import parser
 from bs4 import BeautifulSoup
 
+from webtools import RssPage, Url
+
 from ..apps import LinkDatabase
-from ..webtools import RssPage, Url
 from ..configuration import Configuration
 
 from .sourcerssplugin import BaseRssPlugin

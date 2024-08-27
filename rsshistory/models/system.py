@@ -10,8 +10,11 @@ from django.urls import reverse
 from django.conf import settings
 from django.contrib.auth.models import User
 
+from webtools.ipc import DEFAULT_PORT
+from utils.dateutils import DateUtils
+
 from ..apps import LinkDatabase
-from ..webtools.ipc import DEFAULT_PORT
+
 
 DISPLAY_STYLE_LIGHT = "style-light"
 DISPLAY_STYLE_DARK = "style-dark"
@@ -409,8 +412,6 @@ class SystemOperation(models.Model):
         ordering = ["-date_created"]
 
     def cleanup():
-        from ..dateutils import DateUtils
-
         all_entries = SystemOperation.objects.filter(date_created__isnull=True)
         all_entries.delete()
 
@@ -495,8 +496,6 @@ class SystemOperation(models.Model):
         return thread_ids
 
     def is_system_healthy():
-        from ..dateutils import DateUtils
-
         status_is_valid = True
 
         c = ConfigurationEntry.get()
@@ -790,8 +789,6 @@ class AppLogging(models.Model):
         return AppLogging.objects.all()[0:100]
 
     def remove_old_infos():
-        from ..dateutils import DateUtils
-
         try:
             date_range = DateUtils.get_days_range(3)
             while True:

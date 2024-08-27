@@ -5,20 +5,25 @@ from django.db.models import IntegerField, Model
 from django.core.validators import MaxValueValidator, MinValueValidator
 
 
+from utils.dateutils import DateUtils
+
 from .models import (
     BackgroundJob,
     UserTags,
     LinkCommentDataModel,
     UserVotes,
     UserSearchHistory,
+    DomainsSuffixes,
+    DomainsTlds,
+    DomainsMains,
+    SourceCategories,
+    SourceSubCategories,
+    ConfigurationEntry,
+    UserConfig,
+    DataExport,
+    EntryRules,
 )
 from .pluginsources.sourcecontrollerbuilder import SourceControllerBuilder
-from .models import DomainsSuffixes
-from .models import DomainsTlds
-from .models import DomainsMains
-from .models import SourceCategories
-from .models import SourceSubCategories
-from .models import ConfigurationEntry, UserConfig, DataExport, EntryRules
 
 from .configuration import Configuration
 from .controllers import (
@@ -27,7 +32,6 @@ from .controllers import (
     ArchiveLinkDataController,
     DomainsController,
 )
-from .dateutils import DateUtils
 
 
 # https://docs.djangoproject.com/en/4.1/ref/forms/widgets/

@@ -1,9 +1,17 @@
 """
 @breif This program manages "workspaces".
 
-Each app is a "workspace". Each workspace contain separate set of links in the database.
+Each django app is a "workspace". Each workspace contain separate set of links in the database.
 
-Therefore you can have one "general" workspace, or you can have "music", "movies" etc.
+Therefore you can have multiple apps for managing different resources.
+
+For example you can have workspaces like:
+     - music
+     - movies
+     - youtube
+     - memes
+     - work
+     - etc.
 """
 
 import os, sys
@@ -185,9 +193,9 @@ def main():
 
     elif args.create:
         if not create_workspace("rsshistory", args.create):
-            print("Could not create workspace")
+            print("Could not create workspace. Please check if directory exists:{}".format(args.create))
         else:
-            print("Call now python makemigration & python migrate")
+            print("Call python makemigration & python migrate")
 
     else:
         parser.print_help()

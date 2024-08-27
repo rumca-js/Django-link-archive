@@ -8,7 +8,7 @@ import time
 import argparse
 import sys
 
-from rsshistory import webtools
+import webtools
 
 
 def main():

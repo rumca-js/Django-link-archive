@@ -10,9 +10,11 @@ def get_ascii_text(text):
     return thebytes.decode()
 
 
-def fix_path_for_windows(file_path, max_path=260, limit=False):
+def fix_path_for_os(file_path, max_path=260, limit=False):
     """
     @param file_path needs to be string
+
+    Windows for example does not allow certain characters in file names
     """
     chars = [
         ">",
@@ -32,13 +34,9 @@ def fix_path_for_windows(file_path, max_path=260, limit=False):
     file_path = " ".join(file_path.split())
     file_path = file_path.strip()
 
-    parts = os.path.splitext(file_path)
-    if len(parts) < 2:
-        return file_path
+    file_path[: max_path - 1]
 
-    parts0 = parts[0][: max_path - 1]
-
-    return parts0 + parts[1]
+    return file_path
 
 
 def get_directory_size_bytes(start_path="."):

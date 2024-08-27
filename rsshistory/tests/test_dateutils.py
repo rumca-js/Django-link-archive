@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from ..dateutils import DateUtils
+from utils.dateutils import DateUtils
 
 from .fakeinternet import FakeInternetTestCase
 

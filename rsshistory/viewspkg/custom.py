@@ -10,6 +10,8 @@ from django.shortcuts import render
 from django.shortcuts import redirect
 from django.http import HttpResponseForbidden, HttpResponseRedirect
 
+from utils.dateutils import DateUtils
+
 from ..apps import LinkDatabase
 from ..models import (
     UserTags,
@@ -31,9 +33,7 @@ from ..forms import (
     OmniSearchForm,
 )
 from ..views import ViewPage
-from ..dateutils import DateUtils
 from ..forms import LinkInputForm, OmniSearchForm
-from ..webtools import ContentLinkParser, PageOptions
 from ..pluginurl.urlhandler import UrlHandler
 
 

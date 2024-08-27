@@ -2,6 +2,8 @@ import traceback
 from django.db import models
 from datetime import time, datetime, date, timedelta
 
+from utils.dateutils import DateUtils
+
 from .system import AppLogging
 
 
@@ -136,7 +138,6 @@ class SourceExportHistory(models.Model):
         ordering = ["-date"]
 
     def is_update_required(export):
-        from ..dateutils import DateUtils
         from ..configuration import Configuration
 
         try:
@@ -166,8 +167,6 @@ class SourceExportHistory(models.Model):
         return SourceExportHistory.objects.all()[:7]
 
     def confirm(export, input_date=None):
-        from ..dateutils import DateUtils
-
         process_date = DateUtils.get_date_yesterday()
         if input_date is not None:
             process_date = input_date

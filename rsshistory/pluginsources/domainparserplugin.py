@@ -3,7 +3,8 @@ import re
 import traceback
 import time
 
-from ..webtools import DomainAwarePage
+from webtools import DomainAwarePage
+
 from ..models import AppLogging
 from ..controllers import LinkDataController, BackgroundJobController
 from .sourceparseplugin import BaseParsePlugin

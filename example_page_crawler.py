@@ -9,7 +9,7 @@ import socket
 import json
 import traceback
 
-from rsshistory.webtools import (
+from webtools import (
    PageOptions,
    WebConfig,
    WebLogger,
@@ -17,8 +17,11 @@ from rsshistory.webtools import (
    Url,
    HttpPageHandler,
    ContentLinkParser,
+   run_server_task,
 )
-from rsshistory.webtools import run_server_task
+
+
+__version__ = "0.0.1"
 
 
 class Crawler(object):
@@ -84,6 +87,7 @@ def main():
 
     # more advanced processing is possible through other frameworks
     server = run_server_task()
+
     HttpPageHandler.crawling_server_port = server.port
     HttpPageHandler.crawling_full_script = "poetry run python crawleebeautifulsoup.py"
     HttpPageHandler.crawling_headless_script = "poetry run python crawleebeautifulsoup.py"

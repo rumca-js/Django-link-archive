@@ -17,6 +17,12 @@ from django.db.models import Q
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 
+from utils.dateutils import DateUtils
+from webtools import DomainAwarePage, Url
+
+from utils.basictypes import fix_path_for_os
+from utils.programwrappers import ytdlp, id3v2
+
 from .apps import LinkDatabase
 from .models import (
     AppLogging,
@@ -39,8 +45,6 @@ from .models import (
 )
 
 from .pluginsources.sourcecontrollerbuilder import SourceControllerBuilder
-from .basictypes import fix_path_for_windows
-from .programwrappers import ytdlp, id3v2
 from .controllers import (
     BackgroundJobController,
     LinkDataController,
@@ -55,8 +59,6 @@ from .controllers import (
     ModelFilesBuilder,
 )
 from .configuration import Configuration
-from .dateutils import DateUtils
-from .webtools import HtmlPage, DomainAwarePage, ContentLinkParser, Url
 from .pluginurl import UrlHandler
 
 
@@ -365,7 +367,7 @@ class LinkMusicDownloadJobHandler(BaseJobHandler):
         if data["artist"]:
             file_name = Path(data["artist"]) / file_name
 
-        file_name = fix_path_for_windows(file_name)
+        file_name = fix_path_for_os(file_name)
 
         return file_name
 
@@ -444,7 +446,7 @@ class LinkVideoDownloadJobHandler(BaseJobHandler):
         if data["artist"]:
             file_name = Path(data["artist"]) / file_name
 
-        file_name = fix_path_for_windows(file_name)
+        file_name = fix_path_for_os(file_name)
 
         return file_name
 

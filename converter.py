@@ -10,7 +10,7 @@ import json
 import argparse
 import time
 
-from sqlmodel import SqlModel
+from utils.sqlmodel import SqlModel
 from dateutil import parser
 
 

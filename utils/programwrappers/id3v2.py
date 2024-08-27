@@ -1,7 +1,6 @@
 import logging
 import subprocess
 import os
-from ..apps import LinkDatabase
 
 
 class Id3v2(object):
@@ -21,10 +20,6 @@ class Id3v2(object):
         track = None
         if "track" in self.data:
             track = self.data["track"]
-
-        LinkDatabase.info(
-            "Tagging Song:'{0}' Artist:'{1}' Album:'{2}'".format(song, artist, album)
-        )
 
         if track:
             subprocess.run(

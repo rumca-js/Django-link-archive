@@ -1,5 +1,5 @@
 from .webtools import DefaultContentPage
-from ..dateutils import DateUtils
+from utils.dateutils import DateUtils
 
 
 class DefaultUrlHandler(DefaultContentPage):

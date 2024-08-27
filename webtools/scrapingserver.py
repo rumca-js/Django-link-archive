@@ -32,8 +32,7 @@ import json
 
 from pathlib import Path
 import shutil
-from rsshistory import webtools
-from rsshistory.webtools import ipc
+import webtools
 import subprocess
 import traceback
 from datetime import datetime, timedelta
@@ -269,7 +268,7 @@ def handle_connection(conn, address, port):
     now = datetime.now()
     print("[{}] Handling connection from:{}. Requests len:{}".format(now, str(address), len(requests)))
 
-    c = ipc.SocketConnection(conn)
+    c = webtools.ipc.SocketConnection(conn)
     try:
         handle_connection_inner(c, address, port)
     except Exception as E:
@@ -290,12 +289,12 @@ class ScrapingServer(object):
         if host:
             self.host = host
         else:
-            self.host = ipc.SocketConnection.gethostname()
+            self.host = webtools.ipc.SocketConnection.gethostname()
 
         if port:
             self.port = port
         else:
-            self.port = ipc.DEFAULT_PORT
+            self.port = webtools.ipc.DEFAULT_PORT
 
         self.close_request = False
 
@@ -380,7 +379,7 @@ class ScrapingServerParser(object):
         if "port" in self.args and self.args.port:
             self.port = self.args.port
         else:
-            self.port = ipc.DEFAULT_PORT
+            self.port = webtools.ipc.DEFAULT_PORT
 
     def is_valid(self):
         return True

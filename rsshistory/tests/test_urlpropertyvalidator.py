@@ -1,6 +1,5 @@
 from ..pluginurl.urlhandler import UrlHandler, UrlPropertyValidator
 from ..pluginurl.handlervideoyoutube import YouTubeVideoHandler
-from ..webtools import RssPage, HtmlPage
 
 from .fakeinternet import FakeInternetTestCase
 

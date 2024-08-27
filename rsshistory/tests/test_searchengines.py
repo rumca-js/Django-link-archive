@@ -1,4 +1,3 @@
-from ..webtools import Url, PageOptions, HtmlPage, PageResponseObject
 from ..controllers import SearchEngines, SearchEngineGoogle, SearchEngineGoogleCache
 
 from .fakeinternet import FakeInternetTestCase, MockRequestCounter

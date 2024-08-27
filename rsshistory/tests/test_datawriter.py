@@ -2,11 +2,12 @@ from pathlib import Path
 import shutil
 import json
 
+from utils.dateutils import DateUtils
+
 from ..models import ConfigurationEntry, DataExport
 from ..controllers import SourceDataController, LinkDataController, DomainsController
 from ..configuration import Configuration
 from ..datawriter import DataWriter, DataWriterConfiguration
-from ..dateutils import DateUtils
 
 from .fakeinternet import FakeInternetTestCase
 

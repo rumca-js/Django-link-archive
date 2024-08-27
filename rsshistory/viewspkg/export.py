@@ -5,6 +5,9 @@ from django.urls import reverse
 from django.shortcuts import redirect
 from django.http import HttpResponseRedirect
 
+from webtools import DomainAwarePage
+from utils.dateutils import DateUtils
+
 from ..apps import LinkDatabase
 from ..models import DataExport, ConfigurationEntry
 from ..controllers import (
@@ -14,11 +17,10 @@ from ..controllers import (
 )
 from ..views import ViewPage
 from ..forms import DataExportForm
-from ..webtools import DomainAwarePage
+from ..serializers import ReadingListFile
 
 
 def import_reading_list_view(request):
-    from ..serializers import ReadingListFile
 
     page = ViewPage(request)
     page.set_title("Import view")
@@ -369,8 +371,6 @@ def write_daily_data_form(request):
 
             p.context["summary_text"] = text
             return p.render("summary_present.html")
-
-    from ..dateutils import DateUtils
 
     date = DateUtils.get_date_today()
 

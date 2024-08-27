@@ -1,6 +1,8 @@
-from .sourceparseplugin import BaseParsePlugin
 import re
-from ..webtools import DomainAwarePage
+
+from webtools import DomainAwarePage
+
+from .sourceparseplugin import BaseParsePlugin
 
 
 class SpotifyPlugin(BaseParsePlugin):

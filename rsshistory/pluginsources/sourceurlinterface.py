@@ -1,9 +1,10 @@
+from webtools import HtmlPage, RssPage, JsonPage, HttpPageHandler, DomainAwarePage
+
 from ..models import (
     SourceDataModel,
 )
 from ..pluginsources.sourceparseplugin import BaseParsePlugin
 from ..pluginurl.urlhandler import UrlHandler
-from ..webtools import HtmlPage, RssPage, JsonPage, HttpPageHandler, DomainAwarePage
 
 
 class SourceUrlInterface(object):

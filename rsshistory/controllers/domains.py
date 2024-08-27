@@ -6,6 +6,9 @@ from django.db import models
 from django.urls import reverse
 from django.db.models import Q
 
+from webtools import DomainAwarePage
+from utils.dateutils import DateUtils
+
 from ..models import (
     AppLogging,
     Domains,
@@ -15,7 +18,6 @@ from ..models import (
 )
 from .entries import LinkDataController
 from ..configuration import Configuration
-from ..webtools import HtmlPage, DomainAwarePage
 from ..apps import LinkDatabase
 
 
@@ -149,7 +151,6 @@ class DomainsController(Domains):
         )
 
     def is_update_time(self):
-        from ..dateutils import DateUtils
 
         days = DateUtils.get_day_diff(self.date_update_last)
         # TODO make this configurable
@@ -157,7 +158,6 @@ class DomainsController(Domains):
 
     def update_domain(self):
         import tldextract
-        from ..dateutils import DateUtils
 
         changed = False
 

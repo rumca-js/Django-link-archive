@@ -7,7 +7,7 @@ Process:
  - pretty print it using https://jsonformatter.org/xml-pretty-print
 """
 
-from ..dateutils import DateUtils
+from utils.dateutils import DateUtils
 
 
 webpage_with_real_rss_links = """

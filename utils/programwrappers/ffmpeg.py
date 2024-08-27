@@ -1,8 +1,6 @@
 import subprocess
 import os
 
-from ..apps import LinkDatabase
-
 
 class FFmpeg(object):
     def __init__(self, name, timeout_s=60 * 60):
@@ -10,8 +8,6 @@ class FFmpeg(object):
         self.timeout_s = timeout_s
 
     def convert_to_mp3(self, mp3_name):
-        LinkDatabase.info("Converting to mp3: {0}".format(mp3_name))
-
         data = subprocess.run(
             ["ffmpeg", "-y", "-i", self.name, "-vn", mp3_name],
             stdout=subprocess.PIPE,

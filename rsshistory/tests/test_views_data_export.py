@@ -2,6 +2,8 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 from datetime import time
 
+from utils.dateutils import DateUtils
+
 from ..apps import LinkDatabase
 from ..controllers import (
     SourceDataController,
@@ -9,7 +11,6 @@ from ..controllers import (
     DomainsController,
     BackgroundJobController,
 )
-from ..dateutils import DateUtils
 from ..models import DataExport
 
 from .fakeinternet import FakeInternetTestCase

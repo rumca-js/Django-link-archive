@@ -1,5 +1,6 @@
+from webtools import YouTubeVideoHandler
+
 from ..pluginurl.entryurlinterface import EntryUrlInterface
-from ..webtools import YouTubeVideoHandler
 from ..controllers import SourceDataController
 from ..configuration import Configuration
 from .fakeinternet import FakeInternetTestCase

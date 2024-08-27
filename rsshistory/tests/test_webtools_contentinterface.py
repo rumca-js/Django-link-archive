@@ -1,4 +1,4 @@
-from ..webtools import ContentInterface
+from webtools import ContentInterface
 
 from .fakeinternet import FakeInternetTestCase
 

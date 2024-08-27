@@ -46,11 +46,13 @@ import html
 import urllib.request, urllib.error, urllib.parse
 import urllib.robotparser
 
-
 # import chardet
 from bs4 import BeautifulSoup
 
-from ..dateutils import DateUtils
+from utils.dateutils import DateUtils
+
+__version__ = "0.0.1"
+
 
 
 PAGE_TOO_BIG_BYTES = 5000000  # 5 MB. There are some RSS more than 1MB

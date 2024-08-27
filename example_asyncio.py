@@ -8,13 +8,16 @@ import asyncio
 import time
 import requests
 
-from rsshistory.webtools import (
+from webtools import (
    Url,
    fetch_url,
    fetch_all_urls,
    WebConfig,
    HttpPageHandler,
 )
+
+
+__version__ = "0.0.1"
 
 
 async def main():

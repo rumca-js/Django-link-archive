@@ -12,11 +12,12 @@ from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import User
 
+from utils.dateutils import DateUtils
+
 from .entries import LinkDataModel
+from .system import AppLogging
 from ..configuration import Configuration
 from ..apps import LinkDatabase
-
-from .system import AppLogging
 
 
 class UserSearchHistory(models.Model):
@@ -297,7 +298,6 @@ class UserEntryVisitHistory(models.Model):
          - increment visits counter
         """
         from ..configuration import Configuration
-        from ..dateutils import DateUtils
         from ..controllers import BackgroundJobController
 
         """
@@ -353,8 +353,6 @@ class UserEntryVisitHistory(models.Model):
         return visit
 
     def is_link_just_visited(user, entry):
-        from ..dateutils import DateUtils
-
         last_entry = UserEntryVisitHistory.get_last_user_entry(user)
         if last_entry != entry:
             return False
@@ -410,7 +408,6 @@ class UserEntryVisitHistory(models.Model):
         """
         if not user.is_authenticated:
             return
-        from ..dateutils import DateUtils
 
         time_ago_limit = DateUtils.get_datetime_now_utc() - timedelta(hours=1)
         burst_time_limit = DateUtils.get_datetime_now_utc() - timedelta(seconds=15)

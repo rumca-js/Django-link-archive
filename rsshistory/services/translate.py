@@ -1,4 +1,4 @@
-from ..webtools import DomainAwarePage
+from webtools import DomainAwarePage
 
 
 class TranslatePage(object):

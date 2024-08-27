@@ -1,5 +1,6 @@
 import urllib.parse
-from ..webtools import DomainAwarePage
+
+from webtools import DomainAwarePage
 
 
 class Validator(object):

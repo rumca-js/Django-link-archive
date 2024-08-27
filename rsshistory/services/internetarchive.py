@@ -1,4 +1,4 @@
-from ..dateutils import DateUtils
+from utils.dateutils import DateUtils
 
 
 class InternetArchiveInterface(object):

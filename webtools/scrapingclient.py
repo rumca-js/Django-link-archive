@@ -6,7 +6,7 @@ import argparse
 import json
 from datetime import datetime, timedelta
 
-from rsshistory.webtools import ipc, PageRequestObject, PageResponseObject, get_request_to_bytes
+from webtools import ipc, PageRequestObject, PageResponseObject, get_request_to_bytes
 
 
 max_transaction_timeout_s = 40

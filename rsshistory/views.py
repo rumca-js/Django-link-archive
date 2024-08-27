@@ -4,13 +4,13 @@ from django.shortcuts import render
 from django.views import generic
 from django.urls import reverse
 
+from webtools import HtmlPage, RssPage, HttpPageHandler
+
 from .models import UserConfig, ConfigurationEntry, AppLogging
-from .basictypes import *
 from .configuration import Configuration
 from .apps import LinkDatabase
 from .configuration import Configuration
 from .pluginurl.urlhandler import UrlHandler
-from .webtools import HtmlPage, RssPage, HttpPageHandler
 
 
 class ViewPage(object):

@@ -17,12 +17,12 @@ class LinkDatabase(AppConfig):
         atexit.register(cleanup_on_exit)
 
         try:
+            from utils.dateutils import DateUtils
             from .models import SystemOperation
 
             SystemOperation.objects.all().delete()
 
             from .models import AppLogging
-            from .dateutils import DateUtils
             from .configuration import Configuration
 
             c = Configuration.get_object()

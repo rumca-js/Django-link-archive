@@ -1,4 +1,4 @@
-from ...dateutils import DateUtils
+from utils.dateutils import DateUtils
 
 
 webpage_code_project_rss = """

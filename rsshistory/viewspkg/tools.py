@@ -1,6 +1,8 @@
 from django.urls import reverse
 from django.http import JsonResponse
 
+from webtools import ContentLinkParser, RssPage, DomainCache, DomainAwarePage
+
 from ..apps import LinkDatabase
 from ..models import (
     ConfigurationEntry,
@@ -18,7 +20,6 @@ from ..forms import (
 )
 from ..views import ViewPage
 from ..pluginurl.urlhandler import UrlHandler
-from ..webtools import ContentLinkParser, RssPage, DomainCache, DomainAwarePage
 
 
 def page_show_properties(request):

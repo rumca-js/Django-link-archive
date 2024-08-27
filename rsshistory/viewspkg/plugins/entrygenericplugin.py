@@ -3,12 +3,13 @@ import urllib.parse
 from django.urls import reverse
 from django.templatetags.static import static
 
+from webtools import DomainAwarePage, InputContent
+from utils.dateutils import DateUtils
+
 from ...apps import LinkDatabase
 from ...models import ConfigurationEntry, UserConfig
 from ...controllers import LinkDataController, SearchEngineGoogleCache
-from ...webtools import DomainAwarePage, InputContent
 from ...configuration import Configuration
-from ...dateutils import DateUtils
 from ...services import (
     TranslateBuilder,
     InternetArchiveBuilder,
