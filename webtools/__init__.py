@@ -7,6 +7,7 @@ from .url import (
     fetch_url,
     fetch_all_urls,
 )
+
 from .handlerhttppage import (
     HttpRequestBuilder,
     HttpPageHandler,
@@ -33,3 +34,6 @@ from .handlervideoodysee import OdyseeVideoHandler
 
 from .scrapingclient import ScrapingClientParser, ScrapingClient
 from .scrapingserver import ScrapingServerParser, ScrapingServer, run_server_task
+
+from .feedreader import FeedReader
+from .feedclient import FeedClient

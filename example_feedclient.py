@@ -1,94 +1,152 @@
 """
 This is example script about how to use this project as a simple RSS reader
 """
-import socket
-import json
-import traceback
-import argparse
-import asyncio
-from pathlib import Path
-import shutil
-
-from utils.sqlmodel import SqlModel
-from datetime import timedelta, datetime, timezone
-
 from webtools import (
-    PageOptions,
     WebConfig,
-    WebLogger,
-    PrintWebLogger,
-    Url,
     HttpPageHandler,
+    FeedClient,
 )
-from webtools import run_server_task
-from utils.serializers import HtmlExporter
-
-
-__version__ = "0.0.2"
-
-
-day_limit = 7
-
 
 # Initial sources list. Will be used to populate SQLite
 sources = [
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCF4cAwaYlXAt2LcnqUOgtMA", "title" : "a vox in the void"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCiRiQGCHGjDLT9FQXFW0I3A", "title" : "academy of ideas"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCJhay24LTpO1s4bIZxuIqKw", "title" : "accu conference"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCnkp4xDOwqqJD7sSM3xdUiQ", "title" : "adamneely"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCUSElbgKZpE4Xdh5aFWG-Ig", "title" : "airpano vr"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCu7_D0o48KbfhpEohoP7YSQ", "title" : "andreas spiess"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCC552Sd-3nyi_tk2BudLUzA", "title" : "asap science"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCQeRaTukNYft1_6AZPACnog", "title" : "asmongold tv"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCXGgrKt94gR6lmN4aN3mYTg", "title" : "austin evans"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UC2J-0g_nxlwcD9JBK1eTleQ", "title" : "auto focus"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCwUizOU8pPWXdXNniXypQEQ", "title" : "awakenwithJP"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCyl5V3-J_Bsy3x-EBCJwepg", "title" : "babylon bee"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UChHxJaKDqH4bOs0pX3hkKnA", "title" : "basically homeless"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCH4BNI0-FOK2dMXoFtViWHw", "title" : "be smart"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UC3osNjJeuDdvyALIEP-nh0g", "title" : "behind the curtain"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCnQC_G5Xsjhp9fEJKuIcrSw", "title" : "ben shapiro"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCNu7GSRF7Y10OIWHQHpAx1g", "title" : "bez planu"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCmrLCXSDScliR7q8AxxjvXg", "title" : "black pidgeon speaks"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UC7vVhkEfw4nOGp8TyDk7RcQ", "title" : "boston dynamics"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UClozNP-QPyVatzpGKC25s0A", "title" : "brad colbow"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCld68syR8Wi-GY_n4CaoJGA", "title" : "brodie robertson"},
-        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCROQqK3_z79JuTetNP3pIXQ", "title" : "captain midnight"},
-        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCtinbF-Q-fVthA0qrFQTgXQ", "title" : "casey"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCxHAlbZQNFU2LgEtiqd2Maw", "title" : "c++ weekly with jason turner"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCZUyPT9DkJWmS_DzdOi7RIA", "title" : "caleb curry"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCL0QSFSUfW8cHua_rDpltTg", "title" : "call me chato"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCROQqK3_z79JuTetNP3pIXQ", "title" : "captain midnight"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCtinbF-Q-fVthA0qrFQTgXQ", "title" : "caseyneistat"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCLLO-H4NQXNa_DhUv-rqN9g", "title" : "cd action"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCPKT_csvP72boVX0XrMtagQ", "title" : "cercle"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UC2C_jShtL725hvbm1arSV9w", "title" : "cgp grey"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCwjvvgGX6oby5mZ3gbDe8Ug", "title" : "china insights"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCgFP46yVT-GG4o1TgXn-04Q", "title" : "china uncensored"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCctjGdm2NlMNzIlxz02IsXA", "title" : "chris ray gun"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCg6gPGh8HU2U01vaFCAsvmQ", "title" : "christ titus tech"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCuVLG9pThvBABcYCm7pkNkA", "title" : "climate town"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCWEHue8kksIaktO8KTTN_zg", "title" : "coding entrepreneurs"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCFQMnBA3CS502aghlcr0_aw", "title" : "cofeezilla"},
-        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCX_t3BvnQtS5IHzto_y7tbw", "title" : "coreteks"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UC4QZ_LsYcvcq7qOsOhpAX4A", "title" : "coldfusion"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCX_t3BvnQtS5IHzto_y7tbw", "title" : "coreteks"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCCsREoj8rSRkEvxWqxr74rQ", "title" : "cyber news"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UC9Ntx-EF3LzKY1nQ5rTUP2g", "title" : "cyriak"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCw--xPGVVxYzRsWyV1nFqgg", "title" : "daniel greene"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCD8J_xbbBuGobmw_N5ga3MA", "title" : "denis shiryaev"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCVls1GmFKf6WlTraIb_IaJg", "title" : "distrotube"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCTSRIY3GLFYIpkR2QwyeklA", "title" : "drew gooden"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCD4EOyXKjfDUhCI6jlOZZYQ", "title" : "eli the computer guy"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCCDGVMGoT8ql8JQLJt715jA", "title" : "emzdanowicz"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCDNHPNeWScAC8h8IxtEBtkQ", "title" : "eons of battle"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UC_0CVCfC_3iuHqmyClu59Uw", "title" : "eta prime"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UC_DmOS_FBvO4H27U7X0OtRg", "title" : "fearless & far"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCO7fujFV_MuxTM0TuZrnE6Q", "title" : "felix colgrave"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCG_nvdTLdijiAAuPKxtvBjA", "title" : "filmento"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCNnKprAG-MWLsk-GsbsC2BA", "title" : "flashgitz"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCyNtlmLB73-7gtlBz00XOQQ", "title" : "folding ideas"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UC2WHjPDvbE6O328n17ZGcfg", "title" : "forrest knight"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UC8butISFwT-Wl7EV0hUK0BQ", "title" : "freeCodeCamp.org"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCRG_N2uO405WO4P3Ruef9NA", "title" : "friday checkout"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UC3ScyryU9Oy9Wse3a8OAmYQ", "title" : "frontline pbs | official"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCVrvnobbNGGMsS5n2mJwfOg", "title" : "fun for louis"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCkPjHTuNd_ycm__29dXM3Nw", "title" : "g f darwin"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCHDxYLv8iovIbhrfl16CNyg", "title" : "gamelinked"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCNvzD7Z-g64bPXxGzaQaa4g", "title" : "gameranx"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UChIs72whgZI9w6d6FhwGGHA", "title" : "gamers nexus"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCbu2SsF-Or3Rsn3NxqODImw", "title" : "gamespot"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCXa_bzvv7Oo1glaW9FldDhQ", "title" : "gaming bolt"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCmEbe0XH51CI09gm_9Fcn8Q", "title" : "glass reflection"},
-        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCkPjHTuNd_ycm__29dXM3Nw", "title" : "gf darwin"},
-        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCR-DXc1voovS8nhAvccRZhg", "title" : "jeff gerling"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCNTqu16j3F6RbtHZI-3untg", "title" : "glink"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCbO4Vs1vlAA9hz7Ad7IMgug", "title" : "guerilla miniature games"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UClt01z1wHHT7c5lKcU8pxRQ", "title" : "hbomberguy"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCnorhjQR4zJkT7AVNhu395Q", "title" : "home renovision dyi"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCP2vaEZS8MvZrFklwBtW1GA", "title" : "home repair tutor"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCpPndhUatYo4NLn3fleQ2Fw", "title" : "hrejterzy"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCQDhxkSxZA6lxdeXE19aoRA", "title" : "hugh jeffreys"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UC6x7GwJxuoABSosgVXDYtTw", "title" : "i like to make stuff"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCKWaEZ-_VweaEx1j62do_vQ", "title" : "ibm technology"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCKy1dAqELo0zrOtPkf0eTMw", "title" : "ign - YouTube"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCVg2AVe6eTCTVoWQ9AwrIHg", "title" : "in deep geek"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCcyq283he07B7_KUX07mmtA", "title" : "insider business"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCoOjH8D2XAgjzQlneM2W0EQ", "title" : "jake tran"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCHu2KNu6TtJ0p4hpSW7Yv7Q", "title" : "jazza"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCR-DXc1voovS8nhAvccRZhg", "title" : "jeff gerling"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UC7v3-2K1N84V67IF-WTRG-Q", "title" : "jeremy jahns"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UC-2YHgc363EdcusLIBbgxzg", "title" : "joe scott"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCVIFCOJwv3emlVmBbPCZrvw", "title" : "joel havier"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCmGSJVG3mCRXVOP4yZrU1Dw", "title" : "john harris"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCL_f53ZEJxp8TtlOkHwMV9Q", "title" : "jordan peterson"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UC-91UA-Xy2Cvb98deRXuggA", "title" : "joshua fluke"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCnxGkOGNMqQEUMvroOWps6Q", "title" : "jre clips"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCy0Pr5u-MwGXXzp_GDd4m_g", "title" : "julie nolke"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UC337i8LcUSM4UMbLf820I8Q", "title" : "just some guy"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCgH8NCuYcVzxxrfsrBj1u3A", "title" : "justin hawkings rides again"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UClhEl4bMD8_escGCCTmRAYg", "title" : "kanal zero"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UC3I2GFN_F8WudD_2jUZbojA", "title" : "kexp"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCLRlryMfL8ffxzrtqv0_k_w", "title" : "kino check"},
-        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCG2kQBVlgG7kOigXZTcKrQw", "title" : "kolem sie toczy"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UC2_KC8lshtCyiLApy27raYw", "title" : "knowledgehusk"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCG2kQBVlgG7kOigXZTcKrQw", "title" : "kolem sie toczy"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCaifrB5IrvGNPJmPeVOcqBA", "title" : "kruggsmash"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCL0WiIwugwTXU5YBFvatbNg", "title" : "ku bogu"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCLr4hMhk_2KE0GUBSBrspGA", "title" : "kuba klawiter"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCJKt_QVDyUbqdm3ag_py2eQ", "title" : "kuokka77"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCsXVk37bltHxD1rDPwtNM8Q", "title" : "kurzgesagt - in a nutshell"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCme4ZOv65uzGADXuvtHkSvA", "title" : "langusta na palmie"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UChvithwOECK5g_19TjldMKw", "title" : "laowhy86"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCtVGGeUqfVHOK4Q6nAwYO3g", "title" : "laterclips"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UC3_kehZbfRz-KrjXIqeIiPw", "title" : "leadhead"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UC6oHLp5r0FcXwzxmWzL1aSg", "title" : "life in the 1800s"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCs7nPQIEba0T3tGOWWsZpJQ", "title" : "like stories of old"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCyC_4jvPzLiSkJkLIkA7B8g", "title" : "lindsey stirling"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCXuqSBlHAE6Xw-yeJA0Tunw", "title" : "linus tech tips"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCz1fTbwui7o5aDZ6W1dOLTQ", "title" : "literature devil"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCFLFc8Lpbwt4jPtY1_Ai5yA", "title" : "lmg clips"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCymYq4Piq0BrhnM18aQzTlg", "title" : "lon tv"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCac6m8K3OGHUT4itHwpCAmw", "title" : "lost in time"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCl2mFZoRqjw_ELax4Yisf6w", "title" : "louis rossman"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UC8RfCCzWsMgNspTI-GTFenQ", "title" : "luetin09"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UC2eYFnH61tmytImy1mTYvhA", "title" : "luke smith"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCfDX69pxC4q6yKSaugs196g", "title" : "magia natury"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UClOGLGPOqlAiLmOvXW5lKbw", "title" : "mandalore gaming"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCKtu_JtQCY0yryIy6zK4ZCg", "title" : "marc brunet"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCOrplaGWXnDW86Zn-zonHIw", "title" : "mario budowlaniec"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCBJycsmduvYEL83R_U4JriQ", "title" : "marques brownlee"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCTTZqMWBvLsUYqYwKTdjvkw", "title" : "mateusz chrobok"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCO01ytfzgXYy4glnPJm4PPQ", "title" : "matt walsh"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCx-KWLTKlB83hDI6UKECtJQ", "title" : "max"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UC91V6D3nkhP89wUb9f_h17g", "title" : "meat canyon"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UC7YOGHUfC1Tb6E4pudI9STA", "title" : "mental outlaw"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCEBb1b_L6zDS3xTUrIALZOw", "title" : "mit opencourseware"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCmFeOdJI3IXgTBDzqBLD8qg", "title" : "moon"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCGMXM2RS39k1UwyNVoyzHYw", "title" : "mosak marcin"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCl5dXugC3XZeDVsDkTaWJ4g", "title" : "mountain trekker"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCX6OQ3DkcsbYNE6H8uQQuVA", "title" : "mr beast"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCMiJRAwDNSNzuYeN2uWa0pA", "title" : "mrwhosetheboss"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCsM-ZFKD_8vlDjfhKRNUk1A", "title" : "muzotv"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCjuKQCmKlCtrPL2wl1uIphQ", "title" : "more pegasus"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCtecHyLSXoL3P-xgFsbQh-g", "title" : "na galazi"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UC1W8ShdwtfgjRHdbl1Lctcw", "title" : "nass"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCW0gH2G-cMKAEjEkI4YhnPA", "title" : "nerd of the rings"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UC5T0tXJN5CrMZUEJuz4oovw", "title" : "nerdrotic"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCXjmz8dFzRJZrZY8eFiXNUQ", "title" : "nerdstalgic"}, # TODO
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCe6nK69Yc1zna7QSJEfA9pw", "title" : "niebezpiecznik"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCittVh8imKanO_5KohzDbpg", "title" : "paul joseph watson"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCswH8ovgUp5Bdg-0_JTYFNw", "title" : "russel brand"},
@@ -138,237 +196,16 @@ sources = [
 ]
 
 
-def read_source(source):
-    result = []
-
-    source_url = source.url
-    source_title = source.title
-
-    options = PageOptions()
-    options.use_headless_browser = False
-    options.use_full_browser = False
-
-    url = Url(url = source_url, page_options = options)
-    handler = url.get_handler()
-    response = url.get_response()
-
-    if response:
-        for item in handler.get_entries():
-            item["source"] = source_url
-            item["source_title"] = source_title
-            result.append(item)
-
-    return result
-
-
-class OutputWriter(object):
-
-    def __init__(self, db):
-        self.db = db
-
-    def write(self):
-        entries = self.db.entries_table.select()
-        for entry in entries:
-            thumbnail = entry.thumbnail
-            title = entry.title
-            link = entry.link
-            description = entry.description
-            date_published = entry.date_published
-
-            print("{} {} {}".format(entry.date_published, entry.link, entry.title,))
-
-
-def fetch(db):
-    print("Number of entries:{}".format(db.entries_table.count()))
-
-    sources = db.sources_table.select()
-
-    for source in sources:
-        print("Reading {}".format(source.url))
-        source_entries = read_source(source)
-
-        for entry in source_entries:
-            now = datetime.now(timezone.utc)
-            limit = now - timedelta(days = day_limit)
-
-            if entry['date_published'] > limit and not db.entries_table.is_entry(entry):
-                db.entries_table.add_entry(entry)
-
-        print("Number of entries:{}".format(db.entries_table.count()))
-
-    db.commit()
-
-
-async def fetch_async(db):
-    """
-    Async version is really really fast
-    """
-    print("Number of entries:{}".format(db.entries_table.count()))
-
-    sources = db.sources_table.select()
-
-    threads = []
-    for source in sources:
-        thread = asyncio.to_thread(read_source, source)
-        threads.append(thread)
-
-    results = await asyncio.gather(*threads)
-
-    for result in results:
-        for entry in result:
-            now = datetime.now(timezone.utc)
-            limit = now - timedelta(days = day_limit)
-
-            if entry['date_published'] > limit and not db.entries_table.is_entry(entry):
-                db.entries_table.add_entry(entry)
-
-    print("Number of entries:{}".format(db.entries_table.count()))
-
-    db.commit()
-
-
-
-def show_stats(entries_table, sources_table):
-    count_entries = entries_table.count()
-    count_sources = sources_table.count()
-
-    print(f"Entires:{count_entries}")
-    print(f"Sources:{count_sources}")
-
-
-def follow_url(db, url):
-    source = {}
-    u = Url(url=url)
-    response = u.get_response()
-    title = u.get_title()
-
-    if not title:
-        title = input("Specify title of URL")
-
-    source["url"] = url
-    source["title"] = title
-
-    if db.sources_table.is_source(source):
-        return False
-
-    db.sources_table.add_source(source)
-    db.sources_table.commit()
-    return True
-
-
-def unfollow_url(db, url):
-    db.sources_table.remove(url)
-    db.sources_table.commit()
-    return True
-
-
-def add_init_sources(db):
-    for source in sources:
-        if not db.sources_table.is_source(source):
-            print("Adding source:{}".format(source["title"]))
-            db.sources_table.add_source(source)
-
-
-def list_sources(db):
-    sources = db.sources_table.select()
-    for source in sources:
-        print("Title:{}".format(source.title))
-        print("Url:{}".format(source.url))
-
-
-def do_main(parser):
-    database_file = parser.args.db
-
-    db = SqlModel(database_file=database_file)
-
-    if parser.args.init_sources:
-        add_init_sources(db)
-
-    db.entries_table.remove(day_limit)
-
-    if parser.args.cleanup:
-        db.entries_table.truncate()
-
-    if parser.args.follow:
-        if not follow_url(db, parser.args.follow):
-            print("Cannot follow {}".format(parser.args.follow))
-        else:
-            print("Added {}".format(parser.args.follow))
-
-    if parser.args.unfollow:
-        unfollow_url(db, parser.args.unfollow)
-
-    # one of the below needs to be true
-    if parser.args.refresh_on_start:
-        fetch(db)
-        #asyncio.run(fetch_async(db))
-
-
-    if parser.args.list_sources:
-        list_sources(db)
-
-    if parser.args.stats:
-        show_stats(db)
-
-    if parser.args.output_dir:
-        directory = Path(parser.args.output_dir)
-        if not directory.exists():
-            directory.mkdir(parents=True, exist_ok=True)
-        else:
-            shutil.rmtree(str(directory))
-            directory.mkdir(parents=True, exist_ok=True)
-
-        w = HtmlExporter(directory, db.entries_table.select())
-        w.write()
-
-    elif parser.args.print:
-        w = OutputWriter(db)
-        w.write()
-
-    db.close()
-
-
-
-class Parser(object):
-    """
-    Headers can only be passed by input binary file
-    """
-
-    def parse(self):
-        self.parser = argparse.ArgumentParser(description="Data analyzer program")
-        self.parser.add_argument(
-            "--timeout", default=10, type=int, help="Timeout expressed in seconds"
-        )
-        self.parser.add_argument("--port", type=int, default=0, help="Port")
-        self.parser.add_argument("-o", "--output-dir", help="HTML output directory")
-        self.parser.add_argument("--print", help="Print entries to stdout")
-        self.parser.add_argument("-r", "--refresh-on-start", action="store_true", help="Refreshes on start")
-        self.parser.add_argument("--stats", action="store_true", help="Show statistics")
-        self.parser.add_argument("--cleanup", action="store_true", help="Remove unreferenced items")
-        self.parser.add_argument("--follow", help="Follows specific url")
-        self.parser.add_argument("--unfollow", help="Unfollows specific url")
-        self.parser.add_argument("--list-sources",action="store_true", help="Lists sources")
-        self.parser.add_argument("--init-sources",action="store_true", help="Initializes sources")
-        self.parser.add_argument("-v", "--verbose",action="store_true", help="Verbose")
-        self.parser.add_argument("--db", default="feedclient.db", help="SQLite database file")
-
-        # --since "2024-01-01 12:03
-
-        self.args = self.parser.parse_args()
-
-
 def main():
-    p = Parser()
-    p.parse()
+    p = FeedClient(sources = sources, day_limit=7)
 
     WebConfig.use_print_logging()
 
     # scraping server is not running, we do not use port
-    HttpPageHandler.crawling_server_port = p.args.port
+    HttpPageHandler.crawling_server_port = p.parser.args.port
     HttpPageHandler.crawling_full_script = "poetry run python crawleebeautifulsoup.py"
     HttpPageHandler.crawling_headless_script = "poetry run python crawleebeautifulsoup.py"
 
-    do_main(p)
-
+    p.run()
 
 main()

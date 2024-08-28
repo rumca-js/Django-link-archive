@@ -76,9 +76,12 @@ class HtmlEntryExporter(object):
         text = "<!DOCTYPE html>"
         text += "<html>"
         text += "<head>"
-        text += "<style>"
+        text += "   <meta>"
+        text += "     <title>{}</title>".format(entry.title)
+        text += "   </meta>"
+        text += "   <style>"
         text += get_youtube_style()
-        text += "</style>"
+        text += "   </style>"
         text += "</head>"
         text += "<body>"
         text += f'<a href="{index_file}"><h2>Index</h2></a>'
@@ -118,18 +121,25 @@ class HtmlIndexExporter(object):
     def __init__(self, cwd = Path("."), output_file="index.html", previous_index = None):
         self.output_file = output_file
         self.output_directory = cwd
+        self.previous_index = previous_index
 
         self.text = "<!DOCTYPE html>"
         self.text += "<html>"
         self.text += "<head>"
-        self.text += "<style>"
+        self.text += "  <meta>"
+        self.text += "    <title>{}</title>".format(output_file)
+        self.text += "  </meta>"
+        self.text += "  <style>"
         self.text += get_youtube_style()
-        self.text += "</style>"
+        self.text += "  </style>"
         self.text += "</head>"
         self.text += "<body>"
-        self.text += "<ul>"
 
-        self.previous_index = previous_index
+        if self.previous_index:
+            previous_file = self.previous_index.get_file_name()
+            self.text += f'<a href="{previous_file}"><h2>Previous Page</h2></a>'
+
+        self.text += "<ul>"
 
     def add_entry(self, entry):
         # index.html entry text
@@ -156,11 +166,11 @@ class HtmlIndexExporter(object):
     def write(self, next_index = None):
         if self.previous_index:
             previous_file = self.previous_index.get_file_name()
-            self.text += f'<a href="{previous_file}"><h2>Previous Index</h2></a>'
+            self.text += f'<a href="{previous_file}"><h2>Previous Page</h2></a>'
 
         if next_index:
             next_file = next_index.get_file_name()
-            self.text += f'<a href="{next_file}"><h2>Next Index</h2></a>'
+            self.text += f'<a href="{next_file}"><h2>Next Page</h2></a>'
 
         self.text += "</ul>"
         self.text += "</body>"

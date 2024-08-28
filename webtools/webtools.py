@@ -1373,9 +1373,9 @@ class RssPage(ContentInterface):
             return None
 
         try:
-            import feedparser
+            from .feedreader import FeedReader
 
-            self.feed = feedparser.parse(contents)
+            self.feed = FeedReader.parse(contents)
             return self.feed
 
         except Exception as E:

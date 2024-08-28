@@ -41,6 +41,9 @@ def get_processors():
     Write block will not affect source processing.
     """
     return [
+        # if you are bottlenecked by resources,
+        # you can leave only leftover processor
+        # less queues, less CPU overhead
         SourceJobsProcessor,
         WriteJobsProcessor,
         ImportJobsProcessor,
