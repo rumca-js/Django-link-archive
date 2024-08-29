@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from ..basictypes import fix_path_for_os
-from webtools import Url, YouTubeVideoHandler
+from webtools import Url, YouTubeVideoHandler, InputContent
 
 
 def fix_entry_link_name(link):
@@ -44,8 +44,11 @@ class HtmlEntryExporter(object):
         file_name = self.get_entry_file_name()
         print("Writing:{}".format(file_name))
 
-        with open(file_name, "w", encoding="utf-8") as fh:
-            fh.write(text)
+        try:
+            with open(file_name, "w", encoding="utf-8") as fh:
+                fh.write(text)
+        except Exception as E:
+            print("Cannot write file:{} len:{}".format(str(file_name), len(str(file_name))))
 
     def get_entry_text(self):
         entry = self.entry
@@ -89,6 +92,10 @@ class HtmlEntryExporter(object):
 
         if show_thumbnail:
             text += self.get_preview()
+
+        if description:
+            c = InputContent(description)
+            description = c.htmlify()
 
         text += f'<h1>{title}</h1>'
         text += f'</a>'

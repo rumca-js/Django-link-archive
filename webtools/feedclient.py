@@ -6,8 +6,17 @@ import argparse
 import asyncio
 from pathlib import Path
 import shutil
+from sqlalchemy import desc
 
-from utils.sqlmodel import SqlModel
+from utils.sqlmodel import (
+    SqlModel,
+    EntriesTable,
+    EntriesTableController,
+    SourcesTable,
+    SourcesTableController,
+    SourceOperationalData,
+    SourceOperationalDataController,
+)
 from datetime import timedelta, datetime, timezone
 
 from webtools import (
@@ -18,13 +27,14 @@ from webtools import (
     Url,
     HttpPageHandler,
 )
+from utils.dateutils import DateUtils
 from utils.serializers import HtmlExporter
 
 
-__version__ = "0.0.2"
+__version__ = "0.0.3"
 
 
-def read_source(source):
+def read_source(db, source):
     result = []
 
     source_url = source.url
@@ -39,14 +49,14 @@ def read_source(source):
     response = url.get_response()
 
     if not handler:
-        print("##### Cannot obtain handler for:{}".format(source_url))
+        print("Cannot obtain handler for:{}".format(source_url))
         return
 
     if response:
         entries = handler.get_entries()
 
         if not entries:
-            print("##### Cannot obtain entries for:{}".format(source_url))
+            print("Cannot obtain entries for:{}".format(source_url))
             return result
 
         for item in entries:
@@ -75,37 +85,87 @@ class OutputWriter(object):
 
 
 def fetch(db, day_limit):
-    print("Number of entries:{}".format(db.entries_table.count()))
+    """
+    fetch time is used to not spam servers every time you refresh anything
+    """
+    session = db.session_factory()
+    q = session.query(EntriesTable)
+    print("Number of entries:{}".format(q.count()))
 
-    sources = db.sources_table.select()
+    #sources = SourcesTable.query.all()
+    c = SourcesTableController(db)
+    sources = c.get_all()
 
     for source in sources:
+        date_now = DateUtils.get_datetime_now_utc()
+        date_now = date_now.replace(tzinfo=None)
+
+        operational_data = SourceOperationalDataController(db, session)
+        if not operational_data.is_fetch_possible(source, date_now, 60 * 10):
+            op_data = session.query(SourceOperationalData).filter(SourceOperationalData.source_obj_id == source.id).all()
+            if len(op_data) > 0:
+                print("Source {} does not require fetch yet {}".format(source.title, op_data[0].date_fetched))
+            else:
+                print("Source {} does not require fetch yet?".format(source.title))
+            continue
+
+        date_now = DateUtils.get_datetime_now_utc()
+        date_now = date_now.replace(tzinfo=None)
+        op_con = SourceOperationalDataController(db, session)
+        op_con.set_fetched(source, date_now)
+
         print("Reading {}".format(source.url))
-        source_entries = read_source(source)
+        source_entries = read_source(db, source)
 
         for entry in source_entries:
             now = datetime.now(timezone.utc)
             limit = now - timedelta(days = day_limit)
 
-            if entry['date_published'] > limit and not db.entries_table.is_entry(entry):
-                db.entries_table.add_entry(entry)
+            entires_num = session.query(EntriesTable).filter(EntriesTable.link == entry["link"]).count()
 
-        print("Number of entries:{}".format(db.entries_table.count()))
+            if entry['date_published'] > limit and entires_num == 0:
+                ec = EntriesTableController(db, session)
+                ec.add_entry(entry)
 
-    db.commit()
+        q = session.query(EntriesTable)
+        print("Number of entries:{}".format(q.count()))
 
 
 async def fetch_async(db, day_limit):
     """
-    Async version is really really fast
+    Async version is faster than sequentially asking all sites.
+    fetch time is used to not spam servers every time you refresh anything
     """
-    print("Number of entries:{}".format(db.entries_table.count()))
+    session = db.session_factory()
 
-    sources = db.sources_table.select()
+    q = session.query(EntriesTable)
+    print("Number of entries:{}".format(q.count()))
+
+    sources = session.query(SourcesTable).all()
 
     threads = []
     for source in sources:
-        thread = asyncio.to_thread(read_source, source)
+        date_now = DateUtils.get_datetime_now_utc()
+        date_now = date_now.replace(tzinfo=None)
+
+        operational_data = SourceOperationalDataController(db, session)
+        if not operational_data.is_fetch_possible(source, date_now, 60 * 10):
+            op_data = session.query(SourceOperationalData).filter(SourceOperationalData.source_obj_id == source.id).all()
+            if len(op_data) > 0:
+                print("Source {} does not require fetch yet {}".format(source.title, op_data[0].date_fetched))
+            else:
+                print("Source {} does not require fetch yet?".format(source.title))
+            continue
+
+        date_now = DateUtils.get_datetime_now_utc()
+        date_now = date_now.replace(tzinfo=None)
+
+        op_con = SourceOperationalDataController(db, session)
+        op_con.set_fetched(source, date_now)
+
+        print("Reading:{}".format(source.title))
+
+        thread = asyncio.to_thread(read_source, db, source)
         threads.append(thread)
 
     results = await asyncio.gather(*threads)
@@ -115,17 +175,22 @@ async def fetch_async(db, day_limit):
             now = datetime.now(timezone.utc)
             limit = now - timedelta(days = day_limit)
 
-            if entry['date_published'] > limit and not db.entries_table.is_entry(entry):
-                db.entries_table.add_entry(entry)
+            entires_num = session.query(EntriesTable).filter(EntriesTable.link == entry["link"]).count()
 
-    print("Number of entries:{}".format(db.entries_table.count()))
+            if entry['date_published'] > limit and entires_num == 0:
+                ec = EntriesTableController(db, session)
+                ec.add_entry(entry)
 
-    db.commit()
+    q = session.query(EntriesTable)
+    print("Number of entries:{}".format(q.count()))
 
 
 def show_stats(entries_table, sources_table):
-    count_entries = entries_table.count()
-    count_sources = sources_table.count()
+    q = session.query(EntriesTable)
+    count_entries = q.count()
+
+    q = session.query(SourcesTable)
+    count_sources = q.count()
 
     print(f"Entires:{count_entries}")
     print(f"Sources:{count_sources}")
@@ -143,29 +208,48 @@ def follow_url(db, url):
     source["url"] = url
     source["title"] = title
 
-    if db.sources_table.is_source(source):
+    sources = session.query(SourcesTable).filter(SourcesTable.url == url).all()
+    if len(sources) != 0:
         return False
 
-    db.sources_table.add_source(source)
-    db.sources_table.commit()
+    session = db.session_factory()
+    session.add( SourcesTable(url = url, title = title))
+    session.commit()
+
     return True
 
 
 def unfollow_url(db, url):
-    db.sources_table.remove(url)
-    db.sources_table.commit()
+    session = db.session_factory()
+    sources = session.query(SourcesTable).filter(SourcesTable.url == url).all()
+
+    for source in sources:
+        source.delete()
+
+    session.commit()
+
     return True
 
 
 def add_init_sources(db, sources):
+    session = db.session_factory()
+
     for source in sources:
-        if not db.sources_table.is_source(source):
-            print("Adding source:{}".format(source["title"]))
-            db.sources_table.add_source(source)
+        sources = session.query(SourcesTable).filter(SourcesTable.url == source["url"]).all()
+        if len(sources) == 0:
+            print("Adding: {}".format(source["title"]))
+
+            obj = SourcesTable(url = source["url"],
+                    title = source["title"])
+            session.add(obj)
+            session.commit()
 
 
 def list_sources(db):
-    sources = db.sources_table.select()
+    session = db.session_factory()
+
+    sources = session.query(SourcesTable).all()
+
     for source in sources:
         print("Title:{}".format(source.title))
         print("Url:{}".format(source.url))
@@ -216,7 +300,8 @@ class FeedClient(object):
         if self.parser.args.init_sources:
             add_init_sources(db, self.sources)
 
-        db.entries_table.remove(self.day_limit)
+        c = EntriesTableController(db)
+        c.remove(self.day_limit)
 
         if self.parser.args.cleanup:
             db.entries_table.truncate()
@@ -234,7 +319,8 @@ class FeedClient(object):
         if self.parser.args.refresh_on_start:
             #fetch(db, self.day_limit)
             asyncio.run(fetch_async(db, self.day_limit))
-
+            date_now = DateUtils.get_datetime_now_utc()
+            print("Current time:{}".format(date_now))
 
         if self.parser.args.list_sources:
             list_sources(db)
@@ -250,11 +336,11 @@ class FeedClient(object):
                 shutil.rmtree(str(directory))
                 directory.mkdir(parents=True, exist_ok=True)
 
-            w = HtmlExporter(directory, db.entries_table.select())
+            session = db.session_factory()
+            entries = session.query(EntriesTable).order_by(desc(EntriesTable.date_published)).all()
+            w = HtmlExporter(directory, entries)
             w.write()
 
         elif self.parser.args.print:
             w = OutputWriter(db)
             w.write()
-
-        db.close()

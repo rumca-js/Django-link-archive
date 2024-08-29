@@ -2,6 +2,7 @@
 Library package.
 """
 
+from typing import Optional
 from sqlalchemy import (
     create_engine,
     Table,
@@ -14,9 +15,22 @@ from sqlalchemy import (
     Boolean,
     DateTime,
     delete,
+    update,
 )
+from sqlalchemy.orm import sessionmaker
+import sqlalchemy
 from datetime import timedelta, datetime, timezone
 
+
+from sqlalchemy.orm import Session
+from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.orm import Mapped
+from sqlalchemy.orm import mapped_column
+
+
+def create_this_engine():
+    file_name = "test.db"
+    return create_engine("sqlite:///" + file_name)
 
 
 class SqlConnection(object):
@@ -24,7 +38,6 @@ class SqlConnection(object):
     Simple wrapper for connection
     """
     def __init__(self, database_file="test.db", parser=None):
-        self.conn = None
         self.cursor = None
         self.database_file = database_file
 
@@ -33,9 +46,6 @@ class SqlConnection(object):
         if not self.create_database():
             print("Could not connect to database")
             return
-
-        self.conn = self.engine.connect()
-        self.transaction = self.conn.begin()
 
     def create_database(self):
         file_name = self.get_database_file()
@@ -52,23 +62,7 @@ class SqlConnection(object):
             )
             return False
 
-    def commit(self):
-        if self.transaction:
-            try:
-                self.transaction.commit()
-            except Exception as e:
-                self.transaction.rollback()
-
-            self.transaction = self.conn.begin()
-
     def close(self):
-        if self.transaction:
-            try:
-                self.transaction.commit()
-            except Exception as e:
-                self.transaction.rollback()
-
-        self.conn.close()
         self.engine.dispose()
 
     def get_database_file(self):
@@ -99,7 +93,10 @@ class GenericTable(object):
         return result.fetchall()
 
     def truncate(self):
-        self.conn.execute("TRUNCATE TABLE {}".format(table_name))
+        if self.table_name:
+            truncate_query = sqlalchemy.text("DELETE FROM {}".format(self.table_name))
+            self.get_connection().execute(truncate_query)
+            self.commit()
 
     def get_connection(self):
         return self.conn.conn
@@ -108,209 +105,184 @@ class GenericTable(object):
         self.conn.commit()
 
 
-class EntriesTable(GenericTable):
-    def __init__(self, conn, preserve_ids = False):
-        super().__init__(conn)
-        self.table_name = "entries"
-        self.preserve_ids = preserve_ids
+class Base(DeclarativeBase):
+    pass
 
-    def create(self):
-        metadata = MetaData()
 
-        self.table = Table(
-            self.table_name,
-            metadata,
-            Column("id", Integer, primary_key=True),
-            Column("link", String, unique=True),
-            Column("title", String),
-            Column("description", String),
-            Column("thumbnail", String, nullable=True),
-            Column("language", String, nullable=True),
-            Column("age", Integer, default=0),
-            Column(
-                "date_created", DateTime, nullable=True
-            ),  # TODO convert to timestamp
-            Column("date_published", DateTime, nullable=True),
-            Column("date_update_last", DateTime, nullable=True),
-            Column("date_dead_since", DateTime, nullable=True),
-            Column("date_last_modified", DateTime, nullable=True),
-            Column("status_code", Integer, default=0),
-            Column("page_rating", Integer, default=0),
-            Column("page_rating_votes", Integer, default=0),
-            Column("page_rating_contents", Integer, default=0),
-            Column("dead", Boolean, default=False),
-            Column("bookmarked", Boolean, default=False),
-            Column("permanent", Boolean, default=False),
-            Column("source", String, nullable=True),
-            # advanced / foreign
-            Column("source_obj__id", Integer, nullable=True),
-            Column("tags", String, nullable=True),
-        )
+class EntriesTable(Base):
+    __tablename__ = "entries"
 
-        engine = self.conn.engine
-        with engine.connect() as connection:
-            if not engine.dialect.has_table(connection, "entries"):
-                print("Does not have entries table, creating one")
-                metadata.create_all(self.engine)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    link: Mapped[str] = mapped_column(String(30), unique=True)
+    title: Mapped[str]
+    description: Mapped[Optional[str]]
+    thumbnail: Mapped[Optional[str]]
+    language: Mapped[Optional[str]]
+    age: Mapped[int] = mapped_column(default=0)
+    date_created = mapped_column(DateTime, nullable=True)
+    date_published= mapped_column(DateTime, nullable=True)
+    date_update_last= mapped_column(DateTime, nullable=True)
+    date_dead_since= mapped_column(DateTime, nullable=True)
+    date_last_modified= mapped_column(DateTime, nullable=True)
+    status_code: Mapped[int] = mapped_column(default=0)
+    page_rating: Mapped[int] = mapped_column(default=0)
+    page_rating_votes: Mapped[int] = mapped_column(default=0)
+    page_rating_contents: Mapped[int] = mapped_column(default=0)
+    dead: Mapped[bool] = mapped_column(default=False)
+    bookmarked: Mapped[bool] = mapped_column(default=False)
+    permanent: Mapped[bool] = mapped_column(default=False)
+    source: Mapped[Optional[str]]
+    artist: Mapped[Optional[str]]
+    album: Mapped[Optional[str]]
+    # advanced / foreign
+    source_obj__id: Mapped[Optional[int]]
+    tags: Mapped[Optional[str]]
 
-    def add_entry(self, entry):
-        if self.preserve_ids:
-            return self.add_entry_as_is(entry)
+
+class EntriesTableController(object):
+    def __init__(self, db, session = None):
+        self.conn = db
+        self.session = session
+
+    def get_session(self):
+        if not self.session:
+            return self.conn.session_factory()
         else:
-            return self.add_entry_auto_increment(entry)
-
-    def add_entry_auto_increment(self, entry):
-        data = {}
-        for key in entry:
-            if key == "id":
-                continue
-            elif key == "tags":
-                try:
-                    if entry[key]:
-                        data[key] = ", ".join(entry[key])
-                except Exception as E:
-                    data[key] = None
-
-            elif key.startswith("date"):
-                if type(entry[key]) == str:
-                    date = parser.parse(entry[key])
-                    data[key] = date
-                else:
-                    data[key] = entry[key]
-            else:
-                data[key] = entry[key]
-
-        try:
-            self.get_connection().execute(self.table.insert(), [data])
-
-        except Exception as e:
-            print(e)
-            return False
-        return True
-
-    def add_entry_as_is(self, entry):
-        data = {}
-        for key in entry:
-            if key == "tags":
-                if entry[key]:
-                    data[key] = ", ".join(entry[key])
-                else:
-                    data[key] = None
-            elif key.startswith("date"):
-                if type(entry[key]) == str:
-                    date = parser.parse(entry[key])
-                    data[key] = date
-                else:
-                    data[key] = entry[key]
-            else:
-                data[key] = entry[key]
-
-        try:
-            self.get_connection().execute(self.table.insert(), [data])
-
-        except Exception as e:
-            print(e)
-            return False
-        return True
-
-    def is_entry(self, entry):
-        query = select(self.table).where(self.table.c.link == entry["link"])
-
-        result = self.get_connection().execute(query)
-        row = result.fetchone()
-
-        if row:
-            return True
-        else:
-            return False
-
-    def select(self, conditions=None):
-        if conditions:
-            query = select(self.table).where(conditions).order_by(self.table.c.date_published.desc())
-
-            result = self.get_connection().execute(query)
-            return result.fetchall()
-        else:
-            query = select(self.table).order_by(self.table.c.date_published.desc())
-            result = self.get_connection().execute(query)
-            return result.fetchall()
+            return self.session
 
     def remove(self, days):
         now = datetime.now(timezone.utc)
         limit = now - timedelta(days = days)
-        query = delete(self.table).where(self.table.c.date_published < limit)
-        result = self.get_connection().execute(query)
-        return result
+
+        session = self.get_session()
+
+        entries = session.query
+
+        query = delete(EntriesTable).where(EntriesTable.date_published < limit)
+        session.execute(query)
+
+    def add_entry(self, entry):
+        if "author" in entry:
+            entry["artist"] = entry["author"]
+            del entry["author"]
+
+        if "tags" in entry:
+            try:
+                if entry["tags"]:
+                    entry["tags"] = ", ".join(entry["tags"])
+            except Exception as E:
+                data["tags"] = None
+
+        if "feed_entry" in entry:
+            del entry["feed_entry"]
+
+        if "source_title" in entry:
+            del entry["source_title"]
+
+        entry_obj = EntriesTable(**entry)
+
+        session = self.get_session()
+        session.add(entry_obj)
+        session.commit()
 
 
-class SourcesTable(GenericTable):
-    def __init__(self, conn):
-        super().__init__(conn)
-        self.table_name = "sources"
+class SourcesTable(Base):
+    __tablename__ = "sources"
 
-    def create(self):
-        metadata = MetaData()
+    id: Mapped[int] = mapped_column(primary_key=True)
+    url : Mapped[str] = mapped_column(unique=True)
+    title: Mapped[str]
 
-        self.table = Table(
-            self.table_name,
-            metadata,
-            Column("id", Integer, primary_key=True),
-            Column("url", String, unique=True),
-            Column("title", String),
-        )
 
-        engine = self.get_connection().engine
-        with engine.connect() as connection:
-            if not engine.dialect.has_table(connection, "sources"):
-                print("Does not have sources table, creating one")
-                metadata.create_all(self.engine)
+class SourcesTableController(object):
 
-    def add_source(self, source):
-        """
-        Source is a map of props
-        """
-        try:
-            self.get_connection().execute(self.table.insert(), [source])
+    def __init__(self, db, session = None):
+        self.conn = db
+        self.session = session
 
-        except Exception as e:
-            print(e)
-            return False
-        return True
-
-    def is_source(self, source):
-        query = select(self.table).where(self.table.c.url == source["url"])
-
-        result = self.get_connection().execute(query)
-        row = result.fetchone()
-
-        if row:
-            return True
+    def get_session(self):
+        if not self.session:
+            return self.conn.session_factory()
         else:
-            return False
+            return self.session
 
-    def select(self):
-        query = select(self.table)
-        result = self.get_connection().execute(query)
-        return result.fetchall()
+    def get_all(self):
+        session = self.get_session()
+        sources = session.query(SourcesTable).all()
+        return sources
 
-    def remove(self, source_url):
-        query = delete(self.table).where(self.table.c.url == source_url)
-        result = self.get_connection().execute(query)
-        return result
+
+class SourceOperationalData(Base):
+    __tablename__ = "sourceoperationaldata"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    date_fetched = mapped_column(DateTime, nullable=True)
+    source_obj_id: Mapped[int]
+
+
+class SourceOperationalDataController(object):
+
+    def __init__(self, db, session = None):
+        self.conn = db
+        self.session = session
+
+    def get_session(self):
+        if not self.session:
+            return self.conn.session_factory()
+        else:
+            return self.session
+
+    def is_fetch_possible(self, source, date_now, limit_seconds=60 * 10):
+        session = self.get_session()
+
+        rows = session.query(SourceOperationalData).filter(SourceOperationalData.source_obj_id == source.id).all()
+
+        if len(rows) == 0:
+            return True
+
+        row = rows[0]
+
+        source_datetime = row.date_fetched
+
+        diff = date_now - source_datetime
+
+        if diff.total_seconds() > limit_seconds:
+            return True
+        return False
+
+    def set_fetched(self, source, date_now):
+        session = self.get_session()
+
+        op_data = session.query(SourceOperationalData).filter(SourceOperationalData.source_obj_id == source.id).all()
+        if len(op_data) == 0:
+            obj = SourceOperationalData(date_fetched = date_now, source_obj_id = source.id)
+            session.add(obj)
+            session.commit()
+        else:
+            op_data = op_data[0]
+            op_data.date_fetched = date_now
+            session.commit()
 
 
 class SqlModel(object):
     def __init__(self, database_file="test.db", parser=None):
-        self.conn = SqlConnection(database_file=database_file)
+        self.db_file = database_file
 
+        self.engine = create_engine("sqlite:///" + self.db_file)
+
+    def session_factory(self):
+        _SessionFactory = sessionmaker(bind=self.engine)
+
+        Base.metadata.create_all(self.engine)
+        return _SessionFactory()
+
+        """
         self.entries_table = EntriesTable(self.conn)
         self.entries_table.create()
 
         self.sources_table = SourcesTable(self.conn)
         self.sources_table.create()
 
-    def commit(self):
-        self.conn.commit()
-
-    def close(self):
-        self.conn.close()
+        self.source_operational_data = SourceOperationalData(self.conn)
+        self.source_operational_data.create()
+        """
