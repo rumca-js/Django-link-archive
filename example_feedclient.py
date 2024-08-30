@@ -7,6 +7,10 @@ from webtools import (
     FeedClient,
 )
 
+from sqlalchemy import (
+    create_engine,
+)
+
 # Initial sources list. Will be used to populate SQLite
 sources = [
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UC7shUDSkHjuQNegPhGdANQQ", "title" : "2666 - The art of listening"},
@@ -61,6 +65,7 @@ sources = [
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UC_DmOS_FBvO4H27U7X0OtRg", "title" : "fearless & far"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCO7fujFV_MuxTM0TuZrnE6Q", "title" : "felix colgrave"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCG_nvdTLdijiAAuPKxtvBjA", "title" : "filmento"},
+        {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCsBjURrPoezykLs9EqgamOA", "title" : "fireship"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCNnKprAG-MWLsk-GsbsC2BA", "title" : "flashgitz"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UCyNtlmLB73-7gtlBz00XOQQ", "title" : "folding ideas"},
         {"url" : "https://www.youtube.com/feeds/videos.xml?channel_id=UC2WHjPDvbE6O328n17ZGcfg", "title" : "forrest knight"},
@@ -279,9 +284,12 @@ sources = [
 
 
 def main():
-    p = FeedClient(sources = sources, day_limit=7)
 
-    WebConfig.use_print_logging()
+    engine = create_engine("sqlite:///feedclient.db")
+
+    p = FeedClient(sources = sources, day_limit=7, engine=engine)
+
+    # WebConfig.use_print_logging()
 
     # scraping server is not running, we do not use port
     HttpPageHandler.crawling_server_port = 0

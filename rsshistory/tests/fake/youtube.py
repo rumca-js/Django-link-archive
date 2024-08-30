@@ -32,8 +32,7 @@ Sitemap: https://www.youtube.com/sitemaps/sitemap.xml
 Sitemap: https://www.youtube.com/product/sitemap.xml
 """
 
-youtube_sitemap_sitemaps = """
-<?xml version='1.0' encoding='UTF-8'?>
+youtube_sitemap_sitemaps = """<?xml version='1.0' encoding='UTF-8'?>
 <sitemapindex xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
   <sitemap>
     <loc>https://www.youtube.com/ads/sitemap.xml</loc>
@@ -98,8 +97,7 @@ youtube_sitemap_sitemaps = """
 </sitemapindex>
 """
 
-youtube_sitemap_product = """
-<?xml version="1.0" encoding="UTF-8"?>
+youtube_sitemap_product = """<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <sitemap>
         <loc>https://www.youtube.com/product/sitemap-files/sitemap-001.xml.gz</loc>
@@ -123,8 +121,7 @@ youtube_sitemap_product = """
 *********** CHANNELS DATA *********
 """
 
-webpage_samtime_youtube_rss = """
-<?xml version="1.0" encoding="UTF-8"?>
+webpage_samtime_youtube_rss = """<?xml version="1.0" encoding="UTF-8"?>
 <rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
 <channel>
     <title><![CDATA[SAMTIME on Odysee]]></title>

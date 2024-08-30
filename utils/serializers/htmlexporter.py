@@ -8,6 +8,8 @@ def fix_entry_link_name(link):
     link = link.replace("\\", "")
     link = link.replace("/", "")
     link = fix_path_for_os(link)
+    if len(link) > 150:
+        link = link[:150]
     link = link.replace(".", "")
     link = link.replace("-", "")
     return link+".html"
@@ -33,22 +35,24 @@ def get_youtube_style():
 
 
 class HtmlEntryExporter(object):
-    def __init__(self, output_directory, entry, index_file = None):
+    def __init__(self, output_directory, entry, index_file = None, verbose=False):
         self.entry = entry
         self.output_directory = output_directory
         self.index_file = index_file
+        self.verbose = verbose
 
     def write(self):
         text = self.get_entry_text()
 
         file_name = self.get_entry_file_name()
-        print("Writing:{}".format(file_name))
+        if self.verbose:
+            print("Writing:{}".format(file_name))
 
         try:
             with open(file_name, "w", encoding="utf-8") as fh:
                 fh.write(text)
         except Exception as E:
-            print("Cannot write file:{} len:{}".format(str(file_name), len(str(file_name))))
+            print("Cannot write file:{} len:{}\n{}".format(str(file_name), len(str(file_name)), str(E)))
 
     def get_entry_text(self):
         entry = self.entry
@@ -125,7 +129,8 @@ class HtmlEntryExporter(object):
 
 
 class HtmlIndexExporter(object):
-    def __init__(self, cwd = Path("."), output_file="index.html", previous_index = None):
+    def __init__(self, cwd = Path("."), output_file="index.html", previous_index = None, verbose = False):
+        self.verbose = verbose
         self.output_file = output_file
         self.output_directory = cwd
         self.previous_index = previous_index
@@ -194,20 +199,21 @@ class HtmlIndexExporter(object):
 
 
 class HtmlExporter(object):
-    def __init__(self, output_directory, entries):
+    def __init__(self, output_directory, entries, verbose=False):
         self.output_directory = output_directory
         self.entries = entries
         self.current_index = None
+        self.verbose = verbose
 
     def write(self):
         index_number = 0
 
-        self.current_index = HtmlIndexExporter(cwd = self.output_directory, output_file = self.get_index_file_name(index_number))
+        self.current_index = HtmlIndexExporter(cwd = self.output_directory, output_file = self.get_index_file_name(index_number), verbose = self.verbose)
 
         for row_index, entry in enumerate(self.entries):
             if row_index % 100 == 99:
                 index_number += 1
-                next_index = HtmlIndexExporter(cwd = self.output_directory, output_file = self.get_index_file_name(index_number), previous_index=self.current_index)
+                next_index = HtmlIndexExporter(cwd = self.output_directory, output_file = self.get_index_file_name(index_number), previous_index=self.current_index, verbose = self.verbose)
 
                 self.current_index.write(next_index)
 
@@ -220,7 +226,7 @@ class HtmlExporter(object):
 
     def write_entry_file(self, entry):
         # write entry file
-        w = HtmlEntryExporter(self.output_directory, entry, self.current_index)
+        w = HtmlEntryExporter(self.output_directory, entry, self.current_index, verbose=self.verbose)
         w.write()
 
     def get_index_file_name(self, index_number):

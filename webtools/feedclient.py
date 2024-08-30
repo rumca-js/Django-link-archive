@@ -1,4 +1,3 @@
-
 """
 This is example script about how to use this project as a simple RSS reader
 """
@@ -31,7 +30,7 @@ from utils.dateutils import DateUtils
 from utils.serializers import HtmlExporter
 
 
-__version__ = "0.0.3"
+__version__ = "0.0.4"
 
 
 def read_source(db, source):
@@ -84,7 +83,7 @@ class OutputWriter(object):
             print("{} {} {}".format(entry.date_published, entry.link, entry.title,))
 
 
-def fetch(db, day_limit):
+def fetch(db, parser, day_limit):
     """
     fetch time is used to not spam servers every time you refresh anything
     """
@@ -100,14 +99,17 @@ def fetch(db, day_limit):
         date_now = DateUtils.get_datetime_now_utc()
         date_now = date_now.replace(tzinfo=None)
 
-        operational_data = SourceOperationalDataController(db, session)
-        if not operational_data.is_fetch_possible(source, date_now, 60 * 10):
-            op_data = session.query(SourceOperationalData).filter(SourceOperationalData.source_obj_id == source.id).all()
-            if len(op_data) > 0:
-                print("Source {} does not require fetch yet {}".format(source.title, op_data[0].date_fetched))
-            else:
-                print("Source {} does not require fetch yet?".format(source.title))
-            continue
+        if not parser.args.force:
+           operational_data = SourceOperationalDataController(db, session)
+           if not operational_data.is_fetch_possible(source, date_now, 60 * 10):
+
+               if parser.args.verbose:
+                   op_data = session.query(SourceOperationalData).filter(SourceOperationalData.source_obj_id == source.id).all()
+                   if len(op_data) > 0:
+                       print("Source {} does not require fetch yet {}".format(source.title, op_data[0].date_fetched))
+                   else:
+                       print("Source {} does not require fetch yet?".format(source.title))
+               continue
 
         date_now = DateUtils.get_datetime_now_utc()
         date_now = date_now.replace(tzinfo=None)
@@ -131,15 +133,12 @@ def fetch(db, day_limit):
         print("Number of entries:{}".format(q.count()))
 
 
-async def fetch_async(db, day_limit):
+async def fetch_async(db, parser, day_limit):
     """
     Async version is faster than sequentially asking all sites.
     fetch time is used to not spam servers every time you refresh anything
     """
     session = db.session_factory()
-
-    q = session.query(EntriesTable)
-    print("Number of entries:{}".format(q.count()))
 
     sources = session.query(SourcesTable).all()
 
@@ -148,14 +147,16 @@ async def fetch_async(db, day_limit):
         date_now = DateUtils.get_datetime_now_utc()
         date_now = date_now.replace(tzinfo=None)
 
-        operational_data = SourceOperationalDataController(db, session)
-        if not operational_data.is_fetch_possible(source, date_now, 60 * 10):
-            op_data = session.query(SourceOperationalData).filter(SourceOperationalData.source_obj_id == source.id).all()
-            if len(op_data) > 0:
-                print("Source {} does not require fetch yet {}".format(source.title, op_data[0].date_fetched))
-            else:
-                print("Source {} does not require fetch yet?".format(source.title))
-            continue
+        if not parser.args.force:
+            operational_data = SourceOperationalDataController(db, session)
+            if not operational_data.is_fetch_possible(source, date_now, 60 * 10):
+                if parser.args.verbose:
+                    op_data = session.query(SourceOperationalData).filter(SourceOperationalData.source_obj_id == source.id).all()
+                    if len(op_data) > 0:
+                        print("Source {} does not require fetch yet {}".format(source.title, op_data[0].date_fetched))
+                    else:
+                        print("Source {} does not require fetch yet?".format(source.title))
+                continue
 
         date_now = DateUtils.get_datetime_now_utc()
         date_now = date_now.replace(tzinfo=None)
@@ -170,6 +171,8 @@ async def fetch_async(db, day_limit):
 
     results = await asyncio.gather(*threads)
 
+    total_added_entries = 0
+
     for result in results:
         for entry in result:
             now = datetime.now(timezone.utc)
@@ -180,12 +183,17 @@ async def fetch_async(db, day_limit):
             if entry['date_published'] > limit and entires_num == 0:
                 ec = EntriesTableController(db, session)
                 ec.add_entry(entry)
+                total_added_entries += 1
+
+    print(f"Added {total_added_entries}")
 
     q = session.query(EntriesTable)
     print("Number of entries:{}".format(q.count()))
 
 
-def show_stats(entries_table, sources_table):
+def show_stats(db):
+    session = db.session_factory()
+
     q = session.query(EntriesTable)
     count_entries = q.count()
 
@@ -196,25 +204,41 @@ def show_stats(entries_table, sources_table):
     print(f"Sources:{count_sources}")
 
 
-def follow_url(db, url):
+def follow_url(db, page_url):
+    def is_source(page_url):
+        session = db.session_factory()
+
+        sources = session.query(SourcesTable).filter(SourcesTable.url == page_url).all()
+        if len(sources) != 0:
+            return True
+
     source = {}
-    u = Url(url=url)
-    response = u.get_response()
-    title = u.get_title()
+
+    if is_source(page_url):
+        print("Such source is already added")
+        return True
+
+    url = Url.find_rss_url(page_url)
+    if not url:
+        print("That does not seem to be a correct RSS source:{}".format(page_url))
+
+    response = url.get_response()
+    title = url.get_title()
 
     if not title:
         title = input("Specify title of URL")
 
-    source["url"] = url
+    source["url"] = url.url
     source["title"] = title
 
-    sources = session.query(SourcesTable).filter(SourcesTable.url == url).all()
-    if len(sources) != 0:
-        return False
+    if is_source(url.url):
+        print("Such source is already added")
 
     session = db.session_factory()
-    session.add( SourcesTable(url = url, title = title))
+    session.add( SourcesTable(url = url.url, title = title))
     session.commit()
+
+    print("You started following {}/{}".format(url.url, title))
 
     return True
 
@@ -227,6 +251,8 @@ def unfollow_url(db, url):
         source.delete()
 
     session.commit()
+
+    print("You stopped following {}".format(url))
 
     return True
 
@@ -269,6 +295,7 @@ class FeedClientParser(object):
         self.parser.add_argument("-o", "--output-dir", help="HTML output directory")
         self.parser.add_argument("--print", help="Print entries to stdout")
         self.parser.add_argument("-r", "--refresh-on-start", action="store_true", help="Refreshes on start")
+        self.parser.add_argument("--force", action="store_true", help="Forces refresh")
         self.parser.add_argument("--stats", action="store_true", help="Show statistics")
         self.parser.add_argument("--cleanup", action="store_true", help="Remove unreferenced items")
         self.parser.add_argument("--follow", help="Follows specific url")
@@ -285,9 +312,10 @@ class FeedClientParser(object):
 
 
 class FeedClient(object):
-    def __init__(self, sources = None, day_limit = 7):
+    def __init__(self, sources = None, day_limit = 7, engine = None):
         self.sources = sources
         self.day_limit = day_limit
+        self.engine = engine
 
         self.parser = FeedClientParser()
         self.parser.parse()
@@ -295,13 +323,10 @@ class FeedClient(object):
     def run(self):
         database_file = self.parser.args.db
 
-        db = SqlModel(database_file=database_file)
+        db = SqlModel(database_file=database_file, engine=self.engine)
 
         if self.parser.args.init_sources:
             add_init_sources(db, self.sources)
-
-        c = EntriesTableController(db)
-        c.remove(self.day_limit)
 
         if self.parser.args.cleanup:
             db.entries_table.truncate()
@@ -309,16 +334,17 @@ class FeedClient(object):
         if self.parser.args.follow:
             if not follow_url(db, self.parser.args.follow):
                 print("Cannot follow {}".format(self.parser.args.follow))
-            else:
-                print("Added {}".format(self.parser.args.follow))
 
         if self.parser.args.unfollow:
             unfollow_url(db, self.parser.args.unfollow)
 
         # one of the below needs to be true
         if self.parser.args.refresh_on_start:
-            #fetch(db, self.day_limit)
-            asyncio.run(fetch_async(db, self.day_limit))
+            c = EntriesTableController(db)
+            c.remove(self.day_limit)
+
+            #fetch(db, self.parser, self.day_limit)
+            asyncio.run(fetch_async(db, self.parser, self.day_limit))
             date_now = DateUtils.get_datetime_now_utc()
             print("Current time:{}".format(date_now))
 
@@ -338,7 +364,12 @@ class FeedClient(object):
 
             session = db.session_factory()
             entries = session.query(EntriesTable).order_by(desc(EntriesTable.date_published)).all()
-            w = HtmlExporter(directory, entries)
+
+            verbose = False
+            if self.parser.args.verbose:
+                verbose = True
+
+            w = HtmlExporter(directory, entries, verbose = verbose)
             w.write()
 
         elif self.parser.args.print:

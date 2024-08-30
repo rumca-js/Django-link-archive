@@ -50,46 +50,19 @@ class SourceUrlInterface(object):
     def get_props_internal(self, input_props=None):
         handler = self.u.get_handler()
 
-        if type(handler) is UrlHandler.youtube_channel_handler:
-            return self.get_props_from_rss(input_props)
-        elif type(handler) is UrlHandler.youtube_video_handler:
-            # Someone might be surprised that added URL is being replaced
-            self.url = handler.get_channel_feed_url()
-            self.u = UrlHandler(self.url)
+        url = UrlHandler.find_rss_url(self.url)
+        if url:
+            self.url = url.url
+            self.u = url
             self.u.get_response()
 
             return self.get_props_from_rss(input_props)
-        elif type(handler) is HttpPageHandler:
-            if self.is_reddit_channel():
-                rss = self.get_reddit_rss()
-                if not rss:
-                    return self.get_props_from_page(input_props)
+        else:
+            if type(handler) is HttpPageHandler:
+                if type(handler.p) is JsonPage:
+                    return self.get_props_from_json(input_props)
 
-                self.url = rss
-                handler = UrlHandler(self.url)
-                self.u = handler
-                self.u.get_response()
-
-                return self.get_props_internal(input_props)
-
-            elif type(handler.p) is RssPage:
-                return self.get_props_from_rss(input_props)
-            elif type(handler.p) is HtmlPage and handler.p.get_rss_url():
-                # Someone might be surprised that added URL is being replaced
-                url = handler.p.get_rss_url()
-                if not url:
-                    return self.get_props_from_page(input_props)
-
-                self.url = url
-                handler = UrlHandler(url)
-                self.u = handler
-                self.u.get_response()
-
-                return self.get_props_internal(input_props)
-            elif type(handler.p) is JsonPage:
-                return self.get_props_from_json(input_props)
-            else:
-                return self.get_props_from_page(input_props)
+        return self.get_props_from_page(input_props)
 
     def get_props_from_rss(self, input_props=None):
         u = self.u

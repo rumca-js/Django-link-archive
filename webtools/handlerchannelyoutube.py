@@ -21,9 +21,13 @@ class YouTubeChannelHandler(RssPage, DefaultUrlHandler):
         if url:
             self.code = self.input2code(url)
 
-    def is_handled_by(url):
+    def is_handled_by(self):
         from .url import Url
-        short_url = Url.get_protololless(url)
+
+        if not self.url:
+            return False
+
+        short_url = Url.get_protololless(self.url)
 
         if (
             short_url.startswith("www.youtube.com/channel")

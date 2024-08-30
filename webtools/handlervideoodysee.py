@@ -6,9 +6,12 @@ class OdyseeVideoHandler(DefaultUrlHandler):
         super().__init__(url, contents=contents)
         self.url = OdyseeVideoHandler.input2url(url)
 
-    def is_handled_by(url):
+    def is_handled_by(self):
+        if not self.url:
+            return
+
         from .url import Url
-        protocol_less = Url.get_protololless(url)
+        protocol_less = Url.get_protololless(self.url)
 
         if protocol_less.startswith("odysee.com/@"):
             wh1 = protocol_less.find("@")

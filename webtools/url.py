@@ -25,6 +25,7 @@ from .handlervideoyoutube import YouTubeJsonHandler
 from .handlervideoodysee import OdyseeVideoHandler
 from .handlerchannelyoutube import YouTubeChannelHandler
 from .handlerchannelodysee import OdyseeChannelHandler
+from .handlers import RedditChannelHandler
 
 from utils.dateutils import DateUtils
 
@@ -145,7 +146,7 @@ class Url(ContentInterface):
 
         handlers = Url.get_handlers()
         for handler in handlers:
-            if handler.is_handled_by(url):
+            if handler(url).is_handled_by():
                 return handler(url)
 
         page_type = DomainAwarePage(url).get_type()
@@ -184,8 +185,9 @@ class Url(ContentInterface):
 
         handlers = Url.get_handlers()
         for handler in handlers:
-            if handler.is_handled_by(url):
-                return handler(url)
+            h = handler(url = self.url)
+            if h.is_handled_by():
+                return h
 
         if url.startswith("https") or url.startswith("http"):
             return HttpPageHandler(url, page_options=self.options)
@@ -409,6 +411,39 @@ class Url(ContentInterface):
         handler = self.get_handler()
         if handler:
             return handler.get_entries()
+
+    def find_rss_url(page_url):
+        if not page_url:
+            return
+
+        u = Url(page_url)
+        handler = u.get_handler()
+
+        if type(handler) is Url.youtube_channel_handler:
+            return u
+        elif type(handler) is Url.youtube_video_handler:
+            if page_url == handler.get_channel_feed_url():
+                return u
+            return Url(url = handler.get_channel_feed_url())
+        elif type(handler) is HttpPageHandler:
+            h = RedditChannelHandler(page_url)
+            if h.is_handled_by():
+                if page_url == h.get_feed_url():
+                    return u
+
+                if h.get_feed_url():
+                    return Url(url = h.get_feed_url())
+
+            handler.get_response()
+
+            if type(handler.p) is RssPage:
+                return u
+
+            if type(handler.p) is HtmlPage:
+                rss_url = handler.p.get_rss_url()
+                if rss_url:
+                    return Url(rss_url)
+
 
 
 class DomainCacheInfo(object):

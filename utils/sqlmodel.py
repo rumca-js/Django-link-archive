@@ -160,6 +160,7 @@ class EntriesTableController(object):
 
         query = delete(EntriesTable).where(EntriesTable.date_published < limit)
         session.execute(query)
+        session.commit()
 
     def add_entry(self, entry):
         if "author" in entry:
@@ -265,24 +266,16 @@ class SourceOperationalDataController(object):
 
 
 class SqlModel(object):
-    def __init__(self, database_file="test.db", parser=None):
+    def __init__(self, database_file="test.db", parser=None, engine=None):
         self.db_file = database_file
 
-        self.engine = create_engine("sqlite:///" + self.db_file)
+        if not engine:
+            self.engine = create_engine("sqlite:///" + self.db_file)
+        else:
+            self.engine = engine
 
     def session_factory(self):
         _SessionFactory = sessionmaker(bind=self.engine)
 
         Base.metadata.create_all(self.engine)
         return _SessionFactory()
-
-        """
-        self.entries_table = EntriesTable(self.conn)
-        self.entries_table.create()
-
-        self.sources_table = SourcesTable(self.conn)
-        self.sources_table.create()
-
-        self.source_operational_data = SourceOperationalData(self.conn)
-        self.source_operational_data.create()
-        """

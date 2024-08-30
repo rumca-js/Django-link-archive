@@ -6,16 +6,16 @@ b) it contained error, which prevented me from reading one RSS feed (it did not 
 """
 
 import html
-from xml.etree import ElementTree
+import lxml.etree as ET
 
 
-__version__ = "0.0.1"
+__version__ = "0.0.2"
 
 
 class FeedObject(object):
-    def __init__(self, root):
+    def __init__(self, root, ns=None):
         self.root = root
-        self.ns = {'atom': 'http://www.w3.org/2005/Atom', "media" : "http://search.yahoo.com/mrss/"}
+        self.ns = ns
 
     def get_prop(self, aproperty):
         aproperty_value = self.root.find(aproperty, self.ns)
@@ -29,122 +29,183 @@ class FeedObject(object):
                 return aproperty_value.attrib[attribute]
 
 
-class FeedReaderAtomEntry(FeedObject):
-    def __init__(self, entry_data):
-        super().__init__(entry_data)
+class FeedReaderEntry(FeedObject):
+    def __init__(self, entry_data, ns):
+        super().__init__(entry_data, ns)
 
-        self.link = self.get_prop_attribute("atom:link", "href")
-        if not self.link:
-            self.link = self.get_prop("atom:link")
-
-        self.title = self.get_prop("atom:title")
-        self.description = self.get_prop(".//media:description")
+        self.link = self.try_to_get_attribute("link", "href")
+        self.title = self.try_to_get_field("title")
+        self.subtitle = self.try_to_get_field("subtitle")
+        self.description = self.try_to_get_field("description")
         if not self.description:
-            self.description = self.get_prop("atom:content")
-
-        self.published = self.get_prop("atom:pubDate")
-        if not self.published:
-            self.published = self.get_prop("atom:published")
-
-        self.media_thumbnail = []
-
-        media_thumbnail = self.get_prop_attribute(".//media:thumbnail", "url")
-        if media_thumbnail:
-            self.media_thumbnail = [ {"url" : media_thumbnail} ]
-
-        self.media_content = []
-
-        media_content = self.get_prop_attribute(".//media:content", "url")
-        if media_content:
-            self.media_content = [ {"url" : media_content} ]
-
-        self.author = self.get_prop("atom:author/atom:name")
-
-        self.tags = self.get_prop('atom:tags')
-
-    def __contains__(self, item):
-        return True
-
-
-class FeedReaderRssEntry(FeedObject):
-    def __init__(self, entry_data):
-        super().__init__(entry_data)
-
-        self.link = self.get_prop_attribute("link", "href")
-        if not self.link:
-            self.link = self.get_prop("link")
-
-        self.title = self.get_prop("title")
-        self.description = self.get_prop("description")
+            if "media" in self.ns:
+                self.description = self.get_prop(".//media:description")
         if not self.description:
             self.description = self.get_prop("content")
+        if not self.description:
+            if "atom" in self.ns:
+                self.description = self.get_prop("atom:content")
 
-        self.published = self.get_prop("pubDate")
+        self.published = self.try_to_get_field("pubDate")
         if not self.published:
-            self.published = self.get_prop("published")
+            self.published = self.try_to_get_field("published")
 
         self.media_thumbnail = []
 
-        media_thumbnail = self.get_prop_attribute(".//thumbnail", "url")
-        if media_thumbnail:
-            self.media_thumbnail = [ {"url" : media_thumbnail} ]
+        if "media" in self.ns:
+            media_thumbnail = self.get_prop_attribute(".//media:thumbnail", "url")
+            if media_thumbnail:
+                self.media_thumbnail = [ {"url" : media_thumbnail} ]
 
         self.media_content = []
 
-        media_content = self.get_prop_attribute(".//content", "url")
-        if media_content:
-            self.media_content = [ {"url" : media_content} ]
+        if "media" in self.ns:
+            media_content = self.get_prop_attribute(".//media:content", "url")
+            if media_content:
+                self.media_content = [ {"url" : media_content} ]
 
-        self.author = self.get_prop("author/name")
+        self.author = self.try_to_get_fields("author", "name")
 
-        self.tags = self.get_prop('tags')
+        if not self.author:
+            if "itunes" in self.ns:
+                self.author = self.get_prop("itunes:owner/itunes:name")
+
+        self.tags = self.try_to_get_field('tags')
+
+    def try_to_get_field(self, field):
+        value = self.get_prop("./" + field)
+        if not value:
+            value = self.get_prop(field)
+        if not value:
+            if "atom" in self.ns:
+                value = self.get_prop(f'atom:{field}')
+
+        return value
+
+    def try_to_get_fields(self, fieldone, fieldtwo):
+        value = self.get_prop(f"./{fieldone}/{fieldtwo}")
+        if not value:
+            value = self.get_prop(f"{fieldone}/{fieldtwo}")
+        if not value:
+            if "atom" in self.ns:
+                value = self.get_prop(f'atom:{fieldone}/atom:{fieldtwo}')
+
+        return value
+
+    def try_to_get_attribute(self, field, attribute):
+        value = self.get_prop("./" + field)
+        if not value:
+            value = self.get_prop_attribute(field, attribute)
+        if not value:
+            if "atom" in self.ns:
+                value = self.get_prop_attribute(f'atom:{field}', attribute)
+
+        return value
 
     def __contains__(self, item):
         return True
 
 
 class FeedReaderFeed(FeedObject):
-    def __init__(self, root, is_atom = False, is_rss = False):
-        super().__init__(root)
+    def __init__(self, root, ns = None, is_atom = False):
+        super().__init__(root, ns)
 
         self.is_atom = is_atom
-        self.is_rss = is_rss
 
     def parse(self):
-        if self.is_atom:
-            return self.read_atom()
-        if self.is_rss:
-            return self.read_rss()
+        return self.read()
 
-    def read_atom(self):
-        self.title = self.get_prop('atom:title')
-        self.subtitle = self.get_prop('atom:subtitle')
-        self.description = self.get_prop('atom:description')
-        self.language = self.get_prop('atom:language')
-        self.published = self.get_prop('atom:published')
+    def try_to_get_field(self, field):
+        value = self.get_prop("./" + field)
+        if not value:
+            value = self.get_prop(field)
+        if not value:
+            value = self.get_prop(f'channel/{field}')
+        if not value:
+            if "atom" in self.ns:
+                value = self.get_prop(f'atom:{field}')
+        if not field:
+            if "atom" in self.ns:
+                value = self.get_prop(f'atom:channel/atom:{field}')
+
+        return value
+
+    def try_to_get_fields(self, fieldone, fieldtwo):
+        field = self.get_prop(f'./{fieldone}/{fieldtwo}')
+        if not field:
+            field = self.get_prop(f'{fieldone}/{fieldtwo}')
+        if not field:
+            if "atom" in self.ns:
+                field = self.get_prop(f'./atom:{fieldone}/atom:{fieldtwo}')
+        if not field:
+            if "atom" in self.ns:
+                field = self.get_prop(f'atom:{fieldone}/atom:{fieldtwo}')
+        if not field:
+            field = self.get_prop(f'./channel/{fieldone}/{fieldtwo}')
+        if not field:
+            field = self.get_prop(f'channel/{fieldone}/{fieldtwo}')
+        if not field:
+            if "atom" in self.ns:
+                field = self.get_prop(f'./atom:channel/atom:{fieldone}/atom:{fieldtwo}')
+        if not field:
+            if "atom" in self.ns:
+                field = self.get_prop(f'atom:channel/atom:{fieldone}/atom:{fieldtwo}')
+
+        return field
+
+    def try_to_get_attribute(self, field, attribute):
+        value = self.get_prop_attribute(field, attribute)
+        if not value:
+            value = self.get_prop_attribute(f'channel/{field}', attribute)
+        if not value:
+            if "atom" in self.ns:
+                value = self.get_prop_attribute(f'atom:{field}', attribute)
+        if not field:
+            if "atom" in self.ns:
+                value = self.get_prop_attribute(f'atom:channel/atom:{field}', attribute)
+
+        return value
+
+    def read(self):
+        self.title = self.try_to_get_field("title")
+
+        self.subtitle = self.try_to_get_field('subtitle')
+        self.description = self.try_to_get_field('description')
+        self.language = self.try_to_get_field('language')
+
+        self.published = self.try_to_get_field('published')
         if not self.published:
-            self.published = self.get_prop('atom:pubDate')
-        self.author = self.get_prop('atom:author/atom:name')
-        self.tags = self.get_prop('atom:tags')
-
-        self.image = self.get_prop_attribute("atom:image", "href")
-        if not self.image:
-            self.image = self.get_prop_attribute("atom:image", "url")
-
-    def read_rss(self):
-        self.title = self.get_prop('title')
-        self.subtitle = self.get_prop('subtitle')
-        self.description = self.get_prop('description')
-        self.language = self.get_prop('language')
-        self.published = self.get_prop('published')
+            self.published = self.try_to_get_field('pubDate')
         if not self.published:
-            self.published = self.get_prop('pubDate')
-        self.author = self.get_prop('author/name')
-        self.tags = self.get_prop('tags')
+            self.published = self.try_to_get_field('lastBuildDate')
 
-        self.image = self.get_prop_attribute("image", "href")
-        if not self.image:
-            self.image = self.get_prop_attribute("image", "url")
+        self.author = self.try_to_get_fields('author', 'name')
+        if not self.author:
+            if "itunes" in self.ns:
+                self.author = self.get_prop('.//itunes:author')
+        if not self.author:
+            if "itunes" in self.ns:
+                self.author = self.get_prop('itunes:author')
+        if not self.author:
+            if "itunes" in self.ns:
+                self.author = self.get_prop('./channel/itunes:author')
+        if not self.author:
+            if "atom" in self.ns and "itunes" in self.ns:
+                self.author = self.get_prop('./atom:channel/itunes:author')
+
+        self.tags = self.try_to_get_field('tags')
+
+        image = {}
+        image["url"] = self.try_to_get_fields("image","url")
+        if not image["url"]:
+            image["url"] = self.try_to_get_attribute("image", "url")
+        image["href"] = self.try_to_get_fields("image","href")
+        if not image["href"]:
+            if "atom" in self.ns:
+                image["href"] = self.try_to_get_attribute("image", "href")
+        image["width"] = self.try_to_get_fields("image", "width")
+        image["height"] = self.try_to_get_fields("image", "height")
+        self.image = image
 
     def __contains__(self, item):
         return True
@@ -152,14 +213,71 @@ class FeedReaderFeed(FeedObject):
 
 class FeedReader(object):
     def __init__(self, contents):
-        self.contents = contents
+        self.contents = contents.strip()
         if self.contents.strip().startswith("<html"):
             self.process_html()
 
         self.entries = []
-        self.ns = {'atom': 'http://www.w3.org/2005/Atom'}
+        self.ns = self.get_namespaces()
         self.root = None
+
         self.title = None
+
+    def parse(contents):
+        r = FeedReader(contents)
+        r.parse_implementation()
+        return r
+
+    def parse_implementation(self):
+        if not self.contents:
+            return
+
+        parser = ET.XMLParser(strip_cdata=False)
+        self.root = ET.fromstring(self.contents.encode(), parser=parser)
+
+        is_atom = "atom" in self.ns
+
+        self.feed = FeedReaderFeed(self.root, ns = self.ns, is_atom= is_atom)
+        self.feed.parse()
+
+        entries = self.get_entries()
+        if not entries:
+            entries = self.get_items()
+
+        self.read_entries(entries)
+
+    def get_namespaces(self):
+        spaces = {}
+
+        wh = 0
+        while wh != -1:
+            xmlns_wh = self.contents.find("xmlns", wh)
+            if xmlns_wh == -1:
+                break
+            xmlns_comma_wh = self.contents.find(":", xmlns_wh)
+            if xmlns_comma_wh == -1:
+                break
+            xmlns_eq_wh = self.contents.find("=", xmlns_wh)
+            if xmlns_eq_wh == -1:
+                break
+            xmlns_quote1_wh = self.contents.find('"', xmlns_eq_wh)
+            if xmlns_quote1_wh == -1:
+                break
+            xmlns_quote2_wh = self.contents.find('"', xmlns_quote1_wh + 1)
+            if xmlns_quote2_wh == -1:
+                break
+
+            if xmlns_comma_wh > xmlns_eq_wh:
+                ns = ""
+            else:
+                ns = self.contents[xmlns_comma_wh+1 : xmlns_eq_wh]
+            link = self.contents[xmlns_quote1_wh+1: xmlns_quote2_wh]
+
+            spaces[ns] = link
+
+            wh = xmlns_quote2_wh + 1
+
+        return spaces
 
     def process_html(self):
         wh = self.contents.find("&lt;")
@@ -178,43 +296,26 @@ class FeedReader(object):
 
         return True
 
-    def read_entries_atom(self):
-        entries = self.root.findall('.//atom:entry', self.ns)
-        # print(f"entries: {entries}")
+    def read_entries(self, entries):
         for entry in entries:
-            self.entries.append(FeedReaderAtomEntry(entry))
+            self.entries.append(FeedReaderEntry(entry, self.ns))
 
-    def read_entries_rss(self):
-        # parse the RSS feed using xml.etree.ElementTree
+    def get_entries(self):
+        entries = self.root.findall('.//entry', self.ns)
+        if len(entries) > 0:
+            return entries
+
+        if "atom" in self.ns:
+            entries = self.root.findall('.//atom:entry', self.ns)
+            if len(entries) > 0:
+                return entries
+
+    def get_items(self):
         entries = self.root.findall('.//item', self.ns)
-        for entry in entries:
-            self.entries.append(FeedReaderRssEntry(entry))
+        if len(entries) > 0:
+            return entries
 
-    def parse(contents):
-        r = FeedReader(contents)
-        r.parse_implementation()
-        return r
-
-    def parse_implementation(self):
-        if not self.contents:
-            return
-
-        self.root = ElementTree.fromstring(self.contents)
-
-        self.feed = FeedReaderFeed(self.root, is_atom = self.is_atom(), is_rss = self.is_rss())
-        self.feed.parse()
-
-        if self.is_atom():
-            self.read_entries_atom()
-        elif self.is_rss():
-            self.read_entries_rss()
-
-    def is_atom(self):
-        self.ns = {'atom': 'http://www.w3.org/2005/Atom'}
-        entries = self.root.findall('.//atom:entry', self.ns)
-        return len(entries) > 0
-
-    def is_rss(self):
-        self.ns = {'atom': 'http://www.w3.org/2005/Atom'}
-        entries = self.root.findall('.//item', self.ns)
-        return len(entries) > 0
+        if "atom" in self.ns:
+            entries = self.root.findall('.//atom:item', self.ns)
+            if len(entries) > 0:
+                return entries

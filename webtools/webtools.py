@@ -1449,11 +1449,11 @@ class RssPage(ContentInterface):
         if self.feed is None:
             return
 
-        if "subtitle" in self.feed.feed:
-            return self.feed.feed.subtitle
-
         if "description" in self.feed.feed:
             return self.feed.feed.description
+
+        if "subtitle" in self.feed.feed:
+            return self.feed.feed.subtitle
 
     def get_language(self):
         if self.feed is None:
@@ -1470,15 +1470,20 @@ class RssPage(ContentInterface):
         if "image" in self.feed.feed:
             if "href" in self.feed.feed.image:
                 try:
-                    image = str(self.feed.feed.image["href"])
+                    image = self.feed.feed.image["href"]
+                    if image:
+                        return str(image)
                 except Exception as E:
                     WebLogger.debug(str(E))
 
-            elif "url" in self.feed.feed.image:
+            if "url" in self.feed.feed.image:
                 try:
-                    image = str(self.feed.feed.image["url"])
+                    image = self.feed.feed.image["url"]
+                    if image:
+                        return str(image)
                 except Exception as E:
                     WebLogger.debug(str(E))
+
             elif "links" in self.feed.feed.image:
                 links = self.feed.feed.image["links"]
                 if len(links) > 0:

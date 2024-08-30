@@ -9,7 +9,8 @@ from .fakeinternetdata import (
     webpage_old_pubdate_rss,
 )
 from .fake.youtube import (
-    webpage_samtime_youtube_rss,
+    webpage_samtime_youtube_rss,   # you
+    youtube_channel_rss_linus_tech_tips, # uses feed
 )
 
 
@@ -63,7 +64,7 @@ class RssPageTest(FakeInternetTestCase):
 
         self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
-    def test_get_subtitle(self):
+    def test_get_description(self):
         # default language
         reader = RssPage("https://linkedin.com/test", webpage_rss)
         self.assertEqual(reader.get_description(), "SAMTIME channel description")
@@ -92,7 +93,7 @@ class RssPageTest(FakeInternetTestCase):
     def test_get_author(self):
         # default language
         reader = RssPage("https://linkedin.com/test", webpage_rss)
-        self.assertEqual(reader.get_author(), "SAMTIME name")
+        self.assertEqual(reader.get_author(), "SAMTIME author")
         self.assertTrue(reader.is_valid())
 
         self.assertEqual(MockRequestCounter.mock_page_requests, 0)
@@ -200,3 +201,16 @@ class RssPageTest(FakeInternetTestCase):
 
         self.assertTrue(not date)
     """
+
+
+class RssPageYouTubeTest(FakeInternetTestCase):
+    def setUp(self):
+        self.disable_web_pages()
+
+    def test_get_title(self):
+        # default language
+        reader = RssPage("https://linkedin.com/test", youtube_channel_rss_linus_tech_tips)
+        self.assertEqual(reader.get_title(), "Linus Tech Tips")
+        self.assertTrue(reader.is_valid())
+
+        self.assertEqual(MockRequestCounter.mock_page_requests, 0)

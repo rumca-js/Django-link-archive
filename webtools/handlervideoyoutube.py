@@ -11,9 +11,12 @@ class YouTubeVideoHandler(DefaultUrlHandler):
 
         self.url = YouTubeVideoHandler.input2url(url)
 
-    def is_handled_by(url):
+    def is_handled_by(self):
         from .url import Url
-        protocol_less = Url.get_protololless(url)
+        if not self.url:
+            return False
+
+        protocol_less = Url.get_protololless(self.url)
 
         return (
             protocol_less.startswith("www.youtube.com/watch")
@@ -325,7 +328,7 @@ class YouTubeJsonHandler(YouTubeVideoHandler):
         if self.yt_text is not None:
             return True
 
-        from programwrappers import ytdlp
+        from utils.programwrappers import ytdlp
 
         yt = ytdlp.YTDLP(self.url)
         self.yt_text = yt.download_data()
