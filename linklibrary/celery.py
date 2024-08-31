@@ -104,7 +104,10 @@ def setup_periodic_tasks(sender, **kwargs):
 
 @app.task(bind=True)
 def process_all_jobs(self, processor):
-    lock_id = "{0}-lock".format(self.name)
+    """
+    Same app/processor should not work at the same time twice
+    """
+    lock_id = "{}{}-lock".format(self.name, processor)
     with memcache_lock(lock_id, self.app.oid) as acquired:
         logger.info("Lock on:%s acquired:%s", self.name, acquired)
         if acquired:
