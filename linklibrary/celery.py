@@ -14,6 +14,7 @@ from django.core.cache import cache
 from celery import Celery
 from celery.utils.log import get_task_logger
 import importlib.util
+import importlib
 
 
 # Set the default Django settings module for the 'celery' program.
@@ -64,30 +65,41 @@ def setup_periodic_tasks(sender, **kwargs):
     """
     SQLite with Django does not like many tasks.
     If you plan use SQLite do not use this treading solution
+
+    Cannot import apps.tasks
     """
-    cache.clear()
 
-    # define for which apps support celery
-    apps = [ "rsshistory", ]
+    try:
+        logger.info("Clearing cache")
+        print("Clearing cache")
+        cache.clear()
 
-    for app in apps:
-        # periodic task names should be unique, new app tasks should not replace
-        # the other task names
-        # https://docs.celeryq.dev/en/stable/userguide/periodic-tasks.html
+        # define for which apps support celery
+        apps = ["rsshistory",]
+        tasks_info = [
+                [300.0, "RefreshProcessor"],
+                [60.0, "SourceJobsProcessor"],
+                [60.0, "WriteJobsProcessor"],
+                [60.0, "ImportJobsProcessor"],
+                [60.0, "LeftOverJobsProcessor"],
+        ]
 
-        tasks_module = importlib.import_module(app + ".tasks", package=None)
-        tasks = tasks_module.get_tasks()
+        for app in apps:
+            for task_info in tasks_info:
+                time_s = task_info[0]
+                task_processor = task_info[1]
+                print("Tasks. {} Adding {} {}".format(app, time_s, task_processor))
 
-        # in seconds
-        for task_info in tasks:
-            time_s = task_info[0]
-            task_processor = task_info[1]
+                sender.add_periodic_task(
+                    time_s,
+                    process_all_jobs.s(app + ".threadhandlers." + task_processor),
+                    name=app + " " + task_processor + " task ",
+                )
+                print("Tasks. {} Adding {} {} DONE".format(app, time_s, task_processor))
 
-            sender.add_periodic_task(
-                time_s,
-                process_all_jobs.s(app + ".threadhandlers." + str(task_processor)),
-                name=app + " " + processor + " task ",
-            )
+        print("Defined all tasks successfully")
+    except Exception as E:
+        print(str(E))
 
 
 @app.task(bind=True)

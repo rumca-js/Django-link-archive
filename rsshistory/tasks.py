@@ -2,7 +2,7 @@ import traceback
 
 from .apps import LinkDatabase
 from .models import AppLogging
-from .configuration import Configuration
+from .configuration import Configuration, ConfigurationEntry
 from .threadhandlers import (
     GenericJobsProcessor,
     SourceJobsProcessor,
