@@ -33,7 +33,7 @@ class InternetTest(FakeInternetTestCase):
         """
         The hill could not be read because 'link' property was not set by feedparser package
         """
-        handler = UrlHandler("https://warhammer-community.com/feed")
+        handler = UrlHandler("https://thehill.com/feed")
         handler.get_response()
 
         self.assertEqual(type(handler.get_handler()), HttpPageHandler)

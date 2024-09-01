@@ -293,7 +293,7 @@ class FeedClientParser(object):
         )
         self.parser.add_argument("--port", type=int, default=0, help="Port")
         self.parser.add_argument("-o", "--output-dir", help="HTML output directory")
-        self.parser.add_argument("--print", help="Print entries to stdout")
+        self.parser.add_argument("--print", help="Prints data to stdout")
         self.parser.add_argument("-r", "--refresh-on-start", action="store_true", help="Refreshes on start")
         self.parser.add_argument("--force", action="store_true", help="Forces refresh")
         self.parser.add_argument("--stats", action="store_true", help="Show statistics")

@@ -13,7 +13,7 @@ from .serializers.sourcesserializer import SourceSerializerWrapper
 
 
 class DataWriterConfiguration(object):
-    def __init__(self, config, export_config, directory=None, date_iso=None):
+    def __init__(self, config, export_config, directory, date_iso=None):
         """
         @param date date in ISO format
         """
@@ -32,9 +32,7 @@ class BaseDataWriter(object):
 
     def get_directory(self):
         return (
-            self.config.get_export_path()
-            / self.export_config.local_path
-            / self.directory
+            self.directory
         )
 
     def get_domains_json(self):

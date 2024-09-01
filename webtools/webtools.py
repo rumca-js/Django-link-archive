@@ -1305,7 +1305,8 @@ class RssPageEntry(ContentInterface):
 
     def get_date_published_implementation(self):
         if hasattr(self.feed_entry, "published"):
-            if str(self.feed_entry.published) == "":
+            if not self.feed_entry.published or \
+               str(self.feed_entry.published) == "":
                 return DateUtils.get_datetime_now_utc()
             else:
                 try:
@@ -1357,10 +1358,11 @@ class RssPage(ContentInterface):
         """
         Workaround for https://warhammer-community.com/feed
         """
-        if contents:
-            wh = contents.find("<rss version")
-            if wh > 0:
-                contents = contents[wh:]
+        # TODO apply that woraround differently
+        #if contents:
+        #    wh = contents.find("<rss version")
+        #    if wh > 0:
+        #        contents = contents[wh:]
 
         super().__init__(url=url, contents=contents)
 
@@ -1376,6 +1378,9 @@ class RssPage(ContentInterface):
             from .feedreader import FeedReader
 
             self.feed = FeedReader.parse(contents)
+            if not self.feed.entries or len(self.feed.entries) == 0:
+                WebLogger.error("Feed does not have any entries {}".format(self.url))
+
             return self.feed
 
         except Exception as E:
@@ -1430,6 +1435,9 @@ class RssPage(ContentInterface):
 
         #    WebLogger.error("No rss hash contents")
         #    return calculate_hash("no body hash")
+        if not self.feed:
+            WebLogger.error("Url:{}. RssPage has contents, but feed could not been analyzed".format(self.url))
+            return
 
         entries = str(self.feed.entries)
         if entries == "":

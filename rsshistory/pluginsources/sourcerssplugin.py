@@ -58,6 +58,8 @@ class BaseRssPlugin(SourceGenericPlugin):
 
         all_props = self.reader.get_entries()
 
+        total_entries = 0
+
         for index, prop in enumerate(all_props):
             if not self.is_link_ok_to_add(prop):
                 AppLogging.error(
@@ -68,6 +70,10 @@ class BaseRssPlugin(SourceGenericPlugin):
 
             prop = self.enhance(prop)
             yield prop
+            total_entries += 1
+            
+        if total_entries == 0:
+            AppLogging.error("Url:{}. No links for rss".format(source.url))
 
     def enhance(self, prop):
         prop["link"] = UrlHandler.get_cleaned_link(prop["link"])

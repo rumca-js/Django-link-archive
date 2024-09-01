@@ -49,7 +49,9 @@ class UpdateExportManager(object):
 
     def get_directory(self):
         """
-        Path to place where data are written to
+        Path to place where data are written to.
+        Different types have to occupy different directories,
+        because we do not want different exports to change other exports data
         """
         if self.export_data.export_data == DataExport.EXPORT_DAILY_DATA:
             directory = "daily_data"
@@ -60,13 +62,13 @@ class UpdateExportManager(object):
 
         app = LinkDatabase.name
 
-        return Path(self.export_data.local_path) / app / directory
+        return Path(self._cfg.get_export_path()) / Path(self.export_data.local_path) / directory
 
     def get_repo_operating_dir(self, repo):
         """
         Path to repository, rather absolute
         """
-        return Path(self._cfg.get_export_path()) / self.export_data.local_path / "git"
+        return self.get_directory() / "git"
 
     def push(self):
         export_data = self.export_data
@@ -118,7 +120,7 @@ class UpdateExportManager(object):
                 self.clear_operating_directory(repo)
 
             if repo_is_up:
-                local_dir = self._cfg.get_export_path(self.get_directory())
+                local_dir = self.get_directory()
                 repo.copy_tree(local_dir)
 
                 repo.add([])

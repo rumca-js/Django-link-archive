@@ -32,6 +32,11 @@ class FeedObject(object):
 class FeedReaderEntry(FeedObject):
     def __init__(self, entry_data, ns):
         super().__init__(entry_data, ns)
+        self.read()
+
+    def read(self):
+        if self.root is None:
+            return
 
         self.link = self.try_to_get_attribute("link", "href")
         self.title = self.try_to_get_field("title")
@@ -71,6 +76,11 @@ class FeedReaderEntry(FeedObject):
                 self.author = self.get_prop("itunes:owner/itunes:name")
 
         self.tags = self.try_to_get_field('tags')
+
+        source = {}
+        source["href"] = self.try_to_get_fields("source","href")
+        source["url"] = self.try_to_get_fields("source","url")
+        self.source = source
 
     def try_to_get_field(self, field):
         value = self.get_prop("./" + field)
@@ -167,6 +177,9 @@ class FeedReaderFeed(FeedObject):
         return value
 
     def read(self):
+        if self.root is None:
+            return
+
         self.title = self.try_to_get_field("title")
 
         self.subtitle = self.try_to_get_field('subtitle')
@@ -214,14 +227,15 @@ class FeedReaderFeed(FeedObject):
 class FeedReader(object):
     def __init__(self, contents):
         self.contents = contents.strip()
-        if self.contents.strip().startswith("<html"):
-            self.process_html()
 
-        self.entries = []
+        self.process_html()
+
         self.ns = self.get_namespaces()
         self.root = None
-
         self.title = None
+
+        self.feed = FeedReaderFeed(self.root, ns = self.ns, is_atom=True)
+        self.entries = []
 
     def parse(contents):
         r = FeedReader(contents)
@@ -232,8 +246,13 @@ class FeedReader(object):
         if not self.contents:
             return
 
-        parser = ET.XMLParser(strip_cdata=False)
-        self.root = ET.fromstring(self.contents.encode(), parser=parser)
+        try:
+            parser = ET.XMLParser(strip_cdata=False)
+            self.root = ET.fromstring(self.contents.encode(), parser=parser)
+            print("2")
+        except Exception as E:
+            print(str(E))
+            self.root = None
 
         is_atom = "atom" in self.ns
 
@@ -244,7 +263,8 @@ class FeedReader(object):
         if not entries:
             entries = self.get_items()
 
-        self.read_entries(entries)
+        if entries:
+            self.read_entries(entries)
 
     def get_namespaces(self):
         spaces = {}
@@ -280,6 +300,36 @@ class FeedReader(object):
         return spaces
 
     def process_html(self):
+        # TODO what if we have < html?
+        html_wh = self.contents.strip().find("<html")
+        rss_wh = self.contents.strip().find("<rss")
+
+        if html_wh != -1 and rss_wh != -1:
+            if self.process_html_raw():
+                return True
+
+        rss_wh = self.contents.strip().find("&gt;rss")
+        if rss_wh != -1:
+            if self.process_html_encoded():
+                return True
+
+    def process_html_raw(self):
+        wh = self.contents.find("<rss")
+        if wh == -1:
+            self.contents = None
+            return False
+
+        last_wh = self.contents.rfind("</rss>")
+        if last_wh == -1:
+            self.contents = None
+            return False
+
+        # +4 to compensate for &gt; text
+        self.contents = self.contents[wh: last_wh + 6]
+
+        return True
+
+    def process_html_encoded(self):
         wh = self.contents.find("&lt;")
         if wh == -1:
             self.contents = None
@@ -301,6 +351,9 @@ class FeedReader(object):
             self.entries.append(FeedReaderEntry(entry, self.ns))
 
     def get_entries(self):
+        if self.root is None:
+            return
+
         entries = self.root.findall('.//entry', self.ns)
         if len(entries) > 0:
             return entries
@@ -311,6 +364,9 @@ class FeedReader(object):
                 return entries
 
     def get_items(self):
+        if self.root is None:
+            return
+
         entries = self.root.findall('.//item', self.ns)
         if len(entries) > 0:
             return entries

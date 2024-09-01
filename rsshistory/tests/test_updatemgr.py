@@ -377,7 +377,7 @@ class UpdateExportManagerTest(FakeInternetTestCase):
 
         mgr = UpdateExportManager(config, RepoTestFactory, export_config)
 
-        expected_path = Path("./notime_dir") / LinkDatabase.name / "notime_data"
+        expected_path = Path(config.config_entry.data_export_path) / LinkDatabase.name / Path("./notime_dir") / "notime_data"
 
         self.assertEqual(mgr.get_directory(), expected_path)
 
@@ -390,6 +390,6 @@ class UpdateExportManagerTest(FakeInternetTestCase):
 
         mgr = UpdateExportManager(config, RepoTestFactory, export_config)
 
-        expected_path = Path("./daily_dir") / LinkDatabase.name / "daily_data"
+        expected_path = Path(config.config_entry.data_export_path) / LinkDatabase.name / Path("./daily_dir")  / "daily_data"
 
         self.assertEqual(mgr.get_directory(), expected_path)
