@@ -289,7 +289,8 @@ def main():
 
     p = FeedClient(sources = sources, day_limit=7, engine=engine)
 
-    # WebConfig.use_print_logging()
+    if p.parser.args.verbose:
+        WebConfig.use_print_logging()
 
     # scraping server is not running, we do not use port
     HttpPageHandler.crawling_server_port = 0

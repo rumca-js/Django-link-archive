@@ -218,9 +218,10 @@ User actions are tracked by the system, only if it is configured so:
 Web-scraping functionality can be also used without django.
 
 There are some scripts that can be used without Django application:
- - example_feedclient.py - example script that can serve as a simple RSS reader
+ - yafr.py - yet another feed reader
  - example_page_crawler.py - example script that can crawl through web page
  - example_compare_crawlers.py - shows how much time it takes to execute different crawlers
+ - example_page_props.py - shows page properties
  - converter.py - converts JSON files to SQLite table
  - dataanalyzer.py - analyzes data in JSON files / SQLite table. You can query the data
  - script_server.py - server that can be used to dispatch crawlers for certain URLs, to obtain meta data
