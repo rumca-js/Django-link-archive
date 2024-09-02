@@ -191,6 +191,7 @@ class SourcesTable(Base):
     __tablename__ = "sources"
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    enabled: Mapped[bool] = mapped_column(default=True)
     url : Mapped[str] = mapped_column(unique=True)
     title: Mapped[str]
 
@@ -211,6 +212,29 @@ class SourcesTableController(object):
         session = self.get_session()
         sources = session.query(SourcesTable).all()
         return sources
+
+    def is_source(self, id=None, url=None):
+        session = self.get_session()
+
+        if id:
+            sources = session.query(SourcesTable).filter(SourcesTable.id == int(id)).all()
+            if len(sources) != 0:
+                return True
+        if url:
+            sources = session.query(SourcesTable).filter(SourcesTable.url == url).all()
+            if len(sources) != 0:
+                return True
+
+    def get(self, id=None, url=None):
+        session = self.get_session()
+
+        try:
+            if id:
+                return session.query(SourcesTable).filter(SourcesTable.id == int(id)).one()
+            if url:
+                return session.query(SourcesTable).filter(SourcesTable.url == url).one()
+        except Exception as E:
+            pass
 
 
 class SourceOperationalData(Base):

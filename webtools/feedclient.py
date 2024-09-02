@@ -2,6 +2,7 @@
 This is example script about how to use this project as a simple RSS reader
 """
 import argparse
+import sys
 import asyncio
 from pathlib import Path
 import shutil
@@ -24,6 +25,7 @@ from webtools import (
     WebLogger,
     PrintWebLogger,
     Url,
+    RssPage,
     HttpPageHandler,
 )
 from utils.dateutils import DateUtils
@@ -63,6 +65,8 @@ def read_source(db, source):
             item["source_title"] = source_title
             result.append(item)
 
+    print("\rRead:{}".format(source_url), end="")
+
     return result
 
 
@@ -89,11 +93,11 @@ def fetch(db, parser, day_limit):
     """
     session = db.session_factory()
     q = session.query(EntriesTable)
-    print("Number of entries:{}".format(q.count()))
+    print("")
 
     #sources = SourcesTable.query.all()
     c = SourcesTableController(db)
-    sources = c.get_all()
+    sources = session.query(SourcesTable).filter(SourcesTable.enabled == True).all()
 
     for source in sources:
         date_now = DateUtils.get_datetime_now_utc()
@@ -116,7 +120,7 @@ def fetch(db, parser, day_limit):
         op_con = SourceOperationalDataController(db, session)
         op_con.set_fetched(source, date_now)
 
-        print("Reading {}".format(source.url))
+        print("\rReading {}".format(source.url), end="")
         source_entries = read_source(db, source)
 
         for entry in source_entries:
@@ -138,6 +142,7 @@ async def fetch_async(db, parser, day_limit):
     Async version is faster than sequentially asking all sites.
     fetch time is used to not spam servers every time you refresh anything
     """
+    print("")
     session = db.session_factory()
 
     sources = session.query(SourcesTable).all()
@@ -164,7 +169,7 @@ async def fetch_async(db, parser, day_limit):
         op_con = SourceOperationalDataController(db, session)
         op_con.set_fetched(source, date_now)
 
-        print("Reading:{}".format(source.title))
+        print("\rReading:{}".format(source.title), end="")
 
         thread = asyncio.to_thread(read_source, db, source)
         threads.append(thread)
@@ -257,6 +262,28 @@ def unfollow_url(db, url):
     return True
 
 
+def source_enable(db, session, source):
+    if source.enabled == True:
+        return False
+
+    source.enabled = True
+
+    session.commit()
+
+    return True
+
+
+def source_disable(db, session, source):
+    if source.enabled == False:
+        return False
+
+    source.enabled = False
+
+    session.commit()
+
+    return True
+
+
 def add_init_sources(db, sources):
     session = db.session_factory()
 
@@ -277,8 +304,53 @@ def list_sources(db):
     sources = session.query(SourcesTable).all()
 
     for source in sources:
-        print("Title:{}".format(source.title))
+        print("[{}] Title:{} Enabled:{}".format(source.id, source.title, source.enabled))
         print("Url:{}".format(source.url))
+
+
+def show_page_details(url, verbose=False):
+    u = Url(url)
+    u.get_response()
+
+    print("Handler:{}".format(type(u.get_handler())))
+    print("Title:{}".format(u.get_title()))
+    print("Description:{}".format(u.get_description()))
+    print("Language:{}".format(u.get_language()))
+    print("Author:{}".format(u.get_author()))
+    print("Album:{}".format(u.get_album()))
+    print("Response is valid?:{}".format(u.get_response().is_valid()))
+
+    handler = u.get_handler()
+    if type(handler) is HttpPageHandler:
+        if type(handler.p) is RssPage:
+            print("Feed title:{}".format(handler.p.feed.feed.title))
+            print("Feed description:{}".format(handler.p.feed.feed.description))
+            print("Feed published:{}".format(handler.p.feed.feed.published))
+
+            index = 0
+            for entry in handler.p.feed.entries:
+                if index == 0:
+                    print("Feed Entry Link:{}".format(entry.link))
+                    print("Feed Entry Title:{}".format(entry.title))
+                index += 1
+
+            print("Feed Entries:{}".format(index))
+
+            index = 0
+            for entry in handler.p.get_entries():
+                if index == 0:
+                    print("Entry Link:{}".format(entry["link"]))
+                    print("Entry Title:{}".format(entry["title"]))
+                index += 1
+            print("Entries:{}".format(index))
+
+    if u.get_contents():
+        if verbose:
+            print(u.get_contents())
+        else:
+            print("Contents?:Yes")
+    else:
+        print("Contents?:No")
 
 
 class FeedClientParser(object):
@@ -300,8 +372,11 @@ class FeedClientParser(object):
         self.parser.add_argument("--cleanup", action="store_true", help="Remove unreferenced items")
         self.parser.add_argument("--follow", help="Follows specific url")
         self.parser.add_argument("--unfollow", help="Unfollows specific url")
+        self.parser.add_argument("--enable", help="Enables specific source")
+        self.parser.add_argument("--disable", help="Disables specific source")
         self.parser.add_argument("--list-sources",action="store_true", help="Lists sources")
         self.parser.add_argument("--init-sources",action="store_true", help="Initializes sources")
+        self.parser.add_argument("--page-details", help="Shows page details")
         self.parser.add_argument("-v", "--verbose",action="store_true", help="Verbose")
         self.parser.add_argument("--db", default="feedclient.db", help="SQLite database file")
 
@@ -338,6 +413,28 @@ class FeedClient(object):
         if self.parser.args.unfollow:
             unfollow_url(db, self.parser.args.unfollow)
 
+        if self.parser.args.enable:
+            c = SourcesTableController(db)
+            source = c.get(id = self.parser.args.enable)
+            if source:
+                if source_enable(db, c.get_session(), source):
+                    print("Source was enabled")
+                else:
+                    print("Cannot enable {}".format(self.parser.args.enable))
+            else:
+                print("Source does not exist")
+
+        if self.parser.args.disable:
+            c = SourcesTableController(db)
+            source = c.get(id = self.parser.args.disable)
+            if source:
+                if source_disable(db, c.get_session(), source):
+                    print("Source was disabled")
+                else:
+                    print("Cannot disable source")
+            else:
+                print("Source does not exist")
+
         # one of the below needs to be true
         if self.parser.args.refresh_on_start:
             c = EntriesTableController(db)
@@ -371,6 +468,9 @@ class FeedClient(object):
 
             w = HtmlExporter(directory, entries, verbose = verbose)
             w.write()
+
+        if self.parser.args.page_details:
+            show_page_details(self.parser.args.page_details, self.parser.args.verbose)
 
         elif self.parser.args.print:
             w = OutputWriter(db)

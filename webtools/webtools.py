@@ -51,7 +51,7 @@ from bs4 import BeautifulSoup
 
 from utils.dateutils import DateUtils
 
-__version__ = "0.0.1"
+__version__ = "0.0.2"
 
 
 

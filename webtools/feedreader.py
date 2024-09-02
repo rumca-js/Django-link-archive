@@ -78,8 +78,12 @@ class FeedReaderEntry(FeedObject):
         self.tags = self.try_to_get_field('tags')
 
         source = {}
-        source["href"] = self.try_to_get_fields("source","href")
-        source["url"] = self.try_to_get_fields("source","url")
+        source["href"] = self.try_to_get_attribute("source","href")
+        if not source["href"]:
+            source["href"] = self.try_to_get_fields("source","href")
+        source["url"] = self.try_to_get_attribute("source","url")
+        if not source["url"]:
+            source["url"] = self.try_to_get_fields("source","url")
         self.source = source
 
     def try_to_get_field(self, field):
@@ -178,10 +182,17 @@ class FeedReaderFeed(FeedObject):
 
     def read(self):
         if self.root is None:
+            self.title = None
+            self.subtitle = None
+            self.description = None
+            self.language = None
+            self.published = None
+            self.author = None
+            self.tags = []
+            self.image = None
             return
 
         self.title = self.try_to_get_field("title")
-
         self.subtitle = self.try_to_get_field('subtitle')
         self.description = self.try_to_get_field('description')
         self.language = self.try_to_get_field('language')
@@ -230,12 +241,8 @@ class FeedReader(object):
 
         self.process_html()
 
-        self.ns = self.get_namespaces()
+        self.ns = {}
         self.root = None
-        self.title = None
-
-        self.feed = FeedReaderFeed(self.root, ns = self.ns, is_atom=True)
-        self.entries = []
 
     def parse(contents):
         r = FeedReader(contents)
@@ -243,16 +250,24 @@ class FeedReader(object):
         return r
 
     def parse_implementation(self):
+        # initial?
+        self.feed = FeedReaderFeed(self.root, self.ns, is_atom=True)
+        self.entries = []
+
         if not self.contents:
             return
 
         try:
-            parser = ET.XMLParser(strip_cdata=False)
+            # recover - from errors, additional texts should not lead to processing errors
+            # RSS feeds use CDATA for titles etc.
+            parser = ET.XMLParser(strip_cdata=False, recover=True)
             self.root = ET.fromstring(self.contents.encode(), parser=parser)
-            print("2")
         except Exception as E:
             print(str(E))
             self.root = None
+
+        if self.root is not None:
+            self.ns = self.root.nsmap
 
         is_atom = "atom" in self.ns
 
@@ -265,39 +280,6 @@ class FeedReader(object):
 
         if entries:
             self.read_entries(entries)
-
-    def get_namespaces(self):
-        spaces = {}
-
-        wh = 0
-        while wh != -1:
-            xmlns_wh = self.contents.find("xmlns", wh)
-            if xmlns_wh == -1:
-                break
-            xmlns_comma_wh = self.contents.find(":", xmlns_wh)
-            if xmlns_comma_wh == -1:
-                break
-            xmlns_eq_wh = self.contents.find("=", xmlns_wh)
-            if xmlns_eq_wh == -1:
-                break
-            xmlns_quote1_wh = self.contents.find('"', xmlns_eq_wh)
-            if xmlns_quote1_wh == -1:
-                break
-            xmlns_quote2_wh = self.contents.find('"', xmlns_quote1_wh + 1)
-            if xmlns_quote2_wh == -1:
-                break
-
-            if xmlns_comma_wh > xmlns_eq_wh:
-                ns = ""
-            else:
-                ns = self.contents[xmlns_comma_wh+1 : xmlns_eq_wh]
-            link = self.contents[xmlns_quote1_wh+1: xmlns_quote2_wh]
-
-            spaces[ns] = link
-
-            wh = xmlns_quote2_wh + 1
-
-        return spaces
 
     def process_html(self):
         # TODO what if we have < html?

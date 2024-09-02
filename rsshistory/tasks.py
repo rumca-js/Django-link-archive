@@ -18,7 +18,7 @@ def process_jobs_task(Processor):
     """!
     Checks for new entries in sources
     """
-    LinkDatabase.info("process_jobs_task")
+    LinkDatabase.info("process_jobs_task {}".format(str(Processor)))
 
     try:
         c = Configuration.get_object()
@@ -30,9 +30,9 @@ def process_jobs_task(Processor):
         handler = Processor()
         handler.run()
     except Exception as E:
-        AppLogging.exc(E, "Exception in processor task")
+        AppLogging.exc(E, "Exception in process_jobs_task {}".format(str(Processor)))
 
-    LinkDatabase.info("process_jobs_task DONE")
+    LinkDatabase.info("process_jobs_task {} DONE".format(str(Processor)))
 
 
 def get_processors():

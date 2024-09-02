@@ -5,6 +5,7 @@ Some crawlers / scrapers cannot be easily called from a thread, etc, because of 
 """
 
 import json
+import traceback
 
 from .webtools import (
     RssPage,

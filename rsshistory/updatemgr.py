@@ -7,16 +7,8 @@ from utils.dateutils import DateUtils
 from .apps import LinkDatabase
 from .models import AppLogging, DataExport
 from .controllers import SourceDataController, LinkDataController
-from .repotypes import *
+from .repotypes import RepoFactory
 from .datawriter import DataWriter, DataWriterConfiguration
-
-
-class RepoFactory(object):
-    def get(export_data):
-        if export_data.export_type == DataExport.EXPORT_TYPE_GIT:
-            return DefaultRepo
-
-        # TODO add support for more repo types. SMB?
 
 
 class UpdateExportManager(object):
@@ -33,13 +25,15 @@ class UpdateExportManager(object):
         self.clear()
 
     def write(self):
+        AppLogging.notify("Writing to directory: {}".format(self.get_write_directory()))
+
         if self.date:
             config = DataWriterConfiguration(
-                self._cfg, self.export_data, self.get_directory(), self.date.isoformat()
+                self._cfg, self.export_data, self.get_write_directory(), self.date.isoformat()
             )
         else:
             config = DataWriterConfiguration(
-                self._cfg, self.export_data, self.get_directory()
+                self._cfg, self.export_data, self.get_write_directory()
             )
 
         self.writer_config = config
@@ -64,11 +58,14 @@ class UpdateExportManager(object):
 
         return Path(self._cfg.get_export_path()) / Path(self.export_data.local_path) / directory
 
-    def get_repo_operating_dir(self, repo):
+    def get_repo_operating_dir(self):
         """
         Path to repository, rather absolute
         """
         return self.get_directory() / "git"
+
+    def get_write_directory(self):
+        return self.get_directory() / "write"
 
     def push(self):
         export_data = self.export_data
@@ -89,8 +86,8 @@ class UpdateExportManager(object):
 
             shutil.rmtree(dir)
 
-    def clear_operating_directory(self, repo):
-        dir = self.get_repo_operating_dir(repo)
+    def clear_operating_directory(self):
+        dir = self.get_repo_operating_dir()
         if dir.exists():
             import shutil
 
@@ -101,10 +98,7 @@ class UpdateExportManager(object):
 
         if export_data.export_type == DataExport.EXPORT_TYPE_GIT:
             repo_class = self.repo_builder.get(export_data)
-            repo = repo_class(export_data)
-
-            operating_dir = self.get_repo_operating_dir(repo)
-            repo.set_operating_dir(operating_dir)
+            repo = repo_class(export_data, operating_dir = self.get_repo_operating_dir())
 
             repo_is_up = False
             try:
@@ -117,10 +111,10 @@ class UpdateExportManager(object):
                         operating_dir
                     ),
                 )
-                self.clear_operating_directory(repo)
+                self.clear_operating_directory()
 
             if repo_is_up:
-                local_dir = self.get_directory()
+                local_dir = self.get_write_directory()
                 repo.copy_tree(local_dir)
 
                 repo.add([])

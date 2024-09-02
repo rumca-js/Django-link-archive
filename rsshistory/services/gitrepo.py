@@ -5,11 +5,14 @@ from ..models import AppLogging
 
 
 class GitRepo(object):
-    def __init__(self, git_data, timeout_s=60 * 60):
+    def __init__(self, git_data, timeout_s=60 * 60, operating_dir = None):
         self.git_data = git_data
         self.git_repo = git_data.remote_path
         self.timeout_s = timeout_s
-        self.operating_dir = self.git_data.local_path
+        if not operating_dir:
+            self.operating_dir = self.git_data.local_path
+        else:
+            self.operating_dir = operating_dir
         self.is_different_flag = None
 
     def get_local_dir(self):

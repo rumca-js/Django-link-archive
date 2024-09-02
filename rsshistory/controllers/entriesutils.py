@@ -126,25 +126,25 @@ class EntriesCleanup(object):
     def cleanup_remove_entries(self, limit_s=0):
         sources = SourceDataController.objects.all()
         for source in sources:
-            AppLogging.debug("Removing for source:{}".format(source.title))
+            #AppLogging.debug("Removing for source:{}".format(source.title))
             entries = self.get_source_entries(source)
 
             if entries:
-                for entry in entries:
-                    AppLogging.debug("Removing source entry:{}".format(entry.link))
+                #for entry in entries:
+                #    AppLogging.debug("Removing source entry:{}".format(entry.link))
                 entries.delete()
 
         entries = self.get_general_entries()
         if entries:
-            for entry in entries:
-                AppLogging.debug("Removing general entry:{}".format(entry.link))
+            #for entry in entries:
+            #    AppLogging.debug("Removing general entry:{}".format(entry.link))
             entries.delete()
 
         if not self.archive_cleanup:
             entries = self.get_stale_entries()
             if entries:
-                for entry in entries:
-                    AppLogging.debug("Removing stale entry:{}".format(entry.link))
+                #for entry in entries:
+                #    AppLogging.debug("Removing stale entry:{}".format(entry.link))
                 entries.delete()
 
         return True
@@ -839,10 +839,9 @@ class EntryWrapper(object):
         self.date = date
         self.entry = entry
 
-        if link is None:
-            if self.entry:
-                self.link = self.entry.link
-        else:
+        if self.entry:
+            self.link = self.entry.link
+        if link:
             self.link = link
 
         if date is None:

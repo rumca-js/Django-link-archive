@@ -245,10 +245,10 @@ def system_status(request):
     p.context["ArchiveLinkDataModel"] = ArchiveLinkDataController.objects.count()
     p.context["KeyWords"] = KeyWords.objects.count()
 
-    u = EntriesUpdater()
-    entries = u.get_entries_to_update()
-    if entries:
-        p.context["LinkDataModel_toupdate"] = entries.count()
+    #u = EntriesUpdater()
+    #entries = u.get_entries_to_update()
+    #if entries:
+    #    p.context["LinkDataModel_toupdate"] = entries.count()
 
     p.context["UserTags"] = UserTags.objects.count()
     p.context["UserVotes"] = UserVotes.objects.count()

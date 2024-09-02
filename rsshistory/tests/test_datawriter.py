@@ -122,7 +122,7 @@ class DataWriterTest(FakeInternetTestCase):
 
         conf = Configuration.get_object()
 
-        dw_conf = DataWriterConfiguration(conf, self.export_daily, "daily_data")
+        dw_conf = DataWriterConfiguration(conf, self.export_daily, Path("./data/test/daily_data"))
         writer = DataWriter.get(dw_conf)
 
         # call tested function
@@ -139,7 +139,7 @@ class DataWriterTest(FakeInternetTestCase):
 
         conf = Configuration.get_object()
 
-        dw_conf = DataWriterConfiguration(conf, self.export_year, "year")
+        dw_conf = DataWriterConfiguration(conf, self.export_year, Path("./data/test/year"))
         writer = DataWriter.get(dw_conf)
         # call tested function
         writer.write()
@@ -148,8 +148,8 @@ class DataWriterTest(FakeInternetTestCase):
         self.assertEqual(links.count(), 2)
 
         json_file = (
-            conf.get_export_path()
-            / self.export_year.local_path
+            Path("./data")
+            / "test"
             / "year"
             / "2023"
             / "bookmarks_entries.json"
@@ -161,16 +161,16 @@ class DataWriterTest(FakeInternetTestCase):
         self.assertEqual(len(json_obj), 1)
 
         json_file = (
-            conf.get_export_path()
-            / self.export_year.local_path
+            Path("./data")
+            / "test"
             / "year"
             / "sources.json"
         )
         self.assertEqual(json_file.exists(), True)
 
         json_file = (
-            conf.get_export_path()
-            / self.export_year.local_path
+            Path("./data")
+            / "test"
             / "year"
             / "2024"
             / "bookmarks_entries.json"
@@ -184,7 +184,7 @@ class DataWriterTest(FakeInternetTestCase):
 
         conf = Configuration.get_object()
 
-        dw_conf = DataWriterConfiguration(conf, self.export_notime, "notime")
+        dw_conf = DataWriterConfiguration(conf, self.export_notime, Path("./data/test/notime"))
         writer = DataWriter.get(dw_conf)
         # call tested function
         writer.write()
@@ -193,8 +193,8 @@ class DataWriterTest(FakeInternetTestCase):
         self.assertEqual(links.count(), 2)
 
         permanent_path = (
-            conf.get_export_path()
-            / self.export_year.local_path
+            Path("./data")
+            / "test"
             / "notime"
             / "permanent"
             / "00000"
@@ -202,8 +202,8 @@ class DataWriterTest(FakeInternetTestCase):
         self.assertEqual(permanent_path.exists(), True)
 
         json_file = (
-            conf.get_export_path()
-            / self.export_year.local_path
+            Path("./data")
+            / "test"
             / "notime"
             / "sources.json"
         )
@@ -217,15 +217,15 @@ class DataWriterTest(FakeInternetTestCase):
         conf = Configuration.get_object()
 
         dw_conf = DataWriterConfiguration(
-            conf, self.export_daily, "daily_data", "2023-03-03"
+            conf, self.export_daily, Path("./data/test/daily_data"), "2023-03-03"
         )
         writer = DataWriter.get(dw_conf)
         # call tested function
         writer.write()
 
         json_file = (
-            conf.get_export_path()
-            / self.export_year.local_path
+            Path("./data")
+            / "test"
             / "daily_data"
             / "2023"
             / "03"
@@ -237,8 +237,8 @@ class DataWriterTest(FakeInternetTestCase):
         self.assertEqual(len(json_obj), 3)
 
         json_file = (
-            conf.get_export_path()
-            / self.export_year.local_path
+            Path("./data")
+            / "test"
             / "daily_data"
             / "sources.json"
         )
@@ -246,8 +246,8 @@ class DataWriterTest(FakeInternetTestCase):
 
         # 2024 should not be exported
         json_file = (
-            conf.get_export_path()
-            / self.export_year.local_path
+            Path("./data")
+            / "test"
             / "daily_data"
             / "2024"
             / "03"
@@ -270,7 +270,7 @@ class DataWriterTest(FakeInternetTestCase):
 
         conf = Configuration.get_object()
 
-        dw_conf = DataWriterConfiguration(conf, self.export_notime, "notime")
+        dw_conf = DataWriterConfiguration(conf, self.export_notime, Path("./data/test/notime"))
         writer = DataWriter.get(dw_conf)
         # call tested function
         writer.write()
@@ -279,8 +279,8 @@ class DataWriterTest(FakeInternetTestCase):
         self.assertEqual(links.count(), 2)
 
         permanent_path = (
-            conf.get_export_path()
-            / self.export_year.local_path
+            Path("./data")
+            / "test"
             / "notime"
             / "permanent"
             / "00000"
@@ -288,13 +288,13 @@ class DataWriterTest(FakeInternetTestCase):
         self.assertEqual(permanent_path.exists(), True)
 
         json_dir = (
-            conf.get_export_path() / self.export_year.local_path / "notime" / "sources"
+            Path("./data") / "test" / "notime" / "sources"
         )
         self.assertEqual(json_dir.exists(), True)
 
         json_file = (
-            conf.get_export_path()
-            / self.export_year.local_path
+            Path("./data")
+            / "test"
             / "notime"
             / "sources"
             / "00000"

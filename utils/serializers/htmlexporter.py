@@ -58,6 +58,7 @@ class HtmlEntryExporter(object):
         entry = self.entry
 
         # index.html entry text
+        id = entry.id
         thumbnail = entry.thumbnail
         title = entry.title
         link = entry.link
@@ -101,7 +102,7 @@ class HtmlEntryExporter(object):
             c = InputContent(description)
             description = c.htmlify()
 
-        text += f'<h1>{title}</h1>'
+        text += f'<h1>[{id}] {title}</h1>'
         text += f'</a>'
         text += f'<div>{source}</div>'
         text += f'<div>{date_published}</div>'
