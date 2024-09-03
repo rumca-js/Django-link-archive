@@ -87,9 +87,13 @@ For full setup
  $ make run
 ```
 
+## Script server
+
+With django script_server.py server could be started. The server is responsible for scraping handling requests for pages.
+
 ## Setup
 
-After starting server it could be convenient to start script_server.py, which operates as middle-man between apps, and requests.
+After starting django application define RSS sources, start using app.
 
 # Advanced
 
