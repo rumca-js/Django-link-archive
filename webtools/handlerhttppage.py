@@ -376,11 +376,15 @@ class HttpRequestBuilder(object):
         file_name_url_part = fix_path_for_os(request.url)
         file_name_url_part = file_name_url_part.replace("\\", "")
         file_name_url_part = file_name_url_part.replace("/", "")
+        file_name_url_part = file_name_url_part.replace("@", "")
 
         response_file_location = "response_{}.txt".format(file_name_url_part)
 
         if HttpPageHandler.script_responses_directory is not None:
-            response_file_location = Path(HttpPageHandler.script_responses_directory) / response_file_location
+            response_dir = Path(HttpPageHandler.script_responses_directory)
+            response_dir.mkdir(parents=True, exist_ok=True)
+
+            response_file_location = response_dir / response_file_location
 
         script = script + ' --url "{}" --output-file="{}"'.format(request.url, str(response_file_location))
 
@@ -418,25 +422,15 @@ class HttpRequestBuilder(object):
                     request.url, p.returncode
                 )
             )
-            return
 
         if response_file_location.exists():
             with open(str(response_file_location), "rb") as fh:
                 all_bytes = fh.read()
 
-                return get_response_from_bytes(all_bytes)
+                response = get_response_from_bytes(all_bytes)
 
-            WebLogger.error(
-                "Url:{}. Not found response in response file:{}".format(
-                    request.url, str(response_file_location)
-                )
-            )
-            return PageResponseObject(
-                request.url,
-                text=None,
-                status_code=HTTP_STATUS_CODE_EXCEPTION,
-                request_url=request.url,
-            )
+                response_file_location.unlink()
+                return response
 
         else:
             WebLogger.error(

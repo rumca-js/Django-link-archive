@@ -49,7 +49,7 @@ except Exception as E:
     crawlee_feataure_enabled = False
 
 
-def on_close(interface, response, status_code):
+def on_close(interface, response, status_code = 0):
     interface.response = response
     interface.save_response()
     cleanup_storage()

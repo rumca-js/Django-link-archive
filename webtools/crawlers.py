@@ -6,6 +6,7 @@ Some crawlers / scrapers cannot be easily called from a thread, etc, because of 
 
 import json
 import traceback
+from pathlib import Path
 
 from .webtools import (
     RssPage,
@@ -111,6 +112,10 @@ class CrawlerInterface(object):
         all_bytes = self.response_to_bytes()
 
         if self.response_file:
+            path = Path(self.response_file)
+            if not path.parent.exists():
+                path.parent.mkdir(parents=True, exist_ok=True)
+
             with open(self.response_file, "wb") as fh:
                 fh.write(all_bytes)
 
@@ -121,8 +126,6 @@ class CrawlerInterface(object):
 
         else:
             response = self.get_response()
-            print("Response:{}".format(response))
-            print(response.text)
 
         return True
 
