@@ -28,6 +28,7 @@ def main():
         print("Running request:{} with SeleniumChromeHeadless".format(request))
 
     if not driver.run():
+        print("Cannot start driver")
         sys.exit(1)
         return
     driver.save_response()

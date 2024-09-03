@@ -2,6 +2,8 @@ import traceback
 from django.db.models import Q
 from django.utils.http import urlencode
 
+from utils.omnisearch import SingleSymbolEvaluator, OmniSearch
+
 from .controllers import (
     SourceDataController,
     LinkDataController,
@@ -10,8 +12,6 @@ from .controllers import (
 )
 from .apps import LinkDatabase
 from .models import UserConfig, AppLogging
-
-from .omnisearch import SingleSymbolEvaluator, OmniSearch
 
 
 class BaseQueryFilter(object):

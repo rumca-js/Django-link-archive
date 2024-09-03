@@ -1,11 +1,13 @@
 import subprocess
 import json
+from pathlib import Path
 
 from urllib3.exceptions import InsecureRequestWarning
 from urllib3 import disable_warnings
 from datetime import timedelta
 
 from utils.dateutils import DateUtils
+from utils.basictypes import fix_path_for_os
 
 from .webtools import (
     ContentInterface,
@@ -366,8 +368,19 @@ class HttpRequestBuilder(object):
         file_path = os.path.realpath(__file__)
         full_path = Path(file_path)
 
-        operating_path = full_path.parents[2]
-        response_file_location = full_path.parents[1] / "response.txt"
+        if HttpPageHandler.script_operating_dir is None:
+            operating_path = full_path.parents[1]
+        else:
+            operating_path = Path(HttpPageHandler.script_operating_dir)
+
+        file_name_url_part = fix_path_for_os(request.url)
+        file_name_url_part = file_name_url_part.replace("\\", "")
+        file_name_url_part = file_name_url_part.replace("/", "")
+
+        response_file_location = "response_{}.txt".format(file_name_url_part)
+
+        if HttpPageHandler.script_responses_directory is not None:
+            response_file_location = Path(HttpPageHandler.script_responses_directory) / response_file_location
 
         script = script + ' --url "{}" --output-file="{}"'.format(request.url, str(response_file_location))
 
@@ -390,11 +403,22 @@ class HttpRequestBuilder(object):
         )
 
         if p.returncode != 0:
-            return
+            if p.stdout:
+                stdout_str = p.stdout.decode()
+                if stdout_str != "":
+                    WebLogger.debug(stdout_str)
 
-        if p.stdout:
-            stdout_str = p.stdout.decode()
-            WebLogger.debug(stdout_str)
+            if p.stderr:
+                stderr_str = p.stderr.decode()
+                if stderr_str and stderr_str != "":
+                    WebLogger.error("Url:{}. {}".format(request.url, stderr_str))
+
+            WebLogger.error(
+                "Url:{}. Return code invalid:{}".format(
+                    request.url, p.returncode
+                )
+            )
+            return
 
         if response_file_location.exists():
             with open(str(response_file_location), "rb") as fh:
@@ -415,10 +439,11 @@ class HttpRequestBuilder(object):
             )
 
         else:
-            if p.stderr:
-                stderr_str = p.stderr.decode()
-                if stderr_str and stderr_str != "":
-                    WebLogger.error("Url:{}. {}".format(request.url, stderr_str))
+            WebLogger.error(
+                "Url:{}. Response file does not exist:{}".format(
+                    request.url, str(response_file_location)
+                )
+            )
 
         return PageResponseObject(
             request.url,
@@ -563,6 +588,9 @@ class HttpPageHandler(ContentInterface):
     crawling_headless_script = None
     crawling_full_script = None
     crawling_server_port = None
+
+    script_operating_dir = None
+    script_responses_directory = Path("storage")
 
     def __init__(self, url=None, page_options=None):
         super().__init__(url=url, contents=None)

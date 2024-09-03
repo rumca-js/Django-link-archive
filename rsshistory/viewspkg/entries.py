@@ -12,6 +12,7 @@ from django.core.paginator import Paginator
 from webtools import Url, DomainAwarePage, DomainCache
 from utils.dateutils import DateUtils
 from utils.serializers import ReturnDislike
+from utils.omnisearch import SingleSymbolEvaluator
 
 from ..apps import LinkDatabase
 from ..models import (
@@ -49,7 +50,6 @@ from ..forms import (
 )
 from ..views import ViewPage
 from ..queryfilters import EntryFilter, OmniSearchFilter
-from ..omnisearch import SingleSymbolEvaluator
 from ..configuration import Configuration
 from ..pluginurl import UrlHandler
 from ..services import WaybackMachine

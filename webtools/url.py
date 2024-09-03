@@ -83,7 +83,9 @@ class Url(ContentInterface):
         if self.contents:
             return self.contents
 
-        self.handler = self.get_handler_implementation()
+        if not self.handler:
+            self.handler = self.get_handler_implementation()
+
         if self.handler:
             self.contents = self.handler.get_contents()
             self.response = self.handler.get_response()
@@ -185,7 +187,7 @@ class Url(ContentInterface):
 
         handlers = Url.get_handlers()
         for handler in handlers:
-            h = handler(url = self.url)
+            h = handler(url = self.url, page_options=self.options)
             if h.is_handled_by():
                 return h
 
@@ -385,6 +387,8 @@ class Url(ContentInterface):
         # to work around cookie banner requests
         if url.find("youtube.com/user/") >= 0 or url.find("youtube.com/channel/") >= 0:
             return True
+        if url.find("youtube.com/@") >= 0:
+            return True
 
         return False
 
@@ -420,6 +424,10 @@ class Url(ContentInterface):
         handler = u.get_handler()
 
         if type(handler) is Url.youtube_channel_handler:
+            if handler.is_channel_name():
+                rss_url = handler.get_channel_feed_url()
+                if rss_url:
+                    return Url(url = rss_url)
             return u
         elif type(handler) is Url.youtube_video_handler:
             if page_url == handler.get_channel_feed_url():

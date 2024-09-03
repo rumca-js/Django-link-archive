@@ -29,6 +29,7 @@ def main():
         print("Running request:{} with SeleniumChromeFull".format(request))
 
     if not driver.run():
+        print("Cannot start driver")
         sys.exit(1)
         return
 

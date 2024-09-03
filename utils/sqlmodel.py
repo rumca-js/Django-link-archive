@@ -303,3 +303,9 @@ class SqlModel(object):
 
         Base.metadata.create_all(self.engine)
         return _SessionFactory()
+
+    def get_session(self):
+        _SessionFactory = sessionmaker(bind=self.engine)
+
+        Base.metadata.create_all(self.engine)
+        return _SessionFactory()

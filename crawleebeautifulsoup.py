@@ -20,8 +20,15 @@ from datetime import timedelta
 import json
 import webtools
 import traceback
+import shutil
 
 os.environ["CRAWLEE_STORAGE_DIR"] = "./storage/{}".format(os.getpid())
+
+
+def cleanup_storage():
+    path = os.environ["CRAWLEE_STORAGE_DIR"]
+    # cannot remove it yet, when program is running :(
+    #shutil.rmtree(path)
 
 
 crawlee_feataure_enabled = True
@@ -42,6 +49,13 @@ except Exception as E:
     crawlee_feataure_enabled = False
 
 
+def on_close(interface, response, status_code):
+    interface.response = response
+    interface.save_response()
+    cleanup_storage()
+    #crawlee complains if we kill it like this sys.exit(0)
+
+
 async def main() -> None:
     webtools.WebConfig.use_print_logging() 
 
@@ -52,13 +66,16 @@ async def main() -> None:
         return
 
     if not crawlee_feataure_enabled:
-        sys.exit(1)
         print("Python: crawlee package is not available")
+        sys.exit(1)
         return
 
     request = parser.get_request()
     if parser.args.verbose:
         print("Running request:{} with BeautifulSoupCrawler".format(request))
+
+    interface = webtools.ScriptCrawlerInterface(parser, request)
+    response = webtools.PageResponseObject(request.url)
 
     crawler = BeautifulSoupCrawler(
         # Limit the crawl to max requests. Remove or increase it for crawling all links.
@@ -72,9 +89,6 @@ async def main() -> None:
     @crawler.router.default_handler
     async def request_handler(context: BeautifulSoupCrawlingContext) -> None:
         print(f"Processing {context.request.url} ...")
-
-        response = webtools.PageResponseObject(request.url)
-        interface = webtools.ScriptCrawlerInterface(parser, request)
 
         try:
             # maybe we could send header information that we accept text/rss
@@ -91,41 +105,39 @@ async def main() -> None:
             response.headers = headers
 
             if request.ping:
-                interface.response = response
-                interface.save_response()
+                on_close(interface, response)
                 return
 
             if response.get_content_length() > webtools.PAGE_TOO_BIG_BYTES:
-                response.status_code = 500
-                interface.response = response
-                interface.save_response()
                 print("Response too big")
-                return
+
+                response.status_code = webtools.HTTP_STATUS_CODE_FILE_TOO_BIG
+
+                on_close(interface, response)
 
             content_type = response.get_content_type()
             if content_type and not response.is_content_type_supported():
-                response.status_code = webtools.HTTP_STATUS_CODE_PAGE_UNSUPPORTED
-                interface.response = response
-                interface.save_response()
                 print("Content not supported")
+                response.status_code = webtools.HTTP_STATUS_CODE_PAGE_UNSUPPORTED
+
+                on_close(interface, response)
                 return
 
             response.set_text(str(context.soup))
 
-            interface.response = response
-            interface.save_response()
-
             print(f"Processing {context.request.url} ...DONE")
+
+            on_close(interface, response)
+            return
+
         except Exception as E:
             print(str(E))
             error_text = traceback.format_exc()
             print(error_text)
 
-            response.status_code = 500
-            interface.response = response
-            interface.save_response()
-
-            sys.exit(1)
+            response.status_code = webtools.HTTP_STATUS_CODE_EXCEPTION
+            on_close(interface, response, 1)
+            return
 
     try:
         # Run the crawler with the initial list of URLs.
@@ -134,6 +146,10 @@ async def main() -> None:
         print(str(E))
         error_text = traceback.format_exc()
         print(error_text)
+
+        response.status_code = webtools.HTTP_STATUS_CODE_EXCEPTION
+        on_close(interface, response, 1)
+        return
 
 
 if __name__ == "__main__":

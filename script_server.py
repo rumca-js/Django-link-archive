@@ -35,14 +35,17 @@ import shutil
 
 from pathlib import Path
 import webtools
-from webtools import ipc, ScrapingServer, ScrapingServerParser
+from webtools import ipc, ScrapingServer, ScrapingServerParser, HttpPageHandler
 import subprocess
 import traceback
 from datetime import datetime, timedelta
 
 
 if __name__ == "__main__":
-    shutil.rmtree("./storage", ignore_errors=True, onerror=None)
+    if HttpPageHandler.script_responses_directory is not None:
+        path = Path(HttpPageHandler.script_responses_directory)
+        if path.exists():
+            shutil.rmtree(str(path), ignore_errors=True, onerror=None)
 
     p = ScrapingServerParser()
     p.parse()

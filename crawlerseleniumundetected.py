@@ -18,6 +18,7 @@ def main():
     parser = webtools.ScriptCrawlerParser()
     parser.parse()
     if not parser.is_valid():
+        print("Script options are invalid")
         sys.exit(1)
         return
 
@@ -29,6 +30,7 @@ def main():
         print("Running request:{} with SeleniumUndetected".format(request))
 
     if not driver.run():
+        print("Cannot start driver")
         sys.exit(1)
         return
 

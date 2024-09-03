@@ -8,7 +8,7 @@ class DefaultUrlHandler(DefaultContentPage):
     Behavior can be changed by setting .h handler property
     """
 
-    def __init__(self, url=None, contents=None):
+    def __init__(self, url=None, contents=None, page_options=None):
         super().__init__(
             url,
             contents=contents,
@@ -17,6 +17,7 @@ class DefaultUrlHandler(DefaultContentPage):
         self.response = None
         self.dead = None
         self.code = None  # social media handle, ID of channel, etc.
+        self.page_options = page_options
 
     def is_handled_by(self):
         return True

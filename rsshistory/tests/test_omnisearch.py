@@ -1,14 +1,16 @@
 from django.db.models import Q
-from ..queryfilters import (
-    OmniSearchFilter,
-    DjangoSingleSymbolEvaluator,
-    OmniSearchWithDefault,
-)
-from ..omnisearch import (
+
+from utils.omnisearch import (
     EquationTranslator,
     EquationEvaluator,
     SingleSymbolEvaluator,
     OmniSearch,
+)
+
+from ..queryfilters import (
+    OmniSearchFilter,
+    DjangoSingleSymbolEvaluator,
+    OmniSearchWithDefault,
 )
 from ..models import LinkDataModel
 

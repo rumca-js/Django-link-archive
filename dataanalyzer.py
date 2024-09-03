@@ -34,27 +34,16 @@ import time
 from dateutil import parser
 import os
 import json
-from rsshistory.omnisearch import SingleSymbolEvaluator, EquationEvaluator, OmniSearch
-from sqlalchemy import and_, or_, not_
 
 from utils.sqlmodel import SqlModel
+from utils.omnisearch import SingleSymbolEvaluator, EquationEvaluator, OmniSearch
+from utils.alchemysearch import AlchemySymbolEvaluator, AlchemyEquationEvaluator, AlchemySearch
 
 from webtools import (
    Url,
    WebConfig,
+   HttpPageHandler,
 )
-
-try:
-    import asyncio
-
-    # https://github.com/apify/crawlee-python
-    # https://crawlee.dev/python/api
-    from crawlee.beautifulsoup_crawler import BeautifulSoupCrawler, BeautifulSoupCrawlingContext
-    from crawlee.basic_crawler import BasicCrawler
-    from crawlee.basic_crawler.types import BasicCrawlingContext
-    from crawlee.playwright_crawler import PlaywrightCrawler, PlaywrightCrawlingContext
-except Exception as E:
-    crawlee_feataure_enabled = False
 
 
 class DirReader(object):
@@ -75,6 +64,103 @@ class DirReader(object):
                 if file_split[1] in self.accepted_extensions:
                     file_name = os.path.join(root, file)
                     yield file_name
+
+
+
+def read_file_contents(file_path):
+    with open(file_path, "r") as f:
+        return f.read()
+
+def date_from_string(string_input):
+    return parser.parse(string_input)
+
+
+class SearchInterface(object):
+
+    def __init__(self, parser=None):
+        self.parser = parser
+        self.start_time = time.time()
+
+        if self.parser.dir:
+            reader = DirReader(self.parser.dir)
+            self.files = reader.get_files()
+        else:
+            self.files = []
+
+        self.total_entries = 0
+        self.good_entries = 0
+        self.dead_entries = 0
+
+    def print_entry(self, entry):
+        level = self.parser.get_verbosity_level()
+
+        if level >= 1:
+            print("{}".format(entry["link"]))
+        elif level >= 2:
+            description = ""
+            if "description" in entry:
+                description = entry["description"]
+            print("{}\n{}".format(entry["link"], description))
+        else:
+            print("{}".format(entry["link"]))
+
+    def read_file(self, afile):
+        text = read_file_contents(afile)
+
+        try:
+            j = json.loads(text)
+
+            if "links" in j:
+                return j["links"]
+            if "sources" in j:
+                return j["sources"]
+
+            return j
+        except Exception as E:
+            print("Could not read file: {}".format(afile))
+
+    def get_time_diff(self):
+        return time.time() - self.start_time
+
+    def print_time_diff(self):
+        elapsed_time_seconds = time.time() - self.start_time
+        elapsed_minutes = int(elapsed_time_seconds // 60)
+        elapsed_seconds = int(elapsed_time_seconds % 60)
+        print(f"Time: {elapsed_minutes}:{elapsed_seconds}")
+
+    def handle_row(self, row):
+        """
+        Row is to be expected a 'dict', eg. row["link"]
+        """
+        print(row)
+        link = row["link"]
+
+        level = self.parser.get_verbosity_level()
+
+        if self.parser.args.verify:
+            url = Url(link)
+            if level >= 2:
+                print("Checking link:{}".format(link))
+
+            if url.is_valid():
+                print("{}: Valid".format(link))
+                self.good_entries += 1
+            else:
+                print("{}: Dead".format(link))
+                self.dead_entries += 1
+
+            time.sleep(self.parser.args.request_sleep)
+        else:
+            self.print_entry(row)
+
+        self.total_entries += 1
+
+    def summary(self):
+        if self.parser.args.summary:
+            if self.parser.args.verify:
+                print("total:{} good:{} dead:{}".format(self.total_entries, self.good_entries, self.dead_entries))
+            else:
+                print("total:{}".format(self.total_entries))
 
 
 class EntrySymbolEvaluator(SingleSymbolEvaluator):
@@ -138,161 +224,6 @@ class EntrySymbolEvaluator(SingleSymbolEvaluator):
             return True
 
         return False
-
-
-class AlchemySymbolEvaluator(SingleSymbolEvaluator):
-    """
-    return 1 if true
-    """
-
-    def __init__(self, table):
-        self.table = table
-
-    def evaluate_complex_symbol(self, symbol, condition_data):
-        if condition_data[0] not in self.entry:
-            print("evaluate_complex_symbol: symbol {} not in entry".format(condition_data[0]))
-            return
-
-        if condition_data[1] == "==":
-            return self.table.c[condition_data[0]] == condition_data[2]
-
-        if condition_data[1] == "!=":
-            return self.table.c[condition_data[0]] != condition_data[2]
-
-        if condition_data[1] == ">":
-            return self.table.c[condition_data[0]] > condition_data[2]
-
-        if condition_data[1] == "<":
-            return self.table.c[condition_data[0]] < condition_data[2]
-
-        if condition_data[1] == ">=":
-            return self.table.c[condition_data[0]] >= condition_data[2]
-
-        if condition_data[1] == "<=":
-            return self.table.c[condition_data[0]] <= condition_data[2]
-
-        # TODO below
-
-        if condition_data[1] == "=":
-            return entry_field_value.find(condition_data[2]) >= 0
-
-        raise IOError("Unsupported operator")
-
-    def evaluate_simple_symbol(self, symbol):
-        """
-        TODO we could check by default if entry link == symbol, or sth
-        """
-        return or_(self.table.c["link"].like(f"%{symbol}%"),
-            self.table.c["title"].like(f"%{symbol}%"),
-            self.table.c["description"].like(f"%{symbol}%"))
-
-
-class AlchemyEquationEvaluator(EquationEvaluator):
-
-    def evaluate_function(self, operation_symbol, function, args0, args1):
-        if function == "And":  # & sign
-            return and_(args0, args1)
-        elif function == "Or":  # | sign
-            return or_(args0, args1)
-        elif function == "Not":  # ~ sign
-            return not_(args0)
-        else:
-            raise NotImplementedError("Not implemented function: {}".format(function))
-
-
-def read_file_contents(file_path):
-    with open(file_path, "r") as f:
-        return f.read()
-
-def date_from_string(string_input):
-    return parser.parse(string_input)
-
-
-class SearchInterface(object):
-
-    def __init__(self, parser=None):
-        self.parser = parser
-        self.start_time = time.time()
-
-        if self.parser.dir:
-            reader = DirReader(self.parser.dir)
-            self.files = reader.get_files()
-        else:
-            self.files = []
-
-        self.total_entries = 0
-        self.good_entries = 0
-        self.dead_entries = 0
-
-    def print_entry(self, entry):
-        level = self.parser.get_verbosity_level():
-
-        if level >= 1:
-            print("{}".format(entry["link"]))
-        elif level >= 2:
-            description = ""
-            if "description" in entry:
-                description = entry["description"]
-            print("{}\n{}".format(entry["link"], description))
-        else:
-            print("{}".format(entry["link"]))
-
-    def read_file(self, afile):
-        text = read_file_contents(afile)
-
-        try:
-            j = json.loads(text)
-
-            if "links" in j:
-                return j["links"]
-            if "sources" in j:
-                return j["sources"]
-
-            return j
-        except Exception as E:
-            print("Could not read file: {}".format(afile))
-
-    def get_time_diff(self):
-        return time.time() - self.start_time
-
-    def print_time_diff(self):
-        elapsed_time_seconds = time.time() - self.start_time
-        elapsed_minutes = int(elapsed_time_seconds // 60)
-        elapsed_seconds = int(elapsed_time_seconds % 60)
-        print(f"Time: {elapsed_minutes}:{elapsed_seconds}")
-
-    def handle_row(self, row):
-        """
-        Row is to be expected a 'dict', eg. row["link"]
-        """
-        link = row["link"]
-
-        level = self.parser.get_verbosity_level():
-
-        if self.parser.args.verify:
-            url = Url(link)
-            if level >= 2:
-                print("Checking link:{}".format(link))
-
-            if url.is_valid():
-                print("{}: Valid".format(link))
-                self.good_entries += 1
-            else:
-                print("{}: Dead".format(link))
-                self.dead_entries += 1
-
-            time.sleep(self.parser.args.request_sleep)
-        else:
-            self.print_entry(row)
-
-        self.total_entries += 1
-
-    def summary(self):
-        if self.parser.args.summary:
-            if self.parser.args.verify:
-                print("total:{} good:{} dead:{}".format(self.total_entries, self.good_entries, self.dead_entries))
-            else:
-                print("total:{}".format(self.total_entries))
 
 
 class OmniDirSearcher(SearchInterface):
@@ -474,23 +405,6 @@ class TagsSearcher(SearchInterface):
             print("Tag:{} Count:{}".format(tag, tags[tag]))
 
 
-class SqlLiteSearcher(SearchInterface):
-    def process(self):
-        model = SqlModel(self.parser.args.db)
-
-        search_term = self.parser.args.search
-        symbol_evaluator = AlchemySymbolEvaluator(model.entries_table.table)
-        equation_evaluator = AlchemyEquationEvaluator(search_term, symbol_evaluator)
-
-        search = OmniSearch(self.parser.args.search, equation_evaluator = equation_evaluator)
-        combined_query_conditions = search.get_combined_query()
-
-        rows = model.entries_table.select(combined_query_conditions)
-
-        for key, row in enumerate(rows):
-            self.handle_row(row.__dict__)
-
-
 class DataAnalyzer(object):
     def __init__(self, parser):
         self.parser = parser
@@ -498,12 +412,14 @@ class DataAnalyzer(object):
 
     def process(self):
         if self.is_db_scan():
-            searcher = SqlLiteSearcher(self.parser)
-            searcher.process()
-            searcher.print_time_diff()
+            db = SqlModel(database_file=self.parser.args.db)
+            row_handler = SearchInterface(self.parser)
+            searcher = AlchemySearch(db, self.parser.args.search, row_handler = row_handler)
+            searcher.search()
+            #searcher.print_time_diff()
 
-            if self.parser.args.summary:
-                searcher.summary()
+            #if self.parser.args.summary:
+            #    searcher.summary()
 
         elif self.is_omni_search():
             # it is too slow?
@@ -577,11 +493,6 @@ class Parser(object):
         else:
             self.dir = None
 
-        if self.parser.args.verify:
-            if not crawlee_feataure_enabled:
-                print("Crawlee feature is not enabled")
-                return False
-
         return True
 
     def get_verbosity_level(self):
@@ -601,8 +512,8 @@ def main():
     # scraping server is not running, we do not use port
     HttpPageHandler.crawling_server_port = 0
     # when python requests cannot handle a scenario, we run crawlee
-    HttpPageHandler.crawling_headless_script = "poetry run python crawleebeautifulsoup.py"
-    HttpPageHandler.crawling_full_script = "poetry run python crawleebeautifulsoup.py"
+    HttpPageHandler.crawling_headless_script = None
+    HttpPageHandler.crawling_full_script = None
 
     p = Parser()
     if not p.parse():

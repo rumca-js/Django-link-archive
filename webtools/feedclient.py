@@ -30,9 +30,40 @@ from webtools import (
 )
 from utils.dateutils import DateUtils
 from utils.serializers import HtmlExporter
+from utils.alchemysearch import AlchemySearch, AlchemyRowHandler
 
 
 __version__ = "0.0.4"
+
+
+def print_entry(row):
+    id = 0
+    if "id" in row:
+        id = row["id"]
+    page_rating = 0
+    if "page_rating" in row:
+        page_rating = row["page_rating"]
+
+    title = ""
+    if "title" in row:
+        title = row["title"]
+
+    link = ""
+    if "link" in row:
+        link =row["link"]
+
+    date_published = None
+    if "date_published" in row:
+        date_published =row["date_published"]
+
+    print("[{}/{}] {}".format(id, page_rating, title))
+    print(date_published)
+    print("{}".format(link))
+
+
+def print_source(source):
+    print("[{}] Title:{} Enabled:{}".format(source.id, source.title, source.enabled))
+    print("Url:{}".format(source.url))
 
 
 def read_source(db, source):
@@ -40,6 +71,7 @@ def read_source(db, source):
 
     source_url = source.url
     source_title = source.title
+    source_id = source.id
 
     options = PageOptions()
     options.use_headless_browser = False
@@ -63,6 +95,7 @@ def read_source(db, source):
         for item in entries:
             item["source"] = source_url
             item["source_title"] = source_title
+            item["source_obj__id"] = source_id
             result.append(item)
 
     print("\rRead:{}".format(source_url), end="")
@@ -72,19 +105,19 @@ def read_source(db, source):
 
 class OutputWriter(object):
 
-    def __init__(self, db):
+    def __init__(self, db, entries):
         self.db = db
+        self.entries = entries
 
     def write(self):
-        entries = self.db.entries_table.select()
-        for entry in entries:
+        for entry in self.entries:
             thumbnail = entry.thumbnail
             title = entry.title
             link = entry.link
             description = entry.description
             date_published = entry.date_published
 
-            print("{} {} {}".format(entry.date_published, entry.link, entry.title,))
+            print_entry(entry.__dict__)
 
 
 def fetch(db, parser, day_limit):
@@ -95,7 +128,6 @@ def fetch(db, parser, day_limit):
     q = session.query(EntriesTable)
     print("")
 
-    #sources = SourcesTable.query.all()
     c = SourcesTableController(db)
     sources = session.query(SourcesTable).filter(SourcesTable.enabled == True).all()
 
@@ -304,53 +336,7 @@ def list_sources(db):
     sources = session.query(SourcesTable).all()
 
     for source in sources:
-        print("[{}] Title:{} Enabled:{}".format(source.id, source.title, source.enabled))
-        print("Url:{}".format(source.url))
-
-
-def show_page_details(url, verbose=False):
-    u = Url(url)
-    u.get_response()
-
-    print("Handler:{}".format(type(u.get_handler())))
-    print("Title:{}".format(u.get_title()))
-    print("Description:{}".format(u.get_description()))
-    print("Language:{}".format(u.get_language()))
-    print("Author:{}".format(u.get_author()))
-    print("Album:{}".format(u.get_album()))
-    print("Response is valid?:{}".format(u.get_response().is_valid()))
-
-    handler = u.get_handler()
-    if type(handler) is HttpPageHandler:
-        if type(handler.p) is RssPage:
-            print("Feed title:{}".format(handler.p.feed.feed.title))
-            print("Feed description:{}".format(handler.p.feed.feed.description))
-            print("Feed published:{}".format(handler.p.feed.feed.published))
-
-            index = 0
-            for entry in handler.p.feed.entries:
-                if index == 0:
-                    print("Feed Entry Link:{}".format(entry.link))
-                    print("Feed Entry Title:{}".format(entry.title))
-                index += 1
-
-            print("Feed Entries:{}".format(index))
-
-            index = 0
-            for entry in handler.p.get_entries():
-                if index == 0:
-                    print("Entry Link:{}".format(entry["link"]))
-                    print("Entry Title:{}".format(entry["title"]))
-                index += 1
-            print("Entries:{}".format(index))
-
-    if u.get_contents():
-        if verbose:
-            print(u.get_contents())
-        else:
-            print("Contents?:Yes")
-    else:
-        print("Contents?:No")
+        print_source(source)
 
 
 class FeedClientParser(object):
@@ -359,31 +345,55 @@ class FeedClientParser(object):
     """
 
     def parse(self):
-        self.parser = argparse.ArgumentParser(description="Data analyzer program")
+        self.parser = argparse.ArgumentParser(
+           description="""RSS feed program. """,
+        )
         self.parser.add_argument(
             "--timeout", default=10, type=int, help="Timeout expressed in seconds"
         )
-        self.parser.add_argument("--port", type=int, default=0, help="Port")
+        self.parser.add_argument("--port", type=int, default=0, help="Port, if using web scraping server")
         self.parser.add_argument("-o", "--output-dir", help="HTML output directory")
-        self.parser.add_argument("--print", help="Prints data to stdout")
-        self.parser.add_argument("-r", "--refresh-on-start", action="store_true", help="Refreshes on start")
-        self.parser.add_argument("--force", action="store_true", help="Forces refresh")
-        self.parser.add_argument("--stats", action="store_true", help="Show statistics")
+        self.parser.add_argument("--entry", help="Select entry by ID")
+        self.parser.add_argument("--source", help="Select source by ID")
+        self.parser.add_argument("-r", "--refresh-on-start", action="store_true", help="Refreshes links, fetches on start")
+        self.parser.add_argument("--force", action="store_true", help="Force refresh")
+        self.parser.add_argument("--stats", action="store_true", help="Show table stats")
         self.parser.add_argument("--cleanup", action="store_true", help="Remove unreferenced items")
-        self.parser.add_argument("--follow", help="Follows specific url")
-        self.parser.add_argument("--unfollow", help="Unfollows specific url")
+        self.parser.add_argument("--follow", help="Follows specific source")
+        self.parser.add_argument("--unfollow", help="Unfollows specific source")
         self.parser.add_argument("--enable", help="Enables specific source")
         self.parser.add_argument("--disable", help="Disables specific source")
+        self.parser.add_argument("--list-entries", action="store_true", help="Prints data to stdout")
         self.parser.add_argument("--list-sources",action="store_true", help="Lists sources")
         self.parser.add_argument("--init-sources",action="store_true", help="Initializes sources")
-        self.parser.add_argument("--page-details", help="Shows page details")
+        self.parser.add_argument("--page-details", help="Shows page details for specified URL")
+        self.parser.add_argument("--search", help="""Search entries. Example: --search "title=Elon" """)
         self.parser.add_argument("-v", "--verbose",action="store_true", help="Verbose")
-        self.parser.add_argument("--db", default="feedclient.db", help="SQLite database file")
+        self.parser.add_argument("--db", default="feedclient.db", help="SQLite database file name")
 
         # TODO implement
         # --since "2024-01-01 12:03
 
         self.args = self.parser.parse_args()
+
+
+class SearchResultHandler(AlchemyRowHandler):
+    def __init__(self):
+        super().__init__()
+
+    def handle_row(self, row):
+        print_entry(row)
+
+
+def get_entries(session, source_id=None):
+    query = session.query(EntriesTable)
+
+    if source_id:
+        query = query.filter(EntriesTable.source_obj__id == source_id)
+
+    query = query.order_by(desc(EntriesTable.date_published))
+
+    return query.all()
 
 
 class FeedClient(object):
@@ -401,7 +411,8 @@ class FeedClient(object):
         db = SqlModel(database_file=database_file, engine=self.engine)
 
         if self.parser.args.init_sources:
-            add_init_sources(db, self.sources)
+            if self.sources and len(self.sources) > 0:
+                add_init_sources(db, self.sources)
 
         if self.parser.args.cleanup:
             db.entries_table.truncate()
@@ -460,7 +471,7 @@ class FeedClient(object):
                 directory.mkdir(parents=True, exist_ok=True)
 
             session = db.session_factory()
-            entries = session.query(EntriesTable).order_by(desc(EntriesTable.date_published)).all()
+            entries = get_entries(session, self.parser.args.source)
 
             verbose = False
             if self.parser.args.verbose:
@@ -469,9 +480,17 @@ class FeedClient(object):
             w = HtmlExporter(directory, entries, verbose = verbose)
             w.write()
 
-        if self.parser.args.page_details:
-            show_page_details(self.parser.args.page_details, self.parser.args.verbose)
+        if self.parser.args.search:
+            s = AlchemySearch(db, self.parser.args.search, row_handler = SearchResultHandler())
+            s.search()
 
-        elif self.parser.args.print:
-            w = OutputWriter(db)
+        if self.parser.args.page_details:
+            from utils.serializers import PageDisplay
+            PageDisplay(self.parser.args.page_details, verbose = self.parser.args.verbose)
+
+        if self.parser.args.list_entries:
+            session = db.session_factory()
+            entries = get_entries(session, self.parser.args.source)
+
+            w = OutputWriter(db, entries)
             w.write()

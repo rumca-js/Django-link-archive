@@ -143,7 +143,7 @@ class RequestsPage(CrawlerInterface):
         if not requests_feataure_enabled:
             return
 
-        WebLogger.debug("Requests GET:{}".format(self.request.url))
+        WebLogger.debug("Requests Driver:{}".format(self.request.url))
 
         """
         stream argument allows us to read header before we fetch the page.
@@ -414,6 +414,8 @@ class SeleniumChromeHeadless(SeleniumDriver):
         if not driver:
             return
 
+        WebLogger.debug("SeleniumChromeHeadless Driver:{}".format(self.request.url))
+
         try:
             # add 10 seconds for start of browser, etc.
             selenium_timeout = self.request.timeout_s + 10
@@ -510,6 +512,8 @@ class SeleniumChromeFull(SeleniumDriver):
         if not driver:
             return
 
+        WebLogger.debug("SeleniumChromeFull Driver:{}".format(self.request.url))
+
         try:
             # add 10 seconds for start of browser, etc.
             selenium_timeout = self.request.timeout_s + 20
@@ -590,6 +594,8 @@ class SeleniumUndetected(SeleniumDriver):
         driver = self.get_driver()
         if not driver:
             return
+
+        WebLogger.debug("SeleniumUndetected Driver:{}".format(self.request.url))
 
         try:
             # add 10 seconds for start of browser, etc.
