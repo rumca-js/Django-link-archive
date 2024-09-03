@@ -87,9 +87,9 @@ For full setup
  $ make run
 ```
 
-## Script server
+## Script server *optional*
 
-With django script_server.py server could be started. The server is responsible for scraping handling requests for pages.
+With django script_server.py server could be started. The server is responsible for scraping handling requests for pages. This feature is optional.
 
 ## Setup
 
