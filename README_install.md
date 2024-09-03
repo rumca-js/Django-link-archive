@@ -74,10 +74,6 @@ This program allows to configure super user using a rule.
 
 You can create super user manually, as usual in Django [https://www.geeksforgeeks.org/how-to-create-superuser-in-django/](https://www.geeksforgeeks.org/how-to-create-superuser-in-django/)
 
-## RSS
-
-To enable RSS functionality, you have to provide RSS sources by the page UI.
-
 ## Run
 
 For minimal setup
@@ -90,6 +86,10 @@ For full setup
 ```
  $ make run
 ```
+
+## Setup
+
+After starting server it could be convenient to start script_server.py, which operates as middle-man between apps, and requests.
 
 # Advanced
 
