@@ -58,6 +58,8 @@ class YouTubeChannelHandler(DefaultUrlHandler):
 
         if (short_url.startswith("www.youtube.com/@")
             or short_url.startswith("youtube.com/@")
+            or short_url.startswith("www.youtube.com/user")
+            or short_url.startswith("youtube.com/user")
             ):
             return True
 
@@ -227,7 +229,7 @@ class YouTubeChannelHandler(DefaultUrlHandler):
             if thumbnail:
                 return thumbnail
 
-        html_page = self.get_html_page(channel_url)
+        html_page = self.get_html_page()
 
         if html_page:
             return html_page.get_thumbnail()

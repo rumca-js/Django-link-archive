@@ -91,4 +91,4 @@ class AlchemySearch(object):
         rows = session.query(EntriesTable).filter(combined_query_conditions).all()
 
         for key, row in enumerate(rows):
-            self.alchemy_row_handler.handle_row(row.__dict__)
+            self.alchemy_row_handler.handle_row(row)

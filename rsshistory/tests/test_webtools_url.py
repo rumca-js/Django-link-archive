@@ -368,3 +368,41 @@ class UrlTest(FakeInternetTestCase):
         handler = Url.get_type("https://www.youtube.com/watch?v=1234")
 
         self.assertTrue(type(handler), Url.youtube_video_handler)
+
+    def test_get_properties__rss(self):
+        MockRequestCounter.mock_page_requests = 0
+
+        # call tested function
+        url = Url("https://www.codeproject.com/WebServices/NewsRSS.aspx")
+
+        url.get_response()
+        properties = url.get_properties()
+
+        self.assertTrue("title" in properties)
+        self.assertTrue("link" in properties)
+
+    def test_get_properties__ytchan(self):
+        MockRequestCounter.mock_page_requests = 0
+
+        # call tested function
+        url = Url("https://www.youtube.com/feeds/videos.xml?channel_id=UCXuqSBlHAE6Xw-yeJA0Tunw")
+
+        url.get_response()
+        properties = url.get_properties()
+
+        self.assertTrue("title" in properties)
+        self.assertTrue("link" in properties)
+
+    def test_get_properties__html(self):
+        MockRequestCounter.mock_page_requests = 0
+
+        test_link = "https://page-with-two-links.com"
+
+        # call tested function
+        url = Url(test_link)
+
+        url.get_response()
+        properties = url.get_properties()
+
+        self.assertTrue("title" in properties)
+        self.assertTrue("link" in properties)

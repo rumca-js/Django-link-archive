@@ -1,5 +1,7 @@
 """
 Library package.
+
+Should be binary compatibile with django model
 """
 
 from typing import Optional
@@ -120,10 +122,10 @@ class EntriesTable(Base):
     language: Mapped[Optional[str]]
     age: Mapped[int] = mapped_column(default=0)
     date_created = mapped_column(DateTime, nullable=True)
-    date_published= mapped_column(DateTime, nullable=True)
-    date_update_last= mapped_column(DateTime, nullable=True)
-    date_dead_since= mapped_column(DateTime, nullable=True)
-    date_last_modified= mapped_column(DateTime, nullable=True)
+    date_published = mapped_column(DateTime, nullable=True)
+    date_update_last = mapped_column(DateTime, nullable=True)
+    date_dead_since = mapped_column(DateTime, nullable=True)
+    date_last_modified = mapped_column(DateTime, nullable=True)
     status_code: Mapped[int] = mapped_column(default=0)
     page_rating: Mapped[int] = mapped_column(default=0)
     page_rating_votes: Mapped[int] = mapped_column(default=0)
@@ -132,7 +134,7 @@ class EntriesTable(Base):
     bookmarked: Mapped[bool] = mapped_column(default=False)
     permanent: Mapped[bool] = mapped_column(default=False)
     source: Mapped[Optional[str]]
-    artist: Mapped[Optional[str]]
+    author: Mapped[Optional[str]]
     album: Mapped[Optional[str]]
     # advanced / foreign
     source_obj__id: Mapped[Optional[int]]
@@ -146,7 +148,7 @@ class EntriesTableController(object):
 
     def get_session(self):
         if not self.session:
-            return self.conn.session_factory()
+            return self.conn.get_session()
         else:
             return self.session
 
@@ -154,19 +156,16 @@ class EntriesTableController(object):
         now = datetime.now(timezone.utc)
         limit = now - timedelta(days = days)
 
-        session = self.get_session()
+        Session = self.get_session()
 
-        entries = session.query
+        with Session() as session:
+            entries = session.query
 
-        query = delete(EntriesTable).where(EntriesTable.date_published < limit)
-        session.execute(query)
-        session.commit()
+            query = delete(EntriesTable).where(EntriesTable.date_published < limit)
+            session.execute(query)
+            session.commit()
 
     def add_entry(self, entry):
-        if "author" in entry:
-            entry["artist"] = entry["author"]
-            del entry["author"]
-
         if "tags" in entry:
             try:
                 if entry["tags"]:
@@ -182,9 +181,10 @@ class EntriesTableController(object):
 
         entry_obj = EntriesTable(**entry)
 
-        session = self.get_session()
-        session.add(entry_obj)
-        session.commit()
+        Session = self.get_session()
+        with Session() as session:
+            session.add(entry_obj)
+            session.commit()
 
 
 class SourcesTable(Base):
@@ -204,37 +204,34 @@ class SourcesTableController(object):
 
     def get_session(self):
         if not self.session:
-            return self.conn.session_factory()
+            return self.conn.get_session()
         else:
             return self.session
 
     def get_all(self):
-        session = self.get_session()
-        sources = session.query(SourcesTable).all()
+        sources = []
+
+        Session = self.get_session()
+        with Session() as session:
+            sources = session.query(SourcesTable).all()
+
         return sources
 
     def is_source(self, id=None, url=None):
-        session = self.get_session()
+        is_source = False
+        Session = self.get_session()
 
-        if id:
-            sources = session.query(SourcesTable).filter(SourcesTable.id == int(id)).all()
-            if len(sources) != 0:
-                return True
-        if url:
-            sources = session.query(SourcesTable).filter(SourcesTable.url == url).all()
-            if len(sources) != 0:
-                return True
-
-    def get(self, id=None, url=None):
-        session = self.get_session()
-
-        try:
+        with Session() as session:
             if id:
-                return session.query(SourcesTable).filter(SourcesTable.id == int(id)).one()
+                sources = session.query(SourcesTable).filter(SourcesTable.id == int(id)).count()
+                if sources != 0:
+                    is_source = True
             if url:
-                return session.query(SourcesTable).filter(SourcesTable.url == url).one()
-        except Exception as E:
-            pass
+                sources = session.query(SourcesTable).filter(SourcesTable.url == url).count()
+                if sources != 0:
+                    is_source = True
+
+        return is_source
 
 
 class SourceOperationalData(Base):
@@ -253,40 +250,72 @@ class SourceOperationalDataController(object):
 
     def get_session(self):
         if not self.session:
-            return self.conn.session_factory()
+            return self.conn.get_session()
         else:
             return self.session
 
     def is_fetch_possible(self, source, date_now, limit_seconds=60 * 10):
-        session = self.get_session()
+        Session = self.get_session()
+        with Session() as session:
+            rows = session.query(SourceOperationalData).filter(SourceOperationalData.source_obj_id == source.id).all()
 
-        rows = session.query(SourceOperationalData).filter(SourceOperationalData.source_obj_id == source.id).all()
+            if len(rows) == 0:
+                return True
 
-        if len(rows) == 0:
-            return True
+            row = rows[0]
 
-        row = rows[0]
+            source_datetime = row.date_fetched
 
-        source_datetime = row.date_fetched
+            diff = date_now - source_datetime
 
-        diff = date_now - source_datetime
-
-        if diff.total_seconds() > limit_seconds:
-            return True
-        return False
+            if diff.total_seconds() > limit_seconds:
+                return True
+            return False
 
     def set_fetched(self, source, date_now):
-        session = self.get_session()
+        Session = self.get_session()
+        with Session() as session:
+            op_data = session.query(SourceOperationalData).filter(SourceOperationalData.source_obj_id == source.id).all()
+            if len(op_data) == 0:
+                obj = SourceOperationalData(date_fetched = date_now, source_obj_id = source.id)
+                session.add(obj)
+                session.commit()
+            else:
+                op_data = op_data[0]
+                op_data.date_fetched = date_now
+                session.commit()
 
-        op_data = session.query(SourceOperationalData).filter(SourceOperationalData.source_obj_id == source.id).all()
-        if len(op_data) == 0:
-            obj = SourceOperationalData(date_fetched = date_now, source_obj_id = source.id)
-            session.add(obj)
-            session.commit()
-        else:
-            op_data = op_data[0]
-            op_data.date_fetched = date_now
-            session.commit()
+
+class UserTags(Base):
+    __tablename__ = "UserTags"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    date = mapped_column(DateTime)
+    tag: Mapped[str] = mapped_column(String(1000))
+
+    entry_object: Mapped[Optional[int]]
+    user_object: Mapped[Optional[int]]
+
+
+class UserBookmarks(Base):
+    __tablename__ = "UserBookmarks"
+    id: Mapped[int] = mapped_column(primary_key=True)
+
+    date_bookmarked = mapped_column(DateTime)
+
+    entry_object: Mapped[Optional[int]]
+    user_object: Mapped[Optional[int]]
+
+
+class UserVotes(Base):
+    __tablename__ = "UserVotes"
+    id: Mapped[int] = mapped_column(primary_key=True)
+
+    user: Mapped[str] = mapped_column(String(1000))
+    vote: Mapped[int] = mapped_column(default=0)
+
+    entry_object: Mapped[Optional[int]]
+    user_object: Mapped[Optional[int]]
 
 
 class SqlModel(object):
@@ -298,14 +327,8 @@ class SqlModel(object):
         else:
             self.engine = engine
 
-    def session_factory(self):
-        _SessionFactory = sessionmaker(bind=self.engine)
-
         Base.metadata.create_all(self.engine)
-        return _SessionFactory()
 
     def get_session(self):
         _SessionFactory = sessionmaker(bind=self.engine)
-
-        Base.metadata.create_all(self.engine)
-        return _SessionFactory()
+        return _SessionFactory

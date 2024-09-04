@@ -29,9 +29,14 @@ class Crawler(object):
     pages = {}
 
     def crawl(self, url):
+        # start by crawling the link itself
+        self.add(url)
+
+        # crawl main domain
         domain_cache = DomainCache.get_object(url)
         self.add(domain_cache.url)
 
+        # start by site maps
         site_maps_urls = domain_cache.get_site_maps_urls()
         for site_map_url in site_maps_urls:
             self.add(site_map_url)

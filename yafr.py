@@ -4,6 +4,7 @@ This is example script about how to use this project as a simple RSS reader
 from webtools import (
     WebConfig,
     HttpPageHandler,
+    FeedClientParser,
     FeedClient,
 )
 
@@ -285,9 +286,12 @@ sources = [
 
 def main():
 
+    parser = FeedClientParser()
+    parser.parse()
+
     engine = create_engine("sqlite:///feedclient.db")
 
-    p = FeedClient(sources = sources, day_limit=7, engine=engine)
+    p = FeedClient(sources = sources, day_limit=7, engine=engine, parser=parser)
 
     if p.parser.args.verbose:
         WebConfig.use_print_logging()

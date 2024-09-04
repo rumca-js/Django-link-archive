@@ -134,8 +134,8 @@ class MockRequestCounter(object):
 
 
 class YouTubeJsonHandlerMock(YouTubeJsonHandler):
-    def __init__(self, url):
-        super().__init__(url)
+    def __init__(self, url, page_options=None):
+        super().__init__(url, page_options)
 
     def download_details_youtube(self):
         print("Mocked YouTube request URL: {}".format(self.url))

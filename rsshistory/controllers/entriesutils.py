@@ -1469,15 +1469,18 @@ class EntryDataBuilder(object):
 
         self.link_data = self.get_clean_link_data()
 
-        keywords = Configuration.get_object().get_blocked_keywords()
-        v = UrlPropertyValidator(properties=self.link_data, blocked_keywords=keywords)
-        if not v.is_valid():
-            LinkDatabase.error(
-                "Rejecting:{}\nData:{}\n".format(
-                    self.link_data["link"], self.link_data["description"]
+        # TODO - what if there are many places and we do not want people to insert
+        # bad stuff?
+        if self.source_is_auto:
+            keywords = Configuration.get_object().get_blocked_keywords()
+            v = UrlPropertyValidator(properties=self.link_data, blocked_keywords=keywords)
+            if not v.is_valid():
+                AppLogging.error(
+                    "Rejecting:{}\nData:{}\n".format(
+                        self.link_data["link"], self.link_data["description"]
+                    )
                 )
-            )
-            return
+                return
 
         # if self.source_is_auto:
         #    self.link_data["link"] = self.link_data["link"].lower()

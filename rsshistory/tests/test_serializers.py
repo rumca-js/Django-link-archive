@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 
-from .dateutils import DateUtils
+from utils.dateutils import DateUtils
 
 from ..serializers import MarginaliaCrawlerOutput, ReadingList, BookmarksExporter
 from ..models import UserBookmarks
