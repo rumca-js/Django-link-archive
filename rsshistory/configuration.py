@@ -19,7 +19,7 @@ version is split into three digits:
  if a change requires the model to be changed, then second digit is updated, patch is set to 0
  if something should be released to public, then release version changes
 """
-__version__ = "0.77.4"
+__version__ = "0.78.0"
 
 
 class Configuration(object):
@@ -164,7 +164,6 @@ class Configuration(object):
         return "keywords.json"
 
     def get_daily_data_day_path(self, day_iso=None):
-
         if day_iso == None:
             day_iso = DateUtils.get_date_today().isoformat()
 

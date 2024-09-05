@@ -1,4 +1,3 @@
-
 class GenericEntryController(object):
     def __init__(self, entry):
         self.entry = entry
@@ -19,7 +18,7 @@ class GenericEntryController(object):
             title = "[{}] {}".format(code, title)
 
         if bracket_text:
-            title =  "[{}] {}".format(bracket_text, title)
+            title = "[{}] {}".format(bracket_text, title)
 
         return title
 

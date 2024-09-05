@@ -22,6 +22,7 @@ from .models import (
     UserConfig,
     DataExport,
     EntryRules,
+    ApiKeys,
 )
 from .pluginsources.sourcecontrollerbuilder import SourceControllerBuilder
 
@@ -222,6 +223,22 @@ class EntryRulesForm(forms.ModelForm):
             "auto_tag",
             "requires_headless",
             "requires_full_browser",
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+
+class ApiKeysForm(forms.ModelForm):
+    """
+    Category choice form
+    """
+
+    class Meta:
+        model = ApiKeys
+        fields = [
+            "key",
+            "user_object",
         ]
 
     def __init__(self, *args, **kwargs):

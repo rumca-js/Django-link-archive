@@ -1,4 +1,3 @@
-
 from sqlalchemy import (
     create_engine,
 )
@@ -30,13 +29,13 @@ class AlchemySearchTest(FakeInternetTestCase):
         return "test_feedclient.db"
 
     def get_engine(self):
-        return create_engine("sqlite:///" + self.get_engine_path() )
+        return create_engine("sqlite:///" + self.get_engine_path())
 
     def test_follow_url__youtube_feed(self):
         self.teardown()
 
         engine = self.get_engine()
-        db = SqlModel(engine = engine)
+        db = SqlModel(engine=engine)
 
         test_link = "https://www.youtube.com/feeds/videos.xml?channel_id=UCXuqSBlHAE6Xw-yeJA0Tunw"
 

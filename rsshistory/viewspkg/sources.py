@@ -691,6 +691,12 @@ def source_fix_entries(request, source_pk):
 
 
 def source_json(request, pk):
+    p = ViewPage(request)
+    p.set_title("Remove all entries")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
+    if data is not None:
+        return data
+
     sources = SourceDataController.objects.filter(id=pk)
 
     if sources.count() == 0:
@@ -709,6 +715,12 @@ def source_json(request, pk):
 
 
 def sources_json(request):
+    p = ViewPage(request)
+    p.set_title("Remove all entries")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
+    if data is not None:
+        return data
+
     check_views = [
         SourceListView,
     ]

@@ -1,0 +1,28 @@
+{% extends base_generic %}
+{% load static %}
+{% block content %}
+
+<div class="container">
+    <a href="{% url 'rsshistory:api-key-add' %}" title="Add new api key" class="btn btn-primary" role="button">
+        <img src="{% static 'rsshistory/icons/icons8-plus-100.png' %}" class="content-icon" />
+    </a>
+</div>
+
+<h1>API keys</h1>
+  {% if content_list %}
+     <div class="list-group">
+         {% for object in content_list %}
+            <div>{{object.key}}</div>
+            <div>{{object.user_object}}</div>
+            <div>{{object.user_object.id}}</div>
+            <div>{{object.user_object.username}}</div>
+
+            <a href="{% url 'rsshistory:api-key-remove' object.id %}" title="Remove api key" class="btn btn-primary" role="button">
+                <img src="{% static 'rsshistory/icons/icons8-plus-100.png' %}" class="content-icon" />
+            </a>
+         {% endfor %}
+  {% else %}
+    No keys yet
+  {% endif %}
+
+{% endblock %} 

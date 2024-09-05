@@ -24,13 +24,13 @@ class FeedClientTest(FakeInternetTestCase):
         return "test_feedclient.db"
 
     def get_engine(self):
-        return create_engine("sqlite:///" + self.get_engine_path() )
+        return create_engine("sqlite:///" + self.get_engine_path())
 
     def test_follow_url__youtube_feed(self):
         self.teardown()
 
         engine = self.get_engine()
-        db = SqlModel(engine = engine)
+        db = SqlModel(engine=engine)
 
         test_link = "https://www.youtube.com/feeds/videos.xml?channel_id=UCXuqSBlHAE6Xw-yeJA0Tunw"
 
@@ -40,7 +40,11 @@ class FeedClientTest(FakeInternetTestCase):
 
         Session = db.get_session()
         with Session() as session:
-            number_of_source = session.query(SourcesTable).filter(SourcesTable.url == test_link).count()
+            number_of_source = (
+                session.query(SourcesTable)
+                .filter(SourcesTable.url == test_link)
+                .count()
+            )
             self.assertEqual(number_of_source, 1)
 
         self.teardown()
@@ -49,7 +53,7 @@ class FeedClientTest(FakeInternetTestCase):
         self.teardown()
 
         engine = self.get_engine()
-        db = SqlModel(engine = engine)
+        db = SqlModel(engine=engine)
 
         test_link = "https://www.youtube.com/feeds/videos.xml?channel_id=UCXuqSBlHAE6Xw-yeJA0Tunw"
 
@@ -63,7 +67,11 @@ class FeedClientTest(FakeInternetTestCase):
 
         Session = db.get_session()
         with Session() as session:
-            number_of_source = session.query(SourcesTable).filter(SourcesTable.url == test_link).count()
+            number_of_source = (
+                session.query(SourcesTable)
+                .filter(SourcesTable.url == test_link)
+                .count()
+            )
             self.assertEqual(number_of_source, 1)
 
         self.teardown()
@@ -72,7 +80,7 @@ class FeedClientTest(FakeInternetTestCase):
         self.teardown()
 
         engine = self.get_engine()
-        db = SqlModel(engine = engine)
+        db = SqlModel(engine=engine)
 
         c = FeedClient(engine=engine)
         # call tested function
@@ -80,7 +88,14 @@ class FeedClientTest(FakeInternetTestCase):
 
         Session = db.get_session()
         with Session() as session:
-            number_of_source = session.query(SourcesTable).filter(SourcesTable.url == "https://www.youtube.com/feeds/videos.xml?channel_id=UCXuqSBlHAE6Xw-yeJA0Tunw").count()
+            number_of_source = (
+                session.query(SourcesTable)
+                .filter(
+                    SourcesTable.url
+                    == "https://www.youtube.com/feeds/videos.xml?channel_id=UCXuqSBlHAE6Xw-yeJA0Tunw"
+                )
+                .count()
+            )
             self.assertEqual(number_of_source, 1)
 
         self.teardown()
@@ -89,7 +104,7 @@ class FeedClientTest(FakeInternetTestCase):
         self.teardown()
 
         engine = self.get_engine()
-        db = SqlModel(engine = engine)
+        db = SqlModel(engine=engine)
 
         test_link = "https://www.youtube.com/feeds/videos.xml?channel_id=UCXuqSBlHAE6Xw-yeJA0Tunw"
 
@@ -98,7 +113,11 @@ class FeedClientTest(FakeInternetTestCase):
 
         Session = db.get_session()
         with Session() as session:
-            number_of_source = session.query(SourcesTable).filter(SourcesTable.url == test_link).count()
+            number_of_source = (
+                session.query(SourcesTable)
+                .filter(SourcesTable.url == test_link)
+                .count()
+            )
             self.assertEqual(number_of_source, 1)
 
         # call tested function
@@ -108,7 +127,11 @@ class FeedClientTest(FakeInternetTestCase):
 
         Session = db.get_session()
         with Session() as session:
-            number_of_source = session.query(SourcesTable).filter(SourcesTable.url == test_link).count()
+            number_of_source = (
+                session.query(SourcesTable)
+                .filter(SourcesTable.url == test_link)
+                .count()
+            )
             self.assertEqual(number_of_source, 0)
 
         # call tested function
@@ -122,7 +145,7 @@ class FeedClientTest(FakeInternetTestCase):
         self.teardown()
 
         engine = self.get_engine()
-        db = SqlModel(engine = engine)
+        db = SqlModel(engine=engine)
 
         test_link = "https://www.youtube.com/feeds/videos.xml?channel_id=UCXuqSBlHAE6Xw-yeJA0Tunw"
 
@@ -132,7 +155,9 @@ class FeedClientTest(FakeInternetTestCase):
         Session = db.get_session()
         source = None
         with Session() as session:
-            source = session.query(SourcesTable).filter(SourcesTable.url == test_link).one()
+            source = (
+                session.query(SourcesTable).filter(SourcesTable.url == test_link).one()
+            )
 
         self.assertTrue(source is not None)
 
@@ -143,7 +168,9 @@ class FeedClientTest(FakeInternetTestCase):
 
         source = None
         with Session() as session:
-            source = session.query(SourcesTable).filter(SourcesTable.url == test_link).one()
+            source = (
+                session.query(SourcesTable).filter(SourcesTable.url == test_link).one()
+            )
 
         self.assertTrue(source is not None)
 
@@ -155,17 +182,18 @@ class FeedClientTest(FakeInternetTestCase):
         self.assertEqual(status, True)
 
         with Session() as session:
-            source = session.query(SourcesTable).filter(SourcesTable.url == test_link).one()
+            source = (
+                session.query(SourcesTable).filter(SourcesTable.url == test_link).one()
+            )
             self.assertEqual(source.enabled, True)
 
         self.teardown()
 
     def test_list_sources(self):
-
         self.teardown()
 
         engine = self.get_engine()
-        db = SqlModel(engine = engine)
+        db = SqlModel(engine=engine)
 
         c = FeedClient(engine=engine)
         # call tested function
@@ -175,11 +203,10 @@ class FeedClientTest(FakeInternetTestCase):
         self.teardown()
 
     def test_show_stats(self):
-
         self.teardown()
 
         engine = self.get_engine()
-        db = SqlModel(engine = engine)
+        db = SqlModel(engine=engine)
 
         c = FeedClient(engine=engine)
 
@@ -190,11 +217,10 @@ class FeedClientTest(FakeInternetTestCase):
         self.teardown()
 
     def test_add_entry(self):
-
         self.teardown()
 
         engine = self.get_engine()
-        db = SqlModel(engine = engine)
+        db = SqlModel(engine=engine)
 
         c = FeedClient(engine=engine)
 
@@ -208,7 +234,7 @@ class FeedClientTest(FakeInternetTestCase):
         self.teardown()
 
         engine = self.get_engine()
-        db = SqlModel(engine = engine)
+        db = SqlModel(engine=engine)
         Session = db.get_session()
 
         c = FeedClient(engine=engine)

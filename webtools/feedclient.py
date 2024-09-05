@@ -38,7 +38,7 @@ __version__ = "0.0.4"
 
 
 def print_entry(row):
-    link =row.link
+    link = row.link
     date_published = row.date_published
 
     ec = GenericEntryController(row)
@@ -69,7 +69,7 @@ def read_source(db, source):
     options.use_headless_browser = False
     options.use_full_browser = False
 
-    url = Url(url = source_url, page_options = options)
+    url = Url(url=source_url, page_options=options)
     handler = url.get_handler()
     response = url.get_response()
 
@@ -96,7 +96,6 @@ def read_source(db, source):
 
 
 class OutputWriter(object):
-
     def __init__(self, db, entries):
         self.db = db
         self.entries = entries
@@ -130,11 +129,11 @@ def fetch(db, parser, day_limit):
         date_now = date_now.replace(tzinfo=None)
 
         if not parser.args.force:
-           operational_data = SourceOperationalDataController(db, session)
-           if not operational_data.is_fetch_possible(source, date_now, 60 * 10):
-               if parser.args.verbose:
-                   print("Source {} does not require fetch yet".format(source.title))
-               continue
+            operational_data = SourceOperationalDataController(db, session)
+            if not operational_data.is_fetch_possible(source, date_now, 60 * 10):
+                if parser.args.verbose:
+                    print("Source {} does not require fetch yet".format(source.title))
+                continue
 
         date_now = DateUtils.get_datetime_now_utc()
         date_now = date_now.replace(tzinfo=None)
@@ -146,13 +145,17 @@ def fetch(db, parser, day_limit):
 
         for entry in source_entries:
             now = datetime.now(timezone.utc)
-            limit = now - timedelta(days = day_limit)
+            limit = now - timedelta(days=day_limit)
 
             entires_num = 0
             with Session() as session:
-                entires_num = session.query(EntriesTable).filter(EntriesTable.link == entry["link"]).count()
+                entires_num = (
+                    session.query(EntriesTable)
+                    .filter(EntriesTable.link == entry["link"])
+                    .count()
+                )
 
-            if entry['date_published'] > limit and entires_num == 0:
+            if entry["date_published"] > limit and entires_num == 0:
                 ec = EntriesTableController(db)
                 ec.add_entry(entry)
 
@@ -208,13 +211,17 @@ async def fetch_async(db, parser, day_limit):
     for result in results:
         for entry in result:
             now = datetime.now(timezone.utc)
-            limit = now - timedelta(days = day_limit)
+            limit = now - timedelta(days=day_limit)
 
             entires_num = 0
             with Session() as session:
-                entires_num = session.query(EntriesTable).filter(EntriesTable.link == entry["link"]).count()
+                entires_num = (
+                    session.query(EntriesTable)
+                    .filter(EntriesTable.link == entry["link"])
+                    .count()
+                )
 
-            if entry['date_published'] > limit and entires_num == 0:
+            if entry["date_published"] > limit and entires_num == 0:
                 ec = EntriesTableController(db)
                 ec.add_entry(entry)
                 total_added_entries += 1
@@ -233,34 +240,63 @@ class FeedClientParser(object):
 
     def parse(self):
         self.parser = argparse.ArgumentParser(
-           description="""RSS feed program. """,
+            description="""RSS feed program. """,
         )
         self.parser.add_argument(
             "--timeout", default=10, type=int, help="Timeout expressed in seconds"
         )
-        self.parser.add_argument("--port", type=int, default=0, help="Port, if using web scraping server")
+        self.parser.add_argument(
+            "--port", type=int, default=0, help="Port, if using web scraping server"
+        )
         self.parser.add_argument("-o", "--output-dir", help="HTML output directory")
         self.parser.add_argument("--add", help="Adds entry with the specified URL")
-        self.parser.add_argument("--bookmark", action="store_true", help="makes bookmarked")
-        self.parser.add_argument("--unbookmark", action="store_true", help="makes bookmarked")
+        self.parser.add_argument(
+            "--bookmark", action="store_true", help="bookmarks entry"
+        )
+        self.parser.add_argument(
+            "--unbookmark", action="store_true", help="unbookmarks entry"
+        )
         self.parser.add_argument("--entry", help="Select entry by ID")
         self.parser.add_argument("--source", help="Select source by ID")
-        self.parser.add_argument("-r", "--refresh-on-start", action="store_true", help="Refreshes links, fetches on start")
+        self.parser.add_argument(
+            "-r",
+            "--refresh-on-start",
+            action="store_true",
+            help="Refreshes links, fetches on start",
+        )
         self.parser.add_argument("--force", action="store_true", help="Force refresh")
-        self.parser.add_argument("--stats", action="store_true", help="Show table stats")
-        self.parser.add_argument("--cleanup", action="store_true", help="Remove unreferenced items")
+        self.parser.add_argument(
+            "--stats", action="store_true", help="Show table stats"
+        )
+        self.parser.add_argument(
+            "--cleanup", action="store_true", help="Remove unreferenced items"
+        )
         self.parser.add_argument("--follow", help="Follows specific source")
         self.parser.add_argument("--unfollow", help="Unfollows specific source")
         self.parser.add_argument("--enable", help="Enables specific source")
         self.parser.add_argument("--disable", help="Disables specific source")
-        self.parser.add_argument("--list-bookmarks", action="store_true", help="Prints bookmarks to stdout")
-        self.parser.add_argument("--list-entries", action="store_true", help="Prints data to stdout")
-        self.parser.add_argument("--list-sources",action="store_true", help="Lists sources")
-        self.parser.add_argument("--init-sources",action="store_true", help="Initializes sources")
-        self.parser.add_argument("--page-details", help="Shows page details for specified URL")
-        self.parser.add_argument("--search", help="""Search entries. Example: --search "title=Elon" """)
-        self.parser.add_argument("-v", "--verbose",action="store_true", help="Verbose")
-        self.parser.add_argument("--db", default="feedclient.db", help="SQLite database file name")
+        self.parser.add_argument(
+            "--list-bookmarks", action="store_true", help="Prints bookmarks to stdout"
+        )
+        self.parser.add_argument(
+            "--list-entries", action="store_true", help="Prints data to stdout"
+        )
+        self.parser.add_argument(
+            "--list-sources", action="store_true", help="Lists sources"
+        )
+        self.parser.add_argument(
+            "--init-sources", action="store_true", help="Initializes sources"
+        )
+        self.parser.add_argument(
+            "--page-details", help="Shows page details for specified URL"
+        )
+        self.parser.add_argument(
+            "--search", help="""Search entries. Example: --search "title=Elon" """
+        )
+        self.parser.add_argument("-v", "--verbose", action="store_true", help="Verbose")
+        self.parser.add_argument(
+            "--db", default="feedclient.db", help="SQLite database file name"
+        )
 
         # TODO implement
         # --since "2024-01-01 12:03
@@ -291,7 +327,7 @@ def get_entries(db, source_id=None):
 
 
 class FeedClient(object):
-    def __init__(self, sources = None, day_limit = 7, engine = None, parser = None):
+    def __init__(self, sources=None, day_limit=7, engine=None, parser=None):
         self.sources = sources
         self.day_limit = day_limit
         self.engine = engine
@@ -338,7 +374,7 @@ class FeedClient(object):
             c = EntriesTableController(db)
             c.remove(self.day_limit)
 
-            #fetch(db, self.parser, self.day_limit)
+            # fetch(db, self.parser, self.day_limit)
             asyncio.run(fetch_async(db, self.parser, self.day_limit))
             date_now = DateUtils.get_datetime_now_utc()
             print("Current time:{}".format(date_now))
@@ -366,16 +402,19 @@ class FeedClient(object):
             if self.parser.args.verbose:
                 verbose = True
 
-            w = HtmlExporter(directory, entries, verbose = verbose)
+            w = HtmlExporter(directory, entries, verbose=verbose)
             w.write()
 
         if self.parser.args.search:
-            s = AlchemySearch(db, self.parser.args.search, row_handler = SearchResultHandler())
+            s = AlchemySearch(
+                db, self.parser.args.search, row_handler=SearchResultHandler()
+            )
             s.search()
 
         if self.parser.args.page_details:
             from utils.serializers import PageDisplay
-            PageDisplay(self.parser.args.page_details, verbose = self.parser.args.verbose)
+
+            PageDisplay(self.parser.args.page_details, verbose=self.parser.args.verbose)
 
         if self.parser.args.list_entries:
             entries = get_entries(db, self.parser.args.source)
@@ -387,7 +426,11 @@ class FeedClient(object):
         Session = db.get_session()
 
         with Session() as session:
-            source = session.query(SourcesTable).filter(SourcesTable.id == int(source_id)).first()
+            source = (
+                session.query(SourcesTable)
+                .filter(SourcesTable.id == int(source_id))
+                .first()
+            )
             if source:
                 if source.enabled == True:
                     print("Source is already enabled")
@@ -404,7 +447,11 @@ class FeedClient(object):
         Session = db.get_session()
 
         with Session() as session:
-            source = session.query(SourcesTable).filter(SourcesTable.id == int(source_id)).first()
+            source = (
+                session.query(SourcesTable)
+                .filter(SourcesTable.id == int(source_id))
+                .first()
+            )
 
             if source:
                 if source.enabled == False:
@@ -423,7 +470,11 @@ class FeedClient(object):
             Session = db.get_session()
 
             with Session() as session:
-                count = session.query(SourcesTable).filter(SourcesTable.url == page_url).count()
+                count = (
+                    session.query(SourcesTable)
+                    .filter(SourcesTable.url == page_url)
+                    .count()
+                )
                 if count != 0:
                     return True
 
@@ -451,7 +502,7 @@ class FeedClient(object):
 
         Session = db.get_session()
         with Session() as session:
-            session.add( SourcesTable(url = url.url, title = title))
+            session.add(SourcesTable(url=url.url, title=title))
             session.commit()
 
         print("You started following {}/{}".format(url.url, title))
@@ -482,12 +533,15 @@ class FeedClient(object):
 
         with Session() as session:
             for source in sources:
-                sources = session.query(SourcesTable).filter(SourcesTable.url == source["url"]).all()
+                sources = (
+                    session.query(SourcesTable)
+                    .filter(SourcesTable.url == source["url"])
+                    .all()
+                )
                 if len(sources) == 0:
                     print("Adding: {}".format(source["title"]))
 
-                    obj = SourcesTable(url = source["url"],
-                            title = source["title"])
+                    obj = SourcesTable(url=source["url"], title=source["title"])
                     session.add(obj)
                     session.commit()
 
@@ -545,7 +599,10 @@ class FeedClient(object):
         entry = EntriesTable(**properties)
 
         with Session() as session:
-            if session.query(EntriesTable).filter(EntriesTable.link == url).count() != 0:
+            if (
+                session.query(EntriesTable).filter(EntriesTable.link == url).count()
+                != 0
+            ):
                 print("Link is already present in the database")
                 return False
 
@@ -557,7 +614,9 @@ class FeedClient(object):
     def make_bookmarked(self, db, entry_id):
         Session = db.get_session()
         with Session() as session:
-            entries = session.query(EntriesTable).filter(EntriesTable.id == int(entry_id))
+            entries = session.query(EntriesTable).filter(
+                EntriesTable.id == int(entry_id)
+            )
 
             if entries.count() == 0:
                 print("Entry {} is not present in the database".format(entry_id))
@@ -574,7 +633,9 @@ class FeedClient(object):
     def make_not_bookmarked(self, db, entry_id):
         Session = db.get_session()
         with Session() as session:
-            entries = session.query(EntriesTable).filter(EntriesTable.id == int(entry_id))
+            entries = session.query(EntriesTable).filter(
+                EntriesTable.id == int(entry_id)
+            )
 
             if entries.count() == 0:
                 print("Entry {} is not present in the database".format(entry_id))

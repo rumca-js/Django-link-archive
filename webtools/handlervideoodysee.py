@@ -3,7 +3,7 @@ from .defaulturlhandler import DefaultUrlHandler
 
 class OdyseeVideoHandler(DefaultUrlHandler):
     def __init__(self, url=None, contents=None, page_options=None):
-        super().__init__(url, contents=contents, page_options = page_options)
+        super().__init__(url, contents=contents, page_options=page_options)
         self.url = OdyseeVideoHandler.input2url(url)
 
     def is_handled_by(self):
@@ -11,6 +11,7 @@ class OdyseeVideoHandler(DefaultUrlHandler):
             return
 
         from .url import Url
+
         protocol_less = Url.get_protololless(self.url)
 
         if protocol_less.startswith("odysee.com/@"):

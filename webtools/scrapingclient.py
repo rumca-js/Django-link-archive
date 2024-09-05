@@ -13,14 +13,14 @@ max_transaction_timeout_s = 40
 
 
 class ScrapingResponseHandler(object):
-
     def on_response(self, response):
         print("Received response:{}".format(response))
 
 
 class ScrapingClient(object):
-
-    def __init__(self, host=None, port=None, response_handler=None, scraping_script=None):
+    def __init__(
+        self, host=None, port=None, response_handler=None, scraping_script=None
+    ):
         if host:
             self.host = host
         else:
@@ -72,7 +72,7 @@ class ScrapingClient(object):
     def is_closed(self):
         return self.c.is_closed()
 
-    def send_request_for_url(self, url, timeout_s = 30):
+    def send_request_for_url(self, url, timeout_s=30):
         request = PageRequestObject(url)
         request.timeout_s = timeout_s
 

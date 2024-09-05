@@ -606,7 +606,7 @@ class EntryDetailView(generic.DetailView):
         from_entry = None
         if "from_entry_id" in self.request.GET:
             from_entry_id = self.request.GET["from_entry_id"]
-            entries = LinkDataController.objects.filter(id = from_entry_id)
+            entries = LinkDataController.objects.filter(id=from_entry_id)
             if entries.exists():
                 from_entry = entries[0]
 
@@ -787,7 +787,7 @@ def add_entry(request):
             entry = b.add_from_props_internal()
 
             if not entry:
-                p.context["summary_text"] = "Could not save link"
+                p.context["summary_text"] = "Link was not saved"
                 return p.render("summary_present.html")
 
             p.context["entry"] = entry
@@ -817,7 +817,7 @@ def add_entry(request):
 
             if not Url.is_web_link(link):
                 p.context[
-                    "summary_text"
+                    "ummary_text"
                 ] = "Only http links are allowed. Link:{}".format(link)
                 return p.render("summary_present.html")
 
@@ -1248,6 +1248,15 @@ def wayback_save(request, pk):
 
 
 def entry_json(request, pk):
+    """
+    User might set access through config. Default is all
+    """
+    p = ViewPage(request)
+    p.set_title("Remove all entries")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
+    if data is not None:
+        return data
+
     links = LinkDataController.objects.filter(id=pk)
 
     if links.count() == 0:
@@ -1266,6 +1275,15 @@ def entry_json(request, pk):
 
 
 def entries_json(request):
+    """
+    User might set access through config. Default is all
+    """
+    p = ViewPage(request)
+    p.set_title("Remove all entries")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
+    if data is not None:
+        return data
+
     found_view = False
 
     query_type = "standard"

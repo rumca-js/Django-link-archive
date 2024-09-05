@@ -213,6 +213,10 @@ User actions are tracked by the system, only if it is configured so:
  - system stores limited amount of search queries, the user can select previous queries from combobox
  - system stores order of visits on entries. This allows to provide "related" section for each entry. For example if you vist entry "X" after "Y", then "X" will appear on "Y" related section
 
+# API keys
+
+Administrator can create API keys for less restricted access to contents.
+
 # Scripts
 
 Web-scraping functionality can be also used without django.

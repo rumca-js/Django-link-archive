@@ -21,7 +21,6 @@ from ..serializers import ReadingListFile
 
 
 def import_reading_list_view(request):
-
     page = ViewPage(request)
     page.set_title("Import view")
     data = page.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
@@ -329,7 +328,7 @@ def data_export_job_add(request, pk):
 
     BackgroundJobController.export_data(export)
 
-    return redirect("{}:data-exports".format(LinkDatabase.name))
+    return redirect("{}:backgroundjobs".format(LinkDatabase.name))
 
 
 def write_daily_data_form(request):

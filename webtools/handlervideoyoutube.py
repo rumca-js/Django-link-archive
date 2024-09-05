@@ -7,12 +7,13 @@ from .defaulturlhandler import DefaultUrlHandler
 
 class YouTubeVideoHandler(DefaultUrlHandler):
     def __init__(self, url=None, contents=None, page_options=None):
-        super().__init__(url, contents=contents, page_options = page_options)
+        super().__init__(url, contents=contents, page_options=page_options)
 
         self.url = self.input2url(url)
 
     def is_handled_by(self):
         from .url import Url
+
         if not self.url:
             return False
 
@@ -22,7 +23,10 @@ class YouTubeVideoHandler(DefaultUrlHandler):
             protocol_less.startswith("www.youtube.com/watch")
             or protocol_less.startswith("youtube.com/watch")
             or protocol_less.startswith("m.youtube.com/watch")
-            or (protocol_less.startswith("youtu.be/") and len(protocol_less) > len("youtu.be/"))
+            or (
+                protocol_less.startswith("youtu.be/")
+                and len(protocol_less) > len("youtu.be/")
+            )
         )
 
     def get_video_code(self):
@@ -82,7 +86,7 @@ class YouTubeVideoHandler(DefaultUrlHandler):
 
 
 class YouTubeHtmlHandler(HtmlPage, YouTubeVideoHandler):
-    def __init__(self, url, page_options = None):
+    def __init__(self, url, page_options=None):
         super().__init__(url, page_options)
 
     def is_valid(self):
@@ -233,9 +237,12 @@ class YouTubeJsonHandler(YouTubeVideoHandler):
         if self.get_contents():
             return self.yt_ob.get_channel_code()
 
-    def get_channel_feed_url(self):
+    def get_feeds(self):
+        result = []
         if self.get_contents():
-            return self.yt_ob.get_channel_feed_url()
+            return [self.yt_ob.get_channel_feed_url()]
+
+        return result
 
     def get_channel_name(self):
         if self.get_contents():
@@ -292,7 +299,9 @@ class YouTubeJsonHandler(YouTubeVideoHandler):
 
         youtube_props["embed_url"] = self.get_link_embed()
         youtube_props["valid"] = self.is_valid()
-        youtube_props["channel_feed_url"] = self.get_channel_feed_url()
+        feeds = self.get_feeds()
+        if len(feeds) > 0:
+            youtube_props["channel_feed_url"] = feeds[0]
         youtube_props["contents"] = self.get_json_text()
         youtube_props["keywords"] = self.get_tags()
         youtube_props["live"] = self.is_live()
@@ -381,9 +390,12 @@ class YouTubeJsonHandler(YouTubeVideoHandler):
         if self.get_contents():
             return self.yt_ob.get_channel_code()
 
-    def get_channel_feed_url(self):
+    def get_feeds(self):
+        result = []
         if self.get_contents():
-            return self.yt_ob.get_channel_feed_url()
+            return [self.yt_ob.get_channel_feed_url()]
+
+        return result
 
     def get_channel_name(self):
         if self.get_contents():

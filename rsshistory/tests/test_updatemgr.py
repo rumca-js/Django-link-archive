@@ -8,14 +8,14 @@ from ..controllers import SourceDataController, LinkDataController
 from ..updatemgr import UpdateManager, UpdateExportManager
 from ..configuration import Configuration
 from ..apps import LinkDatabase
-from ..services import GitRepo
+from ..services import GitRepository
 
 from .fakeinternet import FakeInternetTestCase
 
 
-class BaseRepo(GitRepo):
-    def __init__(self, git_data, operating_dir = None):
-        super().__init__(git_data, operating_dir)
+class BaseRepo(GitRepository):
+    def __init__(self, git_data, operating_dir=None, data_source_dir=None):
+        super().__init__(git_data, operating_dir, data_source_dir)
 
         self.is_up = False
         self.is_add = False
@@ -35,7 +35,7 @@ class BaseRepo(GitRepo):
     def push(self):
         self.is_push = True
 
-    def copy_tree(self, input_path):
+    def copy_tree(self):
         self.is_copy_tree = True
 
 
@@ -152,9 +152,6 @@ class UpdateManagerGitTest(FakeInternetTestCase):
 
         self.assertEqual(len(RepoTestFactory.used_repos), 1)
 
-        # expected_path = Path("./data/exports/daily_dir/git/RSS-Link-Database-DAILY")
-        # self.assertEqual(mgr.get_repo_operating_dir(), expected_path)
-
     def test_year_repo(self):
         RepoTestFactory.used_repos = []
 
@@ -167,9 +164,6 @@ class UpdateManagerGitTest(FakeInternetTestCase):
 
         mgr.write_and_push(export_config)
         self.assertEqual(len(RepoTestFactory.used_repos), 1)
-
-        # expected_path = Path("./data/exports/year_dir/git/RSS-Link-Database-YEAR")
-        # self.assertEqual(mgr.get_repo_operating_dir(), expected_path)
 
     def test_notime_repo(self):
         RepoTestFactory.used_repos = []
@@ -184,9 +178,6 @@ class UpdateManagerGitTest(FakeInternetTestCase):
         mgr.write_and_push(export_config)
 
         self.assertEqual(len(RepoTestFactory.used_repos), 1)
-
-        # expected_path = Path("./data/exports/notime_dir/git/RSS-Link-Database-NOTIME")
-        # self.assertEqual(mgr.get_repo_operating_dir(), expected_path)
 
 
 class UpdateManagerLocTest(FakeInternetTestCase):
@@ -286,7 +277,7 @@ class UpdateManagerLocTest(FakeInternetTestCase):
 
         mgr.write_and_push(export_config)
 
-        self.assertEqual(len(RepoTestFactory.used_repos), 0)
+        self.assertEqual(len(RepoTestFactory.used_repos), 1)
 
     def test_year_repo(self):
         RepoTestFactory.used_repos = []
@@ -299,7 +290,7 @@ class UpdateManagerLocTest(FakeInternetTestCase):
         )[0]
 
         mgr.write_and_push(export_config)
-        self.assertEqual(len(RepoTestFactory.used_repos), 0)
+        self.assertEqual(len(RepoTestFactory.used_repos), 1)
 
     def test_notime_repo(self):
         RepoTestFactory.used_repos = []
@@ -313,7 +304,7 @@ class UpdateManagerLocTest(FakeInternetTestCase):
 
         mgr.write_and_push(export_config)
 
-        self.assertEqual(len(RepoTestFactory.used_repos), 0)
+        self.assertEqual(len(RepoTestFactory.used_repos), 1)
 
 
 class UpdateExportManagerTest(FakeInternetTestCase):
@@ -361,7 +352,6 @@ class UpdateExportManagerTest(FakeInternetTestCase):
         )
 
     def test_get_directory__notime(self):
-
         config = Configuration.get_object()
         export_config = DataExport.objects.filter(
             export_data=DataExport.EXPORT_NOTIME_DATA
@@ -369,14 +359,18 @@ class UpdateExportManagerTest(FakeInternetTestCase):
 
         mgr = UpdateExportManager(config, RepoTestFactory, export_config)
 
-        expected_path = Path(config.config_entry.data_export_path) / LinkDatabase.name / Path("./notime_dir") / "notime_data"
+        expected_path = (
+            Path(config.config_entry.data_export_path)
+            / LinkDatabase.name
+            / Path("./notime_dir")
+            / "notime_data"
+        )
 
         # call tested function
         self.assertEqual(mgr.get_directory(), expected_path)
         self.assertEqual(mgr.get_directory(), expected_path)
 
     def test_get_repo_operating_dir(self):
-
         config = Configuration.get_object()
         export_config = DataExport.objects.filter(
             export_data=DataExport.EXPORT_DAILY_DATA
@@ -384,13 +378,18 @@ class UpdateExportManagerTest(FakeInternetTestCase):
 
         mgr = UpdateExportManager(config, RepoTestFactory, export_config)
 
-        expected_path = Path(config.config_entry.data_export_path) / LinkDatabase.name / Path("./daily_dir")  / "daily_data" / "git"
+        expected_path = (
+            Path(config.config_entry.data_export_path)
+            / LinkDatabase.name
+            / Path("./daily_dir")
+            / "daily_data"
+            / "repository"
+        )
 
         # call tested function
         self.assertEqual(mgr.get_repo_operating_dir(), expected_path)
 
     def test_get_write_directory(self):
-
         config = Configuration.get_object()
         export_config = DataExport.objects.filter(
             export_data=DataExport.EXPORT_DAILY_DATA
@@ -398,7 +397,13 @@ class UpdateExportManagerTest(FakeInternetTestCase):
 
         mgr = UpdateExportManager(config, RepoTestFactory, export_config)
 
-        expected_path = Path(config.config_entry.data_export_path) / LinkDatabase.name / Path("./daily_dir")  / "daily_data" / "write"
+        expected_path = (
+            Path(config.config_entry.data_export_path)
+            / LinkDatabase.name
+            / Path("./daily_dir")
+            / "daily_data"
+            / "write"
+        )
 
         # call tested function
         self.assertEqual(mgr.get_write_directory(), expected_path)

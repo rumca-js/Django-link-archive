@@ -17,12 +17,11 @@ from webtools import (
     Url,
     HttpRequestBuilder,
     PageResponseObject,
-    WebLogger
+    WebLogger,
 )
 
 from ..models import AppLogging, ConfigurationEntry
 from ..configuration import Configuration
-
 
 
 from .fakeinternetdata import (

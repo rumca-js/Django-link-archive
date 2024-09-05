@@ -74,8 +74,23 @@ class ViewPage(object):
         self.context[variable_name] = variable_value
 
     def check_access(self):
+        if self.is_api_key_allowed():
+            return True
+
         if not self.is_user_allowed(self.access_type):
             return self.render_implementation("missing_rights.html", 500)
+
+    def is_api_key_allowed(self):
+        key = None
+        if "key" in self.request.GET and self.request.GET["key"]:
+            key = self.request.GET["key"]
+
+        if not key:
+            return False
+
+        keys = ApiKeys.objects.filter(key = key)
+        if keys.exists():
+            return True
 
     def is_user_allowed(self, access_type):
         if not self.is_user_allowed_on_page_level(self.access_type):

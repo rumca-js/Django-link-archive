@@ -13,7 +13,9 @@ from ..controllers import (
 )
 from ..models import KeyWords, DataExport, UserBookmarks
 from ..models import (
-    UserEntryVisitHistory, UserSearchHistory, UserEntryTransitionHistory
+    UserEntryVisitHistory,
+    UserSearchHistory,
+    UserEntryTransitionHistory,
 )
 from ..configuration import Configuration
 
@@ -718,10 +720,14 @@ class EntriesViewsTests2(FakeInternetTestCase):
         MockRequestCounter.mock_page_requests = 0
 
         self.client.login(username="testuser", password="testpassword")
-        url = reverse(
-            "{}:entry-detail".format(LinkDatabase.name),
-            args=[self.entry_youtube.id],
-        ) + "?from_entry_id=" + str(self.entry_html.id)
+        url = (
+            reverse(
+                "{}:entry-detail".format(LinkDatabase.name),
+                args=[self.entry_youtube.id],
+            )
+            + "?from_entry_id="
+            + str(self.entry_html.id)
+        )
 
         # call tested function
         response = self.client.get(url)

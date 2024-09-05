@@ -71,7 +71,6 @@ class WaybackMachine(object):
             time -= timedelta(days=1)
 
     def save_impl(self, url):
-
         user_agent = HttpPageHandler.user_agent
 
         save_api = WaybackMachineSaveAPI(url, user_agent)

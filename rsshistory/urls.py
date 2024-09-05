@@ -16,6 +16,7 @@ from .viewspkg import (
     export,
     domains,
     entryrules,
+    apikeys,
     modelfiles,
     keywords,
     tools,
@@ -194,6 +195,10 @@ urlpatterns = [
     path("entry-rules-json/", entryrules.entry_rules_json, name="entry-rules-json",),
     path("entry-rule/<int:pk>/", entryrules.EntryRulesDetailView.as_view(), name="entry-rule",),
     path("entry-rule-run/<int:pk>/", entryrules.entry_rule_run, name="entry-rule-run",),
+    # API keys
+    path("api-key-add", apikeys.add, name="api-key-add"),
+    path("api-key-remove/<int:pk>/", apikeys.remove, name="api-key-remove"),
+    path("api-keys/", apikeys.ListView.as_view(), name="api-keys",),
     # other, debug forms
     path("page-show-props", tools.page_show_properties, name="page-show-props",),
     path("page-scan-link", tools.page_scan_link, name="page-scan-link",),

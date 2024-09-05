@@ -39,6 +39,9 @@ from .keywords import (
 from .entryrules import (
     EntryRules,
 )
+from .apikeys import (
+    ApiKeys,
+)
 from .useractions import (
     UserTags,
     UserVotes,

@@ -14,6 +14,7 @@ class OdyseeChannelHandler(DefaultUrlHandler):
 
     def is_handled_by(self):
         from .url import Url
+
         if not self.url:
             return False
 

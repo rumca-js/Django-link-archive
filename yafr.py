@@ -2,10 +2,11 @@
 This is example script about how to use this project as a simple RSS reader
 """
 from webtools import (
-    WebConfig,
-    HttpPageHandler,
-    FeedClientParser,
-    FeedClient,
+   WebConfig,
+   HttpPageHandler,
+   FeedClientParser,
+   FeedClient,
+   ScrapingClient,
 )
 
 from sqlalchemy import (
@@ -296,10 +297,18 @@ def main():
     if p.parser.args.verbose:
         WebConfig.use_print_logging()
 
+    # if scraping server is running, use it
+    c = ScrapingClient()
+    c.set_scraping_script("poetry run python crawleebeautifulsoup.py")
+    if c.connect():
+        c.close()
+        HttpPageHandler.crawling_server_port = c.port
+    else:
+        HttpPageHandler.crawling_server_port = 0
+
     # scraping server is not running, we do not use port
-    HttpPageHandler.crawling_server_port = 0
-    HttpPageHandler.crawling_full_script = None
-    HttpPageHandler.crawling_headless_script = None
+    #HttpPageHandler.crawling_full_script = None
+    #HttpPageHandler.crawling_headless_script = None
 
     HttpPageHandler.crawling_full_script = "poetry run python crawleebeautifulsoup.py"
     HttpPageHandler.crawling_headless_script = "poetry run python crawleebeautifulsoup.py"

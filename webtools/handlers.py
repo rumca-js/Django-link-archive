@@ -2,7 +2,7 @@ from .defaulturlhandler import DefaultUrlHandler, DefaultChannelHandler
 from .webtools import RssPage, DomainAwarePage
 
 
-class RedditChannelHandler(RssPage, DefaultUrlHandler):
+class RedditChannelHandler(DefaultChannelHandler):
     def __init__(self, url=None, contents=None):
         self.html = None  # channel html page contains useful info
 

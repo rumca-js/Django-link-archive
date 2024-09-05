@@ -39,6 +39,7 @@ class SqlConnection(object):
     """
     Simple wrapper for connection
     """
+
     def __init__(self, database_file="test.db", parser=None):
         self.cursor = None
         self.database_file = database_file
@@ -82,10 +83,13 @@ class GenericTable(object):
         """
         Expected to set self.table
         """
-        raise NotImplementedError("GenericTable: create function has not been implemeneted")
+        raise NotImplementedError(
+            "GenericTable: create function has not been implemeneted"
+        )
 
     def count(self):
         from sqlalchemy.sql import text
+
         st = select(func.count()).select_from(text(self.table_name))
         return self.get_connection().execute(st).scalar()
 
@@ -142,7 +146,7 @@ class EntriesTable(Base):
 
 
 class EntriesTableController(object):
-    def __init__(self, db, session = None):
+    def __init__(self, db, session=None):
         self.conn = db
         self.session = session
 
@@ -154,14 +158,14 @@ class EntriesTableController(object):
 
     def remove(self, days):
         now = datetime.now(timezone.utc)
-        limit = now - timedelta(days = days)
+        limit = now - timedelta(days=days)
 
         Session = self.get_session()
 
         with Session() as session:
             entries = session.query
 
-            query = delete(EntriesTable).where(EntriesTable.date_published < limit)
+            query = delete(EntriesTable).where(EntriesTable.date_published < limit, EntriesTable.bookmarked == False)
             session.execute(query)
             session.commit()
 
@@ -192,13 +196,12 @@ class SourcesTable(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     enabled: Mapped[bool] = mapped_column(default=True)
-    url : Mapped[str] = mapped_column(unique=True)
+    url: Mapped[str] = mapped_column(unique=True)
     title: Mapped[str]
 
 
 class SourcesTableController(object):
-
-    def __init__(self, db, session = None):
+    def __init__(self, db, session=None):
         self.conn = db
         self.session = session
 
@@ -223,11 +226,17 @@ class SourcesTableController(object):
 
         with Session() as session:
             if id:
-                sources = session.query(SourcesTable).filter(SourcesTable.id == int(id)).count()
+                sources = (
+                    session.query(SourcesTable)
+                    .filter(SourcesTable.id == int(id))
+                    .count()
+                )
                 if sources != 0:
                     is_source = True
             if url:
-                sources = session.query(SourcesTable).filter(SourcesTable.url == url).count()
+                sources = (
+                    session.query(SourcesTable).filter(SourcesTable.url == url).count()
+                )
                 if sources != 0:
                     is_source = True
 
@@ -243,8 +252,7 @@ class SourceOperationalData(Base):
 
 
 class SourceOperationalDataController(object):
-
-    def __init__(self, db, session = None):
+    def __init__(self, db, session=None):
         self.conn = db
         self.session = session
 
@@ -257,7 +265,11 @@ class SourceOperationalDataController(object):
     def is_fetch_possible(self, source, date_now, limit_seconds=60 * 10):
         Session = self.get_session()
         with Session() as session:
-            rows = session.query(SourceOperationalData).filter(SourceOperationalData.source_obj_id == source.id).all()
+            rows = (
+                session.query(SourceOperationalData)
+                .filter(SourceOperationalData.source_obj_id == source.id)
+                .all()
+            )
 
             if len(rows) == 0:
                 return True
@@ -275,9 +287,15 @@ class SourceOperationalDataController(object):
     def set_fetched(self, source, date_now):
         Session = self.get_session()
         with Session() as session:
-            op_data = session.query(SourceOperationalData).filter(SourceOperationalData.source_obj_id == source.id).all()
+            op_data = (
+                session.query(SourceOperationalData)
+                .filter(SourceOperationalData.source_obj_id == source.id)
+                .all()
+            )
             if len(op_data) == 0:
-                obj = SourceOperationalData(date_fetched = date_now, source_obj_id = source.id)
+                obj = SourceOperationalData(
+                    date_fetched=date_now, source_obj_id=source.id
+                )
                 session.add(obj)
                 session.commit()
             else:

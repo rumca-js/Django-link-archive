@@ -31,9 +31,7 @@ class BaseDataWriter(object):
         self.date_iso = data_writer_config.date_iso
 
     def get_directory(self):
-        return (
-            self.directory
-        )
+        return self.directory
 
     def get_domains_json(self):
         from .controllers import DomainsController

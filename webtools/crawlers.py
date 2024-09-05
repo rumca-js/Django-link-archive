@@ -21,7 +21,7 @@ from .webtools import (
     HTTP_STATUS_CODE_PAGE_UNSUPPORTED,
 )
 
-from .ipc import(
+from .ipc import (
     string_to_command,
     SocketConnection,
 )
@@ -48,7 +48,6 @@ except Exception as E:
 
 
 class CrawlerInterface(object):
-
     def __init__(self, request, response_file=None, response_port=None):
         """
         @param response_file If set, response is stored in a file
@@ -140,7 +139,9 @@ class RequestsPage(CrawlerInterface):
         """
         Wrapper for python requests.
         """
-        super().__init__(request, response_file=response_file, response_port=response_port)
+        super().__init__(
+            request, response_file=response_file, response_port=response_port
+        )
 
     def run(self):
         if not requests_feataure_enabled:
@@ -288,9 +289,10 @@ class RequestsPage(CrawlerInterface):
 
 
 class SeleniumDriver(CrawlerInterface):
-
     def __init__(self, request, response_file=None, response_port=None):
-        super().__init__(request, response_file=response_file, response_port=response_port)
+        super().__init__(
+            request, response_file=response_file, response_port=response_port
+        )
 
     def get_driver(self):
         """

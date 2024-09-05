@@ -909,11 +909,7 @@ class ExportDataJobHandler(BaseJobHandler):
                 AppLogging.error("Export {} does not exist".format(obj.subject))
                 return
 
-            AppLogging.notify(
-                "Exporting data. Export:{}".format(
-                    obj.subject
-                )
-            )
+            AppLogging.notify("Exporting data. Export:{}".format(obj.subject))
 
             update_mgr = UpdateManager(self._config)
 
@@ -1194,7 +1190,7 @@ class RunRuleJobHandler(BaseJobHandler):
         try:
             rule_id = int(obj.subject)
 
-            rules = EntryRules.objects.filter(id = rule_id)
+            rules = EntryRules.objects.filter(id=rule_id)
 
             entries_all = LinkDataController.objects.all()
             p = Paginator(entries_all, 1000)
@@ -1468,7 +1464,7 @@ class GenericJobsProcessor(CeleryTaskInterface):
             jobs_conditions = Q()
 
             for ajob in jobs:
-                jobs_conditions |= Q(job = ajob)
+                jobs_conditions |= Q(job=ajob)
 
             query_conditions &= jobs_conditions
 
@@ -1507,7 +1503,9 @@ class SourceJobsProcessor(GenericJobsProcessor):
     """
 
     def get_supported_jobs(self):
-        return [BackgroundJob.JOB_PROCESS_SOURCE,]
+        return [
+            BackgroundJob.JOB_PROCESS_SOURCE,
+        ]
 
 
 class WriteJobsProcessor(GenericJobsProcessor):
@@ -1516,11 +1514,13 @@ class WriteJobsProcessor(GenericJobsProcessor):
     """
 
     def get_supported_jobs(self):
-        return [BackgroundJob.JOB_WRITE_DAILY_DATA,
-                BackgroundJob.JOB_WRITE_TOPIC_DATA,
-                BackgroundJob.JOB_WRITE_YEAR_DATA,
-                BackgroundJob.JOB_WRITE_NOTIME_DATA,
-                BackgroundJob.JOB_EXPORT_DATA,]
+        return [
+            BackgroundJob.JOB_WRITE_DAILY_DATA,
+            BackgroundJob.JOB_WRITE_TOPIC_DATA,
+            BackgroundJob.JOB_WRITE_YEAR_DATA,
+            BackgroundJob.JOB_WRITE_NOTIME_DATA,
+            BackgroundJob.JOB_EXPORT_DATA,
+        ]
 
 
 class ImportJobsProcessor(GenericJobsProcessor):
@@ -1529,11 +1529,13 @@ class ImportJobsProcessor(GenericJobsProcessor):
     """
 
     def get_supported_jobs(self):
-        return [BackgroundJob.JOB_IMPORT_DAILY_DATA,
-                BackgroundJob.JOB_IMPORT_BOOKMARKS,
-                BackgroundJob.JOB_IMPORT_SOURCES,
-                BackgroundJob.JOB_IMPORT_INSTANCE,
-                BackgroundJob.JOB_IMPORT_FROM_FILES,]
+        return [
+            BackgroundJob.JOB_IMPORT_DAILY_DATA,
+            BackgroundJob.JOB_IMPORT_BOOKMARKS,
+            BackgroundJob.JOB_IMPORT_SOURCES,
+            BackgroundJob.JOB_IMPORT_INSTANCE,
+            BackgroundJob.JOB_IMPORT_FROM_FILES,
+        ]
 
 
 class LeftOverJobsProcessor(GenericJobsProcessor):
@@ -1542,6 +1544,7 @@ class LeftOverJobsProcessor(GenericJobsProcessor):
 
     def get_supported_jobs(self):
         from .tasks import get_processors
+
         jobs = []
         choices = BackgroundJobController.JOB_CHOICES
 

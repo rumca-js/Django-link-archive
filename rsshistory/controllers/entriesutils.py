@@ -126,24 +126,24 @@ class EntriesCleanup(object):
     def cleanup_remove_entries(self, limit_s=0):
         sources = SourceDataController.objects.all()
         for source in sources:
-            #AppLogging.debug("Removing for source:{}".format(source.title))
+            # AppLogging.debug("Removing for source:{}".format(source.title))
             entries = self.get_source_entries(source)
 
             if entries:
-                #for entry in entries:
+                # for entry in entries:
                 #    AppLogging.debug("Removing source entry:{}".format(entry.link))
                 entries.delete()
 
         entries = self.get_general_entries()
         if entries:
-            #for entry in entries:
+            # for entry in entries:
             #    AppLogging.debug("Removing general entry:{}".format(entry.link))
             entries.delete()
 
         if not self.archive_cleanup:
             entries = self.get_stale_entries()
             if entries:
-                #for entry in entries:
+                # for entry in entries:
                 #    AppLogging.debug("Removing stale entry:{}".format(entry.link))
                 entries.delete()
 
@@ -1473,7 +1473,9 @@ class EntryDataBuilder(object):
         # bad stuff?
         if self.source_is_auto:
             keywords = Configuration.get_object().get_blocked_keywords()
-            v = UrlPropertyValidator(properties=self.link_data, blocked_keywords=keywords)
+            v = UrlPropertyValidator(
+                properties=self.link_data, blocked_keywords=keywords
+            )
             if not v.is_valid():
                 AppLogging.error(
                     "Rejecting:{}\nData:{}\n".format(
