@@ -3,18 +3,28 @@
 #  - ps auxw | grep runserver
 #  - kill -9 xxx the server
 #
+# postgres
+#  https://stackoverflow.com/questions/60420940/how-to-fix-error-error-database-is-uninitialized-and-superuser-password-is-not
+#
 
 build:
-	docker build -t python-django-app .
+	docker build -t django-link-archive .
+
+build-clean:
+	docker build --no-cache -t django-link-archive .
 
 run:
-	docker run -p 8000:8000 python-django-app
+	docker run -p 8000:8000 django-link-archive
 
 list:
 	docker ps -a
 
 stop:
 	docker stop container_id
+
+remove:
+	# if poetry complains do poetry update
+	docker container rm container_id
 
 install:
 	# installation as in https://www.linuxtechi.com/how-to-install-docker-on-linux-mint/#6_Test_Docker_Installation

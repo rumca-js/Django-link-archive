@@ -12,6 +12,27 @@ echo "Apply database migrations"
 # poetry run python manage.py migrate
 poetry run python manage.py migrate --run-syncdb
 
+if [ -z "${DJANGO_SUPERUSER_USERNAME}" ]; then 
+    FOO_USER='admin'
+else 
+    FOO_USER=${DJANGO_SUPERUSER_USERNAME}
+fi
+
+if [ -z "${DJANGO_SUPERUSER_PASSWORD}" ]; then 
+    export DJANGO_SUPERUSER_PASSWORD='admin'
+else 
+    export FOO_PASSWORD=${DJANGO_SUPERUSER_PASSWORD}
+fi
+
+if [ -z "${DJANGO_SUPERUSER_EMAIL}" ]; then 
+    export DJANGO_SUPERUSER_EMAIL='no@email.com'
+fi
+
+poetry run python manage.py createsuperuser \
+  --noinput \
+  --username $FOO_USER \
+  --email "${DJANGO_SUPERUSER_EMAIL}" \
+
 # Start server
 echo "Starting server"
 poetry run python manage.py runserver 0.0.0.0:8000
