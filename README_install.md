@@ -1,3 +1,14 @@
+
+# Docker [under constructon]
+
+Docker image is available at [hub.docker.com](https://hub.docker.com/r/rozbujnik/django-link-archive)
+
+Notes:
+
+ - the image uses SQLite database
+ - currently does not provide background tasks
+ - the image uses 'admin' user, with 'admin' password. Django can be accessed locally with 127.0.0.1:8000, via browser.
+
 # Overview
 
 This project uses the following technologies:
@@ -5,9 +16,8 @@ This project uses the following technologies:
  - celery - background task processing
  - Postgresql - use of SQLite is discouraged
  - spacy - for text/keyword analysis
- - crawlee - for crawling the web
+ - selenium / crawlee
  - rabbitmq-server
- - memcached - without it memory locking does not work
 
 Steps:
  - [Prerequisites](https://github.com/rumca-js/Django-link-archive/blob/main/README_install.md#prerequisites)
@@ -20,16 +30,6 @@ Steps:
 Notes:
  - it is best to use on a device with SSD
  - do not use SQLlite for production, or more advanced setups https://docs.djangoproject.com/en/5.0/ref/databases/#sqlite-notes
-
-# Docker [under constructon]
-
-Docker image is available at [hub.docker.com](https://hub.docker.com/r/rozbujnik/django-link-archive)
-
-Notes:
-
- - the image uses SQLite database
- - currently does not provide background tasks
- - the image uses 'admin' user, with 'admin' password. Django can be accessed locally with 127.0.0.1:8000, via browser.
 
 # Prerequisites
 
