@@ -85,7 +85,7 @@ def setup_periodic_tasks(sender, **kwargs):
                 [60.0, "LeftOverJobsProcessor"],
         ]
 
-        for app in apps:
+        for app in installed_apps:
             for task_info in tasks_info:
                 time_s = task_info[0]
                 task_processor = task_info[1]
