@@ -1,4 +1,4 @@
-from ..services import GoogleTranslate
+from utils.services import GoogleTranslate
 from .fakeinternet import FakeInternetTestCase
 
 

@@ -484,7 +484,10 @@ class FeedClient(object):
             print("Such source is already added")
             return False
 
-        url = Url.find_rss_url(page_url)
+        u = Url(page_url)
+        u.get_response()
+
+        url = Url.find_rss_url(u)
         if not url:
             print("That does not seem to be a correct RSS source:{}".format(page_url))
 

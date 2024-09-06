@@ -22,6 +22,7 @@ from webtools import DomainAwarePage, Url
 
 from utils.basictypes import fix_path_for_os
 from utils.programwrappers import ytdlp, id3v2
+from utils.services.waybackmachine import WaybackMachine
 
 from .apps import LinkDatabase
 from .models import (
@@ -595,8 +596,6 @@ class LinkSaveJobHandler(BaseJobHandler):
     def process(self, obj=None):
         try:
             item = obj.subject
-
-            from .services.waybackmachine import WaybackMachine
 
             wb = WaybackMachine()
             if wb.is_saved(item):
@@ -1539,6 +1538,10 @@ class ImportJobsProcessor(GenericJobsProcessor):
 
 
 class LeftOverJobsProcessor(GenericJobsProcessor):
+    """
+    There can be many queues handling jobs.
+    This processor handles jobs that are not handled by other queues
+    """
     def __init__(self):
         super().__init__()
 
@@ -1563,3 +1566,22 @@ class LeftOverJobsProcessor(GenericJobsProcessor):
                     jobs.remove(processor_job)
 
         return jobs
+
+
+class OneTaskProcessor(GenericJobsProcessor):
+    """
+    To be used by processing if there is only one task running.
+    that captures all necessar data.
+    """
+
+    def __init__(self):
+        super().__init__()
+
+    def run(self):
+        from .tasks import get_processors
+        for processor in get_processors():
+            processor_object = processor()
+            processor_object.run()
+
+        leftover_processor = LeftOverJobsProcessor()
+        leftover_processor.run()

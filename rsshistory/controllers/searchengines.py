@@ -1,5 +1,6 @@
 import urllib.parse
 from utils.dateutils import DateUtils
+from utils.services.waybackmachine import WaybackMachine
 
 
 class SearchEngine(object):

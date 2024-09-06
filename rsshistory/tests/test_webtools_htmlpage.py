@@ -411,7 +411,7 @@ class HtmlPageTest(FakeInternetTestCase):
 
         p = HtmlPage("https://linkedin.com/test", webpage_rss_links)
 
-        all_rss = p.get_rss_urls()
+        all_rss = p.get_feeds()
 
         self.assertTrue("http://your-site.com/your-feed1.rss" in all_rss)
         self.assertTrue("http://your-site.com/your-feed2.rss" in all_rss)

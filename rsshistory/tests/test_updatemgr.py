@@ -8,7 +8,7 @@ from ..controllers import SourceDataController, LinkDataController
 from ..updatemgr import UpdateManager, UpdateExportManager
 from ..configuration import Configuration
 from ..apps import LinkDatabase
-from ..services import GitRepository
+from utils.services import GitRepository
 
 from .fakeinternet import FakeInternetTestCase
 

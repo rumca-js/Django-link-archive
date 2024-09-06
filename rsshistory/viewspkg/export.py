@@ -7,6 +7,7 @@ from django.http import HttpResponseRedirect
 
 from webtools import DomainAwarePage
 from utils.dateutils import DateUtils
+from utils.services.waybackmachine import WaybackMachine
 
 from ..apps import LinkDatabase
 from ..models import DataExport, ConfigurationEntry
@@ -169,8 +170,6 @@ def get_time_stamps(url, start_time, stop_time):
 
 
 def import_source_from_ia_range_impl(source_url, archive_start, archive_stop):
-    from ..services.waybackmachine import WaybackMachine
-
     wb = WaybackMachine()
 
     for timestamp in get_time_stamps(source_url, archive_start, archive_stop):

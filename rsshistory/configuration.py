@@ -5,6 +5,7 @@ import logging
 from django.contrib.auth.models import User
 
 from utils.dateutils import DateUtils
+from utils.logger import Logger
 
 from .models import ConfigurationEntry, SystemOperation
 from .apps import LinkDatabase
@@ -19,7 +20,7 @@ version is split into three digits:
  if a change requires the model to be changed, then second digit is updated, patch is set to 0
  if something should be released to public, then release version changes
 """
-__version__ = "0.78.0"
+__version__ = "0.78.1"
 
 
 class Configuration(object):
@@ -101,7 +102,8 @@ class Configuration(object):
         return result
 
     def enable_logging(self):
-        pass
+        from .models import AppLogging
+        Logger.app_logger = AppLogging
 
     def apply_ssl_verification(self):
         from webtools import HttpPageHandler

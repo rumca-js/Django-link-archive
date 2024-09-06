@@ -13,6 +13,7 @@ from webtools import Url, DomainAwarePage, DomainCache
 from utils.dateutils import DateUtils
 from utils.serializers import ReturnDislike
 from utils.omnisearch import SingleSymbolEvaluator
+from utils.services import WaybackMachine
 
 from ..apps import LinkDatabase
 from ..models import (
@@ -52,7 +53,6 @@ from ..views import ViewPage
 from ..queryfilters import EntryFilter, OmniSearchFilter
 from ..configuration import Configuration
 from ..pluginurl import UrlHandler
-from ..services import WaybackMachine
 from ..serializers.instanceimporter import InstanceExporter
 from .plugins.entrypreviewbuilder import EntryPreviewBuilder
 

@@ -1,6 +1,7 @@
+from utils.services.gitrepository import GitRepository
+from utils.repositoryinterface import RepositoryInterface
+
 from .models import AppLogging, DataExport
-from .services.gitrepository import GitRepository
-from .repositoryinterface import RepositoryInterface
 
 
 class RepositoryFactory(object):

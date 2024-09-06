@@ -189,7 +189,7 @@ class FeedReaderFeed(FeedObject):
             self.published = None
             self.author = None
             self.tags = []
-            self.image = None
+            self.image = {}
             return
 
         self.title = self.try_to_get_field("title")

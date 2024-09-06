@@ -29,7 +29,6 @@ class YouTubeChannelHandlerTest(FakeInternetTestCase):
         )
 
     def test_source_code2feed(self):
-        self.assertEqual(
-            YouTubeChannelHandler("1234").get_channel_feed_url(),
-            "https://www.youtube.com/feeds/videos.xml?channel_id=1234",
+        self.assertTrue(
+            "https://www.youtube.com/feeds/videos.xml?channel_id=1234" in YouTubeChannelHandler("1234").get_feeds(),
         )

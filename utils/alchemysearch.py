@@ -89,8 +89,11 @@ class AlchemySearch(object):
         search = OmniSearch(self.search_term, equation_evaluator=equation_evaluator)
         combined_query_conditions = search.get_combined_query()
 
-        session = self.db.get_session()
-        rows = session.query(EntriesTable).filter(combined_query_conditions).all()
+        Session = self.db.get_session()
+
+        rows = []
+        with Session() as session:
+            rows = session.query(EntriesTable).filter(combined_query_conditions).all()
 
         for key, row in enumerate(rows):
             self.alchemy_row_handler.handle_row(row)

@@ -347,7 +347,6 @@ class DomainAwarePage(object):
         text = parts[0] + parts[1] + parts[2].lower()
         x = DomainAwarePage(text)
         if self.url and not x.is_web_link():
-            print("1")
             return
 
         # if passed email, with user

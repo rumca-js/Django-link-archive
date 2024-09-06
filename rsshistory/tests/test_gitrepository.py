@@ -2,13 +2,13 @@ from pathlib import Path
 
 from django.contrib.auth.models import User
 from utils.dateutils import DateUtils
+from utils.services import GitRepository
 
 from ..models import DataExport, ConfigurationEntry, UserBookmarks
 from ..controllers import SourceDataController, LinkDataController
 from ..updatemgr import UpdateManager, UpdateExportManager
 from ..configuration import Configuration
 from ..apps import LinkDatabase
-from ..services import GitRepository
 
 from .fakeinternet import FakeInternetTestCase
 

@@ -59,6 +59,9 @@ def memcache_lock(lock_id, oid):
         if status:
             cache.delete(lock_id)
 
+# define for which apps support celery
+installed_apps = [ "rsshistory", ]
+
 
 @app.on_after_configure.connect
 def setup_periodic_tasks(sender, **kwargs):
@@ -74,8 +77,6 @@ def setup_periodic_tasks(sender, **kwargs):
         print("Clearing cache")
         cache.clear()
 
-        # define for which apps support celery
-        apps = ["rsshistory",]
         tasks_info = [
                 [300.0, "RefreshProcessor"],
                 [60.0, "SourceJobsProcessor"],

@@ -2,7 +2,7 @@ from datetime import timedelta
 from django.test import TestCase
 from django.contrib.auth.models import User
 
-from .fakeinternet import FakeInternetTestCase
+from utils.dateutils import DateUtils
 
 from ..models import (
     UserEntryVisitHistory,
@@ -10,8 +10,8 @@ from ..models import (
     UserEntryTransitionHistory,
 )
 from ..controllers import LinkDataController, SourceDataController
-from .dateutils import DateUtils
 from ..configuration import Configuration
+from .fakeinternet import FakeInternetTestCase
 
 
 class UserSearchHistoryTest(TestCase):

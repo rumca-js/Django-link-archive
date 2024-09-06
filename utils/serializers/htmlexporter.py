@@ -12,7 +12,7 @@ def fix_entry_link_name(link):
         link = link[:150]
     link = link.replace(".", "")
     link = link.replace("-", "")
-    return link+".html"
+    return link + ".html"
 
 
 def get_youtube_style():
@@ -35,7 +35,7 @@ def get_youtube_style():
 
 
 class HtmlEntryExporter(object):
-    def __init__(self, output_directory, entry, index_file = None, verbose=False):
+    def __init__(self, output_directory, entry, index_file=None, verbose=False):
         self.entry = entry
         self.output_directory = output_directory
         self.index_file = index_file
@@ -52,7 +52,11 @@ class HtmlEntryExporter(object):
             with open(file_name, "w", encoding="utf-8") as fh:
                 fh.write(text)
         except Exception as E:
-            print("Cannot write file:{} len:{}\n{}".format(str(file_name), len(str(file_name)), str(E)))
+            print(
+                "Cannot write file:{} len:{}\n{}".format(
+                    str(file_name), len(str(file_name)), str(E)
+                )
+            )
 
     def get_entry_text(self):
         entry = self.entry
@@ -65,7 +69,7 @@ class HtmlEntryExporter(object):
         description = entry.description
         date_published = entry.date_published
         source = entry.source
-        #source_title = entry.source
+        # source_title = entry.source
 
         show_thumbnail = True
 
@@ -102,11 +106,11 @@ class HtmlEntryExporter(object):
             c = InputContent(description)
             description = c.htmlify()
 
-        text += f'<h1>[{id}] {title}</h1>'
-        text += f'</a>'
-        text += f'<div>{source}</div>'
-        text += f'<div>{date_published}</div>'
-        text += f'<div><pre>{description}</pre></div>'
+        text += f"<h1>[{id}] {title}</h1>"
+        text += f"</a>"
+        text += f"<div>{source}</div>"
+        text += f"<div>{date_published}</div>"
+        text += f"<div><pre>{description}</pre></div>"
         text += "</body>"
         text += "</html>"
         return text
@@ -116,13 +120,15 @@ class HtmlEntryExporter(object):
         handler = url.get_handler()
 
         if type(handler) is Url.youtube_video_handler:
-            h = YouTubeVideoHandler(url = self.entry.link)
+            h = YouTubeVideoHandler(url=self.entry.link)
             return '<div class="youtube_player_container"><iframe src="{0}" frameborder="0" allowfullscreen class="youtube_player_frame" referrerpolicy="no-referrer-when-downgrade"></iframe></div>'.format(
                 h.get_link_embed()
             )
         else:
             thumbnail = self.entry.thumbnail
-            return f'<div><img style="width:400px;height=300px" src="{thumbnail}" /></div>'
+            return (
+                f'<div><img style="width:400px;height=300px" src="{thumbnail}" /></div>'
+            )
 
     def get_entry_file_name(self):
         link = self.entry.link
@@ -130,7 +136,13 @@ class HtmlEntryExporter(object):
 
 
 class HtmlIndexExporter(object):
-    def __init__(self, cwd = Path("."), output_file="index.html", previous_index = None, verbose = False):
+    def __init__(
+        self,
+        cwd=Path("."),
+        output_file="index.html",
+        previous_index=None,
+        verbose=False,
+    ):
         self.verbose = verbose
         self.output_file = output_file
         self.output_directory = cwd
@@ -162,21 +174,23 @@ class HtmlIndexExporter(object):
         description = entry.description
         date_published = entry.date_published
         source = entry.source
-        #source_title = entry.source
+        # source_title = entry.source
 
         entry_file_name = self.get_entry_file_name(entry)
 
         self.text += f'<a href="{entry_file_name}">'
         if thumbnail:
-            self.text += f'<div><img style="width:400px;height=300px" src="{thumbnail}" /></div>'
+            self.text += (
+                f'<div><img style="width:400px;height=300px" src="{thumbnail}" /></div>'
+            )
 
-        self.text += f'<h1>{title}</h1>'
-        self.text += f'</a>'
-        self.text += f'<div>{source}</div>'
-        self.text += f'<div>{date_published}</div>'
-        self.text += f'<hr/>'
+        self.text += f"<h1>{title}</h1>"
+        self.text += f"</a>"
+        self.text += f"<div>{source}</div>"
+        self.text += f"<div>{date_published}</div>"
+        self.text += f"<hr/>"
 
-    def write(self, next_index = None):
+    def write(self, next_index=None):
         if self.previous_index:
             previous_file = self.previous_index.get_file_name()
             self.text += f'<a href="{previous_file}"><h2>Previous Page</h2></a>'
@@ -189,7 +203,9 @@ class HtmlIndexExporter(object):
         self.text += "</body>"
         self.text += "</html>"
 
-        with open(str(self.output_directory / self.output_file), "w", encoding="utf-8") as fh:
+        with open(
+            str(self.output_directory / self.output_file), "w", encoding="utf-8"
+        ) as fh:
             fh.write(self.text)
 
     def get_file_name(self):
@@ -209,12 +225,21 @@ class HtmlExporter(object):
     def write(self):
         index_number = 0
 
-        self.current_index = HtmlIndexExporter(cwd = self.output_directory, output_file = self.get_index_file_name(index_number), verbose = self.verbose)
+        self.current_index = HtmlIndexExporter(
+            cwd=self.output_directory,
+            output_file=self.get_index_file_name(index_number),
+            verbose=self.verbose,
+        )
 
         for row_index, entry in enumerate(self.entries):
             if row_index % 100 == 99:
                 index_number += 1
-                next_index = HtmlIndexExporter(cwd = self.output_directory, output_file = self.get_index_file_name(index_number), previous_index=self.current_index, verbose = self.verbose)
+                next_index = HtmlIndexExporter(
+                    cwd=self.output_directory,
+                    output_file=self.get_index_file_name(index_number),
+                    previous_index=self.current_index,
+                    verbose=self.verbose,
+                )
 
                 self.current_index.write(next_index)
 
@@ -227,7 +252,9 @@ class HtmlExporter(object):
 
     def write_entry_file(self, entry):
         # write entry file
-        w = HtmlEntryExporter(self.output_directory, entry, self.current_index, verbose=self.verbose)
+        w = HtmlEntryExporter(
+            self.output_directory, entry, self.current_index, verbose=self.verbose
+        )
         w.write()
 
     def get_index_file_name(self, index_number):
