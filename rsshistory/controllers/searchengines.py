@@ -1,6 +1,5 @@
 import urllib.parse
 from utils.dateutils import DateUtils
-from utils.services.waybackmachine import WaybackMachine
 
 
 class SearchEngine(object):
@@ -100,7 +99,7 @@ class SearchEngineArchiveOrg(SearchEngine):
 
     def get_search_string(self, search_term=None):
         """ """
-        from ..services.waybackmachine import WaybackMachine
+        from utils.services.waybackmachine import WaybackMachine
 
         if not search_term:
             search_term = self.query_term

@@ -5,16 +5,21 @@
 #
 # postgres
 #  https://stackoverflow.com/questions/60420940/how-to-fix-error-error-database-is-uninitialized-and-superuser-password-is-not
-#
+
+
+APP_NAME=django-link-archive
+
 
 build:
-	docker build -t django-link-archive .
+	# poetry lock -> to write lock file
+	docker build -t $(USER_NAME)/$(APP_NAME) .
 
 build-clean:
-	docker build --no-cache -t django-link-archive .
+	# poetry lock -> to write lock file
+	docker build --no-cache -t $(USER_NAME)/$(APP_NAME) .
 
 run:
-	docker run -p 8000:8000 django-link-archive
+	docker run -p 8000:8000 $(USER_NAME)/$(APP_NAME)
 
 list:
 	docker ps -a
@@ -37,3 +42,11 @@ install:
 	newgrp docker
 	
 	echo Installation successful, please reboot computer
+
+publish:
+	docker login --username $(USER_NAME) --password $(USER_PASSWORD)
+	#docker image tag local-image:INIT new-repo:tagname
+	docker push $(USER_NAME)/$(APP_NAME)
+
+refresh:
+	docker exec -d container_id poetry run celery call app.tasks.process_all_jobs -a '["rsshistory.threadhandlers.OneTaskProcessor"]'
