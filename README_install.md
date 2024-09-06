@@ -21,16 +21,15 @@ Notes:
  - it is best to use on a device with SSD
  - do not use SQLlite for production, or more advanced setups https://docs.djangoproject.com/en/5.0/ref/databases/#sqlite-notes
 
-# Docker
+# Docker [under constructon]
 
-There is a docker image that can be simply executed
+Docker image is available at [hub.docker.com](https://hub.docker.com/r/rozbujnik/django-link-archive)
 
- - make -f Makefile.docker build
- - make -f Makefile.docker run
+Notes:
 
-It creates 'admin' user, with 'admin' password. Django can be accessed locally with 127.0.0.1:8000, via browser.
-
-This uses app with SQLite database, no background task (celery).
+ - the image uses SQLite database
+ - currently does not provide background tasks
+ - the image uses 'admin' user, with 'admin' password. Django can be accessed locally with 127.0.0.1:8000, via browser.
 
 # Prerequisites
 
