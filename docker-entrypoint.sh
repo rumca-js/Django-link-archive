@@ -12,6 +12,7 @@ echo "Apply database migrations"
 # poetry run python manage.py migrate
 poetry run python manage.py migrate --run-syncdb
 
+echo "Creating user"
 if [ -z "${DJANGO_SUPERUSER_USERNAME}" ]; then 
     FOO_USER='admin'
 else 
@@ -33,7 +34,10 @@ poetry run python manage.py createsuperuser \
   --username $FOO_USER \
   --email "${DJANGO_SUPERUSER_EMAIL}" \
 
-# Start server
+echo "Starting celery"
+rm -rf celerybeat-schedule.db
+poetry run celery -A linklibrary worker -l INFO &
+
 echo "Starting server"
 poetry run python manage.py runserver 0.0.0.0:8000
 

@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.sites",
     # Manual edit start
+    'django_celery_results',
     "rsshistory.apps.LinkDatabase",
 ]
 SITE_ID = 1
