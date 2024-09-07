@@ -29,12 +29,17 @@ ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
 
 # Celery
 
-CELERY_BROKER_URL = 'amqp://guest:guest@localhost'
+# for now, to simpliify, we will not use any broker
+# https://www.reddit.com/r/django/comments/er0v7r/did_you_know_that_you_can_use_filesystem_as/
+#CELERY_BROKER_URL = 'memory://localhost/'
+
+CELERY_BROKER_URL = 'amqp://guest:guest@rabbitmq'
 
 #: Only add pickle to this list if your broker is secured
 #: from unwanted access (see userguide/security.html)
 CELERY_ACCEPT_CONTENT = ['json']
-CELERY_RESULT_BACKEND = 'db+sqlite:///results.sqlite'
+#CELERY_RESULT_BACKEND = 'db+sqlite:///results.sqlite'
+CELERY_RESULT_BACKEND = 'db+postgresql://power:notexample@dbserver/control'
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_CACHE_BACKEND = 'django-cache'
 CELERY_RESULT_BACKEND = 'django-db'
@@ -48,6 +53,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
+
     # Manual edit start
     'django_celery_results',
     "rsshistory.apps.LinkDatabase",
@@ -90,10 +97,10 @@ WSGI_APPLICATION = 'linklibrary.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'admin', # database
-        'USER': 'admin',
-        'PASSWORD': 'admin',
-        'HOST': 'localhost',
+        'NAME': 'control', # database
+        'USER': 'power',
+        'PASSWORD': 'notexample',
+        'HOST': 'dbserver',
         'PORT': '',
     }
 }

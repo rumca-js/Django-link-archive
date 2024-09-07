@@ -44,9 +44,17 @@ install:
 	echo Installation successful, please reboot computer
 
 publish:
-	docker login --username $(USER_NAME) --password $(USER_PASSWORD)
-	#docker image tag local-image:INIT new-repo:tagname
+	# docker login --username $(USER_NAME) --password $(USER_PASSWORD)
+	# docker image tag local-image:INIT new-repo:tagname
 	docker push $(USER_NAME)/$(APP_NAME)
 
 refresh:
 	docker exec -d container_id poetry run celery call app.tasks.process_all_jobs -a '["rsshistory.threadhandlers.OneTaskProcessor"]'
+
+compose:
+	# if rabbit cannot start disable rabbit on your system
+	# systemctl stop rabbitmq-server
+	docker compose up
+
+compose-refresh:
+	docker compose up --build rozbujnik/django-link-archive

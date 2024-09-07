@@ -47,7 +47,7 @@ RUN poetry run playwright install
 COPY . /app
 
 # Copy the custom settings template
-COPY ./linklibrary/settings_template_sqlite_celery.py /app/linklibrary/settings.py
+COPY ./linklibrary/settings_template_postgres_celery.py /app/linklibrary/settings.py
 RUN mkdir -p /app/linklibrary/rsshistory/migrations
 RUN touch /app/linklibrary/rsshistory/migrations/__init__.py
 
