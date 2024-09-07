@@ -5,8 +5,8 @@ Docker image is available at [hub.docker.com](https://hub.docker.com/r/rozbujnik
 
 Notes:
 
- - the image uses SQLite database
- - currently does not provide background tasks
+ - cannot log in
+ - celery beat seems to be not running
  - the image uses 'admin' user, with 'admin' password. Django can be accessed locally with 127.0.0.1:8000, via browser.
 
 # Overview
@@ -18,6 +18,8 @@ This project uses the following technologies:
  - spacy - for text/keyword analysis
  - selenium / crawlee
  - rabbitmq-server
+
+# Manual installation
 
 Steps:
  - [Prerequisites](https://github.com/rumca-js/Django-link-archive/blob/main/README_install.md#prerequisites)
