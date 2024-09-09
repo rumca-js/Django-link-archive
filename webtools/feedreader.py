@@ -253,6 +253,7 @@ class FeedReader(object):
     def parse_implementation(self):
         # initial?
         self.feed = FeedReaderFeed(self.root, self.ns, is_atom=True)
+        self.feed.parse()
         self.entries = []
 
         if not self.contents:

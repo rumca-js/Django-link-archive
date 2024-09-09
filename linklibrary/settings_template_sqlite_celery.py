@@ -30,7 +30,8 @@ ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
 
 # for now, to simpliify, we will not use any broker
 # https://www.reddit.com/r/django/comments/er0v7r/did_you_know_that_you_can_use_filesystem_as/
-CELERY_BROKER_URL = 'memory://localhost/'
+
+CELERY_BROKER_URL = 'amqp://guest:guest@rabbitmq'
 
 #: Only add pickle to this list if your broker is secured
 #: from unwanted access (see userguide/security.html)
