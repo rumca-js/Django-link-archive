@@ -284,6 +284,8 @@ class FeedClientParser(object):
         self.parser.add_argument("--unfollow-all", action="store_true", help="Unfollows all sources")
         self.parser.add_argument("--enable", help="Enables specific source")
         self.parser.add_argument("--disable", help="Disables specific source")
+        self.parser.add_argument("--enable-all", help="Enables all sources")
+        self.parser.add_argument("--disable-all", help="Disables all sources")
         self.parser.add_argument(
             "--list-bookmarks", action="store_true", help="Prints bookmarks to stdout"
         )
@@ -384,6 +386,12 @@ class FeedClient(object):
         if self.parser.args.disable:
             self.disable_source(db, self.parser.args.disable)
 
+        if self.parser.args.enable_all:
+            self.enable_all_sources(db)
+
+        if self.parser.args.disable_all:
+            self.disable_all_sources(db)
+
         if self.parser.args.mark_read:
             self.mark_read(db)
 
@@ -446,6 +454,36 @@ class FeedClient(object):
 
             w = OutputWriter(db, entries, date_limit)
             w.write()
+
+    def enable_all_sources(self, db):
+        Session = db.get_session()
+
+        with Session() as session:
+            sources = (
+                session.query(SourcesTable).all()
+            )
+            for source in sources:
+                source.enabled = True
+                session.commit()
+
+            return True
+
+        return False
+
+    def disable_all_sources(self, db):
+        Session = db.get_session()
+
+        with Session() as session:
+            sources = (
+                session.query(SourcesTable).all()
+            )
+            for source in sources:
+                source.enabled = False
+                session.commit()
+
+            return True
+
+        return False
 
     def enable_source(self, db, source_id):
         Session = db.get_session()

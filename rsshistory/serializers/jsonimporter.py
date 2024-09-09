@@ -193,7 +193,9 @@ class MapImporter(object):
         sources = SourceDataController.objects.filter(url=clean_data["url"])
         if sources.count() == 0:
             clean_data = self.drop_source_instance_internal_data(clean_data)
+            clean_data["enabled"] = False
             SourceDataBuilder(link_data=clean_data).add_from_props()
+
         # TODO cleanup
         # else:
         #    if instance_import:

@@ -51,9 +51,9 @@ class InstanceExporter(object):
 
 
 class InstanceImporter(object):
-    def __init__(self, url=None, author=None):
-        super().__init__(author)
+    def __init__(self, url=None, user=None):
         self.url = url
+        self.user = user
 
     def import_all(self):
         from ..pluginurl import UrlHandler
@@ -85,7 +85,7 @@ class InstanceImporter(object):
             importer.import_from_link(json_data["link"])
 
         elif "source" in json_data:
-            importer = MapImporter()
+            importer = MapImporter(user = self.user)
             importer.import_from_source(json_data["source"])
 
     def get_next_page_link(self):

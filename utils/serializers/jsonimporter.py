@@ -206,6 +206,8 @@ class MapImporter(object):
 
         c = SourcesTableController(self.conn)
         if not c.is_source(url = clean_data["url"]):
+            clean_data["enabled"] = False
+
             b = SourceDataBuilder(self.conn, link_data=clean_data)
             b.add_from_props()
 
