@@ -1,6 +1,7 @@
-from ..services import InternetArchive
-from .fakeinternet import FakeInternetTestCase
+from utils.services import InternetArchive
 from datetime import datetime
+
+from .fakeinternet import FakeInternetTestCase
 
 
 class InternetArchiveTest(FakeInternetTestCase):

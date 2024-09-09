@@ -8,9 +8,11 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
+
+Posgres setup:
+https://www.digitalocean.com/community/tutorials/how-to-use-postgresql-with-your-django-application-on-ubuntu-20-04
 """
 
-import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -25,35 +27,20 @@ SECRET_KEY = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# Add necessary hosts here
 ALLOWED_HOSTS = ["127.0.0.1"]
-
-CELERY_BROKER_URL = "amqp://guest:guest@localhost"
-
-#: Only add pickle to this list if your broker is secured
-#: from unwanted access (see userguide/security.html)
-CELERY_ACCEPT_CONTENT = ["json"]
-CELERY_RESULT_BACKEND = "db+sqlite:///results.sqlite"
-CELERY_TASK_SERIALIZER = "json"
-CELERY_CACHE_BACKEND = "django-cache"
-CELERY_RESULT_BACKEND = "django-db"
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    "django.contrib.admin",
-    "django.contrib.auth",
-    "django.contrib.contenttypes",
-    "django.contrib.sessions",
-    "django.contrib.messages",
-    "django.contrib.staticfiles",
-    "django.contrib.sites",
-    # Manual edit start
-    #'django_user_agents',
-    "django_celery_results",
-    "rsshistory.apps.LinkDatabase",
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
 ]
-SITE_ID = 1
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -91,9 +78,13 @@ WSGI_APPLICATION = "linklibrary.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "xxxxxx",  # database name
+        "USER": "xxxxxx",  # database user
+        "PASSWORD": "xxxxxx",  # database password
+        "HOST": "localhost",
+        "PORT": "",
         # manual edit start - for windows
-        "NAME": str(os.path.join(BASE_DIR, "db.sqlite3"))
         # manual edit stop - for windows
     }
 }
@@ -138,11 +129,4 @@ STATIC_URL = "static/"
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-CACHES = {
-    "default": {
-        "BACKEND": "django.core.cache.backends.memcached.PyMemcacheCache",
-        "LOCATION": "127.0.0.1:11211",
-    }
-}
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

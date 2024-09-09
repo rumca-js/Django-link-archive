@@ -43,6 +43,7 @@ from ..controllers import (
     BackgroundJobController,
 )
 from ..configuration import Configuration
+from ..serializers import JsonImporter
 from ..forms import (
     ConfigForm,
     UserConfigForm,
@@ -53,8 +54,13 @@ from ..views import ViewPage
 def index(request):
     p = ViewPage(request)
     p.set_title("Index")
+
     if p.is_user_allowed(ConfigurationEntry.ACCESS_TYPE_ALL):
-        return redirect("{}:entries-omni-search-init".format(LinkDatabase.name))
+        entry = ConfigurationEntry.get()
+        if not entry.initialized:
+            return redirect("{}:wizard".format(LinkDatabase.name))
+        else:
+            return redirect("{}:entries-omni-search-init".format(LinkDatabase.name))
     else:
         exports = DataExport.get_public_export_names()
         p.context["public_exports"] = exports
@@ -245,9 +251,9 @@ def system_status(request):
     p.context["ArchiveLinkDataModel"] = ArchiveLinkDataController.objects.count()
     p.context["KeyWords"] = KeyWords.objects.count()
 
-    #u = EntriesUpdater()
-    #entries = u.get_entries_to_update()
-    #if entries:
+    # u = EntriesUpdater()
+    # entries = u.get_entries_to_update()
+    # if entries:
     #    p.context["LinkDataModel_toupdate"] = entries.count()
 
     p.context["UserTags"] = UserTags.objects.count()
@@ -397,6 +403,14 @@ def wizard_setup(request):
     return p.render("wizard_setup.html")
 
 
+def init_sources(request):
+    if "noinitialize" not in request.GET:
+        path = Path("init_sources.json")
+        if path.exists():
+            i = JsonImporter(path)
+            i.import_all()
+
+
 def wizard_setup_news(request):
     """
     Displays form, or textarea of available links.
@@ -431,7 +445,11 @@ def wizard_setup_news(request):
     c.entries_order_by = "-date_published, link"
     c.display_type = ConfigurationEntry.DISPLAY_TYPE_STANDARD
 
+    c.initialized = True
+
     c.save()
+
+    init_sources(request)
 
     p.context["summary_text"] = "Set configuration for news"
 
@@ -472,7 +490,11 @@ def wizard_setup_gallery(request):
     c.entries_order_by = "-date_published, link"
     c.display_type = ConfigurationEntry.DISPLAY_TYPE_GALLERY
 
+    c.initialized = True
+
     c.save()
+
+    init_sources(request)
 
     p.context["summary_text"] = "Set configuration for gallery"
 
@@ -515,7 +537,11 @@ def wizard_setup_search_engine(request):
     c.entries_order_by = "-page_rating, link"
     c.display_type = ConfigurationEntry.DISPLAY_TYPE_SEARCH_ENGINE
 
+    c.initialized = True
+
     c.save()
+
+    init_sources(request)
 
     p.context["summary_text"] = "Set configuration for search engine"
 
@@ -557,9 +583,9 @@ def is_system_ok(request):
 
 def opensearchxml(request):
     """
-     https://developer.mozilla.org/en-US/docs/Web/OpenSearch
-     example: https://sjp.pwn.pl/opensearch.xml
-     example: https://whoogle.io/opensearch.xml
+    https://developer.mozilla.org/en-US/docs/Web/OpenSearch
+    example: https://sjp.pwn.pl/opensearch.xml
+    example: https://whoogle.io/opensearch.xml
     """
 
     p = ViewPage(request)
@@ -590,13 +616,17 @@ def opensearchxml(request):
       </OpenSearchDescription>
         """
         text = text.replace("{config.instance_title}", config.instance_title)
-        text = text.replace("{config.instance_description}", config.instance_description)
-        text = text.replace("{config.instance_internet_location}", config.instance_internet_location)
+        text = text.replace(
+            "{config.instance_description}", config.instance_description
+        )
+        text = text.replace(
+            "{config.instance_internet_location}", config.instance_internet_location
+        )
 
     status_code = 200
-    content_type="application/opensearchdescription+xml"
+    content_type = "application/opensearchdescription+xml"
 
-    return HttpResponse(text, status=status_code, content_type = content_type)
+    return HttpResponse(text, status=status_code, content_type=content_type)
 
 
 def search_suggestions(request):
@@ -606,7 +636,7 @@ def search_suggestions(request):
     """
 
     status_code = 200
-    content_type="text/html"
+    content_type = "text/html"
     text = "[]"
 
-    return HttpResponse(text, status=status_code, content_type = content_type)
+    return HttpResponse(text, status=status_code, content_type=content_type)

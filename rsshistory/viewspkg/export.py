@@ -7,6 +7,7 @@ from django.http import HttpResponseRedirect
 
 from webtools import DomainAwarePage
 from utils.dateutils import DateUtils
+from utils.services.waybackmachine import WaybackMachine
 
 from ..apps import LinkDatabase
 from ..models import DataExport, ConfigurationEntry
@@ -21,7 +22,6 @@ from ..serializers import ReadingListFile
 
 
 def import_reading_list_view(request):
-
     page = ViewPage(request)
     page.set_title("Import view")
     data = page.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
@@ -170,8 +170,6 @@ def get_time_stamps(url, start_time, stop_time):
 
 
 def import_source_from_ia_range_impl(source_url, archive_start, archive_stop):
-    from ..services.waybackmachine import WaybackMachine
-
     wb = WaybackMachine()
 
     for timestamp in get_time_stamps(source_url, archive_start, archive_stop):
@@ -329,7 +327,7 @@ def data_export_job_add(request, pk):
 
     BackgroundJobController.export_data(export)
 
-    return redirect("{}:data-exports".format(LinkDatabase.name))
+    return redirect("{}:backgroundjobs".format(LinkDatabase.name))
 
 
 def write_daily_data_form(request):

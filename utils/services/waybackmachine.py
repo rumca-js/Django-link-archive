@@ -5,9 +5,7 @@ from datetime import datetime, date, timedelta
 from waybackpy import WaybackMachineCDXServerAPI, WaybackMachineSaveAPI
 
 from webtools import DomainAwarePage, HttpRequestBuilder, HttpPageHandler
-
-from ..models import AppLogging
-from ..apps import LinkDatabase
+from utils.logger import Logger
 
 
 class WaybackMachine(object):
@@ -71,7 +69,6 @@ class WaybackMachine(object):
             time -= timedelta(days=1)
 
     def save_impl(self, url):
-
         user_agent = HttpPageHandler.user_agent
 
         save_api = WaybackMachineSaveAPI(url, user_agent)
@@ -80,7 +77,7 @@ class WaybackMachine(object):
             val = save_api.save()
             return val
         except Exception as E:
-            AppLogging.exc("WaybackMachine: save url: {0}".format(url))
+            Logger.exc("WaybackMachine: save url: {0}".format(url))
             time.sleep(5)  # wait 5 seconds. Ain't nobody got time for that
 
     def save(self, url):
@@ -106,10 +103,10 @@ class WaybackMachine(object):
         return True
 
     def debug_handle(self, handle):
-        LinkDatabase.info(handle)
-        LinkDatabase.info(handle.archive_url)
-        LinkDatabase.info(handle.original)
-        LinkDatabase.info(handle.urlkey)
-        LinkDatabase.info(handle.datetime_timestamp)
-        LinkDatabase.info(handle.statuscode)
-        LinkDatabase.info(handle.mimetype)
+        Logger.debug(handle)
+        Logger.debug(handle.archive_url)
+        Logger.debug(handle.original)
+        Logger.debug(handle.urlkey)
+        Logger.debug(handle.datetime_timestamp)
+        Logger.debug(handle.statuscode)
+        Logger.debug(handle.mimetype)

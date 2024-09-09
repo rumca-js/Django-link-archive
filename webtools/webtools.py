@@ -51,8 +51,7 @@ from bs4 import BeautifulSoup
 
 from utils.dateutils import DateUtils
 
-__version__ = "0.0.3"
-
+__version__ = "0.0.4"
 
 
 PAGE_TOO_BIG_BYTES = 5000000  # 5 MB. There are some RSS more than 1MB
@@ -76,6 +75,7 @@ class WebLogger(object):
     """
     Logging interface
     """
+
     web_logger = None
 
     def info(info_text, detail_text="", user=None, stack=False):
@@ -103,43 +103,6 @@ class WebLogger(object):
             WebLogger.web_logger.exc(exception_object, info_text)
 
 
-class PrintWebLogger(object):
-    """
-    Implementation of weblogger that only prints to std out
-    """
-    def info(info_text, detail_text="", user=None, stack=False):
-        print(info_text)
-        print(detail_text)
-
-    def debug(info_text, detail_text="", user=None, stack=False):
-        print(info_text)
-        print(detail_text)
-
-    def warning(info_text, detail_text="", user=None, stack=False):
-        print(info_text)
-        print(detail_text)
-
-    def error(info_text, detail_text="", user=None, stack=False):
-        print(info_text)
-        print(detail_text)
-
-    def notify(info_text, detail_text="", user=None):
-        print(info_text)
-        print(detail_text)
-
-    def exc(exception_object, info_text=None, user=None):
-        print(str(exception_object))
-
-        error_text = traceback.format_exc()
-        print("Exception format")
-        print(error_text)
-
-        stack_lines = traceback.format_stack()
-        stack_string = "".join(stack_lines)
-        print("Stack:")
-        print("".join(stack_lines))
-
-
 class WebConfig(object):
     """
     API to configure webtools
@@ -149,7 +112,8 @@ class WebConfig(object):
         WebLogger.web_logger = Logger
 
     def use_print_logging():
-        WebLogger.web_logger = PrintWebLogger
+        from utils.logger import PrintLogger
+        WebLogger.web_logger = PrintLogger
 
 
 def lazy_load_content(func):
@@ -346,7 +310,6 @@ class DomainAwarePage(object):
         text = parts[0] + parts[1] + parts[2].lower()
         x = DomainAwarePage(text)
         if self.url and not x.is_web_link():
-            print("1")
             return
 
         # if passed email, with user
@@ -1187,9 +1150,6 @@ class RssPageEntry(ContentInterface):
 
         super().__init__(url=self.url, contents=contents)
 
-        self.allow_adding_with_current_time = True
-        self.default_entry_timestamp = None
-
     def get_properties(self):
         """ """
         output_map = {}
@@ -1298,20 +1258,26 @@ class RssPageEntry(ContentInterface):
     def get_date_published(self):
         date = self.get_date_published_implementation()
 
-        if date > DateUtils.get_datetime_now_utc():
-            date = DateUtils.get_datetime_now_utc()
+        now = DateUtils.get_datetime_now_utc()
+
+        if not date:
+            date = now
+        if date > now:
+            date = now
 
         return date
 
     def get_date_published_implementation(self):
         if hasattr(self.feed_entry, "published"):
-            if not self.feed_entry.published or \
-               str(self.feed_entry.published) == "":
+            if not self.feed_entry.published or str(self.feed_entry.published) == "":
                 return DateUtils.get_datetime_now_utc()
             else:
                 try:
                     dt = parser.parse(self.feed_entry.published)
-                    return DateUtils.to_utc_date(dt)
+                    # TODO this might not be precise, but we do not have to be precise?
+
+                    utc = DateUtils.to_utc_date(dt)
+                    return utc
 
                 except Exception as e:
                     WebLogger.error(
@@ -1323,13 +1289,6 @@ class RssPageEntry(ContentInterface):
                         )
                     )
                 return DateUtils.get_datetime_now_utc()
-
-        elif self.allow_adding_with_current_time:
-            return DateUtils.get_datetime_now_utc()
-        elif self.default_entry_timestamp:
-            return self.default_entry_timestamp
-        else:
-            return DateUtils.get_datetime_now_utc()
 
     def get_author(self):
         if "author" in self.page_object_properties:
@@ -1359,7 +1318,7 @@ class RssPage(ContentInterface):
         Workaround for https://warhammer-community.com/feed
         """
         # TODO apply that woraround differently
-        #if contents:
+        # if contents:
         #    wh = contents.find("<rss version")
         #    if wh > 0:
         #        contents = contents[wh:]
@@ -1436,7 +1395,11 @@ class RssPage(ContentInterface):
         #    WebLogger.error("No rss hash contents")
         #    return calculate_hash("no body hash")
         if not self.feed:
-            WebLogger.error("Url:{}. RssPage has contents, but feed could not been analyzed".format(self.url))
+            WebLogger.error(
+                "Url:{}. RssPage has contents, but feed could not been analyzed".format(
+                    self.url
+                )
+            )
             return
 
         entries = str(self.feed.entries)
@@ -1462,6 +1425,10 @@ class RssPage(ContentInterface):
 
         if "subtitle" in self.feed.feed:
             return self.feed.feed.subtitle
+
+    def get_link(self):
+        if "link" in self.feed.feed:
+            return self.feed.feed.link
 
     def get_language(self):
         if self.feed is None:
@@ -2127,11 +2094,11 @@ class HtmlPage(ContentInterface):
         return self.get_og_field("locale")
 
     def get_rss_url(self, full_check=False):
-        urls = self.get_rss_urls()
+        urls = self.get_feeds()
         if urls and len(urls) > 0:
             return urls[0]
 
-    def get_rss_urls(self, full_check=False):
+    def get_feeds(self):
         if not self.contents:
             return []
 
@@ -2139,13 +2106,13 @@ class HtmlPage(ContentInterface):
             "application/atom+xml"
         )
 
-        if not rss_links:
-            links = self.get_links_inner()
-            rss_links.extend(
-                link
-                for link in links
-                if "feed" in link or "rss" in link or "atom" in link
-            )
+        #if not rss_links:
+        #    links = self.get_links_inner()
+        #    rss_links.extend(
+        #        link
+        #        for link in links
+        #        if "feed" in link or "rss" in link or "atom" in link
+        #    )
 
         return (
             [DomainAwarePage.get_url_full(self.url, rss_url) for rss_url in rss_links]
@@ -2400,7 +2367,9 @@ class PageOptions(object):
         self.use_headless_browser = False
         self.ssl_verify = True
         self.ping = False
-        self.use_browser_promotions = True # tries headles if normal processing does not work
+        self.use_browser_promotions = (
+            True  # tries headles if normal processing does not work
+        )
 
     def use_basic_crawler(self):
         return not self.is_advanced_processing_required()
@@ -2445,7 +2414,7 @@ class PageRequestObject(object):
         if headers:
             self.headers = headers
         else:
-            self.headers = None # not set, use default
+            self.headers = None  # not set, use default
 
         self.timeout_s = timeout_s
         self.ping = False
@@ -2543,7 +2512,7 @@ class PageResponseObject(object):
             date = self.headers["Last-Modified"]
         if "last-modified" in self.headers:
             date = self.headers["last-modified"]
-            
+
         if date:
             return date_str_to_date(date)
 

@@ -3,18 +3,33 @@
 #  - ps auxw | grep runserver
 #  - kill -9 xxx the server
 #
+# postgres
+#  https://stackoverflow.com/questions/60420940/how-to-fix-error-error-database-is-uninitialized-and-superuser-password-is-not
+
+
+APP_NAME=django-link-archive
+
 
 build:
-	docker build -t python-django-app .
+	# poetry lock -> to write lock file
+	docker build -t $(USER_NAME)/$(APP_NAME) .
+
+build-clean:
+	# poetry lock -> to write lock file
+	docker build --no-cache -t $(USER_NAME)/$(APP_NAME) .
 
 run:
-	docker run -p 8000:8000 python-django-app
+	docker run -p 8000:8000 $(USER_NAME)/$(APP_NAME)
 
 list:
 	docker ps -a
 
 stop:
 	docker stop container_id
+
+remove:
+	# if poetry complains do poetry update
+	docker container rm container_id
 
 install:
 	# installation as in https://www.linuxtechi.com/how-to-install-docker-on-linux-mint/#6_Test_Docker_Installation
@@ -27,3 +42,19 @@ install:
 	newgrp docker
 	
 	echo Installation successful, please reboot computer
+
+publish:
+	# docker login --username $(USER_NAME) --password $(USER_PASSWORD)
+	# docker image tag local-image:INIT new-repo:tagname
+	docker push $(USER_NAME)/$(APP_NAME)
+
+refresh:
+	docker exec -d container_id poetry run celery call app.tasks.process_all_jobs -a '["rsshistory.threadhandlers.OneTaskProcessor"]'
+
+compose:
+	# if rabbit cannot start disable rabbit on your system
+	# systemctl stop rabbitmq-server
+	docker compose up
+
+compose-refresh:
+	docker compose up --build rozbujnik/django-link-archive

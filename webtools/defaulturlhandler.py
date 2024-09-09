@@ -26,12 +26,13 @@ class DefaultUrlHandler(DefaultContentPage):
         if self.code:
             return code2url(self.code)
 
-    def get_feed_url(self):
+    def get_feeds(self):
         """
         even for post, or individual videos we might request feed url
         """
         if self.code:
-            return self.code2feed(self.code)
+            return [self.code2feed(self.code)]
+        return []
 
     def input2code(self, input_string):
         raise NotImplementedError
@@ -52,8 +53,7 @@ class DefaultUrlHandler(DefaultContentPage):
         raise NotImplementedError
 
 
-class DefaultChannelHandler(DefaultContentPage):
-
+class DefaultChannelHandler(DefaultUrlHandler):
     def get_contents(self):
         """
         We obtain information about channel.
@@ -75,22 +75,19 @@ class DefaultChannelHandler(DefaultContentPage):
         if self.response:
             return self.response
 
-        feed_url = self.get_feed_url()
-        if not feed_url:
-            AppLogging.error(
-                "Url:{} Cannot read feed URL".format(self.url)
-            )
+        feeds = self.get_feeds()
+        if not feeds or len(feeds) == 0:
+            AppLogging.error("Url:{} Cannot read feed URL".format(self.url))
             self.dead = True
             return
+
+        feed_url = feeds[0]
 
         options = Url.get_url_options(feed_url)
         u = Url(feed_url, page_options=options, handler_class=HttpPageHandler)
         self.response = u.get_response()
 
-        if (
-            not self.response
-            or not self.response.is_valid()
-        ):
+        if not self.response or not self.response.is_valid():
             self.dead = True
 
         if self.response:

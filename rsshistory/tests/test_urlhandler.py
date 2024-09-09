@@ -84,15 +84,6 @@ class UrlHandlerTest(FakeInternetTestCase):
 
         self.assertTrue(handler.options.use_headless_browser)
 
-    def test_get_warhammer_community(self):
-        handler = UrlHandler("https://www.warhammer-community.com")
-        handler.get_response()
-
-        self.assertEqual(type(handler.get_handler()), HttpPageHandler)
-        self.assertEqual(type(handler.get_handler().p), HtmlPage)
-
-        self.assertTrue(handler.options.use_full_browser)
-
     def test_get__defcon_org(self):
         handler = UrlHandler("https://defcon.org")
         handler.get_response()

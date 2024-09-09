@@ -11,7 +11,6 @@ from .sqlmodel import (
 )
 
 
-
 class AlchemySymbolEvaluator(SingleSymbolEvaluator):
     """
     return 1 if true
@@ -51,13 +50,14 @@ class AlchemySymbolEvaluator(SingleSymbolEvaluator):
         """
         TODO we could check by default if entry link == symbol, or sth
         """
-        return or_(self.table.c["link"].like(f"%{symbol}%"),
+        return or_(
+            self.table.c["link"].like(f"%{symbol}%"),
             self.table.c["title"].like(f"%{symbol}%"),
-            self.table.c["description"].like(f"%{symbol}%"))
+            self.table.c["description"].like(f"%{symbol}%"),
+        )
 
 
 class AlchemyEquationEvaluator(EquationEvaluator):
-
     def evaluate_function(self, operation_symbol, function, args0, args1):
         if function == "And":  # & sign
             return and_(args0, args1)
@@ -75,20 +75,25 @@ class AlchemyRowHandler(object):
 
 
 class AlchemySearch(object):
-    def __init__(self, db, search_term, row_handler = None):
+    def __init__(self, db, search_term, row_handler=None):
         self.db = db
         self.search_term = search_term
         self.alchemy_row_handler = row_handler
 
     def search(self):
         symbol_evaluator = AlchemySymbolEvaluator(EntriesTable)
-        equation_evaluator = AlchemyEquationEvaluator(self.search_term, symbol_evaluator)
+        equation_evaluator = AlchemyEquationEvaluator(
+            self.search_term, symbol_evaluator
+        )
 
-        search = OmniSearch(self.search_term, equation_evaluator = equation_evaluator)
+        search = OmniSearch(self.search_term, equation_evaluator=equation_evaluator)
         combined_query_conditions = search.get_combined_query()
 
-        session = self.db.get_session()
-        rows = session.query(EntriesTable).filter(combined_query_conditions).all()
+        Session = self.db.get_session()
+
+        rows = []
+        with Session() as session:
+            rows = session.query(EntriesTable).filter(combined_query_conditions).all()
 
         for key, row in enumerate(rows):
-            self.alchemy_row_handler.handle_row(row.__dict__)
+            self.alchemy_row_handler.handle_row(row)

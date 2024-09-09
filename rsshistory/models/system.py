@@ -85,6 +85,10 @@ class ConfigurationEntry(models.Model):
 
     logging_level = models.IntegerField(default=int(logging.WARNING))
 
+    initialized = models.BooleanField(
+        default=False,
+    )
+
     background_tasks = models.BooleanField(
         default=True,
         help_text="If disabled, background tasks, and jobs are disabled.",
@@ -393,7 +397,7 @@ class SystemOperation(models.Model):
     thread_id = models.CharField(
         blank=True,
         help_text="Thread ID",
-        max_length = 100,
+        max_length=100,
     )
 
     date_created = models.DateTimeField(auto_now_add=True, null=True)
@@ -900,4 +904,4 @@ class BackgroundJob(models.Model):
             "pk",
             "subject",
             "errors",
-        ]
+            ]

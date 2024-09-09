@@ -9,8 +9,8 @@ from .fakeinternetdata import (
     webpage_old_pubdate_rss,
 )
 from .fake.youtube import (
-    webpage_samtime_youtube_rss,   # you
-    youtube_channel_rss_linus_tech_tips, # uses feed
+    webpage_samtime_youtube_rss,  # you
+    youtube_channel_rss_linus_tech_tips,  # uses feed
 )
 
 
@@ -209,7 +209,9 @@ class RssPageYouTubeTest(FakeInternetTestCase):
 
     def test_get_title(self):
         # default language
-        reader = RssPage("https://linkedin.com/test", youtube_channel_rss_linus_tech_tips)
+        reader = RssPage(
+            "https://linkedin.com/test", youtube_channel_rss_linus_tech_tips
+        )
         self.assertEqual(reader.get_title(), "Linus Tech Tips")
         self.assertTrue(reader.is_valid())
 

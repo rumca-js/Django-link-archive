@@ -113,10 +113,10 @@ class Url(ContentInterface):
 
     def get_handlers():
         return [
-           Url.youtube_video_handler,
-           Url.youtube_channel_handler,
-           Url.odysee_video_handler,
-           Url.odysee_channel_handler,
+            Url.youtube_video_handler,
+            Url.youtube_channel_handler,
+            Url.odysee_video_handler,
+            Url.odysee_channel_handler,
         ]
 
     def get_handler(self):
@@ -187,7 +187,7 @@ class Url(ContentInterface):
 
         handlers = Url.get_handlers()
         for handler in handlers:
-            h = handler(url = self.url, page_options=self.options)
+            h = handler(url=self.url, page_options=self.options)
             if h.is_handled_by():
                 return h
 
@@ -416,42 +416,38 @@ class Url(ContentInterface):
         if handler:
             return handler.get_entries()
 
-    def find_rss_url(page_url):
-        if not page_url:
+    def find_rss_url(url):
+        """
+        @param url needs to be Url object
+        """
+        if not url:
             return
 
-        u = Url(page_url)
-        handler = u.get_handler()
+        handler = url.get_handler()
+        handler.get_response()
 
         if type(handler) is Url.youtube_channel_handler:
-            if handler.is_channel_name():
-                rss_url = handler.get_channel_feed_url()
-                if rss_url:
-                    return Url(url = rss_url)
-            return u
-        elif type(handler) is Url.youtube_video_handler:
-            if page_url == handler.get_channel_feed_url():
-                return u
-            return Url(url = handler.get_channel_feed_url())
+            if not handler.is_channel_name():
+                return url
         elif type(handler) is HttpPageHandler:
-            h = RedditChannelHandler(page_url)
-            if h.is_handled_by():
-                if page_url == h.get_feed_url():
-                    return u
-
-                if h.get_feed_url():
-                    return Url(url = h.get_feed_url())
-
-            handler.get_response()
-
             if type(handler.p) is RssPage:
-                return u
+                return url
 
-            if type(handler.p) is HtmlPage:
-                rss_url = handler.p.get_rss_url()
-                if rss_url:
-                    return Url(rss_url)
+        feeds = url.get_feeds()
+        if url.url in feeds:
+            return url
 
+        if feeds and len(feeds) > 0:
+            return Url(url=feeds[0])
+
+    def get_feeds(self):
+        result = []
+
+        handler = self.get_handler()
+        if handler:
+            return handler.get_feeds()
+
+        return result
 
 
 class DomainCacheInfo(object):
@@ -659,7 +655,7 @@ class DomainCache(object):
 
 
 def fetch_url(link):
-    u = Url(url = link)
+    u = Url(url=link)
     u.get_response()
     return u
 
@@ -677,7 +673,7 @@ async def fetch_all_urls(links, max_concurrency=10):
 
         tasks = []
 
-        for link in links[page_start : page_stop]:
+        for link in links[page_start:page_stop]:
             tasks.append(asyncio.to_thread(fetch_url, link))
 
         result = await asyncio.gather(*tasks)

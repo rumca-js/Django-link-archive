@@ -7,11 +7,14 @@ from utils.dateutils import DateUtils
 from .apps import LinkDatabase
 from .models import AppLogging, DataExport
 from .controllers import SourceDataController, LinkDataController
-from .repotypes import RepoFactory
+from .repositoryfactory import RepositoryFactory
 from .datawriter import DataWriter, DataWriterConfiguration
 
 
 class UpdateExportManager(object):
+    """
+    This class is a middleman between data writer & repositories
+    """
     def __init__(self, config, repo_builder, export_data, date=None):
         self._cfg = config
         self.export_data = export_data
@@ -29,7 +32,10 @@ class UpdateExportManager(object):
 
         if self.date:
             config = DataWriterConfiguration(
-                self._cfg, self.export_data, self.get_write_directory(), self.date.isoformat()
+                self._cfg,
+                self.export_data,
+                self.get_write_directory(),
+                self.date.isoformat(),
             )
         else:
             config = DataWriterConfiguration(
@@ -56,84 +62,47 @@ class UpdateExportManager(object):
 
         app = LinkDatabase.name
 
-        return Path(self._cfg.get_export_path()) / Path(self.export_data.local_path) / directory
+        return (
+            Path(self._cfg.get_export_path())
+            / Path(self.export_data.local_path)
+            / directory
+        )
+
+    def push(self):
+        export_data = self.export_data
+
+        message = "Commit"
+
+        if self.export_data.export_data == DataExport.EXPORT_DAILY_DATA:
+            message = DateUtils.get_dir4date(self.date)
+        else:
+            # TODO maybe use today
+            yesterday = DateUtils.get_date_yesterday()
+            message = DateUtils.get_dir4date(yesterday)
+
+        repo_class = self.repo_builder.get(export_data)
+
+        repo = repo_class(export_data, operating_dir=self.get_repo_operating_dir(), data_source_dir= self.get_write_directory())
+
+        AppLogging.info("Pushing repo")
+        repo.push_to_repo(message)
+        AppLogging.info("Pushing repo done")
+
+    def clear(self):
+        dir = self.get_write_directory()
+        if dir.exists():
+            import shutil
+
+            shutil.rmtree(dir)
 
     def get_repo_operating_dir(self):
         """
         Path to repository, rather absolute
         """
-        return self.get_directory() / "git"
+        return self.get_directory() / "repository"
 
     def get_write_directory(self):
         return self.get_directory() / "write"
-
-    def push(self):
-        export_data = self.export_data
-
-        if self.export_data.export_data == DataExport.EXPORT_DAILY_DATA:
-            message = DateUtils.get_dir4date(self.date)
-            self.push_implementation(export_data, message)
-        else:
-            # TODO maybe use today
-            yesterday = DateUtils.get_date_yesterday()
-            message = DateUtils.get_dir4date(yesterday)
-            self.push_implementation(export_data, message)
-
-    def clear(self):
-        dir = self.get_directory()
-        if dir.exists():
-            import shutil
-
-            shutil.rmtree(dir)
-
-    def clear_operating_directory(self):
-        dir = self.get_repo_operating_dir()
-        if dir.exists():
-            import shutil
-
-            shutil.rmtree(dir)
-
-    def push_implementation(self, export_data, commit_message):
-        AppLogging.info("Pushing repo")
-
-        if export_data.export_type == DataExport.EXPORT_TYPE_GIT:
-            repo_class = self.repo_builder.get(export_data)
-            repo = repo_class(export_data, operating_dir = self.get_repo_operating_dir())
-
-            repo_is_up = False
-            try:
-                repo.up()
-                repo_is_up = True
-            except Exception as E:
-                AppLogging.exc(
-                    E,
-                    "Cannot update repository, removing directory {}".format(
-                        operating_dir
-                    ),
-                )
-                self.clear_operating_directory()
-
-            if repo_is_up:
-                local_dir = self.get_write_directory()
-                repo.copy_tree(local_dir)
-
-                repo.add([])
-                if repo.commit(commit_message) == 0:
-                    repo.push()
-
-                    return True
-        elif export_data.export_type == DataExport.EXPORT_TYPE_LOC:
-            if export_data.local_path == export_data.remote_path:
-                return
-            if export_data.remote_path is None or export_data.remote_path == "":
-                return
-
-            # TODO implement
-
-            return True
-
-        AppLogging.info("Pushing repo done")
-        return False
 
 
 class UpdateManager(object):
@@ -141,7 +110,7 @@ class UpdateManager(object):
         self._cfg = config
 
         if repo_builder is None:
-            self.repo_builder = RepoFactory
+            self.repo_builder = RepositoryFactory
         else:
             self.repo_builder = repo_builder
 
@@ -153,9 +122,7 @@ class UpdateManager(object):
         else:
             write_date = datetime.strptime(input_date, "%Y-%m-%d").date()
 
-        mgr = UpdateExportManager(
-            self._cfg, self.repo_builder, export_data, write_date
-        )
+        mgr = UpdateExportManager(self._cfg, self.repo_builder, export_data, write_date)
         mgr.process()
 
         AppLogging.info(
@@ -168,9 +135,7 @@ class UpdateManager(object):
         else:
             write_date = datetime.strptime(input_date, "%Y-%m-%d").date()
 
-        mgr = UpdateExportManager(
-            self._cfg, self.repo_builder, export_data, write_date
-        )
+        mgr = UpdateExportManager(self._cfg, self.repo_builder, export_data, write_date)
         mgr.write()
 
         AppLogging.info("Writing data - daily data DONE")

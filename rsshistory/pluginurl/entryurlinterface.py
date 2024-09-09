@@ -179,10 +179,6 @@ class EntryUrlInterface(object):
 
         p = self.u.get_handler()
 
-        source_url = p.get_channel_feed_url()
-        if source_url is None:
-            AppLogging.error("Could not obtain channel feed url:{}".format(source_url))
-
         # always use classic link format in storage
         input_props["link"] = p.get_link_classic()
 
@@ -210,8 +206,12 @@ class EntryUrlInterface(object):
         if not self.is_property_set(input_props, "language") and source_obj:
             input_props["language"] = source_obj.language
 
-        if source_url:
-            input_props["source"] = source_url
+        if self.is_property_set(input_props, "source"):
+            feeds = p.get_feeds()
+            if len(feeds) > 0:
+                input_props["source"] = feeds[0]
+            else:
+                AppLogging.error("Could not obtain channel feed url:{}".format(self.url))
 
         input_props["live"] = p.is_live()
 

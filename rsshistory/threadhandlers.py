@@ -22,6 +22,7 @@ from webtools import DomainAwarePage, Url
 
 from utils.basictypes import fix_path_for_os
 from utils.programwrappers import ytdlp, id3v2
+from utils.services.waybackmachine import WaybackMachine
 
 from .apps import LinkDatabase
 from .models import (
@@ -596,8 +597,6 @@ class LinkSaveJobHandler(BaseJobHandler):
         try:
             item = obj.subject
 
-            from .services.waybackmachine import WaybackMachine
-
             wb = WaybackMachine()
             if wb.is_saved(item):
                 wb.save(item)
@@ -636,8 +635,6 @@ class ImportDailyDataJobHandler(BaseJobHandler):
         return True
 
     def import_one_file(self, afile):
-        import json
-
         with open(import_file) as json_file:
             data = json.load(json_file)
 
@@ -672,8 +669,6 @@ class ImportBookmarksJobHandler(BaseJobHandler):
         return True
 
     def import_one_file(self, afile):
-        import json
-
         with open(import_file) as json_file:
             data = json.load(json_file)
 
@@ -698,8 +693,6 @@ class ImportSourcesJobHandler(BaseJobHandler):
         return BackgroundJob.JOB_IMPORT_SOURCES
 
     def process(self, obj=None):
-        import json
-
         c = Configuration.get_object()
         import_file = c.get_import_path() / "sources.json"
 
@@ -727,8 +720,6 @@ class ImportInstanceJobHandler(BaseJobHandler):
         return BackgroundJob.JOB_IMPORT_INSTANCE
 
     def process(self, obj=None):
-        import json
-
         json_url = obj.subject
         author = obj.args
 
@@ -752,8 +743,6 @@ class ImportFromFilesJobHandler(BaseJobHandler):
         return BackgroundJob.JOB_IMPORT_FROM_FILES
 
     def process(self, obj=None):
-        import json
-
         data = obj.subject
         data = json.loads(data)
 
@@ -771,9 +760,9 @@ class ImportFromFilesJobHandler(BaseJobHandler):
             if users.count() > 0:
                 user = users[0]
 
-        from .serializers import FileImporter
+        from .serializers import JsonImporter
 
-        FileImporter(path=path, user=user)
+        JsonImporter(path=path, user=user)
 
         return True
 
@@ -909,11 +898,7 @@ class ExportDataJobHandler(BaseJobHandler):
                 AppLogging.error("Export {} does not exist".format(obj.subject))
                 return
 
-            AppLogging.notify(
-                "Exporting data. Export:{}".format(
-                    obj.subject
-                )
-            )
+            AppLogging.notify("Exporting data. Export:{}".format(obj.subject))
 
             update_mgr = UpdateManager(self._config)
 
@@ -1194,7 +1179,7 @@ class RunRuleJobHandler(BaseJobHandler):
         try:
             rule_id = int(obj.subject)
 
-            rules = EntryRules.objects.filter(id = rule_id)
+            rules = EntryRules.objects.filter(id=rule_id)
 
             entries_all = LinkDataController.objects.all()
             p = Paginator(entries_all, 1000)
@@ -1468,7 +1453,7 @@ class GenericJobsProcessor(CeleryTaskInterface):
             jobs_conditions = Q()
 
             for ajob in jobs:
-                jobs_conditions |= Q(job = ajob)
+                jobs_conditions |= Q(job=ajob)
 
             query_conditions &= jobs_conditions
 
@@ -1507,7 +1492,9 @@ class SourceJobsProcessor(GenericJobsProcessor):
     """
 
     def get_supported_jobs(self):
-        return [BackgroundJob.JOB_PROCESS_SOURCE,]
+        return [
+            BackgroundJob.JOB_PROCESS_SOURCE,
+        ]
 
 
 class WriteJobsProcessor(GenericJobsProcessor):
@@ -1516,11 +1503,13 @@ class WriteJobsProcessor(GenericJobsProcessor):
     """
 
     def get_supported_jobs(self):
-        return [BackgroundJob.JOB_WRITE_DAILY_DATA,
-                BackgroundJob.JOB_WRITE_TOPIC_DATA,
-                BackgroundJob.JOB_WRITE_YEAR_DATA,
-                BackgroundJob.JOB_WRITE_NOTIME_DATA,
-                BackgroundJob.JOB_EXPORT_DATA,]
+        return [
+            BackgroundJob.JOB_WRITE_DAILY_DATA,
+            BackgroundJob.JOB_WRITE_TOPIC_DATA,
+            BackgroundJob.JOB_WRITE_YEAR_DATA,
+            BackgroundJob.JOB_WRITE_NOTIME_DATA,
+            BackgroundJob.JOB_EXPORT_DATA,
+        ]
 
 
 class ImportJobsProcessor(GenericJobsProcessor):
@@ -1529,19 +1518,26 @@ class ImportJobsProcessor(GenericJobsProcessor):
     """
 
     def get_supported_jobs(self):
-        return [BackgroundJob.JOB_IMPORT_DAILY_DATA,
-                BackgroundJob.JOB_IMPORT_BOOKMARKS,
-                BackgroundJob.JOB_IMPORT_SOURCES,
-                BackgroundJob.JOB_IMPORT_INSTANCE,
-                BackgroundJob.JOB_IMPORT_FROM_FILES,]
+        return [
+            BackgroundJob.JOB_IMPORT_DAILY_DATA,
+            BackgroundJob.JOB_IMPORT_BOOKMARKS,
+            BackgroundJob.JOB_IMPORT_SOURCES,
+            BackgroundJob.JOB_IMPORT_INSTANCE,
+            BackgroundJob.JOB_IMPORT_FROM_FILES,
+        ]
 
 
 class LeftOverJobsProcessor(GenericJobsProcessor):
+    """
+    There can be many queues handling jobs.
+    This processor handles jobs that are not handled by other queues
+    """
     def __init__(self):
         super().__init__()
 
     def get_supported_jobs(self):
         from .tasks import get_processors
+
         jobs = []
         choices = BackgroundJobController.JOB_CHOICES
 
@@ -1560,3 +1556,22 @@ class LeftOverJobsProcessor(GenericJobsProcessor):
                     jobs.remove(processor_job)
 
         return jobs
+
+
+class OneTaskProcessor(GenericJobsProcessor):
+    """
+    To be used by processing if there is only one task running.
+    that captures all necessar data.
+    """
+
+    def __init__(self):
+        super().__init__()
+
+    def run(self):
+        from .tasks import get_processors
+        for processor in get_processors():
+            processor_object = processor()
+            processor_object.run()
+
+        leftover_processor = LeftOverJobsProcessor()
+        leftover_processor.run()

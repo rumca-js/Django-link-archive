@@ -60,14 +60,14 @@ class FeedReaderEntry(FeedObject):
         if "media" in self.ns:
             media_thumbnail = self.get_prop_attribute(".//media:thumbnail", "url")
             if media_thumbnail:
-                self.media_thumbnail = [ {"url" : media_thumbnail} ]
+                self.media_thumbnail = [{"url": media_thumbnail}]
 
         self.media_content = []
 
         if "media" in self.ns:
             media_content = self.get_prop_attribute(".//media:content", "url")
             if media_content:
-                self.media_content = [ {"url" : media_content} ]
+                self.media_content = [{"url": media_content}]
 
         self.author = self.try_to_get_fields("author", "name")
 
@@ -75,15 +75,15 @@ class FeedReaderEntry(FeedObject):
             if "itunes" in self.ns:
                 self.author = self.get_prop("itunes:owner/itunes:name")
 
-        self.tags = self.try_to_get_field('tags')
+        self.tags = self.try_to_get_field("tags")
 
         source = {}
-        source["href"] = self.try_to_get_attribute("source","href")
+        source["href"] = self.try_to_get_attribute("source", "href")
         if not source["href"]:
-            source["href"] = self.try_to_get_fields("source","href")
-        source["url"] = self.try_to_get_attribute("source","url")
+            source["href"] = self.try_to_get_fields("source", "href")
+        source["url"] = self.try_to_get_attribute("source", "url")
         if not source["url"]:
-            source["url"] = self.try_to_get_fields("source","url")
+            source["url"] = self.try_to_get_fields("source", "url")
         self.source = source
 
     def try_to_get_field(self, field):
@@ -92,7 +92,7 @@ class FeedReaderEntry(FeedObject):
             value = self.get_prop(field)
         if not value:
             if "atom" in self.ns:
-                value = self.get_prop(f'atom:{field}')
+                value = self.get_prop(f"atom:{field}")
 
         return value
 
@@ -102,7 +102,7 @@ class FeedReaderEntry(FeedObject):
             value = self.get_prop(f"{fieldone}/{fieldtwo}")
         if not value:
             if "atom" in self.ns:
-                value = self.get_prop(f'atom:{fieldone}/atom:{fieldtwo}')
+                value = self.get_prop(f"atom:{fieldone}/atom:{fieldtwo}")
 
         return value
 
@@ -112,7 +112,7 @@ class FeedReaderEntry(FeedObject):
             value = self.get_prop_attribute(field, attribute)
         if not value:
             if "atom" in self.ns:
-                value = self.get_prop_attribute(f'atom:{field}', attribute)
+                value = self.get_prop_attribute(f"atom:{field}", attribute)
 
         return value
 
@@ -121,7 +121,7 @@ class FeedReaderEntry(FeedObject):
 
 
 class FeedReaderFeed(FeedObject):
-    def __init__(self, root, ns = None, is_atom = False):
+    def __init__(self, root, ns=None, is_atom=False):
         super().__init__(root, ns)
 
         self.is_atom = is_atom
@@ -134,49 +134,49 @@ class FeedReaderFeed(FeedObject):
         if not value:
             value = self.get_prop(field)
         if not value:
-            value = self.get_prop(f'channel/{field}')
+            value = self.get_prop(f"channel/{field}")
         if not value:
             if "atom" in self.ns:
-                value = self.get_prop(f'atom:{field}')
+                value = self.get_prop(f"atom:{field}")
         if not field:
             if "atom" in self.ns:
-                value = self.get_prop(f'atom:channel/atom:{field}')
+                value = self.get_prop(f"atom:channel/atom:{field}")
 
         return value
 
     def try_to_get_fields(self, fieldone, fieldtwo):
-        field = self.get_prop(f'./{fieldone}/{fieldtwo}')
+        field = self.get_prop(f"./{fieldone}/{fieldtwo}")
         if not field:
-            field = self.get_prop(f'{fieldone}/{fieldtwo}')
-        if not field:
-            if "atom" in self.ns:
-                field = self.get_prop(f'./atom:{fieldone}/atom:{fieldtwo}')
+            field = self.get_prop(f"{fieldone}/{fieldtwo}")
         if not field:
             if "atom" in self.ns:
-                field = self.get_prop(f'atom:{fieldone}/atom:{fieldtwo}')
-        if not field:
-            field = self.get_prop(f'./channel/{fieldone}/{fieldtwo}')
-        if not field:
-            field = self.get_prop(f'channel/{fieldone}/{fieldtwo}')
+                field = self.get_prop(f"./atom:{fieldone}/atom:{fieldtwo}")
         if not field:
             if "atom" in self.ns:
-                field = self.get_prop(f'./atom:channel/atom:{fieldone}/atom:{fieldtwo}')
+                field = self.get_prop(f"atom:{fieldone}/atom:{fieldtwo}")
+        if not field:
+            field = self.get_prop(f"./channel/{fieldone}/{fieldtwo}")
+        if not field:
+            field = self.get_prop(f"channel/{fieldone}/{fieldtwo}")
         if not field:
             if "atom" in self.ns:
-                field = self.get_prop(f'atom:channel/atom:{fieldone}/atom:{fieldtwo}')
+                field = self.get_prop(f"./atom:channel/atom:{fieldone}/atom:{fieldtwo}")
+        if not field:
+            if "atom" in self.ns:
+                field = self.get_prop(f"atom:channel/atom:{fieldone}/atom:{fieldtwo}")
 
         return field
 
     def try_to_get_attribute(self, field, attribute):
         value = self.get_prop_attribute(field, attribute)
         if not value:
-            value = self.get_prop_attribute(f'channel/{field}', attribute)
+            value = self.get_prop_attribute(f"channel/{field}", attribute)
         if not value:
             if "atom" in self.ns:
-                value = self.get_prop_attribute(f'atom:{field}', attribute)
+                value = self.get_prop_attribute(f"atom:{field}", attribute)
         if not field:
             if "atom" in self.ns:
-                value = self.get_prop_attribute(f'atom:channel/atom:{field}', attribute)
+                value = self.get_prop_attribute(f"atom:channel/atom:{field}", attribute)
 
         return value
 
@@ -189,41 +189,42 @@ class FeedReaderFeed(FeedObject):
             self.published = None
             self.author = None
             self.tags = []
-            self.image = None
+            self.image = {}
             return
 
         self.title = self.try_to_get_field("title")
-        self.subtitle = self.try_to_get_field('subtitle')
-        self.description = self.try_to_get_field('description')
-        self.language = self.try_to_get_field('language')
+        self.link = self.try_to_get_field("link")
+        self.subtitle = self.try_to_get_field("subtitle")
+        self.description = self.try_to_get_field("description")
+        self.language = self.try_to_get_field("language")
 
-        self.published = self.try_to_get_field('published')
+        self.published = self.try_to_get_field("published")
         if not self.published:
-            self.published = self.try_to_get_field('pubDate')
+            self.published = self.try_to_get_field("pubDate")
         if not self.published:
-            self.published = self.try_to_get_field('lastBuildDate')
+            self.published = self.try_to_get_field("lastBuildDate")
 
-        self.author = self.try_to_get_fields('author', 'name')
+        self.author = self.try_to_get_fields("author", "name")
         if not self.author:
             if "itunes" in self.ns:
-                self.author = self.get_prop('.//itunes:author')
+                self.author = self.get_prop(".//itunes:author")
         if not self.author:
             if "itunes" in self.ns:
-                self.author = self.get_prop('itunes:author')
+                self.author = self.get_prop("itunes:author")
         if not self.author:
             if "itunes" in self.ns:
-                self.author = self.get_prop('./channel/itunes:author')
+                self.author = self.get_prop("./channel/itunes:author")
         if not self.author:
             if "atom" in self.ns and "itunes" in self.ns:
-                self.author = self.get_prop('./atom:channel/itunes:author')
+                self.author = self.get_prop("./atom:channel/itunes:author")
 
-        self.tags = self.try_to_get_field('tags')
+        self.tags = self.try_to_get_field("tags")
 
         image = {}
-        image["url"] = self.try_to_get_fields("image","url")
+        image["url"] = self.try_to_get_fields("image", "url")
         if not image["url"]:
             image["url"] = self.try_to_get_attribute("image", "url")
-        image["href"] = self.try_to_get_fields("image","href")
+        image["href"] = self.try_to_get_fields("image", "href")
         if not image["href"]:
             if "atom" in self.ns:
                 image["href"] = self.try_to_get_attribute("image", "href")
@@ -252,6 +253,7 @@ class FeedReader(object):
     def parse_implementation(self):
         # initial?
         self.feed = FeedReaderFeed(self.root, self.ns, is_atom=True)
+        self.feed.parse()
         self.entries = []
 
         if not self.contents:
@@ -271,7 +273,7 @@ class FeedReader(object):
 
         is_atom = "atom" in self.ns
 
-        self.feed = FeedReaderFeed(self.root, ns = self.ns, is_atom= is_atom)
+        self.feed = FeedReaderFeed(self.root, ns=self.ns, is_atom=is_atom)
         self.feed.parse()
 
         entries = self.get_entries()
@@ -307,7 +309,7 @@ class FeedReader(object):
             return False
 
         # +4 to compensate for &gt; text
-        self.contents = self.contents[wh: last_wh + 6]
+        self.contents = self.contents[wh : last_wh + 6]
 
         return True
 
@@ -323,7 +325,7 @@ class FeedReader(object):
             return False
 
         # +4 to compensate for &gt; text
-        self.contents = self.contents[wh: last_wh + 4]
+        self.contents = self.contents[wh : last_wh + 4]
         self.contents = html.unescape(self.contents)
 
         return True
@@ -336,12 +338,12 @@ class FeedReader(object):
         if self.root is None:
             return
 
-        entries = self.root.findall('.//entry', self.ns)
+        entries = self.root.findall(".//entry", self.ns)
         if len(entries) > 0:
             return entries
 
         if "atom" in self.ns:
-            entries = self.root.findall('.//atom:entry', self.ns)
+            entries = self.root.findall(".//atom:entry", self.ns)
             if len(entries) > 0:
                 return entries
 
@@ -349,11 +351,11 @@ class FeedReader(object):
         if self.root is None:
             return
 
-        entries = self.root.findall('.//item', self.ns)
+        entries = self.root.findall(".//item", self.ns)
         if len(entries) > 0:
             return entries
 
         if "atom" in self.ns:
-            entries = self.root.findall('.//atom:item', self.ns)
+            entries = self.root.findall(".//atom:item", self.ns)
             if len(entries) > 0:
                 return entries

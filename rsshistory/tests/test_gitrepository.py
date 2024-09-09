@@ -2,18 +2,18 @@ from pathlib import Path
 
 from django.contrib.auth.models import User
 from utils.dateutils import DateUtils
+from utils.services import GitRepository
 
 from ..models import DataExport, ConfigurationEntry, UserBookmarks
 from ..controllers import SourceDataController, LinkDataController
 from ..updatemgr import UpdateManager, UpdateExportManager
 from ..configuration import Configuration
 from ..apps import LinkDatabase
-from ..services import GitRepo
 
 from .fakeinternet import FakeInternetTestCase
 
 
-class GitRepoTest(FakeInternetTestCase):
+class GitRepositoryTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
 
@@ -76,7 +76,7 @@ class GitRepoTest(FakeInternetTestCase):
             export_data=DataExport.EXPORT_DAILY_DATA
         )[0]
 
-        git = GitRepo(export_config)
+        git = GitRepository(export_config)
 
         # call tested function
         self.assertEqual(git.get_repo_name(), "RSS-Link-Database-DAILY")
@@ -87,7 +87,7 @@ class GitRepoTest(FakeInternetTestCase):
         )[0]
         app = LinkDatabase.name
 
-        git = GitRepo(export_config)
+        git = GitRepository(export_config)
 
         # call tested function
         self.assertEqual(git.get_operating_dir(), Path("./daily_dir"))
@@ -98,10 +98,14 @@ class GitRepoTest(FakeInternetTestCase):
         )[0]
         app = LinkDatabase.name
 
-        git = GitRepo(export_config, operating_dir = Path("./other") / "path" / app / "location")
+        git = GitRepository(
+            export_config, operating_dir=Path("./other") / "path" / app / "location"
+        )
 
         # call tested function
-        self.assertEqual(git.get_operating_dir(), Path("./other") / "path" / app / "location")
+        self.assertEqual(
+            git.get_operating_dir(), Path("./other") / "path" / app / "location"
+        )
 
     def test_get_local_dir(self):
         export_config = DataExport.objects.filter(
@@ -109,7 +113,12 @@ class GitRepoTest(FakeInternetTestCase):
         )[0]
         app = LinkDatabase.name
 
-        git = GitRepo(export_config, operating_dir = Path("./other") / "path" / app / "location")
+        git = GitRepository(
+            export_config, operating_dir=Path("./other") / "path" / app / "location"
+        )
 
         # call tested function
-        self.assertEqual(git.get_local_dir(), Path("./other") / "path" / app / "location" / "RSS-Link-Database-DAILY")
+        self.assertEqual(
+            git.get_local_dir(),
+            Path("./other") / "path" / app / "location" / "RSS-Link-Database-DAILY",
+        )

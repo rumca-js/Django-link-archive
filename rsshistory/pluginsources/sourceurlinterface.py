@@ -1,4 +1,5 @@
 from webtools import HtmlPage, RssPage, JsonPage, HttpPageHandler, DomainAwarePage
+from utils.services import OpenRss
 
 from ..models import (
     SourceDataModel,
@@ -20,17 +21,8 @@ class SourceUrlInterface(object):
         options = UrlHandler(self.url).get_init_page_options()
         options.use_headless_browser = self.use_headless_browser
 
-        self.u = UrlHandler(self.url, page_options=options)
-        self.response = self.u.get_response()
-
-        if self.u.response:
-            self.url = self.u.response.url
-
         if not input_props:
             input_props = {}
-
-        if self.u is None:
-            return input_props
 
         props = self.get_props_internal(input_props)
 
@@ -48,19 +40,35 @@ class SourceUrlInterface(object):
         return props
 
     def get_props_internal(self, input_props=None):
-        handler = self.u.get_handler()
+        url_object = UrlHandler(self.url)
 
-        url = UrlHandler.find_rss_url(self.url)
+        url = UrlHandler.find_rss_url(url_object)
         if url:
+            url.get_response()
+
             self.url = url.url
             self.u = url
-            self.u.get_response()
-
             return self.get_props_from_rss(input_props)
         else:
-            if type(handler) is HttpPageHandler:
-                if type(handler.p) is JsonPage:
-                    return self.get_props_from_json(input_props)
+            rss = OpenRss(self.url)
+            link = rss.find_rss_link()
+            if link:
+                url = Url(link)
+                url.get_response()
+
+                self.url = link
+                self.u = url
+                return self.get_props_from_rss(input_props)
+
+            if url_object:
+                self.url = url_object.url
+                self.u = url_object
+
+                handler = self.u.get_handler()
+
+                if type(handler) is HttpPageHandler:
+                    if type(handler.p) is JsonPage:
+                        return self.get_props_from_json(input_props)
 
         return self.get_props_from_page(input_props)
 

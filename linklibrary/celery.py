@@ -59,6 +59,9 @@ def memcache_lock(lock_id, oid):
         if status:
             cache.delete(lock_id)
 
+# define for which apps support celery
+installed_apps = [ "rsshistory", ]
+
 
 @app.on_after_configure.connect
 def setup_periodic_tasks(sender, **kwargs):
@@ -74,8 +77,6 @@ def setup_periodic_tasks(sender, **kwargs):
         print("Clearing cache")
         cache.clear()
 
-        # define for which apps support celery
-        apps = ["rsshistory",]
         tasks_info = [
                 [300.0, "RefreshProcessor"],
                 [60.0, "SourceJobsProcessor"],
@@ -84,7 +85,7 @@ def setup_periodic_tasks(sender, **kwargs):
                 [60.0, "LeftOverJobsProcessor"],
         ]
 
-        for app in apps:
+        for app in installed_apps:
             for task_info in tasks_info:
                 time_s = task_info[0]
                 task_processor = task_info[1]
@@ -93,7 +94,7 @@ def setup_periodic_tasks(sender, **kwargs):
                 sender.add_periodic_task(
                     time_s,
                     process_all_jobs.s(app + ".threadhandlers." + task_processor),
-                    name=app + " " + task_processor + " task ",
+                    name=app + " " + task_processor + " task",
                 )
                 print("Tasks. {} Adding {} {} DONE".format(app, time_s, task_processor))
 
@@ -109,15 +110,18 @@ def process_all_jobs(self, processor):
     """
     lock_id = "{}{}-lock".format(self.name, processor)
     with memcache_lock(lock_id, self.app.oid) as acquired:
-        logger.info("Lock on:%s acquired:%s", self.name, acquired)
-        if acquired:
-            app = processor.split(".")[0]
-            processor_file_name = processor.split(".")[1]
-            processor_class_name = processor.split(".")[2]
+        try:
+            logger.info("Lock on:%s acquired:%s", self.name, acquired)
+            if acquired:
+                app = processor.split(".")[0]
+                processor_file_name = processor.split(".")[1]
+                processor_class_name = processor.split(".")[2]
 
-            tasks_module = importlib.import_module(app + ".tasks", package=None)
-            threadhandlers_module = importlib.import_module(app + ".threadhandlers", package=None)
+                tasks_module = importlib.import_module(app + ".tasks", package=None)
+                threadhandlers_module = importlib.import_module(app + ".threadhandlers", package=None)
 
-            processor_class = getattr(threadhandlers_module, processor_class_name)
+                processor_class = getattr(threadhandlers_module, processor_class_name)
 
-            tasks_module.process_jobs_task(processor_class)
+                tasks_module.process_jobs_task(processor_class)
+        except Exception as E:
+            print(str(E))

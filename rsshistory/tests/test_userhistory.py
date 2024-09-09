@@ -2,14 +2,16 @@ from datetime import timedelta
 from django.test import TestCase
 from django.contrib.auth.models import User
 
-from .fakeinternet import FakeInternetTestCase
+from utils.dateutils import DateUtils
 
 from ..models import (
-    UserEntryVisitHistory, UserSearchHistory, UserEntryTransitionHistory
+    UserEntryVisitHistory,
+    UserSearchHistory,
+    UserEntryTransitionHistory,
 )
 from ..controllers import LinkDataController, SourceDataController
-from .dateutils import DateUtils
 from ..configuration import Configuration
+from .fakeinternet import FakeInternetTestCase
 
 
 class UserSearchHistoryTest(TestCase):
@@ -279,8 +281,12 @@ class UserEntryVisitHistoryTest(FakeInternetTestCase):
         self.assertEqual(visits[0].user_object, self.user)
 
     def test_visited__argument_transition_from(self):
-        youtube_entries = LinkDataController.objects.filter(link="https://youtube.com?v=12345")
-        tiktok_entries = LinkDataController.objects.filter(link="https://tiktok.com?v=12345")
+        youtube_entries = LinkDataController.objects.filter(
+            link="https://youtube.com?v=12345"
+        )
+        tiktok_entries = LinkDataController.objects.filter(
+            link="https://tiktok.com?v=12345"
+        )
 
         self.assertEqual(youtube_entries.count(), 1)
         self.assertEqual(tiktok_entries.count(), 1)

@@ -152,14 +152,14 @@ class HttpRequestBuilder(object):
 
         if self.options.use_basic_crawler():
             preference_table = [
-                    self.get_contents_via_requests,
-                    self.get_contents_via_server_headless,
-                    self.get_contents_via_script_headless,
-                    self.get_contents_via_selenium_chrome_headless,
-                    self.get_contents_via_server_full,
-                    self.get_contents_via_script_full,
-                    self.get_contents_via_selenium_chrome_full,
-                    ]
+                self.get_contents_via_requests,
+                self.get_contents_via_server_headless,
+                self.get_contents_via_script_headless,
+                self.get_contents_via_selenium_chrome_headless,
+                self.get_contents_via_server_full,
+                self.get_contents_via_script_full,
+                self.get_contents_via_selenium_chrome_full,
+            ]
 
             for function in preference_table:
                 result = function(request=request)
@@ -344,7 +344,11 @@ class HttpRequestBuilder(object):
 
             diff = DateUtils.get_datetime_now_utc() - script_time_start
             if diff.total_seconds() > request.timeout_s:
-                WebLogger.error("Url:{} Timeout on socket connection:{}/{}".format(request.url, diff.total_seconds(), request.timeout_s))
+                WebLogger.error(
+                    "Url:{} Timeout on socket connection:{}/{}".format(
+                        request.url, diff.total_seconds(), request.timeout_s
+                    )
+                )
 
                 response = PageResponseObject(
                     request.url,
@@ -376,13 +380,19 @@ class HttpRequestBuilder(object):
         file_name_url_part = fix_path_for_os(request.url)
         file_name_url_part = file_name_url_part.replace("\\", "")
         file_name_url_part = file_name_url_part.replace("/", "")
+        file_name_url_part = file_name_url_part.replace("@", "")
 
         response_file_location = "response_{}.txt".format(file_name_url_part)
 
         if HttpPageHandler.script_responses_directory is not None:
-            response_file_location = Path(HttpPageHandler.script_responses_directory) / response_file_location
+            response_dir = Path(HttpPageHandler.script_responses_directory)
+            response_dir.mkdir(parents=True, exist_ok=True)
 
-        script = script + ' --url "{}" --output-file="{}"'.format(request.url, str(response_file_location))
+            response_file_location = response_dir / response_file_location
+
+        script = script + ' --url "{}" --output-file="{}"'.format(
+            request.url, str(response_file_location)
+        )
 
         if response_file_location.exists():
             response_file_location.unlink()
@@ -414,29 +424,19 @@ class HttpRequestBuilder(object):
                     WebLogger.error("Url:{}. {}".format(request.url, stderr_str))
 
             WebLogger.error(
-                "Url:{}. Return code invalid:{}".format(
-                    request.url, p.returncode
-                )
+                "Url:{}. Return code invalid:{}".format(request.url, p.returncode)
             )
-            return
 
         if response_file_location.exists():
+            response = None 
+
             with open(str(response_file_location), "rb") as fh:
                 all_bytes = fh.read()
 
-                return get_response_from_bytes(all_bytes)
+                response = get_response_from_bytes(all_bytes)
 
-            WebLogger.error(
-                "Url:{}. Not found response in response file:{}".format(
-                    request.url, str(response_file_location)
-                )
-            )
-            return PageResponseObject(
-                request.url,
-                text=None,
-                status_code=HTTP_STATUS_CODE_EXCEPTION,
-                request_url=request.url,
-            )
+            response_file_location.unlink()
+            return response
 
         else:
             WebLogger.error(
@@ -538,7 +538,9 @@ class HttpRequestBuilder(object):
             self.response = self.get_contents_function(request=request)
 
             WebLogger.info(
-                    "Url:{}. Options:{} Requesting page: DONE".format(self.url, self.options)
+                "Url:{}. Options:{} Requesting page: DONE".format(
+                    self.url, self.options
+                )
             )
 
         except Exception as E:
@@ -581,7 +583,6 @@ class HttpRequestBuilder(object):
 
 
 class HttpPageHandler(ContentInterface):
-
     user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/116.0"
     ssl_verify = True
 
@@ -626,7 +627,10 @@ class HttpPageHandler(ContentInterface):
     def get_contents_implementation(self):
         self.p = self.get_page_handler_simple()
 
-        if self.options.use_browser_promotions and self.is_advanced_processing_possible():
+        if (
+            self.options.use_browser_promotions
+            and self.is_advanced_processing_possible()
+        ):
             # we warn, because if that happens too often, it is easy just to
             # define EntryRule for that domain
             WebLogger.error(
@@ -661,8 +665,7 @@ class HttpPageHandler(ContentInterface):
             pass
 
         if contents:
-            """
-            """
+            """ """
 
             if self.is_html():
                 p = HtmlPage(url, contents)
@@ -910,3 +913,26 @@ class HttpPageHandler(ContentInterface):
         if self.p:
             if type(self.p) is RssPage:
                 return self.p.get_entries()
+
+    def get_feeds(self):
+        # TODO ugly import
+        from .handlers import RedditChannelHandler
+        result = []
+        url = self.url
+
+        h = RedditChannelHandler(url)
+        if h.is_handled_by():
+            feeds = h.get_feeds()
+            if feeds and len(feeds) > 0:
+                result.extend(feeds)
+
+        if type(self.p) is RssPage:
+            # we do not add ourselve
+            pass
+
+        if type(self.p) is HtmlPage:
+            feeds = self.p.get_feeds()
+            if feeds and len(feeds) > 0:
+                result.extend(feeds)
+
+        return result

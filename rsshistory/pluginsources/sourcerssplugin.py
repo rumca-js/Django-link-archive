@@ -71,7 +71,7 @@ class BaseRssPlugin(SourceGenericPlugin):
             prop = self.enhance(prop)
             yield prop
             total_entries += 1
-            
+
         if total_entries == 0:
             AppLogging.error("Url:{}. No links for rss".format(source.url))
 

@@ -10,7 +10,7 @@ from ...apps import LinkDatabase
 from ...models import ConfigurationEntry, UserConfig
 from ...controllers import LinkDataController, SearchEngineGoogleCache
 from ...configuration import Configuration
-from ...services import (
+from utils.services import (
     TranslateBuilder,
     InternetArchiveBuilder,
     SchemaOrg,

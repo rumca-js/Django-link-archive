@@ -17,6 +17,7 @@ from ..models import (
     AppLogging,
     ModelFiles,
 )
+from ..apps import LinkDatabase
 
 
 class BackgroundJobController(BackgroundJob):
@@ -94,6 +95,12 @@ class BackgroundJobController(BackgroundJob):
             entry = self.get_text_to_entry(self.subject)
             if entry:
                 return entry.get_absolute_url()
+        elif self.job == BackgroundJob.JOB_EXPORT_DATA:
+            id = self.subject
+            if id and id != "":
+                return reverse(
+                    "{}:data-export".format(LinkDatabase.name), args=[id]
+                )
 
         if self.args and self.args != "":
             p = DomainAwarePage(self.args)
@@ -162,10 +169,15 @@ class BackgroundJobController(BackgroundJob):
             if job.job not in valid_jobs_choices:
                 job.delete()
 
-    def get_number_of_jobs(job_name=None):
-        if job_name is None:
-            return BackgroundJob.objects.all().count()
-        return BackgroundJob.objects.filter(job=job_name).count()
+    def get_number_of_jobs(job_name=None, only_enabled=True):
+        condition = Q()
+        if job_name is not None:
+            condition & Q(job=job_name)
+            
+        if not only_enabled:
+            condition & Q(enabled=True)
+            
+        return BackgroundJob.objects.filter(condition).count()
 
     def get_job_priority(job_name):
         index = 0

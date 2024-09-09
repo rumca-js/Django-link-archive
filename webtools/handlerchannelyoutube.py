@@ -1,16 +1,16 @@
 import traceback
 
-from .defaulturlhandler import DefaultUrlHandler
+from .defaulturlhandler import DefaultChannelHandler
 from .webtools import RssPage, PageResponseObject
 from .handlerhttppage import HttpPageHandler
 
 
-class YouTubeChannelHandler(DefaultUrlHandler):
+class YouTubeChannelHandler(DefaultChannelHandler):
     """
     Natively since we inherit RssPage, the contents should be RssPage
     """
 
-    def __init__(self, url=None, contents=None, page_options = None):
+    def __init__(self, url=None, contents=None, page_options=None):
         self.html_url = None  # channel html page contains useful info
         self.rss_url = None
 
@@ -56,9 +56,12 @@ class YouTubeChannelHandler(DefaultUrlHandler):
 
         short_url = Url.get_protololless(self.url)
 
-        if (short_url.startswith("www.youtube.com/@")
+        if (
+            short_url.startswith("www.youtube.com/@")
             or short_url.startswith("youtube.com/@")
-            ):
+            or short_url.startswith("www.youtube.com/user")
+            or short_url.startswith("youtube.com/user")
+        ):
             return True
 
     def input2url(self, item):
@@ -110,13 +113,17 @@ class YouTubeChannelHandler(DefaultUrlHandler):
         if self.code:
             return self.code2url(self.code)
 
-    def get_channel_feed_url(self):
+    def get_feeds(self):
+        result = []
         if self.code:
-            return self.code2feed(self.code)
+            result.append(self.code2feed(self.code))
+
         elif self.is_channel_name():
             html = self.get_html_page()
             if html:
-                return html.get_rss_url()
+                result.append(html.get_rss_url())
+
+        return result
 
     def get_contents(self):
         """
@@ -164,16 +171,20 @@ class YouTubeChannelHandler(DefaultUrlHandler):
         if self.rss_url:
             return self.rss_url
 
-        feed_url = self.get_channel_feed_url()
-        if not feed_url:
+        feeds = self.get_feeds()
+        if not feeds or len(feeds) == 0:
             WebLogger.error(
                 "Url:{} Cannot read YouTube channel feed URL".format(self.url)
             )
             self.dead = True
             return
 
-        options = Url.get_url_options(feed_url)
-        self.rss_url = Url(feed_url, page_options=options, handler_class=HttpPageHandler)
+        feed = feeds[0]
+
+        options = Url.get_url_options(feed)
+        self.rss_url = Url(
+            feed, page_options=options, handler_class=HttpPageHandler
+        )
         return self.rss_url
 
     def get_html_url(self):
@@ -227,7 +238,7 @@ class YouTubeChannelHandler(DefaultUrlHandler):
             if thumbnail:
                 return thumbnail
 
-        html_page = self.get_html_page(channel_url)
+        html_page = self.get_html_page()
 
         if html_page:
             return html_page.get_thumbnail()

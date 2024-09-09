@@ -151,7 +151,6 @@ class DomainsController(Domains):
         )
 
     def is_update_time(self):
-
         days = DateUtils.get_day_diff(self.date_update_last)
         # TODO make this configurable
         return days > Domains.get_update_days_limit()

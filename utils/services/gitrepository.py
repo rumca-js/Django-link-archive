@@ -1,19 +1,40 @@
 from pathlib import Path
 import subprocess
 import shutil
-from ..models import AppLogging
+from utils.repositoryinterface import RepositoryInterface
+from utils.logger import Logger
 
 
-class GitRepo(object):
-    def __init__(self, git_data, timeout_s=60 * 60, operating_dir = None):
-        self.git_data = git_data
-        self.git_repo = git_data.remote_path
-        self.timeout_s = timeout_s
-        if not operating_dir:
-            self.operating_dir = self.git_data.local_path
-        else:
-            self.operating_dir = operating_dir
+class GitRepository(RepositoryInterface):
+
+    def __init__(self, export_data, timeout_s=60 * 60, operating_dir=None, data_source_dir=None):
+        super().__init__(export_data, timeout_s, operating_dir=operating_dir, data_source_dir=data_source_dir)
+
+        self.git_repo = self.export_data.remote_path
         self.is_different_flag = None
+
+    def push_to_repo(self, commit_message):
+        repo_is_up = False
+        try:
+            self.up()
+            repo_is_up = True
+        except Exception as E:
+            Logger.exc(
+                E,
+                "Cannot update repository, removing directory {}".format(
+                    self.get_operating_dir()
+                ),
+            )
+            self.clear_operating_directory()
+
+        if repo_is_up:
+            self.copy_tree()
+
+            self.add([])
+            if self.commit(commit_message) == 0:
+                self.push()
+
+                return True
 
     def get_local_dir(self):
         """
@@ -27,9 +48,6 @@ class GitRepo(object):
         TODO rename to cwd dir
         """
         self.operating_dir = Path(adir)
-
-    def get_operating_dir(self):
-        return Path(self.operating_dir)
 
     def up(self):
         cwd = self.get_operating_dir()
@@ -69,11 +87,11 @@ class GitRepo(object):
 
     def push(self):
         if not self.is_different_flag:
-            AppLogging.debug("Repository is not different")
+            Logger.debug("Repository is not different")
             return False
 
-        token = self.git_data.password
-        user = self.git_data.user
+        token = self.export_data.password
+        user = self.export_data.user
         repo = self.get_repo_name()
         p = subprocess.run(
             [
@@ -135,14 +153,9 @@ class GitRepo(object):
         )
         return self.check_process(p)
 
-    def copy_tree(self, input_path):
-        expected_dir = self.get_local_dir()
-
-        shutil.copytree(input_path, expected_dir, dirs_exist_ok=True)
-
     def check_process(self, p):
         if p.returncode != 0:
-            AppLogging.error(
+            Logger.error(
                 "GIT status:{}\nstdout:{}\nstderr:{}".format(
                     p.returncode, p.stdout.decode(), p.stderr.decode()
                 )

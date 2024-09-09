@@ -1,0 +1,31 @@
+version: '3.7'
+services:
+  djangolinkarchive:
+    image: rozbujnik/django-link-archive
+    container_name: djangolinkarchive
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8000:8000
+    depends_on:
+      dbserver:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+  rabbitmq:
+    image: rabbitmq 
+    ports:
+      - 5672:5672
+  dbserver:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_DB: control
+      POSTGRES_USER: power
+      POSTGRES_PASSWORD: notexample
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U power -d control"]
+      interval: 5s
+      timeout: 5s
+      retries: 5

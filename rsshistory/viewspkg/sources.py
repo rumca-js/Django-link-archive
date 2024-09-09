@@ -690,7 +690,33 @@ def source_fix_entries(request, source_pk):
     return p.render("summary_present.html")
 
 
+def init_sources(request):
+    if "noinitialize" not in request.GET:
+        path = Path("init_sources.json")
+        if path.exists():
+            i = JsonImporter(path)
+            i.import_all()
+
+
+def sources_initialize(request):
+    p = ViewPage(request)
+    p.set_title("Initialize sources")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    init_sources(request)
+
+    return redirect("{}:sources".format(LinkDatabase.name))
+
+
 def source_json(request, pk):
+    p = ViewPage(request)
+    p.set_title("Remove all entries")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
+    if data is not None:
+        return data
+
     sources = SourceDataController.objects.filter(id=pk)
 
     if sources.count() == 0:
@@ -709,6 +735,12 @@ def source_json(request, pk):
 
 
 def sources_json(request):
+    p = ViewPage(request)
+    p.set_title("Remove all entries")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
+    if data is not None:
+        return data
+
     check_views = [
         SourceListView,
     ]
