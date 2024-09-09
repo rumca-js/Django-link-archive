@@ -20,6 +20,7 @@ from ..controllers import (
 )
 from ..apps import LinkDatabase
 from ..configuration import Configuration
+from .jsonimporter import MapImporter
 
 
 class InstanceExporter(object):
@@ -73,15 +74,16 @@ class InstanceImporter(object):
             return
 
         if "links" in json_data:
-            importer = MapImporter()
+            importer = MapImporter(user = self.user)
             importer.import_from_links(json_data["links"])
 
         elif "sources" in json_data:
-            importer = MapImporter()
+            importer = MapImporter(user = self.user)
+            print(json_data["sources"])
             importer.import_from_sources(json_data["sources"])
 
         elif "link" in json_data:
-            importer = MapImporter()
+            importer = MapImporter(user = self.user)
             importer.import_from_link(json_data["link"])
 
         elif "source" in json_data:

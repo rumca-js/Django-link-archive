@@ -27,7 +27,7 @@ class MapImporter(object):
         self.user = user
 
         if self.user is not None:
-            self.user = self.get_normal_user(user)
+            self.user = self.get_user(user)
         else:
             self.user = self.get_superuser()
 
