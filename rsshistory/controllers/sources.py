@@ -422,12 +422,12 @@ class SourceDataBuilder(object):
         self.get_clean_data()
 
         source = self.add_internal()
+        # domains are created when entry is created
         if not source:
             return None
 
         SourceDataController.fix_entries(source)
 
-        self.add_domains()
         self.add_to_download(source)
 
         return source
@@ -488,13 +488,6 @@ class SourceDataBuilder(object):
 
         # self.link_data["category_object"] = category_object
         # self.link_data["subcategory_object"] = subcategory_object
-
-    def add_domains(self):
-        if Configuration.get_object().config_entry.enable_domain_support:
-            from .entriesutils import EntryDataBuilder
-
-            p = DomainAwarePage(self.link_data["url"])
-            EntryDataBuilder(link=p.get_domain())
 
     def add_to_download(self, source):
         if source.enabled:

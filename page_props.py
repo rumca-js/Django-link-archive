@@ -45,7 +45,6 @@ async def main():
 
     HttpPageHandler.crawling_full_script = "poetry run python crawleebeautifulsoup.py"
     HttpPageHandler.crawling_headless_script = "poetry run python crawleebeautifulsoup.py"
-
     #HttpPageHandler.crawling_full_script = "poetry run python crawlerseleniumundetected.py"
     #HttpPageHandler.crawling_headless_script = "poetry run python crawlerseleniumundetected.py"
 
