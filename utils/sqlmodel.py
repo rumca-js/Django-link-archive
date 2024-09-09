@@ -20,14 +20,15 @@ from sqlalchemy import (
     update,
 )
 from sqlalchemy.orm import sessionmaker
-import sqlalchemy
 from datetime import timedelta, datetime, timezone
 
-
+import sqlalchemy
 from sqlalchemy.orm import Session
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
+
+from .dateutils import DateUtils
 
 
 def create_this_engine():
@@ -198,6 +199,16 @@ class SourcesTable(Base):
     enabled: Mapped[bool] = mapped_column(default=True)
     url: Mapped[str] = mapped_column(unique=True)
     title: Mapped[str]
+    age: Mapped[int] = mapped_column(default=0)
+    category: Mapped[Optional[str]]
+    subcategory: Mapped[Optional[str]]
+    export_to_cms: Mapped[bool] = mapped_column(default=True)
+    favicon: Mapped[Optional[str]]
+    fetch_period: Mapped[Optional[int]]
+    language: Mapped[Optional[str]]
+    proxy_location: Mapped[Optional[str]]
+    remove_after_days: Mapped[Optional[int]]
+    source_type: Mapped[Optional[str]]
 
 
 class SourcesTableController(object):
@@ -334,6 +345,35 @@ class UserVotes(Base):
 
     entry_object: Mapped[Optional[int]]
     user_object: Mapped[Optional[int]]
+
+
+class ReadMarkers(Base):
+    __tablename__ = "ReadMarkers"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    read_date = mapped_column(DateTime)
+    source_object: Mapped[Optional[int]]
+
+    def set(session, source = None):
+        if not source:
+            markers = session.query(ReadMarkers)
+            if markers.count() == 0:
+                m = ReadMarkers(read_date = DateUtils.get_datetime_now_utc())
+                session.add(m)
+                session.commit()
+            else:
+                marker = markers.first()
+                marker.read_date = DateUtils.get_datetime_now_utc()
+                session.commit()
+        else:
+            markers = session.query(ReadMarkers, source_object == source.id)
+            if markers.count() == 0:
+                m = ReadMarkers(read_date = DateUtils.get_datetime_now_utc(), source_object = source.id)
+                session.add(m)
+                session.commit()
+            else:
+                marker = markers.first()
+                marker.read_date = DateUtils.get_datetime_now_utc()
+                session.commit()
 
 
 class SqlModel(object):

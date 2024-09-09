@@ -8,6 +8,7 @@ import traceback
 
 from webtools import DomainAwarePage
 from utils.dateutils import DateUtils
+from utils.controllers import GenericEntryController
 
 from ..apps import LinkDatabase
 
@@ -183,36 +184,8 @@ class BaseLinkDataController(BaseLinkDataModel):
         return "______"
 
     def get_title(self, full_title=False):
-        if not self.title:
-            return
-
-        if not full_title:
-            title = self.title[:100]
-        else:
-            title = self.title
-
-        code = self.get_title_info_string()
-        votes = self.page_rating_votes
-
-        if votes > 0 and code:
-            title = "[{}|{}] ".format(votes, code) + title
-        elif votes > 0:
-            title = "[{}] ".format(votes) + title
-        elif code:
-            title = "[{}] ".format(code) + title
-
-        return title
-
-    def get_title_info_string(self):
-        code = ""
-        if self.is_dead():
-            code += "D"
-        if self.age != 0 and self.age is not None:
-            code += "A"
-        if self.page_rating_votes < 0:
-            code += "V"
-
-        return code
+        c = GenericEntryController(self)
+        return c.get_title()
 
     def get_long_description(self):
         if self.is_dead():
@@ -550,6 +523,9 @@ class BaseLinkDataController(BaseLinkDataModel):
         """
         if self.manual_status_code == BaseLinkDataController.STATUS_UNDEFINED:
             return self.is_status_code_valid() and self.page_rating >= 0
+
+    def is_read(self):
+        return False
 
     def is_status_code_valid(self):
         if self.status_code == 403:

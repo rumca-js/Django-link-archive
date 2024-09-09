@@ -1477,7 +1477,7 @@ class EntryDataBuilder(object):
                 properties=self.link_data, blocked_keywords=keywords
             )
             if not v.is_valid():
-                AppLogging.error(
+                AppLogging.debug(
                     "Rejecting:{}\nData:{}\n".format(
                         self.link_data["link"], self.link_data["description"]
                     )

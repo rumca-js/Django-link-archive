@@ -1,6 +1,7 @@
 class GenericEntryController(object):
-    def __init__(self, entry):
+    def __init__(self, entry, console=False):
         self.entry = entry
+        self.console_printer = console
 
     def get_title(self, full_title=False):
         if not self.entry.title:
@@ -29,17 +30,18 @@ class GenericEntryController(object):
 
         text = ""
 
-        text += str(id)
+        if self.console_printer:
+            text += str(id)
 
         if votes > 0:
-            if title != "":
-                title += "|"
+            if text != "":
+                text += "|"
             text += "{}".format(votes)
 
-        if contents:
-            if title != "":
-                title += "|"
-            text += "{} ".format(contents)
+        #if contents:
+        #    if text != "":
+        #        text += "|"
+        #    text += "{} ".format(contents)
 
         return text
 
@@ -51,8 +53,10 @@ class GenericEntryController(object):
             code += "A"
         if self.entry.page_rating_votes < 0:
             code += "V"
-        if self.entry.bookmarked:
-            code += "B"
+
+        if self.console_printer:
+            if self.entry.bookmarked:
+                code += "B"
 
         return code
 

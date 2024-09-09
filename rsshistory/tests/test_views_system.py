@@ -91,6 +91,7 @@ class SystemViewsTest(FakeInternetTestCase):
 
     def test_wizard_setup_news(self):
         url = reverse("{}:wizard-setup-news".format(LinkDatabase.name))
+        url = url + "?noinitialize=True"
 
         # call tested function
         response = self.client.get(url)
@@ -99,6 +100,7 @@ class SystemViewsTest(FakeInternetTestCase):
 
     def test_wizard_setup_gallery(self):
         url = reverse("{}:wizard-setup-gallery".format(LinkDatabase.name))
+        url = url + "?noinitialize=True"
 
         # call tested function
         response = self.client.get(url)
@@ -107,6 +109,7 @@ class SystemViewsTest(FakeInternetTestCase):
 
     def test_wizard_setup_search_engine(self):
         url = reverse("{}:wizard-setup-search-engine".format(LinkDatabase.name))
+        url = url + "?noinitialize=True"
 
         # call tested function
         response = self.client.get(url)
@@ -114,9 +117,12 @@ class SystemViewsTest(FakeInternetTestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_is_system_ok(self):
+        # system should not be ok
+        # tasks info is None
+
         url = reverse("{}:is-system-ok".format(LinkDatabase.name))
 
         # call tested function
         response = self.client.get(url)
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 500)

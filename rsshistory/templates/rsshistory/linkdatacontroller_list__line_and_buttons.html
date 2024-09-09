@@ -5,6 +5,10 @@
       {% else %}
       class="list-group-item list-group-item-action"
       {% endif %}
+
+      {% if not link.is_valid or link.is_read %}
+      style="opacity: 0.5"
+      {% endif %}
     >
     <a href="{{ link.link }}" >
         <div>

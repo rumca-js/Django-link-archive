@@ -51,7 +51,7 @@ from bs4 import BeautifulSoup
 
 from utils.dateutils import DateUtils
 
-__version__ = "0.0.3"
+__version__ = "0.0.4"
 
 
 PAGE_TOO_BIG_BYTES = 5000000  # 5 MB. There are some RSS more than 1MB
@@ -103,44 +103,6 @@ class WebLogger(object):
             WebLogger.web_logger.exc(exception_object, info_text)
 
 
-class PrintWebLogger(object):
-    """
-    Implementation of weblogger that only prints to std out
-    """
-
-    def info(info_text, detail_text="", user=None, stack=False):
-        print(info_text)
-        print(detail_text)
-
-    def debug(info_text, detail_text="", user=None, stack=False):
-        print(info_text)
-        print(detail_text)
-
-    def warning(info_text, detail_text="", user=None, stack=False):
-        print(info_text)
-        print(detail_text)
-
-    def error(info_text, detail_text="", user=None, stack=False):
-        print(info_text)
-        print(detail_text)
-
-    def notify(info_text, detail_text="", user=None):
-        print(info_text)
-        print(detail_text)
-
-    def exc(exception_object, info_text=None, user=None):
-        print(str(exception_object))
-
-        error_text = traceback.format_exc()
-        print("Exception format")
-        print(error_text)
-
-        stack_lines = traceback.format_stack()
-        stack_string = "".join(stack_lines)
-        print("Stack:")
-        print("".join(stack_lines))
-
-
 class WebConfig(object):
     """
     API to configure webtools
@@ -150,7 +112,8 @@ class WebConfig(object):
         WebLogger.web_logger = Logger
 
     def use_print_logging():
-        WebLogger.web_logger = PrintWebLogger
+        from utils.logger import PrintLogger
+        WebLogger.web_logger = PrintLogger
 
 
 def lazy_load_content(func):
@@ -1187,9 +1150,6 @@ class RssPageEntry(ContentInterface):
 
         super().__init__(url=self.url, contents=contents)
 
-        self.allow_adding_with_current_time = True
-        self.default_entry_timestamp = None
-
     def get_properties(self):
         """ """
         output_map = {}
@@ -1298,8 +1258,12 @@ class RssPageEntry(ContentInterface):
     def get_date_published(self):
         date = self.get_date_published_implementation()
 
-        if date > DateUtils.get_datetime_now_utc():
-            date = DateUtils.get_datetime_now_utc()
+        now = DateUtils.get_datetime_now_utc()
+
+        if not date:
+            date = now
+        if date > now:
+            date = now
 
         return date
 
@@ -1310,7 +1274,10 @@ class RssPageEntry(ContentInterface):
             else:
                 try:
                     dt = parser.parse(self.feed_entry.published)
-                    return DateUtils.to_utc_date(dt)
+                    # TODO this might not be precise, but we do not have to be precise?
+
+                    utc = DateUtils.to_utc_date(dt)
+                    return utc
 
                 except Exception as e:
                     WebLogger.error(
@@ -1322,13 +1289,6 @@ class RssPageEntry(ContentInterface):
                         )
                     )
                 return DateUtils.get_datetime_now_utc()
-
-        elif self.allow_adding_with_current_time:
-            return DateUtils.get_datetime_now_utc()
-        elif self.default_entry_timestamp:
-            return self.default_entry_timestamp
-        else:
-            return DateUtils.get_datetime_now_utc()
 
     def get_author(self):
         if "author" in self.page_object_properties:

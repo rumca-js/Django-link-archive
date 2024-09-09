@@ -21,6 +21,7 @@ from .viewspkg import (
     keywords,
     tools,
     custom,
+    readmarkers,
 )
 
 # register app namespace
@@ -76,6 +77,7 @@ urlpatterns = [
     path("source/<int:pk>/", sources.SourceDetailView.as_view(), name="source-detail"),
     path("source-json/<int:pk>", sources.source_json, name="source-json"),
     path("sources-json/", sources.sources_json, name="sources-json"),
+    path("sources-initialize/", sources.sources_initialize, name="sources-initialize"),
     path("source-add", sources.add_source, name="source-add"),
     path("source-add-simple", sources.add_source_simple, name="source-add-simple"),
     path("source-remove/<int:pk>/", sources.remove_source, name="source-remove"),
@@ -114,6 +116,9 @@ urlpatterns = [
     path("model-file-remove/<int:pk>/", modelfiles.model_file_remove, name="model-file-remove"),
     path("model-files/", modelfiles.ModelFilesListView.as_view(), name="model-files"),
     path("model-files-remove/", modelfiles.model_files_remove, name="model-files-remove"),
+    # read markers
+    path("set-read-marker", readmarkers.set_read_marker, name="set-read-marker"),
+    path("set-source-read-marker/<int:pk>/", readmarkers.set_source_read_marker, name="set-source-read-marker"),
     # background jobs
     path("backgroundjobs/", backgroundjobs.BackgroundJobsView.as_view(), name="backgroundjobs",),
     path("backgroundjob-add", backgroundjobs.backgroundjob_add, name="backgroundjob-add",),

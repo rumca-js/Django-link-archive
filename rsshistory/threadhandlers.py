@@ -635,8 +635,6 @@ class ImportDailyDataJobHandler(BaseJobHandler):
         return True
 
     def import_one_file(self, afile):
-        import json
-
         with open(import_file) as json_file:
             data = json.load(json_file)
 
@@ -671,8 +669,6 @@ class ImportBookmarksJobHandler(BaseJobHandler):
         return True
 
     def import_one_file(self, afile):
-        import json
-
         with open(import_file) as json_file:
             data = json.load(json_file)
 
@@ -697,8 +693,6 @@ class ImportSourcesJobHandler(BaseJobHandler):
         return BackgroundJob.JOB_IMPORT_SOURCES
 
     def process(self, obj=None):
-        import json
-
         c = Configuration.get_object()
         import_file = c.get_import_path() / "sources.json"
 
@@ -726,8 +720,6 @@ class ImportInstanceJobHandler(BaseJobHandler):
         return BackgroundJob.JOB_IMPORT_INSTANCE
 
     def process(self, obj=None):
-        import json
-
         json_url = obj.subject
         author = obj.args
 
@@ -751,8 +743,6 @@ class ImportFromFilesJobHandler(BaseJobHandler):
         return BackgroundJob.JOB_IMPORT_FROM_FILES
 
     def process(self, obj=None):
-        import json
-
         data = obj.subject
         data = json.loads(data)
 
@@ -770,9 +760,9 @@ class ImportFromFilesJobHandler(BaseJobHandler):
             if users.count() > 0:
                 user = users[0]
 
-        from .serializers import FileImporter
+        from .serializers import JsonImporter
 
-        FileImporter(path=path, user=user)
+        JsonImporter(path=path, user=user)
 
         return True
 

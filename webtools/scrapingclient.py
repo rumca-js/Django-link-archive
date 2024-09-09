@@ -47,10 +47,8 @@ class ScrapingClient(object):
     def connect(self):
         self.c = ipc.SocketConnection()
         if not self.c.connect(ipc.SocketConnection.gethostname(), self.port):
-            print("Cannot connect to host at port {}".format(self.port))
             return False
         else:
-            print("Connected to host at port {} {}".format(self.port, self.c))
             return True
 
     def serve_forever(self):

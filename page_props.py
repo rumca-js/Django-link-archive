@@ -18,6 +18,7 @@ from webtools import (
    HttpPageHandler,
    ScrapingClient,
 )
+from utils.logger import Logger
 from utils.serializers import PageDisplay, PageDisplayParser
 
 
@@ -25,7 +26,9 @@ __version__ = "0.0.1"
 
 
 async def main():
-    WebConfig.use_print_logging()
+    # we do not want to be swamped with web requests
+    # WebConfig.use_print_logging()
+    Logger.use_print_logging()
 
     # if scraping server is running, use it
     c = ScrapingClient()

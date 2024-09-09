@@ -6,7 +6,7 @@ import sys
 import asyncio
 from pathlib import Path
 import shutil
-from sqlalchemy import desc
+from sqlalchemy import desc, asc
 
 from utils.sqlmodel import (
     SqlModel,
@@ -16,20 +16,19 @@ from utils.sqlmodel import (
     SourcesTableController,
     SourceOperationalData,
     SourceOperationalDataController,
+    ReadMarkers,
 )
 from datetime import timedelta, datetime, timezone
 
 from webtools import (
     PageOptions,
     WebConfig,
-    WebLogger,
-    PrintWebLogger,
     Url,
     RssPage,
     HttpPageHandler,
 )
 from utils.dateutils import DateUtils
-from utils.serializers import HtmlExporter
+from utils.serializers import HtmlExporter, JsonImporter
 from utils.controllers import GenericEntryController
 from utils.alchemysearch import AlchemySearch, AlchemyRowHandler
 
@@ -41,7 +40,7 @@ def print_entry(row):
     link = row.link
     date_published = row.date_published
 
-    ec = GenericEntryController(row)
+    ec = GenericEntryController(row, console=True)
     title = ec.get_title(True)
 
     print("-------------------")
@@ -96,9 +95,10 @@ def read_source(db, source):
 
 
 class OutputWriter(object):
-    def __init__(self, db, entries):
+    def __init__(self, db, entries, date_limit=None):
         self.db = db
         self.entries = entries
+        self.date_limit = date_limit
 
     def write(self):
         for entry in self.entries:
@@ -108,7 +108,12 @@ class OutputWriter(object):
             description = entry.description
             date_published = entry.date_published
 
-            print_entry(entry)
+            if self.date_limit and date_published > self.date_limit:
+                print_entry(entry)
+            elif not self.date_limit:
+                print_entry(entry)
+
+        print(self.date_limit)
 
 
 def fetch(db, parser, day_limit):
@@ -256,6 +261,9 @@ class FeedClientParser(object):
         self.parser.add_argument(
             "--unbookmark", action="store_true", help="unbookmarks entry"
         )
+        self.parser.add_argument(
+            "-m" ,"--mark-read", action="store_true", help="Marks entries as read"
+        )
         self.parser.add_argument("--entry", help="Select entry by ID")
         self.parser.add_argument("--source", help="Select source by ID")
         self.parser.add_argument(
@@ -273,6 +281,7 @@ class FeedClientParser(object):
         )
         self.parser.add_argument("--follow", help="Follows specific source")
         self.parser.add_argument("--unfollow", help="Unfollows specific source")
+        self.parser.add_argument("--unfollow-all", action="store_true", help="Unfollows all sources")
         self.parser.add_argument("--enable", help="Enables specific source")
         self.parser.add_argument("--disable", help="Disables specific source")
         self.parser.add_argument(
@@ -312,7 +321,8 @@ class SearchResultHandler(AlchemyRowHandler):
         print_entry(row)
 
 
-def get_entries(db, source_id=None):
+def get_entries(db, source_id=None, ascending = True):
+
     Session = db.get_session()
 
     with Session() as session:
@@ -321,14 +331,16 @@ def get_entries(db, source_id=None):
         if source_id:
             query = query.filter(EntriesTable.source_obj__id == source_id)
 
-        query = query.order_by(desc(EntriesTable.date_published))
+        if ascending:
+            query = query.order_by(asc(EntriesTable.date_published))
+        else:
+            query = query.order_by(desc(EntriesTable.date_published))
 
         return query.all()
 
 
 class FeedClient(object):
-    def __init__(self, sources=None, day_limit=7, engine=None, parser=None):
-        self.sources = sources
+    def __init__(self, day_limit=7, engine=None, parser=None):
         self.day_limit = day_limit
         self.engine = engine
 
@@ -341,8 +353,8 @@ class FeedClient(object):
         db = SqlModel(database_file=database_file, engine=self.engine)
 
         if self.parser.args.init_sources:
-            if self.sources and len(self.sources) > 0:
-                self.add_init_sources(db, self.sources)
+            importer = JsonImporter(db, "init_sources.json")
+            importer.import_all()
 
         if self.parser.args.cleanup:
             db.entries_table.truncate()
@@ -363,11 +375,17 @@ class FeedClient(object):
         if self.parser.args.unfollow:
             self.unfollow_url(db, self.parser.args.unfollow)
 
+        if self.parser.args.unfollow_all:
+            self.unfollow_all(db)
+
         if self.parser.args.enable:
             self.enable_source(db, self.parser.args.enable)
 
         if self.parser.args.disable:
             self.disable_source(db, self.parser.args.disable)
+
+        if self.parser.args.mark_read:
+            self.mark_read(db)
 
         # one of the below needs to be true
         if self.parser.args.refresh_on_start:
@@ -396,7 +414,7 @@ class FeedClient(object):
                 shutil.rmtree(str(directory))
                 directory.mkdir(parents=True, exist_ok=True)
 
-            entries = get_entries(db, self.parser.args.source)
+            entries = get_entries(db, self.parser.args.source, ascending=False)
 
             verbose = False
             if self.parser.args.verbose:
@@ -417,9 +435,16 @@ class FeedClient(object):
             PageDisplay(self.parser.args.page_details, verbose=self.parser.args.verbose)
 
         if self.parser.args.list_entries:
-            entries = get_entries(db, self.parser.args.source)
+            entries = get_entries(db, self.parser.args.source, ascending=True)
 
-            w = OutputWriter(db, entries)
+            date_limit = None
+            Session = db.get_session()
+            with Session() as session:
+                read_marker = session.query(ReadMarkers).filter(ReadMarkers.source_object == None).first()
+                if read_marker:
+                    date_limit = read_marker.read_date
+
+            w = OutputWriter(db, entries, date_limit)
             w.write()
 
     def enable_source(self, db, source_id):
@@ -464,6 +489,13 @@ class FeedClient(object):
                 print("Source does not exist")
 
         return False
+
+    def mark_read(self, db):
+        Session = db.get_session()
+        with Session() as session:
+            ReadMarkers.set(session)
+
+        print("Marked as read")
 
     def follow_url(self, db, page_url):
         def is_source(db, page_url):
@@ -531,22 +563,19 @@ class FeedClient(object):
 
         return True
 
-    def add_init_sources(self, db, sources):
+    def unfollow_all(self, db):
         Session = db.get_session()
 
+        sources = []
         with Session() as session:
+            sources = session.query(SourcesTable).all()
             for source in sources:
-                sources = (
-                    session.query(SourcesTable)
-                    .filter(SourcesTable.url == source["url"])
-                    .all()
-                )
-                if len(sources) == 0:
-                    print("Adding: {}".format(source["title"]))
+                session.delete(source)
 
-                    obj = SourcesTable(url=source["url"], title=source["title"])
-                    session.add(obj)
-                    session.commit()
+            session.commit()
+
+        print("Unfollowed all sources")
+        return True
 
     def list_sources(self, db):
         Session = db.get_session()

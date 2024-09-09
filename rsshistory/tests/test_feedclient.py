@@ -141,6 +141,40 @@ class FeedClientTest(FakeInternetTestCase):
 
         self.teardown()
 
+    def test_unfollow_all(self):
+        self.teardown()
+
+        engine = self.get_engine()
+        db = SqlModel(engine=engine)
+
+        test_link = "https://www.youtube.com/feeds/videos.xml?channel_id=UCXuqSBlHAE6Xw-yeJA0Tunw"
+
+        c = FeedClient(engine=engine)
+        c.follow_url(db, test_link)
+
+        Session = db.get_session()
+        with Session() as session:
+            number_of_source = (
+                session.query(SourcesTable)
+                .filter(SourcesTable.url == test_link)
+                .count()
+            )
+            self.assertEqual(number_of_source, 1)
+
+        # call tested function
+        status = c.unfollow_all(db)
+
+        self.assertEqual(status, True)
+
+        Session = db.get_session()
+        with Session() as session:
+            number_of_source = (
+                session.query(SourcesTable).all().count()
+            )
+            self.assertEqual(number_of_source, 0)
+
+        self.teardown()
+
     def test_enable_source__disable_source(self):
         self.teardown()
 
