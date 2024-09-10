@@ -51,6 +51,8 @@ COPY ./linklibrary/settings_template_postgres_celery.py /app/linklibrary/setting
 RUN mkdir -p /app/linklibrary/rsshistory/migrations
 RUN touch /app/linklibrary/rsshistory/migrations/__init__.py
 
+# TODO Copy chromedriver to /usr/local/bin
+
 # Expose the port that Django will run on
 EXPOSE 8000
 

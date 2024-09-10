@@ -389,9 +389,10 @@ class ConfigurationEntry(models.Model):
         Fix errors here
         """
 
-        p = Path(self.selenium_driver_path)
-        if not p.exists():
-            self.selenium_driver_path = None
+        if self.selenium_driver_path:
+            p = Path(self.selenium_driver_path)
+            if not p.exists():
+                self.selenium_driver_path = None
 
         users = User.objects.filter(username=self.admin_user)
         if users.count() == 0:
