@@ -18,6 +18,19 @@ This project uses the following technologies:
  - selenium / crawlee
  - rabbitmq-server
 
+# Using the crawling system
+
+You should not plan on doing anything hostile. For you it might be just web scraping. For others it could be DDOS attack.
+
+Some scraping solutions do not work on Raspberry PI out of the box: for example chrome-undetected.
+
+Links:
+
+ - https://medium.com/codex/the-biggest-web-scraping-roadblocks-and-how-to-avoid-them-669125b886b9
+ - https://crawlee.dev/docs/guides/avoid-blocking
+ - https://docs.apify.com/academy/anti-scraping/mitigation/generating-fingerprints
+ - https://docs.apify.com/academy/anti-scraping/mitigation/cloudflare-challenge.md
+
 # Manual installation
 
 Steps:

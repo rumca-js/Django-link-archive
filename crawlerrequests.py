@@ -12,7 +12,8 @@ import webtools
 
 
 def main():
-    webtools.WebConfig.use_print_logging() 
+    WebConfig.init()
+    WebConfig.use_print_logging() 
 
     parser = webtools.ScriptCrawlerParser()
     parser.parse()
@@ -31,6 +32,7 @@ def main():
         sys.exit(1)
 
     driver.save_response()
+    driver.close()
 
 
 main()

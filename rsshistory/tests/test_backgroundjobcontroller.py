@@ -40,6 +40,23 @@ class BackgroundJobControllerTest(FakeInternetTestCase):
             task=None,
             subject="https://youtube.com?v=1234",
             args="",
+            enabled=True,
+        )
+
+        # call tested function
+        self.assertEqual(
+            BackgroundJobController.get_number_of_jobs(
+                BackgroundJob.JOB_LINK_UPDATE_DATA
+            ),
+            1,
+        )
+
+        bj = BackgroundJob.objects.create(
+            job=BackgroundJob.JOB_PROCESS_SOURCE,
+            task=None,
+            subject="https://youtube.com?v=1234",
+            args="",
+            enabled=False,
         )
 
         # call tested function

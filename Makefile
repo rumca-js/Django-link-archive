@@ -55,8 +55,9 @@ createsuperuser:
 # - I cannot write installation commands for each Linux distro. I assume you are using debian-derivative
 # - assume you are using sudo for this command. solve it later https://github.com/rumca-js/Django-link-archive/issues/10
 # http://pont.ist/rabbit-mq/
+# xvfb is installed for full selenium to be operational
 installsysdeps:
-	apt -y install rabbitmq-server, memcached, wget, id3v2, chromium-chromedriver
+	apt -y install rabbitmq-server, memcached, wget, id3v2, chromium-chromedriver, xvfb
 	systemctl enable rabbitmq-server
 	systemctl start rabbitmq-server
 	systemctl enable memcached.service

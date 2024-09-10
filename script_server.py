@@ -35,15 +35,17 @@ import shutil
 
 from pathlib import Path
 import webtools
-from webtools import ipc, ScrapingServer, ScrapingServerParser, HttpPageHandler
+from webtools import ipc, ScrapingServer, ScrapingServerParser, WebConfig
 import subprocess
 import traceback
 from datetime import datetime, timedelta
 
 
 if __name__ == "__main__":
-    if HttpPageHandler.script_responses_directory is not None:
-        path = Path(HttpPageHandler.script_responses_directory)
+    WebConfig.init()
+
+    if WebConfig.script_responses_directory is not None:
+        path = Path(WebConfig.script_responses_directory)
         if path.exists():
             shutil.rmtree(str(path), ignore_errors=True, onerror=None)
 

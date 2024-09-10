@@ -138,6 +138,7 @@ class ConfigForm(forms.ModelForm):
             "crawling_server_port",
             "crawling_headless_script",
             "crawling_full_script",
+            "selenium_driver_path",
             # user
             "track_user_actions",
             "track_user_searches",

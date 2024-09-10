@@ -37,18 +37,18 @@ def page_show_properties(request):
         if "method" in request.GET and request.GET["method"] == "headless":
             options.use_headless_browser = True
             options.use_full_browser = False
-            options.user_browser_promotions = False
+            options.use_browser_promotions = False
             method = request.GET["method"]
         elif "method" in request.GET and request.GET["method"] == "full":
             options.use_full_browser = True
             options.use_headless_browser = False
-            options.user_browser_promotions = False
+            options.use_browser_promotions = False
         elif "method" in request.GET and request.GET["method"] == "standard":
             options.use_full_browser = False
             options.use_headless_browser = False
-            options.user_browser_promotions = False
+            options.use_browser_promotions = False
         else:
-            options.user_browser_promotions = True
+            options.use_browser_promotions = True
             if options.use_full_browser:
                 method = "full"
             elif options.use_headless_browser:

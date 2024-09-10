@@ -13,6 +13,7 @@ from .webtools import (
     ContentInterface,
     DefaultContentPage,
     WebLogger,
+    WebConfig,
     JsonPage,
     HtmlPage,
     RssPage,
@@ -21,8 +22,6 @@ from .webtools import (
     PageOptions,
     DomainAwarePage,
     lazy_load_content,
-    get_request_to_bytes,
-    get_response_from_bytes,
     HTTP_STATUS_CODE_EXCEPTION,
     HTTP_STATUS_CODE_CONNECTION_ERROR,
     HTTP_STATUS_CODE_TIMEOUT,
@@ -35,6 +34,8 @@ from .crawlers import (
     SeleniumChromeHeadless,
     SeleniumChromeFull,
     SeleniumUndetected,
+    ScriptCrawler,
+    ServerCrawler,
 )
 
 
@@ -198,6 +199,7 @@ class HttpRequestBuilder(object):
             ]
 
             for function in preference_table:
+                print("Trying {}".format(function))
                 result = function(request=request)
                 if result:
                     return result
@@ -218,50 +220,52 @@ class HttpRequestBuilder(object):
         return p.get_response()
 
     def get_contents_via_selenium_chrome_headless(self, request):
-        p = SeleniumChromeHeadless(request)
+        p = SeleniumChromeHeadless(request, driver_executable=WebConfig.selenium_driver_location)
         p.run()
+        p.close()
         return p.get_response()
 
     def get_contents_via_selenium_chrome_full(self, request):
-        p = SeleniumChromeFull(request)
+        p = SeleniumChromeFull(request, driver_executable=WebConfig.selenium_driver_location)
         p.run()
+        p.close()
         return p.get_response()
 
     def get_contents_via_script_headless(self, request):
-        if not HttpPageHandler.crawling_headless_script:
+        if not WebConfig.crawling_headless_script:
             return
 
-        script = HttpPageHandler.crawling_headless_script
+        script = WebConfig.crawling_headless_script
 
         return self.get_contents_via_script(script, request)
 
     def get_contents_via_script_full(self, request):
-        if not HttpPageHandler.crawling_full_script:
+        if not WebConfig.crawling_full_script:
             return
 
-        script = HttpPageHandler.crawling_full_script
+        script = WebConfig.crawling_full_script
 
         return self.get_contents_via_script(script, request)
 
     def get_contents_via_server_headless(self, request):
-        if not HttpPageHandler.crawling_server_port:
+        if not WebConfig.crawling_server_port:
             return
 
-        script = HttpPageHandler.crawling_headless_script
+        script = WebConfig.crawling_headless_script
         if script is None:
             script = "poetry run python crawleebeautifulsoup.py"
-        port = HttpPageHandler.crawling_server_port
+        port = WebConfig.crawling_server_port
 
         return self.get_contents_via_server(script, port, request)
 
     def get_contents_via_server_full(self, request):
-        if not HttpPageHandler.crawling_server_port:
+        if not WebConfig.crawling_server_port:
             return
 
-        script = HttpPageHandler.crawling_full_script
+        script = WebConfig.crawling_full_script
         if script is None:
             script = "poetry run python crawleeplaywright.py"
-        port = HttpPageHandler.crawling_server_port
+        port = WebConfig.crawling_server_port
 
         return self.get_contents_via_server(script, port, request)
 
@@ -269,98 +273,10 @@ class HttpRequestBuilder(object):
         """
         TODO what about timeout?
         """
-        from .ipc import SocketConnection
-
-        script_time_start = DateUtils.get_datetime_now_utc()
-
-        connection = SocketConnection()
-        try:
-            if not connection.connect(SocketConnection.gethostname(), port):
-                WebLogger.error("Cannot connect to port{}".format(port))
-
-                response = PageResponseObject(
-                    request.url,
-                    text=None,
-                    status_code=HTTP_STATUS_CODE_CONNECTION_ERROR,
-                    request_url=request.url,
-                )
-                return response
-        except Exception as E:
-            WebLogger.exc(E, "Cannot connect to port{}".format(port))
-            return
-
-        bytes = get_request_to_bytes(request, script)
-        connection.send(bytes)
-
-        response = PageResponseObject(request.url)
-        response.status_code = HTTP_STATUS_CODE_TIMEOUT
-        response.request_url = request.url
-
-        while True:
-            command_data = connection.get_command_and_data()
-
-            if command_data:
-                if command_data[0] == "PageResponseObject.__init__":
-                    pass
-
-                elif command_data[0] == "PageResponseObject.url":
-                    response.url = command_data[1].decode()
-
-                elif command_data[0] == "PageResponseObject.headers":
-                    try:
-                        response.headers = json.loads(command_data[1].decode())
-                    except Exception as E:
-                        WebLogger.exc(
-                            E, "Cannot load response headers from crawling server"
-                        )
-
-                elif command_data[0] == "PageResponseObject.status_code":
-                    try:
-                        response.status_code = int(command_data[1].decode())
-                    except Exception as E:
-                        WebLogger.exc(E, "Cannot load status_code from crawling server")
-
-                elif command_data[0] == "PageResponseObject.text":
-                    response.set_text(command_data[1].decode())
-
-                elif command_data[0] == "PageResponseObject.request_url":
-                    response.request_url = command_data[1].decode()
-
-                elif command_data[0] == "PageResponseObject.__del__":
-                    break
-
-                elif command[0] == "commands.debug":
-                    pass
-
-                elif command[0] == "debug.requests":
-                    pass
-
-                else:
-                    WebLogger.error("Unsupported command:{}".format(command_data[0]))
-                    break
-
-            if connection.is_closed():
-                break
-
-            diff = DateUtils.get_datetime_now_utc() - script_time_start
-            if diff.total_seconds() > request.timeout_s:
-                WebLogger.error(
-                    "Url:{} Timeout on socket connection:{}/{}".format(
-                        request.url, diff.total_seconds(), request.timeout_s
-                    )
-                )
-
-                response = PageResponseObject(
-                    request.url,
-                    text=None,
-                    status_code=HTTP_STATUS_CODE_TIMEOUT,
-                    request_url=request.url,
-                )
-                break
-
-        connection.close()
-
-        return response
+        p = ServerCrawler(request = request, response_port = port, script = script)
+        p.run()
+        p.close()
+        return p.get_response()
 
     def get_contents_via_script(self, script, request):
         """
@@ -372,85 +288,37 @@ class HttpRequestBuilder(object):
         file_path = os.path.realpath(__file__)
         full_path = Path(file_path)
 
-        if HttpPageHandler.script_operating_dir is None:
+        if WebConfig.script_operating_dir is None:
             operating_path = full_path.parents[1]
         else:
-            operating_path = Path(HttpPageHandler.script_operating_dir)
+            operating_path = Path(WebConfig.script_operating_dir)
+
+        if not operating_path.exists():
+            WebLogger.error("Operating path does not exist: {}".format(operating_path))
+            return
+
+        full_script = operating_path / script
+        if not full_script.exists():
+            WebLogger.error("Script to call does not exist: {}".format(full_script))
+            return
 
         file_name_url_part = fix_path_for_os(request.url)
         file_name_url_part = file_name_url_part.replace("\\", "")
         file_name_url_part = file_name_url_part.replace("/", "")
         file_name_url_part = file_name_url_part.replace("@", "")
 
-        response_file_location = "response_{}.txt".format(file_name_url_part)
+        if WebConfig.script_responses_directory is not None:
+            response_dir = Path(WebConfig.script_responses_directory)
 
-        if HttpPageHandler.script_responses_directory is not None:
-            response_dir = Path(HttpPageHandler.script_responses_directory)
-            response_dir.mkdir(parents=True, exist_ok=True)
+        response_file_location = response_dir / "response_{}.txt".format(file_name_url_part)
 
-            response_file_location = response_dir / response_file_location
-
-        script = script + ' --url "{}" --output-file="{}"'.format(
-            request.url, str(response_file_location)
-        )
-
-        if response_file_location.exists():
-            response_file_location.unlink()
-
-        # WebLogger.debug(operating_path)
-        # WebLogger.debug(response_file_location)
-
-        WebLogger.info(
-            "Url:{} Running script:{} Request:{}".format(request.url, script, request)
-        )
-
-        p = subprocess.run(
-            script,
-            shell=True,
-            capture_output=True,
-            cwd=operating_path,
-            timeout=request.timeout_s,
-        )
-
-        if p.returncode != 0:
-            if p.stdout:
-                stdout_str = p.stdout.decode()
-                if stdout_str != "":
-                    WebLogger.debug(stdout_str)
-
-            if p.stderr:
-                stderr_str = p.stderr.decode()
-                if stderr_str and stderr_str != "":
-                    WebLogger.error("Url:{}. {}".format(request.url, stderr_str))
-
-            WebLogger.error(
-                "Url:{}. Return code invalid:{}".format(request.url, p.returncode)
-            )
-
-        if response_file_location.exists():
-            response = None 
-
-            with open(str(response_file_location), "rb") as fh:
-                all_bytes = fh.read()
-
-                response = get_response_from_bytes(all_bytes)
-
-            response_file_location.unlink()
-            return response
-
-        else:
-            WebLogger.error(
-                "Url:{}. Response file does not exist:{}".format(
-                    request.url, str(response_file_location)
-                )
-            )
-
-        return PageResponseObject(
-            request.url,
-            text=None,
-            status_code=HTTP_STATUS_CODE_EXCEPTION,
-            request_url=request.url,
-        )
+        p = ScriptCrawler(request = request,
+                      response_file = response_file_location,
+                      cwd = operating_path,
+                      script = script)
+        p.run()
+        p.close()
+        return p.get_response()
 
     def ping(self, timeout_s=5):
         url = self.url
@@ -586,16 +454,8 @@ class HttpPageHandler(ContentInterface):
     user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/116.0"
     ssl_verify = True
 
-    crawling_headless_script = None
-    crawling_full_script = None
-    crawling_server_port = None
-
-    script_operating_dir = None
-    script_responses_directory = Path("storage")
-
     def __init__(self, url=None, page_options=None):
         super().__init__(url=url, contents=None)
-
         self.p = None  # page contents object, HtmlPage, RssPage, or whathver
         self.response = None
         self.options = page_options

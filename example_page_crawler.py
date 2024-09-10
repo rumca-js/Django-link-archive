@@ -15,7 +15,6 @@ from webtools import (
    WebLogger,
    DomainCache,
    Url,
-   HttpPageHandler,
    ContentLinkParser,
    run_server_task,
 )
@@ -88,14 +87,15 @@ class Crawler(object):
 
 
 def main():
+    WebConfig.init()
     WebConfig.use_print_logging()
 
     # more advanced processing is possible through other frameworks
     server = run_server_task()
 
-    HttpPageHandler.crawling_server_port = server.port
-    HttpPageHandler.crawling_full_script = "poetry run python crawleebeautifulsoup.py"
-    HttpPageHandler.crawling_headless_script = "poetry run python crawleebeautifulsoup.py"
+    WebConfig.crawling_server_port = server.port
+    WebConfig.crawling_full_script = "poetry run python crawleebeautifulsoup.py"
+    WebConfig.crawling_headless_script = "poetry run python crawleebeautifulsoup.py"
 
     print("Enter page to crawl")
     url = input("->")

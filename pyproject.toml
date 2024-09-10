@@ -8,7 +8,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.9"
-Django = "^4.2.9"
+Django = "^4.2.16"
 feedparser = "^6.0.10"
 django-user-agents = "^0.4.0"
 python-dateutil = "^2.8.2"
@@ -18,11 +18,11 @@ pytz = "^2021.1"
 pymemcache = "^4.0.0"
 celery = "^5.3.6"
 django-celery-results = "^2.5.1"
-sqlalchemy = "^2.0.23"
+sqlalchemy = "^2.0.34"
 tldextract = "5.1.2"
-sympy = "^1.12"
+sympy = "^1.13.2"
 beautifulsoup4 = "^4.12.2"
-spacy = "^3.7.2"
+spacy = "3.7.5"
 
 # [optional] - at least one of methods need to be running
 # example: crawlerrequests.py
@@ -30,33 +30,35 @@ requests = "^2.25.1"
 
 # [optional] use things below if you want to use selenium
 # example: crawlerseleniumfull.py, crawlerseleniumheadless.py
-selenium="*"
+selenium="^4.24.0"
 chardet = "^5.2.0"
 psycopg2 = "*"
 pyvirtualdisplay = "^3.0"
 
 # [optional] use if you plan to use it
+# Note: does not work on raspberry pi
 # example: crawlerseleniumundetected.py
 undetected-chromedriver = "^3.5.5"
 
 # [optional] use things below if you want to use crawlee
 # example: crawleebeautifulsoup.py, crawleeplaywright.py
-crawlee="0.1.1"
+crawlee="^0.1.1"
 playwright="*"
 lxml="5.2.2"
 
 # [optional] use things below if you want to use seleniumbase
 # example: crawlerseleniumbase.py
-# seleniumbase="4.29.9"
+# seleniumbase="^4.30.3"
+
+# [optional] use things below if you want to use botasaurus
+# example: todo
+botasaurus-driver="*"
+# botasaurus="*"
 
 # [optional] use things below if you want to use scrapy
 # example: todo
 # https://github.com/geekan/scrapy-examples
 # scrapy="*"
-
-# [optional] use things below if you want to use botasaurus
-# example: todo
-# botasaurus="*"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.3.0"

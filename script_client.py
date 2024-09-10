@@ -6,10 +6,12 @@ import argparse
 import json
 from datetime import datetime, timedelta
 
-from webtools import ipc, ScrapingClient, ScrapingClientParser
+from webtools import ipc, ScrapingClient, ScrapingClientParser, WebConfig
 
 
 def main():
+    WebConfig.init()
+
     p = ScrapingClientParser()
     p.parse()
 

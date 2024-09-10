@@ -20,7 +20,7 @@ version is split into three digits:
  if a change requires the model to be changed, then second digit is updated, patch is set to 0
  if something should be released to public, then release version changes
 """
-__version__ = "0.79.1"
+__version__ = "0.80.0"
 
 
 class Configuration(object):
@@ -37,11 +37,7 @@ class Configuration(object):
         self.config_entry = ConfigurationEntry.get()
         self.get_context()
 
-        self.apply_ssl_verification()
-        self.apply_user_agent()
-        self.apply_crawling_scripts()
-        self.apply_robots_txt()
-        self.apply_web_logger()
+        self.apply_webconfig()
 
     def get_context_minimal():
         config_entry = ConfigurationEntry.get()
@@ -105,6 +101,17 @@ class Configuration(object):
         from .models import AppLogging
         Logger.app_logger = AppLogging
 
+    def apply_webconfig(self):
+        self.apply_ssl_verification()
+        self.apply_user_agent()
+        self.apply_robots_txt()
+        self.apply_web_logger()
+        self.apply_crawling_scripts()
+
+        from webtools import WebConfig
+        c = self.config_entry
+        WebConfig.selenium_driver_location = c.selenium_driver_path
+
     def apply_ssl_verification(self):
         from webtools import HttpPageHandler
 
@@ -117,13 +124,13 @@ class Configuration(object):
         HttpPageHandler.user_agent = self.config_entry.user_agent
 
     def apply_crawling_scripts(self):
-        from webtools import HttpPageHandler
+        from webtools import WebConfig
 
         c = self.config_entry
 
-        HttpPageHandler.crawling_full_script = c.crawling_full_script
-        HttpPageHandler.crawling_headless_script = c.crawling_headless_script
-        HttpPageHandler.crawling_server_port = c.crawling_server_port
+        WebConfig.crawling_full_script = c.crawling_full_script
+        WebConfig.crawling_headless_script = c.crawling_headless_script
+        WebConfig.crawling_server_port = c.crawling_server_port
 
     def apply_robots_txt(self):
         from webtools import DomainCache

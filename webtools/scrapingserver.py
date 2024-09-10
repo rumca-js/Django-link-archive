@@ -36,7 +36,7 @@ import webtools
 import subprocess
 import traceback
 from datetime import datetime, timedelta
-from webtools import HttpPageHandler
+from webtools import WebConfig
 
 
 max_transaction_timeout_s = 40
@@ -264,8 +264,8 @@ def remove_temporary_files():
     """
     Crawlee storage
     """
-    if HttpPageHandler.script_responses_directory is not None:
-        path = Path(HttpPageHandler.script_responses_directory)
+    if WebConfig.script_responses_directory is not None:
+        path = Path(WebConfig.script_responses_directory)
         if path.exists():
             shutil.rmtree(str(path), ignore_errors=True, onerror=None)
 

@@ -9,10 +9,12 @@ import argparse
 import sys
 
 import webtools
+from webtools import WebConfig
 
 
 def main():
-    webtools.WebConfig.use_print_logging() 
+    WebConfig.use_print_logging() 
+    WebConfig.init()
 
     parser = webtools.ScriptCrawlerParser()
     parser.parse()
@@ -22,7 +24,7 @@ def main():
 
     request = parser.get_request()
 
-    driver = webtools.SeleniumChromeHeadless(request, parser.args.output_file, parser.args.port)
+    driver = webtools.SeleniumChromeHeadless(request, parser.args.output_file, parser.args.port, driver_executable=WebConfig.selenium_driver_location)
 
     if parser.args.verbose:
         print("Running request:{} with SeleniumChromeHeadless".format(request))
@@ -32,6 +34,7 @@ def main():
         sys.exit(1)
         return
     driver.save_response()
+    driver.close()
 
 
 main()

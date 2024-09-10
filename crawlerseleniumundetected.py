@@ -10,10 +10,12 @@ import argparse
 import sys
 
 import webtools
+from webtools import WebConfig
 
 
 def main():
-    webtools.WebConfig.use_print_logging() 
+    WebConfig.init()
+    WebConfig.use_print_logging() 
 
     parser = webtools.ScriptCrawlerParser()
     parser.parse()
@@ -24,7 +26,7 @@ def main():
 
     request = parser.get_request()
 
-    driver = webtools.SeleniumUndetected(request, parser.args.output_file, parser.args.port)
+    driver = webtools.SeleniumUndetected(request, parser.args.output_file, parser.args.port, driver_executable=WebConfig.selenium_driver_location)
 
     if parser.args.verbose:
         print("Running request:{} with SeleniumUndetected".format(request))
@@ -35,6 +37,7 @@ def main():
         return
 
     driver.save_response()
+    driver.close()
 
 
 main()

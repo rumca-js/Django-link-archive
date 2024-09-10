@@ -424,6 +424,9 @@ class Url(ContentInterface):
             return
 
         handler = url.get_handler()
+        if not handler:
+            return
+
         handler.get_response()
 
         if type(handler) is Url.youtube_channel_handler:

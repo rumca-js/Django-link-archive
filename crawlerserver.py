@@ -1,5 +1,5 @@
 """
-This script is not required, SeleniumChromeFull can be called directly from a project.
+This script is not required, driver can be called directly from a project.
  - we just show off how it can be done
  - it can be used to compare with other crawling scripts
 """
@@ -10,12 +10,10 @@ import argparse
 import sys
 
 import webtools
-from webtools import WebConfig
 
 
 def main():
-    WebConfig.init()
-    WebConfig.use_print_logging() 
+    webtools.WebConfig.use_print_logging() 
 
     parser = webtools.ScriptCrawlerParser()
     parser.parse()
@@ -23,12 +21,17 @@ def main():
         sys.exit(1)
         return
 
+    if not parser.args.output_file:
+        print("Please specify output directory")
+        sys.exit(1)
+        return
+
     request = parser.get_request()
 
-    driver = webtools.SeleniumChromeFull(request, parser.args.output_file, parser.args.port, driver_executable=WebConfig.selenium_driver_location)
+    driver = webtools.ServerCrawler(request, response_file = parser.args.output_file, response_port = parser.args.port, script="poetry run python crawlerrequests.py")
 
     if parser.args.verbose:
-        print("Running request:{} with SeleniumChromeFull".format(request))
+        print("Running request:{} with ServerCrawler".format(request))
 
     if not driver.run():
         print("Cannot start driver")

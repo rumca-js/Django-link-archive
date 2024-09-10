@@ -18,6 +18,8 @@ from .crawlers import (
     SeleniumChromeHeadless,
     SeleniumChromeFull,
     SeleniumUndetected,
+    ServerCrawler,
+    ScriptCrawler,
     selenium_feataure_enabled,
 )
 from .crawlerscript import (

@@ -172,10 +172,10 @@ class BackgroundJobController(BackgroundJob):
     def get_number_of_jobs(job_name=None, only_enabled=True):
         condition = Q()
         if job_name is not None:
-            condition & Q(job=job_name)
+            condition = condition & Q(job=job_name)
             
-        if not only_enabled:
-            condition & Q(enabled=True)
+        if only_enabled:
+            condition = condition & Q(enabled=True)
             
         return BackgroundJob.objects.filter(condition).count()
 

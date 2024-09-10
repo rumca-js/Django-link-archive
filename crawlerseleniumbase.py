@@ -10,6 +10,8 @@ import argparse
 import sys
 
 import webtools
+from webtools import WebConfig
+
 
 feature_enabled = True
 try:
@@ -19,7 +21,8 @@ except Exception as E:
 
 
 def main():
-    webtools.WebConfig.use_print_logging() 
+    WebConfig.init()
+    WebConfig.use_print_logging() 
 
     parser = webtools.ScriptCrawlerParser()
     parser.parse()

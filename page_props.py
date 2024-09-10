@@ -15,7 +15,6 @@ from webtools import (
    fetch_url,
    fetch_all_urls,
    WebConfig,
-   HttpPageHandler,
    ScrapingClient,
 )
 from utils.logger import Logger
@@ -26,6 +25,7 @@ __version__ = "0.0.1"
 
 
 async def main():
+    WebConfig.init()
     # we do not want to be swamped with web requests
     # WebConfig.use_print_logging()
     Logger.use_print_logging()
@@ -35,18 +35,18 @@ async def main():
     c.set_scraping_script("poetry run python crawleebeautifulsoup.py")
     if c.connect():
         c.close()
-        HttpPageHandler.crawling_server_port = c.port
+        WebConfig.crawling_server_port = c.port
     else:
-        HttpPageHandler.crawling_server_port = 0
+        WebConfig.crawling_server_port = 0
 
     # scraping server is not running, we do not use port
-    #HttpPageHandler.crawling_full_script = None
-    #HttpPageHandler.crawling_headless_script = None
+    #WebConfig.crawling_full_script = None
+    #WebConfig.crawling_headless_script = None
 
-    HttpPageHandler.crawling_full_script = "poetry run python crawleebeautifulsoup.py"
-    HttpPageHandler.crawling_headless_script = "poetry run python crawleebeautifulsoup.py"
-    #HttpPageHandler.crawling_full_script = "poetry run python crawlerseleniumundetected.py"
-    #HttpPageHandler.crawling_headless_script = "poetry run python crawlerseleniumundetected.py"
+    WebConfig.crawling_full_script = "poetry run python crawleebeautifulsoup.py"
+    WebConfig.crawling_headless_script = "poetry run python crawleebeautifulsoup.py"
+    #WebConfig.crawling_full_script = "poetry run python crawlerseleniumundetected.py"
+    #WebConfig.crawling_headless_script = "poetry run python crawlerseleniumundetected.py"
 
     parser = PageDisplayParser()
     parser.parse()

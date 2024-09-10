@@ -39,6 +39,7 @@ import html
 import traceback
 import re
 import json
+from pathlib import Path
 from datetime import datetime, timedelta
 from dateutil import parser
 
@@ -51,7 +52,7 @@ from bs4 import BeautifulSoup
 
 from utils.dateutils import DateUtils
 
-__version__ = "0.0.4"
+__version__ = "0.0.5"
 
 
 PAGE_TOO_BIG_BYTES = 5000000  # 5 MB. There are some RSS more than 1MB
@@ -107,6 +108,19 @@ class WebConfig(object):
     """
     API to configure webtools
     """
+
+    crawling_headless_script = None
+    crawling_full_script = None
+    crawling_server_port = None
+
+    script_operating_dir = None
+    script_responses_directory = Path("storage")
+    selenium_driver_location = None
+
+    def init():
+        p = Path("/usr/bin/chromedriver")
+        if p.exists():
+            WebConfig.selenium_driver_location = str(p)
 
     def use_logger(Logger):
         WebLogger.web_logger = Logger
@@ -308,6 +322,7 @@ class DomainAwarePage(object):
             parts[2] = parts[2][:wh]
 
         text = parts[0] + parts[1] + parts[2].lower()
+
         x = DomainAwarePage(text)
         if self.url and not x.is_web_link():
             return
@@ -2755,6 +2770,8 @@ def get_response_from_bytes(all_bytes):
             pass
         elif command_data[0] == "PageResponseObject.url":
             response.url = command_data[1].decode()
+        elif command_data[0] == "PageResponseObject.request_url":
+            response.request_url = command_data[1].decode()
         elif command_data[0] == "PageResponseObject.headers":
             try:
                 response.headers = json.loads(command_data[1].decode())

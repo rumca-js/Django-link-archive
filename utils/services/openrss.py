@@ -7,7 +7,13 @@ class OpenRss(object):
     def find_rss_link(self):
         p = DomainAwarePage(self.url)
         url_procolles = p.get_protocolless()
-        u = Url("https://openrss.org/" + url_procolles)
+
+        options = Url.get_url_options(self.url) 
+        options.use_headless_browser = False
+        options.use_full_browser = False
+        options.use_browser_promotions = False
+
+        u = Url("https://openrss.org/" + url_procolles, page_options = options)
         u.get_response()
 
         handler = u.get_handler()

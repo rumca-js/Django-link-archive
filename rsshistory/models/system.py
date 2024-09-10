@@ -263,7 +263,7 @@ class ConfigurationEntry(models.Model):
     )
 
     respect_robots_txt = models.BooleanField(
-        default=True,
+        default=False,
         help_text="Use robots.txt information. Some functionality can not work: for example YouTube channels",
     )
 
@@ -276,14 +276,21 @@ class ConfigurationEntry(models.Model):
         blank=True,
         max_length=1000,
         null=True,
-        help_text="Script that is called when headless request needs to be made. Supported variables $URL $TIMEOUT $RESPONSE_FILE. Example: ./crawleeheadless.sh --url '$URL' -o '$RESPONSE_FILE'",
+        help_text="Script that is called when headless request needs to be made. Will be supplied with --url '$URL' -o '$RESPONSE_FILE'",
     )
 
     crawling_full_script = models.CharField(
         blank=True,
         max_length=1000,
         null=True,
-        help_text="Script that is called when full request needs to be made. Supported variables $URL $TIMEOUT $RESPONSE_FILE. Example: ./crawleefull.sh --url '$URL' -o '$RESPONSE_FILE'",
+        help_text="Script that is called when full request needs to be made. Will be supplied with --url '$URL' -o '$RESPONSE_FILE'",
+    )
+
+    selenium_driver_path = models.CharField(
+        blank=True,
+        max_length=1000,
+        null=True,
+        help_text="For Linux commonly it is /usr/bin/chromedriver. If not specified, driver will not be called with any executable",
     )
 
     # User settings
@@ -380,6 +387,10 @@ class ConfigurationEntry(models.Model):
         """
         Fix errors here
         """
+
+        p = Path(self.selenium_driver_path)
+        if not p.exists():
+            self.selenium_driver_path = None
 
         users = User.objects.filter(username=self.admin_user)
         if users.count() == 0:

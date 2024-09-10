@@ -99,11 +99,21 @@ class SocketConnection(object):
         return socket.gethostname()
 
     def connect(self, host, port):
+        if host:
+            self.host = host
+        else:
+            self.host = SocketConnection.gethostname()
+
+        if port:
+            self.port = port
+        else:
+            self.port = DEFAULT_PORT
+
         self.conn = socket.socket()
         self.conn.settimeout(1.0)  # to be able to make ctrl-c
 
         try:
-            self.conn.connect((host, port))
+            self.conn.connect((self.host, self.port))
             return True
 
         except Exception as E:

@@ -16,10 +16,10 @@ class PageDisplay(object):
 
         if method == "headless":
             options.use_headless_browser = True
-            options.user_browser_promotions = False
+            options.use_browser_promotions = False
         if method == "full":
             options.use_full_browser = True
-            options.user_browser_promotions = False
+            options.use_browser_promotions = False
 
         u = Url(url, page_options=options)
         u.get_response()
@@ -50,6 +50,7 @@ class PageDisplay(object):
             print("Status code:{}".format(response.status_code))
             print("Content-Type:{}".format(response.get_content_type()))
             print("Charset:{}".format(response.get_content_type_charset()))
+            print("Page type:{}".format(type(handler.p)))
 
             if type(handler.p) is RssPage:
                 print("Feed title:{}".format(handler.p.feed.feed.title))
