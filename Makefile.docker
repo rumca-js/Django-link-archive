@@ -19,7 +19,12 @@ build-clean:
 	docker build --no-cache -t $(USER_NAME)/$(APP_NAME) .
 
 run:
-	docker run -p 8000:8000 $(USER_NAME)/$(APP_NAME)
+	# docker run -p 8000:8000 $(USER_NAME)/$(APP_NAME)
+	# if rabbit cannot start disable rabbit on your system
+	echo If rabbitmq-server or memcached is operational, then it will not work. Disable these services
+	# systemctl stop rabbitmq-server
+	# sudo service memcached stop
+	docker compose up
 
 list:
 	docker ps -a
@@ -53,7 +58,7 @@ install-portainer:
 	docker pull portainer/portainer-ce:latest
 	docker run -d -p 9000:9000 --restart always -v /var/run/docker.sock:/var/run/docker.sock portainer/portainer-ce:latest
 
-publish:
+push:
 	# docker login --username $(USER_NAME) --password $(USER_PASSWORD)
 	# docker image tag local-image:INIT new-repo:tagname
 	docker push $(USER_NAME)/$(APP_NAME)
@@ -61,10 +66,6 @@ publish:
 refresh:
 	docker exec -d container_id poetry run celery call app.tasks.process_all_jobs -a '["rsshistory.threadhandlers.OneTaskProcessor"]'
 
-compose:
-	# if rabbit cannot start disable rabbit on your system
-	# systemctl stop rabbitmq-server
-	docker compose up
 
 compose-refresh:
 	docker compose up --build rozbujnik/django-link-archive

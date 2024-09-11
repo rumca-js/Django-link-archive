@@ -18,10 +18,30 @@ services:
       DB_USER: power
       DB_PASSWORD: notexample
       SECRET_KEY: "xxxxxxxxxxxxx"
+      DEBUG: 1
+    networks:
+      - shared_network
+
   rabbitmq:
-    image: rabbitmq 
+    #image: rabbitmq 
+    image: rabbitmq:3-management
     ports:
       - 5672:5672
+    volumes:
+      - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+    depends_on:
+      dbserver:
+        condition: service_healthy
+    networks:
+      - shared_network
+
+  memcached:
+    image: memcached:latest
+    ports:
+      - "11211:11211"
+    networks:
+      - shared_network
+
   dbserver:
     image: postgres
     restart: always
@@ -34,3 +54,9 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - shared_network
+
+networks:
+  shared_network:
+    driver: bridge

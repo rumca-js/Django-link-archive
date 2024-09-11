@@ -5,7 +5,6 @@ Docker image is available at [hub.docker.com](https://hub.docker.com/r/rozbujnik
 
 Notes:
 
- - celery beat seems to be not running
  - the image uses 'admin' user, with 'admin' password. Django can be accessed locally with 127.0.0.1:8000, via browser.
 
 # Overview
