@@ -13,6 +13,42 @@ from .configuration import Configuration
 from .pluginurl.urlhandler import UrlHandler
 
 
+def get_search_term_request(request):
+    search_term = ""
+    if "title" in request.GET and request.GET["title"] != "":
+        search_term = request.GET["title"]
+    elif "tag" in request.GET and request.GET["tag"] != "":
+        search_term = request.GET["tag"]
+    elif "search_history" in request.GET and request.GET["search_history"] != "":
+        search_term = request.GET["search_history"]
+    elif "search" in request.GET and request.GET["search"] != "":
+        search_term = request.GET["search"]
+
+    return search_term
+
+
+def get_request_order_by(request):
+    if "order" in request.GET:
+        order = request.GET["order"]
+        return [order]
+    else:
+        config = Configuration.get_object().config_entry
+        return config.get_entries_order_by()
+
+
+def get_request_page_num(request):
+    if "page" in request.GET:
+        page = request.GET["page"]
+        try:
+            page = int(page)
+        except Exception as e:
+            page = 1
+
+        return page
+    else:
+        return 1
+
+
 class ViewPage(object):
     def __init__(self, request):
         self.request = request

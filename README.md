@@ -13,6 +13,8 @@ Manages link meta information.
  - Minimal aesthetic. Dark mode, custom list displays
  - local data, no algorithms, no advertisements, self-hosted
  - does not support proxy rotation. This is ethical web scraper, it should not spam with requests
+ - support for 'spaces'. You can define own spaces like 'music', 'videos', 'movies', etc.
+ - user action tracking. You can observe and analyze history of your 'views'.
 
 <div align="center">
   <img alt="Django Logo" src="images/django_400.png" width="400px">

@@ -1,6 +1,6 @@
 <a href="{{ link.get_absolute_url | safe }}"
    title="{{link.title}} {{link.link}} {{link.source}}"
-   {% if not link.is_valid or link.is_read %}
+   {% if not link.is_valid %}
    style="opacity: 0.5"
    {% endif %}
 

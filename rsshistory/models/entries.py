@@ -524,9 +524,6 @@ class BaseLinkDataController(BaseLinkDataModel):
         if self.manual_status_code == BaseLinkDataController.STATUS_UNDEFINED:
             return self.is_status_code_valid() and self.page_rating >= 0
 
-    def is_read(self):
-        return False
-
     def is_status_code_valid(self):
         if self.status_code == 403:
             # Many pages return 403, but they are correct

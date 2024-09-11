@@ -1,6 +1,10 @@
 <a href="{{ source.get_absolute_url }}"
    class="my-1 p-1 list-group-item list-group-item-action"
    title="{{source.title}} {{source.get_long_description}}"
+
+   {% if not source.enabled %}
+   style="opacity: 0.5"
+   {% endif %}
    >
     {% if user_config.show_icons %}
     <img src="{{source.get_favicon}}" class="content-icon"/>

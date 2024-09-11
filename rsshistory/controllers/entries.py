@@ -54,12 +54,6 @@ class LinkDataController(LinkDataModel):
                 "{}:entry-dead".format(LinkDatabase.name), args=[str(self.id)]
             )
 
-    def is_read(self):
-        marker = ReadMarker.get()
-        if marker:
-            return marker.read_date > self.date_published
-        return False
-
     def get_title_safe(self):
         title = self.title
         if title:

@@ -231,7 +231,7 @@ async def fetch_async(db, parser, day_limit):
                 ec.add_entry(entry)
                 total_added_entries += 1
 
-    print(f"Added {total_added_entries}")
+    print(f"\nAdded {total_added_entries}")
 
     with Session() as session:
         q = session.query(EntriesTable)
@@ -284,8 +284,8 @@ class FeedClientParser(object):
         self.parser.add_argument("--unfollow-all", action="store_true", help="Unfollows all sources")
         self.parser.add_argument("--enable", help="Enables specific source")
         self.parser.add_argument("--disable", help="Disables specific source")
-        self.parser.add_argument("--enable-all", help="Enables all sources")
-        self.parser.add_argument("--disable-all", help="Disables all sources")
+        self.parser.add_argument("--enable-all", action="store_true", help="Enables all sources")
+        self.parser.add_argument("--disable-all", action="store_true", help="Disables all sources")
         self.parser.add_argument(
             "--list-bookmarks", action="store_true", help="Prints bookmarks to stdout"
         )
@@ -466,6 +466,8 @@ class FeedClient(object):
                 source.enabled = True
                 session.commit()
 
+            print("Enabled all sources")
+
             return True
 
         return False
@@ -480,6 +482,8 @@ class FeedClient(object):
             for source in sources:
                 source.enabled = False
                 session.commit()
+
+            print("Disabled all sources")
 
             return True
 

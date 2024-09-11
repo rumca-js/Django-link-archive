@@ -1,12 +1,16 @@
 from django.db import models
+from django.conf import settings
 
 from utils.dateutils import DateUtils
 from .sources import SourceDataModel
+from ..apps import LinkDatabase
 
 
 class ReadMarkers(models.Model):
     """
     """
+    read_date = models.DateTimeField(null=True)
+
     source_obj = models.OneToOneField(
         SourceDataModel,
         on_delete=models.CASCADE,
@@ -14,37 +18,57 @@ class ReadMarkers(models.Model):
         null=True,
         blank=True,
     )
-    read_date = models.DateTimeField(null=True)
 
-    def get(source = None):
+    user_object = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name=str(LinkDatabase.name) + "_markers",
+        null=True,
+    )
+
+    def get(user, source = None):
         if source is None:
-            return ReadMarkers.get_general()
+            return ReadMarkers.get_general(user)
         else:
-            return ReadMarkers.get_source(source)
+            return ReadMarkers.get_source(user, source)
 
-    def get_general():
-        read_markers = ReadMarkers.objects.filter(source_obj = True)
+    def get_general(user):
+        read_markers = ReadMarkers.objects.filter(user_object = user, source_obj__isnull = True)
         if read_markers.exists():
+            if read_markers.count() > 0:
+                for read_marker in read_markers:
+                    read_marker.delete()
             return read_markers[0]
 
-    def get_source(source):
-        markers = source.marker.all()
-        if markers.exists():
-            return marker[0]
+    def get_source(user, source):
+        if hasattr(source, "marker"):
+            read_markers = source.marker.filter(user_object = user)
+            if read_markers.count() > 0:
+                for read_marker in read_markers:
+                    read_marker.delete()
 
-    def set_general():
-        marker = ReadMarkers.get_general()
+            if read_markers.exists():
+                return read_markers[0]
+
+    def set(user, source = None):
+        if source:
+            ReadMarkers.set_source(user, source)
+        else:
+            ReadMarkers.set_general(user)
+
+    def set_general(user):
+        marker = ReadMarkers.get_general(user)
         if not marker:
-            m = ReadMarkers(read_date = DateUtils.get_datetime_now_utc())
+            m = ReadMarkers(user_object = user, read_date = DateUtils.get_datetime_now_utc())
             m.save()
         else:
             general.read_date = DateUtils.get_datetime_utc()
             general.save()
 
-    def set_source(source):
-        marker = ReadMarkers.get_source(source)
+    def set_source(user, source):
+        marker = ReadMarkers.get_source(user, source)
         if not marker:
-            m = ReadMarkers(read_date = DateUtils.get_datetime_now_utc(), source_obj = source)
+            m = ReadMarkers(user_object = user, read_date = DateUtils.get_datetime_now_utc(), source_obj = source)
             m.save()
         else:
             general.read_date = DateUtils.get_datetime_now_utc()

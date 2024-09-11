@@ -154,8 +154,8 @@ class SourceFilter(BaseQueryFilter):
         if q2:
             q &= q2
 
-        if q is None or q == Q():
-            q &= Q(enabled=True)
+        #if q is None or q == Q():
+        #    q &= Q(enabled=True)
 
         return q
 
@@ -274,9 +274,6 @@ class EntryFilter(BaseQueryFilter):
     def get_arg_conditions_query(self):
         args = self.get_arg_conditions(True)
         return Q(**args)
-
-    def get_sources(self):
-        self.sources = None
 
     def set_time_limit(self, time_limit):
         self.time_limit = time_limit
@@ -482,7 +479,7 @@ class DjangoSingleSymbolEvaluator(SingleSymbolEvaluator):
         https://docs.djangoproject.com/en/4.2/ref/models/querysets/#field-lookups
         """
 
-        if condition_data[1] == "==":
+        if condition_data[1] == "===":
             return {condition_data[0] + "__iexact": condition_data[2]}
         elif condition_data[1] == ">=":
             return {condition_data[0] + "__gte": condition_data[2]}
@@ -492,7 +489,7 @@ class DjangoSingleSymbolEvaluator(SingleSymbolEvaluator):
             return {condition_data[0] + "__gt": condition_data[2]}
         elif condition_data[1] == "<":
             return {condition_data[0] + "__lt": condition_data[2]}
-        elif condition_data[1] == "?=":
+        elif condition_data[1] == "==":
             return {condition_data[0]: condition_data[2]}
         elif condition_data[1] == "=":
             # for title__isnull = True, there are no additions

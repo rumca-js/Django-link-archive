@@ -18,7 +18,6 @@ class SourceDataModel(models.Model):
     category = models.CharField(max_length=1000, blank=True)
     # main subcategory
     subcategory = models.CharField(max_length=1000, blank=True)
-    dead = models.BooleanField(default=False, help_text="Link is rotten indication")
     export_to_cms = models.BooleanField(
         default=True, help_text="Entries from this source are eligible to export to CMS"
     )

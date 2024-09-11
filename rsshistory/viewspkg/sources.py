@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from django.views import generic
 from django.urls import reverse
 from django.shortcuts import render, redirect
@@ -21,33 +23,17 @@ from ..controllers import (
 )
 from ..forms import SourceForm, ContentsForm, SourcesChoiceForm
 from ..queryfilters import SourceFilter
-from ..views import ViewPage
+from ..views import (
+    ViewPage,
+    get_request_order_by,
+    get_request_page_num,
+)
+from ..serializers import JsonImporter
+
 from ..configuration import Configuration
 from ..pluginurl import UrlHandler
 from ..pluginsources import SourceControllerBuilder
 from ..serializers.instanceimporter import InstanceExporter
-
-
-def get_request_order_by(request):
-    if "order" in request.GET:
-        order = request.GET["order"]
-        return [order]
-    else:
-        config = Configuration.get_object().config_entry
-        return config.get_entries_order_by()
-
-
-def get_request_page_num(request):
-    if "page" in request.GET:
-        page = request.GET["page"]
-        try:
-            page = int(page)
-        except Exception as e:
-            page = 1
-
-        return page
-    else:
-        return 1
 
 
 class SourceListView(generic.ListView):
@@ -64,7 +50,7 @@ class SourceListView(generic.ListView):
 
     def get_queryset(self):
         self.query_filter = SourceFilter(self.request.GET, self.request.user)
-        return self.query_filter.get_filtered_objects()
+        return self.query_filter.get_filtered_objects().order_by("-enabled", "title")
 
     def get_paginate_by(self, queryset):
         if not self.request.user.is_authenticated:

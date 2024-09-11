@@ -192,7 +192,6 @@ class SourceDataController(SourceDataModel):
             "title",
             "category",
             "subcategory",
-            "dead",
             "export_to_cms",
             "remove_after_days",
             "language",
@@ -211,7 +210,6 @@ class SourceDataController(SourceDataModel):
             "title",
             "category",
             "subcategory",
-            "dead",
             "export_to_cms",
             "remove_after_days",
             "language",
@@ -318,8 +316,6 @@ class SourceDataController(SourceDataModel):
             self.category = data["category"]
         if "subcategory" in data:
             self.subcategory = data["subcategory"]
-        if "dead" in data:
-            self.dead = data["dead"]
         if "export_to_cms" in data:
             self.export_to_cms = data["export_to_cms"]
         if "remove_after_days" in data:

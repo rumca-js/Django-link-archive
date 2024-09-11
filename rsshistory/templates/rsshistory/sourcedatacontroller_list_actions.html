@@ -32,11 +32,11 @@
    
        <ul class="dropdown-menu">
           <li>
-             <a href="{% url 'rsshistory:sources' %}?search=enabled+%3D+True" class="dropdown-item" title="Shows active sources only">
+             <a href="{% url 'rsshistory:sources' %}?search=enabled+%3D%3D+True" class="dropdown-item" title="Shows active sources only">
               Enabled</a>
           </li>
           <li>
-             <a href="{% url 'rsshistory:sources' %}?search=enabled+%3D+False" class="dropdown-item" title="Shows disabled sources only">
+             <a href="{% url 'rsshistory:sources' %}?search=enabled+%3D%3D+False" class="dropdown-item" title="Shows disabled sources only">
               Disabled</a>
           </li>
           <li>

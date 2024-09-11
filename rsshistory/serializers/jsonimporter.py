@@ -189,7 +189,6 @@ class MapImporter(object):
         LinkDatabase.info("Import from source")
 
         clean_data = SourceDataController.get_clean_data(json_data)
-
         sources = SourceDataController.objects.filter(url=clean_data["url"])
         if sources.count() == 0:
             clean_data = self.drop_source_instance_internal_data(clean_data)
