@@ -22,6 +22,7 @@ from .viewspkg import (
     tools,
     custom,
     readmarkers,
+    userhistory,
 )
 
 # register app namespace
@@ -119,6 +120,8 @@ urlpatterns = [
     # read markers
     path("set-read-marker", readmarkers.set_read_marker, name="set-read-marker"),
     path("set-source-read-marker/<int:pk>/", readmarkers.set_source_read_marker, name="set-source-read-marker"),
+    # history
+    path("user-entry-history/", userhistory.UserEntryVisitHistoryListView.as_view(), name="user-entry-history"),
     # background jobs
     path("backgroundjobs/", backgroundjobs.BackgroundJobsView.as_view(), name="backgroundjobs",),
     path("backgroundjob-add", backgroundjobs.backgroundjob_add, name="backgroundjob-add",),

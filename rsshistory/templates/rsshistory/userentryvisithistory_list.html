@@ -1,0 +1,20 @@
+{% extends base_generic %}
+{% load static %}
+{% block content %}
+
+<h1>{{page_obj.paginator.count}} History</h1>
+
+  {% if content_list %}
+     <div class="list-group">
+         {% for object in content_list %}
+         <div>
+             Link:{{object.entry_object.link}}
+             Visits:{{object.visits}}
+             Date of the last visit:{{object.date_last_visit}}
+         </div>
+         {% endfor %}
+  {% else %}
+    No history yet
+  {% endif %}
+
+{% endblock %} 

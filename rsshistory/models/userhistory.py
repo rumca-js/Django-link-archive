@@ -290,6 +290,9 @@ class UserEntryVisitHistory(models.Model):
         related_name="visits_counter",
     )
 
+    class Meta:
+        ordering = ["-date_last_visit"]
+
     def visited(entry, user, previous_entry=None):
         """
         User visited a link:
