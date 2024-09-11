@@ -19,6 +19,10 @@ services:
       DB_PASSWORD: notexample
       SECRET_KEY: "xxxxxxxxxxxxx"
       DEBUG: 1
+      # could be localhost
+      RABBIT_SERVER: rabbitmq
+      MEMCACHED_SERVER: memecached
+      DB_SERVER: dbserver
     networks:
       - shared_network
 
