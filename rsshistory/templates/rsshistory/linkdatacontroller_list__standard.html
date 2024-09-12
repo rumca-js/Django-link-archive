@@ -1,10 +1,10 @@
-<a href="{{ link.get_absolute_url | safe }}"
-   title="{{link.title}} {{link.link}} {{link.source}}"
-   {% if not link.is_valid %}
+<a href="{{ entry.get_absolute_url | safe }}"
+   title="{{entry.title}} {{entry.entry}} {{entry.source}}"
+   {% if not entry.is_valid %}
    style="opacity: 0.5"
    {% endif %}
 
-   {% if link.bookmarked %}
+   {% if entry.bookmarked %}
    class="my-1 p-1 list-group-item list-group-item-action list-group-item-primary"
    {% else %}
    class="my-1 p-1 list-group-item list-group-item-action"
@@ -12,32 +12,16 @@
    >
 
    <div class="d-flex">
-      {% if user_config.show_icons %}
-      <div>
-         <img src=
-              {% if user_config.thumbnails_as_icons %}
-              "{{link.get_thumbnail}}"
-              {% else %}
-              "{{link.get_favicon}}"
-              {% endif %}
-
-              {% if user_config.small_icons %}
-              class="rounded icon-small"
-              {% else %}
-              class="rounded icon-normal"
-              {% endif %}
-              />
-      </div>
-      {% endif %}
+      {% include "rsshistory/entry_thumbnail_element.html" %}
       <div class="mx-2">
          <span style="font-weight:bold" class="text-reset">
-             {{link.get_title | safe}}
+             {{entry.get_title | safe}}
          </span>
       </div>
    </div>
 
    <div class="text-reset">
-        {{link.source_obj.title | slice:":100"}}
-        {{link.get_local_date_published}}
+        {{entry.source_obj.title | slice:":100"}}
+        {{entry.get_local_date_published}}
    </div>
 </a>

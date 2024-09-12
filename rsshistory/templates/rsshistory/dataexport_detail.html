@@ -9,9 +9,25 @@
    </button>
 
    <ul class="dropdown-menu">
-      <li>
-         <a href="{% url 'rsshistory:data-export-job-add' object.id %}" title="Shows categories" class="dropdown-item">Add to job</a>
-      </li>
+       <li>
+           <a href="{% url 'rsshistory:data-export-job-add' object.id %}" title="Shows categories" class="dropdown-item">Add to job</a>
+       </li>
+
+       {% if object.enabled %}
+       <li>
+           <a href="{% url 'rsshistory:data-export-disable' object.id %}" class="dropdown-item" title="Disables data export">
+               <img src="{% static 'rsshistory/icons/icons8-pause-squared-100.png' %}" class="content-icon" />
+               Disable
+           </a>
+       </li>
+       {% else %}
+       <li>
+           <a href="{% url 'rsshistory:data-export-enable' object.id %}" class="dropdown-item" title="Enables data export">
+               <img src="{% static 'rsshistory/icons/icons8-play-100.png' %}" class="content-icon" />
+               Enable
+           </a>
+       </li>
+       {% endif %}
    </ul>
 </div>
 {% endif %}

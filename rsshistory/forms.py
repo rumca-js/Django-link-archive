@@ -159,6 +159,7 @@ class ConfigForm(forms.ModelForm):
             "sources_per_page",
             "max_links_per_page",
             "max_sources_per_page",
+            "max_number_of_related_links",
             # other
             "debug_mode",
         ]

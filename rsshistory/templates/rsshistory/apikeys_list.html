@@ -11,15 +11,19 @@
 <h1>API keys</h1>
   {% if content_list %}
      <div class="list-group">
-         {% for object in content_list %}
-            <div>{{object.key}}</div>
-            <div>{{object.user_object}}</div>
-            <div>{{object.user_object.id}}</div>
-            <div>{{object.user_object.username}}</div>
+         {% for apikey_object in content_list %}
+         <div class="list-group-item">
+             <div>{{apikey_object.key}}</div>
 
-            <a href="{% url 'rsshistory:api-key-remove' object.id %}" title="Remove api key" class="btn btn-primary" role="button">
-                <img src="{% static 'rsshistory/icons/icons8-plus-100.png' %}" class="content-icon" />
-            </a>
+             {% with user_object=apikey_object.user_object %}
+             <div>{{user_object.id}}</div>
+             <div>{{user_object.username}}</div>
+             {% endwith %}
+
+             <a href="{% url 'rsshistory:api-key-remove' apikey_object.id %}" title="Remove api key" class="btn btn-primary" role="button">
+                 Remove
+             </a>
+         </div>
          {% endfor %}
   {% else %}
     No keys yet

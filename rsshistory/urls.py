@@ -22,7 +22,7 @@ from .viewspkg import (
     tools,
     custom,
     readmarkers,
-    userhistory,
+    users,
 )
 
 # register app namespace
@@ -86,8 +86,8 @@ urlpatterns = [
     path("source-edit/<int:pk>/", sources.edit_source, name="source-edit"),
     path("source-refresh/<int:pk>/", sources.refresh_source, name="source-refresh"),
     path("source-save/<int:pk>/", sources.wayback_save, name="source-save"),
-    path("source-pause/<int:pk>/", sources.pause, name="source-pause"),
-    path("source-resume/<int:pk>/", sources.resume, name="source-resume"),
+    path("source-disable/<int:pk>/", sources.disable, name="source-disable"),
+    path("source-enable/<int:pk>/", sources.enable, name="source-enable"),
     path("source-import-yt-links/<int:pk>/", sources.import_youtube_links_for_source, name="source-import-yt-links"),
     path("source-fix-entries/<int:source_pk>/", sources.source_fix_entries, name="source-fix-entries",),
     path("source-process-contents/<int:pk>/", sources.source_process_contents, name="source-process-contents",),
@@ -120,8 +120,6 @@ urlpatterns = [
     # read markers
     path("set-read-marker", readmarkers.set_read_marker, name="set-read-marker"),
     path("set-source-read-marker/<int:pk>/", readmarkers.set_source_read_marker, name="set-source-read-marker"),
-    # history
-    path("user-entry-history/", userhistory.UserEntryVisitHistoryListView.as_view(), name="user-entry-history"),
     # background jobs
     path("backgroundjobs/", backgroundjobs.BackgroundJobsView.as_view(), name="backgroundjobs",),
     path("backgroundjob-add", backgroundjobs.backgroundjob_add, name="backgroundjob-add",),
@@ -167,6 +165,10 @@ urlpatterns = [
     path("wizard-setup-search-engine", system.wizard_setup_search_engine, name="wizard-setup-search-engine",),
     path("setup-default-rules", system.setup_default_rules, name="setup-default-rules",),
     path("is-system-ok", system.is_system_ok, name="is-system-ok",),
+    # users
+    path("appusers/", users.UserListView.as_view(), name="appusers",),
+    path("appuser-history/<int:user_id>/", users.UserEntryVisitHistoryListView.as_view(), name="appuser-history",),
+    path("user-entry-history/", users.UserEntryVisitHistoryListView.as_view(), name="user-entry-history"),
     # logging
     path("logs/", system.AppLoggingView.as_view(), name="logs",),
     path("truncate-log", system.truncate_log, name="truncate-log"),
@@ -176,6 +178,8 @@ urlpatterns = [
     # import / export
     path("data-export-add", export.data_export_add, name="data-export-add"),
     path("data-export-edit/<int:pk>/", export.data_export_edit, name="data-export-edit"),
+    path("data-export-enable/<int:pk>/", export.enable, name="data-export-enable"),
+    path("data-export-disable/<int:pk>/", export.disable, name="data-export-disable"),
     path("data-export-remove/<int:pk>/", export.data_export_remove, name="data-export-remove"),
     path("data-exports/", export.DataExportListView.as_view(), name="data-exports",),
     path("data-export/<int:pk>/", export.DataExportDetailsView.as_view(), name="data-export",),
@@ -211,7 +215,7 @@ urlpatterns = [
     path("page-show-props", tools.page_show_properties, name="page-show-props",),
     path("page-scan-link", tools.page_scan_link, name="page-scan-link",),
     path("page-scan-contents", tools.page_scan_contents, name="page-scan-contents",),
-    path("page-process-contents", tools.page_process_contents, name="page-process-contents",),
+    path("page-process-rss-contents", tools.page_process_rss_contents, name="page-process-rss-contents",),
     path("page-verify", tools.page_verify, name="page-verify",),
     path("page-add-many-links", tools.page_add_many_links, name="page-add-many-links",),
     path("download-music-url", tools.download_music, name="download-music-url",),

@@ -6,7 +6,7 @@ from django.urls import reverse
 
 from webtools import HtmlPage, RssPage, HttpPageHandler
 
-from .models import UserConfig, ConfigurationEntry, AppLogging
+from .models import UserConfig, ConfigurationEntry, AppLogging, ApiKeys
 from .configuration import Configuration
 from .apps import LinkDatabase
 from .configuration import Configuration
@@ -110,10 +110,7 @@ class ViewPage(object):
         self.context[variable_name] = variable_value
 
     def check_access(self):
-        if self.is_api_key_allowed():
-            return True
-
-        if not self.is_user_allowed(self.access_type):
+        if not self.is_user_allowed(self.access_type) and not self.is_api_key_allowed():
             return self.render_implementation("missing_rights.html", 500)
 
     def is_api_key_allowed(self):

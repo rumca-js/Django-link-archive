@@ -28,6 +28,9 @@ spacy = "3.7.5"
 # example: crawlerrequests.py
 requests = "^2.25.1"
 
+# [optional]
+stealth_requests = "*"
+
 # [optional] use things below if you want to use selenium
 # example: crawlerseleniumfull.py, crawlerseleniumheadless.py
 selenium="^4.24.0"

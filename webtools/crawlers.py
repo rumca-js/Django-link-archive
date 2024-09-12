@@ -141,10 +141,9 @@ class CrawlerInterface(object):
         pass
 
 
-class RequestsPage(CrawlerInterface):
+class RequestsCrawler(CrawlerInterface):
     """
-    Python requests crawler interface
-    # TODO rename to RequestCrawler
+    Python requests
     """
 
     def __init__(self, request, response_file=None, response_port=None):
@@ -300,7 +299,43 @@ class RequestsPage(CrawlerInterface):
         return request_result
 
 
+class StealthRequestsCrawler(CrawlerInterface):
+    """
+    Python steath requests
+    """
+
+    def __init__(self, request, response_file=None, response_port=None):
+        """
+        Wrapper for python requests.
+        """
+        super().__init__(
+            request, response_file=response_file, response_port=response_port
+        )
+
+    def run(self):
+        try:
+            import stealth_requests as requests
+        except Exception as E:
+            print("Cannot import stealth_requests")
+            return
+
+        answer = requests.get(self.request.url)
+
+        if answer and answer.content:
+            self.response = PageResponseObject(
+                self.request.url,
+                binary=answer.content,
+                status_code=200,
+                request_url=self.request.url,
+            )
+
+            return self.response
+
+
 class SeleniumDriver(CrawlerInterface):
+    """
+    Everybody uses selenium
+    """
     def __init__(self, request, response_file=None, response_port=None, driver_executable = None):
         super().__init__(
             request, response_file=response_file, response_port=response_port
@@ -340,6 +375,8 @@ class SeleniumDriver(CrawlerInterface):
         """
         https://stackoverflow.com/questions/5799228/how-to-get-status-code-by-using-selenium-py-python-code
         TODO should we use selenium wire?
+
+        TODO this probably does not work "Correctly"
         """
         last_status_code = 200
         for log in logs:
@@ -694,6 +731,13 @@ class SeleniumUndetected(SeleniumDriver):
 
 
 class ScriptCrawler(CrawlerInterface):
+    """
+    Used to run script to obtain URL response.
+    Calls script, and receives reply in the file.
+
+    Note:
+     If we have multiple instances/workspaces each can write their own output file
+    """
     def __init__(self, request, response_file=None, response_port=None, cwd=None, script=None):
         super().__init__(request = request, response_file = response_file, response_port = response_port)
         self.cwd = cwd
@@ -775,6 +819,10 @@ class ScriptCrawler(CrawlerInterface):
 
 
 class ServerCrawler(CrawlerInterface):
+    """
+    Used to ask crawling server for URL.
+    Sends request to server, and receives reply
+    """
     def __init__(self, request, response_file=None, response_port=None, script=None):
         super().__init__(request = request, response_file = response_file, response_port = response_port)
         self.script = script

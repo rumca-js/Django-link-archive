@@ -15,15 +15,15 @@ Size:{{sum_size_megabytes}}MB, {{sum_size_kilobytes}}KB, {{sum_size_bytes}}B
 
   {% if content_list %}
      <div class="list-group">
-         {% for object in content_list %}
+         {% for modelfile in content_list %}
 	    <div>
-	       {{object.file_name}}
-	       {{object.get_size_bytes}}
+	       {{modelfile.file_name}}
+	       {{modelfile.get_size_bytes}}
 
 	       <div>
-	         <a href="{% url 'rsshistory:model-file' object.id %}" class="btn btn-primary" role="button">Model file</a>
+	         <a href="{% url 'rsshistory:model-file' modelfile.id %}" class="btn btn-primary" role="button">Model file</a>
 
-      	         <a href="{% url 'rsshistory:model-file-remove' object.id %}" class="btn btn-secondary" role="button" title="Remove model file">
+      	         <a href="{% url 'rsshistory:model-file-remove' modelfile.id %}" class="btn btn-secondary" role="button" title="Remove model file">
       	            <img src="{% static 'rsshistory/icons/icons8-trash-100.png' %}" class="content-icon" />
       	         </a>
 	       </div>

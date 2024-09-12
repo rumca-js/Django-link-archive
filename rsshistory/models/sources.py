@@ -14,6 +14,7 @@ class SourceDataModel(models.Model):
 
     url = models.CharField(max_length=2000, unique=True)
     title = models.CharField(max_length=1000)
+    enabled = models.BooleanField(default=True)
     # main category
     category = models.CharField(max_length=1000, blank=True)
     # main subcategory
@@ -27,7 +28,6 @@ class SourceDataModel(models.Model):
     language = models.CharField(max_length=10, blank=True)  # inherited into entries
     age = models.IntegerField(default=0)  # inherited into entries
     favicon = models.CharField(max_length=1000, null=True)
-    enabled = models.BooleanField(default=True)
     fetch_period = models.IntegerField(
         default=900, help_text="Source is checked for new data after [x] seconds"
     )
@@ -43,7 +43,7 @@ class SourceDataModel(models.Model):
     )
 
     class Meta:
-        ordering = ["title"]
+        ordering = ["-enabled", "title"]
 
     def get_absolute_url(self):
         """Returns the URL to access a particular author instance."""

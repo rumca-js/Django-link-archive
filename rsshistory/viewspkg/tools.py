@@ -242,7 +242,7 @@ def page_scan_contents(request):
         return p.render("form_basic.html")
 
 
-def page_process_contents(request):
+def page_process_rss_contents(request):
     """
     Displays form, or textarea of available links.
     User can select which links will be added.

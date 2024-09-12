@@ -14,12 +14,12 @@
 <h1>Entry rules</h1>
   {% if content_list %}
      <div class="list-group">
-         {% for object in content_list %}
-             <a href="{% url 'rsshistory:entry-rule' object.id %}"
+         {% for entry_rule in content_list %}
+             <a href="{% url 'rsshistory:entry-rule' entry_rule.id %}"
                class="my-1 p-1 list-group-item list-group-item-action"
-	       title="{{object.rule_name}}">
-	         {{object.rule_name}}
-		 {% if not object.enabled %}
+	       title="{{entry_rule.rule_name}}">
+	         {{entry_rule.rule_name}}
+		 {% if not entry_rule.enabled %}
 		    [Disabled]
 		 {% endif %}
              </a>

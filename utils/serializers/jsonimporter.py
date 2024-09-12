@@ -56,9 +56,6 @@ class MapImporter(object):
         if "verbose" not in self.import_settings:
             self.import_settings["verbose"] = False
 
-    def get_session(self):
-        return self.conn.get_session()
-
     def import_from_data(self, json_data):
         if "links" in json_data:
             return self.import_from_links(json_data["links"])
@@ -279,7 +276,7 @@ def read_file_contents(file_path):
     """
     TODO use pathlib?
     """
-    with open(file_path, "r") as f:
+    with open(file_path, "r", encoding="utf-8") as f:
         return f.read()
 
 

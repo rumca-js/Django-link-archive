@@ -2503,10 +2503,18 @@ class PageResponseObject(object):
             self.apparent_encoding = "utf-8"
 
         if self.binary and not self.text:
-            self.text = self.binary.decode(self.encoding)
+            try:
+                self.text = self.binary.decode(self.encoding)
+            except Exception as E:
+                WebLogger.exc(E, "Cannot properly decode ansower from {}".format(self.url))
+                self.text = self.binary.decode(self.encoding, errors="ignore")
 
         if self.text and not self.binary:
-            self.binary = self.text.encode(self.encoding)
+            try:
+                self.binary = self.text.encode(self.encoding)
+            except Exception as E:
+                WebLogger.exc(E, "Cannot properly encode ansower from {}".format(self.url))
+                self.binary = self.text.encode(self.encoding, errors="ignore")
 
     def is_headers_empty(self):
         return len(self.headers) == 0

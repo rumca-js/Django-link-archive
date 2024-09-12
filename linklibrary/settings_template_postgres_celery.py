@@ -22,8 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ["SECRET_KEY"]
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG') == "1"
 
 # Add necessary hosts here
 ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
@@ -34,7 +33,12 @@ ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
 # https://www.reddit.com/r/django/comments/er0v7r/did_you_know_that_you_can_use_filesystem_as/
 #CELERY_BROKER_URL = 'memory://localhost/'
 
-CELERY_BROKER_URL = 'amqp://guest:guest@rabbitmq'
+RABBIT_SERVER=os.environ["RABBIT_SERVER"]
+MEMCACHED_SERVER=os.environ["MEMCACHED_SERVER"]
+MEMCACHED_PORT=os.environ["MEMCACHED_PORT"]
+DB_SERVER=os.environ["DB_SERVER"]
+
+CELERY_BROKER_URL = f'amqp://guest:guest@{RABBIT_SERVER}'
 
 DB_DB = os.environ["DB_DB"]
 DB_USER = os.environ["DB_USER"]
@@ -44,7 +48,7 @@ DB_PASSWORD = os.environ["DB_PASSWORD"]
 #: from unwanted access (see userguide/security.html)
 CELERY_ACCEPT_CONTENT = ['json']
 #CELERY_RESULT_BACKEND = 'db+sqlite:///results.sqlite'
-CELERY_RESULT_BACKEND = f'db+postgresql://{DB_USER}:{DB_PASSWORD}@dbserver/{DB_DB}'
+CELERY_RESULT_BACKEND = f'db+postgresql://{DB_USER}:{DB_PASSWORD}@{DB_SERVER}/{DB_DB}'
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_CACHE_BACKEND = 'django-cache'
 CELERY_RESULT_BACKEND = 'django-db'
@@ -108,7 +112,7 @@ DATABASES = {
         'NAME': DB_DB,
         'USER': DB_USER,
         'PASSWORD': DB_PASSWORD,
-        'HOST': 'dbserver',
+        'HOST': DB_SERVER,
         'PORT': '',
     }
 }
@@ -158,6 +162,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.memcached.PyMemcacheCache",
-        "LOCATION": "memcached:11211",
+        "LOCATION": f"{MEMCACHED_SERVER}:{MEMCACHED_PORT}",
     }
 }

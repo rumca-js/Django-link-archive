@@ -19,11 +19,6 @@
                  <img src="{% static 'rsshistory/icons/icons8-add-link-96.png' %}" class="content-icon" />
                  Mark as read
              </a>
-             {% else %}
-             <a href="{% url 'rsshistory:set-read-marker' %}" class="dropdown-item" title="Marks all entries as read">
-                 <img src="{% static 'rsshistory/icons/icons8-add-link-96.png' %}" class="content-icon" />
-                 Mark as read
-             </a>
              {% endif %}
           </li>
        </ul>

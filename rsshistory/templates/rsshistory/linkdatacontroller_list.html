@@ -37,7 +37,7 @@
   {% else %}
   <div class="container list-group">
   {% endif %}
-    {% for link in content_list %}
+    {% for entry in content_list %}
     {% if display_type == "normal" %}
           {% if user_config.display_type == "clickable-tags" %}
               {% include "rsshistory/linkdatacontroller_list__clickable_tags.html" %}

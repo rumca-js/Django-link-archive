@@ -1,0 +1,7 @@
+
+<a href="{{ entry.get_absolute_url }}?from_entry_id={{from_entry.id}}" title="{{ entry.title }}">
+ <div class="d-flex">
+    {% include "rsshistory/entry_thumbnail_element.html" %}
+    <div>{{entry.title}}</div>
+ </div>
+</a>

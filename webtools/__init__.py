@@ -14,12 +14,13 @@ from .handlerhttppage import (
 )
 
 from .crawlers import (
-    RequestsPage,
+    RequestsCrawler,
     SeleniumChromeHeadless,
     SeleniumChromeFull,
     SeleniumUndetected,
     ServerCrawler,
     ScriptCrawler,
+    StealthRequestsCrawler,
     selenium_feataure_enabled,
 )
 from .crawlerscript import (

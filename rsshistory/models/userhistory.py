@@ -163,22 +163,30 @@ class UserEntryTransitionHistory(models.Model):
 
     def get_related_list(user, navigated_to_entry):
         """
-        order by counte
         """
         result = []
 
         if not user.is_authenticated:
             return result
 
-        links = UserEntryTransitionHistory.objects.filter(
+        link_transitions = UserEntryTransitionHistory.objects.filter(
             user_object=user, entry_from=navigated_to_entry
         ).order_by("-counter")
-        if links.exists():
-            for link_info in links:
+
+        config_entry = Configuration.get_object().config_entry
+        max_related_links = config_entry.max_number_of_related_links
+
+        if link_transitions.exists():
+            index = 0
+            for link_info in link_transitions:
                 entries = LinkDataModel.objects.filter(id=link_info.entry_to.id)
                 if entries.exists():
                     entry = entries[0]
                     result.append(entry)
+                index += 1
+
+                if index > max_related_links:
+                    break
 
         return result
 

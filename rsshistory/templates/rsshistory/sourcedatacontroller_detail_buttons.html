@@ -22,16 +22,16 @@
          </li>
          {% if object.enabled %}
          <li>
-           <a href="{% url 'rsshistory:source-pause' object.id %}" class="dropdown-item" title="Pauses source">
+           <a href="{% url 'rsshistory:source-disable' object.id %}" class="dropdown-item" title="Disables source">
                <img src="{% static 'rsshistory/icons/icons8-pause-squared-100.png' %}" class="content-icon" />
-               Pause
+               Disable
            </a>
          </li>
          {% else %}
          <li>
-           <a href="{% url 'rsshistory:source-resume' object.id %}" class="dropdown-item" title="Resumes source">
+           <a href="{% url 'rsshistory:source-enable' object.id %}" class="dropdown-item" title="Enables source">
                <img src="{% static 'rsshistory/icons/icons8-play-100.png' %}" class="content-icon" />
-               Resume
+               Enable
            </a>
          </li>
          {% endif %}

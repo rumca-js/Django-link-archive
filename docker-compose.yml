@@ -14,15 +14,19 @@ services:
       rabbitmq:
         condition: service_started
     environment:
-      DB_DB: control
-      DB_USER: power
-      DB_PASSWORD: notexample
-      SECRET_KEY: "xxxxxxxxxxxxx"
-      DEBUG: 1
       # could be localhost
       RABBIT_SERVER: rabbitmq
       MEMCACHED_SERVER: memecached
+      MEMCACHED_PORT: 11211
       DB_SERVER: dbserver
+      DB_DB: control
+      DB_USER: power
+      DB_PASSWORD: notexample
+      DJANGO_SUPERUSER_USERNAME: admin
+      DJANGO_SUPERUSER_PASSWORD: admin
+      DJANGO_INITIALIZE_SOURCES: 1
+      SECRET_KEY: "xxxxxxxxxxxxx"
+      DEBUG: 1
     networks:
       - shared_network
 

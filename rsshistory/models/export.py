@@ -35,11 +35,11 @@ class DataExport(models.Model):
     export_data = models.CharField(max_length=1000, choices=EXPORT_DATA_CHOICES)
     local_path = models.CharField(
         max_length=1000,
-        blank=True,
+        default="./data",
         help_text="Local path is relative to main configuration export path. This path will be appended with app name and type of export",
     )
     remote_path = models.CharField(
-        max_length=1000, blank=True, help_text="Can be empty"
+        max_length=1000, blank=True, help_text="Example: https://github.com/rumca-js/Django-link-archive.git. Can be empty"
     )
     user = models.CharField(
         default="",
@@ -48,14 +48,15 @@ class DataExport(models.Model):
         help_text="Repo user name. Can be empty",
     )
     password = models.CharField(
-        default="", max_length=2000, blank=True, help_text="Repo password. Can be empty"
+        default="", max_length=2000, blank=True,
+        help_text="Repo password, or token. Can be empty"
     )
 
     db_user = models.CharField(
         default="",
         max_length=2000,
         blank=True,
-        help_text="This instance user that Can be empty",
+        help_text="This instance user. Can be empty",
     )
 
     # maybe we should make another table, for each EXPORT
@@ -71,6 +72,12 @@ class DataExport(models.Model):
     export_time = models.TimeField(
         default=time(0, 0), help_text="Time at which export is performed"
     )
+
+    format_json = models.BooleanField(default=True, help_text="If set JSON files will be created")
+    format_rss = models.BooleanField(default=False)
+    format_md = models.BooleanField(default=True)
+    format_html = models.BooleanField(default=True)
+    format_sqlite = models.BooleanField(default=True)
 
     def is_daily_data(self):
         return self.export_data == DataExport.EXPORT_DAILY_DATA

@@ -3,31 +3,34 @@
 {% block content %}
 
 <div class="container">
-    <a href="{% url 'rsshistory:data-export-add' %}" title="Add new data export" class="btn btn-primary" role="button">
-        <img src="{% static 'rsshistory/icons/icons8-plus-100.png' %}" class="content-icon" />
-    </a>
+   <a href="{% url 'rsshistory:data-export-add' %}" title="Add new data export" class="btn btn-primary" role="button">
+       <img src="{% static 'rsshistory/icons/icons8-plus-100.png' %}" class="content-icon" />
+   </a>
+   <a href="{% url 'rsshistory:push-daily-data-form' %}" title="Pushes daily data to repository" class="btn btn-primary" role="button">Push daily data to repo</a>
 </div>
 
 <h1>Exports</h1>
   {% if content_list %}
      <div class="list-group">
-         {% for object in content_list %}
-             <a href="{% url 'rsshistory:data-export' object.id %}"
+         {% for export_object in content_list %}
+             <a href="{% url 'rsshistory:data-export' export_object.id %}"
                class="my-1 p-1 list-group-item list-group-item-action"
                title="
-             Enabled:{{ object.enabled }},
-             Remote path:{{ object.remote_path }}
-             Export type:{{ object.export_type }},
-             Export data:{{ object.export_data }},
+             Enabled:{{ export_object.enabled }},
+             Remote path:{{ export_object.remote_path }}
+             Export type:{{ export_object.export_type }},
+             Export data:{{ export_object.export_data }},
                "
              >
              - 
-             {% if not object.enabled %}
+             {% if not export_object.enabled %}
                 [DISABLED]
              {% endif %}
-             <b>{{ object.remote_path }}</b>,
-             Export type:{{ object.export_type }},
-             Export data:{{ object.export_data }}
+             {% if export_object.remote_path %}
+               <b>{{ export_object.remote_path }}</b>,
+             {% endif %}
+             Export type:{{ export_object.export_type }},
+             Export data:{{ export_object.export_data }}
              </a>
          {% endfor %}
   {% else %}

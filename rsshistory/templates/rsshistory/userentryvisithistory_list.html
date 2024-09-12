@@ -2,17 +2,30 @@
 {% load static %}
 {% block content %}
 
-<h1>{{page_obj.paginator.count}} History</h1>
+<h1>Browse History</h1>
 
   {% if content_list %}
      <div class="list-group">
-         {% for object in content_list %}
-         <div>
-             Link:{{object.entry_object.link}}
-             Visits:{{object.visits}}
-             Date of the last visit:{{object.date_last_visit}}
+         {% for visit_history in content_list %}
+         <div class="my-1">
+             {% with entry=visit_history.entry_object %}
+             <a href="{{ entry.get_absolute_url }}" title="{{entry.title }}">
+                 <div class="d-flex">
+                     {% include "rsshistory/entry_thumbnail_element.html" %}
+                     <div>{{entry.title}}</div>
+
+                     <div>
+                         Visits:{{visit_history.visits}}
+                     </div>
+                     <div>
+                         Date of the last visit:{{visit_history.date_last_visit}}
+                     </div>
+                 </div>
+             </a>
+             {% endwith %}
          </div>
          {% endfor %}
+      {% include "rsshistory/pagination.html" %}
   {% else %}
     No history yet
   {% endif %}

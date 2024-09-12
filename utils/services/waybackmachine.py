@@ -43,8 +43,8 @@ class WaybackMachine(object):
         time_text = self.get_formatted_date(time)
 
         if not archive_timestamp.startswith(time_text):
-            LinkDatabase.info(archive_timestamp)
-            LinkDatabase.info(time_text)
+            Logger.debug(archive_timestamp)
+            Logger.debug(time_text)
             return
 
         return_url = self.get_archive_url_with_overlay(
@@ -72,7 +72,7 @@ class WaybackMachine(object):
         user_agent = HttpPageHandler.user_agent
 
         save_api = WaybackMachineSaveAPI(url, user_agent)
-        LinkDatabase.info("Save url {0}".format(url))
+        Logger.info("Save url {0}".format(url))
         try:
             val = save_api.save()
             return val

@@ -30,7 +30,7 @@ from .webtools import (
 )
 from .crawlers import (
     selenium_feataure_enabled,
-    RequestsPage,
+    RequestsCrawler,
     SeleniumChromeHeadless,
     SeleniumChromeFull,
     SeleniumUndetected,
@@ -215,7 +215,7 @@ class HttpRequestBuilder(object):
         SSL is mostly important for interacting with pages. During web scraping it is not that useful.
         """
 
-        p = RequestsPage(request)
+        p = RequestsCrawler(request)
         p.run()
         return p.get_response()
 

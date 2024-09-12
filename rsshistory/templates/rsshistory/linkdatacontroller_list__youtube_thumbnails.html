@@ -1,10 +1,10 @@
-<a href="{{ link.get_absolute_url }}"
-   title="{{link.title}} {{link.link}} {{link.source}}"
-   {% if not link.is_valid %}
+<a href="{{ entry.get_absolute_url }}"
+   title="{{entry.title}} {{entry.entry}} {{entry.source}}"
+   {% if not entry.is_valid %}
    style="opacity: 0.5"
    {% endif %}
 
-   {% if link.bookmarked %}
+   {% if entry.bookmarked %}
    class="element_{{user_config.display_type}} list-group-item list-group-item-action list-group-item-primary"
    {% else %}
    class="element_{{user_config.display_type}} list-group-item list-group-item-action"
@@ -15,18 +15,18 @@
            {% if user_config.show_icons %}
            <img src=
                 {% if user_config.thumbnails_as_icons %}
-                "{{link.get_thumbnail}}"
+                "{{entry.get_thumbnail}}"
                 {% else %}
-                "{{link.get_favicon}}"
+                "{{entry.get_favicon}}"
                 {% endif %}
                 style = "width:100%;max-height:100%;object-fit:cover"/>
            {% endif %}
        </div>
        <div style="flex: 0 0 30%; flex-shrink: 0;flex-grow:0;max-height:30%">
           <span style="font-weight:bold" class="text-primary">
-             {{link.get_title | safe}}
+             {{entry.get_title | safe}}
 	      </span>
-          <div class="link-list-item-description">{{link.source_obj.title| slice:":100"}}</div>
+          <div class="link-list-item-description">{{entry.source_obj.title| slice:":100"}}</div>
        </div>
    </div>
 </a>

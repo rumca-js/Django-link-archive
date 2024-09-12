@@ -1,28 +1,28 @@
 <div
-   {% if link.bookmarked %}
-   title="{{link.get_title}} {{link.link}} {{link.get_long_description}}"
+   {% if entry.bookmarked %}
+   title="{{entry.get_title}} {{entry.entry}} {{entry.get_long_description}}"
    {% endif %}
 
-   {% if link.bookmarked %}
+   {% if entry.bookmarked %}
    class="my-1 p-1 list-group-item list-group-item-action list-group-item-primary"
    {% else %}
    class="my-1 p-1 list-group-item list-group-item-action"
    {% endif %}
 
-   {% if not link.is_valid %}
+   {% if not entry.is_valid %}
    style="opacity: 0.5"
    {% endif %}
    >
 
-   <div class="linklistitem">
-       <a href="{{ link.get_absolute_url }}" class="linklistitemtitle">
+   <div class="entry">
+       <a href="{{ entry.get_absolute_url }}" class="linklistitemtitle">
            <div>
                {% if user_config.show_icons %}
                <img src=
                     {% if user_config.thumbnails_as_icons %}
-                    "{{link.get_thumbnail}}"
+                    "{{entry.get_thumbnail}}"
                     {% else %}
-                    "{{link.get_favicon}}"
+                    "{{entry.get_favicon}}"
                     {% endif %}
 
                     {% if user_config.small_icons %}
@@ -33,18 +33,18 @@
                     />
                {% endif %}
 
-               {{link.get_title}} {{link.get_long_description}}
+               {{entry.get_title}} {{entry.get_long_description}}
            </div>
        </a>
        <div class="linklistitemdescription">
-           {% if link.get_tag_string %}
+           {% if entry.get_tag_string %}
            Tags: 
-           {% for tag in link.get_tag_map %}
+           {% for tag in entry.get_tag_map %}
            <a href='{% url 'rsshistory:entries'%}?tag="{{tag}}"' class="btn btn-secondary" role="button">{{tag}}</a>
            {% endfor %}
            {% endif %}
-           {% if link.bookmarked %}
-           User: {{link.user}}
+           {% if entry.bookmarked %}
+           User: {{entry.user}}
            {% endif %}
 
        </div>

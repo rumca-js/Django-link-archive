@@ -1,49 +1,35 @@
 <div
-    title="{{link.get_title}} {{link.link}} {{link.get_long_description}}"
-      {% if link.bookmarked %}
+    title="{{entry.get_title}} {{entry.link}} {{entry.get_long_description}}"
+      {% if entry.bookmarked %}
       class="list-group-item list-group-item-action list-group-item-primary"
       {% else %}
       class="list-group-item list-group-item-action"
       {% endif %}
 
-      {% if not link.is_valid %}
+      {% if not entry.is_valid %}
       style="opacity: 0.5"
       {% endif %}
     >
-    <a href="{{ link.link }}" >
+    <a href="{{ entry.link }}" >
         <div>
-            {% if user_config.show_icons %}
-            <img src=
-                 {% if user_config.thumbnails_as_icons %}
-                 "{{link.get_thumbnail}}"
-                 {% else %}
-                 "{{link.get_favicon}}"
-                 {% endif %}
-
-                 {% if user_config.small_icons %}
-                 class="rounded icon-small"
-                 {% else %}
-                 class="rounded icon-normal"
-                 {% endif %}
-                 />
-            {% endif %}
-            <span class="linklistitemtitle">{{link.title}}</span>
-            <span class="linklistitemdescription">{{link.source_obj.title}}</span>
+            {% include "rsshistory/entry_thumbnail_element.html" %}
+            <span class="linklistitemtitle">{{entry.title}}</span>
+            <span class="linklistitemdescription">{{entry.source_obj.title}}</span>
         </div>
     </a>
 
     {% if user.is_staff %}
     <div>
-        <a href="{{ link.get_absolute_url }}" class="btn btn-secondary" role="button">
+        <a href="{{ entry.get_absolute_url }}" class="btn btn-secondary" role="button">
             Details
         </a>
-        {% if link.bookmarked %}
-        <a href="{% url 'rsshistory:entry-notbookmark' link.id %}" class="btn btn-secondary" role="button">
+        {% if entry.bookmarked %}
+        <a href="{% url 'rsshistory:entry-notbookmark' entry.id %}" class="btn btn-secondary" role="button">
             Not bookmarked
         </a>
-        <a href="{% url 'rsshistory:entry-tag' link.id %}" class="btn btn-secondary" role="button">Tag entry</a>
+        <a href="{% url 'rsshistory:entry-tag' entry.id %}" class="btn btn-secondary" role="button">Tag entry</a>
         {% else %}
-        <a href="{% url 'rsshistory:entry-star' link.id %}" class="btn btn-secondary" role="button">
+        <a href="{% url 'rsshistory:entry-star' entry.id %}" class="btn btn-secondary" role="button">
             Bookmark
         </a>
         {% endif %}

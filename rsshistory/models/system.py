@@ -333,28 +333,41 @@ class ConfigurationEntry(models.Model):
     )
 
     display_style = models.CharField(
-        max_length=500, null=True, default="style-light", choices=STYLE_TYPES
+        max_length=500, null=True, 
+        default="style-light",
+        choices=STYLE_TYPES,
+        help_text="Applies to not logged users",
     )
     display_type = models.CharField(
-        max_length=500, null=True, default="standard", choices=DISPLAY_TYPE_CHOICES
+        max_length=500,
+        null=True,
+        default="standard",
+        choices=DISPLAY_TYPE_CHOICES,
+        help_text="Applies to not logged users",
     )
-    show_icons = models.BooleanField(default=True)
+    show_icons = models.BooleanField(default=True,
+        help_text="Applies to not logged users",
+        )
     thumbnails_as_icons = models.BooleanField(
-        default=True, help_text="If false, source favicons are used as thumbnails"
+        default=True, help_text="If false, source favicons are used as thumbnails. Applies to not logged users",
     )
-    small_icons = models.BooleanField(default=True)
+    small_icons = models.BooleanField(default=True,
+        help_text="Applies to not logged users",
+    )
     local_icons = models.BooleanField(
-        default=False, help_text="If true, only locally stored icons are displayed"
+        default=False, help_text="If true, only locally stored icons are displayed. Applies to not logged users",
     )
 
     links_per_page = models.IntegerField(
-        default=100, help_text="Number of links per page"
+        default=100, help_text="Number of links per page. Applies to not logged users",
     )
     sources_per_page = models.IntegerField(
-        default=100, help_text="Number of sources per page"
+        default=100, help_text="Number of sources per page. Applies to not logged users"
     )
-    max_links_per_page = models.IntegerField(default=100)
-    max_sources_per_page = models.IntegerField(default=100)
+
+    max_links_per_page = models.IntegerField(default=100, help_text="Maximum number of links per page")
+    max_sources_per_page = models.IntegerField(default=100, help_text="Maximum number of sources per page")
+    max_number_of_related_links = models.IntegerField(default=30, help_text="Maximum number of entries displayed in 'entry detail related' view")
 
     debug_mode = models.BooleanField(
         default=False,

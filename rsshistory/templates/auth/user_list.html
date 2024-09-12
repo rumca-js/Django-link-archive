@@ -1,0 +1,22 @@
+{% extends base_generic %}
+{% load static %}
+{% block content %}
+
+{% for object in content_list %}
+<div>
+    User ID:{{object.id}}
+    User name:{{object.username}}
+    Password:<span title="{{object.password}}">password</span>
+    e-mail:{{object.email}}
+    Staff:{{object.is_staff}}
+    Active:{{object.is_active}}
+    Last login:{{object.last_login}}
+    Date joined:{{object.date_joined}}
+    <div>
+    <a href="{% url 'rsshistory:appuser-history' object.id %}" class="btn btn-primary">
+                History</a>
+    </div>
+</div>
+{% endfor %}
+
+{% endblock %}

@@ -106,9 +106,13 @@ class GitRepository(RepositoryInterface):
         return self.check_process(p)
 
     def get_repo_name(self):
-        last = Path(self.git_repo).parts[-1]
-        last = Path(last)
-        last = last.stem
+        if self.git_repo.endswith(".git"):
+            last = Path(self.git_repo).parts[-1]
+            last = Path(last)
+            last = last.stem
+        else:
+            last = Path(self.git_repo).parts[-1]
+            last = str(last)
         return last
 
     def clone(self):

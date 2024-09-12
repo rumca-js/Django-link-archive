@@ -21,6 +21,164 @@ from ..forms import DataExportForm
 from ..serializers import ReadingListFile
 
 
+def data_export_add(request):
+    p = ViewPage(request)
+    p.set_title("Add data export")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    if request.method == "POST":
+        form = DataExportForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(
+                reverse("{}:data-exports".format(LinkDatabase.name))
+            )
+        else:
+            p.context["form"] = form
+            return p.render("form_basic.html")
+
+    form = DataExportForm()
+    form.method = "POST"
+    form.action_url = reverse("{}:data-export-add".format(LinkDatabase.name))
+
+    p.context["form"] = form
+    return p.render("form_basic.html")
+
+
+def data_export_edit(request, pk):
+    p = ViewPage(request)
+    p.set_title("Edit data export")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    objs = DataExport.objects.filter(id=pk)
+    if objs.count() == 0:
+        p.context["summary_text"] = "No such object"
+        return p.render("summary_present.html")
+
+    if request.method == "POST":
+        form = DataExportForm(request.POST, instance=objs[0])
+        if form.is_valid():
+            form.save()
+        else:
+            p.context["summary_text"] = "Form is invalid"
+            return p.render("summary_present.html")
+
+    form = DataExportForm(instance=objs[0])
+    form.method = "POST"
+    form.action_url = reverse(
+        "{}:data-export-edit".format(LinkDatabase.name), args=[pk]
+    )
+
+    p.context["config_form"] = form
+
+    return p.render("configuration.html")
+
+
+def data_export_remove(request, pk):
+    p = ViewPage(request)
+    p.set_title("Remove data export")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    objs = DataExport.objects.filter(id=pk)
+    if objs.count() == 0:
+        p.context["summary_text"] = "No such object"
+        return p.render("summary_present.html")
+    else:
+        objs.delete()
+
+        return redirect("{}:data-exports".format(LinkDatabase.name))
+
+
+def disable(request, pk):
+    p = ViewPage(request)
+    p.set_title("Disable source")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    p.context["pk"] = pk
+
+    objs = DataExport.objects.filter(id=pk)
+    if not objs.exists():
+        p.context["summary_text"] = "Data export does not exist"
+        return p.render("summary_present.html")
+
+    ob = objs[0]
+    ob.enabled = False
+    ob.save()
+
+    return redirect("{}:data-exports".format(LinkDatabase.name))
+
+
+def enable(request, pk):
+    p = ViewPage(request)
+    p.set_title("Enable source")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    p.context["pk"] = pk
+
+    objs = DataExport.objects.filter(id=pk)
+    if not objs.exists():
+        p.context["summary_text"] = "Data export does not exist"
+        return p.render("summary_present.html")
+
+    ob = objs[0]
+    ob.enabled = True
+    ob.save()
+
+    return redirect("{}:data-exports".format(LinkDatabase.name))
+
+
+class DataExportListView(generic.ListView):
+    model = DataExport
+    context_object_name = "content_list"
+    paginate_by = 100
+
+    def get(self, *args, **kwargs):
+        p = ViewPage(self.request)
+        data = p.check_access()
+        if data is not None:
+            return redirect("{}:missing-rights".format(LinkDatabase.name))
+        return super().get(*args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get the context
+        context = super().get_context_data(**kwargs)
+        context = ViewPage(self.request).init_context(context)
+
+        return context
+
+
+class DataExportDetailsView(generic.DetailView):
+    model = DataExport
+    context_object_name = "object"
+
+    def get(self, *args, **kwargs):
+        p = ViewPage(self.request)
+        data = p.check_access()
+        if data is not None:
+            return redirect("{}:missing-rights".format(LinkDatabase.name))
+        return super().get(*args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get the context
+        context = super(DataExportDetailsView, self).get_context_data(**kwargs)
+        context = ViewPage(self.request).init_context(context)
+
+        return context
+
+
+# TODO - analyze what we need from things below - cleanup
+
+
 def import_reading_list_view(request):
     page = ViewPage(request)
     page.set_title("Import view")
@@ -456,114 +614,3 @@ def push_daily_data_form(request):
     return p.render("form_basic.html")
 
 
-def data_export_add(request):
-    p = ViewPage(request)
-    p.set_title("Add data export")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
-
-    if request.method == "POST":
-        form = DataExportForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return HttpResponseRedirect(
-                reverse("{}:data-exports".format(LinkDatabase.name))
-            )
-        else:
-            p.context["form"] = form
-            return p.render("form_basic.html")
-
-    form = DataExportForm()
-    form.method = "POST"
-    form.action_url = reverse("{}:data-export-add".format(LinkDatabase.name))
-
-    p.context["form"] = form
-    return p.render("form_basic.html")
-
-
-def data_export_edit(request, pk):
-    p = ViewPage(request)
-    p.set_title("Edit data export")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
-
-    objs = DataExport.objects.filter(id=pk)
-    if objs.count() == 0:
-        p.context["summary_text"] = "No such object"
-        return p.render("summary_present.html")
-
-    if request.method == "POST":
-        form = DataExportForm(request.POST, instance=objs[0])
-        if form.is_valid():
-            form.save()
-        else:
-            p.context["summary_text"] = "Form is invalid"
-            return p.render("summary_present.html")
-
-    form = DataExportForm(instance=objs[0])
-    form.method = "POST"
-    form.action_url = reverse(
-        "{}:data-export-edit".format(LinkDatabase.name), args=[pk]
-    )
-
-    p.context["config_form"] = form
-
-    return p.render("configuration.html")
-
-
-def data_export_remove(request, pk):
-    p = ViewPage(request)
-    p.set_title("Remove data export")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
-    if data is not None:
-        return data
-
-    objs = DataExport.objects.filter(id=pk)
-    if objs.count() == 0:
-        p.context["summary_text"] = "No such object"
-        return p.render("summary_present.html")
-    else:
-        objs.delete()
-
-        return redirect("{}:data-exports".format(LinkDatabase.name))
-
-
-class DataExportListView(generic.ListView):
-    model = DataExport
-    context_object_name = "content_list"
-    paginate_by = 100
-
-    def get(self, *args, **kwargs):
-        p = ViewPage(self.request)
-        data = p.check_access()
-        if data is not None:
-            return redirect("{}:missing-rights".format(LinkDatabase.name))
-        return super().get(*args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        # Call the base implementation first to get the context
-        context = super().get_context_data(**kwargs)
-        context = ViewPage(self.request).init_context(context)
-
-        return context
-
-
-class DataExportDetailsView(generic.DetailView):
-    model = DataExport
-    context_object_name = "object"
-
-    def get(self, *args, **kwargs):
-        p = ViewPage(self.request)
-        data = p.check_access()
-        if data is not None:
-            return redirect("{}:missing-rights".format(LinkDatabase.name))
-        return super().get(*args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        # Call the base implementation first to get the context
-        context = super(DataExportDetailsView, self).get_context_data(**kwargs)
-        context = ViewPage(self.request).init_context(context)
-
-        return context

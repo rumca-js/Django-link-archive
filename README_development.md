@@ -88,3 +88,22 @@ Each link element style is reflected by a separate style in a CSS file.
 What if we do not want to use main style for highlights, but for youtube we would like a slightly different color?
 
 Each style should be independent from other styles.
+
+# Debugging and other calls
+
+Celery can be debugged as follows
+```
+celery --help
+celery inspect --help
+celery call --help
+```
+
+Shows which tasks are running
+```
+poetry run celery inspect registered
+```
+
+Call process jobs with JSON arguments
+```
+celery call app.tasks.process_all_jobs -a '["rsshistory.threadhandlers.OneTaskProcessor"]'
+```

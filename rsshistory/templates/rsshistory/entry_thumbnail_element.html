@@ -1,0 +1,16 @@
+
+{% if user_config.show_icons%}
+     <img src=
+          {% if user_config.thumbnails_as_icons %}
+          "{{entry.get_thumbnail}}"
+          {% else %}
+          "{{entry.get_favicon}}"
+          {% endif %}
+
+          {% if user_config.small_icons %}
+          class="rounded icon-small"
+          {% else %}
+          class="rounded icon-normal"
+          {% endif %}
+          />
+{% endif %}

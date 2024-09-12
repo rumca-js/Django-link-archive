@@ -71,15 +71,41 @@ class GitRepositoryTest(FakeInternetTestCase):
             export_sources=True,
         )
 
+        DataExport.objects.create(
+            enabled=True,
+            export_type=DataExport.EXPORT_TYPE_GIT,
+            export_data=DataExport.EXPORT_NOTIME_DATA,
+            local_path="./notime_dir",
+            remote_path="https://github.com/rumca-js/RSS-Link-Database-NOTIME",
+            user="testuser",
+            password="password",
+            export_entries=True,
+            export_entries_bookmarks=True,
+            export_entries_permanents=True,
+            export_sources=True,
+        )
+
     def test_get_repo_name(self):
         export_config = DataExport.objects.filter(
-            export_data=DataExport.EXPORT_DAILY_DATA
+            export_data=DataExport.EXPORT_DAILY_DATA,
+            remote_path="https://github.com/rumca-js/RSS-Link-Database-DAILY.git"
         )[0]
 
         git = GitRepository(export_config)
 
         # call tested function
         self.assertEqual(git.get_repo_name(), "RSS-Link-Database-DAILY")
+
+    def test_get_repo_name__nogit(self):
+        export_config = DataExport.objects.filter(
+            export_data=DataExport.EXPORT_NOTIME_DATA,
+            remote_path="https://github.com/rumca-js/RSS-Link-Database-NOTIME"
+        )[0]
+
+        git = GitRepository(export_config)
+
+        # call tested function
+        self.assertEqual(git.get_repo_name(), "RSS-Link-Database-NOTIME")
 
     def test_get_operating_dir__default(self):
         export_config = DataExport.objects.filter(

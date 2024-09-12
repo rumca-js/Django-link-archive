@@ -5,7 +5,7 @@ Manages link meta information.
 # Features
 
  - bookmarks management, with tags, and comment support
- - RSS feed support
+ - RSS feed support. Supports YouTube RSS, Reddit RSS, OpenRss, InternetArchive
  - some Internet crawling capabilities
  - link search. Simple implementation, does not use elastic search
  - maintains website metadata (title, description, thumbnail, etc). It is not [archive.org](https://archive.org) replacement
@@ -20,8 +20,9 @@ Manages link meta information.
   <img alt="Django Logo" src="images/django_400.png" width="400px">
 </div>
 
-## Other use cases
+## Use cases
 
+ - news/RSS reader
  - YouTube client / filter. You will not be able to search YouTube catalog, but if you add YouTube channels as sources of data, new videos will be fetched into the database
  - database of important links: for work, or for school
  - data analysis - analyze link rot, how many a page is cited by other sources, analyze link domains, etc.
@@ -36,7 +37,6 @@ Manages link meta information.
  - Import / Export: most programs do not provide easy way to do that (I want JSON files!)
  - Scale: Some projects are BIG. This project focuses on providing "single user" experience. I do not want many dependencies here
  - Goal: Reddit, Lemmy aim is to provide social media experience, this project aims to grant the ability to create database of links
-
 
 <div align="center">
   <img alt="Django Logo" src="images/old-wild-west.jpg" width="500px">
@@ -66,14 +66,29 @@ Manages link meta information.
 
 Alternative programs for link bookmarking do exist.
 
-[Grimoire](https://github.com/goniszewski/grimoire), [BookmarkOS](https://bookmarkos.com/), [Raindrop](https://raindrop.io/), [LinkAce](https://www.linkace.org/), [Hoarder](https://hoarder.app/), [GGather](https://web.ggather.com/), [Zotero](https://www.zotero.org/), [OneKeep](https://onekeep.com/), [Lasso](https://www.lasso.net/go/), [CarryLinks](https://carrylinks.com/), [Zlinky](https://zlinky.com/), [wakelet](https://wakelet.com/), [Booky](https://booky.io/), [Webtag](https://webtag.io/), [Historious](https://historio.us/), [Knowies](https://www.knowies.com)
+[Grimoire](https://github.com/goniszewski/grimoire),
+[BookmarkOS](https://bookmarkos.com/),
+[Raindrop](https://raindrop.io/),
+[LinkAce](https://www.linkace.org/),
+[Hoarder](https://hoarder.app/),
+[GGather](https://web.ggather.com/),
+[Zotero](https://www.zotero.org/),
+[OneKeep](https://onekeep.com/),
+[Lasso](https://www.lasso.net/go/),
+[CarryLinks](https://carrylinks.com/),
+[Zlinky](https://zlinky.com/),
+[wakelet](https://wakelet.com/),
+[Booky](https://booky.io/),
+[Webtag](https://webtag.io/),
+[Historious](https://historio.us/),
+[Knowies](https://www.knowies.com)
 
 Awasome list at [Github](https://github.com/awesome-selfhosted/awesome-selfhosted?tab=readme-ov-file#bookmarks-and-link-sharing).
 
 # How does it work?
 
- - System reads defined "Sources" regularly
- - Each source is checked regularly for new data. RSS feeds are checked if they contain new links
+ - System reads "sources" regularly
+ - Each "source" is checked regularly for new data. RSS feeds are one type of source
  - new links are inserted into database
  - every day your bookmarks can be exported to a repository, if configured
  - new links are used to populate popular "keywords"
@@ -112,37 +127,68 @@ You may wonder, why am I writing about search engine "keywords" meta field, if G
 
 Database is managed by RSS link database, and user votes. Average of votes is calculated for each link.
 
-# Automatic export
+## Export
 
- - Although it archives some data it is not [archive.org](https://archive.org) replacement. It does not automatically store entire pages. It stores meta data about web pages: title, description, thumbnail 
- - Most of views contain "Show JSON" button that provides the view data as JSON. This can be used by scripts, for import, export
+There are several export types. Each day data can be exported.
 
-## Automatic git export
+The exports support JSON file structure.
 
-Program maintains two repositories: one for bookmarked links, and daily repository.
+We maintain some data, but it is not [archive.org](https://archive.org) replacement. We store only meta data about web pages: title, description, thumbnail.
 
-Each day bookmarks and daily repositories are updated with new data. Daily repository is updated when day finishes, then the complete daily data are pushed into the repository.
+Most of the views contain "Show JSON" button that provides the view data as JSON. This can be used by scripts, for import, export.
 
-### Bookmarks
+Types of exports:
+ - daily data - each day has its own directory
+ - yearly data - each year holds information separately
+ - data not time related - data are in separate directories, and are not time related
 
- - three file formats: JSON, markdown, RSS
- - contains articles that I have selected as interesting, or noteworthy, or funny, or whatever
- - files are split by 'language' and 'year' categories
- - markdown file is generated as a form of preview, JSON can be reused, imported
- - links are bookmarked, but that does not necessarily mean something is endorsed. It shows particular interest in topic. It is indication of importance
- 
-### Daily Data
+## Import
 
- - RSS links are captured for each source separately
- - two files formats for each day and source: JSON and markdown
- - markdown file is generated as a form of preview, JSON can be reused, imported
+Done by admin panel. JSON data files can be used for imports, or other django-link-archive apps [under construction].
 
-### Sources
+# API keys
 
- - provided in sources.json file
- - provides information about sources, like: title, url, langugage
+Administrator can create API keys for not logged users to access the contents.
 
-# Federated
+Format:
+```
+https://yourpage.com/your-app/index?key=yourgeneratedkey
+```
+
+# History
+
+You can keep locally your own web browsing history. Forget about browser history or bookmarks.
+
+With this self-hostied solution you do not need to sync anything, as everything resides on this server.
+
+Forget about YouTube video browsing history, or subscriptions. You can control what you see and when!
+
+# Scripts
+
+Web-scraping functionality can be also used without django.
+
+There are some scripts that can be used without Django application:
+ - yafr.py - yet another feed reader, commandline client
+ - page_props.py - commandline tools that shows page properties
+ - example_page_crawler.py - example script that can crawl through web page
+ - example_compare_crawlers.py - shows how much time it takes to execute different crawlers
+ - converter.py - converts JSON files to SQLite table
+ - dataanalyzer.py - analyzes data in JSON files / SQLite table. You can query the data
+ - script_server.py - server that can be used to dispatch crawlers for certain URLs, to obtain meta data
+ - script_client.py - client that can be used to connect to server, and debug crawler scripts
+ - workspace.py - workspace management. Can be used to update project
+
+# Ease of navigation
+
+This project was created to give libary of navigation. Therefore from a link there should be navigation to other places:
+
+ - google
+ - other search engines, wikipedia, etc
+ - link to internet archive, etc.
+
+Even if Google implements links to internet archive, or introduces most of these features we should continue our work on this, as we never know when corporation decides not to support it.
+
+# Federated [under construction]
 
 This project is federated. Therefore you can rely on data from other djang-link-archive instances.
 
@@ -164,26 +210,6 @@ To do that:
  - Add a new source
  - paste the instance B address, the JSON address link
  - the system should suggest source type to be of JSON
-
-## Manual import
-
-Scenario to import sources from a other instance:
- - find sources in the other instance. It should be at "Sources" menu button, by default
- - select which sources you would like to export, you can select a filter
- - click 'Show as JSON', it should produce a nice JSON output
- - copy link URL of that instance, of that JSON output
- - navigate to your instance
- - select 'Admin' page
- - select 'Import from URL', and paste URL
-
-Scenario to import links from a other instance:
- - find links in the other instance. It should be at "Search" menu button, by default
- - select which links you would like to export, you can select a filter, like a date, tag. etc.
- - click 'Show as JSON', it should produce a nice JSON output
- - copy link URL of that instance, of that JSON output
- - navigate to your instance
- - select 'Admin' page
- - select 'Import from URL', and paste URL
 
 # User management [under construction]
 
@@ -214,25 +240,6 @@ User actions are tracked by the system, only if it is configured so:
  - users can vote for entries
  - system stores limited amount of search queries, the user can select previous queries from combobox
  - system stores order of visits on entries. This allows to provide "related" section for each entry. For example if you vist entry "X" after "Y", then "X" will appear on "Y" related section
-
-# API keys
-
-Administrator can create API keys for less restricted access to contents.
-
-# Scripts
-
-Web-scraping functionality can be also used without django.
-
-There are some scripts that can be used without Django application:
- - yafr.py - yet another feed reader
- - page_props.py - shows page properties
- - converter.py - converts JSON files to SQLite table
- - dataanalyzer.py - analyzes data in JSON files / SQLite table. You can query the data
- - script_server.py - server that can be used to dispatch crawlers for certain URLs, to obtain meta data
- - script_client.py - client that can be used to connect to server, and debug crawler scripts
- - example_page_crawler.py - example script that can crawl through web page
- - example_compare_crawlers.py - shows how much time it takes to execute different crawlers
- - workspace.py - workspace management. Can be used to update project
 
 # Additional notes
 
