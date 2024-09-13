@@ -2,8 +2,13 @@ from time import strptime
 from bs4 import BeautifulSoup
 import re
 import json
+from datetime import datetime
 
-from webtools import DomainAwarePage, calculate_hash
+from webtools import (
+  DomainAwarePage,
+  calculate_hash
+  WebLogger,
+)
 from utils.dateutils import DateUtils
 from .feedreader import FeedReader
 
