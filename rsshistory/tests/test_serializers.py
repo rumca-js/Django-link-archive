@@ -1,8 +1,9 @@
 from django.contrib.auth.models import User
 
 from utils.dateutils import DateUtils
+from utils.services import ReadingList
 
-from ..serializers import MarginaliaCrawlerOutput, ReadingList, BookmarksExporter
+from ..serializers import MarginaliaCrawlerOutput, EntryYearDataMainExporter
 from ..models import UserBookmarks
 from ..controllers import LinkDataController
 from ..configuration import Configuration
@@ -51,7 +52,7 @@ class ReadingListTest(FakeInternetTestCase):
         )
 
 
-class BookmarksExporterTest(FakeInternetTestCase):
+class EntryYearDataMainExporterTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
         self.user = User.objects.create_user(
@@ -78,7 +79,7 @@ class BookmarksExporterTest(FakeInternetTestCase):
         )
 
         # call tested function
-        exporter = BookmarksExporter(config, "testuser")
+        exporter = EntryYearDataMainExporter(config, "testuser")
 
         entries = exporter.get_entries(2024)
         self.assertEqual(entries.count(), 0)
@@ -104,7 +105,7 @@ class BookmarksExporterTest(FakeInternetTestCase):
             date_bookmarked=date, user_object=self.user, entry_object=entry
         )
 
-        exporter = BookmarksExporter(config, "testuser")
+        exporter = EntryYearDataMainExporter(config, "testuser")
 
         # call tested function
         entries = exporter.get_entries(2024)
@@ -131,7 +132,7 @@ class BookmarksExporterTest(FakeInternetTestCase):
             date_bookmarked=date, user_object=self.user, entry_object=entry
         )
 
-        exporter = BookmarksExporter(config, "")
+        exporter = EntryYearDataMainExporter(config, "")
 
         # call tested function
         entries = exporter.get_entries(2024)

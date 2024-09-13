@@ -157,6 +157,8 @@ class RequestsCrawler(CrawlerInterface):
         if not self.is_valid():
             return
 
+        import requests
+
         WebLogger.debug("Requests Driver:{}".format(self.request.url))
 
         """

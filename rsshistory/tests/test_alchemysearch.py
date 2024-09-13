@@ -3,11 +3,11 @@ from sqlalchemy import (
 )
 from pathlib import Path
 
-from webtools import RssPage, HtmlPage, YouTubeVideoHandler, FeedClient
+from webtools import RssPage, HtmlPage, YouTubeVideoHandler, FeedClient, UrlAgeModerator
 from utils.sqlmodel import SqlModel, EntriesTable, SourcesTable
 from utils.alchemysearch import AlchemySearch
 
-from ..pluginurl.urlhandler import UrlHandler, UrlAgeModerator
+from ..pluginurl.urlhandler import UrlHandler
 from .fakeinternet import FakeInternetTestCase
 
 

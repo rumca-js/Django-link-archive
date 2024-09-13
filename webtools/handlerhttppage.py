@@ -46,18 +46,19 @@ class HeadlessScriptCrawler(ScriptCrawler):
     def __init__(self, request, response_file=None, response_port=None):
         self.script = self.get_script()
 
-        if not self.script:
-            return
-
         self.process_input()
 
-        if self.is_valid():
-            super().__init__(request=request, response_file=self.response_file, response_port=response_port, cwd=self.operating_path, script=self.script)
+        super().__init__(request=request, response_file=self.response_file, response_port=response_port, cwd=self.operating_path, script=self.script)
 
     def get_script(self):
         return WebConfig.crawling_headless_script
 
     def process_input(self):
+        if not self.script:
+            self.response_file = None
+            self.operating_path = None
+            return
+
         self.operating_path = self.get_operating_dir()
         self.response_file = self.get_response_file_name(operating_path)
 
@@ -68,6 +69,9 @@ class HeadlessScriptCrawler(ScriptCrawler):
         return True
 
     def is_full_script_valid(self):
+        if not self.script:
+            return
+
         full_script = self.operating_path / self.script
         if not full_script.exists():
             WebLogger.error("Script to call does not exist: {}".format(full_script))
@@ -295,6 +299,7 @@ class HttpRequestBuilder(object):
                 c = crawler(request=request)
                 c.run()
                 response = c.get_response()
+                c.close()
                 if response:
                     return response
 
@@ -315,6 +320,7 @@ class HttpRequestBuilder(object):
                 c = crawler(request=request)
                 c.run()
                 response = c.get_response()
+                c.close()
                 if response:
                     return response
 
@@ -335,6 +341,7 @@ class HttpRequestBuilder(object):
                 c = crawler(request=request)
                 c.run()
                 response = c.get_response()
+                c.close()
                 if response:
                     return response
         else:

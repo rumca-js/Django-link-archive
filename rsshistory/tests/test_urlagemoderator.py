@@ -1,6 +1,7 @@
 from webtools import RssPage, HtmlPage, YouTubeVideoHandler
+from webtools import UrlAgeModerator
 
-from ..pluginurl.urlhandler import UrlHandler, UrlAgeModerator
+from ..pluginurl.urlhandler import UrlHandler
 
 from .fakeinternet import FakeInternetTestCase
 
