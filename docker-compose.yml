@@ -16,7 +16,7 @@ services:
     environment:
       # could be localhost
       RABBIT_SERVER: rabbitmq
-      MEMCACHED_SERVER: memecached
+      MEMCACHED_SERVER: memcached
       MEMCACHED_PORT: 11211
       DB_SERVER: dbserver
       DB_DB: control
