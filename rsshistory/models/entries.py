@@ -1,10 +1,12 @@
 from datetime import date, timedelta
+import traceback
 
+from django.contrib.auth.models import User
 from django.db import models
 from django.urls import reverse
 from django.templatetags.static import static
 from django.utils import timezone
-import traceback
+from django.conf import settings
 
 from webtools import DomainAwarePage
 from utils.dateutils import DateUtils
@@ -72,9 +74,6 @@ class BaseLinkDataModel(models.Model):
         default=False, help_text="This entry will not be automatically removed"
     )
 
-    # user who added entry
-    user = models.CharField(max_length=1000, null=True, blank=True)
-
     # We could use a different model, but it may lead to making multiple queries
     # For each model.
 
@@ -115,7 +114,6 @@ class BaseLinkDataModel(models.Model):
         description_length = BaseLinkDataModel._meta.get_field("description").max_length
         artist_length = BaseLinkDataModel._meta.get_field("artist").max_length
         album_length = BaseLinkDataModel._meta.get_field("album").max_length
-        user_length = BaseLinkDataModel._meta.get_field("user").max_length
         thumbnail_length = BaseLinkDataModel._meta.get_field("thumbnail").max_length
         language_length = BaseLinkDataModel._meta.get_field("language").max_length
 
@@ -131,9 +129,6 @@ class BaseLinkDataModel(models.Model):
 
         if self.artist and len(self.artist) > artist_length:
             self.artist = self.description[: artist_length - 1]
-
-        if self.user and len(self.user) > user_length:
-            self.user = None
 
         if self.thumbnail and len(self.thumbnail) > thumbnail_length:
             self.thumbnail = None
@@ -210,7 +205,7 @@ class BaseLinkDataController(BaseLinkDataModel):
         if tags:
             string += " Tags:{}".format(tags)
         if self.user:
-            string += " User:{}".format(self.user)
+            string += " User:{}".format(self.user_object.username)
 
         return string
 
@@ -325,7 +320,6 @@ class BaseLinkDataController(BaseLinkDataModel):
             "bookmarked",
             "artist",
             "album",
-            "user",
             "language",
             "thumbnail",
             "age",
@@ -357,6 +351,7 @@ class BaseLinkDataController(BaseLinkDataModel):
         """
         names = set(BaseLinkDataController.get_export_names())
         names.add("source_obj__id")
+        names.add("user_object__id")
         names.add("tags")
         names.add("comments")
         names.add("vote")  # TODO is this used?
@@ -624,6 +619,15 @@ class LinkDataModel(BaseLinkDataController):
         null=True,
         blank=True,
     )
+    # user who added entry
+    user_object = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name=str(LinkDatabase.name) + "_entries",
+        null=True,
+        blank=True,
+    )
+
 
     def cleanup_http_duplicate(self):
         """
@@ -652,6 +656,14 @@ class ArchiveLinkDataModel(BaseLinkDataController):
         null=True,
         blank=True,
     )
+    # user who added entry
+    user_object = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name=str(LinkDatabase.name) + "_aentries",
+        null=True,
+    )
+
 
     def is_archive_entry(self):
         return True

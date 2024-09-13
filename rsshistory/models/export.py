@@ -56,7 +56,7 @@ class DataExport(models.Model):
         default="",
         max_length=2000,
         blank=True,
-        help_text="This instance user. Can be empty",
+        help_text="This instance user for which data will be exporter. Example: bookmarks might be for each user separately. Can be empty",
     )
 
     # maybe we should make another table, for each EXPORT
@@ -67,17 +67,27 @@ class DataExport(models.Model):
     export_entries_permanents = models.BooleanField(
         default=False, help_text="Export entries has to be checked for this to work"
     )
+
     export_sources = models.BooleanField(default=False)
+    export_keywords = models.BooleanField(default=False)
 
     export_time = models.TimeField(
         default=time(0, 0), help_text="Time at which export is performed"
     )
 
     format_json = models.BooleanField(default=True, help_text="If set JSON files will be created")
-    format_rss = models.BooleanField(default=False)
     format_md = models.BooleanField(default=True)
-    format_html = models.BooleanField(default=True)
-    format_sqlite = models.BooleanField(default=True)
+    format_rss = models.BooleanField(default=False)
+    format_html = models.BooleanField(default=False)
+
+    format_sources_opml = models.BooleanField(default=False, help_text="If enabled sources will be written in OPML format also")
+
+    output_zip = models.BooleanField(default=False, help_text="If enabled, output will be zipped")
+    output_sqlite = models.BooleanField(default=False, help_text="If enabled, output will be inserted into SQLite")
+
+
+    class Meta:
+        ordering = ["-enabled"]
 
     def is_daily_data(self):
         return self.export_data == DataExport.EXPORT_DAILY_DATA

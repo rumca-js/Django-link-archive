@@ -3,11 +3,7 @@ import urllib.robotparser
 import asyncio
 
 from .webtools import (
-    RssPage,
-    HtmlPage,
-    DefaultContentPage,
     DomainAwarePage,
-    ContentInterface,
     PageOptions,
     WebLogger,
     URL_TYPE_RSS,
@@ -16,6 +12,12 @@ from .webtools import (
     URL_TYPE_HTML,
     URL_TYPE_FONT,
     URL_TYPE_UNKNOWN,
+)
+from .pages import (
+    ContentInterface,
+    DefaultContentPage,
+    RssPage,
+    HtmlPage,
 )
 from .handlerhttppage import (
     HttpPageHandler,

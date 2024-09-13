@@ -2,6 +2,10 @@ import traceback
 from dateutil import parser
 import json
 
+from ..controllers import (
+    SourceDataBuilder,
+    EntryDataBuilder,
+)
 from ..models import AppLogging
 from ..apps import LinkDatabase
 from ..pluginurl import UrlHandler
@@ -69,9 +73,11 @@ class BaseSourceJsonPlugin(SourceGenericPlugin):
             if prop["dead"]:
                 continue
 
-            i = InstanceImporter()
-            # TODO use configured author
-            i.author = c.admin_user
+            entry_builder = EntryDataBuilder()
+            source_builder = SourceDataBuilder()
+            # TODO this might not work
+            user = c.admin_user
+            i = MapImporter(entry_builder=entry_builder, source_builder = source_builder, user = user)
 
             i.import_from_link(prop)
 
@@ -118,6 +124,12 @@ class BaseSourceJsonPlugin(SourceGenericPlugin):
             i.author = c.admin_user
 
             source_prop["proxy_location"] = self.get_source_url(source_prop)
+
+            entry_builder = EntryDataBuilder()
+            source_builder = SourceDataBuilder()
+            # TODO this might not work
+            user = c.admin_user
+            i = MapImporter(entry_builder=entry_builder, source_builder = source_builder, user = user)
             i.import_from_source(source_prop, instance_import=True)
 
     def get_links_from_links(self, links_json):
@@ -127,9 +139,11 @@ class BaseSourceJsonPlugin(SourceGenericPlugin):
             if prop["dead"]:
                 continue
 
-            i = InstanceImporter()
-            i.author = c.admin_user
-
+            entry_builder = EntryDataBuilder()
+            source_builder = SourceDataBuilder()
+            # TODO this might not work
+            user = c.admin_user
+            i = MapImporter(entry_builder=entry_builder, source_builder = source_builder, user = user)
             i.import_from_link(prop)
 
             ## we do not return any found links, because instance importer imports them directly

@@ -73,21 +73,24 @@ class InstanceImporter(object):
             )
             return
 
+        entry_builder = EntryDataBuilder()
+        source_builder = SourceDataBuilder()
+
         if "links" in json_data:
-            importer = MapImporter(user = self.user)
+            importer = MapImporter(entry_builder=entry_builder, source_builder = source_builder, user = self.user)
             importer.import_from_links(json_data["links"])
 
         elif "sources" in json_data:
-            importer = MapImporter(user = self.user)
+            importer = MapImporter(entry_builder=entry_builder, source_builder = source_builder, user = self.user)
             print(json_data["sources"])
             importer.import_from_sources(json_data["sources"])
 
         elif "link" in json_data:
-            importer = MapImporter(user = self.user)
+            importer = MapImporter(entry_builder=entry_builder, source_builder = source_builder, user = self.user)
             importer.import_from_link(json_data["link"])
 
         elif "source" in json_data:
-            importer = MapImporter(user = self.user)
+            importer = MapImporter(entry_builder=entry_builder, source_builder = source_builder, user = self.user)
             importer.import_from_source(json_data["source"])
 
     def get_next_page_link(self):

@@ -621,8 +621,8 @@ class EntryGenericPlugin(object):
 
         parameters.append(EntryParameter("Visists", self.entry.page_rating_visits))
 
-        if self.entry.user != "":
-            parameters.append(EntryParameter("User", self.entry.user))
+        if self.entry.user_object is not None:
+            parameters.append(EntryParameter("User", self.entry.user_object.username))
 
         return parameters
 

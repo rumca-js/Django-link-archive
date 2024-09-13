@@ -92,7 +92,7 @@ class DataWriterTest(FakeInternetTestCase):
             remote_path=".",
             export_entries=True,
             export_entries_bookmarks=True,
-            export_entries_permanents=True,
+            export_entries_permanents=False,
             export_sources=True,
         )
 
@@ -181,8 +181,11 @@ class DataWriterTest(FakeInternetTestCase):
         links = LinkDataController.objects.filter(bookmarked=True)
         self.assertEqual(links.count(), 2)
 
-        permanent_path = Path("./data") / "test" / "notime" / "permanent" / "00000"
-        self.assertEqual(permanent_path.exists(), True)
+        json_file = Path("./data") / "test" / "notime" / "permanent" / "00000" / "permanent_entries.json"
+        self.assertEqual(json_file.exists(), True)
+        json_obj = json.loads(json_file.read_text())
+
+        self.assertEqual(len(json_obj), 1)
 
         json_file = Path("./data") / "test" / "notime" / "sources.json"
         self.assertEqual(json_file.exists(), True)
@@ -247,8 +250,10 @@ class DataWriterTest(FakeInternetTestCase):
         links = LinkDataController.objects.filter(bookmarked=True)
         self.assertEqual(links.count(), 2)
 
-        permanent_path = Path("./data") / "test" / "notime" / "permanent" / "00000"
-        self.assertEqual(permanent_path.exists(), True)
+        json_file = Path("./data") / "test" / "notime" / "permanent" / "00000" / "permanent_entries.json"
+        self.assertEqual(json_file.exists(), True)
+        json_obj = json.loads(json_file.read_text())
+        self.assertEqual(len(json_obj), 1)
 
         json_dir = Path("./data") / "test" / "notime" / "sources"
         self.assertEqual(json_dir.exists(), True)

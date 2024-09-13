@@ -24,9 +24,10 @@ from utils.controllers import (
 
 
 class MapImporter(object):
-    def __init__(self, conn, user=None, import_settings=None):
+    def __init__(self, entry_builder, source_builder, user=None, import_settings=None):
+        self.entry_builder = entry_builder
+        self.source_builder = source_builder
         self.user = user
-        self.conn = conn
 
         if self.user is not None:
             self.user = self.get_normal_user(user)
@@ -149,7 +150,7 @@ class MapImporter(object):
                 # accepted and not. Let the builder deal with it
                 LinkDatabase.info("Importing link:{}".format(clean_data["link"]))
 
-                b = EntryDataBuilder(self.conn, link_data=clean_data, source_is_auto=True)
+                b = self.entry_builder.build(link_data=clean_data, source_is_auto=True)
                 entry = b.result
 
                 if entry and entry.is_archive_entry():
@@ -205,7 +206,7 @@ class MapImporter(object):
         if not c.is_source(url = clean_data["url"]):
             clean_data["enabled"] = False
 
-            b = SourceDataBuilder(self.conn, link_data=clean_data)
+            b = self.source_builder.build(link_data=clean_data)
             b.add_from_props()
 
         # TODO cleanup
@@ -315,6 +316,8 @@ class JsonImporter(object):
             data = json.loads(contents)
 
             settings = {"verbose": False}
-            return MapImporter(conn = self.conn, user = self.user, import_settings = settings).import_from_data(data)
+            source_builder = SourceDataBuilder(conn = self.conn)
+            entry_builder = EntryDataBuilder(conn=self.conn)
+            return MapImporter(source_builder=source_builder, entry_builder=entry_builder, user = self.user, import_settings = settings).import_from_data(data)
 
         return False

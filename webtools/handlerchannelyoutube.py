@@ -1,7 +1,8 @@
 import traceback
 
 from .defaulturlhandler import DefaultChannelHandler
-from .webtools import RssPage, PageResponseObject
+from .webtools import PageResponseObject
+from .pages import RssPage
 from .handlerhttppage import HttpPageHandler
 
 

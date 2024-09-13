@@ -1,3 +1,11 @@
+from utils.logger import Logger
+
+from utils.sqlmodel import (
+    SqlModel,
+    EntriesTable,
+)
+
+
 class GenericEntryController(object):
     def __init__(self, entry, console=False):
         self.entry = entry
@@ -66,3 +74,84 @@ class GenericEntryController(object):
         If there is a dead date -> it is dead. Period.
         """
         return self.entry.date_dead_since is not None
+
+
+class EntryDataBuilder(object):
+    """
+    """
+
+    def __init__(
+        self,
+        conn,
+        link=None,
+        link_data=None,
+        source_is_auto=True,
+        allow_recursion=True,
+        ignore_errors=False,
+    ):
+        self.link = link
+        self.link_data = link_data
+        self.source_is_auto = source_is_auto
+        self.allow_recursion = allow_recursion
+
+        self.ignore_errors = ignore_errors
+        c = Configuration.get_object().config_entry
+        if c.accept_dead:
+            self.ignore_errors = True
+
+        self.result = None
+
+        if self.link:
+            self.build_from_link()
+
+        if self.link_data:
+            self.build_from_props(ignore_errors=self.ignore_errors)
+
+    def build(self,
+        link=None,
+        link_data=None,
+        source_is_auto=True,
+        allow_recursion=True,
+        ignore_errors=False):
+
+        self.link = link
+        self.link_data = link_data
+
+        if self.link:
+            self.build_from_link()
+
+        if self.link_data:
+            self.build_from_props(ignore_errors=self.ignore_errors)
+
+    def build_from_link(self, ignore_errors=False):
+        """
+        TODO extract this to a separate class?
+        """
+        from webtools import Url, UrlPropertyValidator
+        self.ignore_errors = ignore_errors
+        self.link = Url.get_cleaned_link(self.link)
+        if not self.link:
+            return
+
+        url = Url(self.link)
+        self.link_data = url.get_properties()
+        self.build_from_props()
+
+    def build_from_props(self, ignore_errors=False):
+        from webtools import Url, UrlPropertyValidator
+        self.ignore_errors = ignore_errors
+
+        url = self.link_data["link"]
+        if not url:
+            return
+
+        obj = None
+
+        self.link_data["link"] = Url.get_cleaned_link(self.link_data["link"])
+        self.link = self.link_data["link"]
+
+        Session = self.get_session()
+        with Session() as session:
+            table = EntriesTable(**self.link_data)
+            session.add(table)
+            session.commit()

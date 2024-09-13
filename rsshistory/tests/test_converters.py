@@ -1,4 +1,4 @@
-from ..serializers import PageSystem, MarkDownConverter, MarkDownDynamicConverter
+from utils.serializers import PageSystem, MarkDownConverter, MarkDownDynamicConverter
 
 from .fakeinternet import FakeInternetTestCase
 

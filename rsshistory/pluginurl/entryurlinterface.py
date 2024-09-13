@@ -5,6 +5,7 @@ from webtools import (
     DomainAwarePage,
     DefaultContentPage,
     HttpPageHandler,
+    UrlAgeModerator,
 )
 
 from ..apps import LinkDatabase
@@ -12,7 +13,7 @@ from ..controllers import SourceDataController
 from ..configuration import Configuration
 from ..models import AppLogging
 
-from .urlhandler import UrlHandler, UrlAgeModerator
+from .urlhandler import UrlHandler
 
 
 class YouTubeException(Exception):

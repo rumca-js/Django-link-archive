@@ -53,12 +53,13 @@ class SourceUrlInterface(object):
             rss = OpenRss(self.url)
             link = rss.find_rss_link()
             if link:
-                url = Url(link)
-                url.get_response()
+                if self.url != link:
+                    url = UrlHandler(link)
+                    url.get_response()
 
-                self.url = link
-                self.u = url
-                return self.get_props_from_rss(input_props)
+                    self.url = link
+                    self.u = url
+                    return self.get_props_from_rss(input_props)
 
             if url_object:
                 self.url = url_object.url

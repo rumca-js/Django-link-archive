@@ -1,4 +1,5 @@
 from datetime import timedelta
+from django.contrib.auth.models import User
 
 from utils.dateutils import DateUtils
 
@@ -24,7 +25,11 @@ class EntryDataBuilderTest(FakeInternetTestCase):
         LinkDataController.objects.all().delete()
         ArchiveLinkDataController.objects.all().delete()
 
-    def test_add_from_props_no_slash(self):
+        self.user = User.objects.create_user(
+            username="TestUser", password="testpassword", is_staff=True
+        )
+
+    def test_build_from_props_no_slash(self):
         config = Configuration.get_object().config_entry
         config.accept_not_domain_entries = True
         config.accept_domains = False
@@ -52,15 +57,18 @@ class EntryDataBuilderTest(FakeInternetTestCase):
         }
 
         b = EntryDataBuilder()
+        b.user = self.user
         b.link_data = link_data
         # call tested function
-        entry = b.add_from_props()
+        entry = b.build_from_props()
 
         objs = LinkDataController.objects.filter(link=link_name)
 
         self.assertEqual(objs.count(), 1)
         self.assertEqual(objs[0].link, link_name)
         self.assertEqual(objs[0].date_published, creation_date)
+        self.assertEqual(objs[0].user_object, self.user)
+
         self.assertEqual(objs[0].page_rating_contents, 23)
         # votes are reset
         self.assertEqual(objs[0].page_rating_votes, 0)
@@ -72,7 +80,7 @@ class EntryDataBuilderTest(FakeInternetTestCase):
         # this is obtained not through page requests
         self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
-    def test_add_from_props_with_slash(self):
+    def test_build_from_props_with_slash(self):
         config = Configuration.get_object().config_entry
         config.accept_not_domain_entries = True
         config.accept_domains = False
@@ -93,7 +101,7 @@ class EntryDataBuilderTest(FakeInternetTestCase):
         b = EntryDataBuilder()
         b.link_data = link_data
         # call tested function
-        entry = b.add_from_props()
+        entry = b.build_from_props()
 
         objs = LinkDataController.objects.filter(link="https://youtube.com/v=1234/")
         self.assertEqual(objs.count(), 0)
@@ -103,7 +111,7 @@ class EntryDataBuilderTest(FakeInternetTestCase):
 
         self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
-    def test_add_from_props_uppercase(self):
+    def test_build_from_props_uppercase(self):
         config = Configuration.get_object().config_entry
         config.accept_not_domain_entries = True
         config.accept_domains = False
@@ -124,7 +132,7 @@ class EntryDataBuilderTest(FakeInternetTestCase):
         b = EntryDataBuilder()
         b.link_data = link_data
         # call tested function
-        entry = b.add_from_props()
+        entry = b.build_from_props()
 
         objs = LinkDataController.objects.filter(link="https://youtube.com/v=1234/")
         self.assertEqual(objs.count(), 0)
@@ -134,7 +142,7 @@ class EntryDataBuilderTest(FakeInternetTestCase):
 
         self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
-    def test_add_from_props_not_adds(self):
+    def test_build_from_props_not_adds(self):
         DomainsController.objects.all().delete()
         LinkDataController.objects.all().delete()
 
@@ -162,14 +170,14 @@ class EntryDataBuilderTest(FakeInternetTestCase):
         b = EntryDataBuilder(source_is_auto=True)
         b.link_data = link_data
         # call tested function
-        entry = b.add_from_props()
+        entry = b.build_from_props()
 
         objs = LinkDataController.objects.all()
         self.assertEqual(objs.count(), 0)
 
         self.assertEqual(MockRequestCounter.mock_page_requests, 0)
 
-    def test_add_from_props_adds_domain(self):
+    def test_build_from_props_adds_domain(self):
         DomainsController.objects.all().delete()
         LinkDataController.objects.all().delete()
 
@@ -196,7 +204,7 @@ class EntryDataBuilderTest(FakeInternetTestCase):
         b = EntryDataBuilder(source_is_auto=True)
         b.link_data = link_data
         # call tested function
-        entry = b.add_from_props()
+        entry = b.build_from_props()
 
         objs = LinkDataController.objects.all()
         domains = DomainsController.objects.all()
@@ -227,7 +235,7 @@ class EntryDataBuilderTest(FakeInternetTestCase):
         b = EntryDataBuilder(source_is_auto=True)
         b.link_data = link_data
         # call tested function
-        entry = b.add_from_props()
+        entry = b.build_from_props()
 
         objs = LinkDataController.objects.all()
         domains = DomainsController.objects.all()
@@ -271,12 +279,12 @@ class EntryDataBuilderTest(FakeInternetTestCase):
         b = EntryDataBuilder()
         b.link_data = link_data
         # call tested function
-        entry = b.add_from_props()
+        entry = b.build_from_props()
 
         objs = LinkDataController.objects.filter(link=link_name)
         self.assertEqual(objs.count(), 0)
 
-    def test_add_from_props__ipv4_rejects(self):
+    def test_build_from_props__ipv4_rejects(self):
         config = Configuration.get_object().config_entry
         config.accept_not_domain_entries = True
         config.accept_domains = False
@@ -307,13 +315,13 @@ class EntryDataBuilderTest(FakeInternetTestCase):
         b = EntryDataBuilder()
         b.link_data = link_data
         # call tested function
-        entry = b.add_from_props()
+        entry = b.build_from_props()
 
         objs = LinkDataController.objects.filter(link=link_name)
 
         self.assertEqual(objs.count(), 0)
 
-    def test_add_from_props__ipv4_accept(self):
+    def test_build_from_props__ipv4_accept(self):
         config = Configuration.get_object().config_entry
         config.accept_not_domain_entries = True
         config.accept_domains = False
@@ -344,13 +352,13 @@ class EntryDataBuilderTest(FakeInternetTestCase):
         b = EntryDataBuilder()
         b.link_data = link_data
         # call tested function
-        entry = b.add_from_props()
+        entry = b.build_from_props()
 
         objs = LinkDataController.objects.filter(link=link_name)
 
         self.assertEqual(objs.count(), 1)
 
-    def test_add_from_props__adds_date_published(self):
+    def test_build_from_props__adds_date_published(self):
         config = Configuration.get_object().config_entry
         config.accept_not_domain_entries = True
         config.accept_domains = False
@@ -374,7 +382,7 @@ class EntryDataBuilderTest(FakeInternetTestCase):
         b = EntryDataBuilder()
         b.link_data = link_data
         # call tested function
-        entry = b.add_from_props()
+        entry = b.build_from_props()
 
         objs = LinkDataController.objects.filter(link=link_name)
         self.assertEqual(objs.count(), 1)

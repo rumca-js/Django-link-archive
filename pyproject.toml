@@ -19,7 +19,7 @@ pymemcache = "^4.0.0"
 celery = "^5.3.6"
 django-celery-results = "^2.5.1"
 sqlalchemy = "^2.0.34"
-tldextract = "5.1.2"
+tldextract = "^5.1.2"
 sympy = "^1.13.2"
 beautifulsoup4 = "^4.12.2"
 spacy = "3.7.5"
@@ -29,7 +29,7 @@ spacy = "3.7.5"
 requests = "^2.25.1"
 
 # [optional]
-stealth_requests = "*"
+# stealth_requests = "*"
 
 # [optional] use things below if you want to use selenium
 # example: crawlerseleniumfull.py, crawlerseleniumheadless.py
@@ -47,7 +47,7 @@ undetected-chromedriver = "^3.5.5"
 # example: crawleebeautifulsoup.py, crawleeplaywright.py
 crawlee="^0.1.1"
 playwright="*"
-lxml="5.2.2"
+lxml="^5.2.2"
 
 # [optional] use things below if you want to use seleniumbase
 # example: crawlerseleniumbase.py

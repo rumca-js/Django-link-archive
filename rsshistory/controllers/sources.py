@@ -369,12 +369,23 @@ class SourceDataBuilder(object):
         self.manual_entry = manual_entry
 
         if self.link:
-            self.add_from_link()
+            self.build_from_link()
 
         if self.link_data:
-            self.add_from_props()
+            self.build_from_props()
 
-    def add_from_link(self):
+    def build(self, link=None, link_data=None, manual_entry=False):
+        self.link = link
+        self.link_data = link_data
+        self.manual_entry = manual_entry
+
+        if self.link:
+            self.build_from_link()
+
+        if self.link_data:
+            self.build_from_props()
+
+    def build_from_link(self):
         from ..pluginurl import UrlHandler
 
         rss_url = self.link
@@ -388,9 +399,9 @@ class SourceDataBuilder(object):
 
         self.link_data = h.get_properties()
 
-        return self.add_from_props()
+        return self.build_from_props()
 
-    def add_from_props(self):
+    def build_from_props(self):
         if "link" in self.link_data and "url" not in self.link_data:
             self.link_data["url"] = self.link_data["link"]
 

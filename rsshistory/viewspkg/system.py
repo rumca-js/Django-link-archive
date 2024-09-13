@@ -237,7 +237,6 @@ def system_status(request):
     p.context["directory"] = c.directory
 
     p.context["last_internet_status"] = SystemOperation.get_last_internet_status()
-    p.context["selenium_feataure_enabled"] = selenium_feataure_enabled
 
     last_internet_check = c.get_local_time(SystemOperation.get_last_internet_check())
     p.context["last_internet_check"] = last_internet_check
@@ -414,7 +413,7 @@ def init_sources(request):
 def init_selenium_driver(configuration_entry):
     p = Path("/usr/bin/chromedriver")
     if p.exists():
-        p.selenium_driver_path = str(p)
+        configuration_entry.selenium_driver_path = str(p)
 
 
 def wizard_setup_news(request):

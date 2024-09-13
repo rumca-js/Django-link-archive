@@ -4,12 +4,22 @@ and different output (Year, or page ordered directories)
 """
 
 from pathlib import Path
+from django.contrib.auth.models import User
 
 from utils.dateutils import DateUtils
 
 from .models import DataExport, AppLogging
-from .serializers.sourceentriesserializer import SourcesEntriesDataWriter
-from .serializers.sourcesserializer import SourceSerializerWrapper
+from .models import KeyWords
+from .controllers import DomainsController
+
+from .serializers import (
+   SourceSerializerWrapper,
+   DomainJsonExporter,
+   KeywordExporter,
+   EntryYearDataMainExporter,
+   EntryNoTimeDataMainExporter,
+   EntryDailyDataMainExporter,
+)
 
 
 class DataWriterConfiguration(object):
@@ -29,13 +39,12 @@ class BaseDataWriter(object):
         self.export_config = data_writer_config.export_config
         self.directory = data_writer_config.directory
         self.date_iso = data_writer_config.date_iso
+        self.data_writer_config = data_writer_config
 
     def get_directory(self):
         return self.directory
 
     def get_domains_json(self):
-        from .controllers import DomainsController
-        from .serializers.domainexporter import DomainJsonExporter
 
         domains = DomainsController.objects.all()
 
@@ -43,13 +52,17 @@ class BaseDataWriter(object):
         return exp.get_text(domains)
 
     def get_keywords_json(self, day_iso):
-        from .models import KeyWords
-        from .serializers.keywordexporter import KeywordExporter
 
         keywords = KeyWords.get_keyword_data()
         if len(keywords) > 0:
             exp = KeywordExporter()
             return exp.get_text(keywords)
+
+    def get_export_user(self):
+        name = self.export_config.db_user
+        user_objects = User.objects.filter(username = name)
+        if user_objects.count() > 0:
+            return user_objects[0]
 
 
 class DailyDataWriter(BaseDataWriter):
@@ -71,19 +84,24 @@ class DailyDataWriter(BaseDataWriter):
         self.write_keywords()
 
     def write_entries(self, daily_path):
+        if not self.export_config.export_entries:
+            return
+
         day_iso = self.date_iso
-
-        # TODO use config switches (enable permanent, bookmark, all switches)
-
-        writer = SourcesEntriesDataWriter(self.config)
+        writer = EntryDailyDataMainExporter(self.data_writer_config)
         writer.write_for_day(daily_path, day_iso)
 
     def write_sources(self):
-        if self.export_config.export_sources:
-            serializer = SourceSerializerWrapper()
-            serializer.export(self.get_directory(), self.config.get_sources_file_name())
+        if not self.export_config.export_sources:
+            return
+
+        serializer = SourceSerializerWrapper()
+        serializer.export(self.get_directory(), self.config.get_sources_file_name())
 
     def write_keywords(self):
+        if not self.export_config.export_keywords:
+            return
+
         day_iso = self.date_iso
         daily_path = self.get_daily_path()
 
@@ -106,23 +124,20 @@ class YearDataWriter(BaseDataWriter):
         self.write_sources()
 
     def write_entries(self):
-        from .serializers.bookmarksexporter import BookmarksExporter
+        if not self.export_config.export_entries:
+            return
 
-        if self.export_config.export_entries_bookmarks:
-            exporter = BookmarksExporter(
-                self.config, username=self.export_config.db_user
-            )
-            exporter.export(self.get_directory())
-
-        if self.export_config.export_entries_permanents:
-            AppLogging.error(
-                "Bookmark exporting for year structure is not yet supported"
-            )
+        exporter = EntryYearDataMainExporter(
+            self.data_writer_config, user=self.get_export_user()
+        )
+        exporter.export(self.get_directory())
 
     def write_sources(self):
-        if self.export_config.export_sources:
-            serializer = SourceSerializerWrapper()
-            serializer.export(self.get_directory(), self.config.get_sources_file_name())
+        if not self.export_config.export_sources:
+            return
+
+        serializer = SourceSerializerWrapper()
+        serializer.export(self.get_directory(), self.config.get_sources_file_name())
 
 
 class NoTimeDataWriter(BaseDataWriter):
@@ -138,21 +153,18 @@ class NoTimeDataWriter(BaseDataWriter):
         self.write_sources()
 
     def write_entries(self):
-        from .serializers.permanententriesexporter import PermanentEntriesExporter
+        if not self.export_config.export_entries:
+            return
 
-        if self.export_config.export_entries_permanents:
-            exporter = PermanentEntriesExporter(self.config)
-            exporter.export("permanents", self.get_directory())
-
-        if self.export_config.export_entries_bookmarks:
-            AppLogging.error(
-                "Bookmark exporting for no time structure is not yet supported"
-            )
+        exporter = EntryNoTimeDataMainExporter(self.data_writer_config)
+        exporter.export("permanents", self.get_directory())
 
     def write_sources(self):
-        if self.export_config.export_sources:
-            serializer = SourceSerializerWrapper()
-            serializer.export(self.get_directory(), self.config.get_sources_file_name())
+        if not self.export_config.export_sources:
+            return
+
+        serializer = SourceSerializerWrapper()
+        serializer.export(self.get_directory(), self.config.get_sources_file_name())
 
 
 class DataWriter(object):

@@ -28,13 +28,24 @@ class EntryDataBuilder(object):
     def get_session(self):
         return self.conn.get_session()
 
-    def add(self):
-        if self.link_data:
-            self.add_from_props()
-        elif self.link:
-            self.add_from_link()
+    def build(self,
+        link=None,
+        link_data=None,
+        manual_entry=False,
+        allow_recursion=True,
+        ignore_errors=False):
 
-    def add_from_link(self):
+        if link:
+            self.link = link
+        if link_data:
+            self.link_data = link_data
+
+        if self.link_data:
+            self.build_from_props()
+        elif self.link:
+            self.build_from_link()
+
+    def build_from_link(self):
         rss_url = self.link
 
         if rss_url.endswith("/"):
@@ -46,9 +57,9 @@ class EntryDataBuilder(object):
 
         self.link_data = h.get_properties()
 
-        return self.add_from_props()
+        return self.build_from_props()
 
-    def add_from_props(self):
+    def build_from_props(self):
         Session = self.get_session()
         with Session() as session:
             table = EntriesTable(**self.link_data)

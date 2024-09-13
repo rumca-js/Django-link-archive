@@ -11,6 +11,8 @@ from webtools import (
     HttpRequestBuilder,
     ContentLinkParser,
     DomainAwarePage,
+    UrlPropertyValidator,
+    UrlAgeModerator,
 )
 from utils.dateutils import DateUtils
 
@@ -470,7 +472,6 @@ class EntryUpdater(object):
         return True
 
     def update_entry(self, url_handler):
-        from ..pluginurl import UrlAgeModerator
 
         entry = self.entry
 
@@ -691,7 +692,7 @@ class EntryUpdater(object):
             rss_urls = url_handler.p.get_rss_urls()
 
             for rss_url in rss_urls:
-                SourceDataBuilder(link=rss_url).add_from_link()
+                SourceDataBuilder(link=rss_url).build_from_link()
 
     def calculate_vote(self):
         """
@@ -835,9 +836,10 @@ class EntryWrapper(object):
     Provides API to make links more uniform (http vs https)
     """
 
-    def __init__(self, link=None, date=None, entry=None):
+    def __init__(self, link=None, date=None, entry=None, user=None):
         self.date = date
         self.entry = entry
+        self.user = user
 
         if self.entry:
             self.link = self.entry.link
@@ -961,6 +963,9 @@ class EntryWrapper(object):
 
         if "id" in link_data:
             del link_data["id"]
+
+        if self.user:
+            link_data["user_object"] = self.user
 
         try:
             if not is_archive:
@@ -1305,6 +1310,7 @@ class EntryDataBuilder(object):
         link=None,
         link_data=None,
         source_is_auto=True,
+        user=None,
         allow_recursion=True,
         ignore_errors=False,
     ):
@@ -1312,6 +1318,7 @@ class EntryDataBuilder(object):
         self.link_data = link_data
         self.source_is_auto = source_is_auto
         self.allow_recursion = allow_recursion
+        self.user = user
 
         self.ignore_errors = ignore_errors
         c = Configuration.get_object().config_entry
@@ -1321,12 +1328,28 @@ class EntryDataBuilder(object):
         self.result = None
 
         if self.link:
-            self.add_from_link()
+            self.build_from_link()
 
         if self.link_data:
-            self.add_from_props(ignore_errors=self.ignore_errors)
+            self.build_from_props(ignore_errors=self.ignore_errors)
 
-    def add_from_link(self, ignore_errors=False):
+    def build(self,
+        link=None,
+        link_data=None,
+        source_is_auto=True,
+        allow_recursion=True,
+        ignore_errors=False):
+
+        self.link = link
+        self.link_data = link_data
+
+        if self.link:
+            self.build_from_link()
+
+        if self.link_data:
+            self.build_from_props(ignore_errors=self.ignore_errors)
+
+    def build_from_link(self, ignore_errors=False):
         from ..pluginurl import UrlHandler
 
         """
@@ -1339,11 +1362,11 @@ class EntryDataBuilder(object):
 
         p = DomainAwarePage(self.link)
         if p.is_link_service():
-            return self.add_from_link_service()
+            return self.build_from_link_service()
         else:
-            return self.add_from_normal_link()
+            return self.build_from_normal_link()
 
-    def add_from_link_service(self):
+    def build_from_link_service(self):
         from ..pluginurl import EntryUrlInterface
 
         url = EntryUrlInterface(self.link, ignore_errors=self.ignore_errors)
@@ -1358,9 +1381,9 @@ class EntryDataBuilder(object):
             return
 
         self.link_data = link_data
-        return self.add_from_props(ignore_errors=self.ignore_errors)
+        return self.build_from_props(ignore_errors=self.ignore_errors)
 
-    def add_from_normal_link(self):
+    def build_from_normal_link(self):
         from ..pluginurl import EntryUrlInterface
 
         """
@@ -1400,7 +1423,7 @@ class EntryDataBuilder(object):
         self.merge_link_data(link_data)
 
         if self.link_data:
-            return self.add_from_props_internal()
+            return self.build_from_props_internal()
         else:
             if Configuration.get_object().config_entry.debug_mode:
                 AppLogging.debug(
@@ -1438,7 +1461,7 @@ class EntryDataBuilder(object):
 
         return True
 
-    def add_from_props(self, ignore_errors=False):
+    def build_from_props(self, ignore_errors=False):
         from ..pluginurl import UrlHandler
 
         self.ignore_errors = ignore_errors
@@ -1458,13 +1481,11 @@ class EntryDataBuilder(object):
             self.result = entry
             return entry
 
-        entry = self.add_from_props_internal()
+        entry = self.build_from_props_internal()
         self.result = entry
         return entry
 
-    def add_from_props_internal(self):
-        from ..pluginurl import UrlPropertyValidator
-
+    def build_from_props_internal(self):
         entry = None
 
         self.link_data = self.get_clean_link_data()
@@ -1553,7 +1574,7 @@ class EntryDataBuilder(object):
         AppLogging.debug("Adding link: {}".format(new_link_data["link"]))
 
         wrapper = EntryWrapper(
-            link=new_link_data["link"], date=new_link_data["date_published"]
+            link=new_link_data["link"], date=new_link_data["date_published"], user=self.user
         )
 
         return wrapper.create(new_link_data)

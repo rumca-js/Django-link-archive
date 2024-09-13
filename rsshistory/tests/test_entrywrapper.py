@@ -128,7 +128,7 @@ class EntryWrapperTest(FakeInternetTestCase):
 
         b = EntryDataBuilder()
         b.link_data = link_data
-        entry = b.add_from_props()
+        entry = b.build_from_props()
 
         objs = LinkDataController.objects.filter(link=link_name)
         self.assertEqual(objs.count(), 1)
@@ -163,7 +163,7 @@ class EntryWrapperTest(FakeInternetTestCase):
 
         b = EntryDataBuilder()
         b.link_data = link_data
-        entry = b.add_from_props()
+        entry = b.build_from_props()
 
         objs = LinkDataController.objects.filter(link=link_name)
         self.assertEqual(objs.count(), 1)
@@ -199,7 +199,7 @@ class EntryWrapperTest(FakeInternetTestCase):
 
         b = EntryDataBuilder()
         b.link_data = link_data
-        entry = b.add_from_props()
+        entry = b.build_from_props()
 
         objs = LinkDataController.objects.filter(link=link_name)
         self.assertEqual(objs.count(), 1)

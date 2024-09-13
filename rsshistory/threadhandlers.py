@@ -529,7 +529,7 @@ class LinkAddJobHandler(BaseJobHandler):
             AppLogging.error("Someone posted wrong link:{}".format(link))
             return
 
-        entry = b.add_from_link()
+        entry = b.build_from_link()
 
         if not entry:
             # TODO send notification?

@@ -1,6 +1,6 @@
 import logging
 import traceback
-from ..models import AppLogging
+from utils.logger import Logger
 
 
 class PageSystem(object):
@@ -9,9 +9,7 @@ class PageSystem(object):
     https://djangosnippets.org/snippets/1170/
     https://nextlinklabs.com/resources/insights/django-big-data-iteration
 
-    TODO maybe replace with paginator
-
-    clean code - we might want to not be dependant on some other library. We want to be independent
+    paginator resides in django. We do not want to be dependent on django.
     """
 
     def __init__(self, no_entries, no_entries_per_page):
@@ -186,7 +184,7 @@ class MarkDownConverter(ItemConverterFabric):
             t = Template(self.item_template)
             return t.safe_substitute(map_data)
         except Exception as E:
-            AppLogging.exc(
+            Logger.exc(
                 "Template exception {0} {1}".format(
                     self.item_template,
                     str(map_data),
@@ -245,7 +243,7 @@ class MarkDownConverter(ItemConverterFabric):
             t = Template(self.item_template)
             return t.safe_substitute(map_data)
         except Exception as E:
-            AppLogging.exc(
+            Logger.exc(
                 E,
                 "Template exception {0} {1}".format(
                     self.item_template,
@@ -280,7 +278,7 @@ class MarkDownSourceConverter(object):
             t = Template(self.item_template)
             return t.safe_substitute(map_data)
         except Exception as E:
-            AppLogging.exc(
+            Logger.exc(
                 E,
                 "Template exception {0} {1}".format(
                     self.item_template,

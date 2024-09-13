@@ -187,7 +187,7 @@ def add_source(request):
             b = SourceDataBuilder()
             b.link_data = form.cleaned_data
             b.manual_entry = True
-            source = b.add_from_props()
+            source = b.build_from_props()
 
             if not source:
                 p.context["summary_text"] = "Cannot add source"

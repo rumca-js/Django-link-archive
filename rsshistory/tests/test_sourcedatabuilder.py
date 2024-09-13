@@ -14,7 +14,7 @@ class SourceDataBuilderTest(FakeInternetTestCase):
 
         SourceDataController.objects.all().delete()
 
-    def test_add_from_props__ads_job(self):
+    def test_build_from_props__ads_job(self):
         # call tested function
         SourceDataBuilder(
             link_data={
@@ -26,7 +26,7 @@ class SourceDataBuilderTest(FakeInternetTestCase):
                 "enabled": True,
             },
             manual_entry=False,
-        ).add_from_props()
+        ).build_from_props()
 
         # automatic entry creates disabled sources, that are not fetched
         sources = SourceDataController.objects.all()
@@ -44,7 +44,7 @@ class SourceDataBuilderTest(FakeInternetTestCase):
                 "export_to_cms": False,
             },
             manual_entry=True,
-        ).add_from_props()
+        ).build_from_props()
 
         # manual entry adds a new active source, that is fetched
         sources = SourceDataController.objects.all()
@@ -69,7 +69,7 @@ class SourceDataBuilderTest(FakeInternetTestCase):
                 "enabled": False,
             },
             manual_entry=True,
-        ).add_from_props()
+        ).build_from_props()
 
         # manual entry adds a new active source, that is fetched
         sources = SourceDataController.objects.all()
@@ -92,7 +92,7 @@ class SourceDataBuilderTest(FakeInternetTestCase):
                 "enabled": True,
             },
             manual_entry=True,
-        ).add_from_props()
+        ).build_from_props()
 
         # manual entry adds a new active source, that is fetched
         sources = SourceDataController.objects.all()
@@ -128,7 +128,7 @@ class SourceDataBuilderTest(FakeInternetTestCase):
             "export_to_cms": False,
         }
 
-        source = b.add_from_props()
+        source = b.build_from_props()
 
         self.assertTrue(not source)
         self.assertEqual(SourceDataController.objects.all().count(), 1)
@@ -146,7 +146,7 @@ class SourceDataBuilderTest(FakeInternetTestCase):
             "export_to_cms": False,
             "favicon": "https://linkedin.com/images/favicon.ico",
         }
-        source = b.add_from_props()
+        source = b.build_from_props()
 
         self.print_errors()
 

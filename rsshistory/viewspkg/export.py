@@ -18,7 +18,7 @@ from ..controllers import (
 )
 from ..views import ViewPage
 from ..forms import DataExportForm
-from ..serializers import ReadingListFile
+from utils.services import ReadingListFile
 
 
 def data_export_add(request):

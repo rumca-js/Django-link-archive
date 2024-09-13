@@ -13,8 +13,6 @@ import subprocess
 from utils.dateutils import DateUtils
 
 from .webtools import (
-    RssPage,
-    HtmlPage,
     PageResponseObject,
     WebLogger,
     get_request_to_bytes,
@@ -26,19 +24,15 @@ from .webtools import (
     HTTP_STATUS_CODE_FILE_TOO_BIG,
     HTTP_STATUS_CODE_PAGE_UNSUPPORTED,
 )
+from .pages import (
+    RssPage,
+    HtmlPage,
+)
 
 from .ipc import (
     string_to_command,
     SocketConnection,
 )
-
-requests_feataure_enabled = True
-try:
-    import requests
-except Exception as E:
-    print(str(E))
-    requests_feataure_enabled = False
-
 
 selenium_feataure_enabled = True
 try:
@@ -69,6 +63,8 @@ class CrawlerInterface(object):
          - does its job
          - sets self.response
          - clears everything from memory, it created
+
+        if crawler can access web, then should return response (may be invalid)
 
         @return response, None if feature is not available
         """
@@ -137,6 +133,9 @@ class CrawlerInterface(object):
 
         return True
 
+    def is_valid(self):
+        return False
+
     def close(self):
         pass
 
@@ -155,7 +154,7 @@ class RequestsCrawler(CrawlerInterface):
         )
 
     def run(self):
-        if not requests_feataure_enabled:
+        if not self.is_valid():
             return
 
         WebLogger.debug("Requests Driver:{}".format(self.request.url))
@@ -164,6 +163,13 @@ class RequestsCrawler(CrawlerInterface):
         stream argument allows us to read header before we fetch the page.
         SSL verification makes everything to work slower.
         """
+
+        self.response = PageResponseObject(
+            self.request.url,
+            text=None,
+            status_code=HTTP_STATUS_CODE_EXCEPTION,
+            request_url=self.request.url,
+        )
 
         try:
             request_result = self.build_requests()
@@ -287,6 +293,7 @@ class RequestsCrawler(CrawlerInterface):
         """
         stream argument - will fetch page contents, when we access contents of page.
         """
+        import requests
 
         request_result = requests.get(
             self.request.url,
@@ -297,6 +304,14 @@ class RequestsCrawler(CrawlerInterface):
         )
 
         return request_result
+
+    def is_valid(self):
+        try:
+            import requests
+            return True
+        except Exception as E:
+            print(str(E))
+            return False
 
 
 class StealthRequestsCrawler(CrawlerInterface):
@@ -313,11 +328,15 @@ class StealthRequestsCrawler(CrawlerInterface):
         )
 
     def run(self):
-        try:
-            import stealth_requests as requests
-        except Exception as E:
-            print("Cannot import stealth_requests")
+        if not self.is_valid():
             return
+
+        self.response = PageResponseObject(
+            self.request.url,
+            text=None,
+            status_code=HTTP_STATUS_CODE_EXCEPTION,
+            request_url=self.request.url,
+        )
 
         answer = requests.get(self.request.url)
 
@@ -330,6 +349,13 @@ class StealthRequestsCrawler(CrawlerInterface):
             )
 
             return self.response
+
+    def is_valid(self):
+        try:
+            import stealth_requests as requests
+            return True
+        except Exception as E:
+            return False
 
 
 class SeleniumDriver(CrawlerInterface):
@@ -492,12 +518,19 @@ class SeleniumChromeHeadless(SeleniumDriver):
 
         Headless might not be enough to fool cloudflare.
         """
-        if not selenium_feataure_enabled:
+        if not self.is_valid():
             return
 
         self.driver = self.get_driver()
         if not self.driver:
             return
+
+        self.response = PageResponseObject(
+            self.request.url,
+            text=None,
+            status_code=HTTP_STATUS_CODE_EXCEPTION,
+            request_url=self.request.url,
+        )
 
         WebLogger.debug("SeleniumChromeHeadless Driver:{}".format(self.request.url))
 
@@ -546,6 +579,9 @@ class SeleniumChromeHeadless(SeleniumDriver):
             )
 
         return self.response
+
+    def is_valid(self):
+        return selenium_feataure_enabled
 
 
 class SeleniumChromeFull(SeleniumDriver):
@@ -604,12 +640,19 @@ class SeleniumChromeFull(SeleniumDriver):
 
         https://stackoverflow.com/questions/50642308/webdriverexception-unknown-error-devtoolsactiveport-file-doesnt-exist-while-t
         """
-        if not selenium_feataure_enabled:
+        if not self.is_valid():
             return
 
         self.driver = self.get_driver()
         if not self.driver:
             return
+
+        self.response = PageResponseObject(
+            self.request.url,
+            text=None,
+            status_code=HTTP_STATUS_CODE_EXCEPTION,
+            request_url=self.request.url,
+        )
 
         WebLogger.debug("SeleniumChromeFull Driver:{}".format(self.request.url))
 
@@ -656,6 +699,9 @@ class SeleniumChromeFull(SeleniumDriver):
 
         return self.response
 
+    def is_valid(self):
+        return selenium_feataure_enabled
+
 
 class SeleniumUndetected(SeleniumDriver):
     """
@@ -687,10 +733,19 @@ class SeleniumUndetected(SeleniumDriver):
 
         This does not work on raspberry pi
         """
+        if not self.is_valid():
+            return
 
         self.driver = self.get_driver()
         if not self.driver:
             return
+
+        self.response = PageResponseObject(
+            self.request.url,
+            text=None,
+            status_code=HTTP_STATUS_CODE_EXCEPTION,
+            request_url=self.request.url,
+        )
 
         WebLogger.debug("SeleniumUndetected Driver:{}".format(self.request.url))
 
@@ -729,6 +784,13 @@ class SeleniumUndetected(SeleniumDriver):
 
         return self.response
 
+    def is_valid(self):
+        try:
+            import undetected_chromedriver as uc
+            return True
+        except Exception as E:
+            return False
+
 
 class ScriptCrawler(CrawlerInterface):
     """
@@ -744,8 +806,15 @@ class ScriptCrawler(CrawlerInterface):
         self.script = script
 
     def run(self):
-        if not self.script:
+        if not self.is_valid():
             return
+
+        self.response = PageResponseObject(
+            self.request.url,
+            text=None,
+            status_code=HTTP_STATUS_CODE_EXCEPTION,
+            request_url=self.request.url,
+        )
 
         file_path = os.path.realpath(__file__)
         full_path = Path(file_path)
@@ -817,6 +886,12 @@ class ScriptCrawler(CrawlerInterface):
         if response_file_location.exists():
             response_file_location.unlink()
 
+    def is_valid(self):
+        if not self.script:
+            return False
+
+        return True
+
 
 class ServerCrawler(CrawlerInterface):
     """
@@ -829,9 +904,15 @@ class ServerCrawler(CrawlerInterface):
         self.connection = None
 
     def run(self):
-        if not self.script:
-            WebLogger.error("Script was not set in the sever crawler")
+        if not self.is_valid():
             return
+
+        self.response = PageResponseObject(
+            self.request.url,
+            text=None,
+            status_code=HTTP_STATUS_CODE_EXCEPTION,
+            request_url=self.request.url,
+        )
 
         script_time_start = DateUtils.get_datetime_now_utc()
 
@@ -927,4 +1008,10 @@ class ServerCrawler(CrawlerInterface):
     def close(self):
         if self.connection:
             self.connection.close()
+
+    def is_valid(self):
+        if not self.script:
+            return False
+
+        return True
 

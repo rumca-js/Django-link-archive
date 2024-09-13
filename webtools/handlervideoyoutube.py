@@ -1,7 +1,8 @@
 from urllib.parse import urlparse
 from urllib.parse import parse_qs
 
-from .webtools import HtmlPage, ContentInterface, PageResponseObject, WebLogger
+from .webtools import PageResponseObject, WebLogger
+from .pages import HtmlPage, ContentInterface
 from .defaulturlhandler import DefaultUrlHandler
 
 

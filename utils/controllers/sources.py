@@ -18,13 +18,13 @@ class SourceDataBuilder(object):
     def get_session(self):
         return self.conn.get_session()
 
-    def add(self):
+    def build(link=None, link_data=None, manual_entry=False):
         if self.link_data:
-            self.add_from_props()
+            self.build_from_props()
         elif self.link:
-            self.add_from_link()
+            self.build_from_link()
 
-    def add_from_link(self):
+    def build_from_link(self):
         rss_url = self.link
 
         if rss_url.endswith("/"):
@@ -36,9 +36,9 @@ class SourceDataBuilder(object):
 
         self.link_data = h.get_properties()
 
-        return self.add_from_props()
+        return self.build_from_props()
 
-    def add_from_props(self):
+    def build_from_props(self):
         result = False
 
         Session = self.get_session()

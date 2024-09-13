@@ -1,5 +1,6 @@
 from .defaulturlhandler import DefaultUrlHandler, DefaultChannelHandler
-from .webtools import RssPage, DomainAwarePage
+from .webtools import DomainAwarePage
+from .pages import RssPage
 
 
 class RedditChannelHandler(DefaultChannelHandler):

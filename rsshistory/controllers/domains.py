@@ -304,13 +304,13 @@ class DomainsController(Domains):
             if missing_entry:
                 b = EntryDataBuilder()
                 b.link = full_domain
-                obj = b.add_from_link()
+                obj = b.build_from_link()
                 if obj:
                     domain.protocol = "https"
                     domain.save()
                 else:
                     b.link = full_domain_http
-                    obj = b.add_from_link()
+                    obj = b.build_from_link()
                     if obj:
                         domain.protocol = "http"
                         domain.save()

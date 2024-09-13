@@ -204,6 +204,9 @@ class DataExportForm(forms.ModelForm):
             "export_entries_permanents",
             "export_sources",
             "export_time",
+            "format_json",
+            "format_md",
+            "format_rss",
         ]
 
     def __init__(self, *args, **kwargs):
@@ -479,7 +482,7 @@ class EntryForm(forms.ModelForm):
             "bookmarked",
             "permanent",
             "language",
-            "user",
+            "user_object",
             "artist",
             "album",
             "age",
@@ -513,7 +516,7 @@ class EntryForm(forms.ModelForm):
         self.fields["artist"].required = False
         self.fields["album"].required = False
         self.fields["bookmarked"].initial = True
-        self.fields["user"].widget.attrs["readonly"] = True
+        self.fields["user_object"].widget.attrs["readonly"] = True
         self.fields["age"].required = False
         self.fields["thumbnail"].required = False
         self.fields["manual_status_code"].required = False
@@ -542,7 +545,7 @@ class EntryArchiveForm(forms.ModelForm):
             "source",
             "bookmarked",
             "language",
-            "user",
+            "user_object",
             "artist",
             "album",
             "age",
@@ -788,7 +791,7 @@ class BasicEntryChoiceForm(forms.Form):
         self.init = UserRequest(args, kwargs)
         super().__init__(*args, **kwargs)
 
-    def create(self, sources):
+    def create(self):
         # how to unpack dynamic forms
         # https://stackoverflow.com/questions/60393884/how-to-pass-choices-dynamically-into-a-django-form
         condition1 = Q(enabled=True)  # & Q(proxy_location = "")
@@ -893,7 +896,7 @@ class EntryChoiceForm(BasicEntryChoiceForm):
     title = forms.CharField(label="title", max_length=1000, required=False)
     bookmarked = forms.BooleanField(required=False, initial=False)
     language = forms.CharField(label="language", max_length=10, required=False)
-    user = forms.CharField(label="user", max_length=500, required=False)
+    user_object = forms.CharField(label="user_object", max_length=500, required=False)
     tag = forms.CharField(label="tag", max_length=500, required=False)
     vote = forms.IntegerField(label="vote", required=False)
     artist = forms.CharField(label="artist", max_length=1000, required=False)

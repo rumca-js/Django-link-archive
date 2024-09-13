@@ -110,7 +110,7 @@ class SourceGenericPlugin(object):
             b.link_data = link_data
             b.source_is_auto = True
 
-            entry = b.add_from_props()
+            entry = b.build_from_props()
 
             # AppLogging.debug("Url:{} Title:{}. Generic plugin add:{} DONE".format(source.url, source.title, link_data["link"]))
 

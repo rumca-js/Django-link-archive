@@ -2,6 +2,8 @@
 Library package.
 
 Should be binary compatibile with django model
+
+Right now we are not able to do sO.
 """
 
 from typing import Optional

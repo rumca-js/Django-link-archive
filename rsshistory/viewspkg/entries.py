@@ -205,7 +205,6 @@ class EntriesSearchListView(generic.ListView):
         print("EntriesSearchListView:get_filter")
 
         query_filter = EntryFilter(self.request.GET, self.request.user)
-        query_filter.get_sources()
         thefilter = query_filter
         print("EntriesSearchListView:get_filter done")
         return thefilter
@@ -250,7 +249,7 @@ class EntriesSearchListView(generic.ListView):
 
     def get_form(self):
         filter_form = self.get_form_instance()
-        filter_form.create(self.query_filter.sources)
+        filter_form.create()
 
         filter_form.method = "GET"
         filter_form.action_url = self.get_form_action_link()
@@ -517,7 +516,6 @@ class EntriesArchiveListView(EntriesSearchListView):
 
     def get_filter(self):
         query_filter = EntryFilter(self.request.GET, self.request.user)
-        query_filter.get_sources()
         query_filter.set_archive_source(True)
         return query_filter
 
@@ -784,7 +782,8 @@ def add_entry(request):
             b = EntryDataBuilder()
             b.link_data = data
             b.source_is_auto = False
-            entry = b.add_from_props_internal()
+            b.user = request.user
+            entry = b.build_from_props_internal()
 
             if not entry:
                 p.context["summary_text"] = "Link was not saved"
@@ -948,8 +947,8 @@ def edit_entry(request, pk):
         return p.render("summary_present.html")
 
     ob = obs[0]
-    if ob.user is None or ob.user == "":
-        ob.user = str(request.user.username)
+    if ob.user_object is None:
+        ob.user_object = request.user
         ob.save()
 
     if ob.description:
@@ -1094,7 +1093,7 @@ def entries_search_init(request):
     p.set_title("Search entries")
 
     filter_form = EntryChoiceForm(request=request)
-    filter_form.create(SourceDataController.objects.all())
+    filter_form.create()
     filter_form.method = "GET"
     filter_form.action_url = reverse("{}:entries".format(LinkDatabase.name))
 
@@ -1136,7 +1135,7 @@ def entries_bookmarked_init(request):
     p.set_title("Bookmarked entries")
 
     filter_form = EntryBookmarksChoiceForm(request=request)
-    filter_form.create(SourceDataController.objects.all())
+    filter_form.create()
     filter_form.method = "GET"
     filter_form.action_url = reverse("{}:entries-bookmarked".format(LinkDatabase.name))
 
@@ -1154,7 +1153,7 @@ def entries_recent_init(request):
     p.set_title("Search recent entries")
 
     filter_form = EntryRecentChoiceForm(request=request)
-    filter_form.create(SourceDataController.objects.all())
+    filter_form.create()
     filter_form.method = "GET"
     filter_form.action_url = reverse("{}:entries-recent".format(LinkDatabase.name))
 
@@ -1172,7 +1171,7 @@ def entries_archived_init(request):
     p.set_title("Search archive entries")
 
     filter_form = EntryChoiceForm(request=request)
-    filter_form.create(SourceDataController.objects.all())
+    filter_form.create()
     filter_form.method = "GET"
     filter_form.action_url = reverse("{}:entries-archived".format(LinkDatabase.name))
 

@@ -14,8 +14,6 @@ from ..controllers import (
     LinkDataController,
     SourceDataController,
     SourceDataController,
-    EntryDataBuilder,
-    SourceDataBuilder,
     LinkCommentDataController,
     EntryWrapper,
 )
@@ -23,8 +21,10 @@ from ..apps import LinkDatabase
 
 
 class MapImporter(object):
-    def __init__(self, user=None, import_settings=None):
+    def __init__(self, entry_builder, source_builder, user=None, import_settings=None):
         self.user = user
+        self.entry_builder = entry_builder
+        self.source_builder = source_builder
 
         if self.user is not None:
             self.user = self.get_user(user)
@@ -136,7 +136,7 @@ class MapImporter(object):
                 # accepted and not. Let the builder deal with it
                 LinkDatabase.info("Importing link:{}".format(clean_data["link"]))
 
-                b = EntryDataBuilder(link_data=clean_data, source_is_auto=True)
+                b = self.entry_builder.build(link_data=clean_data, source_is_auto=True)
                 entry = b.result
 
                 if entry and entry.is_archive_entry():
@@ -193,7 +193,7 @@ class MapImporter(object):
         if sources.count() == 0:
             clean_data = self.drop_source_instance_internal_data(clean_data)
             clean_data["enabled"] = False
-            SourceDataBuilder(link_data=clean_data).add_from_props()
+            self.source_builder.build(link_data=clean_data)
 
         # TODO cleanup
         # else:

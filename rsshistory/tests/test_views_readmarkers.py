@@ -31,7 +31,7 @@ class ReadMarkerTests(FakeInternetTestCase):
         response = self.client.get(url)
 
         # redirect to view the link again
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 302)
 
     def test_set_source_read_marker(self):
         source = SourceDataController.objects.create(
@@ -52,4 +52,4 @@ class ReadMarkerTests(FakeInternetTestCase):
         response = self.client.get(url)
 
         # redirect to view the link again
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 302)

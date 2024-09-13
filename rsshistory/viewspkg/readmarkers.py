@@ -19,7 +19,7 @@ def set_read_marker(request):
     if data is not None:
         return data
 
-    ReadMarkers.set_general()
+    ReadMarkers.set_general(request.user)
 
     return redirect("{}:index".format(LinkDatabase.name))
 
@@ -31,8 +31,8 @@ def set_source_read_marker(request, pk):
     if data is not None:
         return data
 
-    source = SourceDataController.objects.get(pk)
+    source = SourceDataController.objects.get(id = pk)
 
-    ReadMarkers.set_source(source)
+    ReadMarkers.set_source(request.user, source)
 
     return redirect("{}:index".format(LinkDatabase.name))
