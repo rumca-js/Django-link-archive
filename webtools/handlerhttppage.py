@@ -291,7 +291,7 @@ class HttpRequestBuilder(object):
                 ConfiguredSeleniumChromeFull,
             ]
 
-            for function in preference_table:
+            for crawler in preference_table:
                 c = crawler(request=request)
                 c.run()
                 response = c.get_response()
@@ -311,7 +311,7 @@ class HttpRequestBuilder(object):
                 RequestsCrawler,
             ]
 
-            for function in preference_table:
+            for crawler in preference_table:
                 c = crawler(request=request)
                 c.run()
                 response = c.get_response()
@@ -331,7 +331,7 @@ class HttpRequestBuilder(object):
                 RequestsCrawler,
             ]
 
-            for function in preference_table:
+            for crawler in preference_table:
                 c = crawler(request=request)
                 c.run()
                 response = c.get_response()
