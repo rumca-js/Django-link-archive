@@ -132,7 +132,7 @@ class BaseSourceJsonPlugin(SourceGenericPlugin):
             # TODO this might not work
             user = c.admin_user
             i = MapImporter(entry_builder=entry_builder, source_builder = source_builder, user = user)
-            i.import_from_source(source_prop, instance_import=True)
+            i.import_from_source(source_prop)
 
     def get_links_from_links(self, links_json):
         c = Configuration.get_object().config_entry

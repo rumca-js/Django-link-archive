@@ -16,8 +16,6 @@ from ..controllers import (
     SourceDataController,
     LinkCommentDataController,
     EntryWrapper,
-    EntryDataBuilder,
-    SourceDataBuilder,
 )
 from ..apps import LinkDatabase
 
@@ -299,8 +297,6 @@ class JsonImporter(object):
         contents = read_file_contents(afile)
         if contents:
             data = json.loads(contents)
-            entry_builder = EntryDataBuilder()
-            source_builder = SourceDataBuilder()
-            return MapImporter(entry_builder=entry_builder, source_builder=source_builder, user = self.user).import_from_data(data)
+            return MapImporter(user = self.user).import_from_data(data)
 
         return False

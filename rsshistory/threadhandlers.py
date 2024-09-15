@@ -275,6 +275,9 @@ class LinkDownloadJobHandler(BaseJobHandler):
     def process(self, obj=None):
         try:
             url = obj.subject
+            AppLogging.notify(
+                "Downloading page:".format(url)
+            )
 
             Url.download_all(url)
 
@@ -307,11 +310,11 @@ class LinkMusicDownloadJobHandler(BaseJobHandler):
             artist = data["artist"]
             album = data["album"]
 
+            AppLogging.notify("Downloading music: " + url + " " + title)
+
             if not DomainAwarePage(url).is_youtube():
                 AppLogging.error("Unsupported download operation URL:{}".format(url))
                 return True
-
-            AppLogging.info("Downloading music: " + url + " " + title)
 
             file_name = self.get_file_name(data)
 

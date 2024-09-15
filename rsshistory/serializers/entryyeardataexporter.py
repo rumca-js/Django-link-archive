@@ -23,7 +23,7 @@ class EntryYearDataExporter(EntriesExporter):
     def __init__(self, data_writer_config, entries):
         super().__init__(data_writer_config, entries)
 
-    def items2mdtext(self, items):
+    def items2mdtext(self, items, source_url=None):
         column_order = ["title", "link", "date_published", "tags", "date_dead_since"]
         md = MarkDownDynamicConverter(items, column_order)
         md_text = md.export()

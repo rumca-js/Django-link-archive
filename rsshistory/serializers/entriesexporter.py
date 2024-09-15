@@ -61,9 +61,9 @@ class EntriesExporter(object):
 
         export_config = self.data_writer_config.export_config
 
-        self.add_all(items, export_path, export_file_name)
+        self.add_all(items, export_path, export_file_name, source_url)
 
-    def add_all(self, items, export_path, export_file_name):
+    def add_all(self, items, export_path, export_file_name, source_url=None):
         export_config = self.data_writer_config.export_config
         if export_config.format_json:
             json_text = self.items2jsontext(items)
@@ -71,7 +71,7 @@ class EntriesExporter(object):
             file_name.write_text(json_text)
 
         if export_config.format_md:
-            md_text = self.items2mdtext(items)
+            md_text = self.items2mdtext(items=items, source_url = source_url)
             file_name = export_path / (export_file_name + "_entries.md")
             file_name.write_text(md_text)
 
@@ -82,7 +82,10 @@ class EntriesExporter(object):
             file_name.write_text(rss_text)
 
         if export_config.format_html:
-            e = HtmlExporter(export_path / "html", self._entries)
+            p = export_path / "html"
+            if not p.exists():
+                p.mkdir(parents=True, exist_ok=True)
+            e = HtmlExporter(p, self._entries)
             e.write()
 
         if export_config.output_sqlite:
@@ -93,7 +96,7 @@ class EntriesExporter(object):
         js_converter.set_export_columns(LinkDataController.get_all_export_names())
         return js_converter.export()
 
-    def items2mdtext(self, items):
+    def items2mdtext(self, items, source_url=None):
         md = MarkDownConverter(items, self.md_template_link)
         md_text = md.export()
 

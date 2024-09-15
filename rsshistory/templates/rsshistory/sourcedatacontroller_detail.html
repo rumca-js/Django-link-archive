@@ -2,28 +2,65 @@
 {% load static %}
 {% block content %}
 
-<h1 class="link-title">
-    <a href="{{ object.url }}">
-       <div class="d-flex">
-           {% if user_config.show_icons %}
-             <img src="{{object.get_favicon}}" class="link-detail-thumbnail border rounded"/>
-           {% endif %}
-	   <div class="mx-2">
-             {{ object.title }}
-	   </div>
-       </div>
-    </a>
-</h1>
+<div class="d-flex">
+   {% if user_config.show_icons %}
 
-<div>
-  <a href="{{ object.url }}">{{ object.url }}</a>
+        {% if entry_object %}
+	<a href="{% url 'rsshistory:entry-detail' entry_object.id %}">
+		{% else %}
+	<a href="{{ object.url }}">
+		{% endif %}
+		<div>
+	     <img src="{{object.get_favicon}}" class="link-detail-thumbnail border rounded"/>
+		</div>
+	 </a>
+   {% endif %}
+   <div class="mx-2">
+		{% if entry_object %}
+		<div>
+			<h1 class="link-title" title="{{ object.url }}">
+				<a href="{% url 'rsshistory:entry-detail' entry_object.id %}">
+				 {{ object.title }}
+				 </a>
+			</h1>
+		</div>
+		{% else %}
+		<div>
+			<h1 class="link-title" title="{{ object.url }}">
+				<a href="{{ object.url }}">
+					{% include "rsshistory/icon_external.html" %}
+					{{ object.title }}
+				 </a>
+			</h1>
+		</div>
+		{% endif %}
+
+		{% if is_youtube_channel %}
+		<div>
+			  <a href="{{ page_handler.get_channel_url }}">
+				{% include "rsshistory/icon_external.html" %}
+				YouTube Channel
+			  </a>
+		</div>
+		{% endif %}
+
+		{% if entry_object %}
+		<div>
+		  <a href="{{ object.url }}">
+			 {% include "rsshistory/icon_external.html" %}
+			 {{ object.url }}
+		  </a>
+		</div>
+		{% endif %}
+
+   </div>
 </div>
 
 <hr/>
 
 {% include "rsshistory/sourcedatacontroller_detail_buttons.html" %}
 
-<div class="d-flex flex-wrap mb-2">
+<div>
 {% if object.enabled %}
     <div class="text-nowrap mx-2">Enabled: {{ object.enabled }}</div>
 {% else %}
@@ -36,14 +73,18 @@
     <div class="text-nowrap mx-2">Age: {{ object.age }}, </div>
     <div class="text-nowrap mx-2">Export to CMS: {{ object.export_to_cms }}, </div>
     <div class="text-nowrap mx-2">Remove after days: {{ object.remove_after_days }}, </div>
-    <div class="text-nowrap mx-2">Favicon:<a href="{{ object.get_favicon }}" title="{{ object.get_favicon }}">Favicon URL</a>, </div>
+    <div class="text-nowrap mx-2">Favicon: <a href="{{ object.get_favicon }}" title="{{ object.get_favicon }}">
+	   <img src="{% static 'rsshistory/icons/icons8-external-link-128.png' %}"	 class="content-icon"/>
+	   Link</a>, </div>
     <div class="text-nowrap mx-2">Source type: {{ object.source_type }}</div>
     {% if object.proxy_location %}
-    <div class="mx-2">Proxy location:<a href="{{ object.proxy_location }}">{{ object.proxy_location }}</a></div>
+    <div class="mx-2">Proxy location: <a href="{{ object.proxy_location }}">
+	     <img src="{% static 'rsshistory/icons/icons8-external-link-128.png' %}"	 class="content-icon"/>
+	     {{ object.proxy_location }}</a></div>
     {% endif %}
-    <div class="text-nowrap mx-2">Fetched:{{date_fetched}}</div>
-    <div class="text-nowrap mx-2">Import seconds:{{object.dynamic_data.import_seconds}}</div>
-    <div class="text-nowrap mx-2">Consecutive Errors:{{object.dynamic_data.consecutive_errors}}</div>
+    <div class="text-nowrap mx-2">Fetched: {{date_fetched}}</div>
+    <div class="text-nowrap mx-2">Import seconds: {{object.dynamic_data.import_seconds}}</div>
+    <div class="text-nowrap mx-2">Consecutive Errors: {{object.dynamic_data.consecutive_errors}}</div>
 </div>
 
 {% include "rsshistory/search_places_element.html" %}

@@ -56,37 +56,12 @@
      </button>
    
      <ul class="dropdown-menu">
-        {% if is_youtube_channel %}
-          <li>
-              <a href="{{ page_handler.get_channel_url }}" class="dropdown-item">
-                <img src="{% static 'rsshistory/icons/icons8-link-90.png' %}" class="content-icon" />
-                YouTube Channel
-              </a>
-          </li>
-        {% endif %}
-        {% if entry_object %}
-        <li>
-            <a href="{% url 'rsshistory:entry-detail' entry_object.id %}" class="dropdown-item">
-              <img src="{% static 'rsshistory/icons/icons8-link-90.png' %}" class="content-icon" />
-              entry
-            </a>
-        </li>
-        {% else %}
-        <li>
-            <a href="{% url 'rsshistory:entries-omni-search' %}?search=link+%3D+'{{object.url}}'" class="dropdown-item">
-              <img src="{% static 'rsshistory/icons/icons8-link-90.png' %}" class="content-icon" />
-             [S] entry
-            </a>
-        </li>
-        {% endif %}
-   
         <li>
             <a href="{% url 'rsshistory:entries-omni-search' %}?search=source+%3D+'{{object.url}}'" class="dropdown-item">
               <img src="{% static 'rsshistory/icons/icons8-link-90.png' %}" class="content-icon" />
              [S] entries
             </a>
         </li>
-   
       </ul>
    </div>
 

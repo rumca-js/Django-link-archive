@@ -170,7 +170,7 @@ class FeedClientTest(FakeInternetTestCase):
         Session = db.get_session()
         with Session() as session:
             number_of_source = (
-                session.query(SourcesTable).all().count()
+                session.query(SourcesTable).count()
             )
             self.assertEqual(number_of_source, 0)
 

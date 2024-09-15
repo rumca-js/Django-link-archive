@@ -1,12 +1,14 @@
+from pathlib import Path
 from django.contrib.auth.models import User
 
 from utils.dateutils import DateUtils
 from utils.services import ReadingList
 
 from ..serializers import MarginaliaCrawlerOutput, EntryYearDataMainExporter
-from ..models import UserBookmarks
+from ..models import UserBookmarks, DataExport
 from ..controllers import LinkDataController
 from ..configuration import Configuration
+from ..datawriter import DataWriterConfiguration
 
 from .fakeinternet import FakeInternetTestCase
 
@@ -55,6 +57,18 @@ class ReadingListTest(FakeInternetTestCase):
 class EntryYearDataMainExporterTest(FakeInternetTestCase):
     def setUp(self):
         self.disable_web_pages()
+
+        self.export = DataExport.objects.create(
+            export_type=DataExport.EXPORT_TYPE_GIT,
+            export_data=DataExport.EXPORT_YEAR_DATA,
+            local_path=".",
+            remote_path=".",
+            export_entries=True,
+            export_entries_bookmarks=True,
+            export_entries_permanents=False,
+            export_sources=True,
+        )
+
         self.user = User.objects.create_user(
             username="testuser",
             password="testpassword",
@@ -78,8 +92,12 @@ class EntryYearDataMainExporterTest(FakeInternetTestCase):
             thumbnail="thumbnail",
         )
 
+        dw_conf = DataWriterConfiguration(
+            config, self.export, Path("./data/test/year")
+        )
+
         # call tested function
-        exporter = EntryYearDataMainExporter(config, "testuser")
+        exporter = EntryYearDataMainExporter(dw_conf, "testuser")
 
         entries = exporter.get_entries(2024)
         self.assertEqual(entries.count(), 0)
@@ -105,7 +123,11 @@ class EntryYearDataMainExporterTest(FakeInternetTestCase):
             date_bookmarked=date, user_object=self.user, entry_object=entry
         )
 
-        exporter = EntryYearDataMainExporter(config, "testuser")
+        dw_conf = DataWriterConfiguration(
+            config, self.export, Path("./data/test/year")
+        )
+
+        exporter = EntryYearDataMainExporter(dw_conf, "testuser")
 
         # call tested function
         entries = exporter.get_entries(2024)
@@ -132,7 +154,11 @@ class EntryYearDataMainExporterTest(FakeInternetTestCase):
             date_bookmarked=date, user_object=self.user, entry_object=entry
         )
 
-        exporter = EntryYearDataMainExporter(config, "")
+        dw_conf = DataWriterConfiguration(
+            config, self.export, Path("./data/test/year")
+        )
+
+        exporter = EntryYearDataMainExporter(dw_conf, "")
 
         # call tested function
         entries = exporter.get_entries(2024)

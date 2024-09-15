@@ -923,7 +923,7 @@ class BackgroundJob(models.Model):
 
     class Meta:
         ordering = [
-            "enabled",
+            "-enabled",
             "priority",
             "date_created",
             "job",

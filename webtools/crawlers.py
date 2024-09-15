@@ -884,9 +884,10 @@ class ScriptCrawler(CrawlerInterface):
             )
 
     def close(self):
-        response_file_location = Path(self.response_file)
-        if response_file_location.exists():
-            response_file_location.unlink()
+        if self.response_file:
+            response_file_location = Path(self.response_file)
+            if response_file_location.exists():
+                response_file_location.unlink()
 
     def is_valid(self):
         if not self.script:
