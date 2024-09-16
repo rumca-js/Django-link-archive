@@ -8,6 +8,7 @@ from django.http import HttpResponseRedirect
 from webtools import DomainAwarePage
 from utils.dateutils import DateUtils
 from utils.services.waybackmachine import WaybackMachine
+from utils.services import ReadingListFile
 
 from ..apps import LinkDatabase
 from ..models import DataExport, ConfigurationEntry
@@ -16,9 +17,10 @@ from ..controllers import (
     SourceDataController,
     LinkDataController,
 )
+from ..configuration import Configuration
 from ..views import ViewPage
 from ..forms import DataExportForm
-from utils.services import ReadingListFile
+from ..pluginsources.rsssourceprocessor import RssSourceProcessor
 
 
 def data_export_add(request):
@@ -406,8 +408,6 @@ def import_source_from_ia_impl(wb, source_url, source_archive_url, archive_time)
     source_obj = SourceDataController.objects.filter(url=source_url)[0]
 
     c = Configuration.get_object()
-
-    from ..pluginsources.rsssourceprocessor import RssSourceProcessor
 
     proc = RssSourceProcessor(c)
     proc.allow_adding_with_current_time = False
