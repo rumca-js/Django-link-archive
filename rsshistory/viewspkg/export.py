@@ -20,7 +20,7 @@ from ..controllers import (
 from ..configuration import Configuration
 from ..views import ViewPage
 from ..forms import DataExportForm
-from ..pluginsources.rsssourceprocessor import RssSourceProcessor
+from ..pluginsources import BaseRssPlugin
 
 
 def data_export_add(request):
@@ -409,7 +409,7 @@ def import_source_from_ia_impl(wb, source_url, source_archive_url, archive_time)
 
     c = Configuration.get_object()
 
-    proc = RssSourceProcessor(c)
+    proc = BaseRssPlugin(c)
     proc.allow_adding_with_current_time = False
     proc.default_entry_timestamp = archive_time
     entries = proc.process_rss_source(source_obj, source_archive_url)
