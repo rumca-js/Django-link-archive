@@ -12,6 +12,8 @@ from ..models import Domains, AppLogging, UserBookmarks, UserTags, UserVotes
 
 from ..controllers import (
     LinkDataController,
+    EntryDataBuilder,
+    SourceDataBuilder,
     SourceDataController,
     SourceDataController,
     UserCommentsController,
@@ -297,6 +299,10 @@ class JsonImporter(object):
         contents = read_file_contents(afile)
         if contents:
             data = json.loads(contents)
-            return MapImporter(user = self.user).import_from_data(data)
+
+            entry_builder = EntryDataBuilder()
+            source_builder = SourceDataBuilder()
+
+            return MapImporter(user = self.user, entry_builder = entry_builder, source_builder=source_builder).import_from_data(data)
 
         return False
