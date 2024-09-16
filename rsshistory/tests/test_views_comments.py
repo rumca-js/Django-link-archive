@@ -5,7 +5,7 @@ from utils.dateutils import DateUtils
 
 from ..apps import LinkDatabase
 from ..controllers import SourceDataController, LinkDataController, DomainsController
-from ..models import KeyWords, DataExport, LinkCommentDataModel
+from ..models import KeyWords, DataExport, UserComments
 
 from .fakeinternet import FakeInternetTestCase
 
@@ -36,7 +36,7 @@ class CommentsViewsTests(FakeInternetTestCase):
             language="en",
         )
 
-        self.assertEqual(LinkCommentDataModel.objects.all().count(), 0)
+        self.assertEqual(UserComments.objects.all().count(), 0)
 
         url = reverse("{}:entry-comment-add".format(LinkDatabase.name), args=[entry.id])
 
@@ -58,7 +58,7 @@ class CommentsViewsTests(FakeInternetTestCase):
 
         # check that object has been changed
 
-        entries = LinkCommentDataModel.objects.filter(entry_object=entry)
+        entries = UserComments.objects.filter(entry_object=entry)
         self.assertEqual(entries.count(), 1)
 
     def test_entry_comment_edit(self):
@@ -77,7 +77,7 @@ class CommentsViewsTests(FakeInternetTestCase):
             language="en",
         )
 
-        LinkCommentDataModel.objects.create(
+        UserComments.objects.create(
             entry_object=entry, user_object=self.user, comment="comment"
         )
 
@@ -103,7 +103,7 @@ class CommentsViewsTests(FakeInternetTestCase):
 
         # check that object has been changed
 
-        entries = LinkCommentDataModel.objects.filter(entry_object=entry)
+        entries = UserComments.objects.filter(entry_object=entry)
         self.assertEqual(entries.count(), 1)
 
     def test_remove_comment(self):
@@ -122,7 +122,7 @@ class CommentsViewsTests(FakeInternetTestCase):
             language="en",
         )
 
-        LinkCommentDataModel.objects.create(
+        UserComments.objects.create(
             entry_object=entry, user_object=self.user, comment="comment"
         )
 
@@ -136,5 +136,5 @@ class CommentsViewsTests(FakeInternetTestCase):
         # redirect to view the link again
         self.assertEqual(response.status_code, 200)
 
-        entries = LinkCommentDataModel.objects.filter(entry_object=entry)
+        entries = UserComments.objects.filter(entry_object=entry)
         self.assertEqual(entries.count(), 0)

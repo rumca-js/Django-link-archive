@@ -15,7 +15,6 @@ from ..controllers import (
     SourceDataController,
     EntryDataBuilder,
     SourceDataBuilder,
-    LinkCommentDataController,
     EntryWrapper,
 )
 from ..apps import LinkDatabase

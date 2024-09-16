@@ -10,7 +10,7 @@ from utils.dateutils import DateUtils
 from .models import (
     BackgroundJob,
     UserTags,
-    LinkCommentDataModel,
+    UserComments,
     UserVotes,
     UserSearchHistory,
     DomainsSuffixes,
@@ -143,6 +143,7 @@ class ConfigForm(forms.ModelForm):
             "track_user_actions",
             "track_user_searches",
             "track_user_navigation",
+            "max_number_of_searches",
             "vote_min",
             "vote_max",
             "number_of_comments_per_day",
@@ -207,6 +208,10 @@ class DataExportForm(forms.ModelForm):
             "format_json",
             "format_md",
             "format_rss",
+            "format_html",
+            "format_sources_opml",
+            "output_zip",
+            "output_sqlite",
         ]
 
     def __init__(self, *args, **kwargs):

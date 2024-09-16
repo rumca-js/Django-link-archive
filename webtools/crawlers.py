@@ -863,7 +863,7 @@ class ScriptCrawler(CrawlerInterface):
                     WebLogger.error("Url:{}. {}".format(self.request.url, stderr_str))
 
             WebLogger.error(
-                "Url:{}. Return code invalid:{}".format(self.request.url, p.returncode)
+                "Url:{}. Script:'{}'. Return code invalid:{}".format(self.request.url, script, p.returncode)
             )
 
         if response_file_location.exists():

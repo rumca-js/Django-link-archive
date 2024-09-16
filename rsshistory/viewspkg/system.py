@@ -37,7 +37,7 @@ from ..controllers import (
     SourceDataController,
     LinkDataController,
     ArchiveLinkDataController,
-    LinkCommentDataController,
+    UserCommentsController,
     EntryDataBuilder,
     EntriesUpdater,
     BackgroundJobController,
@@ -258,7 +258,7 @@ def system_status(request):
     p.context["UserTags"] = UserTags.objects.count()
     p.context["UserVotes"] = UserVotes.objects.count()
     p.context["UserBookmarks"] = UserBookmarks.objects.count()
-    p.context["LinkCommentDataController"] = LinkCommentDataController.objects.count()
+    p.context["UserCommentsController"] = UserCommentsController.objects.count()
     p.context["UserSearchHistory"] = UserSearchHistory.objects.count()
     p.context["UserEntryVisitHistory"] = UserEntryVisitHistory.objects.count()
     p.context["UserEntryTransitionHistory"] = UserEntryTransitionHistory.objects.count()

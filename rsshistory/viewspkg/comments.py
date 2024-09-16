@@ -11,7 +11,7 @@ from ..models import (
 )
 from ..forms import CommentEntryForm
 from ..views import ViewPage
-from ..controllers import LinkCommentDataController, LinkDataController
+from ..controllers import UserCommentsController, LinkDataController
 from ..apps import LinkDatabase
 
 
@@ -23,7 +23,7 @@ def entry_add_comment(request, link_id):
         return data
 
     user_name = request.user.get_username()
-    if not LinkCommentDataController.can_user_add_comment(link_id, request.user):
+    if not UserCommentsController.can_user_add_comment(link_id, request.user):
         p.context[
             "summary_text"
         ] = "User cannot add more comments. Limit to {} comment per day".format(
@@ -43,7 +43,7 @@ def entry_add_comment(request, link_id):
             data = form.cleaned_data
             data["user"] = request.user
 
-            if LinkCommentDataController.add(request.user, link, form.cleaned_data):
+            if UserCommentsController.add(request.user, link, form.cleaned_data):
                 return HttpResponseRedirect(
                     reverse(
                         "{}:entry-detail".format(LinkDatabase.name),
@@ -85,7 +85,7 @@ def entry_comment_edit(request, pk):
     if data is not None:
         return data
 
-    comment_obj = LinkCommentDataController.objects.get(id=pk)
+    comment_obj = UserCommentsController.objects.get(id=pk)
     link = comment_obj.entry_object
 
     user = request.user
@@ -141,7 +141,7 @@ def entry_comment_remove(request, pk):
     if data is not None:
         return data
 
-    comment_obj = LinkCommentDataController.objects.get(id=pk)
+    comment_obj = UserCommentsController.objects.get(id=pk)
     link = comment_obj.entry_object
 
     if request.user.id != comment_obj.user_object.id:

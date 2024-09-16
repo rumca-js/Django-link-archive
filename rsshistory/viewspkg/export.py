@@ -67,15 +67,17 @@ def data_export_edit(request, pk):
             p.context["summary_text"] = "Form is invalid"
             return p.render("summary_present.html")
 
-    form = DataExportForm(instance=objs[0])
+    export = objs[0]
+
+    form = DataExportForm(instance=export)
     form.method = "POST"
     form.action_url = reverse(
         "{}:data-export-edit".format(LinkDatabase.name), args=[pk]
     )
 
-    p.context["config_form"] = form
+    p.context["form"] = form
 
-    return p.render("configuration.html")
+    return p.render("form_basic.html")
 
 
 def data_export_remove(request, pk):
@@ -172,6 +174,10 @@ class DataExportDetailsView(generic.DetailView):
         # Call the base implementation first to get the context
         context = super(DataExportDetailsView, self).get_context_data(**kwargs)
         context = ViewPage(self.request).init_context(context)
+
+        c = Configuration.get_object()
+
+        context["absolute_local_path"] = c.get_export_path() / self.object.local_path
 
         return context
 

@@ -6,7 +6,7 @@ from django.urls import reverse
 
 from webtools import HtmlPage, RssPage, HttpPageHandler
 
-from .models import UserConfig, ConfigurationEntry, AppLogging, ApiKeys
+from .models import UserConfig, ConfigurationEntry, AppLogging, ApiKeys, ReadLater
 from .configuration import Configuration
 from .apps import LinkDatabase
 from .configuration import Configuration
@@ -73,6 +73,7 @@ class ViewPage(object):
 
         context["user_config"] = UserConfig.get(self.request.user)
         context["is_mobile"] = self.is_mobile()
+        context["is_read_later"] = ReadLater.objects.filter(user = self.request.user).count() != 0
 
         return context
 
@@ -206,3 +207,44 @@ class ViewPage(object):
         if type(urlhandler.get_handler()) == HttpPageHandler:
             context["is_html"] = type(urlhandler.get_handler().p) == HtmlPage
             context["is_rss"] = type(urlhandler.get_handler().p) == RssPage
+
+
+class GenericListView(generic.ListView):
+    def get(self, *args, **kwargs):
+        p = ViewPage(self.request)
+        data = p.check_access()
+        if data is not None:
+            return redirect("{}:missing-rights".format(LinkDatabase.name))
+
+        self.search_user_id = None
+        self.search_user = None
+
+        if "user_id" in kwargs:
+            if not self.request.user.is_staff:
+                self.search_user_id = self.request.user.id
+            else:
+                self.search_user_id = kwargs["user_id"]
+
+            users = User.objects.filter(username = self.search_user_id)
+            if users.count() > 0:
+                self.search_user = users[0]
+
+        return super().get(*args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get the context
+        context = super().get_context_data(**kwargs)
+        context = ViewPage(self.request).init_context(context)
+
+        return context
+
+    def get_queryset(self):
+        p = ViewPage(self.request)
+        data = p.check_access()
+        if data is not None:
+            return redirect("{}:missing-rights".format(LinkDatabase.name))
+
+        if self.search_user:
+            return super().get_queryset().filter(user = self.search_user)
+        else:
+            return super().get_queryset()

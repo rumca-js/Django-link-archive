@@ -320,7 +320,7 @@ class UserVotes(models.Model):
             vote.save()
 
 
-class LinkCommentDataModel(models.Model):
+class UserComments(models.Model):
     """
     TODO change name to UserComments. Cannot do that right now. Django says no.
     """
@@ -347,7 +347,7 @@ class LinkCommentDataModel(models.Model):
     )
 
     def add(user, entry, comment):
-        return LinkCommentDataModel.objects.create(
+        return UserComments.objects.create(
             user_object=user, entry_object=entry, comment=comment
         )
 
@@ -355,7 +355,7 @@ class LinkCommentDataModel(models.Model):
         return InputContent(self.comment).htmlify()
 
     def cleanup():
-        for q in LinkCommentDataModel.objects.filter(user_object__isnull=True):
+        for q in UserComments.objects.filter(user_object__isnull=True):
             users = User.objects.filter(username=q.user)
             if users.count() > 0:
                 q.user_object = users[0]
@@ -366,9 +366,9 @@ class LinkCommentDataModel(models.Model):
                 time.sleep(0.5)
 
     def move_entry(source_entry, destination_entry):
-        comments = LinkCommentDataModel.objects.filter(entry_object=source_entry)
+        comments = UserComments.objects.filter(entry_object=source_entry)
         for comment in comments:
-            dst_comments = LinkCommentDataModel.objects.filter(
+            dst_comments = UserComments.objects.filter(
                 entry_object=destination_entry,
                 user_object=comment.user_object,
                 comment=comment.comment,

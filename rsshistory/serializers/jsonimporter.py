@@ -14,7 +14,7 @@ from ..controllers import (
     LinkDataController,
     SourceDataController,
     SourceDataController,
-    LinkCommentDataController,
+    UserCommentsController,
     EntryWrapper,
 )
 from ..apps import LinkDatabase
@@ -181,7 +181,7 @@ class MapImporter(object):
                         data["date_published"] = comment["date_published"]
                         data["date_edited"] = comment["date_edited"]
                         data["reply_id"] = comment["reply_id"]
-                        LinkCommentDataController.add(user, entry, data)
+                        UserCommentsController.add(user, entry, data)
 
         return True
 

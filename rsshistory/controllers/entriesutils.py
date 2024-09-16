@@ -1124,7 +1124,7 @@ class EntryWrapper(object):
         from ..models import (
             UserTags,
             UserVotes,
-            LinkCommentDataModel,
+            UserComments,
             UserBookmarks,
             UserEntryVisitHistory,
             UserEntryTransitionHistory,
@@ -1134,7 +1134,7 @@ class EntryWrapper(object):
 
         UserTags.move_entry(source_entry, destination_entry)
         UserVotes.move_entry(source_entry, destination_entry)
-        LinkCommentDataModel.move_entry(source_entry, destination_entry)
+        UserComments.move_entry(source_entry, destination_entry)
         UserBookmarks.move_entry(source_entry, destination_entry)
         UserEntryVisitHistory.move_entry(source_entry, destination_entry)
         UserEntryTransitionHistory.move_entry(source_entry, destination_entry)

@@ -684,7 +684,7 @@ def func_display_data_form(request, p, data):
     if ob:
         return HttpResponseRedirect(ob.get_absolute_url())
 
-    data["user"] = request.user.username
+    data["user_object"] = request.user
     data["bookmarked"] = True
 
     if "description" in data:
@@ -807,8 +807,6 @@ def add_entry(request):
         return p.render("summary_present.html")
 
     else:
-        author = request.user.username
-        initial = {"user": author}
         if "link" in request.GET:
             link = request.GET["link"]
 

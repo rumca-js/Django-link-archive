@@ -7,7 +7,7 @@ from ..models import (
     UserBookmarks,
     UserTags,
     UserVotes,
-    LinkCommentDataModel,
+    UserComments,
     UserBookmarks,
     UserEntryTransitionHistory,
     UserEntryVisitHistory,
@@ -798,7 +798,7 @@ class EntryWrapperTest(FakeInternetTestCase):
 
         UserTags.set_tag(http_entry, "test", self.user_not_staff)
         UserVotes.add(self.user_not_staff, http_entry, 30)
-        LinkCommentDataModel.add(self.user_not_staff, http_entry, "This is stupid")
+        UserComments.add(self.user_not_staff, http_entry, "This is stupid")
         UserBookmarks.add(self.user_not_staff, http_entry)
 
         UserEntryVisitHistory.visited(http_entry, self.user_not_staff)
@@ -838,7 +838,7 @@ class EntryWrapperTest(FakeInternetTestCase):
         vote = votes[0]
         self.assertEqual(vote.entry_object, https_entry)
 
-        comments = LinkCommentDataModel.objects.all()
+        comments = UserComments.objects.all()
         self.assertEqual(comments.count(), 1)
         comment = comments[0]
         self.assertEqual(comment.entry_object, https_entry)
@@ -889,7 +889,7 @@ class EntryWrapperTest(FakeInternetTestCase):
 
         UserTags.set_tag(http_entry, "test", self.user_not_staff)
         UserVotes.add(self.user_not_staff, http_entry, 30)
-        LinkCommentDataModel.add(self.user_not_staff, http_entry, "This is stupid")
+        UserComments.add(self.user_not_staff, http_entry, "This is stupid")
         UserBookmarks.add(self.user_not_staff, http_entry)
 
         # UserEntryTransitionHistory.add(self.user_not_staff, entry_from = http_entry, entry_to = youtube_entry)
@@ -932,7 +932,7 @@ class EntryWrapperTest(FakeInternetTestCase):
         vote = votes[0]
         self.assertEqual(vote.entry_object, https_entry)
 
-        comments = LinkCommentDataModel.objects.all()
+        comments = UserComments.objects.all()
         self.assertEqual(comments.count(), 1)
         comment = comments[0]
         self.assertEqual(comment.entry_object, https_entry)
@@ -974,7 +974,7 @@ class EntryWrapperTest(FakeInternetTestCase):
 
         UserTags.set_tag(http_entry, "test", self.user_not_staff)
         UserVotes.add(self.user_not_staff, http_entry, 30)
-        LinkCommentDataModel.add(self.user_not_staff, http_entry, "This is stupid")
+        UserComments.add(self.user_not_staff, http_entry, "This is stupid")
         UserBookmarks.add(self.user_not_staff, http_entry)
 
         # UserEntryTransitionHistory.add(self.user_not_staff, entry_from = http_entry, entry_to = youtube_entry)
@@ -1021,7 +1021,7 @@ class EntryWrapperTest(FakeInternetTestCase):
         vote = votes[0]
         self.assertEqual(vote.entry_object, http_entry)
 
-        comments = LinkCommentDataModel.objects.all()
+        comments = UserComments.objects.all()
         self.assertEqual(comments.count(), 1)
         comment = comments[0]
         self.assertEqual(comment.entry_object, http_entry)

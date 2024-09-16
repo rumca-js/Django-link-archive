@@ -304,6 +304,8 @@ class ConfigurationEntry(models.Model):
 
     track_user_navigation = models.BooleanField(default=False)
 
+    max_number_of_searches = models.IntegerField(default=300)
+
     vote_min = models.IntegerField(default=-100)
 
     vote_max = models.IntegerField(default=100)

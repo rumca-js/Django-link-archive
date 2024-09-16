@@ -22,6 +22,7 @@ from .viewspkg import (
     tools,
     custom,
     readmarkers,
+    readlater,
     users,
 )
 
@@ -168,7 +169,14 @@ urlpatterns = [
     # users
     path("appusers/", users.UserListView.as_view(), name="appusers",),
     path("appuser-history/<int:user_id>/", users.UserEntryVisitHistoryListView.as_view(), name="appuser-history",),
+    path("user-personal/", users.user_personal, name="user-personal",),
     path("user-entry-history/", users.UserEntryVisitHistoryListView.as_view(), name="user-entry-history"),
+    path("user-comments/", users.UserCommentsListView.as_view(), name="user-comments",),
+    path("user-search-history/", users.UserSearchHistoryListView.as_view(), name="user-search-history",),
+    path("read-later-entries/", readlater.ReadLaterListView.as_view(), name="read-later-entries"),
+    path("read-later-add/<int:pk>/", readlater.read_later_add, name="read-later-add"),
+    path("read-later-remove/<int:pk>/", readlater.read_later_remove, name="read-later-remove"),
+    path("read-later-clear/", readlater.read_later_clear, name="read-later-clear"),
     # logging
     path("logs/", system.AppLoggingView.as_view(), name="logs",),
     path("truncate-log", system.truncate_log, name="truncate-log"),

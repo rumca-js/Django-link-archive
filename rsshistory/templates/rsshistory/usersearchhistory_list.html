@@ -1,0 +1,24 @@
+{% extends base_generic %}
+{% load static %}
+{% block content %}
+
+<h1>Search History</h1>
+
+  {% if content_list %}
+     <div class="list-group">
+         {% for search_history in content_list %}
+         <div class="my-1">
+             <div>
+                 <a href="{% url 'rsshistory:entries-omni-search' %}?search={{search_history.search_query}}">{{search_history.search_query}}</a>
+             </div>
+             <div>
+                 Date: {{search_history.date}}
+             </div>
+         </div>
+         {% endfor %}
+      {% include "rsshistory/pagination.html" %}
+  {% else %}
+    No history yet
+  {% endif %}
+
+{% endblock %} 

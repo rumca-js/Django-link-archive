@@ -8,6 +8,7 @@ from ..apps import LinkDatabase
 
 class ReadMarkers(models.Model):
     """
+    Used to indicate what has been read, and what has not
     """
     read_date = models.DateTimeField(null=True)
 

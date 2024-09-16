@@ -15,7 +15,7 @@ from .backgroundjob import (
 )
 
 from .comments import (
-    LinkCommentDataController,
+    UserCommentsController,
 )
 
 from .entries import (

@@ -1,0 +1,43 @@
+{% extends base_generic %}
+{% load static %}
+{% block content %}
+
+<h1>Read later list</h1>
+
+<div class="container">
+  {% if content_list %}
+    <a href="{% url 'rsshistory:read-later-clear' %}" class="btn btn-primary">
+        <img src="{% static 'rsshistory/icons/icons8-trash-100.png' %}" class="content-icon" />
+           Clear list</a>
+  {% endif %}
+</div>
+
+  {% if content_list %}
+     <div class="list-group">
+         {% for readlater in content_list %}
+             {% with entry=readlater.entry  %}
+             <div class="my-1">
+                 <a href="{{ entry.get_absolute_url }}" title="{{entry.title }}">
+                     <div class="d-flex">
+                         <div>
+                         {% include "rsshistory/entry_thumbnail_element.html" %}
+                         </div>
+
+                         <div>
+                             {{entry.title}}
+
+                             <a href="{% url 'rsshistory:read-later-remove' readlater.id %}">
+                                <img src="{% static 'rsshistory/icons/icons8-trash-100.png' %}" class="content-icon" />
+                             </a>
+                         </div>
+                     </div>
+                 </a>
+             </div>
+             {% endwith %}
+         {% endfor %}
+      {% include "rsshistory/pagination.html" %}
+  {% else %}
+    read later list is empty!
+  {% endif %}
+
+{% endblock %} 

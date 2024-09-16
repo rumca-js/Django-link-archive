@@ -10,14 +10,14 @@ from utils.dateutils import DateUtils
 
 from ..models import (
     LinkDataModel,
-    LinkCommentDataModel,
+    UserComments,
 )
 from ..configuration import Configuration
 
 from .entries import LinkDataController
 
 
-class LinkCommentDataController(LinkCommentDataModel):
+class UserCommentsController(UserComments):
     class Meta:
         proxy = True
 
@@ -35,7 +35,7 @@ class LinkCommentDataController(LinkCommentDataModel):
         criterion1 = Q(date_published__range=[time_start, time_stop])
         criterion2 = Q(date_edited__range=[time_start, time_stop])
 
-        comments = LinkCommentDataModel.objects.filter(
+        comments = UserComments.objects.filter(
             criterion0 & (criterion1 | criterion2)
         )
 
@@ -57,7 +57,7 @@ class LinkCommentDataController(LinkCommentDataModel):
             return
 
         date_published = data["date_published"]
-        comments = LinkCommentDataModel.objects.filter(
+        comments = UserComments.objects.filter(
             user_object=user, entry_object=entry, date_published=date_published
         )
 
@@ -69,7 +69,7 @@ class LinkCommentDataController(LinkCommentDataModel):
             if "date_edited" not in data:
                 data["date_edited"] = DateUtils.get_datetime_now_utc()
 
-            return LinkCommentDataModel.objects.create(
+            return UserComments.objects.create(
                 comment=data["comment"],
                 date_published=data["date_published"],
                 date_edited=data["date_edited"],

@@ -110,7 +110,7 @@ class HeadlessScriptCrawler(ScriptCrawler):
 
 class FullScriptCrawler(ScriptCrawler):
     def __init__(self, request, response_file=None, response_port=None):
-        super().__init__(self, request, response_file, response_port)
+        super().__init__(request=request, response_file=response_file, response_port=response_port)
 
     def get_script(self):
         return WebConfig.crawling_full_script

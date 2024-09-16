@@ -7,7 +7,7 @@ from webtools import DomainAwarePage, InputContent
 from utils.dateutils import DateUtils
 
 from ...apps import LinkDatabase
-from ...models import ConfigurationEntry, UserConfig
+from ...models import ConfigurationEntry, UserConfig, ReadLater
 from ...controllers import LinkDataController, SearchEngineGoogleCache
 from ...configuration import Configuration
 from utils.services import (
@@ -330,6 +330,40 @@ class EntryGenericPlugin(object):
         config = Configuration.get_object().config_entry
         buttons = []
 
+        read_laters = ReadLater.objects.filter(entry = self.entry)
+        if read_laters.count() == 0:
+            buttons.append(
+                EntryButton(
+                    self.user,
+                    "Read later",
+                    reverse(
+                        "{}:read-later-add".format(LinkDatabase.name),
+                            args=[self.entry.id],
+                    ),
+                    ConfigurationEntry.ACCESS_TYPE_ALL,
+                    "Adds to read later list",
+                    static(
+                        "{}/icons/icons8-bookmark-100.png".format(LinkDatabase.name)
+                    ),
+                ),
+            )
+        else:
+            buttons.append(
+                EntryButton(
+                    self.user,
+                    "Do not read later",
+                    reverse(
+                        "{}:read-later-remove".format(LinkDatabase.name),
+                            args=[read_laters[0].id],
+                    ),
+                    ConfigurationEntry.ACCESS_TYPE_ALL,
+                    "Removes from read later list",
+                    static(
+                        "{}/icons/icons8-bookmark-100.png".format(LinkDatabase.name)
+                    ),
+                ),
+            )
+
         translate_url = TranslateBuilder.get(self.entry.link).get_translate_url()
 
         p = DomainAwarePage(self.entry.link)
@@ -449,6 +483,9 @@ class EntryGenericPlugin(object):
                 translate_url,
                 ConfigurationEntry.ACCESS_TYPE_ALL,
                 "Translate Page",
+                static(
+                    "{}/icons/icons8-translate-128.png".format(LinkDatabase.name)
+                ),
             ),
         )
 
@@ -528,6 +565,9 @@ class EntryGenericPlugin(object):
                 ),
                 ConfigurationEntry.ACCESS_TYPE_OWNER,
                 "Shows JSON data",
+                static(
+                    "{}/icons/icons8-view-details-100.png".format(LinkDatabase.name)
+                ),
             ),
         )
 

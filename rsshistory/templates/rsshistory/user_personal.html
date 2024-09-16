@@ -1,0 +1,22 @@
+{% extends base_generic %}
+{% load static %}
+{% block content %}
+
+<div class="container">
+    {% if config.track_user_navigation %}
+    <a href="{% url 'rsshistory:user-entry-history' %}" class="btn btn-primary" title="Shows browsing history">
+       <img src="{% static 'rsshistory/icons/icons8-logout-100.png' %}" class="content-icon" />
+       Browse History</a>
+    {% endif %}
+    <a href="{% url 'rsshistory:user-comments' %}" class="btn btn-primary" title="Shows user comments">
+       <img src="{% static 'rsshistory/icons/icons8-logout-100.png' %}" class="content-icon" />
+       Comments</a>
+    {% if config.track_user_searches %}
+    <a href="{% url 'rsshistory:user-search-history' %}" class="btn btn-primary" title="Shows user comments">
+       <img src="{% static 'rsshistory/icons/icons8-logout-100.png' %}" class="content-icon" />
+       Search history</a>
+    {% endif %}
+
+</div>
+
+{% endblock %}

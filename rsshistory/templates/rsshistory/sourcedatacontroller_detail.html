@@ -4,14 +4,14 @@
 
 <div class="d-flex">
    {% if user_config.show_icons %}
-
         {% if entry_object %}
 	<a href="{% url 'rsshistory:entry-detail' entry_object.id %}">
 		{% else %}
 	<a href="{{ object.url }}">
 		{% endif %}
-		<div>
-	     <img src="{{object.get_favicon}}" class="link-detail-thumbnail border rounded"/>
+		<!--div class="link-detail-thumbnail"-->
+		<div class="icon-normal">
+	     <img src="{{object.get_favicon}}" class="border rounded"/>
 		</div>
 	 </a>
    {% endif %}

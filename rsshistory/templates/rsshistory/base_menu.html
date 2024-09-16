@@ -1,7 +1,7 @@
 {% load static %}
 
 <nav class="navbar navbar-expand-sm">
-    <a class="navbar-brand" href="{% url 'rsshistory:entries-omni-search-init' %}" class="nav-link" title="Home">
+    <a class="navbar-brand nav-link" href="{% url 'rsshistory:entries-omni-search-init' %}" title="Home">
 	 <img src="{% static 'rsshistory/icons/icons8-search-100.png' %}" class="mainbutton-icon" />
     </a>
 
@@ -16,34 +16,44 @@
                    <img src="{% static 'rsshistory/icons/icons8-new-100.png' %}" class="mainbutton-icon" />
                    What's new</a>
            </li>
-           <li class="nav-item">
-               <a href="{% url 'rsshistory:entries-bookmarked' %}" class="nav-link" title="Shows bookmarked links">
-                   <img src="{% static 'rsshistory/icons/icons8-bookmarks-100.png' %}" class="mainbutton-icon" />
-                   Bookmarks</a>
-           </li>
-           <li class="nav-item">
-               <a href="{% url 'rsshistory:sources' %}" class="nav-link" title="Sources">
-                   <img src="{% static 'rsshistory/icons/icons8-broadcast-100.png' %}" class="mainbutton-icon" />
-                   Sources</a>
-           </li>
-           <li class="nav-item">
-               {% if config.enable_domain_support %}
-               <a href="{% url 'rsshistory:domains' %}" class="nav-link" title="Captured domains">
-                   <img src="{% static 'rsshistory/icons/icons8-www-64.png' %}" class="mainbutton-icon" />
-                   Domains</a>
-           </li>
-           <li class="nav-item">
+           {% if user.is_authenticated %}
+               {% if is_read_later %}
+               <li class="nav-item">
+                   <a href="{% url 'rsshistory:read-later-entries' %}" class="nav-link" title="Shows entries marked as later to read">
+                       <img src="{% static 'rsshistory/icons/icons8-bookmarks-100.png' %}" class="mainbutton-icon" />
+                       Read later</a>
+               </li>
                {% endif %}
-               <a href="{% url 'rsshistory:tags-show-all' %}" class="nav-link" title="Tags">
-                   <img src="{% static 'rsshistory/icons/icons8-tags-100.png' %}" class="mainbutton-icon" />
-                   Tags</a>
-           </li>
+               <li class="nav-item">
+                   <a href="{% url 'rsshistory:entries-bookmarked' %}" class="nav-link" title="Shows bookmarked links. By default shows all users bookmarks.">
+                       <img src="{% static 'rsshistory/icons/icons8-bookmarks-100.png' %}" class="mainbutton-icon" />
+                       Bookmarks</a>
+               </li>
+               <li class="nav-item">
+                   <a href="{% url 'rsshistory:tags-show-all' %}" class="nav-link" title="Tags. By default shows all users tags">
+                       <img src="{% static 'rsshistory/icons/icons8-tags-100.png' %}" class="mainbutton-icon" />
+                       Tags</a>
+               </li>
+           {% endif %}
+           {% if config.enable_domain_support %}
+               <li class="nav-item">
+                   <a href="{% url 'rsshistory:domains' %}" class="nav-link" title="Captured domains">
+                       <img src="{% static 'rsshistory/icons/icons8-www-64.png' %}" class="mainbutton-icon" />
+                       Domains</a>
+               </li>
+           {% endif %}
            <li class="nav-item">
                {% if config.enable_keyword_support %}
                <a href="{% url 'rsshistory:keywords' %}" class="nav-link" title="Shows keywords used by links">
                    <img src="{% static 'rsshistory/icons/icons8-letters-96.png' %}" class="mainbutton-icon" />
                    Keywords</a>
                {% endif %}
+           </li>
+
+           <li class="nav-item">
+               <a href="{% url 'rsshistory:sources' %}" class="nav-link" title="Sources">
+                   <img src="{% static 'rsshistory/icons/icons8-broadcast-100.png' %}" class="mainbutton-icon" />
+                   Sources</a>
            </li>
 
            {% if user.is_staff %}
@@ -55,6 +65,12 @@
            {% endif %}
 
            {% if user.is_authenticated %}
+           <li class="nav-item">
+               <a href="{% url 'rsshistory:user-personal' %}" class="nav-link" title="Personal space">
+                   <img src="{% static 'rsshistory/icons/icons8-bookmarks-100.png' %}" class="mainbutton-icon" />
+                   Personal</a>
+           </li>
+
            <li class="nav-item">
                <a href="{% url 'rsshistory:user-config' %}" class="nav-link" title="User config">
                    <img src="{% static 'rsshistory/icons/account.png' %}" class="mainbutton-icon" />

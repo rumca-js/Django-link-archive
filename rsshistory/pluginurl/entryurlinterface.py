@@ -38,6 +38,7 @@ class EntryUrlInterface(object):
         """
         self.log = log
         self.ignore_errors = ignore_errors
+        self.props = None
 
         self.url = UrlHandler.get_cleaned_link(url)
 

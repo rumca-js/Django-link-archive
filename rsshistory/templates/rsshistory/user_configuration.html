@@ -6,12 +6,6 @@
     <a href="{% url 'rsshistory:logout' %}" class="btn btn-primary">
                 <img src="{% static 'rsshistory/icons/icons8-logout-100.png' %}" class="content-icon" />
                 Logout</a>
-
-    {% if config.track_user_navigation %}
-    <a href="{% url 'rsshistory:user-entry-history' %}" class="btn btn-primary">
-                <img src="{% static 'rsshistory/icons/icons8-logout-100.png' %}" class="content-icon" />
-                User history</a>
-    {% endif %}
 </div>
 
 <h1>User configuration: [{{ user.get_username }}]</h1>

@@ -52,7 +52,7 @@ from .controllers import (
     SourceDataController,
     EntryDataBuilder,
     DomainsController,
-    LinkCommentDataController,
+    UserCommentsController,
     EntriesCleanupAndUpdate,
     EntryUpdater,
     EntriesUpdater,
@@ -1083,7 +1083,7 @@ class CleanupJobHandler(BaseJobHandler):
     def user_tables_cleanup(self):
         UserTags.cleanup()
         CompactedTags.cleanup()
-        LinkCommentDataController.cleanup()
+        UserCommentsController.cleanup()
         UserVotes.cleanup()
         UserBookmarks.cleanup()
         UserSearchHistory.cleanup()

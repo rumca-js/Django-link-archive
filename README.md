@@ -4,17 +4,31 @@ Manages link meta information.
 
 # Features
 
+## General
  - bookmarks management, with tags, and comment support
- - RSS feed support. Supports YouTube RSS, Reddit RSS, OpenRss, InternetArchive
+ - support for 'spaces'. You can define own spaces like 'music', 'videos', 'movies', etc. Manged by django apps
+ - obtaining keywords (nouns) from sources, to analyze trends
+ - light mode and dark mode
+ - automatic exports
+    - to directory
+    - to GitHub
+ - access for multiple users
+
+## Services
+ - RSS feed support: Supports YouTube RSS, Reddit RSS, OpenRss
+ - support for archived pages through InternetArchive, or any configured archive medium
+ - GitHub support. Exports. For example [Internet domains, users, projects](https://github.com/rumca-js/Internet-Places-Database)
+ - YouTube download support through yt-dlp project
+
+## Crawling
  - some Internet crawling capabilities
  - link search. Simple implementation, does not use elastic search
- - maintains website metadata (title, description, thumbnail, etc). It is not [archive.org](https://archive.org) replacement
- - import and export. To github. For example [Internet domains, users, projects](https://github.com/rumca-js/Internet-Places-Database)
- - Minimal aesthetic. Dark mode, custom list displays
- - local data, no algorithms, no advertisements, self-hosted
  - does not support proxy rotation. This is ethical web scraper, it should not spam with requests
- - support for 'spaces'. You can define own spaces like 'music', 'videos', 'movies', etc.
- - user action tracking. You can observe and analyze history of your 'views'.
+ - configurable user agents, crawlers, selenium, requests, chrome undetected, crawlee, easily extendible
+
+## Privacy
+ - local data, no algorithms, no advertisements, self-hosted
+ - user action tracking. You can observe and analyze history of your 'views', 'searches', 'comments', 'browsing history'
 
 <div align="center">
   <img alt="Django Logo" src="images/django_400.png" width="400px">

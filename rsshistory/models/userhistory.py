@@ -121,10 +121,8 @@ class UserSearchHistory(models.Model):
             entries.delete()
 
     def get_choices_model_limit():
-        """
-        TODO move this to configuration?
-        """
-        return 300
+        config_entry = Configuration.get_object().config_entry
+        return config_entry.max_number_of_searches
 
     def get_choices_limit():
         return 60
