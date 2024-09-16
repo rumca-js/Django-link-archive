@@ -231,7 +231,10 @@ def handle_connection_inner(c, address, port):
         # Other commands handling
         elif command[0] == "commands.debug":
             print("Requests:{}".format(len(requests)))
+            
+            c.send_command_string("debug.__init__", "OK")
             c.send_command_string("debug.requests", str(len(requests)))
+            c.send_command_string("debug.__del__", "OK")
 
         elif command[0] == "debug.requests":
             pass
@@ -315,7 +318,7 @@ class ScrapingServer(object):
         # get the hostname
 
         server_socket = socket.socket()
-        server_socket.settimeout(1.0)  # to be able to make ctrl-c on server
+        server_socket.settimeout(0.5)  # to be able to make ctrl-c on server
 
         try:
             server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)

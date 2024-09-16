@@ -57,7 +57,13 @@ class ScrapingClient(object):
             message = input(" -> ")
 
             try:
-                self.send_request_for_url(self.c, message)
+                if message.startswith("http"):
+                    response = self.send_request_for_url(message)
+                elif message == "help":
+                    print("Supported commands:")
+                    print(" - commands.debug")
+                else:
+                    self.send_command_string(message, "OK")
             except Exception as E:
                 print("Exception:{}".format(str(E)))
                 break
@@ -75,6 +81,20 @@ class ScrapingClient(object):
         request.timeout_s = timeout_s
 
         return self.send_request(request)
+
+    def send_command_string(self, command, message):
+        self.c.send_command_string(command, message)
+
+        while True:
+            command_data = self.c.get_command_and_data()
+            if command_data:
+                if command_data[0] == "debug.__init__":
+                    pass
+                elif command_data[0] == "debug.requests":
+                    print("Requests len:{}".format(command_data[1].decode()))
+                if command_data[0] == "debug.__del__":
+                    return
+
 
     def send_request(self, request):
         response = PageResponseObject()
@@ -170,7 +190,10 @@ def main():
     message = ""
     while message.lower().strip() != "exit":
         message = input(" -> ")
-        response = c.send_request_for_url(message)
+        if message.startswith("http"):
+            response = c.send_request_for_url(message)
+        else:
+            c.send_command_string(message, "OK")
 
         print("Received response:{}".format(response))
 

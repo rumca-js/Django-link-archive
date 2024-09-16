@@ -78,31 +78,29 @@ class CrawlerInterface(object):
 
         # same as PageResponseObject
         bytes1 = string_to_command("PageResponseObject.__init__", "OK")
+        all_bytes.extend(bytes1)
         bytes2 = string_to_command("PageResponseObject.url", self.response.url)
-        bytes3 = string_to_command(
-            "PageResponseObject.request_url", self.response.request_url
-        )
+        all_bytes.extend(bytes2)
+        
+        if self.response and self.response.request_url:
+           thebytes = string_to_command("PageResponseObject.request_url", self.response.request_url)
+           all_bytes.extend(thebytes)
+
         bytes4 = string_to_command(
             "PageResponseObject.status_code", str(self.response.status_code)
         )
-
-        if self.response.text:
-            bytes5 = string_to_command("PageResponseObject.text", self.response.text)
-        else:
-            bytes5 = bytearray()
-
-        bytes6 = string_to_command(
-            "PageResponseObject.headers", json.dumps(self.response.headers)
-        )
-        bytes7 = string_to_command("PageResponseObject.__del__", "OK")
-
-        all_bytes.extend(bytes1)
-        all_bytes.extend(bytes2)
-        all_bytes.extend(bytes3)
         all_bytes.extend(bytes4)
-        all_bytes.extend(bytes5)
+
+        if self.response and self.response.text:
+            bytes5 = string_to_command("PageResponseObject.text", self.response.text)
+            all_bytes.extend(bytes5)
+
+        bytes6 = string_to_command("PageResponseObject.headers", json.dumps(self.response.headers))
         all_bytes.extend(bytes6)
+        
+        bytes7 = string_to_command("PageResponseObject.__del__", "OK")
         all_bytes.extend(bytes7)
+
         return all_bytes
 
     def get_response(self):

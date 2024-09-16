@@ -73,7 +73,10 @@ class ViewPage(object):
 
         context["user_config"] = UserConfig.get(self.request.user)
         context["is_mobile"] = self.is_mobile()
-        context["is_read_later"] = ReadLater.objects.filter(user = self.request.user).count() != 0
+        if self.request.user.is_authenticated:
+            context["is_read_later"] = ReadLater.objects.filter(user = self.request.user).count() != 0
+        else:
+            context["is_read_later"] = False
 
         return context
 

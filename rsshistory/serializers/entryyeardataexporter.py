@@ -82,7 +82,7 @@ class EntryYearDataMainExporter(MainExporter):
 
         result_entries = []
         if self.user:
-            bookmarks = UserBookmarks.get_user_bookmarks(user)
+            bookmarks = UserBookmarks.get_user_bookmarks(self.user)
             # this returns IDs, not 'objects'
             result_entries = bookmarks.values_list("entry_object", flat=True)
             result_entries = LinkDataController.objects.filter(id__in=result_entries)

@@ -362,13 +362,15 @@ class DataWriterTest(FakeInternetTestCase):
         # call tested function
         writer.write()
 
-        md_file = Path("./data")
+        md_file = (
+            Path("./data")
             / "test"
             / "daily_data"
             / "2023"
             / "03"
             / "2023-03-03"
             / "https...youtube.com_entries.md"
+        )
 
         self.assertTrue(md_file.exists())
 
@@ -448,12 +450,13 @@ class DataWriterTest(FakeInternetTestCase):
         # call tested function
         writer.write()
 
-        html_dir =
+        html_dir = (
             Path("./data")
             / "test"
             / "daily_data"
             / "2023"
             / "03"
             / "html"
+        )
 
         self.assertTrue(html_dir.exists())

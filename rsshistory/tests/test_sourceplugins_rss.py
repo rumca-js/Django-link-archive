@@ -18,7 +18,7 @@ class BaseRssPluginTest(FakeInternetTestCase):
             export_to_cms=True,
         )
 
-    def test_get_container_elements(self):
+    def test_get_entries(self):
         LinkDataController.objects.all().delete()
 
         config = Configuration.get_object().config_entry
@@ -34,7 +34,8 @@ class BaseRssPluginTest(FakeInternetTestCase):
         self.assertTrue(self.source_rss)
 
         plugin = BaseRssPlugin(self.source_rss.id)
-        props = plugin.get_container_elements()
+        # call tested function
+        props = plugin.get_entries()
         props = list(props)
 
         self.print_errors()
@@ -48,7 +49,7 @@ class BaseRssPluginTest(FakeInternetTestCase):
         # 1 rss parent, we do not make additional requests
         self.assertEqual(MockRequestCounter.mock_page_requests, 1)
 
-    def test_get_container_elements_use_all_data(self):
+    def test_get_entries__use_all_data(self):
         LinkDataController.objects.all().delete()
 
         config = Configuration.get_object().config_entry
@@ -62,7 +63,8 @@ class BaseRssPluginTest(FakeInternetTestCase):
         self.assertTrue(self.source_rss)
 
         plugin = BaseRssPlugin(self.source_rss.id)
-        props = plugin.get_container_elements()
+        # call tested function
+        props = plugin.get_entries()
         props = list(props)
 
         self.print_errors()
@@ -73,7 +75,7 @@ class BaseRssPluginTest(FakeInternetTestCase):
             "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM",
         )
 
-    def test_get_container_elements_use_clean_page_info(self):
+    def test_get_entries__use_clean_page_info(self):
         LinkDataController.objects.all().delete()
 
         config = Configuration.get_object().config_entry
@@ -87,7 +89,8 @@ class BaseRssPluginTest(FakeInternetTestCase):
         self.assertTrue(self.source_rss)
 
         plugin = BaseRssPlugin(self.source_rss.id)
-        props = plugin.get_container_elements()
+        # call tested function
+        props = plugin.get_entries()
         props = list(props)
 
         self.print_errors()
@@ -98,7 +101,7 @@ class BaseRssPluginTest(FakeInternetTestCase):
             "https://www.youtube.com/feeds/videos.xml?channel_id=SAMTIMESAMTIMESAMTIMESAM",
         )
 
-    def test_get_container_elements__encoded(self):
+    def test_get_entries__encoded(self):
         LinkDataController.objects.all().delete()
 
         config = Configuration.get_object().config_entry
@@ -120,7 +123,8 @@ class BaseRssPluginTest(FakeInternetTestCase):
         self.assertTrue(self.source_rss)
 
         plugin = BaseRssPlugin(self.source_rss.id)
-        props = plugin.get_container_elements()
+        # call tested function
+        props = plugin.get_entries()
         props = list(props)
 
         self.print_errors()
