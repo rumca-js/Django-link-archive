@@ -2,6 +2,17 @@ Personal link database, link aggregator, with RSS functionality. Similar to Redd
 
 Manages link meta information.
 
+## Use cases
+
+ - news/RSS reader
+ - YouTube client / filter. You will not be able to search YouTube catalog, but if you add YouTube channels as sources of data, new videos will be fetched into the database
+ - database of important links: for work, or for school
+ - data analysis - analyze link rot, how many a page is cited by other sources, analyze link domains, etc.
+
+<div align="center">
+  <img alt="Django Logo" src="images/django_400.png" width="400px">
+</div>
+
 # Features
 
 ## General
@@ -29,17 +40,6 @@ Manages link meta information.
 ## Privacy
  - local data, no algorithms, no advertisements, self-hosted
  - user action tracking. You can observe and analyze history of your 'views', 'searches', 'comments', 'browsing history'
-
-<div align="center">
-  <img alt="Django Logo" src="images/django_400.png" width="400px">
-</div>
-
-## Use cases
-
- - news/RSS reader
- - YouTube client / filter. You will not be able to search YouTube catalog, but if you add YouTube channels as sources of data, new videos will be fetched into the database
- - database of important links: for work, or for school
- - data analysis - analyze link rot, how many a page is cited by other sources, analyze link domains, etc.
  
 ## Problems with other RSS readers, or apps
 
@@ -117,7 +117,7 @@ Each page is ranked by several factors.
 The result is equal according to calculation
  - page ranking = content ranking + users votes
 
-## Content ranking
+# Content ranking
 
 To have a good page rating, it is desireable to follow good standards:
  - [Schema Validator](https://validator.schema.org/)
@@ -141,7 +141,7 @@ You may wonder, why am I writing about search engine "keywords" meta field, if G
 
 Database is managed by RSS link database, and user votes. Average of votes is calculated for each link.
 
-## Export
+# Export
 
 There are several export types. Each day data can be exported.
 
@@ -156,7 +156,7 @@ Types of exports:
  - yearly data - each year holds information separately
  - data not time related - data are in separate directories, and are not time related
 
-## Import
+# Import
 
 Done by admin panel. JSON data files can be used for imports, or other django-link-archive apps [under construction].
 
