@@ -1,11 +1,4 @@
 
-This project is work in progress.
-Some screenshots might be little out of date.
-
-You can try try checking official demo on [renegat0x0.ddns.net](https://renegat0x0.ddns.net/apps/places/entries-recent/).
-
-Pinky promise the app will be up, and running.
-
 # Link lists
 
 Available link display types
