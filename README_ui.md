@@ -21,15 +21,13 @@ Available link display types
 
 ![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/entries_list_youtube.PNG)
 
-## List with buttons
+## Search engine view
 
-![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/entries_list_buttons.PNG)
+![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/entries_list_search_engine.PNG)
 
 # Search form
 
-![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/search_form_omni.PNG)
-
-![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/search_form_whats_new.PNG)
+![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/search_form.PNG)
 
 # Entry, link details
 
@@ -48,14 +46,6 @@ Available link display types
 ![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/tags_view.PNG)
 
 ![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/keywords_view.PNG)
-
-# Forms
-
-![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/entry_new_simple.PNG)
-
-![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/entry_new.PNG)
-
-![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/source_new.PNG)
 
 # Admin
 
