@@ -15,37 +15,55 @@ Available link display types
 
 ## Standard list
 
-![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/entries_list_standard.PNG)
+<div align="center">
+  <img alt="Standard list" src="screenshots/entries_list_standard.PNG" style="max-width:700px">
+</div>
 
 ## YouTube list
 
-![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/entries_list_youtube.PNG)
+<div align="center">
+  <img alt="Standard list" src="screenshots/entries_list_youtube.PNG" style="max-width:700px">
+</div>
 
 ## Search engine view
 
-![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/entries_list_search_engine.PNG)
+<div align="center">
+  <img alt="Standard list" src="screenshots/entries_list_search_engine.PNG" style="max-width:700px">
+</div>
 
 # Search form
 
-![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/search_form.PNG)
+<div align="center">
+  <img alt="Standard list" src="screenshots/search_form.PNG" style="max-width:700px">
+</div>
 
 # Entry, link details
 
-![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/entry_details.PNG)
+<div align="center">
+  <img alt="Standard list" src="screenshots/entry_details.PNG" style="max-width:700px">
+</div>
 
 # Sources
 
-![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/source_list.PNG)
+<div align="center">
+  <img alt="Standard list" src="screenshots/source_list.PNG" style="max-width:700px">
+</div>
 
 # Source details
 
-![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/source_details.PNG)
+<div align="center">
+  <img alt="Standard list" src="screenshots/source_details.PNG" style="max-width:700px">
+</div>
 
 # Tags, keywords, and other views
 
-![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/tags_view.PNG)
+<div align="center">
+  <img alt="Standard list" src="screenshots/tags_view.PNG" style="max-width:700px">
+</div>
 
-![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/keywords_view.PNG)
+<div align="center">
+  <img alt="Standard list" src="screenshots/screenshots/keywords_view.PNG" style="max-width:700px">
+</div>
 
 # Admin
 
@@ -55,20 +73,30 @@ Thankfully there are three wizard views that can automatically preset most of th
 
 ## Configuration page
 
-![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/configuration_form.PNG)
+<div align="center">
+  <img alt="Standard list" src="screenshots/configuration_form.PNG" style="max-width:700px">
+</div>
 
 ## Server status
 
-![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/server_status.PNG)
+<div align="center">
+  <img alt="Standard list" src="screenshots/server_status.PNG" style="max-width:700px">
+</div>
 
 ## User configuration
 
-![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/user_configuration_view.PNG)
+<div align="center">
+  <img alt="Standard list" src="screenshots/user_configuration_view.PNG" style="max-width:700px">
+</div>
 
 ## Logs
 
-![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/logs_view.PNG)
+<div align="center">
+  <img alt="Standard list" src="screenshots/logs_view.PNG" style="max-width:700px">
+</div>
 
 ## Background jobs
 
-![](https://raw.githubusercontent.com/rumca-js/Django-link-archive/main/screenshots/backgroundjobs_view.PNG)
+<div align="center">
+  <img alt="Standard list" src="screenshots/backgroundjobs_view.PNG" style="max-width:700px">
+</div>
