@@ -1,0 +1,50 @@
+{% extends base_generic %}
+{% load static %}
+{% block content %}
+
+<h1>Search engines</h1>
+<ul>
+      {% for search_engine in search_engines %}
+      <li>
+	      <a href="{{search_engine.get_address}}" title="{{search_engine.get_title}}">
+              {% include "rsshistory/icon_external.html" %}
+              {{search_engine.get_name}} @ {{search_engine.get_address}}
+              {% if search_engine.get_description %}
+               - {{search_engine.get_description}}
+              {% endif %}
+          </a>
+      </li>
+      {% endfor %}
+</ul>
+
+<h1>AI Search engines</h1>
+<ul>
+      {% for search_engine in ai_search_engines %}
+      <li>
+	      <a href="{{search_engine.get_address}}" title="{{search_engine.get_title}}">
+              {% include "rsshistory/icon_external.html" %}
+              {{search_engine.get_name}} @ {{search_engine.get_address}}
+              {% if search_engine.get_description %}
+               - {{search_engine.get_description}}
+              {% endif %}
+          </a>
+      </li>
+      {% endfor %}
+</ul>
+
+<h1>Archives</h1>
+<ul>
+      {% for search_engine in archives %}
+      <li>
+	      <a href="{{search_engine.get_address}}" title="{{search_engine.get_title}}">
+              {% include "rsshistory/icon_external.html" %}
+              {{search_engine.get_name}} @ {{search_engine.get_address}}
+              {% if search_engine.get_description %}
+               - {{search_engine.get_description}}
+              {% endif %}
+          </a>
+      </li>
+      {% endfor %}
+</ul>
+
+{% endblock %} 

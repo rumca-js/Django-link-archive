@@ -9,6 +9,7 @@ import argparse
 import sys
 
 import webtools
+from webtools import WebConfig
 
 
 def main():

@@ -6,7 +6,7 @@ from ..apps import LinkDatabase
 class ApiKeys(models.Model):
     key = models.CharField(max_length=1000, null=False)
 
-    user_object = models.ForeignKey(
+    user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name=str(LinkDatabase.name) + "_apikeys",

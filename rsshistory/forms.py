@@ -248,7 +248,7 @@ class ApiKeysForm(forms.ModelForm):
         model = ApiKeys
         fields = [
             "key",
-            "user_object",
+            "user",
         ]
 
     def __init__(self, *args, **kwargs):
@@ -399,12 +399,27 @@ class YouTubeLinkSimpleForm(forms.Form):
     youtube_link = forms.CharField(label="YouTube Link URL", max_length=500)
 
 
+class InitSearchForm(forms.Form):
+    """
+    Omni search form
+    """
+
+    search = forms.CharField(label="", max_length=500, required=False)
+
+    def __init__(self, *args, **kwargs):
+        self.init = UserRequest(args, kwargs)
+        super().__init__(*args, **kwargs)
+
+        attr = {"onchange": "this.form.submit()"}
+        self.fields["search"].widget.attrs.update(size=self.init.get_cols_size())
+
+
 class OmniSearchForm(forms.Form):
     """
     Omni search form
     """
 
-    search = forms.CharField(label="Search for", max_length=500, required=False)
+    search = forms.CharField(label="Search", max_length=500, required=False)
     search_history = forms.CharField(widget=forms.Select(choices=[]), required=False)
 
     def __init__(self, *args, **kwargs):

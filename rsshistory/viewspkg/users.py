@@ -11,28 +11,28 @@ from ..models import (
    UserEntryVisitHistory
 )
 from ..controllers import UserCommentsController
-from ..views import ViewPage,GenericListView
+from ..views import ViewPage, UserGenericListView
 
 
-class UserListView(GenericListView):
+class UserListView(UserGenericListView):
     model = User
     context_object_name = "content_list"
     paginate_by = 100
 
 
-class UserEntryVisitHistoryListView(GenericListView):
+class UserEntryVisitHistoryListView(UserGenericListView):
     model = UserEntryVisitHistory
     context_object_name = "content_list"
     paginate_by = 100
 
 
-class UserCommentsListView(GenericListView):
+class UserCommentsListView(UserGenericListView):
     model = UserCommentsController
     context_object_name = "content_list"
     paginate_by = 100
 
 
-class UserSearchHistoryListView(GenericListView):
+class UserSearchHistoryListView(UserGenericListView):
     model = UserSearchHistory
     context_object_name = "content_list"
     paginate_by = 100

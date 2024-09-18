@@ -8,7 +8,7 @@
      <div class="list-group">
          {% for visit_history in content_list %}
          <div class="my-1">
-             {% with entry=visit_history.entry_object %}
+             {% with entry=visit_history.entry %}
              <a href="{{ entry.get_absolute_url }}" title="{{entry.title }}">
                  <div class="d-flex">
                      <div>

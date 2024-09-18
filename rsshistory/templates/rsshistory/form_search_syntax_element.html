@@ -1,45 +1,55 @@
-<h2>Search syntax</h2>
-Examples:
-<ul>
-    <li>"china" - searches china in title</li>
-    <li>"china | japan" - searches china, or japan in title</li>
-    <li>"title = china" - searches anything with China in title</li>
-    <li>"tags__tag = tag" - searches links with tag</li>
-    <li>"bookmarked = True" - all bookmarked link</li>
-    <li>"(title = china | title = japan) & bookmarked = True" - all bookmarked link, with china, or japan in title</li>
-</ul>
+<p class="d-inline-flex gap-1">
+  <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+    Search syntax
+  </a>
+</p>
 
-Available fields:
-<ul>
-    <li>
-    {% for entry_query_name in entry_query_names %}
-        "{{entry_query_name}}",
-    {% endfor %}
-    </li>
-</ul>
+<div class="collapse" id="collapseExample">
+  <div class="card card-body">
 
-Available comparison operators:
-<ul>
-    <li>
-    {% for entry_query_operator in entry_query_operators %}
-        "{{entry_query_operator}}",
-    {% endfor %}
-    </li>
+      Examples:
+      <ul>
+          <li>"china" - searches china in title</li>
+          <li>"china | japan" - searches china, or japan in title</li>
+          <li>"title = china" - searches anything with China in title</li>
+          <li>"tags__tag = tag" - searches links with tag</li>
+          <li>"bookmarked = True" - all bookmarked link</li>
+          <li>"(title = china | title = japan) & bookmarked = True" - all bookmarked link, with china, or japan in title</li>
+      </ul>
 
-    <li>
-       "==" for exact compare, "=" to find items containing string, ">" for comaparing if greater than, "<" for comaparing if less than, ">=", "<=", "~" for negation
-    </li>
+      Available fields:
+      <ul>
+          <li>
+              {% for entry_query_name in entry_query_names %}
+              "{{entry_query_name}}",
+              {% endfor %}
+          </li>
+      </ul>
 
-    <li>
-        <a href="https://docs.djangoproject.com/en/5.0/ref/models/querysets/#field-lookups">
-           {% include "rsshistory/icon_external.html" %}
-           Standard Django operators</a> are also supported. "title__isnull == True" Is correct search term.
-    </li>
-</ul>
+      Available comparison operators:
+      <ul>
+          <li>
+              {% for entry_query_operator in entry_query_operators %}
+              "{{entry_query_operator}}",
+              {% endfor %}
+          </li>
 
-Available condition operators
-<ul>
-    <li>"&" - And, "|" - Or, "~" - Not</li>
-</ul>
+          <li>
+              "==" for exact compare, "=" to find items containing string, ">" for comaparing if greater than, "<" for comaparing if less than, ">=", "<=", "~" for negation
+          </li>
 
-System accepts brackets.
+          <li>
+              <a href="https://docs.djangoproject.com/en/5.0/ref/models/querysets/#field-lookups">
+                       {% include "rsshistory/icon_external.html" %}
+                                   Standard Django operators</a> are also supported. "title__isnull == True" Is correct search term.
+          </li>
+      </ul>
+
+      Available condition operators
+      <ul>
+          <li>"&" - And, "|" - Or, "~" - Not</li>
+      </ul>
+
+      System accepts brackets.
+  </div>
+</div>

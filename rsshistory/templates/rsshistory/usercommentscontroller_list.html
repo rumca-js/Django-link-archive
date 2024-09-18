@@ -8,7 +8,7 @@
      <div class="list-group">
          {% for comment in content_list %}
          <div class="my-1">
-             {% with entry=comment.entry_object %}
+             {% with entry=comment.entry %}
              <a href="{{ entry.get_absolute_url }}" title="{{entry.title }}">
                  <div class="d-flex">
                      <div>

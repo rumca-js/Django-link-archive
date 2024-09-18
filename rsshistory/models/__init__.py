@@ -43,10 +43,11 @@ from .apikeys import (
     ApiKeys,
 )
 from .useractions import (
-    UserTags,
     UserVotes,
     UserComments,
     UserBookmarks,
+    UserTags,
+    UserCompactedTags,
     CompactedTags,
 )
 from .userhistory import (

@@ -104,7 +104,7 @@ urlpatterns = [
     path("tag-rename", useractions.tag_rename, name="tag-rename"),
     path("tags-entry-remove/<int:entrypk>/", useractions.tags_entry_remove, name="tags-entry-remove",),
     path("tags-entry-show/<int:entrypk>/", useractions.tags_entry_show, name="tags-entry-show",),
-    path("tags-show-all", useractions.AllTags.as_view(), name="tags-show-all"),
+    path("tags-show-all", useractions.CompactedTagsListView.as_view(), name="tags-show-all"),
     path("tags-show-actual", useractions.ActualTags.as_view(), name="tags-show-actual"),
     path("tags-many", useractions.tag_many, name="tag-many"),
     # comments
@@ -177,6 +177,9 @@ urlpatterns = [
     path("read-later-add/<int:pk>/", readlater.read_later_add, name="read-later-add"),
     path("read-later-remove/<int:pk>/", readlater.read_later_remove, name="read-later-remove"),
     path("read-later-clear/", readlater.read_later_clear, name="read-later-clear"),
+    path("user-entries-bookmarked/", entries.UserEntriesBookmarkedListView.as_view(), name="user-entries-bookmarked"),
+    path("user-entries-bookmarked-init", entries.user_entries_bookmarked_init, name="user-entries-bookmarked-init"),
+    path("user-tags-show", useractions.UserCompactedTagsListView.as_view(), name="user-tags-show"),
     # logging
     path("logs/", system.AppLoggingView.as_view(), name="logs",),
     path("truncate-log", system.truncate_log, name="truncate-log"),
@@ -230,6 +233,8 @@ urlpatterns = [
     path("download-video-url", tools.download_video, name="download-video-url",),
     path("download-url", tools.download_url, name="download-url",),
     path("is-url-allowed", tools.is_url_allowed, name="is-url-allowed",),
+    path("gateways", tools.gateways, name="gateways",),
+    path("search-engines", tools.search_engines, name="search-engines",),
     # other
     path("cleanup-link", custom.cleanup_link, name="cleanup-link",),
     path("data-errors", custom.data_errors_page, name="data-errors"),

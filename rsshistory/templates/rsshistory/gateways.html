@@ -1,0 +1,20 @@
+{% extends base_generic %}
+{% load static %}
+{% block content %}
+
+<h1>Gateways</h1>
+<ul>
+      {% for gateway in gateways %}
+      <li>
+	      <a href="{{gateway.get_address}}" title="{{gateway.get_title}}">
+              {% include "rsshistory/icon_external.html" %}
+              {{gateway.get_name}} @ {{gateway.get_address}}
+              {% if gateway.get_description %}
+               - {{gateway.get_description}}
+              {% endif %}
+          </a>
+      </li>
+      {% endfor %}
+</ul>
+
+{% endblock %}

@@ -3,10 +3,10 @@ from ..controllers import (
     LinkDataController,
 )
 from ..models import ConfigurationEntry
-from ..views import ViewPage, GenericListView
+from ..views import ViewPage, UserGenericListView
 
 
-class ReadLaterListView(GenericListView):
+class ReadLaterListView(UserGenericListView):
     model = ReadLater
     context_object_name = "content_list"
     paginate_by = 100

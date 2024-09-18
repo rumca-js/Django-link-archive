@@ -39,7 +39,6 @@ import html
 import traceback
 import re
 import json
-from pathlib import Path
 from dateutil import parser
 import urllib.request, urllib.error, urllib.parse
 from bs4 import BeautifulSoup
@@ -96,32 +95,6 @@ class WebLogger(object):
     def exc(exception_object, info_text=None, user=None):
         if WebLogger.web_logger:
             WebLogger.web_logger.exc(exception_object, info_text)
-
-
-class WebConfig(object):
-    """
-    API to configure webtools
-    """
-
-    crawling_headless_script = None
-    crawling_full_script = None
-    crawling_server_port = None
-
-    script_operating_dir = None
-    script_responses_directory = Path("storage")
-    selenium_driver_location = None
-
-    def init():
-        p = Path("/usr/bin/chromedriver")
-        if p.exists():
-            WebConfig.selenium_driver_location = str(p)
-
-    def use_logger(Logger):
-        WebLogger.web_logger = Logger
-
-    def use_print_logging():
-        from utils.logger import PrintLogger
-        WebLogger.web_logger = PrintLogger
 
 
 def lazy_load_content(func):

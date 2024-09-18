@@ -7,13 +7,19 @@ from datetime import datetime, timedelta
 from utils.dateutils import DateUtils
 
 from ..apps import LinkDatabase
-from ..models import CompactedTags, UserTags, ConfigurationEntry, UserVotes
+from ..models import (
+   UserTags,
+   CompactedTags,
+   UserCompactedTags,
+   ConfigurationEntry,
+   UserVotes,
+)
 from ..controllers import LinkDataController, EntryWrapper
 from ..forms import TagForm, TagEntryForm, TagRenameForm, ScannerForm
-from ..views import ViewPage
+from ..views import ViewPage, GenericListView, UserGenericListView
 
 
-class AllTags(generic.ListView):
+class CompactedTagsListView(GenericListView):
     model = CompactedTags
     context_object_name = "content_list"
     paginate_by = 9200
@@ -47,9 +53,16 @@ class AllTags(generic.ListView):
         return context
 
 
-class ActualTags(AllTags):
+class UserCompactedTagsListView(UserGenericListView):
+    model = UserCompactedTags
+    context_object_name = "content_list"
+    paginate_by = 9200
+    template_name = str(ViewPage.get_full_template("tags_list.html"))
+
+
+class ActualTags(UserGenericListView):
     model = UserTags
-    context_object_name = "tags_list"
+    context_object_name = "content_list"
     paginate_by = 9200
     template_name = str(ViewPage.get_full_template("tags_list.html"))
 

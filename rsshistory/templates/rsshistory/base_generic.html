@@ -41,7 +41,7 @@
         <link rel="search" href="opensearch.xml" type="application/opensearchdescription+xml" title="Django archive search">
         {% endif %}
     </head>
-    <body class="body-style">
+    <body class="body-style" style="padding-bottom: 3em;">
 	<!-- Third party things below -->
 	<!-- This was placed as last things. For search engines with icons this prevents us from accessing menu -->
 	<script src="{% static 'bootstrap/jquery-3.3.1.slim.min.js' %}"></script>
@@ -49,9 +49,7 @@
 	<script src="{% static 'bootstrap/bootstrap4.3.1.min.js' %}"></script>
 	<!-- Third party things above -->
 
-        <div class="container">
-            {% include "rsshistory/base_menu.html" %}
-        </div>
+    {% include "rsshistory/base_menu.html" %}
 
         <div class="container">
             {% block content %}{% endblock %}

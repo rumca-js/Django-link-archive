@@ -48,15 +48,17 @@ except Exception as E:
 
 
 class CrawlerInterface(object):
-    def __init__(self, request, response_file=None, response_port=None):
+    def __init__(self, request, response_file=None, response_port=None, settings=None):
         """
         @param response_file If set, response is stored in a file
         @param response_port If set, response is sent through port
+        @param settings passed settings
         """
         self.request = request
         self.response = None
         self.response_file = response_file
         self.response_port = response_port
+        self.settings = settings
 
     def run(self):
         """
@@ -142,14 +144,6 @@ class RequestsCrawler(CrawlerInterface):
     """
     Python requests
     """
-
-    def __init__(self, request, response_file=None, response_port=None):
-        """
-        Wrapper for python requests.
-        """
-        super().__init__(
-            request, response_file=response_file, response_port=response_port
-        )
 
     def run(self):
         if not self.is_valid():
@@ -319,14 +313,6 @@ class StealthRequestsCrawler(CrawlerInterface):
     Python steath requests
     """
 
-    def __init__(self, request, response_file=None, response_port=None):
-        """
-        Wrapper for python requests.
-        """
-        super().__init__(
-            request, response_file=response_file, response_port=response_port
-        )
-
     def run(self):
         if not self.is_valid():
             return
@@ -362,9 +348,9 @@ class SeleniumDriver(CrawlerInterface):
     """
     Everybody uses selenium
     """
-    def __init__(self, request, response_file=None, response_port=None, driver_executable = None):
+    def __init__(self, request, response_file=None, response_port=None, driver_executable = None, settings=None):
         super().__init__(
-            request, response_file=response_file, response_port=response_port
+            request, response_file=response_file, response_port=response_port, settings=settings
         )
         self.display = None
         self.driver = None
@@ -536,7 +522,7 @@ class SeleniumChromeHeadless(SeleniumDriver):
 
         try:
             # add 10 seconds for start of browser, etc.
-            selenium_timeout = self.request.timeout_s + 10
+            selenium_timeout = self.request.timeout_s
 
             self.driver.set_page_load_timeout(selenium_timeout)
 
@@ -658,7 +644,7 @@ class SeleniumChromeFull(SeleniumDriver):
 
         try:
             # add 10 seconds for start of browser, etc.
-            selenium_timeout = self.request.timeout_s + 20
+            selenium_timeout = self.request.timeout_s
 
             self.driver.set_page_load_timeout(selenium_timeout)
 
@@ -751,7 +737,7 @@ class SeleniumUndetected(SeleniumDriver):
 
         try:
             # add 10 seconds for start of browser, etc.
-            selenium_timeout = self.request.timeout_s + 20
+            selenium_timeout = self.request.timeout_s
 
             self.driver.set_page_load_timeout(selenium_timeout)
 
@@ -800,8 +786,8 @@ class ScriptCrawler(CrawlerInterface):
     Note:
      If we have multiple instances/workspaces each can write their own output file
     """
-    def __init__(self, request, response_file=None, response_port=None, cwd=None, script=None):
-        super().__init__(request = request, response_file = response_file, response_port = response_port)
+    def __init__(self, request, response_file=None, response_port=None, cwd=None, script=None, settings=None):
+        super().__init__(request = request, response_file = response_file, response_port = response_port, settings=settings)
         self.cwd = cwd
         self.script = script
 
@@ -899,8 +885,8 @@ class ServerCrawler(CrawlerInterface):
     Used to ask crawling server for URL.
     Sends request to server, and receives reply
     """
-    def __init__(self, request, response_file=None, response_port=None, script=None):
-        super().__init__(request = request, response_file = response_file, response_port = response_port)
+    def __init__(self, request, response_file=None, response_port=None, settings=None, script=None):
+        super().__init__(request = request, response_file = response_file, response_port = response_port, settings=settings)
         self.script = script
         self.connection = None
 

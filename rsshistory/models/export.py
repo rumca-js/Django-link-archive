@@ -143,7 +143,7 @@ class DataExport(models.Model):
 
 class SourceExportHistory(models.Model):
     date = models.DateField(null=False)
-    export_obj = models.ForeignKey(
+    export = models.ForeignKey(
         DataExport,
         related_name="export_history",
         on_delete=models.CASCADE,
@@ -161,7 +161,7 @@ class SourceExportHistory(models.Model):
             yesterday = DateUtils.get_date_yesterday()
 
             history = SourceExportHistory.objects.filter(
-                date=yesterday, export_obj=export
+                date=yesterday, export=export
             )
 
             if history.count() != 0:
@@ -190,11 +190,11 @@ class SourceExportHistory(models.Model):
 
         if (
             SourceExportHistory.objects.filter(
-                date=process_date, export_obj=export
+                date=process_date, export=export
             ).count()
             == 0
         ):
-            SourceExportHistory.objects.create(date=process_date, export_obj=export)
+            SourceExportHistory.objects.create(date=process_date, export=export)
 
     def cleanup():
         remove_threshold = datetime.today() - timedelta(days=30)

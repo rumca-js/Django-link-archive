@@ -718,7 +718,7 @@ class EntryUpdater(object):
         if self.entry.is_archive_entry():
             return 0
 
-        visits = UserEntryVisitHistory.objects.filter(entry_object=self.entry)
+        visits = UserEntryVisitHistory.objects.filter(entry=self.entry)
 
         sum_num = 0
         for visit in visits:

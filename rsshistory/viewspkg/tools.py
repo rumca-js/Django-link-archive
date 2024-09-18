@@ -11,6 +11,7 @@ from ..controllers import (
     LinkDataController,
     EntryDataBuilder,
     BackgroundJobController,
+    SearchEngines,
 )
 from ..configuration import Configuration
 from ..forms import (
@@ -524,3 +525,55 @@ def page_verify(request):
         url = form.cleaned_data["link"]
 
         return page_verify_internal(url)
+
+
+def search_engines(request):
+    p = ViewPage(request)
+    p.set_title("Search engines")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    search_engines = []
+    ai_search_engines = []
+    archives = []
+
+    engine_classes = SearchEngines.get_search_engines()
+    for engine_class in engine_classes:
+        engine = engine_class()
+        search_engines.append(engine)
+
+    engine_classes = SearchEngines.get_aibots()
+    for engine_class in engine_classes:
+        engine = engine_class()
+        ai_search_engines.append(engine)
+
+    engine_classes = SearchEngines.get_archive_libraries()
+    for engine_class in engine_classes:
+        engine = engine_class()
+        archives.append(engine)
+
+    p.context["search_engines"] = search_engines
+    p.context["ai_search_engines"] = ai_search_engines
+    p.context["archives"] = archives
+
+    return p.render("search_engines.html")
+
+
+def gateways(request):
+    p = ViewPage(request)
+    p.set_title("Gateways - useful places on the web")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    result = []
+
+    engine_classes = SearchEngines.get_gateways()
+    for engine_class in engine_classes:
+        engine = engine_class()
+        result.append(engine)
+
+    p.context["gateways"] = result
+
+    return p.render("gateways.html")

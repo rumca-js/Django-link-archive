@@ -27,7 +27,7 @@ class UserSearchHistory(models.Model):
 
     search_query = models.CharField(max_length=1000)
     date = models.DateTimeField(auto_now_add=True)
-    user_object = models.ForeignKey(
+    user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name=str(LinkDatabase.name) + "_search_history",
@@ -54,7 +54,7 @@ class UserSearchHistory(models.Model):
             )
 
             theobject = UserSearchHistory.objects.create(
-                search_query=search_query, user_object=user
+                search_query=search_query, user=user
             )
             UserSearchHistory.delete_old_entries(user)
 
@@ -66,11 +66,11 @@ class UserSearchHistory(models.Model):
             UserSearchHistory.objects.all().delete()
 
         # safety cleanup, if user is not set
-        qs = UserSearchHistory.objects.filter(user_object__isnull=True)
+        qs = UserSearchHistory.objects.filter(user__isnull=True)
         for q in qs:
             users = User.objects.filter(username=q.user)
             if users.count() > 0:
-                q.user_object = users[0]
+                q.user = users[0]
                 q.save()
             else:
                 LinkDatabase.info("Removing invalid search")
@@ -81,7 +81,7 @@ class UserSearchHistory(models.Model):
         if not user.is_authenticated:
             return
 
-        qs = UserSearchHistory.objects.filter(user_object=user).order_by("-date")
+        qs = UserSearchHistory.objects.filter(user=user).order_by("-date")
         if qs.exists():
             return qs[0]
 
@@ -94,7 +94,7 @@ class UserSearchHistory(models.Model):
         if not user.is_authenticated:
             return choices
 
-        qs = UserSearchHistory.objects.filter(user_object=user).order_by("-date")[
+        qs = UserSearchHistory.objects.filter(user=user).order_by("-date")[
             : UserSearchHistory.get_choices_limit()
         ]
 
@@ -105,7 +105,7 @@ class UserSearchHistory(models.Model):
         return choices
 
     def delete_old_entries(user):
-        qs = UserSearchHistory.objects.filter(user_object=user).order_by("date")
+        qs = UserSearchHistory.objects.filter(user=user).order_by("date")
         limit = UserSearchHistory.get_choices_model_limit()
         if qs.count() > limit:
             too_many = qs.count() - limit
@@ -115,7 +115,7 @@ class UserSearchHistory(models.Model):
 
     def delete_old_user_entries(user, search_query):
         entries = UserSearchHistory.objects.filter(
-            search_query=search_query, user_object=user
+            search_query=search_query, user=user
         )
         if entries.exists():
             entries.delete()
@@ -134,7 +134,7 @@ class UserEntryTransitionHistory(models.Model):
     """
 
     counter = models.IntegerField(default=0)
-    user_object = models.ForeignKey(
+    user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name=str(LinkDatabase.name) + "_entry_transitions",
@@ -168,7 +168,7 @@ class UserEntryTransitionHistory(models.Model):
             return result
 
         link_transitions = UserEntryTransitionHistory.objects.filter(
-            user_object=user, entry_from=navigated_to_entry
+            user=user, entry_from=navigated_to_entry
         ).order_by("-counter")
 
         config_entry = Configuration.get_object().config_entry
@@ -208,12 +208,12 @@ class UserEntryTransitionHistory(models.Model):
 
         else:
             return UserEntryTransitionHistory.objects.create(
-                entry_from=entry_from, entry_to=entry_to, counter=1, user_object=user
+                entry_from=entry_from, entry_to=entry_to, counter=1, user=user
             )
 
     def get_element(user, entry_from, entry_to):
         links = UserEntryTransitionHistory.objects.filter(
-            user_object=user, entry_from=entry_from, entry_to=entry_to
+            user=user, entry_from=entry_from, entry_to=entry_to
         ).order_by("-counter")
         if links.exists():
             return links[0]
@@ -227,11 +227,11 @@ class UserEntryTransitionHistory(models.Model):
             UserEntryTransitionHistory.objects.all().delete()
 
         # safety cleanup, if user is not set
-        qs = UserEntryTransitionHistory.objects.filter(user_object__isnull=True)
+        qs = UserEntryTransitionHistory.objects.filter(user__isnull=True)
         for q in qs:
             users = User.objects.filter(username=q.user)
             if users.count() > 0:
-                q.user_object = users[0]
+                q.user = users[0]
                 q.save()
             else:
                 LinkDatabase.info("Cannot find user:'{}'".format(q.user))
@@ -245,7 +245,7 @@ class UserEntryTransitionHistory(models.Model):
         transitions = UserEntryTransitionHistory.objects.filter(entry_from=source_entry)
         for transition in transitions:
             dst_transitions = UserEntryTransitionHistory.objects.filter(
-                entry_from=destination_entry, user_object=transition.user_object
+                entry_from=destination_entry, user=transition.user
             )
             if dst_transitions.exists():
                 dst_transition = dst_transitions[0]
@@ -261,7 +261,7 @@ class UserEntryTransitionHistory(models.Model):
         transitions = UserEntryTransitionHistory.objects.filter(entry_to=source_entry)
         for transition in transitions:
             dst_transitions = UserEntryTransitionHistory.objects.filter(
-                entry_to=destination_entry, user_object=transition.user_object
+                entry_to=destination_entry, user=transition.user
             )
             if dst_transitions.exists():
                 dst_transition = dst_transitions[0]
@@ -283,14 +283,14 @@ class UserEntryVisitHistory(models.Model):
 
     visits = models.IntegerField(blank=True, null=True)
     date_last_visit = models.DateTimeField(blank=True, null=True)
-    user_object = models.ForeignKey(
+    user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name=str(LinkDatabase.name) + "_entry_visits",
         null=True,
     )
 
-    entry_object = models.ForeignKey(
+    entry = models.ForeignKey(
         LinkDataModel,
         on_delete=models.CASCADE,
         related_name="visits_counter",
@@ -335,21 +335,21 @@ class UserEntryVisitHistory(models.Model):
             previous_entry = UserEntryVisitHistory.get_last_user_entry(user)
 
         visits = UserEntryVisitHistory.objects.filter(
-            user_object=user, entry_object=entry
+            user=user, entry=entry
         )
 
         if visits.count() == 0:
             visit = UserEntryVisitHistory.objects.create(
                 visits=1,
-                entry_object=entry,
+                entry=entry,
                 date_last_visit=DateUtils.get_datetime_now_utc(),
-                user_object=user,
+                user=user,
             )
         else:
             visit = visits[0]
             visit.visits += 1
             visit.date_last_visit = DateUtils.get_datetime_now_utc()
-            visit.user_object = user
+            visit.user = user
             visit.save()
 
         if previous_entry:
@@ -367,7 +367,7 @@ class UserEntryVisitHistory(models.Model):
             return False
 
         visits = UserEntryVisitHistory.objects.filter(
-            user_object=user, entry_object=entry
+            user=user, entry=entry
         )
 
         if (
@@ -397,8 +397,8 @@ class UserEntryVisitHistory(models.Model):
             return True
 
         histories = UserEntryVisitHistory.objects.filter(
-            user_object=user,
-            entry_object=entry,
+            user=user,
+            entry=entry,
         )
 
         if histories.count() > 0:
@@ -422,21 +422,21 @@ class UserEntryVisitHistory(models.Model):
         burst_time_limit = DateUtils.get_datetime_now_utc() - timedelta(seconds=15)
 
         entries = UserEntryVisitHistory.objects.filter(
-            user_object=user,
+            user=user,
             date_last_visit__gt=time_ago_limit,
             date_last_visit__lt=burst_time_limit,
         ).order_by("-date_last_visit")
         if entries.exists():
-            return entries[0].entry_object
+            return entries[0].entry
 
         # something might be in burst time
 
         entries = UserEntryVisitHistory.objects.filter(
-            user_object=user,
+            user=user,
             date_last_visit__gt=time_ago_limit,
         ).order_by("date_last_visit")
         if entries.exists():
-            return entries[0].entry_object
+            return entries[0].entry
 
     def cleanup():
         config_entry = Configuration.get_object().config_entry
@@ -447,11 +447,11 @@ class UserEntryVisitHistory(models.Model):
             UserEntryVisitHistory.objects.all().delete()
 
         # safety cleanup, if user is not set
-        qs = UserEntryVisitHistory.objects.filter(user_object__isnull=True)
+        qs = UserEntryVisitHistory.objects.filter(user__isnull=True)
         for q in qs:
             users = User.objects.filter(username=q.user)
             if users.count() > 0:
-                q.user_object = users[0]
+                q.user = users[0]
                 q.save()
             else:
                 LinkDatabase.info("Cannot find user:'{}'".format(q.user))
@@ -459,10 +459,10 @@ class UserEntryVisitHistory(models.Model):
                 time.sleep(0.5)
 
     def move_entry(source_entry, destination_entry):
-        visits = UserEntryVisitHistory.objects.filter(entry_object=source_entry)
+        visits = UserEntryVisitHistory.objects.filter(entry=source_entry)
         for visit in visits:
             dst_visits = UserEntryVisitHistory.objects.filter(
-                entry_object=destination_entry, user_object=visit.user_object
+                entry=destination_entry, user=visit.user
             )
             if dst_visits.exists():
                 dst_visit = dst_visits[0]
@@ -474,7 +474,7 @@ class UserEntryVisitHistory(models.Model):
                 visit.delete()
                 continue
 
-            visit.entry_object = destination_entry
+            visit.entry = destination_entry
             visit.save()
 
 

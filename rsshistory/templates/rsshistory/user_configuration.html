@@ -2,12 +2,6 @@
 {% load static %}
 {% block content %}
 
-<div class="contentbuttonmenu">
-    <a href="{% url 'rsshistory:logout' %}" class="btn btn-primary">
-                <img src="{% static 'rsshistory/icons/icons8-logout-100.png' %}" class="content-icon" />
-                Logout</a>
-</div>
-
 <h1>User configuration: [{{ user.get_username }}]</h1>
 
 <div>Karma: {{user_object.karma}}</div>

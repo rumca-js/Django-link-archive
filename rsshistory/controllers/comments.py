@@ -31,7 +31,7 @@ class UserCommentsController(UserComments):
 
         link = LinkDataModel.objects.get(id=link_id)
 
-        criterion0 = Q(user_object=user, entry_object=link)
+        criterion0 = Q(user=user, entry=link)
         criterion1 = Q(date_published__range=[time_start, time_stop])
         criterion2 = Q(date_edited__range=[time_start, time_stop])
 
@@ -58,7 +58,7 @@ class UserCommentsController(UserComments):
 
         date_published = data["date_published"]
         comments = UserComments.objects.filter(
-            user_object=user, entry_object=entry, date_published=date_published
+            user=user, entry=entry, date_published=date_published
         )
 
         if comments.count() == 0:
@@ -73,8 +73,8 @@ class UserCommentsController(UserComments):
                 comment=data["comment"],
                 date_published=data["date_published"],
                 date_edited=data["date_edited"],
-                entry_object=entry,
-                user_object=user,
+                entry=entry,
+                user=user,
                 reply_id=reply_id,
             )
 
@@ -84,8 +84,8 @@ class UserCommentsController(UserComments):
         """
         entry = None
 
-        if "entry_object" in data:
-            entry = data["entry_object"]
+        if "entry" in data:
+            entry = data["entry"]
 
         if "entry_id" in data:
             entry_id = data["entry_id"]

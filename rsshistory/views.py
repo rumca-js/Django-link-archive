@@ -3,10 +3,15 @@ from pathlib import Path
 from django.shortcuts import render
 from django.views import generic
 from django.urls import reverse
+from django.contrib.auth.models import User
 
 from webtools import HtmlPage, RssPage, HttpPageHandler
 
-from .models import UserConfig, ConfigurationEntry, AppLogging, ApiKeys, ReadLater
+from .models import(
+   UserConfig, ConfigurationEntry, AppLogging,
+   ApiKeys,
+   ReadLater
+)
 from .configuration import Configuration
 from .apps import LinkDatabase
 from .configuration import Configuration
@@ -219,16 +224,44 @@ class GenericListView(generic.ListView):
         if data is not None:
             return redirect("{}:missing-rights".format(LinkDatabase.name))
 
+        return super().get(*args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get the context
+        context = super().get_context_data(**kwargs)
+        context = ViewPage(self.request).init_context(context)
+
+        return context
+
+    def get_queryset(self):
+        p = ViewPage(self.request)
+        data = p.check_access()
+        if data is not None:
+            return redirect("{}:missing-rights".format(LinkDatabase.name))
+
+        return super().get_queryset()
+
+
+class UserGenericListView(GenericListView):
+    def get(self, *args, **kwargs):
+        p = ViewPage(self.request)
+        data = p.check_access()
+        if data is not None:
+            return redirect("{}:missing-rights".format(LinkDatabase.name))
+
         self.search_user_id = None
         self.search_user = None
 
         if "user_id" in kwargs:
-            if not self.request.user.is_staff:
-                self.search_user_id = self.request.user.id
-            else:
-                self.search_user_id = kwargs["user_id"]
+            self.search_user_id = kwargs["user_id"]
+        if "user" in kwargs:
+            self.search_user_id = kwargs["user"]
 
-            users = User.objects.filter(username = self.search_user_id)
+        if not self.search_user_id or not self.request.user.is_staff:
+            self.search_user_id = self.request.user.id
+
+        if self.search_user_id:
+            users = User.objects.filter(id = self.search_user_id)
             if users.count() > 0:
                 self.search_user = users[0]
 

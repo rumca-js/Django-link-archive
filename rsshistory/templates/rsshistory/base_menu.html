@@ -1,9 +1,13 @@
 {% load static %}
 
-<nav class="navbar navbar-expand-sm">
-    <a class="navbar-brand nav-link" href="{% url 'rsshistory:entries-omni-search-init' %}" title="Home">
-	 <img src="{% static 'rsshistory/icons/icons8-search-100.png' %}" class="mainbutton-icon" />
-    </a>
+{% if user_config.display_style == "style-dark" %}
+<nav class="navbar sticky-top navbar-expand-sm bg-dark">
+{% else %}
+<nav class="navbar sticky-top navbar-expand-sm bg-light">
+{% endif %}
+   <a class="navbar-brand nav-link" href="{% url 'rsshistory:entries-omni-search-init' %}" title="Home">
+    <img src="{% static 'rsshistory/icons/icons8-search-100.png' %}" class="mainbutton-icon" />
+   </a>
 
    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNavBar" aria-controls="mainNavBar" aria-expanded="false" aria-label="Toggle navigation">
      <span class="navbar-toggler-icon"></span>
@@ -11,79 +15,195 @@
 
    <div class="collapse navbar-collapse" id="mainNavBar">
        <ul class="nav navbar-nav mr-auto">
-           <li class="nav-item">
-               <a href="{% url 'rsshistory:entries-recent' %}" class="nav-link" title="Shows new entries">
-                   <img src="{% static 'rsshistory/icons/icons8-new-100.png' %}" class="mainbutton-icon" />
-                   What's new</a>
-           </li>
-           {% if user.is_authenticated %}
-               {% if is_read_later %}
-               <li class="nav-item">
-                   <a href="{% url 'rsshistory:read-later-entries' %}" class="nav-link" title="Shows entries marked as later to read">
-                       <img src="{% static 'rsshistory/icons/icons8-bookmarks-100.png' %}" class="mainbutton-icon" />
-                       Read later</a>
-               </li>
-               {% endif %}
-               <li class="nav-item">
-                   <a href="{% url 'rsshistory:entries-bookmarked' %}" class="nav-link" title="Shows bookmarked links. By default shows all users bookmarks.">
-                       <img src="{% static 'rsshistory/icons/icons8-bookmarks-100.png' %}" class="mainbutton-icon" />
-                       Bookmarks</a>
-               </li>
-               <li class="nav-item">
-                   <a href="{% url 'rsshistory:tags-show-all' %}" class="nav-link" title="Tags. By default shows all users tags">
-                       <img src="{% static 'rsshistory/icons/icons8-tags-100.png' %}" class="mainbutton-icon" />
-                       Tags</a>
-               </li>
-           {% endif %}
-           {% if config.enable_domain_support %}
-               <li class="nav-item">
-                   <a href="{% url 'rsshistory:domains' %}" class="nav-link" title="Captured domains">
-                       <img src="{% static 'rsshistory/icons/icons8-www-64.png' %}" class="mainbutton-icon" />
-                       Domains</a>
-               </li>
-           {% endif %}
-           <li class="nav-item">
-               {% if config.enable_keyword_support %}
-               <a href="{% url 'rsshistory:keywords' %}" class="nav-link" title="Shows keywords used by links">
-                   <img src="{% static 'rsshistory/icons/icons8-letters-96.png' %}" class="mainbutton-icon" />
-                   Keywords</a>
-               {% endif %}
-           </li>
 
-           <li class="nav-item">
-               <a href="{% url 'rsshistory:sources' %}" class="nav-link" title="Sources">
-                   <img src="{% static 'rsshistory/icons/icons8-broadcast-100.png' %}" class="mainbutton-icon" />
-                   Sources</a>
-           </li>
-
-           {% if user.is_staff %}
-           <li class="nav-item">
-               <a href="{% url 'rsshistory:admin-page' %}" class="nav-link" title="Admin">
-                   <img src="{% static 'rsshistory/icons/icons8-configuration-67.png' %}" class="mainbutton-icon" />
-                   Admin</a>
-           </li>
-           {% endif %}
-
-           {% if user.is_authenticated %}
-           <li class="nav-item">
-               <a href="{% url 'rsshistory:user-personal' %}" class="nav-link" title="Personal space">
-                   <img src="{% static 'rsshistory/icons/icons8-bookmarks-100.png' %}" class="mainbutton-icon" />
-                   Personal</a>
-           </li>
-
-           <li class="nav-item">
-               <a href="{% url 'rsshistory:user-config' %}" class="nav-link" title="User config">
-                   <img src="{% static 'rsshistory/icons/account.png' %}" class="mainbutton-icon" />
-                   [{{ user.get_username }}]
+           <li class="nav-item dropdown">
+               <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                   Search
                </a>
+               <ul class="dropdown-menu">
+                   <li>
+                       <a href="{% url 'rsshistory:search-engines' %}" class="dropdown-item" href="#" title="Shows search engines">
+                           <img src="{% static 'rsshistory/icons/icons8-search-100.png' %}" class="mainbutton-icon" />
+                           Search engines</a>
+                   </li>
+                   <li>
+                       <a href="{% url 'rsshistory:gateways' %}" class="dropdown-item" href="#" title="Shows popular places">
+                           <img src="{% static 'rsshistory/icons/icons8-search-100.png' %}" class="mainbutton-icon" />
+                           Gateways</a>
+                   </li>
+                   <li>
+                       <a href="{% url 'rsshistory:entries-recent' %}" class="dropdown-item" href="#" title="Shows new entries">
+                           <img src="{% static 'rsshistory/icons/icons8-new-100.png' %}" class="mainbutton-icon" />
+                           What's new</a>
+                   </li>
+               </ul>
            </li>
-           {% else %}
-           <li class="nav-item">
-               <a href="{% url 'rsshistory:login' %}"  class="nav-link" title="Login">
-                   <img src="{% static 'rsshistory/icons/icons8-login-100.png' %}" class="mainbutton-icon" />
-                   Login</a>
+
+           <li class="nav-item dropdown">
+               <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                   Global
+               </a>
+               <ul class="dropdown-menu">
+                   <li>
+                       <a href="{% url 'rsshistory:entries-bookmarked' %}" class="dropdown-item" href="#" title="Shows bookmarked links. By default shows all users bookmarks.">
+                           <img src="{% static 'rsshistory/icons/icons8-bookmarks-100.png' %}" class="mainbutton-icon" />
+                           Bookmarks</a>
+                   </li>
+                   <li>
+                       <a href="{% url 'rsshistory:tags-show-all' %}" class="dropdown-item" href="#" title="Tags. By default shows all users tags">
+                           <img src="{% static 'rsshistory/icons/icons8-tags-100.png' %}" class="mainbutton-icon" />
+                           Tags</a>
+                   </li>
+                   {% if config.enable_domain_support %}
+                   <li>
+                       <a href="{% url 'rsshistory:domains' %}" class="dropdown-item" href="#" title="Captured domains">
+                           <img src="{% static 'rsshistory/icons/icons8-www-64.png' %}" class="mainbutton-icon" />
+                           Domains</a>
+                   </li>
+                   {% endif %}
+                   <li>
+                       {% if config.enable_keyword_support %}
+                       <a href="{% url 'rsshistory:keywords' %}" class="dropdown-item" href="#" title="Shows keywords used by links">
+                           <img src="{% static 'rsshistory/icons/icons8-letters-96.png' %}" class="mainbutton-icon" />
+                           Keywords</a>
+                       {% endif %}
+                   </li>
+                   <li>
+                       <a href="{% url 'rsshistory:sources' %}" class="dropdown-item" href="#" title="Sources">
+                           <img src="{% static 'rsshistory/icons/icons8-broadcast-100.png' %}" class="mainbutton-icon" />
+                           Sources</a>
+                   </li>
+               </ul>
            </li>
-           {% endif %}
+
+           {% if user.is_authenticated %}
+           <li class="nav-item dropdown">
+               <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                   Personal
+               </a>
+               <ul class="dropdown-menu">
+                   {% if is_read_later %}
+                   <li class="nav-item">
+                       <a href="{% url 'rsshistory:read-later-entries' %}" class="dropdown-item" href="#" title="Shows entries marked as later to read">
+                           <img src="{% static 'rsshistory/icons/icons8-bookmarks-100.png' %}" class="mainbutton-icon" />
+                           Read later</a>
+                   </li>
+                   {% endif %}
+                   <li>
+                       <a href="{% url 'rsshistory:user-entries-bookmarked' %}" class="dropdown-item" href="#" title="Shows bookmarked links. By default shows all users bookmarks.">
+                           <img src="{% static 'rsshistory/icons/icons8-bookmarks-100.png' %}" class="mainbutton-icon" />
+                           Bookmarks</a>
+                   </li>
+                   <li>
+                       <a href="{% url 'rsshistory:user-tags-show' %}" class="dropdown-item" href="#" title="Tags. By default shows all users tags">
+                           <img src="{% static 'rsshistory/icons/icons8-tags-100.png' %}" class="mainbutton-icon" />
+                           Tags</a>
+                   </li>
+                   <!--li><a class="dropdown-item" href="#" title="Allows to define source folders like 'music', 'movies'">Folders</a></li-->
+               </ul>
+           </li>
+          {% endif %}
+
+          <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Tools
+              </a>
+              <ul class="dropdown-menu">
+                  {% if user.is_staff %}
+                  <li>
+                      <a href="{% url 'rsshistory:entry-add-simple' %}" title="Add entry" class="dropdown-item">
+                          <img src="{% static 'rsshistory/icons/icons8-add-link-96.png' %}" class="content-icon" />
+                          Add entry</a>
+                  </li>
+                  <li>
+                      <a href="{% url 'rsshistory:download-url' %}" title="Downloads URL" class="dropdown-item">
+                          <img src="{% static 'rsshistory/icons/icons8-download-page-96.png' %}" class="content-icon" />
+                          Download URL</a>
+                  </li>
+                  <li>
+                      <a href="{% url 'rsshistory:download-music-url' %}" title="Downloads music" class="dropdown-item">
+                          <img src="{% static 'rsshistory/icons/icons8-download-music-96.png' %}" class="content-icon" />
+                          Download music</a>
+                  </li>
+                  <li>
+                      <a href="{% url 'rsshistory:download-video-url' %}" title="Downloads video" class="dropdown-item">
+                          <img src="{% static 'rsshistory/icons/icons8-download-video-96.png' %}" class="content-icon" />
+                          Download video</a>
+                  </li>
+                  {% endif %}
+                  {% if user.is_staff %}
+                  <li>
+                      <a href="{% url 'rsshistory:page-scan-link' %}" title="Scans page URL for links" class="dropdown-item">
+                          <img src="{% static 'rsshistory/icons/icons8-radar-64.png' %}" class="content-icon" />
+                          Scan page URL</a>
+                  </li>
+                  {% endif %}
+                  {% if user.is_authenticated %}
+                  <li>
+                      <a href="{% url 'rsshistory:page-show-props' %}" title="Shows page properties" class="dropdown-item">
+                          <img src="{% static 'rsshistory/icons/icons8-view-details-100.png' %}" class="content-icon" />
+                          Page Properties</a>
+                  </li>
+                  {% endif %}
+                  <li>
+                      <a href="{% url 'rsshistory:is-url-allowed' %}" title="Checks if URL is allowed by robots.txt" class="dropdown-item">
+                          <img src="{% static 'rsshistory/icons/icons8-radar-64.png' %}" class="content-icon" />
+                          Check link for robots.txt</a>
+                  </li>
+                  <li>
+                      <a href="{% url 'rsshistory:page-verify' %}" title="Verifies page" class="dropdown-item">
+                          <img src="{% static 'rsshistory/icons/icons8-radar-64.png' %}" class="content-icon" />
+                          Verify page</a>
+                  </li>
+                  <li>
+                      <a href="{% url 'rsshistory:cleanup-link' %}" title="Shows cleanedup link" class="dropdown-item">
+                          <img src="{% static 'rsshistory/icons/icons8-view-details-100.png' %}" class="content-icon" />
+                          Cleanup Link</a>
+                  </li>
+              </ul>
+          </li>
+
+          {% if not user.is_authenticated %}
+          <li class="nav-item">
+              <a href="{% url 'rsshistory:login' %}"  class="nav-link" title="Login">
+                  <img src="{% static 'rsshistory/icons/icons8-login-100.png' %}" class="mainbutton-icon" />
+                  Login</a>
+          </li>
+          {% else %}
+          <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  User
+              </a>
+              <ul class="dropdown-menu">
+                  {% if user.is_staff %}
+                  <li class="nav-item">
+                      <a href="{% url 'rsshistory:admin-page' %}" class="nav-link" title="Admin">
+                          <img src="{% static 'rsshistory/icons/icons8-configuration-67.png' %}" class="mainbutton-icon" />
+                          Admin</a>
+                  </li>
+                  {% endif %}
+
+                  <li class="nav-item">
+                      <a href="{% url 'rsshistory:user-personal' %}" class="nav-link" title="Personal space">
+                          <img src="{% static 'rsshistory/icons/icons8-bookmarks-100.png' %}" class="mainbutton-icon" />
+                          Personal</a>
+                  </li>
+
+                  <li class="nav-item">
+                      <a href="{% url 'rsshistory:user-config' %}" class="nav-link" title="User config">
+                          <img src="{% static 'rsshistory/icons/account.png' %}" class="mainbutton-icon" />
+                          [{{ user.get_username }}]
+                      </a>
+                  </li>
+
+                  <li class="nav-item">
+                      <a href="{% url 'rsshistory:logout' %}" class="btn btn-primary">
+                          <img src="{% static 'rsshistory/icons/icons8-logout-100.png' %}" class="content-icon" />
+                          Logout
+                      </a>
+                  </li>
+          </li>
+          {% endif %}
        </ul>
     </div>
 </nav>

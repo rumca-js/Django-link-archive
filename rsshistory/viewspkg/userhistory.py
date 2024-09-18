@@ -6,10 +6,10 @@ from django.http import HttpResponseRedirect, HttpResponse
 from ..apps import LinkDatabase
 from ..models import ConfigurationEntry
 from ..models import UserEntryVisitHistory
-from ..views import ViewPage, GenericListView
+from ..views import ViewPage, UserGenericListView
 
 
-class UserEntryVisitHistoryListView(GenericListView):
+class UserEntryVisitHistoryListView(UserGenericListView):
     model = UserEntryVisitHistory
     context_object_name = "content_list"
     paginate_by = 100

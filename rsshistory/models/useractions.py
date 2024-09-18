@@ -28,14 +28,14 @@ class UserTags(models.Model):
     date = models.DateTimeField(auto_now_add=True)
     tag = models.CharField(max_length=1000)
 
-    user_object = models.ForeignKey(
+    user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name=str(LinkDatabase.name) + "_user_tags",
         null=True,
     )
 
-    entry_object = models.ForeignKey(
+    entry = models.ForeignKey(
         LinkDataModel,
         on_delete=models.CASCADE,
         related_name="tags",
@@ -61,7 +61,7 @@ class UserTags(models.Model):
 
     def get_user_tag_string(user, entry):
         current_tags_objs = UserTags.objects.filter(
-            entry_object=entry, user_object=user
+            entry=entry, user=user
         )
 
         if current_tags_objs.exists():
@@ -96,11 +96,11 @@ class UserTags(models.Model):
         user_name = user.username
 
         objs = UserTags.objects.filter(
-            entry_object=entry, user_object=user, tag=tag_name
+            entry=entry, user=user, tag=tag_name
         )
 
         if objs.count() == 0:
-            UserTags.objects.create(entry_object=entry, user_object=user, tag=tag_name)
+            UserTags.objects.create(entry=entry, user=user, tag=tag_name)
 
             from ..controllers import BackgroundJobController
 
@@ -159,7 +159,7 @@ class UserTags(models.Model):
         if not entry.is_taggable():
             return
 
-        tag_objs = UserTags.objects.filter(user_object=user, entry_object=entry)
+        tag_objs = UserTags.objects.filter(user=user, entry=entry)
 
         if tag_objs.exists():
             tag_objs.delete()
@@ -167,50 +167,101 @@ class UserTags(models.Model):
         tags_set = data["tags"]
 
         for tag in tags_set:
-            UserTags.objects.create(tag=tag, entry_object=entry, user_object=user)
+            UserTags.objects.create(tag=tag, entry=entry, user=user)
 
         from ..controllers import BackgroundJobController
 
         BackgroundJobController.entry_reset_local_data(entry)
 
     def cleanup():
-        for q in UserTags.objects.filter(user_object__isnull=True):
+        for q in UserTags.objects.filter(user__isnull=True):
             users = User.objects.filter(is_superuser=True)
             if users.count() > 0:
                 user = users[0]
-                q.user_object = user
+                q.user = user
                 q.save()
 
-                # LinkDatabase.error("Cannot find user '{}'".format(q.user_object.id))
+                # LinkDatabase.error("Cannot find user '{}'".format(q.user.id))
                 # q.delete()
                 # time.sleep(0.5)
 
     def move_entry(source_entry, destination_entry):
-        tags = UserTags.objects.filter(entry_object=source_entry)
+        tags = UserTags.objects.filter(entry=source_entry)
         for tag in tags:
             dst_tags = UserTags.objects.filter(
-                entry_object=destination_entry, user_object=tag.user_object, tag=tag.tag
+                entry=destination_entry, user=tag.user, tag=tag.tag
             )
             if dst_tags.exists():
                 tag.delete()
                 continue
 
-            tag.entry_object = destination_entry
+            tag.entry = destination_entry
             tag.save()
 
 
+class UserCompactedTags(models.Model):
+    tag = models.CharField(max_length=1000)
+    count = models.IntegerField(default=0)
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name=str(LinkDatabase.name) + "_user_ctags",
+        null=True,
+    )
+
+    class Meta:
+        ordering = ["-count"]
+
+    def cleanup():
+        UserCompactedTags.objects.all().delete()
+
+        tags = UserTags.objects.all()
+        for tag in tags:
+            compacts = UserCompactedTags.objects.filter(tag=tag.tag, user = tag.user)
+
+            if compacts.count() == 0:
+                UserCompactedTags.objects.create(tag=tag.tag, count=1)
+            else:
+                compacted = compacts[0]
+                compacted.count += 1
+                compacted.save()
+
+
+class CompactedTags(models.Model):
+    tag = models.CharField(max_length=1000)
+    count = models.IntegerField(default=0)
+
+    class Meta:
+        ordering = ["-count"]
+
+    def cleanup():
+        CompactedTags.objects.all().delete()
+
+        tags = UserTags.objects.all()
+        for tag in tags:
+            compacts = CompactedTags.objects.filter(tag=tag.tag)
+
+            if compacts.count() == 0:
+                CompactedTags.objects.create(tag=tag.tag, count=1)
+            else:
+                compacted = compacts[0]
+                compacted.count += 1
+                compacted.save()
+
+
 class UserVotes(models.Model):
-    user = models.CharField(max_length=1000)
+    username = models.CharField(max_length=1000)
     vote = models.IntegerField(default=0)
 
-    user_object = models.ForeignKey(
+    user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name=str(LinkDatabase.name) + "_user_votes",
         null=True,
     )
 
-    entry_object = models.ForeignKey(
+    entry = models.ForeignKey(
         LinkDataModel,
         on_delete=models.CASCADE,
         related_name="votes",
@@ -225,16 +276,16 @@ class UserVotes(models.Model):
         if not user.is_authenticated:
             return
 
-        votes = UserVotes.objects.filter(user_object=user, entry_object=entry)
+        votes = UserVotes.objects.filter(user=user, entry=entry)
 
         if votes.count() == 0:
-            votes = UserVotes.objects.filter(user=user, entry_object=entry)
+            votes = UserVotes.objects.filter(user=user, entry=entry)
             votes.delete()
 
             ob = UserVotes.objects.create(
                 vote=vote,
-                entry_object=entry,
-                user_object=user,
+                entry=entry,
+                user=user,
             )
         else:
             ob = votes[0]
@@ -248,7 +299,7 @@ class UserVotes(models.Model):
         return ob
 
     def get_user_vote(user, entry):
-        votes = UserVotes.objects.filter(user_object=user, entry_object=entry)
+        votes = UserVotes.objects.filter(user=user, entry=entry)
         if votes.count() > 0:
             vote = votes[0].vote
             return vote
@@ -283,17 +334,17 @@ class UserVotes(models.Model):
     def cleanup():
         # recreate missing entries, from votes alone
         for entry in LinkDataModel.objects.filter(page_rating_votes__gt=0):
-            votes = UserVotes.objects.filter(entry_object=entry)
+            votes = UserVotes.objects.filter(entry=entry)
             if votes.count() == 0:
                 users = User.objects.filter(is_superuser=True)
                 if users.count() > 0:
                     UserVotes.add(users[0], entry, entry.page_rating_votes)
 
         # reset missing user object
-        for q in UserVotes.objects.filter(user_object__isnull=True):
+        for q in UserVotes.objects.filter(user__isnull=True):
             users = User.objects.filter(username=q.user)
             if users.count() > 0:
-                q.user_object = users[0]
+                q.user = users[0]
                 q.save()
             else:
                 LinkDatabase.error("Cannot find user '{}'".format(q.user))
@@ -301,11 +352,11 @@ class UserVotes(models.Model):
                 time.sleep(0.5)
 
     def move_entry(source_entry, destination_entry):
-        votes = UserVotes.objects.filter(entry_object=source_entry)
+        votes = UserVotes.objects.filter(entry=source_entry)
         for vote in votes:
             dst_votes = UserVotes.objects.filter(
-                entry_object=destination_entry,
-                user_object=vote.user_object,
+                entry=destination_entry,
+                user=vote.user,
                 vote=vote.vote,
             )
             if dst_votes.exists():
@@ -316,7 +367,7 @@ class UserVotes(models.Model):
                 vote.delete()
                 continue
 
-            vote.entry_object = destination_entry
+            vote.entry = destination_entry
             vote.save()
 
 
@@ -331,7 +382,7 @@ class UserComments(models.Model):
     # id of previous comment
     reply_id = models.IntegerField(null=True)
 
-    entry_object = models.ForeignKey(
+    entry = models.ForeignKey(
         LinkDataModel,
         on_delete=models.CASCADE,
         related_name="comments",
@@ -339,7 +390,7 @@ class UserComments(models.Model):
         blank=True,
     )
 
-    user_object = models.ForeignKey(
+    user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name=str(LinkDatabase.name) + "_user_comments",
@@ -348,17 +399,17 @@ class UserComments(models.Model):
 
     def add(user, entry, comment):
         return UserComments.objects.create(
-            user_object=user, entry_object=entry, comment=comment
+            user=user, entry=entry, comment=comment
         )
 
     def get_comment(self):
         return InputContent(self.comment).htmlify()
 
     def cleanup():
-        for q in UserComments.objects.filter(user_object__isnull=True):
+        for q in UserComments.objects.filter(user__isnull=True):
             users = User.objects.filter(username=q.user)
             if users.count() > 0:
-                q.user_object = users[0]
+                q.user = users[0]
                 q.save()
             else:
                 LinkDatabase.error("Cannot find user '{}'".format(q.user))
@@ -366,25 +417,25 @@ class UserComments(models.Model):
                 time.sleep(0.5)
 
     def move_entry(source_entry, destination_entry):
-        comments = UserComments.objects.filter(entry_object=source_entry)
+        comments = UserComments.objects.filter(entry=source_entry)
         for comment in comments:
             dst_comments = UserComments.objects.filter(
-                entry_object=destination_entry,
-                user_object=comment.user_object,
+                entry=destination_entry,
+                user=comment.user,
                 comment=comment.comment,
             )
             if dst_comments.exists():
                 comment.delete()
                 continue
 
-            comment.entry_object = destination_entry
+            comment.entry = destination_entry
             comment.save()
 
 
 class UserBookmarks(models.Model):
     date_bookmarked = models.DateTimeField(auto_now_add=True)
 
-    entry_object = models.ForeignKey(
+    entry = models.ForeignKey(
         LinkDataModel,
         on_delete=models.CASCADE,
         related_name="bookmarks",
@@ -392,7 +443,7 @@ class UserBookmarks(models.Model):
         blank=True,
     )
 
-    user_object = models.ForeignKey(
+    user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name=str(LinkDatabase.name) + "_user_bookmarks",
@@ -406,9 +457,9 @@ class UserBookmarks(models.Model):
         if not user.is_authenticated:
             return
 
-        objs = UserBookmarks.objects.filter(user_object=user, entry_object=entry)
+        objs = UserBookmarks.objects.filter(user=user, entry=entry)
         if objs.count() == 0:
-            UserBookmarks.objects.create(user_object=user, entry_object=entry)
+            UserBookmarks.objects.create(user=user, entry=entry)
 
     def get_user_bookmarks(user):
         if not user:
@@ -417,23 +468,23 @@ class UserBookmarks(models.Model):
         if not user.is_authenticated:
             return
 
-        return UserBookmarks.objects.filter(user_object=user)
+        return UserBookmarks.objects.filter(user=user)
 
     def remove(user, entry):
         if not user.is_authenticated:
             return
 
-        bookmarks = UserBookmarks.objects.filter(user_object=user, entry_object=entry)
+        bookmarks = UserBookmarks.objects.filter(user=user, entry=entry)
         bookmarks.delete()
 
     def remove_entry(entry):
-        bookmarks = UserBookmarks.objects.filter(entry_object=entry)
+        bookmarks = UserBookmarks.objects.filter(entry=entry)
         bookmarks.delete()
 
     def is_bookmarked(entry):
-        bookmarks = UserBookmarks.objects.filter(entry_object=entry)
+        bookmarks = UserBookmarks.objects.filter(entry=entry)
         for bookmark in bookmarks:
-            if bookmark.user_object.is_staff:
+            if bookmark.user.is_staff:
                 return True
 
         return False
@@ -448,39 +499,17 @@ class UserBookmarks(models.Model):
                     UserBookmarks.add(users[0], entry)
 
     def move_entry(source_entry, destination_entry):
-        bookmarks = UserBookmarks.objects.filter(entry_object=source_entry)
+        bookmarks = UserBookmarks.objects.filter(entry=source_entry)
         for bookmark in bookmarks:
             dst_bookmarks = UserBookmarks.objects.filter(
-                entry_object=destination_entry, user_object=bookmark.user_object
+                entry=destination_entry, user=bookmark.user
             )
             if dst_bookmarks.exists():
                 bookmark.delete()
                 continue
 
-            bookmark.entry_object = destination_entry
+            bookmark.entry = destination_entry
             bookmark.save()
 
         destination_entry.bookmarked = True
         destination_entry.save()
-
-
-class CompactedTags(models.Model):
-    tag = models.CharField(max_length=1000)
-    count = models.IntegerField(default=0)
-
-    class Meta:
-        ordering = ["-count"]
-
-    def cleanup():
-        CompactedTags.objects.all().delete()
-
-        tags = UserTags.objects.all()
-        for tag in tags:
-            compacts = CompactedTags.objects.filter(tag=tag.tag)
-
-            if compacts.count() == 0:
-                CompactedTags.objects.create(tag=tag.tag, count=1)
-            else:
-                compacted = compacts[0]
-                compacted.count += 1
-                compacted.save()

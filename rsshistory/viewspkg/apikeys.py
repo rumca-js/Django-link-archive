@@ -8,9 +8,9 @@ import random
 import string
 
 from ..apps import LinkDatabase
-from ..models import ApiKeys
 from ..models import ConfigurationEntry
 from ..views import ViewPage
+from ..models import ApiKeys
 from ..forms import ApiKeysForm
 
 

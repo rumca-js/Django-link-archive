@@ -27,6 +27,7 @@ from ..models import (
     UserEntryTransitionHistory,
     UserSearchHistory,
     EntryRules,
+    UserBookmarks,
 )
 from ..controllers import (
     LinkDataController,
@@ -46,6 +47,7 @@ from ..forms import (
     EntryRecentChoiceForm,
     EntryArchiveForm,
     OmniSearchForm,
+    InitSearchForm,
     OmniSearchWithArchiveForm,
     LinkInputForm,
 )
@@ -500,6 +502,39 @@ class EntriesBookmarkedListView(EntriesOmniListView):
 
     def get_view_link(self):
         return reverse("{}:entries-bookmarked".format(LinkDatabase.name))
+
+    def get_title(self):
+        return " - Bookmarked"
+
+    def get_query_type(self):
+        return "bookmarked"
+
+
+class UserEntriesBookmarkedListView(EntriesOmniListView):
+    model = LinkDataController
+    context_object_name = "content_list"
+    paginate_by = 100
+
+    def get_initial_query_set(self, archive=False):
+        query_set = super().get_initial_query_set(archive)
+        user = self.request.user
+
+        bookmarks = UserBookmarks.get_user_bookmarks(user)
+        # this returns IDs, not 'objects'
+        result_entries = bookmarks.values_list("entry", flat=True)
+        return query_set.filter(bookmarked=1, id__in=result_entries)
+
+    def has_more_results(self):
+        return False
+
+    def get_reset_link(self):
+        return reverse("{}:user-entries-bookmarked-init".format(LinkDatabase.name))
+
+    def get_form_action_link(self):
+        return reverse("{}:user-entries-bookmarked".format(LinkDatabase.name))
+
+    def get_view_link(self):
+        return reverse("{}:user-entries-bookmarked".format(LinkDatabase.name))
 
     def get_title(self):
         return " - Bookmarked"
@@ -1089,9 +1124,16 @@ def entry_show_dislikes(request, pk):
 def entries_search_init(request):
     p = ViewPage(request)
     p.set_title("Search entries")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
+    if data is not None:
+        return data
 
-    filter_form = EntryChoiceForm(request=request)
-    filter_form.create()
+    user = request.user.username
+    user_choices = UserSearchHistory.get_user_choices(request.user)
+    if user_choices and len(user_choices) > 0:
+        filter_form = OmniSearchForm(request=request, user_choices=user_choices)
+    else:
+        filter_form = InitSearchForm(request=request)
     filter_form.method = "GET"
     filter_form.action_url = reverse("{}:entries".format(LinkDatabase.name))
 
@@ -1100,20 +1142,24 @@ def entries_search_init(request):
     search_term = get_search_term_request(request)
     p.context["search_term"] = search_term
     p.context["search_engines"] = SearchEngines(search_term)
+    p.context["user_choices"] = user_choices
 
-    return p.render("form_search.html")
+    return p.render("form_search_init.html")
 
 
 def entries_omni_search_init(request):
     p = ViewPage(request)
     p.set_title("Search entries")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
+    if data is not None:
+        return data
 
     user = request.user.username
     user_choices = UserSearchHistory.get_user_choices(request.user)
-
-    filter_form = OmniSearchForm(
-        request.GET, user_choices=user_choices, request=request
-    )
+    if user_choices and len(user_choices) > 0:
+        filter_form = OmniSearchForm(request=request, user_choices=user_choices)
+    else:
+        filter_form = InitSearchForm(request=request)
     filter_form.method = "GET"
     filter_form.action_url = reverse("{}:entries-omni-search".format(LinkDatabase.name))
 
@@ -1124,16 +1170,24 @@ def entries_omni_search_init(request):
     p.context["entry_query_names"] = LinkDataController.get_query_names()
     p.context["entry_query_operators"] = SingleSymbolEvaluator().get_operators()
     p.context["search_engines"] = SearchEngines(search_term)
+    p.context["user_choices"] = user_choices
 
-    return p.render("form_search_omni.html")
+    return p.render("form_search_init.html")
 
 
 def entries_bookmarked_init(request):
     p = ViewPage(request)
     p.set_title("Bookmarked entries")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
+    if data is not None:
+        return data
 
-    filter_form = EntryBookmarksChoiceForm(request=request)
-    filter_form.create()
+    user = request.user.username
+    user_choices = UserSearchHistory.get_user_choices(request.user)
+    if user_choices and len(user_choices) > 0:
+        filter_form = OmniSearchForm(request=request, user_choices=user_choices)
+    else:
+        filter_form = InitSearchForm(request=request)
     filter_form.method = "GET"
     filter_form.action_url = reverse("{}:entries-bookmarked".format(LinkDatabase.name))
 
@@ -1141,17 +1195,55 @@ def entries_bookmarked_init(request):
 
     search_term = get_search_term_request(request)
     p.context["search_term"] = search_term
+    p.context["entry_query_names"] = LinkDataController.get_query_names()
+    p.context["entry_query_operators"] = SingleSymbolEvaluator().get_operators()
     p.context["search_engines"] = SearchEngines(search_term)
+    p.context["user_choices"] = user_choices
 
-    return p.render("form_search.html")
+    return p.render("form_search_init.html")
+
+
+def user_entries_bookmarked_init(request):
+    p = ViewPage(request)
+    p.set_title("Bookmarked entries")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
+    if data is not None:
+        return data
+
+    user = request.user.username
+    user_choices = UserSearchHistory.get_user_choices(request.user)
+    if user_choices and len(user_choices) > 0:
+        filter_form = OmniSearchForm(request=request, user_choices=user_choices)
+    else:
+        filter_form = InitSearchForm(request=request)
+    filter_form.method = "GET"
+    filter_form.action_url = reverse("{}:user-entries-bookmarked".format(LinkDatabase.name))
+
+    p.context["filter_form"] = filter_form
+
+    search_term = get_search_term_request(request)
+    p.context["search_term"] = search_term
+    p.context["entry_query_names"] = LinkDataController.get_query_names()
+    p.context["entry_query_operators"] = SingleSymbolEvaluator().get_operators()
+    p.context["search_engines"] = SearchEngines(search_term)
+    p.context["user_choices"] = user_choices
+
+    return p.render("form_search_init.html")
 
 
 def entries_recent_init(request):
     p = ViewPage(request)
     p.set_title("Search recent entries")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
+    if data is not None:
+        return data
 
-    filter_form = EntryRecentChoiceForm(request=request)
-    filter_form.create()
+    user = request.user.username
+    user_choices = UserSearchHistory.get_user_choices(request.user)
+    if user_choices and len(user_choices) > 0:
+        filter_form = OmniSearchForm(request=request, user_choices=user_choices)
+    else:
+        filter_form = InitSearchForm(request=request)
     filter_form.method = "GET"
     filter_form.action_url = reverse("{}:entries-recent".format(LinkDatabase.name))
 
@@ -1159,23 +1251,40 @@ def entries_recent_init(request):
 
     search_term = get_search_term_request(request)
     p.context["search_term"] = search_term
+    p.context["entry_query_names"] = LinkDataController.get_query_names()
+    p.context["entry_query_operators"] = SingleSymbolEvaluator().get_operators()
     p.context["search_engines"] = SearchEngines(search_term)
+    p.context["user_choices"] = user_choices
 
-    return p.render("form_search.html")
+    return p.render("form_search_init.html")
 
 
 def entries_archived_init(request):
     p = ViewPage(request)
     p.set_title("Search archive entries")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
+    if data is not None:
+        return data
 
-    filter_form = EntryChoiceForm(request=request)
-    filter_form.create()
+    user = request.user.username
+    user_choices = UserSearchHistory.get_user_choices(request.user)
+    if user_choices and len(user_choices) > 0:
+        filter_form = OmniSearchForm(request=request, user_choices=user_choices)
+    else:
+        filter_form = InitSearchForm(request=request)
     filter_form.method = "GET"
     filter_form.action_url = reverse("{}:entries-archived".format(LinkDatabase.name))
 
-    p.context["filter_form"] = filter_form
+    search_term = get_search_term_request(request)
 
-    return p.render("form_search.html")
+    p.context["filter_form"] = filter_form
+    p.context["search_term"] = search_term
+    p.context["entry_query_names"] = LinkDataController.get_query_names()
+    p.context["entry_query_operators"] = SingleSymbolEvaluator().get_operators()
+    p.context["search_engines"] = SearchEngines(search_term)
+    p.context["user_choices"] = user_choices
+
+    return p.render("form_search_init.html")
 
 
 def make_bookmarked_entry(request, pk):

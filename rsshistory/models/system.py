@@ -565,7 +565,7 @@ class SystemOperation(models.Model):
 
 class UserConfig(models.Model):
     # TODO move this to relation towards Users
-    user = models.CharField(max_length=500, unique=True)
+    username = models.CharField(max_length=500, unique=True)
     display_style = models.CharField(
         max_length=500, null=True, default="style-light", choices=STYLE_TYPES
     )
@@ -584,7 +584,7 @@ class UserConfig(models.Model):
     links_per_page = models.IntegerField(default=100)
     sources_per_page = models.IntegerField(default=100)
 
-    user_object = models.ForeignKey(
+    user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name=str(LinkDatabase.name) + "_user_configs",
@@ -596,7 +596,7 @@ class UserConfig(models.Model):
         This is used if no request is specified. Use configured by admin setup.
         """
         if user and user.is_authenticated:
-            confs = UserConfig.objects.filter(user_object__id=user.id)
+            confs = UserConfig.objects.filter(user__id=user.id)
             if confs.count() != 0:
                 return confs[0]
 
@@ -612,11 +612,11 @@ class UserConfig(models.Model):
             sources_per_page=config.sources_per_page,
         )
 
-    def get_or_create(user):
+    def get_or_create(input_user):
         """
         This is used if no request is specified. Use configured by admin setup.
         """
-        if not user.is_authenticated:
+        if not input_user.is_authenticated:
             config = ConfigurationEntry.get()
             return UserConfig(
                 display_style=config.display_style,
@@ -627,9 +627,9 @@ class UserConfig(models.Model):
                 sources_per_page=config.sources_per_page,
             )
 
-        users = UserConfig.objects.filter(user=user.username)
+        users = UserConfig.objects.filter(user=input_user)
         if not users.exists():
-            user = UserConfig.objects.create(user=user.username, user_object=user)
+            user = UserConfig.objects.create(username=input_user.username, user=input_user)
             return user
         return users[0]
 
@@ -646,11 +646,11 @@ class UserConfig(models.Model):
         super().save(*args, **kwargs)
 
     def cleanup():
-        configs = UserConfig.objects.filter(user_object__isnull=True)
+        configs = UserConfig.objects.filter(user__isnull=True)
         for uc in configs:
             us = User.objects.filter(username=uc.user)
             if us.count() > 0:
-                uc.user_object = us[0]
+                uc.user = us[0]
                 uc.save()
 
     def get_age(self):

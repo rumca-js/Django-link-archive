@@ -21,16 +21,7 @@ def main():
         print("Could not connect")
         return
 
-    message = ""
-    while message.lower().strip() != "exit":
-        message = input(" -> ")
-        response = c.send_request_for_url(message)
-
-        print("Received response:{}".format(response))
-
-        if c.is_closed():
-            print("Client has closed")
-            return
+    c.serve_forever()
 
 
 if __name__ == "__main__":

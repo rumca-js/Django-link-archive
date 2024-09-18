@@ -36,6 +36,7 @@ from .models import (
     UserConfig,
     UserTags,
     CompactedTags,
+    UserCompactedTags,
     UserVotes,
     UserBookmarks,
     UserSearchHistory,
@@ -1083,6 +1084,7 @@ class CleanupJobHandler(BaseJobHandler):
     def user_tables_cleanup(self):
         UserTags.cleanup()
         CompactedTags.cleanup()
+        UserCompactedTags.cleanup()
         UserCommentsController.cleanup()
         UserVotes.cleanup()
         UserBookmarks.cleanup()

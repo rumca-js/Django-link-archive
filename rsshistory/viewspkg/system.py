@@ -22,6 +22,8 @@ from ..models import (
     AppLogging,
     Domains,
     UserTags,
+    UserCompactedTags,
+    CompactedTags,
     UserVotes,
     UserBookmarks,
     UserSearchHistory,
@@ -256,6 +258,8 @@ def system_status(request):
     #    p.context["LinkDataModel_toupdate"] = entries.count()
 
     p.context["UserTags"] = UserTags.objects.count()
+    p.context["UserCompactedTags"] = UserCompactedTags.objects.count()
+    p.context["CompactedTags"] = CompactedTags.objects.count()
     p.context["UserVotes"] = UserVotes.objects.count()
     p.context["UserBookmarks"] = UserBookmarks.objects.count()
     p.context["UserCommentsController"] = UserCommentsController.objects.count()
