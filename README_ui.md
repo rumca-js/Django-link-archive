@@ -1,10 +1,9 @@
 
-# Link lists
+Program can operate in various setups, scenarios, but mainly there are three types of views
 
-Available link display types
- - standard view
- - similar to YouTube
- - similar to web search engine
+ - standard view, designed for RSS news reading
+ - galler view, similar to YouTube
+ - search engine view
 
 ## Standard list
 
