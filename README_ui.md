@@ -53,6 +53,23 @@ Program can operate in various setups, scenarios, but mainly there are three typ
   <img alt="Standard list" src="screenshots/source_details.PNG" style="max-width:700px">
 </div>
 
+# Tools
+
+Program offers many tools. If you try to find something a list of search engines is provided.
+
+There are also tools that can:
+
+ - scan, or verify, or analyze a page
+ - download data
+
+<div align="center">
+  <img alt="Standard list" src="screenshots/search_engines.PNG" style="max-width:700px">
+</div>
+
+<div align="center">
+  <img alt="Standard list" src="screenshots/tools.PNG" style="max-width:700px">
+</div>
+
 # Tags, keywords, and other views
 
 <div align="center">
