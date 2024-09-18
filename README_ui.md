@@ -31,6 +31,12 @@ Available link display types
   <img alt="Standard list" src="screenshots/entries_list_search_engine.PNG" style="max-width:700px">
 </div>
 
+## Dark theme
+
+<div align="center">
+  <img alt="Standard list" src="screenshots/dark_theme.PNG" style="max-width:700px">
+</div>
+
 # Search form
 
 <div align="center">
