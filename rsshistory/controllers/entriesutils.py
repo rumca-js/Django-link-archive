@@ -114,7 +114,7 @@ class EntriesCleanup(object):
 
             if b.result == invalid_entry:
                 # unattach
-                invalid_entry.domain_obj = None
+                invalid_entry.domain = None
 
                 invalid_domain.delete()
 
@@ -181,7 +181,7 @@ class EntriesCleanup(object):
 
         days_before = DateUtils.get_days_before_dt(days)
 
-        condition_source = Q(source_obj=source) & Q(date_published__lt=days_before)
+        condition_source = Q(source=source) & Q(date_published__lt=days_before)
         if config.keep_permanent_items:
             condition_source &= Q(bookmarked=False, permanent=False)
 
@@ -332,8 +332,8 @@ class EntriesCleanup(object):
          - if enable_domain_support & keep_domains
         This could be intensive
         """
-        link_is_url = Q(source_obj__url=F("link"))
-        domain_is_notnull = Q(domain_obj__isnull=False)
+        link_is_url = Q(source__url=F("link"))
+        domain_is_notnull = Q(domain__isnull=False)
         is_permanent = Q(permanent=True)
 
         # domain is not null and link is url are valid scenarios
@@ -991,8 +991,8 @@ class EntryWrapper(object):
 
         if objs.count() == 0:
             themap = entry_obj.get_map()
-            themap["source_obj"] = entry_obj.source_obj
-            themap["domain_obj"] = entry_obj.domain_obj
+            themap["source"] = entry_obj.source
+            themap["domain"] = entry_obj.domain
             try:
                 archive_obj = ArchiveLinkDataController.objects.create(**themap)
                 entry_obj.delete()
@@ -1013,8 +1013,8 @@ class EntryWrapper(object):
         objs = LinkDataController.objects.filter(link=archive_obj.link)
         if objs.count() == 0:
             themap = archive_obj.get_map()
-            themap["source_obj"] = archive_obj.source_obj
-            themap["domain_obj"] = archive_obj.domain_obj
+            themap["source"] = archive_obj.source
+            themap["domain"] = archive_obj.domain
             try:
                 new_obj = LinkDataController.objects.create(**themap)
                 archive_obj.delete()
@@ -1586,19 +1586,19 @@ class EntryDataBuilder(object):
             domain = DomainsController.add(self.link_data["link"])
 
             if domain:
-                self.link_data["domain_obj"] = domain
+                self.link_data["domain"] = domain
         return self.link_data
 
     def check_and_set_source_object(self):
         link_data = self.link_data
 
-        if "source_obj" not in link_data and "source" in link_data:
+        if "source" not in link_data and "source_url" in link_data:
             source_obj = None
-            sources = SourceDataController.objects.filter(url=link_data["source"])
+            sources = SourceDataController.objects.filter(url=link_data["source_url"])
             if sources.exists():
                 source_obj = sources[0]
 
-            link_data["source_obj"] = source_obj
+            link_data["source"] = source_obj
 
         return link_data
 
@@ -1668,9 +1668,9 @@ class EntryDataBuilder(object):
         url = DomainAwarePage(self.link_data["link"]).get_domain()
         entries = LinkDataController.objects.filter(link=url)
         if entries.count() == 0:
-            if "source_obj" in self.link_data:
+            if "source" in self.link_data:
                 BackgroundJobController.link_add(
-                    url=url, source=self.link_data["source_obj"]
+                    url=url, source=self.link_data["source"]
                 )
             else:
                 BackgroundJobController.link_add(url=url)
@@ -1722,9 +1722,9 @@ class EntryDataBuilder(object):
                         links.add(link)
 
             for link in links:
-                if "source_obj" in link_data:
+                if "source" in link_data:
                     BackgroundJobController.link_add(
-                        url=link, source=link_data["source_obj"]
+                        url=link, source=link_data["source"]
                     )
                 else:
                     BackgroundJobController.link_add(url=link)

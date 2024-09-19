@@ -90,7 +90,7 @@ def entry_comment_edit(request, pk):
 
     user = request.user
 
-    if user != comment_obj.user_object:
+    if user != comment_obj.user:
         p.context["summary_text"] = "You are not the author!"
         return p.render("summary_present.html")
 
@@ -144,7 +144,7 @@ def entry_comment_remove(request, pk):
     comment_obj = UserCommentsController.objects.get(id=pk)
     link = comment_obj.entry_object
 
-    if request.user.id != comment_obj.user_object.id:
+    if request.user.id != comment_obj.user.id:
         p.context["summary_text"] = "You are not the author!"
         return p.render("summary_present.html")
 

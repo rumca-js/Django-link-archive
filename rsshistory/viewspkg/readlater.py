@@ -54,7 +54,7 @@ def read_later_remove(request, pk):
         return p.render("go_back.html")
 
 
-def read_later_clear(request, pk):
+def read_later_clear(request):
     p = ViewPage(request)
     p.set_title("Clear entire later list")
     data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)

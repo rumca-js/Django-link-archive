@@ -372,7 +372,7 @@ class LinkMusicDownloadJobHandler(BaseJobHandler):
         if data["artist"]:
             file_name = Path(data["artist"]) / file_name
 
-        file_name = fix_path_for_os(file_name)
+        file_name = fix_path_for_os(str(file_name))
 
         return file_name
 
@@ -451,7 +451,7 @@ class LinkVideoDownloadJobHandler(BaseJobHandler):
         if data["artist"]:
             file_name = Path(data["artist"]) / file_name
 
-        file_name = fix_path_for_os(file_name)
+        file_name = fix_path_for_os(str(file_name))
 
         return file_name
 

@@ -36,24 +36,24 @@
        {% endif %}
    </div>
 
-   {% if object.source_obj %}
+   {% if object.source %}
    <div class="container borders rounded">
-       <a href="{{object.source_obj.get_absolute_url}}">
+       <a href="{{object.source.get_absolute_url}}">
           <div class="d-flex">
-	     {% if object.get_thumbnail != object.source_obj.get_favicon %}
+	     {% if object.get_thumbnail != object.source.get_favicon %}
                 {% if user_config.show_icons%}
 	            <div>
                     {% if user_config.small_icons %}
-                      <img src="{{object.source_obj.get_favicon}}" class="rounded icon-small border"/>
+                      <img src="{{object.source.get_favicon}}" class="rounded icon-small border"/>
                     {% else %}
-                      <img src="{{object.source_obj.get_favicon}}" class="rounded icon-normal border"/>
+                      <img src="{{object.source.get_favicon}}" class="rounded icon-normal border"/>
                     {% endif %}
 	            </div>
                 {% endif %}
              {% endif %}
 
 	     <div>
-             {{object.source_obj.title}}
+             {{object.source.title}}
 	     </div>
 	  </div>
        </a>

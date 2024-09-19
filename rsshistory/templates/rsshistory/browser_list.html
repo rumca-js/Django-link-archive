@@ -1,0 +1,21 @@
+{% extends base_generic %}
+{% load static %}
+{% block content %}
+
+<h1>Browser list</h1>
+
+  {% if content_list %}
+     <div class="list-group">
+         {% for browser in content_list %}
+         <div>
+           Mode:{{browser.mode.mode}}
+           Crawler:{{browser.crawler}}
+           Settings:{{browser.settings}}
+         </div>
+         {% endfor %}
+      {% include "rsshistory/pagination.html" %}
+  {% else %}
+    Browser list is empty!
+  {% endif %}
+
+{% endblock %} 

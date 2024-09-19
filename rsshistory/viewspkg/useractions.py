@@ -275,7 +275,7 @@ def tags_entry_show(request, entrypk):
     tags = entry.tags.all()
     for tag in tags:
         summary += "Link:{} tag:{} user:{}\n".format(
-            tag.entry_object.link, tag.tag, tag.user_object.username
+            tag.entry_object.link, tag.tag, tag.user.username
         )
 
     p.context["summary_text"] = summary

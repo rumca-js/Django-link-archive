@@ -680,8 +680,8 @@ def source_fix_entries(request, source_pk):
             entry.language = source_obj.language
             entry.save()
             summary_text += "Fixed {} {}\n".format(entry.title, entry.link)
-        if not entry.source_obj:
-            entry.source_obj = source_obj
+        if not entry.source:
+            entry.source = source_obj
             entry.save()
             summary_text += "Fixed {} {}\n".format(entry.title, entry.link)
 

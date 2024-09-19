@@ -107,9 +107,9 @@ class EntryUrlInterface(object):
         if not self.u:
             return None
 
-        if not self.is_property_set(input_props, "source"):
+        if not self.is_property_set(input_props, "source_url"):
             if source_obj:
-                input_props["source"] = source_obj.url
+                input_props["source_url"] = source_obj.url
 
         is_domain = DomainAwarePage(self.url).is_domain()
         handler = self.u.get_handler()
@@ -126,11 +126,11 @@ class EntryUrlInterface(object):
             if sources.exists():
                 source_obj = sources[0]
 
-        if not self.is_property_set(input_props, "source_obj") and source_obj:
-            input_props["source_obj"] = source_obj
-
         if not self.is_property_set(input_props, "source") and source_obj:
-            input_props["source"] = source_obj.url
+            input_props["source"] = source_obj
+
+        if not self.is_property_set(input_props, "source_url") and source_obj:
+            input_props["source_url"] = source_obj.url
 
         if type(handler) is UrlHandler.youtube_video_handler:
             if handler.get_video_code():

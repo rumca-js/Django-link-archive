@@ -19,7 +19,7 @@ class HeadlessScriptCrawler(ScriptCrawler):
 
         self.process_input()
 
-        super().__init__(request=request, response_file=self.response_file, response_port=response_port, cwd=self.operating_path, script=self.script, settings=settings)
+        super().__init__(request=request, response_file=self.response_file, response_port=response_port, cwd=self.operating_path, settings=settings, script=self.script)
 
     def get_script(self):
         return WebConfig.crawling_headless_script
@@ -158,42 +158,104 @@ class WebConfig(object):
 
         WebConfig.init_browser_config()
 
-    def init_browser_config():
-        std_preference_table = [
-                {"crawler" : RequestsCrawler, "settings":{}},
-                {"crawler" : HeadlessServerCrawler, "settings":{}},
-                {"crawler" : HeadlessScriptCrawler, "settings":{}},
-                {"crawler" : ConfiguredSeleniumChromeHeadless, "settings":{}},
-                {"crawler" : FullServerCrawler, "settings" : {}},
-                {"crawler" : FullScriptCrawler, "settings" : {}},
-                {"crawler" : ConfiguredSeleniumChromeFull, "settings" : {}},
+    def get_modes():
+        return [
+           "standard",
+           "headless",
+           "full"
         ]
 
-        WebConfig.browser_mapping["standard"] = std_preference_table
+    def get_browsers():
+        return [
+            "RequestsCrawler",
+            "SeleniumChromeHeadless", # requires driver location
+            "SeleniumChromeFull", # requires driver location
+            "ScriptCrawler", # requires script
+            "ServerCrawler", # requires script & port
+            "HeadlessScriptCrawler",
+            "FullScriptCrawler",
+            "HeadlessServerCrawler",
+            "FullServerCrawler",
+            "ConfiguredSeleniumChromeHeadless",
+            "ConfiguredSeleniumChromeFull",
+        ]
+
+    def get_crawler_from_string(input_string):
+        """
+        TODO - apply generic approach
+        """
+        if input_string == "RequestsCrawler":
+            return RequestsCrawler
+        elif input_string == "SeleniumChromeHeadless":
+            return SeleniumChromeHeadless
+        elif input_string == "SeleniumChromeFull":
+            return SeleniumChromeFull
+        elif input_string == "ScriptCrawler":
+            return ScriptCrawler
+        elif input_string == "ServerCrawler":
+            return ServerCrawler
+        elif input_string == "HeadlessScriptCrawler":
+            return HeadlessScriptCrawler
+        elif input_string == "FullScriptCrawler":
+            return FullScriptCrawler
+        elif input_string == "HeadlessServerCrawler":
+            return HeadlessServerCrawler
+        elif input_string == "FullServerCrawler":
+            return FullServerCrawler
+        elif input_string == "ConfiguredSeleniumChromeHeadless":
+            return ConfiguredSeleniumChromeHeadless
+        elif input_string == "ConfiguredSeleniumChromeFull":
+            return ConfiguredSeleniumChromeFull
+
+    def get_init_browser_config():
+        mapping = {}
+
+        std_preference_table = [
+                {"crawler" : "RequestsCrawler", "settings":{}},
+                {"crawler" : "HeadlessServerCrawler", "settings":{}},
+                {"crawler" : "HeadlessScriptCrawler", "settings":{}},
+                {"crawler" : "ConfiguredSeleniumChromeHeadless", "settings":{}},
+                {"crawler" : "FullServerCrawler", "settings" : {}},
+                {"crawler" : "FullScriptCrawler", "settings" : {}},
+                {"crawler" : "ConfiguredSeleniumChromeFull", "settings" : {}},
+        ]
+
+        mapping["standard"] = std_preference_table
 
         headless_preference_table = [
-                {"crawler" : HeadlessServerCrawler, "settings" : {}},
-                {"crawler" : HeadlessScriptCrawler, "settings" : {}},
-                {"crawler" : ConfiguredSeleniumChromeHeadless, "settings" : {}},
-                {"crawler" : FullServerCrawler, "settings" : {}},
-                {"crawler" : FullScriptCrawler, "settings" : {}},
-                {"crawler" : ConfiguredSeleniumChromeFull, "settings" : {}},
-                {"crawler" : RequestsCrawler, "settings" : {}},
+                {"crawler" : "HeadlessServerCrawler", "settings" : {}},
+                {"crawler" : "HeadlessScriptCrawler", "settings" : {}},
+                {"crawler" : "ConfiguredSeleniumChromeHeadless", "settings" : {}},
+                {"crawler" : "FullServerCrawler", "settings" : {}},
+                {"crawler" : "FullScriptCrawler", "settings" : {}},
+                {"crawler" : "ConfiguredSeleniumChromeFull", "settings" : {}},
+                {"crawler" : "RequestsCrawler", "settings" : {}},
         ]
 
-        WebConfig.browser_mapping["headless"] = headless_preference_table
+        mapping["headless"] = headless_preference_table
 
         full_preference_table = [
-                {"crawler" : FullServerCrawler, "settings" : {}},
-                {"crawler" : FullScriptCrawler, "settings" : {}},
-                {"crawler" : ConfiguredSeleniumChromeFull, "settings" : {}},
-                {"crawler" : HeadlessServerCrawler, "settings" : {}},
-                {"crawler" : HeadlessScriptCrawler, "settings" : {}},
-                {"crawler" : ConfiguredSeleniumChromeHeadless, "settings" : {}},
-                {"crawler" : RequestsCrawler, "settings" : {}},
+                {"crawler" : "FullServerCrawler", "settings" : {}},
+                {"crawler" : "FullScriptCrawler", "settings" : {}},
+                {"crawler" : "ConfiguredSeleniumChromeFull", "settings" : {}},
+                {"crawler" : "HeadlessServerCrawler", "settings" : {}},
+                {"crawler" : "HeadlessScriptCrawler", "settings" : {}},
+                {"crawler" : "ConfiguredSeleniumChromeHeadless", "settings" : {}},
+                {"crawler" : "RequestsCrawler", "settings" : {}},
         ]
 
-        WebConfig.browser_mapping["full"] = full_preference_table
+        mapping["full"] = full_preference_table
+
+        return mapping
+
+    def init_browser_config():
+        WebConfig.set_browser_mapping(WebConfig.get_init_browser_config())
+
+    def set_browser_mapping(browser_mapping):
+        WebConfig.browser_mapping = browser_mapping
+
+    def get_browser_mapping():
+        return WebConfig.browser_mapping
 
     def use_logger(Logger):
         WebLogger.web_logger = Logger

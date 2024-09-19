@@ -250,9 +250,9 @@ class SourceDataController(SourceDataModel):
         return info
 
     def fix_entries(self):
-        entries = LinkDataModel.objects.filter(source=self.url)
+        entries = LinkDataModel.objects.filter(source_url=self.url)
         for entry in entries:
-            entry.source_obj = self
+            entry.source = self
             entry.save()
 
     def get_clean_data(props):

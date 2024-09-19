@@ -11,46 +11,51 @@
        <h2>Managment links</h2>
 
        <ul class="list-group mr-auto">
-	  <li class="list-group-item">
-             <a href="{% url 'rsshistory:system-status' %}" title="System status, health monitoring" class="nav-link">
-                 <img src="{% static 'rsshistory/icons/icons8-heart-monitor-100.png' %}" class="content-icon" />
-                 Status</a>
-	  </li>
-	  <li class="list-group-item">
-             <a href="{% url 'rsshistory:wizard' %}" title="Configuration" class="nav-link">
-                 <img src="{% static 'rsshistory/icons/icons8-configuration-67.png' %}" class="content-icon" />
-                 Configuration</a>
-	  </li>
-	  <li class="list-group-item">
-             <a href="{% url 'rsshistory:entry-rules' %}" title="Entry Rules allow to define URL based rules. Block domains, etc." class="nav-link">
-                 <img src="{% static 'rsshistory/icons/account.png' %}" class="content-icon" />
-                 Entry rules</a>
-	  </li>
-	  <li class="list-group-item">
-             <a href="{% url 'rsshistory:api-keys' %}" title="API keys allow to define URL based rules. Block domains, etc." class="nav-link">
-                 <img src="{% static 'rsshistory/icons/account.png' %}" class="content-icon" />
-                 API keys</a>
-	  </li>
-	  <li class="list-group-item">
-             <a href="{% url 'rsshistory:backgroundjobs' %}" title="Background jobs, queues" class="nav-link">
-                 <img src="{% static 'rsshistory/icons/icons8-schedule-100.png' %}" class="content-icon" />
-                 Background Jobs</a>
-	  </li>
-	  <li class="list-group-item">
-             <a href="{% url 'rsshistory:logs' %}" title="Application logs" class="nav-link">
-                 <img src="{% static 'rsshistory/icons/icons8-paper-64.png' %}" class="content-icon" />
-                 Logs</a>
-	  </li>
-	  <li class="list-group-item">
-             <a href="{% url 'admin:index' %}" title="User administration" class="nav-link">
-                 <img src="{% static 'rsshistory/icons/account.png' %}" class="content-icon" />
-                 User admin panel</a>
-	  </li>
-	  <li class="list-group-item">
-             <a href="{% url 'rsshistory:appusers' %}" title="User administration" class="nav-link">
-                 <img src="{% static 'rsshistory/icons/account.png' %}" class="content-icon" />
-                 App users</a>
-	  </li>
+           <li class="list-group-item">
+               <a href="{% url 'rsshistory:system-status' %}" title="System status, health monitoring" class="nav-link">
+                   <img src="{% static 'rsshistory/icons/icons8-heart-monitor-100.png' %}" class="content-icon" />
+                   Status</a>
+           </li>
+           <li class="list-group-item">
+               <a href="{% url 'rsshistory:logs' %}" title="Application logs" class="nav-link">
+                   <img src="{% static 'rsshistory/icons/icons8-paper-64.png' %}" class="content-icon" />
+                   Logs</a>
+           </li>
+           <li class="list-group-item">
+               <a href="{% url 'rsshistory:backgroundjobs' %}" title="Background jobs, queues" class="nav-link">
+                   <img src="{% static 'rsshistory/icons/icons8-schedule-100.png' %}" class="content-icon" />
+                   Background Jobs</a>
+           </li>
+           <li class="list-group-item">
+               <a href="{% url 'rsshistory:wizard' %}" title="Configuration" class="nav-link">
+                   <img src="{% static 'rsshistory/icons/icons8-configuration-67.png' %}" class="content-icon" />
+                   Configuration</a>
+           </li>
+           <li class="list-group-item">
+               <a href="{% url 'rsshistory:entry-rules' %}" title="Entry Rules allow to define URL based rules. Block domains, etc." class="nav-link">
+                   <img src="{% static 'rsshistory/icons/account.png' %}" class="content-icon" />
+                   Entry rules</a>
+           </li>
+           <li class="list-group-item">
+               <a href="{% url 'rsshistory:api-keys' %}" title="API keys allow to define URL based rules. Block domains, etc." class="nav-link">
+                   <img src="{% static 'rsshistory/icons/account.png' %}" class="content-icon" />
+                   API keys</a>
+           </li>
+           <li class="list-group-item">
+               <a href="{% url 'rsshistory:browsers' %}" title="Browser managment" class="nav-link">
+                   <img src="{% static 'rsshistory/icons/icons8-paper-64.png' %}" class="content-icon" />
+                   Browsers</a>
+           </li>
+           <li class="list-group-item">
+               <a href="{% url 'admin:index' %}" title="User administration" class="nav-link">
+                   <img src="{% static 'rsshistory/icons/account.png' %}" class="content-icon" />
+                   User admin panel</a>
+           </li>
+           <li class="list-group-item">
+               <a href="{% url 'rsshistory:appusers' %}" title="User administration" class="nav-link">
+                   <img src="{% static 'rsshistory/icons/account.png' %}" class="content-icon" />
+                   App users</a>
+           </li>
        </ul>
    </div>
 

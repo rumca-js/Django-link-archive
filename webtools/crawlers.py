@@ -461,8 +461,11 @@ class SeleniumDriver(CrawlerInterface):
         except Exception as E:
             pass
 
-        if self.display:
-            self.display.stop()
+        try:
+            if self.display:
+                self.display.stop()
+        except Exception as E:
+            pass
 
 
 class SeleniumChromeHeadless(SeleniumDriver):
@@ -832,7 +835,7 @@ class ScriptCrawler(CrawlerInterface):
             shell=True,
             capture_output=True,
             cwd=operating_path,
-            timeout=self.request.timeout_s,
+            timeout=self.request.timeout_s + 10, # add more time for closing browser, etc
         )
 
         if p.returncode != 0:
@@ -973,7 +976,7 @@ class ServerCrawler(CrawlerInterface):
                 break
 
             diff = DateUtils.get_datetime_now_utc() - script_time_start
-            if diff.total_seconds() > self.request.timeout_s:
+            if diff.total_seconds() > self.request.timeout_s + 10:
                 WebLogger.error(
                     "Url:{} Timeout on socket connection:{}/{}".format(
                         self.request.url, diff.total_seconds(), self.request.timeout_s

@@ -516,13 +516,14 @@ class UserEntriesBookmarkedListView(EntriesOmniListView):
     paginate_by = 100
 
     def get_initial_query_set(self, archive=False):
-        query_set = super().get_initial_query_set(archive)
         user = self.request.user
-
         bookmarks = UserBookmarks.get_user_bookmarks(user)
         # this returns IDs, not 'objects'
-        result_entries = bookmarks.values_list("entry", flat=True)
-        return query_set.filter(bookmarked=1, id__in=result_entries)
+        if bookmarks and bookmarks.count() > 0:
+            query_set = super().get_initial_query_set(archive)
+
+            result_entries = bookmarks.values_list("entry", flat=True)
+            return query_set.filter(bookmarked=1, id__in=result_entries)
 
     def has_more_results(self):
         return False
@@ -719,7 +720,7 @@ def func_display_data_form(request, p, data):
     if ob:
         return HttpResponseRedirect(ob.get_absolute_url())
 
-    data["user_object"] = request.user
+    data["user"] = request.user
     data["bookmarked"] = True
 
     if "description" in data:
@@ -980,8 +981,8 @@ def edit_entry(request, pk):
         return p.render("summary_present.html")
 
     ob = obs[0]
-    if ob.user_object is None:
-        ob.user_object = request.user
+    if ob.user is None:
+        ob.user = request.user
         ob.save()
 
     if ob.description:
@@ -1385,7 +1386,7 @@ def entries_json(request):
     User might set access through config. Default is all
     """
     p = ViewPage(request)
-    p.set_title("Remove all entries")
+    p.set_title("JSON entries")
     data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
     if data is not None:
         return data

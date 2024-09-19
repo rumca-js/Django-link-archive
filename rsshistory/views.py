@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views import generic
 from django.urls import reverse
 from django.contrib.auth.models import User

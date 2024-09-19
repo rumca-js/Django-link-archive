@@ -33,7 +33,7 @@ class BaseLinkDataModel(models.Model):
     link = models.CharField(max_length=1000, unique=True)
 
     # URL of source, might be RSS source
-    source = models.CharField(max_length=2000)
+    source_url = models.CharField(max_length=2000)
 
     title = models.CharField(max_length=1000, null=True)
     description = models.TextField(max_length=1000, null=True, blank=True)
@@ -102,7 +102,7 @@ class BaseLinkDataModel(models.Model):
 
     class Meta:
         abstract = True
-        ordering = ["-date_published", "source", "title"]
+        ordering = ["-date_published", "source_url", "title"]
 
     def save(self, *args, **kwargs):
         """
@@ -145,7 +145,7 @@ class BaseLinkDataModel(models.Model):
 class BaseLinkDataController(BaseLinkDataModel):
     class Meta:
         abstract = True
-        ordering = ["-date_published", "source", "title"]
+        ordering = ["-date_published", "source_url", "title"]
 
     def get_absolute_url(self):
         """Returns the URL to access a particular author instance."""
@@ -170,10 +170,10 @@ class BaseLinkDataController(BaseLinkDataModel):
             return static("{0}/icons/icons8-locked-100.png".format(LinkDatabase.name))
 
     def get_source_name(self):
-        if self.source_obj:
-            return self.source_obj.title
+        if self.source:
+            return self.source.title
         else:
-            return self.source
+            return self.source_url
 
     def get_link_dead_text(self):
         return "______"
@@ -251,8 +251,8 @@ class BaseLinkDataController(BaseLinkDataModel):
         return result
 
     def update_language(self):
-        if self.source_obj:
-            self.language = self.source_obj.language
+        if self.source:
+            self.language = self.source.language
             self.save()
         else:
             handler = UrlHandler(self.link)
@@ -269,8 +269,8 @@ class BaseLinkDataController(BaseLinkDataModel):
         if self.age and self.age >= 18:
             return static("{0}/images/sign-304093_640.png".format(LinkDatabase.name))
 
-        if self.source_obj:
-            return self.source_obj.get_favicon()
+        if self.source:
+            return self.source.get_favicon()
 
         # returning real favicon from HTML is too long
         return DomainAwarePage(self.link).get_domain() + "/favicon.ico"
@@ -311,7 +311,7 @@ class BaseLinkDataController(BaseLinkDataModel):
         """
         return [
             "id",
-            "source",
+            "source_url",
             "title",
             "description",
             "link",
@@ -333,11 +333,11 @@ class BaseLinkDataController(BaseLinkDataModel):
 
     def get_query_names():
         names = set(BaseLinkDataController.get_export_names())
-        names.add("source_obj__id")
-        names.add("source_obj__url")
-        names.add("source_obj__title")
-        names.add("source_obj__category")
-        names.add("source_obj__subcategory")
+        names.add("source__id")
+        names.add("source__url")
+        names.add("source__title")
+        names.add("source__category")
+        names.add("source__subcategory")
         names.add("tags__tag")
         names.add("votes__vote")
 
@@ -350,8 +350,8 @@ class BaseLinkDataController(BaseLinkDataModel):
         Provides object export names with dependencies from other objects
         """
         names = set(BaseLinkDataController.get_export_names())
-        names.add("source_obj__id")
-        names.add("user_object__id")
+        names.add("source__id")
+        names.add("user__id")
         names.add("tags")
         names.add("comments")
         names.add("vote")  # TODO is this used?
@@ -390,8 +390,8 @@ class BaseLinkDataController(BaseLinkDataModel):
         else:
             themap["comments"] = []
 
-        if self.source_obj:
-            themap["source_obj__id"] = self.source_obj.id
+        if self.source:
+            themap["source__id"] = self.source.id
 
         return themap
 
@@ -477,8 +477,8 @@ class BaseLinkDataController(BaseLinkDataModel):
         if p.is_domain() and conf.accept_domains:
             return True
 
-        if self.source_obj:
-            return self.source_obj.enabled
+        if self.source:
+            return self.source.enabled
 
         return False
 
@@ -605,14 +605,14 @@ class BaseLinkDataController(BaseLinkDataModel):
 
 
 class LinkDataModel(BaseLinkDataController):
-    source_obj = models.ForeignKey(
+    source = models.ForeignKey(
         SourceDataModel,
         on_delete=models.SET_NULL,
         related_name="link_source",
         null=True,
         blank=True,
     )
-    domain_obj = models.ForeignKey(
+    domain = models.ForeignKey(
         Domains,
         on_delete=models.CASCADE,
         related_name="entry_objects",
@@ -620,7 +620,7 @@ class LinkDataModel(BaseLinkDataController):
         blank=True,
     )
     # user who added entry
-    user_object = models.ForeignKey(
+    user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name=str(LinkDatabase.name) + "_entries",
@@ -642,14 +642,14 @@ class LinkDataModel(BaseLinkDataController):
 
 
 class ArchiveLinkDataModel(BaseLinkDataController):
-    source_obj = models.ForeignKey(
+    source = models.ForeignKey(
         SourceDataModel,
         on_delete=models.SET_NULL,
         related_name="archive_source",
         null=True,
         blank=True,
     )
-    domain_obj = models.ForeignKey(
+    domain = models.ForeignKey(
         Domains,
         on_delete=models.CASCADE,
         related_name="archive_entry_objects",
@@ -657,7 +657,7 @@ class ArchiveLinkDataModel(BaseLinkDataController):
         blank=True,
     )
     # user who added entry
-    user_object = models.ForeignKey(
+    user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name=str(LinkDatabase.name) + "_aentries",

@@ -155,8 +155,12 @@ class HttpRequestBuilder(object):
             request.timeout_s = max(request.timeout_s, 10)
 
             for crawler_data in WebConfig.browser_mapping["standard"]:
-                crawler = crawler_data["crawler"]
+                crawler = WebConfig.get_crawler_from_string(crawler_data["crawler"])
+                if not crawler:
+                    WebLogger.error("Cannot find crawler in WebConfig:{}".format(crawler_data["crawler"]))
+                    continue
                 settings = crawler_data["settings"]
+
                 WebLogger.debug("Running crawler {}".format(crawler))
                 c = crawler(request=request, settings=settings)
                 c.run()
@@ -172,8 +176,12 @@ class HttpRequestBuilder(object):
             request.timeout_s = max(request.timeout_s, 20)
 
             for crawler_data in WebConfig.browser_mapping["headless"]:
-                crawler = crawler_data["crawler"]
+                crawler = WebConfig.get_crawler_from_string(crawler_data["crawler"])
+                if not crawler:
+                    WebLogger.error("Cannot find crawler in WebConfig:{}".format(crawler_data["crawler"]))
+                    continue
                 settings = crawler_data["settings"]
+
                 WebLogger.debug("Running crawler {}".format(crawler))
                 c = crawler(request=request, settings=settings)
                 c.run()
@@ -189,8 +197,12 @@ class HttpRequestBuilder(object):
             request.timeout_s = max(request.timeout_s, 30)
 
             for crawler_data in WebConfig.browser_mapping["full"]:
-                crawler = crawler_data["crawler"]
+                crawler = WebConfig.get_crawler_from_string(crawler_data["crawler"])
+                if not crawler:
+                    WebLogger.error("Cannot find crawler in WebConfig:{}".format(crawler_data["crawler"]))
+                    continue
                 settings = crawler_data["settings"]
+
                 WebLogger.debug("Running crawler {}".format(crawler))
                 c = crawler(request=request, settings=settings)
                 c.run()

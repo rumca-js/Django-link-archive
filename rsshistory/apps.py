@@ -32,7 +32,7 @@ class LinkDatabase(AppConfig):
             AppLogging.notify("System is ready {}.".format(current_date))
 
         except Exception as E:
-            print(str(E))
+            print("[{}] {}".format(LinkDatabase.name, str(E)))
             print(
                 "Exception can occur, if this is first run of migrations. Do not worry."
             )

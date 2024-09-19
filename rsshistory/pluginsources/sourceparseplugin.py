@@ -44,8 +44,8 @@ class BaseParsePlugin(SourceGenericPlugin):
 
         props = url.get_props()
         if props:
-            props["source"] = source.url
-            props["source_obj"] = source
+            props["source_url"] = source.url
+            props["source"] = source
 
         return props
 

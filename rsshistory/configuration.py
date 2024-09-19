@@ -20,7 +20,7 @@ version is split into three digits:
  if a change requires the model to be changed, then second digit is updated, patch is set to 0
  if something should be released to public, then release version changes
 """
-__version__ = "0.84.2"
+__version__ = "0.85.0"
 
 
 class Configuration(object):
@@ -102,17 +102,22 @@ class Configuration(object):
         Logger.app_logger = AppLogging
 
     def apply_webconfig(self):
+        from .models import Browser
+        from webtools import WebConfig
+
         self.apply_ssl_verification()
         self.apply_user_agent()
         self.apply_robots_txt()
         self.apply_web_logger()
         self.apply_crawling_scripts()
 
-        from webtools import WebConfig
         c = self.config_entry
         WebConfig.selenium_driver_location = c.selenium_driver_path
 
-        WebConfig.init_browser_config()
+        if Browser.objects.all().count() == 0:
+            Browser.read_browser_setup()
+
+        Browser.apply_browser_setup()
 
     def apply_ssl_verification(self):
         from webtools import HttpPageHandler

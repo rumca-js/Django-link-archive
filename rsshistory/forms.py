@@ -498,11 +498,11 @@ class EntryForm(forms.ModelForm):
             "title",
             "description",
             "date_published",
-            "source",
+            "source_url",
             "bookmarked",
             "permanent",
             "language",
-            "user_object",
+            "user",
             "artist",
             "album",
             "age",
@@ -525,18 +525,18 @@ class EntryForm(forms.ModelForm):
 
         self.fields["link"].widget.attrs.update(size=self.init.get_cols_size())
         self.fields["title"].widget.attrs.update(size=self.init.get_cols_size())
-        self.fields["source"].widget.attrs.update(size=self.init.get_cols_size())
+        self.fields["source_url"].widget.attrs.update(size=self.init.get_cols_size())
         self.fields["thumbnail"].widget.attrs.update(size=self.init.get_cols_size())
 
         self.fields["link"].required = True
-        self.fields["source"].required = False
+        self.fields["source_url"].required = False
         self.fields["language"].required = False
         self.fields["description"].required = False
         self.fields["title"].required = False
         self.fields["artist"].required = False
         self.fields["album"].required = False
         self.fields["bookmarked"].initial = True
-        self.fields["user_object"].widget.attrs["readonly"] = True
+        self.fields["user"].widget.attrs["readonly"] = True
         self.fields["age"].required = False
         self.fields["thumbnail"].required = False
         self.fields["manual_status_code"].required = False
@@ -562,10 +562,10 @@ class EntryArchiveForm(forms.ModelForm):
             "title",
             "description",
             "date_published",
-            "source",
+            "source_url",
             "bookmarked",
             "language",
-            "user_object",
+            "user",
             "artist",
             "album",
             "age",
@@ -916,7 +916,7 @@ class EntryChoiceForm(BasicEntryChoiceForm):
     title = forms.CharField(label="title", max_length=1000, required=False)
     bookmarked = forms.BooleanField(required=False, initial=False)
     language = forms.CharField(label="language", max_length=10, required=False)
-    user_object = forms.CharField(label="user_object", max_length=500, required=False)
+    user = forms.CharField(label="user", max_length=500, required=False)
     tag = forms.CharField(label="tag", max_length=500, required=False)
     vote = forms.IntegerField(label="vote", required=False)
     artist = forms.CharField(label="artist", max_length=1000, required=False)

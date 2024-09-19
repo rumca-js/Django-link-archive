@@ -23,6 +23,7 @@ from .viewspkg import (
     custom,
     readmarkers,
     readlater,
+    browsers,
     users,
 )
 
@@ -222,6 +223,10 @@ urlpatterns = [
     path("api-key-add", apikeys.add, name="api-key-add"),
     path("api-key-remove/<int:pk>/", apikeys.remove, name="api-key-remove"),
     path("api-keys/", apikeys.ListView.as_view(), name="api-keys",),
+    # browser
+    path("browsers/", browsers.BrowserListView.as_view(), name="browsers",),
+    path("browsers-read/", browsers.read_browser_setup, name="browser-read",),
+    path("browsers-apply/", browsers.apply_browser_setup, name="browser-apply",),
     # other, debug forms
     path("page-show-props", tools.page_show_properties, name="page-show-props",),
     path("page-scan-link", tools.page_scan_link, name="page-scan-link",),
