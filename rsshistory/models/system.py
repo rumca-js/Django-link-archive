@@ -11,7 +11,7 @@ from django.urls import reverse
 from django.conf import settings
 from django.contrib.auth.models import User
 
-from webtools.ipc import DEFAULT_PORT
+from ..webtools.ipc import DEFAULT_PORT
 from utils.dateutils import DateUtils
 
 from ..apps import LinkDatabase
@@ -933,3 +933,27 @@ class BackgroundJob(models.Model):
             "subject",
             "errors",
             ]
+
+
+class AppLoggingController(object):
+    """
+    Implementation of weblogger that only prints to std out
+    """
+
+    def info(self, info_text, detail_text="", user=None, stack=False):
+        AppLogging.info(info_text, detail_text, user, stack)
+
+    def debug(self, info_text, detail_text="", user=None, stack=False):
+        AppLogging.debug(info_text, detail_text, user, stack)
+
+    def warning(self, info_text, detail_text="", user=None, stack=False):
+        AppLogging.warning(info_text, detail_text, user, stack)
+
+    def error(self, info_text, detail_text="", user=None, stack=False):
+        AppLogging.error(info_text, detail_text, user, stack)
+
+    def notify(self, info_text, detail_text="", user=None):
+        AppLogging.notify(info_text, detail_text, user )
+
+    def exc(self, exception_object, info_text=None, user=None):
+        AppLogging.exc(exception_object, info_text, user)

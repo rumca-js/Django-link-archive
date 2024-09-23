@@ -43,46 +43,46 @@ class LinkDataControllerTest(FakeInternetTestCase):
         )
 
         ob = LinkDataController.objects.create(
-            source="https://youtube.com",
+            source_url="https://youtube.com",
             link="https://youtube.com?v=bookmarked",
             title="The first link",
-            source_obj=source_youtube,
+            source=source_youtube,
             bookmarked=True,
             language="en",
-            domain_obj=domain,
+            domain=domain,
             date_published=date_link_publish,
         )
 
         ob = LinkDataController.objects.create(
-            source="https://youtube.com",
+            source_url="https://youtube.com",
             link="https://youtube.com?v=nonbookmarked",
             title="The second link",
-            source_obj=source_youtube,
+            source=source_youtube,
             bookmarked=False,
             language="en",
-            domain_obj=domain,
+            domain=domain,
             date_published=date_link_publish,
         )
 
         ob = LinkDataController.objects.create(
-            source="https://youtube.com",
+            source_url="https://youtube.com",
             link="https://youtube.com?v=permanent",
             title="The first link",
-            source_obj=source_youtube,
+            source=source_youtube,
             permanent=True,
             language="en",
-            domain_obj=domain,
+            domain=domain,
             date_published=date_link_publish,
         )
 
         ob = ArchiveLinkDataController.objects.create(
-            source="https://youtube.com",
+            source_url="https://youtube.com",
             link="https://youtube.com?v=nonbookmarked2",
             title="The second link",
-            source_obj=source_youtube,
+            source=source_youtube,
             bookmarked=False,
             language="en",
-            domain_obj=domain,
+            domain=domain,
             date_published=date_to_remove,
         )
 
@@ -120,7 +120,7 @@ class LinkDataControllerTest(FakeInternetTestCase):
 
     def test_is_taggable_true(self):
         entry = LinkDataController.objects.create(
-            source="https://youtube.com",
+            source_url="https://youtube.com",
             link="https://youtube.com?v=nonbookmarked",
             title="The second link",
             bookmarked=True,
@@ -133,7 +133,7 @@ class LinkDataControllerTest(FakeInternetTestCase):
 
     def test_is_taggable_false(self):
         entry = LinkDataController.objects.create(
-            source="https://youtube.com",
+            source_url="https://youtube.com",
             link="https://youtube.com?v=nonbookmarked",
             title="The second link",
             bookmarked=False,
@@ -146,7 +146,7 @@ class LinkDataControllerTest(FakeInternetTestCase):
 
     def test_is_commentable_true(self):
         entry = LinkDataController.objects.create(
-            source="https://youtube.com",
+            source_url="https://youtube.com",
             link="https://youtube.com?v=nonbookmarked",
             title="The second link",
             bookmarked=True,
@@ -159,7 +159,7 @@ class LinkDataControllerTest(FakeInternetTestCase):
 
     def test_is_commentable_false(self):
         entry = LinkDataController.objects.create(
-            source="https://youtube.com",
+            source_url="https://youtube.com",
             link="https://youtube.com?v=nonbookmarked",
             title="The second link",
             bookmarked=False,
@@ -183,16 +183,16 @@ class LinkDataControllerTest(FakeInternetTestCase):
         )
 
         entry = LinkDataController.objects.create(
-            source="",
+            source_url="",
             link="https://linkedin.com",
             title="my title",
             description="my description",
             bookmarked=False,
             language="pl",
-            domain_obj=None,
+            domain=None,
             date_published=add_time,
             thumbnail="thumbnail",
-            source_obj=source_youtube,
+            source=source_youtube,
         )
 
         date_updated = entry.date_update_last
@@ -216,16 +216,16 @@ class LinkDataControllerTest(FakeInternetTestCase):
         )
 
         entry = LinkDataController.objects.create(
-            source="",
+            source_url="",
             link="https://linkedin.com",
             title="my title",
             description="my description",
             bookmarked=False,
             language="pl",
-            domain_obj=None,
+            domain=None,
             date_published=add_time,
             thumbnail="thumbnail",
-            source_obj=source_youtube,
+            source=source_youtube,
             manual_status_code=0,
         )
 
@@ -250,16 +250,16 @@ class LinkDataControllerTest(FakeInternetTestCase):
         )
 
         entry = LinkDataController.objects.create(
-            source="",
+            source_url="",
             link="https://linkedin.com",
             title="my title",
             description="my description",
             bookmarked=False,
             language="pl",
-            domain_obj=None,
+            domain=None,
             date_published=add_time,
             thumbnail="thumbnail",
-            source_obj=source_youtube,
+            source=source_youtube,
             manual_status_code=200,
         )
 
@@ -273,25 +273,25 @@ class LinkDataControllerTest(FakeInternetTestCase):
 
     def test_is_https(self):
         entry_https = LinkDataController.objects.create(
-            source="",
+            source_url="",
             link="https://linkedin.com",
             title="my title",
             description="my description",
             bookmarked=False,
             language="pl",
-            domain_obj=None,
+            domain=None,
             thumbnail="thumbnail",
             manual_status_code=200,
         )
 
         entry_http = LinkDataController.objects.create(
-            source="",
+            source_url="",
             link="http://linkedin.com",
             title="my title",
             description="my description",
             bookmarked=False,
             language="pl",
-            domain_obj=None,
+            domain=None,
             thumbnail="thumbnail",
             manual_status_code=200,
         )
@@ -302,25 +302,25 @@ class LinkDataControllerTest(FakeInternetTestCase):
 
     def test_is_http(self):
         entry_https = LinkDataController.objects.create(
-            source="",
+            source_url="",
             link="https://linkedin.com",
             title="my title",
             description="my description",
             bookmarked=False,
             language="pl",
-            domain_obj=None,
+            domain=None,
             thumbnail="thumbnail",
             manual_status_code=200,
         )
 
         entry_http = LinkDataController.objects.create(
-            source="",
+            source_url="",
             link="http://linkedin.com",
             title="my title",
             description="my description",
             bookmarked=False,
             language="pl",
-            domain_obj=None,
+            domain=None,
             thumbnail="thumbnail",
             manual_status_code=200,
         )
@@ -332,18 +332,18 @@ class LinkDataControllerTest(FakeInternetTestCase):
     def test_get_tag_map(self):
         # demoted page
         entry = LinkDataController.objects.create(
-            source="",
+            source_url="",
             link="https://linkedin.com",
             title="my title",
             description="my description",
             bookmarked=False,
             language="pl",
-            domain_obj=None,
+            domain=None,
             thumbnail="thumbnail",
         )
 
         UserTags.objects.create(
-            tag="test tag", user_object=self.user, entry_object=entry
+            tag="test tag", user=self.user, entry=entry
         )
 
         tag_vec = entry.get_tag_map()
@@ -353,13 +353,13 @@ class LinkDataControllerTest(FakeInternetTestCase):
     def test_get_tag_map__invalid_page(self):
         # demoted page
         entry = LinkDataController.objects.create(
-            source="",
+            source_url="",
             link="https://linkedin.com",
             title="my title",
             description="my description",
             bookmarked=False,
             language="pl",
-            domain_obj=None,
+            domain=None,
             thumbnail="thumbnail",
             manual_status_code=200,
             date_dead_since=DateUtils.get_datetime_now_utc(),
@@ -368,7 +368,7 @@ class LinkDataControllerTest(FakeInternetTestCase):
         )
 
         UserTags.objects.create(
-            tag="test tag", user_object=self.user, entry_object=entry
+            tag="test tag", user=self.user, entry=entry
         )
 
         tag_vec = entry.get_tag_map()
@@ -378,13 +378,13 @@ class LinkDataControllerTest(FakeInternetTestCase):
     def test_get_http_url(self):
         # demoted page
         entry = LinkDataController.objects.create(
-            source="",
+            source_url="",
             link="https://linkedin.com",
             title="my title",
             description="my description",
             bookmarked=False,
             language="pl",
-            domain_obj=None,
+            domain=None,
             thumbnail="thumbnail",
             manual_status_code=200,
             date_dead_since=DateUtils.get_datetime_now_utc(),
@@ -398,13 +398,13 @@ class LinkDataControllerTest(FakeInternetTestCase):
     def test_get_https_url(self):
         # demoted page
         entry = LinkDataController.objects.create(
-            source="",
+            source_url="",
             link="http://linkedin.com",
             title="my title",
             description="my description",
             bookmarked=False,
             language="pl",
-            domain_obj=None,
+            domain=None,
             thumbnail="thumbnail",
             manual_status_code=200,
             date_dead_since=DateUtils.get_datetime_now_utc(),

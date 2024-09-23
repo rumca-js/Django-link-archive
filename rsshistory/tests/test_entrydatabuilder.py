@@ -45,7 +45,7 @@ class EntryDataBuilderTest(FakeInternetTestCase):
 
         link_data = {
             "link": link_name,
-            "source": "https://youtube.com",
+            "source_url": "https://youtube.com",
             "title": "test",
             "description": "description",
             "language": "en",
@@ -90,7 +90,7 @@ class EntryDataBuilderTest(FakeInternetTestCase):
 
         link_data = {
             "link": link_name,
-            "source": "https://youtube.com",
+            "source_url": "https://youtube.com",
             "title": "test",
             "description": "description",
             "language": "en",
@@ -121,7 +121,7 @@ class EntryDataBuilderTest(FakeInternetTestCase):
 
         link_data = {
             "link": link_name,
-            "source": "https://youtube.com",
+            "source_url": "https://youtube.com",
             "title": "test",
             "description": "description",
             "language": "en",
@@ -158,7 +158,7 @@ class EntryDataBuilderTest(FakeInternetTestCase):
 
         link_data = {
             "link": link_name_0,
-            "source": "https://youtube.com",
+            "source_url": "https://youtube.com",
             "title": "test",
             "description": "description",
             "language": "en",
@@ -192,7 +192,7 @@ class EntryDataBuilderTest(FakeInternetTestCase):
 
         link_data = {
             "link": link_name_0,
-            "source": "https://youtube.com",
+            "source_url": "https://youtube.com",
             "title": "test",
             "description": "description",
             "language": "en",
@@ -223,7 +223,7 @@ class EntryDataBuilderTest(FakeInternetTestCase):
 
         link_data = {
             "link": link_name_1,
-            "source": "https://youtube.com",
+            "source_url": "https://youtube.com",
             "title": "test",
             "description": "description",
             "language": "en",
@@ -265,7 +265,7 @@ class EntryDataBuilderTest(FakeInternetTestCase):
 
         link_data = {
             "link": link_name,
-            "source": "https://youtube.com",
+            "source_url": "https://youtube.com",
             "title": "Site not found - GitHub",
             "description": "description",
             "language": "en",
@@ -301,7 +301,7 @@ class EntryDataBuilderTest(FakeInternetTestCase):
 
         link_data = {
             "link": link_name,
-            "source": "https://youtube.com",
+            "source_url": "https://youtube.com",
             "title": "test",
             "description": "description",
             "language": "en",
@@ -338,7 +338,7 @@ class EntryDataBuilderTest(FakeInternetTestCase):
 
         link_data = {
             "link": link_name,
-            "source": "https://youtube.com",
+            "source_url": "https://youtube.com",
             "title": "test",
             "description": "description",
             "language": "en",
@@ -372,7 +372,7 @@ class EntryDataBuilderTest(FakeInternetTestCase):
 
         link_data = {
             "link": link_name,
-            "source": "https://youtube.com",
+            "source_url": "https://youtube.com",
             "title": "test",
             "description": "description",
             "language": "en",

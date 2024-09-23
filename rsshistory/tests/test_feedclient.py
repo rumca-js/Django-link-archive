@@ -3,8 +3,7 @@ from sqlalchemy import (
 )
 from pathlib import Path
 
-from webtools import RssPage, HtmlPage, YouTubeVideoHandler, FeedClient
-from webtools import UrlAgeModerator
+from ..webtools import RssPage, HtmlPage, YouTubeVideoHandler, FeedClient, UrlAgeModerator
 from utils.sqlmodel import SqlModel, EntriesTable, SourcesTable
 
 from ..pluginurl.urlhandler import UrlHandler

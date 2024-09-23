@@ -26,11 +26,11 @@ class CommentsViewsTests(FakeInternetTestCase):
         test_link = "https://linkedin.com"
 
         entry = LinkDataController.objects.create(
-            source="https://linkedin.com",
+            source_url="https://linkedin.com",
             link=test_link,
             title="The first link",
             description="the first link description",
-            source_obj=None,
+            source=None,
             bookmarked=True,
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
@@ -58,7 +58,7 @@ class CommentsViewsTests(FakeInternetTestCase):
 
         # check that object has been changed
 
-        entries = UserComments.objects.filter(entry_object=entry)
+        entries = UserComments.objects.filter(entry=entry)
         self.assertEqual(entries.count(), 1)
 
     def test_entry_comment_edit(self):
@@ -67,18 +67,18 @@ class CommentsViewsTests(FakeInternetTestCase):
         test_link = "https://linkedin.com"
 
         entry = LinkDataController.objects.create(
-            source="https://linkedin.com",
+            source_url="https://linkedin.com",
             link=test_link,
             title="The first link",
             description="the first link description",
-            source_obj=None,
+            source=None,
             bookmarked=True,
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
         )
 
         UserComments.objects.create(
-            entry_object=entry, user_object=self.user, comment="comment"
+            entry=entry, user=self.user, comment="comment"
         )
 
         url = reverse(
@@ -103,7 +103,7 @@ class CommentsViewsTests(FakeInternetTestCase):
 
         # check that object has been changed
 
-        entries = UserComments.objects.filter(entry_object=entry)
+        entries = UserComments.objects.filter(entry=entry)
         self.assertEqual(entries.count(), 1)
 
     def test_remove_comment(self):
@@ -112,18 +112,18 @@ class CommentsViewsTests(FakeInternetTestCase):
         test_link = "https://linkedin.com"
 
         entry = LinkDataController.objects.create(
-            source="https://linkedin.com",
+            source_url="https://linkedin.com",
             link=test_link,
             title="The first link",
             description="the first link description",
-            source_obj=None,
+            source=None,
             bookmarked=True,
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
         )
 
         UserComments.objects.create(
-            entry_object=entry, user_object=self.user, comment="comment"
+            entry=entry, user=self.user, comment="comment"
         )
 
         url = reverse(
@@ -136,5 +136,5 @@ class CommentsViewsTests(FakeInternetTestCase):
         # redirect to view the link again
         self.assertEqual(response.status_code, 200)
 
-        entries = UserComments.objects.filter(entry_object=entry)
+        entries = UserComments.objects.filter(entry=entry)
         self.assertEqual(entries.count(), 0)

@@ -10,7 +10,7 @@ from django.contrib.auth.models import User
 
 # import chardet
 from utils.dateutils import DateUtils
-from webtools import (
+from ..webtools import (
     YouTubeVideoHandler,
     YouTubeJsonHandler,
     YouTubeChannelHandler,
@@ -652,28 +652,28 @@ class FakeInternetTestCase(TestCase):
         All entries are outdated
         """
         entry1 = LinkDataController.objects.create(
-            source="https://youtube.com",
+            source_url="https://youtube.com",
             link="https://youtube.com?v=bookmarked",
             title="The first link",
-            source_obj=source_youtube,
+            source=source_youtube,
             bookmarked=True,
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
         )
         entry2 = LinkDataController.objects.create(
-            source="https://youtube.com",
+            source_url="https://youtube.com",
             link="https://youtube.com?v=nonbookmarked",
             title="The second link",
-            source_obj=source_youtube,
+            source=source_youtube,
             bookmarked=False,
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
         )
         entry3 = LinkDataController.objects.create(
-            source="https://youtube.com",
+            source_url="https://youtube.com",
             link="https://youtube.com?v=permanent",
             title="The first link",
-            source_obj=source_youtube,
+            source=source_youtube,
             permanent=True,
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",

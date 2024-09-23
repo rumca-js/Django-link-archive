@@ -32,11 +32,12 @@ import json
 
 from pathlib import Path
 import shutil
-import webtools
+from .webconfig import WebConfig
+from .webtools import PageRequestObject, PageResponseObject, get_response_to_bytes
+from .ipc import SocketConnection, DEFAULT_PORT
 import subprocess
 import traceback
 from datetime import datetime, timedelta
-from webtools import WebConfig
 
 
 max_transaction_timeout_s = 40
@@ -128,7 +129,7 @@ def handle_connection_inner(c, address, port):
         elif command[0] == "PageRequestObject.url":
             print("Received request url")
             url = command[1].decode()
-            request = webtools.PageRequestObject(url=url)
+            request = PageRequestObject(url=url)
 
         elif command[0] == "PageRequestObject.timeout":
             timeout_s = int(command[1].decode())
@@ -183,7 +184,7 @@ def handle_connection_inner(c, address, port):
             print("Received response init")
 
         elif command[0] == "PageResponseObject.url":
-            response = webtools.PageResponseObject(command[1].decode())
+            response = PageResponseObject(command[1].decode())
             print("Received response url")
 
         elif command[0] == "PageResponseObject.status_code":
@@ -205,7 +206,7 @@ def handle_connection_inner(c, address, port):
         elif command[0] == "PageResponseObject.__del__":
             print("Received response complete")
 
-            all_bytes = webtools.get_response_to_bytes(response)
+            all_bytes = get_response_to_bytes(response)
 
             to_delete = []
             for index, request_data in enumerate(requests):
@@ -281,7 +282,7 @@ def handle_connection(conn, address, port):
         )
     )
 
-    c = webtools.ipc.SocketConnection(conn)
+    c = SocketConnection(conn)
     try:
         handle_connection_inner(c, address, port)
     except Exception as E:
@@ -305,12 +306,12 @@ class ScrapingServer(object):
         if host:
             self.host = host
         else:
-            self.host = webtools.ipc.SocketConnection.gethostname()
+            self.host = SocketConnection.gethostname()
 
         if port:
             self.port = port
         else:
-            self.port = webtools.ipc.DEFAULT_PORT
+            self.port = DEFAULT_PORT
 
         self.close_request = False
 
@@ -395,7 +396,7 @@ class ScrapingServerParser(object):
         if "port" in self.args and self.args.port:
             self.port = self.args.port
         else:
-            self.port = webtools.ipc.DEFAULT_PORT
+            self.port = DEFAULT_PORT
 
     def is_valid(self):
         return True

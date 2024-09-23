@@ -1,4 +1,4 @@
-from webtools import HtmlPage, RssPage, JsonPage, HttpPageHandler, DomainAwarePage
+from ..webtools import HtmlPage, RssPage, JsonPage, HttpPageHandler, DomainAwarePage
 from utils.services import OpenRss
 
 from ..models import (
@@ -18,9 +18,6 @@ class SourceUrlInterface(object):
         self.use_headless_browser = use_headless_browser
 
     def get_props(self, input_props=None):
-        options = UrlHandler(self.url).get_init_page_options()
-        options.use_headless_browser = self.use_headless_browser
-
         if not input_props:
             input_props = {}
 

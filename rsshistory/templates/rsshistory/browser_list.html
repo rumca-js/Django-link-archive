@@ -2,15 +2,42 @@
 {% load static %}
 {% block content %}
 
+<div class="container">
+    <a href="{% url 'rsshistory:browser-read' %}" title="Reads browser setup from webtools" class="btn btn-primary" role="button">
+        Read
+    </a>
+</div>
+
 <h1>Browser list</h1>
 
   {% if content_list %}
      <div class="list-group">
          {% for browser in content_list %}
          <div>
-           Mode:{{browser.mode.mode}}
-           Crawler:{{browser.crawler}}
-           Settings:{{browser.settings}}
+             <div>
+                 {% if not browser.enabled %}
+                 <b>[DISABLED]</b>
+                 {% endif %}
+                 Mode:{{browser.mode.mode}}
+                 Crawler:{{browser.crawler}}
+                 Settings:{{browser.settings}}
+             </div>
+
+             <div>
+                 {% if browser.enabled %}
+                 <a href="{% url 'rsshistory:browser-disable' browser.id %}" title="Disables browser" class="btn btn-primary" role="button">
+                   {% include "rsshistory/icon_disable.html" %}
+                 </a>
+                 {% else %}
+                 <a href="{% url 'rsshistory:browser-enable' browser.id %}" title="Enables browser" class="btn btn-primary" role="button">
+                   {% include "rsshistory/icon_enable.html" %}
+                 </a>
+                 {% endif %}
+                 <a href="{% url 'rsshistory:browser-remove' browser.id %}" title="Removes browser" class="btn btn-primary" role="button">
+                   {% include "rsshistory/icon_remove.html" %}
+                 </a>
+             </div>
+
          </div>
          {% endfor %}
       {% include "rsshistory/pagination.html" %}

@@ -9,10 +9,11 @@ import time
 import argparse
 import sys
 
-import webtools
+from rsshistory import webtools
 
 
 def main():
+    webtools.WebConfig.init()
     webtools.WebConfig.use_print_logging() 
 
     parser = webtools.ScriptCrawlerParser()

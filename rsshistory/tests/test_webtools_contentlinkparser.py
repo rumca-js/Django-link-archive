@@ -1,4 +1,4 @@
-from webtools import ContentLinkParser
+from ..webtools import ContentLinkParser
 
 from .fakeinternet import FakeInternetTestCase
 

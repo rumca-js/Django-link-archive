@@ -1,6 +1,6 @@
 import argparse
 
-from webtools import (
+from rsshistory.webtools import (
     Url,
     RssPage,
     HtmlPage,
@@ -12,16 +12,9 @@ from utils.services import OpenRss
 
 class PageDisplay(object):
     def __init__(self, url, verbose=False, method=None):
-        options = Url.get_url_options(url)
-
-        if method == "headless":
-            options.use_headless_browser = True
-            options.use_browser_promotions = False
-        if method == "full":
-            options.use_full_browser = True
-            options.use_browser_promotions = False
-
-        u = Url(url, page_options=options)
+        u = Url(url)
+        if method:
+            u.options.mode = method
         u.get_response()
 
         print("Handler:{}".format(type(u.get_handler())))

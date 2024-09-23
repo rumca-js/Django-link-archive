@@ -8,7 +8,6 @@ from urllib3 import disable_warnings
 from datetime import timedelta
 
 from utils.dateutils import DateUtils
-from utils.basictypes import fix_path_for_os
 
 from .webtools import (
     WebLogger,
@@ -30,6 +29,7 @@ from .pages import (
     HtmlPage,
     RssPage,
 )
+from .webconfig import WebConfig
 
 
 class HttpRequestBuilder(object):
@@ -41,7 +41,7 @@ class HttpRequestBuilder(object):
     """
 
     # use headers from https://www.supermonitoring.com/blog/check-browser-http-headers/
-    get_contents_function = None
+    get_contents_function = None # TODO remove this, in tests provide own WebConfig crawler mapping
 
     def __init__(self, url=None, options=None, page_object=None, request=None):
         """
@@ -140,28 +140,29 @@ class HttpRequestBuilder(object):
 
         First configured thing provides return value
         """
-        from .webconfig import (
-            WebConfig,
-        )
         if self.options:
             request.ssl_verify = self.options.ssl_verify
         if self.options:
             request.ping = self.options.ping
 
-        if self.options.use_basic_crawler():
-            # up to 20
-            request.timeout_s = min(request.timeout_s, 20)
-            # at least 10
-            request.timeout_s = max(request.timeout_s, 10)
+        if self.options:
+            mode = self.options.get_mode()
+            mode_mapping = self.options.mode_mapping
+        else:
+            mode = "standard"
+            mode_mapping = WebConfig.get_init_crawler_config()
 
-            for crawler_data in WebConfig.browser_mapping["standard"]:
+        request.timeout_s = self.options.get_timeout(request.timeout_s)
+
+        if mode in mode_mapping:
+            for crawler_data in mode_mapping[mode]:
                 crawler = WebConfig.get_crawler_from_string(crawler_data["crawler"])
                 if not crawler:
                     WebLogger.error("Cannot find crawler in WebConfig:{}".format(crawler_data["crawler"]))
                     continue
                 settings = crawler_data["settings"]
 
-                WebLogger.debug("Running crawler {}".format(crawler))
+                WebLogger.debug("Running crawler {}".format(crawler)) # TODO make it debug
                 c = crawler(request=request, settings=settings)
                 c.run()
                 response = c.get_response()
@@ -169,52 +170,12 @@ class HttpRequestBuilder(object):
                 if response:
                     return response
 
-        elif self.options.use_headless_browser:
-            # up to 30
-            request.timeout_s = min(request.timeout_s, 30)
-            # at least 20
-            request.timeout_s = max(request.timeout_s, 20)
-
-            for crawler_data in WebConfig.browser_mapping["headless"]:
-                crawler = WebConfig.get_crawler_from_string(crawler_data["crawler"])
-                if not crawler:
-                    WebLogger.error("Cannot find crawler in WebConfig:{}".format(crawler_data["crawler"]))
-                    continue
-                settings = crawler_data["settings"]
-
-                WebLogger.debug("Running crawler {}".format(crawler))
-                c = crawler(request=request, settings=settings)
-                c.run()
-                response = c.get_response()
-                c.close()
-                if response:
-                    return response
-
-        elif self.options.use_full_browser:
-            # up to 40
-            request.timeout_s = min(request.timeout_s, 40)
-            # at least 30
-            request.timeout_s = max(request.timeout_s, 30)
-
-            for crawler_data in WebConfig.browser_mapping["full"]:
-                crawler = WebConfig.get_crawler_from_string(crawler_data["crawler"])
-                if not crawler:
-                    WebLogger.error("Cannot find crawler in WebConfig:{}".format(crawler_data["crawler"]))
-                    continue
-                settings = crawler_data["settings"]
-
-                WebLogger.debug("Running crawler {}".format(crawler))
-                c = crawler(request=request, settings=settings)
-                c.run()
-                response = c.get_response()
-                c.close()
-                if response:
-                    return response
         else:
             self.dead = True
+            WebLogger.error("Url:{} Could not identify method of page capture".format(request.url))
             raise NotImplementedError("Could not identify method of page capture")
 
-    def ping(self, timeout_s=5):
+    def ping(self, timeout_s=5, options=None):
         url = self.url
 
         if url is None:
@@ -223,6 +184,8 @@ class HttpRequestBuilder(object):
 
             WebLogger.error("Passed incorrect url {}".format(stack_str))
             return
+
+        self.options = options
 
         o = PageRequestObject(
             url=url,
@@ -346,7 +309,6 @@ class HttpRequestBuilder(object):
 
 class HttpPageHandler(ContentInterface):
     user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/116.0"
-    ssl_verify = True
 
     def __init__(self, url=None, page_options=None):
         super().__init__(url=url, contents=None)
@@ -355,7 +317,6 @@ class HttpPageHandler(ContentInterface):
         self.options = page_options
 
     def disable_ssl_warnings():
-        HttpPageHandler.ssl_verify = False
         disable_warnings(InsecureRequestWarning)
 
     def is_handled_by(url):
@@ -388,9 +349,12 @@ class HttpPageHandler(ContentInterface):
             # we warn, because if that happens too often, it is easy just to
             # define EntryRule for that domain
             WebLogger.error(
-                "Url:{}. Trying to workaround with headless browser".format(self.url)
+                "Url:{}. Trying to promote to other mode from {} mode".format(self.url, self.options.mode)
             )
-            self.options.use_headless_browser = True
+            if self.options.mode == "standard":
+                self.options.mode = "headless"
+            if self.options.mode == "headless":
+                self.options.mode = "full"
             self.p = self.get_page_handler_simple()
 
         if self.response:
@@ -493,6 +457,9 @@ class HttpPageHandler(ContentInterface):
         """
         If we do not have data, but we think we can do better
         """
+        if self.options.mode == "full":
+            return False
+
         if not self.response:
             return True
 
@@ -506,20 +473,9 @@ class HttpPageHandler(ContentInterface):
             return False
 
         if status_code < 200 or status_code > 404:
-            if self.options.use_basic_crawler():
-                return True
-            else:
-                return False
-
-        if not self.options.use_basic_crawler():
-            return False
-
-        if not self.p:
             return True
 
-        if self.p and self.p.is_cloudflare_protected():
-            text = self.response.get_text()
-            print(text)
+        if not self.p:
             return True
 
         if not self.p.is_valid():

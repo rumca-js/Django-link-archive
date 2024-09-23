@@ -686,30 +686,66 @@ class PageOptions(object):
     WebTools can be configured to use a script, port, or whatever
 
     Fields:
-     - Ping - only check status code, and headers of page. Does not download contents
-     - Browser promotions - if requests cannot receive response we can try with headless or full browser
+     - ping - only check status code, and headers of page. Does not download contents
+     - browser promotions - if requests cannot receive response we can try with headless or full browser
+     - user_agent - not supported by all crawlers. Selenium, stealth requests uses their own agents
+     - mode_mapping - configuration of modes
     """
 
     def __init__(self):
-        self.use_full_browser = False
-        self.use_headless_browser = False
         self.ssl_verify = True
         self.ping = False
-        self.use_browser_promotions = (
-            True  # tries headles if normal processing does not work
-        )
+        self.use_browser_promotions = True  # tries headles if normal processing does not work
+
+        self.mode = "standard"
+        self.mode_mapping = {}
+
+        self.user_agent = None # passed if you wish certain user agent to be used
 
     def use_basic_crawler(self):
         return not self.is_advanced_processing_required()
 
     def is_advanced_processing_required(self):
-        return self.use_full_browser or self.use_headless_browser
+        return self.mode == "full" or self.mode == "headless"
+
+    def is_mode_mapping(self):
+        if self.mode_mapping and len(self.mode_mapping) > 0:
+            return True
+
+    def get_mode(self):
+        return self.mode
+
+    def get_timeout(self, timeout_s):
+
+        mode = self.get_mode()
+
+        if mode == "standard":
+            # up to 20
+            timeout_s = min(timeout_s, 20)
+            # at least 10
+            timeout_s = max(timeout_s, 10)
+        elif mode == "headless":
+            # up to 30
+            timeout_s = min(timeout_s, 30)
+            # at least 20
+            timeout_s = max(timeout_s, 20)
+        elif mode == "headless":
+            # up to 40
+            timeout_s = min(timeout_s, 40)
+            # at least 30
+            timeout_s = max(timeout_s, 30)
+
+        return timeout_s
+
+    def copy_config(self, other_config):
+        # if we have mode mapping - use it
+        self.mode_mapping = other_config.mode_mapping
+        self.ssl_verify = other_config.ssl_verify
 
     def __str__(self):
-        return "P:{} F:{} H:{} SSL:{} PR:{}".format(
+        return "P:{} M:{} SSL:{} PR:{}".format(
             self.ping,
-            self.use_full_browser,
-            self.use_headless_browser,
+            self.mode,
             self.ssl_verify,
             self.use_browser_promotions,
         )

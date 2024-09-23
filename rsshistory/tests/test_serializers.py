@@ -81,13 +81,13 @@ class EntryYearDataMainExporterTest(FakeInternetTestCase):
         date = DateUtils.from_string("2024-12-08T05:29:52Z")
 
         entry = LinkDataController.objects.create(
-            source="",
+            source_url="",
             link="https://linkedin.com",
             title="my title",
             description="my description",
             bookmarked=True,
             language="pl",
-            domain_obj=None,
+            domain=None,
             date_published=date,
             thumbnail="thumbnail",
         )
@@ -97,7 +97,7 @@ class EntryYearDataMainExporterTest(FakeInternetTestCase):
         )
 
         # call tested function
-        exporter = EntryYearDataMainExporter(dw_conf, "testuser")
+        exporter = EntryYearDataMainExporter(dw_conf, self.user)
 
         entries = exporter.get_entries(2024)
         self.assertEqual(entries.count(), 0)
@@ -108,26 +108,26 @@ class EntryYearDataMainExporterTest(FakeInternetTestCase):
         date = DateUtils.from_string("2024-12-08T05:29:52Z")
 
         entry = LinkDataController.objects.create(
-            source="",
+            source_url="",
             link="https://linkedin.com",
             title="my title",
             description="my description",
             bookmarked=True,
             language="pl",
-            domain_obj=None,
+            domain=None,
             date_published=date,
             thumbnail="thumbnail",
         )
 
         bookmark = UserBookmarks.objects.create(
-            date_bookmarked=date, user_object=self.user, entry_object=entry
+            date_bookmarked=date, user=self.user, entry=entry
         )
 
         dw_conf = DataWriterConfiguration(
             config, self.export, Path("./data/test/year")
         )
 
-        exporter = EntryYearDataMainExporter(dw_conf, "testuser")
+        exporter = EntryYearDataMainExporter(dw_conf, self.user)
 
         # call tested function
         entries = exporter.get_entries(2024)
@@ -139,26 +139,26 @@ class EntryYearDataMainExporterTest(FakeInternetTestCase):
         date = DateUtils.from_string("2024-12-08T05:29:52Z")
 
         entry = LinkDataController.objects.create(
-            source="",
+            source_url="",
             link="https://linkedin.com",
             title="my title",
             description="my description",
             bookmarked=True,
             language="pl",
-            domain_obj=None,
+            domain=None,
             date_published=date,
             thumbnail="thumbnail",
         )
 
         bookmark = UserBookmarks.objects.create(
-            date_bookmarked=date, user_object=self.user, entry_object=entry
+            date_bookmarked=date, user=self.user, entry=entry
         )
 
         dw_conf = DataWriterConfiguration(
             config, self.export, Path("./data/test/year")
         )
 
-        exporter = EntryYearDataMainExporter(dw_conf, "")
+        exporter = EntryYearDataMainExporter(dw_conf, user=None)
 
         # call tested function
         entries = exporter.get_entries(2024)

@@ -11,7 +11,7 @@ from django.shortcuts import redirect
 from django.forms.models import model_to_dict
 from django.contrib.auth.models import User
 
-from webtools import selenium_feataure_enabled
+from ..webtools import selenium_feataure_enabled
 from utils.dateutils import DateUtils
 
 from ..apps import LinkDatabase

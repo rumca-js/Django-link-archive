@@ -55,47 +55,47 @@ class EntriesCleanupTest(FakeInternetTestCase):
         )
 
         ob = LinkDataController.objects.create(
-            source="https://youtube.com",
-            source_obj=source_youtube,
+            source_url="https://youtube.com",
+            source=source_youtube,
             link="https://youtube.com?v=bookmarked",
             title="The first link",
             bookmarked=True,
             language="en",
-            domain_obj=domain,
+            domain=domain,
             date_published=date_link_publish,
         )
         UserBookmarks.add(self.user_not_staff, ob)
 
         ob = LinkDataController.objects.create(
-            source="https://youtube.com",
-            source_obj=source_youtube,
+            source_url="https://youtube.com",
+            source=source_youtube,
             link="https://youtube.com?v=nonbookmarked",
             title="The second link",
             bookmarked=False,
             language="en",
-            domain_obj=domain,
+            domain=domain,
             date_published=date_link_publish,
         )
 
         ob = LinkDataController.objects.create(
-            source="https://youtube.com",
-            source_obj=source_youtube,
+            source_url="https://youtube.com",
+            source=source_youtube,
             link="https://youtube.com?v=permanent",
             title="The first link",
             permanent=True,
             language="en",
-            domain_obj=domain,
+            domain=domain,
             date_published=date_link_publish,
         )
 
         ob = ArchiveLinkDataController.objects.create(
-            source="https://youtube.com",
-            source_obj=source_youtube,
+            source_url="https://youtube.com",
+            source=source_youtube,
             link="https://youtube.com?v=nonbookmarked2",
             title="The second link",
             bookmarked=False,
             language="en",
-            domain_obj=domain,
+            domain=domain,
             date_published=date_to_remove,
         )
 
@@ -206,10 +206,10 @@ class EntriesCleanupTest(FakeInternetTestCase):
         self.assertEqual(archived.count(), 2)
         self.assertEqual(domains.count(), 1)
 
-        self.assertEqual(archived[0].domain_obj, domains[0])
+        self.assertEqual(archived[0].domain, domains[0])
         self.assertEqual(archived[0].date_published, date_link_publish)
 
-        self.assertEqual(archived[1].domain_obj, domains[0])
+        self.assertEqual(archived[1].domain, domains[0])
         self.assertEqual(archived[1].date_published, date_to_remove)
 
     def test_cleanup__https_http_duplicates(self):
@@ -220,7 +220,7 @@ class EntriesCleanupTest(FakeInternetTestCase):
         self.clear()
 
         ob = LinkDataController.objects.create(
-            source="https://youtube.com",
+            source_url="https://youtube.com",
             link="https://youtube.com?v=permanent",
             title="The first link",
             permanent=True,
@@ -228,7 +228,7 @@ class EntriesCleanupTest(FakeInternetTestCase):
         )
 
         ob = LinkDataController.objects.create(
-            source="http://youtube.com",
+            source_url="http://youtube.com",
             link="http://youtube.com?v=permanent",
             title="The second link",
             permanent=True,
@@ -259,7 +259,7 @@ class EntriesCleanupTest(FakeInternetTestCase):
         self.clear()
 
         ob = LinkDataController.objects.create(
-            source="https://youtube.com",
+            source_url="https://youtube.com",
             link="https://youtube.com?v=permanent",
             title="The first link",
             permanent=True,
@@ -267,7 +267,7 @@ class EntriesCleanupTest(FakeInternetTestCase):
         )
 
         ob = LinkDataController.objects.create(
-            source="http://youtube.com",
+            source_url="http://youtube.com",
             link="https://www.youtube.com?v=permanent",
             title="The second link",
             permanent=True,

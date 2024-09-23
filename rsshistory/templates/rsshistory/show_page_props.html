@@ -4,16 +4,9 @@
 
 <div class="contentbuttonmenu">
 Select request options:
-   {% if method == "headless" %}
-   <a class="btn brn-primary" href="{% url 'rsshistory:page-show-props' %}?method=standard&page={{page_url.url}}">Standard</a>
-   <a class="btn brn-primary" href="{% url 'rsshistory:page-show-props' %}?method=full&page={{page_url.url}}">Full</a>
-   {% elif method == "full" %}
-   <a class="btn brn-primary" href="{% url 'rsshistory:page-show-props' %}?method=standard&page={{page_url.url}}">Standard</a>
-   <a class="btn brn-primary" href="{% url 'rsshistory:page-show-props' %}?method=headless&page={{page_url.url}}">Headless</a>
-   {% else %}
-   <a class="btn brn-primary" href="{% url 'rsshistory:page-show-props' %}?method=headless&page={{page_url.url}}">Headless</a>
-   <a class="btn brn-primary" href="{% url 'rsshistory:page-show-props' %}?method=full&page={{page_url.url}}">Full</a>
-   {% endif %}
+   {% for mode in modes %}
+       <a class="btn brn-primary" href="{% url 'rsshistory:page-show-props' %}?method={{mode}}&page={{page_url.url}}">{{mode}}</a>
+   {% endfor %}
 </div>
 
 {% if is_youtube_video %}

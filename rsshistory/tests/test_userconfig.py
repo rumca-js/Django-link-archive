@@ -18,7 +18,7 @@ class UserTagsTest(FakeInternetTestCase):
             is_staff=True,
         )
 
-        uc = UserConfig.objects.create(user="test", user_object=self.user)
+        uc = UserConfig.objects.create(user=self.user)
 
         # user is 20 years old
         current_date = datetime.now().date()

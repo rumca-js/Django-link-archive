@@ -9,7 +9,7 @@ from django.http import HttpResponseForbidden, HttpResponseRedirect
 from django.utils.http import urlencode
 from django.core.paginator import Paginator
 
-from webtools import Url, DomainAwarePage, DomainCache
+from ..webtools import Url, DomainAwarePage, DomainCache
 from utils.dateutils import DateUtils
 from utils.serializers import ReturnDislike
 from utils.omnisearch import SingleSymbolEvaluator

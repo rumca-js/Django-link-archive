@@ -33,11 +33,11 @@ class UserVotesTests(FakeInternetTestCase):
         test_link = "https://linkedin.com"
 
         entry = LinkDataController.objects.create(
-            source="https://linkedin.com",
+            source_url="https://linkedin.com",
             link=test_link,
             title="The first link",
             description="the first link description",
-            source_obj=None,
+            source=None,
             bookmarked=True,
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
@@ -64,7 +64,7 @@ class UserVotesTests(FakeInternetTestCase):
 
         # check that object has been changed
 
-        entries = UserVotes.objects.filter(entry_object=entry)
+        entries = UserVotes.objects.filter(entry=entry)
         self.assertEqual(entries.count(), 1)
 
         jobs = BackgroundJobController.objects.all()

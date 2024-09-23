@@ -1,4 +1,4 @@
-from webtools import Url, DomainCache, DomainCacheInfo
+from ..webtools import Url, DomainCache, DomainCacheInfo
 
 from .fakeinternet import FakeInternetTestCase, MockRequestCounter
 

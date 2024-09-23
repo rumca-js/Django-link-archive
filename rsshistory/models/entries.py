@@ -8,7 +8,7 @@ from django.templatetags.static import static
 from django.utils import timezone
 from django.conf import settings
 
-from webtools import DomainAwarePage
+from ..webtools import DomainAwarePage
 from utils.dateutils import DateUtils
 from utils.controllers import GenericEntryController
 

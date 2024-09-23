@@ -1,9 +1,12 @@
+from django.shortcuts import redirect
+
 from ..models import Browser
 from ..controllers import (
     LinkDataController,
 )
 from ..models import ConfigurationEntry, Browser
 from ..views import ViewPage, GenericListView
+from ..apps import LinkDatabase
 
 
 class BrowserListView(GenericListView):
@@ -15,7 +18,7 @@ class BrowserListView(GenericListView):
 def apply_browser_setup(request):
     p = ViewPage(request)
     p.set_title("Clear entire later list")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
     if data is not None:
         return data
 
@@ -28,7 +31,7 @@ def apply_browser_setup(request):
 def read_browser_setup(request):
     p = ViewPage(request)
     p.set_title("Clear entire later list")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
     if data is not None:
         return data
 
@@ -36,3 +39,60 @@ def read_browser_setup(request):
 
     p.context["summary_text"] = "OK"
     return p.render("go_back.html")
+
+
+def remove(request, pk):
+    p = ViewPage(request)
+    p.set_title("Removes browser")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    browsers = Browser.objects.filter(id=pk)
+    if browsers.exists():
+        browsers.delete()
+
+        p.context["summary_text"] = "Successfully removed browser"
+        return p.render("go_back.html")
+    else:
+        p.context["summary_text"] = "Cannot find such entry"
+        return p.render("go_back.html")
+
+
+def disable(request, pk):
+    p = ViewPage(request)
+    p.set_title("Disables browser")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    browsers = Browser.objects.filter(id=pk)
+    if browsers.exists():
+        browser = browsers[0]
+        browser.enabled = False
+        browser.save()
+
+        return redirect("{}:browsers".format(LinkDatabase.name))
+    else:
+        p.context["summary_text"] = "Cannot find such entry"
+        return p.render("go_back.html")
+
+
+def enable(request, pk):
+    p = ViewPage(request)
+    p.set_title("Enables browser")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    browsers = Browser.objects.filter(id=pk)
+    if browsers.exists():
+        browser = browsers[0]
+        browser.enabled = True
+        browser.save()
+
+        return redirect("{}:browsers".format(LinkDatabase.name))
+    else:
+        p.context["summary_text"] = "Cannot find such entry"
+        return p.render("go_back.html")
+

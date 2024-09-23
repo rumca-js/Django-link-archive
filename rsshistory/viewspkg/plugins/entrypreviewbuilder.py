@@ -1,4 +1,4 @@
-from webtools import HtmlPage
+from ...webtools import HtmlPage
 
 from ...pluginurl.urlhandler import UrlHandler
 

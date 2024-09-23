@@ -1,4 +1,4 @@
-from webtools import YouTubeVideoHandler
+from ..webtools import YouTubeVideoHandler
 
 from ..pluginurl.entryurlinterface import EntryUrlInterface
 from ..controllers import SourceDataController

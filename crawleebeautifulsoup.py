@@ -18,7 +18,7 @@ import sys
 import os
 from datetime import timedelta
 import json
-import webtools
+from rsshistory import webtools
 import traceback
 import shutil
 

@@ -124,7 +124,21 @@ class DomainsByNameDetailView(generic.DetailView):
     model = DomainsController
     context_object_name = "domain_detail"
 
+    def get(self, *args, **kwargs):
+        """
+        API: Used to redirect if user does not have rights
+        """
+
+        p = ViewPage(self.request)
+        data = p.check_access()
+        if data is not None:
+            return redirect("{}:missing-rights".format(LinkDatabase.name))
+
+        view = super().get(*args, **kwargs)
+        return view
+
     def get_object(self):
+
         domain_name = self.request.GET["domain_name"]
         self.objects = DomainsController.objects.filter(domain=domain_name)
         if self.objects.count() > 0:

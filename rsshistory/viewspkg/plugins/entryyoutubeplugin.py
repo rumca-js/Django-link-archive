@@ -1,7 +1,7 @@
 from django.urls import reverse
 from django.templatetags.static import static
 
-from webtools import YouTubeVideoHandler
+from ...webtools import YouTubeVideoHandler
 
 from ...apps import LinkDatabase
 from ...models import ConfigurationEntry

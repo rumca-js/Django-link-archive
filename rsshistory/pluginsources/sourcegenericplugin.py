@@ -1,7 +1,7 @@
 import traceback
 import hashlib
 
-from webtools import ContentLinkParser, calculate_hash
+from ..webtools import ContentLinkParser, calculate_hash
 from utils.dateutils import DateUtils
 
 from ..apps import LinkDatabase

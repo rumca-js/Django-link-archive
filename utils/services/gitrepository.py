@@ -2,7 +2,7 @@ from pathlib import Path
 import subprocess
 import shutil
 from utils.repositoryinterface import RepositoryInterface
-from utils.logger import Logger
+from utils.logger import get_logger
 
 
 class GitRepository(RepositoryInterface):
@@ -19,7 +19,8 @@ class GitRepository(RepositoryInterface):
             self.up()
             repo_is_up = True
         except Exception as E:
-            Logger.exc(
+            logger = get_logger("utils")
+            logger.exc(
                 E,
                 "Cannot update repository, removing directory {}".format(
                     self.get_operating_dir()
@@ -87,7 +88,8 @@ class GitRepository(RepositoryInterface):
 
     def push(self):
         if not self.is_different_flag:
-            Logger.debug("Repository is not different")
+            logger = get_logger("utils")
+            logger.debug("Repository is not different")
             return False
 
         token = self.export_data.password
@@ -159,7 +161,8 @@ class GitRepository(RepositoryInterface):
 
     def check_process(self, p):
         if p.returncode != 0:
-            Logger.error(
+            logger = get_logger("utils")
+            logger.error(
                 "GIT status:{}\nstdout:{}\nstderr:{}".format(
                     p.returncode, p.stdout.decode(), p.stderr.decode()
                 )

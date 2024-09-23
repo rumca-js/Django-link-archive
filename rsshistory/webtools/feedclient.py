@@ -20,13 +20,12 @@ from utils.sqlmodel import (
 )
 from datetime import timedelta, datetime, timezone
 
-from webtools import (
-    PageOptions,
-    WebConfig,
-    Url,
-    RssPage,
-    HttpPageHandler,
-)
+from .webtools import PageOptions
+from .webconfig import WebConfig
+from .pages import RssPage
+from .url import Url
+from .handlerhttppage import HttpPageHandler
+
 from utils.dateutils import DateUtils
 from utils.serializers import HtmlExporter, JsonImporter
 from utils.controllers import GenericEntryController
@@ -64,11 +63,7 @@ def read_source(db, source):
     source_title = source.title
     source_id = source.id
 
-    options = PageOptions()
-    options.use_headless_browser = False
-    options.use_full_browser = False
-
-    url = Url(url=source_url, page_options=options)
+    url = Url(url=source_url)
     handler = url.get_handler()
     response = url.get_response()
 

@@ -8,7 +8,7 @@ import asyncio
 import time
 import requests
 
-from webtools import (
+from rsshistory.webtools import (
    Url,
    RssPage,
    HtmlPage,
@@ -17,7 +17,6 @@ from webtools import (
    WebConfig,
    ScrapingClient,
 )
-from utils.logger import Logger
 from utils.serializers import PageDisplay, PageDisplayParser
 
 
@@ -28,7 +27,6 @@ async def main():
     WebConfig.init()
     # we do not want to be swamped with web requests
     # WebConfig.use_print_logging()
-    Logger.use_print_logging()
 
     # if scraping server is running, use it
     c = ScrapingClient()

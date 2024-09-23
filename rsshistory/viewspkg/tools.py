@@ -1,11 +1,12 @@
 from django.urls import reverse
 from django.http import JsonResponse
 
-from webtools import ContentLinkParser, RssPage, DomainCache, DomainAwarePage
+from ..webtools import ContentLinkParser, RssPage, DomainCache, DomainAwarePage
 
 from ..apps import LinkDatabase
 from ..models import (
     ConfigurationEntry,
+    BrowserMode,
 )
 from ..controllers import (
     LinkDataController,
@@ -31,31 +32,15 @@ def page_show_properties(request):
         return data
 
     def show_page_props_internal(requests, page_link):
-        options = UrlHandler.get_url_options(page_link)
+        url = UrlHandler(page_link)
+        options = url.options
 
         method = "standard"
 
-        if "method" in request.GET and request.GET["method"] == "headless":
-            options.use_headless_browser = True
-            options.use_full_browser = False
-            options.use_browser_promotions = False
-            method = request.GET["method"]
-        elif "method" in request.GET and request.GET["method"] == "full":
-            options.use_full_browser = True
-            options.use_headless_browser = False
-            options.use_browser_promotions = False
-        elif "method" in request.GET and request.GET["method"] == "standard":
-            options.use_full_browser = False
-            options.use_headless_browser = False
-            options.use_browser_promotions = False
+        if "method" in request.GET and request.GET["method"] != "":
+            options.mode = request.GET["method"]
         else:
             options.use_browser_promotions = True
-            if options.use_full_browser:
-                method = "full"
-            elif options.use_headless_browser:
-                method = "headless"
-            else:
-                method = "standard"
 
         page_url = UrlHandler(page_link, page_options=options)
         page_url.get_response()
@@ -71,7 +56,8 @@ def page_show_properties(request):
         p.context["is_link_allowed"] = DomainCache.get_object(page_link).is_allowed(
             page_link
         )
-        p.context["method"] = method
+        p.context["method"] = options.mode
+        p.context["modes"] = BrowserMode.get_modes()
 
         return p.render("show_page_props.html")
 

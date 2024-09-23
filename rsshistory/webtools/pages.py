@@ -6,7 +6,7 @@ from datetime import datetime
 from dateutil import parser
 import html
 
-from webtools import (
+from .webtools import (
   DomainAwarePage,
   calculate_hash,
   WebLogger,

@@ -1,5 +1,3 @@
-from utils.logger import Logger
-
 from utils.sqlmodel import (
     SqlModel,
     EntriesTable,
@@ -127,7 +125,7 @@ class EntryDataBuilder(object):
         """
         TODO extract this to a separate class?
         """
-        from webtools import Url, UrlPropertyValidator
+        from rsshistory.webtools import Url, UrlPropertyValidator
         self.ignore_errors = ignore_errors
         self.link = Url.get_cleaned_link(self.link)
         if not self.link:
@@ -138,7 +136,7 @@ class EntryDataBuilder(object):
         self.build_from_props()
 
     def build_from_props(self, ignore_errors=False):
-        from webtools import Url, UrlPropertyValidator
+        from rsshistory.webtools import Url, UrlPropertyValidator
         self.ignore_errors = ignore_errors
 
         url = self.link_data["link"]

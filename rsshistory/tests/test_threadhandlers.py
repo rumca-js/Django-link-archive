@@ -157,7 +157,7 @@ class RefreshThreadHandlerTest(FakeInternetTestCase):
         SourceExportHistory.objects.all().delete()
 
         LinkDataController.objects.create(
-            source="https://youtube.com",
+            source_url="https://youtube.com",
             link="https://youtube.com?v=12345",
         )
 
@@ -270,37 +270,37 @@ class CleanJobHandlerTest(FakeInternetTestCase):
             export_to_cms=True,
         )
         LinkDataController.objects.create(
-            source="https://youtube.com",
+            source_url="https://youtube.com",
             link="https://youtube.com?v=bookmarked",
             title="The first link",
-            source_obj=source_youtube,
+            source=source_youtube,
             bookmarked=True,
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
         )
         LinkDataController.objects.create(
-            source="https://youtube.com",
+            source_url="https://youtube.com",
             link="https://youtube.com?v=nonbookmarked",
             title="The second link",
-            source_obj=source_youtube,
+            source=source_youtube,
             bookmarked=False,
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
         )
         LinkDataController.objects.create(
-            source="https://youtube.com",
+            source_url="https://youtube.com",
             link="https://youtube.com?v=permanent",
             title="The first link",
-            source_obj=source_youtube,
+            source=source_youtube,
             permanent=True,
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
         )
         LinkDataController.objects.create(
-            source="https://youtube.com",
+            source_url="https://youtube.com",
             link="https://youtube.com",
             title="The first link",
-            source_obj=source_youtube,
+            source=source_youtube,
             permanent=True,
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
@@ -548,7 +548,7 @@ class WriteDailyDataJobHandlerTest(FakeInternetTestCase):
         )
 
         LinkDataController.objects.create(
-            source="https://youtube.com",
+            source_url="https://youtube.com",
             link="https://youtube.com?v=12345",
             date_published=DateUtils.from_string("2024-06-23T11:35:31Z"),
         )
@@ -594,7 +594,7 @@ class ExportDataJobHandlerTest(FakeInternetTestCase):
         )
 
         LinkDataController.objects.create(
-            source="https://youtube.com",
+            source_url="https://youtube.com",
             link="https://youtube.com?v=12345",
             date_published=DateUtils.from_string("2024-06-23T11:35:31Z"),
         )
@@ -630,9 +630,9 @@ class GenericJobsProcessorTest(FakeInternetTestCase):
             url="https://youtube.com", title="YouTube", category="No", subcategory="No"
         )
         LinkDataController.objects.create(
-            source="https://youtube.com",
+            source_url="https://youtube.com",
             link="https://youtube.com?v=12345",
-            source_obj=ob,
+            source=ob,
         )
 
         self.user = self.get_user(
@@ -997,9 +997,9 @@ class SourceJobsProcessorTest(FakeInternetTestCase):
             url="https://youtube.com", title="YouTube", category="No", subcategory="No"
         )
         LinkDataController.objects.create(
-            source="https://youtube.com",
+            source_url="https://youtube.com",
             link="https://youtube.com?v=12345",
-            source_obj=ob,
+            source=ob,
         )
 
         self.user = self.get_user(
@@ -1041,9 +1041,9 @@ class LeftOverJobsProcessorTest(FakeInternetTestCase):
             url="https://youtube.com", title="YouTube", category="No", subcategory="No"
         )
         LinkDataController.objects.create(
-            source="https://youtube.com",
+            source_url="https://youtube.com",
             link="https://youtube.com?v=12345",
-            source_obj=ob,
+            source=ob,
         )
 
         self.user = self.get_user(

@@ -18,11 +18,16 @@ class SourceDataBuilder(object):
     def get_session(self):
         return self.conn.get_session()
 
-    def build(link=None, link_data=None, manual_entry=False):
+    def build(self, link=None, link_data=None, manual_entry=False):
+        if link_data:
+            self.link_data = link_data
+        if link:
+            self.link = link
+
         if self.link_data:
-            self.build_from_props()
+            return self.build_from_props()
         elif self.link:
-            self.build_from_link()
+            return self.build_from_link()
 
     def build_from_link(self):
         rss_url = self.link

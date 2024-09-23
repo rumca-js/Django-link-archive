@@ -133,7 +133,7 @@ class EntriesViewsTests(FakeInternetTestCase):
         test_link = "https://linkedin.com"
 
         ob = ArchiveLinkDataController.objects.create(
-            source="https://linkin.com",
+            source_url="https://linkin.com",
             link=test_link,
             title="The second link",
             language="en",
@@ -187,11 +187,11 @@ class EntriesViewsTests(FakeInternetTestCase):
         test_link = "https://linkedin.com"
 
         entry = LinkDataController.objects.create(
-            source="https://linkedin.com",
+            source_url="https://linkedin.com",
             link=test_link,
             title="The first link",
             description="the first link description",
-            source_obj=None,
+            source=None,
             bookmarked=False,
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
@@ -224,11 +224,11 @@ class EntriesViewsTests(FakeInternetTestCase):
         test_link = "https://linkedin.com"
 
         entry = LinkDataController.objects.create(
-            source="https://linkedin.com",
+            source_url="https://linkedin.com",
             link=test_link,
             title="The first link",
             description="the first link description",
-            source_obj=None,
+            source=None,
             bookmarked=False,
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
@@ -262,11 +262,11 @@ class EntriesViewsTests(FakeInternetTestCase):
         test_link = "https://linkedin.com"
 
         entry = LinkDataController.objects.create(
-            source="https://linkedin.com",
+            source_url="https://linkedin.com",
             link=test_link,
             title="The first link",
             description="the first link description",
-            source_obj=None,
+            source=None,
             bookmarked=True,
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
@@ -285,11 +285,11 @@ class EntriesViewsTests(FakeInternetTestCase):
         test_link = "https://www.youtube.com/watch?v=123"
 
         entry = LinkDataController.objects.create(
-            source="https://linkedin.com",
+            source_url="https://linkedin.com",
             link=test_link,
             title="The first link",
             description="the first link description",
-            source_obj=None,
+            source=None,
             bookmarked=True,
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
@@ -310,11 +310,11 @@ class EntriesViewsTests(FakeInternetTestCase):
         test_link = "https://www.youtube.com/watch?v=123"
 
         entry = LinkDataController.objects.create(
-            source="https://linkedin.com",
+            source_url="https://linkedin.com",
             link=test_link,
             title="The first link",
             description="the first link description",
-            source_obj=None,
+            source=None,
             bookmarked=True,
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
@@ -331,11 +331,11 @@ class EntriesViewsTests(FakeInternetTestCase):
         test_link = "https://www.youtube.com/watch?v=123"
 
         entry = LinkDataController.objects.create(
-            source="https://linkedin.com",
+            source_url="https://linkedin.com",
             link=test_link,
             title="The first link",
             description="the first link description",
-            source_obj=None,
+            source=None,
             bookmarked=False,
             permanent=False,
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
@@ -360,25 +360,25 @@ class EntriesViewsTests(FakeInternetTestCase):
         self.assertTrue(entry.bookmarked)
         self.assertFalse(entry.permanent)
 
-        bookmarks = UserBookmarks.objects.filter(entry_object=entry)
+        bookmarks = UserBookmarks.objects.filter(entry=entry)
         self.assertEqual(bookmarks.count(), 1)
 
     def test_entry_notbookmark(self):
         test_link = "https://www.youtube.com/watch?v=123"
 
         entry = LinkDataController.objects.create(
-            source="https://linkedin.com",
+            source_url="https://linkedin.com",
             link=test_link,
             title="The first link",
             description="the first link description",
-            source_obj=None,
+            source=None,
             bookmarked=True,
             permanent=False,
             date_published=DateUtils.get_datetime_now_utc(),
             language="en",
         )
 
-        UserBookmarks.objects.create(entry_object=entry, user_object=self.user)
+        UserBookmarks.objects.create(entry=entry, user=self.user)
 
         self.client.login(username="testuser", password="testpassword")
         url = reverse("{}:entry-notbookmark".format(LinkDatabase.name), args=[entry.id])
@@ -396,18 +396,18 @@ class EntriesViewsTests(FakeInternetTestCase):
         self.assertFalse(entry.bookmarked)
         self.assertFalse(entry.permanent)
 
-        bookmarks = UserBookmarks.objects.filter(entry_object=entry)
+        bookmarks = UserBookmarks.objects.filter(entry=entry)
         self.assertEqual(bookmarks.count(), 0)
 
     def test_archive_entry_bookmark(self):
         test_link = "https://www.youtube.com/watch?v=123"
 
         entry = ArchiveLinkDataController.objects.create(
-            source="https://linkedin.com",
+            source_url="https://linkedin.com",
             link=test_link,
             title="The first link",
             description="the first link description",
-            source_obj=None,
+            source=None,
             bookmarked=False,
             permanent=False,
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
@@ -436,18 +436,18 @@ class EntriesViewsTests(FakeInternetTestCase):
         self.assertTrue(entry.bookmarked)
         self.assertFalse(entry.permanent)
 
-        bookmarks = UserBookmarks.objects.filter(entry_object=entry)
+        bookmarks = UserBookmarks.objects.filter(entry=entry)
         self.assertEqual(bookmarks.count(), 1)
 
     def test_entry_active(self):
         test_link = "https://www.youtube.com/watch?v=123"
 
         entry = LinkDataController.objects.create(
-            source="https://linkedin.com",
+            source_url="https://linkedin.com",
             link=test_link,
             title="The first link",
             description="the first link description",
-            source_obj=None,
+            source=None,
             bookmarked=True,
             permanent=False,
             date_published=DateUtils.get_datetime_now_utc(),
@@ -469,11 +469,11 @@ class EntriesViewsTests(FakeInternetTestCase):
         test_link = "https://www.youtube.com/watch?v=123"
 
         entry = LinkDataController.objects.create(
-            source="https://linkedin.com",
+            source_url="https://linkedin.com",
             link=test_link,
             title="The first link",
             description="the first link description",
-            source_obj=None,
+            source=None,
             bookmarked=True,
             permanent=False,
             date_published=DateUtils.get_datetime_now_utc(),
@@ -494,11 +494,11 @@ class EntriesViewsTests(FakeInternetTestCase):
         test_link = "https://www.youtube.com/watch?v=123"
 
         entry = LinkDataController.objects.create(
-            source="https://linkedin.com",
+            source_url="https://linkedin.com",
             link=test_link,
             title="The first link",
             description="the first link description",
-            source_obj=None,
+            source=None,
             bookmarked=True,
             permanent=False,
             date_published=DateUtils.get_datetime_now_utc(),
@@ -531,37 +531,37 @@ class EntriesViewsTests2(FakeInternetTestCase):
             export_to_cms=True,
         )
         self.entry_youtube = LinkDataController.objects.create(
-            source="https://youtube.com",
+            source_url="https://youtube.com",
             link="https://youtube.com?v=bookmarked",
             title="The first link",
-            source_obj=source_youtube,
+            source=source_youtube,
             bookmarked=True,
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
         )
         self.entry_non_bookmarked = LinkDataController.objects.create(
-            source="https://youtube.com",
+            source_url="https://youtube.com",
             link="https://youtube.com?v=nonbookmarked",
             title="The second link",
-            source_obj=source_youtube,
+            source=source_youtube,
             bookmarked=False,
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
         )
         self.entry_html = LinkDataController.objects.create(
-            source="https://linkedin.com/feed",
+            source_url="https://linkedin.com/feed",
             link="https://linkedin.com",
             title="The second link",
-            source_obj=source_youtube,
+            source=source_youtube,
             bookmarked=False,
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
         )
         self.entry_pdf = LinkDataController.objects.create(
-            source="https://linkedin.com/feed",
+            source_url="https://linkedin.com/feed",
             link="https://linkedin.com/link-to-pdf.pdf",
             title="The second link",
-            source_obj=source_youtube,
+            source=source_youtube,
             bookmarked=False,
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
@@ -708,7 +708,7 @@ class EntriesViewsTests2(FakeInternetTestCase):
 
         self.assertEqual(visits.count(), 1)
         self.assertEqual(visits[0].visits, 1)
-        self.assertEqual(visits[0].user_object, self.user)
+        self.assertEqual(visits[0].user, self.user)
 
     def test_entry_detail__visit_from(self):
         c = Configuration.get_object()
@@ -739,7 +739,7 @@ class EntriesViewsTests2(FakeInternetTestCase):
 
         self.assertEqual(visits.count(), 1)
         self.assertEqual(visits[0].visits, 1)
-        self.assertEqual(visits[0].user_object, self.user)
+        self.assertEqual(visits[0].user, self.user)
 
         all_transitions = UserEntryTransitionHistory.objects.all()
         self.assertEqual(all_transitions.count(), 1)

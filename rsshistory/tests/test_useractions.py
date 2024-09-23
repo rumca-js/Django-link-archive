@@ -27,24 +27,24 @@ class UserTagsTest(TestCase):
         )
 
         self.entry = LinkDataController.objects.create(
-            source="https://youtube.com",
+            source_url="https://youtube.com",
             link="https://youtube.com?v=bookmarked",
             title="The first link",
-            source_obj=source_youtube,
+            source=source_youtube,
             bookmarked=True,
             language="en",
-            domain_obj=domain,
+            domain=domain,
             date_published=current_time,
         )
 
         self.entry_new = LinkDataController.objects.create(
-            source="https://youtube.com",
+            source_url="https://youtube.com",
             link="http://youtube.com?v=bookmarked",
             title="The first link",
-            source_obj=source_youtube,
+            source=source_youtube,
             bookmarked=True,
             language="en",
-            domain_obj=domain,
+            domain=domain,
             date_published=current_time,
         )
 
@@ -74,8 +74,8 @@ class UserTagsTest(TestCase):
         self.assertEqual(tags.count(), 2)
         self.assertTrue("tag1" in tag_names)
         self.assertTrue("tag2" in tag_names)
-        self.assertEqual(tags[0].entry_object, self.entry)
-        self.assertEqual(tags[1].entry_object, self.entry)
+        self.assertEqual(tags[0].entry, self.entry)
+        self.assertEqual(tags[1].entry, self.entry)
 
     def test_set_tags_map(self):
         UserTags.objects.all().delete()
@@ -92,8 +92,8 @@ class UserTagsTest(TestCase):
 
         self.assertEqual(tags.count(), 2)
 
-        self.assertEqual(tags[0].entry_object, self.entry)
-        self.assertEqual(tags[1].entry_object, self.entry)
+        self.assertEqual(tags[0].entry, self.entry)
+        self.assertEqual(tags[1].entry, self.entry)
 
         tag_values = UserTags.objects.all().values_list("tag", flat=True)
         self.assertTrue("tag1" in tag_values)
@@ -113,8 +113,8 @@ class UserTagsTest(TestCase):
         tag_values = UserTags.objects.all().values_list("tag", flat=True)
 
         self.assertEqual(tags.count(), 2)
-        self.assertEqual(tags[0].entry_object, self.entry)
-        self.assertEqual(tags[1].entry_object, self.entry)
+        self.assertEqual(tags[0].entry, self.entry)
+        self.assertEqual(tags[1].entry, self.entry)
 
         self.assertTrue("tag3" in tag_values)
         self.assertTrue("tag4" in tag_values)
@@ -122,7 +122,7 @@ class UserTagsTest(TestCase):
     def test_cleanup(self):
         user = self.user
 
-        UserTags.objects.create(user_object=None, entry_object=self.entry, tag="test")
+        UserTags.objects.create(user=None, entry=self.entry, tag="test")
 
         # call tested function
         UserTags.cleanup()
@@ -130,8 +130,8 @@ class UserTagsTest(TestCase):
         tags = UserTags.objects.all()
 
         self.assertEqual(tags.count(), 1)
-        self.assertEqual(tags[0].entry_object, self.entry)
-        self.assertEqual(tags[0].user_object, self.user_super)
+        self.assertEqual(tags[0].entry, self.entry)
+        self.assertEqual(tags[0].user, self.user_super)
 
     def test_move_entry(self):
         user = self.user
@@ -143,8 +143,8 @@ class UserTagsTest(TestCase):
         tags = UserTags.objects.all()
 
         self.assertEqual(tags.count(), 1)
-        self.assertEqual(tags[0].entry_object, self.entry_new)
-        self.assertEqual(tags[0].user_object, self.user)
+        self.assertEqual(tags[0].entry, self.entry_new)
+        self.assertEqual(tags[0].user, self.user)
 
 
 class UserVotesTest(TestCase):
@@ -159,23 +159,23 @@ class UserVotesTest(TestCase):
 
         if not self.entry:
             self.entry = LinkDataController.objects.create(
-                source="https://youtube.com",
+                source_url="https://youtube.com",
                 link="https://youtube.com?v=bookmarked",
                 title="The first link",
-                source_obj=None,
+                source=None,
                 bookmarked=True,
                 language="en",
-                domain_obj=None,
+                domain=None,
                 date_published=current_time,
             )
             self.entry_new = LinkDataController.objects.create(
-                source="https://youtube.com",
+                source_url="https://youtube.com",
                 link="http://youtube.com?v=bookmarked",
                 title="The first link",
-                source_obj=None,
+                source=None,
                 bookmarked=True,
                 language="en",
-                domain_obj=None,
+                domain=None,
                 date_published=current_time,
             )
 
@@ -198,7 +198,7 @@ class UserVotesTest(TestCase):
         votes = UserVotes.objects.all()
         self.assertEqual(votes.count(), 1)
         self.assertEqual(votes[0].vote, 50)
-        self.assertEqual(votes[0].entry_object, self.entry)
+        self.assertEqual(votes[0].entry, self.entry)
 
     def test_get_user_vote(self):
         self.create_entry()
@@ -206,9 +206,8 @@ class UserVotesTest(TestCase):
         UserVotes.objects.all().delete()
 
         vote = UserVotes.objects.create(
-            user="testuser",
-            user_object=self.user,
-            entry_object=self.entry,
+            user=self.user,
+            entry=self.entry,
             vote=20,
         )
 
@@ -242,7 +241,7 @@ class UserVotesTest(TestCase):
         votes = UserVotes.objects.all()
         self.assertEqual(votes.count(), 1)
         self.assertEqual(votes[0].vote, 50)
-        self.assertEqual(votes[0].entry_object, self.entry_new)
+        self.assertEqual(votes[0].entry, self.entry_new)
 
 
 class UserBookmarksTest(TestCase):
@@ -257,23 +256,23 @@ class UserBookmarksTest(TestCase):
 
         if not self.entry:
             self.entry = LinkDataController.objects.create(
-                source="https://youtube.com",
+                source_url="https://youtube.com",
                 link="https://youtube.com?v=bookmarked",
                 title="The first link",
-                source_obj=None,
+                source=None,
                 bookmarked=True,
                 language="en",
-                domain_obj=None,
+                domain=None,
                 date_published=current_time,
             )
             self.entry_new = LinkDataController.objects.create(
-                source="https://youtube.com",
+                source_url="https://youtube.com",
                 link="http://youtube.com?v=bookmarked",
                 title="The first link",
-                source_obj=None,
+                source=None,
                 bookmarked=True,
                 language="en",
-                domain_obj=None,
+                domain=None,
                 date_published=current_time,
             )
 
@@ -298,7 +297,7 @@ class UserBookmarksTest(TestCase):
 
         bookmarks = UserBookmarks.objects.all()
         self.assertTrue(bookmarks.count(), 1)
-        self.assertEqual(bookmarks[0].entry_object, self.entry)
+        self.assertEqual(bookmarks[0].entry, self.entry)
 
     def test_cleanup(self):
         UserBookmarks.objects.all().delete()
@@ -326,7 +325,7 @@ class UserBookmarksTest(TestCase):
 
         bookmarks = UserBookmarks.objects.all()
         self.assertTrue(bookmarks.count(), 1)
-        self.assertEqual(bookmarks[0].entry_object, self.entry_new)
+        self.assertEqual(bookmarks[0].entry, self.entry_new)
 
 
 class CompactedTagsTest(TestCase):
@@ -348,13 +347,13 @@ class CompactedTagsTest(TestCase):
         )
 
         self.entry = LinkDataController.objects.create(
-            source="https://youtube.com",
+            source_url="https://youtube.com",
             link="https://youtube.com?v=bookmarked",
             title="The first link",
-            source_obj=source_youtube,
+            source=source_youtube,
             bookmarked=True,
             language="en",
-            domain_obj=domain,
+            domain=domain,
             date_published=current_time,
         )
 

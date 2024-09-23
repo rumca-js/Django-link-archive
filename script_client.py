@@ -6,7 +6,7 @@ import argparse
 import json
 from datetime import datetime, timedelta
 
-from webtools import ipc, ScrapingClient, ScrapingClientParser, WebConfig
+from rsshistory.webtools import ScrapingClient, ScrapingClientParser, WebConfig
 
 
 def main():

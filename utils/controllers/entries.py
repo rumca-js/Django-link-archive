@@ -1,4 +1,4 @@
-from webtools import Url
+from rsshistory.webtools import Url
 
 from utils.sqlmodel import (
     SqlModel,

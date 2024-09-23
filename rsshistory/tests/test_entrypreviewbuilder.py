@@ -15,7 +15,7 @@ class EntryUrlInterfaceTest(FakeInternetTestCase):
         self.disable_web_pages()
 
         ob = LinkDataController.objects.create(
-            source="https://www.youtube.com",
+            source_url="https://www.youtube.com",
             link="https://www.youtube.com/watch?v=123223",
             title="The second link",
             bookmarked=False,
@@ -23,7 +23,7 @@ class EntryUrlInterfaceTest(FakeInternetTestCase):
         )
 
         ob = LinkDataController.objects.create(
-            source="https://odysee.com",
+            source_url="https://odysee.com",
             link="https://odysee.com/@samtime:1/apple-reacts-to-leaked-windows-12:1",
             title="The second link",
             bookmarked=False,
@@ -31,7 +31,7 @@ class EntryUrlInterfaceTest(FakeInternetTestCase):
         )
 
         ob = LinkDataController.objects.create(
-            source="https://odysee.com",
+            source_url="https://odysee.com",
             link="https://odysee.com/@samtime:1",
             title="The second link",
             bookmarked=False,

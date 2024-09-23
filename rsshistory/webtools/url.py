@@ -1,3 +1,15 @@
+"""
+Url class
+
+@example
+options = Url.get_url_options("https://google.com")
+url = Url(link = "https://google.com", page_options=options)
+response = url.get_response()
+
+options.request.url
+options.mode_mapping
+
+"""
 from urllib.parse import unquote
 import urllib.robotparser
 import asyncio
@@ -21,6 +33,7 @@ from .pages import (
 )
 from .handlerhttppage import (
     HttpPageHandler,
+    HttpRequestBuilder,
 )
 
 from .handlervideoyoutube import YouTubeJsonHandler
@@ -43,20 +56,18 @@ class Url(ContentInterface):
     odysee_channel_handler = OdyseeChannelHandler
 
     def __init__(
-        self, url=None, page_object=None, page_options=None, handler_class=None
+        self, url=None, page_options=None, handler_class=None, url_builder=None
     ):
         """
         @param handler_class Allows to enforce desired handler to be used to process link
         """
-        if page_object:
-            self.url = page_object.url
-        else:
+        if url:
             self.url = url
 
         if page_options:
             self.options = page_options
         else:
-            self.options = self.get_init_page_options(page_options)
+            self.options = self.get_init_page_options(url, page_options)
 
         if handler_class:
             self.handler = handler_class(url, page_options=self.options)
@@ -65,53 +76,8 @@ class Url(ContentInterface):
 
         self.response = None
         self.contents = None
-
-    def get_init_page_options(self, initial_options=None):
-        options = PageOptions()
-
-        if initial_options and initial_options.use_headless_browser:
-            options.use_headless_browser = initial_options.use_headless_browser
-        if initial_options and initial_options.use_full_browser:
-            options.use_full_browser = initial_options.use_full_browser
-
-        if Url.is_full_browser_required(self.url):
-            options.use_full_browser = True
-        if Url.is_headless_browser_required(self.url):
-            options.use_headless_browser = True
-
-        return options
-
-    def get_contents(self):
-        if self.contents:
-            return self.contents
-
-        if not self.handler:
-            self.handler = self.get_handler_implementation()
-
-        if self.handler:
-            self.contents = self.handler.get_contents()
-            self.response = self.handler.get_response()
-
-            return self.contents
-
-    def get_response(self):
-        if self.response:
-            return self.response
-
-        if not self.handler:
-            self.handler = self.get_handler_implementation()
-
-        if self.handler:
-            self.response = self.handler.get_response()
-            self.contents = self.handler.get_contents()
-
-            if self.response:
-                if not self.response.is_valid():
-                    WebLogger.error(
-                        "Url:{} Response is invalid:{}".format(self.url, self.response)
-                    )
-
-            return self.response
+        if not url_builder:
+            self.url_builder = Url
 
     def get_handlers():
         return [
@@ -163,17 +129,58 @@ class Url(ContentInterface):
         if page_type == URL_TYPE_RSS:
             return RssPage(url, "")
 
-    def get_url_options(url):
+    def get_contents(self):
+        if self.contents:
+            return self.contents
+
+        if not self.handler:
+            self.handler = self.get_handler_implementation()
+
+        if self.handler:
+            self.contents = self.handler.get_contents()
+            self.response = self.handler.get_response()
+
+            return self.contents
+
+    def get_response(self):
+        if self.response:
+            return self.response
+
+        if not self.handler:
+            self.handler = self.get_handler_implementation()
+
+        if self.handler:
+            self.response = self.handler.get_response()
+            self.contents = self.handler.get_contents()
+
+            if self.response:
+                if not self.response.is_valid():
+                    WebLogger.error(
+                        "Url:{} Response is invalid:{}".format(self.url, self.response)
+                    )
+
+            return self.response
+
+    def ping(self, timeout_s = 5):
+        builder = HttpRequestBuilder(self.url)
+        builder.ping(timeout_s=timeout_s, options=self.options)
+
+    def get_init_page_options(self, url, initial_options=None):
+        from .webconfig import WebConfig
         options = PageOptions()
+        options.mode_mapping = WebConfig.get_init_crawler_config()
+
+        if initial_options and initial_options.mode:
+            options.mode = initial_options.mode
+        if initial_options and initial_options.mode_mapping and len(initial_options.mode_mapping) > 0:
+            options.mode_mapping = initial_options.mode_mapping
 
         if Url.is_full_browser_required(url):
-            options.use_full_browser = True
+            options.mode = "full"
         elif Url.is_headless_browser_required(url):
-            options.use_headless_browser = True
+            options.mode = "headless"
 
-        p = DomainAwarePage(url)
-        if p.is_link_service():
-            options.link_redirect = True
+        self.overvwrite_mapping(options)
 
         return options
 
@@ -211,7 +218,14 @@ class Url(ContentInterface):
             return self
         else:
             p = DomainAwarePage(self.url)
-            return Url(p.get_domain(), self.p.options)
+            u = self.url_builder(p.get_domain())
+            u.set_config(self.options)
+            return u
+
+    def set_config(self, otheroptions):
+        if self.options:
+            if otheroptions:
+                self.options.copy_config(otheroptions)
 
     def get_robots_txt_url(self):
         return DomainAwarePage(self.url).get_robots_txt_url()
@@ -238,7 +252,9 @@ class Url(ContentInterface):
             return
 
         domain = p.get_domain()
-        url = Url(domain)
+        
+        url = self.url_builder(domain)
+        url.set_config(self.options)
 
         return url.get_favicon()
 
@@ -373,6 +389,12 @@ class Url(ContentInterface):
         if url.startswith("//") >= 0:
             return url.replace("//", "")
 
+    def overvwrite_mapping(self, options):
+        if Url.is_full_browser_required(self.url):
+            options.mode = "full"
+        elif Url.is_headless_browser_required(self.url):
+            options.mode = "headless"
+
     def is_headless_browser_required(url):
         p = DomainAwarePage(url)
 
@@ -443,7 +465,8 @@ class Url(ContentInterface):
             return url
 
         if feeds and len(feeds) > 0:
-            return Url(url=feeds[0])
+            u = url.url_builder(url=feeds[0])
+            return u
 
     def get_feeds(self):
         result = []
@@ -460,13 +483,18 @@ class DomainCacheInfo(object):
     is_access_valid
     """
 
-    def __init__(self, url, respect_robots_txt=True):
+    def __init__(self, url, respect_robots_txt=True, page_options = None, url_builder = None):
         p = DomainAwarePage(url)
 
         self.respect_robots_txt = respect_robots_txt
 
         self.url = p.get_domain()
         self.robots_contents = None
+        self.options = page_options
+        self.url_builder = url_builder
+
+        if not self.url_builder:
+            self.url_builder = Url
 
         if self.respect_robots_txt:
             self.robots_contents = self.get_robots_txt_contents()
@@ -505,7 +533,9 @@ class DomainCacheInfo(object):
             return self.robots_contents
 
         robots_url = self.get_robots_txt_url()
-        u = Url(robots_url)
+        u = self.url_builder(robots_url)
+        u.set_config(self.options)
+
         response = u.get_response()
         if response:
             self.robots_contents = response.get_text()
@@ -546,7 +576,8 @@ class DomainCacheInfo(object):
 
         urls = self.get_site_maps_urls()
         for url in urls:
-            u = Url(url=url)
+            u = slef.url_builder(url=url)
+            u.set_config(self.options)
             response = u.get_response()
             contents = response.get_text()
             if contents:
@@ -578,7 +609,8 @@ class DomainCacheInfo(object):
     def get_subordinate_sites(self, site):
         all_subordinates = set()
 
-        u = Url(site)
+        u = self.url_builder(site)
+        u.set_config(self.options)
         response = u.get_response
         if not response:
             return all_subordinates
@@ -610,21 +642,23 @@ class DomainCache(object):
     default_cache_size = 400  # 400 domains
     respect_robots_txt = True
 
-    def get_object(domain_url):
+    def get_object(domain_url, page_options=None, url_builder=None):
         if DomainCache.object is None:
             DomainCache.object = DomainCache(
-                DomainCache.default_cache_size, respect_robots_txt=True
+                DomainCache.default_cache_size, page_options = page_options, url_builder = url_builder
             )
 
         return DomainCache.object.get_domain_info(domain_url)
 
-    def __init__(self, cache_size=400, respect_robots_txt=True):
+    def __init__(self, cache_size=400, respect_robots_txt=True, page_options=None, url_builder = None):
         """
         @note Not public
         """
         self.cache_size = cache_size
         self.cache = {}
         self.respect_robots_txt = respect_robots_txt
+        self.options = page_options
+        self.url_builder = url_builder
 
     def get_domain_info(self, input_url):
         domain_url = DomainAwarePage(input_url).get_domain_only()
@@ -639,7 +673,7 @@ class DomainCache(object):
         return self.cache[domain_url]["domain"]
 
     def read_info(self, domain_url):
-        return DomainCacheInfo(domain_url, self.respect_robots_txt)
+        return DomainCacheInfo(domain_url, self.respect_robots_txt, page_options = self.options, url_builder = self.url_builder)
 
     def remove_from_cache(self):
         if len(self.cache) < self.cache_size:
@@ -659,13 +693,17 @@ class DomainCache(object):
             self.cache[item[0]] = {"date": item[1], "domain": item[2]}
 
 
-def fetch_url(link):
-    u = Url(url=link)
+def fetch_url(link, page_options=None, url_builder=None):
+    if url_builder:
+        u = url_builder(url=link, page_options=page_options, url_builder=url_builder)
+    else:
+        u = Url(url=link, page_options=page_options, url_builder = url_builder)
+
     u.get_response()
     return u
 
 
-async def fetch_all_urls(links, max_concurrency=10):
+async def fetch_all_urls(links, page_options=None, url_builder=None, max_concurrency=10):
     num_pages = int(len(links) / max_concurrency)
     num_pages_mod = len(links) % max_concurrency
 
@@ -679,7 +717,7 @@ async def fetch_all_urls(links, max_concurrency=10):
         tasks = []
 
         for link in links[page_start:page_stop]:
-            tasks.append(asyncio.to_thread(fetch_url, link))
+            tasks.append(asyncio.to_thread(fetch_url, link, page_options, url_builder))
 
         result = await asyncio.gather(*tasks)
         return result

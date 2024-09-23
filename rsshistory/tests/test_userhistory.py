@@ -126,7 +126,7 @@ class UserEntryTransitionHistoryTest(TestCase):
         )
 
         self.assertTrue(entry1)
-        self.assertEqual(entry1.user_object, self.user)
+        self.assertEqual(entry1.user, self.user)
         self.assertEqual(entry1.entry_from.id, self.entry_youtube.id)
         self.assertEqual(entry1.entry_to.id, self.entry_tiktok.id)
 
@@ -179,7 +179,7 @@ class UserEntryTransitionHistoryTest(TestCase):
         entry1 = UserEntryTransitionHistory.add(self.user, None, self.entry_tiktok)
 
         self.assertTrue(entry1)
-        self.assertEqual(entry1.user_object, self.user)
+        self.assertEqual(entry1.user, self.user)
         self.assertEqual(entry1.entry_from, None)
         self.assertEqual(entry1.entry_to.id, self.entry_tiktok.id)
 
@@ -195,7 +195,7 @@ class UserEntryTransitionHistoryTest(TestCase):
         )
 
         self.assertTrue(entry2)
-        self.assertEqual(entry2.user_object, self.user)
+        self.assertEqual(entry2.user, self.user)
         self.assertEqual(entry2.entry_from.id, self.entry_tiktok.id)
         self.assertEqual(entry2.entry_to.id, self.entry_youtube.id)
 
@@ -230,27 +230,27 @@ class UserEntryVisitHistoryTest(FakeInternetTestCase):
         )
 
         self.youtube_object = LinkDataController.objects.create(
-            source="https://youtube.com",
+            source_url="https://youtube.com",
             link="https://youtube.com?v=12345",
-            source_obj=ob,
+            source=ob,
         )
 
         self.tiktok_object = LinkDataController.objects.create(
-            source="https://tiktok.com",
+            source_url="https://tiktok.com",
             link="https://tiktok.com?v=12345",
-            source_obj=ob,
+            source=ob,
         )
 
         self.odysee_object = LinkDataController.objects.create(
-            source="https://odysee.com",
+            source_url="https://odysee.com",
             link="https://odysee.com?v=12345",
-            source_obj=ob,
+            source=ob,
         )
 
         self.youtube_object_new = LinkDataController.objects.create(
-            source="https://youtube.com",
+            source_url="https://youtube.com",
             link="http://youtube.com?v=12345",
-            source_obj=ob,
+            source=ob,
         )
 
         self.user = User.objects.create_user(
@@ -265,20 +265,20 @@ class UserEntryVisitHistoryTest(FakeInternetTestCase):
         # call tested function
         UserEntryVisitHistory.visited(entries[0], self.user)
 
-        visits = UserEntryVisitHistory.objects.filter(entry_object=entries[0])
+        visits = UserEntryVisitHistory.objects.filter(entry=entries[0])
         self.assertEqual(visits.count(), 1)
         self.assertEqual(visits[0].visits, 1)
-        self.assertEqual(visits[0].user_object, self.user)
+        self.assertEqual(visits[0].user, self.user)
 
         # call tested function
         UserEntryVisitHistory.visited(entries[0], self.user)
 
         # this call is not taken into consideration. Happened to fast. refresh, etc.
 
-        visits = UserEntryVisitHistory.objects.filter(entry_object=entries[0])
+        visits = UserEntryVisitHistory.objects.filter(entry=entries[0])
         self.assertEqual(visits.count(), 1)
         self.assertEqual(visits[0].visits, 1)
-        self.assertEqual(visits[0].user_object, self.user)
+        self.assertEqual(visits[0].user, self.user)
 
     def test_visited__argument_transition_from(self):
         youtube_entries = LinkDataController.objects.filter(
@@ -294,10 +294,10 @@ class UserEntryVisitHistoryTest(FakeInternetTestCase):
         # call tested function
         UserEntryVisitHistory.visited(youtube_entries[0], self.user, tiktok_entries[0])
 
-        visits = UserEntryVisitHistory.objects.filter(entry_object=youtube_entries[0])
+        visits = UserEntryVisitHistory.objects.filter(entry=youtube_entries[0])
         self.assertEqual(visits.count(), 1)
         self.assertEqual(visits[0].visits, 1)
-        self.assertEqual(visits[0].user_object, self.user)
+        self.assertEqual(visits[0].user, self.user)
 
         all_transitions = UserEntryTransitionHistory.objects.all()
         self.assertEqual(all_transitions.count(), 1)
@@ -316,20 +316,20 @@ class UserEntryVisitHistoryTest(FakeInternetTestCase):
         UserEntryVisitHistory.objects.create(
             visits=2,
             date_last_visit=date_1,
-            entry_object=self.youtube_object,
-            user_object=self.user,
+            entry=self.youtube_object,
+            user=self.user,
         )
         UserEntryVisitHistory.objects.create(
             visits=2,
             date_last_visit=date_2,
-            entry_object=self.tiktok_object,
-            user_object=self.user,
+            entry=self.tiktok_object,
+            user=self.user,
         )
         UserEntryVisitHistory.objects.create(
             visits=2,
             date_last_visit=date_3,
-            entry_object=self.odysee_object,
-            user_object=self.user,
+            entry=self.odysee_object,
+            user=self.user,
         )
 
         # call tested function
@@ -340,10 +340,10 @@ class UserEntryVisitHistoryTest(FakeInternetTestCase):
 
     def test_entry_get_last_user_entry_not_found(self):
         UserEntryVisitHistory.objects.create(
-            user_object=self.user,
+            user=self.user,
             visits=2,
             date_last_visit=DateUtils.get_datetime_now_utc() - timedelta(hours=2),
-            entry_object=self.youtube_object,
+            entry=self.youtube_object,
         )
 
         # call tested function
@@ -358,15 +358,15 @@ class UserEntryVisitHistoryTest(FakeInternetTestCase):
         UserEntryVisitHistory.move_entry(self.youtube_object, self.youtube_object_new)
 
         rows = UserEntryVisitHistory.objects.filter(
-            entry_object=self.youtube_object_new
+            entry=self.youtube_object_new
         )
 
         self.assertTrue(rows.count() > 0)
-        self.assertEqual(rows[0].entry_object, self.youtube_object_new)
+        self.assertEqual(rows[0].entry, self.youtube_object_new)
 
     def test_visit_burst(self):
         https_entry = LinkDataController.objects.create(
-            source="https://archive.com/test",
+            source_url="https://archive.com/test",
             link="https://testlink.com",
             title="The archive https link",
             bookmarked=True,
@@ -375,7 +375,7 @@ class UserEntryVisitHistoryTest(FakeInternetTestCase):
         )
 
         http_entry = LinkDataController.objects.create(
-            source="http://archive.com/test",
+            source_url="http://archive.com/test",
             link="http://testlink.com",
             title="The archive https link",
             bookmarked=True,
@@ -384,7 +384,7 @@ class UserEntryVisitHistoryTest(FakeInternetTestCase):
         )
 
         youtube_entry = LinkDataController.objects.create(
-            source="http://youtube.com/test",
+            source_url="http://youtube.com/test",
             link="http://youtube.com?v=1",
             title="The archive https link",
             bookmarked=True,

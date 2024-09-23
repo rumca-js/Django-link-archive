@@ -9,13 +9,12 @@ import time
 import argparse
 import sys
 
-import webtools
-from webtools import WebConfig
+from rsshistory import webtools
 
 
 def main():
-    WebConfig.init()
-    WebConfig.use_print_logging() 
+    webtools.WebConfig.init()
+    webtools.WebConfig.use_print_logging() 
 
     parser = webtools.ScriptCrawlerParser()
     parser.parse()
@@ -25,7 +24,7 @@ def main():
 
     request = parser.get_request()
 
-    driver = webtools.SeleniumChromeFull(request, parser.args.output_file, parser.args.port, driver_executable=WebConfig.selenium_driver_location)
+    driver = webtools.SeleniumChromeFull(request, parser.args.output_file, parser.args.port, driver_executable=webtools.WebConfig.selenium_driver_location)
 
     if parser.args.verbose:
         print("Running request:{} with SeleniumChromeFull".format(request))

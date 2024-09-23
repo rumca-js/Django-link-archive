@@ -6,7 +6,7 @@ from django.http import HttpResponseForbidden, HttpResponseRedirect
 from django.utils.http import urlencode
 from django.core.paginator import Paginator
 
-from webtools import Url, DomainAwarePage, HttpPageHandler
+from ..webtools import Url, DomainAwarePage, HttpPageHandler
 
 from ..apps import LinkDatabase
 from ..models import ConfigurationEntry, UserConfig, AppLogging
@@ -348,12 +348,12 @@ def edit_source(request, pk):
         return p.render("summary_present.html")
     else:
         if not ob.favicon:
-            icon = Url(ob.url).get_thumbnail()
+            icon = UrlHandler(ob.url).get_thumbnail()
 
             if not icon:
                 page = DomainAwarePage(ob.url)
                 domain = page.get_domain()
-                u = Url(domain, handler_class=HttpPageHandler)
+                u = UrlHandler(domain, handler_class=HttpPageHandler)
                 icon = u.get_favicon()
 
             if icon:

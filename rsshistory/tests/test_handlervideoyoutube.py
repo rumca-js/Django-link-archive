@@ -1,4 +1,4 @@
-from webtools.handlervideoyoutube import YouTubeVideoHandler
+from ..webtools.handlervideoyoutube import YouTubeVideoHandler
 from .fakeinternet import FakeInternetTestCase
 
 

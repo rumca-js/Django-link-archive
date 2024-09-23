@@ -1,6 +1,6 @@
 import traceback
 
-from webtools import Url, DomainAwarePage, UrlPropertyValidator
+from ..webtools import Url, DomainAwarePage, UrlPropertyValidator
 
 from ..apps import LinkDatabase
 from ..models import AppLogging, EntryRules
@@ -17,8 +17,9 @@ class UrlHandler(Url):
     The controller job is to provide usefull information about link.
     """
 
-    def __init__(self, url=None, page_object=None, page_options=None):
-        super().__init__(url, page_object=page_object, page_options=page_options)
+    def __init__(self, url=None, page_options=None):
+        super().__init__(url, page_options=page_options)
+        self.url_builder = UrlHandler
 
         if not url or url == "":
             lines = traceback.format_stack()
@@ -50,13 +51,15 @@ class UrlHandler(Url):
 
         return False
 
-    def get_init_page_options(self, init_options=None):
-        o = super().get_init_page_options(init_options)
+    def get_init_page_options(self, url, init_options=None):
+        o = super().get_init_page_options(url, init_options)
 
-        if UrlHandler.is_full_browser_required(self.url):
-            o.use_full_browser = True
-        if UrlHandler.is_headless_browser_required(self.url):
-            o.use_headless_browser = True
+        # TODO this is reading overhead. We might cache something?
+        from ..models import Browser
+        o.mode_mapping = Browser.get_browser_setup()
+
+        config = Configuration.get_object().config_entry
+        o.ssl_verify = config.ssl_verification
 
         return o
 

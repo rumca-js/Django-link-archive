@@ -10,7 +10,7 @@ instance_entries_json = """
 {
   "links": [
     {
-      "source": "https://www.lemonde.fr/en/rss/une.xml",
+      "source_url": "https://www.lemonde.fr/en/rss/une.xml",
       "title": "Yotam Ottolenghi: 'A cuisine is never static'",
       "description": "The British-Israeli chef",
       "link": "https://www.lemonde.fr/en/lifestyle/article/2024/01/03/yotam-ottolenghi-a-cuisine-is-never-static_6398241_37.html",
@@ -39,7 +39,7 @@ instance_entries_json = """
       ]
     },
     {
-      "source": "https://moxie.foxnews.com/google-publisher/latest.xml",
+      "source_url": "https://moxie.foxnews.com/google-publisher/latest.xml",
       "title": "Next hot thing in hot wings, 'trashed' or 'dirty,' breaks the rules of America's favorite bar food",
       "description": "Double-fried wings, called trash wings in Missouri and dirt wings in Connecticut, have been a regional phenomenon for decades and are poised to become a national trend.",
       "link": "https://www.foxnews.com/lifestyle/next-hot-thing-hot-wings-trashed-dirty-breaks-rules-americas-favorite-bar-food",
@@ -75,7 +75,7 @@ instance_entries_source_100_json = """
 {
   "links": [
     {
-      "source": "https://www.lemonde.fr/en/rss/une.xml",
+      "source_url": "https://www.lemonde.fr/en/rss/une.xml",
       "title": "Yotam Ottolenghi: 'A cuisine is never static'",
       "description": "The British-Israeli chef",
       "link": "https://www.lemonde.fr/first-link.html",

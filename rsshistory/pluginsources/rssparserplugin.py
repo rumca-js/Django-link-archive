@@ -1,7 +1,7 @@
 import os
 import re
 
-from webtools import ContentLinkParser, DomainAwarePage
+from ..webtools import ContentLinkParser, DomainAwarePage
 
 from ..models import UserTags
 from ..configuration import Configuration

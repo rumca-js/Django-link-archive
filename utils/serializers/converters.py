@@ -1,6 +1,6 @@
 import logging
 import traceback
-from utils.logger import Logger
+from utils.logger import get_logger
 
 
 class PageSystem(object):
@@ -184,7 +184,8 @@ class MarkDownConverter(ItemConverterFabric):
             t = Template(self.item_template)
             return t.safe_substitute(map_data)
         except Exception as E:
-            Logger.exc(
+            logger = get_logger("utils")
+            logger.exc(
                 "Template exception {0} {1}".format(
                     self.item_template,
                     str(map_data),
@@ -243,7 +244,9 @@ class MarkDownConverter(ItemConverterFabric):
             t = Template(self.item_template)
             return t.safe_substitute(map_data)
         except Exception as E:
-            Logger.exc(
+            logger = get_logger("utils")
+
+            logger.exc(
                 E,
                 "Template exception {0} {1}".format(
                     self.item_template,
@@ -278,7 +281,8 @@ class MarkDownSourceConverter(object):
             t = Template(self.item_template)
             return t.safe_substitute(map_data)
         except Exception as E:
-            Logger.exc(
+            logger = get_logger("utils")
+            logger.exc(
                 E,
                 "Template exception {0} {1}".format(
                     self.item_template,

@@ -31,11 +31,11 @@ class UserTagsTest(FakeInternetTestCase):
         test_link = "https://linkedin.com"
 
         entry = LinkDataController.objects.create(
-            source="https://linkedin.com",
+            source_url="https://linkedin.com",
             link=test_link,
             title="The first link",
             description="the first link description",
-            source_obj=None,
+            source=None,
             bookmarked=True,
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
@@ -63,7 +63,7 @@ class UserTagsTest(FakeInternetTestCase):
 
         # check that object has been changed
 
-        entries = UserTags.objects.filter(entry_object=entry)
+        entries = UserTags.objects.filter(entry=entry)
         self.assertEqual(entries.count(), 3)
 
         jobs = BackgroundJobController.objects.all()
@@ -74,18 +74,18 @@ class UserTagsTest(FakeInternetTestCase):
         self.client.login(username="testuser", password="testpassword")
 
         entry = LinkDataController.objects.create(
-            source="https://linkedin.com",
+            source_url="https://linkedin.com",
             link="https://linkedin.com/test",
             title="The first link",
             description="the first link description",
-            source_obj=None,
+            source=None,
             bookmarked=True,
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
         )
 
         tag = UserTags.objects.create(
-            tag="personal", user_object=self.user, entry_object=entry
+            tag="personal", user=self.user, entry=entry
         )
 
         url = reverse("{}:tag-remove".format(LinkDatabase.name), args=[tag.id])
@@ -97,18 +97,18 @@ class UserTagsTest(FakeInternetTestCase):
         self.client.login(username="testuser", password="testpassword")
 
         entry = LinkDataController.objects.create(
-            source="https://linkedin.com",
+            source_url="https://linkedin.com",
             link="https://linkedin.com/test",
             title="The first link",
             description="the first link description",
-            source_obj=None,
+            source=None,
             bookmarked=True,
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
         )
 
         tag = UserTags.objects.create(
-            tag="personal", user_object=self.user, entry_object=entry
+            tag="personal", user=self.user, entry=entry
         )
 
         url = reverse("{}:tags-entry-remove".format(LinkDatabase.name), args=[entry.id])
@@ -123,18 +123,18 @@ class UserTagsTest(FakeInternetTestCase):
         self.client.login(username="testuser", password="testpassword")
 
         entry = LinkDataController.objects.create(
-            source="https://linkedin.com",
+            source_url="https://linkedin.com",
             link="https://linkedin.com/test",
             title="The first link",
             description="the first link description",
-            source_obj=None,
+            source=None,
             bookmarked=True,
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
         )
 
         tag = UserTags.objects.create(
-            tag="personal", user_object=self.user, entry_object=entry
+            tag="personal", user=self.user, entry=entry
         )
 
         url = reverse("{}:tags-entry-show".format(LinkDatabase.name), args=[entry.id])
@@ -146,18 +146,18 @@ class UserTagsTest(FakeInternetTestCase):
         self.client.login(username="testuser", password="testpassword")
 
         entry = LinkDataController.objects.create(
-            source="https://linkedin.com",
+            source_url="https://linkedin.com",
             link="https://linkedin.com/test",
             title="The first link",
             description="the first link description",
-            source_obj=None,
+            source=None,
             bookmarked=True,
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
         )
 
         tag = UserTags.objects.create(
-            tag="personal", user_object=self.user, entry_object=entry
+            tag="personal", user=self.user, entry=entry
         )
 
         url = reverse("{}:tag-rename".format(LinkDatabase.name))
@@ -167,18 +167,18 @@ class UserTagsTest(FakeInternetTestCase):
 
     def test_tag_show_all(self):
         entry = LinkDataController.objects.create(
-            source="https://linkedin.com",
+            source_url="https://linkedin.com",
             link="https://linkedin.com/test",
             title="The first link",
             description="the first link description",
-            source_obj=None,
+            source=None,
             bookmarked=True,
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
         )
 
         tag = UserTags.objects.create(
-            tag="personal", user_object=self.user, entry_object=entry
+            tag="personal", user=self.user, entry=entry
         )
 
         url = reverse("{}:tags-show-all".format(LinkDatabase.name))
@@ -188,18 +188,18 @@ class UserTagsTest(FakeInternetTestCase):
 
     def test_tag_show_actual(self):
         entry = LinkDataController.objects.create(
-            source="https://linkedin.com",
+            source_url="https://linkedin.com",
             link="https://linkedin.com/test",
             title="The first link",
             description="the first link description",
-            source_obj=None,
+            source=None,
             bookmarked=True,
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
         )
 
         tag = UserTags.objects.create(
-            tag="personal", user_object=self.user, entry_object=entry
+            tag="personal", user=self.user, entry=entry
         )
 
         url = reverse("{}:tags-show-actual".format(LinkDatabase.name))

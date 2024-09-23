@@ -18,7 +18,7 @@ from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 
 from utils.dateutils import DateUtils
-from webtools import DomainAwarePage, Url
+from .webtools import DomainAwarePage, Url
 
 from utils.basictypes import fix_path_for_os
 from utils.programwrappers import ytdlp, id3v2

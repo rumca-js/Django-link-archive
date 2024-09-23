@@ -18,9 +18,9 @@ class BackgroundJobControllerTest(FakeInternetTestCase):
             url="https://youtube.com", title="YouTube", category="No", subcategory="No"
         )
         LinkDataController.objects.create(
-            source="https://youtube.com",
+            source_url="https://youtube.com",
             link="https://youtube.com?v=12345",
-            source_obj=ob,
+            source=ob,
         )
 
     def tearDown(self):

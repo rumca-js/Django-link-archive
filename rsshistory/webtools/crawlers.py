@@ -352,9 +352,19 @@ class SeleniumDriver(CrawlerInterface):
         super().__init__(
             request, response_file=response_file, response_port=response_port, settings=settings
         )
-        self.display = None
         self.driver = None
         self.driver_executable = driver_executable
+
+        try:
+            self.display = None
+            # requires xvfb
+            #import os
+            #os.environ["DISPLAY"] = ":10.0"
+            #from pyvirtualdisplay import Display
+            #self.display = Display(visible=0, size=(800, 600))
+            #self.display.start()
+        except Exception as E:
+            print("Str: {}".format(E))
 
     def get_driver(self):
         """
@@ -452,20 +462,25 @@ class SeleniumDriver(CrawlerInterface):
 
     def close(self):
         try:
-            self.driver.close()
+            if self.driver:
+                self.driver.close()
         except Exception as E:
-            pass
+            WebLogger.error(str(E)) # TODO
+            WebLogger.debug(str(E))
 
         try:
-            self.driver.quit()
+            if self.driver:
+                self.driver.quit()
         except Exception as E:
-            pass
+            WebLogger.error(str(E)) # TODO
+            WebLogger.debug(str(E))
 
         try:
             if self.display:
                 self.display.stop()
         except Exception as E:
-            pass
+            WebLogger.error(str(E)) # TODO
+            WebLogger.debug(str(E))
 
 
 class SeleniumChromeHeadless(SeleniumDriver):
@@ -589,17 +604,20 @@ class SeleniumChromeFull(SeleniumDriver):
                     WebLogger.error("We do not have chromedriver executable")
                     return
 
-            # requires xvfb
-            import os
-            os.environ["DISPLAY"] = ":10.0"
-            from pyvirtualdisplay import Display
-            self.display = Display(visible=0, size=(800, 600))
-            self.display.start()
-
             if self.driver_executable:
                 service = Service(executable_path=str(self.driver_executable))
             else:
                 service = Service()
+
+            try:
+                # requires xvfb
+                import os
+                os.environ["DISPLAY"] = ":10.0"
+                from pyvirtualdisplay import Display
+                self.display = Display(visible=0, size=(800, 600))
+                self.display.start()
+            except Exception as E:
+                print("Str: {}".format(E))
 
             options = webdriver.ChromeOptions()
             options.add_argument("--no-sandbox")
@@ -617,9 +635,7 @@ class SeleniumChromeFull(SeleniumDriver):
 
             return webdriver.Chrome(service=service, options=options)
         except Exception as E:
-            print(str(E))
-            error_text = traceback.format_exc()
-            WebLogger.debug("Cannot obtain driver:{}\n{}".format(self.request.url, error_text))
+            WebLogger.exc("Cannot obtain driver:{}\n{}".format(E, self.request.url))
 
     def run(self):
         """
@@ -808,7 +824,13 @@ class ScriptCrawler(CrawlerInterface):
         file_path = os.path.realpath(__file__)
         full_path = Path(file_path)
 
-        operating_path = self.cwd
+        if self.cwd:
+            operating_path = self.cwd
+        else:
+            operating_path = os.path.realpath(__file__)
+            operating_path = Path(file_path)
+            #operating_path.parents[2]
+
         response_file_location = Path(self.response_file)
 
         if len(response_file_location.parents) > 1:
@@ -816,18 +838,19 @@ class ScriptCrawler(CrawlerInterface):
             if not response_dir.exists():
                 response_dir.mkdir(parents=True, exist_ok=True)
 
-        if response_file_location.exists():
-            response_file_location.unlink()
+        file_abs = operating_path / response_file_location
+        if file_abs.exists():
+            file_abs.unlink()
 
-        script = self.script + ' --url "{}" --output-file="{}"'.format(
-            self.request.url, self.response_file
+        script = self.script + ' --url "{}" --output-file="{}" --timeout={}'.format(
+            self.request.url, self.response_file, self.request.timeout_s
         )
 
-        # WebLogger.debug(operating_path)
-        # WebLogger.debug(response_file_location)
-
-        WebLogger.info(
+        WebLogger.error(
             "Url:{} Running script:{} Request:{}".format(self.request.url, script, self.request)
+        )
+        WebLogger.error(
+                "Response location:{}. Operat:{}".format(response_file_location, operating_path)
         )
 
         p = subprocess.run(
@@ -842,7 +865,7 @@ class ScriptCrawler(CrawlerInterface):
             if p.stdout:
                 stdout_str = p.stdout.decode()
                 if stdout_str != "":
-                    WebLogger.debug(stdout_str)
+                    WebLogger.error(stdout_str)
 
             if p.stderr:
                 stderr_str = p.stderr.decode()
@@ -850,17 +873,17 @@ class ScriptCrawler(CrawlerInterface):
                     WebLogger.error("Url:{}. {}".format(self.request.url, stderr_str))
 
             WebLogger.error(
-                "Url:{}. Script:'{}'. Return code invalid:{}".format(self.request.url, script, p.returncode)
+                "Url:{}. Script:'{}'. Return code invalid:{}. Path:{}".format(self.request.url, script, p.returncode, operating_path)
             )
 
-        if response_file_location.exists():
+        if file_abs.exists():
             response = None 
 
-            with open(str(response_file_location), "rb") as fh:
+            with open(str(file_abs), "rb") as fh:
                 all_bytes = fh.read()
                 self.response = get_response_from_bytes(all_bytes)
 
-            response_file_location.unlink()
+            file_abs.unlink()
             return self.response
 
         else:
@@ -1001,6 +1024,9 @@ class ServerCrawler(CrawlerInterface):
 
     def is_valid(self):
         if not self.script:
+            return False
+
+        if self.response_port == 0 or self.response_port is None:
             return False
 
         return True

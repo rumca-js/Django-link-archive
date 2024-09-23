@@ -225,8 +225,11 @@ urlpatterns = [
     path("api-keys/", apikeys.ListView.as_view(), name="api-keys",),
     # browser
     path("browsers/", browsers.BrowserListView.as_view(), name="browsers",),
-    path("browsers-read/", browsers.read_browser_setup, name="browser-read",),
-    path("browsers-apply/", browsers.apply_browser_setup, name="browser-apply",),
+    path("browser-read/", browsers.read_browser_setup, name="browser-read",),
+    path("browser-apply/", browsers.apply_browser_setup, name="browser-apply",),
+    path("browser-enable/<int:pk>/", browsers.enable, name="browser-enable",),
+    path("browser-disable/<int:pk>/", browsers.disable, name="browser-disable",),
+    path("browser-remove/<int:pk>/", browsers.remove, name="browser-remove",),
     # other, debug forms
     path("page-show-props", tools.page_show_properties, name="page-show-props",),
     path("page-scan-link", tools.page_scan_link, name="page-scan-link",),

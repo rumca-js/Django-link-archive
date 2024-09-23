@@ -1,4 +1,4 @@
-from webtools import RssPage, HtmlPage, HttpPageHandler, YouTubeVideoHandler
+from ..webtools import RssPage, HtmlPage, HttpPageHandler, YouTubeVideoHandler
 
 from ..pluginurl.urlhandler import UrlHandler
 

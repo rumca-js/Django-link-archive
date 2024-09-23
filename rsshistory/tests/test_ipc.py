@@ -1,5 +1,5 @@
-from webtools.ipc import *
-from webtools import get_response_from_bytes
+from ..webtools.ipc import *
+from ..webtools import get_response_from_bytes
 
 from .fakeinternet import FakeInternetTestCase
 

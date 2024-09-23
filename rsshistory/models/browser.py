@@ -3,8 +3,8 @@ import json
 from django.db import models
 from django.conf import settings
 
-from webtools import WebConfig
-from utils.logger import Logger
+from ..webtools import WebConfig
+from .system import AppLogging
 
 from ..apps import LinkDatabase
 from .entries import LinkDataModel
@@ -12,6 +12,11 @@ from .entries import LinkDataModel
 
 class BrowserMode(models.Model):
     mode = models.CharField(max_length=2000, unique=True)
+
+    def get_modes():
+        modes = BrowserMode.objects.all()
+        modes = modes.values_list("mode", flat=True)
+        return modes
 
 
 def get_browser_choices():
@@ -38,7 +43,7 @@ class Browser(models.Model):
     settings = models.CharField(max_length=2000, blank=True) # json map inside. script path, port etc
 
     class Meta:
-        ordering = ["mode"]
+        ordering = ["-enabled", "mode"]
 
     def save(self, *args, **kwargs):
         browsers = WebConfig.get_browsers()
@@ -54,7 +59,7 @@ class Browser(models.Model):
         BrowserMode.objects.all().delete()
         Browser.objects.all().delete()
 
-        mapping = WebConfig.get_init_browser_config()
+        mapping = WebConfig.get_init_crawler_config()
         for mode_name in mapping:
             mode_browser_config = mapping[mode_name] 
 
@@ -67,26 +72,29 @@ class Browser(models.Model):
                 try:
                     settings = json.dumps(browser_config["settings"])
                 except Exception as E:
-                    Logger.exc("Cannot dumps browser settings")
+                    AppLogging.exc("Cannot dumps browser settings")
 
                 conf = Browser.objects.create(mode = mode, crawler = browser_config["crawler"], settings=settings)
 
-    def apply_browser_setup():
+    def get_browser_setup():
         """
         sets WebConfigs browser config according to model
         """
         browser_mapping = {}
-        for browser in Browser.objects.filter(enabled=True):
+        for browser in Browser.objects.all():
             mode = browser.mode.mode
             if mode not in browser_mapping:
                 browser_mapping[mode] = []
+
+            if not browser.enabled:
+                continue
 
             settings = {}
             if browser.settings != None and browser.settings != "":
                 try:
                     settings = json.loads(browser.settings)
                 except Exception as E:
-                    Logger.exc("Cannot load browser settings")
+                    AppLogging.exc("Cannot load browser settings")
 
             browser_config = {
                 "crawler" : browser.crawler,
@@ -95,4 +103,5 @@ class Browser(models.Model):
 
             browser_mapping[mode].append(browser_config)
 
-        WebConfig.set_browser_mapping(browser_mapping)
+        return browser_mapping
+

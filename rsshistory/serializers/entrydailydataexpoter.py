@@ -25,7 +25,7 @@ class SourceEntriesDataExporter(object):
     def get_entries(self, day_iso):
         date_range = DateUtils.get_range4day(day_iso)
         entries = LinkDataController.objects.filter(
-            Q(source=self.source_url) & Q(date_published__range=date_range) & self.filters
+            Q(source_url=self.source_url) & Q(date_published__range=date_range) & self.filters
         )
         return entries
 
@@ -37,9 +37,11 @@ class EntryDailyDataMainExporter(MainExporter):
     def write_for_day(self, input_path, day_iso):
         """We do not want to provide for each day cumulative view. Users may want to select which 'streams' are selected individually '"""
 
+        # TODO we first obtain entries to obtain them later again - this could be cleaned up
+
         entries = self.get_entries(day_iso)
 
-        sources_urls = set(entries.values_list("source", flat=True).distinct())
+        sources_urls = set(entries.values_list("source_url", flat=True).distinct())
 
         for source_url in sources_urls:
             source_objs = SourceDataController.objects.filter(url=source_url)

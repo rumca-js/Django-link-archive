@@ -43,10 +43,10 @@ class EntryNoTimeDataMainExporter(MainExporter):
             e.export_entries(export_file_name = "permanent", export_path = self.get_page_dir(export_path, page))
 
     def get_order_columns(self):
-        return [ "domain_obj__tld",
-                 "domain_obj__suffix",
-                 "domain_obj__main",
-                 "domain_obj__domain",
+        return [ "domain__tld",
+                 "domain__suffix",
+                 "domain__main",
+                 "domain__domain",
                  "date_published",
                  "link"]
 

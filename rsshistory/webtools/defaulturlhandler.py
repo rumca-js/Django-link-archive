@@ -17,7 +17,7 @@ class DefaultUrlHandler(DefaultContentPage):
         self.response = None
         self.dead = None
         self.code = None  # social media handle, ID of channel, etc.
-        self.page_options = page_options
+        self.options = page_options
 
     def is_handled_by(self):
         return True
@@ -83,9 +83,11 @@ class DefaultChannelHandler(DefaultUrlHandler):
 
         feed_url = feeds[0]
 
-        options = Url.get_url_options(feed_url)
-        u = Url(feed_url, page_options=options, handler_class=HttpPageHandler)
-        self.response = u.get_response()
+        options = self.get_options(feed_url)
+
+        # now call url with those options
+        url = Url(feed_url, page_options=options, handler_class=HttpPageHandler)
+        self.response = url.get_response()
 
         if not self.response or not self.response.is_valid():
             self.dead = True
@@ -95,3 +97,12 @@ class DefaultChannelHandler(DefaultUrlHandler):
             self.process_contents()
 
             return self.response
+
+    def get_options(self, feed_url):
+        url = Url(feed_url)
+        options = url.page_options
+
+        if self.options:
+            options.copy_config(self.options)
+
+        return options

@@ -1,4 +1,4 @@
-from webtools import Url
+from ..webtools import Url
 
 from ..models import ModelFiles
 from ..configuration import Configuration
@@ -9,6 +9,7 @@ class ModelFilesBuilder(object):
         pass
 
     def build(self, file_name=None):
+        from ..pluginurl import UrlHandler
         if file_name is None:
             return
         if file_name == "":
@@ -18,7 +19,7 @@ class ModelFilesBuilder(object):
         if not c.enabled_file_support:
             return
 
-        p = Url(url=file_name)
+        p = UrlHandler(url=file_name)
         response = p.get_response()
 
         if not response:

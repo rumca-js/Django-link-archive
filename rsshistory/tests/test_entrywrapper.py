@@ -70,46 +70,46 @@ class EntryWrapperTest(FakeInternetTestCase):
         )
 
         ob = LinkDataController.objects.create(
-            source="https://youtube.com",
+            source_url="https://youtube.com",
             link="https://youtube.com?v=bookmarked",
             title="The first link",
-            source_obj=source_youtube,
+            source=source_youtube,
             bookmarked=True,
             language="en",
-            domain_obj=domain,
+            domain=domain,
             date_published=date_link_publish,
         )
 
         ob = LinkDataController.objects.create(
-            source="https://youtube.com",
+            source_url="https://youtube.com",
             link="https://youtube.com?v=nonbookmarked",
             title="The second link",
-            source_obj=source_youtube,
+            source=source_youtube,
             bookmarked=False,
             language="en",
-            domain_obj=domain,
+            domain=domain,
             date_published=date_link_publish,
         )
 
         ob = LinkDataController.objects.create(
-            source="https://youtube.com",
+            source_url="https://youtube.com",
             link="https://youtube.com?v=permanent",
             title="The first link",
-            source_obj=source_youtube,
+            source=source_youtube,
             permanent=True,
             language="en",
-            domain_obj=domain,
+            domain=domain,
             date_published=date_link_publish,
         )
 
         ob = ArchiveLinkDataController.objects.create(
-            source="https://youtube.com",
+            source_url="https://youtube.com",
             link="https://youtube.com?v=nonbookmarked2",
             title="The second link",
-            source_obj=source_youtube,
+            source=source_youtube,
             bookmarked=False,
             language="en",
-            domain_obj=domain,
+            domain=domain,
             date_published=date_to_remove,
         )
 
@@ -118,7 +118,7 @@ class EntryWrapperTest(FakeInternetTestCase):
 
         link_data = {
             "link": link_name,
-            "source": "https://youtube.com",
+            "source_url": "https://youtube.com",
             "title": "test",
             "description": "description",
             "language": "en",
@@ -153,7 +153,7 @@ class EntryWrapperTest(FakeInternetTestCase):
 
         link_data = {
             "link": link_name,
-            "source": "https://youtube.com",
+            "source_url": "https://youtube.com",
             "title": "test",
             "description": "description",
             "language": "en",
@@ -188,7 +188,7 @@ class EntryWrapperTest(FakeInternetTestCase):
 
         link_data = {
             "link": link_name,
-            "source": "https://youtube.com",
+            "source_url": "https://youtube.com",
             "title": "test",
             "description": "description",
             "language": "en",
@@ -222,16 +222,16 @@ class EntryWrapperTest(FakeInternetTestCase):
         add_time = DateUtils.get_datetime_now_utc() - timedelta(days=1)
 
         entry = LinkDataController.objects.create(
-            source="",
+            source_url="",
             link="https://linkedin.com",
             title="my title",
             description="my description",
             bookmarked=False,
             language="pl",
-            domain_obj=None,
+            domain=None,
             date_published=add_time,
             thumbnail="thumbnail",
-            source_obj=self.source_youtube,
+            source=self.source_youtube,
         )
 
         date_updated = entry.date_update_last
@@ -248,16 +248,16 @@ class EntryWrapperTest(FakeInternetTestCase):
         add_time = DateUtils.get_datetime_now_utc() - timedelta(days=1)
 
         entry = LinkDataController.objects.create(
-            source="",
+            source_url="",
             link="https://linkedin.com",
             title="my title",
             description="my description",
             bookmarked=False,
             language="pl",
-            domain_obj=None,
+            domain=None,
             date_published=add_time,
             thumbnail="thumbnail",
-            source_obj=self.source_youtube,
+            source=self.source_youtube,
         )
 
         date_updated = entry.date_update_last
@@ -274,16 +274,16 @@ class EntryWrapperTest(FakeInternetTestCase):
         add_time = DateUtils.get_datetime_now_utc() - timedelta(days=1)
 
         entry = LinkDataController.objects.create(
-            source="",
+            source_url="",
             link="https://linkedin.com",
             title="my title",
             description="my description",
             bookmarked=True,
             language="pl",
-            domain_obj=None,
+            domain=None,
             date_published=add_time,
             thumbnail="thumbnail",
-            source_obj=self.source_youtube,
+            source=self.source_youtube,
         )
 
         date_updated = entry.date_update_last
@@ -300,16 +300,16 @@ class EntryWrapperTest(FakeInternetTestCase):
         add_time = DateUtils.get_datetime_now_utc() - timedelta(days=1)
 
         entry = LinkDataController.objects.create(
-            source="",
+            source_url="",
             link="https://linkedin.com",
             title="my title",
             description="my description",
             bookmarked=True,
             language="pl",
-            domain_obj=None,
+            domain=None,
             date_published=add_time,
             thumbnail="thumbnail",
-            source_obj=self.source_youtube,
+            source=self.source_youtube,
         )
 
         date_updated = entry.date_update_last
@@ -329,8 +329,8 @@ class EntryWrapperTest(FakeInternetTestCase):
 
         link_data = {
             "link": link_name,
-            "source": "https://youtube.com",
-            "domain_obj": domain_obj,
+            "source_url": "https://youtube.com",
+            "domain": domain_obj,
             "title": "test",
             "description": "description",
             "language": "en",
@@ -346,14 +346,14 @@ class EntryWrapperTest(FakeInternetTestCase):
 
         self.assertTrue(result)
         self.assertTrue(result.is_archive_entry())
-        self.assertEqual(result.domain_obj, domain_obj)
+        self.assertEqual(result.domain, domain_obj)
 
     def test_make_bookmarked_archived(self):
         link_name = "https://youtube.com/v=12345"
 
         link_data = {
             "link": link_name,
-            "source": "https://youtube.com",
+            "source_url": "https://youtube.com",
             "title": "test",
             "description": "description",
             "language": "en",
@@ -384,8 +384,8 @@ class EntryWrapperTest(FakeInternetTestCase):
 
         link_data = {
             "link": link_name,
-            "source": "https://youtube.com",
-            "domain_obj": domain_obj,
+            "source_url": "https://youtube.com",
+            "domain": domain_obj,
             "title": "test",
             "description": "description",
             "language": "en",
@@ -403,7 +403,7 @@ class EntryWrapperTest(FakeInternetTestCase):
 
         self.assertTrue(result)
         self.assertTrue(not result.is_archive_entry())
-        self.assertEqual(result.domain_obj, domain_obj)
+        self.assertEqual(result.domain, domain_obj)
 
     def test_get_from_db__linkdatacontroller(self):
         conf = Configuration.get_object().config_entry
@@ -414,7 +414,7 @@ class EntryWrapperTest(FakeInternetTestCase):
         conf.save()
 
         LinkDataController.objects.create(
-            source="https://youtube.com",
+            source_url="https://youtube.com",
             link="https://youtube.com?v=1",
             title="The https link",
             bookmarked=False,
@@ -422,7 +422,7 @@ class EntryWrapperTest(FakeInternetTestCase):
         )
 
         LinkDataController.objects.create(
-            source="http://youtube.com",
+            source_url="http://youtube.com",
             link="http://youtube.com?v=1",
             title="The http link",
             bookmarked=False,
@@ -430,7 +430,7 @@ class EntryWrapperTest(FakeInternetTestCase):
         )
 
         ArchiveLinkDataController.objects.create(
-            source="https://archive.com",
+            source_url="https://archive.com",
             link="https://archive.com?v=1",
             title="The archive https link",
             bookmarked=False,
@@ -438,7 +438,7 @@ class EntryWrapperTest(FakeInternetTestCase):
         )
 
         ArchiveLinkDataController.objects.create(
-            source="http://archive.com",
+            source_url="http://archive.com",
             link="http://archive.com?v=1",
             title="The archive http link",
             bookmarked=False,
@@ -477,7 +477,7 @@ class EntryWrapperTest(FakeInternetTestCase):
         conf.save()
 
         ob = LinkDataController.objects.create(
-            source="https://youtube.com",
+            source_url="https://youtube.com",
             link="https://youtube.com?v=1",
             title="The https link",
             bookmarked=False,
@@ -485,7 +485,7 @@ class EntryWrapperTest(FakeInternetTestCase):
         )
 
         ob = LinkDataController.objects.create(
-            source="http://youtube.com",
+            source_url="http://youtube.com",
             link="http://youtube.com?v=1",
             title="The http link",
             bookmarked=False,
@@ -493,7 +493,7 @@ class EntryWrapperTest(FakeInternetTestCase):
         )
 
         ob = ArchiveLinkDataController.objects.create(
-            source="https://archive.com",
+            source_url="https://archive.com",
             link="https://archive.com?v=1",
             title="The archive https link",
             bookmarked=False,
@@ -501,7 +501,7 @@ class EntryWrapperTest(FakeInternetTestCase):
         )
 
         ob = ArchiveLinkDataController.objects.create(
-            source="http://archive.com",
+            source_url="http://archive.com",
             link="http://archive.com?v=1",
             title="The archive http link",
             bookmarked=False,
@@ -535,7 +535,7 @@ class EntryWrapperTest(FakeInternetTestCase):
         conf.save()
 
         LinkDataController.objects.create(
-            source="https://youtube.com",
+            source_url="https://youtube.com",
             link="https://youtube.com?v=1",
             title="The https link",
             bookmarked=False,
@@ -543,7 +543,7 @@ class EntryWrapperTest(FakeInternetTestCase):
         )
 
         LinkDataController.objects.create(
-            source="http://youtube.com",
+            source_url="http://youtube.com",
             link="http://youtube.com?v=1",
             title="The http link",
             bookmarked=False,
@@ -551,7 +551,7 @@ class EntryWrapperTest(FakeInternetTestCase):
         )
 
         ArchiveLinkDataController.objects.create(
-            source="https://archive.com",
+            source_url="https://archive.com",
             link="https://archive.com?v=1",
             title="The archive https link",
             bookmarked=False,
@@ -559,7 +559,7 @@ class EntryWrapperTest(FakeInternetTestCase):
         )
 
         ArchiveLinkDataController.objects.create(
-            source="http://archive.com",
+            source_url="http://archive.com",
             link="http://archive.com?v=1",
             title="The archive http link",
             bookmarked=False,
@@ -586,7 +586,7 @@ class EntryWrapperTest(FakeInternetTestCase):
         conf.save()
 
         https_entry = LinkDataController.objects.create(
-            source="https://archive.com",
+            source_url="https://archive.com",
             link="https://archive.com?v=1",
             title="The archive https link",
             bookmarked=False,
@@ -594,7 +594,7 @@ class EntryWrapperTest(FakeInternetTestCase):
         )
 
         http_entry = LinkDataController.objects.create(
-            source="http://archive.com",
+            source_url="http://archive.com",
             link="http://archive.com?v=1",
             title="The archive http link",
             bookmarked=False,
@@ -620,7 +620,7 @@ class EntryWrapperTest(FakeInternetTestCase):
         conf.save()
 
         https_entry = LinkDataController.objects.create(
-            source="https://archive.com",
+            source_url="https://archive.com",
             link="https://archive.com?v=1",
             title="The archive https link",
             bookmarked=False,
@@ -628,7 +628,7 @@ class EntryWrapperTest(FakeInternetTestCase):
         )
 
         http_entry = LinkDataController.objects.create(
-            source="http://archive.com",
+            source_url="http://archive.com",
             link="http://archive.com?v=1",
             title="The archive http link",
             bookmarked=False,
@@ -654,7 +654,7 @@ class EntryWrapperTest(FakeInternetTestCase):
         conf.save()
 
         https_entry = LinkDataController.objects.create(
-            source="https://archive.com",
+            source_url="https://archive.com",
             link="https://archive.com?v=1",
             title="The archive https link",
             bookmarked=False,
@@ -686,7 +686,7 @@ class EntryWrapperTest(FakeInternetTestCase):
         conf.save()
 
         https_entry = LinkDataController.objects.create(
-            source="https://archive.com",
+            source_url="https://archive.com",
             link="https://archive.com",
             title="The archive https link",
             bookmarked=False,
@@ -718,7 +718,7 @@ class EntryWrapperTest(FakeInternetTestCase):
         conf.save()
 
         https_entry = LinkDataController.objects.create(
-            source="https://archive.com/test",
+            source_url="https://archive.com/test",
             link="https://archive.com?v=1",
             title="The archive https link",
             bookmarked=False,
@@ -748,7 +748,7 @@ class EntryWrapperTest(FakeInternetTestCase):
         conf.save()
 
         https_entry = LinkDataController.objects.create(
-            source="https://archive.com/test",
+            source_url="https://archive.com/test",
             link="https://archive.com?v=1",
             title="The archive https link",
             bookmarked=False,
@@ -770,7 +770,7 @@ class EntryWrapperTest(FakeInternetTestCase):
 
     def test_move_entry__destination_exists(self):
         https_entry = LinkDataController.objects.create(
-            source="https://archive.com/test",
+            source_url="https://archive.com/test",
             link="https://testlink.com",
             title="The archive https link",
             bookmarked=True,
@@ -779,7 +779,7 @@ class EntryWrapperTest(FakeInternetTestCase):
         )
 
         http_entry = LinkDataController.objects.create(
-            source="http://archive.com/test",
+            source_url="http://archive.com/test",
             link="http://testlink.com",
             title="The archive https link",
             bookmarked=True,
@@ -788,7 +788,7 @@ class EntryWrapperTest(FakeInternetTestCase):
         )
 
         youtube_entry = LinkDataController.objects.create(
-            source="http://youtube.com/test",
+            source_url="http://youtube.com/test",
             link="http://youtube.com?v=1",
             title="The archive https link",
             bookmarked=True,
@@ -831,22 +831,22 @@ class EntryWrapperTest(FakeInternetTestCase):
         tags = UserTags.objects.all()
         self.assertEqual(tags.count(), 1)
         tag = tags[0]
-        self.assertEqual(tag.entry_object, https_entry)
+        self.assertEqual(tag.entry, https_entry)
 
         votes = UserVotes.objects.all()
         self.assertEqual(votes.count(), 1)
         vote = votes[0]
-        self.assertEqual(vote.entry_object, https_entry)
+        self.assertEqual(vote.entry, https_entry)
 
         comments = UserComments.objects.all()
         self.assertEqual(comments.count(), 1)
         comment = comments[0]
-        self.assertEqual(comment.entry_object, https_entry)
+        self.assertEqual(comment.entry, https_entry)
 
         bookmarks = UserBookmarks.objects.all()
         self.assertEqual(bookmarks.count(), 1)
         bookmark = bookmarks[0]
-        self.assertEqual(bookmark.entry_object, https_entry)
+        self.assertEqual(bookmark.entry, https_entry)
 
         all_transitions = UserEntryTransitionHistory.objects.all()
         self.assertEqual(all_transitions.count(), 1)
@@ -857,11 +857,11 @@ class EntryWrapperTest(FakeInternetTestCase):
         visits = UserEntryVisitHistory.objects.all()
         self.assertEqual(visits.count(), 2)
         visit = visits[0]
-        self.assertEqual(visit.entry_object, https_entry)
+        self.assertEqual(visit.entry, https_entry)
 
     def test_move_entry_to_url__destination_exists(self):
         https_entry = LinkDataController.objects.create(
-            source="https://archive.com/test",
+            source_url="https://archive.com/test",
             link="https://testlink.com",
             title="The archive https link",
             bookmarked=True,
@@ -870,7 +870,7 @@ class EntryWrapperTest(FakeInternetTestCase):
         )
 
         http_entry = LinkDataController.objects.create(
-            source="http://archive.com/test",
+            source_url="http://archive.com/test",
             link="http://testlink.com",
             title="The archive https link",
             bookmarked=True,
@@ -879,7 +879,7 @@ class EntryWrapperTest(FakeInternetTestCase):
         )
 
         youtube_entry = LinkDataController.objects.create(
-            source="http://youtube.com/test",
+            source_url="http://youtube.com/test",
             link="http://youtube.com?v=1",
             title="The archive https link",
             bookmarked=True,
@@ -925,22 +925,22 @@ class EntryWrapperTest(FakeInternetTestCase):
         tags = UserTags.objects.all()
         self.assertEqual(tags.count(), 1)
         tag = tags[0]
-        self.assertEqual(tag.entry_object, https_entry)
+        self.assertEqual(tag.entry, https_entry)
 
         votes = UserVotes.objects.all()
         self.assertEqual(votes.count(), 1)
         vote = votes[0]
-        self.assertEqual(vote.entry_object, https_entry)
+        self.assertEqual(vote.entry, https_entry)
 
         comments = UserComments.objects.all()
         self.assertEqual(comments.count(), 1)
         comment = comments[0]
-        self.assertEqual(comment.entry_object, https_entry)
+        self.assertEqual(comment.entry, https_entry)
 
         bookmarks = UserBookmarks.objects.all()
         self.assertEqual(bookmarks.count(), 1)
         bookmark = bookmarks[0]
-        self.assertEqual(bookmark.entry_object, https_entry)
+        self.assertEqual(bookmark.entry, https_entry)
 
         all_transitions = UserEntryTransitionHistory.objects.all()
         self.assertEqual(all_transitions.count(), 1)
@@ -951,11 +951,11 @@ class EntryWrapperTest(FakeInternetTestCase):
         visits = UserEntryVisitHistory.objects.all()
         self.assertEqual(visits.count(), 2)
         visit = visits[0]
-        self.assertEqual(visit.entry_object, https_entry)
+        self.assertEqual(visit.entry, https_entry)
 
     def test_move_entry_to_url__destination_does_not_exist(self):
         http_entry = LinkDataController.objects.create(
-            source="http://archive.com/test",
+            source_url="http://archive.com/test",
             link="http://testlink.com",
             title="The archive https link",
             bookmarked=True,
@@ -964,7 +964,7 @@ class EntryWrapperTest(FakeInternetTestCase):
         )
 
         youtube_entry = LinkDataController.objects.create(
-            source="http://youtube.com/test",
+            source_url="http://youtube.com/test",
             link="http://youtube.com?v=1",
             title="The archive https link",
             bookmarked=True,
@@ -1014,22 +1014,22 @@ class EntryWrapperTest(FakeInternetTestCase):
         tags = UserTags.objects.all()
         self.assertEqual(tags.count(), 1)
         tag = tags[0]
-        self.assertEqual(tag.entry_object, http_entry)
+        self.assertEqual(tag.entry, http_entry)
 
         votes = UserVotes.objects.all()
         self.assertEqual(votes.count(), 1)
         vote = votes[0]
-        self.assertEqual(vote.entry_object, http_entry)
+        self.assertEqual(vote.entry, http_entry)
 
         comments = UserComments.objects.all()
         self.assertEqual(comments.count(), 1)
         comment = comments[0]
-        self.assertEqual(comment.entry_object, http_entry)
+        self.assertEqual(comment.entry, http_entry)
 
         bookmarks = UserBookmarks.objects.all()
         self.assertEqual(bookmarks.count(), 1)
         bookmark = bookmarks[0]
-        self.assertEqual(bookmark.entry_object, http_entry)
+        self.assertEqual(bookmark.entry, http_entry)
 
         all_transitions = UserEntryTransitionHistory.objects.all()
         self.assertEqual(all_transitions.count(), 1)
@@ -1040,4 +1040,4 @@ class EntryWrapperTest(FakeInternetTestCase):
         visits = UserEntryVisitHistory.objects.all()
         self.assertEqual(visits.count(), 2)
         visit = visits[0]
-        self.assertEqual(visit.entry_object, http_entry)
+        self.assertEqual(visit.entry, http_entry)

@@ -7,7 +7,7 @@ from django.db import models
 from django.urls import reverse
 from django.db.models import Q, F
 
-from webtools import (
+from ..webtools import (
     HttpRequestBuilder,
     ContentLinkParser,
     DomainAwarePage,
@@ -965,7 +965,7 @@ class EntryWrapper(object):
             del link_data["id"]
 
         if self.user:
-            link_data["user_object"] = self.user
+            link_data["user"] = self.user
 
         try:
             if not is_archive:
@@ -1173,6 +1173,7 @@ class EntryWrapper(object):
 
         @returns new object, or None object has not been changed
         """
+        from ..pluginurl import UrlHandler
         if not self.entry:
             return
 
@@ -1187,11 +1188,11 @@ class EntryWrapper(object):
         if entry.is_https():
             http_url = entry.get_http_url()
 
-            p = HttpRequestBuilder(url=entry.link)
+            p = UrlHandler(url=entry.link)
             ping_status = p.ping()
 
             if not ping_status:
-                p = HttpRequestBuilder(url=http_url)
+                p = UrlHandler(url=http_url)
                 new_ping_status = p.ping()
 
                 if new_ping_status:
@@ -1202,7 +1203,7 @@ class EntryWrapper(object):
         if entry.is_http():
             https_url = entry.get_https_url()
 
-            p = HttpRequestBuilder(https_url)
+            p = UrlHandler(https_url)
             new_ping_status = p.ping()
 
             if new_ping_status:
@@ -1218,6 +1219,7 @@ class EntryWrapper(object):
 
         @returns new object, or None if object has not been changed
         """
+        from ..pluginurl import UrlHandler
         if not self.entry:
             return
 
@@ -1236,7 +1238,7 @@ class EntryWrapper(object):
 
         destination_link = entry.link.replace("www.", "")
 
-        p = HttpRequestBuilder(url=destination_link)
+        p = UrlHandler(url=destination_link)
         if p.ping():
             self.move_entry_to_url(destination_link)
 

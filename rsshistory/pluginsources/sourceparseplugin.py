@@ -3,7 +3,7 @@ import re
 import os
 import time
 
-from webtools import DomainAwarePage, HtmlPage
+from ..webtools import DomainAwarePage, HtmlPage
 from utils.dateutils import DateUtils
 
 from ..models import AppLogging

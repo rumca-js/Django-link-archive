@@ -260,6 +260,9 @@ class SearchEngineSogou(SearchEngine):
     def get_address(self):
         return "https://sogou.com"
 
+    def get_description(self):
+        return "Chinese"
+
 
 class SearchEngineStract(SearchEngine):
     def get_name(self):

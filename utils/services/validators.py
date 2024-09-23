@@ -1,6 +1,6 @@
 import urllib.parse
 
-from webtools import DomainAwarePage
+from rsshistory.webtools import DomainAwarePage
 
 
 class Validator(object):

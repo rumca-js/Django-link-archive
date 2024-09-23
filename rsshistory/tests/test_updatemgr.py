@@ -74,10 +74,10 @@ class UpdateManagerGitTest(FakeInternetTestCase):
         )
 
         entry = LinkDataController.objects.create(
-            source="https://youtube.com",
+            source_url="https://youtube.com",
             link="https://youtube.com?v=bookmarked",
             title="The first link",
-            source_obj=source_youtube,
+            source=source_youtube,
             bookmarked=True,
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
@@ -85,14 +85,14 @@ class UpdateManagerGitTest(FakeInternetTestCase):
 
         date = DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M")
         UserBookmarks.objects.create(
-            date_bookmarked=date, user_object=self.user, entry_object=entry
+            date_bookmarked=date, user=self.user, entry=entry
         )
 
         LinkDataController.objects.create(
-            source="https://youtube.com",
+            source_url="https://youtube.com",
             link="https://youtube.com?v=permanent",
             title="The first link",
-            source_obj=source_youtube,
+            source=source_youtube,
             permanent=True,
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
@@ -199,10 +199,10 @@ class UpdateManagerLocTest(FakeInternetTestCase):
         )
 
         entry = LinkDataController.objects.create(
-            source="https://youtube.com",
+            source_url="https://youtube.com",
             link="https://youtube.com?v=bookmarked",
             title="The first link",
-            source_obj=source_youtube,
+            source=source_youtube,
             bookmarked=True,
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
@@ -210,14 +210,14 @@ class UpdateManagerLocTest(FakeInternetTestCase):
 
         date = DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M")
         UserBookmarks.objects.create(
-            date_bookmarked=date, user_object=self.user, entry_object=entry
+            date_bookmarked=date, user=self.user, entry=entry
         )
 
         LinkDataController.objects.create(
-            source="https://youtube.com",
+            source_url="https://youtube.com",
             link="https://youtube.com?v=permanent",
             title="The first link",
-            source_obj=source_youtube,
+            source=source_youtube,
             permanent=True,
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",

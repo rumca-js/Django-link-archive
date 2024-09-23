@@ -5,7 +5,7 @@ from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
 from pathlib import Path
 
 from utils.dateutils import DateUtils
-from utils.logger import Logger
+from utils.logger import get_logger
 
 from utils.sqlmodel import (
     SqlModel,
@@ -88,24 +88,26 @@ class MapImporter(object):
         return False
 
     def import_from_links(self, json_data):
-        Logger.debug("Import from links")
+        logger = get_logger("utils")
+
+        logger.debug("Import from links")
 
         for link_data in json_data:
             try:
                 self.import_from_link(link_data)
             except Exception as E:
-                Logger.exc(E, "Cannot import link data {}".format(link_data))
+                logger.exc(E, "Cannot import link data {}".format(link_data))
 
         return True
 
     def import_from_sources(self, json_data):
-        Logger.debug("Import from sources")
+        logger = get_logger("utils")
 
         for source_data in json_data:
             try:
                 self.import_from_source(source_data)
             except Exception as E:
-                Logger.exc(E, "Cannot import source data {}".format(source_data))
+                logger.exc(E, "Cannot import source data {}".format(source_data))
 
         return True
 
@@ -201,13 +203,10 @@ class MapImporter(object):
 
     def import_from_source(self, json_data):
         clean_data = self.get_clean_source_data(json_data)
+        clean_data["enabled"] = False
 
-        c = SourcesTableController(self.conn)
-        if not c.is_source(url = clean_data["url"]):
-            clean_data["enabled"] = False
-
-            b = self.source_builder.build(link_data=clean_data)
-            b.add_from_props()
+        b = self.source_builder
+        b.build(link_data=clean_data)
 
         # TODO cleanup
         # else:
@@ -283,19 +282,21 @@ def read_file_contents(file_path):
 
 class JsonImporter(object):
     def __init__(self, conn, path=None, user=None, verbose = False):
-        Logger.info("Importing from a file")
+        logger = get_logger("utils")
+        logger.info("Importing from a file")
         self.user = user
         self.path = path
         self.conn = conn
         self.verbose = verbose
 
         if self.path is None:
-            Logger.error("Directory was not specified")
+            logger.error("Directory was not specified")
             return
 
     def import_all(self):
+        logger = get_logger("utils")
         if self.path is None:
-            Logger.error("Directory was not specified")
+            logger.error("Directory was not specified")
             return
 
         path = Path(self.path)

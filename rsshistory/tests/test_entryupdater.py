@@ -36,14 +36,14 @@ class EntryUpdaterTest(FakeInternetTestCase):
         )
 
         entry = LinkDataController.objects.create(
-            source="",
+            source_url="",
             link="https://linkedin.com",
             title=None,
             description=None,
-            source_obj=source_youtube,
+            source=source_youtube,
             bookmarked=False,
             language=None,
-            domain_obj=None,
+            domain=None,
             date_published=add_time,
         )
 
@@ -71,14 +71,14 @@ class EntryUpdaterTest(FakeInternetTestCase):
         )
 
         entry = LinkDataController.objects.create(
-            source="",
+            source_url="",
             link="https://linkedin.com",
             title=None,
             description=None,
-            source_obj=source_youtube,
+            source=source_youtube,
             bookmarked=False,
             language=None,
-            domain_obj=None,
+            domain=None,
             thumbnail=None,
             date_published=add_time,
         )
@@ -107,16 +107,16 @@ class EntryUpdaterTest(FakeInternetTestCase):
         )
 
         entry = LinkDataController.objects.create(
-            source="",
+            source_url="",
             link="https://linkedin.com",
             title="my title",
             description="my description",
             bookmarked=False,
             language="pl",
-            domain_obj=None,
+            domain=None,
             date_published=add_time,
             thumbnail="thumbnail",
-            source_obj=source_youtube,
+            source=source_youtube,
         )
 
         date_updated = entry.date_update_last
@@ -147,14 +147,14 @@ class EntryUpdaterTest(FakeInternetTestCase):
         )
 
         entry = LinkDataController.objects.create(
-            source="",
+            source_url="",
             link="https://page-with-http-status-500.com",
             title=None,
             description=None,
-            source_obj=source_youtube,
+            source=source_youtube,
             bookmarked=False,
             language=None,
-            domain_obj=None,
+            domain=None,
             date_published=add_time,
             date_dead_since=add_time,
         )
@@ -187,14 +187,14 @@ class EntryUpdaterTest(FakeInternetTestCase):
         )
 
         entry = LinkDataController.objects.create(
-            source="",
+            source_url="",
             link="https://page-with-http-status-500.com",
             title=None,
             description=None,
-            source_obj=source_youtube,
+            source=source_youtube,
             bookmarked=False,
             language=None,
-            domain_obj=None,
+            domain=None,
             thumbnail=None,
             date_published=add_time,
             date_dead_since=add_time,
@@ -228,14 +228,14 @@ class EntryUpdaterTest(FakeInternetTestCase):
         )
 
         entry = LinkDataController.objects.create(
-            source="",
+            source_url="",
             link="https://page-with-http-status-500.com",
             title=None,
             description=None,
-            source_obj=source_youtube,
+            source=source_youtube,
             bookmarked=False,
             language=None,
-            domain_obj=None,
+            domain=None,
             thumbnail=None,
             date_published=add_time,
         )
@@ -271,14 +271,14 @@ class EntryUpdaterTest(FakeInternetTestCase):
         )
 
         entry = LinkDataController.objects.create(
-            source="",
+            source_url="",
             link="https://youtube.com",
             title=None,
             description=None,
-            source_obj=source_youtube,
+            source=source_youtube,
             bookmarked=False,
             language=None,
-            domain_obj=None,
+            domain=None,
             thumbnail=None,
             date_published=add_time,
             date_dead_since=add_time,
@@ -309,14 +309,14 @@ class EntryUpdaterTest(FakeInternetTestCase):
         )
 
         entry = LinkDataController.objects.create(
-            source="",
+            source_url="",
             link="https://youtube.com",
             title=None,
             description=None,
-            source_obj=source_youtube,
+            source=source_youtube,
             bookmarked=True,
             language=None,
-            domain_obj=None,
+            domain=None,
             thumbnail=None,
         )
 
@@ -348,14 +348,14 @@ class EntryUpdaterTest(FakeInternetTestCase):
         )
 
         entry = LinkDataController.objects.create(
-            source="",
+            source_url="",
             link="https://slot-casino-page.com",
             title="Casino casino casino casino casino",
             description=None,
-            source_obj=source_youtube,
+            source=source_youtube,
             bookmarked=False,
             language=None,
-            domain_obj=None,
+            domain=None,
             thumbnail=None,
             date_published=add_time,
         )

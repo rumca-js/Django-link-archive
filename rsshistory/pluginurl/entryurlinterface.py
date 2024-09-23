@@ -1,5 +1,5 @@
 from utils.dateutils import DateUtils
-from webtools import (
+from ..webtools import (
     HtmlPage,
     RssPage,
     DomainAwarePage,
@@ -28,7 +28,6 @@ class EntryUrlInterface(object):
     def __init__(
         self,
         url,
-        use_headless_browser=False,
         log=False,
         ignore_errors=False,
     ):
@@ -42,8 +41,8 @@ class EntryUrlInterface(object):
 
         self.url = UrlHandler.get_cleaned_link(url)
 
-        self.options = UrlHandler.get_url_options(url)
-        self.options.use_headless_browser = use_headless_browser
+        h = UrlHandler(url)
+        self.options = h.options
 
     def make_request(self):
         self.u = UrlHandler(self.url, page_options=self.options)

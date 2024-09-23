@@ -3,7 +3,7 @@ import urllib.parse
 from django.urls import reverse
 from django.templatetags.static import static
 
-from webtools import DomainAwarePage, InputContent
+from ...webtools import DomainAwarePage, InputContent
 from utils.dateutils import DateUtils
 
 from ...apps import LinkDatabase
@@ -217,7 +217,7 @@ class EntryGenericPlugin(object):
             )
 
         if self.user.is_authenticated:
-            if not self.entry.source_obj or not self.is_entry_share_source_domain():
+            if not self.entry.source or not self.is_entry_share_source_domain():
                 buttons.append(
                     EntryButton(
                         self.user,
@@ -318,11 +318,11 @@ class EntryGenericPlugin(object):
         return buttons
 
     def is_entry_share_source_domain(self):
-        if not self.entry.source_obj:
+        if not self.entry.source:
             return False
 
         entry_domain = DomainAwarePage(self.entry.link).get_domain()
-        source_domain = DomainAwarePage(self.entry.source_obj.url).get_domain()
+        source_domain = DomainAwarePage(self.entry.source.url).get_domain()
 
         return entry_domain == source_domain
 
@@ -400,8 +400,8 @@ class EntryGenericPlugin(object):
                 ),
             )
 
-        if self.entry.source_obj:
-            search_url = self.entry.source_obj.url
+        if self.entry.source:
+            search_url = self.entry.source.url
 
             buttons.append(
                 EntryButton(
@@ -412,7 +412,7 @@ class EntryGenericPlugin(object):
                     )
                     + "?search=link+%3D%3D+{}".format(search_url),
                     ConfigurationEntry.ACCESS_TYPE_ALL,
-                    "Source Entry: {}".format(self.entry.source_obj.title),
+                    "Source Entry: {}".format(self.entry.source.title),
                     static("{}/icons/icons8-link-90.png".format(LinkDatabase.name)),
                 ),
             )
@@ -445,17 +445,17 @@ class EntryGenericPlugin(object):
                 ),
             )
 
-        if config.accept_domains and self.entry.domain_obj:
+        if config.accept_domains and self.entry.domain:
             buttons.append(
                 EntryButton(
                     self.user,
                     "Domain",
                     reverse(
                         "{}:domain-detail".format(LinkDatabase.name),
-                        args=[self.entry.domain_obj.id],
+                        args=[self.entry.domain.id],
                     ),
                     ConfigurationEntry.ACCESS_TYPE_ALL,
-                    "Domain: {}".format(self.entry.domain_obj.domain),
+                    "Domain: {}".format(self.entry.domain.domain),
                     static("{}/icons/icons8-www-64.png".format(LinkDatabase.name)),
                 ),
             )
@@ -661,8 +661,8 @@ class EntryGenericPlugin(object):
 
         parameters.append(EntryParameter("Visists", self.entry.page_rating_visits))
 
-        if self.entry.user_object is not None:
-            parameters.append(EntryParameter("User", self.entry.user_object.username))
+        if self.entry.user is not None:
+            parameters.append(EntryParameter("User", self.entry.user.username))
 
         return parameters
 

@@ -1,6 +1,11 @@
+"""
+TODO
+these scripts will not work in case of multithreaded app
+"""
+import os
 from pathlib import Path
-from webtools import WebLogger
-
+from utils.basictypes import fix_path_for_os
+from .webtools import WebLogger
 
 from .crawlers import (
     selenium_feataure_enabled,
@@ -15,8 +20,8 @@ from .crawlers import (
 
 class HeadlessScriptCrawler(ScriptCrawler):
     def __init__(self, request, response_file=None, response_port=None, settings=None):
+        self.request = request
         self.script = self.get_script()
-
         self.process_input()
 
         super().__init__(request=request, response_file=self.response_file, response_port=response_port, cwd=self.operating_path, settings=settings, script=self.script)
@@ -31,7 +36,7 @@ class HeadlessScriptCrawler(ScriptCrawler):
             return
 
         self.operating_path = self.get_operating_dir()
-        self.response_file = self.get_response_file_name(operating_path)
+        self.response_file = self.get_response_file_name(self.operating_path)
 
     def is_valid(self):
         if not self.is_full_script_valid():
@@ -46,7 +51,7 @@ class HeadlessScriptCrawler(ScriptCrawler):
         return True
 
     def get_response_file_name(self, operating_path):
-        file_name_url_part = fix_path_for_os(request.url)
+        file_name_url_part = fix_path_for_os(self.request.url)
         file_name_url_part = file_name_url_part.replace("\\", "")
         file_name_url_part = file_name_url_part.replace("/", "")
         file_name_url_part = file_name_url_part.replace("@", "")
@@ -58,12 +63,11 @@ class HeadlessScriptCrawler(ScriptCrawler):
         return response_file
 
     def get_operating_dir(self):
-
         file_path = os.path.realpath(__file__)
         full_path = Path(file_path)
 
         if WebConfig.script_operating_dir is None:
-            operating_path = full_path.parents[1]
+            operating_path = full_path.parents[2]
         else:
             operating_path = Path(WebConfig.script_operating_dir)
 
@@ -100,7 +104,7 @@ class HeadlessServerCrawler(ServerCrawler):
         return script
 
     def get_port(self):
-        port = WebConfig.crawling_server_port
+        return WebConfig.crawling_server_port
 
 
 class FullServerCrawler(ServerCrawler):
@@ -121,7 +125,7 @@ class FullServerCrawler(ServerCrawler):
         return script
 
     def get_port(self):
-        port = WebConfig.crawling_server_port
+        return WebConfig.crawling_server_port
 
 
 class ConfiguredSeleniumChromeHeadless(SeleniumChromeHeadless):
@@ -155,8 +159,6 @@ class WebConfig(object):
         p = Path("/usr/bin/chromedriver")
         if p.exists():
             WebConfig.selenium_driver_location = str(p)
-
-        WebConfig.init_browser_config()
 
     def get_modes():
         return [
@@ -207,7 +209,7 @@ class WebConfig(object):
         elif input_string == "ConfiguredSeleniumChromeFull":
             return ConfiguredSeleniumChromeFull
 
-    def get_init_browser_config():
+    def get_init_crawler_config():
         mapping = {}
 
         std_preference_table = [
@@ -247,15 +249,6 @@ class WebConfig(object):
         mapping["full"] = full_preference_table
 
         return mapping
-
-    def init_browser_config():
-        WebConfig.set_browser_mapping(WebConfig.get_init_browser_config())
-
-    def set_browser_mapping(browser_mapping):
-        WebConfig.browser_mapping = browser_mapping
-
-    def get_browser_mapping():
-        return WebConfig.browser_mapping
 
     def use_logger(Logger):
         WebLogger.web_logger = Logger

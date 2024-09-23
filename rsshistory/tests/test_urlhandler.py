@@ -1,4 +1,4 @@
-from webtools import RssPage, HtmlPage, HttpPageHandler, YouTubeVideoHandler
+from ..webtools import RssPage, HtmlPage, HttpPageHandler, YouTubeVideoHandler
 
 from ..pluginurl.urlhandler import UrlHandler
 
@@ -82,7 +82,7 @@ class UrlHandlerTest(FakeInternetTestCase):
         self.assertEqual(type(handler.get_handler()), HttpPageHandler)
         self.assertEqual(type(handler.get_handler().p), HtmlPage)
 
-        self.assertTrue(handler.options.use_headless_browser)
+        self.assertTrue(handler.options.mode == "headless")
 
     def test_get__defcon_org(self):
         handler = UrlHandler("https://defcon.org")
@@ -91,7 +91,7 @@ class UrlHandlerTest(FakeInternetTestCase):
         self.assertEqual(type(handler.get_handler()), HttpPageHandler)
         self.assertEqual(type(handler.get_handler().p), HtmlPage)
 
-        self.assertTrue(handler.options.use_full_browser)
+        self.assertTrue(handler.options.mode == "full")
 
     def test_get_cleaned_link_stupid_google_link(self):
         cleaned_link = UrlHandler.get_cleaned_link(

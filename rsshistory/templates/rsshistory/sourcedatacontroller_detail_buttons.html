@@ -57,7 +57,7 @@
    
      <ul class="dropdown-menu">
         <li>
-            <a href="{% url 'rsshistory:entries-omni-search' %}?search=source+%3D+'{{object.url}}'" class="dropdown-item">
+            <a href="{% url 'rsshistory:entries-omni-search' %}?search=source__url+%3D+'{{object.url}}'" class="dropdown-item">
               <img src="{% static 'rsshistory/icons/icons8-link-90.png' %}" class="content-icon" />
              [S] entries
             </a>

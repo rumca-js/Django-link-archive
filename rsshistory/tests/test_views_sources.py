@@ -160,10 +160,10 @@ class SourceDetailTest(FakeInternetTestCase):
         # entries for sources
 
         LinkDataController.objects.create(
-            source="https://youtube.com",
+            source_url="https://youtube.com",
             link="https://youtube.com",
             title="The first link",
-            source_obj=self.source_youtube,
+            source=self.source_youtube,
             bookmarked=False,
             permanent=True,
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
@@ -171,10 +171,10 @@ class SourceDetailTest(FakeInternetTestCase):
         )
 
         self.entry_html = LinkDataController.objects.create(
-            source="https://linkedin.com/feed",
+            source_url="https://linkedin.com/feed",
             link="https://linkedin.com",
             title="The second link",
-            source_obj=self.source_youtube,
+            source=self.source_youtube,
             bookmarked=False,
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
@@ -183,28 +183,28 @@ class SourceDetailTest(FakeInternetTestCase):
         # other
 
         self.entry_youtube = LinkDataController.objects.create(
-            source="https://youtube.com",
+            source_url="https://youtube.com",
             link="https://youtube.com?v=bookmarked",
             title="The first link",
-            source_obj=self.source_youtube,
+            source=self.source_youtube,
             bookmarked=True,
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
         )
         LinkDataController.objects.create(
-            source="https://youtube.com",
+            source_url="https://youtube.com",
             link="https://youtube.com?v=nonbookmarked",
             title="The second link",
-            source_obj=self.source_youtube,
+            source=self.source_youtube,
             bookmarked=False,
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
         )
         self.entry_pdf = LinkDataController.objects.create(
-            source="https://linkedin.com/feed",
+            source_url="https://linkedin.com/feed",
             link="https://linkedin.com/link-to-pdf.pdf",
             title="The second link",
-            source_obj=self.source_youtube,
+            source=self.source_youtube,
             bookmarked=False,
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
@@ -282,28 +282,28 @@ class SourceDetailTestCreatesEntries(FakeInternetTestCase):
         # other
 
         self.entry_youtube = LinkDataController.objects.create(
-            source="https://youtube.com",
+            source_url="https://youtube.com",
             link="https://youtube.com?v=bookmarked",
             title="The first link",
-            source_obj=self.source_youtube,
+            source=self.source_youtube,
             bookmarked=True,
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
         )
         LinkDataController.objects.create(
-            source="https://youtube.com",
+            source_url="https://youtube.com",
             link="https://youtube.com?v=nonbookmarked",
             title="The second link",
-            source_obj=self.source_youtube,
+            source=self.source_youtube,
             bookmarked=False,
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",
         )
         self.entry_pdf = LinkDataController.objects.create(
-            source="https://linkedin.com/feed",
+            source_url="https://linkedin.com/feed",
             link="https://linkedin.com/link-to-pdf.pdf",
             title="The second link",
-            source_obj=self.source_youtube,
+            source=self.source_youtube,
             bookmarked=False,
             date_published=DateUtils.from_string("2023-03-03;16:34", "%Y-%m-%d;%H:%M"),
             language="en",

@@ -6,7 +6,8 @@ import argparse
 import json
 from datetime import datetime, timedelta
 
-from webtools import ipc, PageRequestObject, PageResponseObject, get_request_to_bytes
+from .webtools import PageRequestObject, PageResponseObject, get_request_to_bytes
+from .ipc import SocketConnection, DEFAULT_PORT
 
 
 max_transaction_timeout_s = 40
@@ -24,12 +25,12 @@ class ScrapingClient(object):
         if host:
             self.host = host
         else:
-            self.host = ipc.SocketConnection.gethostname()
+            self.host = SocketConnection.gethostname()
 
         if port:
             self.port = port
         else:
-            self.port = ipc.DEFAULT_PORT
+            self.port = DEFAULT_PORT
 
         if scraping_script:
             self.scraping_script = scraping_script
@@ -45,8 +46,8 @@ class ScrapingClient(object):
         self.scraping_script = script
 
     def connect(self):
-        self.c = ipc.SocketConnection()
-        if not self.c.connect(ipc.SocketConnection.gethostname(), self.port):
+        self.c = SocketConnection()
+        if not self.c.connect(SocketConnection.gethostname(), self.port):
             return False
         else:
             return True
@@ -171,7 +172,7 @@ class ScrapingClientParser(object):
         if "port" in self.args and self.args.port:
             self.port = self.args.port
         else:
-            self.port = ipc.DEFAULT_PORT
+            self.port = DEFAULT_PORT
 
     def is_valid(self):
         return True

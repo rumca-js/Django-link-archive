@@ -6,7 +6,7 @@ from django.db import models
 from django.urls import reverse
 from django.db.models import Q
 
-from webtools import DomainAwarePage
+from ..webtools import DomainAwarePage
 from utils.dateutils import DateUtils
 
 from ..models import (
@@ -247,16 +247,16 @@ class DomainsController(Domains):
         domains.delete()
 
     def unconnect_entries():
-        entries = LinkDataController.objects.filter(domain_obj__isnull=False)
+        entries = LinkDataController.objects.filter(domain__isnull=False)
         for entry in entries:
-            entry.domain_obj = None
+            entry.domain = None
             entry.save()
 
     def create_missing_domains():
         if not Configuration.get_object().config_entry.accept_domains:
             return
 
-        entries = LinkDataController.objects.filter(domain_obj__isnull=True)
+        entries = LinkDataController.objects.filter(domain__isnull=True)
         for entry in entries:
             p = DomainAwarePage(entry.link)
             domain_url = p.get_domain()
@@ -273,7 +273,7 @@ class DomainsController(Domains):
                     )
                 )
                 domain = DomainsController.add(domain_url)
-                entry.domain_obj = domain
+                entry.domain = domain
                 entry.save()
             else:
                 LinkDatabase.info(
@@ -281,7 +281,7 @@ class DomainsController(Domains):
                         entry.link
                     )
                 )
-                entry.domain_obj = domains[0]
+                entry.domain = domains[0]
                 entry.save()
 
     def create_missing_entries():

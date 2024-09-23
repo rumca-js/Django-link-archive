@@ -5,7 +5,7 @@ from django.views import generic
 from django.urls import reverse
 from django.contrib.auth.models import User
 
-from webtools import HtmlPage, RssPage, HttpPageHandler
+from .webtools import HtmlPage, RssPage, HttpPageHandler
 
 from .models import(
    UserConfig, ConfigurationEntry, AppLogging,

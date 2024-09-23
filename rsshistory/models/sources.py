@@ -1,7 +1,7 @@
 from django.db import models
 from django.urls import reverse
 
-from webtools import DomainAwarePage
+from ..webtools import DomainAwarePage
 
 from ..apps import LinkDatabase
 
