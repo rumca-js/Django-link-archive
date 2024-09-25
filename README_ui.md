@@ -109,3 +109,12 @@ Thankfully there are three wizard views that can automatically preset most of th
 <div align="center">
   <img alt="Standard list" src="screenshots/backgroundjobs_view.PNG" style="max-width:700px">
 </div>
+
+
+## Browsers
+
+Admin can specify which browsers are defined, enabled for crawling. Browsers can be enabled/disabled when necessary.
+
+<div align="center">
+  <img alt="Standard list" src="screenshots/browser_list.PNG" style="max-width:700px">
+</div>
