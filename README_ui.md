@@ -47,12 +47,6 @@ Program can operate in various setups, scenarios, but mainly there are three typ
   <img alt="Standard list" src="screenshots/source_list.PNG" style="max-width:700px">
 </div>
 
-# Source details
-
-<div align="center">
-  <img alt="Standard list" src="screenshots/source_details.PNG" style="max-width:700px">
-</div>
-
 # Tools
 
 Program offers many tools. If you try to find something a list of search engines is provided.
