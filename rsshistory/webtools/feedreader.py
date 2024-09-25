@@ -194,6 +194,8 @@ class FeedReaderFeed(FeedObject):
 
         self.title = self.try_to_get_field("title")
         self.link = self.try_to_get_field("link")
+        if not self.link:
+            self.link = self.try_to_get_attribute("link", "href")
         self.subtitle = self.try_to_get_field("subtitle")
         self.description = self.try_to_get_field("description")
         self.language = self.try_to_get_field("language")
@@ -287,15 +289,17 @@ class FeedReader(object):
         # TODO what if we have < html?
         html_wh = self.contents.strip().find("<html")
         rss_wh = self.contents.strip().find("<rss")
+        feed_wh = self.contents.strip().find("<feed")
 
-        if html_wh != -1 and rss_wh != -1:
-            if self.process_html_raw():
-                return True
+        if html_wh != -1:
+            if rss_wh == -1 and feed_wh == -1:
+                if self.process_html_raw():
+                    return True
 
-        rss_wh = self.contents.strip().find("&gt;rss")
-        if rss_wh != -1:
-            if self.process_html_encoded():
-                return True
+                rss_wh = self.contents.strip().find("&gt;rss")
+                if rss_wh != -1:
+                    if self.process_html_encoded():
+                        return True
 
     def process_html_raw(self):
         wh = self.contents.find("<rss")

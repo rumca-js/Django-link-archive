@@ -68,7 +68,7 @@ def page_show_properties(request):
             form.action_url = reverse("{}:page-show-props".format(LinkDatabase.name))
             p.context["form"] = form
 
-            return p.render("form_basic.html")
+            return p.render("form_oneliner.html")
 
         else:
             page_link = request.GET["page"]
@@ -312,7 +312,7 @@ def download_url(request):
             form.action_url = reverse("{}:download-video-url".format(LinkDatabase.name))
             p.context["form"] = form
 
-            return p.render("form_basic.html")
+            return p.render("form_oneliner.html")
 
         else:
             url = request.GET["page"]
@@ -351,7 +351,7 @@ def download_music(request):
             form.action_url = reverse("{}:download-music-url".format(LinkDatabase.name))
             p.context["form"] = form
 
-            return p.render("form_basic.html")
+            return p.render("form_oneliner.html")
 
         else:
             url = request.GET["page"]
@@ -390,7 +390,7 @@ def download_video(request):
             form.action_url = reverse("{}:download-video-url".format(LinkDatabase.name))
             p.context["form"] = form
 
-            return p.render("form_basic.html")
+            return p.render("form_oneliner.html")
 
         else:
             url = request.GET["page"]
@@ -406,6 +406,42 @@ def download_video(request):
 
         url = form.cleaned_data["link"]
         return download_video_internal(p, url)
+
+
+def download_music_pk(request, pk):
+    p = ViewPage(request)
+    p.set_title("Download music")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    ft = LinkDataController.objects.filter(id=pk)
+    if ft.exists():
+        p.context["summary_text"] = "Added to download queue"
+    else:
+        p.context["summary_text"] = "Failed to add to download queue"
+
+    BackgroundJobController.download_music(ft[0])
+
+    return p.render("summary_present.html")
+
+
+def download_video_pk(request, pk):
+    p = ViewPage(request)
+    p.set_title("Download video")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    if data is not None:
+        return data
+
+    ft = LinkDataController.objects.filter(id=pk)
+    if ft.exists():
+        p.context["summary_text"] = "Added to download queue"
+    else:
+        p.context["summary_text"] = "Failed to add to download queue"
+
+    BackgroundJobController.download_video(ft[0])
+
+    return p.render("summary_present.html")
 
 
 def is_url_allowed(request):
@@ -429,7 +465,7 @@ def is_url_allowed(request):
 
     p = ViewPage(request)
     p.set_title("Is link allowed by robots.txt")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
     if data is not None:
         return data
 
@@ -440,7 +476,7 @@ def is_url_allowed(request):
             form.action_url = reverse("{}:is-url-allowed".format(LinkDatabase.name))
             p.context["form"] = form
 
-            return p.render("form_basic.html")
+            return p.render("form_oneliner.html")
 
         else:
             url = request.GET["page"]
@@ -494,7 +530,7 @@ def page_verify(request):
             form.action_url = reverse("{}:page-verify".format(LinkDatabase.name))
             p.context["form"] = form
 
-            return p.render("form_basic.html")
+            return p.render("form_oneliner.html")
 
         else:
             url = request.GET["page"]
@@ -516,7 +552,7 @@ def page_verify(request):
 def search_engines(request):
     p = ViewPage(request)
     p.set_title("Search engines")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
     if data is not None:
         return data
 
@@ -549,7 +585,7 @@ def search_engines(request):
 def gateways(request):
     p = ViewPage(request)
     p.set_title("Gateways - useful places on the web")
-    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_STAFF)
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_ALL)
     if data is not None:
         return data
 
@@ -563,3 +599,34 @@ def gateways(request):
     p.context["gateways"] = result
 
     return p.render("gateways.html")
+
+
+def cleanup_link(request):
+    p = ViewPage(request)
+    p.set_title("Cleanup Link")
+    data = p.set_access(ConfigurationEntry.ACCESS_TYPE_LOGGED)
+    if data is not None:
+        return data
+
+    if request.method == "POST":
+        form = LinkInputForm(request.POST, request=request)
+        if form.is_valid():
+            link = form.cleaned_data["link"]
+
+            link = UrlHandler.get_cleaned_link(link)
+
+            summary_text = 'Cleaned up link: <a href="{}">{}</a>'.format(link, link)
+
+            p.context["summary_text"] = summary_text
+
+            return p.render("summary_present.html")
+    else:
+        form = LinkInputForm(request=request)
+        form.method = "POST"
+
+        p.context["form"] = form
+        p.context[
+            "form_description_post"
+        ] = "Internet is dangerous, so carefully select which links you add"
+
+        return p.render("form_oneliner.html")

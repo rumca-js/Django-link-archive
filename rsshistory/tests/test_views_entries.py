@@ -746,3 +746,23 @@ class EntriesViewsTests2(FakeInternetTestCase):
         transition = all_transitions[0]
         self.assertEqual(transition.entry_from, self.entry_html)
         self.assertEqual(transition.entry_to, self.entry_youtube)
+
+    def test_user_entries_bookmarked(self):
+        LinkDataController.objects.all().delete()
+
+        url = reverse("{}:user-entries-bookmarked".format(LinkDatabase.name))
+
+        # call tested function
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_user_entries_bookmarked(self):
+        LinkDataController.objects.all().delete()
+
+        url = reverse("{}:user-entries-bookmarked-init".format(LinkDatabase.name))
+
+        # call tested function
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)

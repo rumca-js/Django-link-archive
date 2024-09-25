@@ -9,6 +9,9 @@
 </div>
 
 <h1>Browser list</h1>
+Browsers are chosen using this list. Order of appearance is important.
+
+<hr/>
 
   {% if content_list %}
      <div class="list-group">
@@ -24,6 +27,10 @@
              </div>
 
              <div>
+                 <a href="{% url 'rsshistory:browser-edit' browser.id %}" title="Edits browser" class="btn btn-primary" role="button">
+                    <img src="{% static 'rsshistory/icons/icons8-edit-100.png' %}" class="content-icon" />
+                 </a>
+
                  {% if browser.enabled %}
                  <a href="{% url 'rsshistory:browser-disable' browser.id %}" title="Disables browser" class="btn btn-primary" role="button">
                    {% include "rsshistory/icon_disable.html" %}

@@ -149,7 +149,7 @@ option:hover {
     list-style: none;
 }
 
-.container_youtube-thumbnails {
+.container_gallery {
     margin-top: 20px;
     padding: 0;
     list-style: none;
@@ -234,7 +234,7 @@ option:hover {
 .element_line-and-buttons_selected, .element_line-and-buttons_selected:link, .element_line-and-buttons_selected:visited, .element_line-and-buttons_selected:active {
 }
 
-.element_youtube-thumbnails, .element_youtube-thumbnails:link, .element_youtube-thumbnails:active, .element_youtube-thumbnails:visited {
+.element_gallery, .element_gallery:link, .element_gallery:active, .element_gallery:visited {
     color : #373737;
     background-color: #e9e9e9;
     text-overflow: ellipsis; 
@@ -246,21 +246,21 @@ option:hover {
     flex-direction:column;
 }
 
-.element_youtube-thumbnails a {
+.element_gallery a {
     text-decoration: none;
 }
 
-.element_youtube-thumbnails:hover {
+.element_gallery:hover {
     color: black;
     background-color: #f4f4f4;
 }
 
-.element_youtube-thumbnails_selected, .element_youtube-thumbnails_selected:link, .element_youtube-thumbnails_selected:active, .element_youtube-thumbnails_selected:visited {
+.element_gallery_selected, .element_gallery_selected:link, .element_gallery_selected:active, .element_gallery_selected:visited {
     color : #a0ffa0;
     background-color: #355035;
 }
 
-.element_youtube-thumbnails_selected:hover {
+.element_gallery_selected:hover {
     color: white;
     background-color: blue;
 }

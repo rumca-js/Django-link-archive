@@ -1,15 +1,27 @@
-<h3>Sources help</h3>
+<h3>Notes</h3>
 <ul>
-    <li>Most likely you would like to insert RSS url here</li>
-    <li>You can insert HTML url, the system will try to find and use RSS link in it, if it is correctly configured</li>
-    <li>Finding RSS from a page manually is not simple. First you would have to find in page source link that is of correct type, etc. etc.</li>
-    <li><a href="https://docs.rsshub.app/">
-        {% include "rsshistory/icon_external.html" %}
-        RSS hub</a></li>
+    <li>If provided URL is HTML page that provides RSS link, then the system will try to find the link</li>
+    <li>If provide youtube video in link, then link channel RSS will be added instead</li>
+    <li>If provide reddit link, then RSS channel will be added instead</li>
+    <li>Internet is dangerous, so carefully select which links you add</li>
+</ul>
+
+<h3>Resources</h3>
+<ul>
     <li><a href="https://openrss.org/">
         {% include "rsshistory/icon_external.html" %}
-        OpenRSS</a></li>
-    <li>You can insert other Django link instance JSON URL also</li>
-    <li>If you put youtube video in link, the link channel RSS will be added instead</a>
-    <li>Internet is dangerous, so carefully select which links you add</a>
+        OpenRSS</a> - provides RSS links
+    </li>
+    <li><a href="https://github.com/plenaryapp/awesome-rss-feeds">
+        {% include "rsshistory/icon_external.html" %}
+        Awesome RSS feeds list</a>
+    </li>
+    <li><a href="https://docs.rsshub.app/">
+        {% include "rsshistory/icon_external.html" %}
+        RSS hub</a>
+    </li>
+    <li><a href="https://rss-bridge.org/">
+        {% include "rsshistory/icon_external.html" %}
+        RSS bridge</a>
+    </li>
 </ul>

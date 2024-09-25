@@ -82,10 +82,9 @@ class EntryYearDataMainExporter(MainExporter):
 
         result_entries = []
         if self.user:
-            bookmarks = UserBookmarks.get_user_bookmarks(self.user)
-            # this returns IDs, not 'objects'
-            result_entries = bookmarks.values_list("entry", flat=True)
-            result_entries = LinkDataController.objects.filter(id__in=result_entries)
+            user = self.user
+
+            result_entries = LinkDataController.objects.filter(bookmarks__user__id=user.id)
             result_entries = result_entries.filter(filters & Q(date_published__range=therange))
         else:
             result_entries = LinkDataController.objects.filter(
@@ -112,11 +111,7 @@ class EntryYearTopicExporter(object):
         converter.export_entries(export_file_name = "topic_{}".format(topic), export_path=directory)
 
     def get_entries(self):
-        tag_objs = UserTags.objects.filter(tag=topic)
-
         filters = self.get_configuration_filters()
 
-        # this returns IDs, not 'objects'
-        result_entries = tag_objs.values_list("entry", flat=True)
-        result_entries = LinkDataController.objects.filter(filters & Q(id__in=result_entries))
+        result_entries = LinkDataController.objects.filter(filters & Q(tags__tag=topic))
         return result_entries.order_by(*self.get_order_columns())

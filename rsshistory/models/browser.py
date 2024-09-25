@@ -67,6 +67,7 @@ class Browser(models.Model):
             if not modes.exists():
                 mode = BrowserMode.objects.create(mode = mode_name)
 
+            index = 0
             for browser_config in mode_browser_config:
                 settings = {}
                 try:
@@ -74,7 +75,10 @@ class Browser(models.Model):
                 except Exception as E:
                     AppLogging.exc("Cannot dumps browser settings")
 
-                conf = Browser.objects.create(mode = mode, crawler = browser_config["crawler"], settings=settings)
+                enabled = index == 0
+
+                conf = Browser.objects.create(enabled=enabled, mode = mode, crawler = browser_config["crawler"], settings=settings)
+                index += 1
 
     def get_browser_setup():
         """

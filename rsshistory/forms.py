@@ -23,6 +23,7 @@ from .models import (
     DataExport,
     EntryRules,
     ApiKeys,
+    Browser,
 )
 from .pluginsources.sourcecontrollerbuilder import SourceControllerBuilder
 
@@ -673,7 +674,7 @@ class DomainEditForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.init = UserRequest(args, kwargs)
-        super(DomainEditForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields["domain"].widget.attrs["readonly"] = True
 
 
@@ -955,7 +956,7 @@ class LinkVoteForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         self.init = UserRequest(args, kwargs)
-        super(LinkVoteForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         config = Configuration.get_object().config_entry
 
@@ -963,3 +964,23 @@ class LinkVoteForm(forms.Form):
             MaxValueValidator(config.vote_max),
             MinValueValidator(config.vote_min),
         ]
+
+
+class BrowserEditForm(forms.ModelForm):
+    """
+    Category choice form
+    """
+
+    class Meta:
+        model = Browser
+        fields = [
+            "enabled",
+            "mode",
+            "crawler",
+            "settings",
+        ]
+
+    def __init__(self, *args, **kwargs):
+        self.init = UserRequest(args, kwargs)
+        super().__init__(*args, **kwargs)
+        self.fields["crawler"].widget.attrs["readonly"] = True

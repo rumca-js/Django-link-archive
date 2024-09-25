@@ -57,6 +57,9 @@ from .fake.warhammercommunity import (
 from .fake.thehill import (
     thehill_rss,
 )
+from .fake.reddit import (
+    reddit_rss_text
+)
 from .fake.instance import (
     instance_entries_json,
     instance_sources_json_empty,
@@ -308,7 +311,7 @@ class TestResponseObject(PageResponseObject):
 
         if url.startswith("https://www.reddit.com/r/searchengines/.rss"):
             # providy any rss, to have data
-            return webpage_samtime_youtube_rss
+            return reddit_rss_text
 
         if url == "https://www.youtube.com/robots.txt":
             return youtube_robots_txt

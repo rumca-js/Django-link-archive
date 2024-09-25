@@ -97,7 +97,7 @@ def get_request_page_num(request):
 
 class EntriesSearchListView(generic.ListView):
     model = LinkDataController
-    context_object_name = "content_list"
+    context_object_name = "entry_list"
     paginate_by = 100
     template_name = str(ViewPage.get_full_template("linkdatacontroller_list.html"))
 
@@ -180,7 +180,7 @@ class EntriesSearchListView(generic.ListView):
         context["query"] = self.query
 
         self.filter_form = self.get_form()
-        context["filter_form"] = self.filter_form
+        context["form"] = self.filter_form
 
         search_term = get_search_term_request(self.request)
 
@@ -288,7 +288,7 @@ class EntriesSearchListView(generic.ListView):
 
 class EntriesOmniListView(EntriesSearchListView):
     model = LinkDataController
-    context_object_name = "content_list"
+    context_object_name = "entry_list"
     paginate_by = 100
 
     def get_filter(self):
@@ -422,7 +422,7 @@ class EntriesOmniListView(EntriesSearchListView):
 
 class EntriesRecentListView(EntriesOmniListView):
     model = LinkDataController
-    context_object_name = "content_list"
+    context_object_name = "entry_list"
     paginate_by = 100
 
     def get_initial_query_set(self, archive=False):
@@ -450,7 +450,7 @@ class EntriesRecentListView(EntriesOmniListView):
 
 class EntriesNotTaggedView(EntriesOmniListView):
     model = LinkDataController
-    context_object_name = "content_list"
+    context_object_name = "entry_list"
     paginate_by = 100
 
     def get_order_by(self):
@@ -484,7 +484,7 @@ class EntriesNotTaggedView(EntriesOmniListView):
 
 class EntriesBookmarkedListView(EntriesOmniListView):
     model = LinkDataController
-    context_object_name = "content_list"
+    context_object_name = "entry_list"
     paginate_by = 100
 
     def get_initial_query_set(self, archive=False):
@@ -512,18 +512,13 @@ class EntriesBookmarkedListView(EntriesOmniListView):
 
 class UserEntriesBookmarkedListView(EntriesOmniListView):
     model = LinkDataController
-    context_object_name = "content_list"
+    context_object_name = "entry_list"
     paginate_by = 100
 
     def get_initial_query_set(self, archive=False):
+        query_set = super().get_initial_query_set(archive)
         user = self.request.user
-        bookmarks = UserBookmarks.get_user_bookmarks(user)
-        # this returns IDs, not 'objects'
-        if bookmarks and bookmarks.count() > 0:
-            query_set = super().get_initial_query_set(archive)
-
-            result_entries = bookmarks.values_list("entry", flat=True)
-            return query_set.filter(bookmarked=1, id__in=result_entries)
+        return query_set.filter(bookmarks__user__id = user.id)
 
     def has_more_results(self):
         return False
@@ -546,7 +541,7 @@ class UserEntriesBookmarkedListView(EntriesOmniListView):
 
 class EntriesArchiveListView(EntriesSearchListView):
     model = LinkDataController
-    context_object_name = "content_list"
+    context_object_name = "entry_list"
     paginate_by = 100
     template_name = str(ViewPage.get_full_template("linkdatacontroller_list.html"))
 
@@ -685,7 +680,7 @@ class EntryArchivedDetailView(generic.DetailView):
         return view
 
 
-def func_display_empty_form(request, p):
+def func_display_empty_form(request, p, template_name):
     form = LinkInputForm(request=request)
     form.method = "POST"
 
@@ -694,7 +689,7 @@ def func_display_empty_form(request, p):
         "form_description_post"
     ] = "Internet is dangerous, so carefully select which links you add"
 
-    return p.render("form_basic.html")
+    return p.render(template_name)
 
 
 def func_display_init_form(request, p, cleaned_link):
@@ -766,9 +761,9 @@ def func_display_data_form(request, p, data):
     if EntryRules.is_blocked(link):
         errors.append("Entry is blocked by entry rules")
 
-    p.context["notes"] = notes
-    p.context["warnings"] = warnings
-    p.context["errors"] = errors
+    p.context["form_notes"] = notes
+    p.context["form_warnings"] = warnings
+    p.context["form_errors"] = errors
 
     return p.render("form_add_entry.html")
 
@@ -861,10 +856,10 @@ def add_entry(request):
             p.context["summary_text"] = "Could not obtain details from link {}".format(
                 link
             )
-            return p.render("summary_present.html")
+            return p.render("go_back.html")
 
         else:
-            return func_display_empty_form(request, p)
+            return func_display_empty_form(request, p, "form_multiline.html")
 
 
 def add_simple_entry(request):
@@ -897,13 +892,13 @@ def add_simple_entry(request):
             p.context["summary_text"] = "Could not obtain details from link {}".format(
                 link
             )
-            return p.render("summary_present.html")
+            return p.render("go_back.html")
 
         else:
             p.context["summary_text"] = "Form is invalid {}".format(link)
             return p.render("summary_present.html")
     else:
-        return func_display_empty_form(request, p)
+        return func_display_empty_form(request, p, "form_oneliner.html")
 
 
 def entry_update_data(request, pk):
@@ -1138,7 +1133,7 @@ def entries_search_init(request):
     filter_form.method = "GET"
     filter_form.action_url = reverse("{}:entries".format(LinkDatabase.name))
 
-    p.context["filter_form"] = filter_form
+    p.context["form"] = filter_form
 
     search_term = get_search_term_request(request)
     p.context["search_term"] = search_term
@@ -1164,7 +1159,7 @@ def entries_omni_search_init(request):
     filter_form.method = "GET"
     filter_form.action_url = reverse("{}:entries-omni-search".format(LinkDatabase.name))
 
-    p.context["filter_form"] = filter_form
+    p.context["form"] = filter_form
 
     search_term = get_search_term_request(request)
     p.context["search_term"] = search_term
@@ -1192,7 +1187,7 @@ def entries_bookmarked_init(request):
     filter_form.method = "GET"
     filter_form.action_url = reverse("{}:entries-bookmarked".format(LinkDatabase.name))
 
-    p.context["filter_form"] = filter_form
+    p.context["form"] = filter_form
 
     search_term = get_search_term_request(request)
     p.context["search_term"] = search_term
@@ -1220,7 +1215,7 @@ def user_entries_bookmarked_init(request):
     filter_form.method = "GET"
     filter_form.action_url = reverse("{}:user-entries-bookmarked".format(LinkDatabase.name))
 
-    p.context["filter_form"] = filter_form
+    p.context["form"] = filter_form
 
     search_term = get_search_term_request(request)
     p.context["search_term"] = search_term
@@ -1248,7 +1243,7 @@ def entries_recent_init(request):
     filter_form.method = "GET"
     filter_form.action_url = reverse("{}:entries-recent".format(LinkDatabase.name))
 
-    p.context["filter_form"] = filter_form
+    p.context["form"] = filter_form
 
     search_term = get_search_term_request(request)
     p.context["search_term"] = search_term
@@ -1278,7 +1273,7 @@ def entries_archived_init(request):
 
     search_term = get_search_term_request(request)
 
-    p.context["filter_form"] = filter_form
+    p.context["form"] = filter_form
     p.context["search_term"] = search_term
     p.context["entry_query_names"] = LinkDataController.get_query_names()
     p.context["entry_query_operators"] = SingleSymbolEvaluator().get_operators()

@@ -218,10 +218,10 @@ class UserCompactedTags(models.Model):
 
         tags = UserTags.objects.all()
         for tag in tags:
-            compacts = UserCompactedTags.objects.filter(tag=tag.tag, user = tag.user)
+            compacts = UserCompactedTags.objects.filter(tag=tag.tag, user=tag.user)
 
             if compacts.count() == 0:
-                UserCompactedTags.objects.create(tag=tag.tag, count=1)
+                UserCompactedTags.objects.create(tag=tag.tag, count=1, user=tag.user)
             else:
                 compacted = compacts[0]
                 compacted.count += 1

@@ -19,7 +19,7 @@ from ..controllers import (
     EntryWrapper,
     SearchEngines,
 )
-from ..forms import SourceForm, ContentsForm, SourcesChoiceForm
+from ..forms import SourceForm, ContentsForm, SourcesChoiceForm, SourceInputForm
 from ..queryfilters import SourceFilter
 from ..views import ViewPage
 from ..configuration import Configuration
@@ -89,7 +89,7 @@ class SourceListView(generic.ListView):
 
         context["query_filter"] = self.query_filter
 
-        context["filter_form"] = self.filter_form
+        context["form"] = self.filter_form
         context["page_title"] += " - news source list"
 
         return context
@@ -191,7 +191,7 @@ def add_source(request):
 
             if not source:
                 p.context["summary_text"] = "Cannot add source"
-                return p.render("summary_present.html")
+                return p.render("go_back.html")
 
             return HttpResponseRedirect(source.get_absolute_url())
 
@@ -225,13 +225,10 @@ def add_source(request):
 
         p.context["form_description_post"] = form_text
 
-    return p.render("form_source_add.html")
+    return p.render("form_multiline.html")
 
 
 def add_source_simple(request):
-    from ..forms import SourceInputForm
-    from ..controllers import SourceDataController
-
     def get_add_link_form(p, url):
         url = UrlHandler.get_cleaned_link(url)
 
@@ -277,9 +274,9 @@ def add_source_simple(request):
         if data["status_code"] < 200 or data["status_code"] > 300:
             errors.append("Information about page availability could not be obtained")
 
-        p.context["notes"] = notes
-        p.context["warnings"] = warnings
-        p.context["errors"] = errors
+        p.context["form_notes"] = notes
+        p.context["form_warnings"] = warnings
+        p.context["form_errors"] = errors
 
         return p.render("form_source_add.html")
 

@@ -4,7 +4,7 @@ from django.test import TestCase
 
 from ..controllers import LinkDataController, SourceDataController, DomainsController
 from ..configuration import Configuration
-from ..models import UserTags, UserVotes, UserBookmarks, CompactedTags
+from ..models import UserTags, UserVotes, UserBookmarks, CompactedTags, UserCompactedTags
 from utils.dateutils import DateUtils
 
 
@@ -367,7 +367,7 @@ class CompactedTagsTest(TestCase):
             is_superuser=True,
         )
 
-    def test_set_tags(self):
+    def test_cleanup__compacts(self):
         UserTags.objects.all().delete()
 
         data = {}
@@ -395,6 +395,83 @@ class CompactedTagsTest(TestCase):
         CompactedTags.cleanup()
 
         compacts = CompactedTags.objects.all()
+        self.assertEqual(compacts.count(), 2)
+
+        self.assertEqual(compacts[0].count, 2)
+        self.assertEqual(compacts[1].count, 2)
+
+        compact_list = compacts.values_list("tag", flat=True)
+        self.assertTrue("tag1" in compact_list)
+        self.assertTrue("tag2" in compact_list)
+
+
+class UserCompactedTagsTest(TestCase):
+    def setUp(self):
+        c = Configuration.get_object()
+
+        current_time = DateUtils.get_datetime_now_utc()
+        domain = DomainsController.objects.create(
+            domain="https://youtube.com",
+        )
+
+        source_youtube = SourceDataController.objects.create(
+            url="https://youtube.com",
+            title="YouTube",
+            category="No",
+            subcategory="No",
+            export_to_cms=True,
+            remove_after_days=1,
+        )
+
+        self.entry = LinkDataController.objects.create(
+            source_url="https://youtube.com",
+            link="https://youtube.com?v=bookmarked",
+            title="The first link",
+            source=source_youtube,
+            bookmarked=True,
+            language="en",
+            domain=domain,
+            date_published=current_time,
+        )
+
+        self.user = User.objects.create_user(
+            username="test_username", password="testpassword"
+        )
+
+        self.user_super = User.objects.create_user(
+            username="test_username2",
+            password="testpassword",
+            is_superuser=True,
+        )
+
+    def test_cleanup__compacts(self):
+        UserTags.objects.all().delete()
+
+        data = {}
+        data["tag"] = "tag1, tag2"
+
+        UserTags.set_tags(self.entry, data["tag"], self.user)
+
+        # call tested function
+        UserCompactedTags.cleanup()
+
+        compacts = UserCompactedTags.objects.all()
+        self.assertEqual(compacts.count(), 2)
+
+        self.assertEqual(compacts[0].count, 1)
+        self.assertEqual(compacts[1].count, 1)
+
+        compact_list = compacts.values_list("tag", flat=True)
+        self.assertTrue("tag1" in compact_list)
+        self.assertTrue("tag2" in compact_list)
+
+        data["tag"] = "tag1, tag2"
+        UserCompactedTags.set_tags(self.entry, data["tag"], self.user_super)
+
+        # call tested function
+        CompactedTags.cleanup()
+
+        compacts = UserCompactedTags.objects.all()
         self.assertEqual(compacts.count(), 2)
 
         self.assertEqual(compacts[0].count, 2)

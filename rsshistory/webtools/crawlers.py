@@ -349,6 +349,9 @@ class SeleniumDriver(CrawlerInterface):
     Everybody uses selenium
     """
     def __init__(self, request, response_file=None, response_port=None, driver_executable = None, settings=None):
+        if settings and "driver_executable" in settings and settings["driver_executable"]:
+            driver_executable = settings["driver_executable"]
+
         super().__init__(
             request, response_file=response_file, response_port=response_port, settings=settings
         )
@@ -806,6 +809,9 @@ class ScriptCrawler(CrawlerInterface):
      If we have multiple instances/workspaces each can write their own output file
     """
     def __init__(self, request, response_file=None, response_port=None, cwd=None, script=None, settings=None):
+        if settings and "script" in settings and settings["script"]:
+            script = settings["script"]
+
         super().__init__(request = request, response_file = response_file, response_port = response_port, settings=settings)
         self.cwd = cwd
         self.script = script
@@ -893,6 +899,45 @@ class ScriptCrawler(CrawlerInterface):
                 )
             )
 
+    def process_input(self):
+        """
+        TODO these three functions below, could be used
+        """
+        if not self.script:
+            self.response_file = None
+            self.operating_path = None
+            return
+
+        self.operating_path = self.get_operating_dir()
+        self.response_file = self.get_response_file_name(self.operating_path)
+
+    def get_response_file_name(self, operating_path):
+        file_name_url_part = fix_path_for_os(self.request.url)
+        file_name_url_part = file_name_url_part.replace("\\", "")
+        file_name_url_part = file_name_url_part.replace("/", "")
+        file_name_url_part = file_name_url_part.replace("@", "")
+
+        if WebConfig.script_responses_directory is not None:
+            response_dir = Path(WebConfig.script_responses_directory)
+
+        response_file = response_dir / "response_{}.txt".format(file_name_url_part)
+        return response_file
+
+    def get_operating_dir(self):
+        file_path = os.path.realpath(__file__)
+        full_path = Path(file_path)
+
+        if WebConfig.script_operating_dir is None:
+            operating_path = full_path.parents[2]
+        else:
+            operating_path = Path(WebConfig.script_operating_dir)
+
+        if not operating_path.exists():
+            WebLogger.error("Operating path does not exist: {}".format(operating_path))
+            return
+
+        return operating_path
+
     def close(self):
         if self.response_file:
             response_file_location = Path(self.response_file)
@@ -912,6 +957,11 @@ class ServerCrawler(CrawlerInterface):
     Sends request to server, and receives reply
     """
     def __init__(self, request, response_file=None, response_port=None, settings=None, script=None):
+        if settings and "script" in settings and settings["script"]:
+            script = settings["script"]
+        if settings and "port" in settings and settings["port"]:
+            response_port = settings["port"]
+
         super().__init__(request = request, response_file = response_file, response_port = response_port, settings=settings)
         self.script = script
         self.connection = None

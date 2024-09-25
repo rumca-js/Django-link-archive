@@ -58,7 +58,7 @@ class DomainsListView(generic.ListView):
         self.filter_form.method = "GET"
         self.filter_form.action_url = self.get_form_action_link()
 
-        context["filter_form"] = self.filter_form
+        context["form"] = self.filter_form
         context["query_filter"] = self.query_filter
         context["reset_link"] = self.get_reset_link()
 
