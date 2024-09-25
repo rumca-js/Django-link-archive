@@ -7,7 +7,7 @@ Program can operate in various setups, scenarios, but mainly there are three typ
 
 ## Standard list
 
-<div align="center">
+<div align="center" style="border: 2px groove grey;">
   <img alt="Standard list" src="screenshots/entries_list_standard.PNG" style="max-width:700px">
 </div>
 
