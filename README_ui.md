@@ -7,14 +7,14 @@ Program can operate in various setups, scenarios, but mainly there are three typ
 
 ## Standard list
 
-<div align="center" style="border: 2px groove grey;">
+<div align="center" style="border-style: groove; border-width: 7px; border-color: coral;">
   <img alt="Standard list" src="screenshots/entries_list_standard.PNG" style="max-width:700px">
 </div>
 
 ## YouTube list
 
 <div align="center">
-  <img alt="Standard list" src="screenshots/entries_list_youtube.PNG" style="max-width:700px; border: 2px groove blue;">
+  <img alt="Standard list" src="screenshots/entries_list_youtube.PNG" style="max-width:700px; border-style: groove; border-width: 7px; border-color: coral;">
 </div>
 
 ## Search engine view
