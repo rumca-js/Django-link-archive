@@ -14,7 +14,7 @@ Program can operate in various setups, scenarios, but mainly there are three typ
 ## YouTube list
 
 <div align="center">
-  <img alt="Standard list" src="screenshots/entries_list_youtube.PNG" style="max-width:700px">
+  <img alt="Standard list" src="screenshots/entries_list_youtube.PNG" style="max-width:700px; border: 2px groove blue;">
 </div>
 
 ## Search engine view
