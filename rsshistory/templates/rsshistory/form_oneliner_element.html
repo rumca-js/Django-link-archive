@@ -1,4 +1,6 @@
 <form action="{{form.action_url}}" method="{{form.method}}">
+   {% csrf_token %}
+
    {% for field in form %}
         <label for="{{field.id_for_label}}" class="col-form-label">{{field.label}}</label>
 

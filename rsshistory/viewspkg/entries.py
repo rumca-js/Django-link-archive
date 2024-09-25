@@ -765,7 +765,7 @@ def func_display_data_form(request, p, data):
     p.context["form_warnings"] = warnings
     p.context["form_errors"] = errors
 
-    return p.render("form_add_entry.html")
+    return p.render("form_basic.html")
 
 
 def add_entry(request):
@@ -858,8 +858,7 @@ def add_entry(request):
             )
             return p.render("go_back.html")
 
-        else:
-            return func_display_empty_form(request, p, "form_multiline.html")
+        return func_display_empty_form(request, p, "form_entry_add.html")
 
 
 def add_simple_entry(request):
@@ -898,7 +897,7 @@ def add_simple_entry(request):
             p.context["summary_text"] = "Form is invalid {}".format(link)
             return p.render("summary_present.html")
     else:
-        return func_display_empty_form(request, p, "form_oneliner.html")
+        return func_display_empty_form(request, p, "form_entry_add.html")
 
 
 def entry_update_data(request, pk):

@@ -225,7 +225,7 @@ def add_source(request):
 
         p.context["form_description_post"] = form_text
 
-    return p.render("form_multiline.html")
+    return p.render("form_basic.html")
 
 
 def add_source_simple(request):
@@ -278,7 +278,7 @@ def add_source_simple(request):
         p.context["form_warnings"] = warnings
         p.context["form_errors"] = errors
 
-        return p.render("form_source_add.html")
+        return p.render("form_basic.html")
 
     p = ViewPage(request)
     p.set_title("Add source")
@@ -296,11 +296,11 @@ def add_source_simple(request):
         p.context["form"] = form
     elif request.method == "GET" and "link" in request.GET:
         return get_add_link_form(p, request.GET["link"])
-    else:
-        form = SourceInputForm(request=request)
-        form.method = "POST"
 
-        p.context["form"] = form
+    form = SourceInputForm(request=request)
+    form.method = "POST"
+
+    p.context["form"] = form
 
     return p.render("form_source_add.html")
 
