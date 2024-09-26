@@ -49,7 +49,7 @@ max_transaction_timeout_s = 40
 #
 
 
-requests = []  # date, connection, request
+requests = []  # {date, connection, request}
 
 
 def run_script(script, request, port):
@@ -77,8 +77,10 @@ def delete_connection(c):
 
         if c == connection:
             del requests[index]
-            c.close()
-            break
+    try:
+        c.close()
+    except Exception as E:
+        print(str(E))
 
 
 def delete_request_connection(url):
@@ -91,10 +93,16 @@ def delete_request_connection(url):
 
 
 def permanent_error(string_error):
-    error_text = traceback.format_exc()
+    """
+    Access from multiple thread. Exception can occur
+    """
+    try:
+        error_text = traceback.format_exc()
 
-    with open("server_errors.txt", "w") as fh:
-        fh.write("Error:{}\n{}".format(string_error, error_text))
+        with open("server_errors.txt", "a") as fh:
+            fh.write("Error:{}\n{}".format(string_error, error_text))
+    except Exception as E:
+        print(str(E))
 
 
 def handle_connection_inner(c, address, port):
@@ -256,7 +264,7 @@ def remove_stale_connections():
 
         diff = datetime.now() - dt
 
-        if diff.total_seconds() > 40:
+        if diff.total_seconds() > request.timeout_s + 10:
             to_delete.append(connection)
 
     for connection in to_delete:
@@ -275,34 +283,45 @@ def remove_temporary_files():
 
 
 def handle_connection(conn, address, port):
-    now = datetime.now()
-    print(
-        "[{}] Handling connection from:{}. Requests len:{}".format(
-            now, str(address), len(requests)
-        )
-    )
-
-    c = SocketConnection(conn)
     try:
-        handle_connection_inner(c, address, port)
-    except Exception as E:
-        error_text = "Exception during handling command:{}".format(str(E))
-        permanent_error(error_text)
-
-        delete_connection(c)
-
-    c.close()
-
-    now = datetime.now()
-    print(
-        "[{}] Handling connection from:{} DONE. Requests len:{}.".format(
-            now, str(address), len(requests)
+        now = datetime.now()
+        print(
+            "[{}] Handling connection from:{}. Requests len:{}".format(
+                now, str(address), len(requests)
+            )
         )
-    )
+
+        c = SocketConnection(conn)
+        try:
+            handle_connection_inner(c, address, port)
+        except Exception as E:
+            error_text = "Exception during handling command:{}".format(str(E))
+            permanent_error(error_text)
+
+            delete_connection(c)
+
+        c.close()
+
+        now = datetime.now()
+        print(
+            "[{}] Handling connection from:{} DONE. Requests len:{}.".format(
+                now, str(address), len(requests)
+            )
+        )
+    except Exception as E:
+        error_text = traceback.format_exc()
+        print(error_text)
+        permanent_error(str(E))
+        permanent_error(error_text)
 
 
 class ScrapingServer(object):
     def __init__(self, host=None, port=None):
+
+        p = Path("server_errors.txt")
+        if p.exists():
+            p.unlink()
+
         if host:
             self.host = host
         else:
@@ -367,9 +386,19 @@ class ScrapingServer(object):
             print(str(E))
             error_text = traceback.format_exc()
             print(error_text)
+            permanent_error(str(E))
+            permanent_error(error_text)
 
-        print("Closing")
-        server_socket.close()
+        try:
+            print("Closing")
+            server_socket.close()
+
+        except Exception as E:
+            print(str(E))
+            error_text = traceback.format_exc()
+            print(error_text)
+            permanent_error(str(E))
+            permanent_error(error_text)
 
     def close(self):
         self.close_request = True

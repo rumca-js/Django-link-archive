@@ -4,14 +4,16 @@
 
 <h1 class="mb-0">{{form_title}}</h1>
 
-<div>
-{{form_description_pre| safe}}
-</div>
+<div style="margin-top: 20vh;">
+    <div>
+    {{form_description_pre| safe}}
+    </div>
 
-{% include "rsshistory/form_oneliner_element.html" %}
+    {% include "rsshistory/form_oneliner_element.html" %}
 
-<div>
-{{form_description_post| safe}}
+    <div>
+    {{form_description_post| safe}}
+    </div>
 </div>
 
 {% endblock %}

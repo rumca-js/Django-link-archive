@@ -2,11 +2,10 @@
 {% load static %}
 {% block content %}
 
-<div class="contentbuttonmenu">
+<div style="margin-top: 20vh;">
+    {% include "rsshistory/form_oneliner_element.html" %}
+
+    {% include "rsshistory/source_help_element.html" %}
 </div>
-
-{% include "rsshistory/form_oneliner_element.html" %}
-
-{% include "rsshistory/source_help_element.html" %}
 
 {% endblock %}

@@ -162,7 +162,7 @@ class HttpRequestBuilder(object):
                     continue
                 settings = crawler_data["settings"]
 
-                WebLogger.debug("Running crawler {}".format(crawler)) # TODO make it debug
+                WebLogger.debug("Running crawler {}".format(crawler))
                 c = crawler(request=request, settings=settings)
                 c.run()
                 response = c.get_response()

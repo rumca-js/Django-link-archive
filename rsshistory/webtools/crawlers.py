@@ -11,6 +11,7 @@ import os
 import subprocess
 
 from utils.dateutils import DateUtils
+from utils.basictypes import fix_path_for_os
 
 from .webtools import (
     PageResponseObject,
@@ -110,7 +111,10 @@ class CrawlerInterface(object):
 
     def save_response(self):
         if not self.response:
-            WebLogger.error("Have not received response")
+            if self.request:
+                WebLogger.error("Url:{} Have not received response".format(self.request.url))
+            else:
+                WebLogger.error("Have not received response")
             return False
 
         all_bytes = self.response_to_bytes()
@@ -816,6 +820,23 @@ class ScriptCrawler(CrawlerInterface):
         self.cwd = cwd
         self.script = script
 
+        if not self.cwd:
+            self.cwd = self.get_main_path()
+
+        if not self.response_file:
+            from .webconfig import WebConfig
+            if WebConfig.script_responses_directory is not None:
+                response_dir = Path(WebConfig.script_responses_directory)
+            else:
+                response_dir = Path("storage")
+
+            self.response_file = self.get_main_path() / response_dir / self.get_response_file_name()
+
+    def get_main_path(self):
+        file_path = os.path.realpath(__file__)
+        full_path = Path(file_path)
+        return full_path.parents[2]
+
     def run(self):
         if not self.is_valid():
             return
@@ -827,16 +848,6 @@ class ScriptCrawler(CrawlerInterface):
             request_url=self.request.url,
         )
 
-        file_path = os.path.realpath(__file__)
-        full_path = Path(file_path)
-
-        if self.cwd:
-            operating_path = self.cwd
-        else:
-            operating_path = os.path.realpath(__file__)
-            operating_path = Path(file_path)
-            #operating_path.parents[2]
-
         response_file_location = Path(self.response_file)
 
         if len(response_file_location.parents) > 1:
@@ -844,7 +855,7 @@ class ScriptCrawler(CrawlerInterface):
             if not response_dir.exists():
                 response_dir.mkdir(parents=True, exist_ok=True)
 
-        file_abs = operating_path / response_file_location
+        file_abs = response_file_location
         if file_abs.exists():
             file_abs.unlink()
 
@@ -852,20 +863,22 @@ class ScriptCrawler(CrawlerInterface):
             self.request.url, self.response_file, self.request.timeout_s
         )
 
-        WebLogger.error(
-            "Url:{} Running script:{} Request:{}".format(self.request.url, script, self.request)
-        )
-        WebLogger.error(
-                "Response location:{}. Operat:{}".format(response_file_location, operating_path)
-        )
+        #WebLogger.error("Response:{}".format(self.response_file))
+        #WebLogger.error("CWD:{}".format(self.cwd))
+        #WebLogger.error("maintl:{}".format(self.get_main_path()))
+        #WebLogger.error("script:{}".format(script))
 
-        p = subprocess.run(
-            script,
-            shell=True,
-            capture_output=True,
-            cwd=operating_path,
-            timeout=self.request.timeout_s + 10, # add more time for closing browser, etc
-        )
+        try:
+            p = subprocess.run(
+                script,
+                shell=True,
+                capture_output=True,
+                cwd=self.cwd,
+                timeout=self.request.timeout_s + 10, # add more time for closing browser, etc
+            )
+        except subprocess.TimeoutExpired as E:
+            WebLogger.exc(E, "Cannot run sucessfully script, or timeout")
+            return self.response
 
         if p.returncode != 0:
             if p.stdout:
@@ -890,6 +903,7 @@ class ScriptCrawler(CrawlerInterface):
                 self.response = get_response_from_bytes(all_bytes)
 
             file_abs.unlink()
+
             return self.response
 
         else:
@@ -911,16 +925,13 @@ class ScriptCrawler(CrawlerInterface):
         self.operating_path = self.get_operating_dir()
         self.response_file = self.get_response_file_name(self.operating_path)
 
-    def get_response_file_name(self, operating_path):
+    def get_response_file_name(self):
         file_name_url_part = fix_path_for_os(self.request.url)
         file_name_url_part = file_name_url_part.replace("\\", "")
         file_name_url_part = file_name_url_part.replace("/", "")
         file_name_url_part = file_name_url_part.replace("@", "")
 
-        if WebConfig.script_responses_directory is not None:
-            response_dir = Path(WebConfig.script_responses_directory)
-
-        response_file = response_dir / "response_{}.txt".format(file_name_url_part)
+        response_file = "response_{}.txt".format(file_name_url_part)
         return response_file
 
     def get_operating_dir(self):

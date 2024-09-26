@@ -4,7 +4,6 @@ these scripts will not work in case of multithreaded app
 """
 import os
 from pathlib import Path
-from utils.basictypes import fix_path_for_os
 from .webtools import WebLogger
 
 from .crawlers import (

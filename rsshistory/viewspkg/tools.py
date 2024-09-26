@@ -53,7 +53,7 @@ def page_show_properties(request):
         p.context["page_url"] = page_url
         p.context["page_handler"] = page_handler
         p.context["page_handler_type"] = str(type(page_handler))
-        p.context["is_link_allowed"] = DomainCache.get_object(page_link).is_allowed(
+        p.context["is_link_allowed"] = DomainCache.get_object(page_link, url_builder = UrlHandler).is_allowed(
             page_link
         )
         p.context["method"] = options.mode
@@ -117,7 +117,7 @@ def get_scan_contents_links(link, contents):
 
 
 def page_scan_link(request):
-    def render_page_scan_input(p, link):
+    def render_page_scan_input(p, link, template="form_basic.html"):
         h = UrlHandler(link)
         contents = h.get_contents()
 
@@ -153,7 +153,7 @@ def page_scan_link(request):
             return p.render("form_basic.html")
         else:
             link = request.GET["link"]
-            return render_page_scan_input(p, link)
+            return render_page_scan_input(p, link, "form_oneliner.html")
 
 
 def page_add_many_links(request):
@@ -446,7 +446,7 @@ def download_video_pk(request, pk):
 
 def is_url_allowed(request):
     def is_url_allowed_internal(p, url):
-        c = DomainCache.get_object(url)
+        c = DomainCache.get_object(url, url_builder=UrlHandler)
         status = c.is_allowed(url)
 
         if status:

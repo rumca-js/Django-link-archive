@@ -42,7 +42,6 @@ try:
         BeautifulSoupCrawlingContext,
     )
     from crawlee.basic_crawler import BasicCrawler
-    from crawlee.basic_crawler.types import BasicCrawlingContext
     from crawlee.playwright_crawler import PlaywrightCrawler, PlaywrightCrawlingContext
 except Exception as E:
     print(str(E))

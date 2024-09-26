@@ -741,7 +741,7 @@ def func_display_data_form(request, p, data):
 
     config = Configuration.get_object().config_entry
 
-    info = DomainCache.get_object(link)
+    info = DomainCache.get_object(link, url_builder=UrlHandler)
 
     if config.prefer_https and link.find("http://") >= 0:
         warnings.append(
