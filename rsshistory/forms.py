@@ -329,6 +329,7 @@ class LinkInputForm(forms.Form):
         self.init = UserRequest(args, kwargs)
         super().__init__(*args, **kwargs)
         self.fields["link"].widget.attrs.update(size=self.init.get_cols_size())
+        self.fields["link"].widget.attrs["placeholder"] = "Input URL"
 
     def get_information(self):
         return self.cleaned_data
@@ -342,6 +343,7 @@ class SourceInputForm(forms.Form):
         super().__init__(*args, **kwargs)
 
         self.fields["url"].widget.attrs.update(size=self.init.get_cols_size())
+        self.fields["url"].widget.attrs["placeholder"] = "Input URL"
 
     def get_information(self):
         return self.cleaned_data
@@ -378,6 +380,8 @@ class UrlContentsForm(forms.Form):
         self.init = UserRequest(args, kwargs)
         super().__init__(*args, **kwargs)
 
+        self.fields["url"].widget.attrs["placeholder"] = "Input URL"
+
 
 class ExportTopicForm(forms.Form):
     tag = forms.CharField(label="Tag", max_length=500)
@@ -390,14 +394,6 @@ class TagForm(forms.Form):
     """
 
     tag = forms.CharField(label="Tag name", max_length=500)
-
-
-class YouTubeLinkSimpleForm(forms.Form):
-    """
-    links form
-    """
-
-    youtube_link = forms.CharField(label="YouTube Link URL", max_length=500)
 
 
 class InitSearchForm(forms.Form):
@@ -415,33 +411,69 @@ class InitSearchForm(forms.Form):
         self.fields["search"].widget.attrs.update(size=self.init.get_cols_size())
 
 
+from django.forms.widgets import TextInput
+from django.utils.safestring import mark_safe
+import json
+import html
+
+class DatalistTextInput(TextInput):
+    def __init__(self, attrs=None):
+        super().__init__( attrs)
+        if 'list' not in self.attrs or 'datalist' not in self.attrs:
+            raise ValueError(
+              'DatalistTextInput widget is missing required attrs "list" or "datalist"')
+        self.datalist_name = self.attrs['list']
+
+        text = self.attrs.pop('datalist')
+        self.datalist = text
+
+    def render(self, **kwargs):
+        datalist = self.datalist
+
+        print("render kwargs:{}".format(kwargs))
+
+        #DEBUG( self, kwargs)
+        original_part = super().render( **kwargs)
+
+        opts = ' '.join(
+            [ f'<option>{x}</option>' for x in datalist]
+        )
+
+        part2 = f'<datalist id="{self.datalist_name}">{opts}</datalist>'
+
+        return original_part + part2
+
+
 class OmniSearchForm(forms.Form):
     """
     Omni search form
     """
 
-    search = forms.CharField(label="Search", max_length=500, required=False)
-    search_history = forms.CharField(widget=forms.Select(choices=[]), required=False)
+    search = forms.CharField(label="Search", max_length=500, required=False,
+        widget = DatalistTextInput( attrs={
+                    'list':'',
+                    'datalist': [],
+                    'placeholder' : "Type to search..."
+                    }
+            ))
 
     def __init__(self, *args, **kwargs):
         self.init = UserRequest(args, kwargs)
-        user_choices = self.init.pop_data(args, kwargs, "user_choices")
-        if not user_choices:
-            user_choices = []
-        user_choices = OmniSearchForm.get_user_choices(user_choices)
+        search_history = self.init.pop_data(args, kwargs, "user_choices")
+        if not search_history:
+            search_history = []
 
         super().__init__(*args, **kwargs)
 
         attr = {"onchange": "this.form.submit()"}
-        self.fields["search_history"].widget = forms.Select(
-            choices=user_choices, attrs=attr
-        )
 
+        self.fields["search"].widget = DatalistTextInput( attrs={
+                        'list':'foolist',
+                        'datalist': search_history,
+                        'placeholder' : "Type to search..."
+                        }
+                )
         self.fields["search"].widget.attrs.update(size=self.init.get_cols_size())
-
-        if self.init.user:
-            if not self.init.user.is_authenticated:
-                self.fields["search_history"].widget = forms.HiddenInput()
 
         if self.init.is_mobile:
             # TODO setting size does not work
@@ -449,27 +481,6 @@ class OmniSearchForm(forms.Form):
             # self.fields["search_history"].widget.attrs.update(width="100%")
             # self.fields["search_history"].widget.attrs.update(width="10px")
             pass
-
-    def set_choices(self, choices):
-        self.fields["search_history"].widget = forms.Select(choices=choices)
-
-    def get_user_choices(choices):
-        result = []
-        result.append([None, None])
-
-        for row, choice in enumerate(choices):
-            limit = OmniSearchForm.get_search_history_length()
-            if len(choice) > limit:
-                new_choice = choice[:limit] + "(...)"
-            else:
-                new_choice = choice
-            # result.append([choice, new_choice])
-            result.append([choice, choice])
-
-        return result
-
-    def get_search_history_length():
-        return 30
 
 
 class OmniSearchWithArchiveForm(OmniSearchForm):
@@ -482,14 +493,10 @@ class OmniSearchWithArchiveForm(OmniSearchForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        if self.init.user:
-            if not self.init.user.is_authenticated:
-                self.fields["search_history"].widget = forms.HiddenInput()
-
 
 class EntryForm(forms.ModelForm):
     """
-    Category choice form
+    Used to edit entry
     """
 
     class Meta:
@@ -579,7 +586,7 @@ class EntryArchiveForm(forms.ModelForm):
 
 class SourceForm(forms.ModelForm):
     """
-    Category choice form
+    Used to edit sources
     """
 
     class Meta:
@@ -798,133 +805,6 @@ class SourcesChoiceForm(forms.Form):
             result.append([subcategory.subcategory, subcategory.subcategory])
 
         return result
-
-
-class BasicEntryChoiceForm(forms.Form):
-    search = forms.CharField(label="Search", max_length=1000, required=False)
-    category = forms.CharField(widget=forms.Select(choices=()), required=False)
-    subcategory = forms.CharField(widget=forms.Select(choices=()), required=False)
-    # fmt: off
-    source_id = forms.CharField(label="Source", widget=forms.Select(choices=()), required=False)
-    # fmt: on
-
-    def __init__(self, *args, **kwargs):
-        self.init = UserRequest(args, kwargs)
-        super().__init__(*args, **kwargs)
-
-    def create(self):
-        # how to unpack dynamic forms
-        # https://stackoverflow.com/questions/60393884/how-to-pass-choices-dynamically-into-a-django-form
-        condition1 = Q(enabled=True)  # & Q(proxy_location = "")
-        self.sources = SourceDataController.objects.filter(condition1)
-
-        category_choices = self.get_sources_values("category")
-        subcategory_choices = self.get_sources_values("subcategory")
-        title_choices = self.get_sources_ids_values("title")
-
-        # custom javascript code
-        # https://stackoverflow.com/questions/10099710/how-to-manually-create-a-select-field-from-a-modelform-in-django
-        attr = {"onchange": "this.form.submit()"}
-
-        self.fields["category"].widget = forms.Select(
-            choices=category_choices, attrs=attr
-        )
-        self.fields["subcategory"].widget = forms.Select(
-            choices=subcategory_choices, attrs=attr
-        )
-        self.fields["source_id"].widget = forms.Select(
-            choices=title_choices, attrs=attr
-        )
-
-        self.fields["search"].widget.attrs.update(size=self.init.get_cols_size())
-
-    def get_categories(self):
-        result = []
-        result.append(["", ""])
-
-        for category in SourceCategories.objects.filter(enabled=True):
-            if category and category != "":
-                result.append([category.category, category.category])
-
-        return result
-
-    def get_subcategories(self):
-        result = []
-        result.append(["", ""])
-
-        for subcategory in SourceSubCategories.objects.filter(enabled=True):
-            if subcategory and subcategory != "":
-                result.append([subcategory.subcategory, subcategory.subcategory])
-
-        return result
-
-    def get_sources_values(self, field):
-        values = set()
-        values.add("")
-
-        if self.sources.count() > 0:
-            for val in self.sources.values(field):
-                values.add(val[field])
-
-        dict_values = self.to_dict(values)
-
-        return dict_values
-
-    def get_sources_ids_values(self, field):
-        values = []
-        values.append(("", ""))
-
-        if self.sources.count() > 0:
-            for atuple in self.sources.values_list("id", field):
-                new_val = atuple[1]
-
-                if self.init.is_mobile:
-                    if len(new_val) > 25:
-                        new_val = new_val[:25] + "(...)"
-
-                values.append([atuple[0], new_val])
-
-        return values
-
-    def to_dict(self, alist):
-        result = []
-        for item in sorted(alist):
-            result.append((item, item))
-        return result
-
-
-class EntryBookmarksChoiceForm(BasicEntryChoiceForm):
-    """
-    Category choice form
-    """
-
-    # do not think too much about these settings, these will be overriden by 'create' method
-    title = forms.CharField(label="title", max_length=1000, required=False)
-    tag = forms.CharField(label="tag", max_length=500, required=False)
-    vote = forms.IntegerField(label="vote", required=False)
-
-
-class EntryRecentChoiceForm(BasicEntryChoiceForm):
-    pass
-
-
-class EntryChoiceForm(BasicEntryChoiceForm):
-    """
-    Category choice form
-    """
-
-    # do not think too much about these settings, these will be overriden by 'create' method
-    title = forms.CharField(label="title", max_length=1000, required=False)
-    bookmarked = forms.BooleanField(required=False, initial=False)
-    language = forms.CharField(label="language", max_length=10, required=False)
-    user = forms.CharField(label="user", max_length=500, required=False)
-    tag = forms.CharField(label="tag", max_length=500, required=False)
-    vote = forms.IntegerField(label="vote", required=False)
-    artist = forms.CharField(label="artist", max_length=1000, required=False)
-    album = forms.CharField(label="album", max_length=1000, required=False)
-    date_to = forms.DateField(required=False, initial=my_date_to)
-    date_from = forms.DateField(required=False, initial=my_date_from)
-    archive = forms.BooleanField(required=False, initial=False)
 
 
 class CommentEntryForm(forms.Form):

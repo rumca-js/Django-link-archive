@@ -7,18 +7,16 @@
 </p>
 
 <div class="collapse" id="collapseExample">
-  <div class="card card-body">
-      <ul>
-      {% for search_engine in search_engines.get %}
-      <li>
+   <ul class="list-group list-group-flush">
+   {% for search_engine in search_engines.get %}
+      <li class="list-group-item">
          <a href="{{search_engine.get_search_string}}" title="{{search_engine.get_title}}">
               {% include "rsshistory/icon_external.html" %}
               {{search_engine.get_name}}
          </a>
       </li>
-      {% endfor %}
-      </ul>
- </div>
+   {% endfor %}
+   </ul>
 </div>
 
 {% endif %}

@@ -41,10 +41,7 @@ from ..controllers import (
 )
 from ..forms import (
     EntryForm,
-    EntryChoiceForm,
     ConfigForm,
-    EntryBookmarksChoiceForm,
-    EntryRecentChoiceForm,
     EntryArchiveForm,
     OmniSearchForm,
     InitSearchForm,
@@ -247,7 +244,7 @@ class EntriesSearchListView(generic.ListView):
         return reverse("{}:entries".format(LinkDatabase.name))
 
     def get_form_instance(self):
-        return EntryChoiceForm(self.request.GET, request=self.request)
+        raise NotImplementedError("Not implemented")
 
     def get_form(self):
         filter_form = self.get_form_instance()
@@ -388,7 +385,7 @@ class EntriesOmniListView(EntriesSearchListView):
         config = Configuration.get_object().config_entry
 
         user = self.request.user
-        user_choices = UserSearchHistory.get_user_choices(user)
+        self.search_history = UserSearchHistory.get_user_choices(user)
 
         initial = {}
         if "search" in self.request.GET and self.request.GET["search"]:
@@ -396,15 +393,23 @@ class EntriesOmniListView(EntriesSearchListView):
         if "search_history" in self.request.GET and self.request.GET["search_history"]:
             initial["search"] = self.request.GET["search_history"]
 
+        # TODO enabled view with archive?
+
+        """
         if config.days_to_move_to_archive == 0:
             f = OmniSearchForm(
-                initial=initial, user_choices=user_choices, request=self.request
+                initial=initial, user_choices=self.search_history, request=self.request
             )
             return f
         else:
             return OmniSearchWithArchiveForm(
-                initial=initial, user_choices=user_choices, request=self.request
+                initial=initial, user_choices=self.search_history, request=self.request
             )
+        """
+        f = OmniSearchForm(
+            initial=initial, user_choices=self.search_history, request=self.request
+        )
+        return f
 
     def get_form(self):
         filter_form = self.get_form_instance()
@@ -418,6 +423,12 @@ class EntriesOmniListView(EntriesSearchListView):
 
     def get_query_type(self):
         return "omni"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["search_history"] = self.search_history
+
+        return context
 
 
 class EntriesRecentListView(EntriesOmniListView):
@@ -539,7 +550,7 @@ class UserEntriesBookmarkedListView(EntriesOmniListView):
         return "bookmarked"
 
 
-class EntriesArchiveListView(EntriesSearchListView):
+class EntriesArchiveListView(EntriesOmniListView):
     model = LinkDataController
     context_object_name = "entry_list"
     paginate_by = 100
@@ -561,9 +572,6 @@ class EntriesArchiveListView(EntriesSearchListView):
 
     def get_view_link(self):
         return reverse("{}:entries-archived".format(LinkDatabase.name))
-
-    def get_form_instance(self):
-        return EntryChoiceForm(self.request.GET, request=self.request)
 
     def get_title(self):
         return " - Archived"
@@ -765,7 +773,7 @@ def func_display_data_form(request, p, data):
     p.context["form_warnings"] = warnings
     p.context["form_errors"] = errors
 
-    return p.render("form_basic.html")
+    return p.render("form_entry_add.html")
 
 
 def add_entry(request):
@@ -897,7 +905,7 @@ def add_simple_entry(request):
             p.context["summary_text"] = "Form is invalid {}".format(link)
             return p.render("summary_present.html")
     else:
-        return func_display_empty_form(request, p, "form_entry_add.html")
+        return func_display_empty_form(request, p, "form_entry_add_simple.html")
 
 
 def entry_update_data(request, pk):
@@ -1137,7 +1145,8 @@ def entries_search_init(request):
     search_term = get_search_term_request(request)
     p.context["search_term"] = search_term
     p.context["search_engines"] = SearchEngines(search_term)
-    p.context["user_choices"] = user_choices
+    p.context["search_history"] = user_choices
+    p.context["view_link"] = filter_form.action_url
 
     return p.render("form_search_init.html")
 
@@ -1165,7 +1174,8 @@ def entries_omni_search_init(request):
     p.context["entry_query_names"] = LinkDataController.get_query_names()
     p.context["entry_query_operators"] = SingleSymbolEvaluator().get_operators()
     p.context["search_engines"] = SearchEngines(search_term)
-    p.context["user_choices"] = user_choices
+    p.context["search_history"] = user_choices
+    p.context["view_link"] = filter_form.action_url
 
     return p.render("form_search_init.html")
 
@@ -1193,7 +1203,8 @@ def entries_bookmarked_init(request):
     p.context["entry_query_names"] = LinkDataController.get_query_names()
     p.context["entry_query_operators"] = SingleSymbolEvaluator().get_operators()
     p.context["search_engines"] = SearchEngines(search_term)
-    p.context["user_choices"] = user_choices
+    p.context["search_history"] = user_choices
+    p.context["view_link"] = filter_form.action_url
 
     return p.render("form_search_init.html")
 
@@ -1221,7 +1232,8 @@ def user_entries_bookmarked_init(request):
     p.context["entry_query_names"] = LinkDataController.get_query_names()
     p.context["entry_query_operators"] = SingleSymbolEvaluator().get_operators()
     p.context["search_engines"] = SearchEngines(search_term)
-    p.context["user_choices"] = user_choices
+    p.context["search_history"] = user_choices
+    p.context["view_link"] = filter_form.action_url
 
     return p.render("form_search_init.html")
 
@@ -1249,7 +1261,7 @@ def entries_recent_init(request):
     p.context["entry_query_names"] = LinkDataController.get_query_names()
     p.context["entry_query_operators"] = SingleSymbolEvaluator().get_operators()
     p.context["search_engines"] = SearchEngines(search_term)
-    p.context["user_choices"] = user_choices
+    p.context["search_history"] = user_choices
 
     return p.render("form_search_init.html")
 
@@ -1277,7 +1289,7 @@ def entries_archived_init(request):
     p.context["entry_query_names"] = LinkDataController.get_query_names()
     p.context["entry_query_operators"] = SingleSymbolEvaluator().get_operators()
     p.context["search_engines"] = SearchEngines(search_term)
-    p.context["user_choices"] = user_choices
+    p.context["search_history"] = user_choices
 
     return p.render("form_search_init.html")
 

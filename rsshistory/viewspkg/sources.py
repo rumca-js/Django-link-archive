@@ -225,7 +225,7 @@ def add_source(request):
 
         p.context["form_description_post"] = form_text
 
-    return p.render("form_basic.html")
+    return p.render("form_source_add.html")
 
 
 def add_source_simple(request):
@@ -278,7 +278,7 @@ def add_source_simple(request):
         p.context["form_warnings"] = warnings
         p.context["form_errors"] = errors
 
-        return p.render("form_basic.html")
+        return p.render("form_source_add.html")
 
     p = ViewPage(request)
     p.set_title("Add source")
@@ -302,7 +302,7 @@ def add_source_simple(request):
 
     p.context["form"] = form
 
-    return p.render("form_source_add.html")
+    return p.render("form_source_add_simple.html")
 
 
 def edit_source(request, pk):

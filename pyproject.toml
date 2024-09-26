@@ -45,7 +45,7 @@ undetected-chromedriver = "^3.5.5"
 
 # [optional] use things below if you want to use crawlee
 # example: crawleebeautifulsoup.py, crawleeplaywright.py
-crawlee="^0.1.1"
+crawlee="^0.3.7"
 playwright="*"
 lxml="^5.2.2"
 

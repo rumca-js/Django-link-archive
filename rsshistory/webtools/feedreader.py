@@ -288,28 +288,30 @@ class FeedReader(object):
     def process_html(self):
         # TODO what if we have < html?
         html_wh = self.contents.strip().find("<html")
-        rss_wh = self.contents.strip().find("<rss")
-        feed_wh = self.contents.strip().find("<feed")
 
         if html_wh != -1:
-            if rss_wh == -1 and feed_wh == -1:
-                if self.process_html_raw():
+            rss_wh = self.contents.strip().find("<rss")
+            if rss_wh != -1:
+                if self.process_html_raw("rss"):
                     return True
 
-                rss_wh = self.contents.strip().find("&gt;rss")
-                if rss_wh != -1:
-                    if self.process_html_encoded():
-                        return True
+            feed_wh = self.contents.strip().find("<feed")
+            if feed_wh != -1:
+                if self.process_html_raw("feed"):
+                    return True
 
-    def process_html_raw(self):
-        wh = self.contents.find("<rss")
+            rss_wh = self.contents.strip().find("&gt;rss")
+            if rss_wh != -1:
+                if self.process_html_encoded():
+                    return True
+
+    def process_html_raw(self, tag):
+        wh = self.contents.find("<"+tag)
         if wh == -1:
-            self.contents = None
             return False
 
-        last_wh = self.contents.rfind("</rss>")
+        last_wh = self.contents.rfind("</{}>".format(tag))
         if last_wh == -1:
-            self.contents = None
             return False
 
         # +4 to compensate for &gt; text
@@ -320,12 +322,10 @@ class FeedReader(object):
     def process_html_encoded(self):
         wh = self.contents.find("&lt;")
         if wh == -1:
-            self.contents = None
             return False
 
         last_wh = self.contents.rfind("&gt;")
         if last_wh == -1:
-            self.contents = None
             return False
 
         # +4 to compensate for &gt; text
