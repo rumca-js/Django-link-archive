@@ -20,7 +20,7 @@ version is split into three digits:
  if a change requires the model to be changed, then second digit is updated, patch is set to 0
  if something should be released to public, then release version changes
 """
-__version__ = "0.86.4"
+__version__ = "0.86.5"
 
 
 class Configuration(object):
@@ -109,10 +109,6 @@ class Configuration(object):
         self.apply_user_agent()
         self.apply_robots_txt()
         self.apply_web_logger()
-        self.apply_crawling_scripts()
-
-        c = self.config_entry
-        WebConfig.selenium_driver_location = c.selenium_driver_path
 
         if Browser.objects.all().count() == 0:
             Browser.read_browser_setup()
@@ -127,15 +123,6 @@ class Configuration(object):
         from .webtools import HttpPageHandler
 
         HttpPageHandler.user_agent = self.config_entry.user_agent
-
-    def apply_crawling_scripts(self):
-        from .webtools import WebConfig
-
-        c = self.config_entry
-
-        WebConfig.crawling_full_script = c.crawling_full_script
-        WebConfig.crawling_headless_script = c.crawling_headless_script
-        WebConfig.crawling_server_port = c.crawling_server_port
 
     def apply_robots_txt(self):
         from .webtools import DomainCache

@@ -75,7 +75,7 @@ class Browser(models.Model):
                 except Exception as E:
                     AppLogging.exc("Cannot dumps browser settings")
 
-                enabled = index == 0
+                enabled = browser_config["enabled"]
 
                 conf = Browser.objects.create(enabled=enabled, mode = mode, crawler = browser_config["crawler"], settings=settings)
                 index += 1

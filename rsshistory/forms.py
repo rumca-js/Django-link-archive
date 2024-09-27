@@ -136,10 +136,6 @@ class ConfigForm(forms.ModelForm):
             "user_headers",
             "internet_test_page",
             "respect_robots_txt",
-            "crawling_server_port",
-            "crawling_headless_script",
-            "crawling_full_script",
-            "selenium_driver_path",
             # user
             "track_user_actions",
             "track_user_searches",
@@ -459,9 +455,12 @@ class OmniSearchForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         self.init = UserRequest(args, kwargs)
-        search_history = self.init.pop_data(args, kwargs, "user_choices")
-        if not search_history:
-            search_history = []
+        full_search_history = self.init.pop_data(args, kwargs, "user_choices")
+
+        search_history = []
+        if full_search_history:
+            for search in full_search_history:
+                search_history.append(search.search_query)
 
         super().__init__(*args, **kwargs)
 

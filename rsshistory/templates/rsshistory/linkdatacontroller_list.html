@@ -4,13 +4,7 @@
 
   {% include "rsshistory/linkdatacontroller_list_actions.html" %}
 
-  {% include "rsshistory/form_filter_element.html" %}
-
-  <div class="collapse" id="searchHistoryCollapse">
-      <div class="card card-body">
-          {% include "rsshistory/search_history_element.html" %} 
-      </div> 
-  </div> 
+  {% include "rsshistory/form_filter_oneliner_element.html" %}
 
   {% if rss_are_fetched %}
     <div class="spinner-border text-danger" role="status">

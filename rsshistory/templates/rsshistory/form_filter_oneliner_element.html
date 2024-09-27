@@ -1,33 +1,22 @@
 {% load static %}
 
-<!-- this element should be uesd by lists, to filter elements -->
+<!-- this element should be uesd by lists, to filter elements, where one line of input is enough -->
 
 <form action="{{form.action_url}}" method="{{form.method}}">
-    {% for field in form %}
-       {% if field.is_hidden %}
-       <div style="display:none">
-       {% else %}
-       <div class="form-group row m-0 p-0">
-       {% endif %}
-          <label for="{{field.id_for_label}}" class="col-sm-2 col-form-label my-0 py-0">{{field.label}}</label>
-          <div class="col-sm-10 my-0 py-0">
-             <div>
-             {{field }}
-             </div>
-	     {% if field.help_text %}
-             <small id="{{field.id_for_label}}_help" class="form-text text-muted">
-               {{field.help_text | safe }}
-             </small>
-	     {% endif %}
-          </div>
-       </div>
-    {% endfor %}
+   {% csrf_token %}
 
-    <div class="mt-2">
+   {% for field in form %}
+        <label for="{{field.id_for_label}}" class="col-form-label">{{field.label}}</label>
+
+        <span>
+        {{field }}
+        </span>
+   {% endfor %}
+
     {% if form_submit_button_name %}
-       <button type="submit" value="Search" class="btn btn-primary" role="button">{{form_submit_button_name}}</button>
+       <button type="submit" value="{{form_submit_button_name}}" class="btn btn-primary" role="button">{{form_submit_button_name}}</button>
     {% else %}
-       <button type="submit" value="Search" class="btn btn-primary" role="button">Search</button>
+       <button type="submit" value="Submit" class="btn btn-primary" role="button">Submit</button>
     {% endif %}
 
     {% if search_history %}
@@ -35,7 +24,6 @@
           Search history
         </a>
     {% endif %}
-    </div>
 </form>
 
 {% if search_history %}
@@ -44,6 +32,7 @@
    </div> 
 {% endif %}
 
+{% if form.errors.items %}
 <ul>
   {% for field, errors in form.errors.items %}
     {% for error in errors %}
@@ -51,6 +40,7 @@
     {% endfor %}
   {% endfor %}
 </ul>
+{% endif %}
 
 {% if form_errors %}
   <div style="color:red">

@@ -16,6 +16,7 @@
     {% endif %}
 </form>
 
+{% if form.errors.items %}
 <ul>
   {% for field, errors in form.errors.items %}
     {% for error in errors %}
@@ -23,6 +24,7 @@
     {% endfor %}
   {% endfor %}
 </ul>
+{% endif %}
 
 {% if form_errors %}
   <div style="color:red">

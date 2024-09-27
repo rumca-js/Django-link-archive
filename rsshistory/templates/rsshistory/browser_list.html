@@ -27,20 +27,20 @@ Browsers are chosen using this list. Order of appearance is important.
              </div>
 
              <div>
-                 <a href="{% url 'rsshistory:browser-edit' browser.id %}" title="Edits browser" class="btn btn-primary" role="button">
+                 <a href="{% url 'rsshistory:browser-edit' browser.id %}" title="Edits browser" class="btn btn-secondary btn-sm" role="button">
                     <img src="{% static 'rsshistory/icons/icons8-edit-100.png' %}" class="content-icon" />
                  </a>
 
                  {% if browser.enabled %}
-                 <a href="{% url 'rsshistory:browser-disable' browser.id %}" title="Disables browser" class="btn btn-primary" role="button">
+                 <a href="{% url 'rsshistory:browser-disable' browser.id %}" title="Disables browser" class="btn btn-secondary btn-sm" role="button">
                    {% include "rsshistory/icon_disable.html" %}
                  </a>
                  {% else %}
-                 <a href="{% url 'rsshistory:browser-enable' browser.id %}" title="Enables browser" class="btn btn-primary" role="button">
+                 <a href="{% url 'rsshistory:browser-enable' browser.id %}" title="Enables browser" class="btn btn-secondary btn-sm" role="button">
                    {% include "rsshistory/icon_enable.html" %}
                  </a>
                  {% endif %}
-                 <a href="{% url 'rsshistory:browser-remove' browser.id %}" title="Removes browser" class="btn btn-primary" role="button">
+                 <a href="{% url 'rsshistory:browser-remove' browser.id %}" title="Removes browser" class="btn btn-secondary btn-sm" role="button">
                    {% include "rsshistory/icon_remove.html" %}
                  </a>
              </div>

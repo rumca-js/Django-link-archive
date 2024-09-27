@@ -156,17 +156,15 @@ class HttpRequestBuilder(object):
 
         if mode in mode_mapping:
             for crawler_data in mode_mapping[mode]:
-                crawler = WebConfig.get_crawler_from_string(crawler_data["crawler"])
+                crawler = WebConfig.get_crawler_from_mapping(request, crawler_data)
                 if not crawler:
-                    WebLogger.error("Cannot find crawler in WebConfig:{}".format(crawler_data["crawler"]))
+                    WebLogger.debug("Cannot find crawler in WebConfig:{}".format(crawler_data["crawler"]))
                     continue
-                settings = crawler_data["settings"]
 
-                WebLogger.debug("Running crawler {}".format(crawler))
-                c = crawler(request=request, settings=settings)
-                c.run()
-                response = c.get_response()
-                c.close()
+                WebLogger.debug("Url:{}: Running crawler {}".format(request.url, type(crawler)))
+                crawler.run()
+                response = crawler.get_response()
+                crawler.close()
                 if response:
                     return response
 

@@ -41,7 +41,7 @@
           <div>{{info.info_text}}</div>
 
           {% if info.detail_text %}
-            <a class="btn btn-secondary" data-bs-toggle="collapse" href="#collapseDetails{{info.id}}" role="button" aria-expanded="false" aria-controls="collapseDetails{{info.id}}">
+            <a class="btn btn-secondary btn-sm" data-bs-toggle="collapse" href="#collapseDetails{{info.id}}" role="button" aria-expanded="false" aria-controls="collapseDetails{{info.id}}">
                 Show Details
             </a>
             <div class="collapse" id="collapseDetails{{info.id}}"><pre>{{info.detail_text}}</pre></div>

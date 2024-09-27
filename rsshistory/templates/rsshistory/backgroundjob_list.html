@@ -52,32 +52,32 @@
 
 	 <div>
 	  {% if job.get_link %}
-	     <a href={{job.get_link}} class="btn btn-secondary mb-2" rule="button">Object</a>
+	     <a href={{job.get_link}} class="btn btn-secondary btn-sm mb-2" rule="button">Object</a>
 	  {% endif %}
 	 </div>
 
 	 <div>
             {% if job.enabled %}
-            <a href="{% url 'rsshistory:backgroundjob-disable' job.id %}" class="btn btn-secondary" role="button" title="Disable job">
+            <a href="{% url 'rsshistory:backgroundjob-disable' job.id %}" class="btn btn-secondary btn-sm" role="button" title="Disable job">
                 {% include "rsshistory/icon_disable.html" %}
             </a>
             {% else %}
-            <a href="{% url 'rsshistory:backgroundjob-enable' job.id %}" class="btn btn-secondary" role="button" title="Enable job">
+            <a href="{% url 'rsshistory:backgroundjob-enable' job.id %}" class="btn btn-secondary btn-sm" role="button" title="Enable job">
                 {% include "rsshistory/icon_enable.html" %}
             </a>
             {% endif %}
 
-            <a href="{% url 'rsshistory:backgroundjob-prio-up' job.id %}" class="btn btn-secondary" role="button" title="Increase priority">
+            <a href="{% url 'rsshistory:backgroundjob-prio-up' job.id %}" class="btn btn-secondary btn-sm" role="button" title="Increase priority">
                <img src="{% static 'rsshistory/icons/icons8-up-100.png' %}" class="content-icon" />
             </a>
-            <a href="{% url 'rsshistory:backgroundjob-prio-down' job.id %}" class="btn btn-secondary" role="button" title="Decrease priority">
+            <a href="{% url 'rsshistory:backgroundjob-prio-down' job.id %}" class="btn btn-secondary btn-sm" role="button" title="Decrease priority">
                <img src="{% static 'rsshistory/icons/icons8-down-100.png' %}" class="content-icon" />
             </a>
 
-            <a href="{% url 'rsshistory:backgroundjob-remove' job.id %}" class="btn btn-secondary" role="button" title="Remove job">
+            <a href="{% url 'rsshistory:backgroundjob-remove' job.id %}" class="btn btn-secondary btn-sm" role="button" title="Remove job">
                {% include "rsshistory/icon_remove.html" %}
             </a>
-            <a href="{% url 'rsshistory:backgroundjobs-remove' job.job %}" class="btn btn-secondary" role="button" title="Remove all in type">
+            <a href="{% url 'rsshistory:backgroundjobs-remove' job.job %}" class="btn btn-secondary btn-sm" role="button" title="Remove all in type">
                <img src="{% static 'rsshistory/icons/icons8-trash-multiple-100.png' %}" class="content-icon" />
                Type
             </a>

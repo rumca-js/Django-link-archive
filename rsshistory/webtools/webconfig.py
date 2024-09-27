@@ -22,20 +22,13 @@ class WebConfig(object):
     API to configure webtools
     """
 
-    crawling_headless_script = None
-    crawling_full_script = None
-    crawling_server_port = None
-
     script_operating_dir = None
     script_responses_directory = Path("storage")
-    selenium_driver_location = None
 
     browser_mapping = {}
 
     def init():
-        p = Path("/usr/bin/chromedriver")
-        if p.exists():
-            WebConfig.selenium_driver_location = str(p)
+        pass
 
     def get_modes():
         return [
@@ -49,6 +42,7 @@ class WebConfig(object):
             "RequestsCrawler",
             "SeleniumChromeHeadless", # requires driver location
             "SeleniumChromeFull", # requires driver location
+            "SeleniumUndetected", # requires driver location
             "ScriptCrawler", # requires script
             "ServerCrawler", # requires script & port
         ]
@@ -63,57 +57,137 @@ class WebConfig(object):
             return SeleniumChromeHeadless
         elif input_string == "SeleniumChromeFull":
             return SeleniumChromeFull
+        elif input_string == "SeleniumUndetected":
+            return SeleniumUndetected
         elif input_string == "ScriptCrawler":
             return ScriptCrawler
         elif input_string == "ServerCrawler":
             return ServerCrawler
 
-    def get_init_crawler_config():
+    def get_crawler_from_mapping(request, mapping_data):
+        crawler = WebConfig.get_crawler_from_string(mapping_data["crawler"])
+        if not crawler:
+            return
+
+        settings = mapping_data["settings"]
+
+        c = crawler(request=request, settings=settings)
+        if c.is_valid():
+            return c
+
+    def get_init_crawler_config(headless_script = None, full_script = None, port=None):
+        """
+        Caller may provide scripts
+        """
         mapping = {}
 
         # one of the methods should be available
+        from .ipc import DEFAULT_PORT, SocketConnection
 
-        std_preference_table = [
-                {"crawler" : "RequestsCrawler", "settings":{}},
-                {"crawler" : "ServerCrawler", "settings":{"port": WebConfig.crawling_server_port, "script" : WebConfig.crawling_headless_script }},
-                {"crawler" : "ScriptCrawler", "settings":{"script" : WebConfig.crawling_headless_script}},
-                {"crawler" : "SeleniumChromeHeadless", "settings":{"driver_executable" : "/usr/local/bin"}},
-                {"crawler" : "ServerCrawler", "settings":{"port": WebConfig.crawling_server_port, "script" : WebConfig.crawling_full_script }},
-                {"crawler" : "ScriptCrawler", "settings":{"script" : WebConfig.crawling_full_script}},
-                {"crawler" : "SeleniumChromeFull", "settings" : {"driver_executable" : "/usr/local/bin"}},
-        ]
+        if not port:
+            port = DEFAULT_PORT
+
+            c = SocketConnection()
+            if not c.connect(host = SocketConnection.gethostname(), port = port):
+                port = None
+                c.close()
+
+        try:
+            import os
+            from crawlee.beautifulsoup_crawler import BeautifulSoupCrawler
+
+            poetry_path = ""
+            if "POETRY_ENV" in os.environ:
+                poetry_path = os.environ["POETRY_ENV"] + "/bin/"
+
+            if full_script is None:
+                full_script = poetry_path + "poetry run python crawleebeautifulsoup.py"
+            if headless_script is None:
+                headless_script = poetry_path + "poetry run python crawleebeautifulsoup.py"
+        except:
+            pass
+
+        std_preference_table = []
+
+        std_preference_table.append(WebConfig.get_requests())
+        std_preference_table.append(WebConfig.get_servercralwer(port, headless_script))
+        std_preference_table.append(WebConfig.get_scriptcralwer(headless_script))
+        std_preference_table.append(WebConfig.get_seleniumheadless())
+        std_preference_table.append(WebConfig.get_servercralwer(port, full_script))
+        std_preference_table.append(WebConfig.get_scriptcralwer(full_script))
+        std_preference_table.append(WebConfig.get_seleniumfull())
 
         mapping["standard"] = std_preference_table
 
         # one of the methods should be available
 
-        headless_preference_table = [
-                {"crawler" : "ServerCrawler", "settings":{"port": WebConfig.crawling_server_port, "script" : WebConfig.crawling_headless_script }},
-                {"crawler" : "ScriptCrawler", "settings":{"script" : WebConfig.crawling_headless_script}},
-                {"crawler" : "SeleniumChromeHeadless", "settings":{"driver_executable" : "/usr/local/bin"}},
-                {"crawler" : "ServerCrawler", "settings":{"port": WebConfig.crawling_server_port, "script" : WebConfig.crawling_full_script }},
-                {"crawler" : "ScriptCrawler", "settings":{"script" : WebConfig.crawling_full_script}},
-                {"crawler" : "SeleniumChromeFull", "settings" : {"driver_executable" : "/usr/local/bin"}},
-                {"crawler" : "RequestsCrawler", "settings" : {}},
-        ]
+        headless_preference_table = []
+
+        headless_preference_table.append(WebConfig.get_servercralwer(port, headless_script))
+        headless_preference_table.append(WebConfig.get_scriptcralwer(headless_script))
+        headless_preference_table.append(WebConfig.get_seleniumheadless())
+        headless_preference_table.append(WebConfig.get_servercralwer(port, full_script))
+        headless_preference_table.append(WebConfig.get_scriptcralwer(full_script))
+        headless_preference_table.append(WebConfig.get_seleniumfull())
+        headless_preference_table.append(WebConfig.get_requests())
 
         mapping["headless"] = headless_preference_table
 
         # one of the methods should be available
 
-        full_preference_table = [
-                {"crawler" : "ServerCrawler", "settings":{"port": WebConfig.crawling_server_port, "script" : WebConfig.crawling_full_script }},
-                {"crawler" : "ScriptCrawler", "settings":{"script" : WebConfig.crawling_full_script}},
-                {"crawler" : "SeleniumChromeFull", "settings" : {"driver_executable" : "/usr/local/bin"}},
-                {"crawler" : "ServerCrawler", "settings":{"port": WebConfig.crawling_server_port, "script" : WebConfig.crawling_headless_script }},
-                {"crawler" : "ScriptCrawler", "settings":{"script" : WebConfig.crawling_headless_script}},
-                {"crawler" : "SeleniumChromeHeadless", "settings":{"driver_executable" : "/usr/local/bin"}},
-                {"crawler" : "RequestsCrawler", "settings" : {}},
-        ]
+
+        full_preference_table = []
+
+        full_preference_table.append(WebConfig.get_servercralwer(port, full_script))
+        full_preference_table.append(WebConfig.get_scriptcralwer(full_script))
+        full_preference_table.append(WebConfig.get_seleniumfull())
+        full_preference_table.append(WebConfig.get_servercralwer(port, headless_script))
+        full_preference_table.append(WebConfig.get_scriptcralwer(headless_script))
+        full_preference_table.append(WebConfig.get_seleniumheadless())
+        full_preference_table.append(WebConfig.get_requests())
 
         mapping["full"] = full_preference_table
 
         return mapping
+
+    def get_requests():
+        return {"enabled" : True, "crawler" : "RequestsCrawler", "settings":{}}
+
+    def get_servercralwer(port, script):
+        if port and script:
+            return {"enabled" : True, "crawler" : "ServerCrawler", "settings":{"port": port, "script" : script }}
+        else:
+            return {"enabled" : False, "crawler" : "ServerCrawler", "settings":{"port": port, "script" : script }}
+
+    def get_scriptcralwer(script):
+        if script:
+            return {"enabled" : True, "crawler" : "ScriptCrawler", "settings":{"script" : script}}
+        else:
+            return {"enabled" : False, "crawler" : "ScriptCrawler", "settings":{"script" : script}}
+
+    def get_seleniumheadless():
+        chromedriver_path = Path("/usr/bin/chromedriver")
+
+        if chromedriver_path.exists():
+            return {"enabled" : True, "crawler" : "SeleniumChromeHeadless", "settings":{"driver_executable" : str(chromedriver_path)}}
+        else:
+            return {"enabled" : True, "crawler" : "SeleniumChromeHeadless", "settings":{"driver_executable" : None}}
+
+    def get_seleniumfull():
+        chromedriver_path = Path("/usr/bin/chromedriver")
+
+        if chromedriver_path.exists():
+            return {"enabled" : True, "crawler" : "SeleniumChromeFull", "settings":{"driver_executable" : str(chromedriver_path)}}
+        else:
+            return {"enabled" : True, "crawler" : "SeleniumChromeFull", "settings":{"driver_executable" : None}}
+
+    def get_seleniumundetected():
+        chromedriver_path = Path("/usr/bin/chromedriver")
+
+        if chromedriver_path.exists():
+            return {"enabled" : True, "crawler" : "SeleniumUndetected", "settings":{"driver_executable" : str(chromedriver_path)}}
+        else:
+            return {"enabled" : True, "crawler" : "SeleniumUndetected", "settings":{"driver_executable" : None}}
 
     def use_logger(Logger):
         WebLogger.web_logger = Logger

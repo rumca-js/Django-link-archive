@@ -98,11 +98,7 @@ class UserSearchHistory(models.Model):
             : UserSearchHistory.get_choices_limit()
         ]
 
-        for q in qs:
-            if q.search_query not in choices:
-                choices.append(q.search_query)
-
-        return choices
+        return qs
 
     def delete_old_entries(user):
         qs = UserSearchHistory.objects.filter(user=user).order_by("date")

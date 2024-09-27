@@ -21,7 +21,7 @@
                  <div>{{user.username}}</div>
                  {% endwith %}
 
-                 <a href="{% url 'rsshistory:api-key-remove' apikey_object.id %}" title="Remove api key" class="btn btn-primary" role="button">
+                 <a href="{% url 'rsshistory:api-key-remove' apikey_object.id %}" title="Remove api key" class="btn btn-secondary btn-sm" role="button">
                      <img src="{% static 'rsshistory/icons/icons8-trash-multiple-100.png' %}" class="content-icon" />
                  </a>
              </div>

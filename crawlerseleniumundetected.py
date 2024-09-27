@@ -10,11 +10,12 @@ import argparse
 import sys
 
 from rsshistory import webtools
+from rsshistory.webtools import WebConfig
 
 
 def main():
-    webtools.WebConfig.init()
-    webtools.WebConfig.use_print_logging() 
+    WebConfig.init()
+    WebConfig.use_print_logging() 
 
     parser = webtools.ScriptCrawlerParser()
     parser.parse()
@@ -25,7 +26,11 @@ def main():
 
     request = parser.get_request()
 
-    driver = webtools.SeleniumUndetected(request, parser.args.output_file, parser.args.port, driver_executable=WebConfig.selenium_driver_location)
+    selenium_config = WebConfig.get_seleniumundetected()
+    driver = WebConfig.get_crawler_from_mapping(request, selenium_config)
+
+    driver.response_file = parser.args.output_file
+    driver.response_port = parser.args.port
 
     if parser.args.verbose:
         print("Running request:{} with SeleniumUndetected".format(request))

@@ -9,11 +9,12 @@ import argparse
 import sys
 
 from rsshistory import webtools
+from rsshistory.webtools import WebConfig
 
 
 def main():
-    webtools.WebConfig.use_print_logging() 
-    webtools.WebConfig.init()
+    WebConfig.use_print_logging() 
+    WebConfig.init()
 
     parser = webtools.ScriptCrawlerParser()
     parser.parse()
@@ -23,7 +24,11 @@ def main():
 
     request = parser.get_request()
 
-    driver = webtools.SeleniumChromeHeadless(request, parser.args.output_file, parser.args.port, driver_executable=WebConfig.selenium_driver_location)
+    selenium_config = WebConfig.get_seleniumheadless()
+    driver = WebConfig.get_crawler_from_mapping(request, selenium_config)
+
+    driver.response_file = parser.args.output_file
+    driver.response_port = parser.args.port
 
     if parser.args.verbose:
         print("Running request:{} with SeleniumChromeHeadless".format(request))

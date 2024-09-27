@@ -268,32 +268,6 @@ class ConfigurationEntry(models.Model):
         help_text="Use robots.txt information. Some functionality can not work: for example YouTube channels",
     )
 
-    crawling_server_port = models.IntegerField(
-        default=0,
-        help_text=f"If this port is configured, then advanced crawling occurs through this server. 0 means not configured. By default server uses {DEFAULT_PORT}",
-    )
-
-    crawling_headless_script = models.CharField(
-        blank=True,
-        max_length=1000,
-        null=True,
-        help_text="Script that is called when headless request needs to be made. Will be supplied with --url '$URL' -o '$RESPONSE_FILE'",
-    )
-
-    crawling_full_script = models.CharField(
-        blank=True,
-        max_length=1000,
-        null=True,
-        help_text="Script that is called when full request needs to be made. Will be supplied with --url '$URL' -o '$RESPONSE_FILE'",
-    )
-
-    selenium_driver_path = models.CharField(
-        blank=True,
-        max_length=1000,
-        null=True,
-        help_text="For Linux commonly it is /usr/bin/chromedriver. If not specified, driver will not be called with any executable",
-    )
-
     # User settings
 
     track_user_actions = models.BooleanField(
