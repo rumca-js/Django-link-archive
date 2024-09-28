@@ -70,7 +70,6 @@ Manages link meta information.
 
  - [Screenshots](https://github.com/rumca-js/Django-link-archive/blob/main/README_ui.md)
  - [Installation, configuration](https://github.com/rumca-js/Django-link-archive/blob/main/README_install.md)
- - [https://renegat0x0.ddns.net/apps/programming/](https://renegat0x0.ddns.net/apps/programming/) - programming demo instance
  - [https://renegat0x0.ddns.net/apps/catalog/](https://renegat0x0.ddns.net/apps/catalog/) - instance which looks like YouTube replacement
  - [https://renegat0x0.ddns.net/apps/various/](https://renegat0x0.ddns.net/apps/various/) - demo instance, which contains various things
  - [Notes about search industry](https://github.com/rumca-js/Django-link-archive/blob/main/README_search.md)
