@@ -1345,7 +1345,7 @@ def download_entry(request, pk):
 
     p.context["summary_text"] = summary_text
 
-    return p.render("summary_present.html")
+    return p.render("go_back.html")
 
 
 def wayback_save(request, pk):
@@ -1363,7 +1363,7 @@ def wayback_save(request, pk):
     else:
         p.context["summary_text"] = "Waybacksave is disabled for links"
 
-    return p.render("summary_present.html")
+    return p.render("go_back.html")
 
 
 def entry_json(request, pk):

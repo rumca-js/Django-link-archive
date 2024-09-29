@@ -182,12 +182,12 @@ def page_add_many_links(request):
                     BackgroundJobController.link_add(link, tag=tag, user=request.user)
 
         p.context["summary_text"] = "Added links"
-        return p.render("summary_present.html")
+        return p.render("go_back.html")
 
     else:
         p.context["summary_text"] = "Error"
 
-        return p.render("summary_present.html")
+        return p.render("go_back.html")
 
 
 def page_scan_contents(request):
@@ -297,7 +297,7 @@ def download_url(request):
         BackgroundJobController.download_file(url)
 
         p.context["summary_text"] = "Added to download queue"
-        return p.render("summary_present.html")
+        return p.render("go_back.html")
 
     p = ViewPage(request)
     p.set_title("Download url")
@@ -336,7 +336,7 @@ def download_music(request):
         BackgroundJobController.download_music_url(url)
 
         p.context["summary_text"] = "Added to download queue"
-        return p.render("summary_present.html")
+        return p.render("go_back.html")
 
     p = ViewPage(request)
     p.set_title("Download music")
@@ -375,7 +375,7 @@ def download_video(request):
         BackgroundJobController.download_video_url(url)
 
         p.context["summary_text"] = "Added to download queue"
-        return p.render("summary_present.html")
+        return p.render("go_back.html")
 
     p = ViewPage(request)
     p.set_title("Download video")
@@ -423,7 +423,7 @@ def download_music_pk(request, pk):
 
     BackgroundJobController.download_music(ft[0])
 
-    return p.render("summary_present.html")
+    return p.render("go_back.html")
 
 
 def download_video_pk(request, pk):
@@ -441,7 +441,7 @@ def download_video_pk(request, pk):
 
     BackgroundJobController.download_video(ft[0])
 
-    return p.render("summary_present.html")
+    return p.render("go_back.html")
 
 
 def is_url_allowed(request):

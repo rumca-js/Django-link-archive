@@ -125,12 +125,12 @@ def tag_entry(request, pk):
 
     if not entries.exists():
         p.context["summary_text"] = "Sorry, such object does not exist"
-        return p.render("summary_present.html")
+        return p.render("go_back.html")
 
     entry = entries[0]
     if not entry.is_taggable():
         p.context["summary_text"] = "Sorry, only bookmarked objects can be tagged"
-        return p.render("summary_present.html")
+        return p.render("go_back.html")
 
     if request.method == "POST":
         method = "POST"
@@ -181,7 +181,7 @@ def tag_entry(request, pk):
         p.context["form_description"] = entry.title
         p.context["form_description_pre"] = entry.link
 
-    return p.render("form_basic.html")
+    return p.render("form_oneliner.html")
 
 
 def tag_remove(request, pk):
@@ -434,4 +434,4 @@ def entry_vote(request, pk):
         p.context["form_title"] = obj.title
         p.context["form_description"] = obj.title
 
-    return p.render("form_basic.html")
+    return p.render("form_oneliner.html")

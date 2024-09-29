@@ -1296,6 +1296,9 @@ class HtmlPage(ContentInterface):
         if not image:
             image = self.get_schema_field("thumbnailUrl")
 
+        if not image:
+            image = self.get_schema_field("image")
+
         # do not return favicon here.
         # we use thumbnails in <img, but icons do not work correctly there
 
@@ -1388,6 +1391,11 @@ class HtmlPage(ContentInterface):
                     favicons[full_favicon] = ""
 
         return favicons
+
+    def get_favicon(self):
+        favicons = self.get_favicons()
+        for favicon in favicons:
+            return favicon
 
     def get_tags(self):
         if not self.contents:

@@ -326,6 +326,7 @@ class LinkInputForm(forms.Form):
         super().__init__(*args, **kwargs)
         self.fields["link"].widget.attrs.update(size=self.init.get_cols_size())
         self.fields["link"].widget.attrs["placeholder"] = "Input URL"
+        self.fields["link"].widget.attrs["autofocus"] = True
 
     def get_information(self):
         return self.cleaned_data
@@ -340,6 +341,7 @@ class SourceInputForm(forms.Form):
 
         self.fields["url"].widget.attrs.update(size=self.init.get_cols_size())
         self.fields["url"].widget.attrs["placeholder"] = "Input URL"
+        self.fields["url"].widget.attrs["autofocus"] = True
 
     def get_information(self):
         return self.cleaned_data
@@ -390,6 +392,11 @@ class TagForm(forms.Form):
     """
 
     tag = forms.CharField(label="Tag name", max_length=500)
+
+    def __init__(self, *args, **kwargs):
+        self.init = UserRequest(args, kwargs)
+        super().__init__(*args, **kwargs)
+        self.fields["tag"].widget.attrs["autofocus"] = True
 
 
 class InitSearchForm(forms.Form):
@@ -473,6 +480,7 @@ class OmniSearchForm(forms.Form):
                         }
                 )
         self.fields["search"].widget.attrs.update(size=self.init.get_cols_size())
+        self.fields["search"].widget.attrs["autofocus"] = True
 
         if self.init.is_mobile:
             # TODO setting size does not work
@@ -843,6 +851,7 @@ class LinkVoteForm(forms.Form):
             MaxValueValidator(config.vote_max),
             MinValueValidator(config.vote_min),
         ]
+        self.fields["vote"].widget.attrs["autofocus"] = True
 
 
 class BrowserEditForm(forms.ModelForm):

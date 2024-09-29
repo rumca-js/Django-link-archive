@@ -466,10 +466,10 @@ class UserCompactedTagsTest(TestCase):
         self.assertTrue("tag2" in compact_list)
 
         data["tag"] = "tag1, tag2"
-        UserCompactedTags.set_tags(self.entry, data["tag"], self.user_super)
+        UserTags.set_tags(self.entry, data["tag"], self.user_super)
 
         # call tested function
-        CompactedTags.cleanup()
+        UserCompactedTags.cleanup()
 
         compacts = UserCompactedTags.objects.all()
         self.assertEqual(compacts.count(), 2)

@@ -10,7 +10,7 @@ from ..controllers import (
     DomainsController,
     BackgroundJobController,
 )
-from ..models import KeyWords, DataExport, UserTags
+from ..models import ReadLater
 
 from .fakeinternet import FakeInternetTestCase
 
@@ -52,7 +52,7 @@ class ReadLaterViewsTest(FakeInternetTestCase):
             language="en",
         )
 
-        url = reverse("{}:read-later-add".format(LinkDatabase.name))
+        url = reverse("{}:read-later-add".format(LinkDatabase.name), args=[entry.id])
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
@@ -69,7 +69,9 @@ class ReadLaterViewsTest(FakeInternetTestCase):
             language="en",
         )
 
-        url = reverse("{}:read-later-remove".format(LinkDatabase.name))
+        read_later = ReadLater.objects.create(entry = entry, user = self.user)
+
+        url = reverse("{}:read-later-remove".format(LinkDatabase.name), args=[read_later.id])
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)

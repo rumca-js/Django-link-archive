@@ -36,7 +36,6 @@ app_name = str(LinkDatabase.name)
 urlpatterns = [
     path("", system.index, name="index"),
     # entries
-    path("entries/", entries.EntriesSearchListView.as_view(), name="entries"),
     path("entries-recent/", entries.EntriesRecentListView.as_view(), name="entries-recent"),
     path("entries-archived/", entries.EntriesArchiveListView.as_view(), name="entries-archived"),
     path("entries-untagged/", entries.EntriesNotTaggedView.as_view(), name="entries-untagged"),

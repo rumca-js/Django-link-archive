@@ -25,70 +25,70 @@
 <h1>Jobs [{{BackgroundJob}}]</h1>
 
 {% if content_list %}
-<div class="container list-group">
-    {% for job in content_list %}
-      <div class="my-1 p-1 list-group-item list-group-item-action"
-         title="{{job.date_created}} {{job.job}} {{job.task}} {{job.subject}} {{job.args}}"
-         >
-	 <div>
-          {{ job.id }}
-          {% if not job.enabled %}
-          [DISABLED]
-          {% endif %}
-          {% if job.errors > 0 %}
-          ERRORS: {{job.errors}}
-          {% endif %}
+  <div class="container list-group">
+     {% for job in content_list %}
+        <div class="my-1 p-1 list-group-item list-group-item-action"
+           title="{{job.date_created}} {{job.job}} {{job.task}} {{job.subject}} {{job.args}}"
+           >
+           <div>
+              {{ job.id }}
+              {% if not job.enabled %}
+              [DISABLED]
+              {% endif %}
+              {% if job.errors > 0 %}
+              ERRORS: {{job.errors}}
+              {% endif %}
 
-          [{{job.date_created}}] {{job.priority}} <b>{{job.job}}</b> 
+              [{{job.date_created}}] {{job.priority}} <b>{{job.job}}</b> 
 
-	  {% if job.is_subject_link %}
-	     <a href={{job.subject}}>{{job.subject}}</a>
-	  {% else %}
-	     {{job.subject}}
-	  {% endif %}
+              {% if job.is_subject_link %}
+                 <a href={{job.subject}}>{{job.subject}}</a>
+              {% else %}
+                 {{job.subject}}
+              {% endif %}
 
-	  {{job.args}} 
-	 </div>
+              {{job.args}} 
+           </div>
 
-	 <div>
-	  {% if job.get_link %}
-	     <a href={{job.get_link}} class="btn btn-secondary btn-sm mb-2" rule="button">Object</a>
-	  {% endif %}
-	 </div>
-
-	 <div>
-            {% if job.enabled %}
-            <a href="{% url 'rsshistory:backgroundjob-disable' job.id %}" class="btn btn-secondary btn-sm" role="button" title="Disable job">
-                {% include "rsshistory/icon_disable.html" %}
-            </a>
-            {% else %}
-            <a href="{% url 'rsshistory:backgroundjob-enable' job.id %}" class="btn btn-secondary btn-sm" role="button" title="Enable job">
-                {% include "rsshistory/icon_enable.html" %}
-            </a>
+           <div>
+            {% if job.get_link %}
+               <a href={{job.get_link}} class="btn btn-secondary btn-sm mb-2" rule="button">Object</a>
             {% endif %}
+           </div>
 
-            <a href="{% url 'rsshistory:backgroundjob-prio-up' job.id %}" class="btn btn-secondary btn-sm" role="button" title="Increase priority">
-               <img src="{% static 'rsshistory/icons/icons8-up-100.png' %}" class="content-icon" />
-            </a>
-            <a href="{% url 'rsshistory:backgroundjob-prio-down' job.id %}" class="btn btn-secondary btn-sm" role="button" title="Decrease priority">
-               <img src="{% static 'rsshistory/icons/icons8-down-100.png' %}" class="content-icon" />
-            </a>
+           <div>
+              {% if job.enabled %}
+              <a href="{% url 'rsshistory:backgroundjob-disable' job.id %}" class="btn btn-secondary btn-sm" role="button" title="Disable job">
+                  {% include "rsshistory/icon_disable.html" %}
+              </a>
+              {% else %}
+              <a href="{% url 'rsshistory:backgroundjob-enable' job.id %}" class="btn btn-secondary btn-sm" role="button" title="Enable job">
+                  {% include "rsshistory/icon_enable.html" %}
+              </a>
+              {% endif %}
 
-            <a href="{% url 'rsshistory:backgroundjob-remove' job.id %}" class="btn btn-secondary btn-sm" role="button" title="Remove job">
-               {% include "rsshistory/icon_remove.html" %}
-            </a>
-            <a href="{% url 'rsshistory:backgroundjobs-remove' job.job %}" class="btn btn-secondary btn-sm" role="button" title="Remove all in type">
-               <img src="{% static 'rsshistory/icons/icons8-trash-multiple-100.png' %}" class="content-icon" />
-               Type
-            </a>
-	 </div>
-      </div>
-  {% endfor %}
-  {% include "rsshistory/pagination.html" %}
+              <a href="{% url 'rsshistory:backgroundjob-prio-up' job.id %}" class="btn btn-secondary btn-sm" role="button" title="Increase priority">
+                 <img src="{% static 'rsshistory/icons/icons8-up-100.png' %}" class="content-icon" />
+              </a>
+              <a href="{% url 'rsshistory:backgroundjob-prio-down' job.id %}" class="btn btn-secondary btn-sm" role="button" title="Decrease priority">
+                 <img src="{% static 'rsshistory/icons/icons8-down-100.png' %}" class="content-icon" />
+              </a>
+
+              <a href="{% url 'rsshistory:backgroundjob-remove' job.id %}" class="btn btn-secondary btn-sm" role="button" title="Remove job">
+                 {% include "rsshistory/icon_remove.html" %}
+              </a>
+              <a href="{% url 'rsshistory:backgroundjobs-remove' job.job %}" class="btn btn-secondary btn-sm" role="button" title="Remove all in type">
+                 <img src="{% static 'rsshistory/icons/icons8-trash-multiple-100.png' %}" class="content-icon" />
+                 Type
+              </a>
+           </div>
+        </div>
+     {% endfor %}
+
+     {% include "rsshistory/pagination.html" %}
 
   </div>
   {% else %}
     Currently no jobs
-</div>
-{% endif %}
+  {% endif %}
 {% endblock %}

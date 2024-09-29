@@ -414,12 +414,6 @@ def init_sources(request):
             i.import_all()
 
 
-def init_selenium_driver(configuration_entry):
-    p = Path("/usr/bin/chromedriver")
-    if p.exists():
-        configuration_entry.selenium_driver_path = str(p)
-
-
 def wizard_setup_news(request):
     """
     Displays form, or textarea of available links.
@@ -456,7 +450,6 @@ def wizard_setup_news(request):
 
     c.initialized = True
 
-    init_selenium_driver(c)
     c.save()
 
     init_sources(request)
@@ -502,7 +495,6 @@ def wizard_setup_gallery(request):
 
     c.initialized = True
 
-    init_selenium_driver(c)
     c.save()
 
     init_sources(request)
@@ -550,7 +542,6 @@ def wizard_setup_search_engine(request):
 
     c.initialized = True
 
-    init_selenium_driver(c)
     c.save()
 
     init_sources(request)

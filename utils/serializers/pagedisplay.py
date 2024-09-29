@@ -23,6 +23,7 @@ class PageDisplay(object):
         print("Language:{}".format(u.get_language()))
         print("Author:{}".format(u.get_author()))
         print("Album:{}".format(u.get_album()))
+        print("Thumbnail:{}".format(u.get_thumbnail()))
 
         print("RSS path:{}".format(Url.find_rss_url(u)))
 
@@ -67,6 +68,7 @@ class PageDisplay(object):
                     index += 1
                 print("Entries:{}".format(index))
             if type(handler.p) is HtmlPage:
+                print("Favicon:{}".format(handler.p.get_favicon()))
                 print("meta title:{}".format(handler.p.get_meta_field("title")))
                 print(
                     "meta description:{}".format(
@@ -117,6 +119,6 @@ class PageDisplayParser(object):
         )
         self.parser.add_argument("--method", help="method. Choices: full, headless")
         self.parser.add_argument("--url", help="Url to fetch")
-        self.parser.add_argument("-v", "--verbose", action="store_true", help="Verbose")
+        self.parser.add_argument("-v", "--verbose", action="store_true", help="Verbose. For example: displays full contents")
 
         self.args = self.parser.parse_args()

@@ -55,45 +55,6 @@ class ViewsTest(FakeInternetTestCase):
         # redirect
         self.assertEqual(response.status_code, 302)
 
-    """
-    Entries
-    """
-
-    def test_entries(self):
-        url = reverse("{}:entries".format(LinkDatabase.name))
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
-    def test_entries_recent(self):
-        url = reverse("{}:entries-recent".format(LinkDatabase.name))
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
-    def test_entries_untagged(self):
-        url = reverse("{}:entries-untagged".format(LinkDatabase.name))
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
-    def test_entries_bookmarked(self):
-        url = reverse("{}:entries-bookmarked".format(LinkDatabase.name))
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
-    def test_entry_detail(self):
-        url = reverse("{}:entry-detail".format(LinkDatabase.name), args=[0])
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 404)
-
-    def test_entry_remove(self):
-        url = reverse("{}:entry-remove".format(LinkDatabase.name), args=[0])
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
 
     """ TODO
     def test_entry_download_music(self):
@@ -121,47 +82,6 @@ class ViewsTest(FakeInternetTestCase):
         self.assertEqual(response.status_code, 200)
     """
 
-    def test_entries_untagged(self):
-        url = reverse("{}:entries-untagged".format(LinkDatabase.name))
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
-    def test_omni_search_init(self):
-        url = reverse("{}:entries-omni-search-init".format(LinkDatabase.name))
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
-    def test_entries_search_init(self):
-        url = reverse("{}:entries-search-init".format(LinkDatabase.name))
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
-    def test_entries_archived_init(self):
-        url = reverse("{}:entries-archived-init".format(LinkDatabase.name))
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
-    def test_entries_bookmarked_init(self):
-        url = reverse("{}:entries-bookmarked-init".format(LinkDatabase.name))
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
-    def test_entries_recent_init(self):
-        url = reverse("{}:entries-recent-init".format(LinkDatabase.name))
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
-
-    def test_omni_search(self):
-        url = reverse("{}:entries-omni-search".format(LinkDatabase.name))
-        response = self.client.get(url)
-
-        self.assertEqual(response.status_code, 200)
 
     """
     Other views

@@ -32,7 +32,7 @@ class FeedreaderTest(FakeInternetTestCase):
         # default language
         p = FeedReader.parse(webpage_youtube_airpano_feed)
         self.assertEqual(p.feed.title, "AirPano VR")
-        self.assertEqual(p.feed.link, "https://www.youtube.com/channel/UCUSElbgKZpE4Xdh5aFWG-Ig")
+        self.assertEqual(p.feed.link, "http://www.youtube.com/channel/UCUSElbgKZpE4Xdh5aFWG-Ig")
         self.assertEqual(len(p.entries), 26)
 
     def test_the_hill(self):

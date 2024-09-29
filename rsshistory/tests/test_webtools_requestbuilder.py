@@ -74,52 +74,42 @@ class PageOptionsTest(FakeInternetTestCase):
 
     def test_use_browser__full(self):
         o = PageOptions()
-        o.use_full_browser = True
+        o.mode = "standard"
 
         # call tested function
         self.assertTrue(o.is_advanced_processing_required())
 
     def test_use_browser__headless(self):
         o = PageOptions()
-        o.use_headless_browser = True
+        o.mode = "headless"
 
         # call tested function
         self.assertTrue(o.is_advanced_processing_required())
 
     def test_use_browser__both(self):
         o = PageOptions()
-        o.use_headless_browser = True
-        o.use_full_browser = True
+        o.mode = "full"
 
         # call tested function
         self.assertTrue(o.is_advanced_processing_required())
 
     def test_use_basic_crawler__full(self):
         o = PageOptions()
-        o.use_full_browser = True
+        o.mode = "full"
 
         # call tested function
         self.assertFalse(o.use_basic_crawler())
 
     def test_use_basic_crawler__headless(self):
         o = PageOptions()
-        o.use_headless_browser = True
-
-        # call tested function
-        self.assertFalse(o.use_basic_crawler())
-
-    def test_use_basic_crawler__both(self):
-        o = PageOptions()
-        o.use_headless_browser = True
-        o.use_full_browser = True
+        o.mode = "headless"
 
         # call tested function
         self.assertFalse(o.use_basic_crawler())
 
     def test_use_basic_crawler__none(self):
         o = PageOptions()
-        o.use_headless_browser = False
-        o.use_full_browser = False
+        o.mode = "standard"
 
         # call tested function
         self.assertTrue(o.use_basic_crawler())
