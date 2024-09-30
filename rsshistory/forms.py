@@ -101,6 +101,7 @@ class ConfigForm(forms.ModelForm):
             "data_export_path",
             "data_import_path",
             "auto_store_thumbnails",
+            "favicon_internet_location",
             # features
             "enable_domain_support",
             "enable_keyword_support",
@@ -412,6 +413,7 @@ class InitSearchForm(forms.Form):
 
         attr = {"onchange": "this.form.submit()"}
         self.fields["search"].widget.attrs.update(size=self.init.get_cols_size())
+        self.fields["search"].widget.attrs["autofocus"] = True
 
 
 from django.forms.widgets import TextInput
@@ -654,6 +656,7 @@ class TagEntryForm(forms.Form):
         super().__init__(*args, **kwargs)
 
         self.fields["tag"].widget.attrs.update(size=self.init.get_cols_size())
+        self.fields["tag"].widget.attrs["autofocus"] = True
 
 
 class TagRenameForm(forms.Form):
@@ -663,6 +666,11 @@ class TagRenameForm(forms.Form):
 
     current_tag = forms.CharField(label="Current tag", max_length=100)
     new_tag = forms.CharField(label="New tag", max_length=100)
+
+    def __init__(self, *args, **kwargs):
+        self.init = UserRequest(args, kwargs)
+        super().__init__(*args, **kwargs)
+        self.fields["new_tag"].widget.attrs["autofocus"] = True
 
 
 class BackgroundJobForm(forms.Form):

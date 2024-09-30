@@ -19,16 +19,6 @@ hr {
     padding: 0px;
 }
 
-.mainbutton-icon {
-    width:2em;
-}
-
-.base-button-container a:link, .base-button-container a:visited, .base-button-container a:active {
-}
-
-.base-button-container a:hover {
-}
-
 .link-title {
     margin : 0px;
     padding: 0px;
@@ -57,17 +47,19 @@ hr {
      float: right;
 }
 
-.highlight_background {
+.mainbutton-icon {
+    width:2em;
+}
+
+/* simple buttons used by views */
+.content-icon {
+    width:1em;
 }
 
 /* Basic Content elements */
 
 .error-text {
     color : red;
-}
-
-.content-icon {
-    width:1em;
 }
 
 .icon-small {

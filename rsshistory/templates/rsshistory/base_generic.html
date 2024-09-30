@@ -35,7 +35,11 @@
 	<script src="{% static 'bootstrap/bootstrap.bundle5.3.3.min.js' %}"></script>
 	<!-- Third party things above -->
 
-        <link rel="shortcut icon" type="image/png" href="{% static 'rsshistory/icons/favicon.ico' %}"/>
+        {% if config.favicon_internet_location %}
+        <link rel="shortcut icon" type="image" href="{{config.favicon_internet_location}}"/>
+        {% else %}
+        <link rel="shortcut icon" type="image" href="{% static 'rsshistory/icons/favicon.ico' %}"/>
+        {% endif %}
 
         {% if config.instance_internet_location %}
         <link rel="search" href="opensearch.xml" type="application/opensearchdescription+xml" title="Django archive search">

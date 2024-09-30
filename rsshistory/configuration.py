@@ -20,7 +20,7 @@ version is split into three digits:
  if a change requires the model to be changed, then second digit is updated, patch is set to 0
  if something should be released to public, then release version changes
 """
-__version__ = "0.86.7"
+__version__ = "0.86.8"
 
 
 class Configuration(object):
@@ -46,6 +46,7 @@ class Configuration(object):
             "app_name": str(LinkDatabase.name),
             "app_title": config_entry.instance_title,
             "app_description": config_entry.instance_description,
+            "app_favicon": config_entry.favicon_internet_location,
             "admin_email": "renegat@renegat0x0.ddns.net",
             "admin_user": config_entry.admin_user,
             "app_version": __version__,
@@ -57,18 +58,8 @@ class Configuration(object):
         if len(self.context) == 0:
             config_entry = ConfigurationEntry.get()
 
-            self.context = {
-                "page_title": "[{}]".format(self.app_name),
-                "app_name": str(self.app_name),
-                "app_title": config_entry.instance_title,
-                "app_description": config_entry.instance_description,
-                "admin_email": "renegat@renegat0x0.ddns.net",
-                "admin_user": self.config_entry.admin_user,
-                "app_version": self.version,
-                "config": self.config_entry,
-                "base_generic": str(Path(self.app_name) / "base_generic.html"),
-                "c": self,
-            }
+            self.context = Configuration.get_context_minimal()
+            self.context["c"] = self
         else:
             return self.context
 

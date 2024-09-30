@@ -10,6 +10,7 @@ from django.db import models
 from django.urls import reverse
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.templatetags.static import static
 
 from ..webtools.ipc import DEFAULT_PORT
 from utils.dateutils import DateUtils
@@ -69,7 +70,13 @@ class ConfigurationEntry(models.Model):
     instance_internet_location = models.CharField(
         blank=True,
         max_length=200,
-        help_text="Instance location. For example https://my-domain.com/apps/rsshistory",
+        help_text="Instance location. For example https://my-domain.com/apps/rsshistory/",
+    )
+
+    favicon_internet_location = models.CharField(
+        default="",
+        max_length=200,
+        help_text="Instance location. For example https://my-domain.com/apps/rsshistory/static/rsshistory/icons/favicon.ico",
     )
 
     admin_user = models.CharField(

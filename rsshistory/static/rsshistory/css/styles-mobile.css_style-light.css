@@ -47,16 +47,6 @@ option:hover {
     white-space: normal;
 }
 
-.mainbutton-icon {
-    width:2em;
-}
-
-.base-button-container a:link, .base-button-container a:visited, .base-button-container a:active {
-}
-
-.base-button-container a:hover {
-}
-
 .link-title {
     margin : 0;
     padding: 0px;
@@ -82,17 +72,18 @@ option:hover {
 .link-list a:hover {
 }
 
-.highlight_background {
+.mainbutton-icon {
+    width:2em;
+}
+
+.content-icon {
+    width:1em;
 }
 
 /* Basic Content elements */
 
 .error-text {
     color : red;
-}
-
-.content-icon {
-    width:1em;
 }
 
 .icon-small {
